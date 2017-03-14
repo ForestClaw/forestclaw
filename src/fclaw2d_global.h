@@ -80,7 +80,7 @@ typedef struct fclaw2d_global
     int gparms_owned;                   /**< Did we allocate \a gparms? */
     fclaw_options_t *gparms;            /**< Option values for forestclaw. */
  
-    fclaw_package_container_t *pkgs;    /**< Solver packages for internal use. */
+    fclaw_package_container_t *pkg_container;    /**< Solver packages for internal use. */
  
     fclaw2d_domain_t *domain;
 }
@@ -96,14 +96,17 @@ typedef struct fclaw2d_global_iterate
  * \param [in] gparms           If not NULL, we borrow this gparms pointer.
  *                              If NULL, we allocate gparms ourselves.
  */
-fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain);
+//fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain);
+fclaw2d_global_t* fclaw2d_global_new ();
+void fclaw2d_global_set_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain);
+void fclaw2d_global_set_gparms (fclaw2d_global_t* glob, fclaw_options_t * gparms);
 
 /** Free a global structures and all members. */
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 
 /** Access the package container from the global type. */
-fclaw_package_container_t *fclaw2d_global_get_container (fclaw2d_global_t *
-                                                         glob);
+fclaw_package_container_t* fclaw2d_global_get_container (fclaw2d_global_t *
+                                                                glob);
 
 fclaw_app_t* fclaw2d_global_get_app(fclaw2d_global_t* glob);
 

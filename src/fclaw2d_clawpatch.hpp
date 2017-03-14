@@ -113,10 +113,6 @@ public :
 
     FArrayBox area;
     FArrayBox curvature;  // ???
-
-    /* This is an opaque pointer */
-    fclaw_package_data_t *package_data_ptr;
-
 };
 
 fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);

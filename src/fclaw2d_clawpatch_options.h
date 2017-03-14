@@ -23,51 +23,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPACK46_OPTIONS_H
-#define FCLAW2D_CLAWPACK46_OPTIONS_H
+/** \file
+ *
+ * Routines for handling general ForestClaw input options.
+ *
+ */
 
-#include <fclaw_options.h>
+#ifndef FCLAW2D_CLAWPATCH_OPTIONS_H
+#define FCLAW2D_CLAWPATCH_OPTIONS_H
+
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
-}
+}                               /* need this because indent is dumb */
 #endif
 #endif
 
-/* Only one copy of clawpack46_options for each run */
-typedef struct fc2d_clawpack46_options
+typedef struct fclaw2d_clawpatch_options
 {
-    int mwaves;
+    /* These are constant for all clawpatch's */
+    int mx;
+    int my;
     int maux;
+    int mbc;
 
-    const char *order_string;
-    int *order;
+    int meqn;
 
-    int *mthlim;
-    const char *mthlim_string;
+    int is_registered;
 
-    int method[7];
-    int mcapa;
-    int src_term;
-    int use_fwaves;
-}
-fc2d_clawpack46_options_t;
+} fclaw2d_clawpatch_options_t;
 
-fclaw_exit_type_t fc2d_clawpack46_postprocess (fc2d_clawpack46_options_t *
-                                               clawopt);
-fclaw_exit_type_t fc2d_clawpack46_check (fc2d_clawpack46_options_t * clawopt);
-void fc2d_clawpack46_reset (fc2d_clawpack46_options_t * clawopt);
+fclaw2d_clawpatch_options_t *
+fclaw2d_clawpatch_register(fclaw_app_t* app, const char* configfile, fclaw2d_global_t* glob);
+fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob);
 
-fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
-                                                              const char *configfile);
 
 #ifdef __cplusplus
 #if 0
-{
+{                               /* need this because indent is dumb */
 #endif
 }
 #endif
 
-#endif
+#endif /* !FCLAW2D_OPTIONS_H */

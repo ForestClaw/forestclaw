@@ -23,7 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_global.h>
+#include <fclaw_package.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_patch.h>
 
 const int SpaceDim = FCLAW2D_SPACEDIM;
 const int NumFaces = FCLAW2D_NUMFACES;
@@ -31,6 +34,40 @@ const int p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
 const int NumCorners = FCLAW2D_NUM_CORNERS;
 const int NumSiblings = FCLAW2D_NUM_SIBLINGS;
 
+fclaw2d_global_t* fclaw2d_global_new ()
+{
+    fclaw2d_global_t *glob;
+
+    glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
+    glob->pkg_container = fclaw_package_container_new ();
+
+    return glob;
+}
+void
+fclaw2d_global_set_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
+{
+    glob->domain = domain;
+    glob->mpicomm = domain->mpicomm;
+    glob->mpisize = domain->mpisize;
+    glob->mpirank = domain->mpirank;
+}
+
+void
+fclaw2d_global_set_gparms (fclaw2d_global_t* glob, fclaw_options_t * gparms)
+{
+    if (gparms == NULL)
+    {
+        glob->gparms_owned = 1;
+        glob->gparms = FCLAW_ALLOC_ZERO (fclaw_options_t, 1);
+    }
+    else
+    {
+        glob->gparms_owned = 0;
+        glob->gparms = gparms;
+    }
+}
+
+#if 0
 fclaw2d_global_t *
 fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain)
 {
@@ -59,13 +96,13 @@ fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain)
 
     return glob;
 }
-
+#endif
 void
 fclaw2d_global_destroy (fclaw2d_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
 
-    fclaw_package_container_destroy (glob->pkgs);
+    fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
 
     if (glob->gparms_owned)
     {
@@ -78,9 +115,9 @@ fclaw_package_container_t *
 fclaw2d_global_get_container (fclaw2d_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
-    FCLAW_ASSERT (glob->pkgs != NULL);
+    FCLAW_ASSERT (glob->pkg_container != NULL);
 
-    return glob->pkgs;
+    return glob->pkg_container;
 }
 
 fclaw_app_t* fclaw2d_global_get_app(fclaw2d_global_t* glob)
