@@ -119,19 +119,6 @@ const fclaw_app_options_vtable_t fclaw2d_clawpatch_options_vtable = {
     clawpatch_options_destroy
 };
 
-// fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw_app_t* app)
-// {
-//     fclaw2d_clawpatch_options_t*  clawpatch_options;
-//     clawpatch_options = (fclaw2d_clawpatch_options_t*) fclaw_app_get_attribute(app,"clawpatch",NULL);
-//     FCLAW_ASSERT(clawpatch_options != NULL);
-//     return clawpatch_options;
-// }
-
-static const fclaw_package_vtable_t clawpatch_vtable_notused = {
-    NULL, // patch_data_new
-    NULL //patch_data_delete
-};
-
 fclaw2d_clawpatch_options_t *
 fclaw2d_clawpatch_register(fclaw_app_t* app, const char* configfile, fclaw2d_global_t* glob)
 {

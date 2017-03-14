@@ -97,7 +97,7 @@ fclaw_package_container_destroy_app (fclaw_app_t *app)
 
 int
 fclaw_package_container_add (fclaw_package_container_t * pkg_container,
-                             void *opt, const fclaw_package_vtable_t *vtable)
+                             void *opt)
 {
     int id;
     fclaw_package_t *new_pkg;
@@ -115,15 +115,14 @@ fclaw_package_container_add (fclaw_package_container_t * pkg_container,
 
 int
     fclaw_package_container_add_pkg(fclaw_app_t* app,
-                                    void* opt,
-                                    const fclaw_package_vtable_t *vtable)
+                                    void* opt)
 {
     fclaw_package_container_t *pkg_container;
 
     pkg_container = (fclaw_package_container_t *)
       fclaw_app_get_attribute (app, "packages", NULL);
 
-    return fclaw_package_container_add (pkg_container, opt, vtable);
+    return fclaw_package_container_add (pkg_container, opt);
 }
 
 int fclaw_package_container_add_pkg_new(fclaw2d_global_t* glob,
@@ -131,7 +130,7 @@ int fclaw_package_container_add_pkg_new(fclaw2d_global_t* glob,
 {
     fclaw_package_container_t *pkg_container = 
           (fclaw_package_container_t *) glob->pkg_container;
-    return fclaw_package_container_add (pkg_container, opt, NULL);
+    return fclaw_package_container_add (pkg_container, opt);
 }
 
 void* fclaw_package_get_options(fclaw_app_t* app, int id)

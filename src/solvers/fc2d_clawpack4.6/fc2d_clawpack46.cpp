@@ -125,44 +125,6 @@ fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_domain_t *domain)
     return (fc2d_clawpack46_options_t*) fclaw_package_get_options(app,id);
 }
 
-#if 0
-/* Patch data is stored in each fclaw2d_clawpatch_t */
-struct patch_aux_data
-{
-    // FArrayBox auxarray;
-    // int maux;
-};
-
-static patch_aux_data*
-get_patch_data(fclaw2d_clawpatch_t *cp)
-{
-    patch_aux_data *wp =
-        (patch_aux_data*) cp->clawpack_patch_data(s_clawpack46_package_id);
-    return wp;
-}
-
-static void*
-patch_data_new()
-{
-    patch_aux_data* data;
-    data = new patch_aux_data;
-    return (void*) data;
-}
-
-static void
-patch_data_delete(void *data)
-{
-    patch_aux_data *pd = (patch_aux_data*) data;
-    FCLAW_ASSERT(pd != NULL);
-    delete pd;
-}
-#endif
-
-static const fclaw_package_vtable_t clawpack46_patch_vtable = {
-    NULL, // patch_data_new
-    NULL //patch_data_delete
-};
-
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
@@ -180,8 +142,7 @@ void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile)
     /* Don't register a package more than once */
     FCLAW_ASSERT(s_clawpack46_package_id == -1);
 
-    id = fclaw_package_container_add_pkg(app,clawopt,
-                                         &clawpack46_patch_vtable);
+    id = fclaw_package_container_add_pkg(app,clawopt);
 
     s_clawpack46_package_id = id;
 }
