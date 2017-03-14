@@ -443,7 +443,6 @@ void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
         }
     }
 
-    // fc2d_clawpack46_define_auxaray (domain, this_patch);
     fclaw_package_patch_data_new(fclaw2d_clawpatch_t::app,cp->package_data_ptr);
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
@@ -529,9 +528,9 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_global_t *glob,
    when partitioning the domain
    --------------------------------------------------------------*/
 
-size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
+size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -554,18 +553,18 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_domain_t* domain)
     return psize*sizeof(double);
 }
 
-void fclaw2d_clawpatch_local_ghost_alloc(fclaw2d_domain_t* domain,
-                                           fclaw2d_patch_t* this_patch,
-                                           void** q)
+void fclaw2d_clawpatch_local_ghost_alloc(fclaw2d_global_t* glob,
+                                         fclaw2d_patch_t* this_patch,
+                                         void** q)
 {
     /* Create contiguous block for data and area */
-    int msize = fclaw2d_clawpatch_ghost_packsize(domain);
+    int msize = fclaw2d_clawpatch_ghost_packsize(glob);
     *q = (void*) FCLAW_ALLOC(double,msize);
     FCLAW_ASSERT(*q != NULL);
 
 }
 
-void fclaw2d_clawpatch_local_ghost_free(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_local_ghost_free(fclaw2d_global_t* glob,
                                         void **q)
 {
     FCLAW_FREE(*q);
@@ -579,7 +578,6 @@ void ghost_comm(fclaw2d_global_t* glob,
                 double *qpack, int time_interp,
                 int packmode)
 {
-    fclaw2d_domain_t *domain = glob->domain;
     int meqn;
     double *qthis;
     double *area;
@@ -617,7 +615,7 @@ void ghost_comm(fclaw2d_global_t* glob,
       qpack += qareasize;
       int extrasize = psize - qareasize;
       FCLAW_ASSERT(clawpatch_vt()->ghostpack_extra != NULL);
-      clawpatch_vt()->ghostpack_extra(domain,this_patch,mint,qpack,extrasize,packmode,&ierror);
+      clawpatch_vt()->ghostpack_extra(glob,this_patch,mint,qpack,extrasize,packmode,&ierror);
       FCLAW_ASSERT(ierror == 0);
     }
 
@@ -673,12 +671,14 @@ size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_global_t* glob)
     return size*sizeof(double);
 }
 
-void fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_partition_pack(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
                                       void *user)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
@@ -689,12 +689,14 @@ void fclaw2d_clawpatch_partition_pack(fclaw2d_domain_t *domain,
     cp->griddata.copyToMemory(patch_data);
 }
 
-void fclaw2d_clawpatch_partition_unpack(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_partition_unpack(fclaw2d_global_t *glob,
                                         fclaw2d_patch_t *this_patch,
                                         int this_block_idx,
                                         int this_patch_idx,
                                         void *user)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];

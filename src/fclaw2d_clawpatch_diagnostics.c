@@ -43,10 +43,10 @@ typedef struct {
    Create and initialize a new accumulator
    ------------------------------------------------------------- */
 
-void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
                                               void **acc_patch)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
 
     error_info_t *error_data;
     int meqn;
@@ -65,11 +65,11 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_domain_t *domain,
 
 }
 
-void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_domain_t *domain,
+void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
                                          void* patch_acc)
 {
     error_info_t *error_data = (error_info_t*) patch_acc;
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
     int meqn;
 
     meqn = gparms->meqn;
@@ -149,12 +149,14 @@ void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
 
 
 /* Accumulate the errors computed above */
-void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
                                           void* patch_acc,
                                           int init_flag)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+    
     error_info_t *error_data = (error_info_t*) patch_acc;
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
 
     int meqn;
     double total_area;
@@ -214,7 +216,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_domain_t* domain,
     }
 }
 
-void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
                                             void** patch_acc)
 {
     error_info_t *error_data = *((error_info_t**) patch_acc);

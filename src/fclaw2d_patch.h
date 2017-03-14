@@ -166,13 +166,13 @@ void fclaw2d_patch_build_remote_ghost(fclaw2d_global_t *glob,
                                       int patchno,
                                       void *user);
 
-size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain);
+size_t fclaw2d_patch_ghost_packsize(fclaw2d_global_t* glob);
 
-void fclaw2d_patch_alloc_local_ghost(fclaw2d_domain_t* domain,
+void fclaw2d_patch_alloc_local_ghost(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* this_patch,
                                      void** q);
 
-void fclaw2d_patch_free_local_ghost(fclaw2d_domain_t* domain,
+void fclaw2d_patch_free_local_ghost(fclaw2d_global_t* glob,
                                     void **q);
 
 
@@ -445,26 +445,26 @@ typedef void (*fclaw2d_patch_build_ghost_t)(fclaw2d_global_t *glob,
                                             int patchno,
                                             void *user);
 
-typedef size_t (*fclaw2d_patch_ghost_packsize_t)(fclaw2d_domain_t* domain);
+typedef size_t (*fclaw2d_patch_ghost_packsize_t)(fclaw2d_global_t* glob);
 
-typedef void (*fclaw2d_patch_local_ghost_alloc_t)(fclaw2d_domain_t* domain,
+typedef void (*fclaw2d_patch_local_ghost_alloc_t)(fclaw2d_global_t* glob,
                                                  fclaw2d_patch_t* this_patch,
                                                  void** q);
 
-typedef void (*fclaw2d_patch_local_ghost_free_t)(fclaw2d_domain_t* domain,
+typedef void (*fclaw2d_patch_local_ghost_free_t)(fclaw2d_global_t* glob,
                                                  void **q);
 
-typedef void (*fclaw2d_patch_partition_pack_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_partition_pack_t)(fclaw2d_global_t *glob,
                                                fclaw2d_patch_t *this_patch,
                                                int this_block_idx,
                                                int this_patch_idx,
                                                void *user);
 
-typedef void (*fclaw2d_patch_partition_unpack_t)(fclaw2d_domain_t *domain,
-                                           fclaw2d_patch_t *this_patch,
-                                           int this_block_idx,
-                                           int this_patch_idx,
-                                           void *user);
+typedef void (*fclaw2d_patch_partition_unpack_t)(fclaw2d_global_t *glob,
+                                                 fclaw2d_patch_t *this_patch,
+                                                 int this_block_idx,
+                                                 int this_patch_idx,
+                                                 void *user);
 
 typedef size_t (*fclaw2d_patch_partition_packsize_t)(fclaw2d_global_t* glob);
 

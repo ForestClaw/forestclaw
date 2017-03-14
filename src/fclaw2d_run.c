@@ -90,11 +90,8 @@ void save_time_step(fclaw2d_global_t *glob)
    -------------------------------------------------------------------------------- */
 static void outstyle_0(fclaw2d_global_t *glob)
 {
-
-    fclaw2d_domain_t** domain = &glob->domain;
-
     fclaw2d_diagnostics_accumulator_t acc;
-    fclaw2d_diagnostics_initialize(*domain,&acc);
+    fclaw2d_diagnostics_initialize(glob,&acc);
 
     int iframe;
 
@@ -131,7 +128,7 @@ void outstyle_1(fclaw2d_global_t *glob)
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
     fclaw2d_diagnostics_accumulator_t acc;
-    fclaw2d_diagnostics_initialize(*domain,&acc);
+    fclaw2d_diagnostics_initialize(glob,&acc);
 
     int iframe = 0;
 
@@ -303,7 +300,7 @@ void outstyle_1(fclaw2d_global_t *glob)
         iframe++;
         fclaw2d_output_frame(glob,iframe);
     }
-    fclaw2d_diagnostics_finalize(*domain,&acc);
+    fclaw2d_diagnostics_finalize(glob,&acc);
 }
 
 #if 0
@@ -321,7 +318,7 @@ void outstyle_3(fclaw2d_global_t *glob)
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
 
     fclaw2d_diagnostics_accumulator_t acc;
-    fclaw2d_diagnostics_initialize(*domain,&acc);
+    fclaw2d_diagnostics_initialize(glob,&acc);
 
     int init_flag = 1;
     fclaw2d_diagnostics_gather(glob,&acc,init_flag);
@@ -445,7 +442,7 @@ void outstyle_3(fclaw2d_global_t *glob)
             fclaw2d_output_frame(glob,iframe);
         }
     }
-    fclaw2d_diagnostics_finalize(*domain,&acc);
+    fclaw2d_diagnostics_finalize(glob,&acc);
 }
 
 
@@ -458,7 +455,7 @@ void outstyle_4(fclaw2d_global_t *glob)
 #endif
 
     fclaw2d_diagnostics_accumulator_t acc;
-    fclaw2d_diagnostics_initialize(*domain,&acc);
+    fclaw2d_diagnostics_initialize(glob,&acc);
 
     /* Write out an initial time file */
     int iframe = 0;
@@ -520,7 +517,7 @@ void outstyle_4(fclaw2d_global_t *glob)
             fclaw2d_output_frame(glob,iframe);
         }
     }
-    fclaw2d_diagnostics_finalize(*domain,&acc);
+    fclaw2d_diagnostics_finalize(glob,&acc);
 }
 
 

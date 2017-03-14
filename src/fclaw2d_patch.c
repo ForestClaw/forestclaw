@@ -329,25 +329,25 @@ void fclaw2d_patch_unpack_remote_ghost(fclaw2d_global_t* glob,
                              this_patch_idx, qdata, time_interp);
 }
 
-size_t fclaw2d_patch_ghost_packsize(fclaw2d_domain_t* domain)
+size_t fclaw2d_patch_ghost_packsize(fclaw2d_global_t* glob)
 {
     FCLAW_ASSERT(patch_vt()->ghost_packsize != NULL);
-    return patch_vt()->ghost_packsize(domain);
+    return patch_vt()->ghost_packsize(glob);
 }
 
-void fclaw2d_patch_alloc_local_ghost(fclaw2d_domain_t* domain,
+void fclaw2d_patch_alloc_local_ghost(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* this_patch,
                                      void** q)
 {
     FCLAW_ASSERT(patch_vt()->local_ghost_alloc != NULL);
-    patch_vt()->local_ghost_alloc(domain, this_patch, q);
+    patch_vt()->local_ghost_alloc(glob, this_patch, q);
 }
 
-void fclaw2d_patch_free_local_ghost(fclaw2d_domain_t* domain,
+void fclaw2d_patch_free_local_ghost(fclaw2d_global_t* glob,
                                     void **q)
 {
     FCLAW_ASSERT(patch_vt()->local_ghost_free != NULL);
-    patch_vt()->local_ghost_free(domain, q);
+    patch_vt()->local_ghost_free(glob, q);
 }
 
 void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
@@ -358,7 +358,7 @@ void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     FCLAW_ASSERT(patch_vt()->partition_pack != NULL);
-    patch_vt()->partition_pack(domain,
+    patch_vt()->partition_pack(g->glob,
                                this_patch,
                                this_block_idx,
                                this_patch_idx,
@@ -406,7 +406,7 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
     /* This copied q data from memory */
     FCLAW_ASSERT(patch_vt()->partition_pack != NULL);
 
-    patch_vt()->partition_unpack(glob->domain,
+    patch_vt()->partition_unpack(glob,
                                  this_patch,
                                  this_block_idx,
                                  this_patch_idx,
