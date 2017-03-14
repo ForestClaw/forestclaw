@@ -74,7 +74,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
 
     /* This mapping context is needed by fortran mapping functions */
-    fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(*domain);
+    fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(glob);
     SET_CONTEXT(&cont);
 
     int maxthreads = 0;

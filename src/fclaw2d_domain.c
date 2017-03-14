@@ -241,13 +241,13 @@ const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
     return fclaw2d_forestclaw_get_options(domain);
 }
 
-fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain)
+fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_global_t* glob)
 {
     fclaw2d_map_context_t* cont;
-  cont = (fclaw2d_map_context_t*)
-         fclaw2d_domain_attribute_access (domain, "fclaw_map_context", NULL);
-  FCLAW_ASSERT (cont != NULL);
-  return cont;
+    cont = (fclaw2d_map_context_t*)
+           fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
+    FCLAW_ASSERT (cont != NULL);
+    return cont;
 }
 
 #ifdef __cplusplus

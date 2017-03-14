@@ -48,7 +48,7 @@ void fclaw2d_metric_compute_area(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double *area = fclaw2d_clawpatch_get_area(glob->domain,this_patch);
+    double *area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     /* Could make this a virtual function, but what is the signature?
        vt.fort_compute_area(...) */
@@ -74,7 +74,7 @@ void fclaw2d_metric_compute_area_exact(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double *area = fclaw2d_clawpatch_get_area(glob->domain,this_patch);
+    double *area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     int size = (2*(mbc+1) + mx)*(2*(mbc+1) + my);
     double *favg = FCLAW_ALLOC(double,size);
@@ -102,7 +102,7 @@ void fclaw2d_metric_area_set_ghost(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(glob->domain,this_patch);
+    area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     /* Set area in ghost cells not set above */
     const amr_options_t* gparms = glob->gparms;
@@ -132,7 +132,7 @@ void fclaw2d_metric_area_set_ghost_exact(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(glob->domain,this_patch);
+    area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     /* Not needed, but seems to be bad form to send in a NULL */
     int size = (2*(mbc+1) + mx)*(2*(mbc+1) + my);
@@ -165,7 +165,7 @@ void fclaw2d_metric_setup_mesh(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob->domain,this_patch,
+    fclaw2d_clawpatch_metric_data(glob,this_patch,
                                   &xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     /* Compute centers and corners of mesh cell */
@@ -192,10 +192,10 @@ void fclaw2d_metric_compute_normals(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob->domain,this_patch,
+    fclaw2d_clawpatch_metric_data(glob,this_patch,
                                   &xp,&yp,&zp,&xd,&yd,&zd,&area);
 
-    fclaw2d_clawpatch_metric_data2(glob->domain,this_patch,
+    fclaw2d_clawpatch_metric_data2(glob,this_patch,
                                    &xnormals,&ynormals,
                                    &xtangents,&ytangents,
                                    &surfnormals,&edgelengths,

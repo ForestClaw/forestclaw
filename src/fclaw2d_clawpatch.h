@@ -57,20 +57,20 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
                                  double* dx, double* dy);
 
 
-void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_metric_data(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch,
                                    double **xp, double **yp, double **zp,
                                    double **xd, double **yd, double **zd,
                                    double **area);
 
-void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_metric_data2(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,
                                     double **xtangents, double **ytangents,
                                     double **surfnormals, double ** edgelengths,
                                     double **curvature);
 
-double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
+double* fclaw2d_clawpatch_get_area(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch);
 
 void fclaw2d_clawpatch_soln_data(fclaw2d_global_t* glob,

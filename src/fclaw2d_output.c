@@ -244,13 +244,13 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
     double dx,dy,xlower,ylower;
 
 
-    cont = fclaw2d_domain_get_map_context(glob->domain);
+    cont = fclaw2d_domain_get_map_context(glob);
 
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
 #if 0
-    fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
+    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     const double xlower = cp->xlower ();

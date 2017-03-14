@@ -47,13 +47,13 @@ void fclaw2d_metric_average_area(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    areacoarse = fclaw2d_clawpatch_get_area(glob->domain,coarse_patch);
+    areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
 
     for(igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
 
-        areafine = fclaw2d_clawpatch_get_area(glob->domain,fine_patch);
+        areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
 
         FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }

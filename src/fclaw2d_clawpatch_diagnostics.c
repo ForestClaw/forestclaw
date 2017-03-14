@@ -112,7 +112,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_grid_data(s->glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(domain,this_patch);  /* Might be null */
+    area = fclaw2d_clawpatch_get_area(s->glob,this_patch);  /* Might be null */
     fclaw2d_clawpatch_soln_data(s->glob,this_patch,&q,&meqn);
 
     error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);

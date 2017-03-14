@@ -285,7 +285,7 @@ void metric_setup(fclaw2d_global_t* glob,
 }
 
 
-void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_metric_data(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch,
                                    double **xp, double **yp, double **zp,
                                    double **xd, double **yd, double **zd,
@@ -301,7 +301,7 @@ void fclaw2d_clawpatch_metric_data(fclaw2d_domain_t* domain,
     *area = cp->area.dataPtr();
 }
 
-void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_metric_data2(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* this_patch,
                                     double **xnormals, double **ynormals,
                                     double **xtangents, double **ytangents,
@@ -319,7 +319,7 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
     *edgelengths = cp->edge_lengths.dataPtr();
 }
 
-double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
+double* fclaw2d_clawpatch_get_area(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch)
 {
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
@@ -335,8 +335,6 @@ void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
                               int blockno, int patchno,
                               fclaw2d_build_mode_t build_mode)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
     /* We are getting closer to getting rid the class fclaw2d_clawpatch_t */
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
 
@@ -355,7 +353,7 @@ void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
     }
 
     fclaw2d_map_context_t* cont =
-        fclaw2d_domain_get_map_context(domain);
+        fclaw2d_domain_get_map_context(glob);
 
     int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
 
@@ -592,7 +590,7 @@ void ghost_comm(fclaw2d_global_t* glob,
     int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
 
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
-    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+    area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     int mx = gparms->mx;
     int my = gparms->my;
@@ -612,7 +610,7 @@ void ghost_comm(fclaw2d_global_t* glob,
 
     int qareasize = (wg - hole)*(meqn + packarea);
     clawpatch_vt()->fort_ghostpack_qarea(&mx,&my,&mbc,&meqn,&mint,qthis,area,
-                                      qpack,&qareasize,&packmode,&ierror);
+                                         qpack,&qareasize,&packmode,&ierror);
     FCLAW_ASSERT(ierror == 0);
     if (gparms->ghost_patch_pack_extra)
     {
@@ -741,8 +739,6 @@ void fclaw2d_clawpatch_average_face(fclaw2d_global_t *glob,
                                     int igrid,
                                     fclaw2d_transform_data_t* transform_data)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
@@ -752,8 +748,8 @@ void fclaw2d_clawpatch_average_face(fclaw2d_global_t *glob,
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
     /* These will be empty for non-manifolds cases */
-    areacoarse = fclaw2d_clawpatch_get_area(domain,coarse_patch);
-    areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
+    areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
+    areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
 
     mx = gparms->mx;
     my = gparms->my;
@@ -824,8 +820,6 @@ void fclaw2d_clawpatch_average_corner(fclaw2d_global_t *glob,
                                       fclaw_bool time_interp,
                                       fclaw2d_transform_data_t* transform_data)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
@@ -834,8 +828,8 @@ void fclaw2d_clawpatch_average_corner(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-    areacoarse = fclaw2d_clawpatch_get_area(domain,coarse_patch);
-    areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
+    areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
+    areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
 
     mx = gparms->mx;
     my = gparms->my;

@@ -111,7 +111,7 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t* glob,
     my = gparms->my;
     mbc = gparms->mbc;
 
-    fclaw2d_clawpatch_metric_data(glob->domain,coarse_patch,&xp,&yp,&zp,
+    fclaw2d_clawpatch_metric_data(glob,coarse_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&areacoarse);
     fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
@@ -124,7 +124,7 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 
         if (gparms->manifold)
         {
-            fclaw2d_clawpatch_metric_data(glob->domain,fine_patch,&xp,&yp,&zp,
+            fclaw2d_clawpatch_metric_data(glob,fine_patch,&xp,&yp,&zp,
                                           &xd,&yd,&zd,&areafine);
         }
 
@@ -159,7 +159,7 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
     my = gparms->my;
     mbc = gparms->mbc;
 
-    fclaw2d_clawpatch_metric_data(glob->domain,coarse_patch,&xp,&yp,&zp,
+    fclaw2d_clawpatch_metric_data(glob,coarse_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&areacoarse);
     fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
@@ -171,7 +171,7 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
 
         if (gparms->manifold)
         {
-            fclaw2d_clawpatch_metric_data(glob->domain,fine_patch,&xp,&yp,&zp,
+            fclaw2d_clawpatch_metric_data(glob,fine_patch,&xp,&yp,&zp,
                                           &xd,&yd,&zd,&areafine);
         }
 

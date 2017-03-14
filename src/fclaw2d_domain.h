@@ -105,7 +105,7 @@ fclaw2d_domain_get_time(fclaw2d_domain_t *domain);
 
 /* Mapping context */
 fclaw2d_map_context_t*
-fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain);
+fclaw2d_domain_get_map_context(fclaw2d_global_t* glob);
 
 int
 fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
