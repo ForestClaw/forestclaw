@@ -123,11 +123,11 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
 
     int d = ddata->count_grids_per_proc;
     ddata->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
-    ddata->count_amr_advance = (d > 0) ? d : 1;   /* To avoid division by zero */
+    glob->count_amr_advance = (d > 0) ? d : 1;   /* To avoid division by zero */
 
-    double gpp = ddata->count_grids_per_proc/       ddata->count_amr_advance;
-    double glb = ddata->count_grids_local_boundary/ ddata->count_amr_advance;
-    double grb = ddata->count_grids_remote_boundary/ddata->count_amr_advance;
+    double gpp = ddata->count_grids_per_proc/       glob->count_amr_advance;
+    double glb = ddata->count_grids_local_boundary/ glob->count_amr_advance;
+    double grb = ddata->count_grids_remote_boundary/glob->count_amr_advance;
     double gint = gpp - glb;
 
     /* compute arithmetic mean of total advance steps per processor */
@@ -211,7 +211,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
 
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
                           "regrid %d %d %g\n", glob->mpisize,
-                          ddata->count_amr_advance,
+                          glob->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].average,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_GHOSTFILL].average,
@@ -221,7 +221,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
 
     SC_GLOBAL_ESSENTIALF ("Max/P %d advance %d %g exchange %d %g "
                           "regrid %d %d %g\n", glob->mpisize,
-                          ddata->count_amr_advance,
+                          glob->count_amr_advance,
                           stats[FCLAW2D_TIMER_ADVANCE].max,
                           ddata->count_ghost_exchange,
                           stats[FCLAW2D_TIMER_GHOSTFILL].max,

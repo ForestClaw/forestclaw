@@ -58,21 +58,20 @@ extern const int NumSiblings;
 typedef struct fclaw2d_global
 {
 
-#if 0
-    int count_set_clawpatch, count_delete_clawpatch;
-    int count_amr_advance, count_ghost_exchange, count_amr_regrid;
+    int count_amr_advance;
+    int count_ghost_exchange;
+    int count_amr_regrid;
     int count_amr_new_domain;
     int count_single_step;
     int count_multiproc_corner;
     int count_grids_per_proc;
     int count_grids_remote_boundary;
     int count_grids_local_boundary;
-    int is_latest_domain;
     fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
 
     /* Time at start of each subcycled time step */
     double curr_time;
-#endif
+
 	sc_MPI_Comm mpicomm;
     int mpisize;              /**< Size of communicator. */
     int mpirank;              /**< Rank of this process in \b mpicomm. */

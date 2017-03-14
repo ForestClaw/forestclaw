@@ -87,6 +87,7 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
     memcpy (ddata_new->timers, ddata_old->timers,
             sizeof (fclaw2d_timer_t) * FCLAW2D_TIMER_COUNT);
     ddata_new->is_latest_domain = 1;
+    
     ddata_new->count_amr_advance = ddata_old->count_amr_advance;
     ddata_new->count_ghost_exchange = ddata_old->count_ghost_exchange;
     ddata_new->count_amr_regrid = ddata_old->count_amr_regrid;
