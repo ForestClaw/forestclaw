@@ -154,10 +154,9 @@ fclaw2d_clawpatch_register(fclaw2d_global_t* glob, fclaw_app_t* app, const char*
     fclaw_app_set_attribute(app,"clawpatch",clawpatch_options);
 
     FCLAW_ASSERT(s_clawpatch_package_id == -1);
-    id = fclaw_package_container_add (glob->pkg_container, 
-                                      clawpatch_options,
-                                      &clawpatch_vtable_notused);
-
+    id = fclaw_package_container_add_pkg_new(glob,
+                                             clawpatch_options,
+                                             &clawpatch_vtable_notused);
     s_clawpatch_package_id = id;
 
     return clawpatch_options;
@@ -172,5 +171,6 @@ int fclaw2d_clawpatch_get_package_id (void)
 fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob)
 {
     int id = fclaw2d_clawpatch_get_package_id();
-    return (fclaw2d_clawpatch_options_t*) fclaw_package_get_options_new(glob->pkg_container, id);
+    return (fclaw2d_clawpatch_options_t*) 
+            fclaw_package_get_options_new(glob, id);
 }
