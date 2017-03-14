@@ -28,9 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include "fclaw2d_clawpatch.h"
 
-void torus_link_solvers(fclaw2d_domain_t *domain)
+void torus_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t *user =  torus_user_get_options(domain);
+    const user_options_t *user =  torus_user_get_options(glob);
 
     fclaw2d_vt()->problem_setup = &torus_problem_setup;
     fclaw2d_patch_vt()->setup = &torus_patch_setup;
@@ -77,9 +77,9 @@ void torus_link_solvers(fclaw2d_domain_t *domain)
     }
 }
 
-void torus_problem_setup(fclaw2d_domain_t *domain)
+void torus_problem_setup(fclaw2d_global_t *glob)
 {
-    const user_options_t* user = torus_user_get_options(domain);
+    const user_options_t* user = torus_user_get_options(glob);
     TORUS_SETPROB(&user->example,&user->alpha);
 }
 
@@ -88,7 +88,7 @@ void torus_patch_setup(fclaw2d_domain_t *domain,
                        int this_block_idx,
                        int this_patch_idx)
 {
-    const user_options_t* user = torus_user_get_options(domain);
+    const user_options_t* user = torus_user_get_options_old(domain);
 
     if (user->claw_version == 4)
     {
@@ -114,7 +114,7 @@ void torus_output_write_file(fclaw2d_domain_t *domain,
     double *q, *error;
     char matname1[11];
 
-    const user_options_t *user = torus_user_get_options(domain);
+    const user_options_t *user = torus_user_get_options_old(domain);
 
     t = fclaw2d_domain_get_time(domain);
 

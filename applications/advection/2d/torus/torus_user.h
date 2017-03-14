@@ -69,9 +69,9 @@ void TORUS_SETPROB(const int* example, const double* alpha);
 void     TORUS_FORT_WRITE_HEADER(char* matname1, char* matname2,
                                  double* time, int* meqn, int* ngrids);
 
-void torus_link_solvers(fclaw2d_domain_t *domain);
+void torus_link_solvers(fclaw2d_global_t *glob);
 
-void torus_problem_setup(fclaw2d_domain_t *domain);
+void torus_problem_setup(fclaw2d_global_t *glob);
 
 void torus_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
@@ -79,7 +79,8 @@ void torus_patch_setup(fclaw2d_domain_t *domain,
                        int this_patch_idx);
 
 
-const user_options_t* torus_user_get_options(fclaw2d_domain_t* domain);
+const user_options_t* torus_user_get_options(fclaw2d_global_t* glob);
+const user_options_t* torus_user_get_options_old(fclaw2d_domain_t* domain);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
