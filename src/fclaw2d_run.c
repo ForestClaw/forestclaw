@@ -56,13 +56,14 @@ void cb_restore_time_step(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
-    fclaw2d_patch_restore_step(domain,this_patch);
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_patch_restore_step(s->glob,this_patch);
 }
 
 static
-void restore_time_step(fclaw2d_domain_t *domain)
+void restore_time_step(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_iterate_patches(domain,cb_restore_time_step,(void *) NULL);
+    fclaw2d_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
 }
 
 static
@@ -72,13 +73,14 @@ void cb_save_time_step(fclaw2d_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    fclaw2d_patch_save_step(domain,this_patch);
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_patch_save_step(s->glob,this_patch);
 }
 
 static
-void save_time_step(fclaw2d_domain_t *domain)
+void save_time_step(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_iterate_patches(domain,cb_save_time_step,(void *) NULL);
+    fclaw2d_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
 }
 
 
@@ -172,7 +174,7 @@ void outstyle_1(fclaw2d_global_t *glob)
             /* In case we have to reject this step */
             if (!gparms->use_fixed_dt)
             {
-                save_time_step(*domain);
+                save_time_step(glob);
             }
 
             /* Use the tolerance to make sure we don't take a tiny time
@@ -235,7 +237,7 @@ void outstyle_1(fclaw2d_global_t *glob)
                                    "retaking time step\n");
                 if (!gparms->use_fixed_dt)
                 {
-                    restore_time_step(*domain);
+                    restore_time_step(glob);
 
                     /* Modify dt_level0 from step used. */
                     dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
@@ -372,7 +374,7 @@ void outstyle_3(fclaw2d_global_t *glob)
         /* In case we have to reject this step */
         if (!gparms->use_fixed_dt)
         {
-            save_time_step(*domain);
+            save_time_step(glob);
         }
 
         /* Get current domain data since it may change during regrid */
@@ -401,7 +403,7 @@ void outstyle_3(fclaw2d_global_t *glob)
             if (!gparms->use_fixed_dt)
             {
                 fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-                restore_time_step(*domain);
+                restore_time_step(glob);
 
                 dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
 

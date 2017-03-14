@@ -469,20 +469,20 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
     }
 }
 
-void fclaw2d_patch_restore_step(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch)
+void fclaw2d_patch_restore_step(fclaw2d_global_t* glob,
+                                fclaw2d_patch_t* this_patch)
 {
     FCLAW_ASSERT(patch_vt()->restore_step != NULL);
 
-    patch_vt()->restore_step(domain, this_patch);
+    patch_vt()->restore_step(glob, this_patch);
 }
 
 /* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
-void fclaw2d_patch_save_step(fclaw2d_domain_t* domain,
+void fclaw2d_patch_save_step(fclaw2d_global_t* glob,
                              fclaw2d_patch_t* this_patch)
 {
     FCLAW_ASSERT(patch_vt()->save_step != NULL);
-    patch_vt()->save_step(domain, this_patch);
+    patch_vt()->save_step(glob, this_patch);
 }
 
 void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
@@ -597,30 +597,29 @@ int fclaw2d_patch_tag4coarsening(fclaw2d_global_t *glob,
                                       blockno, patchno);
 }
 
-void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
-                                             fclaw2d_patch_t* coarse_patch,
-                                             fclaw2d_patch_t* fine_patches,
-                                             int this_blockno, int coarse_patchno,
-                                             int fine0_patchno)
-
+void fclaw2d_patch_interpolate2fine(fclaw2d_global_t* glob,
+                                    fclaw2d_patch_t* coarse_patch,
+                                    fclaw2d_patch_t* fine_patches,
+                                    int this_blockno, int coarse_patchno,
+                                    int fine0_patchno)
 {
     FCLAW_ASSERT(patch_vt()->interpolate2fine != NULL);
 
-    patch_vt()->interpolate2fine(domain,coarse_patch,fine_patches,
+    patch_vt()->interpolate2fine(glob,coarse_patch,fine_patches,
                                  this_blockno,coarse_patchno,
                                  fine0_patchno);
 }
 
-void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
-                                         fclaw2d_patch_t *fine_patches,
-                                         fclaw2d_patch_t *coarse_patch,
-                                         int blockno, int fine0_patchno,
-                                         int coarse_patchno)
+void fclaw2d_patch_average2coarse(fclaw2d_global_t *glob,
+                                  fclaw2d_patch_t *fine_patches,
+                                  fclaw2d_patch_t *coarse_patch,
+                                  int blockno, int fine0_patchno,
+                                  int coarse_patchno)
 
 {
     FCLAW_ASSERT(patch_vt()->average2coarse != NULL);
 
-    patch_vt()->average2coarse(domain,fine_patches,coarse_patch,
+    patch_vt()->average2coarse(glob,fine_patches,coarse_patch,
                                blockno,fine0_patchno,coarse_patchno);
 }
 

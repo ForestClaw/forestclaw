@@ -38,25 +38,25 @@ extern "C"
 #endif
 
 int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
-                                  int blockno, int patchno,
-                                  int initflag);
+                                     fclaw2d_patch_t *this_patch,
+                                     int blockno, int patchno,
+                                     int initflag);
 
 int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
-                                  int blockno, int patchno);
+                                     fclaw2d_patch_t *this_patch,
+                                     int blockno, int patchno);
 
-void fclaw2d_clawpatch_average2coarse(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *fine_siblings,
-                                   fclaw2d_patch_t *coarse_patch,
-                                   int blockno, int fine_patchno,
-                                   int coarse_patchno);
+void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
+                                      fclaw2d_patch_t *fine_siblings,
+                                      fclaw2d_patch_t *coarse_patch,
+                                      int blockno, int fine_patchno,
+                                      int coarse_patchno);
 
-void fclaw2d_clawpatch_interpolate2fine(fclaw2d_domain_t* domain,
-                                     fclaw2d_patch_t *coarse_patch,
-                                     fclaw2d_patch_t* fine_patch,
-                                     int this_blockno, int coarse_patchno,
-                                     int fine_patchno);
+void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t *glob,
+                                        fclaw2d_patch_t *coarse_patch,
+                                        fclaw2d_patch_t* fine_patch,
+                                        int this_blockno, int coarse_patchno,
+                                        int fine_patchno);
 
 #ifdef __cplusplus
 #if 0

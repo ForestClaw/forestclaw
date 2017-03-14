@@ -32,9 +32,7 @@ int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
                                   int blockno, int patchno,
                                   int initflag)
 {
-    fclaw2d_domain_t* domain = glob->domain;
-    const amr_options_t *gparms;
-    gparms = glob->gparms;
+    const amr_options_t *gparms = glob->gparms;
 
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
@@ -47,7 +45,7 @@ int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     tag_patch = 0;
     fclaw2d_clawpatch_vt()->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
@@ -61,9 +59,7 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
                                   int blockno,
                                   int patchno)
 {
-    fclaw2d_domain_t* domain = glob->domain;
-    const amr_options_t *gparms;
-    gparms = glob->gparms;
+    const amr_options_t *gparms = glob->gparms;
 
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
@@ -81,7 +77,7 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 
     for (igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_soln_data(domain,&fine_patches[igrid],&q[igrid],&meqn);
+        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
     tag_patch = 0;
@@ -96,12 +92,11 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
    Callback routine for tagging
    ----------------------------------------------------------------- */
 
-void fclaw2d_clawpatch_interpolate2fine(fclaw2d_domain_t* domain,
-                                     fclaw2d_patch_t *coarse_patch,
-                                     fclaw2d_patch_t* fine_patches,
-                                     int this_blockno, int coarse_patchno,
-                                     int fine0_patchno)
-
+void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t* glob,
+                                        fclaw2d_patch_t *coarse_patch,
+                                        fclaw2d_patch_t* fine_patches,
+                                        int this_blockno, int coarse_patchno,
+                                        int fine0_patchno)
 {
     int mx,my,mbc,meqn;
     double *qcoarse,*qfine;
@@ -109,28 +104,27 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_domain_t* domain,
     double *xp,*yp,*zp,*xd,*yd,*zd;
     int igrid;
 
-    const amr_options_t* gparms;
+    const amr_options_t* gparms = glob->gparms;
     fclaw2d_patch_t* fine_patch;
 
-    gparms = get_domain_parms(domain);
     mx = gparms->mx;
     my = gparms->my;
     mbc = gparms->mbc;
 
-    fclaw2d_clawpatch_metric_data(domain,coarse_patch,&xp,&yp,&zp,
+    fclaw2d_clawpatch_metric_data(glob->domain,coarse_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&areacoarse);
-    fclaw2d_clawpatch_soln_data(domain,coarse_patch,&qcoarse,&meqn);
+    fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
     /* Loop over four siblings (z-ordering) */
     for (igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
 
-        fclaw2d_clawpatch_soln_data(domain,fine_patch,&qfine,&meqn);
+        fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
 
         if (gparms->manifold)
         {
-            fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
+            fclaw2d_clawpatch_metric_data(glob->domain,fine_patch,&xp,&yp,&zp,
                                           &xd,&yd,&zd,&areafine);
         }
 
@@ -146,14 +140,14 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_domain_t* domain,
    something like "average from fine" routine which handles more generic
    things, including area averaging, and maybe something to do with averaging
    stuff in aux arrays. */
-void fclaw2d_clawpatch_average2coarse(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *fine_patches,
-                                   fclaw2d_patch_t *coarse_patch,
-                                   int blockno, int fine0_patchno,
-                                   int coarse_patchno)
+void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
+                                      fclaw2d_patch_t *fine_patches,
+                                      fclaw2d_patch_t *coarse_patch,
+                                      int blockno, int fine0_patchno,
+                                      int coarse_patchno)
 
 {
-    const amr_options_t* gparms;
+    const amr_options_t* gparms = glob->gparms;
     int mx,my, mbc, meqn;
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
@@ -161,24 +155,23 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_domain_t *domain,
     int igrid;
     fclaw2d_patch_t *fine_patch;
 
-    gparms = get_domain_parms(domain);
     mx = gparms->mx;
     my = gparms->my;
     mbc = gparms->mbc;
 
-    fclaw2d_clawpatch_metric_data(domain,coarse_patch,&xp,&yp,&zp,
+    fclaw2d_clawpatch_metric_data(glob->domain,coarse_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&areacoarse);
-    fclaw2d_clawpatch_soln_data(domain,coarse_patch,&qcoarse,&meqn);
+    fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
     for(igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
 
-        fclaw2d_clawpatch_soln_data(domain,fine_patch,&qfine,&meqn);
+        fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
 
         if (gparms->manifold)
         {
-            fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
+            fclaw2d_clawpatch_metric_data(glob->domain,fine_patch,&xp,&yp,&zp,
                                           &xd,&yd,&zd,&areafine);
         }
 

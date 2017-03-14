@@ -297,7 +297,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
     double xlower,ylower,dx,dy;
     int mx,my,mbc,meqn;
 
-    fclaw2d_clawpatch_soln_data(glob->domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);

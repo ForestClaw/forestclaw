@@ -152,8 +152,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             int coarse_patchno = old_patchno;
             int fine_patchno = new_patchno;
 
-            fclaw2d_patch_interpolate2fine(new_domain,coarse_patch,fine_siblings,
-                                           blockno,coarse_patchno,fine_patchno);
+            fclaw2d_patch_interpolate2fine(g->glob,coarse_patch,fine_siblings,
+                                           blockno,coarse_patchno,fine_patchno);//new_domain
         }
         /* used to pass in old_domain */
         fclaw2d_patch_data_delete(g->glob,coarse_patch);
@@ -185,8 +185,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
                                       build_mode);// new_domain
 
         /* Average the solution. Does this need to be customizable? */
-        fclaw2d_patch_average2coarse(new_domain,fine_siblings,coarse_patch,
-                                     blockno,coarse_patchno, fine_patchno);
+        fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
+                                     blockno,coarse_patchno, fine_patchno);//new_domain
 
         int i;
         for(i = 0; i < 4; i++)

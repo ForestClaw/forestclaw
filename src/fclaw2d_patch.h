@@ -205,10 +205,10 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
                                    int fine0_patchno,
                                    fclaw2d_build_mode_t build_mode);
 
-void fclaw2d_patch_restore_step(fclaw2d_domain_t* domain,
+void fclaw2d_patch_restore_step(fclaw2d_global_t* glob,
                                 fclaw2d_patch_t* this_patch);
 
-void fclaw2d_patch_save_step(fclaw2d_domain_t* domain,
+void fclaw2d_patch_save_step(fclaw2d_global_t* glob,
                              fclaw2d_patch_t* this_patch);
 
 void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
@@ -273,13 +273,13 @@ int fclaw2d_patch_tag4coarsening(fclaw2d_global_t *glob,
                                  int blockno,
                                  int patchno);
 
-void fclaw2d_patch_interpolate2fine(fclaw2d_domain_t* domain,
+void fclaw2d_patch_interpolate2fine(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t* coarse_patch,
                                     fclaw2d_patch_t* fine_patches,
                                     int this_blockno, int coarse_patchno,
                                     int fine0_patchno);
 
-void fclaw2d_patch_average2coarse(fclaw2d_domain_t *domain,
+void fclaw2d_patch_average2coarse(fclaw2d_global_t *glob,
                                   fclaw2d_patch_t *fine_patches,
                                   fclaw2d_patch_t *coarse_patch,
                                   int blockno, int fine0_patchno,
@@ -407,13 +407,13 @@ typedef int (*fclaw2d_patch_tag4coarsening_t)(fclaw2d_global_t *glob,
                                                int this_blockno,
                                                int this_patchno);
 
-typedef void (*fclaw2d_patch_interpolate2fine_t)(fclaw2d_domain_t* domain,
+typedef void (*fclaw2d_patch_interpolate2fine_t)(fclaw2d_global_t *glob,
                                                  fclaw2d_patch_t *coarse_patch,
                                                  fclaw2d_patch_t* fine_patches,
                                                  int this_blockno, int coarse_patchno,
                                                  int fine_patchno);
 
-typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_domain_t *domain,
+typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_global_t *glob,
                                                fclaw2d_patch_t *fine_siblings,
                                                fclaw2d_patch_t *coarse_patch,
                                                int blockno, int fine_patchno,
@@ -483,14 +483,14 @@ typedef void (*fclaw2d_patch_build_from_fine_t)(fclaw2d_global_t *glob,
                                                 fclaw2d_build_mode_t build_mode);
 
 typedef void (*fclaw2d_patch_setup_timeinterp_t)(fclaw2d_global_t *glob,
-                                                  fclaw2d_patch_t *this_patch,
-                                                  double alpha);
+                                                 fclaw2d_patch_t *this_patch,
+                                                 double alpha);
 
 
-typedef void (*fclaw2d_patch_restore_step_t)(fclaw2d_domain_t* domain,
+typedef void (*fclaw2d_patch_restore_step_t)(fclaw2d_global_t *glob,
                                              fclaw2d_patch_t* this_patch);
 
-typedef void (*fclaw2d_patch_save_step_t)(fclaw2d_domain_t* domain,
+typedef void (*fclaw2d_patch_save_step_t)(fclaw2d_global_t *glob,
                                           fclaw2d_patch_t* this_patch);
 
 

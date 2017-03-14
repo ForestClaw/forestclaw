@@ -73,7 +73,7 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_domain_t* domain,
 double* fclaw2d_clawpatch_get_area(fclaw2d_domain_t* domain,
                                    fclaw2d_patch_t* this_patch);
 
-void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_soln_data(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn);
 
@@ -81,26 +81,32 @@ void fclaw2d_clawpatch_aux_data(fclaw2d_global_t *glob,
                                 fclaw2d_patch_t *this_patch,
                                 double **aux, int* maux);
 
-double *fclaw2d_clawpatch_get_q(fclaw2d_global_t* glob,
+double* fclaw2d_clawpatch_get_q(fclaw2d_global_t* glob,
                                 fclaw2d_patch_t* this_patch);
 
 
-double* fclaw2d_clawpatch_get_error(fclaw2d_domain_t* domain,
+double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* this_patch);
 
-size_t fclaw2d_clawpatch_size(fclaw2d_domain_t *domain);
+size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob);
 
 void fclaw2d_clawpatch_timesync_data(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* this_patch,
                                      fclaw_bool time_interp,
                                      double **q, int* meqn);
 
-double *fclaw2d_clawpatch_get_q_timesync(fclaw2d_domain_t* domain,
+double* fclaw2d_clawpatch_get_q_timesync(fclaw2d_global_t* glob,
                                          fclaw2d_patch_t* this_patch,
                                          int time_interp);
 
-void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_save_current_step(fclaw2d_global_t* glob,
                                          fclaw2d_patch_t* this_patch);
+
+void fclaw2d_clawpatch_restore_step(fclaw2d_global_t* glob,
+                                    fclaw2d_patch_t* this_patch);
+
+void fclaw2d_clawpatch_save_step(fclaw2d_global_t* glob,
+                                 fclaw2d_patch_t* this_patch);
 
 int* fclaw2d_clawpatch_block_corner_count(fclaw2d_domain_t* domain,
                                           fclaw2d_patch_t* this_patch);
@@ -117,12 +123,6 @@ void fclaw2d_clawpatch_finegrid_neighbors(fclaw2d_domain_t* domain);
 
 int fclaw2d_clawpatch_has_finegrid_neighbors(fclaw2d_domain_t* domain,
                                              fclaw2d_patch_t* this_patch);
-
-void fclaw2d_clawpatch_restore_step(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch);
-
-void fclaw2d_clawpatch_save_step(fclaw2d_domain_t* domain,
-                                 fclaw2d_patch_t* this_patch);
 
 
 /* -----------------------------------------------------

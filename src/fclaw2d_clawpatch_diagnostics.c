@@ -113,7 +113,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
                                 &xlower,&ylower,&dx,&dy);
 
     area = fclaw2d_clawpatch_get_area(domain,this_patch);  /* Might be null */
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_soln_data(s->glob,this_patch,&q,&meqn);
 
     error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
 
@@ -121,7 +121,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     {
         double *error;
         t = fclaw2d_domain_get_time(domain);
-        error = fclaw2d_clawpatch_get_error(domain,this_patch);
+        error = fclaw2d_clawpatch_get_error(s->glob,this_patch);
 
         clawpatch_vt->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
                                               &xlower,&ylower, &t, q, error);

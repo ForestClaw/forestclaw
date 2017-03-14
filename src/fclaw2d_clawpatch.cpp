@@ -143,7 +143,7 @@ void fclaw2d_clawpatch_aux_data(fclaw2d_global_t *glob,
     *aux = cp->aux.dataPtr();
 }
 
-void fclaw2d_clawpatch_soln_data(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_soln_data(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* this_patch,
                                  double **q, int* meqn)
 {
@@ -159,19 +159,16 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_global_t* glob,
     return cp->griddata.dataPtr();
 }
 
-double* fclaw2d_clawpatch_get_error(fclaw2d_domain_t* domain,
+double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* this_patch)
 {
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
     return cp->griderror.dataPtr();
 }
 
-
-
-
-size_t fclaw2d_clawpatch_size(fclaw2d_domain_t *domain)
+size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const amr_options_t *gparms = glob->gparms;
     int mx = gparms->mx;
     int my = gparms->my;
     int meqn = gparms->meqn;
@@ -184,7 +181,6 @@ size_t fclaw2d_clawpatch_size(fclaw2d_domain_t *domain)
 /* ------------------------------------------------
    Functions for handling time-interpolated data
    ------------------------------------------------ */
-
 void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
                                         fclaw2d_patch_t *this_patch,
                                         double alpha)
@@ -228,7 +224,6 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
 
 }
 
-
 void fclaw2d_clawpatch_timesync_data(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* this_patch,
                                      fclaw_bool time_interp,
@@ -239,7 +234,7 @@ void fclaw2d_clawpatch_timesync_data(fclaw2d_global_t* glob,
     *meqn = cp->meqn;
 }
 
-double *fclaw2d_clawpatch_get_q_timesync(fclaw2d_domain_t* domain,
+double* fclaw2d_clawpatch_get_q_timesync(fclaw2d_global_t* glob,
                                          fclaw2d_patch_t* this_patch,
                                          int time_interp)
 {
@@ -247,10 +242,8 @@ double *fclaw2d_clawpatch_get_q_timesync(fclaw2d_domain_t* domain,
     return q_time_sync(cp, time_interp);
 }
 
-
-
 /* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
-void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_save_current_step(fclaw2d_global_t* glob,
                                          fclaw2d_patch_t* this_patch)
 {
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
@@ -258,7 +251,7 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_domain_t* domain,
 }
 
 /* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
-void fclaw2d_clawpatch_restore_step(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_restore_step(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* this_patch)
 {
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
@@ -266,7 +259,7 @@ void fclaw2d_clawpatch_restore_step(fclaw2d_domain_t* domain,
 }
 
 /* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
-void fclaw2d_clawpatch_save_step(fclaw2d_domain_t* domain,
+void fclaw2d_clawpatch_save_step(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* this_patch)
 {
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);

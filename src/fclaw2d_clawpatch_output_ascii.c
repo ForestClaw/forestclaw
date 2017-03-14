@@ -64,7 +64,7 @@ void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob->domain,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     sprintf(fname,"fort.q%04d",iframe);
     fclaw2d_clawpatch_vt()->fort_write_file(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
