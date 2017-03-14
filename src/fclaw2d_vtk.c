@@ -173,12 +173,13 @@ write_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 }
 
 static void
-write_position_cb (fclaw2d_global_t * glob, fclaw2d_patch_t * patch,
+write_position_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                    int blockno, int patchno, void *user)
 {
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
-    s->coordinate_cb (glob, patch, blockno, patchno, s->buf);
+    s->coordinate_cb (g->glob, patch, blockno, patchno, s->buf);
     write_buffer (s, s->psize_position);
 }
 
@@ -186,7 +187,8 @@ static void
 write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int i, j;
 
     if (s->fits32)
@@ -220,7 +222,8 @@ static void
 write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
 
     if (s->fits32)
@@ -247,7 +250,8 @@ static void
 write_types_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                 int blockno, int patchno, void *user)
 {
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
 
     char *cdata = s->buf;
@@ -262,7 +266,8 @@ static void
 write_mpirank_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
 
     int *idata = (int *) s->buf;
@@ -277,7 +282,8 @@ static void
 write_blockno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
 
     int *idata = (int *) s->buf;
@@ -292,7 +298,8 @@ static void
 write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
 
     if (s->fits32)
@@ -315,20 +322,24 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 static void
-write_meqn_cb (fclaw2d_global_t * glob, fclaw2d_patch_t * patch,
+write_meqn_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                int blockno, int patchno, void *user)
 {
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) user;
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
-    s->value_cb (glob, patch, blockno, patchno, s->buf);
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+
+    s->value_cb (g->glob, patch, blockno, patchno, s->buf);
     write_buffer (s, s->psize_meqn);
 }
 
 static void
-fclaw2d_vtk_write_field (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s,
+fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, int64_t psize_field,
                          fclaw2d_patch_callback_t cb)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     int32_t bcount;
 #ifndef P4EST_ENABLE_MPIIO
     int retval;
@@ -369,7 +380,7 @@ fclaw2d_vtk_write_field (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s,
         SC_CHECK_MPI (mpiret);
 #endif
     }
-    fclaw2d_domain_iterate_patches (domain, cb, s);
+    fclaw2d_global_iterate_patches (glob, cb, s);
     P4EST_FREE (s->buf);
 
 #ifdef P4EST_ENABLE_MPIIO
@@ -388,14 +399,14 @@ fclaw2d_vtk_write_field (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s,
 }
 
 static void
-fclaw2d_vtk_write_data (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
+fclaw2d_vtk_write_data (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s)
 {
 #ifdef P4EST_ENABLE_MPIIO
     int mpiret;
     MPI_Offset mpipos;
 
     /* collectively open the file in append mode and reserve space */
-    mpiret = MPI_File_open (domain->mpicomm, s->filename,
+    mpiret = MPI_File_open (glob->mpicomm, s->filename,
                             MPI_MODE_WRONLY | MPI_MODE_APPEND |
                             MPI_MODE_UNIQUE_OPEN, MPI_INFO_NULL, &s->mpifile);
     SC_CHECK_MPI (mpiret);
@@ -407,21 +418,21 @@ fclaw2d_vtk_write_data (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
 #endif
 
     /* write meta data fields */
-    fclaw2d_vtk_write_field (domain, s, s->offset_position, s->psize_position,
+    fclaw2d_vtk_write_field (glob, s, s->offset_position, s->psize_position,
                              write_position_cb);
-    fclaw2d_vtk_write_field (domain, s, s->offset_connectivity,
+    fclaw2d_vtk_write_field (glob, s, s->offset_connectivity,
                              s->psize_connectivity, write_connectivity_cb);
-    fclaw2d_vtk_write_field (domain, s, s->offset_offsets, s->psize_offsets,
+    fclaw2d_vtk_write_field (glob, s, s->offset_offsets, s->psize_offsets,
                              write_offsets_cb);
-    fclaw2d_vtk_write_field (domain, s, s->offset_types, s->psize_types,
+    fclaw2d_vtk_write_field (glob, s, s->offset_types, s->psize_types,
                              write_types_cb);
-    fclaw2d_vtk_write_field (domain, s, s->offset_mpirank, s->psize_mpirank,
+    fclaw2d_vtk_write_field (glob, s, s->offset_mpirank, s->psize_mpirank,
                              write_mpirank_cb);
-    fclaw2d_vtk_write_field (domain, s, s->offset_blockno, s->psize_blockno,
+    fclaw2d_vtk_write_field (glob, s, s->offset_blockno, s->psize_blockno,
                              write_blockno_cb);
-    fclaw2d_vtk_write_field (domain, s, s->offset_patchno, s->psize_patchno,
+    fclaw2d_vtk_write_field (glob, s, s->offset_patchno, s->psize_patchno,
                              write_patchno_cb);
-    fclaw2d_vtk_write_field (domain, s, s->offset_meqn, s->psize_meqn,
+    fclaw2d_vtk_write_field (glob, s, s->offset_meqn, s->psize_meqn,
                              write_meqn_cb);
 
 #ifdef P4EST_ENABLE_MPIIO
@@ -466,7 +477,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
                         double vtkspace, int vtkwrite,
                         fclaw2d_vtk_patch_data_t coordinate_cb,
                         fclaw2d_vtk_patch_data_t value_cb)
-{
+{   
     fclaw2d_domain_t *domain = glob->domain;
     
     int retval, gretval;
@@ -525,7 +536,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
     retval = 0;
     if (domain->mpirank == 0)
     {
-        retval = fclaw2d_vtk_write_header (domain, s);
+        retval = fclaw2d_vtk_write_header (glob->domain, s);
     }
     mpiret = sc_MPI_Allreduce (&retval, &gretval, 1, sc_MPI_INT, sc_MPI_MIN,
                                domain->mpicomm);
@@ -536,7 +547,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
     }
 
     /* write mesh and numerical data using MPI I/O */
-    fclaw2d_vtk_write_data (domain, s);
+    fclaw2d_vtk_write_data (glob, s);
 
     /* write footer information and check for error */
     retval = 0;

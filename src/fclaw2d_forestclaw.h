@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Basic header files that are probably required by all apps */
 #include "fclaw_options.h"
-#include "fclaw_register.h"
 #include "fclaw_package.h"
 #include "fclaw2d_vtable.h"
 
