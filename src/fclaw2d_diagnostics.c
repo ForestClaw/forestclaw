@@ -100,10 +100,10 @@ int run_diagnostics(fclaw2d_global_t* glob)
 
 
 
-void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob,
-                                    fclaw2d_diagnostics_accumulator_t* acc)
+void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
+    fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 #if 0
     int run_diag = run_diagnostics(glob);
@@ -133,9 +133,9 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob,
 
 /* Collect statistics in the accumulator */
 void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
-                                fclaw2d_diagnostics_accumulator_t* acc,
                                 int init_flag)
 {
+    fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
@@ -193,12 +193,12 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
 
-    fclaw2d_diagnostics_reset(glob,acc);
+    fclaw2d_diagnostics_reset(glob);
 }
 
-void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob,
-                               fclaw2d_diagnostics_accumulator_t* acc)
+void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
 {
+    fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
@@ -228,9 +228,9 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob,
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 }
 
-void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob,
-                                  fclaw2d_diagnostics_accumulator_t* acc)
+void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
 {
+    fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
@@ -259,11 +259,4 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob,
     }
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 }
-
-#if 0
-solver_accumulator* fclaw2d_diagnostics_get_solver_acc(fclaw2d_diagnostics_accumulator_t* acc)
-{
-
-}
-#endif
 

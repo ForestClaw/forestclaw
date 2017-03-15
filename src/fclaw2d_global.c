@@ -74,7 +74,7 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     FCLAW_ASSERT (glob != NULL);
 
     fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
-
+    FCLAW_FREE (glob->acc);
     FCLAW_FREE (glob);
 }
 

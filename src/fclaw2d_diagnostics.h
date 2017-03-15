@@ -97,18 +97,14 @@ void fclaw2d_diagnostics_vtable_init();
 /* See forestclaw2d.h for the maximum version of this function */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
 
-void fclaw2d_diagnostics_initialize(struct fclaw2d_global *glob,
-                                    fclaw2d_diagnostics_accumulator_t* acc);
+void fclaw2d_diagnostics_initialize(struct fclaw2d_global *glob);
 
 void fclaw2d_diagnostics_gather(struct fclaw2d_global *glob,
-                                fclaw2d_diagnostics_accumulator_t* acc,
                                 int init_flag);
 
-void fclaw2d_diagnostics_reset(struct fclaw2d_global *glob,
-                               fclaw2d_diagnostics_accumulator_t* acc);
+void fclaw2d_diagnostics_reset(struct fclaw2d_global *glob);
 
-void fclaw2d_diagnostics_finalize(struct fclaw2d_global *glob,
-                                  fclaw2d_diagnostics_accumulator_t* acc);
+void fclaw2d_diagnostics_finalize(struct fclaw2d_global *glob);
 
 #ifdef __cplusplus
 #if 0
