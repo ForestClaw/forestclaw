@@ -40,24 +40,14 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
     ddata = FCLAW2D_ALLOC_ZERO(fclaw2d_domain_data_t, 1);
-    domain->user = (void *) ddata;
+    domain->user = ddata;
 
-    ddata->count_set_clawpatch = ddata->count_delete_clawpatch = 0;
-    ddata->count_amr_advance = 0;
-    ddata->count_ghost_exchange = 0;
-    ddata->count_amr_regrid = 0;
-    ddata->count_amr_new_domain = 0;
-    ddata->count_multiproc_corner = 0;
-    ddata->count_grids_per_proc = 0;
-    ddata->count_grids_remote_boundary = 0;
-    ddata->count_grids_local_boundary = 0;
+    ddata->count_set_patch = ddata->count_delete_patch = 0;
+    
     ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
-    ddata->count_single_step = 0;
 
     ddata->domain_exchange = NULL;
     ddata->domain_indirect = NULL;
-
-    ddata->curr_time = 0;
 }
 
 void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain)
@@ -84,22 +74,7 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
 
     /* Move timers over to the new domain */
     ddata_old->is_latest_domain = 0;
-    memcpy (ddata_new->timers, ddata_old->timers,
-            sizeof (fclaw2d_timer_t) * FCLAW2D_TIMER_COUNT);
     ddata_new->is_latest_domain = 1;
-    
-    ddata_new->count_amr_advance = ddata_old->count_amr_advance;
-    ddata_new->count_ghost_exchange = ddata_old->count_ghost_exchange;
-    ddata_new->count_amr_regrid = ddata_old->count_amr_regrid;
-    ddata_new->count_amr_new_domain = ddata_old->count_amr_new_domain;
-    ddata_new->count_multiproc_corner = ddata_old->count_multiproc_corner;
-    ddata_new->count_single_step = ddata_old->count_single_step;
-    ddata_new->count_grids_per_proc = ddata_old->count_grids_per_proc;
-    ddata_new->count_grids_remote_boundary = ddata_old->count_grids_remote_boundary;
-    ddata_new->count_grids_local_boundary = ddata_old->count_grids_local_boundary;
-
-    ddata_new->curr_time = ddata_old->curr_time;
-
 }
 
 
@@ -115,8 +90,7 @@ void fclaw2d_domain_setup(fclaw2d_global_t* glob,
     {
         fclaw_global_infof("Building initial domain\n");
         t = 0;
-        fclaw2d_domain_set_time(glob,t);//new_domain
-
+        glob->curr_time = t;//new_domain
     }
     else
     {
@@ -169,11 +143,11 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     }
 
     /* Output memory discrepancy for the ClawPatch */
-    if (ddata->count_set_clawpatch != ddata->count_delete_clawpatch)
+    if (ddata->count_set_patch != ddata->count_delete_patch)
     {
         printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
                 (*domain)->mpirank,
-                ddata->count_set_clawpatch, ddata->count_delete_clawpatch);
+                ddata->count_set_patch, ddata->count_delete_patch);
     }
 
     fclaw2d_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
@@ -182,7 +156,12 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     *domain = NULL;
 }
 
+int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain)
+{
+    return domain->global_num_patches;
+}
 
+#if 0
 fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain)
 {
     fclaw_app_t *app;
@@ -199,26 +178,6 @@ void fclaw2d_domain_set_app(fclaw2d_domain_t* domain,fclaw_app_t* app)
     FCLAW_ASSERT(app != NULL);
     fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
 }
-
-int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain)
-{
-    return domain->global_num_patches;
-}
-
-
-void fclaw2d_domain_set_time(fclaw2d_global_t *glob, double time)
-{
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
-    ddata->curr_time = time;
-}
-
-double fclaw2d_domain_get_time(fclaw2d_global_t *glob)
-{
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
-    return ddata->curr_time;
-}
-
-#if 0
 const amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain)
 {
     const amr_options_t *gparms;
@@ -228,7 +187,7 @@ const amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain)
     gparms = fclaw_forestclaw_get_options(app);
     return gparms;
 }
-#endif
+
 
 void* fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain)
 {
@@ -238,21 +197,21 @@ void* fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain)
     return fclaw_app_get_user(app);
 }
 
-#if 0
 const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
 {
     return fclaw2d_forestclaw_get_options(domain);
 }
+
 #endif
 
-fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_global_t* glob)
-{
-    fclaw2d_map_context_t* cont;
-    cont = (fclaw2d_map_context_t*)
-           fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
-    FCLAW_ASSERT (cont != NULL);
-    return cont;
-}
+// fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_global_t* glob)
+// {
+//     fclaw2d_map_context_t* cont;
+//     cont = (fclaw2d_map_context_t*)
+//            fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
+//     FCLAW_ASSERT (cont != NULL);
+//     return cont;
+// }
 
 #ifdef __cplusplus
 #if 0

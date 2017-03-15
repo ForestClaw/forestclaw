@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>
 #include <fclaw_options.h>
 #include <fclaw_package.h>
+#include <fclaw_timer.h>
+#include <fclaw2d_map.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -81,6 +83,7 @@ typedef struct fclaw2d_global
  
     fclaw_package_container_t *pkg_container;    /**< Solver packages for internal use. */
  
+    fclaw2d_map_context_t* cont;
     fclaw2d_domain_t *domain;
 }
 fclaw2d_global_t;

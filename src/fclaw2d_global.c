@@ -41,6 +41,18 @@ fclaw2d_global_t* fclaw2d_global_new ()
     glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
     glob->pkg_container = fclaw_package_container_new ();
 
+    glob->count_amr_advance = 0;
+    glob->count_ghost_exchange = 0;
+    glob->count_amr_regrid = 0;
+    glob->count_amr_new_domain = 0;
+    glob->count_multiproc_corner = 0;
+    glob->count_grids_per_proc = 0;
+    glob->count_grids_remote_boundary = 0;
+    glob->count_grids_local_boundary = 0;
+    glob->count_single_step = 0;
+    glob->curr_time = 0;
+    glob->cont = NULL;
+
     return glob;
 }
 void
@@ -50,6 +62,9 @@ fclaw2d_global_set_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
     glob->mpicomm = domain->mpicomm;
     glob->mpisize = domain->mpisize;
     glob->mpirank = domain->mpirank;
+    
+    glob->cont = (fclaw2d_map_context_t*)
+           fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
 }
 
 void

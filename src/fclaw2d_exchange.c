@@ -157,8 +157,7 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
 {
     fclaw2d_domain_t* domain = glob->domain;
     /* Time spend in build here is negligible and is included in regrid */
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     size_t data_size =  fclaw2d_patch_ghost_packsize(glob);
     fclaw2d_domain_exchange_t *e;
@@ -201,21 +200,21 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
        Note that this is a parallel communication, but only needs
        to happen once when setting up the exchange.
        ------------------------------------------------------- */
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_stop (&ddata->timers[running]);
+        fclaw2d_timer_stop (&glob->timers[running]);
     }
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
     fclaw2d_domain_indirect_t *ind =
         fclaw2d_domain_indirect_begin(domain);
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
 
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_start (&ddata->timers[running]);
+        fclaw2d_timer_start (&glob->timers[running]);
     }
 
     /* Do some some work that we hope to hide by communication above.  */
@@ -224,34 +223,32 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
     /* Build ghost patches from neighboring remote processors.  These will be
        filled later with q data and the area, if we are on a manifold */
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
     build_remote_ghost_patches(glob);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     /* ---------------------------------------------------------
        Receive ghost patch meta data from send initiated above.
        ------------------------------------------------------- */
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_stop (&ddata->timers[running]);
+        fclaw2d_timer_stop (&glob->timers[running]);
     }
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
     fclaw2d_domain_indirect_end(domain,ind);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
 
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_start (&ddata->timers[running]);
+        fclaw2d_timer_start (&glob->timers[running]);
     }
 }
 
 void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
-    
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     /* Free old parallel ghost patch data structure, must exist by construction. */
     fclaw2d_domain_exchange_t *e_old = get_exchange_data(glob);
@@ -286,7 +283,7 @@ void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
        from different procs */
     fclaw2d_domain_indirect_t* ind_old = get_indirect_data(glob);
     fclaw2d_domain_indirect_destroy(*domain,ind_old);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 }
 
 
@@ -302,9 +299,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
                                           fclaw2d_timer_names_t running)
 {
     fclaw2d_domain_t* domain = glob->domain;
-
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     fclaw2d_domain_exchange_t *e = get_exchange_data(glob);
 
@@ -334,13 +329,13 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
         }
     }
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_stop (&ddata->timers[running]);
+        fclaw2d_timer_stop (&glob->timers[running]);
     }
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
     /* Exchange only over levels currently in use */
     if (time_interp)
     {
@@ -354,10 +349,10 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
         fclaw2d_domain_ghost_exchange_begin(domain, e, minlevel, maxlevel);
 
     }
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_start (&ddata->timers[running]);
+        fclaw2d_timer_start (&glob->timers[running]);
     }
 }
 
@@ -369,13 +364,11 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
                                         fclaw2d_timer_names_t running)
 {
     fclaw2d_domain_t* domain = glob->domain;
-
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_stop (&ddata->timers[running]);
+        fclaw2d_timer_stop (&glob->timers[running]);
     }
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
 
     fclaw2d_domain_exchange_t *e = get_exchange_data(glob);
 
@@ -389,21 +382,21 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
         fclaw2d_domain_ghost_exchange_end (domain, e);
     }
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM]);
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_start (&ddata->timers[running]);
+        fclaw2d_timer_start (&glob->timers[running]);
     }
 
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
     /* Unpack data from remote patches to corresponding ghost patches
        stored locally */
     unpack_remote_ghost_patches(glob,e,minlevel,maxlevel,time_interp);
 
     /* Count calls to this function */
-    ++ddata->count_ghost_exchange;
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
+    ++glob->count_ghost_exchange;
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 }
 
 #ifdef __cplusplus

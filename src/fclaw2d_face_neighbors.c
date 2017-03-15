@@ -71,8 +71,6 @@ void get_face_neighbors(fclaw2d_global_t *glob,
                         fclaw2d_transform_data_t* ftransform_finegrid)
 {
     fclaw2d_domain_t *domain = glob->domain;
-
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     int rproc[p4est_refineFactor];
     int rblockno;
     int rpatchno[p4est_refineFactor];
@@ -85,7 +83,7 @@ void get_face_neighbors(fclaw2d_global_t *glob,
         neighbor_patches[ir] = NULL;
     }
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
     fclaw2d_patch_relation_t neighbor_type =
     fclaw2d_patch_face_neighbors(domain,
                                  this_block_idx,
@@ -95,7 +93,7 @@ void get_face_neighbors(fclaw2d_global_t *glob,
                                  &rblockno,
                                  rpatchno,
                                  &rfaceno);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 
 
     /* ------------------------------
@@ -474,7 +472,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
                     fclaw2d_patch_copy_face(glob,this_ghost_patch,neighbor_patch,iface,
                                             use_timeinterp_patch,&transform_data);
 
-                    ++ddata->count_multiproc_corner;
+                    ++glob->count_multiproc_corner;
                 }
                 else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
                 {
@@ -493,7 +491,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
                                                        igrid,&transform_data);
                         }
                     }
-                    ++ddata->count_multiproc_corner;
+                    ++glob->count_multiproc_corner;
                 }
                 else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
                 {
@@ -572,10 +570,7 @@ void cb_set_neighbor_types(fclaw2d_domain_t *domain,
 
 void fclaw2d_regrid_set_neighbor_types(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
     fclaw2d_global_iterate_patches(glob,cb_set_neighbor_types,NULL);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 }

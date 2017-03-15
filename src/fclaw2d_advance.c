@@ -224,10 +224,9 @@ double advance_level(fclaw2d_global_t *glob,
                 fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
                                    coarser_level,alpha);
 
-                fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
-                fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+                fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);
                 fclaw2d_timeinterp(glob,coarser_level,alpha);
-                fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+                fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);
             }
         }
     }
@@ -248,8 +247,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
     fclaw2d_domain_t* domain = glob->domain;
 
     int level;
-    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
 
     const amr_options_t* gparms = glob->gparms;
     fclaw2d_timestep_counters *ts_counter;
@@ -319,12 +317,12 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
     delete_timestep_counters(&ts_counter);
 
     /* Stop the timer */
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
 
     /* Count total grids on this processor */
-    ddata->count_grids_per_proc +=  domain->local_num_patches;
-    ddata->count_grids_local_boundary +=  domain->num_exchange_patches;
-    ddata->count_grids_remote_boundary +=  domain->num_ghost_patches;
+    glob->count_grids_per_proc +=  domain->local_num_patches;
+    glob->count_grids_local_boundary +=  domain->num_exchange_patches;
+    glob->count_grids_remote_boundary +=  domain->num_ghost_patches;
 
     /* Count the number of times that advance is called */
     ++glob->count_amr_advance;

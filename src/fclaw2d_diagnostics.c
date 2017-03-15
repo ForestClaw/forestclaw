@@ -136,10 +136,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
                                 fclaw2d_diagnostics_accumulator_t* acc,
                                 int init_flag)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
     const amr_options_t *gparms = glob->gparms;
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     int run_diag = run_diagnostics(glob);
@@ -152,7 +149,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
     /* -----------------------------------------------------
        Compute diagnostics on all local patches
        ----------------------------------------------------- */
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
 
     if (diag_vt->patch_compute_diagnostics != NULL)
@@ -170,13 +167,13 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
         diag_vt->user_compute_diagnostics(glob,acc->user_accumulator);
     }
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
 
     /* ---------------------------------------------------------
        Gather all of the statistics (requires communication)
        --------------------------------------------------------- */
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
 
     if (diag_vt->patch_gather_diagnostics != NULL)
     {
@@ -193,7 +190,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
         diag_vt->user_gather_diagnostics(glob,acc->user_accumulator,init_flag);
     }
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
 
     fclaw2d_diagnostics_reset(glob,acc);
 }
@@ -201,9 +198,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
 void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob,
                                fclaw2d_diagnostics_accumulator_t* acc)
 {
-    fclaw2d_domain_t *domain = glob->domain;
     const amr_options_t *gparms = glob->gparms;
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     int run_diag = run_diagnostics(glob);
@@ -213,7 +208,7 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob,
     }
 
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_reset_diagnostics != NULL)
     {
@@ -229,15 +224,13 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob,
     {
         diag_vt->user_reset_diagnostics(glob,acc->user_accumulator);
     }
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 }
 
 void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob,
                                   fclaw2d_diagnostics_accumulator_t* acc)
 {
-    fclaw2d_domain_t *domain = glob->domain;
     const amr_options_t *gparms = glob->gparms;
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     int run_diag = run_diagnostics(glob);
@@ -247,7 +240,7 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob,
     }
 
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_finalize_diagnostics != NULL)
     {
@@ -263,5 +256,5 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob,
     {
         diag_vt->user_finalize_diagnostics(glob,&acc->user_accumulator);
     }
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 }

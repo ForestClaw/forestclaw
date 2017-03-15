@@ -244,7 +244,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
     double dx,dy,xlower,ylower;
 
 
-    cont = fclaw2d_domain_get_map_context(glob);
+    cont = glob->cont;
 
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -335,14 +335,12 @@ fclaw2d_output_write_vtk (fclaw2d_global_t * glob, const char *basename)
 void
 fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 {
-    fclaw2d_domain_t *domain = glob->domain;
     double time;
 
-    time = fclaw2d_domain_get_time(glob);
+    time = glob->curr_time;
 
     /* Record output time */
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
 
     /* Output VTK file while we're at it */
 
@@ -381,11 +379,11 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 
     if (gparms->tikzout)
     {
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
+        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA3]);
         fclaw2d_output_write_tikz(glob,iframe);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA3]);
+        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA3]);
     }
 
     /* Record output time */
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
 }

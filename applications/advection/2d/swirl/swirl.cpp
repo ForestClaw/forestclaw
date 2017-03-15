@@ -72,7 +72,8 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
-static void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
+static 
+void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
@@ -86,17 +87,6 @@ const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob)
             fclaw_package_get_options(glob, id);    
 }
 
-const user_options_t* swirl_user_get_options_old(fclaw2d_domain_t* domain)
-{
-    fclaw_app_t* app;
-    // app = fclaw2d_global_get_app(glob);
-    app = fclaw2d_domain_get_app(domain);
-
-    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
-
-    return (user_options_t*) user;
-}
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms)
 {
@@ -106,7 +96,6 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms)
     fclaw2d_map_context_t    *cont = NULL;
 
     /* Map unit square to disk using mapc2m_disk.f */
-
     gparms->manifold = 0;
     conn = p4est_connectivity_new_unitsquare();
     cont = fclaw2d_map_new_nomap();
@@ -118,7 +107,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms)
 }
 
 static
-void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
+void run_program(fclaw2d_global_t* glob)
 {
     user_options_t           *user;
 
@@ -126,9 +115,9 @@ void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
-    fclaw2d_domain_set_app (glob->domain,app);
 
-    user = (user_options_t*) fclaw_app_get_user(app);
+    user = (user_options_t*) swirl_user_get_options(glob);
+
     if (user->claw_version == 4)
     {
       fc2d_clawpack46_set_vtable_defaults();
@@ -143,12 +132,8 @@ void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
-    
-    fclaw2d_map_context_t* cont = fclaw2d_domain_get_map_context(glob);
-    fclaw2d_map_destroy(cont);
     fclaw2d_finalize(glob);
 }
 
@@ -204,7 +189,7 @@ main (int argc, char **argv)
     /* Run the program */
     if (!retval & !vexit)
     {
-        run_program(glob, app);
+        run_program(glob);
     }
     
     fclaw2d_global_destroy(glob);

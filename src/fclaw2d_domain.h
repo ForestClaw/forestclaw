@@ -45,7 +45,9 @@ extern "C"
 typedef struct fclaw2d_domain_data
 {
     /* Debug counters and timers */
-    int count_set_clawpatch, count_delete_clawpatch;
+    int count_set_patch, count_delete_patch;
+    int is_latest_domain;
+#if 0
     int count_amr_advance, count_ghost_exchange, count_amr_regrid;
     int count_amr_new_domain;
     int count_single_step;
@@ -53,11 +55,9 @@ typedef struct fclaw2d_domain_data
     int count_grids_per_proc;
     int count_grids_remote_boundary;
     int count_grids_local_boundary;
-    int is_latest_domain;
     fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
-
-    /* Time at start of each subcycled time step */
     double curr_time;
+#endif    
 
     /* This should not be copied, but needs to be redone for every new domain */
     fclaw2d_domain_exchange_t *domain_exchange;

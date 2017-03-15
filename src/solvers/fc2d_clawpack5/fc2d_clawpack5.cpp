@@ -511,7 +511,7 @@ void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
     amropt = glob->gparms;
     clawpack_opt = fc2d_clawpack5_get_options(glob);
 
-    time = fclaw2d_domain_get_time(glob);
+    time = glob->curr_time;
     ngrids = fclaw2d_domain_get_num_patches(glob->domain);
 
     meqn = amropt->meqn;

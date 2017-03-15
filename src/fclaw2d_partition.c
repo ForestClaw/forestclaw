@@ -50,8 +50,8 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
 
         new_patch->user = old_patch->user;
         old_patch->user = NULL;
-        ++ddata_old->count_delete_clawpatch;
-        ++ddata_new->count_set_clawpatch;
+        ++ddata_old->count_delete_patch;
+        ++ddata_new->count_set_patch;
     }
     else
     {
@@ -72,8 +72,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
                               fclaw2d_timer_names_t running)
 {
     fclaw2d_domain_t** domain = &glob->domain;
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION]);
 
     char basename[BUFSIZ];
 
@@ -82,7 +81,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
     size_t data_size = fclaw2d_patch_partition_packsize(glob);
     void ** patch_data = NULL;
 
@@ -94,18 +93,18 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
     fclaw2d_global_iterate_patches(glob,
                                    cb_fclaw2d_patch_partition_pack,
                                    (void *) patch_data);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
 
 
     /* this call creates a new domain that is valid after partitioning
        and transfers the data packed above to the new owner processors */
     int exponent = gparms->subcycle && gparms->weighted_partition ? 1 : 0;
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION]);
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_stop (&ddata->timers[running]);
+        fclaw2d_timer_stop (&glob->timers[running]);
     }
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_COMM]);
     fclaw2d_domain_t *domain_partitioned =
         fclaw2d_domain_partition (*domain, exponent);
     fclaw_bool have_new_partition = domain_partitioned != NULL;
@@ -114,20 +113,19 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
     {
         /* Do this part so we can get a pointer to the new data */
         fclaw2d_domain_setup(glob, domain_partitioned);
-        ddata = fclaw2d_domain_get_data(domain_partitioned);
     }
 
     /* Stop the communication timer */
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_COMM]);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION]);
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_start (&ddata->timers[running]);
+        fclaw2d_timer_start (&glob->timers[running]);
     }
 
     if (have_new_partition)
     {
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
+        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
 
         /* update patch array to point to the numerical data that was received */
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);
@@ -145,9 +143,8 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
         /* VTK output during amrinit */
         if (mode >= 0 && gparms->vtkout & 1) {
             // into timer
-            fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
-            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
-            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
+            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
+            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
 
             // output
             snprintf (basename, BUFSIZ, "%s_init_level_%02d_partition",
@@ -155,17 +152,17 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
             fclaw2d_output_write_vtk (glob, basename);
 
             // out of timer
-            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
-            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
+            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
+            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
         }
 
         /* internal clean up */
         fclaw2d_domain_complete(*domain);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
+        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
     }
 
     /* free the data that was used in the parallel transfer of patches */
     fclaw2d_domain_free_after_partition (*domain, &patch_data);
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION]);
 }

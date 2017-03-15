@@ -255,7 +255,7 @@ void fclaw2d_patch_data_new(fclaw2d_global_t* glob,
     /* create new user data */
     FCLAW_ASSERT(patch_vt()->patch_new != NULL);
     pdata->user_patch = patch_vt()->patch_new();
-    ++ddata->count_set_clawpatch; //this is now in cb_fclaw2d_regrid_repopulate 
+    ++ddata->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
     pdata->neighbors_set = 0;
 }
 
@@ -269,7 +269,7 @@ void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
     {
         fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);
         patch_vt()->patch_delete(pdata->user_patch);
-        ++ddata->count_delete_clawpatch;
+        ++ddata->count_delete_patch;
 
         FCLAW2D_FREE(pdata);
         this_patch->user = NULL;
@@ -391,8 +391,8 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
     fclaw2d_patch_data_new(glob,this_patch);
     /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
        but we really want to increment the new domain. This will be fixed! */
-    --ddata_old->count_set_clawpatch;
-    ++ddata_new->count_set_clawpatch;
+    --ddata_old->count_set_patch;
+    ++ddata_new->count_set_patch;
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 

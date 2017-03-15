@@ -36,6 +36,7 @@ void fclaw2d_finalize(fclaw2d_global_t* glob)
     const amr_options_t *gparms = glob->gparms;
 
     fclaw_global_essentialf("Finalizing run\n");
+    fclaw2d_map_destroy(glob->cont);
     fclaw2d_domain_barrier (glob->domain);
 
     if (gparms->report_timing)
@@ -51,6 +52,5 @@ void fclaw2d_finalize(fclaw2d_global_t* glob)
             fclaw_global_essentialf("Timing reports not generated for outstyle=0\n");
         }
     }
-
     fclaw2d_domain_reset(glob);
 }

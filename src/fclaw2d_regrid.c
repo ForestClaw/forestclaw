@@ -119,8 +119,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     {
         new_patch->user = old_patch->user;
         old_patch->user = NULL;
-        ++ddata_old->count_delete_clawpatch;
-        ++ddata_new->count_set_clawpatch;
+        ++ddata_old->count_delete_patch;
+        ++ddata_new->count_set_patch;
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
@@ -136,8 +136,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             fclaw2d_patch_data_new(g->glob,fine_patch);
             /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
                but we really want to increment the new domain. This will be fixed! */
-            --ddata_old->count_set_clawpatch;
-            ++ddata_new->count_set_clawpatch;
+            --ddata_old->count_set_patch;
+            ++ddata_new->count_set_patch;
 
             fclaw2d_patch_build(g->glob,fine_patch,blockno,
                                 fine_patchno,(void*) &build_mode);
@@ -176,8 +176,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_data_new(g->glob,coarse_patch);// new_domain
         /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
            but we really want to increment the new domain. This will be fixed! */
-        --ddata_old->count_set_clawpatch;
-        ++ddata_new->count_set_clawpatch;
+        --ddata_old->count_set_patch;
+        ++ddata_new->count_set_patch;
         
         /* Area (and possibly other things) should be averaged to coarse grid. */
         fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
@@ -212,14 +212,12 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 void fclaw2d_regrid(fclaw2d_global_t *glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
-
-    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
 
     fclaw_global_infof("Regridding domain\n");
 
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
     /* First determine which families should be coarsened. */
     fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
                                     (void*) NULL);
@@ -228,13 +226,13 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     fclaw2d_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
                                    (void *) &domain_init);
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
     /* Rebuild domain if necessary */
     /* Will return be NULL if no refining was done */
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID]);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
     fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
 
     fclaw_bool have_new_refinement = new_domain != NULL;
@@ -244,23 +242,22 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
         fclaw2d_domain_setup(glob, new_domain);
-        ddata = fclaw2d_domain_get_data(new_domain);
     }
 
     /* Stop the new timer (copied from old timer) */
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADAPT_COMM]);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
 
     if (have_new_refinement)
     {
         fclaw_global_infof(" -- Have new refinement\n");
 
         /* Average to new coarse grids and interpolate to new fine grids */
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
         fclaw2d_global_iterate_adapted(glob, new_domain,
                                        cb_fclaw2d_regrid_repopulate,
                                        (void *) &domain_init);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
         /* free memory associated with old domain */
         fclaw2d_domain_reset(glob);
@@ -272,8 +269,6 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
         /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
 
-        /* Need a new timer */
-        ddata = fclaw2d_domain_get_data(*domain);
 
         /* This includes timers for building patches and (exclusive) communication */
         fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_REGRID);
@@ -288,7 +283,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
         int minlevel = (*domain)->global_minlevel;
         int maxlevel = (*domain)->global_maxlevel;
         int time_interp = 0;
-        double sync_time = fclaw2d_domain_get_time(glob);
+        double sync_time = glob->curr_time;
         fclaw2d_ghost_update(glob,
                              minlevel,
                              maxlevel,
@@ -296,7 +291,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
                              time_interp,
                              FCLAW2D_TIMER_REGRID);
 
-        ++ddata->count_amr_new_domain;
+        ++glob->count_amr_new_domain;
     }
     else
     {
@@ -308,11 +303,10 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
     /* Stop timer.  Be sure to use timers from new grid, if one was
        created */
-    ddata = fclaw2d_domain_get_data(*domain);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
 
     /* Count calls to this function */
-    ++ddata->count_amr_regrid;
+    ++glob->count_amr_regrid;
 }
 
 #ifdef __cplusplus
