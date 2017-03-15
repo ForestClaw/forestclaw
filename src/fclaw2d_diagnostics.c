@@ -89,7 +89,7 @@ static
 int run_diagnostics(fclaw2d_global_t* glob)
 {
     /* Check to see if we should be running any diagnostics */
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
 
     int run_diag = gparms->conservation_check ||
                    gparms->run_user_diagnostics ||
@@ -104,7 +104,7 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob,
                                     fclaw2d_diagnostics_accumulator_t* acc)
 {
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
 
     int run_diag = run_diagnostics(glob);
     if (!run_diag)
@@ -136,7 +136,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
                                 fclaw2d_diagnostics_accumulator_t* acc,
                                 int init_flag)
 {
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     int run_diag = run_diagnostics(glob);
@@ -198,7 +198,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
 void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob,
                                fclaw2d_diagnostics_accumulator_t* acc)
 {
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     int run_diag = run_diagnostics(glob);
@@ -230,7 +230,7 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob,
 void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob,
                                   fclaw2d_diagnostics_accumulator_t* acc)
 {
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     int run_diag = run_diagnostics(glob);

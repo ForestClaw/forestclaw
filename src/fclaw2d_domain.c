@@ -81,7 +81,7 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
 void fclaw2d_domain_setup(fclaw2d_global_t* glob,
                           fclaw2d_domain_t* new_domain)
 {
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
     fclaw2d_domain_t *old_domain = glob->domain;
     double t;
     int i;

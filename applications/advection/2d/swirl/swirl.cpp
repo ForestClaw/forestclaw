@@ -148,9 +148,9 @@ main (int argc, char **argv)
     sc_options_t                *options;
     user_options_t              suser, *user = &suser;
     amr_options_t               *gparms;
-    fclaw2d_clawpatch_options_t* clawpatchopt;
-    fc2d_clawpack46_options_t*  claw46opt;
-    fc2d_clawpack5_options_t*   claw5opt;
+    fclaw2d_clawpatch_options_t *clawpatchopt;
+    fc2d_clawpack46_options_t   *claw46opt;
+    fc2d_clawpack5_options_t    *claw5opt;
 
     fclaw2d_global_t         *glob;
     fclaw2d_domain_t         *domain;

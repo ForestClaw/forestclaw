@@ -43,7 +43,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
     int domain_init = *((int*) g->user);
 
-    gparms = g->glob->gparms;
+    gparms = fclaw_forestclaw_get_options(g->glob);
 
     maxlevel = gparms->maxlevel;
     level = this_patch->level;

@@ -355,7 +355,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw2d_block_get_block_boundary(s->glob, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
-    const amr_options_t *gparms = s->glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(s->glob);
     fclaw2d_transform_data_t transform_data;
     transform_data.mx = gparms->mx;
     transform_data.my = gparms->my;

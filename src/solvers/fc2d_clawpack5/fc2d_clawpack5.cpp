@@ -508,7 +508,7 @@ void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
     int meqn,maux,ngrids;
     double time;
 
-    amropt = glob->gparms;
+    amropt = fclaw_forestclaw_get_options(glob);
     clawpack_opt = fc2d_clawpack5_get_options(glob);
 
     time = glob->curr_time;

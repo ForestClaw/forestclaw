@@ -133,7 +133,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
     fclaw2d_output_frame(glob,iframe);
 
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
 
     double final_time = gparms->tfinal;
     int nout = gparms->nout;
@@ -319,7 +319,7 @@ void outstyle_3(fclaw2d_global_t *glob)
     fclaw2d_output_frame(glob,iframe);
 
 
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
     double initial_dt = gparms->initial_dt;
 
     double t0 = 0;
@@ -449,7 +449,7 @@ void outstyle_4(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_gather(glob,&acc,init_flag);
     init_flag = 0;
 
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
     double initial_dt = gparms->initial_dt;
     int nstep_outer = gparms->nout;
     int nstep_inner = gparms->nstep;
@@ -508,7 +508,7 @@ void outstyle_4(fclaw2d_global_t *glob)
 void fclaw2d_run(fclaw2d_global_t *glob)
 {
 
-    const amr_options_t *gparms = glob->gparms;
+    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
 
     switch (gparms->outstyle)
     {
