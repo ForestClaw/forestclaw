@@ -184,7 +184,6 @@ void fclaw2d_forestclaw_set_options (fclaw2d_global_t *glob, amr_options_t* gpar
 {
     int id;
 
-    glob->gparms = gparms;
     FCLAW_ASSERT(s_forestclaw_package_id == -1);
     id = fclaw_package_container_add_pkg(glob,
                                          gparms);
@@ -546,10 +545,9 @@ void fclaw_options_destroy_array(void* array)
    AMR access functions
    --------------------------------------------------------- */
 
-amr_options_t* fclaw_forestclaw_get_options(fclaw2d_global_t* glob)
+amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_global_t* glob)
 {
     amr_options_t *gp = (amr_options_t*) 
             fclaw_package_get_options(glob, s_forestclaw_package_id);
-    FCLAW_ASSERT(glob->gparms == gp);
     return gp;
 }

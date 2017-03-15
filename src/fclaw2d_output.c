@@ -87,7 +87,7 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
 
     FILE *fp = (FILE*) s->user;
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(s->glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(s->glob);
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num =
@@ -149,7 +149,7 @@ void fclaw2d_output_write_tikz(fclaw2d_global_t* glob,int iframe)
        Use only for small numbers of processors. */
 
     /* Should be in gparms */
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     double figsize[2];
     figsize[0] = gparms->tikz_figsize[0];   /* Inches */
     figsize[1] = gparms->tikz_figsize[1];   /* Inches */
@@ -237,7 +237,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
                                   int this_block_idx, int this_patch_idx,
                                   char *a)
 {
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     fclaw2d_map_context_t *cont;
 
     int mx,my,mbc;
@@ -323,7 +323,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
 void
 fclaw2d_output_write_vtk (fclaw2d_global_t * glob, const char *basename)
 {
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    gparms->mx, gparms->my, gparms->meqn,
@@ -344,7 +344,7 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 
     /* Output VTK file while we're at it */
 
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     if (gparms->vtkout & 2)
     {
         if (gparms->serialout)

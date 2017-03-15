@@ -153,7 +153,7 @@ double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,
 
 size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob)
 {
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     int mx = gparms->mx;
     int my = gparms->my;
     int meqn = gparms->meqn;
@@ -173,7 +173,7 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
     /* We use the pack size here to make sure we are setting
        everything correctly;  it isn't needed for memory
        allocation */
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     int mx = gparms->mx;
     int my = gparms->my;
     int meqn = gparms->meqn;
@@ -323,7 +323,7 @@ void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
     /* We are getting closer to getting rid the class fclaw2d_clawpatch_t */
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
 
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     cp->mx = gparms->mx;
     cp->my = gparms->my;
@@ -450,7 +450,7 @@ void fclaw2d_clawpatch_build(fclaw2d_global_t *glob,
                              void *user)
 {
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     fclaw2d_clawpatch_define(glob,this_patch,blockno,patchno,build_mode);
 
@@ -469,7 +469,7 @@ void fclaw2d_clawpatch_build_from_fine(fclaw2d_global_t *glob,
                                        int fine0_patchno,
                                        fclaw2d_build_mode_t build_mode)
 {
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     fclaw2d_clawpatch_define(glob,coarse_patch,blockno,coarse_patchno,build_mode);
 
@@ -490,7 +490,7 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_global_t *glob,
                                    void *user)
 {
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     fclaw2d_clawpatch_define(glob,this_patch,blockno,patchno,build_mode);
 
@@ -512,7 +512,7 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_global_t *glob,
 
 size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -563,7 +563,7 @@ void ghost_comm(fclaw2d_global_t* glob,
     int meqn;
     double *qthis;
     double *area;
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     int ierror;
 
@@ -613,7 +613,7 @@ void fclaw2d_clawpatch_ghost_pack(fclaw2d_global_t *glob,
                                   double *patch_data,
                                   int time_interp)
 {
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
     int packmode = 2*packarea;  // 0 or 2  (for pack)
 
@@ -627,7 +627,7 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_global_t* glob,
                                     int this_patch_idx,
                                     double *qdata, fclaw_bool time_interp)
 {
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
     int packmode = 2*packarea + 1;  // 1 or 3  (for unpack)
 
@@ -644,7 +644,7 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_global_t* glob,
 
 size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -700,7 +700,7 @@ void fclaw2d_clawpatch_copy_face(fclaw2d_global_t *glob,
 {
     int meqn,mx,my,mbc;
     double *qthis, *qneighbor;
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     mx = gparms->mx;
     my = gparms->my;
@@ -726,7 +726,7 @@ void fclaw2d_clawpatch_average_face(fclaw2d_global_t *glob,
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
@@ -760,7 +760,7 @@ void fclaw2d_clawpatch_interpolate_face(fclaw2d_global_t *glob,
 {
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
@@ -783,7 +783,7 @@ void fclaw2d_clawpatch_copy_corner(fclaw2d_global_t *glob,
 {
     int meqn,mx,my,mbc;
     double *qthis, *qcorner;
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     mx = gparms->mx;
     my = gparms->my;
@@ -807,7 +807,7 @@ void fclaw2d_clawpatch_average_corner(fclaw2d_global_t *glob,
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
@@ -837,7 +837,7 @@ void fclaw2d_clawpatch_interpolate_corner(fclaw2d_global_t* glob,
 {
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
-    const amr_options_t *gparms = fclaw_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     mx = gparms->mx;
     my = gparms->my;

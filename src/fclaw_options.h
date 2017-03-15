@@ -53,7 +53,7 @@ fclaw_exit_type_t fclaw_options_check (fclaw_options_t * amropt);
 void fclaw_options_reset (fclaw_options_t * amropt);
 
 void fclaw2d_forestclaw_set_options (struct fclaw2d_global *glob, amr_options_t* gparms);
-amr_options_t* fclaw_forestclaw_get_options(struct fclaw2d_global *glob);
+amr_options_t* fclaw2d_forestclaw_get_options(struct fclaw2d_global *glob);
 
 
 amr_options_t* fclaw2d_forestclaw_options_register (fclaw_app_t * a,

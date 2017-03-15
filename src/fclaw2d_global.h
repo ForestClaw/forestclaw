@@ -77,9 +77,6 @@ typedef struct fclaw2d_global
 	sc_MPI_Comm mpicomm;
     int mpisize;              /**< Size of communicator. */
     int mpirank;              /**< Rank of this process in \b mpicomm. */
-
-    int gparms_owned;                 /**< Did we allocate \a gparms? */
-    amr_options_t *gparms;            /**< Option values for forestclaw. */
  
     fclaw_package_container_t *pkg_container;    /**< Solver packages for internal use. */
  
