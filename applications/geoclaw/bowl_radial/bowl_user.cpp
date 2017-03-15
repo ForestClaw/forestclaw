@@ -37,12 +37,6 @@ void bowl_link_solvers(fclaw2d_global_t *glob)
 
     /* These are set by GeoClaw for convenience, but the user
        can set these with customized functions, if desired. */
-#if 0
-    fc2d_geoclaw_init_vtables(&vt, &geoclaw);
-    fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
-#endif
-    
-    fclaw2d_set_vtable();
 
 #if 0
     /* Example of a function the user can set. */

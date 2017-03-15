@@ -413,65 +413,48 @@ void  FC2D_GEOCLAW_FORT_GHOSTPACKAUX(int *mx, int *my, int *mbc,
                                      int *auxsize, int *packmode, int *ierror);
 /***************************** MINIMAL API ******************************/
 
-void fc2d_geoclaw_register_vtable (fclaw_package_container_t *
-                                      pkg_container,
-                                      fc2d_geoclaw_options_t *
-                                      clawopt);
-
 /* -------------------------------------------------------------------------
    New routines
    ------------------------------------------------------------------------- */
-void fc2d_geoclaw_define_auxarray(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch);
+void fc2d_geoclaw_set_options (fclaw2d_global_t* glob, 
+                               fc2d_geoclaw_options_t* clawopt);
+fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_global_t *glob);
 
-void fc2d_geoclaw_aux_data(fclaw2d_domain_t* domain,
-                              fclaw2d_patch_t *this_patch,
-                              double **aux, int* maux);
-
-int fc2d_geoclaw_get_maux(fclaw2d_domain_t* domain);
-void fc2d_geoclaw_maux(fclaw2d_domain_t* domain, int* maux);
-
-void fc2d_geoclaw_register (fclaw_app_t* app, const char *configfile);
-
-void fc2d_geoclaw_package_register(fclaw_app_t* app,
-                                      fc2d_geoclaw_options_t* clawopt);
-
-int fc2d_geoclaw_get_package_id (void);
-
-fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_domain_t *domain);
+void fc2d_geoclaw_aux_data(fclaw2d_global_t* glob,
+                           fclaw2d_patch_t *this_patch,
+                           double **aux, int* maux);
 
 /* -------------------------------------------------------------------------
    Routines that won't change
    ------------------------------------------------------------------------- */
-void fc2d_geoclaw_setup(fclaw2d_domain_t *domain);
+void fc2d_geoclaw_setup(fclaw2d_global_t *glob);
 
-void
-    fc2d_geoclaw_setprob(fclaw2d_global_t* glob);
+void fc2d_geoclaw_setprob(fclaw2d_global_t* glob);
 
-void fc2d_geoclaw_patch_setup(fclaw2d_domain_t *domain,
+void fc2d_geoclaw_patch_setup(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx);
 void
-    fc2d_geoclaw_setaux(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_setaux(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
 void
-    fc2d_geoclaw_set_capacity(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_set_capacity(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx);
 
 void
-    fc2d_geoclaw_qinit(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_qinit(fclaw2d_global_t *glob,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx);
 
 void
-    fc2d_geoclaw_b4step2(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_b4step2(fclaw2d_global_t *glob,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
@@ -479,7 +462,7 @@ void
                             double dt);
 
 void
-    fc2d_geoclaw_bc2(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_bc2(fclaw2d_global_t *glob,
                         fclaw2d_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
@@ -489,7 +472,7 @@ void
                         fclaw_bool time_interp);
 
 void
-    fc2d_geoclaw_src2(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_src2(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
@@ -500,7 +483,7 @@ void
 /* A single step method that advances the solution a single step on a single grid
    using a time step dt determined by the subcycle manager */
 double
-    fc2d_geoclaw_step2(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_step2(fclaw2d_global_t *glob,
                           fclaw2d_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -509,7 +492,7 @@ double
 
 /* Use this ro return only the right hand side of the clawpack algorithm */
 double
-    fc2d_geoclaw_step2_rhs(fclaw2d_domain_t *domain,
+    fc2d_geoclaw_step2_rhs(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
@@ -517,43 +500,43 @@ double
                               double *rhs);
 
 double
-fc2d_geoclaw_update(fclaw2d_domain_t *domain,
+fc2d_geoclaw_update(fclaw2d_global_t *glob,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
                        double t,
                        double dt);
 
-int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_patches,
                                       int blockno, int patchno);
 
-int fc2d_geoclaw_patch_tag4refinement(fclaw2d_domain_t *domain,
+int fc2d_geoclaw_patch_tag4refinement(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int blockno, int this_patch_idx,
                                       int initflag);
 
-void fc2d_geoclaw_interpolate2fine(fclaw2d_domain_t *domain,
+void fc2d_geoclaw_interpolate2fine(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *coarse_patch,
                                    fclaw2d_patch_t *fine_patches,
                                    int this_blockno, int coarse_patchno,
                                    int fine0_patchno);
 
-void fc2d_geoclaw_average2coarse(fclaw2d_domain_t *domain,
+void fc2d_geoclaw_average2coarse(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *coarse_patch,
                                    fclaw2d_patch_t *fine_patches,
                                    int this_blockno, int coarse_patchno,
                                    int fine0_patchno);
 
-void fc2d_geoclaw_output_header_ascii(fclaw2d_domain_t* domain,
+void fc2d_geoclaw_output_header_ascii(fclaw2d_global_t *glob,
                                       int iframe);
 
-void fc2d_geoclaw_output_patch_ascii(fclaw2d_domain_t *domain,
+void fc2d_geoclaw_output_patch_ascii(fclaw2d_global_t *glob,
                                      fclaw2d_patch_t *this_patch,
                                      int this_block_idx, int this_patch_idx,
                                      int iframe,int patch_num,int level);
 
-void fc2d_geoclaw_average_face(fclaw2d_domain_t *domain,
+void fc2d_geoclaw_average_face(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *coarse_patch,
                                     fclaw2d_patch_t *fine_patch,
                                     int idir,
@@ -564,7 +547,7 @@ void fc2d_geoclaw_average_face(fclaw2d_domain_t *domain,
                                     int igrid,
                                     fclaw2d_transform_data_t* transform_data);
 
-void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
+void fc2d_geoclaw_interpolate_face(fclaw2d_global_t *glob,
                                         fclaw2d_patch_t *coarse_patch,
                                         fclaw2d_patch_t *fine_patch,
                                         int idir,
@@ -575,7 +558,7 @@ void fc2d_geoclaw_interpolate_face(fclaw2d_domain_t *domain,
                                         int igrid,
                                         fclaw2d_transform_data_t* transform_data);
 
-void fc2d_geoclaw_average_corner(fclaw2d_domain_t *domain,
+void fc2d_geoclaw_average_corner(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *coarse_patch,
                                  fclaw2d_patch_t *fine_patch,
                                  int coarse_corner,
@@ -583,7 +566,7 @@ void fc2d_geoclaw_average_corner(fclaw2d_domain_t *domain,
                                  fclaw_bool time_interp,
                                  fclaw2d_transform_data_t* transform_data);
 
-void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
+void fc2d_geoclaw_interpolate_corner(fclaw2d_global_t *glob,
                                      fclaw2d_patch_t* coarse_patch,
                                      fclaw2d_patch_t* fine_patch,
                                      int coarse_corner,
@@ -591,19 +574,20 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_domain_t* domain,
                                      fclaw_bool time_interp,
                                      fclaw2d_transform_data_t* transform_data);
 
-void  fc2d_geoclaw_ghostpack_aux(fclaw2d_domain_t *domain,
+void  fc2d_geoclaw_ghostpack_aux(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *this_patch,
                                  int mint,
                                  double *auxpack,
                                  int auxsize,
                                  int packmode, int* ierror);
 
-void fc2d_geoclaw_set_gauge_info(fclaw2d_domain_t* domain, geoclaw_gauge_t gauges[], int num);
-void fc2d_geoclaw_update_gauges(fclaw2d_domain_t *domain, const double tcurr);
-void fc2d_geoclaw_after_regrid(fclaw2d_domain_t *domain);
-void fc2d_geoclaw_gauge_setup(fclaw2d_domain_t* domain);
+void fc2d_geoclaw_set_gauge_info(fclaw2d_global_t *glob, geoclaw_gauge_t gauges[], int num);
+void fc2d_geoclaw_update_gauges(fclaw2d_global_t *glob, const double tcurr);
+void fc2d_geoclaw_after_regrid(fclaw2d_global_t *glob);
+void fc2d_geoclaw_gauge_initialize(fclaw2d_global_t *glob, void** acc);
+void fc2d_geoclaw_gauge_setup(fclaw2d_global_t *glob);
 
-void fc2d_geoclaw_finalize(fclaw2d_domain_t *domain);
+void fc2d_geoclaw_finalize(fclaw2d_global_t *glob);
 
 
 #ifdef __cplusplus

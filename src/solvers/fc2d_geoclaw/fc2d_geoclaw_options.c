@@ -133,7 +133,7 @@ options_postprocess (fclaw_app_t * app, void *package, void *registered)
     clawopt = &clawpkg->clawopt;
     FCLAW_ASSERT (clawopt != NULL);
 
-    amr_options_t *gparms = fclaw2d_forestclaw_get_options(app);
+    amr_options_t *gparms = fclaw_app_get_attribute(app,"Options",NULL);
     FCLAW_ASSERT (gparms != NULL);
 
     if (clawopt->ghost_patch_pack_aux)

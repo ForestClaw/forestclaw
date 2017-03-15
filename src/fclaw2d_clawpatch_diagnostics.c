@@ -58,7 +58,7 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
     /* Allocate memory for 1-norm, 2-norm, and inf-norm errors */
     error_data->local_error  = FCLAW_ALLOC_ZERO(double,3*meqn);
     error_data->mass   = FCLAW_ALLOC_ZERO(double,meqn);
-    error_data->mass0   = FCLAW_ALLOC_ZERO(double,meqn);
+    error_data->mass0  = FCLAW_ALLOC_ZERO(double,meqn);
     error_data->area = 0;
 
     *acc_patch = error_data;
