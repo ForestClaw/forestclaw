@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_package.h>
 #include <fclaw_timer.h>
 #include <fclaw2d_map.h>
+#include <fclaw2d_diagnostics.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -82,6 +83,8 @@ typedef struct fclaw2d_global
  
     fclaw2d_map_context_t* cont;
     fclaw2d_domain_t *domain;
+
+    fclaw2d_diagnostics_accumulator_t *acc;
 }
 fclaw2d_global_t;
 

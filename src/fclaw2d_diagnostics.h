@@ -45,21 +45,23 @@ typedef struct
     void* user_accumulator;
 } fclaw2d_diagnostics_accumulator_t;
 
+struct fclaw2d_global;
+
 /* Diagnostic information */
-typedef void (*fclaw2d_diagnostics_initialize_t)(fclaw2d_global_t *glob,
+typedef void (*fclaw2d_diagnostics_initialize_t)(struct fclaw2d_global *glob,
                                                  void** acc);
 
-typedef void (*fclaw2d_diagnostics_compute_t)(fclaw2d_global_t *glob,
+typedef void (*fclaw2d_diagnostics_compute_t)(struct fclaw2d_global *glob,
                                               void* acc);
 
-typedef void (*fclaw2d_diagnostics_gather_t)(fclaw2d_global_t *glob,
+typedef void (*fclaw2d_diagnostics_gather_t)(struct fclaw2d_global *glob,
                                              void* acc,
                                              int init_flag);
 
-typedef void (*fclaw2d_diagnostics_reset_t)(fclaw2d_global_t *glob,
+typedef void (*fclaw2d_diagnostics_reset_t)(struct fclaw2d_global *glob,
                                             void* acc);
 
-typedef void (*fclaw2d_diagnostics_finalize_t)(fclaw2d_global_t *glob,
+typedef void (*fclaw2d_diagnostics_finalize_t)(struct fclaw2d_global *glob,
                                                void** acc);
 
 fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt();
@@ -95,17 +97,17 @@ void fclaw2d_diagnostics_vtable_init();
 /* See forestclaw2d.h for the maximum version of this function */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
 
-void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob,
+void fclaw2d_diagnostics_initialize(struct fclaw2d_global *glob,
                                     fclaw2d_diagnostics_accumulator_t* acc);
 
-void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
+void fclaw2d_diagnostics_gather(struct fclaw2d_global *glob,
                                 fclaw2d_diagnostics_accumulator_t* acc,
                                 int init_flag);
 
-void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob,
+void fclaw2d_diagnostics_reset(struct fclaw2d_global *glob,
                                fclaw2d_diagnostics_accumulator_t* acc);
 
-void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob,
+void fclaw2d_diagnostics_finalize(struct fclaw2d_global *glob,
                                   fclaw2d_diagnostics_accumulator_t* acc);
 
 #ifdef __cplusplus

@@ -52,6 +52,7 @@ fclaw2d_global_t* fclaw2d_global_new ()
     glob->count_single_step = 0;
     glob->curr_time = 0;
     glob->cont = NULL;
+    glob->acc = FCLAW_ALLOC(fclaw2d_diagnostics_accumulator_t, 1);
 
     return glob;
 }

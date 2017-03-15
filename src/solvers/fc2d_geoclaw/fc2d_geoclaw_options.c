@@ -196,7 +196,6 @@ fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt)
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
     fclaw_options_destroy_array (clawopt->speed_tolerance_c);
-    fclaw_options_destroy_array (clawopt->gauges);
 }
 
 static void

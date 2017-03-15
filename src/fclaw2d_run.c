@@ -90,8 +90,7 @@ void save_time_step(fclaw2d_global_t *glob)
    -------------------------------------------------------------------------------- */
 static void outstyle_0(fclaw2d_global_t *glob)
 {
-    fclaw2d_diagnostics_accumulator_t acc;
-    fclaw2d_diagnostics_initialize(glob,&acc);
+    fclaw2d_diagnostics_initialize(glob,glob->acc);
 
     int iframe;
 
@@ -99,7 +98,7 @@ static void outstyle_0(fclaw2d_global_t *glob)
     fclaw2d_output_frame(glob,iframe);
 
     int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,&acc,init_flag);
+    fclaw2d_diagnostics_gather(glob,glob->acc,init_flag);
     init_flag = 0;
 
     /* Here is where we might include a call to a static solver, for, say,
@@ -126,8 +125,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
 
-    fclaw2d_diagnostics_accumulator_t acc;
-    fclaw2d_diagnostics_initialize(glob,&acc);
+    fclaw2d_diagnostics_initialize(glob,glob->acc);
 
     int iframe = 0;
 
@@ -143,7 +141,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
 
     int init_flag = 1;  /* Store anything that needs to be stored */
-    fclaw2d_diagnostics_gather(glob,&acc,init_flag);
+    fclaw2d_diagnostics_gather(glob,glob->acc,init_flag);
     init_flag = 0;
 
     double t0 = 0;
@@ -275,7 +273,7 @@ void outstyle_1(fclaw2d_global_t *glob)
             }
             glob->curr_time = t_curr;
 
-            fclaw2d_diagnostics_gather(glob, &acc, init_flag);
+            fclaw2d_diagnostics_gather(glob, glob->acc, init_flag);
 
             if (gparms->regrid_interval > 0)
             {
@@ -292,7 +290,7 @@ void outstyle_1(fclaw2d_global_t *glob)
         iframe++;
         fclaw2d_output_frame(glob,iframe);
     }
-    fclaw2d_diagnostics_finalize(glob,&acc);
+    fclaw2d_diagnostics_finalize(glob,glob->acc);
 }
 
 #if 0
@@ -308,11 +306,10 @@ void outstyle_3(fclaw2d_global_t *glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
 
-    fclaw2d_diagnostics_accumulator_t acc;
-    fclaw2d_diagnostics_initialize(glob,&acc);
+    fclaw2d_diagnostics_initialize(glob,glob->acc);
 
     int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,&acc,init_flag);
+    fclaw2d_diagnostics_gather(glob,glob->acc,init_flag);
     init_flag = 0;
 
     int iframe = 0;
@@ -426,27 +423,26 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         if (n % nstep_inner == 0)
         {
-            fclaw2d_diagnostics_gather(glob, &acc, init_flag);
+            fclaw2d_diagnostics_gather(glob, glob->acc, init_flag);
             iframe++;
             fclaw2d_output_frame(glob,iframe);
         }
     }
-    fclaw2d_diagnostics_finalize(glob,&acc);
+    fclaw2d_diagnostics_finalize(glob,glob->acc);
 }
 
 
 static
 void outstyle_4(fclaw2d_global_t *glob)
 {
-    fclaw2d_diagnostics_accumulator_t acc;
-    fclaw2d_diagnostics_initialize(glob,&acc);
+    fclaw2d_diagnostics_initialize(glob,glob->acc);
 
     /* Write out an initial time file */
     int iframe = 0;
     fclaw2d_output_frame(glob,iframe);
 
     int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,&acc,init_flag);
+    fclaw2d_diagnostics_gather(glob,glob->acc,init_flag);
     init_flag = 0;
 
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
@@ -492,12 +488,12 @@ void outstyle_4(fclaw2d_global_t *glob)
 
         if (n % nstep_inner == 0)
         {
-            fclaw2d_diagnostics_gather(glob, &acc, init_flag);
+            fclaw2d_diagnostics_gather(glob, glob->acc, init_flag);
             iframe++;
             fclaw2d_output_frame(glob,iframe);
         }
     }
-    fclaw2d_diagnostics_finalize(glob,&acc);
+    fclaw2d_diagnostics_finalize(glob,glob->acc);
 }
 
 

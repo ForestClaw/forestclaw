@@ -79,10 +79,6 @@ typedef struct fc2d_geoclaw_options
     /* ghost patch */
     int ghost_patch_pack_aux;
 
-    /* gauges */
-    int num_gauges;
-    geoclaw_gauge_t *gauges;
-
     amr_options_t* gparms;
 }
 fc2d_geoclaw_options_t;
