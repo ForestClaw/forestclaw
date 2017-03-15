@@ -142,8 +142,8 @@ void fc2d_geoclaw_init_vtables()
 
     /* Update gauges */
     diag_vt->solver_init_diagnostics  = &fc2d_geoclaw_gauge_initialize;
-    // diag_vt->solver_compute_diagnostics = &fc2d_geoclaw_update_gauges;
-    // diag_vt->solver_finalize_diagnostics = &fc2d_geoclaw_gauge_finalize;
+    diag_vt->solver_compute_diagnostics = &fc2d_geoclaw_gauge_update;
+    diag_vt->solver_finalize_diagnostics = &fc2d_geoclaw_gauge_finalize;
 }
 
 fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_global_t *glob)
@@ -312,11 +312,11 @@ void fc2d_geoclaw_gauge_initialize(fclaw2d_global_t* glob, void** acc)
     }
 }
 
-void fc2d_geoclaw_gauge_update(fclaw2d_global_t *glob, void* acc)
+void fc2d_geoclaw_gauge_update(fclaw2d_global_t *glob, void* solver_acc)
 {
-    fc2d_geoclaw_gauge_acc_t* gauge_acc = (fc2d_geoclaw_gauge_acc_t*) acc;
+    fc2d_geoclaw_gauge_acc_t* gauge_acc = (fc2d_geoclaw_gauge_acc_t*) solver_acc;
 
-    double tcurr = glob->curr_time;
+    const double tcurr = glob->curr_time;
     int mx,my,mbc,meqn,maux;
     double dx,dy,xlower,ylower,eta;
     double *q, *aux;
@@ -373,6 +373,7 @@ void fc2d_geoclaw_gauge_finalize(fclaw2d_global_t *glob, void** acc)
 {
     fc2d_geoclaw_gauge_acc_t* gauge_acc = *((fc2d_geoclaw_gauge_acc_t**) acc);
     FCLAW_FREE(gauge_acc->gauges);
+    FCLAW_FREE(gauge_acc);
     *acc = NULL;
 }
 
@@ -392,14 +393,16 @@ void fc2d_geoclaw_finalize(fclaw2d_global_t *glob)
 
 void fc2d_geoclaw_after_regrid(fclaw2d_global_t *glob)
 {
-#if 0
     int i,index;
-
-    fc2d_geoclaw_options_t *geoclaw_options;
-    geoclaw_options = fc2d_geoclaw_get_options(glob);
+    fc2d_geoclaw_gauge_acc_t* gauge_acc = (fc2d_geoclaw_gauge_acc_t*) glob->acc->solver_accumulator;
+    
+    if (gauge_acc == NULL)
+    {
+        return;
+    }
 
     /* Locate each gauge in the new mesh */
-    int num = geoclaw_options->num_gauges;
+    int num = gauge_acc->num_gauges;
 
     if (num == 0)
     {
@@ -410,9 +413,9 @@ void fc2d_geoclaw_after_regrid(fclaw2d_global_t *glob)
     fclaw2d_domain_search_points(glob->domain, gauge_info.block_offsets,
                                  gauge_info.coordinates, results);
 
-    for (i = 0; i < geoclaw_options->num_gauges; ++i)
+    for (i = 0; i < gauge_acc->num_gauges; ++i)
     {
-        index = geoclaw_options->gauges[i].location_in_results;
+        index = gauge_acc->gauges[i].location_in_results;
         FCLAW_ASSERT(index >= 0 && index < num);
 
         /* patchno == -1  : Patch is not on this processor
@@ -420,10 +423,9 @@ void fc2d_geoclaw_after_regrid(fclaw2d_global_t *glob)
         */
 
         int patchno = *((int *) sc_array_index_int(results, index));
-        geoclaw_options->gauges[i].patchno = patchno;
+        gauge_acc->gauges[i].patchno = patchno;
     }
     sc_array_destroy(results);
-#endif
 }
 
 

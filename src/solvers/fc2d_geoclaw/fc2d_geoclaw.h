@@ -582,13 +582,13 @@ void  fc2d_geoclaw_ghostpack_aux(fclaw2d_global_t *glob,
                                  int packmode, int* ierror);
 
 void fc2d_geoclaw_set_gauge_info(fclaw2d_global_t *glob, geoclaw_gauge_t gauges[], int num);
-void fc2d_geoclaw_update_gauges(fclaw2d_global_t *glob, const double tcurr);
 void fc2d_geoclaw_after_regrid(fclaw2d_global_t *glob);
 void fc2d_geoclaw_gauge_setup(fclaw2d_global_t *glob);
 
 void fc2d_geoclaw_finalize(fclaw2d_global_t *glob);
 
 void fc2d_geoclaw_gauge_initialize(fclaw2d_global_t *glob, void** acc);
+void fc2d_geoclaw_gauge_update(fclaw2d_global_t *glob, void* solver_acc);
 void fc2d_geoclaw_gauge_finalize(fclaw2d_global_t *glob, void** acc);
 
 
