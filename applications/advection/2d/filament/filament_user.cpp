@@ -30,12 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void filament_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
-    const user_options_t* user = filament_user_get_options(*domain);
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(*domain);
-
-    // fclaw2d_init_vtable();
-
+    const user_options_t* user = filament_user_get_options(glob);
+    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vt()->setprob   = &SETPROB;
@@ -89,34 +86,34 @@ void filament_link_solvers(fclaw2d_global_t *glob)
     }
 }
 
-void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
+void filament_patch_setup_manifold(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *this_patch,
                                    int this_block_idx,
                                    int this_patch_idx)
 {
-    const user_options_t* user = filament_user_get_options(domain);
+    const user_options_t* user = filament_user_get_options(glob);
 
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
+    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+        fc2d_clawpack46_aux_data(glob,this_patch,&aux,&maux);
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                                &dx,&dy,&maux,aux,&this_block_idx,
                                xd,yd,zd,area);
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+        fc2d_clawpack5_aux_data(glob,this_patch,&aux,&maux);
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                               &dx,&dy,&maux,aux,&this_block_idx,
                               xd,yd,zd,area);
