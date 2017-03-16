@@ -26,7 +26,7 @@ endif
 include applications/advection/2d/swirl/Makefile.am
 include applications/advection/2d/torus/Makefile.am
 #include applications/advection/2d/torthem/Makefile.am
-#include applications/advection/2d/annulus/Makefile.am
+include applications/advection/2d/annulus/Makefile.am
 #include applications/advection/2d/filament/Makefile.am
 #include applications/advection/2d/latlong/Makefile.am
 #include applications/advection/2d/replicated/Makefile.am

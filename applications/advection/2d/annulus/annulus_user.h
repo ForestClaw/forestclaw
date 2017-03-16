@@ -49,20 +49,20 @@ typedef struct user_options
 user_options_t;
 
 
-void annulus_link_solvers(fclaw2d_domain_t *domain);
+void annulus_link_solvers(fclaw2d_global_t *glob);
 
-void annulus_problem_setup(fclaw2d_domain_t *domain);
+void annulus_problem_setup(fclaw2d_global_t *glob);
 
 #define SETPROB_ANNULUS FCLAW_F77_FUNC(setprob_annulus,SETPROB_ANNULUS)
 void SETPROB_ANNULUS(const double* beta);
 
-void annulus_patch_setup(fclaw2d_domain_t *domain,
+void annulus_patch_setup(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx);
 
 
-const user_options_t* annulus_user_get_options(fclaw2d_domain_t* domain);
+const user_options_t* annulus_user_get_options(fclaw2d_global_t *glob);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,

@@ -30,9 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-void annulus_link_solvers(fclaw2d_domain_t *domain)
+void annulus_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t *user =  annulus_user_get_options(domain);
+    const user_options_t *user =  annulus_user_get_options(glob);
 
     fclaw2d_vt()->problem_setup  = &annulus_problem_setup;
     fclaw2d_patch_vt()->setup    = &annulus_patch_setup;
@@ -53,14 +53,14 @@ void annulus_link_solvers(fclaw2d_domain_t *domain)
 
 
 
-void annulus_problem_setup(fclaw2d_domain_t *domain)
+void annulus_problem_setup(fclaw2d_global_t *glob)
 {
-    const user_options_t *user = annulus_user_get_options(domain);
+    const user_options_t *user = annulus_user_get_options(glob);
     SETPROB_ANNULUS(&user->beta);
 }
 
 
-void annulus_patch_setup(fclaw2d_domain_t *domain,
+void annulus_patch_setup(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx)
@@ -69,24 +69,24 @@ void annulus_patch_setup(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
-    const user_options_t* user = annulus_user_get_options(domain);
+    const user_options_t* user = annulus_user_get_options(glob);
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(domain,this_patch,&xp,&yp,&zp,
+    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
+        fc2d_clawpack46_aux_data(glob,this_patch,&aux,&maux);
 
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                                &maux,aux,&this_block_idx,xd,yd,zd,area);
     }
     else if(user->claw_version == 5)
     {
-        fc2d_clawpack5_aux_data(domain,this_patch,&aux,&maux);
+        fc2d_clawpack5_aux_data(glob,this_patch,&aux,&maux);
 
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                               &maux,aux,&this_block_idx,xd,yd,zd,area);
