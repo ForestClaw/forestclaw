@@ -192,6 +192,7 @@ void fclaw2d_clawpatch_partition_pack(fclaw2d_global_t *glob,
                                       void *user);
 
 void fclaw2d_clawpatch_partition_unpack(fclaw2d_global_t *glob,
+                                        fclaw2d_domain_t *new_domain,
                                         fclaw2d_patch_t *this_patch,
                                         int this_block_idx,
                                         int this_patch_idx,

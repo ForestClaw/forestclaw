@@ -631,7 +631,7 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_global_t* glob,
     int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
     int packmode = 2*packarea + 1;  // 1 or 3  (for unpack)
 
-    ghost_comm(glob,this_patch,qdata, time_interp,packmode);
+    ghost_comm(glob,this_patch,qdata,time_interp,packmode);
 }
 
 /* --------------------------------------------------------
@@ -672,14 +672,13 @@ void fclaw2d_clawpatch_partition_pack(fclaw2d_global_t *glob,
 }
 
 void fclaw2d_clawpatch_partition_unpack(fclaw2d_global_t *glob,
+                                        fclaw2d_domain_t *new_domain,
                                         fclaw2d_patch_t *this_patch,
                                         int this_block_idx,
                                         int this_patch_idx,
                                         void *user)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    fclaw2d_block_t *this_block = &new_domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
 

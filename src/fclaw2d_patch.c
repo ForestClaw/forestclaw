@@ -402,6 +402,7 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
     FCLAW_ASSERT(patch_vt()->partition_pack != NULL);
 
     patch_vt()->partition_unpack(glob,
+                                 new_domain,
                                  this_patch,
                                  this_block_idx,
                                  this_patch_idx,

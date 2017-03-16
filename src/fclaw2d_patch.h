@@ -461,6 +461,7 @@ typedef void (*fclaw2d_patch_partition_pack_t)(fclaw2d_global_t *glob,
                                                void *user);
 
 typedef void (*fclaw2d_patch_partition_unpack_t)(fclaw2d_global_t *glob,
+                                                 fclaw2d_domain_t *new_domain,
                                                  fclaw2d_patch_t *this_patch,
                                                  int this_block_idx,
                                                  int this_patch_idx,
