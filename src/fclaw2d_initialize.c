@@ -252,6 +252,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                              time_interp,FCLAW2D_TIMER_INIT);
     }
 
+    fclaw2d_diagnostics_initialize(glob);
     fclaw2d_after_regrid(glob);
 
     /* Print global minimum and maximum levels */

@@ -395,11 +395,6 @@ void fc2d_geoclaw_after_regrid(fclaw2d_global_t *glob)
 {
     int i,index;
     fc2d_geoclaw_gauge_acc_t* gauge_acc = (fc2d_geoclaw_gauge_acc_t*) glob->acc->solver_accumulator;
-    
-    if (glob->curr_time == 0)
-    {
-        return;
-    }
 
     /* Locate each gauge in the new mesh */
     int num = gauge_acc->num_gauges;

@@ -90,7 +90,6 @@ void save_time_step(fclaw2d_global_t *glob)
    -------------------------------------------------------------------------------- */
 static void outstyle_0(fclaw2d_global_t *glob)
 {
-    fclaw2d_diagnostics_initialize(glob);
 
     int iframe;
 
@@ -124,8 +123,6 @@ static
 void outstyle_1(fclaw2d_global_t *glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
-
-    fclaw2d_diagnostics_initialize(glob);
 
     int iframe = 0;
 
@@ -306,8 +303,6 @@ void outstyle_3(fclaw2d_global_t *glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
 
-    fclaw2d_diagnostics_initialize(glob);
-
     int init_flag = 1;
     fclaw2d_diagnostics_gather(glob,init_flag);
     init_flag = 0;
@@ -435,7 +430,6 @@ void outstyle_3(fclaw2d_global_t *glob)
 static
 void outstyle_4(fclaw2d_global_t *glob)
 {
-    fclaw2d_diagnostics_initialize(glob);
 
     /* Write out an initial time file */
     int iframe = 0;
