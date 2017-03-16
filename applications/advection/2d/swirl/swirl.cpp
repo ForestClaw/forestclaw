@@ -27,7 +27,7 @@
 
 #include <fclaw2d_forestclaw.h>
 
-
+static int s_user_package_id = -1;
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -58,8 +58,6 @@ static const fclaw_app_options_vtable_t options_vtable_user =
     options_check_user,
     NULL
 };
-
-static int s_user_package_id = -1;
 
 static
 void register_user_options (fclaw_app_t * app,

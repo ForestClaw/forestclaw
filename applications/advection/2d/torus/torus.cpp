@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_clawpack46.h>
 
+static int s_user_package_id = -1;
+
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -93,19 +95,19 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
-const user_options_t* torus_user_get_options(fclaw2d_global_t* glob)
+static 
+void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
 {
-    return torus_user_get_options_old(glob->domain);
+    FCLAW_ASSERT(s_user_package_id == -1);
+    int id = fclaw_package_container_add_pkg(glob,user);
+    s_user_package_id = id;
 }
 
-const user_options_t* torus_user_get_options_old(fclaw2d_domain_t* domain)
+const user_options_t* torus_user_get_options(fclaw2d_global_t* glob)
 {
-    fclaw_app_t* app;
-    app = fclaw2d_domain_get_app(domain);
-
-    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
-
-    return (user_options_t*) user;
+    int id = s_user_package_id;
+    return (user_options_t*) 
+            fclaw_package_get_options(glob, id);    
 }
 
 static
@@ -145,17 +147,16 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms, user
     return domain;
 }
 static
-void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
+void run_program(fclaw2d_global_t* glob)
 {
     user_options_t  *user;
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_set_app (glob->domain,app);
     fclaw2d_domain_data_new(glob->domain);
 
-    user = (user_options_t*) fclaw_app_get_user(app);
+    user = (user_options_t*) torus_user_get_options(glob);
 
     if (user->claw_version == 4)
     {
@@ -170,9 +171,6 @@ void run_program(fclaw2d_global_t* glob, fclaw_app_t* app)
 
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
-
-    fclaw2d_map_context_t* cont = fclaw2d_domain_get_map_context(glob->domain);
-    fclaw2d_map_destroy(cont);
     fclaw2d_finalize(glob);
 }
 
@@ -182,7 +180,6 @@ main (int argc, char **argv)
 {
     int first_arg;
     fclaw_app_t *app;
-    fclaw_options_t *gparms;
     fclaw2d_global_t *glob;
     fclaw_exit_type_t vexit;
 
@@ -190,8 +187,12 @@ main (int argc, char **argv)
     fclaw2d_domain_t *domain;
 
     /* Options */
-    sc_options_t     *options;
-    user_options_t    suser_options, *user = &suser_options;
+    sc_options_t                *options;
+    user_options_t              suser, *user = &suser;
+    amr_options_t               *gparms;
+    fclaw2d_clawpatch_options_t *clawpatchopt;
+    fc2d_clawpack46_options_t   *claw46opt;
+    fc2d_clawpack5_options_t    *claw5opt;
 
     int retval;
 
@@ -199,10 +200,11 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, user);
 
     /* Register packages */
-    fclaw_forestclaw_register(app,"fclaw_options.ini");
-    fc2d_clawpack46_register(app,"fclaw_options.ini");
-    fc2d_clawpack5_register(app,"fclaw_options.ini");
-
+    gparms = fclaw2d_forestclaw_options_register(app,"fclaw_options.ini");
+    clawpatchopt = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
+    claw46opt = fc2d_clawpack46_options_register(app,"fclaw_options.ini");
+    claw5opt = fc2d_clawpack5_options_register(app,"fclaw_options.ini");
+    register_user_options(app,"fclaw_options.ini",user);  /* [user] */
     /* User defined options (defined above) */
     register_user_options (app, "fclaw_options.ini", user);
 
@@ -211,21 +213,26 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    fclaw2d_clawpatch_link_app (app);
-
     /* at this point gparms is valid */
-    gparms = fclaw_forestclaw_get_options(app);
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     domain = create_domain(mpicomm, gparms, user);
-    glob = fclaw2d_global_new (gparms, domain);
+
+    glob = fclaw2d_global_new();
+    fclaw2d_global_set_domain(glob, domain);
+    
+    fclaw2d_forestclaw_set_options (glob, gparms);
+    fclaw2d_clawpatch_set_options (glob, clawpatchopt);
+    fc2d_clawpack46_set_options (glob, claw46opt);
+    fc2d_clawpack5_set_options (glob, claw5opt);
+    user_set_options (glob, user);
+
 
     if (!retval & !vexit)
     {
-        run_program(glob, app);
+        run_program(glob);
     }
 
     fclaw2d_global_destroy (glob);
-    fclaw_forestclaw_destroy(app);
     fclaw_app_destroy (app);
 
     return 0;

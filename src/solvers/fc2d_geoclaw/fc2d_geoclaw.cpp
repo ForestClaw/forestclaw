@@ -89,13 +89,13 @@ void fc2d_geoclaw_init_vtables()
     fclaw_vt->problem_setup      = &fc2d_geoclaw_setprob;  /* This function calls ... */
     geoclaw_vt->setprob          = NULL;                   /* ....     this function. */
 
-    patch_vt->setup        = &fc2d_geoclaw_patch_setup;
+    patch_vt->setup              = &fc2d_geoclaw_patch_setup;
     geoclaw_vt->setaux           = &GEOCLAW_SETAUX;
 
-    patch_vt->initialize   = &fc2d_geoclaw_qinit;
+    patch_vt->initialize         = &fc2d_geoclaw_qinit;
     geoclaw_vt->qinit            = &GEOCLAW_QINIT;
 
-    patch_vt->physical_bc  = &fc2d_geoclaw_bc2;
+    patch_vt->physical_bc        = &fc2d_geoclaw_bc2;
     geoclaw_vt->bc2              = &GEOCLAW_BC2;
 
     patch_vt->single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
@@ -111,7 +111,7 @@ void fc2d_geoclaw_init_vtables()
     patch_vt->interpolate2fine  = &fc2d_geoclaw_interpolate2fine;
     patch_vt->average2coarse    = &fc2d_geoclaw_average2coarse;
 
-    patch_vt->write_header             = &fc2d_geoclaw_output_header_ascii;
+    patch_vt->write_header       = &fc2d_geoclaw_output_header_ascii;
     patch_vt->write_file         = &fc2d_geoclaw_output_patch_ascii;
 
     /* diagnostic functions */

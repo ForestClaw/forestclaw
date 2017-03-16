@@ -83,26 +83,26 @@ void torus_problem_setup(fclaw2d_global_t *glob)
     TORUS_SETPROB(&user->example,&user->alpha);
 }
 
-void torus_patch_setup(fclaw2d_domain_t *domain,
+void torus_patch_setup(fclaw2d_global_t *glob,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx)
 {
-    const user_options_t* user = torus_user_get_options_old(domain);
+    const user_options_t* user = torus_user_get_options(glob);
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-        fc2d_clawpack46_set_capacity(domain,this_patch,this_block_idx,this_patch_idx);
+        fc2d_clawpack46_setaux(glob,this_patch,this_block_idx,this_patch_idx);
+        fc2d_clawpack46_set_capacity(glob,this_patch,this_block_idx,this_patch_idx);
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_setaux(domain,this_patch,this_block_idx,this_patch_idx);
-        fc2d_clawpack5_set_capacity(domain,this_patch,this_block_idx,this_patch_idx);
+        fc2d_clawpack5_setaux(glob,this_patch,this_block_idx,this_patch_idx);
+        fc2d_clawpack5_set_capacity(glob,this_patch,this_block_idx,this_patch_idx);
     }
 }
 
-void torus_output_write_file(fclaw2d_domain_t *domain,
+void torus_output_write_file(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *this_patch,
                              int this_block_idx, int this_patch_idx,
                              int iframe, int patch_num,int level)
@@ -114,15 +114,15 @@ void torus_output_write_file(fclaw2d_domain_t *domain,
     double *q, *error;
     char matname1[11];
 
-    const user_options_t *user = torus_user_get_options_old(domain);
+    const user_options_t *user = torus_user_get_options(glob);
 
-    t = fclaw2d_domain_get_time(domain);
+    t = glob->curr_time;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(domain,this_patch);
+    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    error = fclaw2d_clawpatch_get_error(glob,this_patch);
 
     sprintf(matname1,"fort.q%04d",iframe);
 
@@ -132,13 +132,13 @@ void torus_output_write_file(fclaw2d_domain_t *domain,
         TORUS46_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
                                 &dx,&dy,q,error,&t,
                                 &patch_num,&level,&this_block_idx,
-                                &domain->mpirank);
+                                &glob->mpirank);
     }
     else if (user->claw_version == 5)
     {
         TORUS5_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
                                &dx,&dy,q,error,&t,
                                &patch_num,&level,&this_block_idx,
-                               &domain->mpirank);
+                               &glob->mpirank);
     }
 }
