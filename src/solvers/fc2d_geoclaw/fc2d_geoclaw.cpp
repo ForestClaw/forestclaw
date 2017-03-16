@@ -396,7 +396,7 @@ void fc2d_geoclaw_after_regrid(fclaw2d_global_t *glob)
     int i,index;
     fc2d_geoclaw_gauge_acc_t* gauge_acc = (fc2d_geoclaw_gauge_acc_t*) glob->acc->solver_accumulator;
     
-    if (gauge_acc == NULL)
+    if (glob->curr_time == 0)
     {
         return;
     }
