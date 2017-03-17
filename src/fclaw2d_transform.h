@@ -49,6 +49,8 @@ typedef struct fclaw2d_transform_data
     int is_block_corner;
     int block_iface;   /* -1 for interior faces or block corners */
 
+    //fclaw2d_global_t *glob;
+
 #if 0
     /* These don't seem to be used */
     int is_block_face;    /* not a corner */

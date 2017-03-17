@@ -81,6 +81,7 @@ void  FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(const int& mx, const int& m
 /* ----------------------------------------------------------------------------------
    Physical boundary conditions
    ---------------------------------------------------------------------------------- */
+#if 0
 #define FCLAW2D_FORT_SET_PHYS_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_set_phys_corner_ghost, \
                                                           FCLAW2D_FORT_SET_PHYS_CORNER_GHOST)
 void FCLAW2D_FORT_SET_PHYS_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
@@ -90,8 +91,9 @@ void FCLAW2D_FORT_SET_PHYS_CORNER_GHOST(const int& mx, const int& my, const int&
 #define FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_exchange_phys_corner_ghost, \
                                                                FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST)
 void FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
-                                 const int& meqn, double qthis[],double qneighbor[],
-                                 const int& icorner, const int& iside);
+                                             const int& meqn, double qthis[],double qneighbor[],
+                                             const int& icorner, const int& iside);
+#endif
 
 #ifdef __cplusplus
 #if 0
