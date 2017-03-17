@@ -273,7 +273,7 @@ Box::Box(const Box& a_box)
 
 Box::Box(const int ll[], const int ur[])
 {
-    for(int idir = 0; idir < 2; idir++)
+    for(int idir = 0; idir < SpaceDim; idir++)
     {
         m_ll[idir] = ll[idir];
         m_ur[idir] = ur[idir];
