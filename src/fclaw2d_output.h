@@ -37,14 +37,7 @@ extern "C"
 #endif
 
 void fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe);
-
-/* --------------------------------------------------------------------
- * Write a one-stop function that creates a big VTK file in parallel.
- * The file extension is basename.vtu.  It contains per-patch data for
- * mpirank, blockno, and global patchno, and the meqn-vector data.
- * Function will be refactored into our callback structure eventually.
- * -------------------------------------------------------------------- */
-
+void fclaw2d_output_write_tikz(fclaw2d_global_t* glob,int iframe);
 void fclaw2d_output_write_vtk (fclaw2d_global_t *glob, const char *basename);
 
 
