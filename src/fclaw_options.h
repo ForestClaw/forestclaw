@@ -138,9 +138,6 @@ struct amr_options
     int meqn;
     int maux;
 
-    const char *mthbc_string;
-    int *mthbc;
-
     /* Initialization of ghost cell */
     int init_ghostcell;
 

@@ -85,6 +85,7 @@ void fclaw2d_diagnostics_vtable_init()
    Note that the check for whether the user has specified diagnostics
    to run is done here, not in fclaw2d_run.cpp
    ---------------------------------------------------------------- */
+#if 0
 static
 int run_diagnostics(fclaw2d_global_t* glob)
 {
@@ -97,7 +98,7 @@ int run_diagnostics(fclaw2d_global_t* glob)
     return run_diag;
 
 }
-
+#endif
 
 
 void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)

@@ -64,9 +64,6 @@ options_register_general (fclaw_app_t * a, void *package, sc_options_t * opt)
 fclaw_exit_type_t
 fclaw_options_postprocess (fclaw_options_t * amropt)
 {
-  fclaw_options_convert_int_array (amropt->mthbc_string, &amropt->mthbc,
-                                   fclaw2d_NumFaces);
-
   fclaw_options_convert_double_array (amropt->scale_string, &amropt->scale, 3);
   fclaw_options_convert_double_array (amropt->shift_string, &amropt->shift, 3);
 
@@ -149,7 +146,6 @@ options_check_general (fclaw_app_t * app, void *package, void *registered)
 void
 fclaw_options_reset (fclaw_options_t * amropt)
 {
-    FCLAW_FREE (amropt->mthbc);
     FCLAW_FREE (amropt->scale);
     FCLAW_FREE (amropt->shift);
     FCLAW_FREE (amropt->tikz_figsize);
@@ -289,11 +285,6 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
                         "Number of ghost cells [2]");
-
-    /* Array of NumFaces many values */
-    fclaw_options_add_int_array (opt, 0, "mthbc", &amropt->mthbc_string, "1 1 1 1",
-        &amropt->mthbc, fclaw2d_NumFaces,
-        "Physical boundary condition type [1 1 1 1]");
 
     /* Initialization of ghost cell */
     sc_options_add_bool (opt, 0, "init_ghostcell", &amropt->init_ghostcell, 1,

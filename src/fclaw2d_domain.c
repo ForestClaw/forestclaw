@@ -81,10 +81,8 @@ void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *ne
 void fclaw2d_domain_setup(fclaw2d_global_t* glob,
                           fclaw2d_domain_t* new_domain)
 {
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     fclaw2d_domain_t *old_domain = glob->domain;
     double t;
-    int i;
 
     if (old_domain == new_domain)
     {
@@ -98,17 +96,6 @@ void fclaw2d_domain_setup(fclaw2d_global_t* glob,
         fclaw2d_domain_data_new(new_domain);
         fclaw2d_domain_data_copy(old_domain,new_domain);
     }
-
-    fclaw2d_block_data_new(new_domain);
-
-    int num = new_domain->num_blocks;
-    for (i = 0; i < num; i++)
-    {
-        fclaw2d_block_t *block = &new_domain->blocks[i];
-        /* This will work for rectangular domains ... */
-        fclaw2d_block_set_data(block,gparms->mthbc);
-    }
-
     fclaw_global_infof("Done\n");
 }
 
@@ -122,7 +109,6 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     for(i = 0; i < (*domain)->num_blocks; i++)
     {
         fclaw2d_block_t *block = (*domain)->blocks + i;
-        fclaw2d_block_data_t *bd = (fclaw2d_block_data_t *) block->user;
 
         for(j = 0; j < block->num_patches; j++)
         {
@@ -131,8 +117,6 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
             fclaw2d_patch_t *patch = block->patches + j;
             fclaw2d_patch_data_delete(glob,patch);
         }
-
-        FCLAW2D_FREE (bd);
         block->user = NULL;
 
     }
