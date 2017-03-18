@@ -78,6 +78,10 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
                                  &clawopt->mthlim, clawopt->mwaves,
                                  "[clawpack5] Waves limiters (one entry per wave; " \
                                  "values 0-4) [NULL]");
+    
+    fclaw_options_add_int_array (opt, 0, "mthbc", &clawopt->mthbc_string, "1 1 1 1",
+                                 &clawopt->mthbc, fclaw2d_NumFaces,
+                                 "[clawpack5] Physical boundary condition type [1 1 1 1]");
 
     clawpkg->is_registered = 1;
     return NULL;
@@ -90,6 +94,8 @@ fc2d_clawpack5_postprocess (fc2d_clawpack5_options_t * clawopt)
                                      clawopt->mwaves);
     fclaw_options_convert_int_array (clawopt->order_string, &clawopt->order,
                                      2);
+    fclaw_options_convert_int_array (clawopt->mthbc_string, &clawopt->mthbc,
+                                     fclaw2d_NumFaces); 
     return FCLAW_NOEXIT;
 }
 
@@ -169,6 +175,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
 void
 fc2d_clawpack5_reset (fc2d_clawpack5_options_t * clawopt)
 {
+    fclaw_options_destroy_array (clawopt->mthbc);
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
 }

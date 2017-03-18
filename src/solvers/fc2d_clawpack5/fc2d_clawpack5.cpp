@@ -343,7 +343,7 @@ void fc2d_clawpack5_bc2(fclaw2d_global_t *glob,
                          fclaw_bool intersects_phys_bdry[],
                          fclaw_bool time_interp)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fc2d_clawpack5_options_t *clawopt = fc2d_clawpack5_get_options(glob);
 
     FCLAW_ASSERT(classic_vt.bc2 != NULL);
 
@@ -356,9 +356,7 @@ void fc2d_clawpack5_bc2(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    fclaw2d_block_data_t *bdata = fclaw2d_block_get_data(this_block);
-    int *block_mthbc = bdata->mthbc;
+    int *block_mthbc = clawopt->mthbc;
 
     /* Set a local copy of mthbc that can be used for a patch. */
     int mthbc[NumFaces];

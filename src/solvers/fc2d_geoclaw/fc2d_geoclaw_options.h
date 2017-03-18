@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_GEOCLAW_OPTIONS_H
 
 #include <fclaw_options.h>
+#include <fclaw2d_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -62,6 +63,9 @@ typedef struct fc2d_geoclaw_options
 
     int *mthlim;
     const char *mthlim_string;
+
+    int *mthbc;
+    const char *mthbc_string;
 
     int method[7];
     int mcapa;

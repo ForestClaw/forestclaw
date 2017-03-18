@@ -587,6 +587,7 @@ void fc2d_geoclaw_bc2(fclaw2d_global_t *glob,
                       fclaw_bool intersects_phys_bdry[],
                       fclaw_bool time_interp)
 {
+    fc2d_geoclaw_options_t *geoclaw_options = fc2d_geoclaw_get_options(glob);
     FCLAW_ASSERT(geoclaw_vt.bc2 != NULL);
 
     int mx,my,mbc,meqn, maux;
@@ -598,9 +599,7 @@ void fc2d_geoclaw_bc2(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
-    fclaw2d_block_t *this_block = &glob->domain->blocks[this_block_idx];
-    fclaw2d_block_data_t *bdata = fclaw2d_block_get_data(this_block);
-    int *block_mthbc = bdata->mthbc;
+    int *block_mthbc = geoclaw_options->mthbc;
 
     /* Set a local copy of mthbc that can be used for a patch. */
     int mthbc[NumFaces];
