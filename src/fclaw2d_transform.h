@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_TRANSFORM_H
 
 #include <forestclaw2d.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -42,14 +43,12 @@ typedef struct fclaw2d_transform_data
     fclaw2d_patch_t *this_patch;
     fclaw2d_patch_t *neighbor_patch;
     int transform[9];
-    int mx;
-    int my;
     int icorner;
     int based;      /* 1 for cell-centered (1 .. mx); 0 for nodes (0 .. mx) */
     int is_block_corner;
     int block_iface;   /* -1 for interior faces or block corners */
 
-    //fclaw2d_global_t *glob;
+    fclaw2d_global_t *glob;
 
 #if 0
     /* These don't seem to be used */

@@ -218,15 +218,13 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
     /* Transform data needed at block boundaries */
     fclaw2d_transform_data_t transform_data;
-    transform_data.mx = gparms->mx;
-    transform_data.my = gparms->my;
+    transform_data.glob = s->glob;
     transform_data.based = 1;                 /* cell-centered data in this routine. */
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;     /* gets filled in below. */
 
     fclaw2d_transform_data_t transform_data_finegrid;
-    transform_data_finegrid.mx = gparms->mx;
-    transform_data_finegrid.my = gparms->my;
+    transform_data_finegrid.glob = s->glob;
     transform_data_finegrid.based = 1;   /* cell-centered data in this routine. */
 
     for (iface = 0; iface < NumFaces; iface++)
@@ -399,8 +397,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
     int min_interp_level = time_interp ? minlevel-1 : minlevel;
 
     fclaw2d_transform_data_t transform_data;
-    transform_data.mx = gparms->mx;
-    transform_data.my = gparms->my;
+    transform_data.glob = glob;
     transform_data.based = 1;      /* cell-centered data in this routine. */
 
     fclaw2d_domain_indirect_t *ind = ddata->domain_indirect;
