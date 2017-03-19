@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_options.h>
 #include <fclaw2d_base.h>
+#include <fclaw2d_clawpatch_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -56,7 +57,6 @@ typedef struct geoclaw_gauge
 typedef struct fc2d_geoclaw_options
 {
     int mwaves;
-    int maux;
 
     const char *order_string;
     int *order;
