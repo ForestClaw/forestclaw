@@ -110,13 +110,6 @@ fclaw_options_check (fclaw_options_t * gparms)
         }
     }
 
-    if (gparms->interp_stencil_width/2 > gparms->mbc)
-    {
-        fclaw_global_essentialf("Interpolation width is too large for number of " \
-                                "ghost cells (mbc) specifed.  We should have " \
-                                "(width)/2 <= mbc");
-    }
-
 
     /* Could also do basic sanity checks on mx,my,... */
 
@@ -139,6 +132,16 @@ fclaw_exit_type_t
 options_check_general (fclaw_app_t * app, void *package, void *registered)
 {
     amr_options_t *gparms = (amr_options_t *) package;
+    
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
+
+    if (gparms->interp_stencil_width/2 > clawpatch_opt->mbc)
+    {
+        fclaw_global_essentialf("Interpolation width is too large for number of " \
+                                "ghost cells (mbc) specifed.  We should have " \
+                                "(width)/2 <= mbc");
+    }
 
     return fclaw_options_check (gparms);
 }
@@ -212,12 +215,13 @@ amr_options_t* fclaw2d_forestclaw_options_register (fclaw_app_t * a, const char 
 
 void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 {
+#if 0
     sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
                         "Number of grid cells per patch in x [8]");
 
     sc_options_add_int (opt, 0, "my", &amropt->my, 8,
                         "Number of grid cells per patch in y [8]");
-
+#endif 
     sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.1,
                            "Initial time step size [0.1]");
 
@@ -276,7 +280,7 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
                            "Maximum CFL allowed [0.9]");
-
+#if 0
     sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
                         "Number of equations [1]");
 
@@ -285,7 +289,7 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
                         "Number of ghost cells [2]");
-
+#endif
     /* Initialization of ghost cell */
     sc_options_add_bool (opt, 0, "init_ghostcell", &amropt->init_ghostcell, 1,
                         "Initialize ghost cells [T]");

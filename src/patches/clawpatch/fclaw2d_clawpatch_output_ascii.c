@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
                                            int iframe)
 {
-    const amr_options_t *amropt = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     int meqn,ngrids;
     double time;
     char matname1[11];
@@ -43,7 +43,7 @@ void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
     time = glob->curr_time;
     ngrids = fclaw2d_domain_get_num_patches(glob->domain);
 
-    meqn = amropt->meqn;
+    meqn = clawpatch_opt->meqn;
 
     fclaw2d_clawpatch_vt()->fort_write_header(matname1,matname2,&time,&meqn,&ngrids);
 }

@@ -101,13 +101,15 @@ void fclaw2d_output_write_tikz(fclaw2d_global_t* glob,int iframe)
 
     /* Should be in gparms */
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    
     double figsize[2];
     figsize[0] = gparms->tikz_figsize[0];   /* Inches */
     figsize[1] = gparms->tikz_figsize[1];   /* Inches */
 
     int lmax = gparms->maxlevel;
-    int mx = gparms->mx;
-    int my = gparms->my;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
     int mi = gparms->mi;
     int mj = gparms->mj;
 

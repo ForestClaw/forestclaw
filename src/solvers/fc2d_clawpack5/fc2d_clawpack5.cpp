@@ -501,18 +501,19 @@ double fc2d_clawpack5_update(fclaw2d_global_t *glob,
 void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
                                         int iframe)
 {
-    const amr_options_t *amropt;
     const fc2d_clawpack5_options_t *clawpack_opt;
+    const fclaw2d_clawpatch_options_t *clawpatch_opt;
+
     int meqn,maux,ngrids;
     double time;
 
-    amropt = fclaw2d_forestclaw_get_options(glob);
     clawpack_opt = fc2d_clawpack5_get_options(glob);
+    clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     time = glob->curr_time;
     ngrids = fclaw2d_domain_get_num_patches(glob->domain);
 
-    meqn = amropt->meqn;
+    meqn = clawpatch_opt->meqn;
     maux = clawpack_opt->maux;
 
     FC2D_CLAWPACK5_FORT_WRITE_HEADER(&iframe,&time,&meqn,&maux,&ngrids);

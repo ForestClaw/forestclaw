@@ -105,11 +105,13 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t* glob,
     int igrid;
 
     const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+
     fclaw2d_patch_t* fine_patch;
 
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
 
     fclaw2d_clawpatch_metric_data(glob,coarse_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&areacoarse);
@@ -148,6 +150,8 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
 
 {
     const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    
     int mx,my, mbc, meqn;
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
@@ -155,9 +159,9 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
     int igrid;
     fclaw2d_patch_t *fine_patch;
 
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
 
     fclaw2d_clawpatch_metric_data(glob,coarse_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&areacoarse);

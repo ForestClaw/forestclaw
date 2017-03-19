@@ -153,11 +153,11 @@ double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,
 
 size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob)
 {
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int meqn = gparms->meqn;
-    int mbc = gparms->mbc;
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int meqn = clawpatch_opt->meqn;
+    int mbc = clawpatch_opt->mbc;
     size_t size = (mx+2*mbc)*(my+2*mbc)*meqn;
 
     return size;
@@ -174,10 +174,12 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
        everything correctly;  it isn't needed for memory
        allocation */
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int meqn = gparms->meqn;
-    int mbc = gparms->mbc;
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int meqn = clawpatch_opt->meqn;
+    int mbc = clawpatch_opt->mbc;
     int mint = gparms->interp_stencil_width/2+1;  /* Assume interp stencils have odd width */
 
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
@@ -324,13 +326,14 @@ void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
 
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
-    cp->mx = gparms->mx;
-    cp->my = gparms->my;
-    cp->mbc = gparms->mbc;
+    cp->mx = clawpatch_opt->mx;
+    cp->my = clawpatch_opt->my;
+    cp->mbc = clawpatch_opt->mbc;
     cp->blockno = blockno;
-    cp->meqn = gparms->meqn;
-    cp->maux = gparms->maux;
+    cp->meqn = clawpatch_opt->meqn;
+    cp->maux = clawpatch_opt->maux;
 
     for (int icorner=0; icorner < 4; icorner++)
     {
@@ -409,7 +412,7 @@ void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
         cp->griderror.define(box,cp->meqn);
     }
 
-    if (gparms->maux > 0)
+    if (clawpatch_opt->maux > 0)
     {
       cp->aux.define(box,cp->maux);
     }
@@ -513,10 +516,12 @@ void fclaw2d_clawpatch_build_ghost(fclaw2d_global_t *glob,
 size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_global_t* glob)
 {
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
+    int meqn = clawpatch_opt->meqn;
     int refratio = gparms->refratio;
 
     int mint = refratio*mbc;
@@ -564,6 +569,7 @@ void ghost_comm(fclaw2d_global_t* glob,
     double *qthis;
     double *area;
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     int ierror;
 
@@ -572,9 +578,9 @@ void ghost_comm(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
     area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
     int refratio = gparms->refratio;
 
     int mint = mbc*refratio;   /* # interior cells needed for averaging */
@@ -644,11 +650,11 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_global_t* glob,
 
 size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
-    int mx = gparms->mx;
-    int my = gparms->my;
-    int mbc = gparms->mbc;
-    int meqn = gparms->meqn;
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
+    int meqn = clawpatch_opt->meqn;
     size_t size = (2*mbc + mx)*(2*mbc + my)*meqn;  /* Store area */
     return size*sizeof(double);
 }
@@ -699,11 +705,11 @@ void fclaw2d_clawpatch_copy_face(fclaw2d_global_t *glob,
 {
     int meqn,mx,my,mbc;
     double *qthis, *qneighbor;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
 
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
     fclaw2d_clawpatch_timesync_data(glob,neighbor_patch,time_interp,&qneighbor,&meqn);
@@ -725,7 +731,9 @@ void fclaw2d_clawpatch_average_face(fclaw2d_global_t *glob,
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+
+    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
@@ -734,9 +742,9 @@ void fclaw2d_clawpatch_average_face(fclaw2d_global_t *glob,
     areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
     areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
 
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
 
     int manifold = gparms->manifold;
     clawpatch_vt()->fort_average_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,areacoarse,areafine,
@@ -759,14 +767,14 @@ void fclaw2d_clawpatch_interpolate_face(fclaw2d_global_t *glob,
 {
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
 
     clawpatch_vt()->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iside,
                                           &p4est_refineFactor,&refratio,&igrid,&transform_data);
@@ -782,11 +790,11 @@ void fclaw2d_clawpatch_copy_corner(fclaw2d_global_t *glob,
 {
     int meqn,mx,my,mbc;
     double *qthis, *qcorner;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
 
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
     fclaw2d_clawpatch_timesync_data(glob,corner_patch,time_interp,&qcorner,&meqn);
@@ -806,7 +814,9 @@ void fclaw2d_clawpatch_average_corner(fclaw2d_global_t *glob,
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
     double *areacoarse, *areafine;
+
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
@@ -814,9 +824,9 @@ void fclaw2d_clawpatch_average_corner(fclaw2d_global_t *glob,
     areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
     areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
 
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
 
     int manifold = gparms->manifold;
     clawpatch_vt()->fort_average_corner(&mx,&my,&mbc,&meqn,&refratio,
@@ -836,12 +846,12 @@ void fclaw2d_clawpatch_interpolate_corner(fclaw2d_global_t* glob,
 {
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
-    mx = gparms->mx;
-    my = gparms->my;
-    mbc = gparms->mbc;
-    meqn = gparms->meqn;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
+    meqn = clawpatch_opt->meqn;
 
 
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);

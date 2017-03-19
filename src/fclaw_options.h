@@ -115,10 +115,12 @@ struct amr_options
 {
     int dim;
 
+#if 0
     /* Fixed grid size for each grid */
     int mx;      /**< Number of cells in x direction (fixed for all grids) */
     int my;      /**< Number of cells in y direction (fixed for all grids) */
     int mbc;     /**< Number of ghost cells in each grid */
+#endif
 
     /* Time stepping */
     double initial_dt;  /**< Initial time step size */
@@ -134,10 +136,12 @@ struct amr_options
     double desired_cfl;
     double *tout;
 
+#if 0
     /* Number of equations in the system of PDEs */
     int meqn;
     int maux;
-
+#endif
+    
     /* Initialization of ghost cell */
     int init_ghostcell;
 

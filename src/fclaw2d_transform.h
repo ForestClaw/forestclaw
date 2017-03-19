@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_clawpatch_options.h>
 
 #ifdef __cplusplus
 extern "C"

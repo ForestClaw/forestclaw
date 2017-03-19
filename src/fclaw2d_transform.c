@@ -31,14 +31,14 @@ FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
                         int *i2, int *j2, fclaw2d_transform_data_t** ptdata)
 {
     fclaw2d_transform_data_t *tdata = *ptdata;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(tdata->glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(tdata->glob);
 
     *i2 = *i1;
     *j2 = *j1;
     fclaw2d_patch_transform_face (tdata->this_patch,
                                   tdata->neighbor_patch,
                                   tdata->transform,
-                                  gparms->mx, gparms->my, tdata->based, i2, j2);
+                                  clawpatch_opt->mx, clawpatch_opt->my, tdata->based, i2, j2);
 }
 
 
@@ -49,13 +49,13 @@ FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
                              fclaw2d_transform_data_t** ptdata)
 {
     fclaw2d_transform_data_t *tdata = *ptdata;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(tdata->glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(tdata->glob);
 
     i2[0] = *i1;
     j2[0] = *j1;
     fclaw2d_patch_transform_face2 (tdata->this_patch,
                                    tdata->neighbor_patch,
-                                   tdata->transform, gparms->mx, gparms->my,
+                                   tdata->transform, clawpatch_opt->mx, clawpatch_opt->my,
                                    tdata->based, i2, j2);
 }
 
@@ -67,7 +67,7 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
                           fclaw2d_transform_data_t** ptdata)
 {
     fclaw2d_transform_data_t *tdata = *ptdata;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(tdata->glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(tdata->glob);
 
     *i2 = *i1;
     *j2 = *j1;
@@ -79,7 +79,7 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
 #endif
         fclaw2d_patch_transform_face (tdata->this_patch,
                                       tdata->neighbor_patch, tdata->transform,
-                                      gparms->mx, gparms->my,
+                                      clawpatch_opt->mx, clawpatch_opt->my,
                                       tdata->based, i2, j2);
     }
     else
@@ -89,7 +89,7 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
         fclaw2d_patch_transform_corner (tdata->this_patch,
                                         tdata->neighbor_patch,
                                         tdata->icorner, tdata->is_block_corner,
-                                        gparms->mx, gparms->my,
+                                        clawpatch_opt->mx, clawpatch_opt->my,
                                         tdata->based, i2, j2);
     }
     /* Done. */
@@ -104,7 +104,7 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                fclaw2d_transform_data_t** ptdata)
 {
     fclaw2d_transform_data_t *tdata = *ptdata;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(tdata->glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(tdata->glob);
 
     i2[0] = *i1;
     j2[0] = *j1;
@@ -113,7 +113,7 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
         /* block-face but not a block-corner. */
         fclaw2d_patch_transform_face2 (tdata->this_patch,
                                        tdata->neighbor_patch,
-                                       tdata->transform, gparms->mx, gparms->my,
+                                       tdata->transform, clawpatch_opt->mx, clawpatch_opt->my,
                                        tdata->based, i2, j2);
     }
     else
@@ -123,7 +123,7 @@ FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
         fclaw2d_patch_transform_corner2 (tdata->this_patch,
                                          tdata->neighbor_patch,
                                          tdata->icorner, tdata->is_block_corner,
-                                         gparms->mx, gparms->my,
+                                         clawpatch_opt->mx, clawpatch_opt->my,
                                          tdata->based, i2, j2);
     }
     /* Done */

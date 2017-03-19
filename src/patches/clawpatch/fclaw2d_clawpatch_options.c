@@ -53,6 +53,9 @@ clawpatch_options_register(fclaw_app_t * a, void *optpkg, sc_options_t * opt)
     sc_options_add_int (opt, 0, "mbc", &clawpatch_options->mbc, 2,
                         "Number of ghost cells [2]");
 
+    sc_options_add_int (opt, 0, "meqn", &clawpatch_options->meqn, 1,
+                        "Number of equations [2]");
+
     /* we do not need to work with the return value */
     clawpatch_options->is_registered = 1;
     return NULL;

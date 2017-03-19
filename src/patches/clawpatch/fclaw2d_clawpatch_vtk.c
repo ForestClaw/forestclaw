@@ -123,9 +123,11 @@ void
 fclaw2d_output_write_vtk (fclaw2d_global_t * glob, const char *basename)
 {
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
-                                   gparms->mx, gparms->my, gparms->meqn,
+                                   clawpatch_opt->mx, clawpatch_opt->my, 
+                                   clawpatch_opt->meqn,
                                    gparms->vtkspace, gparms->vtkwrite,
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
