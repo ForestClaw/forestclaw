@@ -265,7 +265,7 @@ static const fclaw_app_options_vtable_t geoclaw_options_vtable = {
    Public interface to clawpack options
    ---------------------------------------------------------- */
 fc2d_geoclaw_options_t*  fc2d_geoclaw_options_register (fclaw_app_t * app,
-                                                              const char *configfile)
+                                                        const char *configfile)
 {
     fc2d_geoclaw_package_t *clawpkg;
 
@@ -274,6 +274,7 @@ fc2d_geoclaw_options_t*  fc2d_geoclaw_options_register (fclaw_app_t * app,
     clawpkg = FCLAW_ALLOC (fc2d_geoclaw_package_t, 1);
     fclaw_app_options_register (app, "geoclaw", configfile,
                                 &geoclaw_options_vtable, clawpkg);
+    fclaw_app_set_attribute(app,"geoclaw",clawpkg);
     return &clawpkg->clawopt;
 }
 
