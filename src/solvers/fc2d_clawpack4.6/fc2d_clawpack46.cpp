@@ -355,7 +355,7 @@ void fc2d_clawpack46_bc2(fclaw2d_global_t *glob,
 
     FCLAW_ASSERT(classic_vt.bc2 != NULL);
 
-    int mx,my,mbc,meqn, maux,maxmx,maxmy;
+    int mx,my,mbc,meqn,maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
     double *aux,*q;
 

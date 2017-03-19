@@ -61,9 +61,6 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_int (opt, 0, "mcapa", &clawopt->mcapa, -1,
                         "[clawpack46] Location of capacity function in aux array [-1]");
 
-    sc_options_add_int (opt, 0, "maux", &clawopt->maux, 0,
-                        "[clawpack46] Number of auxiliary variables [0]");
-
     sc_options_add_bool (opt, 0, "src_term", &clawopt->src_term, 0,
                          "[clawpack46] Source term option [F]");
 
@@ -119,6 +116,7 @@ options_postprocess (fclaw_app_t * app, void *package, void *registered)
     return fc2d_clawpack46_postprocess (clawopt);
 }
 
+#if 0
 fclaw_exit_type_t
 fc2d_clawpack46_check (fc2d_clawpack46_options_t * clawopt)
 {
@@ -147,12 +145,16 @@ fc2d_clawpack46_check (fc2d_clawpack46_options_t * clawopt)
 
     return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
 }
+#endif
 
 static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
     fc2d_clawpack46_package_t *clawpkg;
     fc2d_clawpack46_options_t *clawopt;
+
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -163,7 +165,30 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt = &clawpkg->clawopt;
     FCLAW_ASSERT (clawopt != NULL);
     
-    return fc2d_clawpack46_check (clawopt);
+    clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
+
+    clawopt->method[1] = clawopt->order[0];
+    clawopt->method[2] = clawopt->order[1];
+    clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
+    clawopt->method[4] = clawopt->src_term;
+    clawopt->method[5] = clawopt->mcapa;
+    clawopt->method[6] = clawpatch_opt->maux;
+
+    if (clawopt->use_fwaves)
+    {
+        fclaw_global_essentialf("clawpack46 : fwaves not yet implemented\n");
+        return FCLAW_EXIT_QUIET;
+    }
+
+    if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
+    {
+        fclaw_global_essentialf("clawpack46 : bad maux/mcapa combination\n");
+        return FCLAW_EXIT_ERROR;
+    }
+
+    /* Should also check mthbc, mthlim, etc. */
+
+    return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
 }
 
 void

@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CLAWPATCH_OPTIONS_H
 
 #include <fclaw_base.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
