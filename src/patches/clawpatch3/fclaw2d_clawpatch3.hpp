@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_HPP
-#define FCLAW2D_CLAWPATCH_HPP
+#ifndef FCLAW2D_CLAWPATCH3_HPP
+#define FCLAW2D_CLAWPATCH3_HPP
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_forestclaw.h>
@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_farraybox.hpp>
 
 
-class fclaw2d_clawpatch_t
+class fclaw2d_clawpatch3_t
 {
 public :
     Box dataBox();  /* Box containing data pointer q */
@@ -50,15 +50,15 @@ public :
        ---------------------------------------------------------------- */
 
     void mb_exchange_block_corner_ghost(const int& a_icorner,
-                                        fclaw2d_clawpatch_t *a_neighbor_cp,
+                                        fclaw2d_clawpatch3_t *a_neighbor_cp,
                                         int time_interp);
 
     void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                       fclaw2d_clawpatch_t *cp_fine,
+                                       fclaw2d_clawpatch3_t *cp_fine,
                                        fclaw_bool a_time_interp);
 
     void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                           fclaw2d_clawpatch_t *cp_fine,
+                                           fclaw2d_clawpatch3_t *cp_fine,
                                            fclaw_bool a_time_interp);
 
     // ----------------------------------------------------------------
@@ -81,15 +81,19 @@ public :
     /* Grid info */
     int mx;           /* also in amr_options_t */
     int my;           /* also in amr_options_t */
+    int mz;
     int mbc;          /* also in amr_options_t */
     int maux;
 
     double dx;
     double dy;
+    double dz;
     double xlower;
     double ylower;
+    double zlower;
     double xupper;
     double yupper;
+    double zupper;
 
     fclaw_bool manifold;    /* also in amr_options_t */
     int blockno;
@@ -115,6 +119,6 @@ public :
     FArrayBox curvature;  // ???
 };
 
-fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
+fclaw2d_clawpatch3_t* fclaw2d_clawpatch3_get_cp(fclaw2d_patch_t* this_patch);
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */

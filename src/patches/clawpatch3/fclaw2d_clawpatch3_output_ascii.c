@@ -28,10 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 
-void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
+void fclaw2d_clawpatch3_output_ascii_header(fclaw2d_global_t* glob,
                                            int iframe)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw2d_clawpatch3_options_t *clawpatch3_opt = fclaw2d_clawpatch3_get_options(glob);
     int meqn,ngrids;
     double time;
     char matname1[11];
@@ -43,13 +43,13 @@ void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
     time = glob->curr_time;
     ngrids = fclaw2d_domain_get_num_patches(glob->domain);
 
-    meqn = clawpatch_opt->meqn;
+    meqn = clawpatch3_opt->meqn;
 
-    fclaw2d_clawpatch_vt()->fort_write_header(matname1,matname2,&time,&meqn,&ngrids);
+    fclaw2d_clawpatch3_vt()->fort_write_header(matname1,matname2,&time,&meqn,&ngrids);
 }
 
 
-void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t *glob,
+void fclaw2d_clawpatch3_output_ascii(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
                                     int this_block_idx, int this_patch_idx,
                                     int iframe,int patch_num,int level)
@@ -59,13 +59,13 @@ void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t *glob,
     double *q;
     char fname[11];
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw2d_clawpatch3_soln_data(glob,this_patch,&q,&meqn);
 
     sprintf(fname,"fort.q%04d",iframe);
-    fclaw2d_clawpatch_vt()->fort_write_file(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
+    fclaw2d_clawpatch3_vt()->fort_write_file(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
                                             &patch_num,&level,&this_block_idx,
                                             &glob->domain->mpirank);
 }

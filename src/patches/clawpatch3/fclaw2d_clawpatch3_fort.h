@@ -50,7 +50,7 @@ extern "C"
    ---------------------------------------------------------------------------------- */
 
 #if 0
-#define FCLAW2D_CLAWPATCH_FORT_ERROR FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_error, \
+#define FCLAW2D_CLAWPATCH_FORT_ERROR FCLAW_F77_FUNC(fclaw2d_clawpatch3_fort_error, \
                                                     FCLAW2D_CLAWPATCH_FORT_ERROR)
 
 void FCLAW2D_CLAWPATCH_FORT_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
@@ -62,7 +62,7 @@ void FCLAW2D_CLAWPATCH_FORT_ERROR(int* blockno, int *mx, int *my, int* mbc, int*
 /* Not obvious that the user would want to generalize the conservation routine,
    so they are not in a 'default' file.*/
 
-#define FCLAW2D_CLAWPATCH_FORT_CONSCHECK FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_conscheck, \
+#define FCLAW2D_CLAWPATCH_FORT_CONSCHECK FCLAW_F77_FUNC(fclaw2d_clawpatch3_fort_conscheck, \
                                                         FCLAW2D_CLAWPATCH_FORT_CONSCHECK)
 
 void FCLAW2D_CLAWPATCH_FORT_CONSCHECK(int *mx, int *my, int* mbc, int* meqn,
@@ -72,14 +72,14 @@ void FCLAW2D_CLAWPATCH_FORT_CONSCHECK(int *mx, int *my, int* mbc, int* meqn,
 /* These are only needed if the user has not supplied their own routine to compute
    the area of the entire domain. Not obvious taht the user would want to
    generalize these routines. */
-#define FCLAW2D_CLAWPATCH_FORT_AREA FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_area, \
+#define FCLAW2D_CLAWPATCH_FORT_AREA FCLAW_F77_FUNC(fclaw2d_clawpatch3_fort_area, \
                                                    FCLAW2D_CLAWPATCH_FORT_AREA)
 
 double FCLAW2D_CLAWPATCH_FORT_AREA(int *mx, int* my, int*mbc, double* dx,
                                    double* dy, double area[]);
 
 
-#define FCLAW2D_CLAWPATCH_FORT_NORM FCLAW_F77_FUNC(fclaw2d_clawpatch_fort_norm, \
+#define FCLAW2D_CLAWPATCH_FORT_NORM FCLAW_F77_FUNC(fclaw2d_clawpatch3_fort_norm, \
                                                    FCLAW2D_CLAWPATCH_FORT_NORM)
 
 void FCLAW2D_CLAWPATCH_FORT_NORM(int *mx, int *my, int *mbc, int *meqn,

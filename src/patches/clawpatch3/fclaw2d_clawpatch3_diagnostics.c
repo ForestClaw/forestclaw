@@ -43,15 +43,15 @@ typedef struct {
    Create and initialize a new accumulator
    ------------------------------------------------------------- */
 
-void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
+void fclaw2d_clawpatch3_diagnostics_initialize(fclaw2d_global_t *glob,
                                               void **acc_patch)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw2d_clawpatch3_options_t *clawpatch3_opt = fclaw2d_clawpatch3_get_options(glob);
 
     error_info_t *error_data;
     int meqn;
 
-    meqn = clawpatch_opt->meqn;  /* Clawpatch */
+    meqn = clawpatch3_opt->meqn;  /* Clawpatch */
 
     error_data = FCLAW_ALLOC(error_info_t,1);
 
@@ -65,14 +65,14 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
 
 }
 
-void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
+void fclaw2d_clawpatch3_diagnostics_reset(fclaw2d_global_t *glob,
                                          void* patch_acc)
 {
     error_info_t *error_data = (error_info_t*) patch_acc;
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw2d_clawpatch3_options_t *clawpatch3_opt = fclaw2d_clawpatch3_get_options(glob);
     int meqn;
 
-    meqn = clawpatch_opt->meqn;
+    meqn = clawpatch3_opt->meqn;
 
     for(int m = 0; m < meqn; m++)
     {
@@ -102,43 +102,43 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     error_info_t *error_data = (error_info_t*) s->user;//patch_acc;
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(s->glob);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch3_vtable_t *clawpatch3_vt = fclaw2d_clawpatch3_vt();
 
     double *area;
     double *q;
     int mx, my, mbc, meqn;
     double xlower,ylower,dx,dy, t;
 
-    fclaw2d_clawpatch_grid_data(s->glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch3_grid_data(s->glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(s->glob,this_patch);  /* Might be null */
-    fclaw2d_clawpatch_soln_data(s->glob,this_patch,&q,&meqn);
+    area = fclaw2d_clawpatch3_get_area(s->glob,this_patch);  /* Might be null */
+    fclaw2d_clawpatch3_soln_data(s->glob,this_patch,&q,&meqn);
 
-    error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
+    error_data->area += clawpatch3_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
 
-    if (gparms->compute_error && clawpatch_vt->fort_compute_patch_error != NULL)
+    if (gparms->compute_error && clawpatch3_vt->fort_compute_patch_error != NULL)
     {
         double *error;
         t = s->glob->curr_time;
-        error = fclaw2d_clawpatch_get_error(s->glob,this_patch);
+        error = fclaw2d_clawpatch3_get_error(s->glob,this_patch);
 
-        clawpatch_vt->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
+        clawpatch3_vt->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
                                               &xlower,&ylower, &t, q, error);
 
         /* Accumulate sums and maximums needed to compute error norms */
-        clawpatch_vt->fort_compute_error_norm(&mx, &my, &mbc, &meqn, &dx,&dy, area,
+        clawpatch3_vt->fort_compute_error_norm(&mx, &my, &mbc, &meqn, &dx,&dy, area,
                                              error, error_data->local_error);
     }
 
-    if (gparms->conservation_check && clawpatch_vt->fort_conservation_check != NULL)
+    if (gparms->conservation_check && clawpatch3_vt->fort_conservation_check != NULL)
     {
-        clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy,
+        clawpatch3_vt->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy,
                                               area, q, error_data->mass);
     }
 }
 
-void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
+void fclaw2d_clawpatch3_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc)
 {
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
@@ -149,7 +149,7 @@ void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
 
 
 /* Accumulate the errors computed above */
-void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
+void fclaw2d_clawpatch3_diagnostics_gather(fclaw2d_global_t *glob,
                                           void* patch_acc,
                                           int init_flag)
 {
@@ -157,12 +157,12 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     
     error_info_t *error_data = (error_info_t*) patch_acc;
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw2d_clawpatch3_options_t *clawpatch3_opt = fclaw2d_clawpatch3_get_options(glob);
     
     int meqn;
     double total_area;
 
-    meqn = clawpatch_opt->meqn;  /* clawpatch->meqn */
+    meqn = clawpatch3_opt->meqn;  /* clawpatch->meqn */
 
     if (gparms->compute_error != 0)
     {
@@ -217,7 +217,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     }
 }
 
-void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
+void fclaw2d_clawpatch3_diagnostics_finalize(fclaw2d_global_t *glob,
                                             void** patch_acc)
 {
     error_info_t *error_data = *((error_info_t**) patch_acc);

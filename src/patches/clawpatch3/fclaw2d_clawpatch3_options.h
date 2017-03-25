@@ -43,11 +43,12 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw2d_clawpatch_options
+typedef struct fclaw2d_clawpatch3_options
 {
     /* These are constant for all clawpatch's */
     int mx;
     int my;
+    int mz;
     int maux;
     int mbc;
 
@@ -55,13 +56,13 @@ typedef struct fclaw2d_clawpatch_options
 
     int is_registered;
 
-} fclaw2d_clawpatch_options_t;
+} fclaw2d_clawpatch3_options_t;
 
-fclaw2d_clawpatch_options_t *
-fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile);
-void fclaw2d_clawpatch_set_options (fclaw2d_global_t *glob, 
-	                                fclaw2d_clawpatch_options_t* clawpatch_options);
-fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob);
+fclaw2d_clawpatch3_options_t *
+fclaw2d_clawpatch3_options_register(fclaw_app_t* app, const char* configfile);
+void fclaw2d_clawpatch3_set_options (fclaw2d_global_t *glob, 
+	                                fclaw2d_clawpatch3_options_t* clawpatch3_options);
+fclaw2d_clawpatch3_options_t* fclaw2d_clawpatch3_get_options(fclaw2d_global_t* glob);
 
 
 #ifdef __cplusplus

@@ -45,13 +45,13 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
 
     cont = glob->cont;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
 #if 0
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
+    fclaw2d_clawpatch3_metric_data(glob,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
+    ClawPatch *cp = fclaw2d_clawpatch3_get_cp(this_patch);
     const double xlower = cp->xlower ();
     const double ylower = cp->ylower ();
     const double dx = cp->dx ();
@@ -96,9 +96,9 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
     double xlower,ylower,dx,dy;
     int mx,my,mbc,meqn;
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw2d_clawpatch3_soln_data(glob,this_patch,&q,&meqn);
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     const int xlane = mx + 2 * mbc;
@@ -123,11 +123,11 @@ void
 fclaw2d_output_write_vtk (fclaw2d_global_t * glob, const char *basename)
 {
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw2d_clawpatch3_options_t *clawpatch3_opt = fclaw2d_clawpatch3_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
-                                   clawpatch_opt->mx, clawpatch_opt->my, 
-                                   clawpatch_opt->meqn,
+                                   clawpatch3_opt->mx, clawpatch3_opt->my, 
+                                   clawpatch3_opt->meqn,
                                    gparms->vtkspace, gparms->vtkwrite,
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
