@@ -21,20 +21,23 @@ c     # ----------------------------------------------------------
 c     # This routine is used for both mapped and non-mapped
 c     # cases.
 c     # ----------------------------------------------------------
-      subroutine fc3d_clawpack5_fort_interpolate_face(mx,my,mbc,meqn,
+      subroutine fc3d_clawpack5_fort_interpolate_face(mx,my,mz,mbc,meqn,
      &      qcoarse,qfine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
      &      transform_ptr)
       implicit none
-      integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
+      integer mx,my,mz,mbc,meqn,refratio,igrid,idir,iface_coarse
       integer num_neighbors
       integer*8 transform_ptr
-      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,
+     &                       1-mbc:mz+mbc)
+      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,
+     &                         1-mbc:mz+mbc)
 
       integer mq,r2, m
       integer i, ic1, ic2, ibc, ifine,i1
       integer j, jc1, jc2, jbc, jfine,j1
+      integer k
       integer ic_add, jc_add, ic, jc, mth
       double precision gradx, grady, qc, sl, sr, value
       double precision compute_slopes
@@ -83,59 +86,60 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
 c     # Create map :
 
       do mq = 1,meqn
-         if (idir .eq. 0) then
+         do k = 1,mz
+            if (idir .eq. 0) then
 c           # this ensures that we get 'hanging' corners
 
-            if (iface_coarse .eq. 0) then
-               ic = 1
-            elseif (iface_coarse .eq. 1) then
-               ic = mx
-            endif
-            do jc = 1,mx
-               i1 = ic
-               j1 = jc
-               call fclaw2d_transform_face_half(i1,j1,i2,j2,
+               if (iface_coarse .eq. 0) then
+                  ic = 1
+               elseif (iface_coarse .eq. 1) then
+                  ic = mx
+               endif
+               do jc = 1,mx
+                  i1 = ic
+                  j1 = jc
+                  call fclaw2d_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
-               skip_this_grid = .false.
-               do m = 0,r2-1
-                  if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
+                  skip_this_grid = .false.
+                  do m = 0,r2-1
+                     if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
      &                  then
-                     skip_this_grid = .true.
-                     exit
+                        skip_this_grid = .true.
+                        exit
+                     endif
+                  enddo
+                  if (.not. skip_this_grid) then
+                     qc = qcoarse(mq,ic,jc,k)
+c                    # Compute limited slopes in both x and y. Note we are not
+c                    # really computing slopes, but rather just differences.
+c                    # Scaling is accounted for in 'shiftx' and 'shifty', below.
+                     sl = (qc - qcoarse(mq,ic-1,jc,k))
+                     sr = (qcoarse(mq,ic+1,jc,k) - qc)
+                     gradx = compute_slopes(sl,sr,mth)
+
+                     sl = (qc - qcoarse(mq,ic,jc-1,k))
+                     sr = (qcoarse(mq,ic,jc+1,k) - qc)
+                     grady = compute_slopes(sl,sr,mth)
+
+                     do m = 0,rr2-1
+                        iff = i2(0) + df(1,m)
+                        jff = j2(0) + df(2,m)
+                        value = qc + gradx*shiftx(m) + grady*shifty(m)
+                        qfine(mq,iff,jff,k) = value
+                     enddo
                   endif
                enddo
-               if (.not. skip_this_grid) then
-                  qc = qcoarse(mq,ic,jc)
-c                 # Compute limited slopes in both x and y. Note we are not
-c                 # really computing slopes, but rather just differences.
-c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
-                  sl = (qc - qcoarse(mq,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc) - qc)
-                  gradx = compute_slopes(sl,sr,mth)
-
-                  sl = (qc - qcoarse(mq,ic,jc-1))
-                  sr = (qcoarse(mq,ic,jc+1) - qc)
-                  grady = compute_slopes(sl,sr,mth)
-
-                  do m = 0,rr2-1
-                     iff = i2(0) + df(1,m)
-                     jff = j2(0) + df(2,m)
-                     value = qc + gradx*shiftx(m) + grady*shifty(m)
-                     qfine(mq,iff,jff) = value
-                  enddo
+            else
+               if (iface_coarse .eq. 2) then
+                  jc = 1
+               elseif (iface_coarse .eq. 3) then
+                  jc = my
                endif
-            enddo
-         else
-            if (iface_coarse .eq. 2) then
-               jc = 1
-            elseif (iface_coarse .eq. 3) then
-               jc = my
-            endif
-            do ic = 1,mx
-    1          i1 = ic
-               j1 = jc
-               call fclaw2d_transform_face_half(i1,j1,i2,j2,
-     &               transform_ptr)
+               do ic = 1,mx
+                  i1 = ic
+                  j1 = jc
+                  call fclaw2d_transform_face_half(i1,j1,i2,j2,
+     &                 transform_ptr)
 c              # ---------------------------------------------
 c              # Two 'half-size' neighbors will be passed into
 c              # this routine.  Only half of the coarse grid ghost
@@ -144,35 +148,36 @@ c              # passed in.  We skip those ghost cells that will
 c              # have to be filled in by the other half-size
 c              # grid.
 c              # ---------------------------------------------
-               skip_this_grid = .false.
-               do m = 0,r2-1
-                  if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
+                  skip_this_grid = .false.
+                  do m = 0,r2-1
+                     if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
      &                  then
-                     skip_this_grid = .true.
-                     exit
-                  endif
-               enddo
-               if (.not. skip_this_grid) then
-                  qc = qcoarse(mq,ic,jc)
-
-                  sl = (qc - qcoarse(mq,ic-1,jc))
-                  sr = (qcoarse(mq,ic+1,jc) - qc)
-                  gradx = compute_slopes(sl,sr,mth)
-
-                  sl = (qc - qcoarse(mq,ic,jc-1))
-                  sr = (qcoarse(mq,ic,jc+1) - qc)
-                  grady = compute_slopes(sl,sr,mth)
-
-                  do m = 0,rr2-1
-                     iff = i2(0) + df(1,m)
-                     jff = j2(0) + df(2,m)
-                     value = qc + gradx*shiftx(m) + grady*shifty(m)
-                     qfine(mq,iff,jff) = value
+                        skip_this_grid = .true.
+                        exit
+                     endif
                   enddo
+                  if (.not. skip_this_grid) then
+                     qc = qcoarse(mq,ic,jc,k)
 
-               endif                    !! Don't skip this grid
-            enddo                       !! i loop
-         endif                          !! end idir branch
+                     sl = (qc - qcoarse(mq,ic-1,jc,k))
+                     sr = (qcoarse(mq,ic+1,jc,k) - qc)
+                     gradx = compute_slopes(sl,sr,mth)
+
+                     sl = (qc - qcoarse(mq,ic,jc-1,k))
+                     sr = (qcoarse(mq,ic,jc+1,k) - qc)
+                     grady = compute_slopes(sl,sr,mth)
+
+                     do m = 0,rr2-1
+                        iff = i2(0) + df(1,m)
+                        jff = j2(0) + df(2,m)
+                        value = qc + gradx*shiftx(m) + grady*shifty(m)
+                        qfine(mq,iff,jff,k) = value
+                     enddo
+
+                  endif                    !! Don't skip this grid
+               enddo                       !! i loop
+            endif                          !! end idir branch
+         enddo
       enddo                             !! endo mq loop
 
       end
@@ -279,21 +284,24 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
       end
 
 c     # Conservative intepolation to fine grid patch
-      subroutine fc3d_clawpack5_fort_interpolate2fine(mx,my,mbc,meqn,
+      subroutine fc3d_clawpack5_fort_interpolate2fine(mx,my,mz,mbc,meqn,
      &      qcoarse, qfine, areacoarse, areafine, igrid, manifold)
       implicit none
 
-      integer mx,my,mbc,meqn
+      integer mx,my,mz,mbc,meqn
       integer igrid, manifold
 
-      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-
-      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,
+     &                         1-mbc:mz+mbc)
+      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,
+     &                       1-mbc:mz+mbc)
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,
+     &                            -mbc:mz+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1,
+     &                            -mbc:mz+mbc+1)
 
       integer ii, jj, i,j, i1, i2, j1, j2, ig, jg, mq, mth
-      integer ic,jc,ic_add, jc_add
+      integer ic,jc,ic_add, jc_add,k
       double precision qc, shiftx, shifty, sl, sr, gradx, grady
       double precision compute_slopes
 
@@ -318,30 +326,33 @@ c     # Get (ig,jg) for grid from linear (igrid) coordinates
       jc_add = jg*my/p4est_refineFactor
 
       do mq = 1,meqn
-         do i = i1,i2
-            do j = j1,j2
-               ic = i + ic_add
-               jc = j + jc_add
-               qc = qcoarse(mq,ic,jc)
+         do k = 1,mz
+            do i = i1,i2
+               do j = j1,j2
+                  ic = i + ic_add
+                  jc = j + jc_add
+                  qc = qcoarse(mq,ic,jc,k)
 
-c              # Compute limited slopes in both x and y. Note we are not
-c              # really computing slopes, but rather just differences.
-c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
-               sl = (qc - qcoarse(mq,ic-1,jc))
-               sr = (qcoarse(mq,ic+1,jc) - qc)
-               gradx = compute_slopes(sl,sr,mth)
+c                 # Compute limited slopes in both x and y. Note we are not
+c                 # really computing slopes, but rather just differences.
+c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
+                  sl = (qc - qcoarse(mq,ic-1,jc,k))
+                  sr = (qcoarse(mq,ic+1,jc,k) - qc)
+                  gradx = compute_slopes(sl,sr,mth)
 
-               sl = (qc - qcoarse(mq,ic,jc-1))
-               sr = (qcoarse(mq,ic,jc+1) - qc)
-               grady = compute_slopes(sl,sr,mth)
+                  sl = (qc - qcoarse(mq,ic,jc-1,k))
+                  sr = (qcoarse(mq,ic,jc+1,k) - qc)
+                  grady = compute_slopes(sl,sr,mth)
 
-c              # Fill in refined values on coarse grid cell (ic,jc)
-               do ii = 1,refratio
-                  do jj = 1,refratio
-                     shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
-                     shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
-                     qfine(mq,(i-1)*refratio + ii,(j-1)*refratio + jj)
-     &                     = qc + shiftx*gradx + shifty*grady
+c                 # Fill in refined values on coarse grid cell (ic,jc)
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
+                        shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
+                        qfine(mq,(i-1)*refratio + ii,(j-1)*refratio + jj
+     &                        ,k)
+     &                    = qc + shiftx*gradx + shifty*grady
+                     enddo
                   enddo
                enddo
             enddo
@@ -349,7 +360,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       enddo
 
       if (manifold .ne. 0) then
-         call fc3d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+         call fc3d_clawpack5_fort_fixcapaq2(mx,my,mz,mbc,meqn,
      &         qcoarse,qfine,areacoarse,areafine,igrid)
       endif
 
@@ -362,19 +373,23 @@ c     # So far, this is only used by the interpolation from
 c     # coarse to fine when regridding.  But maybe it should
 c     # be used by the ghost cell routines as well?
 c     # ------------------------------------------------------
-      subroutine fc3d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+      subroutine fc3d_clawpack5_fort_fixcapaq2(mx,my,mz,mbc,meqn,
      &      qcoarse,qfine, areacoarse,areafine,igrid)
       implicit none
 
-      integer mx,my,mbc,meqn, refratio, igrid
+      integer mx,my,mz,mbc,meqn, refratio, igrid
       integer p4est_refineFactor
 
-      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,
+     &                         1-mbc:mz+mbc)
+      double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,
+     &                       1-mbc:mz+mbc)
+      double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,
+     &                            -mbc:mz+mbc+1)
+      double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1,
+     &                            -mbc:mz+mbc+1)
 
-      integer i,j,ii, jj, ifine, jfine, m, ig, jg, ic_add, jc_add
+      integer i,j,k,ii, jj, ifine, jfine, m, ig, jg, ic_add, jc_add
       double precision kf, kc, r2, sum, cons_diff, qf, qc
 
       p4est_refineFactor = 2
@@ -396,33 +411,35 @@ c     # -------------------------------------------------------
 
       r2 = refratio*refratio
       do m = 1,meqn
-         do i = 1,mx/p4est_refineFactor
-            do j = 1,my/p4est_refineFactor
-               sum = 0.d0
-               do ii = 1,refratio
-                  do jj = 1,refratio
-                     ifine = (i-1)*refratio + ii
-                     jfine = (j-1)*refratio + jj
-                     kf = areafine(ifine,jfine)
-                     qf = qfine(m,ifine,jfine)
-                     sum = sum + kf*qf
+         do k = 1,mz
+            do i = 1,mx/p4est_refineFactor
+               do j = 1,my/p4est_refineFactor
+                  sum = 0.d0
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ifine = (i-1)*refratio + ii
+                        jfine = (j-1)*refratio + jj
+                        kf = areafine(ifine,jfine,k)
+                        qf = qfine(m,ifine,jfine,k)
+                        sum = sum + kf*qf
+                     enddo
                   enddo
-               enddo
 
-               kc = areacoarse(i+ic_add,j+jc_add)
-               qc = qcoarse(m,i+ic_add, j+jc_add)
-               cons_diff = (qc*kc - sum)/r2
+                  kc = areacoarse(i+ic_add,j+jc_add,k)
+                  qc = qcoarse(m,i+ic_add, j+jc_add,k)
+                  cons_diff = (qc*kc - sum)/r2
 
-               do ii = 1,refratio
-                  do jj = 1,refratio
-                     ifine  = (i-1)*refratio + ii
-                     jfine  = (j-1)*refratio + jj
-                     kf = areafine(ifine,jfine)
-                     qfine(m,ifine,jfine) = qfine(m,ifine,jfine) +
+                  do ii = 1,refratio
+                     do jj = 1,refratio
+                        ifine  = (i-1)*refratio + ii
+                        jfine  = (j-1)*refratio + jj
+                        kf = areafine(ifine,jfine,k)
+                        qfine(m,ifine,jfine,k) = qfine(m,ifine,jfine,k)+
      &                     cons_diff/kf
+                     enddo
                   enddo
-               enddo
-            enddo  !! end of meqn
+               enddo  !! end of meqn
+            enddo
          enddo
       enddo
 
