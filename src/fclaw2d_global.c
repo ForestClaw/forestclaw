@@ -34,6 +34,7 @@ const int p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
 const int NumCorners = FCLAW2D_NUM_CORNERS;
 const int NumSiblings = FCLAW2D_NUM_SIBLINGS;
 const int PatchDim = FCLAW_PATCH_DIM;
+const int RefineDim = FCLAW_REFINE_DIM;
 
 fclaw2d_global_t* fclaw2d_global_new ()
 {

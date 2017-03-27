@@ -60,6 +60,8 @@ extern const int NumSiblings;
 
 extern const int PatchDim;
 
+extern const int RefineDim;
+
 typedef struct fclaw2d_global
 {
 
