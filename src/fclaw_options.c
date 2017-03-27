@@ -331,9 +331,15 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                            "(used only with manifold=0) [0]");
     sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "xupper " \
                            "(used only with manifold=0) [1]");
+    
     sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower " \
                            "(used only with manifold=0) [0]");
     sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper " \
+                           "(used only with manifold=0) [1]");
+    
+    sc_options_add_double (opt, 0, "az", &amropt->az, 0, "zlower " \
+                           "(used only with manifold=0) [0]");
+    sc_options_add_double (opt, 0, "bz", &amropt->bz, 1, "zupper " \
                            "(used only with manifold=0) [1]");
 
     sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,

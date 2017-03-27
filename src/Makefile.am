@@ -24,7 +24,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
-	src/fclaw2d_output_ascii_fort.h \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost_fill.h \
@@ -45,10 +44,17 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_diagnostics.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
+	src/patches/clawpatch/fclaw2d_output_ascii_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_regrid.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.h \
-	src/patches/clawpatch/fclaw2d_vtk.h
+	src/patches/clawpatch/fclaw2d_vtk.h \
+	src/patches/clawpatch3/fclaw_clawpatch3.h \
+	src/patches/clawpatch3/fclaw_clawpatch3.hpp \
+	src/patches/clawpatch3/fclaw_clawpatch3_output_ascii.h \
+	src/patches/clawpatch3/fclaw_clawpatch3_regrid.h \
+	src/patches/clawpatch3/fclaw_clawpatch3_options.h \
+	src/patches/clawpatch3/fclaw_output_ascii_fort.h
 
 libforestclaw_internal_headers =
 
@@ -126,10 +132,18 @@ libforestclaw_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_tikz.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_vtk.c \
-	src/patches/clawpatch/fclaw2d_vtk.c
+	src/patches/clawpatch/fclaw2d_vtk.c \
+	src/patches/clawpatch3/fclaw_clawpatch3.cpp \
+	src/patches/clawpatch3/fclaw_clawpatch3_diagnostics.c \
+	src/patches/clawpatch3/fclaw_clawpatch3_regrid.c \
+	src/patches/clawpatch3/fclaw_clawpatch3_output_ascii.c \
+	src/patches/clawpatch3/fclaw_clawpatch3_options.c \
+	src/patches/clawpatch3/fclaw_clawpatch3_tikz.c \
+	src/patches/clawpatch3/fclaw_clawpatch3_vtk.c 
 
 # this variable is used for headers that are not publicly installed
-FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d -I@top_srcdir@/src/patches/clawpatch
+FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d -I@top_srcdir@/src/patches/clawpatch \
+                 -I@top_srcdir@/src/patches/clawpatch3
 FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)
 
 lib_LTLIBRARIES += src/libforestclaw.la

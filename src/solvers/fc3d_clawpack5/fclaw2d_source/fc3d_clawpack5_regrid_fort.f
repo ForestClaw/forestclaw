@@ -7,118 +7,120 @@ c     # fclaw2d_fort_interpolate2fine
 c     # fclaw2d_fort_average2coarse
 c     # --------------------------------------------
 
-      subroutine fc2d_clawpack5_fort_tag4refinement(mx,my,mbc,
-     &      meqn, xlower,ylower,dx,dy,blockno,
+      subroutine fc3d_clawpack5_fort_tag4refinement(mx,my,mz,mbc,
+     &      meqn,xlower,ylower,zlower,dx,dy,dz,blockno,
      &      q, tag_threshold, init_flag,tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch, init_flag
+      integer mx,my,mz,mbc,meqn,tag_patch,init_flag
       integer blockno
-      double precision xlower, ylower, dx, dy
+      double precision xlower,ylower,zlower,dx,dy,dz
       double precision tag_threshold
-      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
 
-      integer i,j, mq
+      integer i,j,k,mq
       double precision qmin, qmax
 
       tag_patch = 0
 
 c     # Refine based only on first variable in system.
       mq = 1
-      qmin = q(mq,1,1)
-      qmax = q(mq,1,1)
-      do j = 1-mbc,my+mbc
-         do i = 1-mbc,mx+mbc
-            qmin = min(q(mq,i,j),qmin)
-            qmax = max(q(mq,i,j),qmax)
-            if (qmax - qmin .gt. tag_threshold) then
-               tag_patch = 1
-               return
-            endif
+      qmin = q(mq,1,1,1)
+      qmax = q(mq,1,1,1)
+      do k = 1-mbc,mz+mbc
+         do j = 1-mbc,my+mbc
+            do i = 1-mbc,mx+mbc
+               qmin = min(q(mq,i,j,k),qmin)
+               qmax = max(q(mq,i,j,k),qmax)
+               if (qmax - qmin .gt. tag_threshold) then
+                  tag_patch = 1
+                  return
+               endif
+            enddo
          enddo
       enddo
-
       end
 
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine fc2d_clawpack5_fort_tag4coarsening(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
+      subroutine fc3d_clawpack5_fort_tag4coarsening(mx,my,mz,mbc,meqn,
+     &      xlower,ylower,zlower,dx,dy,dz,blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch
+      integer mx,my,mz,mbc,meqn,tag_patch
       integer blockno
-      double precision xlower(0:3), ylower(0:3), dx, dy
+      double precision xlower(0:3),ylower(0:3),zlower(0:3),dx,dy,dz
       double precision coarsen_threshold
-      double precision q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+      double precision q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+      double precision q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+      double precision q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
 
-      integer i,j, mq
+      integer i,j,k,mq
       double precision qmin, qmax
 
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
       tag_patch = 1
       mq = 1
-      qmin = q0(mq,1,1)
-      qmax = q0(mq,1,1)
+      qmin = q0(mq,1,1,1)
+      qmax = q0(mq,1,1,1)
 
 c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
+      call fc3d_clawpack5_get_minmax(mx,my,mz,mbc,meqn,mq,q0,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
+      call fc3d_clawpack5_get_minmax(mx,my,mz,mbc,meqn,mq,q1,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
+      call fc3d_clawpack5_get_minmax(mx,my,mz,mbc,meqn,mq,q2,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
+      call fc3d_clawpack5_get_minmax(mx,my,mz,mbc,meqn,mq,q3,qmin,qmax,
      &      coarsen_threshold,tag_patch)
 
       end
 
-      subroutine fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q,
+      subroutine fc3d_clawpack5_get_minmax(mx,my,mz,mbc,meqn,mq,q,
      &      qmin,qmax,coarsen_threshold,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq,tag_patch
+      integer mx,my,mz,mbc,meqn,mq,tag_patch
       double precision coarsen_threshold
       double precision qmin,qmax
-      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      integer i,j
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+      integer i,j,k
 
-      do i = 1,mx
-         do j = 1,my
-            qmin = min(q(mq,i,j),qmin)
-            qmax = max(q(mq,i,j),qmax)
-            if (qmax - qmin .gt. coarsen_threshold) then
-c              # We won't coarsen this family because at least one
-c              # grid fails the coarsening test.
-               tag_patch = 0
-               return
-            endif
+      do k = 1,mz
+         do i = 1,mx
+            do j = 1,my
+               qmin = min(q(mq,i,j,k),qmin)
+               qmax = max(q(mq,i,j,k),qmax)
+               if (qmax - qmin .gt. coarsen_threshold) then
+c                 # We won't coarsen this family because at least one
+c                 # grid fails the coarsening test.
+                  tag_patch = 0
+                  return
+               endif
+            enddo
          enddo
       enddo
-
       end
 
-
+c     # Not finished for 2.5 d
 c     # Conservative intepolation to fine grid patch
-      subroutine fc2d_clawpack5_fort_interpolate2fine(mx,my,mbc,meqn,
+      subroutine fc3d_clawpack5_fort_interpolate2fine(mx,my,mz,mbc,meqn,
      &      qcoarse, qfine, areacoarse, areafine, igrid, manifold)
       implicit none
 
-      integer mx,my,mbc,meqn
+      integer mx,my,mz,mbc,meqn
       integer igrid, manifold
 
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -184,7 +186,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       enddo
 
       if (manifold .ne. 0) then
-         call fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+         call fc3d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
      &         qcoarse,qfine,areacoarse,areafine,igrid)
       endif
 
@@ -193,11 +195,11 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
 
 c> \ingroup  Averaging
 c> Average fine grid siblings to parent coarse grid.
-      subroutine fc2d_clawpack5_fort_average2coarse(mx,my,mbc,meqn,
+      subroutine fc3d_clawpack5_fort_average2coarse(mx,my,mz,mbc,meqn,
      &      qcoarse,qfine,areacoarse,areafine,igrid,manifold)
       implicit none
 
-      integer mx,my,mbc,meqn,p4est_refineFactor, refratio, igrid
+      integer mx,my,mz,mbc,meqn,p4est_refineFactor, refratio, igrid
       integer manifold
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -282,7 +284,7 @@ c     # So far, this is only used by the interpolation from
 c     # coarse to fine when regridding.  But maybe it should
 c     # be used by the ghost cell routines as well?
 c     # ------------------------------------------------------
-      subroutine fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+      subroutine fc3d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse,areafine,igrid)
       implicit none
 

@@ -1,4 +1,4 @@
-      subroutine fc2d_clawpack5_fort_tag4refinement(mx,my,mbc,
+      subroutine fc3d_clawpack5_fort_tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
      &      q, tag_threshold, init_flag,tag_patch)
       implicit none

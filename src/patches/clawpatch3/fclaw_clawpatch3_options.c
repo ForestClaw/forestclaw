@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch3_options.h>
+#include <fclaw_clawpatch3_options.h>
 #include <fclaw_package.h>
 
 static int s_clawpatch3_package_id = -1;
@@ -32,7 +32,7 @@ static int s_clawpatch3_package_id = -1;
 static void *
 clawpatch3_options_register(fclaw_app_t * a, void *optpkg, sc_options_t * opt)
 {
-    fclaw2d_clawpatch3_options_t *clawpatch3_options = (fclaw2d_clawpatch3_options_t *) optpkg;
+    fclaw_clawpatch3_options_t *clawpatch3_options = (fclaw_clawpatch3_options_t *) optpkg;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (optpkg != NULL);
@@ -67,7 +67,7 @@ clawpatch3_options_register(fclaw_app_t * a, void *optpkg, sc_options_t * opt)
 static fclaw_exit_type_t
 clawpatch3_options_postprocess(fclaw_app_t * a, void *optpkg, void *registered)
 {
-    fclaw2d_clawpatch3_options_t *clawpatch3_options = (fclaw2d_clawpatch3_options_t *) optpkg;
+    fclaw_clawpatch3_options_t *clawpatch3_options = (fclaw_clawpatch3_options_t *) optpkg;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (optpkg != NULL);
@@ -85,16 +85,19 @@ clawpatch3_options_postprocess(fclaw_app_t * a, void *optpkg, void *registered)
 static fclaw_exit_type_t
 clawpatch3_options_check(fclaw_app_t * app, void *optpkg, void *registered)
 {
-    fclaw2d_clawpatch3_options_t *clawpatch3_options = (fclaw2d_clawpatch3_options_t *) optpkg;
+    fclaw_clawpatch3_options_t *clawpatch3_options = (fclaw_clawpatch3_options_t *) optpkg;
 
-    if (clawpatch3_options->mx != clawpatch3_options->my)
+    if ((clawpatch3_options->mx != clawpatch3_options->my) || 
+        (clawpatch3_options->mx != clawpatch3_options->mz) ||
+        (clawpatch3_options->my != clawpatch3_options->mz))
     {
-        fclaw_global_essentialf("Clawpatch error : mx != my\n");
-        return FCLAW_EXIT_ERROR;    }
+        fclaw_global_essentialf("Clawpatch error : mx, my, mz must be equal\n");
+        return FCLAW_EXIT_ERROR;    
+    }
 
     if (2*clawpatch3_options->mbc > clawpatch3_options->mx)
     {
-        fclaw_global_essentialf("Clawpatch error : 2*mbc > mx or 2*mbc > my\n");
+        fclaw_global_essentialf("Clawpatch error : 2*mbc > mx or 2*mbc > my or 2*mbc > mz\n");
         return FCLAW_EXIT_ERROR;
     }
 
@@ -104,7 +107,7 @@ clawpatch3_options_check(fclaw_app_t * app, void *optpkg, void *registered)
 static void
 clawpatch3_options_destroy (fclaw_app_t * a, void *optpkg, void *registered)
 {
-    fclaw2d_clawpatch3_options_t *clawpatch3_options = (fclaw2d_clawpatch3_options_t *) optpkg;
+    fclaw_clawpatch3_options_t *clawpatch3_options = (fclaw_clawpatch3_options_t *) optpkg;
 
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (optpkg != NULL);
@@ -118,34 +121,34 @@ clawpatch3_options_destroy (fclaw_app_t * a, void *optpkg, void *registered)
 }
 
 static
-const fclaw_app_options_vtable_t fclaw2d_clawpatch3_options_vtable = {
+const fclaw_app_options_vtable_t fclaw_clawpatch3_options_vtable = {
     clawpatch3_options_register,
     clawpatch3_options_postprocess,
     clawpatch3_options_check,
     clawpatch3_options_destroy
 };
 
-fclaw2d_clawpatch3_options_t *
-fclaw2d_clawpatch3_options_register(fclaw_app_t* app, const char* configfile)
+fclaw_clawpatch3_options_t *
+fclaw_clawpatch3_options_register(fclaw_app_t* app, const char* configfile)
 {
-    fclaw2d_clawpatch3_options_t* clawpatch3_options;
+    fclaw_clawpatch3_options_t* clawpatch3_options;
 
     FCLAW_ASSERT (app != NULL);
 
     /* allocate storage for fclaw_options */
     /* we will free it in the options_destroy callback */
-    clawpatch3_options = FCLAW_ALLOC(fclaw2d_clawpatch3_options_t,1);
+    clawpatch3_options = FCLAW_ALLOC(fclaw_clawpatch3_options_t,1);
 
     /* Could also pass in a section header (set to NULL for now) */
     fclaw_app_options_register (app,"clawpatch",
                                 configfile,
-                                &fclaw2d_clawpatch3_options_vtable,
+                                &fclaw_clawpatch3_options_vtable,
                                 clawpatch3_options);
     fclaw_app_set_attribute(app,"clawpatch",clawpatch3_options);
     return clawpatch3_options;
 }
 
-void fclaw2d_clawpatch3_set_options (fclaw2d_global_t *glob, fclaw2d_clawpatch3_options_t* clawpatch3_options)
+void fclaw_clawpatch3_set_options (fclaw2d_global_t *glob, fclaw_clawpatch3_options_t* clawpatch3_options)
 {
     int id;
 
@@ -156,14 +159,14 @@ void fclaw2d_clawpatch3_set_options (fclaw2d_global_t *glob, fclaw2d_clawpatch3_
 }
 
 static
-int fclaw2d_clawpatch3_get_package_id (void)
+int fclaw_clawpatch3_get_package_id (void)
 {
     return s_clawpatch3_package_id;
 }
 
-fclaw2d_clawpatch3_options_t* fclaw2d_clawpatch3_get_options(fclaw2d_global_t* glob)
+fclaw_clawpatch3_options_t* fclaw_clawpatch3_get_options(fclaw2d_global_t* glob)
 {
-    int id = fclaw2d_clawpatch3_get_package_id();
-    return (fclaw2d_clawpatch3_options_t*) 
+    int id = fclaw_clawpatch3_get_package_id();
+    return (fclaw_clawpatch3_options_t*) 
             fclaw_package_get_options(glob, id);
 }

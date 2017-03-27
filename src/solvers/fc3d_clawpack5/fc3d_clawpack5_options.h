@@ -23,12 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GEOCLAW_OPTIONS_H
-#define FCLAW2D_GEOCLAW_OPTIONS_H
+#ifndef FC3D_CLAWPACK5_OPTIONS_H
+#define FC3D_CLAWPACK5_OPTIONS_H
 
 #include <fclaw_options.h>
 #include <fclaw2d_base.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch3_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,23 +38,8 @@ extern "C"
 #endif
 #endif
 
-typedef struct geoclaw_gauge
-{
-    int blockno;
-    int patchno;
-    int location_in_results;
-
-    double xc;
-    double yc;
-    double t1;
-    double t2;
-    int num;
-    /* double* buffer; */  /* Not yet used */
-
-} geoclaw_gauge_t;
-/* Only one copy of GEOCLAW_options for each run */
-
-typedef struct fc2d_geoclaw_options
+/* Only one copy of clawpack5_options for each run */
+typedef struct fc3d_clawpack5_options
 {
     int mwaves;
 
@@ -66,32 +51,26 @@ typedef struct fc2d_geoclaw_options
 
     int *mthbc;
     const char *mthbc_string;
-
+    
     int method[7];
     int mcapa;
-    int mbathy;
     int src_term;
     int use_fwaves;
-
-    double dry_tolerance_c;
-    double wave_tolerance_c;
-    int speed_tolerance_entries_c;
-    double *speed_tolerance_c;
-    const char *speed_tolerance_c_string;
-
-
-    /* ghost patch */
-    int ghost_patch_pack_aux;
 }
-fc2d_geoclaw_options_t;
+fc3d_clawpack5_options_t;
 
-fclaw_exit_type_t fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t *
+fclaw_exit_type_t fc3d_clawpack5_postprocess (fc3d_clawpack5_options_t *
                                                clawopt);
-fclaw_exit_type_t fc2d_geoclaw_check (fc2d_geoclaw_options_t * clawopt);
-void fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt);
+fclaw_exit_type_t fc3d_clawpack5_check (fc3d_clawpack5_options_t * clawopt);
+void fc3d_clawpack5_reset (fc3d_clawpack5_options_t * clawopt);
 
-fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t * app,
-                                                       const char *configfile);
+fc3d_clawpack5_options_t *fc3d_clawpack5_options_register (fclaw_app_t *
+                                                             app,
+                                                             const char
+                                                             *configfile);
+#define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
+void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
+                    const int mthlim_in[], const int method_in[]);
 
 #ifdef __cplusplus
 #if 0

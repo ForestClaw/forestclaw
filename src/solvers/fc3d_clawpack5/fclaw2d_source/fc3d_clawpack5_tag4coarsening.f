@@ -1,5 +1,5 @@
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine fc2d_clawpack5_fort_tag4coarsening(mx,my,mbc,meqn,
+      subroutine fc3d_clawpack5_fort_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -27,24 +27,24 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
+      call fc3d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
+      call fc3d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
+      call fc3d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
+      call fc3d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
      &      coarsen_threshold,tag_patch)
 
       end
 
-      subroutine fc2d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q,
+      subroutine fc3d_clawpack5_get_minmax(mx,my,mbc,meqn,mq,q,
      &      qmin,qmax,coarsen_threshold,tag_patch)
 
       implicit none

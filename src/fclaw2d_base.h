@@ -55,6 +55,12 @@ extern const int fclaw2d_NumCorners;
 #define FCLAW2D_NUM_SIBLINGS 4
 extern const int fclaw2d_NumSiblings;
 
+// #define FCLAW_REFINE_DIM 2
+extern const int fclaw_refine_dim;
+
+// #define FCLAW_PATCH_DIM 3
+extern const int fclaw_patch_dim;
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

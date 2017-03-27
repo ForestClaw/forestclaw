@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtk.h>
 #include <fclaw2d_map.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch3.h>
 
 static void
 cb_tikz_output (fclaw2d_domain_t * domain,
@@ -49,11 +49,11 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     int level = this_patch->level;
     int lmax = gparms->maxlevel;
 
-    int mx, my, mbc;
-    double dx,dy;
-    double xlower, ylower;
-    fclaw2d_clawpatch3_grid_data(s->glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    int mx, my, mz, mbc;
+    double dx,dy,dz;
+    double xlower, ylower, zlower;
+    fclaw_clawpatch3_grid_data(s->glob,this_patch,&mx,&my,&mz,&mbc,
+                                &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
     double ax,bx,ay,by,dxf,dyf;
     if (!gparms->manifold)
@@ -101,7 +101,7 @@ void fclaw2d_output_write_tikz(fclaw2d_global_t* glob,int iframe)
 
     /* Should be in gparms */
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
-    const fclaw2d_clawpatch3_options_t *clawpatch3_opt = fclaw2d_clawpatch3_get_options(glob);
+    const fclaw_clawpatch3_options_t *clawpatch3_opt = fclaw_clawpatch3_get_options(glob);
     
     double figsize[2];
     figsize[0] = gparms->tikz_figsize[0];   /* Inches */

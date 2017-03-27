@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtk.h>
 #include <fclaw2d_map.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch3.h>
 
 static void
 fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
@@ -39,19 +39,19 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     fclaw2d_map_context_t *cont;
 
-    int mx,my,mbc;
-    double dx,dy,xlower,ylower;
+    int mx,my,mz,mbc;
+    double dx,dy,dz,xlower,ylower,zlower;
 
 
     cont = glob->cont;
 
-    fclaw2d_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    fclaw_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mz,&mbc,
+                                &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
 #if 0
-    fclaw2d_clawpatch3_metric_data(glob,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
+    fclaw_clawpatch3_metric_data(glob,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
-    ClawPatch *cp = fclaw2d_clawpatch3_get_cp(this_patch);
+    ClawPatch *cp = fclaw_clawpatch3_get_cp(this_patch);
     const double xlower = cp->xlower ();
     const double ylower = cp->ylower ();
     const double dx = cp->dx ();
@@ -93,13 +93,13 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
                              char *a)
 {
     double *q;
-    double xlower,ylower,dx,dy;
-    int mx,my,mbc,meqn;
+    double xlower,ylower,zlower,dx,dy,dz;
+    int mx,my,mz,mbc,meqn;
 
-    fclaw2d_clawpatch3_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch3_soln_data(glob,this_patch,&q,&meqn);
 
-    fclaw2d_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    fclaw_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mz,&mbc,
+                                &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
     const int xlane = mx + 2 * mbc;
     const int ylane = my + 2 * mbc;
@@ -123,7 +123,7 @@ void
 fclaw2d_output_write_vtk (fclaw2d_global_t * glob, const char *basename)
 {
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
-    const fclaw2d_clawpatch3_options_t *clawpatch3_opt = fclaw2d_clawpatch3_get_options(glob);
+    const fclaw_clawpatch3_options_t *clawpatch3_opt = fclaw_clawpatch3_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch3_opt->mx, clawpatch3_opt->my, 

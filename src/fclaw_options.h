@@ -176,6 +176,8 @@ struct amr_options
     double bx;   /**< Only for the single block, unmapped case */
     double ay;   /**< Only for the single block, unmapped case */
     double by;   /**< Only for the single block, unmapped case */
+    double az;
+    double bz;
 
     /* Diagnostics */
     int run_user_diagnostics;

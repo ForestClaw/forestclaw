@@ -23,33 +23,50 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_OUTPUT_ASCII_H
-#define FCLAW2D_OUTPUT_ASCII_H
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_output.h>
+#include <fclaw_clawpatch3.h>
 
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_output_ascii_fort.h>
 
-#ifdef __cplusplus
-extern "C"
+void fclaw_clawpatch3_output_ascii_header(fclaw2d_global_t* glob,
+                                           int iframe)
 {
-#if 0
+    const fclaw_clawpatch3_options_t *clawpatch3_opt = fclaw_clawpatch3_get_options(glob);
+    int meqn,ngrids;
+    double time;
+    char matname1[11];
+    char matname2[11];
+
+    sprintf(matname1,"fort.q%04d",iframe);
+    sprintf(matname2,"fort.t%04d",iframe);
+
+    time = glob->curr_time;
+    ngrids = fclaw2d_domain_get_num_patches(glob->domain);
+
+    meqn = clawpatch3_opt->meqn;
+
+    fclaw_clawpatch3_vt()->fort_write_header(matname1,matname2,&time,&meqn,&ngrids);
 }
-#endif
-#endif
 
-void fclaw2d_clawpatch3_output_ascii_header(fclaw2d_global_t* glob,
-                                           int iframe);
 
-void fclaw2d_clawpatch3_output_ascii(fclaw2d_global_t *glob,
+void fclaw_clawpatch3_output_ascii(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
                                     int this_block_idx, int this_patch_idx,
-                                    int iframe,int num,int level);
-
-#ifdef __cplusplus
-#if 0
+                                    int iframe,int patch_num,int level)
 {
-#endif
-}
-#endif
+    int mx,my,mz,mbc,meqn;
+    double xlower,ylower,zlower,dx,dy,dz;
+    double *q;
+    char fname[11];
 
-#endif
+    fclaw_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mz,&mbc,
+                                &xlower,&ylower,&zlower,&dx,&dy,&dz);
+
+    fclaw_clawpatch3_soln_data(glob,this_patch,&q,&meqn);
+
+    sprintf(fname,"fort.q%04d",iframe);
+    fclaw_clawpatch3_vt()->fort_write_file(fname,&mx,&my,&mz,&meqn,&mbc,&xlower,&ylower,&zlower,
+                                             &dx,&dy,&dz,q,
+                                             &patch_num,&level,&this_block_idx,
+                                             &glob->domain->mpirank);
+}

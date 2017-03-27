@@ -135,8 +135,8 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW2D_TIMER_INIT);
     }
-    fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
-                            0.0,time_interp);
+    // fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
+    //                         0.0,time_interp);
 
     // VTK output during amrinit
     if (gparms->vtkout & 1) {

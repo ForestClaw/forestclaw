@@ -23,81 +23,53 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GEOCLAW_OPTIONS_H
-#define FCLAW2D_GEOCLAW_OPTIONS_H
+/** \file
+ *
+ * Routines for handling general ForestClaw input options.
+ *
+ */
 
-#include <fclaw_options.h>
-#include <fclaw2d_base.h>
-#include <fclaw2d_clawpatch_options.h>
+#ifndef FCLAW_CLAWPATCH3_OPTIONS_H
+#define FCLAW_CLAWPATCH3_OPTIONS_H
+
+#include <fclaw_base.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
-}
+}                               /* need this because indent is dumb */
 #endif
 #endif
 
-typedef struct geoclaw_gauge
+typedef struct fclaw_clawpatch3_options
 {
-    int blockno;
-    int patchno;
-    int location_in_results;
+    /* These are constant for all clawpatch's */
+    int mx;
+    int my;
+    int mz;
+    int maux;
+    int mbc;
 
-    double xc;
-    double yc;
-    double t1;
-    double t2;
-    int num;
-    /* double* buffer; */  /* Not yet used */
+    int meqn;
 
-} geoclaw_gauge_t;
-/* Only one copy of GEOCLAW_options for each run */
+    int is_registered;
 
-typedef struct fc2d_geoclaw_options
-{
-    int mwaves;
+} fclaw_clawpatch3_options_t;
 
-    const char *order_string;
-    int *order;
+fclaw_clawpatch3_options_t *
+fclaw_clawpatch3_options_register(fclaw_app_t* app, const char* configfile);
+void fclaw_clawpatch3_set_options (fclaw2d_global_t *glob, 
+	                                fclaw_clawpatch3_options_t* clawpatch3_options);
+fclaw_clawpatch3_options_t* fclaw_clawpatch3_get_options(fclaw2d_global_t* glob);
 
-    int *mthlim;
-    const char *mthlim_string;
-
-    int *mthbc;
-    const char *mthbc_string;
-
-    int method[7];
-    int mcapa;
-    int mbathy;
-    int src_term;
-    int use_fwaves;
-
-    double dry_tolerance_c;
-    double wave_tolerance_c;
-    int speed_tolerance_entries_c;
-    double *speed_tolerance_c;
-    const char *speed_tolerance_c_string;
-
-
-    /* ghost patch */
-    int ghost_patch_pack_aux;
-}
-fc2d_geoclaw_options_t;
-
-fclaw_exit_type_t fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t *
-                                               clawopt);
-fclaw_exit_type_t fc2d_geoclaw_check (fc2d_geoclaw_options_t * clawopt);
-void fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt);
-
-fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t * app,
-                                                       const char *configfile);
 
 #ifdef __cplusplus
 #if 0
-{
+{                               /* need this because indent is dumb */
 #endif
 }
 #endif
 
-#endif
+#endif /* !FCLAW2D_OPTIONS_H */

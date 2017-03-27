@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_REGRID_DEFAULT_H
-#define FCLAW2D_REGRID_DEFAULT_H
+#ifndef FCLAW_CLAWPATCH3_REGRID_H
+#define FCLAW_CLAWPATCH3_REGRID_H
 
 #include <forestclaw2d.h>
 
@@ -36,54 +36,56 @@ extern "C"
 #endif
 #endif
 
-int fclaw2d_clawpatch3_tag4refinement(fclaw2d_global_t *glob,
+int fclaw_clawpatch3_tag4refinement(fclaw2d_global_t *glob,
                                      fclaw2d_patch_t *this_patch,
                                      int blockno, int patchno,
                                      int initflag);
 
-int fclaw2d_clawpatch3_tag4coarsening(fclaw2d_global_t *glob,
+int fclaw_clawpatch3_tag4coarsening(fclaw2d_global_t *glob,
                                      fclaw2d_patch_t *this_patch,
                                      int blockno, int patchno);
 
-void fclaw2d_clawpatch3_average2coarse(fclaw2d_global_t *glob,
+void fclaw_clawpatch3_average2coarse(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_siblings,
                                       fclaw2d_patch_t *coarse_patch,
                                       int blockno, int fine_patchno,
                                       int coarse_patchno);
 
-void fclaw2d_clawpatch3_interpolate2fine(fclaw2d_global_t *glob,
+void fclaw_clawpatch3_interpolate2fine(fclaw2d_global_t *glob,
                                         fclaw2d_patch_t *coarse_patch,
                                         fclaw2d_patch_t* fine_patch,
                                         int this_blockno, int coarse_patchno,
                                         int fine_patchno);
 
-typedef void (*fclaw2d_fort_tag4refinement_t)(const int* mx,const int* my,
+typedef void (*fclaw_fort_tag4refinement_t)(const int* mx,const int* my,const int* mz,
                                               const int* mbc,const int* meqn,
                                               const double* xlower, const double* ylower,
-                                              const double* dx, const double* dy,
+                                              const double* zlower,
+                                              const double* dx, const double* dy, const double* dz,
                                               const int* blockno,
                                               double q[],
                                               const double* tag_threshold,
                                               const int* init_flag,
                                               int* tag_patch);
 
-typedef void (*fclaw2d_fort_tag4coarsening_t)(const int* mx, const int* my,
+typedef void (*fclaw_fort_tag4coarsening_t)(const int* mx, const int* my,const int* mz,
                                               const int* mbc, const int* meqn,
-                                              const double* xlower, const double* ylower,
-                                              const double* dx, const double* dy,
+                                              const double* xlower, const double* ylower, 
+                                              const double* zlower,
+                                              const double* dx, const double* dy, const double* dz,
                                               const int* blockno,
                                               double q0[],double q1[],
                                               double q2[],double q3[],
                                               const double* tag_threshold,
                                               int* tag_patch);
 
-typedef void (*fclaw2d_fort_interpolate2fine_t)(const int* mx, const int* my,
+typedef void (*fclaw_fort_interpolate2fine_t)(const int* mx, const int* my,const int* mz,
                                                 const int* mbc, const int* meqn,
                                                 double qcoarse[], double qfine[],
                                                 double areacoarse[], double areafine[],
                                                 const int* igrid, const int* manifold);
 
-typedef void (*fclaw2d_fort_average2coarse_t)(const int* mx, const int* my,
+typedef void (*fclaw_fort_average2coarse_t)(const int* mx, const int* my,const int* mz,
                                               const int* mbc, const int* meqn,
                                               double qcoarse[],double qfine[],
                                               double areacoarse[],double areafine[],
@@ -93,9 +95,9 @@ typedef void (*fclaw2d_fort_average2coarse_t)(const int* mx, const int* my,
 
 
 
-#define FCLAW2D_FORT_AVERAGE_AREA FCLAW_F77_FUNC(fclaw2d_fort_average_area, \
-                                                FCLAW2D_FORT_AVERAGE_AREA)
-void FCLAW2D_FORT_AVERAGE_AREA(const int* mx, const int* my,
+#define FCLAW_FORT_AVERAGE_AREA FCLAW_F77_FUNC(fclaw_fort_average_area, \
+                                                FCLAW_FORT_AVERAGE_AREA)
+void FCLAW_FORT_AVERAGE_AREA(const int* mx, const int* my,
                                const int* mbc,
                                double areacoarse[],double areafine[],
                                const int* igrid);

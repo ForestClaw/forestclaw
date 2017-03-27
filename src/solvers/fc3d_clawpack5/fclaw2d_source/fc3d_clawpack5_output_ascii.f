@@ -1,4 +1,4 @@
-      subroutine fc2d_clawpack5_fort_write_header(iframe, time, meqn,
+      subroutine fc3d_clawpack5_fort_write_header(iframe, time, meqn,
      &                                            maux, ngrids)
       implicit none
 
@@ -36,26 +36,26 @@
       end
 
 
-      subroutine fc2d_clawpack5_fort_write_file(matname1,
-     &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
-     &      q,patch_num,level,blockno,mpirank)
+      subroutine fc3d_clawpack5_fort_write_file(matname1,
+     &      mx,my,mz,meqn,mbc,xlower,ylower,zlower,dx,dy,
+     &      dz,q,patch_num,level,blockno,mpirank)
       implicit none
 
       character*11 matname1
-      integer meqn,mbc,mx,my
+      integer meqn,mbc,mx,my,mz
       integer patch_num, level, blockno, mpirank
-      double precision xlower, ylower,dx,dy
+      double precision xlower,ylower,zlower,dx,dy,dz
 
-      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
 
       integer matunit1
-      integer i,j,mq
+      integer i,j,k,mq
 
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
 
-      call fc2d_clawpack5_fort_write_grid_header(matunit1,
-     &      mx,my,xlower,ylower, dx,dy,patch_num,level,
+      call fc3d_clawpack5_fort_write_grid_header(matunit1,
+     &      mx,my,mz,xlower,ylower,zlower,dx,dy,dz,patch_num,level,
      &      blockno,mpirank)
 
 
@@ -66,16 +66,18 @@
       endif
 
 c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
-      do j = 1,my
-         do i = 1,mx
-            do mq = 1,meqn
-               if (abs(q(mq,i,j)) .lt. 1d-99) then
-                  q(mq,i,j) = 0.d0
-               endif
-            enddo
-            write(matunit1,120) (q(mq,i,j),mq=1,meqn)
-         enddo
-         write(matunit1,*) ' '
+      do k = 1,mz
+        do j = 1,my
+           do i = 1,mx
+              do mq = 1,meqn
+                 if (abs(q(mq,i,j,k)) .lt. 1d-99) then
+                    q(mq,i,j,k) = 0.d0
+                 endif
+              enddo
+              write(matunit1,120) (q(mq,i,j,k),mq=1,meqn)
+           enddo
+           write(matunit1,*) ' '
+        enddo
       enddo
   120 format (5E26.16)
 
@@ -83,31 +85,34 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
 
       end
 
-      subroutine fc2d_clawpack5_fort_write_grid_header(matunit1,
-     &      mx,my,xlower,ylower, dx,dy,patch_num,level,
+      subroutine fc3d_clawpack5_fort_write_grid_header(matunit1,
+     &      mx,my,mz,xlower,ylower,zlower,dx,dy,dz,patch_num,level,
      &      blockno,mpirank)
 
       implicit none
 
-      integer matunit1, mx, my
+      integer matunit1, mx, my, mz
       integer patch_num, level, blockno, mpirank
-      double precision xlower, ylower,dx,dy
+      double precision xlower,ylower,zlower,dx,dy,dz
 
 
-      write(matunit1,1001) patch_num, level, blockno, mpirank, mx, my
+      write(matunit1,1001) patch_num,level,blockno,mpirank,mx,my,mz
  1001 format(i5,'                 grid_number',/,
      &       i5,'                 AMR_level',/,
      &       i5,'                 block_number',/,
      &       i5,'                 mpi_rank',/,
      &       i5,'                 mx',/,
-     &       i5,'                 my')
+     &       i5,'                 my',/,
+     &       i5,'                 mz')
 
 
-      write(matunit1,1002) xlower,ylower,dx,dy
+      write(matunit1,1002) xlower,ylower,zlower,dx,dy,dz
  1002 format(e24.16,'    xlow', /,
      &       e24.16,'    ylow', /,
+     &       e24.16,'    zlow', /,
      &       e24.16,'    dx', /,
-     &       e24.16,'    dy',/)
+     &       e24.16,'    dy', /,
+     &       e24.16,'    dz',/)
 
 
       end
