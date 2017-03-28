@@ -24,45 +24,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch3.h>
 #include <fclaw2d_metric_default_fort.h>
 
-int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
+int fclaw_clawpatch3_tag4refinement(fclaw2d_global_t *glob,
                                      fclaw2d_patch_t *this_patch,
                                      int blockno, int patchno,
                                      int initflag)
 {
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
+    int mx,my,mz,mbc,meqn;
+    double xlower,ylower,zlower,dx,dy,dz;
     double *q;
     int tag_patch;
     double refine_threshold;
 
     refine_threshold = gparms->refine_threshold;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    fclaw_clawpatch3_grid_data(glob,this_patch,&mx,&my,&mz,&mbc,
+                                 &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch3_soln_data(glob,this_patch,&q,&meqn);
 
     tag_patch = 0;
-    fclaw2d_clawpatch_vt()->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                                                &blockno, q,&refine_threshold,
-                                                &initflag,&tag_patch);
+    fclaw_clawpatch3_vt()->fort_tag4refinement(&mx,&my,&mz,&mbc,&meqn,&xlower,&ylower,&zlower,
+                                                 &dx,&dy,&dz,
+                                                 &blockno, q,&refine_threshold,
+                                                 &initflag,&tag_patch);
     return tag_patch;
 }
 
-int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
+int fclaw_clawpatch3_tag4coarsening(fclaw2d_global_t *glob,
                                      fclaw2d_patch_t *fine_patches,
                                      int blockno,
                                      int patchno)
 {
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
+    int mx,my,mz,mbc,meqn;
+    double xlower,ylower,zlower,dx,dy,dz;
     double *q[4];
     int tag_patch,igrid;
     double coarsen_threshold;
@@ -72,18 +73,20 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 
     coarsen_threshold = gparms->coarsen_threshold;
 
-    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    fclaw_clawpatch3_grid_data(glob,patch0,&mx,&my,&mz,&mbc,
+                               &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
     for (igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+        fclaw_clawpatch3_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
     tag_patch = 0;
-    fclaw2d_clawpatch_vt()->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                                                &blockno, q[0],q[1],q[2],q[3],
-                                                &coarsen_threshold,&tag_patch);
+    /* 2.5 check needed */
+    fclaw_clawpatch3_vt()->fort_tag4coarsening(&mx,&my,&mz,&mbc,&meqn,&xlower,&ylower,&zlower,
+                                                 &dx,&dy,&dz,
+                                                 &blockno, q[0],q[1],q[2],q[3],
+                                                 &coarsen_threshold,&tag_patch);
     return tag_patch == 1;
 }
 
@@ -92,47 +95,53 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
    Callback routine for tagging
    ----------------------------------------------------------------- */
 
-void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t* glob,
+void fclaw_clawpatch3_interpolate2fine(fclaw2d_global_t* glob,
                                         fclaw2d_patch_t *coarse_patch,
                                         fclaw2d_patch_t* fine_patches,
                                         int this_blockno, int coarse_patchno,
                                         int fine0_patchno)
 {
-    int mx,my,mbc,meqn;
+    int mx,my,mz,mbc,meqn;
     double *qcoarse,*qfine;
     double *areacoarse,*areafine;
-    double *xp,*yp,*zp,*xd,*yd,*zd;
+    // double *xp,*yp,*zp,*xd,*yd,*zd;
     int igrid;
 
     const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch3_options_t *clawpatch3_opt = fclaw_clawpatch3_get_options(glob);
 
     fclaw2d_patch_t* fine_patch;
 
-    mx = clawpatch_opt->mx;
-    my = clawpatch_opt->my;
-    mbc = clawpatch_opt->mbc;
+    mx = clawpatch3_opt->mx;
+    my = clawpatch3_opt->my;
+    mz = clawpatch3_opt->mz;
+    mbc = clawpatch3_opt->mbc;
 
-    fclaw2d_clawpatch_metric_data(glob,coarse_patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&areacoarse);
-    fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
+#if 0
+    fclaw_clawpatch3_metric_data(glob,coarse_patch,&xp,&yp,&zp,
+                                   &xd,&yd,&zd,&areacoarse);
+#endif
+    areacoarse = NULL;
+    areafine = NULL;
+    fclaw_clawpatch3_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
     /* Loop over four siblings (z-ordering) */
+    /* 2.5 check needed */
     for (igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
 
-        fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
-
+        fclaw_clawpatch3_soln_data(glob,fine_patch,&qfine,&meqn);
+#if 0
         if (gparms->manifold)
         {
-            fclaw2d_clawpatch_metric_data(glob,fine_patch,&xp,&yp,&zp,
+            fclaw_clawpatch3_metric_data(glob,fine_patch,&xp,&yp,&zp,
                                           &xd,&yd,&zd,&areafine);
         }
-
-        fclaw2d_clawpatch_vt()->fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                                      areacoarse, areafine, &igrid,
-                                                      &gparms->manifold);
+#endif
+        fclaw_clawpatch3_vt()->fort_interpolate2fine(&mx,&my,&mz,&mbc,&meqn,qcoarse,qfine,
+                                                       areacoarse, areafine, &igrid,
+                                                       &gparms->manifold);
 
     }
 }
@@ -142,7 +151,7 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t* glob,
    something like "average from fine" routine which handles more generic
    things, including area averaging, and maybe something to do with averaging
    stuff in aux arrays. */
-void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
+void fclaw_clawpatch3_average2coarse(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_patches,
                                       fclaw2d_patch_t *coarse_patch,
                                       int blockno, int fine0_patchno,
@@ -150,38 +159,44 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
 
 {
     const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch3_options_t *clawpatch3_opt = fclaw_clawpatch3_get_options(glob);
     
-    int mx,my, mbc, meqn;
+    int mx,my,mz,mbc, meqn;
     double *qcoarse, *qfine;
-    double *areacoarse, *areafine;
-    double *xp,*yp,*zp,*xd,*yd,*zd;
+    double *areacoarse, *areafine;    
+    //double *xp,*yp,*zp,*xd,*yd,*zd;
     int igrid;
     fclaw2d_patch_t *fine_patch;
 
-    mx = clawpatch_opt->mx;
-    my = clawpatch_opt->my;
-    mbc = clawpatch_opt->mbc;
+    mx = clawpatch3_opt->mx;
+    my = clawpatch3_opt->my;
+    mz = clawpatch3_opt->mz;
+    mbc = clawpatch3_opt->mbc;
 
-    fclaw2d_clawpatch_metric_data(glob,coarse_patch,&xp,&yp,&zp,
+    areacoarse = NULL;
+    areafine = NULL;
+#if 0
+    fclaw_clawpatch3_metric_data(glob,coarse_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&areacoarse);
-    fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
+#endif
+    fclaw_clawpatch3_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
+    /* 2.5 check needed */
     for(igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
 
-        fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
-
+        fclaw_clawpatch3_soln_data(glob,fine_patch,&qfine,&meqn);
+#if 0
         if (gparms->manifold)
         {
-            fclaw2d_clawpatch_metric_data(glob,fine_patch,&xp,&yp,&zp,
+            fclaw_clawpatch3_metric_data(glob,fine_patch,&xp,&yp,&zp,
                                           &xd,&yd,&zd,&areafine);
         }
-
-        fclaw2d_clawpatch_vt()->fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                                    areacoarse, areafine, &igrid,
-                                                    &gparms->manifold);
+#endif
+        fclaw_clawpatch3_vt()->fort_average2coarse(&mx,&my,&mz,&mbc,&meqn,qcoarse,qfine,
+                                                     areacoarse, areafine, &igrid,
+                                                     &gparms->manifold);
 
     }
 }

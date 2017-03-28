@@ -23,21 +23,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_HPP
-#define FCLAW2D_CLAWPATCH_HPP
+#ifndef FCLAW_CLAWPATCH3_HPP
+#define FCLAW_CLAWPATCH3_HPP
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_options.h>
 #include <fclaw_package.h>
 #include <fclaw2d_transform.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch3.h>
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_farraybox.hpp>
 
 
-class fclaw2d_clawpatch_t
+class fclaw_clawpatch3_t
 {
 public :
     Box dataBox();  /* Box containing data pointer q */
@@ -50,15 +50,15 @@ public :
        ---------------------------------------------------------------- */
 
     void mb_exchange_block_corner_ghost(const int& a_icorner,
-                                        fclaw2d_clawpatch_t *a_neighbor_cp,
+                                        fclaw_clawpatch3_t *a_neighbor_cp,
                                         int time_interp);
 
     void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                       fclaw2d_clawpatch_t *cp_fine,
+                                       fclaw_clawpatch3_t *cp_fine,
                                        fclaw_bool a_time_interp);
 
     void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                           fclaw2d_clawpatch_t *cp_fine,
+                                           fclaw_clawpatch3_t *cp_fine,
                                            fclaw_bool a_time_interp);
 
     // ----------------------------------------------------------------
@@ -66,9 +66,6 @@ public :
     // ----------------------------------------------------------------
 
     void* clawpack_patch_data(int id);
-
-    static fclaw_app_t* app;
-    static fclaw2d_global_t *global;
 
     /* Solution data */
     int meqn;                    /* also in amr_options_t */
@@ -81,40 +78,27 @@ public :
     /* Grid info */
     int mx;           /* also in amr_options_t */
     int my;           /* also in amr_options_t */
+    int mz;
     int mbc;          /* also in amr_options_t */
     int maux;
 
     double dx;
     double dy;
+    double dz;
     double xlower;
     double ylower;
+    double zlower;
     double xupper;
     double yupper;
+    double zupper;
 
     fclaw_bool manifold;    /* also in amr_options_t */
     int blockno;
 
     FArrayBox aux;
-
-    FArrayBox xp;
-    FArrayBox yp;
-    FArrayBox zp;
-
-    FArrayBox xd;
-    FArrayBox yd;
-    FArrayBox zd;
-
-    FArrayBox xface_normals;
-    FArrayBox yface_normals;
-    FArrayBox xface_tangents;
-    FArrayBox yface_tangents;
-    FArrayBox surf_normals;
-    FArrayBox edge_lengths;
-
     FArrayBox area;
-    FArrayBox curvature;  // ???
 };
 
-fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
+fclaw_clawpatch3_t* fclaw_clawpatch3_get_cp(fclaw2d_patch_t* this_patch);
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */

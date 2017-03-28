@@ -23,52 +23,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** \file
- *
- * Routines for handling general ForestClaw input options.
- *
- */
+#ifndef FCLAW_OUTPUT_ASCII_H
+#define FCLAW_OUTPUT_ASCII_H
 
-#ifndef FCLAW2D_CLAWPATCH_OPTIONS_H
-#define FCLAW2D_CLAWPATCH_OPTIONS_H
-
-#include <fclaw_base.h>
-#include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw_output_ascii_fort.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
-}                               /* need this because indent is dumb */
+}
 #endif
 #endif
 
-typedef struct fclaw2d_clawpatch_options
-{
-    /* These are constant for all clawpatch's */
-    int mx;
-    int my;
-    int maux;
-    int mbc;
+void fclaw_clawpatch3_output_ascii_header(fclaw2d_global_t* glob,
+                                           int iframe);
 
-    int meqn;
-
-    int is_registered;
-
-} fclaw2d_clawpatch_options_t;
-
-fclaw2d_clawpatch_options_t *
-fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile);
-void fclaw2d_clawpatch_set_options (fclaw2d_global_t *glob, 
-	                                fclaw2d_clawpatch_options_t* clawpatch_options);
-fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob);
-
+void fclaw_clawpatch3_output_ascii(fclaw2d_global_t *glob,
+                                    fclaw2d_patch_t *this_patch,
+                                    int this_block_idx, int this_patch_idx,
+                                    int iframe,int num,int level);
 
 #ifdef __cplusplus
 #if 0
-{                               /* need this because indent is dumb */
+{
 #endif
 }
 #endif
 
-#endif /* !FCLAW2D_OPTIONS_H */
+#endif

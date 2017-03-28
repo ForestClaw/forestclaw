@@ -39,8 +39,8 @@ public:
     int bigEnd(int idir) const;
 
 private:
-    int m_ll[2];
-    int m_ur[2];
+    int m_ll[FCLAW_PATCH_DIM];
+    int m_ur[FCLAW_PATCH_DIM];
 };
 
 class FArrayBox

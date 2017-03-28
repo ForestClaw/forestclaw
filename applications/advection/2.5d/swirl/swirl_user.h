@@ -23,12 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GEOCLAW_OPTIONS_H
-#define FCLAW2D_GEOCLAW_OPTIONS_H
+#ifndef SWIRL_USER_H
+#define SWIRL_USER_H
 
-#include <fclaw_options.h>
-#include <fclaw2d_base.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_forestclaw.h>
+#include <fc3d_clawpack5.h>
+// #include "../all/clawpack_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -38,60 +38,30 @@ extern "C"
 #endif
 #endif
 
-typedef struct geoclaw_gauge
+typedef struct user_options
 {
-    int blockno;
-    int patchno;
-    int location_in_results;
+    double period;
+    int claw_version;
+    int is_registered;
 
-    double xc;
-    double yc;
-    double t1;
-    double t2;
-    int num;
-    /* double* buffer; */  /* Not yet used */
+} user_options_t;
 
-} geoclaw_gauge_t;
-/* Only one copy of GEOCLAW_options for each run */
+#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
+void SWIRL_SETPROB(double* tperiod);
 
-typedef struct fc2d_geoclaw_options
-{
-    int mwaves;
+void swirl_link_solvers(fclaw2d_global_t *glob);
 
-    const char *order_string;
-    int *order;
+void swirl_problem_setup(fclaw2d_global_t* glob);
 
-    int *mthlim;
-    const char *mthlim_string;
+void swirl_patch_setup(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx);
 
-    int *mthbc;
-    const char *mthbc_string;
+const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob);
 
-    int method[7];
-    int mcapa;
-    int mbathy;
-    int src_term;
-    int use_fwaves;
-
-    double dry_tolerance_c;
-    double wave_tolerance_c;
-    int speed_tolerance_entries_c;
-    double *speed_tolerance_c;
-    const char *speed_tolerance_c_string;
-
-
-    /* ghost patch */
-    int ghost_patch_pack_aux;
-}
-fc2d_geoclaw_options_t;
-
-fclaw_exit_type_t fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t *
-                                               clawopt);
-fclaw_exit_type_t fc2d_geoclaw_check (fc2d_geoclaw_options_t * clawopt);
-void fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt);
-
-fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t * app,
-                                                       const char *configfile);
+/* Mappings */
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

@@ -121,8 +121,6 @@ void fc2d_geoclaw_init_vtables()
 
     /* Patch functions */
     clawpatch_vt->fort_copy_face     = &FC2D_CLAWPACK5_FORT_COPY_FACE;
-    // clawpatch_vt->fort_average_face = &FC2D_CLAWPACK5_FORT_AVERAGE_FACE;
-    // clawpatch_vt->fort_interpolate_face = &FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE;
 
     patch_vt->average_face       = &fc2d_geoclaw_average_face;
     patch_vt->interpolate_face   = &fc2d_geoclaw_interpolate_face;
@@ -130,8 +128,6 @@ void fc2d_geoclaw_init_vtables()
     clawpatch_vt->fort_copy_corner   =  &FC2D_CLAWPACK5_FORT_COPY_CORNER;
     patch_vt->average_corner     =  &fc2d_geoclaw_average_corner;
     patch_vt->interpolate_corner =  &fc2d_geoclaw_interpolate_corner;
-    // clawpatch_vt->fort_average_corner     = &FC2D_CLAWPACK5_FORT_AVERAGE_CORNER;
-    // clawpatch_vt->fort_interpolate_corner = &FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
     /* Ghost Patch*/
     clawpatch_vt->fort_ghostpack_qarea   = &FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA;

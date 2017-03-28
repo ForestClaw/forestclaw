@@ -23,33 +23,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_OUTPUT_ASCII_H
-#define FCLAW2D_OUTPUT_ASCII_H
+#include "swirl_user.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
 
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_output_ascii_fort.h>
 
-#ifdef __cplusplus
-extern "C"
+/* Two versions of Clawpack */
+#include <fc3d_clawpack5.h>
+
+void swirl_link_solvers(fclaw2d_global_t *glob)
 {
+    fclaw2d_vt()->problem_setup = &swirl_problem_setup;  /* Version-independent */
+
+    fc3d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
 #if 0
-}
-#endif
-#endif
-
-void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
-                                           int iframe);
-
-void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx, int this_patch_idx,
-                                    int iframe,int num,int level);
-
-#ifdef __cplusplus
-#if 0
-{
+        fc2d_clawpack5_vt()->setaux    = &CLAWPACK5_SETAUX;
+        fc2d_clawpack5_vt()->b4step2   = &CLAWPACK5_B4STEP2;
+        fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV;
+        fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV;
 #endif
 }
-#endif
 
-#endif
+void swirl_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = swirl_user_get_options(glob);
+
+    double period = user->period;
+    SWIRL_SETPROB(&period);
+}

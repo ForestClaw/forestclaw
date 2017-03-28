@@ -58,6 +58,10 @@ extern const int NumCorners;
 #define FCLAW2D_NUM_SIBLINGS 4
 extern const int NumSiblings;
 
+extern const int PatchDim;
+
+extern const int RefineDim;
+
 typedef struct fclaw2d_global
 {
 

@@ -23,10 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_OUTPUT_ASCII_fort_H
-#define FCLAW2D_OUTPUT_ASCII_fort_H
+#ifndef FCLAW_OUTPUT_ASCII_FORT_H
+#define FCLAW_OUTPUT_ASCII_FORT_H
 
-#include <fclaw2d_vtable.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,43 +37,43 @@ extern "C"
 
 
 /* Write header files */
-typedef void  (*fclaw2d_fort_write_header_t)(char* matname1,char* matname2,
+typedef void  (*fclaw_fort_write_header_t)(char* matname1,char* matname2,
                                              double* time, int* meqn,
                                              int* ngrids);
 
-#define  FCLAW2D_FORT_WRITE_HEADER FCLAW_F77_FUNC(fclaw2d_fort_write_header, \
-                                                  FCLAW2D_FORT_WRITE_HEADER)
+#define  FCLAW_FORT_WRITE_HEADER FCLAW_F77_FUNC(fclaw_fort_write_header, \
+                                                  FCLAW_FORT_WRITE_HEADER)
 
-void     FCLAW2D_FORT_WRITE_HEADER(char* matname1, char* matname2,
+void     FCLAW_FORT_WRITE_HEADER(char* matname1, char* matname2,
                                    double* time, int* meqn, int* ngrids);
 
 
 /* Write out data */
-typedef void (*fclaw2d_fort_write_file_t)(char* matname1,
-                                          int* mx,        int* my,
+typedef void (*fclaw_fort_write_file_t)(char* matname1,
+                                          int* mx,        int* my,   int*mz,
                                           int* meqn,      int* mbc,
-                                          double* xlower, double* ylower,
-                                          double* dx,     double* dy,
+                                          double* xlower, double* ylower, double* zlower, 
+                                          double* dx,     double* dy,   double* dz,
                                           double q[],
                                           int* patch_num, int* level,
                                           int* blockno,   int* mpirank);
 
-#define  FCLAW2D_FORT_WRITE_FILE FCLAW_F77_FUNC(fclaw2d_fort_write_file, \
-                                                FCLAW2D_FORT_WRITE_FILE)
-void     FCLAW2D_FORT_WRITE_FILE(char* matname1,
-                                 int* mx,        int* my,
+#define  FCLAW_FORT_WRITE_FILE FCLAW_F77_FUNC(fclaw_fort_write_file, \
+                                              FCLAW_FORT_WRITE_FILE)
+void     FCLAW_FORT_WRITE_FILE(char* matname1,
+                                 int* mx,        int* my, int* mz,
                                  int* meqn,      int* mbc,
-                                 double* xlower, double* ylower,
-                                 double* dx,     double* dy,
+                                 double* xlower, double* ylower, double* zlower,
+                                 double* dx,     double* dy,  double* dz,
                                  double q[],
                                  int* patch_num, int* level,
                                  int* blockno,   int* mpirank);
 
 #if 0
-#define FCLAW2D_FORT_WRITE_GRID_HEADER FCLAW_F77_FUNC(fclaw2d_fort_write_grid_header, \
-                                                      FCLAW2D_FORT_WRITE_GRID_HEADER)
+#define FCLAW_CLAWPATCH3_FORT_WRITE_GRID_HEADER FCLAW_F77_FUNC(fclaw_clawpatch3_fort_write_grid_header, \
+                                                      FCLAW_CLAWPATCH3_FORT_WRITE_GRID_HEADER)
 
-void FCLAW2D_FORT_WRITE_GRID_HEADER(int* matunit1, int* mx, int* my,
+void FCLAW_CLAWPATCH3_FORT_WRITE_GRID_HEADER(int* matunit1, int* mx, int* my,
                                     int* meqn, int* mbc, double* xlower,
                                     double* ylower, double* dx,
                                     double *dx, int* patch_num, int* level,

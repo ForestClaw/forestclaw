@@ -34,3 +34,7 @@ const int fclaw2d_RefineFactor = FCLAW2D_REFINE_FACTOR;
 const int fclaw2d_NumCorners = FCLAW2D_NUM_CORNERS;
 
 const int fclaw2d_NumSiblings = FCLAW2D_NUM_SIBLINGS;
+
+const int fclaw_refine_dim = FCLAW_REFINE_DIM;
+
+const int fclaw_patch_dim = FCLAW_PATCH_DIM;
