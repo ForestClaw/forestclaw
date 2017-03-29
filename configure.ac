@@ -25,6 +25,8 @@ FCLAW_ARG_ENABLE([debug], [enable debug mode (assertions and extra checks)],
                  [DEBUG])
 FCLAW_ARG_ENABLE([geoclaw], [enable geoclaw library and applications],
                  [GEOCLAW])
+FCLAW_ARG_ENABLE([ash3d], [enable ash3d library and applications],
+                 [ASH3D])
 
 echo "o---------------------------------------"
 echo "| Checking MPI and related programs"
