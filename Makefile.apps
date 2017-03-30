@@ -72,5 +72,5 @@ endif
 
 # Ash3d examples
 if FCLAW_ENABLE_ASH3D
-include applications/ash3d/cloud_tester/Makefile.am
+include src/solvers/fc3d_ash3d/test_cases/cloud_tester/Makefile.am
 endif
