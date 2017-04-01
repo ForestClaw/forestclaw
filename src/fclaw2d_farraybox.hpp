@@ -34,11 +34,14 @@ class Box
 public:
     Box();
     Box(const int ll[], const int ur[]);
+    Box(const int ll[], const int ur[], const int box_dim);
     Box(const Box& a_box);
     int smallEnd(int idir) const;
     int bigEnd(int idir) const;
+    int boxDim() const;
 
 private:
+    int m_box_dim;
     int m_ll[FCLAW_PATCH_DIM];
     int m_ur[FCLAW_PATCH_DIM];
 };
