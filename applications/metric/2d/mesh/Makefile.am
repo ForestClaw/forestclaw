@@ -9,13 +9,13 @@ applications_metric_2d_mesh_mesh_SOURCES = \
 	applications/metric/2d/mesh/fclaw2d_map_nomap.c \
 	applications/metric/2d/mesh/psi.f \
 	applications/metric/2d/mesh/setprob.f \
-	applications/metric/2d/all/clawpack46_setaux.f \
-	applications/metric/2d/all/clawpack_user.h \
-	applications/metric/2d/all/clawpack5_setaux.f90 \
-	applications/metric/2d/all/clawpack46_rpn2adv.f \
-	applications/metric/2d/all/clawpack46_rpt2adv.f \
-	applications/metric/2d/all/clawpack5_rpn2adv.f90 \
-	applications/metric/2d/all/clawpack5_rpt2adv.f90 \
+	applications/advection/2d/all/clawpack46_setaux.f \
+	applications/advection/2d/all/clawpack_user.h \
+	applications/advection/2d/all/clawpack5_setaux.f90 \
+	applications/advection/2d/all/clawpack46_rpn2adv.f \
+	applications/advection/2d/all/clawpack46_rpt2adv.f \
+	applications/advection/2d/all/clawpack5_rpn2adv.f90 \
+	applications/advection/2d/all/clawpack5_rpt2adv.f90 \
 	applications/metric/2d/mesh/user_4.6/qinit.f \
 	applications/metric/2d/mesh/user_4.6/b4step2.f \
 	applications/metric/2d/mesh/user_5.0/qinit.f90 \
