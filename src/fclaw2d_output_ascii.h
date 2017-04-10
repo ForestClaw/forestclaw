@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_OUTPUT_ASCII_H
 
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_output_ascii_fort.h>
 
 #ifdef __cplusplus
 extern "C"

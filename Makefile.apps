@@ -21,6 +21,7 @@ endif
 
 # Test metric terms used for problems on manifolds
 # include applications/metric/2d/all_mappings/Makefile.am
+include applications/metric/2d/mesh/Makefile.am
 
 # Scalar advection on manifolds
 #include applications/advection/2d/swirl/Makefile.am
