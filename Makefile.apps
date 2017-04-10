@@ -21,6 +21,7 @@ endif
 
 # Test metric terms used for problems on manifolds
 # include applications/metric/2d/all_mappings/Makefile.am
+# include applications/metric/2d/mesh/Makefile.am
 
 # Scalar advection on manifolds
 include applications/advection/2d/swirl/Makefile.am
@@ -56,7 +57,7 @@ include applications/advection/2d/swirl/Makefile.am
 
 # GeoClaw examples
 if FCLAW_ENABLE_GEOCLAW
-include applications/geoclaw/bowl_radial/Makefile.am
+#include applications/geoclaw/bowl_radial/Makefile.am
 #include applications/geoclaw/bowl_slosh/Makefile.am
 #include applications/geoclaw/flat_bathymetry/Makefile.am
 #include applications/geoclaw/chile2010/Makefile.am

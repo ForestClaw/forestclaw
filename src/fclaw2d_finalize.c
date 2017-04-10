@@ -36,6 +36,9 @@ void fclaw2d_finalize(fclaw2d_global_t* glob)
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     fclaw_global_essentialf("Finalizing run\n");
+
+    fclaw2d_diagnostics_finalize(glob);
+    
     fclaw2d_map_destroy(glob->cont);
     fclaw2d_domain_barrier (glob->domain);
 

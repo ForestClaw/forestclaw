@@ -287,7 +287,6 @@ void outstyle_1(fclaw2d_global_t *glob)
         iframe++;
         fclaw2d_output_frame(glob,iframe);
     }
-    fclaw2d_diagnostics_finalize(glob);
 }
 
 #if 0
@@ -423,7 +422,6 @@ void outstyle_3(fclaw2d_global_t *glob)
             fclaw2d_output_frame(glob,iframe);
         }
     }
-    fclaw2d_diagnostics_finalize(glob);
 }
 
 
@@ -487,7 +485,6 @@ void outstyle_4(fclaw2d_global_t *glob)
             fclaw2d_output_frame(glob,iframe);
         }
     }
-    fclaw2d_diagnostics_finalize(glob);
 }
 
 
