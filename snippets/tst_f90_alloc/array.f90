@@ -32,6 +32,19 @@ SUBROUTINE copy_ptrs2mod(fc_ptr)
 
 end
 
+subroutine deallocate_arrays(fc_ptr)
+    use iso_c_binding
+    use test_mod
+    implicit none
+
+    type(c_ptr) :: fc_ptr
+
+    CALL c_f_pointer(fc_ptr,x_comp_sp,[1])
+
+    DEALLOCATE(x_comp_sp)
+
+end
+
 
 SUBROUTINE use_array(value)
     use iso_c_binding

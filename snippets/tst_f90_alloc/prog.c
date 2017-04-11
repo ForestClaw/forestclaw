@@ -4,6 +4,7 @@
 void use_array_(double *v);
 void store_ptrs_(double ** ptr);
 void copy_ptrs2mod_(double ** ptr);
+void deallocate_arrays_(double** ptr);
 
 int main()
 {
@@ -20,9 +21,7 @@ int main()
     use_array_(&value);
     store_ptrs_(&fc_x_comp_sp_2);
 
-
-
-    for(int i = 0; i< 5; i++)
+    for(int i = 0; i < 5; i++)
     {
     	printf("%f %f\n",fc_x_comp_sp_1[i],fc_x_comp_sp_2[i]);
         fc_x_comp_sp_1[i] = 47;
@@ -30,6 +29,15 @@ int main()
 
     copy_ptrs2mod_(&fc_x_comp_sp_1);
     copy_ptrs2mod_(&fc_x_comp_sp_2);
+
+    deallocate_arrays_(&fc_x_comp_sp_1);
+    deallocate_arrays_(&fc_x_comp_sp_2);
+
+    for(int i = 0; i < 5; i++)
+    { 
+        /* This should seg-fault */
+        // fc_x_comp_sp_1[i] = 47;
+    }
 
     return 0;
 }
