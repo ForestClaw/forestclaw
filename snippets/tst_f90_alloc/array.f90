@@ -6,24 +6,29 @@ MODULE test_mod
 
 END MODULE test_mod
 
-MODULE fc_arrays
-    USE iso_c_binding        
-    IMPLICIT NONE
-
-    DOUBLE PRECISION, POINTER :: fc_x_comp_sp(:) 
-
-contains
-
-END MODULE fc_arrays
-
-SUBROUTINE assign_ptrs(fc_ptr)
+SUBROUTINE store_ptrs(fc_ptr)
     use iso_c_binding
-    use fc_arrays
+    use test_mod
     IMPLICIT NONE
 
     TYPE(c_ptr) :: fc_ptr
 
-    call c_f_pointer(fc_ptr,fc_x_comp_sp,[1]);
+    fc_ptr = c_loc(x_comp_sp)
+end
+
+SUBROUTINE copy_ptrs2mod(fc_ptr)
+    use iso_c_binding
+    use test_mod
+    IMPLICIT NONE
+
+    TYPE(c_ptr) :: fc_ptr
+    INTEGER :: i
+
+    CALL c_f_pointer(fc_ptr,x_comp_sp,[1])
+
+    DO i = 1,nx_submet
+        WRITE(6,*) x_comp_sp(i)
+    ENDDO 
 
 end
 
@@ -31,19 +36,16 @@ end
 SUBROUTINE use_array(value)
     use iso_c_binding
     USE test_mod
-    USE fc_arrays
     IMPLICIT NONE
 
-    double precision value
-    integer i
+    DOUBLE PRECISION value
+    INTEGER i
 
-    ALLOCATE(fc_x_comp_sp(nx_submet))
-    x_comp_sp(1:nx_submet) => fc_x_comp_sp
+    ALLOCATE(x_comp_sp(nx_submet))
 
     do i = 1,nx_submet
         x_comp_sp(i) = value
     enddo 
-
 
 end
 

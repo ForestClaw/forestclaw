@@ -2,7 +2,8 @@
 #include <stdlib.h>
 
 void use_array_(double *v);
-void assign_ptrs_(double ** ptr);
+void store_ptrs_(double ** ptr);
+void copy_ptrs2mod_(double ** ptr);
 
 int main()
 {
@@ -10,21 +11,25 @@ int main()
     double *fc_x_comp_sp_2;  // patch 2
     double value;
 
-    assign_ptrs_(&fc_x_comp_sp_1);
     value = 1.0;
-    use_array_(&value);
+    use_array_(&value);    
+    store_ptrs_(&fc_x_comp_sp_1);
 
-    /* 
-    assign_ptrs_(&fc_x_comp_sp_2);
+    
     value = 5.0;
     use_array_(&value);
-    */
+    store_ptrs_(&fc_x_comp_sp_2);
+
+
 
     for(int i = 0; i< 5; i++)
     {
-    	printf("%f %f\n",fc_x_comp_sp_1[i],fc_x_comp_sp_1[i]);
+    	printf("%f %f\n",fc_x_comp_sp_1[i],fc_x_comp_sp_2[i]);
+        fc_x_comp_sp_1[i] = 47;
     }
 
+    copy_ptrs2mod_(&fc_x_comp_sp_1);
+    copy_ptrs2mod_(&fc_x_comp_sp_2);
 
     return 0;
 }
