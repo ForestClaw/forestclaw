@@ -41,7 +41,8 @@ subroutine deallocate_arrays(fc_x_comp_sp_ptr,fc_concen_ptr)
     concen(1:nx,1:nx) => xp
     DEALLOCATE(concen)  !! May also be okay to just de-allocate xp
 
-    CALL c_f_pointer(fc_x_comp_sp_ptr,x_comp_sp,[1])
+    CALL c_f_pointer(fc_x_comp_sp_ptr,xp,[1])
+    x_comp_sp(1:nx) => xp
     DEALLOCATE(x_comp_sp)  
 
 end
