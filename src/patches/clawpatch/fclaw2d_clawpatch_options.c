@@ -95,6 +95,14 @@ clawpatch_options_check(fclaw_app_t * app, void *optpkg, void *registered)
         return FCLAW_EXIT_ERROR;
     }
 
+    amr_options_t *gparms = fclaw_app_get_attribute(app,"Options",NULL);
+    if (gparms->interp_stencil_width/2 > clawpatch_options->mbc)
+    {
+        fclaw_global_essentialf("Interpolation width is too large for number of " \
+                                "ghost cells (mbc) specifed.  We should have " \
+                                "(width)/2 <= mbc");
+    }
+    
     return FCLAW_NOEXIT;
 }
 

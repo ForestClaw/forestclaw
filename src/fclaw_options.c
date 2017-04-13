@@ -132,7 +132,7 @@ fclaw_exit_type_t
 options_check_general (fclaw_app_t * app, void *package, void *registered)
 {
     amr_options_t *gparms = (amr_options_t *) package;
-    
+#if 0    
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
 
@@ -142,7 +142,7 @@ options_check_general (fclaw_app_t * app, void *package, void *registered)
                                 "ghost cells (mbc) specifed.  We should have " \
                                 "(width)/2 <= mbc");
     }
-
+#endif
     return fclaw_options_check (gparms);
 }
 
