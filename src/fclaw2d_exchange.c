@@ -159,7 +159,8 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
     /* Time spend in build here is negligible and is included in regrid */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
-    size_t data_size =  fclaw2d_patch_ghost_packsize(glob);
+    size_t psize = fclaw2d_patch_ghost_packsize(glob);
+    size_t data_size = psize*sizeof(double);
     fclaw2d_domain_exchange_t *e;
 
     /* we just created a grid by fclaw2d_initialize or fclaw2d_regrid
