@@ -1,7 +1,6 @@
 #include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
-#define  MASTER     0
 
 typedef enum
 {
