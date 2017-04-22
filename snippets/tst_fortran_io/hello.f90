@@ -1,8 +1,8 @@
-subroutine print_hello(mpirank)
+subroutine print_hello(mpirank, verb)
 use iso_fortran_env
 implicit none
 
-integer mpirank, i
+integer mpirank, i, verb
 character(len=*), parameter :: nullfile = '/dev/null'
 
 if (mpirank > 0) then

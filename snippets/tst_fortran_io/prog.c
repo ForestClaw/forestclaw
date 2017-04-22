@@ -13,7 +13,7 @@ typedef enum
 
 
 void print_hello_1_(int* mpirank, output_t* verb);
-void print_hello_(int* mpirank);
+void print_hello_(int* mpirank, output_t* verb);
 
 int main (int argc, char *argv[])
 {
@@ -27,9 +27,9 @@ int main (int argc, char *argv[])
     MPI_Get_processor_name(hostname, &len);
 
     verb = DEBUG;
-    print_hello_(&mpirank);
+    print_hello_1_(&mpirank,&verb);    // Doesn't really work
 
-    printf ("Hello from task %d on %s!\n", mpirank, hostname);
+    // printf ("Hello from task %d on %s!\n", mpirank, hostname);
     if (mpirank == 0)
     {
         printf("Number of MPI tasks is: %d\n",numtasks);
