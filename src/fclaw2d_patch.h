@@ -83,6 +83,9 @@ void fclaw2d_patch_data_new(fclaw2d_global_t* glob,
 void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *patch);
 
+void fclaw2d_patch_delete_remote_ghost(fclaw2d_global_t *glob,
+                                       fclaw2d_patch_t *ghost_patch);
+
 void fclaw2d_patch_initialize(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
@@ -314,6 +317,8 @@ typedef void* (*fclaw2d_patch_new_t)();
 
 typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
 
+typedef void (*fclaw2d_patch_delete_ghost_t)(void *user_patch);
+
 typedef void (*fclaw2d_patch_setup_t)(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
@@ -499,6 +504,7 @@ typedef struct fclaw2d_patch_vtable
 {
     fclaw2d_patch_new_t                patch_new;
     fclaw2d_patch_delete_t             patch_delete;
+    fclaw2d_patch_delete_ghost_t       delete_ghost;
     fclaw2d_patch_setup_t              setup;
     fclaw2d_patch_setup_ghost_t        setup_ghost;
     fclaw2d_patch_initialize_t         initialize;
