@@ -71,10 +71,11 @@ void fclaw_clawpatch3_diagnostics_reset(fclaw2d_global_t *glob,
     error_info_t *error_data = (error_info_t*) patch_acc;
     const fclaw_clawpatch3_options_t *clawpatch3_opt = fclaw_clawpatch3_get_options(glob);
     int meqn;
+    int m;
 
     meqn = clawpatch3_opt->meqn;
 
-    for(int m = 0; m < meqn; m++)
+    for(m = 0; m < meqn; m++)
     {
         int i1 = m;            /* 1-norm */
         int i2 = meqn + m;     /* 2-norm */
