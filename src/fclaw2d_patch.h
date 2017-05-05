@@ -101,6 +101,12 @@ void fclaw2d_patch_physical_bc(fclaw2d_global_t *glob,
                                fclaw_bool *intersects_bc,
                                fclaw_bool time_interp);
 
+/* Other information could be added */
+void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
+                            fclaw2d_patch_t * this_patch,
+                            int this_block_idx, int this_patch_idx,
+                            int64_t *global_num, int *level);
+
 
 struct fclaw2d_patch_data*
 fclaw2d_patch_get_data(fclaw2d_patch_t* patch);

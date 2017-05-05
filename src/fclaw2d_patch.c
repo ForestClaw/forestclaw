@@ -185,6 +185,24 @@ int fclaw2d_patch_on_coarsefine_interface(fclaw2d_patch_t *patch)
 }
 
 
+void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
+                            fclaw2d_patch_t * this_patch,
+                            int this_block_idx, int this_patch_idx,
+                            int64_t *global_num, int *level)
+
+{
+  int64_t fclaw2d_patch_get_num(domain,this_patch,this_block_idx,this_patch_idx);
+    
+  fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+
+  *patch_num = domain->global_num_patches_before +
+        (int64_t) (this_block->num_patches_before + this_patch_idx);
+
+  *level = this_patch->level;
+
+}
+
+
 int
 fclaw2d_patch_on_parallel_boundary (const fclaw2d_patch_t * patch)
 {
@@ -630,6 +648,7 @@ void fclaw2d_patch_setup_timeinterp(fclaw2d_global_t *glob,
 }
 
 
+#if 0
 void fclaw2d_patch_write_file(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
@@ -649,6 +668,8 @@ void fclaw2d_patch_write_header(fclaw2d_global_t* glob,
     FCLAW_ASSERT(patch_vt()->write_header != NULL);
     patch_vt()->write_header(glob,iframe);
 }
+#endif
+  
 
 void fclaw2d_patch_physical_bc(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *this_patch,
