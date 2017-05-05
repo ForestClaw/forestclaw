@@ -55,11 +55,13 @@ extern const int fclaw2d_NumCorners;
 #define FCLAW2D_NUM_SIBLINGS 4
 extern const int fclaw2d_NumSiblings;
 
-// #define FCLAW_REFINE_DIM 2
-extern const int fclaw_refine_dim;
+#ifndef FCLAW_PATCH_DIM
+#define FCLAW_PATCH_DIM  2
+#endif
 
-// #define FCLAW_PATCH_DIM 3
-extern const int fclaw_patch_dim;
+#ifndef FCLAW_REFINE_DIM
+#define FCLAW_REFINE_DIM 2
+#endif
 
 #ifdef __cplusplus
 #if 0
