@@ -139,7 +139,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                             0.0,time_interp);
 
     // VTK output during amrinit
-    if (gparms->vtkout & 1) {
+    if (gparms->vtkout_debug & 1) {
         // into timer
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
         fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
@@ -147,7 +147,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
         // output
         snprintf (basename, BUFSIZ, "%s_init_level_%02d",
                   gparms->prefix, minlevel);
-        fclaw2d_output_write_vtk (glob, basename);
+        fclaw2d_output_write_vtk_debug (glob, basename);
 
         // out of timer
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
@@ -208,7 +208,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                 new_domain = NULL;
 
                 // VTK output during amrinit
-                if (gparms->vtkout & 1) {
+                if (gparms->vtkout_debug & 1) {
                     // into timer
                     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
                     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
