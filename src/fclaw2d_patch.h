@@ -88,10 +88,6 @@ void fclaw2d_patch_initialize(fclaw2d_global_t *glob,
                               int this_block_idx,
                               int this_patch_idx);
 
-void fclaw2d_patch_write_header(fclaw2d_global_t* glob,
-                                int iframe);
-
-
 void fclaw2d_patch_physical_bc(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *this_patch,
                                int this_block_idx,
@@ -300,12 +296,18 @@ void fclaw2d_patch_compute_diagnostics(fclaw2d_domain_t* domain, fclaw2d_patch_t
                                        int this_block_idx, int this_patch_idx,
                                        void* local_accumulator);
 #endif 
+
+#if 0
+void fclaw2d_patch_write_header(fclaw2d_global_t* glob,
+                                int iframe);
+
 void fclaw2d_patch_write_file(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
                               int iframe,int patch_num,
                               int level);
+#endif                                
 
 double fclaw2d_patch_single_step_update(fclaw2d_global_t *glob,
                                         fclaw2d_patch_t *this_patch,
@@ -425,6 +427,7 @@ typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_global_t *glob,
                                                int blockno, int fine_patchno,
                                                int coarse_patchno);
 
+#if 0
 typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_global_t* glob,
                                              int iframe);
 
@@ -434,6 +437,7 @@ typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_global_t *glob,
                                            int this_patch_idx,
                                            int iframe,int patch_num,
                                            int level);
+#endif                                           
 
 typedef void (*fclaw2d_patch_ghost_pack_t)(fclaw2d_global_t *glob,
                                            fclaw2d_patch_t *this_patch,
@@ -530,9 +534,11 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_average_corner_t      average_corner;
     fclaw2d_patch_interpolate_corner_t  interpolate_corner;
 
+#if 0
     /* output functions */
     fclaw2d_patch_write_header_t       write_header;
     fclaw2d_patch_write_file_t         write_file;
+#endif    
 
     /* Time interpolation */
     fclaw2d_patch_setup_timeinterp_t   setup_timeinterp;
