@@ -45,6 +45,9 @@ extern "C"
 
 typedef void (*fclaw2d_problem_setup_t)(fclaw2d_global_t *glob);
 
+typedef void (*fclaw2d_output_frame_t)(fclaw2d_global_t * glob, int iframe, double time);
+
+
 typedef void (*fclaw2d_metric_setup_mesh_t)(fclaw2d_global_t *glob,
                                             fclaw2d_patch_t *this_patch,
                                             int blockno,
@@ -73,6 +76,9 @@ typedef struct fclaw2d_vtable
 
     /* regridding functions */
     fclaw2d_after_regrid_t               after_regrid;
+
+    /* Output functions */
+    fclaw2d_output_frame_t               output_frame;
 
     /* Building patches, including functions to create metric terms */
     fclaw2d_metric_setup_mesh_t          metric_setup_mesh;    /* wrapper */

@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_vtable.h>
+#include <fclaw2d_output.h>
 
 fclaw2d_vtable_t* fclaw2d_vt()
 {
@@ -36,7 +37,7 @@ fclaw2d_vtable_t* fclaw2d_vt()
 void fclaw2d_init_vtable()
 {
 
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
 
     /* ------------------------------------------------------------
       Functions below here depend on q and could be solver specific
@@ -44,22 +45,25 @@ void fclaw2d_init_vtable()
 
     /* These may be redefined by the user */
     /* Problem setup */
-    fclaw_vt->problem_setup             = NULL;
+    vt->problem_setup              = NULL;
 
     /* Defaults for regridding */
-    fclaw_vt->after_regrid              = NULL;
+    vt->after_regrid               = NULL;
+
+    /* Defaults for output */
+    vt->output_frame               = NULL;
 
     /* ------------------------------------------------------------
       Metric functions - only loosely depend on solvers
       ------------------------------------------------------------- */
-    fclaw_vt->metric_setup_mesh          = &fclaw2d_metric_setup_mesh;
-    fclaw_vt->fort_setup_mesh            = &FCLAW2D_FORT_SETUP_MESH;
+    vt->metric_setup_mesh          = &fclaw2d_metric_setup_mesh;
+    vt->fort_setup_mesh            = &FCLAW2D_FORT_SETUP_MESH;
 
-    fclaw_vt->metric_compute_area        = &fclaw2d_metric_compute_area;
-    fclaw_vt->metric_area_set_ghost      = &fclaw2d_metric_area_set_ghost;
+    vt->metric_compute_area        = &fclaw2d_metric_compute_area;
+    vt->metric_area_set_ghost      = &fclaw2d_metric_area_set_ghost;
 
-    fclaw_vt->metric_compute_normals     = &fclaw2d_metric_compute_normals;
-    fclaw_vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
-    fclaw_vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
-    fclaw_vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
+    vt->metric_compute_normals     = &fclaw2d_metric_compute_normals;
+    vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
+    vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
+    vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
 }

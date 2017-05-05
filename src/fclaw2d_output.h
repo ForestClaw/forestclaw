@@ -36,9 +36,13 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe);
-void fclaw2d_output_write_tikz(fclaw2d_global_t* glob,int iframe);
-void fclaw2d_output_write_vtk (fclaw2d_global_t *glob, const char *basename);
+void fclaw2d_output (fclaw2d_global_t * glob, int iframe);
+
+/* Some output styles.  These are virtualized in fclaw2d_vtable */
+void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe, double time);
+
+/* Needed for debugging */
+void fclaw2d_output_write_vtk_debug (fclaw2d_global_t *glob, const char *basename);
 
 
 #ifdef __cplusplus

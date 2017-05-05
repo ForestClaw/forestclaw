@@ -24,7 +24,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
-	src/fclaw2d_output_ascii_fort.h \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost_fill.h \
@@ -43,12 +42,12 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h \
+	src/patches/clawpatch/fclaw2d_vtk.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_regrid.h \
-	src/patches/clawpatch/fclaw2d_clawpatch_options.h \
-	src/patches/clawpatch/fclaw2d_vtk.h
+	src/patches/clawpatch/fclaw2d_clawpatch_options.h
 
 libforestclaw_internal_headers =
 
@@ -95,6 +94,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
 	src/fclaw2d_farraybox.cpp \
+	src/patches/clawpatch/fclaw2d_vtk.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
@@ -125,8 +125,8 @@ libforestclaw_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_tikz.c \
-	src/patches/clawpatch/fclaw2d_clawpatch_vtk.c \
-	src/patches/clawpatch/fclaw2d_vtk.c
+	src/patches/clawpatch/fclaw2d_clawpatch_vtk.c
+
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d -I@top_srcdir@/src/patches/clawpatch
