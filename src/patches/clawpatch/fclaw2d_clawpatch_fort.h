@@ -43,7 +43,50 @@ extern "C"
 #endif
 #endif
 
-/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ 
+  Output functions
+  ------------------------------------------------------------------------ */
+
+#if 0 
+    /* output functions in clawpatch */
+    fclaw2d_fort_write_ascii_header_t  fort_write_ascii_header;
+    fclaw2d_fort_write_ascii_file_t    fort_write_ascii_file;
+    fclaw2d_patch_callback_t           cb_write_ascii_file;
+#endif    
+
+
+typedef void  (*fclaw2d_fort_write_ascii_header_t)(char* matname1,char* matname2,
+                                                   double* time, int* meqn,
+                                                   int* ngrids);
+
+#define  FCLAW2D_FORT_WRITE_HEADER FCLAW_F77_FUNC(fclaw2d_fort_write_header, \
+                                                  FCLAW2D_FORT_WRITE_HEADER)
+
+void     FCLAW2D_FORT_WRITE_HEADER(char* matname1, char* matname2,
+                                   double* time, int* meqn, int* ngrids);
+
+
+/* Write out data */
+typedef void (*fclaw2d_fort_write_ascii_file_t)(char* matname1,
+                                                int* mx,        int* my,
+                                                int* meqn,      int* mbc,
+                                                double* xlower, double* ylower,
+                                                double* dx,     double* dy,
+                                                double q[],
+                                                int* patch_num, int* level,
+                                                int* blockno,   int* mpirank);
+
+#define  FCLAW2D_FORT_WRITE_FILE FCLAW_F77_FUNC(fclaw2d_fort_write_file, \
+                                                FCLAW2D_FORT_WRITE_FILE)
+void  FCLAW2D_FORT_WRITE_FILE(char* matname1,
+                              int* mx,        int* my,
+                              int* meqn,      int* mbc,
+                              double* xlower, double* ylower,
+                              double* dx,     double* dy,
+                              double q[],
+                              int* patch_num, int* level,
+                              int* blockno,   int* mpirank);
+
 
 /* ----------------------------------------------------------------------------------
    Internal boundary conditions

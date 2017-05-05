@@ -23,10 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_OUTPUT_H
-#define FCLAW2D_OUTPUT_H
+#ifndef FCLAW2D_CLAWPATCH_OUTPUT_H
+#define FCLAW2D_CLAWPATCH_OUTPUT_H
 
-#include <fclaw2d_vtable.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,12 +36,15 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_output (fclaw2d_global_t * glob, int iframe);
+#if 0 
+    /* output functions */
+    fclaw2d_fort_write_ascii_header_t  fort_write_ascii_header;
+    fclaw2d_fort_write_ascii_file_t    fort_write_ascii_file;
+    fclaw2d_patch_callback_t           cb_write_ascii_file;
+#endif    
 
-void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe);
-
-/* Needed for debugging */
-void fclaw2d_output_write_vtk_debug (fclaw2d_global_t *glob, const char *basename);
+void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe);
+void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t* glob, int iframe);
 
 
 #ifdef __cplusplus

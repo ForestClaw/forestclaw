@@ -119,11 +119,19 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
     }
 }
 
+/*  ---------------------------------------------------------------------------
+    Public interface
+    --------------------------------------------------------------------------- */
+
 void
-fclaw2d_output_write_vtk (fclaw2d_global_t * glob, const char *basename)
+fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
 {
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+
+
+    char basename[BUFSIZ];
+    snprintf (basename, BUFSIZ, "%s_frame_%04d", gparms->prefix, iframe);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my, 

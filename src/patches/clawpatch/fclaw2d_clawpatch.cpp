@@ -1044,8 +1044,9 @@ static void setup_metric_storage(fclaw2d_clawpatch_t* cp)
 
 void fclaw2d_clawpatch_init_vtable_defaults()
 {
+    fclaw2d_vtable_t *vt                  = fclaw2d_vt();
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt      = fclaw2d_patch_vt();
 
     /* These must be redefined by the solver and user */
     patch_vt->initialize         = NULL;
@@ -1078,10 +1079,6 @@ void fclaw2d_clawpatch_init_vtable_defaults()
 
     patch_vt->average2coarse    = &fclaw2d_clawpatch_average2coarse;
     patch_vt->interpolate2fine  = &fclaw2d_clawpatch_interpolate2fine;
-
-    /* Defaults for writing output */
-    patch_vt->write_header             = &fclaw2d_clawpatch_output_ascii_header;
-    patch_vt->write_file               = &fclaw2d_clawpatch_output_ascii;
 
     /* Time interpolation functions */
     patch_vt->setup_timeinterp         = &fclaw2d_clawpatch_setup_timeinterp;

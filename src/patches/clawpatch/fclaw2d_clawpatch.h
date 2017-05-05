@@ -406,8 +406,9 @@ struct fclaw2d_clawpatch_vtable
     fclaw2d_fort_interpolate_corner_t  fort_interpolate_corner;
 
     /* output functions */
-    fclaw2d_fort_write_header_t        fort_write_header;
-    fclaw2d_fort_write_file_t          fort_write_file;
+    fclaw2d_fort_write_ascii_header_t  fort_write_ascii_header;
+    fclaw2d_fort_write_ascii_file_t    fort_write_ascii_file;
+    fclaw2d_patch_callback_t           cb_write_ascii_file;
 
     /* Time interpolation functions */
     fclaw2d_fort_timeinterp_t          fort_timeinterp;
