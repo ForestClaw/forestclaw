@@ -6,7 +6,7 @@
 #include src/solvers/fc2d_dummy/Makefile.am
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/solvers/fc2d_clawpack5/Makefile.am
-include src/solvers/fc3d_clawpack5/Makefile.am
+#include src/solvers/fc3d_clawpack5/Makefile.am
 
 if FCLAW_ENABLE_GEOCLAW
 include src/solvers/fc2d_geoclaw/Makefile.am
@@ -40,7 +40,7 @@ include applications/advection/2d/swirl/Makefile.am
 #include applications/advection/2d/sphere/Makefile.am
 
 # Scalar advection in 2.5 dimension
-include applications/advection/2.5d/swirl/Makefile.am
+#include applications/advection/2.5d/swirl/Makefile.am
 
 # NCAR Transport problems on the sphere
 #include applications/NCAR_transport/gaussian/Makefile.am
