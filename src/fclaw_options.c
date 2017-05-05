@@ -215,15 +215,20 @@ amr_options_t* fclaw2d_forestclaw_options_register (fclaw_app_t * a, const char 
 
 void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 {
-#if 0
-    sc_options_add_int (opt, 0, "mx", &amropt->mx, 8,
-                        "Number of grid cells per patch in x [8]");
+    /* ---------------------- Time stepping control -------------------------- */
 
-    sc_options_add_int (opt, 0, "my", &amropt->my, 8,
-                        "Number of grid cells per patch in y [8]");
-#endif 
     sc_options_add_double (opt, 0, "initial_dt", &amropt->initial_dt, 0.1,
                            "Initial time step size [0.1]");
+
+
+    sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
+                           "Maximum CFL allowed [1]");
+
+    sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
+                           "Maximum CFL allowed [0.9]");
+
+    sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
+                         "Use fixed coarse grid time step [F]");
 
     sc_options_add_int (opt, 0, "outstyle", &amropt->outstyle, 1,
                         "Output style (1,2,3) [1]");
@@ -239,32 +244,31 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_int (opt, 0, "nstep", &amropt->nstep, 1,
                         "Steps between output files, used with outstyle=3 [1]");
 
+    sc_options_add_bool (opt, 0, "advance-one-step",
+                         &amropt->advance_one_step, 1,
+                         "Advance from t to t+dt in one global step (subcycle=F) [F]");
 
-    /* This is a hack to control the VTK output while still in development.
-     * The values are numbers which can be bitwise-or'd together.
-     * 0 - no VTK output ever.
-     * 1 - output for all stages of amrinit.
-     * 2 - output whenever amr_output() is called.
-     */
-    sc_options_add_int (opt, 0, "vtkout", &amropt->vtkout, 0,
-                        "VTK output method [F]");
-    sc_options_add_double (opt, 0, "vtkspace", &amropt->vtkspace, 0.,
-                           "VTK visual spacing [F]");
-    sc_options_add_int (opt, 0, "vtkwrite", &amropt->vtkwrite, 0,
-                        "VTK write variant [F]");
+    sc_options_add_bool (opt, 0, "outstyle-uses-maxlevel",
+                         &amropt->outstyle_uses_maxlevel, 1,
+                         "Expand nout/nstep to global (subcycle=F) [F]");
 
-    /* output options */
+    sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
+                         "Use subcycling in time [F]");
+
+    sc_options_add_bool (opt, 0, "weighted_partition", &amropt->weighted_partition, 0,
+                         "Weight grids when partitioning [F]");
+
+    /* ---------------------- Output options -------------------------- */
+
+    sc_options_add_bool (opt, 0, "output", &amropt->output, 0,
+                            "Enable output [F]");
 
 #if 0
-    /* This is handled now by core options (fclaw_base.c) */
-    sc_options_add_int (opt, 0, "verbosity", &amropt->verbosity, 0,
-                        "Verbosity mode [0]");
-#endif
-
     sc_options_add_bool (opt, 0, "serialout", &amropt->serialout, 0,
                             "Enable serial output [F]");
-    sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
-                           "Output file prefix [fort]");
+
+    sc_options_add_bool (opt, 0, "vtkout", &amropt->vtkout, 0,
+                            "Enable VTK output [F]");
 
     /* tikz output */
     sc_options_add_bool (opt, 0, "tikzout", &amropt->tikzout, 0,
@@ -273,28 +277,31 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     fclaw_options_add_double_array (opt, 0, "tikz_figsize", &amropt->tikz_figsize_string,
                                     "8 6",&amropt->tikz_figsize,2,
                                     "Figure size used by tikz (inches) [8,6]");
+#endif                            
 
-    /* more clawpack options */
-    sc_options_add_double (opt, 0, "max_cfl", &amropt->max_cfl, 1,
-                           "Maximum CFL allowed [1]");
+    /* This is a hack to control the VTK output while still in development.
+     * The values are numbers which can be bitwise-or'd together.
+     * 0 - no VTK output ever.
+     * 1 - output for all stages of amrinit.
+     * 2 - output whenever amr_output() is called.
+     */
 
-    sc_options_add_double (opt, 0, "desired_cfl", &amropt->desired_cfl, 0.9,
-                           "Maximum CFL allowed [0.9]");
-#if 0
-    sc_options_add_int (opt, 0, "meqn", &amropt->meqn, 1,
-                        "Number of equations [1]");
+    sc_options_add_string (opt, 0, "prefix", &amropt->prefix, "fort",
+                           "Output file prefix [fort]");
 
-    sc_options_add_int (opt, 0, "maux", &amropt->maux, 0,
-                        "Number of auxilliary variables [0]");
+    sc_options_add_int (opt, 0, "vtkout_debug", &amropt->vtkout_debug, 0,
+                        "VTK debug output method [F]");
+ 
+    sc_options_add_double (opt, 0, "vtkspace", &amropt->vtkspace, 0.,
+                           "VTK visual spacing [F]");
 
-    sc_options_add_int (opt, 0, "mbc", &amropt->mbc, 2,
-                        "Number of ghost cells [2]");
-#endif
-    /* Initialization of ghost cell */
+    sc_options_add_int (opt, 0, "vtkwrite", &amropt->vtkwrite, 0,
+                        "VTK write variant [F]");
+
+    /* ---------------------- Regridding options -------------------------- */
+
     sc_options_add_bool (opt, 0, "init_ghostcell", &amropt->init_ghostcell, 1,
                         "Initialize ghost cells [T]");
-
-    /* At this point amropt->mthbc is allocated. Set defaults if desired. */
 
     sc_options_add_int (opt, 0, "minlevel", &amropt->minlevel, 0,
                         "Minimum refinement level [0]");
@@ -314,6 +321,7 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 
     sc_options_add_bool (opt, 0, "smooth-refine", &amropt->smooth_refine,
                          0, "Refinement smoothing[F]");
+
     sc_options_add_int (opt, 0, "smooth-level", &amropt->smooth_refine_level,
                         0, "Lowest level for smooth-refine[0]");
 
@@ -326,23 +334,9 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_double (opt, 0, "coarsen_threshold", &amropt->coarsen_threshold,
                            0.1, "Coarsening threshold [0.1]");
 
+     /* ---------------------- Diagnostics -------------------------- */
 
-    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "xlower " \
-                           "(used only with manifold=0) [0]");
-    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "xupper " \
-                           "(used only with manifold=0) [1]");
-    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower " \
-                           "(used only with manifold=0) [0]");
-    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper " \
-                           "(used only with manifold=0) [1]");
-
-    sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,
-                         "Solution is on manifold [F]");
-
-    sc_options_add_bool (opt, 0, "use_fixed_dt", &amropt->use_fixed_dt, 0,
-                         "Use fixed coarse grid time step [F]");
-
-    sc_options_add_bool (opt, 0, "run-user-diagnostics",
+   sc_options_add_bool (opt, 0, "run-user-diagnostics",
                          &amropt->run_user_diagnostics,0,
                          "Run user diagnostics [F]");
 
@@ -358,20 +352,6 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                          &amropt->report_timing,1,
                          "Report timing results [T]");
 
-    sc_options_add_bool (opt, 0, "subcycle", &amropt->subcycle, 1,
-                         "Use subcycling in time [F]");
-
-    sc_options_add_bool (opt, 0, "advance-one-step",
-                         &amropt->advance_one_step, 1,
-                         "Advance from t to t+dt in one global step (subcycle=F) [F]");
-
-    sc_options_add_bool (opt, 0, "outstyle-uses-maxlevel",
-                         &amropt->outstyle_uses_maxlevel, 1,
-                         "Expand nout/nstep to global (subcycle=F) [F]");
-
-    sc_options_add_bool (opt, 0, "weighted_partition", &amropt->weighted_partition, 0,
-                           "Weight grids when partitioning [F]");
-
     /* ---------------------- Ghost packing options -------------------------- */
 
     sc_options_add_bool (opt, 0, "ghost_patch_pack_area", &amropt->ghost_patch_pack_area,1,
@@ -383,7 +363,8 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
     sc_options_add_int (opt, 0, "ghost_patch_pack_numextrafields", &amropt->ghost_patch_pack_numextrafields,
                         0, "Number of extra fields to pack [0]");
 
-    /* ---------------------- Control execution -------------------------- */
+    /* ---------------------- Debugging -------------------------- */
+
     sc_options_add_bool (opt, 0, "trapfpe", &amropt->trapfpe,1,
                          "Trap floating point exceptions [T]");
 
@@ -391,7 +372,23 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
                         "Start MPI debug session (for attaching processes in gdb) [F]");
 
 
-    /* ---------------------- Mapping options -------------------------- */
+    /* ---------------------- Domain geometry options -------------------------- */
+
+    sc_options_add_double (opt, 0, "ax", &amropt->ax, 0, "xlower " \
+                           "(used only with manifold=0) [0]");
+
+    sc_options_add_double (opt, 0, "bx", &amropt->bx, 1, "xupper " \
+                           "(used only with manifold=0) [1]");
+
+    sc_options_add_double (opt, 0, "ay", &amropt->ay, 0, "ylower " \
+                           "(used only with manifold=0) [0]");
+
+    sc_options_add_double (opt, 0, "by", &amropt->by, 1, "yupper " \
+                           "(used only with manifold=0) [1]");
+
+    sc_options_add_bool (opt, 0, "manifold", &amropt->manifold, 0,
+                         "Solution is on manifold [F]");
+
     sc_options_add_int (opt, 0, "mi", &amropt->mi, 1,
                         "Number of blocks in x direction [1]");
 

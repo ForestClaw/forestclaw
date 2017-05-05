@@ -115,13 +115,6 @@ struct amr_options
 {
     int dim;
 
-#if 0
-    /* Fixed grid size for each grid */
-    int mx;      /**< Number of cells in x direction (fixed for all grids) */
-    int my;      /**< Number of cells in y direction (fixed for all grids) */
-    int mbc;     /**< Number of ghost cells in each grid */
-#endif
-
     /* Time stepping */
     double initial_dt;  /**< Initial time step size */
     double tfinal;      /**< Final time */
@@ -136,12 +129,6 @@ struct amr_options
     double desired_cfl;
     double *tout;
 
-#if 0
-    /* Number of equations in the system of PDEs */
-    int meqn;
-    int maux;
-#endif
-    
     /* Initialization of ghost cell */
     int init_ghostcell;
 
@@ -194,19 +181,30 @@ struct amr_options
 
     /* Output and console IO */
     int verbosity;              /**< TODO: Do we have guidelines here? */
+
+    int output;                 
+
+#if 0
     int serialout;              /**< Allow for serial output.  WARNING:
-                                     Will kill all parallel performance. */
+                                     Will kill all parallel performance. */    
+
     int tikzout;      /* Boolean */
     const char *tikz_figsize_string;
     double *tikz_figsize;  /* In inches, e.g. [8,2] */
+#endif    
 
     const char *prefix;         /**< This is prepended to output files */
 
     /* VTK output control */
-    int vtkout;      /**< 0 for no output, 1 for output during amrinit,
+    int vtkout_debug;      /**< 0 for no output, 1 for output during amrinit,
                           2 for output when in amr_output.  Can be or'd. */
+
     double vtkspace; /**< between 0. and 1. to separate patches visually */
-    int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */
+    int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */    
+#if 0    
+    int vtkout;      /* T/F (user variable) */
+#endif    
+
 
     int weighted_partition;            /**< Use weighted partition. */
 
