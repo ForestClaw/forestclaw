@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_TIMEINTERP_H
 #define FCLAW2D_TIMEINTERP_H
 
-#include "forestclaw2d.h"
 #include <fclaw2d_global.h>
 
 #ifdef __cplusplus
