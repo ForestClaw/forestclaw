@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_regrid.h>
-#include <fclaw2d_clawpatch_output_ascii.h>
+#include <fclaw2d_clawpatch_output.h> 
 
 #ifdef __cplusplus
 extern "C"
@@ -405,10 +405,12 @@ struct fclaw2d_clawpatch_vtable
     fclaw2d_fort_average_corner_t      fort_average_corner;
     fclaw2d_fort_interpolate_corner_t  fort_interpolate_corner;
 
-    /* output functions */
-    fclaw2d_fort_write_ascii_header_t  fort_write_ascii_header;
-    fclaw2d_fort_write_ascii_file_t    fort_write_ascii_file;
-    fclaw2d_patch_callback_t           cb_write_ascii_file;
+    /* output functions (ascii) */
+    fclaw2d_fort_header_ascii_t        fort_header_ascii;
+
+    fclaw2d_patch_callback_t           cb_output_ascii;    
+    fclaw2d_fort_output_ascii_t        fort_output_ascii;
+
 
     /* Time interpolation functions */
     fclaw2d_fort_timeinterp_t          fort_timeinterp;

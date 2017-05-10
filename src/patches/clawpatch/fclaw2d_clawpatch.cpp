@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_metric.h>
 #include <fclaw2d_neighbors_fort.h>
-
+#include <fclaw2d_clawpatch_output.h>
 
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt()
@@ -173,6 +173,7 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
     /* We use the pack size here to make sure we are setting
        everything correctly;  it isn't needed for memory
        allocation */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
@@ -206,7 +207,7 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
        level, then the interpolated level is used to interpolate to fine grid
        ghost cells. */
 
-    clawpatch_vt()->fort_timeinterp(&mx,&my,&mbc,&meqn,&psize,
+    clawpatch_vt->fort_timeinterp(&mx,&my,&mbc,&meqn,&psize,
                                     qcurr,qlast,qinterp,&alpha,&ierror);
 
 }
@@ -1044,7 +1045,7 @@ static void setup_metric_storage(fclaw2d_clawpatch_t* cp)
 
 void fclaw2d_clawpatch_init_vtable_defaults()
 {
-    fclaw2d_vtable_t *vt                  = fclaw2d_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
     fclaw2d_patch_vtable_t *patch_vt      = fclaw2d_patch_vt();
 
@@ -1082,6 +1083,17 @@ void fclaw2d_clawpatch_init_vtable_defaults()
 
     /* Time interpolation functions */
     patch_vt->setup_timeinterp         = &fclaw2d_clawpatch_setup_timeinterp;
+
+
+    /* output functions */
+#if 0    
+    clawpatch_vt->fort_header_ascii = &FCLAW2D_FORT_HEADER_ASCII;
+    clawpatch_vt->fort_output_ascii = &FCLAW2D_FORT_OUTPUT_ASCII;
+#endif    
+    clawpatch_vt->fort_header_ascii = NULL;  /* Defined in clawpack solvers */
+
+    clawpatch_vt->cb_output_ascii   = &cb_clawpatch_output_ascii; 
+    clawpatch_vt->fort_output_ascii = NULL;  
 
     /* ghost patch */
     patch_vt->ghost_pack        = &fclaw2d_clawpatch_ghost_pack;
