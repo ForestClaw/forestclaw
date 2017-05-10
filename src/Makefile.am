@@ -42,10 +42,9 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h \
-	src/patches/clawpatch/fclaw2d_vtk.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
-	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
+	src/patches/clawpatch/fclaw2d_clawpatch_output.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_regrid.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.h
 
@@ -94,7 +93,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
 	src/fclaw2d_farraybox.cpp \
-	src/patches/clawpatch/fclaw2d_vtk.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \

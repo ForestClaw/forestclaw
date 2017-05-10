@@ -147,7 +147,9 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
         // output
         snprintf (basename, BUFSIZ, "%s_init_level_%02d",
                   gparms->prefix, minlevel);
+#if 0        
         fclaw2d_output_write_vtk_debug (glob, basename);
+#endif        
 
         // out of timer
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
@@ -216,7 +218,9 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                     // output
                     snprintf (basename, BUFSIZ, "%s_init_level_%02d_adapt",
                               gparms->prefix, level);
+#if 0                    
                     fclaw2d_output_write_vtk (glob, basename);
+#endif                    
 
                     /* out of timer */
                     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);

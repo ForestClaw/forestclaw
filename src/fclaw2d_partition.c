@@ -149,7 +149,9 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
             // output
             snprintf (basename, BUFSIZ, "%s_init_level_%02d_partition",
                       gparms->prefix, mode);
+#if 0            
             fclaw2d_output_write_vtk_debug (glob, basename);
+#endif            
 
             // out of timer
             fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
