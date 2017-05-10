@@ -300,24 +300,33 @@ void FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const 
                                             double neighbor_q[], const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
-#define  FC2D_CLAWPACK5_FORT_WRITE_FILE FCLAW_F77_FUNC(fc2d_clawpack5_fort_write_file, \
-                                                       FC2D_CLAWPACK5_FORT_WRITE_FILE)
-void  FC2D_CLAWPACK5_FORT_WRITE_FILE(char* matname1,
-                                     int* mx,        int* my,
-                                     int* meqn,      int* mbc,
-                                     double* xlower, double* ylower,
-                                     double* dx,     double* dy,
-                                     double q[],
-                                     int* patch_num, int* level,
-                                     int* blockno,   int* mpirank);
+/* ---------------------------------------------------------------------------
+  Output functions
+   --------------------------------------------------------------------------- */
+#define  FC2D_CLAWPACK5_FORT_OUTPUT_ASCII FCLAW_F77_FUNC(fc2d_clawpack5_fort_output_ascii, \
+                                                       FC2D_CLAWPACK5_FORT_OUTPUT_ASCII)
+void  FC2D_CLAWPACK5_FORT_OUTPUT_ASCII(char* matname1,
+                                       int* mx,        int* my,
+                                       int* meqn,      int* mbc,
+                                       double* xlower, double* ylower,
+                                       double* dx,     double* dy,
+                                       double q[],
+                                       int* patch_num, int* level,
+                                       int* blockno,   int* mpirank);
 
-#define FC2D_CLAWPACK5_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_clawpack5_fort_write_header, \
-                                                        FC2D_CLAWPACK5_FORT_WRITE_HEADER)
-void FC2D_CLAWPACK5_FORT_WRITE_HEADER(int* iframe, double* time, int* meqn, int* maux,int* ngrids);
+#define FC2D_CLAWPACK5_FORT_HEADER_ASCII FCLAW_F77_FUNC(fc2d_clawpack5_fort_header_ascii, \
+                                                        FC2D_CLAWPACK5_FORT_HEADER_ASCII)
+void FC2D_CLAWPACK5_FORT_HEADER_ASCII(char* matname1, char* matname2, double* time, int* meqn, 
+                                      int* maux,int* ngrids);
 
 
 #define FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_clawpack5_fort_conservation_check, \
-                                                              FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK)
+                               
+
+/* ---------------------------------------------------------------------------
+  Diagnostics functions
+  --------------------------------------------------------------------------- */
+                               FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK)
 void FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                             double *dx, double *dy,
                                             double* area, double *q, double* sum);
@@ -394,8 +403,10 @@ void fc2d_clawpack5_set_options (fclaw2d_global_t* glob, fc2d_clawpack5_options_
 void fc2d_clawpack5_package_register(fclaw_app_t* app,
                                       fc2d_clawpack5_options_t* clawopt);
 
+#if 0
 void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
                                         int iframe);
+#endif                                        
 
 fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob);
 

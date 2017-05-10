@@ -1,4 +1,5 @@
-      subroutine fc2d_clawpack5_fort_write_header(iframe, time, meqn,
+      subroutine fc2d_clawpack5_fort_header_ascii(matname1,matname2, 
+     &                                            time, meqn,
      &                                            maux, ngrids)
       implicit none
 
@@ -6,19 +7,10 @@
 
       character*11 matname1, matname2
       double precision time
-      integer nstp,ipos,idigit,matunit1,matunit2
+      integer matunit1,matunit2
 
-      matname1 = 'fort.qxxxx'
-      matname2 = 'fort.txxxx'
       matunit1 = 10
       matunit2 = 15
-      nstp     = iframe
-      do ipos = 10, 7, -1
-         idigit = mod(nstp,10)
-         matname1(ipos:ipos) = char(ichar('0') + idigit)
-         matname2(ipos:ipos) = char(ichar('0') + idigit)
-         nstp = nstp / 10
-      enddo
 
       open(unit=matunit2,file=matname2)
       write(matunit2,1000) time,meqn,ngrids,maux,2
@@ -36,7 +28,7 @@
       end
 
 
-      subroutine fc2d_clawpack5_fort_write_file(matname1,
+      subroutine fc2d_clawpack5_fort_output_ascii(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,patch_num,level,blockno,mpirank)
       implicit none

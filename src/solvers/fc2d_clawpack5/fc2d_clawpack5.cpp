@@ -98,9 +98,8 @@ void fc2d_clawpack5_set_vtable_defaults()
     clawpatch_vt->fort_tag4coarsening    = &FC2D_CLAWPACK5_FORT_TAG4COARSENING;
 
     /* output functions */
-    patch_vt->write_header                = &fc2d_clawpack5_output_header_ascii;
-    // fclaw_vt->fort_write_header        = &FC2D_CLAWPACK5_FORT_WRITE_HEADER;
-    clawpatch_vt->fort_write_file         = &FC2D_CLAWPACK5_FORT_WRITE_FILE;
+    clawpatch_vt->fort_header_ascii      = &FC2D_CLAWPACK5_FORT_HEADER_ASCII;
+    clawpatch_vt->fort_output_ascii      = &FC2D_CLAWPACK5_FORT_OUTPUT_ASCII;
 
     /* diagnostic functions */
     clawpatch_vt->fort_compute_patch_error    = NULL;  /* User defined */
@@ -498,6 +497,7 @@ double fc2d_clawpack5_update(fclaw2d_global_t *glob,
     return maxcfl;
 }
 
+#if 0
 void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
                                         int iframe)
 {
@@ -514,5 +514,6 @@ void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
     meqn = clawpatch_opt->meqn;
     maux = clawpatch_opt->maux;
 
-    FC2D_CLAWPACK5_FORT_WRITE_HEADER(&iframe,&time,&meqn,&maux,&ngrids);
+    FC2D_CLAWPACK5_FORT_HEADER_ASCII(&iframe,&time,&meqn,&maux,&ngrids);
 }
+#endif
