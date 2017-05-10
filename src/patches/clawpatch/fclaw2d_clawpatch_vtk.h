@@ -23,10 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_VTK_H
-#define FCLAW2D_VTK_H
+#ifndef FCLAW2D_CLAWPATCH_VTK_H
+#define FCLAW2D_CLAWPATCH_VTK_H
 
-#include <forestclaw2d.h>
 #include <fclaw2d_global.h>
 
 #ifdef __cplusplus
@@ -45,12 +44,11 @@ extern "C"
  *                      The vector index changes fastest, then mx, then my
  *                      slowest.
  */
-typedef void
-    (*fclaw2d_vtk_patch_data_t) (fclaw2d_global_t * glob,
-                                 fclaw2d_patch_t * this_patch,
-                                 int this_block_idx, int this_patch_idx,
-                                 char *a);
-
+typedef void (*fclaw2d_vtk_patch_data_t) (fclaw2d_global_t * glob,
+                                          fclaw2d_patch_t * this_patch,
+                                          int this_block_idx, int this_patch_idx,
+                                          char *a);
+	
 /** Write a file in VTK format for the whole domain in parallel.
  * \param [in] vtkspace     Relative width of visual separation of patches.
  *                          Between 0. (none) and 1. (patch width becomes 0).
