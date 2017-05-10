@@ -47,46 +47,42 @@ extern "C"
   Output functions
   ------------------------------------------------------------------------ */
 
-#if 0 
-    /* output functions in clawpatch */
-    fclaw2d_fort_write_ascii_header_t  fort_write_ascii_header;
-    fclaw2d_fort_write_ascii_file_t    fort_write_ascii_file;
-    fclaw2d_patch_callback_t           cb_write_ascii_file;
-#endif    
+#if 0
+typedef void  (*fclaw2d_fort_header_ascii_t)(char* matname1,char* matname2,
+                                             double* time, int* meqn,
+                                             int* ngrids);
 
+#define  FCLAW2D_FORT_HEADER_ASCII FCLAW_F77_FUNC(fclaw2d_fort_header_ascii, \
+                                                  FCLAW2D_FORT_HEADER_ASCII)
 
-typedef void  (*fclaw2d_fort_write_ascii_header_t)(char* matname1,char* matname2,
-                                                   double* time, int* meqn,
-                                                   int* ngrids);
+void     FCLAW2D_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                                   double* time, int* meqn, int* maux, int* ngrids);
 
-#define  FCLAW2D_FORT_WRITE_HEADER FCLAW_F77_FUNC(fclaw2d_fort_write_header, \
-                                                  FCLAW2D_FORT_WRITE_HEADER)
-
-void     FCLAW2D_FORT_WRITE_HEADER(char* matname1, char* matname2,
-                                   double* time, int* meqn, int* ngrids);
-
+    clawpatch_vt->fort_ascii_output(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
+                                    &patch_num,&level,&this_block_idx,
+                                    &glob->domain->mpirank);
 
 /* Write out data */
-typedef void (*fclaw2d_fort_write_ascii_file_t)(char* matname1,
-                                                int* mx,        int* my,
-                                                int* meqn,      int* mbc,
-                                                double* xlower, double* ylower,
-                                                double* dx,     double* dy,
-                                                double q[],
-                                                int* patch_num, int* level,
-                                                int* blockno,   int* mpirank);
+typedef void (*fclaw2d_fort_output_ascii_t)(char* matname1,
+                                          int* mx,        int* my,
+                                          int* meqn,      int* mbc,
+                                          double* xlower, double* ylower,
+                                          double* dx,     double* dy,
+                                          double q[],
+                                          int* patch_num, int* level,
+                                          int* blockno,   int* mpirank);
 
-#define  FCLAW2D_FORT_WRITE_FILE FCLAW_F77_FUNC(fclaw2d_fort_write_file, \
-                                                FCLAW2D_FORT_WRITE_FILE)
-void  FCLAW2D_FORT_WRITE_FILE(char* matname1,
-                              int* mx,        int* my,
-                              int* meqn,      int* mbc,
-                              double* xlower, double* ylower,
-                              double* dx,     double* dy,
-                              double q[],
-                              int* patch_num, int* level,
-                              int* blockno,   int* mpirank);
-
+#define  FCLAW2D_FORT_OUTPUT_ASCII FCLAW_F77_FUNC(fclaw2d_fort_output_ascii, \
+                                          FCLAW2D_FORT_OUTPUT_ASCII)
+void  FCLAW2D_FORT_OUTPUT_ASCII(char* matname1,
+                                int* mx,        int* my,
+                                int* meqn,      int* mbc,
+                                double* xlower, double* ylower,
+                                double* dx,     double* dy,
+                                double q[],
+                                int* patch_num, int* level,
+                                int* blockno,   int* mpirank);
+#endif                                
 
 /* ----------------------------------------------------------------------------------
    Internal boundary conditions
