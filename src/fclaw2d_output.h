@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_OUTPUT_H
 
 #include <fclaw2d_vtable.h>
+#if 0
+#include <fclaw2d_clawpatch_vtk.h>
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -36,12 +39,14 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_output (fclaw2d_global_t * glob, int iframe);
+void fclaw2d_output_frame(fclaw2d_global_t * glob, int iframe);
 
 void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe);
 
-/* Needed for debugging */
+#if 0
+/* Needed for debugging *(uses a clawpatch) */
 void fclaw2d_output_write_vtk_debug (fclaw2d_global_t *glob, const char *basename);
+#endif
 
 
 #ifdef __cplusplus

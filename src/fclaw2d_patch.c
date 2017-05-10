@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <forestclaw2d.h>
-#include <p4est_base.h>
+#include <fclaw_base.h>
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_domain.h>
@@ -191,11 +191,10 @@ void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
                             int64_t *global_num, int *level)
 
 {
-  int64_t fclaw2d_patch_get_num(domain,this_patch,this_block_idx,this_patch_idx);
     
   fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
 
-  *patch_num = domain->global_num_patches_before +
+  *global_num = domain->global_num_patches_before +
         (int64_t) (this_block->num_patches_before + this_patch_idx);
 
   *level = this_patch->level;
@@ -642,9 +641,10 @@ void fclaw2d_patch_setup_timeinterp(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
                                     double alpha)
 {
-    FCLAW_ASSERT(patch_vt()->setup_timeinterp != NULL);
+    fclaw2d_patch_vtable_t *vt = patch_vt();
+    FCLAW_ASSERT(vt->setup_timeinterp != NULL);
 
-    patch_vt()->setup_timeinterp(glob,this_patch,alpha);
+    vt->setup_timeinterp(glob,this_patch,alpha);
 }
 
 

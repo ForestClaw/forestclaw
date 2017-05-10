@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_output.h>
-#include <fclaw2d_vtk.h>
 
 /* -----------------------------------------------------------------------
     Public interface
@@ -38,7 +37,7 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 
     if (gparms->output != 0)
     {
-        fclaw2d_vtable_t vt = fclaw2d_vt();
+        fclaw2d_vtable_t *vt = fclaw2d_vt();
 
         FCLAW_ASSERT(vt->output_frame);
 
