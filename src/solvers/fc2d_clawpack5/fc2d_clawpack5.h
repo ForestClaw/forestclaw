@@ -320,13 +320,12 @@ void FC2D_CLAWPACK5_FORT_HEADER_ASCII(char* matname1, char* matname2, double* ti
                                       int* maux,int* ngrids);
 
 
-#define FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_clawpack5_fort_conservation_check, \
-                               
-
 /* ---------------------------------------------------------------------------
   Diagnostics functions
   --------------------------------------------------------------------------- */
-                               FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK)
+#define FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_clawpack5_fort_conservation_check, \
+                                                              FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK)
+
 void FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                             double *dx, double *dy,
                                             double* area, double *q, double* sum);

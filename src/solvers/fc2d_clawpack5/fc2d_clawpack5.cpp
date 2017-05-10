@@ -496,24 +496,3 @@ double fc2d_clawpack5_update(fclaw2d_global_t *glob,
     }
     return maxcfl;
 }
-
-#if 0
-void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
-                                        int iframe)
-{
-    const fclaw2d_clawpatch_options_t *clawpatch_opt;
-
-    int meqn,maux,ngrids;
-    double time;
-
-    clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-
-    time = glob->curr_time;
-    ngrids = fclaw2d_domain_get_num_patches(glob->domain);
-
-    meqn = clawpatch_opt->meqn;
-    maux = clawpatch_opt->maux;
-
-    FC2D_CLAWPACK5_FORT_HEADER_ASCII(&iframe,&time,&meqn,&maux,&ngrids);
-}
-#endif

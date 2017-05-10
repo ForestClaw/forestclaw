@@ -188,14 +188,14 @@ int fclaw2d_patch_on_coarsefine_interface(fclaw2d_patch_t *patch)
 void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
                             fclaw2d_patch_t * this_patch,
                             int this_block_idx, int this_patch_idx,
-                            int64_t *global_num, int *level)
+                            int *global_num, int *level)
 
 {
     
   fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
 
   *global_num = domain->global_num_patches_before +
-        (int64_t) (this_block->num_patches_before + this_patch_idx);
+        (this_block->num_patches_before + this_patch_idx);
 
   *level = this_patch->level;
 

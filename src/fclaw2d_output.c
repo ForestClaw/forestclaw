@@ -48,9 +48,9 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
         time = glob->curr_time;
 
         /* User or solver set output file */
-        fclaw_global_essentialf("Output Frame %4d  at time %16.8e (",
+        fclaw_global_essentialf("Output Frame %4d  at time %16.8e\n\n",
                                 iframe,time);  
-        vt->output_frame(glob,iframe,time);
+        vt->output_frame(glob,iframe);
 
         /* Record output time */
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);

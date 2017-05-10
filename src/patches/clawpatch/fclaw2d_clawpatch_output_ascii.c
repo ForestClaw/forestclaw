@@ -40,29 +40,26 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
 
     int patch_num;
-    int64_t patch_num64;
     int level;
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     double *q;
-    char fname[11];
+    // char fname[11];
 
     int iframe = *((int *) s->user);
 
     /* Get info not readily available to user */
     fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_patch_idx,this_block_idx,
-                           &patch_num64,&level);
+                           this_block_idx,this_patch_idx,
+                           &patch_num,&level);
     
-    patch_num = (int) patch_num64;
-
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
-    char basename[BUFSIZ];
-    snprintf (basename, BUFSIZ, "%s.q%04d", gparms->prefix, iframe);
+    char fname[BUFSIZ];
+    snprintf (fname, BUFSIZ, "%s.q%04d", gparms->prefix, iframe);
     /* sprintf(fname,"fort.q%04d",iframe); */
 
     /* The fort routine is defined by a clawpack solver and handles 

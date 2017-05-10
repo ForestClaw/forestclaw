@@ -45,7 +45,7 @@ extern "C"
 
 typedef void (*fclaw2d_problem_setup_t)(fclaw2d_global_t *glob);
 
-typedef void (*fclaw2d_output_frame_t)(fclaw2d_global_t * glob, int iframe, double time);
+typedef void (*fclaw2d_output_frame_t)(fclaw2d_global_t * glob, int iframe);
 
 
 typedef void (*fclaw2d_metric_setup_mesh_t)(fclaw2d_global_t *glob,
