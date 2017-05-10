@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CLAWPATCH_OUTPUT_H
 
 #include <fclaw2d_global.h>
+#include <fclaw2d_patch.h>
+#include <fclaw2d_clawpatch_vtk.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,14 +38,41 @@ extern "C"
 #endif
 #endif
 
-#if 0 
-    /* output functions */
-    fclaw2d_fort_write_ascii_header_t  fort_write_ascii_header;
-    fclaw2d_fort_write_ascii_file_t    fort_write_ascii_file;
-    fclaw2d_patch_callback_t           cb_write_ascii_file;
-#endif    
+/* ----------------------------------------------------------------
+	Ascii output
+   --------------------------------------------------------------- */
+typedef void  (*fclaw2d_fort_header_ascii_t)(char* matname1,char* matname2,
+                                             double* time, int* meqn, int* maux,
+                                             int* ngrids);
+
+/* Write out data */
+typedef void (*fclaw2d_fort_output_ascii_t)(char* matname1,
+                                          int* mx,        int* my,
+                                          int* meqn,      int* mbc,
+                                          double* xlower, double* ylower,
+                                          double* dx,     double* dy,
+                                          double q[],
+                                          int* patch_num, int* level,
+                                          int* blockno,   int* mpirank);
+
+void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
+                                fclaw2d_patch_t * this_patch,
+                                int this_block_idx, int this_patch_idx,
+                                void *user);
 
 void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe);
+
+
+/* ----------------------------------------------------------------
+	VTK output
+   --------------------------------------------------------------- */
+int
+fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
+                        int mx, int my, int meqn,
+                        double vtkspace, int vtkwrite,
+                        fclaw2d_vtk_patch_data_t coordinate_cb,
+                        fclaw2d_vtk_patch_data_t value_cb);
+
 void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t* glob, int iframe);
 
 
