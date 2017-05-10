@@ -1,4 +1,4 @@
-      subroutine fc2d_clawpack46_fort_write_header
+      subroutine fc2d_clawpack46_fort_header_ascii
      &      (matname1,matname2,
      &      time,meqn,ngrids)
       implicit none
@@ -8,7 +8,7 @@
       character*11 matname1
       character*11 matname2
       double precision time
-      integer matunit1, matunit2, nstp,ipos,idigit
+      integer matunit1, matunit2
 
       matunit1 = 10
       matunit2 = 15
@@ -26,7 +26,7 @@
 
       end
 
-      subroutine fc2d_clawpack46_fort_write_file(matname1,
+      subroutine fc2d_clawpack46_fort_output_ascii(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,patch_num,level,blockno,mpirank)
 
@@ -34,7 +34,8 @@
 
       character*11 matname1
       integer meqn,mbc,mx,my
-      integer patch_num, level, blockno, mpirank
+      integer patch_num
+      integer level, blockno, mpirank
       double precision xlower, ylower,dx,dy
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)

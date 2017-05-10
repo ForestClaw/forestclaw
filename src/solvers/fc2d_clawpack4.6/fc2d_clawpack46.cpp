@@ -99,8 +99,8 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_tag4coarsening    = &FC2D_CLAWPACK46_FORT_TAG4COARSENING;
 
     /* output functions */
-    clawpatch_vt->fort_write_header      = &FC2D_CLAWPACK46_FORT_WRITE_HEADER;
-    clawpatch_vt->fort_write_file        = &FC2D_CLAWPACK46_FORT_WRITE_FILE;
+    clawpatch_vt->fort_header_ascii        = &FC2D_CLAWPACK46_FORT_HEADER_ASCII;
+    clawpatch_vt->fort_output_ascii        = &FC2D_CLAWPACK46_FORT_OUTPUT_ASCII;
 
     clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
     clawpatch_vt->fort_compute_error_norm    = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;

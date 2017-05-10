@@ -217,7 +217,9 @@ int FC2D_CLAWPACK46_GET_BLOCK();
 void CLAWPACK46_UNSET_BLOCK();
 
 
-/*************************** REGRIDDING ROUTINES ***************************/
+/* --------------------------------------------------------------------------------------
+   Regridding functions
+   -------------------------------------------------------------------------------------- */
 
 #define FC2D_CLAWPACK46_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(fc2d_clawpack46_fort_tag4refinement, \
                                                            FC2D_CLAWPACK46_FORT_TAG4REFINEMENT)
@@ -314,9 +316,12 @@ void FC2D_CLAWPACK46_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const
                                             double neighbor_q[], const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
-#define  FC2D_CLAWPACK46_FORT_WRITE_FILE FCLAW_F77_FUNC(fc2d_clawpack46_fort_write_file, \
-                                                       FC2D_CLAWPACK46_FORT_WRITE_FILE)
-void  FC2D_CLAWPACK46_FORT_WRITE_FILE(char* matname1,
+/* --------------------------------------------------------------------------------------
+   Output functions
+   -------------------------------------------------------------------------------------- */
+#define  FC2D_CLAWPACK46_FORT_OUTPUT_ASCII FCLAW_F77_FUNC(fc2d_clawpack46_fort_output_ascii, \
+                                                       FC2D_CLAWPACK46_FORT_OUTPUT_ASCII)
+void  FC2D_CLAWPACK46_FORT_OUTPUT_ASCII(char* matname1,
                                      int* mx,        int* my,
                                      int* meqn,      int* mbc,
                                      double* xlower, double* ylower,
@@ -325,10 +330,10 @@ void  FC2D_CLAWPACK46_FORT_WRITE_FILE(char* matname1,
                                      int* patch_num, int* level,
                                      int* blockno,   int* mpirank);
 
-#define FC2D_CLAWPACK46_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_clawpack46_fort_write_header, \
-                                                        FC2D_CLAWPACK46_FORT_WRITE_HEADER)
-void FC2D_CLAWPACK46_FORT_WRITE_HEADER(char* matname1, char* matname2,
-                                      double* time, int* meqn, int* ngrids);
+#define FC2D_CLAWPACK46_FORT_HEADER_ASCII FCLAW_F77_FUNC(fc2d_clawpack46_fort_header_ascii, \
+                                                        FC2D_CLAWPACK46_FORT_HEADER_ASCII)
+void FC2D_CLAWPACK46_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                                      double* time, int* meqn, int* maux, int* ngrids);
 
 
 #define FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_clawpack46_fort_conservation_check, \
