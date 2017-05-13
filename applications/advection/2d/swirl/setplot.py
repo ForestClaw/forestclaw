@@ -79,7 +79,7 @@ def setplot(plotdata):
     plotfigure.kml_ylimits = [0,1]
 
     plotfigure.kml_figsize = [4,4]  #[mx*2**p*mi,mx*2**p*mj]
-    plotfigure.kml_dpi = 512
+    plotfigure.kml_dpi = 128
 
     # Color axis : transparency below 0.1*(cmax-cmin)
     cmin = 0

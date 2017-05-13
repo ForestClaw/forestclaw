@@ -1,9 +1,10 @@
 
 """ 
-Set up the plot figures, axes, and items to be done for each frame.
+Plot swirl using Clawpack's visclaw graphics.  This file can be run as ; 
 
-This module is imported by the plotting routines and then the
-function setplot is called to set the plot parameters.
+    % python plot_swirl.py
+
+To learn more about visclaw graphics, see www.clawpack.org
     
 """ 
 
