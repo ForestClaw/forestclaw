@@ -272,12 +272,19 @@ void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt)
 #endif                            
 
     /* tikz output */
-    sc_options_add_bool (opt, 0, "tikzout", &amropt->tikzout, 0,
+    sc_options_add_bool (opt, 0, "tikz-out", &amropt->tikz_out, 0,
                          "Enable tikz output for gridlines [F]");
 
-    fclaw_options_add_double_array (opt, 0, "tikz_figsize", &amropt->tikz_figsize_string,
+    fclaw_options_add_double_array (opt, 0, "tikz-figsize", &amropt->tikz_figsize_string,
                                     "8 6",&amropt->tikz_figsize,2,
                                     "Figure size used by tikz (inches) [8,6]");
+
+    sc_options_add_string (opt, 0, "tikz-plot-prefix", &amropt->tikz_plot_prefix, "plot",
+                           "Figure prefix for plotting [plot_]");    
+
+
+    sc_options_add_string (opt, 0, "tikz-plot-suffix", &amropt->tikz_plot_suffix, "png",
+                           "Figure suffix for plotting [png]");    
 
     /* This is a hack to control the VTK output while still in development.
      * The values are numbers which can be bitwise-or'd together.

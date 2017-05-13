@@ -93,6 +93,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
 	src/fclaw2d_farraybox.cpp \
+	src/fclaw2d_output_tikz.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
@@ -122,7 +123,6 @@ libforestclaw_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_regrid.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
-	src/patches/clawpatch/fclaw2d_clawpatch_tikz.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_vtk.c
 
 

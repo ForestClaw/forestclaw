@@ -190,10 +190,13 @@ struct amr_options
 
 #endif 
    
-    int tikzout;      /* Boolean */
+    int tikz_out;      /* Boolean */
 
     const char *tikz_figsize_string;
     double *tikz_figsize;  /* In inches, e.g. [8,2] */
+
+    const char *tikz_plot_prefix;  /* For plotting */
+    const char *tikz_plot_suffix;  /* For plotting */
 
     const char *prefix;         /**< This is prepended to output files */
 

@@ -55,6 +55,11 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
         /* Record output time */
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
     }
+
+    if (gparms->tikz_out)
+    {
+        fclaw2d_output_frame_tikz(glob,iframe);
+    }
 }
 
 
