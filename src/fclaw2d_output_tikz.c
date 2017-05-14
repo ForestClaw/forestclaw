@@ -90,7 +90,8 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     xupper_d = xlow_d + mxf;
     yupper_d = ylow_d + myf;
 
-    fprintf(fp,"    %% Patch number %ld\n",(long int) patch_num);
+    fprintf(fp,"    %% Patch number %ld; rank = %d\n",(long int) patch_num,
+            s->glob->domain->mpirank);
     fprintf(fp,"    \\draw [ultra thin] (%d,%d) rectangle (%d,%d);\n\n",
             xlow_d,ylow_d,xupper_d,yupper_d);
 }
@@ -102,9 +103,6 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
     fclaw2d_tikz_info_t s_tikz;
 
     char fname[20];
-    /* BEGIN NON-SCALABLE CODE */
-    /* Write the file contents in serial.
-       Use only for small numbers of processors. */
 
     /* Should be in gparms */
     const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
@@ -125,11 +123,6 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
     double sx = figsize[0]/mxf;
     double sy = figsize[1]/myf;
 
-
-#ifdef FCLAW_ENABLE_MPI
-
-    /* Don't do anything until we are done with this part */
-    MPI_Barrier(MPI_COMM_WORLD);
     FILE *fp;
     sprintf(fname,"tikz_%04d.tex",iframe);  /* fname[20] */
     if (domain->mpirank == 0)
@@ -154,21 +147,18 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fclose(fp); 
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    int i;
-    for(i = 0; i < domain->mpisize; i++)
-    {
-        if (domain->mpirank == i)
-        {
-            fp = fopen(fname,"a");
-            s_tikz.fp = fp;
-            fclaw2d_global_iterate_patches (glob, cb_tikz_output, (void *) &s_tikz);
-            fclose(fp);
-        }
-        MPI_Barrier(MPI_COMM_WORLD);
-    }
+    fp = fopen(fname,"a"); 
+    s_tikz.fp = fp;
 
+    fclaw2d_domain_serialization_enter (domain);
+    fclaw2d_global_iterate_patches (glob, cb_tikz_output, (void *) &s_tikz);
+    fclaw2d_domain_serialization_leave (domain);
+
+    fclose(fp);
+
+    /* Wait for all processes to finish before adding last lines of file */
     MPI_Barrier(MPI_COMM_WORLD);
+
     if (domain->mpirank == 0)
     {
         fp = fopen(fname,"a");
@@ -177,29 +167,4 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fprintf(fp,"\\end{document}\n");
         fclose(fp);
     }
-
-    /* This might not be needed ... */
-    MPI_Barrier(MPI_COMM_WORLD);
-
-    /* END OF NON-SCALABLE CODE */
-#else
-#if 0
-    FILE *fp;
-    sprintf(fname,"tikz.%04d.tex",iframe);  /* fname[20] */
-    /* Only rank 0 opens the file */
-    fp = fopen(fname,"w");
-    fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy);
-    fprintf(fp,"    \\node (forestclaw_plot) at (%3.1f,%3.1f)\n",double(mxf)/2,double(myf)/2);
-    fprintf(fp,"    {\\includegraphics{\\figname}};\n\n");
-    fprintf(fp,"\\plotgrid{\n");
-
-    /* Write out each patch to tikz file */
-    fclaw2d_domain_iterate_patches (domain, cb_tikz_output, (void *) fp);
-
-    fp = fopen(fname,"a");
-    fprintf(fp,"} %% end plotgrid\n");
-    fprintf(fp,"\\end{tikzpicture}\n");
-    fclose(fp);
-#endif
-#endif
 }
