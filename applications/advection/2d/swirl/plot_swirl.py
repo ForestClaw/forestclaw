@@ -22,6 +22,7 @@ def setplot(plotdata):
 
 
     from clawpack.visclaw import colormaps
+    import clawpack.forestclaw as pyclaw
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
     plotdata.format = 'forestclaw'
@@ -74,13 +75,54 @@ def setplot(plotdata):
     # ------------------------------------------------------------
     # Figure for tikz plots (use KML plotting for now)
     # ------------------------------------------------------------
+
+    # To create publication quality graphics with AMR mesh lines : 
+    # Run code with following options, set in fclaw_options.ini
+    #   -- Set --tikz-out=T
+    #   -- Set --tikz-figsize
+    #   -- set --tikz-plot-prefix and --tikz-plot-suffix
+    #    
+    # Running the code will create a series of files tikz_XXXX.tex, which will include 
+    # graphics files <prefix>_XXXX.<suffix>.  
+    #
+    # Run file plot_swirl.py to create <plotdir>/_GoogleEearth.kmz
+    # To extract frame N, use 'unzip' (or something equivalent)
+    #
+    # Example : 
+    # In fclaw_options.ini
+    #     [Options]
+    #        --tikz-out = T
+    #        --tikz-figsize = 4 4    # in inches
+    #        --tikz-plot-prefix = 'plot'
+    #        --tikz-plot-suffix = 'png'
+    #
+    # Running the code will produce files 'tikz_XXXX.tex', which will 
+    # include a file plot_XXXX.png
+    #
+    # Run plot_swirl.py to create <plotdir>/_GoogleEarth.kmz.  Extract frames from 
+    # this file 
+    # 
+    # Example : Extract frame0004fig2.png
+    # 
+    #   % unzip _plots/_GoogleEarth.kmz fig2/frame0004fig2/frame0004fig2.png
+    #   % cp fig2/frame0004fig2/frame0004fig2.png plot_0004.png
+    #   % pdflatex tikz_0004.tex
+    # 
+    # View tikz_0004.pdf in appropriate PDF viewer. 
+    # ------------------------------------------------------------
     plotfigure = plotdata.new_plotfigure(name='swirl (tikz)', figno=2)
     plotfigure.use_for_kml = True
     plotfigure.kml_xlimits = [0,1]
     plotfigure.kml_ylimits = [0,1]
 
-    plotfigure.kml_figsize = [4,4]  #[mx*2**p*mi,mx*2**p*mj]
-    plotfigure.kml_dpi = 256  # Needs to be reasonably high when used with pdflatex
+    mx = 8
+    maxlevel = 6
+    resolution = mx*2**maxlevel
+    figsize = [4.0,4.0]
+    dpi = resolution/figsize[0]
+
+    plotfigure.kml_figsize = figsize  
+    plotfigure.kml_dpi = dpi
 
     # Color axis : transparency below 0.1*(cmax-cmin)
     cmin = 0
@@ -129,22 +171,22 @@ def setplot(plotdata):
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
     plotdata.print_framenos = 'all'          # list of frames to print
-    plotdata.print_fignos = [2]            # list of figures to print
-    plotdata.html = False                    # create html files of plots?
+    plotdata.print_fignos = [0]            # list of figures to print
+    plotdata.html = True                    # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
-    plotdata.html_movie = False      # new style, or "4.x" for old style
+    plotdata.html_movie = 'JSAnimation'      # new style, or "4.x" for old style
     plotdata.latex = False                    # create latex file of plots?
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
 
-    plotdata.kml = True
+    plotdata.kml = False      # Set to true to get tikz output
 
     return plotdata
 
 if __name__=="__main__":
     from clawpack.visclaw.plotclaw import plotclaw
-    plotclaw('.')
+    plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')
 
 
 
