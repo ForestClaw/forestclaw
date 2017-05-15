@@ -126,13 +126,9 @@ typedef struct fc2d_clawpack46_vtable
     fc2d_clawpack46_rpn2_t      rpn2;
     fc2d_clawpack46_rpt2_t      rpt2;
     fc2d_clawpack46_fluxfun_t   fluxfun;
+    int is_set;
 
 } fc2d_clawpack46_vtable_t;
-#if 0
-void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t vt);
-void fc2d_clawpack46_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                         fc2d_clawpack46_vtable_t* claw_vt);
-#endif
 
 void fc2d_clawpack46_set_vtable_defaults(void);
 
@@ -398,14 +394,6 @@ void fc2d_clawpack46_register_vtable (fclaw_package_container_t *
 void fc2d_clawpack46_aux_data(fclaw2d_global_t* glob,
                               fclaw2d_patch_t *this_patch,
                               double **aux, int* maux);
-
-// void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob);
-void fc2d_clawpack46_set_options (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt);
-
-void fc2d_clawpack46_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack46_options_t* clawopt);
-
-fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob);
 
 /* -------------------------------------------------------------------------
    Routines that won't change

@@ -31,37 +31,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_clawpack46.h"
 #include "fc2d_clawpack46_options.h"
 
-static int s_clawpack46_package_id = -1;
-
 static fc2d_clawpack46_vtable_t classic_vt;
-// static fclaw2d_clawpatch_vtable_t clawpatch_vt;
 
-
-fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt()
+static
+fc2d_clawpack_vtable_t* fc2d_clawpack46_vt_init()
 {
     return &classic_vt;
 }
-
-static
-int fc2d_clawpack46_get_package_id (void)
-{
-    return s_clawpack46_package_id;
-}
-
-#if 0
-void fc2d_clawpack46_set_vtable(const fc2d_clawpack46_vtable_t user_vt)
-{
-    classic_vt = user_vt;
-    // fclaw2d_clawpatch_set_vtable(user_vt.clawpatch_vt);
-}
-#endif
 
 void fc2d_clawpack46_set_vtable_defaults()
 {
     fclaw2d_vtable_t*                  fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*            patch_vt = fclaw2d_patch_vt();
     fclaw2d_clawpatch_vtable_t*    clawpatch_vt = fclaw2d_clawpatch_vt();
-    fc2d_clawpack46_vtable_t*         claw46_vt = fc2d_clawpack46_vt();
+    fc2d_clawpack46_vtable_t*         claw46_vt = fc2d_clawpack46_vt_init();
 
     fclaw2d_init_vtable();
     fclaw2d_clawpatch_init_vtable_defaults();
@@ -120,45 +103,18 @@ void fc2d_clawpack46_set_vtable_defaults()
     clawpatch_vt->fort_ghostpack_qarea    = &FC2D_CLAWPACK46_FORT_GHOSTPACK_QAREA;
 
     clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
+
+    is_set = 1;
 }
 
-fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob)
-{
-    int id = fc2d_clawpack46_get_package_id();
-    return (fc2d_clawpack46_options_t*) fclaw_package_get_options(glob,id);
-}
 
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
-#if 0
-void fc2d_clawpack46_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob)
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt()
 {
-    fc2d_clawpack46_options_t* clawopt;
-    int id;
-
-    /* Register the options */
-    clawopt = fc2d_clawpack46_options_register(app,configfile);
-
-    /* And the package */
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack46_package_id == -1);
-
-    id = fclaw_package_container_add_pkg(glob,clawopt);
-
-    s_clawpack46_package_id = id;
-}
-#endif
-
-void fc2d_clawpack46_set_options (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt)
-{
-    int id; 
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack46_package_id == -1);
-
-    id = fclaw_package_container_add_pkg(glob,clawopt);
-
-    s_clawpack46_package_id = id;
+    FCLAW_ASSERT(classic_vt.is_set != 0);
+    return &classic_vt;
 }
 
 void fc2d_clawpack46_aux_data(fclaw2d_global_t* glob,

@@ -56,6 +56,8 @@ typedef struct fc2d_clawpack46_options
     int mcapa;
     int src_term;
     int use_fwaves;
+
+    int is_registered;
 }
 fc2d_clawpack46_options_t;
 
@@ -66,6 +68,14 @@ void fc2d_clawpack46_reset (fc2d_clawpack46_options_t * clawopt);
 
 fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
                                                               const char *configfile);
+
+void fc2d_clawpack46_package_register(fclaw_app_t* app,
+                                      fc2d_clawpack46_options_t* clawopt);
+
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob);
+
+void fc2d_clawpack46_options_store (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt);
+
 
 #ifdef __cplusplus
 #if 0
