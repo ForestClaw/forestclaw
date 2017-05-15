@@ -33,27 +33,23 @@ extern "C"
 #endif
 #endif
 
-typedef struct fc2d_clawpack5_package
+static int s_clawpack5_package_id = -1;
+
+void fc2d_clawpack5_set_package_id(int id)
 {
-  int is_registered;
-  fc2d_clawpack5_options_t clawopt;
+    FCLAW_ASSERT(s_clawpack5_package_id == -1);
+    s_clawpack5_package_id = id;
 }
-fc2d_clawpack5_package_t; 
+
+int fc2d_clawpack5_get_package_id (void)
+{
+    return s_clawpack5_package_id;
+}
+
 
 static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+clawpack5_register (fc2d_clawpack5_options_t* clawopt, sc_options_t * opt)
 {
-    fc2d_clawpack5_package_t *clawpkg;
-    fc2d_clawpack5_options_t *clawopt;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-
-    clawpkg = (fc2d_clawpack5_package_t*) package;
-    clawopt = &clawpkg->clawopt;
-
-    FCLAW_ASSERT (clawopt != NULL);
-
     fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
                                "2 2", &clawopt->order, 2,
                                "[clawpack5] Normal and transverse orders [2 2]");
@@ -80,12 +76,12 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
                                  &clawopt->mthbc, fclaw2d_NumFaces,
                                  "[clawpack5] Physical boundary condition type [1 1 1 1]");
 
-    clawpkg->is_registered = 1;
+    clawopt->is_registered = 1;
     return NULL;
 }
 
 fclaw_exit_type_t
-fc2d_clawpack5_postprocess (fc2d_clawpack5_options_t * clawopt)
+clawpack5_postprocess (fc2d_clawpack5_options_t * clawopt)
 {
     fclaw_options_convert_int_array (clawopt->mthlim_string, &clawopt->mthlim,
                                      clawopt->mwaves);
@@ -96,76 +92,11 @@ fc2d_clawpack5_postprocess (fc2d_clawpack5_options_t * clawopt)
     return FCLAW_NOEXIT;
 }
 
-static fclaw_exit_type_t
-options_postprocess (fclaw_app_t * app, void *package, void *registered)
-{
-    fc2d_clawpack5_package_t *clawpkg;
-    fc2d_clawpack5_options_t *clawopt;
 
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-
-    clawpkg = (fc2d_clawpack5_package_t*) package;
-    FCLAW_ASSERT (clawpkg->is_registered);
-
-    clawopt = &clawpkg->clawopt;
-    FCLAW_ASSERT (clawopt != NULL);
-
-    return fc2d_clawpack5_postprocess (clawopt);
-}
-
-#if 0
 fclaw_exit_type_t
-fc2d_clawpack5_check (fc2d_clawpack5_options_t * clawopt)
+clawpack5_check (fc2d_clawpack5_options_t * clawopt, 
+                 fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
-    clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
-
-    clawopt->method[1] = clawopt->order[0];
-    clawopt->method[2] = clawopt->order[1];
-    clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
-    clawopt->method[4] = clawopt->src_term;
-    clawopt->method[5] = clawopt->mcapa;
-    clawopt->method[6] = clawopt->maux;
-
-    if (clawopt->use_fwaves)
-    {
-        fclaw_global_essentialf("clawpack5 : fwaves not yet implemented\n");
-        return FCLAW_EXIT_QUIET;
-    }
-
-    if (clawopt->maux == 0 && clawopt->mcapa > 0)
-    {
-        fclaw_global_essentialf("clawpack5 : bad maux/mcapa combination\n");
-        return FCLAW_EXIT_ERROR;
-    }
-    /// Need to do it after convert option to array
-    
-    SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
-                   clawopt->mthlim, clawopt->method);
-    /* Should also check mthbc, mthlim, etc. */
-
-    return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
-}
-#endif
-
-static fclaw_exit_type_t
-options_check (fclaw_app_t * app, void *package, void *registered)
-{
-    fc2d_clawpack5_package_t *clawpkg;
-    fc2d_clawpack5_options_t *clawopt;
-
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
-    clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-
-    clawpkg = (fc2d_clawpack5_package_t*) package;
-    FCLAW_ASSERT (clawpkg->is_registered);
-
-    clawopt = &clawpkg->clawopt;
-    FCLAW_ASSERT (clawopt != NULL);
-
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
     clawopt->method[1] = clawopt->order[0];
@@ -186,40 +117,93 @@ options_check (fclaw_app_t * app, void *package, void *registered)
         fclaw_global_essentialf("clawpack5 : bad maux/mcapa combination\n");
         return FCLAW_EXIT_ERROR;
     }
-    /// Need to do it after convert option to array
-    
+
+    /* There is probably a better place to do this */    
     SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
                    clawopt->mthlim, clawopt->method);
+
     /* Should also check mthbc, mthlim, etc. */
 
     return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
 }
 
 void
-fc2d_clawpack5_reset (fc2d_clawpack5_options_t * clawopt)
+clawpack5_destroy (fc2d_clawpack5_options_t * clawopt)
 {
     fclaw_options_destroy_array (clawopt->mthbc);
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
 }
 
-static void
-options_destroy (fclaw_app_t * app, void *package, void *registered)
+
+/* -------------------------------------------------------------------
+   Functions below are part of the options vtable;  no need to change
+    these They call functions above
+   ------------------------------------------------------------------- */
+static void*
+options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
-    fc2d_clawpack5_package_t *clawpkg;
     fc2d_clawpack5_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
 
-    clawpkg = (fc2d_clawpack5_package_t*) package;
-    FCLAW_ASSERT (clawpkg->is_registered);
+    clawopt = (fc2d_clawpack5_options_t*) package;
 
-    clawopt = &clawpkg->clawopt;
-    FCLAW_ASSERT (clawopt != NULL);
+    return clawpack5_register(clawopt,opt);
+}
 
-    fc2d_clawpack5_reset (clawopt);
-    FCLAW_FREE (clawpkg);
+
+
+static fclaw_exit_type_t
+options_postprocess (fclaw_app_t * app, void *package, void *registered)
+{
+    fc2d_clawpack5_options_t *clawopt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    clawopt = (fc2d_clawpack5_options_t*) package;
+    FCLAW_ASSERT (clawopt->is_registered);
+
+    return clawpack5_postprocess (clawopt);
+}
+
+
+static fclaw_exit_type_t
+options_check (fclaw_app_t * app, void *package, void *registered)
+{
+    fc2d_clawpack5_options_t *clawopt;
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    clawopt = (fc2d_clawpack5_options_t*) package;
+    FCLAW_ASSERT (clawopt->is_registered);
+
+    clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
+    FCLAW_ASSERT(clawpatch_opt->is_registered);
+
+    return clawpack5_check(clawopt,clawpatch_opt);    /* Nothing can go wrong here! */
+}
+
+static void
+options_destroy (fclaw_app_t * app, void *package, void *registered)
+{
+    fc2d_clawpack5_options_t *clawopt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    clawopt = (fc2d_clawpack5_options_t*) package;
+    FCLAW_ASSERT (clawopt->is_registered);
+
+    clawpack5_destroy (clawopt);
+    FCLAW_FREE (clawopt);
 }
 
 static const fclaw_app_options_vtable_t clawpack5_options_vtable = {
@@ -235,16 +219,30 @@ static const fclaw_app_options_vtable_t clawpack5_options_vtable = {
 fc2d_clawpack5_options_t*  fc2d_clawpack5_options_register (fclaw_app_t * app,
                                                               const char *configfile)
 {
-    fc2d_clawpack5_package_t *clawpkg;
+    fc2d_clawpack5_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);
 
-    clawpkg = FCLAW_ALLOC (fc2d_clawpack5_package_t, 1);
+    clawopt = FCLAW_ALLOC (fc2d_clawpack5_options_t, 1);
     fclaw_app_options_register (app, "clawpack5", configfile,
-                                &clawpack5_options_vtable, clawpkg);
-    fclaw_app_set_attribute(app,"clawpack5",clawpkg);
-    return &clawpkg->clawopt;
+                                &clawpack5_options_vtable, clawopt);
+
+    fclaw_app_set_attribute(app,"clawpack5",clawopt);
+    return clawopt;
 }
+
+fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob)
+{
+    int id = fc2d_clawpack5_get_package_id();
+    return (fc2d_clawpack5_options_t*) fclaw_package_get_options(glob,id);
+}
+
+void fc2d_clawpack5_options_store (fclaw2d_global_t* glob, fc2d_clawpack5_options_t* clawopt)
+{
+    int id = fclaw_package_container_add_pkg(glob,clawopt);
+    fc2d_clawpack5_set_package_id(id);
+}
+
 
 #ifdef __cplusplus
 #if 0

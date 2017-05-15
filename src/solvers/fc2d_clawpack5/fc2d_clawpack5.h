@@ -124,6 +124,8 @@ typedef struct fc2d_clawpack5_vtable
     fc2d_clawpack5_rpn2_t rpn2;
     fc2d_clawpack5_rpt2_t rpt2;
     fc2d_clawpack5_fluxfun_t fluxfun;
+
+    int is_set;
 } fc2d_clawpack5_vtable_t;
 
 #if 0
@@ -388,26 +390,6 @@ void fc2d_clawpack5_register_vtable (fclaw_package_container_t *
                                       pkg_container,
                                       fc2d_clawpack5_options_t *
                                       clawopt);
-
-/* -------------------------------------------------------------------------
-   New routines
-   ------------------------------------------------------------------------- */
-void fc2d_clawpack5_aux_data(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *this_patch,
-                              double **aux, int* maux);
-
-// void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob);
-void fc2d_clawpack5_set_options (fclaw2d_global_t* glob, fc2d_clawpack5_options_t* clawopt);
-
-void fc2d_clawpack5_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack5_options_t* clawopt);
-
-#if 0
-void fc2d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
-                                        int iframe);
-#endif                                        
-
-fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob);
 
 /* -------------------------------------------------------------------------
    Routines that won't change

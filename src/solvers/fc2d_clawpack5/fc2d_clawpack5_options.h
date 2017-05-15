@@ -56,21 +56,31 @@ typedef struct fc2d_clawpack5_options
     int mcapa;
     int src_term;
     int use_fwaves;
+
+    int is_registered;
 }
 fc2d_clawpack5_options_t;
 
+/* 
 fclaw_exit_type_t fc2d_clawpack5_postprocess (fc2d_clawpack5_options_t *
                                                clawopt);
 fclaw_exit_type_t fc2d_clawpack5_check (fc2d_clawpack5_options_t * clawopt);
 void fc2d_clawpack5_reset (fc2d_clawpack5_options_t * clawopt);
+*/
 
 fc2d_clawpack5_options_t *fc2d_clawpack5_options_register (fclaw_app_t *
                                                              app,
                                                              const char
                                                              *configfile);
+
 #define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
 void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
                     const int mthlim_in[], const int method_in[]);
+
+void fc2d_clawpack5_options_store (fclaw2d_global_t* glob, fc2d_clawpack5_options_t* clawopt);
+
+fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob);
+
 
 #ifdef __cplusplus
 #if 0
