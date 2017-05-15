@@ -186,7 +186,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 
         /* Average the solution. Does this need to be customizable? */
         fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
-                                     blockno,coarse_patchno, fine_patchno);//new_domain
+                                     blockno,fine_patchno,coarse_patchno);//new_domain
 
         int i;
         for(i = 0; i < 4; i++)
