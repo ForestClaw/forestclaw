@@ -34,8 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static fc2d_clawpack46_vtable_t classic_vt;
 
 static
-fc2d_clawpack_vtable_t* fc2d_clawpack46_vt_init()
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt_init()
 {
+    return &classic_vt;
+}
+
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt()
+{
+    FCLAW_ASSERT(classic_vt.is_set != 0);
     return &classic_vt;
 }
 
@@ -104,25 +110,13 @@ void fc2d_clawpack46_set_vtable_defaults()
 
     clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
 
-    is_set = 1;
+    claw46_vt->is_set = 1;
 }
 
 
 /* -----------------------------------------------------------
    Public interface to routines in this file
    ----------------------------------------------------------- */
-fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt()
-{
-    FCLAW_ASSERT(classic_vt.is_set != 0);
-    return &classic_vt;
-}
-
-void fc2d_clawpack46_aux_data(fclaw2d_global_t* glob,
-                              fclaw2d_patch_t *this_patch,
-                              double **aux, int* maux)
-{
-    fclaw2d_clawpatch_aux_data(glob, this_patch, aux, maux);
-}
 
 void fc2d_clawpack46_setprob(fclaw2d_global_t *glob)
 {

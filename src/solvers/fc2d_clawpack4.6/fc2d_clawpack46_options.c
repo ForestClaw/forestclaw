@@ -35,28 +35,19 @@ extern "C"
 
 static int s_clawpack46_package_id = -1;
 
-int fc2d_clawpack46_set_package_id(int id)
+static void fc2d_clawpack46_set_package_id(int id)
 {
     FCLAW_ASSERT(s_clawpack46_package_id == -1);
     s_clawpack46_package_id = id;
 }
 
-int fc2d_clawpack46_get_package_id (void)
+static int fc2d_clawpack46_get_package_id (void)
 {
     return s_clawpack46_package_id;
 }
 
-#if 0
-typedef struct fc2d_clawpack46_package
-{
-  int is_registered;
-  fc2d_clawpack46_options_t clawopt;
-}
-fc2d_clawpack46_package_t; 
-#endif
-
 static void*
-clawpack46_register (fc2d_clawpack46_t* clawopt, sc_options_t * opt)
+clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
 {
     fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
                                "2 2", &clawopt->order, 2,
@@ -104,7 +95,7 @@ clawpack46_postprocess (fc2d_clawpack46_options_t * clawopt)
 
 static fclaw_exit_type_t
 clawpack46_check(fc2d_clawpack46_options_t *clawopt,
-                 fc2d_clawpatch_options_t *clawpatch_opt)
+                 fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
@@ -128,7 +119,7 @@ clawpack46_check(fc2d_clawpack46_options_t *clawopt,
     }
 
     /* Should also check mthbc, mthlim, etc. */
-    FCLAW_NOEXIT;
+    return FCLAW_NOEXIT;
 }
 
 static
@@ -170,7 +161,7 @@ options_postprocess (fclaw_app_t * app, void *package, void *registered)
     clawopt = (fc2d_clawpack46_options_t*) package;
     FCLAW_ASSERT (clawopt->is_registered);
 
-    return fc2d_clawpack46_postprocess (clawopt);
+    return clawpack46_postprocess (clawopt);
 }
 
 
@@ -188,6 +179,8 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     FCLAW_ASSERT (clawopt->is_registered);
 
     clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
+    FCLAW_ASSERT(clawpatch_opt->is_registered);
+    
     return clawpack46_check(clawopt,clawpatch_opt);    
 }
 
@@ -229,7 +222,7 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
     fclaw_app_options_register (app, "clawpack46", configfile,
                                 &clawpack46_options_vtable, clawopt);
     fclaw_app_set_attribute(app,"clawpack46",clawopt);
-    return &clawopt;
+    return clawopt;
 }
 
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob)
@@ -240,13 +233,9 @@ fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob)
 
 void fc2d_clawpack46_options_store (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt)
 {
-    int id; 
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack46_package_id == -1);
+    int id = fclaw_package_container_add_pkg(glob,clawopt);
 
-    id = fclaw_package_container_add_pkg(glob,clawopt);
-
-    s_clawpack46_package_id = id;
+    fc2d_clawpack46_set_package_id(id);
 }
 
 

@@ -389,13 +389,6 @@ void fc2d_clawpack46_register_vtable (fclaw_package_container_t *
                                       clawopt);
 
 /* -------------------------------------------------------------------------
-   New routines
-   ------------------------------------------------------------------------- */
-void fc2d_clawpack46_aux_data(fclaw2d_global_t* glob,
-                              fclaw2d_patch_t *this_patch,
-                              double **aux, int* maux);
-
-/* -------------------------------------------------------------------------
    Routines that won't change
    ------------------------------------------------------------------------- */
 void
