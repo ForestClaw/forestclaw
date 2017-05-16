@@ -34,8 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
-struct fclaw2d_global;
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,23 +42,21 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;  /* Avoid circular dependency */
+
+
 /* Plan is to replace amr_options_t with fclaw_options_t */
 typedef struct amr_options amr_options_t;
-typedef amr_options_t fclaw_options_t;
 
-fclaw_exit_type_t fclaw_options_postprocess (fclaw_options_t * amropt);
-fclaw_exit_type_t fclaw_options_check (fclaw_options_t * amropt);
-void fclaw_options_reset (fclaw_options_t * amropt);
+void fclaw2d_options_store (struct fclaw2d_global *glob, amr_options_t* gparms);
 
-void fclaw2d_forestclaw_set_options (struct fclaw2d_global *glob, amr_options_t* gparms);
-amr_options_t* fclaw2d_forestclaw_get_options(struct fclaw2d_global *glob);
+amr_options_t* fclaw2d_forestclaw_get_options(struct fclaw2d_global* glob);
 
+amr_options_t* fclaw2d_options_get(struct fclaw2d_global *glob);
 
-amr_options_t* fclaw2d_forestclaw_options_register (fclaw_app_t * a,
-                                     const char *configfile);
+amr_options_t* fclaw_options_register (fclaw_app_t * a,
+                                       const char *configfile);
 
-
-void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt);
 
 int fclaw_options_read_from_file(sc_options_t* opt);
 
@@ -75,6 +71,7 @@ int fclaw_options_read_from_file(sc_options_t* opt);
  * \param [in] initial_length   Initial length of int_array.
  * \param [in] help_string      Help message (used with --help).
  */
+
 void fclaw_options_add_int_array (sc_options_t * opt,
                                 int opt_char, const char *opt_name,
                                 const char **array_string,
@@ -182,14 +179,7 @@ struct amr_options
     /* Output and console IO */
     int verbosity;              /**< TODO: Do we have guidelines here? */
 
-    int output;                 
-
-#if 0
-    int serialout;              /**< Allow for serial output.  WARNING:
-                                     Will kill all parallel performance. */    
-
-#endif 
-   
+    int output;                    
     int tikz_out;      /* Boolean */
 
     const char *tikz_figsize_string;
@@ -206,9 +196,6 @@ struct amr_options
 
     double vtkspace; /**< between 0. and 1. to separate patches visually */
     int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */    
-#if 0    
-    int vtkout;      /* T/F (user variable) */
-#endif    
 
 
     int weighted_partition;            /**< Use weighted partition. */

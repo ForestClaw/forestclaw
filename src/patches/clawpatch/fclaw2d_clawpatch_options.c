@@ -172,7 +172,7 @@ fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile)
     return clawpatch_options;
 }
 
-void fclaw2d_clawpatch_set_options (fclaw2d_global_t *glob, fclaw2d_clawpatch_options_t* clawpatch_options)
+void fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob, fclaw2d_clawpatch_options_t* clawpatch_options)
 {
     int id;
 

@@ -114,7 +114,7 @@ clawpack5_check (fc2d_clawpack5_options_t * clawopt,
 
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
     {
-        fclaw_global_essentialf("clawpack5 : bad maux/mcapa combination\n");
+        fclaw_global_essentialf("clawpack5 : mcapa > 0 but maux == 0.\n");
         return FCLAW_EXIT_ERROR;
     }
 
