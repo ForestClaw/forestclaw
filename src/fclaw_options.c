@@ -26,14 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_mpi.h>
 
-static int s_forestclaw_package_id = -1;
-
-
 /* amr_options_t will eventually be replaced with fclaw_options_t. */
 typedef struct fclaw_options
 {
     amr_options_t *gparms;
-
 } fclaw_options_t;
 
 
@@ -355,7 +351,7 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     /* errors from the key-value options would have showed up in parsing */
     fclaw_options_t *fclaw_opt = (fclaw_options_t *) package;
 
-    /* postprocess this package */
+    /* post-process this package */
     FCLAW_ASSERT(fclaw_opt->gparms->is_registered);
 
     /* Convert strings to arrays */
@@ -392,7 +388,7 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
     /* free this package */
     FCLAW_ASSERT (fclaw_opt->gparms->is_registered);
 
-    /* Destroy option arrays created in postprocess */
+    /* Destroy option arrays created in post-process */
     fclaw_destroy (fclaw_opt);
     FCLAW_FREE(fclaw_opt->gparms);
 }
@@ -408,7 +404,8 @@ static const fclaw_app_options_vtable_t options_vtable = {
 /* ---------------------------------------------------------
    Public interface to ForestClaw options
    --------------------------------------------------------- */
-amr_options_t* fclaw_options_register (fclaw_app_t * a, const char *configfile)
+amr_options_t* fclaw_options_register (fclaw_app_t * a, 
+                                       const char *configfile)
 {
     fclaw_options_t* fclaw_opt;
 
@@ -446,8 +443,7 @@ int fclaw_options_read_from_file(sc_options_t* opt)
                               "fclaw_options.ini");
     if (retval < 0)
     {
-        fclaw_global_essentialf( \
-                            "Problem reading fclaw_options.ini.\n");
+        fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
     }
     else
     {
@@ -456,17 +452,15 @@ int fclaw_options_read_from_file(sc_options_t* opt)
     return retval;
 }
 
+#if 0
 void fclaw2d_options_store (fclaw2d_global_t *glob, amr_options_t* gparms)
 {
     int id;
 
     FCLAW_ASSERT(s_forestclaw_package_id == -1);
-    id = fclaw_package_container_add_pkg(glob,
-                                         gparms);
+    id = fclaw_package_container_add_pkg(glob,gparms);
     s_forestclaw_package_id = id;
 }
-
-
 
 amr_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
 {
@@ -474,12 +468,7 @@ amr_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
             fclaw_package_get_options(glob, s_forestclaw_package_id);
     return gp;
 }
-
-amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_global_t* glob)
-{
-    return fclaw2d_get_options(glob);
-}
-
+#endif
 
 /* ------------------------------------------------------------------------
   Some utility functions
