@@ -10,6 +10,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_options.h \
 	src/fclaw_mpi.h \
 	src/fclaw_math.h \
+	src/fclaw_forestclaw.h \
 	src/forestclaw2d.h \
 	src/fortran_source2d/metric_terms.i \
 	src/fp_exception_glibc_extension.h \
@@ -18,7 +19,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_farraybox.hpp \
 	src/fclaw2d_global.h \
 	src/fclaw2d_forestclaw.h \
-	src/fclaw2d_base.h \
 	src/fclaw2d_domain.h \
 	src/fclaw2d_defs.h \
 	src/fclaw2d_block.h \
@@ -66,7 +66,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_options.c \
 	src/fclaw2d_global.c \
 	src/fclaw2d_forestclaw.c \
-	src/fclaw2d_base.c \
 	src/forestclaw2d.c \
 	src/fclaw2d_vtable.c \
 	src/fclaw2d_map.c \

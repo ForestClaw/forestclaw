@@ -23,8 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
+// #include <fclaw2d_forestclaw.h>
 #include <fclaw_mpi.h>
+#include <fclaw_options.h>
 
 /* amr_options_t will eventually be replaced with fclaw_options_t. */
 typedef struct fclaw_options
@@ -271,18 +272,19 @@ fclaw_postprocess (fclaw_options_t * fclaw_opt)
 }
 
 static fclaw_exit_type_t
-fclaw_check (fclaw_options_t * fclaw_opt, 
-             fclaw2d_clawpatch_options_t *clawpatch_opt)
+fclaw_check (fclaw_options_t * fclaw_opt)
 {
 
     amr_options_t *gparms = fclaw_opt->gparms;
 
+#if 0
     if (gparms->interp_stencil_width/2 > clawpatch_opt->mbc)
     {
         fclaw_global_essentialf("Interpolation width is too large for number of " \
                                 "ghost cells (mbc) specifed.  We should have " \
                                 "(width)/2 <= mbc");
     }
+#endif    
 
     /* Check outstyle. */
     if (gparms->outstyle == 1 && gparms->use_fixed_dt)
@@ -369,11 +371,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     fclaw_options_t *fclaw_opt = (fclaw_options_t *) package;
     FCLAW_ASSERT(fclaw_opt->gparms->is_registered);
 
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
-    clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
-    FCLAW_ASSERT(clawpatch_opt->is_registered);
-
-    return fclaw_check (fclaw_opt,clawpatch_opt);
+    return fclaw_check (fclaw_opt);
 }
 
 static void
@@ -451,24 +449,6 @@ int fclaw_options_read_from_file(sc_options_t* opt)
     }
     return retval;
 }
-
-#if 0
-void fclaw2d_options_store (fclaw2d_global_t *glob, amr_options_t* gparms)
-{
-    int id;
-
-    FCLAW_ASSERT(s_forestclaw_package_id == -1);
-    id = fclaw_package_container_add_pkg(glob,gparms);
-    s_forestclaw_package_id = id;
-}
-
-amr_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
-{
-    amr_options_t *gp = (amr_options_t*) 
-            fclaw_package_get_options(glob, s_forestclaw_package_id);
-    return gp;
-}
-#endif
 
 /* ------------------------------------------------------------------------
   Some utility functions

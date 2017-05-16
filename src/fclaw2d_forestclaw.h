@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* This file should come first to retrieve configure-time information */
 #include <fclaw_config.h>
+#include <fclaw_forestclaw.h>
 
 /* Use as an alternate to GNU feenableexcept */
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
@@ -43,14 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Basic objects */
 #include "forestclaw2d.h"
-#include "fclaw2d_base.h"
 #include "fclaw2d_domain.h"
 #include "fclaw2d_block.h"
 /* Don't include fclaw2d_patch.H, since it requires C++ linkage */
 
 /* Basic header files that are probably required by all apps */
-#include "fclaw_options.h"
-#include "fclaw_package.h"
 #include "fclaw2d_vtable.h"
 
 /* Mapping interface - needed even if 'nomap' is used.  */
@@ -58,13 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_map.h"
 #include "fclaw2d_map_query.h"
 
-#include "fclaw_timer.h"
-
 /* These still need to be cleaned up */
 #include "fclaw2d_defs.h"
-
-/* Misc */
-#include "fclaw_math.h"
 
 #include <fclaw2d_global.h>
 
@@ -75,6 +68,25 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
+
+/* Some convenient preprocessor directives */
+
+#define FCLAW2D_SPACEDIM 2
+extern const int fclaw2d_SpaceDim;
+
+/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
+   avoid any confusion in the 2d case. */
+#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
+extern const int fclaw2d_NumFaces;
+
+#define FCLAW2D_REFINE_FACTOR 2
+extern const int fclaw2d_RefineFactor;
+
+#define FCLAW2D_NUM_CORNERS 4
+extern const int fclaw2d_NumCorners;
+
+#define FCLAW2D_NUM_SIBLINGS 4
+extern const int fclaw2d_NumSiblings;
 
 void fclaw2d_initialize(fclaw2d_global_t *glob);
 void fclaw2d_run(fclaw2d_global_t *glob);

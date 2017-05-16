@@ -23,10 +23,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_BASE_H
-#define FCLAW2D_BASE_H
+#ifndef FCLAW_FORESTCLAW_H
+#define FCLAW_FORESTCLAW_H
 
-#include <fclaw_base.h>
+/* This file should come first to retrieve configure-time information */
+#include <fclaw_config.h>
+
+/* Use as an alternate to GNU feenableexcept */
+#ifndef FCLAW_HAVE_FEENABLEEXCEPT
+#include <fp_exception_glibc_extension.h>
+#endif
+
+#include <fenv.h>
+#include <signal.h>
+
+#ifdef FCLAW_HAVE_UNISTD_H
+#include <unistd.h>    /* To get process ids */
+#endif
+
+/* Basic header files that are probably required by all apps */
+#include "fclaw_options.h"
+#include "fclaw_package.h"
+#include "fclaw_timer.h"
+
+/* Misc */
+#include "fclaw_math.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,24 +57,7 @@ extern "C"
 #endif
 #endif
 
-/* Some convenient preprocessor directives */
-
-#define FCLAW2D_SPACEDIM 2
-extern const int fclaw2d_SpaceDim;
-
-/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-   avoid any confusion in the 2d case. */
-#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
-extern const int fclaw2d_NumFaces;
-
-#define FCLAW2D_REFINE_FACTOR 2
-extern const int fclaw2d_RefineFactor;
-
-#define FCLAW2D_NUM_CORNERS 4
-extern const int fclaw2d_NumCorners;
-
-#define FCLAW2D_NUM_SIBLINGS 4
-extern const int fclaw2d_NumSiblings;
+/* Nothing to include ... */
 
 #ifdef __cplusplus
 #if 0
@@ -62,4 +66,7 @@ extern const int fclaw2d_NumSiblings;
 }
 #endif
 
-#endif /* !FCLAW2D_BASE_H */
+
+/* Note: either we make this a C .h file, or we remove the extern "C". */
+
+#endif

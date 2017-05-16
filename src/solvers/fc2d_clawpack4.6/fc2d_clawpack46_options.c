@@ -73,7 +73,7 @@ clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
     
     /* Array of NumFaces many values */
     fclaw_options_add_int_array (opt, 0, "mthbc", &clawopt->mthbc_string, "1 1 1 1",
-                                 &clawopt->mthbc, fclaw2d_NumFaces,
+                                 &clawopt->mthbc, 4,
                                  "[clawpack46] Physical boundary condition type [1 1 1 1]");
 
     clawopt->is_registered = 1;
@@ -83,8 +83,8 @@ clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
 static fclaw_exit_type_t
 clawpack46_postprocess (fc2d_clawpack46_options_t * clawopt)
 {
-    fclaw_options_convert_int_array (clawopt->mthbc_string, &clawopt->mthbc,
-                                     fclaw2d_NumFaces);    
+    fclaw_options_convert_int_array (clawopt->mthbc_string, &clawopt->mthbc,4);
+    
     fclaw_options_convert_int_array (clawopt->mthlim_string, &clawopt->mthlim,
                                      clawopt->mwaves);
     fclaw_options_convert_int_array (clawopt->order_string, &clawopt->order,2);

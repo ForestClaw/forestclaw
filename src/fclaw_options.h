@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_OPTIONS_H
 
 #include <fclaw_base.h>
+#include <fclaw_forestclaw.h>
 
 #ifdef __cplusplus
 extern "C"
