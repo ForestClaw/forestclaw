@@ -30,10 +30,8 @@
 static int s_user_package_id = -1;
 
 static void *
-options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+user_register (user_options_t *user, sc_options_t * opt)
 {
-    user_options_t* user = (user_options_t*) package;
-
     /* [user] User options */
     sc_options_add_double (opt, 0, "period", &user->period, 4,
                            "Period of the flow field [4]");
@@ -48,36 +46,95 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
                            "Output VTK formatted data [F]");
 
     user->is_registered = 1;
+
     return NULL;
 }
 
 static fclaw_exit_type_t
-options_check_user (fclaw_app_t * app, void *package, void *registered)
+check_user (user_options_t *user)
 {
+    /* Nothing to check ? */
     return FCLAW_NOEXIT;
 }
 
+static fclaw_exit_type_t
+user_destroy(user_options_t *user)
+{
+    /* Nothing to destroy */
+    return FCLAW_NOEXIT;
+}
+
+/* ------------ Don't need to set anything between here ... ---------- */
+static void*
+options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+
+    user = (user_options_t*) package;
+
+    return user_register(user,opt);
+}
+
+static fclaw_exit_type_t
+options_check(fclaw_app_t *app, void *package,void *registered)
+{
+    user_options_t           *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT(registered == NULL);
+
+    user = (user_options_t*) package;
+
+    return check_user(user);
+}
+
+static void
+options_destroy (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    user = (user_options_t*) package;
+    FCLAW_ASSERT (user->is_registered);
+
+    user_destroy (user);
+
+    FCLAW_FREE (user);
+}
+
+
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
-    options_register_user,
+    options_register,
     NULL,
-    options_check_user,
-    NULL
+    options_check,
+    options_destroy
 };
 
 static
-void register_user_options (fclaw_app_t * app,
-                            const char *configfile,
-                            user_options_t* user)
+user_options_t* user_options_register (fclaw_app_t * app,
+                                       const char *configfile)
 {
+    user_options_t *user;
     FCLAW_ASSERT (app != NULL);
 
+    user = FCLAW_ALLOC (user_options_t, 1);
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
+
+    fclaw_app_set_attribute(app,"user",user);
+    return user;
 }
 
 static 
-void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
+void user_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
@@ -90,6 +147,9 @@ const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob)
     return (user_options_t*) 
             fclaw_package_get_options(glob, id);    
 }
+/* ------------------------- ... and here ---------------------------- */
+
+
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms)
@@ -122,13 +182,17 @@ void run_program(fclaw2d_global_t* glob)
 
     user = (user_options_t*) swirl_user_get_options(glob);
 
+    /* Initialize virtual table for ForestClaw */
+    fclaw2d_vtable_initialize();
+
+    /* Initialize virtual tables for solvers */
     if (user->claw_version == 4)
     {
-      fc2d_clawpack46_set_vtable_defaults();
+        fc2d_clawpack46_vtable_initialize();
     }
     else if (user->claw_version == 5)
     {
-      fc2d_clawpack5_set_vtable_defaults();
+        fc2d_clawpack5_vtable_initialize();
     }
 
     swirl_link_solvers(glob);
@@ -150,7 +214,7 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    user_options_t              suser, *user = &suser;
+    user_options_t              *user;
     amr_options_t               *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_clawpack46_options_t   *claw46opt;
@@ -163,14 +227,14 @@ main (int argc, char **argv)
     int retval;
 
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, user);
+    app = fclaw_app_new (&argc, &argv, NULL);
 
-    /* All libraries that might be needed should be registered here */
-    gparms = fclaw2d_forestclaw_options_register(app,"fclaw_options.ini");
-    clawpatchopt = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
-    claw46opt = fc2d_clawpack46_options_register(app,"fclaw_options.ini");
-    claw5opt = fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    register_user_options(app,"fclaw_options.ini",user);  /* [user] */
+    /* Create new options packages */
+    gparms =                     fclaw_options_register(app,"fclaw_options.ini");
+    clawpatchopt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
+    claw46opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
+    claw5opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
+    user =                        user_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -181,14 +245,16 @@ main (int argc, char **argv)
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     domain = create_domain(mpicomm, gparms);
     
+    /* Create global structure which stores the domain, timers, etc */
     glob = fclaw2d_global_new();
     fclaw2d_global_set_domain(glob, domain);
 
-    fclaw2d_forestclaw_set_options (glob, gparms);
-    fclaw2d_clawpatch_set_options (glob, clawpatchopt);
-    fc2d_clawpack46_set_options (glob, claw46opt);
-    fc2d_clawpack5_set_options (glob, claw5opt);
-    user_set_options (glob, user);
+    /* Store option packages in glob */
+    fclaw2d_options_store (glob, gparms);
+    fclaw2d_clawpatch_options_store (glob, clawpatchopt);
+    fc2d_clawpack46_options_store (glob, claw46opt);
+    fc2d_clawpack5_options_store (glob, claw5opt);
+    user_options_store (glob, user);
 
     /* Run the program */
     if (!retval & !vexit)
