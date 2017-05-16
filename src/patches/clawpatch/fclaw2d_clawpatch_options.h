@@ -62,8 +62,10 @@ typedef struct fclaw2d_clawpatch_options
 
 fclaw2d_clawpatch_options_t *
 fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile);
+
 void fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob, 
-	                                fclaw2d_clawpatch_options_t* clawpatch_options);
+                                      fclaw2d_clawpatch_options_t* clawpatch_options);
+
 fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob);
 
 
@@ -74,4 +76,4 @@ fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glo
 }
 #endif
 
-#endif /* !FCLAW2D_OPTIONS_H */
+#endif /* FCLAW2D_CLAWPATCH_OPTIONS_H */
