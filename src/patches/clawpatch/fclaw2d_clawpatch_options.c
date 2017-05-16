@@ -56,6 +56,11 @@ clawpatch_options_register(fclaw_app_t * a, void *optpkg, sc_options_t * opt)
     sc_options_add_int (opt, 0, "meqn", &clawpatch_options->meqn, 1,
                         "Number of equations [2]");
 
+    /* ---------------------- advanced options -------------------------- */
+    sc_options_add_int (opt, 0, "interp_stencil_width",
+                        &clawpatch_options->interp_stencil_width,
+                        3, "Interpolation stencil width [3]");
+
     /* we do not need to work with the return value */
     clawpatch_options->is_registered = 1;
     return NULL;
@@ -93,6 +98,13 @@ clawpatch_options_check(fclaw_app_t * app, void *optpkg, void *registered)
     {
         fclaw_global_essentialf("Clawpatch error : 2*mbc > mx or 2*mbc > my\n");
         return FCLAW_EXIT_ERROR;
+    }
+
+    if (clawpatch_options->interp_stencil_width/2 > clawpatch_options->mbc)
+    {
+        fclaw_global_essentialf("Interpolation width is too large for number of " \
+                                "ghost cells (mbc) specifed.  We should have " \
+                                "(width)/2 <= mbc");
     }
 
     return FCLAW_NOEXIT;

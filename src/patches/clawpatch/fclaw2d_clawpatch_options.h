@@ -53,6 +53,9 @@ typedef struct fclaw2d_clawpatch_options
 
     int meqn;
 
+    /* Advanced options */
+    int interp_stencil_width;
+
     int is_registered;
 
 } fclaw2d_clawpatch_options_t;

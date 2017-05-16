@@ -269,7 +269,7 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
     int my = clawpatch_opt->my;
     int meqn = clawpatch_opt->meqn;
     int mbc = clawpatch_opt->mbc;
-    int mint = gparms->interp_stencil_width/2+1;  /* Assume interp stencils have odd width */
+    int mint = clawpatch_opt->interp_stencil_width/2+1;  /* Assume interp stencils have odd width */
 
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);

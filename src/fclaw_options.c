@@ -237,13 +237,6 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "theta", &gparms->theta, 0,
                            "Rotation angle about z axis (degrees) [0]");
 
-
-    /* ---------------------- advanced options -------------------------- */
-    sc_options_add_int (opt, 0, "interp_stencil_width",
-                        &gparms->interp_stencil_width,
-                        3, "Interpolation stencil width [3]");
-
-
     /* -----------------------------------------------------------------------
        Options will be read from this file, if a '-F' flag is used at the command
        line.  Use this file for local modifications that are not tracked by Git.
@@ -276,15 +269,6 @@ fclaw_check (fclaw_options_t * fclaw_opt)
 {
 
     amr_options_t *gparms = fclaw_opt->gparms;
-
-#if 0
-    if (gparms->interp_stencil_width/2 > clawpatch_opt->mbc)
-    {
-        fclaw_global_essentialf("Interpolation width is too large for number of " \
-                                "ghost cells (mbc) specifed.  We should have " \
-                                "(width)/2 <= mbc");
-    }
-#endif    
 
     /* Check outstyle. */
     if (gparms->outstyle == 1 && gparms->use_fixed_dt)

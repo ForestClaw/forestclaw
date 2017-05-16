@@ -199,9 +199,6 @@ struct amr_options
 
     int weighted_partition;            /**< Use weighted partition. */
 
-    /* Advanced options */
-    int interp_stencil_width;
-
     int is_registered;
 };
 
