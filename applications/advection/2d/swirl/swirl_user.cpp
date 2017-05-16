@@ -40,7 +40,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 
     vt->output_frame = &swirl_output;
 
-    const user_options_t* user = swirl_user_get_options(glob);
+    const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
@@ -63,7 +63,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 
 void swirl_problem_setup(fclaw2d_global_t* glob)
 {
-    const user_options_t* user = swirl_user_get_options(glob);
+    const user_options_t* user = swirl_get_options(glob);
 
     double period = user->period;
     SWIRL_SETPROB(&period);
@@ -71,7 +71,7 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
 
 void swirl_output(fclaw2d_global_t *glob, int iframe)
 {
-    const user_options_t* user = swirl_user_get_options(glob);
+    const user_options_t* user = swirl_get_options(glob);
 
     if (user->ascii_out != 0)
     {

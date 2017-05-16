@@ -141,7 +141,7 @@ void user_options_store (fclaw2d_global_t* glob, user_options_t* user)
     s_user_package_id = id;
 }
 
-const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob)
+const user_options_t* swirl_get_options(fclaw2d_global_t* glob)
 {
     int id = s_user_package_id;
     return (user_options_t*) 
@@ -180,7 +180,7 @@ void run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user = (user_options_t*) swirl_user_get_options(glob);
+    user = (user_options_t*) swirl_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtable_initialize();

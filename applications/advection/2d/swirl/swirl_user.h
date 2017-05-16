@@ -61,7 +61,7 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
 
 void swirl_output(fclaw2d_global_t *glob, int iframe);
 
-const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob);
+const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
