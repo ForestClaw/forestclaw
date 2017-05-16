@@ -54,7 +54,7 @@ void initialize_timestep_counters(fclaw2d_global_t* glob,
                                   double t_init, double dt)
 {
     fclaw2d_domain_t *domain = glob->domain;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_timestep_counters *ts_counter;
     int level;
 
@@ -189,7 +189,7 @@ double advance_level(fclaw2d_global_t *glob,
                      fclaw2d_timestep_counters* ts_counter)
 {
     fclaw2d_domain_t* domain = glob->domain;
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t* gparms = fclaw2d_get_options(glob);
     double t_level = ts_counter[level].current_time;
     double dt_level = ts_counter[level].dt_step;
 
@@ -249,7 +249,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
     int level;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
 
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t* gparms = fclaw2d_get_options(glob);
     fclaw2d_timestep_counters *ts_counter;
 
     initialize_timestep_counters(glob,&ts_counter,t_curr,dt);

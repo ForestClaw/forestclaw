@@ -49,7 +49,7 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     int xlow_d, ylow_d, xupper_d, yupper_d;
 
     FILE *fp = s_tikz->fp;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(s->glob);
+    const amr_options_t *gparms = fclaw2d_get_options(s->glob);
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num = domain->global_num_patches_before +
@@ -105,7 +105,7 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
     char fname[20];
 
     /* Should be in gparms */
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_get_options(glob);
     
     double figsize[2];
     figsize[0] = gparms->tikz_figsize[0];   /* Inches */

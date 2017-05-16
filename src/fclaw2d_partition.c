@@ -77,7 +77,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
     char basename[BUFSIZ];
 
     /* will need to access the subcyle switch */
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_get_options(glob);
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */

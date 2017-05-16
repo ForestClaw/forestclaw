@@ -90,7 +90,7 @@ static
 int run_diagnostics(fclaw2d_global_t* glob)
 {
     /* Check to see if we should be running any diagnostics */
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_get_options(glob);
 
     int run_diag = gparms->conservation_check ||
                    gparms->run_user_diagnostics ||
@@ -105,7 +105,7 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_get_options(glob);
 #if 0
     int run_diag = run_diagnostics(glob);
     if (!run_diag)
@@ -137,7 +137,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
                                 int init_flag)
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
 #if 0
@@ -200,7 +200,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
 void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 #if 0
     int run_diag = run_diagnostics(glob);
@@ -232,7 +232,7 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
 void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 #if 0
     int run_diag = run_diagnostics(glob);

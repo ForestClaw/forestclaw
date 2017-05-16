@@ -40,7 +40,7 @@ void fclaw2d_metric_compute_area(fclaw2d_global_t *glob,
     double xlower,ylower,dx,dy;
     int level, maxlevel,refratio;
 
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t* gparms = fclaw2d_get_options(glob);
     level = this_patch->level;
     maxlevel = gparms->maxlevel;
     refratio = gparms->refratio;
@@ -105,7 +105,7 @@ void fclaw2d_metric_area_set_ghost(fclaw2d_global_t* glob,
     area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     /* Set area in ghost cells not set above */
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const amr_options_t* gparms = fclaw2d_get_options(glob);
     int level = this_patch->level;
     int maxlevel = gparms->maxlevel;
     int refratio = gparms->refratio;

@@ -50,9 +50,11 @@ typedef struct amr_options amr_options_t;
 
 void fclaw2d_options_store (struct fclaw2d_global *glob, amr_options_t* gparms);
 
+#if 0
 amr_options_t* fclaw2d_forestclaw_get_options(struct fclaw2d_global* glob);
+#endif
 
-amr_options_t* fclaw2d_options_get(struct fclaw2d_global *glob);
+amr_options_t* fclaw2d_get_options(struct fclaw2d_global *glob);
 
 amr_options_t* fclaw_options_register (fclaw_app_t * a,
                                        const char *configfile);

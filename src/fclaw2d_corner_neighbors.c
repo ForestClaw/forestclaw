@@ -355,7 +355,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     fclaw2d_block_get_block_boundary(s->glob, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(s->glob);
+    const amr_options_t *gparms = fclaw2d_get_options(s->glob);
     fclaw2d_transform_data_t transform_data;
     transform_data.glob = s->glob;
     transform_data.based = 1;   // cell-centered data in this routine.

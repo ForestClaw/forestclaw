@@ -356,7 +356,7 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     fclaw_options_t *fclaw_opt = (fclaw_options_t *) package;
 
     /* postprocess this package */
-    // FCLAW_ASSERT(fclaw_opt->gparms->is_registered);
+    FCLAW_ASSERT(fclaw_opt->gparms->is_registered);
 
     /* Convert strings to arrays */
     return fclaw_postprocess (fclaw_opt);
@@ -406,7 +406,7 @@ static const fclaw_app_options_vtable_t options_vtable = {
 
 
 /* ---------------------------------------------------------
-   FCLAW Options access functions
+   Public interface to ForestClaw options
    --------------------------------------------------------- */
 amr_options_t* fclaw_options_register (fclaw_app_t * a, const char *configfile)
 {
@@ -468,7 +468,7 @@ void fclaw2d_options_store (fclaw2d_global_t *glob, amr_options_t* gparms)
 
 
 
-amr_options_t* fclaw2d_options_get(fclaw2d_global_t* glob)
+amr_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
 {
     amr_options_t *gp = (amr_options_t*) 
             fclaw_package_get_options(glob, s_forestclaw_package_id);
@@ -477,7 +477,7 @@ amr_options_t* fclaw2d_options_get(fclaw2d_global_t* glob)
 
 amr_options_t* fclaw2d_forestclaw_get_options(fclaw2d_global_t* glob)
 {
-    return fclaw2d_options_get(glob);
+    return fclaw2d_get_options(glob);
 }
 
 
