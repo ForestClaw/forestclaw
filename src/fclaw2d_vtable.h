@@ -92,13 +92,14 @@ typedef struct fclaw2d_vtable
     fclaw2d_fort_compute_tangents_t      fort_compute_tangents;
     fclaw2d_fort_compute_surf_normals_t  fort_compute_surf_normals;
 
+    int is_set;
+
 
 } fclaw2d_vtable_t;
 
 
 fclaw2d_vtable_t* fclaw2d_vt();
-
-void fclaw2d_init_vtable();
+void fclaw2d_vtable_initialize();
 
 
 #ifdef __cplusplus

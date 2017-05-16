@@ -33,11 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static fc2d_clawpack5_vtable_t classic_vt;
 
+static
 fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt_init()
 {
-    FCLAW_ASSERT(classic_vt.is_set == 0);
+    classic_vt.is_set = 0;
     return &classic_vt;
 }
+
+/* -----------------------------------------------------------
+   Public interface to routines in this file
+   ----------------------------------------------------------- */
 
 fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt()
 {
@@ -45,17 +50,16 @@ fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt()
     return &classic_vt;
 }
 
-
 /* This is called from the user application. */
-void fc2d_clawpack5_set_vtable_defaults()
+void fc2d_clawpack5_vtable_initialize()
 {
-    fclaw2d_vtable_t*               fclaw_vt = fclaw2d_vt();
-    fclaw2d_patch_vtable_t*         patch_vt = fclaw2d_patch_vt();
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
-    fc2d_clawpack5_vtable_t*        claw5_vt = fc2d_clawpack5_vt_init();
+    fclaw2d_clawpatch_vtable_initialize();
 
-    fclaw2d_init_vtable();
-    fclaw2d_clawpatch_init_vtable_defaults();
+    fc2d_clawpack5_vtable_t*         claw5_vt = fc2d_clawpack5_vt_init();
+
+    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();
+    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
+    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
 
     /* Required functions  - error if NULL*/
     claw5_vt->bc2 = CLAWPACK5_BC2_DEFAULT;
@@ -116,9 +120,6 @@ void fc2d_clawpack5_set_vtable_defaults()
     claw5_vt->is_set = 1;
 }
 
-/* -----------------------------------------------------------
-   Public interface to routines in this file
-   ----------------------------------------------------------- */
 void fc2d_clawpack5_setprob(fclaw2d_global_t *glob)
 {
     if (classic_vt.setprob != NULL)

@@ -92,6 +92,12 @@ void fclaw2d_clawpatch_header_ascii(fclaw2d_global_t* glob, int iframe)
     clawpatch_vt->fort_header_ascii(matname1,matname2,&time,&meqn,&maux,&ngrids);
 }
 
+    /*--------------------------------------------------------------------
+    Public interface
+    Use this function as follows : 
+           fclaw2d_vtable_t *vt = fclaw2d_vt();
+           vt->output_frame = &fclaw2d_clawpatch_output_ascii;
+    -------------------------------------------------------------------- */
 
 void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe)
 {

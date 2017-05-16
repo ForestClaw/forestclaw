@@ -30,16 +30,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_domain.h>
 
+static fclaw2d_patch_vtable_t s_patch_vt;
+
 static
-fclaw2d_patch_vtable_t* patch_vt()
+fclaw2d_patch_vtable_t* patch_vt_init()
 {
-    static fclaw2d_patch_vtable_t s_patch_vt;
+    s_patch_vt.is_set = 0;
     return &s_patch_vt;
 }
 
+static
+fclaw2d_patch_vtable_t* patch_vt()
+{
+    return &s_patch_vt;
+}
+
+/* -----------------------------------------------------------
+   Public interface to routines in this file
+   ----------------------------------------------------------- */
+
 fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
 {
-    return patch_vt();
+    FCLAW_ASSERT(s_patch_vt.is_set != 0);
+    return &s_patch_vt;
+}
+
+void fclaw2d_patch_vtable_initialize()
+{
+    fclaw2d_patch_vtable_t *patch_vt = patch_vt_init();
+    patch_vt->is_set = 1;
+
+    /* Function pointers are set to NULL by default so are not set here */
 }
 
 struct fclaw2d_patch_data

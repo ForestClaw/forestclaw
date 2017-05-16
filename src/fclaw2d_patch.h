@@ -73,6 +73,8 @@ typedef enum
 typedef void (*fclaw2d_patch_iterator_t) (fclaw2d_global_t * glob, int level,
                                           fclaw2d_patch_callback_t pcb, void *user);
 
+typedef struct fclaw2d_patch_vtable fclaw2d_patch_vtable_t;
+
 
 /* Opaque pointer */
 typedef struct fclaw2d_patch_data fclaw2d_patch_data_t;
@@ -427,18 +429,6 @@ typedef void (*fclaw2d_patch_average2coarse_t)(fclaw2d_global_t *glob,
                                                int blockno, int fine_patchno,
                                                int coarse_patchno);
 
-#if 0
-typedef void (*fclaw2d_patch_write_header_t)(fclaw2d_global_t* glob,
-                                             int iframe);
-
-typedef void (*fclaw2d_patch_write_file_t)(fclaw2d_global_t *glob,
-                                           fclaw2d_patch_t *this_patch,
-                                           int this_block_idx,
-                                           int this_patch_idx,
-                                           int iframe,int patch_num,
-                                           int level);
-#endif                                           
-
 typedef void (*fclaw2d_patch_ghost_pack_t)(fclaw2d_global_t *glob,
                                            fclaw2d_patch_t *this_patch,
                                            double *patch_data,
@@ -505,7 +495,15 @@ typedef void (*fclaw2d_patch_save_step_t)(fclaw2d_global_t *glob,
                                           fclaw2d_patch_t* this_patch);
 
 
-typedef struct fclaw2d_patch_vtable
+/* -----------------------------------------------------
+   Patch virtual table
+   ---------------------------------------------------- */
+
+fclaw2d_patch_vtable_t* fclaw2d_patch_vt();
+
+void fclaw2d_patch_vtable_initialize();
+
+struct fclaw2d_patch_vtable
 {
     fclaw2d_patch_new_t                patch_new;
     fclaw2d_patch_delete_t             patch_delete;
@@ -534,12 +532,6 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_average_corner_t      average_corner;
     fclaw2d_patch_interpolate_corner_t  interpolate_corner;
 
-#if 0
-    /* output functions */
-    fclaw2d_patch_write_header_t       write_header;
-    fclaw2d_patch_write_file_t         write_file;
-#endif    
-
     /* Time interpolation */
     fclaw2d_patch_setup_timeinterp_t   setup_timeinterp;
 
@@ -556,17 +548,10 @@ typedef struct fclaw2d_patch_vtable
     fclaw2d_patch_partition_unpack_t     partition_unpack;
     fclaw2d_patch_partition_packsize_t   partition_packsize;
 
-    int defaults_set;
-
-} fclaw2d_patch_vtable_t;
-
-void fclaw2d_set_patch_vtable(fclaw2d_patch_vtable_t user_vt);
-fclaw2d_patch_vtable_t* fclaw2d_patch_vt();
+    int is_set;
+};
 
 
-/* -----------------------------------------------------
-   Ghost exchange
-   ---------------------------------------------------- */
 #ifdef __cplusplus
 #if 0
 {

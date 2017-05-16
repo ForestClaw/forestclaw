@@ -52,6 +52,13 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.5,
                            "[user] Ratio used for squared- and pillow-disk [0.5]");
 
+    sc_options_add_bool (opt, 0, "ascii-out", &user->ascii_out, 0,
+                           "Output ASCII formatted data [F]");
+
+    sc_options_add_bool (opt, 0, "vtk-out", &user->vtk_out, 0,
+                           "Output VTK formatted data [F]");
+
+
     user->is_registered = 1;
     return NULL;
 }
@@ -61,6 +68,7 @@ static fclaw_exit_type_t
 options_check_user (fclaw_app_t * app, void *package, void *registered)
 {
     user_options_t* user = (user_options_t*) package;
+    fclaw_options_t *gparms = fclaw_app_get_attribute(app,"Options",NULL);
 
     if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 0, 1, or 2\n");
@@ -68,7 +76,7 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
     }
     if (user->example == 2)
     {
-        if (user->gparms->mx*pow_int(2,user->gparms->minlevel) < 32)
+        if (gparms->mx*pow_int(2,user->gparms->minlevel) < 32)
         {
             fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel > 32");
             return FCLAW_EXIT_QUIET;
@@ -112,7 +120,8 @@ const user_options_t* filament_user_get_options(fclaw2d_global_t* glob)
 }
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms, user_options_t* user)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms, 
+                                user_options_t* user)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -203,7 +212,7 @@ main (int argc, char **argv)
     /* Options */
     sc_options_t                *options;
     user_options_t              suser, *user = &suser;
-    amr_options_t               *gparms;
+    fclaw_options_t               *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_clawpack46_options_t   *claw46opt;
     fc2d_clawpack5_options_t    *claw5opt;
@@ -238,11 +247,11 @@ main (int argc, char **argv)
     glob = fclaw2d_global_new();
     fclaw2d_global_set_domain(glob, domain);
 
-    fclaw2d_forestclaw_set_options (glob, gparms);
-    fclaw2d_clawpatch_set_options (glob, clawpatchopt);
-    fc2d_clawpack46_set_options (glob, claw46opt);
-    fc2d_clawpack5_set_options (glob, claw5opt);
-    user_set_options (glob, user);
+    fclaw2d_forestclaw_options_store(glob, gparms);
+    fclaw2d_clawpatch_options_store(glob, clawpatchopt);
+    fc2d_clawpack46_options_store(glob, claw46opt);
+    fc2d_clawpack5_options_store(glob, claw5opt);
+    user_options_store(glob, user);
 
     if (!retval & !vexit)
     {

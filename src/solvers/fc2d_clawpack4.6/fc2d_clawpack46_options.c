@@ -180,7 +180,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
 
     clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
     FCLAW_ASSERT(clawpatch_opt->is_registered);
-    
+
     return clawpack46_check(clawopt,clawpatch_opt);    
 }
 
@@ -221,6 +221,7 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
     clawopt = FCLAW_ALLOC (fc2d_clawpack46_options_t, 1);
     fclaw_app_options_register (app, "clawpack46", configfile,
                                 &clawpack46_options_vtable, clawopt);
+    
     fclaw_app_set_attribute(app,"clawpack46",clawopt);
     return clawopt;
 }

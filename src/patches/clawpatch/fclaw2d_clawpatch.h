@@ -44,8 +44,13 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
-void* fclaw2d_clawpatch_new_patch();   /* Called in fclaw2d_patch */
-void fclaw2d_clawpatch_delete_patch(void *cp);
+void fclaw2d_clawpatch_vtable_initialize();
+
+fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
+
+
+void* fclaw2d_clawpatch_new();   /* Called in fclaw2d_patch */
+void fclaw2d_clawpatch_delete(void *cp);
 
 
 void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
@@ -240,8 +245,6 @@ void fclaw2d_clawpatch_ghost_comm(fclaw2d_domain_t* domain,
                                   int packmode);
 #endif
 
-void fclaw2d_clawpatch_init_vtable_defaults();
-
 void fclaw2d_clawpatch_copy_face(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *this_patch,
                                  fclaw2d_patch_t *neighbor_patch,
@@ -388,6 +391,9 @@ void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
                                             void** patch_acc);
 
 
+/* -----------------------------------------------------
+   Patch virtual table
+   ---------------------------------------------------- */
 
 struct fclaw2d_clawpatch_vtable
 {
@@ -411,7 +417,6 @@ struct fclaw2d_clawpatch_vtable
     fclaw2d_patch_callback_t           cb_output_ascii;    
     fclaw2d_fort_output_ascii_t        fort_output_ascii;
 
-
     /* Time interpolation functions */
     fclaw2d_fort_timeinterp_t          fort_timeinterp;
 
@@ -425,10 +430,8 @@ struct fclaw2d_clawpatch_vtable
     fclaw2d_fort_norm_t        fort_compute_error_norm;
     fclaw2d_fort_area_t        fort_compute_patch_area;
 
-    int defaults_set;
+    int is_set;
 };
-
-fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
 #ifdef __cplusplus
 #if 0

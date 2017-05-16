@@ -67,8 +67,10 @@ public :
 
     void* clawpack_patch_data(int id);
 
+#if 0
     static fclaw_app_t* app;
     static fclaw2d_global_t *global;
+#endif    
 
     /* Solution data */
     int meqn;                    /* also in amr_options_t */

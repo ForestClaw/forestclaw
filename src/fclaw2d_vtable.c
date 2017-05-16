@@ -26,18 +26,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_output.h>
 
+static fclaw2d_vtable_t s_vt;
+
+static
+fclaw2d_vtable_t* vt_init()
+{
+    s_vt.is_set = 0;  
+    return &s_vt;
+}
+
+
 fclaw2d_vtable_t* fclaw2d_vt()
 {
-    /* Make this only visible to this function */
-    static fclaw2d_vtable_t s_vt;
+    FCLAW_ASSERT(s_vt.is_set != 0);
     return &s_vt;
 }
 
 /* Initialize any settings that can be set here */
-void fclaw2d_init_vtable()
+void fclaw2d_vtable_initialize()
 {
 
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = vt_init();
 
     /* ------------------------------------------------------------
       Functions below here depend on q and could be solver specific
@@ -66,4 +75,6 @@ void fclaw2d_init_vtable()
     vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
     vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
     vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
+
+    vt->is_set = 1;
 }
