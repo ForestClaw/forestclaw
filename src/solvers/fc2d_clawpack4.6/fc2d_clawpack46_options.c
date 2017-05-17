@@ -29,22 +29,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C"
 {
 #if 0
-}
+}   
 #endif
 #endif
 
-static int s_clawpack46_package_id = -1;
-
-static void fc2d_clawpack46_set_package_id(int id)
-{
-    FCLAW_ASSERT(s_clawpack46_package_id == -1);
-    s_clawpack46_package_id = id;
-}
-
-static int fc2d_clawpack46_get_package_id (void)
-{
-    return s_clawpack46_package_id;
-}
+static int s_clawpack46_options_package_id = -1;
 
 static void*
 clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
@@ -71,10 +60,17 @@ clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
                                  "[clawpack46] Waves limiters (one entry per wave; " \
                                  "values 0-4) [NULL]");
     
-    /* Array of NumFaces many values */
+    /* Array of NumFaces=4 values */
     fclaw_options_add_int_array (opt, 0, "mthbc", &clawopt->mthbc_string, "1 1 1 1",
                                  &clawopt->mthbc, 4,
                                  "[clawpack46] Physical boundary condition type [1 1 1 1]");
+
+    sc_options_add_bool (opt, 0, "ascii-out", &clawopt->ascii_out, 0,
+                           "Output ASCII formatted data [F]");
+
+    sc_options_add_bool (opt, 0, "vtk-out", &clawopt->vtk_out, 0,
+                           "Output VTK formatted data [F]");
+
 
     clawopt->is_registered = 1;
     return NULL;
@@ -228,15 +224,14 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
 
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob)
 {
-    int id = fc2d_clawpack46_get_package_id();
+    int id = s_clawpack46_options_package_id;
     return (fc2d_clawpack46_options_t*) fclaw_package_get_options(glob,id);
 }
 
 void fc2d_clawpack46_options_store (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt)
 {
     int id = fclaw_package_container_add_pkg(glob,clawopt);
-
-    fc2d_clawpack46_set_package_id(id);
+    s_clawpack46_options_package_id = id;
 }
 
 

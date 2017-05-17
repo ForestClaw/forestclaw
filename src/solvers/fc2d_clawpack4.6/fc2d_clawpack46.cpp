@@ -36,7 +36,7 @@ static fc2d_clawpack46_vtable_t classic_vt;
 static
 fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt_init()
 {
-    classic_vt.is_set = 0;
+    FCLAW_ASSERT(classic_vt.is_set == 0);
     return &classic_vt;
 }
 
@@ -60,6 +60,10 @@ void fc2d_clawpack46_vtable_initialize()
 
     fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt_init();
 
+    /* ForestClaw vtable items */
+    fclaw_vt->output_frame   = &fc2d_clawpack46_output;
+    fclaw_vt->problem_setup  = &fc2d_clawpack46_setprob;    
+
     /* Required functions  - error if NULL */
     claw46_vt->bc2 = CLAWPACK46_BC2_DEFAULT;
     claw46_vt->qinit = NULL;
@@ -72,20 +76,13 @@ void fc2d_clawpack46_vtable_initialize()
     claw46_vt->b4step2 = NULL;
     claw46_vt->src2 = NULL;
 
-    /* Default qinit functions */
-    if (fclaw_vt->problem_setup == NULL)
-    {
-        /* This call shouldn't override a version-independent setting
-           for this function */
-        fclaw_vt->problem_setup         = &fc2d_clawpack46_setprob;
-    }
-
+    /* These could be over-written by user specific settings */
     patch_vt->initialize          = &fc2d_clawpack46_qinit;
     patch_vt->setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
     patch_vt->physical_bc         = &fc2d_clawpack46_bc2;
     patch_vt->single_step_update  = &fc2d_clawpack46_update;
 
-    /* Forestclaw functions */
+    /* Clawpatch settings functions */
     clawpatch_vt->fort_average2coarse    = &FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
     clawpatch_vt->fort_interpolate2fine  = &FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE;
 
@@ -96,12 +93,13 @@ void fc2d_clawpack46_vtable_initialize()
     clawpatch_vt->fort_header_ascii        = &FC2D_CLAWPACK46_FORT_HEADER_ASCII;
     clawpatch_vt->fort_output_ascii        = &FC2D_CLAWPACK46_FORT_OUTPUT_ASCII;
 
+    /* Diagnostic functions */
     clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
     clawpatch_vt->fort_compute_error_norm    = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
     clawpatch_vt->fort_compute_patch_area    = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
     clawpatch_vt->fort_conservation_check    = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
 
-    /* Patch functions */
+    /* Ghost cell exchange functions */
     clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK46_FORT_COPY_FACE;
     clawpatch_vt->fort_average_face       = &FC2D_CLAWPACK46_FORT_AVERAGE_FACE;
     clawpatch_vt->fort_interpolate_face   = &FC2D_CLAWPACK46_FORT_INTERPOLATE_FACE;
@@ -457,3 +455,23 @@ double fc2d_clawpack46_update(fclaw2d_global_t *glob,
     }
     return maxcfl;
 }
+
+
+
+void fc2d_clawpack46_output(fclaw2d_global_t *glob, int iframe)
+{
+    const fc2d_clawpack46_options_t* clawpack_options;
+    clawpack_options = fc2d_clawpack46_get_options(glob);
+
+    if (clawpack_options->ascii_out != 0)
+    {
+        fclaw2d_clawpatch_output_ascii(glob,iframe);
+    }
+
+    if (clawpack_options->vtk_out != 0)
+    {
+        fclaw2d_clawpatch_output_vtk(glob,iframe);
+    }
+
+}
+

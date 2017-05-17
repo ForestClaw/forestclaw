@@ -57,6 +57,10 @@ typedef struct fc2d_clawpack46_options
     int src_term;
     int use_fwaves;
 
+    /* Output */
+    int ascii_out;
+    int vtk_out;
+
     int is_registered;
 }
 fc2d_clawpack46_options_t;
@@ -75,6 +79,8 @@ void fc2d_clawpack46_package_register(fclaw_app_t* app,
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob);
 
 void fc2d_clawpack46_options_store (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt);
+
+void fc2d_clawpack46_output(fclaw2d_global_t *glob, int iframe);
 
 
 #ifdef __cplusplus
