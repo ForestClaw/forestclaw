@@ -372,7 +372,7 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
 
     /* Destroy option arrays created in post-process */
     fclaw_destroy (fclaw_opt);
-    FCLAW_FREE(fclaw_opt->gparms);
+    FCLAW_FREE(fclaw_opt);
 }
 
 static const fclaw_app_options_vtable_t options_vtable = {
