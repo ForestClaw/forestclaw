@@ -100,7 +100,7 @@ typedef struct fclaw2d_global_iterate
  */
 //fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain);
 fclaw2d_global_t* fclaw2d_global_new ();
-void fclaw2d_global_set_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain);
+void fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain);
 // void fclaw2d_global_set_gparms (fclaw2d_global_t* glob, fclaw_options_t * gparms);
 
 /** Free a global structures and all members. */

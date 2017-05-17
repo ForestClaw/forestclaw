@@ -57,7 +57,7 @@ fclaw2d_global_t* fclaw2d_global_new ()
     return glob;
 }
 void
-fclaw2d_global_set_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
+fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
 {
     glob->domain = domain;
     glob->mpicomm = domain->mpicomm;
