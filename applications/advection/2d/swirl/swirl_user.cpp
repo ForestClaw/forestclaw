@@ -24,9 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "swirl_user.h"
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-
 
 /* Two versions of Clawpack */
 #include <fc2d_clawpack46.h>
@@ -37,8 +34,6 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
 
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
-
-    vt->output_frame = &swirl_output;
 
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
@@ -69,21 +64,6 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
     SWIRL_SETPROB(&period);
 }
 
-void swirl_output(fclaw2d_global_t *glob, int iframe)
-{
-    const user_options_t* user = swirl_get_options(glob);
-
-    if (user->ascii_out != 0)
-    {
-        fclaw2d_clawpatch_output_ascii(glob,iframe);
-    }
-
-    if (user->vtk_out != 0)
-    {
-        fclaw2d_clawpatch_output_vtk(glob,iframe);
-    }
-
-}
 
 
 

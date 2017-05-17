@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SWIRL_USER_H
 
 #include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
+
 #include "../all/clawpack_user.h"
 
 #ifdef __cplusplus
@@ -40,8 +42,6 @@ extern "C"
 typedef struct user_options
 {
     double period;
-    int ascii_out;
-    int vtk_out;
     int claw_version;
     int is_registered;
 
@@ -58,8 +58,6 @@ void swirl_patch_setup(fclaw2d_domain_t *domain,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
-
-void swirl_output(fclaw2d_global_t *glob, int iframe);
 
 const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
 

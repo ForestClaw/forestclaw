@@ -25,9 +25,7 @@
 
 #include "swirl_user.h"
 
-#include <fclaw2d_forestclaw.h>
-
-static int s_user_package_id = -1;
+static int s_user_options_package_id = -1;
 
 static void *
 user_register (user_options_t *user, sc_options_t * opt)
@@ -39,19 +37,21 @@ user_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                            "Clawpack_version (4 or 5) [5]");
 
-    sc_options_add_bool (opt, 0, "ascii-out", &user->ascii_out, 0,
-                           "Output ASCII formatted data [F]");
-
-    sc_options_add_bool (opt, 0, "vtk-out", &user->vtk_out, 0,
-                           "Output VTK formatted data [F]");
-
     user->is_registered = 1;
 
     return NULL;
 }
 
 static fclaw_exit_type_t
-check_user (user_options_t *user)
+user_postprocess(user_options_t *user)
+{
+    /* nothing to post-process yet ... */
+    return FCLAW_NOEXIT;
+}
+
+
+static fclaw_exit_type_t
+user_check (user_options_t *user)
 {
     /* Nothing to check ? */
     return FCLAW_NOEXIT;
@@ -64,7 +64,7 @@ user_destroy(user_options_t *user)
     return FCLAW_NOEXIT;
 }
 
-/* ------------ Don't need to set anything between here ... ---------- */
+/* ------- Generic option handling routines that call above routines ----- */
 static void*
 options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
@@ -72,11 +72,30 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (opt != NULL);
 
     user = (user_options_t*) package;
 
     return user_register(user,opt);
 }
+
+static fclaw_exit_type_t
+options_postprocess (fclaw_app_t * a, void *package, void *registered)
+{
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* errors from the key-value options would have showed up in parsing */
+    user_options_t *user = (user_options_t *) package;
+
+    /* post-process this package */
+    FCLAW_ASSERT(user->is_registered);
+
+    /* Convert strings to arrays */
+    return user_postprocess (user);
+}
+
 
 static fclaw_exit_type_t
 options_check(fclaw_app_t *app, void *package,void *registered)
@@ -89,7 +108,7 @@ options_check(fclaw_app_t *app, void *package,void *registered)
 
     user = (user_options_t*) package;
 
-    return check_user(user);
+    return user_check(user);
 }
 
 static void
@@ -113,10 +132,12 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register,
-    NULL,
+    options_postprocess,
     options_check,
     options_destroy
 };
+
+/* ------------- User options access functions --------------------- */
 
 static
 user_options_t* user_options_register (fclaw_app_t * app,
@@ -136,16 +157,15 @@ user_options_t* user_options_register (fclaw_app_t * app,
 static 
 void user_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(s_user_package_id == -1);
+    FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_package_id = id;
+    s_user_options_package_id = id;
 }
 
 const user_options_t* swirl_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_package_id;
-    return (user_options_t*) 
-            fclaw_package_get_options(glob, id);    
+    int id = s_user_options_package_id;
+    return (user_options_t*) fclaw_package_get_options(glob, id);    
 }
 /* ------------------------- ... and here ---------------------------- */
 
@@ -184,6 +204,7 @@ void run_program(fclaw2d_global_t* glob)
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtable_initialize();
+    fclaw2d_diagnostics_vtable_initialize();
 
     /* Initialize virtual tables for solvers */
     if (user->claw_version == 4)
