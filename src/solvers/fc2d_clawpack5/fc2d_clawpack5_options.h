@@ -58,6 +58,10 @@ typedef struct fc2d_clawpack5_options
     int src_term;
     int use_fwaves;
 
+    /* Output */
+    int ascii_out;
+    int vtk_out;
+
     int is_registered;
 }
 fc2d_clawpack5_options_t;
@@ -81,6 +85,8 @@ void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
 void fc2d_clawpack5_options_store (fclaw2d_global_t* glob, fc2d_clawpack5_options_t* clawopt);
 
 fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob);
+
+void fc2d_clawpack5_output(fclaw2d_global_t *glob, int iframe);
 
 
 #ifdef __cplusplus

@@ -33,19 +33,7 @@ extern "C"
 #endif
 #endif
 
-static int s_clawpack5_package_id = -1;
-
-void fc2d_clawpack5_set_package_id(int id)
-{
-    FCLAW_ASSERT(s_clawpack5_package_id == -1);
-    s_clawpack5_package_id = id;
-}
-
-int fc2d_clawpack5_get_package_id (void)
-{
-    return s_clawpack5_package_id;
-}
-
+static int s_clawpack5_options_package_id = -1;
 
 static void*
 clawpack5_register (fc2d_clawpack5_options_t* clawopt, sc_options_t * opt)
@@ -75,6 +63,12 @@ clawpack5_register (fc2d_clawpack5_options_t* clawopt, sc_options_t * opt)
     fclaw_options_add_int_array (opt, 0, "mthbc", &clawopt->mthbc_string, "1 1 1 1",
                                  &clawopt->mthbc, 4,
                                  "[clawpack5] Physical boundary condition type [1 1 1 1]");
+
+    sc_options_add_bool (opt, 0, "ascii-out", &clawopt->ascii_out, 0,
+                           "Output ASCII formatted data [F]");
+
+    sc_options_add_bool (opt, 0, "vtk-out", &clawopt->vtk_out, 0,
+                           "Output VTK formatted data [F]");
 
     clawopt->is_registered = 1;
     return NULL;
@@ -217,7 +211,7 @@ static const fclaw_app_options_vtable_t clawpack5_options_vtable = {
    Public interface to clawpack options
    ---------------------------------------------------------- */
 fc2d_clawpack5_options_t*  fc2d_clawpack5_options_register (fclaw_app_t * app,
-                                                              const char *configfile)
+                                                            const char *configfile)
 {
     fc2d_clawpack5_options_t *clawopt;
 
@@ -233,14 +227,14 @@ fc2d_clawpack5_options_t*  fc2d_clawpack5_options_register (fclaw_app_t * app,
 
 fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob)
 {
-    int id = fc2d_clawpack5_get_package_id();
+    int id = s_clawpack5_options_package_id;
     return (fc2d_clawpack5_options_t*) fclaw_package_get_options(glob,id);
 }
 
 void fc2d_clawpack5_options_store (fclaw2d_global_t* glob, fc2d_clawpack5_options_t* clawopt)
 {
     int id = fclaw_package_container_add_pkg(glob,clawopt);
-    fc2d_clawpack5_set_package_id(id);
+    s_clawpack5_options_package_id = id;
 }
 
 

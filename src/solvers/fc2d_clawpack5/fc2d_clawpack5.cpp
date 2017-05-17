@@ -36,7 +36,7 @@ static fc2d_clawpack5_vtable_t classic_vt;
 static
 fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt_init()
 {
-    classic_vt.is_set = 0;
+    FCLAW_ASSERT(classic_vt.is_set == 0);
     return &classic_vt;
 }
 
@@ -55,11 +55,14 @@ void fc2d_clawpack5_vtable_initialize()
 {
     fclaw2d_clawpatch_vtable_initialize();
 
+    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
+    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();
+    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
+
     fc2d_clawpack5_vtable_t*         claw5_vt = fc2d_clawpack5_vt_init();
 
-    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();
-    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
-    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw_vt->output_frame   = &fc2d_clawpack5_output;
+    fclaw_vt->problem_setup  = &fc2d_clawpack5_setprob;    
 
     /* Required functions  - error if NULL*/
     claw5_vt->bc2 = CLAWPACK5_BC2_DEFAULT;
@@ -72,13 +75,6 @@ void fc2d_clawpack5_vtable_initialize()
     claw5_vt->setaux = NULL;
     claw5_vt->b4step2 = NULL;
     claw5_vt->src2 = NULL;
-
-    if (fclaw_vt->problem_setup == NULL)
-    {
-        /* This call shouldn't override a version-independent setting
-           for this function */
-        fclaw_vt->problem_setup        = &fc2d_clawpack5_setprob;
-    }
 
     /* Default patch functions */
     patch_vt->initialize           = &fc2d_clawpack5_qinit;
@@ -447,3 +443,21 @@ double fc2d_clawpack5_update(fclaw2d_global_t *glob,
     }
     return maxcfl;
 }
+
+void fc2d_clawpack5_output(fclaw2d_global_t *glob, int iframe)
+{
+    const fc2d_clawpack5_options_t* clawpack_options;
+    clawpack_options = fc2d_clawpack5_get_options(glob);
+
+    if (clawpack_options->ascii_out != 0)
+    {
+        fclaw2d_clawpatch_output_ascii(glob,iframe);
+    }
+
+    if (clawpack_options->vtk_out != 0)
+    {
+        fclaw2d_clawpatch_output_vtk(glob,iframe);
+    }
+
+}
+
