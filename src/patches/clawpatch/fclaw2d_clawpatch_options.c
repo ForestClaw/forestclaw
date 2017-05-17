@@ -109,7 +109,8 @@ options_register(fclaw_app_t * a, void *optpkg, sc_options_t * opt)
     FCLAW_ASSERT (optpkg != NULL);
     FCLAW_ASSERT (opt != NULL);
 
-    fclaw2d_clawpatch_options_t *clawpatch_opt = (fclaw2d_clawpatch_options_t *) optpkg;
+    fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                                 (fclaw2d_clawpatch_options_t *) optpkg;
 
     return clawpatch_register(clawpatch_opt,opt);
 }
@@ -121,7 +122,8 @@ options_postprocess(fclaw_app_t * a, void *optpkg, void *registered)
     FCLAW_ASSERT (optpkg != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    fclaw2d_clawpatch_options_t *clawpatch_opt = (fclaw2d_clawpatch_options_t *) optpkg;
+    fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                                  (fclaw2d_clawpatch_options_t *) optpkg;
 
     FCLAW_ASSERT (clawpatch_opt->is_registered);
 
@@ -135,7 +137,9 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    fclaw2d_clawpatch_options_t *clawpatch_opt = (fclaw2d_clawpatch_options_t *) package;
+    fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                                (fclaw2d_clawpatch_options_t *) package;
+
     FCLAW_ASSERT(clawpatch_opt->is_registered);
 
     return clawpatch_check (clawpatch_opt);
@@ -148,7 +152,9 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    fclaw2d_clawpatch_options_t *clawpatch_opt = (fclaw2d_clawpatch_options_t*) package;
+    fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                                 (fclaw2d_clawpatch_options_t*) package;
+
     FCLAW_ASSERT (clawpatch_opt->is_registered);
 
     /* Destroy option arrays created in post-process */
@@ -189,8 +195,9 @@ fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile)
     return clawpatch_options;
 }
 
-void fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob, 
-                                      fclaw2d_clawpatch_options_t* clawpatch_options)
+void 
+fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob, 
+                                 fclaw2d_clawpatch_options_t* clawpatch_options)
 {
     int id;
 
@@ -200,7 +207,8 @@ void fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob,
     s_clawpatch_options_package_id = id;
 }
 
-fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob)
+fclaw2d_clawpatch_options_t* 
+fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob)
 {
     FCLAW_ASSERT(s_clawpatch_options_package_id != -1);
     return (fclaw2d_clawpatch_options_t*) 

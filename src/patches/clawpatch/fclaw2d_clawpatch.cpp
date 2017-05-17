@@ -37,7 +37,7 @@ static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
 {
-    s_clawpatch_vt.is_set = 0;
+    FCLAW_ASSERT(s_clawpatch_vt.is_set == 0);
     return &s_clawpatch_vt;
 }
 
@@ -262,7 +262,6 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
        everything correctly;  it isn't needed for memory
        allocation */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     int mx = clawpatch_opt->mx;
