@@ -35,7 +35,7 @@ main (int argc, char **argv)
   MPI_Comm		mpicomm;
   sc_options_t          *options;
   fclaw2d_domain_t	*domain;
-  amr_options_t         samr_options, *gparms = &samr_options;
+  fclaw_options_t         samr_options, *gparms = &samr_options;
 
   lp = SC_LP_PRODUCTION;
   mpicomm = MPI_COMM_WORLD;

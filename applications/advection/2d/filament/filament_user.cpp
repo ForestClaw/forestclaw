@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void filament_link_solvers(fclaw2d_global_t *glob)
 {
     const user_options_t* user = filament_user_get_options(glob);
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
     
     if (user->claw_version == 4)
     {

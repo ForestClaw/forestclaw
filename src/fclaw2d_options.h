@@ -43,9 +43,9 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_options_store (struct fclaw2d_global *glob, amr_options_t* gparms);
+void fclaw2d_options_store (struct fclaw2d_global *glob, fclaw_options_t* gparms);
 
-amr_options_t* fclaw2d_get_options(struct fclaw2d_global *glob);
+fclaw_options_t* fclaw2d_get_options(struct fclaw2d_global *glob);
 
 
 #ifdef __cplusplus

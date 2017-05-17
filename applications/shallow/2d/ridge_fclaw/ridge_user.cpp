@@ -96,7 +96,7 @@ void ridge_patch_setup(fclaw2d_domain_t *domain,
 
     /* --------------------------------------------------------------------- */
     // Get any global parameters that we might need :
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
 
     int mx = gparms->mx;
     int my = gparms->my;
@@ -188,7 +188,7 @@ double ridge_patch_single_step_update(fclaw2d_domain_t *domain,
 
 void ridge_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
@@ -213,7 +213,7 @@ void ridge_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
 
     /* ----------------------------------------------------------- */
     // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -258,7 +258,7 @@ fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -300,7 +300,7 @@ fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
 
     /* ----------------------------------------------------------- */
     // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -339,7 +339,7 @@ void ridge_interpolate2fine(fclaw2d_domain_t* domain, fclaw2d_patch_t *coarse_pa
                                 int fine_patchno, int igrid)
 
 {
-    const amr_options_t* gparms = get_domain_parms(domain);
+    const fclaw_options_t* gparms = get_domain_parms(domain);
 
     int mx = gparms->mx;
     int my = gparms->my;

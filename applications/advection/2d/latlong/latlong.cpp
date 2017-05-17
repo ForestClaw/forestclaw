@@ -127,7 +127,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    amr_options_t   *gparms;
+    fclaw_options_t   *gparms;
     user_options_t  *user;
 
     /* Used locally */

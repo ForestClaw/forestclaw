@@ -32,7 +32,7 @@ static int s_fclaw2d_options_package_id = -1;
    Public interface to ForestClaw options
    --------------------------------------------------------- */
 
-void fclaw2d_options_store (fclaw2d_global_t *glob, amr_options_t* gparms)
+void fclaw2d_options_store (fclaw2d_global_t *glob, fclaw_options_t* gparms)
 {
     int id;
 
@@ -41,9 +41,9 @@ void fclaw2d_options_store (fclaw2d_global_t *glob, amr_options_t* gparms)
     s_fclaw2d_options_package_id = id;
 }
 
-amr_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
+fclaw_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
 {
-    amr_options_t *gp = (amr_options_t*) 
+    fclaw_options_t *gp = (fclaw_options_t*) 
             fclaw_package_get_options(glob, s_fclaw2d_options_package_id);
     return gp;
 }

@@ -82,7 +82,7 @@ double no_solver_update(fclaw2d_domain_t *domain,
                         double t,
                         double dt)
 {
-    const amr_options_t *gparms;
+    const fclaw_options_t *gparms;
     gparms = fclaw2d_forestclaw_get_options(domain);
 
     /* This is needed to avoid a floating point errror */

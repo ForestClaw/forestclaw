@@ -176,7 +176,7 @@ void fc2d_geoclaw_aux_data(fclaw2d_global_t* glob,
 
 void fc2d_geoclaw_setup(fclaw2d_global_t *glob)
 {
-    const amr_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     const fc2d_geoclaw_options_t *geoclaw_options = fc2d_geoclaw_get_options(glob);
 
@@ -192,7 +192,7 @@ void fc2d_geoclaw_gauge_initialize(fclaw2d_global_t* glob, void** acc)
     gauge_acc = FCLAW_ALLOC(fc2d_geoclaw_gauge_acc_t,1);
     *acc = gauge_acc;
 
-    const amr_options_t * gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw_options_t * gparms = fclaw2d_forestclaw_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     /* --------------------------------------------------------
@@ -753,7 +753,7 @@ int fc2d_geoclaw_patch_tag4refinement(fclaw2d_global_t *glob,
     double *q, *aux;
     int tag_patch;
     int level,maxlevel;
-    const amr_options_t * gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw_options_t * gparms = fclaw2d_forestclaw_get_options(glob);
     const fc2d_geoclaw_options_t* geoclaw_options;
 
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
@@ -783,7 +783,7 @@ int fc2d_geoclaw_patch_tag4coarsening(fclaw2d_global_t *glob,
                                       int blockno, int patchno)
 
 {
-    const amr_options_t *amropt;
+    const fclaw_options_t *amropt;
     fc2d_geoclaw_options_t* geoclaw_options;
 
     int mx,my,mbc,meqn,maux,mbathy;
@@ -839,7 +839,7 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_global_t *glob,
     // double *xp,*yp,*zp,*xd,*yd,*zd;
     int igrid;
 
-    const amr_options_t* gparms;
+    const fclaw_options_t* gparms;
     const fc2d_geoclaw_options_t*  geoclaw_options;
     const fclaw2d_clawpatch_options_t *clawpatch_opt;
     fclaw2d_patch_t* fine_patch;
@@ -898,7 +898,7 @@ void fc2d_geoclaw_average2coarse(fclaw2d_global_t *glob,
     // double *xp,*yp,*zp,*xd,*yd,*zd;
     int igrid,mcapa;
 
-    const amr_options_t* gparms;
+    const fclaw_options_t* gparms;
     const fc2d_geoclaw_options_t*  geoclaw_options;
     const fclaw2d_clawpatch_options_t *clawpatch_opt;
 
@@ -959,7 +959,7 @@ void fc2d_geoclaw_average_face(fclaw2d_global_t *glob,
     double *qcoarse, *qfine;
     double *auxcoarse, *auxfine;
     
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     const fc2d_geoclaw_options_t *geoclaw_options;
     const fclaw2d_clawpatch_options_t *clawpatch_opt;
 
@@ -1040,7 +1040,7 @@ void fc2d_geoclaw_average_corner(fclaw2d_global_t *glob,
     double *qcoarse, *qfine;
     double *auxcoarse, *auxfine;
     
-    const amr_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_forestclaw_get_options(glob);
     const fc2d_geoclaw_options_t *geoclaw_options;
     const fclaw2d_clawpatch_options_t *clawpatch_opt;
 

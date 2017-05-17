@@ -84,7 +84,7 @@ void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
 
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms, user_options_t* user)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms, user_options_t* user)
 {
 
     /* Mapped, multi-block domain */
@@ -157,7 +157,7 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    amr_options_t               *gparms;
+    fclaw_options_t               *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_geoclaw_options_t      *geoclawopt;
     user_options_t              suser, *user = &suser;

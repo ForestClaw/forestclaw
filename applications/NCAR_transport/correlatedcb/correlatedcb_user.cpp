@@ -78,7 +78,7 @@ void correlatedcb_link_solvers(fclaw2d_domain_t *domain)
 void correlatedcb_problem_setup(fclaw2d_domain_t* domain)
 {
     const user_options_t* user = correlatedcb_user_get_options(domain);
-    const amr_options_t* gparms = get_domain_parms(domain);
+    const fclaw_options_t* gparms = get_domain_parms(domain);
     CORRELATEDCB_SETPROB(&user->kappa, &gparms->tfinal);
 }
 

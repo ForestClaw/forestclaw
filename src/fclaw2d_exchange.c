@@ -66,7 +66,7 @@ static
 void build_remote_ghost_patches(fclaw2d_global_t* glob)
 {
     fclaw2d_domain_t *domain = glob->domain;
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     fclaw_infof("[%d] Number of ghost patches : %d\n",
                             domain->mpirank,domain->num_ghost_patches);

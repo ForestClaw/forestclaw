@@ -162,9 +162,9 @@ void fclaw2d_domain_set_app(fclaw2d_domain_t* domain,fclaw_app_t* app)
     FCLAW_ASSERT(app != NULL);
     fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
 }
-const amr_options_t* fclaw2d_get_options(fclaw2d_domain_t *domain)
+const fclaw_options_t* fclaw2d_get_options(fclaw2d_domain_t *domain)
 {
-    const amr_options_t *gparms;
+    const fclaw_options_t *gparms;
     fclaw_app_t *app;
 
     app = fclaw2d_domain_get_app(domain);
@@ -181,7 +181,7 @@ void* fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain)
     return fclaw_app_get_user(app);
 }
 
-const amr_options_t* get_domain_parms(fclaw2d_domain_t *domain)
+const fclaw_options_t* get_domain_parms(fclaw2d_domain_t *domain)
 {
     return fclaw2d_get_options(domain);
 }

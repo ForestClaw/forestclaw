@@ -91,7 +91,7 @@ const user_options_t* annulus_user_get_options(fclaw2d_global_t* glob)
 }
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms, user_options_t* user)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms, user_options_t* user)
 {
     /* Used locally */
     double pi = M_PI;
@@ -164,7 +164,7 @@ main (int argc, char **argv)
     /* Options */
     sc_options_t                *options;
     user_options_t              suser, *user = &suser;
-    amr_options_t               *gparms;
+    fclaw_options_t               *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_clawpack46_options_t   *claw46opt;
     fc2d_clawpack5_options_t    *claw5opt;

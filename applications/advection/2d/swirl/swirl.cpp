@@ -172,7 +172,7 @@ const user_options_t* swirl_get_options(fclaw2d_global_t* glob)
 
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -236,7 +236,7 @@ main (int argc, char **argv)
     /* Options */
     sc_options_t                *options;
     user_options_t              *user;
-    amr_options_t               *gparms;
+    fclaw_options_t               *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_clawpack46_options_t   *claw46opt;
     fc2d_clawpack5_options_t    *claw5opt;

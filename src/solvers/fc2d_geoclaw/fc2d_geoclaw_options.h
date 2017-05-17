@@ -83,7 +83,7 @@ typedef struct fc2d_geoclaw_options
     /* ghost patch */
     int ghost_patch_pack_aux;
 
-    amr_options_t* gparms;
+    fclaw_options_t* gparms;
 }
 fc2d_geoclaw_options_t;
 

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void fclaw2d_finalize(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     fclaw_global_essentialf("Finalizing run\n");
 

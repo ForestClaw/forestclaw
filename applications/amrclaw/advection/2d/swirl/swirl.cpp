@@ -91,7 +91,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	       *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    amr_options_t            *gparms;
+    fclaw_options_t            *gparms;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 

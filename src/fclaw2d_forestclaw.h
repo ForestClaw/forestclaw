@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Don't include fclaw2d_patch.H, since it requires C++ linkage */
 
 /* Basic header files that are probably required by all apps */
+#include <fclaw2d_options.h>
 #include "fclaw2d_vtable.h"
 
 /* Mapping interface - needed even if 'nomap' is used.  */

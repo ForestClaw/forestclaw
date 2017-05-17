@@ -46,14 +46,10 @@ extern "C"
 struct fclaw2d_global;  /* Avoid circular dependency */
 
 
-/* Plan is to replace amr_options_t with fclaw_options_t */
-typedef struct amr_options amr_options_t;
+/* Plan is to replace fclaw_options_t with fclaw_options_t */
+typedef struct fclaw_options fclaw_options_t;
 
-void fclaw2d_options_store (struct fclaw2d_global *glob, amr_options_t* gparms);
-
-amr_options_t* fclaw2d_get_options(struct fclaw2d_global *glob);
-
-amr_options_t* fclaw_options_register (fclaw_app_t * a,
+fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
                                        const char *configfile);
 
 
@@ -104,10 +100,10 @@ void fclaw_options_convert_double_array (const char *array_string,
 void fclaw_options_destroy_array(void* array);
 
 
-/* Plan is to replace amr_options_t with fclaw_options_t.
+/* Plan is to replace fclaw_options_t with fclaw_options_t.
    Maybe use a macro as an intermediate step? */
 
-struct amr_options
+struct fclaw_options
 {
     int dim;
 

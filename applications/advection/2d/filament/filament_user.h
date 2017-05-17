@@ -46,8 +46,9 @@ typedef struct user_options
     double alpha;
     int claw_version;
 
-    amr_options_t* gparms;   /* Need to check mx */
-
+    int ascii-out;
+    int vtk-out;
+    
     int is_registered;
 
 } user_options_t;

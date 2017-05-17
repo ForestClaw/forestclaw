@@ -112,10 +112,10 @@ fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
 
 #if 0
 /* Options */
-const amr_options_t*
+const fclaw_options_t*
 fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain);
 
-const amr_options_t*
+const fclaw_options_t*
 get_domain_parms(fclaw2d_domain_t *domain);
 #endif
 

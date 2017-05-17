@@ -573,7 +573,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
                                   int this_block_idx, int this_patch_idx,
                                   char *a)
 {
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_map_context_t *cont;
 
     int mx,my,mbc;
@@ -662,7 +662,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
 void
 fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 {
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
@@ -680,7 +680,7 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 
 void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
 {
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
 

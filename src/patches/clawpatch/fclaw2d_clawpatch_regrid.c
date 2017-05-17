@@ -32,7 +32,7 @@ int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
                                      int blockno, int patchno,
                                      int initflag)
 {
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
@@ -59,7 +59,7 @@ int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
                                      int blockno,
                                      int patchno)
 {
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
@@ -104,7 +104,7 @@ void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t* glob,
     double *xp,*yp,*zp,*xd,*yd,*zd;
     int igrid;
 
-    const amr_options_t* gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     fclaw2d_patch_t* fine_patch;
@@ -149,7 +149,7 @@ void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
                                       int coarse_patchno)
 
 {
-    const amr_options_t* gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     
     int mx,my, mbc, meqn;

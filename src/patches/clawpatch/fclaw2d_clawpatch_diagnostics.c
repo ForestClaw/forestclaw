@@ -100,7 +100,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
 
     error_info_t *error_data = (error_info_t*) s->user;//patch_acc;
-    const amr_options_t *gparms = fclaw2d_get_options(s->glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -141,7 +141,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
 void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc)
 {
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     int check = gparms->compute_error || gparms->conservation_check;
     if (!check) return;
     fclaw2d_global_iterate_patches(glob, cb_compute_diagnostics, patch_acc);
@@ -156,7 +156,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     fclaw2d_domain_t *domain = glob->domain;
     
     error_info_t *error_data = (error_info_t*) patch_acc;
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     
     int meqn;

@@ -38,7 +38,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
                                       void *user)
 {
     int refine_patch, maxlevel, level;
-    const amr_options_t* gparms;
+    const fclaw_options_t* gparms;
 
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
     int domain_init = *((int*) g->user);
@@ -67,7 +67,7 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                               int blockno, int fine0_patchno,
                               void *user)
 {
-    const amr_options_t* gparms;
+    const fclaw_options_t* gparms;
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
     gparms = fclaw2d_get_options(g->glob);

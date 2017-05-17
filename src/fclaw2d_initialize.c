@@ -69,7 +69,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
     int time_interp = 0;
     char basename[BUFSIZ];
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
 
