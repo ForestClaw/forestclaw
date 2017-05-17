@@ -29,17 +29,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static fclaw2d_diagnostics_vtable_t s_diag_vt;
 
 static
-fclaw2d_diagnostics_vtable_t* diagnostics_vt()
+fclaw2d_diagnostics_vtable_t* diagnostics_vt_init()
 {
+    FCLAW_ASSERT(s_diag_vt.is_set == 0);  /* static storage --> is_set == 0 by default */
     return &s_diag_vt;
 }
+
+
+static
+fclaw2d_diagnostics_vtable_t* diagnostics_vt()
+{
+    FCLAW_ASSERT(s_diag_vt.is_set != 0);
+    return &s_diag_vt;
+}
+
+/* ---------------------------------------------------
+    Public interface
+    ------------------------------------------------ */
 
 fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt()
 {
     return diagnostics_vt();
 }
-
-
 
 /* global_maximum is in forestclaw2d.c */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
@@ -51,32 +62,6 @@ double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
     return -maxvalue;
 }
 
-void fclaw2d_diagnostics_vtable_init()
-{
-
-    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
-
-    /* Patch diagnostics (conservation; errors) */
-    diag_vt->patch_init_diagnostics       = NULL;  /* allocate memory; set accumulators to 0 */
-    diag_vt->patch_compute_diagnostics    = NULL;  /* Update local accumulators */
-    diag_vt->patch_gather_diagnostics     = NULL;  /* Gather accumulators from procs; report */
-    diag_vt->patch_reset_diagnostics      = NULL;  /* Reset accumulators (e.g. to 0) */
-    diag_vt->patch_finalize_diagnostics   = NULL;  /* De-allocate memory */
-
-    /* Solver diagnostics (gauges, fixed-grids (fgmax) */
-    diag_vt->solver_init_diagnostics      = NULL;
-    diag_vt->solver_compute_diagnostics    = NULL;
-    diag_vt->solver_gather_diagnostics    = NULL;
-    diag_vt->solver_reset_diagnostics     = NULL;
-    diag_vt->solver_finalize_diagnostics  = NULL;
-
-    /* User defined diagnostics (either patch based or otherwise) */
-    diag_vt->user_init_diagnostics       = NULL;
-    diag_vt->user_compute_diagnostics    = NULL;
-    diag_vt->user_gather_diagnostics     = NULL;
-    diag_vt->user_reset_diagnostics      = NULL;
-    diag_vt->user_finalize_diagnostics   = NULL;
-}
 
 
 /* -----------------------------------------------------------------
@@ -85,34 +70,24 @@ void fclaw2d_diagnostics_vtable_init()
    Note that the check for whether the user has specified diagnostics
    to run is done here, not in fclaw2d_run.cpp
    ---------------------------------------------------------------- */
-#if 0
-static
-int run_diagnostics(fclaw2d_global_t* glob)
+void fclaw2d_diagnostics_vtable_initialize()
 {
-    /* Check to see if we should be running any diagnostics */
-    const amr_options_t *gparms = fclaw2d_get_options(glob);
 
-    int run_diag = gparms->conservation_check ||
-                   gparms->run_user_diagnostics ||
-                   gparms->compute_error;
-    return run_diag;
+    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt_init();
 
+    /* Function pointers all set to zero, since diag_vt has static storage */
+
+    diag_vt->is_set = 1;
 }
-#endif
 
 
 void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
+
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const amr_options_t *gparms = fclaw2d_get_options(glob);
-#if 0
-    int run_diag = run_diagnostics(glob);
-    if (!run_diag)
-    {
-        return;
-    }
-#endif
+
     /* Return an error accumulator */
     if (diag_vt->patch_init_diagnostics != NULL)
     {
@@ -129,6 +104,7 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
     {
         diag_vt->user_init_diagnostics(glob,&acc->user_accumulator);
     }
+
 }
 
 
@@ -139,14 +115,6 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const amr_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
-
-#if 0
-    int run_diag = run_diagnostics(glob);
-    if (!run_diag)
-    {
-        return;
-    }
-#endif
 
     /* -----------------------------------------------------
        Compute diagnostics on all local patches
@@ -202,13 +170,6 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const amr_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
-#if 0
-    int run_diag = run_diagnostics(glob);
-    if (!run_diag)
-    {
-        return;
-    }
-#endif
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
@@ -234,13 +195,6 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const amr_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
-#if 0
-    int run_diag = run_diagnostics(glob);
-    if (!run_diag)
-    {
-        return;
-    }
-#endif
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 

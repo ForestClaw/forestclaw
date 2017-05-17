@@ -31,7 +31,7 @@ static fclaw2d_vtable_t s_vt;
 static
 fclaw2d_vtable_t* vt_init()
 {
-    s_vt.is_set = 0;  
+    FCLAW_ASSERT(s_vt.is_set == 0);
     return &s_vt;
 }
 

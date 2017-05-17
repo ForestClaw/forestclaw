@@ -90,9 +90,10 @@ struct fclaw2d_diagnostics_vtable
     fclaw2d_diagnostics_reset_t          user_reset_diagnostics;
     fclaw2d_diagnostics_finalize_t       user_finalize_diagnostics;
 
+    int is_set;
 };
 
-void fclaw2d_diagnostics_vtable_init();
+void fclaw2d_diagnostics_vtable_initialize();
 
 /* See forestclaw2d.h for the maximum version of this function */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
