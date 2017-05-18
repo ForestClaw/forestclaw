@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_GEOCLAW_OPTIONS_H
 
 #include <fclaw_options.h>
-#include <fclaw2d_base.h>
+#include <fclaw_base.h>
 #include <fclaw2d_clawpatch_options.h>
 
 #ifdef __cplusplus
@@ -79,21 +79,20 @@ typedef struct fc2d_geoclaw_options
     double *speed_tolerance_c;
     const char *speed_tolerance_c_string;
 
+    int ascii_out;  /* Only one type of output now  */    
 
-    /* ghost patch */
-    int ghost_patch_pack_aux;
-
-    fclaw_options_t* gparms;
-}
-fc2d_geoclaw_options_t;
-
-fclaw_exit_type_t fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t *
-                                               clawopt);
-fclaw_exit_type_t fc2d_geoclaw_check (fc2d_geoclaw_options_t * clawopt);
-void fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt);
+    int is_registered;
+} fc2d_geoclaw_options_t;
 
 fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t * app,
                                                        const char *configfile);
+
+void fc2d_geoclaw_options_store (fclaw2d_global_t* glob, 
+                               fc2d_geoclaw_options_t* geo_opt);
+
+fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_global_t *glob);
+
+
 
 #ifdef __cplusplus
 #if 0

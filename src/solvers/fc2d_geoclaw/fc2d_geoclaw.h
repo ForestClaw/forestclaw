@@ -118,6 +118,8 @@ typedef struct fc2d_geoclaw_vtable
     fc2d_geoclaw_rpn2_t rpn2;
     fc2d_geoclaw_rpt2_t rpt2;
     fc2d_geoclaw_fluxfun_t fluxfun;
+
+    int is_set;
 } fc2d_geoclaw_vtable_t;
 
 #if 0
@@ -129,10 +131,7 @@ void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *doamin,
                               fc2d_geoclaw_vtable_t* geoclaw_vt);
 #endif
 
-void fc2d_geoclaw_init_vtables();
-
-void fc2d_geoclaw_set_vtables(fclaw2d_domain_t *doamin,
-                              fclaw2d_vtable_t *vt);
+void fc2d_geoclaw_vtable_initialize();
 
 fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt();
 
@@ -468,8 +467,8 @@ void
                         int this_patch_idx,
                         double t,
                         double dt,
-                        fclaw_bool intersects_bc[],
-                        fclaw_bool time_interp);
+                        int intersects_bc[],
+                        int time_interp);
 
 void
     fc2d_geoclaw_src2(fclaw2d_global_t *glob,
@@ -543,7 +542,7 @@ void fc2d_geoclaw_average_face(fclaw2d_global_t *glob,
                                     int iface_coarse,
                                     int p4est_refineFactor,
                                     int refratio,
-                                    fclaw_bool time_interp,
+                                    int time_interp,
                                     int igrid,
                                     fclaw2d_transform_data_t* transform_data);
 
@@ -554,7 +553,7 @@ void fc2d_geoclaw_interpolate_face(fclaw2d_global_t *glob,
                                         int iside,
                                         int p4est_refineFactor,
                                         int refratio,
-                                        fclaw_bool time_interp,
+                                        int time_interp,
                                         int igrid,
                                         fclaw2d_transform_data_t* transform_data);
 
@@ -563,7 +562,7 @@ void fc2d_geoclaw_average_corner(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *fine_patch,
                                  int coarse_corner,
                                  int refratio,
-                                 fclaw_bool time_interp,
+                                 int time_interp,
                                  fclaw2d_transform_data_t* transform_data);
 
 void fc2d_geoclaw_interpolate_corner(fclaw2d_global_t *glob,
@@ -571,7 +570,7 @@ void fc2d_geoclaw_interpolate_corner(fclaw2d_global_t *glob,
                                      fclaw2d_patch_t* fine_patch,
                                      int coarse_corner,
                                      int refratio,
-                                     fclaw_bool time_interp,
+                                     int time_interp,
                                      fclaw2d_transform_data_t* transform_data);
 
 void  fc2d_geoclaw_ghostpack_aux(fclaw2d_global_t *glob,
@@ -590,6 +589,9 @@ void fc2d_geoclaw_finalize(fclaw2d_global_t *glob);
 void fc2d_geoclaw_gauge_initialize(fclaw2d_global_t *glob, void** acc);
 void fc2d_geoclaw_gauge_update(fclaw2d_global_t *glob, void* solver_acc);
 void fc2d_geoclaw_gauge_finalize(fclaw2d_global_t *glob, void** acc);
+
+void fc2d_geoclaw_output_ascii(fclaw2d_global_t* glob,int iframe);
+void fc2d_geoclaw_output(fclaw2d_global_t *glob, int iframe);
 
 
 #ifdef __cplusplus
