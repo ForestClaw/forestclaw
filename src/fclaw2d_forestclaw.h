@@ -26,28 +26,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_FORESTCLAW_H
 #define FCLAW2D_FORESTCLAW_H
 
-/* This file should come first to retrieve configure-time information */
-#include <fclaw_config.h>
 #include <fclaw_forestclaw.h>
 
-/* Use as an alternate to GNU feenableexcept */
-#ifndef FCLAW_HAVE_FEENABLEEXCEPT
-#include <fp_exception_glibc_extension.h>
-#endif
-
-#include <fenv.h>
-#include <signal.h>
-
-#ifdef FCLAW_HAVE_UNISTD_H
-#include <unistd.h>    /* To get process ids */
-#endif
-
 /* Basic objects */
+#include "fclaw2d_global.h"
+
+
 #include "forestclaw2d.h"
 #include "fclaw2d_domain.h"
 #include "fclaw2d_block.h"
 #include "fclaw2d_patch.h"
-#include "fclaw2d_global.h"
 
 
 /* Basic header files that are probably required by all apps */

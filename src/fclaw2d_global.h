@@ -26,11 +26,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_GLOBAL_H
 #define FCLAW2D_GLOBAL_H
 
-#include <forestclaw2d.h>
 #include <fclaw_options.h>
 #include <fclaw_package.h>
 #include <fclaw_timer.h>
 #include <fclaw2d_map.h>
+
+#include <forestclaw2d.h>
 #include <fclaw2d_diagnostics.h>
 
 #ifdef __cplusplus
@@ -98,19 +99,12 @@ typedef struct fclaw2d_global_iterate
  * \param [in] gparms           If not NULL, we borrow this gparms pointer.
  *                              If NULL, we allocate gparms ourselves.
  */
-//fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms, fclaw2d_domain_t* domain);
-fclaw2d_global_t* fclaw2d_global_new ();
-void fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain);
-// void fclaw2d_global_set_gparms (fclaw2d_global_t* glob, fclaw_options_t * gparms);
 
-/** Free a global structures and all members. */
+fclaw2d_global_t* fclaw2d_global_new ();
+
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 
-/** Access the package container from the global type. */
-fclaw_package_container_t* fclaw2d_global_get_container (fclaw2d_global_t *
-                                                                glob);
-
-fclaw_app_t* fclaw2d_global_get_app(fclaw2d_global_t* glob);
+void fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain);
 
 void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);

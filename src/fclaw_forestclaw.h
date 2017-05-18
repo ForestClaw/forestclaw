@@ -49,24 +49,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Misc */
 #include "fclaw_math.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
-/* Nothing to include ... */
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
-}
-#endif
-
-
-/* Note: either we make this a C .h file, or we remove the extern "C". */
-
 #endif
