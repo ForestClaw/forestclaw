@@ -32,8 +32,12 @@
 static int s_user_package_id = -1;
 
 static void *
-options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+bowl_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
+    FCLAW_ASSERT(app != 0);
+    FCLAW_ASSERT(package != 0);
+    FCLAW_ASSERT(opt != 0);
+
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
@@ -41,12 +45,17 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
                         "[user] 0 = nomap; 1 = brick [0]");
 
     user->is_registered = 1;
+
     return NULL;
 }
 
 static fclaw_exit_type_t
-options_check_user (fclaw_app_t * app, void *package, void *registered)
+bowl_check (fclaw_app_t * app, void *package, void *registered)
 {
+    FCLAW_ASSERT(app != 0);
+    FCLAW_ASSERT(package != 0);
+    FCLAW_ASSERT(registered == 0);
+
     user_options_t* user = (user_options_t*) package;
     if (user->example < 0 || user->example > 1)
     {
@@ -58,14 +67,14 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
 
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
-    options_register_user,
+    bowl_register,
     NULL,
-    options_check_user,
+    bowl_check,
     NULL
 };
 
 static
-void register_user_options (fclaw_app_t * app,
+void bowl_register_options (fclaw_app_t * app,
                             const char *configfile,
                             user_options_t* user)
 {
@@ -75,7 +84,7 @@ void register_user_options (fclaw_app_t * app,
 }
 
 static 
-void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
+void bowl_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
@@ -84,7 +93,9 @@ void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
 
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms, user_options_t* user)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+                                fclaw_options_t* gparms, 
+                                user_options_t* user)
 {
 
     /* Mapped, multi-block domain */
@@ -134,7 +145,12 @@ void run_program(fclaw2d_global_t* glob)
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(*domain);
-    fc2d_geoclaw_init_vtables();
+
+    fclaw2d_vtable_initialize();
+    fclaw2d_diagnostics_vtable_initialize();
+
+    fc2d_geoclaw_vtable_initialize();
+
     bowl_link_solvers(glob);
 
     /* ---------------------------------------------------------------
@@ -157,7 +173,7 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    fclaw_options_t               *gparms;
+    fclaw_options_t              *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_geoclaw_options_t      *geoclawopt;
     user_options_t              suser, *user = &suser;
@@ -170,11 +186,12 @@ main (int argc, char **argv)
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
-    gparms = fclaw2d_forestclaw_options_register(app,"fclaw_options.ini");
+    gparms = fclaw_options_register(app,"fclaw_options.ini");
     clawpatchopt = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
     geoclawopt = fc2d_geoclaw_options_register(app, "fclaw_options.ini");
+
     /* User options */
-    register_user_options(app,"fclaw_options.ini",user);
+    bowl_register_options(app,"fclaw_options.ini",user);
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -185,12 +202,12 @@ main (int argc, char **argv)
     domain = create_domain(mpicomm, gparms, user);
     
     glob = fclaw2d_global_new();
-    fclaw2d_global_set_domain(glob, domain);
+    fclaw2d_global_store_domain(glob, domain);
 
-    fclaw2d_forestclaw_set_options (glob, gparms);
-    fclaw2d_clawpatch_set_options (glob, clawpatchopt);
-    fc2d_geoclaw_set_options (glob, geoclawopt);
-    user_set_options (glob, user);
+    fclaw2d_options_store (glob, gparms);
+    fclaw2d_clawpatch_options_store (glob, clawpatchopt);
+    fc2d_geoclaw_options_store (glob, geoclawopt);
+    bowl_options_store (glob, user);
 
     /* Run the program */
 

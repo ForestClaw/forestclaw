@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_geoclaw.h>
 
 
-// static fclaw2d_vtable_t vt;
-// static fc2d_geoclaw_vtable_t geoclaw;
-
 void bowl_link_solvers(fclaw2d_global_t *glob)
 {
 
