@@ -50,6 +50,7 @@ fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
 
 void* fclaw2d_clawpatch_new();   /* Called in fclaw2d_patch */
+
 void fclaw2d_clawpatch_delete(void *cp);
 
 
@@ -95,7 +96,7 @@ size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob);
 
 void fclaw2d_clawpatch_timesync_data(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* this_patch,
-                                     fclaw_bool time_interp,
+                                     int time_interp,
                                      double **q, int* meqn);
 
 double* fclaw2d_clawpatch_get_q_timesync(fclaw2d_global_t* glob,
@@ -222,7 +223,7 @@ size_t fclaw2d_clawpatch_ghost_packsize(fclaw2d_global_t* glob);
 void fclaw2d_clawpatch_ghost_unpack(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* this_patch,
                                     int this_block_idx, int this_patch_idx,
-                                    double *qdata, fclaw_bool time_interp);
+                                    double *qdata, int time_interp);
 
 
 void fclaw2d_clawpatch_ghost_pack(fclaw2d_global_t *glob,
@@ -259,7 +260,7 @@ void fclaw2d_clawpatch_average_face(fclaw2d_global_t *glob,
                                     int iface_coarse,
                                     int p4est_refineFactor,
                                     int refratio,
-                                    fclaw_bool time_interp,
+                                    int time_interp,
                                     int igrid,
                                     fclaw2d_transform_data_t* transform_data);
 
@@ -270,7 +271,7 @@ void fclaw2d_clawpatch_interpolate_face(fclaw2d_global_t *glob,
                                         int iside,
                                         int p4est_refineFactor,
                                         int refratio,
-                                        fclaw_bool a_time_interp,
+                                        int a_time_interp,
                                         int igrid,
                                         fclaw2d_transform_data_t* transform_data);
 
@@ -288,7 +289,7 @@ void fclaw2d_clawpatch_average_corner(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_patch,
                                       int coarse_corner,
                                       int refratio,
-                                      fclaw_bool time_interp,
+                                      int time_interp,
                                       fclaw2d_transform_data_t* transform_data);
 
 void fclaw2d_clawpatch_interpolate_corner(fclaw2d_global_t* glob,
@@ -296,7 +297,7 @@ void fclaw2d_clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                           fclaw2d_patch_t* fine_patch,
                                           int coarse_corner,
                                           int refratio,
-                                          fclaw_bool a_time_interp,
+                                          int a_time_interp,
                                           fclaw2d_transform_data_t* transform_data);
 
 typedef void (*fclaw2d_fort_copy_face_t)(const int* mx, const int* my, const int* mbc, const int* meqn,
@@ -397,6 +398,9 @@ void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
 
 struct fclaw2d_clawpatch_vtable
 {
+
+    /* These types should all have 'clawpatch' in the name */
+
     /* regridding functions */
     fclaw2d_fort_tag4refinement_t      fort_tag4refinement;
     fclaw2d_fort_tag4coarsening_t      fort_tag4coarsening;

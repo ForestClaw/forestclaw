@@ -55,11 +55,11 @@ public :
 
     void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
                                        fclaw2d_clawpatch_t *cp_fine,
-                                       fclaw_bool a_time_interp);
+                                       int a_time_interp);
 
     void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
                                            fclaw2d_clawpatch_t *cp_fine,
-                                           fclaw_bool a_time_interp);
+                                           int a_time_interp);
 
     // ----------------------------------------------------------------
     // Miscellaneous
@@ -93,7 +93,7 @@ public :
     double xupper;
     double yupper;
 
-    fclaw_bool manifold;    /* also in amr_options_t */
+    int manifold;    /* also in amr_options_t */
     int blockno;
 
     FArrayBox aux;

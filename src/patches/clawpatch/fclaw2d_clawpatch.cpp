@@ -301,7 +301,7 @@ void fclaw2d_clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
 
 void fclaw2d_clawpatch_timesync_data(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* this_patch,
-                                     fclaw_bool time_interp,
+                                     int time_interp,
                                      double **q, int* meqn)
 {
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
@@ -719,7 +719,7 @@ void fclaw2d_clawpatch_ghost_unpack(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* this_patch,
                                     int this_block_idx,
                                     int this_patch_idx,
-                                    double *qdata, fclaw_bool time_interp)
+                                    double *qdata, int time_interp)
 {
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     int packarea = gparms->ghost_patch_pack_area && gparms->manifold;
@@ -812,7 +812,7 @@ void fclaw2d_clawpatch_average_face(fclaw2d_global_t *glob,
                                     int iface_coarse,
                                     int p4est_refineFactor,
                                     int refratio,
-                                    fclaw_bool time_interp,
+                                    int time_interp,
                                     int igrid,
                                     fclaw2d_transform_data_t* transform_data)
 {
@@ -849,7 +849,7 @@ void fclaw2d_clawpatch_interpolate_face(fclaw2d_global_t *glob,
                                         int iside,
                                         int p4est_refineFactor,
                                         int refratio,
-                                        fclaw_bool time_interp,
+                                        int time_interp,
                                         int igrid,
                                         fclaw2d_transform_data_t* transform_data)
 {
@@ -896,7 +896,7 @@ void fclaw2d_clawpatch_average_corner(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_patch,
                                       int coarse_corner,
                                       int refratio,
-                                      fclaw_bool time_interp,
+                                      int time_interp,
                                       fclaw2d_transform_data_t* transform_data)
 {
     int meqn,mx,my,mbc;
@@ -928,7 +928,7 @@ void fclaw2d_clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                           fclaw2d_patch_t* fine_patch,
                                           int coarse_corner,
                                           int refratio,
-                                          fclaw_bool time_interp,
+                                          int time_interp,
                                           fclaw2d_transform_data_t* transform_data)
 
 {
@@ -1008,7 +1008,7 @@ void fclaw2d_clawpatch_t::mb_exchange_block_corner_ghost(const int& a_corner,
 void fclaw2d_clawpatch_t::mb_average_block_corner_ghost(const int& a_coarse_corner,
                                                         const int& a_refratio,
                                                         fclaw2d_clawpatch_t *cp_corner,
-                                                        fclaw_bool a_time_interp)
+                                                        int a_time_interp)
 {
     // 'this' is the finer grid; 'cp_corner' is the coarser grid.
     double *qcoarse = q_time_sync(this,a_time_interp);
@@ -1028,7 +1028,7 @@ void fclaw2d_clawpatch_t::mb_average_block_corner_ghost(const int& a_coarse_corn
 void fclaw2d_clawpatch_t::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
                                                             const int& a_refratio,
                                                             fclaw2d_clawpatch_t *cp_corner,
-                                                            fclaw_bool a_time_interp)
+                                                            int a_time_interp)
 
 {
     double *qcoarse = q_time_sync(this, a_time_interp);

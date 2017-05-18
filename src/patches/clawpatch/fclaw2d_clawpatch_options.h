@@ -55,6 +55,7 @@ typedef struct fclaw2d_clawpatch_options
 
     /* Advanced options */
     int interp_stencil_width;
+    int ghost_patch_pack_aux;
 
     int is_registered;
 

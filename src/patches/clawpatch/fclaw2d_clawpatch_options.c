@@ -54,6 +54,9 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                         &clawpatch_options->interp_stencil_width,
                         3, "Interpolation stencil width [3]");
 
+    sc_options_add_bool (opt, 0, "ghost_patch_pack_aux", 
+                         &clawpatch_options->ghost_patch_pack_aux,1,
+                         "Pack aux. variables for parallel comm. of ghost patches [T]");
 
     clawpatch_options->is_registered = 1;
 

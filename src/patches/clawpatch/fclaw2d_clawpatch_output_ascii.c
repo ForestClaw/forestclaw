@@ -70,7 +70,8 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
 }
 
 
-/* this is a separate file, neeeded for each time frame */
+/* This function isn't virtualized;  should it be? */
+static
 void fclaw2d_clawpatch_header_ascii(fclaw2d_global_t* glob, int iframe)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
