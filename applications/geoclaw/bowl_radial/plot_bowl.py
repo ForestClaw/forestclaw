@@ -329,10 +329,11 @@ def setplot(plotdata):
     plotdata.print_format = 'png'            # file format
     plotdata.print_framenos = 'all' # list of frames to print
     plotdata.print_gaugenos = [1,2,3,101,102,103]  # list of gauges to print
-    plotdata.print_fignos = [300]            # list of figures to print
+    plotdata.print_fignos = [0,1,10,11,300]            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
-    plotdata.latex = True                    # create latex file of plots?
+    plotdata.html_movie = 'JSAnimation'
+    plotdata.latex = False                    # create latex file of plots?
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
@@ -340,3 +341,8 @@ def setplot(plotdata):
     # plotdata.format = 'netcdf'
 
     return plotdata
+
+if __name__=="__main__":
+    from clawpack.visclaw.plotclaw import plotclaw
+    plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')
+
