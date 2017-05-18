@@ -286,8 +286,8 @@ void fc2d_clawpack5_bc2(fclaw2d_global_t *glob,
                          int this_patch_idx,
                          double t,
                          double dt,
-                         fclaw_bool intersects_phys_bdry[],
-                         fclaw_bool time_interp)
+                         int intersects_phys_bdry[],
+                         int time_interp)
 {
     fc2d_clawpack5_options_t *clawopt = fc2d_clawpack5_get_options(glob);
 
