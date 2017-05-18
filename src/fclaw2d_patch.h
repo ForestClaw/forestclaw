@@ -96,8 +96,8 @@ void fclaw2d_patch_physical_bc(fclaw2d_global_t *glob,
                                int this_patch_idx,
                                double t,
                                double dt,
-                               fclaw_bool *intersects_bc,
-                               fclaw_bool time_interp);
+                               int *intersects_bc,
+                               int time_interp);
 
 /* Other information could be added */
 void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
@@ -162,7 +162,7 @@ void fclaw2d_patch_pack_local_ghost(fclaw2d_global_t *glob,
 void fclaw2d_patch_unpack_remote_ghost(fclaw2d_global_t* glob,
                                        fclaw2d_patch_t* this_patch,
                                        int this_block_idx, int this_patch_idx,
-                                       double *qdata, fclaw_bool time_interp);
+                                       double *qdata, int time_interp);
 
 void fclaw2d_patch_build_remote_ghost(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
@@ -222,7 +222,7 @@ void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
                                     int iside,
                                     int p4est_refineFactor,
                                     int refratio,
-                                    fclaw_bool time_interp,
+                                    int time_interp,
                                     int igrid,
                                     fclaw2d_transform_data_t* transform_data);
 
@@ -233,7 +233,7 @@ void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
                                 int iface_coarse,
                                 int p4est_refineFactor,
                                 int refratio,
-                                fclaw_bool time_interp,
+                                int time_interp,
                                 int igrid,
                                 fclaw2d_transform_data_t* transform_data);
 
@@ -256,7 +256,7 @@ void fclaw2d_patch_average_corner(fclaw2d_global_t* glob,
                                   fclaw2d_patch_t *fine_patch,
                                   int coarse_corner,
                                   int refratio,
-                                  fclaw_bool time_interp,
+                                  int time_interp,
                                   fclaw2d_transform_data_t* transform_data);
 
 void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
@@ -264,7 +264,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
                                       fclaw2d_patch_t* fine_patch,
                                       int coarse_corner,
                                       int refratio,
-                                      fclaw_bool time_interp,
+                                      int time_interp,
                                       fclaw2d_transform_data_t* transform_data);
 
 int fclaw2d_patch_tag4refinement(fclaw2d_global_t *glob,
@@ -345,8 +345,8 @@ typedef void (*fclaw2d_patch_physical_bc_t)(fclaw2d_global_t *glob,
                                             int this_patch_idx,
                                             double t,
                                             double dt,
-                                            fclaw_bool *intersects_bc,
-                                            fclaw_bool time_interp);
+                                            int *intersects_bc,
+                                            int time_interp);
 
 typedef double (*fclaw2d_patch_single_step_update_t)(fclaw2d_global_t *glob,
                                                      fclaw2d_patch_t *this_patch,
@@ -369,7 +369,7 @@ typedef void (*fclaw2d_patch_average_face_t)(fclaw2d_global_t* glob,
                                              int iface_coarse,
                                              int p4est_refineFactor,
                                              int refratio,
-                                             fclaw_bool time_interp,
+                                             int time_interp,
                                              int igrid,
                                              fclaw2d_transform_data_t* transform_data);
 
@@ -380,7 +380,7 @@ typedef void (*fclaw2d_patch_interpolate_face_t)(fclaw2d_global_t* glob,
                                                  int iside,
                                                  int p4est_refineFactor,
                                                  int refratio,
-                                                 fclaw_bool a_time_interp,
+                                                 int a_time_interp,
                                                  int igrid,
                                                  fclaw2d_transform_data_t* transform_data);
 
@@ -396,7 +396,7 @@ typedef void (*fclaw2d_patch_average_corner_t)(fclaw2d_global_t* glob,
                                                fclaw2d_patch_t *fine_patch,
                                                int coarse_corner,
                                                int refratio,
-                                               fclaw_bool time_interp,
+                                               int time_interp,
                                                fclaw2d_transform_data_t* transform_data);
 
 typedef void (*fclaw2d_patch_interpolate_corner_t)(fclaw2d_global_t* glob,
@@ -404,7 +404,7 @@ typedef void (*fclaw2d_patch_interpolate_corner_t)(fclaw2d_global_t* glob,
                                                    fclaw2d_patch_t* fine_patch,
                                                    int coarse_corner,
                                                    int refratio,
-                                                   fclaw_bool a_time_interp,
+                                                   int a_time_interp,
                                                    fclaw2d_transform_data_t* transform_data);
 
 typedef int (*fclaw2d_patch_tag4refinement_t)(fclaw2d_global_t *glob,
@@ -437,7 +437,7 @@ typedef void (*fclaw2d_patch_ghost_pack_t)(fclaw2d_global_t *glob,
 typedef void (*fclaw2d_patch_ghost_unpack_t)(fclaw2d_global_t *glob,
                                              fclaw2d_patch_t* this_patch,
                                              int this_block_idx, int this_patch_idx,
-                                             double *qdata, fclaw_bool time_interp);
+                                             double *qdata, int time_interp);
 
 typedef void (*fclaw2d_patch_build_ghost_t)(fclaw2d_global_t *glob,
                                             fclaw2d_patch_t *this_patch,

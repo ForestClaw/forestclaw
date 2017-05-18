@@ -26,13 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTABLE_H
 #define FCLAW2D_VTABLE_H
 
-#include <fclaw_base.h>
-#include <fclaw2d_defs.h>
+#include <fclaw2d_forestclaw.h>
 
 #include <fclaw2d_metric_default.h>
 #include <fclaw2d_diagnostics.h>
-#include <fclaw2d_transform.h>
-#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -42,6 +39,7 @@ extern "C"
 #endif
 #endif
 
+typedef void (*fclaw2d_vtable_initialize_t)();
 
 typedef void (*fclaw2d_problem_setup_t)(fclaw2d_global_t *glob);
 
@@ -72,6 +70,9 @@ typedef void (*fclaw2d_after_regrid_t)(fclaw2d_global_t *glob);
 
 typedef struct fclaw2d_vtable
 {
+
+    fclaw2d_vtable_initialize_t          vtable_init;
+
     fclaw2d_problem_setup_t              problem_setup;
 
     /* regridding functions */

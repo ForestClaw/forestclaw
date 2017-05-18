@@ -39,7 +39,9 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_partition_domain(fclaw2d_global_t* glob, int mode,
+struct fclaw2d_global;
+
+void fclaw2d_partition_domain(struct fclaw2d_global* glob, int mode,
                               fclaw2d_timer_names_t running);
 
 #ifdef __cplusplus

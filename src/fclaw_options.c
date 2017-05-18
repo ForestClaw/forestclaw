@@ -27,14 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_mpi.h>
 #include <fclaw_options.h>
 
-/* fclaw_options_t will eventually be replaced with fclaw_options_t. */
-#if 0
-typedef struct fclaw_options
-{
-    fclaw_options_t *gparms;
-} fclaw_options_t;
-#endif
-
 static void* 
 fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 {

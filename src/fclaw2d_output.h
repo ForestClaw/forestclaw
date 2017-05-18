@@ -26,10 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_OUTPUT_H
 #define FCLAW2D_OUTPUT_H
 
-#include <fclaw2d_vtable.h>
-#if 0
-#include <fclaw2d_clawpatch_vtk.h>
-#endif
+#include "fclaw2d_forestclaw.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -39,9 +36,11 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_output_frame(fclaw2d_global_t * glob, int iframe);
+struct fclaw2d_global;  /* This is a hack !! */
 
-void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe);
+void fclaw2d_output_frame(struct fclaw2d_global * glob, int iframe);
+
+void fclaw2d_output_frame_tikz(struct fclaw2d_global* glob, int iframe);
 
 #if 0
 /* Needed for debugging *(uses a clawpatch) */

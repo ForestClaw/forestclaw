@@ -65,9 +65,9 @@ typedef enum fclaw2d_grid_type
 
 typedef struct fclaw2d_exchange_info
 {
-    fclaw_bool time_interp;
+    int time_interp;
     int level;
-    fclaw_bool read_parallel_patches;   /* before we have done a parallel exchange */
+    int read_parallel_patches;   /* before we have done a parallel exchange */
     fclaw2d_exchange_type_t exchange_type;
     fclaw2d_grid_type_t grid_type;
     int has_fine_grid_neighbor;

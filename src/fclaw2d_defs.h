@@ -33,7 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* change to P4EST_BOOL ?
  * No, p4est does not know about bool and works with pure int */
+#if 0
 #define fclaw_bool bool
+#endif
+
 #define fclaw_true true
 #define fclaw_false false
 

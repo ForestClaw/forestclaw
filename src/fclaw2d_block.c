@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void fclaw2d_block_get_block_boundary(fclaw2d_global_t * glob,
                                       fclaw2d_patch_t * patch,
-                                      fclaw_bool *intersects_block)
+                                      int *intersects_block)
 {
     int iside;
 

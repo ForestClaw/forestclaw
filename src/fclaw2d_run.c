@@ -176,8 +176,8 @@ void outstyle_1(fclaw2d_global_t *glob)
             }
 
             double tol = 1e-2*dt_step;
-            fclaw_bool took_small_step = false;
-            fclaw_bool took_big_step = false;
+            int took_small_step = false;
+            int took_big_step = false;
             double dt_step_desired = dt_step;
             if (!gparms->use_fixed_dt)
             {

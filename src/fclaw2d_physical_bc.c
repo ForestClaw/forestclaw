@@ -35,8 +35,8 @@ void fclaw2d_physical_bc_default(fclaw2d_global_t *glob,
                                  int this_patch_idx,
                                  double t,
                                  double dt,
-                                 fclaw_bool intersects_phys_bdry[],
-                                 fclaw_bool time_interp)
+                                 int intersects_phys_bdry[],
+                                 int time_interp)
 {
     /* This can be used when no BCs are to be called */
 }
@@ -53,7 +53,7 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
 
     t_info = (fclaw2d_physical_time_info_t*) s->user;
 
-    fclaw_bool intersects_bc[NumFaces];
+    int intersects_bc[NumFaces];
     double dt = 1e20;
     fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,intersects_bc);
     fclaw2d_patch_physical_bc(s->glob,
@@ -69,7 +69,7 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
 void fclaw2d_physical_get_bc(fclaw2d_global_t *glob,
                              int this_block_idx,
                              int this_patch_idx,
-                             fclaw_bool *intersects_bdry)
+                             int *intersects_bdry)
 {
     // const int numfaces = get_faces_per_patch(domain);
     int bdry[NumFaces];

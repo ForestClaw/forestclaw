@@ -46,10 +46,10 @@ enum
 static
 void get_face_type(fclaw2d_global_t *glob,
                    int iface,
-                   fclaw_bool intersects_phys_bdry[],
-                   fclaw_bool intersects_block[],
-                   fclaw_bool *is_block_face,
-                   fclaw_bool *is_interior_face)
+                   int intersects_phys_bdry[],
+                   int intersects_block[],
+                   int *is_block_face,
+                   int *is_interior_face)
 {
     *is_block_face = intersects_block[iface];
     *is_interior_face = !intersects_phys_bdry[iface];
@@ -192,23 +192,23 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user; 
 
     fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) s->user;
-    fclaw_bool time_interp = filltype->time_interp;
-    fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
-    fclaw_bool is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
+    int time_interp = filltype->time_interp;
+    int is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
+    int is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
 
     int iface, igrid;
 
-    fclaw_bool read_parallel_patches = filltype->read_parallel_patches;
+    int read_parallel_patches = filltype->read_parallel_patches;
 
-    fclaw_bool copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
-    fclaw_bool average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
-    fclaw_bool interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
+    int copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
+    int average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
+    int interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
 
     const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
     const int refratio = gparms->refratio;
 
-    fclaw_bool intersects_phys_bdry[NumFaces];
-    fclaw_bool intersects_block[NumFaces];
+    int intersects_phys_bdry[NumFaces];
+    int intersects_block[NumFaces];
 
     fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
                             intersects_phys_bdry);
@@ -231,8 +231,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     {
         int idir = iface/2;
 
-        fclaw_bool is_block_face;
-        fclaw_bool is_interior_face;
+        int is_block_face;
+        int is_interior_face;
         get_face_type(s->glob,
                       iface,
                       intersects_phys_bdry,
@@ -280,7 +280,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             transform_data_finegrid.neighbor_patch = this_patch;
 
 
-            /* fclaw_bool block_boundary = (neighbor_block_idx >= 0); */
+            /* int block_boundary = (neighbor_block_idx >= 0); */
             if (ref_flag_ptr == NULL)
             {
                 /* We should never end up here */
@@ -289,7 +289,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
             }
 
             /* Parallel distribution keeps siblings on same processor */
-            fclaw_bool remote_neighbor;
+            int remote_neighbor;
             remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[0]);
             if (is_coarse)
             {
@@ -448,7 +448,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
                 /* We have a neighbor ghost patch that came from a
                    different proc */
 
-                fclaw_bool intersects_block[NumFaces];
+                int intersects_block[NumFaces];
                 fclaw2d_block_get_block_boundary(glob, this_ghost_patch,
                                                  intersects_block);
                 int is_block_face = intersects_block[iface];

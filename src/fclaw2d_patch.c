@@ -355,7 +355,7 @@ void fclaw2d_patch_unpack_remote_ghost(fclaw2d_global_t* glob,
                                        fclaw2d_patch_t* this_patch,
                                        int this_block_idx,
                                        int this_patch_idx,
-                                       double *qdata, fclaw_bool time_interp)
+                                       double *qdata, int time_interp)
 {
     FCLAW_ASSERT(patch_vt()->ghost_unpack != NULL);
     patch_vt()->ghost_unpack(glob, this_patch, this_block_idx,
@@ -526,7 +526,7 @@ void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
                                     int iside,
                                     int p4est_refineFactor,
                                     int refratio,
-                                    fclaw_bool time_interp,
+                                    int time_interp,
                                     int igrid,
                                     fclaw2d_transform_data_t* transform_data)
 {
@@ -543,7 +543,7 @@ void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
                                 int iface_coarse,
                                 int p4est_refineFactor,
                                 int refratio,
-                                fclaw_bool time_interp,
+                                int time_interp,
                                 int igrid,
                                 fclaw2d_transform_data_t* transform_data)
 {
@@ -586,7 +586,7 @@ void fclaw2d_patch_average_corner(fclaw2d_global_t* glob,
                                   fclaw2d_patch_t *fine_patch,
                                   int coarse_corner,
                                   int refratio,
-                                  fclaw_bool time_interp,
+                                  int time_interp,
                                   fclaw2d_transform_data_t* transform_data)
 {
     FCLAW_ASSERT(patch_vt()->average_corner != NULL);
@@ -600,7 +600,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
                                       fclaw2d_patch_t* fine_patch,
                                       int coarse_corner,
                                       int refratio,
-                                      fclaw_bool time_interp,
+                                      int time_interp,
                                       fclaw2d_transform_data_t* transform_data)
 {
     FCLAW_ASSERT(patch_vt()->interpolate_corner != NULL);
@@ -698,8 +698,8 @@ void fclaw2d_patch_physical_bc(fclaw2d_global_t *glob,
                                int this_patch_idx,
                                double t,
                                double dt,
-                               fclaw_bool *intersects_bc,
-                               fclaw_bool time_interp)
+                               int *intersects_bc,
+                               int time_interp)
 {
     FCLAW_ASSERT(patch_vt()->physical_bc != NULL);
     patch_vt()->physical_bc(glob,this_patch,this_block_idx,this_patch_idx,

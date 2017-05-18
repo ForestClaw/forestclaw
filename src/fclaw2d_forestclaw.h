@@ -46,7 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "forestclaw2d.h"
 #include "fclaw2d_domain.h"
 #include "fclaw2d_block.h"
-/* Don't include fclaw2d_patch.H, since it requires C++ linkage */
+#include "fclaw2d_patch.h"
+#include "fclaw2d_global.h"
+
 
 /* Basic header files that are probably required by all apps */
 #include <fclaw2d_options.h>
@@ -59,8 +61,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* These still need to be cleaned up */
 #include "fclaw2d_defs.h"
-
-#include <fclaw2d_global.h>
 
 #include <fclaw2d_diagnostics.h>
 
@@ -77,8 +77,6 @@ extern "C"
 #define FCLAW2D_SPACEDIM 2
 extern const int fclaw2d_SpaceDim;
 
-/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-   avoid any confusion in the 2d case. */
 #define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
 extern const int fclaw2d_NumFaces;
 

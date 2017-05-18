@@ -235,7 +235,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
     fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
 
-    fclaw_bool have_new_refinement = new_domain != NULL;
+    int have_new_refinement = new_domain != NULL;
 
     if (have_new_refinement)
     {
