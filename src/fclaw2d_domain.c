@@ -24,17 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_domain.h>
-#include <fclaw2d_exchange.h>
 #include <fclaw2d_patch.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
+#include <fclaw2d_exchange.h>
 
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
@@ -122,10 +114,3 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
 }
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
-}
-#endif

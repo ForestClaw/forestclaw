@@ -30,16 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
 
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
-
 #include "fclaw_math.h"
 
 /*  -----------------------------------------------------------------
@@ -519,10 +509,3 @@ void fclaw2d_run(fclaw2d_global_t *glob)
         exit(0);
     }
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

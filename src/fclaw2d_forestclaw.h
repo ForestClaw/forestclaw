@@ -55,23 +55,6 @@ extern "C"
 #endif
 #endif
 
-/* Some convenient preprocessor directives */
-
-#define FCLAW2D_SPACEDIM 2
-extern const int fclaw2d_SpaceDim;
-
-#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
-extern const int fclaw2d_NumFaces;
-
-#define FCLAW2D_REFINE_FACTOR 2
-extern const int fclaw2d_RefineFactor;
-
-#define FCLAW2D_NUM_CORNERS 4
-extern const int fclaw2d_NumCorners;
-
-#define FCLAW2D_NUM_SIBLINGS 4
-extern const int fclaw2d_NumSiblings;
-
 void fclaw2d_problem_setup(fclaw2d_global_t *glob);
 
 void fclaw2d_initialize(fclaw2d_global_t *glob);
