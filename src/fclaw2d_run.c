@@ -176,8 +176,8 @@ void outstyle_1(fclaw2d_global_t *glob)
             }
 
             double tol = 1e-2*dt_step;
-            int took_small_step = false;
-            int took_big_step = false;
+            int took_small_step = 0;
+            int took_big_step = 0;
             double dt_step_desired = dt_step;
             if (!gparms->use_fixed_dt)
             {
@@ -189,13 +189,13 @@ void outstyle_1(fclaw2d_global_t *glob)
                     {
                         /* We have (tend-t_curr) < dt_minlevel, and
                            we have to take a small step to hit tend */
-                        took_small_step = true;
+                        took_small_step = 1;
                     }
                     else
                     {
                         /* Take a bigger step now to avoid small step
                            in next time step. */
-                        took_big_step = true;
+                        took_big_step = 1;
                     }
                 }
             }

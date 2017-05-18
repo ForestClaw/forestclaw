@@ -59,9 +59,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_map.h"
 #include "fclaw2d_map_query.h"
 
-/* These still need to be cleaned up */
-#include "fclaw2d_defs.h"
-
 #include <fclaw2d_diagnostics.h>
 
 #ifdef __cplusplus

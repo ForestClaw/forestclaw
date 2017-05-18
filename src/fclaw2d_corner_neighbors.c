@@ -252,7 +252,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
         else
         {
             *block_corner_count = 2;
-            has_corner_neighbor = fclaw_true;
+            has_corner_neighbor = 1;
             int rpatchno[p4est_refineFactor];
             int rproc[p4est_refineFactor];
             int rfaceno;

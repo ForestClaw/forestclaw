@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_BLOCK_H
 #define FCLAW2D_BLOCK_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_defs.h>
+#include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 
 #ifdef __cplusplus
@@ -37,23 +36,6 @@ extern "C"
 }
 #endif
 #endif
-
-#if 0
-typedef struct fclaw2d_block_data
-{
-    int mthbc[FCLAW2D_NUMFACES];  /* >=0 for physical bc types */
-}
-fclaw2d_block_data_t;
-
-void
-fclaw2d_block_data_new(fclaw2d_domain_t *domain);
-
-fclaw2d_block_data_t*
-fclaw2d_block_get_data(fclaw2d_block_t* block);
-
-void
-fclaw2d_block_set_data(fclaw2d_block_t* block,const int mthbc[]);
-#endif 
 
 void 
 fclaw2d_block_get_block_boundary(fclaw2d_global_t * glob,

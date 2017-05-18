@@ -20,7 +20,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_global.h \
 	src/fclaw2d_forestclaw.h \
 	src/fclaw2d_domain.h \
-	src/fclaw2d_defs.h \
 	src/fclaw2d_block.h \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
