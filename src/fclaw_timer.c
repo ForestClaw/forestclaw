@@ -121,6 +121,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
 
     int d = glob->count_grids_per_proc;
     glob->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
+    d = glob->count_amr_advance;
     glob->count_amr_advance = (d > 0) ? d : 1;   /* To avoid division by zero */
 
     double gpp = glob->count_grids_per_proc/       glob->count_amr_advance;
