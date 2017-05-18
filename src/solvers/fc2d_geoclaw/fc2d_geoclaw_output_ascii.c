@@ -62,6 +62,7 @@ void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
                                  &this_block_idx,&glob->mpirank);
 }
 
+static
 void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt;
