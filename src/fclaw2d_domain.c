@@ -44,8 +44,6 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 
     ddata->count_set_patch = ddata->count_delete_patch = 0;
     
-    ddata->is_latest_domain = 0;        /* set 1 by amrinit or rebuild_domain */
-
     ddata->domain_exchange = NULL;
     ddata->domain_indirect = NULL;
 }
@@ -64,20 +62,6 @@ fclaw2d_domain_data_t *fclaw2d_domain_get_data(fclaw2d_domain_t *domain)
 }
 
 
-void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain, fclaw2d_domain_t *new_domain)
-{
-    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data(old_domain);
-
-    /* Has the data already been allocated? */
-    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data(new_domain);
-
-
-    /* Move timers over to the new domain */
-    ddata_old->is_latest_domain = 0;
-    ddata_new->is_latest_domain = 1;
-}
-
-
 void fclaw2d_domain_setup(fclaw2d_global_t* glob,
                           fclaw2d_domain_t* new_domain)
 {
@@ -88,13 +72,12 @@ void fclaw2d_domain_setup(fclaw2d_global_t* glob,
     {
         fclaw_global_infof("Building initial domain\n");
         t = 0;
-        glob->curr_time = t;//new_domain
+        glob->curr_time = t;//new_domain        
     }
     else
     {
         fclaw_global_infof("Rebuilding  domain\n");
         fclaw2d_domain_data_new(new_domain);
-        fclaw2d_domain_data_copy(old_domain,new_domain);
     }
     fclaw_global_infof("Done\n");
 }
@@ -139,63 +122,6 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
 }
-
-int fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain)
-{
-    return domain->global_num_patches;
-}
-
-#if 0
-fclaw_app_t* fclaw2d_domain_get_app(fclaw2d_domain_t* domain)
-{
-    fclaw_app_t *app;
-
-    app = (fclaw_app_t*)
-          fclaw2d_domain_attribute_access(domain,"fclaw_app",NULL);
-
-    FCLAW_ASSERT(app != NULL);
-    return app;
-}
-
-void fclaw2d_domain_set_app(fclaw2d_domain_t* domain,fclaw_app_t* app)
-{
-    FCLAW_ASSERT(app != NULL);
-    fclaw2d_domain_attribute_add (domain,"fclaw_app",app);
-}
-const fclaw_options_t* fclaw2d_get_options(fclaw2d_domain_t *domain)
-{
-    const fclaw_options_t *gparms;
-    fclaw_app_t *app;
-
-    app = fclaw2d_domain_get_app(domain);
-    gparms = fclaw2d_get_options(app);
-    return gparms;
-}
-
-
-void* fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain)
-{
-    fclaw_app_t *app;
-
-    app = fclaw2d_domain_get_app(domain);
-    return fclaw_app_get_user(app);
-}
-
-const fclaw_options_t* get_domain_parms(fclaw2d_domain_t *domain)
-{
-    return fclaw2d_get_options(domain);
-}
-
-#endif
-
-// fclaw2d_map_context_t* fclaw2d_domain_get_map_context(fclaw2d_global_t* glob)
-// {
-//     fclaw2d_map_context_t* cont;
-//     cont = (fclaw2d_map_context_t*)
-//            fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
-//     FCLAW_ASSERT (cont != NULL);
-//     return cont;
-// }
 
 #ifdef __cplusplus
 #if 0

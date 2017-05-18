@@ -71,8 +71,6 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     char basename[BUFSIZ];
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
-    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(*domain);
-
     /* This mapping context is needed by fortran mapping functions */
     fclaw2d_map_context_t *cont = glob->cont;
     SET_CONTEXT(&cont);
@@ -87,7 +85,6 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     int maxlevel = gparms->maxlevel;
 
     /* Initialize all timers */
-    ddata->is_latest_domain = 1;
     int i;
     for (i = 0; i < FCLAW2D_TIMER_COUNT; ++i) {
         fclaw2d_timer_init (&glob->timers[i]);
@@ -225,7 +222,6 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                     /* out of timer */
                     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
                     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
-                    ddata = NULL;
                 }
 
                 /* Repartition domain to new processors.   Second arg is the

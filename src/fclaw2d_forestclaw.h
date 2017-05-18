@@ -31,8 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Basic objects */
 #include "fclaw2d_global.h"
 
-
+/* p4est-centric files */
 #include "forestclaw2d.h"
+#include "fclaw2d_convenience.h"
+#include "p4est_connectivity.h"
+
+/* Basic objects */
 #include "fclaw2d_domain.h"
 #include "fclaw2d_block.h"
 #include "fclaw2d_patch.h"
@@ -43,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_vtable.h"
 
 /* Mapping interface - needed even if 'nomap' is used.  */
-#include "p4est_connectivity.h"
 #include "fclaw2d_map.h"
 #include "fclaw2d_map_query.h"
 
@@ -74,12 +77,13 @@ extern const int fclaw2d_NumCorners;
 #define FCLAW2D_NUM_SIBLINGS 4
 extern const int fclaw2d_NumSiblings;
 
+void fclaw2d_problem_setup(fclaw2d_global_t *glob);
+
 void fclaw2d_initialize(fclaw2d_global_t *glob);
 void fclaw2d_run(fclaw2d_global_t *glob);
 void fclaw2d_finalize(fclaw2d_global_t *glob);
 
 void fclaw2d_after_regrid(fclaw2d_global_t *glob);
-void fclaw2d_problem_setup(fclaw2d_global_t *glob);
 
 
 #ifdef __cplusplus

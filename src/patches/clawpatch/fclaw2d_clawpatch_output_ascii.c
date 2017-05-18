@@ -85,7 +85,7 @@ void fclaw2d_clawpatch_header_ascii(fclaw2d_global_t* glob, int iframe)
 
     double time = glob->curr_time;
 
-    ngrids = fclaw2d_domain_get_num_patches(glob->domain);
+    ngrids = glob->domain->global_num_patches;
 
     meqn = clawpatch_opt->meqn;
     maux = clawpatch_opt->maux;

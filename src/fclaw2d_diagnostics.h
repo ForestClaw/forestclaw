@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DIAGNOSTICS_H
 #define FCLAW2D_DIAGNOSTICS_H
 
-#include "forestclaw2d.h"
+#include "fclaw2d_global.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,6 +36,8 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+
 typedef struct fclaw2d_diagnostics_vtable  fclaw2d_diagnostics_vtable_t;
 
 typedef struct
@@ -44,8 +46,6 @@ typedef struct
     void* solver_accumulator;
     void* user_accumulator;
 } fclaw2d_diagnostics_accumulator_t;
-
-struct fclaw2d_global;
 
 /* Diagnostic information */
 typedef void (*fclaw2d_diagnostics_initialize_t)(struct fclaw2d_global *glob,
@@ -63,9 +63,6 @@ typedef void (*fclaw2d_diagnostics_reset_t)(struct fclaw2d_global *glob,
 
 typedef void (*fclaw2d_diagnostics_finalize_t)(struct fclaw2d_global *glob,
                                                void** acc);
-
-fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt();
-
 
 struct fclaw2d_diagnostics_vtable
 {
@@ -93,9 +90,10 @@ struct fclaw2d_diagnostics_vtable
     int is_set;
 };
 
+fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt();
+
 void fclaw2d_diagnostics_vtable_initialize();
 
-/* See forestclaw2d.h for the maximum version of this function */
 double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
 
 void fclaw2d_diagnostics_initialize(struct fclaw2d_global *glob);

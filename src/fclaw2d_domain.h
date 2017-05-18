@@ -26,10 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DOMAIN_H
 #define FCLAW2D_DOMAIN_H
 
-#include <fclaw_timer.h>
-#include <fclaw2d_partition.h>
-#include <fclaw2d_map.h>
-#include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 
 #ifdef __cplusplus
@@ -40,88 +36,28 @@ extern "C"
 #endif
 #endif
 
-
-
 typedef struct fclaw2d_domain_data
 {
     /* Debug counters and timers */
-    int count_set_patch, count_delete_patch;
-    int is_latest_domain;
-#if 0
-    int count_amr_advance, count_ghost_exchange, count_amr_regrid;
-    int count_amr_new_domain;
-    int count_single_step;
-    int count_multiproc_corner;
-    int count_grids_per_proc;
-    int count_grids_remote_boundary;
-    int count_grids_local_boundary;
-    fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
-    double curr_time;
-#endif    
+    int count_set_patch;
+    int count_delete_patch;
 
-    /* This should not be copied, but needs to be redone for every new domain */
     fclaw2d_domain_exchange_t *domain_exchange;
     fclaw2d_domain_indirect_t *domain_indirect;
+
 } fclaw2d_domain_data_t;
 
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain);
+
 void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
-void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain,
-                              fclaw2d_domain_t *new_domain);
 
 void fclaw2d_domain_setup(fclaw2d_global_t* glob,
                           fclaw2d_domain_t* new_domain);
 
 void fclaw2d_domain_reset(fclaw2d_global_t* glob);
 
-
-/* ----------------------------------------------------
-   Access functions for domain member data, stored in
-   domain->user.  These include :
-
-      -- fclaw_app_t
-      -- time
-      -- mapping context
-   --------------------------------------------------- */
 fclaw2d_domain_data_t*
 fclaw2d_domain_get_data(fclaw2d_domain_t *domain);
-
-/* fclaw_app_t */
-fclaw_app_t*
-fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
-
-void
-fclaw2d_domain_set_app(fclaw2d_domain_t* domain,
-                       fclaw_app_t* app);
-
-
-/* time */
-void
-fclaw2d_domain_set_time(fclaw2d_global_t *glob, double time);
-
-double
-fclaw2d_domain_get_time(fclaw2d_global_t *glob);
-
-
-/* Mapping context */
-fclaw2d_map_context_t*
-fclaw2d_domain_get_map_context(fclaw2d_global_t* glob);
-
-int
-fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
-
-#if 0
-/* Options */
-const fclaw_options_t*
-fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain);
-
-const fclaw_options_t*
-get_domain_parms(fclaw2d_domain_t *domain);
-#endif
-
-void*
-fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain);
-
 
 #ifdef __cplusplus
 #if 0
