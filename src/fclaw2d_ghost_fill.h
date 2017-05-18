@@ -23,12 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GHOST_H
-#define FCLAW2D_GHOST_H
+#ifndef FCLAW2D_GHOST_FILL_H
+#define FCLAW2D_GHOST_FILL_H
 
-#include <fclaw2d_vtable.h>
+#include <fclaw_forestclaw.h>
+#include <fclaw2d_global.h>
 #include <fclaw2d_physical_bc.h>
-#include <fclaw2d_forestclaw.h>
 
 #ifdef __cplusplus
 extern "C"

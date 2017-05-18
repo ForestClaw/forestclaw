@@ -26,10 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTABLE_H
 #define FCLAW2D_VTABLE_H
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_global.h>
+#include <fclaw2d_patch.h>
 
 #include <fclaw2d_metric_default.h>
-#include <fclaw2d_diagnostics.h>
 
 #ifdef __cplusplus
 extern "C"

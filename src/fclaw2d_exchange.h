@@ -26,10 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_EXCHANGE_H
 #define FCLAW2D_EXCHANGE_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_partition.h>
-#include <fclaw2d_convenience.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw2d_global.h>
 #include <fclaw_timer.h>
 
 #ifdef __cplusplus

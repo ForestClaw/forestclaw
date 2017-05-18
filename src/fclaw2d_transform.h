@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_TRANSFORM_H
 #define FCLAW2D_TRANSFORM_H
 
-#include <forestclaw2d.h>
 #include <fclaw2d_global.h>
-#include <fclaw2d_clawpatch_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,11 +36,13 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_patch;  /* fclaw2d_patch.h includes this file */
+
 /* Data structure for transformation data at non-aligned boundaries */
 typedef struct fclaw2d_transform_data
 {
-    fclaw2d_patch_t *this_patch;
-    fclaw2d_patch_t *neighbor_patch;
+    struct fclaw2d_patch *this_patch;
+    struct fclaw2d_patch *neighbor_patch;
     int transform[9];
     int icorner;
     int based;      /* 1 for cell-centered (1 .. mx); 0 for nodes (0 .. mx) */
@@ -50,36 +50,28 @@ typedef struct fclaw2d_transform_data
     int block_iface;   /* -1 for interior faces or block corners */
 
     fclaw2d_global_t *glob;
+} fclaw2d_transform_data_t;
 
-#if 0
-    /* These don't seem to be used */
-    int is_block_face;    /* not a corner */
-    int fine_grid_pos;         /* Fine grid position (0 or 1) */
-    int is_block_boundary;     /* is_block_face ? */
-#endif
-}
-fclaw2d_transform_data_t;
-
-#define FCLAW2D_TRANSFORM_FACE \
-  FCLAW_F77_FUNC_(fclaw2d_transform_face,FCLAW2D_TRANSFORM_FACE)
+#define FCLAW2D_TRANSFORM_FACE FCLAW_F77_FUNC_(fclaw2d_transform_face, \
+                                              FCLAW2D_TRANSFORM_FACE)
 void FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
                              int *i2, int *j2,
                              fclaw2d_transform_data_t** ptdata);
 
-#define FCLAW2D_TRANSFORM_FACE_HALF \
-  FCLAW_F77_FUNC_(fclaw2d_transform_face_half,FCLAW2D_TRANSFORM_FACE_HALF)
+#define FCLAW2D_TRANSFORM_FACE_HALF FCLAW_F77_FUNC_(fclaw2d_transform_face_half, \
+                                                    FCLAW2D_TRANSFORM_FACE_HALF)
 void FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
                                   int i2[], int j2[],
                                   fclaw2d_transform_data_t** ptdata);
 
-#define FCLAW2D_TRANSFORM_CORNER \
-  FCLAW_F77_FUNC_(fclaw2d_transform_corner,FCLAW2D_TRANSFORM_CORNER)
+#define FCLAW2D_TRANSFORM_CORNER FCLAW_F77_FUNC_(fclaw2d_transform_corner, \
+                                                 FCLAW2D_TRANSFORM_CORNER)
 void FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
                                int *i2, int *j2,
                                fclaw2d_transform_data_t** ptdata);
 
-#define FCLAW2D_TRANSFORM_CORNER_HALF \
-  FCLAW_F77_FUNC_(fclaw2d_transform_corner_half,FCLAW2D_TRANSFORM_CORNER_HALF)
+#define FCLAW2D_TRANSFORM_CORNER_HALF FCLAW_F77_FUNC_(fclaw2d_transform_corner_half, \
+                                                      FCLAW2D_TRANSFORM_CORNER_HALF)
 void FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                     int i2[], int j2[],
                                     fclaw2d_transform_data_t** ptdata);

@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_forestclaw.h>
 
-/* Basic objects */
+/* Stores global things */
 #include "fclaw2d_global.h"
 
 /* p4est-centric files */
@@ -46,11 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 #include "fclaw2d_vtable.h"
 
-/* Mapping interface - needed even if 'nomap' is used.  */
-#include "fclaw2d_map.h"
-#include "fclaw2d_map_query.h"
-
-#include <fclaw2d_diagnostics.h>
 
 #ifdef __cplusplus
 extern "C"

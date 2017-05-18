@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_OPTIONS_H
 #define FCLAW_OPTIONS_H
 
-#include <fclaw_base.h>
 #include <fclaw_forestclaw.h>
 
 #ifdef __cplusplus
@@ -43,15 +42,11 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;  /* Avoid circular dependency */
-
-
 /* Plan is to replace fclaw_options_t with fclaw_options_t */
 typedef struct fclaw_options fclaw_options_t;
 
 fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
-                                       const char *configfile);
-
+                                         const char *configfile);
 
 int fclaw_options_read_from_file(sc_options_t* opt);
 

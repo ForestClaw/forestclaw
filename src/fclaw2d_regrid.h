@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_REGRID_H
 
 #include <fclaw2d_global.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_patch.h>
 
 #ifdef __cplusplus
 extern "C"

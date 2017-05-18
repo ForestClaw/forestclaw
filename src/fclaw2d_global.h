@@ -29,10 +29,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_package.h>
 #include <fclaw_timer.h>
-#include <fclaw2d_map.h>
 
 #include <forestclaw2d.h>
 #include <fclaw2d_diagnostics.h>
+#include <fclaw2d_map.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -93,7 +93,7 @@ typedef struct fclaw2d_global_iterate
 {
     fclaw2d_global_t* glob;
     void* user;
-}fclaw2d_global_iterate_t;
+} fclaw2d_global_iterate_t;
 
 /** Allocate a new global structure.
  * \param [in] gparms           If not NULL, we borrow this gparms pointer.

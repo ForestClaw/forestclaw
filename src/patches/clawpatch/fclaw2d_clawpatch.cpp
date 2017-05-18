@@ -27,9 +27,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 
 #include <fclaw2d_timeinterp.h>
-#include <fclaw2d_metric.h>
-#include <fclaw2d_neighbors_fort.h>
 #include <fclaw2d_clawpatch_output.h>
+
+#include <fclaw2d_metric.h>
+#include <fclaw2d_map_query.h>
+
+/* Needed only for MB_BLOCK_CORNER_GHOST */
+#include <fclaw2d_neighbors_fort.h>
 
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
