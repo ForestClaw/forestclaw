@@ -427,8 +427,8 @@ void
                         int this_patch_idx,
                         double t,
                         double dt,
-                        fclaw_bool intersects_bc[],
-                        fclaw_bool time_interp);
+                        int intersects_bc[],
+                        int time_interp);
 
 void
     fc2d_clawpack46_src2(fclaw2d_global_t* glob,
