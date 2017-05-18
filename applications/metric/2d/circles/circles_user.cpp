@@ -49,7 +49,7 @@ void sphere_setprob(fclaw2d_domain_t* domain)
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
-fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
+int sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno, int this_patch_idx,
                                        int initflag)
@@ -81,7 +81,7 @@ fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch == 1;
 }
 
-fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno,
                                        int patchno)

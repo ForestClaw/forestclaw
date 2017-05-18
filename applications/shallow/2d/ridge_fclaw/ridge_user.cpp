@@ -160,7 +160,7 @@ void ridge_patch_physical_bc(fclaw2d_domain *domain,
                              int this_patch_idx,
                              double t,
                              double dt,
-                             fclaw_bool intersects_bc[])
+                             int intersects_bc[])
 {
     // The sphere doesn't have physical boundary conditions.
 }
@@ -248,7 +248,7 @@ void ridge_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
 }
 
 
-fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain,
+int ridge_tag4refinement(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx, int initflag)
@@ -290,7 +290,7 @@ fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch == 1;
 }
 
-fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
+int ridge_tag4coarsening(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_blockno,
                                 int this_patchno)

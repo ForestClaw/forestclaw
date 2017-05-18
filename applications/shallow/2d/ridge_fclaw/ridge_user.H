@@ -101,7 +101,7 @@ void ridge_patch_physical_bc(fclaw2d_domain *domain,
                         int this_patch_idx,
                         double t,
                         double dt,
-                        fclaw_bool intersects_bc[]);
+                        int intersects_bc[]);
 
 double ridge_patch_single_step_update(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
@@ -117,12 +117,12 @@ void ridge_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
 void ridge_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids);
 
 
-fclaw_bool ridge_tag4coarsening(fclaw2d_domain_t *domain,
+int ridge_tag4coarsening(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_blockno,
                                 int this_patchno);
 
-fclaw_bool ridge_tag4refinement(fclaw2d_domain_t *domain,
+int ridge_tag4refinement(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx, int this_patch_idx,
                                 int initflag);
