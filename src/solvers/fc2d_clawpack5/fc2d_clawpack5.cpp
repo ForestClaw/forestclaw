@@ -23,13 +23,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
-
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
-
 #include "fc2d_clawpack5.h"
 #include "fc2d_clawpack5_options.h"
+
+
+#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_defs.h>
+
 
 static fc2d_clawpack5_vtable_t classic_vt;
 
