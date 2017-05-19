@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_REGRID_DEFAULT_H
 #define FCLAW2D_REGRID_DEFAULT_H
 
-#include <forestclaw2d.h>
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,24 +36,27 @@ extern "C"
 #endif
 #endif
 
-int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
-                                     fclaw2d_patch_t *this_patch,
+struct fclaw2d_global;
+struct fclaw2d_patch;
+
+int fclaw2d_clawpatch_tag4refinement(struct fclaw2d_global *glob,
+                                     struct fclaw2d_patch *this_patch,
                                      int blockno, int patchno,
                                      int initflag);
 
-int fclaw2d_clawpatch_tag4coarsening(fclaw2d_global_t *glob,
-                                     fclaw2d_patch_t *this_patch,
+int fclaw2d_clawpatch_tag4coarsening(struct fclaw2d_global *glob,
+                                     struct fclaw2d_patch *this_patch,
                                      int blockno, int patchno);
 
-void fclaw2d_clawpatch_average2coarse(fclaw2d_global_t *glob,
-                                      fclaw2d_patch_t *fine_siblings,
-                                      fclaw2d_patch_t *coarse_patch,
+void fclaw2d_clawpatch_average2coarse(struct fclaw2d_global *glob,
+                                      struct fclaw2d_patch *fine_siblings,
+                                      struct fclaw2d_patch *coarse_patch,
                                       int blockno, int fine_patchno,
                                       int coarse_patchno);
 
-void fclaw2d_clawpatch_interpolate2fine(fclaw2d_global_t *glob,
-                                        fclaw2d_patch_t *coarse_patch,
-                                        fclaw2d_patch_t* fine_patch,
+void fclaw2d_clawpatch_interpolate2fine(struct fclaw2d_global *glob,
+                                        struct fclaw2d_patch *coarse_patch,
+                                        struct fclaw2d_patch* fine_patch,
                                         int this_blockno, int coarse_patchno,
                                         int fine_patchno);
 

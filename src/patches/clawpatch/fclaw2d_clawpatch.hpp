@@ -26,12 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_HPP
 #define FCLAW2D_CLAWPATCH_HPP
 
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_global.h>
-#include <fclaw2d_forestclaw.h>
 #include <fclaw_options.h>
 #include <fclaw_package.h>
 #include <fclaw2d_transform.h>
-#include <fclaw2d_clawpatch.h>
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_farraybox.hpp>

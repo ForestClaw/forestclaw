@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_VTK_H
 #define FCLAW2D_CLAWPATCH_VTK_H
 
-#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,6 +35,9 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+struct fclaw2d_patch;
+
 /** Callback to access/compute patch data for visualization.
  * \param [in,out] a    The callback should write into this memory.
  *                      For coordinate locations, it holds
@@ -44,8 +46,8 @@ extern "C"
  *                      The vector index changes fastest, then mx, then my
  *                      slowest.
  */
-typedef void (*fclaw2d_vtk_patch_data_t) (fclaw2d_global_t * glob,
-                                          fclaw2d_patch_t * this_patch,
+typedef void (*fclaw2d_vtk_patch_data_t) (struct fclaw2d_global * glob,
+                                          struct fclaw2d_patch * this_patch,
                                           int this_block_idx, int this_patch_idx,
                                           char *a);
 	
@@ -58,7 +60,7 @@ typedef void (*fclaw2d_vtk_patch_data_t) (fclaw2d_global_t * glob,
  * \return          0 if successful, negative otherwise.
  *                  Collective with identical value on all ranks.
  */
-int fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
+int fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
                             int mx, int my, int meqn,
                             double vtkspace, int vtkwrite,
                             fclaw2d_vtk_patch_data_t coordinate_cb,

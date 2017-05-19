@@ -23,9 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_base.h>
 #include <fclaw2d_clawpatch_vtk.h>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_options.h>
+#include <fclaw2d_map.h>
+#include <fclaw2d_global.h>
+
 
 typedef struct fclaw2d_vtk_state
 {

@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CLAWPATCH_OPTIONS_H
 
 #include <fclaw_base.h>
-#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -43,7 +42,12 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw2d_clawpatch_options
+struct fclaw2d_global;
+
+typedef struct fclaw2d_clawpatch_options fclaw2d_clawpatch_options_t;
+
+
+struct fclaw2d_clawpatch_options
 {
     /* These are constant for all clawpatch's */
     int mx;
@@ -59,15 +63,15 @@ typedef struct fclaw2d_clawpatch_options
 
     int is_registered;
 
-} fclaw2d_clawpatch_options_t;
+};
 
 fclaw2d_clawpatch_options_t *
 fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile);
 
-void fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob, 
+void fclaw2d_clawpatch_options_store (struct fclaw2d_global *glob, 
                                       fclaw2d_clawpatch_options_t* clawpatch_options);
 
-fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob);
+fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global* glob);
 
 
 #ifdef __cplusplus

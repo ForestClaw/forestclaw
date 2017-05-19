@@ -23,9 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_options.h>
+
+#include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
-#include <fclaw2d_clawpatch.h>
 
 /* -------------------------------------------------------------
    Compute errors (1-norm, 2-norm, inf-norm)

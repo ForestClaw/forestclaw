@@ -23,10 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_options.h>
-
-#include <fclaw2d_forestclaw.h>
 #include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_global.h>
+#include <fclaw_package.h>
 
 static int s_clawpatch_options_package_id = -1;
 

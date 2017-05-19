@@ -23,9 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_options.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_metric_default_fort.h>
+#include <fclaw2d_global.h>
 
 int fclaw2d_clawpatch_tag4refinement(fclaw2d_global_t *glob,
                                      fclaw2d_patch_t *this_patch,
