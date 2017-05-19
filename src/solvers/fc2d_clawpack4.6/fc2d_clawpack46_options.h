@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPACK46_OPTIONS_H
 #define FCLAW2D_CLAWPACK46_OPTIONS_H
 
-#include <fclaw_options.h>
 #include <fclaw_base.h>
-#include <fclaw2d_clawpatch_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,8 +36,10 @@ extern "C"
 #endif
 #endif
 
-/* Only one copy of clawpack46_options for each run */
-typedef struct fc2d_clawpack46_options
+struct fclaw2d_global;
+typedef struct fc2d_clawpack46_options fc2d_clawpack46_options_t;
+
+struct fc2d_clawpack46_options
 {
     int mwaves;
 
@@ -62,12 +62,13 @@ typedef struct fc2d_clawpack46_options
     int vtk_out;
 
     int is_registered;
-}
-fc2d_clawpack46_options_t;
+};
 
 fclaw_exit_type_t fc2d_clawpack46_postprocess (fc2d_clawpack46_options_t *
                                                clawopt);
+
 fclaw_exit_type_t fc2d_clawpack46_check (fc2d_clawpack46_options_t * clawopt);
+
 void fc2d_clawpack46_reset (fc2d_clawpack46_options_t * clawopt);
 
 fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
@@ -76,11 +77,11 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
 void fc2d_clawpack46_package_register(fclaw_app_t* app,
                                       fc2d_clawpack46_options_t* clawopt);
 
-fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob);
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(struct fclaw2d_global *glob);
 
-void fc2d_clawpack46_options_store (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt);
+void fc2d_clawpack46_options_store (struct fclaw2d_global* glob, fc2d_clawpack46_options_t* clawopt);
 
-void fc2d_clawpack46_output(fclaw2d_global_t *glob, int iframe);
+void fc2d_clawpack46_output(struct fclaw2d_global *glob, int iframe);
 
 
 #ifdef __cplusplus

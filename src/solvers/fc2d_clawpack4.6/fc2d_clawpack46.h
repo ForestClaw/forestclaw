@@ -26,12 +26,8 @@
 #ifndef FC2D_CLAWPACK46_H
 #define FC2D_CLAWPACK46_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-#include <fclaw_package.h>
-
-#include "fc2d_clawpack46_options.h"
-#include "clawpack46_user_fort.h"
+#include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
+#include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -41,6 +37,8 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+struct fclaw2d_patch;
 
 typedef void (*fc2d_clawpack46_setprob_t)(void);
 
@@ -380,49 +378,41 @@ void FC2D_CLAWPACK46_FORT_TIMEINTERP(const int *mx, const int* my, const int* mb
                                     const int* ierror);
 
 
-
-/***************************** MINIMAL API ******************************/
-
-void fc2d_clawpack46_register_vtable (fclaw_package_container_t *
-                                      pkg_container,
-                                      fc2d_clawpack46_options_t *
-                                      clawopt);
-
 /* -------------------------------------------------------------------------
    Routines that won't change
    ------------------------------------------------------------------------- */
 void
-    fc2d_clawpack46_setprob(fclaw2d_global_t* glob);
+    fc2d_clawpack46_setprob(struct fclaw2d_global* glob);
 
 void
-    fc2d_clawpack46_setaux(fclaw2d_global_t* glob,
-                           fclaw2d_patch_t *this_patch,
+    fc2d_clawpack46_setaux(struct fclaw2d_global* glob,
+                           struct fclaw2d_patch *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
 void
-    fc2d_clawpack46_set_capacity(fclaw2d_global_t* glob,
-                                 fclaw2d_patch_t *this_patch,
+    fc2d_clawpack46_set_capacity(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx);
 
 void
-    fc2d_clawpack46_qinit(fclaw2d_global_t* glob,
-                          fclaw2d_patch_t *this_patch,
+    fc2d_clawpack46_qinit(struct fclaw2d_global* glob,
+                          struct fclaw2d_patch *this_patch,
                           int this_block_idx,
                           int this_patch_idx);
 
 void
-    fc2d_clawpack46_b4step2(fclaw2d_global_t* glob,
-                            fclaw2d_patch_t *this_patch,
+    fc2d_clawpack46_b4step2(struct fclaw2d_global* glob,
+                            struct fclaw2d_patch *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
                             double t,
                             double dt);
 
 void
-    fc2d_clawpack46_bc2(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
+    fc2d_clawpack46_bc2(struct fclaw2d_global *glob,
+                        struct fclaw2d_patch *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
@@ -431,8 +421,8 @@ void
                         int time_interp);
 
 void
-    fc2d_clawpack46_src2(fclaw2d_global_t* glob,
-                         fclaw2d_patch_t *this_patch,
+    fc2d_clawpack46_src2(struct fclaw2d_global* glob,
+                         struct fclaw2d_patch *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
                          double t,
@@ -441,8 +431,8 @@ void
 
 /* A single step method that advances the solution a single step on a single grid
    using a time step dt determined by the subcycle manager */
-double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
+double fc2d_clawpack46_step2(struct fclaw2d_global *glob,
+                             struct fclaw2d_patch *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              double t,
@@ -450,15 +440,15 @@ double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
 
 /* Use this ro return only the right hand side of the clawpack algorithm */
 double
-    fc2d_clawpack46_step2_rhs(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *this_patch,
+    fc2d_clawpack46_step2_rhs(struct fclaw2d_global *glob,
+                              struct fclaw2d_patch *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
                               double t,
                               double *rhs);
 
-double fc2d_clawpack46_update(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *this_patch,
+double fc2d_clawpack46_update(struct fclaw2d_global *glob,
+                              struct fclaw2d_patch *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
                               double t,
