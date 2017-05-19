@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output.h> 
 
+struct fclaw2d_transform_data;
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -231,7 +233,7 @@ void fclaw2d_clawpatch_copy_face(struct fclaw2d_global *glob,
                                  struct fclaw2d_patch *neighbor_patch,
                                  int iface,
                                  int time_interp,
-                                 fclaw2d_transform_data_t *transform_data);
+                                 struct fclaw2d_transform_data *transform_data);
 
 void fclaw2d_clawpatch_average_face(struct fclaw2d_global *glob,
                                     struct fclaw2d_patch *coarse_patch,
@@ -242,7 +244,7 @@ void fclaw2d_clawpatch_average_face(struct fclaw2d_global *glob,
                                     int refratio,
                                     int time_interp,
                                     int igrid,
-                                    fclaw2d_transform_data_t* transform_data);
+                                    struct fclaw2d_transform_data* transform_data);
 
 void fclaw2d_clawpatch_interpolate_face(struct fclaw2d_global *glob,
                                         struct fclaw2d_patch *coarse_patch,
@@ -253,7 +255,7 @@ void fclaw2d_clawpatch_interpolate_face(struct fclaw2d_global *glob,
                                         int refratio,
                                         int a_time_interp,
                                         int igrid,
-                                        fclaw2d_transform_data_t* transform_data);
+                                        struct fclaw2d_transform_data* transform_data);
 
 
 
@@ -262,7 +264,7 @@ void fclaw2d_clawpatch_copy_corner(struct fclaw2d_global *glob,
                                    struct fclaw2d_patch *corner_patch,
                                    int icorner,
                                    int time_interp,
-                                   fclaw2d_transform_data_t *transform_data);
+                                   struct fclaw2d_transform_data *transform_data);
 
 void fclaw2d_clawpatch_average_corner(struct fclaw2d_global *glob,
                                       struct fclaw2d_patch *coarse_patch,
@@ -270,7 +272,7 @@ void fclaw2d_clawpatch_average_corner(struct fclaw2d_global *glob,
                                       int coarse_corner,
                                       int refratio,
                                       int time_interp,
-                                      fclaw2d_transform_data_t* transform_data);
+                                      struct fclaw2d_transform_data* transform_data);
 
 void fclaw2d_clawpatch_interpolate_corner(struct fclaw2d_global* glob,
                                           struct fclaw2d_patch* coarse_patch,
@@ -278,13 +280,13 @@ void fclaw2d_clawpatch_interpolate_corner(struct fclaw2d_global* glob,
                                           int coarse_corner,
                                           int refratio,
                                           int a_time_interp,
-                                          fclaw2d_transform_data_t* transform_data);
+                                          struct fclaw2d_transform_data* transform_data);
 
 typedef void (*fclaw2d_fort_copy_face_t)(const int* mx, const int* my, const int* mbc, 
                                          const int* meqn,
                                          double qthis[],double qneighbor[], 
                                          const int* a_idir,
-                                         fclaw2d_transform_data_t** transform_cptr);
+                                         struct fclaw2d_transform_data** transform_cptr);
 
 typedef void (*fclaw2d_fort_average_face_t)(const int* mx, const int* my, const int* mbc,
                                                 const int* meqn,
@@ -294,7 +296,7 @@ typedef void (*fclaw2d_fort_average_face_t)(const int* mx, const int* my, const 
                                                 const int* num_neighbors,
                                                 const int* refratio, const int* igrid,
                                                 const int* manifold, 
-                                                fclaw2d_transform_data_t** transform_cptr);
+                                                struct fclaw2d_transform_data** transform_cptr);
 
 typedef void (*fclaw2d_fort_interpolate_face_t)(const int* mx, const int* my, const int* mbc,
                                                 const int* meqn,
@@ -302,25 +304,26 @@ typedef void (*fclaw2d_fort_interpolate_face_t)(const int* mx, const int* my, co
                                                 const int* idir, const int* iside,
                                                 const int* num_neighbors,
                                                 const int* refratio, const int* igrid,
-                                                fclaw2d_transform_data_t** transform_cptr);
+                                                struct fclaw2d_transform_data** transform_cptr);
 
 typedef void (*fclaw2d_fort_copy_corner_t)(const int* mx, const int* my, const int* mbc,
                                      const int* meqn, double this_q[],double neighbor_q[],
                                      const int* a_corner,
-                                     fclaw2d_transform_data_t** transform_cptr);
+                                     struct fclaw2d_transform_data** transform_cptr);
 
 typedef void (*fclaw2d_fort_average_corner_t)(const int* mx, const int* my, const int* mbc,
                                         const int* meqn, const int* a_refratio,
                                         double qcoarse[], double qfine[],
                                         double areacoarse[], double areafine[],
                                         const int* manifold,
-                                        const int* a_corner, fclaw2d_transform_data_t** transform_cptr);
+                                        const int* a_corner, 
+                                        struct fclaw2d_transform_data** transform_cptr);
 
 typedef void (*fclaw2d_fort_interpolate_corner_t)(const int* mx, const int* my, const int* mbc,
                                                   const int* meqn, const int* a_refratio, 
                                                   double this_q[],
                                                   double neighbor_q[], const int* a_corner,
-                                                  fclaw2d_transform_data_t** transform_cptr);
+                                                  struct fclaw2d_transform_data** transform_cptr);
 
 typedef void (*fclaw2d_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
                                           const int *meqn, const int* psize,
