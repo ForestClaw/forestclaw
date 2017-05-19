@@ -23,16 +23,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
-
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
-#include <fclaw2d_map_brick.h>
-#include <fclaw2d_diagnostics.h>
-
-#include <fc2d_clawpack5.h>
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_options.h"
+#include "fclaw2d_options.h"
+
+#include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
+
+#include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_defs.h>
+
+/* Some mapping functions */
+#include <fclaw2d_map_brick.h>
+#include <fclaw2d_map.h>
+#include <fclaw2d_map_query.h>
+
+/* we use a few of these functions */
+#include <fc2d_clawpack5.h>
+
+
 
 
 /* Needed for debugging */
@@ -830,7 +841,7 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_global_t *glob,
     my = clawpatch_opt->my;
     mbc = clawpatch_opt->mbc;
     refratio = gparms->refratio;
-    p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
+    p4est_refineFactor = RefineFactor;
 
     // fclaw2d_clawpatch_metric_data(domain,coarse_patch,&xp,&yp,&zp,
     //                               &xd,&yd,&zd,&areacoarse);
@@ -890,7 +901,7 @@ void fc2d_geoclaw_average2coarse(fclaw2d_global_t *glob,
     my  = clawpatch_opt->my;
     mbc = clawpatch_opt->mbc;
     refratio = gparms->refratio;
-    p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
+    p4est_refineFactor = RefineFactor;
     mbathy = geoclaw_options->mbathy;
 
     // fclaw2d_clawpatch_metric_data(domain,coarse_patch,&xp,&yp,&zp,

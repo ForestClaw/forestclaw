@@ -24,7 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fc2d_geoclaw.h"
-#include <fclaw2d_clawpatch.h>
+#include "fc2d_geoclaw_options.h"
+#include <fclaw2d_clawpatch.h>  /* Include patch, domain declarations */
+#include <fclaw2d_global.h>
 
 static
 void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
@@ -73,7 +75,7 @@ void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
     clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     time = glob->curr_time;
-    ngrids = fclaw2d_domain_get_num_patches(glob->domain);
+    ngrids = glob->domain->global_num_patches;
 
     meqn = clawpatch_opt->meqn;
     maux = clawpatch_opt->maux;

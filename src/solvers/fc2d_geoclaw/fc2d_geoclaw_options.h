@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_GEOCLAW_OPTIONS_H
 #define FCLAW2D_GEOCLAW_OPTIONS_H
 
-#include <fclaw_options.h>
-#include <fclaw_base.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_base.h>  /* Needed for fclaw_app_t */
 
 #ifdef __cplusplus
 extern "C"
@@ -38,21 +36,7 @@ extern "C"
 #endif
 #endif
 
-typedef struct geoclaw_gauge
-{
-    int blockno;
-    int patchno;
-    int location_in_results;
-
-    double xc;
-    double yc;
-    double t1;
-    double t2;
-    int num;
-    /* double* buffer; */  /* Not yet used */
-
-} geoclaw_gauge_t;
-/* Only one copy of GEOCLAW_options for each run */
+struct fclaw2d_global;
 
 typedef struct fc2d_geoclaw_options
 {
@@ -82,15 +66,16 @@ typedef struct fc2d_geoclaw_options
     int ascii_out;  /* Only one type of output now  */    
 
     int is_registered;
+    
 } fc2d_geoclaw_options_t;
 
 fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t * app,
                                                        const char *configfile);
 
-void fc2d_geoclaw_options_store (fclaw2d_global_t* glob, 
-                               fc2d_geoclaw_options_t* geo_opt);
+void fc2d_geoclaw_options_store (struct fclaw2d_global* glob, 
+                                 fc2d_geoclaw_options_t* geo_opt);
 
-fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_global_t *glob);
+fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(struct fclaw2d_global *glob);
 
 
 
