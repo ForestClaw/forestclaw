@@ -25,6 +25,19 @@
 
 #include "swirl_user.h"
 
+#include <fclaw_package.h>
+
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_options.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_convenience.h>
+#include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
+
+#include <fc2d_clawpack46_options.h>
+#include <fc2d_clawpack5_options.h>
+
 static int s_user_options_package_id = -1;
 
 static void *

@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SWIRL_USER_H
 #define SWIRL_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-
+#include <fclaw2d_map.h>
 #include "../all/clawpack_user.h"
 
 #ifdef __cplusplus
@@ -47,19 +45,24 @@ typedef struct user_options
 
 } user_options_t;
 
+struct fclaw2d_fclaw2d_global;
+struct fclaw2d_fclaw2d_patch;
+struct fclaw2d_fclaw2d_domain;
+
+
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
 void SWIRL_SETPROB(double* tperiod);
 
-void swirl_link_solvers(fclaw2d_global_t *glob);
+void swirl_link_solvers(struct fclaw2d_global *glob);
 
-void swirl_problem_setup(fclaw2d_global_t* glob);
+void swirl_problem_setup(struct fclaw2d_global* glob);
 
-void swirl_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
+void swirl_patch_setup(struct fclaw2d_domain *domain,
+                       struct fclaw2d_patch *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
 
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+const user_options_t* swirl_get_options(struct fclaw2d_global* glob);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
