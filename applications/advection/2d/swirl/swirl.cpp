@@ -35,13 +35,19 @@
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch.h>
+
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack5_options.h>
+
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 static int s_user_options_package_id = -1;
 
 static void *
-user_register (user_options_t *user, sc_options_t * opt)
+swirl_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
     sc_options_add_double (opt, 0, "period", &user->period, 4,
@@ -56,7 +62,7 @@ user_register (user_options_t *user, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-user_postprocess(user_options_t *user)
+swirl_postprocess(user_options_t *user)
 {
     /* nothing to post-process yet ... */
     return FCLAW_NOEXIT;
@@ -64,14 +70,14 @@ user_postprocess(user_options_t *user)
 
 
 static fclaw_exit_type_t
-user_check (user_options_t *user)
+swirl_check (user_options_t *user)
 {
     /* Nothing to check ? */
     return FCLAW_NOEXIT;
 }
 
 static fclaw_exit_type_t
-user_destroy(user_options_t *user)
+swirl_destroy(user_options_t *user)
 {
     /* Nothing to destroy */
     return FCLAW_NOEXIT;
@@ -89,7 +95,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     user = (user_options_t*) package;
 
-    return user_register(user,opt);
+    return swirl_register(user,opt);
 }
 
 static fclaw_exit_type_t
@@ -106,7 +112,7 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT(user->is_registered);
 
     /* Convert strings to arrays */
-    return user_postprocess (user);
+    return swirl_postprocess (user);
 }
 
 
@@ -121,7 +127,7 @@ options_check(fclaw_app_t *app, void *package,void *registered)
 
     user = (user_options_t*) package;
 
-    return user_check(user);
+    return swirl_check(user);
 }
 
 static void
@@ -136,7 +142,7 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     user = (user_options_t*) package;
     FCLAW_ASSERT (user->is_registered);
 
-    user_destroy (user);
+    swirl_destroy (user);
 
     FCLAW_FREE (user);
 }
@@ -153,7 +159,7 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 /* ------------- User options access functions --------------------- */
 
 static
-user_options_t* user_options_register (fclaw_app_t * app,
+user_options_t* swirl_options_register (fclaw_app_t * app,
                                        const char *configfile)
 {
     user_options_t *user;
@@ -249,7 +255,7 @@ main (int argc, char **argv)
     /* Options */
     sc_options_t                *options;
     user_options_t              *user;
-    fclaw_options_t               *gparms;
+    fclaw_options_t             *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_clawpack46_options_t   *claw46opt;
     fc2d_clawpack5_options_t    *claw5opt;
@@ -268,7 +274,7 @@ main (int argc, char **argv)
     clawpatchopt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
     claw5opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    user =                        user_options_register(app,"fclaw_options.ini");  
+    user =                        swirl_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
