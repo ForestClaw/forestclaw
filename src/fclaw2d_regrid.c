@@ -23,12 +23,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
-
 #include <fclaw2d_regrid.h>
+
+#include <fclaw2d_options.h>
+
+#include <fclaw2d_convenience.h>   /* p4est domain, patch handling routines */
+#include <forestclaw2d.h>          /* Needed for patch_relation_t data */
+
+#include <fclaw2d_defs.h>
+#include <fclaw2d_global.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_patch.h>
 
 /* This is also called from fclaw2d_initialize, so is not made static */
 void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
@@ -308,6 +317,16 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     /* Count calls to this function */
     ++glob->count_amr_regrid;
 }
+
+void fclaw2d_after_regrid(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    if (fclaw_vt->after_regrid != NULL)
+    {
+        fclaw_vt->after_regrid(glob);
+    }
+}
+
 
 #ifdef __cplusplus
 #if 0

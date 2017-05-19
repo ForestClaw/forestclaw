@@ -28,8 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw2d_map_query_defs.h>
-#include <p4est_connectivity.h>
-#include <fclaw_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,6 +36,8 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
+
+struct p4est_connectivity;
 
 /** This prototype matches the Fortran mapc2m functions used in ClawPatch.
  */
@@ -221,7 +221,7 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
    Brick mapping
    ---------------------------------------------------------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t* conn,
+fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
                                              int mi,
                                              int mj);
 

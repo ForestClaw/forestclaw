@@ -23,10 +23,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_regrid.h>
 #include <fclaw2d_partition.h>
+
+#include <fclaw2d_convenience.h>  /* p4est domain, patch handling routines */
+
+#include <fclaw2d_global.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_patch.h>
+
+#include <fclaw2d_options.h>
 
 static
 void  cb_partition_transfer(fclaw2d_domain_t * old_domain,

@@ -25,20 +25,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 
-
-void fclaw2d_after_regrid(fclaw2d_global_t *glob)
-{
-    if (fclaw2d_vt()->after_regrid != NULL)
-    {
-        fclaw2d_vt()->after_regrid(glob);
-    }
-}
+#include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
 
 void fclaw2d_problem_setup(fclaw2d_global_t *glob)
 {
+	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+	
     /* User defined problem setup */
-    if (fclaw2d_vt()->problem_setup != NULL)
+    if (fclaw_vt->problem_setup != NULL)
     {
-        fclaw2d_vt()->problem_setup(glob);
+        fclaw_vt->problem_setup(glob);
     }
 }

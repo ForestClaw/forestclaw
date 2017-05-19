@@ -26,10 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_PHYSICAL_BC_H
 #define FCLAW2D_PHYSICAL_BC_H
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -37,6 +33,10 @@ extern "C"
 }
 #endif
 #endif
+
+struct fclaw2d_global;
+struct fclaw2d_domain;
+struct fclaw2d_patch;
 
 
 typedef struct fclaw2d_physical_time_info
@@ -46,26 +46,26 @@ typedef struct fclaw2d_physical_time_info
 } fclaw2d_physical_time_info_t;
 
 
-void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
+void cb_fclaw2d_physical_set_bc(struct fclaw2d_domain *domain,
+                                struct fclaw2d_patch *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx,
                                 void *user);
 
 
 /* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_physical_get_bc(fclaw2d_global_t *glob,
+void fclaw2d_physical_get_bc(struct fclaw2d_global *glob,
                              int this_block_idx,
                              int this_patch_idx,
                              int *intersects_bdry);
 
-void fclaw2d_physical_set_bc(fclaw2d_global_t *glob,
+void fclaw2d_physical_set_bc(struct fclaw2d_global *glob,
                              int level,
                              double level_time,
                              int time_interp);
 
-void fclaw2d_physical_bc_default(fclaw2d_global_t *glob,
-                                 fclaw2d_patch_t *this_patch,
+void fclaw2d_physical_bc_default(struct fclaw2d_global *glob,
+                                 struct fclaw2d_patch *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
                                  double t,

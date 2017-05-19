@@ -23,14 +23,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
-
 #include <fclaw2d_forestclaw.h>
+
+#include <fclaw2d_global.h>
+#include <fclaw2d_options.h>
+
+#include <fclaw2d_convenience.h>
+
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_ghost_fill.h>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_map.h>
+#include <fclaw2d_patch.h>
+#include <fclaw2d_domain.h>
 
 #if defined(_OPENMP)
 #include <omp.h>

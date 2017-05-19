@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_TRANSFORM_H
 #define FCLAW2D_TRANSFORM_H
 
-#include <fclaw2d_global.h>
+#include <fclaw_base.h>   /* Defines FCLAW_F77_FUNC */
 
 #ifdef __cplusplus
 extern "C"
@@ -36,6 +36,7 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
 struct fclaw2d_patch;  /* fclaw2d_patch.h includes this file */
 
 /* Data structure for transformation data at non-aligned boundaries */
@@ -49,7 +50,7 @@ typedef struct fclaw2d_transform_data
     int is_block_corner;
     int block_iface;   /* -1 for interior faces or block corners */
 
-    fclaw2d_global_t *glob;
+    struct fclaw2d_global *glob;
 } fclaw2d_transform_data_t;
 
 #define FCLAW2D_TRANSFORM_FACE FCLAW_F77_FUNC_(fclaw2d_transform_face, \

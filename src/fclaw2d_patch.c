@@ -23,12 +23,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
-#include <forestclaw2d.h>
-#include <fclaw_base.h>
-
 #include <fclaw2d_patch.h>
+
+#include <forestclaw2d.h>
+#include <fclaw2d_defs.h>
+#include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
+#include <fclaw2d_transform.h>
 
 static fclaw2d_patch_vtable_t s_patch_vt;
 
@@ -242,33 +243,6 @@ void fclaw2d_patch_set_block_corner_count(fclaw2d_global_t* glob,
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(this_patch);
     pdata->block_corner_count[icorner] = block_corner_count;
-}
-
-
-void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
-                                           fclaw2d_patch_callback_t pcb, void *user)
-{
-#if (_OPENMP)
-    int i, j;
-    fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
-
-    for (i = 0; i < domain->num_blocks; i++)
-    {
-        block = domain->blocks + i;
-#pragma omp parallel for private(patch,j)
-        for (j = 0; j < block->num_patches; j++)
-        {
-            patch = block->patches + j;
-            if (patch->level == level)
-            {
-                pcb (domain, patch, i, j, user);
-            }
-        }
-    }
-#else
-    fclaw_global_essentialf("fclaw2d_patch_iterator_mthread : We should not be here\n");
-#endif
 }
 
 
@@ -524,7 +498,7 @@ void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t *fine_patch,
                                     int idir,
                                     int iside,
-                                    int p4est_refineFactor,
+                                    int RefineFactor,
                                     int refratio,
                                     int time_interp,
                                     int igrid,
@@ -532,7 +506,7 @@ void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
 {
     FCLAW_ASSERT(patch_vt()->interpolate_face != NULL);
     patch_vt()->interpolate_face(glob,coarse_patch,fine_patch,idir,
-                                 iside,p4est_refineFactor,refratio,
+                                 iside,RefineFactor,refratio,
                                  time_interp,igrid,transform_data);
 }
 
@@ -541,7 +515,7 @@ void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
                                 fclaw2d_patch_t *fine_patch,
                                 int idir,
                                 int iface_coarse,
-                                int p4est_refineFactor,
+                                int RefineFactor,
                                 int refratio,
                                 int time_interp,
                                 int igrid,
@@ -550,7 +524,7 @@ void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
     FCLAW_ASSERT(patch_vt()->average_face != NULL);
 
     patch_vt()->average_face(glob,coarse_patch,fine_patch,idir,
-                          iface_coarse,p4est_refineFactor,
+                          iface_coarse,RefineFactor,
                           refratio,time_interp,igrid,
                           transform_data);
 }

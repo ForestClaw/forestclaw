@@ -24,9 +24,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>
 
+#include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
+
+#include <fclaw2d_patch.h>
 #include <fclaw2d_exchange.h>
+#include <fclaw2d_global.h>
 
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
@@ -114,3 +117,31 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
 }
+
+
+void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
+                                           fclaw2d_patch_callback_t pcb, void *user)
+{
+#if (_OPENMP)
+    int i, j;
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+
+    for (i = 0; i < domain->num_blocks; i++)
+    {
+        block = domain->blocks + i;
+#pragma omp parallel for private(patch,j)
+        for (j = 0; j < block->num_patches; j++)
+        {
+            patch = block->patches + j;
+            if (patch->level == level)
+            {
+                pcb (domain, patch, i, j, user);
+            }
+        }
+    }
+#else
+    fclaw_global_essentialf("fclaw2d_patch_iterator_mthread : We should not be here\n");
+#endif
+}
+

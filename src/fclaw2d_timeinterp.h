@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_TIMEINTERP_H
 #define FCLAW2D_TIMEINTERP_H
 
-#include <fclaw2d_global.h>
+#include <fclaw_base.h>    /* Defines FCLAW_F77_FUNC */
 
 #ifdef __cplusplus
 extern "C"
@@ -36,7 +36,9 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_timeinterp(fclaw2d_global_t *glob,
+struct fclaw2d_global;
+
+void fclaw2d_timeinterp(struct fclaw2d_global *glob,
                        int level, double alpha);
 
 #define FCLAW2D_TIMEINTERP_FORT FCLAW_F77_FUNC (fclaw2d_timeinterp_fort, \

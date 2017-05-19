@@ -26,8 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_OUTPUT_H
 #define FCLAW2D_OUTPUT_H
 
-#include "fclaw2d_forestclaw.h"
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,7 +42,7 @@ void fclaw2d_output_frame_tikz(struct fclaw2d_global* glob, int iframe);
 
 #if 0
 /* Needed for debugging *(uses a clawpatch) */
-void fclaw2d_output_write_vtk_debug (fclaw2d_global_t *glob, const char *basename);
+void fclaw2d_output_write_vtk_debug (struct fclaw2d_global *glob, const char *basename);
 #endif
 
 

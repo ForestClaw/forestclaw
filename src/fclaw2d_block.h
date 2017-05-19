@@ -26,9 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_BLOCK_H
 #define FCLAW2D_BLOCK_H
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -37,9 +34,12 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+struct fclaw2d_patch;
+
 void 
-fclaw2d_block_get_block_boundary(fclaw2d_global_t * glob,
-                                 fclaw2d_patch_t * patch,
+fclaw2d_block_get_block_boundary(struct fclaw2d_global * glob,
+                                 struct fclaw2d_patch * patch,
                                  int *intersects_block);
 
 #ifdef __cplusplus

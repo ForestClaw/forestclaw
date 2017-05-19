@@ -26,10 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTABLE_H
 #define FCLAW2D_VTABLE_H
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
-
-#include <fclaw2d_metric_default.h>
+#include <fclaw2d_metric_default.h>  /* Needed as long as metric type defs are defined here */
 
 #ifdef __cplusplus
 extern "C"
@@ -39,34 +36,37 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+struct fclaw2d_patch;
+
 typedef void (*fclaw2d_vtable_initialize_t)();
 
-typedef void (*fclaw2d_problem_setup_t)(fclaw2d_global_t *glob);
+typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
 
-typedef void (*fclaw2d_output_frame_t)(fclaw2d_global_t * glob, int iframe);
+typedef void (*fclaw2d_output_frame_t)(struct fclaw2d_global * glob, int iframe);
 
 
-typedef void (*fclaw2d_metric_setup_mesh_t)(fclaw2d_global_t *glob,
-                                            fclaw2d_patch_t *this_patch,
+typedef void (*fclaw2d_metric_setup_mesh_t)(struct fclaw2d_global *glob,
+                                            struct fclaw2d_patch *this_patch,
                                             int blockno,
                                             int patchno);
 
-typedef void (*fclaw2d_metric_compute_area_t)(fclaw2d_global_t *glob,
-                                              fclaw2d_patch_t* this_patch,
+typedef void (*fclaw2d_metric_compute_area_t)(struct fclaw2d_global *glob,
+                                              struct fclaw2d_patch* this_patch,
                                               int blockno,
                                               int patchno);
 
-typedef void (*fclaw2d_metric_area_set_ghost_t)(fclaw2d_global_t *glob,
-                                                fclaw2d_patch_t* this_patch,
+typedef void (*fclaw2d_metric_area_set_ghost_t)(struct fclaw2d_global *glob,
+                                                struct fclaw2d_patch* this_patch,
                                                 int blockno,
                                                 int patchno);
 
-typedef void (*fclaw2d_metric_compute_normals_t)(fclaw2d_global_t *glob,
-                                                 fclaw2d_patch_t *this_patch,
+typedef void (*fclaw2d_metric_compute_normals_t)(struct fclaw2d_global *glob,
+                                                 struct fclaw2d_patch *this_patch,
                                                  int blockno,
                                                  int patchno);
 
-typedef void (*fclaw2d_after_regrid_t)(fclaw2d_global_t *glob);
+typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
 
 typedef struct fclaw2d_vtable
 {

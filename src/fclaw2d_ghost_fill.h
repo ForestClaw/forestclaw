@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_GHOST_FILL_H
 #define FCLAW2D_GHOST_FILL_H
 
-#include <fclaw_forestclaw.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_timer.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,6 +35,10 @@ extern "C"
 }
 #endif
 #endif
+
+struct fclaw2d_global;
+struct fclaw2d_domain;
+struct fclaw2d_patch;
 
 /* -------------------------------------------
    Routines needed to fill in ghost cells
@@ -71,49 +73,32 @@ typedef struct fclaw2d_exchange_info
     fclaw2d_exchange_type_t exchange_type;
     fclaw2d_grid_type_t grid_type;
     int has_fine_grid_neighbor;
+
 } fclaw2d_exchange_info_t;
 
-void cb_corner_fill(fclaw2d_domain_t *domain,
-                    fclaw2d_patch_t *this_patch,
+void cb_corner_fill(struct fclaw2d_domain *domain,
+                    struct fclaw2d_patch *this_patch,
                     int this_block_idx,
                     int this_patch_idx,
                     void *user);
 
-void cb_face_fill(fclaw2d_domain_t *domain,
-                  fclaw2d_patch_t *this_patch,
+void cb_face_fill(struct fclaw2d_domain *domain,
+                  struct fclaw2d_patch *this_patch,
                   int this_block_idx,
                   int this_patch_idx,
                   void *user);
 
-void fclaw2d_ghost_update(fclaw2d_global_t* glob,
+void fclaw2d_ghost_update(struct fclaw2d_global* glob,
                           int fine_level,
                           int coarse_level,
                           double sync_time,
                           int time_interp,
                           fclaw2d_timer_names_t running);
 
-void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
+void fclaw2d_face_neighbor_ghost(struct fclaw2d_global* glob,
                                  int minlevel,
                                  int maxlevel,
                                  int time_interp);
-
-#define FCLAW2D_GHOST_PACK FCLAW_F77_FUNC(fclaw2d_ghost_pack,FCLAW2D_GHOST_PACK)
-void  FCLAW2D_GHOST_PACK(int *mx, int *my, int *mbc,
-                         int *meqn, int *mint,
-                         double qdata[], double area[],
-                         double qpack[], int *psize,
-                         int *packmode, int *pack_layers,
-                         int *ierror);
-
-#define FCLAW2D_SET_BOUNDARY_TO_VALUE FCLAW_F77_FUNC(fclaw2d_set_boundary_to_value, \
-                                                     FCLAW2D_SET_BOUNDARY_TO_VALUE)
-void FCLAW2D_SET_BOUNDARY_TO_VALUE(int *mx, int* my, int* mbc,
-                                   int* meqn,double* q, double* val);
-
-#define FCLAW2D_SET_CORNERS_TO_VALUE FCLAW_F77_FUNC(fclaw2d_set_corners_to_value, \
-                                                     FCLAW2D_SET_CORNERS_TO_VALUE)
-void FCLAW2D_SET_CORNERS_TO_VALUE(int *mx, int* my, int* mbc,
-                                   int* meqn,double* q, double* val);
 
 #ifdef __cplusplus
 #if 0

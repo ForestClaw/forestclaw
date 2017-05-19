@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_OPTIONS_H
 
 #include <fclaw_options.h>
-#include <fclaw2d_global.h>
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -43,7 +43,10 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_options_store (struct fclaw2d_global *glob, fclaw_options_t* fclaw_opt);
+struct fclaw2d_global;
+struct fclaw_options;
+
+void fclaw2d_options_store (struct fclaw2d_global *glob, struct fclaw_options* fclaw_opt);
 
 fclaw_options_t* fclaw2d_get_options(struct fclaw2d_global *glob);
 

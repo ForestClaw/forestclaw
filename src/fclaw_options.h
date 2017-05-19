@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_OPTIONS_H
 #define FCLAW_OPTIONS_H
 
-#include <fclaw_forestclaw.h>
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -63,11 +63,11 @@ int fclaw_options_read_from_file(sc_options_t* opt);
  */
 
 void fclaw_options_add_int_array (sc_options_t * opt,
-                                int opt_char, const char *opt_name,
-                                const char **array_string,
-                                const char *default_string,
-                                int **int_array, int initial_length,
-                                const char *help_string);
+                                  int opt_char, const char *opt_name,
+                                  const char **array_string,
+                                  const char *default_string,
+                                  int **int_array, int initial_length,
+                                  const char *help_string);
 
 void
 fclaw_options_add_double_array (sc_options_t * opt,
@@ -86,7 +86,7 @@ fclaw_options_add_double_array (sc_options_t * opt,
  * \param [in] new_length       Length of int_array.
  */
 void fclaw_options_convert_int_array (const char *array_string,
-                                    int **int_array, int new_length);
+                                      int **int_array, int new_length);
 
 void fclaw_options_convert_double_array (const char *array_string,
                                          double **double_array, int new_length);

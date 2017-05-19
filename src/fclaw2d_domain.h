@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DOMAIN_H
 #define FCLAW2D_DOMAIN_H
 
-#include <fclaw2d_global.h>
+#include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
 
 #ifdef __cplusplus
 extern "C"
@@ -35,6 +35,9 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
+
+struct fclaw2d_global;
+struct fclaw2d_domain;
 
 typedef struct fclaw2d_domain_data
 {
@@ -47,17 +50,21 @@ typedef struct fclaw2d_domain_data
 
 } fclaw2d_domain_data_t;
 
-void fclaw2d_domain_data_new(fclaw2d_domain_t *domain);
+void fclaw2d_domain_data_new(struct fclaw2d_domain *domain);
 
-void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
+void fclaw2d_domain_data_delete(struct fclaw2d_domain* domain);
 
-void fclaw2d_domain_setup(fclaw2d_global_t* glob,
-                          fclaw2d_domain_t* new_domain);
+void fclaw2d_domain_setup(struct fclaw2d_global* glob,
+                          struct fclaw2d_domain* new_domain);
 
-void fclaw2d_domain_reset(fclaw2d_global_t* glob);
+void fclaw2d_domain_reset(struct fclaw2d_global* glob);
 
-fclaw2d_domain_data_t*
-fclaw2d_domain_get_data(fclaw2d_domain_t *domain);
+fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw2d_domain *domain);
+
+/* OpenMP iterator (not part of forestclaw2d.h */
+void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int level,
+                                           fclaw2d_patch_callback_t pcb, void *user);
+
 
 #ifdef __cplusplus
 #if 0

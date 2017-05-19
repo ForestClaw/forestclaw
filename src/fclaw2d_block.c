@@ -23,8 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw2d_block.h>
 #include <fclaw2d_global.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_defs.h>
+
+#include <fclaw2d_patch.h>
+
 
 void fclaw2d_block_get_block_boundary(fclaw2d_global_t * glob,
                                       fclaw2d_patch_t * patch,

@@ -24,15 +24,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_global.h>
-#include <fclaw_package.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>
 
-const int SpaceDim = FCLAW2D_SPACEDIM;
-const int NumFaces = FCLAW2D_NUMFACES;
-const int p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
-const int NumCorners = FCLAW2D_NUM_CORNERS;
-const int NumSiblings = FCLAW2D_NUM_SIBLINGS;
+#include <fclaw_package.h>
+#include <fclaw_timer.h>
+
+#include <fclaw2d_domain.h>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_map.h>
+
 
 fclaw2d_global_t* fclaw2d_global_new ()
 {
@@ -111,9 +110,7 @@ void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* 
     fclaw2d_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_adapted(glob->domain, new_domain,
-                                   mcb,
-                                   &g);
+    fclaw2d_domain_iterate_adapted(glob->domain, new_domain,mcb,&g);
 }
 
 void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
@@ -122,9 +119,7 @@ void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
     fclaw2d_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_level_mthread(glob->domain, level,
-                                         pcb, 
-                                         &g);
+    fclaw2d_domain_iterate_level_mthread(glob->domain, level,pcb,&g);
 }
 
 void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
@@ -135,8 +130,5 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
     fclaw2d_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_partitioned (glob->domain,
-                                        new_domain,
-                                        tcb,
-                                        &g);
+    fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }

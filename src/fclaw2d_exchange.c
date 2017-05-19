@@ -23,11 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_exchange.h>
+
+#include <fclaw2d_options.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_partition.h>
-#include <fclaw2d_exchange.h>
+#include <fclaw2d_global.h>
+#include <fclaw2d_patch.h>
 
 /* Also needed in fclaw2d_domain_reset */
 fclaw2d_domain_exchange_t*

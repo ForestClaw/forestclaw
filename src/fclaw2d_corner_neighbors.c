@@ -23,10 +23,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
-
+#include <fclaw2d_block.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_map_query.h>
+#include <fclaw2d_options.h>
+#include <fclaw2d_defs.h>
+#include <fclaw2d_global.h>
+#include <fclaw2d_transform.h>
+#include <fclaw2d_physical_bc.h>
+#include <fclaw2d_patch.h>
 
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize)
    This enum is defined both here and in fclaw2d_face_neighbors.cpp.  Is that okay? */
@@ -189,7 +194,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                remote face number.  The remote face number encodes the
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
-            int rproc[p4est_refineFactor];
+            int rproc[RefineFactor];
             int rpatchno;
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw2d_patch_face_neighbors(domain,
@@ -251,8 +256,8 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
         {
             *block_corner_count = 2;
             has_corner_neighbor = 1;
-            int rpatchno[p4est_refineFactor];
-            int rproc[p4est_refineFactor];
+            int rpatchno[RefineFactor];
+            int rproc[RefineFactor];
             int rfaceno;
 
             /* Use only faces 0 or 1 to get block data. */
@@ -272,7 +277,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             {
                 /* igrid = 0 at corners 0,1 and (R-1) at corners 2,3,
                    where R = refinement factor */
-                igrid = (icorner/2)*(p4est_refineFactor - 1);
+                igrid = (icorner/2)*(RefineFactor - 1);
             }
             else
             {

@@ -26,8 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DIAGNOSTICS_H
 #define FCLAW2D_DIAGNOSTICS_H
 
-#include "fclaw2d_global.h"
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -37,15 +35,18 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
+struct fclaw2d_domain;
 
 typedef struct fclaw2d_diagnostics_vtable  fclaw2d_diagnostics_vtable_t;
 
-typedef struct
+typedef struct fclaw2d_diagnostics_accumulator fclaw2d_diagnostics_accumulator_t;
+
+struct fclaw2d_diagnostics_accumulator
 {
     void* patch_accumulator;
     void* solver_accumulator;
     void* user_accumulator;
-} fclaw2d_diagnostics_accumulator_t;
+};
 
 /* Diagnostic information */
 typedef void (*fclaw2d_diagnostics_initialize_t)(struct fclaw2d_global *glob,
@@ -58,10 +59,10 @@ typedef void (*fclaw2d_diagnostics_gather_t)(struct fclaw2d_global *glob,
                                              void* acc,
                                              int init_flag);
 
-typedef void (*fclaw2d_diagnostics_reset_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_diagnostics_reset_t)(struct  fclaw2d_global *glob,
                                             void* acc);
 
-typedef void (*fclaw2d_diagnostics_finalize_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_diagnostics_finalize_t)(struct  fclaw2d_global *glob,
                                                void** acc);
 
 struct fclaw2d_diagnostics_vtable
@@ -94,12 +95,11 @@ fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt();
 
 void fclaw2d_diagnostics_vtable_initialize();
 
-double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d);
+double fclaw2d_domain_global_minimum (struct fclaw2d_domain* domain, double d);
 
 void fclaw2d_diagnostics_initialize(struct fclaw2d_global *glob);
 
-void fclaw2d_diagnostics_gather(struct fclaw2d_global *glob,
-                                int init_flag);
+void fclaw2d_diagnostics_gather(struct fclaw2d_global *glob, int init_flag);
 
 void fclaw2d_diagnostics_reset(struct fclaw2d_global *glob);
 

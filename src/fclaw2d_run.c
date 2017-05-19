@@ -23,8 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_patch.h>
 
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_global.h>
+#include <fclaw2d_options.h>
 #include <fclaw2d_advance.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_output.h>

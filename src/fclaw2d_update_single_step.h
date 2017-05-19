@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AMR_SINGLE_STEP_H
 #define AMR_SINGLE_STEP_H
 
-#include "fclaw2d_global.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,6 +35,7 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
 
 typedef struct single_step_data
 {
@@ -44,7 +44,7 @@ typedef struct single_step_data
     double maxcfl;
 } single_step_data_t;
 
-double fclaw2d_update_single_step(fclaw2d_global_t *glob,
+double fclaw2d_update_single_step(struct fclaw2d_global *glob,
                                   int level,
                                   double t, double dt);
 

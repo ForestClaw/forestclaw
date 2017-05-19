@@ -27,8 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_ADVANCE_H
 #define FCLAW2D_ADVANCE_H
 
-#include <fclaw2d_global.h>
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -37,8 +35,9 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
 
-double fclaw2d_advance_all_levels (fclaw2d_global_t * glob,double t, double dt);
+double fclaw2d_advance_all_levels (struct fclaw2d_global * glob,double t, double dt);
 
 
 #ifdef __cplusplus

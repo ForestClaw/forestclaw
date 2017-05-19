@@ -24,9 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_timer.h>
+#include <fclaw2d_global.h>
 
-
-#include <fclaw2d_forestclaw.h>
 #include <fclaw2d_partition.h>
 #include <sc_statistics.h>
 #include <fclaw2d_domain.h>

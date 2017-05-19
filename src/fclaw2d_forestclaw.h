@@ -26,27 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_FORESTCLAW_H
 #define FCLAW2D_FORESTCLAW_H
 
-#include <fclaw_forestclaw.h>
-
-/* Stores global things */
-#include "fclaw2d_global.h"
-
-/* p4est-centric files */
-#include "forestclaw2d.h"
-#include "fclaw2d_convenience.h"
-#include "p4est_connectivity.h"
-
-/* Basic objects */
-#include "fclaw2d_domain.h"
-#include "fclaw2d_block.h"
-#include "fclaw2d_patch.h"
-
-
-/* Basic header files that are probably required by all apps */
-#include <fclaw2d_options.h>
-#include "fclaw2d_vtable.h"
-
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -55,14 +34,13 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_problem_setup(fclaw2d_global_t *glob);
+struct fclaw2d_global;
 
-void fclaw2d_initialize(fclaw2d_global_t *glob);
-void fclaw2d_run(fclaw2d_global_t *glob);
-void fclaw2d_finalize(fclaw2d_global_t *glob);
+void fclaw2d_problem_setup(struct fclaw2d_global *glob);
 
-void fclaw2d_after_regrid(fclaw2d_global_t *glob);
-
+void fclaw2d_initialize (struct fclaw2d_global *glob);
+void fclaw2d_run (struct fclaw2d_global *glob);
+void fclaw2d_finalize(struct fclaw2d_global *glob);
 
 #ifdef __cplusplus
 #if 0
