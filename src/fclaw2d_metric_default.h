@@ -26,8 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_METRIC_DEFAULT_H
 #define FCLAW2D_METRIC_DEFAULT_H
 
-#include <fclaw2d_metric_default_fort.h>
-
 #ifdef __cplusplus
 extern "C"
 {

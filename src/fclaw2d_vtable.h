@@ -26,7 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTABLE_H
 #define FCLAW2D_VTABLE_H
 
-#include <fclaw2d_metric_default.h>  /* Needed as long as metric type defs are defined here */
+/* Needed as long as metric type defs are defined here */
+#include <fclaw2d_metric_default.h>  
+#include <fclaw2d_metric_default_fort.h>
+
 
 #ifdef __cplusplus
 extern "C"

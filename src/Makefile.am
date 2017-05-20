@@ -10,6 +10,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_options.h \
 	src/fclaw_mpi.h \
 	src/fclaw_math.h \
+	src/fclaw2d_defs.h \
 	src/forestclaw2d.h \
 	src/fortran_source2d/metric_terms.i \
 	src/fp_exception_glibc_extension.h \
@@ -41,9 +42,10 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h \
-	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
-	src/patches/clawpatch/fclaw2d_clawpatch_output.h \
+	src/patches/clawpatch/fclaw2d_clawpatch.h \
+	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h \
+	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_regrid.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.h
 
@@ -119,11 +121,11 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fdisc.f \
 	src/fortran_source2d/philim.f \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
-	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
-	src/patches/clawpatch/fclaw2d_clawpatch_regrid.c \
-	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
-	src/patches/clawpatch/fclaw2d_clawpatch_vtk.c
+	src/patches/clawpatch/fclaw2d_clawpatch_regrid.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.c
 
 
 # this variable is used for headers that are not publicly installed
