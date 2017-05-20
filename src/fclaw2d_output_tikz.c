@@ -24,10 +24,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_output.h>
+#include <fclaw_base.h>   /* Needed for MPI declarations */
+
 #include <fclaw2d_domain.h>
 #include <fclaw2d_global.h>
 
-#include <fclaw2d_map.h>
 #include <fclaw2d_options.h>
 #include <fclaw_math.h>
 
