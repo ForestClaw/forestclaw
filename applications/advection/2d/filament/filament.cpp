@@ -25,21 +25,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "filament_user.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_patch.h>
-#include <fc2d_clawpack46.h>
+/* Maybe these should be bundled together in a nice user-include file? */
+#include <fclaw_package.h>
+#include <fclaw2d_options.h>
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_convenience.h>  /* Needed for connectivity */
+#include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_diagnostics.h>
 
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 #include <fclaw2d_map_query.h>
+
+#include <fclaw2d_clawpatch.h>
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 #include <fclaw_math.h>
 
 static int s_user_package_id = -1;
 
 static void *
-options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+filament_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
+    FCLAW_ASSERT(app != 0);
+    FCLAW_ASSERT(package != 0);
+    FCLAW_ASSERT(opt != 0);
+
     user_options_t* user = (user_options_t*) package;
 
     /* [user] User options */
@@ -65,8 +79,12 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
 
 
 static fclaw_exit_type_t
-options_check_user (fclaw_app_t * app, void *package, void *registered)
+filament_check (fclaw_app_t * app, void *package, void *registered)
 {
+    FCLAW_ASSERT(app != 0);
+    FCLAW_ASSERT(package != 0);
+    FCLAW_ASSERT(registered == 0);
+
     user_options_t* user = (user_options_t*) package;
     fclaw_options_t *gparms = fclaw_app_get_attribute(app,"Options",NULL);
 
@@ -85,21 +103,39 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
     return FCLAW_NOEXIT;
 }
 
+static void
+filament_destroy (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    user = (user_options_t*) package;
+    FCLAW_ASSERT (user->is_registered);
+
+    FCLAW_FREE (user);
+}
+
+
 
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
-    options_register_user,
+    filament_register,
     NULL,
-    options_check_user,
-    NULL
+    filament_check,
+    filament_destroy
 };
 
 static
-void register_user_options (fclaw_app_t * app,
-                            const char *configfile,
-                            user_options_t* user)
+void filament_register_options (fclaw_app_t * app,
+                                const char *configfile)
 {
+    user_options_t *user;
     FCLAW_ASSERT (app != NULL);
+
+    user = FCLAW_ALLOC (user_options_t, 1);
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
 }
@@ -211,8 +247,8 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    user_options_t              suser, *user = &suser;
-    fclaw_options_t               *gparms;
+    user_options_t              *user;
+    fclaw_options_t             *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_clawpack46_options_t   *claw46opt;
     fc2d_clawpack5_options_t    *claw5opt;
@@ -224,17 +260,14 @@ main (int argc, char **argv)
     int retval;
 
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, user);
+    app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Register packages */
-    gparms = fclaw2d_forestclaw_options_register(app,"fclaw_options.ini");
-    clawpatchopt = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
-    claw46opt = fc2d_clawpack46_options_register(app,"fclaw_options.ini");
-    claw5opt = fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-
-    /* User defined options (defined above) */
-    user->gparms = gparms;  /* Needed for checking mx, my for examples 3 and 4 */  
-    register_user_options(app,"fclaw_options.ini",user);  /* [user] */
+    gparms                    = fclaw2d_options_register(app,"fclaw_options.ini");
+    clawpatchopt    = fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
+    claw46opt         = fc2d_clawpack46_options_register(app,"fclaw_options.ini");
+    claw5opt           = fc2d_clawpack5_options_register(app,"fclaw_options.ini");
+    user =                     filament_register_options(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);
