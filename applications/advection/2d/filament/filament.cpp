@@ -129,7 +129,7 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 };
 
 static
-void filament_register_options (fclaw_app_t * app,
+void filament_options_register (fclaw_app_t * app,
                                 const char *configfile)
 {
     user_options_t *user;
@@ -141,14 +141,14 @@ void filament_register_options (fclaw_app_t * app,
 }
 
 static 
-void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
+void filament_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
     s_user_package_id = id;
 }
 
-const user_options_t* filament_user_get_options(fclaw2d_global_t* glob)
+const filament_options_t* filament_user_get_options(fclaw2d_global_t* glob)
 {
     int id = s_user_package_id;
     return (user_options_t*) 
@@ -267,7 +267,7 @@ main (int argc, char **argv)
     clawpatchopt    = fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46opt         = fc2d_clawpack46_options_register(app,"fclaw_options.ini");
     claw5opt           = fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    user =                     filament_register_options(app,"fclaw_options.ini");  
+    user =                     filament_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);
