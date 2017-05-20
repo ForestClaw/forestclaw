@@ -23,11 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_OUTPUT_ASCII_H
-#define FCLAW2D_OUTPUT_ASCII_H
-
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_output_ascii_fort.h>
+#ifndef FCLAW2D_CLAWPATCH_OUTPUT_ASCII_H
+#define FCLAW2D_CLAWPATCH_OUTPUT_ASCII_H
 
 #ifdef __cplusplus
 extern "C"
@@ -37,13 +34,31 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_clawpatch_output_ascii_header(fclaw2d_global_t* glob,
-                                           int iframe);
+struct fclaw2d_global;
+struct fclaw2d_patch;
+struct fclaw2d_domain;
 
-void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *this_patch,
-                                    int this_block_idx, int this_patch_idx,
-                                    int iframe,int num,int level);
+typedef void  (*fclaw2d_fort_header_ascii_t)(char* matname1,char* matname2,
+                                             double* time, int* meqn, int* maux,
+                                             int* ngrids);
+
+/* Write out data */
+typedef void (*fclaw2d_fort_output_ascii_t)(char* matname1,
+                                            int* mx,        int* my,
+                                            int* meqn,      int* mbc,
+                                            double* xlower, double* ylower,
+                                            double* dx,     double* dy,
+                                            double q[],
+                                            int* patch_num, int* level,
+                                            int* blockno,   int* mpirank);
+
+void cb_clawpatch_output_ascii (struct fclaw2d_domain * domain,
+                                struct fclaw2d_patch * this_patch,
+                                int this_block_idx, int this_patch_idx,
+                                void *user);
+
+void fclaw2d_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
+
 
 #ifdef __cplusplus
 #if 0

@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 
 #include <fclaw2d_timeinterp.h>
-#include <fclaw2d_clawpatch_output.h>
+#include <fclaw2d_clawpatch_output_ascii.h>
+#include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_diagnostics.h>
 
 #include <fclaw2d_metric.h>

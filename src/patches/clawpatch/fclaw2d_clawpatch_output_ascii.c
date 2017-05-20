@@ -23,10 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_options.h>
+#include <fclaw2d_clawpatch_output_ascii.h>
+
 #include <fclaw2d_global.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_output.h>
+#include <fclaw2d_options.h>
 
 
 void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,

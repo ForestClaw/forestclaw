@@ -32,9 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Needed for function pointer typedefs in fclaw2d_clawpatch_t */
 #include <fclaw2d_clawpatch_regrid.h>
 #include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch_output.h> 
+#include <fclaw2d_clawpatch_output_ascii.h> 
 
 struct fclaw2d_transform_data;
+struct fclaw2d_patch;
+struct fclaw2d_global;
 
 #ifdef __cplusplus
 extern "C"
@@ -164,6 +166,7 @@ void fclaw2d_clawpatch_build_from_fine(struct fclaw2d_global *glob,
                                        int fine0_patchno,
                                        fclaw2d_build_mode_t build_mode);
 
+#if 0
 void fclaw2d_clawpatch_set_boundary_to_nan(fclaw2d_domain_t* domain,
                                            int minlevel,
                                            int maxlevel,
@@ -174,6 +177,7 @@ void fclaw2d_clawpatch_set_boundary_to_value(fclaw2d_domain_t* domain,
                                              int maxlevel,
                                              int time_interp,
                                              double value);
+#endif
 
 void fclaw2d_clawpatch_set_corners_to_value(fclaw2d_domain_t* domain,
                                             int minlevel,

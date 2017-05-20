@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_VTK_H
-#define FCLAW2D_CLAWPATCH_VTK_H
+#ifndef FCLAW2D_CLAWPATCH_OUTPUT_VTK_H
+#define FCLAW2D_CLAWPATCH_OUTPUT_VTK_H
 
 
 #ifdef __cplusplus
@@ -60,11 +60,16 @@ typedef void (*fclaw2d_vtk_patch_data_t) (struct fclaw2d_global * glob,
  * \return          0 if successful, negative otherwise.
  *                  Collective with identical value on all ranks.
  */
-int fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
-                            int mx, int my, int meqn,
-                            double vtkspace, int vtkwrite,
-                            fclaw2d_vtk_patch_data_t coordinate_cb,
-                            fclaw2d_vtk_patch_data_t value_cb);
+int
+fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
+                        int mx, int my, int meqn,
+                        double vtkspace, int vtkwrite,
+                        fclaw2d_vtk_patch_data_t coordinate_cb,
+                        fclaw2d_vtk_patch_data_t value_cb);
+
+
+void fclaw2d_clawpatch_output_vtk (struct fclaw2d_global* glob, int iframe);
+
 
 #ifdef __cplusplus
 #if 0
