@@ -260,8 +260,8 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46opt;
     fc2d_clawpack5_options_t    *claw5opt;
 
-    fclaw2d_global_t         *glob;
-    fclaw2d_domain_t         *domain;
+    fclaw2d_global_t            *glob;
+    fclaw2d_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 
     int retval;
@@ -274,7 +274,7 @@ main (int argc, char **argv)
     clawpatchopt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
     claw5opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    user =                        swirl_options_register(app,"fclaw_options.ini");  
+    user =                       swirl_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
