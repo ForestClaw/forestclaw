@@ -24,10 +24,23 @@
 */
 
 #include "bowl_user.h"
-
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
 #include <fc2d_geoclaw.h>
+#include <fclaw2d_clawpatch.h>
+
+#include <fc2d_geoclaw_options.h>
+#include <fclaw2d_clawpatch_options.h>
+
+
+/* Maybe these should be bundled together in a nice user-include file? */
+#include <fclaw2d_options.h>
+#include <fclaw_package.h>
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_convenience.h>  /* Needed for connectivity */
+#include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_diagnostics.h>
+
 
 static int s_user_package_id = -1;
 
@@ -186,12 +199,11 @@ main (int argc, char **argv)
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
-    gparms = fclaw_options_register(app,"fclaw_options.ini");
-    clawpatchopt = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
-    geoclawopt = fc2d_geoclaw_options_register(app, "fclaw_options.ini");
 
-    /* User options */
-    bowl_register_options(app,"fclaw_options.ini",user);
+    gparms                   = fclaw_options_register(app,"fclaw_options.ini");
+    clawpatchopt = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
+    geoclawopt        = fc2d_geoclaw_options_register(app, "fclaw_options.ini");
+                                bowl_register_options(app,"fclaw_options.ini",user);
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
