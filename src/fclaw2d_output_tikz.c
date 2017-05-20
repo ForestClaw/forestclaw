@@ -101,7 +101,6 @@ cb_tikz_output (fclaw2d_domain_t * domain,
             xlow_d,ylow_d,xupper_d,yupper_d);
 }
 
-
 void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
 {
     fclaw2d_domain_t *domain = glob->domain;
@@ -162,7 +161,10 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
     fclose(fp);
 
     /* Wait for all processes to finish before adding last lines of file */
+    
+#ifdef FCLAW_ENABLE_MPI
     MPI_Barrier(MPI_COMM_WORLD);
+#endif
 
     if (domain->mpirank == 0)
     {
