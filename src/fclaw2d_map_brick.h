@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_MAP_BRICK_H
 #define FCLAW2D_MAP_BRICK_H
 
+#include <fclaw_base.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -34,11 +36,17 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_map_context;
+
+
+
 #define FCLAW2D_MAP_BRICK_GET_DIM FCLAW_F77_FUNC (fclaw2d_map_brick_get_dim, \
                                                   FCLAW2D_MAP_BRICK_GET_DIM)
 
-void FCLAW2D_MAP_BRICK_GET_DIM(fclaw2d_map_context_t **cont,
+void FCLAW2D_MAP_BRICK_GET_DIM(struct fclaw2d_map_context **cont,
                                int *mi, int* mj);
+
+
 
 /* This is used for communicating with Matlab about the mapping */
 #define WRITE_BRICK_DATA FCLAW_F77_FUNC (write_brick_data,WRITE_BRICK_DATA)
@@ -56,7 +64,7 @@ typedef struct fclaw2d_block_ll
     double *yv;
 } fclaw2d_block_ll_t;
 
-void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont);
+void fclaw2d_map_destroy_brick(struct fclaw2d_map_context *cont);
 
 #ifdef __cplusplus
 #if 0

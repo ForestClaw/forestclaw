@@ -26,8 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_H
 #define FCLAW2D_CLAWPATCH_H
 
-/* Needed for function pointer typedefs in fclaw2d_clawpatch_t */
 #include <fclaw2d_patch.h>  /* Needed to get enum for build modes */
+
+
+/* Needed for function pointer typedefs in fclaw2d_clawpatch_t */
 #include <fclaw2d_clawpatch_regrid.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output.h> 
