@@ -137,9 +137,7 @@ libforestclaw_compiled_sources = \
 	src/patches/clawpatch3/fclaw_clawpatch3_diagnostics.c \
 	src/patches/clawpatch3/fclaw_clawpatch3_regrid.c \
 	src/patches/clawpatch3/fclaw_clawpatch3_output_ascii.c \
-	src/patches/clawpatch3/fclaw_clawpatch3_options.c \
-	src/patches/clawpatch3/fclaw_clawpatch3_tikz.c \
-	src/patches/clawpatch3/fclaw_clawpatch3_vtk.c 
+	src/patches/clawpatch3/fclaw_clawpatch3_options.c
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d -I@top_srcdir@/src/patches/clawpatch \
