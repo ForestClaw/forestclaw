@@ -23,31 +23,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
 #include "annulus_user.h"
-#include "fclaw2d_clawpatch.h"
+
+#include <fclaw2d_include_all.h>
 
 #include <fc2d_clawpack46.h>
+#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
+
 #include <fc2d_clawpack5.h>
+#include <clawpack5_user_fort.h>  /* Headers for user defined fortran files */
+
+#include "fclaw2d_clawpatch.h"
+#include "../all/clawpack_user.h"
+
 
 void annulus_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t *user =  annulus_user_get_options(glob);
+    const user_options_t   *user      =  annulus_get_options(glob);
 
-    fclaw2d_vt()->problem_setup  = &annulus_problem_setup;
-    fclaw2d_patch_vt()->setup    = &annulus_patch_setup;
+    fclaw2d_vtable_t           *vt           = fclaw2d_vt();
+    fclaw2d_patch_vtable_t     *patch_vt     = fclaw2d_patch_vt();
+
+    vt->problem_setup  = &annulus_problem_setup;
+    patch_vt->setup    = &annulus_patch_setup;
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vt()->qinit   = &CLAWPACK46_QINIT;
-        fc2d_clawpack46_vt()->rpn2    = &CLAWPACK46_RPN2ADV_MANIFOLD;
-        fc2d_clawpack46_vt()->rpt2    = &CLAWPACK46_RPT2ADV_MANIFOLD;
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+        clawpack46_vt->qinit   = &CLAWPACK46_QINIT;
+        clawpack46_vt->rpn2    = &CLAWPACK46_RPN2ADV_MANIFOLD;
+        clawpack46_vt->rpt2    = &CLAWPACK46_RPT2ADV_MANIFOLD;
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
-        fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
+        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
+        clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
+        clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
+        clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
     }
 }
 
@@ -55,7 +67,7 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
 
 void annulus_problem_setup(fclaw2d_global_t *glob)
 {
-    const user_options_t *user = annulus_user_get_options(glob);
+    const user_options_t *user = annulus_get_options(glob);
     SETPROB_ANNULUS(&user->beta);
 }
 
@@ -69,7 +81,7 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
-    const user_options_t* user = annulus_user_get_options(glob);
+    const user_options_t* user = annulus_get_options(glob);
 
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -77,17 +89,15 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_aux_data(glob,this_patch,&aux,&maux);
-
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                                &maux,aux,&this_block_idx,xd,yd,zd,area);
     }
     else if(user->claw_version == 5)
     {
-        fc2d_clawpack5_aux_data(glob,this_patch,&aux,&maux);
-
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                               &maux,aux,&this_block_idx,xd,yd,zd,area);
     }

@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ANNULUS_USER_H
 #define ANNULUS_USER_H
 
-#include <fclaw2d_domain.h>
-#include "../all/clawpack_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -62,7 +61,7 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
                          int this_patch_idx);
 
 
-const user_options_t* annulus_user_get_options(fclaw2d_global_t *glob);
+const user_options_t* annulus_get_options(fclaw2d_global_t *glob);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,

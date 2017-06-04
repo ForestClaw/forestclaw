@@ -122,17 +122,16 @@ void filament_patch_setup_manifold(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
-
+    
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     if (user->claw_version == 4)
     {
-        fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                                &dx,&dy,&maux,aux,&this_block_idx,
                                xd,yd,zd,area);
     }
     else if (user->claw_version == 5)
     {
-        fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                               &dx,&dy,&maux,aux,&this_block_idx,
                               xd,yd,zd,area);
