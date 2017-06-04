@@ -14,6 +14,7 @@ switch map
         % This is what is stored in the fort.q files.
         xp = xc;
         yp = yc;
+        
     case 'cart'
         % (xc,yc) in [0,1]x[0,1]
         s = 0.005;
@@ -22,6 +23,7 @@ switch map
                 
         xp = xp + shift(1);
         yp = yp + shift(2);
+        
     case 'fivepatch'
         [xp,yp,~] = mapc2m_fivepatch(xc,yc);
         b = getblocknumber();
