@@ -25,63 +25,82 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "filament_user.h"
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_include_all.h>
+
 #include <fclaw2d_clawpatch.h>
+
+#include <fc2d_clawpack46.h>
+#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
+
+#include <fc2d_clawpack5.h>
+#include <clawpack5_user_fort.h>
+
+#include "../all/clawpack_user.h"
+
 
 void filament_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t* user = filament_user_get_options(glob);
-    const fclaw_options_t* gparms = fclaw2d_forestclaw_get_options(glob);
+    // fclaw2d_vtable_t *vt = fclaw2d_vt();
+
+    const user_options_t* user = filament_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vt()->setprob   = &SETPROB;
-        fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
 
-        if (gparms->manifold)
+        clawpack46_vt->setprob   = &SETPROB;
+        clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
+
+        if (fclaw_opt->manifold)
         {
-            fclaw2d_patch_vt()->setup   = &filament_patch_setup_manifold;
+            patch_vt->setup      = &filament_patch_setup_manifold;
 
-            fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
-            fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
+            clawpack46_vt->rpn2  = &CLAWPACK46_RPN2ADV_MANIFOLD;
+            clawpack46_vt->rpt2  = &CLAWPACK46_RPT2ADV_MANIFOLD;
 
             if (user->example == 2)
             {
                 /* Avoid tagging block corners in 5 patch example*/
-                fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-                fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+                clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+                clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
             }
         }
         else
         {
-            fc2d_clawpack46_vt()->setaux    = &CLAWPACK46_SETAUX;  /* Used in non-manifold case */
-            fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV;
-            fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV;
+            clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;  /* Used in non-manifold case */
+            clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
+            clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV;
         }
 
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vt()->setprob   = &SETPROB;
-        fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
-        if (gparms->manifold)
+        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
+
+        clawpack5_vt->setprob   = &SETPROB;
+        clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
+        if (fclaw_opt->manifold)
         {
-            fclaw2d_patch_vt()->setup  = &filament_patch_setup_manifold;
-            fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
-            fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
+            patch_vt->setup      = &filament_patch_setup_manifold;
+            clawpack5_vt->rpn2   = &CLAWPACK5_RPN2ADV_MANIFOLD;
+            clawpack5_vt->rpt2   = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
             if (user->example == 2)
             {
                 /* Avoid tagging block corners in 5 patch example*/
-                fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-                fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+                clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
+                clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
             }
         }
         else
         {
-            fc2d_clawpack5_vt()->setaux    = &CLAWPACK5_SETAUX;   /* Used in non-manifold case */
-            fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV;
-            fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV;
+            clawpack5_vt->setaux    = &CLAWPACK5_SETAUX;   /* Used in non-manifold case */
+            clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV;
+            clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV;
         }
     }
 }
@@ -91,7 +110,7 @@ void filament_patch_setup_manifold(fclaw2d_global_t *glob,
                                    int this_block_idx,
                                    int this_patch_idx)
 {
-    const user_options_t* user = filament_user_get_options(glob);
+    const user_options_t* user = filament_get_options(glob);
 
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
@@ -106,14 +125,14 @@ void filament_patch_setup_manifold(fclaw2d_global_t *glob,
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_aux_data(glob,this_patch,&aux,&maux);
+        fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                                &dx,&dy,&maux,aux,&this_block_idx,
                                xd,yd,zd,area);
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_aux_data(glob,this_patch,&aux,&maux);
+        fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                               &dx,&dy,&maux,aux,&this_block_idx,
                               xd,yd,zd,area);

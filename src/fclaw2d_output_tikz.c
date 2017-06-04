@@ -36,6 +36,10 @@ typedef struct
 {
     int mx;
     int my;
+    double ax;
+    double bx;
+    double ay;
+    double by;
     FILE *fp;
 
 } fclaw2d_tikz_info_t;
@@ -54,41 +58,31 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     int xlow_d, ylow_d, xupper_d, yupper_d;
 
     FILE *fp = s_tikz->fp;
-    const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
 
     fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num = domain->global_num_patches_before +
         (int64_t) (this_block->num_patches_before + this_patch_idx);
 
     level = this_patch->level;
-    lmax = gparms->maxlevel;
+    lmax = fclaw_opt->maxlevel;
 
-    mi = gparms->mi;
-    mj = gparms->mj;
+    mi = fclaw_opt->mi;
+    mj = fclaw_opt->mj;
 
     mx = s_tikz->mx;
     my = s_tikz->my;
 
-    if (!gparms->manifold)
-    {
-        ax = gparms->ax;
-        bx = gparms->bx;
-        ay = gparms->ay;
-        by = gparms->by;
-        dxf = (bx-ax)/(mi*mx*pow_int(2,lmax));
-        dyf = (by-ay)/(mj*my*pow_int(2,lmax));
-    }
-    else
-    {
-        ax = 0;
-        ay = 0;
-        dxf = 1.0/(mx*pow_int(2,lmax));
-        dyf = 1.0/(my*pow_int(2,lmax));
-    }
+    ax = s_tikz->ax;
+    ay = s_tikz->ay;
+    bx = s_tikz->bx;
+    by = s_tikz->by;
 
+    mxf = mi*mx*pow_int(2,lmax-level);
+    myf = mj*my*pow_int(2,lmax-level);
 
-    mxf = mx*pow_int(2,lmax-level);
-    myf = my*pow_int(2,lmax-level);
+    dxf = 1.0/(mi*mx*pow_int(2,lmax));
+    dyf = 1.0/(mj*my*pow_int(2,lmax));
 
     xlow_d = (this_patch->xlower-ax)/dxf;
     ylow_d = (this_patch->ylower-ay)/dyf;
@@ -108,21 +102,37 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
 
     char fname[20];
 
-    /* Should be in gparms */
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    /* Should be in fclaw_opt */
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     
     double figsize[2];
-    figsize[0] = gparms->tikz_figsize[0];   /* Inches */
-    figsize[1] = gparms->tikz_figsize[1];   /* Inches */
+    figsize[0] = fclaw_opt->tikz_figsize[0];   /* Inches */
+    figsize[1] = fclaw_opt->tikz_figsize[1];   /* Inches */
 
-    s_tikz.mx = 4;  /* Doesn't really matter what we put here;  used only for scaling */
-    s_tikz.my = 4;
+    s_tikz.mx = 1;  /* Doesn't really matter what we put here;  used only for scaling */
+    s_tikz.my = 1;
 
-    int lmax = gparms->maxlevel;
-    int mi = gparms->mi;
-    int mj = gparms->mj;
+    if (!fclaw_opt->manifold)
+    {
+        s_tikz.ax = fclaw_opt->ax;
+        s_tikz.bx = fclaw_opt->bx;
+        s_tikz.ay = fclaw_opt->ay;
+        s_tikz.by = fclaw_opt->by;
+    }
+    else
+    {
+        /* Can't do much with a manifold */
+        s_tikz.ax = 0;
+        s_tikz.bx = 1;
+        s_tikz.ay = 0;
+        s_tikz.by = 1;
+    }
 
-    int mxf = mi*s_tikz.mx*pow_int(2,lmax);  /* Should be multiple of 2, even if lmax = 0 */
+    int lmax = fclaw_opt->maxlevel;
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
+
+    int mxf = mi*s_tikz.mx*pow_int(2,lmax);  
     int myf = mj*s_tikz.my*pow_int(2,lmax);
     double sx = figsize[0]/mxf;
     double sy = figsize[1]/myf;
@@ -139,8 +149,8 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fprintf(fp,"\n");
         fprintf(fp,"\\newcommand{\\plotfig}[1]{#1}\n");
         fprintf(fp,"\\newcommand{\\plotgrid}[1]{#1}\n");
-        fprintf(fp,"\\newcommand{\\figname}{%s_%04d.%s}\n",gparms->tikz_plot_prefix,
-                iframe,gparms->tikz_plot_suffix);
+        fprintf(fp,"\\newcommand{\\figname}{%s_%04d.%s}\n",fclaw_opt->tikz_plot_prefix,
+                iframe,fclaw_opt->tikz_plot_suffix);
         fprintf(fp,"\n");
         fprintf(fp,"\\begin{document}\n");
         fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy);
