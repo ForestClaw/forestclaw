@@ -95,7 +95,7 @@ def setplot(plotdata):
     plotfigure.kml_ylimits = [0,2]
 
     mx = 8
-    maxlevel = 6
+    maxlevel = 4
     resolution = mx*2**maxlevel
     figsize = [4.0,4.0]
     dpi = resolution/figsize[0]
@@ -111,7 +111,7 @@ def setplot(plotdata):
     # Water
     plotaxes = plotfigure.new_plotaxes('tikz')
     plotaxes.xlimits = [0,2]
-    plotaxes.ylimits = [0,1]
+    plotaxes.ylimits = [0,2]
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
     plotitem.plot_var = 0   # Plot height field h.    
     plotitem.pcolor_cmap = cmap
