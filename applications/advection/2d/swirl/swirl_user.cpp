@@ -24,8 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "swirl_user.h"
-#include <fclaw2d_global.h>
-#include <fclaw2d_vtable.h>
+
+#include <fclaw2d_include_all.h>
 
 /* Two versions of Clawpack */
 #include <fc2d_clawpack46.h>
@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 #include <clawpack5_user_fort.h>
 
+#include "../all/clawpack_user.h"
 
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {

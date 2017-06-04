@@ -25,15 +25,7 @@
 
 #include "swirl_user.h"
 
-#include <fclaw_package.h>
-
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_diagnostics.h>
-#include <fclaw2d_convenience.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch.h>
@@ -76,11 +68,10 @@ swirl_check (user_options_t *user)
     return FCLAW_NOEXIT;
 }
 
-static fclaw_exit_type_t
+static void
 swirl_destroy(user_options_t *user)
 {
     /* Nothing to destroy */
-    return FCLAW_NOEXIT;
 }
 
 /* ------- Generic option handling routines that call above routines ----- */
@@ -188,8 +179,6 @@ const user_options_t* swirl_get_options(fclaw2d_global_t* glob)
 }
 /* ------------------------- ... and here ---------------------------- */
 
-
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
@@ -212,25 +201,25 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    user_options_t           *user;
+    const user_options_t           *user_opt;
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user = (user_options_t*) swirl_get_options(glob);
+    user_opt = swirl_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtable_initialize();
     fclaw2d_diagnostics_vtable_initialize();
 
     /* Initialize virtual tables for solvers */
-    if (user->claw_version == 4)
+    if (user_opt->claw_version == 4)
     {
         fc2d_clawpack46_vtable_initialize();
     }
-    else if (user->claw_version == 5)
+    else if (user_opt->claw_version == 5)
     {
         fc2d_clawpack5_vtable_initialize();
     }
@@ -254,11 +243,11 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    user_options_t              *user;
-    fclaw_options_t             *gparms;
-    fclaw2d_clawpatch_options_t *clawpatchopt;
-    fc2d_clawpack46_options_t   *claw46opt;
-    fc2d_clawpack5_options_t    *claw5opt;
+    user_options_t              *user_opt;
+    fclaw_options_t             *fclaw_opt;
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fc2d_clawpack46_options_t   *claw46_opt;
+    fc2d_clawpack5_options_t    *claw5_opt;
 
     fclaw2d_global_t            *glob;
     fclaw2d_domain_t            *domain;
@@ -270,11 +259,11 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
-    gparms =                     fclaw_options_register(app,"fclaw_options.ini");
-    clawpatchopt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    claw46opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
-    claw5opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    user =                       swirl_options_register(app,"fclaw_options.ini");  
+    fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
+    clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
+    claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
+    claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
+    user_opt =                    swirl_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -283,18 +272,18 @@ main (int argc, char **argv)
 
     /* at this point gparms is valid */
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-    domain = create_domain(mpicomm, gparms);
+    domain = create_domain(mpicomm, fclaw_opt);
     
     /* Create global structure which stores the domain, timers, etc */
     glob = fclaw2d_global_new();
     fclaw2d_global_store_domain(glob, domain);
 
     /* Store option packages in glob */
-    fclaw2d_options_store (glob, gparms);
-    fclaw2d_clawpatch_options_store (glob, clawpatchopt);
-    fc2d_clawpack46_options_store (glob, claw46opt);
-    fc2d_clawpack5_options_store (glob, claw5opt);
-    user_options_store (glob, user);
+    fclaw2d_options_store           (glob, fclaw_opt);
+    fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+    fc2d_clawpack46_options_store   (glob, claw46_opt);
+    fc2d_clawpack5_options_store    (glob, claw5_opt);
+    user_options_store              (glob, user_opt);
 
     /* Run the program */
     if (!retval & !vexit)
