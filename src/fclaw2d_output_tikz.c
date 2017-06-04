@@ -54,7 +54,7 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     fclaw2d_tikz_info_t *s_tikz = (fclaw2d_tikz_info_t*) s->user;
 
     int mx, my, mi, mj, level, lmax, mxf, myf;
-    double ax,bx,ay,by,dxf,dyf;
+    double ax,ay,dxf,dyf;
     int xlow_d, ylow_d, xupper_d, yupper_d;
 
     FILE *fp = s_tikz->fp;
@@ -75,8 +75,6 @@ cb_tikz_output (fclaw2d_domain_t * domain,
 
     ax = s_tikz->ax;
     ay = s_tikz->ay;
-    bx = s_tikz->bx;
-    by = s_tikz->by;
 
     mxf = mi*mx*pow_int(2,lmax-level);
     myf = mj*my*pow_int(2,lmax-level);
