@@ -30,9 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 #include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack5_options.h>
-
 #include <fc2d_clawpack46.h>
+
+#include <fc2d_clawpack5_options.h>
 #include <fc2d_clawpack5.h>
 
 static int s_user_options_package_id = -1;
