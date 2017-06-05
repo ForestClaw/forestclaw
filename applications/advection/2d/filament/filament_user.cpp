@@ -40,8 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void filament_link_solvers(fclaw2d_global_t *glob)
 {
-    // fclaw2d_vtable_t *vt = fclaw2d_vt();
-
     const user_options_t* user = filament_get_options(glob);
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 
