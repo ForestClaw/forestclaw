@@ -8,17 +8,14 @@ applications_advection_2d_torus_torus_SOURCES = \
 	applications/advection/2d/torus/setprob.f \
 	applications/advection/2d/torus/psi.f \
 	applications/advection/2d/torus/qexact.f \
-	applications/advection/2d/torus/output_header.f \
 	applications/advection/2d/torus/fdisc.f \
 	applications/advection/2d/torus/user_4.6/qinit.f \
 	applications/advection/2d/torus/user_4.6/setaux_manifold.f \
-	applications/advection/2d/torus/user_4.6/compute_error.f \
 	applications/advection/2d/torus/user_4.6/torus46_output.f \
 	applications/advection/2d/torus/user_4.6/tag4refinement.f \
 	applications/advection/2d/torus/user_4.6/tag4coarsening.f \
 	applications/advection/2d/torus/user_5.0/qinit.f90 \
 	applications/advection/2d/torus/user_5.0/setaux_manifold.f90 \
-	applications/advection/2d/torus/user_5.0/compute_error.f90 \
 	applications/advection/2d/torus/user_5.0/torus5_output.f90 \
 	applications/advection/2d/torus/user_5.0/tag4refinement.f90 \
 	applications/advection/2d/torus/user_5.0/tag4coarsening.f90 \
