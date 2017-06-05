@@ -23,14 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TORUS_USER_H
-#define TORUS_USER_H
+#ifndef REPLICATED_USER_H
+#define REPLICATED_USER_H
 
-#include <fclaw2d_domain.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../all/clawpack_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -49,11 +45,11 @@ typedef struct user_options
 } user_options_t;
 
 
-void torus_link_solvers(fclaw2d_domain_t *domain);
+void replicated_link_solvers(fclaw2d_global_t *glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
-const user_options_t* torus_user_get_options(fclaw2d_domain_t* domain);
+const user_options_t* replicated_get_options(fclaw2d_global_t* glob);
 
 
 
@@ -64,4 +60,4 @@ const user_options_t* torus_user_get_options(fclaw2d_domain_t* domain);
 }
 #endif
 
-#endif /* !TORUS_USER_H */
+#endif /* REPLICATED_USER_H */
