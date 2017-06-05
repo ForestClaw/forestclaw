@@ -25,61 +25,53 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "torus_user.h"
 
-#include <fclaw2d_forestclaw.h>
-#include "fclaw2d_clawpatch.h"
+#include <fclaw2d_include_all.h>
+
+#include <fclaw2d_clawpatch.h>
+
+/* Two versions of Clawpack */
+#include <fc2d_clawpack46.h>
+#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
+
+#include <fc2d_clawpack5.h>
+#include <clawpack5_user_fort.h>
+
+#include "../all/clawpack_user.h"
 
 void torus_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t *user =  torus_user_get_options(glob);
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
-    fclaw2d_vt()->problem_setup = &torus_problem_setup;
-    fclaw2d_patch_vt()->setup = &torus_patch_setup;
+    vt->problem_setup = &torus_problem_setup;  /* Version-independent */
+    patch_vt->setup   = &torus_patch_setup;
 
+    const user_options_t *user =  torus_get_options(glob);
     if (user->claw_version == 4)
     {
-        fclaw2d_clawpatch_vt()->fort_compute_patch_error = &TORUS46_COMPUTE_ERROR;
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
 
-        fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
-        fc2d_clawpack46_vt()->setaux    = &TORUS46_SETAUX;  /* Not really a mapped setaux */
-        fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
-        fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
+        clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
+        clawpack46_vt->setaux    = &TORUS46_SETAUX;  /* Do not need the mapped setaux */
+        clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
+        clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
 
-        if (user->example == 1)
-        {
-            /* Accuracy problem : Used divided differences for tagging */
-            fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-            fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
-
-            /* Include error in output files */
-            fclaw2d_clawpatch_vt()->fort_write_header   = &TORUS_FORT_WRITE_HEADER;
-            fclaw2d_patch_vt()->write_file        = &torus_output_write_file;
-        }
     }
     else if (user->claw_version == 5)
     {
-        fclaw2d_clawpatch_vt()->fort_compute_patch_error = &TORUS5_COMPUTE_ERROR;
+        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
+        
+        clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
+        clawpack5_vt->setaux    = &TORUS5_SETAUX;
+        clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
+        clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
-        fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
-        fc2d_clawpack5_vt()->setaux    = &TORUS5_SETAUX;
-        fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
-
-        if (user->example == 1)
-        {
-            /* Accuracy problem : Used divided differences for tagging */
-            fclaw2d_clawpatch_vt()->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-            fclaw2d_clawpatch_vt()->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
-
-            /* Write out error */
-            fclaw2d_clawpatch_vt()->fort_write_header      = &TORUS_FORT_WRITE_HEADER;
-            fclaw2d_patch_vt()->write_file    = &torus_output_write_file;
-        }
     }
 }
 
 void torus_problem_setup(fclaw2d_global_t *glob)
 {
-    const user_options_t* user = torus_user_get_options(glob);
+    const user_options_t* user = torus_get_options(glob);
     TORUS_SETPROB(&user->example,&user->alpha);
 }
 
@@ -88,8 +80,9 @@ void torus_patch_setup(fclaw2d_global_t *glob,
                        int this_block_idx,
                        int this_patch_idx)
 {
-    const user_options_t* user = torus_user_get_options(glob);
+    const user_options_t* user = torus_get_options(glob);
 
+    /* We use the non-mapped setaux routine, but need to set capacity */
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_setaux(glob,this_patch,this_block_idx,this_patch_idx);
@@ -102,43 +95,3 @@ void torus_patch_setup(fclaw2d_global_t *glob,
     }
 }
 
-void torus_output_write_file(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx, int this_patch_idx,
-                             int iframe, int patch_num,int level)
-{
-    /* This new wrapper is needed because we are passing both q
-       and the error into the FORT file.  */
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy,t;
-    double *q, *error;
-    char matname1[11];
-
-    const user_options_t *user = torus_user_get_options(glob);
-
-    t = glob->curr_time;
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-
-    sprintf(matname1,"fort.q%04d",iframe);
-
-    /* Here, we pass in q and the error, so need special headers and files */
-    if (user->claw_version == 4)
-    {
-        TORUS46_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
-                                &dx,&dy,q,error,&t,
-                                &patch_num,&level,&this_block_idx,
-                                &glob->mpirank);
-    }
-    else if (user->claw_version == 5)
-    {
-        TORUS5_FORT_WRITE_FILE(matname1, &mx,&my,&meqn,&mbc,&xlower,&ylower,
-                               &dx,&dy,q,error,&t,
-                               &patch_num,&level,&this_block_idx,
-                               &glob->mpirank);
-    }
-}
