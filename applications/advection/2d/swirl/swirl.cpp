@@ -165,7 +165,7 @@ user_options_t* swirl_options_register (fclaw_app_t * app,
 }
 
 static 
-void disk_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
@@ -283,7 +283,7 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
     fc2d_clawpack46_options_store   (glob, claw46_opt);
     fc2d_clawpack5_options_store    (glob, claw5_opt);
-    disk_options_store              (glob, user_opt);
+    swirl_options_store              (glob, user_opt);
 
     /* Run the program */
     if (!retval & !vexit)
