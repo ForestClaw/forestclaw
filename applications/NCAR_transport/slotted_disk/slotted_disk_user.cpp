@@ -25,68 +25,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "slotted_disk_user.h"
 
-#include <fc2d_clawpack5.h>
-#include <fc2d_clawpack46.h>
+#include <fclaw2d_include_all.h>
 
+#include "../all/transport_user.h"
+#include "../all/transport_options.h"
 
-static fclaw2d_vtable_t fclaw2d_vt;
-static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t classic_claw5;
-
-void slotted_disk_link_solvers(fclaw2d_domain_t *domain)
+void slotted_disk_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t* user = slotted_disk_user_get_options(domain);
+    transport_link_solvers(glob);
 
-    fclaw2d_init_vtable(&fclaw2d_vt);
-    fclaw2d_vt.problem_setup = &slotted_disk_problem_setup;
-
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
-
-        fclaw2d_vt.patch_setup   = &slotted_disk_patch_setup;
-        fclaw2d_vt.patch_single_step_update = &slotted_disk_update;
-
-        /* Needed to avoid triggering refinement around block corners */
-        fclaw2d_vt.fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
-
-        classic_claw46.qinit = &CLAWPACK46_QINIT;
-        classic_claw46.rpn2  = &CLAWPACK46_RPN2ADV_MANIFOLD;
-        classic_claw46.rpt2  = &CLAWPACK46_RPT2ADV_MANIFOLD;
-
-        fc2d_clawpack46_set_vtable(classic_claw46);
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
-
-        fclaw2d_vt.patch_setup   = &slotted_disk_patch_setup;
-        fclaw2d_vt.patch_single_step_update = &slotted_disk_update;
-
-        /* Avoid triggering refinement around block corners */
-        fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-        fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
-
-        classic_claw5.qinit   = &CLAWPACK5_QINIT;
-        classic_claw5.rpn2    = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        classic_claw5.rpt2    = &CLAWPACK5_RPT2ADV_MANIFOLD;
-
-        fc2d_clawpack5_set_vtable(classic_claw5);
-    }
-
-    fclaw2d_set_vtable(domain,&fclaw2d_vt);
+    /* Custom setprob */
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    vt->problem_setup    = &slotted_disk_problem_setup;  /* Version-independent */
 }
 
 
-void slotted_disk_problem_setup(fclaw2d_domain_t* domain)
+void slotted_disk_problem_setup(fclaw2d_global_t* glob)
 {
-    const user_options_t* user = slotted_disk_user_get_options(domain);
-    const fclaw_options_t* gparms = get_domain_parms(domain);
+    const user_options_t* user = transport_get_options(glob);
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
     SLOTTED_DISK_SETPROB(&user->kappa, &gparms->tfinal);
 }
 
 
+#if 0
 void slotted_disk_patch_setup(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *this_patch,
                               int this_block_idx,
@@ -183,3 +145,4 @@ double slotted_disk_update(fclaw2d_domain_t *domain,
 
     return maxcfl;
 }
+#endif
