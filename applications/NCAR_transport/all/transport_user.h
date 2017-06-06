@@ -26,11 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TRANSPORT_USER_H
 #define TRANSPORT_USER_H
 
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../../advection/2d/all/clawpack_user.h"
-
+#include <fclaw2d_include_all.h>
+#include <fclaw_base.h>  /* for MPI */
 
 #ifdef __cplusplus
 extern "C"
@@ -40,67 +37,52 @@ extern "C"
 #endif
 #endif
 
-#if 0
-#define CLAWPACK46_RPN2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpn2adv_manifold, \
-                                                   CLAWPACK46_RPN2ADV_MANIFOLD)
-void CLAWPACK46_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-                                 const int* mbc,const int* mx, double ql[], double qr[],
-                                 double auxl[], double auxr[], double wave[],
-                                 double s[], double amdq[], double apdq[]);
+struct fclaw_options;
+struct user_options;
+struct fclaw2d_patch;
+struct fclaw2d_domain;
 
-#define CLAWPACK46_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpt2adv_manifold, \
-                                                   CLAWPACK46_RPT2ADV_MANIFOLD)
-void CLAWPACK46_RPT2ADV_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-                                 const int* mbc, const int* mx, double ql[], double qr[],
-                                 double aux1[], double aux2[], double aux3[], const int* imp,
-                                 double dsdq[], double bmasdq[], double bpasdq[]);
+/* 1 = cubed sphere domain; 2 - pillowgrid */
+struct fclaw2d_domain* create_domain(sc_MPI_Comm mpicomm, 
+                                struct fclaw_options* fclaw_opt,
+                                struct user_options* user_opt);
 
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+                                                     const double shift[],
+                                                     const double rotate[]);
 
-#define CLAWPACK5_RPN2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpn2adv_manifold,    \
-                                                  CLAWPACK5_RPN2ADV_MANIFOLD)
-void CLAWPACK5_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn,
-                                const int* mwaves, const int* maux,
-                                const int* mbc,const int* mx,
-                                double ql[], double qr[], double auxl[], double auxr[],
-                                double wave[], double s[],double amdq[], double apdq[]);
-
-#define CLAWPACK5_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpt2adv_manifold,    \
-                                                  CLAWPACK5_RPT2ADV_MANIFOLD)
-void CLAWPACK5_RPT2ADV_MANIFOLD(const int* ixy, const int* imp,
-                                const int* maxm, const int* meqn,
-                                const int* mwaves, const int* maux,
-                                const int* mbc,const int* mx,
-                                double ql[], double qr[],
-                                double aux1[], double aux2[],
-                                double aux3[],  double asdq[],
-                                double bmasdq[], double bpasdq[]);
-
-#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold, \
-                                               USER46_SETAUX_MANIFOLD)
-
-void USER46_SETAUX_MANIFOLD(const int* mbc,
-                            const int* mx, const int* my,
-                            const double* xlower, const double* ylower,
-                            const double* dx, const double* dy,
-                            const int* maux, double aux[],
-                            const int* blockno,
-                            double xd[], double yd[], double zd[],
-                            double area[]);
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
+                                                      const double shfit[],
+                                                      const double rotate[]);
 
 
-#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
-                                             USER5_SETAUX_MANIFOLD)
+void transport_problem_setup(fclaw2d_global_t *glob);
 
-void USER5_SETAUX_MANIFOLD(const int* mbc,
-                           const int* mx, const int* my,
-                           const double* xlower, const double* ylower,
-                           const double* dx, const double* dy,
-                           const int* maux, double aux[],
-                           const int* blockno,
-                           double xd[], double yd[], double zd[],
-                           double area[]);
+#define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
+void TRANSPORT_SETPROB(const double* kappa, const double* tfinal);
 
-#endif
+
+void transport_patch_setup(struct fclaw2d_global *glob,
+                           struct fclaw2d_patch *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx);
+
+double transport_update(struct fclaw2d_global *glob,
+                        struct fclaw2d_patch *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        double t,
+                        double dt);
+
+void transport_b4step2(struct fclaw2d_global *glob,
+                       struct fclaw2d_patch *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       double t,
+                       double dt);
+
+void transport_link_solvers(struct fclaw2d_global *glob);
+
 
 #define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
 void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
