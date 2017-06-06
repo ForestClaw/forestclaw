@@ -1,26 +1,24 @@
-axis image;
-daspect([1 1 1]);
-axis off;
+setviews;
 
 yrbcolormap;
+caxis([0 1]);
+
 showpatchborders;
-setpatchborderprops(1:8,'linewidth',1);
-hidepatchborders(7);
-% hidepatchborders;
-view([65.5,12]);
+setpatchborderprops('linewidth',1);
 
-% showgridlines(3);
+daspect([1 1 1]);
+axis off;
+view([117.50,4]);
 
-setviews;
+
 NoQuery = 0;
 prt = false;
 if (prt)
   MaxFrames = 41;
-  filename = framename(Frame,'ccb0000','png');
+  filename = framename(Frame,'gaussian0000','png');
   fprintf('Printing file %s\n',filename);
   print('-dpng','-r800',filename);
 end
 
 clear afterframe;
 clear mapc2m;
-clear mapc2m_pillow;
