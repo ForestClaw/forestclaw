@@ -7,12 +7,12 @@ include_HEADERS += applications/NCAR_transport/correlatedcb/correlatedcb_user.h
 applications_NCAR_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/NCAR_transport/correlatedcb/correlatedcb_user.cpp \
 	applications/NCAR_transport/correlatedcb/correlatedcb.cpp \
-	applications/NCAR_transport/correlatedcb/fclaw2d_map_cubedsphere.c \
-	applications/NCAR_transport/correlatedcb/fclaw2d_map_pillowsphere.c \
 	applications/NCAR_transport/correlatedcb/setprob.f \
 	applications/NCAR_transport/correlatedcb/cosine_bell.f \
 	applications/NCAR_transport/correlatedcb/user_4.6/qinit.f \
 	applications/NCAR_transport/correlatedcb/user_5.0/qinit.f90 \
+	applications/NCAR_transport/all/fclaw2d_map_cubedsphere.c \
+	applications/NCAR_transport/all/fclaw2d_map_pillowsphere.c \
 	applications/NCAR_transport/correlatedcb/user_4.6/tag4refinement.f \
 	applications/NCAR_transport/correlatedcb/user_5.0/tag4refinement.f \
 	applications/NCAR_transport/correlatedcb/user_4.6/tag4coarsening.f \

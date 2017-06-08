@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "correlatedcb_user.h"
 
-
 #include <fclaw2d_include_all.h>
 
 #include "../all/transport_user.h"
