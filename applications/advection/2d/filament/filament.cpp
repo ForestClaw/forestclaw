@@ -55,14 +55,6 @@ filament_register (user_options_t *user, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-filament_postprocess(user_options_t *user)
-{
-    /* nothing to post-process yet ... */
-    return FCLAW_NOEXIT;
-}
-
-
-static fclaw_exit_type_t
 filament_check (user_options_t *user, fclaw_options_t *fclaw_opt, 
                 fclaw2d_clawpatch_options_t* clawpatch_opt)
 {
@@ -81,11 +73,13 @@ filament_check (user_options_t *user, fclaw_options_t *fclaw_opt,
     return FCLAW_NOEXIT;
 }
 
+
 static void
 filament_destroy (user_options_t *user)
 {
     /* Nothing to destroy */
 }
+
 
 /* ------- Generic option handling routines that call above routines ----- */
 static void*
@@ -100,23 +94,6 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     user = (user_options_t*) package;
 
     return filament_register(user,opt);
-}
-
-static fclaw_exit_type_t
-options_postprocess (fclaw_app_t * a, void *package, void *registered)
-{
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    /* errors from the key-value options would have showed up in parsing */
-    user_options_t *user = (user_options_t *) package;
-
-    /* post-process this package */
-    FCLAW_ASSERT(user->is_registered);
-
-    /* Convert strings to arrays */
-    return filament_postprocess (user);
 }
 
 
@@ -159,9 +136,9 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register,
-    options_postprocess,
+    NULL,
     options_check,
-    options_destroy
+    options_destroy,
 };
 
 
