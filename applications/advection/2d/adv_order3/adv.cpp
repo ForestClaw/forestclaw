@@ -65,8 +65,14 @@ adv_postprocess(user_options_t *user)
 static fclaw_exit_type_t
 adv_check (user_options_t *user)
 {
-    /* Nothing to check ? */
-    return FCLAW_NOEXIT;
+   /* Nothing to check ? */
+
+   if (user->claw_version != 4)
+   {
+      fclaw_global_essentialf("Order 4 only implemented for Clawpack 4.6");
+      return FCLAW_EXIT_QUIET;
+   }
+   return FCLAW_NOEXIT;
 }
 
 static void
