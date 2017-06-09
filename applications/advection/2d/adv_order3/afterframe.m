@@ -5,7 +5,7 @@ axis off;
 
 yrbcolormap;
 showpatchborders(1:10);
-caxis([0,1])
+caxis([-1,1])
 qlo = 0;
 qhi = 1;
 under_label = sprintf('0 - %7.1e',qlo-qmin);

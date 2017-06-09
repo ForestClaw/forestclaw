@@ -72,39 +72,3 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
     double period = user->period;
     SWIRL_SETPROB(&period);
 }
-
-
-
-
-
-#if 0
-void swirl_link_solvers(fclaw2d_domain_t *domain)
-{
-    const user_options_t* user = swirl_user_get_options(domain);
-
-    fclaw2d_init_vtable(&fclaw2d_vt);
-    fclaw2d_vt.problem_setup = &swirl_problem_setup;  /* Version-independent */
-
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
-
-        classic_claw46.qinit     = &CLAWPACK46_QINIT;
-        classic_claw46.setaux    = &CLAWPACK46_SETAUX;
-        classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV;
-        classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV;
-        classic_claw46.b4step2   = &CLAWPACK46_B4STEP2;
-
-        fc2d_clawpack46_set_vtable(classic_claw46);
-    }
-    fclaw2d_set_vtable(domain,&fclaw2d_vt);
-}
-
-void swirl_problem_setup(fclaw2d_domain_t* domain)
-{
-    const user_options_t* user = swirl_user_get_options(domain);
-
-    double period = user->period;
-    SWIRL_SETPROB(&period);
-}
-#endif

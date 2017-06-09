@@ -182,7 +182,8 @@ const user_options_t* swirl_get_options(fclaw2d_global_t* glob)
 
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+                                fclaw_options_t* fclaw_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -191,19 +192,21 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 
     /* Map unit square to disk using mapc2m_disk.f */;
     int a,b,mi,mj;
-    a = 1;
-    b = 1;
-    mi = 1;
-    mj = 1;
+
+    a = fclaw_opt->periodic_x;
+    b = fclaw_opt->periodic_y;
+    mi = fclaw_opt->mi;
+    mj = fclaw_opt->mj;
 
     /* Map unit square to disk using mapc2m_disk.f */
-    gparms->manifold = 0;
+    fclaw_opt->manifold = 0;
+    
     /* Duplicate initial conditions in each block */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);  /* this writes out brick data */
     cont = fclaw2d_map_new_nomap_brick(brick);
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
     return domain;
@@ -268,7 +271,7 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* at this point gparms is valid */
+    /* at this point fclaw_opt is valid */
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     domain = create_domain(mpicomm, fclaw_opt);
     
@@ -293,50 +296,3 @@ main (int argc, char **argv)
 
     return 0;
 }
-
-
-
-
-#if 0
-int
-main (int argc, char **argv)
-{
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
-
-    /* Options */
-    sc_options_t                *options;
-    user_options_t              suser, *user = &suser;
-
-    int retval;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, user);
-    fclaw_forestclaw_register(app,"fclaw_options.ini");  /* Register gparms */
-
-    /* All libraries that might be needed should be registered here */
-    fc2d_clawpack46_register(app,"fclaw_options.ini");    /* [clawpack46] */
-    fc2d_clawpack5_register (app,"fclaw_options.ini");     /* [clawpack5] */
-    register_user_options   (app,"fclaw_options.ini",user);  /* [user] */
-
-    /* Read configuration file(s) and command line, and process options */
-    options = fclaw_app_get_options (app);
-    retval = fclaw_options_read_from_file(options);
-    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
-
-    fclaw2d_clawpatch_link_app(app);
-
-    /* Run the program */
-
-    if (!retval & !vexit)
-    {
-        run_program(app);
-    }
-
-    fclaw_forestclaw_destroy(app);
-    fclaw_app_destroy (app);
-
-    return 0;
-}
-#endif
