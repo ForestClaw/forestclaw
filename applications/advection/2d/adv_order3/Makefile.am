@@ -11,13 +11,12 @@ applications_advection_2d_adv_order3_adv_SOURCES = \
 	applications/advection/2d/adv_order3/setprob.f \
 	applications/advection/2d/all/clawpack46_setaux.f \
 	applications/advection/2d/all/clawpack_user.h \
-	applications/advection/2d/all/clawpack5_setaux.f90 \
 	applications/advection/2d/all/clawpack46_rpn2adv.f \
 	applications/advection/2d/all/clawpack46_rpt2adv.f \
-	applications/advection/2d/all/clawpack5_rpn2adv.f90 \
-	applications/advection/2d/all/clawpack5_rpt2adv.f90 \
 	applications/advection/2d/adv_order3/user_4.6/qinit.f \
-	applications/advection/2d/adv_order3/user_4.6/b4step2.f
+	applications/advection/2d/adv_order3/user_4.6/b4step2.f \
+	applications/advection/2d/adv_order3/user_4.6/tag4refinement.f \
+	applications/advection/2d/adv_order3/user_4.6/tag4coarsening.f
 
 applications_advection_2d_adv_order3_adv_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS) \
