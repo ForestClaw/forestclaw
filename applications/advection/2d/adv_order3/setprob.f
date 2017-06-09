@@ -1,4 +1,4 @@
-      subroutine swirl_setprob(period_in)
+      subroutine adv_setprob(period_in)
       implicit none
 
       double precision pi, tperiod, pi2, period_in

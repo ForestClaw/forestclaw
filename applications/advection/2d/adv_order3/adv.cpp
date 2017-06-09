@@ -40,7 +40,7 @@ static int s_user_options_package_id = -1;
 
 
 static void *
-swirl_register (user_options_t *user, sc_options_t * opt)
+adv_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
     sc_options_add_double (opt, 0, "period", &user->period, 4,
@@ -55,7 +55,7 @@ swirl_register (user_options_t *user, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-swirl_postprocess(user_options_t *user)
+adv_postprocess(user_options_t *user)
 {
     /* nothing to post-process yet ... */
     return FCLAW_NOEXIT;
@@ -63,14 +63,14 @@ swirl_postprocess(user_options_t *user)
 
 
 static fclaw_exit_type_t
-swirl_check (user_options_t *user)
+adv_check (user_options_t *user)
 {
     /* Nothing to check ? */
     return FCLAW_NOEXIT;
 }
 
 static void
-swirl_destroy(user_options_t *user)
+adv_destroy(user_options_t *user)
 {
     /* Nothing to destroy */
 }
@@ -87,7 +87,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     user = (user_options_t*) package;
 
-    return swirl_register(user,opt);
+    return adv_register(user,opt);
 }
 
 static fclaw_exit_type_t
@@ -104,7 +104,7 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT(user->is_registered);
 
     /* Convert strings to arrays */
-    return swirl_postprocess (user);
+    return adv_postprocess (user);
 }
 
 
@@ -119,7 +119,7 @@ options_check(fclaw_app_t *app, void *package,void *registered)
 
     user = (user_options_t*) package;
 
-    return swirl_check(user);
+    return adv_check(user);
 }
 
 static void
@@ -134,7 +134,7 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     user = (user_options_t*) package;
     FCLAW_ASSERT (user->is_registered);
 
-    swirl_destroy (user);
+    adv_destroy (user);
 
     FCLAW_FREE (user);
 }
@@ -151,7 +151,7 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 /* ------------- User options access functions --------------------- */
 
 static
-user_options_t* swirl_options_register (fclaw_app_t * app,
+user_options_t* adv_options_register (fclaw_app_t * app,
                                        const char *configfile)
 {
     user_options_t *user;
@@ -166,14 +166,14 @@ user_options_t* swirl_options_register (fclaw_app_t * app,
 }
 
 static 
-void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void adv_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
     s_user_options_package_id = id;
 }
 
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob)
+const user_options_t* adv_get_options(fclaw2d_global_t* glob)
 {
     int id = s_user_options_package_id;
     return (user_options_t*) fclaw_package_get_options(glob, id);    
@@ -200,7 +200,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     /* Map unit square to disk using mapc2m_disk.f */
     fclaw_opt->manifold = 0;
-    
+
     /* Duplicate initial conditions in each block */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);  /* this writes out brick data */
@@ -227,7 +227,7 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual tables for solvers */
     fc2d_clawpack46_vtable_initialize();
 
-    swirl_link_solvers(glob);
+    adv_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run
@@ -264,7 +264,7 @@ main (int argc, char **argv)
     fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
-    user_opt =                    swirl_options_register(app,"fclaw_options.ini");  
+    user_opt =                      adv_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -283,7 +283,7 @@ main (int argc, char **argv)
     fclaw2d_options_store           (glob, fclaw_opt);
     fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
     fc2d_clawpack46_options_store   (glob, claw46_opt);
-    swirl_options_store              (glob, user_opt);
+    adv_options_store               (glob, user_opt);
 
     /* Run the program */
     if (!retval & !vexit)

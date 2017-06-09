@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SWIRL_USER_H
-#define SWIRL_USER_H
+#ifndef ADV_USER_H
+#define ADV_USER_H
 
 #include <fclaw2d_include_all.h>
 
@@ -44,19 +44,19 @@ typedef struct user_options
 
 } user_options_t;
 
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(double* tperiod);
+#define ADV_SETPROB FCLAW_F77_FUNC(adv_setprob, ADV_SETPROB)
+void ADV_SETPROB(double* tperiod);
 
-void swirl_link_solvers(fclaw2d_global_t *glob);
+void adv_link_solvers(fclaw2d_global_t *glob);
 
-void swirl_problem_setup(fclaw2d_global_t* glob);
+void adv_problem_setup(fclaw2d_global_t* glob);
 
-void swirl_patch_setup(fclaw2d_global_t *glob,
+void adv_patch_setup(fclaw2d_global_t *glob,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
 
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+const user_options_t* adv_get_options(fclaw2d_global_t* glob);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
