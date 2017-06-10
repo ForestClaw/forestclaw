@@ -127,8 +127,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     /* ---------------------- Regridding options -------------------------- */
 
-    sc_options_add_bool (opt, 0, "init_ghostcell", &fclaw_opt->init_ghostcell, 1,
-                        "Initialize ghost cells [T]");
+    sc_options_add_bool (opt, 0, "init_ghostcell", &fclaw_opt->init_ghostcell, 0,
+                        "Initialize ghost cells [F]");
 
     sc_options_add_int (opt, 0, "minlevel", &fclaw_opt->minlevel, 0,
                         "Minimum refinement level [0]");
