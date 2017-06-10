@@ -3,14 +3,24 @@ axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
 axis off;
 
-colormap(jet);
+if (~PlotParallelPartitions)        
+    colormap(jet);
+else
+    if (Frame == 0)
+        cm = ppcolors(7);
+    end
+    colormap(cm);
+    ppcolors_colorbar(7);
+
+end
+
 cv = linspace(qmin,qmax,21);
 cv([1 end]) = [];
-drawcontourlines(cv,true);
+drawcontourlines(cv);
 setcontourlineprops('linewidth',1);
+
 setpatchborderprops('linewidth',1);
 showpatchborders;
-colorbar;
 
 
 view(2);
@@ -18,13 +28,8 @@ view(2);
 NoQuery = 0;
 prt = false;
 if (prt)
-  filename = 'swirl000.png';
-  str = num2str(Frame);
-  len = length(str);
-  filename(8-len+1:8) = str;
-  pstr = ['print -dpng ',filename];
-  disp(pstr);
-  eval(pstr);
+  filename = sprintf('quadrants%03d.png',Frame);
+  print('-dpng',filename);
 end;
 
 shg

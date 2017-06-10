@@ -1,6 +1,6 @@
 ForestClaw = 1;
 
-OutputFlag = 'forestclaw'         % default value.
+OutputFlag = 'forestclaw';         % default value.
 
 PlotType = 1;                % type of plot to produce:
 			     % 1 = pseudo-color (pcolor)
@@ -31,4 +31,4 @@ ContourValues = [];
 %---------------------------------
 
 ShowUnderOverShoots = 0;
-PlotParallelPartitions=0;
+PlotParallelPartitions=1;

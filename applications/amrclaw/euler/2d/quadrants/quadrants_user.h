@@ -26,9 +26,7 @@
 #ifndef QUADRANTS_USER_H
 #define QUADRANTS_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -40,8 +38,6 @@ extern "C"
 
 typedef struct user_options
 {
-    int example;
-    double alpha;
     double gamma;
     int claw_version;
 
@@ -52,11 +48,11 @@ typedef struct user_options
 #define QUADRANTS_SETPROB FCLAW_F77_FUNC(quadrants_setprob, QUADRANTS_SETPROB)
 void QUADRANTS_SETPROB(const double* gamma);
 
-const user_options_t* quadrants_user_get_options(fclaw2d_domain_t* domain);
+user_options_t* quadrants_get_options(fclaw2d_global_t* glob);
 
-void quadrants_link_solvers(fclaw2d_domain_t *domain);
+void quadrants_link_solvers(fclaw2d_global_t *glob);
 
-void quadrants_problem_setup(fclaw2d_domain_t* domain);
+void quadrants_problem_setup(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
