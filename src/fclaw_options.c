@@ -255,8 +255,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 }
 
 
-static fclaw_exit_type_t 
-fclaw_postprocess (fclaw_options_t * fclaw_opt)
+fclaw_exit_type_t 
+fclaw_options_postprocess (fclaw_options_t * fclaw_opt)
 {
     fclaw_options_convert_double_array (fclaw_opt->scale_string, &fclaw_opt->scale, 3);
     fclaw_options_convert_double_array (fclaw_opt->shift_string, &fclaw_opt->shift, 3);
@@ -267,8 +267,8 @@ fclaw_postprocess (fclaw_options_t * fclaw_opt)
   return FCLAW_NOEXIT;
 }
 
-static fclaw_exit_type_t
-fclaw_check (fclaw_options_t * fclaw_opt)
+fclaw_exit_type_t
+fclaw_options_check (fclaw_options_t * fclaw_opt)
 {
     /* Check outstyle. */
     if (fclaw_opt->outstyle == 1 && fclaw_opt->use_fixed_dt)
@@ -301,7 +301,7 @@ fclaw_check (fclaw_options_t * fclaw_opt)
 }
 
 void
-fclaw_destroy(fclaw_options_t* fclaw_opt)
+fclaw_options_destroy(fclaw_options_t* fclaw_opt)
 {
     FCLAW_FREE (fclaw_opt->scale);
     FCLAW_FREE (fclaw_opt->shift);
@@ -339,7 +339,7 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT(fclaw_opt->is_registered);
 
     /* Convert strings to arrays */
-    return fclaw_postprocess (fclaw_opt);
+    return fclaw_options_postprocess (fclaw_opt);
 }
 
 
@@ -353,7 +353,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     fclaw_options_t *fclaw_opt = (fclaw_options_t *) package;
     FCLAW_ASSERT(fclaw_opt->is_registered);
 
-    return fclaw_check (fclaw_opt);
+    return fclaw_options_check (fclaw_opt);
 }
 
 static void
@@ -369,7 +369,7 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT (fclaw_opt->is_registered);
 
     /* Destroy option arrays created in post-process */
-    fclaw_destroy (fclaw_opt);
+    fclaw_options_destroy (fclaw_opt);
     FCLAW_FREE(fclaw_opt);
 }
 

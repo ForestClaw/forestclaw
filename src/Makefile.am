@@ -4,6 +4,7 @@
 
 libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
+    src/fclaw2d_include_all.h \
 	src/fclaw_base.h \
 	src/fclaw_timer.h \
 	src/fclaw_package.h \

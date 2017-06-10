@@ -48,6 +48,22 @@ typedef struct fclaw_options fclaw_options_t;
 fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
                                          const char *configfile);
 
+fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
+                                         const char *configfile);
+
+/* These can be called from external routines (in torthem, for example?) */
+fclaw_exit_type_t 
+fclaw_options_postprocess (fclaw_options_t * fclaw_opt);
+
+fclaw_exit_type_t
+fclaw_options_check (fclaw_options_t * fclaw_opt);
+
+void fclaw_options_destroy(fclaw_options_t* fclaw_opt);
+
+
+
+
+
 int fclaw_options_read_from_file(sc_options_t* opt);
 
 /** Add a string option and prepare using it for an integer array.
