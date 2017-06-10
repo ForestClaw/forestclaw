@@ -34,8 +34,9 @@ include applications/advection/2d/adv_order3/Makefile.am
 #include applications/NCAR_transport/correlatedcb/Makefile.am
 
 # AMRClaw examples from Clawpack/AMRClaw
-#include applications/amrclaw/acoustics/2d/interface/Makefile.am
 #include applications/amrclaw/acoustics/2d/radial/Makefile.am
+
+#include applications/amrclaw/acoustics/2d/interface/Makefile.am
 #include applications/amrclaw/advection/2d/swirl/Makefile.am
 #include applications/amrclaw/burgers/2d/pwconst/Makefile.am
 #include applications/amrclaw/shallow/2d/radialdam/Makefile.am
