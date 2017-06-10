@@ -11,7 +11,6 @@ applications_amrclaw_shallow_2d_radialdam_radialdam_SOURCES = \
 	applications/amrclaw/shallow/2d/radialdam/radialdam_user.h \
 	applications/amrclaw/shallow/2d/radialdam/fclaw2d_map_nomap.c \
 	applications/amrclaw/shallow/2d/radialdam/fclaw2d_map_pillowdisk.c \
-	applications/amrclaw/shallow/2d/radialdam/fclaw2d_map_pillowdisk5.c \
 	applications/amrclaw/shallow/2d/radialdam/setprob.f \
 	applications/amrclaw/shallow/2d/radialdam/fdisc.f \
 	applications/amrclaw/shallow/2d/radialdam/user_4.6/qinit.f \
