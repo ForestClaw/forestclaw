@@ -35,9 +35,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
 fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    if (gparms->output != 0)
+    double time;
+    time = glob->curr_time;
+
+
+    if (fclaw_opt->output != 0)
     {
         fclaw2d_vtable_t *vt = fclaw2d_vt();
 
@@ -45,9 +49,6 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 
         /* Record output time */
         fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-
-        double time;
-        time = glob->curr_time;
 
         /* User or solver set output file */
         fclaw_global_essentialf("Output Frame %4d  at time %16.8e\n\n",
@@ -57,8 +58,13 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
         /* Record output time */
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
     }
+    else
+    {
+        fclaw_global_essentialf("Time step %4d  at time %16.8e\n\n",
+                                iframe,time);          
+    }
 
-    if (gparms->tikz_out)
+    if (fclaw_opt->tikz_out)
     {
         fclaw2d_output_frame_tikz(glob,iframe);
     }
