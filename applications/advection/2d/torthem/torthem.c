@@ -23,15 +23,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
-#include <fc2d_clawpack46.h>
-
 #include "torus_common.h"
+
+#include <fc2d_clawpack46_options.h>
+#include <fc2d_clawpack46.h>
+#include <fclaw2d_clawpatch.h>
+
 
 typedef struct torthem
 {
     fclaw2d_global_t *global;
-    fc2d_clawpack46_options_t clawopt;
+
+    fc2d_clawpack46_options_t claw_opt;
+    fclaw2d_clawpatch_options_t clawpatch_opt;
+    fclaw_options_t fclaw_opt;
     user_options_t user;
 }
 torthem_t;
@@ -39,66 +44,74 @@ torthem_t;
 static void
 torthem_init (torthem_t * torthem)
 {
-    fclaw_options_t *gparms;
-    fc2d_clawpack46_options_t *clawopt = &torthem->clawopt;
-    user_options_t *user = &torthem->user;
+    fclaw_options_t *fclaw_opt;
+    fclaw2d_clawpatch_options_t *clawpatch_opt;    
+    fc2d_clawpack46_options_t *claw_opt;
+    user_options_t *user;
     fclaw_exit_type_t et;
 
     memset (torthem, 0, sizeof (*torthem));
     torthem->global = fclaw2d_global_new (NULL);
-    gparms = torthem->global->gparms;
+
+    claw_opt      = &torthem->claw_opt;
+    user          = &torthem->user;
+    fclaw_opt     = &torthem->fclaw_opt;
+    clawpatch_opt = &torthem->clawpatch_opt;
 
     /**************** FCLAW OPTIONS *************/
 
     /* todo: set all other values */
-    gparms->dim = 2;
-    gparms->mx = 8;
-    gparms->my = 8;
-    gparms->mbc = 2;
+    fclaw_opt->dim = 2;
+    fclaw_opt->periodic_x = 1;
+    fclaw_opt->periodic_y = 0;
+    fclaw_opt->mi = 18;
+    fclaw_opt->mj = 5;
+    fclaw_opt->manifold = 1;
 
-    gparms->periodic_x = 1;
-    gparms->periodic_y = 0;
-    gparms->mi = 18;
-    gparms->mj = 5;
-    gparms->manifold = 1;
+    fclaw_opt->outstyle = 3;
+    fclaw_opt->nout = 10;
+    fclaw_opt->nstep = 1;
 
-    gparms->outstyle = 3;
-    gparms->nout = 10;
-    gparms->nstep = 1;
+    fclaw_opt->trapfpe = 0;
+    fclaw_opt->mpi_debug = 0;
 
-    gparms->trapfpe = 0;
-    gparms->mpi_debug = 0;
+    fclaw_opt->verbosity = 0;
 
-    gparms->verbosity = 0;
+    fclaw_opt->scale_string = "1. 1. 1.";
+    fclaw_opt->shift_string = "0. 0. 0.";
 
-    gparms->mthbc_string = "1 1 1 1";
-
-    gparms->scale_string = "1. 1. 1.";
-    gparms->shift_string = "0. 0. 0.";
-
-    et = fclaw_options_postprocess (gparms);
+    et = fclaw_options_postprocess (fclaw_opt);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Option postprocess error");
-    et = fclaw_options_check (gparms);
+    et = fclaw_options_check (fclaw_opt);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Option check error");
 
     /**************** CLAWPACK 4.6 OPTIONS *************/
+    clawpatch_opt->mx = 8;
+    clawpatch_opt->my = 8;
+    clawpatch_opt->mbc = 2;
+    clawpatch_opt->meqn = 1;
 
-    clawopt->mwaves = 3;
-    clawopt->mthlim_string = "1 1 4";
-    clawopt->order_string = "2 2";
+    /**************** CLAWPACK 4.6 OPTIONS *************/
+
+    claw_opt->mthbc_string = "1 1 1 1";
+
+    claw_opt->mwaves = 3;
+    claw_opt->mthlim_string = "1 1 4";
+    claw_opt->order_string = "2 2";
     /* Plus more options */
 
-    et = fc2d_clawpack46_postprocess (clawopt);
+    et = fc2d_clawpack46_postprocess (claw_opt);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Clawpack46 postprocess error");
-    et = fc2d_clawpack46_check (clawopt);
+
+    et = fc2d_clawpack46_check (claw_opt);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Clawpack46 check error");
 
-    for(int i = 0; i < clawopt->mwaves; i++)
+    for(int i = 0; i < claw_opt->mwaves; i++)
     {
-        fclaw_global_essentialf("mthlim[%d] = %d\n",i,clawopt->mthlim[i]);
+        fclaw_global_essentialf("mthlim[%d] = %d\n",i,claw_opt->mthlim[i]);
     }
 
-    fc2d_clawpack46_set_vtable_defaults();
+    fc2d_clawpack46_vtable_initialize();
 
     /**************** TORUS OPTIONS *************/
 
@@ -119,11 +132,11 @@ torthem_run (torthem_t * torthem)
 }
 
 static void
-torthem_reset (torthem_t * torthem)
+torthem_destroy (torthem_t * torthem)
 {
-    torus_options_reset (&torthem->user);
-    fc2d_clawpack46_reset (&torthem->clawopt);
-    fclaw_options_reset (torthem->global->gparms);
+    torus_options_destroy (&torthem->user);
+    fc2d_clawpack46_options_destroy (&torthem->claw_opt);
+    fclaw_options_destroy (torthem->fclaw_opt);
     fclaw2d_global_destroy (torthem->global);
 }
 
@@ -145,7 +158,7 @@ main (int argc, char **argv)
 
     torthem_init (torthem);
     torthem_run (torthem);
-    torthem_reset (torthem);
+    torthem_destroy (torthem);
 
     sc_finalize ();
 

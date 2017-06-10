@@ -51,7 +51,7 @@ torus_options_check (user_options_t * user)
 }
 
 void
-torus_options_reset (user_options_t * user)
+torus_options_destroy (user_options_t * user)
 {
     fclaw_options_destroy_array (user->latitude);
     fclaw_options_destroy_array (user->longitude);
