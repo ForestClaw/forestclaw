@@ -15,9 +15,11 @@ applications_amrclaw_acoustics_2d_interface_interface_SOURCES = \
 	applications/amrclaw/acoustics/2d/interface/user_4.6/setaux.f \
 	applications/amrclaw/acoustics/2d/interface/user_4.6/qinit.f \
 	applications/amrclaw/acoustics/2d/interface/user_4.6/tag4refinement.f \
+	applications/amrclaw/acoustics/2d/interface/user_4.6/tag4coarsening.f \
 	applications/amrclaw/acoustics/2d/interface/user_5.0/setaux.f90 \
 	applications/amrclaw/acoustics/2d/interface/user_5.0/qinit.f90 \
 	applications/amrclaw/acoustics/2d/interface/user_5.0/tag4refinement.f90 \
+	applications/amrclaw/acoustics/2d/interface/user_5.0/tag4coarsening.f90 \
 	applications/amrclaw/acoustics/2d/rp/rpn2acv.f \
 	applications/amrclaw/acoustics/2d/rp/rpt2acv.f \
 	applications/amrclaw/acoustics/2d/rp/rpn2_vc_acoustics.f90 \
