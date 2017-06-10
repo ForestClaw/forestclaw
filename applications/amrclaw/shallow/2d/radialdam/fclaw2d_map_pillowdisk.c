@@ -12,7 +12,7 @@ extern "C"
 
 
 static int
-fclaw2d_map_query_pillowdisk5 (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_pillowdisk (fclaw2d_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -59,33 +59,33 @@ fclaw2d_map_query_pillowdisk5 (fclaw2d_map_context_t * cont, int query_identifie
 
 
 static void
-fclaw2d_map_c2m_pillowdisk5(fclaw2d_map_context_t * cont, int blockno,
-                                double xc, double yc,
-                                double *xp, double *yp, double *zp)
+fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
+                      double xc, double yc,
+                      double *xp, double *yp, double *zp)
 {
-    double alpha = cont->user_double[0];
-    MAPC2M_PILLOWDISK5(&blockno,&xc,&yc,xp,yp,zp,&alpha);
+    MAPC2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
 
-
-    rotate_map(cont,xp,yp,zp);
+    /* These can probably be replaced by C functions at some point. */
     scale_map(cont, xp,yp,zp);
+    rotate_map(cont, xp,yp,zp);
     shift_map(cont, xp,yp,zp);
+
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
-                                                       const double shift[],
-                                                       const double rotate[],
-                                                       const double alpha)
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[])
 {
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
-    cont->query = fclaw2d_map_query_pillowdisk5;
-    cont->mapc2m = fclaw2d_map_c2m_pillowdisk5;
+    cont->query = fclaw2d_map_query_pillowdisk;
+    cont->mapc2m = fclaw2d_map_c2m_pillowdisk;
 
-    cont->user_double[0] = alpha;
-
+    /* This stores rotate/scale parameters in common blocks for later
+       retrieval by scale_map/rotate_map (called above).  These parameters
+       can of course be stored as variables in a context field */
     set_rotate(cont, rotate);
     set_scale(cont, scale);
     set_shift(cont, shift);
