@@ -43,28 +43,6 @@ void gaussian_problem_setup(fclaw2d_global_t *glob);
 void GAUSSIAN_SETPROB(const double* kappa, const double* tfinal);
 
 
-#if 0
-void gaussian_patch_setup(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx);
-
-double gaussian_update(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt);
-
-void gaussian_b4step2(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      double t,
-                      double dt);
-
-#endif
-
 void gaussian_link_solvers(fclaw2d_global_t *glob);
 
 

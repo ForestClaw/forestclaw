@@ -27,18 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
-
-#include <fc2d_clawpack46.h>
-#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
-
-#include <fc2d_clawpack5.h>
-#include <clawpack5_user_fort.h>
-
 #include "../all/transport_user.h"
 #include "../all/transport_options.h"
-
-#include "../../advection/2d/all/clawpack_user.h"
 
 void gaussian_link_solvers(fclaw2d_global_t *glob)
 {
