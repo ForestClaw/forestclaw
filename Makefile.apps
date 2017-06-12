@@ -16,20 +16,20 @@ endif
 # ----------------------------------
 
 # Scalar advection on manifolds
-#include applications/advection/2d/swirl/Makefile.am
-#include applications/advection/2d/filament/Makefile.am
-#include applications/advection/2d/annulus/Makefile.am
-#include applications/advection/2d/latlong/Makefile.am
-#include applications/advection/2d/disk/Makefile.am
-#include applications/advection/2d/torus/Makefile.am
-#include applications/advection/2d/replicated/Makefile.am
-#include applications/advection/2d/hemisphere/Makefile.am
-#include applications/advection/2d/sphere/Makefile.am
+include applications/advection/2d/swirl/Makefile.am
+include applications/advection/2d/filament/Makefile.am
+include applications/advection/2d/annulus/Makefile.am
+include applications/advection/2d/latlong/Makefile.am
+include applications/advection/2d/disk/Makefile.am
+include applications/advection/2d/torus/Makefile.am
+include applications/advection/2d/replicated/Makefile.am
+include applications/advection/2d/hemisphere/Makefile.am
+include applications/advection/2d/sphere/Makefile.am
 
 # NCAR Transport problems on the sphere
-#include applications/NCAR_transport/gaussian/Makefile.am
-#include applications/NCAR_transport/slotted_disk/Makefile.am
-#include applications/NCAR_transport/correlatedcb/Makefile.am
+include applications/NCAR_transport/gaussian/Makefile.am
+include applications/NCAR_transport/slotted_disk/Makefile.am
+include applications/NCAR_transport/correlatedcb/Makefile.am
 
 # AMRClaw examples from Clawpack/AMRClaw
 include applications/amrclaw/acoustics/2d/radial/Makefile.am
@@ -49,14 +49,12 @@ include applications/geoclaw/bowl_radial/Makefile.am
 endif
 
 # -------------- Under construction ------------------
-#  These are not guaranteed to compile
+#  These are not guaranteed to compile or may not be
+#  available
 # ----------------------------------------------------
 
 # Third order scalar advection
 #include applications/advection/2d/adv_order3/Makefile.am
-
-# Euler example
-#include applications/euler/2d/quadrants/Makefile.am
 
 # Shallow water on the sphere
 # include applications/shallow/2d/sphere/Makefile.am
