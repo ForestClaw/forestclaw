@@ -196,13 +196,7 @@ struct fclaw_options
 
     const char *prefix;         /**< This is prepended to output files */
 
-    /* VTK output control */
-    int vtkout_debug;      /**< 0 for no output, 1 for output during amrinit,
-                          2 for output when in amr_output.  Can be or'd. */
-
     double vtkspace; /**< between 0. and 1. to separate patches visually */
-    int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */    
-
 
     int weighted_partition;            /**< Use weighted partition. */
 

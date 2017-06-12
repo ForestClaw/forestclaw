@@ -145,24 +145,6 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
         *domain = domain_partitioned;
         domain_partitioned = NULL;
 
-        /* VTK output during amrinit */
-        if (mode >= 0 && gparms->vtkout_debug & 1) {
-            // into timer
-            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
-            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-
-            // output
-            snprintf (basename, BUFSIZ, "%s_init_level_%02d_partition",
-                      gparms->prefix, mode);
-#if 0            
-            fclaw2d_output_write_vtk_debug (glob, basename);
-#endif            
-
-            // out of timer
-            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
-        }
-
         /* internal clean up */
         fclaw2d_domain_complete(*domain);
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);

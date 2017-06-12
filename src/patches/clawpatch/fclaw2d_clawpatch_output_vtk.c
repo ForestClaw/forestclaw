@@ -484,6 +484,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 {   
     fclaw2d_domain_t *domain = glob->domain;
     
+
     int retval, gretval;
     int mpiret;
     fclaw2d_vtk_state_t ps, *s = &ps;
@@ -671,7 +672,7 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my, 
                                    clawpatch_opt->meqn,
-                                   gparms->vtkspace, gparms->vtkwrite,
+                                   gparms->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
 }
@@ -693,7 +694,7 @@ void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my, 
                                    clawpatch_opt->meqn,
-                                   gparms->vtkspace, gparms->vtkwrite,
+                                   gparms->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
 }

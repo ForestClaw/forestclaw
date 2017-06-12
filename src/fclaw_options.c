@@ -116,14 +116,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_string (opt, 0, "prefix", &fclaw_opt->prefix, "fort",
                            "Output file prefix [fort]");
 
-    sc_options_add_int (opt, 0, "vtkout_debug", &fclaw_opt->vtkout_debug, 0,
-                        "VTK debug output method [F]");
- 
     sc_options_add_double (opt, 0, "vtkspace", &fclaw_opt->vtkspace, 0.,
                            "VTK visual spacing [F]");
-
-    sc_options_add_int (opt, 0, "vtkwrite", &fclaw_opt->vtkwrite, 0,
-                        "VTK write variant [F]");
 
     /* ---------------------- Regridding options -------------------------- */
 

@@ -143,23 +143,6 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
                             0.0,time_interp);
 
-    // VTK output during amrinit
-    if (gparms->vtkout_debug & 1) {
-        // into timer
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-
-        // output
-        snprintf (basename, BUFSIZ, "%s_init_level_%02d",
-                  gparms->prefix, minlevel);
-#if 0        
-        fclaw2d_output_write_vtk_debug (glob, basename);
-#endif        
-
-        // out of timer
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
-    }
     /* ------------------------------------------------
        Done with initial setup.
        ------------------------------------------------ */
@@ -214,26 +197,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                 *domain = new_domain;
                 new_domain = NULL;
 
-                // VTK output during amrinit
-                if (gparms->vtkout_debug & 1) {
-                    // into timer
-                    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
-                    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-
-                    // output
-                    snprintf (basename, BUFSIZ, "%s_init_level_%02d_adapt",
-                              gparms->prefix, level);
-#if 0                    
-                    fclaw2d_output_write_vtk (glob, basename);
-#endif                    
-
-                    /* out of timer */
-                    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-                    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
-                }
-
-                /* Repartition domain to new processors.   Second arg is the
-                   mode for VTK output */
+                /* Repartition domain to new processors.    */
                 fclaw2d_partition_domain(glob,level,FCLAW2D_TIMER_INIT);
 
                 /* Set up ghost patches.  This probably doesn't need to be done
