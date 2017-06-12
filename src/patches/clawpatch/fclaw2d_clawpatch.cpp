@@ -81,7 +81,6 @@ void fclaw2d_clawpatch_vtable_initialize()
     /* These may be redefined by the user */
     /* Problem setup */
     patch_vt->patch_new             = fclaw2d_clawpatch_new;
-    patch_vt->patch_delete          = fclaw2d_clawpatch_delete;
     patch_vt->build                 = &fclaw2d_clawpatch_build;
     patch_vt->build_from_fine       = &fclaw2d_clawpatch_build_from_fine;
     patch_vt->build_ghost           = &fclaw2d_clawpatch_build_ghost;
@@ -113,6 +112,9 @@ void fclaw2d_clawpatch_vtable_initialize()
     patch_vt->ghost_packsize    = &fclaw2d_clawpatch_ghost_packsize;
     patch_vt->local_ghost_alloc = &fclaw2d_clawpatch_local_ghost_alloc;
     patch_vt->local_ghost_free  = &fclaw2d_clawpatch_local_ghost_free;
+#if 0    
+    patch_vt->patch_delete          = fclaw2d_clawpatch_delete;
+#endif    
 
     /* partitioning */
     patch_vt->partition_pack        = &fclaw2d_clawpatch_partition_pack;
