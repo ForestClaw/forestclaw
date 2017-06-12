@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_FARRAYBOX_H
 #define FCLAW2D_FARRAYBOX_H
 
+#include <fclaw2d_defs.h>
 
 void fclaw2d_farraybox_set_to_nan(double& f);
 
@@ -42,8 +43,8 @@ public:
 
 private:
     int m_box_dim;
-    int m_ll[FCLAW_PATCH_DIM];
-    int m_ur[FCLAW_PATCH_DIM];
+    int m_ll[FCLAW2D_PATCHDIM];
+    int m_ur[FCLAW2D_PATCHDIM];
 };
 
 class FArrayBox

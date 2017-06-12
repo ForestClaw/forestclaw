@@ -154,13 +154,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
      /* ---------------------- Diagnostics -------------------------- */
 
    sc_options_add_bool (opt, 0, "run-user-diagnostics",
-                         &fclaw_opt->run_user_diagnostics,0,
-
-    sc_options_add_double (opt, 0, "az", &amropt->az, 0, "zlower " \
-                           "(used only with manifold=0) [0]");
-    sc_options_add_double (opt, 0, "bz", &amropt->bz, 1, "zupper " \
-                           "(used only with manifold=0) [1]");
-                           "Run user diagnostics [F]");
+                        &fclaw_opt->run_user_diagnostics,0,
+                        "Run user diagnostics [F]");
 
     sc_options_add_bool (opt, 0, "compute-error",
                          &fclaw_opt->compute_error,0,

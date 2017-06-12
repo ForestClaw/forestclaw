@@ -79,8 +79,6 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
     fclaw2d_domain_t** domain = &glob->domain;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION]);
 
-    char basename[BUFSIZ];
-
     /* will need to access the subcyle switch */
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 

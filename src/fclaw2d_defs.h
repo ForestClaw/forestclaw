@@ -39,12 +39,14 @@ extern "C"
 #define FCLAW2D_NUMCORNERS   4
 #define FCLAW2D_NUMFACES     4
 #define FCLAW2D_NUMSIBLINGS  4
+#define FCLAW2D_PATCHDIM     2	
 
 extern const int SpaceDim;
 extern const int NumFaces;
 extern const int NumCorners;
 extern const int NumSiblings;
 extern const int RefineFactor;
+extern const int PatchDim;
 
 
 #ifdef __cplusplus

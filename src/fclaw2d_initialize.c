@@ -76,7 +76,6 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_domain_t** domain = &glob->domain;
 
     int time_interp = 0;
-    char basename[BUFSIZ];
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     /* This mapping context is needed by fortran mapping functions */
