@@ -51,6 +51,14 @@ void fclaw2d_options_store (struct fclaw2d_global *glob, struct fclaw_options* f
 fclaw_options_t* fclaw2d_get_options(struct fclaw2d_global *glob);
 
 
+#ifndef FCLAW_PATCH_DIM
+#define FCLAW_PATCH_DIM  2
+#endif
+
+#ifndef FCLAW_REFINE_DIM
+#define FCLAW_REFINE_DIM 2
+#endif
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

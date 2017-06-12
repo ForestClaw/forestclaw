@@ -90,7 +90,6 @@ clawpatch_check(fclaw2d_clawpatch_options_t *clawpatch_opt)
                                 "ghost cells (mbc) specifed.  We should have " \
                                 "(width)/2 <= mbc");
     }
-
     return FCLAW_NOEXIT;
 }
 

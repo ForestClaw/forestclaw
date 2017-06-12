@@ -144,8 +144,13 @@ void FArrayBox::set_dataPtr(int a_size)
 
 void FArrayBox::define(const Box& a_box, int a_fields)
 {
-    int box_size = (a_box.bigEnd(0) - a_box.smallEnd(0) + 1)*
-                   (a_box.bigEnd(1) - a_box.smallEnd(1) + 1);
+    int box_size = 1;
+
+    for (int i = 0; i < a_box.boxDim(); ++i)
+    {
+        box_size *= (a_box.bigEnd(i) - a_box.smallEnd(i) + 1);
+    }
+
     if (box_size < 0)
     {
         printf("FArrayBox::define(a_box,a_fields) : size < 0\n");
@@ -256,7 +261,8 @@ int FArrayBox::fields()
 // Rename to "IndexBox"
 Box::Box()
 {
-    for (int idir = 0; idir < SpaceDim; idir++)
+    m_box_dim = PatchDim;
+    for (int idir = 0; idir < m_box_dim; idir++)
     {
         m_ll[idir] = 0;
         m_ur[idir] = 0;
@@ -265,7 +271,8 @@ Box::Box()
 
 Box::Box(const Box& a_box)
 {
-    for(int idir = 0; idir < SpaceDim; idir++)
+    m_box_dim = a_box.m_box_dim;
+    for(int idir = 0; idir < m_box_dim; idir++)
     {
         m_ll[idir] = a_box.m_ll[idir];
         m_ur[idir] = a_box.m_ur[idir];
@@ -274,7 +281,18 @@ Box::Box(const Box& a_box)
 
 Box::Box(const int ll[], const int ur[])
 {
-    for(int idir = 0; idir < SpaceDim; idir++)
+    m_box_dim = PatchDim;
+    for(int idir = 0; idir < m_box_dim; idir++)
+    {
+        m_ll[idir] = ll[idir];
+        m_ur[idir] = ur[idir];
+    }
+}
+
+Box::Box(const int ll[], const int ur[], const int box_dim)
+{
+    m_box_dim = box_dim;
+    for(int idir = 0; idir < m_box_dim; idir++)
     {
         m_ll[idir] = ll[idir];
         m_ur[idir] = ur[idir];
@@ -289,4 +307,9 @@ int Box::smallEnd(int idir) const
 int Box::bigEnd(int idir) const
 {
     return m_ur[idir];
+}
+
+int Box::boxDim() const
+{
+    return m_box_dim;
 }

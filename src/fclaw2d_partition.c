@@ -87,7 +87,8 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
-    size_t data_size = fclaw2d_patch_partition_packsize(glob);
+    size_t psize = fclaw2d_patch_partition_packsize(glob);
+    size_t data_size = psize*sizeof(double);
     void ** patch_data = NULL;
 
     fclaw2d_domain_allocate_before_partition (*domain, data_size,

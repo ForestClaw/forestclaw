@@ -23,10 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TRANSPORT_OPTIONS_H
-#define TRANSPORT_OPTIONS_H
+#ifndef FC3D_CLAWPACK5_OPTIONS_H
+#define FC3D_CLAWPACK5_OPTIONS_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_options.h>
+#include <fclaw2d_base.h>
+#include <fclaw_clawpatch3_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,23 +38,39 @@ extern "C"
 #endif
 #endif
 
-
-typedef struct user_options
+/* Only one copy of clawpack5_options for each run */
+typedef struct fc3d_clawpack5_options
 {
-    int example;
-    double kappa;
-    int claw_version;
-    int is_registered;
+    int mwaves;
 
-} user_options_t;
+    const char *order_string;
+    int *order;
 
-const user_options_t* transport_get_options(fclaw2d_global_t* glob);
+    int *mthlim;
+    const char *mthlim_string;
 
-user_options_t* transport_options_register (fclaw_app_t * app,
-                                             const char *configfile);
+    int *mthbc;
+    const char *mthbc_string;
+    
+    int method[7];
+    int mcapa;
+    int src_term;
+    int use_fwaves;
+}
+fc3d_clawpack5_options_t;
 
-void transport_options_store (fclaw2d_global_t* glob, user_options_t* user);
+fclaw_exit_type_t fc3d_clawpack5_postprocess (fc3d_clawpack5_options_t *
+                                               clawopt);
+fclaw_exit_type_t fc3d_clawpack5_check (fc3d_clawpack5_options_t * clawopt);
+void fc3d_clawpack5_reset (fc3d_clawpack5_options_t * clawopt);
 
+fc3d_clawpack5_options_t *fc3d_clawpack5_options_register (fclaw_app_t *
+                                                             app,
+                                                             const char
+                                                             *configfile);
+#define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
+void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
+                    const int mthlim_in[], const int method_in[]);
 
 #ifdef __cplusplus
 #if 0

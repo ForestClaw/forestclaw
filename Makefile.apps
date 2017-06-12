@@ -11,6 +11,10 @@ if FCLAW_ENABLE_GEOCLAW
 include src/solvers/fc2d_geoclaw/Makefile.am
 endif
 
+if FCLAW_ENABLE_ASH3D
+include src/solvers/fc3d_ash3d/Makefile.am
+endif
+
 # ----------------------------------
 # Applications
 # ----------------------------------
@@ -25,6 +29,9 @@ include applications/advection/2d/torus/Makefile.am
 include applications/advection/2d/replicated/Makefile.am
 include applications/advection/2d/hemisphere/Makefile.am
 include applications/advection/2d/sphere/Makefile.am
+
+# Scalar advection in 2.5 dimension
+#include applications/advection/2.5d/swirl/Makefile.am
 
 # NCAR Transport problems on the sphere
 include applications/NCAR_transport/gaussian/Makefile.am
@@ -70,8 +77,7 @@ endif
 # include applications/metric/2d/all_mappings/Makefile.am
 # include applications/metric/2d/mesh/Makefile.am
 
-
-
-
-
-
+# Ash3d examples
+if FCLAW_ENABLE_ASH3D
+include src/solvers/fc3d_ash3d/test_cases/cloud_tester/Makefile.am
+endif

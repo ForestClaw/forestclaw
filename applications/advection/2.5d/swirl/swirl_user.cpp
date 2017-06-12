@@ -23,42 +23,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TRANSPORT_OPTIONS_H
-#define TRANSPORT_OPTIONS_H
+#include "swirl_user.h"
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
 
-#include <fclaw2d_include_all.h>
 
-#ifdef __cplusplus
-extern "C"
+/* Two versions of Clawpack */
+#include <fc3d_clawpack5.h>
+
+void swirl_link_solvers(fclaw2d_global_t *glob)
 {
+    fclaw2d_vt()->problem_setup = &swirl_problem_setup;  /* Version-independent */
+
+    fc3d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
 #if 0
-}
-#endif
-#endif
-
-
-typedef struct user_options
-{
-    int example;
-    double kappa;
-    int claw_version;
-    int is_registered;
-
-} user_options_t;
-
-const user_options_t* transport_get_options(fclaw2d_global_t* glob);
-
-user_options_t* transport_options_register (fclaw_app_t * app,
-                                             const char *configfile);
-
-void transport_options_store (fclaw2d_global_t* glob, user_options_t* user);
-
-
-#ifdef __cplusplus
-#if 0
-{
+        fc2d_clawpack5_vt()->setaux    = &CLAWPACK5_SETAUX;
+        fc2d_clawpack5_vt()->b4step2   = &CLAWPACK5_B4STEP2;
+        fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV;
+        fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV;
 #endif
 }
-#endif
 
-#endif
+void swirl_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = swirl_user_get_options(glob);
+
+    double period = user->period;
+    SWIRL_SETPROB(&period);
+}

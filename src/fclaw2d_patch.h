@@ -96,7 +96,6 @@ struct fclaw2d_patch_data
 typedef void (*fclaw2d_patch_iterator_t) (struct fclaw2d_global * glob, int level,
                                           fclaw2d_patch_callback_t pcb, void *user);
 
-
 /* -------------------------------------------------------
    Functions below are virtual functions that rely on 
    specific patch definitions (clawpatch, for example).
@@ -268,6 +267,12 @@ void fclaw2d_patch_alloc_local_ghost(struct fclaw2d_global* glob,
 
 void fclaw2d_patch_free_local_ghost(struct fclaw2d_global* glob,
                                     void **q);
+
+
+#if 0
+void fclaw2d_patch_delete_remote_ghost(fclaw2d_global_t *glob,
+                                       fclaw2d_patch_t *ghost_patch);
+#endif
 
 
 /* ----------------------------partitioning --------------------------- */
@@ -449,6 +454,12 @@ typedef void (*fclaw2d_patch_local_ghost_alloc_t)(struct fclaw2d_global* glob,
 typedef void (*fclaw2d_patch_local_ghost_free_t)(struct fclaw2d_global* glob,
                                                  void **q);
 
+#if 0
+typedef void (*fclaw2d_patch_delete_ghost_t)(void *user_patch);
+#endif
+
+
+
 typedef void (*fclaw2d_patch_partition_pack_t)(struct fclaw2d_global *glob,
                                                struct fclaw2d_patch *this_patch,
                                                int this_block_idx,
@@ -531,6 +542,7 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_ghost_packsize_t     ghost_packsize;
     fclaw2d_patch_local_ghost_alloc_t  local_ghost_alloc;
     fclaw2d_patch_local_ghost_free_t   local_ghost_free;
+    fclaw2d_patch_delete_ghost_t       delete_ghost;
 
     /* partitioning */
     fclaw2d_patch_partition_pack_t       partition_pack;

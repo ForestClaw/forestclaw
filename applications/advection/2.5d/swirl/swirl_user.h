@@ -23,10 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TRANSPORT_OPTIONS_H
-#define TRANSPORT_OPTIONS_H
+#ifndef SWIRL_USER_H
+#define SWIRL_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw2d_forestclaw.h>
+#include <fc3d_clawpack5.h>
+// #include "../all/clawpack_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,23 +38,30 @@ extern "C"
 #endif
 #endif
 
-
 typedef struct user_options
 {
-    int example;
-    double kappa;
+    double period;
     int claw_version;
     int is_registered;
 
 } user_options_t;
 
-const user_options_t* transport_get_options(fclaw2d_global_t* glob);
+#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
+void SWIRL_SETPROB(double* tperiod);
 
-user_options_t* transport_options_register (fclaw_app_t * app,
-                                             const char *configfile);
+void swirl_link_solvers(fclaw2d_global_t *glob);
 
-void transport_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void swirl_problem_setup(fclaw2d_global_t* glob);
 
+void swirl_patch_setup(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx);
+
+const user_options_t* swirl_user_get_options(fclaw2d_global_t* glob);
+
+/* Mappings */
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0
