@@ -24,25 +24,17 @@
 */
 
 #include "bowl_user.h"
-#include <fc2d_geoclaw.h>
-#include <fclaw2d_clawpatch.h>
 
-#include <fc2d_geoclaw_options.h>
+#include <fclaw2d_include_all.h>
+
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
 
-
-/* Maybe these should be bundled together in a nice user-include file? */
-#include <fclaw2d_options.h>
-#include <fclaw_package.h>
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_convenience.h>  /* Needed for connectivity */
-#include <fclaw2d_global.h>
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_diagnostics.h>
+#include <fc2d_geoclaw.h>
+#include <fc2d_geoclaw_options.h>
 
 
-static int s_user_package_id = -1;
+static int s_user_options_package_id = -1;
 
 static void *
 bowl_register (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -96,12 +88,19 @@ void bowl_register_options (fclaw_app_t * app,
                                 user);
 }
 
+user_options_t* bowl_get_options(fclaw2d_global_t* glob)
+{
+    int id = s_user_options_package_id;
+    return (user_options_t*) fclaw_package_get_options(glob, id);    
+}
+
+
 static 
 void bowl_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(s_user_package_id == -1);
+    FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_package_id = id;
+    s_user_options_package_id = id;
 }
 
 
