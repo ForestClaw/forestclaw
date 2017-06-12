@@ -454,9 +454,7 @@ typedef void (*fclaw2d_patch_local_ghost_alloc_t)(struct fclaw2d_global* glob,
 typedef void (*fclaw2d_patch_local_ghost_free_t)(struct fclaw2d_global* glob,
                                                  void **q);
 
-#if 0
 typedef void (*fclaw2d_patch_delete_ghost_t)(void *user_patch);
-#endif
 
 
 
@@ -542,9 +540,7 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_ghost_packsize_t     ghost_packsize;
     fclaw2d_patch_local_ghost_alloc_t  local_ghost_alloc;
     fclaw2d_patch_local_ghost_free_t   local_ghost_free;
-#if 0    
-    fclaw2d_patch_delete_ghost_t       delete_ghost;
-#endif    
+    fclaw2d_patch_delete_ghost_t       delete_ghost;  /* Delete remote ghosts */
 
     /* partitioning */
     fclaw2d_patch_partition_pack_t       partition_pack;

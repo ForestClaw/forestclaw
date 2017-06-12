@@ -432,24 +432,24 @@ void fclaw2d_patch_free_local_ghost(fclaw2d_global_t* glob,
     patch_vt->local_ghost_free(glob, q);
 }
 
-#if 0
 void fclaw2d_patch_delete_remote_ghost(fclaw2d_global_t *glob,
                                        fclaw2d_patch_t *this_patch)
 {
-    FCLAW_ASSERT(patch_vt()->delete_ghost != NULL);
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    
+    FCLAW_ASSERT(patch_vt->delete_ghost != NULL);
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
 
     if (pdata != NULL)
     {
         fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);
-        patch_vt()->delete_ghost(pdata->user_patch);
+        patch_vt->delete_ghost(pdata->user_patch);
         ++ddata->count_delete_patch;
 
         FCLAW2D_FREE(pdata);
         this_patch->user = NULL;
     }
 }
-#endif
 
 
 
