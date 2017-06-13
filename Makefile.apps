@@ -72,7 +72,7 @@ endif
 # include applications/shallow/2d/sphere/Makefile.am
 
 # Still need to figure out what this version does */
-# include applications/advection/2d/torthem/Makefile.am
+include applications/advection/2d/torthem/Makefile.am
 
 # Simple examples to test options handling, etc, but no solvers.
 #include applications/dummy/Makefile.am
