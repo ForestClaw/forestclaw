@@ -129,8 +129,11 @@ libforestclaw_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.c
 
 # this variable is used for headers that are not publicly installed
-FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d -I@top_srcdir@/src/patches/clawpatch \
-                 -I@top_srcdir@/src/patches/clawpatch3
+FCLAW_CPPFLAGS = \
+    -I@top_srcdir@/src  \
+	-I@top_srcdir@/src/fortran_source2d  \
+	-I@top_srcdir@/src/patches/clawpatch
+
 FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)
 
 lib_LTLIBRARIES += src/libforestclaw.la
