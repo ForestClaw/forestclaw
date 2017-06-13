@@ -60,15 +60,8 @@ void convert_brick(fclaw2d_global_t *glob,
 
     int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
 
-    double ax = 0;
-    double bx = fclaw_opt->mi;
-    double ay = 0;
-    double by = fclaw_opt->mj;
-
     double xl = this_patch->xlower;
     double yl = this_patch->ylower;
-    double xu = this_patch->xupper;
-    double yu = this_patch->yupper;
 
     double xlow,ylow,xupper, yupper;
 
@@ -77,23 +70,26 @@ void convert_brick(fclaw2d_global_t *glob,
         double z;
             /* Scale to [0,1]x[0,1], based on blockno */
         fclaw2d_map_c2m_nomap_brick(cont,blockno,xl,yl,&xlow,&ylow,&z);
-        fclaw2d_map_c2m_nomap_brick(cont,blockno,xu,yu,&xupper,&yupper,&z);
     }
     else
     {
         xlow = xl;
         ylow = yl;
-        xupper = xu;
-        yupper = yu;
     }
 
+#if 0
+    /* This assumes figsize is square */
+    double ax = 0;
+    double bx = fclaw_opt->mi;
+    double ay = 0;
+    double by = fclaw_opt->mj;
     *xlower = ax + (bx - ax)*xlow;
-    // xupper = ax + (bx - ax)*xupper;
     *ylower = ay + (by - ay)*ylow;
-    // yupper = ay + (by - ay)*yupper;
+#endif    
 
-    // cp->dx = (cp->xupper - cp->xlower)/cp->mx;
-    // cp->dy = (cp->yupper - cp->ylower)/cp->my;
+    /* Use figsize to scale tikz picture */
+    *xlower = xlow;
+    *ylower = ylow;
 
 }
 
