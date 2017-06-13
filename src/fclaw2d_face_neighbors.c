@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_physical_bc.h>
+#include <fclaw2d_regrid.h>
 #include <fclaw2d_transform.h>
 #include <fclaw2d_domain.h>
 

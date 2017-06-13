@@ -406,10 +406,3 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
     ++glob->count_ghost_exchange;
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

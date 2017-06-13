@@ -326,11 +326,3 @@ void fclaw2d_after_regrid(fclaw2d_global_t *glob)
         fclaw_vt->after_regrid(glob);
     }
 }
-
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
