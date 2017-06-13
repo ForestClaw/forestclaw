@@ -138,9 +138,11 @@ FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)
 
 lib_LTLIBRARIES += src/libforestclaw.la
 src_libforestclaw_la_SOURCES = \
- $(libforestclaw_internal_headers) \
- $(libforestclaw_compiled_sources)
+	$(libforestclaw_internal_headers) \
+ 	$(libforestclaw_compiled_sources)
+
 # src_libforestclaw_la_CPPFLAGS = $(AM_CPPFLAGS)
+
 LDADD += @top_builddir@/src/libforestclaw.la @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
 EXTRA_src_libforestclaw_la_DEPENDENCIES = @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
 
