@@ -58,6 +58,7 @@ To compile it under Linux, execute:
 
 /* Added this ifdef to compile the file conditionally */
 /* Question: why does this file not include fp_exception_glibc_extension.h? */
+#include <fp_exception_glibc_extension.h>
 #include <fclaw_config.h>
 
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
@@ -241,6 +242,8 @@ typedef union {
 #include <stdio.h>   // printf()
 #include <stdlib.h>  // abort(), exit()
 
+#if 0
+
 static const char *fe_code_name[] = {
   "FPE_NOOP",
   "FPE_FLTDIV", "FPE_FLTINV", "FPE_FLTOVF", "FPE_FLTUND",
@@ -248,7 +251,6 @@ static const char *fe_code_name[] = {
   "FPE_UNKNOWN"
 };
 
-#if 0
 /* SAMPLE ALTERNATE FP EXCEPTION HANDLER
 
    The sample handler just reports information about the
