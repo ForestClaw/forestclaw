@@ -23,11 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
-
+#include <fclaw2d_block.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_map_query.h>
-
+#include <fclaw2d_options.h>
+#include <fclaw2d_defs.h>
+#include <fclaw2d_global.h>
+#include <fclaw2d_transform.h>
+#include <fclaw2d_physical_bc.h>
 #include <fclaw2d_patch.h>
 
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize)
@@ -41,24 +44,26 @@ enum
 
 
 static
-void get_corner_type(fclaw2d_domain_t* domain,
+void get_corner_type(fclaw2d_global_t* glob,
                      int icorner,
-                     fclaw_bool intersects_bdry[],
-                     fclaw_bool intersects_block[],
-                     fclaw_bool *interior_corner,
-                     fclaw_bool *is_block_corner,
+                     int intersects_bdry[],
+                     int intersects_block[],
+                     int *interior_corner,
+                     int *is_block_corner,
                      int *block_iface)
 {
+    fclaw2d_domain_t *domain = glob->domain;
+
     // p4est has tons of lookup table like this, can be exposed similarly
     int corner_faces[SpaceDim];
     fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
 
     /* Both faces are at a physical boundary */
-    fclaw_bool is_phys_corner =
+    int is_phys_corner =
         intersects_bdry[corner_faces[0]] && intersects_bdry[corner_faces[1]];
 
     /* Corner lies in interior of physical boundary edge. */
-    fclaw_bool corner_on_phys_face = !is_phys_corner &&
+    int corner_on_phys_face = !is_phys_corner &&
              (intersects_bdry[corner_faces[0]] || intersects_bdry[corner_faces[1]]);
 
     /* Either a corner is at a block boundary (but not a physical boundary),
@@ -121,13 +126,13 @@ void get_corner_type(fclaw2d_domain_t* domain,
    ------------------------------------------------------ */
 
 static
-void get_corner_neighbor(fclaw2d_domain_t *domain,
+void get_corner_neighbor(fclaw2d_global_t *glob,
                          int this_block_idx,
                          int this_patch_idx,
                          fclaw2d_patch_t* this_patch,
                          int icorner,
                          int block_iface,
-                         fclaw_bool is_block_corner,
+                         int is_block_corner,
                          int *corner_block_idx,
                          fclaw2d_patch_t** corner_patch,
                          int *rcornerno,
@@ -136,17 +141,17 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                          int ftransform[],
                          fclaw2d_transform_data_t* ftransform_finegrid)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+    fclaw2d_domain_t *domain = glob->domain;
     /* See what p4est thinks we have for corners, and consider four cases */
     int rproc_corner;
     int corner_patch_idx;
     fclaw2d_patch_relation_t neighbor_type;
 
-    fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(domain);
-    fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
+    fclaw2d_map_context_t *cont = glob->cont;
+    int ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
 
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
-    fclaw_bool has_corner_neighbor =
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+    int has_corner_neighbor =
         fclaw2d_patch_corner_neighbors(domain,
                                        this_block_idx,
                                        this_patch_idx,
@@ -156,7 +161,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                                        &corner_patch_idx,
                                        rcornerno,
                                        &neighbor_type);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
     if (has_corner_neighbor && is_block_corner)
@@ -189,7 +194,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
                remote face number.  The remote face number encodes the
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
-            int rproc[p4est_refineFactor];
+            int rproc[RefineFactor];
             int rpatchno;
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw2d_patch_face_neighbors(domain,
@@ -250,9 +255,9 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
         else
         {
             *block_corner_count = 2;
-            has_corner_neighbor = fclaw_true;
-            int rpatchno[p4est_refineFactor];
-            int rproc[p4est_refineFactor];
+            has_corner_neighbor = 1;
+            int rpatchno[RefineFactor];
+            int rproc[RefineFactor];
             int rfaceno;
 
             /* Use only faces 0 or 1 to get block data. */
@@ -272,7 +277,7 @@ void get_corner_neighbor(fclaw2d_domain_t *domain,
             {
                 /* igrid = 0 at corners 0,1 and (R-1) at corners 2,3,
                    where R = refinement factor */
-                igrid = (icorner/2)*(p4est_refineFactor - 1);
+                igrid = (icorner/2)*(RefineFactor - 1);
             }
             else
             {
@@ -323,46 +328,45 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-    fclaw2d_vtable_t vt = fclaw2d_get_vtable(domain);
-    fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) user;
-    fclaw_bool time_interp = filltype->time_interp;
-    fclaw_bool is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
-    fclaw_bool is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user; 
 
-    fclaw_bool read_parallel_patches = filltype->read_parallel_patches;
+    fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) s->user;
+    int time_interp = filltype->time_interp;
+    int is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
+    int is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
 
-    fclaw_bool copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
-    fclaw_bool average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
-    fclaw_bool interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
+    int read_parallel_patches = filltype->read_parallel_patches;
 
-    fclaw_bool intersects_bdry[NumFaces];
-    fclaw_bool intersects_block[NumFaces];
-    fclaw_bool is_block_corner;
-    fclaw_bool is_interior_corner;
+    int copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
+    int average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
+    int interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
+
+    int intersects_bdry[NumFaces];
+    int intersects_block[NumFaces];
+    int is_block_corner;
+    int is_interior_corner;
     int block_corner_count;
 
     int icorner;
 
-    fclaw2d_map_context_t *cont = fclaw2d_domain_get_map_context(domain);
-    fclaw_bool ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
+    fclaw2d_map_context_t *cont = s->glob->cont;
+    int ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
 
-    fclaw2d_physical_get_bc(domain,this_block_idx,this_patch_idx,
+    fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
                             intersects_bdry);
 
-    fclaw2d_block_get_block_boundary(domain, this_patch, intersects_block);
+    fclaw2d_block_get_block_boundary(s->glob, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
     fclaw2d_transform_data_t transform_data;
-    transform_data.mx = gparms->mx;
-    transform_data.my = gparms->my;
+    transform_data.glob = s->glob;
     transform_data.based = 1;   // cell-centered data in this routine.
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;  // gets filled in below.
 
     fclaw2d_transform_data_t transform_data_finegrid;
-    transform_data_finegrid.mx = gparms->mx;
-    transform_data_finegrid.my = gparms->my;
+    transform_data_finegrid.glob = s->glob;
     transform_data_finegrid.based = 1;   // cell-centered data in this routine.
 
     int refratio = gparms->refratio;
@@ -370,7 +374,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     for (icorner = 0; icorner < NumCorners; icorner++)
     {
         block_corner_count = 0;
-        get_corner_type(domain,icorner,
+        get_corner_type(s->glob,icorner,
                         intersects_bdry,
                         intersects_block,
                         &is_interior_corner,
@@ -381,7 +385,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
         /* This needs to be set here;  otherwise external corners
            don't get set. */
-        fclaw2d_patch_set_block_corner_count(domain, this_patch,
+        fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                              icorner,block_corner_count);
 
         if (is_interior_corner)
@@ -396,7 +400,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
             transform_data.icorner = icorner;
             corner_block_idx = -1;
-            get_corner_neighbor(domain,
+            get_corner_neighbor(s->glob,
                                 this_block_idx,
                                 this_patch_idx,
                                 this_patch,
@@ -411,7 +415,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                 transform_data.transform,
                                 &transform_data_finegrid);
 
-            fclaw2d_patch_set_block_corner_count(domain, this_patch,
+            fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                                  icorner,block_corner_count);
             transform_data.is_block_corner = is_block_corner;
 
@@ -429,7 +433,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 continue;
             }
 
-            fclaw_bool remote_neighbor = fclaw2d_patch_is_ghost(corner_patch);
+            int remote_neighbor = fclaw2d_patch_is_ghost(corner_patch);
             if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
             {
                 transform_data.neighbor_patch = corner_patch;
@@ -443,24 +447,24 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t* fine_patch = corner_patch;
                             /* Interpolate 'this_cp' (coarse grid) to 'corner_cp' (fine grid)
                                'icorner' is the coarse grid corner. */
-                            vt.interpolate_corner(domain,coarse_patch,fine_patch,
-                                                  icorner,refratio,time_interp,
-                                                  &transform_data);
+                            fclaw2d_patch_interpolate_corner(s->glob,coarse_patch,fine_patch,
+                                                             icorner,refratio,time_interp,
+                                                             &transform_data);
                         }
                         else if (average_from_neighbor)
                         {
                             /* average 'corner_cp' (fine grid) to 'this_cp' (coarse grid) */
                             fclaw2d_patch_t* coarse_patch = this_patch;
                             fclaw2d_patch_t* fine_patch = corner_patch;
-                            vt.average_corner(domain,coarse_patch,fine_patch,icorner,
-                                              refratio,time_interp,&transform_data);
+                            fclaw2d_patch_average_corner(s->glob,coarse_patch,fine_patch,icorner,
+                                                         refratio,time_interp,&transform_data);
                         }
                     }
                     else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                     {
-                        vt.copy_corner(domain,this_patch,corner_patch,
-                                             icorner,
-                                             time_interp,&transform_data);
+                        fclaw2d_patch_copy_corner(s->glob,this_patch,corner_patch,
+                                                  icorner,
+                                                  time_interp,&transform_data);
                     }
                 }
                 else /* is_block_corner && ispillowsphere */
@@ -508,9 +512,9 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         /* Interpolate from remote patch (coarse grid) to
                            'this' patch (fine grid) */
                         int coarse_icorner = transform_data_finegrid.icorner;
-                        vt.interpolate_corner(domain,coarse_patch,fine_patch,
-                                              coarse_icorner,refratio,time_interp,
-                                              &transform_data_finegrid);
+                        fclaw2d_patch_interpolate_corner(s->glob,coarse_patch,fine_patch,
+                                                         coarse_icorner,refratio,time_interp,
+                                                         &transform_data_finegrid);
 
                     }
                     else

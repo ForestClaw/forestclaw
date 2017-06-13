@@ -23,12 +23,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_regrid.h>
-#include <fclaw2d_vtable.h>
 #include <fclaw2d_partition.h>
+
+#include <fclaw2d_convenience.h>  /* p4est domain, patch handling routines */
+
+#include <fclaw2d_global.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_patch.h>
+
+#include <fclaw2d_options.h>
 
 static
 void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
@@ -39,6 +42,7 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
                             int old_patchno, int new_patchno,
                             void *user)
 {
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
     fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
 
@@ -51,15 +55,15 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
 
         new_patch->user = old_patch->user;
         old_patch->user = NULL;
-        ++ddata_old->count_delete_clawpatch;
-        ++ddata_new->count_set_clawpatch;
+        ++ddata_old->count_delete_patch;
+        ++ddata_new->count_set_patch;
     }
     else
     {
         /* We need to rebuild the patch from scratch. 'user' contains
            the packed data received from remote processor. */
-        cb_fclaw2d_clawpatch_partition_unpack(new_domain,new_patch,
-                                              blockno,new_patchno,user);
+        fclaw2d_patch_partition_unpack(g->glob,new_domain,new_patch,
+                                       blockno,new_patchno,g->user);
     }
 }
 
@@ -68,21 +72,21 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
    Public interface
    -------------------------------------------------------------------------- */
 /* Question : Do all patches on this processor get packed? */
-void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
+void fclaw2d_partition_domain(fclaw2d_global_t* glob,
+                              int mode,
                               fclaw2d_timer_names_t running)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(*domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
-
-    char basename[BUFSIZ];
+    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION]);
 
     /* will need to access the subcyle switch */
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
-    size_t data_size = fclaw2d_clawpatch_partition_packsize(*domain);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
+    size_t psize = fclaw2d_patch_partition_packsize(glob);
+    size_t data_size = psize*sizeof(double);
     void ** patch_data = NULL;
 
     fclaw2d_domain_allocate_before_partition (*domain, data_size,
@@ -90,81 +94,63 @@ void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
 
     /* For all (patch i) { pack its numerical data into patch_data[i] }
        Does all the data in every patch need to be copied?  */
-    fclaw2d_domain_iterate_patches(*domain,
-                                   cb_fclaw2d_clawpatch_partition_pack,
+    fclaw2d_global_iterate_patches(glob,
+                                   cb_fclaw2d_patch_partition_pack,
                                    (void *) patch_data);
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
 
 
     /* this call creates a new domain that is valid after partitioning
        and transfers the data packed above to the new owner processors */
     int exponent = gparms->subcycle && gparms->weighted_partition ? 1 : 0;
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION]);
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_stop (&ddata->timers[running]);
+        fclaw2d_timer_stop (&glob->timers[running]);
     }
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_COMM]);
     fclaw2d_domain_t *domain_partitioned =
         fclaw2d_domain_partition (*domain, exponent);
-    fclaw_bool have_new_partition = domain_partitioned != NULL;
+    int have_new_partition = domain_partitioned != NULL;
 
     if (have_new_partition)
     {
         /* Do this part so we can get a pointer to the new data */
-        fclaw2d_domain_setup(*domain, domain_partitioned);
-        ddata = fclaw2d_domain_get_data(domain_partitioned);
+        fclaw2d_domain_setup(glob, domain_partitioned);
     }
 
     /* Stop the communication timer */
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_COMM]);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION]);
     if (running != FCLAW2D_TIMER_NONE)
     {
-        fclaw2d_timer_start (&ddata->timers[running]);
+        fclaw2d_timer_start (&glob->timers[running]);
     }
 
     if (have_new_partition)
     {
-        fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
+        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
 
         /* update patch array to point to the numerical data that was received */
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);
 
         /* New version? */
-        fclaw2d_domain_iterate_partitioned(*domain,domain_partitioned,
+        fclaw2d_global_iterate_partitioned(glob,domain_partitioned,
                                            cb_partition_transfer,
                                            (void*) patch_data);
 
         /* then the old domain is no longer necessary */
-        fclaw2d_domain_reset(domain);
+        fclaw2d_domain_reset(glob);
         *domain = domain_partitioned;
         domain_partitioned = NULL;
 
-        /* VTK output during amrinit */
-        if (mode >= 0 && gparms->vtkout & 1) {
-            // into timer
-            fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
-            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_INIT]);
-            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
-
-            // output
-            snprintf (basename, BUFSIZ, "%s_init_level_%02d_partition",
-                      gparms->prefix, mode);
-            fclaw2d_output_write_vtk (*domain, basename);
-
-            // out of timer
-            fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_OUTPUT]);
-            fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_INIT]);
-        }
-
         /* internal clean up */
         fclaw2d_domain_complete(*domain);
-        fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
+        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
     }
 
     /* free the data that was used in the parallel transfer of patches */
     fclaw2d_domain_free_after_partition (*domain, &patch_data);
 
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_PARTITION]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION]);
 }

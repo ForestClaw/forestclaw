@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_TIMER_H
 #define FCLAW_TIMER_H
 
-#include <p4est_base.h>
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -35,6 +35,8 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
+
+struct fclaw2d_global;
 
 /* -----------------------------------------------------------------
    Work with timers
@@ -47,7 +49,6 @@ extern "C"
 
     -- fclaw2d_time.h  references an fclaw2d_domain_t struct.
 */
-struct fclaw2d_domain;
 
 typedef enum
 {
@@ -108,15 +109,12 @@ double fclaw2d_timer_wtime (void);
 
 void fclaw2d_timer_init (fclaw2d_timer_t *timer);
 
-void
-    fclaw2d_timer_start (fclaw2d_timer_t *timer);
+void fclaw2d_timer_start (fclaw2d_timer_t *timer);
 
-void
-    fclaw2d_timer_stop (fclaw2d_timer_t *timer);
+void fclaw2d_timer_stop (fclaw2d_timer_t *timer);
 
 /* Use keyword 'struct' to avoid circular dependencies */
-void
-    fclaw2d_timer_report(struct fclaw2d_domain* domain);
+void fclaw2d_timer_report(struct fclaw2d_global* glob);
 
 #ifdef __cplusplus
 #if 0

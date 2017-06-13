@@ -23,36 +23,58 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_global.h>
 
+#include <fclaw_package.h>
+#include <fclaw_timer.h>
+
+#include <fclaw2d_domain.h>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_map.h>
+
+#if 0
+/* from feature_clawpatch3 */
 const int SpaceDim = FCLAW2D_SPACEDIM;
 const int NumFaces = FCLAW2D_NUMFACES;
 const int p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
 const int NumCorners = FCLAW2D_NUM_CORNERS;
 const int NumSiblings = FCLAW2D_NUM_SIBLINGS;
+const int PatchDim = FCLAW_PATCH_DIM;
+const int RefineDim = FCLAW_REFINE_DIM;
+#endif
 
-fclaw2d_global_t *
-fclaw2d_global_new (fclaw_options_t * gparms)
+fclaw2d_global_t* fclaw2d_global_new ()
 {
     fclaw2d_global_t *glob;
 
     glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
-    if (gparms == NULL)
-    {
-        glob->gparms_owned = 1;
-        glob->gparms = FCLAW_ALLOC_ZERO (fclaw_options_t, 1);
-    }
-    else
-    {
-        glob->gparms_owned = 0;
-        glob->gparms = gparms;
-    }
+    glob->pkg_container = fclaw_package_container_new ();
 
-    glob->pkgs = fclaw_package_container_new ();
-
-    fclaw2d_clawpatch_link_global (glob);
+    glob->count_amr_advance = 0;
+    glob->count_ghost_exchange = 0;
+    glob->count_amr_regrid = 0;
+    glob->count_amr_new_domain = 0;
+    glob->count_multiproc_corner = 0;
+    glob->count_grids_per_proc = 0;
+    glob->count_grids_remote_boundary = 0;
+    glob->count_grids_local_boundary = 0;
+    glob->count_single_step = 0;
+    glob->curr_time = 0;
+    glob->cont = NULL;
+    glob->acc = FCLAW_ALLOC(fclaw2d_diagnostics_accumulator_t, 1);
 
     return glob;
+}
+void
+fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
+{
+    glob->domain = domain;
+    glob->mpicomm = domain->mpicomm;
+    glob->mpisize = domain->mpisize;
+    glob->mpirank = domain->mpirank;
+    
+    glob->cont = (fclaw2d_map_context_t*)
+           fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
 }
 
 void
@@ -60,20 +82,63 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
 
-    fclaw_package_container_destroy (glob->pkgs);
-
-    if (glob->gparms_owned)
-    {
-        FCLAW_FREE (glob->gparms);
-    }
+    fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
+    FCLAW_FREE (glob->acc);
     FCLAW_FREE (glob);
 }
 
-fclaw_package_container_t *
-fclaw2d_global_get_container (fclaw2d_global_t * glob)
+void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
+                                   fclaw2d_patch_callback_t pcb, void *user)
 {
-    FCLAW_ASSERT (glob != NULL);
-    FCLAW_ASSERT (glob->pkgs != NULL);
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_level(glob->domain, level, pcb, &g);
+}
 
-    return glob->pkgs;
+void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
+                                     fclaw2d_patch_callback_t pcb, void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_patches(glob->domain, pcb, &g);
+}
+
+void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
+                                      fclaw2d_patch_callback_t pcb, void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_families(glob->domain, pcb, &g);
+}
+
+void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* new_domain,
+                                     fclaw2d_match_callback_t mcb, void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_adapted(glob->domain, new_domain,mcb,&g);
+}
+
+void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
+                                           fclaw2d_patch_callback_t pcb, void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_level_mthread(glob->domain, level,pcb,&g);
+}
+
+void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
+                                         fclaw2d_domain_t * new_domain,
+                                         fclaw2d_transfer_callback_t tcb,
+                                         void *user)
+{
+    fclaw2d_global_iterate_t g;
+    g.glob = glob;
+    g.user = user;
+    fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }

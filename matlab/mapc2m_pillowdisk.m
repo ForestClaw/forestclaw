@@ -12,6 +12,7 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 
 maptype = 'disk';
 
+% Get coordinates into [-1,1]x[-1,1] 
 [xc,yc,zc] = mapc2m_cart(xc1,yc1);
 
 

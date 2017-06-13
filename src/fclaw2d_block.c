@@ -23,28 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw2d_block.h>
 #include <fclaw2d_global.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_defs.h>
 
-fclaw2d_block_data_t *fclaw2d_block_get_data(fclaw2d_block_t *block)
-{
-    return (fclaw2d_block_data_t *) block->user;
-}
+#include <fclaw2d_patch.h>
 
-void fclaw2d_block_set_data(fclaw2d_block_t *block, const int mthbc[])
-{
-    fclaw2d_block_data_t *bdata = fclaw2d_block_get_data(block);
-    int i;
 
-    for (i = 0; i < 4; i++)
-    {
-        bdata->mthbc[i] = mthbc[i];
-    }
-}
-
-void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
+void fclaw2d_block_get_block_boundary(fclaw2d_global_t * glob,
                                       fclaw2d_patch_t * patch,
-                                      fclaw_bool *intersects_block)
+                                      int *intersects_block)
 {
     int iside;
 
@@ -55,24 +43,5 @@ void fclaw2d_block_get_block_boundary(fclaw2d_domain_t * domain,
 
         /* True for physical and block boundaries across a face */
         intersects_block[iside] = is_block_face;
-    }
-}
-
-static
-void block_data_new(fclaw2d_block_t *block)
-{
-    fclaw2d_block_data_t *bdata = FCLAW2D_ALLOC_ZERO (fclaw2d_block_data_t, 1);
-    block->user = (void *) bdata;
-}
-
-void fclaw2d_block_data_new(fclaw2d_domain_t *domain)
-{
-    fclaw2d_block_t *block;
-    int i;
-
-    for (i = 0; i < domain->num_blocks; i++)
-    {
-        block = &domain->blocks[i];
-        block_data_new(block);
     }
 }

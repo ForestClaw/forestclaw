@@ -24,57 +24,54 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "swirl_user.h"
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
 
+#include <fclaw2d_include_all.h>
 
 /* Two versions of Clawpack */
 #include <fc2d_clawpack46.h>
+#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
+
 #include <fc2d_clawpack5.h>
+#include <clawpack5_user_fort.h>
 
-static fclaw2d_vtable_t fclaw2d_vt;
-static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t classic_claw5;
+#include "../all/clawpack_user.h"
 
-void swirl_link_solvers(fclaw2d_domain_t *domain)
+void swirl_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t* user = swirl_user_get_options(domain);
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
 
-    fclaw2d_init_vtable(&fclaw2d_vt);
-    fclaw2d_vt.problem_setup = &swirl_problem_setup;  /* Version-independent */
+    vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
 
+    const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
-
-        classic_claw46.qinit     = &CLAWPACK46_QINIT;
-        classic_claw46.setaux    = &CLAWPACK46_SETAUX;
-        classic_claw46.rpn2      = &CLAWPACK46_RPN2ADV;
-        classic_claw46.rpt2      = &CLAWPACK46_RPT2ADV;
-        classic_claw46.b4step2   = &CLAWPACK46_B4STEP2;
-
-        fc2d_clawpack46_set_vtable(classic_claw46);
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+        clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
+        clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
+        clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
+        clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV;
+        clawpack46_vt->b4step2   = &CLAWPACK46_B4STEP2;
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt,&classic_claw5);
-
-        classic_claw5.qinit     = &CLAWPACK5_QINIT;
-        classic_claw5.setaux    = &CLAWPACK5_SETAUX;
-        classic_claw5.b4step2   = &CLAWPACK5_B4STEP2;
-        classic_claw5.rpn2      = &CLAWPACK5_RPN2ADV;
-        classic_claw5.rpt2      = &CLAWPACK5_RPT2ADV;
-
-        fc2d_clawpack5_set_vtable(classic_claw5);
+        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
+        clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
+        clawpack5_vt->setaux    = &CLAWPACK5_SETAUX;
+        clawpack5_vt->b4step2   = &CLAWPACK5_B4STEP2;
+        clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV;
+        clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV;
     }
-
-    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
-void swirl_problem_setup(fclaw2d_domain_t* domain)
+void swirl_problem_setup(fclaw2d_global_t* glob)
 {
-    const user_options_t* user = swirl_user_get_options(domain);
+    const user_options_t* user = swirl_get_options(glob);
 
     double period = user->period;
     SWIRL_SETPROB(&period);
 }
+
+
+
+
+

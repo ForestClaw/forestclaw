@@ -26,9 +26,7 @@
 #ifndef SHOCKBUBBLE_USER_HPP
 #define SHOCKBUBBLE_USER_HPP
 
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-#include "../rp/clawpack_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -59,18 +57,11 @@ void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0
                          const double* r0, const double* rhoin,
                          const double* pinf, const int* idisc);
 
-void shockbubble_problem_setup(fclaw2d_domain_t* domain);
+void shockbubble_problem_setup(fclaw2d_global_t* glob);
 
-#if 0
-void shockbubble_patch_setup(fclaw2d_domain_t* domain,
-                             fclaw2d_patch_t* this_patch,
-                             int blockno,
-                             int patchno);
-#endif
+void shockbubble_link_solvers(fclaw2d_global_t *glob);
 
-void shockbubble_link_solvers(fclaw2d_domain_t *domain);
-
-user_options_t* shockbubble_user_get_options(fclaw2d_domain_t* domain);
+user_options_t* shockbubble_get_options(fclaw2d_global_t* glob);
 
 #ifdef __cplusplus
 #if 0

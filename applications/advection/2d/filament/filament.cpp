@@ -25,21 +25,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "filament_user.h"
 
+#include <fclaw2d_include_all.h>
+
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_patch.h>
+
+#include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack46.h>
 
-#include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
-#include <fclaw2d_map_query.h>
+#include <fc2d_clawpack5_options.h>
+#include <fc2d_clawpack5.h>
 
-#include <fclaw_math.h>
+static int s_user_options_package_id = -1;
 
 static void *
-options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
+filament_register (user_options_t *user, sc_options_t * opt)
 {
-    user_options_t* user = (user_options_t*) package;
-
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 0 = nomap; 1 = brick; 2 = five patch square [0]");
@@ -54,19 +54,17 @@ options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
     return NULL;
 }
 
-
 static fclaw_exit_type_t
-options_check_user (fclaw_app_t * app, void *package, void *registered)
+filament_check (user_options_t *user, fclaw_options_t *fclaw_opt, 
+                fclaw2d_clawpatch_options_t* clawpatch_opt)
 {
-    user_options_t* user = (user_options_t*) package;
-
     if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 0, 1, or 2\n");
         return FCLAW_EXIT_QUIET;
     }
     if (user->example == 2)
     {
-        if (user->gparms->mx*pow_int(2,user->gparms->minlevel) < 32)
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
         {
             fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel > 32");
             return FCLAW_EXIT_QUIET;
@@ -76,65 +74,122 @@ options_check_user (fclaw_app_t * app, void *package, void *registered)
 }
 
 
+static void
+filament_destroy (user_options_t *user)
+{
+    /* Nothing to destroy */
+}
+
+
+/* ------- Generic option handling routines that call above routines ----- */
+static void*
+options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (opt != NULL);
+
+    user = (user_options_t*) package;
+
+    return filament_register(user,opt);
+}
+
+
+static fclaw_exit_type_t
+options_check(fclaw_app_t *app, void *package,void *registered)
+{
+    user_options_t           *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT(registered == NULL);
+
+    user = (user_options_t*) package;
+    fclaw_options_t *fclaw_opt = 
+                 (fclaw_options_t*) fclaw_app_get_attribute(app,"Options",NULL);
+    fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                 (fclaw2d_clawpatch_options_t*)  fclaw_app_get_attribute(app,"clawpatch",NULL);
+
+    return filament_check(user,fclaw_opt, clawpatch_opt);
+}
+
+static void
+options_destroy (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    user = (user_options_t*) package;
+    FCLAW_ASSERT (user->is_registered);
+
+    filament_destroy (user);
+
+    FCLAW_FREE (user);
+}
+
+
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
-    options_register_user,
+    options_register,
     NULL,
-    options_check_user,
-    NULL
+    options_check,
+    options_destroy,
 };
 
+
+/* ------------- User options access functions --------------------- */
+
 static
-void register_user_options (fclaw_app_t * app,
-                            const char *configfile,
-                            user_options_t* user)
+user_options_t* filament_options_register (fclaw_app_t * app,
+                                           const char *configfile)
 {
+    user_options_t *user;
     FCLAW_ASSERT (app != NULL);
+
+    user = FCLAW_ALLOC (user_options_t, 1);
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
+
+    fclaw_app_set_attribute(app,"user",user);
+    return user;
 }
 
-const user_options_t* filament_user_get_options(fclaw2d_domain_t* domain)
+static 
+void filament_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
-    fclaw_app_t* app;
-    app = fclaw2d_domain_get_app(domain);
-
-    const user_options_t* user = (user_options_t*) fclaw_app_get_user(app);
-
-    return (user_options_t*) user;
+    FCLAW_ASSERT(s_user_options_package_id == -1);
+    int id = fclaw_package_container_add_pkg(glob,user);
+    s_user_options_package_id = id;
 }
 
+const user_options_t* filament_get_options(fclaw2d_global_t* glob)
+{
+    int id = s_user_options_package_id;
+    return (user_options_t*) fclaw_package_get_options(glob, id);    
+}
+/* ------------------------- ... and here ---------------------------- */
 
 static
-void run_program(fclaw_app_t* app)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt, 
+                                user_options_t* user)
 {
-    sc_MPI_Comm            mpicomm;
-
     /* Mapped, multi-block domain */
-    p4est_connectivity_t       *conn = NULL;
-    fclaw2d_domain_t	       *domain;
-    fclaw2d_map_context_t      *cont = NULL, *brick = NULL;
-
-    amr_options_t              *gparms;
-    user_options_t             *user;
-
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-
-    gparms = fclaw_forestclaw_get_options(app);
-    user = (user_options_t*) fclaw_app_get_user(app);
-
-    /* ---------------------------------------------------------------
-       Domain geometry
-       -------------------------------------------------------------- */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t         *domain;
+    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    
     int mi, mj;
     double rotate[2];
 
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-
     rotate[0] = 0;
     rotate[1] = 0;
-    mi = gparms->mi;
-    mj = gparms->mj;
+    mi = fclaw_opt->mi;
+    mj = fclaw_opt->mj;
     int a = 0; /* non-periodic */
     int b = 0;
 
@@ -149,39 +204,59 @@ void run_program(fclaw_app_t* app)
         /* Square brick domain */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_cart(brick,gparms->scale,
-                                    gparms->shift,
+        cont = fclaw2d_map_new_cart(brick,fclaw_opt->scale,
+                                    fclaw_opt->shift,
                                     rotate);
         break;
     case 2:
         /* Five patch square domain */
         conn = p4est_connectivity_new_disk ();
-        cont = fclaw2d_map_new_fivepatch (gparms->scale,gparms->shift,
+        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,fclaw_opt->shift,
                                           rotate,user->alpha);
         break;
 
     default:
         SC_ABORT_NOT_REACHED ();
     }
-
-    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
-
+    
+    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    
+    return domain;    
+}
+
+static
+void run_program(fclaw2d_global_t* glob)
+{
+    user_options_t             *user;
+
+    user = (user_options_t*) filament_get_options(glob);
+
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(domain);
-    fclaw2d_domain_set_app(domain,app);
+    fclaw2d_domain_data_new(glob->domain);
 
-    filament_link_solvers(domain);
+    /* Initialize virtual table for ForestClaw */
+    fclaw2d_vtable_initialize();
+    fclaw2d_diagnostics_vtable_initialize();
 
-    fclaw2d_initialize(&domain);
-    fclaw2d_run(&domain);
-    fclaw2d_finalize(&domain);
+    if (user->claw_version == 4)
+    {
+      fc2d_clawpack46_vtable_initialize();
+    }
+    else if (user->claw_version == 5)
+    {
+      fc2d_clawpack5_vtable_initialize();
+    }
 
-    fclaw2d_map_destroy(cont);
+    filament_link_solvers(glob);
+
+    fclaw2d_initialize(glob);
+    fclaw2d_run(glob);
+    fclaw2d_finalize(glob);
 }
 
 
@@ -189,44 +264,58 @@ void run_program(fclaw_app_t* app)
 int
 main (int argc, char **argv)
 {
-  fclaw_app_t *app;
-  int first_arg;
-  fclaw_exit_type_t vexit;
+    fclaw_app_t *app;
+    int first_arg;
+    fclaw_exit_type_t vexit;
 
-  /* Options */
-  sc_options_t     *options;
-  amr_options_t    *gparms;
-  user_options_t   suser_options, *user = &suser_options;
+    /* Options */
+    sc_options_t                *options;
+    user_options_t              *user_opt;
+    fclaw_options_t             *fclaw_opt;
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fc2d_clawpack46_options_t   *claw46_opt;
+    fc2d_clawpack5_options_t    *claw5_opt;
 
-  int retval;
+    fclaw2d_global_t         *glob;
+    fclaw2d_domain_t         *domain;
+    sc_MPI_Comm mpicomm;
 
-  /* Initialize application */
-  app = fclaw_app_new (&argc, &argv, user);
+    int retval;
 
-  /* Register packages */
-  fclaw_forestclaw_register(app,"fclaw_options.ini");
-  fc2d_clawpack46_register(app,"fclaw_options.ini");
-  fc2d_clawpack5_register(app,"fclaw_options.ini");
+    /* Initialize application */
+    app = fclaw_app_new (&argc, &argv, NULL);
 
-  /* User defined options (defined above) */
-  gparms = fclaw_forestclaw_get_options(app);
-  user->gparms = gparms;  /* Needed for checking mx, my for examples 3 and 4 */
-  register_user_options (app, "fclaw_options.ini", user);
+    /* Register packages */
+    fclaw_opt                  = fclaw_options_register(app,"fclaw_options.ini");
+    clawpatch_opt    = fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
+    claw46_opt         = fc2d_clawpack46_options_register(app,"fclaw_options.ini");
+    claw5_opt           = fc2d_clawpack5_options_register(app,"fclaw_options.ini");
+    user_opt =                  filament_options_register(app,"fclaw_options.ini");  
 
-  /* Read configuration file(s) */
-  options = fclaw_app_get_options (app);
-  retval = fclaw_options_read_from_file(options);
-  vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    /* Read configuration file(s) */
+    options = fclaw_app_get_options (app);
+    retval = fclaw_options_read_from_file(options);
+    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-  fclaw2d_clawpatch_link_app(app);
+    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+    domain = create_domain(mpicomm, fclaw_opt, user_opt);
+    
+    glob = fclaw2d_global_new();
+    fclaw2d_global_store_domain(glob, domain);
 
-  if (!retval & !vexit)
-  {
-      run_program(app);
-  }
+    fclaw2d_options_store            (glob, fclaw_opt);
+    fclaw2d_clawpatch_options_store  (glob, clawpatch_opt);
+    fc2d_clawpack46_options_store    (glob, claw46_opt);
+    fc2d_clawpack5_options_store     (glob, claw5_opt);
+    filament_options_store           (glob, user_opt);
 
-  fclaw_forestclaw_destroy(app);
-  fclaw_app_destroy (app);
+    if (!retval & !vexit)
+    {
+        run_program(glob);
+    }
 
-  return 0;
+    fclaw2d_global_destroy(glob);
+    fclaw_app_destroy (app);
+
+    return 0;
 }

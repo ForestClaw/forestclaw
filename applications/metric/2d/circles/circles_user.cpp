@@ -49,14 +49,14 @@ void sphere_setprob(fclaw2d_domain_t* domain)
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
-fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
+int sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno, int this_patch_idx,
                                        int initflag)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -81,14 +81,14 @@ fclaw_bool sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch == 1;
 }
 
-fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
                                        fclaw2d_patch_t *this_patch,
                                        int blockno,
                                        int patchno)
 {
     /* ----------------------------------------------------------- */
     // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -113,7 +113,7 @@ fclaw_bool sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
 
 void metric_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
 
     printf("Matlab output Frame %d  at time %16.8e\n\n",iframe,time);
@@ -138,7 +138,7 @@ void metric_write_output(fclaw2d_domain_t *domain, fclaw2d_patch_t *this_patch,
 
     /* ----------------------------------------------------------- */
     // Global parameters
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;

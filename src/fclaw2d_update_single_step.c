@@ -23,35 +23,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
 #include <fclaw2d_update_single_step.h>
-#include <fclaw2d_vtable.h>
+
+#include <fclaw2d_global.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_patch.h>
 
 static fclaw2d_patch_iterator_t patch_iterator;
 
 
 static
-    void cb_single_step(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
-                        void *user)
+void cb_single_step(fclaw2d_domain_t *domain,
+                    fclaw2d_patch_t *this_patch,
+                    int this_block_idx,
+                    int this_patch_idx,
+                    void *user)
 {
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (domain);
-    fclaw2d_vtable_t vt;
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+
     double maxcfl;
-
-    vt = fclaw2d_get_vtable(domain);
-
-    single_step_data_t *ss_data = (single_step_data_t *) user;
-
+    
+    single_step_data_t *ss_data = (single_step_data_t *) g->user;
     double dt = ss_data->dt;
     double t = ss_data->t;
-    maxcfl = vt.patch_single_step_update(domain,this_patch,
-                                         this_block_idx,
-                                         this_patch_idx,t,dt);
+    
+    maxcfl = fclaw2d_patch_single_step_update(g->glob,this_patch,
+                                              this_block_idx,
+                                              this_patch_idx,t,dt);
 
-    ddata->count_single_step++;
+    g->glob->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);
 }
 
@@ -69,7 +69,7 @@ static
    fclaw_mol_step.cpp in that upon return, all the patches at
    the given level have been updated at the new time.
    --------------------------------------------------- */
-double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
+double fclaw2d_update_single_step(fclaw2d_global_t *glob,
                                   int level,
                                   double t, double dt)
 {
@@ -82,13 +82,13 @@ double fclaw2d_update_single_step(fclaw2d_domain_t *domain,
 
 #if (_OPENMP)
     /* Multi-thread only in single processor case. */
-    patch_iterator = &fclaw2d_domain_iterate_level_mthread;
+    patch_iterator = &fclaw2d_global_iterate_level_mthread;
 #else
-    patch_iterator = &fclaw2d_domain_iterate_level;
+    patch_iterator = &fclaw2d_global_iterate_level;
 #endif
 
     /* If there are not grids at this level, we return CFL = 0 */
-    patch_iterator(domain, level, cb_single_step,(void *) &ss_data);
+    patch_iterator(glob, level, cb_single_step,(void *) &ss_data);
 
     return ss_data.maxcfl;
 }

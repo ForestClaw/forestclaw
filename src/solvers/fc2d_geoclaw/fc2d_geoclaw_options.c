@@ -24,6 +24,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fc2d_geoclaw_options.h"
+#include <fclaw_options.h>
+#include <fclaw_package.h>
+
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -33,189 +38,192 @@ extern "C"
 #endif
 #endif
 
-typedef struct fc2d_geoclaw_package
-{
-  int is_registered;
-  fc2d_geoclaw_options_t clawopt;
-}
-fc2d_geoclaw_package_t;
+static int s_geoclaw_options_package_id = -1;
 
 static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+geoclaw_register (fc2d_geoclaw_options_t *geo_opt, sc_options_t * opt)
 {
-    fc2d_geoclaw_package_t *clawpkg;
-    fc2d_geoclaw_options_t *clawopt;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-
-    clawpkg = (fc2d_geoclaw_package_t*) package;
-    clawopt = &clawpkg->clawopt;
-
-    FCLAW_ASSERT (clawopt != NULL);
-
-    fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
-                               "2 2", &clawopt->order, 2,
+    fclaw_options_add_int_array (opt, 0, "order", &geo_opt->order_string,
+                               "2 2", &geo_opt->order, 2,
                                "[geoclaw] Normal and transverse orders [2 2]");
 
-    sc_options_add_int (opt, 0, "mcapa", &clawopt->mcapa, -1,
+    sc_options_add_int (opt, 0, "mcapa", &geo_opt->mcapa, -1,
                         "[geoclaw] Location of capacity function in aux array [-1]");
 
-    sc_options_add_int (opt, 0, "maux", &clawopt->maux, 0,
-                        "[geoclaw] Number of auxiliary variables [0]");
-
-    sc_options_add_bool (opt, 0, "src_term", &clawopt->src_term, 0,
+    sc_options_add_bool (opt, 0, "src_term", &geo_opt->src_term, 0,
                          "[geoclaw] Source term option [F]");
 
-    sc_options_add_bool (opt, 0, "use_fwaves", &clawopt->use_fwaves, 0,
+    sc_options_add_bool (opt, 0, "use_fwaves", &geo_opt->use_fwaves, 0,
                          "[geoclaw] Use fwaves flux-form [F]");
 
 
-    sc_options_add_int (opt, 0, "mwaves", &clawopt->mwaves, 1,
+    sc_options_add_int (opt, 0, "mwaves", &geo_opt->mwaves, 1,
                         "[geoclaw] Number of waves [1]");
 
-    fclaw_options_add_int_array (opt, 0, "mthlim", &clawopt->mthlim_string, NULL,
-                                 &clawopt->mthlim, clawopt->mwaves,
+    fclaw_options_add_int_array (opt, 0, "mthlim", &geo_opt->mthlim_string, NULL,
+                                 &geo_opt->mthlim, geo_opt->mwaves,
                                  "[geoclaw] Waves limiters (one entry per wave; " \
                                  "values 0-4) [NULL]");
+
+    /* Array of NumFaces many values */
+    fclaw_options_add_int_array (opt, 0, "mthbc", &geo_opt->mthbc_string, "1 1 1 1",
+                                 &geo_opt->mthbc, 4,
+                                 "[clawpack46] Physical boundary condition type [1 1 1 1]");
+
     /* Coarsen criteria */
-    sc_options_add_double (opt, 0, "dry_tolerance_c", &clawopt->dry_tolerance_c, 1.0,
+    sc_options_add_double (opt, 0, "dry_tolerance_c", &geo_opt->dry_tolerance_c, 1.0,
                            "[geoclaw] Coarsen criteria: Dry tolerance [1.0]");
 
-    sc_options_add_double (opt, 0, "wave_tolerance_c", &clawopt->wave_tolerance_c, 1.0,
+    sc_options_add_double (opt, 0, "wave_tolerance_c", &geo_opt->wave_tolerance_c, 1.0,
                            "[geoclaw] Coarsen criteria: Wave tolerance [1.0]");
 
     sc_options_add_int (opt, 0, "speed_tolerance_entries_c",
-                        &clawopt->speed_tolerance_entries_c, 1,
+                        &geo_opt->speed_tolerance_entries_c, 1,
                         "[geoclaw] Coarsen criteria: Number of speed tolerance entries [1]");
 
     fclaw_options_add_double_array (opt, 0, "speed_tolerance_c",
-                                    &clawopt->speed_tolerance_c_string, NULL,
-                                    &clawopt->speed_tolerance_c, clawopt->speed_tolerance_entries_c,
+                                    &geo_opt->speed_tolerance_c_string, NULL,
+                                    &geo_opt->speed_tolerance_c, geo_opt->speed_tolerance_entries_c,
                                     "[geoclaw] Coarsen criteria: speed tolerance [NULL]");
 
-    sc_options_add_int (opt, 0, "mbathy", &clawopt->mbathy, 1,
+    sc_options_add_int (opt, 0, "mbathy", &geo_opt->mbathy, 1,
                         "[geoclaw] Location of bathymetry in aux array [1]");
 
-    sc_options_add_bool (opt, 0, "ghost_patch_pack_aux", &clawopt->ghost_patch_pack_aux,1,
-                         "Pack aux. variables for parallel comm. of ghost patches [T]");
+    sc_options_add_bool (opt, 0, "ascii-out", &geo_opt->ascii_out,1,
+                         "Output ascii files for post-processing [T]");
 
-    clawpkg->is_registered = 1;
+    geo_opt->is_registered = 1;
+
     return NULL;
 }
 
-fclaw_exit_type_t
-fc2d_geoclaw_postprocess (fc2d_geoclaw_options_t * clawopt)
+static fclaw_exit_type_t 
+geoclaw_check (fc2d_geoclaw_options_t *geo_opt, 
+              fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
-    fclaw_options_convert_int_array (clawopt->mthlim_string, &clawopt->mthlim,
-                                     clawopt->mwaves);
-    fclaw_options_convert_int_array (clawopt->order_string, &clawopt->order,
+    geo_opt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
+
+    geo_opt->method[1] = geo_opt->order[0];
+    geo_opt->method[2] = geo_opt->order[1];
+    geo_opt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
+    geo_opt->method[4] = geo_opt->src_term;
+    geo_opt->method[5] = geo_opt->mcapa;
+    geo_opt->method[6] = clawpatch_opt->maux;
+
+    return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
+}
+
+
+static fclaw_exit_type_t
+geoclaw_postprocess (fc2d_geoclaw_options_t * geo_opt,fclaw_options_t *fclaw_opt,
+                     fclaw2d_clawpatch_options_t *clawpatch_opt)
+{
+    fclaw_options_convert_int_array (geo_opt->mthbc_string, &geo_opt->mthbc,4);
+
+    fclaw_options_convert_int_array (geo_opt->mthlim_string, &geo_opt->mthlim,
+                                     geo_opt->mwaves);
+    fclaw_options_convert_int_array (geo_opt->order_string, &geo_opt->order,
                                      2);
-    fclaw_options_convert_double_array (clawopt->speed_tolerance_c_string,
-                                        &clawopt->speed_tolerance_c,
-                                        clawopt->speed_tolerance_entries_c);
+    fclaw_options_convert_double_array (geo_opt->speed_tolerance_c_string,
+                                        &geo_opt->speed_tolerance_c,
+                                        geo_opt->speed_tolerance_entries_c);
+
+    /* We have to do this so that we know how to size the ghost patches */
+    if (clawpatch_opt->ghost_patch_pack_aux)
+    {
+        fclaw_opt->ghost_patch_pack_extra = 1;  /* Pack the bathymetry */
+        fclaw_opt->ghost_patch_pack_numextrafields = clawpatch_opt->maux;
+    }
 
     return FCLAW_NOEXIT;
 }
 
-static fclaw_exit_type_t
-options_postprocess (fclaw_app_t * app, void *package, void *registered)
+static void
+geoclaw_destroy (fc2d_geoclaw_options_t * geo_opt)
 {
-    fc2d_geoclaw_package_t *clawpkg;
-    fc2d_geoclaw_options_t *clawopt;
+    fclaw_options_destroy_array (geo_opt->mthbc);
+    fclaw_options_destroy_array (geo_opt->order);
+    fclaw_options_destroy_array (geo_opt->mthlim);
+    fclaw_options_destroy_array (geo_opt->speed_tolerance_c);
+}
+
+/* ------------------------------------------------------------------------
+  Generic functions - these call the functions above
+  ------------------------------------------------------------------------ */
+
+static void*
+options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    fc2d_geoclaw_options_t *geo_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (opt != NULL);
 
-    clawpkg = (fc2d_geoclaw_package_t*) package;
-    FCLAW_ASSERT (clawpkg->is_registered);
+    geo_opt = (fc2d_geoclaw_options_t*) package;
 
-    clawopt = &clawpkg->clawopt;
-    FCLAW_ASSERT (clawopt != NULL);
-
-    amr_options_t *gparms = fclaw_forestclaw_get_options(app);
-    FCLAW_ASSERT (gparms != NULL);
-
-    if (clawopt->ghost_patch_pack_aux)
-    {
-        gparms->ghost_patch_pack_extra = 1;
-        gparms->ghost_patch_pack_numextrafields = clawopt->maux;
-    }
-    return fc2d_geoclaw_postprocess (clawopt);
-}
-
-fclaw_exit_type_t
-fc2d_geoclaw_check (fc2d_geoclaw_options_t * clawopt)
-{
-    clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
-
-    clawopt->method[1] = clawopt->order[0];
-    clawopt->method[2] = clawopt->order[1];
-    clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
-    clawopt->method[4] = clawopt->src_term;
-    clawopt->method[5] = clawopt->mcapa;
-    clawopt->method[6] = clawopt->maux;
-
-    if (clawopt->use_fwaves)
-    {
-        fclaw_global_essentialf("geoclaw : fwaves not yet implemented\n");
-        return FCLAW_EXIT_QUIET;
-    }
-
-    if (clawopt->maux == 0 && clawopt->mcapa > 0)
-    {
-        fclaw_global_essentialf("geoclaw : bad maux/mcapa combination\n");
-        return FCLAW_EXIT_ERROR;
-    }
-    /* Should also check mthbc, mthlim, etc. */
-
-    return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
+    return geoclaw_register(geo_opt, opt);
 }
 
 static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
-    fc2d_geoclaw_package_t *clawpkg;
-    fc2d_geoclaw_options_t *clawopt;
+    fc2d_geoclaw_options_t *geo_opt;
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
 
-    clawpkg = (fc2d_geoclaw_package_t*) package;
-    FCLAW_ASSERT (clawpkg->is_registered);
+    geo_opt = (fc2d_geoclaw_options_t*) package;
+    FCLAW_ASSERT(geo_opt->is_registered != 0);
 
-    clawopt = &clawpkg->clawopt;
-    FCLAW_ASSERT (clawopt != NULL);
 
-    return fc2d_geoclaw_check (clawopt);
-}
+    clawpatch_opt = (fclaw2d_clawpatch_options_t*) 
+                              fclaw_app_get_attribute(app,"clawpatch",NULL);
+    FCLAW_ASSERT(clawpatch_opt->is_registered != 0);
 
-void
-fc2d_geoclaw_reset (fc2d_geoclaw_options_t * clawopt)
+    return geoclaw_check(geo_opt,clawpatch_opt);
+}    
+
+static fclaw_exit_type_t
+options_postprocess (fclaw_app_t * app, void *package, void *registered)
 {
-    fclaw_options_destroy_array (clawopt->order);
-    fclaw_options_destroy_array (clawopt->mthlim);
-    fclaw_options_destroy_array (clawopt->speed_tolerance_c);
-    fclaw_options_destroy_array (clawopt->gauges);
+    fc2d_geoclaw_options_t *geo_opt;
+    fclaw_options_t *fclaw_opt;
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    geo_opt = (fc2d_geoclaw_options_t*) package;
+    FCLAW_ASSERT (geo_opt->is_registered);
+
+    fclaw_opt = fclaw_app_get_attribute(app,"Options",NULL);
+    FCLAW_ASSERT(fclaw_opt->is_registered);
+
+    clawpatch_opt = fclaw_app_get_attribute(app,"clawpatch",NULL);
+    FCLAW_ASSERT (clawpatch_opt->is_registered);
+
+    return geoclaw_postprocess (geo_opt,fclaw_opt,clawpatch_opt);
 }
+
 
 static void
 options_destroy (fclaw_app_t * app, void *package, void *registered)
 {
-    fc2d_geoclaw_package_t *clawpkg;
-    fc2d_geoclaw_options_t *clawopt;
+    fc2d_geoclaw_options_t *geo_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == 0);
 
-    clawpkg = (fc2d_geoclaw_package_t*) package;
-    FCLAW_ASSERT (clawpkg->is_registered);
+    geo_opt = (fc2d_geoclaw_options_t*) package;
+    FCLAW_ASSERT (geo_opt->is_registered);
 
-    clawopt = &clawpkg->clawopt;
-    FCLAW_ASSERT (clawopt != NULL);
-
-    fc2d_geoclaw_reset (clawopt);
-    FCLAW_FREE (clawpkg);
+    geoclaw_destroy (geo_opt);
+    FCLAW_FREE (geo_opt);
 }
 
 static const fclaw_app_options_vtable_t geoclaw_options_vtable = {
@@ -228,18 +236,41 @@ static const fclaw_app_options_vtable_t geoclaw_options_vtable = {
 /* ----------------------------------------------------------
    Public interface to clawpack options
    ---------------------------------------------------------- */
-fc2d_geoclaw_options_t*  fc2d_geoclaw_options_register (fclaw_app_t * app,
-                                                              const char *configfile)
+fc2d_geoclaw_options_t*  
+fc2d_geoclaw_options_register (fclaw_app_t * app,
+                               const char *configfile)
 {
-    fc2d_geoclaw_package_t *clawpkg;
+    fc2d_geoclaw_options_t *geo_opt;
 
     FCLAW_ASSERT (app != NULL);
 
-    clawpkg = FCLAW_ALLOC (fc2d_geoclaw_package_t, 1);
+    geo_opt = FCLAW_ALLOC (fc2d_geoclaw_options_t, 1);
     fclaw_app_options_register (app, "geoclaw", configfile,
-                                &geoclaw_options_vtable, clawpkg);
-    return &clawpkg->clawopt;
+                                &geoclaw_options_vtable, geo_opt);
+
+    fclaw_app_set_attribute(app,"geoclaw",geo_opt);
+
+    return geo_opt;
 }
+
+fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_global_t *glob)
+{
+    int id = s_geoclaw_options_package_id;
+    return (fc2d_geoclaw_options_t*)  fclaw_package_get_options(glob, id);
+}
+
+void fc2d_geoclaw_options_store (fclaw2d_global_t* glob, 
+                               fc2d_geoclaw_options_t* geo_opt)
+{
+    int id; 
+
+    /* Don't register a package more than once */
+    FCLAW_ASSERT(s_geoclaw_options_package_id == -1);
+    id = fclaw_package_container_add_pkg(glob,geo_opt);
+    s_geoclaw_options_package_id = id;
+}
+
+
 
 #ifdef __cplusplus
 #if 0

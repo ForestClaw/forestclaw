@@ -24,14 +24,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_advance.h>
+#include <fclaw_math.h>
 
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_update_single_step.h>
+#include <fclaw2d_options.h>
+#include <fclaw2d_global.h>
 
-#include <fclaw2d_advance.h>
 
 
 typedef struct fclaw2d_level_data
@@ -49,11 +50,12 @@ typedef struct fclaw2d_level_data
 typedef fclaw2d_level_data_t fclaw2d_timestep_counters;
 
 static
-void initialize_timestep_counters(fclaw2d_domain_t* domain,
+void initialize_timestep_counters(fclaw2d_global_t* glob,
                                   fclaw2d_timestep_counters **ts_counter_ptr,
                                   double t_init, double dt)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    fclaw2d_domain_t *domain = glob->domain;
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     fclaw2d_timestep_counters *ts_counter;
     int level;
 
@@ -146,11 +148,11 @@ int timeinterp_level(fclaw2d_timestep_counters *ts_counter, int maxlevel)
 }
 
 static
-double compute_alpha(fclaw2d_domain_t *domain,
+double compute_alpha(fclaw2d_global_t *glob,
                      fclaw2d_timestep_counters *ts_counter,
                      int level)
 {
-    FCLAW_ASSERT(level > domain->local_minlevel);
+    FCLAW_ASSERT(level > glob->domain->local_minlevel);
 
     /* Time interpolate this data for a future exchange with finer grid */
     int coarse_inc =
@@ -170,24 +172,25 @@ double compute_alpha(fclaw2d_domain_t *domain,
    ---------------------------------------------------------- */
 
 static
-double update_level_solution(fclaw2d_domain_t *domain,
+double update_level_solution(fclaw2d_global_t *glob,
                              int level,
                              double t, double dt)
 {
     /* There might not be any grids at this level */
-    double cfl = fclaw2d_update_single_step(domain,level,t,dt);
+    double cfl = fclaw2d_update_single_step(glob,level,t,dt);
 
     return cfl;
 }
 
 static
-double advance_level(fclaw2d_domain_t *domain,
+double advance_level(fclaw2d_global_t *glob,
                      const int level,
                      const int curr_fine_step,
                      double maxcfl,
                      fclaw2d_timestep_counters* ts_counter)
 {
-    const amr_options_t* gparms = get_domain_parms(domain);
+    fclaw2d_domain_t* domain = glob->domain;
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
     double t_level = ts_counter[level].current_time;
     double dt_level = ts_counter[level].dt_step;
 
@@ -196,7 +199,7 @@ double advance_level(fclaw2d_domain_t *domain,
 
     fclaw_global_infof("Advancing level %d from step %d at time %12.6e\n",
                        this_level,curr_fine_step,t_level);
-    double cfl_step = update_level_solution(domain,this_level,t_level,dt_level);
+    double cfl_step = update_level_solution(glob,this_level,t_level,dt_level);
     maxcfl = fmax(maxcfl,cfl_step);
 
     fclaw_global_infof("------ Max CFL on level %d is %12.4e " \
@@ -211,21 +214,20 @@ double advance_level(fclaw2d_domain_t *domain,
 
         if (last_coarse_step == curr_fine_step)
         {
-            double cfl_step = advance_level(domain,coarser_level,
+            double cfl_step = advance_level(glob,coarser_level,
                                             last_coarse_step,
                                             maxcfl,ts_counter);
             maxcfl = fmax(maxcfl,cfl_step);
             if (gparms->subcycle)
             {
-                double alpha = compute_alpha(domain,ts_counter,this_level);
+                double alpha = compute_alpha(glob,ts_counter,this_level);
 
                 fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
                                    coarser_level,alpha);
 
-                fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
-                fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
-                fclaw2d_timeinterp(domain,coarser_level,alpha);
-                fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_EXTRA1]);
+                fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);
+                fclaw2d_timeinterp(glob,coarser_level,alpha);
+                fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);
             }
         }
     }
@@ -240,17 +242,18 @@ double advance_level(fclaw2d_domain_t *domain,
    Main routine : Called from fclaw2d_run.
    ------------------------------------------------------------- */
 
-double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
+double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
                                   double t_curr, double dt)
 {
-    int level;
-    fclaw2d_domain_data_t* ddata = fclaw2d_domain_get_data(domain);
-    fclaw2d_timer_start (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
+    fclaw2d_domain_t* domain = glob->domain;
 
-    const amr_options_t* gparms = get_domain_parms(domain);
+    int level;
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
+
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
     fclaw2d_timestep_counters *ts_counter;
 
-    initialize_timestep_counters(domain,&ts_counter,t_curr,dt);
+    initialize_timestep_counters(glob,&ts_counter,t_curr,dt);
 
     /* Advance all grids that are present somewhere (on any proc) */
     int minlevel = domain->global_minlevel;
@@ -266,7 +269,7 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
     for(nf = 0; nf < n_fine_steps; nf++)
     {
         /* Coarser levels get updated recursively */
-        double cfl_step = advance_level(domain,maxlevel,nf,maxcfl,ts_counter);
+        double cfl_step = advance_level(glob,maxlevel,nf,maxcfl,ts_counter);
         maxcfl = fmax(cfl_step,maxcfl);
         int last_step = ts_counter[maxlevel].last_step;
         if (last_step < ts_counter[maxlevel].total_steps)
@@ -279,7 +282,7 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
                    and ghost cell exchange for next update. */
                 int time_interp_level = timeinterp_level(ts_counter,maxlevel);
                 int time_interp = 1;
-                fclaw2d_ghost_update(domain,
+                fclaw2d_ghost_update(glob,
                                      time_interp_level+1,
                                      maxlevel,
                                      sync_time,
@@ -289,7 +292,7 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
             else
             {
                 int time_interp = 0;
-                fclaw2d_ghost_update(domain,
+                fclaw2d_ghost_update(glob,
                                      minlevel,
                                      maxlevel,
                                      sync_time,
@@ -309,21 +312,21 @@ double fclaw2d_advance_all_levels(fclaw2d_domain_t *domain,
 
     double sync_time =  ts_counter[maxlevel].current_time;
     int time_interp = 0;
-    fclaw2d_ghost_update(domain,minlevel,maxlevel,sync_time,
+    fclaw2d_ghost_update(glob,minlevel,maxlevel,sync_time,
                          time_interp,FCLAW2D_TIMER_ADVANCE);
 
     delete_timestep_counters(&ts_counter);
 
     /* Stop the timer */
-    fclaw2d_timer_stop (&ddata->timers[FCLAW2D_TIMER_ADVANCE]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
 
     /* Count total grids on this processor */
-    ddata->count_grids_per_proc +=  domain->local_num_patches;
-    ddata->count_grids_local_boundary +=  domain->num_exchange_patches;
-    ddata->count_grids_remote_boundary +=  domain->num_ghost_patches;
+    glob->count_grids_per_proc +=  domain->local_num_patches;
+    glob->count_grids_local_boundary +=  domain->num_exchange_patches;
+    glob->count_grids_remote_boundary +=  domain->num_ghost_patches;
 
     /* Count the number of times that advance is called */
-    ++ddata->count_amr_advance;
+    ++glob->count_amr_advance;
 
     return maxcfl;
 }

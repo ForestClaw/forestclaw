@@ -6,7 +6,6 @@ axis([0 1 0 1]);
 showpatchborders;
 setpatchborderprops('linewidth',1);
 
-
 axis square;
 
 shg;

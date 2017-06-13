@@ -26,10 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_EXCHANGE_H
 #define FCLAW2D_EXCHANGE_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_partition.h>
-#include <fclaw2d_convenience.h>
-#include <fclaw2d_vtable.h>
 #include <fclaw_timer.h>
 
 #ifdef __cplusplus
@@ -40,18 +36,20 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_exchange_setup(fclaw2d_domain_t* domain,
+struct fclaw2d_global;
+
+void fclaw2d_exchange_setup(struct fclaw2d_global* glob,
                             fclaw2d_timer_names_t running);
 
-void fclaw2d_exchange_delete(fclaw2d_domain_t** domain);
+void fclaw2d_exchange_delete(struct fclaw2d_global* glob);
 
-void fclaw2d_exchange_ghost_patches_begin(fclaw2d_domain_t* domain,
+void fclaw2d_exchange_ghost_patches_begin(struct fclaw2d_global* glob,
                                           int minlevel,
                                           int maxlevel,
                                           int time_interp,
                                           fclaw2d_timer_names_t running);
 
-void fclaw2d_exchange_ghost_patches_end(fclaw2d_domain_t* domain,
+void fclaw2d_exchange_ghost_patches_end(struct fclaw2d_global* glob,
                                         int minlevel,
                                         int maxlevel,
                                         int time_interp,

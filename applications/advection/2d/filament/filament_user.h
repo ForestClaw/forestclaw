@@ -26,11 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FILAMENT_USER_H
 #define FILAMENT_USER_H
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-#include "../all/clawpack_user.h"
-
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -46,15 +42,12 @@ typedef struct user_options
     double alpha;
     int claw_version;
 
-    amr_options_t* gparms;   /* Need to check mx */
-
     int is_registered;
 
 } user_options_t;
 
 
-
-const user_options_t* filament_user_get_options(fclaw2d_domain_t* domain);
+const user_options_t* filament_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
@@ -62,30 +55,30 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
                                              const double scale[],
                                              const double shift[],
                                              const double rotate[]);
-
+  
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[]);
-
+  
 fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
-
+  
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
-
+  
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double rotate[],
                                                  const double alpha);
+  
 
+void filament_link_solvers(fclaw2d_global_t *glob);
 
-void filament_link_solvers(fclaw2d_domain_t *domain);
-
-void filament_patch_setup_manifold(fclaw2d_domain_t *domain,
+void filament_patch_setup_manifold(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *this_patch,
                                    int this_block_idx,
                                    int this_patch_idx);

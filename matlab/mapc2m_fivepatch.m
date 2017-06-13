@@ -1,9 +1,11 @@
-function [xp,yp,zp] = mapc2m_fivepatch(xc,yc)
+function [xp,yp,zp] = mapc2m_fivepatch(xc,yc,alpha)
 blockno = getblocknumber();
 
 [m,n] = size(xc);
 
-alpha = 0.4;
+if (nargin < 3)
+    alpha = 0.5;
+end
 
 if (blockno == 2)
     xp = (2*xc - 1)*alpha;

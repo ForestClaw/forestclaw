@@ -26,11 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TORUS_USER_H
 #define TORUS_USER_H
 
-#include <fclaw2d_domain.h>
-#include "../all/clawpack_user.h"
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -54,32 +50,20 @@ typedef struct user_options
 }
 user_options_t;
 
-void torus_output_write_file(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int this_block_idx, int this_patch_idx,
-                               int iframe, int patch_num,int level);
-
-
 #define TORUS_SETPROB FCLAW_F77_FUNC(torus_setprob,TORUS_SETPROB)
 void TORUS_SETPROB(const int* example, const double* alpha);
 
-#define  TORUS_FORT_WRITE_HEADER FCLAW_F77_FUNC(torus_fort_write_header, \
-                                                TORUS_FORT_WRITE_HEADER)
+void torus_link_solvers(fclaw2d_global_t *glob);
 
-void     TORUS_FORT_WRITE_HEADER(char* matname1, char* matname2,
-                                 double* time, int* meqn, int* ngrids);
+void torus_problem_setup(fclaw2d_global_t *glob);
 
-void torus_link_solvers(fclaw2d_domain_t *domain);
-
-void torus_problem_setup(fclaw2d_domain_t *domain);
-
-void torus_patch_setup(fclaw2d_domain_t *domain,
+void torus_patch_setup(fclaw2d_global_t *glob,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
 
 
-const user_options_t* torus_user_get_options(fclaw2d_domain_t* domain);
+const user_options_t* torus_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,

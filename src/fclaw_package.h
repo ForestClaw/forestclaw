@@ -36,28 +36,16 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+
 /* Opaque pointers */
 typedef struct fclaw_package_container fclaw_package_container_t;
-typedef struct fclaw_package_data      fclaw_package_data_t;
 typedef struct fclaw_package           fclaw_package_t;
-
-/* Needs to be completely defined here */
-typedef void* (*fclaw_package_data_new_t)();
-typedef void (*fclaw_package_data_delete_t)(void *data);
-
-typedef struct fclaw_package_vtable fclaw_package_vtable_t;
-
-struct fclaw_package_vtable
-{
-    fclaw_package_data_new_t new_patch_data;
-    fclaw_package_data_delete_t destroy_patch_data;
-};
 
 fclaw_package_container_t *fclaw_package_container_new (void);
 void fclaw_package_container_destroy (fclaw_package_container_t * pkgs);
 int fclaw_package_container_add (fclaw_package_container_t * pkg_container,
-                                 void *opt,
-                                 const fclaw_package_vtable_t *vtable);
+                                 void *opt);
 
 /*********************** CODE BELOW STILL USING APP ********************/
 
@@ -65,26 +53,9 @@ int fclaw_package_container_add (fclaw_package_container_t * pkg_container,
 void fclaw_package_container_new_app (fclaw_app_t *app);
 void fclaw_package_container_destroy_app (fclaw_app_t *app);
 
-int fclaw_package_container_add_pkg(fclaw_app_t* app,
-                                    void* opt,
-                                    const fclaw_package_vtable_t *vtable);
-
-/* Storage in ClawPatch for data from each package */
-void fclaw_package_data_destroy(fclaw_package_data_t* pkg_data);
-fclaw_package_data_t* fclaw_package_data_new();
-
-
-/* Create, destroy and add patch data for each package */
-void fclaw_package_patch_data_new(fclaw_app_t* app,
-                                  fclaw_package_data_t *data_container);
-
-
-void fclaw_package_patch_data_destroy(fclaw_app_t* app,
-                                      fclaw_package_data_t *data_container);
-
-void* fclaw_package_get_data(fclaw_package_data_t *data_container, int id);
-
-void* fclaw_package_get_options(fclaw_app_t* app, int id);
+int fclaw_package_container_add_pkg(struct fclaw2d_global* glob,
+                                    void* opt);
+void* fclaw_package_get_options(struct fclaw2d_global *glob, int id);
 
 
 #ifdef __cplusplus

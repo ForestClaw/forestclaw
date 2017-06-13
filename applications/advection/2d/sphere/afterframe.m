@@ -7,7 +7,6 @@ caxis([0 1]);
 
 showpatchborders;
 setpatchborderprops('linewidth',1);
-hidepatchborders(6);
 view(3);
 
 NoQuery = 0;
@@ -23,5 +22,3 @@ shg;
 
 clear afterframe;
 clear mapc2m;
-clear mapc2m_cubed_sphere;
-clear parallelpartitions;

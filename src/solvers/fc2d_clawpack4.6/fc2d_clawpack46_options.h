@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPACK46_OPTIONS_H
 #define FCLAW2D_CLAWPACK46_OPTIONS_H
 
-#include <fclaw_options.h>
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,11 +36,12 @@ extern "C"
 #endif
 #endif
 
-/* Only one copy of clawpack46_options for each run */
-typedef struct fc2d_clawpack46_options
+struct fclaw2d_global;
+typedef struct fc2d_clawpack46_options fc2d_clawpack46_options_t;
+
+struct fc2d_clawpack46_options
 {
     int mwaves;
-    int maux;
 
     const char *order_string;
     int *order;
@@ -48,22 +49,40 @@ typedef struct fc2d_clawpack46_options
     int *mthlim;
     const char *mthlim_string;
 
+    int *mthbc;
+    const char *mthbc_string;
+
     int method[7];
     int mcapa;
     int src_term;
     int use_fwaves;
-}
-fc2d_clawpack46_options_t;
+
+    /* Output */
+    int ascii_out;
+    int vtk_out;
+
+    int is_registered;
+};
 
 fclaw_exit_type_t fc2d_clawpack46_postprocess (fc2d_clawpack46_options_t *
                                                clawopt);
+
 fclaw_exit_type_t fc2d_clawpack46_check (fc2d_clawpack46_options_t * clawopt);
+
 void fc2d_clawpack46_reset (fc2d_clawpack46_options_t * clawopt);
 
-fc2d_clawpack46_options_t *fc2d_clawpack46_options_register (fclaw_app_t *
-                                                             app,
-                                                             const char
-                                                             *configfile);
+fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                                              const char *configfile);
+
+void fc2d_clawpack46_package_register(fclaw_app_t* app,
+                                      fc2d_clawpack46_options_t* clawopt);
+
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(struct fclaw2d_global *glob);
+
+void fc2d_clawpack46_options_store (struct fclaw2d_global* glob, fc2d_clawpack46_options_t* clawopt);
+
+void fc2d_clawpack46_output(struct fclaw2d_global *glob, int iframe);
+
 
 #ifdef __cplusplus
 #if 0

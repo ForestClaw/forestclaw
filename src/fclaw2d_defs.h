@@ -26,17 +26,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DEFS_H
 #define FCLAW2D_DEFS_H
 
-/* Not nice for namespace cleanliness, but necessary to include mpi.h */
-#include <stdbool.h>
-#include <sc.h>
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
+#define FCLAW2D_REFINEFACTOR 2
+#define FCLAW2D_SPACEDIM     2
+#define FCLAW2D_NUMCORNERS   4
+#define FCLAW2D_NUMFACES     4
+#define FCLAW2D_NUMSIBLINGS  4
+#define FCLAW2D_PATCHDIM     2	
+
+extern const int SpaceDim;
+extern const int NumFaces;
+extern const int NumCorners;
+extern const int NumSiblings;
+extern const int RefineFactor;
+extern const int PatchDim;
 
 
-/* change to P4EST_BOOL ?
- * No, p4est does not know about bool and works with pure int */
-#define fclaw_bool bool
-#define fclaw_true true
-#define fclaw_false false
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
 
-#define fclaw_nan NAN
+
+/* Note: either we make this a C .h file, or we remove the extern "C". */
 
 #endif

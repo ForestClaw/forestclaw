@@ -26,11 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CORRELATEDCB_USER_H
 #define CORRELATEDCB_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../all/transport_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -41,52 +37,12 @@ extern "C"
 #endif
 
 
-typedef struct user_options
-{
-    int example;
-    double kappa;
-    int claw_version;
-    int is_registered;
-
-} user_options_t;
-
-void correlatedcb_problem_setup(fclaw2d_domain_t *domain);
+void correlatedcb_problem_setup(fclaw2d_global_t *glob);
 
 #define CORRELATEDCB_SETPROB FCLAW_F77_FUNC(correlatedcb_setprob,CORRELATEDCB_SETPROB)
 void CORRELATEDCB_SETPROB(const double* kappa, const double* tfinal);
 
-
-void correlatedcb_patch_setup(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *this_patch,
-                              int this_block_idx,
-                              int this_patch_idx);
-
-const user_options_t* correlatedcb_user_get_options(fclaw2d_domain_t* domain);
-
-double correlatedcb_update(fclaw2d_domain_t *domain,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx,
-                           double t,
-                           double dt);
-
-void correlatedcb_b4step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt);
-
-void correlatedcb_link_solvers(fclaw2d_domain_t *domain);
-
-
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
-                                                     const double shift[],
-                                                     const double rotate[]);
-
-fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
-                                                      const double shfit[],
-                                                      const double rotate[]);
+void correlatedcb_link_solvers(fclaw2d_global_t *glob);
 
 #ifdef __cplusplus
 #if 0

@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_REGRID_H
 #define FCLAW2D_REGRID_H
 
-#include "forestclaw2d.h"
-#include <fclaw2d_regrid_default.h>
-#include <fclaw2d_regrid_default_fort.h>
+#include <forestclaw2d.h>    /* Needed to define fclaw2d_patch_relation_t */
 
 #ifdef __cplusplus
 extern "C"
@@ -38,28 +36,32 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+struct fclaw2d_domain;
+struct fclaw2d_patch;
 
-void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
+void cb_fclaw2d_regrid_tag4refinement(struct fclaw2d_domain *domain,
+                                      struct fclaw2d_patch *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
                                       void *user);
 
-void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
-                                  fclaw2d_patch_t * old_patch,
-                                  fclaw2d_domain_t * new_domain,
-                                  fclaw2d_patch_t * new_patch,
+void cb_fclaw2d_regrid_repopulate(struct fclaw2d_domain * old_domain,
+                                  struct fclaw2d_patch * old_patch,
+                                  struct fclaw2d_domain * new_domain,
+                                  struct fclaw2d_patch * new_patch,
                                   fclaw2d_patch_relation_t newsize,
                                   int blockno,
                                   int old_patchno,
                                   int new_patchno,
                                   void *user);
 
-void fclaw2d_regrid_set_neighbor_types(fclaw2d_domain_t *domain);
+void fclaw2d_regrid_set_neighbor_types(struct fclaw2d_global *glob);
 
+void fclaw2d_regrid(struct fclaw2d_global *glob);
 
+void fclaw2d_after_regrid(struct fclaw2d_global *glob);
 
-void fclaw2d_regrid(fclaw2d_domain_t **domain);
 
 
 #ifdef __cplusplus

@@ -26,10 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CLAWPACK_USER_H
 #define CLAWPACK_USER_H
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -54,14 +51,16 @@ void CLAWPACK46_RPT2ADV(const int* ixy, const int* maxm, const int* meqn, const 
 
 #define CLAWPACK46_RPN2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpn2adv_manifold, \
                                                    CLAWPACK46_RPN2ADV_MANIFOLD)
-void CLAWPACK46_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+void CLAWPACK46_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, 
+                                 const int* mwaves,
                                  const int* mbc,const int* mx, double ql[], double qr[],
                                  double auxl[], double auxr[], double wave[],
                                  double s[], double amdq[], double apdq[]);
 
 #define CLAWPACK46_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpt2adv_manifold, \
                                                    CLAWPACK46_RPT2ADV_MANIFOLD)
-void CLAWPACK46_RPT2ADV_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+void CLAWPACK46_RPT2ADV_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
+                                 const int* mwaves,
                                  const int* mbc, const int* mx, double ql[], double qr[],
                                  double aux1[], double aux2[], double aux3[], const int* imp,
                                  double dsdq[], double bmasdq[], double bpasdq[]);

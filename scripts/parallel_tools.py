@@ -831,18 +831,29 @@ def compile_results(results_dir=None,results_file='results.out',
 
             # mx
             for i,l in enumerate(lines):
+                found_mx = False
                 if re.search("mx",l):
                     l1 = lines[i].split()
                     mx = int(l1[2])
                     s = "{mx[2]:s}".format(**option_list)
                     resultsfile.write(s.format(mx))
+                    found_mx = True
                     break
+                if not found_mx:
+                    if re.search("nxmax",l):
+                        l1 = lines[i].split()
+                        mx = int(l1[2])
+                        s = "{mx[2]:s}".format(**option_list)  # for ash3d model
+                        resultsfile.write(s.format(mx))
+                        found_mx = True
+                        break
+
 
             # mi (look for something distinctive;  count down from there)
             mi = 1
             mj = 1
             for i,l in enumerate(lines):
-                if re.search("ghost_patch_pack_area",l):
+                if re.search("mpi_debug",l):
                     if not re.search("mi",lines[i+1]):
                         print "Brick count mi not found in %s; setting mi=1" % f
                         mi = 1
@@ -966,6 +977,9 @@ def read_results_files(dir_list, subdir = None, results_in = None,
             pattern = re.compile("%s_[0-9]{5}\.o[0-9]*" % execname)
         else:
             pattern = re.compile(".*_[0-9]{5}\.o[0-9]*")
+
+    import pdb
+    pdb.set_trace()
 
     mx1 = []
     procs1 = []

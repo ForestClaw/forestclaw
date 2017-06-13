@@ -26,8 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_GLOBAL_H
 #define FCLAW2D_GLOBAL_H
 
-#include <fclaw_options.h>
-#include <fclaw_package.h>
+#include <forestclaw2d.h>  /* Needed to declare callbacks (below) */
+
+#include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
 
 #ifdef __cplusplus
 extern "C"
@@ -37,43 +38,95 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_SPACEDIM 2
-extern const int SpaceDim;
+typedef struct fclaw2d_global fclaw2d_global_t;
+typedef struct fclaw2d_global_iterate fclaw2d_global_iterate_t;
 
-/* Number of faces to a patch. Changed from CUBEFACES to NUMFACES to
-   avoid any confusion in the 2d case. */
-#define FCLAW2D_NUMFACES (2 * FCLAW2D_SPACEDIM)
-extern const int NumFaces;
+struct fclaw2d_global
 
-#define FCLAW2D_P4EST_REFINE_FACTOR 2
-extern const int p4est_refineFactor;
-
+#if 0
 #define FCLAW2D_NUM_CORNERS 4
 extern const int NumCorners;
 
 #define FCLAW2D_NUM_SIBLINGS 4
 extern const int NumSiblings;
 
+extern const int PatchDim;
+
+extern const int RefineDim;
+
 typedef struct fclaw2d_global
+#endif
 {
-    int gparms_owned;                   /**< Did we allocate \a gparms? */
-    fclaw_options_t *gparms;            /**< Option values for forestclaw. */
-    fclaw_package_container_t *pkgs;    /**< Solver packages for internal use. */
-}
-fclaw2d_global_t;
+    int count_amr_advance;
+    int count_ghost_exchange;
+    int count_amr_regrid;
+    int count_amr_new_domain;
+    int count_single_step;
+    int count_multiproc_corner;
+    int count_grids_per_proc;
+    int count_grids_remote_boundary;
+    int count_grids_local_boundary;
+    fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
+
+    /* Time at start of each subcycled time step */
+    double curr_time;
+
+    sc_MPI_Comm mpicomm;
+    int mpisize;              /**< Size of communicator. */
+    int mpirank;              /**< Rank of this process in \b mpicomm. */
+ 
+    struct fclaw_package_container *pkg_container;    /**< Solver packages for internal use. */
+ 
+    struct fclaw2d_map_context* cont;
+    struct fclaw2d_domain *domain;
+
+    struct fclaw2d_diagnostics_accumulator *acc;
+};
+
+struct fclaw2d_global_iterate
+{
+    fclaw2d_global_t* glob;
+    void* user;
+
+};
+
+/* Use forward references here, since this file gets included everywhere */
+struct fclaw2d_domain;
+struct fclaw2d_map_context;
+struct fclaw_package_container;
+struct fclaw2d_diagnostics_accumulator;
 
 /** Allocate a new global structure.
  * \param [in] gparms           If not NULL, we borrow this gparms pointer.
  *                              If NULL, we allocate gparms ourselves.
  */
-fclaw2d_global_t *fclaw2d_global_new (fclaw_options_t * gparms);
 
-/** Free a global structures and all members. */
+fclaw2d_global_t* fclaw2d_global_new ();
+
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 
-/** Access the package container from the global type. */
-fclaw_package_container_t *fclaw2d_global_get_container (fclaw2d_global_t *
-                                                         glob);
+void fclaw2d_global_store_domain (fclaw2d_global_t* glob, struct fclaw2d_domain* domain);
+
+void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
+                                   fclaw2d_patch_callback_t pcb, void *user);
+
+void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
+                                     fclaw2d_patch_callback_t pcb, void *user);
+
+void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
+                                      fclaw2d_patch_callback_t pcb, void *user);
+
+void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, 
+                                     struct fclaw2d_domain* new_domain,
+                                     fclaw2d_match_callback_t mcb, void *user);
+
+void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
+                                           fclaw2d_patch_callback_t pcb, void *user);
+
+void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
+                                         struct fclaw2d_domain * new_domain,
+                                         fclaw2d_transfer_callback_t tcb,
+                                         void *user);
 
 #ifdef __cplusplus
 #if 0

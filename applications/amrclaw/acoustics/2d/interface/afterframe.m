@@ -1,9 +1,7 @@
 axis([0 1 0 1]);
-if PlotType==1
-  rybcolormap
-  caxis([-.1 .1])
-  colorbar
-end
+rybcolormap
+caxis([-.1 .1])
+colorbar
 
 showpatchborders
 setpatchborderprops('linewidth',1);

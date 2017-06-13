@@ -148,7 +148,7 @@ typedef enum fclaw_exit_type
 fclaw_exit_type_t;
 
 /** Making it more explicit when we are using boolean values. */
-typedef int fclaw_bool_t;
+typedef int int_t;
 
 /** This function turns an exit type into a value suitable for ending main ().
  * \param [in] vexit    Exit type from enumeration.

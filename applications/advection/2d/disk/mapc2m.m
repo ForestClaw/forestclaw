@@ -1,7 +1,7 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
 map = 'pillowdisk';
-% map = 'pillowdisk5';
+map = 'pillowdisk5';
 
 % This domain should be in [0,2],[0,2]
 

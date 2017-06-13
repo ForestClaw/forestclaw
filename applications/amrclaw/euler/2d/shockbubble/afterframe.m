@@ -3,14 +3,8 @@ if (PlotType ~= 3)
 end
 
 %%
-axis([0 1.5 -0.75 0.75])
-axis equal;
-axis tight
-axis off
+axis([0 2 0 0.5])
 
-%%
-fprintf('%10s : %12.4e\n','qmin',qmin);
-fprintf('%10s : %12.4e\n','qmax',qmax);
 
 if (PlotType == 3)
     caxis([0 200]);
@@ -46,59 +40,9 @@ set(gca,'fontsize',16);
 tstr = sprintf('ForestClaw : t = %12.4f',t);
 title(tstr,'fontsize',16);
 
-if (PlotParallelPartitions==1)
-    showpatchborders;
-end
-
 showpatchborders;
 % colormap(white)
 
-prt = false;
-NoQuery = 0;
-if (prt)
-    MaxFrames = 1000;
-    axis off;
-    delete(get(gca,'title'));
-    figsize = [8,8];  % Should match size set in options
-    set(gcf,'papersize',figsize);
-    set(gca,'position',[0 0 1 1]);
-    set(gcf,'paperposition',[0 0 figsize]);
-
-    % Use this with 'export_fig'
-%     set(gca,'position',[0 0 1 1]);
-%     set(gcf,'units','inches');
-%     set(gcf,'position',[0 0 figsize]);
-
-    % Start printing
-    % No mesh
-    hidegridlines;
-    hidepatchborders;
-    if (PlotType == 3)
-        fname_prefix = sprintf('fc_sb_schlrn_%04d.png',Frame);
-    else
-        fname_prefix = sprintf('fc_sb',Frame);
-    end
-    yn = 'y';
-    id = input('Input id : ');   
-    if (isempty(id))
-        id = 999;
-    end
-    fname_png = sprintf('results_%03d/%s_%04d.png',id,fname_prefix,Frame);
-    if (exist(fname_png,'file'))
-        str = sprintf('Overwrite file %s (y/[n]) ? ',fname_png);
-        yn = input(str,'s');
-        if (isempty(yn))
-            yn = 'n';
-        end
-    end
-    if (strcmp(lower(yn),'y') == 1)
-        fprintf('Printing %s\n',fname_png);
-        print('-dpng','-r256',fname_png);
-        %             export_fig('-dpng','-transparent','-r512',...
-        %                 '-a1','-nocrop',fname_png);
-        create_tikz_plot(Frame,fname_prefix,id);
-    end
-end
 
 shg;
 

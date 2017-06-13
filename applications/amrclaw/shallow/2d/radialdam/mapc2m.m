@@ -1,7 +1,7 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
 % map = 'nomap';
-map = 'pillowdisk5';
+map = 'pillowdisk';
 
 switch map
     case 'nomap'
@@ -9,8 +9,8 @@ switch map
         % This is what is stored in the fort.q files.
         xp = xc;
         yp = yc;
-    case 'pillowdisk5'
-        [xp,yp,zp] = mapc2m_pillowdisk5(xc,yc);
+    case 'pillowdisk'
+        [xp,yp,zp] = mapc2m_pillowdisk(xc,yc);
         xp = 2.5*xp;
         yp = 2.5*yp;
 end

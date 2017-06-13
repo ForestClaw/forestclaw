@@ -7,8 +7,6 @@ include_HEADERS += applications/NCAR_transport/slotted_disk/slotted_disk_user.h
 applications_NCAR_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/NCAR_transport/slotted_disk/slotted_disk.cpp \
 	applications/NCAR_transport/slotted_disk/slotted_disk_user.cpp \
-	applications/NCAR_transport/slotted_disk/fclaw2d_map_cubedsphere.c \
-	applications/NCAR_transport/slotted_disk/fclaw2d_map_pillowsphere.c \
 	applications/NCAR_transport/slotted_disk/setprob.f \
 	applications/NCAR_transport/slotted_disk/fdisc.f \
 	applications/NCAR_transport/slotted_disk/slotteddisk.f \
@@ -22,8 +20,15 @@ applications_NCAR_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/NCAR_transport/all/transport_user.h \
 	applications/NCAR_transport/all/velocity_wind.f \
 	applications/NCAR_transport/all/gaussian.f \
+	applications/NCAR_transport/all/transport_user.h \
+	applications/NCAR_transport/all/transport_user.cpp \
+	applications/NCAR_transport/all/transport_options.h \
+	applications/NCAR_transport/all/transport_domain.c \
+	applications/NCAR_transport/all/transport_options.c \
 	applications/NCAR_transport/all/user46_b4step2_manifold.f \
 	applications/NCAR_transport/all/user5_b4step2_manifold.f90 \
+	applications/NCAR_transport/all/fclaw2d_map_cubedsphere.c \
+	applications/NCAR_transport/all/fclaw2d_map_pillowsphere.c \
 	applications/advection/2d/all/user46_setaux_manifold.f \
 	applications/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/advection/2d/all/clawpack46_rpn2adv_manifold.f \
