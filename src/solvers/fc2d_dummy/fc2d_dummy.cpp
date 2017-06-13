@@ -104,7 +104,7 @@ void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
 
 void fc2d_dummy_define_data(fclaw2d_domain_t* domain, fclaw2d_patch_t* this_patch)
 {
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
     patch_data* pd = get_patch_data(cp);
 

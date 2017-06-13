@@ -63,7 +63,7 @@ void cb_total_area(fclaw2d_domain_t *domain,
 {
     double *sum = (double*) user;
 
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -85,7 +85,7 @@ void cb_min_cell_area(fclaw2d_domain_t *domain,
 {
     double *minvalue = (double*) user;
 
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -106,7 +106,7 @@ void cb_max_cell_area(fclaw2d_domain_t *domain,
                       void *user)
 {
     double *maxvalue = (double*) user;
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     int mx = gparms->mx;
     int my = gparms->my;
     int mbc = gparms->mbc;
@@ -134,7 +134,7 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
     fclaw_global_productionf("%30s %24.4e\n","Error ",fabs(exact_area-sum));
     fclaw_global_productionf("\n");
 
-    const amr_options_t *gparms = get_domain_parms(domain);
+    const fclaw_options_t *gparms = get_domain_parms(domain);
     if (gparms->minlevel == gparms->maxlevel)
     {
         /* Only compare ratio of smallest grid cell to largest if the grid is

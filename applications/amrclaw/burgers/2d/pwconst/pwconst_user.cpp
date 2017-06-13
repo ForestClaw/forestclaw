@@ -25,14 +25,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pwconst_user.h"
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_clawpatch.h>
+
 #include <fc2d_clawpack46.h>
+#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
+
 #include <fc2d_clawpack5.h>
+#include <clawpack5_user_fort.h>
 
-static fclaw2d_vtable_t fclaw2d_vt;
-static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t classic_claw5;
+void pwconst_link_solvers(fclaw2d_global_t *glob)
+{
+    const user_options_t* user = pwconst_get_options(glob);
+    
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
 
+        clawpack46_vt->qinit  = &CLAWPACK46_QINIT;
+        clawpack46_vt->rpn2   = &CLAWPACK46_RPN2;
+        clawpack46_vt->rpt2   = &CLAWPACK46_RPT2;
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_vtable_t    *clawpack5_vt = fc2d_clawpack5_vt();
+
+        clawpack5_vt->qinit = &CLAWPACK5_QINIT;
+        clawpack5_vt->rpn2  = &CLAWPACK5_RPN2;
+        clawpack5_vt->rpt2  = &CLAWPACK5_RPT2;
+    }
+}
+
+
+
+#if 0
 void pwconst_link_solvers(fclaw2d_domain_t *domain)
 {
     const user_options_t* user = pwconst_user_get_options(domain);
@@ -76,3 +101,4 @@ void pwconst_link_solvers(fclaw2d_domain_t *domain)
     fc2d_clawpack46_set_vtable(&classic_claw);
 #endif
 }
+#endif

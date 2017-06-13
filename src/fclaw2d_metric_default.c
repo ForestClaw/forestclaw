@@ -24,14 +24,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_global.h>
-
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_options.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw_math.h>
 #include <fclaw2d_metric_default_fort.h>
 
-void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
+void fclaw2d_metric_compute_area(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t* this_patch,
                                  int blockno,
                                  int patchno)
@@ -40,15 +39,15 @@ void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
     double xlower,ylower,dx,dy;
     int level, maxlevel,refratio;
 
-    const amr_options_t* gparms = get_domain_parms(domain);
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
     level = this_patch->level;
     maxlevel = gparms->maxlevel;
     refratio = gparms->refratio;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double *area = fclaw2d_clawpatch_get_area(domain,this_patch);
+    double *area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     /* Could make this a virtual function, but what is the signature?
        vt.fort_compute_area(...) */
@@ -63,18 +62,18 @@ void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
     FCLAW_FREE(quadstore);
 }
 
-void fclaw2d_metric_compute_area_exact(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t* this_patch,
+void fclaw2d_metric_compute_area_exact(fclaw2d_global_t *glob,
+                                       fclaw2d_patch_t *this_patch,
                                        int blockno,
                                        int patchno)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double *area = fclaw2d_clawpatch_get_area(domain,this_patch);
+    double *area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     int size = (2*(mbc+1) + mx)*(2*(mbc+1) + my);
     double *favg = FCLAW_ALLOC(double,size);
@@ -90,7 +89,7 @@ void fclaw2d_metric_compute_area_exact(fclaw2d_domain_t *domain,
 }
 
 
-void fclaw2d_metric_area_set_ghost(fclaw2d_domain_t* domain,
+void fclaw2d_metric_area_set_ghost(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch,
                                    int blockno,
                                    int patchno)
@@ -99,13 +98,13 @@ void fclaw2d_metric_area_set_ghost(fclaw2d_domain_t* domain,
     double xlower,ylower,dx,dy;
     double *area;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+    area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     /* Set area in ghost cells not set above */
-    const amr_options_t* gparms = get_domain_parms(domain);
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
     int level = this_patch->level;
     int maxlevel = gparms->maxlevel;
     int refratio = gparms->refratio;
@@ -120,7 +119,7 @@ void fclaw2d_metric_area_set_ghost(fclaw2d_domain_t* domain,
     FCLAW_FREE(quadstore);
 }
 
-void fclaw2d_metric_area_set_ghost_exact(fclaw2d_domain_t* domain,
+void fclaw2d_metric_area_set_ghost_exact(fclaw2d_global_t* glob,
                                          fclaw2d_patch_t* this_patch,
                                          int blockno,
                                          int patchno)
@@ -129,10 +128,10 @@ void fclaw2d_metric_area_set_ghost_exact(fclaw2d_domain_t* domain,
     double xlower,ylower,dx,dy;
     double *area;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(domain,this_patch);
+    area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     /* Not needed, but seems to be bad form to send in a NULL */
     int size = (2*(mbc+1) + mx)*(2*(mbc+1) + my);
@@ -151,37 +150,34 @@ void fclaw2d_metric_area_set_ghost_exact(fclaw2d_domain_t* domain,
 }
 
 
-void fclaw2d_metric_setup_mesh(fclaw2d_domain_t *domain,
+void fclaw2d_metric_setup_mesh(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *this_patch,
                                int blockno,
                                int patchno)
 {
-    fclaw2d_vtable_t vt;
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
     double *xp,*yp,*zp;
     double *xd,*yd,*zd;
     double *area;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(domain,this_patch,
+    fclaw2d_clawpatch_metric_data(glob,this_patch,
                                   &xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     /* Compute centers and corners of mesh cell */
-    vt = fclaw2d_get_vtable(domain);
-    vt.fort_setup_mesh(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&blockno,
+    fclaw2d_vt()->fort_setup_mesh(&mx,&my,&mbc,&xlower,&ylower,&dx,&dy,&blockno,
                        xp,yp,zp,xd,yd,zd);
 
 }
 
-void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
+void fclaw2d_metric_compute_normals(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
                                     int blockno,
                                     int patchno)
 {
-    fclaw2d_vtable_t vt;
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
     double *xp,*yp,*zp;
@@ -192,37 +188,35 @@ void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
     double *surfnormals, *curvature;
     double *area;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(domain,this_patch,
+    fclaw2d_clawpatch_metric_data(glob,this_patch,
                                   &xp,&yp,&zp,&xd,&yd,&zd,&area);
 
-    fclaw2d_clawpatch_metric_data2(domain,this_patch,
+    fclaw2d_clawpatch_metric_data2(glob,this_patch,
                                    &xnormals,&ynormals,
                                    &xtangents,&ytangents,
                                    &surfnormals,&edgelengths,
                                    &curvature);
 
-    vt = fclaw2d_get_vtable(domain);
-
     /* The user could set these to NULL to avoid doing these computations ... */
 
-    if (vt.fort_compute_normals != NULL)
+    if (fclaw2d_vt()->fort_compute_normals != NULL)
     {
-        vt.fort_compute_normals(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
+        fclaw2d_vt()->fort_compute_normals(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
                                 xnormals,ynormals);
     }
 
-    if (vt.fort_compute_tangents != NULL)
+    if (fclaw2d_vt()->fort_compute_tangents != NULL)
     {
-        vt.fort_compute_tangents(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,
+        fclaw2d_vt()->fort_compute_tangents(&mx,&my,&mbc,xd,yd,zd,xtangents,ytangents,
                                  edgelengths);
     }
 
-    if (vt.fort_compute_surf_normals != NULL)
+    if (fclaw2d_vt()->fort_compute_surf_normals != NULL)
     {
-        vt.fort_compute_surf_normals(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
+        fclaw2d_vt()->fort_compute_surf_normals(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
                                      curvature, surfnormals, area);
     }
 

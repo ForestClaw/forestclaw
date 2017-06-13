@@ -26,8 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_OUTPUT_H
 #define FCLAW2D_OUTPUT_H
 
-#include <fclaw2d_vtable.h>
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -36,17 +34,11 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_output_frame (fclaw2d_domain_t * domain, int iframe);
+struct fclaw2d_global;  /* This is a hack !! */
 
-/* --------------------------------------------------------------------
- * Write a one-stop function that creates a big VTK file in parallel.
- * The file extension is basename.vtu.  It contains per-patch data for
- * mpirank, blockno, and global patchno, and the meqn-vector data.
- * Function will be refactored into our callback structure eventually.
- * -------------------------------------------------------------------- */
+void fclaw2d_output_frame(struct fclaw2d_global * glob, int iframe);
 
-void fclaw2d_output_write_vtk (fclaw2d_domain_t *domain, const char *basename);
-
+void fclaw2d_output_frame_tikz(struct fclaw2d_global* glob, int iframe);
 
 #ifdef __cplusplus
 #if 0

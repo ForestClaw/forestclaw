@@ -24,28 +24,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "bowl_user.h"
-#include <fclaw2d_forestclaw.h>
+
+#include <fclaw2d_include_all.h>
+
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_geoclaw.h>
 
 
-static fclaw2d_vtable_t vt;
-static fc2d_geoclaw_vtable_t geoclaw;
-
-void bowl_link_solvers(fclaw2d_domain_t *domain)
+void bowl_link_solvers(fclaw2d_global_t *glob)
 {
 
-    /* These are set by GeoClaw for convenience, but the user
-       can set these with customized functions, if desired. */
-    fc2d_geoclaw_init_vtables(&vt, &geoclaw);
-    fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
-
-#if 0
-    /* Example of a function the user can set. */
-    vt->problem_setup            = &bowl_problem_setup; /* Written by the user */
-    geoclaw_vt->setprob          = NULL;   /* Must be of correct type */
-
-    /* etc ... */
-#endif
+	/* User customizations ... */
 
 }

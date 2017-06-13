@@ -1,9 +1,9 @@
 bin_PROGRAMS += applications/advection/2d/replicated/replicated
 
 applications_advection_2d_replicated_replicated_SOURCES = \
-	applications/advection/2d/replicated/torus.cpp \
-	applications/advection/2d/replicated/torus_user.h \
-	applications/advection/2d/replicated/torus_user.cpp \
+	applications/advection/2d/replicated/replicated.cpp \
+	applications/advection/2d/replicated/replicated_user.h \
+	applications/advection/2d/replicated/replicated_user.cpp \
 	applications/advection/2d/replicated/fclaw2d_map_nomap.c \
 	applications/advection/2d/replicated/setprob.f \
 	applications/advection/2d/replicated/psi.f \

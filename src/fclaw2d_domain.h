@@ -26,12 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DOMAIN_H
 #define FCLAW2D_DOMAIN_H
 
-#include <forestclaw2d.h>
-#include <fclaw_timer.h>
-#include <fclaw2d_partition.h>
-#include <fclaw2d_map.h>
-#include <fclaw2d_patch.h>
-
+#include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
 
 #ifdef __cplusplus
 extern "C"
@@ -41,86 +36,34 @@ extern "C"
 #endif
 #endif
 
-
+struct fclaw2d_global;
+struct fclaw2d_domain;
 
 typedef struct fclaw2d_domain_data
 {
     /* Debug counters and timers */
-    int count_set_clawpatch, count_delete_clawpatch;
-    int count_amr_advance, count_ghost_exchange, count_amr_regrid;
-    int count_amr_new_domain;
-    int count_single_step;
-    int count_multiproc_corner;
-    int count_grids_per_proc;
-    int count_grids_remote_boundary;
-    int count_grids_local_boundary;
-    int is_latest_domain;
-    fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
+    int count_set_patch;
+    int count_delete_patch;
 
-    /* Time at start of each subcycled time step */
-    double curr_time;
-
-    /* This should not be copied, but needs to be redone for every new domain */
     fclaw2d_domain_exchange_t *domain_exchange;
     fclaw2d_domain_indirect_t *domain_indirect;
+
 } fclaw2d_domain_data_t;
 
-void fclaw2d_domain_data_new(fclaw2d_domain_t *domain);
-void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain);
-void fclaw2d_domain_data_copy(fclaw2d_domain_t *old_domain,
-                              fclaw2d_domain_t *new_domain);
+void fclaw2d_domain_data_new(struct fclaw2d_domain *domain);
 
-void fclaw2d_domain_setup(fclaw2d_domain_t* old_domain,
-                          fclaw2d_domain_t* new_domain);
+void fclaw2d_domain_data_delete(struct fclaw2d_domain* domain);
 
-void fclaw2d_domain_reset(fclaw2d_domain_t** domain);
+void fclaw2d_domain_setup(struct fclaw2d_global* glob,
+                          struct fclaw2d_domain* new_domain);
 
+void fclaw2d_domain_reset(struct fclaw2d_global* glob);
 
-/* ----------------------------------------------------
-   Access functions for domain member data, stored in
-   domain->user.  These include :
+fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw2d_domain *domain);
 
-      -- fclaw_app_t
-      -- time
-      -- mapping context
-   --------------------------------------------------- */
-fclaw2d_domain_data_t*
-fclaw2d_domain_get_data(fclaw2d_domain_t *domain);
-
-/* fclaw_app_t */
-fclaw_app_t*
-fclaw2d_domain_get_app(fclaw2d_domain_t* domain);
-
-void
-fclaw2d_domain_set_app(fclaw2d_domain_t* domain,
-                       fclaw_app_t* app);
-
-
-/* time */
-void
-fclaw2d_domain_set_time(fclaw2d_domain_t *domain, double time);
-
-double
-fclaw2d_domain_get_time(fclaw2d_domain_t *domain);
-
-
-/* Mapping context */
-fclaw2d_map_context_t*
-fclaw2d_domain_get_map_context(fclaw2d_domain_t* domain);
-
-int
-fclaw2d_domain_get_num_patches(fclaw2d_domain_t* domain);
-
-
-/* Options */
-const amr_options_t*
-fclaw2d_forestclaw_get_options(fclaw2d_domain_t *domain);
-
-const amr_options_t*
-get_domain_parms(fclaw2d_domain_t *domain);
-
-void*
-fclaw2d_domain_get_user_options(fclaw2d_domain_t* domain);
+/* OpenMP iterator (not part of forestclaw2d.h */
+void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int level,
+                                           fclaw2d_patch_callback_t pcb, void *user);
 
 
 #ifdef __cplusplus

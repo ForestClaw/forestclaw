@@ -90,7 +90,7 @@ void run_program(fclaw_app_t* app)
     fclaw2d_domain_t	       *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    amr_options_t            *gparms;
+    fclaw_options_t            *gparms;
 
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
@@ -109,6 +109,7 @@ void run_program(fclaw_app_t* app)
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(domain);
     fclaw2d_domain_set_app (domain,app);
+    fc2d_geoclaw_init_vtables();
     slosh_link_solvers(domain);
 
     /* ---------------------------------------------------------------
@@ -147,7 +148,6 @@ main (int argc, char **argv)
     options = fclaw_app_get_options (app);
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
-
 
     fclaw2d_clawpatch_link_app(app);
 

@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPACK5_OPTIONS_H
 #define FCLAW2D_CLAWPACK5_OPTIONS_H
 
-#include <fclaw_options.h>
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,11 +36,14 @@ extern "C"
 #endif
 #endif
 
-/* Only one copy of clawpack5_options for each run */
-typedef struct fc2d_clawpack5_options
+struct fclaw2d_global;
+
+typedef struct fc2d_clawpack5_options fc2d_clawpack5_options_t;
+
+
+struct fc2d_clawpack5_options
 {
     int mwaves;
-    int maux;
 
     const char *order_string;
     int *order;
@@ -48,25 +51,39 @@ typedef struct fc2d_clawpack5_options
     int *mthlim;
     const char *mthlim_string;
 
+    int *mthbc;
+    const char *mthbc_string;
+    
     int method[7];
     int mcapa;
     int src_term;
     int use_fwaves;
-}
-fc2d_clawpack5_options_t;
 
-fclaw_exit_type_t fc2d_clawpack5_postprocess (fc2d_clawpack5_options_t *
-                                               clawopt);
-fclaw_exit_type_t fc2d_clawpack5_check (fc2d_clawpack5_options_t * clawopt);
-void fc2d_clawpack5_reset (fc2d_clawpack5_options_t * clawopt);
+    /* Output */
+    int ascii_out;
+    int vtk_out;
+
+    int is_registered;
+};
+
 
 fc2d_clawpack5_options_t *fc2d_clawpack5_options_register (fclaw_app_t *
-                                                             app,
-                                                             const char
-                                                             *configfile);
+                                                           app,
+                                                           const char
+                                                           *configfile);
+
+void fc2d_clawpack5_options_store (struct fclaw2d_global* glob, 
+                                   fc2d_clawpack5_options_t* clawopt);
+
+fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(struct fclaw2d_global *glob);
+
+void fc2d_clawpack5_output(struct fclaw2d_global *glob, int iframe);
+
+
 #define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
 void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
                     const int mthlim_in[], const int method_in[]);
+
 
 #ifdef __cplusplus
 #if 0

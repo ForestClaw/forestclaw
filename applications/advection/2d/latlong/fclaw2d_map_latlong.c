@@ -85,17 +85,13 @@ fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
        a single "logical" block in [long0,long1]x[lat0,lat1] */
     MAPC2M_LATLONG(&blockno,&xc2,&yc2,xp,yp,zp);
 
-#if 0
     scale_map(cont,xp,yp,zp);
-    rotate_map(cont,xp,yp,zp);
-#endif
-    }
+
+}
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
                              const double scale[],
-                             const double shift[],
-                             const double rotate[],
                              const double lat[],
                              const double longitude[],
                              const int a, const int b)
@@ -114,8 +110,6 @@ fclaw2d_map_context_t *
         cont->user_double[3] = longitude[0] + 360.0;
     }
     set_scale(cont,scale);
-    set_shift(cont,shift);
-    set_rotate(cont,rotate);
 
     cont->brick = brick;
 

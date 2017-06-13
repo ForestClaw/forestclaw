@@ -26,15 +26,8 @@
 #ifndef FC2D_CLAWPACK5_H
 #define FC2D_CLAWPACK5_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_vtable.h>
-#include <fclaw_package.h>
-
-#include "fc2d_clawpack5_options.h"
-
-#include "clawpack5_user_fort.h"
-
+#include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
+#include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -44,8 +37,10 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+struct fclaw2d_patch;
 
-typedef void (*fc2d_clawpack5_setprob_t)();
+typedef void (*fc2d_clawpack5_setprob_t)(void);
 
 typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
                                      const int* mx, const int* my,
@@ -122,13 +117,13 @@ typedef struct fc2d_clawpack5_vtable
     fc2d_clawpack5_rpn2_t rpn2;
     fc2d_clawpack5_rpt2_t rpt2;
     fc2d_clawpack5_fluxfun_t fluxfun;
+
+    int is_set;
 } fc2d_clawpack5_vtable_t;
 
+void fc2d_clawpack5_vtable_initialize();
 
-void fc2d_clawpack5_set_vtable(const fc2d_clawpack5_vtable_t vt);
-
-void fc2d_clawpack5_set_vtable_defaults(fclaw2d_vtable_t *fclaw_vt,
-                                fc2d_clawpack5_vtable_t* vt);
+fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt();
 
 #define CLAWPACK5_BC2_DEFAULT FCLAW_F77_FUNC(clawpack5_bc2_default, \
                                              CLAWPACK5_BC2_DEFAULT)
@@ -293,24 +288,32 @@ void FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const 
                                             double neighbor_q[], const int* a_corner,
                                             fclaw2d_transform_data_t** transform_cptr);
 
-#define  FC2D_CLAWPACK5_FORT_WRITE_FILE FCLAW_F77_FUNC(fc2d_clawpack5_fort_write_file, \
-                                                       FC2D_CLAWPACK5_FORT_WRITE_FILE)
-void  FC2D_CLAWPACK5_FORT_WRITE_FILE(char* matname1,
-                                     int* mx,        int* my,
-                                     int* meqn,      int* mbc,
-                                     double* xlower, double* ylower,
-                                     double* dx,     double* dy,
-                                     double q[],
-                                     int* patch_num, int* level,
-                                     int* blockno,   int* mpirank);
+/* ---------------------------------------------------------------------------
+  Output functions
+   --------------------------------------------------------------------------- */
+#define  FC2D_CLAWPACK5_FORT_OUTPUT_ASCII FCLAW_F77_FUNC(fc2d_clawpack5_fort_output_ascii, \
+                                                       FC2D_CLAWPACK5_FORT_OUTPUT_ASCII)
+void  FC2D_CLAWPACK5_FORT_OUTPUT_ASCII(char* matname1,
+                                       int* mx,        int* my,
+                                       int* meqn,      int* mbc,
+                                       double* xlower, double* ylower,
+                                       double* dx,     double* dy,
+                                       double q[],
+                                       int* patch_num, int* level,
+                                       int* blockno,   int* mpirank);
 
-#define FC2D_CLAWPACK5_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_clawpack5_fort_write_header, \
-                                                        FC2D_CLAWPACK5_FORT_WRITE_HEADER)
-void FC2D_CLAWPACK5_FORT_WRITE_HEADER(int* iframe, double* time, int* meqn, int* maux,int* ngrids);
+#define FC2D_CLAWPACK5_FORT_HEADER_ASCII FCLAW_F77_FUNC(fc2d_clawpack5_fort_header_ascii, \
+                                                        FC2D_CLAWPACK5_FORT_HEADER_ASCII)
+void FC2D_CLAWPACK5_FORT_HEADER_ASCII(char* matname1, char* matname2, double* time, int* meqn, 
+                                      int* maux,int* ngrids);
 
 
+/* ---------------------------------------------------------------------------
+  Diagnostics functions
+  --------------------------------------------------------------------------- */
 #define FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_clawpack5_fort_conservation_check, \
                                                               FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK)
+
 void FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                             double *dx, double *dy,
                                             double* area, double *q, double* sum);
@@ -328,6 +331,16 @@ double FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double*
 void FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM(int *mx, int *my, int *mbc, int *meqn,
                                             double *dx, double *dy, double area[],
                                             double error[], double error_norm[]);
+
+#if 0
+#define FC2D_CLAWPACK5_FORT_COMPUTE_ERROR FCLAW_F77_FUNC(fc2d_clawpack5_fort_compute_error, \
+                                                         FC2D_CLAWPACK5_FORT_COMPUTE_ERROR)
+
+void FC2D_CLAWPACK5_FORT_COMPUTE_ERROR(int *mx, int *my, int *mbc, int *meqn,
+                                       double *dx, double *dy, double area[],
+                                       double error[], double error_norm[]);
+
+#endif
 
 #define FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA FCLAW_F77_FUNC(fc2d_clawpack5_fort_ghostpack_qarea, \
                                                            FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA)
@@ -357,83 +370,51 @@ int FC2D_CLAWPACK5_GET_BLOCK();
                                               CLAWPACK5_UNSET_BLOCK)
 void CLAWPACK5_UNSET_BLOCK();
 
-/***************************** MINIMAL API ******************************/
-
-void fc2d_clawpack5_register_vtable (fclaw_package_container_t *
-                                      pkg_container,
-                                      fc2d_clawpack5_options_t *
-                                      clawopt);
-
-/* -------------------------------------------------------------------------
-   New routines
-   ------------------------------------------------------------------------- */
-void fc2d_clawpack5_define_auxarray(fclaw2d_domain_t* domain,
-                                    fclaw2d_patch_t* this_patch);
-
-void fc2d_clawpack5_aux_data(fclaw2d_domain_t* domain,
-                              fclaw2d_patch_t *this_patch,
-                              double **aux, int* maux);
-
-int fc2d_clawpack5_get_maux(fclaw2d_domain_t* domain);
-void fc2d_clawpack5_maux(fclaw2d_domain_t* domain, int* maux);
-
-void fc2d_clawpack5_register (fclaw_app_t* app, const char *configfile);
-
-void fc2d_clawpack5_package_register(fclaw_app_t* app,
-                                      fc2d_clawpack5_options_t* clawopt);
-
-int fc2d_clawpack5_get_package_id (void);
-
-void fc2d_clawpack5_output_header_ascii(fclaw2d_domain_t* domain,
-                                        int iframe);
-
-fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_domain_t *domain);
-
 /* -------------------------------------------------------------------------
    Routines that won't change
    ------------------------------------------------------------------------- */
 void
-    fc2d_clawpack5_setprob(fclaw2d_domain_t* domain);
+    fc2d_clawpack5_setprob(struct fclaw2d_global* glob);
 
 void
-    fc2d_clawpack5_setaux(fclaw2d_domain_t *domain,
-                           fclaw2d_patch_t *this_patch,
+    fc2d_clawpack5_setaux(struct fclaw2d_global *glob,
+                           struct fclaw2d_patch *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
 void
-    fc2d_clawpack5_set_capacity(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t *this_patch,
+    fc2d_clawpack5_set_capacity(struct fclaw2d_global *glob,
+                                 struct fclaw2d_patch *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx);
 
 void
-    fc2d_clawpack5_qinit(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
+    fc2d_clawpack5_qinit(struct fclaw2d_global *glob,
+                          struct fclaw2d_patch *this_patch,
                           int this_block_idx,
                           int this_patch_idx);
 
 void
-    fc2d_clawpack5_b4step2(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
+    fc2d_clawpack5_b4step2(struct fclaw2d_global *glob,
+                            struct fclaw2d_patch *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
                             double t,
                             double dt);
 
 void
-    fc2d_clawpack5_bc2(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
+    fc2d_clawpack5_bc2(struct fclaw2d_global *glob,
+                        struct fclaw2d_patch *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
                         double dt,
-                        fclaw_bool intersects_bc[],
-                        fclaw_bool time_interp);
+                        int intersects_bc[],
+                        int time_interp);
 
 void
-    fc2d_clawpack5_src2(fclaw2d_domain_t *domain,
-                         fclaw2d_patch_t *this_patch,
+    fc2d_clawpack5_src2(struct fclaw2d_global *glob,
+                         struct fclaw2d_patch *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
                          double t,
@@ -442,30 +423,28 @@ void
 
 /* A single step method that advances the solution a single step on a single grid
    using a time step dt determined by the subcycle manager */
-double
-    fc2d_clawpack5_step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt);
+double fc2d_clawpack5_step2(struct fclaw2d_global *glob,
+                            struct fclaw2d_patch *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            double t,
+                            double dt);
 
 /* Use this ro return only the right hand side of the clawpack algorithm */
 double
-    fc2d_clawpack5_step2_rhs(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *this_patch,
+    fc2d_clawpack5_step2_rhs(struct fclaw2d_global *glob,
+                              struct fclaw2d_patch *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
                               double t,
                               double *rhs);
 
-double
-fc2d_clawpack5_update(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt);
+double fc2d_clawpack5_update(struct fclaw2d_global *glob,
+                             struct fclaw2d_patch *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             double t,
+                             double dt);
 
 #ifdef __cplusplus
 #if 0

@@ -3,7 +3,7 @@
 # ----------------------------------
 # Solver libraries
 # ----------------------------------
-include src/solvers/fc2d_dummy/Makefile.am
+#include src/solvers/fc2d_dummy/Makefile.am
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/solvers/fc2d_clawpack5/Makefile.am
 
@@ -11,9 +11,68 @@ if FCLAW_ENABLE_GEOCLAW
 include src/solvers/fc2d_geoclaw/Makefile.am
 endif
 
+## if FCLAW_ENABLE_ASH3D
+## include src/solvers/fc3d_ash3d/Makefile.am
+## endif
+
 # ----------------------------------
 # Applications
 # ----------------------------------
+
+# Scalar advection on manifolds
+include applications/advection/2d/swirl/Makefile.am
+include applications/advection/2d/filament/Makefile.am
+include applications/advection/2d/annulus/Makefile.am
+include applications/advection/2d/latlong/Makefile.am
+include applications/advection/2d/disk/Makefile.am
+include applications/advection/2d/torus/Makefile.am
+include applications/advection/2d/replicated/Makefile.am
+include applications/advection/2d/hemisphere/Makefile.am
+include applications/advection/2d/sphere/Makefile.am
+
+# Scalar advection in 2.5 dimension
+#include applications/advection/2.5d/swirl/Makefile.am
+
+# NCAR Transport problems on the sphere
+include applications/NCAR_transport/gaussian/Makefile.am
+include applications/NCAR_transport/slotted_disk/Makefile.am
+include applications/NCAR_transport/correlatedcb/Makefile.am
+
+# AMRClaw examples from Clawpack/AMRClaw
+include applications/amrclaw/acoustics/2d/radial/Makefile.am
+include applications/amrclaw/acoustics/2d/interface/Makefile.am
+include applications/amrclaw/burgers/2d/pwconst/Makefile.am
+include applications/amrclaw/shallow/2d/radialdam/Makefile.am
+include applications/amrclaw/euler/2d/shockbubble/Makefile.am
+include applications/amrclaw/euler/2d/quadrants/Makefile.am
+include applications/amrclaw/advection/2d/swirl/Makefile.am
+
+# GeoClaw examples
+if FCLAW_ENABLE_GEOCLAW
+include applications/geoclaw/bowl_radial/Makefile.am
+#include applications/geoclaw/bowl_slosh/Makefile.am
+#include applications/geoclaw/flat_bathymetry/Makefile.am
+#include applications/geoclaw/chile2010/Makefile.am
+endif
+
+# -------------- Under construction ------------------
+#  These are not guaranteed to compile or may not be
+#  available
+# ----------------------------------------------------
+
+## # Ash3d examples
+## if FCLAW_ENABLE_ASH3D
+## include src/solvers/fc3d_ash3d/test_cases/cloud_tester/Makefile.am
+## endif
+
+# Third order scalar advection
+#include applications/advection/2d/adv_order3/Makefile.am
+
+# Shallow water on the sphere
+# include applications/shallow/2d/sphere/Makefile.am
+
+# Still need to figure out what this version does */
+# include applications/advection/2d/torthem/Makefile.am
 
 # Simple examples to test options handling, etc, but no solvers.
 #include applications/dummy/Makefile.am
@@ -21,44 +80,5 @@ endif
 
 # Test metric terms used for problems on manifolds
 # include applications/metric/2d/all_mappings/Makefile.am
+# include applications/metric/2d/mesh/Makefile.am
 
-# Scalar advection on manifolds
-include applications/advection/2d/swirl/Makefile.am
-#include applications/advection/2d/torus/Makefile.am
-#include applications/advection/2d/torthem/Makefile.am
-#include applications/advection/2d/annulus/Makefile.am
-#include applications/advection/2d/latlong/Makefile.am
-#include applications/advection/2d/replicated/Makefile.am
-#include applications/advection/2d/hemisphere/Makefile.am
-#include applications/advection/2d/filament/Makefile.am
-#include applications/advection/2d/disk/Makefile.am
-#include applications/advection/2d/sphere/Makefile.am
-
-# NCAR Transport problems on the sphere
-#include applications/NCAR_transport/gaussian/Makefile.am
-#include applications/NCAR_transport/slotted_disk/Makefile.am
-#include applications/NCAR_transport/correlatedcb/Makefile.am
-
-# Euler example
-#include applications/euler/2d/quadrants/Makefile.am
-
-# Shallow water on the sphere
-# include applications/shallow/2d/sphere/Makefile.am
-
-# AMRClaw examples from Clawpack/AMRClaw
-include applications/amrclaw/acoustics/2d/interface/Makefile.am
-include applications/amrclaw/acoustics/2d/radial/Makefile.am
-include applications/amrclaw/advection/2d/swirl/Makefile.am
-include applications/amrclaw/burgers/2d/pwconst/Makefile.am
-include applications/amrclaw/shallow/2d/radialdam/Makefile.am
-include applications/amrclaw/euler/2d/quadrants/Makefile.am
-include applications/amrclaw/euler/2d/shockbubble/Makefile.am
-
-# GeoClaw examples
-if FCLAW_ENABLE_GEOCLAW
-include applications/geoclaw/bowl_radial/Makefile.am
-#include applications/geoclaw/bowl_slosh/Makefile.am
-#include applications/geoclaw/flat_bathymetry/Makefile.am
-include applications/geoclaw/chile2010/Makefile.am
-#include applications/geoclaw/teton/Makefile.am
-endif

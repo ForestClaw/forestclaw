@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BOWL_USER_H
 #define BOWL_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fc2d_geoclaw.h>
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -46,7 +45,8 @@ typedef struct user_options
 
 #define BOWL_WRITE_HEADER FCLAW_F77_FUNC(bowl_write_header, BOWL_WRITE_HEADER)
 
-void bowl_link_solvers(fclaw2d_domain_t *domain);
+void bowl_link_solvers(fclaw2d_global_t *glob);
+user_options_t* bowl_get_options(fclaw2d_global_t* glob);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();

@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_PARTITION_H
 #define FCLAW2D_PARTITION_H
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw2d_convenience.h"
-#include "fclaw2d_vtable.h"
+#include <fclaw_timer.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,10 +36,10 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_partition_domain(fclaw2d_domain_t** domain, int mode,
-                              fclaw2d_timer_names_t running);
+struct fclaw2d_domain;
 
-void fclaw2d_partition_delete(fclaw2d_domain_t** domain);
+void fclaw2d_partition_domain(struct fclaw2d_global* glob, int mode,
+                              fclaw2d_timer_names_t running);
 
 #ifdef __cplusplus
 #if 0

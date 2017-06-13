@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FORESTCLAW2D_H
 #define FORESTCLAW2D_H
 
-#include <fclaw2d_base.h>
+#include <fclaw_base.h>
 #include <sc_keyvalue.h>
 
 #ifdef __cplusplus

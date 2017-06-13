@@ -42,22 +42,27 @@ extern "C"
 #endif
 #endif
 
-/* Plan is to replace amr_options_t with fclaw_options_t */
-typedef struct amr_options amr_options_t;
-typedef amr_options_t fclaw_options_t;
+/* Plan is to replace fclaw_options_t with fclaw_options_t */
+typedef struct fclaw_options fclaw_options_t;
 
-fclaw_exit_type_t fclaw_options_postprocess (fclaw_options_t * amropt);
-fclaw_exit_type_t fclaw_options_check (fclaw_options_t * amropt);
-void fclaw_options_reset (fclaw_options_t * amropt);
+fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
+                                         const char *configfile);
 
-amr_options_t* fclaw_forestclaw_get_options(fclaw_app_t* app);
+fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
+                                         const char *configfile);
+
+/* These can be called from external routines (in torthem, for example?) */
+fclaw_exit_type_t 
+fclaw_options_postprocess (fclaw_options_t * fclaw_opt);
+
+fclaw_exit_type_t
+fclaw_options_check (fclaw_options_t * fclaw_opt);
+
+void fclaw_options_destroy(fclaw_options_t* fclaw_opt);
 
 
-amr_options_t* fclaw_options_register_general (fclaw_app_t * a,
-                                     const char *configfile);
 
 
-void fclaw_options_add_general (sc_options_t * opt, amr_options_t* amropt);
 
 int fclaw_options_read_from_file(sc_options_t* opt);
 
@@ -72,12 +77,13 @@ int fclaw_options_read_from_file(sc_options_t* opt);
  * \param [in] initial_length   Initial length of int_array.
  * \param [in] help_string      Help message (used with --help).
  */
+
 void fclaw_options_add_int_array (sc_options_t * opt,
-                                int opt_char, const char *opt_name,
-                                const char **array_string,
-                                const char *default_string,
-                                int **int_array, int initial_length,
-                                const char *help_string);
+                                  int opt_char, const char *opt_name,
+                                  const char **array_string,
+                                  const char *default_string,
+                                  int **int_array, int initial_length,
+                                  const char *help_string);
 
 void
 fclaw_options_add_double_array (sc_options_t * opt,
@@ -96,7 +102,7 @@ fclaw_options_add_double_array (sc_options_t * opt,
  * \param [in] new_length       Length of int_array.
  */
 void fclaw_options_convert_int_array (const char *array_string,
-                                    int **int_array, int new_length);
+                                      int **int_array, int new_length);
 
 void fclaw_options_convert_double_array (const char *array_string,
                                          double **double_array, int new_length);
@@ -105,17 +111,12 @@ void fclaw_options_convert_double_array (const char *array_string,
 void fclaw_options_destroy_array(void* array);
 
 
-/* Plan is to replace amr_options_t with fclaw_options_t.
+/* Plan is to replace fclaw_options_t with fclaw_options_t.
    Maybe use a macro as an intermediate step? */
 
-struct amr_options
+struct fclaw_options
 {
     int dim;
-
-    /* Fixed grid size for each grid */
-    int mx;      /**< Number of cells in x direction (fixed for all grids) */
-    int my;      /**< Number of cells in y direction (fixed for all grids) */
-    int mbc;     /**< Number of ghost cells in each grid */
 
     /* Time stepping */
     double initial_dt;  /**< Initial time step size */
@@ -130,12 +131,6 @@ struct amr_options
     double max_cfl;
     double desired_cfl;
     double *tout;
-
-    /* Number of equations in the system of PDEs */
-    int meqn;
-
-    const char *mthbc_string;
-    int *mthbc;
 
     /* Initialization of ghost cell */
     int init_ghostcell;
@@ -171,6 +166,8 @@ struct amr_options
     double bx;   /**< Only for the single block, unmapped case */
     double ay;   /**< Only for the single block, unmapped case */
     double by;   /**< Only for the single block, unmapped case */
+    double az;
+    double bz;
 
     /* Diagnostics */
     int run_user_diagnostics;
@@ -189,24 +186,24 @@ struct amr_options
 
     /* Output and console IO */
     int verbosity;              /**< TODO: Do we have guidelines here? */
-    int serialout;              /**< Allow for serial output.  WARNING:
-                                     Will kill all parallel performance. */
-    int tikzout;      /* Boolean */
+
+    int output;                    
+    int tikz_out;      /* Boolean */
+
     const char *tikz_figsize_string;
     double *tikz_figsize;  /* In inches, e.g. [8,2] */
 
+    int tikz_plot_fig;
+    const char *tikz_plot_prefix;  /* For plotting */
+    const char *tikz_plot_suffix;  /* For plotting */
+
     const char *prefix;         /**< This is prepended to output files */
 
-    /* VTK output control */
-    int vtkout;      /**< 0 for no output, 1 for output during amrinit,
-                          2 for output when in amr_output.  Can be or'd. */
     double vtkspace; /**< between 0. and 1. to separate patches visually */
-    int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */
 
     int weighted_partition;            /**< Use weighted partition. */
 
-    /* Advanced options */
-    int interp_stencil_width;
+    int is_registered;
 };
 
 #ifdef __cplusplus

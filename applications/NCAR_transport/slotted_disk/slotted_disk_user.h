@@ -26,10 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SLOTTED_DISK_USER_H
 #define SLOTTED_DISK_USER_H
 
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../all/transport_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -40,52 +37,13 @@ extern "C"
 #endif
 
 
-typedef struct user_options
-{
-    int example;
-    double kappa;
-    int claw_version;
-    int is_registered;
-
-} user_options_t;
-
-void slotted_disk_problem_setup(fclaw2d_domain_t *domain);
+void slotted_disk_problem_setup(fclaw2d_global_t *glob);
 
 #define SLOTTED_DISK_SETPROB FCLAW_F77_FUNC(slotted_disk_setprob,SLOTTED_DISK_SETPROB)
 void SLOTTED_DISK_SETPROB(const double* kappa, const double* tfinal);
 
+void slotted_disk_link_solvers(fclaw2d_global_t *glob);
 
-void slotted_disk_patch_setup(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *this_patch,
-                              int this_block_idx,
-                              int this_patch_idx);
-
-const user_options_t* slotted_disk_user_get_options(fclaw2d_domain_t* domain);
-
-double slotted_disk_update(fclaw2d_domain_t *domain,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx,
-                           double t,
-                           double dt);
-
-void slotted_disk_b4step2(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt);
-
-void slotted_disk_link_solvers(fclaw2d_domain_t *domain);
-
-
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
-                                                     const double shift[],
-                                                     const double rotate[]);
-
-fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
-                                                      const double shfit[],
-                                                      const double rotate[]);
 
 #ifdef __cplusplus
 #if 0

@@ -102,6 +102,7 @@ maintainer-clean-local:
 
 clean-local:
 	rm -f ChangeLog *vtu *.visit
+	rm -f amr_module.mod
 
 doxygen: Doxyfile
 	doxygen

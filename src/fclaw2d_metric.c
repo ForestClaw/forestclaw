@@ -22,15 +22,16 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <fclaw2d_metric_default_fort.h>
+#include <fclaw2d_metric.h>
 
 #include <fclaw2d_global.h>
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_patch.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_metric_default_fort.h>
 
-void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
+void fclaw2d_metric_average_area(fclaw2d_global_t *glob,
                                  fclaw2d_patch_t *fine_patches,
                                  fclaw2d_patch_t *coarse_patch,
                                  int blockno, int coarse_patchno,
@@ -44,23 +45,20 @@ void fclaw2d_metric_average_area(fclaw2d_domain_t *domain,
     int igrid;
     fclaw2d_patch_t *fine_patch;
 
-    fclaw2d_clawpatch_grid_data(domain,coarse_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    areacoarse = fclaw2d_clawpatch_get_area(domain,coarse_patch);
+    areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
 
     for(igrid = 0; igrid < 4; igrid++)
     {
         fine_patch = &fine_patches[igrid];
 
-        areafine = fclaw2d_clawpatch_get_area(domain,fine_patch);
+        areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
 
         FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
 
-    fclaw2d_vtable_t vt;
-    vt = fclaw2d_get_vtable(domain);
-
     /* Use either exact or approximate method */
-    vt.metric_area_set_ghost(domain,coarse_patch,blockno,coarse_patchno);
+    fclaw2d_vt()->metric_area_set_ghost(glob,coarse_patch,blockno,coarse_patchno);
 }

@@ -1,9 +1,10 @@
 /* Cartesian grid, tranformed to Ax + b */
 
+#include <fclaw2d_map_brick.h>
+
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 #include <fclaw2d_convenience.h>
-#include <fclaw2d_map_brick.h>
 
 static int
 fclaw2d_map_query_brick (fclaw2d_map_context_t * cont, int query_identifier)

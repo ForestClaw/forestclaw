@@ -26,9 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_METRIC_DEFAULT_H
 #define FCLAW2D_METRIC_DEFAULT_H
 
-#include <fclaw2d_metric_default_fort.h>
-#include "forestclaw2d.h"
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -37,35 +34,38 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_metric_setup_mesh(fclaw2d_domain_t *domain,
-                               fclaw2d_patch_t *this_patch,
-                               int blockno,
-                               int patchno);
+struct fclaw2d_global;
+struct fclaw2d_patch;
 
-void fclaw2d_metric_compute_area(fclaw2d_domain_t *domain,
-                                 fclaw2d_patch_t* this_patch,
+void fclaw2d_metric_compute_area(struct fclaw2d_global *glob,
+                                 struct fclaw2d_patch* this_patch,
                                  int blockno,
                                  int patchno);
 
-void fclaw2d_metric_area_set_ghost(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t* this_patch,
+void fclaw2d_metric_area_set_ghost(struct fclaw2d_global *glob,
+                                   struct fclaw2d_patch* this_patch,
                                    int blockno,
                                    int patchno);
 
-void fclaw2d_metric_compute_area_exact(fclaw2d_domain_t *domain,
-                                       fclaw2d_patch_t* this_patch,
+void fclaw2d_metric_compute_area_exact(struct fclaw2d_global *glob,
+                                       struct fclaw2d_patch *this_patch,
                                        int blockno,
                                        int patchno);
 
-void fclaw2d_metric_area_set_ghost_exact(fclaw2d_domain_t *domain,
-                                         fclaw2d_patch_t* this_patch,
+void fclaw2d_metric_area_set_ghost_exact(struct fclaw2d_global *glob,
+                                         struct fclaw2d_patch* this_patch,
                                          int blockno,
                                          int patchno);
 
+void fclaw2d_metric_setup_mesh(struct fclaw2d_global *glob,
+                               struct fclaw2d_patch *this_patch,
+                               int blockno,
+                               int patchno);
+
 /* Includes computation of normals and tangents to face, as well
    as surface normals and curvature */
-void fclaw2d_metric_compute_normals(fclaw2d_domain_t *domain,
-                                    fclaw2d_patch_t *this_patch,
+void fclaw2d_metric_compute_normals(struct fclaw2d_global *glob,
+                                    struct fclaw2d_patch *this_patch,
                                     int blockno,
                                     int patchno);
 

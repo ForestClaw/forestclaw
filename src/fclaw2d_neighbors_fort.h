@@ -23,17 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CLAWPACK_FORT_H
-#define CLAWPACK_FORT_H
+#ifndef FCLAW2D_NEIGHBORS_FORT_H
+#define FCLAW2D_NEIGHBORS_FORT_H
 
 /* this header file must come first */
-#include <fclaw2d_defs.h>
 
-#include <forestclaw2d.h>
 #include <fclaw2d_convenience.h>
-
-#include <fclaw_options.h>
-#include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -42,8 +37,6 @@ extern "C"
 }
 #endif
 #endif
-
-/* ------------------------------------------------------------------------ */
 
 /* ----------------------------------------------------------------------------------
    Internal boundary conditions
@@ -77,21 +70,6 @@ void  FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(const int& mx, const int& m
                                                      double qfine[],const int& a_coarse_corner,
                                                      const int& blockno);
 
-
-/* ----------------------------------------------------------------------------------
-   Physical boundary conditions
-   ---------------------------------------------------------------------------------- */
-#define FCLAW2D_FORT_SET_PHYS_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_set_phys_corner_ghost, \
-                                                          FCLAW2D_FORT_SET_PHYS_CORNER_GHOST)
-void FCLAW2D_FORT_SET_PHYS_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
-                                        const int& meqn, double q[],const int& icorner,
-                                        const double &t, const double& dt, const int mthbc[]);
-
-#define FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST FCLAW_F77_FUNC(fclaw2d_fort_exchange_phys_corner_ghost, \
-                                                               FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST)
-void FCLAW2D_FORT_EXCHANGE_PHYS_CORNER_GHOST(const int& mx, const int& my, const int& mbc,
-                                 const int& meqn, double qthis[],double qneighbor[],
-                                 const int& icorner, const int& iside);
 
 #ifdef __cplusplus
 #if 0

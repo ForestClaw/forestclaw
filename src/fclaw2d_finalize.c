@@ -23,20 +23,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
-
 #include <sc_statistics.h>
+#include <fclaw2d_global.h>
+
+#include <fclaw2d_diagnostics.h>
+#include <fclaw2d_options.h>
+#include <fclaw2d_map.h>
+#include <fclaw2d_domain.h>
+#include <fclaw2d_forestclaw.h>
 
 /* ------------------------------------------------------------------
    Public interface
    ---------------------------------------------------------------- */
 
-void fclaw2d_finalize(fclaw2d_domain_t **domain)
+void fclaw2d_finalize(fclaw2d_global_t* glob)
 {
-    const amr_options_t *gparms = get_domain_parms(*domain);
+    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     fclaw_global_essentialf("Finalizing run\n");
-    fclaw2d_domain_barrier (*domain);
+    fclaw2d_diagnostics_finalize(glob);
+    fclaw2d_map_destroy(glob->cont);
+    fclaw2d_domain_barrier (glob->domain);
 
     if (gparms->report_timing)
     {
@@ -44,13 +51,12 @@ void fclaw2d_finalize(fclaw2d_domain_t **domain)
         {
             /* Only call this if we have taken time steps.  For time-independent problems, we
                probably need a different report (no "amr_advance_steps") */
-            fclaw2d_timer_report(*domain);
+            fclaw2d_timer_report(glob);
         }
         else
         {
             fclaw_global_essentialf("Timing reports not generated for outstyle=0\n");
         }
     }
-
-    fclaw2d_domain_reset(domain);
+    fclaw2d_domain_reset(glob);
 }

@@ -26,10 +26,7 @@
 #ifndef SPHERE_USER_H
 #define SPHERE_USER_H
 
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../all/clawpack_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -51,20 +48,23 @@ typedef struct user_options
 
 
 #define SPHERE_SETPROB FCLAW_F77_FUNC(sphere_setprob, SPHERE_SETPROB)
-
 void SPHERE_SETPROB(const double *rps);
 
-const user_options_t* sphere_user_get_options(fclaw2d_domain_t* domain);
+const user_options_t* 
+sphere_get_options(fclaw2d_global_t* glob);
 
-void sphere_problem_setup(fclaw2d_domain_t* domain);
+void 
+sphere_problem_setup(fclaw2d_global_t* glob);
 
-void sphere_link_solvers(fclaw2d_domain_t *domain);
+void 
+sphere_link_solvers(fclaw2d_global_t *glob);
 
 
-void sphere_patch_setup(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx);
+void 
+sphere_patch_setup(fclaw2d_global_t *glob,
+                   fclaw2d_patch_t *this_patch,
+                   int this_block_idx,
+                   int this_patch_idx);
 
 fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
                                                      const double shift[],

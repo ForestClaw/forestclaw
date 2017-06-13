@@ -7,18 +7,23 @@ include_HEADERS += applications/NCAR_transport/correlatedcb/correlatedcb_user.h
 applications_NCAR_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/NCAR_transport/correlatedcb/correlatedcb_user.cpp \
 	applications/NCAR_transport/correlatedcb/correlatedcb.cpp \
-	applications/NCAR_transport/correlatedcb/fclaw2d_map_cubedsphere.c \
-	applications/NCAR_transport/correlatedcb/fclaw2d_map_pillowsphere.c \
 	applications/NCAR_transport/correlatedcb/setprob.f \
 	applications/NCAR_transport/correlatedcb/cosine_bell.f \
 	applications/NCAR_transport/correlatedcb/user_4.6/qinit.f \
 	applications/NCAR_transport/correlatedcb/user_5.0/qinit.f90 \
+	applications/NCAR_transport/all/fclaw2d_map_cubedsphere.c \
+	applications/NCAR_transport/all/fclaw2d_map_pillowsphere.c \
 	applications/NCAR_transport/correlatedcb/user_4.6/tag4refinement.f \
 	applications/NCAR_transport/correlatedcb/user_5.0/tag4refinement.f \
 	applications/NCAR_transport/correlatedcb/user_4.6/tag4coarsening.f \
 	applications/NCAR_transport/correlatedcb/user_5.0/tag4coarsening.f \
 	applications/NCAR_transport/all/velocity_wind.f \
 	applications/NCAR_transport/all/gaussian.f \
+	applications/NCAR_transport/all/transport_user.h \
+	applications/NCAR_transport/all/transport_user.cpp \
+	applications/NCAR_transport/all/transport_options.h \
+	applications/NCAR_transport/all/transport_domain.c \
+	applications/NCAR_transport/all/transport_options.c \
 	applications/NCAR_transport/all/user46_b4step2_manifold.f \
 	applications/NCAR_transport/all/user5_b4step2_manifold.f90 \
 	applications/advection/2d/all/user46_setaux_manifold.f \

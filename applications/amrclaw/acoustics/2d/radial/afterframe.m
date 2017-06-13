@@ -1,11 +1,13 @@
 if (PlotType == 1)
-  daspect([1 1 1]);
   rybcolormap;
+  caxis([-2 2]);
+  colorbar;  
+
   showpatchborders;
   setpatchborderprops('linewidth',1);
 
-  caxis([-2 2]);
-  colorbar;  
+  axis off;
+  daspect([1 1 1]);
 elseif (PlotType == 4)
   hold on;
   dir = './1drad/_output/';
