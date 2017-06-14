@@ -3,52 +3,51 @@ zmin = 80;
 ep = 0.01;
 
 if (PlotType == 1)
-    s = 1e-2;
+    hold on;
+    
+    % Patches
+    % showpatchborders;
+    setpatchborderprops('linewidth',1);
+    set(gca,'zlim',[-20 1]);   % Need so that all patchborders show up
+    
+    colormap(parula);
+    colorbar;
+    tol = -0.8;
+    c1 = -0.14;
+    c2 = 0.15;
+    caxis([c1,c2]);
+    
+    % Contour lines (some are hidden by patch boundaries)
+    cv = linspace(c1,c2,21);
+    drawcontourlines(cv);
+    
+    % Plot boundary of true solution
+    a = 1;
+    sigma = 0.5;
+    h0 = 0.1;
+    grav = 9.81;
+    omega = sqrt(2*grav*h0) / a;
+
+    xe = linspace(-2,2,200);
+    ye = linspace(-2,2,200);
+    [xem,yem] = meshgrid(xe,ye);
+    
+    y = 0;
+    B = h0*(xem.^2 + yem.^2)/a^2 - h0;
+    eta1 = sigma*h0/a.^2 * (2*xem*cos(omega*t) + 2.*yem*sin(omega*t) -sigma);
+    
+    contour(xem,yem,B-eta1,[0 0],'k','linewidth',5);
+   
+    hold off;
+
+    disp(qmin)
+    disp(qmax)
+    
+    
+    % Axes
     axis([-2 2 -2 2])
     daspect([1 1 1]);
-    axis on;
-    
-    showpatchborders(1:9);
-    cv = linspace(qmin,qmax,20);
-    % drawcontourlines(cv);
-    set(gca,'zlim',[-20,0]);   % Need so that all patchborders show up
-    
-    rybcolormap;
-    tol = 0.1;
-    caxis([-tol,tol])
-    %caxis([qmin,qmax])
-    daspect([20,20,1]);
-    
-    hold on;
-    zmin = 0.1;
-    ep = 1;
-    w = 1;
-    th = linspace(0,2*pi,500);
-    plot(w*cos(th),w*sin(th),'k','linewidth',2);
-    % axis([50,75,50,75])
-    axis([-2 2 -2 2]);
-    
-    % Plot regions
-%     clear hh
-%     hh = plot_region([0,0],[100,100]);
-%     set(hh,'linewidth',3,'color','b');
-     
-%     clear hh;
-%     if (t >= 3)
-%         hh(1) = plot_region([52,52],[72,72]);
-%         hh(2) = plot_region([75,-10],[95,10]);
-%         set(hh,'linewidth',3,'color','r');
-%     end
-     
-%     clear hh;
-%     if (t >= 3.4)
-%         hh(1) = plot_region([57,57],[68,68]);
-%         hh(2) = plot_region([83,-4],[92,4]);
-%         set(hh,'linewidth',3,'color','w')
-%     end
-    
-    hold off;
-    colorbar
+    set(gca,'fontsize',16);
 else
     hold on;
     r = linspace(0,100,500);

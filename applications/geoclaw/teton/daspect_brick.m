@@ -7,6 +7,7 @@ bx = -111.25911794;
 ay = 43.59190493;
 by = 43.97790751;
 
+% Meter's
 d1 = compute_distances([ax bx],[ay,ay]);
 d2 = compute_distances([ax,ax],[ay,by]);
 
@@ -14,10 +15,13 @@ fprintf('%20s %12.4f\n','Horizontal distance',d1/1e3);
 fprintf('%20s %12.4f\n','Vertical distance',d2/1e3);
 fprintf('\n\n');
 
-% ax = 0;
-% bx = d1;
-% ay = 0;
-% by = d2;
+use_distance = true;
+if (use_distance)
+    ax = 0;
+    bx = d1;
+    ay = 0;
+    by = d2;
+end
 
 
 plot([ax bx bx ax ax],[ay ay by by ay],'k','linewidth',2);
@@ -47,8 +51,8 @@ ylabel('latitude','fontsize',16);
 % GeoClaw finegrid resolution : 
 R = [1,2,4,4,4];
 r = 1;
-mx = 54;
-my = 19;
+mx = 64;
+my = 32;
 dx = (bx-ax)/mx;
 dy = (by-ay)/my;
 fprintf('%7s %16s %16s %8s %8s\n','level','dx','dy','mx','my');
@@ -58,15 +62,19 @@ for i = 1:length(R)
     dy = dy/R(i);
     mx = mx*R(i);
     my = my*R(i);
-    fprintf('%7d %16.4e %16.4e %8d %8d\n',i,dx,dy,mx,my);
+    if (use_distance)
+        fprintf('%7d %16.2f %16.2f %8d %8d\n',i,dx,dy,mx,my);
+    else
+        fprintf('%7d %16.4e %16.4e %8d %8d\n',i,dx,dy,mx,my);
+    end
 end
 fprintf('%s\n',char(double('-')*ones(1,59)));
 fprintf('\n');
 
 % ForestClaw
 minlevel = 0;
-maxlevel = 7;
-mx0 = 8;
+maxlevel = 10;
+mx0 = 16;
 mx = mi*mx0*2^minlevel;
 my = mj*mx0*2^minlevel;
 dx = (bx-ax)/mx;
@@ -74,7 +82,11 @@ dy = (by-ay)/my;
 fprintf('%7s %16s %16s %8s %8s\n','level','dx','dy','mx','my');
 fprintf('%s\n',char(double('-')*ones(1,59)));
 for l = minlevel:maxlevel    
-    fprintf('%7d %16.4e %16.4e %8d %8d\n',l,dx,dy,mx,my);
+    if (use_distance)
+        fprintf('%7d %16.2f %16.2f %8d %8d\n',l,dx,dy,mx,my);
+    else
+        fprintf('%7d %16.4e %16.4e %8d %8d\n',l,dx,dy,mx,my);
+    end
     dx = dx/2;
     dy = dy/2;
     mx = mx*2;

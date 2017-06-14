@@ -106,6 +106,10 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_string (opt, 0, "tikz-plot-suffix", &fclaw_opt->tikz_plot_suffix, "png",
                            "Figure suffix for plotting [png]");    
 
+    sc_options_add_bool (opt, 0, "tikz-plot-fig", &fclaw_opt->tikz_plot_fig,1,
+                           "Include figure (png,jpg,etc) in .tex file [1]");    
+
+
     /* This is a hack to control the VTK output while still in development.
      * The values are numbers which can be bitwise-or'd together.
      * 0 - no VTK output ever.

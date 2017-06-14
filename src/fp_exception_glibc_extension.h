@@ -12,7 +12,7 @@
 #ifndef FENV_H_LINUX_REPLACEMENT
 #define FENV_H_LINUX_REPLACEMENT
 
-/* #include <fenv.h> */
+#include <fenv.h>
 
 #ifdef __cplusplus
 extern "C" {
