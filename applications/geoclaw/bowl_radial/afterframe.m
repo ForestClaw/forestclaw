@@ -3,21 +3,17 @@ zmin = 80;
 ep = 0.01;
 
 if (PlotType == 1)
-    s = 1e-2;
-    axis([-100 100 -100 100])
-    daspect([1 1 1]);
-    axis on;
-    
-    showpatchborders(1:9);
+    showpatchborders;
+    setpatchborderprops('linewidth',2);
     cv = linspace(qmin,qmax,20);
     % drawcontourlines(cv);
     set(gca,'zlim',[-20,0]);   % Need so that all patchborders show up
     
-    rybcolormap;
+    colormap(parula);
     tol = 1;
     caxis([-tol,tol])
-    % caxis([qmin,qmax])
     daspect([20,20,1]);
+    colorbar
     
     hold on;
     zmin = 80;
@@ -31,7 +27,12 @@ if (PlotType == 1)
     
     hold off;
     
-    colorbar
+    s = 1e-2;
+    axis([-100 100 -100 100])
+    daspect([1 1 1]);
+    set(gca,'fontsize',16);
+    axis on;
+    
 elseif (PlotType == 4)
     % Plot 1d solution
     hold on;
