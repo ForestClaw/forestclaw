@@ -33,18 +33,11 @@
 #include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
 
-
 static int s_user_options_package_id = -1;
 
 static void *
-bowl_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+bowl_register (user_options_t* user, sc_options_t * opt)
 {
-    FCLAW_ASSERT(app != 0);
-    FCLAW_ASSERT(package != 0);
-    FCLAW_ASSERT(opt != 0);
-
-    user_options_t* user = (user_options_t*) package;
-
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 0 = nomap; 1 = brick [0]");
@@ -55,13 +48,8 @@ bowl_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-bowl_check (fclaw_app_t * app, void *package, void *registered)
+bowl_check (user_options_t *user)
 {
-    FCLAW_ASSERT(app != 0);
-    FCLAW_ASSERT(package != 0);
-    FCLAW_ASSERT(registered == 0);
-
-    user_options_t* user = (user_options_t*) package;
     if (user->example < 0 || user->example > 1)
     {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
@@ -70,23 +58,86 @@ bowl_check (fclaw_app_t * app, void *package, void *registered)
     return FCLAW_NOEXIT;
 }
 
+static void
+bowl_destroy(user_options_t *user)
+{
+    /* Nothing to destroy */
+}
+
+
+/* ------- Generic option handling routines that call above routines ----- */
+static void*
+options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    user_options_t *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (opt != NULL);
+
+    user = (user_options_t*) package;
+
+    return bowl_register(user,opt);
+}
+
+static fclaw_exit_type_t
+options_check(fclaw_app_t *app, void *package,void *registered)
+{
+    user_options_t           *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT(registered == NULL);
+
+    user = (user_options_t*) package;
+
+    return bowl_check(user);
+}
+
+static void
+options_destroy (fclaw_app_t * app, void *package, void *registered)
+{
+    user_options_t *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    user = (user_options_t*) package;
+    FCLAW_ASSERT (user->is_registered);
+
+    bowl_destroy (user);
+
+    FCLAW_FREE (user);
+}
+
+
+
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
-    bowl_register,
+    options_register,
     NULL,
-    bowl_check,
-    NULL
+    options_check,
+    options_destroy
 };
 
+/* ------------- User options access functions --------------------- */
+
 static
-void bowl_register_options (fclaw_app_t * app,
-                            const char *configfile,
-                            user_options_t* user)
+user_options_t* bowl_options_register (fclaw_app_t * app,
+                                       const char *configfile)
 {
+    user_options_t *user;
     FCLAW_ASSERT (app != NULL);
+
+    user = FCLAW_ALLOC (user_options_t, 1);
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
+
+    fclaw_app_set_attribute(app,"user",user);
+    return user;
 }
+
 
 user_options_t* bowl_get_options(fclaw2d_global_t* glob)
 {
@@ -153,9 +204,6 @@ void run_program(fclaw2d_global_t* glob)
 {
     fclaw2d_domain_t    **domain = &glob->domain;
 
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
     fclaw2d_domain_data_new(*domain);
 
     fclaw2d_vtable_initialize();
@@ -185,10 +233,10 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    fclaw_options_t              *gparms;
+    fclaw_options_t             *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
     fc2d_geoclaw_options_t      *geoclawopt;
-    user_options_t              suser, *user = &suser;
+    user_options_t              *user;
 
     sc_MPI_Comm mpicomm;
     fclaw2d_domain_t* domain;
@@ -197,12 +245,12 @@ main (int argc, char **argv)
     int retval;
 
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, user);
+    app = fclaw_app_new (&argc, &argv, NULL);
 
     gparms                   = fclaw_options_register(app,"fclaw_options.ini");
     clawpatchopt = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
     geoclawopt        = fc2d_geoclaw_options_register(app, "fclaw_options.ini");
-                                bowl_register_options(app,"fclaw_options.ini",user);
+    user                      =  bowl_options_register(app,"fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -215,10 +263,10 @@ main (int argc, char **argv)
     glob = fclaw2d_global_new();
     fclaw2d_global_store_domain(glob, domain);
 
-    fclaw2d_options_store (glob, gparms);
+    fclaw2d_options_store           (glob, gparms);
     fclaw2d_clawpatch_options_store (glob, clawpatchopt);
-    fc2d_geoclaw_options_store (glob, geoclawopt);
-    bowl_options_store (glob, user);
+    fc2d_geoclaw_options_store      (glob, geoclawopt);
+    bowl_options_store              (glob, user);
 
     /* Run the program */
 
