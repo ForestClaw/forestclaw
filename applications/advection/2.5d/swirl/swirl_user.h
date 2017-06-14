@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SWIRL_USER_H
 #define SWIRL_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fc3d_clawpack5.h>
-// #include "../all/clawpack_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"

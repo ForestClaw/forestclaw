@@ -36,6 +36,8 @@ def setplot(plotdata):
 
     plotdata.verbose = False
 
+    plotdata.format = 'forestclaw'
+
     # To plot gauge locations on pcolor or contour plot, use this as
     # an afteraxis function:
 
@@ -70,6 +72,7 @@ def setplot(plotdata):
 
     plotfigure.use_for_kml = True
     plotfigure.kml_use_for_initial_view = True
+    plotfigure.kml_show_figure = False
 
     # These override any axes limits set below in plotaxes
     plotfigure.kml_xlimits = [-120,-60]
@@ -77,7 +80,7 @@ def setplot(plotdata):
 
     # Resolution (should be consistent with data resolution)
     maxlevel = 5
-    minlevel = 1
+    minlevel = 1  # (real minlevel; dont' overresolve the coarsest level)
     mx = 16                    # Gridsize
     minres = mx*2**minlevel
     plotfigure.kml_figsize = [minres,minres]
@@ -106,6 +109,7 @@ def setplot(plotdata):
 
     plotfigure.use_for_kml = True
     plotfigure.kml_use_for_initial_view = False  # Use large plot for view
+    plotfigure.kml_show_figure = True
 
     # Set Google Earth bounding box and figure size
     plotfigure.kml_xlimits = [-84,-74]
