@@ -37,7 +37,7 @@ def setplot(plotdata):
         # The cell will be plotted as dry if h < drytol.
         # The best value to use often depends on the application and can
         # be set here (measured in meters):
-        current_data.user["drytol"] = 1.e-3
+        current_data.user["drytol"] = 1.e-5
 
     plotdata.beforeframe = set_drytol
 
@@ -162,9 +162,9 @@ def setplot(plotdata):
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = 'all'          # list of frames to print
+    plotdata.print_framenos = [0,1,2]          # list of frames to print
     plotdata.print_gaugenos = []             # list of gauges to print
-    plotdata.print_fignos = 'all'            # list of figures to print
+    plotdata.print_fignos = [0,1]            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
     plotdata.latex = True                    # create latex file of plots?

@@ -6,7 +6,8 @@ h = data(:,mheight);
 b = data(:,mbathy);
 eta = zeros(size(h));
 
+eta = data(:,4);
+
 dry_tol = 0.001;
-eta(h>dry_tol) = h(h>dry_tol)+b(h>dry_tol);
-eta(h<=dry_tol) = nan;
+eta(h <= dry_tol) = nan;
 end

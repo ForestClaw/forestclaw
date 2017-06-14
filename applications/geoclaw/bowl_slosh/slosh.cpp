@@ -163,6 +163,8 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
+
+    fc2d_geoclaw_finalize(glob);
     fclaw2d_finalize(glob);
 }
 
@@ -211,8 +213,8 @@ main (int argc, char **argv)
     /* Store option packages in glob */
     fclaw2d_options_store           (glob, fclaw_opt);
     fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
-    fc2d_geoclaw_options_store          (glob, geo_opt);
-    slosh_options_store              (glob, user_opt);
+    fc2d_geoclaw_options_store      (glob, geo_opt);
+    slosh_options_store             (glob, user_opt);
 
     /* Run the program */
     if (!retval & !vexit)
