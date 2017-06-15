@@ -12,6 +12,8 @@ module geoclaw_module
 
     implicit none
     save
+
+    logical, private :: module_setup = .false.
     
     ! ========================================================================
     !  Constants
@@ -25,7 +27,9 @@ module geoclaw_module
     ! ========================================================================
     !  Physics
     ! ========================================================================
-    real(kind=8) :: grav, earth_radius, sea_level
+    real(kind=8) :: grav, rho_air, ambient_pressure, earth_radius, sea_level
+    ! Water density can be an array to handle multiple layers
+    real(kind=8), allocatable :: rho(:)
     integer :: coordinate_system
 
     ! Rotational velocity of Earth
@@ -51,7 +55,10 @@ contains
     ! ========================================================================
     subroutine set_geo(file_name)
 
+        use utility_module, only: get_value_count
+        
         use amr_module, only: mcapa, rinfinity
+
         implicit none
 
         ! Input
@@ -60,80 +67,95 @@ contains
         ! Locals
         integer, parameter :: unit = 127
 
-        open(unit=GEO_PARM_UNIT,file='fort.geo',status="unknown",action="write")
+        integer :: i
+        character(len=128) :: line
 
-        write(GEO_PARM_UNIT,*) ' '
-        write(GEO_PARM_UNIT,*) '--------------------------------------------'
-        write(GEO_PARM_UNIT,*) 'Physics Parameters:'
-        write(GEO_PARM_UNIT,*) '-------------------'
+        if (.not.module_setup) then
+            open(unit=GEO_PARM_UNIT,file='fort.geo',status="unknown",action="write")
 
-        ! Read user parameters from setgeo.data
-        if (present(file_name)) then
-            call opendatafile(unit, file_name)
-        else
-            call opendatafile(unit, 'geoclaw.data')
-        endif
+            write(GEO_PARM_UNIT,*) ' '
+            write(GEO_PARM_UNIT,*) '--------------------------------------------'
+            write(GEO_PARM_UNIT,*) 'Physics Parameters:'
+            write(GEO_PARM_UNIT,*) '-------------------'
 
-        read(unit,*) grav
-        read(unit,*) earth_radius
-        read(unit,*) coordinate_system
-        read(unit,*) sea_level
-        read(unit,*)
-        read(unit,*) coriolis_forcing
-        if (coordinate_system == 1 .and. coriolis_forcing) then
-            read(unit,*) theta_0
-        else
-            theta_0 = 0.d0
-        endif
-        read(unit,*) friction_forcing
-        if (friction_forcing) then
-            read(unit,*) num_manning
-            allocate(manning_coefficient(num_manning))
-            allocate(manning_break(num_manning))
-            manning_break(num_manning) = rinfinity
-            read(unit,*) manning_coefficient(:)
-            read(unit,*) manning_break(1:num_manning-1)
-            read(unit,*) friction_depth
-        else
-            friction_depth = rinfinity
-        endif
-        read(unit,*)
-        read(unit,*) dry_tolerance
-        
-        close(unit)
+            ! Read user parameters from setgeo.data
+            if (present(file_name)) then
+                call opendatafile(unit, file_name)
+            else
+                call opendatafile(unit, 'geoclaw.data')
+            endif
 
-        ! coordinate_system = 1 means Cartesian grid in meters
-        ! coordinate_system = 2 means lat-long grid on sphere
-        ! Check that coordinate_system is consistent with mcapa:
-        if ((coordinate_system > 1) .and. (mcapa == 0)) then
-            print *, 'ERROR in setgeo:  if coordinate_system > 1 then'
-            print *, '      mcapa should be nonzero'
-            stop
-        endif
-        if ((coordinate_system == 1) .and. (mcapa > 0)) then
-            print *, 'ERROR in setgeo:  if coordinate_system = 1 then'
-            print *, '      mcapa should be zero'
-            stop
-        endif
+            read(unit,*) grav
+            read(unit,'(a)') line
+            allocate(rho(get_value_count(line)))
+            read(line,*) (rho(i), i=1, size(rho, 1))
+            read(unit,*) rho_air
+            read(unit,*) ambient_pressure
+            read(unit,*) earth_radius
+            read(unit,*) coordinate_system
+            read(unit,*) sea_level
+            read(unit,*)
+            read(unit,*) coriolis_forcing
+            if (coordinate_system == 1 .and. coriolis_forcing) then
+                read(unit,*) theta_0
+            else
+                theta_0 = 0.d0
+            endif
+            read(unit,*) friction_forcing
+            if (friction_forcing) then
+                read(unit,*) num_manning
+                allocate(manning_coefficient(num_manning))
+                allocate(manning_break(num_manning))
+                manning_break(num_manning) = rinfinity
+                read(unit,*) manning_coefficient(:)
+                read(unit,*) manning_break(1:num_manning-1)
+                read(unit,*) friction_depth
+            else
+                friction_depth = rinfinity
+            endif
+            read(unit,*)
+            read(unit,*) dry_tolerance
+            
+            close(unit)
 
-        write(GEO_PARM_UNIT,*) '   gravity:',grav
-        write(GEO_PARM_UNIT,*) '   earth_radius:',earth_radius
-        write(GEO_PARM_UNIT,*) '   coordinate_system:',coordinate_system
-        write(GEO_PARM_UNIT,*) '   sea_level:',sea_level
-        write(GEO_PARM_UNIT,*) ' '
-        write(GEO_PARM_UNIT,*) '   coriolis_forcing:',coriolis_forcing
-        write(GEO_PARM_UNIT,*) '   theta_0:',theta_0
-        write(GEO_PARM_UNIT,*) '   friction_forcing:',friction_forcing
-        if (friction_forcing) then
-            write(GEO_PARM_UNIT,*) '   manning_coefficient:', manning_coefficient
-            write(GEO_PARM_UNIT,*) '   friction_depth:',friction_depth
-        else
-            write(GEO_PARM_UNIT,*) '   manning_coefficient: not used'
-            write(GEO_PARM_UNIT,*) '   friction_depth: not used'
+            ! coordinate_system = 1 means Cartesian grid in meters
+            ! coordinate_system = 2 means lat-long grid on sphere
+            ! Check that coordinate_system is consistent with mcapa:
+            if ((coordinate_system > 1) .and. (mcapa == 0)) then
+                print *, 'ERROR in setgeo:  if coordinate_system > 1 then'
+                print *, '      mcapa should be nonzero'
+                stop
+            endif
+            if ((coordinate_system == 1) .and. (mcapa > 0)) then
+                print *, 'ERROR in setgeo:  if coordinate_system = 1 then'
+                print *, '      mcapa should be zero'
+                stop
+            endif
+
+            write(GEO_PARM_UNIT,*) '   gravity:',grav
+            write(GEO_PARM_UNIT,*) '   density water:',rho
+            write(GEO_PARM_UNIT,*) '   density air:',rho_air
+            write(GEO_PARM_UNIT,*) '   ambient pressure:',ambient_pressure
+            write(GEO_PARM_UNIT,*) '   earth_radius:',earth_radius
+            write(GEO_PARM_UNIT,*) '   coordinate_system:',coordinate_system
+            write(GEO_PARM_UNIT,*) '   sea_level:',sea_level
+            write(GEO_PARM_UNIT,*) ' '
+            write(GEO_PARM_UNIT,*) '   coriolis_forcing:',coriolis_forcing
+            write(GEO_PARM_UNIT,*) '   theta_0:',theta_0
+            write(GEO_PARM_UNIT,*) '   friction_forcing:',friction_forcing
+            if (friction_forcing) then
+                write(GEO_PARM_UNIT,*) '   manning_coefficient:', manning_coefficient
+                write(GEO_PARM_UNIT,*) '   friction_depth:',friction_depth
+            else
+                write(GEO_PARM_UNIT,*) '   manning_coefficient: not used'
+                write(GEO_PARM_UNIT,*) '   friction_depth: not used'
+            end if
+
+            write(GEO_PARM_UNIT,*) ' '
+            write(GEO_PARM_UNIT,*) '   dry_tolerance:',dry_tolerance
+
+            module_setup = .true.
         end if
-
-        write(GEO_PARM_UNIT,*) ' '
-        write(GEO_PARM_UNIT,*) '   dry_tolerance:',dry_tolerance
 
     end subroutine set_geo
 

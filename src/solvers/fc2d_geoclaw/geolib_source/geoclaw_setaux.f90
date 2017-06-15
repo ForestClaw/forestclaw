@@ -15,11 +15,10 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost_in,nghost,
   USE amr_module, ONLY: mcapa, xupper, yupper, xlower, ylower, NEEDS_TO_BE_SET
 
   USE geoclaw_module, ONLY: coordinate_system, earth_radius, deg2rad
-  USE geoclaw_module, ONLY: sea_level
+  USE geoclaw_module, ONLY: sea_level, ambient_pressure
 
   USE storm_module, ONLY: wind_forcing, pressure_forcing
   USE storm_module, ONLY: wind_index, pressure_index, set_storm_fields
-  USE storm_module, ONLY: ambient_pressure
 
   USE friction_module, ONLY: variable_friction, friction_index
   USE friction_module, ONLY: set_friction_field

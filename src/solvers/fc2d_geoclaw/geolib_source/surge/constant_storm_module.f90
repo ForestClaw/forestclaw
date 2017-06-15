@@ -18,11 +18,10 @@ module constant_storm_module
         real(kind=8) :: A
         real(kind=8) :: B
         real(kind=8) :: central_pressure
-        real(kind=8) :: ambient_pressure = 101.3d3
-        real(kind=8) :: rho_air = 1.3d0
 
     end type constant_storm_type
 
+    logical, private :: module_setup = .false.
     logical, private, parameter :: DEBUG = .true.
 
 contains
@@ -42,35 +41,38 @@ contains
         ! Local storage
         integer, parameter :: unit = 701
 
-        ! Storm type does not work for lat-long coordinate systems
-        if (coordinate_system == 2) then
-            stop "Constant storm type does not work on lat-long coordinates."
-        endif
+        if (.not.module_setup) then
+            
+            ! Storm type does not work for lat-long coordinate systems
+            if (coordinate_system == 2) then
+                stop "Constant storm type does not work on lat-long coordinates."
+            endif
 
-        ! Open data file
-        if (present(storm_data_path)) then
-            call opendatafile(unit,storm_data_path)
-        else
-            call opendatafile(unit,'storm.data')
-        endif
+            ! Open data file
+            if (present(storm_data_path)) then
+                call opendatafile(unit,storm_data_path)
+            else
+                call opendatafile(unit,'storm.data')
+            endif
 
-        ! Read in hurricane parameters
-        read(unit,*) storm%ramp_up_time
-        read(unit,*) storm%velocity
-        read(unit,*) storm%R_eye_init
-        read(unit,*) storm%A
-        read(unit,*) storm%B
-        read(unit,*) storm%central_pressure
+            ! Read in hurricane parameters
+            read(unit,*) storm%ramp_up_time
+            read(unit,*) storm%velocity
+            read(unit,*) storm%R_eye_init
+            read(unit,*) storm%A
+            read(unit,*) storm%B
+            read(unit,*) storm%central_pressure
 
-        ! Output to log file
-        write(log_unit,*) "Storm Data - Constant Storm"
-        write(log_unit,"('Ramp Up Time = ',d16.8)") storm%ramp_up_time
-        write(log_unit,"('Velocity = ',2d16.8)") storm%velocity
-        write(log_unit,"('Eye initial position = ',2d16.8)") storm%R_eye_init
-        write(log_unit,"('Holland parameters (A,B) =',2d16.8)") storm%A, storm%B
-        write(log_unit,"('Pressures (Pn,Pc) = ',2d16.8)") storm%ambient_pressure,&
-                                                        storm%central_pressure
-        write(log_unit,"('Density of Air = ',d16.8)") storm%rho_air
+            ! Output to log file
+            write(log_unit,*) "Storm Data - Constant Storm"
+            write(log_unit,"('Ramp Up Time = ',d16.8)") storm%ramp_up_time
+            write(log_unit,"('Velocity = ',2d16.8)") storm%velocity
+            write(log_unit,"('Eye initial position = ',2d16.8)") storm%R_eye_init
+            write(log_unit,"('Holland parameters (A,B) =',2d16.8)") storm%A, storm%B
+            write(log_unit,"('Pressures (Pc) = ',2d16.8)") storm%central_pressure
+
+            module_setup = .true.
+        end if
 
     end subroutine set_constant_storm
 
@@ -119,6 +121,7 @@ contains
                                     t,aux, wind_index, pressure_index, storm)
 
         use geoclaw_module, only: coriolis, coriolis_forcing
+        use geoclaw_module, only: rho_air, ambient_pressure
 
         implicit none
 
@@ -142,7 +145,7 @@ contains
         R_eye = constant_storm_location(t,storm)
     
         ! Parameter constant
-        C = storm%A * storm%B * (storm%ambient_pressure - storm%central_pressure) / storm%rho_air
+        C = storm%A * storm%B * (ambient_pressure - storm%central_pressure) / rho_air
         
         f = 0.d0
         do j=1-mbc,my+mbc
@@ -168,9 +171,9 @@ contains
 
                 ! Set pressure
                 if (abs(r) < 10d-3) then
-                    aux(pressure_index,i,j) = storm%ambient_pressure
+                    aux(pressure_index,i,j) = ambient_pressure
                 else
-                    aux(pressure_index,i,j) = storm%central_pressure + (storm%ambient_pressure-storm%central_pressure) &
+                    aux(pressure_index,i,j) = storm%central_pressure + (ambient_pressure-storm%central_pressure) &
                                     * exp(-1.d3**storm%B * storm%A / abs(r)**storm%B)
                 endif
             enddo
@@ -182,8 +185,8 @@ contains
                                 * exp(-(t/(storm%ramp_up_time*0.45d0))**2)
             aux(wind_index+1,:,:) = aux(wind_index+1,:,:) &
                                 * exp(-(t/(storm%ramp_up_time*0.45d0))**2)
-            aux(pressure_index,:,:) = storm%ambient_pressure &
-                        + (aux(pressure_index,:,:) - storm%ambient_pressure) &
+            aux(pressure_index,:,:) = ambient_pressure &
+                        + (aux(pressure_index,:,:) - ambient_pressure) &
                         * exp(-(t/(storm%ramp_up_time*0.45d0))**2)
         endif
         
