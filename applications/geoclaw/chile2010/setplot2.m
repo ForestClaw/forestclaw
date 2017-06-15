@@ -1,5 +1,5 @@
 OutputFlag = 'ForestClaw';   % default value.
-OutputDir = './_output';            % Default (reassign them here anyway)
+OutputDir = './';            % Default (reassign them here anyway)
 
 ForestClaw = 1;     % Plot using ForestClaw preferences.
 
@@ -11,7 +11,7 @@ PlotType = 1;    % type of plot to produce:
 
 mq = 4;                      % which component of q to plot
 UserVariable = 1;            % set to 1 to specify a user-defined variable
-UserVariableFile = 'bathy';      % name of m-file mapping data to q
+UserVariableFile = 'seasurface';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
 Manifold = 0;
 ReadBlockNumber = 1;
@@ -28,12 +28,6 @@ PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
 
 % Set to either a scalar, for automatic contours or a vector of contour levels.
 ContourValues = [];
-
-%---------------------------------
-x0 = 0;
-y0 = 0;
-ScatterStyle = setplotstyle('b.','b.','b.','b.','b.','b.','r.','k.','m.');
-UserMap1d = 0;
 
 ShowUnderOverShoots = 0;
 PlotParallelPartitions=0;
