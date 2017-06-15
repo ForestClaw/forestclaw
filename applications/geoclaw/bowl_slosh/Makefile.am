@@ -9,7 +9,6 @@ applications_geoclaw_bowl_slosh_slosh_SOURCES = \
 	applications/geoclaw/bowl_slosh/slosh_user.cpp \
 	applications/geoclaw/bowl_slosh/slosh_user.h \
 	applications/geoclaw/bowl_slosh/slosh.cpp \
-	applications/geoclaw/bowl_slosh/fclaw2d_map_nomap.c \
 	applications/geoclaw/bowl_slosh/qinit.f90
 
 

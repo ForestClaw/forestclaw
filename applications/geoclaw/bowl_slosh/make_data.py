@@ -346,11 +346,11 @@ def setgeo(rundata):
     geo_data.coriolis_forcing = False
 
     # == Algorithm and Initial Conditions ==
-    geo_data.sea_level = -10.0
+    geo_data.sea_level = -10
     geo_data.dry_tolerance = 1.e-3
     geo_data.friction_forcing = False
     geo_data.manning_coefficient = 0.0
-    geo_data.friction_depth = 1.e6
+    geo_data.friction_depth = 1e6
 
     # Refinement data
     refinement_data = rundata.refinement_data
@@ -377,7 +377,7 @@ def setgeo(rundata):
     #   [minlev, maxlev, fname]
 
     # == setfixedgrids.data values ==
-    fixedgrids = rundata.fixed_grid_data
+    # fixedgrids = rundata.fixed_grid_data
     # for fixed grids append lines of the form
     # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
     #  ioutarrivaltimes,ioutsurfacemax]

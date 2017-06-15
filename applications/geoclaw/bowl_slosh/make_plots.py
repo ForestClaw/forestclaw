@@ -55,8 +55,8 @@ def setplot(plotdata):
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
     plotitem.plot_var = geoplot.surface
     plotitem.pcolor_cmap = geoplot.tsunami_colormap
-    plotitem.pcolor_cmin = -0.1
-    plotitem.pcolor_cmax = 0.1
+    plotitem.pcolor_cmin = -0.2
+    plotitem.pcolor_cmax = 0.2
     plotitem.add_colorbar = True
     plotitem.amr_celledges_show = [0,0,0]
     plotitem.patchedges_show = 1
@@ -65,11 +65,11 @@ def setplot(plotdata):
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
     plotitem.plot_var = geoplot.land
     plotitem.pcolor_cmap = geoplot.land_colors
-    plotitem.pcolor_cmin = 0.0
-    plotitem.pcolor_cmax = 100.0
+    plotitem.pcolor_cmin = 0
+    plotitem.pcolor_cmax = 100.
     plotitem.add_colorbar = False
     plotitem.amr_celledges_show = [0,0,0]
-    plotitem.patchedges_show = 1
+    plotitem.patchedges_show = 0
     plotaxes.xlimits = [-2,2]
     plotaxes.ylimits = [-2,2]
 
@@ -83,7 +83,7 @@ def setplot(plotdata):
     plotitem.amr_contour_show = [1]
     plotitem.celledges_show = 0
     plotitem.patchedges_show = 0
-    plotitem.show = True
+    plotitem.show = False
 
     #-----------------------------------------
     # Figure for cross section
@@ -134,27 +134,6 @@ def setplot(plotdata):
     plotitem.kwargs = {'markersize':3}
     plotitem.amr_show = [1]  # plot on all levels
 
-
-    #-----------------------------------------
-    # Figure for grids alone
-    #-----------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='grids', figno=2)
-    plotfigure.show = True
-
-    # Set up for axes in this figure:
-    plotaxes = plotfigure.new_plotaxes()
-    plotaxes.xlimits = [-2,2]
-    plotaxes.ylimits = [-2,2]
-    plotaxes.title = 'grids'
-    plotaxes.scaled = True
-
-    # Set up for item on these axes:
-    plotitem = plotaxes.new_plotitem(plot_type='2d_patch')
-    plotitem.amr_patch_bgcolor = ['#ffeeee', '#eeeeff', '#eeffee']
-    plotitem.amr_celledges_show = [1,1,0]
-    plotitem.amr_patchedges_show = [1]
-
-
     #-----------------------------------------
 
     # Parameters used only when creating html and/or latex hardcopy
@@ -162,10 +141,11 @@ def setplot(plotdata):
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = [0,1,2]          # list of frames to print
+    plotdata.print_framenos = 'all'        # list of frames to print
     plotdata.print_gaugenos = []             # list of gauges to print
-    plotdata.print_fignos = [0,1]            # list of figures to print
-    plotdata.html = True                     # create html files of plots?
+    plotdata.print_fignos = [0]            # list of figures to print
+    plotdata.html = True  
+    plotdata.html_movie = 'JSAnimation'      # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
     plotdata.latex = True                    # create latex file of plots?
     plotdata.latex_figsperline = 2           # layout of plots
