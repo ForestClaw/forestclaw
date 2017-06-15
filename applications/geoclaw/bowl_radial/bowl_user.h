@@ -43,13 +43,8 @@ typedef struct user_options
 
 } user_options_t;
 
-#define BOWL_WRITE_HEADER FCLAW_F77_FUNC(bowl_write_header, BOWL_WRITE_HEADER)
-
 void bowl_link_solvers(fclaw2d_global_t *glob);
 user_options_t* bowl_get_options(fclaw2d_global_t* glob);
-
-/* Mappings */
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

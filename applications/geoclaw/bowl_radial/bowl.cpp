@@ -220,6 +220,7 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
+    
     fc2d_geoclaw_finalize(glob);
     fclaw2d_finalize(glob);
 }
@@ -257,25 +258,25 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-    domain = create_domain(mpicomm, gparms, user);
-    
-    glob = fclaw2d_global_new();
-    fclaw2d_global_store_domain(glob, domain);
-
-    fclaw2d_options_store           (glob, gparms);
-    fclaw2d_clawpatch_options_store (glob, clawpatchopt);
-    fc2d_geoclaw_options_store      (glob, geoclawopt);
-    bowl_options_store              (glob, user);
-
-    /* Run the program */
-
     if (!retval & !vexit)
     {
+        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+        domain = create_domain(mpicomm, gparms, user);
+    
+        glob = fclaw2d_global_new();
+        fclaw2d_global_store_domain(glob, domain);
+
+        fclaw2d_options_store           (glob, gparms);
+        fclaw2d_clawpatch_options_store (glob, clawpatchopt);
+        fc2d_geoclaw_options_store      (glob, geoclawopt);
+        bowl_options_store              (glob, user);
+
+        /* Run the program */
         run_program(glob);
+
+        fclaw2d_global_destroy(glob);
     }
 
-    fclaw2d_global_destroy(glob);
     fclaw_app_destroy (app);
 
     return 0;
