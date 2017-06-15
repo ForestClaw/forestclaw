@@ -36,15 +36,7 @@ extern "C"
 #endif
 #endif
 
-typedef struct user_options
-{
-    int example;
-    int is_registered;
-
-} user_options_t;
-
 void bowl_link_solvers(fclaw2d_global_t *glob);
-user_options_t* bowl_get_options(fclaw2d_global_t* glob);
 
 #ifdef __cplusplus
 #if 0
