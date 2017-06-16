@@ -51,8 +51,8 @@ include applications/amrclaw/advection/2d/swirl/Makefile.am
 if FCLAW_ENABLE_GEOCLAW
 include applications/geoclaw/bowl_radial/Makefile.am
 include applications/geoclaw/bowl_slosh/Makefile.am
-#include applications/geoclaw/flat_bathymetry/Makefile.am
-#include applications/geoclaw/chile2010/Makefile.am
+include applications/geoclaw/chile2010/Makefile.am
+include applications/geoclaw/flat_bathymetry/Makefile.am
 endif
 
 # -------------- Under construction ------------------
