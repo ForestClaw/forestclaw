@@ -18,18 +18,17 @@ c
       double precision q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
       double precision aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
 
+      double precision z, ze
+
       q = 0.d0
       do i = 1-mbc,mx+mbc
 c         # (xi, yj) is the location of the physical domain
           xi = xlower + (i-0.5d0)*dx
           do j=1-mbc,my+mbc
               yj = ylower + (j-0.5d0)*dy
-              if (-95.0 .lt. xi .and. xi .lt. -90.0) then
-                  q(1,i,j) = sea_level - aux(1,i,j) + 1
-                  q(2,i,j) = sqrt(grav*(sea_level - aux(1,i,j)))
-              else
-                  q(1,i,j) = sea_level - aux(1,i,j)              
-              endif
+              q(1,i,j) = sea_level - aux(1,i,j)
+              q(2,i,j) = 0
+              q(3,i,j) = 0
           enddo
       enddo
 

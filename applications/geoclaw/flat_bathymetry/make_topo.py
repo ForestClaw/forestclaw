@@ -37,7 +37,7 @@ def topo(x,y):
     flatbathy
     """
     # value of z at origin:  Try zmin = 80 for shoreline or 250 for no shore
-    z = ones(x.shape)*-100.e0
+    z = -100*ones(x.shape)
     return z
 
 
@@ -46,11 +46,10 @@ def qinit(x,y):
     Gaussian hump:
     """
     from numpy import where
-    ze = -((x+0e0)**2)/10.
-    z = 1.0 + 0.01*exp(ze)
-    # ze = -((x+0e0)**2 + (y+0e0)**2)/10.
-    # z = where(ze>-10., 40.e0*exp(ze), 0.)
-    return z
+    ze = -((x + 80)**2)/10.
+    z = 2*exp(ze)
+
+    return where(z > 1e-3,z,0)
 
 if __name__=='__main__':
     maketopo()

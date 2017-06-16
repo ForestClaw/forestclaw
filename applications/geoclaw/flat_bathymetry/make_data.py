@@ -343,8 +343,8 @@ def setgeo(rundata):
     # == Algorithm and Initial Conditions ==
     geo_data.sea_level = 0.0
     geo_data.dry_tolerance = 1.e-3
-    geo_data.friction_forcing = True
-    geo_data.manning_coefficient = 0.025
+    geo_data.friction_forcing = False
+    geo_data.manning_coefficient = 0.0
     geo_data.friction_depth = 20.0
 
     # Refinement data
@@ -359,7 +359,6 @@ def setgeo(rundata):
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
     topo_data.topofiles.append([2, 2, 2, 0., 1.e10, 'flatbathy.topotype2'])
-    # topo_data.topofiles.append([2, 0, 0, 0., 1.e10, 'bowl.topotype2'])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
@@ -371,13 +370,7 @@ def setgeo(rundata):
     rundata.qinit_data.qinitfiles = []
     # for qinit perturbations, append lines of the form: (<= 1 allowed for now!)
     #   [minlev, maxlev, fname]
-    rundata.qinit_data.qinitfiles.append([4, 4, 'hump.xyz'])
-
-    # == setfixedgrids.data values ==
-    fixedgrids = rundata.fixed_grid_data.fixedgrids
-    # for fixed grids append lines of the form
-    # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
-    #  ioutarrivaltimes,ioutsurfacemax]
+    rundata.qinit_data.qinitfiles.append([2, 6, 'hump.xyz'])
 
     return rundata
     # end of function setgeo
