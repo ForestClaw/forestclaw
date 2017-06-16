@@ -24,34 +24,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "flatbathy_user.h"
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
+
 #include <fc2d_geoclaw.h>
+#include <fclaw2d_clawpatch.h>
 
-
-static fclaw2d_vtable_t vt;
-static fc2d_geoclaw_vtable_t geoclaw;
-
-void flatbathy_link_solvers(fclaw2d_domain_t *domain)
+void flatbathy_link_solvers(fclaw2d_global_t *glob)
 {
-
-    /* These are set by GeoClaw for convenience, but the user
-       can set these with customized functions, if desired. */    
-    fc2d_geoclaw_init_vtables(&vt, &geoclaw);
-
-    vt.patch_initialize         = &flatbathy_patch_initialize;
-    fclaw2d_set_vtable(domain,&vt);
-    fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw);
+    fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
+    geoclaw_vt->qinit       = &QINIT;
+}
 
 #if 0
-    /* Example of a function the user can set. */
-    vt->problem_setup            = &bowl_problem_setup; /* Written by the user */
-    geoclaw_vt->setprob          = NULL;   /* Must be of correct type */
-
-    /* etc ... */
-#endif
-
-}
 void flatbathy_patch_initialize(fclaw2d_domain_t *domain,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
@@ -82,3 +65,4 @@ void flatbathy_patch_initialize(fclaw2d_domain_t *domain,
     // PREQINIT(&minlevel,&maxlevel);
     QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
 }
+#endif
