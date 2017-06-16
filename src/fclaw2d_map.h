@@ -172,6 +172,9 @@ void fclaw2d_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
                                  double xc, double yc,
                                  double *xp, double* yp, double *zp);
 
+
+fclaw2d_map_context_t* fclaw2d_map_new_nomap(void);
+
 /* ----------------------------------------------------------------------------------
    New maps (torus, cubedsphere, disk) and a utility function for calling maps
    defined in fortran.
