@@ -64,6 +64,61 @@ def setplot(plotdata):
     cmax = 0.2
     cmap = geoplot.googleearth_transparent
 
+
+    #-----------------------------------------
+    # Figure for surface
+    #-----------------------------------------
+    plotfigure = plotdata.new_plotfigure(name='Surface', figno=0)
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes('pcolor')
+    plotaxes.title = 'Surface'
+    plotaxes.scaled = True
+
+    def fixup(current_data):
+        import pylab
+        addgauges(current_data)
+        t = current_data.t
+        t = t / 3600.  # hours
+        pylab.title('Surface at %4.2f hours' % t, fontsize=20)
+        pylab.xticks(fontsize=15)
+        pylab.yticks(fontsize=15)
+    plotaxes.afteraxes = fixup
+
+    # Water
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    #plotitem.plot_var = geoplot.surface
+    plotitem.plot_var = geoplot.surface_or_depth
+    plotitem.pcolor_cmap = geoplot.tsunami_colormap
+    plotitem.pcolor_cmin = -0.2
+    plotitem.pcolor_cmax = 0.2
+    plotitem.add_colorbar = True
+    plotitem.amr_celledges_show = [0,0,0]
+    plotitem.patchedges_show = 1
+
+    # Land
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    plotitem.plot_var = geoplot.land
+    plotitem.pcolor_cmap = geoplot.land_colors
+    plotitem.pcolor_cmin = 0.0
+    plotitem.pcolor_cmax = 100.0
+    plotitem.add_colorbar = False
+    plotitem.amr_celledges_show = [0,0,0]
+    plotitem.patchedges_show = 0
+    plotaxes.xlimits = [-120,-60]
+    plotaxes.ylimits = [-60,0]
+
+    # add contour lines of bathy if desired:
+    plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
+    plotitem.show = False
+    plotitem.plot_var = geoplot.topo
+    plotitem.contour_levels = linspace(-3000,-3000,1)
+    plotitem.amr_contour_colors = ['y']  # color on each level
+    plotitem.kwargs = {'linestyles':'solid','linewidths':2}
+    plotitem.amr_contour_show = [0,0,0]
+    plotitem.celledges_show = 0
+    plotitem.patchedges_show = 0
+
     #-----------------------------------------------------------
     # Figure for KML files
     #----------------------------------------------------------
@@ -72,7 +127,7 @@ def setplot(plotdata):
 
     plotfigure.use_for_kml = True
     plotfigure.kml_use_for_initial_view = True
-    plotfigure.kml_show_figure = False
+    plotfigure.kml_show_figure = True
 
     # These override any axes limits set below in plotaxes
     plotfigure.kml_xlimits = [-120,-60]
@@ -109,7 +164,7 @@ def setplot(plotdata):
 
     plotfigure.use_for_kml = True
     plotfigure.kml_use_for_initial_view = False  # Use large plot for view
-    plotfigure.kml_show_figure = True
+    plotfigure.kml_show_figure = False
 
     # Set Google Earth bounding box and figure size
     plotfigure.kml_xlimits = [-84,-74]
@@ -197,8 +252,8 @@ def setplot(plotdata):
     plotdata.print_framenos = 'all'         # list of frames to print
     plotdata.print_gaugenos =  'all'          # list of gauges to print
     plotdata.print_fignos = 'all'           # list of figures to print
-    plotdata.html = False                     # create html files of plots?
-    plotdata.html_movie = None                     # create html files of plots?
+    plotdata.html = True                     # create html files of plots?
+    plotdata.html_movie = 'JSAnimation'                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
     plotdata.latex = False                    # create latex file of plots?
     plotdata.latex_figsperline = 2           # layout of plots

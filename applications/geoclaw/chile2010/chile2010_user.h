@@ -36,15 +36,6 @@ extern "C"
 #endif
 #endif
 
-typedef struct user_options
-{
-    int example;
-    int is_registered;
-
-} user_options_t;
-
-void chile2010_link_solvers(fclaw2d_global_t *glob);
-user_options_t* chile2010_get_options(fclaw2d_global_t* glob);
 
 #ifdef __cplusplus
 #if 0
