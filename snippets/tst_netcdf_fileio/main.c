@@ -4,12 +4,26 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <netcdf.h>
 
 /* Handle errors by printing an error message and exiting with a
  * non-zero status. */
 #define ERRCODE 2
 #define ERR(e) {printf("Error: %s\n", nc_strerror(e)); exit(ERRCODE);}
+
+#define LEN 40
+
+char* concat(const char *s1, const char *s2)
+{
+    const size_t len1 = strlen(s1);
+    const size_t len2 = strlen(s2);
+    char *result = malloc(len1+len2+1);//+1 for the zero-terminator
+    //in real code you would check for errors in malloc here
+    memcpy(result, s1, len1);
+    memcpy(result+len1, s2, len2+1);//+1 to copy the null-terminator
+    return result;
+}
 
 int main(int argc, char const *argv[])
 {
@@ -23,9 +37,13 @@ int main(int argc, char const *argv[])
     int patchidx = 1;
     int level = 0;
 	double q[] = {0.1,0.2,0.3,0.4,0.5};
+    double xlower = 0.0;
+    double xupper = 1.0;
 
 	const char filename[] = "claw0001.nc";
     const char* dim_name[1] = {"x"};
+    char dimnametemp[LEN];
+    char* temp;
 
 	int ncid, x_dimid, meqn_dimid, qid;
     int patch0id;
@@ -60,6 +78,24 @@ int main(int argc, char const *argv[])
         ERR(retval);
 
     // Dimension attribute
+    for (int i = 0; i < numdim; ++i)
+    {
+        strcpy(dimnametemp, dim_name[i]);
+        // num_cells
+        temp = concat(dimnametemp,".num_cells");
+        if ((retval = nc_put_att_int(patch0id, NC_GLOBAL, temp, NC_INT, 1, &mx)))
+            ERR(retval);
+        // lower bound of this dimension        
+        temp = concat(dimnametemp,".lower");
+        if ((retval = nc_put_att_double(patch0id, NC_GLOBAL, temp, NC_DOUBLE, 1, &xlower)))
+            ERR(retval);
+        // upper bound of this dimension
+        temp = concat(dimnametemp,".upper");
+        if ((retval = nc_put_att_double(patch0id, NC_GLOBAL, temp, NC_DOUBLE, 1, &xupper)))
+            ERR(retval);
+    }
+    if ((retval = nc_put_att_int(patch0id, NC_GLOBAL, "num_eqn", NC_INT, 1, &meqn)))
+        ERR(retval);
 
     /* Define the dimensions. NetCDF will hand back an ID for each. */
     // dim(q) = mx*my*meqn 
