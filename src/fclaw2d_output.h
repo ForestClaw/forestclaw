@@ -40,12 +40,6 @@ void fclaw2d_output_frame(struct fclaw2d_global * glob, int iframe);
 
 void fclaw2d_output_frame_tikz(struct fclaw2d_global* glob, int iframe);
 
-#if 0
-/* Needed for debugging *(uses a clawpatch) */
-void fclaw2d_output_write_vtk_debug (struct fclaw2d_global *glob, const char *basename);
-#endif
-
-
 #ifdef __cplusplus
 #if 0
 {

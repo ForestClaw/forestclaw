@@ -25,39 +25,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "no_solver_user.h"
 
-#include "fclaw2d_physical_bc.h"
-#include "fclaw2d_clawpatch.hpp"
-#include <fc2d_clawpack46.h>
-
-
-static fclaw2d_vtable_t fclaw2d_vt;
-
-/* Want to write this so clawpack isn't needed */
-static fc2d_clawpack46_vtable_t classic_claw46;
-
-
 void no_solver_linker(fclaw2d_domain_t* domain)
 {
-    fclaw2d_init_vtable(&fclaw2d_vt);
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_vtable_t* vt = fclaw2d_vt();
 
-    const user_options_t* user = no_solver_user_get_options(domain);
+    vt->patch_single_step_update      = &no_solver_update;
+    patch_vt->patch_initialize        = &no_solver_patch_initialize;
+    clawpatch_vt->fort_tag4refinement = &no_solver_tag4refinement;
+    clawpatch_vt->fort_tag4coarsening = &no_solver_tag4coarsening;
 
-    fclaw2d_init_vtable(&fclaw2d_vt);
-
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
-
-        fclaw2d_vt.patch_initialize         = &no_solver_patch_initialize;
-        fclaw2d_vt.patch_single_step_update = &no_solver_update;
-
-        fc2d_clawpack46_set_vtable(classic_claw46);
-    }
-
-    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
-void no_solver_patch_initialize(fclaw2d_domain_t *domain,
+void no_solver_patch_initialize(fclaw2d_global_t *glob,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx)
@@ -75,19 +56,15 @@ void no_solver_patch_initialize(fclaw2d_domain_t *domain,
     INITIALIZE(&mx,&my,&meqn,&mbc,&blockno,&xlower,&ylower,&dx,&dy,q);
 }
 
-double no_solver_update(fclaw2d_domain_t *domain,
+double no_solver_update(fclaw2d_global_t *glob,
                         fclaw2d_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
                         double dt)
 {
-    const fclaw_options_t *gparms;
-    gparms = fclaw2d_forestclaw_get_options(domain);
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 
-    /* This is needed to avoid a floating point errror */
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    cp->save_current_step();  // Save for time interpolation
-
-    return gparms->desired_cfl;
+    fclaw2d_clawpatch_save_step(glob,this_patch);
+    return fclaw_opt->desired_cfl;
 }

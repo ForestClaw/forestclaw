@@ -106,6 +106,10 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_string (opt, 0, "tikz-plot-suffix", &fclaw_opt->tikz_plot_suffix, "png",
                            "Figure suffix for plotting [png]");    
 
+    sc_options_add_bool (opt, 0, "tikz-plot-fig", &fclaw_opt->tikz_plot_fig,1,
+                           "Include figure (png,jpg,etc) in .tex file [1]");    
+
+
     /* This is a hack to control the VTK output while still in development.
      * The values are numbers which can be bitwise-or'd together.
      * 0 - no VTK output ever.
@@ -116,19 +120,13 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_string (opt, 0, "prefix", &fclaw_opt->prefix, "fort",
                            "Output file prefix [fort]");
 
-    sc_options_add_int (opt, 0, "vtkout_debug", &fclaw_opt->vtkout_debug, 0,
-                        "VTK debug output method [F]");
- 
     sc_options_add_double (opt, 0, "vtkspace", &fclaw_opt->vtkspace, 0.,
                            "VTK visual spacing [F]");
 
-    sc_options_add_int (opt, 0, "vtkwrite", &fclaw_opt->vtkwrite, 0,
-                        "VTK write variant [F]");
-
     /* ---------------------- Regridding options -------------------------- */
 
-    sc_options_add_bool (opt, 0, "init_ghostcell", &fclaw_opt->init_ghostcell, 1,
-                        "Initialize ghost cells [T]");
+    sc_options_add_bool (opt, 0, "init_ghostcell", &fclaw_opt->init_ghostcell, 0,
+                        "Initialize ghost cells [F]");
 
     sc_options_add_int (opt, 0, "minlevel", &fclaw_opt->minlevel, 0,
                         "Minimum refinement level [0]");
@@ -160,8 +158,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
      /* ---------------------- Diagnostics -------------------------- */
 
    sc_options_add_bool (opt, 0, "run-user-diagnostics",
-                         &fclaw_opt->run_user_diagnostics,0,
-                         "Run user diagnostics [F]");
+                        &fclaw_opt->run_user_diagnostics,0,
+                        "Run user diagnostics [F]");
 
     sc_options_add_bool (opt, 0, "compute-error",
                          &fclaw_opt->compute_error,0,
@@ -255,8 +253,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 }
 
 
-static fclaw_exit_type_t 
-fclaw_postprocess (fclaw_options_t * fclaw_opt)
+fclaw_exit_type_t 
+fclaw_options_postprocess (fclaw_options_t * fclaw_opt)
 {
     fclaw_options_convert_double_array (fclaw_opt->scale_string, &fclaw_opt->scale, 3);
     fclaw_options_convert_double_array (fclaw_opt->shift_string, &fclaw_opt->shift, 3);
@@ -267,8 +265,8 @@ fclaw_postprocess (fclaw_options_t * fclaw_opt)
   return FCLAW_NOEXIT;
 }
 
-static fclaw_exit_type_t
-fclaw_check (fclaw_options_t * fclaw_opt)
+fclaw_exit_type_t
+fclaw_options_check (fclaw_options_t * fclaw_opt)
 {
     /* Check outstyle. */
     if (fclaw_opt->outstyle == 1 && fclaw_opt->use_fixed_dt)
@@ -285,12 +283,12 @@ fclaw_check (fclaw_options_t * fclaw_opt)
         }
     }
 
+    /* TODO: move these blocks to the beginning of forestclaw's control flow */
     if (fclaw_opt->mpi_debug)
     {
         fclaw_global_infof("Entering mpi_debug session");
         fclaw_mpi_debug ();
     }
-
     if (fclaw_opt->trapfpe)
     {
         fclaw_global_infof("Enabling floating point traps\n");
@@ -301,7 +299,7 @@ fclaw_check (fclaw_options_t * fclaw_opt)
 }
 
 void
-fclaw_destroy(fclaw_options_t* fclaw_opt)
+fclaw_options_destroy(fclaw_options_t* fclaw_opt)
 {
     FCLAW_FREE (fclaw_opt->scale);
     FCLAW_FREE (fclaw_opt->shift);
@@ -339,7 +337,7 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT(fclaw_opt->is_registered);
 
     /* Convert strings to arrays */
-    return fclaw_postprocess (fclaw_opt);
+    return fclaw_options_postprocess (fclaw_opt);
 }
 
 
@@ -353,7 +351,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     fclaw_options_t *fclaw_opt = (fclaw_options_t *) package;
     FCLAW_ASSERT(fclaw_opt->is_registered);
 
-    return fclaw_check (fclaw_opt);
+    return fclaw_options_check (fclaw_opt);
 }
 
 static void
@@ -369,7 +367,7 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT (fclaw_opt->is_registered);
 
     /* Destroy option arrays created in post-process */
-    fclaw_destroy (fclaw_opt);
+    fclaw_options_destroy (fclaw_opt);
     FCLAW_FREE(fclaw_opt);
 }
 

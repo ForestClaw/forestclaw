@@ -76,7 +76,6 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_domain_t** domain = &glob->domain;
 
     int time_interp = 0;
-    char basename[BUFSIZ];
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     /* This mapping context is needed by fortran mapping functions */
@@ -140,26 +139,9 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW2D_TIMER_INIT);
     }
-    fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
-                            0.0,time_interp);
+    // fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
+    //                         0.0,time_interp);
 
-    // VTK output during amrinit
-    if (gparms->vtkout_debug & 1) {
-        // into timer
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-
-        // output
-        snprintf (basename, BUFSIZ, "%s_init_level_%02d",
-                  gparms->prefix, minlevel);
-#if 0        
-        fclaw2d_output_write_vtk_debug (glob, basename);
-#endif        
-
-        // out of timer
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
-    }
     /* ------------------------------------------------
        Done with initial setup.
        ------------------------------------------------ */
@@ -214,26 +196,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                 *domain = new_domain;
                 new_domain = NULL;
 
-                // VTK output during amrinit
-                if (gparms->vtkout_debug & 1) {
-                    // into timer
-                    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
-                    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-
-                    // output
-                    snprintf (basename, BUFSIZ, "%s_init_level_%02d_adapt",
-                              gparms->prefix, level);
-#if 0                    
-                    fclaw2d_output_write_vtk (glob, basename);
-#endif                    
-
-                    /* out of timer */
-                    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-                    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
-                }
-
-                /* Repartition domain to new processors.   Second arg is the
-                   mode for VTK output */
+                /* Repartition domain to new processors.    */
                 fclaw2d_partition_domain(glob,level,FCLAW2D_TIMER_INIT);
 
                 /* Set up ghost patches.  This probably doesn't need to be done
@@ -243,7 +206,12 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                 /* This is normally called from regrid, once the initial domain
                    has been set up */
                 fclaw2d_regrid_set_neighbor_types(glob);
-
+                // if (gparms->init_ghostcell)
+                // {
+                //     fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
+                //                         (*domain)->global_maxlevel,0.0,
+                //                         time_interp,FCLAW2D_TIMER_INIT);
+                // }
             }
             else
             {

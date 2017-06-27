@@ -42,6 +42,20 @@ typedef struct fclaw2d_global fclaw2d_global_t;
 typedef struct fclaw2d_global_iterate fclaw2d_global_iterate_t;
 
 struct fclaw2d_global
+
+#if 0
+#define FCLAW2D_NUM_CORNERS 4
+extern const int NumCorners;
+
+#define FCLAW2D_NUM_SIBLINGS 4
+extern const int NumSiblings;
+
+extern const int PatchDim;
+
+extern const int RefineDim;
+
+typedef struct fclaw2d_global
+#endif
 {
     int count_amr_advance;
     int count_ghost_exchange;
@@ -87,7 +101,7 @@ struct fclaw2d_diagnostics_accumulator;
  *                              If NULL, we allocate gparms ourselves.
  */
 
-fclaw2d_global_t* fclaw2d_global_new ();
+fclaw2d_global_t* fclaw2d_global_new (void);
 
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 

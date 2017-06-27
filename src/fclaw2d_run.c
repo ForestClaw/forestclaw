@@ -121,12 +121,12 @@ void outstyle_1(fclaw2d_global_t *glob)
 
     fclaw2d_output_frame(glob,iframe);
 
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    double final_time = gparms->tfinal;
-    int nout = gparms->nout;
-    double initial_dt = gparms->initial_dt;
-    int level_factor = pow_int(2,gparms->maxlevel - gparms->minlevel);
+    double final_time = fclaw_opt->tfinal;
+    int nout = fclaw_opt->nout;
+    double initial_dt = fclaw_opt->initial_dt;
+    int level_factor = pow_int(2,fclaw_opt->maxlevel - fclaw_opt->minlevel);
     double dt_minlevel = initial_dt;
 
 
@@ -150,7 +150,7 @@ void outstyle_1(fclaw2d_global_t *glob)
         while (t_curr < tend)
         {
             /* In case we have to reject this step */
-            if (!gparms->use_fixed_dt)
+            if (!fclaw_opt->use_fixed_dt)
             {
                 save_time_step(glob);
             }
@@ -163,7 +163,7 @@ void outstyle_1(fclaw2d_global_t *glob)
                then dt_minlevel doesn't change. */
 
             double dt_step = dt_minlevel;
-            if (gparms->advance_one_step)
+            if (fclaw_opt->advance_one_step)
             {
                 dt_step /= level_factor;
             }
@@ -172,7 +172,7 @@ void outstyle_1(fclaw2d_global_t *glob)
             int took_small_step = 0;
             int took_big_step = 0;
             double dt_step_desired = dt_step;
-            if (!gparms->use_fixed_dt)
+            if (!fclaw_opt->use_fixed_dt)
             {
                 double small_step = tend-t_curr-dt_step;
                 if (small_step  < tol)
@@ -202,22 +202,22 @@ void outstyle_1(fclaw2d_global_t *glob)
             double tc = t_curr + dt_step;
             fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                      "%8.3f; Final time = %12.4f\n",
-                                     gparms->minlevel,
+                                     fclaw_opt->minlevel,
                                      (*domain)->global_minlevel,
                                      (*domain)->global_maxlevel,
                                      n_inner+1,dt_step,
                                      maxcfl_step, tc);
 
-            if (maxcfl_step > gparms->max_cfl)
+            if (maxcfl_step > fclaw_opt->max_cfl)
             {
                 fclaw_global_essentialf("   WARNING : Maximum CFL exceeded; "    \
                                    "retaking time step\n");
-                if (!gparms->use_fixed_dt)
+                if (!fclaw_opt->use_fixed_dt)
                 {
                     restore_time_step(glob);
 
                     /* Modify dt_level0 from step used. */
-                    dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
+                    dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
 
                     /* Got back to start of loop, without incrementing
                        step counter or time level */
@@ -231,7 +231,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
 
             /* Update this step, if necessary */
-            if (!gparms->use_fixed_dt)
+            if (!fclaw_opt->use_fixed_dt)
             {
                 double step_fraction = 100.0*dt_step/dt_step_desired;
                 if (took_small_step)
@@ -250,7 +250,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
                 /* New time step, which should give a cfl close to the
                    desired cfl. */
-                double dt_new = dt_minlevel*gparms->desired_cfl/maxcfl_step;
+                double dt_new = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
                 if (!took_small_step)
                 {
                     dt_minlevel = dt_new;
@@ -265,9 +265,9 @@ void outstyle_1(fclaw2d_global_t *glob)
 
             fclaw2d_diagnostics_gather(glob, init_flag);
 
-            if (gparms->regrid_interval > 0)
+            if (fclaw_opt->regrid_interval > 0)
             {
-                if (n_inner % gparms->regrid_interval == 0)
+                if (n_inner % fclaw_opt->regrid_interval == 0)
                 {
                     fclaw_global_infof("regridding at step %d\n",n);
                     fclaw2d_regrid(glob);
@@ -303,21 +303,21 @@ void outstyle_3(fclaw2d_global_t *glob)
     fclaw2d_output_frame(glob,iframe);
 
 
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
-    double initial_dt = gparms->initial_dt;
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double initial_dt = fclaw_opt->initial_dt;
 
     double t0 = 0;
     double dt_minlevel = initial_dt;
     glob->curr_time = t0;
-    int nstep_outer = gparms->nout;
-    int nstep_inner = gparms->nstep;
-    int nregrid_interval = gparms->regrid_interval;
-    int level_factor = pow_int(2,gparms->maxlevel-gparms->minlevel);
-    if (!gparms->subcycle)
+    int nstep_outer = fclaw_opt->nout;
+    int nstep_inner = fclaw_opt->nstep;
+    int nregrid_interval = fclaw_opt->regrid_interval;
+    int level_factor = pow_int(2,fclaw_opt->maxlevel-fclaw_opt->minlevel);
+    if (!fclaw_opt->subcycle)
     {
-        if (gparms->advance_one_step)
+        if (fclaw_opt->advance_one_step)
         {
-            if (!gparms->outstyle_uses_maxlevel)
+            if (!fclaw_opt->outstyle_uses_maxlevel)
             {
                 /* Multiply nout/nstep by 2^(maxlevel-minlevel) so that
                    a given nout/nstep pair works for both subcycled
@@ -335,16 +335,16 @@ void outstyle_3(fclaw2d_global_t *glob)
     while (n < nstep_outer)
     {
         double dt_step = dt_minlevel;
-        if (!gparms->subcycle && gparms->advance_one_step)
+        if (!fclaw_opt->subcycle && fclaw_opt->advance_one_step)
         {
-            /* if domain->global_maxlevel < gparms->maxlevel, this choice
+            /* if domain->global_maxlevel < fclaw_opt->maxlevel, this choice
                of time step will take more steps than necessary on
                finest level.  */
             dt_step /= level_factor;
         }
 
         /* In case we have to reject this step */
-        if (!gparms->use_fixed_dt)
+        if (!fclaw_opt->use_fixed_dt)
         {
             save_time_step(glob);
         }
@@ -358,8 +358,8 @@ void outstyle_3(fclaw2d_global_t *glob)
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
 
         double tc = t_curr + dt_step;
-        int level2print = (gparms->advance_one_step && gparms->outstyle_uses_maxlevel) ?
-                          gparms->maxlevel : gparms->minlevel;
+        int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
+                          fclaw_opt->maxlevel : fclaw_opt->minlevel;
 
         fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                  "%8.3f; Final time = %12.4f\n",
@@ -368,14 +368,14 @@ void outstyle_3(fclaw2d_global_t *glob)
                                  (*domain)->global_maxlevel,
                                  n+1,dt_step,maxcfl_step, tc);
 
-        if (maxcfl_step > gparms->max_cfl)
+        if (maxcfl_step > fclaw_opt->max_cfl)
         {
-            if (!gparms->use_fixed_dt)
+            if (!fclaw_opt->use_fixed_dt)
             {
                 fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
                 restore_time_step(glob);
 
-                dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
+                dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
 
                 /* Got back to start of loop without incrementing step counter or
                    current time. */
@@ -392,14 +392,14 @@ void outstyle_3(fclaw2d_global_t *glob)
         glob->curr_time = t_curr;
 
         /* New time step, which should give a cfl close to the desired cfl. */
-        if (!gparms->use_fixed_dt)
+        if (!fclaw_opt->use_fixed_dt)
         {
-            dt_minlevel = dt_minlevel*gparms->desired_cfl/maxcfl_step;
+            dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
         }
 
         n++;  /* Increment outer counter */
 
-        if (gparms->regrid_interval > 0)
+        if (fclaw_opt->regrid_interval > 0)
         {
             if (n % nregrid_interval == 0)
             {
@@ -430,10 +430,10 @@ void outstyle_4(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
-    double initial_dt = gparms->initial_dt;
-    int nstep_outer = gparms->nout;
-    int nstep_inner = gparms->nstep;
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double initial_dt = fclaw_opt->initial_dt;
+    int nstep_outer = fclaw_opt->nout;
+    int nstep_inner = fclaw_opt->nstep;
     double dt_minlevel = initial_dt;
 
     double t0 = 0;
@@ -445,8 +445,8 @@ void outstyle_4(fclaw2d_global_t *glob)
         /* Get current domain data since it may change during regrid */
         fclaw2d_advance_all_levels(glob, t_curr, dt_minlevel);
 
-        int level2print = (gparms->advance_one_step && gparms->outstyle_uses_maxlevel) ?
-                          gparms->maxlevel : gparms->minlevel;
+        int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
+                          fclaw_opt->maxlevel : fclaw_opt->minlevel;
 
         fclaw_global_productionf("Level %d step %5d : dt = %12.3e; Final time = %16.6e\n",
                                  level2print,
@@ -457,9 +457,9 @@ void outstyle_4(fclaw2d_global_t *glob)
 
         glob->curr_time = t_curr;
 
-        if (gparms->regrid_interval > 0)
+        if (fclaw_opt->regrid_interval > 0)
         {
-            if (n % gparms->regrid_interval == 0)
+            if (n % fclaw_opt->regrid_interval == 0)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
 
@@ -488,9 +488,9 @@ void outstyle_4(fclaw2d_global_t *glob)
 void fclaw2d_run(fclaw2d_global_t *glob)
 {
 
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    switch (gparms->outstyle)
+    switch (fclaw_opt->outstyle)
     {
     case 0:
         outstyle_0(glob);
@@ -499,7 +499,7 @@ void fclaw2d_run(fclaw2d_global_t *glob)
         outstyle_1(glob);
         break;
     case 2:
-        fclaw_global_essentialf("Outstyle %d not implemented yet\n", gparms->outstyle);
+        fclaw_global_essentialf("Outstyle %d not implemented yet\n", fclaw_opt->outstyle);
         exit(0);
     case 3:
         outstyle_3(glob);
@@ -508,7 +508,7 @@ void fclaw2d_run(fclaw2d_global_t *glob)
         outstyle_4(glob);
         break;
     default:
-        fclaw_global_essentialf("Outstyle %d not implemented yet\n", gparms->outstyle);
+        fclaw_global_essentialf("Outstyle %d not implemented yet\n", fclaw_opt->outstyle);
         exit(0);
     }
 }

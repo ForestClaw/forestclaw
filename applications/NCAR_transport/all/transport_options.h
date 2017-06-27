@@ -54,8 +54,6 @@ user_options_t* transport_options_register (fclaw_app_t * app,
 void transport_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 
-
-
 #ifdef __cplusplus
 #if 0
 {

@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TORUS_COMMON_H
 #define TORUS_COMMON_H
 
-#include <fclaw2d_global.h>
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -55,7 +55,7 @@ user_options_t;
 
 fclaw_exit_type_t torus_options_postprocess (user_options_t * user);
 fclaw_exit_type_t torus_options_check (user_options_t * user);
-void torus_options_reset (user_options_t * user);
+void torus_options_destroy (user_options_t * user);
 
 #ifdef __cplusplus
 #if 0

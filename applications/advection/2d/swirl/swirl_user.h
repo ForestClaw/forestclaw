@@ -51,11 +51,6 @@ void swirl_link_solvers(fclaw2d_global_t *glob);
 
 void swirl_problem_setup(fclaw2d_global_t* glob);
 
-void swirl_patch_setup(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx);
-
 const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
 
 /* Mappings */

@@ -4,6 +4,7 @@
 
 libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
+    src/fclaw2d_include_all.h \
 	src/fclaw_base.h \
 	src/fclaw_timer.h \
 	src/fclaw_package.h \
@@ -113,6 +114,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/torus/mapc2m_twisted_torus.f \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/pillowsphere/pillowsphere_corner_ghost.f \
+	src/mappings/fclaw2d_map_nomap.c \
 	src/mappings/fclaw2d_map_nomap_brick.c \
 	src/fortran_source2d/fclaw2d_metric_default_fort.f \
 	src/fortran_source2d/fclaw2d_interpolate_util.f \
@@ -127,16 +129,21 @@ libforestclaw_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.c
 
-
 # this variable is used for headers that are not publicly installed
-FCLAW_CPPFLAGS = -I@top_srcdir@/src -I@top_srcdir@/src/fortran_source2d -I@top_srcdir@/src/patches/clawpatch
+FCLAW_CPPFLAGS = \
+    -I@top_srcdir@/src  \
+	-I@top_srcdir@/src/fortran_source2d  \
+	-I@top_srcdir@/src/patches/clawpatch
+
 FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)
 
 lib_LTLIBRARIES += src/libforestclaw.la
 src_libforestclaw_la_SOURCES = \
- $(libforestclaw_internal_headers) \
- $(libforestclaw_compiled_sources)
+	$(libforestclaw_internal_headers) \
+ 	$(libforestclaw_compiled_sources)
+
 # src_libforestclaw_la_CPPFLAGS = $(AM_CPPFLAGS)
+
 LDADD += @top_builddir@/src/libforestclaw.la @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
 EXTRA_src_libforestclaw_la_DEPENDENCIES = @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
 

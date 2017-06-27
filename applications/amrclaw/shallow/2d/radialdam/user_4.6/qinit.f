@@ -19,10 +19,10 @@ c
           xlow = xlower + (i-1.d0)*dx
           do 20 j=1-mbc,my+mbc
              ylow = ylower + (j-1.d0)*dy
-	     call cellave2(blockno,xlow,ylow,dx,dy,win)
-	     q(i,j,1) = hin*win + hout*(1.d0-win)
-	     q(i,j,2) = 0.d0
-	     q(i,j,3) = 0.d0
+             call cellave2(blockno,xlow,ylow,dx,dy,win)
+             q(i,j,1) = hin*win + hout*(1.d0-win)
+             q(i,j,2) = 0.d0
+             q(i,j,3) = 0.d0
   20         continue
        return
        end

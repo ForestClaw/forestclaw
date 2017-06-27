@@ -233,11 +233,12 @@ void fc2d_geoclaw_gauge_initialize(fclaw2d_global_t* glob, void** acc)
         /* We don't know how the blocks are arranged in the brick domain
            so we reverse engineer this information
         */
-        int nb,mi,mj,numblockgauge,numgaugeset;
+        int nb,mi,mj;
         double x,y;
         double z;
         double xll,yll;
         double xur,yur;
+        int number_of_gauges_set;
 
 
         double x0,y0,x1,y1;
@@ -248,8 +249,7 @@ void fc2d_geoclaw_gauge_initialize(fclaw2d_global_t* glob, void** acc)
 
         FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
 
-        numblockgauge = 0;
-        numgaugeset = 0;
+        number_of_gauges_set = 0;
         block_offsets[0] = 0;
         for (nb = 0; nb < glob->domain->num_blocks; ++nb)
         {
@@ -263,16 +263,15 @@ void fc2d_geoclaw_gauge_initialize(fclaw2d_global_t* glob, void** acc)
                 y = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
                 if (xll <= x && x <= xur && yll <= y && y <= yur)
                 {
+                    int ng = number_of_gauges_set;
                     gauges[i].blockno = nb;
-                    coordinates[2*numgaugeset] = mi*(x - xll);
-                    coordinates[2*numgaugeset+1] = mj*(y - yll);
-                    gauges[i].location_in_results = numgaugeset;
-                    numblockgauge++;
-                    numgaugeset++;
+                    coordinates[2*ng] = mi*(x - xll);
+                    coordinates[2*ng+1] = mj*(y - yll);
+                    gauges[i].location_in_results = ng;
+                    number_of_gauges_set++;
                 }
             }
-            block_offsets[nb+1] = numblockgauge;
-            numblockgauge = 0;
+            block_offsets[nb+1] = number_of_gauges_set;
         }
     }
     else
@@ -823,8 +822,6 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_global_t *glob,
 {
     int mx,my,mbc,meqn,maux,refratio,p4est_refineFactor,mbathy;
     double *qcoarse,*qfine,*auxcoarse,*auxfine;
-    // double *areacoarse,*areafine;
-    // double *xp,*yp,*zp,*xd,*yd,*zd;
     int igrid;
 
     const fclaw_options_t* gparms;
@@ -857,19 +854,10 @@ void fc2d_geoclaw_interpolate2fine(fclaw2d_global_t *glob,
         fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
         fclaw2d_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
 
-        // if (gparms->manifold)
-        // {
-        //     fclaw2d_clawpatch_metric_data(domain,fine_patch,&xp,&yp,&zp,
-        //                                   &xd,&yd,&zd,&areafine);
-        // }
         FC2D_GEOCLAW_FORT_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
                                            &maux,auxcoarse,auxfine,&mbathy,
                                            &p4est_refineFactor,&refratio,
                                            &igrid);
-        // vt.fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-        //                          areacoarse, areafine, &igrid,
-        //                          &gparms->manifold);
-
     }
 }
 

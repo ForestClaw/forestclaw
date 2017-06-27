@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FLATBATHY_USER_H
 #define FLATBATHY_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fc2d_geoclaw.h>
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,8 +36,6 @@ extern "C"
 #endif
 #endif
 
-#define FLATBATHY_WRITE_HEADER FCLAW_F77_FUNC(flatbathy_write_header, FLATBATHY_WRITE_HEADER)
-
 #define QINIT FCLAW_F77_FUNC(qinit,QINIT)
 void QINIT(const int* meqn,const int* mbc,
            const int* mx, const int* my,
@@ -46,18 +43,8 @@ void QINIT(const int* meqn,const int* mbc,
            const double* dx, const double* dy,
            double q[], const int* maux, double aux[]);
 
-// #define PREQINIT FCLAW_F77_FUNC(preqinit,PREQINIT)
-// void PREQINIT(const int* minlevel,const int* maxlevel);
+void flatbathy_link_solvers(fclaw2d_global_t *glob);
 
-void flatbathy_link_solvers(fclaw2d_domain_t *domain);
-
-void flatbathy_patch_initialize(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx);
-
-/* Mappings */
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

@@ -1,4 +1,4 @@
-/*
+ /*
 Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
@@ -56,7 +56,6 @@ fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
                                                       const double rotate[]);
 
 
-void transport_problem_setup(fclaw2d_global_t *glob);
 
 #define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
 void TRANSPORT_SETPROB(const double* kappa, const double* tfinal);

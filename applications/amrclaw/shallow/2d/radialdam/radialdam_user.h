@@ -26,11 +26,7 @@
 #ifndef RADIALDAM_USER_H
 #define RADIALDAM_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../rp/clawpack_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -77,12 +73,12 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double surfnormals[],
                            double area[]);
 
-void radialdam_problem_setup(fclaw2d_domain_t* domain);
-void radialdam_link_solvers(fclaw2d_domain_t *domain);
+void radialdam_problem_setup(fclaw2d_global_t *glob);
+void radialdam_link_solvers(fclaw2d_global_t *glob);
 
-user_options_t* radialdam_user_get_options(fclaw2d_domain_t* domain);
+user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
 
-void radialdam_patch_setup(fclaw2d_domain_t *domain,
+void radialdam_patch_setup(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
@@ -93,6 +89,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[]);
+
 
 #ifdef __cplusplus
 #if 0

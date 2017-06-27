@@ -26,11 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef RADIAL_USER_H
 #define RADIAL_USER_H
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../rp/clawpack_user.h"
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -56,16 +52,16 @@ typedef struct user_options
 
 } user_options_t;
 
-void radial_problem_setup(fclaw2d_domain_t* domain);
+void radial_problem_setup(fclaw2d_global_t* glob);
 
 #define RADIAL_SETPROB FCLAW_F77_FUNC(radial_setprob, RADIAL_SETPROB)
 void RADIAL_SETPROB(const double* rho, const double *bulk,
                     double* cc, double*zz);
 
-#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
-                                             USER5_SETAUX_MANIFOLD)
+#define RADIAL_SETAUX_MANIFOLD FCLAW_F77_FUNC(radial_setaux_manifold, \
+                                             RADIAL_SETAUX_MANIFOLD)
 
-void USER5_SETAUX_MANIFOLD(const int* mbc,
+void RADIAL_SETAUX_MANIFOLD(const int* mbc,
                            const int* mx, const int* my,
                            const double* xlower, const double* ylower,
                            const double* dx, const double* dy,
@@ -74,14 +70,14 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double edgelengths[],
                            double area[]);
 
-void radial_patch_setup(fclaw2d_domain_t *domain,
+void radial_patch_setup(fclaw2d_global_t *global,
                         fclaw2d_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx);
 
-user_options_t* radial_user_get_options(fclaw2d_domain_t* domain);
+user_options_t* radial_get_options(fclaw2d_global_t* glob);
 
-void radial_link_solvers(fclaw2d_domain_t *domain);
+void radial_link_solvers(fclaw2d_global_t *glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 

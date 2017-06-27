@@ -58,9 +58,14 @@ To compile it under Linux, execute:
 
 /* Added this ifdef to compile the file conditionally */
 /* Question: why does this file not include fp_exception_glibc_extension.h? */
+#include <fp_exception_glibc_extension.h>
 #include <fclaw_config.h>
 
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
+
+#ifdef FCLAW_HAVE_SIGNAL_H
+#include <signal.h>
+#endif
 
 #ifdef LINUX
 /* BEGIN quote
@@ -237,6 +242,8 @@ typedef union {
 #include <stdio.h>   // printf()
 #include <stdlib.h>  // abort(), exit()
 
+#if 0
+
 static const char *fe_code_name[] = {
   "FPE_NOOP",
   "FPE_FLTDIV", "FPE_FLTINV", "FPE_FLTOVF", "FPE_FLTUND",
@@ -309,7 +316,7 @@ fhdl ( int sig, siginfo_t *sip, ucontext_t *scp )
 
   abort();
 }
-
+#endif
 
 #if 0
 int main (int argc, char **argv)

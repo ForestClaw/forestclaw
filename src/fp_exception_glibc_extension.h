@@ -12,8 +12,7 @@
 #ifndef FENV_H_LINUX_REPLACEMENT
 #define FENV_H_LINUX_REPLACEMENT
 
-/* #include <fenv.h> */
-#include <signal.h>
+#include <fenv.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +54,9 @@ extern "C" {
      fpu (but not the SIMD unit, nor the ppc)
      * imprecision of interrupts from system software
      */
+#if 0
   void fhdl ( int sig, siginfo_t *sip, ucontext_t *scp ) ;
+#endif
 
 #ifdef __cplusplus
 }

@@ -48,6 +48,17 @@ typedef struct fclaw_options fclaw_options_t;
 fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
                                          const char *configfile);
 
+/* These can be called from external routines (in torthem, for example?) */
+fclaw_exit_type_t 
+fclaw_options_postprocess (fclaw_options_t * fclaw_opt);
+
+fclaw_exit_type_t
+fclaw_options_check (fclaw_options_t * fclaw_opt);
+
+void fclaw_options_destroy(fclaw_options_t* fclaw_opt);
+
+
+
 int fclaw_options_read_from_file(sc_options_t* opt);
 
 /** Add a string option and prepare using it for an integer array.
@@ -150,6 +161,8 @@ struct fclaw_options
     double bx;   /**< Only for the single block, unmapped case */
     double ay;   /**< Only for the single block, unmapped case */
     double by;   /**< Only for the single block, unmapped case */
+    double az;
+    double bz;
 
     /* Diagnostics */
     int run_user_diagnostics;
@@ -175,18 +188,13 @@ struct fclaw_options
     const char *tikz_figsize_string;
     double *tikz_figsize;  /* In inches, e.g. [8,2] */
 
+    int tikz_plot_fig;
     const char *tikz_plot_prefix;  /* For plotting */
     const char *tikz_plot_suffix;  /* For plotting */
 
     const char *prefix;         /**< This is prepended to output files */
 
-    /* VTK output control */
-    int vtkout_debug;      /**< 0 for no output, 1 for output during amrinit,
-                          2 for output when in amr_output.  Can be or'd. */
-
     double vtkspace; /**< between 0. and 1. to separate patches visually */
-    int vtkwrite;    /**< 0 for MPI_File_write_all, 1 for MPI_File_write */    
-
 
     int weighted_partition;            /**< Use weighted partition. */
 

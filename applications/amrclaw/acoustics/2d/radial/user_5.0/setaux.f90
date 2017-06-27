@@ -1,4 +1,4 @@
-SUBROUTINE user5_setaux_manifold(mbc,mx,my, &
+SUBROUTINE radial_setaux_manifold(mbc,mx,my, &
         xlower,ylower,dx,dy,maux,aux, &
         xnormals,ynormals,edgelengths,area)
   IMPLICIT NONE
@@ -32,4 +32,4 @@ SUBROUTINE user5_setaux_manifold(mbc,mx,my, &
   ENDDO
 
   RETURN
-END SUBROUTINE user5_setaux_manifold
+END SUBROUTINE radial_setaux_manifold

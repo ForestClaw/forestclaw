@@ -317,28 +317,29 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* at this point gparms is valid */
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-    domain = create_domain(mpicomm, fclaw_opt, user_opt);
-    
-    /* Create global structure which stores the domain, timers, etc */
-    glob = fclaw2d_global_new();
-    fclaw2d_global_store_domain(glob, domain);
-
-    /* Store option packages in glob */
-    fclaw2d_options_store           (glob, fclaw_opt);
-    fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
-    fc2d_clawpack46_options_store   (glob, claw46_opt);
-    fc2d_clawpack5_options_store    (glob, claw5_opt);
-    disk_options_store              (glob, user_opt);
-
-    /* Run the program */
     if (!retval & !vexit)
     {
+        /* Options have been checked and are valid */
+        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+        domain = create_domain(mpicomm, fclaw_opt, user_opt);
+    
+        /* Create global structure which stores the domain, timers, etc */
+        glob = fclaw2d_global_new();
+        fclaw2d_global_store_domain(glob, domain);
+
+        /* Store option packages in glob */
+        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fc2d_clawpack46_options_store   (glob, claw46_opt);
+        fc2d_clawpack5_options_store    (glob, claw5_opt);
+        disk_options_store              (glob, user_opt);
+
+        /* Run the program */
         run_program(glob);
+
+        fclaw2d_global_destroy(glob);
     }
     
-    fclaw2d_global_destroy(glob);
     fclaw_app_destroy (app);
 
     return 0;

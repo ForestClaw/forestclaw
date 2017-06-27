@@ -25,46 +25,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "quadrants_user.h"
 
-#include "../rp/clawpack_user.h"
+#include <fclaw2d_include_all.h>
 
-static fclaw2d_vtable_t fclaw2d_vt;
-static fc2d_clawpack46_vtable_t classic_claw46;
-static fc2d_clawpack5_vtable_t  classic_claw5;
+#include <fclaw2d_clawpatch.h>
 
-void quadrants_link_solvers(fclaw2d_domain_t *domain)
+#include <fc2d_clawpack46.h>
+#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
+
+#include <fc2d_clawpack5.h>
+#include <clawpack5_user_fort.h>
+
+#include "../rp/clawpack_user.h"   
+
+void quadrants_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t *user =  quadrants_user_get_options(domain);
+    user_options_t *user =  quadrants_get_options(glob);
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
 
-    fclaw2d_init_vtable(&fclaw2d_vt);
-    fclaw2d_vt.problem_setup = &quadrants_problem_setup;
+    fclaw_vt->problem_setup = &quadrants_problem_setup;
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
 
-        classic_claw46.qinit = &CLAWPACK46_QINIT;
-        classic_claw46.rpn2  = &CLAWPACK46_RPN2_EULER4;
-        classic_claw46.rpt2  = &CLAWPACK46_RPT2_EULER4;
-
-        fc2d_clawpack46_set_vtable(classic_claw46);
+        clawpack46_vt->qinit = &CLAWPACK46_QINIT;
+        clawpack46_vt->rpn2  = &CLAWPACK46_RPN2_EULER4;
+        clawpack46_vt->rpt2  = &CLAWPACK46_RPT2_EULER4;
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
+        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
 
-        classic_claw5.qinit = &CLAWPACK5_QINIT;
-        classic_claw5.rpn2  = &CLAWPACK5_RPN2_EULER4;  /* Signature is unchanged */
-        classic_claw5.rpt2  = &CLAWPACK5_RPT2_EULER4;
-
-        fc2d_clawpack5_set_vtable(classic_claw5);
+        clawpack5_vt->qinit = &CLAWPACK5_QINIT;
+        clawpack5_vt->rpn2  = &CLAWPACK5_RPN2_EULER4;  /* Signature is unchanged */
+        clawpack5_vt->rpt2  = &CLAWPACK5_RPT2_EULER4;
     }
 
-    fclaw2d_set_vtable(domain,&fclaw2d_vt);
 }
 
-void quadrants_problem_setup(fclaw2d_domain_t* domain)
+void quadrants_problem_setup(fclaw2d_global_t* glob)
 {
-    const user_options_t* user = quadrants_user_get_options(domain);
+    const user_options_t* user = quadrants_get_options(glob);
 
     QUADRANTS_SETPROB(&user->gamma);
 }

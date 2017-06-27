@@ -54,7 +54,7 @@ typedef void (*fclaw2d_vtk_patch_data_t) (struct fclaw2d_global * glob,
 /** Write a file in VTK format for the whole domain in parallel.
  * \param [in] vtkspace     Relative width of visual separation of patches.
  *                          Between 0. (none) and 1. (patch width becomes 0).
- * \param [in] vtkwrite     Mode of writing:
+ * \param [in] vtkwrite     Mode of writing:  (unused; uses 1 by default)
  *                          0 for MPI_File_write_all (faster),
  *                          1 for MPI_File_write (less memory usage).
  * \return          0 if successful, negative otherwise.

@@ -8,8 +8,7 @@ bin_PROGRAMS += applications/geoclaw/bowl_radial/bowl
 applications_geoclaw_bowl_radial_bowl_SOURCES = \
 	applications/geoclaw/bowl_radial/bowl_user.cpp \
 	applications/geoclaw/bowl_radial/bowl_user.h \
-	applications/geoclaw/bowl_radial/bowl.cpp \
-	applications/geoclaw/bowl_radial/fclaw2d_map_nomap.c
+	applications/geoclaw/bowl_radial/bowl.cpp
 
 
 applications_geoclaw_bowl_radial_bowl_CPPFLAGS = \

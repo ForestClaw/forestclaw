@@ -26,6 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 #include <fclaw_base.h>   /* Needed for MPI declarations */
 
+#include <fclaw2d_map_brick.h>
+#include <fclaw2d_map_query.h>
+#include <fclaw2d_map.h>
+
 #include <fclaw2d_domain.h>
 #include <fclaw2d_global.h>
 
@@ -43,6 +47,50 @@ typedef struct
     FILE *fp;
 
 } fclaw2d_tikz_info_t;
+
+static
+void convert_brick(fclaw2d_global_t *glob, 
+                   fclaw2d_patch_t *this_patch, 
+                   int blockno, 
+                   double* xlower, double* ylower)
+{
+    fclaw2d_map_context_t* cont = glob->cont;
+
+    int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+
+    double xl = this_patch->xlower;
+    double yl = this_patch->ylower;
+
+    double xlow,ylow;
+
+    if (is_brick)
+    {
+        double z;
+            /* Scale to [0,1]x[0,1], based on blockno */
+        fclaw2d_map_c2m_nomap_brick(cont,blockno,xl,yl,&xlow,&ylow,&z);
+    }
+    else
+    {
+        xlow = xl;
+        ylow = yl;
+    }
+
+#if 0
+    /* This assumes figsize is square */
+    double ax = 0;
+    double bx = fclaw_opt->mi;
+    double ay = 0;
+    double by = fclaw_opt->mj;
+    *xlower = ax + (bx - ax)*xlow;
+    *ylower = ay + (by - ay)*ylow;
+#endif    
+
+    /* Use figsize to scale tikz picture */
+    *xlower = xlow;
+    *ylower = ylow;
+
+}
+
 
 static void
 cb_tikz_output (fclaw2d_domain_t * domain,
@@ -82,8 +130,11 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     dxf = 1.0/(mi*mx*pow_int(2,lmax));
     dyf = 1.0/(mj*my*pow_int(2,lmax));
 
-    xlow_d = (this_patch->xlower-ax)/dxf;
-    ylow_d = (this_patch->ylower-ay)/dyf;
+    double xlower, ylower;
+    convert_brick(s->glob,this_patch,this_block_idx,&xlower,&ylower);
+
+    xlow_d = (xlower-ax)/dxf;
+    ylow_d = (ylower-ay)/dyf;
     xupper_d = xlow_d + mxf;
     yupper_d = ylow_d + myf;
 
@@ -145,7 +196,15 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fprintf(fp,"\\documentclass{standalone}\n");
         fprintf(fp,"\\usepackage{tikz}\n");
         fprintf(fp,"\n");
-        fprintf(fp,"\\newcommand{\\plotfig}[1]{#1}\n");
+        if (fclaw_opt->tikz_plot_fig != 0)
+        {
+            fprintf(fp,"\\newcommand{\\plotfig}[1]{#1}\n");
+        }
+        else
+        {
+            fprintf(fp,"\\newcommand{\\plotfig}[1]{}\n");            
+        }
+
         fprintf(fp,"\\newcommand{\\plotgrid}[1]{#1}\n");
         fprintf(fp,"\\newcommand{\\figname}{%s_%04d.%s}\n",fclaw_opt->tikz_plot_prefix,
                 iframe,fclaw_opt->tikz_plot_suffix);
@@ -183,3 +242,5 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fclose(fp);
     }
 }
+
+

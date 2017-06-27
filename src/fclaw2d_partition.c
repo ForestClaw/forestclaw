@@ -79,15 +79,14 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
     fclaw2d_domain_t** domain = &glob->domain;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION]);
 
-    char basename[BUFSIZ];
-
     /* will need to access the subcyle switch */
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
-    size_t data_size = fclaw2d_patch_partition_packsize(glob);
+    size_t psize = fclaw2d_patch_partition_packsize(glob);
+    size_t data_size = psize*sizeof(double);
     void ** patch_data = NULL;
 
     fclaw2d_domain_allocate_before_partition (*domain, data_size,
@@ -144,24 +143,6 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
         fclaw2d_domain_reset(glob);
         *domain = domain_partitioned;
         domain_partitioned = NULL;
-
-        /* VTK output during amrinit */
-        if (mode >= 0 && gparms->vtkout_debug & 1) {
-            // into timer
-            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
-            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-
-            // output
-            snprintf (basename, BUFSIZ, "%s_init_level_%02d_partition",
-                      gparms->prefix, mode);
-#if 0            
-            fclaw2d_output_write_vtk_debug (glob, basename);
-#endif            
-
-            // out of timer
-            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
-        }
 
         /* internal clean up */
         fclaw2d_domain_complete(*domain);

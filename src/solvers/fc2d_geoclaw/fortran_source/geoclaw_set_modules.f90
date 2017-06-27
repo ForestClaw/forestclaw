@@ -32,14 +32,12 @@ SUBROUTINE geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in, mthlim_in,
   meqn = meqn_in
   maux = maux_in
   method = method_in
-  !! mthlim = mthlim_in
   use_fwaves = .FALSE.
   xlower = ax
   xupper = bx
   ylower = ay
   yupper = by
 
-  !! Allocate memory for mthlim
   ALLOCATE(mthlim(mwaves))
   DO mw = 1,mwaves
      mthlim(mw) = mthlim_in(mw)

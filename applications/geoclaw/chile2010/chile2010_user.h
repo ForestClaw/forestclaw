@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CHILE2010_USER_H
 #define CHILE2010_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fc2d_geoclaw.h>
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,17 +36,6 @@ extern "C"
 #endif
 #endif
 
-typedef struct user_options
-{
-    int example;
-    int is_registered;
-
-} user_options_t;
-
-void chile2010_link_solvers(fclaw2d_domain_t *domain);
-
-/* Mappings */
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0
