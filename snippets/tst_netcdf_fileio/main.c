@@ -26,7 +26,6 @@ int main(int argc, char const *argv[])
 
 	const char filename[] = "claw0001.nc";
     const char* dim_name[1] = {"x"};
-    const char* greeting[2] = {"Hello\0", "world\0"};
 
 	int ncid, x_dimid, meqn_dimid, qid;
     int patch0id;
@@ -35,13 +34,13 @@ int main(int argc, char const *argv[])
 	int retval;
 
 	/* Create the file. */
-   	if ((retval = nc_create(filename, NC_CLOBBER, &ncid)))
+   	if ((retval = nc_create(filename, NC_NETCDF4, &ncid)))
     	ERR(retval);
 
     /* Create subgroup */
-    // if ((retval = nc_def_grp(ncid, "patch0", &patch0id)))
-    //     ERR(retval);
-    patch0id = ncid;
+    if ((retval = nc_def_grp(ncid, "patch0", &patch0id)))
+        ERR(retval);
+    // patch0id = ncid;
 
     /* Define the attribute */
     // General patch properties
@@ -57,10 +56,8 @@ int main(int argc, char const *argv[])
         ERR(retval);
     
     // Dimension name
-    // Following code is not yet working ...
-    // if ((retval = nc_put_att_string(patch0id, NC_GLOBAL, "dim_names", 1, (const char**) dim_name)))
-    //     printf("%d\n", retval);
-    //     ERR(retval);
+    if ((retval = nc_put_att_string(patch0id, NC_GLOBAL, "dim_names", 1, (const char**) dim_name)))
+        ERR(retval);
 
     // Dimension attribute
 
