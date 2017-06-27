@@ -1,6 +1,6 @@
 all:
-	gcc-6 -c main.c
-	gcc-6 -o main -O2 main.o -lnetcdf
+	gcc -c main.c
+	gcc -o main -O2 main.o -L/opt/local/lib -lnetcdf
 
 clean:
 	rm -f *.o
