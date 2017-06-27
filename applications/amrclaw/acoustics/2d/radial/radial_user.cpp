@@ -64,11 +64,8 @@ void radial_link_solvers(fclaw2d_global_t *glob)
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t    *clawpack5_vt = fc2d_clawpack5_vt();
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
 
         clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
-        patch_vt->setup = &radial_patch_setup;
 
         if (user->example == 0)
         {
@@ -77,6 +74,11 @@ void radial_link_solvers(fclaw2d_global_t *glob)
         }
         else if (user->example == 1)
         {
+            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
+            fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+            
+            patch_vt->setup = &radial_patch_setup;
+
             clawpack5_vt->rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
             clawpack5_vt->rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
 

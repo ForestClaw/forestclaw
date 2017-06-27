@@ -7,7 +7,6 @@ applications_amrclaw_advection_2d_swirl_swirl_SOURCES = \
 	applications/amrclaw/advection/2d/swirl/swirl_user.cpp \
 	applications/amrclaw/advection/2d/swirl/swirl_user.h \
 	applications/amrclaw/advection/2d/swirl/swirl.cpp \
-	applications/amrclaw/advection/2d/swirl/fclaw2d_map_nomap.c \
 	applications/amrclaw/advection/2d/swirl/psi.f \
 	applications/amrclaw/advection/2d/swirl/setprob.f \
 	applications/amrclaw/advection/2d/swirl/user_4.6/qinit.f \
