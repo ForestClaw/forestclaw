@@ -43,7 +43,7 @@ const int PatchDim = FCLAW_PATCH_DIM;
 const int RefineDim = FCLAW_REFINE_DIM;
 #endif
 
-fclaw2d_global_t* fclaw2d_global_new ()
+fclaw2d_global_t* fclaw2d_global_new (void)
 {
     fclaw2d_global_t *glob;
 

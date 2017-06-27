@@ -101,7 +101,7 @@ struct fclaw2d_diagnostics_accumulator;
  *                              If NULL, we allocate gparms ourselves.
  */
 
-fclaw2d_global_t* fclaw2d_global_new ();
+fclaw2d_global_t* fclaw2d_global_new (void);
 
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 
