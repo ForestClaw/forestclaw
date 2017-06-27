@@ -302,13 +302,14 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    /* at this point gparms is valid */
-    mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-    domain = create_domain(mpicomm, fclaw_opt,user_opt);
-    
     /* Run the program */
     if (!retval & !vexit)
     {
+        /* Options have been checked and are valid */
+
+        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+        domain = create_domain(mpicomm, fclaw_opt,user_opt);
+    
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();
         fclaw2d_global_store_domain(glob, domain);
