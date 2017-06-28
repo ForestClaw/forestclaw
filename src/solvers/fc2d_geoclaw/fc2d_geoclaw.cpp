@@ -34,16 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_defs.h>
+#include <fclaw2d_transform.h>
 
 /* Some mapping functions */
 #include <fclaw2d_map_brick.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>
-
-/* we use a few of these functions */
-#include <fc2d_clawpack5.h>
-
-
 
 
 /* Needed for debugging */
@@ -120,13 +116,13 @@ void fc2d_geoclaw_vtable_initialize()
     /* ClawPatch functions (mostly Fortran functions which implement details of the 
        above patch functions */
     clawpatch_vt->ghostpack_extra         = &fc2d_geoclaw_ghostpack_aux;
-    clawpatch_vt->fort_compute_error_norm = &FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM;
-    clawpatch_vt->fort_compute_patch_area = &FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA;
-    clawpatch_vt->fort_conservation_check = &FC2D_CLAWPACK5_FORT_CONSERVATION_CHECK;
-    clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK5_FORT_COPY_FACE;
-    clawpatch_vt->fort_copy_corner        = &FC2D_CLAWPACK5_FORT_COPY_CORNER;
-    clawpatch_vt->fort_ghostpack_qarea    = &FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA;
-    clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK5_FORT_TIMEINTERP;
+    clawpatch_vt->fort_compute_error_norm = &FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->fort_compute_patch_area = &FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA;
+    clawpatch_vt->fort_conservation_check = &FC2D_GEOCLAW_FORT_CONSERVATION_CHECK;
+    clawpatch_vt->fort_copy_face          = &FC2D_GEOCLAW_FORT_COPY_FACE;
+    clawpatch_vt->fort_copy_corner        = &FC2D_GEOCLAW_FORT_COPY_CORNER;
+    clawpatch_vt->fort_ghostpack_qarea    = &FC2D_GEOCLAW_FORT_GHOSTPACK_QAREA;
+    clawpatch_vt->fort_timeinterp         = &FC2D_GEOCLAW_FORT_TIMEINTERP;
 
     geoclaw_vt->setprob          = NULL;                   
     geoclaw_vt->setaux           = &GEOCLAW_SETAUX;

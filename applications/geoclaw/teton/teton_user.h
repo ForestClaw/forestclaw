@@ -23,19 +23,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "flatbathy_user.h"
+#ifndef TETON_USER_H
+#define TETON_USER_H
 
+#include <fclaw2d_forestclaw.h>
 #include <fc2d_geoclaw.h>
-#include <fclaw2d_clawpatch.h>
 
-void flatbathy_link_solvers(fclaw2d_global_t *glob)
+#ifdef __cplusplus
+extern "C"
 {
 #if 0
-    /* Uncomment this line if you want to use qinit to initialize data rather than
-       add a perturabtion using Python scripts.   */
-
-    fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
-    geoclaw_vt->qinit       = &QINIT;     /* Set qinit_type=0 */
-#endif    
 }
+#endif
+#endif
 
+typedef struct user_options
+{
+    int example;
+    int is_registered;
+
+} user_options_t;
+
+void teton_link_solvers(fclaw2d_domain_t *domain);
+
+#define TETON_QINIT   FCLAW_F77_FUNC(teton_qinit,TETON_QINIT)
+void TETON_QINIT(const int* meqn,const int* mbc,
+                 const int* mx, const int* my,
+                 const double* xlower, const double* ylower,
+                 const double* dx, const double* dy,
+                 double q[], const int* maux, double aux[]);
+
+
+/* Mappings */
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
+
+#endif

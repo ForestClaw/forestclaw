@@ -482,9 +482,9 @@ void fclaw2d_clawpatch_define(fclaw2d_global_t* glob,
     cp->dx = (cp->xupper - cp->xlower)/cp->mx;
     cp->dy = (cp->yupper - cp->ylower)/cp->my;
 
-    int ll[SpaceDim];
-    int ur[SpaceDim];
-    for (int idir = 0; idir < SpaceDim; idir++)
+    int ll[2];
+    int ur[2];
+    for (int idir = 0; idir < 2; idir++)
     {
         ll[idir] = 1-cp->mbc;
     }
@@ -1053,9 +1053,9 @@ static void setup_area_storage(fclaw2d_clawpatch_t* cp)
     int my = cp->my;
     int mbc = cp->mbc;
 
-    int ll[SpaceDim];
-    int ur[SpaceDim];
-    for (int idir = 0; idir < SpaceDim; idir++)
+    int ll[2];
+    int ur[2];
+    for (int idir = 0; idir < 2; idir++)
     {
         ll[idir] = -mbc;
     }
@@ -1085,9 +1085,9 @@ static void setup_metric_storage(fclaw2d_clawpatch_t* cp)
     int my = cp->my;
     int mbc = cp->mbc;
 
-    int ll[SpaceDim];
-    int ur[SpaceDim];
-    for (int idir = 0; idir < SpaceDim; idir++)
+    int ll[2];
+    int ur[2];
+    for (int idir = 0; idir < 2; idir++)
     {
         ll[idir] = -cp->mbc;
     }
@@ -1104,7 +1104,7 @@ static void setup_metric_storage(fclaw2d_clawpatch_t* cp)
     cp->curvature.define(box_p,1);
 
     /* Node centered values */
-    for (int idir = 0; idir < SpaceDim; idir++)
+    for (int idir = 0; idir < 2; idir++)
     {
         ll[idir] = -mbc;
     }

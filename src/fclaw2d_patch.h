@@ -536,14 +536,11 @@ struct fclaw2d_patch_vtable
     /* Ghost packing functions (for parallel use) */
     fclaw2d_patch_ghost_pack_t         ghost_pack;
     fclaw2d_patch_ghost_unpack_t       ghost_unpack;
-    fclaw2d_patch_build_ghost_t        build_ghost;
     fclaw2d_patch_ghost_packsize_t     ghost_packsize;
+    fclaw2d_patch_build_ghost_t        build_ghost;
     fclaw2d_patch_local_ghost_alloc_t  local_ghost_alloc;
     fclaw2d_patch_local_ghost_free_t   local_ghost_free;
-    
-#if 0    
     fclaw2d_patch_delete_ghost_t       delete_ghost;  /* Delete remote ghosts */
-#endif    
 
     /* partitioning */
     fclaw2d_patch_partition_pack_t       partition_pack;

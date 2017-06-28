@@ -27,7 +27,6 @@
 #define FC2D_CLAWPACK5_H
 
 #include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
-#include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,6 +36,7 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_transform_data;
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
@@ -242,7 +242,7 @@ void FC2D_CLAWPACK5_FORT_AVERAGE2COARSE(const int* mx, const int* my,
 
 void FC2D_CLAWPACK5_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, const int* meqn,
                                    double qthis[],double qneighbor[], const int* a_idir,
-                                   fclaw2d_transform_data_t** transform_cptr);
+                                   struct fclaw2d_transform_data** transform_cptr);
 
 
 #define FC2D_CLAWPACK5_FORT_AVERAGE_FACE FCLAW_F77_FUNC(fc2d_clawpack5_fort_average_face, \
@@ -254,7 +254,8 @@ void FC2D_CLAWPACK5_FORT_AVERAGE_FACE(const int* mx, const int* my, const int* m
                                       const int* idir, const int* iside,
                                       const int* num_neighbors,
                                       const int* refratio, const int* igrid,
-                                      const int* manifold, fclaw2d_transform_data_t** transform_cptr);
+                                      const int* manifold, 
+                                      struct fclaw2d_transform_data** transform_cptr);
 
 #define FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE FCLAW_F77_FUNC(fc2d_clawpack5_fort_interpolate_face, \
                                                             FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE)
@@ -264,13 +265,14 @@ void FC2D_CLAWPACK5_FORT_INTERPOLATE_FACE(const int* mx, const int* my, const in
                                           const int* idir, const int* iside,
                                           const int* num_neighbors,
                                           const int* refratio, const int* igrid,
-                                          fclaw2d_transform_data_t** transform_cptr);
+                                          struct fclaw2d_transform_data** transform_cptr);
 
 #define FC2D_CLAWPACK5_FORT_COPY_CORNER FCLAW_F77_FUNC(fc2d_clawpack5_fort_copy_corner, \
                                                        FC2D_CLAWPACK5_FORT_COPY_CORNER)
 void FC2D_CLAWPACK5_FORT_COPY_CORNER(const int* mx, const int* my, const int* mbc,
                                      const int* meqn, double this_q[],double neighbor_q[],
-                                     const int* a_corner,fclaw2d_transform_data_t** transform_cptr);
+                                     const int* a_corner,
+                                     struct fclaw2d_transform_data** transform_cptr);
 
 #define FC2D_CLAWPACK5_FORT_AVERAGE_CORNER FCLAW_F77_FUNC(fc2d_clawpack5_fort_average_corner, \
                                                           FC2D_CLAWPACK5_FORT_AVERAGE_CORNER)
@@ -279,14 +281,15 @@ void FC2D_CLAWPACK5_FORT_AVERAGE_CORNER(const int* mx, const int* my, const int*
                                         double qcoarse[], double qfine[],
                                         double areacoarse[], double areafine[],
                                         const int* manifold,
-                                        const int* a_corner, fclaw2d_transform_data_t** transform_cptr);
+                                        const int* a_corner, 
+                                        struct fclaw2d_transform_data** transform_cptr);
 
 #define FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER FCLAW_F77_FUNC(fc2d_clawpack5_fort_interpolate_corner, \
                                                              FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER)
 void FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const int* mbc,
                                             const int* meqn, const int* a_refratio, double this_q[],
                                             double neighbor_q[], const int* a_corner,
-                                            fclaw2d_transform_data_t** transform_cptr);
+                                            struct fclaw2d_transform_data** transform_cptr);
 
 /* ---------------------------------------------------------------------------
   Output functions

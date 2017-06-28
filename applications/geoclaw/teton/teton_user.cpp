@@ -23,19 +23,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "flatbathy_user.h"
-
+#include "teton_user.h"
 #include <fc2d_geoclaw.h>
-#include <fclaw2d_clawpatch.h>
 
-void flatbathy_link_solvers(fclaw2d_global_t *glob)
+
+static fclaw2d_vtable_t vt;
+static fc2d_geoclaw_vtable_t geoclaw_vt;
+
+void teton_link_solvers(fclaw2d_domain_t *domain)
 {
-#if 0
-    /* Uncomment this line if you want to use qinit to initialize data rather than
-       add a perturabtion using Python scripts.   */
 
-    fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
-    geoclaw_vt->qinit       = &QINIT;     /* Set qinit_type=0 */
-#endif    
+    /* These are set by GeoClaw for convenience, but the user
+       can set these with customized functions, if desired. */
+    fc2d_geoclaw_init_vtables(&vt, &geoclaw_vt);
+
+    geoclaw_vt.qinit = &TETON_QINIT;
+
+    fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw_vt);
+
 }
-
