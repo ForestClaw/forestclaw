@@ -54,11 +54,6 @@ void QINIT(const int* meqn,const int* mbc,
 
 void slosh_link_solvers(fclaw2d_global_t *glob);
 
-void slosh_patch_initialize(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
-							int this_block_idx,
-                            int this_patch_idx);
-
 user_options_t* slosh_get_options(fclaw2d_global_t* glob);
 
 

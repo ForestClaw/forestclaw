@@ -51,8 +51,8 @@ include applications/amrclaw/advection/2d/swirl/Makefile.am
 if FCLAW_ENABLE_GEOCLAW
 include applications/geoclaw/bowl_radial/Makefile.am
 include applications/geoclaw/bowl_slosh/Makefile.am
-#include applications/geoclaw/flat_bathymetry/Makefile.am
-#include applications/geoclaw/chile2010/Makefile.am
+include applications/geoclaw/chile2010/Makefile.am
+include applications/geoclaw/flat_bathymetry/Makefile.am
 endif
 
 # -------------- Under construction ------------------
@@ -72,7 +72,7 @@ endif
 # include applications/shallow/2d/sphere/Makefile.am
 
 # Still need to figure out what this version does */
-# include applications/advection/2d/torthem/Makefile.am
+include applications/advection/2d/torthem/Makefile.am
 
 # Simple examples to test options handling, etc, but no solvers.
 #include applications/dummy/Makefile.am

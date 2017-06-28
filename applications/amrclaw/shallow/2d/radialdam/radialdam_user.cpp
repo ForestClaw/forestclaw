@@ -53,11 +53,8 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t    *clawpack5_vt = fc2d_clawpack5_vt();
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
 
         clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
-        patch_vt->setup = &radialdam_patch_setup;
 
         if (user->example == 0)
         {
@@ -66,6 +63,11 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
         }
         else if (user->example == 1)
         {
+            fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+            fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
+
+            patch_vt->setup = &radialdam_patch_setup;
+
             clawpack5_vt->rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
             clawpack5_vt->rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
 
@@ -76,51 +78,6 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
     }
 }
 
-
-
-#if 0
-void radialdam_link_solvers(fclaw2d_domain_t *domain)
-{
-    const user_options_t* user = radialdam_user_get_options(domain);
-
-    fclaw2d_init_vtable(&fclaw2d_vt);
-    fclaw2d_vt.problem_setup = &radialdam_problem_setup;
-
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt, &classic_claw46);
-
-        classic_claw46.qinit = &CLAWPACK46_QINIT;
-        classic_claw46.rpn2  = &CLAWPACK46_RPN2;
-        classic_claw46.rpt2  = &CLAWPACK46_RPT2;
-
-        fc2d_clawpack46_set_vtable(classic_claw46);
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_set_vtable_defaults(&fclaw2d_vt, &classic_claw5);
-
-        classic_claw5.qinit = &CLAWPACK5_QINIT;
-        if (user->example == 0)
-        {
-            classic_claw5.rpn2  = &CLAWPACK5_RPN2;
-            classic_claw5.rpt2  = &CLAWPACK5_RPT2;
-        }
-        else if (user->example == 1)
-        {
-            fclaw2d_vt.patch_setup = &radialdam_patch_setup;
-            classic_claw5.rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
-            classic_claw5.rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
-
-            /* This is a work-around for the corner tagging bug ... */
-            fclaw2d_vt.fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-            fclaw2d_vt.fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
-        }
-        fc2d_clawpack5_set_vtable(classic_claw5);
-    }
-    fclaw2d_set_vtable(domain,&fclaw2d_vt);
-}
-#endif
 
 void radialdam_problem_setup(fclaw2d_global_t* glob)
 {

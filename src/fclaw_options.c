@@ -283,12 +283,12 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
         }
     }
 
+    /* TODO: move these blocks to the beginning of forestclaw's control flow */
     if (fclaw_opt->mpi_debug)
     {
         fclaw_global_infof("Entering mpi_debug session");
         fclaw_mpi_debug ();
     }
-
     if (fclaw_opt->trapfpe)
     {
         fclaw_global_infof("Enabling floating point traps\n");

@@ -32,25 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void slosh_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
-    patch_vt->initialize       = &slosh_patch_initialize;
-}
-
-void slosh_patch_initialize(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx)
-{
-    int mx,my,mbc,meqn, maux;
-    double xlower,ylower,dx,dy;
-    double *q, *aux;
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-
-    fc2d_geoclaw_aux_data(glob,this_patch,&aux,&maux);
-
-    QINIT(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,&maux,aux);
+    fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
+    geoclaw_vt->qinit       = &QINIT;
 }
