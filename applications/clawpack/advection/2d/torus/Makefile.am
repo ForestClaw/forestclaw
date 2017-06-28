@@ -8,6 +8,7 @@ applications_clawpack_advection_2d_torus_torus_SOURCES = \
 	applications/clawpack/advection/2d/torus/setprob.f \
 	applications/clawpack/advection/2d/torus/psi.f \
 	applications/clawpack/advection/2d/torus/fdisc.f \
+	applications/clawpack/advection/2d/torus/qexact.f \
 	applications/clawpack/advection/2d/torus/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/torus/user_4.6/setaux_manifold.f \
 	applications/clawpack/advection/2d/torus/user_4.6/tag4refinement.f \
