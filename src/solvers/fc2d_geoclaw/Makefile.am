@@ -55,10 +55,10 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4refinement_fort.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4coarsening_fort.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_ghostpackaux.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack_qarea.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_timeinterp.f
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_copy.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_ghostpack_qarea.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_diagnostics.f \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_timeinterp.f
 
 lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la
 
@@ -67,7 +67,7 @@ src_solvers_fc2d_geoclaw_libgeoclaw_la_SOURCES = \
   $(libgeoclaw_compiled_sources)
 
 src_solvers_fc2d_geoclaw_libgeoclaw_la_CPPFLAGS = \
-  $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+  $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
 
 FCLAW_GEOCLAW_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_geoclaw
 FCLAW_GEOCLAW_LDADD = @top_builddir@/src/solvers/fc2d_geoclaw/libgeoclaw.la

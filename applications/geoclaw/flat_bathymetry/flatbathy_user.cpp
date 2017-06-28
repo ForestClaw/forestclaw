@@ -30,10 +30,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void flatbathy_link_solvers(fclaw2d_global_t *glob)
 {
-    fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
-
+#if 0
     /* Uncomment this line if you want to use qinit to initialize data rather than
        add a perturabtion using Python scripts.   */
-    // geoclaw_vt->qinit       = &QINIT;     /* Set qinit_type=0 */
+
+    fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
+    geoclaw_vt->qinit       = &QINIT;     /* Set qinit_type=0 */
+#endif    
 }
 
