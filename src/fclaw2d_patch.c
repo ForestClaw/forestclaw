@@ -432,7 +432,6 @@ void fclaw2d_patch_free_local_ghost(fclaw2d_global_t* glob,
     patch_vt->local_ghost_free(glob, q);
 }
 
-#if 0
 void fclaw2d_patch_delete_remote_ghost(fclaw2d_global_t *glob,
                                        fclaw2d_patch_t *this_patch)
 {
@@ -452,7 +451,6 @@ void fclaw2d_patch_delete_remote_ghost(fclaw2d_global_t *glob,
         this_patch->user = NULL;
     }
 }
-#endif
 
 
 
