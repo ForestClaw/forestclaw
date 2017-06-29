@@ -1,5 +1,6 @@
       subroutine rpn2cons_cc(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
      &			              auxl,auxr,wave,s,amdq,apdq)
+
       implicit none
 
       integer maxm, mbc,mwaves,meqn,maux, mx
@@ -26,6 +27,7 @@
 
       common/comxyt/dtcom,dxcom,dycom,tcom,icom,jcom
 
+<<<<<<< HEAD
 C       vflag = get_vflag()
 C       if (vflag .ne. 3) then
 C          write(6,*) 'rpn3cons_cc : You must supply cell ',
@@ -33,6 +35,15 @@ C      &         'centered velocities for this Riemann ',
 C      &         'solver;  set vflag = 3; vflag = ', vflag
 C          stop
 C       endif
+=======
+      vflag = get_vflag()
+      if (vflag .ne. 3) then
+         write(6,*) 'rpn3cons_cc : You must supply cell ',
+     &         'centered velocities for this Riemann ',
+     &         'solver;  set vflag = 3; vflag = ', vflag
+         stop
+      endif
+>>>>>>> develop
 
 
       iface = ixy

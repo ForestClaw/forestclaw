@@ -269,10 +269,8 @@ void fclaw2d_patch_free_local_ghost(struct fclaw2d_global* glob,
                                     void **q);
 
 
-#if 0
-void fclaw2d_patch_delete_remote_ghost(fclaw2d_global_t *glob,
-                                       fclaw2d_patch_t *ghost_patch);
-#endif
+void fclaw2d_patch_delete_remote_ghost(struct fclaw2d_global *glob,
+                                       struct fclaw2d_patch *ghost_patch);
 
 
 /* ----------------------------partitioning --------------------------- */
@@ -509,7 +507,6 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_new_t                patch_new;
     fclaw2d_patch_delete_t             patch_delete;
     fclaw2d_patch_setup_t              setup;
-    fclaw2d_patch_setup_ghost_t        setup_ghost;
     fclaw2d_patch_build_t              build;
     fclaw2d_patch_build_from_fine_t    build_from_fine;
 
@@ -540,6 +537,7 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_build_ghost_t        build_ghost;
     fclaw2d_patch_local_ghost_alloc_t  local_ghost_alloc;
     fclaw2d_patch_local_ghost_free_t   local_ghost_free;
+    fclaw2d_patch_setup_ghost_t        setup_ghost;   /* Remote ghost patches */
     fclaw2d_patch_delete_ghost_t       delete_ghost;  /* Delete remote ghosts */
 
     /* partitioning */

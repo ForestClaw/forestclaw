@@ -1,6 +1,7 @@
       subroutine rpt2cons_cc(ixy,maxm,meqn,mwaves,mbc,mx,
      &                       ql,qr,aux1,aux2,aux3,imp,asdq,
      &                       bmasdq,bpasdq)
+      
       implicit none
 
       integer ixy, icoor, maxm, meqn,mwaves,mbc,mx,maux,imp

@@ -1,8 +1,5 @@
 ## Makefile.am in applications/clawpack/acoustics_2d_radial
 
-# A single hash comment like this one WILL show up in the Makefile.
-## A double hash comment like this one will NOT be copied to the Makefile.
-
 bin_PROGRAMS += applications/clawpack/acoustics/2d/radial/radial
 
 applications_clawpack_acoustics_2d_radial_radial_SOURCES = \
