@@ -1,7 +1,7 @@
 ! ==============================================================================
 !  Variable friction module
 !
-!    This module contains storage and routines for dealing with variable 
+!    This module contains storage and routines for dealing with variable
 !    friction fields in GeoClaw.
 !
 !    If variable_friction > 0 then the data located here will override the basic
@@ -12,15 +12,13 @@
 !      region based
 !      depth based
 !      constant value from geoclaw_module
-!    
+!
 ! ==============================================================================
 
 module friction_module
 
     implicit none
     save
-
-    logical, private :: module_setup = .false.
 
     ! Parameters
     integer, public, parameter :: friction_index = 4
@@ -73,60 +71,55 @@ contains
         integer :: m, file_type
         character(len=128) :: line
 
-        if (.not.module_setup) then
+        ! Open data file
+        if (present(path)) then
+            call opendatafile(unit,path)
+        else
+            call opendatafile(unit,'friction.data')
+        endif
 
-            ! Open data file
-            if (present(path)) then
-                call opendatafile(unit,path)
-            else
-                call opendatafile(unit,'friction.data')
-            endif
+        ! Basic switch to turn on variable friction
+        read(unit,*) variable_friction
+        read(unit,'(a)')
 
-            ! Basic switch to turn on variable friction
-            read(unit,*) variable_friction
-            read(unit,'(a)')
-
-            if (variable_friction) then
-                ! Region based friction
-                read(unit,'(i2)') num_friction_regions
-                allocate(friction_regions(num_friction_regions))
+        if (variable_friction) then
+            ! Region based friction
+            read(unit,'(i2)') num_friction_regions
+            allocate(friction_regions(num_friction_regions))
+            read(unit,*)
+            do m=1,num_friction_regions
+                read(unit,*) friction_regions(m)%lower
+                read(unit,*) friction_regions(m)%upper
+                read(unit,'(a)') line
+                allocate(friction_regions(m)%depths(get_value_count(line)))
+                read(line,*) friction_regions(m)%depths
+                read(unit,'(a)') line
+                allocate(friction_regions(m)%manning_coefficients(get_value_count(line)))
+                read(line,*) friction_regions(m)%manning_coefficients
                 read(unit,*)
-                do m=1,num_friction_regions
-                    read(unit,*) friction_regions(m)%lower
-                    read(unit,*) friction_regions(m)%upper
-                    read(unit,'(a)') line
-                    allocate(friction_regions(m)%depths(get_value_count(line)))
-                    read(line,*) friction_regions(m)%depths
-                    read(unit,'(a)') line
-                    allocate(friction_regions(m)%manning_coefficients(get_value_count(line)))
-                    read(line,*) friction_regions(m)%manning_coefficients
-                    read(unit,*)
-                enddo
+            enddo
 
-                ! File based friction
-                read(unit,"(i2)") num_friction_files
-                allocate(friction_files(num_friction_files))
-                do m=1,num_friction_files
-                    read(unit,"(a,i1)") line, file_type
+            ! File based friction
+            read(unit,"(i2)") num_friction_files
+            allocate(friction_files(num_friction_files))
+            do m=1,num_friction_files
+                read(unit,"(a,i1)") line, file_type
 
-                    ! Open and read in friction file
-                    print *,"*** WARNING *** File based friction specification unimplemented."
-                    friction_files = read_friction_file(line, file_type)
-                enddo
-            endif
+                ! Open and read in friction file
+                print *,"*** WARNING *** File based friction specification unimplemented."
+                friction_files = read_friction_file(line, file_type)
+            enddo
+        endif
 
-            close(unit)
-
-            module_setup = .true.
-        end if
+        close(unit)
 
     end subroutine setup_variable_friction
 
     ! ==========================================================================
-    !  set_friction_field - 
+    !  set_friction_field -
     ! ==========================================================================
     subroutine set_friction_field(mx, my, num_ghost, num_aux, xlower, ylower, &
-                                  dx, dy, aux)
+                                  dx, dy, aux, is_ghost, nghost, mint)
 
         use geoclaw_module, only: sea_level
 
@@ -142,12 +135,18 @@ contains
         ! Locals
         integer :: m,i,j,k
         real(kind=8) :: x, y
+        LOGICAL*1, INTENT(in) :: is_ghost
+        INTEGER, INTENT(in) :: nghost, mint
+
 
         if (variable_friction) then
             ! Set region based coefficients
             do m=1, num_friction_regions
                 do i=1 - num_ghost, mx + num_ghost
-                    do j=1 - num_ghost, my + num_ghost                        
+                    do j=1 - num_ghost, my + num_ghost
+                        if (is_ghost .and. ghost_invalid(i,j,mx,my,nghost,mint)) then
+                            cycle
+                        endif
                         x = xlower + (i-0.5d0) * dx
                         y = ylower + (j-0.5d0) * dy
                         if (friction_regions(m)%lower(1) < x .and.   &
@@ -177,13 +176,27 @@ contains
 
     end subroutine set_friction_field
 
+    logical function ghost_invalid(i,j,mx,my,nghost,mint)
+        implicit none
+        integer, intent(in) :: i,j,nghost,mint,mx,my
+        logical :: inner, outer
+
+        inner = (i .gt. mint .and. i .lt. mx-mint+1) .and. &
+                (j .gt. mint .and. j .lt. my-mint+1)
+
+        outer = (i .lt. 1-nghost) .or. (i .gt. mx+nghost) .or. &
+                (j .lt. 1-nghost) .or. (j .gt. my+nghost)
+
+        ghost_invalid = (inner .or. outer)
+    end function ghost_invalid
+
 
     ! ==========================================================================
     !  read_friction_file - Reads an input file containing info on friction
     !    coefficients.
     ! ==========================================================================
     type(friction_file_type) function read_friction_file(path, file_type) result(file)
-        
+
         implicit none
 
         ! Path to file to be read in
@@ -194,11 +207,11 @@ contains
         integer, parameter :: unit = 24
 !         real(kind=8), parameter :: missing_value = huge(1.d0)
         integer :: ios, missing
-        
+
         ! Open file for reading
         open(unit=unit, file=path, iostat=ios, status="unknown",   &
                 action="read", form='formatted')
-        if ( ios /= 0 ) then 
+        if ( ios /= 0 ) then
             print *,"*** Error *** Could not open friction file ",path
             stop
         endif
@@ -209,7 +222,7 @@ contains
             ! Assumes a uniform rectangular grid of data values.
             case(1)
                 stop "Unimplemented file type for friction files."
-            
+
             ! ================================================================
             ! ASCII file with header followed by z data
             ! (progressing from upper left corner across rows, then down)
@@ -257,11 +270,11 @@ contains
 !                             enddo
 !                         enddo
                 end select
-            
+
             case default
                 stop "Unimplemented file type for friction files."
         end select
-        
+
     end function read_friction_file
 
 end module friction_module
