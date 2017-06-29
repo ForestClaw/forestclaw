@@ -43,7 +43,6 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
     const user_options_t* user = swirlcons_get_options(glob);
-    printf("claw_version = %d\n", user->claw_version);
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
