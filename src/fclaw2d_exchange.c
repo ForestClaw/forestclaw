@@ -111,11 +111,12 @@ void delete_remote_ghost_patches(fclaw2d_global_t* glob)
     for(i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
-#if 0 
+        
         /* From merge with clawpatch3 */
         fclaw2d_patch_delete_remote_ghost(glob,ghost_patch);
-#endif        
+#if 0        
         fclaw2d_patch_data_delete(glob,ghost_patch);
+#endif        
     }
 }
 
