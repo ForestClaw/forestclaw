@@ -23,13 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch.hpp>
+
+
 #include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_options.h>
+#include <fclaw2d_transform.h>
 
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_clawpatch_output_ascii.h>

@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_global.h>

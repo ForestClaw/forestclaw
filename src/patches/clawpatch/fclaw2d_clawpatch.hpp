@@ -26,15 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_HPP
 #define FCLAW2D_CLAWPATCH_HPP
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_global.h>
-#include <fclaw_options.h>
-#include <fclaw_package.h>
-#include <fclaw2d_transform.h>
-
-#include <fclaw2d_patch.h>
 #include <fclaw2d_farraybox.hpp>
 
+struct fclaw2d_patch;
+struct fclaw2d_transform_data;
 
 class fclaw2d_clawpatch_t
 {
@@ -116,6 +111,6 @@ public :
     FArrayBox curvature;  // ???
 };
 
-fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(fclaw2d_patch_t* this_patch);
+fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(struct fclaw2d_patch* this_patch);
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */
