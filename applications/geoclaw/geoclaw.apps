@@ -11,6 +11,6 @@ include applications/geoclaw/flat_bathymetry/Makefile.am
 
 if FCLAW_ENABLE_DEVELOPMENT
 
-include applications/geoclaw/teton/Makefile.am
+#include applications/geoclaw/teton/Makefile.am
 
 endif
