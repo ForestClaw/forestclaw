@@ -223,7 +223,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->argv = argv;
     a->user = user;
     a->opt = sc_options_new ((*argv)[0]);
-    sc_options_set_spacing (a->opt, 26, 42);
+    sc_options_set_spacing (a->opt, 40, 56);
 
     a->opt_pkg = sc_array_new (sizeof (fclaw_app_options_t));
 

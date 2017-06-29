@@ -30,33 +30,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 
+/*******************************************************************
+ *
+ * Some purposes of this application:
+ * - feed forestclaw without using the app object
+ * - run a forestclaw model as a subroutine from another program
+ * - run multiple forestclaw models/subroutines in the same program
+ *
+ * There are multiple ways to fill options without using an app:
+ * - assign values by hand and call postprocess
+ * - tie to an sc_options object and read ini file
+ *
+ *******************************************************************/
+
+
 typedef struct torthem
 {
     fclaw2d_global_t *global;
 
+#if 0
     fc2d_clawpack46_options_t claw_opt;
     fclaw2d_clawpatch_options_t clawpatch_opt;
-    fclaw_options_t fclaw_opt;
     user_options_t user;
+#endif
+
+    fclaw_options_t fclaw_opt;
 }
 torthem_t;
 
 static void
 torthem_init (torthem_t * torthem)
 {
-    fclaw_options_t *fclaw_opt;
+#if 0
     fclaw2d_clawpatch_options_t *clawpatch_opt;    
     fc2d_clawpack46_options_t *claw_opt;
     user_options_t *user;
+#endif
+    fclaw_options_t *fclaw_opt;
     fclaw_exit_type_t et;
 
     memset (torthem, 0, sizeof (*torthem));
-    torthem->global = fclaw2d_global_new (NULL);
+#if 1
+    torthem->global = fclaw2d_global_new ();
+#endif
 
+#if 0
     claw_opt      = &torthem->claw_opt;
     user          = &torthem->user;
-    fclaw_opt     = &torthem->fclaw_opt;
     clawpatch_opt = &torthem->clawpatch_opt;
+#endif
+
+    fclaw_opt     = &torthem->fclaw_opt;
 
     /**************** FCLAW OPTIONS *************/
 
@@ -85,6 +109,7 @@ torthem_init (torthem_t * torthem)
     et = fclaw_options_check (fclaw_opt);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Option check error");
 
+#if 0
     /**************** CLAWPACK 4.6 OPTIONS *************/
     clawpatch_opt->mx = 8;
     clawpatch_opt->my = 8;
@@ -122,6 +147,9 @@ torthem_init (torthem_t * torthem)
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Torus postprocess error");
     et = torus_options_check (user);
     SC_CHECK_ABORT (et == FCLAW_NOEXIT, "Torus check error");
+#endif
+
+    /* make the fclaw_opt structure available from glob */
 }
 
 static void
@@ -134,10 +162,18 @@ torthem_run (torthem_t * torthem)
 static void
 torthem_destroy (torthem_t * torthem)
 {
+#if 0
     torus_options_destroy (&torthem->user);
     fc2d_clawpack46_options_destroy (&torthem->claw_opt);
-    fclaw_options_destroy (torthem->fclaw_opt);
     fclaw2d_global_destroy (torthem->global);
+#endif
+
+    fclaw_options_destroy (&torthem->fclaw_opt);
+
+#if 1
+    fclaw2d_finalize (torthem->global);
+    fclaw2d_global_destroy (torthem->global);
+#endif
 }
 
 int

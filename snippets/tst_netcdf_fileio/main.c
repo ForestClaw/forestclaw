@@ -46,9 +46,6 @@ void write_patch(int ncid, int subgroupid, int patchidx,
     if ((retval = nc_def_dim(subgroupid, "meqn", meqn, &meqn_dimid)))
         ERR(retval);
 
-    dimids[0] = x_dimid;
-    dimids[1] = meqn_dimid;
-
     /* Define the attribute */
     // General patch properties
     if ((retval = nc_put_att_double(subgroupid, NC_GLOBAL, "t", NC_DOUBLE, 1, &time)))
@@ -84,9 +81,9 @@ void write_patch(int ncid, int subgroupid, int patchidx,
         if ((retval = nc_put_att_double(subgroupid, NC_GLOBAL, temp, NC_DOUBLE, 1, &xupper)))
             ERR(retval);
     }
-    if ((retval = nc_put_att_int(subgroupid, NC_GLOBAL, "num_eqn", NC_INT, 1, &meqn)))
-        ERR(retval);
 
+    dimids[0] = x_dimid;
+    dimids[1] = meqn_dimid;
     /* Define the variable. */
     if ((retval = nc_def_var(subgroupid, "q", NC_DOUBLE, numdim+1, dimids, &qid)))
         ERR(retval);
