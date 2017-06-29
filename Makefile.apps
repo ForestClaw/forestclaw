@@ -1,44 +1,44 @@
-# -*- Makefile -*-
+if FCLAW_ENABLE_CLAWPACK
 
 # --------------------------------------------
 # Clawpack 4.6 and 5.0 libraries and examples
 # --------------------------------------------
 
-if FCLAW_ENABLE_CLAWPACK
-
-# Solver libraries (both need to be compiled to compile applications)
+## Solver libraries (both need to be compiled to compile applications)
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/solvers/fc2d_clawpack5/Makefile.am
 
-# examples
+## examples
 include applications/clawpack/clawpack.apps
 
 endif
 
 
+if FCLAW_ENABLE_GEOCLAW
+
 # ----------------------------------
 # GeoClaw library and examples
 # ----------------------------------
-if FCLAW_ENABLE_GEOCLAW
 
-# Solver library
+## Solver library
 include src/solvers/fc2d_geoclaw/Makefile.am
 
-# Examples
+## Examples
 include applications/geoclaw/geoclaw.apps
 
 endif
 
 
-# ----------------------------------
-# Ash3d examples (requires submodule)
-# ----------------------------------
 if FCLAW_ENABLE_ASH3D
 
-# Solver library
+# -----------------------------------
+# Ash3d examples (requires submodule)
+# -----------------------------------
+
+## Solver library
 include src/solvers/fc3d_ash3d/Makefile.am
 
-# Applications
+## Applications
 include src/solvers/fc3d_ash3d/test_cases/ash3d.apps
 
 endif

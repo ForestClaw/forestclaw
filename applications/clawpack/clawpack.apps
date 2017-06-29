@@ -1,4 +1,4 @@
-# ------ applications/clawpack/clawpack.apps ---------
+# ------ applications/clawpack/clawpack.apps --------------
 
 ## -----------------------------------------------------------------
 ## Hyperbolic problems using Clawpack 4.6 and 5.0 
@@ -14,12 +14,12 @@
 ##        R. J. LeVeque, Cambridge University Press, 2002.
 ## -----------------------------------------------------------------
 
-## -----------------
+## ----------------
 ## Scalar advection 
-## -----------------
+## ----------------
 
 ## flat, square domain
-include applications/clawpack/advection/2d/swirl/Makefile.am#
+include applications/clawpack/advection/2d/swirl/Makefile.am
 include applications/clawpack/advection/2d/filament/Makefile.am
 
 ## annulus
@@ -45,16 +45,16 @@ include applications/clawpack/advection/2d/sphere/Makefile.am
 
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
-### ----------------------------------------------------------#
+## ----------------------------------------------------------
 
 ## Acoustics (on flat domains)
-include applications/clawpack/acoustics/2d/radial/Makefile.am#
+include applications/clawpack/acoustics/2d/radial/Makefile.am
 include applications/clawpack/acoustics/2d/interface/Makefile.am
 
-## Burger#s
+## Burgers
 include applications/clawpack/burgers/2d/pwconst/Makefile.am
 
-## Shallo#w
+## Shallow
 include applications/clawpack/shallow/2d/radialdam/Makefile.am
 
 ## Euler
@@ -70,14 +70,14 @@ include applications/clawpack/euler/2d/quadrants/Makefile.am
 ##    transport on the sphere: results from a collection 
 ##    of state-of-the-art schemes", Lauritzen, et al.
 ##    Geosciences Model Development, 2014. 
-###    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
-### ------------------------------------------------------------------#
+##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
+## ------------------------------------------------------------------
 
-#include applications/clawpack/transport/gaussian/Makefile.am
-#include applications/clawpack/transport/slotted_disk/Makefile.am
-#include applications/clawpack/transport/correlatedcb/Makefile.am#
-#
-#
+include applications/clawpack/transport/gaussian/Makefile.am
+include applications/clawpack/transport/slotted_disk/Makefile.am
+include applications/clawpack/transport/correlatedcb/Makefile.am#
+
+
 
 ## Sample code that shows how we can avoid using the 'app' for configuring options
 include applications/clawpack/advection/2d/torthem/Makefile.am
