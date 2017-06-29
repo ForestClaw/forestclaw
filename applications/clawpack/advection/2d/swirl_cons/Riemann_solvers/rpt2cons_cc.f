@@ -36,13 +36,15 @@ c               vr = aux2(i1,10 + (mq-1)*3 + m)
 c               v = v + 0.5*(vl + vr)*nv
 c            enddo
 
-            if (ixy .eq. 1) then
-               vr = aux2(i1,4)
-               vl = aux1(i1,5)
-            else
-               vr = aux2(i1,2)
-               vl = aux1(i1,3)
-            endif
+C             if (ixy .eq. 1) then
+C                vr = aux2(i1,4)
+C                vl = aux1(i1,5)
+C             else
+C                vr = aux2(i1,2)
+C                vl = aux1(i1,3)
+C             endif
+            vr = aux2(i1,iface)
+            vl = aux1(i1,iface)
             v = (vl+vr)/2.d0
 
             bmasdq(i,mq) = min(v,0.d0)*asdq(i,mq)
@@ -58,13 +60,15 @@ c               vr = aux3(i1,10+(mq-1)*3 + m)
 c               v = v + 0.5*(vl + vr)*nv
 c            enddo
 
-            if (ixy .eq. 1) then
-               vr = aux3(i1,4)
-               vl = aux2(i1,5)
-            else
-               vr = aux3(i1,2)
-               vl = aux2(i1,3)
-            endif
+C             if (ixy .eq. 1) then
+C                vr = aux3(i1,4)
+C                vl = aux2(i1,5)
+C             else
+C                vr = aux3(i1,2)
+C                vl = aux2(i1,3)
+C             endif
+            vr = aux3(i1,iface)
+            vl = aux2(i1,iface)
             v = (vl + vr)/2.d0
             bpasdq(i,mq) = max(v,0.d0)*asdq(i,mq)
          enddo

@@ -8,7 +8,7 @@
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
 
       integer i, j
-      double precision tperiod, pi2, vt, xll,yll, psi, u, v
+      double precision tperiod, pi2, vt, xc,yc, psi, u, v
 
       common /comvt/ tperiod,pi2
 c
@@ -23,16 +23,16 @@ c        # setaux should be used for all time.
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
 c           # coordinates of lower left corner of grid cell:
-            xll = xlower + (i-1)*dx
-            yll = ylower + (j-1)*dy
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
 
 c           # difference stream function psi to get normal velocities:
 C             aux(i,j,1) = (psi(xll, yll+dy) - psi(xll,yll)) / dy
 C             aux(i,j,2) =  -(psi(xll+dx, yll) - psi(xll,yll)) / dx
             
 c           # Cell-centered velocity
-            aux(i,j,1) = u(xll,yll)
-            aux(i,j,2) = v(xll,yll)
+            aux(i,j,1) = u(xc,yc)
+            aux(i,j,2) = v(xc,yc)
 
 c           # multiply by time-factor:
             aux(i,j,1) = vt * aux(i,j,1)
