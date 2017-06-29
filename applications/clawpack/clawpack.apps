@@ -1,56 +1,115 @@
-# -*- Makefile -*-
+# ------ clawpack.apps ---------
 
-# ----------------------------------
-# Clawpack 4.6 and 5.0 examples
-# ----------------------------------
+## -----------------------------------------------------------------
+## Hyperbolic problems using Clawpack 4.6 and 5.0 
+## 
+## Many of these examples have been taken from the original 
+## Clawpack software package, developed by R. J. LeVeque, 
+## and many others. (www.clawpack.org)
+## 
+## For descriptions of the wave propagation algorithm used 
+## in Clawpack, see : 
+## 
+## See : "Finite volume methods for hyperbolic problems", 
+##        R. J. LeVeque, Cambridge University Press, 2002.
+## -----------------------------------------------------------------
 
-# Scalar advection on manifolds
-include applications/clawpack/advection/2d/swirl/Makefile.am
+## -----------------
+## Scalar advection 
+## -----------------
+
+## flat, square domain
+include applications/clawpack/advection/2d/swirl/Makefile.am#
 include applications/clawpack/advection/2d/filament/Makefile.am
+
+## annulus
 include applications/clawpack/advection/2d/annulus/Makefile.am
+
+## latitude/longitude domain (periodic in one direction)
 include applications/clawpack/advection/2d/latlong/Makefile.am
+
+## disk
 include applications/clawpack/advection/2d/disk/Makefile.am
+
+## torus and twisted torus (periodic in both directions)
 include applications/clawpack/advection/2d/torus/Makefile.am
+
+## replicated domain (multi-block domain)
 include applications/clawpack/advection/2d/replicated/Makefile.am
+
+## hemisphere
 include applications/clawpack/advection/2d/hemisphere/Makefile.am
+
+## sphere (cubed-sphere and pillow-disk)
 include applications/clawpack/advection/2d/sphere/Makefile.am
 
-# NCAR Transport problems on the sphere
-#include applications/NCAR_transport/gaussian/Makefile.am
-#include applications/NCAR_transport/slotted_disk/Makefile.am
-#include applications/NCAR_transport/correlatedcb/Makefile.am
+## ----------------------------------------------------------
+## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
+### ----------------------------------------------------------#
 
-# AMRClaw examples from Clawpack/AMRClaw
-include applications/clawpack/acoustics/2d/radial/Makefile.am
+## Acoustics (on flat domains)
+include applications/clawpack/acoustics/2d/radial/Makefile.am#
 include applications/clawpack/acoustics/2d/interface/Makefile.am
+
+## Burger#s
 include applications/clawpack/burgers/2d/pwconst/Makefile.am
+
+## Shallo#w
 include applications/clawpack/shallow/2d/radialdam/Makefile.am
+
+## Euler
 include applications/clawpack/euler/2d/shockbubble/Makefile.am
 include applications/clawpack/euler/2d/quadrants/Makefile.am
 
-# Sample code that shows how we can avoid using the 'app' for configuring options
+
+## ----------------------------------------------------------------
+## Transport on the sphere
+## 
+## Examples from suite described by Lauritzen, et al.  See:
+##   "A standard test case suite for two-dimensional  linear
+##    transport on the sphere: results from a collection 
+##    of state-of-the-art schemes", Lauritzen, et al.
+##    Geosciences Model Development, 2014. 
+###    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
+### ------------------------------------------------------------------#
+
+#include applications/clawpack/transport/gaussian/Makefile.am
+#include applications/clawpack/transport/slotted_disk/Makefile.am
+#include applications/clawpack/transport/correlatedcb/Makefile.am#
+#
+#
+
+## Sample code that shows how we can avoid using the 'app' for configuring options
 include applications/clawpack/advection/2d/torthem/Makefile.am
 
 
-# -------------- Under construction ------------------
-#  These are not guaranteed to compile or may not be
-#  available with standard distribution
-# ----------------------------------------------------
+## -------------- Under construction ------------------
+##  These are not guaranteed to compile or may not be
+##  available with standard distribution
+## ----------------------------------------------------
 if FCLAW_ENABLE_DEVELOPMENT
 
-# Third order scalar advection (Christiane Helzel, Univ. Dusseldorf)
+## Third order scalar advection (Christiane Helzel, Univ. Dusseldorf)
 #include applications/clawpack/advection/2d/adv_order3/Makefile.am
 
-# Shallow water on the sphere (D. Calhoun)
+## Shallow water on the sphere (D. Calhoun)
 #include applications/clawpack/shallow/2d/sphere/Makefile.am
 
-# Simple examples to test options handling, etc, but no solvers.
+## Simple examples to test options handling, etc, but no solvers.
 #include applications/dummy/Makefile.am
 
-# Example that doesn't use a solver library
+## ---------------------------
+## No solver
+## ---------------------------
+## This needs work because all exchange functions (copy, average, interpolate) are 
+## stored in solvers, and not in a patch.  To fix this, the patch needs to 
+## know something about data layout.  The clawpatch currently doesn't know about 
+## data layout.
 #include applications/no_solver/Makefile.am
 
-# Test metric terms used for problems on manifolds
+## -------------------------------------------------
+## Checks for metric terms (curvature, normals, etc)
+## --------------------------------------------------
 #include applications/metric/2d/all_mappings/Makefile.am
 #include applications/metric/2d/mesh/Makefile.am
 
