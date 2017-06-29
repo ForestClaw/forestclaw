@@ -43,6 +43,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
     const user_options_t* user = swirlcons_get_options(glob);
+    printf("claw_version = %d\n", user->claw_version);
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
@@ -51,6 +52,8 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->rpn2      = &RPN2CONS_CC;
         clawpack46_vt->rpt2      = &RPT2CONS_CC;
         clawpack46_vt->b4step2   = &CLAWPACK46_B4STEP2;
+        // clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
+        // clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV;
     }
     else if (user->claw_version == 5)
     {
