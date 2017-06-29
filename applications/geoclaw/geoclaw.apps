@@ -1,8 +1,8 @@
-# -*- Makefile -*-
+# ------ applications/geoclaw/geoclaw.apps ----------------
 
-# ----------------------------------
-# GeoClaw examples
-# ----------------------------------
+## ----------------------------------
+## GeoClaw examples
+## ----------------------------------
 
 include applications/geoclaw/bowl_radial/Makefile.am
 include applications/geoclaw/bowl_slosh/Makefile.am

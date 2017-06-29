@@ -4,6 +4,8 @@ module qinit_module
 
     implicit none
     save
+
+    logical :: module_setup = .false.
     
     ! Type of q initialization
     integer, public :: qinit_type
@@ -28,7 +30,54 @@ module qinit_module
 
 contains
 
-    subroutine add_perturbation(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
+    subroutine set_qinit(fname)
+    
+        use geoclaw_module, only: GEO_PARM_UNIT
+    
+        implicit none
+        
+        ! Subroutine arguments
+        character(len=*), optional, intent(in) :: fname
+        
+        ! File handling
+        integer, parameter :: unit = 7
+        character(len=150) :: qinit_fname
+        
+        if (.not.module_setup) then
+            write(GEO_PARM_UNIT,*) ' '
+            write(GEO_PARM_UNIT,*) '--------------------------------------------'
+            write(GEO_PARM_UNIT,*) 'SETQINIT:'
+            write(GEO_PARM_UNIT,*) '-------------'
+            
+            ! Open the data file
+            if (present(fname)) then
+                call opendatafile(unit,fname)
+            else
+                call opendatafile(unit,"qinit.data")
+            endif
+            
+            read(unit,"(i1)") qinit_type
+            if (qinit_type == 0) then
+                ! No perturbation specified
+                write(GEO_PARM_UNIT,*)  '  qinit_type = 0, no perturbation'
+                print *,'  qinit_type = 0, no perturbation'
+                return
+            endif
+            read(unit,*) qinit_fname
+            read(unit,"(2i2)") min_level_qinit, max_level_qinit
+
+            write(GEO_PARM_UNIT,*) '   min_level, max_level, qinit_fname:'
+            write(GEO_PARM_UNIT,*)  min_level_qinit, max_level_qinit, qinit_fname
+            
+            call read_qinit(qinit_fname)
+
+            module_setup = .true.
+        end if
+    
+    end subroutine set_qinit
+
+
+    subroutine add_perturbation(meqn,mbc,mx,my,xlow_patch,ylow_patch,dx,dy,q,maux,aux)
     
         use geoclaw_module, only: sea_level, coordinate_system
         use amr_module, only: mcapa
@@ -37,7 +86,7 @@ contains
     
         ! Subroutine arguments
         integer, intent(in) :: meqn,mbc,mx,my,maux
-        real(kind=8), intent(in) :: xlower,ylower,dx,dy
+        real(kind=8), intent(in) :: xlow_patch,ylow_patch,dx,dy
         real(kind=8), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
         real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
         
@@ -50,11 +99,11 @@ contains
         
         if (qinit_type > 0) then
             do i=1-mbc,mx+mbc
-                x = xlower + (i-0.5d0)*dx
+                x = xlow_patch + (i-0.5d0)*dx
                 xim = x - 0.5d0*dx
                 xip = x + 0.5d0*dx
                 do j=1-mbc,my+mbc
-                    y = ylower + (j-0.5d0)*dy
+                    y = ylow_patch + (j-0.5d0)*dy
                     yjm = y - 0.5d0*dy
                     yjp = y + 0.5d0*dy
 
@@ -90,48 +139,6 @@ contains
         endif
         
     end subroutine add_perturbation
-
-    subroutine set_qinit(fname)
-    
-        use geoclaw_module, only: GEO_PARM_UNIT
-    
-        implicit none
-        
-        ! Subroutine arguments
-        character(len=*), optional, intent(in) :: fname
-        
-        ! File handling
-        integer, parameter :: unit = 7
-        character(len=150) :: qinit_fname
-        
-        write(GEO_PARM_UNIT,*) ' '
-        write(GEO_PARM_UNIT,*) '--------------------------------------------'
-        write(GEO_PARM_UNIT,*) 'SETQINIT:'
-        write(GEO_PARM_UNIT,*) '-------------'
-        
-        ! Open the data file
-        if (present(fname)) then
-            call opendatafile(unit,fname)
-        else
-            call opendatafile(unit,"qinit.data")
-        endif
-        
-        read(unit,"(i1)") qinit_type
-        if (qinit_type == 0) then
-            ! No perturbation specified
-            write(GEO_PARM_UNIT,*)  '  qinit_type = 0, no perturbation'
-            print *,'  qinit_type = 0, no perturbation'
-            return
-        endif
-        read(unit,*) qinit_fname
-        read(unit,*) min_level_qinit, max_level_qinit
-
-        write(GEO_PARM_UNIT,*) '   min_level, max_level, qinit_fname:'
-        write(GEO_PARM_UNIT,*)  min_level_qinit, max_level_qinit, qinit_fname     
-        
-        call read_qinit(qinit_fname)
-    
-    end subroutine set_qinit
 
         
     ! currently only supports one file type:

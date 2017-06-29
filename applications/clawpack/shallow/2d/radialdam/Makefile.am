@@ -1,8 +1,5 @@
 ## Makefile.am in applications/clawpack/shallow/2d/radialdam
 
-# A single hash comment like this one WILL show up in the Makefile.
-## A double hash comment like this one will NOT be copied to the Makefile.
-
 bin_PROGRAMS += applications/clawpack/shallow/2d/radialdam/radialdam
 
 applications_clawpack_shallow_2d_radialdam_radialdam_SOURCES = \
