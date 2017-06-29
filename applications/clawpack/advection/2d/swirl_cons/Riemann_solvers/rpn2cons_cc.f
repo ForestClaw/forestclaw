@@ -27,7 +27,6 @@
 
       common/comxyt/dtcom,dxcom,dycom,tcom,icom,jcom
 
-<<<<<<< HEAD
 C       vflag = get_vflag()
 C       if (vflag .ne. 3) then
 C          write(6,*) 'rpn3cons_cc : You must supply cell ',
@@ -35,15 +34,6 @@ C      &         'centered velocities for this Riemann ',
 C      &         'solver;  set vflag = 3; vflag = ', vflag
 C          stop
 C       endif
-=======
-      vflag = get_vflag()
-      if (vflag .ne. 3) then
-         write(6,*) 'rpn3cons_cc : You must supply cell ',
-     &         'centered velocities for this Riemann ',
-     &         'solver;  set vflag = 3; vflag = ', vflag
-         stop
-      endif
->>>>>>> develop
 
 
       iface = ixy
@@ -92,14 +82,8 @@ c           In the aux array (vl,vr,vb,vt) are stored in postions (2,3,4,5)
 c           # At a cell edge, we need vr from the left cell and vl from the
 c           right cell.
 
-
-            if (iface .eq. 1) then
-               vl = auxr(i-1,3)
-               vr = auxl(i,2)
-            else
-               vl = auxr(i-1,5)
-               vr = auxl(i,4)
-            endif
+            vl = auxr(i-1,iface)
+            vr = auxl(i,iface)
 
             qi = ql(i,mq)
             qim = qr(i-1,mq)
