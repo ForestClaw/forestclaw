@@ -20,6 +20,9 @@ c
 
       double precision z, ze
 
+c     # It would be nice to get a simple wave here, i.e. a single right 
+c     # going wave
+
       q = 0.d0
       do i = 1-mbc,mx+mbc
 c         # (xi, yj) is the location of the physical domain

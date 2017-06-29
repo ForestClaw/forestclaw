@@ -9,7 +9,7 @@ cv = linspace(qmin,qmax,11);
 
 % Color maps
 colormap(parula)
-caxis([qmin qmax])
+caxis([-1 2])
 colorbar;
 
 % Axes
