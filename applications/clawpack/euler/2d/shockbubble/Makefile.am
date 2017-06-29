@@ -1,8 +1,5 @@
 ## Makefile.am in applications/clawpack/euler/2d/shockbubble
 
-# A single hash comment like this one WILL show up in the Makefile.
-## A double hash comment like this one will NOT be copied to the Makefile.
-
 bin_PROGRAMS += applications/clawpack/euler/2d/shockbubble/shockbubble
 
 
