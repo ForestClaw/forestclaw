@@ -46,8 +46,8 @@ def qinit(x,y):
     Gaussian hump:
     """
     from numpy import where
-    ze = -((x + 80)**2)/10.
-    z = 2*exp(ze)
+    ze = -((x + 50)**2)/100.
+    z = 10*exp(ze)
 
     return where(z > 1e-3,z,0)
 
