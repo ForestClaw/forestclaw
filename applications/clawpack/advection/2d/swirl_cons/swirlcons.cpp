@@ -185,12 +185,17 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     /* Map unit square to disk using mapc2m_disk.f */
     gparms->manifold = 0;
-    conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
+    // conn = p4est_connectivity_new_unitsquare();
+    int mi = 1, mj = 1;
+    int a = gparms->periodic_x;
+    int b = gparms->periodic_y;
+    conn = p4est_connectivity_new_brick(mi,mj,a,b);
+    brick = fclaw2d_map_new_brick(conn,mi,mj);
+    cont = fclaw2d_map_new_nomap_brick(brick);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
