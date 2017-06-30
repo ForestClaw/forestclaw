@@ -51,6 +51,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->rpn2      = &RPN2CONS_CC;
         clawpack46_vt->rpt2      = &RPT2CONS_CC;
         clawpack46_vt->b4step2   = &CLAWPACK46_B4STEP2;
+        clawpack46_vt->bc2       = &SWIRLCONS_BC2;
         // clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
         // clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV;
     }

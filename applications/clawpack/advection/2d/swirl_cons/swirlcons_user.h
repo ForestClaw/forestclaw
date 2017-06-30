@@ -68,6 +68,14 @@ void RPT2CONS_CC(const int* ixy, const int* maxm, const int* meqn, const int* mw
                  double aux1[], double aux2[], double aux3[], const int* imp,
                  double dsdq[], double bmasdq[], double bpasdq[]);
 
+#define SWIRLCONS_BC2 FCLAW_F77_FUNC(swirlcons_bc2,SWIRLCONS_BC2)
+void SWIRLCONS_BC2(const int* maxmx, const int* maxmy, const int* meqn,
+                     const int* mbc, const int* mx, const int* my,
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy, const double q[],
+                     const int* maux, const double aux[], const double* t,
+                     const double* dt, const int mthbc[]);
+
 #ifdef __cplusplus
 #if 0
 {
