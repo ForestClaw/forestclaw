@@ -483,7 +483,7 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
                                     int this_block_idx,
                                     int this_patch_idx,
-                                    void *user)
+                                    double *packed_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (glob->domain);
@@ -500,15 +500,16 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
 
     fclaw2d_patch_build(glob,this_patch,this_block_idx,
                         this_patch_idx,(void*) &build_mode);
+
     /* This copied q data from memory */
-    FCLAW_ASSERT(patch_vt->partition_pack != NULL);
+    FCLAW_ASSERT(patch_vt->partition_unpack != NULL);
 
     patch_vt->partition_unpack(glob,
                                new_domain,
                                this_patch,
                                this_block_idx,
                                this_patch_idx,
-                               user);
+                               packed_data);
 }
 
 size_t fclaw2d_patch_partition_packsize(fclaw2d_global_t* glob)

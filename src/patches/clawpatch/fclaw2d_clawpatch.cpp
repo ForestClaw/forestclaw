@@ -777,17 +777,19 @@ void fclaw2d_clawpatch_partition_unpack(fclaw2d_global_t *glob,
                                         fclaw2d_patch_t *this_patch,
                                         int this_block_idx,
                                         int this_patch_idx,
-                                        void *user)
+                                        double *packed_data)
 {
+#if 0    
     fclaw2d_block_t *this_block = &new_domain->blocks[this_block_idx];
     int patch_num = this_block->num_patches_before + this_patch_idx;
     double* patch_data = (double*) ((void**)user)[patch_num];
+#endif    
 
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
 
     /* Time interp is false, since we only partition when all grids
        are time synchronized */
-    cp->griddata.copyFromMemory(patch_data);
+    cp->griddata.copyFromMemory(packed_data);
 }
 
 void fclaw2d_clawpatch_copy_face(fclaw2d_global_t *glob,

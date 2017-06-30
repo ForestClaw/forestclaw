@@ -287,7 +287,7 @@ void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,
                                     struct fclaw2d_patch *this_patch,
                                     int this_block_idx,
                                     int this_patch_idx,
-                                    void *user);
+                                    double *packed_data);
 
 size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
 
@@ -467,7 +467,7 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
                                                  struct fclaw2d_patch *this_patch,
                                                  int this_block_idx,
                                                  int this_patch_idx,
-                                                 void *user);
+                                                 double *packed_data);
 
 typedef size_t (*fclaw2d_patch_partition_packsize_t)(struct fclaw2d_global* glob);
 
