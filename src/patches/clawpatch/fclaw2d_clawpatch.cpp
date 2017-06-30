@@ -750,46 +750,34 @@ size_t fclaw2d_clawpatch_partition_packsize(fclaw2d_global_t* glob)
     int my = clawpatch_opt->my;
     int mbc = clawpatch_opt->mbc;
     int meqn = clawpatch_opt->meqn;
-    size_t size = (2*mbc + mx)*(2*mbc + my)*meqn;  /* Store area */
-    return size*sizeof(double);
+    size_t psize = (2*mbc + mx)*(2*mbc + my)*meqn;  /* Store area */
+    return psize*sizeof(double);
 }
 
 void fclaw2d_clawpatch_partition_pack(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
-                                      void *user)
+                                      void *pack_data_here)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int patch_num = this_block->num_patches_before + this_patch_idx;
-    double* patch_data = (double*) ((void**)user)[patch_num];
-
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
     FCLAW_ASSERT(cp != NULL);
 
-    cp->griddata.copyToMemory(patch_data);
+    cp->griddata.copyToMemory((double*) pack_data_here);
 }
 
-void fclaw2d_clawpatch_partition_unpack(fclaw2d_global_t *glob,
+void fclaw2d_clawpatch_partition_unpack(fclaw2d_global_t *glob,  /* glob contains old domain */
                                         fclaw2d_domain_t *new_domain,
                                         fclaw2d_patch_t *this_patch,
                                         int this_block_idx,
                                         int this_patch_idx,
-                                        double *packed_data)
+                                        void *unpack_data_from_here)
 {
-#if 0    
-    fclaw2d_block_t *this_block = &new_domain->blocks[this_block_idx];
-    int patch_num = this_block->num_patches_before + this_patch_idx;
-    double* patch_data = (double*) ((void**)user)[patch_num];
-#endif    
-
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
 
     /* Time interp is false, since we only partition when all grids
        are time synchronized */
-    cp->griddata.copyFromMemory(packed_data);
+    cp->griddata.copyFromMemory((double*)unpack_data_from_here);
 }
 
 void fclaw2d_clawpatch_copy_face(fclaw2d_global_t *glob,

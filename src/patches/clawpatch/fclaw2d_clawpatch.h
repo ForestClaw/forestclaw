@@ -201,14 +201,14 @@ void fclaw2d_clawpatch_partition_pack(struct fclaw2d_global *glob,
                                       struct fclaw2d_patch *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx,
-                                      void *user);
+                                      void *pack_data_here);
 
 void fclaw2d_clawpatch_partition_unpack(struct fclaw2d_global *glob,
                                         fclaw2d_domain_t *new_domain,
                                         struct fclaw2d_patch *this_patch,
                                         int this_block_idx,
                                         int this_patch_idx,
-                                        double *packed_data);
+                                        void *packed_data);
 
 /* -----------------------------------------------------
    Build/pack/size for ghost exchange

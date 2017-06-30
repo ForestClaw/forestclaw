@@ -276,18 +276,18 @@ void fclaw2d_patch_delete_remote_ghost(struct fclaw2d_global *glob,
 /* ----------------------------partitioning --------------------------- */
 
 
-void cb_fclaw2d_patch_partition_pack(struct fclaw2d_domain *domain,
-                                     struct fclaw2d_patch *this_patch,
-                                     int this_block_idx,
-                                     int this_patch_idx,
-                                     void *user);
+void fclaw2d_patch_partition_pack(struct fclaw2d_global *glob,
+                                  struct fclaw2d_patch *this_patch,
+                                  int this_block_idx,
+                                  int this_patch_idx,
+                                  void *pack_data_here);
 
-void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,
-                                    struct fclaw2d_domain *new_domain,
+void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,  /* contains old domain */
+                                    struct fclaw2d_domain *new_domain,  
                                     struct fclaw2d_patch *this_patch,
                                     int this_block_idx,
                                     int this_patch_idx,
-                                    double *packed_data);
+                                    void *packed_data);
 
 size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
 
@@ -460,14 +460,14 @@ typedef void (*fclaw2d_patch_partition_pack_t)(struct fclaw2d_global *glob,
                                                struct fclaw2d_patch *this_patch,
                                                int this_block_idx,
                                                int this_patch_idx,
-                                               void *user);
+                                               void *pack_data_here);
 
 typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
                                                  struct fclaw2d_domain *new_domain,
                                                  struct fclaw2d_patch *this_patch,
                                                  int this_block_idx,
                                                  int this_patch_idx,
-                                                 double *packed_data);
+                                                 void *unpack_data_from_here);
 
 typedef size_t (*fclaw2d_patch_partition_packsize_t)(struct fclaw2d_global* glob);
 

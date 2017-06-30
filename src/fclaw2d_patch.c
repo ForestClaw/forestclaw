@@ -457,44 +457,45 @@ void fclaw2d_patch_delete_remote_ghost(fclaw2d_global_t *glob,
 
 /* ----------------------------partitioning --------------------------- */
 
-
-void cb_fclaw2d_patch_partition_pack(fclaw2d_domain_t *domain,
-                                     fclaw2d_patch_t *this_patch,
-                                     int this_block_idx,
-                                     int this_patch_idx,
-                                     void *user)
+size_t fclaw2d_patch_partition_packsize(fclaw2d_global_t* glob)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
+
+    return patch_vt->partition_packsize(glob);
+}
+
+void fclaw2d_patch_partition_pack(fclaw2d_global_t *glob,
+                                  fclaw2d_patch_t *this_patch,
+                                  int this_block_idx,
+                                  int this_patch_idx,
+                                  void* pack_data_here)
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->partition_pack != NULL);
-    patch_vt->partition_pack(g->glob,
+
+    patch_vt->partition_pack(glob,
                              this_patch,
                              this_block_idx,
                              this_patch_idx,
-                             g->user);
+                             pack_data_here);
 }
 
 
 
 
 
-void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
+void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,  /* glob contains old domain */
                                     fclaw2d_domain_t *new_domain,
                                     fclaw2d_patch_t *this_patch,
                                     int this_block_idx,
                                     int this_patch_idx,
-                                    double *packed_data)
+                                    void *packed_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (glob->domain);
-    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
-
+    
     /* Create new data in 'user' pointer */
     fclaw2d_patch_data_new(glob,this_patch);
-    /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
-       but we really want to increment the new domain. This will be fixed! */
-    --ddata_old->count_set_patch;
-    ++ddata_new->count_set_patch;
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
@@ -504,19 +505,12 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
     /* This copied q data from memory */
     FCLAW_ASSERT(patch_vt->partition_unpack != NULL);
 
-    patch_vt->partition_unpack(glob,
+    patch_vt->partition_unpack(glob,  /* contains old domain */
                                new_domain,
                                this_patch,
                                this_block_idx,
                                this_patch_idx,
                                packed_data);
-}
-
-size_t fclaw2d_patch_partition_packsize(fclaw2d_global_t* glob)
-{
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-    FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
-    return patch_vt->partition_packsize(glob);
 }
 
 
