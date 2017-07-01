@@ -39,7 +39,7 @@ end function
 
 
 SUBROUTINE fc2d_geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
-  USE fclaw_gauges
+  USE fc2d_geoclaw_gauges
   IMPLICIT NONE
 
     ! Input
