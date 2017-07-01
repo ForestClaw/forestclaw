@@ -62,7 +62,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_vtable_initialize();
     fclaw2d_diagnostics_vtable_initialize();
 
-    fc2d_geoclaw_vtable_initialize();
+    fc2d_geoclaw_solver_initialize();
 
     bowl_link_solvers(glob);
 
