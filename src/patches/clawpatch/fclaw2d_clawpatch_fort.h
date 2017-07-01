@@ -181,13 +181,6 @@ typedef void (*clawpatch_fort_norm_t)(int *mx, int *my, int *mbc,int *meqn,
                                       double error[], double error_norm[]);
 
 
-#define CLAWPATCH_FORT_AVERAGE_AREA FCLAW_F77_FUNC(clawpatch_fort_average_area, \
-                                                   CLAWPATCH_FORT_AVERAGE_AREA) 
-void CLAWPATCH_FORT_AVERAGE_AREA(const int* mx, const int* my,
-                                 const int* mbc,
-                                 double areacoarse[],double areafine[],
-                                 const int* igrid);
-
 /* --------------- User convenience headers ---------------------------- */
 
 #define TAG4REFINEMENT FCLAW_F77_FUNC(tag4refinement,TAG4REFINEMENT)

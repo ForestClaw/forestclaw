@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Needed for function pointer typedefs in fclaw2d_clawpatch_t */
 #include <fclaw2d_clawpatch_diagnostics.h>
-#include <fclaw2d_clawpatch_regrid.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output_ascii.h> 
 
