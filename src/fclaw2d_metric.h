@@ -43,15 +43,6 @@ void fclaw2d_metric_average_area(struct fclaw2d_global *glob,
                                  int blockno, int coarse_patchno,
                                  int fine0_patchno);
 
-#define FCLAW2D_FORT_AVERAGE_AREA FCLAW_F77_FUNC(fclaw2d_fort_average_area, \
-	                                             FCLAW2D_FORT_AVERAGE_AREA) 
-void FCLAW2D_FORT_AVERAGE_AREA(const int* mx, const int* my,
-                                 const int* mbc,
-                                 double areacoarse[],double areafine[],
-                                 const int* igrid);
-
-
-
 #ifdef __cplusplus
 #if 0
 {
