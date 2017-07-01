@@ -39,26 +39,7 @@ extern "C"
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
-int fclaw2d_clawpatch_tag4refinement(struct fclaw2d_global *glob,
-                                     struct fclaw2d_patch *this_patch,
-                                     int blockno, int patchno,
-                                     int initflag);
 
-int fclaw2d_clawpatch_tag4coarsening(struct fclaw2d_global *glob,
-                                     struct fclaw2d_patch *this_patch,
-                                     int blockno, int patchno);
-
-void fclaw2d_clawpatch_average2coarse(struct fclaw2d_global *glob,
-                                      struct fclaw2d_patch *fine_siblings,
-                                      struct fclaw2d_patch *coarse_patch,
-                                      int blockno, int fine_patchno,
-                                      int coarse_patchno);
-
-void fclaw2d_clawpatch_interpolate2fine(struct fclaw2d_global *glob,
-                                        struct fclaw2d_patch *coarse_patch,
-                                        struct fclaw2d_patch* fine_patch,
-                                        int this_blockno, int coarse_patchno,
-                                        int fine_patchno);
 
 typedef void (*fclaw2d_fort_tag4refinement_t)(const int* mx,const int* my,
                                               const int* mbc,const int* meqn,

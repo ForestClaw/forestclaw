@@ -23,8 +23,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_options.h>
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_metric_default_fort.h>
-#include <fclaw2d_global.h>
+#ifndef FCLAW2D_CLAWPATCH_DIAGNOSTICS_H
+#define FCLAW2D_CLAWPATCH_DIAGNOSTICS_H
 
+#include <fclaw_base.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+struct fclaw2d_global;
+struct fclaw2d_patch;
+
+void fclaw2d_clawpatch_diagnostics_initialize(struct fclaw2d_global *glob,
+                                              void** patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_compute(struct fclaw2d_global *glob,
+                                           void* patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_gather(struct fclaw2d_global *glob,
+                                          void* patch_acc, int init_flag);
+
+void fclaw2d_clawpatch_diagnostics_reset(struct fclaw2d_global *glob,
+                                         void* patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
+                                            void** patch_acc);
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
+
+#endif
