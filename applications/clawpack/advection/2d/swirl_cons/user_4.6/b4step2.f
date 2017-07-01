@@ -51,7 +51,7 @@ C             aux(i,j,2) = 0.0
       double precision xp,yp,pi
       common /compi/ pi
 
-      u = 2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp))
+      u = -2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp)) - 2*xp
 
       return
       end
@@ -62,7 +62,7 @@ C             aux(i,j,2) = 0.0
       double precision xp,yp,pi
       common /compi/ pi
 
-      v = -2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
+      v = 2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp)) - 2*yp
 
       return
       end
