@@ -1,6 +1,6 @@
 all:
-	gcc-6 -c main.c
-	gcc-6 -o main -O2 main.o -lnetcdf
+	mpicc -c main.c
+	mpicc -o main -O2 main.o -lnetcdf -lhdf5_hl -lhdf5 -lcurl
 
 clean:
 	rm -f *.o
