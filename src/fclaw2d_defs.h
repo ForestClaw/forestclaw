@@ -34,11 +34,11 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_REFINEFACTOR 2
 #define FCLAW2D_SPACEDIM     2
-#define FCLAW2D_NUMCORNERS   4
 #define FCLAW2D_NUMFACES     4
+#define FCLAW2D_NUMCORNERS   4
 #define FCLAW2D_NUMSIBLINGS  4
+#define FCLAW2D_REFINEFACTOR 2
 #define FCLAW2D_PATCHDIM     2	
 
 extern const int SpaceDim;

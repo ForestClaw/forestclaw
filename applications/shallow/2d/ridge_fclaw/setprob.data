@@ -1,8 +1,0 @@
-
-0.e0 0.e0 1.e0          # symmetry axis for data
-
-10.e0                =: ampl  # amplitude of initial Gaussian
-
-1.e0, 1.e0           =: tol1,tol2
-
-200.e0, 2500.e0             =: tol1, tol2
