@@ -28,8 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
 
 /* Basic forestclaw functions */
+#include <fclaw2d_patch.h>
 #include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
 #include "fclaw2d_options.h"
 #include <fclaw2d_global.h>
