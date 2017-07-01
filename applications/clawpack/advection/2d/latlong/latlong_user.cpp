@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_clawpatch.h"
 #include "../all/clawpack_user.h"
 
+#include <fclaw2d_patch.h>
 
 void latlong_link_solvers(fclaw2d_global_t *glob)
 {
