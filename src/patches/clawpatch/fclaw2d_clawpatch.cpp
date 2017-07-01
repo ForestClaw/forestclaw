@@ -26,9 +26,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch.hpp>
 
-#include <fclaw2d_clawpatch_fort.h>
-#include <fclaw2d_clawpatch_output_ascii.h>
+#include <fclaw2d_clawpatch_diagnostics.h>
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw2d_clawpatch_fort.h>
+
+
+#include <fclaw2d_patch.h>  /* Needed to get enum for build modes */
 
 #include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
@@ -53,13 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
 static
-fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
-{
-    FCLAW_ASSERT(s_clawpatch_vt.is_set == 0);
-    return &s_clawpatch_vt;
-}
-
-static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt()
 {
     FCLAW_ASSERT(s_clawpatch_vt.is_set != 0);
@@ -71,26 +69,6 @@ fclaw2d_clawpatch_t* clawpatch_data(fclaw2d_patch_t *this_patch);
 
 static
 double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp);
-
-static
-void setup_area_storage(fclaw2d_clawpatch_t* cp);
-
-static
-void ghost_comm(fclaw2d_global_t* glob,
-                fclaw2d_patch_t* this_patch,
-                double *qpack, int time_interp,
-                int packmode);
-
-static
-void setup_metric_storage(fclaw2d_clawpatch_t* cp);
-
-
-static
-void metric_setup(fclaw2d_global_t* glob,
-                  fclaw2d_patch_t* this_patch,
-                  int blockno,
-                  int patchno);
-
 
 /* ------------------- Creating/deleting patches ----------------------- */
 
@@ -110,6 +88,19 @@ void fclaw2d_clawpatch_delete(void *patchcp)
     patchcp = NULL;
 }
 
+
+static
+void setup_area_storage(fclaw2d_clawpatch_t* cp);
+
+static
+void setup_metric_storage(fclaw2d_clawpatch_t* cp);
+
+
+static
+void metric_setup(fclaw2d_global_t* glob,
+                  fclaw2d_patch_t* this_patch,
+                  int blockno,
+                  int patchno);
 
 /* Maybe this should just be a 'build' function? */
 static
@@ -984,6 +975,13 @@ void fclaw2d_clawpatch_partition_unpack(fclaw2d_global_t *glob,
 }
 
 /* -------------------------- Virtual table  ---------------------------- */
+
+static
+fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
+{
+    FCLAW_ASSERT(s_clawpatch_vt.is_set == 0);
+    return &s_clawpatch_vt;
+}
 
 void fclaw2d_clawpatch_vtable_initialize()
 {
