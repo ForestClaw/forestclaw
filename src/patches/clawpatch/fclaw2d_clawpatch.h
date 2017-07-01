@@ -58,14 +58,10 @@ fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
 /* ------------------- Creating/deleting patches ----------------------- */
 
+#if 0
 void* fclaw2d_clawpatch_new();   /* Called in fclaw2d_patch */
 
 void fclaw2d_clawpatch_delete(void *cp);
-
-void fclaw2d_clawpatch_define(struct fclaw2d_global *glob,
-                              struct fclaw2d_patch *this_patch,
-                              int blockno, int patchno,
-                              fclaw2d_build_mode_t build_mode);
 
 /* A callback for building the domain and repartitioning */
 void fclaw2d_clawpatch_build(struct fclaw2d_global *glob,
@@ -74,13 +70,6 @@ void fclaw2d_clawpatch_build(struct fclaw2d_global *glob,
                              int this_patch_idx,
                              void *user);
 
-void fclaw2d_clawpatch_build_ghost(struct fclaw2d_global *glob,
-                                   struct fclaw2d_patch *this_patch,
-                                   int blockno,
-                                   int patchno,
-                                   void *user);
-
-
 void fclaw2d_clawpatch_build_from_fine(struct fclaw2d_global *glob,
                                        struct fclaw2d_patch *fine_patches,
                                        struct fclaw2d_patch *coarse_patch,
@@ -88,12 +77,14 @@ void fclaw2d_clawpatch_build_from_fine(struct fclaw2d_global *glob,
                                        int coarse_patchno,
                                        int fine0_patchno,
                                        fclaw2d_build_mode_t build_mode);
+#endif                                       
 
 /* ------------------------- time stepping ------------------------------ */
 
 void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
                                          struct fclaw2d_patch* this_patch);
 
+#if 0
 void fclaw2d_clawpatch_restore_step(struct fclaw2d_global* glob,
                                     struct fclaw2d_patch* this_patch);
 
@@ -103,9 +94,11 @@ void fclaw2d_clawpatch_save_step(struct fclaw2d_global* glob,
 void fclaw2d_clawpatch_setup_timeinterp(struct fclaw2d_global *glob,
                                         struct fclaw2d_patch *this_patch,
                                         double alpha);
+#endif                                        
 
 /* -------------------- Ghost filling - patch specific ------------------ */
 
+#if 0
 void fclaw2d_clawpatch_copy_face(struct fclaw2d_global *glob,
                                  struct fclaw2d_patch *this_patch,
                                  struct fclaw2d_patch *neighbor_patch,
@@ -159,8 +152,10 @@ void fclaw2d_clawpatch_interpolate_corner(struct fclaw2d_global* glob,
                                           int a_time_interp,
                                           struct fclaw2d_transform_data* transform_data);
 
+#endif
 /* ---------------------------- Regridding functions -------------------------- */
 
+#if 0
 int fclaw2d_clawpatch_tag4refinement(struct fclaw2d_global *glob,
                                      struct fclaw2d_patch *this_patch,
                                      int blockno, int patchno,
@@ -182,8 +177,10 @@ void fclaw2d_clawpatch_interpolate2fine(struct fclaw2d_global *glob,
                                         int this_blockno, int coarse_patchno,
                                         int fine_patchno);
 
+#endif
 /* ------------------------ Parallel ghost patches ----------------------------- */
 
+#if 0
 size_t fclaw2d_clawpatch_ghost_packsize(struct fclaw2d_global* glob);
 
 void fclaw2d_clawpatch_local_ghost_alloc(struct fclaw2d_global* glob,
@@ -198,14 +195,23 @@ void fclaw2d_clawpatch_local_ghost_pack(struct fclaw2d_global *glob,
                                   double *patch_data,
                                   int time_interp);
 
+void fclaw2d_clawpatch_remote_ghost_build(struct fclaw2d_global *glob,
+                                          struct fclaw2d_patch *this_patch,
+                                          int blockno,
+                                          int patchno,
+                                          void *user);
+
 void fclaw2d_clawpatch_remote_ghost_unpack(struct fclaw2d_global* glob,
                                            struct fclaw2d_patch* this_patch,
                                            int this_block_idx, int this_patch_idx,
                                            double *qdata, int time_interp);
 
 void fclaw2d_clawpatch_remote_ghost_delete(void *patchcp);
+#endif
 
 /* ------------------------- Parallel partitioning ----------------------------- */
+
+#if 0
 size_t fclaw2d_clawpatch_partition_packsize(struct fclaw2d_global* glob);
 
 
@@ -221,6 +227,52 @@ void fclaw2d_clawpatch_partition_unpack(struct fclaw2d_global *glob,
                                         int this_block_idx,
                                         int this_patch_idx,
                                         void *packed_data);
+
+#endif
+
+
+/* ---------------------- Virtual table ------------------------------- */
+
+/* members of this structure provide the only access to above functions */
+
+struct fclaw2d_clawpatch_vtable
+{
+    /* ghost filling functions */
+    clawpatch_fort_copy_face_t           fort_copy_face;
+    clawpatch_fort_average_face_t        fort_average_face;
+    clawpatch_fort_interpolate_face_t    fort_interpolate_face;
+    clawpatch_fort_copy_corner_t         fort_copy_corner;
+    clawpatch_fort_average_corner_t      fort_average_corner;
+    clawpatch_fort_interpolate_corner_t  fort_interpolate_corner;
+
+    /* regridding functions */
+    clawpatch_fort_tag4refinement_t      fort_tag4refinement;
+    clawpatch_fort_tag4coarsening_t      fort_tag4coarsening;
+    clawpatch_fort_average2coarse_t      fort_average2coarse;
+    clawpatch_fort_interpolate2fine_t    fort_interpolate2fine;
+
+    /* output functions (ascii) */
+    clawpatch_fort_header_ascii_t        fort_header_ascii;
+
+    fclaw2d_patch_callback_t             cb_output_ascii;    
+    clawpatch_fort_output_ascii_t        fort_output_ascii;
+
+    /* Time interpolation functions */
+    clawpatch_fort_timeinterp_t          fort_timeinterp;
+
+    /* ghost patch functions */
+    clawpatch_fort_ghostpack_qarea_t     fort_ghostpack_qarea;
+    clawpatch_fort_ghostpack_extra_t     fort_ghostpack_extra;
+
+    /* diagnostic functions */
+    clawpatch_fort_error_t       fort_compute_patch_error;
+    clawpatch_fort_conscheck_t   fort_conservation_check;
+    clawpatch_fort_norm_t        fort_compute_error_norm;
+    clawpatch_fort_area_t        fort_compute_patch_area;
+
+    int is_set;
+};
+
 
 /* ------------------------- Misc access functions --------------------------- */
 
@@ -276,47 +328,6 @@ double* fclaw2d_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
 
 
 
-/* -----------------------------------------------------
-   Patch virtual table
-   ---------------------------------------------------- */
-
-struct fclaw2d_clawpatch_vtable
-{
-    /* regridding functions */
-    clawpatch_fort_tag4refinement_t      fort_tag4refinement;
-    clawpatch_fort_tag4coarsening_t      fort_tag4coarsening;
-    clawpatch_fort_average2coarse_t      fort_average2coarse;
-    clawpatch_fort_interpolate2fine_t    fort_interpolate2fine;
-
-    /* ghost filling functions */
-    clawpatch_fort_copy_face_t           fort_copy_face;
-    clawpatch_fort_average_face_t        fort_average_face;
-    clawpatch_fort_interpolate_face_t    fort_interpolate_face;
-    clawpatch_fort_copy_corner_t         fort_copy_corner;
-    clawpatch_fort_average_corner_t      fort_average_corner;
-    clawpatch_fort_interpolate_corner_t  fort_interpolate_corner;
-
-    /* output functions (ascii) */
-    clawpatch_fort_header_ascii_t        fort_header_ascii;
-
-    fclaw2d_patch_callback_t             cb_output_ascii;    
-    clawpatch_fort_output_ascii_t        fort_output_ascii;
-
-    /* Time interpolation functions */
-    clawpatch_fort_timeinterp_t          fort_timeinterp;
-
-    /* ghost patch functions */
-    clawpatch_fort_ghostpack_qarea_t     fort_ghostpack_qarea;
-    clawpatch_fort_ghostpack_extra_t     fort_ghostpack_extra;
-
-    /* diagnostic functions */
-    clawpatch_fort_error_t       fort_compute_patch_error;
-    clawpatch_fort_conscheck_t   fort_conservation_check;
-    clawpatch_fort_norm_t        fort_compute_error_norm;
-    clawpatch_fort_area_t        fort_compute_patch_area;
-
-    int is_set;
-};
 
 #ifdef __cplusplus
 #if 0
