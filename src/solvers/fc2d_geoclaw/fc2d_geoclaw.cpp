@@ -25,13 +25,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_options.h"
-#include "fclaw2d_options.h"
 
+#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
+
+/* Basic forestclaw functions */
 #include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
-
+#include "fclaw2d_options.h"
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_defs.h>
 #include <fclaw2d_transform.h>
@@ -103,19 +105,23 @@ void fc2d_geoclaw_vtable_initialize()
     patch_vt->physical_bc        = &fc2d_geoclaw_bc2;
     patch_vt->single_step_update = &fc2d_geoclaw_update;  /* Includes b4step2 and src2 */
 
+    /* Regridding */
     patch_vt->tag4refinement     = &fc2d_geoclaw_patch_tag4refinement;
     patch_vt->tag4coarsening     = &fc2d_geoclaw_patch_tag4coarsening;
     patch_vt->interpolate2fine   = &fc2d_geoclaw_interpolate2fine;
     patch_vt->average2coarse     = &fc2d_geoclaw_average2coarse;
+
+    /* Ghost filling */
     patch_vt->average_face       = &fc2d_geoclaw_average_face;
     patch_vt->interpolate_face   = &fc2d_geoclaw_interpolate_face;      
     patch_vt->average_corner     = &fc2d_geoclaw_average_corner;
     patch_vt->interpolate_corner = &fc2d_geoclaw_interpolate_corner;
-    patch_vt->setup_ghost        = &fc2d_geoclaw_patch_setup;
+
+    patch_vt->remote_ghost_setup = &fc2d_geoclaw_patch_setup;
   
     /* ClawPatch functions (mostly Fortran functions which implement details of the 
        above patch functions */
-    clawpatch_vt->ghostpack_extra         = &fc2d_geoclaw_ghostpack_aux;
+    clawpatch_vt->fort_ghostpack_extra    = &fc2d_geoclaw_ghostpack_aux;
     clawpatch_vt->fort_compute_error_norm = &FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM;
     clawpatch_vt->fort_compute_patch_area = &FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA;
     clawpatch_vt->fort_conservation_check = &FC2D_GEOCLAW_FORT_CONSERVATION_CHECK;
