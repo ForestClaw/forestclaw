@@ -804,15 +804,15 @@ void ghost_comm(fclaw2d_global_t* glob,
     FCLAW_ASSERT(psize > 0);
 
     int qareasize = (wg - hole)*(meqn + packarea);
-    clawpatch_vt()->fort_ghostpack_qarea(&mx,&my,&mbc,&meqn,&mint,qthis,area,
+    clawpatch_vt()->fort_local_ghost_pack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
                                          qpack,&qareasize,&packmode,&ierror);
     FCLAW_ASSERT(ierror == 0);
     if (fclaw_opt->ghost_patch_pack_extra)
     {
       qpack += qareasize;
       int extrasize = psize - qareasize;
-      FCLAW_ASSERT(clawpatch_vt()->fort_ghostpack_extra != NULL);
-      clawpatch_vt()->fort_ghostpack_extra(glob,this_patch,mint,
+      FCLAW_ASSERT(clawpatch_vt()->fort_local_ghost_pack_aux != NULL);
+      clawpatch_vt()->fort_local_ghost_pack_aux(glob,this_patch,mint,
                                            qpack,extrasize,packmode,&ierror);
       FCLAW_ASSERT(ierror == 0);
     }
