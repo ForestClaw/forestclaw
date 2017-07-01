@@ -204,6 +204,8 @@ void fclaw2d_clawpatch_remote_ghost_unpack(struct fclaw2d_global* glob,
                                            int this_block_idx, int this_patch_idx,
                                            double *qdata, int time_interp);
 
+void fclaw2d_clawpatch_remote_ghost_delete(void *patchcp);
+
 /* ------------------------- Parallel partitioning ----------------------------- */
 size_t fclaw2d_clawpatch_partition_packsize(struct fclaw2d_global* glob);
 
