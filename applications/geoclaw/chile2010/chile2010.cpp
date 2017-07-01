@@ -71,11 +71,11 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fc2d_geoclaw_setup(glob);
+    fc2d_geoclaw_module_setup(glob);
 
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
-    fc2d_geoclaw_finalize(glob);
+    
     fclaw2d_finalize(glob);
 }
 
