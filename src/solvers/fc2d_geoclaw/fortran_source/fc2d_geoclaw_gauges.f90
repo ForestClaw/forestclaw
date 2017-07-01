@@ -1,4 +1,4 @@
-MODULE fclaw_gauges
+MODULE fc2d_geoclaw_gauges
   USE iso_c_binding
   TYPE,BIND(C) :: gauge_type
      INTEGER:: blockno
@@ -9,10 +9,10 @@ MODULE fclaw_gauges
      !! DOUBLE PRECISION, POINTER :: buffer
   END TYPE gauge_type
 
-END MODULE fclaw_gauges
+END MODULE fc2d_geoclaw_gauges
 
 
-INTEGER FUNCTION geoclaw_gauges_getnum(fname)
+INTEGER FUNCTION fc2d_geoclaw_gauges_getnum(fname)
 
     implicit none
 
@@ -32,13 +32,13 @@ INTEGER FUNCTION geoclaw_gauges_getnum(fname)
     endif
 
     read(iunit,*) num_gauges
-    geoclaw_gauges_getnum = num_gauges
+    fc2d_geoclaw_gauges_getnum = num_gauges
     close(iunit)
 end function
 
 
 
-SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
+SUBROUTINE fc2d_geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
   USE fclaw_gauges
   IMPLICIT NONE
 
@@ -74,9 +74,9 @@ SUBROUTINE geoclaw_gauges_init(restart, meqn, num_gauges, gauges, fname)
     close(iunit)
 
 
-END SUBROUTINE geoclaw_gauges_init
+END SUBROUTINE fc2d_geoclaw_gauges_init
 
-SUBROUTINE geoclaw_update_gauge (mx,my,mbc,meqn,xlower,ylower,dx,dy,q,maux,aux,&
+SUBROUTINE fc2d_geoclaw_update_gauge (mx,my,mbc,meqn,xlower,ylower,dx,dy,q,maux,aux,&
                                  xc,yc,var,eta)
 
       use geoclaw_module, only: dry_tolerance
@@ -169,4 +169,4 @@ SUBROUTINE geoclaw_update_gauge (mx,my,mbc,meqn,xlower,ylower,dx,dy,q,maux,aux,&
         !   call print_gauges_and_reset_nextLoc(ii, nvar)
         ! endif
 
-END SUBROUTINE geoclaw_update_gauge
+END SUBROUTINE fc2d_geoclaw_update_gauge

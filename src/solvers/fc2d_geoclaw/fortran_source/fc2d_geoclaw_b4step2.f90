@@ -1,5 +1,5 @@
 !! ============================================
-SUBROUTINE geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
+SUBROUTINE fc2d_geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
      dx,dy,t,dt,maux,aux)
   !! ============================================
   !!
@@ -62,10 +62,10 @@ SUBROUTINE geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
      is_ghost = 0
      nghost = mbc    !! won't be used, if is_ghost = 0
      mint = 2*mbc    !! not used
-     CALL geoclaw_setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux,is_ghost,nghost,mint)
+     CALL fc2d_geoclaw_setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux,is_ghost,nghost,mint)
   ENDIF
 
   !! Set wind and pressure aux variables for this grid
   CALL set_storm_fields(maux,mbc,mx,my,xlower,ylower,dx,dy,t,aux)
 
-END SUBROUTINE geoclaw_b4step2
+END SUBROUTINE fc2d_geoclaw_b4step2

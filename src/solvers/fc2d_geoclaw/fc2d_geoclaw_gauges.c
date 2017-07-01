@@ -98,7 +98,7 @@ void geoclaw_gauge_initialize(fclaw2d_global_t* glob, void** acc)
        Read gauges files 'gauges.data' to get number of gauges
        -------------------------------------------------------- */
     char fname[] = "gauges.data";
-    int num = GEOCLAW_GAUGES_GETNUM(fname);
+    int num = FC2D_GEOCLAW_GAUGES_GETNUM(fname);
     int restart = 0;
 
     gauge_acc->num_gauges = num;
@@ -110,7 +110,7 @@ void geoclaw_gauge_initialize(fclaw2d_global_t* glob, void** acc)
     }
 
     /* Read gauges file for the locations, etc. of all gauges */
-    GEOCLAW_GAUGES_INIT(&restart, &clawpatch_opt->meqn, &num,  gauge_acc->gauges, fname);
+    FC2D_GEOCLAW_GAUGES_INIT(&restart, &clawpatch_opt->meqn, &num,  gauge_acc->gauges, fname);
 
     /* -----------------------------------------------------
        Open gauge files and add header information
@@ -257,7 +257,7 @@ void geoclaw_gauge_update(fclaw2d_global_t *glob, void* solver_acc)
             FCLAW_ASSERT(g.yc >= ylower && g.yc <= ylower+my*dy);
             if (tcurr >= g.t1 && tcurr <= g.t2)
             {
-                GEOCLAW_UPDATE_GAUGE(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                FC2D_GEOCLAW_UPDATE_GAUGE(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
                                       q,&maux,aux,&g.xc,&g.yc,var,&eta);
                 sprintf(filename,"gauge%05d.txt",g.num);
                 fp = fopen(filename, "a");

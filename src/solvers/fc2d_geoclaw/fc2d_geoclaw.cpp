@@ -111,10 +111,10 @@ void geoclaw_qinit(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
-    GEOCLAW_SET_BLOCK(&this_block_idx);
+    FC2D_GEOCLAW_SET_BLOCK(&this_block_idx);
     geoclaw_vt->qinit(&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
                      &maux,aux);
-    GEOCLAW_UNSET_BLOCK();
+    FC2D_GEOCLAW_UNSET_BLOCK();
 }
 
 static
@@ -165,10 +165,10 @@ void geoclaw_bc2(fclaw2d_global_t *glob,
     */
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
 
-    GEOCLAW_SET_BLOCK(&this_block_idx);
+    FC2D_GEOCLAW_SET_BLOCK(&this_block_idx);
     geoclaw_vt->bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
-    GEOCLAW_UNSET_BLOCK();
+    FC2D_GEOCLAW_UNSET_BLOCK();
 
 }
 
@@ -192,10 +192,10 @@ void geoclaw_setaux(fclaw2d_global_t *glob,
     int nghost = mbc;
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-    GEOCLAW_SET_BLOCK(&this_block_idx);
+    FC2D_GEOCLAW_SET_BLOCK(&this_block_idx);
     geoclaw_vt->setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                       &maux,aux,&is_ghost,&nghost,&mint);
-    GEOCLAW_UNSET_BLOCK();
+    FC2D_GEOCLAW_UNSET_BLOCK();
 }
 
 
@@ -222,10 +222,10 @@ void geoclaw_b4step2(fclaw2d_global_t *glob,
         fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
         fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
-        GEOCLAW_SET_BLOCK(&this_block_idx);
+        FC2D_GEOCLAW_SET_BLOCK(&this_block_idx);
         geoclaw_vt->b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
                             &dx,&dy,&t,&dt,&maux,aux);
-        GEOCLAW_UNSET_BLOCK();
+        FC2D_GEOCLAW_UNSET_BLOCK();
     }
 }
 
@@ -251,10 +251,10 @@ void geoclaw_src2(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
-    GEOCLAW_SET_BLOCK(&this_block_idx);
+    FC2D_GEOCLAW_SET_BLOCK(&this_block_idx);
     geoclaw_vt->src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                     &dx,&dy,q,&maux,aux,&t,&dt);
-    GEOCLAW_UNSET_BLOCK();
+    FC2D_GEOCLAW_UNSET_BLOCK();
 
 }
 
@@ -308,7 +308,7 @@ double geoclaw_step2(fclaw2d_global_t *glob,
 
     int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
 
-    GEOCLAW_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, geoclaw_options->method,
+    FC2D_GEOCLAW_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, geoclaw_options->method,
                        geoclaw_options->mthlim, &geoclaw_options->mcapa,
                        &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                        work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
@@ -343,7 +343,7 @@ double geoclaw_update(fclaw2d_global_t *glob,
     const fc2d_geoclaw_options_t* geoclaw_options;
     geoclaw_options = fc2d_geoclaw_get_options(glob);
 
-    GEOCLAW_TOPO_UPDATE(&t);
+    FC2D_GEOCLAW_TOPO_UPDATE(&t);
 
     geoclaw_b4step2(glob,
                     this_patch,
@@ -795,21 +795,11 @@ void fc2d_geoclaw_module_setup(fclaw2d_global_t *glob)
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     const fc2d_geoclaw_options_t *geoclaw_options = fc2d_geoclaw_get_options(glob);
 
-    GEOCLAW_SET_MODULES(&geoclaw_options->mwaves, &geoclaw_options->mcapa,
-                        &clawpatch_opt->meqn, &clawpatch_opt->maux,
-                        geoclaw_options->mthlim, geoclaw_options->method,
-                        &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
+    FC2D_GEOCLAW_SET_MODULES(&geoclaw_options->mwaves, &geoclaw_options->mcapa,
+                             &clawpatch_opt->meqn, &clawpatch_opt->maux,
+                             geoclaw_options->mthlim, geoclaw_options->method,
+                             &gparms->ax, &gparms->bx, &gparms->ay, &gparms->by);
 }
-
-#if 0
-void fc2d_geoclaw_aux_data(fclaw2d_global_t* glob,
-                           fclaw2d_patch_t *this_patch,
-                           double **aux, int* maux)
-{
-    fclaw2d_clawpatch_aux_data(glob, this_patch, aux, maux);
-}
-#endif
-
 
 /* -------------------------- Virtual table  ---------------------------- */
 
@@ -875,13 +865,13 @@ void fc2d_geoclaw_solver_initialize()
     clawpatch_vt->fort_timeinterp         = &FC2D_GEOCLAW_FORT_TIMEINTERP;
 
     geoclaw_vt->setprob          = NULL;                   
-    geoclaw_vt->setaux           = &GEOCLAW_SETAUX;
-    geoclaw_vt->qinit            = &GEOCLAW_QINIT;
-    geoclaw_vt->bc2              = &GEOCLAW_BC2;
-    geoclaw_vt->b4step2          = &GEOCLAW_B4STEP2;
-    geoclaw_vt->src2             = &GEOCLAW_SRC2;
-    geoclaw_vt->rpn2             = &GEOCLAW_RPN2;
-    geoclaw_vt->rpt2             = &GEOCLAW_RPT2;
+    geoclaw_vt->setaux           = FC2D_GEOCLAW_SETAUX;
+    geoclaw_vt->qinit            = FC2D_GEOCLAW_QINIT;
+    geoclaw_vt->bc2              = FC2D_GEOCLAW_BC2;
+    geoclaw_vt->b4step2          = FC2D_GEOCLAW_B4STEP2;
+    geoclaw_vt->src2             = FC2D_GEOCLAW_SRC2;
+    geoclaw_vt->rpn2             = FC2D_GEOCLAW_RPN2;
+    geoclaw_vt->rpt2             = FC2D_GEOCLAW_RPT2;
 
     /* Update gauges */
     fc2d_geoclaw_gauges_vtable_set();
