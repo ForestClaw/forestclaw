@@ -132,17 +132,17 @@ typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const 
     
 /* --------------------- Parallel ghost patches --------------------------- */
 
-typedef void (*clawpatch_fort_ghostpack_qarea_t)(int *mx, int *my, int *mbc,
-                                                 int *meqn, int *mint,
-                                                 double qdata[], double area[],
-                                                 double qpack[], int *psize,
-                                                 int *packmode, int *ierror);
+typedef void (*clawpatch_fort_local_ghost_pack_t)(int *mx, int *my, int *mbc,
+                                                  int *meqn, int *mint,
+                                                  double qdata[], double area[],
+                                                  double qpack[], int *psize,
+                                                  int *packmode, int *ierror);
     
-typedef void (*clawpatch_fort_ghostpack_extra_t)(struct fclaw2d_global *glob,
-                                                 struct fclaw2d_patch *this_patch,
-                                                 int mint,
-                                                 double qpack[], int extrasize,
-                                                 int packmode, int* ierror);
+typedef void (*clawpatch_fort_local_ghost_pack_aux_t)(struct fclaw2d_global *glob,
+                                                      struct fclaw2d_patch *this_patch,
+                                                      int mint,
+                                                      double qpack[], int extrasize,
+                                                      int packmode, int* ierror);
     
 
 /* --------------------------- Output functions --------------------------- */

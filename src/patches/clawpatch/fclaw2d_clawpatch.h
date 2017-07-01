@@ -74,8 +74,8 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_fort_timeinterp_t          fort_timeinterp;
 
     /* ghost patch functions */
-    clawpatch_fort_ghostpack_qarea_t     fort_ghostpack_qarea;
-    clawpatch_fort_ghostpack_extra_t     fort_ghostpack_extra;
+    clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
+    clawpatch_fort_local_ghost_pack_aux_t  fort_local_ghost_pack_aux;
 
     /* diagnostic functions */
     clawpatch_fort_error_t       fort_compute_patch_error;
