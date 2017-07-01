@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_global.h>
@@ -113,7 +114,7 @@ void fc2d_clawpack46_vtable_initialize()
     clawpatch_vt->fort_average_corner     = &FC2D_CLAWPACK46_FORT_AVERAGE_CORNER;
     clawpatch_vt->fort_interpolate_corner = &FC2D_CLAWPACK46_FORT_INTERPOLATE_CORNER;
 
-    clawpatch_vt->ghostpack_extra         = NULL;
+    clawpatch_vt->fort_ghostpack_extra    = NULL;
     clawpatch_vt->fort_ghostpack_qarea    = &FC2D_CLAWPACK46_FORT_GHOSTPACK_QAREA;
 
     clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
