@@ -26,12 +26,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_clawpack46.h"
 #include "fc2d_clawpack46_options.h"
 
-
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_fort.h>
-#include <fclaw2d_clawpatch_output_ascii.h>
+
+#include <fclaw2d_clawpatch_diagnostics.h>
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw2d_clawpatch_fort.h>
+
+#include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_defs.h>
