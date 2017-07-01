@@ -294,16 +294,16 @@ void FC2D_GEOCLAW_FORT_WRITE_FILE(int* mx,int* my,int* meqn,int* maux,int* mbath
 /* -------------------------------- Ghost filling -  ----------------------------------- */
 
 
-#define FC2D_GEOCLAW_FORT_GHOSTPACKAUX FCLAW_F77_FUNC(fc2d_geoclaw_fort_ghostpackaux, \
-                                                     FC2D_GEOCLAW_FORT_GHOSTPACKAUX)
-void  FC2D_GEOCLAW_FORT_GHOSTPACKAUX(int *mx, int *my, int *mbc,
-                                     int *maux, int *mint,
-                                     double auxdata[], double auxpack[],
-                                     int *auxsize, int *packmode, int *ierror);
+#define FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack_aux, \
+                                                     FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX)
+void  FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(int *mx, int *my, int *mbc,
+                                        int *maux, int *mint,
+                                        double auxdata[], double auxpack[],
+                                        int *auxsize, int *packmode, int *ierror);
 
-#define FC2D_GEOCLAW_FORT_GHOSTPACK_QAREA FCLAW_F77_FUNC(fc2d_geoclaw_fort_ghostpack_qarea, \
-                                                           FC2D_GEOCLAW_FORT_GHOSTPACK_QAREA)
-void  FC2D_GEOCLAW_FORT_GHOSTPACK_QAREA(int *mx, int *my, int *mbc,
+#define FC2D_GEOCLAW_LOCAL_GHOST_PACK FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack, \
+                                                     FC2D_GEOCLAW_LOCAL_GHOST_PACK)
+void  FC2D_GEOCLAW_LOCAL_GHOST_PACK(int *mx, int *my, int *mbc,
                                           int *meqn, int *mint,
                                           double qdata[], double area[],
                                           double qpack[], int *psize,

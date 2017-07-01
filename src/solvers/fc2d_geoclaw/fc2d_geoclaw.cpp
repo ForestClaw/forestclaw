@@ -767,12 +767,12 @@ void geoclaw_remote_ghost_setup(fclaw2d_global_t *glob,
 }
 
 static
-void geoclaw_remote_ghost_pack_aux(fclaw2d_global_t *glob,
-                                   fclaw2d_patch_t *this_patch,
-                                   int mint,
-                                   double *auxpack,
-                                   int auxsize, int packmode,
-                                   int* ierror)
+void geoclaw_local_ghost_pack_aux(fclaw2d_global_t *glob,
+                                  fclaw2d_patch_t *this_patch,
+                                  int mint,
+                                  double *auxpack,
+                                  int auxsize, int packmode,
+                                  int* ierror)
     {
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
@@ -781,9 +781,9 @@ void geoclaw_remote_ghost_pack_aux(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-    FC2D_GEOCLAW_FORT_GHOSTPACKAUX(&mx,&my,&mbc,&maux,
-                                   &mint,aux,auxpack,&auxsize,
-                                   &packmode,ierror);
+    FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(&mx,&my,&mbc,&maux,
+                                      &mint,aux,auxpack,&auxsize,
+                                      &packmode,ierror);
 }
 
 /* ------------------------------ Misc access functions ----------------------------- */
@@ -845,8 +845,8 @@ void fc2d_geoclaw_solver_initialize()
     patch_vt->average2coarse              = geoclaw_average2coarse;
 
     /* Ghost filling */
-    clawpatch_vt->fort_copy_face          = &FC2D_GEOCLAW_FORT_COPY_FACE;
-    clawpatch_vt->fort_copy_corner        = &FC2D_GEOCLAW_FORT_COPY_CORNER;
+    clawpatch_vt->fort_copy_face          = FC2D_GEOCLAW_FORT_COPY_FACE;
+    clawpatch_vt->fort_copy_corner        = FC2D_GEOCLAW_FORT_COPY_CORNER;
 
     /* Geoclaw needs specialized averaging and interpolation routines */
     patch_vt->average_face                = geoclaw_average_face;
@@ -855,14 +855,14 @@ void fc2d_geoclaw_solver_initialize()
     patch_vt->interpolate_corner          = geoclaw_interpolate_corner;
 
     patch_vt->remote_ghost_setup          = geoclaw_remote_ghost_setup;
-    clawpatch_vt->fort_ghostpack_qarea    = &FC2D_GEOCLAW_FORT_GHOSTPACK_QAREA;
-    clawpatch_vt->fort_ghostpack_extra    = geoclaw_remote_ghost_pack_aux;
+    clawpatch_vt->fort_local_ghost_pack   = FC2D_GEOCLAW_LOCAL_GHOST_PACK;
+    clawpatch_vt->fort_local_ghost_pack_aux = geoclaw_local_ghost_pack_aux;
   
     /* Diagnostic functions partially implemented in clawpatch */
-    clawpatch_vt->fort_compute_error_norm = &FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM;
-    clawpatch_vt->fort_compute_patch_area = &FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA;
-    clawpatch_vt->fort_conservation_check = &FC2D_GEOCLAW_FORT_CONSERVATION_CHECK;
-    clawpatch_vt->fort_timeinterp         = &FC2D_GEOCLAW_FORT_TIMEINTERP;
+    clawpatch_vt->fort_compute_error_norm = FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->fort_compute_patch_area = FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA;
+    clawpatch_vt->fort_conservation_check = FC2D_GEOCLAW_FORT_CONSERVATION_CHECK;
+    clawpatch_vt->fort_timeinterp         = FC2D_GEOCLAW_FORT_TIMEINTERP;
 
     geoclaw_vt->setprob          = NULL;                   
     geoclaw_vt->setaux           = FC2D_GEOCLAW_SETAUX;
