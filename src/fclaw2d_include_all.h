@@ -29,6 +29,8 @@
 #include <fclaw_base.h>
 #include <fclaw_package.h>
 
+#include <fclaw2d_patch.h>
+
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_domain.h>
