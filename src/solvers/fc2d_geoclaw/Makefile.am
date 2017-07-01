@@ -13,7 +13,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_output_ascii.c \
 	src/solvers/fc2d_geoclaw/amrlib_source/amr_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/utility_module.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_module.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_module.f90 \
 	src/solvers/fc2d_geoclaw/amrlib_source/regions_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/gauges_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/topo_module.f90 \
@@ -39,17 +39,17 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/amrlib_source/check4nans.f90 \
 	src/solvers/fc2d_geoclaw/amrlib_source/quick_sort1.f \
 	src/solvers/fc2d_geoclaw/geolib_source/topointegral.f \
-	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_topo_update.f \
 	src/solvers/fc2d_geoclaw/geolib_source/topo_update.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/bilinearintegral.f \
-	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_bc2.f \
-	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_step2.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_setaux.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_src2.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_b4step2.f90 \
-	src/solvers/fc2d_geoclaw/geolib_source/geoclaw_qinit.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/cellgridintegrate2.f \
 	src/solvers/fc2d_geoclaw/geolib_source/allowflag.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/bilinearintegral.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_topo_update.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_bc2.f \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_step2.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_setaux.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_src2.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_b4step2.f90 \
+	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_qinit.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_average_fort.f \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_interpolate_fort.f \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_output_ascii_fort.f \
