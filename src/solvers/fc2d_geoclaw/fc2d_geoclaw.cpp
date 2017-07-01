@@ -826,7 +826,7 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt()
     return &s_geoclaw_vt;
 }
 
-void fc2d_geoclaw_vtable_initialize()
+void fc2d_geoclaw_solver_initialize()
 {
     fclaw2d_clawpatch_vtable_initialize();
 

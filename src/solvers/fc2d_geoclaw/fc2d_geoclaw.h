@@ -128,7 +128,7 @@ typedef void (*fc2d_geoclaw_fluxfun_t)(const int* meqn, double q[], double aux[]
 
 /* -------------------------------- Virtual table ----------------------------------- */
 
-void fc2d_geoclaw_vtable_initialize();
+void fc2d_geoclaw_solver_initialize();
 
 fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt();
 
