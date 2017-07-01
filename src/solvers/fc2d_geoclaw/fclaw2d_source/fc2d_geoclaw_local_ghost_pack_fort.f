@@ -1,4 +1,4 @@
-      subroutine fc2d_geoclaw_fort_ghostpack_qarea(mx,my,mbc,meqn,
+      subroutine fc2d_geoclaw_local_ghost_pack(mx,my,mbc,meqn,
      &      mint,qdata,area,qpack,psize,packmode,ierror)
 
       implicit none
