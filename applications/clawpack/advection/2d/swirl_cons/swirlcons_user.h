@@ -40,6 +40,7 @@ typedef struct user_options
 {
     double period;
     int claw_version;
+    int cons_rp;
     int is_registered;
 
 } user_options_t;
