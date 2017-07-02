@@ -40,7 +40,7 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
-/* ---------------------- Virtual table ------------------------------- */
+/* ---------------------------- Virtual table ------------------------------------ */
 
 /* members of this structure provide the only access to above functions */
 
@@ -51,50 +51,50 @@ fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 struct fclaw2d_clawpatch_vtable
 {
     /* ghost filling functions */
-    clawpatch_fort_copy_face_t           fort_copy_face;
-    clawpatch_fort_average_face_t        fort_average_face;
-    clawpatch_fort_interpolate_face_t    fort_interpolate_face;
-    clawpatch_fort_copy_corner_t         fort_copy_corner;
-    clawpatch_fort_average_corner_t      fort_average_corner;
-    clawpatch_fort_interpolate_corner_t  fort_interpolate_corner;
+    clawpatch_fort_copy_face_t             fort_copy_face;
+    clawpatch_fort_average_face_t          fort_average_face;
+    clawpatch_fort_interpolate_face_t      fort_interpolate_face;
+    clawpatch_fort_copy_corner_t           fort_copy_corner;
+    clawpatch_fort_average_corner_t        fort_average_corner;
+    clawpatch_fort_interpolate_corner_t    fort_interpolate_corner;
 
     /* regridding functions */
-    clawpatch_fort_tag4refinement_t      fort_tag4refinement;
-    clawpatch_fort_tag4coarsening_t      fort_tag4coarsening;
-    clawpatch_fort_average2coarse_t      fort_average2coarse;
-    clawpatch_fort_interpolate2fine_t    fort_interpolate2fine;
+    clawpatch_fort_tag4refinement_t        fort_tag4refinement;
+    clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
+    clawpatch_fort_average2coarse_t        fort_average2coarse;
+    clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
     /* output functions (ascii) */
-    clawpatch_fort_header_ascii_t        fort_header_ascii;
+    clawpatch_fort_header_ascii_t          fort_header_ascii;
 
-    fclaw2d_patch_callback_t             cb_output_ascii;    
-    clawpatch_fort_output_ascii_t        fort_output_ascii;
+    fclaw2d_patch_callback_t               cb_output_ascii;    
+    clawpatch_fort_output_ascii_t          fort_output_ascii;
 
     /* Time interpolation functions */
-    clawpatch_fort_timeinterp_t          fort_timeinterp;
+    clawpatch_fort_timeinterp_t            fort_timeinterp;
 
     /* ghost patch functions */
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
     clawpatch_fort_local_ghost_pack_aux_t  fort_local_ghost_pack_aux;
 
     /* diagnostic functions */
-    clawpatch_fort_error_t       fort_compute_patch_error;
-    clawpatch_fort_conscheck_t   fort_conservation_check;
-    clawpatch_fort_norm_t        fort_compute_error_norm;
-    clawpatch_fort_area_t        fort_compute_patch_area;
+    clawpatch_fort_error_t                 fort_compute_patch_error;
+    clawpatch_fort_conscheck_t             fort_conservation_check;
+    clawpatch_fort_norm_t                  fort_compute_error_norm;
+    clawpatch_fort_area_t                  fort_compute_patch_area;
 
     int is_set;
 };
 
 
-/* ------------------------- time stepping ------------------------------ */
+/* -------------------------------- time stepping ----------------------------------- */
 
 /* Called in step2 (clawpack 4.6 and clawpack 5.0) */
 void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
                                          struct fclaw2d_patch* this_patch);
 
 
-/* ------------------------- Misc access functions --------------------------- */
+/* ------------------------------- Misc access functions ------------------------------ */
 
 void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* this_patch,

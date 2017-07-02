@@ -769,10 +769,10 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 /* --------------------------- Parallel ghost patches -------------------------------- */
 
 static
-void ghost_comm(fclaw2d_global_t* glob,
-                fclaw2d_patch_t* this_patch,
-                double *qpack, int time_interp,
-                int packmode)
+void clawpatch_ghost_comm(fclaw2d_global_t* glob,
+                          fclaw2d_patch_t* this_patch,
+                          double *qpack, int time_interp,
+                          int packmode)
 {
     int meqn;
     double *qthis;
@@ -881,7 +881,7 @@ void clawpatch_local_ghost_pack(fclaw2d_global_t *glob,
     int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;
     int packmode = 2*packarea;  // 0 or 2  (for pack)
 
-    ghost_comm(glob,this_patch,patch_data, time_interp,packmode);
+    clawpatch_ghost_comm(glob,this_patch,patch_data, time_interp,packmode);
 }
 
 static
@@ -895,7 +895,7 @@ void clawpatch_remote_ghost_unpack(fclaw2d_global_t* glob,
     int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;
     int packmode = 2*packarea + 1;  // 1 or 3  (for unpack)
 
-    ghost_comm(glob,this_patch,qdata,time_interp,packmode);
+    clawpatch_ghost_comm(glob,this_patch,qdata,time_interp,packmode);
 }
 
 static
