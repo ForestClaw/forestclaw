@@ -291,15 +291,8 @@ void FC2D_GEOCLAW_FORT_WRITE_FILE(int* mx,int* my,int* meqn,int* maux,int* mbath
                              int* blockno,int* mpirank);
 
 
-/* -------------------------------- Ghost filling -  ----------------------------------- */
+/* ---------------------------------- Parallel ghost patches  -------------------------------- */
 
-
-#define FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack_aux, \
-                                                     FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX)
-void  FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(int *mx, int *my, int *mbc,
-                                        int *maux, int *mint,
-                                        double auxdata[], double auxpack[],
-                                        int *auxsize, int *packmode, int *ierror);
 
 #define FC2D_GEOCLAW_LOCAL_GHOST_PACK FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack, \
                                                      FC2D_GEOCLAW_LOCAL_GHOST_PACK)
@@ -308,6 +301,13 @@ void  FC2D_GEOCLAW_LOCAL_GHOST_PACK(int *mx, int *my, int *mbc,
                                           double qdata[], double area[],
                                           double qpack[], int *psize,
                                           int *packmode, int *ierror);
+
+#define FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack_aux, \
+                                                     FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX)
+void  FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(int *mx, int *my, int *mbc,
+                                        int *maux, int *mint,
+                                        double auxdata[], double auxpack[],
+                                        int *auxsize, int *packmode, int *ierror);
 
 /* ------------------------------ Diagnostics functions ---------------------------- */
 

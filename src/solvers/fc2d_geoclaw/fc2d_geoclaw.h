@@ -46,13 +46,13 @@ struct fclaw2d_patch;
 struct geoclaw_gauge;
 
 
-/* -------------------------------- Access functions ----------------------------- */
+/* ------------------------------------- Access functions ---------------------------------- */
 
 void fc2d_geoclaw_module_setup(struct fclaw2d_global *glob);
 
 void fc2d_geoclaw_output(struct fclaw2d_global *glob, int iframe);
 
-/* ----------------------------------- Typedefs ----------------------------------- */
+/* --------------------------------------- Typedefs ---------------------------------------- */
 
 typedef void (*fc2d_geoclaw_setprob_t)();
 
@@ -126,7 +126,7 @@ typedef void (*fc2d_geoclaw_fluxfun_t)(const int* meqn, double q[], double aux[]
                                        double fq[]);
 
 
-/* -------------------------------- Virtual table ----------------------------------- */
+/* ------------------------------------- Virtual table ----------------------------------- */
 
 void fc2d_geoclaw_solver_initialize();
 
