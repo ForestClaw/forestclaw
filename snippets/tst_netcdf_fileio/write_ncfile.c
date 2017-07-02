@@ -16,7 +16,7 @@
 #define LEN 40
 
 void write_patch(int ncid, int subgroupid, int patchidx,
-                 double time, int ngrids, int numdim, int meqn, int maux, int mx)
+                 double time, int numdim, int meqn, int maux, int mx)
 {
     const char* dim_name[1] = {"x"};
     // char* temp;
@@ -110,7 +110,6 @@ int main(int argc, char const *argv[])
 
     /* Variables that general to all patches */
     double time = 0.0;
-    int ngrids = 1;
     int numdim = 1;
     int meqn = 1;
     int maux = 0;
@@ -120,6 +119,11 @@ int main(int argc, char const *argv[])
     if ((retval = nc_create(filename, NC_NETCDF4, &ncid)))
         ERR(retval);
 
+    if ((retval = nc_put_att_int(ncid, NC_GLOBAL, "num_patch", NC_INT, 1, &numpatch)))
+        ERR(retval);
+    if ((retval = nc_put_att_int(ncid, NC_GLOBAL, "num_dim", NC_INT, 1, &numdim)))
+        ERR(retval);
+
     for (int i = 0; i < numpatch; ++i)
     {
         sprintf(patchname, "patch%d", i);
@@ -127,7 +131,7 @@ int main(int argc, char const *argv[])
         if ((retval = nc_def_grp(ncid, patchname, &subgroupid[i])))
             ERR(retval);
 
-        write_patch(ncid, subgroupid[i], i, time, ngrids, numdim, meqn, maux, mx);
+        write_patch(ncid, subgroupid[i], i, time, numdim, meqn, maux, mx);
     }
     /* Close the file. */
     if ((retval = nc_close(ncid)))
