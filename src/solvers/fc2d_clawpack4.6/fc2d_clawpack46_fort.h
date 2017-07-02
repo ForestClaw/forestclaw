@@ -159,7 +159,7 @@ void FC2D_CLAWPACK46_FORT_AVERAGE2COARSE(const int* mx, const int* my,
 
 
 
-/* ------------------------- Ghost filling - patch specific ------------------------ */
+/* ---------------------------------- Ghost filling  -------------------------------------- */
 
 #define FC2D_CLAWPACK46_FORT_COPY_FACE FCLAW_F77_FUNC(fc2d_clawpack46_fort_copy_face, \
                                                      FC2D_CLAWPACK46_FORT_COPY_FACE)

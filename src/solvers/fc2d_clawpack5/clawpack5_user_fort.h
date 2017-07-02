@@ -26,11 +26,6 @@
 #ifndef CLAWPACK5_USER_FORT_H
 #define CLAWPACK5_USER_FORT_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw_package.h>
-
-#include "fc2d_clawpack5_options.h"
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -39,39 +34,40 @@ extern "C"
 #endif
 #endif
 
+/* --------------------------------------------------------------------------------
+   Clawpack 5.0 routines
 
-/* --------------------------------------------------------------------
-   Classic routines
-   - These are provided only for convenience;  these files are not
-   compiled into the library, but will be provided by the user.
-   -------------------------------------------------------------------- */
+   These are provided for user convenience.  These files are not compiled
+   into the library, but should be provided by the user.
+
+   These signatures can be used if the user file matches these signatures 
+   and subroutine name. Otherwise, the user should provide their own headers.
+   ------------------------------------------------------------------------------- */
 
 /* Macros for C/Fortran portability */
+
+#define SETPROB            FCLAW_F77_FUNC(setprob,           SETPROB)
+void SETPROB();
+
+
 #define CLAWPACK5_SETPROB FCLAW_F77_FUNC(clawpack5_setprob, CLAWPACK5_SETPROB)
-#define CLAWPACK5_QINIT   FCLAW_F77_FUNC(clawpack5_qinit,   CLAWPACK5_QINIT)
-#define CLAWPACK5_SETAUX  FCLAW_F77_FUNC(clawpack5_setaux,  CLAWPACK5_SETAUX)
-#define CLAWPACK5_B4STEP2 FCLAW_F77_FUNC(clawpack5_b4step2, CLAWPACK5_B4STEP2)
-#define CLAWPACK5_SRC2    FCLAW_F77_FUNC(clawpack5_src2,    CLAWPACK5_SRC2)
-#define CLAWPACK5_BC2     FCLAW_F77_FUNC(clawpack5_bc2,     CLAWPACK5_BC2)
-#define CLAWPACK5_RPN2    FCLAW_F77_FUNC(clawpack5_rpn2,    CLAWPACK5_RPN2)
-#define CLAWPACK5_RPT2    FCLAW_F77_FUNC(clawpack5_rpt2,    CLAWPACK5_RPT2)
-
-/* These will be converted to MACROS slowly ... */
-
 void CLAWPACK5_SETPROB();
 
+#define CLAWPACK5_QINIT   FCLAW_F77_FUNC(clawpack5_qinit,   CLAWPACK5_QINIT)
 void CLAWPACK5_QINIT(const int* meqn,const int* mbc,
                      const int* mx, const int* my,
                      const double* xlower, const double* ylower,
                      const double* dx, const double* dy,
                      double q[], const int* maux, double aux[]);
 
+#define CLAWPACK5_SETAUX  FCLAW_F77_FUNC(clawpack5_setaux,  CLAWPACK5_SETAUX)
 void CLAWPACK5_SETAUX(const int* mbc,
                       const int* mx, const int* my,
                       const double* xlower, const double* ylower,
                       const double* dx, const double* dy,
                       const int* maux, double aux[]);
 
+#define CLAWPACK5_BC2     FCLAW_F77_FUNC(clawpack5_bc2,     CLAWPACK5_BC2)
 void CLAWPACK5_BC2(const int* meqn, const int* mbc,
                    const int* mx, const int* my,
                    const double* xlower, const double* ylower,
@@ -80,6 +76,7 @@ void CLAWPACK5_BC2(const int* meqn, const int* mbc,
                    const double aux[], const double* t,
                    const double* dt, const int mthbc[]);
 
+#define CLAWPACK5_B4STEP2 FCLAW_F77_FUNC(clawpack5_b4step2, CLAWPACK5_B4STEP2)
 void CLAWPACK5_B4STEP2(const int* mbc,
                        const int* mx, const int* my, const int* meqn,
                        double q[], const double* xlower,
@@ -88,6 +85,7 @@ void CLAWPACK5_B4STEP2(const int* mbc,
                        const double* t, const double* dt,
                        const int* maux, double aux[]);
 
+#define CLAWPACK5_SRC2    FCLAW_F77_FUNC(clawpack5_src2,    CLAWPACK5_SRC2)
 void CLAWPACK5_SRC2(const int* meqn,
                     const int* mbc, const int* mx,const int* my,
                     const double* xlower, const double* ylower,
@@ -96,12 +94,14 @@ void CLAWPACK5_SRC2(const int* meqn,
                     const double* dt);
 
 /* Riemann solvers */
+#define CLAWPACK5_RPN2    FCLAW_F77_FUNC(clawpack5_rpn2,    CLAWPACK5_RPN2)
 void CLAWPACK5_RPN2(const int* ixy,const int* maxm, const int* meqn,
                     const int* mwaves, const int* maux,
                     const int* mbc,const int* mx,
                     double ql[], double qr[], double auxl[], double auxr[],
                     double wave[], double s[],double amdq[], double apdq[]);
 
+#define CLAWPACK5_RPT2    FCLAW_F77_FUNC(clawpack5_rpt2,    CLAWPACK5_RPT2)
 void CLAWPACK5_RPT2(const int* ixy, const int* imp,
                     const int* maxm, const int* meqn,
                     const int* mwaves, const int* maux,

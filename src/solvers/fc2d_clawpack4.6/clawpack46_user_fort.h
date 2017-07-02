@@ -26,11 +26,6 @@
 #ifndef CLAWPACK46_USER_FORT_H
 #define CLAWPACK46_USER_FORT_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw_package.h>
-
-#include "fc2d_clawpack46_options.h"
-
 #ifdef __cplusplus
 extern "C"
 {
