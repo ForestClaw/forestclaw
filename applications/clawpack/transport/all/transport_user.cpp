@@ -32,10 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-#include "../all/transport_user.h"
 #include "../all/transport_options.h"
 
-#include "../../advection/2d/all/advection_user_fort.h"
+#include "../all/transport_user.h"
 
 void transport_link_solvers(fclaw2d_global_t *glob)
 {

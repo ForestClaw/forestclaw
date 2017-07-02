@@ -27,17 +27,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-#include "../all/transport_options.h"
-#include "../all/transport_user.h"
-
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
+
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack5_options.h>
 
+#include "../all/transport_options.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+#include "../all/transport_user.h"
+
 
 static
 void run_program(fclaw2d_global_t* glob)

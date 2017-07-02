@@ -29,6 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 #include <fclaw_base.h>  /* for MPI */
 
+#include "../../advection/2d/all/advection_user_fort.h"
+
+
 #ifdef __cplusplus
 extern "C"
 {
