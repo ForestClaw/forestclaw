@@ -26,9 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CLAWPACK_USER_H
 #define CLAWPACK_USER_H
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+#include <clawpack46_user_fort.h>
+#include <clawpack5_user_fort.h>
 
 
 #ifdef __cplusplus
@@ -38,10 +37,6 @@ extern "C"
 }
 #endif
 #endif
-
-/* headers for other Riemann solvers are not needed here because they are supplied
-   automatially in fc2d_clawpack4.6/clawpack46_fort_user.h and
-   clawpack5/clawpack5_fort_user.h */
 
 #define CLAWPACK5_RPN2_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpn2_manifold, \
                                                CLAWPACK5_RPN2_MANIFOLD)
