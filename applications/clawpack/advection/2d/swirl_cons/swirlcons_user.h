@@ -77,6 +77,14 @@ void SWIRLCONS_BC2(const int* maxmx, const int* maxmy, const int* meqn,
                      const int* maux, const double aux[], const double* t,
                      const double* dt, const int mthbc[]);
 
+#define SWIRLCONS_B4STEP2 FCLAW_F77_FUNC(swirlcons_b4step2,SWIRLCONS_B4STEP2)
+void SWIRLCONS_B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
+                       const int* mx, const int* my, const int* meqn,
+                       double q[], const double* xlower, const double* ylower,
+                       const double* dx, const double* dy,
+                       const double* t, const double* dt,
+                       const int* maux, double aux[]);
+
 #ifdef __cplusplus
 #if 0
 {

@@ -17,6 +17,7 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv.f90 \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/b4step2.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/swirlcons_b4step2.f \
 	applications/clawpack/advection/2d/swirl_cons/user_5.0/qinit.f90 \
 	applications/clawpack/advection/2d/swirl_cons/user_5.0/b4step2.f90 \
 	applications/clawpack/advection/2d/swirl_cons/Riemann_solvers/rpn2cons_cc.f \

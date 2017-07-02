@@ -1,4 +1,4 @@
-      subroutine clawpack46_b4step2(maxmx, maxmy, mbc,mx,my,meqn,q,
+      subroutine swirlcons_b4step2(maxmx, maxmy, mbc,mx,my,meqn,q,
      &      xlower,ylower,dx,dy,time,dt,maux,aux)
       implicit none
 
@@ -8,7 +8,7 @@
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
 
       integer i, j
-      double precision tperiod, pi2, vt, xll, yll, psi, uec, vec
+      double precision tperiod, pi2, vt, xc,yc, psi, ucc, vcc
 
       common /comvt/ tperiod,pi2
 c
@@ -24,56 +24,66 @@ C       vt = cos(pi2*(time+dt/2.d0)/tperiod)
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
 c           # coordinates of lower left corner of grid cell:
-            xll = xlower + (i-1)*dx
-            yll = ylower + (j-1)*dy
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
 
 c           # difference stream function psi to get normal velocities:
 C             aux(i,j,1) = (psi(xll, yll+dy) - psi(xll,yll)) / dy
 C             aux(i,j,2) =  -(psi(xll+dx, yll) - psi(xll,yll)) / dx
             
-c           # edge velocity
-            aux(i,j,1) = uec(xll,yll)
-            aux(i,j,2) = vec(xll,yll)
+c           # Cell-centered velocity
+            aux(i,j,1) = ucc(xc,yc)
+            aux(i,j,2) = vcc(xc,yc)
 
 c           # multiply by time-factor:
             aux(i,j,1) = vt * aux(i,j,1)
             aux(i,j,2) = vt * aux(i,j,2)
+C             aux(i,j,1) = 1.0
+C             aux(i,j,2) = 0.0
          enddo
       enddo
 
       return
       end
 
-      double precision function uec(xp,yp)
+      double precision function ucc(xp,yp)
       implicit none
 
       double precision xp,yp,pi
       common /compi/ pi
 
 C       u = -2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp)) + 2
-      if(xp .gt. 0) then
-            uec = exp(-(xp-0.5)**2/(2*0.1**2))
-      else
-            uec = 0
-      endif
-
-C       if((xp .ge. 0.5 .and. xp .lt. 1) .or. (xp .lt. 0)) then
-C             u = 1.0
+C       if(xp .gt. 0) then
+C             ucc = exp(-(xp-0.5)**2/(2*0.1**2))
 C       else
-C             u = 0.5
+C             ucc = 0
 C       endif
+
+C       if((xp .gt. 0.5 .and. xp .lt. 1) .or. (xp .lt. 0)) then
+C             ucc = 1.0
+C       else
+C             ucc = -1.0
+C       endif
+
+      if((xp .gt. 0.5 .and. xp .lt. 0.75)) then
+            ucc = 0.1
+      else if((xp .gt. 0.25 .and. xp .lt. 0.5)) then
+            ucc = -0.1
+      else
+            ucc = 0.0
+      endif
 
       return
       end
 
-      double precision function vec(xp,yp)
+      double precision function vcc(xp,yp)
       implicit none
 
       double precision xp,yp,pi
       common /compi/ pi
 
 C       v = 2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
-      vec = 0
+      vcc = 0
 
       return
       end
