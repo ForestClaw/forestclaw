@@ -30,15 +30,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
-#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
-
 #include <fc2d_clawpack5.h>
-#include <clawpack5_user_fort.h>
 
 #include "../all/transport_user.h"
 #include "../all/transport_options.h"
 
-#include "../../advection/2d/all/clawpack_user.h"
+#include "../../advection/2d/all/advection_user_fort.h"
 
 void transport_link_solvers(fclaw2d_global_t *glob)
 {
@@ -139,32 +136,4 @@ void transport_b4step2(fclaw2d_global_t *glob,
     }
 }
 
-
-/* This routine is needed because the b4step2 wrapper is not virtualized. */
-double transport_update(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt)
-{
-    const user_options_t* user = transport_get_options(glob);
-
-    transport_b4step2(glob,this_patch,this_block_idx,
-                         this_patch_idx,t,dt);
-
-    double maxcfl;
-    if (user->claw_version == 4)
-    {
-        maxcfl = fc2d_clawpack46_step2(glob,this_patch,this_block_idx,
-                                       this_patch_idx,t,dt);
-    }
-    else
-    {
-        maxcfl = fc2d_clawpack5_step2(glob,this_patch,this_block_idx,
-                                      this_patch_idx,t,dt);
-    }
-
-    return maxcfl;
-}
 
