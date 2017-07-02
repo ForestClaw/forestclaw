@@ -1,5 +1,5 @@
       subroutine rpn2cons_cc(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
-     &			              auxl,auxr,wave,s,amdq,apdq)
+     &                       auxl,auxr,wave,s,amdq,apdq)
 
       implicit none
 
@@ -82,33 +82,53 @@ c           In the aux array (vl,vr,vb,vt) are stored in postions (2,3,4,5)
 c           # At a cell edge, we need vr from the left cell and vl from the
 c           right cell.
 
-            vl = auxr(i-1,iface)
             vr = auxl(i,iface)
+            vl = auxr(i-1,iface)
 
             qi = ql(i,mq)
             qim = qr(i-1,mq)
 
             if (vr .ge. 0.d0) then
-               if (vr .eq. 0) then
-                  qstar = qim
+               if(vl .ge. 0.d0) then
+                  if (vr .eq. 0) then
+                     qstar = qim
+                  else
+                     qstar = vl*qim/vr
+                  endif
+                  wave(i,mq,mq) = qi - qstar
+                  s(i,mq) = vr
+                  amdq(i,mq) = 0.d0
+                  apdq(i,mq) = vr*qi - vl*qim
                else
-                  qstar = vl*qim/vr
+C                 # Note: Not sure what is wave, s for this case 
+                  qstar = 0
+                  wave(i,mq,mq) = qi - qstar
+                  s(i,mq) = vr
+                  amdq(i,mq) = -vl*qim
+                  apdq(i,mq) = vr*qi                  
                endif
-               wave(i,mq,mq) = qi - qstar
-               s(i,mq) = vr
-               amdq(i,mq) = 0.d0
-               apdq(i,mq) = vr*qi - vl*qim
 c               fstar = vl*qim
             else
-               if (vl. eq. 0) then
-                  qstar = qi
+               if(vl .le. 0.d0) then
+                  if (vl .eq. 0) then
+                     qstar = qi
+                  else
+                     qstar = vr*qi/vl
+                  endif
+                  wave(i,mq,mq) = qstar - qim
+                  s(i,mq) = vl
+                  amdq(i,mq) = vr*qi - vl*qim
+                  apdq(i,mq) = 0.d0
                else
+                  write(*,*) "vl > 0, vr < 0"
                   qstar = vr*qi/vl
+                  wave(i,mq,mq) = qstar - qim
+                  s(i,mq) = vl
+C                   amdq(i,mq) = 0.5*(vr*qi - vl*qim)
+C                   apdq(i,mq) = 0.5*(vr*qi - vl*qim)
+                  amdq(i,mq) = vr*qi - vl*qim
+                  apdq(i,mq) = 0.d0
                endif
-               wave(i,mq,mq) = qstar - qim
-               s(i,mq) = vl
-               amdq(i,mq) = vr*qi - vl*qim
-               apdq(i,mq) = 0.d0
 c               fstar = vr*qi
             endif
 

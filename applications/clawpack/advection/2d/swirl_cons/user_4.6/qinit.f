@@ -18,7 +18,7 @@
                 if (xc .lt. 0.5d0) then
                    q(i,j,mq) = 1.d0
                 else
-                   q(i,j,mq) = 0
+                   q(i,j,mq) = 0.5
                 endif
              enddo
           enddo

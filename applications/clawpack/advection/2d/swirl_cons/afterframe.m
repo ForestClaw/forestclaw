@@ -1,11 +1,12 @@
 s = 1e-2;
 axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
-axis off;
+axis on;
 
 yrbcolormap;
+colorbar;
 showpatchborders(1:10);
-caxis([0,1])
+caxis([0,5])
 qlo = 0;
 qhi = 1;
 under_label = sprintf('0 - %7.1e',qlo-qmin);
