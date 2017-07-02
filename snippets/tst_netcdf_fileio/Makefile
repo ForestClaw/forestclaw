@@ -6,7 +6,9 @@ write:
 	mpicc -c write_ncfile.c
 	mpicc -o write_ncfile -O2 write_ncfile.o -lnetcdf -lhdf5_hl -lhdf5 -lcurl
 
-.PHONY: all read_ncfile write_ncfile
+write_par:
+	mpicc -c write_ncfile_par.c
+	mpicc -o write_ncfile_par -O2 write_ncfile_par.o -lnetcdf -lhdf5_hl -lhdf5 -lcurl
 
 clean:
 	rm -f *.o

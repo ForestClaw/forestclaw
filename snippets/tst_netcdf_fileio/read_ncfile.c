@@ -15,97 +15,83 @@
 
 #define LEN 40
 
-void read_patch(int ncid, int subgroupid, int patchidx,
-                double time, int ngrids, int numdim, int meqn, int maux, int mx)
+void read_patch(int ncid, int subgroupid, int numdim)
 {
-    printf("Reading patch %d\n", patchidx);
-    // const char* dim_name[1] = {"x"};
-    // // char* temp;
-    // char temp[LEN];
+    char* dim_name[numdim];
+    // char* temp;
+    char temp[LEN];
 
-    // /* Patch specific */
-    // int level = 0;
-    // double q[mx];
-    // double xlower = 0.0;
-    // double xupper = 1.0;
+    /* Patch specific */
+    int level = 0;
+    double* q;
+    double xlower;
+    double xupper;
+    double time;
+    int meqn, maux, patchidx, mx;
 
-    // int x_dimid, meqn_dimid, qid;
-    // int dimids[numdim+1];
+    int qid;
+    int dimids[numdim+1];
 
-    // int retval;
+    int retval;
 
-    // /* Create pretend data*/
-    // for (int i = 0; i < mx; ++i)
-    // {
-    //     q[i] = patchidx + i;
-    // }
-
-    // /* Define the dimensions. NetCDF will hand back an ID for each. */
-    // // dim(q) = mx*my*meqn 
-    // if ((retval = nc_def_dim(subgroupid, "x", mx, &x_dimid)))
-    //     ERR(retval);
-    // if ((retval = nc_def_dim(subgroupid, "meqn", meqn, &meqn_dimid)))
-    //     ERR(retval);
-
-    // /* Define the attribute */
-    // // General patch properties
-    // if ((retval = nc_put_att_double(subgroupid, NC_GLOBAL, "t", NC_DOUBLE, 1, &time)))
-    //     ERR(retval);
-    // if ((retval = nc_put_att_int(subgroupid, NC_GLOBAL, "num_eqn", NC_INT, 1, &meqn)))
-    //     ERR(retval);
-    // if ((retval = nc_put_att_int(subgroupid, NC_GLOBAL, "num_aux", NC_INT, 1, &maux)))
-    //     ERR(retval);
-    // if ((retval = nc_put_att_int(subgroupid, NC_GLOBAL, "patch_index", NC_INT, 1, &patchidx)))
-    //     ERR(retval);
-    // if ((retval = nc_put_att_int(subgroupid, NC_GLOBAL, "level", NC_INT, 1, &level)))
-    //     ERR(retval);
+    /* Define the attribute */
+    // General patch properties
+    if ((retval = nc_get_att_double(subgroupid, NC_GLOBAL, "t", &time)))
+        ERR(retval);
+    if ((retval = nc_get_att_int(subgroupid, NC_GLOBAL, "num_eqn", &meqn)))
+        ERR(retval);
+    if ((retval = nc_get_att_int(subgroupid, NC_GLOBAL, "num_aux", &maux)))
+        ERR(retval);
+    if ((retval = nc_get_att_int(subgroupid, NC_GLOBAL, "patch_index", &patchidx)))
+        ERR(retval);
+    if ((retval = nc_get_att_int(subgroupid, NC_GLOBAL, "level", &level)))
+        ERR(retval);
     
-    // // Dimension name
-    // if ((retval = nc_put_att_string(subgroupid, NC_GLOBAL, "dim_names", 1, (const char**) dim_name)))
-    //     ERR(retval);
+    // Dimension name
+    if ((retval = nc_get_att_string(subgroupid, NC_GLOBAL, "dim_names", dim_name)))
+        ERR(retval);
 
-    // // Dimension attribute
-    // for (int i = 0; i < numdim; ++i)
-    // {
-    //     // num_cells
-    //     sprintf(temp,"%s.num_cells",dim_name[i]);
-    //     if ((retval = nc_put_att_int(subgroupid, NC_GLOBAL, temp, NC_INT, 1, &mx)))
-    //         ERR(retval);
+    // Dimension attribute
+    for (int i = 0; i < numdim; ++i)
+    {
+        // num_cells
+        sprintf(temp,"%s.num_cells",dim_name[i]);
+        if ((retval = nc_get_att_int(subgroupid, NC_GLOBAL, temp, &mx)))
+            ERR(retval);
 
-    //     // lower bound of this dimension        
-    //     sprintf(temp,"%s.lower",dim_name[i]);
-    //     if ((retval = nc_put_att_double(subgroupid, NC_GLOBAL, temp, NC_DOUBLE, 1, &xlower)))
-    //         ERR(retval);
+        // lower bound of this dimension        
+        sprintf(temp,"%s.lower",dim_name[i]);
+        if ((retval = nc_get_att_double(subgroupid, NC_GLOBAL, temp, &xlower)))
+            ERR(retval);
 
-    //     // upper bound of this dimension
-    //     sprintf(temp,"%s.upper",dim_name[i]);
-    //     if ((retval = nc_put_att_double(subgroupid, NC_GLOBAL, temp, NC_DOUBLE, 1, &xupper)))
-    //         ERR(retval);
-    // }
+        // upper bound of this dimension
+        sprintf(temp,"%s.upper",dim_name[i]);
+        if ((retval = nc_get_att_double(subgroupid, NC_GLOBAL, temp, &xupper)))
+            ERR(retval);
+    }
+    /* Allocate memory for q */
+    q = malloc(sizeof(double)*mx);
+    /* Inquire variable id */
+    if ((retval = nc_inq_varid(subgroupid, "q", &qid)))
+        ERR(retval);
 
-    // dimids[0] = x_dimid;
-    // dimids[1] = meqn_dimid;
-    // /* Define the variable. */
-    // if ((retval = nc_def_var(subgroupid, "q", NC_DOUBLE, numdim+1, dimids, &qid)))
-    //     ERR(retval);
+    /* Get the pretend data to the file.*/
+    if ((retval = nc_get_var_double(subgroupid, qid, &q[0])))
+        ERR(retval);
     
-    // /* End define mode. */
-    // if ((retval = nc_enddef(subgroupid)))
-    //     ERR(retval);
-
-    // /* Write the pretend data to the file. Although netCDF supports
-    //  * reading and writing subsets of data, in this case we write all
-    //  * the data in one operation. */
-    // if ((retval = nc_put_var_double(subgroupid, qid, &q[0])))
-    //     ERR(retval);
+    for (int i = 0; i < mx; ++i)
+    {
+        printf("%f\n", q[i]);
+    }
+    printf("\n");
 }
 
 int main(int argc, char const *argv[])
 {
     const char filename[] = "claw0001.nc";
     int ncid;
-    int numpatch = 3;
-    int subgroupid[numpatch];
+    int numpatch;
+    int subgroupid;
     int retval;
     char patchname[7];
 
@@ -121,14 +107,21 @@ int main(int argc, char const *argv[])
     if ((retval = nc_open(filename, NC_NOWRITE, &ncid)))
         ERR(retval);
 
+    if ((retval = nc_get_att_int(ncid, NC_GLOBAL, "num_patch", &numpatch)))
+            ERR(retval);
+    if ((retval = nc_get_att_int(ncid, NC_GLOBAL, "num_dim", &numdim)))
+            ERR(retval);
+
     for (int i = 0; i < numpatch; ++i)
     {
         sprintf(patchname, "patch%d", i);
-        /* Create subgroup */
-        if ((retval = nc_inq_ncid(ncid, patchname, &subgroupid[i])))
+        /* Inquire subgroup id*/
+        if ((retval = nc_inq_ncid(ncid, patchname, &subgroupid)))
             ERR(retval);
-        read_patch(ncid, subgroupid[i], i, time, ngrids, numdim, meqn, maux, mx);
+        printf("Reading %s\n", patchname);
+        read_patch(ncid, subgroupid, numdim);
     }
+
     /* Close the file. */
     if ((retval = nc_close(ncid)))
         ERR(retval);
