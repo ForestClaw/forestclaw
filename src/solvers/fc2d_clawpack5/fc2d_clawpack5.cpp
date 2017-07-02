@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fc2d_clawpack5.h"
+#include "fc2d_clawpack5_fort.h"
 #include "fc2d_clawpack5_options.h"
 
 
@@ -93,33 +94,6 @@ void clawpack5_setaux(fclaw2d_global_t *glob,
     claw5_vt->setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                       &maux,aux);
     CLAWPACK5_UNSET_BLOCK();
-}
-
-/* This should only be called when a new fclaw2d_clawpatch_t is created. */
-static
-void clawpack5_set_capacity(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx)
-{
-    int mx,my,mbc,maux,mcapa;
-    double dx,dy,xlower,ylower;
-    double *aux, *area;
-    fc2d_clawpack5_options_t *clawopt;
-
-    clawopt = fc2d_clawpack5_get_options(glob);
-    mcapa = clawopt->mcapa;
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    area = fclaw2d_clawpatch_get_area(glob,this_patch);
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-    FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
-
-    CLAWPACK5_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
-                            &maux,aux);
 }
 
 static
@@ -368,7 +342,7 @@ double clawpack5_update(fclaw2d_global_t *glob,
                                     this_patch,
                                     this_block_idx,
                                     this_patch_idx,t,dt);
-    
+
     if (clawpack_options->src_term > 0)
     {
         clawpack5_src2(glob,
@@ -468,7 +442,7 @@ void fc2d_clawpack5_vtable_initialize()
     clawpatch_vt->fort_interpolate_corner     = FC2D_CLAWPACK5_FORT_INTERPOLATE_CORNER;
 
     clawpatch_vt->fort_local_ghost_pack_aux   = NULL;
-    clawpatch_vt->fort_local_ghost_pack       = FC2D_CLAWPACK5_FORT_GHOSTPACK_QAREA;
+    clawpatch_vt->fort_local_ghost_pack       = FC2D_CLAWPACK5_FORT_LOCAL_GHOST_PACK;
 
     clawpatch_vt->fort_timeinterp             = FC2D_CLAWPACK5_FORT_TIMEINTERP;
 

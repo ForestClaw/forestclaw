@@ -1,4 +1,4 @@
-      subroutine fc2d_clawpack5_fort_ghostpack_qarea(mx,my,mbc,meqn,
+      subroutine fc2d_clawpack5_fort_local_ghost_pack(mx,my,mbc,meqn,
      &      mint,qdata,area,qpack,psize,packmode,ierror)
 
       implicit none
