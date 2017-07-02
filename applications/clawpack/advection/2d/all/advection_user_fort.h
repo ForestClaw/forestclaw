@@ -28,6 +28,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
+/* Fortran headers for user-defined fortran files
+   CLAWPACK46_BC2, CLAWPACK46_QINIT, CLAWPACK5_QINIT,
+   and so on */
+
+#include <clawpack46_user_fort.h>  
+#include <clawpack5_user_fort.h>
+
 #ifdef __cplusplus
 extern "C"
 {
