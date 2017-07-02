@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GEOCLAW_GAUGES_H
-#define FCLAW2D_GEOCLAW_GAUGES_H
+#ifndef FC2D_GEOCLAW_GAUGES_H
+#define FC2D_GEOCLAW_GAUGES_H
 
 #include <fclaw_base.h>  /* Needed for fclaw_app_t */
 
@@ -39,11 +39,6 @@ extern "C"
 
 struct fclaw2d_global;
 struct fc2d_geoclaw_gauge;
-
-void fc2d_geoclaw_set_gauge_info(struct fclaw2d_global *glob, 
-                                 struct fc2d_geoclaw_gauge *gauges, int num);
-
-void fc2d_geoclaw_gauge_setup(struct fclaw2d_global *glob);
 
 void fc2d_geoclaw_locate_gauges(struct fclaw2d_global *glob);
 
