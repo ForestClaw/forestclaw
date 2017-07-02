@@ -384,7 +384,7 @@ fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt_init()
 
 
 /* This is called from the user application. */
-void fc2d_clawpack5_vtable_initialize()
+void fc2d_clawpack5_solver_initialize()
 {
     fclaw2d_clawpatch_vtable_initialize();
 

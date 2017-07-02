@@ -133,7 +133,7 @@ struct fc2d_clawpack46_vtable
 
 };
 
-void fc2d_clawpack46_vtable_initialize(void);
+void fc2d_clawpack46_solver_initialize(void);
 
 fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(void);
 

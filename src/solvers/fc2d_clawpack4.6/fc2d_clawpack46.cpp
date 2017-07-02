@@ -392,7 +392,7 @@ fc2d_clawpack46_vtable_t* clawpack46_vt_init()
     return &s_clawpack46_vt;
 }
 
-void fc2d_clawpack46_vtable_initialize()
+void fc2d_clawpack46_solver_initialize()
 {
     fclaw2d_clawpatch_vtable_initialize();
 

@@ -123,7 +123,7 @@ typedef struct fc2d_clawpack5_vtable
     int is_set;
 } fc2d_clawpack5_vtable_t;
 
-void fc2d_clawpack5_vtable_initialize();
+void fc2d_clawpack5_solver_initialize();
 
 fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt();
 
