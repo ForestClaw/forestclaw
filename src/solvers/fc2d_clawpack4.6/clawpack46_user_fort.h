@@ -40,18 +40,17 @@ extern "C"
 #endif
 
 
-/* --------------------------------------------------------------------
-   Classic routines
-   - These are provided only for convenience;  these files are not
-   compiled into the library, but should be provided by the user.
+/* --------------------------------------------------------------------------------
+   Clawpack 4.6 routines
 
-   Users maybe define these files how they wish. These signatures can
-   be used if the user file matches these signatures and subroutine name.
-   Otherwise, the user should provide their own headers.
-   -------------------------------------------------------------------- */
+   These are provided for user convenience.  These files are not compiled
+   into the library, but should be provided by the user.
 
-/* Macros for C/Fortran portability */
-#define SETPROB                 FCLAW_F77_FUNC(setprob,SETPROB)
+   These signatures can be used if the user file matches these signatures 
+   and subroutine name. Otherwise, the user should provide their own headers.
+   ------------------------------------------------------------------------------- */
+
+#define SETPROB            FCLAW_F77_FUNC(setprob,           SETPROB)
 #define CLAWPACK46_SETPROB FCLAW_F77_FUNC(clawpack46_setprob,CLAWPACK46_SETPROB)
 #define CLAWPACK46_QINIT   FCLAW_F77_FUNC(clawpack46_qinit,  CLAWPACK46_QINIT)
 #define CLAWPACK46_SETAUX  FCLAW_F77_FUNC(clawpack46_setaux, CLAWPACK46_SETAUX)
