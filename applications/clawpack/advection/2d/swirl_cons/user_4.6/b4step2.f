@@ -18,7 +18,8 @@ c        # setaux should be used for all time.
          return
       endif
 
-      vt = cos(pi2*(time+dt/2.d0)/tperiod)
+C       vt = cos(pi2*(time+dt/2.d0)/tperiod)
+      vt = 1.0
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
@@ -51,7 +52,8 @@ C             aux(i,j,2) = 0.0
       double precision xp,yp,pi
       common /compi/ pi
 
-      u = -2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp)) - 2*xp
+C       u = -2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp)) + 2
+      u = exp(-(xp-0.5)**2/(2*0.1**2))
 
       return
       end
@@ -62,7 +64,8 @@ C             aux(i,j,2) = 0.0
       double precision xp,yp,pi
       common /compi/ pi
 
-      v = 2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp)) - 2*yp
+C       v = 2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
+      v = 0
 
       return
       end
