@@ -487,11 +487,6 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
-#if 0    
-    /* Create new data in 'user' pointer */
-    fclaw2d_patch_data_new(glob,this_patch);
-#endif    
-
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     fclaw2d_patch_build(glob,this_patch,this_block_idx,
