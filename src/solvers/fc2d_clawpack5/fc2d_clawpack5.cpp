@@ -378,7 +378,7 @@ void clawpack5_output(fclaw2d_global_t *glob, int iframe)
 static
 fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt_init()
 {
-    FCLAW_ASSERT(s_clawpack5_vt->is_set == 0);
+    FCLAW_ASSERT(s_clawpack5_vt.is_set == 0);
     return &s_clawpack5_vt;
 }
 
@@ -457,7 +457,7 @@ void fc2d_clawpack5_solver_initialize()
 
 fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt()
 {
-    FCLAW_ASSERT(s_clawpack5_vt->is_set != 0);
+    FCLAW_ASSERT(s_clawpack5_vt.is_set != 0);
     return &s_clawpack5_vt;
 }
 

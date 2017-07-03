@@ -137,7 +137,7 @@ void clawpack46_b4step2(fclaw2d_global_t *glob,
 
 {
     fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
-    FCLAW_ASSERT(classic_vt.b4step2 != NULL);
+    FCLAW_ASSERT(claw46_vt->b4step2 != NULL);
 
     int mx,my,mbc,meqn, maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
@@ -264,8 +264,8 @@ double clawpack46_step2(fclaw2d_global_t *glob,
     int mx, my, meqn, maux, mbc;
     double xlower, ylower, dx,dy;
 
-    FCLAW_ASSERT(classic_vt.rpn2 != NULL);
-    FCLAW_ASSERT(classic_vt.rpt2 != NULL);
+    FCLAW_ASSERT(claw46_vt->rpn2 != NULL);
+    FCLAW_ASSERT(claw46_vt->rpt2 != NULL);
 
     clawpack_options = fc2d_clawpack46_get_options(glob);
 
