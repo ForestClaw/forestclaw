@@ -384,7 +384,7 @@ void fclaw2d_patch_local_ghost_free(fclaw2d_global_t* glob,
 
 void fclaw2d_patch_local_ghost_pack(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
-                                    double *patch_data,
+                                    void *patch_data,
                                     int time_interp)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
@@ -442,7 +442,7 @@ void fclaw2d_patch_remote_ghost_unpack(fclaw2d_global_t* glob,
                                        fclaw2d_patch_t* this_patch,
                                        int this_block_idx,
                                        int this_patch_idx,
-                                       double *qdata, int time_interp)
+                                       void *qdata, int time_interp)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->remote_ghost_unpack != NULL);

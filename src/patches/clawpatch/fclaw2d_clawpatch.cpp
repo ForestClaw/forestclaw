@@ -771,7 +771,7 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 static
 void clawpatch_ghost_comm(fclaw2d_global_t* glob,
                           fclaw2d_patch_t* this_patch,
-                          double *qpack, int time_interp,
+                          void *qpack, int time_interp,
                           int packmode)
 {
     int meqn;
@@ -805,16 +805,19 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
     int qareasize = (wg - hole)*(meqn + packarea);
     clawpatch_vt()->fort_local_ghost_pack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
-                                         qpack,&qareasize,&packmode,&ierror);
+                                         (double*) qpack,&qareasize,&packmode,&ierror);
     FCLAW_ASSERT(ierror == 0);
     if (fclaw_opt->ghost_patch_pack_extra)
     {
-      qpack += qareasize;
-      int extrasize = psize - qareasize;
-      FCLAW_ASSERT(clawpatch_vt()->fort_local_ghost_pack_aux != NULL);
-      clawpatch_vt()->fort_local_ghost_pack_aux(glob,this_patch,mint,
-                                           qpack,extrasize,packmode,&ierror);
-      FCLAW_ASSERT(ierror == 0);
+        double *qp = (double*) qpack;
+        qp += qareasize;
+        int extrasize = psize - qareasize;
+        FCLAW_ASSERT(extrasize > 0);
+        FCLAW_ASSERT(clawpatch_vt()->fort_local_ghost_pack_aux != NULL);
+        clawpatch_vt()->fort_local_ghost_pack_aux(glob,this_patch,mint,
+                                                  (double*) qp,extrasize,
+                                                  packmode,&ierror);
+        FCLAW_ASSERT(ierror == 0);
     }
 
     if (ierror > 0)
@@ -858,8 +861,8 @@ void clawpatch_local_ghost_alloc(fclaw2d_global_t* glob,
                                  void** q)
 {
     /* Create contiguous block for data and area */
-    int msize = clawpatch_ghost_packsize(glob);
-    *q = (void*) FCLAW_ALLOC(double,msize);
+    size_t msize = clawpatch_ghost_packsize(glob);
+    *q = (void*) FCLAW_ALLOC(char,msize);
     FCLAW_ASSERT(*q != NULL);
 }
 
@@ -874,7 +877,7 @@ void clawpatch_local_ghost_free(fclaw2d_global_t* glob,
 static
 void clawpatch_local_ghost_pack(fclaw2d_global_t *glob,
                                 fclaw2d_patch_t *this_patch,
-                                double *patch_data,
+                                void *patch_data,
                                 int time_interp)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -889,7 +892,7 @@ void clawpatch_remote_ghost_unpack(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch,
                                    int this_block_idx,
                                    int this_patch_idx,
-                                   double *qdata, int time_interp)
+                                   void *qdata, int time_interp)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;

@@ -243,7 +243,7 @@ size_t fclaw2d_patch_ghost_packsize(struct fclaw2d_global* glob);
 
 void fclaw2d_patch_local_ghost_pack(struct fclaw2d_global *glob,
                                     struct fclaw2d_patch *this_patch,
-                                    double *patch_data,
+                                    void *patch_data,
                                     int time_interp);
 
 void fclaw2d_patch_local_ghost_alloc(struct fclaw2d_global* glob,
@@ -263,7 +263,7 @@ void fclaw2d_patch_remote_ghost_build(struct fclaw2d_global *glob,
 void fclaw2d_patch_remote_ghost_unpack(struct fclaw2d_global* glob,
                                        struct fclaw2d_patch* this_patch,
                                        int this_block_idx, int this_patch_idx,
-                                       double *qdata, int time_interp);
+                                       void *qdata, int time_interp);
 
 
 void fclaw2d_patch_remote_ghost_delete(struct fclaw2d_global *glob,
@@ -450,7 +450,7 @@ typedef size_t (*fclaw2d_patch_ghost_packsize_t)(struct fclaw2d_global* glob);
 
 typedef void (*fclaw2d_patch_local_ghost_pack_t)(struct fclaw2d_global *glob,
                                                  struct fclaw2d_patch *this_patch,
-                                                 double *patch_data,
+                                                 void *patch_data,
                                                  int time_interp);
 
 typedef void (*fclaw2d_patch_local_ghost_alloc_t)(struct fclaw2d_global* glob,
@@ -475,7 +475,7 @@ typedef void (*fclaw2d_patch_remote_ghost_setup_t)(struct fclaw2d_global *glob,
 typedef void (*fclaw2d_patch_remote_ghost_unpack_t)(struct fclaw2d_global *glob,
                                                     struct fclaw2d_patch* this_patch,
                                                     int this_block_idx, int this_patch_idx,
-                                                    double *qdata, int time_interp);
+                                                    void *qdata, int time_interp);
 
 typedef void (*fclaw2d_patch_remote_ghost_delete_t)(void *user_patch);
 
