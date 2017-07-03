@@ -292,6 +292,10 @@ void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
                             int this_block_idx, int this_patch_idx,
                             int *global_num, int *level);
 
+
+void*
+fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch);
+
 struct fclaw2d_patch_data*
 fclaw2d_patch_get_user_data(struct fclaw2d_patch* patch);
 

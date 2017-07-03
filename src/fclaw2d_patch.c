@@ -36,7 +36,7 @@ static fclaw2d_patch_vtable_t s_patch_vt;
 
 /* ----------------------------- Creating/deleting patches ---------------------------- */
 
-void fclaw2d_patch_data_new(fclaw2d_global_t* glob,
+void patch_data_new(fclaw2d_global_t* glob,
                             fclaw2d_patch_t* this_patch)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
@@ -82,6 +82,9 @@ void fclaw2d_patch_build(fclaw2d_global_t *glob,
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->build != NULL);
+
+    patch_data_new(glob,this_patch);
+
     patch_vt->build(glob,
                       this_patch,
                       blockno,
@@ -107,6 +110,9 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->build_from_fine != NULL);
+
+    patch_data_new(glob,coarse_patch);
+
     patch_vt->build_from_fine(glob,
                               fine_patches,
                               coarse_patch,
@@ -401,6 +407,9 @@ void fclaw2d_patch_remote_ghost_build(fclaw2d_global_t *glob,
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
     FCLAW_ASSERT(patch_vt->remote_ghost_build != NULL);
+
+    patch_data_new(glob,this_patch);
+
     patch_vt->remote_ghost_build(glob,this_patch,blockno,
                             patchno,&build_mode);
     if (patch_vt->remote_ghost_setup != NULL)
@@ -481,7 +490,9 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
     /* Create new data in 'user' pointer */
+#if 0    
     fclaw2d_patch_data_new(glob,this_patch);
+#endif    
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
@@ -552,11 +563,18 @@ void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
 
 }
 
-fclaw2d_patch_data_t*
-fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
+void*
+fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch)
+
 {
     fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
     FCLAW_ASSERT(pdata != NULL);
+    return pdata->user_patch;
+}
+
+fclaw2d_patch_data_t*
+fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
+{
     return (fclaw2d_patch_data_t *) patch->user;
 }
 

@@ -96,7 +96,9 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
            need to be passed in */
         patchno = i;
 
+#if 0
         fclaw2d_patch_data_new(glob,ghost_patch);
+#endif        
         fclaw2d_patch_remote_ghost_build(glob,ghost_patch,blockno,
                                          patchno,(void*) &build_mode);
     }
