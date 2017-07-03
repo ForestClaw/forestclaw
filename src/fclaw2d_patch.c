@@ -41,9 +41,6 @@ void patch_data_new(fclaw2d_global_t* glob,
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
-    FCLAW_ASSERT(patch_vt->patch_new != NULL);
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);
-
     /* Initialize user data */
     fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
     this_patch->user = (void *) pdata;
@@ -52,6 +49,7 @@ void patch_data_new(fclaw2d_global_t* glob,
     FCLAW_ASSERT(patch_vt->patch_new != NULL);
     pdata->user_patch = patch_vt->patch_new();
 
+    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);
     ++ddata->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
     pdata->neighbors_set = 0;
 }
@@ -81,15 +79,15 @@ void fclaw2d_patch_build(fclaw2d_global_t *glob,
                          void *user)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-    FCLAW_ASSERT(patch_vt->build != NULL);
 
     patch_data_new(glob,this_patch);
 
+    FCLAW_ASSERT(patch_vt->build != NULL);
     patch_vt->build(glob,
-                      this_patch,
-                      blockno,
-                      patchno,
-                      user);
+                    this_patch,
+                    blockno,
+                    patchno,
+                    user);
 
 
     if (patch_vt->setup != NULL)

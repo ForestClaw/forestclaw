@@ -95,8 +95,10 @@ struct fclaw2d_transform_data;
 
 /* ------------------- Creating/deleting patches ----------------------- */
 
+#if 0
 void fclaw2d_patch_data_new(struct fclaw2d_global* glob,
                             struct fclaw2d_patch* this_patch);
+#endif                            
 
 void fclaw2d_patch_data_delete(struct fclaw2d_global *glob,
                                struct fclaw2d_patch *patch);
