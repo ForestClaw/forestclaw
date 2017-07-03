@@ -33,24 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static fclaw2d_patch_vtable_t s_patch_vt;
 
-static
-fclaw2d_patch_vtable_t* patch_vt_init()
-{
-    s_patch_vt.is_set = 0;
-    return &s_patch_vt;
-}
 
-/* -----------------------------------------------------------
-   Public interface to routines in this file
-   ----------------------------------------------------------- */
-
-fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
-{
-    FCLAW_ASSERT(s_patch_vt.is_set != 0);
-    return &s_patch_vt;
-}
-
-/* ------------------- Creating/deleting patches ----------------------- */
+/* ----------------------------- Creating/deleting patches ---------------------------- */
 
 void fclaw2d_patch_data_new(fclaw2d_global_t* glob,
                             fclaw2d_patch_t* this_patch)
@@ -138,7 +122,7 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
 }
 
 
-/* ------------------- Solver specific functions -------------------------- */
+/* --------------------------- Solver specific functions ------------------------------ */
 
 void fclaw2d_patch_initialize(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *this_patch,
@@ -183,7 +167,8 @@ double fclaw2d_patch_single_step_update(fclaw2d_global_t *glob,
 }
 
 
-/* --------------------- time stepping ------------------------ */
+/* ------------------------------------ time stepping --------------------------------- */
+
 void fclaw2d_patch_restore_step(fclaw2d_global_t* glob,
                                 fclaw2d_patch_t* this_patch)
 {
@@ -212,7 +197,7 @@ void fclaw2d_patch_setup_timeinterp(fclaw2d_global_t *glob,
     patch_vt->setup_timeinterp(glob,this_patch,alpha);
 }
     
-/* -------------------- Ghost filling - patch specific ------------------ */
+/* ---------------------------------- Ghost filling  ---------------------------------- */
 
 void fclaw2d_patch_copy_face(fclaw2d_global_t* glob,
                              fclaw2d_patch_t *this_patch,
@@ -313,7 +298,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
                                 transform_data);
 }
 
-/* ------------------------ Regridding functions ---------------------- */
+/* ------------------------------- Regridding functions ------------------------------- */
 
 int fclaw2d_patch_tag4refinement(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *this_patch,
@@ -367,7 +352,7 @@ void fclaw2d_patch_interpolate2fine(fclaw2d_global_t* glob,
                                fine0_patchno);
 }
 
-/* ------------- Ghost patches (local and remote) --------------- */
+/* ---------------------------- Ghost patches (local and remote) ---------------------- */
 
 size_t fclaw2d_patch_ghost_packsize(fclaw2d_global_t* glob)
 {
@@ -412,11 +397,12 @@ void fclaw2d_patch_remote_ghost_build(fclaw2d_global_t *glob,
                                       int patchno,
                                       void *user)
 {
+    fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
     FCLAW_ASSERT(patch_vt->remote_ghost_build != NULL);
     patch_vt->remote_ghost_build(glob,this_patch,blockno,
-                            patchno,(void*) user);
+                            patchno,&build_mode);
     if (patch_vt->remote_ghost_setup != NULL)
     {
         patch_vt->remote_ghost_setup(glob,this_patch,blockno,patchno);
@@ -458,7 +444,7 @@ void fclaw2d_patch_remote_ghost_unpack(fclaw2d_global_t* glob,
 }
 
 
-/* ----------------------------partitioning --------------------------- */
+/* ----------------------------------- Partitioning ----------------------------------- */
 
 size_t fclaw2d_patch_partition_packsize(fclaw2d_global_t* glob)
 {
@@ -485,7 +471,7 @@ void fclaw2d_patch_partition_pack(fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,  /* glob contains old domain */
+void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,  
                                     fclaw2d_domain_t *new_domain,
                                     fclaw2d_patch_t *this_patch,
                                     int this_block_idx,
@@ -514,45 +500,21 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,  /* glob contains ol
 }
 
 
-/* --------------------------------------------------------------
-    Other access functions used mostly by ForestClaw (not solvers)
-   -------------------------------------------------------------- */
+/* ----------------------------------- Virtual table ---------------------------------- */
 
-void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * this_patch,
-                            int this_block_idx, int this_patch_idx,
-                            int *global_num, int *level)
-
+static
+fclaw2d_patch_vtable_t* patch_vt_init()
 {
-    
-  fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-
-  *global_num = domain->global_num_patches_before +
-        (this_block->num_patches_before + this_patch_idx);
-
-  *level = this_patch->level;
-
+    s_patch_vt.is_set = 0;
+    return &s_patch_vt;
 }
 
-void*
-fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch)
-
+fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
 {
-    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
-    FCLAW_ASSERT(pdata != NULL);
-    return pdata->user_patch;
+    FCLAW_ASSERT(s_patch_vt.is_set != 0);
+    return &s_patch_vt;
 }
 
-fclaw2d_patch_data_t*
-fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
-{
-    return (fclaw2d_patch_data_t *) patch->user;
-}
-
-
-/* --------------------------------------------------------------
-    Initialize virtual table
-   -------------------------------------------------------------- */
 void fclaw2d_patch_vtable_initialize()
 {
     fclaw2d_patch_vtable_t *patch_vt = patch_vt_init();
@@ -571,9 +533,35 @@ void fclaw2d_patch_vtable_initialize()
     /* Function pointers are set to NULL by default so are not set here */
 }
 
-/* --------------------------------------------------------------
-    Other access functions used mostly for ghost-filling, etc. 
-   -------------------------------------------------------------- */
+/* ------------------------------ User access functions ------------------------------- */
+
+
+void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
+                            fclaw2d_patch_t * this_patch,
+                            int this_block_idx, int this_patch_idx,
+                            int *global_num, int *level)
+
+{
+    
+  fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+
+  *global_num = domain->global_num_patches_before +
+        (this_block->num_patches_before + this_patch_idx);
+
+  *level = this_patch->level;
+
+}
+
+fclaw2d_patch_data_t*
+fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
+{
+    fclaw2d_patch_data_t *pdata = fclaw2d_patch_get_user_data(patch);
+    FCLAW_ASSERT(pdata != NULL);
+    return (fclaw2d_patch_data_t *) patch->user;
+}
+
+
+/* -------------------------- Internal ForestClaw functions --------------------------- */
 
 void fclaw2d_patch_set_face_type(fclaw2d_patch_t *patch,int iface,
                                  fclaw2d_patch_relation_t face_type)
