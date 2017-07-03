@@ -68,7 +68,7 @@ static
 fclaw2d_clawpatch_t* clawpatch_data(fclaw2d_patch_t *this_patch)
 {
     fclaw2d_clawpatch_t *cp = (fclaw2d_clawpatch_t*) 
-                     fclaw2d_patch_get_user_patch(this_patch);
+                     fclaw2d_patch_get_user_data(this_patch);
     return cp;
 }
 
@@ -430,7 +430,7 @@ void clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
 }
 
 
-/* ------------------------- Ghost filling - patch specific ------------------------ */
+/* -------------------------------------- Ghost filling  ------------------------------------- */
 
 static
 void clawpatch_copy_face(fclaw2d_global_t *glob,
@@ -603,7 +603,7 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                             &coarse_corner,&transform_data);
 }
 
-/* ------------------------------ Regridding functions --------------------------- */
+/* ----------------------------------- Regridding functions --------------------------------- */
 
 static
 int clawpatch_tag4refinement(fclaw2d_global_t *glob,
@@ -766,7 +766,7 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
     }
 }
 
-/* --------------------------- Parallel ghost patches -------------------------------- */
+/* --------------------------------- Parallel ghost patches ----------------------------------- */
 
 static
 void clawpatch_ghost_comm(fclaw2d_global_t* glob,
@@ -928,7 +928,7 @@ void clawpatch_remote_ghost_delete(void *patchcp)
     patchcp = NULL;
 }
 
-/* ---------------------- Parallel partitioning --------------------------- */
+/* -------------------------------- Parallel partitioning ------------------------------------ */
 
 static
 size_t clawpatch_partition_packsize(fclaw2d_global_t* glob)
@@ -971,7 +971,7 @@ void clawpatch_partition_unpack(fclaw2d_global_t *glob,
     cp->griddata.copyFromMemory((double*)unpack_data_from_here);
 }
 
-/* -------------------------- Virtual table  ---------------------------- */
+/* ------------------------------------ Virtual table  -------------------------------------- */
 
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
@@ -1049,7 +1049,7 @@ void fclaw2d_clawpatch_vtable_initialize()
 }
 
 
-/* ------------------------------ Misc access functions ----------------------------- */
+/* --------------------------------- Misc access functions --------------------------------- */
 
 /* These functions are not virtualized and are not defined by the 
    patch interface */
