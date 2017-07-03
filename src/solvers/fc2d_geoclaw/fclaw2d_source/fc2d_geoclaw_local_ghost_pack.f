@@ -1,4 +1,4 @@
-      subroutine fc2d_clawpack5_fort_ghostpack_qarea(mx,my,mbc,meqn,
+      subroutine fc2d_geoclaw_local_ghost_pack(mx,my,mbc,meqn,
      &      mint,qdata,area,qpack,psize,packmode,ierror)
 
       implicit none
@@ -145,7 +145,7 @@ c     # Face 3
       end
 
 
-      subroutine fc2d_clawpack5_set_boundary_to_value(mx,my,mbc,
+      subroutine fc2d_geoclaw_set_boundary_to_value(mx,my,mbc,
      &      meqn,q,val)
       implicit none
 
@@ -189,7 +189,7 @@ c        # Face 3
 
       end
 
-      subroutine fc2d_clawpack5_set_corners_to_value(mx,my,mbc,meqn,
+      subroutine fc2d_geoclaw_set_corners_to_value(mx,my,mbc,meqn,
      &      q,value)
       implicit none
 

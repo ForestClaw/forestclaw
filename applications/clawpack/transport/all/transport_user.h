@@ -29,6 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 #include <fclaw_base.h>  /* for MPI */
 
+#include "../../advection/2d/all/advection_user_fort.h"
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -56,11 +59,6 @@ fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
                                                       const double rotate[]);
 
 
-
-#define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
-void TRANSPORT_SETPROB(const double* kappa, const double* tfinal);
-
-
 void transport_patch_setup(struct fclaw2d_global *glob,
                            struct fclaw2d_patch *this_patch,
                            int this_block_idx,
@@ -81,6 +79,10 @@ void transport_b4step2(struct fclaw2d_global *glob,
                        double dt);
 
 void transport_link_solvers(struct fclaw2d_global *glob);
+
+
+#define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
+void TRANSPORT_SETPROB(const double* kappa, const double* tfinal);
 
 
 #define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)

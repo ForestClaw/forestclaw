@@ -1,5 +1,5 @@
 
-SUBROUTINE geoclaw_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
+SUBROUTINE fc2d_geoclaw_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
 
     use qinit_module, only: qinit_type,add_perturbation
     use geoclaw_module, only: sea_level
@@ -38,4 +38,4 @@ SUBROUTINE geoclaw_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
         close(23)
     endif
 
-  END SUBROUTINE geoclaw_qinit
+  END SUBROUTINE fc2d_geoclaw_qinit

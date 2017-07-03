@@ -1,4 +1,4 @@
-SUBROUTINE geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
+SUBROUTINE fc2d_geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
      qold,aux,dx,dy,dt,cflgrid, &
      fm,fp,gm,gp,rpn2,rpt2,block_corner_count)
 !     ==========================================================
@@ -271,4 +271,4 @@ SUBROUTINE geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
         enddo
     endif
 
-  END SUBROUTINE geoclaw_step2
+  END SUBROUTINE fc2d_geoclaw_step2

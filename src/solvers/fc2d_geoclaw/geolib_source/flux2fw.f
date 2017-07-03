@@ -181,7 +181,7 @@ c     # modify F fluxes for second order q_{xx} correction terms:
 c     -----------------------------------------------------------
 c
 c     # apply limiter to fwaves:
-      if (limit) call geoclaw_limiter(maxm,meqn,mwaves,mbc,mx,
+      if (limit) call fc2d_geoclaw_limiter(maxm,meqn,mwaves,mbc,mx,
      &      fwave,s,mthlim)
 c
       do 120 i = 1, mx+1
