@@ -25,12 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_exchange.h>
 
-#include <fclaw2d_options.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_regrid.h>
-#include <fclaw2d_partition.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
+
+#include <fclaw2d_options.h>
 
 /* Also needed in fclaw2d_domain_reset */
 fclaw2d_domain_exchange_t*
@@ -114,9 +113,6 @@ void delete_remote_ghost_patches(fclaw2d_global_t* glob)
         
         /* From merge with clawpatch3 */
         fclaw2d_patch_remote_ghost_delete(glob,ghost_patch);
-#if 0        
-        fclaw2d_patch_data_delete(glob,ghost_patch);
-#endif        
     }
 }
 
