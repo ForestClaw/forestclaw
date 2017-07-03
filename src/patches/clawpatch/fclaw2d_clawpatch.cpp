@@ -68,7 +68,7 @@ static
 fclaw2d_clawpatch_t* clawpatch_data(fclaw2d_patch_t *this_patch)
 {
     fclaw2d_clawpatch_t *cp = (fclaw2d_clawpatch_t*) 
-                     fclaw2d_patch_get_user_data(this_patch);
+                     fclaw2d_patch_get_user_patch(this_patch);
     return cp;
 }
 

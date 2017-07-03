@@ -95,8 +95,10 @@ struct fclaw2d_transform_data;
 
 /* ------------------- Creating/deleting patches ----------------------- */
 
+#if 0
 void fclaw2d_patch_data_new(struct fclaw2d_global* glob,
                             struct fclaw2d_patch* this_patch);
+#endif                            
 
 void fclaw2d_patch_data_delete(struct fclaw2d_global *glob,
                                struct fclaw2d_patch *patch);
@@ -291,6 +293,10 @@ void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
                             struct fclaw2d_patch * this_patch,
                             int this_block_idx, int this_patch_idx,
                             int *global_num, int *level);
+
+
+void*
+fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch);
 
 struct fclaw2d_patch_data*
 fclaw2d_patch_get_user_data(struct fclaw2d_patch* patch);

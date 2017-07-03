@@ -88,12 +88,12 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
 
         fclaw2d_block_t *this_block = &domain->blocks[blockno];
         int patch_num = this_block->num_patches_before + new_patchno;
-        void* packed_data = (void*) ((void**)g->user)[patch_num];
+        void* unpack_data_from_here = (void*) ((void**)g->user)[patch_num];
 
         /* pass in new_domain, since glob only contains old domain at this point
         and the both domains are needed to increment/decrement patches */
         fclaw2d_patch_partition_unpack(g->glob,new_domain,new_patch,
-                                       blockno,new_patchno,packed_data);
+                                       blockno,new_patchno,unpack_data_from_here);
 
         /* Reason for the following two lines: the glob contains the old domain 
         which is incremented in ddata_old  but we really want to increment the 

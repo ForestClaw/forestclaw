@@ -142,7 +142,9 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
             /* used to pass in new_domain, but if we call like this, the old_domain is passed in */
+#if 0            
             fclaw2d_patch_data_new(g->glob,fine_patch);
+#endif            
             /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
                but we really want to increment the new domain. This will be fixed! */
             --ddata_old->count_set_patch;
@@ -182,7 +184,9 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
         
+#if 0        
         fclaw2d_patch_data_new(g->glob,coarse_patch);// new_domain
+#endif        
         /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
            but we really want to increment the new domain. This will be fixed! */
         --ddata_old->count_set_patch;

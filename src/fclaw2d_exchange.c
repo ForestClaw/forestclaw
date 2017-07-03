@@ -96,7 +96,6 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
            need to be passed in */
         patchno = i;
 
-        fclaw2d_patch_data_new(glob,ghost_patch);
         fclaw2d_patch_remote_ghost_build(glob,ghost_patch,blockno,
                                          patchno,(void*) &build_mode);
     }
@@ -111,7 +110,6 @@ void delete_remote_ghost_patches(fclaw2d_global_t* glob)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
         
-        /* From merge with clawpatch3 */
         fclaw2d_patch_remote_ghost_delete(glob,ghost_patch);
     }
 }
