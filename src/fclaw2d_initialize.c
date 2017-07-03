@@ -58,9 +58,6 @@ void cb_initialize (fclaw2d_domain_t *domain,
 
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
-#if 0
-    fclaw2d_patch_data_new(g->glob,this_patch);
-#endif    
     fclaw2d_patch_build(g->glob,this_patch,
                         this_block_idx,
                         this_patch_idx,

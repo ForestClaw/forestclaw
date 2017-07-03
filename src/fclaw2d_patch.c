@@ -25,17 +25,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 
-#include <forestclaw2d.h>
-#include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
-#include <fclaw2d_transform.h>
+
+struct fclaw2d_transform_data;
 
 static fclaw2d_patch_vtable_t s_patch_vt;
 
 
 /* ----------------------------- Creating/deleting patches ---------------------------- */
 
+static
 void patch_data_new(fclaw2d_global_t* glob,
                             fclaw2d_patch_t* this_patch)
 {
@@ -208,7 +208,7 @@ void fclaw2d_patch_copy_face(fclaw2d_global_t* glob,
                              fclaw2d_patch_t *neighbor_patch,
                              int iface,
                              int time_interp,
-                             fclaw2d_transform_data_t *transform_data)
+                             struct fclaw2d_transform_data *transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->copy_face != NULL);
@@ -228,7 +228,7 @@ void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
                                 int refratio,
                                 int time_interp,
                                 int igrid,
-                                fclaw2d_transform_data_t* transform_data)
+                                struct fclaw2d_transform_data* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->average_face != NULL);
@@ -248,7 +248,7 @@ void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
                                     int refratio,
                                     int time_interp,
                                     int igrid,
-                                    fclaw2d_transform_data_t* transform_data)
+                                    struct fclaw2d_transform_data* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->interpolate_face != NULL);
@@ -263,7 +263,7 @@ void fclaw2d_patch_copy_corner(fclaw2d_global_t* glob,
                                fclaw2d_patch_t *corner_patch,
                                int icorner,
                                int time_interp,
-                               fclaw2d_transform_data_t *transform_data)
+                               struct fclaw2d_transform_data *transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->copy_corner != NULL);
@@ -278,7 +278,7 @@ void fclaw2d_patch_average_corner(fclaw2d_global_t* glob,
                                   int coarse_corner,
                                   int refratio,
                                   int time_interp,
-                                  fclaw2d_transform_data_t* transform_data)
+                                  struct fclaw2d_transform_data* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->average_corner != NULL);
@@ -293,7 +293,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
                                       int coarse_corner,
                                       int refratio,
                                       int time_interp,
-                                      fclaw2d_transform_data_t* transform_data)
+                                      struct fclaw2d_transform_data* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->interpolate_corner != NULL);
@@ -422,19 +422,19 @@ void fclaw2d_patch_remote_ghost_delete(fclaw2d_global_t *glob,
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     
-    FCLAW_ASSERT(patch_vt->patch_delete != NULL);
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
 
 
     if (pdata != NULL)
     {
+        FCLAW_ASSERT(patch_vt->patch_delete != NULL);
         patch_vt->remote_ghost_delete(pdata->user_patch);
-
-        fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);
-        ++ddata->count_delete_patch;
 
         FCLAW2D_FREE(pdata);
         this_patch->user = NULL;
+
+        fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);
+        ++ddata->count_delete_patch;
     }
 }
 
@@ -487,8 +487,8 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
-    /* Create new data in 'user' pointer */
 #if 0    
+    /* Create new data in 'user' pointer */
     fclaw2d_patch_data_new(glob,this_patch);
 #endif    
 
