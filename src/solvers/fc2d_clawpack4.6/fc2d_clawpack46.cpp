@@ -420,7 +420,7 @@ void fc2d_clawpack46_solver_initialize()
 
     /* These could be over-written by user specific settings */
     patch_vt->initialize                     = clawpack46_qinit;
-    patch_vt->setup                          = NULL;  /* Use setaux, for example */
+    patch_vt->setup                          = clawpack46_setaux;  
     patch_vt->physical_bc                    = clawpack46_bc2;
     patch_vt->single_step_update             = clawpack46_update;
 
