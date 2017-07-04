@@ -326,7 +326,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
 
                 /* Pack q and area into one contingous block */
                 fclaw2d_patch_local_ghost_pack(glob,this_patch,
-                                               (double*) e->patch_data[zz++],
+                                               e->patch_data[zz++],
                                                pack_time_interp);
             }
         }
