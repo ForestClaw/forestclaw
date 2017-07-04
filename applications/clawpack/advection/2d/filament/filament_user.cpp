@@ -50,6 +50,8 @@ void filament_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->setprob   = &SETPROB;
         clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
 
+        patch_vt->setup = fc2d_clawpack46_setaux;
+
         if (fclaw_opt->manifold)
         {
             patch_vt->setup      = &filament_patch_setup_manifold;
@@ -93,6 +95,7 @@ void filament_link_solvers(fclaw2d_global_t *glob)
         }
         else
         {
+            patch_vt->setup         = fc2d_clawpack5_setaux;
             clawpack5_vt->setaux    = &CLAWPACK5_SETAUX;   /* Used in non-manifold case */
             clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV;
             clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV;
