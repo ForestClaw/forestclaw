@@ -863,8 +863,8 @@ void clawpatch_local_ghost_alloc(fclaw2d_global_t* glob,
                                  void** q)
 {
     /* Create contiguous block for data and area */
-    size_t msize = clawpatch_ghost_packsize(glob);
-    *q = (void*) FCLAW_ALLOC(char,msize);
+    size_t psize = clawpatch_ghost_packsize(glob);
+    *q = (void*) FCLAW_ALLOC(char,psize);  /* sizeof(double) included in psize */
     FCLAW_ASSERT(*q != NULL);
 }
 
@@ -991,8 +991,6 @@ void fclaw2d_clawpatch_vtable_initialize()
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_init();
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
-
 
     /* These may be redefined by the user */
     /* Problem setup */
@@ -1043,12 +1041,7 @@ void fclaw2d_clawpatch_vtable_initialize()
     clawpatch_vt->fort_header_ascii = NULL;    /* Defined in clawpack solvers */ 
     clawpatch_vt->fort_output_ascii = NULL;    /* Defined in clawpack solvers */
 
-    /* diagnostic functions that apply to patches (error, conservation) */
-    diag_vt->patch_init_diagnostics      = fclaw2d_clawpatch_diagnostics_initialize;
-    diag_vt->patch_compute_diagnostics   = fclaw2d_clawpatch_diagnostics_compute;
-    diag_vt->patch_gather_diagnostics    = fclaw2d_clawpatch_diagnostics_gather;
-    diag_vt->patch_reset_diagnostics     = fclaw2d_clawpatch_diagnostics_reset;
-    diag_vt->patch_finalize_diagnostics  = fclaw2d_clawpatch_diagnostics_finalize;
+    fclaw2d_clawpatch_diagnostics_vtable_initialize();
 
     clawpatch_vt->is_set = 1;
 }

@@ -34,10 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
 
-/* -------------------------------------------------------------
-   Compute errors (1-norm, 2-norm, inf-norm)
-   ------------------------------------------------------------- */
-
 typedef struct {
     double* local_error;  /* meqn x 3 array of errors on a patch */
     double area;
@@ -45,10 +41,6 @@ typedef struct {
     double *mass0;  /* Mass at initial time */
 } error_info_t;
 
-
-/* -------------------------------------------------------------
-   Create and initialize a new accumulator
-   ------------------------------------------------------------- */
 
 void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
                                               void **acc_patch)
@@ -234,4 +226,17 @@ void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
     FCLAW_FREE(error_data->local_error);
     FCLAW_FREE(error_data);
     *patch_acc = NULL;
+}
+
+void fclaw2d_clawpatch_diagnostics_vtable_initialize()
+{
+    /* diagnostic functions that apply to patches (error, conservation) */
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
+    
+    diag_vt->patch_init_diagnostics      = fclaw2d_clawpatch_diagnostics_initialize;
+    diag_vt->patch_compute_diagnostics   = fclaw2d_clawpatch_diagnostics_compute;
+    diag_vt->patch_gather_diagnostics    = fclaw2d_clawpatch_diagnostics_gather;
+    diag_vt->patch_reset_diagnostics     = fclaw2d_clawpatch_diagnostics_reset;
+    diag_vt->patch_finalize_diagnostics  = fclaw2d_clawpatch_diagnostics_finalize;
+
 }
