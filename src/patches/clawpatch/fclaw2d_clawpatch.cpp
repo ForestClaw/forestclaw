@@ -829,7 +829,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 }
 
 static
-size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
+size_t clawpatch_ghost_pack_elems(fclaw2d_global_t* glob)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
@@ -854,17 +854,25 @@ size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
     size_t psize = (wg - hole)*(meqn + packarea + packextra);
     FCLAW_ASSERT(psize > 0);
 
-    return psize*sizeof(double);
+    return psize;
+}    
+
+size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
+{
+    size_t esize = clawpatch_ghost_pack_elems(glob);
+    return esize*sizeof(double);
 }
 
+#if 0
+/* This is only optional and can be handled directly in 
+    fclaw2d_patch.c by using clawpatch_ghost_packsize, above. */
 static
 void clawpatch_local_ghost_alloc(fclaw2d_global_t* glob,
-                                 fclaw2d_patch_t* this_patch,
                                  void** q)
 {
     /* Create contiguous block for data and area */
-    size_t psize = clawpatch_ghost_packsize(glob);
-    *q = (void*) FCLAW_ALLOC(char,psize);  /* sizeof(double) included in psize */
+    size_t esize = clawpatch_ghost_pack_elems(glob);
+    *q = (void*) FCLAW_ALLOC(double,esize);  
     FCLAW_ASSERT(*q != NULL);
 }
 
@@ -875,6 +883,7 @@ void clawpatch_local_ghost_free(fclaw2d_global_t* glob,
     FCLAW_FREE(*q);
     *q = NULL;
 }
+#endif
 
 static
 void clawpatch_local_ghost_pack(fclaw2d_global_t *glob,
@@ -1022,10 +1031,12 @@ void fclaw2d_clawpatch_vtable_initialize()
 
     /* ghost patch */
     patch_vt->ghost_packsize       = clawpatch_ghost_packsize;
-
     patch_vt->local_ghost_pack     = clawpatch_local_ghost_pack;
+
+#if 0    
     patch_vt->local_ghost_alloc    = clawpatch_local_ghost_alloc;
     patch_vt->local_ghost_free     = clawpatch_local_ghost_free;
+#endif    
     
     patch_vt->remote_ghost_build   = clawpatch_remote_ghost_build;
     patch_vt->remote_ghost_unpack  = clawpatch_remote_ghost_unpack;

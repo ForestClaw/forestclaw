@@ -187,11 +187,8 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
         {
             if (domain->blocks[nb].patches[np].flags &
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
-            {
-                /* Copy q and area into one contingous block */
-                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
-                fclaw2d_patch_local_ghost_alloc(glob,this_patch,
-                                                &e->patch_data[zz++]);
+            {                
+                fclaw2d_patch_local_ghost_alloc(glob, &e->patch_data[zz++]);
             }
         }
     }
@@ -271,8 +268,7 @@ void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
                 if ((*domain)->blocks[nb].patches[np].flags &
                     FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
                 {
-                    fclaw2d_patch_local_ghost_free(glob,
-                                                   &e_old->patch_data[zz++]);
+                    fclaw2d_patch_local_ghost_free(glob,&e_old->patch_data[zz++]);
                 }
             }
         }
