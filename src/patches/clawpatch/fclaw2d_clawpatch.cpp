@@ -75,7 +75,7 @@ fclaw2d_clawpatch_t* clawpatch_data(fclaw2d_patch_t *this_patch)
 static
 double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp);
 
-/* ------------------- Creating/deleting patches ----------------------- */
+/* ----------------------------- Creating/deleting patches ---------------------------- */
 
 static
 void* clawpatch_new()
@@ -364,7 +364,7 @@ static void setup_metric_storage(fclaw2d_clawpatch_t* cp)
     cp->edge_lengths.define(box_d,2);
 }
 
-/* ------------------------- time stepping ------------------------------ */
+/* -------------------------------- time stepping ------------------------------------- */
 
 static
 void clawpatch_save_step(fclaw2d_global_t* glob,
@@ -603,7 +603,7 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                             &coarse_corner,&transform_data);
 }
 
-/* ----------------------------------- Regridding functions --------------------------- */
+/* -------------------------------- Regridding functions ------------------------------ */
 
 static
 int clawpatch_tag4refinement(fclaw2d_global_t *glob,
@@ -766,7 +766,7 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
     }
 }
 
-/* --------------------------------- Parallel ghost patches --------------------------- */
+/* ------------------------------ Parallel ghost patches ------------------------------ */
 
 static
 void clawpatch_ghost_comm(fclaw2d_global_t* glob,
@@ -862,28 +862,6 @@ size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
     size_t esize = clawpatch_ghost_pack_elems(glob);
     return esize*sizeof(double);
 }
-
-#if 0
-/* This is only optional and can be handled directly in 
-    fclaw2d_patch.c by using clawpatch_ghost_packsize, above. */
-static
-void clawpatch_local_ghost_alloc(fclaw2d_global_t* glob,
-                                 void** q)
-{
-    /* Create contiguous block for data and area */
-    size_t esize = clawpatch_ghost_pack_elems(glob);
-    *q = (void*) FCLAW_ALLOC(double,esize);  
-    FCLAW_ASSERT(*q != NULL);
-}
-
-static
-void clawpatch_local_ghost_free(fclaw2d_global_t* glob,
-                                void **q)
-{
-    FCLAW_FREE(*q);
-    *q = NULL;
-}
-#endif
 
 static
 void clawpatch_local_ghost_pack(fclaw2d_global_t *glob,
@@ -1032,20 +1010,14 @@ void fclaw2d_clawpatch_vtable_initialize()
     /* ghost patch */
     patch_vt->ghost_packsize       = clawpatch_ghost_packsize;
     patch_vt->local_ghost_pack     = clawpatch_local_ghost_pack;
-
-#if 0    
-    patch_vt->local_ghost_alloc    = clawpatch_local_ghost_alloc;
-    patch_vt->local_ghost_free     = clawpatch_local_ghost_free;
-#endif    
-    
     patch_vt->remote_ghost_build   = clawpatch_remote_ghost_build;
     patch_vt->remote_ghost_unpack  = clawpatch_remote_ghost_unpack;
     patch_vt->remote_ghost_delete  = clawpatch_remote_ghost_delete;
 
     /* partitioning */
+    patch_vt->partition_packsize    = clawpatch_partition_packsize;
     patch_vt->partition_pack        = clawpatch_partition_pack;
     patch_vt->partition_unpack      = clawpatch_partition_unpack;
-    patch_vt->partition_packsize    = clawpatch_partition_packsize;
 
     /* output functions */
     clawpatch_vt->cb_output_ascii   = cb_clawpatch_output_ascii; 
@@ -1216,7 +1188,7 @@ double* fclaw2d_clawpatch_get_area(fclaw2d_global_t* glob,
 }
 
 
-/* -------------------------- Pillow grid  --------------------------- */
+/* --------------------------------- Pillow grid  ------------------------------------- */
 
 void fclaw2d_clawpatch_t::mb_exchange_block_corner_ghost(const int& a_corner,
                                                          fclaw2d_clawpatch_t *cp_corner,
