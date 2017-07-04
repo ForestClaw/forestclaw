@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_neighbors_fort.h>
 
 
-/* ----------------------------- static function defs ------------------------------- */
+/* ------------------------------- static function defs ------------------------------- */
 
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
@@ -430,7 +430,7 @@ void clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
 }
 
 
-/* -------------------------------------- Ghost filling  ------------------------------------- */
+/* ------------------------------------- Ghost filling  ------------------------------- */
 
 static
 void clawpatch_copy_face(fclaw2d_global_t *glob,
@@ -603,7 +603,7 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                             &coarse_corner,&transform_data);
 }
 
-/* ----------------------------------- Regridding functions --------------------------------- */
+/* ----------------------------------- Regridding functions --------------------------- */
 
 static
 int clawpatch_tag4refinement(fclaw2d_global_t *glob,
@@ -766,14 +766,15 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
     }
 }
 
-/* --------------------------------- Parallel ghost patches ----------------------------------- */
+/* --------------------------------- Parallel ghost patches --------------------------- */
 
 static
 void clawpatch_ghost_comm(fclaw2d_global_t* glob,
                           fclaw2d_patch_t* this_patch,
-                          double *qpack, int time_interp,
+                          void *unpack_from_here, int time_interp,
                           int packmode)
 {
+    double *qpack = (double*) unpack_from_here;
     int meqn;
     double *qthis;
     double *area;
@@ -782,6 +783,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
     int ierror;
 
+    int packextra = fclaw_opt->ghost_patch_pack_numextrafields;
     int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
 
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
@@ -800,41 +802,47 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
 
-    int psize = (wg - hole)*(meqn + packarea + fclaw_opt->ghost_patch_pack_numextrafields);
+    int psize = (wg - hole)*(meqn + packarea + packextra);
     FCLAW_ASSERT(psize > 0);
 
     int qareasize = (wg - hole)*(meqn + packarea);
     clawpatch_vt()->fort_local_ghost_pack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
                                          qpack,&qareasize,&packmode,&ierror);
     FCLAW_ASSERT(ierror == 0);
-    if (fclaw_opt->ghost_patch_pack_extra)
+    if (packextra)
     {
-      qpack += qareasize;
-      int extrasize = psize - qareasize;
-      FCLAW_ASSERT(clawpatch_vt()->fort_local_ghost_pack_aux != NULL);
-      clawpatch_vt()->fort_local_ghost_pack_aux(glob,this_patch,mint,
-                                           qpack,extrasize,packmode,&ierror);
-      FCLAW_ASSERT(ierror == 0);
+        qpack += qareasize;
+        int extrasize = psize - qareasize;
+        FCLAW_ASSERT(extrasize > 0);
+        FCLAW_ASSERT(clawpatch_vt()->fort_local_ghost_pack_aux != NULL);
+        clawpatch_vt()->fort_local_ghost_pack_aux(glob,this_patch,mint,
+                                                  qpack,extrasize,
+                                                  packmode,&ierror);
+        FCLAW_ASSERT(ierror == 0);
     }
 
     if (ierror > 0)
     {
-        fclaw_global_essentialf("ghost_pack (fclaw2d_clawpatch.cpp) : ierror = %d\n",ierror);
+        fclaw_global_essentialf("clawpatch_ghost_comm  : ierror = %d\n",ierror);
         exit(0);
     }
 }
 
 static
-size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
+size_t clawpatch_ghost_pack_elems(fclaw2d_global_t* glob)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                         fclaw2d_clawpatch_get_options(glob);
 
     int mx = clawpatch_opt->mx;
     int my = clawpatch_opt->my;
     int mbc = clawpatch_opt->mbc;
     int meqn = clawpatch_opt->meqn;
     int refratio = fclaw_opt->refratio;
+
+    int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;
+    int packextra = fclaw_opt->ghost_patch_pack_numextrafields;
 
     int mint = refratio*mbc;
     int nghost = mbc;
@@ -843,23 +851,28 @@ size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
     int hole = (mx - 2*mint)*(my - 2*mint);    /* Hole in center */
     FCLAW_ASSERT(hole >= 0);
 
-    int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;
-    int packextra = fclaw_opt->ghost_patch_pack_numextrafields;
-    int nfields = meqn + packarea + packextra;
-    size_t psize = (wg - hole)*nfields;
+    size_t psize = (wg - hole)*(meqn + packarea + packextra);
     FCLAW_ASSERT(psize > 0);
 
-    return psize*sizeof(double);
+    return psize;
+}    
+
+size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
+{
+    size_t esize = clawpatch_ghost_pack_elems(glob);
+    return esize*sizeof(double);
 }
 
+#if 0
+/* This is only optional and can be handled directly in 
+    fclaw2d_patch.c by using clawpatch_ghost_packsize, above. */
 static
 void clawpatch_local_ghost_alloc(fclaw2d_global_t* glob,
-                                 fclaw2d_patch_t* this_patch,
                                  void** q)
 {
     /* Create contiguous block for data and area */
-    int msize = clawpatch_ghost_packsize(glob);
-    *q = (void*) FCLAW_ALLOC(double,msize);
+    size_t esize = clawpatch_ghost_pack_elems(glob);
+    *q = (void*) FCLAW_ALLOC(double,esize);  
     FCLAW_ASSERT(*q != NULL);
 }
 
@@ -870,11 +883,12 @@ void clawpatch_local_ghost_free(fclaw2d_global_t* glob,
     FCLAW_FREE(*q);
     *q = NULL;
 }
+#endif
 
 static
 void clawpatch_local_ghost_pack(fclaw2d_global_t *glob,
                                 fclaw2d_patch_t *this_patch,
-                                double *patch_data,
+                                void *patch_data,
                                 int time_interp)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -889,7 +903,7 @@ void clawpatch_remote_ghost_unpack(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch,
                                    int this_block_idx,
                                    int this_patch_idx,
-                                   double *qdata, int time_interp)
+                                   void *qdata, int time_interp)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;
@@ -928,7 +942,7 @@ void clawpatch_remote_ghost_delete(void *patchcp)
     patchcp = NULL;
 }
 
-/* -------------------------------- Parallel partitioning ------------------------------------ */
+/* ---------------------------- Parallel partitioning --------------------------------- */
 
 static
 size_t clawpatch_partition_packsize(fclaw2d_global_t* glob)
@@ -971,7 +985,7 @@ void clawpatch_partition_unpack(fclaw2d_global_t *glob,
     cp->griddata.copyFromMemory((double*)unpack_data_from_here);
 }
 
-/* ------------------------------------ Virtual table  -------------------------------------- */
+/* ------------------------------------ Virtual table  -------------------------------- */
 
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
@@ -986,8 +1000,6 @@ void fclaw2d_clawpatch_vtable_initialize()
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_init();
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
-
 
     /* These may be redefined by the user */
     /* Problem setup */
@@ -1019,10 +1031,12 @@ void fclaw2d_clawpatch_vtable_initialize()
 
     /* ghost patch */
     patch_vt->ghost_packsize       = clawpatch_ghost_packsize;
-
     patch_vt->local_ghost_pack     = clawpatch_local_ghost_pack;
+
+#if 0    
     patch_vt->local_ghost_alloc    = clawpatch_local_ghost_alloc;
     patch_vt->local_ghost_free     = clawpatch_local_ghost_free;
+#endif    
     
     patch_vt->remote_ghost_build   = clawpatch_remote_ghost_build;
     patch_vt->remote_ghost_unpack  = clawpatch_remote_ghost_unpack;
@@ -1038,18 +1052,13 @@ void fclaw2d_clawpatch_vtable_initialize()
     clawpatch_vt->fort_header_ascii = NULL;    /* Defined in clawpack solvers */ 
     clawpatch_vt->fort_output_ascii = NULL;    /* Defined in clawpack solvers */
 
-    /* diagnostic functions that apply to patches (error, conservation) */
-    diag_vt->patch_init_diagnostics      = fclaw2d_clawpatch_diagnostics_initialize;
-    diag_vt->patch_compute_diagnostics   = fclaw2d_clawpatch_diagnostics_compute;
-    diag_vt->patch_gather_diagnostics    = fclaw2d_clawpatch_diagnostics_gather;
-    diag_vt->patch_reset_diagnostics     = fclaw2d_clawpatch_diagnostics_reset;
-    diag_vt->patch_finalize_diagnostics  = fclaw2d_clawpatch_diagnostics_finalize;
+    fclaw2d_clawpatch_diagnostics_vtable_initialize();
 
     clawpatch_vt->is_set = 1;
 }
 
 
-/* --------------------------------- Misc access functions --------------------------------- */
+/* --------------------------------- Misc access functions ---------------------------- */
 
 /* These functions are not virtualized and are not defined by the 
    patch interface */

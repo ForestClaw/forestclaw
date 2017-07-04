@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static fc2d_clawpack46_vtable_t s_clawpack46_vt;
 
-/* -------------------------- Clawpack solver functions ------------------------------ */
+/* --------------------------- Clawpack solver functions ------------------------------ */
 
 
 static
@@ -383,7 +383,7 @@ void clawpack46_output(fclaw2d_global_t *glob, int iframe)
 }
 
 
-/* ---------------------------------- Virtual table  ------------------------------------- */
+/* ---------------------------------- Virtual table  ---------------------------------- */
 
 static
 fc2d_clawpack46_vtable_t* clawpack46_vt_init()
@@ -397,30 +397,30 @@ void fc2d_clawpack46_solver_initialize()
     fclaw2d_clawpatch_vtable_initialize();
 
     fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
-    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  /* initialized in clawpatch_init */
+    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
     fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
 
     fc2d_clawpack46_vtable_t*  claw46_vt = clawpack46_vt_init();
 
     /* ForestClaw vtable items */
-    fclaw_vt->output_frame   = clawpack46_output;
-    fclaw_vt->problem_setup  = clawpack46_setprob;    
+    fclaw_vt->output_frame                   = clawpack46_output;
+    fclaw_vt->problem_setup                  = clawpack46_setprob;    
 
     /* Required functions  - error if NULL */
-    claw46_vt->bc2 = CLAWPACK46_BC2_DEFAULT;
-    claw46_vt->qinit = NULL;
-    claw46_vt->rpn2 = NULL;
-    claw46_vt->rpt2 = NULL;
+    claw46_vt->bc2                           = CLAWPACK46_BC2_DEFAULT;
+    claw46_vt->qinit                         = NULL;
+    claw46_vt->rpn2                          = NULL;
+    claw46_vt->rpt2                          = NULL;
 
     /* Optional functions - call only if non-NULL */
-    claw46_vt->setprob = NULL;
-    claw46_vt->setaux = NULL;
-    claw46_vt->b4step2 = NULL;
-    claw46_vt->src2 = NULL;
+    claw46_vt->setprob                       = NULL;
+    claw46_vt->setaux                        = NULL;
+    claw46_vt->b4step2                       = NULL;
+    claw46_vt->src2                          = NULL;
 
     /* These could be over-written by user specific settings */
     patch_vt->initialize                     = clawpack46_qinit;
-    patch_vt->setup                          = NULL;  /* Use setaux, for example */
+    patch_vt->setup                          = clawpack46_setaux;  
     patch_vt->physical_bc                    = clawpack46_bc2;
     patch_vt->single_step_update             = clawpack46_update;
 

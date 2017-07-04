@@ -54,6 +54,9 @@ void fclaw2d_clawpatch_diagnostics_reset(struct fclaw2d_global *glob,
 void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
                                             void** patch_acc);
 
+void fclaw2d_clawpatch_diagnostics_vtable_initialize();
+
+
 #ifdef __cplusplus
 #if 0
 {
