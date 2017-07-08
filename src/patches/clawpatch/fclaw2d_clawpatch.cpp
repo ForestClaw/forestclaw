@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_neighbors_fort.h>
 
 
-/* ------------------------------- static function defs ------------------------------- */
+/* ------------------------------- Static function defs ------------------------------- */
 
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
@@ -306,7 +306,8 @@ static void setup_area_storage(fclaw2d_clawpatch_t* cp)
     cp->area.define(box_p,1);
 }
 
-static void setup_metric_storage(fclaw2d_clawpatch_t* cp)
+static 
+void setup_metric_storage(fclaw2d_clawpatch_t* cp)
 {
     /* 24 additional field variables needed for all metric terms
        xp,yp,zp           : 3
