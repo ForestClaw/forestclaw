@@ -25,118 +25,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_clawpack46.h"
 #include "fc2d_clawpack46_options.h"
-
+#include "fc2d_clawpack46_fort.h"
 
 #include <fclaw2d_clawpatch.hpp>
-#include <fclaw2d_clawpatch_output_ascii.h>
+#include <fclaw2d_clawpatch.h>
+
+#include <fclaw2d_clawpatch_diagnostics.h>
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw2d_clawpatch_fort.h>
+
+#include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_defs.h>
 
 
-static fc2d_clawpack46_vtable_t classic_vt;
+static fc2d_clawpack46_vtable_t s_clawpack46_vt;
+
+/* --------------------------- Clawpack solver functions ------------------------------ */
+
 
 static
-fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt_init()
+void clawpack46_setprob(fclaw2d_global_t *glob)
 {
-    FCLAW_ASSERT(classic_vt.is_set == 0);
-    return &classic_vt;
-}
-
-/* -----------------------------------------------------------
-   Public interface to routines in this file
-   ----------------------------------------------------------- */
-
-fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt()
-{
-    FCLAW_ASSERT(classic_vt.is_set != 0);
-    return &classic_vt;
-}
-
-void fc2d_clawpack46_vtable_initialize()
-{
-    fclaw2d_clawpatch_vtable_initialize();
-
-    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
-    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  /* initialized in clawpatch_init */
-    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
-
-    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt_init();
-
-    /* ForestClaw vtable items */
-    fclaw_vt->output_frame   = &fc2d_clawpack46_output;
-    fclaw_vt->problem_setup  = &fc2d_clawpack46_setprob;    
-
-    /* Required functions  - error if NULL */
-    claw46_vt->bc2 = CLAWPACK46_BC2_DEFAULT;
-    claw46_vt->qinit = NULL;
-    claw46_vt->rpn2 = NULL;
-    claw46_vt->rpt2 = NULL;
-
-    /* Optional functions - call only if non-NULL */
-    claw46_vt->setprob = NULL;
-    claw46_vt->setaux = NULL;
-    claw46_vt->b4step2 = NULL;
-    claw46_vt->src2 = NULL;
-
-    /* These could be over-written by user specific settings */
-    patch_vt->initialize          = &fc2d_clawpack46_qinit;
-    patch_vt->setup               = &fc2d_clawpack46_setaux;   /* Checks that SETAUX != NULL */
-    patch_vt->physical_bc         = &fc2d_clawpack46_bc2;
-    patch_vt->single_step_update  = &fc2d_clawpack46_update;
-
-    /* Clawpatch settings functions */
-    clawpatch_vt->fort_average2coarse    = &FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
-    clawpatch_vt->fort_interpolate2fine  = &FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE;
-
-    clawpatch_vt->fort_tag4refinement    = &FC2D_CLAWPACK46_FORT_TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening    = &FC2D_CLAWPACK46_FORT_TAG4COARSENING;
-
-    /* output functions */
-    clawpatch_vt->fort_header_ascii        = &FC2D_CLAWPACK46_FORT_HEADER_ASCII;
-    clawpatch_vt->fort_output_ascii        = &FC2D_CLAWPACK46_FORT_OUTPUT_ASCII;
-
-    /* Diagnostic functions */
-    clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
-    clawpatch_vt->fort_compute_error_norm    = &FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
-    clawpatch_vt->fort_compute_patch_area    = &FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
-    clawpatch_vt->fort_conservation_check    = &FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
-
-    /* Ghost cell exchange functions */
-    clawpatch_vt->fort_copy_face          = &FC2D_CLAWPACK46_FORT_COPY_FACE;
-    clawpatch_vt->fort_average_face       = &FC2D_CLAWPACK46_FORT_AVERAGE_FACE;
-    clawpatch_vt->fort_interpolate_face   = &FC2D_CLAWPACK46_FORT_INTERPOLATE_FACE;
-
-    clawpatch_vt->fort_copy_corner        = &FC2D_CLAWPACK46_FORT_COPY_CORNER;
-    clawpatch_vt->fort_average_corner     = &FC2D_CLAWPACK46_FORT_AVERAGE_CORNER;
-    clawpatch_vt->fort_interpolate_corner = &FC2D_CLAWPACK46_FORT_INTERPOLATE_CORNER;
-
-    clawpatch_vt->ghostpack_extra         = NULL;
-    clawpatch_vt->fort_ghostpack_qarea    = &FC2D_CLAWPACK46_FORT_GHOSTPACK_QAREA;
-
-    clawpatch_vt->fort_timeinterp         = &FC2D_CLAWPACK46_FORT_TIMEINTERP;
-
-    claw46_vt->is_set = 1;
-}
-
-
-void fc2d_clawpack46_setprob(fclaw2d_global_t *glob)
-{
-    if (classic_vt.setprob != NULL)
+    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
+    if (claw46_vt->setprob != NULL)
     {
-        classic_vt.setprob();
+        claw46_vt->setprob();
     }
 }
 
 
 /* This should only be called when a new fclaw2d_clawpatch_t is created. */
-void fc2d_clawpack46_setaux(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx)
-{
-    if (classic_vt.setaux == NULL)
+static
+void clawpack46_setaux(fclaw2d_global_t *glob,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx)
+    {
+    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
+    if (claw46_vt->setaux == NULL)
     {
         /* For consistency, class_vt.patch_setup is set to
            fc2d_clawpack46_setaux by default.  We
@@ -164,44 +94,20 @@ void fc2d_clawpack46_setaux(fclaw2d_global_t *glob,
     maxmy = my;
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.setaux(&maxmx,&maxmy,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+    claw46_vt->setaux(&maxmx,&maxmy,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                       &maux,aux);
     CLAWPACK46_UNSET_BLOCK();
 }
 
-/* This should only be called when a new fclaw2d_clawpatch_t is created. */
-void fc2d_clawpack46_set_capacity(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
-                                  int this_block_idx,
-                                  int this_patch_idx)
+static
+void clawpack46_qinit(fclaw2d_global_t *glob,
+                      fclaw2d_patch_t *this_patch,
+                      int this_block_idx,
+                      int this_patch_idx)
 {
-    int mx,my,mbc,maux,mcapa;
-    double dx,dy,xlower,ylower;
-    double *aux, *area;
-    fc2d_clawpack46_options_t *clawopt;
+    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
 
-    clawopt = fc2d_clawpack46_get_options(glob);
-    mcapa = clawopt->mcapa;
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    area = fclaw2d_clawpatch_get_area(glob,this_patch);
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-    FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
-
-    CLAWPACK46_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
-                            &maux,aux);
-}
-
-
-void fc2d_clawpack46_qinit(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx)
-{
-    FCLAW_ASSERT(classic_vt.qinit != NULL); /* Must be initialized */
+    FCLAW_ASSERT(claw46_vt->qinit != NULL); /* Must be initialized */
     int mx,my,mbc,meqn,maux,maxmx,maxmy;
     double dx,dy,xlower,ylower;
     double *q, *aux;
@@ -217,19 +123,21 @@ void fc2d_clawpack46_qinit(fclaw2d_global_t *glob,
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.qinit(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
+    claw46_vt->qinit(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
                      &maux,aux);
     CLAWPACK46_UNSET_BLOCK();
 }
 
-void fc2d_clawpack46_b4step2(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t, double dt)
+static
+void clawpack46_b4step2(fclaw2d_global_t *glob,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        double t, double dt)
 
 {
-    FCLAW_ASSERT(classic_vt.b4step2 != NULL);
+    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
+    FCLAW_ASSERT(claw46_vt->b4step2 != NULL);
 
     int mx,my,mbc,meqn, maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
@@ -245,19 +153,21 @@ void fc2d_clawpack46_b4step2(fclaw2d_global_t *glob,
     maxmy = my;
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
+    claw46_vt->b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
                        &dx,&dy,&t,&dt,&maux,aux);
     CLAWPACK46_UNSET_BLOCK();
 }
 
-void fc2d_clawpack46_src2(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          double t,
-                          double dt)
+static
+void clawpack46_src2(fclaw2d_global_t *glob,
+                     fclaw2d_patch_t *this_patch,
+                     int this_block_idx,
+                     int this_patch_idx,
+                     double t,
+                     double dt)
 {
-    FCLAW_ASSERT(classic_vt.src2 != NULL);
+    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
+    FCLAW_ASSERT(claw46_vt->src2 != NULL);
 
     int mx,my,mbc,meqn, maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
@@ -273,40 +183,27 @@ void fc2d_clawpack46_src2(fclaw2d_global_t *glob,
     maxmy = my;
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.src2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
+    claw46_vt->src2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
                     &dx,&dy,q,&maux,aux,&t,&dt);
     CLAWPACK46_UNSET_BLOCK();
 }
 
 
-/* Use this to return only the right hand side of the clawpack algorithm */
-double fc2d_clawpack46_step2_rhs(fclaw2d_global_t *glob,
-                                 fclaw2d_patch_t *this_patch,
-                                 int this_block_idx,
-                                 int this_patch_idx,
-                                 double t,
-                                 double *rhs)
+static
+void clawpack46_bc2(fclaw2d_global_t *glob,
+                    fclaw2d_patch_t *this_patch,
+                    int this_block_idx,
+                    int this_patch_idx,
+                    double t,
+                    double dt,
+                    int intersects_phys_bdry[],
+                    int time_interp)
 {
-    /* This should evaluate the right hand side, but not actually do the update.
-       This will be useful in cases where we want to use something other than
-       a single step method.  For example, in a RK scheme, one might want to
-       call the right hand side to evaluate stages. */
-    return 0;
-}
+    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
 
-
-void fc2d_clawpack46_bc2(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx,
-                         double t,
-                         double dt,
-                         int intersects_phys_bdry[],
-                         int time_interp)
-{
     fc2d_clawpack46_options_t *clawpack_options = fc2d_clawpack46_get_options(glob);
 
-    FCLAW_ASSERT(classic_vt.bc2 != NULL);
+    FCLAW_ASSERT(claw46_vt->bc2 != NULL);
 
     int mx,my,mbc,meqn,maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
@@ -345,28 +242,30 @@ void fc2d_clawpack46_bc2(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
 
     CLAWPACK46_SET_BLOCK(&this_block_idx);
-    classic_vt.bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
+    claw46_vt->bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
                    &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     CLAWPACK46_UNSET_BLOCK();
 }
 
 
 /* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
-double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt)
+static
+double clawpack46_step2(fclaw2d_global_t *glob,
+                        fclaw2d_patch_t *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        double t,
+                        double dt)
 {
+    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
     fc2d_clawpack46_options_t* clawpack_options;
     int level;
     double *qold, *aux;
     int mx, my, meqn, maux, mbc;
     double xlower, ylower, dx,dy;
 
-    FCLAW_ASSERT(classic_vt.rpn2 != NULL);
-    FCLAW_ASSERT(classic_vt.rpt2 != NULL);
+    FCLAW_ASSERT(claw46_vt->rpn2 != NULL);
+    FCLAW_ASSERT(claw46_vt->rpt2 != NULL);
 
     clawpack_options = fc2d_clawpack46_get_options(glob);
 
@@ -405,13 +304,13 @@ double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
                           clawpack_options->mthlim, &clawpack_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
-                          classic_vt.rpn2, classic_vt.rpt2,flux2,
+                          claw46_vt->rpn2, claw46_vt->rpt2,flux2,
                           block_corner_count, &ierror);
 
     FCLAW_ASSERT(ierror == 0);
 
     /* Accumulate fluxes needed for conservative fix-up */
-    if (classic_vt.fluxfun != NULL)
+    if (claw46_vt->fluxfun != NULL)
     {
         /* Accumulate fluxes */
     }
@@ -427,42 +326,46 @@ double fc2d_clawpack46_step2(fclaw2d_global_t *glob,
     return cflgrid;
 }
 
-double fc2d_clawpack46_update(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *this_patch,
-                              int this_block_idx,
-                              int this_patch_idx,
-                              double t,
-                              double dt)
-{   
+static
+double clawpack46_update(fclaw2d_global_t *glob,
+                         fclaw2d_patch_t *this_patch,
+                         int this_block_idx,
+                         int this_patch_idx,
+                         double t,
+                         double dt)
+{
+    fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
+
     const fc2d_clawpack46_options_t* clawpack_options;
     clawpack_options = fc2d_clawpack46_get_options(glob);
 
-    if (classic_vt.b4step2 != NULL)
+    if (claw46_vt->b4step2 != NULL)
     {
-        fc2d_clawpack46_b4step2(glob,
-                                this_patch,
-                                this_block_idx,
-                                this_patch_idx,t,dt);
+        clawpack46_b4step2(glob,
+                           this_patch,
+                           this_block_idx,
+                           this_patch_idx,t,dt);
     }
 
-    double maxcfl = fc2d_clawpack46_step2(glob,
-                                          this_patch,
-                                          this_block_idx,
-                                          this_patch_idx,t,dt);
+    double maxcfl = clawpack46_step2(glob,
+                                     this_patch,
+                                     this_block_idx,
+                                     this_patch_idx,t,dt);
 
     if (clawpack_options->src_term > 0)
     {
-        fc2d_clawpack46_src2(glob,
-                             this_patch,
-                             this_block_idx,
-                             this_patch_idx,t,dt);
+        clawpack46_src2(glob,
+                        this_patch,
+                        this_block_idx,
+                        this_patch_idx,t,dt);
     }
     return maxcfl;
 }
 
+/* ---------------------------------- Output functions -------------------------------- */
 
-
-void fc2d_clawpack46_output(fclaw2d_global_t *glob, int iframe)
+static
+void clawpack46_output(fclaw2d_global_t *glob, int iframe)
 {
     const fc2d_clawpack46_options_t* clawpack_options;
     clawpack_options = fc2d_clawpack46_get_options(glob);
@@ -478,4 +381,181 @@ void fc2d_clawpack46_output(fclaw2d_global_t *glob, int iframe)
     }
 
 }
+
+
+/* ---------------------------------- Virtual table  ---------------------------------- */
+
+static
+fc2d_clawpack46_vtable_t* clawpack46_vt_init()
+{
+    FCLAW_ASSERT(s_clawpack46_vt.is_set == 0);
+    return &s_clawpack46_vt;
+}
+
+void fc2d_clawpack46_solver_initialize()
+{
+    fclaw2d_clawpatch_vtable_initialize();
+
+    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
+    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
+    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
+
+    fc2d_clawpack46_vtable_t*  claw46_vt = clawpack46_vt_init();
+
+    /* ForestClaw vtable items */
+    fclaw_vt->output_frame                   = clawpack46_output;
+    fclaw_vt->problem_setup                  = clawpack46_setprob;    
+
+    /* Required functions  - error if NULL */
+    claw46_vt->bc2                           = CLAWPACK46_BC2_DEFAULT;
+    claw46_vt->qinit                         = NULL;
+    claw46_vt->rpn2                          = NULL;
+    claw46_vt->rpt2                          = NULL;
+
+    /* Optional functions - call only if non-NULL */
+    claw46_vt->setprob                       = NULL;
+    claw46_vt->setaux                        = NULL;
+    claw46_vt->b4step2                       = NULL;
+    claw46_vt->src2                          = NULL;
+
+    /* These could be over-written by user specific settings */
+    patch_vt->initialize                     = clawpack46_qinit;
+    patch_vt->setup                          = clawpack46_setaux;  
+    patch_vt->physical_bc                    = clawpack46_bc2;
+    patch_vt->single_step_update             = clawpack46_update;
+
+    /* Clawpatch settings functions */
+    clawpatch_vt->fort_average2coarse        = FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
+    clawpatch_vt->fort_interpolate2fine      = FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE;
+
+    clawpatch_vt->fort_tag4refinement        = FC2D_CLAWPACK46_FORT_TAG4REFINEMENT;
+    clawpatch_vt->fort_tag4coarsening        = FC2D_CLAWPACK46_FORT_TAG4COARSENING;
+
+    /* output functions */
+    clawpatch_vt->fort_header_ascii          = FC2D_CLAWPACK46_FORT_HEADER_ASCII;
+    clawpatch_vt->fort_output_ascii          = FC2D_CLAWPACK46_FORT_OUTPUT_ASCII;
+
+    /* Diagnostic functions */
+    clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
+    clawpatch_vt->fort_compute_error_norm    = FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->fort_compute_patch_area    = FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
+    clawpatch_vt->fort_conservation_check    = FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
+
+    /* Ghost cell exchange functions */
+    clawpatch_vt->fort_copy_face             = FC2D_CLAWPACK46_FORT_COPY_FACE;
+    clawpatch_vt->fort_average_face          = FC2D_CLAWPACK46_FORT_AVERAGE_FACE;
+    clawpatch_vt->fort_interpolate_face      = FC2D_CLAWPACK46_FORT_INTERPOLATE_FACE;
+
+    clawpatch_vt->fort_copy_corner           = FC2D_CLAWPACK46_FORT_COPY_CORNER;
+    clawpatch_vt->fort_average_corner        = FC2D_CLAWPACK46_FORT_AVERAGE_CORNER;
+    clawpatch_vt->fort_interpolate_corner    = FC2D_CLAWPACK46_FORT_INTERPOLATE_CORNER;
+
+    clawpatch_vt->fort_local_ghost_pack_aux  = NULL;
+    clawpatch_vt->fort_local_ghost_pack      = FC2D_CLAWPACK46_FORT_LOCAL_GHOST_PACK;
+
+    clawpatch_vt->fort_timeinterp            = FC2D_CLAWPACK46_FORT_TIMEINTERP;
+
+    claw46_vt->is_set = 1;
+}
+
+
+/* ----------------------------- User access to solver functions --------------------------- */
+
+
+/* These are here in case the user wants to call Clawpack routines directly */
+
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt()
+{
+    FCLAW_ASSERT(s_clawpack46_vt.is_set != 0);
+    return &s_clawpack46_vt;
+}
+
+
+void fc2d_clawpack46_setprob(fclaw2d_global_t *glob)
+{
+    clawpack46_setprob(glob);
+}
+
+void fc2d_clawpack46_setaux(fclaw2d_global_t *glob,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx)
+{
+    clawpack46_setaux(glob,this_patch,this_block_idx,this_patch_idx);
+}
+
+
+/* This should only be called when a new fclaw2d_clawpatch_t is created. */
+void fc2d_clawpack46_set_capacity(fclaw2d_global_t *glob,
+                                  fclaw2d_patch_t *this_patch,
+                                  int this_block_idx,
+                                  int this_patch_idx)
+{
+    int mx,my,mbc,maux,mcapa;
+    double dx,dy,xlower,ylower;
+    double *aux, *area;
+    fc2d_clawpack46_options_t *clawopt;
+
+    clawopt = fc2d_clawpack46_get_options(glob);
+    mcapa = clawopt->mcapa;
+
+    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    area = fclaw2d_clawpatch_get_area(glob,this_patch);
+
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
+
+    CLAWPACK46_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
+                            &maux,aux);
+}
+
+void fc2d_clawpack46_qinit(fclaw2d_global_t *glob,
+                           fclaw2d_patch_t *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx)
+{
+    clawpack46_qinit(glob,this_patch,this_block_idx,this_patch_idx);
+}
+
+void fc2d_clawpack46_b4step2(fclaw2d_global_t* glob,
+                             fclaw2d_patch_t *this_patch,
+                             int this_block_idx,
+                             int this_patch_idx,
+                             double t,
+                             double dt)
+{
+    clawpack46_b4step2(glob,this_patch,this_block_idx,this_patch_idx,t,dt);
+}
+
+void fc2d_clawpack46_bc2(fclaw2d_global_t *glob,
+                         fclaw2d_patch_t *this_patch,
+                         int this_block_idx,
+                         int this_patch_idx,
+                         double t,
+                         double dt,
+                         int intersects_bc[],
+                         int time_interp)
+{
+    clawpack46_bc2(glob,this_patch,this_block_idx,this_block_idx,t,dt,
+                   intersects_bc,time_interp);
+}
+
+void fc2d_clawpack46_src2(fclaw2d_global_t* glob,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          double t,
+                          double dt)
+{
+    clawpack46_src2(glob,this_patch,this_block_idx,this_block_idx,t,dt);
+}
+
+
+
+
+
+
+
 

@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
 
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack46.h>
@@ -245,11 +246,11 @@ void run_program(fclaw2d_global_t* glob)
 
     if (user->claw_version == 4)
     {
-      fc2d_clawpack46_vtable_initialize();
+      fc2d_clawpack46_solver_initialize();
     }
     else if (user->claw_version == 5)
     {
-      fc2d_clawpack5_vtable_initialize();
+      fc2d_clawpack5_solver_initialize();
     }
 
     filament_link_solvers(glob);

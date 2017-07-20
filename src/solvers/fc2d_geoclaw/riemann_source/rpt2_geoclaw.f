@@ -1,5 +1,5 @@
 ! =====================================================
-      subroutine geoclaw_rpt2(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx,
+      subroutine fc2d_geoclaw_rpt2(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx,
      &      ql,qr,aux1,aux2,aux3,asdq,bmasdq,bpasdq)
 ! =====================================================
       use geoclaw_module, only: g => grav, tol => dry_tolerance

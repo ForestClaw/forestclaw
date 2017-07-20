@@ -1,4 +1,4 @@
-      subroutine fc2d_geoclaw_fort_ghostpackaux(mx,my,mbc,maux,
+      subroutine fc2d_geoclaw_local_ghost_pack_aux(mx,my,mbc,maux,
      &           mint,auxdata,auxpack,auxsize,packmode,ierror)
 
       implicit none

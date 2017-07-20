@@ -1,5 +1,5 @@
 c======================================================================
-      subroutine geoclaw_rpn2(ixy,maxm,meqn,mwaves,maux,mbc,mx,
+      subroutine fc2d_geoclaw_rpn2(ixy,maxm,meqn,mwaves,maux,mbc,mx,
      &      ql,qr,auxl,auxr,fwave,s,amdq,apdq)
 c======================================================================
 c

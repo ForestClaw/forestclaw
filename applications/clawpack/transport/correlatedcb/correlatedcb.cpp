@@ -58,11 +58,11 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_initialize();
+        fc2d_clawpack46_solver_initialize();
     }
     else if (user_opt->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_initialize();
+        fc2d_clawpack5_solver_initialize();
     }
 
     correlatedcb_link_solvers(glob);

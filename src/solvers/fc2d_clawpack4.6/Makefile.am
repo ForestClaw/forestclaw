@@ -20,7 +20,7 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_average.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_copy.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_interpolate.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_ghostpack_qarea.f \
+	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_local_ghost_pack.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_diagnostics.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_output_ascii.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_tag4refinement.f \

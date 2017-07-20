@@ -1,7 +1,7 @@
 c
 c
 c     =====================================================
-      subroutine geoclaw_limiter(maxm,meqn,mwaves,mbc,mx,
+      subroutine fc2d_geoclaw_limiter(maxm,meqn,mwaves,mbc,mx,
      &      wave,s,mthlim)
 c     =====================================================
 c

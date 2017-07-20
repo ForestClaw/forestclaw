@@ -23,13 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CLAWPACK_USER_H
-#define CLAWPACK_USER_H
+#ifndef FCLAW2D_CLAWPATCH_DIAGNOSTICS_H
+#define FCLAW2D_CLAWPATCH_DIAGNOSTICS_H
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -39,24 +36,26 @@ extern "C"
 #endif
 #endif
 
-#define CLAWPACK5_RPN2_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpn2_manifold, \
-                                               CLAWPACK5_RPN2_MANIFOLD)
-void CLAWPACK5_RPN2_MANIFOLD(const int* ixy,const int* maxm, const int* meqn,
-                                const int* mwaves, const int* maux,
-                                const int* mbc,const int* mx,
-                                double ql[], double qr[], double auxl[], double auxr[],
-                                double wave[], double s[],double amdq[], double apdq[]);
+struct fclaw2d_global;
+struct fclaw2d_patch;
 
-#define CLAWPACK5_RPT2_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpt2_manifold, \
-                                               CLAWPACK5_RPT2_MANIFOLD)
-void CLAWPACK5_RPT2_MANIFOLD(const int* ixy, const int* imp,
-                             const int* maxm, const int* meqn,
-                             const int* mwaves, const int* maux,
-                             const int* mbc,const int* mx,
-                             double ql[], double qr[],
-                             double aux1[], double aux2[],
-                             double aux3[],  double asdq[],
-                             double bmasdq[], double bpasdq[]);
+void fclaw2d_clawpatch_diagnostics_initialize(struct fclaw2d_global *glob,
+                                              void** patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_compute(struct fclaw2d_global *glob,
+                                           void* patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_gather(struct fclaw2d_global *glob,
+                                          void* patch_acc, int init_flag);
+
+void fclaw2d_clawpatch_diagnostics_reset(struct fclaw2d_global *glob,
+                                         void* patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
+                                            void** patch_acc);
+
+void fclaw2d_clawpatch_diagnostics_vtable_initialize();
+
 
 #ifdef __cplusplus
 #if 0

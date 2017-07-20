@@ -30,12 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
-#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
-
 #include <fc2d_clawpack5.h>
-#include <clawpack5_user_fort.h>
 
-#include "../all/clawpack_user.h"
+#include "../all/advection_user_fort.h"
 
 
 void filament_link_solvers(fclaw2d_global_t *glob)
@@ -52,6 +49,8 @@ void filament_link_solvers(fclaw2d_global_t *glob)
 
         clawpack46_vt->setprob   = &SETPROB;
         clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
+
+        patch_vt->setup = fc2d_clawpack46_setaux;
 
         if (fclaw_opt->manifold)
         {
@@ -96,6 +95,7 @@ void filament_link_solvers(fclaw2d_global_t *glob)
         }
         else
         {
+            patch_vt->setup         = fc2d_clawpack5_setaux;
             clawpack5_vt->setaux    = &CLAWPACK5_SETAUX;   /* Used in non-manifold case */
             clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV;
             clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV;
