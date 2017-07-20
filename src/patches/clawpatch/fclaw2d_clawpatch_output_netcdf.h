@@ -38,10 +38,15 @@ struct fclaw2d_global;
 struct fclaw2d_patch;
 struct fclaw2d_domain;
 
-void cb_clawpatch_output_netcdf (struct fclaw2d_domain * domain,
-                                struct fclaw2d_patch * this_patch,
-                                int this_block_idx, int this_patch_idx,
-                                void *user);
+void cb_clawpatch_output_netcdf_defpatch (struct fclaw2d_domain * domain,
+                                		  struct fclaw2d_patch * this_patch,
+                                          int this_block_idx, int this_patch_idx,
+                                          void *user);
+
+void cb_clawpatch_output_netcdf_writeq (struct fclaw2d_domain * domain,
+                                        struct fclaw2d_patch * this_patch,
+                                        int this_block_idx, int this_patch_idx,
+                                        void *user);
 
 void fclaw2d_clawpatch_output_netcdf(struct fclaw2d_global* glob,int iframe);
 
