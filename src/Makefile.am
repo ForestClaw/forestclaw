@@ -47,6 +47,7 @@ libforestclaw_installed_headers = \
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
+	src/patches/clawpatch/fclaw2d_clawpatch_output_netcdf.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.h
 
@@ -126,7 +127,8 @@ libforestclaw_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
-	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.c
+	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_output_netcdf.c
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = \

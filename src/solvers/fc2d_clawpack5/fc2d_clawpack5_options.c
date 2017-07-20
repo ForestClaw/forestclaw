@@ -67,6 +67,8 @@ clawpack5_register (fc2d_clawpack5_options_t* clawopt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "vtk-out", &clawopt->vtk_out, 0,
                            "Output VTK formatted data [F]");
 
+    sc_options_add_bool (opt, 0, "netcdf-out", &clawopt->netcdf_out, 0,
+                           "Output NETCDF formatted data [F]");
     clawopt->is_registered = 1;
     return NULL;
 }

@@ -23,10 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPACK5_OPTIONS_H
-#define FCLAW2D_CLAWPACK5_OPTIONS_H
-
-#include <fclaw_base.h>
+#ifndef FCLAW2D_CLAWPATCH_OUTPUT_NETCDF_H
+#define FCLAW2D_CLAWPATCH_OUTPUT_NETCDF_H
 
 #ifdef __cplusplus
 extern "C"
@@ -37,53 +35,15 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
+struct fclaw2d_patch;
+struct fclaw2d_domain;
 
-typedef struct fc2d_clawpack5_options fc2d_clawpack5_options_t;
+void cb_clawpatch_output_netcdf (struct fclaw2d_domain * domain,
+                                struct fclaw2d_patch * this_patch,
+                                int this_block_idx, int this_patch_idx,
+                                void *user);
 
-
-struct fc2d_clawpack5_options
-{
-    int mwaves;
-
-    const char *order_string;
-    int *order;
-
-    int *mthlim;
-    const char *mthlim_string;
-
-    int *mthbc;
-    const char *mthbc_string;
-    
-    int method[7];
-    int mcapa;
-    int src_term;
-    int use_fwaves;
-
-    /* Output */
-    int ascii_out;
-    int vtk_out;
-    int netcdf_out;
-
-    int is_registered;
-};
-
-
-fc2d_clawpack5_options_t *fc2d_clawpack5_options_register (fclaw_app_t *
-                                                           app,
-                                                           const char
-                                                           *configfile);
-
-void fc2d_clawpack5_options_store (struct fclaw2d_global* glob, 
-                                   fc2d_clawpack5_options_t* clawopt);
-
-fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(struct fclaw2d_global *glob);
-
-void fc2d_clawpack5_output(struct fclaw2d_global *glob, int iframe);
-
-
-#define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
-void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
-                    const int mthlim_in[], const int method_in[]);
+void fclaw2d_clawpatch_output_netcdf(struct fclaw2d_global* glob,int iframe);
 
 
 #ifdef __cplusplus

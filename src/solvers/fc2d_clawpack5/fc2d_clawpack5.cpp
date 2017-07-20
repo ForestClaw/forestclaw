@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw2d_clawpatch_output_netcdf.h>
 
 
 #include <fclaw2d_patch.h>
@@ -369,6 +370,11 @@ void clawpack5_output(fclaw2d_global_t *glob, int iframe)
     if (clawpack_options->vtk_out != 0)
     {
         fclaw2d_clawpatch_output_vtk(glob,iframe);
+    }
+
+    if (clawpack_options->netcdf_out != 0)
+    {
+        fclaw2d_clawpatch_output_netcdf(glob,iframe);
     }
 
 }
