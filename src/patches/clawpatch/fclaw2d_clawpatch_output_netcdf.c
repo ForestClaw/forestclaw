@@ -67,13 +67,6 @@ void cb_clawpatch_output_netcdf_defpatch (fclaw2d_domain_t * domain,
     double xlower,ylower,xupper,yupper,dx,dy;
     double *q;
 
-    char patchname[10];
-    sprintf(patchname, "patch%04d", this_patch_idx);
-    /* Create subgroup */
-    if ((retval = nc_def_grp(ncid, patchname, &subgroupid)))
-    ERR(retval);
-
-    const char* dim_name[2] = {"x","y"};    
     /* Get info not readily available to user */
     fclaw2d_patch_get_info(glob->domain,this_patch,
                            this_block_idx,this_patch_idx,
@@ -83,6 +76,15 @@ void cb_clawpatch_output_netcdf_defpatch (fclaw2d_domain_t * domain,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+
+
+    char patchname[10];
+    sprintf(patchname, "patch%04d", patch_num);
+    /* Create subgroup */
+    if ((retval = nc_def_grp(ncid, patchname, &subgroupid)))
+    ERR(retval);
+
+    const char* dim_name[2] = {"x","y"}; 
 
     xupper = xlower + mx*dx;
     yupper = ylower + my*dy;
@@ -147,9 +149,15 @@ void cb_clawpatch_output_netcdf_writeq (fclaw2d_domain_t * domain,
     int ncid = *((int *) s->user);
     int groupid,qid;
     int retval;
+    int patch_num, level;
+
+    /* Get info not readily available to user */
+    fclaw2d_patch_get_info(glob->domain,this_patch,
+                           this_block_idx,this_patch_idx,
+                           &patch_num,&level);
     
     char patchname[10];
-    sprintf(patchname, "patch%04d", this_patch_idx);
+    sprintf(patchname, "patch%04d", patch_num);
     if ((retval = nc_inq_grp_ncid(ncid, patchname, &groupid)))
         ERR(retval);
     if ((retval = nc_inq_varid(groupid, "q", &qid)))
