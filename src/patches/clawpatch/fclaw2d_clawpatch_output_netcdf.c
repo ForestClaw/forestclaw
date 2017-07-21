@@ -33,21 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 
 #include <netcdf.h>
+#include <netcdf_par.h>
 
 #define ERRCODE 2
 #define ERR(e) {printf("Error: %s\n", nc_strerror(e)); exit(ERRCODE);}
 
-typedef struct netcdf_data
-{
-    int ncid;
-    int step_inc;
-    int total_steps;  /* This level takes total_steps of step_inc each */
 
-    double initial_time;
-    double current_time;
-    double dt_step;
-} fclaw2d_level_data_t;
-
+#if 0
 void cb_clawpatch_output_netcdf_defpatch (fclaw2d_domain_t * domain,
                                           fclaw2d_patch_t * this_patch,
                                           int this_block_idx, int this_patch_idx,
@@ -137,6 +129,7 @@ void cb_clawpatch_output_netcdf_defpatch (fclaw2d_domain_t * domain,
     if ((retval = nc_enddef(subgroupid)))
         ERR(retval);
 }
+#endif
 
 void cb_clawpatch_output_netcdf_writeq (fclaw2d_domain_t * domain,
                                         fclaw2d_patch_t * this_patch,
@@ -147,14 +140,21 @@ void cb_clawpatch_output_netcdf_writeq (fclaw2d_domain_t * domain,
     fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
 
     int ncid = *((int *) s->user);
-    int groupid,qid;
+    int groupid,qid,patchlocationid,patchinfoid;
     int retval;
-    int patch_num, level;
+    int patch_num, level, meqn, mx, my, mbc;
+    double xlower, ylower, dx, dy;
+    double* q;
+    double patchlocation[4];
+    int patchinfo[2];
 
     /* Get info not readily available to user */
     fclaw2d_patch_get_info(glob->domain,this_patch,
                            this_block_idx,this_patch_idx,
                            &patch_num,&level);
+    
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
     
     char patchname[10];
     sprintf(patchname, "patch%04d", patch_num);
@@ -162,15 +162,27 @@ void cb_clawpatch_output_netcdf_writeq (fclaw2d_domain_t * domain,
         ERR(retval);
     if ((retval = nc_inq_varid(groupid, "q", &qid)))
         ERR(retval);
+    if ((retval = nc_inq_varid(groupid, "patch_location", &patchlocationid)))
+        ERR(retval);
+    if ((retval = nc_inq_varid(groupid, "patch_info", &patchinfoid)))
+        ERR(retval);
 
-    /* Write the pretend data to the file. Although netCDF supports
-     * reading and writing subsets of data, in this case we write all
-     * the data in one operation. */
-    int meqn;
-    double* q;
+    patchinfo[0] = patch_num;
+    patchinfo[0] = level;
+    if ((retval = nc_put_var_int(groupid, patchinfoid, &patchinfo[0])))
+        ERR(retval);
+
+    patchlocation[0] = xlower;
+    patchlocation[1] = ylower;
+    patchlocation[2] = xlower + dx*mx;
+    patchlocation[3] = xlower + dy*my;
+    if ((retval = nc_put_var_double(groupid, patchlocationid, &patchlocation[0])))
+        ERR(retval);
+
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
     if ((retval = nc_put_var_double(groupid, qid, &q[0])))
         ERR(retval);
+
 }
 
 
@@ -204,6 +216,61 @@ void fclaw2d_clawpatch_header_netcdf(fclaw2d_global_t* glob, int iframe, int nci
 
 }
 
+static
+void fclaw2d_clawpatch_defpatch_netcdf(fclaw2d_global_t* glob, int ipatch, int ncid)
+{
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    
+    int subgroupid;
+    int retval;
+    int numdim = 2;
+    int x_dimid, y_dimid, meqn_dimid, location_dimid, info_dimid,
+        qid, patchlocationid, patchinfoid;
+    int dimids[3];
+
+    int mx,my,meqn;
+    meqn = clawpatch_opt->meqn;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+
+    char patchname[10];
+    sprintf(patchname, "patch%04d", ipatch);
+    /* Create subgroup */
+    if ((retval = nc_def_grp(ncid, patchname, &subgroupid)))
+    ERR(retval);
+
+    /* Define the dimensions. NetCDF will hand back an ID for each. */
+    // dim(q) = mx*my*meqn
+    if ((retval = nc_def_dim(subgroupid, "mx", mx, &x_dimid)))
+        ERR(retval);
+    if ((retval = nc_def_dim(subgroupid, "my", my, &y_dimid)))
+        ERR(retval);
+    if ((retval = nc_def_dim(subgroupid, "meqn", meqn, &meqn_dimid)))
+        ERR(retval);
+    if ((retval = nc_def_dim(subgroupid, "mlocation", numdim*2, &location_dimid)))
+        ERR(retval);
+    if ((retval = nc_def_dim(subgroupid, "minfo", 2, &info_dimid)))
+        ERR(retval);
+
+    dimids[0] = x_dimid;
+    dimids[1] = y_dimid;
+    dimids[2] = meqn_dimid;
+
+    /* Define the variable. */
+    if ((retval = nc_def_var(subgroupid, "patch_info", NC_INT, 1, &info_dimid, &patchinfoid)))
+        ERR(retval);
+
+    if ((retval = nc_def_var(subgroupid, "patch_location", NC_DOUBLE, 1, &location_dimid, &patchlocationid)))
+        ERR(retval);
+
+    if ((retval = nc_def_var(subgroupid, "q", NC_DOUBLE, 3, dimids, &qid)))
+        ERR(retval);
+
+    /* End define mode. */
+    if ((retval = nc_enddef(subgroupid)))
+        ERR(retval);
+}
+
     /*--------------------------------------------------------------------
     Public interface
     Use this function as follows : 
@@ -216,30 +283,39 @@ void fclaw2d_clawpatch_output_netcdf(fclaw2d_global_t* glob,int iframe)
     fclaw2d_domain_t *domain = glob->domain;
     int retval;
     int ncid;
+    int ngrids;
 
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
-    fclaw2d_domain_serialization_enter (domain);
+    // fclaw2d_domain_serialization_enter (domain);
 
     /* Create the file. */
     char filename[12];
     sprintf(filename,"claw%04d.nc",iframe);
 
-    if ((retval = nc_create(filename, NC_NETCDF4, &ncid)))
-        ERR(retval);
-    
+    // if ((retval = nc_create(filename, NC_NETCDF4, &ncid)))
+        // ERR(retval);
+    if ((retval = nc_create_par(filename, NC_NETCDF4|NC_MPIIO, glob->mpicomm, 
+                                MPI_INFO_NULL, &ncid)));
+
     fclaw2d_clawpatch_header_netcdf(glob, iframe, ncid);
+    
+    ngrids = glob->domain->global_num_patches;
+    for (int i = 0; i < ngrids; ++i)
+    {
+        fclaw2d_clawpatch_defpatch_netcdf(glob,i,ncid);
+    }
 
     /* Write out each patch to clawXXXX.nc */
-    fclaw2d_global_iterate_patches (glob, cb_clawpatch_output_netcdf_defpatch, &ncid);
+    // fclaw2d_global_iterate_patches (glob, cb_clawpatch_output_netcdf_defpatch, &ncid);
     fclaw2d_global_iterate_patches (glob, cb_clawpatch_output_netcdf_writeq, &ncid);
     
     /* Close the file. */
     if ((retval = nc_close(ncid)))
         ERR(retval);
 
-    fclaw2d_domain_serialization_leave (domain);
+    // fclaw2d_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
 }
 
