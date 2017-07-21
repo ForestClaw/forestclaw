@@ -1,0 +1,260 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{cite}
+
+\begin{document}
+\paragraph{Scalar approach to conservation}
+In \cite{le:2002}, LeVeque describes a solution to the conservation law
+\begin{align}
+q_t + (uq)_x &= 0 \\
+\end{align}
+where $u = u(x)$ is a spatially varying velocity field, and $q = q(x,t)$ is a conserved 
+tracer in  the flow field.  At a mesh cell interface, we have two velocities, 
+$u_r$ and $u_\ell$, which will not in general be equal.  As a result, satisfying a jump
+condition 
+\begin{equation}
+u_r q_r - u_\ell q_\ell = s(q_r - q_\ell)
+\end{equation}
+for some speed $s$ will not in general be possible.   Assuming that $u_r > 0$The correct solution actually has two waves, one moving at speed 0 and a second at speed $u_r$.  To determine the 
+intermediate state $q^*$ we impose flux continuity across the speed 0 wave.
+\begin{equation}
+\end{equation}
+
+
+\paragraph{2-wave decomposition approach.}
+Consider the following conservation law for the conservative form of the scalar advection equation.
+\begin{align}
+q_t + (uq)_x &= 0 \\
+u_t + (au)_x & = 0
+\end{align}
+for conserved quantity $q(x,t)$, and  $u = u(x,t)$ is a prescribed velocity field.  We will only 
+interested in the case $a = 0$ so that $u = u(x)$ depends on space only.
+
+We set $\mathbf q = (q,u)$ and compute the flux Jacobian $f'(\mathbf q)$
+\begin{equation}
+f'(\mathbf q) = \left(\begin{array}{rr} u & q \\ 0 & a\end{array}\right).
+\end{equation}
+The eigenvalue and eigenvector pairs for $f'(\mathbf q)$ are given by
+\begin{equation}
+\lambda_1 = a,  \quad  {\mathbf r}^1 = \left(\begin{array}{c} q \\ a-u\end{array}\right) \qquad \mbox{and} \qquad
+\lambda_2 = u,  \quad  {\mathbf r}^2 = \left(\begin{array}{c} 1 \\ 0\end{array}\right)
+\end{equation}
+where we have assumed that $a < u$.  For $a \ne u$, the eigenvectors are linear independent, and so the system is strictly hyperbolic.  Furthermore, both fields satisfy $\nabla \lambda_p(\mathbf q) \cdot r^p(\mathbf q) = 0$, and so both waves are linearly degenerate.  
+
+The first wave satisfies $\lambda_1(\mathbf q_\ell) = \lambda_1(\mathbf q_r)$ and so is only supports contact discontinuities with jumps proportional to $r^1$ and neither wave supports rarefaction
+waves.  One consequence of this is that if $u_\ell < u_r$, the solution in the classic sense does not exist. 
+
+We write the problem in quasi-linear form as 
+\begin{equation}
+\mathbf q_t + f'(\mathbf q) \mathbf q_x = 0
+\end{equation}
+or
+\begin{equation}
+\mathbf q_t + A(\mathbf q) \mathbf q_x = 0
+\end{equation}
+where $A(\mathbf q) \equiv f'(\mathbf q)$.  
+
+Let $R = R(\mathbf q)$ be a matrix of eigen-vectors, and solve
+\begin{equation}
+R \alpha = \mathbf \delta,
+\end{equation}
+where  $\mathbf \delta = \mathbf q_r - \mathbf q_\ell$ is a general jump in
+left and right states.  Solving for $\alpha$, we get 
+\begin{equation}
+\left[\begin{array}{c} \alpha_1 \\ \alpha_2 \end{array}\right] = \frac{1}{u-a}
+\left[
+\begin{array}{rr}
+0 & -1 \\ u-a & q
+\end{array}
+\right]
+\left[
+\begin{array}{r}
+\delta_1 \\ \delta_2
+\end{array}
+\right]
+\end{equation}
+or 
+\begin{equation}
+\alpha_1(\mathbf q) = \frac{-(u_r - u_\ell)}{u-a}, \qquad 
+\alpha_2(\mathbf q) = q_r - q_\ell + \frac{u_r - u_l}{u-a} q
+\end{equation}
+To determine which values to use for $\mathbf q$, we seek values $\widehat{\mathbf q}$ 
+so that 
+\begin{align}
+f(\mathbf q_r) - f(\mathbf q_\ell) & = A(\widehat{\mathbf q})(\mathbf q_r - \mathbf q_\ell) 
+\end{align}
+is satisfied.  It is straightforward to show that 
+setting $\widehat{\mathbf q} = (\widehat{q},\widehat{u})$ to
+\begin{equation}
+\widehat{q} = \frac{q_\ell + q_r}{2} 
+\qquad \mbox{and} \qquad
+\widehat{u} = \frac{u_\ell + u_r}{2}
+\end{equation}
+we can guarantee the conservation of the method.
+Using these values, we can then write
+down the solution to the Riemann problem as a two-wave
+solution separated by constant states
+
+The Riemann solution to the quasi-linear problem at at interface $x=0$ can be written as 
+\begin{equation}
+\mathbf q(x,t) = \left\{\begin{array}{ll}
+(q_\ell, u_\ell) &   x/t < a \\ 
+(q^*, u^*)       &   a   \le x/t < \widehat{u} \\ 
+(q_r, u_r)       &   \widehat{u} \le x/t
+\end{array}
+\right.
+\end{equation}
+where
+\begin{align}
+\mathbf q^* 
+& = \mathbf q_\ell + \alpha_1(\widehat{\mathbf q}) {\mathbf r}^1 \\
+& = \mathbf q_r - \alpha_2(\widehat{\mathbf q}) {\mathbf r}^2
+\end{align}
+Solving for $q^*$ and $u^*$, we get
+\begin{equation}
+q^*  = q_\ell - \frac{u_r - u_\ell}{\widehat{u}-a} \widehat{q}, \qquad
+u^*  = u_\ell - \frac{u_r - u_\ell}{\widehat{u}-a} (a - \widehat{u}) = u_r
+\end{equation}
+Waves, speeds and fluctuations ae given by
+\begin{align}
+\mathcal W_1 & \equiv \alpha_1 \mathbf r^1 = - \frac{u_r - u_\ell}{\widehat{u}-a} 
+\left(\begin{array}{c} \widehat{q} \\ a - \widehat{u}\end{array}\right) 
+= (u_r - u_\ell)
+\left(\begin{array}{c} \widehat{q}/\varepsilon \\ 
+1 \end{array}\right) \\
+\mathcal W_2 & \equiv \alpha_2 \mathbf r^2 = 
+\left(q_r - q_\ell + \frac{u_r - u_\ell}{\widehat{u}-a}\widehat{q} \right)
+\left(\begin{array}{c} 1 \\ 0\end{array}\right) 
+= \left(\begin{array}{c} q_r - q_\ell - (u_r - u_\ell) \widehat{q}/\varepsilon \\ 
+0 \end{array}\right) 
+\end{align}
+where we have set $\varepsilon \equiv a - \widehat{u}$. 
+The fluctuations are  defined as
+\begin{align}
+\mathcal A^- \Delta Q & \equiv \lambda_1 \alpha_1(\widehat{q}) \mathbf r^1 
+= a \mathcal W_1 \\
+\mathcal A^+ \Delta Q & \equiv \lambda_2 \alpha_2(\widehat{q}) \mathbf r^2 
+= \widehat{u} \mathcal W_2
+\end{align}
+Our choice of $\widehat{\mathbf q}$ guarantees that the following conservation property is satisfied
+\begin{equation}
+f(\mathbf q_r) - f(\mathbf q_\ell) = \mathcal A^- \Delta Q + \mathcal A^+ \Delta Q
+\end{equation}
+For a spatially varying velocity field, we have $a = 0$.  In this case, $\mathcal A^- \Delta Q = 0$, $\varepsilon = -\widehat{u}$, and the waves are not defined if $u_\ell$ and $u_r$ are equal in magnitude, but opposite in sign. However, the fluctuations are still well defined.  
+
+\begin{align}
+\lim_{\varepsilon \rightarrow 0} \mathcal A^+ \Delta Q
+& = \lim_{\varepsilon \rightarrow 0} -\varepsilon \mathcal W_2 \\
+& = \lim_{\varepsilon \rightarrow 0} \left[-\varepsilon(q_r - q_\ell) + (u_r - u_\ell) \widehat{q}\right] \\
+& = (u_r - u_\ell) \widehat{q}
+\end{align}
+where, for convenience, we have ignored the second component of $\mathcal W_2$. 
+
+Following the above approach, we can also find waves for the case $\widehat{u} < a = 0$.   Combining these two cases, we get the following Clawpack Riemann solver.  
+
+\vspace{0.25cm}
+
+\begin{minipage}{\textwidth}
+\begin{verbatim}
+# Riemann solver for wave decomposition approach
+def rpn2(ql,qr,ul,ur):
+    uavg = (ul + ur)/2        
+    uhat = sign(uavg)*max([abs(uavg),tol])
+    qhat = (ql + qr)/2
+    wave = qr - ql + (ur-ul)*qhat/uhat
+    if uavg == 0:
+        amdq = -ul*qhat     # amdq+apdq = (ur-ul)*qhat
+        apdq = ur*qhat
+        s = uavg
+    else:
+        apdq = max([uhat,0])*wave
+        amdq = min([uhat,0])*wave        
+        s = uhat
+    return wave,s,amdq,apdq
+\end{verbatim}
+\end{minipage}
+
+\vspace{0.25cm}
+
+\paragraph{The F-wave approach.} To correct this problem, we use the f-wave approach and
+split the jump in the flux directly, avoiding the need to create waves $\mathcal W_p$.  
+We decompose the jump in flux as
+\begin{equation}
+f(\mathbf q_r) - f(\mathbf q_\ell) = \beta_1 \mathbf r^1 + \beta_2\mathbf r^2
+\end{equation}
+where $\mathbf r^1$ and $\mathbf r^2$ are the eigenvectors from above, evaluated at the $\widehat{\mathbf q}$ state.   Solve this leads to 
+
+\begin{equation}
+\left[\begin{array}{c} \beta_1 \\ \beta_2 \end{array}\right] = \frac{1}{u-a}
+\left[
+\begin{array}{rr}
+0 & -1 \\ u-a & q
+\end{array}
+\right]
+\left[
+\begin{array}{r}
+\delta_1 \\ \delta_2
+\end{array}
+\right]
+\end{equation}
+or 
+\begin{equation}
+\beta_1(\mathbf q) = \frac{-a(u_r - u_\ell)}{\widehat{u}-a}, \qquad 
+\beta_2(\mathbf q) = u_rq_r - q_rq_\ell + \frac{a(u_r - u_l)}{\widehat{u}-a} \widehat{q}
+\end{equation}
+F-waves are then defined as 
+\begin{align}
+\mathcal Z_1 & \equiv \beta_1(\mathbf q) \mathbf r^1 = - \frac{a(u_r - u_\ell)}{\widehat{u}-a} 
+\left(\begin{array}{c} \widehat{q} \\ a - \widehat{u}\end{array}\right) 
+= a(u_r - u_\ell) \left(\begin{array}{c} \widehat{q}/\varepsilon \\ 1 \end{array}\right) \\
+\mathcal Z_2 & \equiv \beta_2(\mathbf q) \mathbf r^2 =
+\left(u_r q_r - u_\ell q_\ell + \frac{a(u_r - u_\ell)}{\widehat{u}-a}\widehat{q} \right)
+\left(\begin{array}{c} 1 \\ 0\end{array}\right) 
+= \left(\begin{array}{c} u_r q_r - q_r q_\ell - a(u_r - u_\ell) \widehat{q}/\varepsilon \\ 
+0 \end{array}\right) 
+\end{align}
+
+As in the above, we set $a = 0$.  Following the f-wave approach, we set $\mathcal A^- \Delta Q = \mathcal Z_1$ and $\mathcal A^+ \Delta Q = \mathcal Z_2$ to get
+\begin{align}
+\mathcal A^- \Delta Q & = 0 \\
+\mathcal A^+ \Delta Q & = u_r q_r - q_r q_\ell
+\end{align}
+As before, the fluctuations are well-defined for all $u_\ell$, $u_r$, but now the fwaves needed by the algorithm are defined as well and are given by
+\begin{align}
+\mathcal Z_1 & = 0 \\
+\mathcal Z_2 & = u_r q_r - q_r q_\ell
+\end{align}
+The f-wave approach leads to the following Clawpack Riemann solver. 
+
+\vspace{0.25cm}
+
+\begin{minipage}{\textwidth}
+\begin{verbatim}
+# Riemann solver for f-wave approach
+def rpn2fwave(ql,qr,ul,ur):
+    uhat = (ul + ur)/2.0
+    fwave = ur*qr - ql*ul
+    s = uhat
+    if uhat < 0:
+        amdq = wave
+        apdq = 0
+    else:
+        amdq = 0
+        apdq = wave
+\end{verbatim}
+\end{minipage}
+
+\vspace{0.25cm}
+
+\noindent
+The advantage of this approach is that we don't have to make any artifical choices for the case $u_r \approx -u_\ell$.  
+
+\paragraph{numerical results.}  We test the two above approaches
+
+\bibliographystyle{plain}
+\bibliography{cons}
+
+
+\end{document}
