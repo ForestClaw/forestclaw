@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void swirlcons_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
@@ -48,29 +49,29 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
         clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
-        clawpack46_vt->b4step2   = &CLAWPACK46_B4STEP2;
-        clawpack46_vt->bc2       = &SWIRLCONS_BC2;
+        //clawpack46_vt->b4step2   = &CLAWPACK46_B4STEP2;
+        //clawpack46_vt->bc2       = &SWIRLCONS_BC2;
         if (user->cons_rp)
         {
-            clawpack46_vt->rpn2      = &RPN2CONS_CC;
-            clawpack46_vt->rpt2      = &RPT2CONS_CC;
-            clawpack46_vt->b4step2   = &SWIRLCONS_B4STEP2;
+            clawopt->use_fwaves = 0;
+            clawpack46_vt->rpn2      = &RPN2CONS_CC;                                
+        }
+        else if (clawopt->use_fwaves)
+        {
+            clawpack46_vt->rpn2      = &RPN2FWAVE;                
         }
         else
         {
-            clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
-            clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV;
-            clawpack46_vt->b4step2   = &CLAWPACK46_B4STEP2;
+            clawopt->use_fwaves = 0;
+            clawpack46_vt->rpn2      = &RPN2CONS;                                
         }
+        clawpack46_vt->rpt2      = &RPT2CONS_CC;
+        clawpack46_vt->b4step2   = &SWIRLCONS_B4STEP2;
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
-        clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
-        clawpack5_vt->setaux    = &CLAWPACK5_SETAUX;
-        clawpack5_vt->b4step2   = &CLAWPACK5_B4STEP2;
-        clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV;
-        clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV;
+        fclaw_global_essentialf("swirl (cons) : Clawpack 5.x implementation not implemented\n");
+        exit(0);
     }
 }
 

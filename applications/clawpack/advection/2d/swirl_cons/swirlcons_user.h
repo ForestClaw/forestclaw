@@ -63,6 +63,21 @@ void RPN2CONS_CC(const int* ixy,const int* maxm, const int* meqn, const int* mwa
                  double auxl[], double auxr[], double wave[],
                  double s[], double amdq[], double apdq[]);
 
+
+#define RPN2CONS FCLAW_F77_FUNC(rpn2cons,RPN2CONS)
+void RPN2CONS(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+              const int* mbc,const int* mx, double ql[], double qr[],
+              double auxl[], double auxr[], double wave[],
+              double s[], double amdq[], double apdq[]);
+
+#define RPN2FWAVE FCLAW_F77_FUNC(rpn2fwave, RPN2FWAVE)
+void RPN2FWAVE(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+               const int* mbc, const int* mx, double ql[], double qr[],
+               double auxl[], double auxr[], double fwave[],
+               double s[], double amdq[], double apdq[]);
+
+
+
 #define RPT2CONS_CC FCLAW_F77_FUNC(rpt2cons_cc, RPT2CONS_CC)
 void RPT2CONS_CC(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
                  const int* mbc, const int* mx, double ql[], double qr[],

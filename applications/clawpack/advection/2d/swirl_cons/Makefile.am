@@ -8,19 +8,14 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons.cpp \
 	applications/clawpack/advection/2d/swirl_cons/psi.f \
 	applications/clawpack/advection/2d/swirl_cons/setprob.f \
-	applications/clawpack/advection/2d/all/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/all/clawpack_user.h \
 	applications/clawpack/advection/2d/all/clawpack5_setaux.f90 \
-	applications/clawpack/advection/2d/all/clawpack46_rpn2adv.f \
-	applications/clawpack/advection/2d/all/clawpack46_rpt2adv.f \
-	applications/clawpack/advection/2d/all/clawpack5_rpn2adv.f90 \
-	applications/clawpack/advection/2d/all/clawpack5_rpt2adv.f90 \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/qinit.f \
-	applications/clawpack/advection/2d/swirl_cons/user_4.6/b4step2.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/swirlcons_b4step2.f \
-	applications/clawpack/advection/2d/swirl_cons/user_5.0/qinit.f90 \
-	applications/clawpack/advection/2d/swirl_cons/user_5.0/b4step2.f90 \
-	applications/clawpack/advection/2d/swirl_cons/Riemann_solvers/rpn2cons_cc.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2fwave.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_new.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_qstar.f \
 	applications/clawpack/advection/2d/swirl_cons/Riemann_solvers/rpt2cons_cc.f \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons_bc2.f
 

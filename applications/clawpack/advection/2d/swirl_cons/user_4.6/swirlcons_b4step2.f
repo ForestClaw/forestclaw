@@ -18,8 +18,8 @@ c        # setaux should be used for all time.
          return
       endif
 
-C       vt = cos(pi2*(time+dt/2.d0)/tperiod)
-      vt = 1.0
+      vt = cos(pi2*(time+dt/2.d0)/tperiod)
+c      vt = 1.0
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
@@ -52,26 +52,34 @@ C             aux(i,j,2) = 0.0
       double precision xp,yp,pi
       common /compi/ pi
 
-C       u = -2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp)) + 2
-C       if(xp .gt. 0) then
-C             ucc = exp(-(xp-0.5)**2/(2*0.1**2))
-C       else
-C             ucc = 0
-C       endif
+c      ucc = 2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp))
+      ucc = cos(2*pi*xp)
 
-C       if((xp .gt. 0.5 .and. xp .lt. 1) .or. (xp .lt. 0)) then
-C             ucc = 1.0
-C       else
-C             ucc = -1.0
-C       endif
+c      ucc = 0.1*sin(2*pi*xp)*sin(16*pi*xp)
+c      if (xp .le. 0.5d0) then
+c            ucc = -.5d0
+c      else
+c            ucc = .50
+c      endif
+c      if(xp .gt. 0) then
+c            ucc = exp(-(xp-0.5)**2/(2*0.1**2))
+c      else
+c            ucc = 0
+c      endif
 
-      if((xp .gt. 0.5 .and. xp .lt. 0.75)) then
-            ucc = 0.1
-      else if((xp .gt. 0.25 .and. xp .lt. 0.5)) then
-            ucc = -0.1
-      else
-            ucc = 0.0
-      endif
+C      if (xp .gt. 0.5) then
+C            ucc = 0.5
+C      else
+C            ucc = 1.0
+C      endif
+
+c      if((xp .gt. 0.5 .and. xp .lt. 0.75)) then
+c            ucc = 0.1
+c      else if((xp .gt. 0.25 .and. xp .lt. 0.5)) then
+c            ucc = -0.1
+c      else
+c            ucc = 0.0
+c      endif
 
       return
       end
@@ -82,7 +90,7 @@ C       endif
       double precision xp,yp,pi
       common /compi/ pi
 
-C       v = 2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
+c      vcc = -2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
       vcc = 0
 
       return
