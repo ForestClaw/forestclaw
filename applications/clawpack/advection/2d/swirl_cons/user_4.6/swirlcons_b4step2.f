@@ -49,11 +49,15 @@ C             aux(i,j,2) = 0.0
       double precision function ucc(xp,yp)
       implicit none
 
-      double precision xp,yp,pi
+      double precision xp,yp,pi, c,rp2
       common /compi/ pi
 
-c      ucc = 2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp))
-      ucc = cos(2*pi*xp)
+      rp2 = (xp-0.5d0)**2 + (yp-0.5d0)**2
+      c = exp(-350.d0*rp2)
+
+      ucc = 2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp))
+      ucc = ucc + c
+c      ucc = cos(2*pi*xp)
 
 c      ucc = 0.1*sin(2*pi*xp)*sin(16*pi*xp)
 c      if (xp .le. 0.5d0) then
@@ -87,11 +91,15 @@ c      endif
       double precision function vcc(xp,yp)
       implicit none
 
-      double precision xp,yp,pi
+      double precision xp,yp,pi, rp2, c
       common /compi/ pi
 
-c      vcc = -2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
-      vcc = 0
+      rp2 = (xp-0.5d0)**2 + (yp-0.5d0)**2
+      c = exp(-350.d0*rp2)
+
+      vcc = -2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
+      vcc = vcc + c
+c      vcc = 0
 
       return
       end

@@ -18,6 +18,7 @@
 
       integer i, iface, m, mw, version
       double precision ur,ul,qrr,qll, uhat,qhat, tau,uavg
+      double precision a,b,c
 
 
       double precision dtcom, dxcom, dycom, tcom
@@ -43,21 +44,23 @@
          qhat = (qrr + qll)/2.d0
 
          uavg = (ur+ul)/2.d0
-         tau = 1e-8
-         uhat = sign(1.d0,uavg)*max(abs(uavg),tau) 
 
-         wave(i,1,1) = qrr-qll + (ur-ul)*qhat/uhat         
          if (uavg .eq. 0) then
-C           # lim(uavg --> 0) uavg*W = (ur-ul)*qhat
-C           #             
+            tau = 1e-12
+            uhat = sign(1.d0,uavg)*max(abs(uavg),tau) 
+         else
+            uhat = uavg
+         endif
+         wave(i,1,1) = qrr-qll + (ur-ul)*qhat/uhat         
+         s(i,1) = uhat
+
+         if (uavg .eq. 0) then
             amdq(i,1) = -ul*qhat
             apdq(i,1) = ur*qhat
-            s(i,1) = uavg
          else
+            amdq(i,1) = min(uhat,0.d0)*wave(i,1,1)
+            apdq(i,1) = max(uhat,0.d0)*wave(i,1,1)
          endif
-         amdq(i,1) = min(uhat,0.d0)*wave(i,1,1)
-         apdq(i,1) = max(uhat,0.d0)*wave(i,1,1)
-         s(i,1) = uhat
       enddo
 
       return

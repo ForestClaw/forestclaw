@@ -15,9 +15,9 @@
            do j = 1-mbc,my+mbc
               yc = ylower + (j-0.5d0)*dy
               if (abs(xc-0.5) .lt. 0.15d0) then
-                 q(i,j,mq) = 1.d0
-              else
                  q(i,j,mq) = 1.0
+              else
+                 q(i,j,mq) = 0.0
               endif
            enddo
         enddo

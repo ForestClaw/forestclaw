@@ -49,8 +49,6 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
         clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
-        //clawpack46_vt->b4step2   = &CLAWPACK46_B4STEP2;
-        //clawpack46_vt->bc2       = &SWIRLCONS_BC2;
         if (user->cons_rp)
         {
             clawopt->use_fwaves = 0;

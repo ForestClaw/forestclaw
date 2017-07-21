@@ -30,7 +30,7 @@ elseif PlotType == 4
     [q1d,x1d] = plotframe1ez(amrdata1d,mq,'b.-');    
 
     % Plot zeros of velocity function
-    vel_case = 1;
+    vel_case = 5;
     yl = [-5,25];
     switch vel_case
         case 1
