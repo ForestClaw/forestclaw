@@ -31,10 +31,7 @@
 #include <fclaw2d_clawpatch.h>
 
 #include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack5_options.h>
-
 #include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
 
 static int s_user_options_package_id = -1;
 
@@ -45,7 +42,7 @@ swirlcons_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "period", &user->period, 4,
                            "Period of the flow field [4]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
                            "Clawpack_version (4 or 5) [5]");
 
     sc_options_add_bool (opt, 0, "cons-rp", &user->cons_rp, 1,
@@ -208,28 +205,17 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t           *user_opt;
-
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
-
-    user_opt = swirlcons_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtable_initialize();
     fclaw2d_diagnostics_vtable_initialize();
 
     /* Initialize virtual tables for solvers */
-    if (user_opt->claw_version == 4)
-    {
-        fc2d_clawpack46_vtable_initialize();
-    }
-    else if (user_opt->claw_version == 5)
-    {
-        fc2d_clawpack5_vtable_initialize();
-    }
+    fc2d_clawpack46_solver_initialize();
 
     swirlcons_link_solvers(glob);
 
@@ -254,7 +240,6 @@ main (int argc, char **argv)
     fclaw_options_t             *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
-    fc2d_clawpack5_options_t    *claw5_opt;
 
     fclaw2d_global_t            *glob;
     fclaw2d_domain_t            *domain;
@@ -269,7 +254,6 @@ main (int argc, char **argv)
     fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
-    claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
     user_opt =                swirlcons_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
@@ -293,7 +277,6 @@ main (int argc, char **argv)
         fclaw2d_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
-        fc2d_clawpack5_options_store    (glob, claw5_opt);
         swirlcons_options_store             (glob, user_opt);
 
         run_program(glob);
