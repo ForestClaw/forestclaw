@@ -217,7 +217,7 @@ void fclaw2d_clawpatch_header_netcdf(fclaw2d_global_t* glob, int iframe, int nci
 }
 
 static
-void fclaw2d_clawpatch_defpatch_netcdf(fclaw2d_global_t* glob, int ipatch, int ncid)
+void fclaw2d_clawpatch_defgroup_netcdf(fclaw2d_global_t* glob, int ipatch, int ncid)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     
@@ -294,21 +294,24 @@ void fclaw2d_clawpatch_output_netcdf(fclaw2d_global_t* glob,int iframe)
     char filename[12];
     sprintf(filename,"claw%04d.nc",iframe);
 
+    /* serial */
     // if ((retval = nc_create(filename, NC_NETCDF4, &ncid)))
         // ERR(retval);
+
+    /* parallel */
     if ((retval = nc_create_par(filename, NC_NETCDF4|NC_MPIIO, glob->mpicomm, 
                                 MPI_INFO_NULL, &ncid)));
 
     fclaw2d_clawpatch_header_netcdf(glob, iframe, ncid);
     
+    /* Create groups for patches */
     ngrids = glob->domain->global_num_patches;
     for (int i = 0; i < ngrids; ++i)
     {
-        fclaw2d_clawpatch_defpatch_netcdf(glob,i,ncid);
+        fclaw2d_clawpatch_defgroup_netcdf(glob,i,ncid);
     }
 
-    /* Write out each patch to clawXXXX.nc */
-    // fclaw2d_global_iterate_patches (glob, cb_clawpatch_output_netcdf_defpatch, &ncid);
+    /* Write out patch data*/
     fclaw2d_global_iterate_patches (glob, cb_clawpatch_output_netcdf_writeq, &ncid);
     
     /* Close the file. */
