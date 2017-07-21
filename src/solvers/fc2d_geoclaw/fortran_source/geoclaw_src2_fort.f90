@@ -1,4 +1,4 @@
-SUBROUTINE geoclaw_src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
+SUBROUTINE fc2d_geoclaw_src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
 
   use geoclaw_module, only: g => grav, coriolis_forcing, coriolis
   use geoclaw_module, only: friction_forcing, friction_depth
@@ -162,4 +162,4 @@ SUBROUTINE geoclaw_src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
      enddo
   endif
 
-end subroutine geoclaw_src2
+end subroutine fc2d_geoclaw_src2

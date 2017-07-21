@@ -38,20 +38,6 @@ struct fclaw2d_global;
 struct fclaw2d_patch;
 struct fclaw2d_domain;
 
-typedef void  (*fclaw2d_fort_header_ascii_t)(char* matname1,char* matname2,
-                                             double* time, int* meqn, int* maux,
-                                             int* ngrids);
-
-/* Write out data */
-typedef void (*fclaw2d_fort_output_ascii_t)(char* matname1,
-                                            int* mx,        int* my,
-                                            int* meqn,      int* mbc,
-                                            double* xlower, double* ylower,
-                                            double* dx,     double* dy,
-                                            double q[],
-                                            int* patch_num, int* level,
-                                            int* blockno,   int* mpirank);
-
 void cb_clawpatch_output_ascii (struct fclaw2d_domain * domain,
                                 struct fclaw2d_patch * this_patch,
                                 int this_block_idx, int this_patch_idx,

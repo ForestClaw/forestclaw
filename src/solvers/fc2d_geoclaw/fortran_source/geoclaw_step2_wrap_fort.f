@@ -1,4 +1,4 @@
-      subroutine geoclaw_step2_wrap(maxm, meqn, maux, mbc,
+      subroutine fc2d_geoclaw_step2_wrap(maxm, meqn, maux, mbc,
      &      method, mthlim, mcapa, mwaves, mx, my, qold, aux,
      &      dx, dy, dt,cfl, work, mwork,xlower,ylower,level,
      &      t, fp,fm, gp, gm, rpn2, rpt2,
@@ -87,7 +87,7 @@ c     &      work(i0aux1),work(i0aux2),work(i0aux3),
 c     &      work(i0next),mwork1,rpn2,rpt2,flux2,
 c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
 
-      call geoclaw_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,
+      call fc2d_geoclaw_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,
      &      dx,dy,dt,cfl,fm,fp,gm,gp,rpn2,rpt2,
      &      block_corner_count)
 

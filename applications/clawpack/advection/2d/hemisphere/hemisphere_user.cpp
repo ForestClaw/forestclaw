@@ -30,12 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
-#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
-
 #include <fc2d_clawpack5.h>
-#include <clawpack5_user_fort.h>
 
-#include "../all/clawpack_user.h"
+#include "../all/advection_user_fort.h"
 
 void hemisphere_link_solvers(fclaw2d_global_t *glob)
 {

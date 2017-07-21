@@ -23,38 +23,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef FC2D_GEOCLAW_GAUGES_H
+#define FC2D_GEOCLAW_GAUGES_H
 
-#include "replicated_user.h"
+#include <fclaw_base.h>  /* Needed for fclaw_app_t */
 
-#include <fclaw2d_include_all.h>
-
-/* Two versions of Clawpack */
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../all/advection_user_fort.h"
-
-void replicated_link_solvers(fclaw2d_global_t *glob)
+#ifdef __cplusplus
+extern "C"
 {
-    const user_options_t* user = replicated_get_options(glob);
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
-        clawpack46_vt->setprob   = &SETPROB;
-        clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
-        clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
-        clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
-        clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV;
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
-        clawpack5_vt->setprob   = &SETPROB;
-        clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
-        clawpack5_vt->setaux    = &CLAWPACK5_SETAUX;
-        clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV;
-        clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV;
-    }
+#if 0
 }
+#endif
+#endif
 
 
+struct fclaw2d_global;
+struct fc2d_geoclaw_gauge;
+
+void fc2d_geoclaw_locate_gauges(struct fclaw2d_global *glob);
+
+void fc2d_geoclaw_gauges_vtable_set();
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
+
+#endif

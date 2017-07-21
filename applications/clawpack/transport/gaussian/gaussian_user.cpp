@@ -27,8 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-#include "../all/transport_user.h"
 #include "../all/transport_options.h"
+
+#include "../all/transport_user.h"
 
 void gaussian_link_solvers(fclaw2d_global_t *glob)
 {

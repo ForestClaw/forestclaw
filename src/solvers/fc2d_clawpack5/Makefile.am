@@ -22,7 +22,7 @@ libclawpack5_compiled_sources = \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_average.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_copy.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_interpolate.f \
-	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_ghostpack_qarea.f \
+	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_local_ghost_pack.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_diagnostics.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_tag4refinement.f \
 	src/solvers/fc2d_clawpack5/fclaw2d_source/fc2d_clawpack5_tag4coarsening.f \

@@ -1,7 +1,7 @@
 c
 c
 c     =====================================================
-      subroutine geoclaw_bc2(meqn,mbc,mx,my,xlower,ylower,
+      subroutine fc2d_geoclaw_bc2(meqn,mbc,mx,my,xlower,ylower,
      &      dx,dy,q,maux,aux,t,dt,mthbc)
 c     =====================================================
 c

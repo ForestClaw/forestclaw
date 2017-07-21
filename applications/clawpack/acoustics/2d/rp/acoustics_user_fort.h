@@ -23,12 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CLAWPACK_USER_H
-#define CLAWPACK_USER_H
+#ifndef ACOUSTICS_USER_H
+#define ACOUSTICS_USER_H
 
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+#include <clawpack46_user_fort.h>
+#include <clawpack5_user_fort.h>
 
 
 #ifdef __cplusplus
@@ -39,17 +38,13 @@ extern "C"
 #endif
 #endif
 
-/* headers for other Riemann solvers are not needed here because they are supplied
-   automatially in fc2d_clawpack4.6/clawpack46_fort_user.h and
-   clawpack5/clawpack5_fort_user.h */
-
 #define CLAWPACK5_RPN2_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpn2_manifold, \
                                                CLAWPACK5_RPN2_MANIFOLD)
 void CLAWPACK5_RPN2_MANIFOLD(const int* ixy,const int* maxm, const int* meqn,
-                             const int* mwaves, const int* maux,
-                             const int* mbc,const int* mx,
-                             double ql[], double qr[], double auxl[], double auxr[],
-                             double wave[], double s[],double amdq[], double apdq[]);
+                                const int* mwaves, const int* maux,
+                                const int* mbc,const int* mx,
+                                double ql[], double qr[], double auxl[], double auxr[],
+                                double wave[], double s[],double amdq[], double apdq[]);
 
 #define CLAWPACK5_RPT2_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpt2_manifold, \
                                                CLAWPACK5_RPT2_MANIFOLD)

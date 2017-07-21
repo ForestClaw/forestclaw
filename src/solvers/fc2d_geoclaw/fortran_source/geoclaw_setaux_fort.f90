@@ -1,5 +1,6 @@
 !
-SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost_in,nghost,mint)
+SUBROUTINE fc2d_geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux, & 
+                               is_ghost_in,nghost,mint)
   !!     ============================================
   !!
   !!     # set auxiliary arrays
@@ -268,7 +269,7 @@ SUBROUTINE geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux,is_ghost_in,nghost,
      ENDDO
   ENDIF
 
-END SUBROUTINE geoclaw_setaux
+END SUBROUTINE fc2d_geoclaw_setaux
 
 LOGICAL FUNCTION ghost_invalid(i,j,mx,my,nghost,mint)
   implicit none

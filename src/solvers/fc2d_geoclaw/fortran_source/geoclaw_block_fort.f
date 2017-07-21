@@ -1,4 +1,4 @@
-      subroutine geoclaw_set_block(blockno)
+      subroutine fc2d_geoclaw_set_block(blockno)
       implicit none
 
       integer blockno, blockno_com
@@ -7,17 +7,17 @@
       blockno_com = blockno
       end
 
-      integer function geoclaw_get_block()
+      integer function fc2d_geoclaw_get_block()
       implicit none
 
       integer blockno_com
       common /comblock/ blockno_com
 
-      geoclaw_get_block = blockno_com
+      fc2d_geoclaw_get_block = blockno_com
       return
       end
 
-      subroutine geoclaw_unset_block()
+      subroutine fc2d_geoclaw_unset_block()
       implicit none
 
       integer blockno, blockno_com
