@@ -5,8 +5,6 @@ if PlotType == 1
     daspect([1 1 1]);
     axis on;
     
-    hidepatchborders;
-    
     if (ShowUnderOverShoots == 1)
         qlo = 0;
         qhi = 1;
@@ -20,7 +18,8 @@ if PlotType == 1
         colorbar;
         caxis([0 1]);
     end
-    showpatchborders(1:10);
+    showpatchborders;
+    setpatchborderprops('linewidth',1);
     view(2);
 elseif PlotType == 4
     hold on;
@@ -30,7 +29,7 @@ elseif PlotType == 4
     [q1d,x1d] = plotframe1ez(amrdata1d,mq,'b.-');    
 
     % Plot zeros of velocity function
-    vel_case = 5;
+    vel_case = 3;
     yl = [-5,25];
     switch vel_case
         case 1
