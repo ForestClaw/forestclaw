@@ -1,14 +1,14 @@
-2048               mx          = cells in x direction
+4096               mx          = cells in x direction
 
-20                 nout        = number of output times to print results
+10                 nout        = number of output times to print results
 1                  outstyle    = style of specifying output times
-1.0d0               tfinal      = final time
+0.5d0               tfinal      = final time
 
 0.50d0             dtv(1)      = initial dt (used in all steps if method(1)=0)
 1.0d99             dtv(2)      = max allowable dt 
 1.0d0              cflv(1)     = max allowable Courant number
 0.90d0             cflv(2)     = desired Courant number
-5000               nv(1)       = max number of time steps per call to claw1
+1000000000               nv(1)       = max number of time steps per call to claw1
 
 1                  method(1)   = 1 for variable dt
 2                  method(2)   = order 
