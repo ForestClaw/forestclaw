@@ -136,7 +136,7 @@ c     # modify F fluxes for second order q_{xx} correction terms:
 c     -----------------------------------------------------------
 c
 c     # apply limiter to waves:
-      if (limit) call clawpack46_limiter(maxm,meqn,mwaves,mbc,mx,
+      if (limit) call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
      &      wave,s,mthlim)
 c
       do 120 i = 1, mx+1
