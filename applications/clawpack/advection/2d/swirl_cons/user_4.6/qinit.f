@@ -17,7 +17,7 @@
               if (abs(xc-0.5) .lt. 0.15d0) then
                  q(i,j,mq) = 1.0
               else
-                 q(i,j,mq) = 0.0
+                 q(i,j,mq) = 1.0
               endif
            enddo
         enddo

@@ -41,12 +41,13 @@ typedef struct user_options
     double period;
     int claw_version;
     int cons_rp;
+    int example;
     int is_registered;
 
 } user_options_t;
 
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(double* tperiod);
+void SWIRL_SETPROB(double* tperiod, int* example);
 
 void swirlcons_link_solvers(fclaw2d_global_t *glob);
 

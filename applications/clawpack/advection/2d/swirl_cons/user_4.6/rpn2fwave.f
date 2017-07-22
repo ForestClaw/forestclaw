@@ -37,7 +37,10 @@
 
          wave(i,1,1) = ur*qrr - ul*qll
          s(i,1) = uhat
-         if (uhat .lt. 0) then
+         if (uhat .eq. 0) then
+            amdq(i,1) = -ul*qll
+            apdq(i,1) = ur*qrr            
+         elseif (uhat .lt. 0) then
             amdq(i,1) = wave(i,1,1)
             apdq(i,1) = 0.d0
          else

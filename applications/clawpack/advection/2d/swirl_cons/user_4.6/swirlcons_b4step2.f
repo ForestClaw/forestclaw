@@ -7,19 +7,21 @@
       double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
 
-      integer i, j
-      double precision tperiod, pi2, vt, xc,yc, psi, ucc, vcc
+      integer i, j, example
+      double precision tperiod, pi2, vt, xc,yc, ucc, vcc
 
       common /comvt/ tperiod,pi2
+      common /comex/ example
 c
-      if (tperiod .eq. 0.d0) then
-c        # special case --- indication that velocities specified in
-c        # setaux should be used for all time.
-         return
+      if (example .le. 3) then
+          vt = 1.d0
+      else
+          if (tperiod .eq. 0.d0) then
+              vt = 1.d0
+          else
+              vt = cos(pi2*(time+dt/2.d0)/tperiod)
+          endif
       endif
-
-      vt = cos(pi2*(time+dt/2.d0)/tperiod)
-c      vt = 1.0
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
@@ -27,19 +29,9 @@ c           # coordinates of lower left corner of grid cell:
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
 
-c           # difference stream function psi to get normal velocities:
-C             aux(i,j,1) = (psi(xll, yll+dy) - psi(xll,yll)) / dy
-C             aux(i,j,2) =  -(psi(xll+dx, yll) - psi(xll,yll)) / dx
-            
 c           # Cell-centered velocity
-            aux(i,j,1) = ucc(xc,yc)
-            aux(i,j,2) = vcc(xc,yc)
-
-c           # multiply by time-factor:
-            aux(i,j,1) = vt * aux(i,j,1)
-            aux(i,j,2) = vt * aux(i,j,2)
-C             aux(i,j,1) = 1.0
-C             aux(i,j,2) = 0.0
+            aux(i,j,1) = vt*ucc(xc,yc)
+            aux(i,j,2) = vt*vcc(xc,yc)
          enddo
       enddo
 
@@ -49,41 +41,38 @@ C             aux(i,j,2) = 0.0
       double precision function ucc(xp,yp)
       implicit none
 
-      double precision xp,yp,pi, c,rp2
+      double precision xp,yp,pi, c,rp2,ul,ur,uavg
+      integer example
       common /compi/ pi
+      common /comex/ example
 
-      rp2 = (xp-0.5d0)**2 + (yp-0.5d0)**2
-      c = exp(-350.d0*rp2)
-
-      ucc = 2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp))
-      ucc = ucc + c
-c      ucc = cos(2*pi*xp)
-
-c      ucc = 0.1*sin(2*pi*xp)*sin(16*pi*xp)
-c      if (xp .le. 0.5d0) then
-c            ucc = -.5d0
-c      else
-c            ucc = .50
-c      endif
-c      if(xp .gt. 0) then
-c            ucc = exp(-(xp-0.5)**2/(2*0.1**2))
-c      else
-c            ucc = 0
-c      endif
-
-C      if (xp .gt. 0.5) then
-C            ucc = 0.5
-C      else
-C            ucc = 1.0
-C      endif
-
-c      if((xp .gt. 0.5 .and. xp .lt. 0.75)) then
-c            ucc = 0.1
-c      else if((xp .gt. 0.25 .and. xp .lt. 0.5)) then
-c            ucc = -0.1
-c      else
-c            ucc = 0.0
-c      endif
+      if (example .eq. 1) then
+c         # 1d : Piecewise constant velocity (-0.5, 0.5)
+          if (xp .le. 0.5d0) then
+              ucc = -0.5d0
+          else
+              ucc = 0.5d0
+          endif
+      elseif (example .eq. 2) then
+c         # 1d : u = cos(2*pi*xp)       
+          ucc = cos(2*pi*xp) + 1.d0            
+      elseif (example .eq. 3) then
+c         # 1d : More complicated 1d example
+          ucc = 0.1*sin(2*pi*xp)*sin(16*pi*xp)
+      elseif ((example .eq. 4) .or. (example .eq. 5)) then
+c         # 2d : Swirl example (computed from streamfunction)           
+          ucc = 2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp))
+          if (example .eq. 5) then
+c             # Add non-zero divergence            
+              rp2 = (xp-0.5d0)**2 + (yp-0.5d0)**2
+              rp2 = (xp-0.5d0)**2
+              c = exp(-350.d0*rp2)
+              ucc = ucc + 5*c
+          endif
+      else
+          write(6,*) 'b4step2 : example not set'
+          stop
+      endif
 
       return
       end
@@ -92,14 +81,26 @@ c      endif
       implicit none
 
       double precision xp,yp,pi, rp2, c
+      integer example
+
       common /compi/ pi
+      common /comex/ example
 
-      rp2 = (xp-0.5d0)**2 + (yp-0.5d0)**2
-      c = exp(-350.d0*rp2)
 
-      vcc = -2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
-      vcc = vcc + c
-c      vcc = 0
+      if (example .le. 3) then
+c         # 1d examples
+          vcc = 0        
+      elseif ((example .eq. 4) .or. (example .eq. 5)) then
+c         # 2d examples
+          vcc = -2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
+          if (example .eq. 5) then
+c             # Add non-zero divergence              
+              rp2 = (xp-0.5d0)**2 + (yp-0.5d0)**2
+              rp2 = (xp-0.5d0)**2
+              c = exp(-350.d0*rp2)
+              vcc = vcc + 5*c
+          endif
+      endif
 
       return
       end

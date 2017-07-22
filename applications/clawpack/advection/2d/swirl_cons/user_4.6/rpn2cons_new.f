@@ -34,32 +34,41 @@
 
       iface = ixy
       do i = 2-mbc, mx+mbc
+          ur = auxl(i,iface)
+          ul = auxr(i-1,iface)
 
-         ur = auxl(i,iface)
-         ul = auxr(i-1,iface)
+          qrr = ql(i,1)
+          qll = qr(i-1,1)
 
-         qrr = ql(i,1)
-         qll = qr(i-1,1)
+          qhat = (qrr + qll)/2.d0
 
-         qhat = (qrr + qll)/2.d0
+          uavg = (ur+ul)/2.d0
+          if (uavg .eq. 0) then
+              uhat = 1.d-12
+          else
+              uhat = uavg
+          endif
 
-         uavg = (ur+ul)/2.d0
+          s(i,1) = uavg
 
-         if (uavg .eq. 0) then
-            tau = 1e-12
-            uhat = sign(1.d0,uavg)*max(abs(uavg),tau) 
-         else
-            uhat = uavg
-         endif
-         wave(i,1,1) = qrr-qll + (ur-ul)*qhat/uhat         
-         s(i,1) = uhat
+          if (ur .eq. ul) then
+              wave(i,1,1) = qrr - qll
+          else
+              wave(i,1,1) = (ur*qrr - ul*qll)/uhat   !! Same as above
+          endif
 
-         if (uavg .eq. 0) then
-            amdq(i,1) = -ul*qhat
-            apdq(i,1) = ur*qhat
-         else
-            amdq(i,1) = min(uhat,0.d0)*wave(i,1,1)
-            apdq(i,1) = max(uhat,0.d0)*wave(i,1,1)
+
+          if (uavg .eq. 0) then
+c             # This definition is needed to guarantee conservation, i.e. 
+c             #       f(qr) - f(ql) = apdq + amdq                      
+c             # and a consistent definition of f(qr), f(ql).  
+c             # If we base apdq,amdq on uhat, we will have inconsistent
+c             # definitions of f(q). 
+              amdq(i,1) = -ul*qhat
+              apdq(i,1) = ur*qhat
+          else
+              amdq(i,1) = min(uhat,0.d0)*wave(i,1,1)
+              apdq(i,1) = max(uhat,0.d0)*wave(i,1,1)
          endif
       enddo
 

@@ -45,6 +45,9 @@ swirlcons_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
                            "Clawpack_version (4 or 5) [5]");
 
+    sc_options_add_int (opt, 0, "example", &user->example, 3,
+                           "Velocity field (1d, 2d, swirl, ...) (1-5) [3]");
+
     sc_options_add_bool (opt, 0, "cons-rp", &user->cons_rp, 1,
                            "Conservative riemann solver (T or F) [T]");
     user->is_registered = 1;
@@ -277,7 +280,7 @@ main (int argc, char **argv)
         fclaw2d_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
-        swirlcons_options_store             (glob, user_opt);
+        swirlcons_options_store         (glob, user_opt);
 
         run_program(glob);
 

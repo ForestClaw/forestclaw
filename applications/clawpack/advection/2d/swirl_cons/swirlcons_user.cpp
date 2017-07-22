@@ -76,7 +76,8 @@ void swirlcons_problem_setup(fclaw2d_global_t* glob)
     const user_options_t* user = swirlcons_get_options(glob);
 
     double period = user->period;
-    SWIRL_SETPROB(&period);
+    int ex = user->example;
+    SWIRL_SETPROB(&period,&ex);
 }
 
 
