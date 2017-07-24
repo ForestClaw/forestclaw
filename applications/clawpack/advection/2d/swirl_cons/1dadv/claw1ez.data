@@ -1,10 +1,10 @@
-4096               mx          = cells in x direction
+8192               mx          = cells in x direction
 
-10                 nout        = number of output times to print results
+1                 nout        = number of output times to print results
 1                  outstyle    = style of specifying output times
-0.5d0               tfinal      = final time
+0.25d0               tfinal      = final time
 
-0.50d0             dtv(1)      = initial dt (used in all steps if method(1)=0)
+0.0050d0             dtv(1)      = initial dt (used in all steps if method(1)=0)
 1.0d99             dtv(2)      = max allowable dt 
 1.0d0              cflv(1)     = max allowable Courant number
 0.90d0             cflv(2)     = desired Courant number
@@ -14,7 +14,7 @@
 2                  method(2)   = order 
 0                  method(3)   = not used in one dimension
 0                  method(4)   = verbosity of output
-1                  method(5)   = source term splitting
+2                  method(5)   = source term splitting
 0                  method(6)   = mcapa
 2                  method(7)   = maux (should agree with parameter in driver)
 
