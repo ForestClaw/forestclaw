@@ -26,35 +26,46 @@ elseif PlotType == 4
     dir = './1dadv/';
     dim = 1;
     [amrdata1d,t1d] = readamrdata(dim,Frame,dir);
-    [q1d,x1d] = plotframe1ez(amrdata1d,mq,'b.-');    
+    [q1d,x1d] = plotframe1ez(amrdata1d,mq,'b.-');  
+    
+    if (abs(t1d-t) > 1e-12) 
+        fprintf('t1d = %16.8e\n',t1d);
+        fprintf('t   = %16.8e\n',t);
+        error('Reference solution time incorrect');
+    end
+    
+    % Compute errors
+    pp = csape(x1d,q1d,'periodic');
+    qxc = ppval(pp,xcenter);
+    qerr = abs(qxc(:)-q(:,2));
+    qnorm(1) = sum(qerr)*dx;
+    qnorm(2) = sqrt(sum(qerr.^2*dx));
+    qnorm(3) = max(qerr);
+    fprintf('%5d %12.4e %12.4e %12.4e %12.4e %12.4e\n',mx,qnorm(1),...
+        qnorm(2),qnorm(3),qmin,qmax);
 
     % Plot zeros of velocity function
-    vel_case = 3;
+    vel_case = 5;
     yl = [-5,25];
     switch vel_case
         case 1
-            % Case 1 : u= cos(2*pi*x)
-            u = @(x) cos(2*pi*x);
-            plot([0.25,0.25],yl,'k--');
-            plot([0.75,0.75],yl,'k--');
+            u = @(x) (x < 0.5)*(-0.5) + (x >= 0.5)*(0.5);
         case 2
-            % Case 2 : u = cos(2*pi*x) + 0.5
-            u = @(x) cos(2*pi*x) + 0.5;
-            z = acos(-0.5)/(2*pi);
+            % Case 2 : u = cos(2*pi*x) + a
+            a = 0;
+            u = @(x) cos(2*pi*x) + a;
+            z = acos(-a)/(2*pi);
             plot([z,z],yl,'k--');
             plot(1-[z,z],yl,'k--');
         case 3
-            % Case 3 : u = cos(2*pi*x) + 1
-            u = @(x) cos(2*pi*x) + 1;
-            plot([0.5,0.5],yl,'k--');
-        case 4
-            % Case 4 : u = cos(2*pi*x) + 2
-            u = @(x) cos(2*pi*x) + 2;
-            % no zeros
-        case 5
             u = @(x) sin(2*pi*x).*sin(16*pi*x);
+        case 4
+            a = 0.01;
+            u = @(x) tanh((x-0.5)/a);
+        case 5
+            a = 0.1;
+            u = @(x) -tanh((x-0.5)/a);
         otherwise
-            u = @(x) (x < 0.5)*(-0.5) + (x >= 0.5)*(0.5);
             %u = @(x) x*nan;
     end
     
@@ -73,6 +84,7 @@ elseif PlotType == 4
 end
     
 set(gca,'fontsize',16);
+set(gca,'box','on');
 
 NoQuery = 0;
 prt = false;

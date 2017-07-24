@@ -5,25 +5,65 @@
 \usepackage{cite}
 
 \begin{document}
-\paragraph{Scalar approach to conservation}
+\section{Introduction}
+\section{Numerical approaches}
+
+\subsection{Scalar approach to conservation}
 In \cite{le:2002}, LeVeque describes a solution to the conservation law
 \begin{align}
 q_t + (uq)_x &= 0 \\
 \end{align}
-where $u = u(x)$ is a spatially varying velocity field, and $q = q(x,t)$ is a conserved 
-tracer in  the flow field.  At a mesh cell interface, we have two velocities, 
-$u_r$ and $u_\ell$, which will not in general be equal.  As a result, satisfying a jump
-condition 
+where $u = u(x)$ is a spatially varying velocity field, and $q = q(x,t)$ is a conserved  tracer in  the flow field.  Using the analogy of boxes moving along a series of conveyor belts operating
+at speeds prescribed by $u(x)$, LeVeque describes a solution involving two waves. One moves at local speeds given by each conveyor belts, and stationary waves at the interfaces between conveyor belts.  To see this, we let suppose we have two conveyor belts. The left moves at speed $u_\ell$ and the right moves at speed $u_r$.  Each conveyor belt has a density of boxes, given by $q_\ell$ and $\q_r$. 
+If we have $u_\ell > u_r > 0$, boxes will pile up on the right conveyor belt  as faster moving boxes from the left are transfered to the slower moving conveyor belt on the right.  If $0 < u_\ell < u_r$, the density of boxes on the right conveyor belt will drop as faster moving boxes on the right move away from boxes arriving at a slower rate from the left.  In either case, we expect a jump 
+in box density both at the wave moving at speed $u_r$ along the right conveyor belt, and at the interface between the left and right conveyor belts.
+
+Mathematically, we can see that single wave is not enough by considering the Riemann problem at an interface between conveyor belts.   To solve the Riemann problem, we might try to connect left and 
+right states $q_\ell$ and $q_r$ by a single wave moving at some speed $s$ satisfying
 \begin{equation}
 u_r q_r - u_\ell q_\ell = s(q_r - q_\ell)
 \end{equation}
-for some speed $s$ will not in general be possible.   Assuming that $u_r > 0$The correct solution actually has two waves, one moving at speed 0 and a second at speed $u_r$.  To determine the 
-intermediate state $q^*$ we impose flux continuity across the speed 0 wave.
+Since $u_r \ne u_\ell$ in general, a single wave that connects the left and 
+right states $q_\ell$ and $q_r$ does not exist.  Instead, we write the conservation 
+law as
+\begin{align*}
+q_t + u_r q_x & = 0, \qquad \mbox{in the left cell} \\
+q_t + u_\ell q_x & = 0, \qquad \mbox{in the right cell}
+\end{align*}
+and introduce two waves, one moving at speed zero, and the second moving at speed $u_r > 0$.  
+We seek an intermediate state $q^*$ that can be used to connect to left and right states.
+Across the wave moving at speed $u_r > 0$, we impose the condition
 \begin{equation}
+u_r q_r - u^* q^* = u_r(q_r - q^*)
 \end{equation}
+to get $u^* = u_r$.  Across the stationary wave, we impose a flux continuity condition
+\begin{equation}
+u^* q^* - u_\ell q_\ell = 0
+\end{equation}
+to get
+\begin{equation*}
+q^* = \frac{u_\ell q_\ell}{u_r}.
+\end{equation*}
+The waves moving at speeds 0 and speed $u_r > 0$ are given by
+\begin{align*}
+\mathcal{W}_1 & \equiv q^* - q_\ell = \frac{u_\ell q_\ell}{u_r} - q_\ell = 
+-\frac{u_r - u_\ell}{u_r}q_\ell\\
+\mathcal{W}_2 & \equiv q_r - q^* = q_r - \frac{u_\ell q_\ell}{u_r} = 
+\frac{1}{u_r}\left(u_r q_r - u_\ell q_\ell\right)
+\end{align*}
+The fluctuations are then defined in terms of these waves as
+\begin{align*}
+\mathcal{A}^+ \Delta Q & \equiv u_r \mathcal{W}_1 = u_r q_r - u_\ell q_\ell \\
+\mathcal{A}^- \Delta Q & \equiv 0
+\end{align*}
+The sum of the fluctuations satisfy the conservation requirement
+\begin{equation*}
+\mathcal{A}^+ \Delta Q + \mathcal{A}^- \Delta Q = f(q_r) - f(q_\ell)
+\end{equation*}
 
 
-\paragraph{2-wave decomposition approach.}
+
+\subsection{2-wave decomposition approach.}
 Consider the following conservation law for the conservative form of the scalar advection equation.
 \begin{align}
 q_t + (uq)_x &= 0 \\
@@ -178,7 +218,7 @@ def rpn2(ql,qr,ul,ur):
 
 \vspace{0.25cm}
 
-\paragraph{The F-wave approach.} To correct this problem, we use the f-wave approach and
+\subsection{The F-wave approach.} To correct this problem, we use the f-wave approach and
 split the jump in the flux directly, avoiding the need to create waves $\mathcal W_p$.  
 We decompose the jump in flux as
 \begin{equation}
@@ -251,7 +291,9 @@ def rpn2fwave(ql,qr,ul,ur):
 \noindent
 The advantage of this approach is that we don't have to make any artifical choices for the case $u_r \approx -u_\ell$.  
 
-\paragraph{numerical results.}  We test the two above approaches
+\section{Numerical results.}  We test the two above approaches
+
+
 
 \bibliographystyle{plain}
 \bibliography{cons}

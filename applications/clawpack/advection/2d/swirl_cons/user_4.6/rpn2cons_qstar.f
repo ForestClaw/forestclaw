@@ -17,7 +17,7 @@
 
 
       integer i, iface
-      double precision qstar, qrr,qll,ur,ul, uhat
+      double precision qstar, qrr,qll,ur,ul, uhat, uavg
 
 
       double precision dtcom, dxcom, dycom, tcom
@@ -39,25 +39,21 @@ C     # ur > 0 : us*qs - ul*qll = 0 -->  us = ur; qs = ul*qll/ur;
           qrr = ql(i,1)
           qll = qr(i-1,1)
 
-          uhat = (ur+ul)/2.d0
-
 c         # ur and ul have the same sign
           if (ur .gt. 0 .and. ul .gt. 0) then
-              qstar = ul*qll/ur
-              wave(i,1,1) = qrr - qstar
+              wave(i,1,1) = (ur*qrr - ul*qll)/ur
               s(i,1) = ur
               amdq(i,1) = 0.d0
               apdq(i,1) = ur*qrr - ul*qll
           elseif (ur .lt. 0 .and. ul .lt. 0) then
-              qstar = ur*qrr/ul
-              wave(i,1,1) = (ur*qrr - ul*qll)/ur
-              s(i,1) = ur
+              wave(i,1,1) = (ur*qrr - ul*qll)/ul
+              s(i,1) = ul
               amdq(i,1) = ur*qrr - ul*qll
               apdq(i,1) = 0.d0
           else
 C             # ul and ur have different signs
-              qstar = 0
-              uhat = max(abs(uhat),1e-12)
+              uavg = (ur+ul)/2.d0
+              uhat = max(abs(uavg),1d-12)
               s(i,1) = uhat
               wave(i,1,1) = (ur*qrr - ul*qll)/uhat
               amdq(i,1) = -ul*qll

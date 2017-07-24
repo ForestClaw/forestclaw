@@ -20,7 +20,6 @@
       double precision ur,ul,qrr,qll, uhat,qhat, tau,uavg
       double precision a,b,c
 
-
       double precision dtcom, dxcom, dycom, tcom
       integer icom, jcom
 
@@ -50,13 +49,7 @@
           endif
 
           s(i,1) = uavg
-
-          if (ur .eq. ul) then
-              wave(i,1,1) = qrr - qll
-          else
-              wave(i,1,1) = (ur*qrr - ul*qll)/uhat   !! Same as above
-          endif
-
+          wave(i,1,1) = (ur*qrr - ul*qll)/uhat   !! Same as above
 
           if (uavg .eq. 0) then
 c             # This definition is needed to guarantee conservation, i.e. 
