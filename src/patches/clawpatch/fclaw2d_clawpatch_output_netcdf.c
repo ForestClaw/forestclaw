@@ -296,12 +296,20 @@ void cb_clawpatch_output_netcdf_writeq (fclaw2d_domain_t * domain,
         ERR(retval);
 
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    for (int j = mbc; j < my+mbc; ++j)
+    
+    /* Following code only works for clawpack5 */
+    for (int m = 0; m < meqn; ++m)
     {
-        start = mx*my*meqn*patch_num+(j-mbc)*mx;
-        count = mx;
-        if ((retval = nc_put_vara_double(ncid, qid, &start, &count, &q[j*(mx+2*mbc)+mbc])))
-            ERR(retval);
+        for (int j = mbc; j < my+mbc; ++j)
+        {
+            start = patch_num*mx*my*meqn + m*mx*my + (j-mbc)*mx;
+            count = mx;
+            if ((retval = nc_put_vara_double(ncid, qid, 
+                                             &start, 
+                                             &count, 
+                                             &q[m*(mx+2)*(my+2) + j*(mx+2*mbc) + mbc])))
+                ERR(retval);
+        }
     }
 
 }
