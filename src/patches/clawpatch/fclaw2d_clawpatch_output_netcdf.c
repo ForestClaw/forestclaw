@@ -258,7 +258,6 @@ void cb_clawpatch_output_netcdf_writeq (fclaw2d_domain_t * domain,
     double xlower, ylower, dx, dy;
     double* q;
     double patchlocation[4];
-    int patchinfo[2];
 
     /* Get info not readily available to user */
     fclaw2d_patch_get_info(glob->domain,this_patch,
@@ -272,7 +271,7 @@ void cb_clawpatch_output_netcdf_writeq (fclaw2d_domain_t * domain,
         ERR(retval);
     if ((retval = nc_inq_varid(ncid, "patch_location", &patchlocationid)))
         ERR(retval);
-    if ((retval = nc_inq_varid(ncid, "patch_info", &patchinfoid)))
+    if ((retval = nc_inq_varid(ncid, "patch_level", &patchinfoid)))
         ERR(retval);
 
     if ((retval = nc_var_par_access(ncid, qid, NC_COLLECTIVE)))
@@ -282,11 +281,9 @@ void cb_clawpatch_output_netcdf_writeq (fclaw2d_domain_t * domain,
     if ((retval = nc_var_par_access(ncid, patchinfoid, NC_COLLECTIVE)))
         ERR(retval);
 
-    patchinfo[0] = patch_num;
-    patchinfo[1] = level;
-    start = patch_num*2;
-    count = 2;
-    if ((retval = nc_put_vara_int(ncid, patchinfoid, &start, &count, &patchinfo[0])))
+    start = patch_num;
+    count = 1;
+    if ((retval = nc_put_vara_int(ncid, patchinfoid, &start, &count, &level)))
         ERR(retval);
 
     patchlocation[0] = xlower;
@@ -351,8 +348,8 @@ void fclaw2d_clawpatch_defgroup_netcdf(fclaw2d_global_t* glob, int ngrids, int n
     
     int retval;
     int numdim = 2;
-    int q_dimid, location_dimid, info_dimid,
-        qid, patchlocationid, patchinfoid;
+    int q_dimid, location_dimid, level_dimid,
+        qid, patchlocationid, patchlevelid;
 
     int mx,my,meqn;
     meqn = clawpatch_opt->meqn;
@@ -368,11 +365,11 @@ void fclaw2d_clawpatch_defgroup_netcdf(fclaw2d_global_t* glob, int ngrids, int n
     if ((retval = nc_def_dim(ncid, "ngridsxmlocation", numdim*2*ngrids, &location_dimid)))
         ERR(retval);
     
-    if ((retval = nc_def_dim(ncid, "ngridsxminfo", 2*ngrids, &info_dimid)))
+    if ((retval = nc_def_dim(ncid, "ngrids", ngrids, &level_dimid)))
         ERR(retval);
 
     /* Define the variable. */
-    if ((retval = nc_def_var(ncid, "patch_info", NC_INT, 1, &info_dimid, &patchinfoid)))
+    if ((retval = nc_def_var(ncid, "patch_level", NC_INT, 1, &level_dimid, &patchlevelid)))
         ERR(retval);
 
     if ((retval = nc_def_var(ncid, "patch_location", NC_DOUBLE, 1, &location_dimid, &patchlocationid)))
@@ -421,7 +418,7 @@ void fclaw2d_clawpatch_output_netcdf(fclaw2d_global_t* glob,int iframe)
     /* Create groups for patches */
     ngrids = domain->global_num_patches;
     fclaw2d_clawpatch_defgroup_netcdf(glob,ngrids,ncid);
-    
+
 #if 0
     for (int i = 0; i < ngrids; ++i)
     {
