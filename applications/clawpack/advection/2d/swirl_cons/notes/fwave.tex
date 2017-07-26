@@ -4,21 +4,46 @@
 \usepackage{amsmath}
 \usepackage{cite}
 
+\newcommand{\Fig}[1]{Figure \ref{fig:#1}}
+
 \begin{document}
 \section{Introduction}
 \section{Numerical approaches}
+The variable coefficient conservative form of the transport equation arises in many areas of
+geophysical flow modeling.  For example, the transport of pollutants, volcanic ash or 
+other conserved tracer component must often transported using prescibed reanalysis 
+wind field data. 
+
+In \cite{le:2002}, LeVeque describes several approaches to solving the conservative, 
+variable coefficient advection equation, given by
+\begin{align}
+q_t + (uq)_x = 0 \\
+\end{align}
+In his book, LeVeque describes several approaches to solving this equation, although
+there is a question about what to do in the case where the velocity field changes sign. 
+In this case, there is a loss of hyperbolicity that cannot be easily addressed by the 
+wave propagation algorithms implemented in ClawPack.  Here, we propose reasonable approaches
+to handling this case. 
+
+In the following, we provide details for four of the approaches described, and pay
+particular attention to ways to treat the change of sign that can lead to loss of 
+hyperbolicity.  The accuracy obtained from such methods is second order for velocity
+fields with no sign changes.  For velocity fields with sign changes, the accuracy can be
+significantly degraded, depending on the use of limiters, and whether the velocity field 
+converges or diverges at the sign change.  
+
 
 \subsection{Scalar approach to conservation}
 In \cite{le:2002}, LeVeque describes a solution to the conservation law
 \begin{align}
-q_t + (uq)_x &= 0 \\
+q_t + (uq)_x = 0 \\
 \end{align}
 where $u = u(x)$ is a spatially varying velocity field, and $q = q(x,t)$ is a conserved  tracer in  the flow field.  Using the analogy of boxes moving along a series of conveyor belts operating
-at speeds prescribed by $u(x)$, LeVeque describes a solution involving two waves. One moves at local speeds given by each conveyor belts, and stationary waves at the interfaces between conveyor belts.  To see this, we let suppose we have two conveyor belts. The left moves at speed $u_\ell$ and the right moves at speed $u_r$.  Each conveyor belt has a density of boxes, given by $q_\ell$ and $\q_r$. 
+at speeds prescribed by $u(x)$, LeVeque describes a solution involving two waves. One moves at local speeds given by each conveyor belts, and stationary waves at the interfaces between conveyor belts.  To see this, we let suppose we have two conveyor belts. The left moves at speed $u_\ell$ and the right moves at speed $u_r$.  Each conveyor belt has a density of boxes, given by $q_\ell$ and $q_r$. 
 If we have $u_\ell > u_r > 0$, boxes will pile up on the right conveyor belt  as faster moving boxes from the left are transfered to the slower moving conveyor belt on the right.  If $0 < u_\ell < u_r$, the density of boxes on the right conveyor belt will drop as faster moving boxes on the right move away from boxes arriving at a slower rate from the left.  In either case, we expect a jump 
 in box density both at the wave moving at speed $u_r$ along the right conveyor belt, and at the interface between the left and right conveyor belts.
 
-Mathematically, we can see that single wave is not enough by considering the Riemann problem at an interface between conveyor belts.   To solve the Riemann problem, we might try to connect left and 
+We can see that single wave is not enough by considering the Riemann problem at an interface between conveyor belts.   To solve the Riemann problem, we might try to connect left and 
 right states $q_\ell$ and $q_r$ by a single wave moving at some speed $s$ satisfying
 \begin{equation}
 u_r q_r - u_\ell q_\ell = s(q_r - q_\ell)
@@ -61,9 +86,44 @@ The sum of the fluctuations satisfy the conservation requirement
 \mathcal{A}^+ \Delta Q + \mathcal{A}^- \Delta Q = f(q_r) - f(q_\ell)
 \end{equation*}
 
+The Riemann solver for this approach is described in \Fig{qstar}. 
+
+\begin{figure}
+\begin{center}
+\begin{minipage}{0.5\textwidth}
+\vspace{0.5cm}
+\begin{verbatim}
+# Riemann solver for "conveyor belt" approach
+def rpn2(ql,qr,ul,ur):
+    if ur > 0 and ul > 0:
+        wave = (ur*qr - ul*ql)/ur
+        amdq = 0
+        apdq = ur*qr - ul*ql
+        s = ur
+    else if ur < 0 and ul < 0:
+        wave = (ur*qr - ul*ql)/ul
+        amdq = ur*qr - ul*ql
+        apdq = 0
+        s = ul
+    else:
+        uavg = (ur+ul)/2.0
+        uhat = max(abs(uvg),1e-12)
+        wave = (ur*qr - ul*ql)/uhat
+        amdq = -ul*ql
+        apdq = ur*qr
+        s = uhat
+
+    return wave,s,amdq,apdq
+\end{verbatim}
+\end{minipage}
+\end{center}
+\caption{Algorithm for cell-centered velocities based on scalar equations.}
+\label{fig:qstar}
+\end{figure}
 
 
 \subsection{2-wave decomposition approach.}
+Problem 13.11 in \cite{le:2002}
 Consider the following conservation law for the conservative form of the scalar advection equation.
 \begin{align}
 q_t + (uq)_x &= 0 \\
@@ -164,8 +224,8 @@ Waves, speeds and fluctuations ae given by
 = (u_r - u_\ell)
 \left(\begin{array}{c} \widehat{q}/\varepsilon \\ 
 1 \end{array}\right) \\
-\mathcal W_2  \equiv \alpha_2 \mathbf r^2 & = 
-\left(q_r - q_\ell + \frac{u_r - u_\ell}{\widehat{u}-a}\widehat{q} \right)
+\mathcal W_2  \equiv \alpha_2 \mathbf r^2 
+& =  \left(q_r - q_\ell + \frac{u_r - u_\ell}{\widehat{u}-a}\widehat{q} \right)
 \left(\begin{array}{c} 1 \\ 0\end{array}\right) 
 = \left(\begin{array}{c} q_r - q_\ell - (u_r - u_\ell) \widehat{q}/\varepsilon \\ 
 0 \end{array}\right)
@@ -192,31 +252,56 @@ For a spatially varying velocity field, we have $a = 0$.  In this case, $\mathca
 \end{align}
 where, for convenience, we have ignored the second component of $\mathcal W_2$. 
 
-Following the above approach, we can also find waves for the case $\widehat{u} < a = 0$.   Combining these two cases, we get the following Clawpack Riemann solver.  
+The Riemann solver for this approach is described in \Fig{wave_decomp}.
 
+
+\begin{figure}
+\begin{center}
+\begin{minipage}{0.5\textwidth}
 \vspace{0.25cm}
-
-\begin{minipage}{\textwidth}
 \begin{verbatim}
 # Riemann solver for wave decomposition approach
 def rpn2(ql,qr,ul,ur):
-    uavg = (ul + ur)/2        
-    uhat = sign(uavg)*max([abs(uavg),tol])
-    qhat = (ql + qr)/2
-    wave = qr - ql + (ur-ul)*qhat/uhat
+    qhat = (ql + qr)/2.0
+
+    uavg = (ul + ur)/2.0      
+    if uavg == 0:
+        uhat = 1e-12
+    else
+        uhat = uavg
+
+    s = uavg
+    wave = (ur*qr - ul*ql)/uhat
+
     if uavg == 0:
         amdq = -ul*qhat     # amdq+apdq = (ur-ul)*qhat
         apdq = ur*qhat
-        s = uavg
     else:
         apdq = max([uhat,0])*wave
         amdq = min([uhat,0])*wave        
-        s = uhat
+
     return wave,s,amdq,apdq
 \end{verbatim}
 \end{minipage}
+\end{center}
+\caption{2-wave decomposition approach to handling conservative advection equation.}
+\label{fig:wave_decomp}
+\end{figure}
 
 \vspace{0.25cm}
+
+\subsection{Edge velocities}
+In some sense, the simplest approach is to assume that the velocity field at cell edges is available. 
+In this case, we can easily evaluate a flux at cell interfaces, and formulate the problem 
+in classic flux form, where the flux is defined as
+\begin{equation*}
+F_{i-1/2} = \left\{\begin{array}{cc} 
+u_\ell q & u_\ell, u_r < 0 \\
+u_r q & u_r, u_\ell > 0
+\end{array}
+\right.
+\end{equation*}
+where
 
 \subsection{The F-wave approach.} To correct this problem, we use the f-wave approach and
 split the jump in the flux directly, avoiding the need to create waves $\mathcal W_p$.  

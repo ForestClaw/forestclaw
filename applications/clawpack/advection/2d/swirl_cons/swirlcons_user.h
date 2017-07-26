@@ -39,8 +39,7 @@ extern "C"
 typedef struct user_options
 {
     double period;
-    int claw_version;
-    int cons_rp;
+    int rp_solver;
     int example;
     int is_registered;
 
@@ -58,26 +57,29 @@ const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob);
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
-#define RPN2CONS_CC FCLAW_F77_FUNC(rpn2cons_cc,RPN2CONS_CC)
-void RPN2CONS_CC(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-                 const int* mbc,const int* mx, double ql[], double qr[],
-                 double auxl[], double auxr[], double wave[],
-                 double s[], double amdq[], double apdq[]);
+#define RPN2CONS_QSTAR FCLAW_F77_FUNC(rpn2cons_qstar,RPN2CONS_QSTAR)
+void RPN2CONS_QSTAR(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                    const int* mbc,const int* mx, double ql[], double qr[],
+                    double auxl[], double auxr[], double wave[],
+                    double s[], double amdq[], double apdq[]);
 
-
-#define RPN2CONS FCLAW_F77_FUNC(rpn2cons,RPN2CONS)
-void RPN2CONS(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+#define RPN2CONS_WD FCLAW_F77_FUNC(rpn2cons_wd,RPN2CONS_WD)
+void RPN2CONS_WD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
               const int* mbc,const int* mx, double ql[], double qr[],
               double auxl[], double auxr[], double wave[],
               double s[], double amdq[], double apdq[]);
+
+#define RPN2CONS_EC FCLAW_F77_FUNC(rpn2cons_ec,RPN2CONS_EC)
+void RPN2CONS_EC(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                 const int* mbc,const int* mx, double ql[], double qr[],
+                 double auxl[], double auxr[], double wave[],
+                 double s[], double amdq[], double apdq[]);
 
 #define RPN2FWAVE FCLAW_F77_FUNC(rpn2fwave, RPN2FWAVE)
 void RPN2FWAVE(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
                const int* mbc, const int* mx, double ql[], double qr[],
                double auxl[], double auxr[], double fwave[],
                double s[], double amdq[], double apdq[]);
-
-
 
 #define RPT2CONS_CC FCLAW_F77_FUNC(rpt2cons_cc, RPT2CONS_CC)
 void RPT2CONS_CC(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
