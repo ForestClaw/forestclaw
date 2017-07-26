@@ -23,7 +23,7 @@ if PlotType == 1
     view(2);
 elseif PlotType == 4
     hold on;
-    dir = './1dadv/';
+    dir = './1dcons/1dadv/';
     dim = 1;
     [amrdata1d,t1d] = readamrdata(dim,Frame,dir);
     [q1d,x1d] = plotframe1ez(amrdata1d,mq,'b.-');  
@@ -45,7 +45,7 @@ elseif PlotType == 4
         qnorm(2),qnorm(3),qmin,qmax);
 
     % Plot zeros of velocity function
-    vel_case = 5;
+    vel_case = 4;
     yl = [-5,25];
     switch vel_case
         case 1
@@ -61,8 +61,11 @@ elseif PlotType == 4
             u = @(x) sin(2*pi*x).*sin(16*pi*x);
         case 4
             a = 0.01;
-            u = @(x) tanh((x-0.5)/a);
+            u = @(x) 1 + 0.5*tanh((x-0.5)/a);
         case 5
+            a = 0.01;
+            u = @(x) tanh((x-0.5)/a);
+        case 6
             a = 0.1;
             u = @(x) -tanh((x-0.5)/a);
         otherwise
@@ -77,8 +80,7 @@ elseif PlotType == 4
     
     qm = min([max([q1d(:); qmax]),15]);
     ylim([-2 max([2.1,1.1*qm]);])
-    
-    
+       
     hold off;
      
 end

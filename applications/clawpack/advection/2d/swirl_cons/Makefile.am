@@ -14,6 +14,7 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/swirlcons_b4step2.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2fwave.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_ec.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_new.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_qstar.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpt2cons_cc.f \

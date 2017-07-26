@@ -8,7 +8,7 @@
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
 
       integer i, j, example
-      double precision tperiod, pi2, vt, xc,yc, ucc, vcc
+      double precision tperiod, pi2, vt, xc,yc, ucc, vcc, xe,ye
 
       common /comvt/ tperiod,pi2
       common /comex/ example
@@ -29,9 +29,14 @@ c           # coordinates of lower left corner of grid cell:
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
 
+            xe = xlower + (i-1)*dx
+            ye = ylower + (j-1)*dy
+
 c           # Cell-centered velocity
             aux(i,j,1) = vt*ucc(xc,yc)
             aux(i,j,2) = vt*vcc(xc,yc)
+            aux(i,j,3) = vt*ucc(xe,yc)
+            aux(i,j,4) = vt*vcc(xc,ye)
          enddo
       enddo
 
@@ -55,10 +60,10 @@ c         # 1d : Piecewise constant velocity (-0.5, 0.5)
           endif
       elseif (example .eq. 2) then
 c         # 1d : u = cos(2*pi*xp)       
-          ucc = cos(2*pi*xp)
+          ucc = cos(2*pi*xp) + 1.d0
       elseif (example .eq. 3) then
 c         # 1d : More complicated 1d example
-          ucc = 0.1*sin(2*pi*xp)*sin(16*pi*xp)
+          ucc = 0.2*sin(2*pi*xp)*sin(16*pi*xp)
       elseif (example .eq. 4) then 
           a = 0.01d0                   
           ucc = tanh((xp-0.5d0)/a)
@@ -96,10 +101,10 @@ c             # Add non-zero divergence
       if (example .le. 4) then
 c         # 1d examples
           vcc = 0        
-      elseif ((example .eq. 5) .or. (example .eq. 6)) then
+      elseif ((example .eq. 6) .or. (example .eq. 7)) then
 c         # 2d examples
           vcc = -2*((sin(pi*yp))**2 * sin(pi*xp) * cos(pi*xp))
-          if (example .eq. 6) then
+          if (example .eq. 7) then
 c             # Add non-zero divergence              
               rp2 = (xp-0.5d0)**2 + (yp-0.5d0)**2
               rp2 = (xp-0.5d0)**2

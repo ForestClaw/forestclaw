@@ -1,5 +1,5 @@
-      subroutine rpn2cons(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
-     &                       auxl,auxr,wave,s,amdq,apdq)
+      subroutine rpn2cons_wd(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
+     &                      auxl,auxr,wave,s,amdq,apdq)
 
       implicit none
 

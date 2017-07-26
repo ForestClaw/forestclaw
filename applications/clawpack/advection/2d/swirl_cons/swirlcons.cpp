@@ -42,14 +42,11 @@ swirlcons_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "period", &user->period, 4,
                            "Period of the flow field [4]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
-                           "Clawpack_version (4 or 5) [5]");
-
     sc_options_add_int (opt, 0, "example", &user->example, 3,
                            "Velocity field (1d, 2d, swirl, ...) (1-5) [3]");
 
-    sc_options_add_bool (opt, 0, "cons-rp", &user->cons_rp, 1,
-                           "Conservative riemann solver (T or F) [T]");
+    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 1,
+                           "Conservative riemann solver (1-4) [T]");
     user->is_registered = 1;
 
     return NULL;

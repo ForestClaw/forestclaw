@@ -42,33 +42,34 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
     const user_options_t* user = swirlcons_get_options(glob);
-    if (user->claw_version == 4)
+    fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+    clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
+    clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
+
+    switch(user->rp_solver)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
-        clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
-        clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
-        if (user->cons_rp)
-        {
+        case 1:
             clawopt->use_fwaves = 0;
-            clawpack46_vt->rpn2      = &RPN2CONS_CC;                                
-        }
-        else if (clawopt->use_fwaves)
-        {
-            clawpack46_vt->rpn2      = &RPN2FWAVE;                
-        }
-        else
-        {
+            clawpack46_vt->rpn2      = &RPN2CONS_QSTAR; 
+            break; 
+
+        case 2:
             clawopt->use_fwaves = 0;
-            clawpack46_vt->rpn2      = &RPN2CONS;                                
-        }
-        clawpack46_vt->rpt2      = &RPT2CONS_CC;
-        clawpack46_vt->b4step2   = &SWIRLCONS_B4STEP2;
+            clawpack46_vt->rpn2      = &RPN2CONS_WD; 
+            break; 
+
+        case 3:
+            clawopt->use_fwaves = 0;
+            clawpack46_vt->rpn2      = &RPN2CONS_EC; 
+            break;
+
+        case 4:
+            clawopt->use_fwaves = 1;
+            clawpack46_vt->rpn2      = &RPN2FWAVE; 
+            break;
     }
-    else if (user->claw_version == 5)
-    {
-        fclaw_global_essentialf("swirl (cons) : Clawpack 5.x implementation not implemented\n");
-        exit(0);
-    }
+    clawpack46_vt->rpt2      = &RPT2CONS_CC;
+    clawpack46_vt->b4step2   = &SWIRLCONS_B4STEP2;
 }
 
 void swirlcons_problem_setup(fclaw2d_global_t* glob)
