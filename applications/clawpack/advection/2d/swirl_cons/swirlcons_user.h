@@ -38,7 +38,6 @@ extern "C"
 
 typedef struct user_options
 {
-    double period;
     int rp_solver;
     int example;
     int is_registered;
@@ -46,7 +45,7 @@ typedef struct user_options
 } user_options_t;
 
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(double* tperiod, int* example);
+void SWIRL_SETPROB(int* example);
 
 void swirlcons_link_solvers(fclaw2d_global_t *glob);
 
@@ -54,14 +53,11 @@ void swirlcons_problem_setup(fclaw2d_global_t* glob);
 
 const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob);
 
-/* Mappings */
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
-
-#define RPN2CONS_QSTAR FCLAW_F77_FUNC(rpn2cons_qstar,RPN2CONS_QSTAR)
-void RPN2CONS_QSTAR(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-                    const int* mbc,const int* mx, double ql[], double qr[],
-                    double auxl[], double auxr[], double wave[],
-                    double s[], double amdq[], double apdq[]);
+#define RPN2CONS_QS FCLAW_F77_FUNC(rpn2cons_qs,RPN2CONS_QS)
+void RPN2CONS_QS(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                 const int* mbc,const int* mx, double ql[], double qr[],
+                 double auxl[], double auxr[], double wave[],
+                 double s[], double amdq[], double apdq[]);
 
 #define RPN2CONS_WD FCLAW_F77_FUNC(rpn2cons_wd,RPN2CONS_WD)
 void RPN2CONS_WD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
@@ -75,33 +71,17 @@ void RPN2CONS_EC(const int* ixy,const int* maxm, const int* meqn, const int* mwa
                  double auxl[], double auxr[], double wave[],
                  double s[], double amdq[], double apdq[]);
 
-#define RPN2FWAVE FCLAW_F77_FUNC(rpn2fwave, RPN2FWAVE)
-void RPN2FWAVE(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-               const int* mbc, const int* mx, double ql[], double qr[],
-               double auxl[], double auxr[], double fwave[],
-               double s[], double amdq[], double apdq[]);
-
-#define RPT2CONS_CC FCLAW_F77_FUNC(rpt2cons_cc, RPT2CONS_CC)
-void RPT2CONS_CC(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+#define RPN2CONS_FW FCLAW_F77_FUNC(rpn2cons_fw, RPN2CONS_FW)
+void RPN2CONS_FW(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
                  const int* mbc, const int* mx, double ql[], double qr[],
-                 double aux1[], double aux2[], double aux3[], const int* imp,
-                 double dsdq[], double bmasdq[], double bpasdq[]);
+                 double auxl[], double auxr[], double fwave[],
+                 double s[], double amdq[], double apdq[]);
 
-#define SWIRLCONS_BC2 FCLAW_F77_FUNC(swirlcons_bc2,SWIRLCONS_BC2)
-void SWIRLCONS_BC2(const int* maxmx, const int* maxmy, const int* meqn,
-                     const int* mbc, const int* mx, const int* my,
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy, const double q[],
-                     const int* maux, const double aux[], const double* t,
-                     const double* dt, const int mthbc[]);
-
-#define SWIRLCONS_B4STEP2 FCLAW_F77_FUNC(swirlcons_b4step2,SWIRLCONS_B4STEP2)
-void SWIRLCONS_B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
-                       const int* mx, const int* my, const int* meqn,
-                       double q[], const double* xlower, const double* ylower,
-                       const double* dx, const double* dy,
-                       const double* t, const double* dt,
-                       const int* maux, double aux[]);
+#define RPT2CONS FCLAW_F77_FUNC(rpt2cons, RPT2CONS)
+void RPT2CONS(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+              const int* mbc, const int* mx, double ql[], double qr[],
+              double aux1[], double aux2[], double aux3[], const int* imp,
+              double dsdq[], double bmasdq[], double bpasdq[]);
 
 #ifdef __cplusplus
 #if 0

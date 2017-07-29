@@ -1,27 +1,36 @@
-function plot_velocity(N)
+function plot_velocity(ex,M)
+
+global example
 
 close all;
+
+N = 200;  % For hi-res plots
+
+example = ex;
 
 % Quiver plot
 figure(1);
 
-x = linspace(0,1,N+1);
+x = linspace(0,1,M+1);
 y = x;
 [xm,ym] = meshgrid(x,y);
 
 [um,vm] = vel(xm,ym);
 
-s = 1;
+s = 1.5;
 quiver(xm,ym,um,vm,s);
 daspect([1 1 1]);
 axis([0 1 0 1]);
-title('Vecocity','fontsize',18);
+title(sprintf('Example %d : Velocity',ex),'fontsize',18);
+set(gca,'fontsize',16);
+xlabel('x','fontsize',16);
+ylabel('y','fontsize',16);
 
 % Contour plot of magnitude
 figure(2);
 clf
 
-x = linspace(0,1,10*N+1);
+x = linspace(0,1,N+1);
 y = x;
 
 [xm,ym] = meshgrid(x,y);
@@ -29,9 +38,13 @@ y = x;
 [um,vm] = vel(xm,ym);
 
 mm = sqrt(um.^2 + vm.^2);
-contour(xm,ym,mm,11);
-hold on;
-contour(xm,ym,mm,[0 0],'r--');
+contour(xm,ym,mm,21);
+
+fprintf('%-10s %12.4e\n','min(mm)',min(mm(:)));
+fprintf('%-10s %12.4e\n','max(mm)',max(mm(:)));
+
+
+caxis([0 1]);
 daspect([1 1 1]);
 axis([0 1 0 1]);
 colorbar;
@@ -60,11 +73,15 @@ ux = (um(:,2:end) - um(:,1:end-1))/h;
 vy = (vm(2:end,:) - vm(1:end-1,:))/h;
 
 divu = ux + vy;
+dmax = round(max(divu));
+dmin = round(min(divu));
+dlim = max(abs([dmax,dmin]));
 
 [xcm,ycm]= meshgrid(xc,yc);
 
-contour(xcm,ycm,divu,10);
+contour(xcm,ycm,divu,21);
 daspect([1 1 1]);
+caxis([-dlim dlim]);
 colorbar;
 title('Divergence','fontsize',18);
 
@@ -73,13 +90,17 @@ end
 
 function [u,v] = vel(x,y)
 
+global example
 
-ucc = @(x,y) 2*((sin(pi*x)).^2 .* sin(pi*y) .* cos(pi*y));
-vcc = @(x,y) -2*sin(pi*y).^2 .* sin(pi*x) .* cos(pi*x);
-vcc_add = @(x,y) 0.2*sin(4*pi*y).*cos(4*pi*x);
+if (example == 1)
+    a = 0.5;
+else
+    a = -0.5;
+end
 
-ucc = @(x,y) cos(pi*x).^2 - 0.5;
-vcc = @(x,y) sin(pi*y).^2 - 0.5;
+s = sqrt(2)/2;
+ucc = @(x,y) s*(cos(pi*x).^2 + a);
+vcc = @(x,y) s*(sin(pi*y).^2 + a);
 
 u = ucc(x,y);
 v = vcc(x,y);
