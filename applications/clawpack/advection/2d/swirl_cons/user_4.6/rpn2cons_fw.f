@@ -1,4 +1,4 @@
-      subroutine rpn2fwave(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
+      subroutine rpn2cons_fw(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
      &			auxl,auxr,wave,s,amdq,apdq)
       implicit none
 

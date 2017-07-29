@@ -1,4 +1,4 @@
-      subroutine rpt2cons_cc(ixy,maxm,meqn,mwaves,mbc,mx,
+      subroutine rpt2cons(ixy,maxm,meqn,mwaves,mbc,mx,
      &                       ql,qr,aux1,aux2,aux3,imp,asdq,
      &                       bmasdq,bpasdq)
       

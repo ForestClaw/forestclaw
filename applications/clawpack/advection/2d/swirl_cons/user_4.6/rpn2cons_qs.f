@@ -1,4 +1,4 @@
-      subroutine rpn2cons_qstar(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
+      subroutine rpn2cons_qs(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
      &                       auxl,auxr,wave,s,amdq,apdq)
 
       implicit none

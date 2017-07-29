@@ -17,13 +17,9 @@ c           # coordinates of lower left corner of grid cell:
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
 
-c           ucc = 2*((sin(pi*xp))**2 * sin(pi*yp) * cos(pi*yp))
-c           ucc = cos(2*pi*xp)
+            aux(i,j,1) = cos(pi*xc)**2 - 0.5
+            aux(i,j,2) = sin(pi*yc)**2 - 0.5
 
-            ucc = 0.1*sin(2*pi*xc)*sin(16*pi*xc)
-
-            aux(i,j,1) = ucc
-            aux(i,j,2) = 0.d0
          enddo
       enddo
 
