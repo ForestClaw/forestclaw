@@ -151,20 +151,19 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_vtable_initialize();
     fclaw2d_diagnostics_vtable_initialize();
 
-    fc2d_geoclaw_vtable_initialize();
+    fc2d_geoclaw_solver_initialize();
 
     slosh_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fc2d_geoclaw_setup(glob);
+    fc2d_geoclaw_module_setup(glob);
 
 
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
 
-    fc2d_geoclaw_finalize(glob);
     fclaw2d_finalize(glob);
 }
 

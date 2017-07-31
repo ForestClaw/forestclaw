@@ -34,6 +34,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 
 static
+void cb_partition_pack(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       void *user)
+
+{
+    /* Pack everything in old domain */
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
+
+    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    int patch_num = this_block->num_patches_before + this_patch_idx;
+    void* pack_data_here = (void*) ((void**)g->user)[patch_num];
+
+    fclaw2d_patch_partition_pack(g->glob,this_patch,
+                                 this_block_idx,this_patch_idx,
+                                 pack_data_here);
+}
+
+
+static
 void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
                             fclaw2d_patch_t * old_patch,
                             fclaw2d_domain_t * new_domain,
@@ -42,6 +63,7 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
                             int old_patchno, int new_patchno,
                             void *user)
 {
+    /* Transfer data to new domain */
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
     fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
@@ -61,9 +83,25 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
     else
     {
         /* We need to rebuild the patch from scratch. 'user' contains
-           the packed data received from remote processor. */
+           the packed data received from remote processor. */   
+        fclaw2d_domain_t *domain = new_domain;  /* get patch id in new domain */
+
+        fclaw2d_block_t *this_block = &domain->blocks[blockno];
+        int patch_num = this_block->num_patches_before + new_patchno;
+        void* unpack_data_from_here = (void*) ((void**)g->user)[patch_num];
+
+        /* pass in new_domain, since glob only contains old domain at this point
+        and the both domains are needed to increment/decrement patches */
         fclaw2d_patch_partition_unpack(g->glob,new_domain,new_patch,
-                                       blockno,new_patchno,g->user);
+                                       blockno,new_patchno,unpack_data_from_here);
+
+        /* Reason for the following two lines: the glob contains the old domain 
+        which is incremented in ddata_old  but we really want to increment the 
+        new domain. */
+        --ddata_old->count_set_patch;
+        ++ddata_new->count_set_patch;
+
+
     }
 }
 
@@ -86,7 +124,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
        use data size (in bytes per patch) below. */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
     size_t psize = fclaw2d_patch_partition_packsize(glob);
-    size_t data_size = psize*sizeof(double);
+    size_t data_size = psize;  /* Includes sizeof(data_type) */
     void ** patch_data = NULL;
 
     fclaw2d_domain_allocate_before_partition (*domain, data_size,
@@ -95,7 +133,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
     /* For all (patch i) { pack its numerical data into patch_data[i] }
        Does all the data in every patch need to be copied?  */
     fclaw2d_global_iterate_patches(glob,
-                                   cb_fclaw2d_patch_partition_pack,
+                                   cb_partition_pack,
                                    (void *) patch_data);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
 

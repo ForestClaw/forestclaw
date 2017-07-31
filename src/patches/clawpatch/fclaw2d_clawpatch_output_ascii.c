@@ -25,8 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_output_ascii.h>
 
-#include <fclaw2d_global.h>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
+
+#include <fclaw2d_patch.h>
+#include <fclaw2d_global.h>
 #include <fclaw2d_options.h>
 
 

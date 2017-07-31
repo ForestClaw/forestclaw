@@ -21,6 +21,8 @@ module topo_module
     use amr_module, only: tstart_thisrun
     implicit none
 
+    logical, private :: module_setup = .false.
+
     ! Work array for topography for all t
     real(kind=8), allocatable :: topowork(:)
 
@@ -110,213 +112,218 @@ contains
         real(kind=8) :: area_i,area_j,x_junk,y_junk
         real(kind=8) :: area, area_domain
 
-        ! Open and begin parameter file output
-        write(GEO_PARM_UNIT,*) ' '
-        write(GEO_PARM_UNIT,*) '--------------------------------------------'
-        write(GEO_PARM_UNIT,*) 'SETTOPO:'
-        write(GEO_PARM_UNIT,*) '---------'
+        if (.not.module_setup) then
+
+            ! Open and begin parameter file output
+            write(GEO_PARM_UNIT,*) ' '
+            write(GEO_PARM_UNIT,*) '--------------------------------------------'
+            write(GEO_PARM_UNIT,*) 'SETTOPO:'
+            write(GEO_PARM_UNIT,*) '---------'
 
 
-        if (present(file_name)) then
-            call opendatafile(iunit, file_name)
-        else
-            call opendatafile(iunit, 'topo.data')
-        endif
-
-        ! Read in topography specification type
-        read(iunit,"(i1)") test_topography
-
-        ! Primary topography type, read in topography files specified
-        if (test_topography == 0) then
-            read(iunit,*) mtopofiles
-
-            if (mtopofiles == 0) then
-                write(GEO_PARM_UNIT,*) '   mtopofiles = 0'
-                write(GEO_PARM_UNIT,*) '   No topo files specified, '
-                write(GEO_PARM_UNIT,*) '          will set B(x,y) = 0 in setaux'
-                return
+            if (present(file_name)) then
+                call opendatafile(iunit, file_name)
+            else
+                call opendatafile(iunit, 'topo.data')
             endif
 
-            mtopofiles = mtopofiles + num_dtopo
-            write(GEO_PARM_UNIT,*) '   mtopofiles = ',mtopofiles-num_dtopo
+            ! Read in topography specification type
+            read(iunit,"(i1)") test_topography
 
-            ! Read and allocate data parameters for each file
-            allocate(mxtopo(mtopofiles),mytopo(mtopofiles))
-            allocate(xlowtopo(mtopofiles),ylowtopo(mtopofiles))
-            allocate(tlowtopo(mtopofiles),xhitopo(mtopofiles),yhitopo(mtopofiles))
-            allocate(thitopo(mtopofiles),dxtopo(mtopofiles),dytopo(mtopofiles))
-            allocate(topofname(mtopofiles),itopotype(mtopofiles))
-            allocate(minleveltopo(mtopofiles),maxleveltopo(mtopofiles))
-            allocate(i0topo(mtopofiles),mtopo(mtopofiles),mtopoorder(mtopofiles))
-            allocate(topoID(mtopofiles),topotime(mtopofiles),topo0save(mtopofiles))
-            allocate(i0topo0(mtopofiles),topo0ID(mtopofiles))
+            ! Primary topography type, read in topography files specified
+            if (test_topography == 0) then
+                read(iunit,*) mtopofiles
 
-            do i=1,mtopofiles - num_dtopo
-                read(iunit,*) topofname(i)
-                read(iunit,*) itopotype(i),minleveltopo(i), maxleveltopo(i), &
-                    tlowtopo(i),thitopo(i)
-
-                write(GEO_PARM_UNIT,*) '   '
-                write(GEO_PARM_UNIT,*) '   ',topofname(i)
-                write(GEO_PARM_UNIT,*) '  itopotype = ', itopotype(i)
-                write(GEO_PARM_UNIT,*) '  minlevel, maxlevel = ', &
-                    minleveltopo(i), maxleveltopo(i)
-                write(GEO_PARM_UNIT,*) '  tlow, thi = ', tlowtopo(i),thitopo(i)
-                if (abs(itopotype(i)) == 1) then
-                    print *, 'WARNING: topotype 1 has been deprecated'
-                    print *, 'converting to topotype > 1 is encouraged'
-                    print *, 'python tools for converting files are provided'
+                if (mtopofiles == 0) then
+                    write(GEO_PARM_UNIT,*) '   mtopofiles = 0'
+                    write(GEO_PARM_UNIT,*) '   No topo files specified, '
+                    write(GEO_PARM_UNIT,*) '          will set B(x,y) = 0 in setaux'
+                    return
                 endif
-                call read_topo_header(topofname(i),itopotype(i),mxtopo(i), &
-                    mytopo(i),xlowtopo(i),ylowtopo(i),xhitopo(i),yhitopo(i), &
-                    dxtopo(i),dytopo(i))
-                topoID(i) = i
-                mtopo(i) = mxtopo(i)*mytopo(i)
-            enddo
 
-            ! adding extra topo arrays corresponding spatially to dtopo
-            ! arrays will be part of time dependent topowork as with all others.
-            ! the state of these arrays at t=0 will be stored in topo0work
-            topo0save(:)= 0
-            do i= mtopofiles - num_dtopo + 1, mtopofiles
-               j = i - mtopofiles + num_dtopo
-               itopotype(i) = dtopotype(j)
-               mxtopo(i) = mxdtopo(j)
-               mytopo(i) = mydtopo(j)
-               xlowtopo(i) = xlowdtopo(j)
-               ylowtopo(i) = ylowdtopo(j)
-               xhitopo(i) = xhidtopo(j)
-               yhitopo(i) = yhidtopo(j)
-               dxtopo(i) = dxdtopo(j)
-               dytopo(i) = dydtopo(j)
-               minleveltopo(i) = minleveldtopo(j)
-               maxleveltopo(i) = maxleveldtopo(j)
-               tlowtopo(i) = t0dtopo(j)
-               thitopo(i) = tfdtopo(j)
-               mtopo(i) = mxtopo(i)*mytopo(i)
-               topoID(i) = i
-               topotime(i) = -huge(1.0)
-               topo0save(i) = 1
-            enddo
+                mtopofiles = mtopofiles + num_dtopo
+                write(GEO_PARM_UNIT,*) '   mtopofiles = ',mtopofiles-num_dtopo
 
-            ! Indexing into work array
-            i0topo(1)=1
-            if (mtopofiles > 1) then
-                do i=2,mtopofiles
-                    i0topo(i)=i0topo(i-1) + mtopo(i-1)
-                enddo
-            endif
+                ! Read and allocate data parameters for each file
+                allocate(mxtopo(mtopofiles),mytopo(mtopofiles))
+                allocate(xlowtopo(mtopofiles),ylowtopo(mtopofiles))
+                allocate(tlowtopo(mtopofiles),xhitopo(mtopofiles),yhitopo(mtopofiles))
+                allocate(thitopo(mtopofiles),dxtopo(mtopofiles),dytopo(mtopofiles))
+                allocate(topofname(mtopofiles),itopotype(mtopofiles))
+                allocate(minleveltopo(mtopofiles),maxleveltopo(mtopofiles))
+                allocate(i0topo(mtopofiles),mtopo(mtopofiles),mtopoorder(mtopofiles))
+                allocate(topoID(mtopofiles),topotime(mtopofiles),topo0save(mtopofiles))
+                allocate(i0topo0(mtopofiles),topo0ID(mtopofiles))
 
-            ! Read topography and allocate space for each file
-            mtoposize = sum(mtopo)
-            allocate(topowork(mtoposize))
+                do i=1,mtopofiles - num_dtopo
+                    read(iunit,*) topofname(i)
+                    read(iunit,*) itopotype(i),minleveltopo(i), maxleveltopo(i), &
+                        tlowtopo(i),thitopo(i)
 
-            do i=1,mtopofiles - num_dtopo
-                topoID(i) = i
-                topotime(i) = -huge(1.0)
-                call read_topo_file(mxtopo(i),mytopo(i),itopotype(i),topofname(i), &
-                    topowork(i0topo(i):i0topo(i)+mtopo(i)-1))
-            enddo
-
-            ! topography order...This determines which order to process topography
-            !
-            ! The finest topography will be given priority in any region
-            ! mtopoorder(rank) = i means that i'th topography file has rank rank,
-            ! where the file with rank=1 is the finest and considered first.
-            do i=1,mtopofiles
-                finer_than = 0
-                do j=1,mtopofiles
-                    if (j /= i) then
-                        area_i=dxtopo(i)*dytopo(i)
-                        area_j=dxtopo(j)*dytopo(j)
-                        if (area_i < area_j) finer_than = finer_than + 1
-                        ! if two files have the same resolution, order is
-                        ! arbitrarily chosen
-                        if ((area_i == area_j).and.(j < i)) then
-                            finer_than = finer_than + 1
-                        endif
+                    write(GEO_PARM_UNIT,*) '   '
+                    write(GEO_PARM_UNIT,*) '   ',topofname(i)
+                    write(GEO_PARM_UNIT,*) '  itopotype = ', itopotype(i)
+                    write(GEO_PARM_UNIT,*) '  minlevel, maxlevel = ', &
+                        minleveltopo(i), maxleveltopo(i)
+                    write(GEO_PARM_UNIT,*) '  tlow, thi = ', tlowtopo(i),thitopo(i)
+                    if (abs(itopotype(i)) == 1) then
+                        print *, 'WARNING: topotype 1 has been deprecated'
+                        print *, 'converting to topotype > 1 is encouraged'
+                        print *, 'python tools for converting files are provided'
                     endif
+                    call read_topo_header(topofname(i),itopotype(i),mxtopo(i), &
+                        mytopo(i),xlowtopo(i),ylowtopo(i),xhitopo(i),yhitopo(i), &
+                        dxtopo(i),dytopo(i))
+                    topoID(i) = i
+                    mtopo(i) = mxtopo(i)*mytopo(i)
                 enddo
-                ! ifinerthan tells how many other files, file i is finer than
-                rank = mtopofiles - finer_than
-                mtopoorder(rank) = i
-            enddo
 
-            write(GEO_PARM_UNIT,*) ' '
-            write(GEO_PARM_UNIT,*) '  Ranking of topography files', &
-                '  finest to coarsest: ', &
-                (mtopoorder(rank),rank=1,mtopofiles)
-            write(GEO_PARM_UNIT,*) ' '
+                ! adding extra topo arrays corresponding spatially to dtopo
+                ! arrays will be part of time dependent topowork as with all others.
+                ! the state of these arrays at t=0 will be stored in topo0work
+                topo0save(:)= 0
+                do i= mtopofiles - num_dtopo + 1, mtopofiles
+                   j = i - mtopofiles + num_dtopo
+                   itopotype(i) = dtopotype(j)
+                   mxtopo(i) = mxdtopo(j)
+                   mytopo(i) = mydtopo(j)
+                   xlowtopo(i) = xlowdtopo(j)
+                   ylowtopo(i) = ylowdtopo(j)
+                   xhitopo(i) = xhidtopo(j)
+                   yhitopo(i) = yhidtopo(j)
+                   dxtopo(i) = dxdtopo(j)
+                   dytopo(i) = dydtopo(j)
+                   minleveltopo(i) = minleveldtopo(j)
+                   maxleveltopo(i) = maxleveldtopo(j)
+                   tlowtopo(i) = t0dtopo(j)
+                   thitopo(i) = tfdtopo(j)
+                   mtopo(i) = mxtopo(i)*mytopo(i)
+                   topoID(i) = i
+                   topotime(i) = -huge(1.0)
+                   topo0save(i) = 1
+                enddo
 
-            !set values in topo array for dtopo generated topo
-            !this call will also determine which topo arrays to save in topo0work
-            do i = mtopofiles - num_dtopo + 1, mtopofiles
-               call set_topo_for_dtopo(mxtopo(i),mytopo(i),dxtopo(i),dytopo(i), &
-                    xlowtopo(i),ylowtopo(i),xhitopo(i),yhitopo(i), &
-                    topowork(i0topo(i):i0topo(i)+mtopo(i)-1))
-            enddo
+                ! Indexing into work array
+                i0topo(1)=1
+                if (mtopofiles > 1) then
+                    do i=2,mtopofiles
+                        i0topo(i)=i0topo(i-1) + mtopo(i-1)
+                    enddo
+                endif
 
-            !create topo0work array for finest arrays covering dtopo
-            !arrays to be saved are indicated in topo0save
-            topo_finalized = .true.
-            aux_finalized = 2   !# indicates aux arrays properly set with dtopo
-            if (num_dtopo>0) then
-               topo_finalized = .false.
-               aux_finalized = 0  !# will be incremented each time level 1 goes
-               i0topo0(1) = 1
-               mtopo0size = dot_product(mtopo,topo0save)
-               allocate(topo0work(mtopo0size))
-               do i = 2,mtopofiles
-                  i0topo0(i)= i0topo0(i-1) + mtopo(i-1)*topo0save(i-1)
-               enddo
+                ! Read topography and allocate space for each file
+                mtoposize = sum(mtopo)
+                allocate(topowork(mtoposize))
 
-               do i = 1,mtopofiles
-                  if (topo0save(i)>0) then
-                     topo0work(i0topo0(i):i0topo0(i)+mtopo(i)-1) = &
-                        topowork(i0topo(i):i0topo(i)+mtopo(i)-1)
-                  endif
-               enddo
-            endif
+                do i=1,mtopofiles - num_dtopo
+                    topoID(i) = i
+                    topotime(i) = -huge(1.0)
+                    call read_topo_file(mxtopo(i),mytopo(i),itopotype(i),topofname(i), &
+                        topowork(i0topo(i):i0topo(i)+mtopo(i)-1))
+                enddo
 
-            ! Check that topo arrays cover full domain:
-            call topoarea(xlower,xupper,ylower,yupper,1,area)
-            area_domain = (yupper-ylower)*(xupper-xlower)
-            if (abs(area - area_domain) > 1e-2*area_domain) then
-                write(6,*) '**** topo arrays do not cover domain'
-                write(6,*) '**** area of overlap = ', area
-                write(6,*) '**** area of domain  = ', area_domain
+                ! topography order...This determines which order to process topography
+                !
+                ! The finest topography will be given priority in any region
+                ! mtopoorder(rank) = i means that i'th topography file has rank rank,
+                ! where the file with rank=1 is the finest and considered first.
+                do i=1,mtopofiles
+                    finer_than = 0
+                    do j=1,mtopofiles
+                        if (j /= i) then
+                            area_i=dxtopo(i)*dytopo(i)
+                            area_j=dxtopo(j)*dytopo(j)
+                            if (area_i < area_j) finer_than = finer_than + 1
+                            ! if two files have the same resolution, order is
+                            ! arbitrarily chosen
+                            if ((area_i == area_j).and.(j < i)) then
+                                finer_than = finer_than + 1
+                            endif
+                        endif
+                    enddo
+                    ! ifinerthan tells how many other files, file i is finer than
+                    rank = mtopofiles - finer_than
+                    mtopoorder(rank) = i
+                enddo
+
+                write(GEO_PARM_UNIT,*) ' '
+                write(GEO_PARM_UNIT,*) '  Ranking of topography files', &
+                    '  finest to coarsest: ', &
+                    (mtopoorder(rank),rank=1,mtopofiles)
+                write(GEO_PARM_UNIT,*) ' '
+
+                !set values in topo array for dtopo generated topo
+                !this call will also determine which topo arrays to save in topo0work
+                do i = mtopofiles - num_dtopo + 1, mtopofiles
+                   call set_topo_for_dtopo(mxtopo(i),mytopo(i),dxtopo(i),dytopo(i), &
+                        xlowtopo(i),ylowtopo(i),xhitopo(i),yhitopo(i), &
+                        topowork(i0topo(i):i0topo(i)+mtopo(i)-1))
+                enddo
+
+                !create topo0work array for finest arrays covering dtopo
+                !arrays to be saved are indicated in topo0save
+                topo_finalized = .true.
+                aux_finalized = 2   !# indicates aux arrays properly set with dtopo
+                if (num_dtopo>0) then
+                   topo_finalized = .false.
+                   aux_finalized = 0  !# will be incremented each time level 1 goes
+                   i0topo0(1) = 1
+                   mtopo0size = dot_product(mtopo,topo0save)
+                   allocate(topo0work(mtopo0size))
+                   do i = 2,mtopofiles
+                      i0topo0(i)= i0topo0(i-1) + mtopo(i-1)*topo0save(i-1)
+                   enddo
+
+                   do i = 1,mtopofiles
+                      if (topo0save(i)>0) then
+                         topo0work(i0topo0(i):i0topo0(i)+mtopo(i)-1) = &
+                            topowork(i0topo(i):i0topo(i)+mtopo(i)-1)
+                      endif
+                   enddo
+                endif
+
+                ! Check that topo arrays cover full domain:
+                call topoarea(xlower,xupper,ylower,yupper,1,area)
+                area_domain = (yupper-ylower)*(xupper-xlower)
+                if (abs(area - area_domain) > 1e-2*area_domain) then
+                    write(6,*) '**** topo arrays do not cover domain'
+                    write(6,*) '**** area of overlap = ', area
+                    write(6,*) '**** area of domain  = ', area_domain
+                    stop
+                else if (abs(area - area_domain) > 1e-12*area_domain) then
+                    write(6,*) '**** WARNING'
+                    write(6,*) '**** topo arrays do not quite cover domain'
+                    write(6,*) '**** area of overlap = ', area
+                    write(6,*) '**** area of domain  = ', area_domain
+                    write(6,*) '**** error is less than 1% so proceeding...'
+                endif
+
+            !---------------tests for analytic bathymetry-------------------
+            ! Simple jump discontinuity in bathymetry
+            else if (test_topography == 1) then
+                topo_finalized = .true.
+                read(iunit,"(d16.8)") topo_location
+                read(iunit,"(d16.8)") topo_left
+                read(iunit,"(d16.8)") topo_right
+
+            ! Idealized ocean shelf
+            else if (test_topography == 2 .or. test_topography == 3) then
+                topo_finalized = .true.
+                read(iunit,"(d16.8)") topo_x0
+                read(iunit,"(d16.8)") topo_x1
+                read(iunit,"(d16.8)") topo_x2
+                read(iunit,"(d16.8)") topo_basin_depth
+                read(iunit,"(d16.8)") topo_shelf_depth
+                read(iunit,"(d16.8)") topo_beach_slope
+                topo_shelf_slope = (topo_basin_depth - topo_shelf_depth) &
+                                            / (topo_x0 - topo_x1)
+            else
+                print *,"Error:  Unknown test topography type ",test_topography
                 stop
-            else if (abs(area - area_domain) > 1e-12*area_domain) then
-                write(6,*) '**** WARNING'
-                write(6,*) '**** topo arrays do not quite cover domain'
-                write(6,*) '**** area of overlap = ', area
-                write(6,*) '**** area of domain  = ', area_domain
-                write(6,*) '**** error is less than 1% so proceeding...'
             endif
 
-        !---------------tests for analytic bathymetry-------------------
-        ! Simple jump discontinuity in bathymetry
-        else if (test_topography == 1) then
-            topo_finalized = .true.
-            read(iunit,"(d16.8)") topo_location
-            read(iunit,"(d16.8)") topo_left
-            read(iunit,"(d16.8)") topo_right
-
-        ! Idealized ocean shelf
-        else if (test_topography == 2 .or. test_topography == 3) then
-            topo_finalized = .true.
-            read(iunit,"(d16.8)") topo_x0
-            read(iunit,"(d16.8)") topo_x1
-            read(iunit,"(d16.8)") topo_x2
-            read(iunit,"(d16.8)") topo_basin_depth
-            read(iunit,"(d16.8)") topo_shelf_depth
-            read(iunit,"(d16.8)") topo_beach_slope
-            topo_shelf_slope = (topo_basin_depth - topo_shelf_depth) &
-                                        / (topo_x0 - topo_x1)
-        else
-            print *,"Error:  Unknown test topography type ",test_topography
-            stop
-        endif
+            module_setup = .true.
+        end if
 
     end subroutine read_topo_settings
 
@@ -425,13 +432,17 @@ contains
         integer :: i,j,num_points,missing,status,topo_start,n
         real(kind=8) :: no_data_value,x,y,z,topo_temp
         real(kind=8) :: values(10)
-        character(len=20) :: str
+        character(len=80) :: str
 
         ! NetCDF Support
         character(len=10) :: direction
-        character(len=1) :: axis_string
+        ! character(len=1) :: axis_string
         real(kind=8), allocatable :: nc_buffer(:, :)
-        integer :: ios, root_id, z_var_id, var_ids(10), num_vars, row_index
+        
+        integer(kind=4) :: ios, nc_file, num_values
+        integer(kind=4) :: dim_ids(2), num_dims, var_type, var_ids(2), num_vars
+        character(len=10) :: z_var_name, var_name
+        integer(kind=4) :: z_var_id, row_index
 
         print *, ' '
         print *, 'Reading topography file  ', fname
@@ -490,6 +501,9 @@ contains
                             if (topo(i) == no_data_value) then
                                 missing = missing + 1
                                 topo(i) = topo_missing
+                                ! uncomment next line to print row i
+                                ! write(6,600) i
+ 600                            format('*** missing data, i = ',i6)
                             endif
                         enddo
                     case(3)
@@ -499,6 +513,11 @@ contains
                                 if (topo((j-1)*mx + i) == no_data_value) then
                                     missing = missing + 1
                                     topo((j-1)*mx + i) = topo_missing
+                                    ! uncomment next line to print row j
+                                    ! and element i that are missing.
+                                    ! write(6,601) i,j
+ 601                                format('*** missing data, i = ',i6, &
+                                           '  j = ',i6)
                                 endif
                             enddo
                         enddo
@@ -508,9 +527,9 @@ contains
                 if (missing > 0)  then
                     print *, '   WARNING...some missing data values this file'
                     print *, '       ',missing,' missing data values'
-                    print *, '              (see fort.missing)'
                     print *, '   These values have arbitrarily been set to ',&
                         topo_missing
+                    print *, '   See read_topo_file in topo_module.f90'
                 endif
 
                 close(unit=iunit)
@@ -519,36 +538,69 @@ contains
             case(4)
 #ifdef NETCDF
                 ! Open file    
-                call check_netcdf_error(nf90_open(fname, nf90_nowrite, root_id))
+                call check_netcdf_error(nf90_open(fname, nf90_nowrite, nc_file))
                 
-                ! Find z_var_id
-                call check_netcdf_error(nf90_inq_varids(root_id, num_vars, var_ids))
+                ! Again assume that the topography is the only variable that has
+                ! two dimensions
+                call check_netcdf_error(nf90_inq_varids(nc_file, num_vars, var_ids))
+                ! print *, "n, var_name, var_type, num_dims, dim_ids"
                 z_var_id = -1
-                do n=1,num_vars
-                    ios = nf90_get_att(root_id, var_ids(n), 'Axis', axis_string)
-                    if (ios /= NF90_NOERR) then
-                        ios = nf90_get_att(root_id, var_ids(n), 'axis', axis_string)
+                do n=1, num_vars
+                    call check_netcdf_error(nf90_inquire_variable(nc_file, n, var_name, var_type, num_dims, dim_ids))
+
+                    if (num_dims == 2) then
+                        z_var_name = var_name
+                        call check_netcdf_error(nf90_inq_varid(nc_file, z_var_name, z_var_id))
                     end if
-                    if (ios /= NF90_NOERR) then
-                        z_var_id = var_ids(n)
-                    end if
+
                 end do
+
+                if (z_var_id == -1) then
+                    stop "Unable to find topography data!"
+                end if
 
                 ! Load in data
                 ! TODO: Provide striding into data if need be
                 ! TODO: Only grab section of data within the domain
-                row_index = mx + 1
-                do j=1, my
-                    row_index = row_index - 1
-                    call check_netcdf_error(nf90_get_var(root_id, z_var_id,  &
-                          topo((row_index-1)*mx + 1:(row_index-1)*mx + mx),  &
-                                    start = (/ 1, j /), count=(/ mx, 1 /)))
+                ! ! i = mx + 1
+                ! +--------------------+
+                ! |                    | <--- start on this row
+                ! |                    |
+                ! |                    |
+                ! |                    |
+                ! +--------------------+
+
+
+                allocate(nc_buffer(mx, my))
+                ! print *, size(topo, 1)
+                call check_netcdf_error(nf90_get_var(nc_file, z_var_id, nc_buffer))
+                do j = 0, my - 1
+                    topo(j * mx + 1:(j + 1) * mx) = nc_buffer(:, my - j)
                 end do
+                deallocate(nc_buffer)
+                ! do j=1, my
+                !     i = i - 1
+                !     topo((i - 1) * mx + 1:)
+                ! print *, mx, my
+                ! do j=1, my
+                !     row_index = row_index - 1
+                !     print *, row_index
+                !     print *, (row_index-1)*mx + 1, (row_index-1)*mx + mx
+                !     ! call check_netcdf_error(nf90_get_var(nc_file, z_var_id,    &
+                !             ! topo))
+                !     ! call check_netcdf_error(nf90_get_var(nc_file, z_var_id,  &
+                !     !       topo((row_index-1)*mx + 1:(row_index-1)*mx + mx),  &
+                !     !                 start = (/ 1, j /), count=(/ mx, 1 /)))
+                !     call check_netcdf_error(nf90_get_var(nc_file, z_var_id,  &
+                !           nc_buffer, start = (/ 1, j /), count=(/ mx, 1 /)))
+                !     topo((row_index - 1) * mx + 1:(row_index - 1) * mx + mx) = &
+                !             nc_buffer
+                ! end do
 
                 ! Check if the topography was defined positive down and flip the
                 ! sign if need be.  Just in case this is true but topo_type < 0
                 ! we do not do anything here on this to avoid doing it twice.
-                ios = nf90_get_att(root_id, z_var_id, 'positive', direction)
+                ios = nf90_get_att(nc_file, z_var_id, 'positive', direction)
                 if (ios == NF90_NOERR) then
                     if (to_lower(direction) == "down") then
                         if (topo_type < 0) then
@@ -626,32 +678,39 @@ contains
         ! Input and Output
         character(len=150), intent(in) :: fname
         integer, intent(in) :: topo_type
-        integer, intent(out) :: mx,my
-        real(kind=8), intent(out) :: xll,yll,xhi,yhi,dx,dy
+        integer, intent(out) :: mx, my
+        real(kind=8), intent(out) :: xll, yll, xhi, yhi, dx, dy
 
         ! Local
         integer, parameter :: iunit = 19
-        integer :: topo_size, status, n
+        integer :: topo_size, status, n, i
         real(kind=8) :: x,y,z,nodata_value
         logical :: found_file
         real(kind=8) :: values(10)
         character(len=80) :: str
 
         ! NetCDF Support
-        character(len=1) :: axis_string
-        character(len=6) :: convention_string
-        character(len=10) :: x_dim_name, y_dim_name, z_dim_name
-        character(len=10) :: x_var_name, y_var_name, z_var_name
-        integer :: ios, root_id, x_var_id, y_var_id, z_var_id, var_ids(10)
-        integer :: num_dims, num_vars, type, x_dim_id, y_dim_id, num_values
-        integer :: dim_ids(2)
-        real(kind=8) :: convention_version(10), buffer(10)
+        ! character(len=1) :: axis_string
+        ! character(len=6) :: convention_string
+        ! integer(kind=4) :: convention_version
+        integer(kind=4) :: ios, nc_file, num_values
 
-        ! New
-        real(kind=8), allocatable :: lat(:), long(:)
-        character(len=80) :: temp(6)
+        integer(kind=4) :: dim_ids(2), num_dims, var_type, var_ids(2), num_vars
+        character(len=10) :: var_name
 
-        inquire(file=fname,exist=found_file)
+        character(len=10) :: x_dim_name, x_var_name, y_dim_name, y_var_name, z_var_name
+        integer(kind=4) :: x_var_id, y_var_id, z_var_id
+        logical :: verbose
+        ! character(len=10) :: x_dim_name, y_dim_name, z_dim_name
+        ! character(len=10) :: x_var_name, y_var_name, z_var_name
+        ! integer :: ios, root_id, x_var_id, y_var_id, z_var_id, var_ids(10)
+        ! integer :: num_dims, num_vars, type, x_dim_id, y_dim_id, num_values
+        ! ! integer :: dim_ids(2), z_type
+        ! real(kind=8) :: convention_version(10), buffer(10)
+
+        verbose = .true.
+
+        inquire(file=fname, exist=found_file)
         if (.not. found_file) then
             print *, 'Missing topography file:'
             print *, '   ', fname
@@ -739,75 +798,91 @@ contains
 #ifdef NETCDF
 
                 ! Open file    
-                call check_netcdf_error(nf90_open(fname, nf90_nowrite, root_id))
+                call check_netcdf_error(nf90_open(fname, nf90_nowrite, nc_file))
 
                 ! NetCDF4 GEBCO topography, should conform to CF metadata
                 ! standard
-                ios = nf90_get_att(root_id, NF90_GLOBAL, 'Conventions', convention_string)
-                if (ios /= NF90_NOERR .or. convention_string(1:3) /= "CF-") then
-                    print *, "Topography file does not conform to the CF"
-                    print *, "conventions and meta-data.  Please see the"
-                    print *, "information at "
-                    print *, ""
-                    print *, "    cfconventions.org"
-                    print *, ""
-                    print *, "to find out more info."
-                    stop
+                ! ios = nf90_get_att(nc_file, NF90_GLOBAL, 'Conventions', convention_string)
+                ! if (verbose) then
+                    ! print *, convention_string
+                ! end if
+                ! if (ios /= NF90_NOERR .or. convention_string(1:3) /= "CF-") then
+                !     print *, "Topography file does not conform to the CF"
+                !     print *, "conventions and meta-data.  Please see the"
+                !     print *, "information at "
+                !     print *, ""
+                !     print *, "    cfconventions.org"
+                !     print *, ""
+                !     print *, "to find out more info."
+                !     stop
+                ! end if
+
+                ! call parse_values(convention_string(4:6), num_values, convention_version)
+                ! if (convention_version(1) < CONVENTION_REQUIREMENT) then
+                !     print *, "Topography file conforms to a CF version that"
+                !     print *, "is too old (", convention_version, ").  "
+                !     print *, "Please refer to"
+                !     print *, ""
+                !     print *, "    cfconventions.org"
+                !     print *, ""
+                !     print *, "to find out more info."
+                !     stop
+                ! end if
+
+                ! Get dimensions - Assume the lon-lat are dimensions 1 and 2
+                call check_netcdf_error(nf90_inquire_dimension(nc_file, 1, x_dim_name, mx))
+                call check_netcdf_error(nf90_inquire_dimension(nc_file, 2, y_dim_name, my))
+
+                if (verbose) then
+                    print *, "Names = (", x_dim_name, ", ", y_dim_name, ")"
+                    print *, "Size = (", mx, ", ", my, ")"
                 end if
 
-                call parse_values(convention_string(4:6), num_values, convention_version)
-                if (convention_version(1) < CONVENTION_REQUIREMENT) then
-                    print *, "Topography file conforms to a CF version that"
-                    print *, "is too old (", convention_version, ").  "
-                    print *, "Please refer to"
-                    print *, ""
-                    print *, "    cfconventions.org"
-                    print *, ""
-                    print *, "to find out more info."
-                    stop
-                end if
-
-                ! Find axis identifiers
-                call check_netcdf_error(nf90_inq_varids(root_id, num_vars, var_ids))
-                x_var_id = -1
-                y_var_id = -1
-                do n=1,num_vars
-                    ios = nf90_get_att(root_id, var_ids(n), 'Axis', axis_string)
-                    if (ios /= NF90_NOERR) then
-                        ios = nf90_get_att(root_id, var_ids(n), 'axis', axis_string)
+                ! Read in variables
+                call check_netcdf_error(nf90_inq_varids(nc_file, num_vars, var_ids))
+                print *, "n, var_name, var_type, num_dims, dim_ids"
+                do n=1, num_vars
+                    call check_netcdf_error(nf90_inquire_variable(nc_file, n, var_name, var_type, num_dims, dim_ids))
+                    if (verbose) then
+                        print *, n, ": ", var_name, "|", var_type, "|", num_dims, "|", dim_ids
                     end if
-                    if (ios == NF90_NOERR) then
-                        if (axis_string == "X" .or. axis_string == "x") then
-                            x_var_id = var_ids(n)
-                            call check_netcdf_error(nf90_inquire_variable(root_id, x_var_id, dimids=dim_ids))
-                            x_dim_id = dim_ids(1)
-                        else if ( axis_string == "Y" .or. axis_string == "y" ) then
-                            y_var_id = var_ids(n)
-                            call check_netcdf_error(nf90_inquire_variable(root_id, y_var_id, dimids=dim_ids))
-                            y_dim_id = dim_ids(1)
-                        else
-                            print *,"What happened?"
-                            stop
+
+                    ! Assume dim names are same as var ids
+                    if (var_name == x_dim_name) then
+                        x_var_name = var_name
+                        call check_netcdf_error(nf90_inq_varid(nc_file, x_var_name, x_var_id))
+                        ! x_var_id = n
+                        ! x_var_name = var_name
+                    else if (var_name == y_dim_name) then
+                        y_var_name = var_name
+                        call check_netcdf_error(nf90_inq_varid(nc_file, y_var_name, y_var_id))
+                        ! y_var_id = n
+                        ! y_var_name = var_name
+                    ! Assume that this is the topography data
+                    else if (num_dims == 2) then
+                        z_var_name = var_name
+                        call check_netcdf_error(nf90_inq_varid(nc_file, z_var_name, z_var_id))
+                        ! z_var_id = n
+                        ! z_var_name = var_name
+                    else
+                        if (verbose) then
+                            print *, "Not using var_id ", n
                         end if
                     end if
+
                 end do
 
-                if (x_var_id == -1 .or. y_var_id == -1) then
-                    print *, "Did not identify one of the dimension fields."
-                    stop
-                end if
+                print *, "x_var_name, x_var_id = ", x_var_name, x_var_id
+                print *, "x_var_name, x_var_id = ", y_var_name, y_var_id
+                print *, "x_var_name, x_var_id = ", z_var_name, z_var_id
 
-                ! Read in spatial data
-                call check_netcdf_error(nf90_inquire_dimension(root_id, x_dim_id, len=mx))
-                call check_netcdf_error(nf90_get_var(root_id, x_var_id, xll, start=(/ 1 /)))
-                call check_netcdf_error(nf90_get_var(root_id, x_var_id, xhi, start=(/ mx /)))
-!                 call check_netcdf_error(nf90_inquire)
-                
-                call check_netcdf_error(nf90_inquire_dimension(root_id, y_dim_id, len=my))
-                call check_netcdf_error(nf90_get_var(root_id, y_var_id, yll, start=(/ 1 /)))
-                call check_netcdf_error(nf90_get_var(root_id, y_var_id, yhi, start=(/ my /)))
+                call check_netcdf_error(nf90_get_var(nc_file, x_var_id, xll, start=(/ 1 /)))
+                call check_netcdf_error(nf90_get_var(nc_file, x_var_id, xhi, start=(/ mx /)))
 
-                call check_netcdf_error(nf90_close(root_id))
+                call check_netcdf_error(nf90_get_var(nc_file, y_var_id, yll, start=(/ 1 /)))
+                call check_netcdf_error(nf90_get_var(nc_file, y_var_id, yhi, start=(/ my /)))
+
+                call check_netcdf_error(nf90_close(nc_file))
                 
                 dx = (xhi - xll) / (mx - 1)
                 dy = (yhi - yll) / (my - 1)

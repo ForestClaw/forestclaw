@@ -9,7 +9,6 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.cpp \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.c \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_inlinelimiter.f \
-	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_limiter.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_set_capacity.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_block.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_bc2_default.f \
@@ -20,7 +19,7 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_average.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_copy.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_interpolate.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_ghostpack_qarea.f \
+	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_local_ghost_pack.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_diagnostics.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_output_ascii.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_tag4refinement.f \

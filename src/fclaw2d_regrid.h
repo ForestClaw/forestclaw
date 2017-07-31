@@ -40,6 +40,7 @@ struct fclaw2d_global;
 struct fclaw2d_domain;
 struct fclaw2d_patch;
 
+/* Called from both fclaw2d_initialize and fclaw2d_regrid */
 void cb_fclaw2d_regrid_tag4refinement(struct fclaw2d_domain *domain,
                                       struct fclaw2d_patch *this_patch,
                                       int this_block_idx,

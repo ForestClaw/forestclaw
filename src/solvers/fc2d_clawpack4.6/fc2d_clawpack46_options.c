@@ -45,8 +45,8 @@ clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "src_term", &clawopt->src_term, 0,
                          "[clawpack46] Source term option [F]");
 
-    sc_options_add_bool (opt, 0, "use_fwaves", &clawopt->use_fwaves, 0,
-                         "[clawpack46] Use fwaves flux-form [F]");
+    sc_options_add_bool (opt, 0, "use-fwaves", &clawopt->use_fwaves, 0,
+                         "[clawpack46] Use fwave flux-form [F]");
 
 
     sc_options_add_int (opt, 0, "mwaves", &clawopt->mwaves, 1,
@@ -99,11 +99,13 @@ clawpack46_check(fc2d_clawpack46_options_t *clawopt,
     clawopt->method[5] = clawopt->mcapa;
     clawopt->method[6] = clawpatch_opt->maux;
 
+#if 0
     if (clawopt->use_fwaves)
     {
         fclaw_global_essentialf("clawpack46 : fwaves not yet implemented\n");
         return FCLAW_EXIT_QUIET;
     }
+#endif    
 
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
     {

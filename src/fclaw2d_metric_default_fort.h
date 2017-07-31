@@ -71,6 +71,13 @@ typedef void (*fclaw2d_fort_compute_surf_normals_t)(const int* mx, const int* my
 typedef double (*fclaw2d_fort_aux_func_t)(double* xc, double *yc);
 
 
+#define FCLAW2D_FORT_AVERAGE_AREA FCLAW_F77_FUNC(fclaw2d_fort_average_area, \
+                                               FCLAW2D_FORT_AVERAGE_AREA) 
+void FCLAW2D_FORT_AVERAGE_AREA(const int* mx, const int* my,
+                                 const int* mbc,
+                                 double areacoarse[],double areafine[],
+                                 const int* igrid);
+
 #define FCLAW2D_FORT_SETUP_MESH \
     FCLAW_F77_FUNC(fclaw2d_fort_setup_mesh,FCLAW2D_FORT_SETUP_MESH)
 void FCLAW2D_FORT_SETUP_MESH(const int* mx, const int* my, const int* mbc,

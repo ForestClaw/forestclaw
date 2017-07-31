@@ -25,12 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_exchange.h>
 
-#include <fclaw2d_options.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_regrid.h>
-#include <fclaw2d_partition.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
+
+#include <fclaw2d_options.h>
 
 /* Also needed in fclaw2d_domain_reset */
 fclaw2d_domain_exchange_t*
@@ -97,8 +96,7 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
            need to be passed in */
         patchno = i;
 
-        fclaw2d_patch_data_new(glob,ghost_patch);
-        fclaw2d_patch_build_remote_ghost(glob,ghost_patch,blockno,
+        fclaw2d_patch_remote_ghost_build(glob,ghost_patch,blockno,
                                          patchno,(void*) &build_mode);
     }
 }
@@ -111,11 +109,8 @@ void delete_remote_ghost_patches(fclaw2d_global_t* glob)
     for(i = 0; i < domain->num_ghost_patches; i++)
     {
         fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
-#if 0 
-        /* From merge with clawpatch3 */
-        fclaw2d_patch_delete_remote_ghost(glob,ghost_patch);
-#endif        
-        fclaw2d_patch_data_delete(glob,ghost_patch);
+        
+        fclaw2d_patch_remote_ghost_delete(glob,ghost_patch);
     }
 }
 
@@ -142,14 +137,14 @@ unpack_remote_ghost_patches(fclaw2d_global_t* glob,
             int patchno = i;
 
             /* access data stored on remote procs. */
-            double *q = (double*) e->ghost_data[patchno];
+            void *q = e->ghost_data[patchno];
 
             int unpack_to_timeinterp_patch=0;
             if (time_interp && level == minlevel-1)
             {
                 unpack_to_timeinterp_patch = 1;
             }
-            fclaw2d_patch_unpack_remote_ghost(glob, ghost_patch, blockno,
+            fclaw2d_patch_remote_ghost_unpack(glob, ghost_patch, blockno,
                                               patchno, q, unpack_to_timeinterp_patch);
         }
     }
@@ -167,7 +162,7 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     size_t psize = fclaw2d_patch_ghost_packsize(glob);
-    size_t data_size = psize*sizeof(double);
+    size_t data_size = psize;  /* Includes sizeof(datatype), i.e. sizeof(double) */
     fclaw2d_domain_exchange_t *e;
 
     /* we just created a grid by fclaw2d_initialize or fclaw2d_regrid
@@ -192,11 +187,8 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
         {
             if (domain->blocks[nb].patches[np].flags &
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
-            {
-                /* Copy q and area into one contingous block */
-                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
-                fclaw2d_patch_alloc_local_ghost(glob,this_patch,
-                                                &e->patch_data[zz++]);
+            {                
+                fclaw2d_patch_local_ghost_alloc(glob, &e->patch_data[zz++]);
             }
         }
     }
@@ -276,8 +268,7 @@ void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
                 if ((*domain)->blocks[nb].patches[np].flags &
                     FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
                 {
-                    fclaw2d_patch_free_local_ghost(glob,
-                                                   &e_old->patch_data[zz++]);
+                    fclaw2d_patch_local_ghost_free(glob,&e_old->patch_data[zz++]);
                 }
             }
         }
@@ -330,8 +321,8 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
                 int pack_time_interp = time_interp && level == minlevel-1;
 
                 /* Pack q and area into one contingous block */
-                fclaw2d_patch_pack_local_ghost(glob,this_patch,
-                                               (double*) e->patch_data[zz++],
+                fclaw2d_patch_local_ghost_pack(glob,this_patch,
+                                               e->patch_data[zz++],
                                                pack_time_interp);
             }
         }
