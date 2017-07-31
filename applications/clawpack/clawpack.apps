@@ -1,6 +1,5 @@
-# ------ applications/clawpack/clawpack.apps --------------
-
-## -----------------------------------------------------------------
+## ------------------------- Clawpack examples ----------------------
+##
 ## Hyperbolic problems using Clawpack 4.6 and 5.0 
 ## 
 ## Many of these examples have been taken from the original 
@@ -62,31 +61,27 @@ include applications/clawpack/euler/2d/shockbubble/Makefile.am
 include applications/clawpack/euler/2d/quadrants/Makefile.am
 
 
-## ----------------------------------------------------------------
-## Transport on the sphere
-## 
+## ---------------------Transport on the sphere ---------------------------- 
 ## Examples from suite described by Lauritzen, et al.  See:
 ##   "A standard test case suite for two-dimensional  linear
 ##    transport on the sphere: results from a collection 
 ##    of state-of-the-art schemes", Lauritzen, et al.
 ##    Geosciences Model Development, 2014. 
 ##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
-## ------------------------------------------------------------------
+## -------------------------------------------------------------------------
 
 include applications/clawpack/transport/gaussian/Makefile.am
 include applications/clawpack/transport/slotted_disk/Makefile.am
 include applications/clawpack/transport/correlatedcb/Makefile.am#
 
-
-
 ## Sample code that shows how we can avoid using the 'app' for configuring options
 include applications/clawpack/advection/2d/torthem/Makefile.am
 
 
-## -------------- Under construction ------------------
-##  These are not guaranteed to compile or may not be
-##  available with standard distribution
-## ----------------------------------------------------
+## ----------------------- Under construction -----------------------------
+##  These are not guaranteed to compile or may not be available with 
+## standard distribution
+## ------------------------------------------------------------------------
 if FCLAW_ENABLE_DEVELOPMENT
 
 include applications/clawpack/advection/2d/swirl_cons/Makefile.am
