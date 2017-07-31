@@ -27,20 +27,18 @@
          qrr = ql(i,1)
          qll = qr(i-1,1)
 
-c         vn = auxl(i,2 + iface)  !! cell centered ?
          uhat = (ur + ul)/2.d0
-
-         wave(i,1,1) = qrr - qll
-         s(i,1) = uhat
 
          if (uhat .ge. 0.d0) then
             fstar = uhat*qll
          else
             fstar = uhat*qrr
          endif
+         amdq(i,1) = fstar - ul*qll        
+         apdq(i,1) = ur*qrr - fstar        
 
-         amdq(i,1) = fstar - ul*qll              !flux
-         apdq(i,1) = ur*qrr - fstar            !-flux
+         wave(i,1,1) = qrr - qll
+         s(i,1) = uhat         
       enddo
 
 

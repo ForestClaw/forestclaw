@@ -63,7 +63,7 @@ uo = struct('color_under',[0 1 1],...  % cyan
     'color_over',[1 0 1],...   % magenta
     'color_nan',[1 1 1],...    % white
     'value_lower',0, ...       % theoretical minimum
-    'value_upper',1,...        % theoretical maximum
+    'value_upper',2.738465249609046,...   % theoretical maximum
     'tol',eps(1),...             % acceptable numerical over/undershoot
     'colormap',cm);            % Colors for non under/over shoot values
 

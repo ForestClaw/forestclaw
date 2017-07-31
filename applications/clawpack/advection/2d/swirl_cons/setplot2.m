@@ -31,7 +31,7 @@ ContourValues = [];
 
 %---------------------------------
 
-UserMap1d = 1;
+UserMap1d = 0;
 ScatterStyle = setplotstyle('ko','go','yo','mx','bo','ro');
 
 ShowUnderOverShoots = 0;

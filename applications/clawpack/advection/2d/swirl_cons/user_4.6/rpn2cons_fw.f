@@ -16,13 +16,7 @@
 
 
       integer i, iface, m
-      double precision uhat,qll,qrr,ul,ur, tol
-
-
-      double precision dtcom, dxcom, dycom, tcom
-      integer icom, jcom
-
-      common/comxyt/dtcom,dxcom,dycom,tcom,icom,jcom
+      double precision uhat,qll,qrr,ul,ur
 
       iface = ixy
       do i = 2-mbc, mx+mbc
@@ -33,20 +27,19 @@
          qrr = ql(i,1)
          qll = qr(i-1,1)
 
+c        # Use Roe-average values         
          uhat = (ul + ur)/2.d0
 
+         if (uhat .ge. 0) then
+            amdq(i,1) = 0.d0
+            apdq(i,1) = ur*qrr - ul*qll
+         else
+            amdq(i,1) = ur*qrr - ul*qll
+            apdq(i,1) = 0.d0
+         endif
          wave(i,1,1) = ur*qrr - ul*qll
          s(i,1) = uhat
-         if (uhat .eq. 0) then
-            amdq(i,1) = -ul*qll
-            apdq(i,1) = ur*qrr            
-         elseif (uhat .lt. 0) then
-            amdq(i,1) = wave(i,1,1)
-            apdq(i,1) = 0.d0
-         else
-            amdq(i,1) = 0.d0
-            apdq(i,1) = wave(i,1,1)
-         endif
+
       enddo
 
 

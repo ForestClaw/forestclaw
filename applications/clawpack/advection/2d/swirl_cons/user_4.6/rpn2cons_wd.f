@@ -16,14 +16,8 @@
       double precision auxr(1-mbc:maxm+mbc,*)
 
 
-      integer i, iface, m, mw, version
-      double precision ur,ul,qrr,qll, uhat,qhat, tau,uavg
-      double precision a,b,c
-
-      double precision dtcom, dxcom, dycom, tcom
-      integer icom, jcom
-
-      common/comxyt/dtcom,dxcom,dycom,tcom,icom,jcom
+      integer i, iface
+      double precision ur,ul,qrr,qll, uhat,uavg
 
       if ((mwaves .ne. 1) .or. (meqn .ne. 1)) then
          write(6,*) 'rpn2cons : mwaves .ne. 1 or meqn .ne. 1'
@@ -39,30 +33,46 @@
           qrr = ql(i,1)
           qll = qr(i-1,1)
 
-          qhat = (qrr + qll)/2.d0
+          uavg = (ul + ur)/2.d0
 
-          uavg = (ur+ul)/2.d0
-          if (uavg .eq. 0) then
-              uhat = 1.d-12
+c         # -eps < uavg < eps --> uhat = eps
+          uhat = sign(1.d0,uavg)*max(abs(uavg),1e-12)
+
+c         # Use of .ge. here is consistent with choice of sign above
+          if (uhat .ge. 0) then
+              amdq(i,1) = 0
+              apdq(i,1) = ur*qrr - ul*qll
           else
-              uhat = uavg
+              amdq(i,1) = ur*qrr - ul*qll
+              apdq(i,1) = 0
           endif
-
-          s(i,1) = uavg
           wave(i,1,1) = (ur*qrr - ul*qll)/uhat   !! Same as above
+          s(i,1) = uhat      
 
-          if (uavg .eq. 0) then
-c             # This definition is needed to guarantee conservation, i.e. 
-c             #       f(qr) - f(ql) = apdq + amdq                      
-c             # and a consistent definition of f(qr), f(ql).  
-c             # If we base apdq,amdq on uhat, we will have inconsistent
-c             # definitions of f(q). 
-              amdq(i,1) = -ul*qhat
-              apdq(i,1) = ur*qhat
-          else
-              amdq(i,1) = min(uhat,0.d0)*wave(i,1,1)
-              apdq(i,1) = max(uhat,0.d0)*wave(i,1,1)
-         endif
+c          qhat = (qrr + qll)/2.d0
+c
+c          uavg = (ur+ul)/2.d0
+c          if (uavg .eq. 0) then
+c              uhat = 1.d-12
+c          else
+c              uhat = uavg
+c          endif
+c
+c          s(i,1) = uavg
+c          wave(i,1,1) = (ur*qrr - ul*qll)/uhat   !! Same as above
+c
+c          if (uavg .eq. 0) then
+cc             # This definition is needed to guarantee conservation, i.e. 
+cc             #       f(qr) - f(ql) = apdq + amdq                      
+cc             # and a consistent definition of f(qr), f(ql).  
+cc             # If we base apdq,amdq on uhat, we will have inconsistent
+cc             # definitions of f(q). 
+c              amdq(i,1) = -ul*qhat
+c              apdq(i,1) = ur*qhat
+c          else
+c              amdq(i,1) = min(uhat,0.d0)*wave(i,1,1)
+c              apdq(i,1) = max(uhat,0.d0)*wave(i,1,1)
+c         endif
       enddo
 
       return
