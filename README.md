@@ -22,9 +22,9 @@ GeoClaw (see http://www.clawpack.org).
     
 * Visualization tools include Matlab scripts, VisClaw (from Clawpack) and VTK output.
 
-For installation instructions, please visit our GitHub Wiki at [[https://github.com/ForestClaw/ForestClaw/wiki]]
+For installation instructions, please visit our GitHub Wiki at https://github.com/ForestClaw/ForestClaw/wiki.
 
-For more information on ForestClaw, visit our website at [[http://www.forestclaw.org]]
+For more information on ForestClaw, visit our website at http://www.forestclaw.org.
 
 ForestClaw is free software under a BSD-style license (see COPYING). The p4est library is
 released under the GPL 2.0 (or later).  As it is generally linked with the ForestClaw
