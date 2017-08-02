@@ -3,9 +3,13 @@
 ForestClaw (http://www.forestclaw.org) is a parallel, multi-block adaptive finite volume
 code  for solving PDEs on a hierarchy of logically Cartesian meshes.  
 
+-------
+
 **NOTE to BitBucket users** : ForestClaw has been migrated to a public GitHub site, and
 the BitBucket site will no longer be updated.  Please navigate to 
-[http://www.github.com/ForestClaw/forestclaw] for latest ForestClaw updates.
+http://www.github.com/ForestClaw/forestclaw for latest ForestClaw updates.
+
+------
 
 Features of ForestClaw : 
 
