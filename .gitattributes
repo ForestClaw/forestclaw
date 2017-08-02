@@ -1,3 +1,3 @@
-src/solvers/fc2d_clawpack4.6/* linguist-vendored
-src/solvers/fc2d_clawpack5/* linguist-vendored
-src/solvers/fc2d_geoclaw/*
+src/solvers/fc2d_clawpack4.6/* linguist-vendored=true
+src/solvers/fc2d_clawpack5/* linguist-vendored=true
+src/solvers/fc2d_geoclaw/*  linguist-vendored=true
