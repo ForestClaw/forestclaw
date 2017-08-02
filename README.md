@@ -23,6 +23,8 @@ For installation instructions, please visit our GitHub Wiki at https://github.co
 
 For more information on ForestClaw, visit our website at http://www.forestclaw.org.
 
+Have more questions?  Please contact donnacalhoun@boisestate.edu
+
 ForestClaw is free software under a BSD-style license (see COPYING). The p4est library is
 released under the GPL 2.0 (or later).  As it is generally linked with the ForestClaw
 code,  binary distribution falls under GPL as well.
