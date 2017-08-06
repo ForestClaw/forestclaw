@@ -83,6 +83,15 @@ void RPT2CONS(const int* ixy, const int* maxm, const int* meqn, const int* mwave
               double aux1[], double aux2[], double aux3[], const int* imp,
               double dsdq[], double bmasdq[], double bpasdq[]);
 
+#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+
+void RPN2_CONS_UPDATE(int* meqn, int* maux, int* idir,
+                      double ql[], double qr[], double auxl[],
+                      double auxr[], double flux_diff[]);
+
+
+
+
 #ifdef __cplusplus
 #if 0
 {

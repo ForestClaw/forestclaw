@@ -13,7 +13,10 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_wd.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_ec.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_fw.f \
-	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpt2cons.f
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpt2cons.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2_cons_update.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/tag4coarsening.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/tag4refinement.f
 
 applications_clawpack_advection_2d_swirl_cons_swirlcons_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)

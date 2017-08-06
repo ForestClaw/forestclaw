@@ -27,10 +27,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-/* Two versions of Clawpack */
+/* Two versions of Clawpack */     
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack46_options.h>
 #include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
+
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
 
 #include "../all/advection_user_fort.h"
 
@@ -41,12 +44,19 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
 
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
+
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
+    clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
+
+
     const user_options_t* user = swirlcons_get_options(glob);
     fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
 
     clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
     clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
     clawpack46_vt->rpt2      = &RPT2CONS;
+    clawpack46_vt->rpn2_cons = &RPN2_CONS_UPDATE;
 
     switch(user->rp_solver)
     {

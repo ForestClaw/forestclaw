@@ -3,7 +3,7 @@ axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
 axis on;
 
-ex = 2;
+ex = 1;
 lstr = 'no limiter';
 mstr = 'QS';
 
@@ -26,23 +26,25 @@ else
     colorbar;
     caxis(ca);
     % title(sprintf('Example %d',ex),'fontsize',18);
-    title(sprintf('%s (%s)',mstr,limstr),'fontsize',18);
+    title(sprintf('%s (%s)',mstr,lstr),'fontsize',18);
 
+    one_patch = length(amrdata) == 1;
+    if (one_patch)
+        figure(2);  
+        clf;    
+        [xm,ym]     = meshgrid(xcenter,ycenter);
+        h = surf(xm,ym,q,'edgecolor','none');
+        caxis(ca);
+        set(gca,'xlim',[0 1],'ylim',[0 1],'zlim',ca,'box','on');
+        colorbar;
+        camlight;
+        xlabel('x','fontsize',16);
+        ylabel('y','fontsize',16);
+        % title(sprintf('Example %d',ex),'fontsize',18);
+        title(sprintf('%s (%s)',mstr,lstr),'fontsize',18);
+        figure(1);    
+    end
     
-    figure(2);
-    clf;
-    [xm,ym] = meshgrid(xcenter,ycenter);
-    h = surf(xm,ym,q,'edgecolor','none');
-    caxis(ca);
-    set(gca,'xlim',[0 1],'ylim',[0 1],'zlim',ca,'box','on');    
-    colorbar;
-    camlight;
-    xlabel('x','fontsize',16);
-    ylabel('y','fontsize',16);
-    % title(sprintf('Example %d',ex),'fontsize',18);
-    title(sprintf('%s (%s)',mstr,limstr),'fontsize',18);
-    
-    figure(1);    
 end
 fprintf('%-10s %12.4e\n','qmin',qmin);
 fprintf('%-10s %12.4e\n','qmax',qmax);
