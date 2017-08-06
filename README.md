@@ -5,9 +5,13 @@ code  for solving PDEs on a hierarchy of logically Cartesian meshes.
 
 -------
 
-**NOTE to BitBucket users** : ForestClaw has been migrated to a public GitHub site, and
-the BitBucket site will no longer be updated.  Please navigate to 
-http://www.github.com/ForestClaw/forestclaw for latest ForestClaw updates.
+**NOTE to BitBucket users** : If you are reading this on our former BitBucket site, 
+ForestClaw has migrated to a public GitHub site and this 
+site will no longer be updated.  Please navigate to 
+http://www.github.com/ForestClaw/forestclaw for latest ForestClaw repository.
+
+**NOTE to GitHub users** : If you are reading this on our new GitHub site, lucky you!  You are
+can clone the latest repository from here.   
 
 ------
 
