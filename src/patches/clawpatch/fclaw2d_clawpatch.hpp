@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct fclaw2d_patch;
 struct fclaw2d_transform_data;
+struct fclaw2d_clawpatch_cons_update;
 
 class fclaw2d_clawpatch_t
 {
@@ -56,15 +57,10 @@ public :
                                            int a_time_interp);
 
     // ----------------------------------------------------------------
-    // Miscellaneous
+    // Solution data
     // ----------------------------------------------------------------
 
     void* clawpack_patch_data(int id);
-
-#if 0
-    static fclaw_app_t* app;
-    static fclaw2d_global_t *global;
-#endif    
 
     /* Solution data */
     int meqn;                    /* also in amr_options_t */
@@ -73,6 +69,8 @@ public :
     FArrayBox griddata_save;
     FArrayBox griddata_time_interpolated;
     FArrayBox griderror;
+
+    struct fclaw2d_clawpatch_cons_update *cons_update;
 
     /* Grid info */
     int mx;           /* also in amr_options_t */

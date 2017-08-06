@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
+#include <fclaw2d_clawpatch_conservation.h>
 
 
 #include <fclaw2d_patch.h>  /* Needed to get enum for build modes */
@@ -222,6 +223,8 @@ void clawpatch_define(fclaw2d_global_t* glob,
         }
     }
     
+    fclaw2d_clawpatch_cons_update_new(glob,this_patch,blockno,patchno,&cp->cons_update);
+
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
     {
         return;
@@ -485,6 +488,10 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
     mx = clawpatch_opt->mx;
     my = clawpatch_opt->my;
     mbc = clawpatch_opt->mbc;
+
+    /* Include conservative update here - may move it later */
+
+
 
     int manifold = fclaw_opt->manifold;
     clawpatch_vt()->fort_average_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,areacoarse,areafine,

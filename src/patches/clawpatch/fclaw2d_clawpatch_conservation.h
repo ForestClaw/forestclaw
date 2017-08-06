@@ -34,9 +34,9 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw2d_clawpatch_cons_fix fclaw2d_clawpatch_cons_udpate_t;
+typedef struct fclaw2d_clawpatch_cons_update fclaw2d_clawpatch_cons_update_t;
 
-struct fclaw2d_clawpatch_cons_udpate
+struct fclaw2d_clawpatch_cons_update
 {
     double **qc;
     double **auxc;
@@ -46,6 +46,26 @@ struct fclaw2d_clawpatch_cons_udpate
     double **gp;
     double **gm;
 };
+
+struct fclaw2d_global;
+struct fclaw2d_patch;
+
+void fclaw2d_clawpatch_cons_update_new(struct fclaw2d_global* glob,
+                                       struct fclaw2d_patch* this_patch,
+                                       int blockno,int patchno,
+                                       fclaw2d_clawpatch_cons_update_t **cons_update);
+
+void fclaw2d_clawpatch_cons_update_reset(struct fclaw2d_global* glob,
+                                         struct fclaw2d_patch* this_patch,
+                                         int blockno,int patchno,
+                                         fclaw2d_clawpatch_cons_update_t **cons_update);
+
+
+void fclaw2d_clawpatch_cons_update_delete(struct fclaw2d_global* glob,
+                                          struct fclaw2d_patch* this_patch,
+                                          int blockno,int patchno,
+                                          fclaw2d_clawpatch_cons_update_t **cons_update);
+
 
 
 #ifdef __cplusplus
