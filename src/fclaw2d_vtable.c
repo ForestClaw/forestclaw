@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_output.h>
+#include <fclaw2d_global.h>
 
 static fclaw2d_vtable_t s_vt;
 
@@ -42,6 +43,39 @@ fclaw2d_vtable_t* fclaw2d_vt()
     return &s_vt;
 }
 
+
+void fclaw2d_after_init(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    if (fclaw_vt->after_init != NULL)
+    {
+        fclaw_vt->after_init(glob);
+    }
+}
+
+void fclaw2d_after_regrid(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    if (fclaw_vt->after_regrid != NULL)
+    {
+        fclaw_vt->after_regrid(glob);
+    }
+}
+
+
+void fclaw2d_time_sync_reset(fclaw2d_global_t *glob, 
+                             int minlevel,int maxlevel,double dt)
+{
+    /* This is used for updating conservation arrays, for example */
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+
+    if (fclaw_vt->time_sync_reset != NULL)
+    {
+        fclaw_vt->time_sync_reset(glob,minlevel,maxlevel,dt);
+    }
+}
+
+
 /* Initialize any settings that can be set here */
 void fclaw2d_vtable_initialize()
 {
@@ -55,6 +89,8 @@ void fclaw2d_vtable_initialize()
     /* These may be redefined by the user */
     /* Problem setup */
     vt->problem_setup              = NULL;
+
+    vt->after_init                 = NULL;
 
     /* Defaults for regridding */
     vt->after_regrid               = NULL;

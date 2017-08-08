@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_update_single_step.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
+#include <fclaw2d_vtable.h>
 
 
 typedef struct fclaw2d_level_data
@@ -262,8 +262,12 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
     /* Keep track of largest cfl over all grid updates */
     double maxcfl = 0;
 
-    /* Reset all conservative arrays */
-    fclaw2d_patch_cons_update_reset(glob,minlevel,maxlevel,dt);
+    /* This zeros out accumulating registers, which will be filled in 
+    subsequent time steps.  It does not zero out transfer of coarse
+    grid values to the fine grid registers (needed for Riemann problem). 
+    Important here is that dt has a valid value, because this is needed
+    to construct conservative correction (e.g. dt/dx*delta) */
+    fclaw2d_time_sync_reset(glob,minlevel,maxlevel,dt);
 
     /* Step inc at maxlevel should be 1 by definition */
     FCLAW_ASSERT(ts_counter[maxlevel].step_inc == 1);
@@ -285,7 +289,6 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
                    and ghost cell exchange for next update. */
                 int time_interp_level = timeinterp_level(ts_counter,maxlevel);
 
-                fclaw2d_patch_cons_update_reset(glob,time_interp_level+1,maxlevel,dt);                
                 int time_interp = 1;
                 fclaw2d_ghost_update(glob,
                                      time_interp_level+1,
@@ -293,6 +296,8 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
                                      sync_time,
                                      time_interp,
                                      FCLAW2D_TIMER_ADVANCE);
+                double dt_minlevel = ts_counter[time_interp_level+1].dt_step;
+                fclaw2d_time_sync_reset(glob,time_interp_level+1,maxlevel,dt_minlevel);                
             }
             else
             {

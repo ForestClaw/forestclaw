@@ -42,6 +42,15 @@ extern "C"
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
+
+void fclaw2d_after_regrid(struct fclaw2d_global *glob);
+
+void fclaw2d_after_init(struct fclaw2d_global *glob);
+  
+void fclaw2d_time_sync_reset(struct fclaw2d_global *glob, 
+                             int minlevel,int maxlevel,double dt);
+
+
 typedef void (*fclaw2d_vtable_initialize_t)();
 
 typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
@@ -69,7 +78,14 @@ typedef void (*fclaw2d_metric_compute_normals_t)(struct fclaw2d_global *glob,
                                                  int blockno,
                                                  int patchno);
 
+typedef void (*fclaw2d_after_initialization_t)(struct fclaw2d_global *glob);
+
 typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
+
+typedef void (*fclaw2d_time_sync_reset_t)(struct fclaw2d_global *glob, 
+                                          int minlevel,int maxlevel,double dt);
+
+
 
 typedef struct fclaw2d_vtable
 {
@@ -78,8 +94,13 @@ typedef struct fclaw2d_vtable
 
     fclaw2d_problem_setup_t              problem_setup;
 
+    fclaw2d_after_initialization_t       after_init;
+
     /* regridding functions */
     fclaw2d_after_regrid_t               after_regrid;
+
+    /* Time syncing */
+    fclaw2d_time_sync_reset_t            time_sync_reset;
 
     /* Output functions */
     fclaw2d_output_frame_t               output_frame;

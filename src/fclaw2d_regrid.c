@@ -321,12 +321,3 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     /* Count calls to this function */
     ++glob->count_amr_regrid;
 }
-
-void fclaw2d_after_regrid(fclaw2d_global_t *glob)
-{
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
-    if (fclaw_vt->after_regrid != NULL)
-    {
-        fclaw_vt->after_regrid(glob);
-    }
-}
