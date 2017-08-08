@@ -518,6 +518,23 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
                                unpack_data_from_here);
 }
 
+/* ----------------------------- Conservative updates --------------------------------- */
+
+/* We need to virtualize this because we call it from advance ... */
+
+
+void fclaw2d_patch_cons_update_reset(fclaw2d_global_t *glob, 
+                                     int minlevel,int maxlevel,double dt)
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+
+    FCLAW_ASSERT(patch_vt->cons_update_reset);
+
+    patch_vt->cons_update_reset(glob,minlevel,maxlevel,dt);
+}
+
+
+
 
 /* ----------------------------------- Virtual table ---------------------------------- */
 

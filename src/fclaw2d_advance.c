@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_update_single_step.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_global.h>
-
+#include <fclaw2d_patch.h>
 
 
 typedef struct fclaw2d_level_data
@@ -262,6 +262,9 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
     /* Keep track of largest cfl over all grid updates */
     double maxcfl = 0;
 
+    /* Reset all conservative arrays */
+    fclaw2d_patch_cons_update_reset(glob,minlevel,maxlevel,dt);
+
     /* Step inc at maxlevel should be 1 by definition */
     FCLAW_ASSERT(ts_counter[maxlevel].step_inc == 1);
     int n_fine_steps = ts_counter[maxlevel].total_steps;
@@ -281,6 +284,8 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
                 /* Find time interpolated level and do ghost patch exchange
                    and ghost cell exchange for next update. */
                 int time_interp_level = timeinterp_level(ts_counter,maxlevel);
+
+                fclaw2d_patch_cons_update_reset(glob,time_interp_level+1,maxlevel,dt);                
                 int time_interp = 1;
                 fclaw2d_ghost_update(glob,
                                      time_interp_level+1,

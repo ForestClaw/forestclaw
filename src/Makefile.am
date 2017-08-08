@@ -45,6 +45,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_diagnostics.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
+	src/patches/clawpatch/fclaw2d_clawpatch_conservation.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \
@@ -123,6 +124,7 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fdisc.f \
 	src/fortran_source2d/philim.f \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
+	src/patches/clawpatch/fclaw2d_clawpatch_conservation.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \

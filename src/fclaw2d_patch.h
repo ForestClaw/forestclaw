@@ -286,6 +286,12 @@ void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,  /* contains ol
 size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
 
 
+/* ----------------------------- Conservative updates --------------------------------- */
+
+void fclaw2d_patch_cons_update_reset(struct fclaw2d_global *glob, 
+                                     int minlevel,int maxlevel,double dt);
+
+
 /* ------------------------------ Misc access functions ------------------------------- */
 void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
                             struct fclaw2d_patch * this_patch,
@@ -497,6 +503,12 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
                                                  int this_patch_idx,
                                                  void *unpack_data_from_here);
 
+/* ----------------------------- Conservative updates --------------------------------- */
+
+typedef void (*fclaw2d_patch_cons_update_reset_t)(struct fclaw2d_global *glob, 
+                                                  int minlevel,int maxlevel,double dt);
+
+
 /* ----------------------------------- Virtual table  --------------------------------- */
 struct fclaw2d_patch_vtable
 {
@@ -549,6 +561,9 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_partition_pack_t         partition_pack;
     fclaw2d_patch_partition_unpack_t       partition_unpack;
     fclaw2d_patch_partition_packsize_t     partition_packsize;
+
+    /* Conservative update */
+    fclaw2d_patch_cons_update_reset_t      cons_update_reset;
 
     int is_set;
 };
