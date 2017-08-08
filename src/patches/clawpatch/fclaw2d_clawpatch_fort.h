@@ -122,6 +122,47 @@ typedef void (*clawpatch_fort_average2coarse_t)(const int* mx, const int* my,
                                                 double areacoarse[],double areafine[],
                                                 const int* igrid, const int* manifold);
     
+
+typedef void (*clawpatch_fort_cons_coarse_to_fine_t)(const int* mx,const int* my,
+                                                     const int* mbc, const int* maux,
+                                                     const int* meqn,
+                                                     int maskfine[],
+                                                     double qcoarse[],
+                                                     double auxcoarse[],
+                                                     double qfine_dummy[],
+                                                     double auxfine_dummy[],
+                                                     const int* idir, 
+                                                     const int* iface_coarse,
+                                                     double qc0[], double qc1[],
+                                                     double qc2[], double qc3[],
+                                                     double auxc0[], double auxc1[],
+                                                     double auxc2[], double auxc3[],
+                                                     struct fclaw2d_transform_data** 
+                                                     transform_cptr);
+
+typedef void  (*clawpatch_fort_cons_coarse_correct_t)(const int* mx,
+                                                      const int* my,
+                                                      const int *mbc,
+                                                      const int *meqn,
+                                                      const double *dt, 
+                                                      const double *dx, 
+                                                      const double *dy,
+                                                      int maskfine[],
+                                                      double qcoarse[], 
+                                                      double qfine_dummy[],
+                                                      const int* idir,
+                                                      const int* iface_coarse,
+                                                      double fmcoarse0[], 
+                                                      double fpcoarse1[],
+                                                      double gmcoarse2[], 
+                                                      double gpcoarse3[],
+                                                      double fm0[], double fp1[],
+                                                      double gm2[], double gp3[],
+                                                      double rp0[], double rp1[],
+                                                      double rp2[], double rp3[],
+                                                      struct fclaw2d_transform_data** 
+                                                      transform_cptr);
+
 /* ----------------------------- time stepping ------------------------------ */
 
 typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,

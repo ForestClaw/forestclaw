@@ -38,13 +38,18 @@ typedef struct fclaw2d_clawpatch_cons_update fclaw2d_clawpatch_cons_update_t;
 
 struct fclaw2d_clawpatch_cons_update
 {
-    double **qc;
-    double **auxc;
-    double **rp;
-    double **fp;
-    double **fm;
-    double **gp;
-    double **gm;
+    /* 1d arrays stored on each of four faces */
+    double *qc[4];
+    double *auxc[4];
+    double *rp[4];
+
+    double dt;   /* Coarse grid dt */
+
+    /* 1d arrays stored on left/right faces (fp/fm) and top/bottom faces (gp/gm) */
+    double *fp[2];
+    double *fm[2];
+    double *gp[2];
+    double *gm[2];
 };
 
 struct fclaw2d_global;
@@ -55,16 +60,11 @@ void fclaw2d_clawpatch_cons_update_new(struct fclaw2d_global* glob,
                                        int blockno,int patchno,
                                        fclaw2d_clawpatch_cons_update_t **cons_update);
 
-void fclaw2d_clawpatch_cons_update_reset(struct fclaw2d_global* glob,
-                                         struct fclaw2d_patch* this_patch,
-                                         int blockno,int patchno,
-                                         fclaw2d_clawpatch_cons_update_t **cons_update);
+void fclaw2d_clawpatch_cons_update_reset(struct fclaw2d_global* glob,int minlevel,
+                                         int maxlevel, double dt);
 
 
-void fclaw2d_clawpatch_cons_update_delete(struct fclaw2d_global* glob,
-                                          struct fclaw2d_patch* this_patch,
-                                          int blockno,int patchno,
-                                          fclaw2d_clawpatch_cons_update_t **cons_update);
+void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons_update);
 
 
 

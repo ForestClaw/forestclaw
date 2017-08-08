@@ -64,6 +64,10 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_fort_average2coarse_t        fort_average2coarse;
     clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
+    /* Conservation update */
+    clawpatch_fort_cons_coarse_to_fine_t   fort_cons_coarse_to_fine;
+    clawpatch_fort_cons_coarse_correct_t   fort_cons_coarse_correct;
+
     /* output functions (ascii) */
     clawpatch_fort_header_ascii_t          fort_header_ascii;
 
@@ -118,6 +122,11 @@ void fclaw2d_clawpatch_metric_data2(struct fclaw2d_global* glob,
 
 double* fclaw2d_clawpatch_get_area(struct fclaw2d_global* glob,
                                    struct fclaw2d_patch* this_patch);
+
+struct fclaw2d_clawpatch_cons_update* 
+fclaw2d_clawpatch_get_cons_update(struct fclaw2d_global* glob,
+                                  struct fclaw2d_patch* this_patch);
+
 
 void fclaw2d_clawpatch_soln_data(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* this_patch,
