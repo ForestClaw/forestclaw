@@ -328,18 +328,18 @@ double clawpack46_step2(fclaw2d_global_t *glob,
     double *auxr = FCLAW_ALLOC(double, maux);
     double *fluxdiff = FCLAW_ALLOC(double,meqn);     /* f(qr) - f(ql) = amdq+apdq */
     int mside = (mx >= my) ? mx : my;
+
+    fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_user_data(this_patch);
+    FCLAW_ASSERT(claw46_vt->rpn2_cons !=  NULL);
+
     for(int k = 0; k < 4; k++)
     {
-        if (cu->qc[k] != NULL)
+        if (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE)
         {
-            /* This side has a coarse grid, so we have to solve an additional Riemann 
-               problem */
-            FCLAW_ASSERT(claw46_vt->rpn2_cons !=  NULL);
-            int iside = k;
-            /* Should we do this before we update q?  Array 'qold' is the updated
-            array, and although ghost cells are not updated, this could create
-            issues */
+            /* this patch has a coarse grid neighbor on side 'k'. */
+
             int idir = k/2;
+            int iside = k;
 
             CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(&mx,&my,&mbc,&meqn,&maux,
                                                   &mside, &idir,&iside,
@@ -445,6 +445,8 @@ void fc2d_clawpack46_solver_initialize()
     /* ForestClaw vtable items */
     fclaw_vt->output_frame                   = clawpack46_output;
     fclaw_vt->problem_setup                  = clawpack46_setprob;    
+
+    fclaw_vt->time_sync_reset                = fclaw2d_clawpatch_cons_update_reset;
 
     /* Required functions  - error if NULL */
     claw46_vt->bc2                           = CLAWPACK46_BC2_DEFAULT;
