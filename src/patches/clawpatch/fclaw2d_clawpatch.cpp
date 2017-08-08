@@ -495,44 +495,38 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
     time interpolated patches */
     if (!(time_interp || fclaw2d_patch_is_ghost(coarse_patch)))
     {
-        /* Add correction to coarse grid */ 
+        /* Add correction to coarse grid.  Correction will be zero at start of run. */ 
 
-        fclaw2d_clawpatch_t *cp = clawpatch_data(coarse_patch);
-        double dx = cp->dx;
-        double dy = cp->dy;
+        fclaw2d_clawpatch_t *cpcoarse = clawpatch_data(coarse_patch);
 
         fclaw2d_clawpatch_cons_update_t* cufine = 
                   fclaw2d_clawpatch_get_cons_update(glob,fine_patch);
 
-        if (cufine->dt > 0)
-        {
+        fclaw2d_clawpatch_cons_update_t* cucoarse = 
+              fclaw2d_clawpatch_get_cons_update(glob,coarse_patch);
 
-            /* cons_update->dt = -1 upon initialization */
-            fclaw2d_clawpatch_cons_update_t* cucoarse = 
-                              fclaw2d_clawpatch_get_cons_update(glob,coarse_patch);
+        /* create dummy fine grid to handle indexing between blocks */
+        double *qfine_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
+        int *maskfine = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
 
-            /* create dummy fine grid to handle indexing between blocks */
-            double *qfine_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
-            int *maskfine = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
+        double dx = cpcoarse->dx;
+        double dy = cpcoarse->dy;
+        double dt = cucoarse->dt;
 
-            double dt = cucoarse->dt;
-            FCLAW_ASSERT(dt > 0);
+        clawpatch_vt->fort_cons_coarse_correct(&mx,&my,&mbc,&meqn,
+                                               &dt, &dx, &dy, maskfine,
+                                               qcoarse,qfine_dummy,
+                                               &idir,&iface_coarse,
+                                               cucoarse->fm[0],cucoarse->fp[1],
+                                               cucoarse->gm[0],cucoarse->gp[1],
+                                               cufine->fm[0],cufine->fp[1],
+                                               cufine->gm[0],cufine->gp[1],
+                                               cufine->rp[0],cufine->rp[1],
+                                               cufine->rp[2],cufine->rp[3],
+                                               &transform_data);
 
-            clawpatch_vt->fort_cons_coarse_correct(&mx,&my,&mbc,&meqn,
-                                                   &dt, &dx, &dy, maskfine,
-                                                   qcoarse,qfine_dummy,
-                                                   &idir,&iface_coarse,
-                                                   cucoarse->fm[0],cucoarse->fp[1],
-                                                   cucoarse->gm[0],cucoarse->gp[1],
-                                                   cufine->fm[0],cufine->fp[1],
-                                                   cufine->gm[0],cufine->gp[1],
-                                                   cufine->rp[0],cufine->rp[1],
-                                                   cufine->rp[2],cufine->rp[3],
-                                                   &transform_data);
-
-            FCLAW_FREE(qfine_dummy);
-            FCLAW_FREE(maskfine);            
-        }
+        FCLAW_FREE(qfine_dummy);
+        FCLAW_FREE(maskfine);                    
     }
 
 
@@ -1093,9 +1087,6 @@ void fclaw2d_clawpatch_vtable_initialize()
     patch_vt->average_corner       = clawpatch_average_corner;
     patch_vt->interpolate_corner   = clawpatch_interpolate_corner;
 
-    /* Conservation */
-    patch_vt->cons_update_reset    = fclaw2d_clawpatch_cons_update_reset;
-
     /* Regridding  functions */
     patch_vt->tag4refinement       = clawpatch_tag4refinement;
     patch_vt->tag4coarsening       = clawpatch_tag4coarsening;
@@ -1285,7 +1276,7 @@ double* fclaw2d_clawpatch_get_area(fclaw2d_global_t* glob,
 
 fclaw2d_clawpatch_cons_update_t* 
 fclaw2d_clawpatch_get_cons_update(fclaw2d_global_t* glob,
-                                fclaw2d_patch_t* this_patch)
+                                  fclaw2d_patch_t* this_patch)
 {
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
     return cp->cons_update;

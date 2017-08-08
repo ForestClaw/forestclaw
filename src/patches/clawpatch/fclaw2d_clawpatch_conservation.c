@@ -49,7 +49,8 @@ void set_snan(double* f)
       "NaNs, Uninitialized Variables, and C++"
       http://codingcastles.blogspot.fr/2008/12/nans-in-c.html
     */
-    *((long long*)&f) = 0x7ff0000000000001LL;
+    // *((long long*)&f) = 0x7ff0000000000001LL;
+    *f = -9999.0;
 }
 
 
@@ -72,7 +73,7 @@ void fclaw2d_clawpatch_cons_update_new(fclaw2d_global_t* glob,
     cu = FCLAW_ALLOC(fclaw2d_clawpatch_cons_update_t,1);
     *cons_update = cu;
 
-    cu->dt = -1;      /* We don't have a time step yet */
+    cu->dt = 0;  /* This ensures that initial coarse grid correction is zero */
 
     /* Iterate over sides 0,1,3,4 */
     for(k = 0; k < 2; k++)
@@ -93,6 +94,7 @@ void fclaw2d_clawpatch_cons_update_new(fclaw2d_global_t* glob,
         cu->qc[k+2]   = FCLAW_ALLOC(double,mx*meqn);      /* bottom, top side */
         cu->auxc[k+2] = FCLAW_ALLOC(double,mx*maux);      /* bottom, top side */ 
     }
+
 #ifdef FCLAW_ENABLE_DEBUG
     /* Set qc, auxc to signaling NANS, to make sure we only use valid values */
     for(k = 0; k < 2; k++)
@@ -151,7 +153,7 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
     {
         if (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE)
         {
-            idir = k % 2;
+            idir = k/2;
             if (idir == 0)
             {
                 for(j = 0; j < meqn*my; j++)
@@ -159,10 +161,12 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
                     if (k == 0)
                     {
                         cu->fm[0][j] = 0;
+                        cu->rp[0][j] = 0;
                     }
                     else if (k == 1)
                     {
                         cu->fp[1][j] = 0;
+                        cu->rp[1][j] = 0;
                     }
                 }
             }
@@ -173,10 +177,12 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
                     if (k == 2)
                     {
                         cu->gm[0][i] = 0;
+                        cu->rp[2][i] = 0;
                     }
                     else if (k == 3)
                     {
                         cu->gp[1][i] = 0;
+                        cu->rp[3][i] = 0;
                     }
                 }
             }
