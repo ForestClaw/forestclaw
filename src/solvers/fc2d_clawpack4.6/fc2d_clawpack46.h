@@ -91,6 +91,10 @@ typedef void (*fc2d_clawpack46_rpn2_t)(const int* ixy,const int* maxm, const int
                                        double wave[], double s[],double amdq[], double apdq[]);
 
 
+typedef void (*fc2d_clawpack46_rpn2_cons_t)(int* meqn, int* maux, int* idir,
+                                            double ql[], double qr[], double auxl[],
+                                            double auxr[], double flux_diff[]);
+
 typedef void (*fc2d_clawpack46_rpt2_t)(const int* ixy, const int* maxm, const int* meqn,
                                        const int* mwaves, const int* mbc,const int* mx,
                                        double ql[], double qr[], double aux1[], double aux2[],
@@ -111,9 +115,6 @@ typedef void (*fc2d_clawpack46_flux2_t)(const int* ixy,const int* maxm, const in
                                         const int* mwaves, const int* mcapa,
                                         int method[], int mthlim[]);
 
-typedef void (*fc2d_clawpack46_fluxfun_t)(const int* meqn, double q[], double aux[],
-                                          double fq[]);
-
 
 struct fc2d_clawpack46_vtable
 {
@@ -127,7 +128,7 @@ struct fc2d_clawpack46_vtable
     fc2d_clawpack46_src2_t      src2;
     fc2d_clawpack46_rpn2_t      rpn2;
     fc2d_clawpack46_rpt2_t      rpt2;
-    fc2d_clawpack46_fluxfun_t   fluxfun;
+    fc2d_clawpack46_rpn2_cons_t rpn2_cons;
     
     int is_set;
 

@@ -16,6 +16,7 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_flux2fw.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2_wrap.f \
+	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_cons_update.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_average.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_copy.f \
 	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_interpolate.f \

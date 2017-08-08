@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
+#include <fclaw2d_clawpatch_conservation.h>
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
@@ -108,7 +109,7 @@ void clawpack46_qinit(fclaw2d_global_t *glob,
     fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
 
     FCLAW_ASSERT(claw46_vt->qinit != NULL); /* Must be initialized */
-    int mx,my,mbc,meqn,maux,maxmx,maxmy;
+    int mx,my,mbc,meqn,maux,maxmx,maxmy;    
     double dx,dy,xlower,ylower;
     double *q, *aux;
 
@@ -280,6 +281,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
 
+
     int mwaves = clawpack_options->mwaves;
 
     int maxm = fmax(mx,my);
@@ -309,12 +311,50 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
     FCLAW_ASSERT(ierror == 0);
 
-    /* Accumulate fluxes needed for conservative fix-up */
-    if (claw46_vt->fluxfun != NULL)
+
+    fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(glob,this_patch);
+
+    cu->dt = dt;
+    CLAWPACK46_ACCUMULATE_CONS_UPDATES(&mx,&my,&mbc,&meqn,
+                                       fp,fm,gp,gm,
+                                       cu->fp[0],cu->fp[1],
+                                       cu->fm[0],cu->fm[1],
+                                       cu->gp[0],cu->gp[1],
+                                       cu->gm[0],cu->gm[1]);
+
+    double *ql   = FCLAW_ALLOC(double, meqn);
+    double *qr   = FCLAW_ALLOC(double, meqn);
+    double *auxl = FCLAW_ALLOC(double, maux);
+    double *auxr = FCLAW_ALLOC(double, maux);
+    double *fluxdiff = FCLAW_ALLOC(double,meqn);     /* f(qr) - f(ql) = amdq+apdq */
+    int mside = (mx >= my) ? mx : my;
+    for(int k = 0; k < 4; k++)
     {
-        /* Accumulate fluxes */
+        if (cu->qc[k] != NULL)
+        {
+            /* This side has a coarse grid, so we have to solve an additional Riemann 
+               problem */
+            FCLAW_ASSERT(claw46_vt->rpn2_cons !=  NULL);
+            int iside = k;
+            /* Should we do this before we update q?  Array 'qold' is the updated
+            array, and although ghost cells are not updated, this could create
+            issues */
+            int idir = k/2;
+
+            CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(&mx,&my,&mbc,&meqn,&maux,
+                                                  &mside, &idir,&iside,
+                                                  cu->qc[k],cu->auxc[k], 
+                                                  qold,aux,cu->rp[k],
+                                                  claw46_vt->rpn2_cons,
+                                                  ql,qr,auxl,auxr,fluxdiff);
+        }
     }
 
+    FCLAW_FREE(ql);
+    FCLAW_FREE(qr);
+    FCLAW_FREE(auxl);
+    FCLAW_FREE(auxr);
+    FCLAW_FREE(fluxdiff);
 
     delete [] fp;
     delete [] fm;
@@ -430,6 +470,10 @@ void fc2d_clawpack46_solver_initialize()
 
     clawpatch_vt->fort_tag4refinement        = FC2D_CLAWPACK46_FORT_TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening        = FC2D_CLAWPACK46_FORT_TAG4COARSENING;
+
+    /* Conservation update */
+    clawpatch_vt->fort_cons_coarse_to_fine   = &CLAWPACK46_FORT_CONS_COARSE_TO_FINE;
+    clawpatch_vt->fort_cons_coarse_correct   = &CLAWPACK46_FORT_CONS_COARSE_CORRECT;
 
     /* output functions */
     clawpatch_vt->fort_header_ascii          = FC2D_CLAWPACK46_FORT_HEADER_ASCII;
