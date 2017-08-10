@@ -83,6 +83,8 @@ struct fclaw2d_patch_data
     int on_coarsefine_interface;
     int has_finegrid_neighbors;
     int neighbors_set;
+    int patch_idx;    /* for debugging!! */
+    int block_idx;
 
     void *user_patch; /* Start of attempt to "virtualize" the user patch. */
 };
@@ -99,6 +101,12 @@ struct fclaw2d_transform_data;
 void fclaw2d_patch_data_new(struct fclaw2d_global* glob,
                             struct fclaw2d_patch* this_patch);
 #endif                            
+
+void fclaw2d_patch_reset_data(struct fclaw2d_global* glob,
+                              struct fclaw2d_patch* old_patch,
+                              struct fclaw2d_patch* new_patch,
+                              int blockno,int old_patchno, int new_patchno);
+
 
 void fclaw2d_patch_data_delete(struct fclaw2d_global *glob,
                                struct fclaw2d_patch *patch);
@@ -290,6 +298,12 @@ size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
 void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
                             struct fclaw2d_patch * this_patch,
                             int this_block_idx, int this_patch_idx,
+                            int *global_num, int *level);
+
+
+void fclaw2d_patch_get_info2(fclaw2d_domain_t * domain,
+                            fclaw2d_patch_t * this_patch,
+                            int *this_block_idx, int *this_patch_idx,
                             int *global_num, int *level);
 
 

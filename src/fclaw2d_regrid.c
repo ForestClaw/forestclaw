@@ -128,6 +128,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     {
         new_patch->user = old_patch->user;
         old_patch->user = NULL;
+        fclaw2d_patch_reset_data(g->glob,old_patch,new_patch,blockno,old_patchno,new_patchno);
         ++ddata_old->count_delete_patch;
         ++ddata_new->count_set_patch;
     }
