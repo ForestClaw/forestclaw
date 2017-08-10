@@ -316,6 +316,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
     cu->dt = dt;
     CLAWPACK46_ACCUMULATE_CONS_UPDATES(&mx,&my,&mbc,&meqn,
+                                       &this_patch_idx,
                                        fp,fm,gp,gm,
                                        cu->fp[0],cu->fp[1],
                                        cu->fm[0],cu->fm[1],

@@ -82,6 +82,7 @@ void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
                                                           CLAWPACK46_ACCUMULATE_CONS_UPDATES)
 
 void CLAWPACK46_ACCUMULATE_CONS_UPDATES(int* mx, int* my, int* mbc, int* meqn,
+                                        int* patchno,
                                         double fp[], double fm[],
                                         double gp[], double gm[],
                                         double fp_left[], double fp_right[],
@@ -134,6 +135,8 @@ void  CLAWPACK46_FORT_CONS_COARSE_CORRECT(const int* mx,const int* my,
                                           double gm2[], double gp3[],
                                           double rp0[], double rp1[],
                                           double rp2[], double rp3[],
+                                          double delta0[], double delta1[],
+                                          double delta2[], double delta3[],
                                           struct fclaw2d_transform_data** 
                                           transform_cptr);
 

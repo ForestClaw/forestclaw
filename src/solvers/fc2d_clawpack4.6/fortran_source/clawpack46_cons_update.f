@@ -9,10 +9,12 @@ c    # a ghost patch) to compute correction terms.
      &                                          dt, dx, dy, maskfine,
      &                                          qcoarse,qfine_dummy,
      &                                          idir, iface_coarse,
-     &                                          fmcoarse0,fpcoarse1,
-     &                                          gmcoarse0,gpcoarse1,
+     &                                          fpcoarse0,fmcoarse1,
+     &                                          gpcoarse2,gmcoarse3,
      &                                          fm0, fp1,gm0, gp1,
      &                                          rp0, rp1, rp2, rp3,
+     &                                          delta0,delta1,delta2,
+     &                                          delta3,
      &                                          transform_cptr)
 
       implicit none
@@ -24,11 +26,15 @@ c    # a ghost patch) to compute correction terms.
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      double precision fmcoarse0(my,meqn)
-      double precision fpcoarse1(my,meqn)
-      double precision gmcoarse0(mx,meqn)
-      double precision gpcoarse1(mx,meqn)
+      double precision fpcoarse0(my,meqn)
+      double precision fmcoarse1(my,meqn)
+      double precision gpcoarse2(mx,meqn)
+      double precision gmcoarse3(mx,meqn)
 
+      double precision delta0(my,meqn)
+      double precision delta1(my,meqn)
+      double precision delta2(mx,meqn)
+      double precision delta3(mx,meqn)
 
       double precision fm0(my,meqn)
       double precision fp1(my,meqn)
@@ -74,11 +80,11 @@ c     # Don't divide delta by 4;  it will be averaged later
          do j = 1,my/2
             jj1 = 2*(j-1) + 1     !! indexing starts at 1
             jj2 = 2*(j-1) + 2
-            deltam = fm0(jj1,mq) + fm0(jj2,mq) +
+            deltam = (fm0(jj1,mq) + fm0(jj2,mq)) +
      &              (rp0(jj1,mq) + rp0(jj2,mq))
-            deltap = fp1(jj1,mq) + fp1(jj2,mq) -
+            deltap = (fp1(jj1,mq) + fp1(jj2,mq)) +
      &              (rp1(jj1,mq) + rp1(jj2,mq))
-            do ii = 0,1
+            do ii = 1,mbc
                do jj = jj1,jj2
                   qfine_dummy(1-ii,jj,mq) = deltam/4
                   qfine_dummy(mx+ii,jj,mq) = deltap/4
@@ -89,12 +95,12 @@ c     # Don't divide delta by 4;  it will be averaged later
          do i = 1,mx/2
             ii1 = 2*(i-1) + 1        !! indexing starts at 1
             ii2 = 2*(i-1) + 2
-            deltam = gm0(ii1,mq) + gm0(ii2,mq) +
+            deltam = (gm0(ii1,mq) + gm0(ii2,mq)) +
      &              (rp2(ii1,mq) + rp2(ii2,mq))
-            deltap = gp1(ii1,mq) + gp1(ii2,mq) -
+            deltap = 0*(gp1(ii1,mq) + gp1(ii2,mq)) +
      &              (rp3(ii1,mq) + rp3(ii2,mq))
             do ii = ii1,ii2
-               do jj = 0,1
+               do jj = 1,mbc
                   qfine_dummy(ii+1,1-jj,mq) = deltam/4
                   qfine_dummy(ii+1,my+jj,mq) = deltap/4
                enddo
@@ -133,11 +139,13 @@ c     # Average fine grid onto coarse grid
                      sum = sum + qfine_dummy(i2(m),j2(m),mq)
                   enddo
                   if (iface_coarse .eq. 0) then
-                     deltac = sum/r2 - fmcoarse0(jc,mq) 
+                     deltac = sum/r2 - fpcoarse0(jc,mq) 
+                     delta0(jc,mq) = deltac
                   else
-                     deltac = sum/r2 - fpcoarse1(jc,mq)
+                     deltac = sum/r2 - fmcoarse1(jc,mq)
+                     delta1(jc,mq) = deltac
                   endif
-                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + dtdx*deltac
+                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - dtdx*deltac
 
                endif
             enddo
@@ -166,11 +174,13 @@ c     # Average fine grid onto coarse grid
                      sum = sum + qfine_dummy(i2(m),j2(m),mq)
                   enddo
                   if (iface_coarse .eq. 2) then
-                     deltac = sum/r2 - gmcoarse0(ic,mq)
+                     deltac = sum/r2 - gpcoarse2(ic,mq)
+                     delta2(ic,mq) = deltac
                   else               
-                     deltac = sum/r2 - gpcoarse1(ic,mq)        
+                     deltac = sum/r2 - gmcoarse3(ic,mq)        
+                     delta3(ic,mq) = deltac
                   endif
-                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + dtdy*deltac
+                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - dtdy*deltac
                endif                    !! skip grid loop
             enddo
          enddo
@@ -368,6 +378,7 @@ c    # These are called from step2 routine (after update)
 c    # -----------------------------------------------------------------     
 
       subroutine clawpack46_accumulate_cons_updates(mx,my,mbc,meqn,
+     &      patchno,                                               
      &      fp,fm,gp,gm,
      &      fp_left,fp_right,
      &      fm_left,fm_right,
@@ -376,7 +387,7 @@ c    # -----------------------------------------------------------------
 
       implicit none
 
-      integer mx,my,mbc,meqn
+      integer mx,my,mbc,meqn,patchno
 
       double precision fp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision fm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
