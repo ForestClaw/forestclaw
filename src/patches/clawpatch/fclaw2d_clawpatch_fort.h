@@ -160,6 +160,8 @@ typedef void  (*clawpatch_fort_cons_coarse_correct_t)(const int* mx,
                                                       double gm2[], double gp3[],
                                                       double rp0[], double rp1[],
                                                       double rp2[], double rp3[],
+                                                      double delta0[], double delta1[],
+                                                      double delta2[], double delta3[],
                                                       struct fclaw2d_transform_data** 
                                                       transform_cptr);
 

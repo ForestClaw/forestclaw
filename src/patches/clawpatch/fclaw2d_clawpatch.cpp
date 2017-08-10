@@ -498,6 +498,8 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
         /* Add correction to coarse grid.  Correction will be zero at start of run. */ 
 
         fclaw2d_clawpatch_t *cpcoarse = clawpatch_data(coarse_patch);
+        double dx = cpcoarse->dx;
+        double dy = cpcoarse->dy;
 
         fclaw2d_clawpatch_cons_update_t* cufine = 
                   fclaw2d_clawpatch_get_cons_update(glob,fine_patch);
@@ -509,24 +511,41 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
         double *qfine_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
         int *maskfine = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
 
-        double dx = cpcoarse->dx;
-        double dy = cpcoarse->dy;
+        double *delta0 = FCLAW_ALLOC_ZERO(double,meqn*my);
+        double *delta1 = FCLAW_ALLOC_ZERO(double,meqn*my);
+        double *delta2 = FCLAW_ALLOC_ZERO(double,meqn*mx);
+        double *delta3 = FCLAW_ALLOC_ZERO(double,meqn*mx);
+
+        /* INclude this for debugging */
+        int coarse_blockno, coarse_patchno,globnum,level;
+        int fine_blockno, fine_patchno;
+        fclaw2d_patch_get_info2(glob->domain,coarse_patch,&coarse_blockno, &coarse_patchno,
+                                &globnum,&level);
+
+        fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, &fine_patchno,
+                                &globnum,&level);
+
         double dt = cucoarse->dt;
 
         clawpatch_vt->fort_cons_coarse_correct(&mx,&my,&mbc,&meqn,
                                                &dt, &dx, &dy, maskfine,
                                                qcoarse,qfine_dummy,
                                                &idir,&iface_coarse,
-                                               cucoarse->fm[0],cucoarse->fp[1],
-                                               cucoarse->gm[0],cucoarse->gp[1],
+                                               cucoarse->fp[0],cucoarse->fm[1],
+                                               cucoarse->gp[0],cucoarse->gm[1],
                                                cufine->fm[0],cufine->fp[1],
                                                cufine->gm[0],cufine->gp[1],
                                                cufine->rp[0],cufine->rp[1],
                                                cufine->rp[2],cufine->rp[3],
+                                               delta0,delta1,delta2, delta3,
                                                &transform_data);
 
         FCLAW_FREE(qfine_dummy);
-        FCLAW_FREE(maskfine);                    
+        FCLAW_FREE(maskfine);   
+        FCLAW_FREE(delta0);                 
+        FCLAW_FREE(delta1);                 
+        FCLAW_FREE(delta2);                 
+        FCLAW_FREE(delta3);                 
     }
 
 

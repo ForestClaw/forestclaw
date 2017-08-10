@@ -98,6 +98,11 @@ void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
                                          struct fclaw2d_patch* this_patch);
 
 
+/* ----------------------------- Conservative updates --------------------------------- */
+void fclaw2d_patch_cons_update_reset(struct fclaw2d_global *glob, 
+                                     int minlevel,int maxlevel,double dt);
+
+
 /* ------------------------------- Misc access functions ------------------------------ */
 
 void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,

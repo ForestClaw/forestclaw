@@ -151,39 +151,26 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 
     for(k = 0; k < 4; k++)
     {
-        if (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE)
+        idir = k/2;
+        if (((pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE) && level > minlevel)
+            || ((pdata->face_neighbors[k] == FCLAW2D_PATCH_HALFSIZE)))
         {
-            idir = k/2;
             if (idir == 0)
             {
                 for(j = 0; j < meqn*my; j++)
-                {                    
-                    if (k == 0)
-                    {
-                        cu->fm[0][j] = 0;
-                        cu->rp[0][j] = 0;
-                    }
-                    else if (k == 1)
-                    {
-                        cu->fp[1][j] = 0;
-                        cu->rp[1][j] = 0;
-                    }
+                {                 
+                    cu->fm[k][j] = 0;
+                    cu->fp[k][j] = 0;
+                    cu->rp[k][j] = 0;
                 }
             }
             else
             {
                 for(i = 0; i < meqn*mx; i++)
                 {
-                    if (k == 2)
-                    {
-                        cu->gm[0][i] = 0;
-                        cu->rp[2][i] = 0;
-                    }
-                    else if (k == 3)
-                    {
-                        cu->gp[1][i] = 0;
-                        cu->rp[3][i] = 0;
-                    }
+                    cu->gm[k-2][i] = 0;
+                    cu->gp[k-2][i] = 0;
+                    cu->rp[k][i] = 0;
                 }
             }
         }     /* coarse grid neighbor */
@@ -222,7 +209,7 @@ void fclaw2d_clawpatch_cons_update_reset(fclaw2d_global_t* glob,int minlevel,
 
     /* Reset fine grids only;  coarse grids do not accumulate fluxes; they are 
     set only once */
-    for(level = minlevel+1; level <= maxlevel; level++)
+    for(level = minlevel; level <= maxlevel; level++)
     {
         fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset, &cons_info);
     }
