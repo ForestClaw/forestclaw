@@ -48,7 +48,7 @@ void fclaw2d_after_regrid(struct fclaw2d_global *glob);
 void fclaw2d_after_init(struct fclaw2d_global *glob);
   
 void fclaw2d_time_sync_reset(struct fclaw2d_global *glob, 
-                             int minlevel,int maxlevel,double dt);
+                             int minlevel,int maxlevel);
 
 
 typedef void (*fclaw2d_vtable_initialize_t)();
@@ -83,7 +83,7 @@ typedef void (*fclaw2d_after_initialization_t)(struct fclaw2d_global *glob);
 typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
 
 typedef void (*fclaw2d_time_sync_reset_t)(struct fclaw2d_global *glob, 
-                                          int minlevel,int maxlevel,double dt);
+                                          int minlevel,int maxlevel);
 
 
 

@@ -267,7 +267,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
     grid values to the fine grid registers (needed for Riemann problem). 
     Important here is that dt has a valid value, because this is needed
     to construct conservative correction (e.g. dt/dx*delta) */
-    fclaw2d_time_sync_reset(glob,minlevel,maxlevel,dt);
+    fclaw2d_time_sync_reset(glob,minlevel,maxlevel);
 
     /* Step inc at maxlevel should be 1 by definition */
     FCLAW_ASSERT(ts_counter[maxlevel].step_inc == 1);
@@ -296,8 +296,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
                                      sync_time,
                                      time_interp,
                                      FCLAW2D_TIMER_ADVANCE);
-                double dt_minlevel = ts_counter[time_interp_level+1].dt_step;
-                fclaw2d_time_sync_reset(glob,time_interp_level+1,maxlevel,dt_minlevel);                
+                fclaw2d_time_sync_reset(glob,time_interp_level+1,maxlevel);                
             }
             else
             {

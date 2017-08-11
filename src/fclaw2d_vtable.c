@@ -64,14 +64,14 @@ void fclaw2d_after_regrid(fclaw2d_global_t *glob)
 
 
 void fclaw2d_time_sync_reset(fclaw2d_global_t *glob, 
-                             int minlevel,int maxlevel,double dt)
+                             int minlevel,int maxlevel)
 {
     /* This is used for updating conservation arrays, for example */
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
 
     if (fclaw_vt->time_sync_reset != NULL)
     {
-        fclaw_vt->time_sync_reset(glob,minlevel,maxlevel,dt);
+        fclaw_vt->time_sync_reset(glob,minlevel,maxlevel);
     }
 }
 
