@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
+#include <fclaw2d_vtable.h>
 
 #include "fclaw_math.h"
 
@@ -57,6 +58,9 @@ static
 void restore_time_step(fclaw2d_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
+
+    fclaw_options_t *fopt = fclaw2d_get_options(glob);
+    fclaw2d_time_sync_reset(glob,fopt->minlevel,fopt->maxlevel);
 }
 
 static

@@ -375,8 +375,27 @@ static
 void clawpatch_save_step(fclaw2d_global_t* glob,
                          fclaw2d_patch_t* this_patch)
 {
+    int i, j, mx, my, meqn;
+
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
     cp->griddata_save = cp->griddata;
+
+    /* Save data potentially needed for conservative fix */
+    mx = cp->mx;
+    my = cp->my;
+    meqn = cp->meqn;
+
+    for(j = 0; j < meqn*my; j++)
+    {
+        cp->cons_update->qc_save[0][j] = cp->cons_update->qc[0][j];
+        cp->cons_update->qc_save[1][j] = cp->cons_update->qc[1][j];
+    }
+
+    for(i = 0; i < meqn*mx; i++)
+    {
+        cp->cons_update->qc_save[2][i] = cp->cons_update->qc[2][i];
+        cp->cons_update->qc_save[3][i] = cp->cons_update->qc[3][i];
+    }
 }
 
 
@@ -384,8 +403,29 @@ static
 void clawpatch_restore_step(fclaw2d_global_t* glob,
                             fclaw2d_patch_t* this_patch)
 {
+    int i,j, mx, my, meqn;
+    
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
     cp->griddata = cp->griddata_save;
+
+    /* Save data potentially needed for conservative fix */
+
+    mx = cp->mx;
+    my = cp->my;
+    meqn = cp->meqn;
+
+    for(j = 0; j < meqn*my; j++)
+    {
+        cp->cons_update->qc[0][j] = cp->cons_update->qc_save[0][j];
+        cp->cons_update->qc[1][j] = cp->cons_update->qc_save[1][j];
+    }
+
+    for(i = 0; i < meqn*mx; i++)
+    {
+        cp->cons_update->qc[2][i] = cp->cons_update->qc_save[2][i];
+        cp->cons_update->qc[3][i] = cp->cons_update->qc_save[3][i];
+    }
+
 }
 
 static
