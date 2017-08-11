@@ -102,6 +102,9 @@ void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
 void fclaw2d_patch_cons_update_reset(struct fclaw2d_global *glob, 
                                      int minlevel,int maxlevel,double dt);
 
+void fclaw2d_clawpatch_cons_update_metric(struct fclaw2d_global* glob,
+                                          struct fclaw2d_patch* this_patch,
+                                          int blockno,int patchno);
 
 /* ------------------------------- Misc access functions ------------------------------ */
 
@@ -111,6 +114,11 @@ void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
                                  double* xlower, double* ylower,
                                  double* dx, double* dy);
 
+
+void fclaw2d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch* this_patch,
+                                     double **area,double **edgelengths,
+                                     double **curvature);
 
 void fclaw2d_clawpatch_metric_data(struct fclaw2d_global* glob,
                                    struct fclaw2d_patch* this_patch,
@@ -127,11 +135,6 @@ void fclaw2d_clawpatch_metric_data2(struct fclaw2d_global* glob,
 
 double* fclaw2d_clawpatch_get_area(struct fclaw2d_global* glob,
                                    struct fclaw2d_patch* this_patch);
-
-struct fclaw2d_clawpatch_cons_update* 
-fclaw2d_clawpatch_get_cons_update(struct fclaw2d_global* glob,
-                                  struct fclaw2d_patch* this_patch);
-
 
 void fclaw2d_clawpatch_soln_data(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* this_patch,
@@ -158,6 +161,11 @@ void fclaw2d_clawpatch_timesync_data(struct fclaw2d_global* glob,
 double* fclaw2d_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
                                          struct fclaw2d_patch* this_patch,
                                          int time_interp);
+
+struct fclaw2d_clawpatch_cons_update* 
+fclaw2d_clawpatch_get_cons_update(struct fclaw2d_global* glob,
+                                  struct fclaw2d_patch* this_patch);
+
 
 
 #ifdef __cplusplus

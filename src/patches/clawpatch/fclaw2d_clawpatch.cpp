@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_conservation.h>
+#include <fclaw2d_clawpatch_conservation_fort.h>
 
 
 #include <fclaw2d_patch.h>  /* Needed to get enum for build modes */
@@ -224,7 +225,9 @@ void clawpatch_define(fclaw2d_global_t* glob,
         }
     }
     
-    fclaw2d_clawpatch_cons_update_new(glob,this_patch,blockno,patchno,&cp->cons_update);
+    /* Build interface registers needed for conservation */
+    fclaw2d_clawpatch_cons_update_new(glob,this_patch,
+                                      blockno,patchno,&cp->cons_update);
 
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
     {
@@ -253,6 +256,8 @@ void clawpatch_build(fclaw2d_global_t *glob,
         fclaw2d_vt()->metric_compute_area(glob,this_patch,blockno,patchno);
         metric_setup(glob,this_patch,blockno,patchno);
     }
+
+    fclaw2d_clawpatch_cons_update_metric(glob,this_patch,blockno,patchno);
 }
 
 static
@@ -284,10 +289,8 @@ void metric_setup(fclaw2d_global_t* glob,
                   int blockno,
                   int patchno)
 {
-    /* vt.patch_manifold_setup_mesh(...) */
     fclaw2d_metric_setup_mesh(glob,this_patch,blockno,patchno);
 
-    /* vt.patch_manifold_compute_normals(...) */
     fclaw2d_metric_compute_normals(glob,this_patch,blockno,patchno);
 }
 
@@ -369,6 +372,39 @@ void setup_metric_storage(fclaw2d_clawpatch_t* cp)
     cp->edge_lengths.define(box_d,2);
 }
 
+void fclaw2d_clawpatch_cons_update_metric(fclaw2d_global_t* glob,
+                                          fclaw2d_patch_t* this_patch,
+                                          int blockno,int patchno)
+{
+    int mx,my,mbc;
+    double dx,dy;
+    double *area, *edgelengths, *curvature;
+
+    fclaw2d_clawpatch_cons_update_t *cu = fclaw2d_clawpatch_get_cons_update(glob,this_patch);
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+
+    fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
+    mx = cp->mx;
+    my = cp->my;
+    dx = cp->dx;
+    dy = cp->dy;
+    mbc = cp->mbc;
+
+
+    fclaw2d_clawpatch_metric_scalar(glob,this_patch,
+                                    &area, &edgelengths,&curvature);
+
+    CLAWPATCH_CONS_UPDATE_METRIC(&mx,&my,&mbc,&dx,&dy,area,edgelengths,
+                                 cu->area[0],cu->area[1],
+                                 cu->area[2],cu->area[3],
+                                 cu->edgelengths[0],cu->edgelengths[1],
+                                 cu->edgelengths[2],cu->edgelengths[3],
+                                 &fclaw_opt->manifold);
+}
+
+
+
 /* -------------------------------- time stepping ------------------------------------- */
 
 static
@@ -404,7 +440,7 @@ void clawpatch_restore_step(fclaw2d_global_t* glob,
                             fclaw2d_patch_t* this_patch)
 {
     int i,j, mx, my, meqn;
-    
+
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
     cp->griddata = cp->griddata_save;
 
@@ -539,10 +575,6 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
     {
         /* Add correction to coarse grid.  Correction will be zero at start of run. */ 
 
-        fclaw2d_clawpatch_t *cpcoarse = clawpatch_data(coarse_patch);
-        double dx = cpcoarse->dx;
-        double dy = cpcoarse->dy;
-
         fclaw2d_clawpatch_cons_update_t* cufine = 
                   fclaw2d_clawpatch_get_cons_update(glob,fine_patch);
 
@@ -553,11 +585,6 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
         double *qfine_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
         int *maskfine = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
 
-        double *delta0 = FCLAW_ALLOC_ZERO(double,meqn*my);
-        double *delta1 = FCLAW_ALLOC_ZERO(double,meqn*my);
-        double *delta2 = FCLAW_ALLOC_ZERO(double,meqn*mx);
-        double *delta3 = FCLAW_ALLOC_ZERO(double,meqn*mx);
-
         /* Include this for debugging */
         int coarse_blockno, coarse_patchno,globnum,level;
         int fine_blockno, fine_patchno;
@@ -567,26 +594,22 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
         fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, &fine_patchno,
                                 &globnum,&level);
 
-        clawpatch_vt->fort_cons_coarse_correct(&mx,&my,&mbc,&meqn,
-                                               &dx, &dy, maskfine,
-                                               qcoarse,qfine_dummy,
-                                               &idir,&iface_coarse,
+        clawpatch_vt->fort_cons_coarse_correct(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
+                                               cucoarse->area[0], cucoarse->area[1], 
+                                               cucoarse->area[2], cucoarse->area[3],
+                                               qcoarse,
                                                cucoarse->fp[0],cucoarse->fm[1],
                                                cucoarse->gp[0],cucoarse->gm[1],
                                                cufine->fm[0],cufine->fp[1],
                                                cufine->gm[0],cufine->gp[1],
                                                cufine->rp[0],cufine->rp[1],
                                                cufine->rp[2],cufine->rp[3],
-                                               delta0,delta1,delta2, delta3,
+                                               maskfine,qfine_dummy,
                                                &transform_data);
 
 
         FCLAW_FREE(qfine_dummy);
         FCLAW_FREE(maskfine);   
-        FCLAW_FREE(delta0);                 
-        FCLAW_FREE(delta1);                 
-        FCLAW_FREE(delta2);                 
-        FCLAW_FREE(delta3);                 
     }
 
 
@@ -1342,6 +1365,19 @@ double* fclaw2d_clawpatch_get_area(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
     return cp->area.dataPtr();
 }
+
+void fclaw2d_clawpatch_metric_scalar(fclaw2d_global_t* glob,
+                                     fclaw2d_patch_t* this_patch,
+                                     double **area,double **edgelengths,
+                                     double **curvature)
+{
+    fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
+
+    *area = cp->area.dataPtr();
+    *curvature   = cp->curvature.dataPtr();
+    *edgelengths = cp->edge_lengths.dataPtr();
+}
+
 
 fclaw2d_clawpatch_cons_update_t* 
 fclaw2d_clawpatch_get_cons_update(fclaw2d_global_t* glob,

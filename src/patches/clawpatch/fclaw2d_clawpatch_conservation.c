@@ -36,12 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_math.h>
 
 
-typedef struct cons_update_info
-{
-    int minlevel;
-    int maxlevel;
-} cons_update_info_t;
-
 static
 void set_snan(double* f)
 {
@@ -85,12 +79,19 @@ void fclaw2d_clawpatch_cons_update_new(fclaw2d_global_t* glob,
         cu->gm[k]     = FCLAW_ALLOC_ZERO(double,mx*meqn);
         cu->rp[k+2]   = FCLAW_ALLOC_ZERO(double,mx*meqn);     
 
-        /* Coarse grid information */
-        cu->qc[k]     = FCLAW_ALLOC(double,my*meqn);      /* left, right side */
-        cu->auxc[k]   = FCLAW_ALLOC(double,my*maux);      /* left, right side */
+        cu->edgelengths[k]   = FCLAW_ALLOC(double,my);
+        cu->edgelengths[k+2] = FCLAW_ALLOC(double,mx);
+        cu->area[k]          = FCLAW_ALLOC(double,my);
+        cu->area[k+2]        = FCLAW_ALLOC(double,mx);
 
-        cu->qc[k+2]   = FCLAW_ALLOC(double,mx*meqn);      /* bottom, top side */
-        cu->auxc[k+2] = FCLAW_ALLOC(double,mx*maux);      /* bottom, top side */ 
+        /* Coarse grid information */
+        cu->qc[k]          = FCLAW_ALLOC(double,my*meqn);      /* left, right side */
+        cu->qc_save[k]     = FCLAW_ALLOC(double,my*meqn);      /* left, right side */
+        cu->auxc[k]        = FCLAW_ALLOC(double,my*maux);      /* left, right side */
+
+        cu->qc[k+2]        = FCLAW_ALLOC(double,mx*meqn);      /* bottom, top side */
+        cu->qc_save[k+2]   = FCLAW_ALLOC(double,mx*meqn);      /* bottom, top side */
+        cu->auxc[k+2]      = FCLAW_ALLOC(double,mx*maux);      /* bottom, top side */ 
     }
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -124,23 +125,22 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
+    int mx,my,meqn,level,minlevel;
+    int i,j,k,idir;
+
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
- 
-    cons_update_info_t cons_info = *((cons_update_info_t*) g->user);
 
     fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(g->glob);
 
     fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(g->glob,
                                                                             this_patch);
 
-    int level = this_patch->level;
-    int minlevel = cons_info.minlevel;
+    minlevel = *((int*) g->user);
+    level = this_patch->level;
 
-    int i, j, k, idir;
-
-    int mx = clawpatch_opt->mx;
-    int my = clawpatch_opt->my;
-    int meqn = clawpatch_opt->meqn;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    meqn = clawpatch_opt->meqn;
 
     fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_user_data(this_patch);
 
@@ -177,16 +177,9 @@ void fclaw2d_clawpatch_cons_update_reset(fclaw2d_global_t* glob,int minlevel,
 {
     int level;
 
-    cons_update_info_t cons_info;
-
-    cons_info.minlevel = minlevel;
-    cons_info.maxlevel = maxlevel;
-
-    /* Reset fine grids only;  coarse grids do not accumulate fluxes; they are 
-    set only once */
     for(level = minlevel; level <= maxlevel; level++)
     {
-        fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset, &cons_info);
+        fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset, &minlevel);
     }
 }
 
@@ -212,8 +205,15 @@ void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons
         /* COARSE GRID information */
         FCLAW_FREE(cu->qc[k]); 
         FCLAW_FREE(cu->qc[k+2]); 
+        FCLAW_FREE(cu->qc_save[k]); 
+        FCLAW_FREE(cu->qc_save[k+2]); 
         FCLAW_FREE(cu->auxc[k]); 
         FCLAW_FREE(cu->auxc[k+2]); 
+
+        FCLAW_FREE(cu->edgelengths[k]);
+        FCLAW_FREE(cu->area[k]);
+        FCLAW_FREE(cu->edgelengths[k+2]);
+        FCLAW_FREE(cu->area[k+2]);
      }
      FCLAW_FREE(*cons_update);
      *cons_update = NULL;

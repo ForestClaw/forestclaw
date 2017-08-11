@@ -40,8 +40,13 @@ struct fclaw2d_clawpatch_cons_update
 {
     /* 1d arrays stored on each of four faces */
     double *qc[4];
+    double *qc_save[4];  /* In case we need to retake a time step */
     double *auxc[4];
     double *rp[4];
+
+    /* Scaling factors */
+    double *edgelengths[4];
+    double *area[4];
 
     /* 1d arrays stored on left/right faces (fp/fm) and top/bottom faces (gp/gm) */
     double *fp[2];
