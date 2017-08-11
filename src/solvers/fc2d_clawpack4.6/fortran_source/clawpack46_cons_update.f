@@ -81,13 +81,15 @@ c     # Don't divide delta by 4;  it will be averaged later
             jj1 = 2*(j-1) + 1     !! indexing starts at 1
             jj2 = 2*(j-1) + 2
             deltam = (fm0(jj1,mq) + fm0(jj2,mq)) +
-     &              (rp0(jj1,mq) + rp0(jj2,mq))
+     &               (rp0(jj1,mq) + rp0(jj2,mq))
             deltap = (fp1(jj1,mq) + fp1(jj2,mq)) +
-     &              (rp1(jj1,mq) + rp1(jj2,mq))
-            do ii = 1,mbc
-               do jj = jj1,jj2
-                  qfine_dummy(1-ii,jj,mq) = deltam/4
-                  qfine_dummy(mx+ii,jj,mq) = deltap/4
+     &               (rp1(jj1,mq) + rp1(jj2,mq))
+
+c           # Reset registers     
+            do jj = jj1,jj2
+               do ii = 1,mbc
+                  qfine_dummy(1-ii,jj,mq) = deltam/2
+                  qfine_dummy(mx+ii,jj,mq) = deltap/2
                enddo
             enddo
          enddo
@@ -96,13 +98,13 @@ c     # Don't divide delta by 4;  it will be averaged later
             ii1 = 2*(i-1) + 1        !! indexing starts at 1
             ii2 = 2*(i-1) + 2
             deltam = (gm0(ii1,mq) + gm0(ii2,mq)) +
-     &              (rp2(ii1,mq) + rp2(ii2,mq))
-            deltap = 0*(gp1(ii1,mq) + gp1(ii2,mq)) +
-     &              (rp3(ii1,mq) + rp3(ii2,mq))
+     &               (rp2(ii1,mq) + rp2(ii2,mq))
+            deltap = (gp1(ii1,mq) + gp1(ii2,mq)) +
+     &               (rp3(ii1,mq) + rp3(ii2,mq))
             do ii = ii1,ii2
                do jj = 1,mbc
-                  qfine_dummy(ii+1,1-jj,mq) = deltam/4
-                  qfine_dummy(ii+1,my+jj,mq) = deltap/4
+                  qfine_dummy(ii,1-jj,mq) = deltam/2
+                  qfine_dummy(ii,my+jj,mq) = deltap/2
                enddo
             enddo
          enddo
@@ -177,7 +179,7 @@ c     # Average fine grid onto coarse grid
                      deltac = sum/r2 - gpcoarse2(ic,mq)
                      delta2(ic,mq) = deltac
                   else               
-                     deltac = sum/r2 - gmcoarse3(ic,mq)        
+                     deltac = sum/r2 - gmcoarse3(ic,mq) 
                      delta3(ic,mq) = deltac
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - dtdy*deltac
@@ -220,7 +222,7 @@ c     #  Hard-coding refratio = 2
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
-      logical is_valid_interp
+      logical is_valid_correct
       logical skip_this_grid
 
       integer a(2,2)
@@ -272,7 +274,7 @@ c        # this ensures that we get 'hanging' corners
 
             skip_this_grid = .false.
             do k = 0,r2-1
-               if (.not. is_valid_interp(i2(k),j2(k),mx,my,mbc))
+               if (.not. is_valid_correct(idir,i2(k),j2(k),mx,my))
      &               then
                   skip_this_grid = .true.
                   exit
@@ -307,7 +309,7 @@ c           # fine grid ghost cells.
      &            transform_ptr)
             skip_this_grid = .false.
             do k = 0,r2-1
-               if (.not. is_valid_interp(i2(k),j2(k),mx,my,mbc))
+               if (.not. is_valid_correct(idir,i2(k),j2(k),mx,my))
      &               then
                   skip_this_grid = .true.
                   exit
@@ -421,6 +423,8 @@ c    # -----------------------------------------------------------------
             gm_top(i,m) = gm_top(i,m) + gm(i,my+1,m)
          enddo
       enddo
+
+      return
 
       end
 

@@ -288,6 +288,48 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
     double cflgrid = 0.0;
 
+
+    fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(glob,this_patch);
+    {
+        double *ql   = FCLAW_ALLOC(double, meqn);
+        double *qr   = FCLAW_ALLOC(double, meqn);
+        double *auxl = FCLAW_ALLOC(double, maux);
+        double *auxr = FCLAW_ALLOC(double, maux);
+        double *fluxdiff = FCLAW_ALLOC(double,meqn);     /* f(qr) - f(ql) = amdq+apdq */
+        int mside = (mx >= my) ? mx : my;
+
+        fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_user_data(this_patch);
+        FCLAW_ASSERT(claw46_vt->rpn2_cons !=  NULL);
+
+        for(int k = 0; k < 4; k++)
+        {
+            if (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE)
+            {
+            /* this patch has a coarse grid neighbor on side 'k'. */
+
+                int idir = k/2;
+                int iside = k;
+
+                /* Solve Riemann problems between fine grid ghost values and 
+                   coarse grid values using old values */
+                CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(&mx,&my,&mbc,&meqn,&maux,
+                                                      &mside, &idir,&iside,
+                                                      cu->qc[k],cu->auxc[k], 
+                                                      qold,aux,cu->rp[k],
+                                                      claw46_vt->rpn2_cons,
+                                                      ql,qr,auxl,auxr,fluxdiff);
+            }
+        }
+
+        FCLAW_FREE(ql);
+        FCLAW_FREE(qr);
+        FCLAW_FREE(auxl);
+        FCLAW_FREE(auxr);
+        FCLAW_FREE(fluxdiff);
+    }
+
+
+
     int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
     double* work = new double[mwork];
 
@@ -312,9 +354,6 @@ double clawpack46_step2(fclaw2d_global_t *glob,
     FCLAW_ASSERT(ierror == 0);
 
 
-    fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(glob,this_patch);
-
-    cu->dt = dt;
     CLAWPACK46_ACCUMULATE_CONS_UPDATES(&mx,&my,&mbc,&meqn,
                                        &this_patch_idx,
                                        fp,fm,gp,gm,
@@ -323,39 +362,6 @@ double clawpack46_step2(fclaw2d_global_t *glob,
                                        cu->gp[0],cu->gp[1],
                                        cu->gm[0],cu->gm[1]);
 
-    double *ql   = FCLAW_ALLOC(double, meqn);
-    double *qr   = FCLAW_ALLOC(double, meqn);
-    double *auxl = FCLAW_ALLOC(double, maux);
-    double *auxr = FCLAW_ALLOC(double, maux);
-    double *fluxdiff = FCLAW_ALLOC(double,meqn);     /* f(qr) - f(ql) = amdq+apdq */
-    int mside = (mx >= my) ? mx : my;
-
-    fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_user_data(this_patch);
-    FCLAW_ASSERT(claw46_vt->rpn2_cons !=  NULL);
-
-    for(int k = 0; k < 4; k++)
-    {
-        if (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE)
-        {
-            /* this patch has a coarse grid neighbor on side 'k'. */
-
-            int idir = k/2;
-            int iside = k;
-
-            CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(&mx,&my,&mbc,&meqn,&maux,
-                                                  &mside, &idir,&iside,
-                                                  cu->qc[k],cu->auxc[k], 
-                                                  qold,aux,cu->rp[k],
-                                                  claw46_vt->rpn2_cons,
-                                                  ql,qr,auxl,auxr,fluxdiff);
-        }
-    }
-
-    FCLAW_FREE(ql);
-    FCLAW_FREE(qr);
-    FCLAW_FREE(auxl);
-    FCLAW_FREE(auxr);
-    FCLAW_FREE(fluxdiff);
 
     delete [] fp;
     delete [] fm;
