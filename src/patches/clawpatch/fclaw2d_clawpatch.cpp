@@ -527,10 +527,8 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
         fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, &fine_patchno,
                                 &globnum,&level);
 
-        double dt = cucoarse->dt;
-
         clawpatch_vt->fort_cons_coarse_correct(&mx,&my,&mbc,&meqn,
-                                               &dt, &dx, &dy, maskfine,
+                                               &dx, &dy, maskfine,
                                                qcoarse,qfine_dummy,
                                                &idir,&iface_coarse,
                                                cucoarse->fp[0],cucoarse->fm[1],

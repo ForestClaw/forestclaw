@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct cons_update_info
 {
-    double dt;
     int minlevel;
     int maxlevel;
 } cons_update_info_t;
@@ -73,8 +72,6 @@ void fclaw2d_clawpatch_cons_update_new(fclaw2d_global_t* glob,
 
     cu = FCLAW_ALLOC(fclaw2d_clawpatch_cons_update_t,1);
     *cons_update = cu;
-
-    cu->dt = 0;  /* This ensures that initial coarse grid correction is zero */
 
     /* Iterate over sides 0,1,3,4 */
     for(k = 0; k < 2; k++)
@@ -136,21 +133,8 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(g->glob,
                                                                             this_patch);
 
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(g->glob);
-
     int level = this_patch->level;
     int minlevel = cons_info.minlevel;
-    double dt = cons_info.dt;
-
-
-    if (fclaw_opt->subcycle)
-    {
-        cu->dt = dt/pow_int(2,level-minlevel);
-    }
-    else
-    {
-        cu->dt = dt;
-    }
 
     int i, j, k, idir;
 
@@ -186,35 +170,15 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
             }
         }     /* coarse grid neighbor */
     }
-
-#if 0
-    for(k = 0; k < 2; k++)
-    {
-        for(j = 0; j < meqn*my; j++)
-        {
-            cu->fp[k][j] = 0;
-            cu->fm[k][j] = 0;
-            cu->rp[k][j] = 0;
-        }
-
-        for(i = 0; i < meqn*mx; i++)
-        {
-            cu->gp[k][i] = 0;
-            cu->gm[k][i] = 0;
-            cu->rp[k+2][i] = 0;  
-        }
-    }
-#endif    
 }
 
 void fclaw2d_clawpatch_cons_update_reset(fclaw2d_global_t* glob,int minlevel,
-                                         int maxlevel, double dt)
+                                         int maxlevel)
 {
     int level;
 
     cons_update_info_t cons_info;
 
-    cons_info.dt = dt;
     cons_info.minlevel = minlevel;
     cons_info.maxlevel = maxlevel;
 

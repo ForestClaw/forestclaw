@@ -43,8 +43,6 @@ struct fclaw2d_clawpatch_cons_update
     double *auxc[4];
     double *rp[4];
 
-    double dt;   /* dt used on this grid */
-
     /* 1d arrays stored on left/right faces (fp/fm) and top/bottom faces (gp/gm) */
     double *fp[2];
     double *fm[2];
@@ -62,7 +60,7 @@ void fclaw2d_clawpatch_cons_update_new(struct fclaw2d_global* glob,
                                        fclaw2d_clawpatch_cons_update_t **cons_update);
 
 void fclaw2d_clawpatch_cons_update_reset(struct fclaw2d_global* glob,int minlevel,
-                                         int maxlevel, double dt);
+                                         int maxlevel);
 
 
 void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons_update);
