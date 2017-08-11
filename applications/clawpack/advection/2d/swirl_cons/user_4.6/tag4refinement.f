@@ -10,9 +10,10 @@
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, mq
-      double precision qmin, qmax, xc
+      double precision qmin, qmax, xc, yc
 
       tag_patch = 0
+
 
 c     # Refine based only on first variable in system.
       mq = 1
@@ -22,15 +23,16 @@ c     # Refine based only on first variable in system.
          do i = 1,mx
 c            qmin = min(q(i,j,mq),qmin)
 c            qmax = max(q(i,j,mq),qmax)
-c            if (qmax - qmin .gt. tag_threshold) then
-c               tag_patch = 1
-c               return
-c            endif
-            xc = xlower + (i-0.5)*dx
-            if (xc .gt. 0.5d0) then
+            if (q(i,j,mq) .gt. tag_threshold) then
                tag_patch = 1
                return
             endif
+c            xc = xlower + (i-0.5)*dx
+c            yc = ylower + (j-0.5)*dy
+c            if (abs(yc-0.5d0) .lt. dy .and. abs(xc-0.5d0) .lt. dx) then
+c               tag_patch = 1
+c               return
+c            endif
 
          enddo
       enddo

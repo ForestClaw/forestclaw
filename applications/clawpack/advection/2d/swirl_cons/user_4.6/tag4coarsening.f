@@ -36,7 +36,7 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-c     # Don't refine for now.
+c     # Don't coarsen for now.
       tag_patch = 0    
       return
 

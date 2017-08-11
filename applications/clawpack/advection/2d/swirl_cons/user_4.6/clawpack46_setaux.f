@@ -20,7 +20,10 @@ c           # coordinates of lower left corner of grid cell:
             yc = ylower + (j-0.5)*dy
 
             s = sqrt(2.d0)
-            if (example .eq. 1) then
+            if (example .eq. 0) then
+               aux(i,j,1) = 0*(cos(2*pi*xc) + 2)
+               aux(i,j,2) = (cos(2*pi*yc) + 2)
+            else if (example .eq. 1) then
                aux(i,j,1) = s*(cos(pi*xc)**2 + 0.5d0)
                aux(i,j,2) = s*(sin(pi*yc)**2 + 0.5d0)
             else
