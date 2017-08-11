@@ -29,7 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_clawpatch.h"
 #include "fclaw2d_clawpatch_options.h"
 
-#include "fclaw2d_patch.h"
+#include <fclaw2d_patch.h>
+#include <fclaw2d_options.h>
 
 #include <fclaw2d_global.h>
 #include <fclaw_math.h>
@@ -135,11 +136,21 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(g->glob,
                                                                             this_patch);
 
+    fclaw_options_t *fclaw_opt = fclaw2d_get_options(g->glob);
+
     int level = this_patch->level;
     int minlevel = cons_info.minlevel;
     double dt = cons_info.dt;
 
-    cu->dt = dt/pow_int(2,level-minlevel);
+
+    if (fclaw_opt->subcycle)
+    {
+        cu->dt = dt/pow_int(2,level-minlevel);
+    }
+    else
+    {
+        cu->dt = dt;
+    }
 
     int i, j, k, idir;
 
