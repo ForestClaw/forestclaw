@@ -450,6 +450,8 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
     double *qthis, *qneighbor;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
     mx = clawpatch_opt->mx;
     my = clawpatch_opt->my;
     mbc = clawpatch_opt->mbc;
@@ -457,7 +459,7 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
     fclaw2d_clawpatch_timesync_data(glob,neighbor_patch,time_interp,&qneighbor,&meqn);
 
-    clawpatch_vt()->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+    clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
 }
 
 static
@@ -516,7 +518,7 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
         double *delta2 = FCLAW_ALLOC_ZERO(double,meqn*mx);
         double *delta3 = FCLAW_ALLOC_ZERO(double,meqn*mx);
 
-        /* INclude this for debugging */
+        /* Include this for debugging */
         int coarse_blockno, coarse_patchno,globnum,level;
         int fine_blockno, fine_patchno;
         fclaw2d_patch_get_info2(glob->domain,coarse_patch,&coarse_blockno, &coarse_patchno,
@@ -539,6 +541,7 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
                                                cufine->rp[2],cufine->rp[3],
                                                delta0,delta1,delta2, delta3,
                                                &transform_data);
+
 
         FCLAW_FREE(qfine_dummy);
         FCLAW_FREE(maskfine);   
@@ -595,6 +598,15 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
                   fclaw2d_clawpatch_get_cons_update(glob,fine_patch);
 
         fclaw2d_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
+
+        /* Include this for debugging */
+        int coarse_blockno, coarse_patchno,globnum,level;
+        int fine_blockno, fine_patchno;
+        fclaw2d_patch_get_info2(glob->domain,coarse_patch,&coarse_blockno, &coarse_patchno,
+                                &globnum,&level);
+
+        fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, &fine_patchno,
+                                &globnum,&level);
 
         /* create dummy fine grid to handle indexing between blocks */
         double *qfine_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
