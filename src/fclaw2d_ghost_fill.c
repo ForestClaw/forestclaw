@@ -576,15 +576,16 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
         int read_parallel_patches = 0;
 
 
-        /* Copy */
-        copy_samelevel(glob,minlevel,maxlevel,time_interp,
-                       read_parallel_patches,parallel_mode);
-
         /* Average */
         average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
                                   time_interp,
                                   read_parallel_patches,
                                   parallel_mode);
+
+        /* Copy */
+        copy_samelevel(glob,minlevel,maxlevel,time_interp,
+                       read_parallel_patches,parallel_mode);
+
 
         /* This is needed when the parallel boundary intersects the physical
            boundary.  In this case, a coarse grid ghost patch might
@@ -614,16 +615,15 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
         fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP2]);
         parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
 
-        /* Copy */
-        copy_samelevel(glob,minlevel,maxlevel,time_interp,
-                       read_parallel_patches,parallel_mode);
-
-        /* Average */
+         /* Average */
         average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
                                   time_interp,
                                   read_parallel_patches,
                                   parallel_mode);
 
+       /* Copy */
+        copy_samelevel(glob,minlevel,maxlevel,time_interp,
+                       read_parallel_patches,parallel_mode);
 
         /* Physical ghost */
         fill_physical_ghost(glob,
@@ -680,12 +680,12 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
         parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
         read_parallel_patches = 1;
 
-        /* Copy */
-        copy_samelevel(glob,minlevel,maxlevel,time_interp,
-            read_parallel_patches,parallel_mode);
-
         /* Average */
         average_fine2coarse_ghost(glob,mincoarse,maxcoarse, time_interp,
+            read_parallel_patches,parallel_mode);
+
+        /* Copy */
+        copy_samelevel(glob,minlevel,maxlevel,time_interp,
             read_parallel_patches,parallel_mode);
 
         /* Physical */
