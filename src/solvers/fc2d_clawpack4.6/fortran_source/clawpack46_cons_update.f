@@ -6,35 +6,31 @@ c    # -----------------------------------------------------------------
 c    # Called from averaging routine, using fine grid (possibly from 
 c    # a ghost patch) to compute correction terms.  
       subroutine clawpack46_fort_cons_coarse_correct(mx,my,mbc,meqn,
-     &                                          dx, dy, maskfine,
-     &                                          qcoarse,qfine_dummy,
      &                                          idir, iface_coarse,
+     &                                          area0, area1, 
+     &                                          area2, area3,
+     &                                          qcoarse,
      &                                          fpcoarse0,fmcoarse1,
      &                                          gpcoarse2,gmcoarse3,
      &                                          fm0, fp1,gm0, gp1,
      &                                          rp0, rp1, rp2, rp3,
-     &                                          delta0,delta1,delta2,
-     &                                          delta3,
+     &                                          maskfine, qfine_dummy,
      &                                          transform_cptr)
 
       implicit none
 
       integer mx,my,mbc,meqn,idir,iface_coarse
-      double precision dx,dy
 
       integer maskfine(1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
+      double precision area0(my), area1(my), area2(mx), area3(mx)
+
       double precision fpcoarse0(my,meqn)
       double precision fmcoarse1(my,meqn)
       double precision gpcoarse2(mx,meqn)
       double precision gmcoarse3(mx,meqn)
-
-      double precision delta0(my,meqn)
-      double precision delta1(my,meqn)
-      double precision delta2(mx,meqn)
-      double precision delta3(mx,meqn)
 
       double precision fm0(my,meqn)
       double precision fp1(my,meqn)
@@ -109,8 +105,6 @@ c     # do them all.
       enddo
 
 
-      areac = dx*dy
-
 c     # Average fine grid onto coarse grid
       if (idir .eq. 0) then
          do mq = 1,meqn
@@ -136,10 +130,10 @@ c     # Average fine grid onto coarse grid
                   fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 0) then
                      deltac = fineval - fpcoarse0(jc,mq) 
-                     delta0(jc,mq) = deltac
+                     areac = area0(jc)
                   else
                      deltac = fineval - fmcoarse1(jc,mq)
-                     delta1(jc,mq) = deltac
+                     areac = area1(jc)
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - deltac/areac
 
@@ -168,10 +162,10 @@ c     # Average fine grid onto coarse grid
                   fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 2) then
                      deltac = fineval - gpcoarse2(ic,mq)
-                     delta2(ic,mq) = deltac
+                     areac = area2(ic)
                   else               
                      deltac = fineval - gmcoarse3(ic,mq) 
-                     delta3(ic,mq) = deltac
+                     areac = area3(ic)
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - deltac/areac
                endif                    !! skip grid loop
@@ -371,7 +365,8 @@ c    # These are called from step2 routine (after update)
 c    # -----------------------------------------------------------------     
 
       subroutine clawpack46_accumulate_cons_updates(mx,my,mbc,meqn,
-     &      dx, dy, dt, patchno,    
+     &      dt, patchno,    
+     &      el0, el1, el2, el3,
      &      fp,fm,gp,gm,
      &      fp_left,fp_right,
      &      fm_left,fm_right,
@@ -381,7 +376,7 @@ c    # -----------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn,patchno
-      double precision dx,dy, dt
+      double precision dt
 
       double precision fp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision fm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -394,28 +389,27 @@ c    # -----------------------------------------------------------------
       double precision gp_bottom(mx,meqn),gp_top(mx,meqn)
       double precision gm_bottom(mx,meqn),gm_top(mx,meqn)
 
-      integer i,j,m
-      double precision dtdx, dtdy
+      double precision el0(my), el1(my), el2(mx), el3(mx)
 
-      dtdx = dt*dx
-      dtdy = dt*dy
+      integer i,j,m
+
       do j = 1,my
          do m = 1,meqn
-            fp_left(j,m) = fp_left(j,m) - dtdy*fp(1,j,m)
-            fm_left(j,m) = fm_left(j,m) + dtdy*fm(1,j,m)
+            fp_left(j,m) = fp_left(j,m) - dt*el0(j)*fp(1,j,m)
+            fm_left(j,m) = fm_left(j,m) + dt*el0(j)*fm(1,j,m)
 
-            fp_right(j,m) = fp_right(j,m) - dtdy*fp(mx+1,j,m)
-            fm_right(j,m) = fm_right(j,m) + dtdy*fm(mx+1,j,m)
+            fp_right(j,m) = fp_right(j,m) - dt*el1(j)*fp(mx+1,j,m)
+            fm_right(j,m) = fm_right(j,m) + dt*el1(j)*fm(mx+1,j,m)
          enddo
       enddo
 
       do i = 1,mx
          do m = 1,meqn
-            gp_bottom(i,m) = gp_bottom(i,m) - dtdx*gp(i,1,m)
-            gm_bottom(i,m) = gm_bottom(i,m) + dtdx*gm(i,1,m)
+            gp_bottom(i,m) = gp_bottom(i,m) - dt*el2(i)*gp(i,1,m)
+            gm_bottom(i,m) = gm_bottom(i,m) + dt*el2(i)*gm(i,1,m)
 
-            gp_top(i,m) = gp_top(i,m) - dtdx*gp(i,my+1,m)
-            gm_top(i,m) = gm_top(i,m) + dtdx*gm(i,my+1,m)
+            gp_top(i,m) = gp_top(i,m) - dt*el3(i)*gp(i,my+1,m)
+            gm_top(i,m) = gm_top(i,m) + dt*el3(i)*gm(i,my+1,m)
          enddo
       enddo
 
@@ -425,14 +419,17 @@ c    # -----------------------------------------------------------------
 
 
       subroutine clawpack46_accumulate_riemann_problem(mx,my,mbc,meqn,
-     &      maux, dx,dy,dt,
+     &      maux, dt,
+     &      el0, el1, el2, el3,
      &      mside,idir,iside,qc,auxc,qfine,auxfine,rp_accum,
      &      rpn2_cons,ql,qr,auxl,auxr,flux_diff)
 
       implicit none
 
       integer mx,my,mbc,meqn, maux, iside, mside, idir
-      double precision dx,dy,dt
+      double precision dt
+
+      double precision el0(my), el1(my), el2(mx), el3(mx)
 
       double precision qc(mside,meqn)
       double precision auxc(mside,maux)
@@ -445,10 +442,7 @@ c    # -----------------------------------------------------------------
       double precision flux_diff(meqn)
 
       integer i,j,m
-      double precision dtdx, dtdy
-
-      dtdx = dt*dx
-      dtdy = dt*dy
+      double precision elen
 
       if (idir .eq. 0) then
          do j = 1,my
@@ -462,6 +456,7 @@ c              # left side
                   ql(m) = qc(j,m)
                   qr(m) = qfine(0,j,m)
                enddo
+               elen = el0(j)
             elseif (iside .eq. 1) then
 c              # right side
                do m = 1,maux
@@ -472,12 +467,13 @@ c              # right side
                   ql(m) = qfine(mx+1,j,m)
                   qr(m) = qc(j,m)
                enddo
+               elen = el1(j)
             endif
 
             call rpn2_cons(meqn,maux,idir,ql,qr,auxl,auxr,flux_diff)
 
             do m = 1,meqn
-               rp_accum(j,m) = rp_accum(j,m) + dtdy*flux_diff(m)
+               rp_accum(j,m) = rp_accum(j,m) + dt*elen*flux_diff(m)
             enddo
          enddo
       elseif (idir .eq. 1) then
@@ -492,6 +488,7 @@ c              # bottom side
                   ql(m) = qc(i,m)
                   qr(m) = qfine(i,0,m)
                enddo
+               elen = el2(i)
             elseif (iside .eq. 3) then
 c              # top side
                do m = 1,maux
@@ -502,12 +499,13 @@ c              # top side
                   ql(m) = qfine(i,my+1,m)
                   qr(m) = qc(i,m)
                enddo
+               elen = el3(i)
             endif
 
             call rpn2_cons(meqn,maux,idir,ql,qr,auxl,auxr,flux_diff)
 
             do m = 1,meqn
-               rp_accum(i,m) = rp_accum(i,m) + dtdx*flux_diff(m)
+               rp_accum(i,m) = rp_accum(i,m) + dt*elen*flux_diff(m)
             enddo
          enddo
       endif

@@ -312,8 +312,9 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
                 /* Solve Riemann problems between fine grid ghost values and 
                    coarse grid values using old values */
-                CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(&mx,&my,&mbc,&meqn,&maux,
-                                                      &dx,&dy,&dt,
+                CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(&mx,&my,&mbc,&meqn,&maux,&dt,
+                                                      cu->edgelengths[0],cu->edgelengths[1],
+                                                      cu->edgelengths[2],cu->edgelengths[3],
                                                       &mside, &idir,&iside,
                                                       cu->qc[k],cu->auxc[k], 
                                                       qold,aux,cu->rp[k],
@@ -355,8 +356,9 @@ double clawpack46_step2(fclaw2d_global_t *glob,
     FCLAW_ASSERT(ierror == 0);
 
 
-    CLAWPACK46_ACCUMULATE_CONS_UPDATES(&mx,&my,&mbc,&meqn,&dx, &dy, &dt, 
-                                       &this_patch_idx,
+    CLAWPACK46_ACCUMULATE_CONS_UPDATES(&mx,&my,&mbc,&meqn,&dt, &this_patch_idx,
+                                       cu->edgelengths[0],cu->edgelengths[1],
+                                       cu->edgelengths[2],cu->edgelengths[3],
                                        fp,fm,gp,gm,
                                        cu->fp[0],cu->fp[1],
                                        cu->fm[0],cu->fm[1],
