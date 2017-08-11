@@ -6,7 +6,7 @@ c    # -----------------------------------------------------------------
 c    # Called from averaging routine, using fine grid (possibly from 
 c    # a ghost patch) to compute correction terms.  
       subroutine clawpack46_fort_cons_coarse_correct(mx,my,mbc,meqn,
-     &                                          dt, dx, dy, maskfine,
+     &                                          dx, dy, maskfine,
      &                                          qcoarse,qfine_dummy,
      &                                          idir, iface_coarse,
      &                                          fpcoarse0,fmcoarse1,
@@ -20,7 +20,7 @@ c    # a ghost patch) to compute correction terms.
       implicit none
 
       integer mx,my,mbc,meqn,idir,iface_coarse
-      double precision dt,dx,dy
+      double precision dx,dy
 
       integer maskfine(1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -50,7 +50,7 @@ c    # a ghost patch) to compute correction terms.
 
       integer i,j,ii1,ii2,jj1,jj2,ii,jj, m, mq
       integer ic,jc, r2, refratio
-      double precision deltam,deltap, deltac, dtdx,dtdy, sum
+      double precision deltam,deltap, deltac, sum,areac, fineval
       logical is_valid_correct
 
 c     # This should be refratio*refratio.
@@ -75,7 +75,6 @@ c     # qfine_dummy. We don't really know which face corresponds
 c     # to the common face shared between fine and coarse grids, so we
 c     # do them all.
 
-c     # Don't divide delta by 4;  it will be averaged later
       do mq = 1,meqn
          do j = 1,my/2
             jj1 = 2*(j-1) + 1     !! indexing starts at 1
@@ -85,11 +84,10 @@ c     # Don't divide delta by 4;  it will be averaged later
             deltap = (fp1(jj1,mq) + fp1(jj2,mq)) +
      &               (rp1(jj1,mq) + rp1(jj2,mq))
 
-c           # Reset registers     
             do jj = jj1,jj2
                do ii = 1,mbc
-                  qfine_dummy(1-ii,jj,mq) = deltam/2
-                  qfine_dummy(mx+ii,jj,mq) = deltap/2
+                  qfine_dummy(1-ii,jj,mq) = deltam
+                  qfine_dummy(mx+ii,jj,mq) = deltap
                enddo
             enddo
          enddo
@@ -97,22 +95,21 @@ c           # Reset registers
          do i = 1,mx/2
             ii1 = 2*(i-1) + 1        !! indexing starts at 1
             ii2 = 2*(i-1) + 2
-            deltam = (gm0(ii1,mq) + gm0(ii2,mq)) +
-     &               (rp2(ii1,mq) + rp2(ii2,mq))
-            deltap = (gp1(ii1,mq) + gp1(ii2,mq)) +
-     &               (rp3(ii1,mq) + rp3(ii2,mq))
+            deltam = (gm0(ii1,mq) + gm0(ii2,mq) +
+     &               rp2(ii1,mq) + rp2(ii2,mq))
+            deltap = (gp1(ii1,mq) + gp1(ii2,mq) +
+     &               rp3(ii1,mq) + rp3(ii2,mq))
             do ii = ii1,ii2
                do jj = 1,mbc
-                  qfine_dummy(ii,1-jj,mq) = deltam/2
-                  qfine_dummy(ii,my+jj,mq) = deltap/2
+                  qfine_dummy(ii,1-jj,mq) = deltam
+                  qfine_dummy(ii,my+jj,mq) = deltap
                enddo
             enddo
          enddo
       enddo
 
 
-      dtdx = dt/dx
-      dtdy = dt/dy
+      areac = dx*dy
 
 c     # Average fine grid onto coarse grid
       if (idir .eq. 0) then
@@ -136,18 +133,15 @@ c     # Average fine grid onto coarse grid
                enddo
 
                if (.not. skip_this_grid) then
-                  sum = 0
-                  do m = 0,r2-1
-                     sum = sum + qfine_dummy(i2(m),j2(m),mq)
-                  enddo
+                  fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 0) then
-                     deltac = sum/r2 - fpcoarse0(jc,mq) 
+                     deltac = fineval - fpcoarse0(jc,mq) 
                      delta0(jc,mq) = deltac
                   else
-                     deltac = sum/r2 - fmcoarse1(jc,mq)
+                     deltac = fineval - fmcoarse1(jc,mq)
                      delta1(jc,mq) = deltac
                   endif
-                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - dtdx*deltac
+                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - deltac/areac
 
                endif
             enddo
@@ -171,18 +165,15 @@ c     # Average fine grid onto coarse grid
                   endif
                enddo
                if (.not. skip_this_grid) then
-                  sum = 0
-                  do m = 0,r2-1
-                     sum = sum + qfine_dummy(i2(m),j2(m),mq)
-                  enddo
+                  fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 2) then
-                     deltac = sum/r2 - gpcoarse2(ic,mq)
+                     deltac = fineval - gpcoarse2(ic,mq)
                      delta2(ic,mq) = deltac
                   else               
-                     deltac = sum/r2 - gmcoarse3(ic,mq) 
+                     deltac = fineval - gmcoarse3(ic,mq) 
                      delta3(ic,mq) = deltac
                   endif
-                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - dtdy*deltac
+                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - deltac/areac
                endif                    !! skip grid loop
             enddo
          enddo
@@ -380,7 +371,7 @@ c    # These are called from step2 routine (after update)
 c    # -----------------------------------------------------------------     
 
       subroutine clawpack46_accumulate_cons_updates(mx,my,mbc,meqn,
-     &      patchno,                                               
+     &      dx, dy, dt, patchno,    
      &      fp,fm,gp,gm,
      &      fp_left,fp_right,
      &      fm_left,fm_right,
@@ -390,6 +381,7 @@ c    # -----------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn,patchno
+      double precision dx,dy, dt
 
       double precision fp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision fm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -403,24 +395,27 @@ c    # -----------------------------------------------------------------
       double precision gm_bottom(mx,meqn),gm_top(mx,meqn)
 
       integer i,j,m
+      double precision dtdx, dtdy
 
+      dtdx = dt*dx
+      dtdy = dt*dy
       do j = 1,my
          do m = 1,meqn
-            fp_left(j,m) = fp_left(j,m) - fp(1,j,m)
-            fm_left(j,m) = fm_left(j,m) + fm(1,j,m)
+            fp_left(j,m) = fp_left(j,m) - dtdy*fp(1,j,m)
+            fm_left(j,m) = fm_left(j,m) + dtdy*fm(1,j,m)
 
-            fp_right(j,m) = fp_right(j,m) - fp(mx+1,j,m)
-            fm_right(j,m) = fm_right(j,m) + fm(mx+1,j,m)
+            fp_right(j,m) = fp_right(j,m) - dtdy*fp(mx+1,j,m)
+            fm_right(j,m) = fm_right(j,m) + dtdy*fm(mx+1,j,m)
          enddo
       enddo
 
       do i = 1,mx
          do m = 1,meqn
-            gp_bottom(i,m) = gp_bottom(i,m) - gp(i,1,m)
-            gm_bottom(i,m) = gm_bottom(i,m) + gm(i,1,m)
+            gp_bottom(i,m) = gp_bottom(i,m) - dtdx*gp(i,1,m)
+            gm_bottom(i,m) = gm_bottom(i,m) + dtdx*gm(i,1,m)
 
-            gp_top(i,m) = gp_top(i,m) - gp(i,my+1,m)
-            gm_top(i,m) = gm_top(i,m) + gm(i,my+1,m)
+            gp_top(i,m) = gp_top(i,m) - dtdx*gp(i,my+1,m)
+            gm_top(i,m) = gm_top(i,m) + dtdx*gm(i,my+1,m)
          enddo
       enddo
 
@@ -430,12 +425,14 @@ c    # -----------------------------------------------------------------
 
 
       subroutine clawpack46_accumulate_riemann_problem(mx,my,mbc,meqn,
-     &      maux,mside,idir,iside,qc,auxc,qfine,auxfine,rp_accum,
+     &      maux, dx,dy,dt,
+     &      mside,idir,iside,qc,auxc,qfine,auxfine,rp_accum,
      &      rpn2_cons,ql,qr,auxl,auxr,flux_diff)
 
       implicit none
 
       integer mx,my,mbc,meqn, maux, iside, mside, idir
+      double precision dx,dy,dt
 
       double precision qc(mside,meqn)
       double precision auxc(mside,maux)
@@ -448,6 +445,10 @@ c    # -----------------------------------------------------------------
       double precision flux_diff(meqn)
 
       integer i,j,m
+      double precision dtdx, dtdy
+
+      dtdx = dt*dx
+      dtdy = dt*dy
 
       if (idir .eq. 0) then
          do j = 1,my
@@ -476,7 +477,7 @@ c              # right side
             call rpn2_cons(meqn,maux,idir,ql,qr,auxl,auxr,flux_diff)
 
             do m = 1,meqn
-               rp_accum(j,m) = rp_accum(j,m) + flux_diff(m)
+               rp_accum(j,m) = rp_accum(j,m) + dtdy*flux_diff(m)
             enddo
          enddo
       elseif (idir .eq. 1) then
@@ -506,7 +507,7 @@ c              # top side
             call rpn2_cons(meqn,maux,idir,ql,qr,auxl,auxr,flux_diff)
 
             do m = 1,meqn
-               rp_accum(i,m) = rp_accum(i,m) + flux_diff(m)
+               rp_accum(i,m) = rp_accum(i,m) + dtdx*flux_diff(m)
             enddo
          enddo
       endif

@@ -82,6 +82,7 @@ void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
                                                           CLAWPACK46_ACCUMULATE_CONS_UPDATES)
 
 void CLAWPACK46_ACCUMULATE_CONS_UPDATES(int* mx, int* my, int* mbc, int* meqn,
+                                        double* dx, double* dy, double* dt, 
                                         int* patchno,
                                         double fp[], double fm[],
                                         double gp[], double gm[],
@@ -93,8 +94,9 @@ void CLAWPACK46_ACCUMULATE_CONS_UPDATES(int* mx, int* my, int* mbc, int* meqn,
 
 #define CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM FCLAW_F77_FUNC(clawpack46_accumulate_riemann_problem, \
                                                              CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM)
-void CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(int* mx,int* my,int* mbc,int* meqn,
-             int* maux,int* mside,int* idir,int* iside, double qc[], 
+void CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(int* mx,int* my,int* mbc,int* meqn, int* maux,
+             double* dx, double *dy, double *dt,                              
+             int* mside,int* idir,int* iside, double qc[], 
              double auxc[], double qfine[], double auxfine[], double rp_accum[],
              fc2d_clawpack46_rpn2_cons_t rpn2_cons,
              double ql[], double qr[], double auxl[], double auxr[],
@@ -125,7 +127,7 @@ void CLAWPACK46_FORT_CONS_COARSE_TO_FINE(const int* mx,const int* my,
 
 void  CLAWPACK46_FORT_CONS_COARSE_CORRECT(const int* mx,const int* my,
                                           const int *mbc,const int *meqn,
-                                          const double *dt, const double *dx, 
+                                          const double *dx, 
                                           const double *dy,int maskfine[],
                                           double qcoarse[], double qfine_dummy[],
                                           const int* idir,const int* iface_coarse,
