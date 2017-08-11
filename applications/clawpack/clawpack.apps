@@ -42,6 +42,9 @@ include applications/clawpack/advection/2d/hemisphere/Makefile.am
 ## sphere (cubed-sphere and pillow-disk)
 include applications/clawpack/advection/2d/sphere/Makefile.am
 
+## Advection in conservative  form (unit square)
+include applications/clawpack/advection/2d/swirl_cons/Makefile.am
+
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
 ## ----------------------------------------------------------
@@ -59,6 +62,8 @@ include applications/clawpack/shallow/2d/radialdam/Makefile.am
 ## Euler
 include applications/clawpack/euler/2d/shockbubble/Makefile.am
 include applications/clawpack/euler/2d/quadrants/Makefile.am
+
+
 
 
 ## ---------------------Transport on the sphere ---------------------------- 
@@ -83,8 +88,6 @@ include applications/clawpack/advection/2d/torthem/Makefile.am
 ## standard distribution
 ## ------------------------------------------------------------------------
 if FCLAW_ENABLE_DEVELOPMENT
-
-include applications/clawpack/advection/2d/swirl_cons/Makefile.am
 
 ## Third order scalar advection (Christiane Helzel, Univ. Dusseldorf)
 #include applications/clawpack/advection/2d/adv_order3/Makefile.am

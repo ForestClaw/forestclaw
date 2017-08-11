@@ -31,8 +31,8 @@ ContourValues = [];
 
 %---------------------------------
 
-UserMap1d = 0;
-ScatterStyle = setplotstyle('ko','go','yo','mx','bo','ro');
+UserMap1d = 1;
+ScatterStyle = setplotstyle('ro','go','ro','go','bo','ro');
 
 ShowUnderOverShoots = 0;
 PlotParallelPartitions = 0;

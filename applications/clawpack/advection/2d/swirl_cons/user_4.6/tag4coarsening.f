@@ -36,10 +36,6 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-c     # Don't coarsen for now.
-      tag_patch = 0    
-      return
-
       call user_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
@@ -71,7 +67,7 @@ c     # Don't coarsen for now.
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if (qmax - qmin .gt. coarsen_threshold) then
+            if (q(i,j,mq) .gt. coarsen_threshold) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
                tag_patch = 0

@@ -1,14 +1,25 @@
-s = 0;
-axis([-s 1+s -s 1+s])
-daspect([1 1 1]);
-axis on;
-
-ex = 1;
+% s = 0;
+% axis([-s 1+s -s 1+s])
+% daspect([1 1 1]);
+% axis on;
+% 
+ex = 0;
 lstr = 'no limiter';
 mstr = 'QS';
 
-
-if (ShowUnderOverShoots == 1)
+if (PlotType == 4)
+    hold on;
+    [grids, soln] = test_cons();
+    mg =length(grids);
+    solnq = soln{Frame+1}.q;
+    for m = 1:mg
+        g = grids{m};
+        q = solnq{m};
+        plot(g.xc(:),q(:),'bx','linewidth',2);
+    end
+    axis([0 1 0 3.1]);
+    hold off;    
+elseif (ShowUnderOverShoots == 1)
     qlo = 0;
     qhi = 1;
     under_label = sprintf('%3.1f - %7.1e',qlo,qlo-qmin);
@@ -17,7 +28,9 @@ if (ShowUnderOverShoots == 1)
     fprintf('%-10s %12.4e\n','qmax',qmax);
     colorbar_underover(under_label,over_label);
 else
-    if (ex == 1)
+    if (ex == 0)
+        ca = [0 9];
+    elseif (ex == 1)
         ca = [0 9];
     else
         ca = [0 16];
@@ -28,6 +41,9 @@ else
     % title(sprintf('Example %d',ex),'fontsize',18);
     title(sprintf('%s (%s)',mstr,lstr),'fontsize',18);
 
+    cv = linspace(ca(1),ca(2),11);
+    % drawcontourlines(cv);
+    
     one_patch = length(amrdata) == 1;
     if (one_patch)
         figure(2);  
@@ -43,19 +59,21 @@ else
         % title(sprintf('Example %d',ex),'fontsize',18);
         title(sprintf('%s (%s)',mstr,lstr),'fontsize',18);
         figure(1);    
+        
     end
+    setpatchborderprops('linewidth',1);
+    showpatchborders;
+    daspect([1 1 1]);
+    view(2);        
     
+    fprintf('%-10s %12.4e\n','qmin',qmin);
+    fprintf('%-10s %12.4e\n','qmax',qmax);    
 end
-fprintf('%-10s %12.4e\n','qmin',qmin);
-fprintf('%-10s %12.4e\n','qmax',qmax);
 
 
-showpatchborders;
-setpatchborderprops('linewidth',1);
-view(2);
 
 set(gca,'fontsize',16);
-set(gca,'box','on');
+% set(gca,'box','on');
 
 NoQuery = 0;
 prt = false;
