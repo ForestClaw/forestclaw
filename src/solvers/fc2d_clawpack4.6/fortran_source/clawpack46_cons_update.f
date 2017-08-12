@@ -198,8 +198,8 @@ c    # on fine grids.
 
       double precision qc0(my,meqn), auxc0(my,maux)
       double precision qc1(my,meqn), auxc1(my,maux)
-      double precision qc2(my,meqn), auxc2(my,maux)
-      double precision qc3(my,meqn), auxc3(my,maux)
+      double precision qc2(mx,meqn), auxc2(mx,maux)
+      double precision qc3(mx,meqn), auxc3(mx,maux)
 
       integer*8 transform_ptr
 
@@ -520,13 +520,10 @@ c              # top side
       integer i,j,mx,my, idir
       logical i1, j1
 
-      if (idir .eq. 0) then
-         j1 = 1 .le. j .and. j .le. my
-         is_valid_correct = j1
-      else
-         i1 = 1 .le. i .and. i .le. mx
-         is_valid_correct = i1
-      endif
+      i1 = 1 .le. i .and. i .le. mx
+      j1 = 1 .le. j .and. j .le. my
+
+      is_valid_correct = xor(i1,j1)
 
 
       end
