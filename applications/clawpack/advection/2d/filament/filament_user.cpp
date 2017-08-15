@@ -72,6 +72,7 @@ void filament_link_solvers(fclaw2d_global_t *glob)
             clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
             clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV;
         }
+        clawpack46_vt->rpn2_cons = &RPN2_CONS_UPDATE;
 
     }
     else if (user->claw_version == 5)

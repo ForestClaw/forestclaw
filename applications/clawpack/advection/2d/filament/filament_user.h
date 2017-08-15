@@ -84,6 +84,13 @@ void filament_patch_setup_manifold(fclaw2d_global_t *glob,
                                    int this_patch_idx);
 
 
+#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+
+void RPN2_CONS_UPDATE(int* meqn, int* maux, int* idir,
+                      double ql[], double qr[], double auxl[],
+                      double auxr[], double flux_diff[]);
+
+
 #ifdef __cplusplus
 #if 0
 {
