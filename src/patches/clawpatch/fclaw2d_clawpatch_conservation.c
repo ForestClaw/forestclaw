@@ -43,8 +43,8 @@ void set_snan(double* f)
       "NaNs, Uninitialized Variables, and C++"
       http://codingcastles.blogspot.fr/2008/12/nans-in-c.html
     */
-    // *((long long*)&f) = 0x7ff0000000000001LL;
-    *f = -9999.0;
+    *((long long*)&f) = 0x7ff0000000000001LL;
+    // *f = -9999.0;
 }
 
 

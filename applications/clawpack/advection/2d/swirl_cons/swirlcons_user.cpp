@@ -35,44 +35,73 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
 
-#include "../all/advection_user_fort.h"
+#include "../all/advection_user_fort.h"  
 
 void swirlcons_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
-    fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
+    fclaw2d_vtable_t                     *vt = fclaw2d_vt();
+    fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
 
+    fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
+    const user_options_t* user = swirlcons_get_options(glob);
+
+    /* ForestClaw functions */
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
-
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    /* ClawPatch specific functions */
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
 
+    /* Clawpack specific functions */
+    clawpack46_vt->qinit = &CLAWPACK46_QINIT;
 
-    const user_options_t* user = swirlcons_get_options(glob);
-    fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+    /* Patch specific functions */
+    patch_vt->setup   = &swirlcons_patch_setup_manifold;
 
-    clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
-    clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
-    clawpack46_vt->rpt2      = &RPT2CONS;
-    clawpack46_vt->rpn2_cons = &RPN2_CONS_UPDATE;
 
+    switch(user->mapping)
+    {
+        case 0:
+            clawpack46_vt->rpt2      = &RPT2CONS;
+            clawpack46_vt->rpn2_cons = &RPN2_CONS_UPDATE;
+            break;
+        case 1:
+        case 2:
+            clawpack46_vt->rpt2      = &RPT2CONS_MANIFOLD;      
+            clawpack46_vt->rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+
+            break;
+    }
+
+    clawopt->use_fwaves = 0;
     switch(user->rp_solver)
     {
         case 1:
-            clawopt->use_fwaves = 0;
-            clawpack46_vt->rpn2      = &RPN2CONS_QS; 
+            if (user->mapping == 0)
+            {
+                clawpack46_vt->rpn2      = &RPN2CONS_QS; 
+            }
+            else
+            {
+                clawpack46_vt->rpn2      = &RPN2CONS_QS_MANIFOLD; 
+            }
             break; 
 
         case 2:
-            clawopt->use_fwaves = 0;
             clawpack46_vt->rpn2      = &RPN2CONS_WD; 
             break; 
 
         case 3:
-            clawopt->use_fwaves = 0;
-            clawpack46_vt->rpn2      = &RPN2CONS_EC; 
+            if (user->mapping == 0)
+            {
+                clawpack46_vt->rpn2      = &RPN2CONS_EC;                 
+            }
+            else
+            {
+                clawpack46_vt->rpn2      = &RPN2CONS_EC_MANIFOLD;                                 
+            }
             break;
 
         case 4:
@@ -89,6 +118,54 @@ void swirlcons_problem_setup(fclaw2d_global_t* glob)
     int ex = user->example;
     SWIRL_SETPROB(&ex);
 }
+
+
+void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
+                                    fclaw2d_patch_t *this_patch,
+                                    int this_block_idx,
+                                    int this_patch_idx)
+{
+    const user_options_t* user = swirlcons_get_options(glob);
+
+    int mx,my,mbc,maux;
+    double xlower,ylower,dx,dy;
+    double *aux,*edgelengths,*area, *curvature;
+    double *xp, *yp, *zp, *xd, *yd, *zd;
+    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
+
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+                                  &xd,&yd,&zd,&area);
+
+    fclaw2d_clawpatch_metric_scalar(glob, this_patch,&area,&edgelengths,
+                                    &curvature);
+
+    fclaw2d_clawpatch_metric_vector(glob,this_patch,
+                                    &xnormals, &ynormals,
+                                    &xtangents, &ytangents,
+                                    &surfnormals);
+
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+
+    if (user->mapping == 0)
+    {
+        int maxmx, maxmy;
+        maxmx = mx;
+        maxmy = my;
+        CLAWPACK46_SETAUX(&maxmx, &maxmy, &mbc,&mx,&my,&xlower,&ylower,
+                          &dx,&dy,&maux,aux);
+    }
+    else 
+    {
+        CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                                   &dx,&dy,&maux,aux,&this_block_idx,
+                                   xp,yp,zp,area,
+                                   edgelengths,xnormals,ynormals,surfnormals);
+    }
+}
+
 
 
 

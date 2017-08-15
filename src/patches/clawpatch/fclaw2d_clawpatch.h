@@ -120,6 +120,12 @@ void fclaw2d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
                                      double **area,double **edgelengths,
                                      double **curvature);
 
+void fclaw2d_clawpatch_metric_vector(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch* this_patch,
+                                     double **xnormals, double **ynormals,
+                                     double **xtangents, double **ytangents,
+                                     double **surfnormals);
+
 void fclaw2d_clawpatch_metric_data(struct fclaw2d_global* glob,
                                    struct fclaw2d_patch* this_patch,
                                    double **xp, double **yp, double **zp,

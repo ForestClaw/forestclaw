@@ -279,8 +279,11 @@ void clawpatch_build_from_fine(fclaw2d_global_t *glob,
         fclaw2d_metric_average_area(glob,fine_patches,coarse_patch,
                                     blockno, coarse_patchno, fine0_patchno);
 
-        metric_setup(glob,coarse_patch,blockno,coarse_patchno);
+        metric_setup(glob,coarse_patch,blockno,coarse_patchno);        
     }
+
+    fclaw2d_clawpatch_cons_update_metric(glob,coarse_patch,blockno,coarse_patchno);
+
 }
 
 static
@@ -534,6 +537,51 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
     fclaw2d_clawpatch_timesync_data(glob,neighbor_patch,time_interp,&qneighbor,&meqn);
+
+#if 0
+    /* We only need to correct actual patches, not ghost patches, or 
+    time interpolated patches */
+    if (!(time_interp || fclaw2d_patch_is_ghost(coarse_patch)))
+    {
+        /* Add correction to coarse grid.  Correction will be zero at start of run. */ 
+
+        fclaw2d_clawpatch_cons_update_t* cuthis = 
+                  fclaw2d_clawpatch_get_cons_update(glob,this_patch);
+
+        fclaw2d_clawpatch_cons_update_t* cuneighbor = 
+              fclaw2d_clawpatch_get_cons_update(glob,neighbor_patch);
+
+        /* create dummy fine grid to handle indexing between blocks */
+        double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
+        int *maskneighbor = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
+
+        /* Include this for debugging */
+        int this_blockno, this_patchno,globnum,level;
+        int neighbor_blockno, neighbor_patchno;
+        fclaw2d_patch_get_info2(glob->domain,this_patch,&neighbor_blockno, &this_patchno,
+                                &globnum,&level);
+
+        fclaw2d_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
+                                &neighbor_patchno,&globnum,&level);
+
+        clawpatch_vt->fort_cons_copy_correct(&mx,&my,&mbc,&meqn,&idir,&iface,
+                                             cuthis->area[0], cuthis->area[1], 
+                                               cuthis->area[2], cuthis->area[3],
+                                               qthis,
+                                               cuthis->fp[0],cuthis->fm[1],
+                                               cuthis->gp[0],cuthis->gm[1],
+                                               cuneighbor->fm[0],cuneighbor->fp[1],
+                                               cuneighbor->gm[0],cuneighbor->gp[1],
+                                               cuneighbor->rp[0],cuneighbor->rp[1],
+                                               cuneighbor->rp[2],cuneighbor->rp[3],
+                                               maskneighbor,qneighbor_dummy,
+                                               &transform_data);
+
+
+        FCLAW_FREE(qneighbor_dummy);
+        FCLAW_FREE(maskneighbor);   
+    }
+#endif
 
     clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
 }
@@ -1377,6 +1425,22 @@ void fclaw2d_clawpatch_metric_scalar(fclaw2d_global_t* glob,
     *curvature   = cp->curvature.dataPtr();
     *edgelengths = cp->edge_lengths.dataPtr();
 }
+
+void fclaw2d_clawpatch_metric_vector(fclaw2d_global_t* glob,
+                                     fclaw2d_patch_t* this_patch,
+                                     double **xnormals, double **ynormals,
+                                     double **xtangents, double **ytangents,
+                                     double **surfnormals)
+{
+    /* or just call the member functions? */
+    fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
+    *xnormals    = cp->xface_normals.dataPtr();
+    *ynormals    = cp->yface_normals.dataPtr();
+    *xtangents   = cp->xface_tangents.dataPtr();
+    *ytangents   = cp->yface_tangents.dataPtr();
+    *surfnormals = cp->surf_normals.dataPtr();
+}
+
 
 
 fclaw2d_clawpatch_cons_update_t* 

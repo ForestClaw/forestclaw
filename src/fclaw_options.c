@@ -292,7 +292,8 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
     if (fclaw_opt->trapfpe)
     {
         fclaw_global_infof("Enabling floating point traps\n");
-        feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
+        // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
+        feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
     }
 
     return FCLAW_NOEXIT;

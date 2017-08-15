@@ -1,9 +1,9 @@
-% s = 0;
-% axis([-s 1+s -s 1+s])
-% daspect([1 1 1]);
-% axis on;
-% 
-ex = 0;
+s = 0.05;
+axis([-s 1+s -s 1+s])
+daspect([1 1 1]);
+axis on;
+
+ex = 3;
 lstr = 'no limiter';
 mstr = 'QS';
 
@@ -28,12 +28,16 @@ elseif (ShowUnderOverShoots == 1)
     fprintf('%-10s %12.4e\n','qmax',qmax);
     colorbar_underover(under_label,over_label);
 else
-    if (ex == 0)
-        ca = [0 9];
-    elseif (ex == 1)
-        ca = [0 9];
-    else
-        ca = [0 16];
+    switch ex
+        case 0
+            ca = [0 9];
+        case 1
+            ca = [0 40];
+        case 2
+            ca = [0 16];    
+        case 3
+            ca = [0,1.5];
+            ca = 1e-15*[-1,1];
     end    
     colormap(parula);
     colorbar;
@@ -85,3 +89,4 @@ end
 shg
 
 clear afterframe;
+clear mapc2m;

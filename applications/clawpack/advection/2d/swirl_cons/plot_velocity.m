@@ -21,8 +21,12 @@ y = x;
 
 s = 1.5;
 quiver(xm,ym,um,vm,s);
+hold on;
+plot([0 1 1 0 0],[0 0 1 1 0],'k');
+
 daspect([1 1 1]);
-axis([0 1 0 1]);
+s = 0.05;
+axis([-s 1+s -s 1+s]);
 title(sprintf('Example %d : Velocity',ex),'fontsize',18);
 set(gca,'fontsize',16);
 xlabel('x','fontsize',16);
@@ -57,6 +61,9 @@ switch example
     case 2
         smin = 0;
         smax = 0.5;
+    case 3
+        smin = 0;
+        smax = 2*sqrt(2);
 end
 caxis([smin smax]);
 daspect([1 1 1]);
@@ -111,7 +118,7 @@ global example
 switch example
     case 0
         ucc = @(x,y) cos(2*pi*x) + 2.d0;
-        vcc = @(x,y) cos(2*pi*y) + 2.d0;
+        vcc = @(x,y) cos(2*pi*y) + 2.d0;        
     case {1,2}        
         if (example == 1)
             a = 0.5;
@@ -122,6 +129,9 @@ switch example
         s = sqrt(2)/2;
         ucc = @(x,y) s*(cos(pi*x).^2 + a);
         vcc = @(x,y) s*(sin(pi*y).^2 + a);
+    case 3
+        ucc = @(x,y) sin(2*pi*x);
+        vcc = @(x,y) sin(2*pi*y);
 end
 
 u = ucc(x,y);

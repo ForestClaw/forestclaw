@@ -39,10 +39,17 @@ static void *
 swirlcons_register (user_options_t *user, sc_options_t * opt)
 {
     sc_options_add_int (opt, 0, "example", &user->example, 1,
-                           "1 : u(x) > 0; 2: u(x) changes sign (1,2) [1]");
+                           "Velocity field choice (0-3) [1]");
 
-    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 1,
-                           "Conservative riemann solver (1-4) [T]");
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                           "Mapping parameter alpha [0.4]");
+
+    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 3,
+                           "Conservative Riemann solver (1-4) [3]");
+
+    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
+                           "Mapping (0=no map; 1=5-patch) [0]");
+
     user->is_registered = 1;
 
     return NULL;
@@ -175,23 +182,50 @@ const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob)
 /* ------------------------- ... and here ---------------------------- */
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
+                                user_options_t *user)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    /* Map unit square to disk using mapc2m_disk.f */
-    fclaw_opt->manifold = 0;
-    // conn = p4est_connectivity_new_unitsquare();
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont = fclaw2d_map_new_nomap_brick(brick);
+
+    double rotate[2];
+    rotate[0] = 0;
+    rotate[1] = 0;
+
+    switch (user->mapping) {
+    case 0:
+        /* Square brick domain */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_nomap_brick(brick);
+        break;
+
+    case 1:
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_cart(brick,fclaw_opt->scale,
+                                    fclaw_opt->shift,
+                                    rotate);
+        break;
+        
+    case 2:
+        /* Five patch square domain */
+        conn = p4est_connectivity_new_disk ();
+        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,fclaw_opt->shift,
+                                          rotate,user->alpha);
+        break;
+
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
+
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
@@ -264,7 +298,7 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt);
+        domain = create_domain(mpicomm, fclaw_opt,user_opt);
     
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();

@@ -40,24 +40,50 @@ typedef struct user_options
 {
     int rp_solver;
     int example;
+    int mapping;
+    double alpha;
     int is_registered;
 
 } user_options_t;
 
+struct fclaw2d_global;
+struct fclaw2d_patch;
+
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
 void SWIRL_SETPROB(int* example);
 
-void swirlcons_link_solvers(fclaw2d_global_t *glob);
+void swirlcons_link_solvers(struct fclaw2d_global *glob);
 
-void swirlcons_problem_setup(fclaw2d_global_t* glob);
+void swirlcons_problem_setup(struct fclaw2d_global* glob);
 
-const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob);
+const user_options_t* swirlcons_get_options(struct fclaw2d_global* glob);
+
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double rotate[],
+                                                 const double alpha);
+
+void swirlcons_patch_setup_manifold(struct fclaw2d_global *glob,
+                                    struct fclaw2d_patch *this_patch,
+                                    int this_block_idx,
+                                    int this_patch_idx);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
+                                             const double scale[],
+                                             const double shift[],
+                                             const double rotate[]);
 
 #define RPN2CONS_QS FCLAW_F77_FUNC(rpn2cons_qs,RPN2CONS_QS)
 void RPN2CONS_QS(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
                  const int* mbc,const int* mx, double ql[], double qr[],
                  double auxl[], double auxr[], double wave[],
                  double s[], double amdq[], double apdq[]);
+
+#define RPN2CONS_QS_MANIFOLD FCLAW_F77_FUNC(rpn2cons_qs_manifold,RPN2CONS_QS_MANIFOLD)
+void RPN2CONS_QS_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                          const int* mbc,const int* mx, double ql[], double qr[],
+                          double auxl[], double auxr[], double wave[],
+                          double s[], double amdq[], double apdq[]);
 
 #define RPN2CONS_WD FCLAW_F77_FUNC(rpn2cons_wd,RPN2CONS_WD)
 void RPN2CONS_WD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
@@ -71,6 +97,13 @@ void RPN2CONS_EC(const int* ixy,const int* maxm, const int* meqn, const int* mwa
                  double auxl[], double auxr[], double wave[],
                  double s[], double amdq[], double apdq[]);
 
+#define RPN2CONS_EC_MANIFOLD FCLAW_F77_FUNC(rpn2cons_ec_manifold,RPN2CONS_EC_MANIFOLD)
+void RPN2CONS_EC_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                          const int* mbc,const int* mx, double ql[], double qr[],
+                          double auxl[], double auxr[], double wave[],
+                          double s[], double amdq[], double apdq[]);
+
+
 #define RPN2CONS_FW FCLAW_F77_FUNC(rpn2cons_fw, RPN2CONS_FW)
 void RPN2CONS_FW(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
                  const int* mbc, const int* mx, double ql[], double qr[],
@@ -83,6 +116,13 @@ void RPT2CONS(const int* ixy, const int* maxm, const int* meqn, const int* mwave
               double aux1[], double aux2[], double aux3[], const int* imp,
               double dsdq[], double bmasdq[], double bpasdq[]);
 
+#define RPT2CONS_MANIFOLD FCLAW_F77_FUNC(rpt2cons_manifold, RPT2CONS_MANIFOLD)
+void RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                       const int* mbc, const int* mx, double ql[], double qr[],
+                       double aux1[], double aux2[], double aux3[], const int* imp,
+                       double dsdq[], double bmasdq[], double bpasdq[]);
+
+
 #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
 
 void RPN2_CONS_UPDATE(int* meqn, int* maux, int* idir,
@@ -90,7 +130,27 @@ void RPN2_CONS_UPDATE(int* meqn, int* maux, int* idir,
                       double auxr[], double flux_diff[]);
 
 
+#define RPN2_CONS_UPDATE_MANIFOLD FCLAW_F77_FUNC(rpn2_cons_update_manifold, \
+                                                 RPN2_CONS_UPDATE_MANIFOLD)
 
+void RPN2_CONS_UPDATE_MANIFOLD(int* meqn, int* maux, int* idir,
+                               double ql[], double qr[], double auxl[],
+                               double auxr[], double flux_diff[]);
+
+
+#define CLAWPACK46_SETAUX_MANIFOLD FCLAW_F77_FUNC(clawpack46_setaux_manifold, \
+                                               CLAWPACK46_SETAUX_MANIFOLD)
+
+void CLAWPACK46_SETAUX_MANIFOLD(const int* mbc,
+                            const int* mx, const int* my,
+                            const double* xlower, const double* ylower,
+                            const double* dx, const double* dy,
+                            const int* maux, double aux[],
+                            const int* blockno,
+                            double xp[], double yp[], double zp[],
+                            double area[],double edgelengths[],
+                            double xnormals[],double ynormals[],
+                            double surfnormals[]);
 
 #ifdef __cplusplus
 #if 0

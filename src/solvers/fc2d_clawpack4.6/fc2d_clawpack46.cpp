@@ -289,6 +289,8 @@ double clawpack46_step2(fclaw2d_global_t *glob,
     double cflgrid = 0.0;
 
 
+    /* Solve Riemann problem between coarse grid ghost cells and fine grid
+       Does this need to be here?  */
     fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(glob,this_patch);
     {
         double *ql   = FCLAW_ALLOC(double, meqn);
@@ -303,13 +305,11 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
         for(int k = 0; k < 4; k++)
         {
+            int idir = k/2;
+            int iside = k;
+
             if (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE)
             {
-            /* this patch has a coarse grid neighbor on side 'k'. */
-
-                int idir = k/2;
-                int iside = k;
-
                 /* Solve Riemann problems between fine grid ghost values and 
                    coarse grid values using old values */
                 CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(&mx,&my,&mbc,&meqn,&maux,&dt,

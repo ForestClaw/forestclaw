@@ -24,15 +24,15 @@
          i1 = i-2+imp    !#  =  i-1 for amdq,  i for apdq
 
 c        # Lower face (at imp faces)
-         vr = aux2(i1,iface)
          vl = aux1(i1,iface)
+         vr = aux2(i1,iface)
          vhat = (vl+vr)/2.d0
 
          bmasdq(i,1) = min(vhat,0.d0)*asdq(i,1)
 
 c        # Upper face (at imp faces)
-         vr = aux3(i1,iface)
          vl = aux2(i1,iface)
+         vr = aux3(i1,iface)
          vhat = (vl + vr)/2.d0
          bpasdq(i,1) = max(vhat,0.d0)*asdq(i,1)
       enddo
