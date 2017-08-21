@@ -22,7 +22,7 @@
       do i = 2-mbc, mx+mbc
 
          ur = auxl(i,iface)
-         ul = auxL(i-1,iface)         
+         ul = auxr(i-1,iface)         
 
          qrr = ql(i,1)
          qll = qr(i-1,1)

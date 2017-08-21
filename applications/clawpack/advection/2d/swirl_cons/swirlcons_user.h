@@ -126,16 +126,14 @@ void RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const i
 #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
 
 void RPN2_CONS_UPDATE(int* meqn, int* maux, int* idir,
-                      double ql[], double qr[], double auxl[],
-                      double auxr[], double flux_diff[]);
+                      double q[], double aux[], double flux[]);
 
 
 #define RPN2_CONS_UPDATE_MANIFOLD FCLAW_F77_FUNC(rpn2_cons_update_manifold, \
                                                  RPN2_CONS_UPDATE_MANIFOLD)
 
 void RPN2_CONS_UPDATE_MANIFOLD(int* meqn, int* maux, int* idir,
-                               double ql[], double qr[], double auxl[],
-                               double auxr[], double flux_diff[]);
+                               double q[], double aux[], double flux[]);
 
 
 #define CLAWPACK46_SETAUX_MANIFOLD FCLAW_F77_FUNC(clawpack46_setaux_manifold, \

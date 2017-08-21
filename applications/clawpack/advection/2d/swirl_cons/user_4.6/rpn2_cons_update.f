@@ -1,17 +1,17 @@
-      subroutine  rpn2_cons_update(meqn,maux, idir,
-     &                ql,qr,auxl,auxr,fluxdiff)
+      subroutine  rpn2_cons_update(meqn,maux, idir, q,aux,flux)
 
       implicit none
 
-      integer meqn,maux,idir, iface
-      double precision ql(meqn), qr(meqn), auxl(maux), auxr(maux)
-      double precision fluxdiff(meqn)
+      integer meqn,maux,idir
+      double precision q(meqn), aux(maux), flux(meqn)
+      double precision u
 
-c     # Flux function : ur*qr - ul*ql = apdq + amdq
+      integer iface
 
-      
-      iface = idir + 1
-      fluxdiff(1) = auxr(iface)*qr(1) - auxl(iface)*ql(1)
+c     # Cell-centered velocities         
+      iface = idir+1
+      u = aux(iface)
 
+      flux(1) = u*q(1)
 
       end
