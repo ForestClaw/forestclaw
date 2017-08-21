@@ -1,19 +1,20 @@
-c    # -----------------------------------------------------------------     
+c    # -----------------------------------------------------------------
 c    # These are called from ghost filling routines
-c    # -----------------------------------------------------------------     
+c    # -----------------------------------------------------------------
 
 
-c    # Called from averaging routine, using fine grid (possibly from 
-c    # a ghost patch) to compute correction terms.  
-      subroutine clawpack46_fort_cons_coarse_correct(mx,my,mbc,meqn,
+c    # Called from averaging routine, using fine grid (possibly from
+c    # a ghost patch) to compute correction terms.
+      subroutine clawpack46_fort_time_sync_f2c(mx,my,mbc,meqn,
      &                                          idir, iface_coarse,
-     &                                          area0, area1, 
+     &                                          area0, area1,
      &                                          area2, area3,
      &                                          qcoarse,
      &                                          fpcoarse0,fmcoarse1,
      &                                          gpcoarse2,gmcoarse3,
      &                                          fm0, fp1,gm0, gp1,
-     &                                          rp0, rp1, rp2, rp3,
+     &                                          efc0, efc1, efc2, efc3,
+     &                                          eff0, eff1, eff2, eff3,
      &                                          maskfine, qfine_dummy,
      &                                          transform_cptr)
 
@@ -21,9 +22,10 @@ c    # a ghost patch) to compute correction terms.
 
       integer mx,my,mbc,meqn,idir,iface_coarse
 
-      integer maskfine(1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
       double precision qfine_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      integer maskfine(1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision area0(my), area1(my), area2(mx), area3(mx)
 
@@ -37,10 +39,15 @@ c    # a ghost patch) to compute correction terms.
       double precision gm0(mx,meqn)
       double precision gp1(mx,meqn)
 
-      double precision rp0(my,meqn)
-      double precision rp1(my,meqn)
-      double precision rp2(mx,meqn)
-      double precision rp3(mx,meqn)
+      double precision eff0(my,meqn)
+      double precision eff1(my,meqn)
+      double precision eff2(mx,meqn)
+      double precision eff3(mx,meqn)
+
+      double precision efc0(my,meqn)
+      double precision efc1(my,meqn)
+      double precision efc2(mx,meqn)
+      double precision efc3(mx,meqn)
 
       integer*8 transform_cptr
 
@@ -75,15 +82,15 @@ c     # do them all.
          do j = 1,my/2
             jj1 = 2*(j-1) + 1     !! indexing starts at 1
             jj2 = 2*(j-1) + 2
-            deltam = (fm0(jj1,mq) + fm0(jj2,mq)) +
-     &               (rp0(jj1,mq) + rp0(jj2,mq))
-            deltap = (fp1(jj1,mq) + fp1(jj2,mq)) +
-     &               (rp1(jj1,mq) + rp1(jj2,mq))
+            deltam = (fm0(jj1,mq) + fm0(jj2,mq) +
+     &               eff0(jj1,mq) + eff0(jj2,mq))
+            deltap = (fp1(jj1,mq) + fp1(jj2,mq) +
+     &               eff1(jj1,mq) + eff1(jj2,mq))
 
             do jj = jj1,jj2
                do ii = 1,mbc
-                  qfine_dummy(1-ii,jj,mq) = deltam
-                  qfine_dummy(mx+ii,jj,mq) = deltap
+                  qfine_dummy(1-ii,jj,mq) = -deltam
+                  qfine_dummy(mx+ii,jj,mq) = -deltap
                enddo
             enddo
          enddo
@@ -92,13 +99,13 @@ c     # do them all.
             ii1 = 2*(i-1) + 1        !! indexing starts at 1
             ii2 = 2*(i-1) + 2
             deltam = (gm0(ii1,mq) + gm0(ii2,mq) +
-     &               rp2(ii1,mq) + rp2(ii2,mq))
+     &               eff2(ii1,mq) + eff2(ii2,mq))
             deltap = (gp1(ii1,mq) + gp1(ii2,mq) +
-     &               rp3(ii1,mq) + rp3(ii2,mq))
+     &               eff3(ii1,mq) + eff3(ii2,mq))
             do ii = ii1,ii2
                do jj = 1,mbc
-                  qfine_dummy(ii,1-jj,mq) = deltam
-                  qfine_dummy(ii,my+jj,mq) = deltap
+                  qfine_dummy(ii,1-jj,mq) = -deltam
+                  qfine_dummy(ii,my+jj,mq) = -deltap
                enddo
             enddo
          enddo
@@ -129,13 +136,13 @@ c     # Average fine grid onto coarse grid
                if (.not. skip_this_grid) then
                   fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 0) then
-                     deltac = fineval - fpcoarse0(jc,mq) 
+                     deltac = fineval + fpcoarse0(jc,mq) + efc0(jc,mq)
                      areac = area0(jc)
                   else
-                     deltac = fineval - fmcoarse1(jc,mq)
+                     deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq)
                      areac = area1(jc)
                   endif
-                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - deltac/areac
+                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
 
                endif
             enddo
@@ -161,13 +168,13 @@ c     # Average fine grid onto coarse grid
                if (.not. skip_this_grid) then
                   fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 2) then
-                     deltac = fineval - gpcoarse2(ic,mq)
+                     deltac = fineval + gpcoarse2(ic,mq) + efc2(ic,mq)
                      areac = area2(ic)
-                  else               
-                     deltac = fineval - gmcoarse3(ic,mq) 
+                  else
+                     deltac = fineval + gmcoarse3(ic,mq) + efc3(ic,mq)
                      areac = area3(ic)
                   endif
-                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) - deltac/areac
+                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
                endif                    !! skip grid loop
             enddo
          enddo
@@ -175,10 +182,141 @@ c     # Average fine grid onto coarse grid
 
 
       end
-   
-c    # Called from interpolation routine (with possible context 
-c    # switching). This fills in coarse grid values qc/auxc 
-c    # on fine grids. 
+
+
+c     # Exchange edge ghost data with neighboring grid at same level.
+      subroutine fc2d_clawpack46_fort_time_sync_copy(mx,my,mbc,meqn,
+     &                                        idir, this_iface,
+     &                                        area0, area1,
+     &                                        area2, area3,
+     &                                        qthis,
+     &                                        fpthis0,fmthis1,
+     &                                        gpthis2,gmthis3,
+     &                                        fmneighbor0, fpneighbor1,
+     &                                        gmneighbor2, gpneighbor3,
+     &                                        efc0, efc1, efc2, efc3,
+     &                                        eff0, eff1, eff2, eff3,
+     &                                        mask, qneighbor_dummy,
+     &                                        transform_cptr)
+
+      implicit none
+
+      integer mx,my,mbc,meqn,idir,iface_coarse
+
+      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      double precision qneighbor_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      integer mask(1-mbc:mx+mbc,1-mbc:my+mbc)
+
+      double precision area0(my), area1(my), area2(mx), area3(mx)
+
+      double precision fpthis0(my,meqn)
+      double precision fmthis1(my,meqn)
+      double precision gpthis2(mx,meqn)
+      double precision gmthis3(mx,meqn)
+
+      double precision fmneighbor0(my,meqn)
+      double precision fpneighbor1(my,meqn)
+      double precision gmneighbor2(mx,meqn)
+      double precision gpneighbor3(mx,meqn)
+
+c     # These store flux evaluations f(q) at the first layer of ghost 
+c     # cells and the first interior row/column.  Interior values are 
+c     # stored at the '0' index; ghost layer stored at the '1' index.    
+      double precision efthis0(my,meqn,0:1)
+      double precision efthis1(my,meqn,0:1)
+      double precision efthis2(mx,meqn,0:1)
+      double precision efthis3(mx,meqn,0:1)
+
+      double precision efneighbor0(my,meqn,0:1)
+      double precision efneighbor1(my,meqn,0:1)
+      double precision efneighbor2(mx,meqn,0:1)
+      double precision efneighbor3(mx,meqn,0:1)
+
+
+      integer*8 transform_cptr
+
+
+      integer i,j,ibc,jbc,mq, idir
+      integer i1,j1, i2, j2
+
+      idir = iface/2
+
+
+      do mq = 1,meqn
+         do j = 1,my
+            deltam = fpneighbor0(j,mq) + efneighbor0(j,mq)
+            deltap = fpneighbor1(j,mq) + efneighbor1(j,mq)
+
+            qneighbor_dummy(0,j,mq) = -deltam
+            qneighbor_dummy(mx+1,j,mq) = -deltap
+         enddo
+
+         do i = 1,mx
+            deltam = gmneighbor2(i,mq) + efneighbor2(i,mq)
+            deltap = gpneighbor3(i,mq) + efneighbor3(i,mq)
+
+            qneighbor_dummy(i,0,mq) = -deltam
+            qneighbor_dummy(i,my+1,mq) = -deltap
+         enddo
+      enddo
+
+
+
+c     # High side of 'qthis' exchanges with low side of
+c     # 'qneighbor'
+      do mq = 1,meqn
+         if (idir .eq. 0) then
+            do j = 1,my
+               do ibc = 1,mbc
+c                 # Exchange at low side of 'this' grid in
+c                 # x-direction (idir == 0)
+                  if (iface .eq. 0) then
+                     i1 = 1-ibc
+                     j1 = j
+                  elseif (iface .eq. 1) then
+                     i1 = mx+ibc
+                     j1 = j
+                  endif
+                  call fclaw2d_transform_face(i1,j1,i2,j2,
+     &                  transform_ptr)
+
+                  neighborval = qneighbor(i2,j2,mq)
+                  if (iface_this .eq. 0) then
+                    delta = neighborval + fm0()
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+
+               enddo
+            enddo
+         else
+            do jbc = 1,mbc
+               do i = 1,mx
+c                 # Exchange at high side of 'this' grid in
+c                 # y-direction (idir == 1)
+                  if (iface .eq. 2) then
+                     i1 = i
+                     j1 = 1-jbc
+                  elseif (iface .eq. 3) then
+                     i1 = i
+                     j1 = my+jbc
+                  endif
+                  call fclaw2d_transform_face(i1,j1,i2,j2,
+     &                  transform_ptr)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+
+               enddo
+            enddo
+         endif
+      enddo
+      end
+
+
+
+
+
+c    # Called from interpolation routine (with possible context
+c    # switching). This fills in coarse grid values qc/auxc
+c    # on fine grids.
       subroutine clawpack46_fort_cons_coarse_to_fine(mx,my,mbc,maux,
      &       meqn, maskfine, qcoarse,auxcoarse,
      &       qfine_dummy,auxfine_dummy,
@@ -266,7 +404,7 @@ c        # this ensures that we get 'hanging' corners
                endif
             enddo
 c           # Idea is to fill in ghost cells in groups of four
-c           # fine grid ghost cells.  
+c           # fine grid ghost cells.
             if (.not. skip_this_grid) then
                do k = 0,rr2-1
                   iff = i2(0) + df(1,k)
@@ -360,12 +498,12 @@ c     # We only fill in qc arrays which have been set above.
       end
 
 
-c    # -----------------------------------------------------------------     
+c    # -----------------------------------------------------------------
 c    # These are called from step2 routine (after update)
-c    # -----------------------------------------------------------------     
+c    # -----------------------------------------------------------------
 
       subroutine clawpack46_accumulate_cons_updates(mx,my,mbc,meqn,
-     &      dt, patchno,    
+     &      dt, patchno,
      &      el0, el1, el2, el3,
      &      fp,fm,gp,gm,
      &      fp_left,fp_right,
@@ -418,97 +556,94 @@ c    # -----------------------------------------------------------------
       end
 
 
-      subroutine clawpack46_accumulate_riemann_problem(mx,my,mbc,meqn,
+      subroutine clawpack46_evaluate_edge_fluxes(mx,my,mbc,meqn,
      &      maux, dt,
      &      el0, el1, el2, el3,
-     &      mside,idir,iside,qc,auxc,qfine,auxfine,rp_accum,
-     &      rpn2_cons,ql,qr,auxl,auxr,flux_diff)
+     &      q, aux,
+     &      flux0,flux1,flux2,flux3,
+     &      rpn2_cons,qvec,auxvec,flux)
 
       implicit none
 
-      integer mx,my,mbc,meqn, maux, iside, mside, idir
+      integer mx,my,mbc,meqn, maux,idir
       double precision dt
 
       double precision el0(my), el1(my), el2(mx), el3(mx)
 
-      double precision qc(mside,meqn)
-      double precision auxc(mside,maux)
-      double precision rp_accum(mside,meqn)
+      double precision flux0(my,meqn,0:1)
+      double precision flux1(my,meqn,0:1)
+      double precision flux2(my,meqn,0:1)
+      double precision flux3(my,meqn,0:1)
 
-      double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision auxfine(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
-      double precision ql(meqn),qr(meqn),auxl(maux), auxr(maux)
-      double precision flux_diff(meqn)
+      double precision qvec(meqn),auxvec(maux),flux(meqn)
 
-      integer i,j,m
-      double precision elen
+      integer i,j,k,m
 
-      if (idir .eq. 0) then
-         do j = 1,my
-            if (iside .eq. 0) then
-c              # left side
-               do m = 1,maux
-                  auxl(m) = auxc(j,m)
-                  auxr(m) = auxfine(0,j,m)
-               enddo
-               do m = 1,meqn
-                  ql(m) = qc(j,m)
-                  qr(m) = qfine(0,j,m)
-               enddo
-               elen = el0(j)
-            elseif (iside .eq. 1) then
-c              # right side
-               do m = 1,maux
-                  auxl(m) = auxfine(mx+1,j,m)
-                  auxr(m) = auxc(j,m)
-               enddo
-               do m = 1,meqn
-                  ql(m) = qfine(mx+1,j,m)
-                  qr(m) = qc(j,m)
-               enddo
-               elen = el1(j)
-            endif
-
-            call rpn2_cons(meqn,maux,idir,ql,qr,auxl,auxr,flux_diff)
-
+      do j = 1,my
+c        # left side 0 = in; 1 = out
+        idir = 0
+         do k = 0,1
+            do m = 1,maux
+               auxvec(m) = aux(1-k,j,m)
+            enddo
             do m = 1,meqn
-               rp_accum(j,m) = rp_accum(j,m) + dt*elen*flux_diff(m)
+               qvec(m) = q(1-k,j,m)
+            enddo
+            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            do m = 1,meqn
+               flux0(j,m,k) = dt*el0(j)*flux(m)
             enddo
          enddo
-      elseif (idir .eq. 1) then
-         do i = 1,mx
-            if (iside .eq. 2) then
-c              # bottom side
-               do m = 1,maux
-                  auxl(m) = auxc(i,m)
-                  auxr(m) = auxfine(i,0,m)
-               enddo
-               do m = 1,meqn
-                  ql(m) = qc(i,m)
-                  qr(m) = qfine(i,0,m)
-               enddo
-               elen = el2(i)
-            elseif (iside .eq. 3) then
-c              # top side
-               do m = 1,maux
-                  auxl(m) = auxfine(i,my+1,m)
-                  auxr(m) = auxc(i,m)
-               enddo
-               do m = 1,meqn
-                  ql(m) = qfine(i,my+1,m)
-                  qr(m) = qc(i,m)
-               enddo
-               elen = el3(i)
-            endif
 
-            call rpn2_cons(meqn,maux,idir,ql,qr,auxl,auxr,flux_diff)
-
+c        # right side 0 = in; 1 = out
+         do k = 0,1
+            do m = 1,maux
+               auxvec(m) = aux(mx+k,j,m)
+            enddo
             do m = 1,meqn
-               rp_accum(i,m) = rp_accum(i,m) + dt*elen*flux_diff(m)
+               qvec(m) = q(mx+k,j,m)
+            enddo
+            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            do m = 1,meqn
+               flux1(j,m,k) = dt*el1(j)*flux(m)
             enddo
          enddo
-      endif
+      enddo
+
+
+      do i = 1,mx
+c        # bottom side 0 = in; 1 = out
+         idir = 1
+         do k = 0,1
+            do m = 1,maux
+               auxvec(m) = aux(i,1-k,m)
+            enddo
+            do m = 1,meqn
+               qvec(m) = q(i,1-k,m)
+            enddo
+            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            do m = 1,meqn
+               flux2(i,m,k) = dt*el2(i)*flux(m)
+            enddo
+         enddo
+
+c        # Top side 0 = in; 1 = out
+         do k = 0,1
+            do m = 1,maux
+               auxvec(m) = aux(i,my+k,m)
+            enddo
+            do m = 1,meqn
+               qvec(m) = q(i,my+k,m)
+            enddo
+            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            do m = 1,meqn
+               flux3(i,m,k) = dt*el3(i)*flux(m)
+            enddo
+         enddo
+      enddo
 
       end
 

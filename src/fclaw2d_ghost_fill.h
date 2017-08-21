@@ -47,8 +47,9 @@ struct fclaw2d_patch;
 typedef enum fclaw2d_ghost_fill_parallel_mode
 {
     FCLAW2D_BOUNDARY_INTERIOR_ONLY = 0,  /* Don't read parallel patches */
-    FCLAW2D_BOUNDARY_GHOST_ONLY,   /* read parallel patches */
-    FCLAW2D_BOUNDARY_ALL   /* read parallel patches */
+    FCLAW2D_BOUNDARY_GHOST_ONLY,         /* read parallel patches */
+    FCLAW2D_BOUNDARY_ALL,                 /* read parallel patches */
+    FCLAW2D_BOUNDARY_LOCAL_ALL,
 } fclaw2d_ghost_fill_parallel_mode_t;
 
 
@@ -57,6 +58,8 @@ typedef enum fclaw2d_exchange_type
     FCLAW2D_COPY = 1,
     FCLAW2D_AVERAGE,
     FCLAW2D_INTERPOLATE,
+    FCLAW2D_TIME_SYNC_FINE_TO_COARSE,
+    FCLAW2D_TIME_SYNC_COPY,
 } fclaw2d_exchange_type_t;
 
 typedef enum fclaw2d_grid_type
@@ -94,6 +97,20 @@ void fclaw2d_ghost_update(struct fclaw2d_global* glob,
                           double sync_time,
                           int time_interp,
                           fclaw2d_timer_names_t running);
+
+void fclaw2d_ghost_update_async(struct fclaw2d_global* glob,
+                                int fine_level,
+                                int coarse_level,
+                                double sync_time,
+                                int time_interp,
+                                fclaw2d_timer_names_t running);
+
+void fclaw2d_ghost_update_nonasync(struct fclaw2d_global* glob,
+                                   int fine_level,
+                                   int coarse_level,
+                                   double sync_time,
+                                   int time_interp,
+                                   fclaw2d_timer_names_t running);
 
 void fclaw2d_face_neighbor_ghost(struct fclaw2d_global* glob,
                                  int minlevel,

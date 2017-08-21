@@ -93,19 +93,35 @@ void CLAWPACK46_ACCUMULATE_CONS_UPDATES(int* mx, int* my, int* mbc, int* meqn,
                                         double gm_bottom[], double gm_top[]);
     
 
+#if 0
 #define CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM FCLAW_F77_FUNC(clawpack46_accumulate_riemann_problem, \
                                                              CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM)
-void CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(int* mx,int* my,int* mbc,int* meqn, int* maux,
-             double *dt,                              
-             double el0[], double el1[], 
-             double el2[], double el3[],
-             int* mside,int* idir,int* iside, double qc[], 
-             double auxc[], double qfine[], double auxfine[], double rp_accum[],
-             fc2d_clawpack46_rpn2_cons_t rpn2_cons,
-             double ql[], double qr[], double auxl[], double auxr[],
-             double flux_diff[]);
+void CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(int* mx,int* my,int* mbc, 
+                                           int* meqn, int* maux,
+                                           double *dt,                              
+                                           double el0[], double el1[], 
+                                           double el2[], double el3[],
+                                           int* maxm, int* idir, int* iside, 
+                                           double q[], double aux[], double fp[],
+                                           fc2d_clawpack46_rpn2_cons_t rpn2_cons,
+                                           double ql[], double qr[], 
+                                           double auxl[], double auxr[]);
+#endif
 
 
+#define CLAWPACK46_EVALUATE_EDGE_FLUXES FCLAW_F77_FUNC(clawpack46_evaluate_edge_fluxes, \
+                                                       CLAWPACK46_EVALUATE_EDGE_FLUXES)
+
+void CLAWPACK46_EVALUATE_EDGE_FLUXES(int* mx,int* my,int* mbc,int* meqn,
+                                     int* maux, double* dt,
+                                     double el0[], double el1[], double el2[], double el3[],
+                                     double q[], double aux[],
+                                     double flux0[],double flux1[], 
+                                     double flux2[], double flux3[],
+                                     fc2d_clawpack46_rpn2_cons_t rpn2_cons,
+                                     double qvec[], double auxvec[], double flux[]);
+
+#if 0
 #define CLAWPACK46_FORT_CONS_COARSE_TO_FINE FCLAW_F77_FUNC(clawpack46_fort_cons_coarse_to_fine, \
                                                            CLAWPACK46_FORT_CONS_COARSE_TO_FINE) 
 
@@ -123,28 +139,54 @@ void CLAWPACK46_FORT_CONS_COARSE_TO_FINE(const int* mx,const int* my,
                                          double auxc0[], double auxc1[],
                                          double auxc2[], double auxc3[],
                                          struct fclaw2d_transform_data** transform_cptr);
+#endif
 
 
-#define CLAWPACK46_FORT_CONS_COARSE_CORRECT FCLAW_F77_FUNC(clawpack46_fort_cons_coarse_correct, \
-                                                           CLAWPACK46_FORT_CONS_COARSE_CORRECT)
+#define CLAWPACK46_FORT_TIME_SYNC_FC2 FCLAW_F77_FUNC(clawpack46_fort_time_sync_f2c, \
+                                                     CLAWPACK46_FORT_TIME_SYNC_F2C)
 
-void  CLAWPACK46_FORT_CONS_COARSE_CORRECT(const int* mx,const int* my,
-                                          const int *mbc,const int *meqn,
-                                          const int* idir,const int* iface_coarse,
-                                          double area0[], double area1[],
-                                          double area2[], double area3[],
-                                          double qcoarse[], 
-                                          double fmcoarse0[], double fpcoarse1[],
-                                          double gmcoarse2[], double gpcoarse3[],
-                                          double fm0[], double fp1[],
-                                          double gm2[], double gp3[],
-                                          double rp0[], double rp1[],
-                                          double rp2[], double rp3[],
-                                          int maskfine[],
-                                          double qfine_dummy[],
-                                          struct fclaw2d_transform_data** 
-                                          transform_cptr);
+void  CLAWPACK46_FORT_TIME_SYNC_F2C(const int* mx,const int* my,
+                                    const int *mbc,const int *meqn,
+                                    const int* idir,const int* iface_coarse,
+                                    double areac0[], double areac1[],
+                                    double areac2[], double areac3[],
+                                    double qcoarse[], 
+                                    double fmcoarse0[], double fpcoarse1[],
+                                    double gmcoarse2[], double gpcoarse3[],
+                                    double fmfine0[], double fpfine1[],
+                                    double gmfine2[], double gpfine3[],
+                                    double efc0[], double efc1[],
+                                    double efc2[], double efc3[],
+                                    double eff0[], double eff1[],
+                                    double eff2[], double eff3[],
+                                    int maskfine[],
+                                    double qfine_dummy[],
+                                    struct fclaw2d_transform_data** 
+                                    transform_cptr);
 
+
+#define CLAWPACK46_FORT_TIME_SYNC_copy FCLAW_F77_FUNC(clawpack46_fort_time_sync_copy, \
+                                                     CLAWPACK46_FORT_TIME_SYNC_COPY)
+
+void  CLAWPACK46_FORT_TIME_SYNC_COPY(const int* mx,const int* my,
+                                     const int *mbc,const int *meqn,
+                                     const int* idir,const int* iface_coarse,
+                                     double area0[], double area1[],
+                                     double area2[], double area3[],
+                                     double qcoarse[], 
+                                     double fmcoarse0[], double fpcoarse1[],
+                                     double gmcoarse2[], double gpcoarse3[],
+                                     double fmfine0[], double fpfine1[],
+                                     double gmfine2[], double gpfine3[],
+                                     double efc0[], double efc1[],
+                                     double efc2[], double efc3[],
+                                     double eff0[], double eff1[],
+                                     double eff2[], double eff3[],
+                                     int maskfine[],
+                                     double qfine_dummy[],
+                                     struct fclaw2d_transform_data** 
+                                     transform_cptr);
+    
 /* ------------------------------ Time stepping functions ---------------------------- */
 
 #define CLAWPACK46_STEP2_WRAP FCLAW_F77_FUNC(clawpack46_step2_wrap,CLAWPACK46_STEP2_WRAP)

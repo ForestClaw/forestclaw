@@ -288,46 +288,29 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
     double cflgrid = 0.0;
 
+    fclaw2d_clawpatch_cons_update_t* cu = 
+          fclaw2d_clawpatch_get_cons_update(glob,this_patch);
 
-    /* Solve Riemann problem between coarse grid ghost cells and fine grid
-       Does this need to be here?  */
-    fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(glob,this_patch);
+    /* Evaluate fluxes needed in correction terms */
+    if (claw46_vt->rpn2_cons != NULL)
     {
-        double *ql   = FCLAW_ALLOC(double, meqn);
-        double *qr   = FCLAW_ALLOC(double, meqn);
-        double *auxl = FCLAW_ALLOC(double, maux);
-        double *auxr = FCLAW_ALLOC(double, maux);
-        double *fluxdiff = FCLAW_ALLOC(double,meqn);     /* f(qr) - f(ql) = amdq+apdq */
-        int mside = (mx >= my) ? mx : my;
+        double *qvec   = FCLAW_ALLOC(double, meqn);
+        double *auxvec = FCLAW_ALLOC(double, maux);
+        double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
-        fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_user_data(this_patch);
-        FCLAW_ASSERT(claw46_vt->rpn2_cons !=  NULL);
 
-        for(int k = 0; k < 4; k++)
-        {
-            int idir = k/2;
-            int iside = k;
+        CLAWPACK46_EVALUATE_EDGE_FLUXES(&mx,&my,&mbc,&meqn,&maux,&dt,
+                                        cu->edgelengths[0],cu->edgelengths[1],
+                                        cu->edgelengths[2],cu->edgelengths[3],
+                                        qold,aux,
+                                        cu->edge_fluxes[0],cu->edge_fluxes[1],
+                                        cu->edge_fluxes[2],cu->edge_fluxes[3],
+                                        claw46_vt->rpn2_cons,
+                                        qvec,auxvec,flux);
 
-            if (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE)
-            {
-                /* Solve Riemann problems between fine grid ghost values and 
-                   coarse grid values using old values */
-                CLAWPACK46_ACCUMULATE_RIEMANN_PROBLEM(&mx,&my,&mbc,&meqn,&maux,&dt,
-                                                      cu->edgelengths[0],cu->edgelengths[1],
-                                                      cu->edgelengths[2],cu->edgelengths[3],
-                                                      &mside, &idir,&iside,
-                                                      cu->qc[k],cu->auxc[k], 
-                                                      qold,aux,cu->rp[k],
-                                                      claw46_vt->rpn2_cons,
-                                                      ql,qr,auxl,auxr,fluxdiff);
-            }
-        }
-
-        FCLAW_FREE(ql);
-        FCLAW_FREE(qr);
-        FCLAW_FREE(auxl);
-        FCLAW_FREE(auxr);
-        FCLAW_FREE(fluxdiff);
+        FCLAW_FREE(qvec);
+        FCLAW_FREE(auxvec);
+        FCLAW_FREE(flux);
     }
 
 
@@ -484,8 +467,8 @@ void fc2d_clawpack46_solver_initialize()
     clawpatch_vt->fort_tag4coarsening        = FC2D_CLAWPACK46_FORT_TAG4COARSENING;
 
     /* Conservation update */
-    clawpatch_vt->fort_cons_coarse_to_fine   = &CLAWPACK46_FORT_CONS_COARSE_TO_FINE;
-    clawpatch_vt->fort_cons_coarse_correct   = &CLAWPACK46_FORT_CONS_COARSE_CORRECT;
+    clawpatch_vt->fort_time_sync_fine_to_coarse   = &CLAWPACK46_FORT_TIME_SYNC_F2C;
+    clawpatch_vt->fort_time_sync_copy        = &CLAWPACK46_FORT_TIME_SYNC_COPY;
 
     /* output functions */
     clawpatch_vt->fort_header_ascii          = FC2D_CLAWPACK46_FORT_HEADER_ASCII;

@@ -122,7 +122,7 @@ typedef void (*clawpatch_fort_average2coarse_t)(const int* mx, const int* my,
                                                 double areacoarse[],double areafine[],
                                                 const int* igrid, const int* manifold);
     
-
+#if 0
 typedef void (*clawpatch_fort_cons_coarse_to_fine_t)(const int* mx,const int* my,
                                                      const int* mbc, const int* maux,
                                                      const int* meqn,
@@ -139,30 +139,79 @@ typedef void (*clawpatch_fort_cons_coarse_to_fine_t)(const int* mx,const int* my
                                                      double auxc2[], double auxc3[],
                                                      struct fclaw2d_transform_data** 
                                                      transform_cptr);
+#endif                                                     
 
-typedef void  (*clawpatch_fort_cons_coarse_correct_t)(const int* mx,
-                                                      const int* my,
-                                                      const int *mbc,
-                                                      const int *meqn,
-                                                      const int* idir,
-                                                      const int* iface_coarse,
-                                                      double area0[], double area1[],
-                                                      double area2[], double area3[],
-                                                      double qcoarse[], 
-                                                      double fmcoarse0[], 
-                                                      double fpcoarse1[],
-                                                      double gmcoarse2[], 
-                                                      double gpcoarse3[],
-                                                      double fm0[], double fp1[],
-                                                      double gm2[], double gp3[],
-                                                      double rp0[], double rp1[],
-                                                      double rp2[], double rp3[],
-                                                      int maskfine[],
-                                                      double qfine_dummy[],
-                                                      struct fclaw2d_transform_data** 
-                                                      transform_cptr);
+#if 0
+    clawpatch_vt->fort_time_sync_fine_to_coarse(&mx,&my,&mbc,&meqn,&idir,&iface,
+                                                cucoarse->area[0], cucoarse->area[1], 
+                                                cucoarse->area[2], cucoarse->area[3],
+                                                qcoarse,
+                                                cucoarse->fp[0],cucoarse->fm[1],
+                                                cucoarse->gp[0],cucoarse->gm[1],
+                                                cufine->fm[0],cufine->fp[1],
+                                                cufine->gm[0],cufine->gp[1],
+                                                cucoarse->edge_fluxes[0],
+                                                cucoarse->edge_fluxes[1],
+                                                cucoarse->edge_fluxes[2],
+                                                cucoarse->edge_fluxes[3],
+                                                cufine->edge_fluxes[0],
+                                                cufine->edge_fluxes[1],
+                                                cufine->edge_fluxes[2],
+                                                cufine->edge_fluxes[3],
+                                                maskneighbor,qneighbor_dummy,
+                                                &transform_data);
+#endif                                                
 
-/* ----------------------------- time stepping ------------------------------ */
+typedef void  (*clawpatch_fort_time_sync_f2c_t)(const int* mx,
+                                                const int* my,
+                                                const int *mbc,
+                                                const int *meqn,
+                                                const int* idir,
+                                                const int* iface_coarse,
+                                                double area0[], double area1[],
+                                                double area2[], double area3[],
+                                                double qcoarse[], 
+                                                double fmcoarse0[], 
+                                                double fpcoarse1[],
+                                                double gmcoarse2[], 
+                                                double gpcoarse3[],
+                                                double fmfine0[], double fpfine1[],
+                                                double gmfine2[], double gpfine3[],
+                                                double efc0[], double efc1[],
+                                                double efc2[], double efc3[],
+                                                double eff0[], double eff1[],
+                                                double eff2[], double eff3[],
+                                                int maskfine[],
+                                                double qfine_dummy[],
+                                                struct fclaw2d_transform_data** 
+                                                transform_cptr);
+
+
+typedef void  (*clawpatch_fort_time_sync_copy_t)(const int* mx,
+                                                 const int* my,
+                                                 const int *mbc,
+                                                 const int *meqn,
+                                                 const int* idir,
+                                                 const int* iface_coarse,
+                                                 double area0[], double area1[],
+                                                 double area2[], double area3[],
+                                                 double qcoarse[], 
+                                                 double fmcoarse0[], 
+                                                 double fpcoarse1[],
+                                                 double gmcoarse2[], 
+                                                 double gpcoarse3[],
+                                                 double fmfine0[], double fpfine1[],
+                                                 double gmfine2[], double gpfine3[],
+                                                 double efc0[], double efc1[],
+                                                 double efc2[], double efc3[],
+                                                 double eff0[], double eff1[],
+                                                 double eff2[], double eff3[],
+                                                 int maskfine[],
+                                                 double qfine_dummy[],
+                                                 struct fclaw2d_transform_data** 
+                                                 transform_cptr);
+
+/* ----------------------------------- time stepping ---------------------------------- */
 
 typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
                                             const int *meqn, const int* psize,
@@ -170,7 +219,7 @@ typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const 
                                             double qinterp[],const double* alpha,
                                             const int* ierror);
     
-/* --------------------- Parallel ghost patches --------------------------- */
+/* --------------------------------- Parallel ghost patches --------------------------- */
 
 typedef void (*clawpatch_fort_local_ghost_pack_t)(int *mx, int *my, int *mbc,
                                                   int *meqn, int *mint,

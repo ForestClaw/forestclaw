@@ -424,17 +424,19 @@ void clawpatch_save_step(fclaw2d_global_t* glob,
     my = cp->my;
     meqn = cp->meqn;
 
-    for(j = 0; j < meqn*my; j++)
+#if 0
+    for(j = 0; j < 2*meqn*my; j++)
     {
-        cp->cons_update->qc_save[0][j] = cp->cons_update->qc[0][j];
-        cp->cons_update->qc_save[1][j] = cp->cons_update->qc[1][j];
+        cp->cons_update->edge_fluxes_save[0][j] = cp->cons_update->edge_fluxes[0][j];
+        cp->cons_update->edge_fluxes_save[1][j] = cp->cons_update->edge_fluxes[1][j];
     }
 
-    for(i = 0; i < meqn*mx; i++)
+    for(i = 0; i < 2*meqn*mx; i++)
     {
-        cp->cons_update->qc_save[2][i] = cp->cons_update->qc[2][i];
-        cp->cons_update->qc_save[3][i] = cp->cons_update->qc[3][i];
+        cp->cons_update->edge_fluxes_save[2][i] = cp->cons_update->edge_fluxes[2][i];
+        cp->cons_update->edge_fluxes_save[3][i] = cp->cons_update->edge_fluxes[3][i];            
     }
+#endif    
 }
 
 
@@ -453,18 +455,19 @@ void clawpatch_restore_step(fclaw2d_global_t* glob,
     my = cp->my;
     meqn = cp->meqn;
 
-    for(j = 0; j < meqn*my; j++)
+#if 0
+    for(j = 0; j < 2*meqn*my; j++)
     {
-        cp->cons_update->qc[0][j] = cp->cons_update->qc_save[0][j];
-        cp->cons_update->qc[1][j] = cp->cons_update->qc_save[1][j];
+        cp->cons_update->edge_fluxes[0][j] = cp->cons_update->edge_fluxes_save[0][j];
+        cp->cons_update->edge_fluxes[1][j] = cp->cons_update->edge_fluxes_save[1][j];
     }
 
-    for(i = 0; i < meqn*mx; i++)
+    for(i = 0; i < 2*meqn*mx; i++)
     {
-        cp->cons_update->qc[2][i] = cp->cons_update->qc_save[2][i];
-        cp->cons_update->qc[3][i] = cp->cons_update->qc_save[3][i];
+        cp->cons_update->edge_fluxes[2][i] = cp->cons_update->edge_fluxes_save[2][i];
+        cp->cons_update->edge_fluxes[3][i] = cp->cons_update->edge_fluxes_save[3][i];            
     }
-
+#endif    
 }
 
 static
@@ -538,51 +541,6 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
     fclaw2d_clawpatch_timesync_data(glob,neighbor_patch,time_interp,&qneighbor,&meqn);
 
-#if 0
-    /* We only need to correct actual patches, not ghost patches, or 
-    time interpolated patches */
-    if (!(time_interp || fclaw2d_patch_is_ghost(coarse_patch)))
-    {
-        /* Add correction to coarse grid.  Correction will be zero at start of run. */ 
-
-        fclaw2d_clawpatch_cons_update_t* cuthis = 
-                  fclaw2d_clawpatch_get_cons_update(glob,this_patch);
-
-        fclaw2d_clawpatch_cons_update_t* cuneighbor = 
-              fclaw2d_clawpatch_get_cons_update(glob,neighbor_patch);
-
-        /* create dummy fine grid to handle indexing between blocks */
-        double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
-        int *maskneighbor = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
-
-        /* Include this for debugging */
-        int this_blockno, this_patchno,globnum,level;
-        int neighbor_blockno, neighbor_patchno;
-        fclaw2d_patch_get_info2(glob->domain,this_patch,&neighbor_blockno, &this_patchno,
-                                &globnum,&level);
-
-        fclaw2d_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
-                                &neighbor_patchno,&globnum,&level);
-
-        clawpatch_vt->fort_cons_copy_correct(&mx,&my,&mbc,&meqn,&idir,&iface,
-                                             cuthis->area[0], cuthis->area[1], 
-                                               cuthis->area[2], cuthis->area[3],
-                                               qthis,
-                                               cuthis->fp[0],cuthis->fm[1],
-                                               cuthis->gp[0],cuthis->gm[1],
-                                               cuneighbor->fm[0],cuneighbor->fp[1],
-                                               cuneighbor->gm[0],cuneighbor->gp[1],
-                                               cuneighbor->rp[0],cuneighbor->rp[1],
-                                               cuneighbor->rp[2],cuneighbor->rp[3],
-                                               maskneighbor,qneighbor_dummy,
-                                               &transform_data);
-
-
-        FCLAW_FREE(qneighbor_dummy);
-        FCLAW_FREE(maskneighbor);   
-    }
-#endif
-
     clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
 }
 
@@ -616,51 +574,6 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
     mx = clawpatch_opt->mx;
     my = clawpatch_opt->my;
     mbc = clawpatch_opt->mbc;
-
-    /* We only need to correct actual patches, not ghost patches, or 
-    time interpolated patches */
-    if (!(time_interp || fclaw2d_patch_is_ghost(coarse_patch)))
-    {
-        /* Add correction to coarse grid.  Correction will be zero at start of run. */ 
-
-        fclaw2d_clawpatch_cons_update_t* cufine = 
-                  fclaw2d_clawpatch_get_cons_update(glob,fine_patch);
-
-        fclaw2d_clawpatch_cons_update_t* cucoarse = 
-              fclaw2d_clawpatch_get_cons_update(glob,coarse_patch);
-
-        /* create dummy fine grid to handle indexing between blocks */
-        double *qfine_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
-        int *maskfine = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
-
-        /* Include this for debugging */
-        int coarse_blockno, coarse_patchno,globnum,level;
-        int fine_blockno, fine_patchno;
-        fclaw2d_patch_get_info2(glob->domain,coarse_patch,&coarse_blockno, &coarse_patchno,
-                                &globnum,&level);
-
-        fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, &fine_patchno,
-                                &globnum,&level);
-
-        clawpatch_vt->fort_cons_coarse_correct(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
-                                               cucoarse->area[0], cucoarse->area[1], 
-                                               cucoarse->area[2], cucoarse->area[3],
-                                               qcoarse,
-                                               cucoarse->fp[0],cucoarse->fm[1],
-                                               cucoarse->gp[0],cucoarse->gm[1],
-                                               cufine->fm[0],cufine->fp[1],
-                                               cufine->gm[0],cufine->gp[1],
-                                               cufine->rp[0],cufine->rp[1],
-                                               cufine->rp[2],cufine->rp[3],
-                                               maskfine,qfine_dummy,
-                                               &transform_data);
-
-
-        FCLAW_FREE(qfine_dummy);
-        FCLAW_FREE(maskfine);   
-    }
-
-
 
     int manifold = fclaw_opt->manifold;
     clawpatch_vt->fort_average_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,areacoarse,areafine,
@@ -696,6 +609,7 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
     mbc = clawpatch_opt->mbc;
 
 
+#if 0
     /* Only store coarse grid values from real coarse grids, not 
     time interpolated ones. But we might get coarse values from a ghost patch. */
     if (!time_interp)
@@ -737,6 +651,7 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
         FCLAW_FREE(auxfine_dummy);
         FCLAW_FREE(maskfine);
     }
+#endif    
     
 
     clawpatch_vt->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,

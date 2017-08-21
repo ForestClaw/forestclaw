@@ -233,8 +233,6 @@ void fclaw2d_patch_copy_face(fclaw2d_global_t* glob,
                        time_interp,transform_data);
 }
 
-
-
 void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
                                 fclaw2d_patch_t *coarse_patch,
                                 fclaw2d_patch_t *fine_patch,
@@ -244,7 +242,7 @@ void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
                                 int refratio,
                                 int time_interp,
                                 int igrid,
-                                struct fclaw2d_transform_data* transform_data)
+                                fclaw2d_transform_data_t* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->average_face != NULL);
@@ -538,6 +536,39 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
 
 /* We need to virtualize this because we call it from advance ... */
 
+void fclaw2d_patch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
+                                            fclaw2d_patch_t *coarse_patch,
+                                            fclaw2d_patch_t *fine_patch,
+                                            int idir,
+                                            int igrid,
+                                            int iface_coarse,
+                                            int time_interp,
+                                            fclaw2d_transform_data_t* transform_data)
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    FCLAW_ASSERT(patch_vt->time_sync_coarse_to_fine != NULL);
+
+    patch_vt->time_sync_coarse_to_fine(glob,coarse_patch,fine_patch,idir,
+                                       iface_coarse,time_interp,igrid,
+                                       transform_data);    
+}
+
+/* Correct for metric discontinuities at block boundaries */
+void fclaw2d_patch_time_sync_copy(fclaw2d_global_t* glob,
+                                  fclaw2d_patch_t *this_patch,
+                                  fclaw2d_patch_t *neighbor_patch,
+                                  int iface,
+                                  int time_interp,
+                                  struct fclaw2d_transform_data *transform_data)
+
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    FCLAW_ASSERT(patch_vt->time_sync_copy != NULL);
+
+    patch_vt->time_sync_copy(glob,this_patch,neighbor_patch,iface,
+                            time_interp,transform_data);    
+}
+
 
 /* ----------------------------------- Virtual table ---------------------------------- */
 
@@ -562,6 +593,9 @@ void fclaw2d_patch_vtable_initialize()
     patch_vt->initialize         = NULL;
     patch_vt->physical_bc        = NULL;
     patch_vt->single_step_update = NULL;
+
+    patch_vt->time_sync_fine_to_coarse = NULL;
+    patch_vt->time_sync_copy     = NULL;
 
     /* These are optional */
     patch_vt->setup              = NULL;

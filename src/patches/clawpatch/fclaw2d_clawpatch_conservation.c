@@ -55,11 +55,10 @@ void fclaw2d_clawpatch_cons_update_new(fclaw2d_global_t* glob,
 {
     fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
-    int i,j,k;
+    int k;
 
     int mx = clawpatch_opt->mx;
     int my = clawpatch_opt->my;
-    int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;
 
     fclaw2d_clawpatch_cons_update_t *cu = *cons_update;
@@ -73,28 +72,24 @@ void fclaw2d_clawpatch_cons_update_new(fclaw2d_global_t* glob,
         /* Accumulators */
         cu->fp[k]     = FCLAW_ALLOC_ZERO(double,my*meqn);
         cu->fm[k]     = FCLAW_ALLOC_ZERO(double,my*meqn);
-        cu->rp[k]     = FCLAW_ALLOC_ZERO(double,my*meqn);       /* apdq + amdq = f(qghost) - f(qcourse) */
 
         cu->gp[k]     = FCLAW_ALLOC_ZERO(double,mx*meqn);
         cu->gm[k]     = FCLAW_ALLOC_ZERO(double,mx*meqn);
-        cu->rp[k+2]   = FCLAW_ALLOC_ZERO(double,mx*meqn);     
 
         cu->edgelengths[k]   = FCLAW_ALLOC(double,my);
         cu->edgelengths[k+2] = FCLAW_ALLOC(double,mx);
         cu->area[k]          = FCLAW_ALLOC(double,my);
         cu->area[k+2]        = FCLAW_ALLOC(double,mx);
 
-        /* Coarse grid information */
-        cu->qc[k]          = FCLAW_ALLOC(double,my*meqn);      /* left, right side */
-        cu->qc_save[k]     = FCLAW_ALLOC(double,my*meqn);      /* left, right side */
-        cu->auxc[k]        = FCLAW_ALLOC(double,my*maux);      /* left, right side */
-
-        cu->qc[k+2]        = FCLAW_ALLOC(double,mx*meqn);      /* bottom, top side */
-        cu->qc_save[k+2]   = FCLAW_ALLOC(double,mx*meqn);      /* bottom, top side */
-        cu->auxc[k+2]      = FCLAW_ALLOC(double,mx*maux);      /* bottom, top side */ 
+        cu->edge_fluxes[k]   = FCLAW_ALLOC(double,2*my*meqn);
+        cu->edge_fluxes[k+2] = FCLAW_ALLOC(double,2*mx*meqn);
+#if 0         
+        cu->edge_fluxes_save[k]   = FCLAW_ALLOC(double,2*my*meqn);
+        cu->edge_fluxes_save[k+2] = FCLAW_ALLOC(double,2*mx*meqn);
+#endif        
     }
 
-#ifdef FCLAW_ENABLE_DEBUG
+#if 0
     /* Set qc, auxc to signaling NANS, to make sure we only use valid values */
     for(k = 0; k < 2; k++)
     {
@@ -156,7 +151,6 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
                 {                 
                     cu->fm[k][j] = 0;
                     cu->fp[k][j] = 0;
-                    cu->rp[k][j] = 0;
                 }
             }
             else
@@ -165,7 +159,6 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
                 {
                     cu->gm[k-2][i] = 0;
                     cu->gp[k-2][i] = 0;
-                    cu->rp[k][i] = 0;
                 }
             }
         }     /* coarse grid neighbor */
@@ -196,19 +189,17 @@ void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons
         /* Accumulators */
         FCLAW_FREE(cu->fp[k]);
         FCLAW_FREE(cu->fm[k]);    
-        FCLAW_FREE(cu->rp[k]);    
 
         FCLAW_FREE(cu->gp[k]);    
-        FCLAW_FREE(cu->gm[k]);    
-        FCLAW_FREE(cu->rp[k+2]);
+        FCLAW_FREE(cu->gm[k]);  
 
         /* COARSE GRID information */
-        FCLAW_FREE(cu->qc[k]); 
-        FCLAW_FREE(cu->qc[k+2]); 
-        FCLAW_FREE(cu->qc_save[k]); 
-        FCLAW_FREE(cu->qc_save[k+2]); 
-        FCLAW_FREE(cu->auxc[k]); 
-        FCLAW_FREE(cu->auxc[k+2]); 
+        FCLAW_FREE(cu->edge_fluxes[k]); 
+        FCLAW_FREE(cu->edge_fluxes[k+2]); 
+#if 0        
+        FCLAW_FREE(cu->edge_fluxes_save[k]); 
+        FCLAW_FREE(cu->edge_fluxes_save[k+2]); 
+#endif        
 
         FCLAW_FREE(cu->edgelengths[k]);
         FCLAW_FREE(cu->area[k]);
@@ -218,6 +209,141 @@ void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons
      FCLAW_FREE(*cons_update);
      *cons_update = NULL;
 }
+
+
+
+/* This is a patch call-back */
+void fclaw2d_clawpatch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
+                                                fclaw2d_patch_t* coarse_patch,
+                                                fclaw2d_patch_t* fine_patch,
+                                                int idir,
+                                                int igrid,
+                                                int iface_coarse,
+                                                int time_interp,
+                                                fclaw2d_transform_data_t* transform_data)
+{
+
+    int meqn,mx,my,mbc;
+    double *qcoarse, *qfine;
+    int coarse_blockno, coarse_patchno,globnum,level;
+    int fine_blockno, fine_patchno;
+
+
+    if (time_interp != NULL)
+    {
+        return;
+    }
+
+    /* We don't correct time interpolated grids, since we assume that the time 
+    interpolated average will already have correction information from times 
+    n and n+1 patches.  But we do correct ghost patches, since corrections will be 
+    needed for copying and interpolation.  */
+
+    qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
+    qfine   = fclaw2d_clawpatch_get_q(glob,fine_patch);
+
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
+    mbc = clawpatch_opt->mbc;
+    meqn = clawpatch_opt->meqn;
+
+
+    fclaw2d_clawpatch_cons_update_t* cucoarse = 
+    fclaw2d_clawpatch_get_cons_update(glob,coarse_patch);
+
+    fclaw2d_clawpatch_cons_update_t* cufine = 
+    fclaw2d_clawpatch_get_cons_update(glob,fine_patch);
+
+    /* create dummy fine grid to handle indexing between blocks */
+    double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
+    int *maskneighbor = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
+
+    /* Include this for debugging */
+    fclaw2d_patch_get_info2(glob->domain,coarse_patch,&coarse_blockno, &coarse_patchno,
+                            &globnum,&level);
+
+    fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, 
+                            &fine_patchno,&globnum,&level);
+
+    clawpatch_vt->fort_time_sync_fine_to_coarse(&mx,&my,&mbc,&meqn,&idir,&iface,
+                                                cucoarse->area[0], cucoarse->area[1], 
+                                                cucoarse->area[2], cucoarse->area[3],
+                                                qcoarse,
+                                                cucoarse->fp[0],cucoarse->fm[1],
+                                                cucoarse->gp[0],cucoarse->gm[1],
+                                                cufine->fm[0],cufine->fp[1],
+                                                cufine->gm[0],cufine->gp[1],
+                                                cucoarse->edge_fluxes[0],
+                                                cucoarse->edge_fluxes[1],
+                                                cucoarse->edge_fluxes[2],
+                                                cucoarse->edge_fluxes[3],
+                                                cufine->edge_fluxes[0],
+                                                cufine->edge_fluxes[1],
+                                                cufine->edge_fluxes[2],
+                                                cufine->edge_fluxes[3],
+                                                maskneighbor,qneighbor_dummy,
+                                                &transform_data);
+
+    FCLAW_FREE(qneighbor_dummy);
+    FCLAW_FREE(maskneighbor);       
+}
+
+
+void fclaw2d_clawpatch_time_sync_copy(struct fclaw2d_global* glob,
+                                      struct fclaw2d_patch* this_patch,
+                                      struct fclaw2d_patch* neighbor_patch,
+                                      int this_iface,
+                                      fclaw2d_transform_data_t* transform_data)
+{
+    /* We don't correct time interpolated grids, since we assume that the time 
+    interpolated average will already have correction information from times 
+    n and n+1 patches.  But we do correct ghost patches, since corrections will be 
+    needed for copying and interpolation.  */
+
+    fclaw2d_clawpatch_cons_update_t* cuthis = 
+    fclaw2d_clawpatch_get_cons_update(glob,this_patch);
+
+    fclaw2d_clawpatch_cons_update_t* cuneighbor = 
+    fclaw2d_clawpatch_get_cons_update(glob,neighbor_patch);
+
+    /* create dummy fine grid to handle indexing between blocks */
+    double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
+    int *maskneighbor = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
+
+    /* Include this for debugging */
+    int this_blockno, this_patchno,globnum,level;
+    int neighbor_blockno, neighbor_patchno;
+    fclaw2d_patch_get_info2(glob->domain,this_patch,&neighbor_blockno, &this_patchno,
+                            &globnum,&level);
+
+    fclaw2d_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
+                            &neighbor_patchno,&globnum,&level);
+
+    clawpatch_vt->fort_time_sync_fine_to_coarse(&mx,&my,&mbc,&meqn,&idir,&iface,
+                                                cuthis->area[0], cuthis->area[1], 
+                                                cuthis->area[2], cuthis->area[3],
+                                                qthis,
+                                                cuthis->fp[0],cuthis->fm[1],
+                                                cuthis->gp[0],cuthis->gm[1],
+                                                cuneighbor->fm[0],cuneighbor->fp[1],
+                                                cuneighbor->gm[0],cuneighbor->gp[1],
+                                                cuthis->edge_fluxes[0],
+                                                cuthis->edge_fluxes[1],
+                                                cuthis->edge_fluxes[2],
+                                                cuthis->edge_fluxes[3],
+                                                cuneighbor->edge_fluxes[0],
+                                                cuneighbor->edge_fluxes[1],
+                                                cuneighbor->edge_fluxes[2],
+                                                cuneighbor->edge_fluxes[3],
+                                                maskneighbor,qneighbor_dummy,
+                                                &transform_data);
+
+    FCLAW_FREE(qneighbor_dummy);
+    FCLAW_FREE(maskneighbor);       
+
+}
+
+
 
 
 

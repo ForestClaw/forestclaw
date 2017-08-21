@@ -38,11 +38,11 @@ typedef struct fclaw2d_clawpatch_cons_update fclaw2d_clawpatch_cons_update_t;
 
 struct fclaw2d_clawpatch_cons_update
 {
-    /* 1d arrays stored on each of four faces */
-    double *qc[4];
-    double *qc_save[4];  /* In case we need to retake a time step */
-    double *auxc[4];
-    double *rp[4];
+    /* Two 1d arrays stored on each of four faces */
+    double *edge_fluxes[4];
+#if 0    
+    double *edge_fluxes_save[4];
+#endif    
 
     /* Scaling factors */
     double *edgelengths[4];
@@ -73,6 +73,24 @@ void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons
 void fclaw2d_clawpatch_cons_update_init(struct fclaw2d_global *glob,
                                         struct fclaw2d_patch* this_patch,
                                         int blockno, int patchno);
+
+
+void fclaw2d_clawpatch_time_sync_fine_to_coarse(struct fclaw2d_global* glob,
+                                                struct fclaw2d_patch* coarse_patch,
+                                                struct fclaw2d_patch* fine_patch,
+                                                int idir,
+                                                int igrid,
+                                                int iface_coarse,
+                                                int time_interp,
+                                                fclaw2d_transform_data_t* transform_data);
+
+
+void fclaw2d_clawpatch_time_sync_copy(struct fclaw2d_global* glob,
+                                      struct fclaw2d_patch* this_patch,
+                                      struct fclaw2d_patch* neighbor_patch,
+                                      int this_iface,
+                                      fclaw2d_transform_data_t* transform_data);
+
 
 #ifdef __cplusplus
 #if 0

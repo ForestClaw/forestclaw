@@ -92,8 +92,7 @@ typedef void (*fc2d_clawpack46_rpn2_t)(const int* ixy,const int* maxm, const int
 
 
 typedef void (*fc2d_clawpack46_rpn2_cons_t)(int* meqn, int* maux, int* idir,
-                                            double ql[], double qr[], double auxl[],
-                                            double auxr[], double flux_diff[]);
+                                            double q[], double aux[], double flux[]);
 
 typedef void (*fc2d_clawpack46_rpt2_t)(const int* ixy, const int* maxm, const int* meqn,
                                        const int* mwaves, const int* mbc,const int* mx,

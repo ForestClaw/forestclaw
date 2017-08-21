@@ -23,30 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- * Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 #ifndef FCLAW2D_PATCH_H
 #define FCLAW2D_PATCH_H
@@ -294,6 +270,23 @@ void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,  /* contains ol
 size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
 
 
+/* ------------------------------ Time syncing funtions ------------------------------- */
+void fclaw2d_patch_time_sync_fine_to_coarse(struct fclaw2d_global* glob,
+                                            struct fclaw2d_patch *coarse_patch,
+                                            struct fclaw2d_patch *fine_patch,
+                                            int idir,
+                                            int igrid,
+                                            int iface_coarse,
+                                            int time_interp,
+                                            struct fclaw2d_transform_data* transform_data);
+
+void fclaw2d_patch_time_sync_copy(fclaw2d_global_t* glob,
+                                  fclaw2d_patch_t *this_patch,
+                                  fclaw2d_patch_t *neighbor_patch,
+                                  int iface,
+                                  int time_interp,
+                                  struct fclaw2d_transform_data *transform_data);
+
 /* ------------------------------ Misc access functions ------------------------------- */
 void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
                             struct fclaw2d_patch * this_patch,
@@ -517,6 +510,23 @@ typedef void (*fclaw2d_patch_cons_update_reset_t)(struct fclaw2d_global *glob,
                                                   int minlevel,int maxlevel,double dt);
 
 
+typedef void (*fclaw2d_patch_time_sync_coarse_to_fine_t)(struct fclaw2d_global* glob,
+                                                         struct fclaw2d_patch *coarse_patch,
+                                                         struct fclaw2d_patch *fine_patch,
+                                                         int idir,
+                                                         int igrid,
+                                                         int iface_coarse,
+                                                         int time_interp,
+                                                         struct fclaw2d_transform_data* transform_data);
+
+typedef void (*fclaw2d_patch_time_sync_copy_t)(struct fclaw2d_global* glob,
+                                               struct fclaw2d_patch* this_patch,
+                                               struct fclaw2d_patch* neighbor_patch,
+                                               int iface,
+                                               int time_interp,
+                                               struct fclaw2d_transform_data *transform_data);
+
+
 /* ----------------------------------- Virtual table  --------------------------------- */
 struct fclaw2d_patch_vtable
 {
@@ -544,6 +554,10 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_tag4coarsening_t        tag4coarsening;
     fclaw2d_patch_average2coarse_t        average2coarse;
     fclaw2d_patch_interpolate2fine_t      interpolate2fine;
+
+    /* Time syncing functions */
+    fclaw2d_patch_time_sync_fine_to_coarse  time_sync_fine_to_coarse;
+    fclaw2d_patch_time_sync_copy         time_sync_copy;
 
     /* ghost filling functions */
     fclaw2d_patch_copy_face_t             copy_face;
