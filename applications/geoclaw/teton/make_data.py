@@ -104,11 +104,21 @@ def setrun(claw_pkg='geoclaw'):
 
     clawdata.lower[1] = mdpt_topo[1] - dim_comp[1]/2.0
     clawdata.upper[1] = mdpt_topo[1] + dim_comp[1]/2.0
+
     print "[{0:16.8f},{1:16.8f}]".format(*clawdata.lower)
     print "[{0:16.8f},{1:16.8f}]".format(*clawdata.upper)
 
     dims_computed = np.array([clawdata.upper[0]-clawdata.lower[0], clawdata.upper[1]-clawdata.lower[1]])
     print "Computed aspect ratio    : {0:16.8f}".format(dims_computed[0]/dims_computed[1])
+
+    print("")
+    print("Details in km : ")    
+
+    lon = np.array([clawdata.lower[0],clawdata.upper[0]])
+    lat = np.array([clawdata.lower[1],clawdata.upper[1]])
+    d = tools.compute_distances(lon,lat)
+
+
 
 
     # ---------------
