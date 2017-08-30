@@ -1,10 +1,6 @@
-c    # -----------------------------------------------------------------
-c    # These are called from ghost filling routines
-c    # -----------------------------------------------------------------
+c     # Synchronize by adding corrections from finer grid to coarser
+c     # grid.       
 
-
-c    # Called from averaging routine, using fine grid (possibly from
-c    # a ghost patch) to compute correction terms.
       subroutine clawpack46_fort_time_sync_f2c(mx,my,mbc,meqn,
      &                                          idir, iface_coarse,
      &                                          area0, area1,
@@ -12,7 +8,8 @@ c    # a ghost patch) to compute correction terms.
      &                                          qcoarse,
      &                                          fpcoarse0,fmcoarse1,
      &                                          gpcoarse2,gmcoarse3,
-     &                                          fm0, fp1,gm0, gp1,
+     &                                          fmfine0, fpfine1,
+     &                                          gmfine2, gpfine3,
      &                                          efc0, efc1, efc2, efc3,
      &                                          eff0, eff1, eff2, eff3,
      &                                          maskfine, qfine_dummy,
@@ -34,20 +31,20 @@ c    # a ghost patch) to compute correction terms.
       double precision gpcoarse2(mx,meqn)
       double precision gmcoarse3(mx,meqn)
 
-      double precision fm0(my,meqn)
-      double precision fp1(my,meqn)
-      double precision gm0(mx,meqn)
-      double precision gp1(mx,meqn)
+      double precision fmfine0(my,meqn)
+      double precision fpfine1(my,meqn)
+      double precision gmfine2(mx,meqn)
+      double precision gpfine3(mx,meqn)
 
-      double precision eff0(my,meqn)
-      double precision eff1(my,meqn)
-      double precision eff2(mx,meqn)
-      double precision eff3(mx,meqn)
+      double precision eff0(my,meqn,0:1)
+      double precision eff1(my,meqn,0:1)
+      double precision eff2(mx,meqn,0:1)
+      double precision eff3(mx,meqn,0:1)
 
-      double precision efc0(my,meqn)
-      double precision efc1(my,meqn)
-      double precision efc2(mx,meqn)
-      double precision efc3(mx,meqn)
+      double precision efc0(my,meqn,0:1)
+      double precision efc1(my,meqn,0:1)
+      double precision efc2(mx,meqn,0:1)
+      double precision efc3(mx,meqn,0:1)
 
       integer*8 transform_cptr
 
@@ -82,10 +79,10 @@ c     # do them all.
          do j = 1,my/2
             jj1 = 2*(j-1) + 1     !! indexing starts at 1
             jj2 = 2*(j-1) + 2
-            deltam = (fm0(jj1,mq) + fm0(jj2,mq) +
-     &               eff0(jj1,mq) + eff0(jj2,mq))
-            deltap = (fp1(jj1,mq) + fp1(jj2,mq) +
-     &               eff1(jj1,mq) + eff1(jj2,mq))
+            deltam = fmfine0(jj1,mq) + fmfine0(jj2,mq) +
+     &               eff0(jj1,mq,1) + eff0(jj2,mq,1)
+            deltap = fpfine1(jj1,mq) + fpfine1(jj2,mq) +
+     &               eff1(jj1,mq,1) + eff1(jj2,mq,1)
 
             do jj = jj1,jj2
                do ii = 1,mbc
@@ -98,10 +95,10 @@ c     # do them all.
          do i = 1,mx/2
             ii1 = 2*(i-1) + 1        !! indexing starts at 1
             ii2 = 2*(i-1) + 2
-            deltam = (gm0(ii1,mq) + gm0(ii2,mq) +
-     &               eff2(ii1,mq) + eff2(ii2,mq))
-            deltap = (gp1(ii1,mq) + gp1(ii2,mq) +
-     &               eff3(ii1,mq) + eff3(ii2,mq))
+            deltam = gmfine2(ii1,mq) + gmfine3(ii2,mq) +
+     &               eff2(ii1,mq,1) + eff2(ii2,mq,1)
+            deltap = gpfine1(ii1,mq) + gpfine1(ii2,mq) +
+     &               eff3(ii1,mq,1) + eff3(ii2,mq,1)
             do ii = ii1,ii2
                do jj = 1,mbc
                   qfine_dummy(ii,1-jj,mq) = -deltam
@@ -136,10 +133,10 @@ c     # Average fine grid onto coarse grid
                if (.not. skip_this_grid) then
                   fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 0) then
-                     deltac = fineval + fpcoarse0(jc,mq) + efc0(jc,mq)
+                     deltac = fineval + fpcoarse0(jc,mq) + efc0(jc,mq,0)
                      areac = area0(jc)
                   else
-                     deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq)
+                     deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq,0)
                      areac = area1(jc)
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
@@ -168,10 +165,10 @@ c     # Average fine grid onto coarse grid
                if (.not. skip_this_grid) then
                   fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 2) then
-                     deltac = fineval + gpcoarse2(ic,mq) + efc2(ic,mq)
+                     deltac = fineval + gpcoarse2(ic,mq) + efc2(ic,mq,0)
                      areac = area2(ic)
                   else
-                     deltac = fineval + gmcoarse3(ic,mq) + efc3(ic,mq)
+                     deltac = fineval + gmcoarse3(ic,mq) + efc3(ic,mq,0)
                      areac = area3(ic)
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
@@ -245,16 +242,19 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
 
       do mq = 1,meqn
          do j = 1,my
-            deltam = fpneighbor0(j,mq) + efneighbor0(j,mq)
-            deltap = fpneighbor1(j,mq) + efneighbor1(j,mq)
+c           # Left edge             
+            deltam = efneighbor0(j,mq,1) + fm neighbor0(j,mq)
+
+c           # Right edge                         
+            deltap = efneighbor1(j,mq,1) - fpneighbor1(j,mq)
 
             qneighbor_dummy(0,j,mq) = -deltam
             qneighbor_dummy(mx+1,j,mq) = -deltap
          enddo
 
          do i = 1,mx
-            deltam = gmneighbor2(i,mq) + efneighbor2(i,mq)
-            deltap = gpneighbor3(i,mq) + efneighbor3(i,mq)
+            deltam = gmneighbor2(i,mq) + efneighbor2(i,mq,1)
+            deltap = gpneighbor3(i,mq) + efneighbor3(i,mq,1)
 
             qneighbor_dummy(i,0,mq) = -deltam
             qneighbor_dummy(i,my+1,mq) = -deltap
