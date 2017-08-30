@@ -1,5 +1,29 @@
 import numpy as np
 
+def read_topo_data(topofile):
+
+    f = open(topofile,'r')
+
+    l = f.readline()
+    ncols = np.fromstring(l.split()[0].strip(),sep=' ')                    
+
+    l = f.readline()
+    nrows = np.fromstring(l.split()[0].strip(),sep=' ')
+
+    l = f.readline()
+    xllcorner = np.fromstring(l.split()[0].strip(),sep=' ')
+
+    l = f.readline()
+    yllcorner = np.fromstring(l.split()[0].strip(),sep=' ')
+
+    l = f.readline()
+    cellsize = np.fromstring(l.split()[0].strip(),sep=' ')
+
+    return ncols[0],nrows[0],xllcorner[0],yllcorner[0],cellsize[0]
+
+
+
+
 def region_coords(xll,xur, num_cells,lower,upper):
     """ Get location of region in coarse grid coordinates
     xll, xur     : lower and upper coordinates of approximate region

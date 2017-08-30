@@ -201,3 +201,7 @@ def setplot(plotdata):
     plotdata.kml = False
 
     return plotdata
+
+if __name__=="__main__":
+    from clawpack.visclaw.plotclaw import plotclaw
+    plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')    

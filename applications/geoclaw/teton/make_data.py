@@ -10,6 +10,8 @@ import os
 import numpy as np
 from pdb import *
 
+import tools
+
 
 try:
     CLAW = os.environ['CLAW']
@@ -41,6 +43,8 @@ def setrun(claw_pkg='geoclaw'):
 
     rundata = data.ClawRunData(claw_pkg, num_dim)
 
+    topofile = 'topos/TetonLarge.topo'
+
     #------------------------------------------------------------------
     # GeoClaw specific parameters:
     #------------------------------------------------------------------
@@ -64,12 +68,14 @@ def setrun(claw_pkg='geoclaw'):
     # Number of space dimensions:
     clawdata.num_dim = num_dim
 
+    m_topo,n_topo,xllcorner,yllcorner,cellsize = tools.read_topo_data(topofile)
+
     # Topo info (TetonDamLatLong.topo)
-    m_topo = 4180
-    n_topo = 1464
-    xllcorner = -112.390734400000
-    yllcorner = 43.581746970335
-    cellsize = 0.000277729665
+    # m_topo = 4180
+    # n_topo = 1464
+    # xllcorner = -112.390734400000
+    # yllcorner = 43.581746970335
+    # cellsize = 0.000277729665
 
     # Derived info from the topo map
     mx_topo = m_topo - 1
@@ -338,7 +344,6 @@ def setrun(claw_pkg='geoclaw'):
     regions.append([maxlevel,maxlevel, 0, 1.e10,-111.7,-111.24,43.857, 43.9881])
 
     # Box containing gauge location locations
-    import tools
 
     xll = [-111.64, 43.913661]  # From email
     xur = [-111.60, 43.92]  # from email
