@@ -205,7 +205,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
             total_mass[m] = fclaw2d_domain_global_sum(domain, error_data->mass[m]);
 
             /* Store mass for future checks */
-            if (init_flag != 0)
+            if (init_flag)
             {
                 /* Store mass at time t = 0 */
                 error_data->mass0[m] = total_mass[m];

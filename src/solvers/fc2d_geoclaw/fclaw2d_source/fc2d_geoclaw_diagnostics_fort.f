@@ -23,13 +23,13 @@ c    # -------------------------------------------------------------------------
          if (fclaw2d_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
-                  sum(m) = sum(m) + q(1,i,j)*area(i,j)
+                  sum(m) = sum(m) + q(m,i,j)*area(i,j)
                enddo
             enddo
          else
             do j = 1,my
                do i = 1,mx
-                  sum(m) = sum(m) + q(1,i,j)*dx*dy
+                  sum(m) = sum(m) + q(m,i,j)*dx*dy
                enddo
             enddo
          endif
