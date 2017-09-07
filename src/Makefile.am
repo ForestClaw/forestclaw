@@ -45,6 +45,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_diagnostics.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
+	src/patches/clawpatch/fclaw2d_clawpatch_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \

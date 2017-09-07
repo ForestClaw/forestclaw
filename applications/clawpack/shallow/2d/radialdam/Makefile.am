@@ -14,7 +14,7 @@ applications_clawpack_shallow_2d_radialdam_radialdam_SOURCES = \
 	applications/clawpack/shallow/2d/radialdam/user_5.0/setaux.f90 \
 	applications/clawpack/shallow/2d/radialdam/user_5.0/tag4refinement.f90 \
 	applications/clawpack/shallow/2d/radialdam/user_5.0/tag4coarsening.f90 \
-	applications/clawpack/shallow/2d/rp/clawpack_user.h \
+	applications/clawpack/shallow/2d/rp/shallow_user_fort.h \
 	applications/clawpack/shallow/2d/rp/clawpack46_rpn2.f \
 	applications/clawpack/shallow/2d/rp/clawpack46_rpt2.f \
 	applications/clawpack/shallow/2d/rp/clawpack5_rpn2.f90 \
