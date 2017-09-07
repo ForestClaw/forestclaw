@@ -14,7 +14,7 @@ applications_clawpack_acoustics_2d_radial_radial_SOURCES = \
 	applications/clawpack/acoustics/2d/radial/user_5.0/tag4coarsening.f90 \
 	applications/clawpack/acoustics/2d/radial/user_5.0/setaux.f90 \
 	applications/clawpack/acoustics/2d/rp/rpn2ac.f \
-	applications/clawpack/acoustics/2d/rp/clawpack_user.h \
+	applications/clawpack/acoustics/2d/rp/acoustics_user_fort.h \
 	applications/clawpack/acoustics/2d/rp/rpt2ac.f \
 	applications/clawpack/acoustics/2d/rp/rpn2_acoustics.f90 \
 	applications/clawpack/acoustics/2d/rp/rpt2_acoustics.f90 \

@@ -9,7 +9,7 @@ applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/psi.f \
 	applications/clawpack/advection/2d/swirl/setprob.f \
 	applications/clawpack/advection/2d/all/clawpack46_setaux.f \
-	applications/clawpack/advection/2d/all/clawpack_user.h \
+	applications/clawpack/advection/2d/all/advection_user.h \
 	applications/clawpack/advection/2d/all/clawpack5_setaux.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv.f \
