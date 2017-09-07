@@ -62,6 +62,18 @@ def compute_distances(lon,lat):
     return d
 
 
+def deg2m2(lon,lat):
+
+    area_deg = (lat[1]-lat[0])*(lon[1]-lon[0])
+    d = compute_distances(lon,lat)
+
+    avg_width = (d[0] + d[2])/2.0
+    avg_height = (d[1] + d[3])/2.0
+
+    area_m2 = avg_width*avg_height
+
+    return area_m2/area_deg
+
 
 def region_coords(xll,xur, num_cells,lower,upper):
     """ Get location of region in coarse grid coordinates

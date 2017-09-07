@@ -24,21 +24,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "teton_user.h"
+
+#include <fclaw2d_include_all.h>
+
+#include <fclaw2d_clawpatch.h>
 #include <fc2d_geoclaw.h>
 
-
-static fclaw2d_vtable_t vt;
-static fc2d_geoclaw_vtable_t geoclaw_vt;
-
-void teton_link_solvers(fclaw2d_domain_t *domain)
+void teton_link_solvers(fclaw2d_global_t *glob)
 {
 
     /* These are set by GeoClaw for convenience, but the user
        can set these with customized functions, if desired. */
-    fc2d_geoclaw_init_vtables(&vt, &geoclaw_vt);
+    fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
 
-    geoclaw_vt.qinit = &TETON_QINIT;
-
-    fc2d_geoclaw_set_vtables(domain,&vt,&geoclaw_vt);
-
+    geoclaw_vt->qinit = &TETON_QINIT;
 }

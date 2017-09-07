@@ -48,12 +48,22 @@ def setplot(plotdata):
     # Add [file_name,visibility]
     plotdata.kml_user_files.append(['teton_dam_validate.kml',True])
 
-    # Cells used in setrun.py
+    # Cells used in setrun.py (original)
     num_cells = [54,19]
     lower = [-112.36171859324912, 43.591904932832371]
     upper = [-111.25911793671588, 43.977907507732617]
-    xll = [-111.64, 43.913661]
-    xur = [-111.60, 43.92]
+    #xll = [-111.64, 43.913661]
+    #xur = [-111.60, 43.92]
+
+    # Lower left   ( -112.34626736,  43.18013542)
+    # Upper right  ( -111.26428819,  43.95986458)
+
+    num_cells = [54,54]
+    lower = [-112.34626736,  43.18013542]
+    upper = [-111.26428819,  43.95986458]
+
+    #xll = [-111.64, 43.913661]
+    #xur = [-111.60, 43.92]
 
     #-----------------------------------------------------------
     # Figure for KML files (large view)
@@ -72,7 +82,7 @@ def setplot(plotdata):
 
     # Use computational coordinates for plotting
     plotfigure.kml_use_figure_limits = True
-    plotfigure.kml_tile_images = True    # Tile images for faster loading.  Requires GDAL [False]
+    plotfigure.kml_tile_images = False    # Tile images for faster loading.  Requires GDAL [False]
 
 
     # --------------------------------------------------
@@ -84,14 +94,14 @@ def setplot(plotdata):
 
     # If amr refinement ratios set to [0,6]; max_level = 6
     # figsize*dpi = [2,1]*16*2**6 = [2048,1024]
-    mx = 32
-    mi = 2
+    mx = 16
+    mi = 1
     mj = 1
     minlevel = 0
-    maxlevel = 4
+    maxlevel = 7
     p = 1
-    plotfigure.kml_figsize = [32,16]  #[mx*2**p*mi,mx*2**p*mj]
-    plotfigure.kml_dpi = 32
+    plotfigure.kml_figsize = [32,32]  #[mx*2**p*mi,mx*2**p*mj]
+    plotfigure.kml_dpi = 64
 
     # --------------------------------------------------
 
@@ -126,10 +136,10 @@ def setplot(plotdata):
     # Latlong box used for GoogleEarth
 
     import tools
-    region_lower, region_upper, figsize = tools.region_coords(xll,xur,
-                                                              num_cells,
-                                                              lower,
-                                                              upper)
+    #region_lower, region_upper, figsize = tools.region_coords(xll,xur,
+    #                                                          num_cells,
+    #                                                          lower,
+    #                                                          upper)
 
     # # Get degrees per finest level :
     # dx_coarse = (upper[0]-lower[0])/num_cells[0]
@@ -143,32 +153,32 @@ def setplot(plotdata):
     # xlow = lower[0] + mx_xlow*dx_coarse
     # ylow = lower[1] + my_ylow*dy_coarse
 
-    plotfigure.kml_xlimits = [region_lower[0],region_upper[0]]
-    plotfigure.kml_ylimits = [region_lower[1], region_upper[1]]
+    #plotfigure.kml_xlimits = [region_lower[0],region_upper[0]]
+    #plotfigure.kml_ylimits = [region_lower[1], region_upper[1]]
 
     # Use computational coordinates for plotting
     plotfigure.kml_use_figure_limits = True
 
     # --------------------------------------------------
-    plotfigure.kml_figsize = figsize*8
-    plotfigure.kml_dpi = 4*4
+    # plotfigure.kml_figsize = figsize*8
+    # plotfigure.kml_dpi = 4*4
 
     # --------------------------------------------------
 
     plotfigure.kml_tile_images = False    # Tile images for faster loading.  Requires GDAL [False]
 
     # Color axis : transparency below 0.1*(cmax-cmin)
-    cmin = 0
-    cmax = 5
-    cmap = geoplot.googleearth_flooding  # transparent --> light blue --> dark blue
+    # cmin = 0
+    # cmax = 5
+    # cmap = geoplot.googleearth_flooding  # transparent --> light blue --> dark blue
 
     # Water
-    plotaxes = plotfigure.new_plotaxes('kml')
-    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    plotitem.plot_var = geoplot.depth   # Plot height field h.
-    plotitem.pcolor_cmap = geoplot.googleearth_flooding
-    plotitem.pcolor_cmin = cmin
-    plotitem.pcolor_cmax = cmax
+    # plotaxes = plotfigure.new_plotaxes('kml')
+    # plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    # plotitem.plot_var = geoplot.depth   # Plot height field h.
+    # plotitem.pcolor_cmap = geoplot.googleearth_flooding
+    # plotitem.pcolor_cmin = cmin
+    # plotitem.pcolor_cmax = cmax
 
     #-----------------------------------------
     # Figures for gauges
@@ -223,7 +233,7 @@ def setplot(plotdata):
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via pyclaw.plotters.frametools.printframes:
 
-    plotdata.parallel = True
+    plotdata.parallel = False
     plotdata.print_format = 'png'           # file format
     plotdata.print_framenos = 'all'         # list of frames to print
     plotdata.print_gaugenos = 'all'         # list of gauges to print

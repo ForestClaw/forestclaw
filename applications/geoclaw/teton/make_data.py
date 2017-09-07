@@ -70,6 +70,7 @@ def setrun(claw_pkg='geoclaw'):
 
     m_topo,n_topo,xllcorner,yllcorner,cellsize = tools.read_topo_data(topofile)
 
+
     # Topo info (TetonDamLatLong.topo)
     # m_topo = 4180
     # n_topo = 1464
@@ -85,19 +86,22 @@ def setrun(claw_pkg='geoclaw'):
     ll_topo = np.array([xllcorner, yllcorner])
     ur_topo = np.array([xurcorner, yurcorner])
 
+    print("")
+    print("Topo domain")
+    print("%-12s (%14.8f, %12.8f)" % ("Lower left",ll_topo[0],ll_topo[1]))
+    print("%-12s (%14.8f, %12.8f)" % ("Upper right",ur_topo[0],ur_topo[1]))
+    print("")
+
     dims_topo = ur_topo - ll_topo
 
     # Try to match aspect ratio of topo map
     clawdata.num_cells[0] = 54
-    clawdata.num_cells[1] =  19
-
-    print "Approximate aspect ratio : {0:16.8f}".format(float(clawdata.num_cells[0])/clawdata.num_cells[1])
-    print "Actual      aspect ratio : {0:16.8f}".format(dims_topo[0]/dims_topo[1])
+    clawdata.num_cells[1] =  54
 
     dim_topo = ur_topo - ll_topo
-    mdpt_topo = ll_topo + 0.5*(ur_topo-ll_topo)
+    mdpt_topo = ll_topo + 0.5*dim_topo
 
-    dim_comp = 0.95*dim_topo   # Shrink domain inside of given bathymetry.
+    dim_comp = 0.975*dim_topo   # Shrink domain inside of given bathymetry.
 
     clawdata.lower[0] = mdpt_topo[0] - dim_comp[0]/2.0
     clawdata.upper[0] = mdpt_topo[0] + dim_comp[0]/2.0
@@ -105,11 +109,20 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.lower[1] = mdpt_topo[1] - dim_comp[1]/2.0
     clawdata.upper[1] = mdpt_topo[1] + dim_comp[1]/2.0
 
-    print "[{0:16.8f},{1:16.8f}]".format(*clawdata.lower)
-    print "[{0:16.8f},{1:16.8f}]".format(*clawdata.upper)
+    print("")
+    print("Computational domain")
+    print("%-12s (%14.8f, %12.8f)" % ("Lower left",clawdata.lower[0],clawdata.lower[1]))
+    print("%-12s (%14.8f, %12.8f)" % ("Upper right",clawdata.upper[0],clawdata.upper[1]))
+    print("")
+
+    print "Approximate aspect ratio : {0:16.8f}".format(float(clawdata.num_cells[0])/clawdata.num_cells[1])
+    print "Actual      aspect ratio : {0:16.8f}".format(dims_topo[0]/dims_topo[1])
+
+    # print "[{0:20.12f},{1:20.12f}]".format(*clawdata.lower)
+    # print "[{0:20.12f},{1:20.12f}]".format(*clawdata.upper)
 
     dims_computed = np.array([clawdata.upper[0]-clawdata.lower[0], clawdata.upper[1]-clawdata.lower[1]])
-    print "Computed aspect ratio    : {0:16.8f}".format(dims_computed[0]/dims_computed[1])
+    print "Computed aspect ratio    : {0:20.12f}".format(dims_computed[0]/dims_computed[1])
 
     print("")
     print("Details in km : ")    
@@ -163,7 +176,7 @@ def setrun(claw_pkg='geoclaw'):
 
     if clawdata.output_style == 1:
         # Output nout frames at equally spaced times up to tfinal:
-        n_hours = 0.5
+        n_hours = 2.0
         frames_per_minute = 60.0/5.0 # Frames every 5 seconds
         clawdata.num_output_times = int(frames_per_minute*60*n_hours)  # Plot every 10 seconds
         clawdata.tfinal = 60*60*n_hours
@@ -351,19 +364,19 @@ def setrun(claw_pkg='geoclaw'):
     regions = rundata.regiondata.regions
 
     # Region containing initial reservoir
-    regions.append([maxlevel,maxlevel, 0, 1.e10,-111.7,-111.24,43.857, 43.9881])
+    regions.append([maxlevel,maxlevel, 0, 1.e10,-111.543,-111.24,43.88, 43.965])
 
     # Box containing gauge location locations
 
-    xll = [-111.64, 43.913661]  # From email
-    xur = [-111.60, 43.92]  # from email
-    region_lower, region_upper,_ = tools.region_coords(xll,xur,
-                                                     clawdata.num_cells,
-                                                     clawdata.lower,
-                                                     clawdata.upper)
-
-    regions.append([maxlevel,maxlevel,0, 1e10, region_lower[0],region_upper[0],
-                    region_lower[1],region_upper[1]])
+#    xll = [-111.64, 43.913661]  # From email
+#    xur = [-111.60, 43.92]  # from email
+#    region_lower, region_upper,_ = tools.region_coords(xll,xur,
+#                                                     clawdata.num_cells,
+#                                                     clawdata.lower,
+#                                                     clawdata.upper)
+#
+#    regions.append([maxlevel,maxlevel,0, 1e10, region_lower[0],region_upper[0],
+#                    region_lower[1],region_upper[1]])
 
     # Computational domain.  With exception of region above, don't go beyond level 4
     regions.append([0,maxlevel-1,0, 1e10, clawdata.lower[0],clawdata.upper[0],
@@ -389,35 +402,35 @@ def setrun(claw_pkg='geoclaw'):
     # Start at SW corner; build gauges in counter-clockwise order in a
     # square around the region [xll,xur].
 
-    m = 2  # Gauge spacing along one edge (m=4 --> edge divided into four sections)
-    gauge_counter = 100
-
-    # South West corner of power plant
-    xll = [-111.623926, 43.913661]  # From email
-
-    # North East corner of power plant
-    xur = [-111.620150, 43.916382]  # from email
-
-    s = np.linspace(0,1.,m+1)
-    for i in range(0,m):
-        x = xll[0] + (xur[0] - xll[0])*s[i]
-        rundata.gaugedata.gauges.append([gauge_counter,x,xll[1],0.,clawdata.tfinal])
-        gauge_counter = gauge_counter + 1
-
-    for i in range(0,m):
-        y = xll[1] + (xur[1] - xll[1])*s[i]
-        rundata.gaugedata.gauges.append([gauge_counter,xur[0],y,0.,clawdata.tfinal])
-        gauge_counter = gauge_counter + 1
-
-    for i in range(0,m):
-        x = xur[0] + (xll[0] - xur[0])*s[i]
-        rundata.gaugedata.gauges.append([gauge_counter,x,xur[1],0.,clawdata.tfinal])
-        gauge_counter = gauge_counter + 1
-
-    for i in range(0,m):
-        y = xur[1] + (xll[1] - xur[1])*s[i]
-        rundata.gaugedata.gauges.append([gauge_counter,xll[0],y,0.,clawdata.tfinal])
-        gauge_counter = gauge_counter + 1
+#    m = 2  # Gauge spacing along one edge (m=4 --> edge divided into four sections)
+#    gauge_counter = 100
+#
+#    # South West corner of power plant
+#    xll = [-111.623926, 43.913661]  # From email
+#
+#    # North East corner of power plant
+#    xur = [-111.620150, 43.916382]  # from email
+#
+#    s = np.linspace(0,1.,m+1)
+#    for i in range(0,m):
+#        x = xll[0] + (xur[0] - xll[0])*s[i]
+#        rundata.gaugedata.gauges.append([gauge_counter,x,xll[1],0.,clawdata.tfinal])
+#        gauge_counter = gauge_counter + 1
+#
+#    for i in range(0,m):
+#        y = xll[1] + (xur[1] - xll[1])*s[i]
+#        rundata.gaugedata.gauges.append([gauge_counter,xur[0],y,0.,clawdata.tfinal])
+#        gauge_counter = gauge_counter + 1
+#
+#    for i in range(0,m):
+#        x = xur[0] + (xll[0] - xur[0])*s[i]
+#        rundata.gaugedata.gauges.append([gauge_counter,x,xur[1],0.,clawdata.tfinal])
+#        gauge_counter = gauge_counter + 1
+#
+#    for i in range(0,m):
+#        y = xur[1] + (xll[1] - xur[1])*s[i]
+#        rundata.gaugedata.gauges.append([gauge_counter,xll[0],y,0.,clawdata.tfinal])
+#        gauge_counter = gauge_counter + 1
 
 
     # -------------------------------------------------------
@@ -456,6 +469,8 @@ def setgeo(rundata):
         raise AttributeError("Missing geo_data attribute")
 
 
+    topofile = 'topos/TetonLarge.topo'
+
     # == Physics ==
     geo_data.gravity = 9.81
     geo_data.coordinate_system = 2   # LatLong coordinates
@@ -482,11 +497,8 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    # topo_data.topofiles.append([2, 1, 10, 0, 1e10, 'topos/TetonDamFloodPlain.topo']);
-    # topo_data.topofiles.append([2, 1, 10, 0, 1e10, 'topos/TetonDamLargeLowRes.topo'])
-    # topo_data.topofiles.append([2, 1, 10, 0, 1e10, 'topos/TetonDamSmallHiRes.topo'])
 
-    topo_data.topofiles.append([2, 1, 10, 0, 1e10, 'topos/TetonDamLatLong.topo'])
+    topo_data.topofiles.append([2, 1, 10, 0, 1e10, topofile])
 
 
     # == setdtopo.data values ==
