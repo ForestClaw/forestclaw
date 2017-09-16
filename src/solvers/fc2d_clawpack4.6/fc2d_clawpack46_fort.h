@@ -81,7 +81,7 @@ void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
 #define CLAWPACK46_ACCUMULATE_CONS_UPDATES FCLAW_F77_FUNC(clawpack46_accumulate_cons_updates, \
                                                           CLAWPACK46_ACCUMULATE_CONS_UPDATES)
 
-void CLAWPACK46_ACCUMULATE_CONS_UPDATES(int* mx, int* my, int* mbc, int* meqn,
+void CLAWPACK46_CONS_UPDATES_ACCUMULATE(int* mx, int* my, int* mbc, int* meqn,
                                         double* dt, int* patchno,
                                         double el0[], double el1[], 
                                         double el2[], double el3[],

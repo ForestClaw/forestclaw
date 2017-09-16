@@ -1,5 +1,9 @@
+c     # ----------------------------------------------------------------
 c     # Synchronize by adding corrections from finer grid to coarser
 c     # grid.       
+c     # 
+c     # 
+c     # ----------------------------------------------------------------
 
       subroutine clawpack46_fort_time_sync_f2c(mx,my,mbc,meqn,
      &                                          idir, iface_coarse,
@@ -243,7 +247,7 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       do mq = 1,meqn
          do j = 1,my
 c           # Left edge             
-            deltam = efneighbor0(j,mq,1) + fm neighbor0(j,mq)
+            deltam = efneighbor0(j,mq,1) + fmneighbor0(j,mq)
 
 c           # Right edge                         
             deltap = efneighbor1(j,mq,1) - fpneighbor1(j,mq)
@@ -312,8 +316,173 @@ c                 # y-direction (idir == 1)
 
 
 
+c    # -----------------------------------------------------------------
+c    # These are called from step2 routine (after update)
+c    # -----------------------------------------------------------------
+
+      subroutine clawpack46_cons_updates_accumulate(mx,my,mbc,meqn,
+     &      dt, patchno,
+     &      el0, el1, el2, el3,
+     &      fp,fm,gp,gm,
+     &      fp_left,fp_right,
+     &      fm_left,fm_right,
+     &      gp_bottom,gp_top,
+     &      gm_bottom,gm_top)
+
+      implicit none
+
+      integer mx,my,mbc,meqn,patchno
+      double precision dt
+
+      double precision fp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision fm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision gp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision gm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      double precision fp_left(my,meqn),fp_right(my,meqn)
+      double precision fm_left(my,meqn),fm_right(my,meqn)
+
+      double precision gp_bottom(mx,meqn),gp_top(mx,meqn)
+      double precision gm_bottom(mx,meqn),gm_top(mx,meqn)
+
+      double precision el0(my), el1(my), el2(mx), el3(mx)
+
+      integer i,j,m
+
+      do j = 1,my
+         do m = 1,meqn
+            fp_left(j,m) = fp_left(j,m) - dt*el0(j)*fp(1,j,m)
+            fm_left(j,m) = fm_left(j,m) + dt*el0(j)*fm(1,j,m)
+
+            fp_right(j,m) = fp_right(j,m) - dt*el1(j)*fp(mx+1,j,m)
+            fm_right(j,m) = fm_right(j,m) + dt*el1(j)*fm(mx+1,j,m)
+         enddo
+      enddo
+
+      do i = 1,mx
+         do m = 1,meqn
+            gp_bottom(i,m) = gp_bottom(i,m) - dt*el2(i)*gp(i,1,m)
+            gm_bottom(i,m) = gm_bottom(i,m) + dt*el2(i)*gm(i,1,m)
+
+            gp_top(i,m) = gp_top(i,m) - dt*el3(i)*gp(i,my+1,m)
+            gm_top(i,m) = gm_top(i,m) + dt*el3(i)*gm(i,my+1,m)
+         enddo
+      enddo
+
+      return
+
+      end
 
 
+      subroutine clawpack46_evaluate_edge_fluxes(mx,my,mbc,meqn,
+     &      maux, dt,
+     &      el0, el1, el2, el3,
+     &      q, aux,
+     &      flux0,flux1,flux2,flux3,
+     &      rpn2_cons,qvec,auxvec,flux)
+
+      implicit none
+
+      integer mx,my,mbc,meqn, maux,idir
+      double precision dt
+
+      double precision el0(my), el1(my), el2(mx), el3(mx)
+
+      double precision flux0(my,meqn,0:1)
+      double precision flux1(my,meqn,0:1)
+      double precision flux2(my,meqn,0:1)
+      double precision flux3(my,meqn,0:1)
+
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+
+      double precision qvec(meqn),auxvec(maux),flux(meqn)
+
+      integer i,j,k,m
+
+      do j = 1,my
+c        # left side 0 = in; 1 = out
+        idir = 0
+         do k = 0,1
+            do m = 1,maux
+               auxvec(m) = aux(1-k,j,m)
+            enddo
+            do m = 1,meqn
+               qvec(m) = q(1-k,j,m)
+            enddo
+            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            do m = 1,meqn
+               flux0(j,m,k) = dt*el0(j)*flux(m)
+            enddo
+         enddo
+
+c        # right side 0 = in; 1 = out
+         do k = 0,1
+            do m = 1,maux
+               auxvec(m) = aux(mx+k,j,m)
+            enddo
+            do m = 1,meqn
+               qvec(m) = q(mx+k,j,m)
+            enddo
+            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            do m = 1,meqn
+               flux1(j,m,k) = dt*el1(j)*flux(m)
+            enddo
+         enddo
+      enddo
+
+
+      do i = 1,mx
+c        # bottom side 0 = in; 1 = out
+         idir = 1
+         do k = 0,1
+            do m = 1,maux
+               auxvec(m) = aux(i,1-k,m)
+            enddo
+            do m = 1,meqn
+               qvec(m) = q(i,1-k,m)
+            enddo
+            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            do m = 1,meqn
+               flux2(i,m,k) = dt*el2(i)*flux(m)
+            enddo
+         enddo
+
+c        # Top side 0 = in; 1 = out
+         do k = 0,1
+            do m = 1,maux
+               auxvec(m) = aux(i,my+k,m)
+            enddo
+            do m = 1,meqn
+               qvec(m) = q(i,my+k,m)
+            enddo
+            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            do m = 1,meqn
+               flux3(i,m,k) = dt*el3(i)*flux(m)
+            enddo
+         enddo
+      enddo
+
+      end
+
+
+
+      logical function is_valid_correct(idir,i,j,mx,my)
+      implicit none
+
+      integer i,j,mx,my, idir
+      logical i1, j1
+
+      i1 = 1 .le. i .and. i .le. mx
+      j1 = 1 .le. j .and. j .le. my
+
+      is_valid_correct = xor(i1,j1)
+
+
+      end
+
+
+c    # THIS IS NOT USED .... AND SHOULD BE DELETED!
 c    # Called from interpolation routine (with possible context
 c    # switching). This fills in coarse grid values qc/auxc
 c    # on fine grids.
@@ -498,167 +667,5 @@ c     # We only fill in qc arrays which have been set above.
       end
 
 
-c    # -----------------------------------------------------------------
-c    # These are called from step2 routine (after update)
-c    # -----------------------------------------------------------------
 
-      subroutine clawpack46_accumulate_cons_updates(mx,my,mbc,meqn,
-     &      dt, patchno,
-     &      el0, el1, el2, el3,
-     &      fp,fm,gp,gm,
-     &      fp_left,fp_right,
-     &      fm_left,fm_right,
-     &      gp_bottom,gp_top,
-     &      gm_bottom,gm_top)
-
-      implicit none
-
-      integer mx,my,mbc,meqn,patchno
-      double precision dt
-
-      double precision fp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision fm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision gp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision gm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-
-      double precision fp_left(my,meqn),fp_right(my,meqn)
-      double precision fm_left(my,meqn),fm_right(my,meqn)
-
-      double precision gp_bottom(mx,meqn),gp_top(mx,meqn)
-      double precision gm_bottom(mx,meqn),gm_top(mx,meqn)
-
-      double precision el0(my), el1(my), el2(mx), el3(mx)
-
-      integer i,j,m
-
-      do j = 1,my
-         do m = 1,meqn
-            fp_left(j,m) = fp_left(j,m) - dt*el0(j)*fp(1,j,m)
-            fm_left(j,m) = fm_left(j,m) + dt*el0(j)*fm(1,j,m)
-
-            fp_right(j,m) = fp_right(j,m) - dt*el1(j)*fp(mx+1,j,m)
-            fm_right(j,m) = fm_right(j,m) + dt*el1(j)*fm(mx+1,j,m)
-         enddo
-      enddo
-
-      do i = 1,mx
-         do m = 1,meqn
-            gp_bottom(i,m) = gp_bottom(i,m) - dt*el2(i)*gp(i,1,m)
-            gm_bottom(i,m) = gm_bottom(i,m) + dt*el2(i)*gm(i,1,m)
-
-            gp_top(i,m) = gp_top(i,m) - dt*el3(i)*gp(i,my+1,m)
-            gm_top(i,m) = gm_top(i,m) + dt*el3(i)*gm(i,my+1,m)
-         enddo
-      enddo
-
-      return
-
-      end
-
-
-      subroutine clawpack46_evaluate_edge_fluxes(mx,my,mbc,meqn,
-     &      maux, dt,
-     &      el0, el1, el2, el3,
-     &      q, aux,
-     &      flux0,flux1,flux2,flux3,
-     &      rpn2_cons,qvec,auxvec,flux)
-
-      implicit none
-
-      integer mx,my,mbc,meqn, maux,idir
-      double precision dt
-
-      double precision el0(my), el1(my), el2(mx), el3(mx)
-
-      double precision flux0(my,meqn,0:1)
-      double precision flux1(my,meqn,0:1)
-      double precision flux2(my,meqn,0:1)
-      double precision flux3(my,meqn,0:1)
-
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-
-      double precision qvec(meqn),auxvec(maux),flux(meqn)
-
-      integer i,j,k,m
-
-      do j = 1,my
-c        # left side 0 = in; 1 = out
-        idir = 0
-         do k = 0,1
-            do m = 1,maux
-               auxvec(m) = aux(1-k,j,m)
-            enddo
-            do m = 1,meqn
-               qvec(m) = q(1-k,j,m)
-            enddo
-            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
-            do m = 1,meqn
-               flux0(j,m,k) = dt*el0(j)*flux(m)
-            enddo
-         enddo
-
-c        # right side 0 = in; 1 = out
-         do k = 0,1
-            do m = 1,maux
-               auxvec(m) = aux(mx+k,j,m)
-            enddo
-            do m = 1,meqn
-               qvec(m) = q(mx+k,j,m)
-            enddo
-            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
-            do m = 1,meqn
-               flux1(j,m,k) = dt*el1(j)*flux(m)
-            enddo
-         enddo
-      enddo
-
-
-      do i = 1,mx
-c        # bottom side 0 = in; 1 = out
-         idir = 1
-         do k = 0,1
-            do m = 1,maux
-               auxvec(m) = aux(i,1-k,m)
-            enddo
-            do m = 1,meqn
-               qvec(m) = q(i,1-k,m)
-            enddo
-            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
-            do m = 1,meqn
-               flux2(i,m,k) = dt*el2(i)*flux(m)
-            enddo
-         enddo
-
-c        # Top side 0 = in; 1 = out
-         do k = 0,1
-            do m = 1,maux
-               auxvec(m) = aux(i,my+k,m)
-            enddo
-            do m = 1,meqn
-               qvec(m) = q(i,my+k,m)
-            enddo
-            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
-            do m = 1,meqn
-               flux3(i,m,k) = dt*el3(i)*flux(m)
-            enddo
-         enddo
-      enddo
-
-      end
-
-
-
-      logical function is_valid_correct(idir,i,j,mx,my)
-      implicit none
-
-      integer i,j,mx,my, idir
-      logical i1, j1
-
-      i1 = 1 .le. i .and. i .le. mx
-      j1 = 1 .le. j .and. j .le. my
-
-      is_valid_correct = xor(i1,j1)
-
-
-      end
+      

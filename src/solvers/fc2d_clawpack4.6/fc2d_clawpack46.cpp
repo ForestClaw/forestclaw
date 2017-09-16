@@ -339,7 +339,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
     FCLAW_ASSERT(ierror == 0);
 
 
-    CLAWPACK46_ACCUMULATE_CONS_UPDATES(&mx,&my,&mbc,&meqn,&dt, &this_patch_idx,
+    CLAWPACK46_CONS_UPDATES_ACCUMULATE(&mx,&my,&mbc,&meqn,&dt, &this_patch_idx,
                                        cu->edgelengths[0],cu->edgelengths[1],
                                        cu->edgelengths[2],cu->edgelengths[3],
                                        fp,fm,gp,gm,
