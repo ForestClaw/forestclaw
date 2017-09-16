@@ -35,6 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw_math.h>
 
+/* -------------------------------------------------------------
+    Four routines here : 
+    1. fclaw2d_clawpatch_cons_update_new
+    2. fclaw2d_clawpatch_cons_update_reset
+    3. fclaw2d_clawpatch_cons_update_delete
+    4. fclaw2d_clawpatch_time_sync_fine_to_coarse
+    5. fclaw2d_clawpatch_time_sync_copy
+*/
+
 
 static
 void set_snan(double* f)
@@ -48,7 +57,7 @@ void set_snan(double* f)
 }
 
 
-void fclaw2d_clawpatch_cons_update_new(fclaw2d_global_t* glob,
+void fclaw2d_clawpatch_cons_update_new (fclaw2d_global_t* glob,
                                        fclaw2d_patch_t* this_patch,
                                        int blockno,int patchno,
                                        fclaw2d_clawpatch_cons_update_t **cons_update)
@@ -114,11 +123,11 @@ void fclaw2d_clawpatch_cons_update_new(fclaw2d_global_t* glob,
 
 
 static
-void cb_cons_update_reset(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
-                          void *user)
+void cb_cons_update_reset (fclaw2d_domain_t *domain,
+                           fclaw2d_patch_t *this_patch,
+                           int this_block_idx,
+                           int this_patch_idx,
+                           void *user)
 {
     int mx,my,meqn,level,minlevel;
     int i,j,k,idir;
@@ -165,7 +174,7 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
     }
 }
 
-void fclaw2d_clawpatch_cons_update_reset(fclaw2d_global_t* glob,int minlevel,
+void fclaw2d_clawpatch_cons_update_reset (fclaw2d_global_t* glob,int minlevel,
                                          int maxlevel)
 {
     int level;
@@ -178,7 +187,7 @@ void fclaw2d_clawpatch_cons_update_reset(fclaw2d_global_t* glob,int minlevel,
 
 
 
-void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons_update)
+void fclaw2d_clawpatch_cons_update_delete (fclaw2d_clawpatch_cons_update_t **cons_update)
 {
     int k;
 
@@ -213,14 +222,14 @@ void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons
 
 
 /* This is a patch call-back */
-void fclaw2d_clawpatch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
-                                                fclaw2d_patch_t* coarse_patch,
-                                                fclaw2d_patch_t* fine_patch,
-                                                int idir,
-                                                int igrid,
-                                                int iface_coarse,
-                                                int time_interp,
-                                                fclaw2d_transform_data_t* transform_data)
+void fclaw2d_clawpatch_time_sync_fine_to_coarse (fclaw2d_global_t* glob,
+                                                 fclaw2d_patch_t* coarse_patch,
+                                                 fclaw2d_patch_t* fine_patch,
+                                                 int idir,
+                                                 int igrid,
+                                                 int iface_coarse,
+                                                 int time_interp,
+                                                 fclaw2d_transform_data_t* transform_data)
 {
 
     int meqn,mx,my,mbc;
@@ -289,11 +298,11 @@ void fclaw2d_clawpatch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
 }
 
 
-void fclaw2d_clawpatch_time_sync_copy(struct fclaw2d_global* glob,
-                                      struct fclaw2d_patch* this_patch,
-                                      struct fclaw2d_patch* neighbor_patch,
-                                      int this_iface,
-                                      fclaw2d_transform_data_t* transform_data)
+void fclaw2d_clawpatch_time_sync_copy (struct fclaw2d_global* glob,
+                                       struct fclaw2d_patch* this_patch,
+                                       struct fclaw2d_patch* neighbor_patch,
+                                       int this_iface,
+                                       fclaw2d_transform_data_t* transform_data)
 {
     /* We don't correct time interpolated grids, since we assume that the time 
     interpolated average will already have correction information from times 

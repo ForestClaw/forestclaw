@@ -375,38 +375,6 @@ void setup_metric_storage(fclaw2d_clawpatch_t* cp)
     cp->edge_lengths.define(box_d,2);
 }
 
-void fclaw2d_clawpatch_cons_update_metric(fclaw2d_global_t* glob,
-                                          fclaw2d_patch_t* this_patch,
-                                          int blockno,int patchno)
-{
-    int mx,my,mbc;
-    double dx,dy;
-    double *area, *edgelengths, *curvature;
-
-    fclaw2d_clawpatch_cons_update_t *cu = fclaw2d_clawpatch_get_cons_update(glob,this_patch);
-
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-
-    fclaw2d_clawpatch_t *cp = clawpatch_data(this_patch);
-    mx = cp->mx;
-    my = cp->my;
-    dx = cp->dx;
-    dy = cp->dy;
-    mbc = cp->mbc;
-
-
-    fclaw2d_clawpatch_metric_scalar(glob,this_patch,
-                                    &area, &edgelengths,&curvature);
-
-    CLAWPATCH_CONS_UPDATE_METRIC(&mx,&my,&mbc,&dx,&dy,area,edgelengths,
-                                 cu->area[0],cu->area[1],
-                                 cu->area[2],cu->area[3],
-                                 cu->edgelengths[0],cu->edgelengths[1],
-                                 cu->edgelengths[2],cu->edgelengths[3],
-                                 &fclaw_opt->manifold);
-}
-
-
 
 /* -------------------------------- time stepping ------------------------------------- */
 
