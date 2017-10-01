@@ -142,7 +142,8 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],gpp,"GRIDS_PER_PROC");
 
     /* Compute the inverse harmonic mean of grids per processor  */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],1/gpp,
+    gpp = (gpp == 0) ? 1 : gpp; 
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],1.0/gpp,
                    "GRIDS_PER_PROC_INV_HMEAN");
 
     /* Compute the arithmetic mean of grids per processor */

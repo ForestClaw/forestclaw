@@ -42,6 +42,9 @@ include applications/clawpack/advection/2d/hemisphere/Makefile.am
 ## sphere (cubed-sphere and pillow-disk)
 include applications/clawpack/advection/2d/sphere/Makefile.am
 
+## Advection in conservation form
+include applications/clawpack/advection/2d/swirl_cons/Makefile.am
+
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
 ## ----------------------------------------------------------
@@ -84,9 +87,7 @@ include applications/clawpack/advection/2d/torthem/Makefile.am
 ## ------------------------------------------------------------------------
 if FCLAW_ENABLE_DEVELOPMENT
 
-include applications/clawpack/advection/2d/swirl_cons/Makefile.am
-
-## Third order scalar advection (Christiane Helzel, Univ. Dusseldorf)
+## Third order scalar advection
 #include applications/clawpack/advection/2d/adv_order3/Makefile.am
 
 ## Shallow water on the sphere (D. Calhoun)
