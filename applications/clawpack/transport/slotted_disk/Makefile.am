@@ -28,6 +28,7 @@ applications_clawpack_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/transport/all/user5_b4step2_manifold.f90 \
 	applications/clawpack/transport/all/fclaw2d_map_cubedsphere.c \
 	applications/clawpack/transport/all/fclaw2d_map_pillowsphere.c \
+	applications/clawpack/advection/2d/all/advection_user_fort.h \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
