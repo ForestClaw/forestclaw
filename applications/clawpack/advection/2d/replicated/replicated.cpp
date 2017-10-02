@@ -43,14 +43,14 @@ static int s_user_options_package_id = -1;
 static void *
 replicated_register (user_options_t *user_opt, sc_options_t * opt)
 {
-    sc_options_add_int (opt, 0, "example", &user_opt->claw_version, 0,
+    sc_options_add_int (opt, 0, "example", &user_opt->example, 0,
                         "[user] 0 - multi-block; 1 - single block [0]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
+    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 4,
                         "[user] Clawpack version (4 or 5) [5]");
 
-    sc_options_add_int (opt, 0, "replicate-factor", &user_opt->replicate_factor, 2,
-                        "[user] Replication factor [2]");
+    sc_options_add_int (opt, 0, "replicate-factor", &user_opt->replicate_factor, -1,
+                        "[user] Replication factor [-1]");
 
 
     user_opt->is_registered = 1;
