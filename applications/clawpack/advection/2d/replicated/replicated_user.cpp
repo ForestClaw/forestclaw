@@ -36,11 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void replicated_link_solvers(fclaw2d_global_t *glob)
 {
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
+
+    vt->problem_setup = &replicated_problem_setup; 
+
     const user_options_t* user = replicated_get_options(glob);
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
-        clawpack46_vt->setprob   = &SETPROB;
         clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
         clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
@@ -49,12 +52,19 @@ void replicated_link_solvers(fclaw2d_global_t *glob)
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
-        clawpack5_vt->setprob   = &SETPROB;
         clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
         clawpack5_vt->setaux    = &CLAWPACK5_SETAUX;
         clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV;
         clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV;
     }
+}
+
+void replicated_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = replicated_get_options(glob);
+
+    int example = user->example;  /* Macros don't expand properly without this */
+    REPLICATED_SETPROB(&example);    
 }
 
 

@@ -565,7 +565,7 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
             proc_file.write("#@ queue\n")
             proc_file.write("\n")
             proc_file.write(("runjob --ranks-per-node %d --np %d : " \
-                             + "/homec/hbn26/hbn263/projects/forestclaw-build-alt/local/bin/%s " \
+                             + "/homec/hbn26/hbn263/projects/forestclaw-build/local/bin/%s " \
                              + "--inifile=ex_%05d.ini\n") %
                             (np.min([rpn,p]),p,execname,p))
             proc_file.close()
@@ -853,7 +853,7 @@ def compile_results(results_dir=None,results_file='results.out',
             mi = 1
             mj = 1
             for i,l in enumerate(lines):
-                if re.search("mpi_debug",l):
+                if re.search("manifold",l):  # 'mi' not distinctive enough
                     if not re.search("mi",lines[i+1]):
                         print "Brick count mi not found in %s; setting mi=1" % f
                         mi = 1
@@ -887,7 +887,7 @@ def compile_results(results_dir=None,results_file='results.out',
 
             # maxlevel
             for i,l in enumerate(lines):
-                if re.search("maxlevel",l):
+                if re.search("[^-]maxlevel",l):  # don't match maxlevel-uses-outstyle
                     l1 = lines[i].split()
                     if duplicate:
                         maxlevel = int(l1[2]) + np.log(float(mi))/np.log(2.0)
@@ -977,9 +977,6 @@ def read_results_files(dir_list, subdir = None, results_in = None,
             pattern = re.compile("%s_[0-9]{5}\.o[0-9]*" % execname)
         else:
             pattern = re.compile(".*_[0-9]{5}\.o[0-9]*")
-
-    import pdb
-    pdb.set_trace()
 
     mx1 = []
     procs1 = []
@@ -1175,7 +1172,7 @@ def print_jobs(jobs,val2plot,fmt_int=False):
                         d = job[val2plot]
                     except:
                         print "job[\"%s\"] not a valid variable" % (val2plot)
-                        pdb.set_traceg()
+                        pdb.set_trace()
                         sys.exit()
                 else:
                     import types

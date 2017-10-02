@@ -38,6 +38,7 @@ extern "C"
 
 typedef struct user_options
 {
+    int example;
     int claw_version;
     int replicate_factor;
 
@@ -45,12 +46,17 @@ typedef struct user_options
 } user_options_t;
 
 
-void replicated_link_solvers(fclaw2d_global_t *glob);
+void replicated_problem_setup(fclaw2d_global_t* glob);
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+#define REPLICATED_SETPROB FCLAW_F77_FUNC(replicated_setprob, REPLICATED_SETPROB)
+void REPLICATED_SETPROB(int* example);
+
+
+void replicated_link_solvers(fclaw2d_global_t *glob);
 
 const user_options_t* replicated_get_options(fclaw2d_global_t* glob);
 
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 
 #ifdef __cplusplus

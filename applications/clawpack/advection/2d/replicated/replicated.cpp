@@ -36,11 +36,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
+#include <math.h>
+
 static int s_user_options_package_id = -1;
 
 static void *
 replicated_register (user_options_t *user_opt, sc_options_t * opt)
 {
+    sc_options_add_int (opt, 0, "example", &user_opt->claw_version, 0,
+                        "[user] 0 - multi-block; 1 - single block [0]");
+
     sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
 
@@ -145,30 +150,60 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    int mi, mj, a, b;
+
+    fclaw_opt->ax = 0;
+    fclaw_opt->ay = 0;
 
     /* Expand domain to get replicated behavior */
-    if (user_opt->replicate_factor > 0)
+    int mi,mj;
+    if (user_opt->example == 0)
     {
-        mi = user_opt->replicate_factor;
-        mj = user_opt->replicate_factor;
+        if (user_opt->replicate_factor > 0)
+        {
+            mi = user_opt->replicate_factor;
+            mj = user_opt->replicate_factor;
+        }
+        else
+        {
+            mi = fclaw_opt->mi;
+            mj = fclaw_opt->mj;
+        }
+        fclaw_opt->bx = mi;
+        fclaw_opt->by = mj;
     }
     else
     {
-        mi = fclaw_opt->mi;
-        mj = fclaw_opt->mj;
+        /* Single block */
+        if (user_opt->replicate_factor > 0)
+        {
+            fclaw_opt->bx = user_opt->replicate_factor;
+            fclaw_opt->by = user_opt->replicate_factor;
+        }
+        else
+        {
+            fclaw_opt->bx = fclaw_opt->mi;
+            fclaw_opt->by = fclaw_opt->mj;
+        }
+
+        mi = 1;
+        mj = 1;
+
+        /* We also need to adjust the min/max levels */
+        double ds = log(double(fclaw_opt->mi))/log(2.0);
+        fclaw_opt->minlevel += int(ds);
+        fclaw_opt->maxlevel += int(ds);
     }
 
+    fclaw_opt->mi = mi;
+    fclaw_opt->mj = mj;
+
     /* Set periodic domains.  */
-    a = 1;  
-    b = 1; 
+
+    int a,b;
+    a = 1;
+    b = 1;
     fclaw_opt->periodic_x = a;
     fclaw_opt->periodic_y = b;
-
-    fclaw_opt->ax = 0;
-    fclaw_opt->bx = mi;
-    fclaw_opt->ay = 0;
-    fclaw_opt->by = mj;
 
     /* Duplicate initial conditions in each block */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
