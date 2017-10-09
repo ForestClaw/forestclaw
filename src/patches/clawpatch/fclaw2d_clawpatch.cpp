@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
+#include <fclaw2d_clawpatch_transform.h>
 
 #include <fclaw2d_patch.h>  /* Needed to get enum for build modes */
 
@@ -67,11 +68,20 @@ fclaw2d_clawpatch_t* get_clawpatch(fclaw2d_patch_t *this_patch)
     return cp;
 }
 
-static
-fclaw2d_metric_patch_t* get_metric_patch(fclaw2d_patch_t *this_patch)
+/* Needed for virtual patch function so that the metric class can be independent 
+of a clawpatch object */
+static 
+void* clawpatch_get_metric_patch(fclaw2d_patch_t* this_patch)
 {
     fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
     return cp->mp;
+}
+
+
+static
+fclaw2d_metric_patch_t* get_metric_patch(fclaw2d_patch_t *this_patch)
+{
+    return (fclaw2d_metric_patch_t*) clawpatch_get_metric_patch(this_patch);
 }
 
 
@@ -208,7 +218,13 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
     if (fclaw_opt->manifold)
     {
-        fclaw2d_metric_patch_define(glob,this_patch,blockno, patchno, build_mode);
+        /* We pass in detailed info so that the metric patch doesn't have
+        to know about a clawpatch */
+        fclaw2d_metric_patch_define(glob,this_patch,cp->mx,cp->my,cp->mbc,
+                                    cp->dx,cp->dy,
+                                    cp->xlower,cp->ylower,
+                                    cp->xupper,cp->yupper,
+                                    blockno, patchno, build_mode);
     }
     
     if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
@@ -918,6 +934,11 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
     patch_vt->average_corner       = clawpatch_average_corner;
     patch_vt->interpolate_corner   = clawpatch_interpolate_corner;
 
+    /* Transform functions (defined in forestclaw2d */
+    patch_vt->transform_init_data    = fclaw2d_clawpatch_transform_init_data;
+    patch_vt->transform_face         = fclaw2d_patch_face_transformation;
+    patch_vt->transform_face_intra   = fclaw2d_patch_face_transformation_intra;
+
     /* Regridding  functions */
     patch_vt->tag4refinement       = clawpatch_tag4refinement;
     patch_vt->tag4coarsening       = clawpatch_tag4coarsening;
@@ -940,6 +961,8 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
     /* output functions */
     clawpatch_vt->cb_output_ascii  = cb_clawpatch_output_ascii; 
 
+    /* Metric access */
+    patch_vt->metric_patch         = clawpatch_get_metric_patch;
 
     /* Fortran functions that depend on data layout (version 4.6 or 5.0) */
     if (claw_version == 4)
@@ -1043,12 +1066,12 @@ fclaw2d_clawpatch_get_clawpatch(fclaw2d_patch_t* this_patch)
     return get_clawpatch(this_patch);
 }
 
-
 fclaw2d_metric_patch_t* 
 fclaw2d_clawpatch_get_metric_patch(fclaw2d_patch_t* this_patch)
 {
     return get_metric_patch(this_patch);
 }
+
 
 void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* this_patch,

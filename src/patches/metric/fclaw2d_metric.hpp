@@ -26,15 +26,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_METRIC_PATCH_HPP
 #define FCLAW2D_METRIC_PATCH_HPP
 
-#include <fclaw2d_farraybox.hpp>
+#include <fclaw2d_farraybox.hpp>     /* Needed for FArray box used to store metric data */
 
-#include <fclaw2d_patch.h>                /* Needed to get enum for build modes */
+#include <fclaw2d_patch.h>           /* Needed to get enum for build modes */
 
 #include "fclaw2d_metric_default_fort.h"  /* Needed for fort typdefs in vtable */
 
 typedef struct fclaw2d_metric_vtable fclaw2d_metric_vtable_t;
 
-class fclaw2d_clawpatch_t;
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
@@ -105,6 +104,10 @@ void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t *patchmp);
 
 void fclaw2d_metric_patch_define(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch *this_patch,
+                                 int mx, int my, int mbc, 
+                                 double dx, double dy, 
+                                 double xlower, double ylower,
+                                 double xupper, double yupper,
                                  int blockno, int patchno,
                                  fclaw2d_build_mode_t build_mode);
 

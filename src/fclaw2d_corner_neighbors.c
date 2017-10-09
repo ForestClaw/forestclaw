@@ -170,8 +170,8 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
         *block_corner_count = 4;  /* assume four for now */
         /* We don't have a block corner transformation, so I am going to
            treat this as if it were an interior corner */
-        fclaw2d_patch_face_transformation_intra (ftransform);
-        fclaw2d_patch_face_transformation_intra
+        fclaw2d_patch_transform_blockface_intra (ftransform);
+        fclaw2d_patch_transform_blockface_intra
             (ftransform_finegrid->transform);
     }
     else if (!has_corner_neighbor && !is_block_corner)
@@ -207,7 +207,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                                          &rfaceno);
 
             /* Get encoding of transforming a neighbor coordinate across a face */
-            fclaw2d_patch_face_transformation (block_iface, rfaceno, ftransform);
+            fclaw2d_patch_transform_blockface (block_iface, rfaceno, ftransform);
 
             /* Get transform needed to swap parallel ghost patch with fine
                grid on-proc patch.  This is done so that averaging and
@@ -216,8 +216,8 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             iface1 = block_iface;
             rface1 = rfaceno;
             fclaw2d_patch_face_swap(&iface1,&rface1);
-            fclaw2d_patch_face_transformation (iface1, rface1,
-                                               ftransform_finegrid->transform);
+            fclaw2d_patch_transform_blockface(iface1, rface1,
+                                              ftransform_finegrid->transform);
             ftransform_finegrid->block_iface = iface1;
         }
         else if (this_block_idx == *corner_block_idx)
@@ -225,8 +225,8 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             /* Both patches are in the same block, so we set the transform to
                a default transform.  This could be the case for periodic boundaries. */
             *block_corner_count = 4;  /* assume four for now */
-            fclaw2d_patch_face_transformation_intra (ftransform);
-            fclaw2d_patch_face_transformation_intra
+            fclaw2d_patch_transform_blockface_intra (ftransform);
+            fclaw2d_patch_transform_blockface_intra
                 (ftransform_finegrid->transform);
         }
         else
@@ -365,9 +365,21 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;  // gets filled in below.
 
+    fclaw2d_patch_transform_init_data(s->glob,this_patch,
+                                      this_block_idx,
+                                      this_patch_idx,
+                                      &transform_data);
+
+
     fclaw2d_transform_data_t transform_data_finegrid;
     transform_data_finegrid.glob = s->glob;
     transform_data_finegrid.based = 1;   // cell-centered data in this routine.
+
+    fclaw2d_patch_transform_init_data(s->glob,this_patch,
+                                      this_block_idx,
+                                      this_patch_idx,
+                                      &transform_data_finegrid);
+
 
     int refratio = gparms->refratio;
 

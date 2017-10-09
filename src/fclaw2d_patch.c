@@ -302,6 +302,36 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
                                 transform_data);
 }
 
+
+/* -------------------------- Transform functions (typedefs) -------------------------- */
+
+void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
+                                       struct fclaw2d_patch* patch,
+                                       int blockno, int patchno,
+                                       struct fclaw2d_transform_data *ftransform)
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    FCLAW_ASSERT(patch_vt->transform_init_data != NULL);
+    patch_vt->transform_init_data(glob,patch,blockno,patchno,ftransform);    
+}
+
+
+void fclaw2d_patch_transform_blockface(int faceno, int rfaceno,
+                                       int ftransform[])
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    FCLAW_ASSERT(patch_vt->transform_face != NULL);
+    patch_vt->transform_face(faceno, rfaceno, ftransform);
+}
+
+void fclaw2d_patch_transform_blockface_intra(int ftransform[])
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    FCLAW_ASSERT(patch_vt->transform_face_intra != NULL);
+    patch_vt->transform_face_intra(ftransform);
+}
+
+
 /* ------------------------------- Regridding functions ------------------------------- */
 
 int fclaw2d_patch_tag4refinement(fclaw2d_global_t *glob,
@@ -532,18 +562,21 @@ void fclaw2d_patch_vtable_initialize()
 {
     fclaw2d_patch_vtable_t *patch_vt = patch_vt_init();
 
+#if 0
+    /* Function pointers are set to NULL by default so are not set here */
+
     /* These must be redefined by the solver and user */
-    patch_vt->initialize         = NULL;
-    patch_vt->physical_bc        = NULL;
-    patch_vt->single_step_update = NULL;
+    patch_vt->initialize          = NULL;
+    patch_vt->physical_bc         = NULL;
+    patch_vt->single_step_update  = NULL;
 
     /* These are optional */
-    patch_vt->setup              = NULL;
-    patch_vt->remote_ghost_setup        = NULL;
+    patch_vt->setup               = NULL;
+    patch_vt->remote_ghost_setup  = NULL;
+#endif    
 
     patch_vt->is_set = 1;
 
-    /* Function pointers are set to NULL by default so are not set here */
 }
 
 /* ------------------------------ User access functions ------------------------------- */
@@ -587,6 +620,13 @@ fclaw2d_patch_get_user_data(fclaw2d_patch_t* patch)
     return (fclaw2d_patch_data_t *) patch->user;
 }
 
+
+void* fclaw2d_patch_metric_patch(struct fclaw2d_patch *patch)
+{
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();    
+    FCLAW_ASSERT(patch_vt->metric_patch != NULL);
+    return patch_vt->metric_patch(patch);
+}
 
 /* -------------------------- Internal ForestClaw functions --------------------------- */
 

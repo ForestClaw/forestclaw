@@ -28,6 +28,8 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost_fill.h \
+	src/fclaw2d_corner_neighbors.h \
+	src/fclaw2d_face_neighbors.h \
 	src/fclaw2d_map.h \
 	src/fclaw2d_timeinterp.h \
 	src/fclaw2d_regrid.h \

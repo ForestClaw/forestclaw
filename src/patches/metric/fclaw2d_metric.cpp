@@ -24,16 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_metric.hpp"
-#include "fclaw2d_metric_default_fort.h"
 
 #include <fclaw2d_global.h>
-
-#include <fclaw2d_patch.h>  /* Needed to get enum for build modes */
-
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch.hpp>
-
+#include <fclaw2d_patch.h>  
 
 static fclaw2d_metric_vtable_t s_metric_vt;
 
@@ -41,7 +34,7 @@ static fclaw2d_metric_vtable_t s_metric_vt;
 static
 fclaw2d_metric_patch_t* get_metric_patch(fclaw2d_patch_t *this_patch)
 {
-    return fclaw2d_clawpatch_get_metric_patch(this_patch);
+    return (fclaw2d_metric_patch_t*) fclaw2d_patch_metric_patch(this_patch);
 }
 
 
@@ -61,40 +54,28 @@ void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t *mp)
 }
 
 
-/* The metric patch is designed to work specifically with a clawpatch;  we make 
-this explicit by passing in both a clawpatch (cp) and the metric patch (mp). 
-
-*/
-
 void fclaw2d_metric_patch_define(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t *this_patch,
+                                 int mx, int my, int mbc, 
+                                 double dx, double dy, 
+                                 double xlower, double ylower,
+                                 double xupper, double yupper,
                                  int blockno, int patchno,
                                  fclaw2d_build_mode_t build_mode)
 {
-    /* The only way to avoid this is to give the metric patch its own set of 
-    options, which would essentially be copied from a clawpatch 
-
-    Or we just acknowledge that this "metric class" is tied to the "clawpatch class", 
-    .e.g. we can use one without the other */
-
-    fclaw2d_clawpatch_t*    cp = fclaw2d_clawpatch_get_clawpatch(this_patch);
     fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
 
-    mp->mx   = cp->mx;
-    mp->my   = cp->my;
-    mp->mbc  = cp->mbc;
+    mp->mx   = mx;
+    mp->my   = my;
+    mp->mbc  = mbc;
     mp->blockno = blockno;
 
-    mp->dx = cp->dx;
-    mp->dy = cp->dy;
-    mp->xlower = cp->xlower;
-    mp->ylower = cp->ylower;
-    mp->xupper = cp->xupper;
-    mp->yupper = cp->yupper;
-
-    int mbc = mp->mbc;
-    int mx = mp->mx;
-    int my = mp->my;
+    mp->dx = dx;
+    mp->dy = dy;
+    mp->xlower = xlower;
+    mp->ylower = ylower;
+    mp->xupper = xupper;
+    mp->yupper = yupper;
 
     /* Set up area for storage - this is needed for ghost patches, 
     and updated patches */
@@ -138,7 +119,7 @@ void fclaw2d_metric_patch_define(fclaw2d_global_t* glob,
 
         for (int idir = 0; idir < 2; idir++)
         {
-            ll[idir] = -cp->mbc;
+            ll[idir] = -mbc;
         }
         ur[0] = mx + mbc + 1;
         ur[1] = my + mbc + 1;

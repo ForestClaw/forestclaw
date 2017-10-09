@@ -23,43 +23,72 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TRANSFORM_H
-#define FCLAW2D_TRANSFORM_H
-
-#include <fclaw_base.h>   /* Defines FCLAW_F77_FUNC */
+#ifndef FCLAW2D_FACE_NEIGHBORS_H
+#define FCLAW2D_FACE_NEIGHBORS_H
 
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
-}                               /* need this because indent is dumb */
+}
 #endif
 #endif
 
+struct fclaw2d_global;
+struct fclaw2d_domain;
+struct fclaw2d_patch;
 
-/* Data structure for transformation data at non-aligned boundaries */
-  
-typedef struct fclaw2d_transform_data
+#if 0
+typedef enum fclaw2d_ghost_fill_parallel_mode
 {
-    struct fclaw2d_patch *this_patch;
-    struct fclaw2d_patch *neighbor_patch;
-    int transform[9];
-    int icorner;
-    int based;      /* 1 for cell-centered (1 .. mx); 0 for nodes (0 .. mx) */
-    int is_block_corner;
-    int block_iface;   /* -1 for interior faces or block corners */
-
-    struct fclaw2d_global *glob;
-    void* user;  /* Used by individual patches */
-} fclaw2d_transform_data_t;
+    FCLAW2D_BOUNDARY_INTERIOR_ONLY = 0,  /* Don't read parallel patches */
+    FCLAW2D_BOUNDARY_GHOST_ONLY,   /* read parallel patches */
+    FCLAW2D_BOUNDARY_ALL   /* read parallel patches */
+} fclaw2d_ghost_fill_parallel_mode_t;
 
 
+typedef enum fclaw2d_exchange_type
+{
+    FCLAW2D_COPY = 1,
+    FCLAW2D_AVERAGE,
+    FCLAW2D_INTERPOLATE,
+} fclaw2d_exchange_type_t;
+
+typedef enum fclaw2d_grid_type
+{
+    FCLAW2D_IS_COARSE = 1,
+    FCLAW2D_IS_FINE,
+} fclaw2d_grid_type_t;
+
+typedef struct fclaw2d_exchange_info
+{
+    int time_interp;
+    int level;
+    int read_parallel_patches;   /* before we have done a parallel exchange */
+    fclaw2d_exchange_type_t exchange_type;
+    fclaw2d_grid_type_t grid_type;
+    int has_fine_grid_neighbor;
+
+} fclaw2d_exchange_info_t;
+
+#endif
+
+void cb_face_fill(struct fclaw2d_domain *domain,
+                  struct fclaw2d_patch *this_patch,
+                  int this_block_idx,
+                  int this_patch_idx,
+                  void *user);
+
+void fclaw2d_face_neighbor_ghost(struct fclaw2d_global* glob,
+                                 int minlevel,
+                                 int maxlevel,
+                                 int time_interp);
 
 #ifdef __cplusplus
 #if 0
-{                               /* need this because indent is dumb */
+{
 #endif
 }
 #endif
 
-#endif /* !FCLAW2D_TRANSFORM_H */
+#endif
