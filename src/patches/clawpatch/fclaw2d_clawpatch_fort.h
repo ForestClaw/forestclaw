@@ -40,7 +40,7 @@ struct fclaw2d_transform_data;  /* Should be replaced by long int?  */
    clawpack 5.0) */
 
 
-/* -------------------- Ghost filling - patch specific ------------------ */
+/* --------------------------- Ghost filling - patch specific ------------------------- */
 
 typedef void (*clawpatch_fort_copy_face_t)(const int* mx, const int* my, const int* mbc, 
                                            const int* meqn,
@@ -88,7 +88,7 @@ typedef void (*clawpatch_fort_interpolate_corner_t)(const int* mx, const int* my
                                                     struct fclaw2d_transform_data** transform_cptr);
     
 
-/* -------------------------- Regridding functions -------------------------- */
+/* --------------------------------- Regridding functions ----------------------------- */
 
 typedef void (*clawpatch_fort_tag4refinement_t)(const int* mx,const int* my,
                                                 const int* mbc,const int* meqn,
@@ -122,7 +122,7 @@ typedef void (*clawpatch_fort_average2coarse_t)(const int* mx, const int* my,
                                                 double areacoarse[],double areafine[],
                                                 const int* igrid, const int* manifold);
     
-/* ----------------------------- time stepping ------------------------------ */
+/* --------------------------------- time stepping ------------------------------------ */
 
 typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
                                             const int *meqn, const int* psize,
@@ -130,7 +130,7 @@ typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const 
                                             double qinterp[],const double* alpha,
                                             const int* ierror);
     
-/* --------------------- Parallel ghost patches --------------------------- */
+/* ------------------------------- Parallel ghost patches ----------------------------- */
 
 typedef void (*clawpatch_fort_local_ghost_pack_t)(int *mx, int *my, int *mbc,
                                                   int *meqn, int *mint,
@@ -145,7 +145,7 @@ typedef void (*clawpatch_fort_local_ghost_pack_aux_t)(struct fclaw2d_global *glo
                                                       int packmode, int* ierror);
     
 
-/* --------------------------- Output functions --------------------------- */
+/* ---------------------------------- Output functions -------------------------------- */
 
 typedef void  (*clawpatch_fort_header_ascii_t)(char* matname1,char* matname2,
                                                double* time, int* meqn, int* maux,
@@ -162,7 +162,7 @@ typedef void (*clawpatch_fort_output_ascii_t)(char* matname1,
                                               int* blockno,   int* mpirank);
 
 
-/* --------------------- Diagnostic functions ------------------------------- */
+/* ----------------------------- Diagnostic functions --------------------------------- */
     
 typedef void (*clawpatch_fort_error_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
                                        double *dx, double *dy, double *xlower,
@@ -176,12 +176,13 @@ typedef void (*clawpatch_fort_conscheck_t)(int *mx, int *my, int* mbc, int* meqn
 typedef double (*clawpatch_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
                                         double* dy, double area[]);
 
-typedef void (*clawpatch_fort_norm_t)(int *mx, int *my, int *mbc,int *meqn,
+typedef void (*clawpatch_fort_norm_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
                                       double *dx, double *dy, double area[],
                                       double error[], double error_norm[]);
 
 
-/* --------------- User convenience headers ---------------------------- */
+
+/* -------------------------- User convenience headers -------------------------------- */
 
 #define TAG4REFINEMENT FCLAW_F77_FUNC(tag4refinement,TAG4REFINEMENT)
 void TAG4REFINEMENT(const int* mx,const int* my,

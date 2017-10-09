@@ -27,9 +27,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CLAWPATCH_HPP
 
 #include <fclaw2d_farraybox.hpp>
+#include "../metric/fclaw2d_metric.hpp"
 
 struct fclaw2d_patch;
-struct fclaw2d_transform_data;
+struct fclaw2d_global;
+
 
 class fclaw2d_clawpatch_t
 {
@@ -59,7 +61,9 @@ public :
     // Miscellaneous
     // ----------------------------------------------------------------
 
+#if 0
     void* clawpack_patch_data(int id);
+#endif    
 
 #if 0
     static fclaw_app_t* app;
@@ -92,6 +96,9 @@ public :
 
     FArrayBox aux;
 
+    fclaw2d_metric_patch_t *mp;
+
+#if 0
     FArrayBox xp;
     FArrayBox yp;
     FArrayBox zp;
@@ -109,8 +116,22 @@ public :
 
     FArrayBox area;
     FArrayBox curvature;  // ???
+#endif    
 };
 
 fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(struct fclaw2d_patch* this_patch);
+
+fclaw2d_clawpatch_t* 
+fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
+
+fclaw2d_metric_patch_t* 
+fclaw2d_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
+
+void fclaw2d_metric_compute_area_default(struct fclaw2d_global *glob,
+                                         struct fclaw2d_patch *this_patch,
+                                         class fclaw2d_metric_patch* mp,
+                                         int blockno,
+                                         int patchno);
+
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */
