@@ -43,7 +43,7 @@ struct fclaw2d_patch;
 typedef  struct fc2d_clawpack46_vtable  fc2d_clawpack46_vtable_t;
 
 
-/* -------------------------- Clawpack solver functions ------------------------------ */
+/* --------------------------- Clawpack solver functions ------------------------------ */
 
 typedef void (*fc2d_clawpack46_setprob_t)(void);
 
@@ -138,7 +138,7 @@ void fc2d_clawpack46_solver_initialize(void);
 fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(void);
 
 
-/* ----------------------------- User access to solver functions --------------------------- */
+/* ----------------------------- User access to solver functions ---------------------- */
 
 void fc2d_clawpack46_setprob(struct fclaw2d_global* glob);
 
