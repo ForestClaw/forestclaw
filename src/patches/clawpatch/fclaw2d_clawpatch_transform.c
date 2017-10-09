@@ -26,13 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_transform.h>
 
-#include <fclaw2d_transform.h>
+#include <fclaw2d_patch.h>
+
+// #include <fclaw2d_patch_transform.h>
 #include <fclaw2d_global.h>
 
 void fclaw2d_clawpatch_transform_init_data(fclaw2d_global_t* glob, 
                                            fclaw2d_patch_t* this_patch,
                                            int blockno, int patchno,
-                                           fclaw2d_transform_data_t* transform)
+                                           fclaw2d_patch_transform_data_t* transform)
 {
     /* Cell centered data */
     transform->based = 1;
@@ -44,9 +46,9 @@ void fclaw2d_clawpatch_transform_init_data(fclaw2d_global_t* glob,
 /* Same size neighbor across a face */
 void
 FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
-                        int *i2, int *j2, fclaw2d_transform_data_t** ptdata)
+                        int *i2, int *j2, fclaw2d_patch_transform_data_t** ptdata)
 {
-    fclaw2d_transform_data_t *tdata = *ptdata;
+    fclaw2d_patch_transform_data_t *tdata = *ptdata;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
              fclaw2d_clawpatch_get_options(tdata->glob);
 
@@ -65,9 +67,9 @@ FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
 void
 FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
                              int i2[], int j2[],
-                             fclaw2d_transform_data_t** ptdata)
+                             fclaw2d_patch_transform_data_t** ptdata)
 {
-    fclaw2d_transform_data_t *tdata = *ptdata;
+    fclaw2d_patch_transform_data_t *tdata = *ptdata;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
                 fclaw2d_clawpatch_get_options(tdata->glob);
 
@@ -86,9 +88,9 @@ FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
 void
 FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
                           int *i2, int *j2,
-                          fclaw2d_transform_data_t** ptdata)
+                          fclaw2d_patch_transform_data_t** ptdata)
 {
-    fclaw2d_transform_data_t *tdata = *ptdata;
+    fclaw2d_patch_transform_data_t *tdata = *ptdata;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
                    fclaw2d_clawpatch_get_options(tdata->glob);
 
@@ -124,9 +126,9 @@ FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
 void
 FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                int *i2, int *j2,
-                               fclaw2d_transform_data_t** ptdata)
+                               fclaw2d_patch_transform_data_t** ptdata)
 {
-    fclaw2d_transform_data_t *tdata = *ptdata;
+    fclaw2d_patch_transform_data_t *tdata = *ptdata;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
                fclaw2d_clawpatch_get_options(tdata->glob);
 

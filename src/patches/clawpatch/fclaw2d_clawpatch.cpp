@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_options.h>
-#include <fclaw2d_transform.h>
 
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_diagnostics.h>
@@ -350,7 +349,7 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *neighbor_patch,
                          int iface,
                          int time_interp,
-                         fclaw2d_transform_data_t *transform_data)
+                         fclaw2d_patch_transform_data_t *transform_data)
 
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -379,7 +378,7 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
                             int refratio,
                             int time_interp,
                             int igrid,
-                            fclaw2d_transform_data_t* transform_data)
+                            fclaw2d_patch_transform_data_t* transform_data)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -418,7 +417,7 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
                                 int refratio,
                                 int time_interp,
                                 int igrid,
-                                fclaw2d_transform_data_t* transform_data)
+                                fclaw2d_patch_transform_data_t* transform_data)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -443,7 +442,7 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *corner_patch,
                            int icorner,
                            int time_interp,
-                           fclaw2d_transform_data_t *transform_data)
+                           fclaw2d_patch_transform_data_t *transform_data)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -469,7 +468,7 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
                               int coarse_corner,
                               int refratio,
                               int time_interp,
-                              fclaw2d_transform_data_t* transform_data)
+                              fclaw2d_patch_transform_data_t* transform_data)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -505,7 +504,7 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                   int coarse_corner,
                                   int refratio,
                                   int time_interp,
-                                  fclaw2d_transform_data_t* transform_data)
+                                  fclaw2d_patch_transform_data_t* transform_data)
 
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();

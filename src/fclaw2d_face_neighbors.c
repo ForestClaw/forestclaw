@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_regrid.h>
-#include <fclaw2d_transform.h>
 #include <fclaw2d_domain.h>
 
 
@@ -76,7 +75,7 @@ void get_face_neighbors(fclaw2d_global_t *glob,
                         int **fine_grid_pos_ptr,
                         int **iface_neighbor_ptr,
                         int ftransform[],
-                        fclaw2d_transform_data_t* ftransform_finegrid)
+                        fclaw2d_patch_transform_data_t* ftransform_finegrid)
 {
     fclaw2d_domain_t *domain = glob->domain;
     int rproc[RefineFactor];
@@ -225,7 +224,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 
 
     /* Transform data needed at block boundaries */
-    fclaw2d_transform_data_t transform_data;
+    fclaw2d_patch_transform_data_t transform_data;
     transform_data.glob = s->glob;
     transform_data.based = 1;             /* Set by user defined patch routine */
     transform_data.this_patch = this_patch;
@@ -236,7 +235,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                                       this_patch_idx,
                                       &transform_data);
 
-    fclaw2d_transform_data_t transform_data_finegrid;
+    fclaw2d_patch_transform_data_t transform_data_finegrid;
     transform_data_finegrid.glob = s->glob;
     transform_data_finegrid.based = 1;   /* cell-centered data in this routine. */
 
@@ -418,7 +417,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
 
     int min_interp_level = time_interp ? minlevel-1 : minlevel;
 
-    fclaw2d_transform_data_t transform_data;
+    fclaw2d_patch_transform_data_t transform_data;
     transform_data.glob = glob;
     transform_data.based = 1;      /* cell-centered data in this routine. */
 

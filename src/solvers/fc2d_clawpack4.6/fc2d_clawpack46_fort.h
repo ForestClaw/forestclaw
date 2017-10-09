@@ -34,7 +34,9 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_transform_data;  /* Should be replaced by long int?  */
+#if 0
+struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
+#endif
 
 /* --------------------------------- Clawpack functions ------------------------------- */
 

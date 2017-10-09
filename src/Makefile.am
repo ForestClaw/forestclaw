@@ -38,7 +38,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_exchange.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_neighbors_fort.h \
-	src/fclaw2d_transform.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h
@@ -63,7 +62,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_forestclaw.c \
 	src/fclaw2d_vtable.c \
 	src/fclaw2d_map.c \
-	src/fclaw2d_transform.c \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_map_brick.c \
 	src/fclaw2d_convenience.c \

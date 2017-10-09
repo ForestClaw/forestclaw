@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 
-struct fclaw2d_transform_data;
+struct fclaw2d_patch_transform_data;
 
 static fclaw2d_patch_vtable_t s_patch_vt;
 
@@ -208,7 +208,7 @@ void fclaw2d_patch_copy_face(fclaw2d_global_t* glob,
                              fclaw2d_patch_t *neighbor_patch,
                              int iface,
                              int time_interp,
-                             struct fclaw2d_transform_data *transform_data)
+                             struct fclaw2d_patch_transform_data *transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->copy_face != NULL);
@@ -228,7 +228,7 @@ void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
                                 int refratio,
                                 int time_interp,
                                 int igrid,
-                                struct fclaw2d_transform_data* transform_data)
+                                struct fclaw2d_patch_transform_data* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->average_face != NULL);
@@ -248,7 +248,7 @@ void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
                                     int refratio,
                                     int time_interp,
                                     int igrid,
-                                    struct fclaw2d_transform_data* transform_data)
+                                    struct fclaw2d_patch_transform_data* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->interpolate_face != NULL);
@@ -263,7 +263,7 @@ void fclaw2d_patch_copy_corner(fclaw2d_global_t* glob,
                                fclaw2d_patch_t *corner_patch,
                                int icorner,
                                int time_interp,
-                               struct fclaw2d_transform_data *transform_data)
+                               struct fclaw2d_patch_transform_data *transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->copy_corner != NULL);
@@ -278,7 +278,7 @@ void fclaw2d_patch_average_corner(fclaw2d_global_t* glob,
                                   int coarse_corner,
                                   int refratio,
                                   int time_interp,
-                                  struct fclaw2d_transform_data* transform_data)
+                                  struct fclaw2d_patch_transform_data* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->average_corner != NULL);
@@ -293,7 +293,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
                                       int coarse_corner,
                                       int refratio,
                                       int time_interp,
-                                      struct fclaw2d_transform_data* transform_data)
+                                      struct fclaw2d_patch_transform_data* transform_data)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->interpolate_corner != NULL);
@@ -308,7 +308,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
 void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
                                        struct fclaw2d_patch* patch,
                                        int blockno, int patchno,
-                                       struct fclaw2d_transform_data *ftransform)
+                                       struct fclaw2d_patch_transform_data *ftransform)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->transform_init_data != NULL);

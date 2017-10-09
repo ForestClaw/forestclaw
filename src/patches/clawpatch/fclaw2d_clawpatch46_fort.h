@@ -36,11 +36,12 @@ extern "C"
 
 
 
-struct fclaw2d_transform_data;  /* Should be replaced by long int?  */
+struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 /* ------------------------------ Time stepping functions ----------------------------- */
-#define FCLAW2D_CLAWPATCH46_FORT_TIMEINTERP FCLAW_F77_FUNC (fclaw2d_clawpatch46_fort_timeinterp, \
-                                                       FCLAW2D_CLAWPATCH46_FORT_TIMEINTERP)
+#define FCLAW2D_CLAWPATCH46_FORT_TIMEINTERP \
+            FCLAW_F77_FUNC (fclaw2d_clawpatch46_fort_timeinterp, \
+                            FCLAW2D_CLAWPATCH46_FORT_TIMEINTERP)
 void FCLAW2D_CLAWPATCH46_FORT_TIMEINTERP(const int *mx, const int* my, const int* mbc,
                                          const int *meqn, const int* psize,
                                          double qcurr[], double qlast[],
@@ -49,8 +50,9 @@ void FCLAW2D_CLAWPATCH46_FORT_TIMEINTERP(const int *mx, const int* my, const int
 
 /* --------------------------------- Regridding functions ----------------------------- */
 
-#define FCLAW2D_CLAWPATCH46_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_tag4refinement, \
-                                                           FCLAW2D_CLAWPATCH46_FORT_TAG4REFINEMENT)
+#define FCLAW2D_CLAWPATCH46_FORT_TAG4REFINEMENT \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_tag4refinement, \
+                          FCLAW2D_CLAWPATCH46_FORT_TAG4REFINEMENT)
 
 void FCLAW2D_CLAWPATCH46_FORT_TAG4REFINEMENT(const int* mx,const int* my,
                                              const int* mbc,const int* meqn,
@@ -64,8 +66,9 @@ void FCLAW2D_CLAWPATCH46_FORT_TAG4REFINEMENT(const int* mx,const int* my,
 
 
 
-#define FCLAW2D_CLAWPATCH46_FORT_TAG4COARSENING FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_tag4coarsening, \
-                                                          FCLAW2D_CLAWPATCH46_FORT_TAG4COARSENING)
+#define FCLAW2D_CLAWPATCH46_FORT_TAG4COARSENING \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_tag4coarsening, \
+                          FCLAW2D_CLAWPATCH46_FORT_TAG4COARSENING)
 
 void FCLAW2D_CLAWPATCH46_FORT_TAG4COARSENING(const int* mx, const int* my,
                                              const int* mbc, const int* meqn,
@@ -77,16 +80,18 @@ void FCLAW2D_CLAWPATCH46_FORT_TAG4COARSENING(const int* mx, const int* my,
                                              const double* tag_threshold,
                                              int* tag_patch);
 
-#define FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE2FINE FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_interpolate2fine, \
-                                                FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE2FINE)
+#define FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE2FINE \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_interpolate2fine, \
+                          FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE2FINE)
 void FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
                                                const int* mbc, const int* meqn,
                                                double qcoarse[], double qfine[],
                                                double areacoarse[], double areafine[],
                                                const int* igrid, const int* manifold);
   
-#define FCLAW2D_CLAWPATCH46_FORT_AVERAGE2COARSE FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_average2coarse, \
-                                                FCLAW2D_CLAWPATCH46_FORT_AVERAGE2COARSE)
+#define FCLAW2D_CLAWPATCH46_FORT_AVERAGE2COARSE \
+      FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_average2coarse, \
+                     FCLAW2D_CLAWPATCH46_FORT_AVERAGE2COARSE)
 void FCLAW2D_CLAWPATCH46_FORT_AVERAGE2COARSE(const int* mx, const int* my,
                                              const int* mbc, const int* meqn,
                                              double qcoarse[],double qfine[],
@@ -97,16 +102,21 @@ void FCLAW2D_CLAWPATCH46_FORT_AVERAGE2COARSE(const int* mx, const int* my,
 
 /* ---------------------------------- Ghost filling  ---------------------------------- */
 
-#define FCLAW2D_CLAWPATCH46_FORT_COPY_FACE FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_copy_face, \
-                                                     FCLAW2D_CLAWPATCH46_FORT_COPY_FACE)
+#define FCLAW2D_CLAWPATCH46_FORT_COPY_FACE \
+         FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_copy_face, \
+                        FCLAW2D_CLAWPATCH46_FORT_COPY_FACE)
 
-void FCLAW2D_CLAWPATCH46_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, const int* meqn,
-                                        double qthis[],double qneighbor[], const int* a_idir,
-                                        struct fclaw2d_transform_data** transform_cptr);
+void FCLAW2D_CLAWPATCH46_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, 
+                                        const int* meqn,
+                                        double qthis[],double qneighbor[], 
+                                        const int* a_idir,
+                                        struct fclaw2d_patch_transform_data** 
+                                        transform_cptr);
 
 
-#define FCLAW2D_CLAWPATCH46_FORT_AVERAGE_FACE FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_average_face, \
-                                                        FCLAW2D_CLAWPATCH46_FORT_AVERAGE_FACE)
+#define FCLAW2D_CLAWPATCH46_FORT_AVERAGE_FACE \
+             FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_average_face, \
+                            FCLAW2D_CLAWPATCH46_FORT_AVERAGE_FACE)
 void FCLAW2D_CLAWPATCH46_FORT_AVERAGE_FACE(const int* mx, const int* my, const int* mbc,
                                            const int* meqn,
                                            double qcoarse[],double qfine[],
@@ -115,48 +125,58 @@ void FCLAW2D_CLAWPATCH46_FORT_AVERAGE_FACE(const int* mx, const int* my, const i
                                            const int* num_neighbors,
                                            const int* refratio, const int* igrid,
                                            const int* manifold, 
-                                           struct fclaw2d_transform_data** transform_cptr);
+                                           struct fclaw2d_patch_transform_data** 
+                                           transform_cptr);
   
-#define FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_FACE FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_interpolate_face, \
-                                                            FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_FACE)
-void FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_FACE(const int* mx, const int* my, const int* mbc,
-                                               const int* meqn,
+#define FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_FACE \
+              FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_interpolate_face, \
+                             FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_FACE)
+void FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_FACE(const int* mx, const int* my, 
+                                               const int* mbc,const int* meqn,
                                                double qcoarse[],double qfine[],
                                                const int* idir, const int* iside,
                                                const int* num_neighbors,
                                                const int* refratio, const int* igrid,
-                                               struct fclaw2d_transform_data** transform_cptr);
+                                               struct fclaw2d_patch_transform_data** 
+                                               transform_cptr);
 
-#define FCLAW2D_CLAWPATCH46_FORT_COPY_CORNER FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_copy_corner, \
-                                                       FCLAW2D_CLAWPATCH46_FORT_COPY_CORNER)
+#define FCLAW2D_CLAWPATCH46_FORT_COPY_CORNER \
+             FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_copy_corner, \
+                            FCLAW2D_CLAWPATCH46_FORT_COPY_CORNER)
 void FCLAW2D_CLAWPATCH46_FORT_COPY_CORNER(const int* mx, const int* my, const int* mbc,
-                                          const int* meqn, double this_q[],double neighbor_q[],
-                                          const int* a_corner,
-                                          struct fclaw2d_transform_data** transform_cptr);
+                                          const int* meqn, double this_q[],
+                                          double neighbor_q[],const int* a_corner,
+                                          struct fclaw2d_patch_transform_data** 
+                                          transform_cptr);
 
-#define FCLAW2D_CLAWPATCH46_FORT_AVERAGE_CORNER FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_average_corner, \
-                                                          FCLAW2D_CLAWPATCH46_FORT_AVERAGE_CORNER)
+#define FCLAW2D_CLAWPATCH46_FORT_AVERAGE_CORNER \
+      FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_average_corner, \
+                     FCLAW2D_CLAWPATCH46_FORT_AVERAGE_CORNER)
 void FCLAW2D_CLAWPATCH46_FORT_AVERAGE_CORNER(const int* mx, const int* my, const int* mbc,
                                              const int* meqn, const int* a_refratio,
                                              double qcoarse[], double qfine[],
                                              double areacoarse[], double areafine[],
-                                             const int* manifold,
-                                             const int* a_corner, 
-                                             struct fclaw2d_transform_data** transform_cptr);
+                                             const int* manifold,const int* a_corner, 
+                                             struct fclaw2d_patch_transform_data** 
+                                             transform_cptr);
   
-#define FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_CORNER FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_interpolate_corner, \
-                                                             FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_CORNER)
-void FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const int* mbc,
-                                                 const int* meqn, const int* a_refratio, double this_q[],
+#define FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_CORNER \
+      FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_interpolate_corner, \
+                     FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_CORNER)
+void FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, 
+                                                 const int* mbc,const int* meqn, 
+                                                 const int* a_refratio, double this_q[],
                                                  double neighbor_q[], const int* a_corner,
-                                                 struct fclaw2d_transform_data** transform_cptr);
+                                                 struct fclaw2d_patch_transform_data** 
+                                                 transform_cptr);
 
 
 
 /* ------------------------------------ Output functions ------------------------------ */
 
-#define  FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_output_ascii, \
-                                                       FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII)
+#define  FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_output_ascii, \
+                          FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII)
 void FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII(char* matname1,
                                             int* mx,        int* my,
                                             int* meqn,      int* mbc,
@@ -166,29 +186,34 @@ void FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII(char* matname1,
                                             int* patch_num, int* level,
                                             int* blockno,   int* mpirank);
 
-#define FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_header_ascii, \
-                                                        FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII)
+#define FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_header_ascii, \
+                        FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII)
 void FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII(char* matname1, char* matname2,
-                                           double* time, int* meqn, int* maux, int* ngrids);
+                                           double* time, int* meqn, int* maux, 
+                                           int* ngrids);
 
 
 
 /* ----------------------------- Diagnostics functions -------------------------------- */
 
-#define FCLAW2D_CLAWPATCH46_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_conservation_check, \
-                                                              FCLAW2D_CLAWPATCH46_FORT_CONSERVATION_CHECK)
+#define FCLAW2D_CLAWPATCH46_FORT_CONSERVATION_CHECK \
+          FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_conservation_check, \
+                         FCLAW2D_CLAWPATCH46_FORT_CONSERVATION_CHECK)
 void FCLAW2D_CLAWPATCH46_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                                  double *dx, double *dy,
                                                  double* area, double *q, double* sum);
 
-#define FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_compute_patch_area, \
-                                                                    FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA)
+#define FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA \
+          FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_compute_patch_area, \
+                         FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA)
 
 double FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double* dx,
                                                    double* dy, double area[]);
 
-#define FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_compute_error_norm, \
-                                                              FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM)
+#define FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_compute_error_norm, \
+                          FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM)
 
 void FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM (int* blockno, int* mx,int* my,int* mbc,
                                                   int* meqn,double* dx,double* dy,
@@ -198,8 +223,9 @@ void FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM (int* blockno, int* mx,int* my,
 /* ----------------------------- Parallel ghost patches  ------------------------------ */
 
 
-#define FCLAW2D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_local_ghost_pack, \
-                                                             FCLAW2D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK)
+#define FCLAW2D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK \
+          FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_local_ghost_pack, \
+                         FCLAW2D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK)
 void FCLAW2D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK(int *mx, int *my, int *mbc,
                                                 int *meqn, int *mint,
                                                 double qdata[], double area[],

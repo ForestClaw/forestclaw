@@ -38,7 +38,8 @@ extern "C"
 
 
 /* Data structure for transformation data at non-aligned boundaries */
-  
+
+#if 0
 typedef struct fclaw2d_transform_data
 {
     struct fclaw2d_patch *this_patch;
@@ -52,6 +53,8 @@ typedef struct fclaw2d_transform_data
     struct fclaw2d_global *glob;
     void* user;  /* Used by individual patches */
 } fclaw2d_transform_data_t;
+
+#endif
 
 
 

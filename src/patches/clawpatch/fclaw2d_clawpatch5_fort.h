@@ -36,7 +36,7 @@ extern "C"
 
 
 
-struct fclaw2d_transform_data;  /* Should be replaced by long int?  */
+struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 /* ------------------------------ Time stepping functions ----------------------------- */
 #define FCLAW2D_CLAWPATCH5_FORT_TIMEINTERP \
@@ -109,9 +109,11 @@ void FCLAW2D_CLAWPATCH5_FORT_AVERAGE2COARSE(const int* mx, const int* my,
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_copy_face, \
                    FCLAW2D_CLAWPATCH5_FORT_COPY_FACE)
 
-void FCLAW2D_CLAWPATCH5_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, const int* meqn,
+void FCLAW2D_CLAWPATCH5_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, 
+                                       const int* meqn,
                                         double qthis[],double qneighbor[], const int* a_idir,
-                                        struct fclaw2d_transform_data** transform_cptr);
+                                        struct fclaw2d_patch_transform_data** 
+                                        transform_cptr);
 
 
 #define FCLAW2D_CLAWPATCH5_FORT_AVERAGE_FACE \
@@ -126,28 +128,32 @@ void FCLAW2D_CLAWPATCH5_FORT_AVERAGE_FACE(const int* mx, const int* my, const in
                                            const int* num_neighbors,
                                            const int* refratio, const int* igrid,
                                            const int* manifold, 
-                                           struct fclaw2d_transform_data** transform_cptr);
+                                           struct fclaw2d_patch_transform_data** 
+                                           transform_cptr);
   
 #define FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_FACE \
                     FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_interpolate_face, \
                     FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_FACE)
 
-void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_FACE(const int* mx, const int* my, const int* mbc,
+void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_FACE(const int* mx,const int* my,const int* mbc,
                                               const int* meqn,
                                               double qcoarse[],double qfine[],
                                               const int* idir, const int* iside,
                                                const int* num_neighbors,
                                                const int* refratio, const int* igrid,
-                                               struct fclaw2d_transform_data** transform_cptr);
+                                               struct fclaw2d_patch_transform_data** 
+                                               transform_cptr);
 
 #define FCLAW2D_CLAWPATCH5_FORT_COPY_CORNER \
                           FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_copy_corner, \
                           FCLAW2D_CLAWPATCH5_FORT_COPY_CORNER)
 
 void FCLAW2D_CLAWPATCH5_FORT_COPY_CORNER(const int* mx, const int* my, const int* mbc,
-                                         const int* meqn, double this_q[],double neighbor_q[],
+                                         const int* meqn, double this_q[], 
+                                         double neighbor_q[],
                                          const int* a_corner,
-                                         struct fclaw2d_transform_data** transform_cptr);
+                                         struct fclaw2d_patch_transform_data** 
+                                         transform_cptr);
 
 #define FCLAW2D_CLAWPATCH5_FORT_AVERAGE_CORNER \
                          FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_average_corner, \
@@ -159,16 +165,20 @@ void FCLAW2D_CLAWPATCH5_FORT_AVERAGE_CORNER(const int* mx, const int* my, const 
                                             double areacoarse[], double areafine[],
                                             const int* manifold,
                                             const int* a_corner, 
-                                            struct fclaw2d_transform_data** transform_cptr);
+                                            struct fclaw2d_patch_transform_data** 
+                                            transform_cptr);
   
 #define FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER \
                     FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_interpolate_corner, \
                     FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER)
 
-void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const int* mbc,
-                                                const int* meqn, const int* a_refratio, double this_q[],
+void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, 
+                                                const int* mbc,
+                                                const int* meqn, const int* a_refratio, 
+                                                double this_q[],
                                                 double neighbor_q[], const int* a_corner,
-                                                struct fclaw2d_transform_data** transform_cptr);
+                                                struct fclaw2d_patch_transform_data** 
+                                                transform_cptr);
 
 
 
@@ -192,7 +202,8 @@ void FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII(char* matname1,
                    FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII)
 
 void FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII(char* matname1, char* matname2,
-                                          double* time, int* meqn, int* maux, int* ngrids);
+                                          double* time, int* meqn, int* maux, 
+                                          int* ngrids);
 
 
 

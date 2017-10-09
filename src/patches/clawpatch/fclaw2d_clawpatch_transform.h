@@ -38,12 +38,12 @@ extern "C"
 
 struct fclaw2d_global;
 struct fclaw2d_patch;  /* fclaw2d_patch.h includes this file */
-struct fclaw2d_transform_data;
+struct fclaw2d_patch_transform_data;
 
 void fclaw2d_clawpatch_transform_init_data(struct fclaw2d_global* glob, 
                                            struct fclaw2d_patch* this_patch,
                                            int blockno, int patchno,
-                                           struct fclaw2d_transform_data* transform);
+                                           struct fclaw2d_patch_transform_data* transform);
 
 
 /* ----------------------------- Called from Fortran ---------------------------------- */
@@ -52,25 +52,25 @@ void fclaw2d_clawpatch_transform_init_data(struct fclaw2d_global* glob,
                                               FCLAW2D_TRANSFORM_FACE)
 void FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
                              int *i2, int *j2,
-                             struct fclaw2d_transform_data** ptdata);
+                             struct fclaw2d_patch_transform_data** ptdata);
 
 #define FCLAW2D_TRANSFORM_FACE_HALF FCLAW_F77_FUNC_(fclaw2d_transform_face_half, \
                                                     FCLAW2D_TRANSFORM_FACE_HALF)
 void FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
                                   int i2[], int j2[],
-                                  struct fclaw2d_transform_data** ptdata);
+                                  struct fclaw2d_patch_transform_data** ptdata);
 
 #define FCLAW2D_TRANSFORM_CORNER FCLAW_F77_FUNC_(fclaw2d_transform_corner, \
                                                  FCLAW2D_TRANSFORM_CORNER)
 void FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
                                int *i2, int *j2,
-                               struct fclaw2d_transform_data** ptdata);
+                               struct fclaw2d_patch_transform_data** ptdata);
 
 #define FCLAW2D_TRANSFORM_CORNER_HALF FCLAW_F77_FUNC_(fclaw2d_transform_corner_half, \
                                                       FCLAW2D_TRANSFORM_CORNER_HALF)
 void FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                     int i2[], int j2[],
-                                    struct fclaw2d_transform_data** ptdata);
+                                    struct fclaw2d_patch_transform_data** ptdata);
 
 #ifdef __cplusplus
 #if 0
