@@ -528,12 +528,6 @@ fclaw2d_patch_vtable_t* patch_vt_init()
     return &s_patch_vt;
 }
 
-fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
-{
-    FCLAW_ASSERT(s_patch_vt.is_set != 0);
-    return &s_patch_vt;
-}
-
 void fclaw2d_patch_vtable_initialize()
 {
     fclaw2d_patch_vtable_t *patch_vt = patch_vt_init();
@@ -553,6 +547,13 @@ void fclaw2d_patch_vtable_initialize()
 }
 
 /* ------------------------------ User access functions ------------------------------- */
+
+fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
+{
+    FCLAW_ASSERT(s_patch_vt.is_set != 0);
+    return &s_patch_vt;
+}
+
 
 
 void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,

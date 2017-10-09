@@ -117,6 +117,16 @@ void fclaw2d_patch_build_from_fine(struct fclaw2d_global *glob,
                                    int fine0_patchno,
                                    fclaw2d_build_mode_t build_mode);
 
+
+#if 0
+void fclaw2d_patch_copy(struct fclaw2d_global *glob,
+                        struct fclaw2d_patch *old_patch,
+                        struct fclaw2d_patch *new_patch,
+                        int this_block_idx,
+                        int old_patch_idx,
+                        int new_patch_idx);
+#endif                        
+
 /* ---------------------------- Solver specific functions ----------------------------- */
 
 void fclaw2d_patch_initialize(struct fclaw2d_global *glob,
@@ -302,7 +312,6 @@ fclaw2d_patch_get_user_data(struct fclaw2d_patch* patch);
 
 void* fclaw2d_patch_get_user_patch(struct fclaw2d_patch* patch);
 
-
 /* ---------------------- Creating/deleting patches (typedefs) ------------------------ */
 
 typedef void* (*fclaw2d_patch_new_t)();
@@ -327,6 +336,15 @@ typedef void (*fclaw2d_patch_setup_t)(struct fclaw2d_global *glob,
                                       struct fclaw2d_patch *this_patch,
                                       int this_block_idx,
                                       int this_patch_idx);
+
+#if 0
+typedef void (*fclaw2d_patch_copy_t)(struct fclaw2d_global *glob,
+                                     struct fclaw2d_patch *old_patch,
+                                     struct fclaw2d_patch *new_patch,
+                                     int this_block_idx,
+                                     int old_patch_idx,
+                                     int new_patch_idx);
+#endif                                     
 
 /* --------------------- Solver specific functions (typedefs) ------------------------- */
 
