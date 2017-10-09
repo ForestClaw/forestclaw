@@ -261,7 +261,7 @@ double FC2D_CLAWPACK5_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double*
 #define FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM FCLAW_F77_FUNC(fc2d_clawpack5_fort_compute_error_norm, \
                                                               FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM)
 
-void FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM(int *mx, int *my, int *mbc, int *meqn,
+void FC2D_CLAWPACK5_FORT_COMPUTE_ERROR_NORM(int* blockno, int *mx, int *my, int *mbc, int *meqn,
                                             double *dx, double *dy, double area[],
                                             double error[], double error_norm[]);
 

@@ -386,7 +386,8 @@ fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt_init()
 /* This is called from the user application. */
 void fc2d_clawpack5_solver_initialize()
 {
-    fclaw2d_clawpatch_vtable_initialize();
+    int claw_version = 5;
+    fclaw2d_clawpatch_vtable_initialize(claw_version);
 
     fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();
