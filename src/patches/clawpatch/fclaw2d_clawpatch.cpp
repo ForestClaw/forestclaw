@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
-// #include <fclaw2d_clawpatch46_fort.h>
 
 #include <fclaw2d_patch.h>  /* Needed to get enum for build modes */
 
@@ -55,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../metric/fclaw2d_metric.hpp"
 
 #include "fclaw2d_clawpatch46_fort.h"
+#include "fclaw2d_clawpatch5_fort.h"
 
 /* ------------------------------- Static function defs ------------------------------- */
 
@@ -618,7 +618,7 @@ void clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 
         if (fclaw_opt->manifold)
         {
-            fclaw2d_metric_patch_mesh_data(glob,fine_patches,&xp,&yp,&zp,
+            fclaw2d_metric_patch_mesh_data(glob,fine_patch,&xp,&yp,&zp,
                                            &xd,&yd,&zd,&areafine);
         }
         else
@@ -679,8 +679,8 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
         }
 
         clawpatch_vt->fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                                    areacoarse, areafine, &igrid,
-                                                    &fclaw_opt->manifold);
+                                          areacoarse, areafine, &igrid,
+                                          &fclaw_opt->manifold);
 
     }
 }
@@ -708,7 +708,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
     int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
 
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
-    area = fclaw2d_metric_patch_get_area(glob,this_patch);
+    area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
     int mx = clawpatch_opt->mx;
     int my = clawpatch_opt->my;

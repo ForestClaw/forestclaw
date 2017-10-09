@@ -208,7 +208,7 @@ void metric_average_area_from_fine(fclaw2d_global_t *glob,
 
 /* --------------------------------- Public interface  -------------------------------- */
 
-void fclaw2d_metric_patch_compute_area(fclaw2d_global_t *glob,
+void fclaw2d_metric_patch_compute_area (fclaw2d_global_t *glob,
                                        fclaw2d_patch_t* this_patch,
                                        int blockno, int patchno)
 {
