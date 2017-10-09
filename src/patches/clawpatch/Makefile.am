@@ -1,5 +1,6 @@
 # -*- Makefile -*-
 libclawpatch_generated_headers =
+
 libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
@@ -44,15 +45,32 @@ libclawpatch_compiled_sources = \
 	src/patches/metric/fortran_source2d/fclaw2d_metric_default_fort.f
 
 
+## Name of library to build
 lib_LTLIBRARIES += src/patches/clawpatch/libclawpatch.la
 
+## Named variables that can be reference from other libraries/apps
+FCLAW_CLAWPATCH_CPPFLAGS = -I@top_srcdir@/src/patches/clawpatch \
+                           -I@top_srcdir@/src/patches/metric
+
+FCLAW_CLAWPATCH_LDADD    = @top_builddir@/src/patches/clawpatch/libclawpatch.la
+
+## Sources needed to build this library
 src_patches_clawpatch_libclawpatch_la_SOURCES = \
-  $(libclawpatch_internal_headers) \
-  $(libclawpatch_compiled_sources)
+        $(libclawpatch_internal_headers) \
+        $(libclawpatch_compiled_sources)
 
-src_patches_clawpatch_libclawpatch_la_CPPFLAGS = $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS) 
+## Headers needed to build this library.  
+##  - AM_CPPFLAGS needed to get p4est/sc headers
+##  - FCLAW_CPPFLAGS needed for forestclaw headers (also included in AM_CPPFLAGS)
+##  - FCLAW_CLAWPATCH_CPPFLAGS needed for clawpatch headers (also included in AM_CPPFLAGS)
+src_patches_clawpatch_libclawpatch_la_CPPFLAGS = \
+                $(AM_CPPFLAGS)
 
-FCLAW_CLAWPATCH_CPPFLAGS = -I@top_srcdir@/src/patches/clawpatch
-FCLAW_CLAWPATCH_LDADD = @top_builddir@/src/patches/clawpatch/libclawpatch.la
+#				$(FCLAW_CPPFLAGS) \
+#				$(FCLAW_CLAWPATCH_CPPFLAGS)
+
+## Add headers from this library to general header "pool", to be used by other apps
+AM_CPPFLAGS += $(FCLAW_CLAWPATCH_CPPFLAGS)
+LDADD       += $(FCLAW_CLAWPATCH_LDADD)
 
 include_HEADERS += $(libclawpatch_installed_headers)

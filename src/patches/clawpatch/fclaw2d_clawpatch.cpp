@@ -50,11 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Needed only for MB_BLOCK_CORNER_GHOST */
 #include <fclaw2d_neighbors_fort.h>
 
+#include <fclaw2d_metric.hpp>
 
-#include "../metric/fclaw2d_metric.hpp"
-
-#include "fclaw2d_clawpatch46_fort.h"
-#include "fclaw2d_clawpatch5_fort.h"
+#include <fclaw2d_clawpatch46_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
 
 /* ------------------------------- Static function defs ------------------------------- */
 
@@ -934,12 +933,12 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
     patch_vt->remote_ghost_delete  = clawpatch_remote_ghost_delete;
 
     /* partitioning */
-    patch_vt->partition_packsize    = clawpatch_partition_packsize;
-    patch_vt->partition_pack        = clawpatch_partition_pack;
-    patch_vt->partition_unpack      = clawpatch_partition_unpack;
+    patch_vt->partition_packsize   = clawpatch_partition_packsize;
+    patch_vt->partition_pack       = clawpatch_partition_pack;
+    patch_vt->partition_unpack     = clawpatch_partition_unpack;
 
     /* output functions */
-    clawpatch_vt->cb_output_ascii   = cb_clawpatch_output_ascii; 
+    clawpatch_vt->cb_output_ascii  = cb_clawpatch_output_ascii; 
 
 
     /* Fortran functions that depend on data layout (version 4.6 or 5.0) */
