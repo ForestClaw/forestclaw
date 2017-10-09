@@ -19,6 +19,9 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_clawpack_advection_2d_swirl_cons_swirlcons_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK46_LDADD) \
+        $(FCLAW_CLAWPACK5_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+        $(LDADD)
 
 ## @top_builddir@/src/solvers/fclaw2d_clawpack46/libclawpack5.la
