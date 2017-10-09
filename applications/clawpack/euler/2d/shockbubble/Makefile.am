@@ -35,4 +35,7 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK46_LDADD) \
+        $(FCLAW_CLAWPACK5_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+        $(LDADD)

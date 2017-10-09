@@ -4,6 +4,9 @@ if FCLAW_ENABLE_CLAWPACK
 # Clawpack 4.6 and 5.0 libraries and examples
 # --------------------------------------------
 
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
 ## Solver libraries (both need to be compiled to compile applications)
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/solvers/fc2d_clawpack5/Makefile.am

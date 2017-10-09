@@ -26,4 +26,7 @@ applications_clawpack_acoustics_2d_radial_radial_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_clawpack_acoustics_2d_radial_radial_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK46_LDADD) \
+        $(FCLAW_CLAWPACK5_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+        $(LDADD)

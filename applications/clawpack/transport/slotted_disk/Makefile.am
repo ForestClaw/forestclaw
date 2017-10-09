@@ -40,4 +40,7 @@ applications_clawpack_transport_slotted_disk_slotted_disk_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_clawpack_transport_slotted_disk_slotted_disk_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK46_LDADD)  \
+        $(FCLAW_CLAWPACK5_LDADD)  \
+        $(FCLAW_CLAWPATCH_LDADD)  \
+        $(LDADD)
