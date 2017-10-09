@@ -31,8 +31,14 @@ src_solvers_fc2d_clawpack5_libclawpack5_la_CPPFLAGS = \
   $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS) $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 FCLAW_CLAWPACK5_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_clawpack5
+
+LDADD += @top_builddir@/src/solvers/fc2d_clawpack5/libclawpack5.la
+
 FCLAW_CLAWPACK5_LDADD = @top_builddir@/src/solvers/fc2d_clawpack5/libclawpack5.la
 
-AM_CPPFLAGS += -I@top_srcdir@/src/solvers/fcd_clawpack5 $(FCLAW_CLAWPATCH_CPPFLAGS)
+# AM_CPPFLAGS += -I@top_srcdir@/src/solvers/fcd_clawpack5 $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 include_HEADERS += $(libclawpack5_installed_headers)
+
+
+
