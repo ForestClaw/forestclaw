@@ -1,5 +1,6 @@
 # -*- Makefile -*-
 libclawpack4_6_generated_headers =
+
 libclawpack4_6_installed_headers = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.h \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.h \
@@ -19,19 +20,31 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2_wrap.f
 
 
+## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_clawpack4.6/libclawpack4.6.la
 
-src_solvers_fc2d_clawpack4_6_libclawpack4_6_la_SOURCES = \
-  $(libclawpack4_6_internal_headers) \
-  $(libclawpack4_6_compiled_sources)
-
-src_solvers_fc2d_clawpack4.6_libclawpack4.6_la_CPPFLAGS = \
-  $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS) $(FCLAW_CLAWPATCH_CPPFLAGS)
-
+## Named variables that can be reference from other libraries/apps
 FCLAW_CLAWPACK46_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_clawpack4.6 
+FCLAW_CLAWPACK46_LDADD    = @top_builddir@/src/solvers/fc2d_clawpack4.6/libclawpack4.6.la
 
-LDADD += @top_builddir@/src/solvers/fc2d_clawpack4.6/libclawpack4.6.la
+## Sources needed to build this library
+src_solvers_fc2d_clawpack4_6_libclawpack4_6_la_SOURCES = \
+          $(libclawpack4_6_internal_headers) \
+          $(libclawpack4_6_compiled_sources)
 
-AM_CPPFLAGS += -I@top_srcdir@/src/solvers/fcd_clawpack4.6 $(FCLAW_CLAWPATCH_CPPFLAGS)
+## Headers needed to build this library.  
+##  - AM_CPPFLAGS needed to get p4est/sc headers
+##  - FCLAW_CPPFLAGS needed for forestclaw headers (also included in AM_CPPFLAGS)
+##  - FCLAW_CLAWPATCH_CPPFLAGS needed for clawpatch headers (also included in AM_CPPFLAGS)
+##  - FCLAW_CLAWPACK46_CPPFLAGS needed for clawpack46 headers (also included in AM_CPPFLAGS)
+src_solvers_fc2d_clawpack4.6_libclawpack4.6_la_CPPFLAGS = \
+          $(AM_CPPFLAGS) \
+          $(FCLAW_CPPFLAGS) \
+          $(FCLAW_CLAWPACK46_CPPFLAGS) \
+          $(FCLAW_CLAWPATCH_CPPFLAGS)
+
+## Add headers from this library to general header pool, to be used by other apps
+LDADD        += $(FCLAW_CLAWPACK46_LDADD)
+AM_CPPFLAGS  += $(FCLAW_CLAWPACK46_CPPFLAGS)
 
 include_HEADERS += $(libclawpack4_6_installed_headers)
