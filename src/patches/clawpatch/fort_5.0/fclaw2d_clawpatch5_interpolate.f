@@ -21,10 +21,9 @@ c     # ----------------------------------------------------------
 c     # This routine is used for both mapped and non-mapped
 c     # cases.
 c     # ----------------------------------------------------------
-      subroutine fc2d_clawpack5_fort_interpolate_face(mx,my,mbc,meqn,
-     &      qcoarse,qfine,
-     &      idir,iface_coarse,num_neighbors,refratio,igrid,
-     &      transform_ptr)
+      subroutine fclaw2d_clawpatch5_fort_interpolate_face(mx,my,mbc,
+     &      meqn, qcoarse,qfine, idir,iface_coarse,num_neighbors,
+     & refratio,igrid,transform_ptr)
       implicit none
       integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
       integer num_neighbors
@@ -177,9 +176,9 @@ c              # ---------------------------------------------
 
       end
 
-      subroutine fc2d_clawpack5_fort_interpolate_corner(mx,my,mbc,meqn,
-     &      refratio,
-     &      qcoarse,qfine,icorner_coarse,transform_ptr)
+      subroutine fclaw2d_clawpatch5_fort_interpolate_corner(mx,my,
+     &      mbc,meqn,refratio, qcoarse,qfine,icorner_coarse,
+     &      transform_ptr)
       implicit none
 
       integer mx,my,mbc,meqn,icorner_coarse,refratio
@@ -279,8 +278,8 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
       end
 
 c     # Conservative intepolation to fine grid patch
-      subroutine fc2d_clawpack5_fort_interpolate2fine(mx,my,mbc,meqn,
-     &      qcoarse, qfine, areacoarse, areafine, igrid, manifold)
+      subroutine fclaw2d_clawpatch5_fort_interpolate2fine(mx,my,mbc,
+     &    meqn, qcoarse, qfine, areacoarse, areafine, igrid, manifold)
       implicit none
 
       integer mx,my,mbc,meqn
@@ -349,7 +348,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       enddo
 
       if (manifold .ne. 0) then
-         call fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+         call fclaw2d_clawpatch5_fort_fixcapaq2(mx,my,mbc,meqn,
      &         qcoarse,qfine,areacoarse,areafine,igrid)
       endif
 
@@ -362,7 +361,7 @@ c     # So far, this is only used by the interpolation from
 c     # coarse to fine when regridding.  But maybe it should
 c     # be used by the ghost cell routines as well?
 c     # ------------------------------------------------------
-      subroutine fc2d_clawpack5_fort_fixcapaq2(mx,my,mbc,meqn,
+      subroutine fclaw2d_clawpatch5_fort_fixcapaq2(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse,areafine,igrid)
       implicit none
 

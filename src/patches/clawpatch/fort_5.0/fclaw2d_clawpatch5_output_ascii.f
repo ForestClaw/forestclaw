@@ -1,14 +1,13 @@
-      subroutine fc2d_clawpack46_fort_header_ascii
-     &      (matname1,matname2,
-     &      time,meqn,maux,ngrids)
+      subroutine fclaw2d_clawpatch5_fort_header_ascii(matname1,matname2, 
+     &     time, meqn,maux, ngrids)
+                                                 
       implicit none
 
-      integer iframe,meqn,ngrids, maux
+      integer iframe,meqn,maux,ngrids
 
-      character*11 matname1
-      character*11 matname2
+      character*11 matname1, matname2
       double precision time
-      integer matunit1, matunit2
+      integer matunit1,matunit2
 
       matunit1 = 10
       matunit2 = 15
@@ -28,19 +27,18 @@
 
       end
 
-      subroutine fc2d_clawpack46_fort_output_ascii(matname1,
+
+      subroutine fclaw2d_clawpatch5_fort_output_ascii(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,patch_num,level,blockno,mpirank)
-
       implicit none
 
-      character(len=11) matname1
+      character*11 matname1
       integer meqn,mbc,mx,my
-      integer patch_num
-      integer level, blockno, mpirank
+      integer patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy
 
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer matunit1
       integer i,j,mq
@@ -48,39 +46,36 @@
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
 
-      call fc2d_clawpack46_fort_write_grid_header(matunit1,
+      call fclaw2d_clawpatch5_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 
 
       if (meqn .gt. 5) then
-         write(6,'(A,A,A)')
-     &         'Warning (fclaw2d_fort_write_grid_header.f) ',
-     &         ': meqn > 5; change format statement 120.'
+         write(6,'(A,A)') 'Warning (fclaw2d_fort_write_file.f) ',
+     &         ': meqn > 5;  change format statement 109.'
          stop
       endif
 
+c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
       do j = 1,my
          do i = 1,mx
             do mq = 1,meqn
-               if (abs(q(i,j,mq)) .lt. 1d-99) then
-                  q(i,j,mq) = 0.d0
+               if (abs(q(mq,i,j)) .lt. 1d-99) then
+                  q(mq,i,j) = 0.d0
                endif
             enddo
-            write(matunit1,120) (q(i,j,mq),mq=1,meqn)
+            write(matunit1,120) (q(mq,i,j),mq=1,meqn)
          enddo
          write(matunit1,*) ' '
       enddo
-c     # This statement is checked above (meqn <= 5)
   120 format (5E26.16)
 
       close(matunit1)
 
       end
 
-
-      subroutine fc2d_clawpack46_fort_write_grid_header
-     &      (matunit1,
+      subroutine fclaw2d_clawpatch5_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 

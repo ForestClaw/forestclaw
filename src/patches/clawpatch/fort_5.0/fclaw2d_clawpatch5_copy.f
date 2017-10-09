@@ -8,8 +8,8 @@ c     # ----------------------------------------------------------
 
 
 c     # Exchange edge ghost data with neighboring grid at same level.
-      subroutine fc2d_clawpack5_fort_copy_face(mx,my,mbc,meqn,qthis,
-     &      qneighbor,iface,transform_ptr)
+      subroutine fclaw2d_clawpatch5_fort_copy_face(mx,my,mbc,
+     &      meqn,qthis,qneighbor,iface,transform_ptr)
       implicit none
 
       integer mx,my,mbc,meqn,iface, ftransform(9)
@@ -66,7 +66,7 @@ c                 # y-direction (idir == 1)
       end
 
 
-      subroutine fc2d_clawpack5_fort_copy_corner(mx,my,mbc,meqn,
+      subroutine fclaw2d_clawpatch5_fort_copy_corner(mx,my,mbc,meqn,
      &      qthis, qneighbor, this_icorner,transform_ptr)
       implicit none
 
@@ -107,8 +107,8 @@ c              # can now be dropped in.
       end
 
 
-      subroutine fc2d_clawpack5_fort_copy_phys_corner(mx,my,mbc,meqn,
-     &      qthis, qneighbor, icorner, iface)
+      subroutine fclaw2d_clawpatch5_fort_copy_phys_corner(mx,my,
+     &      mbc,meqn, qthis, qneighbor, icorner, iface)
       implicit none
 
       integer mx, my, mbc, meqn, iface, icorner

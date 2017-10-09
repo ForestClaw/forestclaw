@@ -1,5 +1,5 @@
-      subroutine fc2d_clawpack5_fort_timeinterp(mx,my,mbc,meqn,psize,
-     &      qcurr,qlast,qinterp,alpha,ierror)
+      subroutine fclaw2d_clawpatch5_fort_timeinterp(mx,my,mbc,
+     &      meqn,psize, qcurr,qlast,qinterp,alpha,ierror)
       implicit none
 
       integer mx,my,mbc,meqn,psize, ierror
