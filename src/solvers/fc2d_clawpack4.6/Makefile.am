@@ -32,11 +32,9 @@ src_solvers_fc2d_clawpack4_6_libclawpack4_6_la_SOURCES = \
           $(libclawpack4_6_internal_headers) \
           $(libclawpack4_6_compiled_sources)
 
-## Headers needed to build this library.  
-##  - AM_CPPFLAGS needed to get p4est/sc headers
-##  - FCLAW_CPPFLAGS needed for forestclaw headers (also included in AM_CPPFLAGS)
-##  - FCLAW_CLAWPATCH_CPPFLAGS needed for clawpatch headers (also included in AM_CPPFLAGS)
-##  - FCLAW_CLAWPACK46_CPPFLAGS needed for clawpack46 headers (also included in AM_CPPFLAGS)
+## Headers needed to build this library.  Only AM_CPPFLAGS required; others are 
+## included in AM_CPPFLAGS, but are included here for clarity (although makes 
+## for lengthy compile lines)
 src_solvers_fc2d_clawpack4.6_libclawpack4.6_la_CPPFLAGS = \
           $(AM_CPPFLAGS) \
           $(FCLAW_CPPFLAGS) \

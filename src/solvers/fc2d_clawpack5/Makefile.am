@@ -26,7 +26,7 @@ lib_LTLIBRARIES += src/solvers/fc2d_clawpack5/libclawpack5.la
 
 ## Named variables that can be reference from other libraries/apps
 FCLAW_CLAWPACK5_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_clawpack5
-FCLAW_CLAWPACK46_LDADD    = @top_builddir@/src/solvers/fc2d_clawpack5/libclawpack5.la
+FCLAW_CLAWPACK5_LDADD    = @top_builddir@/src/solvers/fc2d_clawpack5/libclawpack5.la
 
 ## Sources needed to build this library
 src_solvers_fc2d_clawpack5_libclawpack5_la_SOURCES = \
@@ -39,7 +39,7 @@ src_solvers_fc2d_clawpack5_libclawpack5_la_SOURCES = \
 src_solvers_fc2d_clawpack5_libclawpack5_la_CPPFLAGS = \
               $(AM_CPPFLAGS) \
               $(FCLAW_CPPFLAGS) \
-              $(FCLAW_CLAWPACK46_CPPFLAGS) \
+              $(FCLAW_CLAWPACK5_CPPFLAGS) \
               $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 
