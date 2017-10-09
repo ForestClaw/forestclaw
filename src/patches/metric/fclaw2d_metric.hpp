@@ -35,8 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef struct fclaw2d_metric_vtable fclaw2d_metric_vtable_t;
 
 class fclaw2d_clawpatch_t;
-
 struct fclaw2d_global;
+struct fclaw2d_patch;
 
 class fclaw2d_metric_patch_t
 {
