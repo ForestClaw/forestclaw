@@ -1,4 +1,4 @@
-# This file is part of ForestClaw.
+ # This file is part of ForestClaw.
 # Makefile.am in src
 # included non-recursively from toplevel directory
 
@@ -112,17 +112,17 @@ libforestclaw_compiled_sources = \
 
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = \
-    -I@top_srcdir@/src  \
+    -I@top_srcdir@/src \
 	-I@top_srcdir@/src/fortran_source2d
 
-FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)
+FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)   # Not currently needed
 
 lib_LTLIBRARIES += src/libforestclaw.la
 src_libforestclaw_la_SOURCES = \
 	$(libforestclaw_internal_headers) \
  	$(libforestclaw_compiled_sources)
 
-# src_libforestclaw_la_CPPFLAGS = $(AM_CPPFLAGS)
+src_libforestclaw_la_CPPFLAGS = $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
 
 LDADD += @top_builddir@/src/libforestclaw.la \
 	     @FCLAW_P4EST_LDADD@ \

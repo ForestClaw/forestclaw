@@ -54,6 +54,9 @@ lib_LTLIBRARIES += src/patches/clawpatch/libclawpatch.la
 FCLAW_CLAWPATCH_CPPFLAGS = -I@top_srcdir@/src/patches/clawpatch \
                            -I@top_srcdir@/src/patches/metric
 
+## Needed for metric_terms.i
+FCLAW_CLAWPATCH_FFLAGS = -I@top_srcdir@/src/patches/metric/fortran_source2d
+
 FCLAW_CLAWPATCH_LDADD    = @top_builddir@/src/patches/clawpatch/libclawpatch.la
 
 ## Sources needed to build this library
@@ -74,5 +77,7 @@ src_patches_clawpatch_libclawpatch_la_CPPFLAGS = \
 ## Add headers from this library to general header "pool", to be used by other apps
 AM_CPPFLAGS += $(FCLAW_CLAWPATCH_CPPFLAGS)
 LDADD       += $(FCLAW_CLAWPATCH_LDADD)
+AM_FFLAGS   += $(FCLAW_CLAWPATCH_FFLAGS)
+
 
 include_HEADERS += $(libclawpatch_installed_headers)
