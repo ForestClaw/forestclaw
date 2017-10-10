@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_defs.h>
-#include <fclaw2d_transform.h>
 
 
 static fc2d_clawpack5_vtable_t s_clawpack5_vt;

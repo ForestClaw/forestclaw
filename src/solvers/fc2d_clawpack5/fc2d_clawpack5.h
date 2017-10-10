@@ -36,7 +36,6 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_transform_data;
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
