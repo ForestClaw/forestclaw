@@ -107,6 +107,8 @@ typedef void (*fc2d_clawpack5_fluxfun_t)(const int* meqn, double q[], double aux
                                           double fq[]);
 
 
+/* ------------------------------------- Virtual table -------------------------------- */
+
 typedef struct fc2d_clawpack5_vtable
 {
     fc2d_clawpack5_setprob_t setprob;
@@ -169,33 +171,6 @@ void fc2d_clawpack5_src2(struct fclaw2d_global *glob,
                          double t,
                          double dt);
 
-
-#if 0
-/* A single step method that advances the solution a single step on a single grid
-   using a time step dt determined by the subcycle manager */
-double fc2d_clawpack5_step2(struct fclaw2d_global *glob,
-                            struct fclaw2d_patch *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            double t,
-                            double dt);
-
-/* Use this ro return only the right hand side of the clawpack algorithm */
-double
-    fc2d_clawpack5_step2_rhs(struct fclaw2d_global *glob,
-                              struct fclaw2d_patch *this_patch,
-                              int this_block_idx,
-                              int this_patch_idx,
-                              double t,
-                              double *rhs);
-
-double fc2d_clawpack5_update(struct fclaw2d_global *glob,
-                             struct fclaw2d_patch *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt);
-#endif                             
 
 #ifdef __cplusplus
 #if 0
