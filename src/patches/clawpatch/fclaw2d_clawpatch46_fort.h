@@ -170,8 +170,6 @@ void FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
                                                  struct fclaw2d_patch_transform_data** 
                                                  transform_cptr);
 
-
-
 /* ------------------------------------ Output functions ------------------------------ */
 
 #define  FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII \
@@ -192,8 +190,6 @@ void FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII(char* matname1,
 void FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII(char* matname1, char* matname2,
                                            double* time, int* meqn, int* maux, 
                                            int* ngrids);
-
-
 
 /* ----------------------------- Diagnostics functions -------------------------------- */
 

@@ -44,6 +44,7 @@ public :
        Pillow grid ghost exchanges
        ---------------------------------------------------------------- */
 
+#if 0
     void mb_exchange_block_corner_ghost(const int& a_icorner,
                                         fclaw2d_clawpatch_t *a_neighbor_cp,
                                         int time_interp);
@@ -55,6 +56,7 @@ public :
     void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
                                            fclaw2d_clawpatch_t *cp_fine,
                                            int a_time_interp);
+#endif                                           
 
     /* Solution data */
     int meqn;                   
@@ -92,5 +94,8 @@ fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
 
 fclaw2d_metric_patch_t* 
 fclaw2d_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
+
+
+
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */

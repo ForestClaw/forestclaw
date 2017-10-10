@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Average, coarsen and copy between grids at faces.
  **/
 
+#include <fclaw2d_face_neighbors.h>
+
 #include <fclaw2d_global.h>
 #include <fclaw2d_defs.h>
 
@@ -230,6 +232,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     transform_data.this_patch = this_patch;
     transform_data.neighbor_patch = NULL;     /* gets filled in below. */
 
+    /* This calls a patch-specific initialization routine  - does nothing yet. */
     fclaw2d_patch_transform_init_data(s->glob,this_patch,
                                       this_block_idx,
                                       this_patch_idx,
@@ -239,6 +242,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     transform_data_finegrid.glob = s->glob;
     transform_data_finegrid.based = 1;   /* cell-centered data in this routine. */
 
+    /* This calls a patch-specific initialization routine - does nothing yet. */
     fclaw2d_patch_transform_init_data(s->glob,this_patch,
                                       this_block_idx,
                                       this_patch_idx,
@@ -370,13 +374,15 @@ void cb_face_fill(fclaw2d_domain_t *domain,
                 int igrid = fine_grid_pos;  /* Not used */
                 int idir_coarse = iface_coarse/2;
 
-                /* Swap 'this_patch' (fine grid) and the neighbor patch (a coarse grid) */
+                /* Swap 'this_patch' (fine grid) and the neighbor patch 
+                (a coarse grid) */
                 fclaw2d_patch_t* coarse_patch = neighbor_patches[0];
                 fclaw2d_patch_t* fine_patch = this_patch;
 
-		if (average_from_neighbor)
+                if (average_from_neighbor)
                 {
-		    /* Average from 'this' grid (fine grid) to remote grid (coarse grid) */
+		                /* Average from 'this' grid (fine grid) to remote grid 
+                    (coarse grid) */
                     fclaw2d_patch_average_face(s->glob,coarse_patch,fine_patch,
                                                idir_coarse,iface_coarse,
                                                RefineFactor,refratio,

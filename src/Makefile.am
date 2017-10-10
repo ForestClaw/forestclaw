@@ -1,4 +1,4 @@
- # This file is part of ForestClaw.
+# This file is part of ForestClaw.
 # Makefile.am in src
 # included non-recursively from toplevel directory
 
@@ -98,6 +98,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/pillowdisk5/mapc2m_pillowdisk5.f \
 	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
 	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
+	src/mappings/pillowsphere/pillowsphere_corner_ghost.f  \
 	src/mappings/fivepatch/mapc2m_fivepatch.f \
 	src/mappings/torus/mapc2m_torus.f \
 	src/mappings/torus/mapc2m_twisted_torus.f \

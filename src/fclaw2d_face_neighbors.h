@@ -38,40 +38,6 @@ struct fclaw2d_global;
 struct fclaw2d_domain;
 struct fclaw2d_patch;
 
-#if 0
-typedef enum fclaw2d_ghost_fill_parallel_mode
-{
-    FCLAW2D_BOUNDARY_INTERIOR_ONLY = 0,  /* Don't read parallel patches */
-    FCLAW2D_BOUNDARY_GHOST_ONLY,   /* read parallel patches */
-    FCLAW2D_BOUNDARY_ALL   /* read parallel patches */
-} fclaw2d_ghost_fill_parallel_mode_t;
-
-
-typedef enum fclaw2d_exchange_type
-{
-    FCLAW2D_COPY = 1,
-    FCLAW2D_AVERAGE,
-    FCLAW2D_INTERPOLATE,
-} fclaw2d_exchange_type_t;
-
-typedef enum fclaw2d_grid_type
-{
-    FCLAW2D_IS_COARSE = 1,
-    FCLAW2D_IS_FINE,
-} fclaw2d_grid_type_t;
-
-typedef struct fclaw2d_exchange_info
-{
-    int time_interp;
-    int level;
-    int read_parallel_patches;   /* before we have done a parallel exchange */
-    fclaw2d_exchange_type_t exchange_type;
-    fclaw2d_grid_type_t grid_type;
-    int has_fine_grid_neighbor;
-
-} fclaw2d_exchange_info_t;
-
-#endif
 
 void cb_face_fill(struct fclaw2d_domain *domain,
                   struct fclaw2d_patch *this_patch,

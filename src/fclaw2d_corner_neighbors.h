@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CORNER_NEIGHBORS_H
 #define FCLAW2D_CORNER_NEIGHBORS_H
 
+#include <fclaw_base.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -38,50 +40,82 @@ struct fclaw2d_global;
 struct fclaw2d_domain;
 struct fclaw2d_patch;
 
-/* -------------------------------------------
-   Routines needed to fill in ghost cells
-   ------------------------------------------- */
-
-#if 0
-typedef enum fclaw2d_ghost_fill_parallel_mode
-{
-    FCLAW2D_BOUNDARY_INTERIOR_ONLY = 0,  /* Don't read parallel patches */
-    FCLAW2D_BOUNDARY_GHOST_ONLY,   /* read parallel patches */
-    FCLAW2D_BOUNDARY_ALL   /* read parallel patches */
-} fclaw2d_ghost_fill_parallel_mode_t;
-
-
-typedef enum fclaw2d_exchange_type
-{
-    FCLAW2D_COPY = 1,
-    FCLAW2D_AVERAGE,
-    FCLAW2D_INTERPOLATE,
-} fclaw2d_exchange_type_t;
-
-typedef enum fclaw2d_grid_type
-{
-    FCLAW2D_IS_COARSE = 1,
-    FCLAW2D_IS_FINE,
-} fclaw2d_grid_type_t;
-
-typedef struct fclaw2d_exchange_info
-{
-    int time_interp;
-    int level;
-    int read_parallel_patches;   /* before we have done a parallel exchange */
-    fclaw2d_exchange_type_t exchange_type;
-    fclaw2d_grid_type_t grid_type;
-    int has_fine_grid_neighbor;
-
-} fclaw2d_exchange_info_t;
-
-#endif
 
 void cb_corner_fill(struct fclaw2d_domain *domain,
                     struct fclaw2d_patch *this_patch,
                     int this_block_idx,
                     int this_patch_idx,
                     void *user);
+
+/* ------------------------------------ Pillow grid ----------------------------------- */
+
+/* Pillow grid */
+void mb_exchange_block_corner_ghost(struct fclaw2d_global *glob,
+                                    struct fclaw2d_patch* this_patch, 
+                                    int icorner,
+                                    struct fclaw2d_patch *corner_patch,
+                                    int time_interp);
+
+
+void mb_average_block_corner_ghost(struct fclaw2d_global *glob,
+                                   struct fclaw2d_patch* coarse_patch,
+                                   int icorner_coarse,
+                                   int refratio,
+                                   struct fclaw2d_patch *corner_patch,
+                                   int time_interp);
+
+void mb_interpolate_block_corner_ghost(struct fclaw2d_global *glob,
+                                       struct fclaw2d_patch* this_patch,
+                                       int icoarse_corner,
+                                       int refratio,
+                                       struct fclaw2d_patch *corner_patch,
+                                       int time_interp);
+
+
+
+/* --------------------------------------- Pillow grid -------------------------------- */
+
+
+#define FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST \
+               FCLAW_F77_FUNC(fclaw2d_fort_mb_exchange_block_corner_ghost, \
+                              FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST)
+
+void FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(int* mx, int* my,
+                                                 int* mbc, int* meqn,
+                                                 double qthis[], 
+                                                 double qneighbor[], 
+                                                 int* icorner,
+                                                 int* iblock);
+
+// Averaging at block boundaries between coarse and fine grids.
+#define FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST \
+          FCLAW_F77_FUNC(fclaw2d_fort_mb_average_block_corner_ghost,\
+                         FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST)
+
+void  FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST(int* mx, int* my, int* mbc,
+                                                 int* meqn, 
+                                                 int* refratio, 
+                                                 double qcoarse[],
+                                                 double qfine[], 
+                                                 double areacoarse[], 
+                                                 double areafine[],
+                                                 int* a_coarse_corner,
+                                                 int* blockno);
+
+// Averaging at block boundaries between coarse and fine grids.
+#define FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST \
+          FCLAW_F77_FUNC(fclaw2d_fort_mb_interpolate_block_corner_ghost, \
+                         FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST)
+
+void  FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(int* mx, int* my, int* mbc,
+                                                     int* meqn, int* refratio,
+                                                     double qcoarse[],
+                                                     double qfine[], 
+                                                     int* icoarse_corner,
+                                                     int* blockno);
+
+
+
 
 #ifdef __cplusplus
 #if 0
