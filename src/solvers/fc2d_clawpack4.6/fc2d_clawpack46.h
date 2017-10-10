@@ -27,7 +27,6 @@
 #define FC2D_CLAWPACK46_H
 
 #include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
-#include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
 extern "C"

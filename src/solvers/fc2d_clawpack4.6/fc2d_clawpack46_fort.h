@@ -34,10 +34,6 @@ extern "C"
 #endif
 #endif
 
-#if 0
-struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
-#endif
-
 /* --------------------------------- Clawpack functions ------------------------------- */
 
 #define CLAWPACK46_BC2_DEFAULT FCLAW_F77_FUNC(clawpack46_bc2_default,CLAWPACK46_BC2_DEFAULT)
