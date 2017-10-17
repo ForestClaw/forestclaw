@@ -204,7 +204,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     double rotate[2];
 
     rotate[0] = pi*fclaw_opt->theta/180.0;
-    rotate[1] = 0;
+    rotate[1] = pi*fclaw_opt->phi/180.0;
 
     switch (user_opt->example) {
     case 0:

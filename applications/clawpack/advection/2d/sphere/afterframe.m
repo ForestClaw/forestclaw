@@ -9,16 +9,17 @@ showpatchborders;
 setpatchborderprops('linewidth',1);
 view(3);
 
-NoQuery = 0;
-prt = false;
+MaxFrames = 16;
+NoQuery = 1;
+prt = true;
 if (prt)
-    filename = sprintf('sphere%4.4d.png',Frame);
+    filename = sprintf('pillow%4.4d.png',Frame);
     disp(filename);
     print('-dpng',filename);
-end;
+end
 
-shg;
+shg
 
 
-clear afterframe;
-clear mapc2m;
+clear afterframe
+clear mapc2m
