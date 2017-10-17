@@ -175,11 +175,11 @@ void metric_average_area_from_fine(fclaw2d_global_t *glob,
     fclaw2d_metric_patch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                    &xlower,&ylower,&dx,&dy);
 
-    areacoarse = fclaw2d_metric_patch_get_area(glob,coarse_patch);
+    areacoarse = fclaw2d_metric_patch_get_area(coarse_patch);
 
     for(igrid = 0; igrid < 4; igrid++)
     {
-        areafine = fclaw2d_metric_patch_get_area(glob,&fine_patches[igrid]);
+        areafine = fclaw2d_metric_patch_get_area(&fine_patches[igrid]);
 
         FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
@@ -279,8 +279,7 @@ fclaw2d_metric_patch_t* fclaw2d_metric_get_metric_patch(fclaw2d_patch_t* this_pa
     return get_metric_patch(this_patch);
 }
 
-double* fclaw2d_metric_patch_get_area(fclaw2d_global_t* glob,
-                                      fclaw2d_patch_t* this_patch)
+double* fclaw2d_metric_patch_get_area(fclaw2d_patch_t* this_patch)
 {
     fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
     return mp->area.dataPtr();

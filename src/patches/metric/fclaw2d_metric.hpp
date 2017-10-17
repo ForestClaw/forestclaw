@@ -152,8 +152,7 @@ void fclaw2d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
                                      double **edgelengths, double **curvature);
 
 
-double* fclaw2d_metric_patch_get_area(struct fclaw2d_global* glob,
-                                      struct fclaw2d_patch* this_patch);
+double* fclaw2d_metric_patch_get_area(struct fclaw2d_patch* this_patch);
 
 
 /* ---------------------------- Metric default (virtualized) -------------------------- */

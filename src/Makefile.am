@@ -37,7 +37,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_partition.h \
 	src/fclaw2d_exchange.h \
 	src/fclaw2d_convenience.h \
-	src/fclaw2d_neighbors_fort.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h

@@ -83,13 +83,24 @@ fclaw2d_metric_patch_t* get_metric_patch(fclaw2d_patch_t *this_patch)
     return (fclaw2d_metric_patch_t*) clawpatch_get_metric_patch(this_patch);
 }
 
+/* Return a pointer to either time interpolated data or regular grid data */
+static 
+double* q_time_sync(fclaw2d_patch_t* this_patch, int time_interp)
+{
+    fclaw2d_clawpatch_t* cp = get_clawpatch(this_patch);
+    if (time_interp)
+        return cp->griddata_time_interpolated.dataPtr();
+    else
+        return cp->griddata.dataPtr();
+}
 
-static
-double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp);
 
 static 
-double* clawpatch_get_area(fclaw2d_global_t* glob, 
-                           fclaw2d_patch_t* this_patch);
+double* clawpatch_get_area(fclaw2d_patch_t* this_patch)
+{
+    return fclaw2d_metric_patch_get_area(this_patch);
+}
+
 
 /* ----------------------------- Creating/deleting patches ---------------------------- */
 
@@ -397,9 +408,9 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
     /* These will be empty for non-manifolds cases */
-    areacoarse = clawpatch_get_area(glob,coarse_patch);
+    areacoarse = clawpatch_get_area(coarse_patch);
 
-    areafine = clawpatch_get_area(glob,fine_patch);
+    areafine = clawpatch_get_area(fine_patch);
 
     mx = clawpatch_opt->mx;
     my = clawpatch_opt->my;
@@ -487,9 +498,9 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
     /* These will be empty for non-manifolds cases */
-    areacoarse = clawpatch_get_area(glob,coarse_patch);
+    areacoarse = clawpatch_get_area(coarse_patch);
 
-    areafine = clawpatch_get_area(glob,fine_patch);
+    areafine = clawpatch_get_area(fine_patch);
 
     mx = clawpatch_opt->mx;
     my = clawpatch_opt->my;
@@ -726,7 +737,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
     int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
 
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
-    area = clawpatch_get_area(glob,this_patch);
+    area = clawpatch_get_area(this_patch);
 
     int mx = clawpatch_opt->mx;
     int my = clawpatch_opt->my;
@@ -1043,14 +1054,6 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 }
 
 
-/* ------------------------------- Static access functions ---------------------------- */
-static 
-double* clawpatch_get_area(fclaw2d_global_t* glob, fclaw2d_patch_t* this_patch)
-{
-    return fclaw2d_metric_patch_get_area(glob,this_patch);
-}
-
-
 /* ------------------------------- Public access functions ---------------------------- */
 
 /* These functions are not virtualized and are not defined by the 
@@ -1151,40 +1154,24 @@ void fclaw2d_clawpatch_timesync_data(fclaw2d_global_t* glob,
                                      int time_interp,
                                      double **q, int* meqn)
 {
-    fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
-    *q = q_time_sync(cp, time_interp);
+    fclaw2d_clawpatch_t* cp = get_clawpatch(this_patch);
+    *q = q_time_sync(this_patch, time_interp);
     *meqn = cp->meqn;
 }
-
-
-/* Return a pointer to either time interpolated data or regular grid data */
-static 
-double* q_time_sync(fclaw2d_clawpatch_t* cp, int time_interp)
-{
-    if (time_interp)
-        return cp->griddata_time_interpolated.dataPtr();
-    else
-        return cp->griddata.dataPtr();
-}
-
 
 double* fclaw2d_clawpatch_get_q_timesync(fclaw2d_global_t* glob,
                                          fclaw2d_patch_t* this_patch,
                                          int time_interp)
 {
-    fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
-    return q_time_sync(cp, time_interp);
+    return q_time_sync(this_patch, time_interp);
 }
 
 
-double* fclaw2d_clawpatch_get_area(fclaw2d_global_t *glob,
+double* fclaw2d_clawpatch_get_area(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch)
 {
-    return clawpatch_get_area(glob,this_patch);
+    return clawpatch_get_area(this_patch);
 }
-
-
-
 
 void fclaw2d_clawpatch_metric_data(fclaw2d_global_t* glob,
                                    fclaw2d_patch_t* this_patch,
@@ -1270,8 +1257,7 @@ void mb_exchange_block_corner_ghost(fclaw2d_global_t* glob,
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 
-    fclaw2d_clawpatch_t* cp = get_clawpatch(this_patch);
-    double *qthis = q_time_sync(cp,time_interp);
+    double *qthis = q_time_sync(this_patch,time_interp);
 
     fclaw2d_clawpatch_t* cp_corner = get_clawpatch(corner_patch);
     double *qcorner = cp_corner->griddata.dataPtr();
@@ -1279,8 +1265,8 @@ void mb_exchange_block_corner_ghost(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    int meqn = cp->meqn;
-    int blockno = cp->blockno;
+    int meqn = cp_corner->meqn;
+    int blockno = cp_corner->blockno;
     FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(&mx, &my, &mbc, &meqn, qthis, qcorner,
                                                 &icorner, &blockno);
 
@@ -1297,11 +1283,10 @@ void mb_average_block_corner_ghost(fclaw2d_global_t *glob,
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 
-    fclaw2d_clawpatch_t* coarse_cp = get_clawpatch(coarse_patch);
-    double *qcoarse = q_time_sync(coarse_cp,time_interp);
+    double *qcoarse = q_time_sync(coarse_patch,time_interp);
 
-    double *areacoarse = clawpatch_get_area(glob,coarse_patch);
-    double *areafine = clawpatch_get_area(glob,corner_patch);
+    double *areacoarse = clawpatch_get_area(coarse_patch);
+    double *areafine = clawpatch_get_area(corner_patch);
 
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -1309,6 +1294,7 @@ void mb_average_block_corner_ghost(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_t* cp_corner = get_clawpatch(corner_patch);
     double *qfine = cp_corner->griddata.dataPtr();
 
+    fclaw2d_clawpatch_t* coarse_cp = get_clawpatch(coarse_patch);
     int meqn = coarse_cp->meqn;
     int blockno = coarse_cp->blockno;
 
@@ -1331,8 +1317,7 @@ void mb_interpolate_block_corner_ghost(fclaw2d_global_t* glob,
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 
-    fclaw2d_clawpatch_t* cp = get_clawpatch(this_patch);
-    double *qcoarse = q_time_sync(cp, time_interp);
+    double *qcoarse = q_time_sync(this_patch, time_interp);
 
     /* qcorner is the finer level. */
     fclaw2d_clawpatch_t* cp_corner = get_clawpatch(this_patch);
@@ -1341,6 +1326,7 @@ void mb_interpolate_block_corner_ghost(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
+    fclaw2d_clawpatch_t* cp = get_clawpatch(this_patch);
     int meqn = cp->meqn;
     int blockno = cp->blockno;
     FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(&mx, &my, &mbc, &meqn,
