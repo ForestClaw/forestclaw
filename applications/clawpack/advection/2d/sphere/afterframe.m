@@ -10,10 +10,10 @@ setpatchborderprops('linewidth',1);
 view(3);
 
 MaxFrames = 16;
-NoQuery = 1;
-prt = true;
+NoQuery = 0;
+prt = false;
 if (prt)
-    filename = sprintf('pillow%4.4d.png',Frame);
+    filename = sprintf('sphere%0.4d.png',Frame);
     disp(filename);
     print('-dpng',filename);
 end

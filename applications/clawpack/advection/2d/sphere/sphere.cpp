@@ -43,7 +43,7 @@ static void *
 {
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 0 for cubed sphere, "    \
-                        "2 for pillow sphere ");
+                        "1 for pillow sphere ");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
