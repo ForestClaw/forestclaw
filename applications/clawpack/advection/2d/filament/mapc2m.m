@@ -1,10 +1,12 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-map = 'nomap';
+% map = 'nomap';
 % map = 'cart';   % brick
-% map = 'fivepatch';
+map = 'fivepatch';
 
 % This domain should be in [0,2],[0,2]
+
+alpha = 0.4;
 
 shift = [1,1,0];
 
@@ -25,7 +27,7 @@ switch map
         yp = yp + shift(2);
         
     case 'fivepatch'
-        [xp,yp,~] = mapc2m_fivepatch(xc,yc);
+        [xp,yp,~] = mapc2m_fivepatch(xc,yc,alpha);
         b = getblocknumber();
         s = 0.005;
         switch b
