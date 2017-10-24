@@ -102,8 +102,9 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     fclaw2d_tikz_info_t *s_tikz = (fclaw2d_tikz_info_t*) s->user;
 
     int mx, my, mi, mj, level, lmax, mxf, myf;
-    double ax,ay,dxf,dyf;
+    double dxf,dyf;
     int xlow_d, ylow_d, xupper_d, yupper_d;
+    const char* indent = "    ";
 
     FILE *fp = s_tikz->fp;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
@@ -121,27 +122,32 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     mx = s_tikz->mx;
     my = s_tikz->my;
 
-    ax = s_tikz->ax;
-    ay = s_tikz->ay;
+    // ax = s_tikz->ax;
+    // ay = s_tikz->ay;
 
-    mxf = mi*mx*pow_int(2,lmax-level);
-    myf = mj*my*pow_int(2,lmax-level);
+    mxf = mx*pow_int(2,lmax-level);  /* grid cells per patch at level 'level' */
+    myf = my*pow_int(2,lmax-level);
 
-    dxf = 1.0/(mi*mx*pow_int(2,lmax));
+    dxf = 1.0/(mi*mx*pow_int(2,lmax));   /* All grid cells in [0,1]x[0,1] */
     dyf = 1.0/(mj*my*pow_int(2,lmax));
 
+    /* Converts to [0,1]x[0,1] */
     double xlower, ylower;
     convert_brick(s->glob,this_patch,this_block_idx,&xlower,&ylower);
 
-    xlow_d = (xlower-ax)/dxf;
-    ylow_d = (ylower-ay)/dyf;
-    xupper_d = xlow_d + mxf;
+    xlow_d = xlower/dxf;       /* Lower left edge of patch */
+    ylow_d = ylower/dyf;
+    xupper_d = xlow_d + mxf;   /* Upper right edge of patch */
     yupper_d = ylow_d + myf;
 
-    fprintf(fp,"    %% Patch number %ld; rank = %d\n",(long int) patch_num,
-            s->glob->domain->mpirank);
-    fprintf(fp,"    \\draw [ultra thin] (%d,%d) rectangle (%d,%d);\n\n",
-            xlow_d,ylow_d,xupper_d,yupper_d);
+    fprintf(fp,"%s\\ifthenelse{\\level = %d}\n",indent,level);
+    fprintf(fp,"%s{\n",indent);
+    fprintf(fp,"%s%s%% Patch number %ld; rank = %d\n",indent,indent,
+                            (long int) patch_num,
+                            s->glob->domain->mpirank);
+    fprintf(fp,"%s%s\\draw [ultra thin] (%d,%d) rectangle (%d,%d);\n",
+                            indent,indent,xlow_d,ylow_d,xupper_d,yupper_d);
+    fprintf(fp,"%s}{%%else statement}\n\n",indent);
 }
 
 void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
@@ -183,8 +189,8 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
 
     int mxf = mi*s_tikz.mx*pow_int(2,lmax);  
     int myf = mj*s_tikz.my*pow_int(2,lmax);
-    double sx = figsize[0]/mxf;
-    double sy = figsize[1]/myf;
+    double sx = figsize[0]/mxf;   /* Effective x-resolution */
+    double sy = figsize[1]/myf;   /* Effective y-resolution */
 
     FILE *fp;
     sprintf(fname,"tikz_%04d.tex",iframe);  /* fname[20] */
@@ -195,6 +201,7 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
 
         fprintf(fp,"\\documentclass{standalone}\n");
         fprintf(fp,"\\usepackage{tikz}\n");
+        fprintf(fp,"\\usepackage{xifthen}\n");
         fprintf(fp,"\n");
         if (fclaw_opt->tikz_plot_fig != 0)
         {
@@ -205,7 +212,7 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
             fprintf(fp,"\\newcommand{\\plotfig}[1]{}\n");            
         }
 
-        fprintf(fp,"\\newcommand{\\plotgrid}[1]{#1}\n");
+        fprintf(fp,"\\newcommand{\\plotgrid}[1]{#1}\n\n");
         fprintf(fp,"\\newcommand{\\figname}{%s_%04d.%s}\n",fclaw_opt->tikz_plot_prefix,
                 iframe,fclaw_opt->tikz_plot_suffix);
         fprintf(fp,"\n");
@@ -214,7 +221,10 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fprintf(fp,"    \\plotfig{\\node (forestclaw_plot) at (%3.1f,%3.1f)\n",
                 ((double) mxf)/2,((double) myf)/2);
         fprintf(fp,"    {\\includegraphics{\\figname}};}\n\n");
-        fprintf(fp,"\\plotgrid{\n");
+        fprintf(fp,"%% Maximum level is %d\n",lmax);
+        fprintf(fp,"\\def \\maxlevel {%d}\n\n",lmax);
+        fprintf(fp,"\\plotgrid{\n\n");
+        fprintf(fp,"\\foreach \\level in {0,...,\\maxlevel}{\n\n");
         fclose(fp); 
     }
 
@@ -236,6 +246,7 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
     if (domain->mpirank == 0)
     {
         fp = fopen(fname,"a");
+        fprintf(fp,"} %% end \\foreach\n");
         fprintf(fp,"} %% end plotgrid\n");
         fprintf(fp,"\\end{tikzpicture}\n");
         fprintf(fp,"\\end{document}\n");
