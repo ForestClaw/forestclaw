@@ -1,11 +1,3 @@
-if (PlotType ~= 3)
-    colormap(jet)
-end
-
-%%
-axis([0 2 0 0.5])
-
-
 if (PlotType == 3)
     caxis([0 200]);
 elseif mq == 5
@@ -24,27 +16,42 @@ elseif mq == 5
     colormap((cm));
     
     
-    caxis([0 3])
+    caxis([0.1 3.5])
     % yrbcolormap;
 else
     colormap(jet)
-    caxis([0.1 2.81]);
+    % caxis([0.1 2.81]);
+    caxis([0.1 3.5])
 end
 
-showpatchborders
-setpatchborderprops('linewidth',1);
-% showgridlines(1:5);
-% hidepatchborders;
+% Axes and title
+axis([0 2 0 0.5])
 set(gca,'fontsize',16);
-
 tstr = sprintf('ForestClaw : t = %12.4f',t);
 title(tstr,'fontsize',16);
 
-showpatchborders;
-% colormap(white)
+% Show patch borders
+showpatchborders
+setpatchborderprops('linewidth',1);
 
-
-shg;
+% This is used for creating vectorized PDFs
+prt_tikz = false;
+if (prt_tikz)
+    axis off
+    hidepatchborders;
+    delete(get(gca,'title'));
+    figsize = [4,1];  % Should match size set in options
+    set(gcf,'papersize',figsize);
+    set(gca,'position',[0 0 1 1]);
+    set(gcf,'paperposition',[0 0 figsize]);
+    fname = sprintf('plot_%04d.png',Frame);
+    
+    % Match print resolution to computational resolution
+    maxlevel = 4;   % Adjust to determine resolution
+    res = sprintf('-r%d',mx*2^maxlevel);
+    print('-dpng',res,fname);  
+end
+shg
 
 clear afterframe
 clear mapc2m
