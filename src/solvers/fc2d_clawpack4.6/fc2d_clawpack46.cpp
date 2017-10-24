@@ -400,10 +400,6 @@ void fc2d_clawpack46_solver_initialize()
     fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
 
-#if 0    
-    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
-#endif    
-
     fc2d_clawpack46_vtable_t*  claw46_vt = clawpack46_vt_init();
 
     /* ForestClaw vtable items */
@@ -427,39 +423,6 @@ void fc2d_clawpack46_solver_initialize()
     patch_vt->setup                          = clawpack46_setaux;  
     patch_vt->physical_bc                    = clawpack46_bc2;
     patch_vt->single_step_update             = clawpack46_update;
-
-#if 0
-    /* Clawpatch settings functions */
-    clawpatch_vt->fort_average2coarse        = FC2D_CLAWPACK46_FORT_AVERAGE2COARSE;
-    clawpatch_vt->fort_interpolate2fine      = FC2D_CLAWPACK46_FORT_INTERPOLATE2FINE;
-
-    clawpatch_vt->fort_tag4refinement        = FC2D_CLAWPACK46_FORT_TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening        = FC2D_CLAWPACK46_FORT_TAG4COARSENING;
-
-    /* output functions */
-    clawpatch_vt->fort_header_ascii          = FC2D_CLAWPACK46_FORT_HEADER_ASCII;
-    clawpatch_vt->fort_output_ascii          = FC2D_CLAWPACK46_FORT_OUTPUT_ASCII;
-
-    /* Diagnostic functions */
-    clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
-    clawpatch_vt->fort_compute_error_norm    = FC2D_CLAWPACK46_FORT_COMPUTE_ERROR_NORM;
-    clawpatch_vt->fort_compute_patch_area    = FC2D_CLAWPACK46_FORT_COMPUTE_PATCH_AREA;
-    clawpatch_vt->fort_conservation_check    = FC2D_CLAWPACK46_FORT_CONSERVATION_CHECK;
-
-    /* Ghost cell exchange functions */
-    clawpatch_vt->fort_copy_face             = FC2D_CLAWPACK46_FORT_COPY_FACE;
-    clawpatch_vt->fort_average_face          = FC2D_CLAWPACK46_FORT_AVERAGE_FACE;
-    clawpatch_vt->fort_interpolate_face      = FC2D_CLAWPACK46_FORT_INTERPOLATE_FACE;
-
-    clawpatch_vt->fort_copy_corner           = FC2D_CLAWPACK46_FORT_COPY_CORNER;
-    clawpatch_vt->fort_average_corner        = FC2D_CLAWPACK46_FORT_AVERAGE_CORNER;
-    clawpatch_vt->fort_interpolate_corner    = FC2D_CLAWPACK46_FORT_INTERPOLATE_CORNER;
-
-    clawpatch_vt->fort_local_ghost_pack_aux  = NULL;
-    clawpatch_vt->fort_local_ghost_pack      = FC2D_CLAWPACK46_FORT_LOCAL_GHOST_PACK;
-
-    clawpatch_vt->fort_timeinterp            = FC2D_CLAWPACK46_FORT_TIMEINTERP;
-#endif    
 
     claw46_vt->is_set = 1;
 }

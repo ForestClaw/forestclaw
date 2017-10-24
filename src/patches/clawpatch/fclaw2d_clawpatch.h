@@ -117,6 +117,7 @@ void fclaw2d_clawpatch_metric_data2(struct fclaw2d_global* glob,
                                     double **surfnormals, double ** edgelengths,
                                     double **curvature);
 
+
 double* fclaw2d_clawpatch_get_area(struct fclaw2d_global* glob,
                                    struct fclaw2d_patch* this_patch);
 

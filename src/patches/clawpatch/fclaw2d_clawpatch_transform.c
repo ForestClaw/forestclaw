@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 
-// #include <fclaw2d_patch_transform.h>
 #include <fclaw2d_global.h>
 
 void fclaw2d_clawpatch_transform_init_data(fclaw2d_global_t* glob, 

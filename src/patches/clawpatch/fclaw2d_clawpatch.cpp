@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 
 #include <fclaw2d_map_query.h>
+#include <pillowsphere.h>   /* For special treatment of corners */
 
 /* Needed only for MB_BLOCK_CORNER_GHOST */
 #include <fclaw2d_corner_neighbors.h>
@@ -472,20 +473,23 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
     fclaw2d_clawpatch_timesync_data(glob,corner_patch,time_interp,&qcorner,&meqn);
 
-    clawpatch_vt->fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,&transform_data);
+    clawpatch_vt->fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,
+                                   &transform_data);
 
 }
+
 
 static
 void clawpatch_average_corner(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *coarse_patch,
                               fclaw2d_patch_t *fine_patch,
                               int coarse_corner,
-                              int refratio,
                               int time_interp,
                               fclaw2d_patch_transform_data_t* transform_data)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+    int refratio = 2;
 
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
@@ -517,16 +521,18 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                   fclaw2d_patch_t* coarse_patch,
                                   fclaw2d_patch_t* fine_patch,
                                   int coarse_corner,
-                                  int refratio,
                                   int time_interp,
                                   fclaw2d_patch_transform_data_t* transform_data)
 
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
+    int refratio = 2;
+
     int meqn,mx,my,mbc;
     double *qcoarse, *qfine;
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt 
+                       = fclaw2d_clawpatch_get_options(glob);
 
     mx = clawpatch_opt->mx;
     my = clawpatch_opt->my;
@@ -541,6 +547,8 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                           &refratio,qcoarse,qfine,
                                           &coarse_corner,&transform_data);
 }
+
+
 
 /* -------------------------------- Regridding functions ------------------------------ */
 
@@ -948,6 +956,11 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
     patch_vt->average_corner       = clawpatch_average_corner;
     patch_vt->interpolate_corner   = clawpatch_interpolate_corner;
 
+    /* Assume regular block corners;  change in user files */    
+    patch_vt->copy_block_corner          = clawpatch_copy_corner;
+    patch_vt->average_block_corner       = clawpatch_average_corner;
+    patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
+
     /* Transform functions (defined in forestclaw2d */
     patch_vt->transform_init_data    = fclaw2d_clawpatch_transform_init_data;
     patch_vt->transform_face         = fclaw2d_patch_face_transformation;
@@ -1080,6 +1093,7 @@ fclaw2d_clawpatch_get_clawpatch(fclaw2d_patch_t* this_patch)
     return get_clawpatch(this_patch);
 }
 
+
 fclaw2d_metric_patch_t* 
 fclaw2d_clawpatch_get_metric_patch(fclaw2d_patch_t* this_patch)
 {
@@ -1192,145 +1206,5 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_global_t* glob,
     fclaw2d_metric_patch_mesh_data2(glob,this_patch,xnormals,ynormals,
                                     xtangents,ytangents,surfnormals,
                                     edgelengths,curvature);
-}
-
-/* --------------------------------- Pillow grid  ------------------------------------- */
-
-#if 0
-void fclaw2d_clawpatch_t::mb_exchange_block_corner_ghost(const int& a_corner,
-                                                         fclaw2d_clawpatch_t *cp_corner,
-                                                         int time_interp)
-{
-    double *qthis = q_time_sync(this,time_interp);
-    double *qcorner = cp_corner->griddata.dataPtr();
-
-
-    FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(mx, my, mbc, meqn, qthis, qcorner,
-                                    a_corner, blockno);
-
-}
-
-
-void fclaw2d_clawpatch_t::mb_average_block_corner_ghost(const int& a_coarse_corner,
-                                                        const int& a_refratio,
-                                                        fclaw2d_clawpatch_t *cp_corner,
-                                                        int a_time_interp)
-{
-    // 'this' is the finer grid; 'cp_corner' is the coarser grid.
-    double *qcoarse = q_time_sync(this,a_time_interp);
-
-
-    double *areacoarse = this->area.dataPtr();
-    double *areafine = cp_corner->area.dataPtr();
-    double *qfine = cp_corner->griddata.dataPtr();
-
-    FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST(mx,my,mbc,meqn,
-                                               a_refratio,qcoarse,qfine,
-                                               areacoarse,areafine,
-                                               a_coarse_corner,blockno);
-}
-
-void fclaw2d_clawpatch_t::mb_interpolate_block_corner_ghost(const int& a_coarse_corner,
-                                                            const int& a_refratio,
-                                                            fclaw2d_clawpatch_t *cp_corner,
-                                                            int a_time_interp)
-
-{
-    double *qcoarse = q_time_sync(this, a_time_interp);
-
-    /* qcorner is the finer level. */
-    double *qfine = cp_corner->griddata.dataPtr();
-
-    FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(mx, my, mbc, meqn,
-                                                   a_refratio, qcoarse, qfine,
-                                                   a_coarse_corner, blockno);
-}
-#endif
-
-
-void mb_exchange_block_corner_ghost(fclaw2d_global_t* glob,
-                                    fclaw2d_patch_t* this_patch, 
-                                    int icorner,
-                                    fclaw2d_patch_t *corner_patch,
-                                    int time_interp)
-{
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-
-    double *qthis = q_time_sync(this_patch,time_interp);
-
-    fclaw2d_clawpatch_t* cp_corner = get_clawpatch(corner_patch);
-    double *qcorner = cp_corner->griddata.dataPtr();
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    int meqn = cp_corner->meqn;
-    int blockno = cp_corner->blockno;
-    FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(&mx, &my, &mbc, &meqn, qthis, qcorner,
-                                                &icorner, &blockno);
-
-}
-
-
-void mb_average_block_corner_ghost(fclaw2d_global_t *glob,
-                                   fclaw2d_patch_t* coarse_patch,
-                                   int icorner_coarse,
-                                   int refratio,
-                                   fclaw2d_patch_t *corner_patch,
-                                   int time_interp)
-{
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-
-    double *qcoarse = q_time_sync(coarse_patch,time_interp);
-
-    double *areacoarse = clawpatch_get_area(coarse_patch);
-    double *areafine = clawpatch_get_area(corner_patch);
-
-    fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_t* cp_corner = get_clawpatch(corner_patch);
-    double *qfine = cp_corner->griddata.dataPtr();
-
-    fclaw2d_clawpatch_t* coarse_cp = get_clawpatch(coarse_patch);
-    int meqn = coarse_cp->meqn;
-    int blockno = coarse_cp->blockno;
-
-    FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST(&mx,&my,&mbc,&meqn,
-                                               &refratio,qcoarse,qfine,
-                                               areacoarse,areafine,
-                                               &icorner_coarse,&blockno);
-}
-
-
-
-void mb_interpolate_block_corner_ghost(fclaw2d_global_t* glob,
-                                       fclaw2d_patch_t* this_patch,
-                                       int icoarse_corner,
-                                       int refratio,
-                                       fclaw2d_patch_t *corner_patch,
-                                       int time_interp)
-
-{
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-
-    double *qcoarse = q_time_sync(this_patch, time_interp);
-
-    /* qcorner is the finer level. */
-    fclaw2d_clawpatch_t* cp_corner = get_clawpatch(this_patch);
-    double *qfine = cp_corner->griddata.dataPtr();
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_t* cp = get_clawpatch(this_patch);
-    int meqn = cp->meqn;
-    int blockno = cp->blockno;
-    FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(&mx, &my, &mbc, &meqn,
-                                                   &refratio, qcoarse, qfine,
-                                                   &icoarse_corner, &blockno);
 }
 
