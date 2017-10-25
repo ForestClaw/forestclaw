@@ -40,24 +40,6 @@ public :
     Box edgeBox();  /* Box containing edge based values */
     Box nodeBox();  /* Box containing nodes */
 
-    /* ----------------------------------------------------------------
-       Pillow grid ghost exchanges
-       ---------------------------------------------------------------- */
-
-#if 0
-    void mb_exchange_block_corner_ghost(const int& a_icorner,
-                                        fclaw2d_clawpatch_t *a_neighbor_cp,
-                                        int time_interp);
-
-    void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                       fclaw2d_clawpatch_t *cp_fine,
-                                       int a_time_interp);
-
-    void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                           fclaw2d_clawpatch_t *cp_fine,
-                                           int a_time_interp);
-#endif                                           
-
     /* Solution data */
     int meqn;                   
     FArrayBox griddata;

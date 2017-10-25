@@ -515,8 +515,9 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
     mbc = clawpatch_opt->mbc;
 
     int manifold = fclaw_opt->manifold;
-    clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,&refratio,
-                                      qcoarse,qfine,areacoarse,areafine,
+    clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,
+                                      &refratio,qcoarse,qfine,
+                                      areacoarse,areafine,
                                       &manifold,&coarse_corner,&transform_data);
 }
 
