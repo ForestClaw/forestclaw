@@ -201,6 +201,8 @@ void fclaw2d_patch_interpolate_face(struct fclaw2d_global* glob,
 void fclaw2d_patch_copy_corner(struct fclaw2d_global* glob,
                                struct fclaw2d_patch *this_patch,
                                struct fclaw2d_patch *corner_patch,
+                               int coarse_blockno,
+                               int fine_blockno,
                                int is_block_corner,
                                int icorner,
                                int time_interp,
@@ -209,6 +211,8 @@ void fclaw2d_patch_copy_corner(struct fclaw2d_global* glob,
 void fclaw2d_patch_average_corner(struct fclaw2d_global* glob,
                                   struct fclaw2d_patch *coarse_patch,
                                   struct fclaw2d_patch *fine_patch,
+                                  int coarse_blockno,
+                                  int fine_blockno,
                                   int is_block_corner,
                                   int coarse_corner,
                                   int time_interp,
@@ -219,43 +223,14 @@ void fclaw2d_patch_average_corner(struct fclaw2d_global* glob,
 void fclaw2d_patch_interpolate_corner(struct fclaw2d_global* glob,
                                       struct fclaw2d_patch* coarse_patch,
                                       struct fclaw2d_patch* fine_patch,
+                                      int coarse_blockno,
+                                      int fine_blockno,
                                       int is_block_corner,
                                       int coarse_corner,
                                       int time_interp,
                                       struct fclaw2d_patch_transform_data* transform_data);
 
 
-#if 0
-void fclaw2d_patch_copy_block_corner(struct fclaw2d_global* glob,
-                                     struct fclaw2d_patch *this_patch,
-                                     struct fclaw2d_patch *corner_patch,
-                                     int is_block_corner,
-                                     int icorner,
-                                     int time_interp,
-                                     struct fclaw2d_patch_transform_data
-                                     *transform_data);
-
-void fclaw2d_patch_average_block_corner(struct fclaw2d_global* glob,
-                                        struct fclaw2d_patch *coarse_patch,
-                                        struct fclaw2d_patch *fine_patch,
-                                        int is_block_corner,
-                                        int coarse_corner,
-                                        int time_interp,
-                                        struct fclaw2d_patch_transform_data
-                                        *transform_data);
-
-
-    
-void fclaw2d_patch_interpolate_block_corner(struct fclaw2d_global* glob,
-                                            struct fclaw2d_patch* coarse_patch,
-                                            struct fclaw2d_patch* fine_patch,
-                                            int is_block_corner,
-                                            int coarse_corner,
-                                            int time_interp,
-                                            struct fclaw2d_patch_transform_data
-                                            *transform_data);
-#endif                                            
-    
 /* -------------------------- Transform functions (typedefs) -------------------------- */
 
 void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
@@ -445,35 +420,13 @@ typedef void (*fclaw2d_patch_interpolate_face_t)(struct fclaw2d_global* glob,
 typedef void (*fclaw2d_patch_corner_t)(struct fclaw2d_global* glob,
                                        struct fclaw2d_patch *this_patch,
                                        struct fclaw2d_patch *corner_patch,
+                                       int coarse_blockno,
+                                       int fine_blockno,
                                        int icorner,
                                        int time_interp,
                                        struct fclaw2d_patch_transform_data 
                                        *transform_data);
     
-#if 0
-typedef void (*fclaw2d_patch_copy_corner_t)(struct fclaw2d_global* glob,
-                                            struct fclaw2d_patch *this_patch,
-                                            struct fclaw2d_patch *corner_patch,
-                                            int icorner,
-                                            int time_interp,
-                                            struct fclaw2d_patch_transform_data *transform_data);
-
-typedef void (*fclaw2d_patch_average_corner_t)(struct fclaw2d_global* glob,
-                                               struct fclaw2d_patch *coarse_patch,
-                                               struct fclaw2d_patch *fine_patch,
-                                               int coarse_corner,
-                                               int time_interp,
-                                               struct fclaw2d_patch_transform_data* transform_data);
-
-typedef void (*fclaw2d_patch_interpolate_corner_t)(struct fclaw2d_global* glob,
-                                                   struct fclaw2d_patch* coarse_patch,
-                                                   struct fclaw2d_patch* fine_patch,
-                                                   int coarse_corner,
-                                                   int time_interp,
-                                                   struct fclaw2d_patch_transform_data* transform_data);
-#endif                                                   
-
-
 
 /* -------------------------- Transform functions (typedefs) -------------------------- */
 

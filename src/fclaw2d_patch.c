@@ -284,6 +284,8 @@ void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
 void fclaw2d_patch_copy_corner(fclaw2d_global_t* glob,
                                fclaw2d_patch_t *this_patch,
                                fclaw2d_patch_t *corner_patch,
+                               int coarse_blockno,
+                               int fine_blockno,
                                int is_block_corner,
                                int icorner,
                                int time_interp,
@@ -294,12 +296,14 @@ void fclaw2d_patch_copy_corner(fclaw2d_global_t* glob,
     {
         FCLAW_ASSERT(patch_vt->copy_corner != NULL);        
         patch_vt->copy_corner(glob,this_patch,corner_patch,
+                              coarse_blockno,fine_blockno,
                               icorner,time_interp,transform_data);
     }
     else
     {
         FCLAW_ASSERT(patch_vt->copy_block_corner != NULL);        
         patch_vt->copy_block_corner(glob,this_patch,corner_patch,
+                                    coarse_blockno,fine_blockno,
                                     icorner,time_interp,transform_data);        
     }
 }
@@ -307,6 +311,8 @@ void fclaw2d_patch_copy_corner(fclaw2d_global_t* glob,
 void fclaw2d_patch_average_corner(fclaw2d_global_t* glob,
                                   fclaw2d_patch_t *coarse_patch,
                                   fclaw2d_patch_t *fine_patch,
+                                  int coarse_blockno,
+                                  int fine_blockno,
                                   int is_block_corner,
                                   int coarse_corner,
                                   int time_interp,
@@ -316,14 +322,17 @@ void fclaw2d_patch_average_corner(fclaw2d_global_t* glob,
     if (!is_block_corner)
     {
         FCLAW_ASSERT(patch_vt->average_corner != NULL);
-        patch_vt->average_corner(glob,coarse_patch,fine_patch,coarse_corner,
+        patch_vt->average_corner(glob,coarse_patch,fine_patch,
+                                 coarse_blockno,fine_blockno,
+                                 coarse_corner,
                                  time_interp,transform_data);
     }
     else
     {
         FCLAW_ASSERT(patch_vt->average_block_corner != NULL);
-        patch_vt->average_block_corner(glob,coarse_patch,
-                                       fine_patch,coarse_corner,
+        patch_vt->average_block_corner(glob,coarse_patch,fine_patch,
+                                       coarse_blockno,fine_blockno,
+                                       coarse_corner,
                                        time_interp,transform_data);        
     }
 }
@@ -331,6 +340,8 @@ void fclaw2d_patch_average_corner(fclaw2d_global_t* glob,
 void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
                                       fclaw2d_patch_t* coarse_patch,
                                       fclaw2d_patch_t* fine_patch,
+                                      int coarse_blockno,
+                                      int fine_blockno,
                                       int is_block_corner,
                                       int coarse_corner,
                                       int time_interp,
@@ -342,6 +353,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
     {
         FCLAW_ASSERT(patch_vt->interpolate_corner != NULL);
         patch_vt->interpolate_corner(glob,coarse_patch,fine_patch,
+                                     coarse_blockno,fine_blockno,
                                      coarse_corner,time_interp,
                                      transform_data);        
     }
@@ -349,6 +361,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
     {
         FCLAW_ASSERT(patch_vt->interpolate_block_corner != NULL);
         patch_vt->interpolate_block_corner(glob,coarse_patch,fine_patch,
+                                           coarse_blockno,fine_blockno,
                                            coarse_corner,time_interp,
                                            transform_data);
 

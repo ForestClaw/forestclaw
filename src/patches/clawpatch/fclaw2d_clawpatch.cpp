@@ -456,6 +456,8 @@ static
 void clawpatch_copy_corner(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,
                            fclaw2d_patch_t *corner_patch,
+                           int coarse_blockno,
+                           int fine_blockno,
                            int icorner,
                            int time_interp,
                            fclaw2d_patch_transform_data_t *transform_data)
@@ -483,6 +485,8 @@ static
 void clawpatch_average_corner(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *coarse_patch,
                               fclaw2d_patch_t *fine_patch,
+                              int coarse_blockno,
+                              int fine_blockno,
                               int coarse_corner,
                               int time_interp,
                               fclaw2d_patch_transform_data_t* transform_data)
@@ -520,6 +524,8 @@ static
 void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
                                   fclaw2d_patch_t* coarse_patch,
                                   fclaw2d_patch_t* fine_patch,
+                                  int coarse_blockno,
+                                  int fine_blockno,
                                   int coarse_corner,
                                   int time_interp,
                                   fclaw2d_patch_transform_data_t* transform_data)

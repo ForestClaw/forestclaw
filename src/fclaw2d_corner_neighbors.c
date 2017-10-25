@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-// #include <fclaw2d_neighbors_fort.h>
-
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize)
    This enum is defined both here and in fclaw2d_face_neighbors.cpp.  Is that okay? */
 enum
@@ -151,8 +149,9 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
     int corner_patch_idx;
     fclaw2d_patch_relation_t neighbor_type;
 
+    /* Note : Pillowsphere case does not return a block corner neighbor */
     fclaw2d_map_context_t *cont = glob->cont;
-    int ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
+    int ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0;
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
     int has_corner_neighbor =
@@ -165,15 +164,18 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                                        &corner_patch_idx,
                                        rcornerno,
                                        &neighbor_type);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);    
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
     if (has_corner_neighbor && is_block_corner)
     {
-        /* Case 1 : 4 or more patches meet at a block corner */
+        /* Case 1 : 4 or more patches meet at a block corner.
+        This case does NOT include the pillowgrid.   */
         *block_corner_count = 4;  /* assume four for now */
-        /* We don't have a block corner transformation, so I am going to
-           treat this as if it were an interior corner */
+
+        /* No block corner transforms yet, so we use the 
+        interior 'default' transforms. */
         fclaw2d_patch_transform_blockface_intra (ftransform);
         fclaw2d_patch_transform_blockface_intra
             (ftransform_finegrid->transform);
@@ -289,6 +291,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                 igrid = 0;
             }
 
+            *rcornerno = icorner;    /* This wasn't being set! */
             corner_patch_idx = rpatchno[igrid];
             rproc_corner = rproc[igrid];
         }
@@ -353,20 +356,12 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
     int icorner;
 
-#if 0
-    fclaw2d_map_context_t *cont = s->glob->cont;
-    int ispillowsphere = FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0; //
-#endif    
-
     fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
                             intersects_bdry);
 
     fclaw2d_block_get_block_boundary(s->glob, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
-#if 0    
-    const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
-#endif    
     fclaw2d_patch_transform_data_t transform_data;
     transform_data.glob = s->glob;
     transform_data.based = 1;   // cell-centered data in this routine.
@@ -388,10 +383,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                       this_patch_idx,
                                       &transform_data_finegrid);
 
-
-#if 0
-    int refratio = gparms->refratio;
-#endif    
 
     for (icorner = 0; icorner < NumCorners; icorner++)
     {
@@ -447,6 +438,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             transform_data_finegrid.this_patch = corner_patch;
             transform_data_finegrid.neighbor_patch = this_patch;
 
+
             if (ref_flag_ptr == NULL)
             {
                 /* No corner neighbor.  Either :
@@ -462,15 +454,19 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 transform_data.neighbor_patch = corner_patch;
                 if (neighbor_level == FINER_GRID)
                 {
+                    fclaw2d_patch_t* coarse_patch = this_patch;
+                    fclaw2d_patch_t* fine_patch = corner_patch;
+                    int coarse_blockno = this_block_idx;
+                    int fine_blockno = corner_block_idx;
                     if (interpolate_to_neighbor && !remote_neighbor)
                     {
                         /* No need to interpolate to remote ghost patches. */
 
-                        fclaw2d_patch_t* coarse_patch = this_patch;
-                        fclaw2d_patch_t* fine_patch = corner_patch;
                         fclaw2d_patch_interpolate_corner(s->glob,
                                                          coarse_patch,
                                                          fine_patch,
+                                                         coarse_blockno,
+                                                         fine_blockno,
                                                          is_block_corner,
                                                          icorner,time_interp,
                                                          &transform_data);
@@ -483,6 +479,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                         fclaw2d_patch_average_corner(s->glob,
                                                      coarse_patch,
                                                      fine_patch,
+                                                     coarse_blockno,
+                                                     fine_blockno,
                                                      is_block_corner,
                                                      icorner,time_interp,
                                                      &transform_data);                        
@@ -493,6 +491,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_copy_corner(s->glob,
                                               this_patch,
                                               corner_patch,
+                                              this_block_idx,
+                                              corner_block_idx,
                                               is_block_corner,
                                               icorner, time_interp,
                                               &transform_data);
@@ -508,29 +508,26 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 
                 fclaw2d_patch_t* coarse_patch = corner_patch;
                 fclaw2d_patch_t* fine_patch = this_patch;
+                int coarse_blockno = corner_block_idx;
+                int fine_blockno = this_patch_idx;
 
                 if (interpolate_to_neighbor)
                 {
                     /* Interpolate from remote coarse grid patch (coarse grid) to
-                        local fine grid patch */
-                        int coarse_icorner = transform_data_finegrid.icorner;
-                        fclaw2d_patch_interpolate_corner(s->glob,
-                                                         coarse_patch,
-                                                         fine_patch,
-                                                         is_block_corner,
-                                                         coarse_icorner,time_interp,
-                                                         &transform_data_finegrid);
+                       local fine grid patch.  We do not need to average to the 
+                       remote patch corners unless corners are used in the 
+                       interpolation stencil. */
+                    int coarse_icorner = transform_data_finegrid.icorner;
+                    fclaw2d_patch_interpolate_corner(s->glob,
+                                                     coarse_patch,
+                                                     fine_patch,
+                                                     coarse_blockno,
+                                                     fine_blockno,
+                                                     is_block_corner,
+                                                     coarse_icorner,time_interp,
+                                                     &transform_data_finegrid);
 
                 }
-                else if (average_from_neighbor)
-                {
-                    /* We only need to average to ghost patch corners if our 
-                       interpolation stencils require corner values */
-
-                    fclaw_global_essentialf("fclaw2d_corner_neighbors.c : We shouldn't " \
-                                            "be here; (average_corner_ghost)\n");
-                    exit(0);
-                }  /* End of interpolate/average */
             } /* End of parallel case */
         }  /* End of 'interior_corner' */
     }  /* End of icorner loop */
