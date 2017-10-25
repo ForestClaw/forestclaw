@@ -52,9 +52,9 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    FCLAW2D_FORT_MB_EXCHANGE_BLOCK_CORNER_GHOST(&mx, &my, &mbc, &meqn, 
-                                                qthis, qcorner,
-                                                &icorner, &this_blockno);
+    FCLAW2D_PILLOW46_COPY_BLOCK_CORNER(&mx, &my, &mbc, &meqn, 
+                                       qthis, qcorner,
+                                       &icorner, &this_blockno);
 
 }
 
@@ -84,10 +84,10 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
 
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-    FCLAW2D_FORT_MB_AVERAGE_BLOCK_CORNER_GHOST(&mx,&my,&mbc,&meqn,
-                                               &refratio,qcoarse,qfine,
-                                               areacoarse,areafine,
-                                               &icorner_coarse,&coarse_blockno);
+    FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER(&mx,&my,&mbc,&meqn,
+                                          &refratio,qcoarse,qfine,
+                                          areacoarse,areafine,
+                                          &icorner_coarse,&coarse_blockno);
 }
 
 void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
@@ -114,9 +114,9 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    FCLAW2D_FORT_MB_INTERPOLATE_BLOCK_CORNER_GHOST(&mx, &my, &mbc, &meqn,
-                                                   &refratio, qcoarse, qfine,
-                                                   &icoarse_corner, &coarse_blockno);
+    FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER(&mx, &my, &mbc, &meqn,
+                                              &refratio, qcoarse, qfine,
+                                              &icoarse_corner, &coarse_blockno);
 }
 
 

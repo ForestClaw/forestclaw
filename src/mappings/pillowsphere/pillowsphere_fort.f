@@ -3,8 +3,7 @@ c     # This handles the boundary conditions at the block
 c     # corners for the pillow sphere.
 c     # ----------------------------------------------------------------------
 
-c     # Exchange ghost cells at block corner
-      subroutine fclaw2d_fort_mb_exchange_block_corner_ghost
+      subroutine fclaw2d_pillow46_copy_block_corner
      &      (mx,my,mbc,meqn,
      &      qthis, qneighbor, icorner, iblock)
       implicit none
@@ -50,8 +49,7 @@ c     # Exchange ghost cells at block corner
       enddo
       end
 
-c     # Exchange ghost cells at block corner
-      subroutine fclaw2d_fort_mb_average_block_corner_ghost
+      subroutine fclaw2d_pillow46_average_block_corner
      &      (mx,my,mbc,meqn,
      &      refratio, qcoarse, qfine, areacoarse, areafine,
      &      icorner,iblock)
@@ -143,8 +141,7 @@ c     # Exchange ghost cells at block corner
       end
 
 
-c     # Exchange ghost cells at block corner
-      subroutine fclaw2d_fort_mb_interpolate_block_corner_ghost
+      subroutine fclaw2d_pillow46_interpolate_block_corner
      &      (mx,my,mbc,meqn,
      &      refratio, qcoarse, qfine, icorner_coarse, iblock)
       implicit none
