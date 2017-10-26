@@ -72,11 +72,11 @@ c     # Compute area of a patch
       end
 
 
-      subroutine fc2d_geoclaw_fort_compute_error_norm(mx,my,mbc,meqn,
-     &      dx,dy,area,error,error_norm)
+      subroutine fc2d_geoclaw_fort_compute_error_norm(blockno, 
+     &      mx,my,mbc,meqn, dx,dy,area,error,error_norm)
       implicit none
 
-      integer mx,my,mbc,meqn
+      integer blockno, mx,my,mbc,meqn
       double precision dx, dy, dxdy, eij
       double precision error_norm(meqn,3)
       double precision error(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)

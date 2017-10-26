@@ -23,6 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fc2d_geoclaw_output_ascii.h"
+
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_fort.h"
 #include "fc2d_geoclaw_options.h"

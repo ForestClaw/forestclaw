@@ -63,14 +63,24 @@ libgeoclaw_compiled_sources = \
 
 lib_LTLIBRARIES += src/solvers/fc2d_geoclaw/libgeoclaw.la
 
+## Named variables that can be reference from other libraries/apps
+FCLAW_GEOCLAW_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_geoclaw
+FCLAW_GEOCLAW_LDADD    = @top_builddir@/src/solvers/fc2d_geoclaw/libgeoclaw.la
+
+## Sources needed to build this library
 src_solvers_fc2d_geoclaw_libgeoclaw_la_SOURCES = \
   $(libgeoclaw_internal_headers) \
   $(libgeoclaw_compiled_sources)
 
+## Headers needed to build this library.  
 src_solvers_fc2d_geoclaw_libgeoclaw_la_CPPFLAGS = \
-  $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
+    $(FCLAW_CLAWPATCH_CPPFLAGS) \
+	$(FCLAW_GEOCLAW_CPPFLAGS) \
+  	$(AM_CPPFLAGS) \
+  	$(FCLAW_CPPFLAGS)
 
-FCLAW_GEOCLAW_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_geoclaw
-FCLAW_GEOCLAW_LDADD = @top_builddir@/src/solvers/fc2d_geoclaw/libgeoclaw.la
+
+AM_CPPFLAGS += $(FCLAW_GEOCLAW_CPPFLAGS)
+LDADD += $(FCLAW_GEOCLAW_LDADD)
 
 include_HEADERS += $(libgeoclaw_installed_headers)
