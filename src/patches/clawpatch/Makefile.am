@@ -6,7 +6,8 @@ libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \
-	src/patches/clawpatch/fclaw2d_clawpatch_transform.h \
+	src/patches/clawpatch/fclaw2d_clawpatch_pillow.h \
+	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch46_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch5_fort.h \
@@ -21,6 +22,7 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_pillow.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.c \
@@ -29,6 +31,7 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_interpolate.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_local_ghost_pack.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_diagnostics.f \
+	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_pillowsphere.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_output_ascii.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4refinement.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4coarsening.f \
@@ -38,6 +41,7 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_interpolate.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_local_ghost_pack.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_diagnostics.f \
+	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_pillowsphere.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_output_ascii.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_tag4refinement.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_tag4coarsening.f \

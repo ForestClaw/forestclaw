@@ -59,12 +59,6 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_fort_average_corner_t        fort_average_corner;
     clawpatch_fort_interpolate_corner_t    fort_interpolate_corner;
 
-    /* Block corners */
-    clawpatch_fort_copy_corner_t           fort_copy_block_corner;
-    clawpatch_fort_average_corner_t        fort_average_block_corner;
-    clawpatch_fort_interpolate_corner_t    fort_interpolate_block_corner;
-
-
     /* regridding functions */
     clawpatch_fort_tag4refinement_t        fort_tag4refinement;
     clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;

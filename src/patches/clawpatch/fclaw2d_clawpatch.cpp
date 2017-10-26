@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_transform.h>
+#include <fclaw2d_clawpatch_pillow.h>  
 
 #include <fclaw2d_patch.h>  /* Needed to get enum for build modes */
 
@@ -46,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 
 #include <fclaw2d_map_query.h>
-#include <pillowsphere.h>   /* For special treatment of corners */
 
 /* Needed only for MB_BLOCK_CORNER_GHOST */
 #include <fclaw2d_corner_neighbors.h>
@@ -963,7 +963,7 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
     patch_vt->average_corner       = clawpatch_average_corner;
     patch_vt->interpolate_corner   = clawpatch_interpolate_corner;
 
-    /* Assume regular block corners;  change in user files */    
+    /* Assume regular block corners;  Change by calling 'fclaw2d_clawpatch_use_pillowsphere' */    
     patch_vt->copy_block_corner          = clawpatch_copy_corner;
     patch_vt->average_block_corner       = clawpatch_average_corner;
     patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
@@ -1069,6 +1069,9 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 
 
     fclaw2d_clawpatch_diagnostics_vtable_initialize();
+
+    /* Set the virtual table, even if it isn't used */
+    fclaw2d_clawpatch_pillow_vtable_initialize(claw_version);
 
     clawpatch_vt->is_set = 1;
 }
