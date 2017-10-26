@@ -43,39 +43,6 @@ struct fclaw2d_patch_transform;
 typedef struct fclaw2d_clawpatch_pillow_vtable fclaw2d_clawpatch_pillow_vtable_t;
 
 
-#if 0
-void pillow_copy_block_corner(struct fclaw2d_global* glob,
-                              struct fclaw2d_patch* this_patch, 
-                              struct fclaw2d_patch *corner_patch,
-                              int coarse_blockno,
-                              int fine_blockno,
-                              int icorner,
-                              int time_interp,
-                              struct fclaw2d_patch_transform_data 
-                              *transform_data);
-
-void pillow_average_block_corner(struct fclaw2d_global* glob,
-                                 struct fclaw2d_patch* this_patch, 
-                                 struct fclaw2d_patch *corner_patch,
-                                 int coarse_blockno,
-                                 int fine_blockno,
-                                 int icorner,
-                                 int time_interp,
-                                 struct fclaw2d_patch_transform_data 
-                                 *transform_data);
-
-void pillow_interpolate_block_corner(struct fclaw2d_global* glob,
-                                     struct fclaw2d_patch* this_patch, 
-                                     struct fclaw2d_patch *corner_patch,
-                                     int coarse_blockno,
-                                     int fine_blockno,
-                                     int icorner,
-                                     int time_interp,
-                                     struct fclaw2d_patch_transform_data 
-                                     *transform_data);
-#endif                                     
-
-
 /* ----------------------------- Fortran typedefs ------------------------------------- */
 
 typedef void (*pillow_fort_copy_block_corner_t)(int* mx, int* my,
@@ -129,85 +96,6 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version);
 fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt();
 
 void fclaw2d_clawpatch_use_pillowsphere();
-
-/* -------------------------------- Fortran code (version 4.0) ------------------------ */
-
-#define FCLAW2D_PILLOW46_COPY_BLOCK_CORNER \
-               FCLAW_F77_FUNC(fclaw2d_pillow46_copy_block_corner, \
-                              FCLAW2D_PILLOW46_COPY_BLOCK_CORNER)
-
-void FCLAW2D_PILLOW46_COPY_BLOCK_CORNER(int* mx, int* my,
-                                        int* mbc, int* meqn,
-                                        double qthis[], 
-                                        double qneighbor[], 
-                                        int* icorner,
-                                        int* iblock);
-
-#define FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER \
-          FCLAW_F77_FUNC(fclaw2d_pillow46_average_block_corner,\
-                         FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER)
-
-void  FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER(int* mx, int* my, int* mbc,
-                                            int* meqn, 
-                                            int* refratio, 
-                                            double qcoarse[],
-                                            double qfine[], 
-                                            double areacoarse[], 
-                                            double areafine[],
-                                            int* a_coarse_corner,
-                                            int* blockno);
-
-// Averaging at block boundaries between coarse and fine grids.
-#define FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER \
-          FCLAW_F77_FUNC(fclaw2d_pillow46_interpolate_block_corner, \
-                         FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER)
-
-void  FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER(int* mx, int* my, int* mbc,
-                                                int* meqn, int* refratio,
-                                                double qcoarse[],
-                                                double qfine[], 
-                                                int* icoarse_corner,
-                                                int* blockno);
-
-
-/* -------------------------------- Fortran code (version 5.0) ------------------------ */
-
-#define FCLAW2D_PILLOW5_COPY_BLOCK_CORNER \
-               FCLAW_F77_FUNC(fclaw2d_pillow5_copy_block_corner, \
-                              FCLAW2D_PILLOW5_COPY_BLOCK_CORNER)
-
-void FCLAW2D_PILLOW5_COPY_BLOCK_CORNER(int* mx, int* my,
-                                        int* mbc, int* meqn,
-                                        double qthis[], 
-                                        double qneighbor[], 
-                                        int* icorner,
-                                        int* iblock);
-
-#define FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER \
-          FCLAW_F77_FUNC(fclaw2d_pillow5_average_block_corner,\
-                         FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER)
-
-void  FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER(int* mx, int* my, int* mbc,
-                                            int* meqn, 
-                                            int* refratio, 
-                                            double qcoarse[],
-                                            double qfine[], 
-                                            double areacoarse[], 
-                                            double areafine[],
-                                            int* a_coarse_corner,
-                                            int* blockno);
-
-// Averaging at block boundaries between coarse and fine grids.
-#define FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER \
-          FCLAW_F77_FUNC(fclaw2d_pillow5_interpolate_block_corner, \
-                         FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER)
-
-void  FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER(int* mx, int* my, int* mbc,
-                                                int* meqn, int* refratio,
-                                                double qcoarse[],
-                                                double qfine[], 
-                                                int* icoarse_corner,
-                                                int* blockno);
 
 #ifdef __cplusplus
 #if 0

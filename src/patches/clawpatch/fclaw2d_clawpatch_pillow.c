@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch46_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
 #include <fclaw2d_clawpatch_transform.h>
 
 static fclaw2d_clawpatch_pillow_vtable_t s_clawpatch_pillow_vt;

@@ -182,6 +182,46 @@ void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
 
 
 
+/* ----------------------------------- Pillow grid  ----------------------------------- */
+
+#define FCLAW2D_PILLOW5_COPY_BLOCK_CORNER \
+               FCLAW_F77_FUNC(fclaw2d_pillow5_copy_block_corner, \
+                              FCLAW2D_PILLOW5_COPY_BLOCK_CORNER)
+
+void FCLAW2D_PILLOW5_COPY_BLOCK_CORNER(int* mx, int* my,
+                                        int* mbc, int* meqn,
+                                        double qthis[], 
+                                        double qneighbor[], 
+                                        int* icorner,
+                                        int* iblock);
+
+#define FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER \
+          FCLAW_F77_FUNC(fclaw2d_pillow5_average_block_corner,\
+                         FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER)
+
+void  FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER(int* mx, int* my, int* mbc,
+                                            int* meqn, 
+                                            int* refratio, 
+                                            double qcoarse[],
+                                            double qfine[], 
+                                            double areacoarse[], 
+                                            double areafine[],
+                                            int* a_coarse_corner,
+                                            int* blockno);
+
+// Averaging at block boundaries between coarse and fine grids.
+#define FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER \
+          FCLAW_F77_FUNC(fclaw2d_pillow5_interpolate_block_corner, \
+                         FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER)
+
+void  FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER(int* mx, int* my, int* mbc,
+                                                int* meqn, int* refratio,
+                                                double qcoarse[],
+                                                double qfine[], 
+                                                int* icoarse_corner,
+                                                int* blockno);
+
+
 /* ------------------------------------ Output functions ------------------------------ */
 
 #define  FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII \
