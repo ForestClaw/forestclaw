@@ -32,9 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
-#include <fclaw2d_clawpatch_transform.h>
 
 static fclaw2d_clawpatch_pillow_vtable_t s_clawpatch_pillow_vt;
+
+struct fclaw2d_patch_transform_data;  /* Not used here, so we leave it incomplete */
 
 static
 void pillow_copy_block_corner(fclaw2d_global_t* glob,
@@ -44,7 +45,7 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
                               int corner_blockno,
                               int icorner,
                               int time_interp,
-                              fclaw2d_patch_transform_data_t *transform_data)
+                              struct fclaw2d_patch_transform_data *transform_data)
 {
     fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
 
@@ -73,7 +74,7 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
                                  int fine_blockno,
                                  int icorner_coarse,
                                  int time_interp,
-                                 fclaw2d_patch_transform_data_t* transform_data)
+                                 struct fclaw2d_patch_transform_data* transform_data)
 {
     fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
 
@@ -108,7 +109,7 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
                                      int fine_blockno,
                                      int icoarse_corner,
                                      int time_interp,
-                                     fclaw2d_patch_transform_data_t* transform_data)
+                                     struct fclaw2d_patch_transform_data* transform_data)
 
 {
     fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();

@@ -182,7 +182,7 @@ void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
 
 
 
-/* ----------------------------------- Pillow grid  ----------------------------------- */
+/* ------------------------- Pillow grid block corner routines  ----------------------- */
 
 #define FCLAW2D_PILLOW5_COPY_BLOCK_CORNER \
                FCLAW_F77_FUNC(fclaw2d_pillow5_copy_block_corner, \

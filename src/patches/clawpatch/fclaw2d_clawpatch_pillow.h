@@ -26,8 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PILLOWSPHERE_H
 #define PILLOWSPHERE_H
 
-#include <fclaw_base.h>    /* Needed for def. of FCLAW_F77_FUNC */
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -69,10 +67,11 @@ typedef void  (*pillow_fort_interpolate_block_corner_t)(int* mx, int* my, int* m
                                                         int* icoarse_corner,
                                                         int* blockno);
 
+/* ----------------------------- Use pillow sphere ------------------------------------ */
 
-/* --------------------------------- Virtual function --------------------------------- */
+void fclaw2d_clawpatch_use_pillowsphere();
 
-/* members of this structure provide the only access to above functions */
+/* --------------------------------- Virtual table ------------------------------------ */
 
 void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version);
 
@@ -86,16 +85,11 @@ struct fclaw2d_clawpatch_pillow_vtable
     int is_set;
 };
 
-/* ---------------------------- Virtual table ------------------------------------ */
-
-void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version);
-
 
 /* ------------------------------- Public access functions ---------------------------- */
 
 fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt();
 
-void fclaw2d_clawpatch_use_pillowsphere();
 
 #ifdef __cplusplus
 #if 0
