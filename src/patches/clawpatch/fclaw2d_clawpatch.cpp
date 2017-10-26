@@ -26,6 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch.hpp>
 
+#include <fclaw2d_metric.h>
+#include <fclaw2d_metric.hpp>
+
 #include <fclaw2d_clawpatch_diagnostics.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output_ascii.h> 
@@ -47,11 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 
 #include <fclaw2d_map_query.h>
-
-/* Needed only for MB_BLOCK_CORNER_GHOST */
-#include <fclaw2d_corner_neighbors.h>
-
-#include <fclaw2d_metric.hpp>
 
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>

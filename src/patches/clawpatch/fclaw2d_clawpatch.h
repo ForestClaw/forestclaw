@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_fort.h>
 
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -37,6 +38,7 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
+
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 

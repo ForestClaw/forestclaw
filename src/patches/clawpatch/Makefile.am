@@ -13,6 +13,7 @@ libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw2d_clawpatch5_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h \
+	src/patches/metric/fclaw2d_metric.h \
 	src/patches/metric/fclaw2d_metric.hpp \
 	src/patches/metric/fclaw2d_metric_default.h \
 	src/patches/metric/fclaw2d_metric_default_fort.h \
@@ -54,7 +55,7 @@ libclawpatch_compiled_sources = \
 ## Name of library to build
 lib_LTLIBRARIES += src/patches/clawpatch/libclawpatch.la
 
-## Named variables that can be reference from other libraries/apps
+## Named variables that can be referenced from other libraries/apps
 FCLAW_CLAWPATCH_CPPFLAGS = -I@top_srcdir@/src/patches/clawpatch \
                            -I@top_srcdir@/src/patches/metric
 
@@ -69,14 +70,8 @@ src_patches_clawpatch_libclawpatch_la_SOURCES = \
         $(libclawpatch_compiled_sources)
 
 ## Headers needed to build this library.  
-##  - AM_CPPFLAGS needed to get p4est/sc headers
-##  - FCLAW_CPPFLAGS needed for forestclaw headers (also included in AM_CPPFLAGS)
-##  - FCLAW_CLAWPATCH_CPPFLAGS needed for clawpatch headers (also included in AM_CPPFLAGS)
 src_patches_clawpatch_libclawpatch_la_CPPFLAGS = \
                 $(AM_CPPFLAGS)
-
-#				$(FCLAW_CPPFLAGS) \
-#				$(FCLAW_CLAWPATCH_CPPFLAGS)
 
 ## Add headers from this library to general header "pool", to be used by other apps
 AM_CPPFLAGS += $(FCLAW_CLAWPATCH_CPPFLAGS)
