@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_pillow.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
@@ -44,6 +45,12 @@ void transport_link_solvers(fclaw2d_global_t *glob)
     patch_vt->setup      = &transport_patch_setup;  
 
     const user_options_t* user = transport_get_options(glob);
+
+    if (user->example == 1)
+    {
+        fclaw2d_clawpatch_use_pillowsphere();
+    }
+
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();

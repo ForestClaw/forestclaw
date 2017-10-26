@@ -63,8 +63,10 @@ transport_check (user_options_t *user)
 {
     if (user->example == 1)
     {
+#if 0        
         fclaw_global_essentialf("Pillow sphere is not currently implemented.");
         return FCLAW_EXIT_ERROR;
+#endif        
     }
 
     if (user->example < 0 || user->example > 1) {

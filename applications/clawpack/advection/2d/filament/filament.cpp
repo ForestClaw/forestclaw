@@ -257,7 +257,10 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
+    
+    fclaw_global_essentialf("Calling finalize");
     fclaw2d_finalize(glob);
+    fclaw_global_essentialf("Done");
 }
 
 

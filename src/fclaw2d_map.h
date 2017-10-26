@@ -38,6 +38,7 @@ extern "C"
 #endif
 
 struct p4est_connectivity;
+struct fclaw2d_global;
 
 /** This prototype matches the Fortran mapc2m functions used in ClawPatch.
  */
@@ -227,6 +228,13 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
 fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
                                              int mi,
                                              int mj);
+
+
+/* ----------------------------------------------------------------------------------
+   Pillowsphere utility
+   ---------------------------------------------------------------------------------- */
+
+int fclaw2d_map_pillowsphere(struct fclaw2d_global* glob);
 
 /* ----------------------------------------------------------------------------------
    Some mapping utility functions

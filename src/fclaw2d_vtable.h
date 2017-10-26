@@ -26,11 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_VTABLE_H
 #define FCLAW2D_VTABLE_H
 
-/* Needed as long as metric type defs are defined here */
-#include <fclaw2d_metric_default.h>  
-#include <fclaw2d_metric_default_fort.h>
-
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -48,27 +43,6 @@ typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
 
 typedef void (*fclaw2d_output_frame_t)(struct fclaw2d_global * glob, int iframe);
 
-
-typedef void (*fclaw2d_metric_setup_mesh_t)(struct fclaw2d_global *glob,
-                                            struct fclaw2d_patch *this_patch,
-                                            int blockno,
-                                            int patchno);
-
-typedef void (*fclaw2d_metric_compute_area_t)(struct fclaw2d_global *glob,
-                                              struct fclaw2d_patch* this_patch,
-                                              int blockno,
-                                              int patchno);
-
-typedef void (*fclaw2d_metric_area_set_ghost_t)(struct fclaw2d_global *glob,
-                                                struct fclaw2d_patch* this_patch,
-                                                int blockno,
-                                                int patchno);
-
-typedef void (*fclaw2d_metric_compute_normals_t)(struct fclaw2d_global *glob,
-                                                 struct fclaw2d_patch *this_patch,
-                                                 int blockno,
-                                                 int patchno);
-
 typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
 
 typedef struct fclaw2d_vtable
@@ -78,23 +52,9 @@ typedef struct fclaw2d_vtable
 
     fclaw2d_problem_setup_t              problem_setup;
 
-    /* regridding functions */
     fclaw2d_after_regrid_t               after_regrid;
 
-    /* Output functions */
     fclaw2d_output_frame_t               output_frame;
-
-    /* Building patches, including functions to create metric terms */
-    fclaw2d_metric_setup_mesh_t          metric_setup_mesh;    /* wrapper */
-    fclaw2d_fort_setup_mesh_t            fort_setup_mesh;
-
-    fclaw2d_metric_compute_area_t        metric_compute_area;  /* wrapper */
-    fclaw2d_metric_area_set_ghost_t      metric_area_set_ghost;
-
-    fclaw2d_metric_compute_normals_t     metric_compute_normals;  /* wrapper */
-    fclaw2d_fort_compute_normals_t       fort_compute_normals;
-    fclaw2d_fort_compute_tangents_t      fort_compute_tangents;
-    fclaw2d_fort_compute_surf_normals_t  fort_compute_surf_normals;
 
     int is_set;
 
@@ -103,6 +63,7 @@ typedef struct fclaw2d_vtable
 
 
 fclaw2d_vtable_t* fclaw2d_vt();
+
 void fclaw2d_vtable_initialize();
 
 

@@ -16,7 +16,7 @@ else
 end
 hold on;
 plot(xout,yout,'k','linewidth',2);
-fprintf('Area of filament %24.16f\n',polyarea(xout,yout));
+% fprintf('Area of filament %24.16f\n',polyarea(xout,yout));
 hold off;
 
 showpatchborders;

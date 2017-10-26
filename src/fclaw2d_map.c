@@ -24,6 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_map.h>
+#include <fclaw2d_global.h>
+
+#include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
@@ -462,6 +465,11 @@ fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
 }
 #endif
 
+int fclaw2d_map_pillowsphere(fclaw2d_global_t* glob)
+{
+    fclaw2d_map_context_t *cont = glob->cont;
+    return FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0;    
+}
 
 void set_scale(fclaw2d_map_context_t* cont, const double scale[])
 {
