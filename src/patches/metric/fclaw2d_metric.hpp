@@ -23,14 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_METRIC_PATCH_HPP
-#define FCLAW2D_METRIC_PATCH_HPP
+#ifndef FCLAW2D_METRIC_HPP
+#define FCLAW2D_METRIC_HPP
 
 #include <fclaw2d_farraybox.hpp>     /* Needed for FArray box used to store metric data */
-
-#include <fclaw2d_patch.h>           /* Needed to get enum for build modes */
-
-#include "fclaw2d_metric_default_fort.h"  /* Needed for fort typdefs in vtable */
 
 typedef struct fclaw2d_metric_vtable fclaw2d_metric_vtable_t;
 
@@ -72,138 +68,8 @@ public :
     FArrayBox curvature;  // ???
 };
 
-/* --------------------------- Metric routines (typedefs) ----------------------------- */
-
-typedef void (*fclaw2d_metric_compute_mesh_t)(struct fclaw2d_global *glob,
-                                              struct fclaw2d_patch *this_patch,
-                                              int blockno,
-                                              int patchno);
-
-typedef void (*fclaw2d_metric_compute_area_t)(struct fclaw2d_global *glob,
-                                              struct fclaw2d_patch *patch,
-                                              int blockno,
-                                              int patchno);
-
-typedef void (*fclaw2d_metric_compute_area_ghost_t)(struct fclaw2d_global *glob,
-                                                    struct fclaw2d_patch *patch,
-                                                    int blockno,
-                                                    int patchno);
-
-typedef void (*fclaw2d_metric_compute_normals_t)(struct fclaw2d_global *glob,
-                                                 struct fclaw2d_patch *this_patch,
-                                                 int blockno,
-                                                 int patchno);
-
-
-/* ------------------------------ Metric routines ------------------------------------- */
-
 fclaw2d_metric_patch_t* fclaw2d_metric_patch_new();
 
 void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t *patchmp);
 
-
-void fclaw2d_metric_patch_define(struct fclaw2d_global* glob,
-                                 struct fclaw2d_patch *this_patch,
-                                 int mx, int my, int mbc, 
-                                 double dx, double dy, 
-                                 double xlower, double ylower,
-                                 double xupper, double yupper,
-                                 int blockno, int patchno,
-                                 fclaw2d_build_mode_t build_mode);
-
-
-void fclaw2d_metric_patch_setup(struct fclaw2d_global* glob,
-                                struct fclaw2d_patch* this_patch,
-                                int blockno,
-                                int patchno);
-
-void fclaw2d_metric_patch_setup_from_fine(struct fclaw2d_global *glob,
-                                          struct fclaw2d_patch *fine_patches,
-                                          struct fclaw2d_patch *coarse_coarse,
-                                          int blockno,
-                                          int coarse_patchno,
-                                          int fine0_patchno);
-
-void fclaw2d_metric_patch_compute_area(struct fclaw2d_global *glob,
-                                       struct fclaw2d_patch* this_patch,
-                                       int blockno, int patchno);
-
-/* --------------------------------- Access functions --------------------------------- */
-
-void fclaw2d_metric_patch_grid_data(struct fclaw2d_global* glob,
-                                    struct fclaw2d_patch* this_patch,
-                                    int* mx, int* my, int* mbc,
-                                    double* xlower, double* ylower,
-                                    double* dx, double* dy);
-
-
-void fclaw2d_metric_patch_mesh_data(struct fclaw2d_global* glob,
-                                    struct fclaw2d_patch* this_patch,
-                                    double **xp, double **yp, double **zp,
-                                    double **xd, double **yd, double **zd,
-                                    double **area);
-
-
-void fclaw2d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
-                                     struct fclaw2d_patch* this_patch,
-                                     double **xnormals, double **ynormals,
-                                     double **xtangents, double **ytangents,
-                                     double **surfnormals,
-                                     double **edgelengths, double **curvature);
-
-
-double* fclaw2d_metric_patch_get_area(struct fclaw2d_patch* this_patch);
-
-
-/* ---------------------------- Metric default (virtualized) -------------------------- */
-
-void fclaw2d_metric_compute_area_default(struct fclaw2d_global *glob,
-                                         struct fclaw2d_patch* this_patch,
-                                         int blockno, int patchno);
-
-
-void fclaw2d_metric_compute_area_ghost_default(struct fclaw2d_global* glob,
-                                               struct fclaw2d_patch* this_patch,
-                                               int blockno,
-                                               int patchno);
-
-void fclaw2d_metric_compute_mesh_default(struct fclaw2d_global *glob,
-                                         struct fclaw2d_patch *this_patch,
-                                         int blockno,
-                                         int patchno);
-
-
-void fclaw2d_metric_compute_normals_default(struct fclaw2d_global *glob,
-                                            struct fclaw2d_patch *this_patch,
-                                            int blockno,
-                                            int patchno);
-
-
-/* ------------------------------------ Virtual table --------------------------------- */
-
-fclaw2d_metric_vtable_t* fclaw2d_metric_vt();
-
-
-struct fclaw2d_metric_vtable
-{
-    /* Building patches, including functions to create metric terms */
-    fclaw2d_metric_compute_mesh_t        compute_mesh;    /* wrapper */
-    fclaw2d_metric_compute_area_t        compute_area;  /* wrapper */
-    fclaw2d_metric_compute_area_ghost_t  compute_area_ghost;
-    fclaw2d_metric_compute_normals_t     compute_normals;  /* wrapper */
-
-    /* Fortran files */
-    fclaw2d_fort_compute_mesh_t          fort_compute_mesh;
-    fclaw2d_fort_compute_normals_t       fort_compute_normals;
-    fclaw2d_fort_compute_tangents_t      fort_compute_tangents;
-    fclaw2d_fort_compute_surf_normals_t  fort_compute_surf_normals;
-
-    int is_set;
-};
-
-void fclaw2d_metric_vtable_initialize();
-
-
-
-
-#endif /* !FCLAW2D_METRIC_PATCH_HPP */
+#endif /* !FCLAW2D_METRIC_HPP */

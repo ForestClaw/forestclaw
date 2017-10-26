@@ -36,6 +36,7 @@ extern "C"
 #endif
 #endif
 
+
 /* Typedef'd functions that user can set to whatever they want */
 typedef void (*fclaw2d_fort_compute_mesh_t)(const int* mx, const int* my, const int* mbc,
                                             const double* xlower, const double* ylower,
