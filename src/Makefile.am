@@ -39,8 +39,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_diagnostics.h \
-	src/mappings/pillowsphere/pillowsphere.h
+	src/fclaw2d_diagnostics.h
 
 libforestclaw_internal_headers =
 
@@ -98,8 +97,6 @@ libforestclaw_compiled_sources = \
 	src/mappings/pillowdisk5/mapc2m_pillowdisk5.f \
 	src/mappings/cubedsphere/mapc2m_cubedsphere.f \
 	src/mappings/pillowsphere/mapc2m_pillowsphere.f \
-	src/mappings/pillowsphere/pillowsphere_fort.f  \
-	src/mappings/pillowsphere/pillowsphere.c  \
 	src/mappings/fivepatch/mapc2m_fivepatch.f \
 	src/mappings/torus/mapc2m_torus.f \
 	src/mappings/torus/mapc2m_twisted_torus.f \
@@ -114,7 +111,6 @@ libforestclaw_compiled_sources = \
 # this variable is used for headers that are not publicly installed
 FCLAW_CPPFLAGS = \
     -I@top_srcdir@/src \
-    -I@top_srcdir@/src/mappings/pillowsphere \
 	-I@top_srcdir@/src/fortran_source2d
 
 FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)   # Not currently needed
