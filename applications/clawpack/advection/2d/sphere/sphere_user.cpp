@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-#include <pillowsphere.h>
+#include <fclaw2d_clawpatch_pillow.h>
 
 #include "../all/advection_user_fort.h"
 
@@ -46,9 +46,15 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup    = &sphere_problem_setup;  /* Version-independent */
 
-
-
     const user_options_t* user = sphere_get_options(glob);
+
+    if (user->example == 1)
+    {
+        /* Needed to get correct handling of block corners */
+        fclaw2d_clawpatch_use_pillowsphere();
+    }
+
+
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
@@ -59,13 +65,6 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
 
         clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
         clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
-
-        if (user->example == 1)
-        {
-            patch_vt->copy_block_corner        = pillow_copy_block_corner;  
-            patch_vt->average_block_corner     = pillow_average_block_corner;  
-            patch_vt->interpolate_block_corner = pillow_interpolate_block_corner;  
-        }
     }
     else if (user->claw_version == 5)
     {
@@ -77,12 +76,6 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
 
         clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
         clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
-
-        if (user->example == 1)
-        {
-            fclaw_global_essentialf("Pillowsphere not implemented for Clawpack 5.0\n");
-            exit(0);
-        }
     }
 }
 
