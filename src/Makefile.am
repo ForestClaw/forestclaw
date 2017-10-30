@@ -113,7 +113,7 @@ FCLAW_CPPFLAGS = \
     -I@top_srcdir@/src \
 	-I@top_srcdir@/src/fortran_source2d
 
-FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)   # Not currently needed
+FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)   # (orignally used for metric.i;  not needed now)
 
 lib_LTLIBRARIES += src/libforestclaw.la
 src_libforestclaw_la_SOURCES = \
