@@ -42,32 +42,32 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
     const user_options_t* user = swirlcons_get_options(glob);
-    fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+    fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
 
-    clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
-    clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
-    clawpack46_vt->rpt2      = &RPT2CONS;
+    claw46_vt->fort_qinit     = CLAWPACK46_QINIT;
+    claw46_vt->fort_setaux    = CLAWPACK46_SETAUX;
+    claw46_vt->fort_rpt2      = RPT2CONS;
 
     switch(user->rp_solver)
     {
         case 1:
             clawopt->use_fwaves = 0;
-            clawpack46_vt->rpn2      = &RPN2CONS_QS; 
+            claw46_vt->fort_rpn2      = RPN2CONS_QS; 
             break; 
 
         case 2:
             clawopt->use_fwaves = 0;
-            clawpack46_vt->rpn2      = &RPN2CONS_WD; 
+            claw46_vt->fort_rpn2      = RPN2CONS_WD; 
             break; 
 
         case 3:
             clawopt->use_fwaves = 0;
-            clawpack46_vt->rpn2      = &RPN2CONS_EC; 
+            claw46_vt->fort_rpn2      = RPN2CONS_EC; 
             break;
 
         case 4:
             clawopt->use_fwaves = 1;
-            clawpack46_vt->rpn2      = &RPN2CONS_FW; 
+            claw46_vt->fort_rpn2      = RPN2CONS_FW; 
             break;
     }
  }

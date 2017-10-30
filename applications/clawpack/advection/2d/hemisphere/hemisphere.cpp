@@ -186,15 +186,11 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                              rotate,user_opt->alpha);
         break;
     case 2:
-        fclaw_global_essentialf("This is not yet implemented");
-        exit(0);
-#if 0        
         /* Map unit square to disk using mapc2m_disk.f */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
                                             fclaw_opt->shift,
                                             rotate);
-#endif                                            
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */

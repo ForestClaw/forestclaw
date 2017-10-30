@@ -45,24 +45,24 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();        
-        patch_vt->setup = fc2d_clawpack46_setaux;
+        // patch_vt->setup = fc2d_clawpack46_setaux;
 
-        clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
-        clawpack46_vt->setaux    = &CLAWPACK46_SETAUX;
-        clawpack46_vt->rpn2      = &CLAWPACK46_RPN2ADV;
-        clawpack46_vt->rpt2      = &CLAWPACK46_RPT2ADV;
-        clawpack46_vt->b4step2   = &CLAWPACK46_B4STEP2;
+        clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
+        clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
+        clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
+        clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
+        clawpack46_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
     }
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
-        patch_vt->setup = fc2d_clawpack5_setaux;
+        // patch_vt->setup = fc2d_clawpack5_setaux;
 
-        clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
-        clawpack5_vt->setaux    = &CLAWPACK5_SETAUX;
-        clawpack5_vt->b4step2   = &CLAWPACK5_B4STEP2;
-        clawpack5_vt->rpn2      = &CLAWPACK5_RPN2ADV;
-        clawpack5_vt->rpt2      = &CLAWPACK5_RPT2ADV;
+        clawpack5_vt->fort_qinit     = &CLAWPACK5_QINIT;
+        clawpack5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
+        clawpack5_vt->fort_b4step2   = &CLAWPACK5_B4STEP2;
+        clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
+        clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
     }
 }
 
