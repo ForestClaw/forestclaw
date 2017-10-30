@@ -47,25 +47,25 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
         fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 
-        clawpack46_vt->qinit  = &CLAWPACK46_QINIT;
-        clawpack46_vt->setaux = &CLAWPACK46_SETAUX;
-        clawpack46_vt->bc2    = &CLAWPACK46_BC2;   /* Special  BCs at left edge */
-        clawpack46_vt->src2   = &CLAWPACK46_SRC2;  /* To simulate axis-symmetric */
+        claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
+        claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
+        claw46_vt->fort_bc2    = &CLAWPACK46_BC2;   /* Special  BCs at left edge */
+        claw46_vt->fort_src2   = &CLAWPACK46_SRC2;  /* To simulate axis-symmetric */
 
         switch (clawopt->mwaves)
         {
         case 4:
             /* Requires meqn=4 */
-            clawpack46_vt->rpn2   = &CLAWPACK46_RPN2_EULER4;  /* No tracer */
-            clawpack46_vt->rpt2   = &CLAWPACK46_RPT2_EULER4;
+            claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER4;  /* No tracer */
+            claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER4;
             break;
         case 5:
             /* Requires meqn=5 */
-            clawpack46_vt->rpn2   = &CLAWPACK46_RPN2_EULER5;  /* Includes a tracer */
-            clawpack46_vt->rpt2   = &CLAWPACK46_RPT2_EULER5;
+            claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER5;  /* Includes a tracer */
+            claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER5;
             break;
         default:
             SC_ABORT_NOT_REACHED ();
@@ -77,27 +77,25 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
         fc2d_clawpack5_options_t *clawopt = fc2d_clawpack5_get_options(glob);
 
-        clawpack5_vt->qinit  = &CLAWPACK5_QINIT;
-        clawpack5_vt->setaux = &CLAWPACK5_SETAUX;
-        clawpack5_vt->bc2    = &CLAWPACK5_BC2;   /* Special  BCs at left edge */
-        clawpack5_vt->src2   = &CLAWPACK5_SRC2;  /* To simulate axis-symmetric */
-
-
-        switch (clawopt->mwaves)
+        claw5_vt->fort_qinit  = &CLAWPACK5_QINIT;
+        claw5_vt->fort_setaux = &CLAWPACK5_SETAUX;
+        claw5_vt->fort_bc2    = &CLAWPACK5_BC2;   /* Special  BCs at left edge */
+        claw5_vt->fort_src2   = &CLAWPACK5_SRC2;  /* To simulate axis-symmetric */
+      switch (clawopt->mwaves)
         {
         case 4:
             /* Requires meqn=4 */
-            clawpack5_vt->rpn2   = &CLAWPACK5_RPN2_EULER4;  /* no tracer */
-            clawpack5_vt->rpt2   = &CLAWPACK5_RPT2_EULER4;
+            claw5_vt->fort_rpn2   = &CLAWPACK5_RPN2_EULER4;  /* no tracer */
+            claw5_vt->fort_rpt2   = &CLAWPACK5_RPT2_EULER4;
             break;
         case 5:
             /* Requires meqn=5 */
-            clawpack5_vt->rpn2   = &CLAWPACK5_RPN2_EULER5;  /* Includes a tracer */
-            clawpack5_vt->rpt2   = &CLAWPACK5_RPT2_EULER5;
+            claw5_vt->fort_rpn2   = &CLAWPACK5_RPN2_EULER5;  /* Includes a tracer */
+            claw5_vt->fort_rpt2   = &CLAWPACK5_RPT2_EULER5;
             break;
         default:
             SC_ABORT_NOT_REACHED ();

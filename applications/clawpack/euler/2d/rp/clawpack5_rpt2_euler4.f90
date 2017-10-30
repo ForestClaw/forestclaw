@@ -20,7 +20,7 @@ SUBROUTINE clawpack5_rpt2_euler4(ixy,imp,maxm,meqn,mwaves,maux, &
 !
       common /cparam/  gamma
       dimension waveb(4,3),sb(3)
-      parameter (maxm2 = 1800)  !# assumes at most 200x200 grid with mbc=2
+      parameter (maxm2 = 602)  !# assumes at most 200x200 grid with mbc=2
 !
       double precision u2v2(-6:maxm2+7), &
             u(-6:maxm2+7),v(-6:maxm2+7),enth(-6:maxm2+7),a(-6:maxm2+7), &

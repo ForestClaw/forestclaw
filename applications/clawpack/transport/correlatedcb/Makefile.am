@@ -33,8 +33,14 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
+
+CORRELATEDCB_CPPFLAGS = -I@top_srcdir@/applications/clawpack/transport/all
+
 applications_clawpack_transport_correlatedcb_correlatedcb_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+		$(CORRELATEDCB_CPPFLAGS) \
+        $(AM_CPPFLAGS) \
+        $(FCLAW_CLAWPACK46_CPPFLAGS) \
+        $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_clawpack_transport_correlatedcb_correlatedcb_LDADD = \
         $(FCLAW_CLAWPACK46_LDADD) \

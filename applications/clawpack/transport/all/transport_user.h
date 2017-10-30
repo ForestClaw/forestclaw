@@ -59,6 +59,7 @@ fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
                                                       const double rotate[]);
 
 
+#if 0
 void transport_patch_setup(struct fclaw2d_global *glob,
                            struct fclaw2d_patch *this_patch,
                            int this_block_idx,
@@ -77,6 +78,8 @@ void transport_b4step2(struct fclaw2d_global *glob,
                        int this_patch_idx,
                        double t,
                        double dt);
+
+#endif                        
 
 void transport_link_solvers(struct fclaw2d_global *glob);
 

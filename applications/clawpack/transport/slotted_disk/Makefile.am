@@ -36,11 +36,14 @@ applications_clawpack_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-applications_clawpack_transport_slotted_disk_slotted_disk_CPPFLAGS = $(AM_CPPFLAGS)
+SLOTTED_DISK_CPPFLAGS = -I@top_srcdir@/applications/clawpack/transport/all
+
+applications_clawpack_transport_slotted_disk_slotted_disk_CPPFLAGS = \
+		$(SLOTTED_DISK_CPPFLAGS) \
+		$(AM_CPPFLAGS)
 
 applications_clawpack_transport_slotted_disk_slotted_disk_LDADD = \
-        $(LDADD)
-
-#        $(FCLAW_CLAWPACK46_LDADD)  \
-#        $(FCLAW_CLAWPACK5_LDADD)  \
-#        $(FCLAW_CLAWPATCH_LDADD)
+        $(LDADD) \
+        $(FCLAW_CLAWPACK46_LDADD)  \
+        $(FCLAW_CLAWPACK5_LDADD)  \
+        $(FCLAW_CLAWPATCH_LDADD)
