@@ -58,7 +58,7 @@ void CLAWPACK5_FLUX2(const int* ixy,const int* maxm, const int* meqn,
                       double gaddp[],double cfl1d[], double wave[],
                       double s[], double amdq[],double apdq[],double cqxx[],
                       double bmasdq[], double bpasdq[],
-                      fc2d_clawpack5_rpn2_t rpn2,fc2d_clawpack5_rpt2_t rpt2);
+                      clawpack5_fort_rpn2_t rpn2, clawpack5_fort_rpt2_t rpt2);
 #if 0
 #define CLAWPACK5_FLUX2FW FCLAW_F77_FUNC(clawpack5_flux2fw,CLAWPACK5_FLUX2FW)
 void CLAWPACK5_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
@@ -93,9 +93,9 @@ void CLAWPACK5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             const double* xlower, const double* ylower, const int* level,
                             const double* t, double fp[], double fm[], double gp[],
                             double gm[],
-                            fc2d_clawpack5_rpn2_t rpn2,
-                            fc2d_clawpack5_rpt2_t rpt2,
-                            fc2d_clawpack5_flux2_t flux2,
+                            clawpack5_fort_rpn2_t rpn2,
+                            clawpack5_fort_rpt2_t rpt2,
+                            clawpack5_fort_flux2_t flux2,
                             int block_corner_count[],int* ierror);
 
 #define CLAWPACK5_STEP2 FCLAW_F77_FUNC(clawpack5_step2,CLAWPACK5_STEP2)
@@ -105,8 +105,8 @@ void CLAWPACK5_STEP2(const int* maxm, const int* meqn, const int* maux,
                             const double* dx, const double* dy, const double* dt,
                             const double* cflgrid, double fm[], double fp[], double gm[],
                             double gp[],
-                            fc2d_clawpack5_rpn2_t rpn2,
-                            fc2d_clawpack5_rpt2_t rpt2);
+                            clawpack5_fort_rpn2_t rpn2,
+                            clawpack5_fort_rpt2_t rpt2);
 
 /* ----------------------------- Misc ClawPack specific functions ------------------------------ */
     
