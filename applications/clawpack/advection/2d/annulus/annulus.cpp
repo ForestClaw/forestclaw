@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5_options.h>
 #include <fc2d_clawpack5.h>
 
-static int s_user_package_id = -1;
+static int s_user_options_package_id = -1;
 
 static void *
 annulus_register(user_options_t *user, sc_options_t * opt)
@@ -119,14 +119,14 @@ user_options_t* annulus_options_register (fclaw_app_t * app,
 static 
 void annulus_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(s_user_package_id == -1);
+    FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_package_id = id;
+    s_user_options_package_id = id;
 }
 
 const user_options_t* annulus_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_package_id;
+    int id = s_user_options_package_id;
     return (user_options_t*) 
             fclaw_package_get_options(glob, id);
 }
