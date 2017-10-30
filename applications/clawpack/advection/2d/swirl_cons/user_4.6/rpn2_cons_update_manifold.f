@@ -10,7 +10,7 @@ c        # Cell-centered velocities
          u = aux(1)
          v = aux(2)
 
-         urot = aux(6+2*idir)*u + aux(7+2*idir)
+         urot = aux(6+2*idir)*u + aux(7+2*idir)*v
          flux(1) = urot*q(1)
 
       end
