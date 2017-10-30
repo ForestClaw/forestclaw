@@ -34,10 +34,10 @@ extern "C"
 #endif
 #endif
 
-#define CLAWPATCH_CONS_UPDATE_METRIC FCLAW_F77_FUNC(clawpatch_cons_update_metric, \
-                                                    CLAWPATCH_CONS_UPDATE_METRIC)
+#define CLAWPATCH_CONS_STORE_METRIC FCLAW_F77_FUNC(clawpatch_cons_store_metric, \
+                                                    CLAWPATCH_CONS_STORE_METRIC)
 
-void CLAWPATCH_CONS_UPDATE_METRIC(const int* mx,const int *my, const int* mbc, 
+void CLAWPATCH_CONS_STORE_METRIC(const int* mx,const int *my, const int* mbc, 
                                   const double* dx, const double *dy,
                                   double area[], double edge_lengths[],
                                   double area0[], double area1[], 

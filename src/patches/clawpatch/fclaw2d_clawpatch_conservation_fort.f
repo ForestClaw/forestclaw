@@ -1,4 +1,4 @@
-      subroutine clawpatch_cons_update_metric(mx,my,mbc,dx,dy,
+      subroutine clawpatch_cons_store_metric(mx,my,mbc,dx,dy,
      &           area,edgelengths,
      &           area0,area1,area2,area3,
      &           el0, el1, el2, el3, manifold)

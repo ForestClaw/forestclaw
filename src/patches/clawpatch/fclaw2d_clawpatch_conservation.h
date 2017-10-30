@@ -70,12 +70,6 @@ void fclaw2d_clawpatch_cons_update_reset(struct fclaw2d_global* glob,int minleve
 
 void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons_update);
 
-#if 0
-void fclaw2d_clawpatch_cons_update_init(struct fclaw2d_global *glob,
-                                        struct fclaw2d_patch* this_patch,
-                                        int blockno, int patchno);
-#endif                                        
-
 void fclaw2d_clawpatch_cons_update_metric(fclaw2d_global_t* glob,
                                           fclaw2d_patch_t* this_patch,
                                           int blockno,int patchno);
