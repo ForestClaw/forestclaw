@@ -26,6 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_TRANSFORM_H
 #define FCLAW2D_CLAWPATCH_TRANSFORM_H
 
+
+#include <fclaw_base.h>   /* Defines FCLAW_F77_FUNC */
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -33,9 +37,6 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
-
-#include <fclaw_base.h>   /* Defines FCLAW_F77_FUNC */
-
 
 struct fclaw2d_global;
 struct fclaw2d_patch;  /* fclaw2d_patch.h includes this file */
