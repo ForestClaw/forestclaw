@@ -140,52 +140,6 @@ static void cb_parallel_wrap(fclaw2d_domain_t* domain,
 
 
 static
-void time_sync_copy(fclaw2d_global_t *glob,
-                    int level,
-                    int time_interp,
-                    int read_parallel_patches,
-                    fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
-{
-    struct fclaw2d_ghost_fill_wrap_info parallel_mode;
-    fclaw2d_exchange_info_t e_info;
-    e_info.exchange_type = FCLAW2D_TIME_SYNC_COPY;
-    e_info.grid_type = FCLAW2D_IS_COARSE;
-    e_info.time_interp = time_interp;
-    e_info.read_parallel_patches = read_parallel_patches;
-
-    parallel_mode.ghost_mode = ghost_mode;
-    parallel_mode.user = (void*) &e_info;
-
-    parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(glob, level, cb_parallel_wrap,
-                         (void *) &parallel_mode);
-}
-
-
-static
-void time_sync_fine_to_coarse(fclaw2d_global_t *glob,
-                              int level,
-                              int time_interp,
-                              int read_parallel_patches,
-                              fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
-{
-    struct fclaw2d_ghost_fill_wrap_info parallel_mode;
-    fclaw2d_exchange_info_t e_info;
-    e_info.exchange_type = FCLAW2D_TIME_SYNC_FINE_TO_COARSE;
-    e_info.grid_type = FCLAW2D_IS_COARSE;
-    e_info.time_interp = time_interp;
-    e_info.read_parallel_patches = read_parallel_patches;
-
-    parallel_mode.ghost_mode = ghost_mode;
-    parallel_mode.user = (void*) &e_info;
-
-    parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(glob, level, cb_parallel_wrap,
-                         (void *) &parallel_mode);
-}
-
-
-static
 void copy2ghost(fclaw2d_global_t *glob,
                 int level,
                 int time_interp,
@@ -351,6 +305,8 @@ void setphysical(fclaw2d_global_t *glob,
 /* -------------------------------------------------
    Loop over all levels
    ----------------------------------------------- */
+
+#if 0
 static
 void time_sync(fclaw2d_global_t* glob,
                int minlevel,
@@ -377,8 +333,7 @@ void time_sync(fclaw2d_global_t* glob,
     }
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_COPY]);
 }
-
-
+#endif
 
 
 static
@@ -578,40 +533,131 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
 
 
     /* --------------------------------------------------------------
-        Start send ...
+        Send and receive ghost patches
     ------------------------------------------------------------*/
     fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
                                          FCLAW2D_TIMER_GHOSTFILL);
-
-    /* -------------------------------------------------------------
-        Receive ghost patches ...
-    ------------------------------------------------------------- */
 
     fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
                                        FCLAW2D_TIMER_GHOSTFILL);
 
     /* -------------------------------------------------------------
-        Loop over ghost patches to find indirect neighbors and do
-        any necessary face exchanges.
-
-        Note : There is no special timer for this call, but checks
-        show that ghostfill-(step1+step2+step3+comm) << 1
+        Indirect neighbor exchange
     ------------------------------------------------------------- */
     fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
 
 
-    /* --------------------------------------------------------------
-    Time sync any corrections
-    ------------------------------------------------------------*/
+    /* -------------------------------------------------------------
+        Do everything in one set of sequential steps
+    ------------------------------------------------------------- */
 
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+
+    /* Average */
+    average_fine2coarse_ghost(glob,mincoarse,maxcoarse, time_interp,
+                              read_parallel_patches,parallel_mode);
+
+    /* Copy */
+    copy_samelevel(glob,minlevel,maxlevel,time_interp,
+                   read_parallel_patches,parallel_mode);
+
+    /* Physical */
+    fill_physical_ghost(glob,
+                        minlevel,
+                        maxlevel,
+                        sync_time,
+                        time_interp,
+                        parallel_mode);
+
+    /* Interpolate */
+    interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
+                                  time_interp,read_parallel_patches,
+                                  parallel_mode);
+    /* Physical */
+    fill_physical_ghost(glob,
+                        minlevel,
+                        maxlevel,
+                        sync_time,
+                        time_interp,
+                        FCLAW2D_BOUNDARY_ALL);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+
+    // Stop timing
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL]);
+    if (running != FCLAW2D_TIMER_NONE)
+    {
+        fclaw2d_timer_start (&glob->timers[running]);
+    }
+}
+
+
+/**
+ * <summary>Complete exchange of all ghost patches at all levels.</summary>
+ * <remarks>All parallel ghost patches are also exchanged at all
+ * levels.</remarks>
+ * <list>
+ *    <item>Every level exchanges ghost cells with other patches
+ *       at that level</item>
+ *    <item>Every finer level exchanges with a coarser level</item>
+ *    <item> All levels will be updated in next update step, regardless of
+ *       whether we are in the subcycled or non-subcycled case.</item>
+ *       </list>
+ *   The reason for two separate ghost cell exchange routines is that
+ *   the logic here is considerably simpler than for the partial
+ *   update used in intermediate steps in the subcycled case.
+ **/
+void fclaw2d_ghost_update_async(fclaw2d_global_t* glob,
+                                int minlevel,
+                                int maxlevel,
+                                double sync_time,
+                                int time_interp,
+                                fclaw2d_timer_names_t running)
+{
+    if (running != FCLAW2D_TIMER_NONE) {
+        fclaw2d_timer_stop (&glob->timers[running]);
+    }
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL]);
+
+    fclaw_global_infof("Exchanging ghost patches across all levels\n");
 
 #if 0
+    /* uncomment this if debugging ghost cell interpolation */
+    fclaw_global_essentialf("WARNING : compute_slopes set to average\n");
+#endif
+
+    /* ---------------------------------------------------------
+       Get coarse grid ghost cells ready to use for interpolation.
+       Coarse ghost cells on ghost patches are not updated in
+       this step.  Ghost patches do not yet have valid data, and
+       so boundary patches will have to be updated after the exchange.
+       ---------------------------------------------------------- */
+
+    if (time_interp)
+    {
+        int time_interp_level = minlevel - 1;
+        fclaw_global_infof("Time interpolated level is %d\n",   \
+                           time_interp_level);
+    }
+
+    /* If minlevel == maxlevel, then maxcoarse < mincoase. In this
+       case, loops involving averaging and interpolation will be
+       skipped and we only copy between patches on
+       same levels. */
+
+    int mincoarse = minlevel;
+    int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
+
     fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
            FCLAW2D_BOUNDARY_ALL;
-    int read_parallel_patches = 0;
+    int read_parallel_patches;
 
-    time_sync(glob, minlevel, maxlevel, time_interp, read_parallel_patches,
-              parallel_mode);
+
+#if (_OPENMP)
+    /* Multi-thread only in single processor case. */
+    patch_iterator = &fclaw2d_global_iterate_level_mthread;
+#else
+    patch_iterator = &fclaw2d_global_iterate_level;
+#endif
 
     /* --------------------------------------------------------------
     Do work we can do before sending
@@ -651,6 +697,12 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
                         parallel_mode);
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+
+    /* --------------------------------------------------------------
+        Start send ...
+    ------------------------------------------------------------*/
+    fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
+                                         FCLAW2D_TIMER_GHOSTFILL);
 
     /* --------------------------------------------------------------
         Finish exchanges in the interior of the grid.
@@ -700,12 +752,29 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP2]);
 
-#endif
+    /* -------------------------------------------------------------
+        Receive ghost patches ...
+    ------------------------------------------------------------- */
+
+    fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
+                                       FCLAW2D_TIMER_GHOSTFILL);
+
+    /* -------------------------------------------------------------
+        Loop over ghost patches to find indirect neighbors and do
+        any necessary face exchanges.
+
+        Note : There is no special timer for this call, but checks
+        show that ghostfill-(step1+step2+step3+comm) << 1
+    ------------------------------------------------------------- */
+    fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
+
     /* -------------------------------------------------------------
         Repeat above, but now with parallel ghost cells.
     ------------------------------------------------------------- */
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+    parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
+    read_parallel_patches = 1;
 
     /* Average */
     average_fine2coarse_ghost(glob,mincoarse,maxcoarse, time_interp,
@@ -766,6 +835,11 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
     }
 }
 
+
+
+/* -----------------------------------------------------------------------
+   Public interface
+   ---------------------------------------------------------------------*/
 
 void fclaw2d_ghost_update(fclaw2d_global_t* glob,
                           int minlevel,

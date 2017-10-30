@@ -110,14 +110,10 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 
 
     /* --------------------------------------------------------------
-        Start send ...
+        Send and receive patches
     ------------------------------------------------------------*/
     fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
                                          FCLAW2D_TIMER_TIMESYNC);
-
-    /* -------------------------------------------------------------
-        Receive ghost patches ...
-    ------------------------------------------------------------- */
 
     fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
                                        FCLAW2D_TIMER_TIMESYNC);

@@ -299,7 +299,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
         double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
 
-        CLAWPACK46_EVALUATE_EDGE_FLUXES(&mx,&my,&mbc,&meqn,&maux,&dt,
+        CLAWPACK46_CONS_UPDATE_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,&dt,
                                         cu->edgelengths[0],cu->edgelengths[1],
                                         cu->edgelengths[2],cu->edgelengths[3],
                                         qold,aux,
@@ -339,14 +339,14 @@ double clawpack46_step2(fclaw2d_global_t *glob,
     FCLAW_ASSERT(ierror == 0);
 
 
-    CLAWPACK46_CONS_UPDATES_ACCUMULATE(&mx,&my,&mbc,&meqn,&dt, &this_patch_idx,
-                                       cu->edgelengths[0],cu->edgelengths[1],
-                                       cu->edgelengths[2],cu->edgelengths[3],
-                                       fp,fm,gp,gm,
-                                       cu->fp[0],cu->fp[1],
-                                       cu->fm[0],cu->fm[1],
-                                       cu->gp[0],cu->gp[1],
-                                       cu->gm[0],cu->gm[1]);
+    CLAWPACK46_CONS_UPDATES_ACCUMLATE_WAVES(&mx,&my,&mbc,&meqn,&dt, &this_patch_idx,
+                                            cu->edgelengths[0],cu->edgelengths[1],
+                                            cu->edgelengths[2],cu->edgelengths[3],
+                                            fp,fm,gp,gm,
+                                            cu->fp[0],cu->fp[1],
+                                            cu->fm[0],cu->fm[1],
+                                            cu->gp[0],cu->gp[1],
+                                            cu->gm[0],cu->gm[1]);
 
 
     delete [] fp;

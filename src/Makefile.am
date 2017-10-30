@@ -81,7 +81,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_advance.c \
 	src/fclaw2d_physical_bc.c \
 	src/fclaw2d_ghost_fill.c \
-	src/fclaw2d_ghost_fill_async.c \
 	src/fclaw2d_metric.c \
 	src/fclaw2d_output.c \
 	src/fclaw2d_update_single_step.c \
