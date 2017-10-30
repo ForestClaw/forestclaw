@@ -153,6 +153,7 @@ struct fc2d_clawpack46_vtable
     clawpack46_fort_setaux_t    fort_setaux;
     clawpack46_fort_b4step2_t   fort_b4step2;
     clawpack46_fort_src2_t      fort_src2;
+    
     clawpack46_fort_rpn2_t      fort_rpn2;
     clawpack46_fort_rpt2_t      fort_rpt2;
     clawpack46_fort_fluxfun_t   fort_fluxfun;

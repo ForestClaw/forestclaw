@@ -54,7 +54,7 @@ void CLAWPACK46_FLUX2(const int* ixy,const int* maxm, const int* meqn,
                       double gaddp[],double cfl1d[], double fwave[],
                       double s[], double amdq[],double apdq[],double cqxx[],
                       double bmasdq[], double bpasdq[],
-                      fc2d_clawpack46_rpn2_t rpn2,fc2d_clawpack46_rpt2_t rpt2,
+                      clawpack46_fort_rpn2_t rpn2, clawpack46_fort_rpt2_t rpt2,
                       const int* mwaves, const int* mcapa,
                       int method[], int mthlim[]);
 
@@ -67,7 +67,7 @@ void CLAWPACK46_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
                         double gaddp[],double cfl1d[], double fwave[],
                         double s[], double amdq[],double apdq[],double cqxx[],
                         double bmasdq[], double bpasdq[],
-                        fc2d_clawpack46_rpn2_t rpn2,fc2d_clawpack46_rpt2_t rpt2,
+                        clawpack46_fort_rpn2_t rpn2,clawpack46_fort_rpt2_t rpt2,
                         const int* mwaves, const int* mcapa,
                         int method[], int mthlim[]);
 
@@ -95,9 +95,9 @@ void CLAWPACK46_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
                             const double* xlower, const double* ylower, const int* level,
                             const double* t, double fp[], double fm[], double gp[],
                             double gm[],
-                            fc2d_clawpack46_rpn2_t rpn2,
-                            fc2d_clawpack46_rpt2_t rpt2,
-                            fc2d_clawpack46_flux2_t flux2,
+                            clawpack46_fort_rpn2_t rpn2,
+                            clawpack46_fort_rpt2_t rpt2,
+                            clawpack46_fort_flux2_t flux2,
                             int block_corner_count[],int* ierror);
 
 /* ----------------------------- Misc ClawPack specific functions ------------------------------ */
