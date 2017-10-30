@@ -382,7 +382,8 @@ void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
     patch_vt->transform_init_data(glob,patch,blockno,patchno,ftransform);    
 }
 
-
+/* Confusing name;  but fclaw2d_patch_transform_face already used by 
+  p4est layer. */
 void fclaw2d_patch_transform_blockface(int faceno, int rfaceno,
                                        int ftransform[])
 {
