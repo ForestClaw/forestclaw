@@ -31,8 +31,16 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/rp/clawpack5_rpn2_euler5.f90 \
 	applications/clawpack/euler/2d/rp/clawpack5_rpt2_euler5.f90
 
+SHOCKBUBBLE_CPPFLAGS = -I@top_srcdir@/applications/clawpack/euler/2d/rp
+
 applications_clawpack_euler_2d_shockbubble_shockbubble_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+        $(SHOCKBUBBLE_CPPFLAGS) \
+        $(AM_CPPFLAGS) \
+        $(FCLAW_CLAWPACK46_CPPFLAGS) \
+        $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK46_LDADD) \
+        $(FCLAW_CLAWPACK5_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+        $(LDADD)

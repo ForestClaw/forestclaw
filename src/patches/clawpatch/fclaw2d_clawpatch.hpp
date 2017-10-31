@@ -26,11 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_HPP
 #define FCLAW2D_CLAWPATCH_HPP
 
-#include <fclaw2d_farraybox.hpp>
+#include <fclaw2d_farraybox.hpp>  /* Needed for FArray boxes */
 
 struct fclaw2d_patch;
-struct fclaw2d_transform_data;
-struct fclaw2d_clawpatch_cons_update;
+struct fclaw2d_global;
+class  fclaw2d_metric_patch_t;
 
 class fclaw2d_clawpatch_t
 {
@@ -40,30 +40,8 @@ public :
     Box edgeBox();  /* Box containing edge based values */
     Box nodeBox();  /* Box containing nodes */
 
-    /* ----------------------------------------------------------------
-       Pillow grid ghost exchanges
-       ---------------------------------------------------------------- */
-
-    void mb_exchange_block_corner_ghost(const int& a_icorner,
-                                        fclaw2d_clawpatch_t *a_neighbor_cp,
-                                        int time_interp);
-
-    void mb_average_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                       fclaw2d_clawpatch_t *cp_fine,
-                                       int a_time_interp);
-
-    void mb_interpolate_block_corner_ghost(const int& a_corner, const int& a_refratio,
-                                           fclaw2d_clawpatch_t *cp_fine,
-                                           int a_time_interp);
-
-    // ----------------------------------------------------------------
-    // Solution data
-    // ----------------------------------------------------------------
-
-    void* clawpack_patch_data(int id);
-
     /* Solution data */
-    int meqn;                    /* also in amr_options_t */
+    int meqn;                   
     FArrayBox griddata;
     FArrayBox griddata_last;
     FArrayBox griddata_save;
@@ -73,9 +51,9 @@ public :
     struct fclaw2d_clawpatch_cons_update *cons_update;
 
     /* Grid info */
-    int mx;           /* also in amr_options_t */
-    int my;           /* also in amr_options_t */
-    int mbc;          /* also in amr_options_t */
+    int mx;           
+    int my;           
+    int mbc;          
     int maux;
 
     double dx;
@@ -85,30 +63,23 @@ public :
     double xupper;
     double yupper;
 
-    int manifold;    /* also in amr_options_t */
-    int blockno;
-
+    /* Auxilliary array (used by Clawpack 4.6 and 5.0) */
     FArrayBox aux;
 
-    FArrayBox xp;
-    FArrayBox yp;
-    FArrayBox zp;
+    /* Mapping and metric info */
+    int manifold;    
+    int blockno;
 
-    FArrayBox xd;
-    FArrayBox yd;
-    FArrayBox zd;
-
-    FArrayBox xface_normals;
-    FArrayBox yface_normals;
-    FArrayBox xface_tangents;
-    FArrayBox yface_tangents;
-    FArrayBox surf_normals;
-    FArrayBox edge_lengths;
-
-    FArrayBox area;
-    FArrayBox curvature;  // ???
+    fclaw2d_metric_patch_t *mp;
 };
 
-fclaw2d_clawpatch_t* fclaw2d_clawpatch_get_cp(struct fclaw2d_patch* this_patch);
+fclaw2d_clawpatch_t* 
+fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
+
+fclaw2d_metric_patch_t* 
+fclaw2d_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
+
+
+
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */

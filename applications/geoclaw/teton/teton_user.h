@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TETON_USER_H
 #define TETON_USER_H
 
-#include <fclaw2d_forestclaw.h>
-#include <fc2d_geoclaw.h>
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,14 +36,8 @@ extern "C"
 #endif
 #endif
 
-typedef struct user_options
-{
-    int example;
-    int is_registered;
 
-} user_options_t;
-
-void teton_link_solvers(fclaw2d_domain_t *domain);
+void teton_link_solvers(fclaw2d_global_t *glob);
 
 #define TETON_QINIT   FCLAW_F77_FUNC(teton_qinit,TETON_QINIT)
 void TETON_QINIT(const int* meqn,const int* mbc,

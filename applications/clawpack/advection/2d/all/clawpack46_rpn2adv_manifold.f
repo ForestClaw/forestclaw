@@ -28,25 +28,15 @@ c
 
       iface = ixy
       do i = 2-mbc, mx+mbc
-         do m1 = 1,meqn
-            do m2 = 1,meqn
-               wave(i,m1,m2) = 0
-            enddo
+         do m = 1,meqn
+            wave(i,1,m) = ql(i,m) - qr(i-1,m)
          enddo
 
-         do m = 1,meqn
-            delta(m) = ql(i,m) - qr(i-1,m)
-            wave(i,m,m) = delta(m)
-            s(i,m) = auxl(i,1 + iface)
-         enddo
+         s(i,1) = auxl(i,1 + iface)
 
          do m = 1,meqn
-            amdq(i,m) = 0
-            apdq(i,m) = 0
-            do mw = 1,mwaves
-               amdq(i,m) = amdq(i,m) + min(s(i,mw), 0.d0) * wave(i,m,mw)
-               apdq(i,m) = apdq(i,m) + max(s(i,mw), 0.d0) * wave(i,m,mw)
-            enddo
+            amdq(i,m) = min(s(i,1), 0.d0) * wave(i,m,1)
+            apdq(i,m) = max(s(i,1), 0.d0) * wave(i,m,1)
          enddo
       enddo
 

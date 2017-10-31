@@ -12,7 +12,7 @@ c     # Rigid body rotation
 c      psi = r**2
 
 c     # Filament formation (negative for clockwise rotation)
-      psi = -(4.d0/3.d0)*r**3
+      psi = (4.d0/3.d0)*r**3
 
 c      psi = x + y
 
@@ -24,7 +24,7 @@ c      psi = x + y
 
       double precision xd1(3),xd2(3), ds, vn, psi,t
 
-      vn = -(psi(xd1(1),xd1(2),xd1(3)) -
+      vn = (psi(xd1(1),xd1(2),xd1(3)) -
      &      psi(xd2(1),xd2(2),xd2(3)))/ds
 
       end

@@ -1,11 +1,11 @@
 # -*- Makefile -*-
 libclawpack4_6_generated_headers =
+
 libclawpack4_6_installed_headers = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.h \
-	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_fort.h \
-	src/solvers/fc2d_clawpack4.6/fc2d_clawpack5_fort.h \
+	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.h \
 	src/solvers/fc2d_clawpack4.6/clawpack46_user_fort.h \
-	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.h
+	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_fort.h 
 
 libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.cpp \
@@ -17,29 +17,33 @@ libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_flux2.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_flux2fw.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2.f \
-	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2_wrap.f \
-	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_cons_update.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_average.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_copy.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_interpolate.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_local_ghost_pack.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_diagnostics.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_output_ascii.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_tag4refinement.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_tag4coarsening.f \
-	src/solvers/fc2d_clawpack4.6/fclaw2d_source/fc2d_clawpack46_timeinterp.f
+	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_step2_wrap.f
 
 
+## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_clawpack4.6/libclawpack4.6.la
 
+## Named variables that can be reference from other libraries/apps
+FCLAW_CLAWPACK46_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_clawpack4.6 
+FCLAW_CLAWPACK46_LDADD    = @top_builddir@/src/solvers/fc2d_clawpack4.6/libclawpack4.6.la
+
+## Sources needed to build this library
 src_solvers_fc2d_clawpack4_6_libclawpack4_6_la_SOURCES = \
-  $(libclawpack4_6_internal_headers) \
-  $(libclawpack4_6_compiled_sources)
+          $(libclawpack4_6_internal_headers) \
+          $(libclawpack4_6_compiled_sources)
 
+## Headers needed to build this library.  Only AM_CPPFLAGS required; others are 
+## included in AM_CPPFLAGS, but are included here for clarity (although makes 
+## for lengthy compile lines)
 src_solvers_fc2d_clawpack4.6_libclawpack4.6_la_CPPFLAGS = \
-  $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
+          $(AM_CPPFLAGS) \
+          $(FCLAW_CPPFLAGS) \
+          $(FCLAW_CLAWPACK46_CPPFLAGS) \
+          $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-FCLAW_CLAWPACK46_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_clawpack4.6
-FCLAW_CLAWPACK46_LDADD = @top_builddir@/src/solvers/fc2d_clawpack4.6/libclawpack4.6.la
+## Add headers from this library to general header pool, to be used by other apps
+AM_CPPFLAGS  += $(FCLAW_CLAWPACK46_CPPFLAGS)
+
+LDADD        += $(FCLAW_CLAWPACK46_LDADD)
 
 include_HEADERS += $(libclawpack4_6_installed_headers)

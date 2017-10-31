@@ -1,0 +1,5 @@
+src/solvers/fc2d_clawpack4.6/fortran_source/* linguist-vendored=true
+src/solvers/fc2d_clawpack5/fortran_source/* linguist-vendored=true
+src/solvers/fc2d_geoclaw/amrlib_source/*  linguist-vendored=true
+src/solvers/fc2d_geoclaw/geolib_source/*  linguist-vendored=true
+src/solvers/fc2d_geoclaw/riemann_source/*  linguist-vendored=true

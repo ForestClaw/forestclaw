@@ -17,7 +17,7 @@
 
 
       integer i, iface
-      double precision ur,ul,qrr,qll, uhat,uavg
+      double precision ur,ul,qrr,qll, uhat,uavg,tol
 
       if ((mwaves .ne. 1) .or. (meqn .ne. 1)) then
          write(6,*) 'rpn2cons : mwaves .ne. 1 or meqn .ne. 1'
@@ -36,7 +36,8 @@
           uavg = (ul + ur)/2.d0
 
 c         # -eps < uavg < eps --> uhat = eps
-          uhat = sign(1.d0,uavg)*max(abs(uavg),1e-12)
+          tol = 1d-12
+          uhat = sign(1.d0,uavg)*max(abs(uavg),tol)
 
 c         # Use of .ge. here is consistent with choice of sign above
           if (uhat .ge. 0) then

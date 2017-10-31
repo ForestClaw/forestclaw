@@ -28,7 +28,6 @@
 
 #include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
 
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -40,7 +39,7 @@ extern "C"
 typedef struct fc2d_geoclaw_vtable fc2d_geoclaw_vtable_t;
 
 /* Forward declarations */
-struct fclaw2d_transform_data;
+struct fclaw2d_patch_transform_data;
 struct fclaw2d_global;
 struct fclaw2d_patch;
 struct geoclaw_gauge;

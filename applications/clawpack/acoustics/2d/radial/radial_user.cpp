@@ -43,31 +43,32 @@ void radial_link_solvers(fclaw2d_global_t *glob)
     const user_options_t* user = radial_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
 
-        clawpack46_vt->qinit     = &CLAWPACK46_QINIT;
+        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
 
         if (user->example == 0)
         {
-            clawpack46_vt->rpn2      = &CLAWPACK46_RPN2;
-            clawpack46_vt->rpt2      = &CLAWPACK46_RPT2;
+            claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
+            claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
         }
         else if (user->example == 1)
         {
-            fclaw_global_essentialf("Not implemented for ClawPack 4.6\n");
+            fclaw_global_essentialf("Mapped Riemann solver not yet " \
+                                    "implemented for ClawPack 4.6\n");
             exit(0);
         }
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t    *clawpack5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t    *claw5_vt = fc2d_clawpack5_vt();
 
-        clawpack5_vt->qinit     = &CLAWPACK5_QINIT;
+        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
 
         if (user->example == 0)
         {
-            clawpack5_vt->rpn2 = &CLAWPACK5_RPN2;
-            clawpack5_vt->rpt2 = &CLAWPACK5_RPT2;
+            claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
+            claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
         }
         else if (user->example == 1)
         {
@@ -76,8 +77,8 @@ void radial_link_solvers(fclaw2d_global_t *glob)
             
             patch_vt->setup = &radial_patch_setup;
 
-            clawpack5_vt->rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
-            clawpack5_vt->rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
+            claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
+            claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
 
             /* Avoid tagging block corners in 5 patch example*/
             clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;

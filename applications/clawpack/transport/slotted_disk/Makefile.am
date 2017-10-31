@@ -28,6 +28,7 @@ applications_clawpack_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/transport/all/user5_b4step2_manifold.f90 \
 	applications/clawpack/transport/all/fclaw2d_map_cubedsphere.c \
 	applications/clawpack/transport/all/fclaw2d_map_pillowsphere.c \
+	applications/clawpack/advection/2d/all/advection_user_fort.h \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
@@ -35,8 +36,14 @@ applications_clawpack_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
+SLOTTED_DISK_CPPFLAGS = -I@top_srcdir@/applications/clawpack/transport/all
+
 applications_clawpack_transport_slotted_disk_slotted_disk_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+		$(SLOTTED_DISK_CPPFLAGS) \
+		$(AM_CPPFLAGS)
 
 applications_clawpack_transport_slotted_disk_slotted_disk_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
+        $(LDADD) \
+        $(FCLAW_CLAWPACK46_LDADD)  \
+        $(FCLAW_CLAWPACK5_LDADD)  \
+        $(FCLAW_CLAWPATCH_LDADD)

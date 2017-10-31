@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_fort.h>
 
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -38,13 +39,15 @@ extern "C"
 #endif
 #endif
 
+
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
 /* ---------------------------- Virtual table ------------------------------------ */
 
 /* members of this structure provide the only access to above functions */
 
-void fclaw2d_clawpatch_vtable_initialize();
+void fclaw2d_clawpatch_vtable_initialize(int claw_version);
+
 
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
@@ -138,6 +141,7 @@ void fclaw2d_clawpatch_metric_data2(struct fclaw2d_global* glob,
                                     double **xtangents, double **ytangents,
                                     double **surfnormals, double ** edgelengths,
                                     double **curvature);
+
 
 double* fclaw2d_clawpatch_get_area(struct fclaw2d_global* glob,
                                    struct fclaw2d_patch* this_patch);

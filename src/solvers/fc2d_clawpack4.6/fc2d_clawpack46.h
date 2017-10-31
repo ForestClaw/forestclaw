@@ -27,7 +27,6 @@
 #define FC2D_CLAWPACK46_H
 
 #include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
-#include <fclaw2d_transform.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -43,11 +42,28 @@ struct fclaw2d_patch;
 typedef  struct fc2d_clawpack46_vtable  fc2d_clawpack46_vtable_t;
 
 
-/* -------------------------- Clawpack solver functions ------------------------------ */
+/* --------------------------- Clawpack solver functions ------------------------------ */
 
-typedef void (*fc2d_clawpack46_setprob_t)(void);
+/* Virtualize clawpack-specific wrapper functions */
+typedef void (*clawpack46_src2_t)(struct fclaw2d_global* glob,
+                                  struct fclaw2d_patch *this_patch,
+                                  int this_block_idx,
+                                  int this_patch_idx,
+                                  double t,
+                                  double dt);
+    
+typedef void (*clawpack46_b4step2_t)(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch *this_patch,
+                                     int this_block_idx,
+                                     int this_patch_idx,
+                                     double t,
+                                     double dt);
 
-typedef void (*fc2d_clawpack46_bc2_t)(const int* maxmx, const int* maxmy,
+/* ---------------------- Clawpack solver functions (Fortran) ------------------------- */
+
+typedef void (*clawpack46_fort_setprob_t)(void);
+
+typedef void (*clawpack46_fort_bc2_t)(const int* maxmx, const int* maxmy,
                                       const int* meqn, const int* mbc,
                                       const int* mx, const int* my,
                                       const double* xlower, const double* ylower,
@@ -56,20 +72,21 @@ typedef void (*fc2d_clawpack46_bc2_t)(const int* maxmx, const int* maxmy,
                                       const double aux[], const double* t,
                                       const double* dt, const int mthbc[]);
 
-typedef  void (*fc2d_clawpack46_qinit_t)(const int* maxmx, const int* maxmy,
+typedef  void (*clawpack46_fort_qinit_t)(const int* maxmx, const int* maxmy,
                                          const int* meqn,const int* mbc,
                                          const int* mx, const int* my,
                                          const double* xlower, const double* ylower,
                                          const double* dx, const double* dy,
                                          double q[], const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack46_setaux_t)(const int* maxmx, const int* maxmy, const int* mbc,
+typedef void (*clawpack46_fort_setaux_t)(const int* maxmx, const int* maxmy, 
+                                         const int* mbc,
                                          const int* mx, const int* my,
                                          const double* xlower, const double* ylower,
                                          const double* dx, const double* dy,
                                          const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack46_b4step2_t)(const int* maxmx, const int* maxmy,
+typedef void (*clawpack46_fort_b4step2_t)(const int* maxmx, const int* maxmy,
                                           const int* mbc,
                                           const int* mx, const int* my, const int* meqn,
                                           double q[], const double* xlower,
@@ -78,56 +95,68 @@ typedef void (*fc2d_clawpack46_b4step2_t)(const int* maxmx, const int* maxmy,
                                           const double* t, const double* dt,
                                           const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack46_src2_t)(const int* maxmx, const int* maxmy, const int* meqn,
+typedef void (*clawpack46_fort_src2_t)(const int* maxmx, const int* maxmy, 
+                                       const int* meqn,
                                        const int* mbc, const int* mx,const int* my,
                                        const double* xlower, const double* ylower,
                                        const double* dx, const double* dy, double q[],
                                        const int* maux, double aux[], const double* t,
                                        const double* dt);
 
-typedef void (*fc2d_clawpack46_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
+typedef void (*clawpack46_fort_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
                                        const int* mwaves, const int* mbc,const int* mx,
-                                       double ql[], double qr[], double auxl[], double auxr[],
-                                       double wave[], double s[],double amdq[], double apdq[]);
+                                       double ql[], double qr[], double auxl[], 
+                                       double auxr[],
+                                       double wave[], double s[],double amdq[], 
+                                       double apdq[]);
 
 
-typedef void (*fc2d_clawpack46_rpn2_cons_t)(int* meqn, int* maux, int* idir,
-                                            double q[], double aux[], double flux[]);
-
-typedef void (*fc2d_clawpack46_rpt2_t)(const int* ixy, const int* maxm, const int* meqn,
+typedef void (*clawpack46_fort_rpt2_t)(const int* ixy, const int* maxm, const int* meqn,
                                        const int* mwaves, const int* mbc,const int* mx,
-                                       double ql[], double qr[], double aux1[], double aux2[],
+                                       double ql[], double qr[], double aux1[], 
+                                       double aux2[],
                                        double aux3[], const int* imp, double dsdq[],
                                        double bmasdq[], double bpasdq[]);
 
 
-typedef void (*fc2d_clawpack46_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
+typedef void (*clawpack46_fort_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
                                         const int* maux,const int* mbc,const int* mx,
                                         double q1d[], double dtdx1d[],
                                         double aux1[], double aux2[], double aux3[],
                                         double faddm[],double faddp[], double gaddm[],
                                         double gaddp[],double cfl1d[], double fwave[],
-                                        double s[], double amdq[],double apdq[],double cqxx[],
+                                        double s[], double amdq[],double apdq[], 
+                                        double cqxx[],
                                         double bmasdq[], double bpasdq[],
-                                        fc2d_clawpack46_rpn2_t rpn2,
-                                        fc2d_clawpack46_rpt2_t rpt2,
+                                        clawpack46_fort_rpn2_t rpn2,
+                                        clawpack46_fort_rpt2_t rpt2,
                                         const int* mwaves, const int* mcapa,
                                         int method[], int mthlim[]);
 
+typedef void (*clawpack46_fort_fluxfun_t)(const int* meqn, double q[], double aux[],
+                                          double fq[]);
+
+
+/* --------------------------------- Virtual table ------------------------------------ */
 
 struct fc2d_clawpack46_vtable
 {
 
+    /* C wrappers */
+    clawpack46_b4step2_t   b4step2;
+    clawpack46_src2_t      src2;
+
     /* Fortran routines */
-    fc2d_clawpack46_setprob_t   setprob;
-    fc2d_clawpack46_bc2_t       bc2;
-    fc2d_clawpack46_qinit_t     qinit;
-    fc2d_clawpack46_setaux_t    setaux;
-    fc2d_clawpack46_b4step2_t   b4step2;
-    fc2d_clawpack46_src2_t      src2;
-    fc2d_clawpack46_rpn2_t      rpn2;
-    fc2d_clawpack46_rpt2_t      rpt2;
-    fc2d_clawpack46_rpn2_cons_t rpn2_cons;
+    clawpack46_fort_setprob_t   fort_setprob;
+    clawpack46_fort_bc2_t       fort_bc2;
+    clawpack46_fort_qinit_t     fort_qinit;
+    clawpack46_fort_setaux_t    fort_setaux;
+    clawpack46_fort_b4step2_t   fort_b4step2;
+    clawpack46_fort_src2_t      fort_src2;
+    
+    clawpack46_fort_rpn2_t      fort_rpn2;
+    clawpack46_fort_rpt2_t      fort_rpt2;
+    clawpack46_fort_fluxfun_t   fort_fluxfun;
     
     int is_set;
 
@@ -138,7 +167,7 @@ void fc2d_clawpack46_solver_initialize(void);
 fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(void);
 
 
-/* ----------------------------- User access to solver functions --------------------------- */
+/* ----------------------------- User access to solver functions ---------------------- */
 
 void fc2d_clawpack46_setprob(struct fclaw2d_global* glob);
 

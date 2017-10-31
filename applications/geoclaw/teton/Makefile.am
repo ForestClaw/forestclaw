@@ -5,6 +5,7 @@ bin_PROGRAMS += applications/geoclaw/teton/teton
 applications_geoclaw_teton_teton_SOURCES = \
 	applications/geoclaw/teton/teton_user.cpp \
 	applications/geoclaw/teton/teton_user.h \
+	applications/geoclaw/teton/reservoir_module.f90 \
 	applications/geoclaw/teton/qinit.f90 \
 	applications/geoclaw/teton/teton.cpp
 

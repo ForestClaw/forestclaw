@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack46.h>
 
-#include "../all/transport_options.h"
+#include <transport_options.h>
 
 static int s_user_options_package_id = -1;
 
@@ -42,7 +42,7 @@ transport_register (user_options_t* user, sc_options_t * opt)
                         "[user] 0 for cubed sphere, "    \
                         "1 for pillowgrid [0]");
 
-    sc_options_add_double (opt, 0, "kappa", &user->kappa, 1, "kappa (0 or 2.0) [2]");
+    sc_options_add_double (opt, 0, "kappa", &user->kappa, 2, "kappa (0 or 2.0) [2]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4, "claw-version [4]");
 
@@ -63,8 +63,10 @@ transport_check (user_options_t *user)
 {
     if (user->example == 1)
     {
+#if 0        
         fclaw_global_essentialf("Pillow sphere is not currently implemented.");
         return FCLAW_EXIT_ERROR;
+#endif        
     }
 
     if (user->example < 0 || user->example > 1) {

@@ -111,7 +111,8 @@ options_check(fclaw_app_t *app, void *package,void *registered)
     fclaw_options_t *fclaw_opt = 
                  (fclaw_options_t*) fclaw_app_get_attribute(app,"Options",NULL);
     fclaw2d_clawpatch_options_t *clawpatch_opt = 
-                 (fclaw2d_clawpatch_options_t*)  fclaw_app_get_attribute(app,"clawpatch",NULL);
+                 (fclaw2d_clawpatch_options_t*)  
+                 fclaw_app_get_attribute(app,"clawpatch",NULL);
 
     return filament_check(user,fclaw_opt, clawpatch_opt);
 }

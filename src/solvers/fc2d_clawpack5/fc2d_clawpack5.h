@@ -36,15 +36,33 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_transform_data;
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
+
+/* --------------------------- Clawpack solver functions ------------------------------ */
+
+/* Virtualize clawpack-specific wrapper functions */
+typedef void (*clawpack5_src2_t)(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch *this_patch,
+                                 int this_block_idx,
+                                 int this_patch_idx,
+                                 double t,
+                                 double dt);
+    
+typedef void (*clawpack5_b4step2_t)(struct fclaw2d_global* glob,
+                                    struct fclaw2d_patch *this_patch,
+                                    int this_block_idx,
+                                    int this_patch_idx,
+                                    double t,
+                                    double dt);
+
+
 /* -------------------------- Clawpack solver functions ------------------------------ */
 
-typedef void (*fc2d_clawpack5_setprob_t)(void);
+typedef void (*clawpack5_fort_setprob_t)(void);
 
-typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
+typedef void (*clawpack5_fort_bc2_t)(const int* meqn, const int* mbc,
                                      const int* mx, const int* my,
                                      const double* xlower, const double* ylower,
                                      const double* dx, const double* dy,
@@ -52,19 +70,19 @@ typedef void (*fc2d_clawpack5_bc2_t)(const int* meqn, const int* mbc,
                                      const double aux[], const double* t,
                                      const double* dt, const int mthbc[]);
 
-typedef  void (*fc2d_clawpack5_qinit_t)(const int* meqn,const int* mbc,
+typedef  void (*clawpack5_fort_qinit_t)(const int* meqn,const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         double q[], const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack5_setaux_t)(const int* mbc,
+typedef void (*clawpack5_fort_setaux_t)(const int* mbc,
                                         const int* mx, const int* my,
                                         const double* xlower, const double* ylower,
                                         const double* dx, const double* dy,
                                         const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack5_b4step2_t)(const int* mbc,
+typedef void (*clawpack5_fort_b4step2_t)(const int* mbc,
                                          const int* mx, const int* my, const int* meqn,
                                          double q[], const double* xlower,
                                          const double* ylower,
@@ -72,7 +90,7 @@ typedef void (*fc2d_clawpack5_b4step2_t)(const int* mbc,
                                          const double* t, const double* dt,
                                          const int* maux, double aux[]);
 
-typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
+typedef void (*clawpack5_fort_src2_t)(const int* meqn,
                                       const int* mbc, const int* mx,const int* my,
                                       const double* xlower, const double* ylower,
                                       const double* dx, const double* dy, double q[],
@@ -80,20 +98,20 @@ typedef void (*fc2d_clawpack5_src2_t)(const int* meqn,
                                       const double* dt);
 
 
-typedef void (*fc2d_clawpack5_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
+typedef void (*clawpack5_fort_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
                                       const int* mwaves, const int* maux,
                                       const int* mbc,const int* mx,
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
 
-typedef void (*fc2d_clawpack5_rpt2_t)(const int* ixy, const int* imp, const int* maxm, const int* meqn,
+typedef void (*clawpack5_fort_rpt2_t)(const int* ixy, const int* imp, const int* maxm, const int* meqn,
                                        const int* mwaves, const int* maux, const int* mbc,const int* mx,
                                        double ql[], double qr[], double aux1[], double aux2[],
                                        double aux3[],  double asdq[],
                                        double bmasdq[], double bpasdq[]);
 
 
-typedef void (*fc2d_clawpack5_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
+typedef void (*clawpack5_fort_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
                                         const int* maux,const int* mbc,const int* mx,
                                         double q1d[], double dtdx1d[],
                                         double aux1[], double aux2[], double aux3[],
@@ -101,24 +119,32 @@ typedef void (*fc2d_clawpack5_flux2_t)(const int* ixy,const int* maxm, const int
                                         double gaddp[],double cfl1d[], double wave[],
                                         double s[], double amdq[],double apdq[],double cqxx[],
                                         double bmasdq[], double bpasdq[],
-                                        fc2d_clawpack5_rpn2_t rpn2,
-                                        fc2d_clawpack5_rpt2_t rpt2);
+                                        clawpack5_fort_rpn2_t rpn2,
+                                        clawpack5_fort_rpt2_t rpt2);
 
-typedef void (*fc2d_clawpack5_fluxfun_t)(const int* meqn, double q[], double aux[],
+typedef void (*clawpack5_fort_fluxfun_t)(const int* meqn, double q[], double aux[],
                                           double fq[]);
 
 
+/* ------------------------------------- Virtual table -------------------------------- */
+
 typedef struct fc2d_clawpack5_vtable
 {
-    fc2d_clawpack5_setprob_t setprob;
-    fc2d_clawpack5_bc2_t bc2;
-    fc2d_clawpack5_qinit_t qinit;
-    fc2d_clawpack5_setaux_t setaux;
-    fc2d_clawpack5_b4step2_t b4step2;
-    fc2d_clawpack5_src2_t src2;
-    fc2d_clawpack5_rpn2_t rpn2;
-    fc2d_clawpack5_rpt2_t rpt2;
-    fc2d_clawpack5_fluxfun_t fluxfun;
+
+    /* C wrappers */
+    clawpack5_b4step2_t        b4step2;
+    clawpack5_src2_t           src2;
+
+    clawpack5_fort_setprob_t   fort_setprob;
+    clawpack5_fort_qinit_t     fort_qinit;
+    clawpack5_fort_setaux_t    fort_setaux;
+    clawpack5_fort_bc2_t       fort_bc2;
+    clawpack5_fort_b4step2_t   fort_b4step2;
+    clawpack5_fort_src2_t      fort_src2;
+
+    clawpack5_fort_rpn2_t      fort_rpn2;
+    clawpack5_fort_rpt2_t      fort_rpt2;
+    clawpack5_fort_fluxfun_t   fort_fluxfun;
 
     int is_set;
 } fc2d_clawpack5_vtable_t;
@@ -170,33 +196,6 @@ void fc2d_clawpack5_src2(struct fclaw2d_global *glob,
                          double t,
                          double dt);
 
-
-#if 0
-/* A single step method that advances the solution a single step on a single grid
-   using a time step dt determined by the subcycle manager */
-double fc2d_clawpack5_step2(struct fclaw2d_global *glob,
-                            struct fclaw2d_patch *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            double t,
-                            double dt);
-
-/* Use this ro return only the right hand side of the clawpack algorithm */
-double
-    fc2d_clawpack5_step2_rhs(struct fclaw2d_global *glob,
-                              struct fclaw2d_patch *this_patch,
-                              int this_block_idx,
-                              int this_patch_idx,
-                              double t,
-                              double *rhs);
-
-double fc2d_clawpack5_update(struct fclaw2d_global *glob,
-                             struct fclaw2d_patch *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             double t,
-                             double dt);
-#endif                             
 
 #ifdef __cplusplus
 #if 0

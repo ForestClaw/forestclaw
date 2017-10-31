@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_defs.h>
-#include <fclaw2d_transform.h>
 
 /* Some mapping functions */
 #include <fclaw2d_map_brick.h>
@@ -580,7 +579,7 @@ void geoclaw_average_face(fclaw2d_global_t *glob,
                           int refratio,
                           int time_interp,
                           int igrid,
-                          fclaw2d_transform_data_t* transform_data)
+                          fclaw2d_patch_transform_data_t* transform_data)
 {
     int meqn,mx,my,mbc;
     int mcapa, mbathy, maux;
@@ -624,7 +623,7 @@ void geoclaw_interpolate_face(fclaw2d_global_t *glob,
                               int refratio,
                               int time_interp,
                               int igrid,
-                              fclaw2d_transform_data_t* transform_data)
+                              fclaw2d_patch_transform_data_t* transform_data)
 {
 
     int meqn,mx,my,mbc,maux,mbathy;
@@ -655,20 +654,22 @@ void geoclaw_interpolate_face(fclaw2d_global_t *glob,
                                        &transform_data);
 }
 
-
 void geoclaw_average_corner(fclaw2d_global_t *glob,
                             fclaw2d_patch_t *coarse_patch,
                             fclaw2d_patch_t *fine_patch,
+                            int coarse_blockno,
+                            int fine_blockno,
                             int coarse_corner,
-                            int refratio,
                             int time_interp,
-                            fclaw2d_transform_data_t* transform_data)
+                            fclaw2d_patch_transform_data_t* transform_data)
 {
     int meqn,mx,my,mbc;
     int maux,mbathy,mcapa;
     double *qcoarse, *qfine;
     double *auxcoarse, *auxfine;
     
+    int refratio = 2;
+
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     const fc2d_geoclaw_options_t *geoclaw_options;
     const fclaw2d_clawpatch_options_t *clawpatch_opt;
@@ -700,16 +701,19 @@ void geoclaw_average_corner(fclaw2d_global_t *glob,
 void geoclaw_interpolate_corner(fclaw2d_global_t* glob,
                                 fclaw2d_patch_t* coarse_patch,
                                 fclaw2d_patch_t* fine_patch,
+                                int coarse_blockno,
+                                int fine_blockno,
                                 int coarse_corner,
-                                int refratio,
                                 int time_interp,
-                                fclaw2d_transform_data_t* transform_data)
+                                fclaw2d_patch_transform_data_t* transform_data)
 
 {
     int meqn,mx,my,mbc;
     int mbathy,maux;
     double *qcoarse, *qfine;
     double *auxcoarse, *auxfine;
+
+    int refratio = 2;
 
     const fclaw2d_clawpatch_options_t *clawpatch_opt;
     const fc2d_geoclaw_options_t *geoclaw_options;
@@ -818,7 +822,8 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt()
 
 void fc2d_geoclaw_solver_initialize()
 {
-    fclaw2d_clawpatch_vtable_initialize();
+    int claw_version = 5;
+    fclaw2d_clawpatch_vtable_initialize(claw_version);
 
     fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();

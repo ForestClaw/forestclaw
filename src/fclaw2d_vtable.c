@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 #include <fclaw2d_global.h>
 
+#include <forestclaw2d.h>
+
 static fclaw2d_vtable_t s_vt;
 
 static
@@ -83,20 +85,6 @@ void fclaw2d_vtable_initialize()
 
     /* Defaults for output */
     vt->output_frame               = NULL;
-
-    /* ------------------------------------------------------------
-      Metric functions - only loosely depend on solvers
-      ------------------------------------------------------------- */
-    vt->metric_setup_mesh          = &fclaw2d_metric_setup_mesh;
-    vt->fort_setup_mesh            = &FCLAW2D_FORT_SETUP_MESH;
-
-    vt->metric_compute_area        = &fclaw2d_metric_compute_area;
-    vt->metric_area_set_ghost      = &fclaw2d_metric_area_set_ghost;
-
-    vt->metric_compute_normals     = &fclaw2d_metric_compute_normals;
-    vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
-    vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
-    vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
 
     vt->is_set = 1;
 }

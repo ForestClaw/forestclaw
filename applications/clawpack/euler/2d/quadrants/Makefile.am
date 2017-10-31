@@ -15,8 +15,16 @@ applications_clawpack_euler_2d_quadrants_quadrants_SOURCES = \
 	applications/clawpack/euler/2d/rp/clawpack5_rpn2_euler4.f90 \
 	applications/clawpack/euler/2d/rp/clawpack5_rpt2_euler4.f90
 
+EULER_CPPFLAGS = -I@top_srcdir@/applications/clawpack/euler/2d/rp/
+
 applications_clawpack_euler_2d_quadrants_quadrants_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+        $(EULER_CPPFLAGS) \
+        $(AM_CPPFLAGS) \
+        $(FCLAW_CLAWPACK46_CPPFLAGS) \
+        $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_clawpack_euler_2d_quadrants_quadrants_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD)  $(FCLAW_CLAWPACK5_LDADD) $(LDADD)
+        $(FCLAW_CLAWPACK46_LDADD)  \
+        $(FCLAW_CLAWPACK5_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+        $(LDADD)

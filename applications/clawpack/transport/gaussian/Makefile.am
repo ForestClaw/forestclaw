@@ -32,8 +32,17 @@ applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
+GAUSSIAN_CPPFLAGS = -I@top_srcdir@/applications/clawpack/transport/all
+
+
 applications_clawpack_transport_gaussian_gaussian_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+		$(GAUSSIAN_CPPFLAGS) \
+        $(AM_CPPFLAGS) \
+        $(FCLAW_CLAWPACK46_CPPFLAGS) \
+        $(FCLAW_CLAWPACK5_CPPFLAGS)
 
 applications_clawpack_transport_gaussian_gaussian_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) $(LDADD) $(FCLAW_CLAWPACK5_LDADD)
+        $(FCLAW_CLAWPACK46_LDADD) \
+        $(FCLAW_CLAWPACK5_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+	    $(LDADD) 

@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
 
+
 /* This is also called from fclaw2d_initialize, so is not made static */
 void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
                                       fclaw2d_patch_t *this_patch,
@@ -142,9 +143,6 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
-            /* Reason for the following two lines: the glob contains the old domain 
-               which is incremented in ddata_old but we really want to increment 
-               the new domain. This will be fixed! */
             --ddata_old->count_set_patch;
             ++ddata_new->count_set_patch;
 
@@ -182,9 +180,6 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
         
-        /* Reason for the following two lines: the glob contains the old 
-           domain which is incremented in ddata_old but we really want to increment 
-           the new domain. This will be fixed! */
         --ddata_old->count_set_patch;
         ++ddata_new->count_set_patch;
         
@@ -213,8 +208,6 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     fclaw2d_patch_neighbors_reset(new_patch);
 }
 
-
-
 /* ----------------------------------------------------------------
    Public interface
    -------------------------------------------------------------- */
@@ -224,7 +217,6 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
 
     fclaw_global_infof("Regridding domain\n");
-
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
     /* First determine which families should be coarsened. */
@@ -317,4 +309,78 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
     /* Count calls to this function */
     ++glob->count_amr_regrid;
+}
+
+void fclaw2d_after_regrid(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    if (fclaw_vt->after_regrid != NULL)
+    {
+        fclaw_vt->after_regrid(glob);
+    }
+}
+
+static
+void cb_set_neighbor_types(fclaw2d_domain_t *domain,
+                           fclaw2d_patch_t *this_patch,
+                           int blockno,
+                           int patchno,
+                           void *user)
+{
+    int iface, icorner;
+
+    for (iface = 0; iface < 4; iface++)
+    {
+        int rproc[2];
+        int rblockno;
+        int rpatchno[2];
+        int rfaceno;
+
+        fclaw2d_patch_relation_t neighbor_type =
+        fclaw2d_patch_face_neighbors(domain,
+                                     blockno,
+                                     patchno,
+                                     iface,
+                                     rproc,
+                                     &rblockno,
+                                     rpatchno,
+                                     &rfaceno);
+
+        fclaw2d_patch_set_face_type(this_patch,iface,neighbor_type);
+    }
+
+    for (icorner = 0; icorner < 4; icorner++)
+    {
+        int rproc_corner;
+        int cornerpatchno;
+        int cornerblockno;
+        int rcornerno;
+        fclaw2d_patch_relation_t neighbor_type;
+
+        int has_corner_neighbor =
+        fclaw2d_patch_corner_neighbors(domain,
+                                       blockno,
+                                       patchno,
+                                       icorner,
+                                       &rproc_corner,
+                                       &cornerblockno,
+                                       &cornerpatchno,
+                                       &rcornerno,
+                                       &neighbor_type);
+
+        fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
+        if (!has_corner_neighbor)
+        {
+            fclaw2d_patch_set_missing_corner(this_patch,icorner);
+        }
+    }
+    fclaw2d_patch_neighbors_set(this_patch);
+}
+
+/* Set neighbor type : samesize, halfsize, or doublesize */
+void fclaw2d_regrid_set_neighbor_types(fclaw2d_global_t *glob)
+{
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+    fclaw2d_global_iterate_patches(glob,cb_set_neighbor_types,NULL);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 }

@@ -42,6 +42,7 @@ extern "C"
 #endif
 #endif
 
+
 struct fclaw2d_global;
 
 typedef struct fclaw2d_clawpatch_options fclaw2d_clawpatch_options_t;

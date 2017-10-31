@@ -46,7 +46,7 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
 !
 !     local arrays -- common block comroe is passed to rpt2eu
 !     ------------
-      parameter (maxm2 = 1800)  !# assumes at most 200x200 grid with mbc=2
+      parameter (maxm2 = 602)  !# assumes at most 200x200 grid with mbc=2
       dimension delta(4)
       logical efix
       common /cparam/  gamma

@@ -4,6 +4,9 @@ if FCLAW_ENABLE_CLAWPACK
 # Clawpack 4.6 and 5.0 libraries and examples
 # --------------------------------------------
 
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
 ## Solver libraries (both need to be compiled to compile applications)
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/solvers/fc2d_clawpack5/Makefile.am
@@ -20,6 +23,9 @@ if FCLAW_ENABLE_GEOCLAW
 # GeoClaw library and examples
 # ----------------------------------
 
+## Patches needed for GeoClaw solvers
+include src/patches/clawpatch/Makefile.am
+
 ## Solver library
 include src/solvers/fc2d_geoclaw/Makefile.am
 
@@ -34,6 +40,9 @@ if FCLAW_ENABLE_ASH3D
 # -----------------------------------
 # Ash3d examples (requires submodule)
 # -----------------------------------
+
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
 
 ## Solver library
 include src/solvers/fc3d_ash3d/Makefile.am

@@ -17,12 +17,12 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
   CALL get_td_sdisk_parms(r,hmax,b,c)
 
   DO j = 1-mbc,my+mbc
-     xlow = xlower + (i-1)*dx
-     DO i = 1-mbc,mx+mbc
-        ylow = ylower + (j-1)*dy
+      ylow = ylower + (j-1)*dy
+      DO i = 1-mbc,mx+mbc
+        xlow = xlower + (i-1)*dx
         CALL cellave2(blockno,xlow,ylow,dx,dy,w)
         q(1,i,j) = b + c*w
-     ENDDO
+    ENDDO
   ENDDO
 
   RETURN

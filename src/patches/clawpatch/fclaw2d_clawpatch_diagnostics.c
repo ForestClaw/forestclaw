@@ -127,8 +127,9 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
                                               &xlower,&ylower, &t, q, error);
 
         /* Accumulate sums and maximums needed to compute error norms */
-        clawpatch_vt->fort_compute_error_norm(&mx, &my, &mbc, &meqn, &dx,&dy, area,
-                                             error, error_data->local_error);
+        clawpatch_vt->fort_compute_error_norm(&this_block_idx, &mx, &my, &mbc, &meqn, 
+                                              &dx,&dy, area,
+                                              error, error_data->local_error);
     }
 
     if (gparms->conservation_check && clawpatch_vt->fort_conservation_check != NULL)
@@ -205,7 +206,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
             total_mass[m] = fclaw2d_domain_global_sum(domain, error_data->mass[m]);
 
             /* Store mass for future checks */
-            if (init_flag != 0)
+            if (init_flag)
             {
                 /* Store mass at time t = 0 */
                 error_data->mass0[m] = total_mass[m];
