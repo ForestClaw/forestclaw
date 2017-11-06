@@ -287,6 +287,34 @@ double* fclaw2d_metric_patch_get_area(fclaw2d_patch_t* this_patch)
 }
 
 
+
+void fclaw2d_metric_patch_scalar(fclaw2d_global_t* glob,
+                                 fclaw2d_patch_t* this_patch,
+                                 double **area, double** edgelengths,
+                                 double **curvature)
+{
+    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    *area = mp->area.dataPtr();
+    *edgelengths =  mp->edge_lengths.dataPtr();
+    *curvature = mp->curvature.dataPtr();
+}
+
+
+void fclaw2d_metric_patch_vector(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch* this_patch,
+                                 double **xnormals, double **ynormals,
+                                 double **xtangents, double **ytangents,
+                                 double **surfnormals)
+{
+    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    *xnormals = mp->xface_normals.dataPtr();
+    *ynormals = mp->yface_normals.dataPtr();
+    *xtangents = mp->xface_tangents.dataPtr();
+    *ytangents = mp->yface_tangents.dataPtr();
+    *surfnormals = mp->surf_normals.dataPtr();
+}
+
+
 void fclaw2d_metric_patch_grid_data(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* this_patch,
                                     int* mx, int* my, int* mbc,
