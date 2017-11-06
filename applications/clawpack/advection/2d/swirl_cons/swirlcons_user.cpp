@@ -43,7 +43,6 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
-
     fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
     const user_options_t* user = swirlcons_get_options(glob);
 
@@ -61,22 +60,20 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     switch(user->mapping)
     {
         case 0:
-            clawpack46_vt->rpt2      = &RPT2CONS;
-            clawpack46_vt->rpn2_cons = &RPN2_CONS_UPDATE;
+            clawpack46_vt->fort_rpt2      = &RPT2CONS;
+            clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
             break;
         case 1:
         case 2:
-            clawpack46_vt->rpt2      = &RPT2CONS_MANIFOLD;      
-            clawpack46_vt->rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+            clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
+            clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
             break;
     }
-    const user_options_t* user = swirlcons_get_options(glob);
-    fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
 
-    claw46_vt->fort_qinit     = CLAWPACK46_QINIT;
-    claw46_vt->fort_setaux    = CLAWPACK46_SETAUX;
-    claw46_vt->fort_rpt2      = RPT2CONS;
+    clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
+    clawpack46_vt->fort_setaux    = CLAWPACK46_SETAUX;
+    clawpack46_vt->fort_rpt2      = RPT2CONS;
 
     clawopt->use_fwaves = 0;
     switch(user->rp_solver)
@@ -84,32 +81,32 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
         case 1:
             if (user->mapping == 0)
             {
-                clawpack46_vt->rpn2      = &RPN2CONS_QS; 
+                clawpack46_vt->fort_rpn2      = &RPN2CONS_QS; 
             }
             else
             {
-                clawpack46_vt->rpn2      = &RPN2CONS_QS_MANIFOLD; 
+                clawpack46_vt->fort_rpn2      = &RPN2CONS_QS_MANIFOLD; 
             }
             break; 
 
         case 2:
-            clawpack46_vt->rpn2      = &RPN2CONS_WD; 
+            clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
             break; 
 
         case 3:
             if (user->mapping == 0)
             {
-                clawpack46_vt->rpn2      = &RPN2CONS_EC;                 
+                clawpack46_vt->fort_rpn2      = &RPN2CONS_EC;                 
             }
             else
             {
-                clawpack46_vt->rpn2      = &RPN2CONS_EC_MANIFOLD;                                 
+                clawpack46_vt->fort_rpn2      = &RPN2CONS_EC_MANIFOLD;                                 
             }
             break;
 
         case 4:
             clawopt->use_fwaves = 1;
-            claw46_vt->fort_rpn2      = RPN2CONS_FW; 
+            clawpack46_vt->fort_rpn2      = RPN2CONS_FW; 
             break;
     }
  }
