@@ -298,7 +298,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
           fclaw2d_clawpatch_get_cons_update(glob,this_patch);
 
     /* Evaluate fluxes needed in correction terms */
-    if (claw46_vt->rpn2_cons != NULL)
+    if (claw46_vt->fort_rpn2_cons != NULL)
     {
         double *qvec   = FCLAW_ALLOC(double, meqn);
         double *auxvec = FCLAW_ALLOC(double, maux);
@@ -311,7 +311,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
                                         qold,aux,
                                         cu->edge_fluxes[0],cu->edge_fluxes[1],
                                         cu->edge_fluxes[2],cu->edge_fluxes[3],
-                                        claw46_vt->rpn2_cons,
+                                        claw46_vt->fort_rpn2_cons,
                                         qvec,auxvec,flux);
 
         FCLAW_FREE(qvec);
@@ -344,7 +344,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
     FCLAW_ASSERT(ierror == 0);
 
-    CLAWPACK46_CONS_UPDATES_ACCUMLATE_WAVES(&mx,&my,&mbc,&meqn,&dt, &this_patch_idx,
+    CLAWPACK46_CONS_UPDATE_ACCUMULATE_WAVES(&mx,&my,&mbc,&meqn,&dt, &this_patch_idx,
                                             cu->edgelengths[0],cu->edgelengths[1],
                                             cu->edgelengths[2],cu->edgelengths[3],
                                             fp,fm,gp,gm,

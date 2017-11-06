@@ -17,7 +17,7 @@ c    # ghost cell is stored;  at k=1, the flux at the the first interior
 c    # cell is stored;  If there is no flux function, we should set up a 
 c    # dummy function that returns zero.
 c    # -----------------------------------------------------------------
-      subroutine clawpack46_cons_update_store_flux(mx,my,mbc,meqn,
+      subroutine clawpack46_update_cons_store_flux(mx,my,mbc,meqn,
      &      maux, dt,
      &      el0, el1, el2, el3,
      &      q, aux,
@@ -112,8 +112,8 @@ c    # -----------------------------------------------------------------
 c    # This is called AFTER the step update.   This accumulates plus and 
 c    # minus waves, scaled by dt*edge_length.  
 c    # -----------------------------------------------------------------
-      subroutine clawpack46_cons_update_accumulate_wave(mx,my,
-                                                        mbc,meqn,
+      subroutine clawpack46_cons_update_accumulate_waves(mx,my,
+     &                                                   mbc,meqn,
      &      dt, patchno,
      &      el0, el1, el2, el3,
      &      fp,fm,gp,gm,
@@ -264,9 +264,9 @@ c    # fine grid correction for the coarse grid.
          do i = 1,mx/2
             ii1 = 2*(i-1) + 1        !! indexing starts at 1
             ii2 = 2*(i-1) + 2
-            deltam = gmfine2(ii1,mq) + gmfine3(ii2,mq) +
+            deltam = gmfine2(ii1,mq) + gpfine3(ii2,mq) +
      &               eff2(ii1,mq,1) + eff2(ii2,mq,1)
-            deltap = gpfine1(ii1,mq) + gpfine1(ii2,mq) +
+            deltap = gmfine2(ii1,mq) + gpfine3(ii2,mq) +
      &               eff3(ii1,mq,1) + eff3(ii2,mq,1)
             do ii = ii1,ii2
                do jj = 1,mbc
@@ -373,8 +373,10 @@ c    # -----------------------------------------------------------------
      &                                          qthis,
      &                                          fpthis0,fmthis1,
      &                                          gpthis2,gmthis3,
-     &                                          fmneighbor0, fpneighbor1,
-     &                                          gmneighbor2, gpneighbor3,
+     &                                          fmneighbor0, 
+     &                                          fpneighbor1,
+     &                                          gmneighbor2, 
+     &                                          gpneighbor3,
      &                                          efc0, efc1, efc2, efc3,
      &                                          eff0, eff1, eff2, eff3,
      &                                          mask, qneighbor_dummy,
@@ -383,6 +385,7 @@ c    # -----------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn,idir,iface_coarse
+      integer this_iface
 
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -414,11 +417,25 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       double precision efneighbor2(mx,meqn,0:1)
       double precision efneighbor3(mx,meqn,0:1)
 
+      double precision eff0(my,meqn,0:1)
+      double precision eff1(my,meqn,0:1)
+      double precision eff2(mx,meqn,0:1)
+      double precision eff3(mx,meqn,0:1)
+
+      double precision efc0(my,meqn,0:1)
+      double precision efc1(my,meqn,0:1)
+      double precision efc2(mx,meqn,0:1)
+      double precision efc3(mx,meqn,0:1)
+
+      double precision delta, deltap, deltam
+      integer iface
+
+      double precision neighborval
 
       integer*8 transform_cptr
 
 
-      integer i,j,ibc,jbc,mq, idir
+      integer i,j,ibc,jbc,mq
       integer i1,j1, i2, j2
 
       idir = iface/2
@@ -464,11 +481,11 @@ c                 # x-direction (idir == 0)
                      j1 = j
                   endif
                   call fclaw2d_transform_face(i1,j1,i2,j2,
-     &                  transform_ptr)
+     &                  transform_cptr)
 
                   neighborval = qneighbor_dummy(i2,j2,mq)
-                  if (iface_this .eq. 0) then
-                     delta = neighborval + fm0()
+                  if (iface .eq. 0) then
+                     delta = neighborval   !! + fm0()
                      qthis(i1,j1,mq) = qthis(i1,j1,mq) + delta
                   endif
 
@@ -487,8 +504,8 @@ c                 # y-direction (idir == 1)
                      j1 = my+jbc
                   endif
                   call fclaw2d_transform_face(i1,j1,i2,j2,
-     &                  transform_ptr)
-                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+     &                  transform_cptr)
+                  qthis(i1,j1,mq) = qneighbor_dummy(i2,j2,mq)
 
                enddo
             enddo
@@ -521,7 +538,7 @@ c    # --------------------------------------------------------
 c    # Called from interpolation routine (with possible context
 c    # switching). This fills in coarse grid values qc/auxc
 c    # on fine grids.
-      subroutine clawpack46_fort_cons_coarse_to_fine(mx,my,mbc,maux,
+      subroutine clawpack46_fort_cons_fine_to_coarse(mx,my,mbc,maux,
      &       meqn, maskfine, qcoarse,auxcoarse,
      &       qfine_dummy,auxfine_dummy,
      &       idir,iface_coarse,qc0,qc1,qc2,qc3,
