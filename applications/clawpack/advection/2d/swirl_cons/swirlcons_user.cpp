@@ -27,10 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-/* Two versions of Clawpack */     
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack46_options.h>
-#include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
+#include <clawpack46_user_fort.h>    /* Headers for user defined fortran files */
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
