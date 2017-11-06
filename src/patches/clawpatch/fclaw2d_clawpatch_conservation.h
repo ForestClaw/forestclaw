@@ -34,25 +34,29 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_patch_transform_data;
+struct fclaw2d_global;
+struct fclaw2d_patch;
+
 typedef struct fclaw2d_clawpatch_cons_update fclaw2d_clawpatch_cons_update_t;
 
 struct fclaw2d_clawpatch_cons_update
 {
-    /* Two 1d arrays stored on each of four faces */
-    double *edge_fluxes[4];
+	/* Two 1d arrays stored on each of four faces */
+	double *edge_fluxes[4];
 #if 0    
-    double *edge_fluxes_save[4];
+	double *edge_fluxes_save[4];
 #endif    
 
-    /* Scaling factors */
-    double *edgelengths[4];
-    double *area[4];
+	/* Scaling factors */
+	double *edgelengths[4];
+	double *area[4];
 
-    /* 1d arrays stored on left/right faces (fp/fm) and top/bottom faces (gp/gm) */
-    double *fp[2];
-    double *fm[2];
-    double *gp[2];
-    double *gm[2];
+	/* 1d arrays stored on left/right faces (fp/fm) and top/bottom faces (gp/gm) */
+	double *fp[2];
+	double *fm[2];
+	double *gp[2];
+	double *gm[2];
 
 };
 
@@ -60,35 +64,40 @@ struct fclaw2d_global;
 struct fclaw2d_patch;
 
 void fclaw2d_clawpatch_cons_update_new(struct fclaw2d_global* glob,
-                                       struct fclaw2d_patch* this_patch,
-                                       int blockno,int patchno,
-                                       fclaw2d_clawpatch_cons_update_t **cons_update);
+									   struct fclaw2d_patch* this_patch,
+									   int blockno,int patchno,
+									   fclaw2d_clawpatch_cons_update_t **cons_update);
 
 void fclaw2d_clawpatch_cons_update_reset(struct fclaw2d_global* glob,int minlevel,
-                                         int maxlevel);
+										 int maxlevel);
 
 
 void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons_update);
 
-void fclaw2d_clawpatch_cons_update_metric(fclaw2d_global_t* glob,
-                                          fclaw2d_patch_t* this_patch,
-                                          int blockno,int patchno);
+void fclaw2d_clawpatch_cons_update_metric(struct fclaw2d_global* glob,
+										  struct fclaw2d_patch* this_patch,
+										  int blockno,int patchno);
 
 void fclaw2d_clawpatch_time_sync_fine_to_coarse(struct fclaw2d_global* glob,
-                                                struct fclaw2d_patch* coarse_patch,
-                                                struct fclaw2d_patch* fine_patch,
-                                                int idir,
-                                                int igrid,
-                                                int iface_coarse,
-                                                int time_interp,
-                                                fclaw2d_transform_data_t* transform_data);
-
+												struct fclaw2d_patch* coarse_patch,
+												struct fclaw2d_patch* fine_patch,
+												int idir,
+												int igrid,
+												int iface_coarse,
+												int time_interp,
+												struct fclaw2d_patch_transform_data
+												*transform_data);
 
 void fclaw2d_clawpatch_time_sync_copy(struct fclaw2d_global* glob,
-                                      struct fclaw2d_patch* this_patch,
-                                      struct fclaw2d_patch* neighbor_patch,
-                                      int this_iface,
-                                      fclaw2d_transform_data_t* transform_data);
+									  struct fclaw2d_patch* this_patch,
+									  struct fclaw2d_patch* neighbor_patch,
+									  int this_iface,int idir,
+									  struct fclaw2d_patch_transform_data
+									  *transform_data);
+
+void fclaw2d_clawpatch_update_cons_metric(struct fclaw2d_global* glob,
+										  struct fclaw2d_patch* this_patch,
+										  int blockno,int patchno);
 
 
 #ifdef __cplusplus

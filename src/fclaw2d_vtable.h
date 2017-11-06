@@ -43,7 +43,7 @@ void fclaw2d_after_regrid(struct fclaw2d_global *glob);
 void fclaw2d_after_init(struct fclaw2d_global *glob);
   
 void fclaw2d_time_sync_reset(struct fclaw2d_global *glob, 
-                             int minlevel,int maxlevel);
+							 int minlevel,int maxlevel);
 
 
 typedef void (*fclaw2d_vtable_initialize_t)();
@@ -55,29 +55,32 @@ typedef void (*fclaw2d_output_frame_t)(struct fclaw2d_global * glob, int iframe)
 typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
 
 typedef void (*fclaw2d_time_sync_reset_t)(struct fclaw2d_global *glob, 
-                                          int minlevel,int maxlevel);
+										  int minlevel,int maxlevel);
+
+typedef void (*fclaw2d_after_initialization_t)(struct fclaw2d_global *glob);
+
 
 
 
 typedef struct fclaw2d_vtable
 {
 
-    fclaw2d_vtable_initialize_t          vtable_init;
+	fclaw2d_vtable_initialize_t          vtable_init;
 
-    fclaw2d_problem_setup_t              problem_setup;
+	fclaw2d_problem_setup_t              problem_setup;
 
-    fclaw2d_after_initialization_t       after_init;
+	fclaw2d_after_initialization_t       after_init;
 
-    /* regridding functions */
-    fclaw2d_after_regrid_t               after_regrid;
+	/* regridding functions */
+	fclaw2d_after_regrid_t               after_regrid;
 
-    /* Time syncing */
-    fclaw2d_time_sync_reset_t            time_sync_reset;
+	/* Time syncing */
+	fclaw2d_time_sync_reset_t            time_sync_reset;
 
-    /* Output functions */
-    fclaw2d_output_frame_t               output_frame;
+	/* Output functions */
+	fclaw2d_output_frame_t               output_frame;
 
-    int is_set;
+	int is_set;
 
 
 } fclaw2d_vtable_t;

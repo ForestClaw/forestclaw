@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_CONSERVATION_FORT_H
 #define FCLAW2D_CLAWPATCH_CONSERVATION_FORT_H
 
+#include <fclaw_base.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -34,10 +36,10 @@ extern "C"
 #endif
 #endif
 
-#define CLAWPATCH_CONS_STORE_METRIC FCLAW_F77_FUNC(clawpatch_cons_store_metric, \
-                                                    CLAWPATCH_CONS_STORE_METRIC)
+#define CLAWPATCH_UPDATE_CONS_METRIC FCLAW_F77_FUNC(clawpatch_update_cons_metric, \
+                                                    CLAWPATCH_UPDATE_CONS_METRIC)
 
-void CLAWPATCH_CONS_STORE_METRIC(const int* mx,const int *my, const int* mbc, 
+void CLAWPATCH_UPDATE_CONS_METRIC(const int* mx,const int *my, const int* mbc, 
                                   const double* dx, const double *dy,
                                   double area[], double edge_lengths[],
                                   double area0[], double area1[], 

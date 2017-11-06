@@ -43,231 +43,235 @@ struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 /* --------------------------- Ghost filling - patch specific ------------------------- */
 
 typedef void (*clawpatch_fort_copy_face_t)(const int* mx, const int* my, const int* mbc, 
-                                           const int* meqn,
-                                           double qthis[],double qneighbor[], 
-                                           const int* a_idir,
-                                           struct fclaw2d_patch_transform_data** transform_cptr);
+										   const int* meqn,
+										   double qthis[],double qneighbor[], 
+										   const int* a_idir,
+										   struct fclaw2d_patch_transform_data** transform_cptr);
 
 typedef void (*clawpatch_fort_average_face_t)(const int* mx, const int* my, const int* mbc,
-                                              const int* meqn,
-                                              double qcoarse[],double qfine[],
-                                              double areacoarse[], double areafine[],
-                                              const int* idir, const int* iside,
-                                              const int* num_neighbors,
-                                              const int* refratio, const int* igrid,
-                                              const int* manifold, 
-                                              struct fclaw2d_patch_transform_data** transform_cptr);
-    
+											  const int* meqn,
+											  double qcoarse[],double qfine[],
+											  double areacoarse[], double areafine[],
+											  const int* idir, const int* iside,
+											  const int* num_neighbors,
+											  const int* refratio, const int* igrid,
+											  const int* manifold, 
+											  struct fclaw2d_patch_transform_data** transform_cptr);
+	
 typedef void (*clawpatch_fort_interpolate_face_t)(const int* mx, const int* my, const int* mbc,
-                                                  const int* meqn,
-                                                  double qcoarse[],double qfine[],
-                                                  const int* idir, const int* iside,
-                                                  const int* num_neighbors,
-                                                  const int* refratio, const int* igrid,
-                                                  struct fclaw2d_patch_transform_data** transform_cptr);
-    
-    
+												  const int* meqn,
+												  double qcoarse[],double qfine[],
+												  const int* idir, const int* iside,
+												  const int* num_neighbors,
+												  const int* refratio, const int* igrid,
+												  struct fclaw2d_patch_transform_data** transform_cptr);
+	
+	
 
 typedef void (*clawpatch_fort_copy_corner_t)(const int* mx, const int* my, const int* mbc,
-                                             const int* meqn, double this_q[],double neighbor_q[],
-                                             const int* a_corner,
-                                             struct fclaw2d_patch_transform_data** transform_cptr);
+											 const int* meqn, double this_q[],double neighbor_q[],
+											 const int* a_corner,
+											 struct fclaw2d_patch_transform_data** transform_cptr);
 
 typedef void (*clawpatch_fort_average_corner_t)(const int* mx, const int* my, const int* mbc,
-                                                const int* meqn, const int* a_refratio,
-                                                double qcoarse[], double qfine[],
-                                                double areacoarse[], double areafine[],
-                                                const int* manifold,
-                                                const int* a_corner, 
-                                                struct fclaw2d_patch_transform_data** transform_cptr);
+												const int* meqn, const int* a_refratio,
+												double qcoarse[], double qfine[],
+												double areacoarse[], double areafine[],
+												const int* manifold,
+												const int* a_corner, 
+												struct fclaw2d_patch_transform_data** transform_cptr);
 
 typedef void (*clawpatch_fort_interpolate_corner_t)(const int* mx, const int* my, const int* mbc,
-                                                    const int* meqn, const int* a_refratio, 
-                                                    double this_q[],
-                                                    double neighbor_q[], const int* a_corner,
-                                                    struct fclaw2d_patch_transform_data** transform_cptr);
-    
+													const int* meqn, const int* a_refratio, 
+													double this_q[],
+													double neighbor_q[], const int* a_corner,
+													struct fclaw2d_patch_transform_data** transform_cptr);
+	
 
 /* --------------------------------- Regridding functions ----------------------------- */
 
 typedef void (*clawpatch_fort_tag4refinement_t)(const int* mx,const int* my,
-                                                const int* mbc,const int* meqn,
-                                                const double* xlower, const double* ylower,
-                                                const double* dx, const double* dy,
-                                                const int* blockno,
-                                                double q[],
-                                                const double* tag_threshold,
-                                                const int* init_flag,
-                                                int* tag_patch);
+												const int* mbc,const int* meqn,
+												const double* xlower, const double* ylower,
+												const double* dx, const double* dy,
+												const int* blockno,
+												double q[],
+												const double* tag_threshold,
+												const int* init_flag,
+												int* tag_patch);
 
 typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx, const int* my,
-                                                const int* mbc, const int* meqn,
-                                                const double* xlower, const double* ylower,
-                                                const double* dx, const double* dy,
-                                                const int* blockno,
-                                                double q0[],double q1[],
-                                                double q2[],double q3[],
-                                                const double* tag_threshold,
-                                                int* tag_patch);
+												const int* mbc, const int* meqn,
+												const double* xlower, const double* ylower,
+												const double* dx, const double* dy,
+												const int* blockno,
+												double q0[],double q1[],
+												double q2[],double q3[],
+												const double* tag_threshold,
+												int* tag_patch);
 
 typedef void (*clawpatch_fort_interpolate2fine_t)(const int* mx, const int* my,
-                                                  const int* mbc, const int* meqn,
-                                                  double qcoarse[], double qfine[],
-                                                  double areacoarse[], double areafine[],
-                                                  const int* igrid, const int* manifold);
-    
+												  const int* mbc, const int* meqn,
+												  double qcoarse[], double qfine[],
+												  double areacoarse[], double areafine[],
+												  const int* igrid, const int* manifold);
+	
 typedef void (*clawpatch_fort_average2coarse_t)(const int* mx, const int* my,
-                                                const int* mbc, const int* meqn,
-                                                double qcoarse[],double qfine[],
-                                                double areacoarse[],double areafine[],
-                                                const int* igrid, const int* manifold);
-    
+												const int* mbc, const int* meqn,
+												double qcoarse[],double qfine[],
+												double areacoarse[],double areafine[],
+												const int* igrid, const int* manifold);
+	
 #if 0
 typedef void (*clawpatch_fort_cons_coarse_to_fine_t)(const int* mx,const int* my,
-                                                     const int* mbc, const int* maux,
-                                                     const int* meqn,
-                                                     int maskfine[],
-                                                     double qcoarse[],
-                                                     double auxcoarse[],
-                                                     double qfine_dummy[],
-                                                     double auxfine_dummy[],
-                                                     const int* idir, 
-                                                     const int* iface_coarse,
-                                                     double qc0[], double qc1[],
-                                                     double qc2[], double qc3[],
-                                                     double auxc0[], double auxc1[],
-                                                     double auxc2[], double auxc3[],
-                                                     struct fclaw2d_transform_data** 
-                                                     transform_cptr);
-#endif                                                     
+													 const int* mbc, const int* maux,
+													 const int* meqn,
+													 int maskfine[],
+													 double qcoarse[],
+													 double auxcoarse[],
+													 double qfine_dummy[],
+													 double auxfine_dummy[],
+													 const int* idir, 
+													 const int* iface_coarse,
+													 double qc0[], double qc1[],
+													 double qc2[], double qc3[],
+													 double auxc0[], double auxc1[],
+													 double auxc2[], double auxc3[],
+													 struct fclaw2d_transform_data** 
+													 transform_cptr);
+#endif
+
 
 #if 0
-    clawpatch_vt->fort_time_sync_fine_to_coarse(&mx,&my,&mbc,&meqn,&idir,&iface,
-                                                cucoarse->area[0], cucoarse->area[1], 
-                                                cucoarse->area[2], cucoarse->area[3],
-                                                qcoarse,
-                                                cucoarse->fp[0],cucoarse->fm[1],
-                                                cucoarse->gp[0],cucoarse->gm[1],
-                                                cufine->fm[0],cufine->fp[1],
-                                                cufine->gm[0],cufine->gp[1],
-                                                cucoarse->edge_fluxes[0],
-                                                cucoarse->edge_fluxes[1],
-                                                cucoarse->edge_fluxes[2],
-                                                cucoarse->edge_fluxes[3],
-                                                cufine->edge_fluxes[0],
-                                                cufine->edge_fluxes[1],
-                                                cufine->edge_fluxes[2],
-                                                cufine->edge_fluxes[3],
-                                                maskneighbor,qneighbor_dummy,
-                                                &transform_data);
-#endif                                                
+typedef void  (*fort_time_sync_fine_to_coarse_t)(&mx,&my,&mbc,&meqn,&idir,
+												 &iface,
+												 cucoarse->area[0], 
+												 cucoarse->area[1], 
+												 cucoarse->area[2], 
+												 cucoarse->area[3],
+												 qcoarse,
+												 cucoarse->fp[0],cucoarse->fm[1],
+												 cucoarse->gp[0],cucoarse->gm[1],
+												 cufine->fm[0],cufine->fp[1],
+												 cufine->gm[0],cufine->gp[1],
+												 cucoarse->edge_fluxes[0],
+												 cucoarse->edge_fluxes[1],
+												 cucoarse->edge_fluxes[2],
+												 cucoarse->edge_fluxes[3],
+												 cufine->edge_fluxes[0],
+												 cufine->edge_fluxes[1],
+												 cufine->edge_fluxes[2],
+												 cufine->edge_fluxes[3],
+												 maskneighbor,qneighbor_dummy,
+												 &transform_data);
+#endif
 
 typedef void  (*clawpatch_fort_time_sync_f2c_t)(const int* mx,
-                                                const int* my,
-                                                const int *mbc,
-                                                const int *meqn,
-                                                const int* idir,
-                                                const int* iface_coarse,
-                                                double area0[], double area1[],
-                                                double area2[], double area3[],
-                                                double qcoarse[], 
-                                                double fmcoarse0[], 
-                                                double fpcoarse1[],
-                                                double gmcoarse2[], 
-                                                double gpcoarse3[],
-                                                double fmfine0[], double fpfine1[],
-                                                double gmfine2[], double gpfine3[],
-                                                double efc0[], double efc1[],
-                                                double efc2[], double efc3[],
-                                                double eff0[], double eff1[],
-                                                double eff2[], double eff3[],
-                                                int maskfine[],
-                                                double qfine_dummy[],
-                                                struct fclaw2d_transform_data** 
-                                                transform_cptr);
+												const int* my,
+												const int *mbc,
+												const int *meqn,
+												const int* idir,
+												const int* iface_coarse,
+												double area0[], double area1[],
+												double area2[], double area3[],
+												double qcoarse[], 
+												double fmcoarse0[], 
+												double fpcoarse1[],
+												double gmcoarse2[], 
+												double gpcoarse3[],
+												double fmfine0[], double fpfine1[],
+												double gmfine2[], double gpfine3[],
+												double efc0[], double efc1[],
+												double efc2[], double efc3[],
+												double eff0[], double eff1[],
+												double eff2[], double eff3[],
+												int maskfine[],
+												double qfine_dummy[],
+												struct fclaw2d_patch_transform_data** 
+												transform_cptr);
 
 
 typedef void  (*clawpatch_fort_time_sync_copy_t)(const int* mx,
-                                                 const int* my,
-                                                 const int *mbc,
-                                                 const int *meqn,
-                                                 const int* idir,
-                                                 const int* iface_coarse,
-                                                 double area0[], double area1[],
-                                                 double area2[], double area3[],
-                                                 double qcoarse[], 
-                                                 double fmcoarse0[], 
-                                                 double fpcoarse1[],
-                                                 double gmcoarse2[], 
-                                                 double gpcoarse3[],
-                                                 double fmfine0[], double fpfine1[],
-                                                 double gmfine2[], double gpfine3[],
-                                                 double efc0[], double efc1[],
-                                                 double efc2[], double efc3[],
-                                                 double eff0[], double eff1[],
-                                                 double eff2[], double eff3[],
-                                                 int maskfine[],
-                                                 double qfine_dummy[],
-                                                 struct fclaw2d_transform_data** 
-                                                 transform_cptr);
+												 const int* my,
+												 const int *mbc,
+												 const int *meqn,
+												 const int* idir,
+												 const int* iface_coarse,
+												 double area0[], double area1[],
+												 double area2[], double area3[],
+												 double qcoarse[], 
+												 double fmcoarse0[], 
+												 double fpcoarse1[],
+												 double gmcoarse2[], 
+												 double gpcoarse3[],
+												 double fmfine0[], double fpfine1[],
+												 double gmfine2[], double gpfine3[],
+												 double efc0[], double efc1[],
+												 double efc2[], double efc3[],
+												 double eff0[], double eff1[],
+												 double eff2[], double eff3[],
+												 int maskfine[],
+												 double qfine_dummy[],
+												 struct fclaw2d_patch_transform_data** 
+												 transform_cptr);
 
 /* ----------------------------------- time stepping ---------------------------------- */
 
 typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const int* mbc,
-                                            const int *meqn, const int* psize,
-                                            double qcurr[], double qlast[],
-                                            double qinterp[],const double* alpha,
-                                            const int* ierror);
-    
+											const int *meqn, const int* psize,
+											double qcurr[], double qlast[],
+											double qinterp[],const double* alpha,
+											const int* ierror);
+	
 /* ------------------------------- Parallel ghost patches ----------------------------- */
 
 typedef void (*clawpatch_fort_local_ghost_pack_t)(int *mx, int *my, int *mbc,
-                                                  int *meqn, int *mint,
-                                                  double qdata[], double area[],
-                                                  double qpack[], int *psize,
-                                                  int *packmode, int *ierror);
-    
+												  int *meqn, int *mint,
+												  double qdata[], double area[],
+												  double qpack[], int *psize,
+												  int *packmode, int *ierror);
+	
 typedef void (*clawpatch_fort_local_ghost_pack_aux_t)(struct fclaw2d_global *glob,
-                                                      struct fclaw2d_patch *this_patch,
-                                                      int mint,
-                                                      double qpack[], int extrasize,
-                                                      int packmode, int* ierror);
-    
+													  struct fclaw2d_patch *this_patch,
+													  int mint,
+													  double qpack[], int extrasize,
+													  int packmode, int* ierror);
+	
 
 /* ---------------------------------- Output functions -------------------------------- */
 
 typedef void  (*clawpatch_fort_header_ascii_t)(char* matname1,char* matname2,
-                                               double* time, int* meqn, int* maux,
-                                               int* ngrids);
+											   double* time, int* meqn, int* maux,
+											   int* ngrids);
 
 /* Write out data */
 typedef void (*clawpatch_fort_output_ascii_t)(char* matname1,
-                                              int* mx,        int* my,
-                                              int* meqn,      int* mbc,
-                                              double* xlower, double* ylower,
-                                              double* dx,     double* dy,
-                                              double q[],
-                                              int* patch_num, int* level,
-                                              int* blockno,   int* mpirank);
+											  int* mx,        int* my,
+											  int* meqn,      int* mbc,
+											  double* xlower, double* ylower,
+											  double* dx,     double* dy,
+											  double q[],
+											  int* patch_num, int* level,
+											  int* blockno,   int* mpirank);
 
 
 /* ----------------------------- Diagnostic functions --------------------------------- */
-    
+
 typedef void (*clawpatch_fort_error_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
-                                       double *dx, double *dy, double *xlower,
-                                       double *ylower, double *t, double q[],
-                                       double error[]);
+									   double *dx, double *dy, double *xlower,
+									   double *ylower, double *t, double q[],
+									   double error[]);
 
 typedef void (*clawpatch_fort_conscheck_t)(int *mx, int *my, int* mbc, int* meqn,
-                                           double *dx, double *dy,
-                                           double area[], double q[], double sum[]);
-    
+										   double *dx, double *dy,
+										   double area[], double q[], double sum[]);
+
 typedef double (*clawpatch_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
-                                        double* dy, double area[]);
+										double* dy, double area[]);
 
 typedef void (*clawpatch_fort_norm_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
-                                      double *dx, double *dy, double area[],
-                                      double error[], double error_norm[]);
+									  double *dx, double *dy, double area[],
+									  double error[], double error_norm[]);
 
 
 
@@ -275,38 +279,38 @@ typedef void (*clawpatch_fort_norm_t)(int* blockno, int *mx, int *my, int *mbc,i
 
 #define TAG4REFINEMENT FCLAW_F77_FUNC(tag4refinement,TAG4REFINEMENT)
 void TAG4REFINEMENT(const int* mx,const int* my,
-                    const int* mbc,const int* meqn,
-                    const double* xlower, const double* ylower,
-                    const double* dx, const double* dy,
-                    const int* blockno,
-                    double q[],
-                    const double* tag_threshold,
-                    const int* init_flag,
-                    int* tag_patch);
+					const int* mbc,const int* meqn,
+					const double* xlower, const double* ylower,
+					const double* dx, const double* dy,
+					const int* blockno,
+					double q[],
+					const double* tag_threshold,
+					const int* init_flag,
+					int* tag_patch);
 
 #define TAG4COARSENING FCLAW_F77_FUNC(tag4coarsening,TAG4COARSENING)
 void TAG4COARSENING(const int* mx, const int* my,
-                    const int* mbc, const int* meqn,
-                    const double* xlower, const double* ylower,
-                    const double* dx, const double* dy,
-                    const int* blockno,
-                    double q0[],double q1[],
-                    double q2[],double q3[],
-                    const double* tag_threshold,
-                    int* tag_patch);
+					const int* mbc, const int* meqn,
+					const double* xlower, const double* ylower,
+					const double* dx, const double* dy,
+					const int* blockno,
+					double q0[],double q1[],
+					double q2[],double q3[],
+					const double* tag_threshold,
+					int* tag_patch);
 
 #define INTERPOLATE2FINE FCLAW_F77_FUNC(interpolate2fine, INTERPOLATE2FINE)
 void INTERPOLATE2FINE(const int* mx,const int* my,const int* mbc,
-                      const int* meqn, double qcoarse[], double qfine[],
-                      double areacoarse[], double areafine[],
-                      const int* igrid,const int* manifold);
+					  const int* meqn, double qcoarse[], double qfine[],
+					  double areacoarse[], double areafine[],
+					  const int* igrid,const int* manifold);
 
 #define AVERAGE2COARSE FCLAW_F77_FUNC(average2coarse, AVERAGE2COARSE)
 void AVERAGE2COARSE(const int* mx,const int* my,const int* mbc,
-                    const int* meqn,
-                    double qcoarse[],double qfine[],
-                    double areacoarse[],double areafine[],
-                    const int* igrid, const int* manifold);
+					const int* meqn,
+					double qcoarse[],double qfine[],
+					double areacoarse[],double areafine[],
+					const int* igrid, const int* manifold);
 
 
 #ifdef __cplusplus

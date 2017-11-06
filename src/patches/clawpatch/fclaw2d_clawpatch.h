@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>       /* Need patch callback def */
 
 #include <fclaw2d_clawpatch_fort.h>
+#include <fclaw2d_clawpatch_conservation.h>
 
 
 #ifdef __cplusplus
@@ -68,8 +69,8 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
     /* Conservation update */
-    clawpatch_fort_cons_coarse_to_fine_t   fort_cons_coarse_to_fine;
-    clawpatch_fort_cons_coarse_correct_t   fort_cons_coarse_correct;
+    clawpatch_fort_time_sync_f2c_t         fort_time_sync_fine_to_coarse;
+    clawpatch_fort_time_sync_copy_t        fort_time_sync_copy;
 
     /* output functions (ascii) */
     clawpatch_fort_header_ascii_t          fort_header_ascii;

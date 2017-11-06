@@ -25,78 +25,86 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_time_sync.h>
 
-void fclaw2d_time_sync_reset(fclaw2d_global_t *glob, 
-                             int minlevel,int maxlevel)
-{
-    /* This is used for updating conservation arrays, for example */
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+#include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
+#include <fclaw2d_ghost_fill.h>
+#include <fclaw2d_patch.h>
+#include <fclaw2d_options.h>
+#include <fclaw2d_exchange.h>
 
-    if (fclaw_vt->time_sync_reset != NULL)
-    {
-        fclaw_vt->time_sync_reset(glob,minlevel,maxlevel);
-    }
+void fclaw2d_time_sync_reset(fclaw2d_global_t *glob, 
+							 int minlevel,int maxlevel)
+{
+	/* This is used for updating conservation arrays, for example */
+	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+
+	if (fclaw_vt->time_sync_reset != NULL)
+	{
+		fclaw_vt->time_sync_reset(glob,minlevel,maxlevel);
+	}
 }
 
 
 static
 void copy_at_blockbdry(fclaw2d_global_t *glob,
-                       int level,
-                       int read_parallel_patches,
-                       fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+					   int level,
+					   int read_parallel_patches,
+					   fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
-    fclaw2d_exchange_info_t e_info;
-    e_info.exchange_type = FCLAW2D_TIME_SYNC_COPY;
-    e_info.grid_type = FCLAW2D_IS_COARSE;
-    e_info.time_interp = 0;
-    e_info.read_parallel_patches = read_parallel_patches;
-
-    fclaw2d_global_patch_iterator(glob, level, cb_face_fill,
-                         &e_info);    
+	fclaw2d_exchange_info_t e_info;
+	e_info.exchange_type = FCLAW2D_TIME_SYNC_COPY;
+	e_info.grid_type = FCLAW2D_IS_COARSE;
+	e_info.time_interp = 0;
+	e_info.read_parallel_patches = read_parallel_patches;
+	fclaw2d_global_iterate_level(glob, level, cb_face_fill,
+						 &e_info);    
 }
 
 
 static
 void fine2coarse(fclaw2d_global_t *glob,
-                int level,
-                int read_parallel_patches,
-                fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+				int level,
+				int read_parallel_patches,
+				fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
-    fclaw2d_exchange_info_t e_info;
-    e_info.exchange_type = FCLAW2D_TIME_SYNC_FINE_TO_COARSE;
-    e_info.grid_type = FCLAW2D_IS_COARSE;
-    e_info.time_interp = 0;
-    e_info.read_parallel_patches = read_parallel_patches;
+	fclaw2d_exchange_info_t e_info;
+	e_info.exchange_type = FCLAW2D_TIME_SYNC_FINE_TO_COARSE;
+	e_info.grid_type = FCLAW2D_IS_COARSE;
+	e_info.time_interp = 0;
+	e_info.read_parallel_patches = read_parallel_patches;
 
-    fclaw2d_global_patch_iterator(glob, level, cb_face_fill,
-                         &e_info);
+	fclaw2d_global_iterate_level(glob, level, cb_face_fill,
+	                                &e_info);
 }
 
 static
-void coarse_correct(fclaw2d_global_t *glob, 
-                    int minlevel, int maxlevel,
-                    int read_parallel_patches,
-                    fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+void correct_coarse_cells(fclaw2d_global_t *glob, 
+                          int minlevel, 
+                          int read_parallel_patches,
+                          fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 
 {
-    int level;
+	fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    int read_parallel_patches;
-    int time_interp = 0;
+	int level;
 
-    int mincoarse = minlevel;
-    int maxcoarse = maxlevel-1;
-    
-    for(level = maxcoarse; level >= mincoarse; level--)
-    {
-        fine2coarse(glob,level,
-                    read_parallel_patches,ghost_mode);
-    }
+	int mincoarse = minlevel;
+	int maxcoarse = fclaw_opt->maxlevel - 1;
+	
+	/* We have to at all coarse/fine boundaries, and at block_boundaries
+	where grids are the same size */
+	for(level = maxcoarse; level >= mincoarse; level--)
+	{
+		fine2coarse(glob,level,
+					read_parallel_patches,ghost_mode);
+	}
 
-    for(level = maxlevel; level >= minlevel; level--)
-    {
-        copy_at_blockbdry(glob,level,
-                          read_parallel_patches,ghost_mode);
-    }
+	/* This step accounts for any metric discontinuities at block boundaries */
+	for(level = maxcoarse; level >= mincoarse; level--)
+	{
+		copy_at_blockbdry(glob,level,
+						  read_parallel_patches,ghost_mode);
+	}
 
 }
 
@@ -104,32 +112,43 @@ void coarse_correct(fclaw2d_global_t *glob,
 void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 {
 
-    int time_interp = 0;
+	int time_interp = 0;
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
-
-
-    /* --------------------------------------------------------------
-        Send and receive patches
-    ------------------------------------------------------------*/
-    fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
-                                         FCLAW2D_TIMER_TIMESYNC);
-
-    fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
-                                       FCLAW2D_TIMER_TIMESYNC);
-
-    /* -------------------------------------------------------------
-        Loop over ghost patches to find indirect neighbors and do
-        any necessary face exchanges.
-    ------------------------------------------------------------- */
-    fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
+	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
 
 
-    /* Add time_sync coarse grid corrections (include corrections form 
-    the fine grid and from copies) */
-    coarse_correct(glob,minlevel,maxlevel,read_parallel_patches,parallel_mode);
+	/* --------------------------------------------------------------
+		Send and receive patches
+	------------------------------------------------------------*/
+	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
+										 FCLAW2D_TIMER_TIMESYNC);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
+	fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
+									   FCLAW2D_TIMER_TIMESYNC);
+
+	/* Three-way corner exchanges */
+	fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
+
+
+	/* -------------------------------------------------------------
+	Add corrections from  fine grids to coarse grid.  This is is done 
+	when two or more levels are time synchronized.
+	   -- All parallel patches are valid 
+	   -- Iterate over boundary patches only, since correction occurs
+	   only at coarse/fine boundaries.
+	------------------------------------------------------------- */
+
+	/* Parallel patches are valid */
+	int read_parallel_patches = 1;
+
+	/* Indicates that we should read only interior, only boundary, or all patches
+	on a local processor */
+	fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
+		   FCLAW2D_BOUNDARY_ALL;    
+
+	correct_coarse_cells(glob,minlevel,read_parallel_patches,parallel_mode);
+
+	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
 
 }
 
