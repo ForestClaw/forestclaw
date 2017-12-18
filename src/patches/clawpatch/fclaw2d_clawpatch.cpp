@@ -1019,7 +1019,7 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 
 	/* Conservation */
 	patch_vt->time_sync_fine_to_coarse   = fclaw2d_clawpatch_time_sync_fine_to_coarse;
-	patch_vt->time_sync_copy             = fclaw2d_clawpatch_time_sync_copy;
+	patch_vt->time_sync_copy             = fclaw2d_clawpatch_time_sync_copy;	
 
 	/* Transform functions (defined in forestclaw2d */
 	patch_vt->transform_init_data    = fclaw2d_clawpatch_transform_init_data;

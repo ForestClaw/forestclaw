@@ -253,6 +253,8 @@ c    # fine grid correction for the coarse grid.
             deltap = fpfine1(jj1,mq) + fpfine1(jj2,mq) +
      &               eff1(jj1,mq,1) + eff1(jj2,mq,1)
 
+c           # Put the same value in four ghost cells;  grab the first
+c           # one that shows up in the tranformation.          
             do jj = jj1,jj2
                do ii = 1,mbc
                   qfine_dummy(1-ii,jj,mq) = -deltam
@@ -264,9 +266,9 @@ c    # fine grid correction for the coarse grid.
          do i = 1,mx/2
             ii1 = 2*(i-1) + 1        !! indexing starts at 1
             ii2 = 2*(i-1) + 2
-            deltam = gmfine2(ii1,mq) + gpfine3(ii2,mq) +
+            deltam = gmfine2(ii1,mq) + gmfine2(ii2,mq) +
      &               eff2(ii1,mq,1) + eff2(ii2,mq,1)
-            deltap = gmfine2(ii1,mq) + gpfine3(ii2,mq) +
+            deltap = gpfine3(ii1,mq) + gpfine3(ii2,mq) +
      &               eff3(ii1,mq,1) + eff3(ii2,mq,1)
             do ii = ii1,ii2
                do jj = 1,mbc
@@ -278,10 +280,13 @@ c    # fine grid correction for the coarse grid.
       enddo
 
 
-c     # Average fine grid onto coarse grid
+c     # Add corrections from above to coarse grid.  Use transforms to get
+c     # correct location.
       if (idir .eq. 0) then
          do mq = 1,meqn
             do jc = 1,my
+              
+c              # Move this to beginning of routine.              
                if (iface_coarse .eq. 0) then
                   ic = 1
                elseif (iface_coarse .eq. 1) then

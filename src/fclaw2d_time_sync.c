@@ -99,12 +99,14 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 					read_parallel_patches,ghost_mode);
 	}
 
+#if 0
 	/* This step accounts for any metric discontinuities at block boundaries */
 	for(level = maxcoarse; level >= mincoarse; level--)
 	{
 		copy_at_blockbdry(glob,level,
 						  read_parallel_patches,ghost_mode);
 	}
+#endif	
 
 }
 
@@ -119,7 +121,7 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 
 	/* --------------------------------------------------------------
 		Send and receive patches
-	------------------------------------------------------------*/
+	-----------------------------------------------------------------*/
 	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
 										 FCLAW2D_TIMER_TIMESYNC);
 

@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 
+#include <fclaw2d_time_sync.h>
+
 
 typedef struct fclaw2d_level_data
 {
@@ -290,6 +292,9 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 				int time_interp_level = timeinterp_level(ts_counter,maxlevel);
 
 				int time_interp = 1;
+
+				/* Do Conservative fix up here */
+				fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
 				fclaw2d_ghost_update(glob,
 									 time_interp_level+1,
 									 maxlevel,
@@ -301,12 +306,14 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 			else
 			{
 				int time_interp = 0;
+				fclaw2d_time_sync(glob,minlevel,maxlevel);
 				fclaw2d_ghost_update(glob,
 									 minlevel,
 									 maxlevel,
 									 sync_time,
 									 time_interp,
 									 FCLAW2D_TIMER_ADVANCE);
+				fclaw2d_time_sync_reset(glob,minlevel,maxlevel);                
 			}
 		}
 	}
