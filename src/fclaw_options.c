@@ -54,6 +54,9 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "desired_cfl", &fclaw_opt->desired_cfl, 0.9,
                            "Maximum CFL allowed [0.9]");
 
+    sc_options_add_bool (opt, 0, "reduce-cfl", &fclaw_opt->reduce_cfl, 1,
+                           "Get maximum CFL over all processors [T]");
+
     sc_options_add_bool (opt, 0, "use_fixed_dt", &fclaw_opt->use_fixed_dt, 0,
                          "Use fixed coarse grid time step [F]");
 
@@ -281,6 +284,12 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
                " tfinal/nout exactly.\n");
             return FCLAW_EXIT_ERROR;
         }
+    }
+    if (!fclaw_opt->reduce_cfl & !fclaw_opt->use_fixed_dt)
+    {
+        fclaw_global_essentialf("The CFL reduce can only be skipped if"
+                                " use_fixed_dt = True\n");
+        return FCLAW_EXIT_ERROR;
     }
 
     /* TODO: move these blocks to the beginning of forestclaw's control flow */

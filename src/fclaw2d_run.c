@@ -194,9 +194,12 @@ void outstyle_1(fclaw2d_global_t *glob)
             }
             double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
 
-            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
-            maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
+            if (fclaw_opt->reduce_cfl)
+            {
+                fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
+                maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
+                fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);                
+            }
 
 
             double tc = t_curr + dt_step;
@@ -211,7 +214,8 @@ void outstyle_1(fclaw2d_global_t *glob)
             if (maxcfl_step > fclaw_opt->max_cfl)
             {
                 fclaw_global_essentialf("   WARNING : Maximum CFL exceeded; "    \
-                                   "retaking time step\n");
+                                        "retaking time step\n");
+
                 if (!fclaw_opt->use_fixed_dt)
                 {
                     restore_time_step(glob);
@@ -353,9 +357,12 @@ void outstyle_3(fclaw2d_global_t *glob)
         double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
 
         /* This is a collective communication - everybody needs to wait here. */
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
-        maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
+        if (fclaw_opt->reduce_cfl)
+        {
+            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
+            maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
+            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);     
+        }
 
         double tc = t_curr + dt_step;
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
@@ -368,7 +375,7 @@ void outstyle_3(fclaw2d_global_t *glob)
                                  (*domain)->global_maxlevel,
                                  n+1,dt_step,maxcfl_step, tc);
 
-        if (maxcfl_step > fclaw_opt->max_cfl)
+        if (fclaw_opt->reduce_cfl & maxcfl_step > fclaw_opt->max_cfl)
         {
             if (!fclaw_opt->use_fixed_dt)
             {

@@ -125,6 +125,7 @@ struct fclaw_options
     int use_fixed_dt;
     double max_cfl;
     double desired_cfl;
+    int reduce_cfl;   /* Do an all-reduce to get max. cfl */
     double *tout;
 
     /* Initialization of ghost cell */
