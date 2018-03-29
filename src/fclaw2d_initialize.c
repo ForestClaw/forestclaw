@@ -75,7 +75,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_domain_t** domain = &glob->domain;
 
     int time_interp = 0;
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     /* This mapping context is needed by fortran mapping functions */
     fclaw2d_map_context_t *cont = glob->cont;
@@ -87,8 +87,8 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 #endif
     fclaw_global_essentialf("Max threads set to %d\n",maxthreads);
 
-    int minlevel = gparms->minlevel;
-    int maxlevel = gparms->maxlevel;
+    int minlevel = fclaw_opt->minlevel;
+    int maxlevel = fclaw_opt->maxlevel;
 
     /* Initialize all timers */
     int i;
@@ -106,8 +106,8 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
     /* set specific refinement strategy */
     fclaw2d_domain_set_refinement
-        (*domain, gparms->smooth_refine, gparms->smooth_refine_level,
-         gparms->coarsen_delay);
+        (*domain, fclaw_opt->smooth_refine, fclaw_opt->smooth_refine_level,
+         fclaw_opt->coarsen_delay);
 
 
     /* ------------------------------------------------
@@ -133,13 +133,14 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     fclaw2d_regrid_set_neighbor_types(glob);
 
     /* We need a user option here to set ghost values after initialization */
-    if (gparms->init_ghostcell){
+    if (fclaw_opt->init_ghostcell)
+    {
         fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW2D_TIMER_INIT);
     }
-    // fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
-    //                         0.0,time_interp);
+    //fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
+    //                        0.0,fclaw_opt->dt_initial,time_interp);
 
     /* ------------------------------------------------
        Done with initial setup.
@@ -205,7 +206,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                 /* This is normally called from regrid, once the initial domain
                    has been set up */
                 fclaw2d_regrid_set_neighbor_types(glob);
-                // if (gparms->init_ghostcell)
+                // if (fclaw_opt->init_ghostcell)
                 // {
                 //     fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
                 //                         (*domain)->global_maxlevel,0.0,
@@ -220,7 +221,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
         }  /* Level loop (minlevel --> maxlevel) */
     }
 
-    if (gparms->init_ghostcell)
+    if (fclaw_opt->init_ghostcell)
     {
         fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
                              (*domain)->global_maxlevel,0.0,

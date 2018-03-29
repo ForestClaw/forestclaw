@@ -303,36 +303,6 @@ void setphysical(fclaw2d_global_t *glob,
 }
 
 
-
-#if 0
-static
-void copy2ghost(fclaw2d_domain_t *domain,
-                int level,
-                int time_interp,
-                int read_parallel_patches,
-                fclaw2d_ghost_fill_parallel_mode_t ghost_mode);
-
-static
-void average2ghost(fclaw2d_domain_t *domain,
-                   int coarse_level,
-                   int time_interp,
-                   int read_parallel_patches,
-                   fclaw2d_ghost_fill_parallel_mode_t ghost_mode);
-static
-void interpolate2ghost(fclaw2d_domain_t *domain,
-                       int fine_level,
-                       int time_interp,
-                       int read_parallel_patches,
-                       fclaw2d_ghost_fill_parallel_mode_t ghost_mode);
-
-static
-void setphysical(fclaw2d_domain_t *domain,
-                 int level,
-                 double sync_time,
-                 int time_interp,
-                 fclaw2d_ghost_fill_parallel_mode_t ghost_mode);
-#endif
-
 /* -------------------------------------------------
    Loop over all levels
    ----------------------------------------------- */
@@ -525,215 +495,182 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
     patch_iterator = &fclaw2d_global_iterate_level;
 #endif
 
-    if (glob->mpisize == 0)
-    {
-#if 0
-        /* This seems to be equivalent to the other branch of this loop when
-           run on a single processor (but is about 20% faster on a
-           single processor) */
-        fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
-            FCLAW2D_BOUNDARY_ALL;
-        int read_parallel_patches = 0;
+    /* --------------------------------------------------------------
+       Do work we can do before sending
+       ------------------------------------------------------------*/
 
-        copy_samelevel(glob,minlevel,maxlevel,time_interp,
-                       read_parallel_patches,parallel_mode);
+    /* Copy/average ghost cells in local patches at the parallel boundary.
+       This is needed so that when these boundary patches get sent to other
+       processors as ghost patches, they have valid ghost cells if needed
+       for interpolation.*/
 
-        average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+
+    fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
+    FCLAW2D_BOUNDARY_GHOST_ONLY;
+    int read_parallel_patches = 0;
+
+
+    /* Copy */
+    copy_samelevel(glob,minlevel,maxlevel,time_interp,
+                   read_parallel_patches,parallel_mode);
+
+    /* Average */
+    average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
+                              time_interp,
+                              read_parallel_patches,
+                              parallel_mode);
+
+    /* This is needed when the parallel boundary intersects the physical
+       boundary.  In this case, a coarse grid ghost patch might
+       need to have physical boundary conditions in order to interpolate
+       to a fine grid local patch. Note that we don't need to fill in
+       ghost cells on the finest level grids, since these will never be
+       used for interpolation. */
+    fill_physical_ghost(glob,
+                        mincoarse,
+                        maxcoarse,
+                        sync_time,
+                        time_interp,
+                        parallel_mode);
+
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+
+    /* --------------------------------------------------------------
+       Start send ...
+       ------------------------------------------------------------*/
+    fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
+                                         FCLAW2D_TIMER_GHOSTFILL);
+
+    /* --------------------------------------------------------------
+       Finish exchanges in the interior of the grid.
+       ------------------------------------------------------------*/
+
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP2]);
+    parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
+
+    /* Copy */
+    copy_samelevel(glob,minlevel,maxlevel,time_interp,
+                   read_parallel_patches,parallel_mode);
+
+    /* Average */
+    average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
+                              time_interp,
+                              read_parallel_patches,
+                              parallel_mode);
+
+
+    /* Physical ghost */
+    fill_physical_ghost(glob,
+                        mincoarse,
+                        maxcoarse,
+                        sync_time,
+                        time_interp,
+                        parallel_mode);
+
+    /* Fine grids that are adjacent to boundary patches don't get
+       ghost regions filled in that overlap boundary patch */
+
+    /* Interpolate */
+    interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
                                   time_interp,
                                   read_parallel_patches,
                                   parallel_mode);
 
-        fill_physical_ghost(glob,
-                            mincoarse,
-                            maxcoarse,
-                            sync_time,
-                            time_interp,
-                            parallel_mode);
+    /* minfine to maxfine?  */
+    int minfine = mincoarse+1;
+    int maxfine = maxlevel;
 
-        interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
-                                      time_interp,read_parallel_patches,
-                                      parallel_mode);
+    /* Physical ghost */
+    fill_physical_ghost(glob,
+                        minfine,
+                        maxfine,
+                        sync_time,
+                        time_interp,
+                        parallel_mode);
 
-        fill_physical_ghost(glob,
-                            minlevel,
-                            maxlevel,
-                            sync_time,
-                            time_interp,
-                            parallel_mode);
-#endif
-    }
-    else
-    {
-        /* --------------------------------------------------------------
-           Do work we can do before sending
-           ------------------------------------------------------------*/
-        /* Copy/average ghost cells in local patches at the parallel boundary.
-           This is needed so that when these boundary patches get sent to other
-           processors as ghost patches, they have valid ghost cells if needed
-           for interpolation.*/
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP2]);
 
-        fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
-            FCLAW2D_BOUNDARY_GHOST_ONLY;
-        int read_parallel_patches = 0;
+    /* -------------------------------------------------------------
+       Receive ghost patches ...
+       ------------------------------------------------------------- */
 
+    fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
+                                       FCLAW2D_TIMER_GHOSTFILL);
 
-        /* Copy */
-        copy_samelevel(glob,minlevel,maxlevel,time_interp,
-                       read_parallel_patches,parallel_mode);
+    /* -------------------------------------------------------------
+       Loop over ghost patches to find indirect neighbors and do
+       any necessary face exchanges.
 
-        /* Average */
-        average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
-                                  time_interp,
-                                  read_parallel_patches,
+       Note : There is no special timer for this call, but checks
+       show that ghostfill-(step1+step2+step3+comm) << 1
+       ------------------------------------------------------------- */
+    fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
+
+    /* -------------------------------------------------------------
+       Repeat above, but now with parallel ghost cells.
+       ------------------------------------------------------------- */
+
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+    parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
+    read_parallel_patches = 1;
+
+    /* Copy */
+    copy_samelevel(glob,minlevel,maxlevel,time_interp,
+                   read_parallel_patches,parallel_mode);
+
+    /* Average */
+    average_fine2coarse_ghost(glob,mincoarse,maxcoarse, time_interp,
+                              read_parallel_patches,parallel_mode);
+
+    /* Physical */
+    fill_physical_ghost(glob,
+                        minlevel,
+                        maxlevel,
+                        sync_time,
+                        time_interp,
+                        parallel_mode);
+
+    /* Interpolate */
+    interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
+                                  time_interp,read_parallel_patches,
                                   parallel_mode);
 
-        /* This is needed when the parallel boundary intersects the physical
-           boundary.  In this case, a coarse grid ghost patch might
-           need to have physical boundary conditions in order to interpolate
-           to a fine grid local patch. Note that we don't need to fill in
-           ghost cells on the finest level grids, since these will never be
-           used for interpolation. */
-        fill_physical_ghost(glob,
-                            mincoarse,
-                            maxcoarse,
-                            sync_time,
-                            time_interp,
-                            parallel_mode);
+    /* This needs to be over all patches.  The situation that can arise is
+       that a coarse grid boundary patch adjacent to a fine grid non-boundary
+       patch. Both have a physical boundary.  In this case, the following steps
+       happens at the coarse/fine interface :
 
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+       (1) Ghost only (before exchange) : Fine grid averages to coarse grid;
+       Physical BC applied to coarse grid.
 
-        /* --------------------------------------------------------------
-           Start send ...
-           ------------------------------------------------------------*/
-        fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
-                                             FCLAW2D_TIMER_GHOSTFILL);
+       (2) Interior only : Fine grid is not picked up in an interpolation step,
+       since in interpolation, we only sweep over coarse grids, looking for fine
+       grid neighbors.  Applying physical BC to this fine grid leaves invalid values
+       in fine grid ghost cells at boundary.
 
-        /* --------------------------------------------------------------
-           Finish exchanges in the interior of the grid.
-           ------------------------------------------------------------*/
+       (3) Ghost only (after exchange) : Coarse grid boundary patch interpolates
+       to adjacent fine grid.  But now, we need to apply physical BCs to fine grid.
+       So we sweep over all grids to apply phys. BCs.  This is overkill, since
+       only those fine grids with neighboring coarse grid patches on the parallel boundary
+       are affected, but it is hard to see how to avoid this without some tedious
+       checking.
+    */
 
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP2]);
-        parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
+    /* Physical */
+    fill_physical_ghost(glob,
+                        minlevel,
+                        maxlevel,
+                        sync_time,
+                        time_interp,
+                        FCLAW2D_BOUNDARY_ALL);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
 
-        /* Copy */
-        copy_samelevel(glob,minlevel,maxlevel,time_interp,
-                       read_parallel_patches,parallel_mode);
+    /* ----------------------------------------------------------------
+       Done with ghost fill
+           -- Stop ghost fill timer, start current running timer
+       -------------------------------------------------------------- */
 
-        /* Average */
-        average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
-                                  time_interp,
-                                  read_parallel_patches,
-                                  parallel_mode);
-
-
-        /* Physical ghost */
-        fill_physical_ghost(glob,
-                            mincoarse,
-                            maxcoarse,
-                            sync_time,
-                            time_interp,
-                            parallel_mode);
-
-        /* Fine grids that are adjacent to boundary patches don't get
-           ghost regions filled in that overlap boundary patch */
-
-        /* Interpolate */
-        interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
-                                      time_interp,
-                                      read_parallel_patches,
-                                      parallel_mode);
-
-        /* minfine to maxfine?  */
-        int minfine = mincoarse+1;
-        int maxfine = maxlevel;
-
-        /* Physical ghost */
-        fill_physical_ghost(glob,
-                            minfine,
-                            maxfine,
-                            sync_time,
-                            time_interp,
-                            parallel_mode);
-
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP2]);
-
-        /* -------------------------------------------------------------
-           Receive ghost patches ...
-           ------------------------------------------------------------- */
-
-        fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
-                                           FCLAW2D_TIMER_GHOSTFILL);
-
-        /* -------------------------------------------------------------
-           Loop over ghost patches to find indirect neighbors and do
-           any necessary face exchanges.
-
-           Note : There is no special timer for this call, but checks
-           show that ghostfill-(step1+step2+step3+comm) << 1
-           ------------------------------------------------------------- */
-        fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
-
-        /* -------------------------------------------------------------
-           Repeat above, but now with parallel ghost cells.
-           ------------------------------------------------------------- */
-
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
-        parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
-        read_parallel_patches = 1;
-
-        /* Copy */
-        copy_samelevel(glob,minlevel,maxlevel,time_interp,
-            read_parallel_patches,parallel_mode);
-
-        /* Average */
-        average_fine2coarse_ghost(glob,mincoarse,maxcoarse, time_interp,
-            read_parallel_patches,parallel_mode);
-
-        /* Physical */
-        fill_physical_ghost(glob,
-                            minlevel,
-                            maxlevel,
-                            sync_time,
-                            time_interp,
-                            parallel_mode);
-
-        /* Interpolate */
-        interpolate_coarse2fine_ghost(glob,mincoarse, maxcoarse,
-                                      time_interp,read_parallel_patches,
-                                      parallel_mode);
-
-        /* This needs to be over all patches.  The situation that can arise is
-           that a coarse grid boundary patch adjacent to a fine grid non-boundary
-           patch. Both have a physical boundary.  In this case, the following steps
-           happens at the coarse/fine interface :
-
-           (1) Ghost only (before exchange) : Fine grid averages to coarse grid;
-           Physical BC applied to coarse grid.
-
-           (2) Interior only : Fine grid is not picked up in an interpolation step,
-           since in interpolation, we only sweep over coarse grids, looking for fine
-           grid neighbors.  Applying physical BC to this fine grid leaves invalid values
-           in fine grid ghost cells at boundary.
-
-           (3) Ghost only (after exchange) : Coarse grid boundary patch interpolates
-           to adjacent fine grid.  But now, we need to apply physical BCs to fine grid.
-           So we sweep over all grids to apply phys. BCs.  This is overkill, since
-           only those fine grids with neighboring coarse grid patches on the parallel boundary
-           are affected, but it is hard to see how to avoid this without some tedious
-           checking.
-        */
-
-        /* Physical */
-        fill_physical_ghost(glob,
-                            minlevel,
-                            maxlevel,
-                            sync_time,
-                            time_interp,
-                            FCLAW2D_BOUNDARY_ALL);
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
-    }
-    // Stop timing
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL]);
     if (running != FCLAW2D_TIMER_NONE)
     {

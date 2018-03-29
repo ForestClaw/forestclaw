@@ -70,6 +70,7 @@ typedef struct fclaw2d_global
 
     /* Time at start of each subcycled time step */
     double curr_time;
+    double curr_dt;
 
     sc_MPI_Comm mpicomm;
     int mpisize;              /**< Size of communicator. */
