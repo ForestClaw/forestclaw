@@ -213,8 +213,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
     int average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
     int interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
 
-    const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
-    const int refratio = gparms->refratio;
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
+    const int refratio = fclaw_opt->refratio;
 
     int intersects_phys_bdry[NumFaces];
     int intersects_block[NumFaces];
@@ -412,8 +412,8 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
     fclaw2d_domain_t *domain = glob->domain;
 
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
-    int refratio = gparms->refratio;
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    int refratio = fclaw_opt->refratio;
 
     int rproc[2];
     int rpatchno[2];
