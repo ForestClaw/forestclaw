@@ -39,13 +39,11 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 
 
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();        
-        // patch_vt->setup = fc2d_clawpack46_setaux;
 
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
@@ -56,7 +54,6 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
-        // patch_vt->setup = fc2d_clawpack5_setaux;
 
         clawpack5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         clawpack5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
