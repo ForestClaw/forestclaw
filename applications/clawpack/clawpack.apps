@@ -77,40 +77,7 @@ include applications/clawpack/transport/gaussian/Makefile.am
 include applications/clawpack/transport/slotted_disk/Makefile.am
 include applications/clawpack/transport/correlatedcb/Makefile.am#
 
-## Sample code that shows how we can avoid using the 'app' for configuring options
+## Example : avoid using the 'app' for configuring options
 include applications/clawpack/advection/2d/torthem/Makefile.am
-
-
-## ----------------------- Under construction -----------------------------
-##  These are not guaranteed to compile or may not be available with 
-## standard distribution
-## ------------------------------------------------------------------------
-if FCLAW_ENABLE_DEVELOPMENT
-
-## Third order scalar advection
-#include applications/clawpack/advection/2d/adv_order3/Makefile.am
-
-## Shallow water on the sphere (D. Calhoun)
-#include applications/clawpack/shallow/2d/sphere/Makefile.am
-
-## Simple examples to test options handling, etc, but no solvers.
-#include applications/dummy/Makefile.am
-
-## ---------------------------
-## No solver
-## ---------------------------
-## This needs work because all exchange functions (copy, average, interpolate) are 
-## stored in solvers, and not in a patch.  To fix this, the patch needs to 
-## know something about data layout.  The clawpatch currently doesn't know about 
-## data layout.
-#include applications/no_solver/Makefile.am
-
-## -------------------------------------------------
-## Checks for metric terms (curvature, normals, etc)
-## --------------------------------------------------
-#include applications/metric/2d/all_mappings/Makefile.am
-#include applications/metric/2d/mesh/Makefile.am
-
-endif
 
 
