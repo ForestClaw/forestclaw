@@ -19,7 +19,7 @@
 ## fix this, the patch needs to know something about data layout.  
 ## The clawpatch currently doesn't know about data layout. 
 
-#include applications/no_solver/Makefile.am
+include applications/no_solver/Makefile.am
 
 ## -------------------------------------------------
 ## Checks for metric terms (curvature, normals, etc)
