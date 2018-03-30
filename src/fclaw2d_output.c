@@ -45,7 +45,7 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
     {
         fclaw2d_vtable_t *vt = fclaw2d_vt();
 
-        FCLAW_ASSERT(vt->output_frame);
+        FCLAW_ASSERT(vt->output_frame != NULL);
 
         /* Record output time */
         fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
@@ -63,6 +63,7 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
         fclaw_global_essentialf("Time step %4d  at time %16.8e\n\n",
                                 iframe,time);          
     }
+
 
     if (fclaw_opt->tikz_out)
     {
