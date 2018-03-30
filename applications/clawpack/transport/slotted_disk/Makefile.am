@@ -46,4 +46,6 @@ applications_clawpack_transport_slotted_disk_slotted_disk_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD)  \
         $(FCLAW_CLAWPACK5_LDADD)  \
-        $(FCLAW_CLAWPATCH_LDADD)
+		$(FCLAW_CLAWPATCH_LDADD	) \     
+        $(FCLAW_LDADD)
+

@@ -488,12 +488,16 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
     int mincoarse = minlevel;
     int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
 
+#if 0
 #if (_OPENMP)
     /* Multi-thread only in single processor case. */
     patch_iterator = &fclaw2d_global_iterate_level_mthread;
 #else
     patch_iterator = &fclaw2d_global_iterate_level;
 #endif
+#endif
+
+    patch_iterator = &fclaw2d_global_iterate_level;
 
     /* --------------------------------------------------------------
        Do work we can do before sending
