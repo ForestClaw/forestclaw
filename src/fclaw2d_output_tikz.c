@@ -147,7 +147,11 @@ cb_tikz_output (fclaw2d_domain_t * domain,
                             s->glob->domain->mpirank);
     fprintf(fp,"%s%s\\draw [ultra thin] (%d,%d) rectangle (%d,%d);\n",
                             indent,indent,xlow_d,ylow_d,xupper_d,yupper_d);
-    fprintf(fp,"%s}{%%else statement}\n\n",indent);
+    fprintf(fp,"%s}\n",indent);
+    fprintf(fp,"%s{\n",indent);
+    fprintf(fp,"%s%s%%else statement\n",indent,indent);
+    fprintf(fp,"%s}\n",indent);
+    fprintf(fp,"\n");
 }
 
 void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
@@ -193,7 +197,7 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
     double sy = figsize[1]/myf;   /* Effective y-resolution */
 
     FILE *fp;
-    sprintf(fname,"tikz_%04d.tex",iframe);  /* fname[20] */
+    sprintf(fname,"tikz.%04d.tex",iframe);  /* fname[20] */
     if (domain->mpirank == 0)
     {
         /* Only rank 0 opens the file */
@@ -203,13 +207,13 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fprintf(fp,"\\usepackage{tikz}\n");
         fprintf(fp,"\\usepackage{xifthen}\n");
         fprintf(fp,"\n");
-        if (fclaw_opt->tikz_plot_fig != 0)
+        if (fclaw_opt->tikz_mesh_only != 0)
         {
-            fprintf(fp,"\\newcommand{\\plotfig}[1]{#1}\n");
+            fprintf(fp,"\\newcommand{\\plotfig}[1]{}\n");
         }
         else
         {
-            fprintf(fp,"\\newcommand{\\plotfig}[1]{}\n");            
+            fprintf(fp,"\\newcommand{\\plotfig}[1]{#1}\n");            
         }
 
         fprintf(fp,"\\newcommand{\\plotgrid}[1]{#1}\n\n");
@@ -217,10 +221,19 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
                 iframe,fclaw_opt->tikz_plot_suffix);
         fprintf(fp,"\n");
         fprintf(fp,"\\begin{document}\n");
-        fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy);
-        fprintf(fp,"    \\plotfig{\\node (forestclaw_plot) at (%3.1f,%3.1f)\n",
-                ((double) mxf)/2,((double) myf)/2);
-        fprintf(fp,"    {\\includegraphics{\\figname}};}\n\n");
+        fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy); 
+        if (fclaw_opt->tikz_mesh_only)
+        {
+            fprintf(fp,"    %%\\plotfig{\\node (forestclaw_plot) at (%3.1f,%3.1f)\n",
+                    ((double) mxf)/2,((double) myf)/2);            
+            fprintf(fp,"    %%{\\includegraphics{\\figname}};}\n\n");
+        }       
+        else
+        {
+            fprintf(fp,"    \\plotfig{\\node (forestclaw_plot) at (%3.1f,%3.1f)\n",
+                    ((double) mxf)/2,((double) myf)/2);            
+            fprintf(fp,"    {\\includegraphics{\\figname}};}\n\n");
+        }
         fprintf(fp,"%% Maximum level is %d\n",lmax);
         fprintf(fp,"\\def \\maxlevel {%d}\n\n",lmax);
         fprintf(fp,"\\plotgrid{\n\n");

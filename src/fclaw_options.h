@@ -192,6 +192,7 @@ struct fclaw_options
     int tikz_plot_fig;
     const char *tikz_plot_prefix;  /* For plotting */
     const char *tikz_plot_suffix;  /* For plotting */
+    int tikz_mesh_only;
 
     const char *prefix;         /**< This is prepended to output files */
 
