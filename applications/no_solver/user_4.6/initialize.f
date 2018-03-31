@@ -11,7 +11,10 @@
 
       common /com_init/ ichoice
 
+c     # ichoice = 1 : One large circle only
+c     # ichocie = 2 : One large circle and several satellite circles
       ichoice = 2
+
 
       do mq = 1,meqn
          do i = 1-mbc,mx+mbc
