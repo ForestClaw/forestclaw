@@ -4,6 +4,7 @@ bin_PROGRAMS += applications/no_solver/no_solver
 
 applications_no_solver_no_solver_SOURCES = \
 	applications/no_solver/no_solver.cpp \
+    applications/no_solver/gem3d_output_mesh.c \
     applications/no_solver/no_solver_options.c \
 	applications/no_solver/no_solver_user.cpp \
 	applications/no_solver/fclaw2d_map_nomap.c \

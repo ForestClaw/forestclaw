@@ -31,6 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_physical_bc.h>
 
+#include "gem3d_output_mesh.h"
+
+static
+void no_solver_output(fclaw2d_global_t* glob,int iframe);
+
 void no_solver_link_solvers(fclaw2d_global_t* global)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
@@ -39,7 +44,7 @@ void no_solver_link_solvers(fclaw2d_global_t* global)
     patch_vt->single_step_update   = &no_solver_update;
     patch_vt->initialize           = &no_solver_patch_initialize;
     patch_vt->physical_bc          = &fclaw2d_physical_bc_default;  /* do nothing */
-    vt->output_frame               = &fclaw2d_clawpatch_output_ascii;
+    vt->output_frame               = &no_solver_output;
 
 }
 
@@ -71,3 +76,17 @@ double no_solver_update(fclaw2d_global_t *glob,
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     return fclaw_opt->desired_cfl;
 }
+
+static
+void no_solver_output(fclaw2d_global_t* glob,int iframe)
+{
+    fclaw2d_domain_t *domain = glob->domain;
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+
+    /* Create usual output */
+    fclaw2d_clawpatch_output_ascii(glob,iframe);
+
+    /* Write out mesh (for GEM3d) */
+    gem3d_output_mesh(glob,iframe);
+}
+
