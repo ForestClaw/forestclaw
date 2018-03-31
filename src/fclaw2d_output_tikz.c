@@ -143,15 +143,17 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     fprintf(fp,"%s\\ifthenelse{\\level = %d}\n",indent,level);
     fprintf(fp,"%s{\n",indent);
     fprintf(fp,"%s%s%% Patch number %ld; rank = %d\n",indent,indent,
-                            (long int) patch_num,
-                            s->glob->domain->mpirank);
+                            (long int) patch_num,s->glob->domain->mpirank);
     fprintf(fp,"%s%s\\draw [ultra thin] (%d,%d) rectangle (%d,%d);\n",
                             indent,indent,xlow_d,ylow_d,xupper_d,yupper_d);
-    fprintf(fp,"%s}\n",indent);
+    fprintf(fp,"%s}{}\n\n",indent);
+#if 0    
+    /* This increases file size considerably */
     fprintf(fp,"%s{\n",indent);
     fprintf(fp,"%s%s%%else statement\n",indent,indent);
     fprintf(fp,"%s}\n",indent);
     fprintf(fp,"\n");
+#endif    
 }
 
 void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
@@ -209,11 +211,11 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fprintf(fp,"\n");
         if (fclaw_opt->tikz_mesh_only != 0)
         {
-            fprintf(fp,"\\newcommand{\\plotfig}[1]{}\n");
+            fprintf(fp,"\\newcommand{\\plotfig}[1]{}      %% Change to {#1} to include PNG file\n");
         }
         else
         {
-            fprintf(fp,"\\newcommand{\\plotfig}[1]{#1}\n");            
+            fprintf(fp,"\\newcommand{\\plotfig}[1]{#1}     %% Change to {} to plot mesh only\n");            
         }
 
         fprintf(fp,"\\newcommand{\\plotgrid}[1]{#1}\n\n");
@@ -222,18 +224,9 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
         fprintf(fp,"\n");
         fprintf(fp,"\\begin{document}\n");
         fprintf(fp,"\\begin{tikzpicture}[x=%18.16fin, y=%18.16fin]\n",sx,sy); 
-        if (fclaw_opt->tikz_mesh_only)
-        {
-            fprintf(fp,"    %%\\plotfig{\\node (forestclaw_plot) at (%3.1f,%3.1f)\n",
-                    ((double) mxf)/2,((double) myf)/2);            
-            fprintf(fp,"    %%{\\includegraphics{\\figname}};}\n\n");
-        }       
-        else
-        {
-            fprintf(fp,"    \\plotfig{\\node (forestclaw_plot) at (%3.1f,%3.1f)\n",
-                    ((double) mxf)/2,((double) myf)/2);            
-            fprintf(fp,"    {\\includegraphics{\\figname}};}\n\n");
-        }
+        fprintf(fp,"    \\plotfig{\\node (forestclaw_plot) at (%3.1f,%3.1f)\n",
+                ((double) mxf)/2,((double) myf)/2);            
+        fprintf(fp,"    {\\includegraphics{\\figname}};}\n\n");
         fprintf(fp,"%% Maximum level is %d\n",lmax);
         fprintf(fp,"\\def \\maxlevel {%d}\n\n",lmax);
         fprintf(fp,"\\plotgrid{\n\n");
