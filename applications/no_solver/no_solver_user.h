@@ -40,7 +40,7 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    int claw_version;
+    int clawpatch_version;  /*  Determines data layout for patches */
     int is_registered;
 
 } user_options_t;

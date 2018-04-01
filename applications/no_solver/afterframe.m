@@ -11,9 +11,10 @@ caxis([0,1])
 plot_tikz = true;
 if (plot_tikz)
     axis([-1, 1, -1,1]);
-    figsize = [4,4];  % Should match tikz figsize.
-    maxlevel = 4;
+    figsize = [16,16];  % Should match tikz figsize.
+    maxlevel = 6;
     dpi = mx*2^maxlevel/figsize(1);
+    fprintf('dpi = %d\n',dpi);
     prefix = 'plot';
     plot_tikz_fig(Frame,figsize,prefix,dpi);
 end

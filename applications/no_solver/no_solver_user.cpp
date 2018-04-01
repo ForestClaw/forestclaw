@@ -80,9 +80,6 @@ double no_solver_update(fclaw2d_global_t *glob,
 static
 void no_solver_output(fclaw2d_global_t* glob,int iframe)
 {
-    fclaw2d_domain_t *domain = glob->domain;
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-
     /* Create usual output */
     fclaw2d_clawpatch_output_ascii(glob,iframe);
 

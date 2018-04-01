@@ -65,9 +65,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_vtable_initialize();
     fclaw2d_diagnostics_vtable_initialize();
 
-    int claw_version = user->claw_version;
-    fclaw2d_clawpatch_vtable_initialize(claw_version);
-
+    fclaw2d_clawpatch_vtable_initialize(user->clawpatch_version);
 
     no_solver_link_solvers(glob);
 

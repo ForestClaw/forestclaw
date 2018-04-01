@@ -36,8 +36,8 @@ no_solver_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                            "Example [0]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
-                           "Clawpack_version (4 or 5) [5]");
+    sc_options_add_int (opt, 0, "clawpatch-version", &user->clawpatch_version, 4,
+                           "Clawpatch version (4 or 5) [4]");
 
     user->is_registered = 1;
 
