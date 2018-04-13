@@ -56,7 +56,8 @@ fclaw2d_timer_init (fclaw2d_timer_t *timer)
 void
 fclaw2d_timer_start (fclaw2d_timer_t *timer)
 {
-    if (!timer->running) {
+    if (!timer->running) 
+    {
         timer->started = fclaw2d_timer_wtime ();
         timer->stopped = 0.;
         timer->running = 1;
@@ -70,7 +71,8 @@ fclaw2d_timer_start (fclaw2d_timer_t *timer)
 void
 fclaw2d_timer_stop (fclaw2d_timer_t *timer)
 {
-    if (timer->running) {
+    if (timer->running) 
+    {
         timer->stopped = fclaw2d_timer_wtime ();
         timer->cumulative += timer->stopped - timer->started;
         timer->running = 0;

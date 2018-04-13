@@ -124,6 +124,11 @@ src_libforestclaw_la_SOURCES = \
 
 src_libforestclaw_la_CPPFLAGS = $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
 
+FCLAW_LDADD = @top_builddir@/src/libforestclaw.la \
+	          @FCLAW_P4EST_LDADD@ \
+              @FCLAW_SC_LDADD@
+
+
 LDADD += @top_builddir@/src/libforestclaw.la \
 	     @FCLAW_P4EST_LDADD@ \
 	     @FCLAW_SC_LDADD@

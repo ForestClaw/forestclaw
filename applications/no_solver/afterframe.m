@@ -8,14 +8,25 @@ showpatchborders(1:10);
 setpatchborderprops('linewidth',1);
 caxis([0,1])
 
+plot_tikz = true;
+if (plot_tikz)
+    axis([-1, 1, -1,1]);
+    figsize = [16,16];  % Should match tikz figsize.
+    maxlevel = 6;
+    dpi = mx*2^maxlevel/figsize(1);
+    fprintf('dpi = %d\n',dpi);
+    prefix = 'plot';
+    plot_tikz_fig(Frame,figsize,prefix,dpi);
+end
+
 view(2);
 
 NoQuery = 0;
 prt = false;
 if (prt)
-  filename = framename(Frame,'swirl0000','png');
+  filename = framename(Frame,'mesh0000','png');
   print('-dpng',filename);
-end;
+end
 
 shg
 clear afterframe

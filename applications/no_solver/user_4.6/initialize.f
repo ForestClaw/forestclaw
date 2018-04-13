@@ -1,8 +1,8 @@
-      subroutine initialize(mx,my,meqn,mbc,xlower,ylower,
-     &      dx,dy,q,mpirank)
+      subroutine initialize(mx,my,meqn,mbc,blockno,
+     &      xlower,ylower,dx,dy,q)
       implicit none
 
-      integer maxmx, maxmy, meqn, mbc, mx, my, mpirank
+      integer meqn, mbc, mx, my, blockno
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
 
@@ -11,7 +11,10 @@
 
       common /com_init/ ichoice
 
+c     # ichoice = 1 : One large circle only
+c     # ichocie = 2 : One large circle and several satellite circles
       ichoice = 2
+
 
       do mq = 1,meqn
          do i = 1-mbc,mx+mbc
@@ -19,13 +22,8 @@
             do j = 1-mbc,my+mbc
                ylow = ylower + (j-1)*dy
 
-               call cellave2(xlow,ylow,dx,dy,wl)
-
-               if (mq .eq. 1) then
-                  q(i,j,mq) = mpirank
-               else
-                  q(i,j,mq) = wl
-               endif
+               call cellave2(blockno,xlow,ylow,dx,dy,wl)
+               q(i,j,mq) = wl
             enddo
          enddo
       enddo
@@ -33,20 +31,30 @@
       return
       end
 
-      double precision function fdisc(x,y)
+      double precision function fdisc(blockno,xc,yc)
       implicit none
 
-      double precision x,y, r
-      double precision xp, yp, rp, th, x0
+      double precision xc,yc, r
+      double precision xp, yp, zp, rp, th, x0
       double precision y0, pi
-      integer m, ichoice
+      integer m, ichoice, blockno
+      logical fclaw2d_map_is_used
+
+      integer*8 cont, get_context
 
       common /com_init/ ichoice
 
+      cont = get_context()
+
       pi = 4.d0*atan(1.d0)
 
-      xp = x
-      yp = y
+      if (fclaw2d_map_is_used(cont)) then
+         call fclaw2d_map_c2m(cont,
+     &         blockno,xc,yc,xp,yp,zp)
+      else
+         xp = xc
+         yp = yc
+      endif
 
       fdisc = -1
       rp = sqrt((xp)**2 + (yp)**2)

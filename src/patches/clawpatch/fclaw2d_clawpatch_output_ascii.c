@@ -44,6 +44,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
+
     int patch_num;
     int level;
     int mx,my,mbc,meqn;
@@ -69,6 +70,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
 
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
+    FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
     clawpatch_vt->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
                                     &patch_num,&level,&this_block_idx,
                                     &glob->domain->mpirank);

@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_defs.h>
 
-// #include <forestclaw2d.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>
@@ -57,13 +56,21 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
     t_info = (fclaw2d_physical_time_info_t*) s->user;
 
     int intersects_bc[NumFaces];
-    double dt = 1e20;
+
+    /* Time dt should not be passed in here. If BCs are obtained by 
+       evolving an ODE, then we should really evolve the ODE at the same time 
+       that we advance the solution, not when we apply boundary conditions.
+       The reason is that this routine gets called several times per time step, and 
+       could mess up the BC evolution. */
+
+    double dt = 1e20;  /* Signals that not a good idea to use dt in this context */
     fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,intersects_bc);
     fclaw2d_patch_physical_bc(s->glob,
                               this_patch,
                               this_block_idx,
                               this_patch_idx,
-                              t_info->level_time,dt,
+                              t_info->level_time,
+                              dt,
                               intersects_bc,
                               t_info->time_interp);
 }

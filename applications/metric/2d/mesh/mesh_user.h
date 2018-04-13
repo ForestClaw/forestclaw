@@ -23,54 +23,50 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_output.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_vtable.h>
+#ifndef MESH_USER_H
+#define MESH_USER_H
 
-/* -----------------------------------------------------------------------
-    Public interface
-    -------------------------------------------------------------------- */
+#include <fclaw2d_forestclaw.h>
+#include </Users/calhoun/projects/ForestClaw/code/forestclaw/applications/advection/2d/all/clawpack_user.h>
 
-void
-fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
+#ifdef __cplusplus
+extern "C"
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-
-    double time;
-    time = glob->curr_time;
-
-
-    if (fclaw_opt->output != 0)
-    {
-        fclaw2d_vtable_t *vt = fclaw2d_vt();
-
-        FCLAW_ASSERT(vt->output_frame != NULL);
-
-        /* Record output time */
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-
-        /* User or solver set output file */
-        fclaw_global_essentialf("Output Frame %4d  at time %16.8e\n\n",
-                                iframe,time);  
-        vt->output_frame(glob,iframe);
-
-        /* Record output time */
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
-    }
-    else
-    {
-        fclaw_global_essentialf("Time step %4d  at time %16.8e\n\n",
-                                iframe,time);          
-    }
-
-
-    if (fclaw_opt->tikz_out)
-    {
-        fclaw2d_output_frame_tikz(glob,iframe);
-    }
+#if 0
 }
+#endif
+#endif
 
+typedef struct user_options
+{
+    double period;
+    int claw_version;
+    int is_registered;
 
+} user_options_t;
 
+#define MESH_SETPROB FCLAW_F77_FUNC(mesh_setprob, MESH_SETPROB)
+void MESH_SETPROB(double* tperiod);
 
+void mesh_link_solvers(fclaw2d_global_t *glob);
+
+void mesh_problem_setup(fclaw2d_global_t* glob);
+
+void mesh_patch_setup(fclaw2d_domain_t *domain,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx);
+
+const user_options_t* mesh_user_get_options(fclaw2d_global_t* glob);
+
+/* Mappings */
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
+
+#endif

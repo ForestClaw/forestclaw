@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static void* 
 fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 {
-    /* ---------------------- Time stepping control -------------------------- */
+    /* -------------------------- Time stepping control ------------------------------- */
 
     sc_options_add_double (opt, 0, "initial_dt", &fclaw_opt->initial_dt, 0.1,
                            "Initial time step size [0.1]");
@@ -53,6 +53,9 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     sc_options_add_double (opt, 0, "desired_cfl", &fclaw_opt->desired_cfl, 0.9,
                            "Maximum CFL allowed [0.9]");
+
+    sc_options_add_bool (opt, 0, "reduce-cfl", &fclaw_opt->reduce_cfl, 1,
+                           "Get maximum CFL over all processors [T]");
 
     sc_options_add_bool (opt, 0, "use_fixed_dt", &fclaw_opt->use_fixed_dt, 0,
                          "Use fixed coarse grid time step [F]");
@@ -85,31 +88,41 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "weighted_partition", &fclaw_opt->weighted_partition, 0,
                          "Weight grids when partitioning [F]");
 
-    /* ---------------------- Output options -------------------------- */
+    /* ------------------------------- Output options --------------------------------- */
 
     sc_options_add_bool (opt, 0, "output", &fclaw_opt->output, 0,
                             "Enable output [F]");
 
 
-    /* tikz output */
+    /* -------------------------------- tikz output ----------------------------------- */
     sc_options_add_bool (opt, 0, "tikz-out", &fclaw_opt->tikz_out, 0,
                          "Enable tikz output for gridlines [F]");
 
-    fclaw_options_add_double_array (opt, 0, "tikz-figsize", &fclaw_opt->tikz_figsize_string,
+    fclaw_options_add_double_array (opt, 0, "tikz-figsize", 
+                                    &fclaw_opt->tikz_figsize_string,
                                     "8 6",&fclaw_opt->tikz_figsize,2,
                                     "Figure size used by tikz (inches) [8,6]");
 
-    sc_options_add_string (opt, 0, "tikz-plot-prefix", &fclaw_opt->tikz_plot_prefix, "plot",
-                           "Figure prefix for plotting [plot_]");    
+    sc_options_add_string (opt, 0, "tikz-plot-prefix", 
+                           &fclaw_opt->tikz_plot_prefix, 
+                           "plot","Figure prefix for plotting [plot_]");    
 
 
-    sc_options_add_string (opt, 0, "tikz-plot-suffix", &fclaw_opt->tikz_plot_suffix, "png",
-                           "Figure suffix for plotting [png]");    
+    sc_options_add_string (opt, 0, "tikz-plot-suffix", 
+                           &fclaw_opt->tikz_plot_suffix, 
+                           "png","Figure suffix for plotting [png]");    
 
+    sc_options_add_bool (opt, 0, "tikz-mesh-only", 
+                         &fclaw_opt->tikz_mesh_only,1,
+                         "Plot mesh only  .tex file [1]");    
+
+    /* Deprecated */
     sc_options_add_bool (opt, 0, "tikz-plot-fig", &fclaw_opt->tikz_plot_fig,1,
                            "Include figure (png,jpg,etc) in .tex file [1]");    
 
 
+
+    /* --------------------------------- VTK output ----------------------------------- */
     /* This is a hack to control the VTK output while still in development.
      * The values are numbers which can be bitwise-or'd together.
      * 0 - no VTK output ever.
@@ -117,15 +130,18 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
      * 2 - output whenever amr_output() is called.
      */
 
+    /* Deprecated */
     sc_options_add_string (opt, 0, "prefix", &fclaw_opt->prefix, "fort",
                            "Output file prefix [fort]");
 
+    /* Deprecated */
     sc_options_add_double (opt, 0, "vtkspace", &fclaw_opt->vtkspace, 0.,
                            "VTK visual spacing [F]");
 
-    /* ---------------------- Regridding options -------------------------- */
+    /* ----------------------------- Regridding options ------------------------------- */
 
-    sc_options_add_bool (opt, 0, "init_ghostcell", &fclaw_opt->init_ghostcell, 0,
+    sc_options_add_bool (opt, 0, "init_ghostcell", 
+                         &fclaw_opt->init_ghostcell, 0,
                         "Initialize ghost cells [F]");
 
     sc_options_add_int (opt, 0, "minlevel", &fclaw_opt->minlevel, 0,
@@ -134,32 +150,38 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "maxlevel", &fclaw_opt->maxlevel, 0,
                         "Maximum refinement level[0]");
 
-    sc_options_add_int (opt, 0, "regrid_interval", &fclaw_opt->regrid_interval,
+    sc_options_add_int (opt, 0, "regrid_interval", 
+                        &fclaw_opt->regrid_interval,
                         1, "Regridding frequency [1]");
 
     sc_options_add_int (opt, 0, "refratio", &fclaw_opt->refratio,
                         2, "Refinement ratio [2]");
 
-    sc_options_add_bool (opt, 0, "smooth-refine", &fclaw_opt->smooth_refine,
+    sc_options_add_bool (opt, 0, "smooth-refine",
+                         &fclaw_opt->smooth_refine,
                          0, "Refinement smoothing[F]");
 
-    sc_options_add_int (opt, 0, "smooth-level", &fclaw_opt->smooth_refine_level,
+    sc_options_add_int (opt, 0, "smooth-level", 
+                        &fclaw_opt->smooth_refine_level,
                         0, "Lowest level for smooth-refine[0]");
 
-    sc_options_add_int (opt, 0, "coarsen-delay", &fclaw_opt->coarsen_delay,
+    sc_options_add_int (opt, 0, "coarsen-delay", 
+                        &fclaw_opt->coarsen_delay,
                         0, "Number skipped coarsenings[0]");
 
-    sc_options_add_double (opt, 0, "refine_threshold", &fclaw_opt->refine_threshold,
+    sc_options_add_double (opt, 0, "refine_threshold", 
+                           &fclaw_opt->refine_threshold,
                            0.5, "Refinement threshold [0.5]");
 
-    sc_options_add_double (opt, 0, "coarsen_threshold", &fclaw_opt->coarsen_threshold,
+    sc_options_add_double (opt, 0, "coarsen_threshold", 
+                           &fclaw_opt->coarsen_threshold,
                            0.1, "Coarsening threshold [0.1]");
 
-     /* ---------------------- Diagnostics -------------------------- */
+    /* ---------------------------------- Diagnostics --------------------------------- */
 
-   sc_options_add_bool (opt, 0, "run-user-diagnostics",
-                        &fclaw_opt->run_user_diagnostics,0,
-                        "Run user diagnostics [F]");
+    sc_options_add_bool (opt, 0, "run-user-diagnostics",
+                         &fclaw_opt->run_user_diagnostics,0,
+                         "Run user diagnostics [F]");
 
     sc_options_add_bool (opt, 0, "compute-error",
                          &fclaw_opt->compute_error,0,
@@ -173,19 +195,21 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                          &fclaw_opt->report_timing,1,
                          "Report timing results [T]");
 
-    /* ---------------------- Ghost packing options -------------------------- */
+    /* ---------------------------- Ghost packing options ----------------------------- */
 
-    sc_options_add_bool (opt, 0, "ghost_patch_pack_area", &fclaw_opt->ghost_patch_pack_area,1,
+    sc_options_add_bool (opt, 0, "ghost_patch_pack_area", 
+                         &fclaw_opt->ghost_patch_pack_area,1,
                          "Pack area for parallel comm. of ghost patches [T]");
 
-    sc_options_add_bool (opt, 0, "ghost_patch_pack_extra", &fclaw_opt->ghost_patch_pack_extra,
+    sc_options_add_bool (opt, 0, "ghost_patch_pack_extra", 
+                         &fclaw_opt->ghost_patch_pack_extra,
                         0, "Pack extra fields for parallel comm. of ghost patches [F]");
 
     sc_options_add_int (opt, 0, "ghost_patch_pack_numextrafields", 
                         &fclaw_opt->ghost_patch_pack_numextrafields,
                         0, "Number of extra fields to pack [0]");
 
-    /* ---------------------- Debugging -------------------------- */
+    /* ---------------------------------- Debugging ----------------------------------- */
 
     sc_options_add_bool (opt, 0, "trapfpe", &fclaw_opt->trapfpe,1,
                          "Trap floating point exceptions [T]");
@@ -194,7 +218,7 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                         "Start MPI debug session (for attaching processes in gdb) [F]");
 
 
-    /* ---------------------- Domain geometry options -------------------------- */
+    /* ---------------------------- Domain geometry options --------------------------- */
 
     sc_options_add_double (opt, 0, "ax", &fclaw_opt->ax, 0, "xlower " \
                            "(used only with manifold=0) [0]");
@@ -281,6 +305,12 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
                " tfinal/nout exactly.\n");
             return FCLAW_EXIT_ERROR;
         }
+    }
+    if (!fclaw_opt->reduce_cfl & !fclaw_opt->use_fixed_dt)
+    {
+        fclaw_global_essentialf("The CFL reduce can only be skipped if"
+                                " use_fixed_dt = True\n");
+        return FCLAW_EXIT_ERROR;
     }
 
     /* TODO: move these blocks to the beginning of forestclaw's control flow */

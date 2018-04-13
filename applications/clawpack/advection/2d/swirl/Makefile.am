@@ -29,7 +29,8 @@ applications_clawpack_advection_2d_swirl_swirl_CPPFLAGS = \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_advection_2d_swirl_swirl_LDADD = \
+        $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
-        $(LDADD)
+        $(FCLAW_LDADD)

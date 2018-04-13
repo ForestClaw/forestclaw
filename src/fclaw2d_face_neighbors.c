@@ -570,7 +570,6 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
 					   coarse grid. */
 				}
 			}
-
 		}
 	}
 }

@@ -526,13 +526,8 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
 	fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
 		   FCLAW2D_BOUNDARY_ALL;    
 
-#if (_OPENMP)
-	/* Multi-thread only in single processor case. */
-	patch_iterator = &fclaw2d_global_iterate_level_mthread;
-#else
+	/* OpenMP doesn't work very well for filling ghost cells */
 	patch_iterator = &fclaw2d_global_iterate_level;
-#endif
-
 
 	/* --------------------------------------------------------------
 		Send and receive ghost patches
@@ -850,7 +845,7 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
 						  int time_interp,
 						  fclaw2d_timer_names_t running)
 {
-
+    
 	int async = 0;
 	if (async == 0)
 	{

@@ -47,27 +47,27 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 									  int this_patch_idx,
 									  void *user)
 {
-	int refine_patch, maxlevel, level;
-	const fclaw_options_t* gparms;
+    int refine_patch, maxlevel, level;
+    const fclaw_options_t* fclaw_opt;
 
-	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
-	int domain_init = *((int*) g->user);
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    int domain_init = *((int*) g->user);
 
-	gparms = fclaw2d_get_options(g->glob);
+    fclaw_opt = fclaw2d_get_options(g->glob);
 
-	maxlevel = gparms->maxlevel;
-	level = this_patch->level;
+    maxlevel = fclaw_opt->maxlevel;
+    level = this_patch->level;
 
-	if (level < maxlevel)
-	{
-		refine_patch  =
-			fclaw2d_patch_tag4refinement(g->glob,this_patch,this_block_idx,
-										 this_patch_idx, domain_init);
-		if (refine_patch == 1)
-		{
-			fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
-		}
-	}
+    if (level < maxlevel)
+    {
+        refine_patch  =
+            fclaw2d_patch_tag4refinement(g->glob,this_patch,this_block_idx,
+                                         this_patch_idx, domain_init);
+        if (refine_patch == 1)
+        {
+            fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
+        }
+    }
 }
 
 /* Tag family for coarsening */
@@ -77,30 +77,30 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
 							  int blockno, int fine0_patchno,
 							  void *user)
 {
-	const fclaw_options_t* gparms;
-	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    const fclaw_options_t* fclaw_opt;
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
-	gparms = fclaw2d_get_options(g->glob);
+    fclaw_opt = fclaw2d_get_options(g->glob);
 
-	int minlevel = gparms->minlevel;
+    int minlevel = fclaw_opt->minlevel;
 
-	int level = fine_patches[0].level;
+    int level = fine_patches[0].level;
 
-	if (level > minlevel)
-	{
-		int family_coarsened = 1;
-		family_coarsened = fclaw2d_patch_tag4coarsening(g->glob,&fine_patches[0],
-														blockno, fine0_patchno);
-		if (family_coarsened == 1)
-		{
-			int igrid;
-			for (igrid = 0; igrid < NumSiblings; igrid++)
-			{
-				int fine_patchno = fine0_patchno + igrid;
-				fclaw2d_patch_mark_coarsen(domain,blockno, fine_patchno);
-			}
-		}
-	}
+    if (level > minlevel)
+    {
+        int family_coarsened = 1;
+        family_coarsened = fclaw2d_patch_tag4coarsening(g->glob,&fine_patches[0],
+                                                        blockno, fine0_patchno);
+        if (family_coarsened == 1)
+        {
+            int igrid;
+            for (igrid = 0; igrid < NumSiblings; igrid++)
+            {
+                int fine_patchno = fine0_patchno + igrid;
+                fclaw2d_patch_mark_coarsen(domain,blockno, fine_patchno);
+            }
+        }
+    }
 }
 
 

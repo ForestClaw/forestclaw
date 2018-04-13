@@ -26,10 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef NO_SOLVER_USER_H
 #define NO_SOLVER_USER_H
 
-#include "fclaw2d_clawpatch.h"
-#include "fclaw2d_forestclaw.h"
-
-#include <fc2d_clawpack46.h>
+#include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -43,40 +40,38 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    double alpha;
-
-    int claw_version;
-
+    int clawpatch_version;  /*  Determines data layout for patches */
     int is_registered;
 
 } user_options_t;
 
 
+/* ------- Options ------ */
+user_options_t* no_solver_options_register (fclaw_app_t * app,
+                                            const char *configfile);
 
-#define INITIALIZE FCLAW_F77_FUNC(initialize,INITIALIZE)
-void INITIALIZE(const int* mx, const int* my, const int* meqn,
-                const int* mbc,const int* blockno,
-                const double* xlower, const double* ylower,
-                const double* dx, const double* dy,
-                double *q);
+void no_solver_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
-void no_solver_linker(fclaw2d_domain_t* domain);
+const user_options_t* no_solver_get_options(fclaw2d_global_t* glob);
 
-void no_solver_patch_initialize(fclaw2d_domain_t *domain,
+/* ------- Link solvers ------ */
+void no_solver_patch_initialize(fclaw2d_global_t *glob,
                                 fclaw2d_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx);
 
-double no_solver_update(fclaw2d_domain_t *domain,
+
+double no_solver_update(fclaw2d_global_t *glob,
                         fclaw2d_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
                         double dt);
 
-const user_options_t* no_solver_user_get_options(fclaw2d_domain_t* domain);
+void no_solver_link_solvers(fclaw2d_global_t* global);
 
 
+/* ------- Mapping functions ------- */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
@@ -96,6 +91,15 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                        const double shift[],
                                                        const double rotate[],
                                                        const double alpha);
+
+
+#define INITIALIZE FCLAW_F77_FUNC(initialize,INITIALIZE)
+void INITIALIZE(const int* mx, const int* my, const int* meqn,
+                const int* mbc,const int* blockno,
+                const double* xlower, const double* ylower,
+                const double* dx, const double* dy,
+                double *q);
+
 
 
 

@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_PHYSICAL_BC_H
-#define FCLAW2D_PHYSICAL_BC_H
+#ifndef GEM3D_OUTPUT_MESH_H
+#define GEM3D_OUTPUT_MESH_H
 
 #ifdef __cplusplus
 extern "C"
@@ -35,45 +35,15 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_domain;
 struct fclaw2d_patch;
+struct fclaw2d_domain;
 
+void cb_gem3d_output_mesh (struct fclaw2d_domain * domain,
+                           struct fclaw2d_patch * this_patch,
+                           int this_block_idx, int this_patch_idx,
+                           void *user);
 
-typedef struct fclaw2d_physical_time_info
-{
-    double level_time;
-    double dt;
-    int time_interp;
-} fclaw2d_physical_time_info_t;
-
-
-void cb_fclaw2d_physical_set_bc(struct fclaw2d_domain *domain,
-                                struct fclaw2d_patch *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx,
-                                void *user);
-
-
-/* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_physical_get_bc(struct fclaw2d_global *glob,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             int *intersects_bdry);
-
-void fclaw2d_physical_set_bc(struct fclaw2d_global *glob,
-                             int level,
-                             double level_time,
-                             int time_interp);
-
-void fclaw2d_physical_bc_default(struct fclaw2d_global *glob,
-                                 struct fclaw2d_patch *this_patch,
-                                 int this_block_idx,
-                                 int this_patch_idx,
-                                 double t,
-                                 double dt,
-                                 int intersects_phys_bdry[],
-                                 int time_interp);
-
+void gem3d_output_mesh(struct fclaw2d_global* glob,int iframe);
 
 
 #ifdef __cplusplus
