@@ -34,7 +34,7 @@ include applications/clawpack/advection/2d/filament/Makefile.am
 #include applications/clawpack/advection/2d/torus/Makefile.am
 
 ## replicated domain (multi-block domain)
-#include applications/clawpack/advection/2d/replicated/Makefile.am
+include applications/clawpack/advection/2d/replicated/Makefile.am
 
 ## hemisphere
 #include applications/clawpack/advection/2d/hemisphere/Makefile.am
