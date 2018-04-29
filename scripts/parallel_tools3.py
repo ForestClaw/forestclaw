@@ -264,6 +264,559 @@ def compile_results(results_dir=None,results_file='results.out',
     resultsfile.close()
 
 
+# Read in an array of results that can be used for both weak
+# and strong scaling.
+def read_results_files(dir_list, subdir = None, results_in = None,
+                       results_file='results.out',execname=None):
+
+    import re
+
+    dirs = []
+    for d in dir_list:
+        dirs.append("run_%03d" % d)
+
+    read_input = not (results_in == None)
+
+    if read_input:
+        # Get data from results.in only
+        pattern = re.compile(results_in)
+        results_file = results_in
+    else:
+        if not execname == None:
+            pattern = re.compile("%s_[0-9]{5}\.o[0-9]*" % execname)
+        else:
+            pattern = re.compile(".*_[0-9]{5}\.o[0-9]*")
+
+    mx1 = []
+    procs1 = []
+    levels1 = []
+    t = []
+    for results_dir in dirs:
+        # Match file names like run_004
+        if subdir == None:
+            d = results_dir
+        else:
+            d = os.path.join(results_dir,subdir)
+
+
+        files = os.listdir(d)
+        for f in files:
+            if re.match(pattern,f):
+                # Load data file to read in (mx,levels) for this file
+                if subdir == None:
+                    rf = os.path.join(results_dir,results_file)
+                else:
+                    rf = os.path.join(results_dir,subdir,results_file)
+
+                if not os.path.exists(rf):
+                    print("File %s not found in %s" % (results_file,f))
+                    continue
+
+                data = np.loadtxt(rf)
+                if data.ndim == 1:
+                    # Needed in case we only have 1 row in results file.
+                    data = np.reshape(data,(-1,len(data)))
+
+                if read_input:
+                    procs1.extend(data[:,0])
+                    mx1.extend(data[:,1])
+                    levels1.extend(data[:,3])
+                else:
+                    procs1.extend(data[:,1])    # Must be updated if results file is changed
+                    mx1.extend(data[:,2])       # Check below
+                    levels1.extend(data[:,6])   # Check  below
+
+    t = zip(mx1,procs1,levels1)  # All possible combos
+
+    # Create array of all (procs/levels).  Not every combo will have data.
+    mx = sorted(list(set(mx1)))
+    procs = sorted(list(set([x[1] for x in t])))
+    levels = sorted(list(set([x[2] for x in t])))
+
+    jobs = dict.fromkeys(mx)
+    for m in mx:
+        jobs[m] = dict.fromkeys(procs)
+        for p in procs:
+            jobs[m][p] = dict.fromkeys(levels)
+
+
+    # Initialize dictionaries for all values
+    for results_dir in dirs:
+        rundir = int(results_dir.partition('_')[2])
+        if subdir == None:
+            d = results_dir
+        else:
+            d = os.path.join(results_dir,subdir)
+
+        files = os.listdir(d)
+        for f in files:
+            if re.match(pattern,f):
+
+                # Load data file to read in (mx,levels) for this file
+                if subdir == None:
+                    rf = os.path.join(results_dir,results_file)
+                else:
+                    rf = os.path.join(results_dir,subdir,results_file)
+
+                if not os.path.exists(rf):
+                    print("File %s not found in %s" % (results_file,f))
+                    continue
+
+                data = np.loadtxt(rf)
+
+                if data.ndim == 1:
+                    data = np.reshape(data,(-1,len(data)))
+
+                for row in data:
+                    if read_input:
+                        p = row[0]
+                        m = row[1]
+                        l = row[3]
+
+                        s = int(results_dir.partition('_')[2])
+
+                        job = {}
+                        job["rundir"]         = rundir
+                        job["procs"]          = row[0]
+                        job["mx"]             = row[1]
+                        job["minlevel"]       = row[2]
+                        job["maxlevel"]       = row[3]
+                        job["nout"]           = row[4]
+                        job["nstep"]          = row[5]
+                        job["dt"]             = row[6]
+                        job["tfinal"]         = row[7]
+                        job["effres"]         = row[8]
+                        job["grids_per_proc"] = row[9]
+                        job["walltime"]       = row[10]
+
+                    else:
+                        p = row[1]
+                        m = row[2]    # Index of mx in data array
+                        l = row[6]    # Index of maxlevel
+
+                        if len(row) < 32:
+                            print("read_results_file (parallel_tools.py)")
+                            print("Length of row from %s is incorrect" %(rf))
+                            print("It should be 32 instead of %d" % (len(row)))
+                            sys.exit()
+
+
+                        job = {}
+                        job["rundir"]          = rundir
+                        job["jobid"]           = row[0]
+                        job["procs"]           = row[1]
+                        job["mx"]              = row[2]   # Used above in computing m
+                        job["mi"]              = row[3]
+                        job["mj"]              = row[4]
+                        job["minlevel"]        = row[5]
+                        job["maxlevel"]        = row[6]   # Used above in computing l
+                        job["nout"]            = row[7]
+                        job["tfinal"]          = row[8]
+                        job["advance_steps"]   = row[9]
+                        job["grids_per_proc"]  = row[10]
+                        if job["grids_per_proc"] == 0:    # avoid log(0)
+                            job["grids_per_proc"] = 0.1
+
+                        job["local_boundary"]  = row[11]
+                        job["remote_boundary"] = row[12]
+                        job["interior"]        = row[13]
+                        job["init"]            = row[14]
+                        job["advance"]         = row[15]
+                        job["ghostfill"]       = row[16]
+                        job["regrid"]          = row[17]
+                        job["ghostpatch_comm"] = row[18]
+                        job["adapt_comm"]      = row[19]
+                        job["partition_comm"]  = row[20]
+                        job["cfl_comm"]        = row[21]
+                        job["walltime"]        = row[22]
+                        job["ghostfill_copy"]  = row[23]
+                        job["local"]           = row[24]
+                        job["comm"]            = row[25]
+                        job["partition"]       = row[26]
+                        job["ghostpatch_build"]= row[27]
+                        job["step1"]           = row[28]
+                        job["step2"]           = row[29]
+                        job["step3"]           = row[30]
+                        job["copy"]            = row[31]
+                        job["interp"]          = row[32]
+                        job["average"]         = row[33]
+                        job["local_ratio"]     = row[34]
+                        job["remote_ratio"]    = row[35]
+
+                    jobs[m][p][l] = job
+
+    return jobs
+
+
+def print_jobs(jobs,val2plot,fmt_int=False):
+
+    mx = sorted(jobs.keys())
+
+    int_list = ['jobid','procs','mx','minlevel','maxlevel','nout', 'advance_steps',
+                'rundir','mi','mj']
+
+    for m in mx:
+        procs = sorted(jobs[m].keys())
+        levels = []
+        for p in procs:
+            levels += jobs[m][p]
+
+        levels = np.array(sorted(set(levels))).astype(int)
+        data = np.empty((len(procs),len(levels)))
+
+        rundir_data = np.empty(levels.shape)
+
+        for i,p in enumerate(procs):
+            for j,l in enumerate(levels):
+                try:
+                    job = jobs[m][p][l]
+                except:
+                    data[i,j] = None
+                    continue
+
+                if job == None:
+                    # This (m,p,l) combo doesn't exist;  p
+                    data[i,j] = np.nan
+                    continue
+                else:
+                    rundir_data[j] = job["rundir"]
+
+                if isinstance(val2plot,str):
+                    try:
+                        d = job[val2plot]
+                    except:
+                        print("job[\"%s\"] not a valid variable" % (val2plot))
+                        pdb.set_trace()
+                        sys.exit()
+                else:
+                    import types
+                    if isinstance(val2plot,types.FunctionType):
+                        try:
+                            d,fmt_int = val2plot(job,mx=m,proc=p,level=l,all=jobs)
+                        except:
+                            print("print_jobs : Problem with function %s" % (val2plot.__name__))
+                            sys.exit()
+
+
+                try:
+                    data[i,j] = np.average(d)
+                except:
+                    print("job (mx=%d,proc=%d,level=%d) is empty" % (m,p,l))
+                    data[i,j] = np.nan
+
+        # Create an array that interleaves levels and rundirs so that
+        # we can print out both in the header, e.g.
+        # 2 (10)   3 (11)    4 (12)
+        header_data = zip(levels,rundir_data.astype(int))
+
+        # Header
+        print("")
+        print(val2plot)
+        linelen = 8 + 3 + 13*len(levels)
+        line = "-"*linelen
+        print(line)
+        mxstr = "mx = %d" % m
+
+        # header_format = "{mxstr:>8}" + "{sep:>3}" + "{:>12d}" * len(levels)
+        # print header_format.format(mxstr = mxstr, sep="|",*header_data)
+
+        s = '{mxstr:>8}'.format(mxstr=mxstr) + '{sep:>3}'.format(sep='|')
+        for t in header_data:
+            s = s +  '{level:>7d} ({rundir:3d})'.format(level=t[0],rundir=t[1])
+        print(s)
+        print(line)
+        # Format integer and float values separately
+        if (val2plot in int_list) or fmt_int:
+            row_format = "{:>8d}" + "{sep:>3}" + "{:>13.0f}"*len(levels)
+        else:
+            row_format = "{:>8d}" + "{sep:>3}" + "{:>13.2e}"*len(levels)
+        for p, d in zip(procs, data):
+            print(row_format.format(int(p), sep="|", *d))
+
+        print(line)
+
+
+def plot_results(jobs,start_point,val2plot='walltime',
+                 scaling='strong',scale_uniform=False,
+                 ideal_slope = True,efficiency=False,
+                 scatter=False,model='normal'):
+
+    import matplotlib.pyplot as plt
+    import matplotlib.ticker as ticker
+    from matplotlib.lines import Line2D
+
+    import seaborn.apionly as sns
+
+    ax = plt.gca()
+    # Or we can set the colormap explicitly.
+    cmap = sns.color_palette("Set1",10)
+    cm = [cmap[i] for i in [0,5,1,4,2,7,3]]
+    from cycler import cycler
+    ax.set_prop_cycle(cycler('color',cm))
+
+
+    markers = {}
+    markers["walltime"] = r'$\clubsuit$'
+    markers["advance"] = u's'
+    markers["ghostfill"] = u'h'
+    markers["regrid"] = u'v'
+    markers["ghostpatch_comm"] = u'^'
+    markers["advance_steps"] = u'o'
+    markers["cfl_comm"] = u'p'
+
+    # colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')*2
+
+    mx = sorted(jobs.keys())
+    ph = []
+    mb_data = []
+
+    # each start point generates a plot, either down a column (strong), across a
+    # diagonal (weak) or from back to front (block size comparison)
+    tlist = []
+    gpplist = []
+    ylist = []
+    proclist = []
+    for i,sp in enumerate(start_point):
+        m = sp[0]
+        p = sp[1]
+        l = sp[2]
+        try:
+            job = jobs[m][p][l]
+        except:
+            print("Job entry not found;  m = %d; p = %d; l = %d" % (m,p,l))            
+            import pdb
+            pdb.set_trace()
+            job = None
+
+
+        # "headers" for this mx table
+        procs = sorted(jobs[m].keys())
+        levels = sorted(jobs[m][p].keys())
+
+        if scaling  == 'weak':  # Work down/right across diagonal
+            mx_sub = [sp[0] for p in procs if p >= sp[1]]
+            procs_sub =  [p for p in procs if p >= sp[1]]
+            levels_sub = [l for l in levels if l >= sp[2]]
+
+        elif scaling == 'strong':  # Work down colum
+            # assume that mx is fixed
+            mx_sub = [sp[0] for p in procs if p >= sp[1]]
+            procs_sub = [p for p in procs if p >= sp[1]]
+            levels_sub = [sp[2] for p in procs if p >= sp[1]]
+
+        elif scaling == 'resolution':
+            # scaling as resolution is increased
+            levels_sub = [l for l in levels if l >= sp[2]]
+            mx_sub = [sp[0] for l in levels_sub]
+            procs_sub = [sp[1] for l in levels_sub]
+
+        t = zip(mx_sub,procs_sub,levels_sub)
+
+        # Internal plotting routine
+        phandle,mb,gpp1,y_avg1,procs1 = plot_results_internal(val2plot,t,
+                                                              jobs,scaling,markers,
+                                                              scale_uniform,efficiency,
+                                                              ideal_slope,
+                                                              scatter)
+
+        # phandle.set_color(colors[i])
+        plt.draw()
+        ph.append(phandle)
+        mb_data.append(mb)
+
+        tlist.extend(t)
+        gpplist.extend(gpp1)
+        ylist.extend(y_avg1)
+        proclist.extend(procs1)
+
+    # Set up axis
+    ax = plt.gca()
+    ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%d'))
+
+    A = None
+    B = None
+    alpha = None
+
+    if scatter:
+        plt.xscale('log')
+        plt.xlim([2**(-0.5),1e4])
+        xticks = ticker.MultipleLocator(base=10)
+        xticks = ticker.MaxNLocator(nbins=7)
+        ax.xaxis.set_minor_locator(xticks)
+
+        xformatter = ticker.FormatStrFormatter('%d')
+        ax.xaxis.set_major_formatter(xformatter)
+        ax.set_xlabel("Grids per processor",fontsize=16)
+
+        yformatter = ticker.FormatStrFormatter('%5.2e')
+        ax.yaxis.set_major_formatter(yformatter)
+        ax.set_ylabel("Cost per grid",fontsize=16)
+
+        if len(gpplist) > 1:
+            ranks_per_node = -1    # Set to -1 to get single curve through all data
+            gpp = np.array(gpplist)
+            y = np.array(ylist)
+            z = zip(gpp,y,proclist)
+            gpp      = np.array([x[0] for x in z if x[0] > 1]).astype(int)
+            y        = np.array([x[1] for x in z if x[0] > 1])
+            proclist = np.array([x[2] for x in z if x[0] > 1]).astype(int)
+
+            z = zip(gpp,y,proclist)
+            gpp1 = np.array([t[0] for t in z if t[2] <= ranks_per_node])
+            y1   = np.array([t[1] for t in z if t[2] <= ranks_per_node])
+
+            if len(gpp1) > 1:
+                xs = np.logspace(np.log10(np.min(gpp1)),np.log10(np.max(gpp1)),50)
+                ys,A,alpha,B = scatter_fit(gpp1,y1,xs,model)
+                plt.plot(xs,ys,'k--')
+
+            gpp2 = np.array([t[0] for t in z if t[2] > ranks_per_node])
+            y2   = np.array([t[1] for t in z if t[2] > ranks_per_node])
+            if len(gpp2) > 1:
+                xs = np.logspace(np.log10(np.min(gpp2)),np.log10(np.max(gpp2)),50)
+                ys,A,alpha,B = scatter_fit(gpp2,y2,xs,model)
+                plt.plot(xs,ys,'k-')
+
+            plt.draw()
+
+    else:
+        if scaling == 'resolution':
+            levels = list(set([x[2] for x in tlist]))
+            ax.xaxis.set_major_locator(plt.FixedLocator(levels))
+            ax.set_xlabel("Levels",fontsize=16)
+            l1 = np.min(levels)
+            l2 = np.max(levels)
+            plt.xlim([l1-0.5,l2+0.5])
+
+        else:
+            ax.xaxis.set_major_locator(plt.FixedLocator(procs))
+            ax.set_xlabel("Processor count",fontsize=16)
+            p1 = np.log(np.min(procs))/np.log(4)
+            p2 = np.log(np.max(procs))/np.log(4)
+            plt.xlim([4**(p1-0.5), 4**(p2+0.5)])
+
+        if efficiency:
+            ax.set_yscale('linear')
+            ax.set_yticks(range(0,110,10),minor=True)
+            plt.grid(b=True,which='major')
+            plt.grid(b=True,which='minor',axis='y')
+            # plt.minorticks_on()
+            plt.ylim([0,110])
+
+    plt.grid(b=True,which='minor',axis='y')
+    plt.grid(b=True,which='major',axis='x')
+    plt.setp(ax.get_xticklabels(),fontsize=14)
+    plt.setp(ax.get_yticklabels(),fontsize=14)
+
+    plt.draw()
+
+    return ph,mb,t,A,alpha,B
+
+
+def plot_results_internal(val2plot,t,jobs,scaling,markers,
+                          scale_uniform=False, efficiency=False,
+                          ideal_slope=None,scatter=False):
+
+    import matplotlib.pyplot as plt
+
+    if isinstance(val2plot,list):
+        print("Only one val2plot allowed per plot")
+        sys.exit()
+
+    v = val2plot
+
+    # mode = 'uniform'
+    ph = []
+    mx = sorted(jobs.keys())
+    y_avg = []
+    gpp = []
+
+    # First collect y values (which may need to be averaged)
+    for idx_tuple in t:
+
+        m = idx_tuple[0]
+        p = int(idx_tuple[1])
+        l = idx_tuple[2]
+        job = jobs[m][p][l]
+        if job == None:
+            y_avg = np.append(y_avg,np.nan)
+            gpp = np.append(gpp,np.nan)
+            continue
+
+        if isinstance(v,str):
+            try:
+                data = np.average(job[v])  # Average multiple runs
+            except:
+                print("job[\"%s\"] not a valid variable" % (val2plot))
+                sys.exit()
+        else:
+            try:
+                # Call function val2plot
+                val,_ = v(job,mx=m,proc=p,level=l,all=jobs)
+                data = np.average(val)
+            except:
+                print("plot_results_internal : Problem with function '%s'" % (val2plot.__name__))
+                sys.exit()
+
+        y_avg = np.append(y_avg,data)
+        gpp = np.append(gpp,job["grids_per_proc"])
+
+    if efficiency:
+        y_avg = 100*y_avg/y_avg[0]
+
+    # Plot ideal scaling
+    tp = zip([x[0] for x in t],
+             [x[1] for x in t],
+             [x[2] for x in t],y_avg,gpp)
+    mx      = [x[0] for x in tp if not np.isnan(x[3])]
+    procs1  = [x[1] for x in tp if not np.isnan(x[3])]
+    levels1 = [x[2] for x in tp if not np.isnan(x[3])]
+    y_avg1  = [x[3] for x in tp if not np.isnan(x[3])]
+    gpp1  = [x[4] for x in tp if not np.isnan(x[4])]
+
+    mb = None
+
+    if ideal_slope is not None:
+        try:
+            if ideal_slope == 0:
+                s = 'k--'
+            else:
+                s = 'k.--'
+
+            R = np.array([np.log(float(x))/np.log(4.0) for x in procs1])
+            if R[0] > 0:
+                R = R - R[0]
+            ideal = y_avg1[0]*2**(ideal_slope*R)
+            if scaling is not  'resolution':
+                plt.loglog(procs1,ideal,s,markersize=15)
+            else:
+                plt.semilogy(levels1,ideal,s,markersize=15)
+        except:
+            print("plot_results_internal: Could not plot ideal curve")
+
+    try:
+        mv = markers[v]
+    except:
+        mv = u'o'
+
+    if not scatter:
+        # Here is where we finally plot the data
+        if scaling in ['strong','weak']:
+            ph = plt.loglog(procs1,y_avg1,marker=mv,markersize=10)
+        elif scaling in ['resolution']:
+            ph = plt.semilogy(levels1,y_avg1,marker=mv,markersize=10)
+
+    else:
+        # Plot scatter of data
+        ph = plt.plot(gpp1,y_avg1,linestyle='',marker=mv,markersize=10,
+                      color='b')
+
+
+    return ph[0],mb,gpp1,y_avg1,procs1
+
+
+
+
 
 def write_ini_files(input_file='create_run.ini',problem='advection'):
     config = configparser.SafeConfigParser(allow_no_value=True)
@@ -887,9 +1440,23 @@ def write_ini_files(input_file='create_run.ini',problem='advection'):
         print("    %s" % procfile)
 
 
-def launch_jobs(N=1):
+def run_results(execname,run_dir,duplicate):
 
-    import subprocess
-    for i in range(N):
-        po = subprocess.call(['bash','jobs.sh'])
+    dirs = []
+    for d in run_dir:
+        dirs.append("run_%03d" % d)
+
+    cwd = os.getcwd()
+
+    for results_dir in dirs:
+        d = results_dir
+        os.chdir(d)
+        print("Compiling results in %s" % d)
+        compile_results(duplicate=duplicate)
+        os.chdir(cwd)
+
+
+
+
+
 
