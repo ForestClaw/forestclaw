@@ -23,7 +23,7 @@ libclawpack4_6_compiled_sources = \
 ## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_clawpack4.6/libclawpack4.6.la
 
-## Named variables that can be reference from other libraries/apps
+## Named variables that can be referenced from other libraries/apps
 FCLAW_CLAWPACK46_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_clawpack4.6 
 FCLAW_CLAWPACK46_LDADD    = @top_builddir@/src/solvers/fc2d_clawpack4.6/libclawpack4.6.la
 
