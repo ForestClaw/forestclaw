@@ -1,4 +1,4 @@
-import parallel_tools
+import parallel_tools3
 import numpy as np
 import sys
 
@@ -53,8 +53,8 @@ def fraction_regrid(job,mx=None,proc=None,level=None,all=None):
     r = job["regrid"]
     w = job["walltime"]
     if (r) == 0:
-        print "fraction_regrid : Zero regrid time"
-        print "mx = %d: proc : %d; level = %d" % (mx,proc,level)
+        print("fraction_regrid : Zero regrid time")
+        print("mx = %d: proc : %d; level = %d" % (mx,proc,level))
         sys.exit()
     v = (a+r+p)/w
 
@@ -294,7 +294,7 @@ def grids_per_advance_time(job,mx=None,proc=None,level=None,all=None):
 
 def cost_per_grid(job,mx=None,proc=None,level=None,all=None):
 
-    print "This function has been renamed ''time_per_grid''"
+    print("This function has been renamed ''time_per_grid''")
     sys.exit()
 
 

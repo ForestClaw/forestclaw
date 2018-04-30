@@ -92,7 +92,7 @@ def compile_results(results_dir=None,results_file='results.out',
     # resultsfile.write("# " + "-"*line_len)
     # resultsfile.write("\n")
 
-    resultsfile.write(header_str)
+    resultsfile.write("# " + header_str + "\n")
 
     # resultsfile.write("# " + "-"*line_len)
     resultsfile.write("\n")
@@ -545,7 +545,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
     import matplotlib.ticker as ticker
     from matplotlib.lines import Line2D
 
-    import seaborn.apionly as sns
+    import seaborn as sns
 
     ax = plt.gca()
     # Or we can set the colormap explicitly.
@@ -591,7 +591,12 @@ def plot_results(jobs,start_point,val2plot='walltime',
 
         # "headers" for this mx table
         procs = sorted(jobs[m].keys())
-        levels = sorted(jobs[m][p].keys())
+        # levels = sorted(jobs[m][p].keys())
+        levels = []
+        for p in procs:
+            levels += jobs[m][p]
+
+        levels = np.array(sorted(set(levels))).astype(int)
 
         if scaling  == 'weak':  # Work down/right across diagonal
             mx_sub = [sp[0] for p in procs if p >= sp[1]]
@@ -610,7 +615,7 @@ def plot_results(jobs,start_point,val2plot='walltime',
             mx_sub = [sp[0] for l in levels_sub]
             procs_sub = [sp[1] for l in levels_sub]
 
-        t = zip(mx_sub,procs_sub,levels_sub)
+        t = list(zip(mx_sub,procs_sub,levels_sub))
 
         # Internal plotting routine
         phandle,mb,gpp1,y_avg1,procs1 = plot_results_internal(val2plot,t,
@@ -765,9 +770,9 @@ def plot_results_internal(val2plot,t,jobs,scaling,markers,
         y_avg = 100*y_avg/y_avg[0]
 
     # Plot ideal scaling
-    tp = zip([x[0] for x in t],
+    tp = list(zip([x[0] for x in t],
              [x[1] for x in t],
-             [x[2] for x in t],y_avg,gpp)
+             [x[2] for x in t],y_avg,gpp))
     mx      = [x[0] for x in tp if not np.isnan(x[3])]
     procs1  = [x[1] for x in tp if not np.isnan(x[3])]
     levels1 = [x[2] for x in tp if not np.isnan(x[3])]
