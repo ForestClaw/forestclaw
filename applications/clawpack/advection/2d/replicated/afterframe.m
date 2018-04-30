@@ -4,8 +4,7 @@ setviews;
 global map isflat;
 
 brick = load('brick.dat');
-% axis([0 brick(1,1) 0 brick(1,2)])
-axis([0 2 0 2]);
+axis([0 brick(1,1) 0 brick(1,2)])
 caxis([0 1]);
 
 showpatchborders;

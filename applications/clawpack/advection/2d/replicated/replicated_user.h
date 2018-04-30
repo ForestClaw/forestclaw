@@ -41,6 +41,8 @@ typedef struct user_options
     int example;
     int claw_version;
     int replicate_factor;
+    int minlevel_base;
+    int maxlevel_base;
 
     int is_registered;
 } user_options_t;

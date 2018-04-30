@@ -49,12 +49,70 @@ replicated_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 4,
                         "[user] Clawpack version (4 or 5) [5]");
 
-    sc_options_add_int (opt, 0, "replicate-factor", &user_opt->replicate_factor, -1,
+    sc_options_add_int (opt, 0, "replicate-factor", &user_opt->replicate_factor, 1,
                         "[user] Replication factor [-1]");
+
+    sc_options_add_int (opt, 0, "minlevel-base", &user_opt->minlevel_base, 4,
+                        "[user] Block 1x1 minimum refinement [4]");
+
+    sc_options_add_int (opt, 0, "maxlevel-base", &user_opt->maxlevel_base, 7,
+                        "[user] Block 1x1 maximum refinement [7]");
 
 
     user_opt->is_registered = 1;
     return NULL;
+}
+
+static fclaw_exit_type_t 
+replicated_postprocess(user_options_t *user, fclaw_options_t *fclaw_opt)
+{
+
+    /* Check to make sure replicate factor is power of 2. 
+       We do it here, since options_check only happens after post-process. */
+    int pos = 0;    
+    while (user->replicate_factor != (1 << pos))
+    {
+        pos++;
+        if (pos > 32)
+        {
+            fclaw_global_essentialf("Replicated_postprocess : Replicate " \
+                                    "factor should be a low power of 2 (< 2**32)\n");
+            return FCLAW_EXIT_QUIET;
+        }
+    }
+
+    fclaw_opt->ax = 0;
+    fclaw_opt->ay = 0;
+    fclaw_opt->bx = user->replicate_factor;
+    fclaw_opt->by = user->replicate_factor;
+
+    fclaw_opt->minlevel = user->minlevel_base;
+    fclaw_opt->maxlevel = user->maxlevel_base;
+
+
+
+    if (user->example == 0)
+    {
+        /* 1x1 block;  use replicate factor to dimension domain */
+        fclaw_opt->mi = 1;
+        fclaw_opt->mj = 1;
+
+        /* We need to increase the refinement level when we increase domain size. 
+           Code below computes pos=log2(replicate_factor) */
+        fclaw_opt->minlevel += pos;
+        fclaw_opt->maxlevel += pos;
+    }
+    else
+    {
+        /* NxN block */
+        fclaw_opt->mi = user->replicate_factor;
+        fclaw_opt->mj = user->replicate_factor;
+    }
+
+    fclaw_opt->periodic_x = 1;
+    fclaw_opt->periodic_y = 1;
+    fclaw_opt->smooth_level = fclaw_opt->maxlevel-1;
+    return FCLAW_NOEXIT;
 }
 
 static void
@@ -80,6 +138,22 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     return replicated_register(user,opt);
 }
 
+static fclaw_exit_type_t
+options_postprocess(fclaw_app_t *app, void *package,void *registered)
+{
+    user_options_t           *user;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT(registered == NULL);
+
+    user = (user_options_t*) package;
+    fclaw_options_t *fclaw_opt = 
+                 (fclaw_options_t*) fclaw_app_get_attribute(app,"Options",NULL);
+
+    return replicated_postprocess(user, fclaw_opt);
+}
+
 
 static void
 options_destroy (fclaw_app_t * app, void *package, void *registered)
@@ -103,7 +177,7 @@ static const
 fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register,
-    NULL,
+    options_postprocess,
     NULL,
     options_destroy
 };
@@ -150,60 +224,12 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
+    int mi,mj,a,b;
+    mi = fclaw_opt->mi;
+    mj = fclaw_opt->mj;
+    a = fclaw_opt->periodic_x;
+    b = fclaw_opt->periodic_y;
 
-    fclaw_opt->ax = 0;
-    fclaw_opt->ay = 0;
-
-    /* Expand domain to get replicated behavior */
-    int mi,mj;
-    if (user_opt->example == 0)
-    {
-        if (user_opt->replicate_factor > 0)
-        {
-            mi = user_opt->replicate_factor;
-            mj = user_opt->replicate_factor;
-        }
-        else
-        {
-            mi = fclaw_opt->mi;
-            mj = fclaw_opt->mj;
-        }
-        fclaw_opt->bx = mi;
-        fclaw_opt->by = mj;
-    }
-    else
-    {
-        /* Single block */
-        if (user_opt->replicate_factor > 0)
-        {
-            fclaw_opt->bx = user_opt->replicate_factor;
-            fclaw_opt->by = user_opt->replicate_factor;
-        }
-        else
-        {
-            fclaw_opt->bx = fclaw_opt->mi;
-            fclaw_opt->by = fclaw_opt->mj;
-        }
-
-        mi = 1;
-        mj = 1;
-
-        /* We also need to adjust the min/max levels */
-        double ds = log(double(fclaw_opt->mi))/log(2.0);
-        fclaw_opt->minlevel += int(ds);
-        fclaw_opt->maxlevel += int(ds);
-    }
-
-    fclaw_opt->mi = mi;
-    fclaw_opt->mj = mj;
-
-    /* Set periodic domains.  */
-
-    int a,b;
-    a = 1;
-    b = 1;
-    fclaw_opt->periodic_x = a;
-    fclaw_opt->periodic_y = b;
 
     /* Duplicate initial conditions in each block */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
