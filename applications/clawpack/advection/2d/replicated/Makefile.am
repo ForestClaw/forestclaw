@@ -3,6 +3,7 @@ bin_PROGRAMS += applications/clawpack/advection/2d/replicated/replicated
 applications_clawpack_advection_2d_replicated_replicated_SOURCES = \
 	applications/clawpack/advection/2d/replicated/replicated.cpp \
 	applications/clawpack/advection/2d/replicated/replicated_user.h \
+    applications/clawpack/advection/2d/replicated/replicated_options.c \
 	applications/clawpack/advection/2d/replicated/replicated_user.cpp \
 	applications/clawpack/advection/2d/replicated/setprob.f \
 	applications/clawpack/advection/2d/replicated/psi.f \
