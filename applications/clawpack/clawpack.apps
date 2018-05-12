@@ -22,13 +22,13 @@ include applications/clawpack/advection/2d/swirl/Makefile.am
 include applications/clawpack/advection/2d/filament/Makefile.am
 
 ## annulus
-# include applications/clawpack/advection/2d/annulus/Makefile.am
+include applications/clawpack/advection/2d/annulus/Makefile.am
 
 ## latitude/longitude domain (periodic in one direction)
-# include applications/clawpack/advection/2d/latlong/Makefile.am
+include applications/clawpack/advection/2d/latlong/Makefile.am
 
 ## disk
-#include applications/clawpack/advection/2d/disk/Makefile.am
+include applications/clawpack/advection/2d/disk/Makefile.am
 
 ## torus and twisted torus (periodic in both directions)
 #include applications/clawpack/advection/2d/torus/Makefile.am
