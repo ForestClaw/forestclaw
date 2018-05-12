@@ -27,7 +27,7 @@ applications_clawpack_advection_2d_sphere_sphere_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
-        $(FCLAW_CLAWPATCH_CPPFLAGS
+        $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_advection_2d_sphere_sphere_LDADD = \
         $(LDADD) \
