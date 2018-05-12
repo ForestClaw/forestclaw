@@ -30,11 +30,11 @@ applications_clawpack_advection_2d_filament_filament_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-inifiles := \
+filament_inifiles = \
 	applications/clawpack/advection/2d/filament/fclaw_options.ini \
 	applications/clawpack/advection/2d/filament/regression.ini
 
-applications_clawpack_advection_2d_filament_filament_SOURCES += $(inifiles)
+applications_clawpack_advection_2d_filament_filament_SOURCES += $(filament_inifiles)
 
 
 applications_clawpack_advection_2d_filament_filament_CPPFLAGS = \

@@ -25,11 +25,11 @@ applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-inifiles := \
+hemisphere_inifiles = \
 	applications/clawpack/advection/2d/hemisphere/fclaw_options.ini \
 	applications/clawpack/advection/2d/hemisphere/regression.ini
 
-applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES += $(inifiles)
+applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES += $(hemisphere_inifiles)
 
 applications_clawpack_advection_2d_hemisphere_hemisphere_CPPFLAGS = \
         $(AM_CPPFLAGS) \

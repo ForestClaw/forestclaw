@@ -22,11 +22,11 @@ applications_clawpack_advection_2d_torus_torus_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-inifiles := \
+torus_inifiles = \
 	applications/clawpack/advection/2d/torus/fclaw_options.ini \
 	applications/clawpack/advection/2d/torus/regression.ini
 
-applications_clawpack_advection_2d_torus_torus_SOURCES += $(inifiles)
+applications_clawpack_advection_2d_torus_torus_SOURCES += $(torus_inifiles)
 
 applications_clawpack_advection_2d_torus_torus_CPPFLAGS = \
         $(AM_CPPFLAGS) \
