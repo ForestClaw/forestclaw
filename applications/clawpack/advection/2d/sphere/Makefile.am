@@ -2,8 +2,6 @@ bin_PROGRAMS += applications/clawpack/advection/2d/sphere/sphere
 
 
 applications_clawpack_advection_2d_sphere_sphere_SOURCES = \
-	applications/clawpack/advection/2d/sphere/fclaw_options.ini \
-	applications/clawpack/advection/2d/sphere/regression.ini \
 	applications/clawpack/advection/2d/sphere/sphere_user.cpp \
 	applications/clawpack/advection/2d/sphere/sphere_user.h \
 	applications/clawpack/advection/2d/sphere/sphere.cpp \
@@ -24,6 +22,12 @@ applications_clawpack_advection_2d_sphere_sphere_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
+
+inifiles := \
+	applications/clawpack/advection/2d/sphere/fclaw_options.ini \
+	applications/clawpack/advection/2d/sphere/regression.ini
+
+applications_clawpack_advection_2d_sphere_sphere_SOURCES += $(inifiles)
 
 applications_clawpack_advection_2d_sphere_sphere_CPPFLAGS = \
         $(AM_CPPFLAGS) \

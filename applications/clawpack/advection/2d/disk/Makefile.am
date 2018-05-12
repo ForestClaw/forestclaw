@@ -4,8 +4,6 @@ bin_PROGRAMS += applications/clawpack/advection/2d/disk/disk
 
 
 applications_clawpack_advection_2d_disk_disk_SOURCES = \
-	applications/clawpack/advection/2d/disk/fclaw_options.ini \
-	applications/clawpack/advection/2d/disk/regression.ini \
 	applications/clawpack/advection/2d/disk/disk_user.cpp \
 	applications/clawpack/advection/2d/disk/disk_user.h \
 	applications/clawpack/advection/2d/disk/disk.cpp \
@@ -26,6 +24,13 @@ applications_clawpack_advection_2d_disk_disk_SOURCES = \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
+
+inifiles := \
+	applications/clawpack/advection/2d/disk/fclaw_options.ini \
+	applications/clawpack/advection/2d/disk/regression.ini
+
+applications_clawpack_advection_2d_disk_disk_SOURCES += $(inifiles)
+
 
 
 applications_clawpack_advection_2d_disk_disk_CPPFLAGS = -I../all/ \

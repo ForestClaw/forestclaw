@@ -3,8 +3,6 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/swirl_cons/swirlcons
 
 applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
-	applications/clawpack/advection/2d/swirl_cons/fclaw_options.ini \
-	applications/clawpack/advection/2d/swirl_cons/regression.ini \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons_user.cpp \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons_user.h \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons.cpp \
@@ -16,6 +14,12 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_ec.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_fw.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpt2cons.f
+
+inifiles := \
+	applications/clawpack/advection/2d/swirl_cons/fclaw_options.ini
+
+applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES += $(inifiles)
+
 
 applications_clawpack_advection_2d_swirl_cons_swirlcons_CPPFLAGS = \
         $(AM_CPPFLAGS) \

@@ -3,8 +3,6 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/swirl/swirl
 
 applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
-	applications/clawpack/advection/2d/swirl/fclaw_options.ini \
-	applications/clawpack/advection/2d/swirl/regression.ini \
 	applications/clawpack/advection/2d/swirl/swirl_user.cpp \
 	applications/clawpack/advection/2d/swirl/swirl_user.h \
 	applications/clawpack/advection/2d/swirl/swirl.cpp \
@@ -21,6 +19,13 @@ applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/user_4.6/b4step2.f \
 	applications/clawpack/advection/2d/swirl/user_5.0/qinit.f90 \
 	applications/clawpack/advection/2d/swirl/user_5.0/b4step2.f90
+
+inifiles :=	\
+	applications/clawpack/advection/2d/swirl/fclaw_options.ini \
+	applications/clawpack/advection/2d/swirl/regression.ini 
+
+applications_clawpack_advection_2d_swirl_swirl_SOURCES += $(inifiles)
+
 
 ## Include headers and libraries needed to build this application
 ##  -- Only really need AM_CPPFLAGS and LDADD (since these include all the other 

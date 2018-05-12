@@ -1,8 +1,7 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/replicated/replicated
 
 applications_clawpack_advection_2d_replicated_replicated_SOURCES = \
-	applications/clawpack/advection/2d/replicated/fclaw_options.ini \
-	applications/clawpack/advection/2d/replicated/regression.ini \
+	applications/clawpack/advection/2d/replicated/replicated.cpp \
 	applications/clawpack/advection/2d/replicated/replicated_user.h \
     applications/clawpack/advection/2d/replicated/replicated_options.c \
 	applications/clawpack/advection/2d/replicated/replicated_user.cpp \
@@ -19,7 +18,12 @@ applications_clawpack_advection_2d_replicated_replicated_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/all/clawpack5_setaux.f90
 
+inifiles := \
+	applications/clawpack/advection/2d/replicated/fclaw_options.ini \
+	applications/clawpack/advection/2d/replicated/regression.ini
 
+# Is there a better way to do this? 
+applications_clawpack_advection_2d_replicated_replicated_SOURCES += $(inifiles)
 
 applications_clawpack_advection_2d_replicated_replicated_CPPFLAGS = \
         $(AM_CPPFLAGS)  \

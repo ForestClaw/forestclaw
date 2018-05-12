@@ -1,8 +1,6 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/torus/torus
 
 applications_clawpack_advection_2d_torus_torus_SOURCES = \
-	applications/clawpack/advection/2d/torus/fclaw_options.ini \
-	applications/clawpack/advection/2d/torus/regression.ini \
 	applications/clawpack/advection/2d/torus/torus.cpp \
 	applications/clawpack/advection/2d/torus/torus_user.h \
 	applications/clawpack/advection/2d/torus/torus_user.cpp \
@@ -23,6 +21,12 @@ applications_clawpack_advection_2d_torus_torus_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
+
+inifiles := \
+	applications/clawpack/advection/2d/torus/fclaw_options.ini \
+	applications/clawpack/advection/2d/torus/regression.ini
+
+applications_clawpack_advection_2d_torus_torus_SOURCES += $(inifiles)
 
 applications_clawpack_advection_2d_torus_torus_CPPFLAGS = \
         $(AM_CPPFLAGS) \

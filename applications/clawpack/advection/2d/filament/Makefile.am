@@ -3,8 +3,6 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/filament/filament
 
 applications_clawpack_advection_2d_filament_filament_SOURCES = \
-	applications/clawpack/advection/2d/filament/fclaw_options.ini \
-	applications/clawpack/advection/2d/filament/regression.ini \
 	applications/clawpack/advection/2d/filament/filament_user.cpp \
 	applications/clawpack/advection/2d/filament/filament_user.h \
 	applications/clawpack/advection/2d/filament/filament.cpp \
@@ -31,6 +29,13 @@ applications_clawpack_advection_2d_filament_filament_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
+
+inifiles := \
+	applications/clawpack/advection/2d/filament/fclaw_options.ini \
+	applications/clawpack/advection/2d/filament/regression.ini
+
+applications_clawpack_advection_2d_filament_filament_SOURCES += $(inifiles)
+
 
 applications_clawpack_advection_2d_filament_filament_CPPFLAGS = \
         $(AM_CPPFLAGS) \
