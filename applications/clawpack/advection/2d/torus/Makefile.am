@@ -1,6 +1,8 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/torus/torus
 
 applications_clawpack_advection_2d_torus_torus_SOURCES = \
+	applications/clawpack/advection/2d/torus/fclaw_options.ini \
+	applications/clawpack/advection/2d/torus/regression.ini \
 	applications/clawpack/advection/2d/torus/torus.cpp \
 	applications/clawpack/advection/2d/torus/torus_user.h \
 	applications/clawpack/advection/2d/torus/torus_user.cpp \

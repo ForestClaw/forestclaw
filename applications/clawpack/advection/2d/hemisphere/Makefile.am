@@ -4,6 +4,8 @@ bin_PROGRAMS += applications/clawpack/advection/2d/hemisphere/hemisphere
 
 
 applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES = \
+	applications/clawpack/advection/2d/hemisphere/fclaw_options.ini \
+	applications/clawpack/advection/2d/hemisphere/regression.ini \
 	applications/clawpack/advection/2d/hemisphere/hemisphere_user.cpp \
 	applications/clawpack/advection/2d/hemisphere/hemisphere_user.h \
 	applications/clawpack/advection/2d/hemisphere/hemisphere.cpp \

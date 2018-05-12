@@ -2,6 +2,8 @@ bin_PROGRAMS += applications/clawpack/advection/2d/latlong/latlong
 
 
 applications_clawpack_advection_2d_latlong_latlong_SOURCES = \
+	applications/clawpack/advection/2d/latlong/fclaw_options.ini \
+	applications/clawpack/advection/2d/latlong/regression.ini \
 	applications/clawpack/advection/2d/latlong/latlong.cpp \
 	applications/clawpack/advection/2d/latlong/latlong_user.h \
 	applications/clawpack/advection/2d/latlong/latlong_user.cpp \

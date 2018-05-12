@@ -2,6 +2,8 @@ bin_PROGRAMS += applications/clawpack/advection/2d/sphere/sphere
 
 
 applications_clawpack_advection_2d_sphere_sphere_SOURCES = \
+	applications/clawpack/advection/2d/sphere/fclaw_options.ini \
+	applications/clawpack/advection/2d/sphere/regression.ini \
 	applications/clawpack/advection/2d/sphere/sphere_user.cpp \
 	applications/clawpack/advection/2d/sphere/sphere_user.h \
 	applications/clawpack/advection/2d/sphere/sphere.cpp \

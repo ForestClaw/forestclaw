@@ -2,6 +2,8 @@ bin_PROGRAMS += applications/clawpack/advection/2d/annulus/annulus
 
 
 applications_clawpack_advection_2d_annulus_annulus_SOURCES = \
+	applications/clawpack/advection/2d/annulus/fclaw_options.ini \
+	applications/clawpack/advection/2d/annulus/regression.ini \
 	applications/clawpack/advection/2d/annulus/annulus.cpp \
 	applications/clawpack/advection/2d/annulus/annulus_user.h \
 	applications/clawpack/advection/2d/annulus/annulus_user.cpp \

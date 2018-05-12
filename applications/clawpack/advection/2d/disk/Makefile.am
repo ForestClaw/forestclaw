@@ -4,6 +4,8 @@ bin_PROGRAMS += applications/clawpack/advection/2d/disk/disk
 
 
 applications_clawpack_advection_2d_disk_disk_SOURCES = \
+	applications/clawpack/advection/2d/disk/fclaw_options.ini \
+	applications/clawpack/advection/2d/disk/regression.ini \
 	applications/clawpack/advection/2d/disk/disk_user.cpp \
 	applications/clawpack/advection/2d/disk/disk_user.h \
 	applications/clawpack/advection/2d/disk/disk.cpp \

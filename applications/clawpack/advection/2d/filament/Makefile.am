@@ -3,6 +3,8 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/filament/filament
 
 applications_clawpack_advection_2d_filament_filament_SOURCES = \
+	applications/clawpack/advection/2d/filament/fclaw_options.ini \
+	applications/clawpack/advection/2d/filament/regression.ini \
 	applications/clawpack/advection/2d/filament/filament_user.cpp \
 	applications/clawpack/advection/2d/filament/filament_user.h \
 	applications/clawpack/advection/2d/filament/filament.cpp \
