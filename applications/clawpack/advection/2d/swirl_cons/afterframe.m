@@ -37,7 +37,7 @@ else
             ca = [0 16];    
         case 3
             ca = [0,1.5];
-            ca = 1e-15*[-1,1];
+%             ca = 1e-15*[-1,1];
     end    
     colormap(parula);
     colorbar;

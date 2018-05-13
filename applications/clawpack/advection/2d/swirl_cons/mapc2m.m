@@ -1,8 +1,8 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-% map = 'nomap';
-map = 'cart';   % brick
-map = 'fivepatch';
+map = 'nomap';
+% map = 'cart';   % brick
+% map = 'fivepatch';
 
 % This domain should be in [0,2],[0,2]
 

@@ -41,8 +41,10 @@ c           # coordinates of lower left corner of grid cell:
       s = sqrt(2.d0)
       if (example .eq. 0) then
 c        # Conservative for all solvers (rp=1,2,3,4)              
-         u = cos(2*pi*xc) + 2
-         v = cos(2*pi*yc) + 2
+c         u = cos(2*pi*xc) + 2
+c         v = cos(2*pi*yc) + 2
+         u = 1
+         v = 1
       elseif (example .eq. 1) then
 c        # Conservative for all solvers (rp=1,2,3,4)               
          u = s*(cos(pi*xc)**2 + 0.5d0)
