@@ -293,7 +293,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 
 				int time_interp = 1;
 
-				/* Do Conservative fix up here */
+				/* Do conservative fix up here */
 				fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
 				fclaw2d_ghost_update(glob,
 									 time_interp_level+1,

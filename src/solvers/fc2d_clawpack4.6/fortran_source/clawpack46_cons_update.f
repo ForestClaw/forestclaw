@@ -12,15 +12,16 @@ c    # ----------------------------------------------------------------
 
 c    # -----------------------------------------------------------------
 c    # Called BEFORE step update.  This stores the value of the flux
-c    # function at cell centers.  At k=0, the flux evaluted in the 
-c    # ghost cell is stored;  at k=1, the flux at the the first interior
+c    # function at cell centers.  At k=1, the flux evaluated in the 
+c    # ghost cell is stored;  at k=0, the flux at the the first interior
 c    # cell is stored;  If there is no flux function, we should set up a 
 c    # dummy function that returns zero.
+c    # 
+c    # These will be stored for each grid and used to compute
+c    # corrections.
 c    # -----------------------------------------------------------------
       subroutine clawpack46_update_cons_store_flux(mx,my,mbc,meqn,
-     &      maux, dt,
-     &      el0, el1, el2, el3,
-     &      q, aux,
+     &      maux, dt,el0, el1, el2, el3,q, aux,
      &      flux0,flux1,flux2,flux3,
      &      rpn2_cons,qvec,auxvec,flux)
 
@@ -33,8 +34,8 @@ c    # -----------------------------------------------------------------
 
       double precision flux0(my,meqn,0:1)
       double precision flux1(my,meqn,0:1)
-      double precision flux2(my,meqn,0:1)
-      double precision flux3(my,meqn,0:1)
+      double precision flux2(mx,meqn,0:1)
+      double precision flux3(mx,meqn,0:1)
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
@@ -250,11 +251,12 @@ c    # fine grid correction for the coarse grid.
             jj2 = 2*(j-1) + 2
             deltam = fmfine0(jj1,mq) + fmfine0(jj2,mq) +
      &               eff0(jj1,mq,1) + eff0(jj2,mq,1)
+     
             deltap = fpfine1(jj1,mq) + fpfine1(jj2,mq) +
      &               eff1(jj1,mq,1) + eff1(jj2,mq,1)
 
 c           # Put the same value in four ghost cells;  grab the first
-c           # one that shows up in the tranformation.          
+c           # one that shows up in the transformation.          
             do jj = jj1,jj2
                do ii = 1,mbc
                   qfine_dummy(1-ii,jj,mq) = -deltam
