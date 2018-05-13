@@ -4,7 +4,6 @@ bin_PROGRAMS += applications/clawpack/acoustics/2d/radial/radial
 
 applications_clawpack_acoustics_2d_radial_radial_SOURCES = \
 	applications/clawpack/acoustics/2d/radial/radial_user.cpp \
-	applications/clawpack/acoustics/2d/radial/radial_user.h \
 	applications/clawpack/acoustics/2d/radial/radial.cpp \
 	applications/clawpack/acoustics/2d/radial/fclaw2d_map_pillowdisk5.c \
 	applications/clawpack/acoustics/2d/radial/setprob.f \
@@ -21,12 +20,26 @@ applications_clawpack_acoustics_2d_radial_radial_SOURCES = \
 	applications/clawpack/acoustics/2d/rp/rpn2_acoustics_mapped.f90 \
 	applications/clawpack/acoustics/2d/rp/rpt2_acoustics_mapped.f90
 
+radial_headers = \
+	applications/clawpack/acoustics/2d/radial/radial_user.h
+
+radial_inifiles = \
+	applications/clawpack/acoustics/2d/radial/fclaw_options.ini \
+	applications/clawpack/acoustics/2d/radial/regression.ini
+
+applications_clawpack_acoustics_2d_radial_radial_SOURCES += \
+	$(radial_headers) \
+	$(radial_inifiles)
 
 applications_clawpack_acoustics_2d_radial_radial_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+        $(AM_CPPFLAGS) \
+        $(FCLAW_CLAWPACK46_CPPFLAGS) \
+        $(FCLAW_CLAWPACK5_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_acoustics_2d_radial_radial_LDADD = \
+        $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
-        $(LDADD)
+        $(FCLAW_LDADD)

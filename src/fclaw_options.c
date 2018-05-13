@@ -162,7 +162,7 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                          0, "Refinement smoothing[F]");
 
     sc_options_add_int (opt, 0, "smooth-level", 
-                        &fclaw_opt->smooth_refine_level,
+                        &fclaw_opt->smooth_level,
                         0, "Lowest level for smooth-refine[0]");
 
     sc_options_add_int (opt, 0, "coarsen-delay", 

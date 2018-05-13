@@ -25,12 +25,23 @@ applications_clawpack_advection_2d_disk_disk_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
+disk_inifiles = \
+	applications/clawpack/advection/2d/disk/fclaw_options.ini \
+	applications/clawpack/advection/2d/disk/regression.ini
+
+applications_clawpack_advection_2d_disk_disk_SOURCES += $(disk_inifiles)
+
+
 
 applications_clawpack_advection_2d_disk_disk_CPPFLAGS = -I../all/ \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+        $(AM_CPPFLAGS) \
+        $(FCLAW_CLAWPACK46_CPPFLAGS) \
+        $(FCLAW_CLAWPACK5_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_advection_2d_disk_disk_LDADD = \
+        $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD)  \
         $(FCLAW_CLAWPACK5_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
-        $(LDADD)
+        $(FCLAW_LDADD)

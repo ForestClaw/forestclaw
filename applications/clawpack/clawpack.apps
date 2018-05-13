@@ -17,32 +17,34 @@
 ## Scalar advection 
 ## ----------------
 
-## flat, square domain
+## swirl  (single block, square)
 include applications/clawpack/advection/2d/swirl/Makefile.am
+
+## filament  (square, multi-block disk)
 include applications/clawpack/advection/2d/filament/Makefile.am
 
-## annulus
+## annulus  (manifold, periodic in one direction)
 include applications/clawpack/advection/2d/annulus/Makefile.am
 
-## latitude/longitude domain (periodic in one direction)
+## latlong (manifold, periodic in one direction)
 include applications/clawpack/advection/2d/latlong/Makefile.am
 
-## disk
+## disk  (manifold, multi-block)
 include applications/clawpack/advection/2d/disk/Makefile.am
 
-## torus and twisted torus (periodic in both directions)
+## torus  (manifold, periodic in both directions)
 include applications/clawpack/advection/2d/torus/Makefile.am
 
-## replicated domain (multi-block domain)
+## replicated (square, multi-block)
 include applications/clawpack/advection/2d/replicated/Makefile.am
 
-## hemisphere
+## hemisphere (manifold, multi-block)
 include applications/clawpack/advection/2d/hemisphere/Makefile.am
 
 ## sphere (cubed-sphere and pillow-disk)
 include applications/clawpack/advection/2d/sphere/Makefile.am
 
-## Advection in conservative  form (unit square)
+## swirl_cons (square)
 include applications/clawpack/advection/2d/swirl_cons/Makefile.am
 
 ## ----------------------------------------------------------
@@ -79,7 +81,12 @@ include applications/clawpack/transport/gaussian/Makefile.am
 include applications/clawpack/transport/slotted_disk/Makefile.am
 include applications/clawpack/transport/correlatedcb/Makefile.am#
 
-## Example : avoid using the 'app' for configuring options
-include applications/clawpack/advection/2d/torthem/Makefile.am
+
+## ---------------------Transport on the sphere ---------------------------- 
+## Example : Don't using the 'app' for configuring options;  
+##           This is how you might call ForestClaw from another
+##           program.
+## -------------------------------------------------------------------------
+#include applications/clawpack/advection/2d/torthem/Makefile.am
 
 

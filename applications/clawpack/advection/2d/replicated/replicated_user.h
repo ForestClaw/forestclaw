@@ -41,6 +41,8 @@ typedef struct user_options
     int example;
     int claw_version;
     int replicate_factor;
+    int minlevel_base;
+    int maxlevel_base;
 
     int is_registered;
 } user_options_t;
@@ -54,9 +56,15 @@ void REPLICATED_SETPROB(int* example);
 
 void replicated_link_solvers(fclaw2d_global_t *glob);
 
-const user_options_t* replicated_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+/* Options handling */
+user_options_t* replicated_options_register (fclaw_app_t * app,
+                                             const char *configfile);
+
+void replicated_options_store (fclaw2d_global_t* glob, user_options_t* user);
+const user_options_t* replicated_get_options(fclaw2d_global_t* glob);
 
 
 #ifdef __cplusplus

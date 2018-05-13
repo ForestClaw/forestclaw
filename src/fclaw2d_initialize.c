@@ -270,7 +270,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
     /* set specific refinement strategy */
     fclaw2d_domain_set_refinement
-        (*domain, fclaw_opt->smooth_refine, fclaw_opt->smooth_refine_level,
+        (*domain, fclaw_opt->smooth_refine, fclaw_opt->smooth_level,
          fclaw_opt->coarsen_delay);
 
 

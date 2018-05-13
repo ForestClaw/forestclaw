@@ -18,11 +18,22 @@ applications_clawpack_advection_2d_latlong_latlong_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
+latlong_inifiles = \
+	applications/clawpack/advection/2d/latlong/fclaw_options.ini \
+	applications/clawpack/advection/2d/latlong/regression.ini
+
+applications_clawpack_advection_2d_latlong_latlong_SOURCES += $(latlong_inifiles)
+
 applications_clawpack_advection_2d_latlong_latlong_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+	$(AM_CPPFLAGS) \
+	$(FCLAW_CLAWPACK46_CPPFLAGS) \
+	$(FCLAW_CLAWPACK5_CPPFLAGS) \
+	$(FCLAW_CLAWPATCH_CPPFLAGS)
+
 
 applications_clawpack_advection_2d_latlong_latlong_LDADD = \
+        $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD)  \
         $(FCLAW_CLAWPATCH_LDADD)  \
-        $(LDADD)
+        $(FCLAW_LDADD)

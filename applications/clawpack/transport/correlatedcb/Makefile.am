@@ -2,8 +2,6 @@
 
 bin_PROGRAMS += applications/clawpack/transport/correlatedcb/correlatedcb
 
-include_HEADERS += applications/clawpack/transport/correlatedcb/correlatedcb_user.h
-
 applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/correlatedcb/correlatedcb_user.cpp \
 	applications/clawpack/transport/correlatedcb/correlatedcb.cpp \
@@ -19,9 +17,7 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/correlatedcb/user_5.0/tag4coarsening.f \
 	applications/clawpack/transport/all/velocity_wind.f \
 	applications/clawpack/transport/all/gaussian.f \
-	applications/clawpack/transport/all/transport_user.h \
 	applications/clawpack/transport/all/transport_user.cpp \
-	applications/clawpack/transport/all/transport_options.h \
 	applications/clawpack/transport/all/transport_domain.c \
 	applications/clawpack/transport/all/transport_options.c \
 	applications/clawpack/transport/all/user46_b4step2_manifold.f \
@@ -33,17 +29,29 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
+correlatedcb_headers = \
+	applications/clawpack/advection/2d/all/advection_user_fort.h \
+	applications/clawpack/transport/correlatedcb/correlatedcb_user.h \
+	applications/clawpack/transport/all/transport_user.h \
+	applications/clawpack/transport/all/transport_options.h
 
-CORRELATEDCB_CPPFLAGS = -I@top_srcdir@/applications/clawpack/transport/all
+correlatedcb_inifiles = \
+	applications/clawpack/transport/correlatedcb/fclaw_options.ini \
+	applications/clawpack/transport/correlatedcb/regression.ini 
+
+applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES += \
+	$(correlatedcb_inifiles) \
+	$(correlatedcb_headers)
 
 applications_clawpack_transport_correlatedcb_correlatedcb_CPPFLAGS = \
-		$(CORRELATEDCB_CPPFLAGS) \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
-        $(FCLAW_CLAWPACK5_CPPFLAGS)
+        $(FCLAW_CLAWPACK5_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_transport_correlatedcb_correlatedcb_LDADD = \
-        $(FCLAW_CLAWPACK46_LDADD) \
+	    $(LDADD) \
+	    $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
-        $(FCLAW_CLAWPATCH_LDADD) \
-	    $(LDADD) 
+        $(FCLAW_CLAWPATCH_LDADD)  \
+        $(FCLAW_LDADD)

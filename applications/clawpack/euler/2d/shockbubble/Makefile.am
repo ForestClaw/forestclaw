@@ -5,7 +5,6 @@ bin_PROGRAMS += applications/clawpack/euler/2d/shockbubble/shockbubble
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/shockbubble.cpp \
-	applications/clawpack/euler/2d/shockbubble/shockbubble_user.h \
 	applications/clawpack/euler/2d/shockbubble/shockbubble_user.cpp \
 	applications/clawpack/euler/2d/shockbubble/fdisc.f \
 	applications/clawpack/euler/2d/shockbubble/setprob.f \
@@ -21,7 +20,6 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/src2.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4coarsening.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4refinement.f90 \
-	applications/clawpack/euler/2d/rp/euler_user_fort.h \
 	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler4.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpt2_euler4.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler5.f \
@@ -31,16 +29,30 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/rp/clawpack5_rpn2_euler5.f90 \
 	applications/clawpack/euler/2d/rp/clawpack5_rpt2_euler5.f90
 
-SHOCKBUBBLE_CPPFLAGS = -I@top_srcdir@/applications/clawpack/euler/2d/rp
+# These files will be installed locally
+shockbubble_headers = \
+	applications/clawpack/euler/2d/shockbubble/shockbubble_user.h \
+	applications/clawpack/euler/2d/rp/euler_user_fort.h
+
+shockbubble_inifiles = \
+	applications/clawpack/euler/2d/shockbubble/fclaw_options.ini \
+	applications/clawpack/euler/2d/shockbubble/regression.ini
+
+applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES += \
+	$(shockbubble_headers) \
+	$(shockbubble_inifiles)
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_CPPFLAGS = \
-        $(SHOCKBUBBLE_CPPFLAGS) \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
-        $(FCLAW_CLAWPACK5_CPPFLAGS)
+        $(FCLAW_CLAWPACK5_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_LDADD = \
+        $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
-        $(LDADD)
+        $(FCLAW_LDADD)
+
+
