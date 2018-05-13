@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "transport_user.h"
+#include "transport_options.h"
 
 #include <fclaw2d_include_all.h>
 
@@ -33,9 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-#include <transport_options.h>
 
-#include <transport_user.h>
 
 static
 void transport_patch_setup(fclaw2d_global_t *glob,

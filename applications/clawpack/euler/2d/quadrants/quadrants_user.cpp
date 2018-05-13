@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-#include <euler_user_fort.h>
+#include "../rp/euler_user_fort.h"
 
 void quadrants_link_solvers(fclaw2d_global_t *glob)
 {

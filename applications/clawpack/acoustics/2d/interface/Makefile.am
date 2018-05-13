@@ -4,7 +4,6 @@ bin_PROGRAMS += applications/clawpack/acoustics/2d/interface/interface
 
 applications_clawpack_acoustics_2d_interface_interface_SOURCES = \
 	applications/clawpack/acoustics/2d/interface/interface_user.cpp \
-	applications/clawpack/acoustics/2d/interface/interface_user.h \
 	applications/clawpack/acoustics/2d/interface/interface.cpp \
 	applications/clawpack/acoustics/2d/interface/p0.f \
 	applications/clawpack/acoustics/2d/interface/setprob.f \
@@ -21,12 +20,26 @@ applications_clawpack_acoustics_2d_interface_interface_SOURCES = \
 	applications/clawpack/acoustics/2d/rp/rpn2_vc_acoustics.f90 \
 	applications/clawpack/acoustics/2d/rp/rpt2_vc_acoustics.f90
 
+interface_headers = \
+	applications/clawpack/acoustics/2d/interface/interface_user.h
+
+interface_inifiles = \
+	applications/clawpack/acoustics/2d/interface/fclaw_options.ini \
+	applications/clawpack/acoustics/2d/interface/regression.ini
+
+applications_clawpack_acoustics_2d_interface_interface_SOURCES += \
+	$(interface_headers) \
+	$(interface_inifiles)
 
 applications_clawpack_acoustics_2d_interface_interface_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_CLAWPACK46_CPPFLAGS) $(FCLAW_CLAWPACK5_CPPFLAGS)
+        $(AM_CPPFLAGS) \
+        $(FCLAW_CLAWPACK46_CPPFLAGS) \
+        $(FCLAW_CLAWPACK5_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_acoustics_2d_interface_interface_LDADD = \
+        $(LDADD)  \
         $(FCLAW_CLAWPACK46_LDADD)  \
         $(FCLAW_CLAWPACK5_LDADD)  \
         $(FCLAW_CLAWPATCH_LDADD)  \
-        $(LDADD)
+        $(FCLAW_LDADD)
