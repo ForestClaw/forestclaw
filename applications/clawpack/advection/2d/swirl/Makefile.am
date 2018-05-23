@@ -24,7 +24,15 @@ swirl_inifiles =	\
 	applications/clawpack/advection/2d/swirl/fclaw_options.ini \
 	applications/clawpack/advection/2d/swirl/regression.ini 
 
-applications_clawpack_advection_2d_swirl_swirl_SOURCES += $(swirl_inifiles)
+swirl_graphics = \
+	applications/clawpack/advection/2d/swirl/afterframe.m \
+	applications/clawpack/advection/2d/swirl/setplot2.m \
+	applications/clawpack/advection/2d/swirl/swirl.ipynb \
+	applications/clawpack/advection/2d/swirl/make_plots.py
+
+applications_clawpack_advection_2d_swirl_swirl_SOURCES += \
+	$(swirl_inifiles) \
+	$(swirl_graphics)
 
 
 ## Include headers and libraries needed to build this application

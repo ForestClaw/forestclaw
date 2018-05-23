@@ -22,7 +22,14 @@ annulus_inifiles =	\
 	applications/clawpack/advection/2d/annulus/fclaw_options.ini \
 	applications/clawpack/advection/2d/annulus/regression.ini
 
-applications_clawpack_advection_2d_annulus_annulus_SOURCES += $(annulus_inifiles)
+annulus_graphics = \
+	applications/clawpack/advection/2d/annulus/afterframe.m \
+	applications/clawpack/advection/2d/annulus/setplot2.m \
+	applications/clawpack/advection/2d/annulus/mapc2m.m
+
+applications_clawpack_advection_2d_annulus_annulus_SOURCES += \
+	$(annulus_inifiles) \
+	$(annulus_graphics)
 
 
 
