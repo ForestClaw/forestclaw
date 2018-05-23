@@ -25,7 +25,7 @@ applications_clawpack_advection_2d_disk_disk_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-applications_clawpack_advection_2d_disk_disk_EXTRA_DIST = \
+EXTRA_DIST += \
 	applications/clawpack/advection/2d/disk/fclaw_options.ini \
 	applications/clawpack/advection/2d/disk/regression.ini \
 	applications/clawpack/advection/2d/disk/afterframe.m \

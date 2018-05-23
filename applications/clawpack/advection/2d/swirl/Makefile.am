@@ -20,7 +20,7 @@ applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/user_5.0/qinit.f90 \
 	applications/clawpack/advection/2d/swirl/user_5.0/b4step2.f90
 
-applications_clawpack_advection_2d_swirl_swirl_EXTRA_DIST = \
+EXTRA_DIST += \
 	applications/clawpack/advection/2d/swirl/fclaw_options.ini \
 	applications/clawpack/advection/2d/swirl/regression.ini \
 	applications/clawpack/advection/2d/swirl/afterframe.m \
