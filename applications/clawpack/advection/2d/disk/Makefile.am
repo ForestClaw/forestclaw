@@ -25,23 +25,14 @@ applications_clawpack_advection_2d_disk_disk_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-disk_inifiles = \
+applications_clawpack_advection_2d_disk_disk_EXTRA_DIST = \
 	applications/clawpack/advection/2d/disk/fclaw_options.ini \
-	applications/clawpack/advection/2d/disk/regression.ini
-
-disk_graphics = \
+	applications/clawpack/advection/2d/disk/regression.ini \
 	applications/clawpack/advection/2d/disk/afterframe.m \
 	applications/clawpack/advection/2d/disk/setplot2.m \
 	applications/clawpack/advection/2d/disk/mapc2m.m \
 	applications/clawpack/advection/2d/disk/filament_soln.m \
 	applications/clawpack/advection/2d/disk/create_filament_soln_tikz.m
-
-
-applications_clawpack_advection_2d_disk_disk_SOURCES += \
-	$(disk_inifiles) \
-	$(disk_graphics)
-
-
 
 applications_clawpack_advection_2d_disk_disk_CPPFLAGS = -I../all/ \
         $(AM_CPPFLAGS) \

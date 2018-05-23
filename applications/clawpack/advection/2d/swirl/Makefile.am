@@ -20,20 +20,13 @@ applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/user_5.0/qinit.f90 \
 	applications/clawpack/advection/2d/swirl/user_5.0/b4step2.f90
 
-swirl_inifiles =	\
+applications_clawpack_advection_2d_swirl_swirl_EXTRA_DIST = \
 	applications/clawpack/advection/2d/swirl/fclaw_options.ini \
-	applications/clawpack/advection/2d/swirl/regression.ini 
-
-swirl_graphics = \
+	applications/clawpack/advection/2d/swirl/regression.ini \
 	applications/clawpack/advection/2d/swirl/afterframe.m \
 	applications/clawpack/advection/2d/swirl/setplot2.m \
 	applications/clawpack/advection/2d/swirl/swirl.ipynb \
 	applications/clawpack/advection/2d/swirl/make_plots.py
-
-applications_clawpack_advection_2d_swirl_swirl_SOURCES += \
-	$(swirl_inifiles) \
-	$(swirl_graphics)
-
 
 ## Include headers and libraries needed to build this application
 ##  -- Only really need AM_CPPFLAGS and LDADD (since these include all the other 

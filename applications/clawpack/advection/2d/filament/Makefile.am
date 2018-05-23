@@ -30,12 +30,16 @@ applications_clawpack_advection_2d_filament_filament_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-filament_inifiles = \
+applications_clawpack_advection_2d_filament_filament_EXTRA_DIST = \
 	applications/clawpack/advection/2d/filament/fclaw_options.ini \
-	applications/clawpack/advection/2d/filament/regression.ini
-
-applications_clawpack_advection_2d_filament_filament_SOURCES += $(filament_inifiles)
-
+	applications/clawpack/advection/2d/filament/regression.ini \
+	applications/clawpack/advection/2d/filament/afterframe.m \
+	applications/clawpack/advection/2d/filament/setplot2.m \
+	applications/clawpack/advection/2d/filament/mapc2m.m \
+	applications/clawpack/advection/2d/filament/filament_soln.m \
+	applications/clawpack/advection/2d/filament/create_filament_soln_tikz.m \
+	applications/clawpack/advection/2d/filament/filament.ipynb \
+	applications/clawpack/advection/2d/filament/make_plots.py
 
 applications_clawpack_advection_2d_filament_filament_CPPFLAGS = \
         $(AM_CPPFLAGS) \
