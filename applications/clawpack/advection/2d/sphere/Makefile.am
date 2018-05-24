@@ -23,11 +23,12 @@ applications_clawpack_advection_2d_sphere_sphere_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-sphere_inifiles = \
+EXTRA_DIST += \
 	applications/clawpack/advection/2d/sphere/fclaw_options.ini \
-	applications/clawpack/advection/2d/sphere/regression.ini
-
-applications_clawpack_advection_2d_sphere_sphere_SOURCES += $(sphere_inifiles)
+	applications/clawpack/advection/2d/sphere/regression.ini \
+	applications/clawpack/advection/2d/sphere/afterframe.m \
+	applications/clawpack/advection/2d/sphere/setplot2.m \
+	applications/clawpack/advection/2d/sphere/mapc2m.m
 
 applications_clawpack_advection_2d_sphere_sphere_CPPFLAGS = \
         $(AM_CPPFLAGS) \
