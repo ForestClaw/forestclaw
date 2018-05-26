@@ -22,10 +22,9 @@ def setplot(plotdata):
 
 
     from clawpack.visclaw import colormaps
-    import clawpack.forestclaw as pyclaw
+    import clawpack.forestclaw as pyclaw 
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
-    plotdata.format = 'forestclaw'
     
     # ------------------------------------------------------------
     # Figure for pcolor plot
@@ -179,6 +178,7 @@ def setplot(plotdata):
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
+    plotdata.format = 'forestclaw'
 
     plotdata.kml = False      # Set to true to get tikz output
 
