@@ -13,16 +13,14 @@ EXTRA_DIST += \
 	applications/geoclaw/bowl_slosh/make_data.py \
 	applications/geoclaw/bowl_slosh/make_plots.py \
 	applications/geoclaw/bowl_slosh/make_topo.py \
-	applications/geoclaw/bowl_slosh/afterframe.py \
-	applications/geoclaw/bowl_slosh/bathy.py \
-	applications/geoclaw/bowl_slosh/setplot2.py \
-	applications/geoclaw/bowl_slosh/wetcell.py \
-	applications/geoclaw/bowl_slosh/plot_region.py
+	applications/geoclaw/bowl_slosh/afterframe.m \
+	applications/geoclaw/bowl_slosh/bathy.m \
+	applications/geoclaw/bowl_slosh/setplot2.m \
+	applications/geoclaw/bowl_slosh/wetcell.m \
+	applications/geoclaw/bowl_slosh/plot_region.m
 
 applications_geoclaw_bowl_slosh_slosh_CPPFLAGS = \
         $(AM_CPPFLAGS) $(FCLAW_GEOCLAW_CPPFLAGS)
 
 applications_geoclaw_bowl_slosh_slosh_LDADD = \
-        $(FCLAW_GEOCLAW_LDADD) $(LDADD)
-
-## @top_builddir@/src/solvers/fc2d_geoclaw/libgeoclaw.la
+         $(LDADD) $(FCLAW_GEOCLAW_LDADD)
