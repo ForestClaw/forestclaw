@@ -11,7 +11,7 @@ function setplot is called to set the plot parameters.
 try:
     from setplotfg import setplotfg
 except:
-    print "Did not find setplotfg.py"
+    print("Did not find setplotfg.py")
     setplotfg = None
 
 
@@ -30,7 +30,6 @@ def setplot(plotdata):
     from clawpack.visclaw import colormaps, geoplot
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
-    plotdata.format = "forestclaw"
 
     def set_drytol(current_data):
         # The drytol parameter is used in masking land and water and
@@ -337,8 +336,7 @@ def setplot(plotdata):
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
-    plotdata.format = 'ascii'                # Format of output
-    # plotdata.format = 'netcdf'
+    plotdata.format = 'forestclaw'                # Format of output
 
     return plotdata
 
