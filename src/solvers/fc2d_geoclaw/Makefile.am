@@ -4,12 +4,15 @@ libgeoclaw_installed_headers = \
 	src/solvers/fc2d_clawpack5/fc2d_clawpack5.h \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw.h \
 	src/solvers/fc2d_geoclaw/types.h \
-	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.h
+	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.h \
+	src/solvers/fc2d_geoclaw/fc2d_geoclaw_gauges.h \
+	src/solvers/fc2d_geoclaw/fc2d_geoclaw_gauges_default.h
 
 libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw.cpp \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.c \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_gauges.c \
+	src/solvers/fc2d_geoclaw/fc2d_geoclaw_gauges_default.c \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_output_ascii.c \
 	src/solvers/fc2d_geoclaw/amrlib_source/amr_module.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/utility_module.f90 \
@@ -73,10 +76,10 @@ src_solvers_fc2d_geoclaw_libgeoclaw_la_SOURCES = \
 
 ## Headers needed to build this library.  
 src_solvers_fc2d_geoclaw_libgeoclaw_la_CPPFLAGS = \
+  	$(FCLAW_CPPFLAGS) \
     $(FCLAW_CLAWPATCH_CPPFLAGS) \
 	$(FCLAW_GEOCLAW_CPPFLAGS) \
-  	$(AM_CPPFLAGS) \
-  	$(FCLAW_CPPFLAGS)
+  	$(AM_CPPFLAGS)
 
 
 AM_CPPFLAGS += $(FCLAW_GEOCLAW_CPPFLAGS)

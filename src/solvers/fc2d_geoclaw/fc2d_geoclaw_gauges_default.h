@@ -23,10 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_GEOCLAW_GAUGES_H
-#define FC2D_GEOCLAW_GAUGES_H
-
-#include <fclaw_base.h>  /* Needed for fclaw_app_t */
+#ifndef FC2D_GEOCLAW_GAUGES_DEFAULT_H
+#define FC2D_GEOCLAW_GAUGES_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -36,35 +34,16 @@ extern "C"
 #endif
 #endif
 
-typedef struct geoclaw_gauge
-{
-    int blockno;
-    int patchno;
-    int location_in_results;
-
-    double xc;
-    double yc;
-    double t1;   /* Tstart */
-    double t2;   /* Tend */
-    int num;     /* Gauge number 1001, 1002, 1003, ...*/
-
-    /* Control output times for gauges */
-    double min_time_increment;  /* Output gauges this often */
-    double last_time;           /* Last time we output gauge */
-
-    /* Store data in buffer before outputting gauges */
-    int buffer_index;      /* Where are we in the gauge output */
-    double **q_gauges;     /* q[buffer_max][meqn]    */
-    double **aux_gauges;   /* aux[buffer_max][meqn]  */
-} geoclaw_gauge_t;
-
-
 struct fclaw2d_global;
-struct fc2d_geoclaw_gauge;
+struct geoclaw_gauge;
 
-void fc2d_geoclaw_locate_gauges(struct fclaw2d_global *glob);
+void read_gauges_data(struct fclaw2d_global *glob, 
+                      struct geoclaw_gauge **gauges, 
+                      int *num);
 
-void fc2d_geoclaw_gauges_vtable_set();
+void create_gauge_files(struct fclaw2d_global *glob, 
+                        struct geoclaw_gauge *gauges, 
+                        int num_gauges);
 
 #ifdef __cplusplus
 #if 0
