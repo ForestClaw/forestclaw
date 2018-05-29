@@ -56,10 +56,13 @@ typedef struct fc2d_geoclaw_gauge
 
     /* Store data in buffer before outputting gauges */
     int buffer_index;     /* Where are we in the gauge output */
+    void **buffer;
+#if 0    
     int *level_store;
     double *tcurr_store;
     double **q_store;     /* q[buffer_max][meqn]     */
     double **aux_store;   /* aux[buffer_max][maux];  */
+#endif    
 
 } fc2d_geoclaw_gauge_t;
 
@@ -77,17 +80,30 @@ typedef void (*fc2d_geoclaw_create_gauge_files_t)(struct fclaw2d_global *glob,
 typedef void (*fc2d_geoclaw_store_gauge_vars_t)(struct fclaw2d_global *glob, 
                                                 int level, double tcurr,
                                                 double* qvar, double *avar,
-                                                fc2d_geoclaw_gauge_t *gauge);
+                                                struct fc2d_geoclaw_gauge *gauge);
+
+typedef void (*fc2d_geoclaw_gauge_update_t)(struct fclaw2d_global* glob, 
+                                            struct fclaw2d_block* block,
+                                            struct fclaw2d_patch* patch, 
+                                            int blockno, int patchno,
+                                            double tcurr, struct fc2d_geoclaw_gauge *g);
+
 
 typedef void (*fc2d_geoclaw_print_gauges_t)(struct fclaw2d_global *glob, 
-                                            fc2d_geoclaw_gauge_t *gauge);
+                                            struct fc2d_geoclaw_gauge *gauge);
+
+typedef void (*fc2d_geoclaw_gauge_destroy_t)(struct fclaw2d_global *glob, 
+                                             struct fc2d_geoclaw_gauge *g);
+
 
 struct fc2d_geoclaw_gauges_vtable
 {
     fc2d_geoclaw_read_gauges_data_t    read_gauges_data;
     fc2d_geoclaw_create_gauge_files_t  create_gauge_files;
-    fc2d_geoclaw_store_gauge_vars_t    store_gauge_output;
+    fc2d_geoclaw_gauge_update_t        update_gauge;
+    // fc2d_geoclaw_store_gauge_vars_t    store_gauge_output;
     fc2d_geoclaw_print_gauges_t        print_gauge_buffer;
+    fc2d_geoclaw_gauge_destroy_t       destroy_gauge;
 
     int is_set;
 };
