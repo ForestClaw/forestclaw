@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_geoclaw_gauges_default.h"
 
 #include "fc2d_geoclaw_gauges.h"
+#include "fc2d_geoclaw_fort.h"
 
 #include "fc2d_geoclaw_options.h"
 
@@ -43,9 +44,9 @@ extern "C"
 #endif
 
 
-void read_gauges_data(fclaw2d_global_t *glob, 
-                      geoclaw_gauge_t **gauges, 
-                      int *num)
+void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob, 
+                                      fc2d_geoclaw_gauge_t **gauges, 
+                                      int *num_gauges)
 {
     /* Idea is that we may only need to change this file when updating to newer
        geoclaw code */
@@ -89,36 +90,42 @@ void read_gauges_data(fclaw2d_global_t *glob,
 
     /* Read number of gauges */
     fgets(line,max_line_len, f_gauges_data);
-    *num = strtod(line,NULL);
+    *num_gauges = strtod(line,NULL);
 
-    *gauges = (geoclaw_gauge_t*) FCLAW_ALLOC(geoclaw_gauge_t,*num);
-    geoclaw_gauge_t *g = *gauges;
-
-    /* Read gauge info */
-    for(i = 0; i < *num; i++)
+    if (*num_gauges == 0)
     {
-        fgets(line,max_line_len, f_gauges_data);
-        g[i].num = strtod(line,&next);
-        g[i].xc = strtod(next,&next);
-        g[i].yc = strtod(next,&next);
-        g[i].t1 = strtod(next,&next);
-        g[i].t2 = strtod(next,NULL);
+        *gauges = NULL;
     }
-
-    /* Skip a bunch of lines to get to min_time_increment */
-    for(i = 0; i < 8; i++)
+    else
     {
-        fgets(line,max_line_len,f_gauges_data);        
-    }
+        *gauges = (fc2d_geoclaw_gauge_t*) FCLAW_ALLOC(fc2d_geoclaw_gauge_t,*num_gauges);
+        fc2d_geoclaw_gauge_t *g = *gauges;
 
-    /* Read minimum time increment */
-    fgets(line,max_line_len,f_gauges_data);
-    g[0].min_time_increment = strtod(line,&next);
-    for(i = 0; i < *num-1; i++)
-    {
-        g[i].min_time_increment = strtod(next,&next);
-        fclaw_global_essentialf("%f\n",g[i].min_time_increment);
-    }
+        /* Read gauge info */
+        for(i = 0; i < *num_gauges; i++)
+        {
+            fgets(line,max_line_len, f_gauges_data);
+            g[i].num = strtod(line,&next);
+            g[i].xc = strtod(next,&next);
+            g[i].yc = strtod(next,&next);
+            g[i].t1 = strtod(next,&next);
+            g[i].t2 = strtod(next,NULL);
+        }
+
+        /* Skip a bunch of lines to get to min_time_increment */
+        for(i = 0; i < 8; i++)
+        {
+            fgets(line,max_line_len,f_gauges_data);        
+        }
+
+        /* Read minimum time increment */
+        fgets(line,max_line_len,f_gauges_data);
+        g[0].min_time_increment = strtod(line,&next);
+        for(i = 1; i < *num_gauges; i++)
+        {
+            g[i].min_time_increment = strtod(next,&next);
+        }
+    }   /* End of num_gauges > 0 loop */
 
     /* Finish up */
     fclose(f_gauges_data);    
@@ -128,9 +135,9 @@ void read_gauges_data(fclaw2d_global_t *glob,
 /* This function can be virtualized so the user can specify their 
    gauge output */
 
-void create_gauge_files(fclaw2d_global_t *glob, 
-                        geoclaw_gauge_t *gauges, 
-                        int num_gauges)
+void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob, 
+                                        fc2d_geoclaw_gauge_t *gauges, 
+                                        int num_gauges)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
                             fclaw2d_clawpatch_get_options(glob);
@@ -143,10 +150,12 @@ void create_gauge_files(fclaw2d_global_t *glob,
 
     for (int i = 0; i < num_gauges; i++)
     {
-        geoclaw_gauge_t g = gauges[i];
+        fc2d_geoclaw_gauge_t g = gauges[i];
         sprintf(filename,"gauge%05d.txt",g.num);
         fp = fopen(filename, "w");
-        fprintf(fp, "# gauge_id = %5d location = (%17.10e %17.10e) num_eqn = %2d\n",
+        /* This is read in line 99 of $CLAW/pyclaw/src/pyclaw/gauges.py
+           and so must have exactly the right spacing, etc */
+        fprintf(fp, "# gauge_id= %5d location=( %17.10e %17.10e ) num_eqn= %2d\n",
                 g.num, g.xc, g.yc, clawpatch_opt->meqn+1);
 
         fprintf(fp, "# Columns: level time h    hu    hv    eta\n");
@@ -154,6 +163,56 @@ void create_gauge_files(fclaw2d_global_t *glob,
     }
 }
 
+void geoclaw_store_gauge_vars_default(fclaw2d_global_t *glob,
+                                      int level, double tcurr,
+                                      double* qvar, double *avar, 
+                                      fc2d_geoclaw_gauge_t *gauge)
+{
+    int meqn, k;
+    int m;
+
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                   fclaw2d_clawpatch_get_options(glob);
+
+    k = gauge->buffer_index;
+    meqn = clawpatch_opt->meqn;
+
+    gauge->q_store[k] = FCLAW_ALLOC(double,meqn);  /* q vars + eta */
+    gauge->aux_store[k] = FCLAW_ALLOC(double,1);     /* store bathy */
+    gauge->level_store[k] = level;
+    gauge->tcurr_store[k] = tcurr;
+    for(m = 0; m < meqn; m++)
+    {
+        gauge->q_store[k][m] = qvar[m];
+    }
+    gauge->aux_store[k][0] = avar[0];   /* Just store bathymetry for now */
+}
+
+
+void geoclaw_print_gauges_default(fclaw2d_global_t *glob, 
+                                  fc2d_geoclaw_gauge_t *gauge) 
+{
+    int k;
+
+    char filename[15];  /* gaugexxxxx.txt + EOL character */
+    FILE *fp;
+
+    sprintf(filename,"gauge%05d.txt",gauge->num);
+    fp = fopen(filename, "a");
+    for(k = 0; k < gauge->buffer_index; k++)
+    {
+        double *qvar = gauge->q_store[k];
+        double *avar = gauge->aux_store[k];
+        double eta = qvar[0] + avar[0];
+        eta = abs(eta) < 1e-99 ? 0 : eta; /* For reading in Matlab */
+        fprintf(fp, "%5d %15.7e %15.7e %15.7e %15.7e %15.7e\n",
+                gauge->level_store[k],gauge->tcurr_store[k],
+                qvar[0],qvar[1],qvar[2],eta);
+        FCLAW_FREE(gauge->q_store[k]);
+        FCLAW_FREE(gauge->aux_store[k]);
+    }
+    fclose(fp);
+}
 
 #ifdef __cplusplus
 #if 0
