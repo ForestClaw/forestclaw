@@ -52,11 +52,13 @@ typedef struct geoclaw_user
 } geoclaw_user_t;
 
 
+#if 0
 static
 geoclaw_user_t** geoclaw_gauge_buffer(fclaw2d_global_t *glob, fc2d_geoclaw_gauge_t *g)
 {
     return (geoclaw_user_t**) fc2d_geoclaw_gauge_buffer(glob,g);
 }
+#endif
 
 
 
@@ -197,7 +199,7 @@ void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob,
     int num_eqns = 4;  /* meqn + 1 (h, hu, hv, eta) */
     for (int i = 0; i < num_gauges; i++)
     {
-        fc2d_geoclaw_gauge_data(glob,&gauges[i],&num, &xc, &yc, &t1, &t2);
+        fc2d_geoclaw_gauge_get_data(glob,&gauges[i],&num, &xc, &yc, &t1, &t2);
 
         sprintf(filename,"gauge%05d.txt",num);
         fp = fopen(filename, "w");
@@ -211,8 +213,10 @@ void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob,
     }
 }
 
-void geoclaw_gauge_update_default(fclaw2d_global_t* glob, fclaw2d_block_t* block,
-                                  fclaw2d_patch_t* patch, int blockno, int patchno,
+void geoclaw_gauge_update_default(fclaw2d_global_t* 
+                                  glob, fclaw2d_block_t* block,
+                                  fclaw2d_patch_t* patch, 
+                                  int blockno, int patchno,
                                   double tcurr, fc2d_geoclaw_gauge_t *g)
 {
     int mx,my,mbc,meqn,maux;
@@ -222,10 +226,12 @@ void geoclaw_gauge_update_default(fclaw2d_global_t* glob, fclaw2d_block_t* block
     int num;
     double xc,yc, t1, t2;
 
+    int m;
+
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fc2d_geoclaw_gauge_data(glob,g,&num, &xc, &yc, &t1, &t2);
+    fc2d_geoclaw_gauge_get_data(glob,g,&num, &xc, &yc, &t1, &t2);
 
     FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
     FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
@@ -239,45 +245,18 @@ void geoclaw_gauge_update_default(fclaw2d_global_t* glob, fclaw2d_block_t* block
                               &dx,&dy,q,&maux,aux,&xc,&yc,
                               qvar,avar);
                 
-    /* Store qvar, avar in gauge buffers */
-
-
-#if 1    
-    geoclaw_store_gauge_vars_default(glob, patch->level, tcurr, qvar,avar,g); 
-#endif    
-}
-
-
-void geoclaw_store_gauge_vars_default(fclaw2d_global_t *glob,
-                                      int level, double tcurr,
-                                      double* qvar, double *avar, 
-                                      fc2d_geoclaw_gauge_t *gauge)
-{
-    int meqn, k;
-    int m;
-    geoclaw_user_t **gauge_buffer;
-
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-                   fclaw2d_clawpatch_get_options(glob);
-
-    // k = fc2d_geoclaw_gauge_buffer_index(glob,gauge);
-    k = gauge->buffer_index;
-    meqn = clawpatch_opt->meqn;
-
-    gauge_buffer = geoclaw_gauge_buffer(glob,gauge);
-
-    gauge_buffer[k] = FCLAW_ALLOC(geoclaw_user_t,1);
-
-    geoclaw_user_t *guser = gauge_buffer[k];
-    guser->level = level;
+    /* Store qvar, avar in gauge buffers;  Anything stored will be printed
+       in print_buffers */
+    geoclaw_user_t *guser = FCLAW_ALLOC(geoclaw_user_t,1);
+    guser->level = patch->level;
     guser->tcurr = tcurr;
     for(m = 0; m < meqn; m++)
     {
         guser->qvar[m] = qvar[m];
     }
     guser->avar[0] = avar[0];   /* Just store bathymetry for now */
+    fc2d_geoclaw_gauge_set_buffer_entry(glob,g,guser);
 }
-
 
 void geoclaw_print_gauges_default(fclaw2d_global_t *glob, 
                                   fc2d_geoclaw_gauge_t *gauge) 
@@ -288,8 +267,9 @@ void geoclaw_print_gauges_default(fclaw2d_global_t *glob,
     char filename[15];  /* gaugexxxxx.txt + EOL character */
     FILE *fp;
 
-    kmax = fc2d_geoclaw_gauge_buffer_index(glob,gauge);
-    gauge_buffer = geoclaw_gauge_buffer(glob,gauge);
+    /* This assumes on buffers be organized as an array - not very 
+       OO.  But anything else would be too complicated */
+    fc2d_geoclaw_gauge_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
 
     sprintf(filename,"gauge%05d.txt",gauge->num);
     fp = fopen(filename, "a");
@@ -307,11 +287,6 @@ void geoclaw_print_gauges_default(fclaw2d_global_t *glob,
         FCLAW_FREE(guser);
     }
     fclose(fp);
-}
-
-void geoclaw_gauge_destroy_default(fclaw2d_global_t *glob, fc2d_geoclaw_gauge_t *g)
-{
-    FCLAW_FREE(g->buffer);
 }
 
 #ifdef __cplusplus

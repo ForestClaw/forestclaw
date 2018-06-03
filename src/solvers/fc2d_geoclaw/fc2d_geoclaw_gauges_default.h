@@ -51,20 +51,8 @@ void geoclaw_gauge_update_default(struct fclaw2d_global* glob,
                                   int blockno, int patchno,
                                   double tcurr, struct fc2d_geoclaw_gauge *g);
 
-#if 1
-void geoclaw_store_gauge_vars_default(struct fclaw2d_global *glob, 
-                                      int level, double tcurr,
-                                      double* qvar, double *avar,
-                                      struct fc2d_geoclaw_gauge *gauge);
-#endif                                      
-
 void geoclaw_print_gauges_default(struct fclaw2d_global *glob, 
                                   struct fc2d_geoclaw_gauge *gauge);
-
-void geoclaw_gauge_destroy_default(struct fclaw2d_global *glob, 
-                                   struct fc2d_geoclaw_gauge *g);
-
-
 
 #ifdef __cplusplus
 #if 0
