@@ -267,8 +267,8 @@ void geoclaw_print_gauges_default(fclaw2d_global_t *glob,
     char filename[15];  /* gaugexxxxx.txt + EOL character */
     FILE *fp;
 
-    /* This assumes on buffers be organized as an array - not very 
-       OO.  But anything else would be too complicated */
+    /* This assumes on buffers be organized as an array; entries
+       start at 0 and with kmax-1 */
     fc2d_geoclaw_gauge_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
 
     sprintf(filename,"gauge%05d.txt",gauge->num);
