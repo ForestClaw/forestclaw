@@ -103,14 +103,14 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         For  q_gauges, users must still allocate space for variables to be
         stored in the print_buffer.
         ---------------------------------------------------------------- */
-    int bl = geo_opt->gauge_print_buffer_length;   
+    int buffer_len = geo_opt->gauge_print_buffer_length;   
     for(i = 0; i < num_gauges; i++)
     {
         gauges[i].last_time = gauges[i].t1;
         gauges[i].patchno = -1;
         gauges[i].blockno = -1;
         gauges[i].location_in_results = -1;
-        gauges[i].buffer = FCLAW_ALLOC(void*,bl);
+        gauges[i].buffer = FCLAW_ALLOC(void*,buffer_len);
         gauges[i].buffer_index = 0;
     }       
 
@@ -355,6 +355,53 @@ void fc2d_geoclaw_gauges_vtable_set()
 
     gauges_vt->is_set = 1;
 }
+
+/* ---------------------------- Get Access Functions ---------------------------------- */
+
+void fc2d_geoclaw_gauge_allocate(fclaw2d_global_t *glob, int num_gauges,
+                                 fc2d_geoclaw_gauge_t **g)
+{
+    *g = (fc2d_geoclaw_gauge_t*) FCLAW_ALLOC(fc2d_geoclaw_gauge_t,num_gauges);
+}
+
+void fc2d_geoclaw_gauge_set_data(fclaw2d_global_t *glob, 
+                                 fc2d_geoclaw_gauge_t *g,
+                                 int num, double xc, double yc, 
+                                 double  t1, double t2, 
+                                 double min_time_increment)
+{
+    g->num = num;
+    g->xc = xc;
+    g->yc = yc;
+    g->t1 = t1;
+    g->t2 = t2;
+    g->min_time_increment = min_time_increment;
+}
+
+void fc2d_geoclaw_gauge_data(fclaw2d_global_t *glob, 
+                             fc2d_geoclaw_gauge_t *g,
+                             int *num, 
+                             double *xc, double *yc, 
+                             double  *t1, double *t2)
+{
+    *num = g->num;
+    *xc = g->xc;
+    *yc = g->yc;
+    *t1 = g->t1;
+    *t2 = g->t2;
+}
+
+void** fc2d_geoclaw_gauge_buffer(fclaw2d_global_t *glob, fc2d_geoclaw_gauge_t *g)
+{
+    return g->buffer;
+}
+
+int fc2d_geoclaw_gauge_buffer_index(fclaw2d_global_t* glob,
+                                    fc2d_geoclaw_gauge_t *g)
+{
+    return g->buffer_index;
+}
+
 
 
 #ifdef __cplusplus

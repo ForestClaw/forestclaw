@@ -57,13 +57,6 @@ typedef struct fc2d_geoclaw_gauge
     /* Store data in buffer before outputting gauges */
     int buffer_index;     /* Where are we in the gauge output */
     void **buffer;
-#if 0    
-    int *level_store;
-    double *tcurr_store;
-    double **q_store;     /* q[buffer_max][meqn]     */
-    double **aux_store;   /* aux[buffer_max][maux];  */
-#endif    
-
 } fc2d_geoclaw_gauge_t;
 
 struct fclaw2d_global;
@@ -78,6 +71,7 @@ typedef void (*fc2d_geoclaw_create_gauge_files_t)(struct fclaw2d_global *glob,
                                                   int num_gauges);
 
 typedef void (*fc2d_geoclaw_store_gauge_vars_t)(struct fclaw2d_global *glob, 
+                                                int buffer_index,
                                                 int level, double tcurr,
                                                 double* qvar, double *avar,
                                                 struct fc2d_geoclaw_gauge *gauge);
@@ -101,7 +95,6 @@ struct fc2d_geoclaw_gauges_vtable
     fc2d_geoclaw_read_gauges_data_t    read_gauges_data;
     fc2d_geoclaw_create_gauge_files_t  create_gauge_files;
     fc2d_geoclaw_gauge_update_t        update_gauge;
-    // fc2d_geoclaw_store_gauge_vars_t    store_gauge_output;
     fc2d_geoclaw_print_gauges_t        print_gauge_buffer;
     fc2d_geoclaw_gauge_destroy_t       destroy_gauge;
 
@@ -113,6 +106,30 @@ void fc2d_geoclaw_locate_gauges(struct fclaw2d_global *glob);
 void fc2d_geoclaw_gauges_vtable_set();
 
 fc2d_geoclaw_gauges_vtable_t* fc2d_geoclaw_gauges_vt();
+
+/* ---------------------------------- Gauges ------------------------------------------ */
+
+void fc2d_geoclaw_gauge_allocate(struct fclaw2d_global *glob, int num_gauges,
+                                 struct fc2d_geoclaw_gauge **g);
+
+void fc2d_geoclaw_gauge_set_data(struct fclaw2d_global *glob, 
+                                 struct fc2d_geoclaw_gauge *g,
+                                 int num, 
+                                 double xc, double yc, 
+                                 double  t1, double t2,
+                                 double min_time_increment);
+
+void fc2d_geoclaw_gauge_data(struct fclaw2d_global *glob, 
+                             struct fc2d_geoclaw_gauge *g,                             
+                             int *num, 
+                             double *xc, double *yc, 
+                             double  *t1, double *t2);
+
+void** fc2d_geoclaw_gauge_buffer(struct fclaw2d_global *glob, 
+                                struct fc2d_geoclaw_gauge *g);
+
+int fc2d_geoclaw_gauge_buffer_index(struct fclaw2d_global* glob,
+                                    struct fc2d_geoclaw_gauge *g);
 
 
 #ifdef __cplusplus
