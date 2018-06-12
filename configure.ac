@@ -21,19 +21,22 @@ echo "o---------------------------------------"
 echo "| Checking options"
 echo "o---------------------------------------"
 
-FCLAW_ARG_ENABLE([debug], [enable debug mode (assertions and extra checks)],
+FCLAW_ARG_ENABLE([debug], [Enable debug mode (assertions and extra checks)],
                  [DEBUG])
                  
-FCLAW_ARG_ENABLE([geoclaw], [enable geoclaw library and applications],
+FCLAW_ARG_ENABLE([geoclaw], [Enable geoclaw library and applications],
                  [GEOCLAW])
+
+FCLAW_ARG_ENABLE([geoclaw_development], [Enable Geoclaw applications under development],
+                 [GEOCLAW_DEVELOPMENT])
 
 FCLAW_ARG_ENABLE([ash3d], [enable ash3d library and applications],
                  [ASH3D])
 
-FCLAW_ARG_ENABLE([clawpack], [enable clawpack libraries 4.6 and 5.0 and applications],
+FCLAW_ARG_ENABLE([clawpack], [Enable clawpack libraries 4.6 and 5.0 and applications],
                  [CLAWPACK])
 
-FCLAW_ARG_ENABLE([development], [enable applications under development],
+FCLAW_ARG_ENABLE([development], [Enable general applications under development],
                  [DEVELOPMENT])
 
 echo "o---------------------------------------"

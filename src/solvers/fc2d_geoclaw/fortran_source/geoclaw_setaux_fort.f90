@@ -271,6 +271,7 @@ SUBROUTINE fc2d_geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux, &
 
 END SUBROUTINE fc2d_geoclaw_setaux
 
+!! Change this to ghost_valid
 LOGICAL FUNCTION ghost_invalid(i,j,mx,my,nghost,mint)
   implicit none
   integer, intent(in) :: i,j,nghost,mint,mx,my

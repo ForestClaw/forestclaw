@@ -5,6 +5,7 @@ bin_PROGRAMS += applications/clawpack/transport/gaussian/gaussian
 applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/transport/gaussian/gaussian.cpp \
 	applications/clawpack/transport/gaussian/gaussian_user.cpp \
+	applications/clawpack/transport/gaussian/gaussian_user.h \
 	applications/clawpack/transport/gaussian/setprob.f \
 	applications/clawpack/transport/gaussian/user_4.6/qinit.f \
 	applications/clawpack/transport/gaussian/user_5.0/qinit.f90 \
@@ -14,6 +15,8 @@ applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/transport/gaussian/user_5.0/tag4coarsening.f \
 	applications/clawpack/transport/all/velocity_wind.f \
 	applications/clawpack/transport/all/gaussian.f \
+	applications/clawpack/transport/all/transport_user.h \
+	applications/clawpack/transport/all/transport_options.h \
 	applications/clawpack/transport/all/transport_user.cpp \
 	applications/clawpack/transport/all/transport_domain.c \
 	applications/clawpack/transport/all/transport_options.c \
@@ -21,6 +24,7 @@ applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/transport/all/user5_b4step2_manifold.f90 \
 	applications/clawpack/transport/all/fclaw2d_map_cubedsphere.c \
 	applications/clawpack/transport/all/fclaw2d_map_pillowsphere.c \
+	applications/clawpack/advection/2d/all/advection_user_fort.h \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
@@ -28,20 +32,12 @@ applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-gaussian_headers = \
-	applications/clawpack/advection/2d/all/advection_user_fort.h \
-	applications/clawpack/transport/gaussian/gaussian_user.h \
-	applications/clawpack/transport/all/transport_user.h \
-	applications/clawpack/transport/all/transport_options.h
-
-gaussian_inifiles = \
+EXTRA_DIST += \
 	applications/clawpack/transport/gaussian/fclaw_options.ini \
-	applications/clawpack/transport/gaussian/regression.ini 
-
-# Is this the best way to include these?
-applications_clawpack_transport_gaussian_gaussian_SOURCES += \
-	$(gaussian_inifiles) \
-	$(gaussian_headers)
+	applications/clawpack/transport/gaussian/regression.ini \
+	applications/clawpack/transport/gaussian/afterframe.m \
+	applications/clawpack/transport/gaussian/setplot2.m \
+	applications/clawpack/transport/gaussian/mapc2m.m
 
 applications_clawpack_transport_gaussian_gaussian_CPPFLAGS = \
         $(AM_CPPFLAGS) \

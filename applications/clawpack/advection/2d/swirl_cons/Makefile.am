@@ -15,11 +15,10 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpn2cons_fw.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/rpt2cons.f
 
-swirl_cons_inifiles = \
-	applications/clawpack/advection/2d/swirl_cons/fclaw_options.ini
-
-applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES += $(swirl_cons_inifiles)
-
+EXTRA_DIST += \
+	applications/clawpack/advection/2d/swirl_cons/fclaw_options.ini \
+	applications/clawpack/advection/2d/swirl_cons/afterframe.m \
+	applications/clawpack/advection/2d/swirl_cons/setplot2.m
 
 applications_clawpack_advection_2d_swirl_cons_swirlcons_CPPFLAGS = \
         $(AM_CPPFLAGS) \

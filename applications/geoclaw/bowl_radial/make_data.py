@@ -338,6 +338,8 @@ def setrun(claw_pkg='geoclaw'):
     # rundata.gaugedata.add_gauge()
 
     # gauges along x-axis:
+
+    
     gaugeno = 0
     for r in np.linspace(86., 93., 9):
         gaugeno = gaugeno+1
@@ -353,8 +355,11 @@ def setrun(claw_pkg='geoclaw'):
         y = (r + .001) / np.sqrt(2.)
         rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
 
+    rundata.gaugedata.min_time_increment = 0.025
+    
 
     return rundata
+
     # end of function setrun
     # ----------------------
 
@@ -370,7 +375,7 @@ def setgeo(rundata):
     try:
         geo_data = rundata.geo_data
     except:
-        print "*** Error, this rundata has no geo_data attribute"
+        print("*** Error, this rundata has no geo_data attribute")
         raise AttributeError("Missing geo_data attribute")
 
 

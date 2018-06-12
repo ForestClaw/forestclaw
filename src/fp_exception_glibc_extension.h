@@ -12,7 +12,9 @@
 #ifndef FENV_H_LINUX_REPLACEMENT
 #define FENV_H_LINUX_REPLACEMENT
 
+/* We are replacing the declarations from this header file.
 #include <fenv.h>
+*/
 
 #ifdef __cplusplus
 extern "C" {
