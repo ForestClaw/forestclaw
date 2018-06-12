@@ -24,15 +24,67 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_base.h>
+#include <fclaw2d_convenience.h>
+
+typedef struct fclaw_smooth
+{
+    sc_MPI_Comm mpicomm;
+    fclaw_app_t *a;
+
+    int minlevel;
+    int maxlevel;
+    fclaw2d_domain_t *domain;
+}
+fclaw_smooth_t;
+
+static void
+run_refine (fclaw_smooth_t * s)
+{
+    int lev;
+    int ib, ip;
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+
+    for (lev = s->minlevel; lev < s->maxlevel; ++lev)
+    {
+        for (ib = 0; ib < s->domain->num_blocks; ++ib)
+        {
+            block = s->domain->blocks + ib;
+            for (ip = 0; ip < block->num_patches; ++ip)
+            {
+                patch = block->patches + ip;
+                if ((patch->xlower > .3 && patch->xupper < .6) &&
+                    (patch->ylower > .2 && patch->yupper < .55))
+                {
+
+                    /* prompt refinement of this patch */
+                    fclaw2d_patch_mark_refine (s->domain, ib, ip);
+                }
+            }
+        }
+    }
+}
 
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *a;
+    fclaw_smooth_t smoo, *s = &smoo;
 
-    a = fclaw_app_new (&argc, &argv, NULL);
+    s->a = fclaw_app_new (&argc, &argv, NULL);
+    s->mpicomm = fclaw_app_get_mpi_size_rank (s->a, NULL, NULL);
 
-    fclaw_app_destroy (a);
+    /* set parameters */
+    s->minlevel = 2;
+    s->maxlevel = 5;
 
+    /* create a new domain */
+    s->domain = fclaw2d_domain_new_unitsquare (s->mpicomm, s->minlevel);
+
+    /* run refinement cycles */
+    run_refine (s);
+
+    /* cleanup */
+    fclaw2d_domain_destroy (s->domain);
+    fclaw_app_destroy (s->a);
     return 0;
 }
