@@ -30,15 +30,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Use as an alternate to GNU feenableexcept */
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
 #include <fp_exception_glibc_extension.h>
+#else
+#ifdef FCLAW_HAVE_FENV_H
+#ifndef __USE_GNU
+#define __USE_GNU
+#endif
+#include <fenv.h>
+#endif
 #endif
 
-#include <fenv.h>
 #include <signal.h>
 
 #ifdef FCLAW_HAVE_UNISTD_H
 #include <unistd.h>    /* To get process ids */
 #endif
-
 
 static void* 
 fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
