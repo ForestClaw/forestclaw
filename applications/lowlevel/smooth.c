@@ -35,13 +35,22 @@ typedef struct fclaw_smooth
     /* parameters */
     int minlevel, maxlevel;
     int smooth_refine, smooth_level, coarsen_delay;
+    int write_vtk;
+    double dt, finalt;
+    double radius, thickn;
+
+    /* derived data */
+    double rmin2, rmax2;
+    char prefix[BUFSIZ];
 
     /* mesh */
     fclaw2d_domain_t *domain;
 
     /* numerical data */
+    int k;
+    double time;
     double pxy[2];
-    double radius, thickn;
+    double vel[2];
 }
 fclaw_smooth_t;
 
@@ -80,28 +89,45 @@ patch_overlap (fclaw2d_patch_t * patch,
 }
 
 static void
-run_refine (fclaw_smooth_t * s)
+init_values (fclaw_smooth_t * s)
+{
+    double ss;
+
+    /* prepare comparing geometric distance */
+    ss = s->radius - s->thickn;
+    s->rmin2 = SC_SQR (ss);
+    ss = s->radius + s->thickn;
+    s->rmax2 = SC_SQR (ss);
+    snprintf (s->prefix, BUFSIZ, "sm_l%dL%d_s%dl%dc%d",
+              s->minlevel, s->maxlevel,
+              s->smooth_refine, s->smooth_level, s->coarsen_delay);
+
+    /* init numerical data */
+    s->pxy[0] = .4;
+    s->pxy[1] = .3;
+    s->vel[0] = .6;
+    s->vel[1] = .8;
+}
+
+static void
+init_refine (fclaw_smooth_t * s)
 {
     int lev;
     int ib, ip;
-    double rmin2, rmax2;
     char basename[BUFSIZ];
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
     fclaw2d_domain_t *domain;
 
-    /* prepare comparing geometric distance */
-    rmin2 = s->radius - s->thickn;
-    rmin2 = SC_SQR (rmin2);
-    rmax2 = s->radius + s->thickn;
-    rmax2 = SC_SQR (rmax2);
-
     /* loop over multiple initial refinements */
     for (lev = s->minlevel; lev < s->maxlevel; ++lev)
     {
         fclaw_global_productionf ("Initial refinement from level %d\n", lev);
-        snprintf (basename, BUFSIZ, "init_%02d", lev);
-        fclaw2d_domain_write_vtk (s->domain, basename);
+        if (s->write_vtk)
+        {
+            snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
+            fclaw2d_domain_write_vtk (s->domain, basename);
+        }
         for (ib = 0; ib < s->domain->num_blocks; ++ib)
         {
             block = s->domain->blocks + ib;
@@ -109,7 +135,7 @@ run_refine (fclaw_smooth_t * s)
             {
                 /* refine according to overlap with spherical ring */
                 patch = block->patches + ip;
-                if (patch_overlap (patch, s->pxy, rmin2, rmax2))
+                if (patch_overlap (patch, s->pxy, s->rmin2, s->rmax2))
                 {
                     /* we overlap and prompt refinement of this patch */
                     fclaw2d_patch_mark_refine (s->domain, ib, ip);
@@ -141,14 +167,105 @@ run_refine (fclaw_smooth_t * s)
     }
     if (lev < s->maxlevel)
     {
-        fclaw_global_productionf ("No more refinement to do\n");
+        fclaw_global_productionf ("No more refinement done\n");
     }
     else
     {
-        fclaw_global_productionf ("Initial refinement to level %d\n", lev);
-        snprintf (basename, BUFSIZ, "init_%02d", lev);
+        fclaw_global_productionf ("Refined up to theoretical level %d\n",
+                                  s->maxlevel);
+    }
+}
+
+static void
+run_refine (fclaw_smooth_t * s)
+{
+    int ib, ip;
+    double nextt, deltat;
+    char basename[BUFSIZ];
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+    fclaw2d_domain_t *domain;
+
+    /* initialize time stepping */
+    s->k = 0;
+    s->time = 0.;
+    if (s->write_vtk)
+    {
+        snprintf (basename, BUFSIZ, "%s_K%05d", s->prefix, s->k);
         fclaw2d_domain_write_vtk (s->domain, basename);
     }
+
+    /* run time loop */
+    while (s->time < s->finalt)
+    {
+        fclaw_global_productionf ("Run time %.3g step %d\n", s->time, s->k);
+
+        /* adjust time step near final time */
+        nextt = s->time + (deltat = s->dt);
+        if (nextt > s->finalt - 1e-3 * deltat)
+        {
+            nextt = s->finalt;
+            deltat = nextt - s->time;
+        }
+
+        /* advance position of sphere */
+        s->pxy[0] += deltat * s->vel[0];
+        s->pxy[1] += deltat * s->vel[1];
+
+        /* adapt mesh */
+        for (ib = 0; ib < s->domain->num_blocks; ++ib)
+        {
+            block = s->domain->blocks + ib;
+            for (ip = 0; ip < block->num_patches; ++ip)
+            {
+                /* refine according to overlap with spherical ring */
+                patch = block->patches + ip;
+                if (patch_overlap (patch, s->pxy, s->rmin2, s->rmax2))
+                {
+                    /* we overlap and prompt refinement of this patch */
+                    if (patch->level < s->maxlevel)
+                    {
+                        fclaw2d_patch_mark_refine (s->domain, ib, ip);
+                    }
+                }
+                else
+                {
+                    /* we coarsen if we do not overlap */
+                    if (patch->level > s->minlevel)
+                    {
+                        fclaw2d_patch_mark_coarsen (s->domain, ib, ip);
+                    }
+                }
+            }
+        }
+
+        /* run internal mesh refinement */
+        domain = fclaw2d_domain_adapt (s->domain);
+        FCLAW_ASSERT (domain != s->domain);
+        if (domain != NULL)
+        {
+            fclaw2d_domain_destroy (s->domain);
+            s->domain = domain;
+            domain = fclaw2d_domain_partition (s->domain, 0);
+            FCLAW_ASSERT (domain != s->domain);
+            if (domain != NULL)
+            {
+                fclaw2d_domain_destroy (s->domain);
+                s->domain = domain;
+                fclaw2d_domain_complete (s->domain);
+            }
+        }
+
+        /* advance time */
+        ++s->k;
+        s->time = nextt;
+        if (s->write_vtk)
+        {
+            snprintf (basename, BUFSIZ, "%s_K%05d", s->prefix, s->k);
+            fclaw2d_domain_write_vtk (s->domain, basename);
+        }
+    }
+    fclaw_global_productionf ("Run time %.3g step %d\n", s->time, s->k);
 }
 
 int
@@ -159,25 +276,32 @@ main (int argc, char **argv)
     s->a = fclaw_app_new (&argc, &argv, NULL);
     s->mpicomm = fclaw_app_get_mpi_size_rank (s->a, &s->mpisize, &s->mpirank);
 
-    /* set parameters */
-    s->minlevel = 3;
-    s->maxlevel = 4;
+    /* set refinement parameters */
+    s->minlevel = 4;
+    s->maxlevel = 5;
     s->smooth_refine = 0;
     s->smooth_level = 0;
     s->coarsen_delay = 0;
+    s->write_vtk = 1;
 
-    /* init numerical data */
-    s->pxy[0] = .4;
-    s->pxy[1] = .3;
+    /* set numerical parameters */
+    s->dt = .05;
+    s->finalt = .5;
     s->radius = .2;
     s->thickn = .1 * s->radius;
+
+    /* init numerical data */
+    init_values (s);
 
     /* create a new domain */
     s->domain = fclaw2d_domain_new_unitsquare (s->mpicomm, s->minlevel);
     fclaw2d_domain_set_refinement (s->domain, s->smooth_refine,
                                    s->smooth_level, s->coarsen_delay);
 
-    /* run refinement cycles */
+    /* run initial refinement loop */
+    init_refine (s);
+
+    /* run refinement/coarsening while sphere is moving */
     run_refine (s);
 
     /* cleanup */
