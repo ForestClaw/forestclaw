@@ -85,6 +85,7 @@ run_refine (fclaw_smooth_t * s)
     int lev;
     int ib, ip;
     double rmin2, rmax2;
+    char basename[BUFSIZ];
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
     fclaw2d_domain_t *domain;
@@ -99,6 +100,8 @@ run_refine (fclaw_smooth_t * s)
     for (lev = s->minlevel; lev < s->maxlevel; ++lev)
     {
         fclaw_global_productionf ("Initial refinement from level %d\n", lev);
+        snprintf (basename, BUFSIZ, "init_%02d", lev);
+        fclaw2d_domain_write_vtk (s->domain, basename);
         for (ib = 0; ib < s->domain->num_blocks; ++ib)
         {
             block = s->domain->blocks + ib;
@@ -136,7 +139,16 @@ run_refine (fclaw_smooth_t * s)
             break;
         }
     }
-    fclaw_global_productionf ("Initial refinement to level %d\n", lev);
+    if (lev < s->maxlevel)
+    {
+        fclaw_global_productionf ("No more refinement to do\n");
+    }
+    else
+    {
+        fclaw_global_productionf ("Initial refinement to level %d\n", lev);
+        snprintf (basename, BUFSIZ, "init_%02d", lev);
+        fclaw2d_domain_write_vtk (s->domain, basename);
+    }
 }
 
 int
@@ -155,10 +167,10 @@ main (int argc, char **argv)
     s->coarsen_delay = 0;
 
     /* init numerical data */
-    s->pxy[0] = .3;
-    s->pxy[1] = .4;
+    s->pxy[0] = .4;
+    s->pxy[1] = .3;
     s->radius = .2;
-    s->thickn = .05;
+    s->thickn = .1 * s->radius;
 
     /* create a new domain */
     s->domain = fclaw2d_domain_new_unitsquare (s->mpicomm, s->minlevel);
