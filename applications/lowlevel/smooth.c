@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef struct fclaw_smooth
 {
     sc_MPI_Comm mpicomm;
+    int mpisize, mpirank;
     fclaw_app_t *a;
 
     /* parameters */
@@ -44,22 +45,51 @@ typedef struct fclaw_smooth
 }
 fclaw_smooth_t;
 
+static int
+patch_overlap (fclaw2d_patch_t * patch,
+               const double pxy[2], double rmin2, double rmax2)
+{
+    int i;
+    int outside[2];
+    double m, hw;
+    double ssmin, ssmax;
+    double center[2], fdist[2];
+
+    hw = .5 * (patch->xupper - patch->xlower);
+    center[0] = patch->xlower + hw;
+    center[1] = patch->ylower + hw;
+
+    for (i = 0; i < 2; ++i)
+    {
+        outside[i] = (fdist[i] = fabs (center[i] - pxy[i])) > hw;
+    }
+
+    ssmin = ssmax = 0.;
+    for (i = 0; i < 2; ++i)
+    {
+        if (outside[i])
+        {
+            m = fdist[i] - hw;
+            FCLAW_ASSERT (m >= 0.);
+            ssmin += m * m;
+        }
+        m = fdist[i] + hw;
+        ssmax += m * m;
+    }
+    return ssmin <= rmax2 && rmin2 <= ssmax;
+}
+
 static void
 run_refine (fclaw_smooth_t * s)
 {
     int lev;
     int ib, ip;
-    int i;
-    int outside[2];
-    double m, hw;
-    double ssmin, ssmax;
     double rmin2, rmax2;
-    double center[2], fdist[2];
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
     fclaw2d_domain_t *domain;
 
-    /* prepare comparing geometrical distance */
+    /* prepare comparing geometric distance */
     rmin2 = s->radius - s->thickn;
     rmin2 = SC_SQR (rmin2);
     rmax2 = s->radius + s->thickn;
@@ -74,30 +104,9 @@ run_refine (fclaw_smooth_t * s)
             block = s->domain->blocks + ib;
             for (ip = 0; ip < block->num_patches; ++ip)
             {
-                patch = block->patches + ip;
-
                 /* refine according to overlap with spherical ring */
-                hw = .5 * (patch->xupper - patch->xlower);
-                center[0] = patch->xlower + hw;
-                center[1] = patch->ylower + hw;
-                for (i = 0; i < 2; ++i)
-                {
-                    outside[i] =
-                        (fdist[i] = fabs (center[i] - s->pxy[i])) > hw;
-                }
-                ssmin = ssmax = 0.;
-                for (i = 0; i < 2; ++i)
-                {
-                    if (outside[i])
-                    {
-                        m = fdist[i] - hw;
-                        FCLAW_ASSERT (m >= 0.);
-                        ssmin += m * m;
-                    }
-                    m = fdist[i] + hw;
-                    ssmax += m * m;
-                }
-                if (ssmin <= rmax2 && rmin2 <= ssmax)
+                patch = block->patches + ip;
+                if (patch_overlap (patch, s->pxy, rmin2, rmax2))
                 {
                     /* we overlap and prompt refinement of this patch */
                     fclaw2d_patch_mark_refine (s->domain, ib, ip);
@@ -136,7 +145,7 @@ main (int argc, char **argv)
     fclaw_smooth_t smoo, *s = &smoo;
 
     s->a = fclaw_app_new (&argc, &argv, NULL);
-    s->mpicomm = fclaw_app_get_mpi_size_rank (s->a, NULL, NULL);
+    s->mpicomm = fclaw_app_get_mpi_size_rank (s->a, &s->mpisize, &s->mpirank);
 
     /* set parameters */
     s->minlevel = 3;
@@ -145,16 +154,16 @@ main (int argc, char **argv)
     s->smooth_level = 0;
     s->coarsen_delay = 0;
 
-    /* create a new domain */
-    s->domain = fclaw2d_domain_new_unitsquare (s->mpicomm, s->minlevel);
-    fclaw2d_domain_set_refinement (s->domain, s->smooth_refine,
-                                   s->smooth_level, s->coarsen_delay);
-
     /* init numerical data */
     s->pxy[0] = .3;
     s->pxy[1] = .4;
     s->radius = .2;
     s->thickn = .05;
+
+    /* create a new domain */
+    s->domain = fclaw2d_domain_new_unitsquare (s->mpicomm, s->minlevel);
+    fclaw2d_domain_set_refinement (s->domain, s->smooth_refine,
+                                   s->smooth_level, s->coarsen_delay);
 
     /* run refinement cycles */
     run_refine (s);
