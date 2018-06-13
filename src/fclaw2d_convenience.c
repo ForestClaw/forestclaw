@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_convenience.h>
 #include <p4est_bits.h>
 #include <p4est_search.h>
+#include <p4est_vtk.h>
 #include <p4est_wrap.h>
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
@@ -663,6 +664,17 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
     domain->partition_unchanged_old_first = 0;
 
     p4est_wrap_complete (wrap);
+}
+
+void
+fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
+{
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+
+    FCLAW_ASSERT (wrap != NULL);
+    FCLAW_ASSERT (wrap->p4est != NULL);
+
+    p4est_vtk_write_file (wrap->p4est, NULL, basename);
 }
 
 static void
