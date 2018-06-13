@@ -31,9 +31,16 @@ typedef struct fclaw_smooth
     sc_MPI_Comm mpicomm;
     fclaw_app_t *a;
 
-    int minlevel;
-    int maxlevel;
+    /* parameters */
+    int minlevel, maxlevel;
+    int smooth_refine, smooth_level, coarsen_delay;
+
+    /* mesh */
     fclaw2d_domain_t *domain;
+
+    /* numerical data */
+    double pxy[2];
+    double radius, thickn;
 }
 fclaw_smooth_t;
 
@@ -42,27 +49,85 @@ run_refine (fclaw_smooth_t * s)
 {
     int lev;
     int ib, ip;
+    int i;
+    int outside[2];
+    double m, hw;
+    double ssmin, ssmax;
+    double rmin2, rmax2;
+    double center[2], fdist[2];
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
+    fclaw2d_domain_t *domain;
 
+    /* prepare comparing geometrical distance */
+    rmin2 = s->radius - s->thickn;
+    rmin2 = SC_SQR (rmin2);
+    rmax2 = s->radius + s->thickn;
+    rmax2 = SC_SQR (rmax2);
+
+    /* loop over multiple initial refinements */
     for (lev = s->minlevel; lev < s->maxlevel; ++lev)
     {
+        fclaw_global_productionf ("Initial refinement from level %d\n", lev);
         for (ib = 0; ib < s->domain->num_blocks; ++ib)
         {
             block = s->domain->blocks + ib;
             for (ip = 0; ip < block->num_patches; ++ip)
             {
                 patch = block->patches + ip;
-                if ((patch->xlower > .3 && patch->xupper < .6) &&
-                    (patch->ylower > .2 && patch->yupper < .55))
-                {
 
-                    /* prompt refinement of this patch */
+                /* refine according to overlap with spherical ring */
+                hw = .5 * (patch->xupper - patch->xlower);
+                center[0] = patch->xlower + hw;
+                center[1] = patch->ylower + hw;
+                for (i = 0; i < 2; ++i)
+                {
+                    outside[i] =
+                        (fdist[i] = fabs (center[i] - s->pxy[i])) > hw;
+                }
+                ssmin = ssmax = 0.;
+                for (i = 0; i < 2; ++i)
+                {
+                    if (outside[i])
+                    {
+                        m = fdist[i] - hw;
+                        FCLAW_ASSERT (m >= 0.);
+                        ssmin += m * m;
+                    }
+                    m = fdist[i] + hw;
+                    ssmax += m * m;
+                }
+                if (ssmin <= rmax2 && rmin2 <= ssmax)
+                {
+                    /* we overlap and prompt refinement of this patch */
                     fclaw2d_patch_mark_refine (s->domain, ib, ip);
                 }
             }
         }
+
+        /* run internal mesh refinement */
+        domain = fclaw2d_domain_adapt (s->domain);
+        FCLAW_ASSERT (domain != s->domain);
+        if (domain != NULL)
+        {
+            fclaw2d_domain_destroy (s->domain);
+            s->domain = domain;
+            domain = fclaw2d_domain_partition (s->domain, 0);
+            FCLAW_ASSERT (domain != s->domain);
+            if (domain != NULL)
+            {
+                fclaw2d_domain_destroy (s->domain);
+                s->domain = domain;
+                fclaw2d_domain_complete (s->domain);
+            }
+        }
+        else
+        {
+            /* mesh did not change; initialization is done */
+            break;
+        }
     }
+    fclaw_global_productionf ("Initial refinement to level %d\n", lev);
 }
 
 int
@@ -74,11 +139,22 @@ main (int argc, char **argv)
     s->mpicomm = fclaw_app_get_mpi_size_rank (s->a, NULL, NULL);
 
     /* set parameters */
-    s->minlevel = 2;
-    s->maxlevel = 5;
+    s->minlevel = 3;
+    s->maxlevel = 4;
+    s->smooth_refine = 0;
+    s->smooth_level = 0;
+    s->coarsen_delay = 0;
 
     /* create a new domain */
     s->domain = fclaw2d_domain_new_unitsquare (s->mpicomm, s->minlevel);
+    fclaw2d_domain_set_refinement (s->domain, s->smooth_refine,
+                                   s->smooth_level, s->coarsen_delay);
+
+    /* init numerical data */
+    s->pxy[0] = .3;
+    s->pxy[1] = .4;
+    s->radius = .2;
+    s->thickn = .05;
 
     /* run refinement cycles */
     run_refine (s);
