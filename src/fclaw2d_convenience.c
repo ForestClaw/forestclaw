@@ -526,6 +526,10 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                     SC_MAX (max_tlevel, npatch->target_level);
                         }
                     }
+                    else
+                    {
+                        FCLAW_ASSERT (nrel == FCLAW2D_PATCH_BOUNDARY);
+                    }
                 }
 
                 /* loop through corner neighbors of this patch */
@@ -562,16 +566,11 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                 else if (max_tlevel > level)
                 {
                     /* max target level may be bigger by one or two */
+                    FCLAW_ASSERT (max_tlevel <= level + 2);
                     p4est_wrap_mark_refine (wrap,
                                             (p4est_locidx_t) nb,
                                             (p4est_locidx_t) np);
                 }
-
-                /* clean up the target markers in case we don't adapt */
-                /* if we adapt, we'll make all new target markers anyway */
-#if 0
-                patch->target_level = patch->level;
-#endif
             }
         }
     }
@@ -590,6 +589,21 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     }
     else
     {
+        /* clean up the target levels since we don't adapt */
+        int nb, np;
+        fclaw2d_block_t *block;
+        fclaw2d_patch_t *patch;
+
+        for (nb = 0; nb < domain->num_blocks; ++nb)
+        {
+            block = domain->blocks + nb;
+            for (np = 0; np < block->num_patches; ++np)
+            {
+                /* compute maximum target level between patch and neighbors */
+                patch = block->patches + np;
+                patch->target_level = patch->level;
+            }
+        }
         return NULL;
     }
 }
