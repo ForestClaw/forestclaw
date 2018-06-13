@@ -55,6 +55,19 @@ typedef struct fclaw_smooth
 fclaw_smooth_t;
 
 static int
+domain_match (fclaw2d_domain_t * d1, fclaw2d_domain_t * d2)
+{
+    FCLAW_ASSERT (d1 != NULL && d2 != NULL);
+
+    if (d1->p.smooth_refine != d2->p.smooth_refine ||
+        d1->p.smooth_level != d2->p.smooth_level)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+static int
 patch_overlap (fclaw2d_patch_t * patch,
                const double pxy[2], double rmin2, double rmax2)
 {
@@ -120,6 +133,7 @@ init_refine (fclaw_smooth_t * s)
     fclaw2d_domain_t *domain;
 
     /* loop over multiple initial refinements */
+    fclaw_global_infof ("Initial position %g %g\n", s->pxy[0], s->pxy[1]);
     for (lev = s->minlevel; lev < s->maxlevel; ++lev)
     {
         fclaw_global_productionf ("Initial refinement from level %d\n", lev);
@@ -148,12 +162,14 @@ init_refine (fclaw_smooth_t * s)
         FCLAW_ASSERT (domain != s->domain);
         if (domain != NULL)
         {
+            FCLAW_ASSERT (domain_match (domain, s->domain));
             fclaw2d_domain_destroy (s->domain);
             s->domain = domain;
             domain = fclaw2d_domain_partition (s->domain, 0);
             FCLAW_ASSERT (domain != s->domain);
             if (domain != NULL)
             {
+                FCLAW_ASSERT (domain_match (domain, s->domain));
                 fclaw2d_domain_destroy (s->domain);
                 s->domain = domain;
                 fclaw2d_domain_complete (s->domain);
@@ -211,6 +227,7 @@ run_refine (fclaw_smooth_t * s)
         /* advance position of sphere */
         s->pxy[0] += deltat * s->vel[0];
         s->pxy[1] += deltat * s->vel[1];
+        fclaw_global_infof ("New position %g %g\n", s->pxy[0], s->pxy[1]);
 
         /* adapt mesh */
         for (ib = 0; ib < s->domain->num_blocks; ++ib)
@@ -244,12 +261,14 @@ run_refine (fclaw_smooth_t * s)
         FCLAW_ASSERT (domain != s->domain);
         if (domain != NULL)
         {
+            FCLAW_ASSERT (domain_match (domain, s->domain));
             fclaw2d_domain_destroy (s->domain);
             s->domain = domain;
             domain = fclaw2d_domain_partition (s->domain, 0);
             FCLAW_ASSERT (domain != s->domain);
             if (domain != NULL)
             {
+                FCLAW_ASSERT (domain_match (domain, s->domain));
                 fclaw2d_domain_destroy (s->domain);
                 s->domain = domain;
                 fclaw2d_domain_complete (s->domain);
@@ -277,18 +296,18 @@ main (int argc, char **argv)
     s->mpicomm = fclaw_app_get_mpi_size_rank (s->a, &s->mpisize, &s->mpirank);
 
     /* set refinement parameters */
-    s->minlevel = 4;
+    s->minlevel = 2;
     s->maxlevel = 5;
-    s->smooth_refine = 0;
+    s->smooth_refine = 1;
     s->smooth_level = 0;
     s->coarsen_delay = 0;
     s->write_vtk = 1;
 
     /* set numerical parameters */
     s->dt = .05;
-    s->finalt = .5;
+    s->finalt = 1.;
     s->radius = .2;
-    s->thickn = .1 * s->radius;
+    s->thickn = .0 * s->radius;
 
     /* init numerical data */
     init_values (s);
