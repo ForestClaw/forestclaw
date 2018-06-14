@@ -269,7 +269,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
         new_domain = NULL;
 
         /* Repartition for load balancing.  Second arg (mode) for vtk output */
-        fclaw2d_partition_domain(glob, -1,FCLAW2D_TIMER_REGRID);
+        fclaw2d_partition_domain(glob,FCLAW2D_TIMER_REGRID);
 
         /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
 
