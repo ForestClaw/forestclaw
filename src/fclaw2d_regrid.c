@@ -71,7 +71,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 }
 
 /* Tag family for coarsening */
-static
+
 void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *fine_patches,
                               int blockno, int fine0_patchno,

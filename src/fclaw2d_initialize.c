@@ -157,7 +157,13 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
         for (level = minlevel; level < maxlevel; level++)
         {
             fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
-            fclaw2d_global_iterate_level(glob, level,
+
+#if 1
+            fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
+                                            (void*) NULL);
+#endif                                            
+
+            fclaw2d_global_iterate_patches(glob,
                                          cb_fclaw2d_regrid_tag4refinement,
                                          &domain_init);
             fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
