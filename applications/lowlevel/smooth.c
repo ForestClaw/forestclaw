@@ -54,6 +54,8 @@ typedef struct fclaw_smooth
 }
 fclaw_smooth_t;
 
+#ifdef FCLAW_ENABLE_DEBUG
+
 static int
 domain_match (fclaw2d_domain_t * d1, fclaw2d_domain_t * d2)
 {
@@ -66,6 +68,8 @@ domain_match (fclaw2d_domain_t * d1, fclaw2d_domain_t * d2)
     }
     return 1;
 }
+
+#endif
 
 static int
 patch_overlap (fclaw2d_patch_t * patch,
