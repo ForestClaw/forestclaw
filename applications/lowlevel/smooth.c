@@ -118,6 +118,7 @@ init_values (fclaw_smooth_t * s)
     snprintf (s->prefix, BUFSIZ, "sm_l%dL%d_s%dl%dc%d",
               s->minlevel, s->maxlevel,
               s->smooth_refine, s->smooth_level, s->coarsen_delay);
+    fclaw_global_productionf ("Output prefix %s\n", s->prefix);
 
     /* init numerical data */
     s->pxy[0] = .4;
@@ -138,9 +139,9 @@ init_refine (fclaw_smooth_t * s)
 
     /* loop over multiple initial refinements */
     fclaw_global_infof ("Initial position %g %g\n", s->pxy[0], s->pxy[1]);
-    for (lev = s->minlevel; lev < s->maxlevel; ++lev)
+    for (lev = s->minlevel; lev <= s->maxlevel; ++lev)
     {
-        fclaw_global_productionf ("Initial refinement level %d\n", lev);
+        fclaw_global_productionf ("Initial pseudo-level %d\n", lev);
         if (s->write_vtk)
         {
             snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
@@ -156,8 +157,10 @@ init_refine (fclaw_smooth_t * s)
                 if (patch_overlap (patch, s->pxy, s->rmin2, s->rmax2))
                 {
                     /* we overlap and prompt refinement of this patch */
-                    FCLAW_ASSERT (patch->level < s->maxlevel);
-                    fclaw2d_patch_mark_refine (s->domain, ib, ip);
+                    if (patch->level < s->maxlevel)
+                    {
+                        fclaw2d_patch_mark_refine (s->domain, ib, ip);
+                    }
                 }
                 else
                 {
@@ -195,7 +198,7 @@ init_refine (fclaw_smooth_t * s)
             break;
         }
     }
-    fclaw_global_productionf ("Initial refinement level %d\n", lev);
+    fclaw_global_productionf ("Initial pseudo-level %d\n", lev);
     if (s->write_vtk)
     {
         snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
@@ -309,7 +312,7 @@ main (int argc, char **argv)
     s->minlevel = 2;
     s->maxlevel = 7;
     s->smooth_refine = 1;
-    s->smooth_level = 0;
+    s->smooth_level = 7;
     s->coarsen_delay = 0;
     s->write_vtk = 1;
 
