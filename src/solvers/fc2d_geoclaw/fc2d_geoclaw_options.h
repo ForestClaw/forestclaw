@@ -51,7 +51,7 @@ typedef struct fc2d_geoclaw_options
     int *mthbc;
     const char *mthbc_string;
 
-    int gauge_print_buffer_length;   
+    int gauge_buffer_length;   
 
     int method[7];
     int mcapa;
