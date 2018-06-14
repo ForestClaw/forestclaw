@@ -140,7 +140,7 @@ init_refine (fclaw_smooth_t * s)
     fclaw_global_infof ("Initial position %g %g\n", s->pxy[0], s->pxy[1]);
     for (lev = s->minlevel; lev < s->maxlevel; ++lev)
     {
-        fclaw_global_productionf ("Initial refinement from level %d\n", lev);
+        fclaw_global_productionf ("Initial refinement level %d\n", lev);
         if (s->write_vtk)
         {
             snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
@@ -195,14 +195,11 @@ init_refine (fclaw_smooth_t * s)
             break;
         }
     }
-    if (lev < s->maxlevel)
+    fclaw_global_productionf ("Initial refinement level %d\n", lev);
+    if (s->write_vtk)
     {
-        fclaw_global_productionf ("No more refinement done\n");
-    }
-    else
-    {
-        fclaw_global_productionf ("Refined up to theoretical level %d\n",
-                                  s->maxlevel);
+        snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
+        fclaw2d_domain_write_vtk (s->domain, basename);
     }
 }
 
@@ -219,6 +216,7 @@ run_refine (fclaw_smooth_t * s)
     /* initialize time stepping */
     s->k = 0;
     s->time = 0.;
+    fclaw_global_productionf ("Run time %.3g step %d\n", s->time, s->k);
     if (s->write_vtk)
     {
         snprintf (basename, BUFSIZ, "%s_K%05d", s->prefix, s->k);
@@ -228,8 +226,6 @@ run_refine (fclaw_smooth_t * s)
     /* run time loop */
     while (s->time < s->finalt)
     {
-        fclaw_global_productionf ("Run time %.3g step %d\n", s->time, s->k);
-
         /* adjust time step near final time */
         nextt = s->time + (deltat = s->dt);
         if (nextt > s->finalt - 1e-3 * deltat)
@@ -292,13 +288,13 @@ run_refine (fclaw_smooth_t * s)
         /* advance time */
         ++s->k;
         s->time = nextt;
+        fclaw_global_productionf ("Run time %.3g step %d\n", s->time, s->k);
         if (s->write_vtk)
         {
             snprintf (basename, BUFSIZ, "%s_K%05d", s->prefix, s->k);
             fclaw2d_domain_write_vtk (s->domain, basename);
         }
     }
-    fclaw_global_productionf ("Run time %.3g step %d\n", s->time, s->k);
 }
 
 int
