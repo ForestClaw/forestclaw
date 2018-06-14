@@ -168,11 +168,15 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
+
+#if 0      
         if (domain_init)
         {
+            /* We now do coarsening at the initial refinement */
             fclaw_debugf("fclaw2d_regrid.cpp (repopulate): We shouldn't end up here\n");
-            //exit(0);
+            exit(0);
         }
+#endif        
 
         /* Old grids are the finer grids;  new grid is the coarsened grid */
         fclaw2d_patch_t *fine_siblings = old_patch;
