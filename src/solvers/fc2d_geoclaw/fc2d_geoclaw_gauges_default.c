@@ -52,16 +52,6 @@ typedef struct geoclaw_user
 } geoclaw_user_t;
 
 
-#if 0
-static
-geoclaw_user_t** geoclaw_gauge_buffer(fclaw2d_global_t *glob, fc2d_geoclaw_gauge_t *g)
-{
-    return (geoclaw_user_t**) fc2d_geoclaw_gauge_buffer(glob,g);
-}
-#endif
-
-
-
 void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob, 
                                       fc2d_geoclaw_gauge_t **gauges,
                                       int *num_gauges)
@@ -119,11 +109,6 @@ void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob,
     }
     else
     {
-#if 0        
-        *gauges = (fc2d_geoclaw_gauge_t*) FCLAW_ALLOC(fc2d_geoclaw_gauge_t,*num_gauges);
-        fc2d_geoclaw_gauge_t *g = *gauges;
-#endif
-
         fc2d_geoclaw_gauge_allocate(glob,*num_gauges,gauges);
         fc2d_geoclaw_gauge_t *g = *gauges;
 
