@@ -156,8 +156,18 @@ init_refine (fclaw_smooth_t * s)
                 if (patch_overlap (patch, s->pxy, s->rmin2, s->rmax2))
                 {
                     /* we overlap and prompt refinement of this patch */
+                    FCLAW_ASSERT (patch->level < s->maxlevel);
                     fclaw2d_patch_mark_refine (s->domain, ib, ip);
                 }
+                else
+                {
+                    /* we coarsen if we do not overlap */
+                    if (patch->level > s->minlevel)
+                    {
+                        fclaw2d_patch_mark_coarsen (s->domain, ib, ip);
+                    }
+                }
+
             }
         }
 
@@ -301,15 +311,15 @@ main (int argc, char **argv)
 
     /* set refinement parameters */
     s->minlevel = 2;
-    s->maxlevel = 5;
+    s->maxlevel = 7;
     s->smooth_refine = 1;
     s->smooth_level = 0;
     s->coarsen_delay = 0;
     s->write_vtk = 1;
 
     /* set numerical parameters */
-    s->dt = .05;
-    s->finalt = 1.;
+    s->dt = .02;
+    s->finalt = .3;
     s->radius = .2;
     s->thickn = .0 * s->radius;
 
