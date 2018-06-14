@@ -71,6 +71,28 @@ domain_match (fclaw2d_domain_t * d1, fclaw2d_domain_t * d2)
 
 #endif
 
+static void
+init_values (fclaw_smooth_t * s)
+{
+    double ss;
+
+    /* prepare comparing geometric distance */
+    ss = s->radius - s->thickn;
+    s->rmin2 = SC_SQR (ss);
+    ss = s->radius + s->thickn;
+    s->rmax2 = SC_SQR (ss);
+    snprintf (s->prefix, BUFSIZ, "sm_l%dL%d_s%dl%dc%d",
+              s->minlevel, s->maxlevel,
+              s->smooth_refine, s->smooth_level, s->coarsen_delay);
+    fclaw_global_productionf ("Output prefix %s\n", s->prefix);
+
+    /* init numerical data */
+    s->pxy[0] = .4;
+    s->pxy[1] = .3;
+    s->vel[0] = .6;
+    s->vel[1] = .8;
+}
+
 static int
 patch_overlap (fclaw2d_patch_t * patch,
                const double pxy[2], double rmin2, double rmax2)
@@ -103,28 +125,6 @@ patch_overlap (fclaw2d_patch_t * patch,
         ssmax += m * m;
     }
     return ssmin <= rmax2 && rmin2 <= ssmax;
-}
-
-static void
-init_values (fclaw_smooth_t * s)
-{
-    double ss;
-
-    /* prepare comparing geometric distance */
-    ss = s->radius - s->thickn;
-    s->rmin2 = SC_SQR (ss);
-    ss = s->radius + s->thickn;
-    s->rmax2 = SC_SQR (ss);
-    snprintf (s->prefix, BUFSIZ, "sm_l%dL%d_s%dl%dc%d",
-              s->minlevel, s->maxlevel,
-              s->smooth_refine, s->smooth_level, s->coarsen_delay);
-    fclaw_global_productionf ("Output prefix %s\n", s->prefix);
-
-    /* init numerical data */
-    s->pxy[0] = .4;
-    s->pxy[1] = .3;
-    s->vel[0] = .6;
-    s->vel[1] = .8;
 }
 
 static void
