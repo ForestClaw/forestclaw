@@ -45,15 +45,14 @@ void geoclaw_create_gauge_files_default(struct fclaw2d_global *glob,
                                 struct fc2d_geoclaw_gauge *gauges, 
                                 int num_gauges);
 
-void geoclaw_store_gauge_vars_default(struct fclaw2d_global *glob, 
-                                      int level, double tcurr,
-                                      double* qvar, double *avar,
-                                      struct fc2d_geoclaw_gauge *gauge);
+void geoclaw_gauge_update_default(struct fclaw2d_global* glob, 
+                                  struct fclaw2d_block* block,
+                                  struct fclaw2d_patch* patch, 
+                                  int blockno, int patchno,
+                                  double tcurr, struct fc2d_geoclaw_gauge *g);
 
 void geoclaw_print_gauges_default(struct fclaw2d_global *glob, 
                                   struct fc2d_geoclaw_gauge *gauge);
-
-
 
 #ifdef __cplusplus
 #if 0
