@@ -113,8 +113,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                            "png","Figure suffix for plotting [png]");    
 
     sc_options_add_bool (opt, 0, "tikz-mesh-only", 
-                         &fclaw_opt->tikz_mesh_only,1,
-                         "Plot mesh only  .tex file [1]");    
+                         &fclaw_opt->tikz_mesh_only,0,
+                         "Do not include .png file in tikz .tex output [0]");    
 
     /* Deprecated */
     sc_options_add_bool (opt, 0, "tikz-plot-fig", &fclaw_opt->tikz_plot_fig,1,
