@@ -171,7 +171,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         if (domain_init)
         {
             fclaw_debugf("fclaw2d_regrid.cpp (repopulate): We shouldn't end up here\n");
-            exit(0);
+            //exit(0);
         }
 
         /* Old grids are the finer grids;  new grid is the coarsened grid */
@@ -188,6 +188,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         
         if (domain_init)
         {
+            fclaw2d_patch_build(g->glob,coarse_patch,blockno,
+                                coarse_patchno,(void*) &build_mode);
             fclaw2d_patch_initialize(g->glob,coarse_patch,blockno,coarse_patchno);
         }
         else
