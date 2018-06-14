@@ -128,13 +128,45 @@ init_values (fclaw_smooth_t * s)
 }
 
 static void
+mark_patches (fclaw_smooth_t * s)
+{
+    int ib, ip;
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+
+    for (ib = 0; ib < s->domain->num_blocks; ++ib)
+    {
+        block = s->domain->blocks + ib;
+        for (ip = 0; ip < block->num_patches; ++ip)
+        {
+            /* refine according to overlap with spherical ring */
+            patch = block->patches + ip;
+            if (patch_overlap (patch, s->pxy, s->rmin2, s->rmax2))
+            {
+                /* we overlap and prompt refinement of this patch */
+                if (patch->level < s->maxlevel)
+                {
+                    fclaw2d_patch_mark_refine (s->domain, ib, ip);
+                }
+            }
+            else
+            {
+                /* we coarsen if we do not overlap */
+                if (patch->level > s->minlevel)
+                {
+                    fclaw2d_patch_mark_coarsen (s->domain, ib, ip);
+                }
+            }
+
+        }
+    }
+}
+
+static void
 init_refine (fclaw_smooth_t * s)
 {
     int lev;
-    int ib, ip;
     char basename[BUFSIZ];
-    fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
     fclaw2d_domain_t *domain;
 
     /* loop over multiple initial refinements */
@@ -147,32 +179,9 @@ init_refine (fclaw_smooth_t * s)
             snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
             fclaw2d_domain_write_vtk (s->domain, basename);
         }
-        for (ib = 0; ib < s->domain->num_blocks; ++ib)
-        {
-            block = s->domain->blocks + ib;
-            for (ip = 0; ip < block->num_patches; ++ip)
-            {
-                /* refine according to overlap with spherical ring */
-                patch = block->patches + ip;
-                if (patch_overlap (patch, s->pxy, s->rmin2, s->rmax2))
-                {
-                    /* we overlap and prompt refinement of this patch */
-                    if (patch->level < s->maxlevel)
-                    {
-                        fclaw2d_patch_mark_refine (s->domain, ib, ip);
-                    }
-                }
-                else
-                {
-                    /* we coarsen if we do not overlap */
-                    if (patch->level > s->minlevel)
-                    {
-                        fclaw2d_patch_mark_coarsen (s->domain, ib, ip);
-                    }
-                }
 
-            }
-        }
+        /* run refinement indicator for all patches */
+        mark_patches (s);
 
         /* run internal mesh refinement */
         domain = fclaw2d_domain_adapt (s->domain);
@@ -209,11 +218,8 @@ init_refine (fclaw_smooth_t * s)
 static void
 run_refine (fclaw_smooth_t * s)
 {
-    int ib, ip;
     double nextt, deltat;
     char basename[BUFSIZ];
-    fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
     fclaw2d_domain_t *domain;
 
     /* initialize time stepping */
@@ -242,32 +248,8 @@ run_refine (fclaw_smooth_t * s)
         s->pxy[1] += deltat * s->vel[1];
         fclaw_global_infof ("New position %g %g\n", s->pxy[0], s->pxy[1]);
 
-        /* adapt mesh */
-        for (ib = 0; ib < s->domain->num_blocks; ++ib)
-        {
-            block = s->domain->blocks + ib;
-            for (ip = 0; ip < block->num_patches; ++ip)
-            {
-                /* refine according to overlap with spherical ring */
-                patch = block->patches + ip;
-                if (patch_overlap (patch, s->pxy, s->rmin2, s->rmax2))
-                {
-                    /* we overlap and prompt refinement of this patch */
-                    if (patch->level < s->maxlevel)
-                    {
-                        fclaw2d_patch_mark_refine (s->domain, ib, ip);
-                    }
-                }
-                else
-                {
-                    /* we coarsen if we do not overlap */
-                    if (patch->level > s->minlevel)
-                    {
-                        fclaw2d_patch_mark_coarsen (s->domain, ib, ip);
-                    }
-                }
-            }
-        }
+        /* run refinement indicator for all patches */
+        mark_patches (s);
 
         /* run internal mesh refinement */
         domain = fclaw2d_domain_adapt (s->domain);
