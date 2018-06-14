@@ -154,17 +154,14 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     {
         int domain_init = 1;
         int level;
-        for (level = minlevel; level < maxlevel; level++)
+        for (level = minlevel; level <= maxlevel; level++)
         {
             fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
-#if 1
             fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
                                             (void*) NULL);
-#endif                                            
 
-            fclaw2d_global_iterate_patches(glob,
-                                         cb_fclaw2d_regrid_tag4refinement,
+            fclaw2d_global_iterate_patches(glob,cb_fclaw2d_regrid_tag4refinement,
                                          &domain_init);
             fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
@@ -203,7 +200,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                 new_domain = NULL;
 
                 /* Repartition domain to new processors.    */
-                fclaw2d_partition_domain(glob,level,FCLAW2D_TIMER_INIT);
+                fclaw2d_partition_domain(glob,FCLAW2D_TIMER_INIT);
 
                 /* Set up ghost patches.  This probably doesn't need to be done
                    each time we add a new level. */

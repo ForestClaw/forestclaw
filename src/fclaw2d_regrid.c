@@ -186,15 +186,21 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         --ddata_old->count_set_patch;
         ++ddata_new->count_set_patch;
         
-        /* Area (and possibly other things) should be averaged to coarse grid. */
-        fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
-                                      blockno,coarse_patchno,fine_patchno,
-                                      build_mode);// new_domain
+        if (domain_init)
+        {
+            fclaw2d_patch_initialize(g->glob,coarse_patch,blockno,coarse_patchno);
+        }
+        else
+        {
+            /* Area (and possibly other things) should be averaged to coarse grid. */
+            fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
+                                          blockno,coarse_patchno,fine_patchno,
+                                          build_mode);
+            /* Average the solution. Does this need to be customizable? */
+            fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
+                                        blockno,fine_patchno,coarse_patchno);
 
-        /* Average the solution. Does this need to be customizable? */
-        fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
-                                     blockno,fine_patchno,coarse_patchno);//new_domain
-
+        }
         int i;
         for(i = 0; i < 4; i++)
         {
