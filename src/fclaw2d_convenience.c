@@ -491,8 +491,8 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                     nblockno,
                                                                     npatchno
                                                                     [0]);
-                        P4EST_ASSERT (npatch->level == patch->level);
-                        if (patch->level >= domain->p.smooth_level)
+                        P4EST_ASSERT (npatch->level == level);
+                        if (npatch->level >= domain->p.smooth_level)
                             /* Match target level only if we are in a level that
                                should be refined */
                             max_tlevel =
@@ -505,8 +505,8 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                     nblockno,
                                                                     npatchno
                                                                     [0]);
-                        P4EST_ASSERT (npatch->level == patch->level - 1);
-                        if (patch->level >= domain->p.smooth_level)
+                        P4EST_ASSERT (npatch->level == level - 1);
+                        if (npatch->level >= domain->p.smooth_level)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
                     }
@@ -520,8 +520,8 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                    nblockno,
                                                                    npatchno
                                                                    [k]);
-                            P4EST_ASSERT (npatch->level == patch->level + 1);
-                            if (patch->level >= domain->p.smooth_level)
+                            P4EST_ASSERT (npatch->level == level + 1);
+                            if (npatch->level >= domain->p.smooth_level)
                                 max_tlevel =
                                     SC_MAX (max_tlevel, npatch->target_level);
                         }
@@ -549,7 +549,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                nprocs[0],
                                                                nblockno,
                                                                npatchno[0]);
-                        if (patch->level >= domain->p.smooth_level)
+                        if (npatch->level >= domain->p.smooth_level)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
                     }
