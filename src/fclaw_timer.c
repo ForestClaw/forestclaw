@@ -207,8 +207,32 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
 
     sc_stats_compute (glob->mpicomm, FCLAW2D_TIMER_COUNT, stats);
 
-    sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
-                    stats, 1, 0);
+    /* Set stats groups */
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_INIT",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_OUTPUT",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_DIAGNOSTICS",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_REGRID",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_ADVANCE",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_GHOSTFILL",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_ADAPT_COMM",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_PARTITION_COMM",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_GHOSTPATCH_COMM",1, 0);    
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_DIAGNOSTICS_COMM",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_CFL_COMM",1, 0);
+    sc_stats_init_ext (stats, "FCLAW2D_TIMER_WALLTIME",1, 0);
+
+
+    int report_timing_group = 0;  /* just for testing for now;  add option later? */
+    if (report_timing_group == 0)
+    {
+        sc_stats_print_ext(sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
+                           stats,1,0,1,0);
+    }
+    else
+    {
+        sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
+                        stats, 1, 0);        
+    }
 
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
                           "regrid %d %d %g\n", glob->mpisize,
