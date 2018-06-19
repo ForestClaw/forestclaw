@@ -44,17 +44,22 @@ typedef struct user_options
 
 } user_options_t;
 
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(double* tperiod);
-
 void swirl_link_solvers(fclaw2d_global_t *glob);
 
 void swirl_problem_setup(fclaw2d_global_t* glob);
 
+/* ------------------------------------- Options ---------------------------------------*/
+user_options_t* swirl_options_register (fclaw_app_t * app,
+                                        const char *configfile);
+
+void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
 
-/* Mappings */
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+/* ------------------------------------ Fortran ----------------------------------------*/
+#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
+void SWIRL_SETPROB(double* tperiod);
+
 
 #ifdef __cplusplus
 #if 0
