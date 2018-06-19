@@ -294,7 +294,7 @@ main (int argc, char **argv)
     s->minlevel = 2;
     s->maxlevel = 7;
     s->smooth_refine = 1;
-    s->smooth_level = 7;
+    s->smooth_level = 6;
     s->coarsen_delay = 0;
     s->write_vtk = 1;
 
