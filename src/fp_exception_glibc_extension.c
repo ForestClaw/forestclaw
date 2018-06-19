@@ -94,9 +94,9 @@ http://graphviz.sourcearchive.com/documentation/2.16/gvrender__pango_8c-source.h
 /* END quote */
 #endif // LINUX
 
-/* this should be included from fp_exception_glibc_extension.h (or not at all)
+#ifdef FCLAW_HAVE_FENV_H
 #include <fenv.h>
-*/
+#endif
 
 #define DEFINED_PPC      (defined(__ppc__) || defined(__ppc64__))
 #define DEFINED_INTEL    (defined(__i386__) || defined(__x86_64__))

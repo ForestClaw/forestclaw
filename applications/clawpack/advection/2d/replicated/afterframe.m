@@ -15,6 +15,18 @@ delete(get(gca,'title'));
 set(gca,'fontsize',16,'box','on');
 axis square
 
+plot_tikz = true;
+if (plot_tikz)
+    caxis([0 7]);
+    axis([0, 1, 0,1]);
+    figsize = [8,8];  % Should match tikz figsize.
+    maxlevel = 7;
+    dpi = mx*2^maxlevel/figsize(1);
+    prefix = 'plot';
+    caxis([0,1]);
+    plot_tikz_fig(Frame,figsize,prefix,dpi);    
+end
+
 shg
 
 clear afterframe;

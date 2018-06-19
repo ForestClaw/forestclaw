@@ -23,23 +23,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// #include <fclaw2d_forestclaw.h>
 #include <fclaw_options.h>
 #include <fclaw_mpi.h>
 
-/* Use as an alternate to GNU feenableexcept */
-#ifndef FCLAW_HAVE_FEENABLEEXCEPT
-#include <fp_exception_glibc_extension.h>
-#else
+/* Get whatever definitions exist already */
 #ifdef FCLAW_HAVE_FENV_H
 #ifndef __USE_GNU
 #define __USE_GNU
 #endif
 #include <fenv.h>
 #endif
+
+/* Use as an alternate to GNU feenableexcept */
+#ifndef FCLAW_HAVE_FEENABLEEXCEPT
+#include <fp_exception_glibc_extension.h>
 #endif
 
+#ifdef FCLAW_HAVE_SIGNAL_H
 #include <signal.h>
+#endif
 
 #ifdef FCLAW_HAVE_UNISTD_H
 #include <unistd.h>    /* To get process ids */
@@ -118,8 +120,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                            "png","Figure suffix for plotting [png]");    
 
     sc_options_add_bool (opt, 0, "tikz-mesh-only", 
-                         &fclaw_opt->tikz_mesh_only,1,
-                         "Plot mesh only  .tex file [1]");    
+                         &fclaw_opt->tikz_mesh_only,0,
+                         "Do not include .png file in tikz .tex output [0]");    
 
     /* Deprecated */
     sc_options_add_bool (opt, 0, "tikz-plot-fig", &fclaw_opt->tikz_plot_fig,1,
