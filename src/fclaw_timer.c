@@ -30,11 +30,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sc_statistics.h>
 #include <fclaw2d_domain.h>
 
-#define FCLAW2D_STATS_SET(stats,glob,NAME) do {                               \
-    SC_CHECK_ABORT (!(glob)->timers[FCLAW2D_TIMER_ ## NAME].running,          \
-                    "Timer " #NAME " still running in fclaw2d_domain_finalize");              \
-    sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                           \
-                   (glob)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
+#define FCLAW2D_STATS_SET(stats,glob,NAME,group_id,prio_value) do {               \
+    SC_CHECK_ABORT (!(glob)->timers[FCLAW2D_TIMER_ ## NAME].running,              \
+                    "Timer " #NAME " still running in fclaw2d_domain_finalize");  \
+    sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                              \
+                   (glob)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME);     \
+    sc_stats_set_group_prio ((stats) + FCLAW2D_TIMER_ ## NAME,group_id,prio_value, \
+                             group_id,prio_value);     \
+} while (0)
+
+
+#define FCLAW2D_STATS_SET_GROUP(stats,glob,NAME,group_id,prio_value) do {               \
+    SC_CHECK_ABORT (!(glob)->timers[FCLAW2D_TIMER_ ## NAME].running,                    \
+                    "Timer " #NAME " still running in fclaw2d_domain_finalize");        \
+    sc_stats_init_ext ((stats) + FCLAW2D_TIMER_ ## NAME,                                    \
+                   (glob)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME,group_id,prio_value);           \
 } while (0)
 
 /* -----------------------------------------------------------------
@@ -208,25 +218,57 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     sc_stats_compute (glob->mpicomm, FCLAW2D_TIMER_COUNT, stats);
 
     /* Set stats groups */
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_INIT",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_OUTPUT",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_DIAGNOSTICS",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_REGRID",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_ADVANCE",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_GHOSTFILL",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_ADAPT_COMM",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_PARTITION_COMM",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_GHOSTPATCH_COMM",1, 0);    
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_DIAGNOSTICS_COMM",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_CFL_COMM",1, 0);
-    sc_stats_init_ext (stats, "FCLAW2D_TIMER_WALLTIME",1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_INIT],             1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_OUTPUT],           1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_DIAGNOSTICS],      1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_REGRID],           1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_ADVANCE],          1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTFILL],        1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_ADAPT_COMM],       1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_PARTITION_COMM],   1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTPATCH_COMM],  1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_DIAGNOSTICS_COMM], 1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_CFL_COMM],         1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_WALLTIME],         1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_UNACCOUNTED],      1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_LOCAL],            1, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_COMM],             1, 0);
+
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_COUNTER],       2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_INV_HMEAN],     2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],              2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],    2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY],        2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GRIDS_INTERIOR],              2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY_RATIO],  2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY],       2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY_RATIO], 2, 0);
+
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_REGRID_BUILD],     2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_REGRID_TAGGING],   2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_PARTITION],        2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_PARTITION_BUILD],  2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTPATCH_BUILD], 2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTFILL_COPY],   2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTFILL_AVERAGE],2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTFILL_INTERP], 2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTFILL_PHYSBC], 2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTFILL_STEP1],  2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTFILL_STEP2],  2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_GHOSTFILL_STEP3],  2, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_NEIGHBOR_SEARCH],  2, 0);
+
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_EXTRA1],           3, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_EXTRA2],           3, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_EXTRA3],           3, 0);
+    sc_stats_set_group_prio (&stats[FCLAW2D_TIMER_EXTRA4],           3, 0);
 
 
     int report_timing_group = 0;  /* just for testing for now;  add option later? */
     if (report_timing_group == 0)
     {
         sc_stats_print_ext(sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
-                           stats,1,0,0,0);
+                           stats,1,0,1,0);
     }
     else
     {
