@@ -226,7 +226,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     if (report_timing_group == 0)
     {
         sc_stats_print_ext(sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
-                           stats,1,0,1,0);
+                           stats,1,0,0,0);
     }
     else
     {
