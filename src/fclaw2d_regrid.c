@@ -71,7 +71,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 }
 
 /* Tag family for coarsening */
-static
+
 void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
                               fclaw2d_patch_t *fine_patches,
                               int blockno, int fine0_patchno,
@@ -168,11 +168,15 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     }
     else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
+
+#if 0      
         if (domain_init)
         {
+            /* We now do coarsening at the initial refinement */
             fclaw_debugf("fclaw2d_regrid.cpp (repopulate): We shouldn't end up here\n");
             exit(0);
         }
+#endif        
 
         /* Old grids are the finer grids;  new grid is the coarsened grid */
         fclaw2d_patch_t *fine_siblings = old_patch;
@@ -186,15 +190,23 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         --ddata_old->count_set_patch;
         ++ddata_new->count_set_patch;
         
-        /* Area (and possibly other things) should be averaged to coarse grid. */
-        fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
-                                      blockno,coarse_patchno,fine_patchno,
-                                      build_mode);// new_domain
+        if (domain_init)
+        {
+            fclaw2d_patch_build(g->glob,coarse_patch,blockno,
+                                coarse_patchno,(void*) &build_mode);
+            fclaw2d_patch_initialize(g->glob,coarse_patch,blockno,coarse_patchno);
+        }
+        else
+        {
+            /* Area (and possibly other things) should be averaged to coarse grid. */
+            fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
+                                          blockno,coarse_patchno,fine_patchno,
+                                          build_mode);
+            /* Average the solution. Does this need to be customizable? */
+            fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
+                                        blockno,fine_patchno,coarse_patchno);
 
-        /* Average the solution. Does this need to be customizable? */
-        fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
-                                     blockno,fine_patchno,coarse_patchno);//new_domain
-
+        }
         int i;
         for(i = 0; i < 4; i++)
         {
@@ -269,7 +281,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
         new_domain = NULL;
 
         /* Repartition for load balancing.  Second arg (mode) for vtk output */
-        fclaw2d_partition_domain(glob, -1,FCLAW2D_TIMER_REGRID);
+        fclaw2d_partition_domain(glob,FCLAW2D_TIMER_REGRID);
 
         /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
 

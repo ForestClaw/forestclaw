@@ -5,6 +5,7 @@ bin_PROGRAMS += applications/clawpack/advection/2d/swirl/swirl
 applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/swirl_user.cpp \
 	applications/clawpack/advection/2d/swirl/swirl_user.h \
+	applications/clawpack/advection/2d/swirl/swirl_options.c \
 	applications/clawpack/advection/2d/swirl/swirl.cpp \
 	applications/clawpack/advection/2d/swirl/psi.f \
 	applications/clawpack/advection/2d/swirl/setprob.f \

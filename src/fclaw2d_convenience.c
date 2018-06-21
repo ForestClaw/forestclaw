@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_convenience.h>
 #include <p4est_bits.h>
 #include <p4est_search.h>
+#include <p4est_vtk.h>
 #include <p4est_wrap.h>
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
@@ -435,7 +436,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     if (domain->p.smooth_refine)
     {
         int ng, nb, np;
-        int face, corner, fcfirst;
+        int face, corner;
         int nprocs[2], nblockno, npatchno[2], nfc;
         int level, max_tlevel;
         int exists;
@@ -468,14 +469,8 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                 level = patch->level;
                 max_tlevel = patch->target_level;
 
-                /* use this to skip the level-up if the quadrant is too big */
-                /* this is a lazy hack because I don't want to indent further */
-                fcfirst =
-                    level >= domain->p.smooth_level ? 0 :
-                    SC_MAX (wrap->p4est_faces, wrap->p4est_children);
-
                 /* loop through face neighbors of this patch */
-                for (face = fcfirst; max_tlevel <= level &&
+                for (face = 0; max_tlevel <= level &&
                      face < wrap->p4est_faces; ++face)
                 {
                     nrel = fclaw2d_patch_face_neighbors (domain, nb, np, face,
@@ -490,8 +485,8 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                     nblockno,
                                                                     npatchno
                                                                     [0]);
-                        P4EST_ASSERT (npatch->level == patch->level);
-                        if (patch->level >= domain->p.smooth_level)
+                        P4EST_ASSERT (npatch->level == level);
+                        if (npatch->level >= domain->p.smooth_level)
                             /* Match target level only if we are in a level that
                                should be refined */
                             max_tlevel =
@@ -504,8 +499,8 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                     nblockno,
                                                                     npatchno
                                                                     [0]);
-                        P4EST_ASSERT (npatch->level == patch->level - 1);
-                        if (patch->level >= domain->p.smooth_level)
+                        P4EST_ASSERT (npatch->level == level - 1);
+                        if (npatch->level >= domain->p.smooth_level)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
                     }
@@ -519,16 +514,20 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                    nblockno,
                                                                    npatchno
                                                                    [k]);
-                            P4EST_ASSERT (npatch->level == patch->level + 1);
-                            if (patch->level >= domain->p.smooth_level)
+                            P4EST_ASSERT (npatch->level == level + 1);
+                            if (npatch->level >= domain->p.smooth_level)
                                 max_tlevel =
                                     SC_MAX (max_tlevel, npatch->target_level);
                         }
                     }
+                    else
+                    {
+                        FCLAW_ASSERT (nrel == FCLAW2D_PATCH_BOUNDARY);
+                    }
                 }
 
                 /* loop through corner neighbors of this patch */
-                for (corner = fcfirst; max_tlevel <= level &&
+                for (corner = 0; max_tlevel <= level &&
                      corner < wrap->p4est_children; ++corner)
                 {
                     exists = fclaw2d_patch_corner_neighbors (domain, nb, np,
@@ -544,7 +543,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                nprocs[0],
                                                                nblockno,
                                                                npatchno[0]);
-                        if (patch->level >= domain->p.smooth_level)
+                        if (npatch->level >= domain->p.smooth_level)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
                     }
@@ -561,16 +560,11 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                 else if (max_tlevel > level)
                 {
                     /* max target level may be bigger by one or two */
+                    FCLAW_ASSERT (max_tlevel <= level + 2);
                     p4est_wrap_mark_refine (wrap,
                                             (p4est_locidx_t) nb,
                                             (p4est_locidx_t) np);
                 }
-
-                /* clean up the target markers in case we don't adapt */
-                /* if we adapt, we'll make all new target markers anyway */
-#if 0
-                patch->target_level = patch->level;
-#endif
             }
         }
     }
@@ -589,6 +583,21 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     }
     else
     {
+        /* clean up the target levels since we don't adapt */
+        int nb, np;
+        fclaw2d_block_t *block;
+        fclaw2d_patch_t *patch;
+
+        for (nb = 0; nb < domain->num_blocks; ++nb)
+        {
+            block = domain->blocks + nb;
+            for (np = 0; np < block->num_patches; ++np)
+            {
+                /* compute maximum target level between patch and neighbors */
+                patch = block->patches + np;
+                patch->target_level = patch->level;
+            }
+        }
         return NULL;
     }
 }
@@ -663,6 +672,17 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
     domain->partition_unchanged_old_first = 0;
 
     p4est_wrap_complete (wrap);
+}
+
+void
+fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
+{
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+
+    FCLAW_ASSERT (wrap != NULL);
+    FCLAW_ASSERT (wrap->p4est != NULL);
+
+    p4est_vtk_write_file (wrap->p4est, NULL, basename);
 }
 
 static void

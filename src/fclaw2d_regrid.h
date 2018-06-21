@@ -47,6 +47,12 @@ void cb_fclaw2d_regrid_tag4refinement(struct fclaw2d_domain *domain,
                                       int this_patch_idx,
                                       void *user);
 
+void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+                              fclaw2d_patch_t *fine_patches,
+                              int blockno, int fine0_patchno,
+                              void *user);
+
+
 void cb_fclaw2d_regrid_repopulate(struct fclaw2d_domain * old_domain,
                                   struct fclaw2d_patch * old_patch,
                                   struct fclaw2d_domain * new_domain,
