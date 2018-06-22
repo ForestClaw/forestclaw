@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_convenience.h>   /* p4est domain, patch handling routines */
 #include <forestclaw2d.h>          /* Needed for patch_relation_t data */
 
+#include <fclaw_gauges.h>
+
 #include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_ghost_fill.h>
@@ -315,7 +317,11 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
            it here */
     }
 
+    /* User defined */
     fclaw2d_after_regrid(glob);
+
+    /* Only if gauges count > 0 */
+    fclaw_locate_gauges(glob);
 
     /* Stop timer.  Be sure to use timers from new grid, if one was
        created */

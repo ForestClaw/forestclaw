@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_options.h>
 
+#include <fclaw_gauges.h>
+
 static fclaw2d_diagnostics_vtable_t s_diag_vt;
 
 static

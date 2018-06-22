@@ -70,11 +70,6 @@ geoclaw_register (fc2d_geoclaw_options_t *geo_opt, sc_options_t * opt)
                                  &geo_opt->mthbc, 4,
                                  "[clawpack46] Physical boundary condition type [1 1 1 1]");
 
-    /* Gauge options */
-    sc_options_add_int(opt, 0, "gauge-buffer-length",
-                       &geo_opt->gauge_buffer_length, 1,
-                       "[geoclaw] Number of lines of gauge output to buffer before printing [1]");
-
     /* Coarsen criteria */
     sc_options_add_double (opt, 0, "dry_tolerance_c", &geo_opt->dry_tolerance_c, 1.0,
                            "[geoclaw] Coarsen criteria: Dry tolerance [1.0]");
