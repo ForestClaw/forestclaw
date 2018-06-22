@@ -109,52 +109,52 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt();
 /* ------------------------ Virtualized gauge functions ------------------------------- */
 
 void fclaw_set_gauge_data(struct fclaw2d_global* glob, 
-                                 struct fclaw_gauge **gauges, 
-                                 int *num_gauges);
+                          struct fclaw_gauge **gauges, 
+                          int *num_gauges);
 
 void fclaw_create_gauge_files(struct fclaw2d_global* glob, 
-                                     struct fclaw_gauge *gauges, 
-                                     int num_gauges);
+                              struct fclaw_gauge *gauges, 
+                              int num_gauges);
 
 
 void  fclaw_update_gauge(struct fclaw2d_global* glob, 
-                                struct fclaw2d_block *block,
-                                struct fclaw2d_patch *patch,
-                                int blockno, int patchno,
-                                double tcurr, fclaw_gauge_t *g);
+                         struct fclaw2d_block *block,
+                         struct fclaw2d_patch *patch,
+                         int blockno, int patchno,
+                         double tcurr, fclaw_gauge_t *g);
 
 void fclaw_print_gauge_buffer(struct fclaw2d_global* glob, 
-                                     struct fclaw_gauge *g);
+                              struct fclaw_gauge *g);
 
 
 /* ---------------------------------- Gauges ------------------------------------------ */
 
 void fclaw_gauge_allocate(struct fclaw2d_global *glob, int num_gauges,
-                                 struct fclaw_gauge **g);
+                          struct fclaw_gauge **g);
 
 void fclaw_gauge_set_data(struct fclaw2d_global *glob, 
-                                 struct fclaw_gauge *g,
-                                 int num, 
-                                 double xc, double yc, 
-                                 double  t1, double t2,
-                                 double min_time_increment);
+                          struct fclaw_gauge *g,
+                          int num, 
+                          double xc, double yc, 
+                          double  t1, double t2,
+                          double min_time_increment);
 
 void fclaw_gauge_get_data(struct fclaw2d_global *glob, 
-                                 struct fclaw_gauge *g,                             
-                                 int *num, 
-                                 double *xc, double *yc, 
-                                 double  *t1, double *t2);
+                          struct fclaw_gauge *g,                             
+                          int *num, 
+                          double *xc, double *yc, 
+                          double  *t1, double *t2);
 
 void fclaw_gauge_set_buffer_entry(struct fclaw2d_global *glob,
-                                           struct fclaw_gauge* g,
-                                           void* guser);
+                                  struct fclaw_gauge* g,
+                                  void* guser);
 
 void fclaw_gauge_get_buffer(struct fclaw2d_global *glob,
-                                   struct fclaw_gauge *g,
-                                   int *kmax, void*** gauge_buffer);
+                            struct fclaw_gauge *g,
+                            int *kmax, void*** gauge_buffer);
 
 void fclaw_gauge_buffer_reset(struct fclaw2d_global *glob, 
-                                     struct fclaw_gauge *g);
+                              struct fclaw_gauge *g);
 
 
 #ifdef __cplusplus
