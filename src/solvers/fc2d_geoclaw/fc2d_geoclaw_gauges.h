@@ -26,8 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FC2D_GEOCLAW_GAUGES_H
 #define FC2D_GEOCLAW_GAUGES_H
 
-#include <fclaw_base.h>  /* Needed for fclaw_app_t */
-
 #ifdef __cplusplus
 extern "C"
 {
