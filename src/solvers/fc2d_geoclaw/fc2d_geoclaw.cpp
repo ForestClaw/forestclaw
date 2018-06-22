@@ -879,6 +879,8 @@ void fc2d_geoclaw_solver_initialize()
     geoclaw_vt->rpt2             = FC2D_GEOCLAW_RPT2;
 
     /* Update gauges */
+#if 0
+    /* This should eventually be added to core ForestClaw routines */
     fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_init();
 
     gauges_vt->set_gauge_data    = geoclaw_read_gauges_data_default;
@@ -886,6 +888,7 @@ void fc2d_geoclaw_solver_initialize()
 
     gauges_vt->update_gauge       = geoclaw_gauge_update_default;
     gauges_vt->print_gauge_buffer = geoclaw_print_gauges_default;
+#endif    
 
     /* Set diagnostic gauges */
     fclaw_gauges_vtable_set();
