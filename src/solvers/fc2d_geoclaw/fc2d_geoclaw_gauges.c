@@ -226,7 +226,9 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
             tcurr - g->last_time >= g->min_time_increment)
         {
             /* Update the last time, even though this gauge may not be local to
-               this processor. This keeps the time consistent across all processors */
+               this processor. This keeps the time consistent across all processors, 
+               so that when this gauge is local to this processor, it knows when 
+               it was last updated (even if it was updated on another processor). */
             g->last_time = tcurr;
 
             if (g->is_local)
@@ -241,7 +243,6 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
                 
                 if (g->next_buffer_location == geo_opt->gauge_buffer_length)
                 {
-                    /* This printes buffers and deletes buffer storage */
                     fc2d_geoclaw_print_gauge_buffer(glob,g);
                     g->next_buffer_location = 0;
                 }  
