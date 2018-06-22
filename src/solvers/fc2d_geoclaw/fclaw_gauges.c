@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fc2d_geoclaw_gauges.h"
+#include "fclaw_gauges.h"
 #include "fc2d_geoclaw_gauges_default.h"
 
 #include "fc2d_geoclaw_options.h"
@@ -51,30 +51,30 @@ extern "C"
 
 /* -------------------------------------------------------------------------------------*/
 
-static fc2d_geoclaw_gauges_vtable_t s_geoclaw_gauges_vt;
+static fclaw_gauges_vtable_t s_geoclaw_gauges_vt;
 
-typedef struct fc2d_geoclaw_gauge_acc
+typedef struct fclaw_gauge_acc
 {
     int num_gauges;
     int is_latest_domain;
-    struct fc2d_geoclaw_gauge *gauges;
-} fc2d_geoclaw_gauge_acc_t;
+    struct fclaw_gauge *gauges;
+} fclaw_gauge_acc_t;
 
 
-typedef struct fc2d_geoclaw_gauge_info
+typedef struct fclaw_gauge_info
 {
     sc_array_t *block_offsets;
     sc_array_t *coordinates;
-} fc2d_geoclaw_gauge_info_t;
+} fclaw_gauge_info_t;
 
 
-static fc2d_geoclaw_gauge_info_t gauge_info;
+static fclaw_gauge_info_t gauge_info;
 
 static
 void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 {
-    fc2d_geoclaw_gauge_acc_t* gauge_acc;
-    fc2d_geoclaw_gauge_t *gauges;
+    fclaw_gauge_acc_t* gauge_acc;
+    fclaw_gauge_t *gauges;
     int i, num_gauges;
 
     const fclaw_options_t * gparms = fclaw2d_get_options(glob);
@@ -86,15 +86,15 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
        gauge output files (e.g. gauge00123.txt)
        ---------------------------------------------------------------- */
     
-    fc2d_geoclaw_set_gauge_data(glob, &gauges, &num_gauges);
+    fclaw_set_gauge_data(glob, &gauges, &num_gauges);
 
     /* Set diagnostic accumulutor info  */
-    gauge_acc = FCLAW_ALLOC(fc2d_geoclaw_gauge_acc_t,1);
+    gauge_acc = FCLAW_ALLOC(fclaw_gauge_acc_t,1);
     *acc = gauge_acc;
     gauge_acc->num_gauges = num_gauges;
     gauge_acc->gauges = gauges;  /* Might be NULL */
 
-    fc2d_geoclaw_create_gauge_files(glob,gauges,num_gauges);
+    fclaw_create_gauge_files(glob,gauges,num_gauges);
 
     /* ------------------------------------------------------------------
         Finish setting gauges with ForestClaw specific info 
@@ -209,10 +209,10 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
 
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
-    fc2d_geoclaw_gauge_t *g;
+    fclaw_gauge_t *g;
 
-    fc2d_geoclaw_gauge_acc_t* gauge_acc = (fc2d_geoclaw_gauge_acc_t*) acc;
-    fc2d_geoclaw_gauge_t *gauges = gauge_acc->gauges;
+    fclaw_gauge_acc_t* gauge_acc = (fclaw_gauge_acc_t*) acc;
+    fclaw_gauge_t *gauges = gauge_acc->gauges;
 
     const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
 
@@ -235,7 +235,7 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
             {
                 block = &glob->domain->blocks[g->blockno];
                 patch = &block->patches[g->patchno]; 
-                fc2d_geoclaw_update_gauge(glob,block,patch,
+                fclaw_update_gauge(glob,block,patch,
                                           g->blockno,g->patchno,
                                           tcurr,g);
 
@@ -243,7 +243,7 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
                 
                 if (g->next_buffer_location == geo_opt->gauge_buffer_length)
                 {
-                    fc2d_geoclaw_print_gauge_buffer(glob,g);
+                    fclaw_print_gauge_buffer(glob,g);
                     g->next_buffer_location = 0;
                 }  
             }
@@ -252,13 +252,13 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
 }
 
 
-void fc2d_geoclaw_locate_gauges(fclaw2d_global_t *glob)
+void fclaw_locate_gauges(fclaw2d_global_t *glob)
 {
     int i,index,num;
-    fc2d_geoclaw_gauge_t *g;
+    fclaw_gauge_t *g;
 
-    fc2d_geoclaw_gauge_acc_t* gauge_acc = 
-              (fc2d_geoclaw_gauge_acc_t*) glob->acc->solver_accumulator;
+    fclaw_gauge_acc_t* gauge_acc = 
+              (fclaw_gauge_acc_t*) glob->acc->solver_accumulator;
 
     /* Locate each gauge in the new mesh */
     num = gauge_acc->num_gauges;
@@ -292,7 +292,7 @@ void fc2d_geoclaw_locate_gauges(fclaw2d_global_t *glob)
         if (!g->is_local && g->next_buffer_location > 0)
         {
             /* Patch moved off of processor, but the buffer is not empty. */
-            fc2d_geoclaw_print_gauge_buffer(glob,g);
+            fclaw_print_gauge_buffer(glob,g);
             g->next_buffer_location = 0;
         }
     }
@@ -303,11 +303,11 @@ static
 void gauge_finalize(fclaw2d_global_t *glob, void** acc)
 {
     int i;
-    fc2d_geoclaw_gauge_t *g;
+    fclaw_gauge_t *g;
 
     /* Clean up gauges and print anything left over in buffers */
-    fc2d_geoclaw_gauge_acc_t* gauge_acc = *((fc2d_geoclaw_gauge_acc_t**) acc);
-    fc2d_geoclaw_gauge_t *gauges = gauge_acc->gauges;
+    fclaw_gauge_acc_t* gauge_acc = *((fclaw_gauge_acc_t**) acc);
+    fclaw_gauge_t *gauges = gauge_acc->gauges;
 
     for(i = 0; i < gauge_acc->num_gauges; i++)
     {
@@ -318,7 +318,7 @@ void gauge_finalize(fclaw2d_global_t *glob, void** acc)
         for gauges that are on the local processor */        
         if (g->is_local)
         {
-            fc2d_geoclaw_print_gauge_buffer(glob,g);
+            fclaw_print_gauge_buffer(glob,g);
         }
         FCLAW_FREE(g->buffer);               
     }
@@ -345,22 +345,22 @@ void gauge_finalize(fclaw2d_global_t *glob, void** acc)
 /* -------------------------- Virtual table  ---------------------------- */
 
 static
-fc2d_geoclaw_gauges_vtable_t* fc2d_geoclaw_gauges_vt_init()
+fclaw_gauges_vtable_t* fclaw_gauges_vt_init()
 {
     FCLAW_ASSERT(s_geoclaw_gauges_vt.is_set == 0);
     return &s_geoclaw_gauges_vt;
 }
 
-fc2d_geoclaw_gauges_vtable_t* fc2d_geoclaw_gauges_vt()
+fclaw_gauges_vtable_t* fclaw_gauges_vt()
 {
     FCLAW_ASSERT(s_geoclaw_gauges_vt.is_set != 0);
     return &s_geoclaw_gauges_vt;
 }
 
-void fc2d_geoclaw_gauges_vtable_set()
+void fclaw_gauges_vtable_set()
 {
     fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt();
-    fc2d_geoclaw_gauges_vtable_t* gauges_vt = fc2d_geoclaw_gauges_vt_init();
+    fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_init();
 
     gauges_vt->set_gauge_data    = geoclaw_read_gauges_data_default;
     gauges_vt->create_gauge_files = geoclaw_create_gauge_files_default; 
@@ -376,40 +376,40 @@ void fc2d_geoclaw_gauges_vtable_set()
 }
 /* ---------------------------- Virtualized Functions --------------------------------- */
 
-void fc2d_geoclaw_set_gauge_data(fclaw2d_global_t* glob, 
-                                 fc2d_geoclaw_gauge_t **gauges, 
+void fclaw_set_gauge_data(fclaw2d_global_t* glob, 
+                                 fclaw_gauge_t **gauges, 
                                  int *num_gauges)
 {
-    const fc2d_geoclaw_gauges_vtable_t* gauge_vt = fc2d_geoclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
     FCLAW_ASSERT(gauge_vt->set_gauge_data != NULL);
     gauge_vt->set_gauge_data(glob, gauges, num_gauges);
 }
 
-void fc2d_geoclaw_create_gauge_files(fclaw2d_global_t* glob, 
-                                 fc2d_geoclaw_gauge_t *gauges, 
+void fclaw_create_gauge_files(fclaw2d_global_t* glob, 
+                                 fclaw_gauge_t *gauges, 
                                  int num_gauges)
 {
-    const fc2d_geoclaw_gauges_vtable_t* gauge_vt = fc2d_geoclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
     FCLAW_ASSERT(gauge_vt->create_gauge_files != NULL);
     gauge_vt->create_gauge_files(glob, gauges, num_gauges);    
 
 }
 
-void  fc2d_geoclaw_update_gauge(fclaw2d_global_t* glob, 
+void  fclaw_update_gauge(fclaw2d_global_t* glob, 
                                 fclaw2d_block_t *block,
                                 fclaw2d_patch_t *patch,
                                 int blockno, int patchno,
-                                double tcurr, fc2d_geoclaw_gauge_t *g)
+                                double tcurr, fclaw_gauge_t *g)
 {
-    const fc2d_geoclaw_gauges_vtable_t* gauge_vt = fc2d_geoclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
     FCLAW_ASSERT(gauge_vt->update_gauge != NULL);
 
     gauge_vt->update_gauge(glob,block,patch,blockno,patchno,tcurr,g);
 }
 
-void fc2d_geoclaw_print_gauge_buffer(fclaw2d_global_t* glob, fc2d_geoclaw_gauge_t *g)
+void fclaw_print_gauge_buffer(fclaw2d_global_t* glob, fclaw_gauge_t *g)
 {
-    const fc2d_geoclaw_gauges_vtable_t* gauge_vt = fc2d_geoclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
     FCLAW_ASSERT(gauge_vt->print_gauge_buffer != NULL);
 
     gauge_vt->print_gauge_buffer(glob,g);
@@ -417,14 +417,14 @@ void fc2d_geoclaw_print_gauge_buffer(fclaw2d_global_t* glob, fc2d_geoclaw_gauge_
 
 /* ---------------------------- Get Access Functions ---------------------------------- */
 
-void fc2d_geoclaw_gauge_allocate(fclaw2d_global_t *glob, int num_gauges,
-                                 fc2d_geoclaw_gauge_t **g)
+void fclaw_gauge_allocate(fclaw2d_global_t *glob, int num_gauges,
+                                 fclaw_gauge_t **g)
 {
-    *g = (fc2d_geoclaw_gauge_t*) FCLAW_ALLOC(fc2d_geoclaw_gauge_t,num_gauges);
+    *g = (fclaw_gauge_t*) FCLAW_ALLOC(fclaw_gauge_t,num_gauges);
 }
 
-void fc2d_geoclaw_gauge_set_data(fclaw2d_global_t *glob, 
-                                 fc2d_geoclaw_gauge_t *g,
+void fclaw_gauge_set_data(fclaw2d_global_t *glob, 
+                                 fclaw_gauge_t *g,
                                  int num, double xc, double yc, 
                                  double  t1, double t2, 
                                  double min_time_increment)
@@ -439,8 +439,8 @@ void fc2d_geoclaw_gauge_set_data(fclaw2d_global_t *glob,
 
 
 
-void fc2d_geoclaw_gauge_get_data(fclaw2d_global_t *glob, 
-                                 fc2d_geoclaw_gauge_t *g,
+void fclaw_gauge_get_data(fclaw2d_global_t *glob, 
+                                 fclaw_gauge_t *g,
                                  int *num, 
                                  double *xc, double *yc, 
                                  double  *t1, double *t2)
@@ -452,16 +452,16 @@ void fc2d_geoclaw_gauge_get_data(fclaw2d_global_t *glob,
     *t2 = g->t2;
 }
 
-void fc2d_geoclaw_gauge_get_buffer(fclaw2d_global_t *glob,
-                                   fc2d_geoclaw_gauge_t *g,
+void fclaw_gauge_get_buffer(fclaw2d_global_t *glob,
+                                   fclaw_gauge_t *g,
                                    int *kmax, void*** gauge_buffer)
 {
     *kmax = g->next_buffer_location;
     *gauge_buffer = g->buffer;
 }
 
-void fc2d_geoclaw_gauge_set_buffer_entry(fclaw2d_global_t *glob,
-                                         fc2d_geoclaw_gauge_t* g,
+void fclaw_gauge_set_buffer_entry(fclaw2d_global_t *glob,
+                                         fclaw_gauge_t* g,
                                          void* guser)
 {
     int k = g->next_buffer_location;

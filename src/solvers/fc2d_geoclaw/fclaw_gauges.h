@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_GEOCLAW_GAUGES_H
-#define FC2D_GEOCLAW_GAUGES_H
+#ifndef FCLAW_GAUGES_H
+#define FCLAW_GAUGES_H
 
 #ifdef __cplusplus
 extern "C"
@@ -34,9 +34,9 @@ extern "C"
 #endif
 #endif
 
-typedef struct fc2d_geoclaw_gauges_vtable fc2d_geoclaw_gauges_vtable_t;
+typedef struct fclaw_gauges_vtable fclaw_gauges_vtable_t;
 
-typedef struct fc2d_geoclaw_gauge
+typedef struct fclaw_gauge
 {
     int blockno;
     int location_in_results;
@@ -59,102 +59,102 @@ typedef struct fc2d_geoclaw_gauge
     /* Store data in buffer before outputting gauges */
     int next_buffer_location;     /* Where are we in the gauge output */
     void **buffer;
-} fc2d_geoclaw_gauge_t;
+} fclaw_gauge_t;
 
 struct fclaw2d_global;
 struct fclaw2d_patch;
 struct fclaw2d_block;
-struct fc2d_geoclaw_gauge;
+struct fclaw_gauge;
 
 
-typedef void (*fc2d_geoclaw_set_gauge_data_t)(struct fclaw2d_global *glob, 
-                                              struct fc2d_geoclaw_gauge **gauges, 
+typedef void (*fclaw_set_gauge_data_t)(struct fclaw2d_global *glob, 
+                                              struct fclaw_gauge **gauges, 
                                               int *num);
 
-typedef void (*fc2d_geoclaw_create_gauge_files_t)(struct fclaw2d_global *glob, 
-                                                  struct fc2d_geoclaw_gauge *gauges, 
+typedef void (*fclaw_create_gauge_files_t)(struct fclaw2d_global *glob, 
+                                                  struct fclaw_gauge *gauges, 
                                                   int num_gauges);
 
-typedef void (*fc2d_geoclaw_gauge_update_t)(struct fclaw2d_global* glob, 
+typedef void (*fclaw_gauge_update_t)(struct fclaw2d_global* glob, 
                                             struct fclaw2d_block* block,
                                             struct fclaw2d_patch* patch, 
                                             int blockno, int patchno,
-                                            double tcurr, struct fc2d_geoclaw_gauge *g);
+                                            double tcurr, struct fclaw_gauge *g);
 
-typedef void (*fc2d_geoclaw_gauge_print_t)(struct fclaw2d_global *glob, 
-                                           struct fc2d_geoclaw_gauge *gauge);
+typedef void (*fclaw_gauge_print_t)(struct fclaw2d_global *glob, 
+                                           struct fclaw_gauge *gauge);
 
-typedef void (*fc2d_geoclaw_gauge_destroy_buffer_data_t)(struct fclaw2d_global *glob, 
+typedef void (*fclaw_gauge_destroy_buffer_data_t)(struct fclaw2d_global *glob, 
                                                          void* gdata);
 
 
-struct fc2d_geoclaw_gauges_vtable
+struct fclaw_gauges_vtable
 {
-    fc2d_geoclaw_set_gauge_data_t    set_gauge_data;
-    fc2d_geoclaw_create_gauge_files_t  create_gauge_files;
-    fc2d_geoclaw_gauge_update_t        update_gauge;
-    fc2d_geoclaw_gauge_print_t         print_gauge_buffer;
+    fclaw_set_gauge_data_t    set_gauge_data;
+    fclaw_create_gauge_files_t  create_gauge_files;
+    fclaw_gauge_update_t        update_gauge;
+    fclaw_gauge_print_t         print_gauge_buffer;
 
     int is_set;
 };
 
-void fc2d_geoclaw_locate_gauges(struct fclaw2d_global *glob);
+void fclaw_locate_gauges(struct fclaw2d_global *glob);
 
-void fc2d_geoclaw_gauges_vtable_set();
+void fclaw_gauges_vtable_set();
 
-fc2d_geoclaw_gauges_vtable_t* fc2d_geoclaw_gauges_vt();
+fclaw_gauges_vtable_t* fclaw_gauges_vt();
 
 
 
 /* ------------------------ Virtualized gauge functions ------------------------------- */
 
-void fc2d_geoclaw_set_gauge_data(struct fclaw2d_global* glob, 
-                                 struct fc2d_geoclaw_gauge **gauges, 
+void fclaw_set_gauge_data(struct fclaw2d_global* glob, 
+                                 struct fclaw_gauge **gauges, 
                                  int *num_gauges);
 
-void fc2d_geoclaw_create_gauge_files(struct fclaw2d_global* glob, 
-                                     struct fc2d_geoclaw_gauge *gauges, 
+void fclaw_create_gauge_files(struct fclaw2d_global* glob, 
+                                     struct fclaw_gauge *gauges, 
                                      int num_gauges);
 
 
-void  fc2d_geoclaw_update_gauge(struct fclaw2d_global* glob, 
+void  fclaw_update_gauge(struct fclaw2d_global* glob, 
                                 struct fclaw2d_block *block,
                                 struct fclaw2d_patch *patch,
                                 int blockno, int patchno,
-                                double tcurr, fc2d_geoclaw_gauge_t *g);
+                                double tcurr, fclaw_gauge_t *g);
 
-void fc2d_geoclaw_print_gauge_buffer(struct fclaw2d_global* glob, 
-                                     struct fc2d_geoclaw_gauge *g);
+void fclaw_print_gauge_buffer(struct fclaw2d_global* glob, 
+                                     struct fclaw_gauge *g);
 
 
 /* ---------------------------------- Gauges ------------------------------------------ */
 
-void fc2d_geoclaw_gauge_allocate(struct fclaw2d_global *glob, int num_gauges,
-                                 struct fc2d_geoclaw_gauge **g);
+void fclaw_gauge_allocate(struct fclaw2d_global *glob, int num_gauges,
+                                 struct fclaw_gauge **g);
 
-void fc2d_geoclaw_gauge_set_data(struct fclaw2d_global *glob, 
-                                 struct fc2d_geoclaw_gauge *g,
+void fclaw_gauge_set_data(struct fclaw2d_global *glob, 
+                                 struct fclaw_gauge *g,
                                  int num, 
                                  double xc, double yc, 
                                  double  t1, double t2,
                                  double min_time_increment);
 
-void fc2d_geoclaw_gauge_get_data(struct fclaw2d_global *glob, 
-                                 struct fc2d_geoclaw_gauge *g,                             
+void fclaw_gauge_get_data(struct fclaw2d_global *glob, 
+                                 struct fclaw_gauge *g,                             
                                  int *num, 
                                  double *xc, double *yc, 
                                  double  *t1, double *t2);
 
-void fc2d_geoclaw_gauge_set_buffer_entry(struct fclaw2d_global *glob,
-                                           struct fc2d_geoclaw_gauge* g,
+void fclaw_gauge_set_buffer_entry(struct fclaw2d_global *glob,
+                                           struct fclaw_gauge* g,
                                            void* guser);
 
-void fc2d_geoclaw_gauge_get_buffer(struct fclaw2d_global *glob,
-                                   struct fc2d_geoclaw_gauge *g,
+void fclaw_gauge_get_buffer(struct fclaw2d_global *glob,
+                                   struct fclaw_gauge *g,
                                    int *kmax, void*** gauge_buffer);
 
-void fc2d_geoclaw_gauge_buffer_reset(struct fclaw2d_global *glob, 
-                                     struct fc2d_geoclaw_gauge *g);
+void fclaw_gauge_buffer_reset(struct fclaw2d_global *glob, 
+                                     struct fclaw_gauge *g);
 
 
 #ifdef __cplusplus

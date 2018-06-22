@@ -35,24 +35,24 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fc2d_geoclaw_gauge;
+struct fclaw_gauge;
 
 void geoclaw_read_gauges_data_default(struct fclaw2d_global *glob, 
-                              struct fc2d_geoclaw_gauge **gauges, 
+                              struct fclaw_gauge **gauges, 
                               int *num);
 
 void geoclaw_create_gauge_files_default(struct fclaw2d_global *glob, 
-                                struct fc2d_geoclaw_gauge *gauges, 
+                                struct fclaw_gauge *gauges, 
                                 int num_gauges);
 
 void geoclaw_gauge_update_default(struct fclaw2d_global* glob, 
                                   struct fclaw2d_block* block,
                                   struct fclaw2d_patch* patch, 
                                   int blockno, int patchno,
-                                  double tcurr, struct fc2d_geoclaw_gauge *g);
+                                  double tcurr, struct fclaw_gauge *g);
 
 void geoclaw_print_gauges_default(struct fclaw2d_global *glob, 
-                                  struct fc2d_geoclaw_gauge *gauge);
+                                  struct fclaw_gauge *gauge);
 
 #ifdef __cplusplus
 #if 0

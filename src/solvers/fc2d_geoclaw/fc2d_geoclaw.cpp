@@ -25,10 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_options.h"
-#include "fc2d_geoclaw_gauges.h"
 #include "fc2d_geoclaw_fort.h"
 #include "fc2d_geoclaw_output_ascii.h"
 
+#include "fclaw_gauges.h"
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
@@ -747,7 +747,7 @@ void geoclaw_interpolate_corner(fclaw2d_global_t* glob,
 
 void geoclaw_after_regrid(struct fclaw2d_global *glob)
 {
-    fc2d_geoclaw_locate_gauges(glob);
+    fclaw_locate_gauges(glob);
 }
 
 /* --------------------------- Parallel ghost patches -------------------------------- */
@@ -879,7 +879,7 @@ void fc2d_geoclaw_solver_initialize()
     geoclaw_vt->rpt2             = FC2D_GEOCLAW_RPT2;
 
     /* Update gauges */
-    fc2d_geoclaw_gauges_vtable_set();
+    fclaw_gauges_vtable_set();
 
     geoclaw_vt->is_set = 1;
 }

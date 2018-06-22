@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw_gauges_default.h"
 
-#include "fc2d_geoclaw_gauges.h"
+#include "fclaw_gauges.h"
 #include "fc2d_geoclaw_fort.h"
 
 #include "fc2d_geoclaw_options.h"
@@ -53,7 +53,7 @@ typedef struct geoclaw_user
 
 
 void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob, 
-                                      fc2d_geoclaw_gauge_t **gauges,
+                                      fclaw_gauge_t **gauges,
                                       int *num_gauges)
 {
     /* Idea is that we may only need to change this file when updating to newer
@@ -109,8 +109,8 @@ void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob,
     }
     else
     {
-        fc2d_geoclaw_gauge_allocate(glob,*num_gauges,gauges);
-        fc2d_geoclaw_gauge_t *g = *gauges;
+        fclaw_gauge_allocate(glob,*num_gauges,gauges);
+        fclaw_gauge_t *g = *gauges;
 
         num = FCLAW_ALLOC(int,   *num_gauges);
         xc  = FCLAW_ALLOC(double,*num_gauges);
@@ -146,7 +146,7 @@ void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob,
 
         for(i = 0; i < *num_gauges; i++)
         {
-            fc2d_geoclaw_gauge_set_data(glob,&g[i],num[i],
+            fclaw_gauge_set_data(glob,&g[i],num[i],
                                         xc[i],yc[i],t1[i],t2[i],
                                         min_time_increment[i]);
         }
@@ -169,7 +169,7 @@ void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob,
    gauge output */
 
 void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob, 
-                                        fc2d_geoclaw_gauge_t *gauges,
+                                        fclaw_gauge_t *gauges,
                                         int num_gauges)
 {
     int num;
@@ -184,7 +184,7 @@ void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob,
     int num_eqns = 4;  /* meqn + 1 (h, hu, hv, eta) */
     for (int i = 0; i < num_gauges; i++)
     {
-        fc2d_geoclaw_gauge_get_data(glob,&gauges[i],&num, &xc, &yc, &t1, &t2);
+        fclaw_gauge_get_data(glob,&gauges[i],&num, &xc, &yc, &t1, &t2);
 
         sprintf(filename,"gauge%05d.txt",num);
         fp = fopen(filename, "w");
@@ -202,7 +202,7 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
                                   glob, fclaw2d_block_t* block,
                                   fclaw2d_patch_t* patch, 
                                   int blockno, int patchno,
-                                  double tcurr, fc2d_geoclaw_gauge_t *g)
+                                  double tcurr, fclaw_gauge_t *g)
 {
     int mx,my,mbc,meqn,maux;
     double xlower,ylower,dx,dy;
@@ -216,7 +216,7 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fc2d_geoclaw_gauge_get_data(glob,g,&num, &xc, &yc, &t1, &t2);
+    fclaw_gauge_get_data(glob,g,&num, &xc, &yc, &t1, &t2);
 
     FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
     FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
@@ -240,11 +240,11 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
         guser->qvar[m] = qvar[m];
     }
     guser->avar[0] = avar[0];   /* Just store bathymetry for now */
-    fc2d_geoclaw_gauge_set_buffer_entry(glob,g,guser);
+    fclaw_gauge_set_buffer_entry(glob,g,guser);
 }
 
 void geoclaw_print_gauges_default(fclaw2d_global_t *glob, 
-                                  fc2d_geoclaw_gauge_t *gauge) 
+                                  fclaw_gauge_t *gauge) 
 {
     int k, kmax;
     geoclaw_user_t **gauge_buffer;
@@ -254,7 +254,7 @@ void geoclaw_print_gauges_default(fclaw2d_global_t *glob,
 
     /* This assumes on buffers be organized as an array; entries
        start at 0 and with kmax-1 */
-    fc2d_geoclaw_gauge_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
+    fclaw_gauge_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
 
     sprintf(filename,"gauge%05d.txt",gauge->num);
     fp = fopen(filename, "a");
