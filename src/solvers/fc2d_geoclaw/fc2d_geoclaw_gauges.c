@@ -222,18 +222,22 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
     for (int i = 0; i < num_gauges; i++)
     {
         g = &gauges[i];
-
-        if (g->is_local)
+        if (tcurr >= g->t1 && tcurr <= g->t2 &&
+            tcurr - g->last_time >= g->min_time_increment)
         {
-            if (tcurr >= g->t1 && tcurr <= g->t2 &&
-                tcurr - g->last_time >= g->min_time_increment)
+            /* Update the last time, even though this gauge may not be local to
+               this processor. This keeps the time consistent across all processors */
+            g->last_time = tcurr;
+
+            if (g->is_local)
             {
                 block = &glob->domain->blocks[g->blockno];
                 patch = &block->patches[g->patchno]; 
-                fc2d_geoclaw_update_gauge(glob,block,patch,g->blockno,g->patchno,
+                fc2d_geoclaw_update_gauge(glob,block,patch,
+                                          g->blockno,g->patchno,
                                           tcurr,g);
+
                 g->next_buffer_location++;
-                g->last_time = tcurr;
                 
                 if (g->next_buffer_location == geo_opt->gauge_buffer_length)
                 {
