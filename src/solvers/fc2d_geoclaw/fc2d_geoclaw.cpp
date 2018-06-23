@@ -743,17 +743,6 @@ void geoclaw_interpolate_corner(fclaw2d_global_t* glob,
 
 }
 
-
-
-/* ---------------------- Forestclaw virtual table functions --------------------------- */
-
-#if 0
-void geoclaw_after_regrid(struct fclaw2d_global *glob)
-{
-    fclaw_locate_gauges(glob);
-}
-#endif
-
 /* --------------------------- Parallel ghost patches -------------------------------- */
 
 void geoclaw_remote_ghost_setup(fclaw2d_global_t *glob,
@@ -828,6 +817,8 @@ void fc2d_geoclaw_solver_initialize()
 {
     int claw_version = 5;
     fclaw2d_clawpatch_vtable_initialize(claw_version);
+    
+    fclaw_gauges_vtable_t*           gauges_vt = fclaw_gauges_vt();
 
     fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();
@@ -882,17 +873,11 @@ void fc2d_geoclaw_solver_initialize()
     geoclaw_vt->rpn2             = FC2D_GEOCLAW_RPN2;
     geoclaw_vt->rpt2             = FC2D_GEOCLAW_RPT2;
 
-    /* Update gauges */
-#if 1
-    /* This should eventually be added to core ForestClaw routines */    
-    fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt();
-
     gauges_vt->set_gauge_data     = geoclaw_read_gauges_data_default;
     gauges_vt->create_gauge_files = geoclaw_create_gauge_files_default; 
 
     gauges_vt->update_gauge       = geoclaw_gauge_update_default;
     gauges_vt->print_gauge_buffer = geoclaw_print_gauges_default;
-#endif    
 
     geoclaw_vt->is_set = 1;
 }
