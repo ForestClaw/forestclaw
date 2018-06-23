@@ -366,19 +366,11 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt()
     return &s_gauges_vt;
 }
 
-void fclaw_gauges_vtable_set()
+void fclaw_gauges_vtable_initialize()
 {
     fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt();
 
     fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_init();
-
-#if 0
-    gauges_vt->set_gauge_data    = geoclaw_read_gauges_data_default;
-    gauges_vt->create_gauge_files = geoclaw_create_gauge_files_default; 
-
-    gauges_vt->update_gauge       = geoclaw_gauge_update_default;
-    gauges_vt->print_gauge_buffer = geoclaw_print_gauges_default;
-#endif    
 
     diag_vt->solver_init_diagnostics     = gauge_initialize;
     diag_vt->solver_compute_diagnostics  = gauge_update;

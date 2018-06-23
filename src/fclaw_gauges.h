@@ -100,7 +100,7 @@ struct fclaw_gauges_vtable
 
 void fclaw_locate_gauges(struct fclaw2d_global *glob);
 
-void fclaw_gauges_vtable_set();
+void fclaw_gauges_vtable_initialize();
 
 fclaw_gauges_vtable_t* fclaw_gauges_vt();
 
