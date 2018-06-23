@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_convenience.h>
 
+#include <fclaw_gauges.h>
+
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_physical_bc.h>
@@ -228,6 +230,8 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     }
 
     fclaw2d_diagnostics_initialize(glob);
+    fclaw_locate_gauges(glob);
+
     fclaw2d_after_regrid(glob);
 
     /* Print global minimum and maximum levels */

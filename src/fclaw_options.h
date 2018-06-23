@@ -142,6 +142,9 @@ struct fclaw_options
     double refine_threshold;
     double coarsen_threshold;
 
+    /* Gauges */
+    int gauge_buffer_length;   
+
     /* Mapping functions */
     int manifold;
     int mi;

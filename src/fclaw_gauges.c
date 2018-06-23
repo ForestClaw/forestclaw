@@ -23,13 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw_gauges.h"
+#include <fclaw_gauges.h>
+
+#if 0
 #include "fc2d_geoclaw_gauges_default.h"
 
 #include "fc2d_geoclaw_options.h"
 
 #include "fc2d_geoclaw.h"
 #include "fc2d_geoclaw_fort.h"
+#endif
 
 #include "fclaw2d_options.h"
 #include <fclaw2d_global.h>
@@ -51,7 +54,7 @@ extern "C"
 
 /* -------------------------------------------------------------------------------------*/
 
-static fclaw_gauges_vtable_t s_geoclaw_gauges_vt;
+static fclaw_gauges_vtable_t s_gauges_vt;
 
 typedef struct fclaw_gauge_acc
 {
@@ -77,8 +80,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     fclaw_gauge_t *gauges;
     int i, num_gauges;
 
-    const fclaw_options_t * gparms = fclaw2d_get_options(glob);
-    const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
+    const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
 
     /* ------------------------------------------------------------------
        These two calls are the only calls that should worry about the format
@@ -101,7 +103,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         For  q_gauges, users must still allocate space for variables to be
         stored in the print buffer.
         ---------------------------------------------------------------- */
-    int buffer_len = geo_opt->gauge_buffer_length;   
+    int buffer_len = fclaw_opt->gauge_buffer_length;
     for(i = 0; i < num_gauges; i++)
     {
         gauges[i].last_time = gauges[i].t1;
@@ -166,8 +168,8 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
             for(int i = 0; i < num_gauges; i++)
             {
                 /* Map gauge to global [0,1]x[0,1] space */
-                x = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
-                y = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
+                x = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
+                y = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
                 if (xll <= x && x <= xur && yll <= y && y <= yur)
                 {
                     int ng = number_of_gauges_set;
@@ -194,8 +196,8 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 
         for (int i = 0; i < num_gauges; ++i)
         {
-            coordinates[2*i] = (gauges[i].xc - gparms->ax)/(gparms->bx-gparms->ax);
-            coordinates[2*i+1] = (gauges[i].yc - gparms->ay)/(gparms->by-gparms->ay);
+            coordinates[2*i] = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
+            coordinates[2*i+1] = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
         }
     }
 }
@@ -211,11 +213,12 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
     fclaw2d_patch_t *patch;
     fclaw_gauge_t *g;
 
+    const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
+
     fclaw_gauge_acc_t* gauge_acc = (fclaw_gauge_acc_t*) acc;
     fclaw_gauge_t *gauges = gauge_acc->gauges;
 
-    const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
-
+    int buffer_len = fclaw_opt->gauge_buffer_length;
     tcurr = glob->curr_time;
     num_gauges = gauge_acc->num_gauges;
 
@@ -241,7 +244,7 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
 
                 g->next_buffer_location++;
                 
-                if (g->next_buffer_location == geo_opt->gauge_buffer_length)
+                if (g->next_buffer_location == buffer_len)
                 {
                     fclaw_print_gauge_buffer(glob,g);
                     g->next_buffer_location = 0;
@@ -353,27 +356,21 @@ void gauge_finalize(fclaw2d_global_t *glob, void** acc)
 static
 fclaw_gauges_vtable_t* fclaw_gauges_vt_init()
 {
-    FCLAW_ASSERT(s_geoclaw_gauges_vt.is_set == 0);
-    return &s_geoclaw_gauges_vt;
+    FCLAW_ASSERT(s_gauges_vt.is_set == 0);
+    return &s_gauges_vt;
 }
 
 fclaw_gauges_vtable_t* fclaw_gauges_vt()
 {
-    FCLAW_ASSERT(s_geoclaw_gauges_vt.is_set != 0);
-    return &s_geoclaw_gauges_vt;
+    FCLAW_ASSERT(s_gauges_vt.is_set != 0);
+    return &s_gauges_vt;
 }
 
-void fclaw_gauges_vtable_set()
+void fclaw_gauges_vtable_initialize()
 {
     fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt();
 
     fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_init();
-
-    gauges_vt->set_gauge_data    = geoclaw_read_gauges_data_default;
-    gauges_vt->create_gauge_files = geoclaw_create_gauge_files_default; 
-
-    gauges_vt->update_gauge       = geoclaw_gauge_update_default;
-    gauges_vt->print_gauge_buffer = geoclaw_print_gauges_default;
 
     diag_vt->solver_init_diagnostics     = gauge_initialize;
     diag_vt->solver_compute_diagnostics  = gauge_update;

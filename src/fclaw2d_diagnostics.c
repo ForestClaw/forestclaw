@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_options.h>
 
+#include <fclaw_gauges.h>
+
 static fclaw2d_diagnostics_vtable_t s_diag_vt;
 
 static
@@ -89,7 +91,7 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     /* Return an error accumulator */
     if (diag_vt->patch_init_diagnostics != NULL)
@@ -103,7 +105,7 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
         diag_vt->solver_init_diagnostics(glob,&acc->solver_accumulator);
     }
 
-    if (gparms->run_user_diagnostics != 0 && diag_vt->user_init_diagnostics != NULL)
+    if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_init_diagnostics != NULL)
     {
         diag_vt->user_init_diagnostics(glob,&acc->user_accumulator);
     }
@@ -116,7 +118,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
                                 int init_flag)
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     /* -----------------------------------------------------
@@ -135,7 +137,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
         diag_vt->solver_compute_diagnostics(glob,acc->solver_accumulator);
     }
 
-    if (gparms->run_user_diagnostics != 0 && diag_vt->user_compute_diagnostics != NULL)
+    if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_compute_diagnostics != NULL)
     {
         diag_vt->user_compute_diagnostics(glob,acc->user_accumulator);
     }
@@ -158,7 +160,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
         diag_vt->solver_gather_diagnostics(glob,acc->solver_accumulator,init_flag);
     }
 
-    if (gparms->run_user_diagnostics != 0 && diag_vt->user_gather_diagnostics != NULL)
+    if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_gather_diagnostics != NULL)
     {
         diag_vt->user_gather_diagnostics(glob,acc->user_accumulator,init_flag);
     }
@@ -171,7 +173,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
 void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
@@ -186,7 +188,7 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
         diag_vt->solver_reset_diagnostics(glob,acc->solver_accumulator);
     }
 
-    if (gparms->run_user_diagnostics != 0 && diag_vt->user_reset_diagnostics != NULL)
+    if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_reset_diagnostics != NULL)
     {
         diag_vt->user_reset_diagnostics(glob,acc->user_accumulator);
     }
@@ -196,7 +198,7 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
 void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
@@ -211,7 +213,7 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
         diag_vt->solver_finalize_diagnostics(glob,&acc->solver_accumulator);
     }
 
-    if (gparms->run_user_diagnostics != 0 && diag_vt->user_finalize_diagnostics != NULL)
+    if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_finalize_diagnostics != NULL)
     {
         diag_vt->user_finalize_diagnostics(glob,&acc->user_accumulator);
     }

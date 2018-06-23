@@ -5,13 +5,11 @@ libgeoclaw_installed_headers = \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw.h \
 	src/solvers/fc2d_geoclaw/types.h \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.h \
-	src/solvers/fc2d_geoclaw/fclaw_gauges.h \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_gauges_default.h
 
 libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw.cpp \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.c \
-	src/solvers/fc2d_geoclaw/fclaw_gauges.c \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_gauges_default.c \
 	src/solvers/fc2d_geoclaw/fc2d_geoclaw_output_ascii.c \
 	src/solvers/fc2d_geoclaw/amrlib_source/amr_module.f90 \
