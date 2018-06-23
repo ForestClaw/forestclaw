@@ -68,29 +68,29 @@ struct fclaw_gauge;
 
 
 typedef void (*fclaw_set_gauge_data_t)(struct fclaw2d_global *glob, 
-                                              struct fclaw_gauge **gauges, 
-                                              int *num);
+                                       struct fclaw_gauge **gauges, 
+                                       int *num);
 
 typedef void (*fclaw_create_gauge_files_t)(struct fclaw2d_global *glob, 
-                                                  struct fclaw_gauge *gauges, 
-                                                  int num_gauges);
+                                           struct fclaw_gauge *gauges, 
+                                           int num_gauges);
 
 typedef void (*fclaw_gauge_update_t)(struct fclaw2d_global* glob, 
-                                            struct fclaw2d_block* block,
-                                            struct fclaw2d_patch* patch, 
-                                            int blockno, int patchno,
-                                            double tcurr, struct fclaw_gauge *g);
+                                     struct fclaw2d_block* block,
+                                     struct fclaw2d_patch* patch, 
+                                     int blockno, int patchno,
+                                     double tcurr, struct fclaw_gauge *g);
 
 typedef void (*fclaw_gauge_print_t)(struct fclaw2d_global *glob, 
-                                           struct fclaw_gauge *gauge);
+                                    struct fclaw_gauge *gauge);
 
 typedef void (*fclaw_gauge_destroy_buffer_data_t)(struct fclaw2d_global *glob, 
-                                                         void* gdata);
+                                                  void* gdata);
 
 
 struct fclaw_gauges_vtable
 {
-    fclaw_set_gauge_data_t    set_gauge_data;
+    fclaw_set_gauge_data_t      set_gauge_data;
     fclaw_create_gauge_files_t  create_gauge_files;
     fclaw_gauge_update_t        update_gauge;
     fclaw_gauge_print_t         print_gauge_buffer;
