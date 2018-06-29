@@ -75,6 +75,10 @@ void radial_patch_setup(fclaw2d_global_t *global,
                         int this_block_idx,
                         int this_patch_idx);
 
+user_options_t* radial_options_register (fclaw_app_t * app, const char *configfile);
+
+void radial_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 user_options_t* radial_get_options(fclaw2d_global_t* glob);
 
 void radial_link_solvers(fclaw2d_global_t *glob);
