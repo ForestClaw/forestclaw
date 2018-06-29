@@ -83,6 +83,9 @@ void fclaw2d_diagnostics_vtable_initialize()
     /* Function pointers all set to zero, since diag_vt has static storage */
 
     diag_vt->is_set = 1;
+
+    /* This is a hack and should eventually be called from applications */
+    fclaw_gauges_vtable_initialize();    
 }
 
 

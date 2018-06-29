@@ -96,7 +96,14 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     gauge_acc->num_gauges = num_gauges;
     gauge_acc->gauges = gauges;  /* Might be NULL */
 
-    fclaw_create_gauge_files(glob,gauges,num_gauges);
+    if (num_gauges == 0)
+    {
+        // gauge_info.block_offsets = NULL;
+        // gauge_info.coordinates = NULL;
+        return;
+    }
+
+    fclaw_create_gauge_files(glob,gauges,num_gauges);    
 
     /* ------------------------------------------------------------------
         Finish setting gauges with ForestClaw specific info 
@@ -118,13 +125,6 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
        Set up block offsets and coordinate list for p4est
        search function
        ----------------------------------------------------- */
-
-    if (num_gauges == 0)
-    {
-        gauge_info.block_offsets = NULL;
-        gauge_info.coordinates = NULL;
-        return;
-    }
 
     fclaw2d_map_context_t* cont = glob->cont;
 
@@ -385,8 +385,15 @@ void fclaw_set_gauge_data(fclaw2d_global_t* glob,
                           int *num_gauges)
 {
     const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
-    FCLAW_ASSERT(gauge_vt->set_gauge_data != NULL);
-    gauge_vt->set_gauge_data(glob, gauges, num_gauges);
+    if (gauge_vt->set_gauge_data == NULL)
+    {
+        *gauges = NULL;
+        *num_gauges = 0;
+    }
+    else
+    {
+        gauge_vt->set_gauge_data(glob, gauges, num_gauges);    
+    }
 }
 
 void fclaw_create_gauge_files(fclaw2d_global_t* glob, 
@@ -471,6 +478,7 @@ void fclaw_gauge_set_buffer_entry(fclaw2d_global_t *glob,
     int k = g->next_buffer_location;
     g->buffer[k] = guser;
 }
+
 
 #ifdef __cplusplus
 #if 0
