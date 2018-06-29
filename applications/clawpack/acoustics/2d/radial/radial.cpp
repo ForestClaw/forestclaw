@@ -90,7 +90,6 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtable_initialize();
     fclaw2d_diagnostics_vtable_initialize();
-    fclaw_gauges_vtable_initialize();
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)
