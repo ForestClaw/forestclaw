@@ -2,6 +2,7 @@ bin_PROGRAMS += applications/clawpack/burgers/2d/pwconst/pwconst
 
 applications_clawpack_burgers_2d_pwconst_pwconst_SOURCES = \
 	applications/clawpack/burgers/2d/pwconst/pwconst.cpp \
+	applications/clawpack/burgers/2d/pwconst/pwconst_options.c \
 	applications/clawpack/burgers/2d/pwconst/pwconst_user.cpp \
 	applications/clawpack/burgers/2d/pwconst/pwconst_user.h \
 	applications/clawpack/burgers/2d/pwconst/user_4.6/qinit.f \

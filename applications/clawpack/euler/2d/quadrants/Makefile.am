@@ -4,6 +4,7 @@ bin_PROGRAMS += applications/clawpack/euler/2d/quadrants/quadrants
 
 applications_clawpack_euler_2d_quadrants_quadrants_SOURCES = \
 	applications/clawpack/euler/2d/quadrants/quadrants.cpp \
+	applications/clawpack/euler/2d/quadrants/quadrants_options.c \
 	applications/clawpack/euler/2d/quadrants/quadrants_user.cpp \
 	applications/clawpack/euler/2d/quadrants/quadrants_user.h \
 	applications/clawpack/euler/2d/quadrants/setprob.f \

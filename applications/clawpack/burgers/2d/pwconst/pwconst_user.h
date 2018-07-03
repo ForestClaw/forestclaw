@@ -43,6 +43,11 @@ typedef struct user_options
 
 } user_options_t;
 
+user_options_t* pwconst_options_register (fclaw_app_t * app,
+                                          const char *configfile);
+
+void pwconst_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 const user_options_t* pwconst_get_options(fclaw2d_global_t* glob);
 
 void pwconst_link_solvers(fclaw2d_global_t *glob);

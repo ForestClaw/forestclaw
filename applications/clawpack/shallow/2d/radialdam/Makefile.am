@@ -4,6 +4,7 @@ bin_PROGRAMS += applications/clawpack/shallow/2d/radialdam/radialdam
 
 applications_clawpack_shallow_2d_radialdam_radialdam_SOURCES = \
 	applications/clawpack/shallow/2d/radialdam/radialdam.cpp \
+	applications/clawpack/shallow/2d/radialdam/radialdam_options.c \
 	applications/clawpack/shallow/2d/radialdam/radialdam_user.cpp \
 	applications/clawpack/shallow/2d/radialdam/radialdam_user.h \
 	applications/clawpack/shallow/2d/radialdam/fclaw2d_map_pillowdisk.c \

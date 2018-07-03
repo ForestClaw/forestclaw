@@ -5,6 +5,7 @@ bin_PROGRAMS += applications/clawpack/euler/2d/shockbubble/shockbubble
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/shockbubble.cpp \
+	applications/clawpack/euler/2d/shockbubble/shockbubble_options.c \
 	applications/clawpack/euler/2d/shockbubble/shockbubble_user.cpp \
 	applications/clawpack/euler/2d/shockbubble/shockbubble_user.h \
 	applications/clawpack/euler/2d/shockbubble/fdisc.f \

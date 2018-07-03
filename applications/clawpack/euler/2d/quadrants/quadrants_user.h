@@ -45,8 +45,10 @@ typedef struct user_options
 
 } user_options_t;
 
-#define QUADRANTS_SETPROB FCLAW_F77_FUNC(quadrants_setprob, QUADRANTS_SETPROB)
-void QUADRANTS_SETPROB(const double* gamma);
+user_options_t* quadrants_options_register (fclaw_app_t * app,
+                                          const char *configfile);
+
+void quadrants_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 user_options_t* quadrants_get_options(fclaw2d_global_t* glob);
 
@@ -55,6 +57,13 @@ void quadrants_link_solvers(fclaw2d_global_t *glob);
 void quadrants_problem_setup(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+/* -------------------------------- Fortran code -------------------------------------- */
+
+#define QUADRANTS_SETPROB FCLAW_F77_FUNC(quadrants_setprob, QUADRANTS_SETPROB)
+void QUADRANTS_SETPROB(const double* gamma);
+
+
 
 #ifdef __cplusplus
 #if 0
