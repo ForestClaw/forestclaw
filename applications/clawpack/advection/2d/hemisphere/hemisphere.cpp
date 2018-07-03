@@ -36,128 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-static int s_user_options_package_id = -1;
-
-static void *
-hemisphere_register (user_options_t* user_opt, sc_options_t * opt)
-{
-    sc_options_add_int (opt, 0, "example", &user_opt->example, 2,
-                        "[user] 1 for pillow grid, "    \
-                        "2 for five-patch hemisphere [2]");
-
-    sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
-                           "Ratio of outer square to inner square [0.4]");
-
-    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 4,
-                           "Clawpack_version (4 or 5) [4]");
-
-    user_opt->is_registered = 1;
-    return NULL;
-}
-
-static fclaw_exit_type_t
-hemisphere_check (user_options_t *user_opt)
-{
-    if (user_opt->example < 0 || user_opt->example > 2) {
-        fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
-        return FCLAW_EXIT_ERROR;
-    }
-
-    return FCLAW_NOEXIT;
-}
-
-static void
-hemisphere_destroy (user_options_t *user)
-{
-    /* Nothing to destroy */
-}
-
-
-/* ------- Generic option handling routines that call above routines ----- */
-static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (opt != NULL);
-
-    user = (user_options_t*) package;
-
-    return hemisphere_register(user,opt);
-}
-
-static fclaw_exit_type_t
-options_check(fclaw_app_t *app, void *package,void *registered)
-{
-    user_options_t           *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT(registered == NULL);
-
-    user = (user_options_t*) package;
-
-    return hemisphere_check(user);
-}
-
-static void
-options_destroy (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    user = (user_options_t*) package;
-    FCLAW_ASSERT (user->is_registered);
-
-    hemisphere_destroy (user);
-
-    FCLAW_FREE (user);
-}
-
-static const fclaw_app_options_vtable_t options_vtable_user =
-{
-    options_register,
-    NULL,
-    options_check,
-    options_destroy
-};
-
-/* ------------- User options access functions --------------------- */
-
-static
-user_options_t* hemisphere_options_register (fclaw_app_t * app,
-                                             const char *configfile)
-{
-    user_options_t *user;
-    FCLAW_ASSERT (app != NULL);
-
-    user = FCLAW_ALLOC (user_options_t, 1);
-    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
-                                user);
-
-    fclaw_app_set_attribute(app,"user",user);
-    return user;
-}
-
-static 
-void hemisphere_options_store (fclaw2d_global_t* glob, user_options_t* user)
-{
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
-}
-
-const user_options_t* hemisphere_get_options(fclaw2d_global_t* glob)
-{
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
-}
-/* ------------------------- ... and here ---------------------------- */
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
@@ -215,8 +93,7 @@ void run_program(fclaw2d_global_t* glob)
     user_opt = hemisphere_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)

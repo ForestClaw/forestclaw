@@ -44,14 +44,24 @@ typedef struct user_options
 
 } user_options_t;
 
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(int* example);
-
 void swirlcons_link_solvers(fclaw2d_global_t *glob);
 
 void swirlcons_problem_setup(fclaw2d_global_t* glob);
 
+user_options_t* swirlcons_options_register (fclaw_app_t * app,
+                                       const char *configfile);
+
+void swirlcons_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob);
+
+
+
+/* ---------------------------- Fortran headers --------------------------------------- */
+
+#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
+void SWIRL_SETPROB(int* example);
+
 
 #define RPN2CONS_QS FCLAW_F77_FUNC(rpn2cons_qs,RPN2CONS_QS)
 void RPN2CONS_QS(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,

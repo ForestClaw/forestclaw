@@ -3,9 +3,10 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/filament/filament
 
 applications_clawpack_advection_2d_filament_filament_SOURCES = \
+	applications/clawpack/advection/2d/filament/filament.cpp \
+	applications/clawpack/advection/2d/filament/filament_options.c \
 	applications/clawpack/advection/2d/filament/filament_user.cpp \
 	applications/clawpack/advection/2d/filament/filament_user.h \
-	applications/clawpack/advection/2d/filament/filament.cpp \
 	applications/clawpack/advection/2d/filament/fclaw2d_map_cart.c \
 	applications/clawpack/advection/2d/filament/fclaw2d_map_fivepatch.c \
 	applications/clawpack/advection/2d/filament/psi.f \

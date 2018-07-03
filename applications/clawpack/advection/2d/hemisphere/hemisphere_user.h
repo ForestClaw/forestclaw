@@ -50,8 +50,12 @@ typedef struct user_options
 
 void hemisphere_link_solvers(fclaw2d_global_t *glob);
 
+user_options_t* hemisphere_options_register (fclaw_app_t * app,
+                                             const char *configfile);
+
 const user_options_t* hemisphere_get_options(fclaw2d_global_t* glob);
 
+void hemisphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 void hemisphere_patch_setup(fclaw2d_global_t *glob,
                             fclaw2d_patch_t *this_patch,

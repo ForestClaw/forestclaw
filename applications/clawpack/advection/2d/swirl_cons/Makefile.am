@@ -3,9 +3,10 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/swirl_cons/swirlcons
 
 applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
+	applications/clawpack/advection/2d/swirl_cons/swirlcons.cpp \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons_user.cpp \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons_user.h \
-	applications/clawpack/advection/2d/swirl_cons/swirlcons.cpp \
+	applications/clawpack/advection/2d/swirl_cons/swirlcons_options.c \
 	applications/clawpack/advection/2d/swirl_cons/setprob.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/clawpack46_setaux.f \

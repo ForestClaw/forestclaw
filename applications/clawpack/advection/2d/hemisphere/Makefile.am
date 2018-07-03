@@ -4,9 +4,10 @@ bin_PROGRAMS += applications/clawpack/advection/2d/hemisphere/hemisphere
 
 
 applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES = \
+	applications/clawpack/advection/2d/hemisphere/hemisphere.cpp \
+	applications/clawpack/advection/2d/hemisphere/hemisphere_options.c \
 	applications/clawpack/advection/2d/hemisphere/hemisphere_user.cpp \
 	applications/clawpack/advection/2d/hemisphere/hemisphere_user.h \
-	applications/clawpack/advection/2d/hemisphere/hemisphere.cpp \
 	applications/clawpack/advection/2d/hemisphere/fclaw2d_map_pillowsphere.c \
 	applications/clawpack/advection/2d/hemisphere/fclaw2d_map_pillowsphere5.c \
 	applications/clawpack/advection/2d/hemisphere/setprob.f \
