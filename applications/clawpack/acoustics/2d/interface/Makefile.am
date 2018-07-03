@@ -5,6 +5,7 @@ bin_PROGRAMS += applications/clawpack/acoustics/2d/interface/interface
 
 applications_clawpack_acoustics_2d_interface_interface_SOURCES = \
 	applications/clawpack/acoustics/2d/interface/interface.cpp \
+	applications/clawpack/acoustics/2d/interface/interface_options.c \
 	applications/clawpack/acoustics/2d/interface/interface_user.cpp \
 	applications/clawpack/acoustics/2d/interface/interface_user.h \
 	applications/clawpack/acoustics/2d/interface/p0.f \

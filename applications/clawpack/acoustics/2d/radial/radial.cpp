@@ -88,8 +88,7 @@ void run_program(fclaw2d_global_t* glob)
     user_opt = radial_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)

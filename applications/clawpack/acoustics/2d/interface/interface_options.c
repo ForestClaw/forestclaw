@@ -23,18 +23,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "radial_user.h"
+#include "interface_user.h"
+
+#if 0
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch.h>
+
+#include <fc2d_clawpack46_options.h>
+#include <fc2d_clawpack5_options.h>
+
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
+#endif
 
 static int s_user_options_package_id = -1;
 
 static void *
-radial_register (user_options_t *user, sc_options_t * opt)
+interface_register (user_options_t* user, sc_options_t * opt)
 {
     /* [user] User options */
-    sc_options_add_int    (opt, 0, "example", &user->example, 0, "[user] 0 - nomap; 1 - disk [0]");
-    sc_options_add_double (opt, 0, "rho",     &user->rho, 1, "[user] rho [1]");
-    sc_options_add_double (opt, 0, "bulk",    &user->bulk, 4, "[user] bulk modulus [4]");
-    sc_options_add_double (opt, 0, "alpha",   &user->alpha, 0.5, "[user] alpha (for 5-patch map) [0.5]");
+    sc_options_add_double (opt, 0, "rho", &user->rhol, 1.0, "[user] rho (left) [1]");
+    sc_options_add_double (opt, 0, "bulk", &user->cl, 1.0, "[user] c (left) [1]");
+    sc_options_add_double (opt, 0, "rho", &user->rhor, 4.0, "[user] rho (right) [4]");
+    sc_options_add_double (opt, 0, "bulk", &user->cr, 0.5, "[user] c (right) [0.5]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
@@ -43,36 +54,11 @@ radial_register (user_options_t *user, sc_options_t * opt)
     return NULL;
 }
 
-static fclaw_exit_type_t
-radial_postprocess (user_options_t *user)
-{
-    user->cc = sqrt(user->bulk/user->rho);
-    user->zz = user->rho*user->cc;
-
-    return FCLAW_NOEXIT;
-}
-
-static fclaw_exit_type_t
-radial_check (user_options_t *user)
-{
-    if (user->example < 0 || user->example > 1) {
-        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    if (user->example == 1 && user->claw_version == 4)
-    {
-        fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    return FCLAW_NOEXIT;
-}
-
 static void
-radial_destroy(user_options_t *user)
+interface_destroy(user_options_t *user)
 {
     /* Nothing to destroy */
 }
-
 
 /* ------- Generic option handling routines that call above routines ----- */
 static void*
@@ -86,39 +72,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     user = (user_options_t*) package;
 
-    return radial_register(user,opt);
-}
-
-static fclaw_exit_type_t
-options_postprocess (fclaw_app_t * a, void *package, void *registered)
-{
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    /* errors from the key-value options would have showed up in parsing */
-    user_options_t *user = (user_options_t *) package;
-
-    /* post-process this package */
-    FCLAW_ASSERT(user->is_registered);
-
-    /* Convert strings to arrays */
-    return radial_postprocess (user);
-}
-
-
-static fclaw_exit_type_t
-options_check(fclaw_app_t *app, void *package,void *registered)
-{
-    user_options_t           *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT(registered == NULL);
-
-    user = (user_options_t*) package;
-
-    return radial_check(user);
+    return interface_register(user,opt);
 }
 
 static void
@@ -133,7 +87,7 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     user = (user_options_t*) package;
     FCLAW_ASSERT (user->is_registered);
 
-    radial_destroy (user);
+    interface_destroy (user);
 
     FCLAW_FREE (user);
 }
@@ -142,14 +96,13 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register,
-    options_postprocess,
-    options_check,
+    NULL,
+    NULL,
     options_destroy
 };
 
 /* ------------------------- ... and here ---------------------------- */
-
-user_options_t* radial_options_register (fclaw_app_t * app,
+user_options_t* interface_options_register (fclaw_app_t * app,
                             const char *configfile)
 {
     user_options_t *user;
@@ -163,16 +116,19 @@ user_options_t* radial_options_register (fclaw_app_t * app,
     return user;
 }
 
-void radial_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void interface_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
     s_user_options_package_id = id;
 }
 
-user_options_t* radial_get_options(fclaw2d_global_t* glob)
+const user_options_t* interface_get_options(fclaw2d_global_t* glob)
 {
     int id = s_user_options_package_id;
     return (user_options_t*) fclaw_package_get_options(glob, id);    
 }
+
+
+
 

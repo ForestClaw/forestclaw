@@ -50,17 +50,25 @@ typedef struct user_options
 
 } user_options_t;
 
+user_options_t* interface_options_register (fclaw_app_t * app,
+                            const char *configfile);
+
+void interface_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 const user_options_t* interface_get_options(fclaw2d_global_t* glob);
 
 void interface_problem_setup(fclaw2d_global_t* glob);
 
-#define INTERFACE_SETPROB FCLAW_F77_FUNC(interface_setprob,INTERFACE_SETPROB)
-void INTERFACE_SETPROB(const double *rhol, const double* cl, 
-                       const double* rhor, const double *cr);
 
 void interface_link_solvers(fclaw2d_global_t *glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+/* ----------------------------- Fortran code ----------------------------------------- */
+
+#define INTERFACE_SETPROB FCLAW_F77_FUNC(interface_setprob,INTERFACE_SETPROB)
+void INTERFACE_SETPROB(const double *rhol, const double* cl, 
+                       const double* rhor, const double *cr);
 
 #ifdef __cplusplus
 #if 0
