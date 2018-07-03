@@ -27,6 +27,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
+#include <fclaw2d_diagnostics.h>
+#include <fclaw_gauges.h>
+
+void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_initialize();
+    fclaw2d_diagnostics_vtable_initialize();
+    fclaw_gauges_vtable_initialize();    
+}
 
 void fclaw2d_problem_setup(fclaw2d_global_t *glob)
 {
