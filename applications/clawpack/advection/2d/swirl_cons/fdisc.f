@@ -26,8 +26,10 @@
       endif
   
 
-      if (abs(xp - 0.125d0) .gt. 0.025d0 .or. 
-     &    abs(yp - 0.5d0) .gt. 0.125d0) then
+c      if (abs(xp - 0.125d0) .gt. 0.025d0 .or. 
+c      if (abs(xp - 0.375d0) .gt. 0.025d0 .or. 
+c     &    abs(yp - 0.5d0) .gt. 0.125d0) then
+      if (abs(xp - 0.3125d0) .gt. 0.0625d0) then
          fdisc = 1
       else
          fdisc = -1

@@ -36,7 +36,7 @@ else
         case 2
             ca = [0 16];    
         case 3
-            ca = [0,1.5];
+            ca = [0,1];
 %             ca = 1e-15*[-1,1];
     end    
     colormap(parula);
@@ -73,6 +73,8 @@ else
     fprintf('%-10s %12.4e\n','qmin',qmin);
     fprintf('%-10s %12.4e\n','qmax',qmax);    
 end
+
+showgridlines
 
 
 

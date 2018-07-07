@@ -55,7 +55,8 @@ c        # Conservative for all solvers (rp=1,2,3,4)
       else if (example .eq. 3) then
 c        # Conservative only for rp=1 and 3  (??)
 c        # Should work with non-periodic BCs
-         u = sin(2*pi*xc)
+c         u = sin(2*pi*xc)
+         u = 1.0
          v = 0*sin(2*pi*yc)
       else
          write(6,'(A,A)') 'clawpack46_setaux : ',
