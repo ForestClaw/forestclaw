@@ -109,7 +109,7 @@ void CLAWPACK46_CONS_UPDATE_ACCUMULATE_WAVES(int* mx, int* my, int* mbc, int* me
 											  double gm_bottom[], double gm_top[]);
 	
 
-#define CLAWPACK46_FORT_TIME_SYNC_FC2 FCLAW_F77_FUNC(clawpack46_fort_time_sync_f2c, \
+#define CLAWPACK46_FORT_TIME_SYNC_F2C FCLAW_F77_FUNC(clawpack46_fort_time_sync_f2c, \
 													 CLAWPACK46_FORT_TIME_SYNC_F2C)
 
 void  CLAWPACK46_FORT_TIME_SYNC_F2C(const int* mx,const int* my,

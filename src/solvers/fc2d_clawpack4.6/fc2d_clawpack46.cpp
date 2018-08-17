@@ -440,6 +440,7 @@ void fc2d_clawpack46_solver_initialize()
 
 	fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
 	fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
+    fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
 
 	fc2d_clawpack46_vtable_t*  claw46_vt = clawpack46_vt_init();
 
@@ -456,6 +457,9 @@ void fc2d_clawpack46_solver_initialize()
 	patch_vt->setup                          = clawpack46_setaux;  
 	patch_vt->physical_bc                    = clawpack46_bc2;
 	patch_vt->single_step_update             = clawpack46_update;
+
+	clawpatch_vt->fort_time_sync_fine_to_coarse = CLAWPACK46_FORT_TIME_SYNC_F2C;
+
 
 	/* Wrappers so that user can change argument list */
 	claw46_vt->b4step2                       = clawpack46_b4step2;
