@@ -1,11 +1,11 @@
-s = 0.05;
+s = 0.01;
 axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
 axis on;
 
 ex = 3;
 lstr = 'no limiter';
-mstr = 'QS';
+mstr = 'WD';
 
 if (PlotType == 4)
     hold on;
