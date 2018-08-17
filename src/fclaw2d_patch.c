@@ -651,7 +651,7 @@ void fclaw2d_patch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
 	FCLAW_ASSERT(patch_vt->time_sync_fine_to_coarse != NULL);
 
 	patch_vt->time_sync_fine_to_coarse(glob,coarse_patch,fine_patch,idir,
-									   iface_coarse,time_interp,igrid,
+									   igrid,iface_coarse,time_interp,
 									   transform_data);    
 }
 
