@@ -33,14 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_exchange.h>
 
 void fclaw2d_time_sync_reset(fclaw2d_global_t *glob, 
-							 int minlevel,int maxlevel)
+							 int minlevel,int maxlevel, int init)
 {
 	/* This is used for updating conservation arrays, for example */
 	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
 
 	if (fclaw_vt->time_sync_reset != NULL)
 	{
-		fclaw_vt->time_sync_reset(glob,minlevel,maxlevel);
+		fclaw_vt->time_sync_reset(glob,minlevel,maxlevel,init);
 	}
 }
 
@@ -119,6 +119,7 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
 
 
+#if 0
 	/* --------------------------------------------------------------
 		Send and receive patches
 	-----------------------------------------------------------------*/
@@ -130,7 +131,7 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 
 	/* Three-way corner exchanges */
 	fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
-
+#endif
 
 	/* -------------------------------------------------------------
 	Add corrections from  fine grids to coarse grid.  This is is done 
@@ -149,6 +150,7 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 		   FCLAW2D_BOUNDARY_ALL;    
 
 	correct_coarse_cells(glob,minlevel,read_parallel_patches,parallel_mode);
+
 
 	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
 

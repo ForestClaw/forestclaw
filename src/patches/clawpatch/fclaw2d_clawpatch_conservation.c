@@ -132,7 +132,8 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 						  void *user)
 {
 	int mx,my,meqn,level,minlevel;
-	int i,j,k,idir;
+	int i,j,k,idir, init;
+	int* reset_data;
 
 	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
@@ -141,7 +142,10 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 	fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(g->glob,
 																			this_patch);
 
-	minlevel = *((int*) g->user);
+	reset_data = (int*) g->user;
+	init = reset_data[0];
+	minlevel = reset_data[1];
+
 	level = this_patch->level;
 
 	mx = clawpatch_opt->mx;
@@ -163,6 +167,13 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 					cu->fm[k][j] = 0;
 					cu->fp[k][j] = 0;
 				}
+				if (init)
+				{
+					for(j = 0; j < 2*meqn*my; j++)
+					{
+						cu->edge_fluxes[k][j] = 0;
+					}					
+				}
 			}
 			else
 			{
@@ -171,19 +182,30 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 					cu->gm[k-2][i] = 0;
 					cu->gp[k-2][i] = 0;
 				}
+				if (init) 
+				{
+					for(i = 0; i < 2*meqn*mx; i++)
+					{
+						cu->edge_fluxes[k][i] = 0;
+					}					
+				}
 			}
 		}     /* coarse grid neighbor */
 	}
 }
 
-void fclaw2d_clawpatch_cons_update_reset (fclaw2d_global_t* glob,int minlevel,
-										 int maxlevel)
+void fclaw2d_clawpatch_cons_update_reset (fclaw2d_global_t* glob,
+                                          int minlevel,
+                                          int maxlevel, int init)
 {
 	int level;
+	int reset_data[2];
+	reset_data[0] = init;
+	reset_data[1] = minlevel;
 
 	for(level = minlevel; level <= maxlevel; level++)
 	{
-		fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset, &minlevel);
+		fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset, reset_data);
 	}
 }
 
@@ -220,6 +242,7 @@ void fclaw2d_clawpatch_cons_update_delete (fclaw2d_clawpatch_cons_update_t **con
 	 FCLAW_FREE(*cons_update);
 	 *cons_update = NULL;
 }
+
 
 void fclaw2d_clawpatch_update_cons_metric(fclaw2d_global_t* glob,
 										  fclaw2d_patch_t* this_patch,
@@ -286,10 +309,10 @@ void fclaw2d_clawpatch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
 	                            &xlower,&ylower,&dx,&dy);
 
 	fclaw2d_clawpatch_cons_update_t* cucoarse = 
-	fclaw2d_clawpatch_get_cons_update(glob,coarse_patch);
+	           fclaw2d_clawpatch_get_cons_update(glob,coarse_patch);
 
 	fclaw2d_clawpatch_cons_update_t* cufine = 
-	fclaw2d_clawpatch_get_cons_update(glob,fine_patch);
+	           fclaw2d_clawpatch_get_cons_update(glob,fine_patch);
 
 	/* create dummy fine grid to handle indexing between blocks */
 	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));

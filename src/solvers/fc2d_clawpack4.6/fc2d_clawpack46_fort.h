@@ -81,10 +81,12 @@ void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
 #define CLAWPACK46_CONS_UPDATE_STORE_FLUX FCLAW_F77_FUNC(clawpack46_update_cons_store_flux, \
 														 CLAWPACK46_UPDATE_CONS_STORE_FLUX)
 
-void CLAWPACK46_CONS_UPDATE_STORE_FLUX(int* mx,int* my,int* mbc,int* meqn,
+void CLAWPACK46_CONS_UPDATE_STORE_FLUX(int* mx,int* my, int* mbc, int* meqn,
 									   int* maux, double* dt,
-									   double el0[], double el1[], 
-									   double el2[], double el3[],
+									   double* el0, 
+									   double* el1, 
+									   double* el2, 
+									   double* el3,
 									   double q[], double aux[],
 									   double flux0[],double flux1[], 
 									   double flux2[], double flux3[],

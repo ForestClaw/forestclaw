@@ -334,6 +334,20 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 						if (time_sync_fine_to_coarse)
 						{
 							/* Add correction to coarse grid from fine grid */
+#if 0							
+							int cblockno,cpatchno,fblockno,fpatchno;
+							cblockno = fclaw2d_patch_get_blockno(coarse_patch);
+							fblockno = fclaw2d_patch_get_blockno(fine_patch);
+							cpatchno = fclaw2d_patch_get_patchno(coarse_patch);
+							fpatchno = fclaw2d_patch_get_patchno(fine_patch);
+							printf("coarse block no %d\n",cblockno);
+							printf("coarse patch no. %d\n",cpatchno);
+							printf("fine block no %d\n",fblockno);
+							printf("fine patch no. %d\n",fpatchno);
+							printf("idir = %d\n", igrid);
+							printf("igrid = %d\n", idir);
+							printf("iface = %d\n\n",iface);		
+#endif												
 							fclaw2d_patch_time_sync_fine_to_coarse(s->glob,coarse_patch,
 																   fine_patch,idir,igrid,
 																   iface,time_interp,

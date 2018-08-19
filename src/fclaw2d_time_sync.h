@@ -38,7 +38,7 @@ extern "C"
 struct fclaw2d_global;
 
 void fclaw2d_time_sync_reset(struct fclaw2d_global *glob, 
-                             int minlevel,int maxlevel);
+                             int minlevel,int maxlevel, int init);
 
 
 void fclaw2d_time_sync(struct fclaw2d_global *glob, int minlevel, int maxlevel);

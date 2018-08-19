@@ -783,6 +783,15 @@ fclaw2d_patch_get_blockno(fclaw2d_patch_t* this_patch)
 	return pdata->block_idx;
 }
 
+int
+fclaw2d_patch_get_patchno(fclaw2d_patch_t* this_patch)
+{
+	/* This is is really only here if we fail to pass in the patchno to a patch 
+	routine.  */
+	fclaw2d_patch_data_t* pdata = get_patch_data(this_patch);
+	FCLAW_ASSERT(pdata->patch_idx >= 0);
+	return pdata->patch_idx;
+}
 
 
 /* -------------------------- Internal ForestClaw functions --------------------------- */

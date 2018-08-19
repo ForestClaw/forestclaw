@@ -44,9 +44,6 @@ struct fclaw2d_clawpatch_cons_update
 {
 	/* Two 1d arrays stored on each of four faces */
 	double *edge_fluxes[4];
-#if 0    
-	double *edge_fluxes_save[4];
-#endif    
 
 	/* Scaling factors */
 	double *edgelengths[4];
@@ -57,7 +54,6 @@ struct fclaw2d_clawpatch_cons_update
 	double *fm[2];
 	double *gp[2];
 	double *gm[2];
-
 };
 
 struct fclaw2d_global;
@@ -69,7 +65,7 @@ void fclaw2d_clawpatch_cons_update_new(struct fclaw2d_global* glob,
 									   fclaw2d_clawpatch_cons_update_t **cons_update);
 
 void fclaw2d_clawpatch_cons_update_reset(struct fclaw2d_global* glob,int minlevel,
-										 int maxlevel);
+										 int maxlevel, int init);
 
 
 void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons_update);

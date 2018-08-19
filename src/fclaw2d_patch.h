@@ -672,6 +672,7 @@ void* fclaw2d_patch_metric_patch(struct fclaw2d_patch *patch);
 
 int fclaw2d_patch_get_blockno(fclaw2d_patch_t* this_patch);
 
+int fclaw2d_patch_get_patchno(fclaw2d_patch_t* this_patch);
 
 
 /* ------------------  Miscellaneous functions (mostly internal) ---------------------- */

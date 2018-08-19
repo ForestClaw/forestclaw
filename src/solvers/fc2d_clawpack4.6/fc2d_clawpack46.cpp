@@ -305,10 +305,11 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 		double *auxvec = FCLAW_ALLOC(double, maux);
 		double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
-
 		CLAWPACK46_CONS_UPDATE_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,&dt,
-										  cu->edgelengths[0],cu->edgelengths[1],
-										  cu->edgelengths[2],cu->edgelengths[3],
+										  cu->edgelengths[0], 
+										  cu->edgelengths[1], 
+										  cu->edgelengths[2], 
+										  cu->edgelengths[3],
 										  qold,aux,
 										  cu->edge_fluxes[0],cu->edge_fluxes[1],
 										  cu->edge_fluxes[2],cu->edge_fluxes[3],

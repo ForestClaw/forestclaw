@@ -12,10 +12,10 @@ c    # ----------------------------------------------------------------
 
 c    # -----------------------------------------------------------------
 c    # Called BEFORE step update.  This stores the value of the flux
-c    # function at cell centers.  At k=1, the flux evaluated in the 
-c    # ghost cell is stored;  at k=0, the flux at the the first interior
-c    # cell is stored;  If there is no flux function, we should set up a 
-c    # dummy function that returns zero.
+c    # function at cell centers.  At k=0, the flux at the the first interior
+c    # interior cell is stored;  At k=1, the flux evaluated in the 
+c    # ghost cell is stored;    If there is no flux function, we should 
+c    # set up a dummy function that returns zero.
 c    # 
 c    # These will be stored for each grid and used to compute
 c    # corrections.
@@ -111,7 +111,8 @@ c        # Top side 0 = in; 1 = out
 
 c    # -----------------------------------------------------------------
 c    # This is called AFTER the step update.   This accumulates plus and 
-c    # minus waves, scaled by dt*edge_length.  
+c    # minus waves, scaled by dt*edge_length.  This scaling takes care 
+c    # of any division by 2 or 4. 
 c    # -----------------------------------------------------------------
       subroutine clawpack46_cons_update_accumulate_waves(mx,my,
      &                                                   mbc,meqn,
@@ -145,6 +146,8 @@ c    # -----------------------------------------------------------------
 
       do j = 1,my
          do m = 1,meqn
+c           # In flux2, fp = -apdq.  Then the update is 
+c           # written as -(fm-fp) = (fp-fm) = -(apdq+amdq)
             fp_left(j,m) = fp_left(j,m) - dt*el0(j)*fp(1,j,m)
             fm_left(j,m) = fm_left(j,m) + dt*el0(j)*fm(1,j,m)
 
@@ -170,6 +173,7 @@ c    # -----------------------------------------------------------------
 c    # -----------------------------------------------------------------
 c    # Add fine grid corrections to coarse grid.  
 c    # -----------------------------------------------------------------
+
       subroutine clawpack46_fort_time_sync_f2c (mx,my,mbc,meqn,
      &                                          idir, iface_coarse,
      &                                          area0, area1,
@@ -253,7 +257,7 @@ c    # fine grid correction for the coarse grid.
      &               eff0(jj1,mq,1) + eff0(jj2,mq,1)
      
             deltap = fpfine1(jj1,mq) + fpfine1(jj2,mq) +
-     &               eff1(jj1,mq,1) + eff1(jj2,mq,1)
+     &               (eff1(jj1,mq,1) + eff1(jj2,mq,1))
 
 c           # Put the same value in four ghost cells;  grab the first
 c           # one that shows up in the transformation.          
@@ -320,7 +324,10 @@ c                    # efc1(0) is flux stored in the coarse grid
 c                    # interior cell. 
                      deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq,0)
                      areac = area1(jc)
-                  endif
+c                     write(6,'(1I5,5F16.8)') jc,
+c     &                       qcoarse(ic,jc,mq), fineval, efc1(jc,mq,0),
+c     &                       deltac, deltac/areac
+                  endif   
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
 
                endif

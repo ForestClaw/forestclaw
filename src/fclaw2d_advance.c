@@ -269,7 +269,8 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	grid values to the fine grid registers (needed for Riemann problem). 
 	Important here is that dt has a valid value, because this is needed
 	to construct conservative correction (e.g. dt/dx*delta) */
-	fclaw2d_time_sync_reset(glob,minlevel,maxlevel);
+	fclaw_global_essentialf("advance : time_sync_reset\n");
+	fclaw2d_time_sync_reset(glob,minlevel,maxlevel,1);
 
 	/* Step inc at maxlevel should be 1 by definition */
 	FCLAW_ASSERT(ts_counter[maxlevel].step_inc == 1);
@@ -278,9 +279,15 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	for(nf = 0; nf < n_fine_steps; nf++)
 	{
 		/* Coarser levels get updated recursively */
+		fclaw_global_essentialf("advance : time_sync\n");
 		double cfl_step = advance_level(glob,maxlevel,nf,maxcfl,ts_counter);
+		fclaw2d_time_sync(glob,minlevel,maxlevel);
+		// fclaw2d_time_sync_reset(glob,minlevel,maxlevel,0);                
+
 		maxcfl = fmax(cfl_step,maxcfl);
 		int last_step = ts_counter[maxlevel].last_step;
+
+		/* This loop is entered if we are doing local time stepping */
 		if (last_step < ts_counter[maxlevel].total_steps)
 		{
 			/* Do intermediate ghost cell exchanges */
@@ -301,7 +308,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 									 sync_time,
 									 time_interp,
 									 FCLAW2D_TIMER_ADVANCE);
-				fclaw2d_time_sync_reset(glob,time_interp_level+1,maxlevel);                
+				fclaw2d_time_sync_reset(glob,time_interp_level+1,maxlevel,0);                
 			}
 			else
 			{
@@ -313,7 +320,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 									 sync_time,
 									 time_interp,
 									 FCLAW2D_TIMER_ADVANCE);
-				fclaw2d_time_sync_reset(glob,minlevel,maxlevel);                
+				fclaw2d_time_sync_reset(glob,minlevel,maxlevel,0);                
 			}
 		}
 	}
