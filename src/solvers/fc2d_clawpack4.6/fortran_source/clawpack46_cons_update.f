@@ -256,7 +256,7 @@ c    # fine grid correction for the coarse grid.
             deltam = fmfine0(jj1,mq) + fmfine0(jj2,mq) +
      &               eff0(jj1,mq,1) + eff0(jj2,mq,1)
      
-            deltap = fpfine1(jj1,mq) + fpfine1(jj2,mq) +
+            deltap = (fpfine1(jj1,mq) + fpfine1(jj2,mq)) -
      &               (eff1(jj1,mq,1) + eff1(jj2,mq,1))
 
 c           # Put the same value in four ghost cells;  grab the first
@@ -264,7 +264,7 @@ c           # one that shows up in the transformation.
             do jj = jj1,jj2
                do ii = 1,mbc
                   qfine_dummy(1-ii,jj,mq) = -deltam
-                  qfine_dummy(mx+ii,jj,mq) = -deltap
+                  qfine_dummy(mx+ii,jj,mq) =-deltap
                enddo
             enddo
          enddo
@@ -274,8 +274,10 @@ c           # one that shows up in the transformation.
             ii2 = 2*(i-1) + 2
             deltam = gmfine2(ii1,mq) + gmfine2(ii2,mq) +
      &               eff2(ii1,mq,1) + eff2(ii2,mq,1)
-            deltap = gpfine3(ii1,mq) + gpfine3(ii2,mq) +
-     &               eff3(ii1,mq,1) + eff3(ii2,mq,1)
+
+            deltap = gpfine3(ii1,mq) + gpfine3(ii2,mq) -
+     &               (eff3(ii1,mq,1) + eff3(ii2,mq,1))
+
             do ii = ii1,ii2
                do jj = 1,mbc
                   qfine_dummy(ii,1-jj,mq) = -deltam
@@ -313,20 +315,29 @@ c              # Move this to beginning of routine.
                if (.not. skip_this_grid) then
                   fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 0) then
-c                    # Coarse face is right; fine grid is left
+c                    # Coarse grid is right; fine grid is left
 c                    # efc0(0) is flux stored in the coarse grid 
 c                    # interior cell. 
-                     deltac = fineval + fpcoarse0(jc,mq) + efc0(jc,mq,0)
+                     deltac = fineval + fpcoarse0(jc,mq) - efc0(jc,mq,0)
                      areac = area0(jc)
+
+c                     write(6,'(2I3,6F14.8)') ic, jc,
+c     &                       qcoarse(ic,jc,mq), fineval, 
+c     &                       fpcoarse0(jc,mq), efc0(jc,mq,0),
+c     &                       deltac, deltac/areac
+
                   else
-c                    # Coarse face is left; fine grid is right                    
+c                   # Coarse grid is left; fine grid is right                    
 c                    # efc1(0) is flux stored in the coarse grid 
 c                    # interior cell. 
                      deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq,0)
                      areac = area1(jc)
-c                     write(6,'(1I5,5F16.8)') jc,
-c     &                       qcoarse(ic,jc,mq), fineval, efc1(jc,mq,0),
+
+c                     write(6,'(2I3,6F14.8)') ic, jc,
+c     &                       qcoarse(ic,jc,mq), fineval, 
+c     &                       fmcoarse1(jc,mq), efc1(jc,mq,0),
 c     &                       deltac, deltac/areac
+
                   endif   
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
 
@@ -354,13 +365,13 @@ c     &                       deltac, deltac/areac
                if (.not. skip_this_grid) then
                   fineval = qfine_dummy(i2(1),j2(1),mq)
                   if (iface_coarse .eq. 2) then
-c                    # Fine grid is bottom grid; coarse is top grid  
+c                    # Coarse is top grid  Fine grid is bottom grid; 
 c                    # efc2(0) is flux stored in the coarse grid 
 c                    # interior cell. 
-                     deltac = fineval + gpcoarse2(ic,mq) + efc2(ic,mq,0)
+                     deltac = fineval + gpcoarse2(ic,mq) - efc2(ic,mq,0)
                      areac = area2(ic)
                   else
-c                    # coarse grid is bottom grid; fine is top grid   
+c                    # Coarse grid is bottom grid; fine is top grid   
 c                    # efc3(0) is flux stored in the coarse grid 
 c                    # interior cell.                   
                      deltac = fineval + gmcoarse3(ic,mq) + efc3(ic,mq,0)
