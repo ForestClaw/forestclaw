@@ -21,18 +21,18 @@ c     # Refine based only on first variable in system.
       qmax = q(1,1,mq)
       do j = 1,my
          do i = 1,mx
-c            qmin = min(q(i,j,mq),qmin)
-c            qmax = max(q(i,j,mq),qmax)
-c            if (q(i,j,mq) .gt. tag_threshold) then
-c               tag_patch = 1
-c               return
-c            endif
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
-            if (xc > 0.5d0) then
+            qmin = min(q(i,j,mq),qmin)
+            qmax = max(q(i,j,mq),qmax)
+            if (q(i,j,mq) .gt. tag_threshold) then
                tag_patch = 1
                return
             endif
+c            xc = xlower + (i-0.5)*dx
+c            yc = ylower + (j-0.5)*dy
+c            if (yc > 0.5d0) then
+c               tag_patch = 1
+c               return
+c            endif
 
          enddo
       enddo

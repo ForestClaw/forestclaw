@@ -1,0 +1,12 @@
+7/6/2018
+--------
+
+* use example3.ini
+* Velocity field set in clawpack46_setaux.f  (1,0)
+* Fix tag4refinement.f so that we have only two levels (level 1-2)
+* 
+* 
+
+8/17/2018
+---------
+* Write down flow chart of conservation steps.
