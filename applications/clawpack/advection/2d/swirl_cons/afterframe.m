@@ -1,5 +1,5 @@
 s = 0.01;
-axis([-s 1+s -s 1+s])
+axis([-s 2+s -s 1+s])
 daspect([1 1 1]);
 axis on;
 
@@ -24,8 +24,8 @@ elseif (ShowUnderOverShoots == 1)
     qhi = 1;
     under_label = sprintf('%3.1f - %7.1e',qlo,qlo-qmin);
     over_label = sprintf('%3.1f + %7.1e',qhi,qmax-qhi);
-    fprintf('%-10s %12.4e\n','qmin',qmin);
-    fprintf('%-10s %12.4e\n','qmax',qmax);
+    fprintf('%-10s %16.8e\n','qmin',qmin);
+    fprintf('%-10s %16.8e\n','qmax',qmax);
     colorbar_underover(under_label,over_label);
 else
     switch ex
@@ -36,9 +36,10 @@ else
         case 2
             ca = [0 16];    
         case 3
-            ca = [0,1];
-%             ca = 1e-15*[-1,1];
+            ca = 3*[0,1];
+            % ca = 1e-15*[-1,1];
     end    
+    % rybcolormap;
     colormap(parula);
     colorbar;
     caxis(ca);
@@ -70,11 +71,13 @@ else
     daspect([1 1 1]);
     view(2);        
     
-    fprintf('%-10s %12.4e\n','qmin',qmin);
-    fprintf('%-10s %12.4e\n','qmax',qmax);    
+    fprintf('%-10s %16.8e\n','qmin',qmin);
+    fprintf('%-10s %16.8e\n','qmax',qmax);    
 end
 
 showgridlines
+hidegridlines(5);
+
 
 
 
