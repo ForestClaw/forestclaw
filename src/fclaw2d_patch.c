@@ -636,7 +636,7 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
 
 /* ----------------------------- Conservative updates --------------------------------- */
 
-/* We need to virtualize this because we call it from advance ... */
+/* We need to virtualize this because we call it from fclaw2d_face_neighbors */
 
 void fclaw2d_patch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
 											fclaw2d_patch_t *coarse_patch,
