@@ -337,6 +337,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	clawpack46_fort_flux2_t flux2 = clawpack_options->use_fwaves ?
 									 CLAWPACK46_FLUX2FW : CLAWPACK46_FLUX2;
 
+	/* NOTE: qold will be overwritten in this step */
 	CLAWPACK46_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
 						  clawpack_options->mthlim, &clawpack_options->mcapa,
 						  &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
