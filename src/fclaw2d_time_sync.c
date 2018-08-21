@@ -38,6 +38,8 @@ void fclaw2d_time_sync_reset(fclaw2d_global_t *glob,
 	/* This is used for updating conservation arrays, for example */
 	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
 
+	// FCLAW_ASSERT(minlevel == maxlevel);
+	// fclaw_global_essentialf("reset level = %d\n",minlevel);
 	if (fclaw_vt->time_sync_reset != NULL)
 	{
 		fclaw_vt->time_sync_reset(glob,minlevel,maxlevel,init);
@@ -56,6 +58,7 @@ void copy_at_blockbdry(fclaw2d_global_t *glob,
 	e_info.grid_type = FCLAW2D_IS_COARSE;
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
+
 	fclaw2d_global_iterate_level(glob, level, cb_face_fill,
 						 &e_info);    
 }
@@ -95,8 +98,14 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 	where grids are the same size */
 	for(level = maxcoarse; level >= mincoarse; level--)
 	{
+		/* Level is the coarse level to be corrected */
 		fine2coarse(glob,level,
 					read_parallel_patches,ghost_mode);
+
+		/* Reset fluxes on fine grid, since they have all been used to 
+		   correct coarse grid.  Coarse grid data is reset in
+		   syncing step. */
+		fclaw2d_time_sync_reset(glob, level+1, level+1, 1);
 	}
 
 #if 0

@@ -56,7 +56,7 @@ c        # left side k=0 = in; k=1 = out
             enddo
             call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
             do m = 1,meqn
-               flux0(j,m,k) = dt*el0(j)*flux(m)
+               flux0(j,m,k) = flux0(j,m,k) + dt*el0(j)*flux(m)
             enddo
          enddo
 
@@ -70,7 +70,7 @@ c        # right side 0 = in; 1 = out
             enddo
             call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
             do m = 1,meqn
-               flux1(j,m,k) = dt*el1(j)*flux(m)
+               flux1(j,m,k) = flux1(j,m,k) + dt*el1(j)*flux(m)
             enddo
          enddo
       enddo
@@ -88,7 +88,7 @@ c        # bottom side 0 = in; 1 = out
             enddo
             call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
             do m = 1,meqn
-               flux2(i,m,k) = dt*el2(i)*flux(m)
+               flux2(i,m,k) = flux2(i,\,k) + dt*el2(i)*flux(m)
             enddo
          enddo
 
@@ -102,7 +102,7 @@ c        # Top side 0 = in; 1 = out
             enddo
             call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
             do m = 1,meqn
-               flux3(i,m,k) = dt*el3(i)*flux(m)
+               flux3(i,m,k) = flux3(i,m,k) + dt*el3(i)*flux(m)
             enddo
          enddo
       enddo
@@ -323,10 +323,10 @@ c                    # interior cell.
                      deltac = fineval + fpcoarse0(jc,mq) - efc0(jc,mq,0)
                      areac = area0(jc)
 
-c                     write(6,'(2I3,6F14.8)') ic, jc,
-c     &                       qcoarse(ic,jc,mq), fineval, 
-c     &                       fpcoarse0(jc,mq), efc0(jc,mq,0),
-c     &                       deltac, deltac/areac
+c                    # Reset these, since they will no longer be needed                     
+                     fpcoarse0(jc,mq) = 0
+                     efc0(jc,mq,0) = 0
+                     efc0(jc,mq,1) = 0
 
                   else
 c                   # Coarse grid is left; fine grid is right                    
@@ -335,10 +335,10 @@ c                    # interior cell.
                      deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq,0)
                      areac = area1(jc)
 
-c                      write(6,'(2I3,6F14.8)') ic, jc,
-c      &                       qcoarse(ic,jc,mq), fineval, 
-c      &                       fmcoarse1(jc,mq), efc1(jc,mq,0),
-c      &                       deltac, deltac/areac
+c                    # Reset these, since they will no longer be needed                     
+                     fmcoarse1(jc,mq) = 0
+                     efc1(jc,mq,0) = 0
+                     efc1(jc,mq,1) = 0
 
                   endif   
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
@@ -372,12 +372,24 @@ c                    # efc2(0) is flux stored in the coarse grid
 c                    # interior cell. 
                      deltac = fineval + gpcoarse2(ic,mq) - efc2(ic,mq,0)
                      areac = area2(ic)
+
+c                    # Reset these, since they will no longer be needed                     
+                     gpcoarse2(ic,mq) = 0
+                     efc2(ic,mq,0) = 0
+                     efc2(ic,mq,1) = 0
+
                   else
 c                    # Coarse grid is bottom grid; fine is top grid   
 c                    # efc3(0) is flux stored in the coarse grid 
 c                    # interior cell.                   
                      deltac = fineval + gmcoarse3(ic,mq) + efc3(ic,mq,0)
                      areac = area3(ic)
+
+c                    # Reset these, since they will no longer be needed                     
+                     gmcoarse3(ic,mq) = 0
+                     efc3(ic,mq,0) = 0
+                     efc3(ic,mq,1) = 0
+
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
                endif                    !! skip grid loop

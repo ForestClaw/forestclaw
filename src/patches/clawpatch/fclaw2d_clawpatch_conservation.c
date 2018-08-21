@@ -157,8 +157,10 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 	for(k = 0; k < 4; k++)
 	{
 		idir = k/2;
+#if 0		
 		if (((pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE) && level > minlevel)
 			|| ((pdata->face_neighbors[k] == FCLAW2D_PATCH_HALFSIZE)))
+#endif			
 		{
 			if (idir == 0)
 			{
@@ -167,7 +169,7 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 					cu->fm[k][j] = 0;
 					cu->fp[k][j] = 0;
 				}
-				if (init)
+				if (1)
 				{
 					for(j = 0; j < 2*meqn*my; j++)
 					{
@@ -182,7 +184,7 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 					cu->gm[k-2][i] = 0;
 					cu->gp[k-2][i] = 0;
 				}
-				if (init) 
+				if (1) 
 				{
 					for(i = 0; i < 2*meqn*mx; i++)
 					{
@@ -346,6 +348,7 @@ void fclaw2d_clawpatch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
 
 	FCLAW_FREE(qneighbor_dummy);
 	FCLAW_FREE(maskneighbor);       
+
 }
 
 

@@ -269,7 +269,6 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	grid values to the fine grid registers (needed for Riemann problem). 
 	Important here is that dt has a valid value, because this is needed
 	to construct conservative correction (e.g. dt/dx*delta) */
-	// fclaw_global_essentialf("advance : time_sync_reset\n");
 	fclaw2d_time_sync_reset(glob,minlevel,maxlevel,1);
 
 	/* Step inc at maxlevel should be 1 by definition */
@@ -279,14 +278,8 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	for(nf = 0; nf < n_fine_steps; nf++)
 	{
 		/* Coarser levels get updated recursively */
-		// fclaw_global_essentialf("advance : time_sync\n");
 		/* Advance stores anything needed for later synchronization */
 		double cfl_step = advance_level(glob,maxlevel,nf,maxcfl,ts_counter);
-		if (fclaw_opt->time_sync)
-		{
-			fclaw2d_time_sync(glob,minlevel,maxlevel);
-		}
-		// fclaw2d_time_sync_reset(glob,minlevel,maxlevel,0);                
 
 		maxcfl = fmax(cfl_step,maxcfl);
 		int last_step = ts_counter[maxlevel].last_step;
@@ -305,26 +298,39 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 				int time_interp = 1;
 
 				/* Do conservative fix up here */
-				fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
+				if (fclaw_opt->time_sync)
+			    {
+			        /* Add coarse grid corrections to coarse levels time_interp_level+1 
+			           to maxlevel-1. Finer grids will be reset; coarse grid data
+			           at coarse/fine interfaces will be reset. */			        
+			    	fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
+			    	/* Don't reset coarsest level, since it might still be used 
+			    	   for coarser levels */
+			    }
 				fclaw2d_ghost_update(glob,
 									 time_interp_level+1,
 									 maxlevel,
 									 sync_time,
 									 time_interp,
 									 FCLAW2D_TIMER_ADVANCE);
-				fclaw2d_time_sync_reset(glob,time_interp_level+1,maxlevel,0);                
 			}
 			else
 			{
+				/* End up here is we are doing global time stepping but return from 
+				   advance after 2^(maxlevel-minlevel) time steps. */
+				if (fclaw_opt->time_sync)
+			    {
+			        /* Add coarse grid corrections */
+				    fclaw2d_time_sync(glob,minlevel,maxlevel);
+				    fclaw2d_time_sync_reset(glob,minlevel,minlevel,0);                
+			    }
 				int time_interp = 0;
-				fclaw2d_time_sync(glob,minlevel,maxlevel);
 				fclaw2d_ghost_update(glob,
 									 minlevel,
 									 maxlevel,
 									 sync_time,
 									 time_interp,
 									 FCLAW2D_TIMER_ADVANCE);
-				fclaw2d_time_sync_reset(glob,minlevel,maxlevel,0);                
 			}
 		}
 	}
@@ -335,6 +341,13 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	{
 		FCLAW_ASSERT(ts_counter[level].last_step ==
 					 ts_counter[level].step_inc*ts_counter[level].total_steps);
+	}
+
+	if (fclaw_opt->time_sync)
+	{
+	    /* Final coarse grid correction */
+		fclaw2d_time_sync(glob,minlevel,maxlevel);
+		fclaw2d_time_sync_reset(glob,minlevel,minlevel,0);                
 	}
 
 	double sync_time =  ts_counter[maxlevel].current_time;
