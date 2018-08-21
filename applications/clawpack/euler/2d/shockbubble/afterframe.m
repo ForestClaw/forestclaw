@@ -51,6 +51,7 @@ if (prt_tikz)
     res = sprintf('-r%d',mx*2^maxlevel);
     print('-dpng',res,fname);  
 end
+daspect([1,1,1]);
 shg
 
 clear afterframe
