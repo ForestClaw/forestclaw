@@ -148,6 +148,8 @@ c    # -----------------------------------------------------------------
          do m = 1,meqn
 c           # In flux2, fp = -apdq.  Then the update is 
 c           # written as -(fm-fp) = (fp-fm) = -(apdq+amdq)
+c           # We change the sign back here so that we can write
+c           # the update as fp=apdq, fm = amdq.             
             fp_left(j,m) = fp_left(j,m) - dt*el0(j)*fp(1,j,m)
             fm_left(j,m) = fm_left(j,m) + dt*el0(j)*fm(1,j,m)
 
@@ -333,10 +335,10 @@ c                    # interior cell.
                      deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq,0)
                      areac = area1(jc)
 
-c                     write(6,'(2I3,6F14.8)') ic, jc,
-c     &                       qcoarse(ic,jc,mq), fineval, 
-c     &                       fmcoarse1(jc,mq), efc1(jc,mq,0),
-c     &                       deltac, deltac/areac
+c                      write(6,'(2I3,6F14.8)') ic, jc,
+c      &                       qcoarse(ic,jc,mq), fineval, 
+c      &                       fmcoarse1(jc,mq), efc1(jc,mq,0),
+c      &                       deltac, deltac/areac
 
                   endif   
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac

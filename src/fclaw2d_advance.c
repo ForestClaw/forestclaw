@@ -57,16 +57,16 @@ void initialize_timestep_counters(fclaw2d_global_t* glob,
 								  double t_init, double dt)
 {
 	fclaw2d_domain_t *domain = glob->domain;
-	const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 	fclaw2d_timestep_counters *ts_counter;
 	int level;
 
-	*ts_counter_ptr = FCLAW2D_ALLOC(fclaw2d_level_data_t,gparms->maxlevel+1);
+	*ts_counter_ptr = FCLAW2D_ALLOC(fclaw2d_level_data_t,fclaw_opt->maxlevel+1);
 
 	ts_counter = *ts_counter_ptr;
 
 	/* Set global indexing for time levels */
-	for (level = gparms->minlevel; level <= gparms->maxlevel; level++)
+	for (level = fclaw_opt->minlevel; level <= fclaw_opt->maxlevel; level++)
 	{
 		ts_counter[level].last_step = 0;
 		ts_counter[level].initial_time = t_init;
@@ -74,12 +74,12 @@ void initialize_timestep_counters(fclaw2d_global_t* glob,
 	}
 
 	/* Set time step and number of steps to take for each level */
-	if (gparms->subcycle)
+	if (fclaw_opt->subcycle)
 	{
 		double dt_level = dt;
-		int steps_inc = pow_int(2,domain->global_maxlevel-gparms->minlevel);
+		int steps_inc = pow_int(2,domain->global_maxlevel-fclaw_opt->minlevel);
 		int total_steps = 1;
-		for (level = gparms->minlevel; level <= gparms->maxlevel; level++)
+		for (level = fclaw_opt->minlevel; level <= fclaw_opt->maxlevel; level++)
 		{
 			ts_counter[level].dt_step = dt_level;
 			ts_counter[level].total_steps = total_steps;
@@ -91,11 +91,11 @@ void initialize_timestep_counters(fclaw2d_global_t* glob,
 	}
 	else
 	{
-		int rf = pow_int(2,gparms->maxlevel-gparms->minlevel);
-		for (level = gparms->minlevel; level <= gparms->maxlevel; level++)
+		int rf = pow_int(2,fclaw_opt->maxlevel-fclaw_opt->minlevel);
+		for (level = fclaw_opt->minlevel; level <= fclaw_opt->maxlevel; level++)
 		{
 			ts_counter[level].step_inc = 1;
-			if (gparms->advance_one_step)
+			if (fclaw_opt->advance_one_step)
 			{
 				/* Take exactly one step of the dt (stable or not!)
 				   that was passed into advance;
@@ -192,7 +192,7 @@ double advance_level(fclaw2d_global_t *glob,
 					 fclaw2d_timestep_counters* ts_counter)
 {
 	fclaw2d_domain_t* domain = glob->domain;
-	const fclaw_options_t* gparms = fclaw2d_get_options(glob);
+	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 	double t_level = ts_counter[level].current_time;
 	double dt_level = ts_counter[level].dt_step;
 
@@ -220,7 +220,7 @@ double advance_level(fclaw2d_global_t *glob,
 											last_coarse_step,
 											maxcfl,ts_counter);
 			maxcfl = fmax(maxcfl,cfl_step);
-			if (gparms->subcycle)
+			if (fclaw_opt->subcycle)
 			{
 				double alpha = compute_alpha(glob,ts_counter,this_level);
 
@@ -252,7 +252,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	int level;
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
 
-	const fclaw_options_t* gparms = fclaw2d_get_options(glob);
+	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 	fclaw2d_timestep_counters *ts_counter;
 
 	initialize_timestep_counters(glob,&ts_counter,t_curr,dt);
@@ -269,7 +269,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	grid values to the fine grid registers (needed for Riemann problem). 
 	Important here is that dt has a valid value, because this is needed
 	to construct conservative correction (e.g. dt/dx*delta) */
-	fclaw_global_essentialf("advance : time_sync_reset\n");
+	// fclaw_global_essentialf("advance : time_sync_reset\n");
 	fclaw2d_time_sync_reset(glob,minlevel,maxlevel,1);
 
 	/* Step inc at maxlevel should be 1 by definition */
@@ -279,9 +279,13 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	for(nf = 0; nf < n_fine_steps; nf++)
 	{
 		/* Coarser levels get updated recursively */
-		fclaw_global_essentialf("advance : time_sync\n");
+		// fclaw_global_essentialf("advance : time_sync\n");
+		/* Advance stores anything needed for later synchronization */
 		double cfl_step = advance_level(glob,maxlevel,nf,maxcfl,ts_counter);
-		fclaw2d_time_sync(glob,minlevel,maxlevel);
+		if (fclaw_opt->time_sync)
+		{
+			fclaw2d_time_sync(glob,minlevel,maxlevel);
+		}
 		// fclaw2d_time_sync_reset(glob,minlevel,maxlevel,0);                
 
 		maxcfl = fmax(cfl_step,maxcfl);
@@ -292,7 +296,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 		{
 			/* Do intermediate ghost cell exchanges */
 			double sync_time = ts_counter[maxlevel].current_time;
-			if (gparms->subcycle)
+			if (fclaw_opt->subcycle)
 			{
 				/* Find time interpolated level and do ghost patch exchange
 				   and ghost cell exchange for next update. */

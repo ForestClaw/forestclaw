@@ -296,6 +296,8 @@ void clawpatch_build_from_fine(fclaw2d_global_t *glob,
 		fclaw2d_metric_patch_setup_from_fine(glob, fine_patches, coarse_patch,
 											 blockno, coarse_patchno, fine0_patchno);
 	}
+
+	fclaw2d_clawpatch_update_cons_metric(glob,coarse_patch,blockno,coarse_patchno);
 }
 
 

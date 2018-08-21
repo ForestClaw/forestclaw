@@ -88,6 +88,12 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "weighted_partition", &fclaw_opt->weighted_partition, 0,
                          "Weight grids when partitioning [F]");
 
+    /* ------------------------------ Conservation fix -------------------------------- */
+
+    sc_options_add_bool (opt, 0, "time-sync", &fclaw_opt->time_sync, 0,
+                         "Synchronize coarse/fine grids to include conservation fix [F]");
+
+
     /* ------------------------------- Output options --------------------------------- */
 
     sc_options_add_bool (opt, 0, "output", &fclaw_opt->output, 0,
