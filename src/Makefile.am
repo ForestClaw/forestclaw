@@ -91,6 +91,7 @@ libforestclaw_compiled_sources = \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
 	src/mappings/cart/mapc2m_cart.f \
+	src/mappings/bilinear/mapc2m_bilinear.f \
 	src/mappings/annulus/mapc2m_annulus.f \
 	src/mappings/brick/write_brick_data.f \
 	src/mappings/identity/mapc2m_identity.f \
