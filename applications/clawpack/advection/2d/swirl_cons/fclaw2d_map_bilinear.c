@@ -74,10 +74,12 @@ fclaw2d_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
                          double *xp, double *yp, double *zp)
 {
     /* Brick mapping to computational coordinates [0,1]x[0,1] */
-    double xc1, yc1, zc1;
     double center[2];
 
-#if 0
+    /* Don't scale brick domain into [0,1].  Instead, mapping is more conveniently
+       implemented using native block coordinates, where each block is in 
+       [0,1]x[0,1] */
+#if 0    
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
     xc1 = xc;
     yc1 = yc;
