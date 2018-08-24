@@ -101,7 +101,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
 
     clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
     clawpack46_vt->fort_setaux    = CLAWPACK46_SETAUX;
-    clawpack46_vt->fort_rpt2      = RPT2CONS;
+    // clawpack46_vt->fort_rpt2      = RPT2CONS;
 
 #if 0    
     switch(user->rp_solver)
