@@ -88,7 +88,7 @@ c        # bottom side 0 = in; 1 = out
             enddo
             call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
             do m = 1,meqn
-               flux2(i,m,k) = flux2(i,\,k) + dt*el2(i)*flux(m)
+               flux2(i,m,k) = flux2(i,m,k) + dt*el2(i)*flux(m)
             enddo
          enddo
 
@@ -479,6 +479,7 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
 
       idir = iface/2
 
+      return
 
       do mq = 1,meqn
          do j = 1,my
@@ -553,10 +554,6 @@ c                 # y-direction (idir == 1)
       end
 
 
-
-
-
-
       logical function is_valid_correct(idir,i,j,mx,my)
       implicit none
 
@@ -570,193 +567,4 @@ c                 # y-direction (idir == 1)
 
 
       end
-
-c    # --------------------------------------------------------
-c    # THIS IS NOT USED .... AND SHOULD BE DELETED!
-c    # --------------------------------------------------------
-c    # Called from interpolation routine (with possible context
-c    # switching). This fills in coarse grid values qc/auxc
-c    # on fine grids.
-      subroutine clawpack46_fort_cons_fine_to_coarse(mx,my,mbc,maux,
-     &       meqn, maskfine, qcoarse,auxcoarse,
-     &       qfine_dummy,auxfine_dummy,
-     &       idir,iface_coarse,qc0,qc1,qc2,qc3,
-     &       auxc0,auxc1,auxc2, auxc3,transform_ptr)
-
-      implicit none
-
-      integer mx,my,mbc,maux,meqn,idir,iface_coarse
-      integer maskfine(1-mbc:mx+mbc,1-mbc:my+mbc)
-
-      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision qfine_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-
-      double precision auxcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-      double precision auxfine_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-
-      double precision qc0(my,meqn), auxc0(my,maux)
-      double precision qc1(my,meqn), auxc1(my,maux)
-      double precision qc2(mx,meqn), auxc2(mx,maux)
-      double precision qc3(mx,meqn), auxc3(mx,maux)
-
-      integer*8 transform_ptr
-
-c     #  Hard-coding refratio = 2
-      integer rr2
-      parameter(rr2 = 4)
-      integer i2(0:rr2-1),j2(0:rr2-1)
-      logical is_valid_correct
-      logical skip_this_grid
-
-      integer a(2,2)
-      integer ii,jj, m, mm, dc(2),df(2,0:rr2-1),iff,jff
-      integer refratio
-
-      integer i,j,k, r2,ic,jc, i1, j1
-
-
-c     # Idea is to fill in a dummy fine grid using zeroth-order
-c     # interpolation.  Then assign qc, auxc values
-
-      refratio = 2
-      r2 = refratio*refratio
-
-      call build_transform(transform_ptr,a)
-
-c     # This needs to be written for refratios .ne. 2.
-      k = 0
-      do jj = 0,1
-         do ii = 0,1
-c           # Direction on coarse grid
-            dc(1) = ii
-            dc(2) = jj
-
-c           # Direction on fine grid (converted using metric). Divide
-c           # by refratio to scale length to unit vector
-            df(1,k) = (a(1,1)*dc(1) + a(1,2)*dc(2))/refratio
-            df(2,k) = (a(2,1)*dc(1) + a(2,2)*dc(2))/refratio
-
-            k = k + 1
-         enddo
-      enddo
-c     # Create map :
-
-      if (idir .eq. 0) then
-c        # this ensures that we get 'hanging' corners
-
-         if (iface_coarse .eq. 0) then
-            ic = 1
-         elseif (iface_coarse .eq. 1) then
-            ic = mx
-         endif
-         do jc = 1,mx
-            i1 = ic
-            j1 = jc
-            call fclaw2d_transform_face_half(i1,j1,i2,j2,
-     &            transform_ptr)
-
-            skip_this_grid = .false.
-            do k = 0,r2-1
-               if (.not. is_valid_correct(idir,i2(k),j2(k),mx,my))
-     &               then
-                  skip_this_grid = .true.
-                  exit
-               endif
-            enddo
-c           # Idea is to fill in ghost cells in groups of four
-c           # fine grid ghost cells.
-            if (.not. skip_this_grid) then
-               do k = 0,rr2-1
-                  iff = i2(0) + df(1,k)
-                  jff = j2(0) + df(2,k)
-                  maskfine(iff,jff) = 1
-                  do m = 1,meqn
-                     qfine_dummy(iff,jff,m) = qcoarse(ic,jc,m)
-                  enddo
-                  do m = 1,maux
-                     auxfine_dummy(iff,jff,m) = auxcoarse(ic,jc,m)
-                  enddo
-               enddo
-            endif
-         enddo
-      else
-         if (iface_coarse .eq. 2) then
-            jc = 1
-         elseif (iface_coarse .eq. 3) then
-            jc = my
-         endif
-         do ic = 1,mx
-    1       i1 = ic
-            j1 = jc
-            call fclaw2d_transform_face_half(i1,j1,i2,j2,
-     &            transform_ptr)
-            skip_this_grid = .false.
-            do k = 0,r2-1
-               if (.not. is_valid_correct(idir,i2(k),j2(k),mx,my))
-     &               then
-                  skip_this_grid = .true.
-                  exit
-               endif
-            enddo
-            if (.not. skip_this_grid) then
-               do k = 0,rr2-1
-                  iff = i2(0) + df(1,k)
-                  jff = j2(0) + df(2,k)
-                  maskfine(iff,jff) = 1
-                  do m = 1,meqn
-                     qfine_dummy(iff,jff,m) = qcoarse(ic,jc,m)
-                  enddo
-                  do m = 1,maux
-                     auxfine_dummy(iff,jff,m) = auxcoarse(ic,jc,m)
-                  enddo
-               enddo
-
-            endif                       !! Don't skip this grid
-         enddo                          !! i loop
-      endif                             !! end idir branch
-
-c     # We only fill in qc arrays which have been set above.
-      if (maskfine(0,1) .ne. 0) then
-         do j = 1,my
-            do mm = 1,meqn
-                qc0(j,mm) = qfine_dummy(0,j,mm)
-            enddo
-            do mm = 1,maux
-                auxc0(j,mm) = auxfine_dummy(0,j,mm)
-            enddo
-         enddo
-      elseif (maskfine(mx+1,1) .ne. 0) then
-         do j = 1,my
-            do mm = 1,meqn
-                qc1(j,mm) = qfine_dummy(mx+1,j,mm)
-            enddo
-            do mm = 1,maux
-                auxc1(j,mm) = auxfine_dummy(mx+1,j,mm)
-            enddo
-         enddo
-      elseif (maskfine(1,0) .ne. 0) then
-         do i = 1,mx
-            do mm = 1,meqn
-                qc2(i,mm) = qfine_dummy(i,0,mm)
-            enddo
-            do mm = 1,maux
-                auxc2(i,mm) = auxfine_dummy(i,0,mm)
-            enddo
-         enddo
-      elseif (maskfine(1,my+1) .ne. 0) then
-         do i = 1,mx
-            do mm = 1,meqn
-                qc3(i,mm) = qfine_dummy(i,my+1,mm)
-            enddo
-            do mm = 1,maux
-                auxc3(i,mm) = auxfine_dummy(i,my+1,mm)
-            enddo
-         enddo
-      endif
-
-
-      end
-
-
-
 

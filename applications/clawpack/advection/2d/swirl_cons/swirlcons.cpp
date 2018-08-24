@@ -199,6 +199,11 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
     rotate[0] = 0;
     rotate[1] = 0;
 
+    double center[2];     /* For bilinear mapping */
+    /* Center of [-1,1]x[-1,1] box */
+    center[0] = 0;
+    center[1] = 0;
+
     switch (user->mapping) {
     case 0:
         /* Square brick domain */
@@ -220,6 +225,14 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
         conn = p4est_connectivity_new_disk ();
         cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,fclaw_opt->shift,
                                           rotate,user->alpha);
+        break;
+
+    case 3:
+        /* bilinear square domain */
+        conn = p4est_connectivity_new_brick (2,2,a,b);
+        brick = fclaw2d_map_new_brick(conn,2,2);
+        cont = fclaw2d_map_new_bilinear (brick, fclaw_opt->scale,fclaw_opt->shift,
+                                          rotate,center);
         break;
 
     default:

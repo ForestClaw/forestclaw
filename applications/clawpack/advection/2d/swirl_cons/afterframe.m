@@ -1,5 +1,5 @@
 s = 0.01;
-axis([-s 2+s -s 1+s])
+axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
 axis on;
 
@@ -32,14 +32,14 @@ else
         case 0
             ca = [0 9];
         case 1
-            ca = [0 40];
+            ca = [0 2];
         case 2
             ca = [0 16];    
         case 3
-            ca = 3*[0,1];
+            ca = 1*[-1,1];
             % ca = 1e-15*[-1,1];
     end    
-    % rybcolormap;
+    % yrbcolormap;
     colormap(parula);
     colorbar;
     caxis(ca);
@@ -76,7 +76,8 @@ else
 end
 
 showgridlines
-hidegridlines(5);
+hidegridlines(6);
+hidepatchborders(6)
 
 
 

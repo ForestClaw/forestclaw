@@ -73,6 +73,13 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
                                              const double shift[],
                                              const double rotate[]);
 
+fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+                                                const double scale[],
+                                                const double shift[],
+                                                const double rotate[],
+                                                const double center[]);
+
+
 #define RPN2CONS_QS FCLAW_F77_FUNC(rpn2cons_qs,RPN2CONS_QS)
 void RPN2CONS_QS(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
                  const int* mbc,const int* mx, double ql[], double qr[],
@@ -109,6 +116,14 @@ void RPN2CONS_FW(const int* ixy, const int* maxm, const int* meqn, const int* mw
                  const int* mbc, const int* mx, double ql[], double qr[],
                  double auxl[], double auxr[], double fwave[],
                  double s[], double amdq[], double apdq[]);
+
+#define RPN2CONS_FW_MANIFOLD FCLAW_F77_FUNC(rpn2cons_fw_manifold, RPN2CONS_FW_MANIFOLD)
+void RPN2CONS_FW_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
+                          const int* mwaves,
+                          const int* mbc, const int* mx, double ql[], double qr[],
+                          double auxl[], double auxr[], double fwave[],
+                          double s[], double amdq[], double apdq[]);
+
 
 #define RPT2CONS FCLAW_F77_FUNC(rpt2cons, RPT2CONS)
 void RPT2CONS(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,

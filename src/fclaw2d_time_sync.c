@@ -38,8 +38,6 @@ void fclaw2d_time_sync_reset(fclaw2d_global_t *glob,
 	/* This is used for updating conservation arrays, for example */
 	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
 
-	// FCLAW_ASSERT(minlevel == maxlevel);
-	// fclaw_global_essentialf("reset level = %d\n",minlevel);
 	if (fclaw_vt->time_sync_reset != NULL)
 	{
 		fclaw_vt->time_sync_reset(glob,minlevel,maxlevel,init);

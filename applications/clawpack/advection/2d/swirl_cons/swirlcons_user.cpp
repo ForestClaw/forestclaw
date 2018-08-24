@@ -56,16 +56,45 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     patch_vt->setup   = &swirlcons_patch_setup_manifold;
 
 
+    clawopt->use_fwaves = 0;
     switch(user->mapping)
     {
         case 0:
             clawpack46_vt->fort_rpt2      = &RPT2CONS;
             clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
+            switch(user->rp_solver)
+            {
+                case 1:  /* QS */
+                    clawpack46_vt->fort_rpn2      = &RPN2CONS_QS;
+                case 2:  /* WD */
+                    clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
+                case 3:  /* EC */
+                    clawpack46_vt->fort_rpn2      = &RPN2CONS_EC;                 
+                case 4:  /* FW */
+                    clawopt->use_fwaves = 1;
+                    clawpack46_vt->fort_rpn2      = RPN2CONS_FW;
+            }
+
             break;
-        case 1:
-        case 2:
+
+        case 1: /* Cart */
+        case 2: /* Fivepatch */
+        case 3: /* bilinear */
             clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
             clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+            switch(user->rp_solver)
+            {
+                case 1:  /* QS */
+                    clawpack46_vt->fort_rpn2      = &RPN2CONS_QS_MANIFOLD; 
+                case 2:  /* WD */
+                    clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
+                case 3:  /* EC */
+                    clawpack46_vt->fort_rpn2      = &RPN2CONS_EC;                 
+                case 4:  /* FW */
+                    clawopt->use_fwaves = 1;
+                    clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
+            }
+
 
             break;
     }
@@ -74,7 +103,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     clawpack46_vt->fort_setaux    = CLAWPACK46_SETAUX;
     clawpack46_vt->fort_rpt2      = RPT2CONS;
 
-    clawopt->use_fwaves = 0;
+#if 0    
     switch(user->rp_solver)
     {
         case 1:
@@ -105,9 +134,14 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
 
         case 4:
             clawopt->use_fwaves = 1;
-            clawpack46_vt->fort_rpn2      = RPN2CONS_FW; 
+            if (user_mapping == 0)
+            {
+                clawpack46_vt->fort_rpn2      = RPN2CONS_FW; 
+
+            }
             break;
     }
+#endif    
  }
 
 void swirlcons_problem_setup(fclaw2d_global_t* glob)

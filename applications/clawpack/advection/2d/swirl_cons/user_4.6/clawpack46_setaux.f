@@ -53,10 +53,8 @@ c        # Conservative for all solvers (rp=1,2,3,4)
          u = s*(cos(pi*xc)**2 - 0.5d0)
          v = s*(sin(pi*yc)**2 - 0.5d0)
       else if (example .eq. 3) then
-c        # Conservative only for rp=1 and 3  (??)
-c        # Should work with non-periodic BCs
-         u = 0.d0
-         v = 1.d0
+         u = 1.d0
+         v = 0.d0
       else
          write(6,'(A,A)') 'clawpack46_setaux : ',
      &              'No valid example provided'

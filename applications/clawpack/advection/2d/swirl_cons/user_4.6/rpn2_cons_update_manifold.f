@@ -5,12 +5,18 @@
       integer meqn,maux,idir
       double precision q(meqn), aux(maux), flux(meqn)
       double precision u,v,urot
+      integer iface
 
-c        # Cell-centered velocities         
-         u = aux(1)
-         v = aux(2)
+c     # Cell-centered velocities         
+      u = aux(1)
+      v = aux(2)
 
-         urot = aux(6+2*idir)*u + aux(7+2*idir)*v
-         flux(1) = urot*q(1)
+c     # x-face normal : (6,7)
+c     # y-face normal : (8,9)       
+      iface = idir+1  
+      urot = aux(5+iface)*u + aux(7+iface)*v
+
+c     # xnormals      
+      flux(1) = urot*q(1)
 
       end

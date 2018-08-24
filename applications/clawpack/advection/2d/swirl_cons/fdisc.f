@@ -5,6 +5,8 @@
       integer blockno
       integer*8 cont, get_context
 
+      double precision dxc, xm, w
+
       double precision r
 
       logical fclaw2d_map_is_used
@@ -25,14 +27,14 @@
          yp = yc
       endif
   
-
-c      if (abs(xp - 0.125d0) .gt. 0.025d0 .or. 
-c      if (abs(xp - 0.375d0) .gt. 0.025d0 .or. 
-c     &    abs(yp - 0.5d0) .gt. 0.125d0) then
-      if (abs(xp - 0.375d0) .le. 0.125d0) then
+      dxc = 0.25d0
+      xm = 0.5-dxc/2
+      w = dxc/2.d0
+      if (abs(xp-xm) .le. w) then
          fdisc = -1
       else
          fdisc = 1
       endif
+
 
       end

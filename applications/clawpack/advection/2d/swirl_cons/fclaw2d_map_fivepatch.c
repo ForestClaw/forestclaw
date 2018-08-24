@@ -10,9 +10,11 @@ extern "C"
 #endif
 #endif
 
+#if 0
 void mapc2m(int* blockno, double* xc, double *yc,
             double *xp, double *yp, double *zp,
             double *alpha);
+#endif
 
 static int
 fclaw2d_map_query_fivepatch(fclaw2d_map_context_t * cont, int query_identifier)

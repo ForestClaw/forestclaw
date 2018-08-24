@@ -45,20 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	5. fclaw2d_clawpatch_time_sync_copy
 */
 
-#if 0
-static
-void set_snan(double* f)
-{
-	/* From :
-	"NaNs, Uninitialized Variables, and C++"
-	http://codingcastles.blogspot.fr/2008/12/nans-in-c.html
-	*/
-	*((long long*)&f) = 0x7ff0000000000001LL;
-	// *f = -9999.0;
-}
-#endif
-
-
 void fclaw2d_clawpatch_cons_update_new (fclaw2d_global_t* glob,
 									   fclaw2d_patch_t* this_patch,
 									   int blockno,int patchno,
@@ -87,40 +73,15 @@ void fclaw2d_clawpatch_cons_update_new (fclaw2d_global_t* glob,
 		cu->gp[k]     = FCLAW_ALLOC_ZERO(double,mx*meqn);
 		cu->gm[k]     = FCLAW_ALLOC_ZERO(double,mx*meqn);
 
+		cu->edge_fluxes[k]   = FCLAW_ALLOC_ZERO(double,2*my*meqn);
+		cu->edge_fluxes[k+2] = FCLAW_ALLOC_ZERO(double,2*mx*meqn);
+
 		cu->edgelengths[k]   = FCLAW_ALLOC(double,my);
 		cu->edgelengths[k+2] = FCLAW_ALLOC(double,mx);
 		cu->area[k]          = FCLAW_ALLOC(double,my);
-		cu->area[k+2]        = FCLAW_ALLOC(double,mx);
-
-		cu->edge_fluxes[k]   = FCLAW_ALLOC(double,2*my*meqn);
-		cu->edge_fluxes[k+2] = FCLAW_ALLOC(double,2*mx*meqn);
-#if 0
-		cu->edge_fluxes_save[k]   = FCLAW_ALLOC(double,2*my*meqn);
-		cu->edge_fluxes_save[k+2] = FCLAW_ALLOC(double,2*mx*meqn);
-#endif
+		cu->area[k+2]        = FCLAW_ALLOC(double,mx);		
 	}
 
-#if 0
-	/* Set qc, auxc to signaling NANS, to make sure we only use valid values */
-	for(k = 0; k < 2; k++)
-	{
-		for(j = 0; j < meqn*my; j++)
-		{
-			set_snan(&cu->qc[k][j]);
-			set_snan(&cu->auxc[k][j]);
-			set_snan(&cu->qc[k+2][j]);
-			set_snan(&cu->auxc[k+2][j]);
-		}
-
-		for(i = 0; i < meqn*mx; i++)
-		{
-			set_snan(&cu->qc[k][i]);
-			set_snan(&cu->auxc[k][i]);
-			set_snan(&cu->qc[k+2][i]);
-			set_snan(&cu->auxc[k+2][i]);
-		}
-	}
-#endif
 }
 
 
@@ -168,13 +129,8 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 				{
 					cu->fm[k][j] = 0;
 					cu->fp[k][j] = 0;
-				}
-				if (1)
-				{
-					for(j = 0; j < 2*meqn*my; j++)
-					{
-						cu->edge_fluxes[k][j] = 0;
-					}					
+					cu->edge_fluxes[k][j] = 0;
+					cu->edge_fluxes[k][j+meqn*my];  /* Two fluxes stored at each edge point */
 				}
 			}
 			else
@@ -183,13 +139,8 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 				{
 					cu->gm[k-2][i] = 0;
 					cu->gp[k-2][i] = 0;
-				}
-				if (1) 
-				{
-					for(i = 0; i < 2*meqn*mx; i++)
-					{
-						cu->edge_fluxes[k][i] = 0;
-					}					
+					cu->edge_fluxes[k][i] = 0;
+					cu->edge_fluxes[k][i + meqn*mx] = 0;
 				}
 			}
 		}     /* coarse grid neighbor */
@@ -231,10 +182,6 @@ void fclaw2d_clawpatch_cons_update_delete (fclaw2d_clawpatch_cons_update_t **con
 		/* COARSE GRID information */
 		FCLAW_FREE(cu->edge_fluxes[k]); 
 		FCLAW_FREE(cu->edge_fluxes[k+2]); 
-#if 0        
-		FCLAW_FREE(cu->edge_fluxes_save[k]); 
-		FCLAW_FREE(cu->edge_fluxes_save[k+2]); 
-#endif        
 
 		FCLAW_FREE(cu->edgelengths[k]);
 		FCLAW_FREE(cu->area[k]);
@@ -321,11 +268,13 @@ void fclaw2d_clawpatch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
 	int *maskneighbor = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
 
 	/* Include this for debugging */
+#if 1	
 	fclaw2d_patch_get_info2(glob->domain,coarse_patch,&coarse_blockno, &coarse_patchno,
 							&globnum,&level);
 
 	fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, 
 							&fine_patchno,&globnum,&level);
+#endif							
 
 	clawpatch_vt->fort_time_sync_fine_to_coarse(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
 												cucoarse->area[0], cucoarse->area[1], 
