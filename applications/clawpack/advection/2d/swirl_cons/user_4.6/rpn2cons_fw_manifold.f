@@ -33,9 +33,14 @@ c        # y-edgelengths (5)
          g = auxl(i,3+iface)
 
 c        # x-face normal : (6,7)
-c        # y-face normal : (8,9)         
-         urrot = g*(auxl(i,5+iface)*ur + auxl(i,7+iface)*vr)
-         ulrot = g*(auxl(i,5+iface)*ul + auxl(i,7+iface)*vl)
+c        # y-face normal : (8,9)      
+         if (ixy .eq. 1) then
+            urrot = g*(auxl(i,6)*ur + auxl(i,7)*vr)
+            ulrot = g*(auxl(i,6)*ul + auxl(i,7)*vl)
+         else
+            urrot = g*(auxl(i,8)*ur + auxl(i,9)*vr)
+            ulrot = g*(auxl(i,8)*ul + auxl(i,9)*vl)
+         endif
 
          qrr = ql(i,1)
          qll = qr(i-1,1)

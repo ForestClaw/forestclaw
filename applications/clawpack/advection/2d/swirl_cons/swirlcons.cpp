@@ -33,152 +33,6 @@
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack46.h>
 
-static int s_user_options_package_id = -1;
-
-static void *
-swirlcons_register (user_options_t *user, sc_options_t * opt)
-{
-    sc_options_add_int (opt, 0, "example", &user->example, 1,
-                           "Velocity field choice (0-3) [1]");
-
-    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
-                           "Mapping parameter alpha [0.4]");
-
-    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 3,
-                           "Conservative Riemann solver (1-4) [3]");
-
-    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
-                           "Mapping (0=no map; 1=5-patch) [0]");
-
-    user->is_registered = 1;
-
-    return NULL;
-}
-
-static fclaw_exit_type_t
-swirlcons_postprocess(user_options_t *user)
-{
-    /* nothing to post-process yet ... */
-    return FCLAW_NOEXIT;
-}
-
-
-static fclaw_exit_type_t
-swirlcons_check (user_options_t *user)
-{
-    /* Nothing to check ? */
-    return FCLAW_NOEXIT;
-}
-
-static void
-swirlcons_destroy(user_options_t *user)
-{
-    /* Nothing to destroy */
-}
-
-/* ------- Generic option handling routines that call above routines ----- */
-static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (opt != NULL);
-
-    user = (user_options_t*) package;
-
-    return swirlcons_register(user,opt);
-}
-
-static fclaw_exit_type_t
-options_postprocess (fclaw_app_t * a, void *package, void *registered)
-{
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    /* errors from the key-value options would have showed up in parsing */
-    user_options_t *user = (user_options_t *) package;
-
-    /* post-process this package */
-    FCLAW_ASSERT(user->is_registered);
-
-    /* Convert strings to arrays */
-    return swirlcons_postprocess (user);
-}
-
-
-static fclaw_exit_type_t
-options_check(fclaw_app_t *app, void *package,void *registered)
-{
-    user_options_t           *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT(registered == NULL);
-
-    user = (user_options_t*) package;
-
-    return swirlcons_check(user);
-}
-
-static void
-options_destroy (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    user = (user_options_t*) package;
-    FCLAW_ASSERT (user->is_registered);
-
-    swirlcons_destroy (user);
-
-    FCLAW_FREE (user);
-}
-
-
-static const fclaw_app_options_vtable_t options_vtable_user =
-{
-    options_register,
-    options_postprocess,
-    options_check,
-    options_destroy
-};
-
-/* ------------- User options access functions --------------------- */
-
-static
-user_options_t* swirlcons_options_register (fclaw_app_t * app,
-                                       const char *configfile)
-{
-    user_options_t *user;
-    FCLAW_ASSERT (app != NULL);
-
-    user = FCLAW_ALLOC (user_options_t, 1);
-    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
-                                user);
-
-    fclaw_app_set_attribute(app,"user",user);
-    return user;
-}
-
-static 
-void swirlcons_options_store (fclaw2d_global_t* glob, user_options_t* user)
-{
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
-}
-
-const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob)
-{
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
-}
 /* ------------------------- ... and here ---------------------------- */
 
 static
@@ -198,11 +52,6 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
     double rotate[2];
     rotate[0] = 0;
     rotate[1] = 0;
-
-    double center[2];     /* For bilinear mapping */
-    /* Center of [-1,1]x[-1,1] box */
-    center[0] = 0;
-    center[1] = 0;
 
     switch (user->mapping) {
     case 0:
@@ -232,7 +81,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
         conn = p4est_connectivity_new_brick (2,2,a,b);
         brick = fclaw2d_map_new_brick(conn,2,2);
         cont = fclaw2d_map_new_bilinear (brick, fclaw_opt->scale,fclaw_opt->shift,
-                                          rotate,center);
+                                          rotate,user->center);
         break;
 
     default:

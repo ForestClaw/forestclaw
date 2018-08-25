@@ -42,6 +42,10 @@ typedef struct user_options
     int example;
     int mapping;
     double alpha;
+
+    double *center;
+    const char *center_string;
+
     int is_registered;
 
 } user_options_t;
@@ -57,6 +61,13 @@ void swirlcons_link_solvers(struct fclaw2d_global *glob);
 void swirlcons_problem_setup(struct fclaw2d_global* glob);
 
 const user_options_t* swirlcons_get_options(struct fclaw2d_global* glob);
+
+void swirlcons_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
+
+user_options_t* swirlcons_options_register (fclaw_app_t * app,
+                                       const char *configfile);
+
 
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],

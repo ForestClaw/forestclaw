@@ -9,7 +9,10 @@
 
       integer i, j, mq, blockno, fc2d_clawpack46_get_block
       double precision xc,yc, xp, yp, zp, xlow, ylow, w, tol
-      double precision dxc,xm
+      double precision dxc,xm,ym
+
+      integer*8 cont, get_context
+      logical fclaw2d_map_is_used
 
       double precision pi
       integer example
@@ -17,9 +20,7 @@
       common /compi/ pi
       common /comex/ example
 
-      integer*8 map_context_ptr, get_context
-
-      map_context_ptr = get_context()
+      cont = get_context()
 
       blockno = fc2d_clawpack46_get_block()
 
@@ -35,6 +36,22 @@
                   elseif (example .eq. 3) then
                       call cellave2(blockno,xlow,ylow,dx,dy,w)
                       q(i,j,1) = w
+                  elseif (example .eq. 4) then
+                      if (fclaw2d_map_is_used(cont)) then
+                          call fclaw2d_map_c2m(cont,
+     &                           blockno,xc,yc,xp,yp,zp)
+                      else
+                          xp = xc
+                          yp = yc
+                      endif
+                     dxc = 0.25d0
+                     xm = 0.5-dxc/2
+                     ym = 0.5
+                     w = dxc/2.d0
+                     q(i,j,mq) = 0
+                     if (abs(xp-xm) .le. w) then
+                         q(i,j,mq) = 1
+                     endif
                   endif
               enddo
           enddo

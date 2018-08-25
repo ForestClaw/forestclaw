@@ -119,6 +119,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
     set_shift(cont,shift);
     set_rotate(cont,rotate);
 
+    FILE* fp = fopen("center.dat","w");
+    fprintf(fp,"%24.16f %24.16f",center[0],center[1]);
+    fclose(fp);
+
+
     return cont;
 }
 

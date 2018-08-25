@@ -29,10 +29,8 @@ elseif (ShowUnderOverShoots == 1)
     colorbar_underover(under_label,over_label);
 else
     switch ex
-        case 0
-            ca = [0 9];
         case 1
-            ca = [0 2];
+            ca = [0 1.2];
         case 2
             ca = [0 16];    
         case 3
@@ -78,6 +76,9 @@ end
 showgridlines
 hidegridlines(6);
 hidepatchborders(6)
+% setpatchborderprops('linewidth',2);
+% hidepatchborders;
+% hidegridlines;
 
 
 

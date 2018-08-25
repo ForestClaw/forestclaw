@@ -4,12 +4,12 @@
       double precision xc,yc, xp, yp, zp
       integer blockno
       integer*8 cont, get_context
+      logical fclaw2d_map_is_used
 
-      double precision dxc, xm, w
+      double precision dxc, xm, ym, w
 
       double precision r
 
-      logical fclaw2d_map_is_used
 
       double precision pi
       integer example
@@ -28,7 +28,8 @@
       endif
   
       dxc = 0.25d0
-      xm = 0.5-dxc/2
+      xm = 0.5-dxc/2.d0
+      ym = 0.5d0
       w = dxc/2.d0
       if (abs(xp-xm) .le. w) then
          fdisc = -1

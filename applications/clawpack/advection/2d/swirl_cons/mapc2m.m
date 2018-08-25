@@ -45,7 +45,7 @@ switch map
         yp = yp/2+shift(2);
         
     case 'bilinear'
-        center = 0.*[0;0];
+        center = load('center.dat');
         [xp,yp,~] = mapc2m_bilinear(xc,yc,center);
         xp = 0.5*xp + 0.5;
         yp = 0.5*yp + 0.5;
