@@ -130,7 +130,7 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 					cu->fm[k][j] = 0;
 					cu->fp[k][j] = 0;
 					cu->edge_fluxes[k][j] = 0;
-					cu->edge_fluxes[k][j+meqn*my];  /* Two fluxes stored at each edge point */
+					cu->edge_fluxes[k][j+meqn*my] = 0;  /* Two fluxes stored at each edge point */
 				}
 			}
 			else

@@ -67,7 +67,7 @@ c
                yc0 = yy(i)
                xc1 = xx(i+1)
                yc1 = yy(i+1)
-               ss = zeroin(blockno,0.d0, 1.d0, fss, 1.d-12)
+               ss = zeroin(blockno,0.d0, 1.d0, fss, 1.d-14)
 c              write(27,*) 'xc,yc,ss:',xc0,yc0,xc1,yc1,ss
                x(iv) = xx(i) + ss*(xx(i+1)-xx(i))
                y(iv) = yy(i) + ss*(yy(i+1)-yy(i))

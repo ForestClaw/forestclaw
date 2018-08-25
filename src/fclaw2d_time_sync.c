@@ -106,12 +106,13 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 		fclaw2d_time_sync_reset(glob, level+1, level+1, 1);
 	}
 
-#if 0
+#if 1
 	/* This step accounts for any metric discontinuities at block boundaries */
-	for(level = maxcoarse; level >= mincoarse; level--)
+	for(level = fclaw_opt->maxlevel; level >= minlevel; level--)
 	{
 		copy_at_blockbdry(glob,level,
 						  read_parallel_patches,ghost_mode);
+		fclaw2d_time_sync_reset(glob, level, level, 1);
 	}
 #endif	
 

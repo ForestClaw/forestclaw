@@ -358,7 +358,8 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 						}
 					}
 				}
-				else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
+				else if (neighbor_level == SAMESIZE_GRID && 
+				         (copy_from_neighbor || time_sync_copy))
 				{
 					/* Copy to same size patch */
 					fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];

@@ -423,8 +423,14 @@ c    # -----------------------------------------------------------------
      &                                          fpneighbor1,
      &                                          gmneighbor2, 
      &                                          gpneighbor3,
-     &                                          efc0, efc1, efc2, efc3,
-     &                                          eff0, eff1, eff2, eff3,
+     &                                          efthis0, 
+     &                                          efthis1, 
+     &                                          efthis2, 
+     &                                          efthis3,
+     &                                          efneighbor0, 
+     &                                          efneighbor1, 
+     &                                          efneighbor2, 
+     &                                          efneighbor3,
      &                                          mask, qneighbor_dummy,
      &                                          transform_cptr)
 
@@ -463,18 +469,8 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       double precision efneighbor2(mx,meqn,0:1)
       double precision efneighbor3(mx,meqn,0:1)
 
-      double precision eff0(my,meqn,0:1)
-      double precision eff1(my,meqn,0:1)
-      double precision eff2(mx,meqn,0:1)
-      double precision eff3(mx,meqn,0:1)
 
-      double precision efc0(my,meqn,0:1)
-      double precision efc1(my,meqn,0:1)
-      double precision efc2(mx,meqn,0:1)
-      double precision efc3(mx,meqn,0:1)
-
-      double precision delta, deltap, deltam
-      integer iface
+      double precision delta, deltap, deltam, areathis
 
       double precision neighborval
 
@@ -484,15 +480,14 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       integer i,j,ibc,jbc,mq
       integer i1,j1, i2, j2
 
-      idir = iface/2
+      idir = this_iface/2
 
-      return
 
       do mq = 1,meqn
          do j = 1,my
 c           # Left edge - "this" grid is right grid; 
 c           # "neighbor" grid is left grid.          
-            deltam = fmneighbor0(j,mq)  - efneighbor0(j,mq,1)
+            deltam = fmneighbor0(j,mq)  + efneighbor0(j,mq,1)
 
 c           # Right edge                         
             deltap = fpneighbor1(j,mq) - efneighbor1(j,mq,1)
@@ -503,9 +498,9 @@ c           # Right edge
 
          do i = 1,mx
             deltam = gmneighbor2(i,mq) + efneighbor2(i,mq,1)
-            deltap = gpneighbor3(i,mq) + efneighbor3(i,mq,1)
+            deltap = gpneighbor3(i,mq) - efneighbor3(i,mq,1)
 
-            qneighbor_dummy(i,0,mq) = -deltam
+            qneighbor_dummy(i,0,mq)    = -deltam
             qneighbor_dummy(i,my+1,mq) = -deltap
          enddo
       enddo
@@ -520,22 +515,38 @@ c     # 'qneighbor'
                do ibc = 1,mbc
 c                 # Exchange at low side of 'this' grid in
 c                 # x-direction (idir == 0) 
-                  if (iface .eq. 0) then
-                     i1 = 1-ibc
-                     j1 = j
-                  elseif (iface .eq. 1) then
-                     i1 = mx+ibc
-                     j1 = j
+                  j1 = j
+                  if (this_iface .eq. 0) then
+                     i1 = 1
+                  elseif (this_iface .eq. 1) then
+                     i1 = mx
                   endif
                   call fclaw2d_transform_face(i1,j1,i2,j2,
      &                  transform_cptr)
 
                   neighborval = qneighbor_dummy(i2,j2,mq)
-                  if (iface .eq. 0) then
-                     delta = neighborval   !! + fm0()
-                     qthis(i1,j1,mq) = qthis(i1,j1,mq) + delta
-                  endif
+                  if (this_iface .eq. 0) then
+                     delta = neighborval  + fpthis0(j1,mq) 
+     &                             - efthis0(j1,mq,0)
+                     areathis = area0(j1)
 
+                     fpthis0(j1,mq) = 0
+                     efthis0(j1,mq,0) = 0
+                     efthis0(j1,mq,1) = 0
+                  else
+c                   # Coarse grid is left; fine grid is right                    
+c                    # efc1(0) is flux stored in the coarse grid 
+c                    # interior cell. 
+                     delta = neighborval + fmthis1(j1,mq) + 
+     &                             efthis1(j1,mq,0)
+                     areathis = area1(j1)
+
+c                    # Reset these, since they will no longer be needed                     
+                     fmthis1(j1,mq) = 0
+                     efthis1(j1,mq,0) = 0
+                     efthis1(j1,mq,1) = 0
+                  endif
+                  qthis(i1,j1,mq) = qthis(i1,j1,mq) + delta/areathis
                enddo
             enddo
          else
@@ -543,17 +554,41 @@ c                 # x-direction (idir == 0)
                do i = 1,mx
 c                 # Exchange at high side of 'this' grid in
 c                 # y-direction (idir == 1)
-                  if (iface .eq. 2) then
-                     i1 = i
-                     j1 = 1-jbc
-                  elseif (iface .eq. 3) then
-                     i1 = i
-                     j1 = my+jbc
+                  i1 = i
+                  if (this_iface .eq. 2) then
+                     j1 = 1
+                  elseif (this_iface .eq. 3) then
+                     j1 = my
                   endif
                   call fclaw2d_transform_face(i1,j1,i2,j2,
      &                  transform_cptr)
-                  qthis(i1,j1,mq) = qneighbor_dummy(i2,j2,mq)
+                  neighborval = qneighbor_dummy(i2,j2,mq)
+                  if (this_iface .eq. 2) then
+c                    # Coarse is top grid  Fine grid is bottom grid; 
+c                    # efc2(0) is flux stored in the coarse grid 
+c                    # interior cell. 
+                     delta = neighborval + gpthis2(i1,mq) 
+     &                          - efthis2(i1,mq,0)
+                     areathis = area2(i1)
 
+c                    # Reset these, since they will no longer be needed                     
+                     gpthis2(i1,mq) = 0
+                     efthis2(i1,mq,0) = 0
+                     efthis2(i1,mq,1) = 0
+                  else
+c                    # Coarse grid is bottom grid; fine is top grid   
+c                    # efc3(0) is flux stored in the coarse grid 
+c                    # interior cell.                   
+                     delta = neighborval + gmthis3(i1,mq) + 
+     &                            efthis3(i1,mq,0)
+                     areathis = area3(i1)
+
+c                    # Reset these, since they will no longer be needed                     
+                     gmthis3(i1,mq) = 0
+                     efthis3(i1,mq,0) = 0
+                     efthis3(i1,mq,1) = 0
+                  endif
+                  qthis(i1,j1,mq) = qthis(i1,j1,mq) + delta/areathis                 
                enddo
             enddo
          endif

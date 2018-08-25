@@ -462,6 +462,7 @@ void fc2d_clawpack46_solver_initialize()
 	patch_vt->single_step_update             = clawpack46_update;
 
 	clawpatch_vt->fort_time_sync_fine_to_coarse = CLAWPACK46_FORT_TIME_SYNC_F2C;
+	clawpatch_vt->fort_time_sync_copy = CLAWPACK46_FORT_TIME_SYNC_COPY;
 
 
 	/* Wrappers so that user can change argument list */
