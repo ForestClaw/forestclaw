@@ -116,7 +116,7 @@ c    # of any division by 2 or 4.
 c    # -----------------------------------------------------------------
       subroutine clawpack46_cons_update_accumulate_waves(mx,my,
      &                                                   mbc,meqn,
-     &      dt, patchno,
+     &      dt, dx,dy, patchno,
      &      el0, el1, el2, el3,
      &      fp,fm,gp,gm,
      &      fp_left,fp_right,
@@ -127,7 +127,7 @@ c    # -----------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn,patchno
-      double precision dt
+      double precision dt,dx,dy
 
       double precision fp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision fm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -149,22 +149,26 @@ c    # -----------------------------------------------------------------
 c           # In flux2, fp = -apdq.  Then the update is 
 c           # written as -(fm-fp) = (fp-fm) = -(apdq+amdq)
 c           # We change the sign back here so that we can write
-c           # the update as fp=apdq, fm = amdq.             
-            fp_left(j,m) = fp_left(j,m) - dt*el0(j)*fp(1,j,m)
-            fm_left(j,m) = fm_left(j,m) + dt*el0(j)*fm(1,j,m)
+c           # the update as fp=apdq, fm = amdq.      
 
-            fp_right(j,m) = fp_right(j,m) - dt*el1(j)*fp(mx+1,j,m)
-            fm_right(j,m) = fm_right(j,m) + dt*el1(j)*fm(mx+1,j,m)
+c           # NOTE : Fluxes have already been scaled by gamma, e.g. 
+c           # x-face-length/dy or y-face-length/dx
+
+            fp_left(j,m) = fp_left(j,m) - dt*dy*fp(1,j,m)
+            fm_left(j,m) = fm_left(j,m) + dt*dy*fm(1,j,m)
+
+            fp_right(j,m) = fp_right(j,m)-dt*dy*fp(mx+1,j,m)
+            fm_right(j,m) = fm_right(j,m)+dt*dy*fm(mx+1,j,m)
          enddo
       enddo
 
       do i = 1,mx
          do m = 1,meqn
-            gp_bottom(i,m) = gp_bottom(i,m) - dt*el2(i)*gp(i,1,m)
-            gm_bottom(i,m) = gm_bottom(i,m) + dt*el2(i)*gm(i,1,m)
+            gp_bottom(i,m) = gp_bottom(i,m) - dt*dx*gp(i,1,m)
+            gm_bottom(i,m) = gm_bottom(i,m) + dt*dx*gm(i,1,m)
 
-            gp_top(i,m) = gp_top(i,m) - dt*el3(i)*gp(i,my+1,m)
-            gm_top(i,m) = gm_top(i,m) + dt*el3(i)*gm(i,my+1,m)
+            gp_top(i,m) = gp_top(i,m) - dt*dx*gp(i,my+1,m)
+            gm_top(i,m) = gm_top(i,m) + dt*dx*gm(i,my+1,m)
          enddo
       enddo
 
@@ -261,6 +265,11 @@ c    # fine grid correction for the coarse grid.
             deltap = (fpfine1(jj1,mq) + fpfine1(jj2,mq)) -
      &               (eff1(jj1,mq,1) + eff1(jj2,mq,1))
 
+            if (j .eq. 1) then
+c                write(6,200) fmfine0(jj1,mq),eff0(jj1,mq,1)
+            endif
+ 200        format(2F16.8)
+
 c           # Put the same value in four ghost cells;  grab the first
 c           # one that shows up in the transformation.          
             do jj = jj1,jj2
@@ -339,10 +348,8 @@ c                    # Reset these, since they will no longer be needed
                      fmcoarse1(jc,mq) = 0
                      efc1(jc,mq,0) = 0
                      efc1(jc,mq,1) = 0
-
                   endif   
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
-
                endif
             enddo
          enddo
@@ -563,6 +570,7 @@ c                 # y-direction (idir == 1)
       i1 = 1 .le. i .and. i .le. mx
       j1 = 1 .le. j .and. j .le. my
 
+c     # At least one of the above should be true.
       is_valid_correct = xor(i1,j1)
 
 

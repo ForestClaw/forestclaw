@@ -100,7 +100,8 @@ void CLAWPACK46_CONS_UPDATE_STORE_FLUX(int* mx,int* my, int* mbc, int* meqn,
 									   CLAWPACK46_CONS_UPDATE_ACCUMULATE_WAVES)
 
 void CLAWPACK46_CONS_UPDATE_ACCUMULATE_WAVES(int* mx, int* my, int* mbc, int* meqn,
-											  double* dt, int* patchno,
+											  double* dt, double* dx, double* dy, 
+											  int* patchno,
 											  double el0[], double el1[], 
 											  double el2[], double el3[],
 											  double fp[], double fm[],
