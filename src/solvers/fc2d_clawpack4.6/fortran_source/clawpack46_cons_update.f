@@ -49,7 +49,7 @@ c        # left side k=0 = in; k=1 = out
         idir = 0
          do k = 0,1
             do m = 1,maux
-               auxvec(m) = aux(1-k,j,m)
+               auxvec(m) = aux(1,j,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(1-k,j,m)
@@ -63,7 +63,7 @@ c        # left side k=0 = in; k=1 = out
 c        # right side 0 = in; 1 = out
          do k = 0,1
             do m = 1,maux
-               auxvec(m) = aux(mx+k,j,m)
+               auxvec(m) = aux(mx+1,j,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(mx+k,j,m)
@@ -81,7 +81,7 @@ c        # bottom side 0 = in; 1 = out
          idir = 1
          do k = 0,1
             do m = 1,maux
-               auxvec(m) = aux(i,1-k,m)
+               auxvec(m) = aux(i,1,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(i,1-k,m)
@@ -95,7 +95,7 @@ c        # bottom side 0 = in; 1 = out
 c        # Top side 0 = in; 1 = out
          do k = 0,1
             do m = 1,maux
-               auxvec(m) = aux(i,my+k,m)
+               auxvec(m) = aux(i,my+1,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(i,my+k,m)
@@ -154,8 +154,8 @@ c           # the update as fp=apdq, fm = amdq.
 c           # NOTE : Fluxes have already been scaled by gamma, e.g. 
 c           # x-face-length/dy or y-face-length/dx
 
-            fp_left(j,m) = fp_left(j,m) - dt*dy*fp(1,j,m)
-            fm_left(j,m) = fm_left(j,m) + dt*dy*fm(1,j,m)
+            fp_left(j,m)  = fp_left(j,m) - dt*dy*fp(1,j,m)
+            fm_left(j,m)  = fm_left(j,m) + dt*dy*fm(1,j,m)
 
             fp_right(j,m) = fp_right(j,m)-dt*dy*fp(mx+1,j,m)
             fm_right(j,m) = fm_right(j,m)+dt*dy*fm(mx+1,j,m)
@@ -264,11 +264,6 @@ c    # fine grid correction for the coarse grid.
      
             deltap = (fpfine1(jj1,mq) + fpfine1(jj2,mq)) -
      &               (eff1(jj1,mq,1) + eff1(jj2,mq,1))
-
-            if (j .eq. 1) then
-c                write(6,200) fmfine0(jj1,mq),eff0(jj1,mq,1)
-            endif
- 200        format(2F16.8)
 
 c           # Put the same value in four ghost cells;  grab the first
 c           # one that shows up in the transformation.          
@@ -470,14 +465,14 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       double precision efneighbor3(mx,meqn,0:1)
 
 
-      double precision delta, deltap, deltam, areathis
+      double precision delta, deltap, deltam, area
 
       double precision neighborval
 
       integer*8 transform_cptr
 
 
-      integer i,j,ibc,jbc,mq
+      integer i,j,mq
       integer i1,j1, i2, j2
 
       idir = this_iface/2
@@ -485,14 +480,10 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
 
       do mq = 1,meqn
          do j = 1,my
-c           # Left edge - "this" grid is right grid; 
-c           # "neighbor" grid is left grid.          
-            deltam = fmneighbor0(j,mq)  + efneighbor0(j,mq,1)
-
-c           # Right edge                         
+            deltam = fmneighbor0(j,mq) + efneighbor0(j,mq,1)
             deltap = fpneighbor1(j,mq) - efneighbor1(j,mq,1)
 
-            qneighbor_dummy(0,j,mq) = -deltam
+            qneighbor_dummy(0,j,mq)    = -deltam
             qneighbor_dummy(mx+1,j,mq) = -deltap
          enddo
 
@@ -509,10 +500,9 @@ c           # Right edge
 
 c     # High side of 'qthis' exchanges with low side of
 c     # 'qneighbor'
-      do mq = 1,meqn
-         if (idir .eq. 0) then
-            do j = 1,my
-               do ibc = 1,mbc
+      if (idir .eq. 0) then
+          do mq = 1,meqn
+              do j = 1,my
 c                 # Exchange at low side of 'this' grid in
 c                 # x-direction (idir == 0) 
                   j1 = j
@@ -528,30 +518,40 @@ c                 # x-direction (idir == 0)
                   if (this_iface .eq. 0) then
                      delta = neighborval  + fpthis0(j1,mq) 
      &                             - efthis0(j1,mq,0)
-                     areathis = area0(j1)
+                     area = area0(j1)
+
+                     write(6,100) this_iface, j1, neighborval, 
+     &                       fpthis0(j1,mq), 
+     &                       efthis0(j1,mq,0), delta
+
 
                      fpthis0(j1,mq) = 0
                      efthis0(j1,mq,0) = 0
-                     efthis0(j1,mq,1) = 0
+c                     efthis0(j1,mq,0) = 0
                   else
 c                   # Coarse grid is left; fine grid is right                    
 c                    # efc1(0) is flux stored in the coarse grid 
 c                    # interior cell. 
                      delta = neighborval + fmthis1(j1,mq) + 
      &                             efthis1(j1,mq,0)
-                     areathis = area1(j1)
+                     area = area1(j1)
+
+                     write(6,100) this_iface, j1, neighborval, 
+     &                       fmthis1(j1,mq), 
+     &                       efthis1(j1,mq,0), delta
+100                  format(2I5, 4F24.16)
 
 c                    # Reset these, since they will no longer be needed                     
                      fmthis1(j1,mq) = 0
                      efthis1(j1,mq,0) = 0
-                     efthis1(j1,mq,1) = 0
+c                     efthis1(j1,mq,1) = 0
                   endif
-                  qthis(i1,j1,mq) = qthis(i1,j1,mq) + delta/areathis
-               enddo
-            enddo
-         else
-            do jbc = 1,mbc
-               do i = 1,mx
+                  qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area
+              enddo
+          enddo
+      else
+          do mq = 1,meqn
+              do i = 1,mx
 c                 # Exchange at high side of 'this' grid in
 c                 # y-direction (idir == 1)
                   i1 = i
@@ -569,30 +569,38 @@ c                    # efc2(0) is flux stored in the coarse grid
 c                    # interior cell. 
                      delta = neighborval + gpthis2(i1,mq) 
      &                          - efthis2(i1,mq,0)
-                     areathis = area2(i1)
+                     area = area2(i1)
+
+                     write(6,100) this_iface, i1, neighborval, 
+     &                       gpthis2(i1,mq), 
+     &                       efthis2(i1,mq,0), delta                     
 
 c                    # Reset these, since they will no longer be needed                     
                      gpthis2(i1,mq) = 0
                      efthis2(i1,mq,0) = 0
-                     efthis2(i1,mq,1) = 0
+c                     efthis2(i1,mq,1) = 0
                   else
 c                    # Coarse grid is bottom grid; fine is top grid   
 c                    # efc3(0) is flux stored in the coarse grid 
 c                    # interior cell.                   
                      delta = neighborval + gmthis3(i1,mq) + 
      &                            efthis3(i1,mq,0)
-                     areathis = area3(i1)
+                     area = area3(i1)
+
+                     write(6,100) this_iface, i1, neighborval, 
+     &                       gmthis3(i1,mq), 
+     &                       efthis3(i1,mq,0), delta                     
+
 
 c                    # Reset these, since they will no longer be needed                     
                      gmthis3(i1,mq) = 0
                      efthis3(i1,mq,0) = 0
-                     efthis3(i1,mq,1) = 0
+c                     efthis3(i1,mq,1) = 0
                   endif
-                  qthis(i1,j1,mq) = qthis(i1,j1,mq) + delta/areathis                 
-               enddo
-            enddo
-         endif
-      enddo
+                  qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area                 
+              enddo
+          enddo
+      endif
       end
 
 
