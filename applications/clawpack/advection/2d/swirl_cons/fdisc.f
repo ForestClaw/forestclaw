@@ -28,10 +28,10 @@
       endif
   
       dxc = 0.25d0
-      xm = 0.5-dxc/2.d0
-      ym = 0.5d0
+      xm = 0.5
+      ym = 0.5
       w = dxc/2.d0
-      if (abs(xp-xm) .le. w) then
+      if (abs(yp-ym) .le. w .and. abs(xp-xm) .le. w) then
          fdisc = -1
       else
          fdisc = 1

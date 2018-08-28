@@ -32,9 +32,6 @@ c     # that doesn't pass the coarsening test.
       qmin = q0(1,1,mq)
       qmax = q0(1,1,mq)
 
-      tag_patch = 0
-      return
-
 c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.

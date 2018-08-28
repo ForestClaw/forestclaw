@@ -119,6 +119,9 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
     set_shift(cont,shift);
     set_rotate(cont,rotate);
 
+    /* NOTE : On coarse grids, moving the center too close to one of the edges can lead
+       to problems with the metric terms;  lines will cross and ghost cells can be messed
+       up.  For mx=8, center should be within 0.8 of the boundary.  See map_debug2.m */
     FILE* fp = fopen("center.dat","w");
     fprintf(fp,"%24.16f %24.16f",center[0],center[1]);
     fclose(fp);

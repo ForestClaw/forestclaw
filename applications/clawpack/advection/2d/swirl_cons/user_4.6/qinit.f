@@ -46,11 +46,13 @@
                       endif
                      dxc = 0.25d0
                      xm = 0.5-dxc/2
-                     ym = 0.5
+                     ym = 0.5-dxc/2
                      w = dxc/2.d0
                      q(i,j,mq) = 0
-                     if (abs(xp-xm) .le. w) then
-                         q(i,j,mq) = 1
+                     if (mod(blockno,2) .eq. 0) then
+                         if (abs(xc-0.75d0) .le. 0.25) then
+                             q(i,j,mq) = 1
+                         endif
                      endif
                   endif
               enddo
