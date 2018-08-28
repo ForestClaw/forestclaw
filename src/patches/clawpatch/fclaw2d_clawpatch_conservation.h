@@ -89,7 +89,7 @@ void fclaw2d_clawpatch_time_sync_samesize(struct fclaw2d_global* glob,
 
 void fclaw2d_clawpatch_time_sync_reset_f2c(struct fclaw2d_global* glob,
                                            struct fclaw2d_patch *this_patch,
-                                           int minlevel,int maxlevel);
+                                           int coarse_level);
 
 void fclaw2d_clawpatch_time_sync_reset_samesize(struct fclaw2d_global* glob,
                                                 struct fclaw2d_patch *this_patch);

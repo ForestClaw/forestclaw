@@ -86,8 +86,8 @@ void fclaw2d_clawpatch_cons_update_new (fclaw2d_global_t* glob,
 
 
 void fclaw2d_clawpatch_time_sync_reset_f2c(fclaw2d_global_t *glob,
-                                           fclaw2d_patch_t *this_patch,
-                                           int minlevel, int maxlevel)
+                                           fclaw2d_patch_t *this_patch, 
+                                           int coarse_level)
 {
 	int mx,my,meqn;
 	int i,j,k,idir;
@@ -102,18 +102,17 @@ void fclaw2d_clawpatch_time_sync_reset_f2c(fclaw2d_global_t *glob,
 
 	fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);
 
+	int fine_level = coarse_level+1;
+
 	for(k = 0; k < 4; k++)
 	{
 		idir = k/2;
-#if 1		
 		int is_coarse = pdata->face_neighbors[k] == FCLAW2D_PATCH_HALFSIZE 
-		          && this_patch->level == minlevel;
+		          && this_patch->level == coarse_level;
 		int is_fine = pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE &&
-		          this_patch->level == maxlevel;
-#endif		          
-#if 1		
+		          this_patch->level == fine_level;
+
 		if (is_fine || is_coarse)
-#endif			
 		{
 			if (idir == 0)
 			{
