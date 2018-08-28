@@ -302,7 +302,8 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	if (claw46_vt->fort_rpn2_cons != NULL)
 	{
 		double *qvec   = FCLAW_ALLOC(double, meqn);
-		double *auxvec = FCLAW_ALLOC(double, maux);
+		double *auxvec_center = FCLAW_ALLOC(double, maux);
+		double *auxvec_edge = FCLAW_ALLOC(double, maux);
 		double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
 		CLAWPACK46_CONS_UPDATE_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,&dt,
@@ -314,10 +315,11 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 										  cu->edge_fluxes[0],cu->edge_fluxes[1],
 										  cu->edge_fluxes[2],cu->edge_fluxes[3],
 										  claw46_vt->fort_rpn2_cons,
-										  qvec,auxvec,flux);
+										  qvec,auxvec_center,auxvec_edge,flux);
 
 		FCLAW_FREE(qvec);
-		FCLAW_FREE(auxvec);
+		FCLAW_FREE(auxvec_center);
+		FCLAW_FREE(auxvec_edge);
 		FCLAW_FREE(flux);
 	}
 
@@ -451,8 +453,11 @@ void fc2d_clawpack46_solver_initialize()
 	fclaw_vt->output_frame      = clawpack46_output;
 	fclaw_vt->problem_setup     = clawpack46_setprob;    
 
+#if 0
 	/* Conservation fix (this could also go in clawpatch vtable */
-	fclaw_vt->time_sync_reset   = fclaw2d_clawpatch_cons_update_reset;
+	fclaw_vt->time_sync_reset            = fclaw2d_clawpatch_cons_update_reset;
+	fclaw_vt->time_sync_reset_samesize   = fclaw2d_clawpatch_cons_update_reset_samesize;
+#endif	
 
 
 	/* These could be over-written by user specific settings */
@@ -461,9 +466,9 @@ void fc2d_clawpack46_solver_initialize()
 	patch_vt->physical_bc                    = clawpack46_bc2;
 	patch_vt->single_step_update             = clawpack46_update;
 
+	/* Conservation updates (based on Clawpack updates) */
 	clawpatch_vt->fort_time_sync_fine_to_coarse = CLAWPACK46_FORT_TIME_SYNC_F2C;
-	clawpatch_vt->fort_time_sync_copy = CLAWPACK46_FORT_TIME_SYNC_COPY;
-
+	clawpatch_vt->fort_time_sync_samesize       = CLAWPACK46_FORT_TIME_SYNC_SAMESIZE;
 
 	/* Wrappers so that user can change argument list */
 	claw46_vt->b4step2                       = clawpack46_b4step2;

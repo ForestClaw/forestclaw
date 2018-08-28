@@ -23,7 +23,7 @@ c    # -----------------------------------------------------------------
       subroutine clawpack46_update_cons_store_flux(mx,my,mbc,meqn,
      &      maux, dt,el0, el1, el2, el3,q, aux,
      &      flux0,flux1,flux2,flux3,
-     &      rpn2_cons,qvec,auxvec,flux)
+     &      rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
 
       implicit none
 
@@ -40,7 +40,8 @@ c    # -----------------------------------------------------------------
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
-      double precision qvec(meqn),auxvec(maux),flux(meqn)
+      double precision qvec(meqn),flux(meqn)
+      double precision auxvec_center(maux), auxvec_edge(maux)
 
       integer i,j,k,m
 
@@ -49,12 +50,19 @@ c        # left side k=0 = in; k=1 = out
         idir = 0
          do k = 0,1
             do m = 1,maux
-               auxvec(m) = aux(1,j,m)
+c              # Cell centered values                
+               auxvec_center(m) = aux(1-k,j,m)
+
+c              # Edge between ghost cell and interior cell               
+               auxvec_edge(m) = aux(1,j,m)
             enddo
+
+
             do m = 1,meqn
                qvec(m) = q(1-k,j,m)
             enddo
-            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            call rpn2_cons(meqn,maux,idir,qvec,
+     &               auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
                flux0(j,m,k) = flux0(j,m,k) + dt*el0(j)*flux(m)
             enddo
@@ -63,12 +71,14 @@ c        # left side k=0 = in; k=1 = out
 c        # right side 0 = in; 1 = out
          do k = 0,1
             do m = 1,maux
-               auxvec(m) = aux(mx+1,j,m)
+               auxvec_center(m) = aux(mx+k,j,m)
+               auxvec_edge(m) = aux(mx+1,j,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(mx+k,j,m)
             enddo
-            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            call rpn2_cons(meqn,maux,idir,qvec,
+     &              auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
                flux1(j,m,k) = flux1(j,m,k) + dt*el1(j)*flux(m)
             enddo
@@ -81,12 +91,14 @@ c        # bottom side 0 = in; 1 = out
          idir = 1
          do k = 0,1
             do m = 1,maux
-               auxvec(m) = aux(i,1,m)
+               auxvec_center(m) = aux(i,1-k,m)
+               auxvec_edge(m) = aux(i,1,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(i,1-k,m)
             enddo
-            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            call rpn2_cons(meqn,maux,idir,qvec,
+     &               auxvec_center, auxvec_edge,flux)         
             do m = 1,meqn
                flux2(i,m,k) = flux2(i,m,k) + dt*el2(i)*flux(m)
             enddo
@@ -95,12 +107,14 @@ c        # bottom side 0 = in; 1 = out
 c        # Top side 0 = in; 1 = out
          do k = 0,1
             do m = 1,maux
-               auxvec(m) = aux(i,my+1,m)
+               auxvec_center(m) = aux(i,my+k,m)
+               auxvec_edge(m) = aux(i,my+1,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(i,my+k,m)
             enddo
-            call rpn2_cons(meqn,maux,idir,qvec,auxvec,flux)         
+            call rpn2_cons(meqn,maux,idir,qvec,
+     &              auxvec_center,auxvec_edge, flux)         
             do m = 1,meqn
                flux3(i,m,k) = flux3(i,m,k) + dt*el3(i)*flux(m)
             enddo
@@ -328,9 +342,9 @@ c                    # interior cell.
                      areac = area0(jc)
 
 c                    # Reset these, since they will no longer be needed                     
-                     fpcoarse0(jc,mq) = 0
-                     efc0(jc,mq,0) = 0
-                     efc0(jc,mq,1) = 0
+c                     fpcoarse0(jc,mq) = 0
+c                     efc0(jc,mq,0) = 0
+c                     efc0(jc,mq,1) = 0
 
                   else
 c                   # Coarse grid is left; fine grid is right                    
@@ -340,9 +354,9 @@ c                    # interior cell.
                      areac = area1(jc)
 
 c                    # Reset these, since they will no longer be needed                     
-                     fmcoarse1(jc,mq) = 0
-                     efc1(jc,mq,0) = 0
-                     efc1(jc,mq,1) = 0
+c                     fmcoarse1(jc,mq) = 0
+c                     efc1(jc,mq,0) = 0
+c                     efc1(jc,mq,1) = 0
                   endif   
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
                endif
@@ -376,9 +390,9 @@ c                    # interior cell.
                      areac = area2(ic)
 
 c                    # Reset these, since they will no longer be needed                     
-                     gpcoarse2(ic,mq) = 0
-                     efc2(ic,mq,0) = 0
-                     efc2(ic,mq,1) = 0
+c                     gpcoarse2(ic,mq) = 0
+c                     efc2(ic,mq,0) = 0
+c                     efc2(ic,mq,1) = 0
 
                   else
 c                    # Coarse grid is bottom grid; fine is top grid   
@@ -388,9 +402,9 @@ c                    # interior cell.
                      areac = area3(ic)
 
 c                    # Reset these, since they will no longer be needed                     
-                     gmcoarse3(ic,mq) = 0
-                     efc3(ic,mq,0) = 0
-                     efc3(ic,mq,1) = 0
+c                     gmcoarse3(ic,mq) = 0
+c                     efc3(ic,mq,0) = 0
+c                     efc3(ic,mq,1) = 0
 
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
@@ -407,7 +421,7 @@ c    # -----------------------------------------------------------------
 c    # Add wave corrections at same level interfaces.  This accounts for
 c    # metric mismatches that can occur at block boundaries.
 c    # -----------------------------------------------------------------
-      subroutine clawpack46_fort_time_sync_copy(mx,my,mbc,meqn,
+      subroutine clawpack46_fort_time_sync_samesize(mx,my,mbc,meqn,
      &                                          idir, this_iface,
      &                                          area0, area1,
      &                                          area2, area3,
@@ -477,7 +491,6 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
 
       idir = this_iface/2
 
-
       do mq = 1,meqn
          do j = 1,my
             deltam = fmneighbor0(j,mq) + efneighbor0(j,mq,1)
@@ -520,13 +533,8 @@ c                 # x-direction (idir == 0)
      &                             - efthis0(j1,mq,0)
                      area = area0(j1)
 
-                     write(6,100) this_iface, j1, neighborval, 
-     &                       fpthis0(j1,mq), 
-     &                       efthis0(j1,mq,0), delta
-
-
-                     fpthis0(j1,mq) = 0
-                     efthis0(j1,mq,0) = 0
+c                     fpthis0(j1,mq) = 0
+c                     efthis0(j1,mq,0) = 0
 c                     efthis0(j1,mq,0) = 0
                   else
 c                   # Coarse grid is left; fine grid is right                    
@@ -536,14 +544,9 @@ c                    # interior cell.
      &                             efthis1(j1,mq,0)
                      area = area1(j1)
 
-                     write(6,100) this_iface, j1, neighborval, 
-     &                       fmthis1(j1,mq), 
-     &                       efthis1(j1,mq,0), delta
-100                  format(2I5, 4F24.16)
-
 c                    # Reset these, since they will no longer be needed                     
-                     fmthis1(j1,mq) = 0
-                     efthis1(j1,mq,0) = 0
+c                     fmthis1(j1,mq) = 0
+c                     efthis1(j1,mq,0) = 0
 c                     efthis1(j1,mq,1) = 0
                   endif
                   qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area
@@ -571,13 +574,9 @@ c                    # interior cell.
      &                          - efthis2(i1,mq,0)
                      area = area2(i1)
 
-                     write(6,100) this_iface, i1, neighborval, 
-     &                       gpthis2(i1,mq), 
-     &                       efthis2(i1,mq,0), delta                     
-
 c                    # Reset these, since they will no longer be needed                     
-                     gpthis2(i1,mq) = 0
-                     efthis2(i1,mq,0) = 0
+c                     gpthis2(i1,mq) = 0
+c                     efthis2(i1,mq,0) = 0
 c                     efthis2(i1,mq,1) = 0
                   else
 c                    # Coarse grid is bottom grid; fine is top grid   
@@ -587,14 +586,9 @@ c                    # interior cell.
      &                            efthis3(i1,mq,0)
                      area = area3(i1)
 
-                     write(6,100) this_iface, i1, neighborval, 
-     &                       gmthis3(i1,mq), 
-     &                       efthis3(i1,mq,0), delta                     
-
-
 c                    # Reset these, since they will no longer be needed                     
-                     gmthis3(i1,mq) = 0
-                     efthis3(i1,mq,0) = 0
+c                     gmthis3(i1,mq) = 0
+c                     efthis3(i1,mq,0) = 0
 c                     efthis3(i1,mq,1) = 0
                   endif
                   qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area                 

@@ -91,7 +91,9 @@ void CLAWPACK46_CONS_UPDATE_STORE_FLUX(int* mx,int* my, int* mbc, int* meqn,
 									   double flux0[],double flux1[], 
 									   double flux2[], double flux3[],
 									   clawpack46_fort_rpn2_cons_t rpn2_cons,
-									   double qvec[], double auxvec[], double flux[]);
+									   double qvec[], 
+									   double auxvec_center[], double auxvec_edge[],
+									   double flux[]);
 
 
 
@@ -135,27 +137,27 @@ void  CLAWPACK46_FORT_TIME_SYNC_F2C(const int* mx,const int* my,
 									transform_cptr);
 
 
-#define CLAWPACK46_FORT_TIME_SYNC_COPY FCLAW_F77_FUNC(clawpack46_fort_time_sync_copy, \
-													 CLAWPACK46_FORT_TIME_SYNC_COPY)
+#define CLAWPACK46_FORT_TIME_SYNC_SAMESIZE FCLAW_F77_FUNC(clawpack46_fort_time_sync_samesize, \
+													 CLAWPACK46_FORT_TIME_SYNC_SAMESIZE)
 
-void  CLAWPACK46_FORT_TIME_SYNC_COPY(const int* mx,const int* my,
-									 const int *mbc,const int *meqn,
-									 const int* idir,const int* iface_coarse,
-									 double area0[], double area1[],
-									 double area2[], double area3[],
-									 double qcoarse[], 
-									 double fmcoarse0[], double fpcoarse1[],
-									 double gmcoarse2[], double gpcoarse3[],
-									 double fmfine0[], double fpfine1[],
-									 double gmfine2[], double gpfine3[],
-									 double efc0[], double efc1[],
-									 double efc2[], double efc3[],
-									 double eff0[], double eff1[],
-									 double eff2[], double eff3[],
-									 int maskfine[],
-									 double qfine_dummy[],
-									 struct fclaw2d_patch_transform_data** 
-									 transform_cptr);
+void  CLAWPACK46_FORT_TIME_SYNC_SAMESIZE(const int* mx,const int* my,
+                                         const int *mbc,const int *meqn,
+                                         const int* idir,const int* iface_coarse,
+                                         double area0[], double area1[],
+                                         double area2[], double area3[],
+                                         double qcoarse[], 
+                                         double fmcoarse0[], double fpcoarse1[],
+                                         double gmcoarse2[], double gpcoarse3[],
+                                         double fmfine0[], double fpfine1[],
+                                         double gmfine2[], double gpfine3[],
+                                         double efc0[], double efc1[],
+                                         double efc2[], double efc3[],
+                                         double eff0[], double eff1[],
+                                         double eff2[], double eff3[],
+                                         int maskfine[],
+                                         double qfine_dummy[],
+                                         struct fclaw2d_patch_transform_data** 
+                                         transform_cptr);
 
 /* ------------------------------- Time stepping functions ---------------------------- */
 

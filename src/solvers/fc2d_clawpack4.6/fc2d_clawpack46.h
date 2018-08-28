@@ -135,7 +135,8 @@ typedef void (*clawpack46_fort_flux2_t)(const int* ixy,const int* maxm, const in
 
 typedef void (*clawpack46_fort_rpn2_cons_t)(const int* meqn, const int* maux, 
 											const int *idir, double q[], 
-											double aux[],double fq[]);
+											double auxvec_center[],
+											double auxvec_edge[],double fq[]);
 
 
 /* --------------------------------- Virtual table ------------------------------------ */
