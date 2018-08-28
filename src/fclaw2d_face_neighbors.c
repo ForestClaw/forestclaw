@@ -214,7 +214,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 	int interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
 
 	int time_sync_fine_to_coarse = filltype->exchange_type == FCLAW2D_TIME_SYNC_FINE_TO_COARSE;
-	int time_sync_copy = filltype->exchange_type == FCLAW2D_TIME_SYNC_COPY;
+	int time_sync_samesize = filltype->exchange_type == FCLAW2D_TIME_SYNC_SAMESIZE;
 
 	const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
 	const int refratio = gparms->refratio;
@@ -359,18 +359,18 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 					}
 				}
 				else if (neighbor_level == SAMESIZE_GRID && 
-				         (copy_from_neighbor || time_sync_copy))
+				         (copy_from_neighbor || time_sync_samesize))
 				{
 					/* Copy to same size patch */
 					fclaw2d_patch_t *neighbor_patch = neighbor_patches[0];
 					transform_data.neighbor_patch = neighbor_patch;
 
-					if (time_sync_copy && is_block_face)
+					if (time_sync_samesize)    // && is_block_face)
 					{
 						/* Correct for metric discontinuities at block boundaries */
-						fclaw2d_patch_time_sync_copy(s->glob,this_patch,neighbor_patch,
-													 iface,idir,
-													 &transform_data);
+						fclaw2d_patch_time_sync_samesize(s->glob,this_patch,neighbor_patch,
+						                                 iface,idir,
+						                                 &transform_data);
 					}
 					else
 					{                        
@@ -387,13 +387,13 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 						/* Create a new transform so we don't mess up the original one */
 						int this_iface = iface_neighbor;
 
-						if (time_sync_copy && is_block_face)
+						if (time_sync_samesize) // && is_block_face)
 						{
 							/* Correct ghost patches, since these will be used to copy or
 							interpolate to local grids. */
-							fclaw2d_patch_time_sync_copy(s->glob,neighbor_patch,this_patch,
-														 this_iface,idir,
-														 &transform_data_finegrid);                            
+							fclaw2d_patch_time_sync_samesize(s->glob,neighbor_patch,this_patch,
+							                                 this_iface,idir,
+							                                 &transform_data_finegrid);                            
 						}
 						else
 						{
