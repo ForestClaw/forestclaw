@@ -59,7 +59,7 @@ typedef enum fclaw2d_exchange_type
 	FCLAW2D_AVERAGE,
 	FCLAW2D_INTERPOLATE,
 	FCLAW2D_TIME_SYNC_FINE_TO_COARSE,
-	FCLAW2D_TIME_SYNC_COPY,
+	FCLAW2D_TIME_SYNC_SAMESIZE,
 } fclaw2d_exchange_type_t;
 
 typedef enum fclaw2d_grid_type
