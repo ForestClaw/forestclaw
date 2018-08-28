@@ -1020,8 +1020,10 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
 
 	/* Conservation */
-	patch_vt->time_sync_fine_to_coarse   = fclaw2d_clawpatch_time_sync_fine_to_coarse;
-	patch_vt->time_sync_copy             = fclaw2d_clawpatch_time_sync_copy;	
+	patch_vt->time_sync_fine_to_coarse   = fclaw2d_clawpatch_time_sync_f2c;
+	patch_vt->time_sync_samesize         = fclaw2d_clawpatch_time_sync_samesize;	
+	patch_vt->time_sync_reset_f2c        = fclaw2d_clawpatch_time_sync_reset_f2c;
+	patch_vt->time_sync_reset_samesize   = fclaw2d_clawpatch_time_sync_reset_samesize;	
 
 	/* Transform functions (defined in forestclaw2d */
 	patch_vt->transform_init_data    = fclaw2d_clawpatch_transform_init_data;

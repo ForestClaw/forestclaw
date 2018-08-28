@@ -49,7 +49,6 @@ typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
 void fclaw2d_clawpatch_vtable_initialize(int claw_version);
 
-
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
 struct fclaw2d_clawpatch_vtable
@@ -70,7 +69,7 @@ struct fclaw2d_clawpatch_vtable
 
     /* Conservation update */
     clawpatch_fort_time_sync_f2c_t         fort_time_sync_fine_to_coarse;
-    clawpatch_fort_time_sync_copy_t        fort_time_sync_copy;
+    clawpatch_fort_time_sync_samesize_t    fort_time_sync_samesize;
 
     /* output functions (ascii) */
     clawpatch_fort_header_ascii_t          fort_header_ascii;

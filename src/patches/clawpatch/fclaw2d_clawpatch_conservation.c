@@ -85,30 +85,17 @@ void fclaw2d_clawpatch_cons_update_new (fclaw2d_global_t* glob,
 }
 
 
-static
-void cb_cons_update_reset(fclaw2d_domain_t *domain,
-						  fclaw2d_patch_t *this_patch,
-						  int this_block_idx,
-						  int this_patch_idx,
-						  void *user)
+void fclaw2d_clawpatch_time_sync_reset_f2c(fclaw2d_global_t *glob,
+                                           fclaw2d_patch_t *this_patch,
+                                           int minlevel, int maxlevel)
 {
-	int mx,my,meqn,level,minlevel;
-	int i,j,k,idir, init;
-	int* reset_data;
+	int mx,my,meqn;
+	int i,j,k,idir;
 
-	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
-	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(g->glob);
-
-	fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(g->glob,
+	fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(glob,
 																			this_patch);
-
-	reset_data = (int*) g->user;
-	init = reset_data[0];
-	minlevel = reset_data[1];
-
-	level = this_patch->level;
-
 	mx = clawpatch_opt->mx;
 	my = clawpatch_opt->my;
 	meqn = clawpatch_opt->meqn;
@@ -118,9 +105,14 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 	for(k = 0; k < 4; k++)
 	{
 		idir = k/2;
-#if 0		
-		if (((pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE) && level > minlevel)
-			|| ((pdata->face_neighbors[k] == FCLAW2D_PATCH_HALFSIZE)))
+#if 1		
+		int is_coarse = pdata->face_neighbors[k] == FCLAW2D_PATCH_HALFSIZE 
+		          && this_patch->level == minlevel;
+		int is_fine = pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE &&
+		          this_patch->level == maxlevel;
+#endif		          
+#if 1		
+		if (is_fine || is_coarse)
 #endif			
 		{
 			if (idir == 0)
@@ -147,21 +139,77 @@ void cb_cons_update_reset(fclaw2d_domain_t *domain,
 	}
 }
 
+#if 0
 void fclaw2d_clawpatch_cons_update_reset (fclaw2d_global_t* glob,
                                           int minlevel,
                                           int maxlevel, int init)
 {
 	int level;
-	int reset_data[2];
+	int reset_data[3];
 	reset_data[0] = init;
 	reset_data[1] = minlevel;
+	reset_data[2] = maxlevel;
 
 	for(level = minlevel; level <= maxlevel; level++)
 	{
 		fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset, reset_data);
 	}
 }
+#endif
 
+
+void fclaw2d_clawpatch_time_sync_reset_samesize(fclaw2d_global_t *glob,
+                                                fclaw2d_patch_t *this_patch)
+{
+	int mx,my,meqn;
+	int i,j,k,idir;
+
+	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+
+	fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(glob,
+																			this_patch);
+	mx = clawpatch_opt->mx;
+	my = clawpatch_opt->my;
+	meqn = clawpatch_opt->meqn;
+
+	fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);
+
+	for(k = 0; k < 4; k++)
+	{
+		idir = k/2;
+		if (pdata->face_neighbors[k] == FCLAW2D_PATCH_SAMESIZE)
+		{
+			if (idir == 0)
+			{
+				for(j = 0; j < meqn*my; j++)
+				{
+					cu->fm[k][j] = 0;
+					cu->fp[k][j] = 0;
+					cu->edge_fluxes[k][j] = 0;
+					cu->edge_fluxes[k][j+meqn*my] = 0;  /* Two fluxes stored at each edge point */
+				}
+			}
+			else
+			{
+				for(i = 0; i < meqn*mx; i++)
+				{
+					cu->gm[k-2][i] = 0;
+					cu->gp[k-2][i] = 0;
+					cu->edge_fluxes[k][i] = 0;
+					cu->edge_fluxes[k][i + meqn*mx] = 0;
+				}
+			}
+		}     /* coarse grid neighbor */
+	}
+}
+
+
+#if 0
+void fclaw2d_clawpatch_cons_update_reset_samesize(fclaw2d_global_t* glob, int level)
+{
+	fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset_samesize, NULL);
+}
+#endif
 
 
 void fclaw2d_clawpatch_cons_update_delete (fclaw2d_clawpatch_cons_update_t **cons_update)
@@ -222,15 +270,15 @@ void fclaw2d_clawpatch_update_cons_metric(fclaw2d_global_t* glob,
 
 
 /* This is a patch call-back */
-void fclaw2d_clawpatch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
-                                                fclaw2d_patch_t* coarse_patch,
-                                                fclaw2d_patch_t* fine_patch,
-                                                int idir,
-                                                int igrid,
-                                                int iface_coarse,
-                                                int time_interp,
-                                                fclaw2d_patch_transform_data_t
-                                                *transform_data)
+void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
+                                     fclaw2d_patch_t* coarse_patch,
+                                     fclaw2d_patch_t* fine_patch,
+                                     int idir,
+                                     int igrid,
+                                     int iface_coarse,
+                                     int time_interp,
+                                     fclaw2d_patch_transform_data_t
+                                     *transform_data)
 {
 
 	int meqn,mx,my,mbc;
@@ -301,12 +349,12 @@ void fclaw2d_clawpatch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
 }
 
 
-void fclaw2d_clawpatch_time_sync_copy (struct fclaw2d_global* glob,
-									   struct fclaw2d_patch* this_patch,
-									   struct fclaw2d_patch* neighbor_patch,
-									   int this_iface,int idir,
-									   fclaw2d_patch_transform_data_t
-									   *transform_data)
+void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
+                                           struct fclaw2d_patch* this_patch,
+                                           struct fclaw2d_patch* neighbor_patch,
+                                           int this_iface,int idir,
+                                           fclaw2d_patch_transform_data_t
+                                           *transform_data)
 {
 	/* We don't correct time interpolated grids, since we assume that the time 
 	interpolated average will already have correction information from times 
@@ -342,25 +390,28 @@ void fclaw2d_clawpatch_time_sync_copy (struct fclaw2d_global* glob,
 	fclaw2d_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
 							&neighbor_patchno,&globnum,&level);
 
-	clawpatch_vt->fort_time_sync_copy(&mx,&my,&mbc,&meqn,&idir,&this_iface,
-	                                  cuthis->area[0], cuthis->area[1], 
-	                                  cuthis->area[2], cuthis->area[3],
-	                                  qthis,
-	                                  cuthis->fp[0],cuthis->fm[1],
-	                                  cuthis->gp[0],cuthis->gm[1],
-	                                  cuneighbor->fm[0],cuneighbor->fp[1],
-	                                  cuneighbor->gm[0],cuneighbor->gp[1],
-	                                  cuthis->edge_fluxes[0],
-	                                  cuthis->edge_fluxes[1],
-	                                  cuthis->edge_fluxes[2],
-	                                  cuthis->edge_fluxes[3],
-	                                  cuneighbor->edge_fluxes[0],
-	                                  cuneighbor->edge_fluxes[1],
-	                                  cuneighbor->edge_fluxes[2],
-	                                  cuneighbor->edge_fluxes[3],
-	                                  maskneighbor,qneighbor_dummy,
-	                                  &transform_data);
-
+    if (1)
+    {
+    	/* Distribute 0.5 each correction from each side */
+    	clawpatch_vt->fort_time_sync_samesize(&mx,&my,&mbc,&meqn,&idir,&this_iface,
+    	                                      cuthis->area[0], cuthis->area[1], 
+    	                                      cuthis->area[2], cuthis->area[3],
+    	                                      qthis,
+    	                                      cuthis->fp[0],cuthis->fm[1],
+    	                                      cuthis->gp[0],cuthis->gm[1],
+    	                                      cuneighbor->fm[0],cuneighbor->fp[1],
+    	                                      cuneighbor->gm[0],cuneighbor->gp[1],
+    	                                      cuthis->edge_fluxes[0],
+    	                                      cuthis->edge_fluxes[1],
+    	                                      cuthis->edge_fluxes[2],
+    	                                      cuthis->edge_fluxes[3],
+    	                                      cuneighbor->edge_fluxes[0],
+    	                                      cuneighbor->edge_fluxes[1],
+    	                                      cuneighbor->edge_fluxes[2],
+    	                                      cuneighbor->edge_fluxes[3],
+    	                                      maskneighbor,qneighbor_dummy,
+    	                                      &transform_data);
+    }
 	FCLAW_FREE(qneighbor_dummy);
 	FCLAW_FREE(maskneighbor);       
 
