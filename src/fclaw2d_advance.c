@@ -264,13 +264,6 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	/* Keep track of largest cfl over all grid updates */
 	double maxcfl = 0;
 
-	/* This zeros out accumulating registers, which will be filled in 
-	subsequent time steps.  It does not zero out transfer of coarse
-	grid values to the fine grid registers (needed for Riemann problem). 
-	Important here is that dt has a valid value, because this is needed
-	to construct conservative correction (e.g. dt/dx*delta) */
-	fclaw2d_time_sync_reset(glob,minlevel,maxlevel,1);
-
 	/* Step inc at maxlevel should be 1 by definition */
 	FCLAW_ASSERT(ts_counter[maxlevel].step_inc == 1);
 	int n_fine_steps = ts_counter[maxlevel].total_steps;
@@ -300,12 +293,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 				/* Do conservative fix up here */
 				if (fclaw_opt->time_sync)
 			    {
-			        /* Add coarse grid corrections to coarse levels time_interp_level+1 
-			           to maxlevel-1. Finer grids will be reset; coarse grid data
-			           at coarse/fine interfaces will be reset. */			        
 			    	fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
-			    	/* Don't reset coarsest level, since it might still be used 
-			    	   for coarser levels */
 			    }
 				fclaw2d_ghost_update(glob,
 									 time_interp_level+1,
@@ -320,9 +308,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 				   advance after 2^(maxlevel-minlevel) time steps. */
 				if (fclaw_opt->time_sync)
 			    {
-			        /* Add coarse grid corrections */
 				    fclaw2d_time_sync(glob,minlevel,maxlevel);
-				    fclaw2d_time_sync_reset(glob,minlevel,minlevel,0);                
 			    }
 				int time_interp = 0;
 				fclaw2d_ghost_update(glob,
@@ -345,9 +331,8 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 
 	if (fclaw_opt->time_sync)
 	{
-	    /* Final coarse grid correction */
+	    /* Do not remove (still not sure why ...) */
 		fclaw2d_time_sync(glob,minlevel,maxlevel);
-		fclaw2d_time_sync_reset(glob,minlevel,minlevel,0);                
 	}
 
 	double sync_time =  ts_counter[maxlevel].current_time;
