@@ -672,14 +672,12 @@ void fclaw2d_patch_time_sync_samesize(fclaw2d_global_t* glob,
 
 void fclaw2d_patch_time_sync_reset_f2c(fclaw2d_global_t* glob,
                                        fclaw2d_patch_t* this_patch,
-                                       int minlevel,
-                                       int maxlevel)
+                                       int coarse_level)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 	FCLAW_ASSERT(patch_vt->time_sync_reset_f2c != NULL);
 
-	patch_vt->time_sync_reset_f2c(glob,this_patch,
-	                              minlevel,maxlevel); 
+	patch_vt->time_sync_reset_f2c(glob,this_patch,coarse_level);
 
 }
 

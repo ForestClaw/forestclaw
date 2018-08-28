@@ -45,15 +45,16 @@ void cb_time_sync_reset(fclaw2d_domain_t *domain,
 	fclaw2d_global_t *glob = (fclaw2d_global_t*) g->glob;
 
 	fclaw2d_time_sync_info_t *tstype = (fclaw2d_time_sync_info_t*) g->user;
-	int fine_to_coarse = tstype->reset_type == FCLAW2D_TIME_SYNC_RESET_F2C;
-	int samesize = tstype->reset_type == FCLAW2D_TIME_SYNC_RESET_SAMESIZE;
+	int fine_to_coarse = tstype->reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C;
+	int samesize = tstype->reset_mode == FCLAW2D_TIME_SYNC_RESET_SAMESIZE;
+	int all = tstype->reset_mode == FCLAW2D_TIME_SYNC_RESET_ALL;
+
+	int coarse_level = tstype->coarse_level;
 
 	if (fine_to_coarse)
 	{
-		int minlevel = tstype->minlevel;
-		int maxlevel = tstype->maxlevel;
-
-		fclaw2d_patch_time_sync_reset_f2c(glob,this_patch,minlevel,maxlevel);
+		/* This_patch is the coarse patch;  Reset registers at the c/f interface */
+		fclaw2d_patch_time_sync_reset_f2c(glob,this_patch,coarse_level);
 	}
 	else if (samesize)
 	{
@@ -63,32 +64,16 @@ void cb_time_sync_reset(fclaw2d_domain_t *domain,
 
 static
 void time_sync_reset (fclaw2d_global_t* glob,
-                      int minlevel,
-                      int maxlevel)
+                      int coarse_level, int reset_mode)
 {
 	fclaw2d_time_sync_info_t ts_info;
-	int level;
 
-	ts_info.reset_type = FCLAW2D_TIME_SYNC_RESET_F2C;
-	ts_info.minlevel = minlevel;
-	ts_info.maxlevel = maxlevel;	
+	ts_info.reset_mode = reset_mode;
+	ts_info.coarse_level = coarse_level;
 
-	for(level = minlevel; level <= maxlevel; level++)
-	{
-		fclaw2d_global_iterate_level(glob, level, 
-		                             cb_time_sync_reset, &ts_info);
-	}
+	fclaw2d_global_iterate_level(glob, coarse_level, 
+	                             cb_time_sync_reset, &ts_info);
 }
-
-static
-void time_sync_reset_samesize(fclaw2d_global_t* glob, int level)
-{
-	fclaw2d_time_sync_info_t ts_info;
-	ts_info.reset_type = FCLAW2D_TIME_SYNC_RESET_SAMESIZE;
-
-	fclaw2d_global_iterate_level(glob, level, cb_time_sync_reset, &ts_info);
-}
-
 
 static
 void copy_at_blockbdry(fclaw2d_global_t *glob,
@@ -143,7 +128,7 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 		copy_at_blockbdry(glob,level,
 						  read_parallel_patches,ghost_mode);
 
-		time_sync_reset_samesize(glob, level);
+		time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_SAMESIZE);
 
 		/* Correct coarser grids with corrections from coarse/fine grids */
 		if (level < fclaw_opt->maxlevel)
@@ -153,7 +138,7 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 			            read_parallel_patches,ghost_mode);
 
 			/* clear registers on finer level.  What happens to the coarser level? */
-			time_sync_reset(glob, level, level+1);
+			time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_F2C);
 		}
 	}
 	if (minlevel == fclaw_opt->minlevel)

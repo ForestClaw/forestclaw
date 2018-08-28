@@ -327,8 +327,7 @@ void fclaw2d_patch_time_sync_samesize(struct fclaw2d_global* glob,
 
 void fclaw2d_patch_time_sync_reset_f2c(struct fclaw2d_global* glob,
                                        struct fclaw2d_patch *patch,
-                                       int minlevel,
-                                       int maxlevel);
+                                       int coarse_level);
 
 void fclaw2d_patch_time_sync_reset_samesize(struct fclaw2d_global* glob, 
                                             struct fclaw2d_patch *patch);
@@ -557,13 +556,6 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
 
 /* ----------------------------- Conservative updates --------------------------------- */
 
-typedef void (*fclaw2d_patch_time_sync_reset_f2c_t)(struct fclaw2d_global *glob, 
-                                                    struct fclaw2d_patch *this_patch,
-                                                    int minlevel,int maxlevel);
-
-typedef void (*fclaw2d_patch_time_sync_reset_samesize_t)(struct fclaw2d_global *glob,
-                                                         struct fclaw2d_patch *patch);
-
 typedef void (*fclaw2d_patch_time_sync_f2c_t)(struct fclaw2d_global* glob,
 											  struct fclaw2d_patch *coarse_patch,
 											  struct fclaw2d_patch *fine_patch,
@@ -581,6 +573,12 @@ typedef void (*fclaw2d_patch_time_sync_samesize_t)(struct fclaw2d_global* glob,
                                                    struct fclaw2d_patch_transform_data 
                                                    *transform_data);
 
+typedef void (*fclaw2d_patch_time_sync_reset_f2c_t)(struct fclaw2d_global *glob, 
+                                                    struct fclaw2d_patch *this_patch,
+                                                    int coarse_level);
+
+typedef void (*fclaw2d_patch_time_sync_reset_samesize_t)(struct fclaw2d_global *glob,
+                                                         struct fclaw2d_patch *patch);
 
 /* ---------------------------------  Access functions -------------------------------- */
 
