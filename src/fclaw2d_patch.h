@@ -318,11 +318,20 @@ void fclaw2d_patch_time_sync_fine_to_coarse(struct fclaw2d_global* glob,
 											int time_interp,
 											struct fclaw2d_patch_transform_data* transform_data);
 
-void fclaw2d_patch_time_sync_copy(struct fclaw2d_global* glob,
-								  struct fclaw2d_patch *this_patch,
-								  struct fclaw2d_patch *neighbor_patch,
-								  int iface, int idir,
-								  struct fclaw2d_patch_transform_data *transform_data);
+void fclaw2d_patch_time_sync_samesize(struct fclaw2d_global* glob,
+                                      struct fclaw2d_patch *this_patch,
+                                      struct fclaw2d_patch *neighbor_patch,
+                                      int iface, int idir,
+                                      struct fclaw2d_patch_transform_data *transform_data);
+
+
+void fclaw2d_patch_time_sync_reset_f2c(struct fclaw2d_global* glob,
+                                       struct fclaw2d_patch *patch,
+                                       int minlevel,
+                                       int maxlevel);
+
+void fclaw2d_patch_time_sync_reset_samesize(struct fclaw2d_global* glob, 
+                                            struct fclaw2d_patch *patch);
 
 /* ------------------------------ Misc access functions ------------------------------- */
 void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
@@ -548,9 +557,12 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
 
 /* ----------------------------- Conservative updates --------------------------------- */
 
-typedef void (*fclaw2d_patch_cons_update_reset_t)(struct fclaw2d_global *glob, 
-												  int minlevel,int maxlevel,double dt);
+typedef void (*fclaw2d_patch_time_sync_reset_f2c_t)(struct fclaw2d_global *glob, 
+                                                    struct fclaw2d_patch *this_patch,
+                                                    int minlevel,int maxlevel);
 
+typedef void (*fclaw2d_patch_time_sync_reset_samesize_t)(struct fclaw2d_global *glob,
+                                                         struct fclaw2d_patch *patch);
 
 typedef void (*fclaw2d_patch_time_sync_f2c_t)(struct fclaw2d_global* glob,
 											  struct fclaw2d_patch *coarse_patch,
@@ -562,12 +574,12 @@ typedef void (*fclaw2d_patch_time_sync_f2c_t)(struct fclaw2d_global* glob,
 											  struct fclaw2d_patch_transform_data
 											  *transform_data);
 
-typedef void (*fclaw2d_patch_time_sync_copy_t)(struct fclaw2d_global* glob,
-											   struct fclaw2d_patch* this_patch,
-											   struct fclaw2d_patch* neighbor_patch,
-											   int iface, int idir,
-											   struct fclaw2d_patch_transform_data 
-											   *transform_data);
+typedef void (*fclaw2d_patch_time_sync_samesize_t)(struct fclaw2d_global* glob,
+                                                   struct fclaw2d_patch* this_patch,
+                                                   struct fclaw2d_patch* neighbor_patch,
+                                                   int iface, int idir,
+                                                   struct fclaw2d_patch_transform_data 
+                                                   *transform_data);
 
 
 /* ---------------------------------  Access functions -------------------------------- */
@@ -605,8 +617,10 @@ struct fclaw2d_patch_vtable
 	fclaw2d_patch_interpolate2fine_t      interpolate2fine;
 
 	/* Time syncing functions */
-	fclaw2d_patch_time_sync_f2c_t  time_sync_fine_to_coarse;
-	fclaw2d_patch_time_sync_copy_t         time_sync_copy;
+	fclaw2d_patch_time_sync_f2c_t             time_sync_fine_to_coarse;
+	fclaw2d_patch_time_sync_samesize_t        time_sync_samesize;
+	fclaw2d_patch_time_sync_reset_f2c_t       time_sync_reset_f2c;
+	fclaw2d_patch_time_sync_reset_samesize_t  time_sync_reset_samesize;
 
 	/* ghost filling functions */
 	fclaw2d_patch_copy_face_t             copy_face;

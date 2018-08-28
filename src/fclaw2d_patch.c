@@ -656,18 +656,40 @@ void fclaw2d_patch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
 }
 
 /* Correct for metric discontinuities at block boundaries */
-void fclaw2d_patch_time_sync_copy(fclaw2d_global_t* glob,
-								  fclaw2d_patch_t *this_patch,
-								  fclaw2d_patch_t *neighbor_patch,
-								  int iface, int idir,
-								  struct fclaw2d_patch_transform_data *transform_data)
+void fclaw2d_patch_time_sync_samesize(fclaw2d_global_t* glob,
+                                      fclaw2d_patch_t *this_patch,
+                                      fclaw2d_patch_t *neighbor_patch,
+                                      int iface, int idir,
+                                      struct fclaw2d_patch_transform_data *transform_data)
 
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-	FCLAW_ASSERT(patch_vt->time_sync_copy != NULL);
+	FCLAW_ASSERT(patch_vt->time_sync_samesize != NULL);
 
-	patch_vt->time_sync_copy(glob,this_patch,neighbor_patch,iface,idir,
+	patch_vt->time_sync_samesize(glob,this_patch,neighbor_patch,iface,idir,
 							transform_data);    
+}
+
+void fclaw2d_patch_time_sync_reset_f2c(fclaw2d_global_t* glob,
+                                       fclaw2d_patch_t* this_patch,
+                                       int minlevel,
+                                       int maxlevel)
+{
+	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+	FCLAW_ASSERT(patch_vt->time_sync_reset_f2c != NULL);
+
+	patch_vt->time_sync_reset_f2c(glob,this_patch,
+	                              minlevel,maxlevel); 
+
+}
+
+void fclaw2d_patch_time_sync_reset_samesize(fclaw2d_global_t* glob, 
+                                            fclaw2d_patch_t* this_patch)
+{
+	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+	FCLAW_ASSERT(patch_vt->time_sync_reset_f2c != NULL);
+
+	patch_vt->time_sync_reset_samesize(glob,this_patch); /* Call a clawpatch routine */
 }
 
 
@@ -693,7 +715,7 @@ void fclaw2d_patch_vtable_initialize()
 	patch_vt->single_step_update  = NULL;
 
 	patch_vt->time_sync_fine_to_coarse = NULL;
-	patch_vt->time_sync_copy     = NULL;
+	patch_vt->time_sync_samesize    = NULL;
 
 	/* These are optional */
 	patch_vt->setup               = NULL;
