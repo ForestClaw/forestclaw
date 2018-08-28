@@ -35,15 +35,24 @@ extern "C"
 #endif
 #endif
 
+
 struct fclaw2d_global;
 
-void fclaw2d_time_sync_reset(struct fclaw2d_global *glob, 
-                             int minlevel,int maxlevel, int init);
+typedef enum fclaw2d_time_sync_type
+{
+    FCLAW2D_TIME_SYNC_RESET_F2C = 1,
+    FCLAW2D_TIME_SYNC_RESET_SAMESIZE
+} fclaw2d_time_sync_type_t;
 
+typedef struct fclaw2d_time_sync_info
+{
+    fclaw2d_time_sync_type_t reset_type;
+    int minlevel;
+    int maxlevel;
+    int last_step;
+} fclaw2d_time_sync_info_t;
 
 void fclaw2d_time_sync(struct fclaw2d_global *glob, int minlevel, int maxlevel);
-
-
 
 
 #ifdef __cplusplus
