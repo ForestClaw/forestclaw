@@ -3,7 +3,7 @@ axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
 axis on;
 
-ex = 3;
+ex = 2;
 lstr = 'no limiter';
 mstr = 'WD';
 
@@ -30,14 +30,14 @@ elseif (ShowUnderOverShoots == 1)
 else
     switch ex
         case 1
-            ca = [0 1.2];
+            ca = [-0.05, 1.4];
         case 2
-            ca = [0 16];    
+            ca = [-1, 2.5];    
         case 3
-            ca = 1*[-1,1];
+            ca = 1*[0,1];
             % ca = 1e-15*[-1,1];
     end    
-    % yrbcolormap;
+    %yrbcolormap;
     colormap(parula);
     colorbar;
     caxis(ca);
@@ -73,8 +73,8 @@ else
     fprintf('%-10s %16.8e\n','qmax',qmax);    
 end
 
-showgridlines
-hidegridlines(6);
+% showgridlines
+hidegridlines(5);
 hidepatchborders(6)
 % setpatchborderprops('linewidth',2);
 % hidepatchborders;
