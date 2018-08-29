@@ -78,10 +78,10 @@ void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
 
 /* ------------------------------------- Conservation --------------------------------- */
 
-#define CLAWPACK46_CONS_UPDATE_STORE_FLUX FCLAW_F77_FUNC(clawpack46_update_cons_store_flux, \
-														 CLAWPACK46_UPDATE_CONS_STORE_FLUX)
+#define CLAWPACK46_TIME_SYNC_STORE_FLUX FCLAW_F77_FUNC(clawpack46_time_sync_store_flux, \
+														 CLAWPACK46_TIME_SYNC_STORE_FLUX)
 
-void CLAWPACK46_CONS_UPDATE_STORE_FLUX(int* mx,int* my, int* mbc, int* meqn,
+void CLAWPACK46_TIME_SYNC_STORE_FLUX(int* mx,int* my, int* mbc, int* meqn,
 									   int* maux, double* dt,
 									   double* el0, 
 									   double* el1, 
@@ -97,11 +97,11 @@ void CLAWPACK46_CONS_UPDATE_STORE_FLUX(int* mx,int* my, int* mbc, int* meqn,
 
 
 
-#define CLAWPACK46_CONS_UPDATE_ACCUMULATE_WAVES \
-						FCLAW_F77_FUNC(clawpack46_cons_update_accumulate_waves, \
-									   CLAWPACK46_CONS_UPDATE_ACCUMULATE_WAVES)
+#define CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES \
+						FCLAW_F77_FUNC(clawpack46_time_sync_accumulate_waves, \
+									   CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES)
 
-void CLAWPACK46_CONS_UPDATE_ACCUMULATE_WAVES(int* mx, int* my, int* mbc, int* meqn,
+void CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES(int* mx, int* my, int* mbc, int* meqn,
 											  double* dt, double* dx, double* dy, 
 											  int* patchno,
 											  double el0[], double el1[], 

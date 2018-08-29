@@ -295,8 +295,8 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 	double cflgrid = 0.0;
 
-	fclaw2d_clawpatch_cons_update_t* cu = 
-		  fclaw2d_clawpatch_get_cons_update(glob,this_patch);
+	fclaw2d_clawpatch_registers_t* cr = 
+		  fclaw2d_clawpatch_get_registers(glob,this_patch);
 
 	/* Evaluate fluxes needed in correction terms */
 	if (claw46_vt->fort_rpn2_cons != NULL)
@@ -306,14 +306,14 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 		double *auxvec_edge = FCLAW_ALLOC(double, maux);
 		double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
-		CLAWPACK46_CONS_UPDATE_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,&dt,
-										  cu->edgelengths[0], 
-										  cu->edgelengths[1], 
-										  cu->edgelengths[2], 
-										  cu->edgelengths[3],
+		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,&dt,
+										  cr->edgelengths[0], 
+										  cr->edgelengths[1], 
+										  cr->edgelengths[2], 
+										  cr->edgelengths[3],
 										  qold,aux,
-										  cu->edge_fluxes[0],cu->edge_fluxes[1],
-										  cu->edge_fluxes[2],cu->edge_fluxes[3],
+										  cr->edge_fluxes[0],cr->edge_fluxes[1],
+										  cr->edge_fluxes[2],cr->edge_fluxes[3],
 										  claw46_vt->fort_rpn2_cons,
 										  qvec,auxvec_center,auxvec_edge,flux);
 
@@ -349,15 +349,15 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 	FCLAW_ASSERT(ierror == 0);
 
-	CLAWPACK46_CONS_UPDATE_ACCUMULATE_WAVES(&mx,&my,&mbc,&meqn, &dt, &dx, 
+	CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES(&mx,&my,&mbc,&meqn, &dt, &dx, 
 	                                        &dy, &this_patch_idx,
-											cu->edgelengths[0],cu->edgelengths[1],
-											cu->edgelengths[2],cu->edgelengths[3],
+											cr->edgelengths[0],cr->edgelengths[1],
+											cr->edgelengths[2],cr->edgelengths[3],
 											fp,fm,gp,gm,
-											cu->fp[0],cu->fp[1],
-											cu->fm[0],cu->fm[1],
-											cu->gp[0],cu->gp[1],
-											cu->gm[0],cu->gm[1]);
+											cr->fp[0],cr->fp[1],
+											cr->fm[0],cr->fm[1],
+											cr->gp[0],cr->gp[1],
+											cr->gm[0],cr->gm[1]);
 
 
 	delete [] fp;
@@ -452,13 +452,6 @@ void fc2d_clawpack46_solver_initialize()
 	/* ForestClaw vtable items */
 	fclaw_vt->output_frame      = clawpack46_output;
 	fclaw_vt->problem_setup     = clawpack46_setprob;    
-
-#if 0
-	/* Conservation fix (this could also go in clawpatch vtable */
-	fclaw_vt->time_sync_reset            = fclaw2d_clawpatch_cons_update_reset;
-	fclaw_vt->time_sync_reset_samesize   = fclaw2d_clawpatch_cons_update_reset_samesize;
-#endif	
-
 
 	/* These could be over-written by user specific settings */
 	patch_vt->initialize                     = clawpack46_qinit;

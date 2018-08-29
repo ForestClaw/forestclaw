@@ -3,8 +3,8 @@ c    # This file contains routines which accumulate fluxes, waves
 c    # and add corrections to coarse grid at edges of both same size
 c    # grids and coarse/fine interfaces. 
 c    # 
-c    # 1. clawpack46_cons_update_store_flux (before step update)
-c    # 2. clawpack46_cons_update_accumulate_waves (after step update)
+c    # 1. clawpack46_time_sync_store_flux (before step update)
+c    # 2. clawpack46_time_sync_accumulate_waves (after step update)
 c    # 3. clawpack46_fort_time_sync_f2c ()
 c    # 4. clawpack46_fort_time_sync_copy
 c    # ----------------------------------------------------------------
@@ -20,7 +20,7 @@ c    #
 c    # These will be stored for each grid and used to compute
 c    # corrections.
 c    # -----------------------------------------------------------------
-      subroutine clawpack46_update_cons_store_flux(mx,my,mbc,meqn,
+      subroutine clawpack46_time_sync_store_flux(mx,my,mbc,meqn,
      &      maux, dt,el0, el1, el2, el3,q, aux,
      &      flux0,flux1,flux2,flux3,
      &      rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
@@ -128,7 +128,7 @@ c    # This is called AFTER the step update.   This accumulates plus and
 c    # minus waves, scaled by dt*edge_length.  This scaling takes care 
 c    # of any division by 2 or 4. 
 c    # -----------------------------------------------------------------
-      subroutine clawpack46_cons_update_accumulate_waves(mx,my,
+      subroutine clawpack46_time_sync_accumulate_waves(mx,my,
      &                                                   mbc,meqn,
      &      dt, dx,dy, patchno,
      &      el0, el1, el2, el3,
@@ -340,23 +340,12 @@ c                    # efc0(0) is flux stored in the coarse grid
 c                    # interior cell. 
                      deltac = fineval + fpcoarse0(jc,mq) - efc0(jc,mq,0)
                      areac = area0(jc)
-
-c                    # Reset these, since they will no longer be needed                     
-c                     fpcoarse0(jc,mq) = 0
-c                     efc0(jc,mq,0) = 0
-c                     efc0(jc,mq,1) = 0
-
                   else
 c                   # Coarse grid is left; fine grid is right                    
 c                    # efc1(0) is flux stored in the coarse grid 
 c                    # interior cell. 
                      deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq,0)
                      areac = area1(jc)
-
-c                    # Reset these, since they will no longer be needed                     
-c                     fmcoarse1(jc,mq) = 0
-c                     efc1(jc,mq,0) = 0
-c                     efc1(jc,mq,1) = 0
                   endif   
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
                endif
@@ -388,24 +377,12 @@ c                    # efc2(0) is flux stored in the coarse grid
 c                    # interior cell. 
                      deltac = fineval + gpcoarse2(ic,mq) - efc2(ic,mq,0)
                      areac = area2(ic)
-
-c                    # Reset these, since they will no longer be needed                     
-c                     gpcoarse2(ic,mq) = 0
-c                     efc2(ic,mq,0) = 0
-c                     efc2(ic,mq,1) = 0
-
                   else
 c                    # Coarse grid is bottom grid; fine is top grid   
 c                    # efc3(0) is flux stored in the coarse grid 
 c                    # interior cell.                   
                      deltac = fineval + gmcoarse3(ic,mq) + efc3(ic,mq,0)
                      areac = area3(ic)
-
-c                    # Reset these, since they will no longer be needed                     
-c                     gmcoarse3(ic,mq) = 0
-c                     efc3(ic,mq,0) = 0
-c                     efc3(ic,mq,1) = 0
-
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
                endif                    !! skip grid loop
@@ -532,10 +509,6 @@ c                 # x-direction (idir == 0)
                      delta = neighborval  + fpthis0(j1,mq) 
      &                             - efthis0(j1,mq,0)
                      area = area0(j1)
-
-c                     fpthis0(j1,mq) = 0
-c                     efthis0(j1,mq,0) = 0
-c                     efthis0(j1,mq,0) = 0
                   else
 c                   # Coarse grid is left; fine grid is right                    
 c                    # efc1(0) is flux stored in the coarse grid 
@@ -543,11 +516,6 @@ c                    # interior cell.
                      delta = neighborval + fmthis1(j1,mq) + 
      &                             efthis1(j1,mq,0)
                      area = area1(j1)
-
-c                    # Reset these, since they will no longer be needed                     
-c                     fmthis1(j1,mq) = 0
-c                     efthis1(j1,mq,0) = 0
-c                     efthis1(j1,mq,1) = 0
                   endif
                   qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area
               enddo
@@ -573,11 +541,6 @@ c                    # interior cell.
                      delta = neighborval + gpthis2(i1,mq) 
      &                          - efthis2(i1,mq,0)
                      area = area2(i1)
-
-c                    # Reset these, since they will no longer be needed                     
-c                     gpthis2(i1,mq) = 0
-c                     efthis2(i1,mq,0) = 0
-c                     efthis2(i1,mq,1) = 0
                   else
 c                    # Coarse grid is bottom grid; fine is top grid   
 c                    # efc3(0) is flux stored in the coarse grid 
@@ -585,11 +548,6 @@ c                    # interior cell.
                      delta = neighborval + gmthis3(i1,mq) + 
      &                            efthis3(i1,mq,0)
                      area = area3(i1)
-
-c                    # Reset these, since they will no longer be needed                     
-c                     gmthis3(i1,mq) = 0
-c                     efthis3(i1,mq,0) = 0
-c                     efthis3(i1,mq,1) = 0
                   endif
                   qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area                 
               enddo
