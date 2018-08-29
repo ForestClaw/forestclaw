@@ -48,7 +48,8 @@ public :
     FArrayBox griddata_time_interpolated;
     FArrayBox griderror;
 
-    struct fclaw2d_clawpatch_cons_update *cons_update;
+    /* Registers for accumulating mismatches at coarse/fine interfaces */
+    struct fclaw2d_clawpatch_registers *registers;
 
     /* Grid info */
     int mx;           

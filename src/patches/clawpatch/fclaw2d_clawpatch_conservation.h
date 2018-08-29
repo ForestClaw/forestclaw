@@ -38,9 +38,9 @@ struct fclaw2d_patch_transform_data;
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
-typedef struct fclaw2d_clawpatch_cons_update fclaw2d_clawpatch_cons_update_t;
+typedef struct fclaw2d_clawpatch_registers fclaw2d_clawpatch_registers_t;
 
-struct fclaw2d_clawpatch_cons_update
+struct fclaw2d_clawpatch_registers
 {
 	/* Two 1d arrays stored on each of four faces */
 	double *edge_fluxes[4];
@@ -59,16 +59,16 @@ struct fclaw2d_clawpatch_cons_update
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
-void fclaw2d_clawpatch_cons_update_new(struct fclaw2d_global* glob,
-									   struct fclaw2d_patch* this_patch,
-									   int blockno,int patchno,
-									   fclaw2d_clawpatch_cons_update_t **cons_update);
+void fclaw2d_clawpatch_time_sync_new(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch* this_patch,
+                                     int blockno,int patchno,
+                                     fclaw2d_clawpatch_registers_t **registers);
 
-void fclaw2d_clawpatch_cons_update_delete(fclaw2d_clawpatch_cons_update_t **cons_update);
+void fclaw2d_clawpatch_time_sync_delete(fclaw2d_clawpatch_registers_t **registers);
 
-void fclaw2d_clawpatch_cons_update_metric(struct fclaw2d_global* glob,
-										  struct fclaw2d_patch* this_patch,
-										  int blockno,int patchno);
+void fclaw2d_clawpatch_time_sync_setup(struct fclaw2d_global* glob,
+                                       struct fclaw2d_patch* this_patch,
+                                       int blockno,int patchno);
 
 void fclaw2d_clawpatch_time_sync_f2c(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* coarse_patch,
@@ -92,19 +92,11 @@ void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global* glob,
                                        int coarse_level,
                                        int reset_mode);
 
-
 #if 0
-void fclaw2d_clawpatch_time_sync_reset_f2c(struct fclaw2d_global* glob,
-                                           struct fclaw2d_patch *this_patch,
-                                           int coarse_level);
-
-void fclaw2d_clawpatch_time_sync_reset_samesize(struct fclaw2d_global* glob,
-                                                struct fclaw2d_patch *this_patch);
-#endif
-
 void fclaw2d_clawpatch_update_cons_metric(struct fclaw2d_global* glob,
 										  struct fclaw2d_patch* this_patch,
 										  int blockno,int patchno);
+#endif
 
 
 #ifdef __cplusplus

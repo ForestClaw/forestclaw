@@ -68,7 +68,7 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
     /* Conservation update */
-    clawpatch_fort_time_sync_f2c_t         fort_time_sync_fine_to_coarse;
+    clawpatch_fort_time_sync_f2c_t         fort_time_sync_f2c;
     clawpatch_fort_time_sync_samesize_t    fort_time_sync_samesize;
 
     /* output functions (ascii) */
@@ -102,10 +102,12 @@ void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
 
 
 /* ----------------------------- Conservative updates --------------------------------- */
-void fclaw2d_patch_cons_update_reset(struct fclaw2d_global *glob, 
+#if 0
+void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global *glob, 
                                      int minlevel,int maxlevel,double dt);
+#endif
 
-void fclaw2d_clawpatch_cons_update_metric(struct fclaw2d_global* glob,
+void fclaw2d_clawpatch_time_sync_metric(struct fclaw2d_global* glob,
                                           struct fclaw2d_patch* this_patch,
                                           int blockno,int patchno);
 
@@ -172,9 +174,9 @@ double* fclaw2d_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
                                          struct fclaw2d_patch* this_patch,
                                          int time_interp);
 
-struct fclaw2d_clawpatch_cons_update* 
-fclaw2d_clawpatch_get_cons_update(struct fclaw2d_global* glob,
-                                  struct fclaw2d_patch* this_patch);
+struct fclaw2d_clawpatch_registers* 
+fclaw2d_clawpatch_get_registers(struct fclaw2d_global* glob,
+                                struct fclaw2d_patch* this_patch);
 
 
 

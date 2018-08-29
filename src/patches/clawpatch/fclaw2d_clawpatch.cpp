@@ -121,7 +121,7 @@ void clawpatch_delete(void *patchcp)
 {
 	FCLAW_ASSERT(patchcp != NULL);
 	fclaw2d_clawpatch_t* cp = (fclaw2d_clawpatch_t*) patchcp;
-	fclaw2d_clawpatch_cons_update_delete(&cp->cons_update);
+	fclaw2d_clawpatch_time_sync_delete(&cp->registers);
 
 	FCLAW_ASSERT(cp->mp != NULL);
 	fclaw2d_metric_patch_delete(cp->mp);
@@ -244,8 +244,8 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	}
 	
 	/* Build interface registers needed for conservation */
-	fclaw2d_clawpatch_cons_update_new(glob,this_patch,
-									  blockno,patchno,&cp->cons_update);
+	fclaw2d_clawpatch_time_sync_new(glob,this_patch,
+									  blockno,patchno,&cp->registers);
 
 	if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
 	{
@@ -275,7 +275,7 @@ void clawpatch_build(fclaw2d_global_t *glob,
 		fclaw2d_metric_patch_setup(glob,this_patch,blockno,patchno);
 	}
 
-	fclaw2d_clawpatch_update_cons_metric(glob,this_patch,blockno,patchno);
+	fclaw2d_clawpatch_time_sync_setup(glob,this_patch,blockno,patchno);
 }
 
 static
@@ -297,7 +297,7 @@ void clawpatch_build_from_fine(fclaw2d_global_t *glob,
 											 blockno, coarse_patchno, fine0_patchno);
 	}
 
-	fclaw2d_clawpatch_update_cons_metric(glob,coarse_patch,blockno,coarse_patchno);
+	fclaw2d_clawpatch_time_sync_setup(glob,coarse_patch,blockno,coarse_patchno);
 }
 
 
@@ -310,25 +310,6 @@ void clawpatch_save_step(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
 	cp->griddata_save = cp->griddata;
 
-#if 0
-	int mx,my, meqn;
-	/* Save data potentially needed for conservative fix */
-	mx = cp->mx;
-	my = cp->my;
-	meqn = cp->meqn;
-
-	for(j = 0; j < 2*meqn*my; j++)
-	{
-		cp->cons_update->edge_fluxes_save[0][j] = cp->cons_update->edge_fluxes[0][j];
-		cp->cons_update->edge_fluxes_save[1][j] = cp->cons_update->edge_fluxes[1][j];
-	}
-
-	for(i = 0; i < 2*meqn*mx; i++)
-	{
-		cp->cons_update->edge_fluxes_save[2][i] = cp->cons_update->edge_fluxes[2][i];
-		cp->cons_update->edge_fluxes_save[3][i] = cp->cons_update->edge_fluxes[3][i];            
-	}
-#endif    
 }
 
 
@@ -341,23 +322,6 @@ void clawpatch_restore_step(fclaw2d_global_t* glob,
 
 	/* Save data potentially needed for conservative fix */
 
-#if 0
-	mx = cp->mx;
-	my = cp->my;
-	meqn = cp->meqn;
-
-	for(j = 0; j < 2*meqn*my; j++)
-	{
-		cp->cons_update->edge_fluxes[0][j] = cp->cons_update->edge_fluxes_save[0][j];
-		cp->cons_update->edge_fluxes[1][j] = cp->cons_update->edge_fluxes_save[1][j];
-	}
-
-	for(i = 0; i < 2*meqn*mx; i++)
-	{
-		cp->cons_update->edge_fluxes[2][i] = cp->cons_update->edge_fluxes_save[2][i];
-		cp->cons_update->edge_fluxes[3][i] = cp->cons_update->edge_fluxes_save[3][i];            
-	}
-#endif    
 }
 
 static
@@ -1020,13 +984,9 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
 
 	/* Conservation */
-	patch_vt->time_sync_fine_to_coarse   = fclaw2d_clawpatch_time_sync_f2c;
-	patch_vt->time_sync_samesize         = fclaw2d_clawpatch_time_sync_samesize;
-	patch_vt->time_sync_reset            = fclaw2d_clawpatch_time_sync_reset;
-#if 0		
-	patch_vt->time_sync_reset_f2c        = fclaw2d_clawpatch_time_sync_reset_f2c;
-	patch_vt->time_sync_reset_samesize   = fclaw2d_clawpatch_time_sync_reset_samesize;	
-#endif	
+	patch_vt->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
+	patch_vt->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
+	patch_vt->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
 
 	/* Transform functions (defined in forestclaw2d */
 	patch_vt->transform_init_data    = fclaw2d_clawpatch_transform_init_data;
@@ -1213,12 +1173,12 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_global_t* glob,
 	return cp->griddata.dataPtr();
 }
 
-fclaw2d_clawpatch_cons_update_t* 
-fclaw2d_clawpatch_get_cons_update(fclaw2d_global_t* glob,
+fclaw2d_clawpatch_registers_t* 
+fclaw2d_clawpatch_get_registers(fclaw2d_global_t* glob,
                                   fclaw2d_patch_t* this_patch)
 {
 	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
-	return cp->cons_update;
+	return cp->registers;
 }
 
 
