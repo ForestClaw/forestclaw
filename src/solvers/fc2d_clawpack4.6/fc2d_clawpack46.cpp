@@ -460,8 +460,8 @@ void fc2d_clawpack46_solver_initialize()
 	patch_vt->single_step_update             = clawpack46_update;
 
 	/* Conservation updates (based on Clawpack updates) */
-	clawpatch_vt->fort_time_sync_fine_to_coarse = CLAWPACK46_FORT_TIME_SYNC_F2C;
-	clawpatch_vt->fort_time_sync_samesize       = CLAWPACK46_FORT_TIME_SYNC_SAMESIZE;
+	clawpatch_vt->fort_time_sync_f2c         = CLAWPACK46_FORT_TIME_SYNC_F2C;
+	clawpatch_vt->fort_time_sync_samesize    = CLAWPACK46_FORT_TIME_SYNC_SAMESIZE;
 
 	/* Wrappers so that user can change argument list */
 	claw46_vt->b4step2                       = clawpack46_b4step2;
