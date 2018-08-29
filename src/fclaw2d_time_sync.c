@@ -64,6 +64,13 @@ void time_sync_reset (fclaw2d_global_t* glob,
 
 	fclaw2d_global_iterate_level(glob, coarse_level, 
 	                             cb_time_sync_reset, &ts_info);
+
+	if (reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C)
+	{
+		fclaw2d_global_iterate_level(glob, coarse_level+1, 
+		                             cb_time_sync_reset, &ts_info);
+	}
+
 }
 
 static
