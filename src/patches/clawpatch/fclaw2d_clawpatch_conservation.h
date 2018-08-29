@@ -92,13 +92,6 @@ void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global* glob,
                                        int coarse_level,
                                        int reset_mode);
 
-#if 0
-void fclaw2d_clawpatch_update_cons_metric(struct fclaw2d_global* glob,
-										  struct fclaw2d_patch* this_patch,
-										  int blockno,int patchno);
-#endif
-
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

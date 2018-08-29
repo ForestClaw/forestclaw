@@ -626,10 +626,10 @@ struct fclaw2d_patch_vtable
 	fclaw2d_patch_average2coarse_t        average2coarse;
 	fclaw2d_patch_interpolate2fine_t      interpolate2fine;
 
-	/* Time syncing functions */
-	fclaw2d_patch_time_sync_f2c_t             time_sync_f2c;
-	fclaw2d_patch_time_sync_samesize_t        time_sync_samesize;
-	fclaw2d_patch_time_sync_reset_t           time_sync_reset;
+	/* Time syncing functions for conservation */
+	fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;      /* f2c = fine to coarse */
+	fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
+	fclaw2d_patch_time_sync_reset_t       time_sync_reset;    /* Virtualized for each patch */
 
 	/* ghost filling functions */
 	fclaw2d_patch_copy_face_t             copy_face;

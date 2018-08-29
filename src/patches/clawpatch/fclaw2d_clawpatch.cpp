@@ -983,7 +983,7 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	patch_vt->average_block_corner       = clawpatch_average_corner;
 	patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
 
-	/* Conservation */
+	/* Timing syncing module for conservation */
 	patch_vt->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
 	patch_vt->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
 	patch_vt->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
