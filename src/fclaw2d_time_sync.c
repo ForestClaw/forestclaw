@@ -139,10 +139,11 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 			time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_F2C);
 		}
 	}
-	if (minlevel == fclaw_opt->minlevel)
+	for(level = fclaw_opt->maxlevel; level >= minlevel; level--)
 	{
-		/* Clear registers at coarsest level */
-		// time_sync_reset(glob, minlevel, FCLAW2D_TIME_SYNC_RESET_LEVEL);		
+		/* Clear registers at physical level;  These should never used
+     	   in sychronization, but will accumulate throughout simulation.  */
+		time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_PHYS);		
 	}
 }
 

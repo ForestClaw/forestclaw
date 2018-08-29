@@ -331,7 +331,7 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 
 	if (fclaw_opt->time_sync)
 	{
-	    /* Do not remove (still not sure why ...) */
+	    /* This is the final synchronization not covered in fine_steps loop */
 		fclaw2d_time_sync(glob,minlevel,maxlevel);
 	}
 
