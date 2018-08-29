@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_clawpatch_conservation.h"
 #include "fclaw2d_clawpatch_conservation_fort.h"
 
+#include <fclaw2d_time_sync.h>
+
 #include "fclaw2d_clawpatch.h"
 #include "fclaw2d_clawpatch_options.h"
 
@@ -85,9 +87,10 @@ void fclaw2d_clawpatch_cons_update_new (fclaw2d_global_t* glob,
 }
 
 
-void fclaw2d_clawpatch_time_sync_reset_f2c(fclaw2d_global_t *glob,
-                                           fclaw2d_patch_t *this_patch, 
-                                           int coarse_level)
+void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
+                                       fclaw2d_patch_t *this_patch, 
+                                       int coarse_level,
+                                       int reset_mode)
 {
 	int mx,my,meqn;
 	int i,j,k,idir;
@@ -103,16 +106,31 @@ void fclaw2d_clawpatch_time_sync_reset_f2c(fclaw2d_global_t *glob,
 	fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);
 
 	int fine_level = coarse_level+1;
+	int reset_flux;
 
 	for(k = 0; k < 4; k++)
 	{
 		idir = k/2;
-		int is_coarse = pdata->face_neighbors[k] == FCLAW2D_PATCH_HALFSIZE 
-		          && this_patch->level == coarse_level;
-		int is_fine = pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE &&
-		          this_patch->level == fine_level;
+		reset_flux = 0;
+		if (reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C)
+		{
+			int is_coarse = (pdata->face_neighbors[k] == FCLAW2D_PATCH_HALFSIZE)
+          			&& (this_patch->level == coarse_level);
+		    int is_fine = (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE) &&
+		          (this_patch->level == fine_level);
+		    reset_flux = is_coarse || is_fine;
+		}
+		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_SAMESIZE)
+		{
+			reset_flux = (pdata->face_neighbors[k] == FCLAW2D_PATCH_SAMESIZE) ||   
+			      (this_patch->level == coarse_level);
+		}
+		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_LEVEL)
+		{
+			reset_flux = this_patch->level == coarse_level;
+		}
 
-		if (is_fine || is_coarse)
+		if (reset_flux)
 		{
 			if (idir == 0)
 			{
@@ -137,78 +155,6 @@ void fclaw2d_clawpatch_time_sync_reset_f2c(fclaw2d_global_t *glob,
 		}     /* coarse grid neighbor */
 	}
 }
-
-#if 0
-void fclaw2d_clawpatch_cons_update_reset (fclaw2d_global_t* glob,
-                                          int minlevel,
-                                          int maxlevel, int init)
-{
-	int level;
-	int reset_data[3];
-	reset_data[0] = init;
-	reset_data[1] = minlevel;
-	reset_data[2] = maxlevel;
-
-	for(level = minlevel; level <= maxlevel; level++)
-	{
-		fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset, reset_data);
-	}
-}
-#endif
-
-
-void fclaw2d_clawpatch_time_sync_reset_samesize(fclaw2d_global_t *glob,
-                                                fclaw2d_patch_t *this_patch)
-{
-	int mx,my,meqn;
-	int i,j,k,idir;
-
-	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-
-	fclaw2d_clawpatch_cons_update_t* cu = fclaw2d_clawpatch_get_cons_update(glob,
-																			this_patch);
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
-	meqn = clawpatch_opt->meqn;
-
-	fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);
-
-	for(k = 0; k < 4; k++)
-	{
-		idir = k/2;
-		if (pdata->face_neighbors[k] == FCLAW2D_PATCH_SAMESIZE)
-		{
-			if (idir == 0)
-			{
-				for(j = 0; j < meqn*my; j++)
-				{
-					cu->fm[k][j] = 0;
-					cu->fp[k][j] = 0;
-					cu->edge_fluxes[k][j] = 0;
-					cu->edge_fluxes[k][j+meqn*my] = 0;  /* Two fluxes stored at each edge point */
-				}
-			}
-			else
-			{
-				for(i = 0; i < meqn*mx; i++)
-				{
-					cu->gm[k-2][i] = 0;
-					cu->gp[k-2][i] = 0;
-					cu->edge_fluxes[k][i] = 0;
-					cu->edge_fluxes[k][i + meqn*mx] = 0;
-				}
-			}
-		}     /* coarse grid neighbor */
-	}
-}
-
-
-#if 0
-void fclaw2d_clawpatch_cons_update_reset_samesize(fclaw2d_global_t* glob, int level)
-{
-	fclaw2d_global_iterate_level(glob, level, cb_cons_update_reset_samesize, NULL);
-}
-#endif
 
 
 void fclaw2d_clawpatch_cons_update_delete (fclaw2d_clawpatch_cons_update_t **cons_update)

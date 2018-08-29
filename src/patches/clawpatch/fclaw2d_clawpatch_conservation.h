@@ -87,13 +87,20 @@ void fclaw2d_clawpatch_time_sync_samesize(struct fclaw2d_global* glob,
                                           struct fclaw2d_patch_transform_data
                                           *transform_data);
 
+void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global* glob,
+                                       struct fclaw2d_patch *this_patch,
+                                       int coarse_level,
+                                       int reset_mode);
+
+
+#if 0
 void fclaw2d_clawpatch_time_sync_reset_f2c(struct fclaw2d_global* glob,
                                            struct fclaw2d_patch *this_patch,
                                            int coarse_level);
 
 void fclaw2d_clawpatch_time_sync_reset_samesize(struct fclaw2d_global* glob,
                                                 struct fclaw2d_patch *this_patch);
-
+#endif
 
 void fclaw2d_clawpatch_update_cons_metric(struct fclaw2d_global* glob,
 										  struct fclaw2d_patch* this_patch,

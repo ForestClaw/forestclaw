@@ -45,21 +45,12 @@ void cb_time_sync_reset(fclaw2d_domain_t *domain,
 	fclaw2d_global_t *glob = (fclaw2d_global_t*) g->glob;
 
 	fclaw2d_time_sync_info_t *tstype = (fclaw2d_time_sync_info_t*) g->user;
-	int fine_to_coarse = tstype->reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C;
-	int samesize = tstype->reset_mode == FCLAW2D_TIME_SYNC_RESET_SAMESIZE;
-	int all = tstype->reset_mode == FCLAW2D_TIME_SYNC_RESET_ALL;
 
+	int reset_mode = tstype->reset_mode;
 	int coarse_level = tstype->coarse_level;
 
-	if (fine_to_coarse)
-	{
-		/* This_patch is the coarse patch;  Reset registers at the c/f interface */
-		fclaw2d_patch_time_sync_reset_f2c(glob,this_patch,coarse_level);
-	}
-	else if (samesize)
-	{
-		fclaw2d_patch_time_sync_reset_samesize(glob,this_patch);		
-	}
+	fclaw2d_patch_time_sync_reset(glob,this_patch,coarse_level,reset_mode);
+
 }
 
 static
@@ -144,7 +135,7 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 	if (minlevel == fclaw_opt->minlevel)
 	{
 		/* Clear registers at coarsest level */
-		// fclaw2d_time_sync_reset(glob, level, level+1, 1);		
+		// time_sync_reset(glob, minlevel, FCLAW2D_TIME_SYNC_RESET_LEVEL);		
 	}
 }
 

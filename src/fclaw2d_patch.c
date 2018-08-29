@@ -670,26 +670,17 @@ void fclaw2d_patch_time_sync_samesize(fclaw2d_global_t* glob,
 							transform_data);    
 }
 
-void fclaw2d_patch_time_sync_reset_f2c(fclaw2d_global_t* glob,
-                                       fclaw2d_patch_t* this_patch,
-                                       int coarse_level)
+void fclaw2d_patch_time_sync_reset(fclaw2d_global_t* glob,
+                                   fclaw2d_patch_t* this_patch,
+                                   int coarse_level,
+                                   int reset_mode)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-	FCLAW_ASSERT(patch_vt->time_sync_reset_f2c != NULL);
+	FCLAW_ASSERT(patch_vt->time_sync_reset != NULL);
 
-	patch_vt->time_sync_reset_f2c(glob,this_patch,coarse_level);
+	patch_vt->time_sync_reset(glob,this_patch,coarse_level, reset_mode);
 
 }
-
-void fclaw2d_patch_time_sync_reset_samesize(fclaw2d_global_t* glob, 
-                                            fclaw2d_patch_t* this_patch)
-{
-	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-	FCLAW_ASSERT(patch_vt->time_sync_reset_f2c != NULL);
-
-	patch_vt->time_sync_reset_samesize(glob,this_patch); /* Call a clawpatch routine */
-}
-
 
 /* ----------------------------------- Virtual table ---------------------------------- */
 

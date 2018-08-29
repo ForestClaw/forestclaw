@@ -42,13 +42,14 @@ typedef enum fclaw2d_time_sync_type
 {
     FCLAW2D_TIME_SYNC_RESET_F2C = 1,  /* Reset registers at c/f boundaries */
     FCLAW2D_TIME_SYNC_RESET_SAMESIZE, /* Reset registers between same size grids */
-    FCLAW2D_TIME_SYNC_RESET_ALL       /* Reset all registers on grids at given level */
+    FCLAW2D_TIME_SYNC_RESET_LEVEL       /* Reset all registers on grids at given level */
 } fclaw2d_time_sync_type_t;
 
 typedef struct fclaw2d_time_sync_info
 {
     fclaw2d_time_sync_type_t reset_mode;
     int coarse_level;
+    int minlevel;
 } fclaw2d_time_sync_info_t;
 
 void fclaw2d_time_sync(struct fclaw2d_global *glob, int minlevel, int maxlevel);

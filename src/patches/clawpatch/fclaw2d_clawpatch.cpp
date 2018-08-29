@@ -1021,9 +1021,12 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 
 	/* Conservation */
 	patch_vt->time_sync_fine_to_coarse   = fclaw2d_clawpatch_time_sync_f2c;
-	patch_vt->time_sync_samesize         = fclaw2d_clawpatch_time_sync_samesize;	
+	patch_vt->time_sync_samesize         = fclaw2d_clawpatch_time_sync_samesize;
+	patch_vt->time_sync_reset            = fclaw2d_clawpatch_time_sync_reset;
+#if 0		
 	patch_vt->time_sync_reset_f2c        = fclaw2d_clawpatch_time_sync_reset_f2c;
 	patch_vt->time_sync_reset_samesize   = fclaw2d_clawpatch_time_sync_reset_samesize;	
+#endif	
 
 	/* Transform functions (defined in forestclaw2d */
 	patch_vt->transform_init_data    = fclaw2d_clawpatch_transform_init_data;

@@ -325,12 +325,19 @@ void fclaw2d_patch_time_sync_samesize(struct fclaw2d_global* glob,
                                       struct fclaw2d_patch_transform_data *transform_data);
 
 
+void fclaw2d_patch_time_sync_reset(struct fclaw2d_global* glob,
+                                   struct fclaw2d_patch* this_patch,
+                                   int coarse_level,
+                                   int reset_mode);
+
+#if 0
 void fclaw2d_patch_time_sync_reset_f2c(struct fclaw2d_global* glob,
                                        struct fclaw2d_patch *patch,
                                        int coarse_level);
 
 void fclaw2d_patch_time_sync_reset_samesize(struct fclaw2d_global* glob, 
                                             struct fclaw2d_patch *patch);
+#endif                                            
 
 /* ------------------------------ Misc access functions ------------------------------- */
 void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
@@ -573,6 +580,11 @@ typedef void (*fclaw2d_patch_time_sync_samesize_t)(struct fclaw2d_global* glob,
                                                    struct fclaw2d_patch_transform_data 
                                                    *transform_data);
 
+typedef void (*fclaw2d_patch_time_sync_reset_t)(struct fclaw2d_global *glob, 
+                                                struct fclaw2d_patch *this_patch,
+                                                int coarse_level,
+                                                int reset_mode);
+
 typedef void (*fclaw2d_patch_time_sync_reset_f2c_t)(struct fclaw2d_global *glob, 
                                                     struct fclaw2d_patch *this_patch,
                                                     int coarse_level);
@@ -617,8 +629,7 @@ struct fclaw2d_patch_vtable
 	/* Time syncing functions */
 	fclaw2d_patch_time_sync_f2c_t             time_sync_fine_to_coarse;
 	fclaw2d_patch_time_sync_samesize_t        time_sync_samesize;
-	fclaw2d_patch_time_sync_reset_f2c_t       time_sync_reset_f2c;
-	fclaw2d_patch_time_sync_reset_samesize_t  time_sync_reset_samesize;
+	fclaw2d_patch_time_sync_reset_t           time_sync_reset;
 
 	/* ghost filling functions */
 	fclaw2d_patch_copy_face_t             copy_face;
