@@ -122,7 +122,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
 		}
 		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_SAMESIZE)
 		{
-			reset_flux = (pdata->face_neighbors[k] == FCLAW2D_PATCH_SAMESIZE) ||   
+			reset_flux = (pdata->face_neighbors[k] == FCLAW2D_PATCH_SAMESIZE) &&   
 			      (this_patch->level == coarse_level);
 		}
 		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_LEVEL)
