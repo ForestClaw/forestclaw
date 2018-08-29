@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_time_sync.h>
 
 #include <fclaw2d_global.h>
-// #include <fclaw2d_vtable.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_options.h>
@@ -97,13 +96,12 @@ void fine2coarse(fclaw2d_global_t *glob,
 				fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
 	fclaw2d_exchange_info_t e_info;
-	e_info.exchange_type = FCLAW2D_TIME_SYNC_FINE_TO_COARSE;
+	e_info.exchange_type = FCLAW2D_TIME_SYNC_F2C;
 	e_info.grid_type = FCLAW2D_IS_COARSE;
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
-	fclaw2d_global_iterate_level(glob, level, cb_face_fill,
-	                                &e_info);
+	fclaw2d_global_iterate_level(glob, level, cb_face_fill, &e_info);
 }
 
 static
@@ -135,13 +133,13 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 			fine2coarse(glob,level,
 			            read_parallel_patches,ghost_mode);
 
-			/* clear registers on finer level.  What happens to the coarser level? */
+			/* Clear registers at coarse/fine interface */
 			time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_F2C);
 		}
 	}
 	for(level = fclaw_opt->maxlevel; level >= minlevel; level--)
 	{
-		/* Clear registers at physical level;  These should never used
+		/* Clear registers at physical level;  These are not used
      	   in sychronization, but will accumulate throughout simulation.  */
 		time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_PHYS);		
 	}

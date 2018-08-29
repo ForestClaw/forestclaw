@@ -213,7 +213,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 	int average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
 	int interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
 
-	int time_sync_fine_to_coarse = filltype->exchange_type == FCLAW2D_TIME_SYNC_FINE_TO_COARSE;
+	int time_sync_fine_to_coarse = filltype->exchange_type == FCLAW2D_TIME_SYNC_F2C;
 	int time_sync_samesize = filltype->exchange_type == FCLAW2D_TIME_SYNC_SAMESIZE;
 
 	const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
@@ -335,10 +335,10 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 						{
 							/* Add correction to coarse grid from fine grid 
 							   Question : Is this general enough? */
-							fclaw2d_patch_time_sync_fine_to_coarse(s->glob,coarse_patch,
-																   fine_patch,idir,igrid,
-																   iface,time_interp,
-																   &transform_data);
+							fclaw2d_patch_time_sync_f2c(s->glob,coarse_patch,
+							                            fine_patch,idir,igrid,
+							                            iface,time_interp,
+							                            &transform_data);
 						}
 						else if (interpolate_to_neighbor && !remote_neighbor)
 						{

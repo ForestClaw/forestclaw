@@ -638,21 +638,21 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
 
 /* We need to virtualize this because we call it from fclaw2d_face_neighbors */
 
-void fclaw2d_patch_time_sync_fine_to_coarse(fclaw2d_global_t* glob,
-											fclaw2d_patch_t *coarse_patch,
-											fclaw2d_patch_t *fine_patch,
-											int idir,
-											int igrid,
-											int iface_coarse,
-											int time_interp,
-											fclaw2d_patch_transform_data_t* transform_data)
+void fclaw2d_patch_time_sync_f2c(fclaw2d_global_t* glob,
+								 fclaw2d_patch_t *coarse_patch,
+								 fclaw2d_patch_t *fine_patch,
+								 int idir,
+								 int igrid,
+								 int iface_coarse,
+								 int time_interp,
+								 fclaw2d_patch_transform_data_t* transform_data)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-	FCLAW_ASSERT(patch_vt->time_sync_fine_to_coarse != NULL);
+	FCLAW_ASSERT(patch_vt->time_sync_f2c != NULL);
 
-	patch_vt->time_sync_fine_to_coarse(glob,coarse_patch,fine_patch,idir,
-									   igrid,iface_coarse,time_interp,
-									   transform_data);    
+	patch_vt->time_sync_f2c(glob,coarse_patch,fine_patch,idir,
+	                        igrid,iface_coarse,time_interp,
+	                        transform_data);    
 }
 
 /* Correct for metric discontinuities at block boundaries */
@@ -703,8 +703,8 @@ void fclaw2d_patch_vtable_initialize()
 	patch_vt->physical_bc         = NULL;
 	patch_vt->single_step_update  = NULL;
 
-	patch_vt->time_sync_fine_to_coarse = NULL;
-	patch_vt->time_sync_samesize    = NULL;
+	patch_vt->time_sync_f2c       = NULL;
+	patch_vt->time_sync_samesize  = NULL;
 
 	/* These are optional */
 	patch_vt->setup               = NULL;

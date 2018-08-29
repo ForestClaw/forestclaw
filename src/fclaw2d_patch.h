@@ -309,14 +309,14 @@ size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
 
 
 /* ------------------------------ Time syncing funtions ------------------------------- */
-void fclaw2d_patch_time_sync_fine_to_coarse(struct fclaw2d_global* glob,
-											struct fclaw2d_patch *coarse_patch,
-											struct fclaw2d_patch *fine_patch,
-											int idir,
-											int igrid,
-											int iface_coarse,
-											int time_interp,
-											struct fclaw2d_patch_transform_data* transform_data);
+void fclaw2d_patch_time_sync_f2c(struct fclaw2d_global* glob,
+								 struct fclaw2d_patch *coarse_patch,
+								 struct fclaw2d_patch *fine_patch,
+								 int idir,
+								 int igrid,
+								 int iface_coarse,
+								 int time_interp,
+								 struct fclaw2d_patch_transform_data* transform_data);
 
 void fclaw2d_patch_time_sync_samesize(struct fclaw2d_global* glob,
                                       struct fclaw2d_patch *this_patch,
@@ -627,7 +627,7 @@ struct fclaw2d_patch_vtable
 	fclaw2d_patch_interpolate2fine_t      interpolate2fine;
 
 	/* Time syncing functions */
-	fclaw2d_patch_time_sync_f2c_t             time_sync_fine_to_coarse;
+	fclaw2d_patch_time_sync_f2c_t             time_sync_f2c;
 	fclaw2d_patch_time_sync_samesize_t        time_sync_samesize;
 	fclaw2d_patch_time_sync_reset_t           time_sync_reset;
 
