@@ -251,6 +251,8 @@ c     # This should be refratio*refratio.
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
 
+      integer a(2,2), ainv(2,2), d, f(2), iff, jff
+
       logical is_valid_average, skip_this_grid
 
 
@@ -261,7 +263,6 @@ c     # This should be refratio*refratio.
      &         '  Refratio**2 is not equal to rr2'
          stop
       endif
-
 
 c    # Visit each fine grid face and fill in correction term into
 c    # qfine_dummy. We don't really know which face corresponds
@@ -278,7 +279,7 @@ c    # fine grid correction for the coarse grid.
      
             deltap = (fpfine1(jj1,mq) + fpfine1(jj2,mq)) -
      &               (eff1(jj1,mq,1) + eff1(jj2,mq,1))
-
+             
 c           # Put the same value in four ghost cells;  grab the first
 c           # one that shows up in the transformation.          
             do jj = jj1,jj2
@@ -306,7 +307,6 @@ c           # one that shows up in the transformation.
             enddo
          enddo
       enddo
-
 
 c     # Add corrections from above to coarse grid.  Use transforms to get
 c     # correct location.
@@ -417,7 +417,7 @@ c    # -----------------------------------------------------------------
      &                                          efneighbor1, 
      &                                          efneighbor2, 
      &                                          efneighbor3,
-     &                                          mask, qneighbor_dummy,
+     &                                          mask, qthis_dummy,
      &                                          transform_cptr)
 
       implicit none
@@ -427,7 +427,7 @@ c    # -----------------------------------------------------------------
 
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      double precision qneighbor_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qthis_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer mask(1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision area0(my), area1(my), area2(mx), area3(mx)
@@ -457,6 +457,8 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
 
 
       double precision delta, deltap, deltam, area
+c      integer a(2,2), ainv(2,2), f(2), d, icn, jcn, ic, jc
+      double precision fp,fm,gp,gm,ef
 
       double precision neighborval
 
@@ -466,23 +468,55 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       integer i,j,mq
       integer i1,j1, i2, j2
 
+
+
+c     # Build transform needed to transform fine grid coordinates to 
+c     # a coarse grid.  Transform takes the form
+c     # 
+c     #       Tc(ic,jc) := A*[ic;jc] + F = [iff; jff]
+c     # 
+c     # We then invert this to get 
+c     #
+c     #       Tc(iff;jff) := A^{-1}([iff;jff] - F)
+c     # 
+
+c      call build_transform_samesize(transform_cptr,a,f)
+c      d = a(1,1)*a(2,2) - a(1,2)*a(2,1)
+c      ainv(1,1) = a(2,2)/d
+c      ainv(1,2) = -a(1,2)/d
+c      ainv(2,1) = -a(2,1)/d
+c      ainv(2,2) = a(1,1)/d
+
       idir = this_iface/2
 
       do mq = 1,meqn
          do j = 1,my
-            deltam = fmneighbor0(j,mq) + efneighbor0(j,mq,1)
-            deltap = fpneighbor1(j,mq) - efneighbor1(j,mq,1)
+c            deltam = fmneighbor0(j,mq) + efneighbor0(j,mq,1)
+c            deltap = fpneighbor1(j,mq) - efneighbor1(j,mq,1)
 
-            qneighbor_dummy(0,j,mq)    = -deltam
-            qneighbor_dummy(mx+1,j,mq) = -deltap
+             qthis_dummy(0,j,mq)  = fmneighbor0(j,mq)
+             qthis_dummy(-1,j,mq) = efneighbor0(j,mq,1)
+
+             qthis_dummy(mx+1,j,mq) = fpneighbor1(j,mq)
+             qthis_dummy(mx+2,j,mq) = efneighbor1(j,mq,1)
+
+c            qneighbor_dummy(0,j,mq)    = -deltam
+c            qneighbor_dummy(mx+1,j,mq) = -deltap
          enddo
 
          do i = 1,mx
-            deltam = gmneighbor2(i,mq) + efneighbor2(i,mq,1)
-            deltap = gpneighbor3(i,mq) - efneighbor3(i,mq,1)
+c            deltam = gmneighbor2(i,mq) + efneighbor2(i,mq,1)
+c            deltap = gpneighbor3(i,mq) - efneighbor3(i,mq,1)
 
-            qneighbor_dummy(i,0,mq)    = -deltam
-            qneighbor_dummy(i,my+1,mq) = -deltap
+             qthis_dummy(i,0,mq)  = gmneighbor2(i,mq)
+             qthis_dummy(i,-1,mq) = efneighbor2(i,mq,1)
+
+             qthis_dummy(i,my+1,mq) = gpneighbor3(i,mq)
+             qthis_dummy(i,my+2,mq) = efneighbor3(i,mq,1)
+
+
+c            qneighbor_dummy(i,0,mq)    = -deltam
+c            qneighbor_dummy(i,my+1,mq) = -deltap
          enddo
       enddo
 
@@ -496,26 +530,37 @@ c     # 'qneighbor'
 c                 # Exchange at low side of 'this' grid in
 c                 # x-direction (idir == 0) 
                   j1 = j
-                  if (this_iface .eq. 0) then
-                     i1 = 1
-                  elseif (this_iface .eq. 1) then
-                     i1 = mx
-                  endif
-                  call fclaw2d_transform_face(i1,j1,i2,j2,
-     &                  transform_cptr)
+c                  if (this_iface .eq. 0) then
+c                     i1 = 1
+c                  elseif (this_iface .eq. 1) then
+c                     i1 = mx
+c                  endif
+c                  call fclaw2d_transform_face(i1,j1,i2,j2,
+c     &                  transform_cptr)
 
-                  neighborval = qneighbor_dummy(i2,j2,mq)
+c                  neighborval = qneighbor_dummy(i2,j2,mq)
+c                  neighborval = qthis_dummy(i1,j1,mq)
+
                   if (this_iface .eq. 0) then
-                     delta = neighborval  + fpthis0(j1,mq) 
+                      i1 = 1
+                      call fclaw2d_transform_face(i1,j1,i2,j2,
+     &                      transform_cptr)
+                      fp = qthis_dummy(i2,j2,mq)
+                      ef = qthis_dummy(i2+1,j2,mq)
+                      neighborval = -(fp-ef)
+                      delta = neighborval  + fpthis0(j1,mq) 
      &                             - efthis0(j1,mq,0)
-                     area = area0(j1)
+                      area = area0(j1)
                   else
-c                   # Coarse grid is left; fine grid is right                    
-c                    # efc1(0) is flux stored in the coarse grid 
-c                    # interior cell. 
-                     delta = neighborval + fmthis1(j1,mq) + 
+                      i1 = mx
+                      call fclaw2d_transform_face(i1,j1,i2,j2,
+     &                      transform_cptr)
+                      fm = qthis_dummy(i2,j2,mq)
+                      ef = qthis_dummy(i2-1,j2,mq)
+                      neighborval = -(fm+ef)
+                      delta = neighborval + fmthis1(j1,mq) + 
      &                             efthis1(j1,mq,0)
-                     area = area1(j1)
+                      area = area1(j1)
                   endif
                   qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area
               enddo
@@ -526,25 +571,38 @@ c                    # interior cell.
 c                 # Exchange at high side of 'this' grid in
 c                 # y-direction (idir == 1)
                   i1 = i
+c                  if (this_iface .eq. 2) then
+c                     j1 = 1
+c                  elseif (this_iface .eq. 3) then
+c                     j1 = my
+c                  endif
+c                  call fclaw2d_transform_face(i1,j1,i2,j2,
+c     &                  transform_cptr)
+c                  neighborval = qneighbor_dummy(i2,j2,mq)
+c                  neighborval = qthis_dummy(i1,j1,mq)
                   if (this_iface .eq. 2) then
-                     j1 = 1
-                  elseif (this_iface .eq. 3) then
-                     j1 = my
-                  endif
-                  call fclaw2d_transform_face(i1,j1,i2,j2,
-     &                  transform_cptr)
-                  neighborval = qneighbor_dummy(i2,j2,mq)
-                  if (this_iface .eq. 2) then
-c                    # Coarse is top grid  Fine grid is bottom grid; 
-c                    # efc2(0) is flux stored in the coarse grid 
-c                    # interior cell. 
-                     delta = neighborval + gpthis2(i1,mq) 
-     &                          - efthis2(i1,mq,0)
-                     area = area2(i1)
+                      j1 = 1
+                      call fclaw2d_transform_face(i1,j1,i2,j2,
+     &                      transform_cptr)
+c                      write(6,*) this_iface, i1, j1, i2, j2
+                      gp = qthis_dummy(i2,j2,mq)
+                      ef = qthis_dummy(i2,j2+1,mq)
+                      neighborval = -(gp-ef)
+                      delta = neighborval + gpthis2(i1,mq) 
+     &                           - efthis2(i1,mq,0)
+                      area = area2(i1)
                   else
-c                    # Coarse grid is bottom grid; fine is top grid   
-c                    # efc3(0) is flux stored in the coarse grid 
-c                    # interior cell.                   
+c                     # Coarse grid is bottom grid; fine is top grid   
+c                     # efc3(0) is flux stored in the coarse grid 
+c                     # interior cell.    
+                      j1 = my
+                      call fclaw2d_transform_face(i1,j1,i2,j2,
+     &                      transform_cptr)
+c                      write(6,*) this_iface, i1, j1, i2, j2
+                      gm = qthis_dummy(i2,j2,mq)
+                      ef = qthis_dummy(i2,j2-1,mq)
+                      neighborval = -(gm + ef)
+
                      delta = neighborval + gmthis3(i1,mq) + 
      &                            efthis3(i1,mq,0)
                      area = area3(i1)
@@ -570,4 +628,49 @@ c     # At least one of the above should be true.
 
 
       end
+
+
+      subroutine build_transform_samesize(transform_ptr,a,f)
+      implicit none
+
+      integer a(2,2)
+      integer*8 transform_ptr
+      integer f(2)
+      integer icn, jcn
+      integer i1,j1
+
+c     # Assume index mapping fclaw2d_transform_face has the
+c     # the form
+c     #
+c     #       T(ic,jc) = A*(ic,jc) + F = (icn,jcn)
+c     #
+c     # where (ic,jc) is the coarse grid index, and (icn,jcn)
+c     # is the neighbor grid index.
+c     #
+c     # We can recover coefficients A(2,2) with the following
+c     # calls to T.
+
+      i1 = 0
+      j1 = 0
+      call fclaw2d_transform_face(i1,j1,icn,jcn,
+     &      transform_ptr)
+      f(1) = icn
+      f(2) = jcn
+
+      i1 = 1
+      j1 = 0
+      call fclaw2d_transform_face(i1,j1,icn,jcn,
+     &      transform_ptr)
+      a(1,1) = icn - f(1)
+      a(2,1) = jcn - f(2)
+
+      i1 = 0
+      j1 = 1
+      call fclaw2d_transform_face(i1,j1,icn,jcn,
+     &      transform_ptr)
+      a(1,2) = icn - f(1)
+      a(2,2) = jcn - f(2)
+
+      end
+
 
