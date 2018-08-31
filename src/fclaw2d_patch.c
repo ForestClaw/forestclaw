@@ -388,7 +388,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
 
 
 
-/* -------------------------- Transform functions (typedefs) -------------------------- */
+/* -------------------------- Transform functions ------------------------------------- */
 
 void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
 									   struct fclaw2d_patch* patch,
@@ -400,8 +400,7 @@ void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
 	patch_vt->transform_init_data(glob,patch,blockno,patchno,ftransform);    
 }
 
-/* Confusing name;  but fclaw2d_patch_transform_face already used by 
-  p4est layer. */
+/* This is the transform at block faces.  */
 void fclaw2d_patch_transform_blockface(int faceno, int rfaceno,
 									   int ftransform[])
 {
@@ -410,6 +409,7 @@ void fclaw2d_patch_transform_blockface(int faceno, int rfaceno,
 	patch_vt->transform_face(faceno, rfaceno, ftransform);
 }
 
+/* Transform within a block, where we only have the identity transform */
 void fclaw2d_patch_transform_blockface_intra(int ftransform[])
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
@@ -667,7 +667,7 @@ void fclaw2d_patch_time_sync_samesize(fclaw2d_global_t* glob,
 	FCLAW_ASSERT(patch_vt->time_sync_samesize != NULL);
 
 	patch_vt->time_sync_samesize(glob,this_patch,neighbor_patch,iface,idir,
-							transform_data);    
+	                             transform_data);    
 }
 
 void fclaw2d_patch_time_sync_reset(fclaw2d_global_t* glob,
