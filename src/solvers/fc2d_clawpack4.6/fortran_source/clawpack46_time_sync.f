@@ -71,7 +71,10 @@ c              # Edge between ghost cell and interior cell
 c        # right side 0 = in; 1 = out
          do k = 0,1
             do m = 1,maux
+c              # Cell centered values                
                auxvec_center(m) = aux(mx+k,j,m)
+
+c              # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(mx+1,j,m)
             enddo
             do m = 1,meqn
@@ -91,7 +94,10 @@ c        # bottom side 0 = in; 1 = out
          idir = 1
          do k = 0,1
             do m = 1,maux
+c              # Cell centered values                
                auxvec_center(m) = aux(i,1-k,m)
+
+c              # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(i,1,m)
             enddo
             do m = 1,meqn
@@ -107,7 +113,10 @@ c        # bottom side 0 = in; 1 = out
 c        # Top side 0 = in; 1 = out
          do k = 0,1
             do m = 1,maux
+c              # Cell centered values                
                auxvec_center(m) = aux(i,my+k,m)
+
+c              # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(i,my+1,m)
             enddo
             do m = 1,meqn
@@ -129,7 +138,7 @@ c    # minus waves, scaled by dt*edge_length.  This scaling takes care
 c    # of any division by 2 or 4. 
 c    # -----------------------------------------------------------------
       subroutine clawpack46_time_sync_accumulate_waves(mx,my,
-     &                                                   mbc,meqn,
+     &                                                 mbc,meqn,
      &      dt, dx,dy, patchno,
      &      el0, el1, el2, el3,
      &      fp,fm,gp,gm,
@@ -400,6 +409,8 @@ c    # metric mismatches that can occur at block boundaries.
 c    # -----------------------------------------------------------------
       subroutine clawpack46_fort_time_sync_samesize(mx,my,mbc,meqn,
      &                                          idir, this_iface,
+     &                                          this_blockno, 
+     &                                          neighbor_blockno,
      &                                          area0, area1,
      &                                          area2, area3,
      &                                          qthis,
@@ -423,7 +434,7 @@ c    # -----------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn,idir,iface_coarse
-      integer this_iface
+      integer this_iface, this_blockno, neighbor_blockno
 
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -546,7 +557,9 @@ c                  neighborval = qthis_dummy(i1,j1,mq)
                       call fclaw2d_transform_face(i1,j1,i2,j2,
      &                      transform_cptr)
                       fp = qthis_dummy(i2,j2,mq)
-                      ef = qthis_dummy(i2+1,j2,mq)
+                      call fclaw2d_transform_face(i1+1,j1,i2,j2,
+     &                      transform_cptr)
+                      ef = qthis_dummy(i2,j2,mq)
                       neighborval = -(fp-ef)
                       delta = neighborval  + fpthis0(j1,mq) 
      &                             - efthis0(j1,mq,0)
@@ -556,11 +569,21 @@ c                  neighborval = qthis_dummy(i1,j1,mq)
                       call fclaw2d_transform_face(i1,j1,i2,j2,
      &                      transform_cptr)
                       fm = qthis_dummy(i2,j2,mq)
-                      ef = qthis_dummy(i2-1,j2,mq)
-                      neighborval = -(fm+ef)
+                      call fclaw2d_transform_face(i1-1,j1,i2,j2,
+     &                      transform_cptr)
+                      ef = qthis_dummy(i2,j2,mq)
+                      neighborval = -(fm+ef)   
                       delta = neighborval + fmthis1(j1,mq) + 
      &                             efthis1(j1,mq,0)
                       area = area1(j1)
+                      if (this_blockno .eq. 4 .and. 
+     &                    neighbor_blockno .eq. 3) then
+                          write(6,100) this_blockno, i1, j1, fm, ef, 
+     &                    neighborval, 
+     &                    fmthis1(j1,mq), efthis1(j1,mq,0), delta
+                      endif
+  100                 format(3I5,6F16.8)                   
+
                   endif
                   qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area
               enddo
@@ -586,7 +609,9 @@ c                  neighborval = qthis_dummy(i1,j1,mq)
      &                      transform_cptr)
 c                      write(6,*) this_iface, i1, j1, i2, j2
                       gp = qthis_dummy(i2,j2,mq)
-                      ef = qthis_dummy(i2,j2+1,mq)
+                      call fclaw2d_transform_face(i1,j1+1,i2,j2,
+     &                      transform_cptr)
+                      ef = qthis_dummy(i2,j2,mq)
                       neighborval = -(gp-ef)
                       delta = neighborval + gpthis2(i1,mq) 
      &                           - efthis2(i1,mq,0)
@@ -600,12 +625,21 @@ c                     # interior cell.
      &                      transform_cptr)
 c                      write(6,*) this_iface, i1, j1, i2, j2
                       gm = qthis_dummy(i2,j2,mq)
-                      ef = qthis_dummy(i2,j2-1,mq)
+                      call fclaw2d_transform_face(i1,j1-1,i2,j2,
+     &                      transform_cptr)
+                      ef = qthis_dummy(i2,j2,mq)
                       neighborval = -(gm + ef)
 
                      delta = neighborval + gmthis3(i1,mq) + 
      &                            efthis3(i1,mq,0)
                      area = area3(i1)
+                     if (this_blockno .eq. 3 .and. 
+     &                    neighbor_blockno .eq. 4) then
+                          write(6,100) this_blockno, i1, j1, 
+     &                    gm, ef, neighborval, 
+     &                    gmthis3(i1,mq), efthis3(i1,mq,0),delta
+                     endif
+
                   endif
                   qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area                 
               enddo
