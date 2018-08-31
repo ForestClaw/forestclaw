@@ -36,6 +36,8 @@ FCLAW_ARG_ENABLE([ash3d], [enable ash3d library and applications],
 FCLAW_ARG_ENABLE([clawpack], [Enable clawpack libraries 4.6 and 5.0 and applications],
                  [CLAWPACK])
 
+FCLAW_ARG_ENABLE([cudaclaw], [Enable cudaclaw library and application],
+                 [CUDACLAW])
 FCLAW_ARG_ENABLE([development], [Enable general applications under development],
                  [DEVELOPMENT])
 
