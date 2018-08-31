@@ -989,9 +989,9 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	patch_vt->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
 
 	/* Transform functions (defined in forestclaw2d */
-	patch_vt->transform_init_data    = fclaw2d_clawpatch_transform_init_data;
-	patch_vt->transform_face         = fclaw2d_patch_face_transformation;
-	patch_vt->transform_face_intra   = fclaw2d_patch_face_transformation_intra;
+	patch_vt->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
+	patch_vt->transform_face       = fclaw2d_clawpatch_face_transformation;       /* forestclaw2d.c */
+	patch_vt->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
 
 	/* Regridding  functions */
 	patch_vt->tag4refinement       = clawpatch_tag4refinement;

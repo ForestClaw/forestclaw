@@ -165,6 +165,8 @@ double* fclaw2d_clawpatch_get_error(struct fclaw2d_global* glob,
 
 size_t fclaw2d_clawpatch_size(struct fclaw2d_global *glob);
 
+
+/* These should be renamed to time_interp data */
 void fclaw2d_clawpatch_timesync_data(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* this_patch,
                                      int time_interp,

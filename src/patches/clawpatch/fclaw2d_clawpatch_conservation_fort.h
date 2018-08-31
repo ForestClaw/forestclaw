@@ -36,10 +36,14 @@ extern "C"
 #endif
 #endif
 
-#define CLAWPATCH_UPDATE_CONS_METRIC FCLAW_F77_FUNC(clawpatch_update_cons_metric, \
-                                                    CLAWPATCH_UPDATE_CONS_METRIC)
+#if 0
+/* To fix syntax highlighting below */
+#endif    
 
-void CLAWPATCH_UPDATE_CONS_METRIC(const int* mx,const int *my, const int* mbc, 
+#define CLAWPATCH_TIME_SYNC_SETUP FCLAW_F77_FUNC(clawpatch_time_sync_setup, \
+                                                 CLAWPATCH_TIME_SYNC_SETUP)
+
+void CLAWPATCH_TIME_SYNC_SETUP(const int* mx,const int *my, const int* mbc, 
                                   const double* dx, const double *dy,
                                   double area[], double edge_lengths[],
                                   double area0[], double area1[], 

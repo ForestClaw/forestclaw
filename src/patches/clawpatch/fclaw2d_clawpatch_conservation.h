@@ -59,6 +59,60 @@ struct fclaw2d_clawpatch_registers
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
+
+typedef void  (*clawpatch_fort_time_sync_f2c_t)(const int* mx,
+                        const int* my,
+                        const int *mbc,
+                        const int *meqn,
+                        const int* idir,
+                        const int* iface_coarse,
+                        double area0[], double area1[],
+                        double area2[], double area3[],
+                        double qcoarse[], 
+                        double fmcoarse0[], 
+                        double fpcoarse1[],
+                        double gmcoarse2[], 
+                        double gpcoarse3[],
+                        double fmfine0[], double fpfine1[],
+                        double gmfine2[], double gpfine3[],
+                        double efc0[], double efc1[],
+                        double efc2[], double efc3[],
+                        double eff0[], double eff1[],
+                        double eff2[], double eff3[],
+                        int maskfine[],
+                        double qfine_dummy[],
+                        struct fclaw2d_patch_transform_data** 
+                        transform_cptr);
+
+
+typedef void  (*clawpatch_fort_time_sync_samesize_t)(const int* mx,
+                                                     const int* my,
+                                                     const int *mbc,
+                                                     const int *meqn,
+                                                     const int* idir,
+                                                     const int* iface_coarse,
+                                                     const int* this_blockno,
+                                                     const int* neighbor_blockno,
+                                                     double area0[], double area1[],
+                                                     double area2[], double area3[],
+                                                     double qcoarse[], 
+                                                     double fmcoarse0[], 
+                                                     double fpcoarse1[],
+                                                     double gmcoarse2[], 
+                                                     double gpcoarse3[],
+                                                     double fmfine0[], double fpfine1[],
+                                                     double gmfine2[], double gpfine3[],
+                                                     double efc0[], double efc1[],
+                                                     double efc2[], double efc3[],
+                                                     double eff0[], double eff1[],
+                                                     double eff2[], double eff3[],
+                                                     int maskfine[],
+                                                     double qfine_dummy[],
+                                                     struct fclaw2d_patch_transform_data** 
+                                                     transform_cptr);
+
+
+
 void fclaw2d_clawpatch_time_sync_new(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* this_patch,
                                      int blockno,int patchno,

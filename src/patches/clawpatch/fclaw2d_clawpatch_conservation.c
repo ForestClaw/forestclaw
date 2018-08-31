@@ -209,12 +209,12 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_metric_scalar(glob,this_patch,
 									&area, &edgelengths,&curvature);
 
-	CLAWPATCH_UPDATE_CONS_METRIC(&mx,&my,&mbc,&dx,&dy,area,edgelengths,
-	                             cr->area[0],cr->area[1],
-	                             cr->area[2],cr->area[3],
-	                             cr->edgelengths[0],cr->edgelengths[1],
-	                             cr->edgelengths[2],cr->edgelengths[3],
-	                             &fclaw_opt->manifold);
+	CLAWPATCH_TIME_SYNC_SETUP(&mx,&my,&mbc,&dx,&dy,area,edgelengths,
+	                          cr->area[0],cr->area[1],
+	                          cr->area[2],cr->area[3],
+	                          cr->edgelengths[0],cr->edgelengths[1],
+	                          cr->edgelengths[2],cr->edgelengths[3],
+	                          &fclaw_opt->manifold);
 }
 
 
@@ -344,6 +344,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
     {
     	/* Distribute 0.5 each correction from each side */
     	clawpatch_vt->fort_time_sync_samesize(&mx,&my,&mbc,&meqn,&idir,&this_iface,
+    	                                      &this_blockno, &neighbor_blockno,
     	                                      crthis->area[0], crthis->area[1], 
     	                                      crthis->area[2], crthis->area[3],
     	                                      qthis,
@@ -361,6 +362,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
     	                                      crneighbor->edge_fluxes[3],
     	                                      maskneighbor,qneighbor_dummy,
     	                                      &transform_data);
+    	fclaw_global_essentialf("\n\n");
     }
 	FCLAW_FREE(qneighbor_dummy);
 	FCLAW_FREE(maskneighbor);       
