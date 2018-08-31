@@ -1,8 +1,8 @@
-      subroutine clawpatch_update_cons_metric(mx,my,mbc,dx,dy,
-     &                                        area,edgelengths,
-     &                                        area0,area1,area2,area3,
-     &                                        el0, el1, el2, el3, 
-     &                                        manifold)
+      subroutine clawpatch_time_sync_setup(mx,my,mbc,dx,dy,
+     &                                     area,edgelengths,
+     &                                     area0,area1,area2,area3,
+     &                                     el0, el1, el2, el3, 
+     &                                     manifold)
 
 
       implicit none
