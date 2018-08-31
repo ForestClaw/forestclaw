@@ -48,6 +48,11 @@ void fclaw2d_clawpatch_transform_init_data(struct fclaw2d_global* glob,
                                            struct fclaw2d_patch_transform_data* transform);
 
 
+void fclaw2d_clawpatch_face_transformation (int faceno, int rfaceno, int ftransform[]);
+
+void fclaw2d_clawpatch_face_transformation_intra (int ftransform[]);
+
+
 /* ----------------------------- Called from Fortran ---------------------------------- */
 
 #define FCLAW2D_TRANSFORM_FACE FCLAW_F77_FUNC_(fclaw2d_transform_face, \
