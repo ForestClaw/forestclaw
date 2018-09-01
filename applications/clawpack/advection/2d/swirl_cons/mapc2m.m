@@ -1,9 +1,10 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
 map = 'nomap';
-map = 'cart';   % brick
-% map = 'fivepatch';
-map = 'bilinear';
+% map = 'cart';   % brick
+% map = 'flatpillow';
+map = 'fivepatch';
+% map = 'bilinear';
 
 % This domain should be in [0,2],[0,2]
 
@@ -15,7 +16,17 @@ switch map
         % This is what is stored in the fort.q files.
         xp = xc;
         yp = yc;
-        
+     
+    case 'flatpillow'
+        b = getblocknumber();
+        if b == 0
+            xp = xc;
+            yp = yc;
+        else
+            xp = -xc;
+        end
+        xp = xp + 1;
+                
     case 'cart'
         % (xc,yc) in [0,1]x[0,1]
         s = 0.005;
@@ -27,7 +38,7 @@ switch map
         yp = yp/2 + shift(2);
         
     case 'fivepatch'
-        alpha = 0.5;
+        alpha = 0.25;
         [xp,yp,~] = mapc2m_fivepatch(xc,yc,alpha);
         b = getblocknumber();
         s = 0.005;
