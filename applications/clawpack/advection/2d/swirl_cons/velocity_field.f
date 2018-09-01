@@ -4,7 +4,7 @@
       double precision xc,yc,u,v
 
       double precision s, pi
-      double precision xp,yp,zp
+      double precision xp,yp,zp, r, th
       integer example
 
       common /compi/ pi
@@ -24,12 +24,12 @@ c        # Conservative for all solvers (rp=1,2,3,4)
       elseif (example .eq. 2) then
          u = s*(cos(pi*xc)**2 - 0.5d0)
          v = s*(sin(pi*yc)**2 - 0.5d0)
-      else if (example .ge. 3) then
-c         u = 1.d0
-        u = s*(cos(pi*xc)**2 + 0.5d0)
+      else if (example .ge. 3) then         
+c         u = -1
+         u = s*(cos(pi*yc)**2 + 0.5d0)
 
-c         v = 0.0d0
-         v = s*(sin(pi*yc)**2 + 0.5d0)
+         v = 0
+c        v = -s*(sin(pi*xc)**2 + 0.5d0)
 
       else
          write(6,'(A,A)') 'clawpack46_setaux : ',

@@ -78,8 +78,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
 
     case 3:
         /* bilinear square domain */
-        conn = p4est_connectivity_new_brick (2,2,a,b);
-        brick = fclaw2d_map_new_brick(conn,2,2);
+        conn = p4est_connectivity_new_brick (mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_bilinear (brick, fclaw_opt->scale,fclaw_opt->shift,
                                           rotate,user->center);
         break;

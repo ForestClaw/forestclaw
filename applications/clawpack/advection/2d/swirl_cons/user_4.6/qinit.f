@@ -14,6 +14,8 @@
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
+      integer ii,jj
+
       double precision pi
       integer example
 
@@ -44,16 +46,23 @@
                           xp = xc
                           yp = yc
                       endif
-                     dxc = 0.25d0
-                     xm = 0.5-dxc/2
-                     ym = 0.5-dxc/2
-                     w = dxc/2.d0
-                     q(i,j,mq) = 0
-                     if (mod(blockno,2) .eq. 0) then
-                         if (abs(xc-0.75d0) .le. 0.25) then
-                             q(i,j,mq) = 1
-                         endif
-                     endif
+                      dxc = 1.d0/8.d0
+                      xm = 0.25
+                      ym = 0.25
+                      w = dxc/2.d0
+                      q(i,j,mq) = 0                     
+                      if (blockno .eq.2) then
+                           do jj=7,8
+                               do ii=1,2
+                                  q(ii,jj,1) = 1.d0
+                               enddo
+                           enddo
+                      endif
+                      if (blockno .eq. 1) then
+                           do ii=5,7
+c                               q(ii,my,1) = 1.d0
+                           enddo
+                      endif
                   endif
               enddo
           enddo

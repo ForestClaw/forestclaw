@@ -8,6 +8,9 @@
 
       integer i, j
       double precision xc,yc,u,v
+      integer blockno, fc2d_clawpack46_get_block
+
+      blockno = fc2d_clawpack46_get_block()
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc

@@ -78,7 +78,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
             break;
 
         case 1: /* Cart */
-        case 2: /* Fivepatch */
+        case 2: /* fivepatch */
         case 3: /* bilinear */
             clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
             clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
@@ -94,54 +94,10 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
                     clawopt->use_fwaves = 1;
                     clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
             }
-
-
             break;
     }
 
     clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
-    clawpack46_vt->fort_setaux    = CLAWPACK46_SETAUX;
-    // clawpack46_vt->fort_rpt2      = RPT2CONS;
-
-#if 0    
-    switch(user->rp_solver)
-    {
-        case 1:
-            if (user->mapping == 0)
-            {
-                clawpack46_vt->fort_rpn2      = &RPN2CONS_QS; 
-            }
-            else
-            {
-                clawpack46_vt->fort_rpn2      = &RPN2CONS_QS_MANIFOLD; 
-            }
-            break; 
-
-        case 2:
-            clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
-            break; 
-
-        case 3:
-            if (user->mapping == 0)
-            {
-                clawpack46_vt->fort_rpn2      = &RPN2CONS_EC;                 
-            }
-            else
-            {
-                clawpack46_vt->fort_rpn2      = &RPN2CONS_EC_MANIFOLD;                                 
-            }
-            break;
-
-        case 4:
-            clawopt->use_fwaves = 1;
-            if (user_mapping == 0)
-            {
-                clawpack46_vt->fort_rpn2      = RPN2CONS_FW; 
-
-            }
-            break;
-    }
-#endif    
  }
 
 void swirlcons_problem_setup(fclaw2d_global_t* glob)
@@ -182,20 +138,23 @@ void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
-    if (user->mapping == 0)
+    switch(user->mapping)
     {
-        int maxmx, maxmy;
-        maxmx = mx;
-        maxmy = my;
-        CLAWPACK46_SETAUX(&maxmx, &maxmy, &mbc,&mx,&my,&xlower,&ylower,
-                          &dx,&dy,&maux,aux);
-    }
-    else 
-    {
-        CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                                   &dx,&dy,&maux,aux,&this_block_idx,
-                                   xp,yp,zp,area,
-                                   edgelengths,xnormals,ynormals,surfnormals);
+        case 0:  /* No map */
+            int maxmx, maxmy;
+            maxmx = mx;
+            maxmy = my;
+            CLAWPACK46_SETAUX(&maxmx, &maxmy, &mbc,&mx,&my,&xlower,&ylower,
+                              &dx,&dy,&maux,aux);
+            break;
+        case 1: /* cart map */
+        case 2: /* fivepatch */
+        case 3: /* bilinear */
+            CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                                       &dx,&dy,&maux,aux,&this_block_idx,
+                                       xp,yp,zp,area,
+                                       edgelengths,xnormals,ynormals,surfnormals);
+            break;
     }
 }
 
