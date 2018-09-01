@@ -362,7 +362,6 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
     	                                      crneighbor->edge_fluxes[3],
     	                                      maskneighbor,qneighbor_dummy,
     	                                      &transform_data);
-    	fclaw_global_essentialf("\n\n");
     }
 	FCLAW_FREE(qneighbor_dummy);
 	FCLAW_FREE(maskneighbor);       
