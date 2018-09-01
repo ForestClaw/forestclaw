@@ -208,11 +208,12 @@ c    # -----------------------------------------------------------------
      &                                          area0, area1,
      &                                          area2, area3,
      &                                          qcoarse,
-     &                                          fpcoarse0,fmcoarse1,
-     &                                          gpcoarse2,gmcoarse3,
+     &                                          fpthis0,fmthis1,
+     &                                          gpthis2,gmthis3,
      &                                          fmfine0, fpfine1,
      &                                          gmfine2, gpfine3,
-     &                                          efc0, efc1, efc2, efc3,
+     &                                          efthis0, efthis1, 
+     &                                          efthis2, efthis3,
      &                                          eff0, eff1, eff2, eff3,
      &                                          maskfine, qfine_dummy,
      &                                          transform_cptr)
@@ -223,15 +224,18 @@ c    # -----------------------------------------------------------------
 
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      double precision qfine_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+c     # Double number of ghost cells so they map to whole coarse
+c     # grid cells      
+      double precision qfine_dummy(1-2*mbc:mx+2*mbc,
+     &                              1-2*mbc:my+2*mbc,meqn)
       integer maskfine(1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision area0(my), area1(my), area2(mx), area3(mx)
 
-      double precision fpcoarse0(my,meqn)
-      double precision fmcoarse1(my,meqn)
-      double precision gpcoarse2(mx,meqn)
-      double precision gmcoarse3(mx,meqn)
+      double precision fpthis0(my,meqn)
+      double precision fmthis1(my,meqn)
+      double precision gpthis2(mx,meqn)
+      double precision gmthis3(mx,meqn)
 
       double precision fmfine0(my,meqn)
       double precision fpfine1(my,meqn)
@@ -243,26 +247,33 @@ c    # -----------------------------------------------------------------
       double precision eff2(mx,meqn,0:1)
       double precision eff3(mx,meqn,0:1)
 
-      double precision efc0(my,meqn,0:1)
-      double precision efc1(my,meqn,0:1)
-      double precision efc2(mx,meqn,0:1)
-      double precision efc3(mx,meqn,0:1)
+      double precision efthis0(my,meqn,0:1)
+      double precision efthis1(my,meqn,0:1)
+      double precision efthis2(mx,meqn,0:1)
+      double precision efthis3(mx,meqn,0:1)
 
       integer*8 transform_cptr
 
-      integer i,j,ii1,ii2,jj1,jj2,ii,jj, m, mq
+      integer i,j,ii1,ii2,jj1,jj2,ii,jj,m, mq
       integer ic,jc, r2, refratio
-      double precision deltam,deltap, deltac, sum,areac, fineval
+      double precision deltac, areac
       logical is_valid_correct
+
+      double precision fm,fp,gm,gp,ef
 
 c     # This should be refratio*refratio.
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
 
-      integer a(2,2), ainv(2,2), d, f(2), iff, jff
+
+      integer a(2,2), f(2), sc
 
       logical is_valid_average, skip_this_grid
+
+      call build_transform(transform_cptr,a,f)
+c      write(6,*) a(1,1), a(1,2), a(2,1), a(2,2)
+
 
 
       refratio = 2
@@ -281,124 +292,169 @@ c    # fine grid correction for the coarse grid.
 
       do mq = 1,meqn
          do j = 1,my/2
-            jj1 = 2*(j-1) + 1     !! indexing starts at 1
+            jj1 = 2*(j-1) + 1
             jj2 = 2*(j-1) + 2
-            deltam = fmfine0(jj1,mq) + fmfine0(jj2,mq) +
-     &               eff0(jj1,mq,1) + eff0(jj2,mq,1)
-     
-            deltap = (fpfine1(jj1,mq) + fpfine1(jj2,mq)) -
-     &               (eff1(jj1,mq,1) + eff1(jj2,mq,1))
-             
-c           # Put the same value in four ghost cells;  grab the first
-c           # one that shows up in the transformation.          
+            fm = fmfine0(jj1,mq) + fmfine0(jj2,mq)
+            ef = eff0(jj1,mq,1) + eff0(jj2,mq,1)
             do jj = jj1,jj2
-               do ii = 1,mbc
-                  qfine_dummy(1-ii,jj,mq) = -deltam
-                  qfine_dummy(mx+ii,jj,mq) =-deltap
-               enddo
+                do ii = -1,0
+                    qfine_dummy(ii,jj,mq)  = fm
+                    qfine_dummy(ii-2,jj,mq) = ef
+                enddo
+            enddo
+     
+            fp = fpfine1(jj1,mq) + fpfine1(jj2,mq)
+            ef = eff1(jj1,mq,1) + eff1(jj2,mq,1)
+            do jj = jj1,jj2
+                do ii = 1,2
+                    qfine_dummy(mx+ii,jj,mq) = fp
+                    qfine_dummy(mx+ii+2,jj,mq) = ef
+                enddo
             enddo
          enddo
 
          do i = 1,mx/2
-            ii1 = 2*(i-1) + 1        !! indexing starts at 1
+            ii1 = 2*(i-1) + 1
             ii2 = 2*(i-1) + 2
-            deltam = gmfine2(ii1,mq) + gmfine2(ii2,mq) +
-     &               eff2(ii1,mq,1) + eff2(ii2,mq,1)
-
-            deltap = gpfine3(ii1,mq) + gpfine3(ii2,mq) -
-     &               (eff3(ii1,mq,1) + eff3(ii2,mq,1))
-
+            gm = gmfine2(ii1,mq) + gmfine2(ii2,mq)
+            ef = eff2(ii1,mq,1) + eff2(ii2,mq,1)
             do ii = ii1,ii2
-               do jj = 1,mbc
-                  qfine_dummy(ii,1-jj,mq) = -deltam
-                  qfine_dummy(ii,my+jj,mq) = -deltap
-               enddo
+                do jj = -1,0
+                    qfine_dummy(ii,jj,mq)  = gm
+                    qfine_dummy(ii,jj-2,mq) = ef
+                enddo
             enddo
+            gp = gpfine3(ii1,mq) + gpfine3(ii2,mq)
+            ef = eff3(ii1,mq,1) + eff3(ii2,mq,1)
+            do ii = ii1,ii2
+                do jj = 1,2
+                    qfine_dummy(ii,my+jj,mq) = gp
+                    qfine_dummy(ii,my+jj+2,mq) = ef
+                enddo
+            enddo
+
          enddo
       enddo
 
 c     # Add corrections from above to coarse grid.  Use transforms to get
 c     # correct location.
       if (idir .eq. 0) then
-         do mq = 1,meqn
-            do jc = 1,my
-              
-c              # Move this to beginning of routine.              
-               if (iface_coarse .eq. 0) then
-                  ic = 1
-               elseif (iface_coarse .eq. 1) then
-                  ic = mx
-               endif
-
-               call fclaw2d_transform_face_half(ic,jc,i2,j2,
-     &               transform_cptr)
-               skip_this_grid = .false.
-               do m = 0,r2-1
-                  if (.not. is_valid_correct(idir,i2(m),j2(m),mx,my))
-     &                  then
-                     skip_this_grid = .true.
-                     exit
-                  endif
-               enddo
-
-               if (.not. skip_this_grid) then
-                  fineval = qfine_dummy(i2(1),j2(1),mq)
+          sc = (a(1,1) + a(2,1))/2
+          do mq = 1,meqn
+              do jc = 1,my
                   if (iface_coarse .eq. 0) then
-c                    # Coarse grid is right; fine grid is left
-c                    # efc0(0) is flux stored in the coarse grid 
-c                    # interior cell. 
-                     deltac = fineval + fpcoarse0(jc,mq) - efc0(jc,mq,0)
-                     areac = area0(jc)
-                  else
-c                   # Coarse grid is left; fine grid is right                    
-c                    # efc1(0) is flux stored in the coarse grid 
-c                    # interior cell. 
-                     deltac = fineval + fmcoarse1(jc,mq) + efc1(jc,mq,0)
-                     areac = area1(jc)
-                  endif   
+                      ic = 1
+                      call fclaw2d_transform_face_half(ic,jc,i2,j2,
+     &                     transform_cptr)
+                      skip_this_grid = .false.
+                      do m = 0,r2-1
+                          if (.not. 
+     &                       is_valid_correct(idir,i2(m),j2(m),mx,my))
+     &                               then
+                              skip_this_grid = .true.
+                              exit
+                          endif
+                      enddo
+                      deltac = 0
+                      areac = area0(jc)
+                      if (.not. skip_this_grid) then
+                          fp = qfine_dummy(i2(0),j2(0),mq)
+                          call fclaw2d_transform_face_half(ic+1,jc,
+     &                         i2,j2,transform_cptr)
+c                         # Check for validity?                          
+                          ef = sc*qfine_dummy(i2(0),j2(0),mq)
+                          deltac = (ef-efthis0(jc,mq,0))-
+     &                            (fp-fpthis0(jc,mq))
+                      endif
+                  elseif (iface_coarse .eq. 1) then
+                      ic = mx
+                      call fclaw2d_transform_face_half(ic,jc,i2,j2,
+     &                      transform_cptr)
+                      skip_this_grid = .false.
+                      do m = 0,r2-1
+                          if (.not. 
+     &                       is_valid_correct(idir,i2(m),j2(m),mx,my))
+     &                              then
+                              skip_this_grid = .true.
+                              exit
+                          endif
+                      enddo
+                      deltac = 0
+                      areac = area1(jc)
+                      if (.not. skip_this_grid) then
+                          fm = qfine_dummy(i2(0),j2(0),mq)
+    
+                          call fclaw2d_transform_face_half(ic-1,jc,
+     &                          i2,j2,transform_cptr)
+                          ef = sc*qfine_dummy(i2(0),j2(0),mq)
+    
+                          deltac = (efthis1(jc,mq,0)-ef)-
+     &                             (fm-fmthis1(jc,mq))
+                      endif
+                  endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
-               endif
-            enddo
-         enddo
+              enddo
+          enddo
       else
-         do mq = 1,meqn
-            do ic = 1,mx
-               if (iface_coarse .eq. 2) then
-                  jc = 1
-               elseif (iface_coarse .eq. 3) then
-                  jc = my
-               endif
-
-               call fclaw2d_transform_face_half(ic,jc,i2,j2,
-     &               transform_cptr)
-               skip_this_grid = .false.
-               do m = 0,r2-1
-                  if (.not. is_valid_correct(idir,i2(m),j2(m),mx,my))
-     &                  then
-                     skip_this_grid = .true.
-                  endif
-               enddo
-               if (.not. skip_this_grid) then
-                  fineval = qfine_dummy(i2(1),j2(1),mq)
+          sc = (a(1,2) + a(2,2))/2
+          do mq = 1,meqn
+              do ic = 1,mx                  
                   if (iface_coarse .eq. 2) then
-c                    # Coarse is top grid  Fine grid is bottom grid; 
-c                    # efc2(0) is flux stored in the coarse grid 
-c                    # interior cell. 
-                     deltac = fineval + gpcoarse2(ic,mq) - efc2(ic,mq,0)
-                     areac = area2(ic)
-                  else
-c                    # Coarse grid is bottom grid; fine is top grid   
-c                    # efc3(0) is flux stored in the coarse grid 
-c                    # interior cell.                   
-                     deltac = fineval + gmcoarse3(ic,mq) + efc3(ic,mq,0)
-                     areac = area3(ic)
+                      jc = 1
+                      call fclaw2d_transform_face_half(ic,jc,i2,j2,
+     &                      transform_cptr)
+                      skip_this_grid = .false.
+                      do m = 0,r2-1
+                          if (.not. 
+     &                       is_valid_correct(idir,i2(m),j2(m),mx,my))
+     &                                then
+                              skip_this_grid = .true.
+                              exit
+                          endif
+                      enddo      
+                      deltac = 0
+                      areac = area2(ic)
+                      if (.not. skip_this_grid) then                
+                          gp = qfine_dummy(i2(0),j2(0),mq)
+                          call fclaw2d_transform_face_half(ic,jc+1,
+     &                         i2,j2,transform_cptr)
+                          ef = sc*qfine_dummy(i2(0),j2(0),mq)
+    
+                          deltac = (ef-efthis2(ic,mq,0))-
+     &                        (gp-gpthis2(ic,mq))
+                      endif
+                  else if (iface_coarse .eq. 3) then
+c                     # Coarse grid is bottom grid; fine is top grid   
+c                     # efc3(0) is flux stored in the coarse grid 
+c                     # interior cell.    
+                      jc = my
+                      call fclaw2d_transform_face_half(ic,jc,i2,j2,
+     &                      transform_cptr)
+                      skip_this_grid = .false.
+                      do m = 0,r2-1
+                          if (.not. 
+     &                       is_valid_correct(idir,i2(m),j2(m),mx,my))
+     &                            then
+                              skip_this_grid = .true.
+                              exit
+                          endif
+                      enddo   
+                      deltac = 0
+                      areac = area3(ic)
+                      if (.not. skip_this_grid) then                   
+                          gm = qfine_dummy(i2(0),j2(0),mq)
+                          call fclaw2d_transform_face_half(ic,jc-1,
+     &                          i2,j2,transform_cptr)
+                          ef = sc*qfine_dummy(i2(0),j2(0),mq)
+    
+                         deltac = (efthis3(ic,mq,0)-ef)-
+     &                            (gm-gmthis3(ic,mq))
+                      endif
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
-               endif                    !! skip grid loop
-            enddo
-         enddo
+              enddo
+          enddo
       endif
-
 
       end
 
