@@ -120,6 +120,8 @@ void CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES(int* mx, int* my, int* mbc, int* meqn
 void  CLAWPACK46_FORT_TIME_SYNC_F2C(const int* mx,const int* my,
 									const int *mbc,const int *meqn,
 									const int* idir,const int* iface_coarse,
+									const int* coarse_blockno, 
+									const int* fine_blockno,
 									double areac0[], double areac1[],
 									double areac2[], double areac3[],
 									double qcoarse[], 
@@ -131,7 +133,6 @@ void  CLAWPACK46_FORT_TIME_SYNC_F2C(const int* mx,const int* my,
 									double efc2[], double efc3[],
 									double eff0[], double eff1[],
 									double eff2[], double eff3[],
-									int maskfine[],
 									double qfine_dummy[],
 									struct fclaw2d_patch_transform_data** 
 									transform_cptr);
@@ -156,7 +157,6 @@ void  CLAWPACK46_FORT_TIME_SYNC_SAMESIZE(const int* mx,const int* my,
                                          double efc2[], double efc3[],
                                          double eff0[], double eff1[],
                                          double eff2[], double eff3[],
-                                         int maskfine[],
                                          double qfine_dummy[],
                                          struct fclaw2d_patch_transform_data** 
                                          transform_cptr);

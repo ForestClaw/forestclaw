@@ -215,7 +215,7 @@ c    # -----------------------------------------------------------------
      &                                          efthis0, efthis1, 
      &                                          efthis2, efthis3,
      &                                          eff0, eff1, eff2, eff3,
-     &                                          maskfine, qfine_dummy,
+     &                                          qfine_dummy,
      &                                          transform_cptr)
 
       implicit none
@@ -228,7 +228,6 @@ c     # Double number of ghost cells so they map to whole coarse
 c     # grid cells      
       double precision qfine_dummy(1-2*mbc:mx+2*mbc,
      &                              1-2*mbc:my+2*mbc,meqn)
-      integer maskfine(1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision area0(my), area1(my), area2(mx), area3(mx)
 
@@ -254,17 +253,13 @@ c     # grid cells
 
       integer*8 transform_cptr
 
-      integer i,j,ii1,ii2,jj1,jj2,ii,jj,m, mq
-      integer ic,jc, r2, refratio
-      double precision deltac, areac
       logical is_valid_correct
 
       double precision fm,fp,gm,gp,ef
 
-c     # This should be refratio*refratio.
-      integer rr2
-      parameter(rr2 = 4)
-      integer i2(0:rr2-1),j2(0:rr2-1)
+      integer i, j, ic, jc, ii1, ii2, jj1, jj2, ii, jj
+      integer i2(0:3), j2(0:3), m, mq
+      double precision deltac, areac
 
 
       integer a(2,2), f(2), sc
@@ -272,24 +267,10 @@ c     # This should be refratio*refratio.
       logical is_valid_average, skip_this_grid
 
       call build_transform(transform_cptr,a,f)
-c      write(6,*) a(1,1), a(1,2), a(2,1), a(2,2)
 
-
-
-      refratio = 2
-      r2 = refratio*refratio
-      if (r2 .ne. rr2) then
-         write(6,*) 'cons_coarse_correct ',
-     &         '  Refratio**2 is not equal to rr2'
-         stop
-      endif
-
-c    # Visit each fine grid face and fill in correction term into
-c    # qfine_dummy. We don't really know which face corresponds
-c    # to the common face shared between fine and coarse grids, so we
-c    # do them all.  Then use the transform to select correct the 
-c    # fine grid correction for the coarse grid.
-
+c     # We do not know which edge will be used, or how it will be used
+c     # so we fill in data at every edge.  Use double the number of 
+c     # ghost cells so that data aligns with coarse grid ghost cells.
       do mq = 1,meqn
          do j = 1,my/2
             jj1 = 2*(j-1) + 1
@@ -336,9 +317,10 @@ c    # fine grid correction for the coarse grid.
          enddo
       enddo
 
-c     # Add corrections from above to coarse grid.  Use transforms to get
-c     # correct location.
       if (idir .eq. 0) then
+c         # sign change ('sc') to account for normals at 0-1
+c         # patch faces which may point in a different direction.
+c         # First column is A*[1;0]        
           sc = (a(1,1) + a(2,1))/2
           do mq = 1,meqn
               do jc = 1,my
@@ -346,18 +328,9 @@ c     # correct location.
                       ic = 1
                       call fclaw2d_transform_face_half(ic,jc,i2,j2,
      &                     transform_cptr)
-                      skip_this_grid = .false.
-                      do m = 0,r2-1
-                          if (.not. 
-     &                       is_valid_correct(idir,i2(m),j2(m),mx,my))
-     &                               then
-                              skip_this_grid = .true.
-                              exit
-                          endif
-                      enddo
                       deltac = 0
                       areac = area0(jc)
-                      if (.not. skip_this_grid) then
+                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then
                           fp = qfine_dummy(i2(0),j2(0),mq)
                           call fclaw2d_transform_face_half(ic+1,jc,
      &                         i2,j2,transform_cptr)
@@ -370,18 +343,9 @@ c                         # Check for validity?
                       ic = mx
                       call fclaw2d_transform_face_half(ic,jc,i2,j2,
      &                      transform_cptr)
-                      skip_this_grid = .false.
-                      do m = 0,r2-1
-                          if (.not. 
-     &                       is_valid_correct(idir,i2(m),j2(m),mx,my))
-     &                              then
-                              skip_this_grid = .true.
-                              exit
-                          endif
-                      enddo
                       deltac = 0
                       areac = area1(jc)
-                      if (.not. skip_this_grid) then
+                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then
                           fm = qfine_dummy(i2(0),j2(0),mq)
     
                           call fclaw2d_transform_face_half(ic-1,jc,
@@ -396,6 +360,9 @@ c                         # Check for validity?
               enddo
           enddo
       else
+c         # sign change ('sc') to account for normals at 2-3 
+c         # patch faces which may point in a different direction.
+c         # Second column is A*[0;1]        
           sc = (a(1,2) + a(2,2))/2
           do mq = 1,meqn
               do ic = 1,mx                  
@@ -403,18 +370,9 @@ c                         # Check for validity?
                       jc = 1
                       call fclaw2d_transform_face_half(ic,jc,i2,j2,
      &                      transform_cptr)
-                      skip_this_grid = .false.
-                      do m = 0,r2-1
-                          if (.not. 
-     &                       is_valid_correct(idir,i2(m),j2(m),mx,my))
-     &                                then
-                              skip_this_grid = .true.
-                              exit
-                          endif
-                      enddo      
                       deltac = 0
                       areac = area2(ic)
-                      if (.not. skip_this_grid) then                
+                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then                
                           gp = qfine_dummy(i2(0),j2(0),mq)
                           call fclaw2d_transform_face_half(ic,jc+1,
      &                         i2,j2,transform_cptr)
@@ -424,24 +382,12 @@ c                         # Check for validity?
      &                        (gp-gpthis2(ic,mq))
                       endif
                   else if (iface_coarse .eq. 3) then
-c                     # Coarse grid is bottom grid; fine is top grid   
-c                     # efc3(0) is flux stored in the coarse grid 
-c                     # interior cell.    
                       jc = my
                       call fclaw2d_transform_face_half(ic,jc,i2,j2,
      &                      transform_cptr)
-                      skip_this_grid = .false.
-                      do m = 0,r2-1
-                          if (.not. 
-     &                       is_valid_correct(idir,i2(m),j2(m),mx,my))
-     &                            then
-                              skip_this_grid = .true.
-                              exit
-                          endif
-                      enddo   
                       deltac = 0
                       areac = area3(ic)
-                      if (.not. skip_this_grid) then                   
+                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then                   
                           gm = qfine_dummy(i2(0),j2(0),mq)
                           call fclaw2d_transform_face_half(ic,jc-1,
      &                          i2,j2,transform_cptr)
@@ -484,7 +430,7 @@ c    # -----------------------------------------------------------------
      &                                          efneighbor1, 
      &                                          efneighbor2, 
      &                                          efneighbor3,
-     &                                          mask, qthis_dummy,
+     &                                          qthis_dummy,
      &                                          transform_cptr)
 
       implicit none
@@ -495,7 +441,6 @@ c    # -----------------------------------------------------------------
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       double precision qthis_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      integer mask(1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision area0(my), area1(my), area2(mx), area3(mx)
 
@@ -638,6 +583,24 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
               enddo
           enddo
       endif
+      end
+
+      logical function skip_this_grid(idir,i2,j2,mx,my)
+      implicit none
+
+      integer idir, i2(0:3), j2(0:3), mx,my
+      integer m
+      logical is_valid_correct
+
+      skip_this_grid = .false.
+      do m = 0,3
+          if (.not. is_valid_correct(idir,i2(m),j2(m),mx,my)) then
+              skip_this_grid = .true.
+              exit
+          endif
+      enddo   
+
+
       end
 
 

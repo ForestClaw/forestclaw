@@ -259,11 +259,9 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 	           fclaw2d_clawpatch_get_registers(glob,fine_patch);
 
 	/* create dummy fine grid to handle indexing between blocks */
-	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
-	int *maskneighbor = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
+	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+4*mbc)*(my+4*mbc));
 
 	/* Include this for debugging */
-#if 0	
 	int coarse_blockno, coarse_patchno,globnum,level;
 	int fine_blockno, fine_patchno;
 
@@ -272,9 +270,9 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 
 	fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, 
 							&fine_patchno,&globnum,&level);
-#endif							
 
 	clawpatch_vt->fort_time_sync_f2c(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
+	                                 &coarse_blockno, &fine_blockno,
 									 crcoarse->area[0], crcoarse->area[1], 
 									 crcoarse->area[2], crcoarse->area[3],
 									 qcoarse,
@@ -290,12 +288,10 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 									 crfine->edge_fluxes[1],
 									 crfine->edge_fluxes[2],
 									 crfine->edge_fluxes[3],
-									 maskneighbor,qneighbor_dummy,
+									 qneighbor_dummy,
 									 &transform_data);
 
 	FCLAW_FREE(qneighbor_dummy);
-	FCLAW_FREE(maskneighbor);       
-
 }
 
 
@@ -329,7 +325,6 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 
 	/* create dummy fine grid to handle indexing between blocks */
 	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));
-	int *maskneighbor = FCLAW_ALLOC_ZERO(int,(mx+2*mbc)*(my+2*mbc));
 
 	/* Include this for debugging */
 	int this_blockno, this_patchno,globnum,level;
@@ -360,11 +355,10 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
     	                                      crneighbor->edge_fluxes[1],
     	                                      crneighbor->edge_fluxes[2],
     	                                      crneighbor->edge_fluxes[3],
-    	                                      maskneighbor,qneighbor_dummy,
+    	                                      qneighbor_dummy,
     	                                      &transform_data);
     }
 	FCLAW_FREE(qneighbor_dummy);
-	FCLAW_FREE(maskneighbor);       
 
 }
 
