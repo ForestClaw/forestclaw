@@ -25,11 +25,23 @@ c        # Conservative for all solvers (rp=1,2,3,4)
          u = s*(cos(pi*xc)**2 - 0.5d0)
          v = s*(sin(pi*yc)**2 - 0.5d0)
       else if (example .ge. 3) then         
-c         u = -1
-         u = s*(cos(pi*yc)**2 + 0.5d0)
+c         u = 1
+c         u = s*(sin(pi*yc)**2 + 0.5d0)
+c         u = s*sin(pi*yc)
 
-         v = 0
-c        v = -s*(sin(pi*xc)**2 + 0.5d0)
+c         v = 0
+c         v = -s*(sin(pi*xc)**2 + 0.5d0)
+c         v = s*sin(pi*xc)
+
+c         r = sqrt((x-0.5d0)**2 + (y-0.5d0)**2)
+
+c        # Rigid body rotation
+c        psi = r**2
+         u = 2*(yc-0.5)
+         v = -2*(xc-0.5)
+ 
+c        # Filament formation (negative for clockwise rotation)
+c         psi = (4.d0/3.d0)*r**3
 
       else
          write(6,'(A,A)') 'clawpack46_setaux : ',

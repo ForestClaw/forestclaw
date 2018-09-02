@@ -28,18 +28,18 @@
       endif
   
       dxc = 0.25d0
-      xm = 0.2d0
+      xm = 0.5d0
       ym = 0.5d0
       w = 0.3d0
-      wx = 0.1d0
-      wy = 0.35d0
-c      r2 = (xp-0.5d0)**2 + (yp-0.5d0)**2
-c      fdisc = r2 - 0.25**2
-      if (abs(xp-xm) .le. wx .and. abs(yp-ym) .le. wy) then      
-         fdisc = -1
-      else
-         fdisc = 1
-      endif
+      wx = 0.3d0
+      wy = 0.3d0
+      r2 = (xp-0.625d0)**2 + (yp-0.5d0)**2
+      fdisc = r2 - 0.05**2
+c      if (abs(xp-xm) .le. wx .and. abs(yp-ym) .le. wy) then      
+c         fdisc = -1
+c      else
+c         fdisc = 1
+c      endif
 
 
       end
