@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <clawpack46_user_fort.h>  
 #include <clawpack5_user_fort.h>
+#include <cudaclaw5_user_fort.h>
 
 #ifdef __cplusplus
 extern "C"
