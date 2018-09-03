@@ -13,7 +13,6 @@ include src/solvers/fc2d_clawpack5/Makefile.am
 
 ## examples
 include applications/clawpack/clawpack.apps
-include applications/cudaclaw/cudaclaw.apps
 
 endif
 
