@@ -84,6 +84,12 @@ P4EST_AS_SUBPACKAGE([FCLAW])
 AM_CONDITIONAL([FCLAW_DIST_DENY], [test "x$FCLAW_DIST_DENY" != x])
 AC_SUBST([FCLAW_DISTCLEAN])
 
+echo "o---------------------------------------"
+echo "| Checking CUDA"
+echo "o---------------------------------------"
+
+AX_CHECK_CUDA()
+
 # Print summary.
 AC_DEFINE_UNQUOTED(CPP,         ["${CPP}"],         [C preprocessor])
 AC_DEFINE_UNQUOTED(CPPFLAGS,    ["${CPPFLAGS}"],    [C preprocessor flags])
@@ -100,17 +106,20 @@ AC_DEFINE_UNQUOTED(FLIBS,       ["${FLIBS}"],       [Fortran libraries])
 echo "o----------------------------------"
 echo "| Results for ForestClaw are"
 echo "o----------------------------------"
-echo "| CPP:         $CPP"
-echo "| CPPFLAGS:    $CPPFLAGS"
-echo "| F77:         $F77"
-echo "| FFLAGS:      $FFLAGS"
-echo "| CC:          $CC"
-echo "| CFLAGS:      $CFLAGS"
-echo "| CXX:         $CXX"
-echo "| CXXFLAGS:    $CXXFLAGS"
-echo "| LDFLAGS:     $LDFLAGS"
-echo "| LIBS:        $LIBS"
-echo "| FLIBS:       $FLIBS"
+echo "| CPP:          $CPP"
+echo "| CPPFLAGS:     $CPPFLAGS"
+echo "| F77:          $F77"
+echo "| FFLAGS:       $FFLAGS"
+echo "| CC:           $CC"
+echo "| CFLAGS:       $CFLAGS"
+echo "| CXX:          $CXX"
+echo "| CXXFLAGS:     $CXXFLAGS"
+echo "| LDFLAGS:      $LDFLAGS"
+echo "| LIBS:         $LIBS"
+echo "| FLIBS:        $FLIBS"
+echo "| NVCC:         $NVCC"
+echo "| CUDA_LDFLAGS: $CUDA_LDFLAGS"
+echo "| CUDA_CFLAGS:  $CUDA_CFLAGS"
 echo "o----------------------------------"
 
 # Create output files.
