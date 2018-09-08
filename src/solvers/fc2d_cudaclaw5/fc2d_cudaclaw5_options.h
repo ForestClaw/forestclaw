@@ -80,9 +80,10 @@ fc2d_cudaclaw5_options_t* fc2d_cudaclaw5_get_options(struct fclaw2d_global *glob
 void fc2d_cudaclaw5_output(struct fclaw2d_global *glob, int iframe);
 
 
-#define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
-void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
-                    const int mthlim_in[], const int method_in[]);
+#define CUDACLAW5_SET_AMR_MODULE FCLAW_F77_FUNC(cudaclaw5_set_amr_module, \
+                                                CUDACLAW5_SET_AMR_MODULE)
+void CUDACLAW5_SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
+                              const int mthlim_in[], const int method_in[]);
 
 
 #ifdef __cplusplus

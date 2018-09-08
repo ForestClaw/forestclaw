@@ -9,8 +9,8 @@ libcudaclaw5_installed_headers = \
 libcudaclaw5_compiled_sources = \
 	src/solvers/fc2d_cudaclaw5/fc2d_cudaclaw5.cpp \
 	src/solvers/fc2d_cudaclaw5/fc2d_cudaclaw5_options.c \
-	src/solvers/fc2d_cudaclaw5/fortran_source/amr_module.f90 \
-	src/solvers/fc2d_cudaclaw5/fortran_source/set_amr_module.f90 \
+	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_amr_module.f90 \
+	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_set_amr_module.f90 \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_inlinelimiter.f \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_limiter.f \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_set_capacity.f \
@@ -18,8 +18,7 @@ libcudaclaw5_compiled_sources = \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_bc2_default.f \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_flux2.f \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_step2.f90 \
-	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_step2_wrap.f \
-	src/solvers/fc2d_cudaclaw5/fortran_source/philim.f
+	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_step2_wrap.f
 
 ## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_cudaclaw5/libcudaclaw5.la
