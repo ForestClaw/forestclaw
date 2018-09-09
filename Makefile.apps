@@ -1,8 +1,9 @@
-if FCLAW_ENABLE_CLAWPACK
 
 # --------------------------------------------
 # Clawpack 4.6 and 5.0 libraries and examples
 # --------------------------------------------
+
+if FCLAW_ENABLE_CLAWPACK
 
 ## Patches needed for Clawpack solvers
 include src/patches/clawpatch/Makefile.am
@@ -16,10 +17,11 @@ include applications/clawpack/clawpack.apps
 
 endif
 
-if FCLAW_ENABLE_DEVELOPMENT
+
 # ----------------------------------
 # Projects under development
 # ----------------------------------
+if FCLAW_ENABLE_DEVELOPMENT
 
 ## Patches needed for Clawpack solvers
 include src/patches/clawpatch/Makefile.am
@@ -35,11 +37,11 @@ endif
 
 
 
-if FCLAW_ENABLE_GEOCLAW
-
 # ----------------------------------
 # GeoClaw library and examples
 # ----------------------------------
+
+if FCLAW_ENABLE_GEOCLAW
 
 ## Patches needed for GeoClaw solvers
 include src/patches/clawpatch/Makefile.am
@@ -53,13 +55,13 @@ include applications/geoclaw/geoclaw.apps
 endif
 
 
-if FCLAW_ENABLE_ASH3D
-
 # ---------------------------------------------
 # Ash3d examples (requires submodule)
 # -- Uncomment Makefiles below to compile Ash3d
 # -- 
 # ---------------------------------------------
+
+if FCLAW_ENABLE_ASH3D
 
 ## Patches needed for Clawpack solvers
 #include src/patches/clawpatch/Makefile.am
@@ -72,11 +74,23 @@ if FCLAW_ENABLE_ASH3D
 
 endif
 
+# ----------------------------------
+# CudaClaw library and examples
+# ----------------------------------
 if FCLAW_ENABLE_CUDACLAW
 
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 include src/solvers/fc2d_cudaclaw5/Makefile.am
 
+include applications/clawpack/advection/2d/swirl/Makefile.am
+
+
 endif
+
 # Include examples that use the low-level interface to p4est
 # They should always compile
 
