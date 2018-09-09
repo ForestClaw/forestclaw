@@ -153,7 +153,11 @@ void fc2d_cudaclaw5_solver_initialize();
 
 fc2d_cudaclaw5_vtable_t* fc2d_cudaclaw5_vt();
 
-/* ----------------------------- User access to solver functions --------------------------- */
+/* ---------------------------------- CUDA functions ---------------------------------- */
+
+void cudaclaw5_test();
+
+/* ----------------------------- User access to solver functions ---------------------- */
 
 
 void fc2d_cudaclaw5_setprob(struct fclaw2d_global* glob);
