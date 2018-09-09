@@ -37,8 +37,8 @@ swirl_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                            "Clawpack_version (4 or 5) [5]");
 
-    sc_options_add_int (opt, 0, "cuda", &user->cuda, 5,
-                           "Use cudaclaw5 [0]");
+    sc_options_add_bool (opt, 0, "cuda", &user->cuda, 0,
+                           "Use cudaclaw5 [F]");
 
     user->is_registered = 1;
 

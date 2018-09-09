@@ -9,8 +9,8 @@ libclawpack5_installed_headers = \
 libclawpack5_compiled_sources = \
 	src/solvers/fc2d_clawpack5/fc2d_clawpack5.cpp \
 	src/solvers/fc2d_clawpack5/fc2d_clawpack5_options.c \
-	src/solvers/fc2d_clawpack5/fortran_source/amr_module.f90 \
-	src/solvers/fc2d_clawpack5/fortran_source/set_amr_module.f90 \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_amr_module.f90 \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_set_amr_module.f90 \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_inlinelimiter.f \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_limiter.f \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_set_capacity.f \
@@ -18,8 +18,7 @@ libclawpack5_compiled_sources = \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_bc2_default.f \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_flux2.f \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2.f90 \
-	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2_wrap.f \
-	src/solvers/fc2d_clawpack5/fortran_source/philim.f
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_step2_wrap.f
 
 ## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_clawpack5/libclawpack5.la

@@ -1,4 +1,4 @@
-module amr_module
+module clawpack5_amr_module
 
     implicit none
        
@@ -185,4 +185,4 @@ module amr_module
     character(len=200) :: rstfile
     logical :: check_a
 
-end module amr_module
+end module clawpack5_amr_module

@@ -27,9 +27,6 @@ FCLAW_ARG_ENABLE([debug], [Enable debug mode (assertions and extra checks)],
 FCLAW_ARG_ENABLE([geoclaw], [Enable geoclaw library and applications],
                  [GEOCLAW])
 
-FCLAW_ARG_ENABLE([geoclaw_development], [Enable Geoclaw applications under development],
-                 [GEOCLAW_DEVELOPMENT])
-
 FCLAW_ARG_ENABLE([ash3d], [enable ash3d library and applications],
                  [ASH3D])
 
@@ -38,6 +35,7 @@ FCLAW_ARG_ENABLE([clawpack], [Enable clawpack libraries 4.6 and 5.0 and applicat
 
 FCLAW_ARG_ENABLE([cudaclaw], [Enable cudaclaw library and application],
                  [CUDACLAW])
+
 FCLAW_ARG_ENABLE([development], [Enable general applications under development],
                  [DEVELOPMENT])
 
@@ -96,6 +94,7 @@ AC_DEFINE_UNQUOTED(CPPFLAGS,    ["${CPPFLAGS}"],    [C preprocessor flags])
 AC_DEFINE_UNQUOTED(F77,         ["${F77}"],         [F77 compiler])
 AC_DEFINE_UNQUOTED(FFLAGS,      ["${FFLAGS}"],      [F77 compiler flags])
 AC_DEFINE_UNQUOTED(CC,          ["${CC}"],          [C compiler])
+AC_DEFINE_UNQUOTED(NVCC,        ["${NVCC}"],        [Nvidia C/C++ compiler])
 AC_DEFINE_UNQUOTED(CFLAGS,      ["${CFLAGS}"],      [C compiler flags])
 AC_DEFINE_UNQUOTED(CXX,         ["${CXX}"],         [C++ compiler])
 AC_DEFINE_UNQUOTED(CXXFLAGS,    ["${CXXFLAGS}"],    [C++ compiler flags])
@@ -106,20 +105,18 @@ AC_DEFINE_UNQUOTED(FLIBS,       ["${FLIBS}"],       [Fortran libraries])
 echo "o----------------------------------"
 echo "| Results for ForestClaw are"
 echo "o----------------------------------"
-echo "| CPP:          $CPP"
-echo "| CPPFLAGS:     $CPPFLAGS"
-echo "| F77:          $F77"
-echo "| FFLAGS:       $FFLAGS"
-echo "| CC:           $CC"
-echo "| CFLAGS:       $CFLAGS"
-echo "| CXX:          $CXX"
-echo "| CXXFLAGS:     $CXXFLAGS"
-echo "| LDFLAGS:      $LDFLAGS"
-echo "| LIBS:         $LIBS"
-echo "| FLIBS:        $FLIBS"
-echo "| NVCC:         $NVCC"
-echo "| CUDA_LDFLAGS: $CUDA_LDFLAGS"
-echo "| CUDA_CFLAGS:  $CUDA_CFLAGS"
+echo "| CPP:         $CPP"
+echo "| CPPFLAGS:    $CPPFLAGS"
+echo "| F77:         $F77"
+echo "| FFLAGS:      $FFLAGS"
+echo "| CC:          $CC"
+echo "| NVCC:        $NVCC"
+echo "| CFLAGS:      $CFLAGS"
+echo "| CXX:         $CXX"
+echo "| CXXFLAGS:    $CXXFLAGS"
+echo "| LDFLAGS:     $LDFLAGS"
+echo "| LIBS:        $LIBS"
+echo "| FLIBS:       $FLIBS"
 echo "o----------------------------------"
 
 # Create output files.

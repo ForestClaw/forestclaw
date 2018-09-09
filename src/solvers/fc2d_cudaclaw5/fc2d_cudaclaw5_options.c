@@ -110,8 +110,8 @@ cudaclaw5_check (fc2d_cudaclaw5_options_t * clawopt,
     }
 
     /* There is probably a better place to do this */    
-    SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
-                   clawopt->mthlim, clawopt->method);
+    CUDACLAW5_SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
+                             clawopt->mthlim, clawopt->method);
 
     /* Should also check mthbc, mthlim, etc. */
 
