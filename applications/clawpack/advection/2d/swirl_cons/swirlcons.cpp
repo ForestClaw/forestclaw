@@ -71,7 +71,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
         
     case 2:
         /* Five patch square domain */
-        conn = p4est_connectivity_new_disk ();
+        conn = p4est_connectivity_new_disk (1,1);
         cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,fclaw_opt->shift,
                                           rotate,user->alpha);
         break;
