@@ -38,7 +38,7 @@ switch map
         yp = yp/2 + shift(2);
         
     case 'fivepatch'
-        alpha = 0.25;
+        alpha = 0.4;
         [xp,yp,~] = mapc2m_fivepatch(xc,yc,alpha);
         b = getblocknumber();
         s = 0.005;
