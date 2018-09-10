@@ -348,10 +348,13 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
   	/* create dummy fine grid to handle indexing between blocks */
 	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+4*mbc)*(my+4*mbc));
 
+	int normal_match = fclaw2d_patch_normal_match(glob->domain, coarse_blockno, 
+	                                               coarse_patchno, iface_coarse);
 
 	/* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5 */
 	clawpatch_vt->fort_time_sync_f2c(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
 	                                 &coarse_blockno, &fine_blockno,
+	                                 &normal_match,
 									 crcoarse->area[0], crcoarse->area[1], 
 									 crcoarse->area[2], crcoarse->area[3],
 									 qcoarse,

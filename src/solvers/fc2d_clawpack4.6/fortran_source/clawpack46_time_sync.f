@@ -167,16 +167,19 @@ c    # -----------------------------------------------------------------
 
       integer i,j,m
 
+c     # In flux2, fp = -apdq.  Then the update is 
+c     # written as -(fm-fp) = (fp-fm) = -(apdq+amdq)
+c     # We change the sign back here so that we can write
+c     # the update as fp=apdq, fm = amdq.      
+
+c     # NOTE : Fluxes have already been scaled by gamma, e.g. 
+c     # x-face-length/dy or y-face-length/dx. To get scaling 
+c     # by physical length, we just need to multiply by 
+c     # dx or dy.
+
+
       do j = 1,my
          do m = 1,meqn
-c           # In flux2, fp = -apdq.  Then the update is 
-c           # written as -(fm-fp) = (fp-fm) = -(apdq+amdq)
-c           # We change the sign back here so that we can write
-c           # the update as fp=apdq, fm = amdq.      
-
-c           # NOTE : Fluxes have already been scaled by gamma, e.g. 
-c           # x-face-length/dy or y-face-length/dx
-
             fp_left(j,m)  = fp_left(j,m) - dt*dy*fp(1,j,m)
             fm_left(j,m)  = fm_left(j,m) + dt*dy*fm(1,j,m)
 
@@ -207,6 +210,7 @@ c    # -----------------------------------------------------------------
      &                                          idir, iface_coarse,
      &                                          coarse_blockno,
      &                                          fine_blockno,
+     &                                          normal_match,
      &                                          area0, area1,
      &                                          area2, area3,
      &                                          qcoarse,
@@ -223,7 +227,7 @@ c    # -----------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn,idir,iface_coarse
-      integer coarse_blockno, fine_blockno
+      integer coarse_blockno, fine_blockno, normal_match
 
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -265,11 +269,32 @@ c     # grid cells
       double precision deltac, areac
 
 
-      integer a(2,2), f(2), sc
+      integer a(2,2), f(2), sc, nm
 
       logical is_valid_average, skip_this_grid
 
       call build_transform(transform_cptr,a,f)
+
+c     # This is here to test the normal_match value; eventually, it
+c     # should go away.      
+      if (idir .eq. 0) then
+        sc = (a(1,1) + a(2,1))/2
+      else
+        sc = (a(1,2) + a(2,2))/2
+      endif
+      if (normal_match .eq. 0) then
+          nm = -1
+      else
+          nm = 1          
+      endif
+      if (sc .ne. nm) then
+          write(6,*) 'time_sync : Normal match does not match'
+          write(6,*) 'sc = ', sc
+          write(6,*) 'normal_match = ', nm
+          write(6,*) a(1,1), a(2,1), a(1,2),a(2,2)
+          stop
+      endif
+
 
 c     # We do not know which edge will be used, or how it will be used
 c     # so we fill in data at every edge.  Use double the number of 
