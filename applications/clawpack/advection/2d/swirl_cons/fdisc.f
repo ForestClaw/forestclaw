@@ -34,7 +34,7 @@
       wx = 0.3d0
       wy = 0.3d0
       r2 = (xp-0.625d0)**2 + (yp-0.5d0)**2
-      fdisc = r2 - 0.05**2
+      fdisc = r2 - 0.1**2
 c      if (abs(xp-xm) .le. wx .and. abs(yp-ym) .le. wy) then      
 c         fdisc = -1
 c      else

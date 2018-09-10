@@ -37,8 +37,8 @@ c         r = sqrt((x-0.5d0)**2 + (y-0.5d0)**2)
 
 c        # Rigid body rotation
 c        psi = r**2
-         u = 2*(yc-0.5)
-         v = -2*(xc-0.5)
+c         u = 2*(yc-0.5)
+c         v = -2*(xc-0.5)
  
 c        # Filament formation (negative for clockwise rotation)
 c         psi = (4.d0/3.d0)*r**3
