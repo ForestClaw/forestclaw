@@ -319,7 +319,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 			{
 				if (neighbor_level == FINER_GRID)
 				{
-					for (igrid = 0; igrid < RefineFactor; igrid++)
+					for (igrid = 0; igrid < 2; igrid++)
 					{
 						remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[igrid]);
 						int valid_remote = read_parallel_patches && remote_neighbor;
@@ -333,8 +333,7 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 						transform_data.neighbor_patch = neighbor_patches[igrid];
 						if (time_sync_fine_to_coarse)
 						{
-							/* Add correction to coarse grid from fine grid 
-							   Question : Is this general enough? */
+							/* Add correction to coarse grid from fine grid */
 							fclaw2d_patch_time_sync_f2c(s->glob,coarse_patch,
 							                            fine_patch,idir,igrid,
 							                            iface,time_interp,
@@ -401,11 +400,6 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 													this_iface, time_interp,
 													&transform_data_finegrid);                            
 						}
-#if 0
-						fclaw2d_patch_copy_face(s->glob,neighbor_patch,this_patch,
-												this_iface, time_interp,
-												&transform_data_finegrid);
-#endif
 					}
 				}
 			}
