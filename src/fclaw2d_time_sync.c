@@ -153,11 +153,12 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
 
 
-#if 0
+#if 1
 	int time_interp = 0;
 
 	/* --------------------------------------------------------------
-		Send and receive patches
+		Send and receive patches.  This will carry out the exchange  
+		for registers needed for conservation.
 	-----------------------------------------------------------------*/
 	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
 										 FCLAW2D_TIMER_TIMESYNC);

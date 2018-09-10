@@ -43,6 +43,16 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
+/* --------------------------------- Typedefs ----------------------------------------- */
+
+typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob,
+                                                     struct fclaw2d_patch *this_patch,
+                                                     double *qpack,
+                                                     int frsize, 
+                                                     fclaw2d_clawpatch_packmode_t packmode,
+                                                     int *ierror);
+
+
 /* ---------------------------- Virtual table ------------------------------------ */
 
 /* members of this structure provide the only access to above functions */
@@ -70,6 +80,7 @@ struct fclaw2d_clawpatch_vtable
     /* Conservation update */
     clawpatch_fort_time_sync_f2c_t         fort_time_sync_f2c;
     clawpatch_fort_time_sync_samesize_t    fort_time_sync_samesize;
+    clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
 
     /* output functions (ascii) */
     clawpatch_fort_header_ascii_t          fort_header_ascii;
@@ -83,6 +94,7 @@ struct fclaw2d_clawpatch_vtable
     /* ghost patch functions */
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
     clawpatch_fort_local_ghost_pack_aux_t  fort_local_ghost_pack_aux;
+    
 
     /* diagnostic functions */
     clawpatch_fort_error_t                 fort_compute_patch_error;
@@ -105,11 +117,12 @@ void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
 #if 0
 void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global *glob, 
                                      int minlevel,int maxlevel,double dt);
-#endif
 
 void fclaw2d_clawpatch_time_sync_metric(struct fclaw2d_global* glob,
                                           struct fclaw2d_patch* this_patch,
                                           int blockno,int patchno);
+
+#endif
 
 /* ------------------------------- Misc access functions ------------------------------ */
 

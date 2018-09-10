@@ -56,6 +56,12 @@ struct fclaw2d_clawpatch_registers
 	double *gm[2];
 };
 
+typedef enum fclaw2d_clawpatch_packmode
+{
+    CLAWPATCH_REGISTER_PACK = 0,
+    CLAWPATCH_REGISTER_UNPACK
+} fclaw2d_clawpatch_packmode_t;
+
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
@@ -145,6 +151,14 @@ void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global* glob,
                                        struct fclaw2d_patch *this_patch,
                                        int coarse_level,
                                        int reset_mode);
+
+void fclaw2d_clawpatch_time_sync_pack_registers(struct fclaw2d_global *glob,
+                                                struct fclaw2d_patch *this_patch,
+                                                double *qpack,
+                                                int frsize, 
+                                                fclaw2d_clawpatch_packmode_t packmode, 
+                                                int *ierror);
+
 
 #ifdef __cplusplus
 #if 0

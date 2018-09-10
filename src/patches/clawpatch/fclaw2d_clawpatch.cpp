@@ -765,6 +765,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 	int packextra = fclaw_opt->ghost_patch_pack_numextrafields;
 	int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
+	int packregisters = fclaw_opt->time_sync;
 
 	fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
 	area = clawpatch_get_area(this_patch);
@@ -777,29 +778,53 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	int mint = mbc*refratio;   /* # interior cells needed for averaging */
 	int nghost = mbc;          /* # ghost values needed for interpolation */
 
+	/* Include size of conservation registers.  Save fluxes on each size, even though
+	   only one or two sides may be used. */
+	int frsize = packregisters ? 0 : 12*meqn*(mx + my);
+
 	/* This is computed twice - here, and in fclaw2d_clawpatch_ghost_packsize */
 	int wg = (2*nghost + mx)*(2*nghost + my);
 	int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
 	FCLAW_ASSERT(hole >= 0);
 
-	int psize = (wg - hole)*(meqn + packarea + packextra);
+	int psize = (wg - hole)*(meqn + packarea + packextra) + frsize;
 	FCLAW_ASSERT(psize > 0);
 
 	int qareasize = (wg - hole)*(meqn + packarea);
 	clawpatch_vt->fort_local_ghost_pack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
 										 qpack,&qareasize,&packmode,&ierror);
 	FCLAW_ASSERT(ierror == 0);
+	int extrasize;
 	if (packextra)
 	{
-		qpack += qareasize;
-		int extrasize = psize - qareasize;
+		qpack += qareasize;  /* Advance pointer */
+		extrasize = psize - qareasize;
 		FCLAW_ASSERT(extrasize > 0);
 		FCLAW_ASSERT(clawpatch_vt->fort_local_ghost_pack_aux != NULL);
+		/* This should be renamed, since it doesn't point to an actual
+		   Fortran routine (or one with a fortran like signature) */
 		clawpatch_vt->fort_local_ghost_pack_aux(glob,this_patch,mint,
-												  qpack,extrasize,
-												  packmode,&ierror);
+		                                        qpack,extrasize,
+		                                        packmode,&ierror);
 		FCLAW_ASSERT(ierror == 0);
 	}
+
+	FCLAW_ASSERT(ierror == 0);
+	if (packregisters)
+	{
+		qpack += extrasize;  /* Advance pointer */
+		frsize = psize - qareasize - extrasize;
+		FCLAW_ASSERT(frsize > 0);
+		FCLAW_ASSERT(clawpatch_vt->time_sync_pack_registers != NULL);
+		fclaw2d_clawpatch_packmode_t frpackmode = packmode % 2 == 0 ?  
+		                                            CLAWPATCH_REGISTER_PACK : 
+			                                        CLAWPATCH_REGISTER_UNPACK;
+		clawpatch_vt->time_sync_pack_registers(glob,this_patch,
+		                                       qpack,frsize,frpackmode,
+		                                       &ierror);
+		FCLAW_ASSERT(ierror == 0);
+	}
+
 
 	if (ierror > 0)
 	{
@@ -827,11 +852,15 @@ size_t clawpatch_ghost_pack_elems(fclaw2d_global_t* glob)
 	int mint = refratio*mbc;
 	int nghost = mbc;
 
+	/* Include size of conservation registers.  Save fluxes on each size, even though
+	   only one or two sides may be used. */
+	int frsize = 12*meqn*(mx + my); 
+
 	int wg = (2*nghost + mx)*(2*nghost + my);  /* Whole grid     */
 	int hole = (mx - 2*mint)*(my - 2*mint);    /* Hole in center */
 	FCLAW_ASSERT(hole >= 0);
 
-	size_t psize = (wg - hole)*(meqn + packarea + packextra);
+	size_t psize = (wg - hole)*(meqn + packarea + packextra) + frsize;
 	FCLAW_ASSERT(psize > 0);
 
 	return psize;
@@ -889,6 +918,8 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 			fclaw2d_metric_patch_compute_area(glob,this_patch,blockno,patchno);
 		}
 	}
+	/* Build flux registers */
+	fclaw2d_clawpatch_time_sync_setup(glob,this_patch,blockno,patchno);
 }
 
 static
@@ -936,7 +967,9 @@ void clawpatch_partition_unpack(fclaw2d_global_t *glob,
 	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
 
 	/* Time interp is false, since we only partition when all grids
-	   are time synchronized */
+	   are time synchronized and all flux registers are set to 
+	   zero.  After copying data, we re-build patch with any 
+	   data needed.  */
 	cp->griddata.copyFromMemory((double*)unpack_data_from_here);
 }
 
@@ -1007,6 +1040,7 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	patch_vt->remote_ghost_unpack  = clawpatch_remote_ghost_unpack;
 	patch_vt->remote_ghost_delete  = clawpatch_remote_ghost_delete;
 
+
 	/* partitioning */
 	patch_vt->partition_packsize   = clawpatch_partition_packsize;
 	patch_vt->partition_pack       = clawpatch_partition_pack;
@@ -1017,6 +1051,9 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 
 	/* Metric access */
 	patch_vt->metric_patch         = clawpatch_get_metric_patch;
+
+	/* Ghost pack for registers (doesn't depend on clawpack version) */
+	clawpatch_vt->time_sync_pack_registers = fclaw2d_clawpatch_time_sync_pack_registers;
 
 	/* Fortran functions that depend on data layout (version 4.6 or 5.0) */
 	if (claw_version == 4)

@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	5. fclaw2d_clawpatch_time_sync_copy
 */
 
+
+
 void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
                                       fclaw2d_patch_t* this_patch,
                                       int blockno,int patchno,
@@ -85,6 +87,85 @@ void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
 	}
 
 }
+
+void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
+                                                fclaw2d_patch_t *this_patch,
+                                                double *qpack,
+                                                int frsize, 
+                                                fclaw2d_clawpatch_packmode_t packmode, 
+                                                int *ierror)
+{
+	int k, idir, i,j, cnt;
+	int mx,my,meqn;
+
+	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	mx = clawpatch_opt->mx;
+	my = clawpatch_opt->my;
+	meqn = clawpatch_opt->meqn;
+
+	fclaw2d_clawpatch_registers_t* cr = fclaw2d_clawpatch_get_registers(glob,this_patch);
+
+	cnt = 0;
+	for(k = 0; k < 4; k++)
+	{
+		idir = k/2;
+		if (idir == 0)
+		{
+  		    /* k = 0,1 : Pack registers at faces 0,1 */
+			for(j = 0; j < meqn*my; j++)
+			{
+				if(packmode == CLAWPATCH_REGISTER_PACK)
+				{
+					qpack[cnt++] = cr->fm[k][j];
+					qpack[cnt++] = cr->fp[k][j];
+					qpack[cnt++] = cr->edge_fluxes[k][j];
+					qpack[cnt++] = cr->edge_fluxes[k][j+meqn*my];
+				}
+				else
+				{
+					cr->fm[k][j] = qpack[cnt++];
+					cr->fp[k][j] = qpack[cnt++];
+					cr->edge_fluxes[k][j] = qpack[cnt++];
+					cr->edge_fluxes[k][j+meqn*my] = qpack[cnt++]; 
+				}
+			}
+			for(j = 0; j < my; j++)
+			{
+				qpack[cnt++] = cr->edgelengths[k][j];
+				qpack[cnt++] = cr->area[k][j];
+			}
+		}
+		else if (idir == 1)
+		{
+            /* k = 2,3 : Pack registers at faces 2,3 */
+			for(i = 0; i < meqn*mx; i++)
+			{
+				if(packmode == CLAWPATCH_REGISTER_PACK)
+				{
+					qpack[cnt++] = cr->gm[k-2][i];
+					qpack[cnt++] = cr->gp[k-2][i];
+					qpack[cnt++] = cr->edge_fluxes[k][i];
+					qpack[cnt++] = cr->edge_fluxes[k][i + meqn*mx];
+				}
+				else
+				{
+					cr->gm[k-2][i] = qpack[cnt++];
+					cr->gp[k-2][i] = qpack[cnt++];
+					cr->edge_fluxes[k][i] = qpack[cnt++];
+					cr->edge_fluxes[k][i + meqn*mx] = qpack[cnt++];		
+				}
+			}
+			for(i = 0; i < mx; i++)
+			{
+				qpack[cnt++] = cr->edgelengths[k][i];
+				qpack[cnt++] = cr->area[k][i];
+			}
+		}
+	}
+	/* Check that we packed exactly the right number of elements */
+	*ierror = (cnt == frsize) ? 0 : 1;
+}
+
 
 
 void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
@@ -140,6 +221,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
 			{
 				for(j = 0; j < meqn*my; j++)
 				{
+					/* k = 0,1 */
 					cr->fm[k][j] = 0;
 					cr->fp[k][j] = 0;
 					cr->edge_fluxes[k][j] = 0;
@@ -150,6 +232,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
 			{
 				for(i = 0; i < meqn*mx; i++)
 				{
+					/* k = 2,3 */
 					cr->gm[k-2][i] = 0;
 					cr->gp[k-2][i] = 0;
 					cr->edge_fluxes[k][i] = 0;
@@ -233,13 +316,10 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 	int meqn,mx,my,mbc;
 	double dx,dy,xlower,ylower;
 	double *qcoarse, *qfine;
+	int coarse_blockno, coarse_patchno,globnum,level;
+	int fine_blockno, fine_patchno;
 
 	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-
-	if (time_interp)
-	{
-		return;
-	}
 
 	/* We don't correct time interpolated grids, since we assume that the time 
 	interpolated average will already have correction information from times 
@@ -258,19 +338,18 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_registers_t* crfine = 
 	           fclaw2d_clawpatch_get_registers(glob,fine_patch);
 
-	/* create dummy fine grid to handle indexing between blocks */
-	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+4*mbc)*(my+4*mbc));
-
 	/* Include this for debugging */
-	int coarse_blockno, coarse_patchno,globnum,level;
-	int fine_blockno, fine_patchno;
-
 	fclaw2d_patch_get_info2(glob->domain,coarse_patch,&coarse_blockno, &coarse_patchno,
 							&globnum,&level);
 
 	fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, 
 							&fine_patchno,&globnum,&level);
 
+  	/* create dummy fine grid to handle indexing between blocks */
+	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+4*mbc)*(my+4*mbc));
+
+
+	/* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5 */
 	clawpatch_vt->fort_time_sync_f2c(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
 	                                 &coarse_blockno, &fine_blockno,
 									 crcoarse->area[0], crcoarse->area[1], 
@@ -335,31 +414,29 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 	fclaw2d_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
 							&neighbor_patchno,&globnum,&level);
 
-    if (1)
-    {
-    	/* Distribute 0.5 each correction from each side */
-    	clawpatch_vt->fort_time_sync_samesize(&mx,&my,&mbc,&meqn,&idir,&this_iface,
-    	                                      &this_blockno, &neighbor_blockno,
-    	                                      crthis->area[0], crthis->area[1], 
-    	                                      crthis->area[2], crthis->area[3],
-    	                                      qthis,
-    	                                      crthis->fp[0],crthis->fm[1],
-    	                                      crthis->gp[0],crthis->gm[1],
-    	                                      crneighbor->fm[0],crneighbor->fp[1],
-    	                                      crneighbor->gm[0],crneighbor->gp[1],
-    	                                      crthis->edge_fluxes[0],
-    	                                      crthis->edge_fluxes[1],
-    	                                      crthis->edge_fluxes[2],
-    	                                      crthis->edge_fluxes[3],
-    	                                      crneighbor->edge_fluxes[0],
-    	                                      crneighbor->edge_fluxes[1],
-    	                                      crneighbor->edge_fluxes[2],
-    	                                      crneighbor->edge_fluxes[3],
-    	                                      qneighbor_dummy,
-    	                                      &transform_data);
-    }
-	FCLAW_FREE(qneighbor_dummy);
+    /* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5  */
 
+    /* Distribute 0.5 of each correction from each side */
+	clawpatch_vt->fort_time_sync_samesize(&mx,&my,&mbc,&meqn,&idir,&this_iface,
+	                                      &this_blockno, &neighbor_blockno,
+	                                      crthis->area[0], crthis->area[1], 
+	                                      crthis->area[2], crthis->area[3],
+	                                      qthis,
+	                                      crthis->fp[0],crthis->fm[1],
+	                                      crthis->gp[0],crthis->gm[1],
+	                                      crneighbor->fm[0],crneighbor->fp[1],
+	                                      crneighbor->gm[0],crneighbor->gp[1],
+	                                      crthis->edge_fluxes[0],
+	                                      crthis->edge_fluxes[1],
+	                                      crthis->edge_fluxes[2],
+	                                      crthis->edge_fluxes[3],
+	                                      crneighbor->edge_fluxes[0],
+	                                      crneighbor->edge_fluxes[1],
+	                                      crneighbor->edge_fluxes[2],
+	                                      crneighbor->edge_fluxes[3],
+	                                      qneighbor_dummy,
+	                                      &transform_data);    
+	FCLAW_FREE(qneighbor_dummy);
 }
 
 

@@ -145,6 +145,10 @@ typedef void (*clawpatch_fort_local_ghost_pack_aux_t)(struct fclaw2d_global *glo
 													  double qpack[], int extrasize,
 													  int packmode, int* ierror);
 	
+typedef void (*clawpatch_fort_local_ghost_pack_registers_t)(struct fclaw2d_global *glob,
+													  struct fclaw2d_patch *this_patch,
+													  double qpack[], int frsize,
+													  int* ierror);
 
 /* ---------------------------------- Output functions -------------------------------- */
 
