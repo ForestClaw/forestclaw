@@ -14,7 +14,7 @@ __device__ int addem( int a, int b )
 
 __global__ void add( int a, int b, int *c ) 
 {
-    *c = 5;
+    *c = a+b;
 }
 
 
@@ -31,11 +31,14 @@ void cudaclaw5_test()
     a = 2;
     b = 7;
     c=2;
-    printf("C : %d\n",c);   
     add<<<1,1>>>(a, b, dev_c );   
+	cudaError_t code = cudaPeekAtLastError();
+    if(code!=cudaSuccess){
+        printf("ERROR: %s\n",cudaGetErrorString(code));
+    }
+
 
     cudaMemcpy( &c, dev_c, sizeof(int), cudaMemcpyDeviceToHost);
-    printf("C : %d\n",c);   
  
     printf("Kernel result : %d + %d = %d\n",a,b,c);   
 

@@ -33,6 +33,10 @@ void update_q_(int& meqn, int& mx, int& my, int& mbc, double& dtdx,
     int x_stride = mx + 2 * mbc;
     update_q_cuda<<<dimGrid, dimBlock>>>(x_stride, mbc, dtdx, dtdy, qold_dev,
                                          fm_dev, fp_dev, gm_dev, gp_dev);
+	cudaError_t code = cudaPeekAtLastError();
+    if(code!=cudaSuccess){
+        printf("ERROR: %s\n",cudaGetErrorString(code));
+    }
 
     cudaMemcpy(qold, qold_dev, size * sizeof(double), cudaMemcpyDeviceToHost);
     cudaFree(qold_dev);
