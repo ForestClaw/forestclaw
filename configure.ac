@@ -82,6 +82,19 @@ P4EST_AS_SUBPACKAGE([FCLAW])
 AM_CONDITIONAL([FCLAW_DIST_DENY], [test "x$FCLAW_DIST_DENY" != x])
 AC_SUBST([FCLAW_DISTCLEAN])
 
+if test "${enable_cudaclaw}" == "yes"
+then
+echo "o---------------------------------------"
+echo "| Checking CUDA"
+echo "o---------------------------------------"
+
+AX_CHECK_CUDA()
+
+$srcdir/config/nvcc_dummy/generate_libtool.sh $NVCC $srcdir
+AC_SUBST([NVCCLIBTOOL],[./nvcclibtool])
+
+fi
+
 # Print summary.
 AC_DEFINE_UNQUOTED(CPP,         ["${CPP}"],         [C preprocessor])
 AC_DEFINE_UNQUOTED(CPPFLAGS,    ["${CPPFLAGS}"],    [C preprocessor flags])
