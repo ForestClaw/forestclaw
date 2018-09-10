@@ -19,7 +19,8 @@ libcudaclaw5_compiled_sources = \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_flux2.f \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_step2.f90 \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_step2_wrap.f \
-	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_test.cu
+	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_test.cu \
+	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_update_q.cu
 
 ## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_cudaclaw5/libcudaclaw5.la
