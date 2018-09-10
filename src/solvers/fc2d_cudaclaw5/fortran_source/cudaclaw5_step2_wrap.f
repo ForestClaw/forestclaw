@@ -96,22 +96,22 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
 c     # update q
       dtdx = dt/dx
       dtdy = dt/dy
-      do m = 1,meqn
-         do i = 1,mx
-            do j = 1,my
-               if (mcapa.eq.0) then
+      call update_q(meqn,mx,my,mbc,dtdx,dtdy,qold,fm,fp,gm,gp,mcapa);
+c     do m = 1,meqn
+c        do i = 1,mx
+c           do j = 1,my
+c              if (mcapa.eq.0) then
 c                 # no capa array.  Standard flux differencing:
-                  qold(m,i,j) = qold(m,i,j)
-     &                  - dtdx * (fm(m,i+1,j) - fp(m,i,j))
-     &                  - dtdy * (gm(m,i,j+1) - gp(m,i,j))
-               else
+c                 qold(m,i,j) = qold(m,i,j)
+c    &                  - dtdx * (fm(m,i+1,j) - fp(m,i,j))
+c    &                  - dtdy * (gm(m,i,j+1) - gp(m,i,j))
+c              else
 c                 # with capa array.
-                  qold(m,i,j) = qold(m,i,j)
-     &                  -(dtdx*(fm(m,i+1,j) - fp(m,i,j))
-     &                  + dtdy*(gm(m,i,j+1) - gp(m,i,j)))/aux(mcapa,i,j)
-               endif
-            enddo
-         enddo
-      enddo
-
+c                 qold(m,i,j) = qold(m,i,j)
+c    &                  -(dtdx*(fm(m,i+1,j) - fp(m,i,j))
+c    &                  + dtdy*(gm(m,i,j+1) - gp(m,i,j)))/aux(mcapa,i,j)
+c              endif
+c           enddo
+c        enddo
+c     enddo
       end
