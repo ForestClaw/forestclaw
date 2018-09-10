@@ -330,6 +330,16 @@ void fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
 int fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
                                  int blockno, int patchno, int boundaries[4]);
 
+/** Determine whether the normal to a face neighbor align.
+ * \param [in] domain	Valid domain structure.
+ * \param [in] blockno	Number of the block within the domain.
+ * \param [in] patchno	Number of the patch within the block.
+ * \param [in] faceno   Number of the face of the patch.
+ * \return		True if normals match, false for mismatch.
+ */
+int fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
+                                int blockno, int patchno, int faceno);
+
 typedef enum fclaw2d_face_neighbor
 {
     FCLAW2D_PATCH_BOUNDARY,

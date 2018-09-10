@@ -58,7 +58,7 @@ void time_sync_reset (fclaw2d_global_t* glob,
 {
 	fclaw2d_time_sync_info_t ts_info;
 
-	ts_info.reset_mode = reset_mode;
+	ts_info.reset_mode = (fclaw2d_time_sync_type_t) reset_mode;
 	ts_info.coarse_level = coarse_level;
 
 	fclaw2d_global_iterate_level(glob, coarse_level, 
