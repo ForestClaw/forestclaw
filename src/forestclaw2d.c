@@ -363,6 +363,52 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
     return anyboundary;
 }
 
+#ifdef FCLAW_ENABLE_DEBUG
+static const int normal_out[4] = { 0, 1, 0, 1 };
+#endif
+
+int
+fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
+                            int blockno, int patchno, int faceno)
+{
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_t *p4est = wrap->p4est;
+    p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
+    int qtfi;
+    p4est_locidx_t totalleaf;
+    p4est_tree_t *tree;
+#ifdef FCLAW_ENABLE_DEBUG
+    fclaw2d_block_t *block;
+#endif
+
+    /* are we sane */
+    FCLAW_ASSERT (domain->pp_owned);
+
+    /* check input parameters */
+    FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    FCLAW_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+    FCLAW_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+#ifdef FCLAW_ENABLE_DEBUG
+    block = domain->blocks + blockno;
+#endif
+    FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
+
+    /* access p4est tree and element for indexing into mesh */
+    tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
+    totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;
+    FCLAW_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
+
+    /* access face number of the neighbor */
+    FCLAW_ASSERT (0 <= faceno && faceno < P4EST_FACES);
+    qtfi = (int) mesh->quad_to_face[P4EST_FACES * totalleaf + faceno];
+    FCLAW_ASSERT (qtfi >= 0 || qtfi + 8 == (qtfi & 7));
+    FCLAW_ASSERT ((normal_out[faceno] ^ normal_out[qtfi & 3]) ==
+                  ((faceno + qtfi) & 1));
+
+    /* we return true if the last bit of the two face numbers differs */
+    return (faceno + qtfi) & 1;
+}
+
 static void
 fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
                                p4est_locidx_t qtq, int *proc, int *blockno,
