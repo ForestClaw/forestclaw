@@ -205,6 +205,8 @@ c    # -----------------------------------------------------------------
 
       subroutine clawpack46_fort_time_sync_f2c (mx,my,mbc,meqn,
      &                                          idir, iface_coarse,
+     &                                          coarse_blockno,
+     &                                          fine_blockno,
      &                                          area0, area1,
      &                                          area2, area3,
      &                                          qcoarse,
@@ -221,6 +223,7 @@ c    # -----------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn,idir,iface_coarse
+      integer coarse_blockno, fine_blockno
 
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
