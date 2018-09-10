@@ -82,6 +82,8 @@ P4EST_AS_SUBPACKAGE([FCLAW])
 AM_CONDITIONAL([FCLAW_DIST_DENY], [test "x$FCLAW_DIST_DENY" != x])
 AC_SUBST([FCLAW_DISTCLEAN])
 
+AX_CHECK_CUDA()
+
 # Print summary.
 AC_DEFINE_UNQUOTED(CPP,         ["${CPP}"],         [C preprocessor])
 AC_DEFINE_UNQUOTED(CPPFLAGS,    ["${CPPFLAGS}"],    [C preprocessor flags])
