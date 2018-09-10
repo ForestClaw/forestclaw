@@ -6,5 +6,6 @@ cd $2/config/nvcc_dummy
 aclocal
 autoconf
 CC=$1 ./configure
+cp config.status ${build_dir}/nvcc_config.status
 cp libtool ${build_dir}/nvcclibtool
 rm -rf configure libtool config.log config.status autom4te.cache aclocal.m4
