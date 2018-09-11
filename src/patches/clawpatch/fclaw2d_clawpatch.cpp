@@ -795,10 +795,11 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 	clawpatch_vt->fort_local_ghost_pack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
 										 qpack,&qareasize,&packmode,&ierror);
+	qpack += qareasize;  /* Advance pointer */
+
 	FCLAW_ASSERT(ierror == 0);
 	if (packextra)
 	{
-		qpack += qareasize;  /* Advance pointer */
 		FCLAW_ASSERT(extrasize > 0);
 		FCLAW_ASSERT(clawpatch_vt->fort_local_ghost_pack_aux != NULL);
 		/* This should be renamed, since it doesn't point to an actual
@@ -807,12 +808,12 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 		                                        qpack,extrasize,
 		                                        packmode,&ierror);
 		FCLAW_ASSERT(ierror == 0);
+		qpack += extrasize; /* Advance pointer */
 	}
 
 	FCLAW_ASSERT(ierror == 0);
 	if (packregisters)
 	{
-		qpack += extrasize;  /* Advance pointer */
 		FCLAW_ASSERT(frsize > 0);
 		FCLAW_ASSERT(clawpatch_vt->time_sync_pack_registers != NULL);
 		fclaw2d_clawpatch_packmode_t frpackmode = packmode % 2 == 0 ?  
@@ -914,8 +915,6 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 	{
 		if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
 		{
-			/* For the conservative update, we need edgelengths as well as 
-			    area */
 			fclaw2d_metric_patch_compute_area(glob,this_patch,blockno,patchno);
 			//fclaw2d_metric_patch_setup(glob,this_patch,blockno,patchno);
 		}
