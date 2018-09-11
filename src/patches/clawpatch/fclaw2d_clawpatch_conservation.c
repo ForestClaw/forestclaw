@@ -131,8 +131,16 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
 			}
 			for(j = 0; j < my; j++)
 			{
-				qpack[cnt++] = cr->edgelengths[k][j];
-				qpack[cnt++] = cr->area[k][j];
+				if (packmode == CLAWPATCH_REGISTER_PACK)
+				{
+					qpack[cnt++] = cr->edgelengths[k][j];
+					qpack[cnt++] = cr->area[k][j];					
+				}
+				else
+				{
+					cr->edgelengths[k][j] = qpack[cnt++];
+					cr->area[k][j] = qpack[cnt++];									
+				}
 			}
 		}
 		else if (idir == 1)
@@ -157,8 +165,16 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
 			}
 			for(i = 0; i < mx; i++)
 			{
-				qpack[cnt++] = cr->edgelengths[k][i];
-				qpack[cnt++] = cr->area[k][i];
+				if (packmode == CLAWPATCH_REGISTER_PACK)
+				{
+					qpack[cnt++] = cr->edgelengths[k][i];
+					qpack[cnt++] = cr->area[k][i];					
+				}
+				else
+				{
+					cr->edgelengths[k][i] = qpack[cnt++];
+					cr->area[k][i] = qpack[cnt++];										
+				}
 			}
 		}
 	}
