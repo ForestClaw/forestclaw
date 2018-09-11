@@ -780,7 +780,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 	/* Include size of conservation registers.  Save fluxes on each size, even though
 	   only one or two sides may be used. */
-	int frsize = packregisters ? 0 : 12*meqn*(mx + my);
+	int frsize = packregisters ? 12*meqn*(mx + my) : 0;
 
 	/* This is computed twice - here, and in fclaw2d_clawpatch_ghost_packsize */
 	int wg = (2*nghost + mx)*(2*nghost + my);
@@ -791,14 +791,14 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	FCLAW_ASSERT(psize > 0);
 
 	int qareasize = (wg - hole)*(meqn + packarea);
+	int extrasize = (wg - hole)*(packextra);
+
 	clawpatch_vt->fort_local_ghost_pack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
 										 qpack,&qareasize,&packmode,&ierror);
 	FCLAW_ASSERT(ierror == 0);
-	int extrasize;
 	if (packextra)
 	{
 		qpack += qareasize;  /* Advance pointer */
-		extrasize = psize - qareasize;
 		FCLAW_ASSERT(extrasize > 0);
 		FCLAW_ASSERT(clawpatch_vt->fort_local_ghost_pack_aux != NULL);
 		/* This should be renamed, since it doesn't point to an actual
@@ -813,7 +813,6 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	if (packregisters)
 	{
 		qpack += extrasize;  /* Advance pointer */
-		frsize = psize - qareasize - extrasize;
 		FCLAW_ASSERT(frsize > 0);
 		FCLAW_ASSERT(clawpatch_vt->time_sync_pack_registers != NULL);
 		fclaw2d_clawpatch_packmode_t frpackmode = packmode % 2 == 0 ?  
@@ -922,7 +921,7 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 		}
 	}
 	/* Build flux registers */
-	fclaw2d_clawpatch_time_sync_setup(glob,this_patch,blockno,patchno);
+	// fclaw2d_clawpatch_time_sync_setup(glob,this_patch,blockno,patchno);
 }
 
 static
