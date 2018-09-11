@@ -80,7 +80,9 @@ void fclaw2d_patch_reset_data(fclaw2d_global_t* glob,
 							  int blockno,int old_patchno, int new_patchno)
 {
 	fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) new_patch->user;
+	FCLAW_ASSERT(0 <= blockno && blockno < glob->domain->num_blocks);
 	pdata->block_idx = blockno;
+	FCLAW_ASSERT(0 <= new_patchno && new_patchno < glob->domain->local_num_patches);
 	pdata->patch_idx = new_patchno;
 
 	/* Everything else will hopefully sort itself out ... */
