@@ -113,17 +113,6 @@ void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
                                          struct fclaw2d_patch* this_patch);
 
 
-/* ----------------------------- Conservative updates --------------------------------- */
-#if 0
-void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global *glob, 
-                                     int minlevel,int maxlevel,double dt);
-
-void fclaw2d_clawpatch_time_sync_metric(struct fclaw2d_global* glob,
-                                          struct fclaw2d_patch* this_patch,
-                                          int blockno,int patchno);
-
-#endif
-
 /* ------------------------------- Misc access functions ------------------------------ */
 
 void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,

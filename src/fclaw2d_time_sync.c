@@ -152,7 +152,7 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
 
-
+	fclaw_global_essentialf("here ...0\n");
 #if 1
 	int time_interp = 0;
 
@@ -169,6 +169,8 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 	/* Three-way corner exchanges */
 	fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
 #endif
+		fclaw_global_essentialf("here ...1\n");
+
 
 	/* -------------------------------------------------------------
 	Add corrections from  fine grids to coarse grid.  This is is done 

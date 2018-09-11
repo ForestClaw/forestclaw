@@ -913,9 +913,12 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 
 	if (fclaw_opt->manifold)
 	{
-		if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
+		//if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
 		{
+			/* For the conservative update, we need edgelengths as well as 
+			    area */
 			fclaw2d_metric_patch_compute_area(glob,this_patch,blockno,patchno);
+			fclaw2d_metric_patch_setup(glob,this_patch,blockno,patchno);
 		}
 	}
 	/* Build flux registers */
