@@ -62,6 +62,12 @@ void patch_data_new(fclaw2d_global_t* glob,
 	/* Initialize user data */
 	fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
 	this_patch->user = (void *) pdata;
+
+#ifdef FCLAW_ENABLE_DEBUG
+    fclaw2d_block_t *block = glob->domain->blocks + this_block_idx;
+#endif
+    FCLAW_ASSERT (0 <= this_patch_idx && this_patch_idx < block->num_patches);    
+
 	pdata->patch_idx = this_patch_idx;
 	pdata->block_idx = this_block_idx;
 
@@ -80,9 +86,12 @@ void fclaw2d_patch_reset_data(fclaw2d_global_t* glob,
 							  int blockno,int old_patchno, int new_patchno)
 {
 	fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) new_patch->user;
-	FCLAW_ASSERT(0 <= blockno && blockno < glob->domain->num_blocks);
 	pdata->block_idx = blockno;
-	FCLAW_ASSERT(0 <= new_patchno && new_patchno < glob->domain->local_num_patches);
+#ifdef FCLAW_ENABLE_DEBUG
+    fclaw2d_block_t *block = glob->domain->blocks + blockno;
+#endif
+    FCLAW_ASSERT (0 <= new_patchno && new_patchno < block->num_patches);    
+
 	pdata->patch_idx = new_patchno;
 
 	/* Everything else will hopefully sort itself out ... */
