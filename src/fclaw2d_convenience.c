@@ -335,7 +335,7 @@ fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
     return fclaw2d_domain_new
-        (p4est_wrap_new_disk (mpicomm, initial_level, 0), NULL);
+        (p4est_wrap_new_disk (mpicomm, 0, 0, initial_level), NULL);
 }
 
 fclaw2d_domain_t *
