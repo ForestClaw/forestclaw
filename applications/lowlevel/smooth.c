@@ -176,6 +176,12 @@ init_refine (fclaw_smooth_t * s)
         fclaw_global_productionf ("Initial pseudo-level %d\n", lev);
         if (s->write_vtk)
         {
+            /* GCC 7 warns because there may be a truncation.
+               I'm aware of this, but I also know that the code is never at
+               risk of crashing.
+               I choose not to rely on the return value of snprintf
+               since that may not work for very old systems.
+               GCC has no right to bug me and is being fascist. */
             snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
             fclaw2d_domain_write_vtk (s->domain, basename);
         }
