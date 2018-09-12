@@ -222,19 +222,6 @@ void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
 
 /*************************** PATCH FUNCTIONS ******************************/
 
-/** Access a local or off-processor patch by its block and patch number.
- * \param [in] domain   Valid domain.
- * \param [in] blockno  For a local patch the number of the block.
- *                      To request a remote patch set this number to -1.
- * \param [in] patchno  For a local patch the number of the patch
- *                      relative to its block.  Otherwise the number
- *                      of the remote patch as returned by
- *                      \ref fclaw2d_patch_face_neighbors and friends.
- * \return              The patch that was requested.
- */
-fclaw2d_patch_t *fclaw2d_domain_get_patch (fclaw2d_domain_t * domain,
-                                           int blockno, int patchno);
-
 /** Return the dimension of a corner.
  * \param [in] patch    A patch with properly set member variables.
  * \param [in] cornerno A corner number in 0..3.
