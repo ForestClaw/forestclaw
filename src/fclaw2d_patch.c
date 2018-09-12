@@ -66,7 +66,7 @@ void patch_data_new(fclaw2d_global_t* glob,
 #ifdef FCLAW_ENABLE_DEBUG
     fclaw2d_block_t *block = glob->domain->blocks + this_block_idx;
 #endif
-    if (~(0 <= this_patch_idx && this_patch_idx < block->num_patches))
+    if (!(0 <= this_patch_idx && this_patch_idx < block->num_patches))
     {
     	fclaw_global_essentialf("patch index is incorrect\n");
     	FCLAW_ASSERT (0 <= this_patch_idx && this_patch_idx < block->num_patches);    
