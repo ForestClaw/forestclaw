@@ -277,16 +277,20 @@ c     # grid cells
 
 c     # This is here to test the normal_match value; eventually, it
 c     # should go away.      
+
       if (idir .eq. 0) then
         sc = (a(1,1) + a(2,1))/2
       else
         sc = (a(1,2) + a(2,2))/2
       endif
+
+c     # Ignore call to normal_match in calling routine      
       if (normal_match .eq. 0) then
           nm = -1
       else
           nm = 1          
       endif
+c      nm = sc 
       if (sc .ne. nm) then
           write(6,*) 'time_sync : Normal match does not match'
           write(6,*) 'sc = ', sc

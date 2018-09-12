@@ -916,11 +916,12 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 		if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
 		{
 			fclaw2d_metric_patch_compute_area(glob,this_patch,blockno,patchno);
-			//fclaw2d_metric_patch_setup(glob,this_patch,blockno,patchno);
 		}
 	}
-	/* Build flux registers */
-	// fclaw2d_clawpatch_time_sync_setup(glob,this_patch,blockno,patchno);
+	/* Any metric terms we might need for the registers are packed */
+#if 0	
+	fclaw2d_clawpatch_time_sync_setup(glob,this_patch,blockno,patchno);
+#endif	
 }
 
 static

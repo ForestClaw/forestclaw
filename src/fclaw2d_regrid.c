@@ -127,6 +127,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 
 	if (newsize == FCLAW2D_PATCH_SAMESIZE)
 	{
+		FCLAW_ASSERT(0 <= blockno && blockno < new_domain->num_blocks);
+		FCLAW_ASSERT(0 <= new_patchno && new_patchno < new_domain->local_num_patches);
 		new_patch->user = old_patch->user;
 		old_patch->user = NULL;
 		fclaw2d_patch_reset_data(g->glob,old_patch,new_patch,blockno,old_patchno,new_patchno);
