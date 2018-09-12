@@ -70,6 +70,9 @@ extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
  * are denoted *global*.
  */
 
+/** The metadata structure for a forest leaf, which is a forestclaw patch.
+ * The patch may be either a process-local patch or a ghost patch.
+ */
 struct fclaw2d_patch
 {
     int level;                  /* 0 is root, increases if refined */
@@ -223,6 +226,7 @@ void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
 /*************************** PATCH FUNCTIONS ******************************/
 
 /** Return the dimension of a corner.
+ * This function is LEGAL to call for both local and ghost patches.
  * \param [in] patch    A patch with properly set member variables.
  * \param [in] cornerno A corner number in 0..3.
  * \return              0 if the corner is always at a fourfold intersection,
@@ -233,18 +237,20 @@ int fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch,
                                     int cornerno);
 
 /** Return the number of a patch with respect to its parent in the tree.
+ * This function is LEGAL to call for both local and ghost patches.
  * \param [in] patch    A patch with properly set member variables.
  * \return              The child id is a number in 0..3.
  */
 int fclaw2d_patch_childid (const fclaw2d_patch_t * patch);
 
 /** Check if a patch is the first in a family of four siblings.
+ * For ghost patches, we always return false.
  * \param [in] patch    A patch with properly set member variables.
  * \return              True if patch is the first sibling.
  */
 int fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch);
 
-/** Check if a patch is a parallel ghost patch.
+/** Check whether a patch is a parallel ghost patch.
  * \param [in] patch    A patch with properly set member variables.
  * \return              True if patch is off-processor, false if local.
  */
@@ -264,8 +270,9 @@ void fclaw2d_free (void *ptr);
 /***************************** PATCH ITERATORS ****************************/
 
 /** Callback prototype for the patch iterators.
+ * We iterate over local patches only.
  * \param [in] domain	General domain structure.
- * \param [in] patch	The patch currently processed by the iterator.
+ * \param [in] patch	The local patch currently processed by the iterator.
  * \param [in] blockno  Block number of processed patch.
  * \param [in] patchno  Patch number within block of processed patch.
  * \param [in,out] user	Data that was passed into the iterator functions.
@@ -274,7 +281,7 @@ typedef void (*fclaw2d_patch_callback_t)
     (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
      int blockno, int patchno, void *user);
 
-/** Iterate over all patches on a given level.
+/** Iterate over all local patches on a given level.
  * \param [in] domain	General domain structure.
  * \param [in] level	Level to iterate.  Ignore patches of other levels.
  * \param [in] pcb	Function called for each patch of matching level.
@@ -283,7 +290,7 @@ typedef void (*fclaw2d_patch_callback_t)
 void fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);
 
-/** Iterate over all patches of all levels.
+/** Iterate over all local patches of all levels.
  * \param [in] domain	General domain structure.
  * \param [in] pcb	Function called for each patch in the domain.
  * \param [in,out] user	Data is passed to the pcb callback.
@@ -292,7 +299,7 @@ void fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
                                      fclaw2d_patch_callback_t pcb,
                                      void *user);
 
-/** Iterate over all families of sibling patches.
+/** Iterate over all families of local sibling patches.
  * \param [in] domain	General domain structure.
  * \param [in] pcb	Function called for each family in the domain.
  *                      Its patch argument points to an array of four
@@ -307,6 +314,7 @@ void fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
 /************************ PATCH NEIGHBORS *********************************/
 
 /** Determine physical boundary status as 1, or 0 for neighbor patches.
+ * This must ONLY be called for local patches.
  * \param [in] domain	Valid domain structure.
  * \param [in] blockno	Number of the block within the domain.
  * \param [in] patchno	Number of the patch within the block.
@@ -327,6 +335,7 @@ typedef enum fclaw2d_face_neighbor
 fclaw2d_patch_relation_t;
 
 /** Determine neighbor patch(es) and orientation across a given face.
+ * This must ONLY be called for local patches.
  * \param [in] domain   Valid domain structure.
  * \param [in] blockno  Number of the block within the domain.
  * \param [in] patchno  Number of the patch within the block.
@@ -415,6 +424,7 @@ int fclaw2d_patch_face_transformation_valid (const int ftransform[]);
  * This function assumes that the two patches are of the SAME size.
  * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
  * Else we have an input patch in one block and on output patch across a face.
+ * It is LEGAL to call this function for both local and ghost patches.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] ftransform   It must have room for NINE (9) integers and be
@@ -437,6 +447,7 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
  * This function assumes that the neighbor patch is smaller (HALF size).
  * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
  * Else we have an input patch in one block and on output patch across a face.
+ * It is LEGAL to call this function for both local and ghost patches.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] ftransform   It must have room for NINE (9) integers and be
@@ -468,6 +479,7 @@ void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
  * We only return corner neighbors that are not already face neighbors.
  * Inter-tree corners are only returned if the number of meeting corners is
  * exactly four.  Five or more are currently not supported.
+ * This must ONLY be called for local patches.
  * \param [in] domain   Valid domain structure.
  * \param [in] blockno  Number of the block within the domain.
  * \param [in] patchno  Number of the patch within the block.
@@ -501,6 +513,7 @@ void fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size.
+ * It is LEGAL to call this function for both local and ghost patches.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
@@ -520,6 +533,7 @@ void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size).
+ * It is LEGAL to call this function for both local and ghost patches.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
@@ -565,17 +579,19 @@ void fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
                                     int coarsen_delay);
 
 /** Mark a patch for refinement.
+ * This must ONLY be called for local patches.
  * It is safe to call this function from an iterator callback except
- * fclaw2d_domain_iterate_adapted.
+ * \ref fclaw2d_domain_iterate_adapted.
  */
 void fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain,
                                 int blockno, int patchno);
 
 /** Mark a patch for coarsening.
+ * This must ONLY be called for local patches.
  * Coarsening will only happen if the patch family is not further refined
  * and all sibling patches are marked as well.
  * It is safe to call this function from an iterator callback except
- * fclaw2d_domain_iterate_adapted.
+ * \ref fclaw2d_domain_iterate_adapted.
  */
 void fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain,
                                  int blockno, int patchno);
@@ -587,6 +603,7 @@ void fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain,
  * numbers are consecutive as well.
  * If noop (new patch is SAMESIZE), only old_patch[0] and new_patch[0] matter.
  * If coarsened (new patch is DOUBLESIZE), situation is the reverse of refine.
+ * We iterate over local patches only.
  */
 typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
                                           fclaw2d_patch_t * old_patch,
@@ -598,6 +615,7 @@ typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
                                           void *user);
 
 /** Iterate over the previous and the adapted domain simultaneously.
+ * We iterate over local patches only.
  * \param [in,out] old_domain   Domain before adaptation.
  * \param [in,out] new_domain   Domain after adaptation.
  * \param [in] mcb              Callback.
@@ -638,6 +656,7 @@ void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
 /** Callback to iterate through the partitions.
  * We traverse every patch in the new partition.  If that patch was already
  * on the local processor before the partition, we identify its memory.
+ * We iterate over local patches only.
  * \param [in,out] old_domain   Domain before partition.
  * \param [in,out] old_patch    If the patch stayed local, this is the pointer
  *                              in reference to the old domain and partition.
@@ -661,6 +680,7 @@ typedef void (*fclaw2d_transfer_callback_t) (fclaw2d_domain_t * old_domain,
                                              void *user);
 
 /** Iterate over the previous and partitioned domain simultaneously.
+ * We iterate over local patches only.
  * \param [in,out] old_domain   Domain before partition.
  * \param [in,out] new_domain   Domain after partition.
  * \param [in] tcb              Callback.
