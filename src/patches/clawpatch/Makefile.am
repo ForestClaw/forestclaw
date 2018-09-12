@@ -8,7 +8,6 @@ libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_pillow.h \
-	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch46_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch5_fort.h \
