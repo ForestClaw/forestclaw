@@ -30,7 +30,9 @@ EXTRA_DIST += \
 	applications/clawpack/acoustics/2d/radial/mapc2m.m \
 	applications/clawpack/acoustics/2d/radial/map1d.m \
 	applications/clawpack/acoustics/2d/radial/make_data.py \
-	applications/clawpack/acoustics/2d/radial/make_plots.py
+	applications/clawpack/acoustics/2d/radial/make_plots.py \
+	applications/clawpack/acoustics/2d/radial/1drad/setplot.py \
+	applications/clawpack/acoustics/2d/radial/1drad/setrun.py
 
 radial_headers = \
 	applications/clawpack/acoustics/2d/radial/radial_user.h
