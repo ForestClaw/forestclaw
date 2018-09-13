@@ -52,7 +52,6 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
 
-    /* Patch specific functions */
     patch_vt->setup   = &swirlcons_patch_setup_manifold;
 
 
@@ -74,7 +73,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
                     clawopt->use_fwaves = 1;
                     clawpack46_vt->fort_rpn2      = RPN2CONS_FW;
             }
-
+            // clawpack46_vt->fort_setaux = &CLAWPACK46_SETAUX;
             break;
 
         case 1: /* Cart */
@@ -94,6 +93,9 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
                     clawopt->use_fwaves = 1;
                     clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
             }
+            /* Patch specific functions */
+
+
             break;
     }
 
