@@ -300,17 +300,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     FCLAW_ASSERT(ierror == 0);
 
-    cudaclaw5_test();
-
-    //CUDACLAW5_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-    //                fm, fp, gm, gp, cuclaw5_vt->rpn2, cuclaw5_vt->rpt2);
-    /* Accumulate fluxes needed for conservative fix-up */
-    if (cuclaw5_vt->fort_fluxfun != NULL)
-    {
-        /* Accumulate fluxes */
-    }
-
-
     delete [] fp;
     delete [] fm;
     delete [] gp;

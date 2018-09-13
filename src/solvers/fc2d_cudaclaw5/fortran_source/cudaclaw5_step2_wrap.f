@@ -96,7 +96,8 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
 c     # update q
       dtdx = dt/dx
       dtdy = dt/dy
-      call update_q(meqn,mx,my,mbc,dtdx,dtdy,qold,fm,fp,gm,fp,mcapa)
+      call cudaclaw5_update_q(meqn,mx,my,mbc,dtdx,dtdy,qold,
+     &                         fm,fp,gm,fp,mcapa)
 c      do m = 1,meqn
 c         do i = 1,mx
 c            do j = 1,my

@@ -20,8 +20,12 @@ extern "C"
 }
 #endif
 #endif
-void update_q_(int& meqn,int& mx, int&my,int& mbc,double& dtdx,double& dtdy,double*
-        qold,double*fm,double*fp,double*gm,double*gp,int&mcapa);
+    
+void cudaclaw5_update_q_(int& meqn, int& mx, int& my, int& mbc, 
+                         double& dtdx, double& dtdy,
+                         double* qold, 
+                         double* fm, double *fp, 
+                         double *gm, double *gp, int&mcapa);
 #ifdef __cplusplus
 #if 0
 {
