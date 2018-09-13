@@ -39,6 +39,9 @@ extern "C"
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
+#if 0
+    /* to get syntax highlighting */
+#endif
 
 /* --------------------------- Clawpack solver functions ------------------------------ */
 
@@ -104,9 +107,12 @@ typedef void (*cudaclaw5_fort_rpn2_t)(const int* ixy,const int* maxm, const int*
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
 
-typedef void (*cudaclaw5_fort_rpt2_t)(const int* ixy, const int* imp, const int* maxm, const int* meqn,
-                                       const int* mwaves, const int* maux, const int* mbc,const int* mx,
-                                       double ql[], double qr[], double aux1[], double aux2[],
+typedef void (*cudaclaw5_fort_rpt2_t)(const int* ixy, const int* imp, const int* maxm, 
+                                      const int* meqn,
+                                       const int* mwaves, const int* maux, const int* mbc, 
+                                       const int* mx,
+                                       double ql[], double qr[], double aux1[], 
+                                       double aux2[],
                                        double aux3[],  double asdq[],
                                        double bmasdq[], double bpasdq[]);
 
@@ -122,8 +128,25 @@ typedef void (*cudaclaw5_fort_flux2_t)(const int* ixy,const int* maxm, const int
                                         cudaclaw5_fort_rpn2_t rpn2,
                                         cudaclaw5_fort_rpt2_t rpt2);
 
+#if 0
 typedef void (*cudaclaw5_fort_fluxfun_t)(const int* meqn, double q[], double aux[],
                                           double fq[]);
+#endif
+
+/* ------------------------------ Update functions ------------------------------------ */
+
+void cudaclaw5_step2_wrap(int maxm, int meqn, int maux, int mbc,
+                          int method[], int mthlim[], int mcapa, int mwaves, 
+                          int mx, int my, double qold[], double aux[],
+                          double dx, double dy, double dt, double cfl, 
+                          double work[], int mwork, double xlower, 
+                          double ylower, int  level, double t, 
+                          double fp[], double fm[],
+                          double gp[], double gm[], 
+                          cudaclaw5_fort_rpn2_t rpn2, 
+                          cudaclaw5_fort_rpt2_t rpt2,
+                          cudaclaw5_fort_flux2_t flux2, 
+                          int block_corner_count[], int* ierror);
 
 
 /* ------------------------------------- Virtual table -------------------------------- */
@@ -144,7 +167,6 @@ typedef struct fc2d_cudaclaw5_vtable
 
     cudaclaw5_fort_rpn2_t      fort_rpn2;
     cudaclaw5_fort_rpt2_t      fort_rpt2;
-    cudaclaw5_fort_fluxfun_t   fort_fluxfun;
 
     int is_set;
 } fc2d_cudaclaw5_vtable_t;
@@ -155,7 +177,9 @@ fc2d_cudaclaw5_vtable_t* fc2d_cudaclaw5_vt();
 
 /* ---------------------------------- CUDA functions ---------------------------------- */
 
+#if 0
 void cudaclaw5_test();
+#endif
 
 /* ----------------------------- User access to solver functions ---------------------- */
 

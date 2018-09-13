@@ -290,6 +290,16 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     //fc2d_cudaclaw5_flux2_t flux2 = cudaclaw_options->use_fwaves ?
     //                                CUDACLAW5_FLUX2FW : CUDACLAW5_FLUX2;
     cudaclaw5_fort_flux2_t flux2 = CUDACLAW5_FLUX2;
+    
+    int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
+
+    cudaclaw5_step2_wrap(maxm, meqn, maux, mbc, cudaclaw_options->method,
+                          cudaclaw_options->mthlim, cudaclaw_options->mcapa,
+                          mwaves, mx, my, qold, aux, dx, dy, dt, cflgrid,
+                          work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
+                          cuclaw5_vt->fort_rpn2, cuclaw5_vt->fort_rpt2,flux2,
+                          block_corner_count, &ierror);
+#if 0    
     int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
     CUDACLAW5_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, cudaclaw_options->method,
                           cudaclaw_options->mthlim, &cudaclaw_options->mcapa,
@@ -297,6 +307,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
                           cuclaw5_vt->fort_rpn2, cuclaw5_vt->fort_rpt2,flux2,
                           block_corner_count, &ierror);
+#endif
 
     FCLAW_ASSERT(ierror == 0);
 

@@ -100,13 +100,22 @@ void CUDACLAW5_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
 
 #define CUDACLAW5_STEP2 FCLAW_F77_FUNC(cudaclaw5_step2,CUDACLAW5_STEP2)
 void CUDACLAW5_STEP2(const int* maxm, const int* meqn, const int* maux,
-                            const int* mbc, const int* mx,
-                            const int* my, double qold[], double aux[],
-                            const double* dx, const double* dy, const double* dt,
-                            const double* cflgrid, double fm[], double fp[], double gm[],
-                            double gp[],
-                            cudaclaw5_fort_rpn2_t rpn2,
-                            cudaclaw5_fort_rpt2_t rpt2);
+                     const int* mbc, const int* mx,
+                     const int* my, double qold[], double aux[],
+                     const double* dx, const double* dy, const double* dt,
+                     const double* cflgrid, double fm[], double fp[], double gm[],
+                     double gp[], 
+                     cudaclaw5_fort_rpn2_t rpn2, cudaclaw5_fort_rpt2_t rpt2,
+                     int block_corner_count[], int *ierror);
+
+
+#define CUDACLAW5_FORT_UPDATE_Q FCLAW_F77_FUNC(cudaclaw5_fort_update_q,  \
+                                               CUDACLAW5_FORT_UPDATE_Q)
+
+void CUDACLAW5_FORT_UPDATE_Q(int* meqn, int* mx, int* my, int* mbc, int* maux,
+                           double* dtdx, double* dtdy, 
+                           double qold[],double fp[],double fm[],
+                           double gp[], double gm[], int* mcapa);
 
 /* ----------------------------- Misc ClawPack specific functions ------------------------------ */
     

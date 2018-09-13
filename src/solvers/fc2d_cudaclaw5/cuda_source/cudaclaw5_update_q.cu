@@ -1,4 +1,5 @@
 #include "cudaclaw5_update_q.h"
+
 __global__ void cudaclaw5_update_q_cuda(int x_stride, int mbc, 
                                         double dtdx, double dtdy,
                                         double* qold, 
@@ -11,10 +12,10 @@ __global__ void cudaclaw5_update_q_cuda(int x_stride, int mbc,
 }
 
 
-void cudaclaw5_update_q_(int& meqn, int& mx, int& my, int& mbc, 
-                         double& dtdx, double& dtdy, double* qold, 
-                         double* fm, double* fp, 
-                         double* gm, double* gp, int& mcapa) 
+void cudaclaw5_update_q(int meqn, int mx, int my, int mbc, 
+                        double dtdx, double dtdy, double qold[], 
+                        double fm[], double fp[], 
+                        double gm[], double gp[], int mcapa) 
 {
     int size = meqn * (mx + 2 * mbc) * (my + 2 * mbc);
 
