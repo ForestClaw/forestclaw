@@ -1,5 +1,5 @@
-#ifndef CUDACLAW5_STEP2_H
-#define CUDACLAW5_STEP2_H
+#ifndef CUDACLAW5_UPDATE_Q_H
+#define CUDACLAW5_UPDATE_Q_H
 
 
 #include "../fc2d_cudaclaw5.h"
@@ -23,10 +23,16 @@ extern "C"
 #endif
 #endif
 
-void cudaclaw5_update_q(int meqn, int mx, int my, int mbc, 
+__global__
+void cudaclaw5_update_q_cuda(int x_stride, int mbc,
+                             double dtdx, double dtdy,
+                             double* qold,
+                             double* fm, double* fp,
+                             double* gm, double* gp);
+void cudaclaw5_update_q(int meqn, int mx, int my, int mbc,
                          double dtdx, double dtdy,
-                         double qold[], 
-                         double fm[], double fp[], 
+                         double qold[],
+                         double fm[], double fp[],
                          double gm[], double gp[], int mcapa);
 #ifdef __cplusplus
 #if 0
