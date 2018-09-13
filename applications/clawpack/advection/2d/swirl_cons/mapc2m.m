@@ -3,8 +3,8 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 map = 'nomap';
 % map = 'cart';   % brick
 % map = 'flatpillow';
-map = 'fivepatch';
-% map = 'bilinear';
+% map = 'fivepatch';
+map = 'bilinear';
 
 % This domain should be in [0,2],[0,2]
 

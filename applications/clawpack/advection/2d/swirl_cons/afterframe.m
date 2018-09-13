@@ -30,7 +30,7 @@ elseif (ShowUnderOverShoots == 1)
 else
     switch ex
         case 1
-            ca = [-1.4, 10];
+            ca = [-1.4, 2];
         case 2
             ca = [-1, 2.5];    
         case 3
@@ -80,7 +80,7 @@ end
 hidepatchborders;
 hidegridlines;
 
-% showgridlines;
+showgridlines;
 showpatchborders;
 
 
