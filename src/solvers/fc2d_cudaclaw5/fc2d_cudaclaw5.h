@@ -52,7 +52,7 @@ typedef void (*cudaclaw5_src2_t)(struct fclaw2d_global* glob,
                                  int this_patch_idx,
                                  double t,
                                  double dt);
-    
+
 typedef void (*cudaclaw5_b4step2_t)(struct fclaw2d_global* glob,
                                     struct fclaw2d_patch *this_patch,
                                     int this_block_idx,
@@ -107,11 +107,11 @@ typedef void (*cudaclaw5_fort_rpn2_t)(const int* ixy,const int* maxm, const int*
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
 
-typedef void (*cudaclaw5_fort_rpt2_t)(const int* ixy, const int* imp, const int* maxm, 
+typedef void (*cudaclaw5_fort_rpt2_t)(const int* ixy, const int* imp, const int* maxm,
                                       const int* meqn,
-                                       const int* mwaves, const int* maux, const int* mbc, 
+                                       const int* mwaves, const int* maux, const int* mbc,
                                        const int* mx,
-                                       double ql[], double qr[], double aux1[], 
+                                       double ql[], double qr[], double aux1[],
                                        double aux2[],
                                        double aux3[],  double asdq[],
                                        double bmasdq[], double bpasdq[]);
@@ -135,18 +135,12 @@ typedef void (*cudaclaw5_fort_fluxfun_t)(const int* meqn, double q[], double aux
 
 /* ------------------------------ Update functions ------------------------------------ */
 
-void cudaclaw5_step2_wrap(int maxm, int meqn, int maux, int mbc,
-                          int method[], int mthlim[], int mcapa, int mwaves, 
-                          int mx, int my, double qold[], double aux[],
-                          double dx, double dy, double dt, double cfl, 
-                          double work[], int mwork, double xlower, 
-                          double ylower, int  level, double t, 
-                          double fp[], double fm[],
-                          double gp[], double gm[], 
-                          cudaclaw5_fort_rpn2_t rpn2, 
-                          cudaclaw5_fort_rpt2_t rpt2,
-                          cudaclaw5_fort_flux2_t flux2, 
-                          int block_corner_count[], int* ierror);
+double cudaclaw5_step2_wrap(struct fclaw2d_global* glob,
+                            struct fclaw2d_patch* this_patch,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            double t,
+                            double dt);
 
 
 /* ------------------------------------- Virtual table -------------------------------- */

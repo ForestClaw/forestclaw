@@ -97,7 +97,7 @@ void cudaclaw5_qinit(fclaw2d_global_t *glob,
                      int this_patch_idx)
 {
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
-    
+
     FCLAW_ASSERT(cuclaw5_vt->fort_qinit != NULL); /* Must initialized */
     int mx,my,mbc,meqn,maux;
     double dx,dy,xlower,ylower;
@@ -125,7 +125,7 @@ void cudaclaw5_b4step2(fclaw2d_global_t *glob,
 
 {
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
-    
+
     if (cuclaw5_vt->fort_b4step2 == NULL)
     {
         return;
@@ -156,7 +156,7 @@ void cudaclaw5_src2(fclaw2d_global_t *glob,
                     double dt)
 {
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
-    
+
     if (cuclaw5_vt->fort_src2 == NULL)
     {
         return;
@@ -191,7 +191,7 @@ void cudaclaw5_bc2(fclaw2d_global_t *glob,
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
 
     fc2d_cudaclaw5_options_t *clawopt = fc2d_cudaclaw5_get_options(glob);
-    
+
     FCLAW_ASSERT(cuclaw5_vt->fort_bc2 != NULL);
 
     int mx,my,mbc,meqn, maux;
@@ -244,80 +244,11 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                        double t,
                        double dt)
 {
-    fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
-
-    fc2d_cudaclaw5_options_t* cudaclaw_options;
-    int level;
-    double *qold, *aux;
-    int mx, my, meqn, maux, mbc;
-    double xlower, ylower, dx,dy;
-
-    FCLAW_ASSERT(cuclaw5_vt->fort_rpn2 != NULL);
-    FCLAW_ASSERT(cuclaw5_vt->fort_rpt2 != NULL);
-
-    cudaclaw_options = fc2d_cudaclaw5_get_options(glob);
-
-    // cp = fclaw2d_clawpatch_get_cp(this_patch);
-
-    level = this_patch->level;
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-
-    fclaw2d_clawpatch_save_current_step(glob, this_patch);
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
-
-    int mwaves = cudaclaw_options->mwaves;
-
-    int maxm = fmax(mx,my);
-
-    double cflgrid = 0.0;
-
-    int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
-    double* work = new double[mwork];
-
-    int size = meqn*(mx+2*mbc)*(my+2*mbc);
-    double* fp = new double[size];
-    double* fm = new double[size];
-    double* gp = new double[size];
-    double* gm = new double[size];
-
-
-    int ierror = 0;
-    //fc2d_cudaclaw5_flux2_t flux2 = cudaclaw_options->use_fwaves ?
-    //                                CUDACLAW5_FLUX2FW : CUDACLAW5_FLUX2;
-    cudaclaw5_fort_flux2_t flux2 = CUDACLAW5_FLUX2;
-    
-    int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
-
-    cudaclaw5_step2_wrap(maxm, meqn, maux, mbc, cudaclaw_options->method,
-                          cudaclaw_options->mthlim, cudaclaw_options->mcapa,
-                          mwaves, mx, my, qold, aux, dx, dy, dt, cflgrid,
-                          work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
-                          cuclaw5_vt->fort_rpn2, cuclaw5_vt->fort_rpt2,flux2,
-                          block_corner_count, &ierror);
-#if 0    
-    int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
-    CUDACLAW5_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, cudaclaw_options->method,
-                          cudaclaw_options->mthlim, &cudaclaw_options->mcapa,
-                          &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-                          work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
-                          cuclaw5_vt->fort_rpn2, cuclaw5_vt->fort_rpt2,flux2,
-                          block_corner_count, &ierror);
-#endif
-
-    FCLAW_ASSERT(ierror == 0);
-
-    delete [] fp;
-    delete [] fm;
-    delete [] gp;
-    delete [] gm;
-
-    delete [] work;
-
+    double cflgrid = cudaclaw5_step2_wrap(glob,
+                                          this_patch,
+                                          this_block_idx,
+                                          this_patch_idx,
+                                          t, dt);
     return cflgrid;
 }
 
@@ -328,7 +259,7 @@ double cudaclaw5_update(fclaw2d_global_t *glob,
                         int this_patch_idx,
                         double t,
                         double dt)
-{    
+{
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
 
     const fc2d_cudaclaw5_options_t* cudaclaw_options;
@@ -398,7 +329,7 @@ void fc2d_cudaclaw5_solver_initialize()
     fc2d_cudaclaw5_vtable_t*   cuclaw5_vt = fc2d_cudaclaw5_vt_init();
 
     fclaw_vt->output_frame      = cudaclaw5_output;
-    fclaw_vt->problem_setup     = cudaclaw5_setprob;    
+    fclaw_vt->problem_setup     = cudaclaw5_setprob;
 
     /* Default patch functions */
     patch_vt->initialize            = cudaclaw5_qinit;
@@ -517,9 +448,3 @@ void fc2d_cudaclaw5_src2(fclaw2d_global_t* glob,
 {
     cudaclaw5_src2(glob,this_patch,this_block_idx,this_block_idx,t,dt);
 }
-
-
-
-
-
-

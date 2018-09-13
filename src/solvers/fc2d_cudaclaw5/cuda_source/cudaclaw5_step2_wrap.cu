@@ -1,21 +1,52 @@
 #include "../fc2d_cudaclaw5.h"
 #include "../fc2d_cudaclaw5_fort.h"
+#include "../fc2d_cudaclaw5_options.h"
 #include "cudaclaw5_update_q.h"
 
-void cudaclaw5_step2_wrap(int maxm, int meqn, int maux, int mbc,
-                          int method[], int mthlim[], int mcapa, int mwaves, 
-                          int mx, int my, double qold[], double aux[],
-                          double dx, double dy, double dt, double cfl, 
-                          double work[], int mwork, double xlower, 
-                          double ylower, int  level, double t, 
-                          double fp[], double fm[],
-                          double gp[], double gm[], 
-                          cudaclaw5_fort_rpn2_t rpn2, 
-                          cudaclaw5_fort_rpt2_t rpt2,
-                          cudaclaw5_fort_flux2_t flux2, 
-                          int block_corner_count[], int* ierror)
+double cudaclaw5_step2_wrap(fclaw2d_global_t *glob,
+                            fclaw2d_patch_t *this_patch,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            double t,
+                            double dt)
 {
+    fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
+    fc2d_cudaclaw5_options_t* cudaclaw_options;
+    int level;
+    double *qold, *aux;
+    int mx, my, meqn, maux, mbc;
+    double xlower, ylower, dx,dy;
 
+    FCLAW_ASSERT(cuclaw5_vt->fort_rpn2 != NULL);
+    FCLAW_ASSERT(cuclaw5_vt->fort_rpt2 != NULL);
+
+    cudaclaw_options = fc2d_cudaclaw5_get_options(glob);
+    level = this_patch->level;
+
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_save_current_step(glob, this_patch);
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+    fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
+
+    int mwaves = cudaclaw_options->mwaves;
+    int maxm = fmax(mx,my);
+    double cflgrid = 0.0;
+
+    int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
+    double* work = new double[mwork];
+
+    int size = meqn*(mx+2*mbc)*(my+2*mbc);
+    double* fp = new double[size];
+    double* fm = new double[size];
+    double* gp = new double[size];
+    double* gm = new double[size];
+
+    int ierror = 0;
+    cudaclaw5_fort_flux2_t flux2 = CUDACLAW5_FLUX2;
+
+    int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
+    
 #if 0
 c     # Local variables
       integer i0faddm, i0faddp, i0gaddm, i0gaddp
@@ -33,9 +64,9 @@ c     for a Riemann solver.
       common/comxyt/dtcom,dxcom,dycom,tcom,icom,jcom
 
 c     # This should be set to actual time, in case the user wants it
-c     # it for some reason in the Riemann solver. 
+c     # it for some reason in the Riemann solver.
 
-c     # Set up work arrays (these are not used yet) 
+c     # Set up work arrays (these are not used yet)
 
       i0faddm = 1
       i0faddp = i0faddm +   (maxm+2*mbc)*meqn
@@ -46,7 +77,7 @@ c     # Set up work arrays (these are not used yet)
       i0dtdy1 = i0dtdx1 +   (maxm+2*mbc)
       i0aux1  = i0dtdy1 +   (maxm+2*mbc)
       i0aux2  = i0aux1  +   (maxm+2*mbc)*maux
-      i0aux3  = i0aux2  +   (maxm+2*mbc)*maux      
+      i0aux3  = i0aux2  +   (maxm+2*mbc)*maux
 c
 c
       i0next  = i0aux3  + (maxm+2*mbc)*maux    !# next free space
@@ -56,10 +87,7 @@ c
       if (mused.gt.mwork) then
          ierror = 1
          return
-      endif
-
-
-c     # Include four additional arguments to avoid need for
+      endifid need for
 c     # global array
 c      call cudaclaw5_step2(maxm,maxmx,maxmy,meqn,maux, mbc,
 c     &      mx,my, qold,aux,dx,dy,dt,
@@ -72,24 +100,29 @@ c     &      work(i0next),mwork1,rpn2,rpt2,flux2,
 c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
 #endif
 
-    double dtdx, dtdy;
-
-    *ierror = 0;
-
     CUDACLAW5_STEP2(&maxm,&meqn,&maux,&mbc,&mx,&my,qold,aux,
-                     &dx, &dy, &dt, &cfl, fm,fp,gm,gp,rpn2,rpt2,
-                     block_corner_count, ierror);
+                    &dx,&dy,&dt,&cflgrid,fm,fp,gm,gp,cuclaw5_vt->fort_rpn2,
+                    cuclaw5_vt->fort_rpt2,block_corner_count,&ierror);
 
     /* # update q */
+    double dtdx, dtdy;
     dtdx = dt/dx;
     dtdy = dt/dy;
-#if 1    
-    CUDACLAW5_FORT_UPDATE_Q(&meqn, &mx, &my, &mbc, &maux,
-                           &dtdx, &dtdy,qold,fp,fm,
-                           gp, gm, &mcapa);
-#else    
+#if 1
+    CUDACLAW5_FORT_UPDATE_Q(&meqn,&mx,&my,&mbc,&maux,
+                            &dtdx,&dtdy,qold,fp,fm,
+                            gp,gm,&cudaclaw_options->mcapa);
+#else
     cudaclaw5_update_q(meqn,mx,my,mbc,dtdx,dtdy,qold,
                        fm,fp,gm,fp,mcapa);
-#endif      
+#endif
+    FCLAW_ASSERT(ierror == 0);
 
+    delete [] fp;
+    delete [] fm;
+    delete [] gp;
+    delete [] gm;
+    delete [] work;
+
+    return cflgrid;
 }
