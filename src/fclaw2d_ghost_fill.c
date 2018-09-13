@@ -521,13 +521,49 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
 	int mincoarse = minlevel;
 	int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
 
-	int read_parallel_patches = 1;
 
-	fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
-		   FCLAW2D_BOUNDARY_ALL;    
+    /* OpenMP doesn't work very well for filling ghost cells */
+    patch_iterator = &fclaw2d_global_iterate_level;
 
-	/* OpenMP doesn't work very well for filling ghost cells */
-	patch_iterator = &fclaw2d_global_iterate_level;
+    /* --------------------------------------------------------------
+    Do work we have do before sending
+    ------------------------------------------------------------*/
+    /* Copy/average ghost cells in local patches at the parallel boundary.
+        This is needed so that when these boundary patches get sent to other
+        processors as ghost patches, they have valid ghost cells if needed
+        for interpolation.*/
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+
+    fclaw2d_ghost_fill_parallel_mode_t parallel_mode 
+                        = FCLAW2D_BOUNDARY_GHOST_ONLY;
+    int read_parallel_patches = 0;
+
+
+    /* Average */
+    average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
+                              time_interp,
+                              read_parallel_patches,
+                              parallel_mode);
+
+    /* Copy */
+    copy_samelevel(glob,minlevel,maxlevel,time_interp,
+                   read_parallel_patches,parallel_mode);
+
+
+    /* This is needed when the parallel boundary intersects the physical
+       boundary.  In this case, a coarse grid ghost patch might
+       need to have physical boundary conditions in order to interpolate
+       to a fine grid local patch. Note that we don't need to fill in
+       ghost cells on the finest level grids, since these will never be
+        used for interpolation. */
+    fill_physical_ghost(glob,
+                        mincoarse,
+                        maxcoarse,
+                        sync_time,
+                        time_interp,
+                        parallel_mode);
+
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
 
 	/* --------------------------------------------------------------
 		Send and receive ghost patches
@@ -549,6 +585,11 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
 	------------------------------------------------------------- */
 
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+
+    read_parallel_patches = 1;
+
+    parallel_mode =
+           FCLAW2D_BOUNDARY_ALL;    
 
 	/* Average */
 	average_fine2coarse_ghost(glob,mincoarse,maxcoarse, time_interp,
@@ -657,7 +698,7 @@ void fclaw2d_ghost_update_async(fclaw2d_global_t* glob,
 #endif
 
 	/* --------------------------------------------------------------
-	Do work we can do before sending
+	Do work we have do before sending
 	------------------------------------------------------------*/
 	/* Copy/average ghost cells in local patches at the parallel boundary.
 		This is needed so that when these boundary patches get sent to other
