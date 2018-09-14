@@ -10,12 +10,12 @@
 
 #include "cudaclaw5_update_q.h"
 
-double cudaclaw5_step2_wrap(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            double t,
-                            double dt)
+double cudaclaw5_step2(fclaw2d_global_t *glob,
+                       fclaw2d_patch_t *this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       double t,
+                       double dt)
 {
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
     fc2d_cudaclaw5_options_t* cudaclaw_options;
@@ -150,9 +150,11 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
     dim3 dimGrid(mx, my);
     dim3 dimBlock(1, 1);
     int x_stride = mx + 2 * mbc;
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);
     cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(x_stride, mbc, dtdx, dtdy,
                                                    qold_dev, fm_dev, fp_dev,
                                                    gm_dev, gp_dev);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);
     cudaError_t code = cudaPeekAtLastError();
     if(code!=cudaSuccess){
         printf("ERROR: %s\n",cudaGetErrorString(code));
