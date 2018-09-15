@@ -1,14 +1,19 @@
 #include "cudaclaw5_update_q.h"
 
-__global__ void cudaclaw5_update_q_cuda(int x_stride, int mbc, 
+__global__ void cudaclaw5_update_q_cuda(int mbc, 
                                         double dtdx, double dtdy,
                                         double* qold, 
                                         double* fm, double* fp, 
                                         double* gm, double* gp)
 {
-    int i = (blockIdx.x + mbc) * x_stride + blockIdx.y + mbc;
-    qold[i] += -dtdx * (fm[i+x_stride] - fp[i]) -
-                          dtdy * (gm[i+1] - gp[i]);
+    int meqn = threadIdx.z;
+    int x = threadIdx.x;
+    int x_stride = blockDim.z;
+    int y = threadIdx.y;
+    int y_stride = (blockDim.x+2*mbc)*x_stride;
+    int i = meqn + (x+mbc)*x_stride + (y+mbc)*y_stride;
+    qold[i] = qold[i] - dtdx * (fm[i+x_stride] - fp[i]) 
+                      - dtdy * (gm[i+y_stride] - gp[i]);
 }
 
 
@@ -38,13 +43,27 @@ void cudaclaw5_update_q(int meqn, int mx, int my, int mbc,
     cudaMemcpy(gp_dev, gp, size * sizeof(double), cudaMemcpyHostToDevice);
 
     // this is not optimal
-    dim3 dimGrid(mx, my);
+    dim3 dimGrid(mx, my, meqn);
     dim3 dimBlock(1, 1);
-
-    int x_stride = mx + 2 * mbc;
-    cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(x_stride, mbc, dtdx, dtdy, 
+    cudaclaw5_update_q_cuda<<<dimBlock, dimGrid>>>(mbc, dtdx, dtdy, 
                                                    qold_dev, fm_dev, fp_dev, 
                                                    gm_dev, gp_dev);
+    //equivalent c loop
+    /*
+    int x_stride = meqn;
+    int y_stride = (mx + 2 * mbc)*x_stride;
+    for(int m=0;m<meqn;m++){
+        for(int x=0;x<mx;x++){
+            for(int y=0;y<my;y++){
+                int i = m+(x+mbc)*x_stride+(y+mbc)*y_stride;
+                qold[i] =qold[i] -dtdx * (fm[i+x_stride] - fp[i]) -
+                                  dtdy * (gm[i+y_stride] - gp[i]);
+
+            }
+        }
+    }
+    */
+
 	cudaError_t code = cudaPeekAtLastError();
     if(code!=cudaSuccess){
         printf("ERROR: %s\n",cudaGetErrorString(code));

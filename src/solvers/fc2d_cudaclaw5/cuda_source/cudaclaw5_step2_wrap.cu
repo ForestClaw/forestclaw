@@ -83,13 +83,13 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
     /* # update q */
     dtdx = dt/dx;
     dtdy = dt/dy;
-#if 1    
+#if 0    
     CUDACLAW5_FORT_UPDATE_Q(&meqn, &mx, &my, &mbc, &maux,
                            &dtdx, &dtdy,qold,fp,fm,
                            gp, gm, &mcapa);
 #else    
     cudaclaw5_update_q(meqn,mx,my,mbc,dtdx,dtdy,qold,
-                       fm,fp,gm,fp,mcapa);
+                       fm,fp,gm,gp,mcapa);
 #endif      
 
 }
