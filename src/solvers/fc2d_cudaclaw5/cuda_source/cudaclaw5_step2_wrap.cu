@@ -1,6 +1,13 @@
 #include "../fc2d_cudaclaw5.h"
+
+#include <fclaw2d_patch.h>
+#include <fclaw2d_global.h>
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch.hpp>
+
 #include "../fc2d_cudaclaw5_fort.h"
 #include "../fc2d_cudaclaw5_options.h"
+
 #include "cudaclaw5_update_q.h"
 
 double cudaclaw5_step2_wrap(fclaw2d_global_t *glob,
@@ -30,7 +37,7 @@ double cudaclaw5_step2_wrap(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
 
     int mwaves = cudaclaw_options->mwaves;
-    int maxm = fmax(mx,my);
+    int maxm = SC_MAX(mx,my);
     double cflgrid = 0.0;
 
     int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
