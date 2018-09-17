@@ -69,6 +69,9 @@ public :
     int blockno;
 
     fclaw2d_metric_patch_t *mp;
+
+    /* User data*/ 
+    void* user_data;
 };
 
 fclaw2d_clawpatch_t* 

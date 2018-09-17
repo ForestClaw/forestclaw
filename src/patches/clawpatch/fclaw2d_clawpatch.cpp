@@ -1158,6 +1158,13 @@ double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,
     return cp->griderror.dataPtr();
 }
 
+void* flaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
+                                 fclaw2d_patch_t* this_patch)
+{
+    fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
+    return cp->user_data;
+}
+
 size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
