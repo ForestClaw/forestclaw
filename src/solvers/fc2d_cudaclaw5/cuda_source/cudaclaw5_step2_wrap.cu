@@ -150,7 +150,7 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
     dim3 dimGrid(mx, my);
     dim3 dimBlock(1, 1);
     int x_stride = mx + 2 * mbc;
-    cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(x_stride, mbc, dtdx, dtdy,
+    cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(mbc, dtdx, dtdy,
                                                    qold_dev, fm_dev, fp_dev,
                                                    gm_dev, gp_dev);
     cudaError_t code = cudaPeekAtLastError();
