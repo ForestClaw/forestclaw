@@ -5,7 +5,7 @@
 void cudaclaw5_step2_wrap(int maxm, int meqn, int maux, int mbc,
                           int method[], int mthlim[], int mcapa, int mwaves, 
                           int mx, int my, double qold[], double aux[],
-                          double dx, double dy, double dt, double cfl, 
+                          double dx, double dy, double dt, double* cfl, 
                           double work[], int mwork, double xlower, 
                           double ylower, int  level, double t, 
                           double fp[], double fm[],
@@ -77,7 +77,7 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
     *ierror = 0;
 
     CUDACLAW5_STEP2(&maxm,&meqn,&maux,&mbc,&mx,&my,qold,aux,
-                     &dx, &dy, &dt, &cfl, fm,fp,gm,gp,rpn2,rpt2,
+                     &dx, &dy, &dt, cfl, fm,fp,gm,gp,rpn2,rpt2,
                      block_corner_count, ierror);
 
     /* # update q */
