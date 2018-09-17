@@ -86,11 +86,13 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaMalloc((void**)&gp_dev, size * sizeof(double));
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);
 
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
     cudaMemcpy(qold_dev, qold, size * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(fm_dev, fm, size * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(fp_dev, fp, size * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(gm_dev, gm, size * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(gp_dev, gp, size * sizeof(double), cudaMemcpyHostToDevice);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
 
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
@@ -99,12 +101,17 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                                                    qold_dev, fm_dev, fp_dev,
                                                    gm_dev, gp_dev);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);
+
     cudaError_t code = cudaPeekAtLastError();
-    if(code!=cudaSuccess){
+    if(code != cudaSuccess)
+    {
         printf("ERROR: %s\n",cudaGetErrorString(code));
     }
 
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
     cudaMemcpy(qold, qold_dev, size * sizeof(double), cudaMemcpyDeviceToHost);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
+    
     cudaFree(qold_dev);
     cudaFree(fm_dev);
     cudaFree(fp_dev);
