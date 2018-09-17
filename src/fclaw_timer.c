@@ -141,6 +141,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_STEP3);
     FCLAW2D_STATS_SET (stats, glob, NEIGHBOR_SEARCH);
     FCLAW2D_STATS_SET (stats, glob, CUDA_ALLOCATE);
+    FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY);
     FCLAW2D_STATS_SET (stats, glob, CUDA_KERNEL1);
     FCLAW2D_STATS_SET (stats, glob, CUDA_KERNEL2);
     FCLAW2D_STATS_SET (stats, glob, CUDA_KERNEL3);
@@ -276,6 +277,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET_GROUP(stats,NEIGHBOR_SEARCH,       SEARCH);
 
     FCLAW2D_STATS_SET_GROUP(stats,CUDA_ALLOCATE,         CUDA);
+    FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY,          CUDA);
     FCLAW2D_STATS_SET_GROUP(stats,CUDA_KERNEL1,          CUDA);
     FCLAW2D_STATS_SET_GROUP(stats,CUDA_KERNEL2,          CUDA);
     FCLAW2D_STATS_SET_GROUP(stats,CUDA_KERNEL3,          CUDA);
