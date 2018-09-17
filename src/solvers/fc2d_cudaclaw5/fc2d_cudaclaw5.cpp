@@ -234,24 +234,6 @@ void cudaclaw5_bc2(fclaw2d_global_t *glob,
 
 }
 
-
-/* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
-static
-double cudaclaw5_step2(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       double t,
-                       double dt)
-{
-    double cflgrid = cudaclaw5_step2_wrap(glob,
-                                          this_patch,
-                                          this_block_idx,
-                                          this_patch_idx,
-                                          t, dt);
-    return cflgrid;
-}
-
 static
 double cudaclaw5_update(fclaw2d_global_t *glob,
                         fclaw2d_patch_t *this_patch,

@@ -135,12 +135,12 @@ typedef void (*cudaclaw5_fort_fluxfun_t)(const int* meqn, double q[], double aux
 
 /* ------------------------------ Update functions ------------------------------------ */
 
-double cudaclaw5_step2_wrap(struct fclaw2d_global* glob,
-                            struct fclaw2d_patch* this_patch,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            double t,
-                            double dt);
+double cudaclaw5_step2(struct fclaw2d_global* glob,
+                       struct fclaw2d_patch* this_patch,
+                       int this_block_idx,
+                       int this_patch_idx,
+                       double t,
+                       double dt);
 
 
 /* ------------------------------------- Virtual table -------------------------------- */
