@@ -138,7 +138,7 @@ typedef void (*cudaclaw5_fort_fluxfun_t)(const int* meqn, double q[], double aux
 void cudaclaw5_step2_wrap(int maxm, int meqn, int maux, int mbc,
                           int method[], int mthlim[], int mcapa, int mwaves, 
                           int mx, int my, double qold[], double aux[],
-                          double dx, double dy, double dt, double* cfl, 
+                          double dx, double dy, double dt, double cfl, 
                           double work[], int mwork, double xlower, 
                           double ylower, int  level, double t, 
                           double fp[], double fm[],

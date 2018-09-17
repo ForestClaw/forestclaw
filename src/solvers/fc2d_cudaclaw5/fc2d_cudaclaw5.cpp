@@ -295,7 +295,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     cudaclaw5_step2_wrap(maxm, meqn, maux, mbc, cudaclaw_options->method,
                           cudaclaw_options->mthlim, cudaclaw_options->mcapa,
-                          mwaves, mx, my, qold, aux, dx, dy, dt, &cflgrid,
+                          mwaves, mx, my, qold, aux, dx, dy, dt, cflgrid,
                           work, mwork, xlower, ylower, level,t, fp, fm, gp, gm,
                           cuclaw5_vt->fort_rpn2, cuclaw5_vt->fort_rpt2,flux2,
                           block_corner_count, &ierror);
