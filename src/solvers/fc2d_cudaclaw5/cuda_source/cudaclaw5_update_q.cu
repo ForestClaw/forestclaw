@@ -16,7 +16,7 @@ __global__ void cudaclaw5_update_q_cuda(int mbc,
                       - dtdy * (gm[i+y_stride] - gp[i]);
 }
 
-
+#if 0
 void cudaclaw5_update_q(int meqn, int mx, int my, int mbc, 
                         double dtdx, double dtdy, double qold[], 
                         double fm[], double fp[], 
@@ -76,3 +76,4 @@ void cudaclaw5_update_q(int meqn, int mx, int my, int mbc,
     cudaFree(gm_dev);
     cudaFree(gp_dev);
 }
+#endif

@@ -15,8 +15,7 @@ extern "C"
 #endif
 #endif
 
-__global__
-void cudaclaw5_update_q_cuda(int x_stride, int mbc,
+__global__  void cudaclaw5_update_q_cuda(int mbc,
                              double dtdx, double dtdy,
                              double* qold,
                              double* fm, double* fp,
