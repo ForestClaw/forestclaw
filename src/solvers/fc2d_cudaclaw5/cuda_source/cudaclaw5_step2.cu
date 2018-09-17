@@ -7,6 +7,7 @@
 
 #include "../fc2d_cudaclaw5_fort.h"
 #include "../fc2d_cudaclaw5_options.h"
+#include "../fc2d_cudaclaw5_timer.h"
 
 #include "cudaclaw5_update_q.h"
 
@@ -17,6 +18,11 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                        double t,
                        double dt)
 {
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    float milliseconds = 0;
+    
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
     fc2d_cudaclaw5_options_t* cudaclaw_options;
     int level;
@@ -133,13 +139,16 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
     double* gm_dev;
     double* gp_dev;
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);
+    cudaEventRecord(start);
     cudaMalloc((void**)&qold_dev, size * sizeof(double));
     cudaMalloc((void**)&fm_dev, size * sizeof(double));
     cudaMalloc((void**)&fp_dev, size * sizeof(double));
     cudaMalloc((void**)&gm_dev, size * sizeof(double));
     cudaMalloc((void**)&gp_dev, size * sizeof(double));
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE].cumulative += milliseconds*1e-3;
 
     cudaMemcpy(qold_dev, qold, size * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(fm_dev, fm, size * sizeof(double), cudaMemcpyHostToDevice);
@@ -150,11 +159,14 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
     dim3 dimGrid(mx, my);
     dim3 dimBlock(1, 1);
     int x_stride = mx + 2 * mbc;
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);
+    cudaEventRecord(start);
     cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(x_stride, mbc, dtdx, dtdy,
                                                    qold_dev, fm_dev, fp_dev,
                                                    gm_dev, gp_dev);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1].cumulative += milliseconds*1e-3;
     cudaError_t code = cudaPeekAtLastError();
     if(code!=cudaSuccess){
         printf("ERROR: %s\n",cudaGetErrorString(code));
@@ -166,6 +178,9 @@ c     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
     cudaFree(fp_dev);
     cudaFree(gm_dev);
     cudaFree(gp_dev);
+
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
 #endif
 
     FCLAW_ASSERT(ierror == 0);
