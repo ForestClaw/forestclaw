@@ -78,6 +78,11 @@ void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
     FCLAW_ASSERT(patch_vt->patch_delete != NULL);
     fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
 
+    if (patch_vt->destroy_user_data)
+    {
+        patch_vt->destroy_user_data(glob,this_patch);
+    }
+
     if (pdata != NULL)
     {
         fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);        
@@ -87,11 +92,6 @@ void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
         FCLAW2D_FREE(pdata);
         this_patch->user = NULL;
     }
-    if (patch_vt->destroy_user_data)
-    {
-        patch_vt->destroy_user_data(glob,this_patch);
-    }
-
 }
 
 void fclaw2d_patch_build(fclaw2d_global_t *glob,
