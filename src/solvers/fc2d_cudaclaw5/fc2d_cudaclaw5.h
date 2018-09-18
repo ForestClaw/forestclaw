@@ -133,7 +133,7 @@ typedef void (*cudaclaw5_fort_fluxfun_t)(const int* meqn, double q[], double aux
                                           double fq[]);
 #endif
 
-/* ------------------------------ Update functions ------------------------------------ */
+/* ------------------------------ CUDA functions ------------------------------------ */
 
 double cudaclaw5_step2(struct fclaw2d_global* glob,
                        struct fclaw2d_patch* this_patch,
@@ -142,6 +142,9 @@ double cudaclaw5_step2(struct fclaw2d_global* glob,
                        double t,
                        double dt);
 
+
+void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
+                               struct fclaw2d_patch *patch);
 
 /* ------------------------------------- Virtual table -------------------------------- */
 

@@ -1,4 +1,5 @@
 #include "../fc2d_cudaclaw5.h"
+#include "cudaclaw5_allocate.h"
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
@@ -19,16 +20,21 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 {
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
     fc2d_cudaclaw5_options_t* cudaclaw_options;
-    int level;
+    //int level;
     double *qold, *aux;
     int mx, my, meqn, maux, mbc;
     double xlower, ylower, dx,dy;
+
+    cudaclaw5_fluxes_t *fluxes = (cudaclaw5_fluxes_t*) 
+               fclaw2d_patch_get_user_data(glob,this_patch);
+
+
 
     FCLAW_ASSERT(cuclaw5_vt->fort_rpn2 != NULL);
     FCLAW_ASSERT(cuclaw5_vt->fort_rpt2 != NULL);
 
     cudaclaw_options = fc2d_cudaclaw5_get_options(glob);
-    level = this_patch->level;
+    // level = this_patch->level;
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     fclaw2d_clawpatch_save_current_step(glob, this_patch);
@@ -36,27 +42,32 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
     fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
 
-    int mwaves = cudaclaw_options->mwaves;
+    // int mwaves = cudaclaw_options->mwaves;
     int maxm = SC_MAX(mx,my);
     double cflgrid = 0.0;
 
+#if 0
     int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
     double* work = new double[mwork];
+#endif    
 
+#if 0
     int size = meqn*(mx+2*mbc)*(my+2*mbc);
     double* fp = new double[size];
     double* fm = new double[size];
     double* gp = new double[size];
     double* gm = new double[size];
+#endif
 
     int ierror = 0;
-    cudaclaw5_fort_flux2_t flux2 = CUDACLAW5_FLUX2;
+    // cudaclaw5_fort_flux2_t flux2 = CUDACLAW5_FLUX2;
 
     int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
 
 
     CUDACLAW5_STEP2(&maxm,&meqn,&maux,&mbc,&mx,&my,qold,aux,
-                    &dx,&dy,&dt,&cflgrid,fm,fp,gm,gp,cuclaw5_vt->fort_rpn2,
+                    &dx,&dy,&dt,&cflgrid,fluxes->fm,fluxes->fp,
+                    fluxes->gm,fluxes->gp,cuclaw5_vt->fort_rpn2,
                     cuclaw5_vt->fort_rpt2,block_corner_count,&ierror);
 
     /* # update q */
@@ -69,9 +80,8 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                             &dtdx,&dtdy,qold,fp,fm,
                             gp,gm,&cudaclaw_options->mcapa);
 #else
-  //  cudaclaw5_update_q(meqn,mx,my,mbc,
-  //                     dtdx,dtdy,qold,
-  //                     fm,fp,gm,gp,cudaclaw_options->mcapa);
+
+#if 0
     double* qold_dev;
     double* fm_dev;
     double* fp_dev;
@@ -85,21 +95,23 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaMalloc((void**)&gm_dev, size * sizeof(double));
     cudaMalloc((void**)&gp_dev, size * sizeof(double));
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);
+#endif    
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
-    cudaMemcpy(qold_dev, qold, size * sizeof(double), cudaMemcpyHostToDevice);
-    cudaMemcpy(fm_dev, fm, size * sizeof(double), cudaMemcpyHostToDevice);
-    cudaMemcpy(fp_dev, fp, size * sizeof(double), cudaMemcpyHostToDevice);
-    cudaMemcpy(gm_dev, gm, size * sizeof(double), cudaMemcpyHostToDevice);
-    cudaMemcpy(gp_dev, gp, size * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->qold_dev, qold, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->fm_dev, fluxes->fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->fp_dev, fluxes->fp, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->gm_dev, fluxes->gm, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->gp_dev, fluxes->gp, fluxes->num_bytes, cudaMemcpyHostToDevice);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
 
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);
     cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(mbc, dtdx, dtdy,
-                                                   qold_dev, fm_dev, fp_dev,
-                                                   gm_dev, gp_dev);
+                                                   fluxes->qold_dev, 
+                                                   fluxes->fm_dev, fluxes->fp_dev,
+                                                   fluxes->gm_dev, fluxes->gp_dev);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);
 
     cudaError_t code = cudaPeekAtLastError();
@@ -109,23 +121,26 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     }
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
-    cudaMemcpy(qold, qold_dev, size * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
     
+#if 0
     cudaFree(qold_dev);
     cudaFree(fm_dev);
     cudaFree(fp_dev);
     cudaFree(gm_dev);
     cudaFree(gp_dev);
+#endif    
 #endif
 
     FCLAW_ASSERT(ierror == 0);
-
+#if 0
     delete [] fp;
     delete [] fm;
     delete [] gp;
     delete [] gm;
     delete [] work;
+#endif    
 
     return cflgrid;
 }

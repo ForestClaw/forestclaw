@@ -5,7 +5,8 @@ libcudaclaw5_installed_headers = \
 	src/solvers/fc2d_cudaclaw5/fc2d_cudaclaw5_options.h \
 	src/solvers/fc2d_cudaclaw5/cudaclaw5_user_fort.h \
 	src/solvers/fc2d_cudaclaw5/fc2d_cudaclaw5_fort.h \
-	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_update_q.h
+	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_update_q.h \
+	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_allocate.h
 
 libcudaclaw5_compiled_sources = \
 	src/solvers/fc2d_cudaclaw5/fc2d_cudaclaw5.cpp \
@@ -22,7 +23,8 @@ libcudaclaw5_compiled_sources = \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_step2_wrap.f \
 	src/solvers/fc2d_cudaclaw5/fortran_source/cudaclaw5_update_q.f \
 	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_update_q.cu \
-	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_step2.cu
+	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_step2.cu \
+	src/solvers/fc2d_cudaclaw5/cuda_source/cudaclaw5_allocate.cu
 
 ## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_cudaclaw5/libcudaclaw5.la

@@ -319,6 +319,9 @@ void fc2d_cudaclaw5_solver_initialize()
     patch_vt->physical_bc           = cudaclaw5_bc2;
     patch_vt->single_step_update    = cudaclaw5_update;
 
+    /* Set user data */
+    patch_vt->create_user_data = cudaclaw5_allocate_fluxes;
+
     cuclaw5_vt->b4step2   = cudaclaw5_b4step2;
     cuclaw5_vt->src2      = cudaclaw5_src2;
 
