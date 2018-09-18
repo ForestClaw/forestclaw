@@ -22,7 +22,7 @@ typedef struct cudaclaw5_fluxes
     double *fm;
     double *gp;
     double *gm;
-    
+
     double *qold_dev;
     double *fp_dev;
     double *fm_dev;
@@ -32,6 +32,10 @@ typedef struct cudaclaw5_fluxes
 
 void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
                                struct fclaw2d_patch *patch);
+
+void cudaclaw5_deallocate_fluxes(struct fclaw2d_global *glob,
+                                 struct fclaw2d_patch *patch);
+
 
 #ifdef __cplusplus
 #if 0

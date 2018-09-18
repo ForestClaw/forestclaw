@@ -123,6 +123,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
     cudaMemcpy(qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);
+
     
 #if 0
     cudaFree(qold_dev);
@@ -133,7 +134,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 #endif    
 #endif
 
-    FCLAW_ASSERT(ierror == 0);
 #if 0
     delete [] fp;
     delete [] fm;
@@ -141,6 +141,8 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     delete [] gm;
     delete [] work;
 #endif    
+
+    FCLAW_ASSERT(ierror == 0);
 
     return cflgrid;
 }

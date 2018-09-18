@@ -235,6 +235,8 @@ void fclaw2d_patch_interpolate_corner(struct fclaw2d_global* glob,
 void fclaw2d_patch_create_user_data(struct fclaw2d_global* glob,
                                     struct fclaw2d_patch* patch);
 
+void fclaw2d_patch_destroy_user_data(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch* patch);
 
 /* -------------------------- Transform functions (typedefs) -------------------------- */
 

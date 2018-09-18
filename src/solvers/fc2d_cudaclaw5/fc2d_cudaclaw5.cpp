@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_cudaclaw5_fort.h"
 #include "fc2d_cudaclaw5_options.h"
 
+#include "cuda_source/cudaclaw5_allocate.h"
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch.hpp>
@@ -320,7 +321,8 @@ void fc2d_cudaclaw5_solver_initialize()
     patch_vt->single_step_update    = cudaclaw5_update;
 
     /* Set user data */
-    patch_vt->create_user_data = cudaclaw5_allocate_fluxes;
+    patch_vt->create_user_data  = cudaclaw5_allocate_fluxes;
+    patch_vt->destroy_user_data = cudaclaw5_deallocate_fluxes;
 
     cuclaw5_vt->b4step2   = cudaclaw5_b4step2;
     cuclaw5_vt->src2      = cudaclaw5_src2;

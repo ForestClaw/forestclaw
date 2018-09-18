@@ -142,10 +142,6 @@ double cudaclaw5_step2(struct fclaw2d_global* glob,
                        double t,
                        double dt);
 
-
-void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
-                               struct fclaw2d_patch *patch);
-
 /* ------------------------------------- Virtual table -------------------------------- */
 
 typedef struct fc2d_cudaclaw5_vtable

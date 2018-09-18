@@ -32,3 +32,21 @@ void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
 
     fclaw2d_patch_set_user_data(glob,patch,fluxes);
 }
+
+void cudaclaw5_deallocate_fluxes(fclaw2d_global_t *glob,
+                                 fclaw2d_patch_t *patch)
+{
+    cudaclaw5_fluxes_t *fluxes = FCLAW_ALLOC(cudaclaw5_fluxes,1);
+
+    cudaFree(fluxes->qold_dev);
+    cudaFree(fluxes->fm_dev);
+    cudaFree(fluxes->fp_dev);
+    cudaFree(fluxes->gm_dev);
+    cudaFree(fluxes->gp_dev);
+
+    delete [] fluxes->fp;
+    delete [] fluxes->fm;
+    delete [] fluxes->gp;
+    delete [] fluxes->gm;
+}
+
