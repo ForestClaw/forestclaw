@@ -30,8 +30,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     FCLAW_ASSERT(fluxes != NULL);
 
-
-
     FCLAW_ASSERT(cuclaw5_vt->fort_rpn2 != NULL);
     FCLAW_ASSERT(cuclaw5_vt->fort_rpt2 != NULL);
 
