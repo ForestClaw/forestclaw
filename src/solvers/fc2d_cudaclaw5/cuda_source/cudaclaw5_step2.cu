@@ -28,6 +28,8 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaclaw5_fluxes_t *fluxes = (cudaclaw5_fluxes_t*) 
                fclaw2d_patch_get_user_data(glob,this_patch);
 
+    FCLAW_ASSERT(fluxes != NULL);
+
 
 
     FCLAW_ASSERT(cuclaw5_vt->fort_rpn2 != NULL);
