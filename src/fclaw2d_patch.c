@@ -80,6 +80,11 @@ void fclaw2d_patch_data_delete(fclaw2d_global_t *glob,
 
     if (pdata != NULL)
     {
+        if (patch_vt->destroy_user_data)
+        {
+            patch_vt->destroy_user_data(glob,this_patch);
+        }
+
         fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);        
         patch_vt->patch_delete(pdata->user_patch);
         ++ddata->count_delete_patch;
@@ -114,6 +119,10 @@ void fclaw2d_patch_build(fclaw2d_global_t *glob,
     {
         patch_vt->setup(glob,this_patch,blockno,patchno);
     }
+    if (patch_vt->create_user_data)
+    {
+        patch_vt->create_user_data(glob,this_patch);
+    }
 }
 
 
@@ -146,7 +155,46 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
     {
         patch_vt->setup(glob,coarse_patch,blockno,coarse_patchno);
     }
+    if (patch_vt->create_user_data)
+    {
+        patch_vt->create_user_data(glob,coarse_patch);
+    }    
 }
+
+#if 0
+void fclaw2d_patch_create_user_data(fclaw2d_global_t* glob,
+                                    fclaw2d_patch_t* patch)
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    FCLAW_ASSERT(patch_vt->create_user_data != NULL);
+    patch_vt->create_user_data(glob,patch);
+}
+
+void fclaw2d_patch_destroy_user_data(fclaw2d_global_t* glob,
+                                     fclaw2d_patch_t* patch)
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    FCLAW_ASSERT(patch_vt->destroy_user_data != NULL);
+    patch_vt->destroy_user_data(glob,patch);
+}
+#endif
+
+#if 0
+void* fclaw2d_patch_get_user_data(fclaw2d_global_t* glob,
+                              fclaw2d_patch_t* this_patch)
+{
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    return pdata->user_data;
+}
+
+void fclaw2d_patch_set_user_data(fclaw2d_global_t* glob,
+                                 fclaw2d_patch_t* this_patch, 
+                                 void* user)
+{
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    pdata->user_data = user;
+}
+#endif
 
 
 /* --------------------------- Solver specific functions ------------------------------ */
@@ -686,6 +734,21 @@ fclaw2d_patch_data_t*
 fclaw2d_patch_get_patch_data(fclaw2d_patch_t* patch)
 {
     return get_patch_data(patch);
+}
+
+void* fclaw2d_patch_get_user_data(fclaw2d_global_t* glob,
+                                  fclaw2d_patch_t* this_patch)
+{
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    return pdata->user_data;
+}
+
+void fclaw2d_patch_set_user_data(fclaw2d_global_t* glob,
+                                 fclaw2d_patch_t* this_patch, 
+                                 void* user)
+{
+    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    pdata->user_data = user;
 }
 
 

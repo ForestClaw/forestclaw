@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>       /* Need patch callback def */
 
-#include <fclaw2d_clawpatch_fort.h>
+#include <fclaw2d_clawpatch_fort.h>  /* Needed for fortran typedefs */
 
 
 #ifdef __cplusplus
@@ -42,6 +42,11 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
+typedef void (*clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
+                                          struct fclaw2d_patch *patch,
+                                          void* user);
+
+
 /* ---------------------------- Virtual table ------------------------------------ */
 
 /* members of this structure provide the only access to above functions */
@@ -53,6 +58,8 @@ fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
 struct fclaw2d_clawpatch_vtable
 {
+    clawpatch_set_user_data_t              set_user_data;
+
     /* ghost filling functions */
     clawpatch_fort_copy_face_t             fort_copy_face;
     clawpatch_fort_average_face_t          fort_average_face;
@@ -139,6 +146,10 @@ double* fclaw2d_clawpatch_get_error(struct fclaw2d_global* glob,
                                     struct fclaw2d_patch* this_patch);
 
 size_t fclaw2d_clawpatch_size(struct fclaw2d_global *glob);
+
+void* flaw2d_clawpatch_user_data(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch* this_patch);
+
 
 void fclaw2d_clawpatch_timesync_data(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* this_patch,

@@ -86,7 +86,8 @@ struct fclaw2d_patch_data
     int neighbors_set;
     int blockno;
 
-    void *user_patch; /* Start of attempt to "virtualize" the user patch. */
+    void *user_patch; /* User patch is virualized */
+    void *user_data;  /* Data the user may want to attach to each patch */
 };
 
 struct fclaw2d_patch_transform_data
@@ -230,6 +231,12 @@ void fclaw2d_patch_interpolate_corner(struct fclaw2d_global* glob,
                                       int time_interp,
                                       struct fclaw2d_patch_transform_data* transform_data);
 
+/* -------------------------- Transform functions (typedefs) -------------------------- */
+void fclaw2d_patch_create_user_data(struct fclaw2d_global* glob,
+                                    struct fclaw2d_patch* patch);
+
+void fclaw2d_patch_destroy_user_data(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch* patch);
 
 /* -------------------------- Transform functions (typedefs) -------------------------- */
 
@@ -520,6 +527,14 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
                                                  void *unpack_data_from_here);
 
 
+/* ------------------------------  User data functions -------------------------------- */
+
+typedef void (*fclaw2d_patch_create_user_data_t)(struct fclaw2d_global *glob, 
+                                              struct fclaw2d_patch *patch);
+
+typedef void (*fclaw2d_patch_destroy_user_data_t)(struct fclaw2d_global* glob,
+                                                  struct fclaw2d_patch* patch);
+
 /* ---------------------------------  Access functions -------------------------------- */
 
 typedef void* (*fclaw2d_patch_metric_patch_t)(struct fclaw2d_patch *patch);
@@ -536,6 +551,10 @@ struct fclaw2d_patch_vtable
 
     /* Return metric patch from patch struct. */
     fclaw2d_patch_metric_patch_t          metric_patch;
+
+    /* Set user data */
+    fclaw2d_patch_create_user_data_t      create_user_data;
+    fclaw2d_patch_destroy_user_data_t     destroy_user_data;
 
     /* Solver functions */
     fclaw2d_patch_initialize_t            initialize;
@@ -606,18 +625,30 @@ void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
 
 
 void*
-fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch);
+fclaw2d_patch_get_user_patch(struct fclaw2d_patch* patch);
 
+#if 0
 struct fclaw2d_patch_data*
 fclaw2d_patch_get_user_data(struct fclaw2d_patch* patch);
+#endif
+
+void* fclaw2d_patch_get_user_data(struct fclaw2d_global* glob,
+                                  struct fclaw2d_patch* this_patch);
 
 
 void* fclaw2d_patch_get_user_patch(struct fclaw2d_patch* patch);
 
 void* fclaw2d_patch_metric_patch(struct fclaw2d_patch *patch);
 
-int fclaw2d_patch_get_blockno(fclaw2d_patch_t* this_patch);
+int fclaw2d_patch_get_blockno(struct fclaw2d_patch* this_patch);
 
+/* Misc. user data */
+void* fclaw2d_patch_user_data(struct fclaw2d_global* glob,
+                              struct fclaw2d_patch* this_patch);
+
+void fclaw2d_patch_set_user_data(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch* this_patch, 
+                                 void* user);
 
 
 /* ------------------  Miscellaneous functions (mostly internal) ---------------------- */

@@ -5,7 +5,7 @@ import subprocess
 import random
 
 np = 1
-arg_list = ["mpirun","-n",str(np),"swirl","--user:cuda=F"]
+arg_list = ["mpirun","-n",str(np),"swirl","--user:cuda=T"]
 jobid = random.randint(1000,9999)
 outfile = "swirl_0000{:d}.o{:d}".format(np,jobid)
 f = open(outfile,'w')
