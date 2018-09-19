@@ -58,10 +58,12 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
 
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);    
     CUDACLAW5_STEP2(&maxm,&meqn,&maux,&mbc,&mx,&my,qold,aux,
                     &dx,&dy,&dt,&cflgrid,fluxes->fm,fluxes->fp,
                     fluxes->gm,fluxes->gp,cuclaw5_vt->fort_rpn2,
                     cuclaw5_vt->fort_rpt2,block_corner_count,&ierror);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);    
 
     /* update q on the GPU */
     double dtdx, dtdy;
@@ -78,7 +80,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
-    milliseconds = 0;
     cudaEventRecord(start);
 
     cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(mbc, dtdx, dtdy,
@@ -88,8 +89,9 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
+    milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
-    glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1].cumulative += milliseconds*1e-3;
+    glob->timers[FCLAW2D_TIMER_CUDA_KERNEL2].cumulative += milliseconds*1e-3;
 
     cudaError_t code = cudaPeekAtLastError();
     if(code != cudaSuccess)
