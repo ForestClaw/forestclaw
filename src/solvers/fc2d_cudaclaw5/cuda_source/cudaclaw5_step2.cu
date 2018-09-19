@@ -21,7 +21,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
-    float milliseconds = 0;
+    float milliseconds;
     
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
     double *qold, *aux;
@@ -68,26 +68,24 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     dtdx = dt/dx;
     dtdy = dt/dy;
 
-    milliseconds = 0;
-    cudaEventRecord(start);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
     cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fm_dev, fluxes->fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fp_dev, fluxes->fp, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->gm_dev, fluxes->gm, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->gp_dev, fluxes->gp, fluxes->num_bytes, cudaMemcpyHostToDevice);
-    cudaEventRecord(stop);
-    cudaEventSynchronize(stop);
-    cudaEventElapsedTime(&milliseconds, start, stop);
-    glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
 
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
     milliseconds = 0;
     cudaEventRecord(start);
+
     cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(mbc, dtdx, dtdy,
                                                    fluxes->qold_dev, 
                                                    fluxes->fm_dev, fluxes->fp_dev,
                                                    fluxes->gm_dev, fluxes->gp_dev);
+
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&milliseconds, start, stop);
@@ -99,13 +97,9 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         printf("ERROR: %s\n",cudaGetErrorString(code));
     }
 
-    milliseconds = 0;
-    cudaEventRecord(start);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
     cudaMemcpy(qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost);
-    cudaEventRecord(stop);
-    cudaEventSynchronize(stop);
-    cudaEventElapsedTime(&milliseconds, start, stop);
-    glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
     
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
