@@ -25,8 +25,8 @@ void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
     fluxes->fm = new double[size];
     fluxes->gp = new double[size];
     fluxes->gm = new double[size];
-
-
+    
+    
     cudaEventRecord(start);
     cudaMalloc((void**)&fluxes->qold_dev, fluxes->num_bytes);
     cudaMalloc((void**)&fluxes->fm_dev,   fluxes->num_bytes);

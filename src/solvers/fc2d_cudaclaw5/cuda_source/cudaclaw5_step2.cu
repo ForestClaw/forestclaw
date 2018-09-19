@@ -68,6 +68,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     dtdx = dt/dx;
     dtdy = dt/dy;
 
+    milliseconds = 0;
     cudaEventRecord(start);
     cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fm_dev, fluxes->fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
@@ -81,6 +82,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
+    milliseconds = 0;
     cudaEventRecord(start);
     cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(mbc, dtdx, dtdy,
                                                    fluxes->qold_dev, 
@@ -97,6 +99,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         printf("ERROR: %s\n",cudaGetErrorString(code));
     }
 
+    milliseconds = 0;
     cudaEventRecord(start);
     cudaMemcpy(qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost);
     cudaEventRecord(stop);
