@@ -7,7 +7,7 @@
 
 #include "../fc2d_cudaclaw5_fort.h"
 #include "../fc2d_cudaclaw5_options.h"
-#include "../fc2d_cudaclaw5_timer.h"
+//#include "../fc2d_cudaclaw5_timer.h"
 
 #include "cudaclaw5_update_q.h"
 
@@ -106,7 +106,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
-    
+
     FCLAW_ASSERT(ierror == 0);
 
     return cflgrid;
