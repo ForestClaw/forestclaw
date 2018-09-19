@@ -58,11 +58,19 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);    
+    size_t size = fclaw2d_clawpatch_size(glob);
+
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);  
+    /* CPU memory allocation */    
+    double* fp = new double[size];
+    double* fm = new double[size];
+    double* gp = new double[size];
+    double* gm = new double[size];      
+  
     CUDACLAW5_STEP2(&maxm,&meqn,&maux,&mbc,&mx,&my,qold,aux,
                     &dx,&dy,&dt,&cflgrid,fluxes->fm,fluxes->fp,
                     fluxes->gm,fluxes->gp,cuclaw5_vt->fort_rpn2,
-                    cuclaw5_vt->fort_rpt2,block_corner_count,&ierror);
+                    cuclaw5_vt->fort_rpt2,block_corner_count,&ierror);    
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);    
 
     /* update q on the GPU */
@@ -70,7 +78,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     dtdx = dt/dx;
     dtdy = dt/dy;
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);       
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
     cudaEventRecord(start);
     cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fm_dev, fluxes->fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
@@ -82,7 +90,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);    
 
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
@@ -111,6 +119,14 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
+
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);  
+    delete [] fluxes->fp;
+    delete [] fluxes->fm;
+    delete [] fluxes->gp;
+    delete [] fluxes->gm;
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);  
+
 
     FCLAW_ASSERT(ierror == 0);
 

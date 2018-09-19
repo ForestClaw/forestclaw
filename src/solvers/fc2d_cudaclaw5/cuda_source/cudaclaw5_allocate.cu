@@ -15,13 +15,6 @@ void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
     cudaclaw5_fluxes_t *fluxes = FCLAW_ALLOC(cudaclaw5_fluxes,1);
     fluxes->num_bytes = size*sizeof(double);
 
-    /* CPU memory allocation */
-    fluxes->fp = new double[size];
-    fluxes->fm = new double[size];
-    fluxes->gp = new double[size];
-    fluxes->gm = new double[size];
-    
-    
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);    
     cudaMalloc((void**)&fluxes->qold_dev, fluxes->num_bytes);
     cudaMalloc((void**)&fluxes->fm_dev,   fluxes->num_bytes);
@@ -49,11 +42,6 @@ void cudaclaw5_deallocate_fluxes(fclaw2d_global_t *glob,
     cudaFree(fluxes->gm_dev);
     cudaFree(fluxes->gp_dev);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);    
-
-    delete [] fluxes->fp;
-    delete [] fluxes->fm;
-    delete [] fluxes->gp;
-    delete [] fluxes->gm;
 
     FCLAW_FREE((void*) fluxes);
 }
