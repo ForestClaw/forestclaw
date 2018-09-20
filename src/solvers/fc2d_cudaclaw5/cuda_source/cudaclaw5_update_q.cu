@@ -13,7 +13,7 @@ __global__ void cudaclaw5_update_q_cuda(int mbc,
     int y_stride = (blockDim.x+2*mbc)*x_stride;
     int i = mq + (x+mbc)*x_stride + (y+mbc)*y_stride;
     qold[i] = qold[i] - dtdx * (fm[i+x_stride] - fp[i]) 
-                      + dtdy * (gm[i+y_stride] - gp[i]);
+                      - dtdy * (gm[i+y_stride] - gp[i]);
 }
 
 __global__ void cudaclaw5_update_q_cuda2(int mbc, int mx, int my, int meqn,
