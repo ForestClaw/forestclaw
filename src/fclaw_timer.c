@@ -133,6 +133,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET (stats, glob, PARTITION);
     FCLAW2D_STATS_SET (stats, glob, PARTITION_BUILD);
     FCLAW2D_STATS_SET (stats, glob, ADVANCE_STEP2);
+    FCLAW2D_STATS_SET (stats, glob, ADVANCE_B4STEP2);
     FCLAW2D_STATS_SET (stats, glob, GHOSTPATCH_BUILD);
     FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_COPY);
     FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_AVERAGE);
@@ -269,6 +270,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET_GROUP(stats,PARTITION_BUILD,       PARTITION);
 
     FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_STEP2,         ADVANCE);
+    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_B4STEP2,       ADVANCE);
 
     FCLAW2D_STATS_SET_GROUP(stats,GHOSTPATCH_BUILD,      GHOST);
     FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_COPY,        GHOST);
