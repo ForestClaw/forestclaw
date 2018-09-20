@@ -95,8 +95,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     cudaEventRecord(start);
 
-    int mi = 32;
-    int mj = 32;
 #if 1
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
@@ -105,10 +103,10 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                                                    fluxes->fm_dev, fluxes->fp_dev,
                                                    fluxes->gm_dev, fluxes->gp_dev);
 #else
-    dim3 block(mi,mj,meqn);  
+    dim3 block(32,32);  
     dim3 grid((mx+block.x-1)/block.x,(my+block.y-1)/block.y);
 
-    cudaclaw5_update_q_cuda2<<<grid, block>>>(mbc, dtdx, dtdy, mx,my,meqn,
+    cudaclaw5_update_q_cuda2<<<grid, block>>>(mbc, mx,my,meqn,dtdx, dtdy, 
                                               fluxes->qold_dev, 
                                               fluxes->fm_dev, fluxes->fp_dev,
                                               fluxes->gm_dev, fluxes->gp_dev);
