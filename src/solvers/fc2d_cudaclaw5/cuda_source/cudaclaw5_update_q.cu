@@ -12,7 +12,7 @@ __global__ void cudaclaw5_update_q_cuda(int mbc,
     int y = threadIdx.y;
     int y_stride = (blockDim.x+2*mbc)*x_stride;
     int i = mq + (x+mbc)*x_stride + (y+mbc)*y_stride;
-    qold[i] -= dtdx * (fm[i+x_stride] - fp[i]) 
+    qold[i] = qold[i] - dtdx * (fm[i+x_stride] - fp[i]) 
                       + dtdy * (gm[i+y_stride] - gp[i]);
 }
 
@@ -22,15 +22,12 @@ __global__ void cudaclaw5_update_q_cuda2(int mbc, int mx, int my, int meqn,
                                         double* fm, double* fp, 
                                         double* gm, double* gp)
 {
-    // int ix = threadIdx.x + blockIdx.x*blockDim.x;
-    // int iy = threadIdx.y + blockIdx.y*blockDim.y;
-    int ix = threadIdx.x;
-    int iy = threadIdx.y;
+    int ix = threadIdx.x + blockIdx.x*blockDim.x;
+    int iy = threadIdx.y + blockIdx.y*blockDim.y;
     int mq = threadIdx.z;
     int N = (2*mbc + mx)*meqn;
     int I = ((ix+mbc)*N + mbc)*meqn + iy + mq;
-    qold[I] -= (dtdx * (fm[I] - fp[I]) 
-             + dtdy * (gm[I] - gp[I]));
+    qold[I] -= (dtdx * (fm[I+meqn] - fp[I]) + dtdy * (gm[I+N] - gp[I]));
 
 
 #if 0    
