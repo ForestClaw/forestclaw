@@ -26,7 +26,7 @@ __global__ void cudaclaw5_update_q_cuda2(int mbc, int mx, int my, int meqn,
     int iy = threadIdx.y + blockIdx.y*blockDim.y;
     int mq = threadIdx.z;
     int N = (2*mbc + mx)*meqn;
-    int I = ((ix+mbc)*N + mbc)*meqn + iy + mq;
+    int I = (iy+mbc)*N + (ix+mbc)*meqn + mq;
     qold[I] -= (dtdx * (fm[I+meqn] - fp[I]) + dtdy * (gm[I+N] - gp[I]));
 
 

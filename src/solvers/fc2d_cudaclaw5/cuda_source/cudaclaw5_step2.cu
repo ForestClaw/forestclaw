@@ -97,7 +97,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     int mi = 32;
     int mj = 32;
-#if 0
+#if 1
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
     cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(mbc, dtdx, dtdy,
