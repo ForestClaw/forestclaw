@@ -18,6 +18,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                        double t,
                        double dt)
 {
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);  
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
@@ -45,6 +46,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     int maxm = SC_MAX(mx,my);
     double cflgrid = 0.0;
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);  
 
 #if 0
     int mwaves = cudaclaw_options->mwaves;
