@@ -22,8 +22,18 @@ __global__ void cudaclaw5_update_q_cuda2(int mbc, int mx, int my, int meqn,
                                         double* fm, double* fp, 
                                         double* gm, double* gp)
 {
-    int ix = threadIdx.x + blockIdx.x*blockDim.x;
-    int iy = threadIdx.y + blockIdx.y*blockDim.y;
+    // int ix = threadIdx.x + blockIdx.x*blockDim.x;
+    // int iy = threadIdx.y + blockIdx.y*blockDim.y;
+    int ix = threadIdx.x;
+    int iy = threadIdx.y;
+    int mq = threadIdx.z;
+    int N = (2*mbc + mx)*meqn;
+    int I = ((ix+mbc)*N + mbc)*meqn + iy + mq;
+    qold[I] -= (dtdx * (fm[I] - fp[I]) 
+             + dtdy * (gm[I] - gp[I]));
+
+
+#if 0    
     if (ix < mx && iy < my)
     {
         int N = (2*mbc + mx)*meqn;
@@ -36,6 +46,7 @@ __global__ void cudaclaw5_update_q_cuda2(int mbc, int mx, int my, int meqn,
                         + dtdy * (gm[I+mq] - gp[I+mq]);
         }        
     }
+#endif    
 }
 
 
