@@ -78,19 +78,13 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     dtdx = dt/dx;
     dtdy = dt/dy;
 
-    cudaEventRecord(start);
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);       
     cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fm_dev, fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fp_dev, fp, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->gm_dev, gm, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->gp_dev, gp, fluxes->num_bytes, cudaMemcpyHostToDevice);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);    
-    cudaEventRecord(stop);
-    cudaEventSynchronize(stop);
-    milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, start, stop);
-    glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
 
     dim3 dimBlock(mx, my,meqn);
     dim3 dimGrid(1, 1);
@@ -113,15 +107,9 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         printf("ERROR: %s\n",cudaGetErrorString(code));
     }
 
-    cudaEventRecord(start);
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);    
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
     cudaMemcpy(qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);    
-    cudaEventRecord(stop);
-    cudaEventSynchronize(stop);
-    milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, start, stop);
-    glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
     
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
