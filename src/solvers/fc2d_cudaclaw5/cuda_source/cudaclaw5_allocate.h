@@ -21,11 +21,6 @@ struct fclaw2d_global;
 typedef struct cudaclaw5_fluxes
 {
     size_t num_bytes;   /* All members have the same size */
-    double *fp;
-    double *fm;
-    double *gp;
-    double *gm;
-
     double *qold_dev;
     double *fp_dev;
     double *fm_dev;
