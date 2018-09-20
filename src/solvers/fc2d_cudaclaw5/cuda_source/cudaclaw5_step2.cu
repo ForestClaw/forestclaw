@@ -18,7 +18,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                        double t,
                        double dt)
 {
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);  
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
@@ -79,22 +78,41 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     dtdx = dt/dx;
     dtdy = dt/dy;
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);       
+    cudaEventRecord(start);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
     cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fm_dev, fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fp_dev, fp, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->gm_dev, gm, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->gp_dev, gp, fluxes->num_bytes, cudaMemcpyHostToDevice);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);      
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
+  
 
-    dim3 dimBlock(mx, my,meqn);
-    dim3 dimGrid(1, 1);
     cudaEventRecord(start);
 
+    int mi = 16;
+    int mj = 16;
+#if 0
+    dim3 dimBlock(mx, my,meqn);
+    dim3 dimGrid(1, 1);
     cudaclaw5_update_q_cuda<<<dimGrid, dimBlock>>>(mbc, dtdx, dtdy,
                                                    fluxes->qold_dev, 
                                                    fluxes->fm_dev, fluxes->fp_dev,
                                                    fluxes->gm_dev, fluxes->gp_dev);
+#else
+    dim3 block(mi,mj);  
+    dim3 grid((mx+block.x-1)/block.x,(my+block.y-1)/block.y);
+
+    cudaclaw5_update_q_cuda2<<<grid, block>>>(mbc, dtdx, dtdy, mx,my,meqn,
+                                              fluxes->qold_dev, 
+                                              fluxes->fm_dev, fluxes->fp_dev,
+                                              fluxes->gm_dev, fluxes->gp_dev);
+#endif                                                
 
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
@@ -108,9 +126,15 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         printf("ERROR: %s\n",cudaGetErrorString(code));
     }
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
+    cudaEventRecord(start);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);    
     cudaMemcpy(qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY]);    
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);    
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
     
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -124,7 +148,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
 
     FCLAW_ASSERT(ierror == 0);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);  
 
     return cflgrid;
 }
