@@ -21,6 +21,13 @@ __global__  void cudaclaw5_update_q_cuda(int mbc,
                              double* fm, double* fp,
                              double* gm, double* gp);
 
+__global__ void cudaclaw5_update_q_cuda2(int mbc, int mx, int my, int meqn,
+                                        double dtdx, double dtdy,
+                                        double* qold, 
+                                        double* fm, double* fp, 
+                                        double* gm, double* gp);
+
+
 void cudaclaw5_update_q(int meqn, int mx, int my, int mbc,
                          double dtdx, double dtdy,
                          double qold[],
