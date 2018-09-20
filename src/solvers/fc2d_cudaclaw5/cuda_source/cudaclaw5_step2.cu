@@ -68,8 +68,8 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     double* gm = new double[size];      
   
     CUDACLAW5_STEP2(&maxm,&meqn,&maux,&mbc,&mx,&my,qold,aux,
-                    &dx,&dy,&dt,&cflgrid,fluxes->fm,fluxes->fp,
-                    fluxes->gm,fluxes->gp,cuclaw5_vt->fort_rpn2,
+                    &dx,&dy,&dt,&cflgrid,fm,fp,gm,gp,
+                    cuclaw5_vt->fort_rpn2,
                     cuclaw5_vt->fort_rpt2,block_corner_count,&ierror);    
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);    
 
@@ -81,10 +81,10 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaEventRecord(start);
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
     cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(fluxes->fm_dev, fluxes->fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(fluxes->fp_dev, fluxes->fp, fluxes->num_bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(fluxes->gm_dev, fluxes->gm, fluxes->num_bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(fluxes->gp_dev, fluxes->gp, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->fm_dev, fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->fp_dev, fp, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->gm_dev, gm, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->gp_dev, gp, fluxes->num_bytes, cudaMemcpyHostToDevice);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);    
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
@@ -127,10 +127,10 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaEventDestroy(stop);
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);  
-    delete [] fluxes->fp;
-    delete [] fluxes->fm;
-    delete [] fluxes->gp;
-    delete [] fluxes->gm;
+    delete [] fp;
+    delete [] fm;
+    delete [] gp;
+    delete [] gm;
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1]);  
 
 
