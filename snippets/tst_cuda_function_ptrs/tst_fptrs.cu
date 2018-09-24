@@ -1,36 +1,51 @@
+#include "tst_fptrs.h"
+#include "user_f.h"
+
 #include <stdio.h>
 
-typedef void (*fc2d_cuda_t)(float x,float *y);
-
-__device__ void f1(float x, float *y)
+void assign_cuda_ptr(fc2d_cuda_t* h_f, fc2d_cuda_t f)
 {
-    *y = 2*x;
-    return;
+    cudaError_t ce = cudaMemcpyFromSymbol(h_f, f, sizeof(fc2d_cuda_t));
+    if(ce != cudaSuccess)
+    {
+        printf("ERROR: %s\n",cudaGetErrorString(ce));
+        exit(0);
+    }    
+    else
+    {
+        printf("Success!\n");
+    }
 }
 
-__device__ void f2(float x, float *y)
-{
-    *y = -x;
-    return;
-}
 
 __global__ void kernel(fc2d_cuda_t f,float x, float *y)
 {
-    f(x,y);
+    *y = f(x);
     return;
 }
 
-__device__ fc2d_cuda_t fptr = f1;
-
 int main()
 {
+    float x;
+    float y, *y_dev;
+    fc2d_assign_cuda_ptr_t f_assign_user;
+
     fc2d_cuda_t h_f;
 
-    cudaMemcpyFromSymbol(&h_f, fptr, sizeof(fc2d_cuda_t));
+    /* User definitions */
+    x = 5;
+    f_assign_user = assign_cuda_ptr2;  /* Function pointer stored in a v-table */
 
-    float x = 5;
-    float y;
-    kernel<<<1,1>>>(h_f,x,&y);
+
+    /* Code */
+    f_assign_user(&h_f);    
+
+    cudaMalloc((void**) &y_dev, sizeof(float));
+
+    kernel<<<1,1>>>(h_f,x,y_dev);
+
+    cudaMemcpy(&y, y_dev, sizeof(float), cudaMemcpyDeviceToHost);
+
     printf("x = %f; y = %f\n",x,y);
 
     return 0;
