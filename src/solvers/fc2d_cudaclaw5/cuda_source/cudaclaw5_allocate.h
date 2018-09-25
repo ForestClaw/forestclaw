@@ -10,9 +10,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 struct fclaw2d_patch;
@@ -38,9 +35,6 @@ void cudaclaw5_deallocate_fluxes(struct fclaw2d_global *glob,
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 #endif
