@@ -3,21 +3,6 @@
 
 #include <stdio.h>
 
-void assign_cuda_ptr(fc2d_cuda_t* h_f, fc2d_cuda_t f)
-{
-    cudaError_t ce = cudaMemcpyFromSymbol(h_f, f, sizeof(fc2d_cuda_t));
-    if(ce != cudaSuccess)
-    {
-        printf("ERROR: %s\n",cudaGetErrorString(ce));
-        exit(0);
-    }    
-    else
-    {
-        printf("Success!\n");
-    }
-}
-
-
 __global__ void kernel(fc2d_cuda_t f,float x, float *y)
 {
     *y = f(x);
