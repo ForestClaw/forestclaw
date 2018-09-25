@@ -3,6 +3,7 @@
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
 #include <fclaw_timer.h>
 
 
@@ -10,10 +11,18 @@
 void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
                                struct fclaw2d_patch *patch)
 {
-    size_t size = fclaw2d_clawpatch_size(glob);
+    const fclaw2d_clawpatch_options_t *claw_opt = fclaw2d_clawpatch_get_options(glob);
+    int mx = claw_opt->mx;
+    int my = claw_opt->my;
+    int mbc = claw_opt->mbc;
+    int meqn = claw_opt->meqn;
+    int maux = claw_opt->maux;
+    
 
+    size_t size = (2*mbc+mx)*(2*mbc+my);
     cudaclaw5_fluxes_t *fluxes = FCLAW_ALLOC(cudaclaw5_fluxes,1);
-    fluxes->num_bytes = size*sizeof(double);
+    fluxes->num_bytes = meqn*size*sizeof(double);
+    fluxes->num_bytes_aux = maux*size*sizeof(double);
 
     /* Assumption here is that cudaMalloc is a synchronous call */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);       
@@ -22,6 +31,7 @@ void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
     cudaMalloc((void**)&fluxes->fp_dev,   fluxes->num_bytes);
     cudaMalloc((void**)&fluxes->gm_dev,   fluxes->num_bytes);
     cudaMalloc((void**)&fluxes->gp_dev,   fluxes->num_bytes);
+    cudaMalloc((void**)&fluxes->aux_dev,  fluxes->num_bytes_aux);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);    
 
     fclaw2d_patch_set_user_data(glob,patch,fluxes);
@@ -42,6 +52,7 @@ void cudaclaw5_deallocate_fluxes(fclaw2d_global_t *glob,
     cudaFree(fluxes->fp_dev);
     cudaFree(fluxes->gm_dev);
     cudaFree(fluxes->gp_dev);
+    cudaFree(fluxes->aux_dev);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);    
 
     FCLAW_FREE((void*) fluxes);
