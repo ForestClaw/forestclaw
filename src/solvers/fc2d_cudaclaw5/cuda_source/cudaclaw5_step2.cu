@@ -87,10 +87,11 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                     gm,gp,cuclaw5_vt->fort_rpn2,
                     cuclaw5_vt->fort_rpt2,block_corner_count,&ierror);    
 #endif
+    cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
     {
         int mwaves = 1;
         dim3 block(32,32);  
-        dim3 grid((mx+block.x-1)/block.x,(my+block.y-1)/block.y);
+        dim3 grid((mx+2*mbc-1+block.x-1)/block.x,(my+2*(mbc-1)+block.y-1)/block.y);
 
         cudaclaw5_cuda_rpn2_t rpn2;
         cudaMemcpyFromSymbol(&rpn2,rpn2_dev,sizeof(cudaclaw5_cuda_rpn2_t));
@@ -109,7 +110,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaEventRecord(start);
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
     /*
-    cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fm_dev, fm, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->fp_dev, fp, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->gm_dev, gm, fluxes->num_bytes, cudaMemcpyHostToDevice);

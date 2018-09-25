@@ -30,14 +30,9 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
     int ix = threadIdx.x + blockIdx.x * blockDim.x;
     int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
-    if (ix < mx + 1 && iy < my + 1) {
+    if (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)) {
         int x_stride = meqn;
-        int y_stride;
-        if(idir==0){
-            y_stride = (2 * mbc + mx + 1) * x_stride;
-        }else{
-            y_stride = (2 * mbc + mx) * x_stride;
-        }
+        int y_stride = (2 * mbc + mx) * x_stride;
         int I = (ix + mbc - 1) * x_stride + (iy + mbc - 1) * y_stride;
         int x_stride_aux = maux;
         int y_stride_aux = (2 * mbc + mx + 1) * x_stride_aux;
@@ -56,6 +51,7 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
         for (mq = 0; mq < meqn; mq++) {
             int i = I + mq;
             qold[i] = qold[i] - dt / dx * (amdq[mq] + apdq[mq]);
+            //qold[i] = 1;
         }
     }
     delete[] ql;
