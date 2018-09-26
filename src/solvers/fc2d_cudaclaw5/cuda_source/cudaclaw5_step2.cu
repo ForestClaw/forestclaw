@@ -88,6 +88,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                     cuclaw5_vt->fort_rpt2,block_corner_count,&ierror);    
 #endif
     cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->aux_dev, aux,     fluxes->num_bytes_aux, cudaMemcpyHostToDevice);
     {
         int mwaves = 1;
         dim3 block(32,32);  
@@ -140,7 +141,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                                               fluxes->qold_dev, 
                                               fluxes->fm_dev, fluxes->fp_dev,
                                               fluxes->gm_dev, fluxes->gp_dev);
-#endif                                                
 
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
@@ -153,6 +153,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     {
         printf("ERROR: %s\n",cudaGetErrorString(code));
     }
+#endif                                                
 
     cudaEventRecord(start);
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);    

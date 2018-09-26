@@ -13,6 +13,8 @@ __device__ void rpn2adv_cuda2(int idir, int meqn, int mwaves, int maux,
     amdq[0] = SC_MIN(auxr[idir], 0) * wave[0];
     apdq[0] = SC_MAX(auxr[idir], 0) * wave[0];
 }
+
+
 __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
                                 int maux, double* qold, double* aux, double dx,
                                 double dy, double dt, double* cflgrid,
@@ -35,10 +37,11 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
     if (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)) {
         int x_stride = meqn;
         int y_stride = (2 * mbc + mx) * x_stride;
-        int I = (ix + 1) * x_stride + (iy + 1) * y_stride;
+        int I = (ix + mbc-1) * x_stride + (iy + mbc-1) * y_stride;
+
         int x_stride_aux = maux;
         int y_stride_aux = (2 * mbc + mx) * x_stride_aux;
-        int I_aux = (ix + 1) * x_stride_aux + (iy + 1) * y_stride_aux;
+        int I_aux = (ix + mbc-1) * x_stride_aux + (iy + mbc-1) * y_stride_aux;
         int mq;
 
         ql[0] = qold[I - x_stride];
@@ -50,9 +53,11 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
 
         rpn2adv_cuda2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
-        for (mq = 0; mq < meqn; mq++) {
+        for (mq = 0; mq < meqn; mq++) 
+        {
             int i = I + mq;
             qold[i] = qold[i] - dt/dx * (amdq[mq] + apdq[mq]);
+            //qold[i] = auxl[0];
             //qold[i] = 1;
         }
     }
