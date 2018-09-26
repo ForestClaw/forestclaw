@@ -15,6 +15,22 @@ __device__ void rpn2adv_cuda2(int idir, int meqn, int mwaves, int maux,
 }
 
 
+#define MEQN   10
+#define MAUX   20 
+#define MWAVES 10
+
+extern "C"
+{
+
+__host__ int cudaclaw5_check_dims(int meqn, int maux, int mwaves)
+{
+    int check;
+    check = (meqn <= MEQN) && (maux <= MAUX) && (mwaves <= MWAVES);
+    return check;
+}
+}
+
+
 __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
                                 int maux, double* qold, double* aux, double dx,
                                 double dy, double dt, double* cflgrid,
@@ -23,14 +39,14 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
                                 int mwaves) 
 {
     /* TODO : Can we pass in a work array rather than allocating memory everytime? */
-    double* ql = new double[meqn];
-    double* qr = new double[meqn];
-    double* auxl = new double[maux];
-    double* auxr = new double[maux];
-    double* s = new double[mwaves];
-    double* wave = new double[meqn * mwaves];
-    double* amdq = new double[meqn];
-    double* apdq = new double[meqn];
+    double ql[MEQN];
+    double qr[MEQN];
+    double auxl[MAUX];
+    double auxr[MAUX];
+    double s[MWAVES];
+    double wave[MEQN*MWAVES];
+    double amdq[MEQN];
+    double apdq[MEQN];
 
     int ix = threadIdx.x + blockIdx.x * blockDim.x;
     int iy = threadIdx.y + blockIdx.y * blockDim.y;
@@ -90,6 +106,7 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             gm[i] = amdq[mq];
         }
     }
+#if 0    
     delete[] ql;
     delete[] qr;
     delete[] auxl;
@@ -98,4 +115,5 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
     delete[] wave;
     delete[] amdq;
     delete[] apdq;
+#endif    
 }

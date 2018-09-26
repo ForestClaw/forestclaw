@@ -79,7 +79,7 @@ cudaclaw5_postprocess (fc2d_cudaclaw5_options_t * clawopt)
     fclaw_options_convert_int_array (clawopt->order_string, &clawopt->order,
                                      2);
     fclaw_options_convert_int_array (clawopt->mthbc_string, &clawopt->mthbc,4);
-    
+
     return FCLAW_NOEXIT;
 }
 
@@ -114,6 +114,17 @@ cudaclaw5_check (fc2d_cudaclaw5_options_t * clawopt,
                              clawopt->mthlim, clawopt->method);
 
     /* Should also check mthbc, mthlim, etc. */
+
+    /* check hardwired dimensions in cudaclaw5_flux2 */
+    int check = cudaclaw5_check_dims(clawpatch_opt->meqn, 
+                                     clawpatch_opt->maux, 
+                                     clawopt->mwaves);
+    if (!check)
+    {        
+        fclaw_global_essentialf("cudaclaw5 : Problem with dimensions " \
+                                "setting in cudaclaw5_flux2\n");
+        return FCLAW_EXIT_ERROR;
+    }
 
     return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
 }

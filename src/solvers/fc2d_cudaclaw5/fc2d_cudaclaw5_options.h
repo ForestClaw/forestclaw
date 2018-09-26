@@ -79,6 +79,9 @@ fc2d_cudaclaw5_options_t* fc2d_cudaclaw5_get_options(struct fclaw2d_global *glob
 
 void fc2d_cudaclaw5_output(struct fclaw2d_global *glob, int iframe);
 
+/* Check in cudaclaw5_flux2.cu */
+int cudaclaw5_check_dims(int meqn, int maux, int mwaves);
+
 
 #define CUDACLAW5_SET_AMR_MODULE FCLAW_F77_FUNC(cudaclaw5_set_amr_module, \
                                                 CUDACLAW5_SET_AMR_MODULE)
