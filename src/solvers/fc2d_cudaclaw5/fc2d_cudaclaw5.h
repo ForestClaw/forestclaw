@@ -107,6 +107,10 @@ typedef void (*cudaclaw5_fort_rpn2_t)(const int* ixy,const int* maxm, const int*
                                       double ql[], double qr[], double auxl[], double auxr[],
                                       double wave[], double s[],double amdq[], double apdq[]);
 
+typedef void (*cudaclaw5_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
+                                      double ql[], double qr[], double auxl[], double auxr[],
+                                      double wave[], double s[], double amdq[], double apdq[]);
+
 typedef void (*cudaclaw5_fort_rpt2_t)(const int* ixy, const int* imp, const int* maxm,
                                       const int* meqn,
                                        const int* mwaves, const int* maux, const int* mbc,

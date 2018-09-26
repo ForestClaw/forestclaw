@@ -22,7 +22,7 @@ def setplot(plotdata):
 
 
     from clawpack.visclaw import colormaps
-    import clawpack.forestclaw as pyclaw 
+    # import clawpack.forestclaw as pyclaw 
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
     
@@ -46,8 +46,8 @@ def setplot(plotdata):
     plotitem.imshow_cmin = 0.0
     plotitem.imshow_cmax = 1.0
     plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [True, True, False]
-    plotitem.amr_patchedges_show = [True, True]
+    plotitem.amr_celledges_show = [False]*5
+    plotitem.amr_patchedges_show = [True]*5
     plotitem.show = True       # show on plot?
     
     # ------------------------------------------------------------
