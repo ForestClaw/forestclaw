@@ -22,7 +22,7 @@ def setplot(plotdata):
 
 
     from clawpack.visclaw import colormaps
-    import clawpack.forestclaw as pyclaw 
+    # import clawpack.forestclaw as pyclaw 
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
     

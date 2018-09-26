@@ -34,7 +34,7 @@ SUBROUTINE clawpack5_b4step2(mbc,mx,my,meqn,q, &
 
             !! # multiply by time-factor:
             aux(1,i,j) = vt * aux(1,i,j)
-            aux(2,i,j) = vt * aux(2,i,j)
+            aux(2,i,j) = 0 !! vt * aux(2,i,j)
         ENDDO
     ENDDO
 RETURN
