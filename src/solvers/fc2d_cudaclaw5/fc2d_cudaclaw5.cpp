@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_cudaclaw5_fort.h"
 #include "fc2d_cudaclaw5_options.h"
 
+#include <fc2d_clawpack5.h>
+
 #include "cuda_source/cudaclaw5_allocate.h"
 
 #include <fclaw2d_clawpatch.h>
@@ -308,8 +310,14 @@ fc2d_cudaclaw5_vtable_t* fc2d_cudaclaw5_vt_init()
 /* This is called from the user application. */
 void fc2d_cudaclaw5_solver_initialize()
 {
-    int claw_version = 5;
-    fclaw2d_clawpatch_vtable_initialize(claw_version);
+
+#if 1
+    fc2d_clawpack5_solver_initialize();
+#else 
+    fc2d_clawpack46_solver_initialize();
+#endif
+    //int claw_version = 5;
+    //fclaw2d_clawpatch_vtable_initialize(claw_version);
 
     fclaw2d_vtable_t*          fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*    patch_vt = fclaw2d_patch_vt();
@@ -333,7 +341,7 @@ void fc2d_cudaclaw5_solver_initialize()
     cuclaw5_vt->src2      = cudaclaw5_src2;
 
     /* Required functions  - error if NULL */
-    cuclaw5_vt->fort_bc2       = CUDACLAW5_BC2_DEFAULT;
+    cuclaw5_vt->fort_bc2       = CLAWPACK46_BC2_DEFAULT;
     cuclaw5_vt->fort_qinit     = NULL;
     cuclaw5_vt->fort_rpn2      = NULL;
     cuclaw5_vt->fort_rpt2      = NULL;

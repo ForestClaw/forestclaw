@@ -36,7 +36,8 @@ FCLAW_CUDACLAW5_LDADD    = @top_builddir@/src/solvers/fc2d_cudaclaw5/libcudaclaw
 ## Sources needed to build this library
 src_solvers_fc2d_cudaclaw5_libcudaclaw5_la_SOURCES = \
   $(libcudaclaw5_internal_headers) \
-  $(libcudaclaw5_compiled_sources)
+  $(libcudaclaw5_compiled_sources) \
+  $(libclawpack5_compiled_sources)
 
 
 ## Headers needed to build this library.  Only AM_CPPFLAGS required; others are 
