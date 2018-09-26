@@ -22,6 +22,7 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
                                 cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
                                 int mwaves) 
 {
+    /* TODO : Can we pass in a work array rather than allocating memory everytime? */
     double* ql = new double[meqn];
     double* qr = new double[meqn];
     double* auxl = new double[maux];
@@ -34,7 +35,8 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
     int ix = threadIdx.x + blockIdx.x * blockDim.x;
     int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
-    if (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)) {
+    if (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)) 
+    {
         int x_stride = meqn;
         int y_stride = (2 * mbc + mx) * x_stride;
         int I = (ix + mbc-1) * x_stride + (iy + mbc-1) * y_stride;
@@ -56,9 +58,36 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
         for (mq = 0; mq < meqn; mq++) 
         {
             int i = I + mq;
-            qold[i] = qold[i] - dt/dx * (amdq[mq] + apdq[mq]);
-            //qold[i] = auxl[0];
-            //qold[i] = 1;
+            fp[i] = -apdq[mq]; 
+            fm[i] = amdq[mq];
+        }
+    }
+
+    if (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1) 
+    {
+        int x_stride = meqn;
+        int y_stride = (2 * mbc + mx) * x_stride;
+        int I = (ix + mbc-1) * x_stride + (iy + mbc-1) * y_stride;
+
+        int x_stride_aux = maux;
+        int y_stride_aux = (2 * mbc + mx) * x_stride_aux;
+        int I_aux = (ix + mbc-1) * x_stride_aux + (iy + mbc-1) * y_stride_aux;
+        int mq;
+
+        ql[0] = qold[I - y_stride];
+        qr[0] = qold[I];
+        auxl[0] = aux[I_aux - y_stride_aux];
+        auxl[1] = aux[I_aux - y_stride_aux + 1];
+        auxr[0] = aux[I_aux];
+        auxr[1] = aux[I_aux + 1];
+
+        rpn2adv_cuda2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+
+        for (mq = 0; mq < meqn; mq++) 
+        {
+            int i = I + mq;
+            gp[i] = -apdq[mq]; 
+            gm[i] = amdq[mq];
         }
     }
     delete[] ql;
