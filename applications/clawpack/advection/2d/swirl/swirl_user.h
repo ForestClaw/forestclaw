@@ -26,7 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SWIRL_USER_H
 #define SWIRL_USER_H
 
+#include <fc2d_cudaclaw5.h>
+
 #include <fclaw2d_include_all.h>
+
 
 #ifdef __cplusplus
 extern "C"
@@ -56,6 +59,11 @@ user_options_t* swirl_options_register (fclaw_app_t * app,
 void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+
+
+/* --------------------------------------- Cuda ----------------------------------------*/
+
+void swirl_assign_rpn2(cudaclaw5_cuda_rpn2_t *rpn2);
 
 /* ------------------------------------ Fortran ----------------------------------------*/
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
