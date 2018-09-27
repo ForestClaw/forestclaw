@@ -71,7 +71,7 @@ CUDACLAW5_INCLUDE_DIRS = $(DEFS) $(DEFAULT_INCLUDES) \
 # NVCC=nvcc
 
 .cu.o: 
-	$(NVCC) $(CUDACLAW5_INCLUDE_DIRS) -c -o $@ $<
+	$(NVCC) -dc $(CUDACLAW5_INCLUDE_DIRS) -c -o $@ $<
 
 # Setting --tag=NVCC (or --tag=nvcc) generates a non-fatal 
 # warning.  We can avoid the warning by just setting --tag=CC;

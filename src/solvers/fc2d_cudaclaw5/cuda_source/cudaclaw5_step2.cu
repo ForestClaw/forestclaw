@@ -57,6 +57,8 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     FCLAW_ASSERT(cuclaw5_vt->fort_rpn2 != NULL);
     FCLAW_ASSERT(cuclaw5_vt->fort_rpt2 != NULL);
 
+    FCLAW_ASSERT(cuclaw5_vt->cuda_rpn2 != NULL);
+
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     fclaw2d_clawpatch_save_current_step(glob, this_patch);
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
