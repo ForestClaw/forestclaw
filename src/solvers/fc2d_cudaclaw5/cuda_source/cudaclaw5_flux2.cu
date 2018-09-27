@@ -69,7 +69,8 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
         auxr[0] = aux[I_aux];
         auxr[1] = aux[I_aux + 1];
 
-        rpn2adv_cuda2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        //rpn2adv_cuda2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
         for (mq = 0; mq < meqn; mq++) 
         {
@@ -97,7 +98,8 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
         auxr[0] = aux[I_aux];
         auxr[1] = aux[I_aux + 1];
 
-        rpn2adv_cuda2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        // rpn2adv_cuda2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        rpn2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
         for (mq = 0; mq < meqn; mq++) 
         {

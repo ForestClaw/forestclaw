@@ -108,8 +108,10 @@ typedef void (*cudaclaw5_fort_rpn2_t)(const int* ixy,const int* maxm, const int*
                                       double wave[], double s[],double amdq[], double apdq[]);
 
 typedef void (*cudaclaw5_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
-                                      double ql[], double qr[], double auxl[], double auxr[],
-                                      double wave[], double s[], double amdq[], double apdq[]);
+                                      double ql[], double qr[], 
+                                      double auxl[], double auxr[],
+                                      double wave[], double s[], 
+                                      double amdq[], double apdq[]);
 
 typedef void (*cudaclaw5_fort_rpt2_t)(const int* ixy, const int* imp, const int* maxm,
                                       const int* meqn,
@@ -164,6 +166,7 @@ typedef struct fc2d_cudaclaw5_vtable
 
     cudaclaw5_fort_rpn2_t      fort_rpn2;
     cudaclaw5_fort_rpt2_t      fort_rpt2;
+    cudaclaw5_cuda_rpn2_t      cuda_rpn2;
 
     int is_set;
 } fc2d_cudaclaw5_vtable_t;
