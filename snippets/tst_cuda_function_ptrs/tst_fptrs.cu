@@ -16,10 +16,6 @@ int main()
     float y, *y_dev;
     fc2d_cuda_vt_t vt;
 
-    //fc2d_assign_cuda_ptr_t f_assign_user;
-
-    fc2d_cuda_t h_f;
-
     /* User definitions (in swirl_user, for example) */
     x = 5;
     assign_cuda_ptr2(&vt.h_f);
