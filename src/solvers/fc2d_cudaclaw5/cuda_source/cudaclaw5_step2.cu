@@ -5,7 +5,7 @@
 #include <fclaw2d_global.h>
 #include <fclaw2d_clawpatch.h>
 
-#include "../fc2d_cudaclaw5_fort.h"
+//#include "../fc2d_cudaclaw5_fort.h"
 #include "../fc2d_cudaclaw5_options.h"
 //#include "../fc2d_cudaclaw5_timer.h"
 
@@ -57,7 +57,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     FCLAW_ASSERT(cuclaw5_vt->fort_rpn2 != NULL);
     FCLAW_ASSERT(cuclaw5_vt->fort_rpt2 != NULL);
 
-    FCLAW_ASSERT(cuclaw5_vt->cuda_rpn2 != NULL);
+    //FCLAW_ASSERT(cuclaw5_vt->cuda_rpn2 != NULL);
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     fclaw2d_clawpatch_save_current_step(glob, this_patch);
@@ -84,8 +84,8 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     /* -------------------------- Construct fluctuations -------------------------------*/ 
     cudaEventRecord(start);
-    cudaMemcpy(fluxes->qold_dev, qold,     fluxes->num_bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(fluxes->aux_dev, aux,     fluxes->num_bytes_aux, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->qold_dev, qold, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->aux_dev, aux, fluxes->num_bytes_aux, cudaMemcpyHostToDevice);
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
     milliseconds = 0;
@@ -96,9 +96,6 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         dim3 block(32,32);  
         dim3 grid((mx+2*mbc-1+block.x-1)/block.x,(my+2*(mbc-1)+block.y-1)/block.y);
 
-        //cudaclaw5_cuda_rpn2_t rpn2;
-        //cudaMemcpyFromSymbol(&rpn2,rpn2_dev,sizeof(cudaclaw5_cuda_rpn2_t));
-
         int mwaves = cuda_opt->mwaves;
 
         cudaEventRecord(start);
@@ -106,6 +103,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                                          fluxes->aux_dev, dx,dy,dt,&cflgrid,
                                          fluxes->fm_dev,fluxes->fp_dev,
                                          fluxes->gm_dev,fluxes->gp_dev,
+                                         fluxes->waves_dev, fluxes->speeds_dev,
                                          cuclaw5_vt->cuda_rpn2,
                                          NULL,cuda_opt->mwaves);
     }

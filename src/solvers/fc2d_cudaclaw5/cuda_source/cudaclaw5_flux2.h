@@ -22,8 +22,12 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
                                 int maux, double* qold, double* aux, double dx,
                                 double dy, double dt, double* cflgrid,
                                 double* fm, double* fp, double* gm, double* gp,
+                                double* waves, double *speeds,
                                 cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
                                 int mwaves);
+
+
+
 
 
 #ifdef __cplusplus

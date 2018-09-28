@@ -1,6 +1,8 @@
 #include "cudaclaw5_flux2.h"
 #include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
 
+#include <math.h>
+
 __device__ void rpn2adv_cuda2(int idir, int meqn, int mwaves, int maux,
      double ql[], double qr[], double auxl[], double auxr[],
      double wave[], double s[], double amdq[], double apdq[])
@@ -35,10 +37,11 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
                                 int maux, double* qold, double* aux, double dx,
                                 double dy, double dt, double* cflgrid,
                                 double* fm, double* fp, double* gm, double* gp,
+                                double* waves, double *speeds,
                                 cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
                                 int mwaves) 
 {
-    /* TODO : Can we pass in a work array rather than allocating memory everytime? */
+    /* Static memory seems much faster than dynamic memory */
     double ql[MEQN];
     double qr[MEQN];
     double auxl[MAUX];
@@ -53,17 +56,28 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
 
     if (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)) 
     {
-        int x_stride = meqn;
-        int y_stride = (2 * mbc + mx) * x_stride;
-        int I = (ix + mbc-1) * x_stride + (iy + mbc-1) * y_stride;
+        int x_stride_q = meqn;
+        int y_stride_q = (2 * mbc + mx) * x_stride_q;
+        int I_q = (ix + mbc-1) * x_stride_q + (iy + mbc-1) * y_stride_q;
 
         int x_stride_aux = maux;
         int y_stride_aux = (2 * mbc + mx) * x_stride_aux;
         int I_aux = (ix + mbc-1) * x_stride_aux + (iy + mbc-1) * y_stride_aux;
-        int mq;
 
-        ql[0] = qold[I - x_stride];
-        qr[0] = qold[I];
+#if 0
+        int x_stride_waves = mwaves*meqn;
+        int y_stride_waves = (2 * mbc + mx) * x_stride_waves;
+        int I_waves = (ix + mbc-1) * x_stride_waves + (iy + mbc-1) * y_stride_waves;
+
+        int x_stride_s = mwaves;
+        int y_stride_s = (2 * mbc + mx) * x_stride_s;
+        int I_speeds = (ix + mbc-1) * x_stride_s + (iy + mbc-1) * y_stride_s;
+#endif        
+
+        int mq, mw;
+
+        ql[0] = qold[I_q - x_stride_q];
+        qr[0] = qold[I_q];
         auxl[0] = aux[I_aux - x_stride_aux];
         auxl[1] = aux[I_aux - x_stride_aux + 1];
         auxr[0] = aux[I_aux];
@@ -74,10 +88,43 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
 
         for (mq = 0; mq < meqn; mq++) 
         {
-            int i = I + mq;
+            int i = I_q + mq;
             fp[i] = -apdq[mq]; 
             fm[i] = amdq[mq];
         }
+
+#if 0
+        for (m = 0; m < meqn*mwaves; m++)
+        {
+            int i = I_waves + m;
+            waves[i] = wave[m];
+        }
+
+        for (mw = 0; mw < mwaves; mw++)
+        {
+            int i = I_speeds + mw;
+            speeds[i] = s[mw];
+        }
+
+        /* Limit waves here */
+
+        /* Compute second order corrections */
+        double dtdx = dt/dx;
+        for(mq = 0; mq < meqn; mq++)
+        {
+#if 0            
+            cqxx(m,i) = cqxx(m,i) + abs_sign
+     &             * (1.d0 - dabs(s(mw,i))*dtdxave) * wave(m,mw,i)
+#endif      
+            double cqxx = 0;
+            for(mw = 0; mw < mwaves; mw++)
+            {
+                int m = mw*meqn + mq;
+                cqxx += fabs(s[mw])*(1. - fabs(s[mw])*dtdx)*wave[m];
+            }
+
+        }
+#endif        
     }
 
     if (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1) 
@@ -98,7 +145,7 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
         auxr[0] = aux[I_aux];
         auxr[1] = aux[I_aux + 1];
 
-        // rpn2adv_cuda2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        //rpn2adv_cuda2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
         rpn2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
         for (mq = 0; mq < meqn; mq++) 
@@ -108,14 +155,4 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             gm[i] = amdq[mq];
         }
     }
-#if 0    
-    delete[] ql;
-    delete[] qr;
-    delete[] auxl;
-    delete[] auxr;
-    delete[] s;
-    delete[] wave;
-    delete[] amdq;
-    delete[] apdq;
-#endif    
 }
