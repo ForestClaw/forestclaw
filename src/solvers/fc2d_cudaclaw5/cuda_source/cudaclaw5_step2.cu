@@ -5,9 +5,7 @@
 #include <fclaw2d_global.h>
 #include <fclaw2d_clawpatch.h>
 
-//#include "../fc2d_cudaclaw5_fort.h"
 #include "../fc2d_cudaclaw5_options.h"
-//#include "../fc2d_cudaclaw5_timer.h"
 
 #include "cudaclaw5_update_q.h"
 #include "cudaclaw5_flux2.h"
@@ -99,7 +97,17 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         int mwaves = cuda_opt->mwaves;
 
         cudaEventRecord(start);
+        /* X direction */
         cudaclaw5_flux2<<<grid, block>>>(0,mx,my,meqn,mbc,maux,fluxes->qold_dev,
+                                         fluxes->aux_dev, dx,dy,dt,&cflgrid,
+                                         fluxes->fm_dev,fluxes->fp_dev,
+                                         fluxes->gm_dev,fluxes->gp_dev,
+                                         fluxes->waves_dev, fluxes->speeds_dev,
+                                         cuclaw5_vt->cuda_rpn2,
+                                         NULL,cuda_opt->mwaves);
+
+        /* Y direction */
+        cudaclaw5_flux2<<<grid, block>>>(1,mx,my,meqn,mbc,maux,fluxes->qold_dev,
                                          fluxes->aux_dev, dx,dy,dt,&cflgrid,
                                          fluxes->fm_dev,fluxes->fp_dev,
                                          fluxes->gm_dev,fluxes->gp_dev,

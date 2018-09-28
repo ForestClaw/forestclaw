@@ -41,6 +41,12 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
                                 cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
                                 int mwaves) 
 {
+    int mq, mw,m;
+    int x_stride_q, y_stride_q, I_q;
+    int x_stride_aux, y_stride_aux, I_aux;
+    int x_stride_waves, y_stride_waves, I_waves;
+    int x_stride_s, y_stride_s, I_speeds;
+
     /* Static memory seems much faster than dynamic memory */
     double ql[MEQN];
     double qr[MEQN];
@@ -51,33 +57,29 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
     double amdq[MEQN];
     double apdq[MEQN];
 
-    int mq, mw,m;
-    int x_stride_q, y_stride_q, I_q;
-    int x_stride_aux, y_stride_aux, I_aux;
-    int x_stride_waves, y_stride_waves, I_waves;
-    int x_stride_s, y_stride_s, I_speeds;
-
     int ix = threadIdx.x + blockIdx.x * blockDim.x;
     int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
-    if (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)) 
+    /* Array of structures */
+    x_stride_q = meqn;
+    y_stride_q = (2 * mbc + mx) * x_stride_q;
+    I_q = (ix + mbc-1) * x_stride_q + (iy + mbc-1) * y_stride_q;
+
+    x_stride_aux = maux;
+    y_stride_aux = (2 * mbc + mx) * x_stride_aux;
+    I_aux = (ix + mbc-1) * x_stride_aux + (iy + mbc-1) * y_stride_aux;
+
+    x_stride_waves = mwaves*meqn;
+    y_stride_waves = (2 * mbc + mx) * x_stride_waves;
+    I_waves = (ix + mbc-1) * x_stride_waves + (iy + mbc-1) * y_stride_waves;
+
+    x_stride_s = mwaves;
+    y_stride_s = (2 * mbc + mx) * x_stride_s;
+    I_speeds = (ix + mbc-1) * x_stride_s + (iy + mbc-1) * y_stride_s;
+
+
+    if (idir == 0 && (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)))
     {
-        x_stride_q = meqn;
-        y_stride_q = (2 * mbc + mx) * x_stride_q;
-        I_q = (ix + mbc-1) * x_stride_q + (iy + mbc-1) * y_stride_q;
-
-        x_stride_aux = maux;
-        y_stride_aux = (2 * mbc + mx) * x_stride_aux;
-        I_aux = (ix + mbc-1) * x_stride_aux + (iy + mbc-1) * y_stride_aux;
-
-        x_stride_waves = mwaves*meqn;
-        y_stride_waves = (2 * mbc + mx) * x_stride_waves;
-        I_waves = (ix + mbc-1) * x_stride_waves + (iy + mbc-1) * y_stride_waves;
-
-        x_stride_s = mwaves;
-        y_stride_s = (2 * mbc + mx) * x_stride_s;
-        I_speeds = (ix + mbc-1) * x_stride_s + (iy + mbc-1) * y_stride_s;
-
         ql[0] = qold[I_q - x_stride_q];
         qr[0] = qold[I_q];
         auxl[0] = aux[I_aux - x_stride_aux];
@@ -94,52 +96,11 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             fp[i] = -apdq[mq]; 
             fm[i] = amdq[mq];
         }
-
-        for (m = 0; m < meqn*mwaves; m++)
-        {
-            int i = I_waves + m;
-            waves[i] = wave[m];
-        }
-
-        for (mw = 0; mw < mwaves; mw++)
-        {
-            int i = I_speeds + mw;
-            speeds[i] = s[mw];
-        }
-
-        /* Limit waves here */
-
-        /* Compute second order corrections */
-        double dtdx = dt/dx;
-        for(mq = 0; mq < meqn; mq++)
-        {
-#if 0            
-            cqxx(m,i) = cqxx(m,i) + abs_sign
-     &             * (1.d0 - dabs(s(mw,i))*dtdxave) * wave(m,mw,i)
-#endif      
-            double cqxx = 0;
-            for(mw = 0; mw < mwaves; mw++)
-            {
-                int m = mw*meqn + mq;
-                cqxx += fabs(s[mw])*(1. - fabs(s[mw])*dtdx)*wave[m];
-            }
-
-        }
     }
-
-    if (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1) 
+    else if (idir == 1 && (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
     {
-        int x_stride = meqn;
-        int y_stride = (2 * mbc + mx) * x_stride;
-        int I = (ix + mbc-1) * x_stride + (iy + mbc-1) * y_stride;
-
-        int x_stride_aux = maux;
-        int y_stride_aux = (2 * mbc + mx) * x_stride_aux;
-        int I_aux = (ix + mbc-1) * x_stride_aux + (iy + mbc-1) * y_stride_aux;
-        int mq;
-
-        ql[0] = qold[I - y_stride];
-        qr[0] = qold[I];
+        ql[0] = qold[I_q - y_stride_q];
+        qr[0] = qold[I_q];
         auxl[0] = aux[I_aux - y_stride_aux];
         auxl[1] = aux[I_aux - y_stride_aux + 1];
         auxr[0] = aux[I_aux];
@@ -150,9 +111,50 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
 
         for (mq = 0; mq < meqn; mq++) 
         {
-            int i = I + mq;
+            int i = I_q + mq;
             gp[i] = -apdq[mq]; 
             gm[i] = amdq[mq];
         }
     }
+
+    /* Assumes array of structures */
+    for (m = 0; m < meqn*mwaves; m++)
+    {
+        int i = I_waves + m;
+        waves[i] = wave[m];
+    }
+
+    for (mw = 0; mw < mwaves; mw++)
+    {
+        int i = I_speeds + mw;
+        speeds[i] = s[mw];
+    }
 }
+
+
+__device__ void cudaclaw5_second_order(int idir, int mx, int my, int meqn, int mbc,
+                                       int maux, double* qold, double* aux, double dx,
+                                       double dy, double dt, double* cflgrid,
+                                       double* fm, double* fp, double* gm, double* gp,
+                                       double* waves, double *speeds,
+                                       cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
+                                       int mwaves) 
+{    
+    int mq, mw, m;
+
+    /* TODO : Limit waves here */
+
+
+    /* Compute second order corrections */
+    double dtdx = dt/dx;
+    for(mq = 0; mq < meqn; mq++)
+    {
+        double cqxx = 0;
+        for(mw = 0; mw < mwaves; mw++)
+        {
+            int m = mw*meqn + mq;
+            cqxx += fabs(speeds[mw])*(1.0 - fabs(speeds[mw])*dtdx)*waves[m];
+        }
+    }
+}
+
