@@ -41,7 +41,7 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
                                 cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
                                 int mwaves) 
 {
-    int mq, mw,m;
+    int mq, mw, m;
     int x_stride_q, y_stride_q, I_q;
     int x_stride_aux, y_stride_aux, I_aux;
     int x_stride_waves, y_stride_waves, I_waves;
@@ -131,6 +131,28 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
     }
 }
 
+__global__ void cudaclaw5_compute_cfl(int idir, int mx, int my, int meqn, int mwaves, 
+                                      int mbc, double dx, double dy, double dt, 
+                                      double *speeds, double* cflgrid)
+{
+#if 0    
+      # from fortran_source/cudaclaw5_flux2.f */
+
+c     # compute maximum wave speed for checking Courant number:
+      cfl1d = 0.d0
+      do 50 mw=1,mwaves
+         do 50 i=1,mx+1
+c          # if s>0 use dtdx1d(i) to compute CFL,
+c          # if s<0 use dtdx1d(i-1) to compute CFL:
+            cfl1d = dmax1(cfl1d, dtdx1d(i)*s(mw,i),
+     &                          -dtdx1d(i-1)*s(mw,i))
+   50       continue
+#endif   
+    /* Compute largest waves speeds, scaled by dt/dx,  on grid */
+
+
+}
+
 
 __device__ void cudaclaw5_second_order(int idir, int mx, int my, int meqn, int mbc,
                                        int maux, double* qold, double* aux, double dx,
@@ -152,7 +174,7 @@ __device__ void cudaclaw5_second_order(int idir, int mx, int my, int meqn, int m
         double cqxx = 0;
         for(mw = 0; mw < mwaves; mw++)
         {
-            int m = mw*meqn + mq;
+            m = mw*meqn + mq;
             cqxx += fabs(speeds[mw])*(1.0 - fabs(speeds[mw])*dtdx)*waves[m];
         }
     }

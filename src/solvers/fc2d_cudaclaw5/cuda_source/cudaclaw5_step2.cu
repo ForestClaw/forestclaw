@@ -97,7 +97,10 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         int mwaves = cuda_opt->mwaves;
 
         cudaEventRecord(start);
+
+        /* ---------------------------------------------------------------------------- */
         /* X direction */
+        /* ---------------------------------------------------------------------------- */
         cudaclaw5_flux2<<<grid, block>>>(0,mx,my,meqn,mbc,maux,fluxes->qold_dev,
                                          fluxes->aux_dev, dx,dy,dt,&cflgrid,
                                          fluxes->fm_dev,fluxes->fp_dev,
@@ -106,7 +109,12 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                                          cuclaw5_vt->cuda_rpn2,
                                          NULL,cuda_opt->mwaves);
 
+        cudaclaw5_compute_cfl<<<grid, block>>>(0,mx,my,meqn,mwaves, mbc,
+                                               dx,dy,dt,fluxes->speeds_dev, &cflgrid);
+
+        /* ---------------------------------------------------------------------------- */
         /* Y direction */
+        /* ---------------------------------------------------------------------------- */
         cudaclaw5_flux2<<<grid, block>>>(1,mx,my,meqn,mbc,maux,fluxes->qold_dev,
                                          fluxes->aux_dev, dx,dy,dt,&cflgrid,
                                          fluxes->fm_dev,fluxes->fp_dev,
@@ -114,6 +122,10 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
                                          fluxes->waves_dev, fluxes->speeds_dev,
                                          cuclaw5_vt->cuda_rpn2,
                                          NULL,cuda_opt->mwaves);
+
+        cudaclaw5_compute_cfl<<<grid, block>>>(1,mx,my,meqn,mwaves, mbc,
+                                               dx,dy,dt,fluxes->speeds_dev, &cflgrid);
+
     }
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
