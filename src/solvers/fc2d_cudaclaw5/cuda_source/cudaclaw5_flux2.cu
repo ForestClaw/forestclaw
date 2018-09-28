@@ -51,30 +51,32 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
     double amdq[MEQN];
     double apdq[MEQN];
 
+    int mq, mw,m;
+    int x_stride_q, y_stride_q, I_q;
+    int x_stride_aux, y_stride_aux, I_aux;
+    int x_stride_waves, y_stride_waves, I_waves;
+    int x_stride_s, y_stride_s, I_speeds;
+
     int ix = threadIdx.x + blockIdx.x * blockDim.x;
     int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
     if (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)) 
     {
-        int x_stride_q = meqn;
-        int y_stride_q = (2 * mbc + mx) * x_stride_q;
-        int I_q = (ix + mbc-1) * x_stride_q + (iy + mbc-1) * y_stride_q;
+        x_stride_q = meqn;
+        y_stride_q = (2 * mbc + mx) * x_stride_q;
+        I_q = (ix + mbc-1) * x_stride_q + (iy + mbc-1) * y_stride_q;
 
-        int x_stride_aux = maux;
-        int y_stride_aux = (2 * mbc + mx) * x_stride_aux;
-        int I_aux = (ix + mbc-1) * x_stride_aux + (iy + mbc-1) * y_stride_aux;
+        x_stride_aux = maux;
+        y_stride_aux = (2 * mbc + mx) * x_stride_aux;
+        I_aux = (ix + mbc-1) * x_stride_aux + (iy + mbc-1) * y_stride_aux;
 
-#if 0
-        int x_stride_waves = mwaves*meqn;
-        int y_stride_waves = (2 * mbc + mx) * x_stride_waves;
-        int I_waves = (ix + mbc-1) * x_stride_waves + (iy + mbc-1) * y_stride_waves;
+        x_stride_waves = mwaves*meqn;
+        y_stride_waves = (2 * mbc + mx) * x_stride_waves;
+        I_waves = (ix + mbc-1) * x_stride_waves + (iy + mbc-1) * y_stride_waves;
 
-        int x_stride_s = mwaves;
-        int y_stride_s = (2 * mbc + mx) * x_stride_s;
-        int I_speeds = (ix + mbc-1) * x_stride_s + (iy + mbc-1) * y_stride_s;
-#endif        
-
-        int mq, mw;
+        x_stride_s = mwaves;
+        y_stride_s = (2 * mbc + mx) * x_stride_s;
+        I_speeds = (ix + mbc-1) * x_stride_s + (iy + mbc-1) * y_stride_s;
 
         ql[0] = qold[I_q - x_stride_q];
         qr[0] = qold[I_q];
@@ -93,7 +95,6 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             fm[i] = amdq[mq];
         }
 
-#if 0
         for (m = 0; m < meqn*mwaves; m++)
         {
             int i = I_waves + m;
@@ -124,7 +125,6 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             }
 
         }
-#endif        
     }
 
     if (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1) 
