@@ -45,7 +45,7 @@ __device__ void rpn2adv_cuda2(int idir, int meqn, int mwaves, int maux,
 #endif
 
 
-#define MEQN   10
+#define MEQN   32
 #define MAUX   20 
 #define MWAVES 10
 
@@ -62,12 +62,11 @@ __host__ int cudaclaw5_check_dims(int meqn, int maux, int mwaves)
 
 
 __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
-                                int maux, double* qold, double* aux, double dx,
-                                double dy, double dt, double* cflgrid,
+                                int maux, int mwaves, double* qold, double* aux, 
+                                double dx, double dy, double dt, double* cflgrid,
                                 double* fm, double* fp, double* gm, double* gp,
                                 double* waves, double *speeds,
-                                cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
-                                int mwaves) 
+                                cudaclaw5_cuda_rpn2_t rpn2, void* rpt2)
 {
     int mq, mw, m;
     int x_stride_q, y_stride_q, I_q;
@@ -119,15 +118,27 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             auxr[m] = aux[I_aux+m];
         }
 
-        //rpn2adv_cuda2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
-        rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        //rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
+        /* Set value at left interface of cell I */
         for (mq = 0; mq < meqn; mq++) 
         {
             int i = I_q + mq;
             fp[i] = -apdq[mq]; 
             fm[i] = amdq[mq];
         }
+        for (m = 0; m < meqn*mwaves; m++)
+        {
+            int i = I_waves + m;
+            waves[i] = wave[m];
+        }
+
+        for (mw = 0; mw < mwaves; mw++)
+        {
+            int i = I_speeds + mw;
+            speeds[i] = s[0];
+        }        
     }
     else if (idir == 1 && (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
     {
@@ -142,28 +153,28 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             auxr[m] = aux[I_aux + m];
         }
 
-        //rpn2adv_cuda2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
-        rpn2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        rpn2adv(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        //rpn2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
+        /* Set value at bottom interface of cell I */
         for (mq = 0; mq < meqn; mq++) 
         {
-            int i = I_q + mq;
-            gp[i] = -apdq[mq]; 
-            gm[i] = amdq[mq];
+            int j = I_q + mq;
+            gp[j] = -apdq[mq]; 
+            gm[j] = amdq[mq];
         }
-    }
+        /* Assumes array of structures */
+        for (m = 0; m < meqn*mwaves; m++)
+        {
+            int i = I_waves + m;
+            waves[i] = wave[m];
+        }
 
-    /* Assumes array of structures */
-    for (m = 0; m < meqn*mwaves; m++)
-    {
-        int i = I_waves + m;
-        waves[i] = wave[m];
-    }
-
-    for (mw = 0; mw < mwaves; mw++)
-    {
-        int i = I_speeds + mw;
-        speeds[i] = s[mw];
+        for (mw = 0; mw < mwaves; mw++)
+        {
+            int i = I_speeds + mw;
+            speeds[i] = s[0];
+        }
     }
 }
 

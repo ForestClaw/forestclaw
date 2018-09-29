@@ -32,6 +32,7 @@ typedef struct cudaclaw5_fluxes
 
     double *waves_dev;
     double *speeds_dev;
+    
 } cudaclaw5_fluxes_t;
 
 void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,

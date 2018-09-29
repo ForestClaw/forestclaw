@@ -38,12 +38,14 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     float milliseconds;
+    cudaError_t code;
     
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
 
     double *qold, *aux;
     int mx, my, meqn, maux, mbc;
     double xlower, ylower, dx,dy;
+    double cflgrid;
 
     fc2d_cudaclaw5_options_t* cuda_opt = fc2d_cudaclaw5_get_options(glob);
 
@@ -55,17 +57,13 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     FCLAW_ASSERT(cuclaw5_vt->fort_rpn2 != NULL);
     FCLAW_ASSERT(cuclaw5_vt->fort_rpt2 != NULL);
 
-    //FCLAW_ASSERT(cuclaw5_vt->cuda_rpn2 != NULL);
+    FCLAW_ASSERT(cuclaw5_vt->cuda_rpn2 != NULL);
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     fclaw2d_clawpatch_save_current_step(glob, this_patch);
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
-
-    int maxm = SC_MAX(mx,my);
-    double cflgrid = 0.0;
-
 
 #if 0
     int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
@@ -82,12 +80,14 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
 
     /* -------------------------- Construct fluctuations -------------------------------*/ 
     cudaEventRecord(start);
+
     cudaMemcpy(fluxes->qold_dev, qold, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->aux_dev, aux, fluxes->num_bytes_aux, cudaMemcpyHostToDevice);
+
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
     milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, start, stop);
+    cudaEventElapsedTime(&milliseconds, start, stop); 
     glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
 
     {
@@ -95,43 +95,66 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         dim3 grid((mx+2*mbc-1+block.x-1)/block.x,(my+2*(mbc-1)+block.y-1)/block.y);
 
         int mwaves = cuda_opt->mwaves;
+        cflgrid = 0.0;
 
         cudaEventRecord(start);
 
         /* ---------------------------------------------------------------------------- */
         /* X direction */
         /* ---------------------------------------------------------------------------- */
-        cudaclaw5_flux2<<<grid, block>>>(0,mx,my,meqn,mbc,maux,fluxes->qold_dev,
+        cudaclaw5_flux2<<<grid, block>>>(0,mx,my,meqn,mbc,maux,mwaves, 
+                                         fluxes->qold_dev,
                                          fluxes->aux_dev, dx,dy,dt,&cflgrid,
                                          fluxes->fm_dev,fluxes->fp_dev,
                                          fluxes->gm_dev,fluxes->gp_dev,
                                          fluxes->waves_dev, fluxes->speeds_dev,
-                                         cuclaw5_vt->cuda_rpn2,
-                                         NULL,cuda_opt->mwaves);
+                                         cuclaw5_vt->cuda_rpn2, NULL);
 
+        code = cudaPeekAtLastError();
+        if(code != cudaSuccess)
+        {
+            printf("ERROR (1): %s\n",cudaGetErrorString(code));
+            exit(code);
+        }
+
+        cudaDeviceSynchronize();
+
+#if 0
         cudaclaw5_compute_cfl<<<grid, block>>>(0,mx,my,meqn,mwaves, mbc,
                                                dx,dy,dt,fluxes->speeds_dev, &cflgrid);
+#endif                                               
 
         /* ---------------------------------------------------------------------------- */
         /* Y direction */
         /* ---------------------------------------------------------------------------- */
-        cudaclaw5_flux2<<<grid, block>>>(1,mx,my,meqn,mbc,maux,fluxes->qold_dev,
-                                         fluxes->aux_dev, dx,dy,dt,&cflgrid,
+        cudaclaw5_flux2<<<grid, block>>>(1,mx,my,meqn,mbc,maux,mwaves,
+                                         fluxes->qold_dev,fluxes->aux_dev, 
+                                         dx,dy,dt,&cflgrid,
                                          fluxes->fm_dev,fluxes->fp_dev,
                                          fluxes->gm_dev,fluxes->gp_dev,
                                          fluxes->waves_dev, fluxes->speeds_dev,
-                                         cuclaw5_vt->cuda_rpn2,
-                                         NULL,cuda_opt->mwaves);
+                                         cuclaw5_vt->cuda_rpn2,NULL);
+        code = cudaPeekAtLastError();
+        if(code != cudaSuccess)
+        {
+            printf("ERROR (2): %s\n",cudaGetErrorString(code));
+            exit(code);
+        }
 
+
+        cudaDeviceSynchronize();
+
+#if 0
         cudaclaw5_compute_cfl<<<grid, block>>>(1,mx,my,meqn,mwaves, mbc,
                                                dx,dy,dt,fluxes->speeds_dev, &cflgrid);
+#endif                                               
 
+        cudaEventRecord(stop);
+        cudaEventSynchronize(stop);
+        milliseconds = 0;
+        cudaEventElapsedTime(&milliseconds, start, stop);
+        glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1].cumulative += milliseconds*1e-3;        
     }
-    cudaEventRecord(stop);
-    cudaEventSynchronize(stop);
-    milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, start, stop);
-    glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1].cumulative += milliseconds*1e-3;
 
 
     /* -------------------------- Update solution --------------------------------------*/ 
@@ -155,10 +178,11 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     cudaEventElapsedTime(&milliseconds, start, stop);
     glob->timers[FCLAW2D_TIMER_CUDA_KERNEL2].cumulative += milliseconds*1e-3;
 
-    cudaError_t code = cudaPeekAtLastError();
+    code = cudaPeekAtLastError();
     if(code != cudaSuccess)
     {
-        printf("ERROR: %s\n",cudaGetErrorString(code));
+        printf("ERROR (3): %s\n",cudaGetErrorString(code));
+        exit(code);
     }
 
 

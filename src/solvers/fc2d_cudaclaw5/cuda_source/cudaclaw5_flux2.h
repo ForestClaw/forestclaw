@@ -19,12 +19,12 @@ typedef void (*cudaclaw5_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
 
 
 __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
-                                int maux, double* qold, double* aux, double dx,
+                                int maux, int mwaves, 
+                                double* qold, double* aux, double dx,
                                 double dy, double dt, double* cflgrid,
                                 double* fm, double* fp, double* gm, double* gp,
                                 double* waves, double *speeds,
-                                cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
-                                int mwaves);
+                                cudaclaw5_cuda_rpn2_t rpn2, void* rpt2);
 
 __global__ void cudaclaw5_compute_cfl(int idir, int mx, int my, int meqn, int mwaves, 
                                      int mbc, double dx, double dy, double dt, 
