@@ -45,10 +45,9 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 	if(user->cuda)
 	{
 		fc2d_cudaclaw5_vtable_t *cudaclaw5_vt = fc2d_cudaclaw5_vt();        
-		fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();        
 
 		cudaclaw5_vt->fort_qinit     = &CUDACLAW5_QINIT;
-		clawpack5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
+		cudaclaw5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
 		cudaclaw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
 		cudaclaw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
 		cudaclaw5_vt->fort_b4step2   = &CUDACLAW5_B4STEP2;

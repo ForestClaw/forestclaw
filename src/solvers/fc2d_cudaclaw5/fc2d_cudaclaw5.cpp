@@ -310,14 +310,12 @@ fc2d_cudaclaw5_vtable_t* fc2d_cudaclaw5_vt_init()
 /* This is called from the user application. */
 void fc2d_cudaclaw5_solver_initialize()
 {
-
-#if 1
-    fc2d_clawpack5_solver_initialize();
-#else 
-    fc2d_clawpack46_solver_initialize();
-#endif
-    //int claw_version = 5;
-    //fclaw2d_clawpatch_vtable_initialize(claw_version);
+    //(WIP) Work for using both 46, 5 routines 
+    //fc2d_clawpack5_solver_initialize();
+    //fc2d_clawpack46_solver_initialize();
+    
+    int claw_version = 5;
+    fclaw2d_clawpatch_vtable_initialize(claw_version);
 
     fclaw2d_vtable_t*          fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*    patch_vt = fclaw2d_patch_vt();
@@ -341,7 +339,7 @@ void fc2d_cudaclaw5_solver_initialize()
     cuclaw5_vt->src2      = cudaclaw5_src2;
 
     /* Required functions  - error if NULL */
-    cuclaw5_vt->fort_bc2       = CLAWPACK46_BC2_DEFAULT;
+    cuclaw5_vt->fort_bc2       = CUDACLAW5_BC2_DEFAULT;
     cuclaw5_vt->fort_qinit     = NULL;
     cuclaw5_vt->fort_rpn2      = NULL;
     cuclaw5_vt->fort_rpt2      = NULL;
