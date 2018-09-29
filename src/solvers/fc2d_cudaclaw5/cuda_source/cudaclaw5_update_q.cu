@@ -29,12 +29,12 @@ __global__ void cudaclaw5_update_q_cuda2(int mbc, int mx, int my, int meqn,
     {
         int x_stride = meqn;
         int y_stride = (2*mbc + mx)*x_stride;
-        int I = (ix+mbc)*x_stride + (iy+mbc)*y_stride;
+        int I_q = (ix+mbc)*x_stride + (iy+mbc)*y_stride;
         int mq;
 
         for(mq = 0; mq < meqn; mq++)
         {
-            int i = I+mq;
+            int i = I_q+mq;
             qold[i] = qold[i] - dtdx * (fm[i+x_stride] - fp[i]) 
                       - dtdy * (gm[i+y_stride] - gp[i]);
         }        
