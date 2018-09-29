@@ -14,10 +14,21 @@ __device__ void swirl_rpn2adv(int idir, int meqn, int mwaves,
     /* wave[mwaves][meqn] */
     /* idir in 0,1 : needed to get correct  */
 
-    wave[0] = qr[0] - ql[0];
-    s[0] = auxr[idir];
-    amdq[0] = SC_MIN(auxr[idir], 0) * wave[0];
-    apdq[0] = SC_MAX(auxr[idir], 0) * wave[0];
+    /* Solve q_t + D q_x = 0, where D = diag([u,u,...,u]), D in R^{meqn x meqn} */
+    int mq;
+
+    for(mq = 0; mq < meqn; mq++)
+    {
+        wave[mq] = qr[mq] - ql[mq];        
+    }
+
+    s[0] = auxr[idir];    /* Assume all waves move at the same speed */
+
+    for(mq = 0; mq < meqn; mq++)
+    {
+        amdq[mq] = SC_MIN(s[0], 0) * wave[mq];
+        apdq[mq] = SC_MAX(s[0], 0) * wave[mq];            
+    }
 }
 
 __device__ cudaclaw5_cuda_rpn2_t swirl_rpn2 = swirl_rpn2adv;
