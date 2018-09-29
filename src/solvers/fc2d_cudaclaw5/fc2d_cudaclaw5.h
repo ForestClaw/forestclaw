@@ -134,6 +134,7 @@ typedef void (*cudaclaw5_fort_flux2_t)(const int* ixy,const int* maxm, const int
                                         cudaclaw5_fort_rpn2_t rpn2,
                                         cudaclaw5_fort_rpt2_t rpt2);
 
+
 #if 0
 typedef void (*cudaclaw5_fort_fluxfun_t)(const int* meqn, double q[], double aux[],
                                           double fq[]);
