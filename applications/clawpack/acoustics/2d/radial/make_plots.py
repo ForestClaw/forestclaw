@@ -63,7 +63,8 @@ def setplot(plotdata):
     # -----------------------
 
     plotfigure = plotdata.new_plotfigure(name='scatter', figno=3)
-    plotfigure.show = (qref_dir is not None)
+    # plotfigure.show = (qref_dir is not None)
+    plotfigure.show = False
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
@@ -147,4 +148,3 @@ def addgauges(current_data):
 if __name__=="__main__":
     from clawpack.visclaw.plotclaw import plotclaw
     plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')
-
