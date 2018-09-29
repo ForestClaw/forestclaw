@@ -12,7 +12,7 @@ if os.path.exists('./1drad/_output'):
     qref_dir = os.path.abspath('./1drad/_output')
 else:
     qref_dir = None
-    print "Directory ./1drad/_output not found"
+    print("Directory ./1drad/_output not found")
 
 
 #--------------------------
@@ -28,6 +28,7 @@ def setplot(plotdata):
 
 
     from clawpack.visclaw import colormaps
+    import clawpack.forestclaw as pyclaw 
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
     
@@ -142,3 +143,8 @@ def addgauges(current_data):
     from clawpack.visclaw import gaugetools
     gaugetools.plot_gauge_locations(current_data.plotdata, \
          gaugenos='all', format_string='ko', add_labels=True)
+
+if __name__=="__main__":
+    from clawpack.visclaw.plotclaw import plotclaw
+    plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')
+
