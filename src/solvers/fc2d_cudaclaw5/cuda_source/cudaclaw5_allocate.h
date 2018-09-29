@@ -18,13 +18,20 @@ struct fclaw2d_global;
 typedef struct cudaclaw5_fluxes
 {
     size_t num_bytes;   /* All members have the same size */
-    size_t num_bytes_aux;   
+    size_t num_bytes_aux;  
+    size_t num_bytes_waves;  
+    size_t num_bytes_speeds;  
+
     double *qold_dev;
     double *aux_dev;
+    
     double *fp_dev;
     double *fm_dev;
     double *gp_dev;
     double *gm_dev;
+
+    double *waves_dev;
+    double *speeds_dev;
 } cudaclaw5_fluxes_t;
 
 void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,

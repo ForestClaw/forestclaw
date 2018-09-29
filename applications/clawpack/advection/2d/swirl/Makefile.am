@@ -9,7 +9,7 @@ applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/swirl.cpp \
 	applications/clawpack/advection/2d/swirl/psi.f \
 	applications/clawpack/advection/2d/swirl/setprob.f \
-        applications/clawpack/advection/2d/all/advection_user_fort.h \
+    applications/clawpack/advection/2d/all/advection_user_fort.h \
 	applications/clawpack/advection/2d/all/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/all/clawpack5_setaux.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv.f \
@@ -21,7 +21,9 @@ applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/user_5.0/qinit.f90 \
 	applications/clawpack/advection/2d/swirl/user_5.0/b4step2.f90 \
 	applications/clawpack/advection/2d/swirl/user_cuda5.0/qinit.f90 \
-	applications/clawpack/advection/2d/swirl/user_cuda5.0/b4step2.f90
+	applications/clawpack/advection/2d/swirl/user_cuda5.0/b4step2.f90 \
+	applications/clawpack/advection/2d/swirl/user_cuda5.0/rpn2adv.cu
+
 
 EXTRA_DIST += \
 	applications/clawpack/advection/2d/swirl/fclaw_options.ini \
@@ -48,4 +50,10 @@ applications_clawpack_advection_2d_swirl_swirl_LDADD = \
         $(FCLAW_CLAWPACK5_LDADD) \
         $(FCLAW_CUDACLAW5_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
-        $(FCLAW_LDADD)
+        $(FCLAW_LDADD) \
+		applications/clawpack/advection/2d/swirl/user_cuda5.0/devicelink.o 
+
+## nvcc -dlink has to b called after everything for the executable has been compiled.
+## this generates a single object file with all of the linked  device code.
+applications/clawpack/advection/2d/swirl/user_cuda5.0/devicelink.o : applications/clawpack/advection/2d/swirl/user_cuda5.0/rpn2adv.o src/solvers/fc2d_cudaclaw5/libcudaclaw5.la
+		$(NVCC) -dlink  applications/clawpack/advection/2d/swirl/user_cuda5.0/rpn2adv.o src/solvers/fc2d_cudaclaw5/.libs/libcudaclaw5.a -o applications/clawpack/advection/2d/swirl/user_cuda5.0/devicelink.o 

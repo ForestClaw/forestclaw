@@ -45,3 +45,5 @@ void assign_cuda_ptr2(fc2d_cuda_t* h_f)
     }
   
 }
+
+
