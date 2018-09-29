@@ -118,8 +118,8 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             auxr[m] = aux[I_aux+m];
         }
 
-        rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
-        //rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
         /* Set value at left interface of cell I */
         for (mq = 0; mq < meqn; mq++) 
@@ -153,8 +153,8 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
             auxr[m] = aux[I_aux + m];
         }
 
-        rpn2adv(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
-        //rpn2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        //rpn2adv(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        rpn2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
         /* Set value at bottom interface of cell I */
         for (mq = 0; mq < meqn; mq++) 
