@@ -3,6 +3,33 @@
 
 #include <math.h>
 
+
+/* Use this version (in swirl example) to test performance hit with function
+   pointers */
+__device__ void rpn2adv(int idir, int meqn, int mwaves, 
+                        int maux, double ql[], double qr[], 
+                        double auxl[], double auxr[],
+                        double wave[], double s[], 
+                        double amdq[], double apdq[])
+{
+    /* Solve q_t + D q_x = 0, where D = diag([u,u,...,u]), D in R^{meqn x meqn} */
+    int mq;
+
+    for(mq = 0; mq < meqn; mq++)
+    {
+        wave[mq] = qr[mq] - ql[mq];        
+    }
+
+    s[0] = auxr[idir];    /* Assume all waves move at the same speed */
+
+    for(mq = 0; mq < meqn; mq++)
+    {
+        amdq[mq] = SC_MIN(s[0], 0) * wave[mq];
+        apdq[mq] = SC_MAX(s[0], 0) * wave[mq];            
+    }
+}
+
+#if 0
 __device__ void rpn2adv_cuda2(int idir, int meqn, int mwaves, int maux,
      double ql[], double qr[], double auxl[], double auxr[],
      double wave[], double s[], double amdq[], double apdq[])
@@ -15,9 +42,10 @@ __device__ void rpn2adv_cuda2(int idir, int meqn, int mwaves, int maux,
     amdq[0] = SC_MIN(auxr[idir], 0) * wave[0];
     apdq[0] = SC_MAX(auxr[idir], 0) * wave[0];
 }
+#endif
 
 
-#define MEQN   10
+#define MEQN   32
 #define MAUX   20 
 #define MWAVES 10
 
@@ -34,12 +62,11 @@ __host__ int cudaclaw5_check_dims(int meqn, int maux, int mwaves)
 
 
 __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
-                                int maux, double* qold, double* aux, double dx,
-                                double dy, double dt, double* cflgrid,
+                                int maux, int mwaves, double* qold, double* aux, 
+                                double dx, double dy, double dt, double* cflgrid,
                                 double* fm, double* fp, double* gm, double* gp,
                                 double* waves, double *speeds,
-                                cudaclaw5_cuda_rpn2_t rpn2, void* rpt2,
-                                int mwaves) 
+                                cudaclaw5_cuda_rpn2_t rpn2, void* rpt2)
 {
     int mq, mw, m;
     int x_stride_q, y_stride_q, I_q;
@@ -80,54 +107,74 @@ __global__ void cudaclaw5_flux2(int idir, int mx, int my, int meqn, int mbc,
 
     if (idir == 0 && (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)))
     {
-        ql[0] = qold[I_q - x_stride_q];
-        qr[0] = qold[I_q];
-        auxl[0] = aux[I_aux - x_stride_aux];
-        auxl[1] = aux[I_aux - x_stride_aux + 1];
-        auxr[0] = aux[I_aux];
-        auxr[1] = aux[I_aux + 1];
+        for(mq = 0; mq < meqn; mq++)
+        {
+            ql[mq] = qold[I_q - x_stride_q + mq];
+            qr[mq] = qold[I_q + mq];            
+        }
+        for(m = 0; m < maux; m++)
+        {
+            auxl[m] = aux[I_aux - x_stride_aux + m];
+            auxr[m] = aux[I_aux+m];
+        }
 
-        //rpn2adv_cuda2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
         rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
+        /* Set value at left interface of cell I */
         for (mq = 0; mq < meqn; mq++) 
         {
             int i = I_q + mq;
             fp[i] = -apdq[mq]; 
             fm[i] = amdq[mq];
         }
+        for (m = 0; m < meqn*mwaves; m++)
+        {
+            int i = I_waves + m;
+            waves[i] = wave[m];
+        }
+
+        for (mw = 0; mw < mwaves; mw++)
+        {
+            int i = I_speeds + mw;
+            speeds[i] = s[0];
+        }        
     }
     else if (idir == 1 && (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
     {
-        ql[0] = qold[I_q - y_stride_q];
-        qr[0] = qold[I_q];
-        auxl[0] = aux[I_aux - y_stride_aux];
-        auxl[1] = aux[I_aux - y_stride_aux + 1];
-        auxr[0] = aux[I_aux];
-        auxr[1] = aux[I_aux + 1];
+        for(mq = 0; mq < meqn; mq++)
+        {
+            ql[mq] = qold[I_q - y_stride_q + mq];
+            qr[mq] = qold[I_q + mq];            
+        }
+        for(m = 0; m < maux; m++)
+        {
+            auxl[m] = aux[I_aux - y_stride_aux + m];
+            auxr[m] = aux[I_aux + m];
+        }
 
-        //rpn2adv_cuda2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+        //rpn2adv(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
         rpn2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
+        /* Set value at bottom interface of cell I */
         for (mq = 0; mq < meqn; mq++) 
         {
-            int i = I_q + mq;
-            gp[i] = -apdq[mq]; 
-            gm[i] = amdq[mq];
+            int j = I_q + mq;
+            gp[j] = -apdq[mq]; 
+            gm[j] = amdq[mq];
         }
-    }
+        /* Assumes array of structures */
+        for (m = 0; m < meqn*mwaves; m++)
+        {
+            int i = I_waves + m;
+            waves[i] = wave[m];
+        }
 
-    /* Assumes array of structures */
-    for (m = 0; m < meqn*mwaves; m++)
-    {
-        int i = I_waves + m;
-        waves[i] = wave[m];
-    }
-
-    for (mw = 0; mw < mwaves; mw++)
-    {
-        int i = I_speeds + mw;
-        speeds[i] = s[mw];
+        for (mw = 0; mw < mwaves; mw++)
+        {
+            int i = I_speeds + mw;
+            speeds[i] = s[0];
+        }
     }
 }
 

@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef RADIAL_USER_H
 #define RADIAL_USER_H
+#include <fc2d_cudaclaw5.h>
 
 #include <fclaw2d_include_all.h>
 
@@ -47,7 +48,7 @@ typedef struct user_options
     double alpha;
 
     int claw_version;
-
+    int cuda;
     int is_registered;
 
 } user_options_t;
@@ -89,6 +90,9 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
+/* --------------------------------------- Cuda ----------------------------------------*/
+
+void radial_assign_rpn2(cudaclaw5_cuda_rpn2_t *rpn2);
 
 #ifdef __cplusplus
 #if 0

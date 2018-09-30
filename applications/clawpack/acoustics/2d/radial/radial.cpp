@@ -30,9 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack5_options.h>
+#include <fc2d_cudaclaw5_options.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
+#include <fc2d_cudaclaw5.h>
 
 /* ------------------------- Start of program ---------------------------- */
 
@@ -91,14 +93,23 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
-    if (user_opt->claw_version == 4)
+    if (user_opt->cuda)
     {
-        fc2d_clawpack46_solver_initialize();
+        fc2d_cudaclaw5_solver_initialize();
+
     }
-    else if (user_opt->claw_version == 5)
+    else
     {
-        fc2d_clawpack5_solver_initialize();
+        if (user_opt->claw_version == 4)
+        {
+            fc2d_clawpack46_solver_initialize();
+        }
+        else if (user_opt->claw_version == 5)
+        {
+            fc2d_clawpack5_solver_initialize();
+        }
     }
+
 
     radial_link_solvers(glob);
 
@@ -125,6 +136,7 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
+    fc2d_cudaclaw5_options_t    *cuclaw5_opt;
 
     fclaw2d_global_t            *glob;
     fclaw2d_domain_t            *domain;
@@ -140,6 +152,7 @@ main (int argc, char **argv)
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
+    cuclaw5_opt =        fc2d_cudaclaw5_options_register(app,"fclaw_options.ini");
     user_opt =                    radial_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
@@ -164,6 +177,7 @@ main (int argc, char **argv)
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
+        fc2d_cudaclaw5_options_store    (glob, cuclaw5_opt);
         radial_options_store            (glob, user_opt);
 
         run_program(glob);

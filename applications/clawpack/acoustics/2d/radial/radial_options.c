@@ -39,6 +39,9 @@ radial_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
 
+    sc_options_add_bool (opt, 0, "cuda", &user->cuda, 0,
+                           "Use cudaclaw5 [F]");
+
     user->is_registered = 1;
     return NULL;
 }

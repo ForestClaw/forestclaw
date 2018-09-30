@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
+#include <fc2d_cudaclaw5.h>
+#include <cudaclaw5_user_fort.h>
 
 #include "../rp/acoustics_user_fort.h"
 
@@ -41,48 +43,75 @@ void radial_link_solvers(fclaw2d_global_t *glob)
     vt->problem_setup = &radial_problem_setup;  /* Version-independent */
 
     const user_options_t* user = radial_get_options(glob);
-    if (user->claw_version == 4)
+    if(user->cuda)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
-
-        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
-
+        fc2d_cudaclaw5_vtable_t *cudaclaw5_vt = fc2d_cudaclaw5_vt();        
         if (user->example == 0)
         {
-            claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
-            claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
+            cudaclaw5_vt->fort_qinit     = &CUDACLAW5_QINIT;
+            cudaclaw5_vt->fort_rpn2      = &CLAWPACK5_RPN2;
+            cudaclaw5_vt->fort_rpt2      = &CLAWPACK5_RPT2;
+
+            // cudaclaw5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
+            // cudaclaw5_vt->fort_b4step2   = &CUDACLAW5_B4STEP2;
+
+            // TODO: no rpt2 for now, right?
+            radial_assign_rpn2(&cudaclaw5_vt->cuda_rpn2);
+            FCLAW_ASSERT(cudaclaw5_vt->cuda_rpn2 != NULL);
         }
         else if (user->example == 1)
         {
             fclaw_global_essentialf("Mapped Riemann solver not yet " \
-                                    "implemented for ClawPack 4.6\n");
+                                    "implemented for CUDACLAW\n");
             exit(0);
         }
+
     }
-    else if (user->claw_version == 5)
+    else
     {
-        fc2d_clawpack5_vtable_t    *claw5_vt = fc2d_clawpack5_vt();
-
-        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-
-        if (user->example == 0)
+        if (user->claw_version == 4)
         {
-            claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
-            claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
+            fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+
+            claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
+
+            if (user->example == 0)
+            {
+                claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
+                claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
+            }
+            else if (user->example == 1)
+            {
+                fclaw_global_essentialf("Mapped Riemann solver not yet " \
+                                        "implemented for ClawPack 4.6\n");
+                exit(0);
+            }
         }
-        else if (user->example == 1)
+        else if (user->claw_version == 5)
         {
-            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
-            fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-            
-            patch_vt->setup = &radial_patch_setup;
+            fc2d_clawpack5_vtable_t    *claw5_vt = fc2d_clawpack5_vt();
 
-            claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
-            claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
+            claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
 
-            /* Avoid tagging block corners in 5 patch example*/
-            clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-            clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+            if (user->example == 0)
+            {
+                claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
+                claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
+            }
+            else if (user->example == 1)
+            {
+                fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
+                fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+                
+                patch_vt->setup = &radial_patch_setup;
+
+                claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
+                claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
+
+                /* Avoid tagging block corners in 5 patch example*/
+                clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
+                clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+            }
         }
     }
 }
