@@ -21,8 +21,8 @@ applications_clawpack_acoustics_2d_radial_radial_SOURCES = \
 	applications/clawpack/acoustics/2d/rp/rpt2_acoustics.f90 \
 	applications/clawpack/acoustics/2d/rp/rpn2_acoustics_mapped.f90 \
 	applications/clawpack/acoustics/2d/rp/rpt2_acoustics_mapped.f90 \
-	applications/clawpack/acoustics/2d/radial/user_cuda5.0/qinit.f90 \
-	applications/clawpack/acoustics/2d/radial/user_cuda5.0/rpn2acoustics.cu
+	applications/clawpack/acoustics/2d/radial/user_cuda/qinit.f90 \
+	applications/clawpack/acoustics/2d/radial/user_cuda/rpn2acoustics.cu
 
 EXTRA_DIST += \
 	applications/clawpack/acoustics/2d/radial/fclaw_options.ini \
@@ -51,19 +51,21 @@ applications_clawpack_acoustics_2d_radial_radial_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
-        $(FCLAW_CUDACLAW5_CPPFLAGS) \
+        $(FCLAW_CUDACLAW_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_acoustics_2d_radial_radial_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
-        $(FCLAW_CUDACLAW5_LDADD) \
+        $(FCLAW_CUDACLAW_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD) \
-		applications/clawpack/acoustics/2d/radial/user_cuda5.0/devicelink.o
+		applications/clawpack/acoustics/2d/radial/user_cuda/devicelink.o
+
+ACOUSTICS_RADIAL_DIR = applications/clawpack/acoustics/2d/radial
 
 ## nvcc -dlink has to be called after everything for the executable has been compiled.
 ## this generates a single object file with all of the linked  device code.
-applications/clawpack/acoustics/2d/radial/user_cuda5.0/devicelink.o : applications/clawpack/acoustics/2d/radial/user_cuda5.0/rpn2acoustics.o src/solvers/fc2d_cudaclaw5/libcudaclaw5.la
-		$(NVCC) -dlink  applications/clawpack/acoustics/2d/radial/user_cuda5.0/rpn2acoustics.o src/solvers/fc2d_cudaclaw5/.libs/libcudaclaw5.a -o applications/clawpack/acoustics/2d/radial/user_cuda5.0/devicelink.o 
+$(ACOUSTICS_RADIAL_DIR)/user_cuda/devicelink.o : $(ACOUSTICS_RADIAL_DIR)/user_cuda/rpn2acoustics.o src/solvers/fc2d_cudaclaw/libcudaclaw.la
+		$(NVCC) -dlink  $(ACOUSTICS_RADIAL_DIR)/user_cuda/rpn2acoustics.o src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a -o $(ACOUSTICS_RADIAL_DIR)/user_cuda/devicelink.o 

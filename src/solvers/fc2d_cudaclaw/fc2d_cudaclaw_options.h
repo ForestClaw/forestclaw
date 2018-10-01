@@ -23,13 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SWIRL_USER_H
-#define SWIRL_USER_H
+#ifndef FCLAW2D_CUDACLAW_OPTIONS_H
+#define FCLAW2D_CUDACLAW_OPTIONS_H
 
-#include <fc2d_cudaclaw.h> /* Needed for cuda_rpn typedef */
-
-#include <fclaw2d_include_all.h>
-
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -39,35 +36,52 @@ extern "C"
 #endif
 #endif
 
-typedef struct user_options
+struct fclaw2d_global;
+typedef struct fc2d_cudaclaw_options fc2d_cudaclaw_options_t;
+
+struct fc2d_cudaclaw_options
 {
-    double period;
-    int claw_version;
-    int cuda;
+    int mwaves;
+
+    const char *order_string;
+    int *order;
+
+    int *mthlim;
+    const char *mthlim_string;
+
+    int *mthbc;
+    const char *mthbc_string;
+
+    int method[7];
+    int mcapa;
+    int src_term;
+    int use_fwaves;
+
+    /* Output */
+    int ascii_out;
+    int vtk_out;
+
     int is_registered;
+};
 
-} user_options_t;
+fclaw_exit_type_t fc2d_cudaclaw_postprocess (fc2d_cudaclaw_options_t *
+                                               clawopt);
 
-void swirl_link_solvers(fclaw2d_global_t *glob);
+fclaw_exit_type_t fc2d_cudaclaw_check (fc2d_cudaclaw_options_t * clawopt);
 
-void swirl_problem_setup(fclaw2d_global_t* glob);
+void fc2d_cudaclaw_reset (fc2d_cudaclaw_options_t * clawopt);
 
-/* ------------------------------------- Options ---------------------------------------*/
-user_options_t* swirl_options_register (fclaw_app_t * app,
-                                        const char *configfile);
+fc2d_cudaclaw_options_t*  fc2d_cudaclaw_options_register (fclaw_app_t * app,
+                                                              const char *configfile);
 
-void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void fc2d_cudaclaw_package_register(fclaw_app_t* app,
+                                      fc2d_cudaclaw_options_t* clawopt);
 
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+fc2d_cudaclaw_options_t* fc2d_cudaclaw_get_options(struct fclaw2d_global *glob);
 
+void fc2d_cudaclaw_options_store (struct fclaw2d_global* glob, fc2d_cudaclaw_options_t* clawopt);
 
-/* --------------------------------------- Cuda ----------------------------------------*/
-
-void swirl_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
-
-/* ------------------------------------ Fortran ----------------------------------------*/
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(double* tperiod);
+void fc2d_cudaclaw_output(struct fclaw2d_global *glob, int iframe);
 
 
 #ifdef __cplusplus

@@ -32,11 +32,11 @@
 
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack5_options.h>
-#include <fc2d_cudaclaw5_options.h>
+#include <fc2d_cudaclaw_options.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
-#include <fc2d_cudaclaw5.h>
+#include <fc2d_cudaclaw.h>
 
 	static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
@@ -75,8 +75,7 @@ void run_program(fclaw2d_global_t* glob)
 	/* Initialize virtual tables for solvers */
 	if (user_opt->cuda)
 	{
-		fc2d_cudaclaw5_solver_initialize();
-
+		fc2d_cudaclaw_solver_initialize();
 	}
 	else
 	{
@@ -114,7 +113,7 @@ main (int argc, char **argv)
 	fclaw2d_clawpatch_options_t *clawpatch_opt;
 	fc2d_clawpack46_options_t   *claw46_opt;
 	fc2d_clawpack5_options_t    *claw5_opt;
-	fc2d_cudaclaw5_options_t    *cuclaw5_opt;
+	fc2d_cudaclaw_options_t    *cuclaw_opt;
 
 	fclaw2d_global_t            *glob;
 	fclaw2d_domain_t            *domain;
@@ -130,7 +129,7 @@ main (int argc, char **argv)
 	clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
 	claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
 	claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-	cuclaw5_opt =        fc2d_cudaclaw5_options_register(app,"fclaw_options.ini");
+	cuclaw_opt =        fc2d_cudaclaw_options_register(app,"fclaw_options.ini");
 	user_opt =                    swirl_options_register(app,"fclaw_options.ini");  
 
 	/* Read configuration file(s) and command line, and process options */
@@ -155,7 +154,7 @@ main (int argc, char **argv)
 		fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
 		fc2d_clawpack46_options_store   (glob, claw46_opt);
 		fc2d_clawpack5_options_store    (glob, claw5_opt);
-		fc2d_cudaclaw5_options_store    (glob, cuclaw5_opt);
+		fc2d_cudaclaw_options_store    (glob, cuclaw_opt);
 		swirl_options_store             (glob, user_opt);
 
 		run_program(glob);

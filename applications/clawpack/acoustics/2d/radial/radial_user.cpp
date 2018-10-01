@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
-#include <fc2d_cudaclaw5.h>
-#include <cudaclaw5_user_fort.h>
+#include <fc2d_cudaclaw.h>
+#include <cudaclaw_user_fort.h>
 
 #include "../rp/acoustics_user_fort.h"
 
@@ -45,19 +45,19 @@ void radial_link_solvers(fclaw2d_global_t *glob)
     const user_options_t* user = radial_get_options(glob);
     if(user->cuda)
     {
-        fc2d_cudaclaw5_vtable_t *cudaclaw5_vt = fc2d_cudaclaw5_vt();        
+        fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt();        
         if (user->example == 0)
         {
-            cudaclaw5_vt->fort_qinit     = &CUDACLAW5_QINIT;
-            cudaclaw5_vt->fort_rpn2      = &CLAWPACK5_RPN2;
-            cudaclaw5_vt->fort_rpt2      = &CLAWPACK5_RPT2;
+            cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
+            cudaclaw_vt->fort_rpn2      = &CLAWPACK46_RPN2;
+            cudaclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2;
 
-            // cudaclaw5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
-            // cudaclaw5_vt->fort_b4step2   = &CUDACLAW5_B4STEP2;
+            // cudaclaw_vt->fort_setaux    = &CLAWPACK5_SETAUX;
+            // cudaclaw_vt->fort_b4step2   = &CUDACLAW_B4STEP2;
 
             // TODO: no rpt2 for now, right?
-            radial_assign_rpn2(&cudaclaw5_vt->cuda_rpn2);
-            FCLAW_ASSERT(cudaclaw5_vt->cuda_rpn2 != NULL);
+            radial_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
+            FCLAW_ASSERT(cudaclaw_vt->cuda_rpn2 != NULL);
         }
         else if (user->example == 1)
         {

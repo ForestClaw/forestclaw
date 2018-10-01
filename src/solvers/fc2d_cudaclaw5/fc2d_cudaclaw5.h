@@ -176,12 +176,6 @@ void fc2d_cudaclaw5_solver_initialize();
 
 fc2d_cudaclaw5_vtable_t* fc2d_cudaclaw5_vt();
 
-/* ---------------------------------- CUDA functions ---------------------------------- */
-
-#if 0
-void cudaclaw5_test();
-#endif
-
 /* ----------------------------- User access to solver functions ---------------------- */
 
 
