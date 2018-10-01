@@ -103,6 +103,7 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
         /* ---------------------------------------------------------------------------- */
         /* Y direction */
         /* ---------------------------------------------------------------------------- */
+#if 0                                               
         cudaclaw_flux2<<<grid, block>>>(1,mx,my,meqn,mbc,maux,mwaves,
                                         fluxes->qold_dev,fluxes->aux_dev, 
                                         dx,dy,dt,&cflgrid,
@@ -113,6 +114,7 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
         CHECK(cudaPeekAtLastError());
 
         cudaDeviceSynchronize();
+#endif        
 
 #if 0
         cudaclaw_compute_cfl<<<grid, block>>>(1,mx,my,meqn,mwaves, mbc,
