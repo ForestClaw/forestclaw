@@ -74,8 +74,8 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
     glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
 
     {
-        dim3 block(32,32);  
-        dim3 grid((mx+2*mbc-1+block.x-1)/block.x,(my+2*(mbc-1)+block.y-1)/block.y);
+        int block = 32*32;
+        int grid = (mx+2*mbc-1)*(my+2*(mbc-1)+block-1)/block;
 
         int mwaves = cuda_opt->mwaves;
         cflgrid = 0.0;
