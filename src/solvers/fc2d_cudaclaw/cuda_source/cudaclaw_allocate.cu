@@ -44,6 +44,7 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     CHECK(cudaMalloc((void**)&fluxes->aux_dev,    fluxes->num_bytes_aux));
     CHECK(cudaMalloc((void**)&fluxes->waves_dev,  fluxes->num_bytes_waves));
     CHECK(cudaMalloc((void**)&fluxes->speeds_dev, fluxes->num_bytes_speeds));
+    CHECK(cudaMemset((void*)fluxes->speeds_dev, 0, fluxes->num_bytes_speeds));
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);    
 
