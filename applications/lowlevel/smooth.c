@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>
 #include <fclaw2d_convenience.h>
 
+#define TBUFSIZ (2 * BUFSIZ)
+
 typedef struct fclaw_smooth
 {
     sc_MPI_Comm mpicomm;
@@ -166,7 +168,7 @@ static void
 init_refine (fclaw_smooth_t * s)
 {
     int lev;
-    char basename[BUFSIZ];
+    char basename[TBUFSIZ];
     fclaw2d_domain_t *domain;
 
     /* loop over multiple initial refinements */
@@ -176,7 +178,7 @@ init_refine (fclaw_smooth_t * s)
         fclaw_global_productionf ("Initial pseudo-level %d\n", lev);
         if (s->write_vtk)
         {
-            snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
+            snprintf (basename, TBUFSIZ, "%s_L%02d", s->prefix, lev);
             fclaw2d_domain_write_vtk (s->domain, basename);
         }
 
@@ -210,7 +212,7 @@ init_refine (fclaw_smooth_t * s)
     fclaw_global_productionf ("Initial pseudo-level %d\n", lev);
     if (s->write_vtk)
     {
-        snprintf (basename, BUFSIZ, "%s_L%02d", s->prefix, lev);
+        snprintf (basename, TBUFSIZ, "%s_L%02d", s->prefix, lev);
         fclaw2d_domain_write_vtk (s->domain, basename);
     }
 }
@@ -219,7 +221,7 @@ static void
 run_refine (fclaw_smooth_t * s)
 {
     double nextt, deltat;
-    char basename[BUFSIZ];
+    char basename[TBUFSIZ];
     fclaw2d_domain_t *domain;
 
     /* initialize time stepping */
@@ -228,7 +230,7 @@ run_refine (fclaw_smooth_t * s)
     fclaw_global_productionf ("Run time %.3g step %d\n", s->time, s->k);
     if (s->write_vtk)
     {
-        snprintf (basename, BUFSIZ, "%s_K%05d", s->prefix, s->k);
+        snprintf (basename, TBUFSIZ, "%s_K%05d", s->prefix, s->k);
         fclaw2d_domain_write_vtk (s->domain, basename);
     }
 
@@ -276,7 +278,7 @@ run_refine (fclaw_smooth_t * s)
         fclaw_global_productionf ("Run time %.3g step %d\n", s->time, s->k);
         if (s->write_vtk)
         {
-            snprintf (basename, BUFSIZ, "%s_K%05d", s->prefix, s->k);
+            snprintf (basename, TBUFSIZ, "%s_K%05d", s->prefix, s->k);
             fclaw2d_domain_write_vtk (s->domain, basename);
         }
     }
