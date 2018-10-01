@@ -266,7 +266,6 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
                         double t,
                         double dt)
 {
-#if 0    
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
     fc2d_cudaclaw_options_t* clawpack_options;
     int level;
@@ -334,7 +333,6 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
     delete [] work;
 
     return cflgrid;
-#endif    
 }
 #endif
 
@@ -398,8 +396,6 @@ void cudaclaw_output(fclaw2d_global_t *glob, int iframe)
     }
 
 }
-
-
 
 /* ---------------------------------- Virtual table  ---------------------------------- */
 
