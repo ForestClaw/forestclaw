@@ -48,6 +48,7 @@ typedef struct user_options
     double alpha;
 
     int claw_version;
+    int cuda;
     int example;
 
     int is_registered;

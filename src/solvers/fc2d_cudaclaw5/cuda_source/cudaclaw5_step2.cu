@@ -10,6 +10,9 @@
 #include "cudaclaw5_update_q.h"
 #include "cudaclaw5_flux2.h"
 
+// Extra Source
+#include <cub/cub.cuh>
+
 #if 0
 __device__ void rpn2adv_cuda(int idir, int meqn, int mwaves, int maux,
      double ql[], double qr[], double auxl[], double auxr[],
@@ -26,6 +29,50 @@ __device__ void rpn2adv_cuda(int idir, int meqn, int mwaves, int maux,
 #endif
 
 //__device__ cudaclaw5_cuda_rpn2_t rpn2_dev =  rpn2adv_cuda;
+
+// CustomMax functor
+struct AbsMax
+{
+    template <typename T>
+    __device__ __forceinline__
+    T operator()(const T &a, const T &b) const {
+        return (abs(b) > abs(a)) ? abs(b) : abs(a);
+    }
+};
+
+static
+double cudaclaw5_compute_cfl(int idir, int mx, int my, int mbc, int mwaves, 
+			     double dx, double dy, double dt, double* speeds_dev)
+{
+	int size = (2*mbc+mx)*(2*mbc+my)*mwaves;
+	void    *temp_storage_dev = NULL;
+	size_t  temp_storage_bytes = 0;
+	double  *cflgrid_dev;
+	double cflgrid;
+
+	AbsMax maxop;
+	double init=0.0;
+	cudaMalloc(&cflgrid_dev, sizeof(double));	
+	CubDebugExit(cub::DeviceReduce::Reduce(temp_storage_dev,temp_storage_bytes,
+                                         speeds_dev,cflgrid_dev,size,maxop,init));
+	cudaMalloc(&temp_storage_dev, temp_storage_bytes);  
+	CubDebugExit(cub::DeviceReduce::Reduce(temp_storage_dev,temp_storage_bytes,
+                                       speeds_dev,cflgrid_dev,size,maxop,init));
+	cudaMemcpy(&cflgrid, cflgrid_dev, sizeof(double),cudaMemcpyDeviceToHost);
+
+	cudaFree(temp_storage_dev);
+	cudaFree(cflgrid_dev);
+	if(idir == 0)
+	{
+		cflgrid = cflgrid*dt/dx;
+	}
+	else
+	{
+		cflgrid =  cflgrid*dt/dy;
+	}
+
+	return cflgrid;
+}
 
 double cudaclaw5_step2(fclaw2d_global_t *glob,
                        fclaw2d_patch_t *this_patch,
@@ -117,12 +164,10 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
             exit(code);
         }
 
+        cflgrid = cudaclaw5_compute_cfl(0,mx,my,mbc,mwaves,dx,dy,dt,fluxes->speeds_dev);
+        //cudaclaw5_compute_cfl<<<grid, block>>>(0,mx,my,meqn,mwaves, mbc,
+        //                                       dx,dy,dt,fluxes->speeds_dev, &cflgrid);
         cudaDeviceSynchronize();
-
-#if 0
-        cudaclaw5_compute_cfl<<<grid, block>>>(0,mx,my,meqn,mwaves, mbc,
-                                               dx,dy,dt,fluxes->speeds_dev, &cflgrid);
-#endif                                               
 
         /* ---------------------------------------------------------------------------- */
         /* Y direction */
@@ -142,6 +187,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
         }
 
 
+        cflgrid = cudaclaw5_compute_cfl(0,mx,my,mbc,mwaves,dx,dy,dt,fluxes->speeds_dev);
         cudaDeviceSynchronize();
 
 #if 0
