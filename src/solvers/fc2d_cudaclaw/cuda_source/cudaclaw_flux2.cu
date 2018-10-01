@@ -45,12 +45,11 @@ __host__ int cudaclaw_check_dims(int meqn, int maux, int mwaves)
 }
 
 
-__global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
+__global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
                                 int maux, int mwaves, double* qold, double* aux, 
-                                double dx, double dy, double dt, double* cflgrid,
                                 double* fm, double* fp, double* gm, double* gp,
                                 double* waves, double *speeds,
-                                cudaclaw_cuda_rpn2_t rpn2, void* rpt2)
+                                cudaclaw_cuda_rpn2_t rpn2)
 {
     int mq, mw, m;
     int xs, ys, zs;
@@ -130,7 +129,7 @@ __global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
         } 
 #endif        
     }
-    else if (idir == 1 && (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
+    else if ((ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
     {
 #if 0        
         for(mq = 0; mq < meqn; mq++)
