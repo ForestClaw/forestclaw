@@ -63,8 +63,8 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
     /* -------------------------- Construct fluctuations -------------------------------*/ 
     cudaEventRecord(start);
 
-    CHECK(cudaMemcpy(fluxes->qold_dev, qold, fluxes->num_bytes, cudaMemcpyHostToDevice));
-    CHECK(cudaMemcpy(fluxes->aux_dev, aux, fluxes->num_bytes_aux, cudaMemcpyHostToDevice));
+    cudaMemcpy(fluxes->qold_dev, qold, fluxes->num_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(fluxes->aux_dev, aux, fluxes->num_bytes_aux, cudaMemcpyHostToDevice);
 
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
@@ -111,6 +111,7 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
                                         fluxes->waves_dev, fluxes->speeds_dev,
                                         cuclaw_vt->cuda_rpn2,NULL);
         CHECK(cudaPeekAtLastError());
+
         cudaDeviceSynchronize();
 
 #if 0
@@ -150,7 +151,9 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
 
     /* -------------------------- Copy q back to host ----------------------------------*/ 
     cudaEventRecord(start);
-    CHECK(cudaMemcpy(qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost));
+
+    cudaMemcpy(qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost);
+    
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
     milliseconds = 0;

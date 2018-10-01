@@ -426,6 +426,10 @@ void fc2d_cudaclaw_solver_initialize()
     patch_vt->physical_bc                    = cudaclaw_bc2;
     patch_vt->single_step_update             = cudaclaw_update;
 
+    /* Set user data */
+    patch_vt->create_user_data  = cudaclaw_allocate_fluxes;
+    patch_vt->destroy_user_data = cudaclaw_deallocate_fluxes;
+
     /* Wrappers so that user can change argument list */
     cudaclaw_vt->b4step2                       = cudaclaw_b4step2;
     cudaclaw_vt->src2                          = cudaclaw_src2;

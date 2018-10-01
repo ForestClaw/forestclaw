@@ -1,5 +1,6 @@
 #include "cudaclaw_update_q.h"
 
+#if 0
 __global__ void cudaclaw_update_q_cuda(int mbc, 
                                         double dtdx, double dtdy,
                                         double* qold, 
@@ -15,6 +16,7 @@ __global__ void cudaclaw_update_q_cuda(int mbc,
     qold[i] = qold[i] - dtdx * (fm[i+x_stride] - fp[i]) 
                       - dtdy * (gm[i+y_stride] - gp[i]);
 }
+#endif
 
 __global__ void cudaclaw_update_q_cuda2(int mbc, int mx, int my, int meqn,
                                         double dtdx, double dtdy,
@@ -22,21 +24,27 @@ __global__ void cudaclaw_update_q_cuda2(int mbc, int mx, int my, int meqn,
                                         double* fm, double* fp, 
                                         double* gm, double* gp)
 {
-    int ix = threadIdx.x + blockIdx.x*blockDim.x;
-    int iy = threadIdx.y + blockIdx.y*blockDim.y;
+    int xs,ys,zs;
+    int I, I_q;
+    int ix, iy;
+    int mq;
+
+    ix = threadIdx.x + blockIdx.x*blockDim.x;
+    iy = threadIdx.y + blockIdx.y*blockDim.y;
+
+    xs = 1;
+    ys = (2*mbc + mx)*xs;
+    zs = (2*mbc + my)*ys*xs;
 
     if (ix < mx && iy < my)
     {
-        int x_stride = meqn;
-        int y_stride = (2*mbc + mx)*x_stride;
-        int I_q = (ix+mbc)*x_stride + (iy+mbc)*y_stride;
-        int mq;
+        I = (ix+mbc)*xs + (iy+mbc)*ys;
 
         for(mq = 0; mq < meqn; mq++)
         {
-            int i = I_q+mq;
-            qold[i] = qold[i] - dtdx * (fm[i+x_stride] - fp[i]) 
-                      - dtdy * (gm[i+y_stride] - gp[i]);
+            I_q = I + mq*zs;
+            qold[I_q] = qold[I_q] - dtdx * (fm[I_q + xs] - fp[I_q]) 
+                                  - dtdy * (gm[I_q + ys] - gp[I_q]);
         }        
     }
 }
