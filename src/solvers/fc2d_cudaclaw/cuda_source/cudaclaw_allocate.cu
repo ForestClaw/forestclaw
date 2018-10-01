@@ -30,8 +30,8 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     
     fluxes->num_bytes        = meqn*size;
     fluxes->num_bytes_aux    = maux*size;
-    fluxes->num_bytes_waves  = mwaves*meqn*size;
-    fluxes->num_bytes_speeds = mwaves*size;
+    fluxes->num_bytes_waves  = 2*mwaves*meqn*size;
+    fluxes->num_bytes_speeds = 2*mwaves*size;
 
     /* Assumption here is that cudaMalloc is a synchronous call */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]); 

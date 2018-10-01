@@ -105,6 +105,19 @@ __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
             fp[I_q] = -apdq[mq]; 
             fm[I_q] = amdq[mq];
         }
+#if 0        
+        for (m = 0; m < meqn*mwaves; m++)
+        {
+            I_waves = I + m*zs;
+            waves[I_waves] = wave[m];
+        }
+#endif        
+        for (mw = 0; mw < mwaves; mw++)
+        {
+            I_speeds = I + mw*zs;
+            speeds[I_speeds] = s[mw];
+        } 
+
 
         rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, amdq, apdq);
 
@@ -115,6 +128,11 @@ __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
             gp[I_q] = -apdq[mq]; 
             gm[I_q] = amdq[mq];
         }
+        for (mw = 0; mw < mwaves; mw++)
+        {
+            I_speeds = I + (mwaves+mw)*zs;
+            speeds[I_speeds] = s[mw];
+        } 
 
 #if 0        
         for (m = 0; m < meqn*mwaves; m++)
@@ -127,49 +145,24 @@ __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
             I_speeds = I + mw*zs;
             speeds[I_speeds] = s[mw];
         } 
-#endif        
+#endif
+
     }
-    else if ((ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
+#if 0
+    /* Update goes here */
+    if (ix >= mbc && ix <= mx && iy >= mbc && iy <= my)
     {
-#if 0        
+        I = (ix+mbc)*xs + (iy+mbc)*ys;
+
         for(mq = 0; mq < meqn; mq++)
         {
             I_q = I + mq*zs;
-            ql[mq] = qold[I_q - ys];
-            qr[mq] = qold[I_q];            
-        }
-        for(m = 0; m < maux; m++)
-        {
-            I_aux = I + m*zs;
-            auxl[m] = aux[I_aux - ys];
-            auxr[m] = aux[I_aux];
-        }
+            qold[I_q] = qold[I_q] - dtdx * (fm[I_q + xs] - fp[I_q]) 
+                                  - dtdy * (gm[I_q + ys] - gp[I_q]);
+        }        
 
-        //rpn2adv(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
-        rpn2(1, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
-
-        /* Set value at bottom interface of cell I */
-        for (mq = 0; mq < meqn; mq++) 
-        {
-            I_q = I + mq*zs;
-            gp[I_q] = -apdq[mq]; 
-            gm[I_q] = amdq[mq];
-        }
-#endif
-#if 0
-        for (m = 0; m < meqn*mwaves; m++)
-        {
-            I_waves = I + m*zs;
-            waves[I_waves] = wave[m];
-        }
-
-        for (mw = 0; mw < mwaves; mw++)
-        {
-            I_speeds = I + mw*zs;
-            speeds[I_speeds] = s[mw];
-        }
-#endif    
     }
+#endif
 }
 
 __global__ void cudaclaw_compute_cfl(int idir, int mx, int my, int meqn, int mwaves, 
