@@ -11,6 +11,7 @@
 #include "cudaclaw_flux2.h"
 
 #include "../fc2d_cudaclaw_check.cu"  /* CHECK defined here */
+#include <cublas_v2.h>
 
 double cudaclaw_step2(fclaw2d_global_t *glob,
                       fclaw2d_patch_t *this_patch,
@@ -94,6 +95,24 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
 
         cudaDeviceSynchronize();
 
+        int n = (2*mbc+mx)*(2*mbc+my)*mwaves*2;
+        int maxidx;
+	double maxabsspeed;
+
+        cublasStatus_t stat;
+        cublasHandle_t handle;
+        cublasCreate(&handle);
+
+        stat = cublasIdamax(handle,n,fluxes->speeds_dev,1,&maxidx);
+        if (stat != CUBLAS_STATUS_SUCCESS) {
+                printf ("cublasIdamax failed");
+                cublasDestroy(handle);
+                return EXIT_FAILURE;
+        }
+        cudaMemcpy(&maxabsspeed,fluxes->speeds_dev+maxidx-1,sizeof(double),cudaMemcpyDeviceToHost);
+	//cflgrid = maxidx < (2*mbc+mx)*(2*mbc+my) ? maxabsspeed*dt/dx : maxabsspeed*dt/dy;
+	cflgrid = maxabsspeed*dt/dx;
+        cublasDestroy(handle);
 #if 0
         cudaclaw_compute_cfl<<<grid, block>>>(0,mx,my,meqn,mwaves, mbc,
                                                dx,dy,dt,fluxes->speeds_dev, &cflgrid);
