@@ -67,8 +67,11 @@ __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
     double amdq[MEQN];
     double apdq[MEQN];
 
-    int ix = threadIdx.x + blockIdx.x * blockDim.x;
-    int iy = threadIdx.y + blockIdx.y * blockDim.y;
+    int ifaces_x = mx+2*mbc-1;
+    int ifaces_y = my+2*mbc-1;
+    int thread_index = threadIdx.x + blockIdx.x * blockDim.x;
+    int ix = thread_index%ifaces_x;
+    int iy = thread_index/ifaces_y;
 
     /* Compute strides */
     xs = 1;
