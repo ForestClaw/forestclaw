@@ -20,8 +20,8 @@ applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/user_4.6/b4step2.f \
 	applications/clawpack/advection/2d/swirl/user_5.0/qinit.f90 \
 	applications/clawpack/advection/2d/swirl/user_5.0/b4step2.f90 \
-	applications/clawpack/advection/2d/swirl/user_cuda/qinit.f90 \
-	applications/clawpack/advection/2d/swirl/user_cuda/b4step2.f90 \
+	applications/clawpack/advection/2d/swirl/user_cuda/qinit.f \
+	applications/clawpack/advection/2d/swirl/user_cuda/b4step2.f \
 	applications/clawpack/advection/2d/swirl/user_cuda/rpn2adv.cu
 
 
