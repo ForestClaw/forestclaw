@@ -39,8 +39,8 @@ extern "C"
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
-typedef  struct fc2d_cudaclaw_vtable  fc2d_cudaclaw_vtable_t;
 
+typedef  struct fc2d_cudaclaw_vtable  fc2d_cudaclaw_vtable_t;
 
 /* --------------------------- Clawpack solver functions ------------------------------ */
 

@@ -1,12 +1,6 @@
 #ifndef CUDACLAW_ALLOCATE_H
 #define CUDACLAW_ALLOCATE_H
 
-
-/* Only include headers needed to get this file to compile;  all other
-   headers should go in c files */
-
-// #include "../fc2d_cudaclaw.h"
-
 #ifdef __cplusplus
 extern "C"
 {

@@ -79,40 +79,50 @@ __global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
 
     if (idir == 0 && (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)))
     {
+#if 0        
         for(mq = 0; mq < meqn; mq++)
         {
             I_q = I + mq*zs;
             ql[mq] = qold[I_q - xs];
             qr[mq] = qold[I_q];            
         }
+#endif
+#if 0        
         for(m = 0; m < maux; m++)
         {
             I_aux = I + m*zs;
             auxl[m] = aux[I_aux - xs];
             auxr[m] = aux[I_aux];
         }
+#endif        
+
 
         //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
         rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
         /* Set value at left interface of cell I */
+#if 0        
         for (mq = 0; mq < meqn; mq++) 
         {
             I_q = I + mq*zs;
             fp[I_q] = -apdq[mq]; 
             fm[I_q] = amdq[mq];
         }
+#endif
+#if 0        
         for (m = 0; m < meqn*mwaves; m++)
         {
             I_waves = I + m*zs;
             waves[I_waves] = wave[m];
         }
-
+#endif        
+#if 0
         for (mw = 0; mw < mwaves; mw++)
         {
             I_speeds = I + mw*zs;
             speeds[I_speeds] = s[mw];
-        }        
+        } 
+#endif               
     }
     else if (idir == 1 && (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
     {
