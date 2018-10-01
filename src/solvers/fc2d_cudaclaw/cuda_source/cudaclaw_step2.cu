@@ -84,13 +84,12 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
         /* ---------------------------------------------------------------------------- */
         /* X direction */
         /* ---------------------------------------------------------------------------- */
-        cudaclaw_flux2<<<grid, block>>>(0,mx,my,meqn,mbc,maux,mwaves, 
-                                        fluxes->qold_dev,
-                                        fluxes->aux_dev, dx,dy,dt,&cflgrid,
+        cudaclaw_flux2<<<grid, block>>>(mx,my,meqn,mbc,maux,mwaves, 
+                                        fluxes->qold_dev, fluxes->aux_dev,
                                         fluxes->fm_dev,fluxes->fp_dev,
                                         fluxes->gm_dev,fluxes->gp_dev,
                                         fluxes->waves_dev, fluxes->speeds_dev,
-                                        cuclaw_vt->cuda_rpn2, NULL);
+                                        cuclaw_vt->cuda_rpn2);
         CHECK(cudaPeekAtLastError());
 
         cudaDeviceSynchronize();
@@ -103,6 +102,7 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
         /* ---------------------------------------------------------------------------- */
         /* Y direction */
         /* ---------------------------------------------------------------------------- */
+#if 0                                               
         cudaclaw_flux2<<<grid, block>>>(1,mx,my,meqn,mbc,maux,mwaves,
                                         fluxes->qold_dev,fluxes->aux_dev, 
                                         dx,dy,dt,&cflgrid,
@@ -113,6 +113,7 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
         CHECK(cudaPeekAtLastError());
 
         cudaDeviceSynchronize();
+#endif        
 
 #if 0
         cudaclaw_compute_cfl<<<grid, block>>>(1,mx,my,meqn,mwaves, mbc,

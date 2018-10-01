@@ -45,12 +45,11 @@ __host__ int cudaclaw_check_dims(int meqn, int maux, int mwaves)
 }
 
 
-__global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
+__global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
                                 int maux, int mwaves, double* qold, double* aux, 
-                                double dx, double dy, double dt, double* cflgrid,
                                 double* fm, double* fp, double* gm, double* gp,
                                 double* waves, double *speeds,
-                                cudaclaw_cuda_rpn2_t rpn2, void* rpt2)
+                                cudaclaw_cuda_rpn2_t rpn2)
 {
     int mq, mw, m;
     int xs, ys, zs;
@@ -59,8 +58,10 @@ __global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
     /* Static memory seems much faster than dynamic memory */
     double ql[MEQN];
     double qr[MEQN];
+    double qd[MEQN];
     double auxl[MAUX];
     double auxr[MAUX];
+    double auxd[MAUX];
     double s[MWAVES];
     double wave[MEQN*MWAVES];
     double amdq[MEQN];
@@ -77,19 +78,21 @@ __global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
     /* (i,j) index */
     I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
 
-    if (idir == 0 && (ix < mx + 2*mbc-1 && iy < my + 2*(mbc-1)))
+    if (ix < mx + 2*mbc-1 && iy < my + 2*mbc-1)
     {
         for(mq = 0; mq < meqn; mq++)
         {
             I_q = I + mq*zs;
             ql[mq] = qold[I_q - xs];
-            qr[mq] = qold[I_q];            
+            qr[mq] = qold[I_q];  
+            qd[mq] = qold[I_q - ys];          
         }
         for(m = 0; m < maux; m++)
         {
             I_aux = I + m*zs;
             auxl[m] = aux[I_aux - xs];
             auxr[m] = aux[I_aux];
+            auxd[m] = aux[I_aux - ys];
         }
 
         //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
@@ -102,6 +105,17 @@ __global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
             fp[I_q] = -apdq[mq]; 
             fm[I_q] = amdq[mq];
         }
+
+        rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, amdq, apdq);
+
+        /* Set value at bottom interface of cell I */
+        for (mq = 0; mq < meqn; mq++) 
+        {
+            I_q = I + mq*zs;
+            gp[I_q] = -apdq[mq]; 
+            gm[I_q] = amdq[mq];
+        }
+
 #if 0        
         for (m = 0; m < meqn*mwaves; m++)
         {
@@ -115,8 +129,9 @@ __global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
         } 
 #endif        
     }
-    else if (idir == 1 && (ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
+    else if ((ix < mx + 2*(mbc-1) && iy < my + 2*mbc-1))
     {
+#if 0        
         for(mq = 0; mq < meqn; mq++)
         {
             I_q = I + mq*zs;
@@ -140,7 +155,7 @@ __global__ void cudaclaw_flux2(int idir, int mx, int my, int meqn, int mbc,
             gp[I_q] = -apdq[mq]; 
             gm[I_q] = amdq[mq];
         }
-
+#endif
 #if 0
         for (m = 0; m < meqn*mwaves; m++)
         {
