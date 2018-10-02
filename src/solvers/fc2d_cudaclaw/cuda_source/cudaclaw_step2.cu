@@ -20,17 +20,21 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
                       double t,
                       double dt)
 {
+    int mx, my, meqn, maux, mbc;
+    double xlower, ylower, dx,dy;
+    double cflgrid, s;
+
+    int maxidx, n;
+    double maxabsspeed;
+    double dtdx, dtdy;
+    double *qold, *aux;
+
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     float milliseconds;
     
     fc2d_cudaclaw_vtable_t*  cuclaw_vt = fc2d_cudaclaw_vt();
-
-    double *qold, *aux;
-    int mx, my, meqn, maux, mbc;
-    double xlower, ylower, dx,dy;
-    double cflgrid;
 
     fc2d_cudaclaw_options_t* cuda_opt = fc2d_cudaclaw_get_options(glob);
 
@@ -103,9 +107,11 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
 
         cudaDeviceSynchronize();
 
-        int n = (2*mbc+mx)*(2*mbc+my)*mwaves*2;
-        int maxidx;
-	double maxabsspeed;
+        /* -------------------------- Compute CFL --------------------------------------*/ 
+        n = (2*mbc+mx)*(2*mbc+my)*mwaves*2;
+        dtdx = dt/dx;
+        dtdy = dt/dy;
+
 
         cublasStatus_t stat;
         cublasHandle_t handle;
@@ -118,34 +124,9 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
                 return EXIT_FAILURE;
         }
         cudaMemcpy(&maxabsspeed,fluxes->speeds_dev+maxidx-1,sizeof(double),cudaMemcpyDeviceToHost);
-	//cflgrid = maxidx < (2*mbc+mx)*(2*mbc+my) ? maxabsspeed*dt/dx : maxabsspeed*dt/dy;
-	cflgrid = maxabsspeed*dt/dx;
+        s = fabs(maxabsspeed);
+	    cflgrid = maxidx < n/2 ? s*dtdx : s*dtdy;
         cublasDestroy(handle);
-#if 0
-        cudaclaw_compute_cfl<<<grid, block>>>(0,mx,my,meqn,mwaves, mbc,
-                                               dx,dy,dt,fluxes->speeds_dev, &cflgrid);
-#endif                                               
-
-        /* ---------------------------------------------------------------------------- */
-        /* Y direction */
-        /* ---------------------------------------------------------------------------- */
-#if 0                                               
-        cudaclaw_flux2<<<grid, block>>>(1,mx,my,meqn,mbc,maux,mwaves,
-                                        fluxes->qold_dev,fluxes->aux_dev, 
-                                        dx,dy,dt,&cflgrid,
-                                        fluxes->fm_dev,fluxes->fp_dev,
-                                        fluxes->gm_dev,fluxes->gp_dev,
-                                        fluxes->waves_dev, fluxes->speeds_dev,
-                                        cuclaw_vt->cuda_rpn2,NULL);
-        CHECK(cudaPeekAtLastError());
-
-        cudaDeviceSynchronize();
-#endif        
-
-#if 0
-        cudaclaw_compute_cfl<<<grid, block>>>(1,mx,my,meqn,mwaves, mbc,
-                                               dx,dy,dt,fluxes->speeds_dev, &cflgrid);
-#endif                                               
 
         cudaEventRecord(stop);
         cudaEventSynchronize(stop);
@@ -157,7 +138,6 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
 
 #if 0                                               
     /* -------------------------- Update solution --------------------------------------*/ 
-
     cudaEventRecord(start);
 
     dim3 block(32,32);  
