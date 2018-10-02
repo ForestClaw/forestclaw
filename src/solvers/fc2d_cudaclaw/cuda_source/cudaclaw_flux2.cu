@@ -69,87 +69,91 @@ __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
 
     int ifaces_x = mx+2*mbc-1;
     int ifaces_y = my+2*mbc-1;
-    int thread_index = threadIdx.x + blockIdx.x * blockDim.x;
-    int ix = thread_index%ifaces_x;
-    int iy = thread_index/ifaces_y;
+    int num_ifaces = ifaces_x*ifaces_y;
 
-    /* Compute strides */
-    xs = 1;
-    ys = (2*mbc + mx)*xs;
-    zs = (2*mbc + my)*xs*ys;
+    for(int thread_index = threadIdx.x; thread_index<num_ifaces; thread_index+=blockDim.x){
 
-    /* (i,j) index */
-    I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
+        int ix = thread_index%ifaces_x;
+        int iy = thread_index/ifaces_y;
 
-    if (ix < mx + 2*mbc-1 && iy < my + 2*mbc-1)
-    {
-        for(mq = 0; mq < meqn; mq++)
+        /* Compute strides */
+        xs = 1;
+        ys = (2*mbc + mx)*xs;
+        zs = (2*mbc + my)*xs*ys;
+
+        /* (i,j) index */
+        I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
+
+        if (ix < mx + 2*mbc-1 && iy < my + 2*mbc-1)
         {
-            I_q = I + mq*zs;
-            ql[mq] = qold[I_q - xs];
-            qr[mq] = qold[I_q];  
-            qd[mq] = qold[I_q - ys];          
-        }
-        for(m = 0; m < maux; m++)
-        {
-            I_aux = I + m*zs;
-            auxl[m] = aux[I_aux - xs];
-            auxr[m] = aux[I_aux];
-            auxd[m] = aux[I_aux - ys];
-        }
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;
+                ql[mq] = qold[I_q - xs];
+                qr[mq] = qold[I_q];  
+                qd[mq] = qold[I_q - ys];          
+            }
+            for(m = 0; m < maux; m++)
+            {
+                I_aux = I + m*zs;
+                auxl[m] = aux[I_aux - xs];
+                auxr[m] = aux[I_aux];
+                auxd[m] = aux[I_aux - ys];
+            }
 
-        //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
-        rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+            //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+            rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
-        /* Set value at left interface of cell I */
-        for (mq = 0; mq < meqn; mq++) 
-        {
-            I_q = I + mq*zs;
-            fp[I_q] = -apdq[mq]; 
-            fm[I_q] = amdq[mq];
-        }
+            /* Set value at left interface of cell I */
+            for (mq = 0; mq < meqn; mq++) 
+            {
+                I_q = I + mq*zs;
+                fp[I_q] = -apdq[mq]; 
+                fm[I_q] = amdq[mq];
+            }
 #if 0        
-        for (m = 0; m < meqn*mwaves; m++)
-        {
-            I_waves = I + m*zs;
-            waves[I_waves] = wave[m];
-        }
+            for (m = 0; m < meqn*mwaves; m++)
+            {
+                I_waves = I + m*zs;
+                waves[I_waves] = wave[m];
+            }
 #endif        
-        for (mw = 0; mw < mwaves; mw++)
-        {
-            I_speeds = I + mw*zs;
-            speeds[I_speeds] = s[mw];
-        } 
+            for (mw = 0; mw < mwaves; mw++)
+            {
+                I_speeds = I + mw*zs;
+                speeds[I_speeds] = s[mw];
+            } 
 
 
-        rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, amdq, apdq);
+            rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, amdq, apdq);
 
-        /* Set value at bottom interface of cell I */
-        for (mq = 0; mq < meqn; mq++) 
-        {
-            I_q = I + mq*zs;
-            gp[I_q] = -apdq[mq]; 
-            gm[I_q] = amdq[mq];
-        }
-        for (mw = 0; mw < mwaves; mw++)
-        {
-            I_speeds = I + (mwaves+mw)*zs;
-            speeds[I_speeds] = s[mw];
-        } 
+            /* Set value at bottom interface of cell I */
+            for (mq = 0; mq < meqn; mq++) 
+            {
+                I_q = I + mq*zs;
+                gp[I_q] = -apdq[mq]; 
+                gm[I_q] = amdq[mq];
+            }
+            for (mw = 0; mw < mwaves; mw++)
+            {
+                I_speeds = I + (mwaves+mw)*zs;
+                speeds[I_speeds] = s[mw];
+            } 
 
 #if 0        
-        for (m = 0; m < meqn*mwaves; m++)
-        {
-            I_waves = I + m*zs;
-            waves[I_waves] = wave[m];
-        }
-        for (mw = 0; mw < mwaves; mw++)
-        {
-            I_speeds = I + mw*zs;
-            speeds[I_speeds] = s[mw];
-        } 
+            for (m = 0; m < meqn*mwaves; m++)
+            {
+                I_waves = I + m*zs;
+                waves[I_waves] = wave[m];
+            }
+            for (mw = 0; mw < mwaves; mw++)
+            {
+                I_speeds = I + mw*zs;
+                speeds[I_speeds] = s[mw];
+            } 
 #endif
 
+        }
     }
 #if 0
     /* Update goes here */

@@ -75,7 +75,8 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
 
     {
         int block = 32*32;
-        int grid = (mx+2*mbc-1)*(my+2*(mbc-1)+block-1)/block;
+        //int grid = (mx+2*mbc-1)*(my+2*(mbc-1)+block-1)/block;
+        int grid=1;
 
         int mwaves = cuda_opt->mwaves;
         cflgrid = 0.0;
