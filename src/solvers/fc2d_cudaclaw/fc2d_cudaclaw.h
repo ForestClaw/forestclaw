@@ -37,7 +37,7 @@ extern "C"
 #endif
 #endif
 
-#define FC2D_CUDACLAW_BUFFER_LEN 10
+#define FC2D_CUDACLAW_BUFFER_LEN 1
 
 struct fclaw2d_global;
 struct fclaw2d_patch;
