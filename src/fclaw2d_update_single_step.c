@@ -59,6 +59,7 @@ void cb_single_step(fclaw2d_domain_t *domain,
     double dt = ss_data->dt;
     double t = ss_data->t;
     
+    printf("Iteration : %d\n",ss_data->buffer_data.iter);
     maxcfl = fclaw2d_patch_single_step_update(g->glob,this_patch,
                                               this_block_idx,
                                               this_patch_idx,t,dt,
@@ -107,6 +108,7 @@ double fclaw2d_update_single_step(fclaw2d_global_t *glob,
        works in OpenMP.  */
     patch_iterator(glob, level, cb_single_step_count,
                    &ss_data.buffer_data.total_count);
+    printf("level = %d; Total count = %d\n",ss_data.buffer_data.total_count);
 
     /* If there are not grids at this level, we return CFL = 0 */
     patch_iterator(glob, level, cb_single_step,(void *) &ss_data);
