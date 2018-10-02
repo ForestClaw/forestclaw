@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_defs.h>
 
+#include "cuda_source/cudaclaw_allocate.h"
 
 static fc2d_cudaclaw_vtable_t s_cudaclaw_vt;
 
@@ -352,6 +353,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
 
     const fc2d_cudaclaw_options_t* clawpack_options;
     clawpack_options = fc2d_cudaclaw_get_options(glob);
+    double maxcfl = 0.0;
 
 
     fclaw2d_single_step_buffer_data_t *buffer_data = 
@@ -371,6 +373,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
     }
 
+<<<<<<< HEAD
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  
     if (iter == 0)
     {
@@ -401,12 +404,6 @@ double cudaclaw_update(fclaw2d_global_t *glob,
         FCLAW_FREE(buffer_data->user);
     }
 
-#if 0       
-    double maxcfl = cudaclaw_step2(glob,
-                                     this_patch,
-                                     this_block_idx,
-                                     this_patch_idx,t,dt);
-#endif                                     
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     if (clawpack_options->src_term > 0 && cudaclaw_vt->src2 != NULL)
@@ -592,7 +589,6 @@ void fc2d_cudaclaw_bc2(fclaw2d_global_t *glob,
     cudaclaw_bc2(glob,this_patch,this_block_idx,this_block_idx,t,dt,
                    intersects_bc,time_interp);
 }
-
 
 
 

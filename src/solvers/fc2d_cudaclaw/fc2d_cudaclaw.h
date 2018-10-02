@@ -27,6 +27,7 @@
 #define FC2D_CUDACLAW_H
 
 #include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
+#include "cuda_source/cudaclaw_allocate.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -160,7 +161,7 @@ double cudaclaw_step2_batch(struct fclaw2d_global* glob,
 
 void fc2d_cudaclaw_store_buffer(struct fclaw2d_global* glob,
                                 struct fclaw2d_patch *this_patch,
-                                int this_patch_idx,
+                                int this_atch_idx,
                                 int count, int iter, 
                                 struct cudaclaw_fluxes* flux_array);
 
