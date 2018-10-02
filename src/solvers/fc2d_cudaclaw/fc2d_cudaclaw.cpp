@@ -348,8 +348,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                          void* user)
 {
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
-    int iter, total, patch_buffer_len;
-    double maxcfl;
+    int iter, total, patch_buffer_len,n;
 
     const fc2d_cudaclaw_options_t* clawpack_options;
     clawpack_options = fc2d_cudaclaw_get_options(glob);
@@ -373,7 +372,6 @@ double cudaclaw_update(fclaw2d_global_t *glob,
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
     }
 
-<<<<<<< HEAD
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  
     if (iter == 0)
     {
@@ -394,9 +392,9 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     maxcfl = 0;
     if (iter % patch_buffer_len == 0 || iter == total-1)
     {
-        int n = SC_MIN(patch_buffer_len,total-iter);
+        n = SC_MIN(patch_buffer_len,total-iter);
         maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) 
-                             buffer_data->user,patch_buffer_len,dt);
+                             buffer_data->user,n,dt);
     }
 
     if (iter == total-1)
