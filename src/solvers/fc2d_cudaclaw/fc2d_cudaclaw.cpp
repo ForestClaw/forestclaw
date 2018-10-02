@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
 
+#include <fclaw2d_update_single_step.h>
 #include <fclaw2d_clawpatch_diagnostics.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output_ascii.h> 
@@ -346,9 +347,19 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                          void* user)
 {
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
+    int iter, total, patch_buffer_len;
+    double maxcfl;
 
     const fc2d_cudaclaw_options_t* clawpack_options;
     clawpack_options = fc2d_cudaclaw_get_options(glob);
+
+
+    fclaw2d_single_step_buffer_data_t *buffer_data = 
+              (fclaw2d_single_step_buffer_data_t*) user;
+
+    patch_buffer_len = FC2D_CUDACLAW_BUFFER_LEN;
+    iter = buffer_data->iter;
+    total = buffer_data->total_count; 
 
     if (cudaclaw_vt->b4step2 != NULL)
     {
@@ -360,11 +371,42 @@ double cudaclaw_update(fclaw2d_global_t *glob,
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
     }
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  
+    if (iter == 0)
+    {
+        /* Create array to store pointers to patch data */
+        buffer_data->user = FCLAW_ALLOC(cudaclaw_fluxes_t,
+                                        patch_buffer_len*sizeof(cudaclaw_fluxes_t));
+    }  
+
+    /* Be sure to save current step! */
+    fclaw2d_clawpatch_save_current_step(glob, this_patch);
+
+
+    /* Memcopy data to qold_dev, aux_dev;  store pointer to fluxes */
+    fc2d_cudaclaw_store_buffer(glob,this_patch,this_patch_idx,total,
+                              iter, (cudaclaw_fluxes_t*) buffer_data->user);
+
+    
+    maxcfl = 0;
+    if (iter % patch_buffer_len == 0 || iter == total-1)
+    {
+        int n = SC_MIN(patch_buffer_len,total-iter);
+        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) 
+                             buffer_data->user,patch_buffer_len,dt);
+    }
+
+    if (iter == total-1)
+    {
+        FCLAW_FREE(buffer_data->user);
+    }
+
+#if 0       
     double maxcfl = cudaclaw_step2(glob,
                                      this_patch,
                                      this_block_idx,
                                      this_patch_idx,t,dt);
+#endif                                     
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     if (clawpack_options->src_term > 0 && cudaclaw_vt->src2 != NULL)

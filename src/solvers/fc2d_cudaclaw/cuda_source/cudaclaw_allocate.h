@@ -26,6 +26,8 @@ typedef struct cudaclaw_fluxes
 
     double *waves_dev;
     double *speeds_dev;
+
+    double dx,dy;
     
 } cudaclaw_fluxes_t;
 

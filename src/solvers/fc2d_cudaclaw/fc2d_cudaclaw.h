@@ -36,9 +36,11 @@ extern "C"
 #endif
 #endif
 
+#define FC2D_CUDACLAW_BUFFER_LEN 10
+
 struct fclaw2d_global;
 struct fclaw2d_patch;
-
+struct cudaclaw_fluxes;
 
 typedef  struct fc2d_cudaclaw_vtable  fc2d_cudaclaw_vtable_t;
 
@@ -46,18 +48,18 @@ typedef  struct fc2d_cudaclaw_vtable  fc2d_cudaclaw_vtable_t;
 
 /* Virtualize clawpack-specific wrapper functions */
 typedef void (*cudaclaw_src2_t)(struct fclaw2d_global* glob,
-                                  struct fclaw2d_patch *this_patch,
-                                  int this_block_idx,
-                                  int this_patch_idx,
-                                  double t,
-                                  double dt);
+                                struct fclaw2d_patch *this_patch,
+                                int this_block_idx,
+                                int this_patch_idx,
+                                double t,
+                                double dt);
     
 typedef void (*cudaclaw_b4step2_t)(struct fclaw2d_global* glob,
-                                     struct fclaw2d_patch *this_patch,
-                                     int this_block_idx,
-                                     int this_patch_idx,
-                                     double t,
-                                     double dt);
+                                   struct fclaw2d_patch *this_patch,
+                                   int this_block_idx,
+                                   int this_patch_idx,
+                                   double t,
+                                   double dt);
 
 /* ---------------------- Clawpack solver functions (Fortran) ------------------------- */
 
@@ -151,6 +153,16 @@ double cudaclaw_step2(struct fclaw2d_global* glob,
                       int this_patch_idx,
                       double t,
                       double dt);
+
+double cudaclaw_step2_batch(struct fclaw2d_global* glob,
+                            struct cudaclaw_fluxes* fluxes_array,
+                            int patch_buffer_len, double dt);
+
+void fc2d_cudaclaw_store_buffer(struct fclaw2d_global* glob,
+                                struct fclaw2d_patch *this_patch,
+                                int this_patch_idx,
+                                int count, int iter, 
+                                struct cudaclaw_fluxes* flux_array);
 
 /* --------------------------------- Virtual table ------------------------------------ */
 

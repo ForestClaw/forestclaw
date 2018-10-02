@@ -21,7 +21,8 @@ libcudaclaw_compiled_sources = \
 	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_update_q.cu \
 	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_step2.cu \
 	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_allocate.cu \
-	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_flux2.cu
+	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_flux2.cu \
+	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_store_patches.cu
 
 
 ## Name of library to build

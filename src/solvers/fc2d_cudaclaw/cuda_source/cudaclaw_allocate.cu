@@ -14,12 +14,15 @@
 void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *patch)
 {
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+
     const fclaw2d_clawpatch_options_t *claw_opt = fclaw2d_clawpatch_get_options(glob);
-    int mx = claw_opt->mx;
-    int my = claw_opt->my;
-    int mbc = claw_opt->mbc;
     int meqn = claw_opt->meqn;
     int maux = claw_opt->maux;
+
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
 
     fc2d_cudaclaw_options_t* cuda_opt = fc2d_cudaclaw_get_options(glob);
     int mwaves = cuda_opt->mwaves;
@@ -32,6 +35,8 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     fluxes->num_bytes_aux    = maux*size;
     fluxes->num_bytes_waves  = 2*mwaves*meqn*size;
     fluxes->num_bytes_speeds = 2*mwaves*size;
+    fluxes->dx = dx;
+    fluxes->dy = dy;
 
     /* Assumption here is that cudaMalloc is a synchronous call */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]); 
