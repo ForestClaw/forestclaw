@@ -46,7 +46,9 @@ __host__ int cudaclaw_check_dims(int meqn, int maux, int mwaves)
 
 
 __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
-                                int maux, int mwaves, double* qold, double* aux, 
+                                int maux, int mwaves, 
+                                double dtdx, double dtdy,
+                                double* qold, double* aux, 
                                 double* fm, double* fp, double* gm, double* gp,
                                 double* waves, double *speeds,
                                 cudaclaw_cuda_rpn2_t rpn2)
@@ -56,30 +58,31 @@ __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
     int I, I_q, I_aux, I_waves, I_speeds;
 
     /* Static memory seems much faster than dynamic memory */
-    double ql[MEQN];
-    double qr[MEQN];
-    double qd[MEQN];
-    double auxl[MAUX];
-    double auxr[MAUX];
-    double auxd[MAUX];
-    double s[MWAVES];
-    double wave[MEQN*MWAVES];
-    double amdq[MEQN];
-    double apdq[MEQN];
+    extern __shared__ double shared_mem[];
+    double* ql   = shared_mem+threadIdx.x*(5*meqn+3*maux+mwaves+meqn*mwaves);//meqn
+    double* qr   = ql+meqn;         //meqn
+    double* qd   = qr+meqn;         //meqn
+    double* auxl = qd+meqn;         //maux
+    double* auxr = auxl+maux;       //maux
+    double* auxd = auxr+maux;       //maux
+    double* s    = auxd+maux;       //mwaves
+    double* wave = s+mwaves;        //meqn*mwaves
+    double* amdq = wave+meqn*mwaves;//meqn
+    double* apdq = amdq+meqn;       //meqn
 
     int ifaces_x = mx+2*mbc-1;
     int ifaces_y = my+2*mbc-1;
     int num_ifaces = ifaces_x*ifaces_y;
 
+    /* Compute strides */
+    xs = 1;
+    ys = (2*mbc + mx)*xs;
+    zs = (2*mbc + my)*xs*ys;
+
     for(int thread_index = threadIdx.x; thread_index<num_ifaces; thread_index+=blockDim.x){
 
         int ix = thread_index%ifaces_x;
         int iy = thread_index/ifaces_y;
-
-        /* Compute strides */
-        xs = 1;
-        ys = (2*mbc + mx)*xs;
-        zs = (2*mbc + my)*xs*ys;
 
         /* (i,j) index */
         I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
@@ -155,10 +158,12 @@ __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
 
         }
     }
-#if 0
-    /* Update goes here */
-    if (ix >= mbc && ix <= mx && iy >= mbc && iy <= my)
-    {
+    __syncthreads();
+    for(int thread_index = threadIdx.x; thread_index<mx*my; thread_index+=blockDim.x){
+
+        int ix = thread_index%mx;
+        int iy = thread_index/my;
+
         I = (ix+mbc)*xs + (iy+mbc)*ys;
 
         for(mq = 0; mq < meqn; mq++)
@@ -169,7 +174,6 @@ __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
         }        
 
     }
-#endif
 }
 
 __global__ void cudaclaw_compute_cfl(int idir, int mx, int my, int meqn, int mwaves, 

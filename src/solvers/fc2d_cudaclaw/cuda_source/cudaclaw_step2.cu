@@ -74,19 +74,26 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
     glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
 
     {
-        int block = 32*32;
+        int block = 128;
         //int grid = (mx+2*mbc-1)*(my+2*(mbc-1)+block-1)/block;
         int grid=1;
 
         int mwaves = cuda_opt->mwaves;
+        int bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
+
         cflgrid = 0.0;
+
+        double dtdx, dtdy;
+        dtdx = dt/dx;
+        dtdy = dt/dy;
 
         cudaEventRecord(start);
 
         /* ---------------------------------------------------------------------------- */
         /* X direction */
         /* ---------------------------------------------------------------------------- */
-        cudaclaw_flux2<<<grid, block>>>(mx,my,meqn,mbc,maux,mwaves, 
+        cudaclaw_flux2<<<grid, block,block*bytes_per_thread>>>(mx,my,meqn,mbc,maux,mwaves, 
+                                        dtdx, dtdy,
                                         fluxes->qold_dev, fluxes->aux_dev,
                                         fluxes->fm_dev,fluxes->fp_dev,
                                         fluxes->gm_dev,fluxes->gp_dev,
@@ -148,10 +155,8 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
     }
 
 
+#if 0                                               
     /* -------------------------- Update solution --------------------------------------*/ 
-    double dtdx, dtdy;
-    dtdx = dt/dx;
-    dtdy = dt/dy;
 
     cudaEventRecord(start);
 
@@ -169,6 +174,7 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
     milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     glob->timers[FCLAW2D_TIMER_CUDA_KERNEL2].cumulative += milliseconds*1e-3;
+#endif                                               
 
     /* -------------------------- Copy q back to host ----------------------------------*/ 
     cudaEventRecord(start);
