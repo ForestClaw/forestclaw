@@ -342,7 +342,8 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                          int this_block_idx,
                          int this_patch_idx,
                          double t,
-                         double dt)
+                         double dt,
+                         void* user)
 {
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
 

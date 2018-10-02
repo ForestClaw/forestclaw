@@ -151,7 +151,7 @@ double fclaw2d_patch_single_step_update(struct fclaw2d_global *glob,
                                         int this_block_idx,
                                         int this_patch_idx,
                                         double t,
-                                        double dt);
+                                        double dt, void* user);
 
 /* -------------------------------- time stepping ------------------------------------- */
 
@@ -231,7 +231,7 @@ void fclaw2d_patch_interpolate_corner(struct fclaw2d_global* glob,
                                       int time_interp,
                                       struct fclaw2d_patch_transform_data* transform_data);
 
-/* -------------------------- Transform functions (typedefs) -------------------------- */
+/* -------------------------- Transform functions  ------------------------------------ */
 void fclaw2d_patch_create_user_data(struct fclaw2d_global* glob,
                                     struct fclaw2d_patch* patch);
 
@@ -373,7 +373,8 @@ typedef double (*fclaw2d_patch_single_step_update_t)(struct fclaw2d_global *glob
                                                      int this_block_idx,
                                                      int this_patch_idx,
                                                      double t,
-                                                     double dt);
+                                                     double dt,
+                                                     void* user);
 
 /* ----------------------------- Time stepping (typedefs) ----------------------------- */
 

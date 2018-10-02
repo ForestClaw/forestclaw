@@ -42,6 +42,7 @@ typedef struct single_step_data
     double t;
     double dt;
     double maxcfl;
+    void *user;
 } single_step_data_t;
 
 double fclaw2d_update_single_step(struct fclaw2d_global *glob,

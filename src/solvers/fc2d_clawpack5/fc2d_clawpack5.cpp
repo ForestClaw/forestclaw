@@ -325,7 +325,8 @@ double clawpack5_update(fclaw2d_global_t *glob,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
-                        double dt)
+                        double dt,
+                        void* user)
 {    
     fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
 

@@ -49,7 +49,7 @@ void cb_single_step(fclaw2d_domain_t *domain,
     
     maxcfl = fclaw2d_patch_single_step_update(g->glob,this_patch,
                                               this_block_idx,
-                                              this_patch_idx,t,dt);
+                                              this_patch_idx,t,dt,ss_data->user);
 
     g->glob->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);
@@ -79,6 +79,7 @@ double fclaw2d_update_single_step(fclaw2d_global_t *glob,
     ss_data.t = t;
     ss_data.dt = dt;
     ss_data.maxcfl = 0;
+    ss_data.user = NULL;
 
 #if (_OPENMP)
     /* Multi-thread only in single processor case. */

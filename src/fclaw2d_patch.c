@@ -231,13 +231,14 @@ double fclaw2d_patch_single_step_update(fclaw2d_global_t *glob,
                                         int this_block_idx,
                                         int this_patch_idx,
                                         double t,
-                                        double dt)
+                                        double dt, 
+                                        void* user)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->single_step_update != NULL);
 
     double maxcfl = patch_vt->single_step_update(glob,this_patch,this_block_idx,
-                                                   this_patch_idx,t,dt);
+                                                   this_patch_idx,t,dt, user);
     return maxcfl;
 }
 
