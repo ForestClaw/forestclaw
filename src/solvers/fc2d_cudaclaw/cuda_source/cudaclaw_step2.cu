@@ -22,13 +22,13 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
 {
     int mx, my, meqn, maux, mbc;
     double xlower, ylower, dx,dy;
-    double cflgrid;
+    double cflgrid, s;
 
     int maxidx;
     double maxabsspeed;
     double dtdx, dtdy;
     double *qold, *aux;
-    
+
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
@@ -116,7 +116,8 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
                 return EXIT_FAILURE;
         }
         cudaMemcpy(&maxabsspeed,fluxes->speeds_dev+maxidx-1,sizeof(double),cudaMemcpyDeviceToHost);
-	    cflgrid = maxidx < n/2 ? maxabsspeed*dt/dx : maxabsspeed*dt/dy;
+        s = fabs(maxabsspeed);
+	    cflgrid = maxidx < n/2 ? s*dtdx : s*dtdy;
         cublasDestroy(handle);
 
         cudaEventRecord(stop);
