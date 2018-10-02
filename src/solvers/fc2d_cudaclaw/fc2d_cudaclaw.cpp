@@ -387,7 +387,6 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     /* Memcopy data to qold_dev, aux_dev;  store pointer to fluxes */
     fc2d_cudaclaw_store_buffer(glob,this_patch,this_patch_idx,total,
                               iter, (cudaclaw_fluxes_t*) buffer_data->user);
-    cudaclaw_fluxes_t *f = (cudaclaw_fluxes_t*) buffer_data->user;
 
     maxcfl = 0;
     if ((iter+1) % patch_buffer_len == 0 || iter == total-1)
