@@ -55,8 +55,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     //int grid = (mx+2*mbc-1)*(my+2*(mbc-1)+block-1)/block;
     dim3 grid(1,1,batch_size);
 
-    printf("batch_size = %d\n",batch_size);
-
     size_t bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
 
     cudaclaw_flux2_and_update_batch<<<grid,block,128*bytes_per_thread>>>(mx,my,meqn,
