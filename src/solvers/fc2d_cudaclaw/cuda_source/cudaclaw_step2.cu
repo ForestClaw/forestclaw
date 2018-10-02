@@ -49,10 +49,13 @@ double step2_batch( fclaw2d_global_t *glob,
     // launch the merged kernel
     FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
 
-    dim3 block(32*32,1,1);
-    dim3 grid((mx+2*mbc-1)*(my+2*(mbc-1)+block.x-1)/block.x,1,batch_size);
+    dim3 block(128,1,1);
+    //int grid = (mx+2*mbc-1)*(my+2*(mbc-1)+block-1)/block;
+    dim3 grid(1,1,batch_size);
 
-    cudaclaw_flux2_and_update_batch<<<grid, block>>>(mx,my,meqn,mbc,maux,mwaves,dt,
+    size_t bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
+
+    cudaclaw_flux2_and_update_batch<<<grid, block,bytes_per_thread>>>(mx,my,meqn,mbc,maux,mwaves,dt,
                                     array_fluxes_struct_dev,
                                     rpn2);
 

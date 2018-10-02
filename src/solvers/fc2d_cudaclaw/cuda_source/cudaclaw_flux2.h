@@ -49,11 +49,14 @@ cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc,
                                 cudaclaw_cuda_rpn2_t rpn2);
 
 
-__device__  void
-cudaclaw_flux2_and_update (int mx, int my, int meqn, int mbc, 
-                           int maux, int mwaves, double dtdx, double dtdy,
-                           cudaclaw_fluxes_t* fluxes,
-                           cudaclaw_cuda_rpn2_t rpn2);
+__device__ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
+                                int maux, int mwaves, 
+                                double dtdx, double dtdy,
+                                double* qold, double* aux, 
+                                double* fm, double* fp, double* gm, double* gp,
+                                double* waves, double *speeds,
+                                cudaclaw_cuda_rpn2_t rpn2);
+
 
 #ifdef __cplusplus
 }
