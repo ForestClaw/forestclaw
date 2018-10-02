@@ -57,10 +57,10 @@ double cudaclaw_step2_batch( fclaw2d_global_t *glob,
 
     size_t bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
 
-    cudaclaw_flux2_and_update_batch<<<grid, block,bytes_per_thread>>>(mx,my,meqn,
-                                                                      mbc,maux,mwaves,dt,
-                                                                      array_fluxes_struct_dev,
-                                                                      cuclaw_vt->cuda_rpn2);
+    cudaclaw_flux2_and_update_batch<<<grid,block,128*bytes_per_thread>>>(mx,my,meqn,
+                                                                     mbc,maux,mwaves,dt,
+                                                                     array_fluxes_struct_dev,
+                                                                     cuclaw_vt->cuda_rpn2);
 
     cudaDeviceSynchronize();
     CHECK(cudaPeekAtLastError());
