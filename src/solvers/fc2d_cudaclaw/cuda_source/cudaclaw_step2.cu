@@ -15,7 +15,7 @@
 #include "../fc2d_cudaclaw_check.cu"  /* CHECK defined here */
 #include <cublas_v2.h>
     
-double cudaclaw_step2_batch( fclaw2d_global_t *glob,
+double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
         int batch_size, double dt)
 {
@@ -48,12 +48,14 @@ double cudaclaw_step2_batch( fclaw2d_global_t *glob,
 //     {
 //         array_fluxes_struct[i] = *(array_ptr_fluxes[i]);
 //     }
-    cudaMemcpy(array_fluxes_struct_dev, array_fluxes_struct, batch_size*sizeof(cudaclaw_fluxes_t), cudaMemcpyHostToDevice);
+    CHECK(cudaMemcpy(array_fluxes_struct_dev, array_fluxes_struct, batch_size*sizeof(cudaclaw_fluxes_t), cudaMemcpyHostToDevice));
     // launch the merged kernel
 
     dim3 block(128,1,1);
     //int grid = (mx+2*mbc-1)*(my+2*(mbc-1)+block-1)/block;
     dim3 grid(1,1,batch_size);
+
+    printf("batch_size = %d\n",batch_size);
 
     size_t bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
 
