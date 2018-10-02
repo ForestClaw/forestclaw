@@ -33,6 +33,18 @@ static fclaw2d_patch_iterator_t patch_iterator;
 
 
 static
+void cb_single_step_count(fclaw2d_domain_t *domain,
+                          fclaw2d_patch_t *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user)
+{    
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    int *count = (int*) g->user;
+    *count++;
+}
+
+static
 void cb_single_step(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t *this_patch,
                     int this_block_idx,
@@ -43,14 +55,16 @@ void cb_single_step(fclaw2d_domain_t *domain,
 
     double maxcfl;
     
-    single_step_data_t *ss_data = (single_step_data_t *) g->user;
+    fclaw2d_single_step_data_t *ss_data = (fclaw2d_single_step_data_t *) g->user;
     double dt = ss_data->dt;
     double t = ss_data->t;
     
     maxcfl = fclaw2d_patch_single_step_update(g->glob,this_patch,
                                               this_block_idx,
-                                              this_patch_idx,t,dt,ss_data->user);
+                                              this_patch_idx,t,dt,
+                                              &ss_data->buffer_data);
 
+    ss_data->buffer_data.iter++;  /* Used for patch buffer */
     g->glob->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);
 }
@@ -75,11 +89,12 @@ double fclaw2d_update_single_step(fclaw2d_global_t *glob,
 {
 
     /* Iterate over every patch at this level */
-    single_step_data_t ss_data;
+    fclaw2d_single_step_data_t ss_data;
     ss_data.t = t;
     ss_data.dt = dt;
     ss_data.maxcfl = 0;
-    ss_data.user = NULL;
+    ss_data.buffer_data.total_count = 0;
+    ss_data.buffer_data.iter = 0;
 
 #if (_OPENMP)
     /* Multi-thread only in single processor case. */
@@ -87,6 +102,11 @@ double fclaw2d_update_single_step(fclaw2d_global_t *glob,
 #else
     patch_iterator = &fclaw2d_global_iterate_level;
 #endif
+
+    /* Count number of grids to be updated in this call;  not sure how this
+       works in OpenMP.  */
+    patch_iterator(glob, level, cb_single_step_count,
+                   &ss_data.buffer_data.total_count);
 
     /* If there are not grids at this level, we return CFL = 0 */
     patch_iterator(glob, level, cb_single_step,(void *) &ss_data);
