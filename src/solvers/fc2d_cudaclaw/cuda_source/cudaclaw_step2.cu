@@ -39,6 +39,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;
 
+    printf("dx = %f\n",array_fluxes_struct[0].dx);
+    printf("dx = %f\n",array_fluxes_struct[5].dx);
+
 //     cudaclaw_fluxes_t* array_fluxes_struct = (cudaclaw_fluxes_t*)
 //         malloc(batch_size*sizeof(cudaclaw_fluxes_t));
     cudaclaw_fluxes_t* array_fluxes_struct_dev = NULL;
@@ -49,10 +52,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 //         array_fluxes_struct[i] = *(array_ptr_fluxes[i]);
 //     }
     CHECK(cudaMemcpy(array_fluxes_struct_dev, array_fluxes_struct, batch_size*sizeof(cudaclaw_fluxes_t), cudaMemcpyHostToDevice));
-    // launch the merged kernel
 
     dim3 block(128,1,1);
-    //int grid = (mx+2*mbc-1)*(my+2*(mbc-1)+block-1)/block;
     dim3 grid(1,1,batch_size);
 
     size_t bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
