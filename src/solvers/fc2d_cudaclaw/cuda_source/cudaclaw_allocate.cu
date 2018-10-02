@@ -37,7 +37,6 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     fluxes->num_bytes_speeds = 2*mwaves*size;
     fluxes->dx = dx;
     fluxes->dy = dy;
-    printf("dx = %24.16f; dy = %24.16f\n",dx,dy);
 
     /* Assumption here is that cudaMalloc is a synchronous call */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]); 
