@@ -87,7 +87,6 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
 
         cflgrid = 0.0;
 
-        double dtdx, dtdy;
         dtdx = dt/dx;
         dtdy = dt/dy;
 
@@ -109,9 +108,6 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
 
         /* -------------------------- Compute CFL --------------------------------------*/ 
         n = (2*mbc+mx)*(2*mbc+my)*mwaves*2;
-        dtdx = dt/dx;
-        dtdy = dt/dy;
-
 
         cublasStatus_t stat;
         cublasHandle_t handle;
