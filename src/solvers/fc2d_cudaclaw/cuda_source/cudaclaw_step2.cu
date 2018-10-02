@@ -24,7 +24,7 @@ double cudaclaw_step2(fclaw2d_global_t *glob,
     double xlower, ylower, dx,dy;
     double cflgrid, s;
 
-    int maxidx;
+    int maxidx, n;
     double maxabsspeed;
     double dtdx, dtdy;
     double *qold, *aux;
