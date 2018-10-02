@@ -41,9 +41,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;
 
-    printf("dx = %24.16f\n",array_fluxes_struct[0].dx);
-    printf("dx = %24.16f\n",array_fluxes_struct[batch_size-1].dx);
-
 //     cudaclaw_fluxes_t* array_fluxes_struct = (cudaclaw_fluxes_t*)
 //         malloc(batch_size*sizeof(cudaclaw_fluxes_t));
     cudaclaw_fluxes_t* array_fluxes_struct_dev = NULL;
