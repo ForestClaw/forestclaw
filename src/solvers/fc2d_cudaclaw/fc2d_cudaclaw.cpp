@@ -394,7 +394,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
 
     
     maxcfl = 0;
-    if (iter % patch_buffer_len == 0 || iter == total-1)
+    if ((iter+1) % patch_buffer_len == 0 || iter == total-1)
     {
         n = SC_MIN(patch_buffer_len,total-iter);
         printf("iter = %d; dx = %f; dy = %f\n",iter, f[n-1].dx, 
