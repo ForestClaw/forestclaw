@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_defs.h>
 
+#include "cuda_source/cudaclaw_allocate.h"
 
 static fc2d_cudaclaw_vtable_t s_cudaclaw_vt;
 
@@ -349,6 +350,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
 
     const fc2d_cudaclaw_options_t* clawpack_options;
     clawpack_options = fc2d_cudaclaw_get_options(glob);
+    double maxcfl = 0.0;
 
     if (cudaclaw_vt->b4step2 != NULL)
     {
@@ -361,10 +363,38 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     }
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
-    double maxcfl = cudaclaw_step2(glob,
-                                     this_patch,
-                                     this_block_idx,
-                                     this_patch_idx,t,dt);
+//     double maxcfl = cudaclaw_step2(glob,
+//                                      this_patch,
+//                                      this_block_idx,
+//                                      this_patch_idx,t,dt);
+
+    // TODO: get this from Donna
+    size_t batch_size = 10; // parameter 
+
+//     // TODO: should we allocate this outside of collect_ptrs?
+//     cudaclaw_fluxes_t** array_ptr_fluxes = (cudaclaw_fluxes_t**)
+//         malloc(batch_size*sizeof(cudaclaw_fluxes_t*));
+// 
+//     bool pool_full = collect_ptrs(glob, this_patch,
+//                                   this_block_idx,
+//                                   this_patch_idx,t,dt,&array_ptr_fluxes);
+//
+    // Assume I got this from Donna
+    cudaclaw_fluxes_t* array_fluxes_struct = NULL;
+
+        
+
+    // TODO: get bool last_patch somewhere
+    bool last_patch = false;
+    bool pool_full = true;
+    if (pool_full || last_patch)
+    {
+        maxcfl = step2_batch(glob, array_fluxes_struct, batch_size, 
+                dt, cudaclaw_vt->cuda_rpn2);
+    }
+
+    // free(array_ptr_fluxes);
+
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     if (clawpack_options->src_term > 0 && cudaclaw_vt->src2 != NULL)
@@ -550,7 +580,6 @@ void fc2d_cudaclaw_bc2(fclaw2d_global_t *glob,
     cudaclaw_bc2(glob,this_patch,this_block_idx,this_block_idx,t,dt,
                    intersects_bc,time_interp);
 }
-
 
 
 

@@ -1,5 +1,6 @@
 #include "cudaclaw_flux2.h"
 #include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
+#include "cudaclaw_allocate.h"
 
 #include <math.h>
 
@@ -42,6 +43,30 @@ __host__ int cudaclaw_check_dims(int meqn, int maux, int mwaves)
     check = (meqn <= MEQN) && (maux <= MAUX) && (mwaves <= MWAVES);
     return check;
 }
+}
+
+
+__global__
+void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
+                                int maux, int mwaves, double dt,
+                                cudaclaw_fluxes_t* array_fluxes_struct_dev,
+                                cudaclaw_cuda_rpn2_t rpn2)
+{
+    // TODO: check this device function does not depend on blockIdx.z inside
+    cudaclaw_flux2_and_update(mx,my,meqn,mbc,maux,mwaves,
+            dt/array_fluxes_struct_dev[blockIdx.z].dx,
+            dt/array_fluxes_struct_dev[blockIdx.z].dy,
+                                    &(array_fluxes_struct_dev[blockIdx.z]),
+                                    rpn2);
+}
+
+__device__  
+void cudaclaw_flux2_and_update (int mx, int my, int meqn, int mbc, 
+                           int maux, int mwaves, double dtdx, double dtdy,
+                           cudaclaw_fluxes_t* fluxes,
+                           cudaclaw_cuda_rpn2_t rpn2)
+{
+    //TODO: get this from Scott
 }
 
 

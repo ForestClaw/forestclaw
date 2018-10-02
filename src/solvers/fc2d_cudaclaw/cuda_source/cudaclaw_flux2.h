@@ -1,6 +1,7 @@
 #ifndef CUDACLAW_FLUX2_H
 #define CUDACLAW_FLUX2_H
 
+#include "cudaclaw_allocate.h"
 
 /* Only include headers needed to get this file to compile;  all other
    headers should go in c files */
@@ -39,7 +40,18 @@ __global__ void cudaclaw_compute_cfl(int idir, int mx, int my, int meqn, int mwa
                                      double *speeds, double* cflgrid);
 
 
+__global__ void
+cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
+                                int maux, int mwaves, double dt,
+                                cudaclaw_fluxes_t* array_fluxes_struct_dev,
+                                cudaclaw_cuda_rpn2_t rpn2);
 
+
+__device__  void
+cudaclaw_flux2_and_update (int mx, int my, int meqn, int mbc, 
+                           int maux, int mwaves, double dtdx, double dtdy,
+                           cudaclaw_fluxes_t* fluxes,
+                           cudaclaw_cuda_rpn2_t rpn2);
 
 #ifdef __cplusplus
 }
