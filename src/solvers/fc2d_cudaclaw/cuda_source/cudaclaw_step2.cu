@@ -21,6 +21,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 {
     double maxcfl = 0.0;
 
+    FCLAW_ASSERT(batch_size !=0);
+
     /* To get patch-independent parameters */
     fc2d_cudaclaw_options_t *clawopt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;

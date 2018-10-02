@@ -65,7 +65,6 @@ void cb_single_step(fclaw2d_domain_t *domain,
                                               &ss_data->buffer_data);
 
     ss_data->buffer_data.iter++;  /* Used for patch buffer */
-    printf("Iteration number : %d\n",ss_data->buffer_data.iter);
     g->glob->count_single_step++;
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);
 }
