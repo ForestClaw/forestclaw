@@ -7,8 +7,7 @@ libcudaclaw_installed_headers = \
 	src/solvers/fc2d_cudaclaw/cudaclaw_user_fort.h \
 	src/solvers/fc2d_cudaclaw/fc2d_cudaclaw_fort.h 
 
-libcudaclaw_compiled_sources = \
-	src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.cpp \
+libcudaclaw_compiled_sources = \ src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.cpp \
 	src/solvers/fc2d_cudaclaw/fc2d_cudaclaw_options.c \
 	src/solvers/fc2d_cudaclaw/fortran_source/cudaclaw_inlinelimiter.f \
 	src/solvers/fc2d_cudaclaw/fortran_source/cudaclaw_set_capacity.f \
@@ -64,7 +63,7 @@ CUDACLAW_INCLUDE_DIRS = $(DEFS) $(DEFAULT_INCLUDES) \
 	$(CPPFLAGS) $(AM_CFLAGS)
 
 .cu.o: 
-	$(NVCC) -dc $(CUDACLAW_INCLUDE_DIRS) -c -o $@ $<
+	$(NVCC) $(CUDA_CFLAGS) -dc $(CUDACLAW_INCLUDE_DIRS) -c -o $@ $<
 
 # Setting --tag=NVCC (or --tag=nvcc) generates a non-fatal 
 # warning.  We can avoid the warning by just setting --tag=CC;
@@ -72,7 +71,7 @@ CUDACLAW_INCLUDE_DIRS = $(DEFS) $(DEFAULT_INCLUDES) \
 .cu.lo:
 	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	    $(LIBTOOLFLAGS) --mode=compile $(NVCC) \
-	    $(CUDACLAW_INCLUDE_DIRS) -dc -c -o $@ $<
+	    $(CUDA_CFLAGS) $(CUDACLAW_INCLUDE_DIRS) -dc -c -o $@ $<
 
 
 
