@@ -66,11 +66,12 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     size_t bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
     
-    double* maxcflblocks_dev = cudqMalloc(batch_size*sizeof(double)); 
-    cudaclaw_flux2_and_update_batch<<<grid,block,128*bytes_per_thread>>>(mx,my,meqn,
+    double* maxcflblocks_dev;
+    cudaMalloc(&maxcflblocks_dev,batch_size*sizeof(double)); 
+    cudaclaw_flux2_and_update_batch<<<grid,block,128*bytes_per_thread >>>(mx,my,meqn,
                                                                      mbc,maux,mwaves,dt,
                                                                      array_fluxes_struct_dev,
-								     maxcflblocks_dev,
+								                                     maxcflblocks_dev,
                                                                      cuclaw_vt->cuda_rpn2);
     cudaDeviceSynchronize();
     CHECK(cudaPeekAtLastError());
@@ -82,10 +83,10 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     cudaMalloc(&cflgrid_dev, sizeof(double));  
     CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
                                         maxcflblocks_dev,cflgrid_dev,batch_size));
-    cudaMalloc(&d_temp_storage, temp_storage_bytes);
+    cudaMalloc(&temp_storage_dev, temp_storage_bytes);
     CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
                                         maxcflblocks_dev,cflgrid_dev,batch_size));
-    cudaMemcpy(&cflgrid, cflgrid_dev, sizeof(double),cudaMemcpyDeviceToHost);
+    cudaMemcpy(&maxcfl, cflgrid_dev, sizeof(double),cudaMemcpyDeviceToHost);
     cudaFree(temp_storage_dev);
     cudaFree(cflgrid_dev);
 
