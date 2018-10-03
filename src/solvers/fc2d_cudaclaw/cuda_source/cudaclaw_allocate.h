@@ -16,6 +16,7 @@ typedef struct cudaclaw_fluxes
     size_t num_bytes_waves;  
     size_t num_bytes_speeds;  
 
+    double* qold;
     double *qold_dev;
     double *aux_dev;
     

@@ -19,7 +19,13 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
         int batch_size, double dt)
 {
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    float milliseconds;
+
     double maxcfl = 0.0;
+    double dtdx, dtdy, s;
 
     FCLAW_ASSERT(batch_size !=0);
 
@@ -66,9 +72,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     CHECK(cudaPeekAtLastError());
 
 
-#if 0
     // collect max cfl numbers
-    int n = (2*mbc+mx)*(2*mbc+my)*mwaves*2;
+    int n = 2*mwaves*(2*mbc+mx)*(2*mbc+my);
     int maxidx;
 
     // TODO: batch cublas call
@@ -78,26 +83,39 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     for (int i = 0; i < batch_size; ++i)
     {
         cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
-        int stat = cublasIdamax(handle,n,
-            fluxes->speeds_dev,1,&maxidx);
+        stat = cublasIdamax(handle,n, fluxes->speeds_dev,1,&maxidx);
         if (stat != CUBLAS_STATUS_SUCCESS) {
                 printf ("cublasIdamax failed");
                 cublasDestroy(handle);
                 return EXIT_FAILURE;
         }
+        dtdx = dt/fluxes->dx;
+        dtdy = dt/fluxes->dy;
+
         double maxabsspeed_patch = 0.0;
         double maxcfl_patch = 0.0;
-        cudaMemcpy(&maxabsspeed_patch,fluxes->speeds_dev+maxidx-1,sizeof(double),cudaMemcpyDeviceToHost);
-        //cflgrid = maxidx < (2*mbc+mx)*(2*mbc+my) ? maxabsspeed*dt/dx : maxabsspeed*dt/dy;
+        cudaMemcpy(&maxabsspeed_patch,fluxes->speeds_dev+maxidx-1,sizeof(double),
+                   cudaMemcpyDeviceToHost);
+        s = fabs(maxabsspeed_patch);
+        maxcfl_patch = maxidx < n/2 ? s*dtdx : s*dtdy;        
 
-        // TODO: handle cases where dx != dy
-        maxcfl_patch = maxabsspeed_patch*dt/fluxes->dx;
         maxcfl = max(maxcfl_patch,maxcfl);
+
+        /* -------------------------- Copy q back to host ----------------------------------*/ 
+        cudaEventRecord(start);
+
+        cudaMemcpy(fluxes->qold, fluxes->qold_dev, fluxes->num_bytes, cudaMemcpyDeviceToHost);
+
+        cudaEventRecord(stop);
+        cudaEventSynchronize(stop);
+        milliseconds = 0;
+        cudaEventElapsedTime(&milliseconds, start, stop);
+        glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;    
+        /* ------------------------------ Clean up -----------------------------------------*/ 
+
     }
     cublasDestroy(handle);
-#endif    
 
-//     free(array_fluxes_struct);
     cudaFree(array_fluxes_struct_dev);
     return maxcfl;
 }
