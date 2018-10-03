@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 
 #include "cuda_source/cudaclaw_allocate.h"
+#include <fc2d_cuda_profiler.h>
 
 static fc2d_cudaclaw_vtable_t s_cudaclaw_vt;
 
@@ -101,6 +102,7 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
                     int intersects_phys_bdry[],
                     int time_interp)
 {
+    PROFILE_CUDA_GROUP("cudaclaw_bc2",6);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
 
     fc2d_cudaclaw_options_t *clawpack_options = fc2d_cudaclaw_get_options(glob);
@@ -158,6 +160,7 @@ void cudaclaw_b4step2(fclaw2d_global_t *glob,
                         double t, double dt)
 
 {
+    PROFILE_CUDA_GROUP("cudaclaw_b4step2",1);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
 
     int mx,my,mbc,meqn, maux,maxmx,maxmy;
@@ -192,6 +195,7 @@ void cudaclaw_src2(fclaw2d_global_t *glob,
                      double t,
                      double dt)
 {
+    PROFILE_CUDA_GROUP("cudaclaw_src2",7);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
 
     int mx,my,mbc,meqn, maux,maxmx,maxmy;
@@ -226,7 +230,8 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
                        fclaw2d_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx)
-    {
+{
+    PROFILE_CUDA_GROUP("cudaclaw_setaux",2);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
 
     if (cudaclaw_vt->fort_setaux == NULL)
@@ -347,8 +352,9 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                          double dt,
                          void* user)
 {
+    PROFILE_CUDA_GROUP("cudaclaw_update",3);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
-    int iter, total, patch_buffer_len,n;
+    int iter, total, patch_buffer_len;
 
     const fc2d_cudaclaw_options_t* clawpack_options;
     clawpack_options = fc2d_cudaclaw_get_options(glob);
@@ -389,10 +395,13 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                               iter, (cudaclaw_fluxes_t*) buffer_data->user);
 
     maxcfl = 0;
-    if ((iter+1) % patch_buffer_len == 0 || iter == total-1)
+    if ((iter+1) % patch_buffer_len == 0)
     {
-        n = SC_MIN(patch_buffer_len,total-iter);
-        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,n,dt);
+        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,patch_buffer_len,dt);
+    }
+    else if (iter == total-1)
+    {
+        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,total%patch_buffer_len,dt);
     }
 
     if (iter == total-1)

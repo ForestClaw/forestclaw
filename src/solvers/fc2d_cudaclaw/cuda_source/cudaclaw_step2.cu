@@ -14,11 +14,13 @@
 
 #include "../fc2d_cudaclaw_check.cu"  /* CHECK defined here */
 #include <cublas_v2.h>
+#include <fc2d_cuda_profiler.h>
     
 double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
         int batch_size, double dt)
 {
+    PROFILE_CUDA_GROUP("cudaclaw_step2_batch",5);
     double maxcfl = 0.0;
 
     FCLAW_ASSERT(batch_size !=0);
