@@ -1,7 +1,7 @@
 #include "cudaclaw_flux2.h"
 #include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
 #include "cudaclaw_allocate.h"
-
+#include <cub/cub.cuh>   // or equivalently <cub/block/block_reduce.cuh>
 #include <math.h>
 
 
@@ -77,6 +77,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                 double* waves, double *speeds,
                                 cudaclaw_cuda_rpn2_t rpn2)
 {
+    typedef cub::BlockReduce<int,128> BlockReduce;
+    __shared__ typename BlockReduce::TempStorage temp_storage;
     int mq, mw, m;
     int xs, ys, zs;
     int I, I_q, I_aux, I_waves, I_speeds;
@@ -102,6 +104,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     xs = 1;
     ys = (2*mbc + mx)*xs;
     zs = (2*mbc + my)*xs*ys;
+
+    double max_speed = 0;
 
     for(int thread_index = threadIdx.x; thread_index<num_ifaces; thread_index+=blockDim.x)
     {
@@ -150,6 +154,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             {
                 I_speeds = I + mw*zs;
                 speeds[I_speeds] = s[mw];
+                if(fabs(s[mw])*dtdx>max_speed){
+                    max_speed=fabs(s[mw])*dtdx;
+                }
             } 
 
 
@@ -166,6 +173,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             {
                 I_speeds = I + (mwaves+mw)*zs;
                 speeds[I_speeds] = s[mw];
+                if(fabs(s[mw])*dtdy>max_speed){
+                    max_speed=fabs(s[mw])*dtdy;
+                }
             } 
 
 #if 0        
@@ -184,6 +194,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         }
     }
 
+    int result = BlockReduce(temp_storage).Reduce(max_speed,cub::Max());
     __syncthreads();
     for(int thread_index = threadIdx.x; thread_index<mx*my; thread_index+=blockDim.x){
 
