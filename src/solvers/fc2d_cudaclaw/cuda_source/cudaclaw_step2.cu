@@ -23,6 +23,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     float milliseconds;
+    int i;
 
     double maxcfl = 0.0;
     double dtdx, dtdy, s;
@@ -46,6 +47,13 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     int mbc = clawpatch_opt->mbc;
     int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;
+
+    for(i = 0; i < batch_size; i++)
+    {
+        cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
+        cudaMemcpy(fluxes->qold_dev, fluxes->qold, fluxes->num_bytes, cudaMemcpyHostToDevice);
+        cudaMemcpy(fluxes->aux_dev, fluxes->aux, fluxes->num_bytes_aux, cudaMemcpyHostToDevice);
+    }
 
     cudaclaw_fluxes_t* array_fluxes_struct_dev = NULL;
     cudaMalloc(&array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t));

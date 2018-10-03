@@ -32,8 +32,10 @@ void fc2d_cudaclaw_store_buffer(fclaw2d_global_t* glob,
 
     cudaEventRecord(start);
 
+#if 0
     cudaMemcpy(fluxes->qold_dev, qold, fluxes->num_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(fluxes->aux_dev, aux, fluxes->num_bytes_aux, cudaMemcpyHostToDevice);
+#endif    
 
     flux_array[iter % FC2D_CUDACLAW_BUFFER_LEN] = *fluxes;
 
