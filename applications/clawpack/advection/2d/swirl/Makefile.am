@@ -56,4 +56,4 @@ applications_clawpack_advection_2d_swirl_swirl_LDADD = \
 ## nvcc -dlink has to b called after everything for the executable has been compiled.
 ## this generates a single object file with all of the linked  device code.
 applications/clawpack/advection/2d/swirl/user_cuda/devicelink.o : applications/clawpack/advection/2d/swirl/user_cuda/rpn2adv.o src/solvers/fc2d_cudaclaw/libcudaclaw.la
-		$(NVCC) -dlink  applications/clawpack/advection/2d/swirl/user_cuda/rpn2adv.o src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a -o applications/clawpack/advection/2d/swirl/user_cuda/devicelink.o 
+		$(NVCC) $(CUDA_CFLAGS) -dlink  applications/clawpack/advection/2d/swirl/user_cuda/rpn2adv.o src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a -o applications/clawpack/advection/2d/swirl/user_cuda/devicelink.o 
