@@ -131,10 +131,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         int I_q = i*fluxes->num;
 
         memcpy(fluxes->qold,&membuffer[I_q],fluxes->num_bytes);
-#if 0        
-        cudaMemcpy(fluxes->qold, fluxes->qold_dev, fluxes->num_bytes, 
-                   cudaMemcpyDeviceToHost);
-#endif                   
     }
 
     /* ------------------------------ Clean up -----------------------------------------*/ 
