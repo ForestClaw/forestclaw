@@ -29,7 +29,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     int i;
 
     double maxcfl = 0.0;
-    double dtdx, dtdy, s;
+    //double dtdx, dtdy, s;
 
     FCLAW_ASSERT(batch_size !=0);
 
@@ -64,7 +64,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     for(i = 0; i < batch_size; i++)   
     {
         cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);    
-            
+
         int I_q = i*fluxes->num;
         int I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
 
