@@ -29,12 +29,19 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
 
     cudaclaw_fluxes_t *fluxes = FCLAW_ALLOC(cudaclaw_fluxes,1);
 
-    size_t size = (2*mbc+mx)*(2*mbc+my)*sizeof(double);
+    size_t size = (2*mbc+mx)*(2*mbc+my);
+ 
+    fluxes->num        = meqn*size;
+    fluxes->num_aux    = maux*size;
+    fluxes->num_waves  = 2*mwaves*meqn*size;
+    fluxes->num_speeds = 2*mwaves*size;
+ 
+
+    fluxes->num_bytes        = meqn*size*sizeof(double);
+    fluxes->num_bytes_aux    = maux*size*sizeof(double);
+    fluxes->num_bytes_waves  = 2*mwaves*meqn*size*sizeof(double);
+    fluxes->num_bytes_speeds = 2*mwaves*size*sizeof(double);
     
-    fluxes->num_bytes        = meqn*size;
-    fluxes->num_bytes_aux    = maux*size;
-    fluxes->num_bytes_waves  = 2*mwaves*meqn*size;
-    fluxes->num_bytes_speeds = 2*mwaves*size;
     fluxes->dx = dx;
     fluxes->dy = dy;
 

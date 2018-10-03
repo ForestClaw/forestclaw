@@ -5,7 +5,9 @@ libcudaclaw_installed_headers = \
 	src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.h \
 	src/solvers/fc2d_cudaclaw/fc2d_cudaclaw_options.h \
 	src/solvers/fc2d_cudaclaw/cudaclaw_user_fort.h \
-	src/solvers/fc2d_cudaclaw/fc2d_cudaclaw_fort.h 
+	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_flux2.h \
+	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_allocate.h
+
 
 libcudaclaw_compiled_sources = \ src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.cpp \
 	src/solvers/fc2d_cudaclaw/fc2d_cudaclaw_options.c \

@@ -9,8 +9,18 @@ extern "C"
 struct fclaw2d_patch;
 struct fclaw2d_global;
 
-typedef struct cudaclaw_fluxes
+/* This can breaks cuda if memory is not aligne dproperly; use -malign-double flag
+   in gcc */
+   
+typedef struct  cudaclaw_fluxes
 {
+ #if 1   
+    size_t num;
+    size_t num_aux;
+    size_t num_waves;
+    size_t num_speeds;
+#endif    
+
     size_t num_bytes;   /* All members have the same size */
     size_t num_bytes_aux;  
     size_t num_bytes_waves;  
