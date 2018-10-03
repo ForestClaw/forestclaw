@@ -389,10 +389,15 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                               iter, (cudaclaw_fluxes_t*) buffer_data->user);
 
     maxcfl = 0;
-    if ((iter+1) % patch_buffer_len == 0 || iter == total-1)
+    if ((iter+1) % patch_buffer_len == 0)
     {
-        n = SC_MIN(patch_buffer_len,total-iter);
-        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,n,dt);
+        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,
+                                      patch_buffer_len,dt);
+    }
+    else if (iter == total-1)
+    {
+        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,
+                                      total%patch_buffer_len,dt);        
     }
 
     if (iter == total-1)
