@@ -2,6 +2,7 @@
 #include "nvToolsExt.h"
 #include <cstdio>
 
+
 const uint32_t colors[] = { 0x0000ff00, 0x000000ff, 0x00ffff00, 0x00ff00ff, 0x0000ffff, 0x00ff0000, 0x00ffffff }; 
 const int num_colors = sizeof(colors)/sizeof(uint32_t);
 
@@ -19,7 +20,8 @@ const int num_colors = sizeof(colors)/sizeof(uint32_t);
 }
 #define POP_RANGE nvtxRangePop();
 
-CudaTracer::CudaTracer(const char* name, int cid) {
+CudaTracer::CudaTracer(const char* name, int cid) 
+{
     PUSH_RANGE(name,cid);
 }
 CudaTracer::~CudaTracer() {
