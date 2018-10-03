@@ -59,34 +59,27 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     double* membuffer_dev;
     CHECK(cudaMalloc((void**)&membuffer_dev, bytes));
 
-    size_t memoffset = 0;
     for(i = 0; i < batch_size; i++)   
     {
-        cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
-        int I_q = memoffset;
-        int I_aux = I_q + fluxes->num;
+        cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);        
+        int I_q = i*fluxes->num;
+        int I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
 
         memcpy(&membuffer[I_q],fluxes->qold,fluxes->num_bytes);
         memcpy(&membuffer[I_aux],fluxes->aux,fluxes->num_bytes_aux);
 
         /* Assign gpu pointers */
-        fluxes->qold_dev = membuffer_dev + memoffset;
-        fluxes->aux_dev = fluxes->qold_dev + fluxes->num;
-
-        memoffset += (fluxes->num + fluxes->num_aux);
+        fluxes->qold_dev = &membuffer_dev[I_q];
+        fluxes->aux_dev  = &membuffer_dev[I_aux];
     }        
-    FCLAW_ASSERT(memoffset == size);
+    // FCLAW_ASSERT(memoffset == size);
 
     CHECK(cudaMemcpy(membuffer_dev, membuffer, bytes, cudaMemcpyHostToDevice));
-
-    FCLAW_FREE(membuffer);
 
     /* -------------------------------- Work with array --------------------------------*/ 
 
     cudaclaw_fluxes_t* array_fluxes_struct_dev = NULL;
     CHECK(cudaMalloc(&array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
-
-    // printf("sizeof(struct) = %d\n",sizeof(cudaclaw_fluxes_t));
 
     CHECK(cudaMemcpy(array_fluxes_struct_dev, array_fluxes_struct, 
                      batch_size*sizeof(cudaclaw_fluxes_t), 
@@ -124,16 +117,26 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     /* ------------------------------ Done with CFL ------------------------------------*/ 
 
     /* -------------------------- Copy q back to host ----------------------------------*/ 
+    CHECK(cudaMemcpy(membuffer, membuffer_dev, batch_size*fluxes->num_bytes, 
+                     cudaMemcpyDeviceToHost));
+
     for (int i = 0; i < batch_size; ++i)    
     {      
         cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
+        int I_q = i*fluxes->num;
+
+        memcpy(fluxes->qold,&membuffer[I_q],fluxes->num_bytes);
+#if 0        
         cudaMemcpy(fluxes->qold, fluxes->qold_dev, fluxes->num_bytes, 
                    cudaMemcpyDeviceToHost);
+#endif                   
     }
 
     /* ------------------------------ Clean up -----------------------------------------*/ 
     cudaFree(array_fluxes_struct_dev);
     cudaFree(membuffer_dev);
+    FCLAW_FREE(membuffer);
+
     return maxcfl;
 }
 
