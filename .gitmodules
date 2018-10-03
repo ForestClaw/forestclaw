@@ -12,3 +12,6 @@
 [submodule "src/solvers/fc3d_ash3d"]
 	path = src/solvers/fc3d_ash3d
 	url = git@bitbucket.org:MelodyShih/fc3d_ash3d.git
+[submodule "cub"]
+	path = cub
+	url = ./cub
