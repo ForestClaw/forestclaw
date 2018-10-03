@@ -29,6 +29,7 @@ void fc2d_cudaclaw_store_buffer(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
 
     fluxes->qold = qold;
+    fluxes->aux = aux;
 
     cudaEventRecord(start);
 
