@@ -63,18 +63,18 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     for(i = 0; i < batch_size; i++)   
     {
-        cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);        
+        cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);    
+            
         int I_q = i*fluxes->num;
         int I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
 
-        memcpy(&membuffer[I_q],fluxes->qold,fluxes->num_bytes);
-        memcpy(&membuffer[I_aux],fluxes->aux,fluxes->num_bytes_aux);
+        memcpy(&membuffer[I_q]  ,fluxes->qold ,fluxes->num_bytes);
+        memcpy(&membuffer[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);
 
         /* Assign gpu pointers */
         fluxes->qold_dev = &membuffer_dev[I_q];
         fluxes->aux_dev  = &membuffer_dev[I_aux];
     }        
-    // FCLAW_ASSERT(memoffset == size);
 
     CHECK(cudaMemcpy(membuffer_dev, membuffer, bytes, cudaMemcpyHostToDevice));
 
