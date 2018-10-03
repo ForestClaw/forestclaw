@@ -103,7 +103,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     ys = (2*mbc + mx)*xs;
     zs = (2*mbc + my)*xs*ys;
 
-    for(int thread_index = threadIdx.x; thread_index<num_ifaces; thread_index+=blockDim.x){
+    for(int thread_index = threadIdx.x; thread_index<num_ifaces; thread_index+=blockDim.x)
+    {
 
         int ix = thread_index%ifaces_x;
         int iy = thread_index/ifaces_y;
@@ -182,6 +183,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
         }
     }
+
     __syncthreads();
     for(int thread_index = threadIdx.x; thread_index<mx*my; thread_index+=blockDim.x){
 
@@ -196,7 +198,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             qold[I_q] = qold[I_q] - dtdx * (fm[I_q + xs] - fp[I_q]) 
                                   - dtdy * (gm[I_q + ys] - gp[I_q]);
         }        
-
     }
 }
 

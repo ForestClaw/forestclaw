@@ -23,12 +23,14 @@ void fc2d_cudaclaw_store_buffer(fclaw2d_global_t* glob,
     float milliseconds;
 
     cudaclaw_fluxes_t *fluxes = (cudaclaw_fluxes_t*) 
-    fclaw2d_patch_get_user_data(glob,this_patch);
+               fclaw2d_patch_get_user_data(glob,this_patch);
 
     FCLAW_ASSERT(fluxes != NULL);
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
+
+    fluxes->qold = qold;
 
     cudaEventRecord(start);
 
