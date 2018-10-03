@@ -110,19 +110,22 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     CHECK(cudaPeekAtLastError());
 	
     /* -------------------------------- Finish CFL ------------------------------------*/ 
-    void    *temp_storage_dev = NULL;
-    size_t  temp_storage_bytes = 0;
-    double  *cflgrid_dev;
+    {
+        PROFILE_CUDA_GROUP("Finish CFL",7);
+        void    *temp_storage_dev = NULL;
+        size_t  temp_storage_bytes = 0;
+        double  *cflgrid_dev;
 
-    cudaMalloc(&cflgrid_dev, sizeof(double));  
-    CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
-                                        maxcflblocks_dev,cflgrid_dev,batch_size));
-    cudaMalloc(&temp_storage_dev, temp_storage_bytes);
-    CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
-                                        maxcflblocks_dev,cflgrid_dev,batch_size));
-    cudaMemcpy(&maxcfl, cflgrid_dev, sizeof(double),cudaMemcpyDeviceToHost);
-    cudaFree(temp_storage_dev);
-    cudaFree(cflgrid_dev);
+        cudaMalloc(&cflgrid_dev, sizeof(double));  
+        CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
+                                            maxcflblocks_dev,cflgrid_dev,batch_size));
+        cudaMalloc(&temp_storage_dev, temp_storage_bytes);
+        CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
+                                            maxcflblocks_dev,cflgrid_dev,batch_size));
+        cudaMemcpy(&maxcfl, cflgrid_dev, sizeof(double),cudaMemcpyDeviceToHost);
+        cudaFree(temp_storage_dev);
+        cudaFree(cflgrid_dev);
+    }
     /* ------------------------------ Done with CFL ------------------------------------*/ 
 
     /* -------------------------- Copy q back to host ----------------------------------*/ 
