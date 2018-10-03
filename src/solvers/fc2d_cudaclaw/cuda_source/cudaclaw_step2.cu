@@ -48,6 +48,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;
 
+    cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[0]);
+    size_t bytes = batch_size*(fluxes->num_bytes + fluxes->num_bytes_aux);
+
     for(i = 0; i < batch_size; i++)
     {
         cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
