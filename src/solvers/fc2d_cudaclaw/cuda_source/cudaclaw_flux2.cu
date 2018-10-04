@@ -7,13 +7,18 @@
 
 __global__
 void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
-                                int maux, int mwaves, double dt,
+                                int maux, int mwaves, double dt, double t,
                                 cudaclaw_fluxes_t* array_fluxes_struct_dev,
 								double * maxcflblocks_dev,
-                                cudaclaw_cuda_rpn2_t rpn2)
+                                cudaclaw_cuda_rpn2_t rpn2,
+                                cudaclaw_cuda_b4step2_t b4step2)
 {
     // TODO: check this device function does not depend on blockIdx.z inside
     cudaclaw_flux2_and_update(mx,my,meqn,mbc,maux,mwaves,
+            array_fluxes_struct_dev[blockIdx.z].xlower,
+            array_fluxes_struct_dev[blockIdx.z].ylower,
+            array_fluxes_struct_dev[blockIdx.z].dx,
+            array_fluxes_struct_dev[blockIdx.z].dy,
             dt/array_fluxes_struct_dev[blockIdx.z].dx,
             dt/array_fluxes_struct_dev[blockIdx.z].dy,
             array_fluxes_struct_dev[blockIdx.z].qold_dev,
@@ -24,19 +29,23 @@ void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc,
             array_fluxes_struct_dev[blockIdx.z].gp_dev,
             array_fluxes_struct_dev[blockIdx.z].waves_dev,
             array_fluxes_struct_dev[blockIdx.z].speeds_dev,
-            maxcflblocks_dev, rpn2);
+            maxcflblocks_dev, rpn2, b4step2,
+            t,dt);
 }
 
 
 __device__
 void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
-                                int maux, int mwaves, 
+                                int maux, int mwaves, double xlower, double ylower, 
+                                double dx, double dy,
                                 double dtdx, double dtdy,
                                 double* qold, double* aux, 
                                 double* fm, double* fp, double* gm, double* gp,
                                 double* waves, double *speeds,
 								double * maxcflblocks_dev,
-                                cudaclaw_cuda_rpn2_t rpn2)
+                                cudaclaw_cuda_rpn2_t rpn2,
+                                cudaclaw_cuda_b4step2_t b4step2,
+                                double t,double dt)
 {
     typedef cub::BlockReduce<double,128> BlockReduce;
     __shared__ typename BlockReduce::TempStorage temp_storage;
@@ -93,6 +102,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 auxd[m] = aux[I_aux - ys];
             }
 
+            b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
+                    t,dt,maux,auxr,ix,iy,4.0);//tperiod = 4.0
             //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
             rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
