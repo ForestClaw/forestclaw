@@ -98,10 +98,12 @@ typedef void (*cudaclaw_fort_b4step2_t)(const int* maxmx, const int* maxmy,
                                           const double* t, const double* dt,
                                           const int* maux, double aux[]);
 
+#if 1
 typedef void (*cudaclaw_cuda_b4step2_t)(int mbc, int mx, int my, int meqn, double q[],
                                         double xlower, double ylower, double dx, double dy, 
                                         double time, double dt, int maux, 
-                                        double aux[], int ipatch, int jpatch, double tperiod);
+                                        double aux[], int ipatch, int jpatch);
+#endif
 
 typedef void (*cudaclaw_fort_src2_t)(const int* maxmx, const int* maxmy, 
                                        const int* meqn,

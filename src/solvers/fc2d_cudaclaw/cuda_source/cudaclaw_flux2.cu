@@ -76,11 +76,16 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     double max_speed = 0;
 
+
+
+
     for(int thread_index = threadIdx.x; thread_index<num_ifaces; thread_index+=blockDim.x)
     {
 
         int ix = thread_index%ifaces_x;
         int iy = thread_index/ifaces_y;
+        int i = ix-(mbc-2);  /* i,j for index in the grid */
+        int j = iy-(mbc-2);
 
         /* (i,j) index */
         I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
@@ -101,9 +106,13 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 auxr[m] = aux[I_aux];
                 auxd[m] = aux[I_aux - ys];
             }
+            
+            if (b4step2 == NULL)
+            {
+                b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
+                    t,dt,maux,auxr,i,j);//tperiod = 4.0                
+            }
 
-            b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
-                    t,dt,maux,auxr,ix,iy,4.0);//tperiod = 4.0
             //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
             rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 

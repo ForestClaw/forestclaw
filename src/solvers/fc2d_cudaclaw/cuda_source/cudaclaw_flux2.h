@@ -17,10 +17,12 @@ typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
                                       double wave[], double s[], 
                                       double amdq[], double apdq[]);
 
+#if 1
 typedef void (*cudaclaw_cuda_b4step2_t)(int mbc, int mx, int my, int meqn, double q[],
                                         double xlower, double ylower, double dx, double dy, 
                                         double time, double dt, int maux, 
-                                        double aux[], int ipatch, int jpatch, double tperiod);
+                                        double aux[], int ipatch, int jpatch);
+#endif
 
 
 
