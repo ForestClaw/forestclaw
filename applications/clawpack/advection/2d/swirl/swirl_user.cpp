@@ -89,7 +89,7 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
 	const user_options_t* user = swirl_get_options(glob);
 
 	double period = user->period;
-	//SWIRL_SETPROB(&period);
+	SWIRL_SETPROB(&period);
 	swirl_setprob(period);
 }
 
