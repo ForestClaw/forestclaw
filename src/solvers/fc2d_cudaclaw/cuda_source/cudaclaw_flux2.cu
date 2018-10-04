@@ -1,9 +1,19 @@
 #include "cudaclaw_flux2.h"
-#include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
 #include "cudaclaw_allocate.h"
 #include <math.h>
 #include <cub/cub.cuh>   // or equivalently <cub/block/block_reduce.cuh>
 
+static
+__device__ double minmod(double r)
+{
+    return max(0.0,min(1.0,r));
+}
+
+static
+__device__ double limiter(double r)
+{
+    return minmod(r);
+}
 
 __global__
 void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
@@ -48,7 +58,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                 double t,double dt)
 {
     typedef cub::BlockReduce<double,128> BlockReduce;
+
     __shared__ typename BlockReduce::TempStorage temp_storage;
+
     int mq, mw, m;
     int xs, ys, zs;
     int I, I_q, I_aux, I_waves, I_speeds;
@@ -76,16 +88,11 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     double max_speed = 0;
 
-
-
-
     for(int thread_index = threadIdx.x; thread_index<num_ifaces; thread_index+=blockDim.x)
     {
-
         int ix = thread_index%ifaces_x;
         int iy = thread_index/ifaces_y;
-        int i = ix-(mbc-2);  /* i,j for index in the grid */
-        int j = iy-(mbc-2);
+        int i,j;
 
         /* (i,j) index */
         I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
@@ -109,11 +116,12 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             
             if (b4step2 != NULL)
             {
+                i = ix-(mbc-2);  /* i,j for index in the grid */
+                j = iy-(mbc-2);
                 b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
                     t,dt,maux,auxr,i,j);//tperiod = 4.0                
             }
 
-            //rpn2adv(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
             rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
             /* Set value at left interface of cell I */
@@ -123,13 +131,13 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 fp[I_q] = -apdq[mq]; 
                 fm[I_q] = amdq[mq];
             }
-#if 0        
+
             for (m = 0; m < meqn*mwaves; m++)
             {
                 I_waves = I + m*zs;
                 waves[I_waves] = wave[m];
             }
-#endif        
+
             for (mw = 0; mw < mwaves; mw++)
             {
                 I_speeds = I + mw*zs;
@@ -140,7 +148,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 }
             } 
 
-
             rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, amdq, apdq);
 
             /* Set value at bottom interface of cell I */
@@ -150,16 +157,15 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 gp[I_q] = -apdq[mq]; 
                 gm[I_q] = amdq[mq];
             }
-#if 0        
             for (m = 0; m < meqn*mwaves; m++)
             {
-                I_waves = I + m*zs;
+                I_waves = I + (meqn*mwaves+m)*zs;
                 waves[I_waves] = wave[m];
             }
-#endif
+
             for (mw = 0; mw < mwaves; mw++)
             {
-                I_speeds = I + (mwaves+mw)*zs;
+                I_speeds = I + (mwaves + mw)*zs;
                 speeds[I_speeds] = s[mw];
                 if (fabs(s[mw])*dtdy > max_speed)
                 {
@@ -173,12 +179,75 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     __syncthreads();
 
-    for(int thread_index = threadIdx.x; thread_index<mx*my; thread_index+=blockDim.x){
+/* ---------------------------------- Limit waves --------------------------------------*/    
+    for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+    { 
+        int ix = thread_index%ifaces_x;
+        int iy = thread_index/ifaces_y;
 
-        int ix = thread_index%mx;
+        I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
+
+        double wnorm2,dotr,dotl, wlimitr,r;
+        if (1 <= ix < mx + 2*(mbc-1) && 1<= iy && iy < my + 2*(mbc-1))
+        {
+            for(mw = 0; mw < mwaves; mw++)
+            {
+                /* x-faces */
+                wnorm2 = 0;
+                dotr = 0;
+                dotl = 0;
+                for(mq = 0; mq < meqn; mq++)
+                {
+                    I_waves = I + (mw*meqn + mq)*zs;
+                    wave[mq] = waves[I_waves];
+                    wnorm2 += pow(wave[mq],2);
+                    dotl += wave[mq]*waves[I_waves-1];
+                    dotr += wave[mq]*waves[I_waves+1];
+                }
+                I_speeds = I + mw*zs;
+                r = (s[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
+
+                wlimitr = limiter(r);  /* allow for selection */
+
+                for(mq = 0; mq < meqn; mq++)
+                {
+                    I_waves = I + (mw*meqn + mq)*zs;
+                    waves[I_waves] = wlimitr*wave[mq];                    
+                }
+
+                /* y-faces */
+                wnorm2 = 0;
+                dotr = 0;
+                dotl = 0;
+                for(mq = 0; mq < meqn; mq++)
+                {
+                    I_waves = I + (mw*meqn + mq)*zs;
+                    wave[mq] = waves[I_waves];
+                    wnorm2 += pow(wave[mq],2);
+                    dotl += wave[mq]*waves[I_waves-ys];
+                    dotr += wave[mq]*waves[I_waves+ys];
+                }
+                I_speeds = I + (mwaves + mw)*zs;
+                r = (s[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
+
+                wlimitr = limiter(r);  /* allow for selection */
+
+                for(mq = 0; mq < meqn; mq++)
+                {
+                    I_waves = I + ((mwaves+mw)*meqn + mq)*zs;
+                    waves[I_waves] = wlimitr*wave[mq];                    
+                }                
+            }
+        }
+    }
+
+
+    for(int thread_index = threadIdx.x; thread_index<mx*my; thread_index+=blockDim.x)
+    {
+        int ix = thread_index % mx;
         int iy = thread_index/my;
 
-        I = (ix+mbc)*xs + (iy+mbc)*ys;
+        I = (ix + mbc)*xs + (iy + mbc)*ys;
 
         for(mq = 0; mq < meqn; mq++)
         {
