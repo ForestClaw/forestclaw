@@ -107,7 +107,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 auxd[m] = aux[I_aux - ys];
             }
             
-            if (b4step2 == NULL)
+            if (b4step2 != NULL)
             {
                 b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
                     t,dt,maux,auxr,i,j);//tperiod = 4.0                

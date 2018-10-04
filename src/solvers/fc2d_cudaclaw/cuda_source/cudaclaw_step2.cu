@@ -55,8 +55,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[0]);
     size_t size = batch_size*(fluxes->num + fluxes->num_aux);
     size_t bytes = size*sizeof(double);
-
-    double *membuffer = FCLAW_ALLOC(double,size);
+    double *membuffer;
+    //double *membuffer = FCLAW_ALLOC(double,size);
+    CHECK(cudaMallocHost((void**)&membuffer,bytes));
 
     double* membuffer_dev;
     CHECK(cudaMalloc((void**)&membuffer_dev, bytes));
@@ -137,7 +138,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     /* ------------------------------ Clean up -----------------------------------------*/ 
     cudaFree(array_fluxes_struct_dev);
     cudaFree(membuffer_dev);
-    FCLAW_FREE(membuffer);
+    cudaFreeHost(membuffer);
+    //FCLAW_FREE(membuffer);
 
     return maxcfl;
 }
