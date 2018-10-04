@@ -3,7 +3,7 @@
 #include <fc2d_cudaclaw.h>
 #include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
 
-__device__ __managed__ double s_tperiod;
+__managed__ double s_tperiod;
 
 __device__ __managed__ double *data;
 
@@ -32,7 +32,6 @@ __device__ void swirl_b4step2_test(int mbc, int mx, int my, int meqn, double q[]
 
     xll = xlower + (ipatch-1)*dx;
     yll = ylower + (jpatch-1)*dy;
-
     //vt = cos(2*M_PI*(time+dt/2.0)/s_tperiod);
     vt = cos(2*M_PI*(time+dt/2.0)/data[0]);
     p1 = psi(xll,yll+dy);
