@@ -201,8 +201,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     I_waves = I + (mw*meqn + mq)*zs;
                     wave[mq] = waves[I_waves];
                     wnorm2 += pow(wave[mq],2);
-                    //dotl += wave[mq]*waves[I_waves-1];
-                    //dotr += wave[mq]*waves[I_waves+1];
+                    dotl += wave[mq]*waves[I_waves-1];
+                    dotr += wave[mq]*waves[I_waves+1];
                 }
                 I_speeds = I + mw*zs;
                 r = (s[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
