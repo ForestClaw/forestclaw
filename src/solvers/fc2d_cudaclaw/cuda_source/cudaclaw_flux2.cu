@@ -186,11 +186,11 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
   
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
-        int ix = thread_index%ifaces_x;
+        int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_y;
 
         //I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
-        I = (ix + mbc)*xs + (iy+mbc)*ys;
+        I = (ix + mbc+1)*xs + (iy+mbc)*ys;
 
         double wnorm2,dotr,dotl, wlimitr,r;
         if (ix < mx + 1 && iy < my + 1)
