@@ -16,8 +16,8 @@ __device__ void swirl_b4step2_test(int mbc, int mx, int my, int meqn, double q[]
     double vt;
     double xll, yll;
 
-    xll = xlower + ipatch*dx;
-    yll = ylower + jpatch*dx;
+    xll = xlower + (ipatch-1)*dx;
+    yll = ylower + (jpatch-1)*dy;
 
     vt = cos(2*M_PI*(time+dt/2.0)/tperiod);
     aux[0] = (psi(xll,yll+dy) - psi(xll,yll)) / dy;
