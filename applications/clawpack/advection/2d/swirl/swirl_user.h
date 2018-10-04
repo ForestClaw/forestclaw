@@ -70,6 +70,8 @@ void swirl_assign_b4step2(cudaclaw_cuda_b4step2_t *b4step2);
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
 void SWIRL_SETPROB(double* tperiod);
 
+void swirl_setprob(double period_in);
+
 
 #ifdef __cplusplus
 #if 0
