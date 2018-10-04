@@ -17,6 +17,12 @@ typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
                                       double wave[], double s[], 
                                       double amdq[], double apdq[]);
 
+typedef void (*cudaclaw_cuda_b4step2_t)(int mbc, int mx, int my, int meqn, double q[],
+                                        double xlower, double ylower, double dx, double dy, 
+                                        double time, double dt, int maux, 
+                                        double aux[], int ipatch, int jpatch, double tperiod);
+
+
 
 
 __global__ void cudaclaw_flux2(int mx, int my, int meqn, int mbc,
@@ -44,20 +50,24 @@ __global__ void cudaclaw_compute_cfl(int idir, int mx, int my, int meqn, int mwa
 
 __global__ void
 cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
-                                int maux, int mwaves, double dt,
+                                int maux, int mwaves, double dt, double t, 
                                 cudaclaw_fluxes_t* array_fluxes_struct_dev,
-								double * maxcflblocks_dev,
-                                cudaclaw_cuda_rpn2_t rpn2);
+								                double * maxcflblocks_dev,
+                                cudaclaw_cuda_rpn2_t rpn2,
+                                cudaclaw_cuda_b4step2_t b4step2);
 
 
 __device__ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
-                                int maux, int mwaves, 
+                                int maux, int mwaves, double xlower, double ylower, 
+                                double dx, double dy,
                                 double dtdx, double dtdy,
                                 double* qold, double* aux, 
                                 double* fm, double* fp, double* gm, double* gp,
                                 double* waves, double *speeds,
-								double * maxcflblocks_dev,
-                                cudaclaw_cuda_rpn2_t rpn2);
+								                double * maxcflblocks_dev,
+                                cudaclaw_cuda_rpn2_t rpn2,
+                                cudaclaw_cuda_b4step2_t b4step2,
+                                double t,double dt);
 
 
 #ifdef __cplusplus

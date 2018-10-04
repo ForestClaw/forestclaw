@@ -19,7 +19,7 @@
     
 double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
-        int batch_size, double dt)
+        int batch_size, double t, double dt)
 {
     PROFILE_CUDA_GROUP("cudaclaw_step2_batch",5);
     cudaEvent_t start, stop;
@@ -95,10 +95,11 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     double* maxcflblocks_dev;
     cudaMalloc(&maxcflblocks_dev,batch_size*sizeof(double)); 
     cudaclaw_flux2_and_update_batch<<<grid,block,128*bytes_per_thread >>>(mx,my,meqn,
-                                                                     mbc,maux,mwaves,dt,
+                                                                     mbc,maux,mwaves,dt,t,
                                                                      array_fluxes_struct_dev,
 								                                     maxcflblocks_dev,
-                                                                     cuclaw_vt->cuda_rpn2);
+                                                                     cuclaw_vt->cuda_rpn2,
+                                                                     cuclaw_vt->cuda_b4step2);
     cudaDeviceSynchronize();
     CHECK(cudaPeekAtLastError());
 	

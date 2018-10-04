@@ -98,6 +98,11 @@ typedef void (*cudaclaw_fort_b4step2_t)(const int* maxmx, const int* maxmy,
                                           const double* t, const double* dt,
                                           const int* maux, double aux[]);
 
+typedef void (*cudaclaw_cuda_b4step2_t)(int mbc, int mx, int my, int meqn, double q[],
+                                        double xlower, double ylower, double dx, double dy, 
+                                        double time, double dt, int maux, 
+                                        double aux[], int ipatch, int jpatch, double tperiod);
+
 typedef void (*cudaclaw_fort_src2_t)(const int* maxmx, const int* maxmy, 
                                        const int* meqn,
                                        const int* mbc, const int* mx,const int* my,
@@ -157,7 +162,7 @@ double cudaclaw_step2(struct fclaw2d_global* glob,
 
 double cudaclaw_step2_batch(struct fclaw2d_global* glob,
                             struct cudaclaw_fluxes* fluxes_array,
-                            int patch_buffer_len, double dt);
+                            int patch_buffer_len, double t, double dt);
 
 void fc2d_cudaclaw_store_buffer(struct fclaw2d_global* glob,
                                 struct fclaw2d_patch *this_patch,
@@ -185,7 +190,8 @@ struct fc2d_cudaclaw_vtable
     cudaclaw_fort_rpn2_t      fort_rpn2;
     cudaclaw_fort_rpt2_t      fort_rpt2;
 
-    cudaclaw_cuda_rpn2_t      cuda_rpn2;    
+    cudaclaw_cuda_rpn2_t      cuda_rpn2;
+    cudaclaw_cuda_b4step2_t   cuda_b4step2;    
     int is_set;
 
 };
