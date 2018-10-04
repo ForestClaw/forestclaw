@@ -46,7 +46,7 @@ radialdam_register (user_options_t* user, sc_options_t * opt)
                            "Clawpack_version (4 or 5) [5]");
 
     sc_options_add_bool (opt, 0, "cuda", &user->cuda, 0,
-                           "Use cudaclaw5 [F]");
+                           "Use cudaclaw [F]");
 
     user->is_registered = 1;
     return NULL;

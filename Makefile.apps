@@ -87,7 +87,7 @@ include src/solvers/fc2d_clawpack5/Makefile.am
 include src/solvers/fc2d_cudaclaw/Makefile.am
 
 include applications/clawpack/advection/2d/swirl/Makefile.am
-#include applications/clawpack/shallow/2d/radialdam/Makefile.am
+include applications/clawpack/shallow/2d/radialdam/Makefile.am
 include applications/clawpack/acoustics/2d/radial/Makefile.am
 
 
