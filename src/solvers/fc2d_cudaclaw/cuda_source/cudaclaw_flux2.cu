@@ -188,7 +188,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
 
         double wnorm2,dotr,dotl, wlimitr,r;
-        if (1 <= ix < mx + 2*(mbc-1) && 1<= iy && iy < my + 2*(mbc-1))
+        if (1 <= ix && ix < mx + 2*(mbc-1) && 1<= iy && iy < my + 2*(mbc-1))
         {
             for(mw = 0; mw < mwaves; mw++)
             {
