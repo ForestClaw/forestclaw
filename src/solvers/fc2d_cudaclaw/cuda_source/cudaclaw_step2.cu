@@ -31,13 +31,13 @@ void cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
     int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;  
 
+    int batch_size = FC2D_CUDACLAW_BUFFER_LEN;
     size_t size = (2*mbc+mx)*(2*mbc+my);
-    size_t bytes = size*(meqn + maux)*sizeof(double);
+    size_t bytes = batch_size*size*(meqn + maux)*sizeof(double);
 
     CHECK(cudaMallocHost((void**)&s_membuffer,bytes));    
     CHECK(cudaMalloc((void**)&s_membuffer_dev, bytes)); 
 
-    int batch_size = FC2D_CUDACLAW_BUFFER_LEN;
     CHECK(cudaMalloc(&s_array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
 }
 
