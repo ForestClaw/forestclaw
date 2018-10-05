@@ -180,17 +180,19 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     __syncthreads();
 
     /* ---------------------------------- Limit waves --------------------------------------*/  
+#if 0    
+    
     ifaces_x = mx + 1;
     ifaces_y = my + 1;
     num_ifaces = ifaces_x*ifaces_y;
-  
+ 
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_y;
 
         //I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
-        I = (ix + mbc+1)*xs + (iy+mbc)*ys;
+        I = (ix + mbc)*xs + (iy+mbc)*ys;
 
         double wnorm2,dotr,dotl, wlimitr,r;
         if (ix < mx + 1 && iy < my + 1)
@@ -206,8 +208,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     I_waves = I + (mw*meqn + mq)*zs;
                     wave[mq] = waves[I_waves];
                     wnorm2 += pow(wave[mq],2);
-                    dotl += wave[mq]*waves[I_waves-1];
-                    dotr += wave[mq]*waves[I_waves+1];
+                    //dotl += wave[mq]*waves[I_waves-1];
+                    //dotr += wave[mq]*waves[I_waves+1];
                 }
                 I_speeds = I + mw*zs;
                 r = (s[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
@@ -245,7 +247,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
     }
-
+#endif
 
     for(int thread_index = threadIdx.x; thread_index<mx*my; thread_index+=blockDim.x)
     {
