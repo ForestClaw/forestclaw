@@ -59,11 +59,14 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     /* ---------------------------------- Merge Memory ---------------------------------*/ 
     {
-        PROFILE_CUDA_GROUP("cudaclaw_copy_loop",7);    
-        CHECK(cudaMallocHost((void**)&membuffer,bytes));
+        {
+            PROFILE_CUDA_GROUP("cudaclaw_copy_loop",2);    
+            CHECK(cudaMallocHost((void**)&membuffer,bytes));
 
-        CHECK(cudaMalloc((void**)&membuffer_dev, bytes));
+            CHECK(cudaMalloc((void**)&membuffer_dev, bytes));            
+        }
 
+        PROFILE_CUDA_GROUP("cudaclaw_copy_loop",3);    
         for(i = 0; i < batch_size; i++)   
         {
             cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);    
@@ -79,7 +82,10 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             fluxes->aux_dev  = &membuffer_dev[I_aux];
         }        
 
-        CHECK(cudaMemcpy(membuffer_dev, membuffer, bytes, cudaMemcpyHostToDevice));
+        {
+            PROFILE_CUDA_GROUP("cudaclaw_copy_loop",4);    
+            CHECK(cudaMemcpy(membuffer_dev, membuffer, bytes, cudaMemcpyHostToDevice));            
+        }
     }        
 
     /* -------------------------------- Work with array --------------------------------*/ 
