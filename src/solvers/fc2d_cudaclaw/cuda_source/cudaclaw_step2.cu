@@ -126,6 +126,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     //cudaclaw_fluxes_t* array_fluxes_struct_dev = NULL;
     //CHECK(cudaMalloc(&array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
 
+    FCLAW_ASSERT(s_array_fluxes_struct_dev != NULL);
+    
     CHECK(cudaMemcpy(s_array_fluxes_struct_dev, array_fluxes_struct, 
                      batch_size*sizeof(cudaclaw_fluxes_t), 
                      cudaMemcpyHostToDevice));
