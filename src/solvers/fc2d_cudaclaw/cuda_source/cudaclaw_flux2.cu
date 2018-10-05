@@ -239,7 +239,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 #endif                
                 for(mq = 0; mq < meqn; mq++)
                 {
-                    I_q = I + mq;
+                    I_q = I + mq*zs;
                     cqxx += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wlimitr*wave[mq];
                     fm[I_q] += 0.5*cqxx;   /* amdq + cqxx */
                     fp[I_q] += 0.5*cqxx;   /* apdq - cqxx */
@@ -252,7 +252,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 dotl = 0;
                 for(mq = 0; mq < meqn; mq++)
                 {
-                    I_waves = I + (mw*meqn + mq)*zs;
+                    I_waves = I + ((mwaves+mw)*meqn + mq)*zs;
                     wave[mq] = waves[I_waves];
                     wnorm2 += pow(wave[mq],2);
                     dotl += wave[mq]*waves[I_waves-ys];
@@ -276,8 +276,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 #endif
                 for(mq = 0; mq < meqn; mq++)
                 {
-                    I_q = I + mq;
-                    cqxx += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wlimitr*wave[mq];
+                    I_q = I + mq*zs;
+                    cqxx += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdy)*wlimitr*wave[mq];
                     gm[I_q] += 0.5*cqxx;   /* amdq + cqxx */
                     gp[I_q] += 0.5*cqxx;   /* apdq - cqxx */
                 }
