@@ -16,7 +16,39 @@
 #include <fc2d_cuda_profiler.h>
 #include <cub/cub.cuh>
 
-    
+static double* s_membuffer;
+static double* s_membuffer_dev;
+
+cudaclaw_fluxes_t* s_array_fluxes_struct_dev;
+
+
+void cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
+{
+    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
+    int maux = clawpatch_opt->maux;
+    int meqn = clawpatch_opt->meqn;  
+
+    size_t size = (2*mbc+mx)*(2*mbc+my);
+    size_t bytes = size*(meqn + maux)*sizeof(double);
+
+    CHECK(cudaMallocHost((void**)&s_membuffer,bytes));    
+    CHECK(cudaMalloc((void**)&s_membuffer_dev, bytes)); 
+
+    int batch_size = FC2D_CUDACLAW_BUFFER_LEN;
+    CHECK(cudaMalloc(&s_array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
+}
+
+void cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
+{
+    cudaFreeHost(s_membuffer);
+    cudaFree(s_membuffer_dev);
+    cudaFree(s_array_fluxes_struct_dev);
+}
+
+
 double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
         int batch_size, double t, double dt)
@@ -25,11 +57,10 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
-    float milliseconds;
+    //float milliseconds;
     int i;
 
     double maxcfl = 0.0;
-    //double dtdx, dtdy, s;
 
     FCLAW_ASSERT(batch_size !=0);
 
@@ -54,16 +85,18 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[0]);
     size_t size = batch_size*(fluxes->num + fluxes->num_aux);
     size_t bytes = size*sizeof(double);
-    double *membuffer;
-    double* membuffer_dev;
+    //double *membuffer;
+    //double* membuffer_dev;
 
     /* ---------------------------------- Merge Memory ---------------------------------*/ 
     {
         {
             PROFILE_CUDA_GROUP("Malloc buffer on the host and device",2);    
-            CHECK(cudaMallocHost((void**)&membuffer,bytes));
+            FCLAW_ASSERT(s_membuffer != NULL);
+            FCLAW_ASSERT(s_membuffer_dev != NULL);
+            //CHECK(cudaMallocHost((void**)&membuffer,bytes));
 
-            CHECK(cudaMalloc((void**)&membuffer_dev, bytes));            
+            //CHECK(cudaMalloc((void**)&membuffer_dev, bytes));            
         }
 
         PROFILE_CUDA_GROUP("cudaclaw_copy_loop",3);    
@@ -74,26 +107,26 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             int I_q = i*fluxes->num;
             int I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
 
-            memcpy(&membuffer[I_q]  ,fluxes->qold ,fluxes->num_bytes);
-            memcpy(&membuffer[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);
+            memcpy(&s_membuffer[I_q]  ,fluxes->qold ,fluxes->num_bytes);
+            memcpy(&s_membuffer[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);
 
             /* Assign gpu pointers */
-            fluxes->qold_dev = &membuffer_dev[I_q];
-            fluxes->aux_dev  = &membuffer_dev[I_aux];
+            fluxes->qold_dev = &s_membuffer_dev[I_q];
+            fluxes->aux_dev  = &s_membuffer_dev[I_aux];
         }        
 
         {
             PROFILE_CUDA_GROUP("Copy buffer to device",7);    
-            CHECK(cudaMemcpy(membuffer_dev, membuffer, bytes, cudaMemcpyHostToDevice));            
+            CHECK(cudaMemcpy(s_membuffer_dev, s_membuffer, bytes, cudaMemcpyHostToDevice));            
         }
     }        
 
     /* -------------------------------- Work with array --------------------------------*/ 
 
-    cudaclaw_fluxes_t* array_fluxes_struct_dev = NULL;
-    CHECK(cudaMalloc(&array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
+    //cudaclaw_fluxes_t* array_fluxes_struct_dev = NULL;
+    //CHECK(cudaMalloc(&array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
 
-    CHECK(cudaMemcpy(array_fluxes_struct_dev, array_fluxes_struct, 
+    CHECK(cudaMemcpy(s_array_fluxes_struct_dev, array_fluxes_struct, 
                      batch_size*sizeof(cudaclaw_fluxes_t), 
                      cudaMemcpyHostToDevice));
 
@@ -106,7 +139,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     CHECK(cudaMalloc(&maxcflblocks_dev,batch_size*sizeof(double))); 
     cudaclaw_flux2_and_update_batch<<<grid,block,128*bytes_per_thread >>>(mx,my,meqn,
                                                                      mbc,maux,mwaves,dt,t,
-                                                                     array_fluxes_struct_dev,
+                                                                     s_array_fluxes_struct_dev,
 								                                     maxcflblocks_dev,
                                                                      cuclaw_vt->cuda_rpn2,
                                                                      cuclaw_vt->cuda_b4step2);
@@ -133,7 +166,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     /* ------------------------------ Done with CFL ------------------------------------*/ 
 
     /* -------------------------- Copy q back to host ----------------------------------*/ 
-    CHECK(cudaMemcpy(membuffer, membuffer_dev, batch_size*fluxes->num_bytes, 
+    CHECK(cudaMemcpy(s_membuffer, s_membuffer_dev, batch_size*fluxes->num_bytes, 
                      cudaMemcpyDeviceToHost));
 
     {
@@ -144,14 +177,14 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
             int I_q = i*fluxes->num;
 
-            memcpy(fluxes->qold,&membuffer[I_q],fluxes->num_bytes);
+            memcpy(fluxes->qold,&s_membuffer[I_q],fluxes->num_bytes);
         }        
     }
 
     /* ------------------------------ Clean up -----------------------------------------*/ 
-    cudaFree(array_fluxes_struct_dev);
-    cudaFree(membuffer_dev);
-    cudaFreeHost(membuffer);
+    //cudaFree(array_fluxes_struct_dev);
+    //cudaFree(membuffer_dev);
+    //cudaFreeHost(membuffer);
 
     return maxcfl;
 }

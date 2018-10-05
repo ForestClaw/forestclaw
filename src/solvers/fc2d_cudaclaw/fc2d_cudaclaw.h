@@ -172,6 +172,11 @@ void fc2d_cudaclaw_store_buffer(struct fclaw2d_global* glob,
                                 int count, int iter, 
                                 struct cudaclaw_fluxes* flux_array);
 
+void cudaclaw_allocate_buffers(struct fclaw2d_global *glob);
+
+void cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
+
+
 /* --------------------------------- Virtual table ------------------------------------ */
 
 struct fc2d_cudaclaw_vtable
