@@ -5,8 +5,6 @@
 
 __managed__ double s_tperiod;
 
-__device__ __managed__ double *data;
-
 __device__ double psi(double x, double y)
 {
     return (pow(sin(M_PI*x),2) * pow(sin(M_PI*y),2)) / M_PI;
@@ -15,9 +13,6 @@ __device__ double psi(double x, double y)
 void swirl_setprob(double period_in)
 {
     s_tperiod = period_in;
-
-    cudaMallocManaged(&data,100);
-    data[0] = period_in;
 }
 
 
@@ -32,13 +27,14 @@ __device__ void swirl_b4step2_test(int mbc, int mx, int my, int meqn, double q[]
 
     xll = xlower + (ipatch-1)*dx;
     yll = ylower + (jpatch-1)*dy;
-    //vt = cos(2*M_PI*(time+dt/2.0)/s_tperiod);
-    vt = cos(2*M_PI*(time+dt/2.0)/data[0]);
+    vt = cos(2*M_PI*(time+dt/2.0)/s_tperiod);
+
     p1 = psi(xll,yll+dy);
     p2 = psi(xll,yll);
     p3 = psi(xll+dx,yll);
+
     aux[0] = (p1-p2) / dy;
-    aux[1] = - (p2-p3) / dx;
+    aux[1] = - (p3-p2) / dx;
 
     aux[0] = vt * aux[0];
     aux[1] = vt * aux[1];
