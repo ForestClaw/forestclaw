@@ -107,7 +107,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             int I_q = i*fluxes->num;
             int I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
 
+            printf("here ...0\n");
             memcpy(&s_membuffer[I_q]  ,fluxes->qold ,fluxes->num_bytes);
+            printf("here ...1\n");
             memcpy(&s_membuffer[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);
 
             /* Assign gpu pointers */
@@ -116,10 +118,13 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         }        
 
         {
-            PROFILE_CUDA_GROUP("Copy buffer to device",7);    
+            PROFILE_CUDA_GROUP("Copy buffer to device",7);              
+            printf("here ...2\n");
             CHECK(cudaMemcpy(s_membuffer_dev, s_membuffer, bytes, cudaMemcpyHostToDevice));            
         }
     }        
+
+    printf("here ...3\n");
 
     /* -------------------------------- Work with array --------------------------------*/ 
 
@@ -127,10 +132,13 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     //CHECK(cudaMalloc(&array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
 
     FCLAW_ASSERT(s_array_fluxes_struct_dev != NULL);
-    
+
+    printf("here ...4\n");
     CHECK(cudaMemcpy(s_array_fluxes_struct_dev, array_fluxes_struct, 
                      batch_size*sizeof(cudaclaw_fluxes_t), 
                      cudaMemcpyHostToDevice));
+
+    printf("here ...5\n");
 
     dim3 block(128,1,1);
     dim3 grid(1,1,batch_size);
@@ -179,7 +187,10 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
             int I_q = i*fluxes->num;
 
+            printf("here ...5\n");
             memcpy(fluxes->qold,&s_membuffer[I_q],fluxes->num_bytes);
+            printf("here ...6\n");
+
         }        
     }
 
