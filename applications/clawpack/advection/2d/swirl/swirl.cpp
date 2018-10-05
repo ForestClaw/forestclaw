@@ -94,8 +94,19 @@ void run_program(fclaw2d_global_t* glob)
 	/* ---------------------------------------------------------------
 	   Run
 	   --------------------------------------------------------------- */
+	if (user_opt->cuda == 1)
+	{
+		cudaclaw_allocate_buffers(glob);
+	}
+
 	fclaw2d_initialize(glob);
 	fclaw2d_run(glob);
+
+	if (user_opt->cuda == 1)
+	{
+		cudaclaw_deallocate_buffers(glob);
+	}
+
 	fclaw2d_finalize(glob);
 }
 
