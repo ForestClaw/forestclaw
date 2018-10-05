@@ -60,7 +60,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     /* ---------------------------------- Merge Memory ---------------------------------*/ 
     {
         {
-            PROFILE_CUDA_GROUP("cudaclaw_copy_loop",2);    
+            PROFILE_CUDA_GROUP("Malloc buffer on the host and device",2);    
             CHECK(cudaMallocHost((void**)&membuffer,bytes));
 
             CHECK(cudaMalloc((void**)&membuffer_dev, bytes));            
@@ -83,7 +83,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         }        
 
         {
-            PROFILE_CUDA_GROUP("cudaclaw_copy_loop",4);    
+            PROFILE_CUDA_GROUP("Copy buffer to device",7);    
             CHECK(cudaMemcpy(membuffer_dev, membuffer, bytes, cudaMemcpyHostToDevice));            
         }
     }        
