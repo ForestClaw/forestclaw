@@ -180,7 +180,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     __syncthreads();
 
     /* ---------------------------------- Limit waves --------------------------------------*/  
-#if 0    
+#if 1    
     
     ifaces_x = mx + 1;
     ifaces_y = my + 1;
@@ -195,6 +195,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         I = (ix + mbc)*xs + (iy + mbc)*ys;
 
         double wnorm2,dotr,dotl, wlimitr,r;
+        double wave[20];
         if (ix < mx + 1 && iy < my + 1)
         {
             for(mw = 0; mw < mwaves; mw++)
@@ -208,11 +209,11 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     I_waves = I + (mw*meqn + mq)*zs;
                     wave[mq] = waves[I_waves];
                     wnorm2 += pow(wave[mq],2);
-                    //dotl += wave[mq]*waves[I_waves-1];
-                    //dotr += wave[mq]*waves[I_waves+1];
+                    dotl += wave[mq]*waves[I_waves-1];
+                    dotr += wave[mq]*waves[I_waves+1];
                 }
                 I_speeds = I + mw*zs;
-                r = (s[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
+                r = (speeds[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
 
                 wlimitr = limiter(r);  /* allow for selection */
 
@@ -231,11 +232,11 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     I_waves = I + (mw*meqn + mq)*zs;
                     wave[mq] = waves[I_waves];
                     wnorm2 += pow(wave[mq],2);
-                    //dotl += wave[mq]*waves[I_waves-ys];
-                    //dotr += wave[mq]*waves[I_waves+ys];
+                    dotl += wave[mq]*waves[I_waves-ys];
+                    dotr += wave[mq]*waves[I_waves+ys];
                 }
                 I_speeds = I + (mwaves + mw)*zs;
-                r = (s[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
+                r = (speeds[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
 
                 wlimitr = limiter(r);  /* allow for selection */
 

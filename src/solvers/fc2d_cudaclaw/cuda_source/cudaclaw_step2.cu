@@ -134,7 +134,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                      cudaMemcpyHostToDevice));
 
 
-    dim3 block(128,1,1);
+    dim3 block(64,1,1);
     dim3 grid(1,1,batch_size);
 
     size_t bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
