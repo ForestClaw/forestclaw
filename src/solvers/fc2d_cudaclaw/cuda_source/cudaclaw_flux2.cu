@@ -206,7 +206,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 apdq[mq] = fp[I_q];
             }
 #endif            
-            double cqxx = 0;
+            double cqxx_x = 0;
+            double cqxx_y = 0;
             for(mw = 0; mw < mwaves; mw++)
             {
                 /* x-faces */
@@ -240,9 +241,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 for(mq = 0; mq < meqn; mq++)
                 {
                     I_q = I + mq*zs;
-                    cqxx += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wlimitr*wave[mq];
-                    fm[I_q] += 0.5*cqxx;   /* amdq + cqxx */
-                    fp[I_q] += 0.5*cqxx;   /* apdq - cqxx */
+                    cqxx_x += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wlimitr*wave[mq];
+                    fm[I_q] += 0.5*cqxx_x;   /* amdq + cqxx */
+                    fp[I_q] += 0.5*cqxx_x;   /* apdq - cqxx */
                 }
 
 
@@ -277,9 +278,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 for(mq = 0; mq < meqn; mq++)
                 {
                     I_q = I + mq*zs;
-                    cqxx += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdy)*wlimitr*wave[mq];
-                    gm[I_q] += 0.5*cqxx;   /* amdq + cqxx */
-                    gp[I_q] += 0.5*cqxx;   /* apdq - cqxx */
+                    cqxx_y += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdy)*wlimitr*wave[mq];
+                    gm[I_q] += 0.5*cqxx_y;   /* amdq + cqxx */
+                    gp[I_q] += 0.5*cqxx_y;   /* apdq - cqxx */
                 }
 
 
