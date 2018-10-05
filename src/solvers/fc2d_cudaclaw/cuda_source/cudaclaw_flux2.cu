@@ -185,7 +185,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     ifaces_x = mx + 1;
     ifaces_y = my + 1;
     num_ifaces = ifaces_x*ifaces_y;
- 
+
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
         int ix = thread_index % ifaces_x;
@@ -195,9 +195,18 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         I = (ix + mbc)*xs + (iy + mbc)*ys;
 
         double wnorm2,dotr,dotl, wlimitr,r;
-        double wave[20];
+        //double cqxx[MEQN];
         if (ix < mx + 1 && iy < my + 1)
         {
+#if 0            
+            for(mq=0; mq < meqn; mq++)
+            {
+                I_q = I + mq;
+                amdq[mq] = fm[I_q];
+                apdq[mq] = fp[I_q];
+            }
+#endif            
+            double cqxx = 0;
             for(mw = 0; mw < mwaves; mw++)
             {
                 /* x-faces */
@@ -213,15 +222,29 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     dotr += wave[mq]*waves[I_waves+1];
                 }
                 I_speeds = I + mw*zs;
-                r = (speeds[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
+                s[mw] = speeds[I_speeds];
+                wlimitr = 1;
+                if (wnorm2 != 0)
+                {
+                    r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
+                    wlimitr = limiter(r);  /* allow for selection */
+                }
 
-                wlimitr = limiter(r);  /* allow for selection */
-
+#if 0
                 for(mq = 0; mq < meqn; mq++)
                 {
                     I_waves = I + (mw*meqn + mq)*zs;
                     waves[I_waves] = wlimitr*wave[mq];                    
                 }
+#endif                
+                for(mq = 0; mq < meqn; mq++)
+                {
+                    I_q = I + mq;
+                    cqxx += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wlimitr*wave[mq];
+                    fm[I_q] += 0.5*cqxx;   /* amdq + cqxx */
+                    fp[I_q] += 0.5*cqxx;   /* apdq - cqxx */
+                }
+
 
                 /* y-faces */
                 wnorm2 = 0;
@@ -236,15 +259,30 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     dotr += wave[mq]*waves[I_waves+ys];
                 }
                 I_speeds = I + (mwaves + mw)*zs;
-                r = (speeds[I_speeds] > 0) ? dotl/wnorm2 : dotr/wnorm2;
+                s[mw] = speeds[I_speeds];
+                wlimitr = 1;
+                if (wnorm2 != 0)
+                {
+                    r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
+                    wlimitr = limiter(r);  /* allow for selection */
+                }
 
-                wlimitr = limiter(r);  /* allow for selection */
-
+#if 0
                 for(mq = 0; mq < meqn; mq++)
                 {
                     I_waves = I + ((mwaves+mw)*meqn + mq)*zs;
                     waves[I_waves] = wlimitr*wave[mq];                    
-                }                
+                }    
+#endif
+                for(mq = 0; mq < meqn; mq++)
+                {
+                    I_q = I + mq;
+                    cqxx += fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wlimitr*wave[mq];
+                    gm[I_q] += 0.5*cqxx;   /* amdq + cqxx */
+                    gp[I_q] += 0.5*cqxx;   /* apdq - cqxx */
+                }
+
+
             }
         }
     }
