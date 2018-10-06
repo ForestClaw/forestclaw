@@ -321,7 +321,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                                       patch_buffer_len,t,dt);
     }
     else if (iter == total-1)
-    {
+    {        
         maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,
                                       total%patch_buffer_len,t,dt);        
     }
