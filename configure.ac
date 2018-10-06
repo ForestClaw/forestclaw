@@ -90,10 +90,12 @@ AC_DEFINE_UNQUOTED(CPPFLAGS,    ["${CPPFLAGS}"],    [C preprocessor flags])
 AC_DEFINE_UNQUOTED(F77,         ["${F77}"],         [F77 compiler])
 AC_DEFINE_UNQUOTED(FFLAGS,      ["${FFLAGS}"],      [F77 compiler flags])
 AC_DEFINE_UNQUOTED(CC,          ["${CC}"],          [C compiler])
-AC_DEFINE_UNQUOTED(NVCC,        ["${NVCC}"],        [Nvidia C/C++ compiler])
 AC_DEFINE_UNQUOTED(CFLAGS,      ["${CFLAGS}"],      [C compiler flags])
 AC_DEFINE_UNQUOTED(CXX,         ["${CXX}"],         [C++ compiler])
 AC_DEFINE_UNQUOTED(CXXFLAGS,    ["${CXXFLAGS}"],    [C++ compiler flags])
+AC_DEFINE_UNQUOTED(NVCC,        ["${NVCC}"],        [Nvidia C/C++ compiler])
+AC_DEFINE_UNQUOTED(CUDA_CFLAGS, ["${CUDA_CFLAGS}"], [Nvidia C/C++ flags])
+AC_DEFINE_UNQUOTED(CUDA_LDFLAGS,["${CUDA_LDFLAGS}"],[Nvidia LD flags])
 AC_DEFINE_UNQUOTED(LDFLAGS,     ["${LDFLAGS}"],     [Linker flags])
 AC_DEFINE_UNQUOTED(LIBS,        ["${LIBS}"],        [Libraries])
 AC_DEFINE_UNQUOTED(FLIBS,       ["${FLIBS}"],       [Fortran libraries])
@@ -101,18 +103,20 @@ AC_DEFINE_UNQUOTED(FLIBS,       ["${FLIBS}"],       [Fortran libraries])
 echo "o----------------------------------"
 echo "| Results for ForestClaw are"
 echo "o----------------------------------"
-echo "| CPP:         $CPP"
-echo "| CPPFLAGS:    $CPPFLAGS"
-echo "| F77:         $F77"
-echo "| FFLAGS:      $FFLAGS"
-echo "| CC:          $CC"
-echo "| NVCC:        $NVCC"
-echo "| CFLAGS:      $CFLAGS"
-echo "| CXX:         $CXX"
-echo "| CXXFLAGS:    $CXXFLAGS"
-echo "| LDFLAGS:     $LDFLAGS"
-echo "| LIBS:        $LIBS"
-echo "| FLIBS:       $FLIBS"
+echo "| CPP:             $CPP"
+echo "| CPPFLAGS:        $CPPFLAGS"
+echo "| F77:             $F77"
+echo "| FFLAGS:          $FFLAGS"
+echo "| CC:              $CC"
+echo "| CFLAGS:          $CFLAGS"
+echo "| CXX:             $CXX"
+echo "| CXXFLAGS:        $CXXFLAGS"
+echo "| NVCC:            $NVCC"
+echo "| CUDA_CFLAGS:     $CUDA_CFLAGS"
+echo "| CUDA_LDFLAGS:    $CUDA_LDFLAGS"
+echo "| LDFLAGS:         $LDFLAGS"
+echo "| LIBS:            $LIBS"
+echo "| FLIBS:           $FLIBS"
 echo "o----------------------------------"
 
 # Create output files.
