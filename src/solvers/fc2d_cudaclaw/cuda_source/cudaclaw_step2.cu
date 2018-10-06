@@ -35,10 +35,10 @@ void cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
     size_t size = (2*mbc+mx)*(2*mbc+my);
     size_t bytes = batch_size*size*(meqn + maux)*sizeof(double);
 
-    CHECK(cudaMallocHost((void**)&s_membuffer,bytes));    
-    CHECK(cudaMalloc((void**)&s_membuffer_dev, bytes)); 
-
-    CHECK(cudaMalloc(&s_array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
+    CHECK(cudaMallocHost(&s_membuffer,bytes));    
+    CHECK(cudaMalloc(&s_membuffer_dev, bytes)); 
+    CHECK(cudaMalloc(            &s_array_fluxes_struct_dev, 
+                     batch_size*sizeof(cudaclaw_fluxes_t)));
 }
 
 void cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
@@ -54,10 +54,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         int batch_size, double t, double dt)
 {
     PROFILE_CUDA_GROUP("cudaclaw_step2_batch",5);
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-    //float milliseconds;
     int i;
 
     double maxcfl = 0.0;
@@ -85,47 +81,38 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[0]);
     size_t size = batch_size*(fluxes->num + fluxes->num_aux);
     size_t bytes = size*sizeof(double);
-    //double *membuffer;
-    //double* membuffer_dev;
 
     /* ---------------------------------- Merge Memory ---------------------------------*/ 
+    FCLAW_ASSERT(s_membuffer != NULL);
+    FCLAW_ASSERT(s_membuffer_dev != NULL);
+
     {
-        {
-            PROFILE_CUDA_GROUP("Malloc buffer on the host and device",2);    
-            FCLAW_ASSERT(s_membuffer != NULL);
-            FCLAW_ASSERT(s_membuffer_dev != NULL);
-            //CHECK(cudaMallocHost((void**)&membuffer,bytes));
-
-            //CHECK(cudaMalloc((void**)&membuffer_dev, bytes));            
-        }
-
-        PROFILE_CUDA_GROUP("cudaclaw_copy_loop",3);    
+        PROFILE_CUDA_GROUP("Copy q and aux to CPU memory buffer",3);    
         for(i = 0; i < batch_size; i++)   
         {
             cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);    
 
             int I_q = i*fluxes->num;
-            int I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
-
             memcpy(&s_membuffer[I_q]  ,fluxes->qold ,fluxes->num_bytes);
-            memcpy(&s_membuffer[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);
-
-            /* Assign gpu pointers */
             fluxes->qold_dev = &s_membuffer_dev[I_q];
-            fluxes->aux_dev  = &s_membuffer_dev[I_aux];
-        }        
 
-        {
-            PROFILE_CUDA_GROUP("Copy buffer to device",7);              
-            CHECK(cudaMemcpy(s_membuffer_dev, s_membuffer, bytes, cudaMemcpyHostToDevice));            
-        }
-    }        
+            if (fluxes->num_aux > 0)
+            {
+                int I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
+                memcpy(&s_membuffer[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);                
+                fluxes->aux_dev  = &s_membuffer_dev[I_aux];
+            }
+        }   
+    }     
+
+    {
+        PROFILE_CUDA_GROUP("Copy buffer to device",7);              
+        CHECK(cudaMemcpy(s_membuffer_dev, s_membuffer, bytes, cudaMemcpyHostToDevice));            
+    }            
 
 
     /* -------------------------------- Work with array --------------------------------*/ 
 
-    //cudaclaw_fluxes_t* array_fluxes_struct_dev = NULL;
-    //CHECK(cudaMalloc(&array_fluxes_struct_dev, batch_size*sizeof(cudaclaw_fluxes_t)));
 
     FCLAW_ASSERT(s_array_fluxes_struct_dev != NULL);
 
@@ -134,19 +121,27 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                      cudaMemcpyHostToDevice));
 
 
-    dim3 block(128,1,1);
+    /* Data needed to reduce CFL number */
+    double* maxcflblocks_dev;    
+    CHECK(cudaMalloc(&maxcflblocks_dev,batch_size*sizeof(double)));         
+    
+
+    /* Configure kernel */
+    int block_size = 128;
+    dim3 block(block_size,1,1);
     dim3 grid(1,1,batch_size);
 
-    size_t bytes_per_thread = sizeof(double)*(5*meqn+3*maux+mwaves+meqn*mwaves);
+    /* Determine shared memory size */
+    int mwork = 7*meqn+3*maux+mwaves+meqn*mwaves;
+    size_t bytes_per_thread = sizeof(double)*mwork;
+    bytes = bytes_per_thread*block_size;
     
-    double* maxcflblocks_dev;
-    CHECK(cudaMalloc(&maxcflblocks_dev,batch_size*sizeof(double))); 
-    cudaclaw_flux2_and_update_batch<<<grid,block,128*bytes_per_thread >>>(mx,my,meqn,
-                                                                     mbc,maux,mwaves,dt,t,
-                                                                     s_array_fluxes_struct_dev,
-								                                     maxcflblocks_dev,
-                                                                     cuclaw_vt->cuda_rpn2,
-                                                                     cuclaw_vt->cuda_b4step2);
+    cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
+                                                          mwork,dt,t,
+                                                          s_array_fluxes_struct_dev,
+                                                          maxcflblocks_dev,
+                                                          cuclaw_vt->cuda_rpn2,
+                                                          cuclaw_vt->cuda_b4step2);
     cudaDeviceSynchronize();
     CHECK(cudaPeekAtLastError());
 	
@@ -184,11 +179,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             memcpy(fluxes->qold,&s_membuffer[I_q],fluxes->num_bytes);
         }        
     }
-
-    /* ------------------------------ Clean up -----------------------------------------*/ 
-    //cudaFree(array_fluxes_struct_dev);
-    //cudaFree(membuffer_dev);
-    //cudaFreeHost(membuffer);
 
     return maxcfl;
 }

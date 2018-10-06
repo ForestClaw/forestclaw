@@ -52,7 +52,8 @@ __global__ void cudaclaw_compute_cfl(int idir, int mx, int my, int meqn, int mwa
 
 __global__ void
 cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
-                                int maux, int mwaves, double dt, double t, 
+                                int maux, int mwaves, int mwork, 
+                                double dt, double t, 
                                 cudaclaw_fluxes_t* array_fluxes_struct_dev,
 								                double * maxcflblocks_dev,
                                 cudaclaw_cuda_rpn2_t rpn2,
