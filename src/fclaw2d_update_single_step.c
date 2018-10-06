@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
 
-static fclaw2d_patch_iterator_t patch_iterator;
-
-
 static
 void cb_single_step_count(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -96,21 +93,20 @@ double fclaw2d_update_single_step(fclaw2d_global_t *glob,
     ss_data.buffer_data.total_count = 0;
     ss_data.buffer_data.iter = 0;
 
-#if (_OPENMP)
-    /* Multi-thread only in single processor case. */
-    patch_iterator = &fclaw2d_global_iterate_level_mthread;
-#else
-    patch_iterator = &fclaw2d_global_iterate_level;
-#endif
-
     /* Count number of grids to be updated in this call;  not sure how this
        works in OpenMP.  */
     int count = 0;
-    patch_iterator(glob, level, cb_single_step_count,&count);
+    fclaw2d_global_iterate_level(glob, level, cb_single_step_count,&count);
     ss_data.buffer_data.total_count = count;
 
     /* If there are not grids at this level, we return CFL = 0 */
-    patch_iterator(glob, level, cb_single_step,(void *) &ss_data);
+#if defined(_OPENMP)        
+    fclaw2d_global_iterate_level_mthread(glob, level, 
+                                         cb_single_step,(void *) &ss_data);
+#else
+    fclaw2d_global_iterate_level(glob, level, 
+                                 cb_single_step,(void *) &ss_data);
+#endif    
 
     return ss_data.maxcfl;
 }
