@@ -19,7 +19,6 @@ libcudaclaw_compiled_sources = \ src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.cpp \
 	src/solvers/fc2d_cudaclaw/fortran_source/cudaclaw_flux2fw.f \
 	src/solvers/fc2d_cudaclaw/fortran_source/cudaclaw_step2.f \
 	src/solvers/fc2d_cudaclaw/fortran_source/cudaclaw_step2_wrap.f \
-	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_update_q.cu \
 	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_step2.cu \
 	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_allocate.cu \
 	src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_flux2.cu \
