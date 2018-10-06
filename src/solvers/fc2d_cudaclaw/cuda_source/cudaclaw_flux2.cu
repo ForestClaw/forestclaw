@@ -194,9 +194,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             for(mw = 0; mw < mwaves; mw++)
             {
                 /* x-faces */
-                wnorm2 = 0;
-                dotr = 0;
-                dotl = 0;
+                wnorm2 = dotl = dotr = 0;
                 for(mq = 0; mq < meqn; mq++)
                 {
                     I_waves = I + (mw*meqn + mq)*zs;
@@ -224,9 +222,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
 
                 /* y-faces */
-                wnorm2 = 0;
-                dotr = 0;
-                dotl = 0;
+                wnorm2 = dotl = dotr = 0;
                 for(mq = 0; mq < meqn; mq++)
                 {
                     I_waves = I + ((mwaves+mw)*meqn + mq)*zs;
