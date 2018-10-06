@@ -6,7 +6,7 @@
 #include <fclaw2d_patch.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
-#include <fclaw_timer.h>
+//#include <fclaw_timer.h>
 
 #include <fc2d_cuda_profiler.h>
 
@@ -51,7 +51,6 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
 
     fluxes->xlower = xlower;
     fluxes->ylower = ylower;
-    /* Assumption here is that cudaMalloc is a synchronous call */
           
     CHECK(cudaMalloc((void**)&fluxes->qold_dev,   fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->fm_dev,     fluxes->num_bytes));
