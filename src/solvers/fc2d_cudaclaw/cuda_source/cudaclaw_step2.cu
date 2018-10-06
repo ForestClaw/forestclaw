@@ -1,6 +1,6 @@
 #include "../fc2d_cudaclaw.h"
+
 #include "cudaclaw_allocate.h"
-#include "cudaclaw_update_q.h"
 #include "cudaclaw_flux2.h"
 
 #include <fc2d_cudaclaw_options.h>
@@ -37,7 +37,7 @@ void cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
 
     CHECK(cudaMallocHost(&s_membuffer,bytes));    
     CHECK(cudaMalloc(&s_membuffer_dev, bytes)); 
-    CHECK(cudaMalloc(            &s_array_fluxes_struct_dev, 
+    CHECK(cudaMalloc(&s_array_fluxes_struct_dev, 
                      batch_size*sizeof(cudaclaw_fluxes_t)));
 }
 
