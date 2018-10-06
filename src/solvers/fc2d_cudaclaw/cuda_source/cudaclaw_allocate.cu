@@ -6,10 +6,8 @@
 #include <fclaw2d_patch.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
-//#include <fclaw_timer.h>
 
 #include <fc2d_cuda_profiler.h>
-
 
 #include "../fc2d_cudaclaw_check.cu"
 
