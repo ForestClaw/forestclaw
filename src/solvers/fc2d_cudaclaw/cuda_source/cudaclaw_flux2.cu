@@ -43,6 +43,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     int i,j; /* Used for (i,j) indexing in patches numbers */
     double dtdx, dtdy;
     double maxcfl, cfl;
+    double wnorm2,dotr,dotl, wlimitr,r;
     double cqxx;
     double cqyy;
 
@@ -180,7 +181,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
         I = (ix + mbc)*xs + (iy + mbc)*ys;
 
-        double wnorm2,dotr,dotl, wlimitr,r;
         if (ix < mx + 1 && iy < my + 1)
         {
             for(mq=0; mq < meqn; mq++)

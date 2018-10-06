@@ -180,11 +180,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         }        
     }
 
-    /* ------------------------------ Clean up -----------------------------------------*/ 
-    //cudaFree(array_fluxes_struct_dev);
-    //cudaFree(membuffer_dev);
-    //cudaFreeHost(membuffer);
-
     return maxcfl;
 }
 
