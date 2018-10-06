@@ -106,6 +106,21 @@ fclaw2d_timer_stop (fclaw2d_timer_t *timer)
     }
 }
 
+/* Don't put timers inside of any step update functions when using OPENMP */
+void fclaw2d_timer_start_mthread(fclaw2d_timer_t *timer)
+{
+#if !defined(_OPENMP)
+    fclaw2d_timer_start(timer);
+#endif    
+}
+
+void fclaw2d_timer_stop_mthread(fclaw2d_timer_t *timer)
+{
+#if !defined(_OPENMP)
+    fclaw2d_timer_stop(timer);
+#endif    
+}
+
 void
 fclaw2d_timer_report(fclaw2d_global_t *glob)
 {

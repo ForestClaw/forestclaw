@@ -130,6 +130,10 @@ void fclaw2d_timer_start (fclaw2d_timer_t *timer);
 
 void fclaw2d_timer_stop (fclaw2d_timer_t *timer);
 
+void fclaw2d_timer_start_mthread(fclaw2d_timer_t *timer);
+
+void fclaw2d_timer_stop_mthread(fclaw2d_timer_t *timer);
+
 /* Use keyword 'struct' to avoid circular dependencies */
 void fclaw2d_timer_report(struct fclaw2d_global* glob);
 

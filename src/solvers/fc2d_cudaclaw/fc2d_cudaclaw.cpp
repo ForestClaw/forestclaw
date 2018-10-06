@@ -287,6 +287,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     patch_buffer_len = FC2D_CUDACLAW_BUFFER_LEN;
     iter = buffer_data->iter;
     total = buffer_data->total_count; 
+    
 #if 0
     if (cudaclaw_vt->b4step2 != NULL)
     {
@@ -298,7 +299,8 @@ double cudaclaw_update(fclaw2d_global_t *glob,
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
     }
 #endif
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  
+
+    fclaw2d_timer_start_mthread (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  
     if (iter == 0)
     {
         /* Create array to store pointers to patch data */
@@ -331,7 +333,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
         FCLAW_FREE(buffer_data->user);
     }
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
+    fclaw2d_timer_stop_mthread (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     if (clawpack_options->src_term > 0 && cudaclaw_vt->src2 != NULL)
     {
