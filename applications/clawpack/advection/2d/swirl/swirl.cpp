@@ -40,7 +40,7 @@
 
 #include <fc2d_cuda_profiler.h>
 
-	static
+static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
 	/* Mapped, multi-block domain */
@@ -98,6 +98,7 @@ void run_program(fclaw2d_global_t* glob)
 	   --------------------------------------------------------------- */
 	if (user_opt->cuda == 1)
 	{
+		PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
 		cudaclaw_allocate_buffers(glob);
 	}
 
@@ -106,6 +107,7 @@ void run_program(fclaw2d_global_t* glob)
 
 	if (user_opt->cuda == 1)
 	{
+		PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
 		cudaclaw_deallocate_buffers(glob);
 	}
 
