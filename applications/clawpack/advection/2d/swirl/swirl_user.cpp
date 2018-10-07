@@ -32,6 +32,8 @@
 #include <fc2d_clawpack5.h>
 #include <fc2d_cudaclaw.h>
 
+#include <fc2d_cudaclaw_cuda.h>
+
 #include "../all/advection_user_fort.h"
 
 void swirl_link_solvers(fclaw2d_global_t *glob)
