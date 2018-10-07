@@ -1,14 +1,18 @@
 #include "../fc2d_cudaclaw.h"
 
-#include "cudaclaw_allocate.h"
-#include "cudaclaw_flux2.h"
+#include "../fc2d_cudaclaw_cuda.h"
 
-#include <fc2d_cudaclaw_options.h>
+
+#include "cudaclaw_allocate.h"  /* Needed for def of cudaclaw_fluxes_t */
+// #include "cudaclaw_flux2.h"
+
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_vtable.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
+#include <fc2d_cudaclaw_options.h>
 
 #include "../fc2d_cudaclaw_check.cu"  /* CHECK defined here */
 
@@ -19,6 +23,17 @@ static double* s_membuffer;
 static double* s_membuffer_dev;
 
 cudaclaw_fluxes_t* s_array_fluxes_struct_dev;
+
+/* Put header here so it doesn't have to go in *.h file */
+__global__
+void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
+                                int maux, int mwaves, int mwork,
+                                double dt, double t,
+                                struct cudaclaw_fluxes* array_fluxes_struct_dev,
+                                double * maxcflblocks_dev,
+                                cudaclaw_cuda_rpn2_t rpn2,
+                                cudaclaw_cuda_rpt2_t rpt2,
+                                cudaclaw_cuda_b4step2_t b4step2);
 
 
 void cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
@@ -156,6 +171,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                                               s_array_fluxes_struct_dev,
                                                               maxcflblocks_dev,
                                                               cuclaw_vt->cuda_rpn2,
+                                                              cuclaw_vt->cuda_rpt2,
                                                               cuclaw_vt->cuda_b4step2);
         cudaDeviceSynchronize();
         CHECK(cudaPeekAtLastError());
