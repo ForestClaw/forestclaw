@@ -67,6 +67,7 @@ void cudaclaw_qinit(fclaw2d_global_t *glob,
                       int this_block_idx,
                       int this_patch_idx)
 {
+    PROFILE_CUDA_GROUP("cudaclaw_qinit",1);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
 
     FCLAW_ASSERT(cudaclaw_vt->fort_qinit != NULL); /* Must be initialized */
