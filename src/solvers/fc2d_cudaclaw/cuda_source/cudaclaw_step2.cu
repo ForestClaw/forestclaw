@@ -77,9 +77,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     bytes = size*sizeof(double);
 
     /* ---------------------------------- Merge Memory ---------------------------------*/ 
-    //FCLAW_ASSERT(s_membuffer != NULL);
-    //FCLAW_ASSERT(s_membuffer_dev != NULL);
-
     membuffer_cpu = cudaclaw_get_cpu_membuffer();
     membuffer_dev = cudaclaw_get_gpu_membuffer();
     {
@@ -114,8 +111,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         PROFILE_CUDA_GROUP("Copy fluxes to device memory",3);    
 
         array_fluxes_struct_dev = cudaclaw_get_flux_buffer();
-
-        ///FCLAW_ASSERT(array_fluxes_struct_dev != NULL);
 
         CHECK(cudaMemcpy(array_fluxes_struct_dev, array_fluxes_struct, 
                          batch_size*sizeof(cudaclaw_fluxes_t), 
