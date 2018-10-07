@@ -13,6 +13,12 @@
 #include "../fc2d_cudaclaw_check.cu"
 
 
+/* Static buffers for transfering to the GPU */
+static double* s_membuffer;
+static double* s_membuffer_dev;
+static cudaclaw_fluxes_t* s_array_fluxes_struct_dev;
+
+
 void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *patch)
 {
@@ -89,4 +95,55 @@ void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
 
     FCLAW_FREE((void*) fluxes);
 }
+
+
+
+void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
+{
+    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
+    int maux = clawpatch_opt->maux;
+    int meqn = clawpatch_opt->meqn;  
+
+    int batch_size = FC2D_CUDACLAW_BUFFER_LEN;
+    size_t size = (2*mbc+mx)*(2*mbc+my);
+    size_t bytes = batch_size*size*(meqn + maux)*sizeof(double);
+
+    CHECK(cudaMallocHost(&s_membuffer,bytes));    
+    CHECK(cudaMalloc(&s_membuffer_dev, bytes)); 
+    CHECK(cudaMalloc(&s_array_fluxes_struct_dev, 
+                     batch_size*sizeof(cudaclaw_fluxes_t)));
+}
+
+void fc2d_cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
+{
+    cudaFreeHost(s_membuffer);
+    cudaFree(s_membuffer_dev);
+    cudaFree(s_array_fluxes_struct_dev);
+}
+
+double *cudaclaw_get_cpu_membuffer()
+{
+    FCLAW_ASSERT(s_membuffer != NULL);
+    return s_membuffer;
+}
+
+double *cudaclaw_get_gpu_membuffer()
+{
+    FCLAW_ASSERT(s_membuffer_dev != NULL);
+    return s_membuffer_dev;
+}
+
+cudaclaw_fluxes_t* cudaclaw_get_flux_buffer()
+{
+    FCLAW_ASSERT(s_array_fluxes_struct_dev != NULL);
+    return s_array_fluxes_struct_dev;
+}
+
+
+
+
+
 

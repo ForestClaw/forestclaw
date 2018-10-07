@@ -19,10 +19,6 @@
 #include <fc2d_cuda_profiler.h>
 #include <cub/cub.cuh>
 
-static double* s_membuffer;
-static double* s_membuffer_dev;
-
-cudaclaw_fluxes_t* s_array_fluxes_struct_dev;
 
 /* Put header here so it doesn't have to go in *.h file */
 __global__
@@ -35,32 +31,6 @@ void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc,
                                 cudaclaw_cuda_rpt2_t rpt2,
                                 cudaclaw_cuda_b4step2_t b4step2);
 
-
-void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
-{
-    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-    int mx = clawpatch_opt->mx;
-    int my = clawpatch_opt->my;
-    int mbc = clawpatch_opt->mbc;
-    int maux = clawpatch_opt->maux;
-    int meqn = clawpatch_opt->meqn;  
-
-    int batch_size = FC2D_CUDACLAW_BUFFER_LEN;
-    size_t size = (2*mbc+mx)*(2*mbc+my);
-    size_t bytes = batch_size*size*(meqn + maux)*sizeof(double);
-
-    CHECK(cudaMallocHost(&s_membuffer,bytes));    
-    CHECK(cudaMalloc(&s_membuffer_dev, bytes)); 
-    CHECK(cudaMalloc(&s_array_fluxes_struct_dev, 
-                     batch_size*sizeof(cudaclaw_fluxes_t)));
-}
-
-void fc2d_cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
-{
-    cudaFreeHost(s_membuffer);
-    cudaFree(s_membuffer_dev);
-    cudaFree(s_array_fluxes_struct_dev);
-}
 
 
 double cudaclaw_step2_batch(fclaw2d_global_t *glob,
@@ -75,8 +45,11 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     int mx,my,mbc,maux,meqn,mwaves;
     double maxcfl;
+    double* membuffer_cpu, *membuffer_dev;
 
     double* maxcflblocks_dev;    
+
+    cudaclaw_fluxes_t *array_fluxes_struct_dev;
 
 
     FCLAW_ASSERT(batch_size > 0);
@@ -104,9 +77,11 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     bytes = size*sizeof(double);
 
     /* ---------------------------------- Merge Memory ---------------------------------*/ 
-    FCLAW_ASSERT(s_membuffer != NULL);
-    FCLAW_ASSERT(s_membuffer_dev != NULL);
+    //FCLAW_ASSERT(s_membuffer != NULL);
+    //FCLAW_ASSERT(s_membuffer_dev != NULL);
 
+    membuffer_cpu = cudaclaw_get_cpu_membuffer();
+    membuffer_dev = cudaclaw_get_gpu_membuffer();
     {
         PROFILE_CUDA_GROUP("Copy data on patches to CPU memory buffer",5);    
         for(i = 0; i < batch_size; i++)   
@@ -114,21 +89,21 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);    
 
             I_q = i*fluxes->num;
-            memcpy(&s_membuffer[I_q]  ,fluxes->qold ,fluxes->num_bytes);
-            fluxes->qold_dev = &s_membuffer_dev[I_q];
+            memcpy(&membuffer_cpu[I_q]  ,fluxes->qold ,fluxes->num_bytes);
+            fluxes->qold_dev = &membuffer_dev[I_q];
 
             if (fluxes->num_aux > 0)
             {
                 I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
-                memcpy(&s_membuffer[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);                
-                fluxes->aux_dev  = &s_membuffer_dev[I_aux];
+                memcpy(&membuffer_cpu[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);                
+                fluxes->aux_dev  = &membuffer_dev[I_aux];
             }
         }   
     }     
 
     {
         PROFILE_CUDA_GROUP("Copy CPU buffer to device memory",3);              
-        CHECK(cudaMemcpy(s_membuffer_dev, s_membuffer, bytes, cudaMemcpyHostToDevice));            
+        CHECK(cudaMemcpy(membuffer_dev, membuffer_cpu, bytes, cudaMemcpyHostToDevice));            
     }            
 
 
@@ -138,9 +113,11 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     {
         PROFILE_CUDA_GROUP("Copy fluxes to device memory",3);    
 
-        FCLAW_ASSERT(s_array_fluxes_struct_dev != NULL);
+        array_fluxes_struct_dev = cudaclaw_get_flux_buffer();
 
-        CHECK(cudaMemcpy(s_array_fluxes_struct_dev, array_fluxes_struct, 
+        ///FCLAW_ASSERT(array_fluxes_struct_dev != NULL);
+
+        CHECK(cudaMemcpy(array_fluxes_struct_dev, array_fluxes_struct, 
                          batch_size*sizeof(cudaclaw_fluxes_t), 
                          cudaMemcpyHostToDevice));
     }        
@@ -168,7 +145,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork,dt,t,
-                                                              s_array_fluxes_struct_dev,
+                                                              array_fluxes_struct_dev,
                                                               maxcflblocks_dev,
                                                               cuclaw_vt->cuda_rpn2,
                                                               cuclaw_vt->cuda_rpt2,
@@ -199,7 +176,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     {
         PROFILE_CUDA_GROUP("Copy device memory buffer back to CPU",3);
 
-        CHECK(cudaMemcpy(s_membuffer, s_membuffer_dev, batch_size*fluxes->num_bytes, 
+        CHECK(cudaMemcpy(membuffer_cpu, membuffer_dev, batch_size*fluxes->num_bytes, 
                          cudaMemcpyDeviceToHost));
     }
 
@@ -211,7 +188,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
             int I_q = i*fluxes->num;
 
-            memcpy(fluxes->qold,&s_membuffer[I_q],fluxes->num_bytes);
+            memcpy(fluxes->qold,&membuffer_cpu[I_q],fluxes->num_bytes);
         }        
     }
 

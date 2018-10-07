@@ -87,6 +87,15 @@ void fc2d_cudaclaw_allocate_buffers(struct fclaw2d_global *glob);
 
 void fc2d_cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
 
+double *cudaclaw_get_cpu_membuffer();
+
+double *cudaclaw_get_gpu_membuffer();
+
+struct cudaclaw_fluxes* cudaclaw_get_flux_buffer();
+
+
+
+
 
 
 #ifdef __cplusplus
