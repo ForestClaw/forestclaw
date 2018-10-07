@@ -99,7 +99,7 @@ void run_program(fclaw2d_global_t* glob)
 	if (user_opt->cuda == 1)
 	{
 		PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
-		cudaclaw_allocate_buffers(glob);
+		fc2d_cudaclaw_allocate_buffers(glob);
 	}
 
 	fclaw2d_initialize(glob);
@@ -108,7 +108,7 @@ void run_program(fclaw2d_global_t* glob)
 	if (user_opt->cuda == 1)
 	{
 		PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
-		cudaclaw_deallocate_buffers(glob);
+		fc2d_cudaclaw_deallocate_buffers(glob);
 	}
 
 	fclaw2d_finalize(glob);

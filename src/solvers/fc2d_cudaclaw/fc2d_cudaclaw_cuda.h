@@ -66,9 +66,10 @@ typedef void (*cudaclaw_cuda_rpt2_t)(int idir, int meqn, int mwaves, int mbc,
 
 void cudaclaw_allocate_fluxes(struct fclaw2d_global *glob,
                               struct fclaw2d_patch *patch);
-
+    
 void cudaclaw_deallocate_fluxes(struct fclaw2d_global *glob,
                                 struct fclaw2d_patch *patch);
+
 
 double cudaclaw_step2_batch(struct fclaw2d_global* glob,
                             struct cudaclaw_fluxes* fluxes_array,
@@ -80,9 +81,11 @@ void fc2d_cudaclaw_store_buffer(struct fclaw2d_global* glob,
                                 int count, int iter, 
                                 struct cudaclaw_fluxes* flux_array);
 
-void cudaclaw_allocate_buffers(struct fclaw2d_global *glob);
+/* --------------------------- Function headers (used outside) -------------------------*/
 
-void cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
+void fc2d_cudaclaw_allocate_buffers(struct fclaw2d_global *glob);
+
+void fc2d_cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
 
 
 

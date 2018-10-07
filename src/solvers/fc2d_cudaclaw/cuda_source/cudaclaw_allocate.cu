@@ -14,23 +14,33 @@
 
 
 void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
-                               fclaw2d_patch_t *patch)
+                              fclaw2d_patch_t *patch)
 {
     PROFILE_CUDA_GROUP("Allocate patch data in memory device",4);       
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
+    double value;
+
+    cudaclaw_fluxes_t *fluxes = FCLAW_ALLOC(cudaclaw_fluxes,1);
 
     const fclaw2d_clawpatch_options_t *claw_opt = fclaw2d_clawpatch_get_options(glob);
     int meqn = claw_opt->meqn;
     int maux = claw_opt->maux;
 
+    /* Set values needed in batch node */
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
+    fluxes->dx = dx;
+    fluxes->dy = dy;
+
+    fluxes->xlower = xlower;
+    fluxes->ylower = ylower;
+          
+    /* Set global arrays on device */
     fc2d_cudaclaw_options_t* cuda_opt = fc2d_cudaclaw_get_options(glob);
     int mwaves = cuda_opt->mwaves;
 
-    cudaclaw_fluxes_t *fluxes = FCLAW_ALLOC(cudaclaw_fluxes,1);
 
     size_t size = (2*mbc+mx)*(2*mbc+my);
  
@@ -45,42 +55,31 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     fluxes->num_bytes_waves  = 2*mwaves*meqn*size*sizeof(double);
     fluxes->num_bytes_speeds = 2*mwaves*size*sizeof(double);
     
-    fluxes->dx = dx;
-    fluxes->dy = dy;
-
-    fluxes->xlower = xlower;
-    fluxes->ylower = ylower;
-          
-#if 0    
-    CHECK(cudaMalloc((void**)&fluxes->qold_dev,   fluxes->num_bytes));
-    CHECK(cudaMalloc((void**)&fluxes->aux_dev,    fluxes->num_bytes_aux));
-#endif    
-
     CHECK(cudaMalloc((void**)&fluxes->fm_dev,     fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->fp_dev,     fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->gm_dev,     fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->gp_dev,     fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->waves_dev,  fluxes->num_bytes_waves));
     CHECK(cudaMalloc((void**)&fluxes->speeds_dev, fluxes->num_bytes_speeds));
-    CHECK(cudaMemset((void*)fluxes->speeds_dev, 0, fluxes->num_bytes_speeds));
+
+    /* Set all values to 0 so max works, even if boundary edge values are not assigned 
+       speeds in kernel */
+    value = 0;
+    CHECK(cudaMemset((void*)fluxes->speeds_dev, value, fluxes->num_bytes_speeds));
 
     fclaw2d_patch_set_user_data(glob,patch,fluxes);
 }
 
 void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
-                                 fclaw2d_patch_t *patch)
+                                     fclaw2d_patch_t *patch)
 {
-    PROFILE_CUDA_GROUP("De-allocate patch data",4);       
+    PROFILE_CUDA_GROUP("De-allocate patch device memory",4);       
     cudaclaw_fluxes_t *fluxes = (cudaclaw_fluxes_t*) 
                fclaw2d_patch_get_user_data(glob,patch);
 
     FCLAW_ASSERT(fluxes != NULL);
 
     /* Assumption here is that cudaFree is a synchronous call */
-#if 0    
-    CHECK(cudaFree(fluxes->qold_dev));
-    CHECK(cudaFree(fluxes->aux_dev));
-#endif    
     CHECK(cudaFree(fluxes->fm_dev));
     CHECK(cudaFree(fluxes->fp_dev));
     CHECK(cudaFree(fluxes->gm_dev));

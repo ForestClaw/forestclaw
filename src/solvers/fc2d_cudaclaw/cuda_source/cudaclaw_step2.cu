@@ -36,7 +36,7 @@ void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc,
                                 cudaclaw_cuda_b4step2_t b4step2);
 
 
-void cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
 {
     fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     int mx = clawpatch_opt->mx;
@@ -55,7 +55,7 @@ void cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
                      batch_size*sizeof(cudaclaw_fluxes_t)));
 }
 
-void cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
 {
     cudaFreeHost(s_membuffer);
     cudaFree(s_membuffer_dev);
