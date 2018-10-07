@@ -2,14 +2,13 @@
 
 #include "../fc2d_cudaclaw_cuda.h"
 
-
 #include "cudaclaw_allocate.h"  /* Needed for def of cudaclaw_fluxes_t */
-// #include "cudaclaw_flux2.h"
 
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
+
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fc2d_cudaclaw_options.h>
@@ -45,18 +44,20 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     int mx,my,mbc,maux,meqn,mwaves;
     double maxcfl;
-    double* membuffer_cpu, *membuffer_dev;
 
     double* maxcflblocks_dev;    
 
+    double *membuffer_cpu, *membuffer_dev;
     cudaclaw_fluxes_t *array_fluxes_struct_dev;
 
-
-    FCLAW_ASSERT(batch_size > 0);
+    cudaclaw_fluxes_t* fluxes;
 
     /* To get patch-independent parameters */
     fc2d_cudaclaw_options_t *clawopt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
+
+    /* ---------------------------------- start code ---------------------------------- */
+    FCLAW_ASSERT(batch_size > 0);
 
     clawopt = fc2d_cudaclaw_get_options(glob);
     mwaves = clawopt->mwaves;
@@ -72,7 +73,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     maux = clawpatch_opt->maux;
     meqn = clawpatch_opt->meqn;  
 
-    cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[0]);
+    fluxes = &(array_fluxes_struct[0]);
     size = batch_size*(fluxes->num + fluxes->num_aux);
     bytes = size*sizeof(double);
 
@@ -83,7 +84,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         PROFILE_CUDA_GROUP("Copy data on patches to CPU memory buffer",5);    
         for(i = 0; i < batch_size; i++)   
         {
-            cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);    
+            fluxes = &(array_fluxes_struct[i]);    
 
             I_q = i*fluxes->num;
             memcpy(&membuffer_cpu[I_q]  ,fluxes->qold ,fluxes->num_bytes);
@@ -177,11 +178,10 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     {
         PROFILE_CUDA_GROUP("Copy CPU buffer back to patches",5);
-        for (int i = 0; i < batch_size; ++i)    
+        for (i = 0; i < batch_size; ++i)    
         {      
-
-            cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);
-            int I_q = i*fluxes->num;
+            fluxes = &(array_fluxes_struct[i]);
+            I_q = i*fluxes->num;
 
             memcpy(fluxes->qold,&membuffer_cpu[I_q],fluxes->num_bytes);
         }        
