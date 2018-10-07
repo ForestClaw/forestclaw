@@ -53,15 +53,16 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
           
 #if 0    
     CHECK(cudaMalloc((void**)&fluxes->qold_dev,   fluxes->num_bytes));
+    CHECK(cudaMalloc((void**)&fluxes->aux_dev,    fluxes->num_bytes_aux));
+#endif    
+
     CHECK(cudaMalloc((void**)&fluxes->fm_dev,     fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->fp_dev,     fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->gm_dev,     fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->gp_dev,     fluxes->num_bytes));
-    CHECK(cudaMalloc((void**)&fluxes->aux_dev,    fluxes->num_bytes_aux));
     CHECK(cudaMalloc((void**)&fluxes->waves_dev,  fluxes->num_bytes_waves));
     CHECK(cudaMalloc((void**)&fluxes->speeds_dev, fluxes->num_bytes_speeds));
     CHECK(cudaMemset((void*)fluxes->speeds_dev, 0, fluxes->num_bytes_speeds));
-#endif    
 
     fclaw2d_patch_set_user_data(glob,patch,fluxes);
 }
@@ -78,14 +79,14 @@ void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
     /* Assumption here is that cudaFree is a synchronous call */
 #if 0    
     CHECK(cudaFree(fluxes->qold_dev));
+    CHECK(cudaFree(fluxes->aux_dev));
+#endif    
     CHECK(cudaFree(fluxes->fm_dev));
     CHECK(cudaFree(fluxes->fp_dev));
     CHECK(cudaFree(fluxes->gm_dev));
     CHECK(cudaFree(fluxes->gp_dev));
-    CHECK(cudaFree(fluxes->aux_dev));
     CHECK(cudaFree(fluxes->waves_dev));
     CHECK(cudaFree(fluxes->speeds_dev));
-#endif    
 
     FCLAW_FREE((void*) fluxes);
 }
