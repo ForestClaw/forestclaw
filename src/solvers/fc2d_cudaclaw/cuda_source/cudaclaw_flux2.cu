@@ -270,7 +270,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 }
 
 
-
+/* ---------------------------------------------------------------------------------------
+   PUBLIC function  
+   ------------------------------------------------------------------------------------ */
 __global__
 void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
                                 int maux, int mwaves, int mwork,

@@ -348,23 +348,23 @@ double clawpack46_update(fclaw2d_global_t *glob,
 
     if (claw46_vt->b4step2 != NULL)
     {
-        fclaw2d_timer_start_mthread (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);               
+        fclaw2d_timer_start_threadsafe(&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);               
         claw46_vt->b4step2(glob,
                            this_patch,
                            this_block_idx,
                            this_patch_idx,t,dt);
 
-        fclaw2d_timer_stop_mthread (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);               
+        fclaw2d_timer_stop_threadsafe(&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);               
     }
 
-    fclaw2d_timer_start_mthread (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
+    fclaw2d_timer_start_threadsafe(&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     double maxcfl = clawpack46_step2(glob,
                                      this_patch,
                                      this_block_idx,
                                      this_patch_idx,t,dt);
 
-    fclaw2d_timer_stop_mthread (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
+    fclaw2d_timer_stop_threadsafe(&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     if (clawpack_options->src_term > 0 && claw46_vt->src2 != NULL)
     {

@@ -161,7 +161,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaFree(temp_storage_dev);
         cudaFree(cflgrid_dev);
     }
-    /* ------------------------------ Done with CFL ------------------------------------*/ 
 
     /* -------------------------- Copy q back to host ----------------------------------*/ 
     CHECK(cudaMemcpy(s_membuffer, s_membuffer_dev, batch_size*fluxes->num_bytes, 
