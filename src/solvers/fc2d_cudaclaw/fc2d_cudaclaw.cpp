@@ -24,27 +24,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fc2d_cudaclaw.h"
-#include "fc2d_cudaclaw_options.h"
 #include "fc2d_cudaclaw_fort.h"
+#include "fc2d_cudaclaw_options.h"
 
 #include <stdlib.h>  /* For size_t */
 
-#include <fclaw2d_update_single_step.h>  
 #include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
 #include <fclaw2d_vtable.h>
+#include <fclaw2d_update_single_step.h>  
 
+#include <fclaw2d_patch.h>
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
 
-#include <fclaw2d_clawpatch_diagnostics.h>
 #include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch_diagnostics.h>
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
 
-#include <fc2d_cuda_profiler.h>
+#include "fc2d_cuda_profiler.h"
 
+/* ------------------------------- Static virtual table ------------------------------- */
 static fc2d_cudaclaw_vtable_t s_cudaclaw_vt;
 
 /* --------------------- Clawpack solver functions (required) ------------------------- */
@@ -318,7 +319,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
         buffer_data->user = FCLAW_ALLOC(cudaclaw_fluxes_t,bytes);
     } 
 
-    /* Memcopy data to qold_dev, aux_dev;  store pointer to fluxes */
+    /* Buffer pointer to fluxes */
     fc2d_cudaclaw_store_buffer(glob,this_patch,this_patch_idx,total,
                               iter, (cudaclaw_fluxes_t*) buffer_data->user);
 

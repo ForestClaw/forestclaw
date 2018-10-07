@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FC2D_CUDACLAW_FORT_H
 #define FC2D_CUDACLAW_FORT_H
 
+#include <fclaw_base.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -33,6 +35,7 @@ extern "C"
 }
 #endif
 #endif
+
 
 /* --------------------------------- Clawpack functions ------------------------------- */
 
