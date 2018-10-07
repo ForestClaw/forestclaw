@@ -48,18 +48,20 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 		fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt();        
 
 		cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
-		// cudaclaw_vt->fort_b4step2   = &CUDACLAW_B4STEP2;
-		// cudaclaw_vt->fort_setaux    = &CLAWPACK46_SETAUX;
+		
+		cudaclaw_vt->fort_setaux = NULL;
 		patch_vt->setup = NULL;   /* Don't call setaux at all for this problem */
 		
 		//cudaclaw_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
-		//cudaclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
-
         swirl_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
         FCLAW_ASSERT(cudaclaw_vt->cuda_rpn2 != NULL);
 
+		// cudaclaw_vt->fort_b4step2   = &CUDACLAW_B4STEP2;
         swirl_assign_b4step2(&cudaclaw_vt->cuda_b4step2);
         FCLAW_ASSERT(cudaclaw_vt->cuda_b4step2 != NULL);
+
+		//cudaclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
+
 	}
 	else
 	{
