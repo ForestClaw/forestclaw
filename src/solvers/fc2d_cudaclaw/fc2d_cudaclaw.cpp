@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_cudaclaw_options.h"
 #include "fc2d_cudaclaw_fort.h"
 
-#include "cuda_source/cudaclaw_allocate.h"
+//#include "cuda_source/cudaclaw_allocate.h"
 
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_defs.h>
 
-#include "cuda_source/cudaclaw_allocate.h"
 #include <fc2d_cuda_profiler.h>
 
 static fc2d_cudaclaw_vtable_t s_cudaclaw_vt;

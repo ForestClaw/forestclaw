@@ -26,7 +26,6 @@
 #ifndef FC2D_CUDACLAW_H
 #define FC2D_CUDACLAW_H
 
-#include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
 #include "cuda_source/cudaclaw_allocate.h"
 
 #ifdef __cplusplus
@@ -37,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-#define FC2D_CUDACLAW_BUFFER_LEN 1000
+#define FC2D_CUDACLAW_BUFFER_LEN 4000
 
 struct fclaw2d_global;
 struct fclaw2d_patch;

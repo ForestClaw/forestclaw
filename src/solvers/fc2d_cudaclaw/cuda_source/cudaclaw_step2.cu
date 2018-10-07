@@ -12,7 +12,6 @@
 
 #include "../fc2d_cudaclaw_check.cu"  /* CHECK defined here */
 
-#include <cublas_v2.h>
 #include <fc2d_cuda_profiler.h>
 #include <cub/cub.cuh>
 

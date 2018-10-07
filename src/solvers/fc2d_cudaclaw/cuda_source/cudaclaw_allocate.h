@@ -6,6 +6,9 @@ extern "C"
 {
 #endif
 
+#include <stdlib.h>   /* defines size_t */
+
+
 struct fclaw2d_patch;
 struct fclaw2d_global;
 
@@ -14,14 +17,12 @@ struct fclaw2d_global;
    
 typedef struct  cudaclaw_fluxes
 {
- #if 1   
     size_t num;
     size_t num_aux;
     size_t num_waves;
     size_t num_speeds;
-#endif    
 
-    size_t num_bytes;   /* All members have the same size */
+    size_t num_bytes;   
     size_t num_bytes_aux;  
     size_t num_bytes_waves;  
     size_t num_bytes_speeds;  
@@ -47,10 +48,10 @@ typedef struct  cudaclaw_fluxes
 } cudaclaw_fluxes_t;
 
 void cudaclaw_allocate_fluxes(struct fclaw2d_global *glob,
-                               struct fclaw2d_patch *patch);
+                              struct fclaw2d_patch *patch);
 
 void cudaclaw_deallocate_fluxes(struct fclaw2d_global *glob,
-                                 struct fclaw2d_patch *patch);
+                                struct fclaw2d_patch *patch);
 
 
 #ifdef __cplusplus

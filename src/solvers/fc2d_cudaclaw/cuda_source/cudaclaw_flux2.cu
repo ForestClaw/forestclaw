@@ -209,7 +209,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 if (wnorm2 != 0)
                 {
                     r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
-                    //wlimitr = limiter(r);  /* allow for selection */
+                    wlimitr = limiter(r);  /* allow for selection */
                 }
 
                 for(mq = 0; mq < meqn; mq++)
@@ -237,7 +237,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 if (wnorm2 != 0)
                 {
                     r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
-                    //wlimitr = limiter(r);  /* allow for selection */
+                    wlimitr = limiter(r);  /* allow for selection */
                 }
 
                 for(mq = 0; mq < meqn; mq++)
