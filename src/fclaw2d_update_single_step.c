@@ -100,7 +100,6 @@ double fclaw2d_update_single_step(fclaw2d_global_t *glob,
     ss_data.buffer_data.total_count = count;
 
     /* If there are not grids at this level, we return CFL = 0 */
-#if 0
 #if defined(_OPENMP)        
     fclaw2d_global_iterate_level_mthread(glob, level, 
                                          cb_single_step,(void *) &ss_data);
@@ -108,10 +107,6 @@ double fclaw2d_update_single_step(fclaw2d_global_t *glob,
     fclaw2d_global_iterate_level(glob, level, 
                                  cb_single_step,(void *) &ss_data);
 #endif   
-#endif
-
-    fclaw2d_global_iterate_level(glob, level, 
-                                 cb_single_step,(void *) &ss_data);
  
 
     return ss_data.maxcfl;
