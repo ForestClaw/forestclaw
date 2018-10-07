@@ -235,6 +235,7 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
 
     if (cudaclaw_vt->fort_setaux == NULL)
     {
+        /* User did not set a fort function to assign aux arrays */
         return;
     }
 
@@ -405,7 +406,7 @@ void fc2d_cudaclaw_solver_initialize()
 
     /* These could be over-written by user specific settings */
     patch_vt->initialize                     = cudaclaw_qinit;
-    patch_vt->setup                          = cudaclaw_setaux;  
+    patch_vt->setup                          = cudaclaw_setaux; 
     patch_vt->physical_bc                    = cudaclaw_bc2;
     patch_vt->single_step_update             = cudaclaw_update;
 
