@@ -47,12 +47,6 @@ typedef struct  cudaclaw_fluxes
     double ylower;
 } cudaclaw_fluxes_t;
 
-void cudaclaw_allocate_fluxes(struct fclaw2d_global *glob,
-                              struct fclaw2d_patch *patch);
-
-void cudaclaw_deallocate_fluxes(struct fclaw2d_global *glob,
-                                struct fclaw2d_patch *patch);
-
 
 #ifdef __cplusplus
 }

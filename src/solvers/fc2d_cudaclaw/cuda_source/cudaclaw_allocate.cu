@@ -1,4 +1,5 @@
-#include "cudaclaw_allocate.h"
+#include "../fc2d_cudaclaw_cuda.h"
+#include "cudaclaw_allocate.h" /* Needed for definition of fluxes */
 
 #include <fc2d_cudaclaw_options.h>
 
@@ -15,7 +16,7 @@
 void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *patch)
 {
-    PROFILE_CUDA_GROUP("Allocate patch data",4);       
+    PROFILE_CUDA_GROUP("Allocate patch data in memory device",4);       
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 
@@ -50,6 +51,7 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     fluxes->xlower = xlower;
     fluxes->ylower = ylower;
           
+#if 0    
     CHECK(cudaMalloc((void**)&fluxes->qold_dev,   fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->fm_dev,     fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->fp_dev,     fluxes->num_bytes));
@@ -59,6 +61,7 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     CHECK(cudaMalloc((void**)&fluxes->waves_dev,  fluxes->num_bytes_waves));
     CHECK(cudaMalloc((void**)&fluxes->speeds_dev, fluxes->num_bytes_speeds));
     CHECK(cudaMemset((void*)fluxes->speeds_dev, 0, fluxes->num_bytes_speeds));
+#endif    
 
     fclaw2d_patch_set_user_data(glob,patch,fluxes);
 }
@@ -73,6 +76,7 @@ void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
     FCLAW_ASSERT(fluxes != NULL);
 
     /* Assumption here is that cudaFree is a synchronous call */
+#if 0    
     CHECK(cudaFree(fluxes->qold_dev));
     CHECK(cudaFree(fluxes->fm_dev));
     CHECK(cudaFree(fluxes->fp_dev));
@@ -81,6 +85,7 @@ void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
     CHECK(cudaFree(fluxes->aux_dev));
     CHECK(cudaFree(fluxes->waves_dev));
     CHECK(cudaFree(fluxes->speeds_dev));
+#endif    
 
     FCLAW_FREE((void*) fluxes);
 }

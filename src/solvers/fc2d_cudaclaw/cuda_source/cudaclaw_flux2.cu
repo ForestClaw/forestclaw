@@ -1,7 +1,37 @@
-#include "cudaclaw_flux2.h"
-#include "cudaclaw_allocate.h"
+/*
+  Copyright (c) 2018 Carsten Burstedde, Donna Calhoun, Melody Shih, Scott Aiton, 
+  Xinsheng Qin.
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
+
+#include "../fc2d_cudaclaw_cuda.h"
+
 #include <math.h>
 #include <cub/cub.cuh>   // or equivalently <cub/block/block_reduce.cuh>
+
+#include "cudaclaw_allocate.h"
 
 static
 __device__ double minmod(double r)
@@ -15,6 +45,7 @@ __device__ double limiter(double r)
     return minmod(r);
 }
 
+static
 __device__
 void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                 int maux, int mwaves, int mwork,
@@ -26,6 +57,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                 double* waves, double *speeds,
 								double * maxcflblocks_dev,
                                 cudaclaw_cuda_rpn2_t rpn2,
+                                cudaclaw_cuda_rpt2_t rpt2,
                                 cudaclaw_cuda_b4step2_t b4step2,
                                 double t,double dt)
 {
@@ -280,6 +312,7 @@ void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc,
                                 cudaclaw_fluxes_t* array_fluxes_struct_dev,
                                 double * maxcflblocks_dev,
                                 cudaclaw_cuda_rpn2_t rpn2,
+                                cudaclaw_cuda_rpt2_t rpt2,
                                 cudaclaw_cuda_b4step2_t b4step2)
 {
     // TODO: check this device function does not depend on blockIdx.z inside
@@ -296,37 +329,9 @@ void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc,
             array_fluxes_struct_dev[blockIdx.z].gp_dev,
             array_fluxes_struct_dev[blockIdx.z].waves_dev,
             array_fluxes_struct_dev[blockIdx.z].speeds_dev,
-            maxcflblocks_dev, rpn2, b4step2,
+            maxcflblocks_dev, rpn2, rpt2, b4step2,
             t,dt);
 }
 
 
-
-#if 0
-__device__ void cudaclaw_second_order(int idir, int mx, int my, int meqn, int mbc,
-                                       int maux, double* qold, double* aux, double dx,
-                                       double dy, double dt, double* cflgrid,
-                                       double* fm, double* fp, double* gm, double* gp,
-                                       double* waves, double *speeds,
-                                       cudaclaw_cuda_rpn2_t rpn2, void* rpt2,
-                                       int mwaves) 
-{    
-    int mq, mw, m;
-
-    /* TODO : Limit waves here */
-
-
-    /* TODO : Compute second order corrections */
-    double dtdx = dt/dx;
-    for(mq = 0; mq < meqn; mq++)
-    {
-        double cqxx = 0;
-        for(mw = 0; mw < mwaves; mw++)
-        {
-            m = mw*meqn + mq;
-            cqxx += fabs(speeds[mw])*(1.0 - fabs(speeds[mw])*dtdx)*waves[m];
-        }
-    }
-}
-#endif
 

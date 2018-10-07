@@ -26,7 +26,7 @@
 #ifndef FC2D_CUDACLAW_H
 #define FC2D_CUDACLAW_H
 
-#include "cuda_source/cudaclaw_allocate.h"
+#include "fc2d_cudaclaw_cuda.h"  /* Defines typedefs */
 
 #ifdef __cplusplus
 extern "C"
@@ -35,8 +35,6 @@ extern "C"
 }
 #endif
 #endif
-
-#define FC2D_CUDACLAW_BUFFER_LEN 4000
 
 struct fclaw2d_global;
 struct fclaw2d_patch;
@@ -97,13 +95,6 @@ typedef void (*cudaclaw_fort_b4step2_t)(const int* maxmx, const int* maxmy,
                                           const double* t, const double* dt,
                                           const int* maux, double aux[]);
 
-#if 1
-typedef void (*cudaclaw_cuda_b4step2_t)(int mbc, int mx, int my, int meqn, double q[],
-                                        double xlower, double ylower, double dx, double dy, 
-                                        double time, double dt, int maux, 
-                                        double aux[], int ipatch, int jpatch);
-#endif
-
 typedef void (*cudaclaw_fort_src2_t)(const int* maxmx, const int* maxmy, 
                                        const int* meqn,
                                        const int* mbc, const int* mx,const int* my,
@@ -118,13 +109,6 @@ typedef void (*cudaclaw_fort_rpn2_t)(const int* ixy,const int* maxm, const int* 
                                        double auxr[],
                                        double wave[], double s[],double amdq[], 
                                        double apdq[]);
-
-
-typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
-                                     double ql[], double qr[], 
-                                     double auxl[], double auxr[],
-                                     double wave[], double s[], 
-                                     double amdq[], double apdq[]);
 
 
 typedef void (*cudaclaw_fort_rpt2_t)(const int* ixy, const int* maxm, const int* meqn,
@@ -152,30 +136,6 @@ typedef void (*cudaclaw_fort_flux2_t)(const int* ixy,const int* maxm, const int*
 typedef void (*cudaclaw_fort_fluxfun_t)(const int* meqn, double q[], double aux[],
                                           double fq[]);
 
-/* ------------------------------ CUDA functions ------------------------------------ */
-
-double cudaclaw_step2(struct fclaw2d_global* glob,
-                      struct fclaw2d_patch* this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      double t,
-                      double dt);
-
-double cudaclaw_step2_batch(struct fclaw2d_global* glob,
-                            struct cudaclaw_fluxes* fluxes_array,
-                            int patch_buffer_len, double t, double dt);
-
-void fc2d_cudaclaw_store_buffer(struct fclaw2d_global* glob,
-                                struct fclaw2d_patch *this_patch,
-                                int this_atch_idx,
-                                int count, int iter, 
-                                struct cudaclaw_fluxes* flux_array);
-
-void cudaclaw_allocate_buffers(struct fclaw2d_global *glob);
-
-void cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
-
-
 /* --------------------------------- Virtual table ------------------------------------ */
 
 struct fc2d_cudaclaw_vtable
@@ -197,6 +157,7 @@ struct fc2d_cudaclaw_vtable
     cudaclaw_fort_rpt2_t      fort_rpt2;
 
     cudaclaw_cuda_rpn2_t      cuda_rpn2;
+    cudaclaw_cuda_rpt2_t      cuda_rpt2;
     cudaclaw_cuda_b4step2_t   cuda_b4step2;    
     int is_set;
 

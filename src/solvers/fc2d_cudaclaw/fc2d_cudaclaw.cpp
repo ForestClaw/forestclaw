@@ -1,5 +1,7 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2018 Carsten Burstedde, Donna Calhoun, Melody Shih, Scott Aiton,
+Xinsheng Qin.
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -42,6 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
+
+#include "fc2d_cudaclaw_cuda.h"  
+#include "cuda_source/cudaclaw_allocate.h"   /* Needed for def. of cudaclaw_fluxes_t */
 
 #include "fc2d_cuda_profiler.h"
 
