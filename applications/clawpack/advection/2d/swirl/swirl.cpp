@@ -38,6 +38,8 @@
 #include <fc2d_clawpack5.h>
 #include <fc2d_cudaclaw.h>
 
+#include <fc2d_cuda_profiler.h>
+
 	static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
@@ -113,6 +115,9 @@ void run_program(fclaw2d_global_t* glob)
 	int
 main (int argc, char **argv)
 {
+
+	PROFILE_CUDA_GROUP("Swirl : Main",1);
+
 	fclaw_app_t *app;
 	int first_arg;
 	fclaw_exit_type_t vexit;
