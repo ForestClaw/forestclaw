@@ -82,7 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Basic routines - operate on a single level
    ----------------------------------------------- */
 
-static fclaw2d_patch_iterator_t patch_iterator;
+//static fclaw2d_patch_iterator_t patch_iterator;
 
 typedef struct fclaw2d_ghost_fill_wrap_info
 {
@@ -159,11 +159,11 @@ void copy2ghost(fclaw2d_global_t *glob,
     parallel_mode.user = (void*) &e_info;
 
     parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(glob, level, cb_parallel_wrap,
+    fclaw2d_global_iterate_level(glob, level, cb_parallel_wrap,
                          (void *) &parallel_mode);
     /* corner exchanges */
     parallel_mode.cb_fill = cb_corner_fill;
-    patch_iterator(glob, level, cb_parallel_wrap,
+    fclaw2d_global_iterate_level(glob, level, cb_parallel_wrap,
                           (void *) &parallel_mode);
 }
 
@@ -190,12 +190,12 @@ void average2ghost(fclaw2d_global_t *glob,
     parallel_mode.ghost_mode = ghost_mode;
 
     parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(glob, coarse_level,
+    fclaw2d_global_iterate_level(glob, coarse_level,
                    cb_interface_wrap, (void *) &parallel_mode);
 
     /* Corner average */
     parallel_mode.cb_fill = cb_corner_fill;
-    patch_iterator(glob, coarse_level, cb_interface_wrap,
+    fclaw2d_global_iterate_level(glob, coarse_level, cb_interface_wrap,
                    (void *) &parallel_mode);
 
     if (read_parallel_patches)
@@ -251,12 +251,12 @@ void interpolate2ghost(fclaw2d_global_t *glob,
 
     /* Face interpolate */
     parallel_mode.cb_fill = cb_face_fill;
-    patch_iterator(glob,coarse_level, cb_interface_wrap,
+    fclaw2d_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                                          (void *) &parallel_mode);
 
     /* Corner interpolate */
     parallel_mode.cb_fill = cb_corner_fill;
-    patch_iterator(glob,coarse_level, cb_interface_wrap,
+    fclaw2d_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                   (void *) &parallel_mode);
     /* -----------------------------------------------------
        Second pass - Iterate over local fine grids, looking
@@ -487,17 +487,6 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
 
     int mincoarse = minlevel;
     int maxcoarse = maxlevel-1;   /* maxlevel >= minlevel */
-
-#if 0
-#if (_OPENMP)
-    /* Multi-thread only in single processor case. */
-    patch_iterator = &fclaw2d_global_iterate_level_mthread;
-#else
-    patch_iterator = &fclaw2d_global_iterate_level;
-#endif
-#endif
-
-    patch_iterator = &fclaw2d_global_iterate_level;
 
     /* --------------------------------------------------------------
        Do work we can do before sending
