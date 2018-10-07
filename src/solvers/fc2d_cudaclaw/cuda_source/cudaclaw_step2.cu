@@ -82,6 +82,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     membuffer_dev = cudaclaw_get_gpu_membuffer();
     {
         PROFILE_CUDA_GROUP("Copy data on patches to CPU memory buffer",5);    
+#if defined(_OPENMP)
+#pragma omp parallel for private(fluxes,i,I_q, I_aux)
         for(i = 0; i < batch_size; i++)   
         {
             fluxes = &(array_fluxes_struct[i]);    
@@ -96,7 +98,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                 memcpy(&membuffer_cpu[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);                
                 fluxes->aux_dev  = &membuffer_dev[I_aux];
             }
-        }   
+        }  
+#endif         
     }     
 
     {
