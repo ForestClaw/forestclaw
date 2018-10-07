@@ -52,7 +52,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
         int batch_size, double t, double dt)
 {
-    PROFILE_CUDA_GROUP("cudaclaw_step2_batch",5);
+    PROFILE_CUDA_GROUP("cudaclaw_step2_batch",1);
 
     size_t size, bytes, bytes_per_thread;
     int I_q, I_aux, mwork;
@@ -93,7 +93,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     FCLAW_ASSERT(s_membuffer_dev != NULL);
 
     {
-        PROFILE_CUDA_GROUP("Copy q and aux to CPU memory buffer",3);    
+        PROFILE_CUDA_GROUP("Copy data on patches to CPU memory buffer",5);    
         for(i = 0; i < batch_size; i++)   
         {
             cudaclaw_fluxes_t* fluxes = &(array_fluxes_struct[i]);    
@@ -112,7 +112,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     }     
 
     {
-        PROFILE_CUDA_GROUP("Copy CPU buffer to device memory",7);              
+        PROFILE_CUDA_GROUP("Copy CPU buffer to device memory",3);              
         CHECK(cudaMemcpy(s_membuffer_dev, s_membuffer, bytes, cudaMemcpyHostToDevice));            
     }            
 
@@ -121,7 +121,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
 
     {
-        PROFILE_CUDA_GROUP("Copy fluxes to device memory",1);    
+        PROFILE_CUDA_GROUP("Copy fluxes to device memory",3);    
 
         FCLAW_ASSERT(s_array_fluxes_struct_dev != NULL);
 
@@ -139,7 +139,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
 
     {
-        PROFILE_CUDA_GROUP("Configure and call main kernel",3);  
+        PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
 
         /* Configure kernel */
         int block_size = 128;
@@ -163,7 +163,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 	
     /* -------------------------------- Finish CFL ------------------------------------*/ 
     {
-        PROFILE_CUDA_GROUP("Finish CFL",1);
+        PROFILE_CUDA_GROUP("Finish CFL",2);
         void    *temp_storage_dev = NULL;
         size_t  temp_storage_bytes = 0;
         double  *cflgrid_dev;
@@ -181,7 +181,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     /* -------------------------- Copy q back to host ----------------------------------*/ 
     {
-        PROFILE_CUDA_GROUP("Copy device memory buffer back to CPU",4);
+        PROFILE_CUDA_GROUP("Copy device memory buffer back to CPU",3);
 
         CHECK(cudaMemcpy(s_membuffer, s_membuffer_dev, batch_size*fluxes->num_bytes, 
                          cudaMemcpyDeviceToHost));
