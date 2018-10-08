@@ -136,7 +136,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         dim3 grid(1,1,batch_size);
 
         /* Determine shared memory size */
-        mwork = 7*meqn +9*maux + mwaves + meqn*mwaves;
+        mwork = 9*meqn + 9*maux + mwaves + meqn*mwaves;
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
     

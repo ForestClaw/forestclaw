@@ -98,6 +98,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double* aux1 = bpdq+meqn;         //2*maux
     double* aux2 = aux1+2*maux;       //2*maux
     double* aux3 = aux2+2*maux;       //2*maux
+    double* bmasdq = aux3+2*maux;     //meqn
+    double* bpasdq = bmasdq+meqn;     //meqn
 
     ifaces_x = mx+2*mbc-1;
     ifaces_y = my+2*mbc-1;
@@ -307,38 +309,34 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
 
             /* idir = 0; imp = 0 */
-            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,amdq,bmdq,bpdq);
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,amdq,bmasdq,bpasdq);
 
-#if 1
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
-                gupdate = 0.5*dtdx*bmdq[mq];
+                gupdate = 0.5*dtdx*bmasdq[mq];
                 gm[I_q-1] -= gupdate;        /* Subtract 1 when imp=0 */
                 gp[I_q-1] -= gupdate;
 
-                gupdate = 0.5*dtdx*bpdq[mq];
+                gupdate = 0.5*dtdx*bpasdq[mq];
                 gm[I_q-1 + ys] -= gupdate;
                 gp[I_q-1 + ys] -= gupdate;
             }
-#endif            
 
             /* idir = 0; imp = 1 */
-            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmdq,bpdq);
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmasdq,bpasdq);
 
-#if 1
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
-                gupdate = 0.5*dtdx*bmdq[mq];
+                gupdate = 0.5*dtdx*bmasdq[mq];
                 gm[I_q] -= gupdate;        
                 gp[I_q] -= gupdate;
 
-                gupdate = 0.5*dtdx*bpdq[mq];
+                gupdate = 0.5*dtdx*bpasdq[mq];
                 gm[I_q + ys] -= gupdate;
                 gp[I_q + ys] -= gupdate;
             }
-#endif            
             
 
             /* ----------------------- Transverse : Y-faces --------------------------- */
@@ -356,38 +354,34 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
 
             /* idir = 1; imp = 0;  Re-use amdq, apdq */
-            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,amdq,apdq);
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,bmasdq,bpasdq);
 
-#if 1
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
-                gupdate = 0.5*dtdx*amdq[mq];
+                gupdate = 0.5*dtdx*bmasdq[mq];
                 fm[I_q-1] -= gupdate;        /* Subtract 1 when imp=0 */
                 fp[I_q-1] -= gupdate;
 
-                gupdate = 0.5*dtdx*apdq[mq];
+                gupdate = 0.5*dtdx*bpasdq[mq];
                 fm[I_q-1 + ys] -= gupdate;
                 fp[I_q-1 + ys] -= gupdate;
             }
-#endif            
 
             /* idir = 1; imp = 1;  Re-use amdp, apdq */
-            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,amdq,apdq);
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,bmasdq,bpasdq);
 
-#if 1
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
-                gupdate = 0.5*dtdy*amdq[mq];
+                gupdate = 0.5*dtdy*bmasdq[mq];
                 fm[I_q] -= gupdate;        
                 fp[I_q] -= gupdate;
 
-                gupdate = 0.5*dtdy*apdq[mq];
+                gupdate = 0.5*dtdy*bpasdq[mq];
                 fm[I_q + ys] -= gupdate;
                 fp[I_q + ys] -= gupdate;
             }   
-#endif                         
 
         } /* Thread conditional */
     } /* Thread loop */
