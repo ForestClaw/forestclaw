@@ -61,10 +61,11 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     fluxes->num_bytes_waves  = 2*mwaves*meqn*size*sizeof(double);
     fluxes->num_bytes_speeds = 2*mwaves*size*sizeof(double);
     
-    CHECK(cudaMalloc((void**)&fluxes->fm_dev,   fluxes->num_bytes));
-    CHECK(cudaMalloc((void**)&fluxes->fp_dev,   fluxes->num_bytes));
-    CHECK(cudaMalloc((void**)&fluxes->gm_dev,   fluxes->num_bytes));
-    CHECK(cudaMalloc((void**)&fluxes->gp_dev,   fluxes->num_bytes));
+    CHECK(cudaMalloc((void**)&fluxes->fm_dev,   sizeof(double)*fluxes->num));
+    CHECK(cudaMalloc((void**)&fluxes->fp_dev,   sizeof(double)*fluxes->num));
+    CHECK(cudaMalloc((void**)&fluxes->gm_dev,   sizeof(double)*fluxes->num));
+    CHECK(cudaMalloc((void**)&fluxes->gp_dev,   sizeof(double)*fluxes->num));
+
     CHECK(cudaMalloc((void**)&fluxes->amdq_dev, fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->apdq_dev, fluxes->num_bytes));
     CHECK(cudaMalloc((void**)&fluxes->bmdq_dev, fluxes->num_bytes));

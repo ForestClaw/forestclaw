@@ -131,7 +131,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
 
         /* Configure kernel */
-        int block_size = 1;
+        int block_size = 128;
         dim3 block(block_size,1,1);
         dim3 grid(1,1,batch_size);
 

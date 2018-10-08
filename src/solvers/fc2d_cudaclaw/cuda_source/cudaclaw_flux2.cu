@@ -33,6 +33,8 @@
 
 #include "cudaclaw_allocate.h"
 
+#include <sm_60_atomic_functions.h>
+
 static
 __device__ double minmod(double r)
 {
@@ -117,6 +119,50 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     maxcfl = 0;
 
+
+    if (b4step2 != NULL)
+    {
+        for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+        {
+            ix = thread_index % ifaces_x;
+            iy = thread_index/ifaces_y;
+
+            I = (iy + mbc-1)*ys + (ix + mbc-1)*xs;
+
+            if (ix < mx + 2*mbc-1 && iy < my + 2*mbc-1)
+            {
+                for(mq = 0; mq < meqn; mq++)
+                {
+                    I_q = I + mq*zs;
+                    qr[mq] = qold[I_q];  
+                }
+
+                for(m = 0; m < maux; m++)
+                {
+                    /* In case aux is already set */
+                    I_aux = I + m*zs;
+                    auxr[m] = aux[I_aux];
+                }                        
+                
+                i = ix-(mbc-2);  /* i,j for index in the grid */
+                j = iy-(mbc-2);
+                b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
+                        t,dt,maux,auxr,i,j);
+
+                for(m = 0; m < maux; m++)
+                {
+                    /* In case aux is set by b4step2 */
+                    I_aux = I + m*zs;
+                    aux[I_aux] = auxr[m];
+                }
+            } /* Thread conditional */
+        } /* Thread loop */
+
+        __syncthreads();
+
+    } /* b4step2 conditional */
+
+
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     {
         ix = thread_index % ifaces_x;
@@ -129,26 +175,19 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;
-                ql[mq] = qold[I_q - 1];
-                qr[mq] = qold[I_q];  
-                qd[mq] = qold[I_q - ys];          
+                ql[mq] = qold[I_q - 1];          /* Left  */
+                qr[mq] = qold[I_q];              /* Right */
+                qd[mq] = qold[I_q - ys];         /* Down  */  
             }
 
             for(m = 0; m < maux; m++)
             {
+                /* How is this getting set? */
                 I_aux = I + m*zs;
                 auxl[m] = aux[I_aux - 1];
                 auxr[m] = aux[I_aux];
                 auxd[m] = aux[I_aux - ys];
-            }
-            
-            if (b4step2 != NULL)
-            {
-                i = ix-(mbc-2);  /* i,j for index in the grid */
-                j = iy-(mbc-2);
-                b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
-                    t,dt,maux,auxr,i,j);//tperiod = 4.0                
-            }
+            }                        
 
             rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
@@ -185,11 +224,12 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             for (mq = 0; mq < meqn; mq++) 
             {
                 I_q = I + mq*zs;
-                gp[I_q] = -apdq[mq]; 
-                gm[I_q] = amdq[mq];
+                gm[I_q] = bmdq[mq];
+                gp[I_q] = -bpdq[mq]; 
                 bpdq_g[I_q] = bpdq[mq];
                 bmdq_g[I_q] = bmdq[mq];
             }
+
             for (m = 0; m < meqn*mwaves; m++)
             {
                 I_waves = I + (meqn*mwaves+m)*zs;
@@ -228,17 +268,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
         if (ix < mx + 1 && iy < my + 1)   /* Is this needed? */
         {
-#if 0            
-            for(mq = 0; mq < meqn; mq++)
-            {
-                I_q = I + mq*zs;
-                amdq[mq] = fm[I_q];
-                apdq[mq] = -fp[I_q];
-                bmdq[mq] = gm[I_q];
-                bpdq[mq] = -gp[I_q];
-            }
-#endif            
-
             /* Limit waves */
             for(mw = 0; mw < mwaves; mw++)
             {
@@ -282,6 +311,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     dotl += wave[mq]*waves[I_waves-ys];
                     dotr += wave[mq]*waves[I_waves+ys];
                 }
+
                 I_speeds = I + (mwaves + mw)*zs;
                 s[mw] = speeds[I_speeds];
                 wlimitr = 1;
@@ -307,8 +337,21 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     __syncthreads();
 
-    printf("here ...1\n");
 
+    /* ----------------------------- Transverse : X-faces ----------------------------- */
+    
+    /*     transverse-x
+
+            |     |     | 
+            |     |     | 
+        ----|-----|-----|-----
+            |     X     | 
+            |  v--X     |
+        ----|--O--|-----|-----
+            |     |     |
+            |     |     |
+
+    */              
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
@@ -317,11 +360,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
         I = (ix + mbc)*xs + (iy + mbc)*ys;
 
-        if (ix < mx + 1 && iy < my + 1)   /* Is this needed? */
+        /* Lower left face */
+        if (0 < ix && ix < mx + 1 && iy < my)   /* Is this needed? */
         {
-
-            /* ----------------------- Transverse : X-faces --------------------------- */
-
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;
@@ -348,34 +389,210 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             {
                 I_q = I + mq*zs;  
                 gupdate = 0.5*dtdx*bmasdq[mq];
-                gm[I_q - 1] -= gupdate;        /* Subtract 1 when imp=0 */
+                gm[I_q - 1] -= gupdate;       
                 gp[I_q - 1] -= gupdate;
+            }
+        } /* thread conditional */
+    } /* Thread loop */
 
+    __syncthreads();
+
+    /*   transverse-x  
+            |     |     | 
+            |     |     | 
+        ----|--O--|-----|----
+            |  ^__X     | 
+            |     X     |
+        ----|-----|-----|----
+            |     |     |
+            |     |     |
+
+    */              
+
+    for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+    { 
+        ix = thread_index % ifaces_x;
+        iy = thread_index/ifaces_y;
+
+        I = (ix + mbc)*xs + (iy + mbc)*ys;
+
+        if (0 < ix && ix < mx + 1 && iy < my)   /* Is this needed? */
+        {
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;
+                amdq[mq] = amdq_g[I_q];
+                apdq[mq] = apdq_g[I_q];
+            }            
+            
+            for(imp = 0; imp < 2; imp++)
+            {
+                for(m = 0; m < maux; m++)
+                {
+                    I_aux = I + m*zs;
+                    k = imp*maux + m;
+                    aux1[k] = aux[I_aux - ys + (imp - 1)];
+                    aux2[k] = aux[I_aux      + (imp - 1)];
+                    aux3[k] = aux[I_aux + ys + (imp - 1)];
+                }
+            }
+
+            /* idir = 0; imp = 0 */
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,amdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
                 gupdate = 0.5*dtdx*bpasdq[mq];
                 gm[I_q - 1 + ys] -= gupdate;
                 gp[I_q - 1 + ys] -= gupdate;
             }
-            __syncthreads();
+        } /* thread conditional */
+    } /* Thread loop */
 
-            /* idir = 0; imp = 1 */
+    __syncthreads();
+
+    /*  transverse-x
+            |     |     | 
+            |     |     | 
+        ----|-----|-----|----
+            |     X     | 
+            |     X--v  |
+        ----|-----|--O--|----
+            |     |     |
+            |     |     |
+
+    */              
+
+    for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+    { 
+        ix = thread_index % ifaces_x;
+        iy = thread_index/ifaces_y;
+
+        I = (ix + mbc)*xs + (iy + mbc)*ys;
+
+        if (ix < mx && iy < my)   
+        {
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;
+                amdq[mq] = amdq_g[I_q];
+                apdq[mq] = apdq_g[I_q];
+            }            
+            
+            for(imp = 0; imp < 2; imp++)
+            {
+                for(m = 0; m < maux; m++)
+                {
+                    I_aux = I + m*zs;
+                    k = imp*maux + m;
+                    aux1[k] = aux[I_aux - ys + (imp - 1)];
+                    aux2[k] = aux[I_aux      + (imp - 1)];
+                    aux3[k] = aux[I_aux + ys + (imp - 1)];
+                }
+            }
+
+            /* idir = 0; imp = 0 */
             rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmasdq,bpasdq);
-
 
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
                 gupdate = 0.5*dtdx*bmasdq[mq];
-                gm[I_q] -= gupdate;        
+                gm[I_q] -= gupdate;       
                 gp[I_q] -= gupdate;
+            }
+        } /* thread conditional */
+    } /* Thread loop */
 
+    __syncthreads();
+
+    /*  transverse-x 
+            |     |     | 
+            |     |     | 
+        ----|-----|--O--|----
+            |     X__^  | 
+            |     X     |
+        ----|-----|-----|----
+            |     |     |
+            |     |     |
+
+    */              
+
+    for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+    { 
+        ix = thread_index % ifaces_x;
+        iy = thread_index/ifaces_y;
+
+        I = (ix + mbc)*xs + (iy + mbc)*ys;
+
+        if (ix < mx && iy < my)   
+        {
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;
+                amdq[mq] = amdq_g[I_q];
+                apdq[mq] = apdq_g[I_q];
+            }            
+            
+            for(imp = 0; imp < 2; imp++)
+            {
+                for(m = 0; m < maux; m++)
+                {
+                    I_aux = I + m*zs;
+                    k = imp*maux + m;
+                    aux1[k] = aux[I_aux - ys + (imp - 1)];
+                    aux2[k] = aux[I_aux      + (imp - 1)];
+                    aux3[k] = aux[I_aux + ys + (imp - 1)];
+                }
+            }
+
+            /* idir = 0; imp = 0 */
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
                 gupdate = 0.5*dtdx*bpasdq[mq];
                 gm[I_q + ys] -= gupdate;
                 gp[I_q + ys] -= gupdate;
             }
-            __syncthreads();
-            
+        } /* thread conditional */
+    } /* Thread loop */
 
-            /* ----------------------- Transverse : Y-faces --------------------------- */
+    __syncthreads();
+
+    /* ----------------------------- Transverse : Y-faces ----------------------------- */
+
+
+    /*  transverse-y
+
+             |     |     
+             |     |     
+        -----|-----|-----
+             |     |     
+             |     |     
+             |     |     
+        -----|-XXX-|-----
+             |  v  |     
+             0--   |     
+             |     |     
+        -----|-----|-----
+             |     |     
+             |     |     
+    */              
+
+    for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+    { 
+        ix = thread_index % ifaces_x;
+        iy = thread_index/ifaces_y;
+
+        I = (ix + mbc)*xs + (iy + mbc)*ys;
+
+        if (ix < mx && 0 < iy && iy < my+1)   /* Is this needed? */
+        {
 
             for(mq = 0; mq < meqn; mq++)
             {
@@ -396,25 +613,128 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 }
             }
 
-            /* idir = 1; imp = 0;  Re-use amdq, apdq */
+            /* idir = 1; imp = 0 */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,bmasdq,bpasdq);
-
 
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
                 gupdate = 0.5*dtdy*bmasdq[mq];
-                fm[I_q - ys] -= gupdate;        /* Subtract 1 when imp=0 */
+                fm[I_q - ys] -= gupdate;        
                 fp[I_q - ys] -= gupdate;
+            }
+        } /* Thread conditional */
+    } /* Thread loop */
 
+    __syncthreads();
+
+    /*  transverse-y
+
+             |     |     
+             |     |     
+        -----|-----|-----
+             |     |     
+             |     |     
+             |     |     
+        -----|-XXX-|-----
+             |  v  |     
+             |   --O     
+             |     |     
+        -----|-----|-----
+             |     |     
+             |     |     
+    */              
+
+    for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+    { 
+        ix = thread_index % ifaces_x;
+        iy = thread_index/ifaces_y;
+
+        I = (ix + mbc)*xs + (iy + mbc)*ys;
+
+        if (ix < mx && 0 < iy && iy < my+1)   /* Is this needed? */
+        {
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;
+                bmdq[mq] = bmdq_g[I_q];
+                bpdq[mq] = bpdq_g[I_q];
+            }            
+
+            for(imp = 0; imp < 2; imp++)
+            {
+                for(m = 0; m < maux; m++)
+                {
+                    I_aux = I + m*zs;
+                    k = imp*maux + m;
+                    aux1[k] = aux[I_aux - 1 + ys*(imp - 1)];
+                    aux2[k] = aux[I_aux     + ys*(imp - 1)];
+                    aux3[k] = aux[I_aux + 1 + ys*(imp - 1)];
+                }
+            }
+
+            /* idir = 1; imp = 0 */
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
                 gupdate = 0.5*dtdy*bpasdq[mq];
                 fm[I_q - ys + 1] -= gupdate;
                 fp[I_q - ys + 1] -= gupdate;
             }
-            __syncthreads();
+        } /* Thread conditional */
+    } /* Thread loop */
+
+    __syncthreads();
 
 
-            /* idir = 1; imp = 1;  Re-use amdp, apdq */
+    /*  transverse-y
+
+             |     |     
+             |     |     
+        -----|-----|-----
+             |     |     
+             O---  |     
+             |  ^  |     
+        -----|-XXX-|-----
+             |     |     
+             |     |     
+             |     |     
+        -----|-----|-----
+             |     |     
+             |     |     
+    */ 
+
+    for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+    { 
+        ix = thread_index % ifaces_x;
+        iy = thread_index/ifaces_y;
+
+        I = (ix + mbc)*xs + (iy + mbc)*ys;
+
+        if (ix < mx && iy < my)   /* Is this needed? */
+        {
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;
+                bmdq[mq] = bmdq_g[I_q];
+                bpdq[mq] = bpdq_g[I_q];
+            }            
+
+            for(imp = 0; imp < 2; imp++)
+            {
+                for(m = 0; m < maux; m++)
+                {
+                    I_aux = I + m*zs;
+                    k = imp*maux + m;
+                    aux1[k] = aux[I_aux - 1 + ys*(imp - 1)];
+                    aux2[k] = aux[I_aux     + ys*(imp - 1)];
+                    aux3[k] = aux[I_aux + 1 + ys*(imp - 1)];
+                }
+            }
+
+            /* idir = 1; imp = 1 */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,bmasdq,bpasdq);
 
             for(mq = 0; mq < meqn; mq++)
@@ -423,13 +743,68 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 gupdate = 0.5*dtdy*bmasdq[mq];
                 fm[I_q] -= gupdate;        
                 fp[I_q] -= gupdate;
+            }   
+        } /* Thread conditional */
+    } /* Thread loop */
 
+    __syncthreads();
+
+    /*  transverse-y
+
+             |     |     
+             |     |     
+        -----|-----|-----
+             |     |     
+             |  ---O     
+             |  ^  |     
+        -----|-XXX-|-----
+             |     |     
+             |     |     
+             |     |     
+        -----|-----|-----
+             |     |     
+             |     |     
+    */              
+
+    for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+    { 
+        ix = thread_index % ifaces_x;
+        iy = thread_index/ifaces_y;
+
+        I = (ix + mbc)*xs + (iy + mbc)*ys;
+
+        if (ix < mx && iy < my)   /* Is this needed? */
+        {
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;
+                bmdq[mq] = bmdq_g[I_q];
+                bpdq[mq] = bpdq_g[I_q];
+            }            
+
+            for(imp = 0; imp < 2; imp++)
+            {
+                for(m = 0; m < maux; m++)
+                {
+                    I_aux = I + m*zs;
+                    k = imp*maux + m;
+                    aux1[k] = aux[I_aux - 1 + ys*(imp - 1)];
+                    aux2[k] = aux[I_aux     + ys*(imp - 1)];
+                    aux3[k] = aux[I_aux + 1 + ys*(imp - 1)];
+                }
+            }
+
+            /* idir = 1; imp = 1 */
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
                 gupdate = 0.5*dtdy*bpasdq[mq];
                 fm[I_q + 1] -= gupdate;
                 fp[I_q + 1] -= gupdate;
             }   
-            __syncthreads();
-
         } /* Thread conditional */
     } /* Thread loop */
 
