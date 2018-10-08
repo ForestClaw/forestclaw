@@ -37,6 +37,11 @@ typedef struct  cudaclaw_fluxes
     double *gp_dev;
     double *gm_dev;
 
+    double *apdq_dev;
+    double *amdq_dev;
+    double *bpdq_dev;
+    double *bmdq_dev;
+
     double *waves_dev;
     double *speeds_dev;
 

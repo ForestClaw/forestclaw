@@ -1,6 +1,5 @@
 #include "../swirl_user.h"
 
-#include <fc2d_cudaclaw.h>
 #include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
 
 
