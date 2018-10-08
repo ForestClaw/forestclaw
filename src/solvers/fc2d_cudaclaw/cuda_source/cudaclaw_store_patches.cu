@@ -7,11 +7,11 @@
 #include "cudaclaw_allocate.h"
 #include <fc2d_cuda_profiler.h>
 
-void fc2d_cudaclaw_store_buffer(fclaw2d_global_t* glob,
-                                fclaw2d_patch_t *this_patch,
-                                int this_patch_idx,
-                                int count, int iter, 
-                                cudaclaw_fluxes_t* flux_array)
+void cudaclaw_store_buffer(fclaw2d_global_t* glob,
+                           fclaw2d_patch_t *this_patch,
+                           int this_patch_idx,
+                           int count, int iter, 
+                           cudaclaw_fluxes_t* flux_array)
 {
     PROFILE_CUDA_GROUP("fc2d_cudaclaw_store_buffer",4);
     double *qold, *aux;
