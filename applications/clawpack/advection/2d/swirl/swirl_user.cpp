@@ -63,6 +63,8 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
         FCLAW_ASSERT(cudaclaw_vt->cuda_b4step2 != NULL);
 
 		//cudaclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
+        swirl_assign_rpt2(&cudaclaw_vt->cuda_rpt2);
+        FCLAW_ASSERT(cudaclaw_vt->cuda_rpt2 != NULL);
 
 	}
 	else

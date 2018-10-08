@@ -64,6 +64,7 @@ const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
 /* --------------------------------------- Cuda ----------------------------------------*/
 
 void swirl_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+void swirl_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 void swirl_assign_b4step2(cudaclaw_cuda_b4step2_t *b4step2);
 
 /* ------------------------------------ Fortran ----------------------------------------*/
