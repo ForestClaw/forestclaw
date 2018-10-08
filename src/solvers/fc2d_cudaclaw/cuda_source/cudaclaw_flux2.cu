@@ -324,7 +324,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 gm[I_q - 1 + ys] -= gupdate;
                 gp[I_q - 1 + ys] -= gupdate;
             }
-
             __syncthreads();
 
 
@@ -342,6 +341,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 gm[I_q + ys] -= gupdate;
                 gp[I_q + ys] -= gupdate;
             }
+            __syncthreads();
             
 
             /* ----------------------- Transverse : Y-faces --------------------------- */
@@ -373,8 +373,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 fm[I_q - ys + 1] -= gupdate;
                 fp[I_q - ys + 1] -= gupdate;
             }
-
             __syncthreads();
+
 
             /* idir = 1; imp = 1;  Re-use amdp, apdq */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,bmasdq,bpasdq);
@@ -390,7 +390,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 fm[I_q + 1] -= gupdate;
                 fp[I_q + 1] -= gupdate;
             }   
-            
             __syncthreads();
 
         } /* Thread conditional */
