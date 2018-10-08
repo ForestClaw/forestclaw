@@ -334,7 +334,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 gm[I_q] -= gupdate;        
                 gp[I_q] -= gupdate;
 
-                gu = 0.5*dtdx*bpdq[mq];
+                gupdate = 0.5*dtdx*bpdq[mq];
                 gm[I_q + ys] -= gupdate;
                 gp[I_q + ys] -= gupdate;
             }
