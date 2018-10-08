@@ -66,7 +66,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     __shared__ typename BlockReduce::TempStorage temp_storage;
 
-    int mq, mw, m;
+    int mq, mw, m, k;
     int xs, ys, zs;
     int I, I_q, I_aux, I_waves, I_speeds;
     int thread_index;
@@ -78,6 +78,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double wnorm2,dotr,dotl, wlimitr,r;
     double cqxx;
     double cqyy;
+    double gupdate;
+    int imp;
 
     extern __shared__ double shared_mem[];
     double* start = shared_mem + mwork*threadIdx.x;
@@ -93,6 +95,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double* apdq = amdq+meqn;         //meqn
     double* bmdq = apdq+meqn;         //meqn
     double* bpdq = bmdq+meqn;         //meqn
+    double* aux1 = bpdq+meqn;         //2*maux
+    double* aux2 = aux1+2*maux;       //2*maux
+    double* aux3 = aux2+2*maux;       //2*maux
 
     ifaces_x = mx+2*mbc-1;
     ifaces_y = my+2*mbc-1;
@@ -120,7 +125,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;
-                ql[mq] = qold[I_q - xs];
+                ql[mq] = qold[I_q - 1];
                 qr[mq] = qold[I_q];  
                 qd[mq] = qold[I_q - ys];          
             }
@@ -128,7 +133,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             for(m = 0; m < maux; m++)
             {
                 I_aux = I + m*zs;
-                auxl[m] = aux[I_aux - xs];
+                auxl[m] = aux[I_aux - 1];
                 auxr[m] = aux[I_aux];
                 auxd[m] = aux[I_aux - ys];
             }
@@ -217,15 +222,17 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         {
             for(mq=0; mq < meqn; mq++)
             {
-                I_q = I + mq;
+                I_q = I + mq*zs;
                 amdq[mq] = fm[I_q];
                 apdq[mq] = fp[I_q];
                 bmdq[mq] = gm[I_q];
                 bpdq[mq] = gp[I_q];
             }
+
+            /* Limit waves */
             for(mw = 0; mw < mwaves; mw++)
             {
-                /* x-faces */
+                /* X-faces */
                 wnorm2 = dotl = dotr = 0;
                 for(mq = 0; mq < meqn; mq++)
                 {
@@ -248,12 +255,13 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 {
                     I_q = I + mq*zs;
                     cqxx = fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wlimitr*wave[mq];
-                    fm[I_q] += 0.5*cqxx;   /* amdq + cqxx */
-                    fp[I_q] += 0.5*cqxx;   /* apdq - cqxx */
+                    fm[I_q] += 0.5*cqxx;   
+                    fp[I_q] += 0.5*cqxx;   
+                    amdq[mq] += cqxx;   /* Used for transverse waves */
+                    apdq[mq] -= cqxx;      
                 }
 
-
-                /* y-faces */
+                /* Y-faces */
                 wnorm2 = dotl = dotr = 0;
                 for(mq = 0; mq < meqn; mq++)
                 {
@@ -276,12 +284,113 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 {
                     I_q = I + mq*zs;
                     cqyy = fabs(s[mw])*(1.0 - fabs(s[mw])*dtdy)*wlimitr*wave[mq];
-                    gm[I_q] += 0.5*cqyy;   /* amdq + cqxx */
-                    gp[I_q] += 0.5*cqyy;   /* apdq - cqxx */
+                    gm[I_q] += 0.5*cqyy;   
+                    gp[I_q] += 0.5*cqyy;   
+                    bmdq[mq] += cqyy;     /* Used for transverse waves */
+                    bpdq[mq] -= cqyy;      
+                }                
+            }  /* End of mwaves loop */
+
+
+            /* ----------------------- Transverse : X-faces --------------------------- */
+
+            for(imp = 0; imp < 2; imp++)
+            {
+                for(m = 0; m < maux; m++)
+                {
+                    I_aux = I + m*zs;
+                    k = imp*maux + m;
+                    aux1[k] = aux[I_aux - ys + (imp - 1)];
+                    aux2[k] = aux[I_aux      + (imp - 1)];
+                    aux3[k] = aux[I_aux + ys + (imp - 1)];
                 }
             }
-        }
-    }
+
+            /* idir = 0; imp = 0 */
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,amdq,bmdq,bpdq);
+
+#if 0
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdx*bmdq[mq];
+                gm[I_q-1] -= gupdate;        /* Subtract 1 when imp=0 */
+                gp[I_q-1] -= gupdate;
+
+                gupdate = 0.5*dtdx*bpdq[mq];
+                gm[I_q-1 + ys] -= gupdate;
+                gp[I_q-1 + ys] -= gupdate;
+            }
+#endif            
+
+            /* idir = 0; imp = 1 */
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmdq,bpdq);
+
+#if 0
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdx*bmdq[mq];
+                gm[I_q] -= gupdate;        
+                gp[I_q] -= gupdate;
+
+                gu = 0.5*dtdx*bpdq[mq];
+                gm[I_q + ys] -= gupdate;
+                gp[I_q + ys] -= gupdate;
+            }
+#endif            
+            
+
+            /* ----------------------- Transverse : Y-faces --------------------------- */
+
+            for(imp = 0; imp < 2; imp++)
+            {
+                for(m = 0; m < maux; m++)
+                {
+                    I_aux = I + m*zs;
+                    k = imp*maux + m;
+                    aux1[k] = aux[I_aux - 1 + ys*(imp - 1)];
+                    aux2[k] = aux[I_aux     + ys*(imp - 1)];
+                    aux3[k] = aux[I_aux + 1 + ys*(imp - 1)];
+                }
+            }
+
+            /* idir = 1; imp = 0;  Re-use amdq, apdq */
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,amdq,apdq);
+
+#if 0
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdx*amdq[mq];
+                fm[I_q-1] -= gupdate;        /* Subtract 1 when imp=0 */
+                fp[I_q-1] -= gupdate;
+
+                gupdate = 0.5*dtdx*apdq[mq];
+                fm[I_q-1 + ys] -= gupdate;
+                fp[I_q-1 + ys] -= gupdate;
+            }
+#endif            
+
+            /* idir = 1; imp = 1;  Re-use amdp, apdq */
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,amdq,apdq);
+
+#if 0
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdy*amdq[mq];
+                fm[I_q] -= gupdate;        
+                fp[I_q] -= gupdate;
+
+                gupdate = 0.5*dtdy*apdq[mq];
+                fm[I_q + ys] -= gupdate;
+                fp[I_q + ys] -= gupdate;
+            }   
+#endif                         
+
+        } /* Thread conditional */
+    } /* Thread loop */
 
     __syncthreads();
 

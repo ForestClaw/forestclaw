@@ -327,8 +327,8 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     } 
 
     /* Buffer pointer to fluxes */
-    fc2d_cudaclaw_store_buffer(glob,this_patch,this_patch_idx,total,
-                              iter, (cudaclaw_fluxes_t*) buffer_data->user);
+    cudaclaw_store_buffer(glob,this_patch,this_patch_idx,total,
+                          iter, (cudaclaw_fluxes_t*) buffer_data->user);
 
     /* Update all patches in buffer if :
           (1) we have filled the buffer, or 
