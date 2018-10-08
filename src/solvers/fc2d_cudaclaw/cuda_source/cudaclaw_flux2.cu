@@ -294,6 +294,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }  /* End of mwaves loop */
 
 
+            __syncthreads();
+
             /* ----------------------- Transverse : X-faces --------------------------- */
 
             for(imp = 0; imp < 2; imp++)
