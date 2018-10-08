@@ -361,7 +361,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             /* idir = 1; imp = 0;  Re-use amdq, apdq */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,bmasdq,bpasdq);
 
-            __syncthreads();
 
             for(mq = 0; mq < meqn; mq++)
             {
@@ -375,10 +374,10 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 fp[I_q - ys + 1] -= gupdate;
             }
 
+            __syncthreads();
+
             /* idir = 1; imp = 1;  Re-use amdp, apdq */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,bmasdq,bpasdq);
-
-            __syncthreads();
 
             for(mq = 0; mq < meqn; mq++)
             {
