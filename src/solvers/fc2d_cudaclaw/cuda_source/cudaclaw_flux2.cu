@@ -304,7 +304,11 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         } /* End of thread conditional */
     } /* End of thread loop */
 
+
     __syncthreads();
+
+    printf("here ...1\n");
+
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
