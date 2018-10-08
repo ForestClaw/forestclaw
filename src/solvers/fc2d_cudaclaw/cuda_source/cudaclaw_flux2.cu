@@ -309,7 +309,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             /* idir = 0; imp = 0 */
             rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,amdq,bmdq,bpdq);
 
-#if 0
+#if 1
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
@@ -326,7 +326,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             /* idir = 0; imp = 1 */
             rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmdq,bpdq);
 
-#if 0
+#if 1
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
@@ -358,7 +358,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             /* idir = 1; imp = 0;  Re-use amdq, apdq */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,amdq,apdq);
 
-#if 0
+#if 1
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
@@ -375,7 +375,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             /* idir = 1; imp = 1;  Re-use amdp, apdq */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,amdq,apdq);
 
-#if 0
+#if 1
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
