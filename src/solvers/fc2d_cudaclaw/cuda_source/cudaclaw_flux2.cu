@@ -359,13 +359,13 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
-                gupdate = 0.5*dtdx*bmasdq[mq];
-                fm[I_q-1] -= gupdate;        /* Subtract 1 when imp=0 */
-                fp[I_q-1] -= gupdate;
+                gupdate = 0.5*dtdy*bmasdq[mq];
+                fm[I_q - ys] -= gupdate;        /* Subtract 1 when imp=0 */
+                fp[I_q - ys] -= gupdate;
 
-                gupdate = 0.5*dtdx*bpasdq[mq];
-                fm[I_q-1 + ys] -= gupdate;
-                fp[I_q-1 + ys] -= gupdate;
+                gupdate = 0.5*dtdy*bpasdq[mq];
+                fm[I_q - ys + 1] -= gupdate;
+                fp[I_q - ys + 1] -= gupdate;
             }
 
             /* idir = 1; imp = 1;  Re-use amdp, apdq */
@@ -379,8 +379,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 fp[I_q] -= gupdate;
 
                 gupdate = 0.5*dtdy*bpasdq[mq];
-                fm[I_q + ys] -= gupdate;
-                fp[I_q + ys] -= gupdate;
+                fm[I_q + 1] -= gupdate;
+                fp[I_q + 1] -= gupdate;
             }   
 
         } /* Thread conditional */
