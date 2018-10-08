@@ -56,7 +56,7 @@ typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
                                      double wave[], double s[], 
                                      double amdq[], double apdq[]);
 
-typedef void (*cudaclaw_cuda_rpt2_t)(int idir, int meqn, int mwaves, int mbc, 
+typedef void (*cudaclaw_cuda_rpt2_t)(int idir, int meqn, int mwaves, int maux,
                                      double ql[], double qr[], 
                                      double aux1[], double aux2[], double aux3[],
                                      int imp, double dsdq[],
@@ -81,17 +81,18 @@ void fc2d_cudaclaw_store_buffer(struct fclaw2d_global* glob,
                                 int count, int iter, 
                                 struct cudaclaw_fluxes* flux_array);
 
+double *cudaclaw_get_cpu_membuffer();
+
+double *cudaclaw_get_gpu_membuffer();
+
+struct cudaclaw_fluxes* cudaclaw_get_flux_buffer();
+
 /* --------------------------- Function headers (used outside) -------------------------*/
 
 void fc2d_cudaclaw_allocate_buffers(struct fclaw2d_global *glob);
 
 void fc2d_cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
 
-double *cudaclaw_get_cpu_membuffer();
-
-double *cudaclaw_get_gpu_membuffer();
-
-struct cudaclaw_fluxes* cudaclaw_get_flux_buffer();
 
 
 
