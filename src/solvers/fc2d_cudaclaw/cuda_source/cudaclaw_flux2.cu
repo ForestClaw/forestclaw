@@ -226,9 +226,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             {
                 I_q = I + mq*zs;
                 amdq[mq] = fm[I_q];
-                apdq[mq] = fp[I_q];
+                apdq[mq] = -fp[I_q];
                 bmdq[mq] = gm[I_q];
-                bpdq[mq] = gp[I_q];
+                bpdq[mq] = -gp[I_q];
             }
 
             /* Limit waves */
