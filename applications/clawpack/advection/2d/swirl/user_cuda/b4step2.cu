@@ -17,16 +17,16 @@ void swirl_setprob(double period_in)
 
 
 __device__ void swirl_b4step2_test(int mbc, int mx, int my, int meqn, double q[],
-                              double xlower, double ylower, double dx, double dy, 
-                              double time, double dt, int maux, 
-                              double aux[], int ipatch, int jpatch)
+                                   double xlower, double ylower, double dx, double dy, 
+                                   double time, double dt, int maux, 
+                                   double aux[], int i, int j)
 {
     double vt;
     double xll, yll;
-    double p1,p2,p3;
+    double p1,p2,p3;    
 
-    xll = xlower + (ipatch-1)*dx;
-    yll = ylower + (jpatch-1)*dy;
+    xll = xlower + (i-1)*dx;
+    yll = ylower + (j-1)*dy;
     vt = cos(2*M_PI*(time+dt/2.0)/s_tperiod);
 
     p1 = psi(xll,yll+dy);
@@ -36,8 +36,8 @@ __device__ void swirl_b4step2_test(int mbc, int mx, int my, int meqn, double q[]
     aux[0] = (p1-p2) / dy;
     aux[1] = - (p3-p2) / dx;
 
-    aux[0] = vt * aux[0];
-    aux[1] = vt * aux[1];
+    aux[0] *= vt;
+    aux[1] *= vt;
 }
 
 __device__ cudaclaw_cuda_b4step2_t swirl_b4step2 = swirl_b4step2_test;
