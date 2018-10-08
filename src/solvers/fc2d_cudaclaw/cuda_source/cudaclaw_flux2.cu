@@ -220,9 +220,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
         I = (ix + mbc)*xs + (iy + mbc)*ys;
 
-        if (ix < mx + 1 && iy < my + 1)
+        if (ix < mx + 1 && iy < my + 1)   /* Is this needed? */
         {
-            for(mq=0; mq < meqn; mq++)
+            for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;
                 amdq[mq] = fm[I_q];
@@ -325,6 +325,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 gp[I_q - 1 + ys] -= gupdate;
             }
 
+            __syncthreads();
+
+
             /* idir = 0; imp = 1 */
             rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmasdq,bpasdq);
 
@@ -358,6 +361,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             /* idir = 1; imp = 0;  Re-use amdq, apdq */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,bmasdq,bpasdq);
 
+            __syncthreads();
+
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;  
@@ -372,6 +377,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
             /* idir = 1; imp = 1;  Re-use amdp, apdq */
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,bmasdq,bpasdq);
+
+            __syncthreads();
 
             for(mq = 0; mq < meqn; mq++)
             {
