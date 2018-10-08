@@ -390,6 +390,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 fm[I_q + 1] -= gupdate;
                 fp[I_q + 1] -= gupdate;
             }   
+            
+            __syncthreads();
 
         } /* Thread conditional */
     } /* Thread loop */
