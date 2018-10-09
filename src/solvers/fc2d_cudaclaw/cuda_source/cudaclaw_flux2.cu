@@ -28,29 +28,12 @@
 
 #include "../fc2d_cudaclaw_cuda.h"
 
-#include <math.h>
-#include <cub/cub.cuh>   // or equivalently <cub/block/block_reduce.cuh>
+#include <cub/block/block_reduce.cuh>  
 
-#include "cudaclaw_allocate.h"
+#include "cudaclaw_allocate.h"  /* Needed to for definition of 'fluxes' */
 
-static
-__device__ double minmod(double r)
-{
-    return max(0.0,min(1.0,r));
-}
-
-static
-__device__ double limiter(int lim_choice, double r)
-{
-    switch(lim_choice)
-    {
-        case 1:
-            return minmod(r);
-
-        default:
-            return 1;  /* No limiting */
-    }
-}
+/* Include this here so we don't include device code in fc2d_cudaclaw_cuda.h */
+__device__ double cudaclaw_limiter(int lim_choice, double r);
 
 static
 __device__
@@ -72,24 +55,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                double t,double dt)
 {
     /* Does this 128 have to match the 128 grid size used to launch this kernel? */
-    typedef cub::BlockReduce<double,128> BlockReduce;
+    typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
 
     __shared__ typename BlockReduce::TempStorage temp_storage;
-
-    int mq, mw, m, k;
-    int xs, ys, zs;
-    int I, I_q, I_aux, I_waves, I_speeds;
-    int thread_index;
-    int ix,iy,ifaces_x, ifaces_y, num_ifaces;
-
-    int i,j; /* Used for (i,j) indexing in patches numbers */
-    double dtdx, dtdy;
-    double maxcfl, cfl;
-    double wnorm2,dotr,dotl, wlimitr,r;
-    double cqxx;
-    double cqyy;
-    double gupdate;
-    int imp;
 
     extern __shared__ double shared_mem[];
     double* start = shared_mem + mwork*threadIdx.x;
@@ -110,6 +78,23 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double* aux3 = aux2+2*maux;       //2*maux
     double* bmasdq = aux3+2*maux;     //meqn
     double* bpasdq = bmasdq+meqn;     //meqn
+
+    int mq, mw, m, k;
+    int xs, ys, zs;
+    int I, I_q, I_aux, I_waves, I_speeds;
+    int thread_index;
+    int ix,iy,ifaces_x, ifaces_y, num_ifaces;
+
+    int i,j; /* Used for (i,j) indexing in patches  */
+    double dtdx, dtdy;
+    double maxcfl, cfl;
+    double wnorm2,dotr,dotl, wlimitr,r;
+    double cqxx;
+    double cqyy;
+    double gupdate;
+    int imp;
+
+    /* --------------------------------- Start code ----------------------------------- */
 
     ifaces_x = mx+2*mbc-1;
     ifaces_y = my+2*mbc-1;
@@ -180,9 +165,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;
-                ql[mq] = qold[I_q - 1];          /* Left  */
-                qr[mq] = qold[I_q];              /* Right */
-                qd[mq] = qold[I_q - ys];         /* Down  */  
+                ql[mq] = qold[I_q - 1];    /* Left  */
+                qr[mq] = qold[I_q];        /* Right */
+                qd[mq] = qold[I_q - ys];   /* Down  */  
             }
 
             for(m = 0; m < maux; m++)
@@ -316,7 +301,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         if (wnorm2 != 0)
                         {
                             r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
-                            wlimitr = limiter(mthlim[mw],r);  
+                            wlimitr = cudaclaw_limiter(mthlim[mw],r);  
                         }
                         for (mq = 0; mq < meqn; mq++)
                         {
@@ -364,7 +349,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         if (wnorm2 != 0)
                         {
                             r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
-                            wlimitr = limiter(mthlim[mw],r);  
+                            wlimitr = cudaclaw_limiter(mthlim[mw],r);  
                         }
                         for (mq = 0; mq < meqn; mq++)
                         {

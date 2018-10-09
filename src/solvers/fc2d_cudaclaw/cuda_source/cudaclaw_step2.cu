@@ -66,7 +66,10 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     fc2d_cudaclaw_vtable_t*  cuclaw_vt = fc2d_cudaclaw_vt();
     FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
-
+    if (clawopt->order[1] > 0)
+    {
+        FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);        
+    }
 
     clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     mx = clawpatch_opt->mx;
@@ -110,7 +113,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     /* -------------------------------- Work with array --------------------------------*/ 
 
-
     {
         PROFILE_CUDA_GROUP("Copy fluxes to device memory",3);    
 
@@ -133,7 +135,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
 
         /* Configure kernel */
-        int block_size = 128;
+        int block_size = FC2D_CUDACLAW_BLOCK_SIZE;
         dim3 block(block_size,1,1);
         dim3 grid(1,1,batch_size);
 
@@ -145,8 +147,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_get_method_parameters(&order_dev,&mthlim_dev);
 
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
-                                                              mwork,
-                                                              dt,t,
+                                                              mwork, dt,t,
                                                               order_dev, mthlim_dev,
                                                               array_fluxes_struct_dev,
                                                               maxcflblocks_dev,

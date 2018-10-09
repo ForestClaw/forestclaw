@@ -34,7 +34,9 @@ extern "C"
 #endif
 #endif
 
-#define FC2D_CUDACLAW_BUFFER_LEN 4000
+#define FC2D_CUDACLAW_BUFFER_LEN 4000    /* Number of patches that kernel should handle */ 
+
+#define FC2D_CUDACLAW_BLOCK_SIZE 128     /* linear block */    
 
 
 struct fclaw2d_global;
@@ -89,12 +91,16 @@ struct cudaclaw_fluxes* cudaclaw_get_flux_buffer();
 
 /* --------------------------- Function headers (used outside) -------------------------*/
 
-void fc2d_cudaclaw_allocate_buffers(struct fclaw2d_global *glob);
+void fc2d_cudaclaw_allocate_buffers(struct fclaw2d_global *glob);  /* Done once */
 
 void fc2d_cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
 
+void fc2d_cudaclaw_initialize_GPUs(struct fclaw2d_global *glob);
+
 
 void cudaclaw_get_method_parameters(int** order, int** mthlim);
+
+
 
 
 

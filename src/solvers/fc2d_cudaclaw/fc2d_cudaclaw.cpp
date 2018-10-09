@@ -421,8 +421,8 @@ void fc2d_cudaclaw_solver_initialize()
     patch_vt->destroy_user_data = cudaclaw_deallocate_fluxes;
 
     /* Wrappers so that user can change argument list */
-    cudaclaw_vt->b4step2                       = cudaclaw_b4step2;
-    cudaclaw_vt->src2                          = cudaclaw_src2;
+    cudaclaw_vt->b4step2        = cudaclaw_b4step2;
+    cudaclaw_vt->src2           = cudaclaw_src2;
 
     /* Required functions  - error if NULL */
     cudaclaw_vt->fort_bc2       = CUDACLAW_BC2_DEFAULT;
