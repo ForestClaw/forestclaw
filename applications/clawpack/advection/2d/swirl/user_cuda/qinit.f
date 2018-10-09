@@ -15,6 +15,8 @@
              xc = xlower + (i-0.5d0)*dx
              do j = 1-mbc,my+mbc
                 yc = ylower + (j-0.5d0)*dy
+c                if (abs(xc-0.5) .lt. 0.25d0 .and. 
+c     &              abs(yc-0.5) .lt. 0.25d0) then
                 if (xc .lt. 0.5d0) then
                    q(i,j,mq) = 1.d0
                 else
