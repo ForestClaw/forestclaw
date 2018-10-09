@@ -179,6 +179,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 auxd[m] = aux[I_aux - ys];
             }                        
 
+            /* ------------------------ Normal solve in X direction ------------------- */
             rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
             for (mq = 0; mq < meqn; mq++) 
@@ -186,26 +187,23 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 I_q = I + mq*zs;
                 fp[I_q] = -apdq[mq]; 
                 fm[I_q] = amdq[mq];
-                if (order[0] > 0)
-                {
-                    apdq_trans[I_q] = apdq[mq];  
-                    amdq_trans[I_q] = amdq[mq];                    
-                }
+                apdq_trans[I_q] = apdq[mq];  
+                amdq_trans[I_q] = amdq[mq];                    
             }
 
-            if (order[0] == 2)
+            for(mw = 0; mw < mwaves; mw++)
             {
-                for (m = 0; m < meqn*mwaves; m++)
+                I_speeds = I + mw*zs;
+                speeds[I_speeds] = s[mw];
+                for(mq = 0; mq < meqn; mq++)
                 {
-                    I_waves = I + m*zs;
-                    waves[I_waves] = wave[m];
-                }                
+                    I_waves = I + (mw*meqn + mq)*zs;
+                    waves[I_waves] = wave[mw*meqn + mq];
+                }
             }
 
             for (mw = 0; mw < mwaves; mw++)
             {
-                I_speeds = I + mw*zs;
-                speeds[I_speeds] = s[mw];
                 cfl = abs(s[mw]*dtdx);
                 if (cfl > maxcfl)
                 {
@@ -213,6 +211,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 }
             } 
 
+            /* ------------------------ Normal solve in Y direction ------------------- */
             rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, bmdq, bpdq);
 
             /* Set value at bottom interface of cell I */
@@ -221,27 +220,23 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 I_q = I + mq*zs;
                 gm[I_q] = bmdq[mq];
                 gp[I_q] = -bpdq[mq]; 
-                if (order[1] > 0)
-                {
-                    bpdq_trans[I_q] = bpdq[mq];
-                    bmdq_trans[I_q] = bmdq[mq];                                        
-                }
+                bpdq_trans[I_q] = bpdq[mq];
+                bmdq_trans[I_q] = bmdq[mq];                                        
             }
 
-            if (order[0] == 2)
+            for(mw = 0; mw < mwaves; mw++)
             {
-                /* Waves are only needed for second order corrections */
-                for (m = 0; m < meqn*mwaves; m++)
+                I_speeds = I + (mwaves + mw)*zs;
+                speeds[I_speeds] = s[mw];
+                for(mq = 0; mq < meqn; mq++)
                 {
-                    I_waves = I + (meqn*mwaves+m)*zs;
-                    waves[I_waves] = wave[m];
-                }                
+                    I_waves = I + ((mwaves + mw)*meqn + mq)*zs;
+                    waves[I_waves] = wave[mw*meqn + mq];
+                }
             }
 
             for (mw = 0; mw < mwaves; mw++)
             {
-                I_speeds = I + (mwaves + mw)*zs;
-                speeds[I_speeds] = s[mw];
                 cfl = fabs(s[mw])*dtdy;
                 if (cfl > maxcfl)
                 {
@@ -274,7 +269,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
             if (ix < mx + 1 && iy < my + 1)   /* Is this needed? */
             {
-                /* Limit waves */
                 for(mw = 0; mw < mwaves; mw++)
                 {
                     /* X-faces */
@@ -374,10 +368,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 }  /* End of mwaves loop */
             } /* End of thread conditional */
         } /* End of thread loop */
+        __syncthreads();
     } /* End of check on order[0] == 2 */
 
-
-    __syncthreads();
 
 
     if (order[1] == 0)
@@ -399,7 +392,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         }
         return;
     }
-
 
 
     /* ------------------------ Transverse Propagation : X-faces ---------------------- */
