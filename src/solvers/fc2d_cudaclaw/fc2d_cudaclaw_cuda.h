@@ -59,7 +59,7 @@ typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
 typedef void (*cudaclaw_cuda_rpt2_t)(int idir, int meqn, int mwaves, int maux,
                                      double ql[], double qr[], 
                                      double aux1[], double aux2[], double aux3[],
-                                     int imp, double dsdq[],
+                                     int imp, int pm, double dsdq[],
                                      double bmasdq[], double bpasdq[]);
 
 /* ------------------------------------- Function headers ------------------------------*/
@@ -94,7 +94,7 @@ void fc2d_cudaclaw_allocate_buffers(struct fclaw2d_global *glob);
 void fc2d_cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
 
 
-
+void cudaclaw_get_method_parameters(int** order, int** mthlim);
 
 
 

@@ -18,6 +18,9 @@ static double* s_membuffer;
 static double* s_membuffer_dev;
 static cudaclaw_fluxes_t* s_array_fluxes_struct_dev;
 
+static int* s_order_dev;
+static int* s_mthlim_dev;
+
 
 void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
                               fclaw2d_patch_t *patch)
@@ -119,6 +122,19 @@ void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
     int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;  
 
+    fc2d_cudaclaw_options_t* cuda_opt = fc2d_cudaclaw_get_options(glob);
+    int mwaves = cuda_opt->mwaves;
+
+    CHECK(cudaMallocHost(&s_order_dev,2*sizeof(int)));    
+    CHECK(cudaMallocHost(&s_mthlim_dev,mwaves*sizeof(int)));    
+    CHECK(cudaMemcpy(s_order_dev, cuda_opt->order, 
+                     2*sizeof(int), cudaMemcpyHostToDevice));            
+    CHECK(cudaMemcpy(s_mthlim_dev, cuda_opt->mthlim, 
+                     mwaves*sizeof(int), cudaMemcpyHostToDevice));            
+
+
+
+
     int batch_size = FC2D_CUDACLAW_BUFFER_LEN;
     size_t size = (2*mbc+mx)*(2*mbc+my);
     size_t bytes = batch_size*size*(meqn + maux)*sizeof(double);
@@ -134,6 +150,9 @@ void fc2d_cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
     cudaFreeHost(s_membuffer);
     cudaFree(s_membuffer_dev);
     cudaFree(s_array_fluxes_struct_dev);
+
+    cudaFree(s_order_dev);
+    cudaFree(s_mthlim_dev);
 }
 
 double *cudaclaw_get_cpu_membuffer()
@@ -152,6 +171,14 @@ cudaclaw_fluxes_t* cudaclaw_get_flux_buffer()
 {
     FCLAW_ASSERT(s_array_fluxes_struct_dev != NULL);
     return s_array_fluxes_struct_dev;
+}
+
+void cudaclaw_get_method_parameters(int** order, int** mthlim)
+{
+    FCLAW_ASSERT(s_order_dev != NULL);
+    FCLAW_ASSERT(s_mthlim_dev != NULL);
+    *order = s_order_dev;
+    *mthlim = s_mthlim_dev;
 }
 
 
