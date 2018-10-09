@@ -77,6 +77,7 @@ void run_program(fclaw2d_global_t* glob)
 	/* Initialize virtual tables for solvers */
 	if (user_opt->cuda)
 	{
+		fc2d_cudaclaw_initialize_GPUs(glob);
 		fc2d_cudaclaw_solver_initialize();
 	}
 	else
