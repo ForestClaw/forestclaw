@@ -146,12 +146,12 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     I_aux = I + m*zs;
                     aux[I_aux] = auxr[m];
                 }
-            } /* Thread conditional */
-        } /* Thread loop */
+            } 
+        } 
 
         __syncthreads();
 
-    } /* b4step2 conditional */
+    } 
 
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
@@ -180,6 +180,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }                        
 
             /* ------------------------ Normal solve in X direction ------------------- */
+            
             rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
 
             for (mq = 0; mq < meqn; mq++) 
@@ -187,20 +188,26 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 I_q = I + mq*zs;
                 fp[I_q] = -apdq[mq]; 
                 fm[I_q] = amdq[mq];
-                apdq_trans[I_q] = apdq[mq];  
-                amdq_trans[I_q] = amdq[mq];                    
+                if (order[1] > 0)
+                {
+                    apdq_trans[I_q] = apdq[mq];  
+                    amdq_trans[I_q] = amdq[mq];                                        
+                }
             }
 
             for(mw = 0; mw < mwaves; mw++)
             {
                 maxcfl = max(maxcfl,abs(s[mw]*dtdx));
 
-                I_speeds = I + mw*zs;
-                speeds[I_speeds] = s[mw];
-                for(mq = 0; mq < meqn; mq++)
-                {
-                    I_waves = I + (mw*meqn + mq)*zs;
-                    waves[I_waves] = wave[mw*meqn + mq];
+                if (order[0] == 2)
+                {                    
+                    I_speeds = I + mw*zs;
+                    speeds[I_speeds] = s[mw];
+                    for(mq = 0; mq < meqn; mq++)
+                    {
+                        I_waves = I + (mw*meqn + mq)*zs;
+                        waves[I_waves] = wave[mw*meqn + mq];
+                    }
                 }
             }
 
@@ -213,20 +220,26 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 I_q = I + mq*zs;
                 gm[I_q] = bmdq[mq];
                 gp[I_q] = -bpdq[mq]; 
-                bpdq_trans[I_q] = bpdq[mq];
-                bmdq_trans[I_q] = bmdq[mq];                                        
+                if (order[1] > 0)
+                {
+                    bpdq_trans[I_q] = bpdq[mq];
+                    bmdq_trans[I_q] = bmdq[mq];                                                   
+                }
             }
 
             for(mw = 0; mw < mwaves; mw++)
             {
                 maxcfl = max(maxcfl,fabs(s[mw])*dtdy);
 
-                I_speeds = I + (mwaves + mw)*zs;
-                speeds[I_speeds] = s[mw];
-                for(mq = 0; mq < meqn; mq++)
-                {
-                    I_waves = I + ((mwaves + mw)*meqn + mq)*zs;
-                    waves[I_waves] = wave[mw*meqn + mq];
+                if (order[0] == 2)
+                {                    
+                    I_speeds = I + (mwaves + mw)*zs;
+                    speeds[I_speeds] = s[mw];
+                    for(mq = 0; mq < meqn; mq++)
+                    {
+                        I_waves = I + ((mwaves + mw)*meqn + mq)*zs;
+                        waves[I_waves] = wave[mw*meqn + mq];
+                    }
                 }
             }
         }
@@ -294,9 +307,12 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         I_q = I + mq*zs;
                         cqxx = fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wave[mq];
                         fm[I_q] += 0.5*cqxx;   
-                        fp[I_q] += 0.5*cqxx;                               
-                        amdq_trans[I_q] += cqxx;   
-                        apdq_trans[I_q] -= cqxx;      
+                        fp[I_q] += 0.5*cqxx;  
+                        //if (order[1] > 0)
+                        {                         
+                            amdq_trans[I_q] += cqxx;   
+                            apdq_trans[I_q] -= cqxx;                                 
+                        }                             
                     }
 
                     /* Y-faces */
@@ -310,7 +326,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         wave[mq] = waves[I_waves];
                     }                        
 
-                    // if (mthlim[mw] > 0)
+                    //if (mthlim[mw] > 0)
                     {
                         wnorm2 = dotl = dotr = 0;
                         for(mq = 0; mq < meqn; mq++)
@@ -336,15 +352,18 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         I_q = I + mq*zs;
                         cqyy = fabs(s[mw])*(1.0 - fabs(s[mw])*dtdy)*wave[mq];
                         gm[I_q] += 0.5*cqyy;   
-                        gp[I_q] += 0.5*cqyy;   
-                        bmdq_trans[I_q] += cqyy;     
-                        bpdq_trans[I_q] -= cqyy;      
+                        gp[I_q] += 0.5*cqyy;  
+                        //if (order[1] > 0)
+                        {                            
+                            bmdq_trans[I_q] += cqyy;     
+                            bpdq_trans[I_q] -= cqyy;      
+                        } 
                     }                
-                }  /* End of mwaves loop */
-            } /* End of thread conditional */
-        } /* End of thread loop */
+                }  
+            } 
+        } 
         __syncthreads();
-    } /* End of check on order[0] == 2 */
+    } 
 
 
     if (order[1] == 0)
