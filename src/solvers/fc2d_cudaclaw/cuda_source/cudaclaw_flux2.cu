@@ -188,7 +188,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 I_q = I + mq*zs;
                 fp[I_q] = -apdq[mq]; 
                 fm[I_q] = amdq[mq];
-                if (order[1] > 0)
+                //if (order[1] > 0)
                 {
                     apdq_trans[I_q] = apdq[mq];  
                     amdq_trans[I_q] = amdq[mq];                                        
@@ -199,7 +199,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             {
                 maxcfl = max(maxcfl,abs(s[mw]*dtdx));
 
-                if (order[0] == 2)
+                //if (order[0] == 2)
                 {                    
                     I_speeds = I + mw*zs;
                     speeds[I_speeds] = s[mw];
@@ -220,7 +220,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 I_q = I + mq*zs;
                 gm[I_q] = bmdq[mq];
                 gp[I_q] = -bpdq[mq]; 
-                if (order[1] > 0)
+                //if (order[1] > 0)
                 {
                     bpdq_trans[I_q] = bpdq[mq];
                     bmdq_trans[I_q] = bmdq[mq];                                                   
@@ -231,7 +231,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             {
                 maxcfl = max(maxcfl,fabs(s[mw])*dtdy);
 
-                if (order[0] == 2)
+                //if (order[0] == 2)
                 {                    
                     I_speeds = I + (mwaves + mw)*zs;
                     speeds[I_speeds] = s[mw];
@@ -290,11 +290,13 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                             dotl += wave[mq]*waves[I_waves-1];
                             dotr += wave[mq]*waves[I_waves+1];
                         }
+
                         if (wnorm2 != 0)
                         {
                             r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
                             wlimitr = cudaclaw_limiter(mthlim[mw],r);  
                         }
+
                         for (mq = 0; mq < meqn; mq++)
                         {
                             wave[mq] *= wlimitr;
