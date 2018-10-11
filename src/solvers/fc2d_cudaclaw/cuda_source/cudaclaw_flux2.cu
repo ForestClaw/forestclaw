@@ -178,13 +178,14 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         __syncthreads(); /* Needed to be sure all aux variables are available below */ 
     } 
 
+    /* -------------------------- Compute fluctuations -------------------------------- */
+
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     {
-        /* Visit all interior edges */
         ix = thread_index % ifaces_x;
         iy = thread_index/ifaces_y;
 
-        I = (iy + 1)*ys + (ix + 1)*xs;
+        I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
         //if (ix < mx + 2*mbc-1 && iy < my + 2*mbc-1)
         {
@@ -274,14 +275,10 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     __syncthreads();
 
-    /* ---------------------------------- Limit waves --------------------------------------*/  
+
+
+    /* ---------------------- Second order corrections and limiters --------------------*/  
     
-
-
-    ifaces_x = mx + 1;  /* Visit edges of all non-ghost cells */
-    ifaces_y = my + 1;
-    num_ifaces = ifaces_x*ifaces_y;
-
     if (order[0] == 2)
     {
         for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
@@ -289,7 +286,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             ix = thread_index % ifaces_x;
             iy = thread_index/ifaces_y;
 
-            /* Start at first interior cell */
+            /* Start at first non-ghost interior cell */
             I = (ix + mbc)*xs + (iy + mbc)*ys;
 
             //if (ix < mx + 1 && iy < my + 1)   /* Is this needed? */
@@ -509,7 +506,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         ix = thread_index % ifaces_x;
         iy = thread_index/ifaces_y;
 
-        I = (iy + mbc + 1)*ys+ (ix + mbc);
+        I = (iy + mbc)*ys+ (ix + mbc + 1);
 
         //if (0 < ix && ix < mx + 1 && iy < my)   /* Is this needed? */
         {
@@ -681,7 +678,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         ix = thread_index % ifaces_x;
         iy = thread_index/ifaces_y;
 
-        I = (ix + mbc+1)*xs + (iy + mbc)*ys;
+        I =  (iy + mbc + 1)*ys + (ix + mbc);
 
         //if (ix < mx && 0 < iy && iy < my+1)   /* Is this needed? */
         {
@@ -741,7 +738,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         ix = thread_index % ifaces_x;
         iy = thread_index/ifaces_y;
 
-        I = (ix + mbc+1)*xs + (iy + mbc)*ys;
+        I = (iy + mbc + 1)*ys + (ix + mbc);
 
         //if (ix < mx && 0 < iy && iy < my+1)   /* Is this needed? */
         {
@@ -801,7 +798,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         ix = thread_index % ifaces_x;
         iy = thread_index/ifaces_y;
 
-        I = (ix + mbc)*xs + (iy + mbc)*ys;
+        I = (iy + mbc)*ys + (ix + mbc);
 
         //if (ix < mx && iy < my)   /* Is this needed? */
         {
@@ -860,7 +857,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         ix = thread_index % ifaces_x;
         iy = thread_index/ifaces_y;
 
-        I = (ix + mbc)*xs + (iy + mbc)*ys;
+        I = (iy + mbc)*ys + (ix + mbc);
 
         //if (ix < mx && iy < my)   /* Is this needed? */
         {
