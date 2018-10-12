@@ -212,23 +212,23 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
                     glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative),
                    "UNACCOUNTED");
 
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GLOBAL],
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GLOBAL_COMM],
                    glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative,
-                   "FCLAW2D_TIMER_GLOBAL");
+                   "FCLAW2D_TIMER_GLOBAL_COMM");
 
     /* Just subtracting FCLAW2D_TIMER_GLOBAL here doesn't work ... */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_LOCAL],
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_LOCAL_COMM],
                    glob->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
                    (glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
                     glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative),
-                   "FCLAW2D_TIMER_LOCAL");
+                   "FCLAW2D_TIMER_LOCAL_COMM");
 
 
     /* --------------------------------- Set stats groups ------------------------------*/
@@ -268,8 +268,8 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET_GROUP(stats,CFL_COMM,              EXCLUSIVE2);
     FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE2);
 
-    FCLAW2D_STATS_SET_GROUP(stats,LOCAL,                 COMM);
-    FCLAW2D_STATS_SET_GROUP(stats,COMM,                  COMM);
+    FCLAW2D_STATS_SET_GROUP(stats,LOCAL_COMM,            COMM);
+    FCLAW2D_STATS_SET_GROUP(stats,GLOBAL_COMM,           COMM);
 
     FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_STEPS_COUNTER, COUNTERS1);
     FCLAW2D_STATS_SET_GROUP(stats,GRIDS_PER_PROC,        COUNTERS1);
