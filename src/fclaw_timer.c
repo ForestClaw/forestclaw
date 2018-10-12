@@ -212,15 +212,15 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
                     glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative),
                    "UNACCOUNTED");
 
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_COMM],
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GLOBAL],
                    glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative,
-                   "FCLAW2D_TIMER_COMM");
+                   "FCLAW2D_TIMER_GLOBAL");
 
-    /* Just subtracting FCLAW2D_TIMER_COMM here doesn't work ... */
+    /* Just subtracting FCLAW2D_TIMER_GLOBAL here doesn't work ... */
     sc_stats_set1 (&stats[FCLAW2D_TIMER_LOCAL],
                    glob->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
                    (glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
