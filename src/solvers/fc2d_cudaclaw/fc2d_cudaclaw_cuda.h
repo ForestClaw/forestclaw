@@ -36,7 +36,7 @@ extern "C"
 
 #define FC2D_CUDACLAW_BUFFER_LEN 4000    /* Number of patches that kernel should handle */ 
 
-#define FC2D_CUDACLAW_BLOCK_SIZE 128     /* linear block */    
+#define FC2D_CUDACLAW_BLOCK_SIZE 64     /* linear block */    
 
 
 struct fclaw2d_global;
