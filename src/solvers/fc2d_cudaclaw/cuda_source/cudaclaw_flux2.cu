@@ -28,15 +28,41 @@
 
 #include "../fc2d_cudaclaw_cuda.h"
 
+#include "../fc2d_cudaclaw_check.cu"
+
 #include <cub/block/block_reduce.cuh>  
 
 #include "cudaclaw_allocate.h"  /* Needed to for definition of 'fluxes' */
 
-#define MWAVES 10
+
+__managed__ int  s_order[2];
+__managed__ int* s_mthlim;
+
+void cudaclaw_set_method_parameters(int* order, int* mthlim, int mwaves)
+{
+    int mw;
+
+    s_order[0] = order[0];
+    s_order[1] = order[1];
+
+    CHECK(cudaMallocManaged(&s_mthlim,mwaves*sizeof(int)));
+
+    for(mw = 0; mw < mwaves; mw++)
+    {
+        s_mthlim[mw] = mthlim[mw];
+    }
+}
+
+void cudaclaw_destroy_method_parameters()
+{
+    cudaFree(s_mthlim);
+}
 
 
 /* Include this here so we don't include device code in fc2d_cudaclaw_cuda.h */
 __device__ double cudaclaw_limiter(int lim_choice, double r);
+
+
 
 static
 __device__
@@ -54,15 +80,12 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                cudaclaw_cuda_rpn2_t rpn2,
                                cudaclaw_cuda_rpt2_t rpt2,
                                cudaclaw_cuda_b4step2_t b4step2,
-                               int *order_in, int *mthlim_in,
                                double t,double dt)
 {
     typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
 
     __shared__ typename BlockReduce::TempStorage temp_storage;
 
-    __shared__ int mthlim[MWAVES];
-    __shared__ int order[2];
 
     extern __shared__ double shared_mem[];
 
@@ -100,17 +123,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double cqyy;
     double gupdate;
     int imp;
-
-    /* Store these in shared memory for faster access */
-
-    for(mw = 0; mw < mwaves; mw++)
-    {
-        mthlim[mw] = mthlim_in[mw];
-    }
-
-    order[0] = order_in[0];
-    order[1] = order_in[1];
-
 
     /* --------------------------------- Start code ----------------------------------- */
 
@@ -188,8 +200,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             for(mq = 0; mq < meqn; mq++)
             {
                 I_q = I + mq*zs;
-                ql[mq] = qold[I_q - 1];    /* Left  */
                 qr[mq] = qold[I_q];        /* Right */
+                ql[mq] = qold[I_q - 1];    /* Left  */
                 qd[mq] = qold[I_q - ys];   /* Down  */  
             }
 
@@ -210,7 +222,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 I_q = I + mq*zs;
                 fm[I_q] = amdq[mq];
                 fp[I_q] = -apdq[mq]; 
-                if (order[1] > 0)
+                if (s_order[1] > 0)
                 {
                     amdq_trans[I_q] = amdq[mq];                                        
                     apdq_trans[I_q] = apdq[mq];  
@@ -221,7 +233,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             {
                 maxcfl = max(maxcfl,abs(s[mw]*dtdx));
 
-                if (order[0] == 2)
+                if (s_order[0] == 2)
                 {                    
                     I_speeds = I + mw*zs;
                     speeds[I_speeds] = s[mw];
@@ -242,7 +254,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 I_q = I + mq*zs;
                 gm[I_q] = bmdq[mq];
                 gp[I_q] = -bpdq[mq]; 
-                if (order[1] > 0)
+                if (s_order[1] > 0)
                 {
                     bpdq_trans[I_q] = bpdq[mq];
                     bmdq_trans[I_q] = bmdq[mq];                                                   
@@ -253,7 +265,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             {
                 maxcfl = max(maxcfl,fabs(s[mw])*dtdy);
 
-                if (order[0] == 2)
+                if (s_order[0] == 2)
                 {                    
                     I_speeds = I + (mwaves + mw)*zs;
                     speeds[I_speeds] = s[mw];
@@ -267,17 +279,14 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         }
     }
 
-    __syncthreads();
-
     maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
 
     __syncthreads();
 
 
-
-    /* ---------------------- Second order corrections and limiters --------------------*/  
+    /* ---------------------- Second s_order corrections and limiters --------------------*/  
     
-    if (order[0] == 2)
+    if (s_order[0] == 2)
     {
         for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
         { 
@@ -300,7 +309,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         wave[mq] = waves[I_waves];
                     }                        
 
-                    if (mthlim[mw] > 0)
+                    if (s_mthlim[mw] > 0)
                     {
                         wnorm2 = dotl = dotr = 0;
                         for(mq = 0; mq < meqn; mq++)
@@ -318,7 +327,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                             }
                             
                             r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
-                            wlimitr = cudaclaw_limiter(mthlim[mw],r);  
+                            wlimitr = cudaclaw_limiter(s_mthlim[mw],r);  
                         
                             for (mq = 0; mq < meqn; mq++)
                             {
@@ -335,7 +344,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
                         fm[I_q] += 0.5*cqxx;   
                         fp[I_q] += 0.5*cqxx;  
-                        if (order[1] > 0)
+                        if (s_order[1] > 0)
                         {                         
                             amdq_trans[I_q] += cqxx;   
                             apdq_trans[I_q] -= cqxx;                                 
@@ -353,7 +362,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         wave[mq] = waves[I_waves];
                     }                        
 
-                    if (mthlim[mw] > 0)
+                    if (s_mthlim[mw] > 0)
                     {
                         wnorm2 = dotl = dotr = 0;
                         for(mq = 0; mq < meqn; mq++)
@@ -371,7 +380,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                             }  
                             r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
 
-                            wlimitr = cudaclaw_limiter(mthlim[mw],r);  
+                            wlimitr = cudaclaw_limiter(s_mthlim[mw],r);  
 
                             for (mq = 0; mq < meqn; mq++)
                             {
@@ -387,7 +396,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
                         gm[I_q] += 0.5*cqyy;   
                         gp[I_q] += 0.5*cqyy;  
-                        if (order[1] > 0)
+                        if (s_order[1] > 0)
                         {                            
                             bmdq_trans[I_q] += cqyy;     
                             bpdq_trans[I_q] -= cqyy;      
@@ -400,7 +409,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     } 
 
 
-    if (order[1] == 0)
+    if (s_order[1] == 0)
     {
         /* No transverse propagation; Update the solution and exit */
         for(thread_index = threadIdx.x; thread_index < mx*my; thread_index += blockDim.x)
@@ -919,7 +928,6 @@ __global__
 void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
                                       int maux, int mwaves, int mwork,
                                       double dt, double t,
-                                      int* order, int* mthlim,
                                       cudaclaw_fluxes_t* array_fluxes_struct,
                                       double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
@@ -943,8 +951,7 @@ void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc,
                                   array_fluxes_struct[blockIdx.z].bpdq_dev,
                                   array_fluxes_struct[blockIdx.z].waves_dev,
                                   array_fluxes_struct[blockIdx.z].speeds_dev,
-                                  maxcflblocks, rpn2, rpt2, b4step2,
-                                  order, mthlim, t,dt);
+                                  maxcflblocks, rpn2, rpt2, b4step2,t,dt);
 }
 
 
