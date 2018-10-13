@@ -108,6 +108,7 @@ def setplot(plotdata):
     plotfigure = plotdata.new_plotfigure(name='q', figno=300, \
                     type='each_gauge')
     plotfigure.clf_each_gauge = True
+    plotfigure.show = False
 
     plotaxes = plotfigure.new_plotaxes()
     plotaxes.xlimits = 'auto'
@@ -124,7 +125,7 @@ def setplot(plotdata):
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
     plotdata.print_framenos = 'all'          # list of frames to print
-    plotdata.print_fignos = 'all'            # list of figures to print
+    plotdata.print_fignos = [0]            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
     plotdata.html_movie = 'JSAnimation'      # new style, or "4.x" for old style
