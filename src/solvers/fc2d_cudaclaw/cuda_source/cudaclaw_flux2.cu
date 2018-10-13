@@ -131,10 +131,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     if (b4step2 != NULL)
     {
-        ifaces_x = mx + 2*mbc - 1;           /* Visit all interior left edge */
-        ifaces_y = my + 2*mbc - 1;           /* Visit all interior bottom edges */
-        num_ifaces = ifaces_x*ifaces_y;
-
         for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
         {
             ix = thread_index % ifaces_x;
@@ -270,6 +266,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
     }
+
+    __syncthreads();
 
     maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
 

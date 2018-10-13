@@ -42,6 +42,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     size_t size, bytes, bytes_per_thread;
     int I_q, I_aux, mwork;
     int i;
+    float bytes_kb;
 
     int mx,my,mbc,maux,meqn,mwaves;
     double maxcfl;
@@ -85,9 +86,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     /* ---------------------------------- Merge Memory ---------------------------------*/ 
     membuffer_cpu = cudaclaw_get_cpu_membuffer();
     membuffer_dev = cudaclaw_get_gpu_membuffer();
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
     {
         PROFILE_CUDA_GROUP("Copy data on patches to CPU memory buffer",5);    
-//#pragma omp parallel for private(fluxes,i,I_q, I_aux)
         for(i = 0; i < batch_size; i++)   
         {
             fluxes = &(array_fluxes_struct[i]);    
@@ -104,6 +105,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             }
         }  
     }     
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
+    
 
     {
         PROFILE_CUDA_GROUP("Copy CPU buffer to device memory",3);              
@@ -143,6 +146,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         mwork = 9*meqn + 9*maux + mwaves + meqn*mwaves;
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
+
+        bytes_kb = bytes/1024.0;
+        FCLAW_ASSERT(bytes_kb < 64);
     
         cudaclaw_get_method_parameters(&order_dev,&mthlim_dev);
 
@@ -186,6 +192,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     {
         PROFILE_CUDA_GROUP("Copy CPU buffer back to patches",5);
+        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
         for (i = 0; i < batch_size; ++i)    
         {      
             fluxes = &(array_fluxes_struct[i]);
@@ -193,6 +200,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
             memcpy(fluxes->qold,&membuffer_cpu[I_q],fluxes->num_bytes);
         }        
+        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);       
     }
 
     return maxcfl;

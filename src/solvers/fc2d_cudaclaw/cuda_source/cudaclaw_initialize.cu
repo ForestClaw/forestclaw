@@ -39,7 +39,7 @@ void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
     code = cudaGetDeviceCount(&count);
     if (code != cudaSuccess) 
     {
-        fprintf(stderr,"ERROR : %s\n", cudaGetErrorString(code));
+        fprintf(stderr,"ERROR (fc2d_cudaclaw_initialize_GPUS) : %s\n", cudaGetErrorString(code));
         exit(code);
     }
 
