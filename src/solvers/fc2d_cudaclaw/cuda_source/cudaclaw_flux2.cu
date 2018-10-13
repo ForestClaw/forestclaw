@@ -34,36 +34,17 @@
 
 #include "cudaclaw_allocate.h"  /* Needed to for definition of 'fluxes' */
 
-#define MWAVES 10
-
-void cudaclaw_set_method_parameters(int* order, int* mthlim, int mwaves)
+extern "C"
 {
-#if 0    
-    int mw;
-
-    s_order[0] = order[0];
-    s_order[1] = order[1];
-
-    CHECK(cudaMallocManaged(&s_mthlim,mwaves*sizeof(int)));
-
-    for(mw = 0; mw < mwaves; mw++)
-    {
-        s_mthlim[mw] = mthlim[mw];
-    }
-#endif    
+int cudaclaw_check_parameters(int mwaves)
+{
+    return mwaves <= FC2D_CUDACLAW_MWAVES;
 }
-
-void cudaclaw_destroy_method_parameters()
-{
-#if 0    
-    cudaFree(s_mthlim);
-#endif    
 }
 
 
 /* Include this here so we don't include device code in fc2d_cudaclaw_cuda.h */
 __device__ double cudaclaw_limiter(int lim_choice, double r);
-
 
 
 static
@@ -90,7 +71,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     __shared__ typename BlockReduce::TempStorage temp_storage;
 
     __shared__ int  order[2];
-    __shared__ int mthlim[MWAVES];
+    __shared__ int mthlim[FC2D_CUDACLAW_MWAVES];
 
 
     extern __shared__ double shared_mem[];
