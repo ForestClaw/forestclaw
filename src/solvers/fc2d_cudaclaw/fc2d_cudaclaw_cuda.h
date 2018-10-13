@@ -99,6 +99,9 @@ void fc2d_cudaclaw_initialize_GPUs(struct fclaw2d_global *glob);
 
 
 void cudaclaw_get_method_parameters(int** order, int** mthlim);
+void cudaclaw_set_method_parameters(int* order, int* mthlim, int mwaves);
+void cudaclaw_destroy_method_parameters();
+
 
 
 

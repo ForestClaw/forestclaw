@@ -106,6 +106,7 @@ cudaclaw_check(fc2d_cudaclaw_options_t *clawopt,
         return FCLAW_EXIT_QUIET;
     }
 #endif    
+    cudaclaw_set_method_parameters(clawopt->order,clawopt->mthlim,clawopt->mwaves);
 
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
     {
@@ -123,6 +124,8 @@ void cudaclaw_destroy (fc2d_cudaclaw_options_t * clawopt)
     fclaw_options_destroy_array (clawopt->mthbc);
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
+    cudaclaw_destroy_method_parameters();
+
 }
 
 /* ------------------------------------------------------
