@@ -122,11 +122,14 @@ void radial_link_solvers(fclaw2d_global_t *glob)
 void radial_problem_setup(fclaw2d_global_t* glob)
 {
     user_options_t* user = radial_get_options(glob);
-
-    printf("here ...0\n");
-    RADIAL_SETPROB(&user->rho, &user->bulk, &user->cc, &user->zz);
-    radial_setprob_cuda(user->rho, user->bulk);
-
+    if (!user->cuda)
+    {
+        RADIAL_SETPROB(&user->rho, &user->bulk, &user->cc, &user->zz);        
+    }
+    else
+    {
+        radial_setprob_cuda(user->rho, user->bulk);        
+    }
 }
 
 void radial_patch_setup(fclaw2d_global_t *glob,
