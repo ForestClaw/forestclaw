@@ -11,8 +11,6 @@ __device__ void swirl_rpn2adv(int idir, int meqn, int mwaves,
                               double wave[], double s[], 
                               double amdq[], double apdq[])
 {
-    /* wave[mwaves][meqn] */
-    /* idir in 0,1 : needed to get correct  */
 
     /* Solve q_t + D q_x = 0, where D = diag([u,u,...,u]), D in R^{meqn x meqn} */
     int mq;
