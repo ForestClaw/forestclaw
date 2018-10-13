@@ -312,7 +312,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                             I_waves = I + (mw*meqn + mq)*zs;
                             wnorm2 += pow(wave[mq],2);
                         }
-                        if (wnorm2 != 0)
+                        //if (wnorm2 != 0)
                         {
                             for(mq = 0; mq < meqn; mq++)
                             {
@@ -365,7 +365,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                             I_waves = I + ((mwaves+mw)*meqn + mq)*zs;
                             wnorm2 += pow(wave[mq],2);
                         }  
-                        if (wnorm2 != 0)
+                        //if (wnorm2 != 0)  /* Slight faster without check */
                         {
                             for(mq = 0; mq < meqn; mq++)
                             {
