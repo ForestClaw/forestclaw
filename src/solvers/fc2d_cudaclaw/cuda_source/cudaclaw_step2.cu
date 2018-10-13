@@ -24,6 +24,7 @@ __global__
 void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
                                 int maux, int mwaves, int mwork,
                                 double dt, double t,
+                                int order[], int mthlim[],
                                 struct cudaclaw_fluxes* array_fluxes_struct_dev,
                                 double * maxcflblocks_dev,
                                 cudaclaw_cuda_rpn2_t rpn2,
@@ -152,10 +153,11 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         bytes_kb = bytes/1024.0;
         FCLAW_ASSERT(bytes_kb < 64);
     
-        // cudaclaw_get_method_parameters(&order_dev,&mthlim_dev);
+        cudaclaw_get_method_parameters(&order_dev,&mthlim_dev);
 
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork, dt,t,
+                                                              order_dev, mthlim_dev,
                                                               array_fluxes_struct_dev,
                                                               maxcflblocks_dev,
                                                               cuclaw_vt->cuda_rpn2,

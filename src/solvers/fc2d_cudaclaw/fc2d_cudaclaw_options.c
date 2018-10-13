@@ -106,7 +106,9 @@ cudaclaw_check(fc2d_cudaclaw_options_t *clawopt,
         return FCLAW_EXIT_QUIET;
     }
 #endif    
+#if 0    
     cudaclaw_set_method_parameters(clawopt->order,clawopt->mthlim,clawopt->mwaves);
+#endif    
 
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
     {
