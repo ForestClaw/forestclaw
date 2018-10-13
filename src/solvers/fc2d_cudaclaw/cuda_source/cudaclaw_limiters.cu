@@ -61,6 +61,9 @@ __device__ double cudaclaw_limiter(int lim_choice, double r)
 {
     switch(lim_choice)
     {
+        case 0:
+            return 1;
+            
         case 1:
             return minmod(r);
 

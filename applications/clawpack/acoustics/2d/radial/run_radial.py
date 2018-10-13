@@ -5,13 +5,11 @@ import os
 import subprocess
 import random
 
-# run_swirl.py <nodes> <gpus-per-node> <ntasks-per-node> <cpus-per-task> <use_cuda>
-
 # Redhawk has only 4 cores per node on compute nodes;  2 GPUs per node; one PCI bus
 
 if sys.argv.__len__() == 1:
     print("Usage : ")
-    print("   run_swirl.py <nodes> <ntasks-per-node> <gpus-per-node> <nout>")
+    print("   run_radial.py <nodes> <ntasks-per-node> <gpus-per-node> <nout>")
     print("")
     print("          nodes           : Number of nodes to use")
     print("          ntasks-per-node : MPI processes per node")
@@ -36,11 +34,11 @@ arg_list = ["srun", "--gres=gpu:2".format(gpus),
             "--nodes={:d}".format(nodes),
             "--ntasks-per-node={:d}".format(tasks_per_node),
             "--cpus-per-task={:d}".format(cpus_per_task),            
-            "swirl", gpustr, "--nout=100"]     
+            "radial", gpustr]     
 
 np = mpi_tasks
 jobid = random.randint(1000,9999)
-outfile = "swirl_{:05d}.o{:d}".format(np,jobid)
+outfile = "radial_{:05d}.o{:d}".format(np,jobid)
 f = open(outfile,'w')
 po = subprocess.Popen(arg_list,stdout=f)
 print("Starting process {:d} with jobid {:d} on {:d} processor(s).".format(po.pid,jobid,np))

@@ -107,6 +107,15 @@ cudaclaw_check(fc2d_cudaclaw_options_t *clawopt,
     }
 #endif    
 
+    int check = cudaclaw_check_parameters(clawopt->mwaves);
+    if (!check)
+    {
+        fclaw_global_essentialf("Size of MWAVES (set in fc2d_cudaclaw_cuda.h)",\
+                                " should be increased\n");
+        return FCLAW_EXIT_ERROR;
+    }
+
+
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
     {
         fclaw_global_essentialf("cudaclaw : bad maux/mcapa combination\n");

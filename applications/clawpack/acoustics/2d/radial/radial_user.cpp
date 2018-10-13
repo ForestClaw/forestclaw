@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void radial_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
 
     vt->problem_setup = &radial_problem_setup;  /* Version-independent */
 
@@ -49,15 +50,17 @@ void radial_link_solvers(fclaw2d_global_t *glob)
         if (user->example == 0)
         {
             cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
-            cudaclaw_vt->fort_rpn2      = &CLAWPACK46_RPN2;
-            cudaclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2;
+            //cudaclaw_vt->fort_rpn2      = &CLAWPACK46_RPN2;
+            //cudaclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2;
 
-            // cudaclaw_vt->fort_setaux    = &CLAWPACK5_SETAUX;
-            // cudaclaw_vt->fort_b4step2   = &CUDACLAW_B4STEP2;
+            cudaclaw_vt->fort_setaux = NULL;
+            patch_vt->setup = NULL;   
 
-            // TODO: no rpt2 for now, right?
             radial_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
             FCLAW_ASSERT(cudaclaw_vt->cuda_rpn2 != NULL);
+
+            radial_assign_rpt2(&cudaclaw_vt->cuda_rpt2);
+            FCLAW_ASSERT(cudaclaw_vt->cuda_rpt2 != NULL);
         }
         else if (user->example == 1)
         {
@@ -119,10 +122,14 @@ void radial_link_solvers(fclaw2d_global_t *glob)
 void radial_problem_setup(fclaw2d_global_t* glob)
 {
     user_options_t* user = radial_get_options(glob);
-
-    /* rho, bulk are inputs; cc and zz are outputs.  Results are
-       stored in a common block */
-    RADIAL_SETPROB(&user->rho, &user->bulk, &user->cc, &user->zz);
+    if (!user->cuda)
+    {
+        RADIAL_SETPROB(&user->rho, &user->bulk, &user->cc, &user->zz);        
+    }
+    else
+    {
+        radial_setprob_cuda(user->rho, user->bulk);        
+    }
 }
 
 void radial_patch_setup(fclaw2d_global_t *glob,

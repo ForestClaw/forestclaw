@@ -55,6 +55,8 @@ typedef struct user_options
 
 void radial_problem_setup(fclaw2d_global_t* glob);
 
+void radial_setprob_cuda(double rho, double bulk);
+
 #define RADIAL_SETPROB FCLAW_F77_FUNC(radial_setprob, RADIAL_SETPROB)
 void RADIAL_SETPROB(const double* rho, const double *bulk,
                     double* cc, double*zz);
@@ -93,6 +95,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
 /* --------------------------------------- Cuda ----------------------------------------*/
 
 void radial_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+void radial_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 
 #ifdef __cplusplus
 #if 0

@@ -1,12 +1,21 @@
 #include "../radial_user.h"
 
-#include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
-#include <cassert>
+//#include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
+//#include <cassert>
     
-typedef double real;
-static __device__ real claw_zero = 0.0;
-static __device__ real rho = 1.0;
-static __device__ real bulk = 4.0;
+__managed__ double s_rho;
+__managed__ double s_bulk;
+__managed__ double s_c;
+__managed__ double s_z;
+
+void radial_setprob_cuda(double rho, double bulk)
+{
+    s_rho = rho;
+    s_bulk = bulk;
+    s_c = sqrt(bulk/rho);
+    s_z = s_c*rho;
+}
+
 
 __device__ void radial_rpn2acoustics(int idir, int meqn, int mwaves, 
                                      int maux, double ql[], double qr[], 
@@ -14,57 +23,34 @@ __device__ void radial_rpn2acoustics(int idir, int meqn, int mwaves,
                                      double wave[], double s[], 
                                      double amdq[], double apdq[])
 {
-    /* wave[mwaves][meqn] */
-    /* idir in 0,1 : needed to get correct  */
+    double alpha1, alpha2, delta[2];
+    int mu,mv,mq;
 
-    assert(mwaves == 2);
-    assert(meqn == 3);
+    mu = 1+idir;
+    mv = 2-idir;    
 
-    // TODO: pass in bulk and rho
-    real c = sqrt(bulk/rho);
-    real z = c*rho;
+    s[0] = -s_c;
+    s[1] =  s_c;
 
-    // if we use template, we don't have to have this branching here
-    if (0 == idir) // x-direction
-    {
-        s[0] = -c;
-        s[1] =  c;
+    delta[0] = qr[0] - ql[0];
+    delta[1] = qr[mu] - ql[mu];
+    alpha1 = ( -delta[0] + s_z*delta[1]) / (2.0*s_z);
+    alpha2 = (  delta[0] + s_z*delta[1]) / (2.0*s_z);
 
-        real alpha1 = ( ql[0] - qr[0] + z*(qr[1] - ql[1])) / (2*z);
-        real alpha2 = ( qr[0] - ql[0] + z*(qr[1] - ql[1])) / (2*z);
+    /* left going wave */
+    wave[0]  = -alpha1*s_z;
+    wave[mu] = alpha1;
+    wave[mv] = 0;
 
-        // TODO: might want to replace double[] wave in argument list with
-        // double* wave
-        wave[0] = -alpha1*z;
-        wave[1] = alpha1;
-        wave[2] = claw_zero;
+    /* Right going wave */
+    wave[3]       = alpha2*s_z;
+    wave[meqn+mu] = alpha2;
+    wave[meqn+mv] = 0;
 
-        wave[3] = alpha2*z;
-        wave[4] = alpha2;
-        wave[5] = claw_zero;
-    }
-    else if (1 == idir) // y-direction
-    {
-        s[0] = -c;
-        s[1] =  c;
-
-        real alpha1 = ( ql[0] - qr[0] + z*(qr[2] - ql[2])) / (2*z);
-        real alpha2 = ( qr[0] - ql[0] + z*(qr[2] - ql[2])) / (2*z);
-
-        wave[0] = -alpha1*z;
-        wave[1] = claw_zero;
-        wave[2] = alpha1;
-
-        wave[3] = alpha2*z;
-        wave[4] = claw_zero;
-        wave[5] = alpha2;
-    }
-    else printf("Invalid value for idir in riemann solver\n");
-
-    for (int mq = 0; mq < meqn; mq++)
+    for (mq = 0; mq < meqn; mq++)
     {
         amdq[mq] = s[0]*wave[mq];
-        apdq[mq] = s[1]*wave[meqn+mq];
+        apdq[mq] = s[1]*wave[meqn + mq];
     }
 }
 
@@ -75,7 +61,50 @@ void radial_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2)
     cudaError_t ce = cudaMemcpyFromSymbol(rpn2, radial_rpn2, sizeof(cudaclaw_cuda_rpn2_t));
     if(ce != cudaSuccess)
     {
-        fclaw_global_essentialf("ERROR (radial_rpn2adv): %s\n",cudaGetErrorString(ce));
+        fclaw_global_essentialf("ERROR (radial_rpn2acoustics): %s\n",cudaGetErrorString(ce));
         exit(0);
     }    
 }
+
+
+__device__ void radial_rpt2acoustics(int idir, int meqn, int mwaves, int maux,
+                                     double ql[], double qr[], 
+                                     double aux1[], double aux2[], double aux3[],
+                                     int imp, int pm, double asdq[],
+                                     double bmasdq[], double bpasdq[])
+{
+
+    double alpha1, alpha2, delta[2];
+    int mu,mv;
+
+    mu = 1+idir;
+    mv = 2-idir;    
+
+    delta[0] = asdq[0];
+    delta[1] = asdq[mv];
+    alpha1 = ( -delta[0] + s_z*delta[1]) / (2.0*s_z);
+    alpha2 = (  delta[0] + s_z*delta[1]) / (2.0*s_z);
+
+    /* Down going wave */
+    bmasdq[0]  = s_c * alpha1 * s_z;
+    bmasdq[mu] = 0;
+    bmasdq[mv] = -s_c * alpha1;
+
+    /* Up going wave */
+    bpasdq[0]       = s_c * alpha2 * s_z;
+    bpasdq[mu] = 0;
+    bpasdq[mv] = s_c * alpha2;
+}
+
+__device__ cudaclaw_cuda_rpt2_t radial_rpt2 = radial_rpt2acoustics;
+
+void radial_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2)
+{
+    cudaError_t ce = cudaMemcpyFromSymbol(rpt2, radial_rpt2, sizeof(cudaclaw_cuda_rpt2_t));
+    if(ce != cudaSuccess)
+    {
+        fclaw_global_essentialf("ERROR (radial_rpt2acoustics): %s\n",cudaGetErrorString(ce));
+        exit(0);
+    }    
+}
+

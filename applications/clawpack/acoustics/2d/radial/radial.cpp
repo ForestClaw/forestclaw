@@ -36,6 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 #include <fc2d_cudaclaw.h>
 
+#include <fc2d_cuda_profiler.h>
+
+
 /* ------------------------- Start of program ---------------------------- */
 
 static
@@ -95,6 +98,7 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual tables for solvers */
     if (user_opt->cuda)
     {
+        fc2d_cudaclaw_initialize_GPUs(glob);
         fc2d_cudaclaw_solver_initialize();
 
     }
@@ -116,8 +120,21 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
+    if (user_opt->cuda == 1)
+    {
+        PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
+        fc2d_cudaclaw_allocate_buffers(glob);
+    }
+
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
+
+    if (user_opt->cuda == 1)
+    {
+        PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
+        fc2d_cudaclaw_deallocate_buffers(glob);
+    }
+
     fclaw2d_finalize(glob);
 }
 
