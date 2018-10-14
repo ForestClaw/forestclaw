@@ -49,6 +49,7 @@ void cudaclaw_set_method_parameters(int *order_in, int *mthlim_in, int mwaves)
     CHECK(cudaMemcpyToSymbol(order,order_in,2*sizeof(int)));
     CHECK(cudaMemcpyToSymbol(mthlim,mthlim_in,mwaves*sizeof(int)));
 }
+
 }
 
 /* Include this here so we don't include device code in fc2d_cudaclaw_cuda.h */
@@ -100,14 +101,16 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double* bmasdq = aux3   + 2*maux;       /* meqn        */
     double* bpasdq = bmasdq + meqn;         /* meqn        */
 
+    __shared__ double dtdx, dtdy;
+    __shared__ int xs, ys, zs;
+
     int mq, mw, m, k;
-    int xs, ys, zs;
+    //int xs, ys, zs;
     int I, I_q, I_aux, I_waves, I_speeds;
-    int thread_index;
     int ix,iy,ifaces_x, ifaces_y, num_ifaces;
+    int thread_index;
 
     int i,j; /* Used for (i,j) indexing in patches  */
-    double dtdx, dtdy;
     double maxcfl;
     double wnorm2,dotr,dotl, wlimitr,r;
     double cqxx;
@@ -306,18 +309,14 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         wnorm2 = dotl = dotr = 0;
                         for(mq = 0; mq < meqn; mq++)
                         {
-                            I_waves = I + (mw*meqn + mq)*zs;
                             wnorm2 += pow(wave[mq],2);
+
+                            I_waves = I + (mw*meqn + mq)*zs;
+                            dotl += wave[mq]*waves[I_waves-1];
+                            dotr += wave[mq]*waves[I_waves+1];
                         }
                         //if (wnorm2 != 0)
-                        {
-                            for(mq = 0; mq < meqn; mq++)
-                            {
-                                I_waves = I + (mw*meqn + mq)*zs;
-                                dotl += wave[mq]*waves[I_waves-1];
-                                dotr += wave[mq]*waves[I_waves+1];
-                            }
-                            
+                        {                            
                             r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
                             wlimitr = cudaclaw_limiter(mthlim[mw],r);  
                         
@@ -327,8 +326,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                             }
                         }
                     }
-
- 
                     for(mq = 0; mq < meqn; mq++)
                     {
                         I_q = I + mq*zs;
@@ -342,9 +339,11 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                             apdq_trans[I_q] -= cqxx;                                 
                         }  
                     }
+                }
 
-                    /* Y-faces */
-
+                /* Y-faces */
+                for(mw = 0; mw < mwaves; mw++)
+                { 
                     I_speeds = I + (mwaves + mw)*zs;
                     s[mw] = speeds[I_speeds];
 
@@ -359,17 +358,14 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         wnorm2 = dotl = dotr = 0;
                         for(mq = 0; mq < meqn; mq++)
                         {
-                            I_waves = I + ((mwaves+mw)*meqn + mq)*zs;
                             wnorm2 += pow(wave[mq],2);
+
+                            I_waves = I + ((mwaves+mw)*meqn + mq)*zs;
+                            dotl += wave[mq]*waves[I_waves-ys];
+                            dotr += wave[mq]*waves[I_waves+ys];
                         }  
                         //if (wnorm2 != 0)  /* Slight faster without check */
                         {
-                            for(mq = 0; mq < meqn; mq++)
-                            {
-                                I_waves = I + ((mwaves+mw)*meqn + mq)*zs;
-                                dotl += wave[mq]*waves[I_waves-ys];
-                                dotr += wave[mq]*waves[I_waves+ys];
-                            }  
                             r = (s[mw] > 0) ? dotl/wnorm2 : dotr/wnorm2;
 
                             wlimitr = cudaclaw_limiter(mthlim[mw],r);  
