@@ -98,11 +98,13 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual tables for solvers */
     if (user_opt->cuda)
     {
-        fc2d_cudaclaw_options *clawopt = fc2d_cudaclaw_get_options(glob);
+        fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
+
         fc2d_cudaclaw_initialize_GPUs(glob);
 
         /* this has to be done after GPUs have been initialized */
         cudaclaw_set_method_parameters(clawopt->order, clawopt->mthlim, clawopt->mwaves);
+
         fc2d_cudaclaw_solver_initialize();
 
     }
