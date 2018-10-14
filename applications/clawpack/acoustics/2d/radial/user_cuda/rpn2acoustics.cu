@@ -1,19 +1,21 @@
 #include "../radial_user.h"
 
-//#include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
-//#include <cassert>
+#include <fc2d_cudaclaw_check.cu>
     
-__managed__ double s_rho;
-__managed__ double s_bulk;
-__managed__ double s_c;
-__managed__ double s_z;
+__constant__ double s_rho;
+__constant__ double s_bulk;
+__constant__ double s_c;
+__constant__ double s_z;
 
 void radial_setprob_cuda(double rho, double bulk)
 {
-    s_rho = rho;
-    s_bulk = bulk;
-    s_c = sqrt(bulk/rho);
-    s_z = s_c*rho;
+    double c,z;
+    c = sqrt(bulk/rho);
+    z = c*rho;
+    CHECK(cudaMemcpyToSymbol(s_rho,  &rho, sizeof(double)));
+    CHECK(cudaMemcpyToSymbol(s_bulk, &rho, sizeof(double)));
+    CHECK(cudaMemcpyToSymbol(s_c,    &c,   sizeof(double)));
+    CHECK(cudaMemcpyToSymbol(s_z,    &z,   sizeof(double)));
 }
 
 
