@@ -34,14 +34,22 @@
 
 #include "cudaclaw_allocate.h"  /* Needed to for definition of 'fluxes' */
 
+__constant__ int order[2];
+__constant__ int mthlim[FC2D_CUDACLAW_MWAVES];
+
 extern "C"
 {
 int cudaclaw_check_parameters(int mwaves)
 {
     return mwaves <= FC2D_CUDACLAW_MWAVES;
 }
-}
 
+void cudaclaw_set_method_parameters(int *order_in, int *mthlim_in, int mwaves)
+{
+    CHECK(cudaMemcpyToSymbol(order,order_in,2*sizeof(int)));
+    CHECK(cudaMemcpyToSymbol(mthlim,mthlim_in,mwaves*sizeof(int)));
+}
+}
 
 /* Include this here so we don't include device code in fc2d_cudaclaw_cuda.h */
 __device__ double cudaclaw_limiter(int lim_choice, double r);
@@ -63,15 +71,11 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                cudaclaw_cuda_rpn2_t rpn2,
                                cudaclaw_cuda_rpt2_t rpt2,
                                cudaclaw_cuda_b4step2_t b4step2,
-                               int order_in[], int mthlim_in[],
                                double t,double dt)
 {
     typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
 
     __shared__ typename BlockReduce::TempStorage temp_storage;
-
-    __shared__ int  order[2];
-    __shared__ int mthlim[FC2D_CUDACLAW_MWAVES];
 
 
     extern __shared__ double shared_mem[];
@@ -111,13 +115,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double gupdate;
     int imp;
 
-    /* Copy to shared memory for faster loading */
-    order[0] = order_in[0];
-    order[1] = order_in[1];
-    for(mw = 0; mw < mwaves; mw++)
-    {
-        mthlim[mw] = mthlim_in[mw];
-    }
 
     /* --------------------------------- Start code ----------------------------------- */
 
@@ -923,7 +920,6 @@ __global__
 void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
                                       int maux, int mwaves, int mwork,
                                       double dt, double t,
-                                      int order[], int mthlim[],
                                       cudaclaw_fluxes_t* array_fluxes_struct,
                                       double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
@@ -947,8 +943,7 @@ void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc,
                                   array_fluxes_struct[blockIdx.z].bpdq_dev,
                                   array_fluxes_struct[blockIdx.z].waves_dev,
                                   array_fluxes_struct[blockIdx.z].speeds_dev, 
-                                  maxcflblocks, rpn2, rpt2, b4step2,
-                                  order, mthlim, t,dt);
+                                  maxcflblocks, rpn2, rpt2, b4step2, t,dt);
 }
 
 

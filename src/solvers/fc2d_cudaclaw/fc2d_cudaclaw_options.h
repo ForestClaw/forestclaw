@@ -84,6 +84,7 @@ void fc2d_cudaclaw_options_store (struct fclaw2d_global* glob, fc2d_cudaclaw_opt
 void fc2d_cudaclaw_output(struct fclaw2d_global *glob, int iframe);
 
 int cudaclaw_check_parameters(int mwaves);
+void cudaclaw_set_method_parameters(int order[], int mthlim[], int mwaves);
 
 
 

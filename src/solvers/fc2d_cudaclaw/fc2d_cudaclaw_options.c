@@ -114,6 +114,7 @@ cudaclaw_check(fc2d_cudaclaw_options_t *clawopt,
                                 " should be increased\n");
         return FCLAW_EXIT_ERROR;
     }
+    //cudaclaw_set_method_parameters(clawopt->order, clawopt->mthlim, clawopt->mwaves);
 
 
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
