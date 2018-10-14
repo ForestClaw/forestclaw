@@ -101,8 +101,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double* bmasdq = aux3   + 2*maux;       /* meqn        */
     double* bpasdq = bmasdq + meqn;         /* meqn        */
 
-    __shared__ double dtdx, dtdy;
-    __shared__ int xs, ys, zs;
+    double dtdx, dtdy;
+    int xs, ys, zs;
 
     int mq, mw, m, k;
     //int xs, ys, zs;
@@ -418,10 +418,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     }
 
 
-    ifaces_x = mx;  /* Visit edges of all non-ghost cells */
-    ifaces_y = my;
-    num_ifaces = ifaces_x*ifaces_y;
-
     /* ------------------------ Transverse Propagation : X-faces ---------------------- */
     /* Be sure to only visit faces where one (or both) of apdq/amdq are used to update
        a compute cell */
@@ -440,36 +436,46 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     */              
 
+    ifaces_x = mx+1;  /* Visit edges of all non-ghost cells */
+    ifaces_y = my;
+    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
         ix = thread_index % ifaces_x;
         iy = thread_index/ifaces_y;
 
-        I =  + (iy + mbc)*ys + (ix + mbc + 1);
+        I =  (iy + mbc)*ys + (ix + mbc);
+
+
+        for(mq = 0; mq < meqn; mq++)
+        {
+            I_q = I + mq*zs;
+
+            ql[mq] = qold[I_q-1];
+            qr[mq] = qold[I_q];
+
+            amdq[mq] = amdq_trans[I_q];
+            apdq[mq] = apdq_trans[I_q];
+        }            
+
+        for(imp = 0; imp < 2; imp++)
+        {
+            for(m = 0; m < maux; m++)
+            {
+                I_aux = I + m*zs;
+                k = imp*maux + m;
+                aux1[k] = aux[I_aux - ys + (imp - 1)];
+                aux2[k] = aux[I_aux      + (imp - 1)];
+                aux3[k] = aux[I_aux + ys + (imp - 1)];
+            }
+        }
+
 
         /* Lower left face */
-        //if (0 < ix && ix < mx + 1 && iy < my)   
+        //if (0 < ix && ix < mx + 1 && iy < my) 
+        //if (iy < my)          
         {
-            for(mq = 0; mq < meqn; mq++)
-            {
-                I_q = I + mq*zs;
-                amdq[mq] = amdq_trans[I_q];
-                apdq[mq] = apdq_trans[I_q];
-            }            
-            
-            for(imp = 0; imp < 2; imp++)
-            {
-                for(m = 0; m < maux; m++)
-                {
-                    I_aux = I + m*zs;
-                    k = imp*maux + m;
-                    aux1[k] = aux[I_aux - ys + (imp - 1)];
-                    aux2[k] = aux[I_aux      + (imp - 1)];
-                    aux3[k] = aux[I_aux + ys + (imp - 1)];
-                }
-            }
-
             rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,0,amdq,bmasdq,bpasdq);
 
             for(mq = 0; mq < meqn; mq++)
@@ -479,11 +485,50 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 gm[I_q - 1] -= gupdate;       
                 gp[I_q - 1] -= gupdate;
             }
+
+            __threadfence();
+
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,1,amdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdx*bpasdq[mq];
+                gm[I_q - 1 + ys] -= gupdate;
+                gp[I_q - 1 + ys] -= gupdate;
+            }     
+
+            __threadfence();
+
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,0,apdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdx*bmasdq[mq];
+                gm[I_q] -= gupdate;       
+                gp[I_q] -= gupdate;
+            }
+
+            __threadfence();
+
+            rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,1,apdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdx*bpasdq[mq];
+                gm[I_q + ys] -= gupdate;
+                gp[I_q + ys] -= gupdate;
+            }
+
+            __threadfence();
         } 
     } 
 
     __syncthreads();
 
+#if 0
     /*   transverse-x  
             |     |     | 
             |     |     | 
@@ -645,6 +690,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         } 
     } 
+#endif    
 
     __syncthreads();
 
@@ -668,34 +714,42 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
              |     |     
     */              
 
+#if 0
+    ifaces_x = mx;  /* Visit edges of all non-ghost cells */
+    ifaces_y = my;
+    num_ifaces = ifaces_x*ifaces_y;
+#endif    
+
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
         ix = thread_index % ifaces_x;
         iy = thread_index/ifaces_y;
 
-        I =  (iy + mbc + 1)*ys + (ix + mbc);
+        I =  (iy + mbc)*ys + (ix + mbc);
+
+
+        for(mq = 0; mq < meqn; mq++)
+        {
+            I_q = I + mq*zs;
+            bmdq[mq] = bmdq_trans[I_q];
+            bpdq[mq] = bpdq_trans[I_q];
+        }            
+
+        for(imp = 0; imp < 2; imp++)
+        {
+            for(m = 0; m < maux; m++)
+            {
+                I_aux = I + m*zs;
+                k = imp*maux + m;
+                aux1[k] = aux[I_aux - 1 + ys*(imp - 1)];
+                aux2[k] = aux[I_aux     + ys*(imp - 1)];
+                aux3[k] = aux[I_aux + 1 + ys*(imp - 1)];
+            }
+        }
 
         //if (ix < mx && 0 < iy && iy < my+1)   /* Is this needed? */
+        if (ix < mx)
         {
-
-            for(mq = 0; mq < meqn; mq++)
-            {
-                I_q = I + mq*zs;
-                bmdq[mq] = bmdq_trans[I_q];
-                bpdq[mq] = bpdq_trans[I_q];
-            }            
-
-            for(imp = 0; imp < 2; imp++)
-            {
-                for(m = 0; m < maux; m++)
-                {
-                    I_aux = I + m*zs;
-                    k = imp*maux + m;
-                    aux1[k] = aux[I_aux - 1 + ys*(imp - 1)];
-                    aux2[k] = aux[I_aux     + ys*(imp - 1)];
-                    aux3[k] = aux[I_aux + 1 + ys*(imp - 1)];
-                }
-            }
 
             rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,0,bmdq,bmasdq,bpasdq);
 
@@ -706,11 +760,51 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 fm[I_q - ys] -= gupdate;        
                 fp[I_q - ys] -= gupdate;
             }
+
+            __threadfence();
+
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,1,bmdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdy*bpasdq[mq];
+                fm[I_q - ys + 1] -= gupdate;
+                fp[I_q - ys + 1] -= gupdate;
+            }
+
+            __threadfence();
+
+
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,0,bpdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdy*bmasdq[mq];
+                fm[I_q] -= gupdate;        
+                fp[I_q] -= gupdate;
+            }   
+
+            __threadfence();
+
+            rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,1,bpdq,bmasdq,bpasdq);
+
+            for(mq = 0; mq < meqn; mq++)
+            {
+                I_q = I + mq*zs;  
+                gupdate = 0.5*dtdy*bpasdq[mq];
+                fm[I_q + 1] -= gupdate;
+                fp[I_q + 1] -= gupdate;
+            }   
+
+
+            __threadfence();
+
         } 
     } 
 
-    __syncthreads();
-
+#if 0
     /*  transverse-y
 
              |     |     
@@ -887,6 +981,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }   
         } 
     } 
+#endif
 
     __syncthreads();
 
