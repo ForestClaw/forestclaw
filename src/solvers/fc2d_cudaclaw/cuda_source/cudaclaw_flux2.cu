@@ -101,11 +101,10 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double* bmasdq = aux3   + 2*maux;       /* meqn        */
     double* bpasdq = bmasdq + meqn;         /* meqn        */
 
-    __shared__ double dtdx, dtdy;
-    __shared__ int xs, ys, zs;
+    double dtdx, dtdy;
 
     int mq, mw, m, k;
-    //int xs, ys, zs;
+    int xs, ys, zs;
     int I, I_q, I_aux, I_waves, I_speeds;
     int ix,iy,ifaces_x, ifaces_y, num_ifaces;
     int thread_index;
