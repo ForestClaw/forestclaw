@@ -87,20 +87,16 @@ __device__ void radial_rpt2acoustics(int idir, int meqn, int mwaves, int maux,
     alpha1 = ( -delta[0] + s_z*delta[1]) / (2.0*s_z);
     alpha2 = (  delta[0] + s_z*delta[1]) / (2.0*s_z);
 
-    if (pm == 0)
-    {
-        /* Down going wave */
-        bmasdq[0]  = s_c * alpha1 * s_z;
-        bmasdq[mu] = 0;
-        bmasdq[mv] = -s_c * alpha1;
-    }
-    else
-    {
-        /* Up going wave */
-        bpasdq[0]       = s_c * alpha2 * s_z;
-        bpasdq[mu] = 0;
-        bpasdq[mv] = s_c * alpha2;
-    }
+    /* Down going wave */
+    bmasdq[0]  = s_c * alpha1 * s_z;
+    bmasdq[mu] = 0;
+    bmasdq[mv] = -s_c * alpha1;
+
+    /* Up going wave */
+    bpasdq[0]       = s_c * alpha2 * s_z;
+    bpasdq[mu] = 0;
+    bpasdq[mv] = s_c * alpha2;
+    
 }
 
 __device__ cudaclaw_cuda_rpt2_t radial_rpt2 = radial_rpt2acoustics;
