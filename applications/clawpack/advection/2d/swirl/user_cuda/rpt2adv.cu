@@ -6,7 +6,7 @@
 __device__ void swirl_rpt2adv(int idir, int meqn, int mwaves, int maux,
                               double ql[], double qr[], 
                               double aux1[], double aux2[], double aux3[],
-                              int imp, int pm, double asdq[],
+                              int imp, double asdq[],
                               double bmasdq[], double bpasdq[])
 {
     int mq, kv;
@@ -15,14 +15,8 @@ __device__ void swirl_rpt2adv(int idir, int meqn, int mwaves, int maux,
     kv = 1-idir;
     for(mq = 0; mq < meqn; mq++)
     {
-        if (pm == 0)
-        {
-            bmasdq[mq] = SC_MIN(aux2[imp*maux + kv], 0) * asdq[mq];                        
-        }
-        else
-        {
-            bpasdq[mq] = SC_MAX(aux3[imp*maux + kv], 0) * asdq[mq];                                
-        }
+        bmasdq[mq] = SC_MIN(aux2[imp*maux + kv], 0) * asdq[mq];                        
+        bpasdq[mq] = SC_MAX(aux3[imp*maux + kv], 0) * asdq[mq];                                
     }
 }
 
