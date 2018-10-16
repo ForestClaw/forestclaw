@@ -72,7 +72,7 @@ void radial_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2)
 __device__ void radial_rpt2acoustics(int idir, int meqn, int mwaves, int maux,
                                      double ql[], double qr[], 
                                      double aux1[], double aux2[], double aux3[],
-                                     int imp, int pm, double asdq[],
+                                     int imp, double asdq[],
                                      double bmasdq[], double bpasdq[])
 {
 
@@ -93,7 +93,7 @@ __device__ void radial_rpt2acoustics(int idir, int meqn, int mwaves, int maux,
     bmasdq[mv] = -s_c * alpha1;
 
     /* Up going wave */
-    bpasdq[0]       = s_c * alpha2 * s_z;
+    bpasdq[0]  = s_c * alpha2 * s_z;
     bpasdq[mu] = 0;
     bpasdq[mv] = s_c * alpha2;
     
