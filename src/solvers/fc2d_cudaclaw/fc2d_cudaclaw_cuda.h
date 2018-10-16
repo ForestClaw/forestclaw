@@ -63,7 +63,7 @@ typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
 typedef void (*cudaclaw_cuda_rpt2_t)(int idir, int meqn, int mwaves, int maux,
                                      double ql[], double qr[], 
                                      double aux1[], double aux2[], double aux3[],
-                                     int imp, int pm, double dsdq[],
+                                     int imp, double dsdq[],
                                      double bmasdq[], double bpasdq[]);
 
 /* ------------------------------------- Function headers ------------------------------*/
