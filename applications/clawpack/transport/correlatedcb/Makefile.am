@@ -5,6 +5,7 @@ bin_PROGRAMS += applications/clawpack/transport/correlatedcb/correlatedcb
 applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/correlatedcb/correlatedcb_user.cpp \
 	applications/clawpack/transport/correlatedcb/correlatedcb.cpp \
+	applications/clawpack/transport/correlatedcb/correlatedcb_user.h \
 	applications/clawpack/transport/correlatedcb/setprob.f \
 	applications/clawpack/transport/correlatedcb/cosine_bell.f \
 	applications/clawpack/transport/correlatedcb/user_4.6/qinit.f \
@@ -15,6 +16,8 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/correlatedcb/user_5.0/tag4refinement.f \
 	applications/clawpack/transport/correlatedcb/user_4.6/tag4coarsening.f \
 	applications/clawpack/transport/correlatedcb/user_5.0/tag4coarsening.f \
+	applications/clawpack/transport/all/transport_user.h \
+	applications/clawpack/transport/all/transport_options.h \
 	applications/clawpack/transport/all/velocity_wind.f \
 	applications/clawpack/transport/all/gaussian.f \
 	applications/clawpack/transport/all/transport_user.cpp \
@@ -22,6 +25,7 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/all/transport_options.c \
 	applications/clawpack/transport/all/user46_b4step2_manifold.f \
 	applications/clawpack/transport/all/user5_b4step2_manifold.f90 \
+	applications/clawpack/advection/2d/all/advection_user_fort.h \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
@@ -29,19 +33,13 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-correlatedcb_headers = \
-	applications/clawpack/advection/2d/all/advection_user_fort.h \
-	applications/clawpack/transport/correlatedcb/correlatedcb_user.h \
-	applications/clawpack/transport/all/transport_user.h \
-	applications/clawpack/transport/all/transport_options.h
-
-correlatedcb_inifiles = \
+EXTRA_DIST += \
 	applications/clawpack/transport/correlatedcb/fclaw_options.ini \
-	applications/clawpack/transport/correlatedcb/regression.ini 
-
-applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES += \
-	$(correlatedcb_inifiles) \
-	$(correlatedcb_headers)
+	applications/clawpack/transport/correlatedcb/regression.ini \
+	applications/clawpack/transport/correlatedcb/afterframe.m \
+	applications/clawpack/transport/correlatedcb/setplot2.m \
+	applications/clawpack/transport/correlatedcb/mapc2m.m \
+	applications/clawpack/transport/correlatedcb/plot_mixing.m
 
 applications_clawpack_transport_correlatedcb_correlatedcb_CPPFLAGS = \
         $(AM_CPPFLAGS) \

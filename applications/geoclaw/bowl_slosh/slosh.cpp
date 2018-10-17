@@ -33,93 +33,6 @@
 #include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
 
-static int s_user_options_package_id = -1;
-
-static void *
-slosh_register (user_options_t *user, sc_options_t * opt)
-{
-    /* [user] User options */
-
-    user->is_registered = 1;
-    return NULL;
-}
-
-static void
-slosh_destroy(user_options_t *user)
-{
-    /* Nothing to destroy */
-}
-
-/* ------- Generic option handling routines that call above routines ----- */
-static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (opt != NULL);
-
-    user = (user_options_t*) package;
-
-    return slosh_register(user,opt);
-}
-
-static void
-options_destroy (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    user = (user_options_t*) package;
-    FCLAW_ASSERT (user->is_registered);
-
-    slosh_destroy (user);
-
-    FCLAW_FREE (user);
-}
-
-
-static const fclaw_app_options_vtable_t options_vtable_user =
-{
-    options_register,
-    NULL,
-    NULL,
-    options_destroy
-};
-
-static
-user_options_t* slosh_options_register (fclaw_app_t * app,
-                                       const char *configfile)
-{
-    user_options_t *user;
-    FCLAW_ASSERT (app != NULL);
-
-    user = FCLAW_ALLOC (user_options_t, 1);
-    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
-                                user);
-
-    fclaw_app_set_attribute(app,"user",user);
-    return user;
-}
-
-static 
-void slosh_options_store (fclaw2d_global_t* glob, user_options_t* user)
-{
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
-}
-
-user_options_t* slosh_get_options(fclaw2d_global_t* glob)
-{
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
-}
-/* ------------------------- ... and here ---------------------------- */
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
@@ -148,8 +61,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     fc2d_geoclaw_solver_initialize();
 

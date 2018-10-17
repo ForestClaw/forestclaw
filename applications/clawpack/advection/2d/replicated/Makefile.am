@@ -18,12 +18,18 @@ applications_clawpack_advection_2d_replicated_replicated_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/all/clawpack5_setaux.f90
 
-replicated_inifiles = \
+EXTRA_DIST += \
 	applications/clawpack/advection/2d/replicated/fclaw_options.ini \
-	applications/clawpack/advection/2d/replicated/regression.ini
-
-# Is there a better way to do this? 
-applications_clawpack_advection_2d_replicated_replicated_SOURCES += $(replicated_inifiles)
+	applications/clawpack/advection/2d/replicated/regression.ini \
+	applications/clawpack/advection/2d/replicated/ex_00001.ini \
+	applications/clawpack/advection/2d/replicated/ex_00004.ini \
+	applications/clawpack/advection/2d/replicated/ex_00016.ini \
+	applications/clawpack/advection/2d/replicated/p_00001.py \
+	applications/clawpack/advection/2d/replicated/p_00004.py \
+	applications/clawpack/advection/2d/replicated/p_00016.py \
+	applications/clawpack/advection/2d/replicated/afterframe.m \
+	applications/clawpack/advection/2d/replicated/setplot2.m \
+	applications/clawpack/advection/2d/replicated/mapc2m.m
 
 applications_clawpack_advection_2d_replicated_replicated_CPPFLAGS = \
         $(AM_CPPFLAGS)  \

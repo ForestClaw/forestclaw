@@ -37,19 +37,12 @@ setpatchborderprops('linewidth',1);
 % This is used for creating vectorized PDFs
 prt_tikz = false;
 if (prt_tikz)
-    axis off
-    hidepatchborders;
-    delete(get(gca,'title'));
-    figsize = [4,1];  % Should match size set in options
-    set(gcf,'papersize',figsize);
-    set(gca,'position',[0 0 1 1]);
-    set(gcf,'paperposition',[0 0 figsize]);
-    fname = sprintf('plot_%04d.png',Frame);
-    
-    % Match print resolution to computational resolution
-    maxlevel = 4;   % Adjust to determine resolution
-    res = sprintf('-r%d',mx*2^maxlevel);
-    print('-dpng',res,fname);  
+    figsize = [32,8];  % Should match tikz figsize.
+    maxlevel = 6;
+    dpi = mx*2^maxlevel/figsize(1);
+    prefix = 'plot';
+    caxis([0,4]);
+    plot_tikz_fig(Frame,figsize,prefix,dpi);    
 end
 daspect([1,1,1]);
 shg

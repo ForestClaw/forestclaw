@@ -3,7 +3,7 @@ SUBROUTINE fc2d_geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in,  &
     USE amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves, xlower, ylower, xupper, yupper
 
     USE regions_module, ONLY: set_regions
-    USE gauges_module, ONLY: set_gauges
+!!    USE gauges_module, ONLY: set_gauges
     USE geoclaw_module, ONLY: set_geo
     USE topo_module, ONLY: read_topo_settings, read_dtopo_settings
     USE qinit_module, ONLY: set_qinit

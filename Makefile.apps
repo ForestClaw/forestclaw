@@ -72,3 +72,8 @@ if FCLAW_ENABLE_ASH3D
 
 endif
 
+
+# Include examples that use the low-level interface to p4est
+# They should always compile
+
+include applications/lowlevel/Makefile.am

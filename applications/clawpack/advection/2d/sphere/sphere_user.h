@@ -50,8 +50,13 @@ typedef struct user_options
 #define SPHERE_SETPROB FCLAW_F77_FUNC(sphere_setprob, SPHERE_SETPROB)
 void SPHERE_SETPROB(const double *rps);
 
-const user_options_t* 
-sphere_get_options(fclaw2d_global_t* glob);
+
+user_options_t* sphere_options_register (fclaw_app_t * app,
+                                             const char *configfile);
+
+void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
+const user_options_t* sphere_get_options(fclaw2d_global_t* glob);
 
 void 
 sphere_problem_setup(fclaw2d_global_t* glob);

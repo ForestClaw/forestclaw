@@ -3,6 +3,7 @@ bin_PROGRAMS += applications/clawpack/advection/2d/annulus/annulus
 
 applications_clawpack_advection_2d_annulus_annulus_SOURCES = \
 	applications/clawpack/advection/2d/annulus/annulus.cpp \
+	applications/clawpack/advection/2d/annulus/annulus_options.c \
 	applications/clawpack/advection/2d/annulus/annulus_user.h \
 	applications/clawpack/advection/2d/annulus/annulus_user.cpp \
 	applications/clawpack/advection/2d/annulus/fclaw2d_map_annulus.c \
@@ -18,13 +19,12 @@ applications_clawpack_advection_2d_annulus_annulus_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-annulus_inifiles =	\
+EXTRA_DIST += \
 	applications/clawpack/advection/2d/annulus/fclaw_options.ini \
-	applications/clawpack/advection/2d/annulus/regression.ini
-
-applications_clawpack_advection_2d_annulus_annulus_SOURCES += $(annulus_inifiles)
-
-
+	applications/clawpack/advection/2d/annulus/regression.ini \
+	applications/clawpack/advection/2d/annulus/afterframe.m \
+	applications/clawpack/advection/2d/annulus/setplot2.m \
+	applications/clawpack/advection/2d/annulus/mapc2m.m
 
 applications_clawpack_advection_2d_annulus_annulus_CPPFLAGS = \
         $(AM_CPPFLAGS) \

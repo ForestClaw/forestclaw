@@ -33,8 +33,6 @@
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack46.h>
 
-/* ------------------------- ... and here ---------------------------- */
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
                                 user_options_t *user)
@@ -104,8 +102,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     fc2d_clawpack46_solver_initialize();

@@ -15,7 +15,7 @@ from clawpack.geoclaw import topotools
 try:
     TG32412 = np.loadtxt('32412_notide.txt')
 except:
-    print "*** Could not load DART data file"
+    print("*** Could not load DART data file")
 
 #--------------------------
 def setplot(plotdata):
@@ -35,8 +35,6 @@ def setplot(plotdata):
     plotdata.clearfigures()  # clear any old figures,axes,items data
 
     plotdata.verbose = False
-
-    plotdata.format = 'forestclaw'
 
     # To plot gauge locations on pcolor or contour plot, use this as
     # an afteraxis function:
@@ -242,7 +240,7 @@ def setplot(plotdata):
     plotaxes.afteraxes = add_zeroline
 
 
-    #-----------------------------------------
+    #--------------------------------------------------------------
 
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via pyclaw.plotters.frametools.printframes:
@@ -259,6 +257,7 @@ def setplot(plotdata):
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
+    plotdata.format = 'forestclaw'
 
     plotdata.kml = True
 

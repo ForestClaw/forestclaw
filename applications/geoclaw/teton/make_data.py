@@ -115,14 +115,14 @@ def setrun(claw_pkg='geoclaw'):
     print("%-12s (%14.8f, %12.8f)" % ("Upper right",clawdata.upper[0],clawdata.upper[1]))
     print("")
 
-    print "Approximate aspect ratio : {0:16.8f}".format(float(clawdata.num_cells[0])/clawdata.num_cells[1])
-    print "Actual      aspect ratio : {0:16.8f}".format(dims_topo[0]/dims_topo[1])
+    print("Approximate aspect ratio : {0:16.8f}".format(float(clawdata.num_cells[0])/clawdata.num_cells[1]))
+    print("Actual      aspect ratio : {0:16.8f}".format(dims_topo[0]/dims_topo[1]))
 
     # print "[{0:20.12f},{1:20.12f}]".format(*clawdata.lower)
     # print "[{0:20.12f},{1:20.12f}]".format(*clawdata.upper)
 
     dims_computed = np.array([clawdata.upper[0]-clawdata.lower[0], clawdata.upper[1]-clawdata.lower[1]])
-    print "Computed aspect ratio    : {0:20.12f}".format(dims_computed[0]/dims_computed[1])
+    print("Computed aspect ratio    : {0:20.12f}".format(dims_computed[0]/dims_computed[1]))
 
     print("")
     print("Details in km : ")    
@@ -130,10 +130,7 @@ def setrun(claw_pkg='geoclaw'):
     lon = np.array([clawdata.lower[0],clawdata.upper[0]])
     lat = np.array([clawdata.lower[1],clawdata.upper[1]])
     d = tools.compute_distances(lon,lat)
-
-
-
-
+    
     # ---------------
     # Size of system:
     # ---------------
@@ -465,7 +462,7 @@ def setgeo(rundata):
     try:
         geo_data = rundata.geo_data
     except:
-        print "*** Error, this rundata has no geo_data attribute"
+        print("*** Error, this rundata has no geo_data attribute")
         raise AttributeError("Missing geo_data attribute")
 
 

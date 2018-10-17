@@ -23,7 +23,6 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #include "swirlcons_user.h"
 
 #include <fclaw_options.h>
@@ -48,8 +47,10 @@ swirlcons_register (user_options_t *user, sc_options_t * opt)
                            "Conservative Riemann solver (1-4) [3]");
 
     sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
-                           "Mapping (0=no map; 1=5-patch) [0]");
+                           "1 : u(x) > 0; 2: u(x) changes sign (1,2) [1]");
 
+    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 1,
+                           "Conservative riemann solver (1-4) [T]");
     user->is_registered = 1;
 
     return NULL;

@@ -216,17 +216,19 @@ fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
     FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
 }
 
-fclaw2d_patch_t *
+static fclaw2d_patch_t *
 fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)
 {
     fclaw2d_block_t *block;
 
+#if 0
     /* remote patch */
     if (blockno == -1)
     {
         FCLAW_ASSERT (0 <= patchno && patchno < domain->num_ghost_patches);
         return domain->ghost_patches + patchno;
     }
+#endif
 
     /* local patch */
     FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
@@ -1980,3 +1982,22 @@ fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
         SC_CHECK_MPI (mpiret);
     }
 }
+
+#if 0
+
+/* This is how it used to work.  Never needed it */
+
+/** Access a local or off-processor patch by its block and patch number.
+ * \param [in] domain   Valid domain.
+ * \param [in] blockno  For a local patch the number of the block.
+ *                      To request a remote patch set this number to -1.
+ * \param [in] patchno  For a local patch the number of the patch
+ *                      relative to its block.  Otherwise the number
+ *                      of the remote patch as returned by
+ *                      \ref fclaw2d_patch_face_neighbors and friends.
+ * \return              The patch that was requested.
+ */
+fclaw2d_patch_t *fclaw2d_domain_get_patch (fclaw2d_domain_t * domain,
+                                           int blockno, int patchno);
+
+#endif

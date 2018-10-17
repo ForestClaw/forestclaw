@@ -6,7 +6,7 @@ axis off;
 yrbcolormap;
 showpatchborders(1:10);
 setpatchborderprops('linewidth',1);
-caxis([0,1])
+caxis([0,1]) 
 
 plot_tikz = true;
 if (plot_tikz)
@@ -16,7 +16,8 @@ if (plot_tikz)
     dpi = mx*2^maxlevel/figsize(1);
     fprintf('dpi = %d\n',dpi);
     prefix = 'plot';
-    plot_tikz_fig(Frame,figsize,prefix,dpi);
+    caxis([0,4]);
+    plot_tikz_fig(Frame,figsize,prefix,dpi);    
 end
 
 view(2);

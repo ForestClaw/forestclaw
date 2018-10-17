@@ -27,6 +27,7 @@
 #define FC2D_GEOCLAW_H
 
 #include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
+#include <fc2d_geoclaw_fort.h>  /* Needed for virtual functions */
 
 #ifdef __cplusplus
 extern "C"
@@ -50,80 +51,6 @@ struct geoclaw_gauge;
 void fc2d_geoclaw_module_setup(struct fclaw2d_global *glob);
 
 void fc2d_geoclaw_output(struct fclaw2d_global *glob, int iframe);
-
-/* --------------------------------------- Typedefs ---------------------------------------- */
-
-typedef void (*fc2d_geoclaw_setprob_t)();
-
-
-typedef void (*fc2d_geoclaw_bc2_t)(const int* meqn, const int* mbc,
-                                   const int* mx, const int* my,
-                                   const double* xlower, const double* ylower,
-                                   const double* dx, const double* dy,
-                                   const double q[], const int* maux,
-                                   const double aux[], const double* t,
-                                   const double* dt, const int mthbc[]);
-
-typedef  void (*fc2d_geoclaw_qinit_t)(const int* meqn,const int* mbc,
-                                      const int* mx, const int* my,
-                                      const double* xlower, const double* ylower,
-                                      const double* dx, const double* dy,
-                                      double q[], const int* maux, double aux[]);
-
-typedef void (*fc2d_geoclaw_setaux_t)(const int* mbc,
-                                      const int* mx, const int* my,
-                                      const double* xlower, const double* ylower,
-                                      const double* dx, const double* dy,
-                                      const int* maux, double aux[],
-                                      const int* is_ghost, const int* nghost,
-                                      const int* mint);
-
-typedef void (*fc2d_geoclaw_b4step2_t)(const int* mbc,
-                                       const int* mx, const int* my, const int* meqn,
-                                       double q[], const double* xlower,
-                                       const double* ylower,
-                                       const double* dx, const double* dy,
-                                       const double* t, const double* dt,
-                                       const int* maux, double aux[]);
-
-typedef void (*fc2d_geoclaw_src2_t)(const int* meqn,
-                                    const int* mbc, const int* mx,const int* my,
-                                    const double* xlower, const double* ylower,
-                                    const double* dx, const double* dy, double q[],
-                                    const int* maux, double aux[], const double* t,
-                                    const double* dt);
-
-
-typedef void (*fc2d_geoclaw_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
-                                    const int* mwaves, const int* maux,
-                                    const int* mbc,const int* mx,
-                                    double ql[], double qr[], double auxl[], double auxr[],
-                                    double fwave[], double s[],double amdq[], double apdq[]);
-
-typedef void (*fc2d_geoclaw_rpt2_t)(const int* ixy, const int* imp, const int* maxm, 
-                                    const int* meqn,
-                                    const int* mwaves, const int* maux, const int* mbc,
-                                    const int* mx,
-                                    double ql[], double qr[], double aux1[], double aux2[],
-                                    double aux3[],  double asdq[],
-                                    double bmasdq[], double bpasdq[]);
-
-
-typedef void (*fc2d_geoclaw_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
-                                     const int* maux,const int* mbc,const int* mx,
-                                     double q1d[], double dtdx1d[],
-                                     double aux1[], double aux2[], double aux3[],
-                                     double faddm[],double faddp[], double gaddm[],
-                                     double gaddp[],double cfl1d[], double wave[],
-                                     double s[], double amdq[],double apdq[],
-                                     double cqxx[],
-                                     double bmasdq[], double bpasdq[],
-                                     fc2d_geoclaw_rpn2_t rpn2,
-                                     fc2d_geoclaw_rpt2_t rpt2);
-
-typedef void (*fc2d_geoclaw_fluxfun_t)(const int* meqn, double q[], double aux[],
-                                       double fq[]);
-
 
 /* ------------------------------------- Virtual table ----------------------------------- */
 

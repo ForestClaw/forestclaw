@@ -36,139 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-static int s_user_options_package_id = -1;
-
-static void *
-radialdam_register (user_options_t* user, sc_options_t * opt)
-{
-    /* [user] User options */
-    sc_options_add_int (opt, 0, "example", &user->example, 0, "[user] 0 - nomap; 1 - disk [0]");
-
-    sc_options_add_double (opt, 0, "g",     &user->g,     1.0, "[user] g [1.0]");
-    sc_options_add_double (opt, 0, "x0",    &user->x0,    0.0, "[user] x0 [0.0]");
-    sc_options_add_double (opt, 0, "y0",    &user->y0,    0.0, "[user] y0 [0.0]");
-    sc_options_add_double (opt, 0, "r0",    &user->r0,    0.5, "[user] r0 [0.5]");
-    sc_options_add_double (opt, 0, "hin",   &user->hin,   2.0, "[user] hin [2.0]");
-    sc_options_add_double (opt, 0, "hout",  &user->hout,  1.0, "[user] hout [1.0]");
-
-    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4, "[user] alpha (for 5-patch map) [0.4]");
-
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
-                           "Clawpack_version (4 or 5) [5]");
-
-    user->is_registered = 1;
-    return NULL;
-}
-
-static fclaw_exit_type_t
-radialdam_check (user_options_t *user)
-{
-    if (user->example < 0 || user->example > 1) {
-        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    if (user->example == 1 && user->claw_version == 4)
-    {
-        fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    return FCLAW_NOEXIT;
-}
-
-static void
-radialdam_destroy(user_options_t *user)
-{
-    /* Nothing to destroy */
-}
-
-/* ------- Generic option handling routines that call above routines ----- */
-static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (opt != NULL);
-
-    user = (user_options_t*) package;
-
-    return radialdam_register(user,opt);
-}
-
-static fclaw_exit_type_t
-options_check(fclaw_app_t *app, void *package,void *registered)
-{
-    user_options_t           *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT(registered == NULL);
-
-    user = (user_options_t*) package;
-
-    return radialdam_check(user);
-}
-
-
-static void
-options_destroy (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    user = (user_options_t*) package;
-    FCLAW_ASSERT (user->is_registered);
-
-    radialdam_destroy (user);
-
-    FCLAW_FREE (user);
-}
-
-
-static const fclaw_app_options_vtable_t options_vtable_user =
-{
-    options_register,
-    NULL,
-    options_check,
-    options_destroy
-};
-
-/* ------------- User options access functions --------------------- */
-
-static
-user_options_t* radialdam_options_register (fclaw_app_t * app,
-                                          const char *configfile)
-{
-    user_options_t *user;
-    FCLAW_ASSERT (app != NULL);
-
-    user = FCLAW_ALLOC (user_options_t, 1);
-    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
-                                user);
-
-    fclaw_app_set_attribute(app,"user",user);
-    return user;
-}
-
-static 
-void radialdam_options_store (fclaw2d_global_t* glob, user_options_t* user)
-{
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
-}
-
-user_options_t* radialdam_get_options(fclaw2d_global_t* glob)
-{
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
-}
-/* ------------------------- ... and here ---------------------------- */
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt,
@@ -219,8 +86,7 @@ void run_program(fclaw2d_global_t* glob)
     user_opt = radialdam_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)

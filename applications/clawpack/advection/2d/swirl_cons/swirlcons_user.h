@@ -93,6 +93,16 @@ void swirlcons_patch_setup_manifold(struct fclaw2d_global *glob,
                                     int this_patch_idx);
 
 /* --------------------------------- Riemann Problems --------------------------------- */
+void swirlcons_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
+const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob);
+
+
+/* ---------------------------- Fortran headers --------------------------------------- */
+
+#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
+void SWIRL_SETPROB(int* example);
+
 
 #define RPN2CONS_QS FCLAW_F77_FUNC(rpn2cons_qs,RPN2CONS_QS)
 void RPN2CONS_QS(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,

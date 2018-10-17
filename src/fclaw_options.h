@@ -145,6 +145,9 @@ struct fclaw_options
     /* Conservation */
     int time_sync;
 
+    /* Gauges */
+    int gauge_buffer_length;   
+
     /* Mapping functions */
     int manifold;
     int mi;
@@ -174,6 +177,8 @@ struct fclaw_options
     int conservation_check;
     int trapfpe;
     int report_timing;
+    int report_timing_verbosity;
+    sc_keyvalue_t *kv_timing_verbosity;
 
     /* Parallel options */
     int mpi_debug;

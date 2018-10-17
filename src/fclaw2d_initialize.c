@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_convenience.h>
 
+#include <fclaw_gauges.h>
+
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_physical_bc.h>
@@ -321,12 +323,16 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     {
         int domain_init = 1;
         int level;
-        for (level = minlevel; level < maxlevel; level++)
+        for (level = minlevel; level <= maxlevel; level++)
         {
             fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
-            fclaw2d_global_iterate_level(glob, level,
-                                         cb_fclaw2d_regrid_tag4refinement,
+
+            fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
+                                            (void*) NULL);
+
+            fclaw2d_global_iterate_patches(glob,cb_fclaw2d_regrid_tag4refinement,
                                          &domain_init);
+            
             fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
             // Construct new domain based on tagged patches.
@@ -358,30 +364,25 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
                 fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
-                // free all memory associated with old domain
+                /* free all memory associated with old domain */
                 fclaw2d_domain_reset(glob);
                 *domain = new_domain;
                 new_domain = NULL;
 
                 /* Repartition domain to new processors.    */
-                fclaw2d_partition_domain(glob,level,FCLAW2D_TIMER_INIT);
+                fclaw2d_partition_domain(glob,FCLAW2D_TIMER_INIT);
 
                 /* Set up ghost patches.  This probably doesn't need to be done
                    each time we add a new level. */
                 fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_INIT);
-
+                
                 /* This is normally called from regrid, once the initial domain
                    has been set up */
                 fclaw2d_regrid_set_neighbor_types(glob);
-                // if (fclaw_opt->init_ghostcell)
-                // {
-                //     fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
-                //                         (*domain)->global_maxlevel,0.0,
-                //                         time_interp,FCLAW2D_TIMER_INIT);
-                // }
             }
             else
             {
+                fclaw_global_infof(" -- No new initial refinement\n");
                 /* We don't have a new refinement, and so can break out of level loop */
                 break;
             }
@@ -396,6 +397,8 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     }
 
     fclaw2d_diagnostics_initialize(glob);
+    fclaw_locate_gauges(glob);
+
     fclaw2d_after_regrid(glob);
 
     /* Print global minimum and maximum levels */

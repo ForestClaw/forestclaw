@@ -63,6 +63,12 @@ void torus_patch_setup(fclaw2d_global_t *glob,
                        int this_patch_idx);
 
 
+user_options_t* torus_options_register (fclaw_app_t * app,
+                                       const char *configfile);
+
+
+void torus_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 const user_options_t* torus_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t *

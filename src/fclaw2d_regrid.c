@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_convenience.h>   /* p4est domain, patch handling routines */
 #include <forestclaw2d.h>          /* Needed for patch_relation_t data */
 
+#include <fclaw_gauges.h>
+
 #include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_ghost_fill.h>
@@ -71,7 +73,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 }
 
 /* Tag family for coarsening */
-static
+
 void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
 							  fclaw2d_patch_t *fine_patches,
 							  int blockno, int fine0_patchno,
@@ -118,96 +120,111 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 								  int new_patchno,
 								  void *user)
 {
-	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
-	int domain_init = *((int*) g->user);
+    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    int domain_init = *((int*) g->user);
 
-	fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
-	fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
-	fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
+    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
+    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
-	if (newsize == FCLAW2D_PATCH_SAMESIZE)
-	{
-		FCLAW_ASSERT(0 <= blockno && blockno < new_domain->num_blocks);
-		FCLAW_ASSERT(0 <= new_patchno && new_patchno < new_domain->local_num_patches);
-		new_patch->user = old_patch->user;
-		old_patch->user = NULL;
-		fclaw2d_patch_reset_data(g->glob,old_patch,new_patch,blockno,old_patchno,new_patchno);
-		++ddata_old->count_delete_patch;
-		++ddata_new->count_set_patch;
-	}
-	else if (newsize == FCLAW2D_PATCH_HALFSIZE)
-	{
-		fclaw2d_patch_t *fine_siblings = new_patch;
-		fclaw2d_patch_t *coarse_patch = old_patch;
+    if (newsize == FCLAW2D_PATCH_SAMESIZE)
+    {
+        FCLAW_ASSERT(0 <= blockno && blockno < new_domain->num_blocks);
+        FCLAW_ASSERT(0 <= new_patchno && new_patchno < new_domain->local_num_patches);
+        new_patch->user = old_patch->user;
+        old_patch->user = NULL;
+        ++ddata_old->count_delete_patch;
+        ++ddata_new->count_set_patch;
+    }
+    else if (newsize == FCLAW2D_PATCH_HALFSIZE)
+    {
+        fclaw2d_patch_t *fine_siblings = new_patch;
+        fclaw2d_patch_t *coarse_patch = old_patch;
 
-		int i;
-		for (i = 0; i < 4; i++)
-		{
-			fclaw2d_patch_t *fine_patch = &fine_siblings[i];
-			int fine_patchno = new_patchno + i;
-			--ddata_old->count_set_patch;
-			++ddata_new->count_set_patch;
+        int i;
+        for (i = 0; i < NumSiblings; i++)
+        {
+            fclaw2d_patch_t *fine_patch = &fine_siblings[i];
+            int fine_patchno = new_patchno + i;
+            /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
+               but we really want to increment the new domain. This will be fixed! */
+            --ddata_old->count_set_patch;
+            ++ddata_new->count_set_patch;
 
-			fclaw2d_patch_build(g->glob,fine_patch,blockno,
-								fine_patchno,(void*) &build_mode);
-			if (domain_init)
-			{
-				fclaw2d_patch_initialize(g->glob,fine_patch,blockno,fine_patchno);//new_domain
-			}
-		}
+            fclaw2d_patch_build(g->glob,fine_patch,blockno,
+                                fine_patchno,(void*) &build_mode);
+            if (domain_init)
+            {
+                fclaw2d_patch_initialize(g->glob,fine_patch,blockno,fine_patchno);//new_domain
+            }
+        }
 
-		if (!domain_init)
-		{
-			int coarse_patchno = old_patchno;
-			int fine_patchno = new_patchno;
+        if (!domain_init)
+        {
+            int coarse_patchno = old_patchno;
+            int fine_patchno = new_patchno;
 
-			fclaw2d_patch_interpolate2fine(g->glob,coarse_patch,fine_siblings,
-										   blockno,coarse_patchno,fine_patchno);//new_domain
-		}
-		/* used to pass in old_domain */
-		fclaw2d_patch_data_delete(g->glob,coarse_patch);
-	}
-	else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
-	{
-		if (domain_init)
-		{
-			fclaw_debugf("fclaw2d_regrid.cpp (repopulate): We shouldn't end up here\n");
-			exit(0);
-		}
+            fclaw2d_patch_interpolate2fine(g->glob,coarse_patch,fine_siblings,
+                                           blockno,coarse_patchno,fine_patchno);//new_domain
+        }
+        /* used to pass in old_domain */
+        fclaw2d_patch_data_delete(g->glob,coarse_patch);
+    }
+    else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
+    {
 
-		/* Old grids are the finer grids;  new grid is the coarsened grid */
-		fclaw2d_patch_t *fine_siblings = old_patch;
-		int fine_patchno = old_patchno;
+#if 0      
+        if (domain_init)
+        {
+            /* We now do coarsening at the initial refinement */
+            fclaw_debugf("fclaw2d_regrid.cpp (repopulate): We shouldn't end up here\n");
+            exit(0);
+        }
+#endif        
 
-		fclaw2d_patch_t *coarse_patch = new_patch;
-		int coarse_patchno = new_patchno;
-		
-		--ddata_old->count_set_patch;
-		++ddata_new->count_set_patch;
-		
-		/* Area (and possibly other things) should be averaged to coarse grid. */
-		fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
-									  blockno,coarse_patchno,fine_patchno,
-									  build_mode);// new_domain
+        /* Old grids are the finer grids;  new grid is the coarsened grid */
+        fclaw2d_patch_t *fine_siblings = old_patch;
+        int fine_patchno = old_patchno;
 
-		/* Average the solution. Does this need to be customizable? */
-		fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
-									 blockno,fine_patchno,coarse_patchno);//new_domain
+        fclaw2d_patch_t *coarse_patch = new_patch;
+        int coarse_patchno = new_patchno;
+        
+        /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
+           but we really want to increment the new domain. This will be fixed! */
+        --ddata_old->count_set_patch;
+        ++ddata_new->count_set_patch;
+        
+        if (domain_init)
+        {
+            fclaw2d_patch_build(g->glob,coarse_patch,blockno,
+                                coarse_patchno,(void*) &build_mode);
+            fclaw2d_patch_initialize(g->glob,coarse_patch,blockno,coarse_patchno);
+        }
+        else
+        {
+            /* Area (and possibly other things) should be averaged to coarse grid. */
+            fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
+                                          blockno,coarse_patchno,fine_patchno,
+                                          build_mode);
+            /* Average the solution. Does this need to be customizable? */
+            fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
+                                        blockno,fine_patchno,coarse_patchno);
 
-		int i;
-		for(i = 0; i < 4; i++)
-		{
-			fclaw2d_patch_t* fine_patch = &fine_siblings[i];
-			/* used to pass in old_domain */
-			fclaw2d_patch_data_delete(g->glob,fine_patch);
-		}
-	}
-	else
-	{
-		fclaw_global_essentialf("cb_adapt_domain : newsize not recognized\n");
-		exit(1);
-	}
-	fclaw2d_patch_neighbors_reset(new_patch);
+        }
+        int i;
+        for(i = 0; i < 4; i++)
+        {
+            fclaw2d_patch_t* fine_patch = &fine_siblings[i];
+            /* used to pass in old_domain */
+            fclaw2d_patch_data_delete(g->glob,fine_patch);
+        }
+    }
+    else
+    {
+        fclaw_global_essentialf("cb_adapt_domain : newsize not recognized\n");
+        exit(1);
+    }
+    fclaw2d_patch_neighbors_reset(new_patch);
 }
 
 /* ----------------------------------------------------------------
@@ -215,102 +232,114 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
    -------------------------------------------------------------- */
 void fclaw2d_regrid(fclaw2d_global_t *glob)
 {
-	fclaw2d_domain_t** domain = &glob->domain;
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
 
-	fclaw_global_infof("Regridding domain\n");
+    fclaw_global_infof("Regridding domain\n");
 
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
-	/* First determine which families should be coarsened. */
-	fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
-									(void*) NULL);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
+    /* First determine which families should be coarsened. */
+    fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
+                                    (void*) NULL);
 
-	int domain_init = 0;
-	fclaw2d_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
-								   (void *) &domain_init);
+    int domain_init = 0;
+    fclaw2d_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
+                                   (void *) &domain_init);
 
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
-	/* Rebuild domain if necessary */
-	/* Will return be NULL if no refining was done */
+    /* Rebuild domain if necessary */
+    /* Will return be NULL if no refining was done */
 
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
-	fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+    fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
 
-	int have_new_refinement = new_domain != NULL;
+    int have_new_refinement = new_domain != NULL;
 
-	if (have_new_refinement)
-	{
-		/* allocate memory for user patch data and user domain data in the new
-		   domain;  copy data from the old to new the domain. */
-		fclaw2d_domain_setup(glob, new_domain);
-	}
+    if (have_new_refinement)
+    {
+        /* allocate memory for user patch data and user domain data in the new
+           domain;  copy data from the old to new the domain. */
+        fclaw2d_domain_setup(glob, new_domain);
+    }
 
-	/* Stop the new timer (copied from old timer) */
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
+    /* Stop the new timer (copied from old timer) */
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
 
-	if (have_new_refinement)
-	{
-		fclaw_global_infof(" -- Have new refinement\n");
+    if (have_new_refinement)
+    {
+        fclaw_global_infof(" -- Have new refinement\n");
 
-		/* Average to new coarse grids and interpolate to new fine grids */
-		fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
-		fclaw2d_global_iterate_adapted(glob, new_domain,
-									   cb_fclaw2d_regrid_repopulate,
-									   (void *) &domain_init);
-		fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+        /* Average to new coarse grids and interpolate to new fine grids */
+        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+        fclaw2d_global_iterate_adapted(glob, new_domain,
+                                       cb_fclaw2d_regrid_repopulate,
+                                       (void *) &domain_init);
+        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
-		/* free memory associated with old domain */
-		fclaw2d_domain_reset(glob);
-		*domain = new_domain;
-		new_domain = NULL;
+        /* free memory associated with old domain */
+        fclaw2d_domain_reset(glob);
+        *domain = new_domain;
+        new_domain = NULL;
 
-		/* Repartition for load balancing.  Second arg (mode) for vtk output */
-		fclaw2d_partition_domain(glob, -1,FCLAW2D_TIMER_REGRID);
+        /* Repartition for load balancing.  Second arg (mode) for vtk output */
+        fclaw2d_partition_domain(glob,FCLAW2D_TIMER_REGRID);
 
-		/* Set up ghost patches. Communication happens for indirect ghost exchanges. */
+        /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
 
 
-		/* This includes timers for building patches and (exclusive) communication */
-		fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_REGRID);
+        /* This includes timers for building patches and (exclusive) communication */
+        fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_REGRID);
 
-		/* Get new neighbor information.  This is used to short circuit
-		   ghost filling procedures in some cases */
-		fclaw2d_regrid_set_neighbor_types(glob);
+        /* Get new neighbor information.  This is used to short circuit
+           ghost filling procedures in some cases */
+        fclaw2d_regrid_set_neighbor_types(glob);
 
-		/* Update ghost cells.  This is needed because we have new coarse or fine
-		   patches without valid ghost cells.   Time_interp = 0, since we only
-		   only regrid when all levels are time synchronized. */
-		int minlevel = (*domain)->global_minlevel;
-		int maxlevel = (*domain)->global_maxlevel;
-		int time_interp = 0;
-		double sync_time = glob->curr_time;
-		//fclaw2d_time_sync_reset(glob,minlevel,maxlevel,1);                
-		fclaw2d_ghost_update(glob,
-							 minlevel,
-							 maxlevel,
-							 sync_time,
-							 time_interp,
-							 FCLAW2D_TIMER_REGRID);
+        /* Update ghost cells.  This is needed because we have new coarse or fine
+           patches without valid ghost cells.   Time_interp = 0, since we only
+           only regrid when all levels are time synchronized. */
+        int minlevel = (*domain)->global_minlevel;
+        int maxlevel = (*domain)->global_maxlevel;
+        int time_interp = 0;
+        double sync_time = glob->curr_time;
+        fclaw2d_ghost_update(glob,
+                             minlevel,
+                             maxlevel,
+                             sync_time,
+                             time_interp,
+                             FCLAW2D_TIMER_REGRID);
 
-		++glob->count_amr_new_domain;
-	}
-	else
-	{
-		/* We updated all the ghost cells when leaving advance, so don't need to do
-		   it here */
-	}
+        ++glob->count_amr_new_domain;
+    }
+    else
+    {
+        /* We updated all the ghost cells when leaving advance, so don't need to do
+           it here */
+    }
 
-	fclaw2d_after_regrid(glob);
+    /* User defined */
+    fclaw2d_after_regrid(glob);
 
-	/* Stop timer.  Be sure to use timers from new grid, if one was
-	   created */
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
+    /* Only if gauges count > 0 */
+    fclaw_locate_gauges(glob);
 
-	/* Count calls to this function */
-	++glob->count_amr_regrid;
+    /* Stop timer.  Be sure to use timers from new grid, if one was
+       created */
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
+
+    /* Count calls to this function */
+    ++glob->count_amr_regrid;
+}
+
+void fclaw2d_after_regrid(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    if (fclaw_vt->after_regrid != NULL)
+    {
+        fclaw_vt->after_regrid(glob);
+    }
 }
 
 static

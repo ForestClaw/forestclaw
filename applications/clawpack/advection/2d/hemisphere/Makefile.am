@@ -4,9 +4,10 @@ bin_PROGRAMS += applications/clawpack/advection/2d/hemisphere/hemisphere
 
 
 applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES = \
+	applications/clawpack/advection/2d/hemisphere/hemisphere.cpp \
+	applications/clawpack/advection/2d/hemisphere/hemisphere_options.c \
 	applications/clawpack/advection/2d/hemisphere/hemisphere_user.cpp \
 	applications/clawpack/advection/2d/hemisphere/hemisphere_user.h \
-	applications/clawpack/advection/2d/hemisphere/hemisphere.cpp \
 	applications/clawpack/advection/2d/hemisphere/fclaw2d_map_pillowsphere.c \
 	applications/clawpack/advection/2d/hemisphere/fclaw2d_map_pillowsphere5.c \
 	applications/clawpack/advection/2d/hemisphere/setprob.f \
@@ -25,11 +26,12 @@ applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
-hemisphere_inifiles = \
+EXTRA_DIST += \
 	applications/clawpack/advection/2d/hemisphere/fclaw_options.ini \
-	applications/clawpack/advection/2d/hemisphere/regression.ini
-
-applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES += $(hemisphere_inifiles)
+	applications/clawpack/advection/2d/hemisphere/regression.ini \
+	applications/clawpack/advection/2d/hemisphere/afterframe.m \
+	applications/clawpack/advection/2d/hemisphere/setplot2.m \
+	applications/clawpack/advection/2d/hemisphere/mapc2m.m
 
 applications_clawpack_advection_2d_hemisphere_hemisphere_CPPFLAGS = \
         $(AM_CPPFLAGS) \

@@ -23,10 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FLATBATHY_USER_H
-#define FLATBATHY_USER_H
-
-#include <fclaw2d_include_all.h>
+#ifndef FC2D_GEOCLAW_GAUGES_DEFAULT_H
+#define FC2D_GEOCLAW_GAUGES_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -36,15 +34,27 @@ extern "C"
 #endif
 #endif
 
-#define QINIT FCLAW_F77_FUNC(qinit,QINIT)
-void QINIT(const int* meqn,const int* mbc,
-           const int* mx, const int* my,
-           const double* xlower, const double* ylower,
-           const double* dx, const double* dy,
-           double q[], const int* maux, double aux[]);
+struct fclaw2d_global;
+struct fclaw_gauge;
+struct fclaw2d_patch;
+struct fclaw2d_block;
 
-void flatbathy_link_solvers(fclaw2d_global_t *glob);
+void geoclaw_read_gauges_data_default(struct fclaw2d_global *glob, 
+                              struct fclaw_gauge **gauges, 
+                              int *num);
 
+void geoclaw_create_gauge_files_default(struct fclaw2d_global *glob, 
+                                struct fclaw_gauge *gauges, 
+                                int num_gauges);
+
+void geoclaw_gauge_update_default(struct fclaw2d_global* glob, 
+                                  struct fclaw2d_block* block,
+                                  struct fclaw2d_patch* patch, 
+                                  int blockno, int patchno,
+                                  double tcurr, struct fclaw_gauge *g);
+
+void geoclaw_print_gauges_default(struct fclaw2d_global *glob, 
+                                  struct fclaw_gauge *gauge);
 
 #ifdef __cplusplus
 #if 0
