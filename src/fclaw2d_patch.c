@@ -63,14 +63,17 @@ void patch_data_new(fclaw2d_global_t* glob,
 	fclaw2d_patch_data_t *pdata = FCLAW2D_ALLOC(fclaw2d_patch_data_t, 1);
 	this_patch->user = (void *) pdata;
 
+#if 0   
+    /* This check is dubious, since glob->domain is the old domain */
 #ifdef FCLAW_ENABLE_DEBUG
-    fclaw2d_block_t *block = glob->domain->blocks + this_block_idx;
+    fclaw2d_block_t *block = &glob->domain->blocks[this_block_idx];
 #endif
     if (!(0 <= this_patch_idx && this_patch_idx < block->num_patches))
     {
     	fclaw_global_essentialf("patch index is incorrect\n");
     	FCLAW_ASSERT (0 <= this_patch_idx && this_patch_idx < block->num_patches);    
     }
+#endif    
 
 	pdata->patch_idx = this_patch_idx;
 	pdata->block_idx = this_block_idx;
@@ -91,10 +94,13 @@ void fclaw2d_patch_reset_data(fclaw2d_global_t* glob,
 {
 	fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) new_patch->user;
 	pdata->block_idx = blockno;
+#if 0 
+    /* This check may be bogus, since glob->domain is the old domain */
 #ifdef FCLAW_ENABLE_DEBUG
     fclaw2d_block_t *block = glob->domain->blocks + blockno;
 #endif
     FCLAW_ASSERT (0 <= new_patchno && new_patchno < block->num_patches);    
+#endif    
 
 	pdata->patch_idx = new_patchno;
 

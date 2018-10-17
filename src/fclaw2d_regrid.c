@@ -141,7 +141,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 		fclaw2d_patch_t *coarse_patch = old_patch;
 
 		int i;
-		for (i = 0; i < NumSiblings; i++)
+		for (i = 0; i < 4; i++)
 		{
 			fclaw2d_patch_t *fine_patch = &fine_siblings[i];
 			int fine_patchno = new_patchno + i;

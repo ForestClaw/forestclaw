@@ -308,7 +308,11 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_metric_scalar(glob,this_patch,
 									&area, &edgelengths,&curvature);
 
-	FCLAW_ASSERT(area != NULL);
+    if (fclaw_opt->manifold)
+    {
+        /* only need area != NULL if manifold == 1 */
+        FCLAW_ASSERT(area != NULL); 
+    }
 	CLAWPATCH_TIME_SYNC_SETUP(&mx,&my,&mbc,&dx,&dy,area,edgelengths,
 	                          cr->area[0],cr->area[1],
 	                          cr->area[2],cr->area[3],
