@@ -26,6 +26,8 @@
 #ifndef RADIALDAM_USER_H
 #define RADIALDAM_USER_H
 
+#include <fc2d_cudaclaw.h>
+
 #include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
@@ -54,7 +56,23 @@ typedef struct user_options
     int is_registered;
 } user_options_t;
 
+void radialdam_problem_setup(fclaw2d_global_t *glob);
 
+void radialdam_link_solvers(fclaw2d_global_t *glob);
+
+/* ------------------------------------- Options ---------------------------------------*/
+user_options_t* radialdam_options_register (fclaw_app_t * app,
+                                          const char *configfile);
+
+void radialdam_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
+user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
+
+/* --------------------------------------- Cuda ----------------------------------------*/
+
+void radialdam_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+
+/* ------------------------------------ Fortran ----------------------------------------*/
 #define RADIALDAM_SETPROB FCLAW_F77_FUNC(radialdam_setprob, RADIALDAM_SETPROB)
 void RADIALDAM_SETPROB(const double *grav, const double* x0, const double* y0,
                        const double* r0, const double* hin,
@@ -74,15 +92,6 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double surfnormals[],
                            double area[]);
 
-void radialdam_problem_setup(fclaw2d_global_t *glob);
-void radialdam_link_solvers(fclaw2d_global_t *glob);
-
-user_options_t* radialdam_options_register (fclaw_app_t * app,
-                                          const char *configfile);
-
-void radialdam_options_store (fclaw2d_global_t* glob, user_options_t* user);
-
-user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
 
 void radialdam_patch_setup(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,

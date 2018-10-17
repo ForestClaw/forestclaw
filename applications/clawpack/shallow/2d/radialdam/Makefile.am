@@ -21,7 +21,8 @@ applications_clawpack_shallow_2d_radialdam_radialdam_SOURCES = \
 	applications/clawpack/shallow/2d/rp/clawpack5_rpn2.f90 \
 	applications/clawpack/shallow/2d/rp/clawpack5_rpt2.f90 \
 	applications/clawpack/shallow/2d/rp/clawpack5_rpn2_manifold.f90 \
-	applications/clawpack/shallow/2d/rp/clawpack5_rpt2_manifold.f90
+	applications/clawpack/shallow/2d/rp/clawpack5_rpt2_manifold.f90 \
+	applications/clawpack/shallow/2d/radialdam/user_cuda/rpn2shallow.cu
 
 EXTRA_DIST += \
 	applications/clawpack/shallow/2d/radialdam/fclaw_options.ini \
@@ -35,13 +36,19 @@ applications_clawpack_shallow_2d_radialdam_radialdam_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
-        $(FCLAW_CUDACLAW5_CPPFLAGS) \
+        $(FCLAW_CUDACLAW_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_shallow_2d_radialdam_radialdam_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
-        $(FCLAW_CUDACLAW5_LDADD) \
+        $(FCLAW_CUDACLAW_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
-        $(FCLAW_LDADD)
+        $(FCLAW_LDADD) \
+		applications/clawpack/shallow/2d/radialdam/user_cuda/devicelink.o
+
+## nvcc -dlink has to b called after everything for the executable has been compiled.
+## this generates a single object file with all of the linked  device code.
+applications/clawpack/shallow/2d/radialdam/user_cuda/devicelink.o : applications/clawpack/shallow/2d/radialdam/user_cuda/rpn2shallow.o src/solvers/fc2d_cudaclaw/libcudaclaw.la
+		$(NVCC) -dlink  applications/clawpack/shallow/2d/radialdam/user_cuda/rpn2shallow.o src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a -o applications/clawpack/shallow/2d/radialdam/user_cuda/devicelink.o 
