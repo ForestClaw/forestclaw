@@ -1,18 +1,17 @@
 #include "../swirl_user.h"
 
-#include <fc2d_cudaclaw.h>
-#include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
+#include <fc2d_cudaclaw_check.cu>
 
-__managed__ double s_tperiod;
+__constant__ double s_tperiod;
 
 __device__ double psi(double x, double y)
 {
     return (pow(sin(M_PI*x),2) * pow(sin(M_PI*y),2)) / M_PI;
 } 
       
-void swirl_setprob(double period_in)
+void swirl_setprob(double period)
 {
-    s_tperiod = period_in;
+    CHECK(cudaMemcpyToSymbol(s_tperiod, &period, sizeof(double)));
 }
 
 
