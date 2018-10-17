@@ -670,8 +670,12 @@ def compile_results(results_dir=None,results_file='results.out',
                          'GHOSTFILL_COPY',
                          'GHOSTFILL_INTERP',
                          'GHOSTFILL_AVERAGE',
-                         'LOCAL_BOUNDARY_RATIO',
-                         'REMOTE_BOUNDARY_RATIO']
+                         'ADVANCE_B4STEP2',
+                         'ADVANCE_STEP2',
+                         'CUDA_MEMCOPY_H2H',
+                         'CUDA_MEMCOPY_H2D',
+                         'CUDA_MEMCOPY_D2H',
+                         'OUTPUT']
 
     stats_list_int = ['ADVANCE_STEPS_COUNTER$',
                       'GRIDS_PER_PROC$',
@@ -714,7 +718,8 @@ def compile_results(results_dir=None,results_file='results.out',
                   'adapt','partition','cfl','walltime',
                   'gf_copy','local','comm','partition','gbuild','step1',
                   'step2','step3', 'copy',
-                  'interp','average','l_ratio','r_ratio')
+                  'interp','average','adv_b4step2','adv_step2','memcopy_h2h',
+                  'memcopy_h2d','memcopy_d2h','output')
     float_width = 12*len(float_list)
     float_str = ("{:>12s}"*len(float_list)).format(*float_list)
 
@@ -738,7 +743,7 @@ def compile_results(results_dir=None,results_file='results.out',
     if not execname == None:
         pattern = re.compile("%s_[0-9]{5}\.o[0-9]*" % execname)
     else:
-        pattern = re.compile(".*_[0-9]{5}\.o[0-9]*")
+        pattern = re.compile(".*_[0-9]{5}\.o[0-9]*")    
 
     output_files = os.listdir(results_dir)
     for f in output_files:
