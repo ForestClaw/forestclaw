@@ -389,7 +389,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 }   
             }  
         }  
-        __syncthreads();
+        //__syncthreads();
     }  /* Done with second order corrections */
 
 
