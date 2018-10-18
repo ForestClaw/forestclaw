@@ -70,8 +70,8 @@ void patch_data_new(fclaw2d_global_t* glob,
 #endif
     if (!(0 <= this_patch_idx && this_patch_idx < block->num_patches))
     {
-    	fclaw_global_essentialf("patch index is incorrect\n");
-    	FCLAW_ASSERT (0 <= this_patch_idx && this_patch_idx < block->num_patches);    
+    	// fclaw_global_essentialf("patch index is incorrect\n");
+    	// FCLAW_ASSERT (0 <= this_patch_idx && this_patch_idx < block->num_patches);    
     }
 #endif    
 
@@ -662,6 +662,8 @@ void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,
 void fclaw2d_patch_time_sync_f2c(fclaw2d_global_t* glob,
 								 fclaw2d_patch_t *coarse_patch,
 								 fclaw2d_patch_t *fine_patch,
+								 int coarse_blockno, int fine_blockno,
+								 int coarse_patchno, 
 								 int idir,
 								 int igrid,
 								 int iface_coarse,
@@ -671,8 +673,10 @@ void fclaw2d_patch_time_sync_f2c(fclaw2d_global_t* glob,
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 	FCLAW_ASSERT(patch_vt->time_sync_f2c != NULL);
 
-	patch_vt->time_sync_f2c(glob,coarse_patch,fine_patch,idir,
-	                        igrid,iface_coarse,time_interp,
+	patch_vt->time_sync_f2c(glob,coarse_patch,fine_patch,
+	                        coarse_blockno, fine_blockno,
+	                        coarse_patchno, 
+	                        idir, igrid,iface_coarse,time_interp,
 	                        transform_data);    
 }
 

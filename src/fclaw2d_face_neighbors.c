@@ -72,7 +72,7 @@ void get_face_neighbors(fclaw2d_global_t *glob,
 						int iface,
 						int is_block_face,
 						int *neighbor_block_idx,
-						fclaw2d_patch_t* neighbor_patches[],
+						fclaw2d_patch_t* neighbor_patches[],						
 						int **ref_flag_ptr,
 						int **fine_grid_pos_ptr,
 						int **iface_neighbor_ptr,
@@ -333,9 +333,15 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 						transform_data.neighbor_patch = neighbor_patches[igrid];
 						if (time_sync_fine_to_coarse)
 						{
-							/* Add correction to coarse grid from fine grid */
-							fclaw2d_patch_time_sync_f2c(s->glob,coarse_patch,
-							                            fine_patch,idir,igrid,
+							int coarse_patchno = this_patch_idx;
+							int coarse_blockno = this_block_idx;
+							int fine_blockno = neighbor_block_idx;
+							
+							/* Add correction to coarse grid from fine grid.  */
+							fclaw2d_patch_time_sync_f2c(s->glob,coarse_patch,fine_patch,
+							                            coarse_blockno, fine_blockno, 
+							                            coarse_patchno,
+							                            idir,igrid,
 							                            iface,time_interp,
 							                            &transform_data);
 						}
@@ -367,9 +373,13 @@ void cb_face_fill(fclaw2d_domain_t *domain,
 					if (time_sync_samesize)    // && is_block_face)
 					{
 						/* Correct for metric discontinuities at block boundaries */
-						fclaw2d_patch_time_sync_samesize(s->glob,this_patch,neighbor_patch,
-						                                 iface,idir,
-						                                 &transform_data);
+						if (!fclaw2d_patch_is_ghost(this_patch))
+						{							
+							fclaw2d_patch_time_sync_samesize(s->glob,this_patch,
+							                                 neighbor_patch,
+							                                 iface,idir,
+							                                 &transform_data);
+						}
 					}
 					else
 					{                        

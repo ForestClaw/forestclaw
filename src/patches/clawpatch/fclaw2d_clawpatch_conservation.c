@@ -326,6 +326,8 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* coarse_patch,
                                      fclaw2d_patch_t* fine_patch,
+                                     int coarse_blockno, int fine_blockno,
+                                     int coarse_patchno, 
                                      int idir,
                                      int igrid,
                                      int iface_coarse,
@@ -337,8 +339,6 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 	int meqn,mx,my,mbc;
 	double dx,dy,xlower,ylower;
 	double *qcoarse, *qfine;
-	int coarse_blockno, coarse_patchno,globnum,level;
-	int fine_blockno, fine_patchno;
 
 	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -359,26 +359,12 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_registers_t* crfine = 
 	           fclaw2d_clawpatch_get_registers(glob,fine_patch);
 
-	/* Include this for debugging; globnum and level are overwritten */
-	fclaw2d_patch_get_info2(glob->domain,coarse_patch,&coarse_blockno, &coarse_patchno,
-							&globnum,&level);
-#ifdef FCLAW_ENABLE_DEBUG
-    fclaw2d_block_t *block = glob->domain->blocks + coarse_blockno;
-#endif
-	printf("coarse_patchno = %d; coarse_blockno= %d; block->num_patches= %d\n", 
-	       coarse_patchno, coarse_blockno, block->num_patches);
-    FCLAW_ASSERT (0 <= coarse_patchno && coarse_patchno < block->num_patches);    
-
-
-	fclaw2d_patch_get_info2(glob->domain,fine_patch,&fine_blockno, 
-							&fine_patchno,&globnum,&level);
 
   	/* create dummy fine grid to handle indexing between blocks */
 	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+4*mbc)*(my+4*mbc));
 
 	int normal_match = fclaw2d_patch_normal_match(glob->domain, coarse_blockno, 
 	                                              coarse_patchno, iface_coarse);
-	//int normal_match;
 
 	/* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5 */
 	clawpatch_vt->fort_time_sync_f2c(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
