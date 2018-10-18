@@ -6,7 +6,6 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons.cpp \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons_user.cpp \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons_user.h \
-	applications/clawpack/advection/2d/swirl_cons/swirlcons.cpp \
 	applications/clawpack/advection/2d/swirl_cons/swirlcons_options.c \
 	applications/clawpack/advection/2d/swirl_cons/fclaw2d_map_cart.c \
 	applications/clawpack/advection/2d/swirl_cons/fclaw2d_map_fivepatch.c \
