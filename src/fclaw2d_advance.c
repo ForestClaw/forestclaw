@@ -291,25 +291,21 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 				int time_interp = 1;
 
 				/* Do conservative fix up here */
-				if (fclaw_opt->time_sync)
-			    {
-			    	fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
-			    }
 				fclaw2d_ghost_update(glob,
 									 time_interp_level+1,
 									 maxlevel,
 									 sync_time,
 									 time_interp,
 									 FCLAW2D_TIMER_ADVANCE);
+				if (fclaw_opt->time_sync)
+			    {
+			    	fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
+			    }
 			}
 			else
 			{
 				/* End up here is we are doing global time stepping but return from 
 				   advance after 2^(maxlevel-minlevel) time steps. */
-				if (fclaw_opt->time_sync)
-			    {
-				    fclaw2d_time_sync(glob,minlevel,maxlevel);
-			    }
 				int time_interp = 0;
 				fclaw2d_ghost_update(glob,
 									 minlevel,
@@ -317,6 +313,10 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 									 sync_time,
 									 time_interp,
 									 FCLAW2D_TIMER_ADVANCE);
+				if (fclaw_opt->time_sync)
+			    {
+				    fclaw2d_time_sync(glob,minlevel,maxlevel);
+			    }
 			}
 		}
 	}
@@ -329,16 +329,18 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 					 ts_counter[level].step_inc*ts_counter[level].total_steps);
 	}
 
+	double sync_time =  ts_counter[maxlevel].current_time;
+	int time_interp = 0;
+	fclaw2d_ghost_update(glob,minlevel,maxlevel,sync_time,
+						 time_interp,FCLAW2D_TIMER_ADVANCE);
+
 	if (fclaw_opt->time_sync)
 	{
 	    /* This is the final synchronization not covered in fine_steps loop */
 		fclaw2d_time_sync(glob,minlevel,maxlevel);
 	}
 
-	double sync_time =  ts_counter[maxlevel].current_time;
-	int time_interp = 0;
-	fclaw2d_ghost_update(glob,minlevel,maxlevel,sync_time,
-						 time_interp,FCLAW2D_TIMER_ADVANCE);
+
 
 	delete_timestep_counters(&ts_counter);
 

@@ -152,7 +152,7 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
 
-#if 1
+#if 0
 	int time_interp = 0;
 
 	/* --------------------------------------------------------------

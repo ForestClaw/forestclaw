@@ -887,7 +887,7 @@ void fclaw2d_ghost_update(fclaw2d_global_t* glob,
 						  fclaw2d_timer_names_t running)
 {
     
-	int async = 0;
+	int async = 1;
 	if (async == 0)
 	{
 		fclaw2d_ghost_update_nonasync(glob,minlevel,maxlevel,sync_time,time_interp,running);
