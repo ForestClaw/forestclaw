@@ -50,6 +50,9 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
 
 		radialdam_assign_rpn2(&cuclaw_vt->cuda_rpn2);
         FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
+
+		radialdam_assign_rpt2(&cuclaw_vt->cuda_rpt2);
+        FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);
 	}
 	else
 	{
@@ -97,6 +100,10 @@ void radialdam_problem_setup(fclaw2d_global_t* glob)
 
 	RADIALDAM_SETPROB(&user->g, &user->x0, &user->y0, &user->r0,
 			&user->hin, &user->hout, &user->example);
+	if (user->cuda == 1)
+	{
+		radialdam_setprob_cuda(user->g);
+	}
 }
 
 

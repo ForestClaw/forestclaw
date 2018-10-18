@@ -71,6 +71,10 @@ user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
 /* --------------------------------------- Cuda ----------------------------------------*/
 
 void radialdam_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+void radialdam_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
+
+void radialdam_setprob_cuda(double grav);
+
 
 /* ------------------------------------ Fortran ----------------------------------------*/
 #define RADIALDAM_SETPROB FCLAW_F77_FUNC(radialdam_setprob, RADIALDAM_SETPROB)
