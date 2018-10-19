@@ -60,7 +60,7 @@ applications_clawpack_acoustics_2d_radial_cuda_radial_LDADD = \
 ## this generates a single object file with all of the linked  device code.
 $(ACOUSTICS_RADIAL_DIR)/user_cuda/devicelink.o : \
 	$(ACOUSTICS_RADIAL_DIR)/user_cuda/rpn2acoustics.o \
-	src/solvers/fc2d_cudaclaw/libcudaclaw.la \
+	src/solvers/fc2d_cudaclaw/libcudaclaw.la
 		$(NVCC) $(CUDA_CFLAGS) -dlink  \
 		$(ACOUSTICS_RADIAL_DIR)/user_cuda/rpn2acoustics.o \
 		src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a \

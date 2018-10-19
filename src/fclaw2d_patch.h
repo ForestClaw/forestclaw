@@ -367,8 +367,10 @@ void fclaw2d_patch_get_info2(fclaw2d_domain_t * domain,
 void*
 fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch);
 
+#if 0
 struct fclaw2d_patch_data*
 fclaw2d_patch_get_user_data(struct fclaw2d_patch* patch);
+#endif
 
 
 void* fclaw2d_patch_get_user_patch(struct fclaw2d_patch* patch);
@@ -653,6 +655,12 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_average2coarse_t        average2coarse;
     fclaw2d_patch_interpolate2fine_t      interpolate2fine;
 
+    /* Time syncing functions for conservation */
+    fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;      /* f2c = fine to coarse */
+    fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
+    fclaw2d_patch_time_sync_reset_t       time_sync_reset;    /* Virtualized for each patch */
+
+
     /* ghost filling functions */
     fclaw2d_patch_copy_face_t             copy_face;
     fclaw2d_patch_average_face_t          average_face;
@@ -707,10 +715,8 @@ void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
 void*
 fclaw2d_patch_get_user_patch(struct fclaw2d_patch* patch);
 
-#if 0
 struct fclaw2d_patch_data*
-fclaw2d_patch_get_user_data(struct fclaw2d_patch* patch);
-#endif
+fclaw2d_patch_get_patch_data(struct fclaw2d_patch* patch);
 
 void* fclaw2d_patch_get_user_data(struct fclaw2d_global* glob,
                                   struct fclaw2d_patch* this_patch);

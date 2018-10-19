@@ -177,7 +177,7 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     FCLAW_ASSERT(patch_vt->build_from_fine != NULL);
 
-    patch_data_new(glob,coarse_patch);
+    patch_data_new(glob,coarse_patch,blockno, coarse_patchno);
 
     fclaw2d_patch_data_t *pdata = get_patch_data(coarse_patch);
     pdata->blockno = blockno;

@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/shallow/2d/radialdam_cuda/radialdam
 
-applications_clawpack_shallow_2d_radialdam_radialdam_SOURCES = \
+applications_clawpack_shallow_2d_radialdam_cuda_radialdam_SOURCES = \
 	applications/clawpack/shallow/2d/radialdam_cuda/radialdam.cpp \
 	applications/clawpack/shallow/2d/radialdam_cuda/radialdam_options.c \
 	applications/clawpack/shallow/2d/radialdam_cuda/radialdam_user.cpp \
@@ -54,7 +54,7 @@ applications_clawpack_shallow_2d_radialdam_cuda_radialdam_LDADD = \
 ## this generates a single object file with all of the linked  device code.
 $(RADIALDAM_DIR)/user_cuda/devicelink.o : \
     $(RADIALDAM_DIR)/user_cuda/rpn2shallow.o \
-    src/solvers/fc2d_cudaclaw/libcudaclaw.la \
+    src/solvers/fc2d_cudaclaw/libcudaclaw.la 
 		$(NVCC) -dlink  \
 		$(RADIALDAM_DIR)/user_cuda/rpn2shallow.o \
 		src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a \
