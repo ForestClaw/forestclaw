@@ -98,6 +98,12 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "weighted_partition", &fclaw_opt->weighted_partition, 0,
                          "Weight grids when partitioning [F]");
 
+    /* ------------------------------ Conservation fix -------------------------------- */
+
+    sc_options_add_bool (opt, 0, "time-sync", &fclaw_opt->time_sync, 0,
+                         "Synchronize coarse/fine grids to include conservation fix [F]");
+
+
     /* ------------------------------- Output options --------------------------------- */
 
     sc_options_add_bool (opt, 0, "output", &fclaw_opt->output, 0,
@@ -351,7 +357,8 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
     if (fclaw_opt->trapfpe)
     {
         fclaw_global_infof("Enabling floating point traps\n");
-        feenableexcept(FE_INVALID);
+        // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
+        feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
     }
 
     return FCLAW_NOEXIT;

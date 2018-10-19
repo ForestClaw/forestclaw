@@ -44,9 +44,6 @@ include applications/clawpack/advection/2d/hemisphere/Makefile.am
 ## sphere (cubed-sphere and pillow-disk)
 include applications/clawpack/advection/2d/sphere/Makefile.am
 
-## swirl_cons (square)
-include applications/clawpack/advection/2d/swirl_cons/Makefile.am
-
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
 ## ----------------------------------------------------------
@@ -64,6 +61,8 @@ include applications/clawpack/shallow/2d/radialdam/Makefile.am
 ## Euler
 include applications/clawpack/euler/2d/shockbubble/Makefile.am
 include applications/clawpack/euler/2d/quadrants/Makefile.am
+
+
 
 
 ## ---------------------Transport on the sphere ---------------------------- 

@@ -165,7 +165,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
             /* Scale to [0,1]x[0,1], based on blockno */
             fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
             fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);
-            for(int i = 0; i < num_gauges; i++)
+            for(i = 0; i < num_gauges; i++)
             {
                 /* Map gauge to global [0,1]x[0,1] space */
                 x = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
@@ -185,7 +185,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     }
     else
     {
-        for(int i = 0; i < num_gauges; i++)
+        for(i = 0; i < num_gauges; i++)
         {
             gauges[i].blockno = 0;
             gauges[i].location_in_results = i;
@@ -194,7 +194,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         block_offsets[0] = 0;
         block_offsets[1] = num_gauges;
 
-        for (int i = 0; i < num_gauges; ++i)
+        for (i = 0; i < num_gauges; ++i)
         {
             coordinates[2*i] = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
             coordinates[2*i+1] = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
@@ -207,7 +207,7 @@ static
 void gauge_update(fclaw2d_global_t *glob, void* acc)
 {
     double tcurr;
-    int num_gauges;
+    int i, num_gauges;
 
     fclaw2d_block_t *block;
     fclaw2d_patch_t *patch;
@@ -222,7 +222,7 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
     tcurr = glob->curr_time;
     num_gauges = gauge_acc->num_gauges;
 
-    for (int i = 0; i < num_gauges; i++)
+    for (i = 0; i < num_gauges; i++)
     {
         g = &gauges[i];
         if (tcurr >= g->t1 && tcurr <= g->t2 &&

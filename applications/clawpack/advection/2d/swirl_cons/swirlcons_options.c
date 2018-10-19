@@ -25,12 +25,28 @@
 
 #include "swirlcons_user.h"
 
+#include <fclaw_options.h>
+
+
 static int s_user_options_package_id = -1;
 
 static void *
 swirlcons_register (user_options_t *user, sc_options_t * opt)
 {
     sc_options_add_int (opt, 0, "example", &user->example, 1,
+                           "Velocity field choice (0-3) [1]");
+
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                           "Mapping parameter alpha [0.4]");
+
+    fclaw_options_add_double_array (opt, 0, "center", &user->center_string, "0 0",
+                                    &user->center, 2, 
+                                    "Center point for bilinear mapping  [0,0]");
+
+    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 3,
+                           "Conservative Riemann solver (1-4) [3]");
+
+    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
                            "1 : u(x) > 0; 2: u(x) changes sign (1,2) [1]");
 
     sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 1,
@@ -43,7 +59,8 @@ swirlcons_register (user_options_t *user, sc_options_t * opt)
 static fclaw_exit_type_t
 swirlcons_postprocess(user_options_t *user)
 {
-    /* nothing to post-process yet ... */
+    fclaw_options_convert_double_array(user->center_string, &user->center,2);
+
     return FCLAW_NOEXIT;
 }
 
@@ -58,7 +75,7 @@ swirlcons_check (user_options_t *user)
 static void
 swirlcons_destroy(user_options_t *user)
 {
-    /* Nothing to destroy */
+    fclaw_options_destroy_array (user->center);
 }
 
 /* ------- Generic option handling routines that call above routines ----- */
@@ -162,4 +179,3 @@ const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob)
     int id = s_user_options_package_id;
     return (user_options_t*) fclaw_package_get_options(glob, id);    
 }
-

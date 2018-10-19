@@ -44,10 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* This is also called from fclaw2d_initialize, so is not made static */
 void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
-                                      fclaw2d_patch_t *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      void *user)
+									  fclaw2d_patch_t *this_patch,
+									  int this_block_idx,
+									  int this_patch_idx,
+									  void *user)
 {
     int refine_patch, maxlevel, level;
     const fclaw_options_t* fclaw_opt;
@@ -75,9 +75,9 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 /* Tag family for coarsening */
 
 void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
-                              fclaw2d_patch_t *fine_patches,
-                              int blockno, int fine0_patchno,
-                              void *user)
+							  fclaw2d_patch_t *fine_patches,
+							  int blockno, int fine0_patchno,
+							  void *user)
 {
     const fclaw_options_t* fclaw_opt;
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
@@ -111,14 +111,14 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
    -------------------------------------------------------------- */
 
 void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
-                                  fclaw2d_patch_t * old_patch,
-                                  fclaw2d_domain_t * new_domain,
-                                  fclaw2d_patch_t * new_patch,
-                                  fclaw2d_patch_relation_t newsize,
-                                  int blockno,
-                                  int old_patchno,
-                                  int new_patchno,
-                                  void *user)
+								  fclaw2d_patch_t * old_patch,
+								  fclaw2d_domain_t * new_domain,
+								  fclaw2d_patch_t * new_patch,
+								  fclaw2d_patch_relation_t newsize,
+								  int blockno,
+								  int old_patchno,
+								  int new_patchno,
+								  void *user)
 {
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
     int domain_init = *((int*) g->user);
@@ -129,6 +129,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 
     if (newsize == FCLAW2D_PATCH_SAMESIZE)
     {
+        FCLAW_ASSERT(0 <= blockno && blockno < new_domain->num_blocks);
+        FCLAW_ASSERT(0 <= new_patchno && new_patchno < new_domain->local_num_patches);
         new_patch->user = old_patch->user;
         old_patch->user = NULL;
         ++ddata_old->count_delete_patch;
@@ -331,76 +333,67 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     ++glob->count_amr_regrid;
 }
 
-void fclaw2d_after_regrid(fclaw2d_global_t *glob)
-{
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
-    if (fclaw_vt->after_regrid != NULL)
-    {
-        fclaw_vt->after_regrid(glob);
-    }
-}
-
 static
 void cb_set_neighbor_types(fclaw2d_domain_t *domain,
-                           fclaw2d_patch_t *this_patch,
-                           int blockno,
-                           int patchno,
-                           void *user)
+						   fclaw2d_patch_t *this_patch,
+						   int blockno,
+						   int patchno,
+						   void *user)
 {
-    int iface, icorner;
+	int iface, icorner;
 
-    for (iface = 0; iface < 4; iface++)
-    {
-        int rproc[2];
-        int rblockno;
-        int rpatchno[2];
-        int rfaceno;
+	for (iface = 0; iface < 4; iface++)
+	{
+		int rproc[2];
+		int rblockno;
+		int rpatchno[2];
+		int rfaceno;
 
-        fclaw2d_patch_relation_t neighbor_type =
-        fclaw2d_patch_face_neighbors(domain,
-                                     blockno,
-                                     patchno,
-                                     iface,
-                                     rproc,
-                                     &rblockno,
-                                     rpatchno,
-                                     &rfaceno);
+		fclaw2d_patch_relation_t neighbor_type =
+		fclaw2d_patch_face_neighbors(domain,
+									 blockno,
+									 patchno,
+									 iface,
+									 rproc,
+									 &rblockno,
+									 rpatchno,
+									 &rfaceno);
 
-        fclaw2d_patch_set_face_type(this_patch,iface,neighbor_type);
-    }
+		fclaw2d_patch_set_face_type(this_patch,iface,neighbor_type);
+	}
 
-    for (icorner = 0; icorner < 4; icorner++)
-    {
-        int rproc_corner;
-        int cornerpatchno;
-        int cornerblockno;
-        int rcornerno;
-        fclaw2d_patch_relation_t neighbor_type;
+	for (icorner = 0; icorner < 4; icorner++)
+	{
+		int rproc_corner;
+		int cornerpatchno;
+		int cornerblockno;
+		int rcornerno;
+		fclaw2d_patch_relation_t neighbor_type;
 
-        int has_corner_neighbor =
-        fclaw2d_patch_corner_neighbors(domain,
-                                       blockno,
-                                       patchno,
-                                       icorner,
-                                       &rproc_corner,
-                                       &cornerblockno,
-                                       &cornerpatchno,
-                                       &rcornerno,
-                                       &neighbor_type);
+		int has_corner_neighbor =
+		fclaw2d_patch_corner_neighbors(domain,
+									   blockno,
+									   patchno,
+									   icorner,
+									   &rproc_corner,
+									   &cornerblockno,
+									   &cornerpatchno,
+									   &rcornerno,
+									   &neighbor_type);
 
-        fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
-        if (!has_corner_neighbor)
-        {
-            fclaw2d_patch_set_missing_corner(this_patch,icorner);
-        }
-    }
-    fclaw2d_patch_neighbors_set(this_patch);
+		fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
+		if (!has_corner_neighbor)
+		{
+			fclaw2d_patch_set_missing_corner(this_patch,icorner);
+		}
+	}
+	fclaw2d_patch_neighbors_set(this_patch);
 }
 
 /* Set neighbor type : samesize, halfsize, or doublesize */
 void fclaw2d_regrid_set_neighbor_types(fclaw2d_global_t *glob)
 {
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
-    fclaw2d_global_iterate_patches(glob,cb_set_neighbor_types,NULL);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+	fclaw2d_global_iterate_patches(glob,cb_set_neighbor_types,NULL);
+	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 }

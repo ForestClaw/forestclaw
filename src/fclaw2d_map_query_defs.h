@@ -56,10 +56,11 @@ extern "C"
 #define FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE  13     /* Pillow sphere */
 #define FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE   14     /* Cubed sphere */
 #define FCLAW2D_MAP_QUERY_IS_FIVEPATCH     15     /* Five patch unit square */
-#define FCLAW2D_MAP_QUERY_IS_HEMISPHERE    16     /* Hemisphere grid */
-#define FCLAW2D_MAP_QUERY_IS_TORUS         17     /* Hemisphere grid */
-#define FCLAW2D_MAP_QUERY_IS_BRICK         18     /* Is a Cartesian brick */
-#define FCLAW2D_MAP_QUERY_LAST             19     /* Number of "official" queries. */
+#define FCLAW2D_MAP_QUERY_IS_BILINEAR      16     /* Five patch unit square */
+#define FCLAW2D_MAP_QUERY_IS_HEMISPHERE    17     /* Hemisphere grid */
+#define FCLAW2D_MAP_QUERY_IS_TORUS         18     /* Hemisphere grid */
+#define FCLAW2D_MAP_QUERY_IS_BRICK         19     /* Is a Cartesian brick */
+#define FCLAW2D_MAP_QUERY_LAST             20     /* Number of "official" queries. */
 
 #if 0
 /* Generic query function (kept up to date with list above) */
@@ -97,6 +98,8 @@ fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_BILINEAR:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_HEMISPHERE:
         return 0;

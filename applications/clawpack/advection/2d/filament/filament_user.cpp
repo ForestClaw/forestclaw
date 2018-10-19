@@ -72,7 +72,6 @@ void filament_link_solvers(fclaw2d_global_t *glob)
             clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
             clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
         }
-
     }
     else if (user->claw_version == 5)
     {

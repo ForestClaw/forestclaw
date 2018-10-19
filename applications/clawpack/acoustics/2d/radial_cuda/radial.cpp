@@ -65,7 +65,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_nomap();
         break;
     case 1:
-        conn = p4est_connectivity_new_disk();
+        conn = p4est_connectivity_new_disk (0, 0);
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,fclaw_opt->shift,
                                             rotate,user->alpha);
         break;

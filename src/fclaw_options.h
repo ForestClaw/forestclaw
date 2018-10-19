@@ -142,6 +142,9 @@ struct fclaw_options
     double refine_threshold;
     double coarsen_threshold;
 
+    /* Conservation */
+    int time_sync;
+
     /* Gauges */
     int gauge_buffer_length;   
 

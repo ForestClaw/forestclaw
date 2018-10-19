@@ -330,12 +330,17 @@ fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
                                NULL);
 }
 
+
 fclaw2d_domain_t *
 fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
-    return fclaw2d_domain_new (p4est_wrap_new_disk (mpicomm, initial_level),
-                               NULL);
+    return fclaw2d_domain_new
+        (p4est_wrap_new_disk (mpicomm, initial_level, 0), NULL);
+#if 0   
+        /* Not sure which one is correct ... */
+        (p4est_wrap_new_disk (mpicomm, 0, 0, initial_level), NULL);
+#endif    
 }
 
 fclaw2d_domain_t *
@@ -418,9 +423,23 @@ static fclaw2d_patch_t *
 fclaw2d_domain_get_neighbor_patch (fclaw2d_domain_t * domain,
                                    int nproc, int nblockno, int npatchno)
 {
-    const int nb = (nproc == domain->mpirank ? nblockno : -1);
+    fclaw2d_block_t *block;
 
-    return fclaw2d_domain_get_patch (domain, nb, npatchno);
+    /* the block number should always be right */
+    FCLAW_ASSERT (0 <= nblockno && nblockno < domain->num_blocks);
+
+    /* is this a ghost patch */
+    if (nproc != domain->mpirank)
+    {
+        FCLAW_ASSERT (0 <= npatchno && npatchno < domain->num_ghost_patches);
+        FCLAW_ASSERT (domain->ghost_patches[npatchno].u.blockno == nblockno);
+        return domain->ghost_patches + npatchno;
+    }
+
+    /* local patch */
+    block = domain->blocks + nblockno;
+    FCLAW_ASSERT (0 <= npatchno && npatchno < block->num_patches);
+    return block->patches + npatchno;
 }
 
 fclaw2d_domain_t *

@@ -63,7 +63,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         break;
     case 1:
         /* Map five-patch square to pillow disk. */
-        conn = p4est_connectivity_new_disk ();
+        conn = p4est_connectivity_new_disk (0, 0);
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,
                                             fclaw_opt->shift,
                                             rotate,user_opt->alpha);

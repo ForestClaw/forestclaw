@@ -51,20 +51,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    ----------------------------------------------------------------- */
 static
 void cb_initialize (fclaw2d_domain_t *domain,
-                    fclaw2d_patch_t *this_patch,
-                    int this_block_idx,
-                    int this_patch_idx,
-                    void *user)
+					fclaw2d_patch_t *this_patch,
+					int this_block_idx,
+					int this_patch_idx,
+					void *user)
 {
-    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
-    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+	fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
-    fclaw2d_patch_build(g->glob,this_patch,
-                        this_block_idx,
-                        this_patch_idx,
-                        &build_mode);
-    fclaw2d_patch_initialize(g->glob,this_patch,this_block_idx,this_patch_idx);
+	fclaw2d_patch_build(g->glob,this_patch,
+						this_block_idx,
+						this_patch_idx,
+						&build_mode);
+	fclaw2d_patch_initialize(g->glob,this_patch,this_block_idx,this_patch_idx);
 }
 
 
@@ -74,18 +74,182 @@ void cb_initialize (fclaw2d_domain_t *domain,
    ----------------------------------------------------------------- */
 void fclaw2d_initialize(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+	fclaw2d_domain_t** domain = &glob->domain;
 
     int time_interp = 0;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    /* This mapping context is needed by fortran mapping functions */
-    fclaw2d_map_context_t *cont = glob->cont;
-    SET_CONTEXT(&cont);
+	/* This mapping context is needed by fortran mapping functions */
+	fclaw2d_map_context_t *cont = glob->cont;
+	SET_CONTEXT(&cont);
 
-    int maxthreads = 0;
+	int maxthreads = 0;
+
 #if defined(_OPENMP)
-    maxthreads = omp_get_max_threads();
+	maxthreads = omp_get_max_threads();
+#endif
+	
+#if 0  
+    /* ======== HEAD (from merge) */    
+	fclaw_global_essentialf("Max threads set to %d\n",maxthreads);
+
+	int minlevel = gparms->minlevel;
+	int maxlevel = gparms->maxlevel;
+
+	/* Initialize all timers */
+	int i;
+	for (i = 0; i < FCLAW2D_TIMER_COUNT; ++i) {
+		fclaw2d_timer_init (&glob->timers[i]);
+	}
+
+	/* start timing */
+	fclaw2d_domain_barrier (*domain);
+	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_WALLTIME]);
+	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
+
+	/* User defined problem setup */
+	fclaw2d_problem_setup(glob);
+
+	/* set specific refinement strategy */
+	fclaw2d_domain_set_refinement
+		(*domain, gparms->smooth_refine, gparms->smooth_refine_level,
+		 gparms->coarsen_delay);
+
+
+	/* ------------------------------------------------
+	   Set up initial domain.
+
+	   This needs to be set as if it were going to be used
+	   for updating.
+	   ------------------------------------------------ */
+
+	/* Get an initial domain */
+	fclaw2d_domain_setup(glob,*domain);
+
+	/* Initialize patches on uniformly refined level minlevel */
+	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+	fclaw2d_global_iterate_level(glob, minlevel, cb_initialize,
+								 NULL);
+	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+
+	/* Set up ghost patches */
+	fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_INIT);
+
+	/* This is normally called from regrid */
+	fclaw2d_regrid_set_neighbor_types(glob);
+
+	/* We need a user option here to set ghost values after initialization */
+	if (gparms->init_ghostcell){
+		fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
+							 (*domain)->global_maxlevel,0.0,
+							 time_interp,FCLAW2D_TIMER_INIT);
+	}
+
+#if 0
+	fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
+	                         0.0,time_interp);
+#endif
+
+
+	/* ------------------------------------------------
+	   Done with initial setup.
+	   ------------------------------------------------ */
+
+
+	/* ------------------------------------------------
+	   Build up an initial refinement.
+	   ------------------------------------------------ */
+	if (minlevel < maxlevel)
+	{
+		int domain_init = 1;
+		int level;
+		for (level = minlevel; level < maxlevel; level++)
+		{
+			fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
+			fclaw2d_global_iterate_level(glob, level,
+										 cb_fclaw2d_regrid_tag4refinement,
+										 &domain_init);
+			fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
+
+			// Construct new domain based on tagged patches.
+			fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
+			fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+			fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+
+			int have_new_refinement = new_domain != NULL;
+
+			if (have_new_refinement)
+			{
+				/* Have to get a new ddata */
+				fclaw2d_domain_setup(glob,new_domain);
+			}
+
+			fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+			fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_INIT]);
+
+			if (have_new_refinement)
+			{
+				fclaw_global_infof(" -- Have new initial refinement\n");
+
+				/* Re-initialize new grids.   Ghost cell values needed for
+				   interpolation have already been set by initialization */
+				fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+				fclaw2d_global_iterate_adapted(glob, new_domain,
+											   cb_fclaw2d_regrid_repopulate,
+											   (void *) &domain_init);
+
+				fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+
+				// free all memory associated with old domain
+				fclaw2d_domain_reset(glob);
+				*domain = new_domain;
+				new_domain = NULL;
+
+				/* Repartition domain to new processors.    */
+				fclaw2d_partition_domain(glob,level,FCLAW2D_TIMER_INIT);
+
+				/* Set up ghost patches.  This probably doesn't need to be done
+				   each time we add a new level. */
+				fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_INIT);
+
+				/* This is normally called from regrid, once the initial domain
+				   has been set up */
+				fclaw2d_regrid_set_neighbor_types(glob);
+#if 0				 
+				if (gparms->init_ghostcell)
+				{
+					 fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
+										 (*domain)->global_maxlevel,0.0,
+										 time_interp,FCLAW2D_TIMER_INIT);
+				 }
+#endif
+<<<<<<< HEAD
+			}
+			else
+			{
+				/* We don't have a new refinement, and so can break out of level loop */
+				break;
+			}
+		}  /* Level loop (minlevel --> maxlevel) */
+	}
+
+	if (gparms->init_ghostcell)
+	{
+		fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
+							 (*domain)->global_maxlevel,0.0,
+							 time_interp,FCLAW2D_TIMER_INIT);
+	}
+
+	fclaw2d_diagnostics_initialize(glob);
+	fclaw2d_after_regrid(glob);
+
+	/* Print global minimum and maximum levels */
+	fclaw_global_infof("Global minlevel %d maxlevel %d\n",
+				(*domain)->global_minlevel, (*domain)->global_maxlevel);
+
+	/* Stop timer */
+	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
+=======
 #endif
     fclaw_global_essentialf("Max threads set to %d\n",maxthreads);
 
@@ -141,8 +305,11 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW2D_TIMER_INIT);
     }
-    //fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
-    //                        0.0,fclaw_opt->dt_initial,time_interp);
+
+#if 0
+    fclaw2d_physical_set_bc(glob,(*domain)->global_minlevel,
+                            0.0,fclaw_opt->dt_initial,time_interp);
+#endif                            
 
     /* ------------------------------------------------
        Done with initial setup.

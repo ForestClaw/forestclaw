@@ -28,6 +28,10 @@ c     # corners at block corners are triggering refinement where three blocks me
                tag_patch = 1
                return
             endif
+c            if (blockno .eq. 1) then
+c               tag_patch = 1
+c               return
+c            endif
          enddo
       enddo
 

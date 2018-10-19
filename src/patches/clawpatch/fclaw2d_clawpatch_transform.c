@@ -40,6 +40,18 @@ void fclaw2d_clawpatch_transform_init_data(fclaw2d_global_t* glob,
     /* Nothing to do for transform->user */
 }
 
+void fclaw2d_clawpatch_face_transformation (int faceno, int rfaceno, int ftransform[])
+{
+    /* Defined in forestclaw2d.c */
+    fclaw2d_patch_face_transformation (faceno, rfaceno, ftransform);
+}
+
+void fclaw2d_clawpatch_face_transformation_intra (int ftransform[])
+{
+    /* Defined in forestclaw2d.c */
+    fclaw2d_patch_face_transformation_intra (ftransform);
+}
+
 
 /* Same size neighbor across a face */
 void

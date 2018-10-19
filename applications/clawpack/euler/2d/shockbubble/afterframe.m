@@ -44,6 +44,7 @@ if (prt_tikz)
     caxis([0,4]);
     plot_tikz_fig(Frame,figsize,prefix,dpi);    
 end
+daspect([1,1,1]);
 shg
 
 clear afterframe
