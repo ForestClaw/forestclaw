@@ -36,13 +36,6 @@ EXTRA_DIST += \
 	applications/clawpack/acoustics/2d/radial_cuda/1drad/setplot.py \
 	applications/clawpack/acoustics/2d/radial_cuda/1drad/setrun.py
 
-EXTRA_DIST += \
-	applications/clawpack/acoustics/2d/radial_cuda/fclaw_options.ini \
-	applications/clawpack/acoustics/2d/radial_cuda/regression.ini \
-	applications/clawpack/advection/2d/radial_cuda/afterframe.m \
-	applications/clawpack/advection/2d/radial_cuda/setplot2.m \
-	applications/clawpack/advection/2d/radial_cuda/make_plots.py
-
 
 applications_clawpack_acoustics_2d_radial_cuda_radial_CPPFLAGS = \
         $(AM_CPPFLAGS) \
@@ -51,6 +44,8 @@ applications_clawpack_acoustics_2d_radial_cuda_radial_CPPFLAGS = \
         $(FCLAW_CUDACLAW_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
+ACOUSTICS_RADIAL_DIR = applications/clawpack/acoustics/2d/radial_cuda
+
 applications_clawpack_acoustics_2d_radial_cuda_radial_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
@@ -58,15 +53,14 @@ applications_clawpack_acoustics_2d_radial_cuda_radial_LDADD = \
         $(FCLAW_CUDACLAW_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD) \
-		applications/clawpack/acoustics/2d/radial_cuda/user_cuda/devicelink.o
+		$(ACOUSTICS_RADIAL_DIR)/user_cuda/devicelink.o
 
-ACOUSTICS_RADIAL_DIR = applications/clawpack/acoustics/2d/radial_cuda
 
 ## nvcc -dlink has to be called after everything for the executable has been compiled.
 ## this generates a single object file with all of the linked  device code.
 $(ACOUSTICS_RADIAL_DIR)/user_cuda/devicelink.o : \
 	$(ACOUSTICS_RADIAL_DIR)/user_cuda/rpn2acoustics.o \
-	src/solvers/fc2d_cudaclaw/libcudaclaw.la
+	src/solvers/fc2d_cudaclaw/libcudaclaw.la \
 		$(NVCC) $(CUDA_CFLAGS) -dlink  \
 		$(ACOUSTICS_RADIAL_DIR)/user_cuda/rpn2acoustics.o \
 		src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a \

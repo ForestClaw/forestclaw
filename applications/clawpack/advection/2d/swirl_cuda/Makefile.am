@@ -62,7 +62,7 @@ $(SWIRL_DIR)/user_cuda/devicelink.o : \
 	$(SWIRL_DIR)/user_cuda/rpn2adv.o \
 	$(SWIRL_DIR)/user_cuda/rpt2adv.o \
 	$(SWIRL_DIR)/user_cuda/b4step2.o \
-	src/solvers/fc2d_cudaclaw/libcudaclaw.la 
+	src/solvers/fc2d_cudaclaw/libcudaclaw.la \
 		$(NVCC) $(CUDA_CFLAGS) -dlink  \
 		$(SWIRL_DIR)/user_cuda/rpn2adv.o \
 		$(SWIRL_DIR)/user_cuda/rpt2adv.o \
