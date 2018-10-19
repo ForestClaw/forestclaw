@@ -33,6 +33,7 @@
 #include <fc2d_cudaclaw.h>
 
 #include <fc2d_cudaclaw_cuda.h>
+#include <cudaclaw_user_fort.h>
 
 #include "../all/advection_user_fort.h"
 
