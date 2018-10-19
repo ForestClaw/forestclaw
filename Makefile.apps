@@ -16,10 +16,11 @@ include applications/clawpack/clawpack.apps
 
 endif
 
-if FCLAW_ENABLE_DEVELOPMENT
+
 # ----------------------------------
 # Projects under development
 # ----------------------------------
+if FCLAW_ENABLE_DEVELOPMENT
 
 ## Patches needed for Clawpack solvers
 include src/patches/clawpatch/Makefile.am
