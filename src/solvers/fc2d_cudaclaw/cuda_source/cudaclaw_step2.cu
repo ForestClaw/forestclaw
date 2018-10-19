@@ -24,7 +24,6 @@ __global__
 void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
                                 int maux, int mwaves, int mwork,
                                 double dt, double t,
-                                int order[], int mthlim[],
                                 struct cudaclaw_fluxes* array_fluxes_struct_dev,
                                 double * maxcflblocks_dev,
                                 cudaclaw_cuda_rpn2_t rpn2,
@@ -46,7 +45,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     int mx,my,mbc,maux,meqn,mwaves;
     double maxcfl;
-    int *order_dev, *mthlim_dev;
 
     double* maxcflblocks_dev;    
 
@@ -146,18 +144,15 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         dim3 grid(1,1,batch_size);
 
         /* Determine shared memory size */
-        mwork = 9*meqn + 9*maux + mwaves + meqn*mwaves;
+        mwork = 9*meqn + 9*maux + mwaves + 3*meqn*mwaves;
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
 
         bytes_kb = bytes/1024.0;
         FCLAW_ASSERT(bytes_kb < 64);
     
-        cudaclaw_get_method_parameters(&order_dev,&mthlim_dev);
-
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork, dt,t,
-                                                              order_dev, mthlim_dev,
                                                               array_fluxes_struct_dev,
                                                               maxcflblocks_dev,
                                                               cuclaw_vt->cuda_rpn2,

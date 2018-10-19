@@ -36,7 +36,7 @@ arg_list = ["srun", "--gres=gpu:2".format(gpus),
             "--nodes={:d}".format(nodes),
             "--ntasks-per-node={:d}".format(tasks_per_node),
             "--cpus-per-task={:d}".format(cpus_per_task),            
-            "swirl", gpustr, "--nout=100"]     
+            "swirl", gpustr]     
 
 np = mpi_tasks
 jobid = random.randint(1000,9999)

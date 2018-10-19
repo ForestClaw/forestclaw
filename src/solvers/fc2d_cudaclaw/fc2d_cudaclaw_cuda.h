@@ -36,7 +36,7 @@ extern "C"
 
 #define FC2D_CUDACLAW_BUFFER_LEN 4000    /* Number of patches that kernel should handle */ 
 
-#define FC2D_CUDACLAW_BLOCK_SIZE    128  /* linear block */   
+#define FC2D_CUDACLAW_BLOCK_SIZE 64  /* linear block */   
 
 #define FC2D_CUDACLAW_MWAVES  10         /* Used to get shared memory */ 
 
@@ -63,7 +63,7 @@ typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
 typedef void (*cudaclaw_cuda_rpt2_t)(int idir, int meqn, int mwaves, int maux,
                                      double ql[], double qr[], 
                                      double aux1[], double aux2[], double aux3[],
-                                     int imp, int pm, double dsdq[],
+                                     int imp, double dsdq[],
                                      double bmasdq[], double bpasdq[]);
 
 /* ------------------------------------- Function headers ------------------------------*/

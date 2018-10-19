@@ -1,19 +1,21 @@
 #include "../radial_user.h"
 
-//#include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
-//#include <cassert>
+#include <fc2d_cudaclaw_check.cu>
     
-__managed__ double s_rho;
-__managed__ double s_bulk;
-__managed__ double s_c;
-__managed__ double s_z;
+__constant__ double s_rho;
+__constant__ double s_bulk;
+__constant__ double s_c;
+__constant__ double s_z;
 
 void radial_setprob_cuda(double rho, double bulk)
 {
-    s_rho = rho;
-    s_bulk = bulk;
-    s_c = sqrt(bulk/rho);
-    s_z = s_c*rho;
+    double c,z;
+    c = sqrt(bulk/rho);
+    z = c*rho;
+    CHECK(cudaMemcpyToSymbol(s_rho,  &rho, sizeof(double)));
+    CHECK(cudaMemcpyToSymbol(s_bulk, &rho, sizeof(double)));
+    CHECK(cudaMemcpyToSymbol(s_c,    &c,   sizeof(double)));
+    CHECK(cudaMemcpyToSymbol(s_z,    &z,   sizeof(double)));
 }
 
 
@@ -70,7 +72,7 @@ void radial_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2)
 __device__ void radial_rpt2acoustics(int idir, int meqn, int mwaves, int maux,
                                      double ql[], double qr[], 
                                      double aux1[], double aux2[], double aux3[],
-                                     int imp, int pm, double asdq[],
+                                     int imp, double asdq[],
                                      double bmasdq[], double bpasdq[])
 {
 
@@ -91,9 +93,10 @@ __device__ void radial_rpt2acoustics(int idir, int meqn, int mwaves, int maux,
     bmasdq[mv] = -s_c * alpha1;
 
     /* Up going wave */
-    bpasdq[0]       = s_c * alpha2 * s_z;
+    bpasdq[0]  = s_c * alpha2 * s_z;
     bpasdq[mu] = 0;
     bpasdq[mv] = s_c * alpha2;
+    
 }
 
 __device__ cudaclaw_cuda_rpt2_t radial_rpt2 = radial_rpt2acoustics;

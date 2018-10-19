@@ -41,24 +41,24 @@ c     ------------
       common /cparam/ grav    !# gravitational parameter
       common /comroe/ u(-2:maxm2),v(-2:maxm2),a(-2:maxm2),h(-2:maxm2)
 c
-      data efix /.true./    !# use entropy fix for transonic rarefactions
+      data efix /.false./    !# use entropy fix for transonic rarefactions
 c
       if (-2.gt.1-mbc .or. maxm2 .lt. maxm+mbc) then
-	 write(6,*) 'Check dimensions of local arrays in rpn2'
-	 stop
-	 endif
+	        write(6,*) 'Check dimensions of local arrays in rpn2'
+	        stop
+	    endif
 c
 c     # set mu to point to  the component of the system that corresponds
 c     # to momentum in the direction of this slice, mv to the orthogonal
 c     # momentum:
 c
       if (ixy.eq.1) then
-	  mu = 2
-	  mv = 3
-	else
-	  mu = 3
-	  mv = 2
-	endif
+	        mu = 2
+          mv = 3
+      else
+          mu = 3
+          mv = 2
+      endif
 c
 c     # note that notation for u and v reflects assumption that the
 c     # Riemann problems are in the x-direction with u in the normal
@@ -72,46 +72,46 @@ c     # compute the Roe-averaged variables needed in the Roe solver.
 c     # These are stored in the common block comroe since they are
 c     # later used in routine rpt2sh to do the transverse wave splitting.
 c
-        do 10 i = 2-mbc, mx+mbc
-         h(i) = (qr(i-1,1)+ql(i,1))*0.50d0
+      do i = 2-mbc, mx+mbc
+         h(i) = (qr(i-1,1)+ql(i,1))/2.d0
          hsqrtl = dsqrt(qr(i-1,1))
          hsqrtr = dsqrt(ql(i,1))
          hsq2 = hsqrtl + hsqrtr
          u(i) = (qr(i-1,mu)/hsqrtl + ql(i,mu)/hsqrtr) / hsq2
          v(i) = (qr(i-1,mv)/hsqrtl + ql(i,mv)/hsqrtr) / hsq2
          a(i) = dsqrt(grav*h(i))
-   10    continue
+      enddo
 c
 c
 c     # now split the jump in q at each interface into waves
 c
 c     # find a1 thru a3, the coefficients of the 3 eigenvectors:
-      do 20 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
          delta(1) = ql(i,1) - qr(i-1,1)
          delta(2) = ql(i,mu) - qr(i-1,mu)
          delta(3) = ql(i,mv) - qr(i-1,mv)
-         a1 = ((u(i)+a(i))*delta(1) - delta(2))*(0.50d0/a(i))
+         a1 = ((u(i)+a(i))*delta(1) - delta(2))/(2.d0*a(i))
          a2 = -v(i)*delta(1) + delta(3)
-         a3 = (-(u(i)-a(i))*delta(1) + delta(2))*(0.50d0/a(i))
+         a3 = (-(u(i)-a(i))*delta(1) + delta(2))/(2.d0*a(i))
 c
 c        # Compute the waves.
 c
-         wave(i,1,1) = a1
+         wave(i,1,1)  = a1
          wave(i,mu,1) = a1*(u(i)-a(i))
          wave(i,mv,1) = a1*v(i)
          s(i,1) = u(i)-a(i)
 c
-         wave(i,1,2) = 0.0d0
+         wave(i,1,2)  = 0.0d0
          wave(i,mu,2) = 0.0d0
          wave(i,mv,2) = a2
          s(i,2) = u(i)
 c
-         wave(i,1,3) = a3
+         wave(i,1,3)  = a3
          wave(i,mu,3) = a3*(u(i)+a(i))
          wave(i,mv,3) = a3*v(i)
          s(i,3) = u(i)+a(i)
-   20    continue
-c
+      enddo
+
 c
 c    # compute flux differences amdq and apdq.
 c    ---------------------------------------
@@ -124,18 +124,19 @@ c
 c     # amdq = SUM s*wave   over left-going waves
 c     # apdq = SUM s*wave   over right-going waves
 c
-      do 100 m=1,3
-         do 100 i=2-mbc, mx+mbc
-	    amdq(i,m) = 0.d0
-	    apdq(i,m) = 0.d0
-	    do 90 mw=1,mwaves
-	       if (s(i,mw) .lt. 0.d0) then
-		   amdq(i,m) = amdq(i,m) + s(i,mw)*wave(i,m,mw)
-		 else
-		   apdq(i,m) = apdq(i,m) + s(i,mw)*wave(i,m,mw)
-		 endif
-   90          continue
-  100       continue
+      do i = 2-mbc, mx+mbc
+          do m = 1,meqn
+	           amdq(i,m) = 0.d0
+	           apdq(i,m) = 0.d0
+             do mw = 1,mwaves
+                 amdq(i,m) = amdq(i,m) + 
+     &                   dmin1(s(i,mw),0.0)*wave(i,m,mw)
+                 apdq(i,m) = apdq(i,m) + 
+     &                   dmax1(s(i,mw),0.0)*wave(i,m,mw)
+             enddo
+         enddo
+      enddo
+      
       go to 900
 c
 c-----------------------------------------------------
