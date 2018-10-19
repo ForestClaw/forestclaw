@@ -281,8 +281,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     
     if (order[0] == 2)
     {
-        ifaces_x = mx + 1;  
-        ifaces_y = my + 1;
+        ifaces_x = mx + 2*mbc-1;  
+        ifaces_y = my + 2;
         num_ifaces = ifaces_x*ifaces_y;
 
         for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
@@ -291,7 +291,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             iy = thread_index/ifaces_y;
 
             /* Start at first non-ghost interior cell */
-            I = (iy + mbc)*ys + (ix + mbc);
+            I = (iy)*ys + (ix + 1);
 
             /* ------------------------------- X-directions --------------------------- */
             for(mw = 0; mw < mwaves; mw++)
@@ -340,7 +340,26 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                         apdq_trans[I_q] -= cqxx;                                 
                     }  
                 }
+            }
+        }
 
+
+        ifaces_x = mx + 2;  
+        ifaces_y = my + 2*mbc - 1;
+        num_ifaces = ifaces_x*ifaces_y;
+        num_ifaces = ifaces_x*ifaces_y;
+
+        for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
+        { 
+            ix = thread_index % ifaces_x;
+            iy = thread_index/ifaces_y;
+
+            /* Start at first non-ghost interior cell */
+            I = (iy + 1)*ys + ix;
+
+            /* ------------------------------- X-directions --------------------------- */
+            for(mw = 0; mw < mwaves; mw++)
+            {
                 /* ------------------------------- Y-directions --------------------------- */
                 I_speeds = I + (mwaves + mw)*zs;
                 s[mw] = speeds[I_speeds];
@@ -431,8 +450,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     */              
 
-    ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
-    ifaces_y = my;
+    ifaces_x = mx + 2*mbc-1;  /* Visit x - edges of all non-ghost cells */
+    ifaces_y = my + 2;
     num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
@@ -564,8 +583,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
              |     |     
     */              
 
-    ifaces_x = mx;  /* Visit edges of all non-ghost cells */
-    ifaces_y = my + 1;
+    ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
+    ifaces_y = my + 2*mbc - 1;
     num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
