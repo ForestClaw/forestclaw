@@ -754,7 +754,7 @@ def compile_results(results_dir=None,results_file='results.out',
             pcount = int(s[0])
             jobid = int(s[2])
 
-            run_file = open(f,'r')
+            run_file = open(f,'r',encoding = "ISO-8859-1")
             lines = run_file.readlines()
 
             found_bad_file = False
