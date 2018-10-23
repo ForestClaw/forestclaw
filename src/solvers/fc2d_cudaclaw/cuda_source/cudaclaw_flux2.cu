@@ -241,7 +241,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 }
             }
         }
-        
+
         /* ------------------------ Normal solve in Y direction ------------------- */
         rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, bmdq, bpdq);
 
@@ -274,7 +274,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
     }
-    
+
 
     maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
 
@@ -347,8 +347,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
 
-        //__syncthreads();
-
         ifaces_x = mx + 2;  
         ifaces_y = my + 1;
         num_ifaces = ifaces_x*ifaces_y;
@@ -361,7 +359,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             /* Start at first non-ghost interior cell */
             I = (iy + mbc)*ys + ix + mbc - 1;
 
-            /* ------------------------------- X-directions --------------------------- */
             for(mw = 0; mw < mwaves; mw++)
             {
                 /* ------------------------------- Y-directions --------------------------- */
@@ -412,9 +409,10 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 }   
             }  
         }  
-        __syncthreads();
-    }  /* Done with second order corrections */
+        //__syncthreads();
+    }  
 
+    /* ------------------------- First order final update ----------------------------- */
 
     if (order[1] == 0)
     {
@@ -439,6 +437,10 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     /* ------------------------ Transverse Propagation : X-faces ---------------------- */
 
+    ifaces_x = mx + 1;            /* Match edges visited by Clawpack */
+    ifaces_y = my + 2;
+    num_ifaces = ifaces_x*ifaces_y;
+
 
     /*     transverse-x
     
@@ -454,10 +456,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     
     */              
 
-
-    ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
-    ifaces_y = my + 2;
-    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
@@ -500,8 +498,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             gp[I_q - 1] -= gupdate;   
         }            
     }
-
-    __syncthreads();
+    //__syncthreads();
 
 
     /*     transverse-x
@@ -517,10 +514,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             |     |     |
     
     */              
-
-    ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
-    ifaces_y = my + 2;
-    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
@@ -562,8 +555,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             gp[I_q - 1 + ys] -= gupdate;
         }        
     }
-
-    __syncthreads();
+    //__syncthreads();
 
 
     /*     transverse-x
@@ -579,10 +571,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             |     |     |
     
     */              
-
-    ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
-    ifaces_y = my + 2;
-    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
@@ -624,8 +612,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             gp[I_q] -= gupdate;
         }
     }
-
-    __syncthreads();
+    //__syncthreads();
 
 
     /*     transverse-x
@@ -641,10 +628,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             |     |     |
     
     */              
-
-    ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
-    ifaces_y = my + 2;
-    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
@@ -687,12 +670,14 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         }
         
     } 
-
-    __syncthreads();  
+    //__syncthreads();
 
     
     /* ----------------------------- Transverse : Y-faces ----------------------------- */
 
+    ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
+    ifaces_y = my + 1;
+    num_ifaces = ifaces_x*ifaces_y;
 
     /*  transverse-y
     
@@ -708,10 +693,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         -----|-----|-----
              |     |     
     */              
-
-    ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
-    ifaces_y = my + 1;
-    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
@@ -755,6 +736,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         }
 
     }
+    //__syncthreads();
 
 
     /*  transverse-y
@@ -771,10 +753,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         -----|-----|-----
              |     |     
     */              
-
-    ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
-    ifaces_y = my + 1;
-    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
@@ -807,7 +785,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
 
-
         rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,bmasdq,bpasdq);
 
         for(mq = 0; mq < meqn; mq++)
@@ -817,10 +794,9 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             fm[I_q - ys + 1] -= gupdate;
             fp[I_q - ys + 1] -= gupdate;                
         }
-        
     }
+    //__syncthreads();
 
-    __syncthreads();
 
 
     /*  transverse-y
@@ -837,10 +813,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         -----|-----|-----
              |     |     
     */              
-
-    ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
-    ifaces_y = my + 1;
-    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
@@ -883,9 +855,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             fp[I_q] -= gupdate;
         }
     }
-
-    __syncthreads();
-
+    //__syncthreads();
 
     /*  transverse-y
     
@@ -901,10 +871,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         -----|-----|-----
              |     |     
     */              
-
-    ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
-    ifaces_y = my + 1;
-    num_ifaces = ifaces_x*ifaces_y;
 
     for(thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
