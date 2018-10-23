@@ -440,6 +440,21 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     /* ------------------------ Transverse Propagation : X-faces ---------------------- */
 
 
+    /*     transverse-x
+    
+            |     |     | 
+            |     |     | 
+        ----|-----|-----|-----
+            |     X     | 
+            |     X  q  |
+            |  v--X     |
+        ----|--O--|-----|-----
+            |     |     |
+            |     |     |
+    
+    */              
+
+
     ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
     ifaces_y = my + 2;
     num_ifaces = ifaces_x*ifaces_y;
@@ -474,20 +489,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
 
-
-        /*     transverse-x
-    
-                |     |     | 
-                |     |     | 
-            ----|-----|-----|-----
-                |     X     | 
-                |     X  q  |
-                |  v--X     |
-            ----|--O--|-----|-----
-                |     |     |
-                |     |     |
-    
-        */              
 
         rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,amdq,bmasdq,bpasdq);
 
@@ -503,6 +504,20 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     __syncthreads();
 
 
+    /*     transverse-x
+    
+            |     |     | 
+            |     |     | 
+        ----|--0--|-----|-----
+            |  ^--X     | 
+            |     X  q  |
+            |     X     |
+        ----|--O--|-----|-----
+            |     |     |
+            |     |     |
+    
+    */              
+
     ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
     ifaces_y = my + 2;
     num_ifaces = ifaces_x*ifaces_y;
@@ -536,21 +551,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 aux3[k] = aux[I_aux + ys + (imp - 1)];
             }
         }
-
-
-        /*     transverse-x
-    
-                |     |     | 
-                |     |     | 
-            ----|--0--|-----|-----
-                |  ^--X     | 
-                |     X  q  |
-                |     X     |
-            ----|--O--|-----|-----
-                |     |     |
-                |     |     |
-    
-        */              
 
         rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,0,amdq,bmasdq,bpasdq);
 
@@ -563,8 +563,22 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         }        
     }
 
-
     __syncthreads();
+
+
+    /*     transverse-x
+    
+            |     |     | 
+            |     |     | 
+        ----|-----|-----|-----
+            |     X     | 
+            |     X  q  |
+            |     X--v  |
+        ----|-----|--0--|-----
+            |     |     |
+            |     |     |
+    
+    */              
 
     ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
     ifaces_y = my + 2;
@@ -600,19 +614,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
 
-        /*     transverse-x
-    
-                |     |     | 
-                |     |     | 
-            ----|-----|-----|-----
-                |     X     | 
-                |     X  q  |
-                |     X--v  |
-            ----|-----|--0--|-----
-                |     |     |
-                |     |     |
-    
-        */              
         rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmasdq,bpasdq);
 
         for(mq = 0; mq < meqn; mq++)
@@ -626,6 +627,21 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     __syncthreads();
 
+
+    /*     transverse-x
+    
+            |     |     | 
+            |     |     | 
+        ----|-----|--0--|-----
+            |     X--^  | 
+            |     X  q  |
+            |     X     |
+        ----|-----|-----|-----
+            |     |     |
+            |     |     |
+    
+    */              
+
     ifaces_x = mx + 1;  /* Visit x - edges of all non-ghost cells */
     ifaces_y = my + 2;
     num_ifaces = ifaces_x*ifaces_y;
@@ -660,21 +676,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
 
-
-        /*     transverse-x
-    
-                |     |     | 
-                |     |     | 
-            ----|-----|--0--|-----
-                |     X--^  | 
-                |     X  q  |
-                |     X     |
-            ----|-----|-----|-----
-                |     |     |
-                |     |     |
-    
-        */              
-
         rpt2(0,meqn,mwaves,maux,ql,qr,aux1,aux2,aux3,1,apdq,bmasdq,bpasdq);
 
         for(mq = 0; mq < meqn; mq++)
@@ -687,8 +688,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         
     } 
 
-    /* May not the synchthreads(), below, since gm/gp updated above, but only fm/gp
-       updated below */
     __syncthreads();  
 
     
@@ -696,15 +695,15 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
 
     /*  transverse-y
-
+    
              |     |     
         -----|-----|-----
              |     |     
-             O-- --O      
-             | ^ ^ |     
+             |  q  |      
+             |     |     
         -----|-XXX-|-----
-             | v v |     
-             0-- --0     
+             | v   |     
+             0--   0     
              |     |     
         -----|-----|-----
              |     |     
@@ -745,22 +744,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
 
-        /*  transverse-y
-    
-                 |     |     
-            -----|-----|-----
-                 |     |     
-                 |  q  |      
-                 |     |     
-            -----|-XXX-|-----
-                 | v   |     
-                 0--   0     
-                 |     |     
-            -----|-----|-----
-                 |     |     
-        */              
-
-
         rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,bmasdq,bpasdq);
 
         for(mq = 0; mq < meqn; mq++)
@@ -772,6 +755,22 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         }
 
     }
+
+
+    /*  transverse-y
+    
+             |     |     
+        -----|-----|-----
+             |     |     
+             |  q  |      
+             |     |     
+        -----|-XXX-|-----
+             |   v |     
+             0   --0     
+             |     |     
+        -----|-----|-----
+             |     |     
+    */              
 
     ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
     ifaces_y = my + 1;
@@ -809,20 +808,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         }
 
 
-        /*  transverse-y
-    
-                 |     |     
-            -----|-----|-----
-                 |     |     
-                 |  q  |      
-                 |     |     
-            -----|-XXX-|-----
-                 |   v |     
-                 0   --0     
-                 |     |     
-            -----|-----|-----
-                 |     |     
-        */              
         rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,0,bmdq,bmasdq,bpasdq);
 
         for(mq = 0; mq < meqn; mq++)
@@ -837,6 +822,22 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     __syncthreads();
 
+
+    /*  transverse-y
+    
+             |     |     
+        -----|-----|-----
+             |  q  |     
+             O--   |           
+             | ^   |     
+        -----|-XXX-|-----
+             |     |     
+             |     | 
+             |     |     
+        -----|-----|-----
+             |     |     
+    */              
+
     ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
     ifaces_y = my + 1;
     num_ifaces = ifaces_x*ifaces_y;
@@ -871,22 +872,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                 aux3[k] = aux[I_aux + 1 + ys*(imp - 1)];
             }
         }
-
-
-        /*  transverse-y
-    
-                 |     |     
-            -----|-----|-----
-                 |  q  |     
-                 O--   |           
-                 | ^   |     
-            -----|-XXX-|-----
-                 |     |     
-                 |     | 
-                 |     |     
-            -----|-----|-----
-                 |     |     
-        */              
 
         rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,bmasdq,bpasdq);
 
@@ -901,6 +886,22 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     __syncthreads();
 
+
+    /*  transverse-y
+    
+             |     |     
+        -----|-----|-----
+             |  q  |     
+             |   --0           
+             |   ^ |     
+        -----|-XXX-|-----
+             |     |     
+             |     | 
+             |     |     
+        -----|-----|-----
+             |     |     
+    */              
+
     ifaces_x = mx + 2;  /* Visit edges of all non-ghost cells */
     ifaces_y = my + 1;
     num_ifaces = ifaces_x*ifaces_y;
@@ -936,22 +937,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             }
         }
 
-        /*  transverse-y
-    
-                 |     |     
-            -----|-----|-----
-                 |  q  |     
-                 |   --0           
-                 |   ^ |     
-            -----|-XXX-|-----
-                 |     |     
-                 |     | 
-                 |     |     
-            -----|-----|-----
-                 |     |     
-        */              
-
-
         rpt2(1,meqn,mwaves,maux,qd,qr,aux1,aux2,aux3,1,bpdq,bmasdq,bpasdq);
 
         for(mq = 0; mq < meqn; mq++)
@@ -961,7 +946,6 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             fm[I_q + 1] -= gupdate;
             fp[I_q + 1] -= gupdate;
         }   
-        
     } 
 
     __syncthreads();
