@@ -58,16 +58,18 @@ __device__ double cudaclaw_limiter(int lim_choice, double r);
 
 static
 __device__
-void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
-                               int maux, int mwaves, int mwork,
-                               double xlower, double ylower, 
-                               double dx, double dy,
-                               double* qold, double* aux, 
-                               volatile double* fm, volatile double* fp, 
-                               volatile double* gm, volatile double* gp,
-                               double* amdq_trans, double* apdq_trans, 
-                               double* bmdq_trans, double* bpdq_trans,
-                               double* waves, double *speeds,
+void cudaclaw_flux2_and_update(const int mx,   const int my, 
+                               const int meqn, const int mbc,
+                               const int maux, const int mwaves, const 
+                               int mwork,
+                               const double xlower, const double ylower, 
+                               const double dx,     const double dy,
+                               double* __restrict__ qold,       double* __restrict__ aux, 
+                               double* __restrict__ fm,         double* __restrict__ fp, 
+                               double* __restrict__ gm,         double* __restrict__ gp,
+                               double* __restrict__ amdq_trans, double* __restrict__ apdq_trans, 
+                               double* __restrict__ bmdq_trans, double* __restrict__ bpdq_trans,
+                               double* __restrict__ waves,      double* __restrict__ speeds,
                                double * maxcflblocks,
                                cudaclaw_cuda_rpn2_t rpn2,
                                cudaclaw_cuda_rpt2_t rpt2,
@@ -75,6 +77,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                double t,double dt)
 {
     typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
+    
     __shared__ typename BlockReduce::TempStorage temp_storage;
 
     extern __shared__ double shared_mem[];
@@ -938,9 +941,11 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
    PUBLIC function  
    ------------------------------------------------------------------------------------ */
 __global__
-void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
-                                      int maux, int mwaves, int mwork,
-                                      double dt, double t,
+void cudaclaw_flux2_and_update_batch (const int mx,   const int my, 
+                                      const int meqn, const int mbc, 
+                                      const int maux, const int mwaves, 
+                                      const int mwork,
+                                      const double dt, const double t,
                                       cudaclaw_fluxes_t* array_fluxes_struct,
                                       double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,

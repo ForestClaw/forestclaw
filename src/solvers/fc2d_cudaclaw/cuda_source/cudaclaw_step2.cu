@@ -21,16 +21,16 @@
 
 /* Put header here so it doesn't have to go in *.h file */
 __global__
-void cudaclaw_flux2_and_update_batch (int mx, int my, int meqn, int mbc, 
-                                int maux, int mwaves, int mwork,
-                                double dt, double t,
-                                struct cudaclaw_fluxes* array_fluxes_struct_dev,
-                                double * maxcflblocks_dev,
-                                cudaclaw_cuda_rpn2_t rpn2,
-                                cudaclaw_cuda_rpt2_t rpt2,
-                                cudaclaw_cuda_b4step2_t b4step2);
-
-
+void cudaclaw_flux2_and_update_batch (const int mx, const int my, 
+                                      const int meqn, const int mbc, 
+                                      const int maux, const int mwaves, 
+                                      const int mwork,
+                                      const double dt, const double t,
+                                      struct cudaclaw_fluxes* array_fluxes_struct_dev,
+                                      double * maxcflblocks_dev,
+                                      cudaclaw_cuda_rpn2_t rpn2,
+                                      cudaclaw_cuda_rpt2_t rpt2,
+                                      cudaclaw_cuda_b4step2_t b4step2);
 
 double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
@@ -41,7 +41,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     size_t size, bytes, bytes_per_thread;
     int I_q, I_aux, mwork;
     int i;
-    float bytes_kb;
 
     int mx,my,mbc,maux,meqn,mwaves;
     double maxcfl;
@@ -148,9 +147,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
 
-        bytes_kb = bytes/1024.0;
-        FCLAW_ASSERT(bytes_kb < 64);
-
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork, dt,t,
                                                               array_fluxes_struct_dev,
@@ -159,7 +155,19 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                                               cuclaw_vt->cuda_rpt2,
                                                               cuclaw_vt->cuda_b4step2);
         cudaDeviceSynchronize();
-        CHECK(cudaPeekAtLastError());
+
+        cudaError_t code = cudaPeekAtLastError();
+
+        if (code != cudaSuccess) 
+        {
+            fclaw_global_essentialf("ERROR (cudaclaw_step2.cu) : %s\n", 
+                                    cudaGetErrorString(code));
+            fclaw_global_essentialf("    Most likely, too many threads per block were launched.  Set configure flag -DFC2D_CUDACLAW_BLOCK_SIZE=NNN\n");
+            fclaw_global_essentialf("    where NNN is a multiple of 32 smaller than %d. " \
+                                    "Do a clean build of the code and try again.\n\n", FC2D_CUDACLAW_BLOCK_SIZE);   
+            exit(code);
+        }
+
     }
 	
     /* -------------------------------- Finish CFL ------------------------------------*/ 
