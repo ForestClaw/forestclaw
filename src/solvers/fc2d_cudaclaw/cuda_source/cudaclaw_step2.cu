@@ -21,11 +21,11 @@
 
 /* Put header here so it doesn't have to go in *.h file */
 __global__
-void cudaclaw_flux2_and_update_batch (const int mx, const int my, 
-                                      const int meqn, const int mbc, 
-                                      const int maux, const int mwaves, 
-                                      const int mwork,
-                                      const double dt, const double t,
+void cudaclaw_flux2_and_update_batch (int mx,   int my, 
+                                      int meqn, int mbc, 
+                                      int maux, int mwaves, 
+                                      int mwork,
+                                      double dt, double t,
                                       struct cudaclaw_fluxes* array_fluxes_struct_dev,
                                       double * maxcflblocks_dev,
                                       cudaclaw_cuda_rpn2_t rpn2,
@@ -167,7 +167,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                     "Do a clean build of the code and try again.\n\n", FC2D_CUDACLAW_BLOCK_SIZE);   
             exit(code);
         }
-
     }
 	
     /* -------------------------------- Finish CFL ------------------------------------*/ 

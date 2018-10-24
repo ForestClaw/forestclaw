@@ -60,7 +60,6 @@ void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
 
     fclaw_global_essentialf("[fclaw] Block-size (FC2D_CUDACLAW_BLOCK_SIZE) set to %d\n",
                             FC2D_CUDACLAW_BLOCK_SIZE);
-
 }
 
 
