@@ -150,7 +150,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
         bytes_kb = bytes/1024.0;
         FCLAW_ASSERT(bytes_kb < 64);
-    
+
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork, dt,t,
                                                               array_fluxes_struct_dev,

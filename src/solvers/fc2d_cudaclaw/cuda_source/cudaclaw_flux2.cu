@@ -75,9 +75,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                                double t,double dt)
 {
     typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
-
     __shared__ typename BlockReduce::TempStorage temp_storage;
-
 
     extern __shared__ double shared_mem[];
 
@@ -254,8 +252,8 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             gp[I_q] = -bpdq[mq]; 
             if (order[1] > 0)
             {
-                bpdq_trans[I_q] = bpdq[mq];
                 bmdq_trans[I_q] = bmdq[mq];                                                   
+                bpdq_trans[I_q] = bpdq[mq];
             }
         }
 
@@ -342,7 +340,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
                     if (order[1] > 0)
                     {                         
                         amdq_trans[I_q] += cqxx;   
-                        apdq_trans[I_q] -= cqxx;                                 
+                        apdq_trans[I_q] -= cqxx;      /* Subtract cqxx later */                         
                     }  
                 }
             }

@@ -34,11 +34,14 @@ extern "C"
 #endif
 #endif
 
-#define FC2D_CUDACLAW_BUFFER_LEN 4000    /* Number of patches that kernel should handle */ 
+/* Number of patches that kernel should handle (set in app Makefile) */ 
+#define FC2D_CUDACLAW_BUFFER_LEN 4000    
 
-#define FC2D_CUDACLAW_BLOCK_SIZE 128  /* linear block */   
+/* linear block length */
+/* TO DO : Set this as an option (but see use in cub::reduce code */    
+#define FC2D_CUDACLAW_BLOCK_SIZE 96     
 
-#define FC2D_CUDACLAW_MWAVES  10         /* Used to get shared memory */ 
+#define FC2D_CUDACLAW_MWAVES  10           /* Used to set shared memory (checked) */ 
 
 
 struct fclaw2d_global;
