@@ -101,10 +101,10 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
     double* bmasdq = aux3   + 2*maux;       /* meqn        */
     double* bpasdq = bmasdq + meqn;         /* meqn        */
 
-    double dtdx, dtdy;
+    __shared__ double dtdx, dtdy;
+    __shared__ int xs,ys,zs;
 
     int mq, mw, m, k;
-    int xs, ys, zs;
     int I, I_q, I_aux, I_waves, I_speeds;
     int ix,iy,ifaces_x, ifaces_y, num_ifaces;
     int thread_index;
@@ -120,14 +120,18 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
 
     /* --------------------------------- Start code ----------------------------------- */
 
+    if (threadIdx.x == 0)
+    {
+        dtdx = dt/dx;
+        dtdy = dt/dy;        
 
-    dtdx = dt/dx;
-    dtdy = dt/dy;
-
-    /* Compute strides */
-    xs = 1;
-    ys = (2*mbc + mx)*xs;
-    zs = (2*mbc + my)*xs*ys;
+        /* Compute strides */
+        xs = 1;
+        ys = (2*mbc + mx)*xs;
+        zs = (2*mbc + my)*xs*ys;
+    }
+    
+    __syncthreads();
 
     maxcfl = 0;
 
@@ -142,41 +146,38 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             ix = thread_index % ifaces_x;
             iy = thread_index/ifaces_x;
 
-            I = (iy + 1)*ys + (ix + 1)*xs;  /* Start at one cell from left/bottom */
+            I = (iy + 1)*ys + (ix + 1);  /* Start at one cell from left/bottom */
 
-            //if (ix < mx + 2*mbc-1 && iy < my + 2*mbc-1)
+            for(mq = 0; mq < meqn; mq++)
             {
-                for(mq = 0; mq < meqn; mq++)
-                {
-                    I_q = I + mq*zs;
-                    qr[mq] = qold[I_q];  
-                }
+                I_q = I + mq*zs;
+                qr[mq] = qold[I_q];  
+            }
 
-                for(m = 0; m < maux; m++)
-                {
-                    /* In case aux is already set */
-                    I_aux = I + m*zs;
-                    auxr[m] = aux[I_aux];
-                }          
+            for(m = 0; m < maux; m++)
+            {
+                /* In case aux is already set */
+                I_aux = I + m*zs;
+                auxr[m] = aux[I_aux];
+            }          
 
-                /* Compute (i,j) for patch index (i,j) in (1-mbc:mx+mbc,1-mbc:my+mbc)
+            /* Compute (i,j) for patch index (i,j) in (1-mbc:mx+mbc,1-mbc:my+mbc)
+    
+                i + (mbc-2) == ix   Check : i  = 1 --> ix = mbc-1
+                j + (mbc-2) == iy   Check : ix = 0 --> i  = 2-mbc
+            */
+            i = ix-(mbc-2);  
+            j = iy-(mbc-2);
+            b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
+                    t,dt,maux,auxr,i,j);
 
-                      i + (mbc-2) == ix   Check : i  = 1 --> ix = mbc-1
-                      j + (mbc-2) == iy   Check : ix = 0 --> i  = 2-mbc
-                */
-                i = ix-(mbc-2);  
-                j = iy-(mbc-2);
-                b4step2(mbc,mx,my,meqn,qr,xlower,ylower,dx,dy, 
-                        t,dt,maux,auxr,i,j);
-
-                for(m = 0; m < maux; m++)
-                {
-                    /* In case aux is set by b4step2 */
-                    I_aux = I + m*zs;
-                    aux[I_aux] = auxr[m];
-                }
-            } 
-        } 
+            for(m = 0; m < maux; m++)
+            {
+                /* In case aux is set by b4step2 */
+                I_aux = I + m*zs;
+                aux[I_aux] = auxr[m];
+            }
+        }      
         __syncthreads(); /* Needed to be sure all aux variables are available below */ 
     } 
 
@@ -422,7 +423,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
             ix = thread_index % mx;
             iy = thread_index/mx;
 
-            I = (ix + mbc)*xs + (iy + mbc)*ys;
+            I = (ix + mbc) + (iy + mbc)*ys;
 
             for(mq = 0; mq < meqn; mq++)
             {
@@ -923,7 +924,7 @@ void cudaclaw_flux2_and_update(int mx, int my, int meqn, int mbc,
         ix = thread_index % mx;
         iy = thread_index/my;
 
-        I = (ix + mbc)*xs + (iy + mbc)*ys;
+        I = (ix + mbc) + (iy + mbc)*ys;
 
         for(mq = 0; mq < meqn; mq++)
         {
