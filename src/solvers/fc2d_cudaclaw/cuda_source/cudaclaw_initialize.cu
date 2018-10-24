@@ -31,9 +31,12 @@
 
 void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
 {
+    cudaDeviceProp  prop;
+
     int mpirank, count, device_num;
     cudaError_t code;
-    
+
+
     mpirank = glob->mpirank;
 
     code = cudaGetDeviceCount(&count);
@@ -44,14 +47,16 @@ void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
     }
 
     device_num = mpirank % count;  
-    printf("mpirank %d assigned to GPU %d\n",mpirank,device_num); 
 
     code = cudaSetDevice(device_num);
+
     if (code != cudaSuccess) 
     {
         fprintf(stderr,"ERROR : %s\n", cudaGetErrorString(code));
         exit(code);
     }
+    cudaGetDeviceProperties(&prop, device_num);
+    printf("Rank %d assigned to GPU %d (%s)\n",mpirank,device_num,prop.name); 
 
 }
 
