@@ -71,6 +71,19 @@ fclaw_mpi_barrier (sc_MPI_Comm mpicomm)
     SC_CHECK_MPI (mpiret);
 }
 
+void
+fclaw_mpi_serialization_enter (struct fclaw2d_global *glob)
+{
+    fclaw2d_domain_serialization_enter(glob->domain);
+}
+
+void
+fclaw_mpi_serialization_leave (struct fclaw2d_global *glob)
+{
+    fclaw2d_domain_serialization_leave(glob->domain);
+}
+
+
 
 void
 fclaw_mpi_debug (void)

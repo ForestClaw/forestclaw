@@ -29,13 +29,16 @@
 #include "../fc2d_cudaclaw_check.cu"
 
 #include <fclaw2d_global.h>
+#include <fclaw_mpi.h>
 
 void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
 {
     cudaDeviceProp  prop;
 
-    int mpirank, count, device_num, rank;
-    cudaError_t code;
+    int mpirank, count, device_num;
+
+    char name[MPI_MAX_PROCESSOR_NAME];
+    int len;
 
     fclaw_global_essentialf("Block-size (FC2D_CUDACLAW_BLOCK_SIZE) set to %d\n",
                             FC2D_CUDACLAW_BLOCK_SIZE);            
@@ -47,13 +50,20 @@ void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
     device_num = mpirank % count;  
 
     CHECK(cudaSetDevice(device_num));
-    printf("[fclaw] Rank %2d assigned to GPU %d  ",mpirank, device_num); 
 
+
+    /* Print out info */
+    MPI_Get_processor_name(name, &len);
+
+    fclaw_mpi_serialization_enter (glob);
     cudaGetDeviceProperties(&prop, device_num);
-    printf("(%s)\n",prop.name); 
+    printf("[fclaw] Rank %2d (%s) assigned to GPU %d  (%s)\n",mpirank, name, 
+           device_num,prop.name); 
+    fclaw_mpi_serialization_leave (glob);
+
+    fflush(stdout);
 
     cudaDeviceReset();
-    
 }
 
 
