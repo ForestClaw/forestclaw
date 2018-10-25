@@ -941,11 +941,11 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
    PUBLIC function  
    ------------------------------------------------------------------------------------ */
 __global__
-void cudaclaw_flux2_and_update_batch (int mx,   int my, 
-                                      int meqn, int mbc, 
-                                      int maux, int mwaves, 
-                                      int mwork,
-                                      double dt, double t,
+void cudaclaw_flux2_and_update_batch (const int mx,    const int my, 
+                                      const int meqn,  const int mbc, 
+                                      const int maux,  const int mwaves, 
+                                      const int mwork,
+                                      const double dt, const double t,
                                       cudaclaw_fluxes_t* array_fluxes_struct,
                                       double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
