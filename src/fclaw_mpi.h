@@ -42,6 +42,9 @@ void
 fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp);
 
 void
+fclaw_mpi_barrier (sc_MPI_Comm mpicomm);
+
+void
 fclaw_mpi_finalize (void);
 
 void fclaw_mpi_debug (void);
