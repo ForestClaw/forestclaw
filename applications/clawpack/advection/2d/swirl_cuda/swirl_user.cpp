@@ -99,7 +99,10 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
 
 	double period = user->period;
 	SWIRL_SETPROB(&period);
-	swirl_setprob(period);
+    if (user->cuda)
+    {
+        swirl_setprob(period);        
+    }
 }
 
 
