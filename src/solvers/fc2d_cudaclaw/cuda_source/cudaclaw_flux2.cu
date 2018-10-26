@@ -500,7 +500,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             gp[I_q - 1] -= gupdate;   
         }            
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*     transverse-x
@@ -557,7 +557,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             gp[I_q - 1 + ys] -= gupdate;
         }        
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*     transverse-x
@@ -614,7 +614,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             gp[I_q] -= gupdate;
         }
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*     transverse-x
@@ -672,7 +672,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }
         
     } 
-    //__syncthreads();
+    __syncthreads();
 
     
     /* ----------------------------- Transverse : Y-faces ----------------------------- */
@@ -738,7 +738,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }
 
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*  transverse-y
@@ -797,7 +797,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             fp[I_q - ys + 1] -= gupdate;                
         }
     }
-    //__syncthreads();
+    __syncthreads();
 
 
 
@@ -857,7 +857,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             fp[I_q] -= gupdate;
         }
     }
-    //__syncthreads();
+    __syncthreads();
 
     /*  transverse-y
     
