@@ -3,6 +3,7 @@
 #include <fclaw2d_patch.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fc2d_cudaclaw_options.h>
 
 #include "cudaclaw_allocate.h"
 #include <fc2d_cuda_profiler.h>
@@ -17,6 +18,9 @@ void cudaclaw_store_buffer(fclaw2d_global_t* glob,
     double *qold, *aux;
     int meqn, maux;
 
+    const fc2d_cudaclaw_options_t *cuclaw_opt = fc2d_cudaclaw_get_options(glob);
+
+
     cudaclaw_fluxes_t *fluxes = (cudaclaw_fluxes_t*) 
                fclaw2d_patch_get_user_data(glob,this_patch);
 
@@ -28,5 +32,5 @@ void cudaclaw_store_buffer(fclaw2d_global_t* glob,
     fluxes->qold = qold;
     fluxes->aux = aux;
 
-    flux_array[iter % FC2D_CUDACLAW_BUFFER_LEN] = *fluxes;
+    flux_array[iter % cuclaw_opt->buffer_len] = *fluxes;
 }

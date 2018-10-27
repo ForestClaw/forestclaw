@@ -52,6 +52,10 @@ cudaclaw_register (fc2d_cudaclaw_options_t* clawopt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "mwaves", &clawopt->mwaves, 1,
                         "[cudaclaw] Number of waves [1]");
 
+    sc_options_add_int (opt, 0, "buffer-len", &clawopt->buffer_len, 1,
+                        "[cudaclaw] Patch buffer len [4096]");
+
+
     fclaw_options_add_int_array (opt, 0, "mthlim", &clawopt->mthlim_string, NULL,
                                  &clawopt->mthlim, clawopt->mwaves,
                                  "[cudaclaw] Waves limiters (one entry per wave; " \

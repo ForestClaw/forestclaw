@@ -931,7 +931,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             I_q = I + mq*zs;
             qold[I_q] = qold[I_q] - dtdx * (fm[I_q + 1] - fp[I_q]) 
-                                  - dtdy * (gm[I_q + ys] - gp[I_q]);
+                                  - dtdy * (gm[I_q +ys] - gp[I_q]);
         }        
     }
 }

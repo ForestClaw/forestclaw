@@ -61,6 +61,8 @@ struct fc2d_cudaclaw_options
     int ascii_out;
     int vtk_out;
 
+    int buffer_len;
+
     int is_registered;
 };
 
