@@ -357,8 +357,9 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     /* -------------------------------- Source term ----------------------------------- */
-    if (cuclaw_opt->src_term > 0 && cudaclaw_vt->src2 != NULL)
+    if (cuclaw_opt->src_term > 0)
     {
+        FCLAW_ASSERT(cudaclaw_vt->src2 != NULL);
         cudaclaw_vt->src2(glob,
                         this_patch,
                         this_block_idx,
