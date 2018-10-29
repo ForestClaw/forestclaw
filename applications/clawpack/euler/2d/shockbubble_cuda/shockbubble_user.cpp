@@ -44,6 +44,7 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
     const user_options_t* user = shockbubble_get_options(glob);
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
 
     fclaw_vt->problem_setup = &shockbubble_problem_setup;
 
@@ -54,9 +55,11 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 
         cuclaw_vt->fort_qinit  = &CLAWPACK46_QINIT;
-        cuclaw_vt->fort_setaux = &CLAWPACK46_SETAUX; /* Needed to get x location */
         cuclaw_vt->fort_bc2    = &CLAWPACK46_BC2;   /* Special  BCs at left edge */
         cuclaw_vt->fort_src2   = &CLAWPACK46_SRC2;  /* To simulate axis-symmetric */
+
+        cuclaw_vt->fort_setaux = NULL; 
+        patch_vt->setup = NULL;   /* Don't call setaux at all for this problem */
 
         shockbubble_assign_rpn2(&cuclaw_vt->cuda_rpn2);
         FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
@@ -77,12 +80,19 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 
         claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
-        claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
         claw46_vt->fort_bc2    = &CLAWPACK46_BC2;   /* Special  BCs at left edge */
         claw46_vt->fort_src2   = &CLAWPACK46_SRC2;  /* To simulate axis-symmetric */
 
+        claw46_vt->fort_setaux = NULL;
+        patch_vt->setup = NULL;
+
         switch (clawopt->mwaves)
         {
+        case 3:
+            /* Requires meqn=4 */
+            claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER3;  /* No tracer */
+            claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER3;
+            break;
         case 4:
             /* Requires meqn=4 */
             claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER4;  /* No tracer */

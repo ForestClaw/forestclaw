@@ -12,7 +12,6 @@ applications_clawpack_euler_2d_shockbubble_cuda_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble_cuda/setprob.f \
 	applications/clawpack/euler/2d/shockbubble_cuda/user_cuda/rp2euler.cu \
 	applications/clawpack/euler/2d/shockbubble_cuda/user_4.6/qinit.f \
-	applications/clawpack/euler/2d/shockbubble_cuda/user_4.6/setaux.f \
 	applications/clawpack/euler/2d/shockbubble_cuda/user_4.6/bc2.f \
 	applications/clawpack/euler/2d/shockbubble_cuda/user_4.6/src2.f \
 	applications/clawpack/euler/2d/shockbubble_cuda/user_4.6/tag4coarsening.f \
@@ -24,6 +23,8 @@ applications_clawpack_euler_2d_shockbubble_cuda_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble_cuda/user_5.0/tag4coarsening.f90 \
 	applications/clawpack/euler/2d/shockbubble_cuda/user_5.0/tag4refinement.f90 \
 	applications/clawpack/euler/2d/rp/euler_user_fort.h \
+	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler3.f \
+	applications/clawpack/euler/2d/rp/clawpack46_rpt2_euler3.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler4.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpt2_euler4.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler5.f \

@@ -7,6 +7,8 @@ import random
 
 # Redhawk has only 4 cores per node on compute nodes;  2 GPUs per node; one PCI bus
 
+execfile = 'shockbubble'
+
 if sys.argv.__len__() == 1:
     print("Usage : ")
     print("   run_radial.py <nodes> <ntasks-per-node> <gpus-per-node> <nout>")
@@ -20,31 +22,25 @@ if sys.argv.__len__() == 1:
 
 nodes          = int(sys.argv[1])
 tasks_per_node = int(sys.argv[2])
-gpu_count      = int(sys.argv[3])
-
-if (sys.argv.__len__() == 5):
-    inifile = "--inifile={:s}".format(sys.argv[4])
-else:
-    inifile = ""
+gpus           = int(sys.argv[3])
 
 cpus_per_task  = 1  # CPU cores per MPI process
 mpi_tasks = nodes*tasks_per_node
 
-if (gpu_count == 0):
-    gpu_str = "--user:cuda=F"
+if (gpus == 0):
+    gpustr = "--user:cuda=F"
 else:
-    gpu_str = "--user:cuda=T"
+    gpustr = "--user:cuda=T"
 
-
-arg_list = ["srun", "--gres=gpu:2",
+arg_list = ["srun", "--gres=gpu:2".format(gpus), "--mpi=pmi2", 
             "--nodes={:d}".format(nodes),
             "--ntasks-per-node={:d}".format(tasks_per_node),
-            "--cpus-per-task={:d}".format(cpus_per_task),            
-            "radial",inifile,gpu_str,]     
+            "--cpus-per-task={:d}".format(cpus_per_task), 
+            "{:s}".format(execfile), gpustr]     
 
 np = mpi_tasks
 jobid = random.randint(1000,9999)
-outfile = "radial_{:05d}.o{:d}".format(np,jobid)
+outfile = "{:s}_{:05d}.o{:d}".format(execfile,np,jobid)
 f = open(outfile,'w')
 po = subprocess.Popen(arg_list,stdout=f)
 print("Starting process {:d} with jobid {:d} on {:d} processor(s).".format(po.pid,jobid,np))
