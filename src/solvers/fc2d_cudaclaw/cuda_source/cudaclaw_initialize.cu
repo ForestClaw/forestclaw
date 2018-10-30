@@ -29,6 +29,9 @@
 #include "../fc2d_cudaclaw_check.cu"
 
 #include <fclaw2d_global.h>
+#if defined(FCLAW_ENABLE_MPI)  
+#endif
+
 #include <fclaw_mpi.h>
 
 void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
@@ -36,9 +39,6 @@ void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
     cudaDeviceProp  prop;
 
     int mpirank, count, device_num;
-
-    char name[MPI_MAX_PROCESSOR_NAME];
-    int len;
 
     fclaw_global_essentialf("Block-size (FC2D_CUDACLAW_BLOCK_SIZE) set to %d\n",
                             FC2D_CUDACLAW_BLOCK_SIZE);            
@@ -53,7 +53,14 @@ void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
 
 
     /* Print out info */
+#if defined(FCLAW_ENABLE_MPI)
+    char name[MPI_MAX_PROCESSOR_NAME];
+    int len;
+
     MPI_Get_processor_name(name, &len);
+#else
+    const char *name = "unknown00";
+#endif
 
     fclaw_mpi_serialization_enter (glob);
     cudaGetDeviceProperties(&prop, device_num);
