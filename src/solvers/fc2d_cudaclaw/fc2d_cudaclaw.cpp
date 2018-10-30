@@ -408,6 +408,11 @@ void fc2d_cudaclaw_solver_initialize()
 
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = cudaclaw_vt_init();
 
+#if defined(_OPENMP)
+    fclaw_global_essentialf("Current implementation does not allow OPENMP + CUDA\n");
+    exit(0);
+#endif    
+
     /* ForestClaw vtable items */
     fclaw_vt->output_frame                   = cudaclaw_output;
     fclaw_vt->problem_setup                  = cudaclaw_setprob;    
