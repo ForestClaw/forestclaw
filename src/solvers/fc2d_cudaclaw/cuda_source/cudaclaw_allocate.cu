@@ -118,7 +118,10 @@ void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
     int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;  
 
-    int batch_size = FC2D_CUDACLAW_BUFFER_LEN;
+    const fc2d_cudaclaw_options_t *cuclaw_opt = fc2d_cudaclaw_get_options(glob);
+
+
+    int batch_size = cuclaw_opt->buffer_len;
     size_t size = (2*mbc+mx)*(2*mbc+my);
     size_t bytes = batch_size*size*(meqn + maux)*sizeof(double);
 

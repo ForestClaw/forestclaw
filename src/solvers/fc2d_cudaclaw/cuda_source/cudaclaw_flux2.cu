@@ -411,7 +411,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 }   
             }  
         }  
-        //__syncthreads();
+        __syncthreads();
     }  
 
     /* ------------------------- First order final update ----------------------------- */
@@ -500,7 +500,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             gp[I_q - 1] -= gupdate;   
         }            
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*     transverse-x
@@ -557,7 +557,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             gp[I_q - 1 + ys] -= gupdate;
         }        
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*     transverse-x
@@ -614,7 +614,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             gp[I_q] -= gupdate;
         }
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*     transverse-x
@@ -672,7 +672,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }
         
     } 
-    //__syncthreads();
+    __syncthreads();
 
     
     /* ----------------------------- Transverse : Y-faces ----------------------------- */
@@ -738,7 +738,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }
 
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*  transverse-y
@@ -797,7 +797,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             fp[I_q - ys + 1] -= gupdate;                
         }
     }
-    //__syncthreads();
+    __syncthreads();
 
 
 
@@ -857,7 +857,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             fp[I_q] -= gupdate;
         }
     }
-    //__syncthreads();
+    __syncthreads();
 
     /*  transverse-y
     
@@ -931,7 +931,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             I_q = I + mq*zs;
             qold[I_q] = qold[I_q] - dtdx * (fm[I_q + 1] - fp[I_q]) 
-                                  - dtdy * (gm[I_q + ys] - gp[I_q]);
+                                  - dtdy * (gm[I_q +ys] - gp[I_q]);
         }        
     }
 }
@@ -941,9 +941,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
    PUBLIC function  
    ------------------------------------------------------------------------------------ */
 __global__
-void cudaclaw_flux2_and_update_batch (const int mx,   const int my, 
-                                      const int meqn, const int mbc, 
-                                      const int maux, const int mwaves, 
+void cudaclaw_flux2_and_update_batch (const int mx,    const int my, 
+                                      const int meqn,  const int mbc, 
+                                      const int maux,  const int mwaves, 
                                       const int mwork,
                                       const double dt, const double t,
                                       cudaclaw_fluxes_t* array_fluxes_struct,

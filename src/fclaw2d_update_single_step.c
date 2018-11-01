@@ -63,7 +63,10 @@ void cb_single_step(fclaw2d_domain_t *domain,
 
     ss_data->buffer_data.iter++;  /* Used for patch buffer */
     g->glob->count_single_step++;
+
+    /* Note : In openMP, this reduction is probably not correct */
     ss_data->maxcfl = fmax(maxcfl,ss_data->maxcfl);
+
 }
 
 
@@ -93,17 +96,17 @@ double fclaw2d_update_single_step(fclaw2d_global_t *glob,
     ss_data.buffer_data.total_count = 0;
     ss_data.buffer_data.iter = 0;
 
+    /* If there are not grids at this level, we return CFL = 0 */
+#if defined(_OPENMP)        
+    fclaw2d_global_iterate_level_mthread(glob, level, 
+                                         cb_single_step,(void *) &ss_data);
+#else
     /* Count number of grids to be updated in this call;  not sure how this
        works in OpenMP.  */
     int count = 0;
     fclaw2d_global_iterate_level(glob, level, cb_single_step_count,&count);
     ss_data.buffer_data.total_count = count;
 
-    /* If there are not grids at this level, we return CFL = 0 */
-#if defined(_OPENMP)        
-    fclaw2d_global_iterate_level_mthread(glob, level, 
-                                         cb_single_step,(void *) &ss_data);
-#else
     fclaw2d_global_iterate_level(glob, level, 
                                  cb_single_step,(void *) &ss_data);
 #endif   

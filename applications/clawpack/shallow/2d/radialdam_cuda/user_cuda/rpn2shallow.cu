@@ -6,7 +6,7 @@
 
 #include <fc2d_cudaclaw_check.cu>
 
-__constant__ double s_grav = 1.0;
+__constant__ double s_grav;
 
 
 void radialdam_setprob_cuda(double grav)

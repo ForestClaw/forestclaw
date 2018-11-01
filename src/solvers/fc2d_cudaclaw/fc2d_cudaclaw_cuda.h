@@ -34,9 +34,6 @@ extern "C"
 #endif
 #endif
 
-/* Number of patches that kernel should handle (set in app Makefile) */ 
-#define FC2D_CUDACLAW_BUFFER_LEN 4000    
-
 /* linear block length (set by configuration)  */
 #if !defined(FC2D_CUDACLAW_BLOCK_SIZE)
 #define FC2D_CUDACLAW_BLOCK_SIZE 128

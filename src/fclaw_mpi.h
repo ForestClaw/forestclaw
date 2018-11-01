@@ -36,10 +36,23 @@ extern "C"
 #endif
 #endif
 
+struct fclaw2d_global;
+
 /* Functions with C prototypes to use forestclaw from C code */
 
 void
 fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp);
+
+void
+fclaw_mpi_barrier (sc_MPI_Comm mpicomm);
+
+void
+fclaw_mpi_serialization_enter (struct fclaw2d_global *glob);
+
+void
+fclaw_mpi_serialization_leave (struct fclaw2d_global *glob);
+
+
 
 void
 fclaw_mpi_finalize (void);

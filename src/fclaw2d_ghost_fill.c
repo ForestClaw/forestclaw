@@ -685,16 +685,6 @@ void fclaw2d_ghost_update_async(fclaw2d_global_t* glob,
 		   FCLAW2D_BOUNDARY_ALL;
 	int read_parallel_patches;
 
-
-#if 0
-#if (_OPENMP)
-	/* Multi-thread only in single processor case. */
-	patch_iterator = &fclaw2d_global_iterate_level_mthread;
-#else
-	patch_iterator = &fclaw2d_global_iterate_level;
-#endif
-#endif
-
 	/* --------------------------------------------------------------
 	Do work we have do before sending
 	------------------------------------------------------------*/

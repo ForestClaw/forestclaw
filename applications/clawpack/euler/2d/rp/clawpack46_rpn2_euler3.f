@@ -43,7 +43,7 @@ c     ------------
      &       u(-1:maxm2),v(-1:maxm2),enth(-1:maxm2),a(-1:maxm2),
      &       g1a2(-1:maxm2),euv(-1:maxm2)
 c
-      data efix /.true./    !# use entropy fix for transonic rarefactions
+      data efix /.false./    !# use entropy fix for transonic rarefactions
 c
       if (-1.gt.1-mbc .or. maxm2 .lt. maxm+mbc) then
          write(6,*) 'need to increase maxm2 in rpn2'

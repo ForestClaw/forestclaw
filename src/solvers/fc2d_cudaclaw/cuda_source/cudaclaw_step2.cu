@@ -21,9 +21,9 @@
 
 /* Put header here so it doesn't have to go in *.h file */
 __global__
-void cudaclaw_flux2_and_update_batch (const int mx, const int my, 
-                                      const int meqn, const int mbc, 
-                                      const int maux, const int mwaves, 
+void cudaclaw_flux2_and_update_batch (const int mx,    const int my, 
+                                      const int meqn,  const int mbc, 
+                                      const int maux,  const int mwaves, 
                                       const int mwork,
                                       const double dt, const double t,
                                       struct cudaclaw_fluxes* array_fluxes_struct_dev,
@@ -39,6 +39,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     PROFILE_CUDA_GROUP("cudaclaw_step2_batch",1);
 
     size_t size, bytes, bytes_per_thread;
+    float bytes_kb;
     int I_q, I_aux, mwork;
     int i;
 
@@ -143,9 +144,12 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         dim3 grid(1,1,batch_size);
 
         /* Determine shared memory size */
-        mwork = 9*meqn + 9*maux + mwaves + 3*meqn*mwaves;
+        mwork = 9*meqn + 9*maux + mwaves + meqn*mwaves;
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
+
+        bytes_kb = bytes/1024.0;
+        //fclaw_global_essentialf("[fclaw] Shared memory  : %0.2f kb\n\n",bytes_kb);
 
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork, dt,t,
@@ -164,10 +168,10 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                     cudaGetErrorString(code));
             fclaw_global_essentialf("    Most likely, too many threads per block were launched.  Set configure flag -DFC2D_CUDACLAW_BLOCK_SIZE=NNN\n");
             fclaw_global_essentialf("    where NNN is a multiple of 32 smaller than %d. " \
-                                    "Do a clean build of the code and try again.\n\n", FC2D_CUDACLAW_BLOCK_SIZE);   
+                                    "Do a clean build of the code and try again.\n", FC2D_CUDACLAW_BLOCK_SIZE);   
+            fclaw_global_essentialf("    Shared memory exceeds 48kb : %0.2f\n\n",bytes_kb);            
             exit(code);
         }
-
     }
 	
     /* -------------------------------- Finish CFL ------------------------------------*/ 

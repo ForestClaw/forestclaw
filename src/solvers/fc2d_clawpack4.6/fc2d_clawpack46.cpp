@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
+#include <fclaw2d_options.h>
 #include <fclaw2d_defs.h>
 
 
@@ -266,7 +267,8 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 						double dt)
 {
 	fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
-	fc2d_clawpack46_options_t* clawpack_options;
+	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	const fc2d_clawpack46_options_t* clawpack_options;
 	int level;
 	double *qold, *aux;
 	int mx, my, meqn, maux, mbc;
@@ -299,7 +301,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 		  fclaw2d_clawpatch_get_registers(glob,this_patch);
 
 	/* Evaluate fluxes needed in correction terms */
-	if (claw46_vt->fort_rpn2_cons != NULL)
+	if (claw46_vt->fort_rpn2_cons != NULL && fclaw_opt->time_sync)
 	{
 		double *qvec   = FCLAW_ALLOC(double, meqn);
 		double *auxvec_center = FCLAW_ALLOC(double, maux);

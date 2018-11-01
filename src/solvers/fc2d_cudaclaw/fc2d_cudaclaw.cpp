@@ -66,6 +66,7 @@ void cudaclaw_setprob(fclaw2d_global_t *glob)
 }
 
 
+
 static
 void cudaclaw_qinit(fclaw2d_global_t *glob,
                       fclaw2d_patch_t *this_patch,
@@ -280,7 +281,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
 {
     PROFILE_CUDA_GROUP("cudaclaw_update",3);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
-    const fc2d_cudaclaw_options_t* clawpack_options;
+    const fc2d_cudaclaw_options_t* cuclaw_opt;
 
     int iter, total, patch_buffer_len;
     size_t size, bytes;
@@ -302,14 +303,14 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     /* -------------------------------- Main update ----------------------------------- */
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  
 
-    clawpack_options = fc2d_cudaclaw_get_options(glob);
+    cuclaw_opt = fc2d_cudaclaw_get_options(glob);
     maxcfl = 0.0;
 
 
     fclaw2d_single_step_buffer_data_t *buffer_data = 
               (fclaw2d_single_step_buffer_data_t*) user;
 
-    patch_buffer_len = FC2D_CUDACLAW_BUFFER_LEN;
+    patch_buffer_len = cuclaw_opt->buffer_len;
     iter = buffer_data->iter;
     total = buffer_data->total_count; 
     
@@ -356,8 +357,9 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     /* -------------------------------- Source term ----------------------------------- */
-    if (clawpack_options->src_term > 0 && cudaclaw_vt->src2 != NULL)
+    if (cuclaw_opt->src_term > 0)
     {
+        FCLAW_ASSERT(cudaclaw_vt->src2 != NULL);
         cudaclaw_vt->src2(glob,
                         this_patch,
                         this_block_idx,
@@ -405,6 +407,11 @@ void fc2d_cudaclaw_solver_initialize()
     fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
 
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = cudaclaw_vt_init();
+
+#if defined(_OPENMP)
+    fclaw_global_essentialf("Current implementation does not allow OPENMP + CUDA\n");
+    exit(0);
+#endif    
 
     /* ForestClaw vtable items */
     fclaw_vt->output_frame                   = cudaclaw_output;
@@ -482,7 +489,6 @@ void fc2d_cudaclaw_set_capacity(fclaw2d_global_t *glob,
 /* -------------------------- Public interface to Clawpack wrappers --------------------*/
 
 /* These are overkill;  it isn't obvious why the user would want these */
-
 void fc2d_cudaclaw_setprob(fclaw2d_global_t *glob)
 {
     cudaclaw_setprob(glob);
