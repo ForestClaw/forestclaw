@@ -923,7 +923,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     for(thread_index = threadIdx.x; thread_index < mx*my; thread_index += blockDim.x)
     {
         ix = thread_index % mx;
-        iy = thread_index/my;
+        iy = thread_index/mx;
 
         I = (ix + mbc) + (iy + mbc)*ys;
 
