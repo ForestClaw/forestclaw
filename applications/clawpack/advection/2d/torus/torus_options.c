@@ -34,13 +34,21 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user_opt->example, 0,
                         "[user] 0 = torus; 1 = twisted torus [0]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
-                        "[user] Clawpack version (4 or 5) [5]");
+    sc_options_add_int (opt, 0, "mapping", &user_opt->mapping, 0,
+                        "[user] 0 = torus; 1 = twisted torus [0]");
 
+    sc_options_add_int (opt, 0, "initial-condition", &user_opt->initial_condition, 0,
+                        "[user] Initial condition : 0=non-smooth; 1=smooth [1]");
 
     sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
                            "[user] Ratio r/R, r=outer radius, R=inner radius " \
                            "(used for torus) [0.4]");
+
+    sc_options_add_double (opt, 0, "revs-per-s", &user_opt->revs_per_s, 0.5,
+                           "[user] Revolutions per second [0.5]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
+                        "[user] Clawpack version (4 or 5) [5]");
 
     user_opt->is_registered = 1;
     return NULL;

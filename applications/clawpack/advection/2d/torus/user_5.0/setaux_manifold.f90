@@ -41,7 +41,7 @@ SUBROUTINE torus5_velocity_psi_comp(mx,my,mbc, &
         xd2(1) = xlower + (i-1)*dx
         xd2(2) = ylower + (j-1)*dy
 
-        CALL get_vel_psi_comp(blockno,xd1,xd2,dy,vn,t)
+        CALL torus_edge_velocity(blockno,xd1,xd2,dy,vn,t)
         aux(2,i,j) = vn
      ENDDO
   ENDDO
@@ -55,7 +55,7 @@ SUBROUTINE torus5_velocity_psi_comp(mx,my,mbc, &
         xd2(1) = xlower + (i-1)*dx
         xd2(2) = ylower + (j-1)*dy
 
-        CALL get_vel_psi_comp(blockno,xd1,xd2,dx,vn,t)
+        CALL torus_edge_velocity(blockno,xd1,xd2,dx,vn,t)
         aux(3,i,j) = -vn
      ENDDO
   ENDDO
