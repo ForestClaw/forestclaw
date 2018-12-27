@@ -10,6 +10,7 @@ c     !! This is used to get the error
       double precision u0_comm,v0_comm,revs_comm
       common /comm_velocity/ u0_comm,v0_comm, revs_comm
 
+
       u0 = revs_comm*u0_comm
       v0 = revs_comm*v0_comm
 

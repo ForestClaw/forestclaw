@@ -1,21 +1,33 @@
-      subroutine torus_setprob(example_in,alpha_in)
+      subroutine torus_setprob(example_in,mapping_in, ic_in, 
+     &     alpha_in,rps_in)
       implicit none
+
+      double precision alpha_in, rps_in
+      integer example_in, mapping_in, ic_in
 
       double precision pi
       common /compi/ pi
 
-      double precision alpha_in, alpha
-      common /toruscomm/ alpha
+      double precision alpha, revs_per_s
+      common /torus_comm/ alpha, revs_per_s
 
-      integer example_in, example
-      common /excomm_example/ example
+      integer example
+      common /example_comm/ example
 
-      double precision revs_per_sec_comm, r0_comm
-      common /comm_torus/ revs_per_sec_comm, r0_comm
+      integer mapping
+      common /mapping_comm/ mapping
+
+      integer initchoice
+      common /initchoice_comm/ initchoice
 
       pi = 4.d0*atan(1.d0)
 
       example = example_in
+      mapping = mapping_in
+      initchoice = ic_in
+
       alpha = alpha_in
+      revs_per_s = rps_in
+
 
       end

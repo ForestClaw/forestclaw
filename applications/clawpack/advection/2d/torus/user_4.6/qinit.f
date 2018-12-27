@@ -12,21 +12,21 @@
 
       integer blockno, fc2d_clawpack46_get_block
 
-      integer example
-      common /comm_example/ example
+      integer initchoice
+      common /initchoice_comm/ initchoice
 
       blockno = fc2d_clawpack46_get_block()
 
       t0 = 0.d0
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
-            if (example .eq. 0) then
+            if (initchoice .eq. 0) then
 c              # Discontinuous solution
                xlow = xlower + (i-1)*dx
                ylow = ylower + (j-1)*dy
                call cellave2(blockno,xlow,ylow,dx,dy,w)
                q(i,j,1) = w
-            elseif (example .eq. 1) then
+            elseif (initchoice .eq. 1) then
 c              # Smooth solution for computing the error
                xc = xlower + (i-0.5)*dx
                yc = ylower + (j-0.5)*dy
