@@ -124,6 +124,13 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
     cont->user_data = (void*) bv;
 
     /* Write data for Matlab plotting */
-    WRITE_BRICK_DATA(&nb,&mi,&mj,bv->xv,bv->yv);
+    FILE *fid; 
+    fid = fopen("brick.dat","w");
+    fprintf(fid,"%8d %8d\n",mi, mj);
+    for(i = 0; i < nb; i++)
+    {
+        fprintf(fid,"%12g %12g\n",bv->xv[i], bv->yv[i]);
+    }
+    fclose(fid);
     return cont;
 }
