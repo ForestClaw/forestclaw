@@ -70,6 +70,6 @@ public :
 
 fclaw2d_metric_patch_t* fclaw2d_metric_patch_new();
 
-void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t *patchmp);
+void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t **patchmp);
 
 #endif /* !FCLAW2D_METRIC_HPP */

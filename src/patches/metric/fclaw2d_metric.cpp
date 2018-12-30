@@ -47,11 +47,11 @@ fclaw2d_metric_patch_t* fclaw2d_metric_patch_new()
     return mp;
 }
 
-void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t *mp)
+void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t **mp)
 {
     FCLAW_ASSERT(mp != NULL);
-    delete mp;
-    mp = NULL;
+    delete *mp;
+    *mp = NULL;
 }
 
 
