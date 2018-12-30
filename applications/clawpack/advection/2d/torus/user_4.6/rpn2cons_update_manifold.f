@@ -25,11 +25,12 @@ c     # y-face normal : (12-14)
           endif
       enddo
 
+c     # Get flux in direction normal to idir-face
       urot = u*nv(1) + v*nv(2) + w*nv(3)
 
 c     #  f(q) = (n dot u)*q
-c     # Scaling is done elsewhere (don't multiply by edgelength)
       do m = 1,meqn
+c         # Don't multiply by edgelength (scaling is done elsewhere)
           flux(m) = urot*q(m)
       enddo
 

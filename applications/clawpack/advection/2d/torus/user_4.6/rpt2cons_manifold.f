@@ -4,7 +4,7 @@
       
       implicit none
 
-      integer ixy, icoor, maxm, meqn,mwaves,mbc,mx,maux,imp
+      integer ixy, maxm, meqn,mwaves,mbc,mx,maux,imp
 
       double precision     ql(1-mbc:maxm+mbc, meqn)
       double precision     qr(1-mbc:maxm+mbc, meqn)
@@ -16,73 +16,76 @@
       double precision   aux3(1-mbc:maxm+mbc, *)
 
 
-      integer iuv, iface,i,j,i1, k, idir
-      double precision vl,vr,vhat,ulc,urc,vrc,vlc,sigma
-      double precision uvecl(3), uvecr(3) 
+      integer i, i1, k, idir
+      double precision vvecl(3), vvecr(3), vhat, nv(3)
+      double precision vrrot, vlrot, g, vhat1
 
-      iface = 3-ixy 
-      idir = iface = 1
+c     # ixy = 1 --> idir = 1
+c     # ixy = 2 --> idir = 0
+      idir = 2-ixy
+
       do i = 2-mbc, mx+mbc
           i1 = i-2+imp    !#  =  i-1 for amdq,  i for apdq
 
-
 c         # Lower faces - cell centered velocities
-          do k = 1,3
-              uvecl(k) = aux1(i1,4+k-1)    
-              uvecr(k) = aux2(i1,4+k-1)
-          enddo
+          vvecl(1) = aux1(i1,4)    
+          vvecl(2) = aux1(i1,5)
+          vvecl(3) = aux1(i1,6)
+
+          vvecr(1) = aux2(i1,4)    
+          vvecr(2) = aux2(i1,5)
+          vvecr(3) = aux2(i1,6)
+
+c         # x-edge lengths (7)
+c         # y-edge lengths (8)
+          g = aux2(i1,7+idir)
 
 c         # Get scaled edge normals         
           do k = 1,3
               if (idir .eq. 0) then
-                  nv(k) = g*auxl(i,9+k-1)
+                  nv(k) = g*aux2(i1,9+k-1)
               else
-                  nv(k) = g*auxl(i,12+k-1)
+                  nv(k) = g*aux2(i1,12+k-1)
               endif
           enddo
 
+          vrrot = vvecr(1)*nv(1) + vvecr(2)*nv(2) + vvecr(3)*nv(3)
+          vlrot = vvecl(1)*nv(1) + vvecl(2)*nv(2) + vvecl(3)*nv(3)
 
-          if (idir .eq. 0) then
-c             # Project velocity onto normal at the lower y-face
-              vr = aux2(i1,8)*urc + aux2(i1,9)*vrc            
-              vl = aux2(i1,8)*ulc + aux2(i1,9)*vlc
-              sigma = aux2(i1,5)
-          else
-c             # Project velocity onto normal at the lower x-face              
-              vr = aux2(i1,6)*urc + aux2(i1,7)*vrc            
-              vl = aux2(i1,6)*ulc + aux2(i1,7)*vlc
-              sigma = aux2(i1,4)
-          endif
-          vhat = sigma*(vl + vr)/2.d0
+          vhat = (vrrot + vlrot)/2.0
+
           bmasdq(i,1) = min(vhat,0.d0)*asdq(i,1)
-
-c         # upper faces - cell centered velocities
-          do k = 1,3
-              uvecl(k) = aux2(i1,4+k-1)    
-              uvecr(k) = aux3(i1,4+k-1)
-          enddo
 
 
 c         # Upper faces - cell centered velocities
-          ulc = aux2(i1-1,1)    
-          urc = aux3(i1,1)
+          vvecl(1) = aux2(i1,4)    
+          vvecl(2) = aux2(i1,5)
+          vvecl(3) = aux2(i1,6)
 
-          vlc = aux2(i1-1,2)    
-          vrc = aux3(i1,2)
+          vvecr(1) = aux3(i1,4)    
+          vvecr(2) = aux3(i1,5)
+          vvecr(3) = aux3(i1,6)
 
-          if (ixy .eq. 1) then
-c             # Project velocity onto normal at the upper y-face
-              vr = aux3(i1,8)*urc + aux3(i1,9)*vrc            
-              vl = aux3(i1,8)*ulc + aux3(i1,9)*vlc
-              sigma = aux3(i1,5)
-          else
-c             # Project velocity onto normal at the upper x-face              
-              vr = aux3(i1,6)*urc + aux3(i1,7)*vrc            
-              vl = aux3(i1,6)*ulc + aux3(i1,7)*vlc
-              sigma = aux3(i1,4)
-          endif
-          vhat = sigma*(vl + vr)/2.d0
+c         # x-edge lengths (7)
+c         # y-edge lengths (8)
+          g = aux3(i1,7+idir)
+
+c         # Get scaled edge normals         
+          do k = 1,3
+              if (idir .eq. 0) then
+                  nv(k) = g*aux3(i1,9+k-1)
+              else
+                  nv(k) = g*aux3(i1,12+k-1)
+              endif
+          enddo
+
+          vrrot = vvecr(1)*nv(1) + vvecr(2)*nv(2) + vvecr(3)*nv(3)
+          vlrot = vvecl(1)*nv(1) + vvecl(2)*nv(2) + vvecl(3)*nv(3)
+
+          vhat = (vrrot + vlrot)/2.0
+
           bpasdq(i,1) = max(vhat,0.d0)*asdq(i,1)
+
       enddo
 
 

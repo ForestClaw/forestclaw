@@ -79,8 +79,8 @@ void torus_link_solvers(fclaw2d_global_t *glob)
                 claw46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
 
                 /* Transverse solver : Conservative form */
-                // claw46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;  
-                claw46_vt->fort_rpt2 = NULL;  // Debug first
+                claw46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;  
+                //claw46_vt->fort_rpt2 = NULL;  // Debug first
 
                 /* Flux function (for conservative fix) */
                 claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;

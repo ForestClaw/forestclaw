@@ -58,20 +58,14 @@ c        # Twisted torus stream function (to be used with usual torus map)
       integer blockno
       double precision xc,yc,t,nv(3),kappa(3), u,v, w
 
-
       double precision pi, alpha
       double precision revs_per_s
       integer*8 cont, get_context
 
       double precision xc1, yc1, zc1, pi2
+      double precision psi_xi, psi_eta
       double precision tau1(3), tau2(3)
-      double precision R, Reta, Rxi, vel(3), uc, vc
-      double precision a11, a22, a12, a21
-      double precision a11inv, a22inv, a12inv, a21inv
-      double precision tau1inv(3), tau2inv(3)
-      double precision psi_xi, psi_eta, gradpsi(3), nvec(3)
-      double precision vdotn, det, h1, h2
-      integer k
+      double precision R, Reta, Rxi, vel(3)
 
       integer example, mapping
       common /compi/ pi
@@ -88,20 +82,18 @@ c     # a unit square
       pi2 = 2*pi
 
       if (mapping .eq. 0) then
-c        # Rigid body rotation (\Psi_y, -\Psi_x)
           psi_xi = 0
           psi_eta = (pi2)**2*revs_per_s*alpha*(1 + alpha*cos(pi2*yc1))
 
-c         # Coordinate normals          
           R = 1 + alpha*cos(pi2*yc1)
           Reta = -pi2*alpha*sin(pi2*yc1)
 
-c         # tau1
+c         # T_xi
           tau1(1) = -pi2*R*sin(pi2*xc1)
           tau1(2) = pi2*R*cos(pi2*xc1)
           tau1(3) = 0
 
-c         # tau2
+c         # T_eta
           tau2(1) = Reta*cos(pi2*xc1)
           tau2(2) = Reta*sin(pi2*xc1)
           tau2(3) = pi2*alpha*cos(pi2*yc1)               
@@ -120,16 +112,45 @@ c         # Coordinate normals
           Rxi  = -pi2*alpha*sin(pi2*(xc1 + yc1))
           Reta = -pi2*alpha*sin(pi2*(xc1 + yc1))
 
+c         # T_xi
           tau1(1) = Rxi*cos(pi2*xc1) - pi2*R*sin(pi2*xc1)
           tau1(2) = Rxi*sin(pi2*xc1) + pi2*R*cos(pi2*xc1)
           tau1(3) = pi2*alpha*cos(pi2*(xc1 + yc1))
 
+c         # T_eta
           tau2(1) = Reta*cos(pi2*xc1)
           tau2(2) = Reta*sin(pi2*xc1)
           tau2(3) = pi2*alpha*cos(pi2*(xc1+yc1))
       endif
 
+      call fclaw2d_velocity_from_psi(psi_xi, psi_eta,
+     &                 tau1, tau2, nv, u,v,w)
 
+      end
+
+
+c     # To compute velocity from 2d streamfunction : 
+c     # 
+c     #        vel = grad_psi x nv
+c     #
+c     # where nv is a surface normal to the manifold.
+c     # 
+
+      subroutine fclaw2d_velocity_from_psi(psi_xi, psi_eta,
+     &                     tau1, tau2, nv, u,v,w)
+      implicit none
+
+      double precision psi_xi, psi_eta, tau1(3), tau2(3),nv(3)
+      double precision u,v,w
+
+      double precision a11, a22, a12, det
+      double precision a11inv, a22inv, a12inv, a21inv
+      double precision tau1inv(3), tau2inv(3)
+      double precision gradpsi(3), nvec(3), vel(3), sv, vdotn
+
+      integer k
+
+c     # Compute grad psi(xi,eta) 
       a11 = 0
       a22 = 0
       a12 = 0
@@ -158,22 +179,17 @@ c         # Coordinate normals
           gradpsi(k) = psi_xi*tau1inv(k) + psi_eta*tau2inv(k)
       end do
 
-      call torus_cross(tau1,tau2,nvec,w)
+      call torus_cross(tau1,tau2,nvec,sv)
 
 c     # Normalize surface normal
       do k = 1,3
-          nvec(k) = nvec(k)/w
+          nvec(k) = nvec(k)/sv
       end do
 
-      call torus_cross(gradpsi,nvec,vel,w)
+      call torus_cross(gradpsi,nvec,vel,sv)
 
 c     # Compute velocity in physical space uvec = u*tau1 + v*tau2
-      vdotn = 0
-      do k = 1,3
-c         # Compute vdotn = v dot (surface normal)          
-          vdotn = vdotn + vel(k)*nv(k)
-      enddo
-
+      vdotn = vel(1)*nv(1) + vel(2)*nv(2) + vel(3)*nv(3)
 
 c     # Subtract out components of the surface normal
       do k = 1,3
