@@ -124,7 +124,7 @@ void clawpatch_delete(void *patchcp)
 	fclaw2d_clawpatch_time_sync_delete(&cp->registers);
 
 	FCLAW_ASSERT(cp->mp != NULL);
-	fclaw2d_metric_patch_delete(cp->mp);
+	fclaw2d_metric_patch_delete(&cp->mp);
 
 	delete cp;
 	patchcp = NULL;
