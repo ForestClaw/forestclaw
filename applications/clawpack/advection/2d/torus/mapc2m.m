@@ -4,7 +4,7 @@ global map isflat;
 
 map = 'torus';
 map = 'twisted_torus';
-map = 'flat';
+% map = 'flat';
 
 
 isflat = false;

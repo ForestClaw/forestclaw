@@ -5,11 +5,11 @@ s = 1e-2;
 alim = [-1-alpha,1+alpha];
 alim = alim + [-s s];
 axis([alim alim]);
-daspect([1 1 1]);
 
 showpatchborders;
 setpatchborderprops('linewidth',1);   % Default is 2
 view(3);
+daspect([1,1,1]);
 axis off
 
 yrbcolormap;
@@ -29,7 +29,7 @@ if (ShowUnderOverShoots)
     colorbar_underover(under_label,over_label);
 end
 
-%%{
+%{
 view(2)
 axis([0,1,0,1]);
 xtick = linspace(0,1,9);
@@ -37,6 +37,7 @@ set(gca,'xtick',xtick);
 set(gca,'ytick',xtick);
 set(gca,'xticklabels',2*(xtick-0.5));
 set(gca,'yticklabels',(xtick-0.5));
+daspect([2 5 1]);
 axis on
 %}
 
