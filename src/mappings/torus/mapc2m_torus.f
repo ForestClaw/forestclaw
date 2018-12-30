@@ -5,14 +5,16 @@
       double precision xc,yc,xp,yp,zp
       double precision alpha, r
 
-      double precision pi
+      double precision pi, pi2
 
       common /compi/ pi
 
-      r = 1 + alpha*cos(2*pi*yc)
+      pi2 = 2*pi
 
-      xp = r*cos(2*pi*xc)
-      yp = r*sin(2*pi*xc)
-      zp = alpha*sin(2*pi*yc)
+      r = 1 + alpha*cos(pi2*yc)
+
+      xp = r*cos(pi2*xc)
+      yp = r*sin(pi2*xc)
+      zp = alpha*sin(pi2*yc)
 
       end
