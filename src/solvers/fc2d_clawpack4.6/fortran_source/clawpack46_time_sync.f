@@ -50,10 +50,13 @@ c        # left side k=0 = in; k=1 = out
         idir = 0
          do k = 0,1
             do m = 1,maux
-c              # Cell centered values                
+c              # Cell centered values;  Each cell-centered value
+c              # will be projected onto edge between interior and
+c              # exterior cell.                
                auxvec_center(m) = aux(1-k,j,m)
 
-c              # Edge between ghost cell and interior cell               
+c              # Use this array to get edge values between interior
+c              # and exterior cells.
                auxvec_edge(m) = aux(1,j,m)
             enddo
 
