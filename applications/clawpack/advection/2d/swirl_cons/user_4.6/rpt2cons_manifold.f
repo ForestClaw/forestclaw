@@ -25,10 +25,10 @@
 
 
 c        # Lower faces - cell centered velocities
-         ulc = aux1(i1-1,1)    
-         urc = aux2(i1,1)
+         ulc = aux1(i1,1)    
+         vlc = aux1(i1,2)    
 
-         vlc = aux1(i1-1,2)    
+         urc = aux2(i1,1)
          vrc = aux2(i1,2)
 
 
