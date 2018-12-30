@@ -23,17 +23,16 @@
       do i = 2-mbc, mx+mbc
 
 c        # Get cell-centered velocities         
-         uvecl(1) = auxl(i,4)
-         uvecl(2) = auxl(i,5)
-         uvecl(3) = auxl(i,6)
+         uvecr(1) = auxl(i,4)
+         uvecr(2) = auxl(i,5)
+         uvecr(3) = auxl(i,6)
 
-         uvecr(1) = auxr(i-1,4)
-         uvecr(2) = auxr(i-1,5)
-         uvecr(3) = auxr(i-1,6)
+         uvecl(1) = auxr(i-1,4)
+         uvecl(2) = auxr(i-1,5)
+         uvecl(3) = auxr(i-1,6)
 
-c        # x-edgelengths (7)
-c        # y-edgelengths (8)
-
+c        # x-edge lengths (7)
+c        # y-edge lengths (8)
          g = auxl(i,7+idir)
 
 c        # Get scaled edge normals
@@ -53,16 +52,6 @@ c        #    --- y-face : (12,13,14)
             urrot = urrot + nv(k)*uvecr(k)
             ulrot = ulrot + nv(k)*uvecl(k)
          enddo
-
-c        # x-face normal : (9,10,11)
-c        # y-face normal : (12,13,14)      
-c         if (iface .eq. 1) then
-c            urrot = g*(auxl(i,9)*ur + auxl(i,10)*vr + auxl(i,11)*wr)
-c            ulrot = g*(auxl(i,9)*ul + auxl(i,10)*vl + auxl(i,11)*wl)
-c         else
-c            urrot = g*(auxl(i,12)*ur + auxl(i,13)*vr + auxl(i,14)*wr)
-c            ulrot = g*(auxl(i,12)*ul + auxl(i,13)*vl + auxl(i,14)*wl)
-c         endif
 
          qrr = ql(i,1)
          qll = qr(i-1,1)

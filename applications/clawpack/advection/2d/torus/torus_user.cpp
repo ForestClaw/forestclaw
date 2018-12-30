@@ -79,7 +79,8 @@ void torus_link_solvers(fclaw2d_global_t *glob)
                 claw46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
 
                 /* Transverse solver : Conservative form */
-                claw46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;  
+                // claw46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;  
+                claw46_vt->fort_rpt2 = NULL;  // Debug first
 
                 /* Flux function (for conservative fix) */
                 claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
@@ -142,6 +143,7 @@ void torus_patch_setup(fclaw2d_global_t *glob,
     if (user->claw_version == 4)
     {
         /* Handles both non-conservative (ex 1-2) and conservative (ex 3-4) forms */
+        FCLAW_ASSERT(maux == 14);
         TORUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
                        &dx,&dy,&maux,aux,&this_block_idx,
                        area, edgelengths,xnormals,ynormals, 

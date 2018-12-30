@@ -11,6 +11,7 @@
 
       integer i,j, k
       double precision dxdy, xc, yc, nv(3), t, u, v, w
+      double precision u1, u2, v1, v2, e1,e2,e3,e4,udiv
 
       include "metric_terms.i"
 
@@ -22,7 +23,6 @@ c     # 7-8      Edge lengths (x-face, y-face)
 c     # 9-11     x-face normals
 c     # 12-14    y-face normals
 c     # ----------------------------------------------------------------
-
 
       t = 0
       dxdy = dx*dy
@@ -54,7 +54,7 @@ c     # Cell-centered velocities : entries (4,5,6)
             aux(i,j,6) = w
          enddo
       enddo
-
+100   format(4F16.8,E16.8)      
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
@@ -70,7 +70,6 @@ c           # Normals (9,10,11) and (12,13,14)
 
          enddo
       enddo
-
 
       return
       end
