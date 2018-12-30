@@ -274,10 +274,15 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	int mx, my, meqn, maux, mbc;
 	double xlower, ylower, dx,dy;
 
-	FCLAW_ASSERT(claw46_vt->fort_rpn2 != NULL);
-	FCLAW_ASSERT(claw46_vt->fort_rpt2 != NULL);
-
 	clawpack_options = fc2d_clawpack46_get_options(glob);
+
+	FCLAW_ASSERT(claw46_vt->fort_rpn2 != NULL);
+
+	if (clawpack_options->order[1] > 0)
+	{
+		FCLAW_ASSERT(claw46_vt->fort_rpt2 != NULL);
+	}
+
 
 	level = this_patch->level;
 
