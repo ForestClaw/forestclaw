@@ -382,7 +382,7 @@ void outstyle_3(fclaw2d_global_t *glob)
                           fclaw_opt->maxlevel : fclaw_opt->minlevel;
 
         fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
-                                 "%8.3f; Final time = %12.4f\n",
+                                 "%12.6f; Final time = %12.4f\n",
                                  level2print,
                                  (*domain)->global_minlevel,
                                  (*domain)->global_maxlevel,
