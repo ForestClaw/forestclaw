@@ -4,13 +4,16 @@ global map isflat;
 
 map = 'torus';
 map = 'twisted_torus';
-% map = 'flat';
+map = 'flat';
+% map = 'cart';
 
 
 isflat = false;
 R = 1;
 r = 0.4;
 
+shift = [1,1,0];
+scale = [0.5 0.5,1];
 
 switch map
     case 'flat'
@@ -18,6 +21,18 @@ switch map
         [xp,yp,~] = mapc2m_brick(xc,yc,s);
         zp = 0*xp;
          
+    case 'cart'
+        % (xc,yc) in [0,1]x[0,1]
+        s = 0.0;
+        [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
+        [xp,yp,~] = mapc2m_cart(xc1,yc1);
+                
+        xp = scale*xp;
+        yp = scale*yp;
+        xp = xp + shift(1);
+        yp = yp + shift(2);
+        zp = 0*xp;
+        
     case 'torus'
         % Find center to expand radius around.
         s = 0.00;
