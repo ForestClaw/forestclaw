@@ -26,7 +26,7 @@ c     # a unit square
       pi2 = 2*pi
 
 c     # Velocity is described in terms of (xi, eta)=(xc1,yc1) coordinates
-      if (mapping .eq. 0) then
+      if (mapping .eq. 0 .or. mapping .eq. 2) then
 c        # Rigid body rotation
          psi = (pi2*revs_per_s)*alpha*
      &         (pi2*yc1 + alpha*sin(pi2*yc1))

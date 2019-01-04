@@ -93,6 +93,12 @@ fclaw2d_map_context_t *
                            const double alpha,
                            const int example);
 
+fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
+                                             const double scale[],
+                                             const double shift[],
+                                             const double rotate[]);
+
+
 /* ----------------------
    Clawpack 4.6 headers
    ---------------------- */
@@ -182,6 +188,13 @@ void RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const i
 void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir,
                                double q[], double aux_center[], double aux_edge[],
                                double flux[]);
+
+#define RPN2_CONS_UPDATE_ZERO FCLAW_F77_FUNC(rpn2_cons_update_zero, \
+                                             RPN2_CONS_UPDATE_ZERO)
+
+void RPN2_CONS_UPDATE_ZERO(const int* meqn, const int* maux, const int* idir,
+                           double q[], double aux_center[], double aux_edge[],
+                           double flux[]);
 
 
 /* ----------------------

@@ -6,6 +6,7 @@ applications_clawpack_advection_2d_torus_torus_SOURCES = \
 	applications/clawpack/advection/2d/torus/torus_user.h \
 	applications/clawpack/advection/2d/torus/torus_user.cpp \
 	applications/clawpack/advection/2d/torus/fclaw2d_map_torus.c \
+	applications/clawpack/advection/2d/torus/fclaw2d_map_cart.c \
 	applications/clawpack/advection/2d/torus/setprob.f \
 	applications/clawpack/advection/2d/torus/velocity.f \
 	applications/clawpack/advection/2d/torus/fdisc.f \

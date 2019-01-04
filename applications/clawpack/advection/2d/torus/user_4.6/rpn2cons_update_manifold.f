@@ -35,3 +35,22 @@ c         # Don't multiply by edgelength (scaling is done elsewhere)
       enddo
 
       end
+
+      subroutine  rpn2_cons_update_zero(meqn,maux, idir, q,
+     &                                  auxvec_center,
+     &                                  auxvec_edge,flux)
+
+      implicit none
+
+      integer meqn,maux,idir, m
+      double precision q(meqn), flux(meqn)
+      double precision auxvec_center(maux), auxvec_edge(maux)
+
+c     #  f(q) = (n dot u)*q
+      do m = 1,meqn
+c         # Don't multiply by edgelength (scaling is done elsewhere)
+          flux(m) = 0
+      enddo
+
+      end
+
