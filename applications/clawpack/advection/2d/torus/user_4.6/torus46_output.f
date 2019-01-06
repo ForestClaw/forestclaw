@@ -33,14 +33,14 @@
 
       subroutine torus46_fort_write_file(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
-     &      q,error,patch_num,level,blockno,mpirank)
+     &      q,error,time, patch_num,level,blockno,mpirank)
 
       implicit none
 
       character*10 matname1
       integer meqn,mbc,mx,my
       integer patch_num, level, blockno, mpirank
-      double precision xlower, ylower,dx,dy,t
+      double precision xlower, ylower,dx,dy,time
       double precision xc,yc,qc,qexact
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -49,12 +49,14 @@
       integer matunit1
       integer i,j,mq
 
+
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
 
       call torus46_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
+
 
       if (meqn .gt. 5) then
          write(6,'(A,A,A)')
@@ -72,15 +74,19 @@
             enddo
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            qc = qexact(blockno,xc, yc,t)
+            if (time .gt. 0) then
+                qc = qexact(blockno,xc, yc,time)
+            else
+                qc = q(i,j,1)
+            endif
             if (abs(qc) .lt. 1d-99) then
                qc = 0.d0
             endif
             if (abs(error(i,j,1)) .lt. 1d-99) then
                error(i,j,1) = 0.d0
             endif
-            write(matunit1,120) (q(i,j,mq),mq=1,meqn),
-     &            error(i,j,1), qc
+            write(matunit1,120) (q(i,j,mq),mq=1,meqn),qc,
+     &            error(i,j,1)
          enddo
          write(matunit1,*) ' '
       enddo

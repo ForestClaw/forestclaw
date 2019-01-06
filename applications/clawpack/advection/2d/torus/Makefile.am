@@ -9,6 +9,7 @@ applications_clawpack_advection_2d_torus_torus_SOURCES = \
 	applications/clawpack/advection/2d/torus/fclaw2d_map_cart.c \
 	applications/clawpack/advection/2d/torus/setprob.f \
 	applications/clawpack/advection/2d/torus/velocity.f \
+	applications/clawpack/advection/2d/torus/dopri5.f \
 	applications/clawpack/advection/2d/torus/fdisc.f \
 	applications/clawpack/advection/2d/torus/qexact.f \
 	applications/clawpack/advection/2d/torus/user_4.6/qinit.f \

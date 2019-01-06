@@ -102,7 +102,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
 /* ----------------------
    Clawpack 4.6 headers
    ---------------------- */
-#if 0
+#if 1
 #define TORUS46_COMPUTE_ERROR FCLAW_F77_FUNC(torus46_compute_error,TORUS46_COMPUTE_ERROR)
 
 void TORUS46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
@@ -130,6 +130,7 @@ void     TORUS46_FORT_WRITE_FILE(char* matname1,
                                  double* xlower, double* ylower,
                                  double* dx,     double* dy,
                                  double q[],     double error[],
+                                 double *time,
                                  int* patch_num, int* level,
                                  int* blockno,   int* mpirank);
 

@@ -56,10 +56,8 @@ c        # Twisted torus stream function (to be used with usual torus map)
       implicit none
 
       integer blockno
-      double precision xc,yc,t,nv(3),kappa(3), u,v, w
+      double precision xc,yc,t,nv(3), u,v, w
 
-      double precision pi, alpha
-      double precision revs_per_s
       integer*8 cont, get_context
 
       double precision xc1, yc1, zc1, pi2
@@ -67,9 +65,13 @@ c        # Twisted torus stream function (to be used with usual torus map)
       double precision tau1(3), tau2(3)
       double precision R, Reta, Rxi, vel(3)
 
-      integer example, mapping
+      double precision pi
       common /compi/ pi
+
+      double precision alpha, revs_per_s
       common /torus_comm/ alpha, revs_per_s
+      
+      integer mapping
       common /mapping_comm/ mapping
 
       cont = get_context()
@@ -219,6 +221,99 @@ c     # get conservation.
          w = w + uxv(k)*uxv(k)
       enddo
       w = sqrt(w)      
+
+      end
+
+
+c     # --------------------------------------------------
+c     # Use this for exact solution.
+c     # --------------------------------------------------
+      subroutine psi_rhs_torus(n,t,sigma,f,rpar,ipar)
+      implicit none
+
+      integer n, ipar
+      double precision t, sigma(n), f(n), rpar
+
+
+      integer m, i
+      double precision xc1,yc1, u,v
+      double precision psi_xi, psi_eta
+      double precision tau1(3), tau2(3), t1xt2(3), w
+      double precision R, Reta, Rxi
+
+      double precision pi, pi2
+      common /compi/ pi
+
+      double precision alpha, revs_per_s
+      common /torus_comm/ alpha, revs_per_s
+      
+      integer*8 cont, get_context
+      integer mapping, blockno
+      common /mapping_comm/ mapping
+
+      pi2 = 2*pi
+
+      m = n/2
+
+      do i = 1,m
+          xc1 = sigma(i)
+          yc1 = sigma(m+i)
+
+          if (mapping .eq. 0) then
+              psi_xi = 0
+              psi_eta = (pi2)**2*revs_per_s*
+     &                alpha*(1 + alpha*cos(pi2*yc1))
+    
+              R = 1 + alpha*cos(pi2*yc1)
+              Reta = -pi2*alpha*sin(pi2*yc1)
+
+c             # T_xi
+              tau1(1) = -pi2*R*sin(pi2*xc1)
+              tau1(2) = pi2*R*cos(pi2*xc1)
+              tau1(3) = 0
+
+c             # T_eta
+              tau2(1) = Reta*cos(pi2*xc1)
+              tau2(2) = Reta*sin(pi2*xc1)
+              tau2(3) = pi2*alpha*cos(pi2*yc1)               
+
+          elseif (mapping .eq. 1) then
+c             # Twisted torus stream function (to be used with usual torus map)
+c             psi = (pi2*revs_per_s)*alpha*(pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
+
+              psi_xi = (pi2)**2*revs_per_s*alpha*(1 + 
+     &                   alpha*cos(pi2*(xc1+yc1)))
+              psi_eta = (pi2)**2*revs_per_s*alpha*(1 + 
+     &                   alpha*cos(pi2*(xc1+yc1)))
+
+              R    = 1 +  alpha*cos(pi2*(xc1 + yc1))
+              Rxi  = -pi2*alpha*sin(pi2*(xc1 + yc1))
+              Reta = -pi2*alpha*sin(pi2*(xc1 + yc1))
+
+c             # T_xi
+              tau1(1) = Rxi*cos(pi2*xc1) - pi2*R*sin(pi2*xc1)
+              tau1(2) = Rxi*sin(pi2*xc1) + pi2*R*cos(pi2*xc1)
+              tau1(3) = pi2*alpha*cos(pi2*(xc1 + yc1))
+
+c             # T_eta
+              tau2(1) = Reta*cos(pi2*xc1)
+              tau2(2) = Reta*sin(pi2*xc1)
+              tau2(3) = pi2*alpha*cos(pi2*(xc1+yc1))
+          endif
+
+c         # Compute u dot grad q in computational coordinates
+          call torus_cross(tau1,tau2,t1xt2,w);
+
+          u = psi_eta/w
+          v = -psi_xi/w
+
+c         # Negative direction goes counter clockwise    
+          f(i) = -u
+          f(m+i) = -v
+c          write(6,100) w, psi_eta, -psi_xi,f(i),f(m+i)
+      enddo
+100   format(5F16.8)                    
+
 
       end
 

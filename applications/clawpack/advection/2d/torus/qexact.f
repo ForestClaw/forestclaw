@@ -1,52 +1,125 @@
-c     !! This is used to get the error
+c     # ---------------------------------------------------------------      
       double precision function qexact(blockno,xc,yc,t)
       implicit none
 
+      external psi_rhs_torus
+      external solout
+
       integer blockno
       double precision xc,yc,t
-      double precision x0, y0, u0, v0
-      double precision q0,qc
 
-      double precision u0_comm,v0_comm,revs_comm
-      common /comm_velocity/ u0_comm,v0_comm, revs_comm
+      integer*8 cont, get_context, blockno_dummy
+      double precision xc1, yc1, zc1, t0, tfinal
+      double precision xp,yp,zp
 
-      u0 = revs_comm*u0_comm
-      v0 = revs_comm*v0_comm
+      double precision sigma(2), rtol, atol
+      integer itol, iout
 
-c     # Assume velocity is horizontal;  unit speed.
-      qc = q0(blockno, xc - u0*t,yc - v0*t)
+      integer Nmax, lwork,nrdens, liwork
+      parameter(Nmax=2, nrdens=0)
+      parameter(lwork=8*Nmax+5*nrdens+21)
+      parameter(liwork=nrdens+21)
 
-      qexact = qc
+      double precision work(lwork), rpar
+      double precision q0_physical, q0
+      integer iwork(liwork), ipar, idid
 
+      integer i
+
+      sigma(1) = xc
+      sigma(2) = yc
+
+      cont = get_context()
+
+      itol = 0
+      rtol = 1.d-4
+      atol = 1.d-4
+      iout = 0
+
+      do i = 1,20
+          work(i) = 0
+          iwork(i) = 0
+      enddo
+
+
+c     # This is not the torus mapping, but rather maps the brick to
+c     # a unit square      
+      call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+
+      sigma(1) = xc1
+      sigma(2) = yc1
+      t0 = 0
+      tfinal = t
+      call dopri5(2,psi_rhs_torus,t0,sigma,tfinal,rtol,atol,itol,
+     &            solout,iout, work,lwork,iwork,liwork,
+     &            rpar,ipar,idid)
+
+      if (idid .ne. 1) then
+          write(6,*) 'DOPRI5 : idid .ne. 1'
+          stop
+      endif
+
+      xc1 = sigma(1)
+      yc1 = sigma(2)
+
+      !! Do not map (xc1,yc1) to brick, since mapping was done above
+      blockno_dummy = -1  
+
+      call fclaw2d_map_c2m(cont,blockno_dummy,xc1,yc1,xp,yp,zp)
+
+      q0 = q0_physical(xp,yp,zp)
+
+      qexact = q0
 
       end
 
-      double precision function  q0(blockno,xc1,yc1)
+c     # ---------------------------------------------------------------      
+      subroutine solout(nr,xold,x,y,n,con,icomp,nd,rpar,ipar,irtrn)
+      dimension y(n),con(5*nd),icomp(nd)
+
+c     # Dummy routine
+
+      end
+
+
+c     # ---------------------------------------------------------------      
+      double precision function q0(blockno,xc1,yc1)
       implicit none
 
-      double precision xc,yc, xp, yp, zp, rp
+      integer blockno
       double precision xc1, yc1
 
-      integer blockno
       integer*8 cont, get_context
+      double precision xp, yp, zp
+      double precision q0_physical
 
-      double precision r,r0, x0, y0, z0
+      cont = get_context()
+
+      call fclaw2d_map_c2m(cont,
+     &      blockno,xc1,yc1,xp,yp,zp)
+
+      q0 = q0_physical(xp,yp,zp)
+
+      end
+
+
+c     # ---------------------------------------------------------------      
+      double precision function q0_physical(xp,yp,zp)
+      implicit none
+
+      double precision xp, yp, zp
+
+      double precision r,r0, x0, y0, z0, q0
       double precision Hsmooth
 
       integer mapping
       common /mapping_comm/ mapping
 
-
-      cont = get_context()
-
-      xc = xc1
-      yc = yc1
-      call fclaw2d_map_c2m(cont,
-     &      blockno,xc,yc,xp,yp,zp)
-
+      double precision alpha, revs_per_s
+      common /torus_comm/ alpha, revs_per_s      
 
 c     # Sphere centered at (1,0,r0) on torus
-      r0 = 0.4d0
+      r0 = alpha
       if (mapping .le. 1) then
           x0 = 1.0
           y0 = 0.0
@@ -56,12 +129,15 @@ c     # Sphere centered at (1,0,r0) on torus
           y0 = 0.5
           z0 = 0
       endif
-c      r = sqrt((xp - 1.0)**2 + yp**2 + (zp-r0)**2)
+
       r = sqrt((xp - x0)**2 + (yp-y0)**2 + (zp-z0)**2)
       q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
 
+      q0_physical = q0
+
       end
 
+c     # ---------------------------------------------------------------      
       double precision function Hsmooth(r)
       implicit none
 

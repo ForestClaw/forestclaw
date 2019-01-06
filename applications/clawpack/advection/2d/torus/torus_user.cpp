@@ -49,6 +49,8 @@ void torus_link_solvers(fclaw2d_global_t *glob)
     const user_options_t *user =  torus_get_options(glob);
     if (user->claw_version == 4)
     {
+        clawpatch_vt->fort_compute_patch_error = &TORUS46_COMPUTE_ERROR;
+
         fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
         fc2d_clawpack46_options_t *claw46_opt = fc2d_clawpack46_get_options(glob);
 
@@ -64,6 +66,10 @@ void torus_link_solvers(fclaw2d_global_t *glob)
                We should use a divided differences for tagging */
             clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
             clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+
+            /* Include error in output files */
+            clawpatch_vt->fort_header_ascii   = &TORUS46_FORT_HEADER_ASCII;
+            clawpatch_vt->cb_output_ascii     = &cb_torus_output_ascii;
         }
 
         switch(user->example)
@@ -181,16 +187,16 @@ void torus_patch_setup(fclaw2d_global_t *glob,
 }
 #endif
 
-#if 0
+#if 1
 void cb_torus_output_ascii (fclaw2d_domain_t * domain,
-                                fclaw2d_patch_t * this_patch,
-                                int this_block_idx, int this_patch_idx,
-                                void *user)
+                            fclaw2d_patch_t * this_patch,
+                            int this_block_idx, int this_patch_idx,
+                            void *user)
 {
     int patch_num;
     int level;
     int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
+    double xlower,ylower,dx,dy, time;
     double *q, *error;
     int iframe;
 
@@ -203,6 +209,9 @@ void cb_torus_output_ascii (fclaw2d_domain_t * domain,
 
 
     iframe = *((int *) s->user);
+
+    time = glob->curr_time;
+
 
     /* Get info not readily available to user */
     fclaw2d_patch_get_info(glob->domain,this_patch,
@@ -218,13 +227,14 @@ void cb_torus_output_ascii (fclaw2d_domain_t * domain,
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
+
     /* Here, we pass in q and the error, so need special headers and files */
     if (user_opt->claw_version == 4)
     {
         TORUS46_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
                                 &xlower,&ylower,
                                 &dx,&dy,
-                                q,error,
+                                q,error,&time, 
                                 &patch_num,&level,
                                 &this_block_idx,
                                 &glob->mpirank);
