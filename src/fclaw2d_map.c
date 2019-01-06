@@ -52,7 +52,10 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
                           double *xp, double *yp, double *zp)
 {
     fclaw2d_map_context_t *cont = *pcont;
+
+    FCLAW_ASSERT(cont->brick != NULL);
     fclaw2d_map_context_t *brick = cont->brick;
+    
     brick->mapc2m (brick, *blockno, *xc, *yc, xp, yp, zp);
 }
 
