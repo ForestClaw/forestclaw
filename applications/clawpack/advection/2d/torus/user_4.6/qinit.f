@@ -28,6 +28,7 @@ c              # Discontinuous solution
                q(i,j,1) = w
             elseif (initchoice .eq. 1) then
 c              # Smooth solution for computing the error
+c              # Assumes (xc,yc) has not been mapped to brick layout
                xc = xlower + (i-0.5)*dx
                yc = ylower + (j-0.5)*dy
                q(i,j,1) = q0(blockno,xc,yc)
