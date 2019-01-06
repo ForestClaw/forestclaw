@@ -185,8 +185,10 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
 
             error_norm[i2]   = fclaw2d_domain_global_sum(domain, error_data->local_error[i2]);
             error_norm[i2] /= total_area;
+            error_norm[i2] = sqrt(error_norm[i2]);
 
-            error_norm[iinf] = fclaw2d_domain_global_maximum(domain, error_data->local_error[iinf]);
+            error_norm[iinf] = fclaw2d_domain_global_maximum(domain, 
+                                                             error_data->local_error[iinf]);
 
             fclaw_global_essentialf("error[%d] =  %8.4e  %8.4e %8.4e\n",m,
                                     error_norm[i1], error_norm[i2],error_norm[iinf]);
