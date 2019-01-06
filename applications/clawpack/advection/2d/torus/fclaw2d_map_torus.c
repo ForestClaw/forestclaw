@@ -69,7 +69,17 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
 
     /* Scale's brick mapping to [0,1]x[0,1] */
     /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+    if (blockno >= 0)
+    {
+        /* Data is not already in brick domain */
+        FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+    }
+    else
+    {
+        xc1 = xc;
+        yc1 = yc;
+        zc1 = 0;
+    }
 
     /* blockno is ignored in the current torus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
