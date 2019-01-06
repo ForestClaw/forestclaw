@@ -41,29 +41,30 @@ zc0_torus = alpha_torus;
 
 N_torus = length(x0);
 
+use_streamfunction = false;
 
 if (T > 0)
     % Solve for t > 0
     N_torus = length(x0);
 
-    %%{
-    % More general than just rigid body rotation
-    f0 = [x0; y0; z0];
-    opt.RelTol = 1e-12;
-    [~,pout] = ode45(@psi_rhs_simple,[0,T],f0,opt);
-
-    xp = pout(end,1:N_torus);
-    yp = pout(end,(N_torus+1):(2*N_torus));
-    zp = pout(end,(2*N_torus+1):end);
-    %}
-
-    % Rigid body rotation (faster than above?)
-    %{
-    th = 2*pi*revs_per_sec*T;
-    xp = cos(th)*x0 + sin(th)*y0;
-    yp = sin(th)*x0 - cos(th)*y0;
-    zp = z0;
-    %}
+    if (use_streamfunction)
+        % More general than just rigid body rotation
+        f0 = [x0; y0; z0];
+        opt.RelTol = 1e-12;
+        [~,pout] = ode45(@psi_rhs_simple,[0,T],f0,opt);
+        
+        xp = pout(end,1:N_torus);
+        yp = pout(end,(N_torus+1):(2*N_torus));
+        zp = pout(end,(2*N_torus+1):end);
+    else
+        
+        % Rigid body rotation (faster than above?)
+        
+        th = 2*pi*revs_per_sec*T;
+        xp = cos(th)*x0 + sin(th)*y0;
+        yp = sin(th)*x0 - cos(th)*y0;
+        zp = z0;
+    end
 else
     % Return initial conditions
     xp = x0;
@@ -72,22 +73,23 @@ else
 end
 
 if (nargout > 0)
+    % We are plotting the contour on top of a ForestClaw simulation
     xpout = xp;
     ypout = yp;
     zpout = zp;
-    return
+else
+    % This function is being called as a standalone function.
+    plot_torus(N);
+    hold on
+    
+    o = findobj('tag','torus_curve');
+    if ~isempty(o)
+        delete(o)
+    end
+    
+    pline = plot3(xp(:),yp(:),zp(:),'k-','linewidth',2,'markersize',20);
+    set(pline,'tag','torus_curve')
 end
-
-plot_torus(N);
-hold on
-
-o = findobj('tag','torus_curve');
-if ~isempty(o)
-    delete(o)
-end
-
-pline = plot3(xp(:),yp(:),zp(:),'k-','linewidth',2,'markersize',20);
-set(pline,'tag','torus_curve')
 
 end
 
@@ -122,6 +124,8 @@ end
 % Get points that make up zero-level contour
 function [xdata,ydata,zdata] = torus_init(N)
 
+global alpha_torus
+
 xc = linspace(0,1,N);
 yc = linspace(0,1,N);
 [xcm,ycm] = meshgrid(xc,yc);
@@ -144,7 +148,7 @@ while (1)
   xl = h(1,st_idx+1:st_idx+next_length);
   yl = h(2,st_idx+1:st_idx+next_length);
 
-  [x0,y0,z0] = mapc2m_torus(xl(:),yl(:));
+  [x0,y0,z0] = mapc2m_torus(xl(:),yl(:), alpha_torus);
 
   xdata(k:k+next_length-1) = x0;
   ydata(k:k+next_length-1) = y0;
@@ -167,9 +171,9 @@ end
 
 function f = torus_surface(xc,yc)
 
-global r0_torus xc0_torus yc0_torus zc0_torus;
+global r0_torus xc0_torus yc0_torus zc0_torus alpha_torus;
 
-[xp,yp,zp] = mapc2m_torus(xc,yc);
+[xp,yp,zp] = mapc2m_torus(xc,yc,alpha_torus);
 
 
 r2 = (xp-xc0_torus).^2 + (yp-yc0_torus).^2 + (zp - zc0_torus).^2 - r0_torus^2;
