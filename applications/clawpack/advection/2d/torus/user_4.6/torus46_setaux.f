@@ -32,26 +32,31 @@ c     # Capacity : entry (1)
          enddo
       enddo
 
-c     # Edge velocities : entries (2,3)      
-      call torus46_set_edge_velocities(mx,my,mbc,dx,dy,
-     &       blockno,xlower,ylower,aux,maux)
+      if (example .eq. 0) then
+c         # Edge velocities : entries (2,3)      
+          call torus46_set_edge_velocities(mx,my,mbc,dx,dy,
+     &          blockno,xlower,ylower,aux,maux)
+      elseif (example .eq. 1) then
+c         # Center velocities : entries (2-5)      
+          call torus46_set_center_velocities(mx,my,mbc,dx,dy,
+     &          blockno,xlower,ylower,
+     &          edgelengths,xnormals,ynormals,surfnormals,
+     &          aux, maux)
+      endif
 
-      call torus46_set_center_velocities(mx,my,mbc,dx,dy,
-     &       blockno,xlower,ylower,aux,maux, surfnormals)
-
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-c           # x-face and y-face edge lengths (6,7)      
-            aux(i,j,7) = edgelengths(i,j,1)/dy
-            aux(i,j,8) = edgelengths(i,j,2)/dx
-
-c           # Normals (9,10,11) and (12,13,14)
-            do k = 1,3
-               aux(i,j,9  + k-1) = xnormals(i,j,k)
-               aux(i,j,12 + k-1) = ynormals(i,j,k)
-            enddo
-
-         enddo
+c      do i = 1-mbc,mx+mbc
+c         do j = 1-mbc,my+mbc
+cc           # x-face and y-face edge lengths (6,7)      
+c            aux(i,j,7) = edgelengths(i,j,1)/dy
+c            aux(i,j,8) = edgelengths(i,j,2)/dx
+c
+cc           # Normals (9,10,11) and (12,13,14)
+c            do k = 1,3
+c               aux(i,j,9  + k-1) = xnormals(i,j,k)
+c               aux(i,j,12 + k-1) = ynormals(i,j,k)
+c            enddo
+c
+c         enddo
       enddo
 
       return
@@ -120,21 +125,27 @@ c           # y-face - left vertex
       end
 
       subroutine torus46_set_center_velocities(mx,my,mbc,
-     &      dx,dy,blockno,xlower,ylower,aux,maux, surfnormals)
+     &      dx,dy,blockno,xlower,ylower,
+     &          edgelengths,xnormals,ynormals,surfnormals,
+     &          aux, maux)
       implicit none
 
       integer mx,my,mbc,maux,blockno
       double precision dx,dy, xlower,ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
 
       double precision xc,yc
       double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, torus_dot
+
+      double precision nl(3), nr(3), nb(3), nt(3)
+      double precision urrot, ulrot, ubrot, utrot
 
 
       integer*8 cont, get_context
 
       integer i,j, k
+
+      include "metric_terms.i"
 
       cont = get_context()
 
@@ -152,14 +163,32 @@ c           # a unit square
 
 c           # subtract out normal components
             do k = 1,3
-               nv(k) = surfnormals(i,j,k)
+                nv(k) = surfnormals(i,j,k)
             enddo
 
             vdotn = torus_dot(vel,nv)
 
-            aux(i,j,4) = vel(1) - vdotn*nv(1)
-            aux(i,j,5) = vel(2) - vdotn*nv(2)
-            aux(i,j,6) = vel(3) - vdotn*nv(3)
+c           # Subtract out component in the normal direction
+            do k = 1,3
+                vel(k) = vel(k) - vdotn*nv(k)
+            end do
+
+            do k = 1,3
+                nl(k)  = xnormals(i,j,k)
+                nr(k) = xnormals(i+1,j,k)
+                nb(k)   = ynormals(i,j,k)
+                nt(k)   = ynormals(i,j+1,k)
+            enddo
+
+            ulrot = nl(1)*vel(1) + nl(2)*vel(2) + nl(3)*vel(3)
+            urrot = nr(1)*vel(1) + nr(2)*vel(2) + nr(3)*vel(3)
+            ubrot = nb(1)*vel(1) + nb(2)*vel(2) + nb(3)*vel(3)
+            utrot = nt(1)*vel(1) + nt(2)*vel(2) + nt(3)*vel(3)
+
+            aux(i,j,2) = ulrot
+            aux(i,j,3) = urrot
+            aux(i,j,4) = ubrot
+            aux(i,j,5) = utrot
          enddo
       enddo
 

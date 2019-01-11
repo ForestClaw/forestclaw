@@ -27,60 +27,70 @@ c     # ixy = 2 --> idir = 0
       do i = 2-mbc, mx+mbc
           i1 = i-2+imp    !#  =  i-1 for amdq,  i for apdq
 
+c         # -----------------------------------------
 c         # Lower faces - cell centered velocities
-          vvecl(1) = aux1(i1,4)    
-          vvecl(2) = aux1(i1,5)
-          vvecl(3) = aux1(i1,6)
+c         # -----------------------------------------
+c          vvecl(1) = aux1(i1,4)    
+c          vvecl(2) = aux1(i1,5)
+c          vvecl(3) = aux1(i1,6)
 
-          vvecr(1) = aux2(i1,4)    
-          vvecr(2) = aux2(i1,5)
-          vvecr(3) = aux2(i1,6)
+c         vvecr(1) = aux2(i1,4)    
+c         vvecr(2) = aux2(i1,5)
+c         vvecr(3) = aux2(i1,6)
 
 c         # x-edge lengths (7)
 c         # y-edge lengths (8)
-          g = aux2(i1,7+idir)
+c          g = aux2(i1,7+idir)
 
 c         # Get scaled edge normals         
-          do k = 1,3
-              if (idir .eq. 0) then
-                  nv(k) = g*aux2(i1,9+k-1)
-              else
-                  nv(k) = g*aux2(i1,12+k-1)
-              endif
-          enddo
+c          do k = 1,3
+c              if (idir .eq. 0) then
+c                  nv(k) = g*aux2(i1,9+k-1)
+c              else
+c                  nv(k) = g*aux2(i1,12+k-1)
+c              endif
+c          enddo
 
-          vrrot = vvecr(1)*nv(1) + vvecr(2)*nv(2) + vvecr(3)*nv(3)
-          vlrot = vvecl(1)*nv(1) + vvecl(2)*nv(2) + vvecl(3)*nv(3)
+c          vrrot = vvecr(1)*nv(1) + vvecr(2)*nv(2) + vvecr(3)*nv(3)
+c          vlrot = vvecl(1)*nv(1) + vvecl(2)*nv(2) + vvecl(3)*nv(3)
+
+           
+          vrrot = auxl(i,  2 + 2*idir)   !! Left edge of right cell
+          vlrot = auxl(i-1,3 + 2*idir)   !! Right edge of left cell
 
           vhat = (vrrot + vlrot)/2.0
 
           bmasdq(i,1) = min(vhat,0.d0)*asdq(i,1)
 
-
+c         # -----------------------------------------
 c         # Upper faces - cell centered velocities
-          vvecl(1) = aux2(i1,4)    
-          vvecl(2) = aux2(i1,5)
-          vvecl(3) = aux2(i1,6)
+c         # -----------------------------------------
+c          vvecl(1) = aux2(i1,4)    
+c          vvecl(2) = aux2(i1,5)
+c          vvecl(3) = aux2(i1,6)
 
-          vvecr(1) = aux3(i1,4)    
-          vvecr(2) = aux3(i1,5)
-          vvecr(3) = aux3(i1,6)
+c          vvecr(1) = aux3(i1,4)    
+c          vvecr(2) = aux3(i1,5)
+c          vvecr(3) = aux3(i1,6)
 
 c         # x-edge lengths (7)
 c         # y-edge lengths (8)
-          g = aux3(i1,7+idir)
+c          g = aux3(i1,7+idir)
 
 c         # Get scaled edge normals         
-          do k = 1,3
-              if (idir .eq. 0) then
-                  nv(k) = g*aux3(i1,9+k-1)
-              else
-                  nv(k) = g*aux3(i1,12+k-1)
-              endif
-          enddo
+c          do k = 1,3
+c              if (idir .eq. 0) then
+c                  nv(k) = g*aux3(i1,9+k-1)
+c              else
+c                  nv(k) = g*aux3(i1,12+k-1)
+c              endif
+c          enddo
 
-          vrrot = vvecr(1)*nv(1) + vvecr(2)*nv(2) + vvecr(3)*nv(3)
-          vlrot = vvecl(1)*nv(1) + vvecl(2)*nv(2) + vvecl(3)*nv(3)
+c          vrrot = vvecr(1)*nv(1) + vvecr(2)*nv(2) + vvecr(3)*nv(3)
+c          vlrot = vvecl(1)*nv(1) + vvecl(2)*nv(2) + vvecl(3)*nv(3)
+
+          vrrot = auxl(i,  2 + 2*idir)   !! Left edge of right cell
+          vlrot = auxl(i-1,3 + 2*idir)   !! Right edge of left cell
 
           vhat = (vrrot + vlrot)/2.0
 
