@@ -1,6 +1,6 @@
-function [xp,yp,zp] = mapc2m_twisted_torus(xc,yc)
+function [xp,yp,zp] = mapc2m_twisted_torus(xc,yc,alpha)
 
-alpha = 0.4;  % outer radius/inner radius
+% alpha = 0.4;  % outer radius/inner radius
 
 r = 1 + alpha*cos(2*pi*(xc+yc));
 zp = alpha.*sin(2*pi*(xc+yc));

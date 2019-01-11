@@ -1,6 +1,4 @@
-function [xp,yp,zp] = mapc2m_torus(xc,yc)
-
-alpha = 0.4;
+function [xp,yp,zp] = mapc2m_torus(xc,yc,alpha)
 
 r = 1 + alpha*cos(2*pi*yc);
 zp = alpha.*sin(2*pi*yc);
