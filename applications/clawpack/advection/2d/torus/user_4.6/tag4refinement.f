@@ -15,8 +15,6 @@
       tag_for_refinement = 0
 
 c     # Refine based only on first variable in system.
-      qmin = 0.025d0
-      qmax = 0.975d0
       do mq = 1,meqn
          do i = 1,mx
             do j = 1,my
@@ -27,12 +25,6 @@ c     # Refine based only on first variable in system.
                   tag_for_refinement = 1
                   return
                endif
-c              # Tag grid if at least one value is in [qmin,qmax]
-c               if (q(i,j,1) .gt. qmin
-c     &               .and. q(i,j,1) .lt. qmax) then
-c                  tag_for_refinement = 1
-c                  return
-c               endif
             enddo
          enddo
       enddo

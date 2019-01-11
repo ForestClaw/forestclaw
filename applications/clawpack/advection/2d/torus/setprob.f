@@ -8,8 +8,11 @@
       double precision pi
       common /compi/ pi
 
-      double precision alpha, revs_per_s
-      common /torus_comm/ alpha, revs_per_s
+      double precision alpha
+      common /torus_comm/ alpha
+
+      double precision revs_per_s
+      common /stream_comm/ revs_per_s
 
       integer example
       common /example_comm/ example
@@ -27,6 +30,7 @@
       initchoice = ic_in
 
       alpha = alpha_in
+      
       revs_per_s = rps_in
 
 

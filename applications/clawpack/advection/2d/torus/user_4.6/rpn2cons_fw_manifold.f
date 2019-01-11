@@ -68,7 +68,6 @@ c        # Use Roe-average values
          endif
          wave(i,1,1) = urrot*qrr - ulrot*qll
          s(i,1) = uhat
-
       enddo
 
 

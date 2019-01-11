@@ -19,6 +19,7 @@
      &      blockno,xc,yc,xp,yp,zp)
 
       thc = pi/2.0
+      thc = 0
       w1 = pi/8.d0
       w2 = pi/4.0
 

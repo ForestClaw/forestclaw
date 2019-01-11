@@ -1,15 +1,14 @@
 c     # ---------------------------------------------------------------      
-      double precision function qexact(blockno,xc,yc,t)
+      double precision function qexact(xc1,yc1,t)
       implicit none
 
-      external psi_rhs_torus
+      external torus_rhs_divfree
       external solout
 
-      integer blockno
-      double precision xc,yc,t
+      double precision xc1,yc1,t
 
-      integer*8 cont, get_context, blockno_dummy
-      double precision xc1, yc1, zc1, t0, tfinal
+      integer blockno_dummy
+      double precision t0, tfinal
       double precision xp,yp,zp
 
       double precision sigma(2), rtol, atol
@@ -24,16 +23,16 @@ c     # ---------------------------------------------------------------
       double precision q0_physical, q0
       integer iwork(liwork), ipar, idid
 
+      integer*8 cont, get_context
+
       integer i
 
-      sigma(1) = xc
-      sigma(2) = yc
-
-      cont = get_context()
+      sigma(1) = xc1
+      sigma(2) = yc1
 
       itol = 0
-      rtol = 1.d-4
-      atol = 1.d-4
+      rtol = 1.d-10
+      atol = 1.d-10
       iout = 0
 
       do i = 1,20
@@ -41,16 +40,11 @@ c     # ---------------------------------------------------------------
           iwork(i) = 0
       enddo
 
+      cont = get_context()
 
-c     # This is not the torus mapping, but rather maps the brick to
-c     # a unit square      
-      call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-
-      sigma(1) = xc1
-      sigma(2) = yc1
       t0 = 0
       tfinal = t
-      call dopri5(2,psi_rhs_torus,t0,sigma,tfinal,rtol,atol,itol,
+      call dopri5(2,torus_rhs_divfree,t0,sigma,tfinal,rtol,atol,itol,
      &            solout,iout, work,lwork,iwork,liwork,
      &            rpar,ipar,idid)
 
@@ -64,7 +58,6 @@ c     # a unit square
 
       !! Do not map (xc1,yc1) to brick, since mapping was done above
       blockno_dummy = -1  
-
       call fclaw2d_map_c2m(cont,blockno_dummy,xc1,yc1,xp,yp,zp)
 
       q0 = q0_physical(xp,yp,zp)
@@ -83,7 +76,7 @@ c     # Dummy routine
 
 
 c     # ---------------------------------------------------------------      
-      double precision function q0(blockno,xc1,yc1)
+      double precision function q0(xc1,yc1)
       implicit none
 
       integer blockno
@@ -92,11 +85,13 @@ c     # ---------------------------------------------------------------
       integer*8 cont, get_context
       double precision xp, yp, zp
       double precision q0_physical
+      integer blockno_dummy
 
       cont = get_context()
 
+      blockno_dummy = -1
       call fclaw2d_map_c2m(cont,
-     &      blockno,xc1,yc1,xp,yp,zp)
+     &      blockno_dummy,xc1,yc1,xp,yp,zp)
 
       q0 = q0_physical(xp,yp,zp)
 
@@ -115,8 +110,8 @@ c     # ---------------------------------------------------------------
       integer mapping
       common /mapping_comm/ mapping
 
-      double precision alpha, revs_per_s
-      common /torus_comm/ alpha, revs_per_s      
+      double precision alpha
+      common /torus_comm/ alpha
 
 c     # Sphere centered at (1,0,r0) on torus
       r0 = alpha

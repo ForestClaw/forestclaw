@@ -54,7 +54,7 @@ void torus_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
         fc2d_clawpack46_options_t *claw46_opt = fc2d_clawpack46_get_options(glob);
 
-        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
+        claw46_vt->fort_qinit = &CLAWPACK46_QINIT;
 
         if (user->initial_condition == 0)
         {
@@ -68,8 +68,10 @@ void torus_link_solvers(fclaw2d_global_t *glob)
             clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
             /* Include error in output files */
+#if 1            
             clawpatch_vt->fort_header_ascii   = &TORUS46_FORT_HEADER_ASCII;
             clawpatch_vt->cb_output_ascii     = &cb_torus_output_ascii;
+#endif            
         }
 
         switch(user->example)
