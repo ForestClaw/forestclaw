@@ -14,13 +14,14 @@ c     # or using basis functions
 c     # 
 c     #      u = u1*tau1 + u2*tau2   (div u might not be zero)
 c     # 
-c     # All arguments are in computational coordinates (xi,eta)
-c     # which are assumed to be in [0,1]x[0,1]
+c     # NOTE: All arguments to routines here should be in computational 
+c     # coordinates (xi,eta) in [0,1]x[0,1].  Mapping from brick domains
+c     # to [0,1]x[0,1] should be done from calling routines.
 c     # ------------------------------------------------------------
 
 
 c     # ------------------------------------------------------------
-c     # Edge : u = curl \Psi
+c     # Edge : u = \nabla cross \Psi - curl \Psi
 c     # ------------------------------------------------------------
       subroutine torus_edge_velocity(xc1,yc1,xc2,yc2,ds,vn)
       implicit none
@@ -32,7 +33,7 @@ c     # ------------------------------------------------------------
       end
 
 c     # ------------------------------------------------------------
-c     # Center : u = n cross grad \Psi  (div u = 0)
+c     # Center : u = n cross grad \Psi   (div u = 0)
 c     # 
 c     # Center : u = u1*tau1 + u2*tau2   (div u might not be zero)
 c     # ------------------------------------------------------------
@@ -58,10 +59,10 @@ c     # ------------------------------------------------------------
     
       if (example .eq. 0) then
 c         # Divergence free velocity field : u = n cross \Psi
+          call torus_psi_derivs(xc1,yc1,psi_xi,psi_eta)
 
           call torus_contravariant_basis(xc1,yc1, tau1inv,tau2inv)
 
-          call torus_psi_derivs(xc1,yc1,psi_xi,psi_eta)
 
           do k = 1,3
               gradpsi(k) = psi_xi*tau1inv(k) + psi_eta*tau2inv(k)
@@ -95,6 +96,10 @@ c         # Vector field defined as u1*tau1 + u2*tau2
 
 c     # ------------------------------------------------------------
 c     # Streamfunction, velocity components and derivatives
+c     # 
+c     # Stream function depends on these global variables
+c     #         example (0=incompressible; 1=compressible)
+c     #         mapping (0=torus; 1=twisted torus)
 c     # ------------------------------------------------------------
       double precision function torus_psi(xc1,yc1)
       implicit none
@@ -119,13 +124,12 @@ c     # ------------------------------------------------------------
 
 c     # Velocity is described in terms of (xi, eta)=(xc1,yc1) coordinates
       if (mapping .eq. 0 .or. mapping .eq. 2) then
-c        # Rigid body rotation
-         psi = (pi2*revs_per_s)*alpha*
-     &         (pi2*yc1 + alpha*sin(pi2*yc1))
+c         # Rigid body rotation
+          psi = (pi2*revs_per_s)*alpha*(pi2*yc1 + alpha*sin(pi2*yc1))
       elseif (mapping .eq. 1) then
-c        # Twisted torus stream function (to be used with usual torus map)
-         psi = (pi2*revs_per_s)*alpha*
-     &         (pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
+c         # Twisted torus stream function (to be used with usual torus map)
+          psi = (pi2*revs_per_s)*alpha*
+     &                (pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
       endif
       torus_psi = psi
 
@@ -204,6 +208,18 @@ c         psi = (pi2*revs_per_s)*alpha*(pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1))
 
 c     # ----------------------------------------------------------------
 c     # Mapping functions 
+c     # 
+c     # Covariant basis vectors       : tau1 = T_xi, tau2 = T_eta
+c     #
+c     # Contravariant basis vectors   : tau1inv = a^{11}T_xi + a^{12}T_eta 
+c     #                                 tau2inv = a^{21}T_xi + a^{22}T_eta 
+c     # 
+c     # Christoffel symbols           : g111, g112, g212, g222 (needed for 
+c     #                                 computation of the divergence) 
+c     #
+c     # Mapping function depends on these global variables
+c     #         example (0=incompressible; 1=compressible)
+c     #         mapping (0=torus; 1=twisted torus)
 c     # ----------------------------------------------------------------
 
       subroutine torus_covariant_basis(xc1,yc1,tau1,tau2)
@@ -390,7 +406,7 @@ c                 # j == k == 2
       double precision xc1,yc1
 
       double precision u1, u2, u11, u22
-      double precision g111, g112, g221, g222
+      double precision g111, g112, g212, g222
       double precision divu, torus_christoffel_sym
 
       call torus_velocity_components(xc1,yc1,u1,u2,u11,u22)
@@ -398,7 +414,7 @@ c                 # j == k == 2
       g111 = torus_christoffel_sym(xc1,yc1,1,1,1)
       g222 = torus_christoffel_sym(xc1,yc1,2,2,2)
       g112 = torus_christoffel_sym(xc1,yc1,1,1,2)
-      g221 = torus_christoffel_sym(xc1,yc1,2,2,1)
+      g212 = torus_christoffel_sym(xc1,yc1,2,2,1)
 
       divu = u11 + u22 + u1*(g111 + g221) + u2*(g112 + g222)
 
@@ -424,11 +440,9 @@ c     # ----------------------------------------------------------------
       double precision xc1,yc1, q, u1,u2
       double precision psi_xi, psi_eta
       double precision tau1(3), tau2(3), t1xt2(3), w
-      double precision divu, torus_divergence
 
       xc1 = sigma(1)
       yc1 = sigma(2)
-c      q = sigma(3)
 
       call torus_covariant_basis(xc1,yc1,tau1,tau2)
       call torus_psi_derivs(xc1,yc1,psi_xi,psi_eta)
@@ -439,11 +453,9 @@ c     # Compute u dot grad q in computational coordinates
 c     # Solve for contravariant components of velocity field          
       u1 = -psi_eta/w
       u2 = psi_xi/w
-c      divu = torus_divergence(xc1,yc1)
 
       f(1) = u1
       f(2) = u2
-c      f(3) = -divu*q
 
       end
 
@@ -455,20 +467,12 @@ c      f(3) = -divu*q
 
 
       double precision xc1,yc1, q
-      double precision tau1(3), tau2(3), t11, t22
-      double precision T_xi_xi(3), T_xi_eta(3)
-      double precision R, Reta, Rxi
-      double precision u,v,divu, b
+      double precision u1,u2,u11,u22
       double precision torus_dot
+      double precision divu, torus_divergence
 
       double precision pi, pi2
       common /compi/ pi
-
-      double precision alpha
-      common /torus_comm/ alpha
-      
-      integer mapping
-      common /mapping_comm/ mapping
 
       pi2 = 2*pi
 
@@ -477,57 +481,12 @@ c     # Track evolution of these three quantities
       yc1 = sigma(2)
       q = sigma(3)
 
-      if (mapping .eq. 0) then
-          R = 1 + alpha*cos(pi2*yc1)
-          Reta = -pi2*alpha*sin(pi2*yc1)
+      call torus_velocity_components(xc1,yc1,u1,u2,u11,u22)
 
-c         # T_xi
-          tau1(1) = -pi2*R*sin(pi2*xc1)
-          tau1(2) = pi2*R*cos(pi2*xc1)
-          tau1(3) = 0
-          t11 = sqrt(torus_dot(tau1,tau1))
+      divu = torus_divergence(xc1,yc1)
 
-c         # T_eta
-          tau2(1) = Reta*cos(pi2*xc1)
-          tau2(2) = Reta*sin(pi2*xc1)
-          tau2(3) = pi2*alpha*cos(pi2*yc1)               
-          t22 = sqrt(torus_dot(tau2,tau2))
-
-          T_xi_eta(1) = -pi2*Reta*sin(pi2*xc1)
-          T_xi_eta(2) = pi2*Reta*cos(pi2*xc1)
-          T_xi_eta(3) = 0
-
-          T_xi_xi(1) = -pi2**2*R*cos(pi2*xc1)
-          T_xi_xi(2) = -pi2**2*R*sin(pi2*xc1)
-          T_xi_xi(3) = 0
-
-      elseif (mapping .eq. 1) then
-          R    = 1 +  alpha*cos(pi2*(xc1 + yc1))
-          Rxi  = -pi2*alpha*sin(pi2*(xc1 + yc1))
-          Reta = -pi2*alpha*sin(pi2*(xc1 + yc1))
-
-c         # T_xi
-          tau1(1) = Rxi*cos(pi2*xc1) - pi2*R*sin(pi2*xc1)
-          tau1(2) = Rxi*sin(pi2*xc1) + pi2*R*cos(pi2*xc1)
-          tau1(3) = pi2*alpha*cos(pi2*(xc1 + yc1))
-
-c         # T_eta
-          tau2(1) = Reta*cos(pi2*xc1)
-          tau2(2) = Reta*sin(pi2*xc1)
-          tau2(3) = pi2*alpha*cos(pi2*(xc1+yc1))
-      endif
-
-c     # Specify the contravariant components of the velocity
-      u = 1.d0
-      v = 0
-
-      b = t11/t22
-
-      divu = b*torus_dot(T_xi_eta,tau2) + 
-     &                   1.d0/b*torus_dot(T_xi_xi,tau1)
-
-      f(1) = u
-      f(2) = v
+      f(1) = u1
+      f(2) = u2
       f(3) = -divu*q   !! Non-conservative case
 
       end
