@@ -1,20 +1,19 @@
 setviews;
 
-isflat = false;
+global map_isflat;
+
+isflat = map_isflat;
 issquare = false;
 
 plot_contour = true;
-plot_qtrue = true;
+plot_qtrue = false;
 
-hold on;
 R = 0.5;  % revs per second
 alpha = 0.4;
 period = 0;
 meqn = size(amrdata(1).data,1);
 
 if plot_qtrue
-    % hideslices;    
-    % setslicecolor('none');
     evec = zeros(3,1);
     for i = 1:length(amrdata)
         ad = amrdata(i);
@@ -44,6 +43,7 @@ if plot_qtrue
 end
 
 if plot_contour
+    hold on;
     % assume we are doing the Gaussian problem with error
     [xp,yp,zp] = torus_soln_contour(t,alpha,R,period);
     plot3(xp,yp,zp,'k','linewidth',2);
@@ -63,6 +63,7 @@ over_label = sprintf('1 + %7.1e',qmax-qhi);
 
 fprintf('%6s %12s\n','qmin',under_label);
 fprintf('%6s %12s\n\n','qmax',over_label);
+
 
 if (ShowUnderOverShoots)
     qlo = 0;
@@ -86,16 +87,34 @@ if isflat
     axis on
 end
 
-yrbcolormap;
-showgridlines(1:5);
-% showpatchborders;
-hidepatchborders;
+% yrbcolormap;
+colormap(parula);
+% showgridlines(1:5);
+showpatchborders;
+% hidepatchborders;
 setpatchborderprops('linewidth',1);
 daspect([1,1,1]);
-caxis([0,1]);
 
+caxis([-0.2,0.75])
+% colorbar
+axis off;
+
+o = findobj('type','Light');
+if ishandle(o)
+    delete(o);
+end
+%camlight
+
+% view(vfront);
 view(2);
 
+prt = false;
+NoQuery = false;
+if (prt)
+    delete(get(gca,'title'));
+    fname = sprintf('torus%02d.png',Frame);
+    print('-dpng','-r640',fname);
+end
 shg
 
 clear afterframe;

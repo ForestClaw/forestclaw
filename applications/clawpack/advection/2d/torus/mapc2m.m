@@ -1,6 +1,6 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
+global map_isflat;
 
-global map isflat;
 
 map = 'torus';
 % map = 'twisted_torus';
@@ -8,7 +8,7 @@ map = 'torus';
 % map = 'cart';
 
 
-isflat = false;
+map_isflat = strcmp(map,'flat');
 % R = 1;
 % r = 0.4;
 
