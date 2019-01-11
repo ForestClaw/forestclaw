@@ -14,8 +14,11 @@
 ## swirl_cons (square)
 #include applications/clawpack/advection/2d/swirl_cons/Makefile.am
 
+## swirl_cons (square)
+include applications/clawpack/advection/2d/swirl/Makefile.am
+
 ## filament (original)
-#include applications/clawpack/advection/2d/filament/Makefile.am
+include applications/clawpack/advection/2d/filament/Makefile.am
 
 ## replicated (original)
 #include applications/clawpack/advection/2d/replicated/Makefile.am
