@@ -176,7 +176,8 @@ typedef void (*clawpatch_fort_error_t)(int* blockno, int *mx, int *my, int *mbc,
 
 typedef void (*clawpatch_fort_conscheck_t)(int *mx, int *my, int* mbc, int* meqn,
 										   double *dx, double *dy,
-										   double area[], double q[], double sum[]);
+										   double area[], double q[], double sum[],
+                                           double *c_kahan);
 
 typedef double (*clawpatch_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
 										double* dy, double area[]);
