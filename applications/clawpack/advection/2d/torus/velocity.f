@@ -416,7 +416,7 @@ c                 # j == k == 2
       g112 = torus_christoffel_sym(xc1,yc1,1,1,2)
       g212 = torus_christoffel_sym(xc1,yc1,2,2,1)
 
-      divu = u11 + u22 + u1*(g111 + g221) + u2*(g112 + g222)
+      divu = u11 + u22 + u1*(g111 + g212) + u2*(g112 + g222)
 
       torus_divergence = divu
 
