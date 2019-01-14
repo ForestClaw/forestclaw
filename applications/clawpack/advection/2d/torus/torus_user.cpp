@@ -153,7 +153,7 @@ void torus_patch_setup(fclaw2d_global_t *glob,
     if (user->claw_version == 4)
     {
         /* Handles both non-conservative (ex 1-2) and conservative (ex 3-4) forms */
-        FCLAW_ASSERT(maux == 14);
+        FCLAW_ASSERT(maux == 7);
         TORUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
                        &dx,&dy,&maux,aux,&this_block_idx,
                        area, edgelengths,xnormals,ynormals, 

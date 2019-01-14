@@ -17,7 +17,7 @@
 
       integer i, k, iface, m, idir
       double precision uhat,qll,qrr
-      double precision urrot, ulrot
+      double precision urrot, ulrot, g
 
       idir = ixy-1     !! 0 for the x-face; 1 for the y-face
       do i = 2-mbc, mx+mbc
@@ -54,8 +54,11 @@ c            urrot = urrot + nv(k)*uvecr(k)
 c            ulrot = ulrot + nv(k)*uvecl(k)
 c         enddo
 
-         urrot = auxl(i,  2 + 2*idir)   !! Left edge of right cell
-         ulrot = auxl(i-1,3 + 2*idir)   !! Right edge of left cell
+         g = auxl(i,6+idir)  !! Edge length
+
+         urrot = g*auxl(i,  2 + 2*idir)   !! Left edge of right cell
+         ulrot = g*auxl(i-1,3 + 2*idir)   !! Right edge of left cell
+
 
          qrr = ql(i,1)
          qll = qr(i-1,1)

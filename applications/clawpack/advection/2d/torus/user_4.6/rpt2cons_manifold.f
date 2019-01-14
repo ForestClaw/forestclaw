@@ -18,7 +18,7 @@
 
       integer i, i1, k, idir
       double precision vvecl(3), vvecr(3), vhat, nv(3)
-      double precision vrrot, vlrot, g, vhat1
+      double precision vrrot, vlrot, g
 
 c     # ixy = 1 --> idir = 1
 c     # ixy = 2 --> idir = 0
@@ -55,10 +55,12 @@ c          vrrot = vvecr(1)*nv(1) + vvecr(2)*nv(2) + vvecr(3)*nv(3)
 c          vlrot = vvecl(1)*nv(1) + vvecl(2)*nv(2) + vvecl(3)*nv(3)
 
            
-          vrrot = auxl(i,  2 + 2*idir)   !! Left edge of right cell
-          vlrot = auxl(i-1,3 + 2*idir)   !! Right edge of left cell
+          g = aux2(i1,6+idir)
 
-          vhat = (vrrot + vlrot)/2.0
+          vrrot = aux2(i,  2 + 2*idir)   !! Left edge of right cell
+          vlrot = aux2(i-1,3 + 2*idir)   !! Right edge of left cell
+
+          vhat = g*(vrrot + vlrot)/2.0
 
           bmasdq(i,1) = min(vhat,0.d0)*asdq(i,1)
 
@@ -89,10 +91,12 @@ c          enddo
 c          vrrot = vvecr(1)*nv(1) + vvecr(2)*nv(2) + vvecr(3)*nv(3)
 c          vlrot = vvecl(1)*nv(1) + vvecl(2)*nv(2) + vvecl(3)*nv(3)
 
-          vrrot = auxl(i,  2 + 2*idir)   !! Left edge of right cell
-          vlrot = auxl(i-1,3 + 2*idir)   !! Right edge of left cell
+          g = aux3(i1,6+idir)
 
-          vhat = (vrrot + vlrot)/2.0
+          vrrot = aux3(i,  2 + 2*idir)   !! Left edge of right cell
+          vlrot = aux3(i-1,3 + 2*idir)   !! Right edge of left cell
+
+          vhat = g*(vrrot + vlrot)/2.0
 
           bpasdq(i,1) = max(vhat,0.d0)*asdq(i,1)
 

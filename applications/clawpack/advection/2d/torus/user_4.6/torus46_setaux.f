@@ -12,6 +12,9 @@
       integer i,j, k
       double precision dxdy
 
+      integer example
+      common /example_comm/ example  
+
       include "metric_terms.i"
 
 c     # ----------------------------------------------------------------
@@ -44,19 +47,19 @@ c         # Center velocities : entries (2-5)
      &          aux, maux)
       endif
 
-c      do i = 1-mbc,mx+mbc
-c         do j = 1-mbc,my+mbc
-cc           # x-face and y-face edge lengths (6,7)      
-c            aux(i,j,7) = edgelengths(i,j,1)/dy
-c            aux(i,j,8) = edgelengths(i,j,2)/dx
-c
+      do i = 1-mbc,mx+mbc
+         do j = 1-mbc,my+mbc
+c           # x-face and y-face edge lengths (6,7)      
+            aux(i,j,6) = edgelengths(i,j,1)/dy
+            aux(i,j,7) = edgelengths(i,j,2)/dx
+
 cc           # Normals (9,10,11) and (12,13,14)
 c            do k = 1,3
 c               aux(i,j,9  + k-1) = xnormals(i,j,k)
 c               aux(i,j,12 + k-1) = ynormals(i,j,k)
 c            enddo
-c
-c         enddo
+
+         enddo
       enddo
 
       return
