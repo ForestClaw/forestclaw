@@ -5,7 +5,7 @@ global map_isflat;
 isflat = map_isflat;
 issquare = false;
 
-plot_contour = true;
+plot_contour = false;
 plot_qtrue = false;
 
 R = 0.5;  % revs per second

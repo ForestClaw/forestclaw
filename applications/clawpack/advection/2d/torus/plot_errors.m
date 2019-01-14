@@ -5,7 +5,7 @@ Nvec = e(:,1);
 n = length(Nvec);
 
 c = {'r','b','g'};
-idx = 1:n;
+idx = 5:n;
 lh = zeros(3,1);
 lstr = {'1-norm','2-norm','inf-norm'};
 for i = 1:3
