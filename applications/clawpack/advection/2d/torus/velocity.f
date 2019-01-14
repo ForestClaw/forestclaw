@@ -456,7 +456,6 @@ c     # Solve for contravariant components of velocity field
 
       f(1) = u1
       f(2) = u2
-      f(2) = u2
 
       end
 
