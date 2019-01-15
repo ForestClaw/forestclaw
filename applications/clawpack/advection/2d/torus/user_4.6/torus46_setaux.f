@@ -15,6 +15,9 @@
       integer example
       common /example_comm/ example  
 
+      integer color_equation
+      common /eqn_comm/ color_equation      
+
       include "metric_terms.i"
 
 c     # ----------------------------------------------------------------
@@ -35,11 +38,11 @@ c     # Capacity : entry (1)
          enddo
       enddo
 
-      if (example .eq. 0) then
+      if (color_equation .eq. 1) then
 c         # Edge velocities : entries (2,3)      
           call torus46_set_edge_velocities(mx,my,mbc,dx,dy,
      &          blockno,xlower,ylower,aux,maux)
-      elseif (example .eq. 1) then
+      else
 c         # Center velocities : entries (2-5)      
           call torus46_set_center_velocities(mx,my,mbc,dx,dy,
      &          blockno,xlower,ylower,
@@ -177,10 +180,10 @@ c           # Subtract out component in the normal direction
             end do
 
             do k = 1,3
-                nl(k)  = xnormals(i,j,k)
-                nr(k) = xnormals(i+1,j,k)
-                nb(k)   = ynormals(i,j,k)
-                nt(k)   = ynormals(i,j+1,k)
+                nl(k)  = xnormals(i,  j,  k)
+                nr(k)  = xnormals(i+1,j,  k)
+                nb(k)  = ynormals(i,  j,  k)
+                nt(k)  = ynormals(i,  j+1,k)
             enddo
 
             ulrot = nl(1)*vel(1) + nl(2)*vel(2) + nl(3)*vel(3)

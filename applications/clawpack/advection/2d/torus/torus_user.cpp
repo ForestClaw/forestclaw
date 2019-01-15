@@ -74,17 +74,17 @@ void torus_link_solvers(fclaw2d_global_t *glob)
 #endif            
         }
 
-        switch(user->example)
+        if(user->color_equation)
         {
-            case 0:  /* Non-conservative */
-                claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
-                claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
+            claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
+            claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
 
-                /* Flux function (set to zero for non-conservative fix) */
-                claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_ZERO;
-                break;
-
-            case 1:  /* Conservative */
+            /* Flux function (set to zero for non-conservative fix) */
+            claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_ZERO;
+        }
+        else
+        {
+                /* Solve conservative equation using cell-centered velocity */
                 /* Fwaves give best accuracy */
                 claw46_opt->use_fwaves = 1;
                 claw46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
@@ -94,8 +94,6 @@ void torus_link_solvers(fclaw2d_global_t *glob)
 
                 /* Flux function (for conservative fix) */
                 claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
-
-                break;
         }
     }
     else if (user->claw_version == 5)
@@ -115,7 +113,8 @@ void torus_problem_setup(fclaw2d_global_t *glob)
     const user_options_t* user = torus_get_options(glob);
     TORUS_SETPROB(&user->example, &user->mapping, 
                   &user->initial_condition, 
-                  &user->alpha, &user->revs_per_s);
+                  &user->alpha, &user->revs_per_s,
+                  &user->color_equation);
 }
 
 

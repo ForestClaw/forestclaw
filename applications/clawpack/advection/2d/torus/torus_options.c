@@ -40,6 +40,9 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "initial-condition", &user_opt->initial_condition, 0,
                         "[user] Initial condition : 0=non-smooth; 1=smooth [1]");
 
+    sc_options_add_bool (opt, 0, "color-equation", &user_opt->color_equation, 0,
+                        "[user]  Solve color-equation using edge velocities [1]");
+
     sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
                            "[user] Ratio r/R, r=outer radius, R=inner radius " \
                            "(used for torus) [0.4]");
