@@ -43,6 +43,7 @@ if plot_qtrue
 end
 
 if plot_contour
+    yrbcolormap;
     hold on;
     % assume we are doing the Gaussian problem with error
     [xp,yp,zp] = torus_soln_contour(t,alpha,R,period);
@@ -87,15 +88,15 @@ if isflat
     axis on
 end
 
-% yrbcolormap;
-colormap(parula);
+yrbcolormap;
+% colormap(parula);
 % showgridlines(1:5);
 showpatchborders;
 % hidepatchborders;
 setpatchborderprops('linewidth',1);
 daspect([1,1,1]);
 
-caxis([-0.2,0.75])
+caxis([0 1])
 % colorbar
 axis off;
 
