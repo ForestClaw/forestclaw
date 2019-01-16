@@ -47,9 +47,9 @@ c    # -----------------------------------------------------------------
 
       do j = 1,my
 c        # left side k=0 = in; k=1 = out
-        idir = 0
-        iface = 0
+         idir = 0
          do k = 0,1
+            iface = k
             do m = 1,maux
 c              # Cell centered values;  Each cell-centered value
 c              # will be projected onto edge between interior and
@@ -73,8 +73,8 @@ c              # and exterior cells.
          enddo
 
 c        # right side 0 = in; 1 = out
-         iface = 1
          do k = 0,1
+            iface = 1-k
             do m = 1,maux
 c              # Cell centered values                
                auxvec_center(m) = aux(mx+k,j,m)
@@ -94,11 +94,11 @@ c              # Edge between ghost cell and interior cell
       enddo
 
 
+      idir = 1
       do i = 1,mx
-c        # bottom side 0 = in; 1 = out
-         idir = 1
-         iface = 0
+c        # bottom side 0 = in; 1 = out0
          do k = 0,1
+            iface = k
             do m = 1,maux
 c              # Cell centered values                
                auxvec_center(m) = aux(i,1-k,m)
@@ -117,8 +117,8 @@ c              # Edge between ghost cell and interior cell
          enddo
 
 c        # Top side 0 = in; 1 = out
-         iface = 1
          do k = 0,1
+            iface = 1-k
             do m = 1,maux
 c              # Cell centered values                
                auxvec_center(m) = aux(i,my+k,m)
