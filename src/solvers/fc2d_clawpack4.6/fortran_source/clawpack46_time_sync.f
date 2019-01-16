@@ -27,7 +27,7 @@ c    # -----------------------------------------------------------------
 
       implicit none
 
-      integer mx,my,mbc,meqn, maux,idir
+      integer mx,my,mbc,meqn, maux
       double precision dt
 
       double precision el0(my), el1(my), el2(mx), el3(mx)
@@ -43,11 +43,12 @@ c    # -----------------------------------------------------------------
       double precision qvec(meqn),flux(meqn)
       double precision auxvec_center(maux), auxvec_edge(maux)
 
-      integer i,j,k,m
+      integer i,j,k,m, idir, iface
 
       do j = 1,my
 c        # left side k=0 = in; k=1 = out
         idir = 0
+        iface = 0
          do k = 0,1
             do m = 1,maux
 c              # Cell centered values;  Each cell-centered value
@@ -64,7 +65,7 @@ c              # and exterior cells.
             do m = 1,meqn
                qvec(m) = q(1-k,j,m)
             enddo
-            call rpn2_cons(meqn,maux,idir,qvec,
+            call rpn2_cons(meqn,maux,idir,iface,qvec,
      &               auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
                flux0(j,m,k) = flux0(j,m,k) + dt*el0(j)*flux(m)
@@ -72,6 +73,7 @@ c              # and exterior cells.
          enddo
 
 c        # right side 0 = in; 1 = out
+         iface = 1
          do k = 0,1
             do m = 1,maux
 c              # Cell centered values                
@@ -83,7 +85,7 @@ c              # Edge between ghost cell and interior cell
             do m = 1,meqn
                qvec(m) = q(mx+k,j,m)
             enddo
-            call rpn2_cons(meqn,maux,idir,qvec,
+            call rpn2_cons(meqn,maux,idir,iface,qvec,
      &              auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
                flux1(j,m,k) = flux1(j,m,k) + dt*el1(j)*flux(m)
@@ -95,6 +97,7 @@ c              # Edge between ghost cell and interior cell
       do i = 1,mx
 c        # bottom side 0 = in; 1 = out
          idir = 1
+         iface = 0
          do k = 0,1
             do m = 1,maux
 c              # Cell centered values                
@@ -106,7 +109,7 @@ c              # Edge between ghost cell and interior cell
             do m = 1,meqn
                qvec(m) = q(i,1-k,m)
             enddo
-            call rpn2_cons(meqn,maux,idir,qvec,
+            call rpn2_cons(meqn,maux,idir,iface,qvec,
      &               auxvec_center, auxvec_edge,flux)         
             do m = 1,meqn
                flux2(i,m,k) = flux2(i,m,k) + dt*el2(i)*flux(m)
@@ -114,6 +117,7 @@ c              # Edge between ghost cell and interior cell
          enddo
 
 c        # Top side 0 = in; 1 = out
+         iface = 1
          do k = 0,1
             do m = 1,maux
 c              # Cell centered values                
@@ -125,7 +129,7 @@ c              # Edge between ghost cell and interior cell
             do m = 1,meqn
                qvec(m) = q(i,my+k,m)
             enddo
-            call rpn2_cons(meqn,maux,idir,qvec,
+            call rpn2_cons(meqn,maux,idir,iface,qvec,
      &              auxvec_center,auxvec_edge, flux)         
             do m = 1,meqn
                flux3(i,m,k) = flux3(i,m,k) + dt*el3(i)*flux(m)
