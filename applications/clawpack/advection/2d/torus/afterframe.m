@@ -3,7 +3,7 @@ setviews;
 global map_isflat;
 
 isflat = map_isflat;
-issquare = false;
+issquare = true;
 
 plot_contour = true;
 plot_qtrue = false;

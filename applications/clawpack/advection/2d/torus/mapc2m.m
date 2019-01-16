@@ -3,7 +3,7 @@ global map_isflat;
 
 
 map = 'torus';
-% map = 'twisted_torus';
+map = 'twisted_torus';
 % map = 'flat';
 % map = 'cart';
 
