@@ -23,6 +23,7 @@ c     # Assume a single field variable only
 
             call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
+
             if (t .eq. 0) then
                error(i,j,1) = 0
             else

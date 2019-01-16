@@ -1,10 +1,10 @@
-      subroutine  rpn2_cons_update_manifold(meqn,maux, idir, q,
+      subroutine  rpn2_cons_update_manifold(meqn,maux, idir, iface, q,
      &                                     auxvec_center,
      &                                     auxvec_edge,flux)
 
       implicit none
 
-      integer meqn,maux,idir, m
+      integer meqn,maux,idir, m, iface
       double precision q(meqn), flux(meqn)
       double precision auxvec_center(maux), auxvec_edge(maux)
       double precision u,v,w,urot, nv(3)
@@ -28,7 +28,11 @@ c      enddo
 c     # Get flux in direction normal to idir-face
 c      urot = u*nv(1) + v*nv(2) + w*nv(3)
 
-      urot = auxvec_edge(2+2*idir)  !! Left edge or bottom edge
+      if (iface .eq. 0) then
+          urot = auxvec_center(2+2*idir)  !! Left edge or bottom edge
+      else
+          urot = auxvec_center(3+2*idir)
+      endif
 
 c     #  f(q) = (n dot u)*q
       do m = 1,meqn

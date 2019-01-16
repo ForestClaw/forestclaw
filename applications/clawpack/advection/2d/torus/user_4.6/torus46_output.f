@@ -42,6 +42,7 @@
       integer patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy,time
       double precision xc,yc,qc,qexact
+      double precision xc1, yc1, zc1
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -49,6 +50,9 @@
       integer matunit1
       integer i,j,mq
 
+      integer*8 cont, get_context
+
+      cont = get_context()
 
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
@@ -74,8 +78,9 @@
             enddo
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
+            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
             if (time .gt. 0) then
-                qc = qexact(blockno,xc, yc,time)
+                qc = qexact(xc1, yc1,time)
             else
                 qc = q(i,j,1)
             endif

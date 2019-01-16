@@ -45,6 +45,7 @@ c     # ------------------------------------------------------------
       double precision tau1(3), tau2(3)
       double precision tau1inv(3), tau2inv(3)
       double precision nvec(3), gradpsi(3), sv
+      logical use_stream
 
       double precision psi_xi, psi_eta
       double precision u1, u2, u11, u22      
@@ -57,8 +58,10 @@ c     # ------------------------------------------------------------
 
       integer k
     
-      if (example .eq. 0) then
-c         # Divergence free velocity field : u = n cross \Psi
+      use_stream = .true.
+
+      if (example .eq. 0 .and. use_stream) then
+c         # Divergence free velocity field : u = n cross \Psi  
           call torus_psi_derivs(xc1,yc1,psi_xi,psi_eta)
 
           call torus_contravariant_basis(xc1,yc1, tau1inv,tau2inv)
@@ -70,6 +73,8 @@ c         # Divergence free velocity field : u = n cross \Psi
 
 c         # Get surface normal
           call torus_covariant_basis(xc1,yc1,tau1,tau2)
+
+c         Outward directed normal          
           call torus_cross(tau2,tau1,nvec,sv)
 
 c         # Normalize surface normal
@@ -79,9 +84,9 @@ c         # Normalize surface normal
 
 c         # v = nvec x grad \Psi
           call torus_cross(nvec,gradpsi,vel,sv)
-
-      elseif (example .eq. 1) then
-c         # Vector field defined as u1*tau1 + u2*tau2        
+      else
+c         # Vector field defined as u1*tau1 + u2*tau2    
+c         # So far, ony works for mapping = 0    
 
           call torus_covariant_basis(xc1, yc1, tau1,tau2)
           call torus_velocity_components(xc1,yc1,u1,u2,u11,u22)
@@ -90,7 +95,7 @@ c         # Vector field defined as u1*tau1 + u2*tau2
               vel(k) = u1*tau1(k) + u2*tau2(k)
           enddo
       endif
-
+        
       end
 
 
@@ -106,7 +111,7 @@ c     # Christoffel symbols           : g111, g112, g212, g222 (needed for
 c     #                                 computation of the divergence) 
 c     #
 c     # Mapping function depends on these global variables
-c     #         example (0=incompressible; 1=compressible)
+c     #
 c     #         mapping (0=torus; 1=twisted torus)
 c     # ----------------------------------------------------------------
 
@@ -338,10 +343,11 @@ c     # ----------------------------------------------------------------
 c     # Compute u dot grad q in computational coordinates
       call torus_cross(tau1,tau2,t1xt2,w);
 
-c     # Solve for contravariant components of velocity field          
+c     # Evolve contravariant components of velocity field          
       u1 = -psi_eta/w
       u2 = psi_xi/w
 
+c     # This is a clockwise velocity field ? 
       f(1) = u1
       f(2) = u2
 
@@ -356,13 +362,7 @@ c     # Solve for contravariant components of velocity field
 
       double precision xc1,yc1, q
       double precision u1,u2,u11,u22
-      double precision torus_dot
       double precision divu, torus_divergence
-
-      double precision pi, pi2
-      common /compi/ pi
-
-      pi2 = 2*pi
 
 c     # Track evolution of these three quantities
       xc1 = sigma(1)
