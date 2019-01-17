@@ -5,8 +5,8 @@
       double precision alpha_in, rps_in
       integer example_in, mapping_in, ic_in, ceqn_in
 
-      double precision pi
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
       double precision alpha
       common /torus_comm/ alpha
@@ -27,6 +27,7 @@
       common /eqn_comm/ color_equation
 
       pi = 4.d0*atan(1.d0)
+      pi2 = 2*pi
 
       example = example_in
       mapping = mapping_in

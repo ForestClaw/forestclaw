@@ -21,12 +21,13 @@
       include "metric_terms.i"
 
 c     # ----------------------------------------------------------------
-c     # 1        capacity
-c     # 2-3      Edge velocities
-c     # 4-6      Cell-centered velocities (x,y,z)
-c     # 7-8      Edge lengths (x-face, y-face)
-c     # 9-11     x-face normals
-c     # 12-14    y-face normals
+c     # Color equation (edge velocities)
+c     # 1      capacity
+c     # 2-3    Edge velocities
+c     #
+c     # Conservative form (cell-centered velocities)
+c     # 2-5    Cell-centered velocities projected onto four edge normals
+c     # 6-7    Edge lengths (x-face, y-face)
 c     # ----------------------------------------------------------------
 
       dxdy = dx*dy
@@ -50,18 +51,13 @@ c         # Center velocities : entries (2-5)
      &          aux, maux)
       endif
 
+c     # Needed to scale speeds in Riemann solver when using
+c     # cell-centered velocities
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
 c           # x-face and y-face edge lengths (6,7)      
             aux(i,j,6) = edgelengths(i,j,1)/dy
             aux(i,j,7) = edgelengths(i,j,2)/dx
-
-cc           # Normals (9,10,11) and (12,13,14)
-c            do k = 1,3
-c               aux(i,j,9  + k-1) = xnormals(i,j,k)
-c               aux(i,j,12 + k-1) = ynormals(i,j,k)
-c            enddo
-
          enddo
       enddo
 

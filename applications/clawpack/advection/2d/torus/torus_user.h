@@ -190,13 +190,15 @@ void RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const i
                                                  RPN2_CONS_UPDATE_MANIFOLD)
 
 void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir,
-                               double q[], double aux_center[], double aux_edge[],
+                               const int* iface, double q[], 
+                               double aux_center[], double aux_edge[],
                                double flux[]);
 
 #define RPN2_CONS_UPDATE_ZERO FCLAW_F77_FUNC(rpn2_cons_update_zero, \
                                              RPN2_CONS_UPDATE_ZERO)
 
 void RPN2_CONS_UPDATE_ZERO(const int* meqn, const int* maux, const int* idir,
+                           const int* iface,
                            double q[], double aux_center[], double aux_edge[],
                            double flux[]);
 
