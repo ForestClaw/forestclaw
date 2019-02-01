@@ -364,7 +364,6 @@ c      call torus_covariant_derivative(xc1,yc1,2,coderiv2)
       call torus_velocity_components(xc1,yc1,u1,u2,coderiv1,
      &                                     coderiv2)
       
-
       torus_divergence = coderiv1(1) + coderiv2(2)
 
       end

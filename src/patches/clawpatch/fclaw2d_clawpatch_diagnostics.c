@@ -39,6 +39,7 @@ typedef struct {
     double area;
     double *mass;
     double *mass0;  /* Mass at initial time */
+    double c_kahan;  
 } error_info_t;
 
 
@@ -59,6 +60,7 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
     error_data->mass   = FCLAW_ALLOC_ZERO(double,meqn);
     error_data->mass0  = FCLAW_ALLOC_ZERO(double,meqn);
     error_data->area = 0;
+    error_data->c_kahan = 0;      // For accurate summation
 
     *acc_patch = error_data;
 
@@ -85,6 +87,7 @@ void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
         error_data->mass[m]= 0;
     }
     error_data->area = 0;
+    error_data->c_kahan = 0;
 }
 
 
@@ -135,7 +138,8 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     if (gparms->conservation_check && clawpatch_vt->fort_conservation_check != NULL)
     {
         clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy,
-                                              area, q, error_data->mass);
+                                              area, q, error_data->mass,
+                                              &error_data->c_kahan);
     }
 }
 
