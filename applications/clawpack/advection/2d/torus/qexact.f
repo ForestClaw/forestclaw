@@ -81,7 +81,7 @@ c     # Do not map (xc1,yc1) to brick, since mapping was done above
 
       q0 = q0_physical(xp,yp,zp)
       
-      evolve_q = .false.
+      evolve_q = .true.
       if (evolve_q) then
 c         # We now need to evolve q along with (xc0,yc0)
           sigma(1) = xc0

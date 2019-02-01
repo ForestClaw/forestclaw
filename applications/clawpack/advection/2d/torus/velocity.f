@@ -48,7 +48,7 @@ c     # ------------------------------------------------------------
       logical use_stream
 
       double precision psi_xi, psi_eta
-      double precision u1, u2, u11, u22      
+      double precision u1, u2, coderiv1(2), coderiv2(2)     
 
       double precision pi
       common /compi/ pi
@@ -58,7 +58,7 @@ c     # ------------------------------------------------------------
 
       integer k
     
-      use_stream = .true.
+      use_stream = .false.
 
       if (example .eq. 0 .and. use_stream) then
 c         # Divergence free velocity field : u = n cross \Psi  
@@ -86,10 +86,10 @@ c         # v = nvec x grad \Psi
           call torus_cross(nvec,gradpsi,vel,sv)
       else
 c         # Vector field defined as u1*tau1 + u2*tau2    
-c         # So far, ony works for mapping = 0    
 
           call torus_covariant_basis(xc1, yc1, tau1,tau2)
-          call torus_velocity_components(xc1,yc1,u1,u2,u11,u22)
+          call torus_velocity_components(xc1,yc1,u1,u2, coderiv1,
+     &                                   coderiv2)
 
           do k = 1,3
               vel(k) = u1*tau1(k) + u2*tau2(k)
@@ -170,7 +170,7 @@ c         # T_eta
       end
 
 
-      subroutine torus_contravariant_basis(xc1,yc1,tau1inv, tau2inv)
+      subroutine torus_contravariant_basis(xc1,yc1, tau1inv, tau2inv)
       implicit none
 
       double precision xc1,yc1
@@ -206,6 +206,56 @@ c     # Contravariant vectors
 
       end
 
+cc     # Derivative in direction x^i = (xi, eta) 
+      subroutine torus_covariant_derivative(xc1,yc1,j,u1,u2,
+     &                                  u1j,u2j,coderiv)
+      implicit none
+ 
+      double precision xc1, yc1, u1,u2, u1j, u2j, coderiv(2)
+      integer j
+
+      double precision g111,g112,g211,g212
+      double precision g121,g122,g221,g222
+      double precision torus_christoffel_sym
+
+      double precision u11, u12, u21, u22
+
+c      call torus_velocity_components(xc1,yc1,u1,u2,u11,u22,u12,u21)
+
+c     # Christoffel symbol gijk
+c     # i - component  (u1 or u2)
+c     # j - derivative (xi or eta)
+c     # k - dummy variable
+      if (j .eq. 1) then
+          u11 = u1j
+          u21 = u2j
+          g111 = torus_christoffel_sym(xc1,yc1,1,1,1)
+          g112 = torus_christoffel_sym(xc1,yc1,1,1,2)
+          coderiv(1) = u11 + (u1*g111 + u2*g112)
+
+          g211 = torus_christoffel_sym(xc1,yc1,2,1,1)
+          g212 = torus_christoffel_sym(xc1,yc1,2,1,2)
+          coderiv(2) = u21 + (u1*g211 + u2*g212)
+
+c          write(6,100) coderiv(1), coderiv(2)
+      else
+          u12 = u1j
+          u22 = u2j
+          g121 = torus_christoffel_sym(xc1,yc1,1,2,1)
+          g122 = torus_christoffel_sym(xc1,yc1,1,2,2)
+          coderiv(1) = u12 + (u1*g121 + u2*g122)
+
+          g221 = torus_christoffel_sym(xc1,yc1,2,2,1)
+          g222 = torus_christoffel_sym(xc1,yc1,2,2,2)
+          coderiv(2) = u22 + (u1*g221 + u2*g222)
+
+c          write(6,100) coderiv(1), coderiv(2)
+c          write(6,100) g121, g221
+      endif
+
+100   format(3F24.16)
+      end
+
 
       double precision function torus_christoffel_sym(xc1,yc1,i,j,k) 
       implicit none
@@ -215,7 +265,7 @@ c     # Contravariant vectors
       double precision gijk
 
       double precision T1(3), T2(3)
-      double precision T11(3), T22(3), T12(3)
+      double precision T11(3), T22(3), T12(3), T21(3)
       double precision gi(3), gjk(3)
 
       double precision R, R2, R22
@@ -255,8 +305,12 @@ c         T2(3) = pi2*alpha*cos(pi2*yc1)
           T11(3) = 0
 
           T12(1) = -pi2*R2*sin(pi2*xc1)
-          T12(2) = pi2*R2*cos(pi2*xc1)
+          T12(2) =  pi2*R2*cos(pi2*xc1)
           T12(3) = 0
+
+          T21(1) = -pi2*R2*sin(pi2*xc1)
+          T21(2) =  pi2*R2*cos(pi2*xc1)
+          T21(3) = 0
 
           T22(1) = R22*cos(pi2*xc1)
           T22(2) = R22*sin(pi2*xc1)
@@ -275,7 +329,11 @@ c         # To do ....
           endif
 
           if (j .ne. k) then
-              gjk(kk) = T12(kk)
+              if (j .eq. 1) then
+                  gjk(kk) = T12(kk)
+              else
+                  gjk(kk) = T21(kk)
+              endif
           else
               if (j .eq. 1) then
 c                 # j == k == 1                  
@@ -298,20 +356,16 @@ c                 # j == k == 2
 
       double precision xc1,yc1
 
-      double precision u1, u2, u11, u22
-      double precision g111, g112, g212, g222
-      double precision divu, torus_christoffel_sym
+      double precision divu, u1, u2, coderiv1(2), coderiv2(2)
 
-      call torus_velocity_components(xc1,yc1,u1,u2,u11,u22)
+c      call torus_covariant_derivative(xc1,yc1,1,coderiv1)
+c      call torus_covariant_derivative(xc1,yc1,2,coderiv2)
 
-      g111 = torus_christoffel_sym(xc1,yc1,1,1,1)
-      g222 = torus_christoffel_sym(xc1,yc1,2,2,2)
-      g112 = torus_christoffel_sym(xc1,yc1,1,1,2)
-      g212 = torus_christoffel_sym(xc1,yc1,2,2,1)
+      call torus_velocity_components(xc1,yc1,u1,u2,coderiv1,
+     &                                     coderiv2)
+      
 
-      divu = u11 + u22 + u1*(g111 + g212) + u2*(g112 + g222)
-
-      torus_divergence = divu
+      torus_divergence = coderiv1(1) + coderiv2(2)
 
       end
 
@@ -363,15 +417,20 @@ c     # This is a clockwise velocity field ?
       double precision xc1,yc1, q
       double precision u1,u2,u11,u22
       double precision divu, torus_divergence
+      double precision coderiv1(2), coderiv2(2)
 
 c     # Track evolution of these three quantities
       xc1 = sigma(1)
       yc1 = sigma(2)
       q = sigma(3)
 
-      call torus_velocity_components(xc1,yc1,u1,u2,u11,u22)
+      call torus_velocity_components(xc1,yc1,u1,u2,coderiv1,coderiv2)
 
-      divu = torus_divergence(xc1,yc1)
+      divu = coderiv1(1) + coderiv2(2)
+      if (abs(divu) .gt. 1e-10) then
+c          write(6,100) coderiv1(1), coderiv2(2), divu
+      endif
+100   format(3F24.16)
 
       f(1) = u1
       f(2) = u2

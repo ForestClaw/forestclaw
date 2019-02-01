@@ -21,44 +21,12 @@
 
       idir = ixy-1     !! 0 for the x-face; 1 for the y-face
       do i = 2-mbc, mx+mbc
-
-c        # Get cell-centered velocities         
-c         uvecr(1) = auxl(i,4)
-c         uvecr(2) = auxl(i,5)
-c         uvecr(3) = auxl(i,6)
-
-c         uvecl(1) = auxr(i-1,4)
-c         uvecl(2) = auxr(i-1,5)
-c         uvecl(3) = auxr(i-1,6)
-
-c        # x-edge lengths (7)
-c        # y-edge lengths (8)
-c         g = auxl(i,7+idir)
-
-c        # Get scaled edge normals
-c        #    --- x-face : (9,10,11)     
-c        #    --- y-face : (12,13,14)     
-
-c         do k = 1,3
-c            if (idir .eq. 0) then
-c               nv(k) = g*auxl(i,9+k-1)
-c            else
-c               nv(k) = g*auxl(i,12+k-1)
-c            endif
-c         enddo
-
-c         urrot = 0
-c         ulrot = 0
-c         do k = 1,3
-c            urrot = urrot + nv(k)*uvecr(k)
-c            ulrot = ulrot + nv(k)*uvecl(k)
-c         enddo
-
          g = auxl(i,6+idir)  !! Edge length
 
+c        # left-right : 2,3
+c        # top-bottom : 4,5         
          urrot = g*auxl(i,  2 + 2*idir)   !! Left edge of right cell
          ulrot = g*auxl(i-1,3 + 2*idir)   !! Right edge of left cell
-
 
          qrr = ql(i,1)
          qll = qr(i-1,1)
