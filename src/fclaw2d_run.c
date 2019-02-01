@@ -274,7 +274,10 @@ void outstyle_1(fclaw2d_global_t *glob)
             }
             glob->curr_time = t_curr;
 
-            fclaw2d_diagnostics_gather(glob, init_flag);
+            if (fclaw_opt->advance_one_step)
+            {
+                fclaw2d_diagnostics_gather(glob, init_flag);                
+            }
 
             if (fclaw_opt->regrid_interval > 0)
             {
@@ -287,6 +290,7 @@ void outstyle_1(fclaw2d_global_t *glob)
         }
 
         /* Output file at every outer loop iteration */
+        fclaw2d_diagnostics_gather(glob, init_flag);
         glob->curr_time = t_curr;
         iframe++;
         fclaw2d_output_frame(glob,iframe);
@@ -428,9 +432,13 @@ void outstyle_3(fclaw2d_global_t *glob)
             }
         }
 
-        if (n % nstep_inner == 0)
+        if (fclaw_opt->advance_one_step)
         {
             fclaw2d_diagnostics_gather(glob,init_flag);
+        }
+
+        if (n % nstep_inner == 0)
+        {
             iframe++;
             fclaw2d_output_frame(glob,iframe);
         }
