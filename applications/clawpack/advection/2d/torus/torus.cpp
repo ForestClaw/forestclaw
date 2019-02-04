@@ -74,6 +74,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                           fclaw_opt->shift,
                                           rotate,
                                           user_opt->alpha,
+                                          user_opt->beta,
                                           user_opt->mapping);
             break;
         case 2:

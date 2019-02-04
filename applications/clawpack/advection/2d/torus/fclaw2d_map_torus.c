@@ -66,9 +66,15 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
                        double *xp, double *yp, double *zp)
 {
     double xc1,yc1,zc1;
+    double alpha, beta;
+    double L[4];
+    double a,b, r, R, pi, pi2;
+    int i;
 
-    /* Scale's brick mapping to [0,1]x[0,1] */
-    /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
+    pi = M_PI;
+    pi2 = 2*pi;
+
+    /* Scale brick mapping to [0,1]x[0,1] */
     if (blockno >= 0)
     {
         /* Data is not already in brick domain */
@@ -83,7 +89,26 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
 
     /* blockno is ignored in the current torus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
-    double alpha = cont->user_double[0];
+    alpha = cont->user_double[0];
+    beta = cont->user_double[1];
+
+    for(i=0; i < 4; i++)
+    {
+        L[i] = cont->user_double[2+i];
+    }
+
+    /* Map to non-orthogonal coordinates */
+    a = L[0]*xc1 + L[1]*yc1;
+    b = L[2]*xc1 + L[3]*yc1;
+
+    r = alpha*(1 + beta*sin(pi2*a));
+    R = 1 + r*cos(pi2*b);
+    
+    *xp = R*cos(pi2*a);
+    *yp = R*sin(pi2*a);
+    *zp = r*sin(pi2*b);
+
+/*    
     int example = cont->user_int[0];
     if (example == 0)
     {
@@ -93,8 +118,8 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
     {
         MAPC2M_TWISTED_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha);
     }
-
     rotate_map(cont,xp,yp,zp);
+*/    
 }
 
 fclaw2d_map_context_t *
@@ -103,8 +128,14 @@ fclaw2d_map_context_t *
                            const double shift[],
                            const double rotate[],
                            const double alpha,
-                           const int example)
+                           const double beta,
+                           const int mapping)
 {
+    int i;
+    double l0[4] = {1.,  0.,  0.,  1.};
+    double l1[4] = {1.,  0.,  1.,  1.};
+    double l2[4] = {1.,  1.,  1.,  0.};
+
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
@@ -112,8 +143,28 @@ fclaw2d_map_context_t *
     cont->mapc2m = fclaw2d_map_c2m_torus;
 
     cont->user_double[0] = alpha;
-    cont->user_int[0] = example;
+    cont->user_double[1] = beta;
 
+    for(i = 0; i < 4; i++)
+    {
+        if (mapping == 0)
+        {
+            /* Regular torus mapping.  L given rowwise*/
+            cont->user_double[2+i] = l0[i];
+        }
+        else if (mapping == 1)
+        {
+            cont->user_double[2+i] = l1[i];
+        }
+        else if (mapping == 2)
+        {
+            cont->user_double[2+i] = l2[i];
+        }
+    }
+
+    cont->user_int[0] = mapping;  /* Might not be used */
+
+    /* Are we really using these? */
     set_scale(cont,scale);
     set_shift(cont,shift);
     set_rotate(cont,rotate);

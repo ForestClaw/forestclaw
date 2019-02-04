@@ -1,15 +1,15 @@
       subroutine torus_setprob(example_in,mapping_in, ic_in, 
-     &     alpha_in,rps_in, ceqn_in)
+     &     alpha_in,beta_in, rps_in, ceqn_in)
       implicit none
 
-      double precision alpha_in, rps_in
+      double precision alpha_in, beta_in, rps_in
       integer example_in, mapping_in, ic_in, ceqn_in
 
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision alpha
-      common /torus_comm/ alpha
+      double precision alpha, beta
+      common /torus_comm/ alpha, beta
 
       double precision revs_per_s
       common /stream_comm/ revs_per_s
@@ -34,6 +34,7 @@
       initchoice = ic_in
 
       alpha = alpha_in
+      beta = beta_in
       
       revs_per_s = rps_in
 

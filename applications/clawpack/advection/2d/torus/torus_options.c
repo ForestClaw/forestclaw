@@ -47,6 +47,9 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
                            "[user] Ratio r/R, r=outer radius, R=inner radius " \
                            "(used for torus) [0.4]");
 
+    sc_options_add_double (opt, 0, "beta", &user_opt->beta, 0.0,
+                           "[user] beta > 0 gives variable cross section [0]");
+
     sc_options_add_double (opt, 0, "revs-per-s", &user_opt->revs_per_s, 0.5,
                            "[user] Revolutions per second [0.5]");
 

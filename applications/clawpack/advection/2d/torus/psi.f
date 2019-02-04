@@ -5,265 +5,313 @@ c     # Stream function depends on these global variables
 c     #         example (0=incompressible; 1=compressible)
 c     #         mapping (0=torus; 1=twisted torus)
 c     # ------------------------------------------------------------
-      double precision function torus_psi(xc1,yc1)
+      double precision function torus_psi(x,y)
       implicit none
 
-      double precision xc1, yc1
+      double precision x, y
 
       double precision pi, pi2
       common /compi/ pi
 
-      double precision alpha
-      common /torus_comm/ alpha
+      double precision alpha, beta
+      common /torus_comm/ alpha, beta
 
       double precision revs_per_s
       common /stream_comm/ revs_per_s
-
-      integer mapping
-      common /mapping_comm/ mapping
-
-      integer example
-      common /example_comm/ example  
 
       double precision psi
 
       pi2 = 2*pi      
 
-c     # Velocity is described in terms of a stream function.  This 
-c     # approach depends on the mapping. 
-
-      if (example .eq. 0) then
-
-c         # Rigid body rotation
-          if (mapping .eq. 0 .or. mapping .eq. 2) then
-              psi = (pi2*revs_per_s)*
-     &                alpha*(pi2*yc1 + alpha*sin(pi2*yc1))
-          elseif (mapping .eq. 1) then
-              psi = (pi2*revs_per_s)*alpha*
-     &                  (pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
-          endif
-      else
-
-          write(6,'(A,A)') '(psi.f) Non-rigid body rotation not ',
-     &               'defined in terms of a streamfunction'
+      if (beta .ne. 0) then
+          write(6,'(A,A)') 'psi (psi.f) : Streamfunction only works ',
+     &         'for beta == 0'
           stop
       endif
+
+      psi = (pi2*revs_per_s)* alpha*(pi2*y + alpha*sin(pi2*y))
+
       torus_psi = psi
 
       end
 
-      subroutine torus_psi_derivs(xc1,yc1,psi_xi, psi_eta)
+      subroutine torus_velocity_components(x,y,u)
       implicit none
 
-      double precision xc1, yc1
-      double precision psi_xi, psi_eta
+      double precision x, y, u(2)
 
       double precision pi, pi2
-      common /compi/ pi
-
-      double precision alpha
-      common /torus_comm/ alpha
-
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
-
-      integer mapping
-      common /mapping_comm/ mapping
+      common /compi/ pi, pi2
 
       integer example
       common /example_comm/ example  
 
-
-      pi2 = 2*pi
+      double precision s
 
       if (example .eq. 0) then
-          if (mapping .eq. 0) then
-c             # psi = (pi2*revs_per_s)*alpha*(pi2*yc1 + alpha*sin(pi2*yc1))
-              psi_xi = 0
-              psi_eta = (pi2)**2*revs_per_s*alpha*(1 + 
-     &                    alpha*cos(pi2*yc1))
-          elseif (mapping .eq. 1) then 
-c             # psi = (pi2*revs_per_s)*alpha*(pi2*(xc1+yc1) + alpha*sin(pi2*(xc1+yc1)))
-              psi_xi = (pi2)**2*revs_per_s*alpha*(1 + 
-     &           alpha*cos(pi2*(xc1+yc1)))
-              psi_eta = (pi2)**2*revs_per_s*alpha*(1 + 
-     &           alpha*cos(pi2*(xc1+yc1)))
-    
-          endif 
-      else
-         write(6,'(A,A)') '(psi.f) : Velocity not defined in terms', 
-     &                    'of a stream function'
-         stop
+          u(1) = 1
+          u(2) = 0
+      elseif (example .eq. 1) then
+          s = sqrt(2.d0)
+          u(1) = s*cos(8*pi*x)
+          u(2) = s*sin(8*pi*y)   
+      endif
+
+
+      end
+
+      subroutine torus_velocity_derivs(x,y,u,uderivs)
+      implicit none
+
+      double precision x, y, u(2)
+      double precision uderivs(4)
+
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
+      integer example
+      common /example_comm/ example  
+
+      double precision s, pim
+
+      if (example .eq. 0) then
+          u(1) = 1
+          u(2) = 0
+          uderivs(1) = 0
+          uderivs(2) = 0
+          uderivs(3) = 0
+          uderivs(4) = 0
+      elseif (example .eq. 1) then
+          s = sqrt(2.d0)
+          pim = 8*pi
+          u(1) = s*cos(pim*x)
+          u(2) = s*sin(pim*y)   
+c         # uderivs = [u1x u1y; u2x u2y]          
+          uderivs(1) = -s*pim*sin(pim*x)
+          uderivs(2) = 0;
+          uderivs(3) = 0; 
+          uderivs(4) = s*pim*cos(pim*y)
+      endif
+
+
+      end
+
+
+      subroutine torus_psi_derivs(x,y,p,px,py)
+      implicit none
+
+      double precision x, y
+      double precision p, px, py
+
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
+      double precision alpha, beta
+      common /torus_comm/ alpha,beta
+
+      double precision revs_per_s
+      common /stream_comm/ revs_per_s
+
+      if (beta .ne. 0) then
+          write(6,'(A,A)') 'psi (psi.f) : Streamfunction only works ',
+     &         'for beta == 0'
+          stop
+      endif
+
+c     # Stream function for rigid body rotation.      
+      p = (pi2*revs_per_s)*alpha*(pi2*y + alpha*sin(pi2*y))
+      px = 0
+      py = (pi2)**2*revs_per_s*alpha*(1 + alpha*cos(pi2*y))
+
+      end
+
+      subroutine torus_covariant_basis_complete(x,y, t, tinv,
+     &                                          tderivs, flag) 
+      implicit none
+      
+      double precision x,y 
+      integer flag
+      double precision t(3,2), tinv(3,2), tderivs(3,2,2)
+
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
+      double precision alpha, beta
+      common /torus_comm/ alpha, beta
+
+      double precision r1, r1x, r1xx, r1y, r1yy, r1xy
+      double precision R,  Rx,  Rxx,  Ry,  Ryy,  Rxy
+      double precision f(3), fx(3), fy(3), fxx(3), fyy(3), fxy(3)
+      double precision g(3), gx(3), gy(3), gxx(3), gyy(3), gxy(3)
+      double precision t1(3), t2(3), a11, a12, a22, a21
+      double precision det, a11inv, a22inv, a12inv, a21inv
+      double precision pi4
+      integer b(3), torus_dot
+
+      integer k, kk
+      logical compute_covariant, compute_contravariant
+      logical compute_derivatives
+
+      if (flag > 7) then
+          write(6,*) 'psi.f : flag > 7'
+          stop
+      endif
+
+c     # flag = 0      NA
+c     # flag = 1      Covariant basis only
+c     # flag = 2      NA
+c     # flag = 3      Covariant + contravariant basis
+c     # flag = 4      Derivatives only
+c     # flag = 5      Derivatives + covariant basis
+c     # flag = 6      NA
+c     # flag = 7      Covariant + contravariant + derivatives
+
+
+      k = 1
+      do while (flag > 0)
+          b(k) = mod(flag,2)
+          x = flag/2
+          k = k + 1
+      enddo
+
+      compute_covariant     = (b(1) .eq. 1) .or. (b(2) .eq. 1) 
+      compute_contravariant = b(2) .eq. 1
+      compute_derivatives   = b(3) .eq. 1
+
+      pi4 = pi2*pi2
+
+      r1    = alpha*(1 + beta*sin(pi2*x))
+      r1x   = pi2*alpha*beta*cos(pi2*x)
+      r1xx  = -pi4*alpha*beta*sin(pi2*x)
+
+      R     = 1 + r1*cos(pi2*y)
+      Rx    = r1x*sin(pi2*y)
+      Rxx   = r1xx*sin(pi2*y)
+      Ry    = -pi2*r1*sin(pi2*y)
+      Ryy   = -pi4*r1*cos(pi2*y)
+      Rxy   = pi2*r1x*cos(pi2*y)
+
+      f(1)  = cos(pi2*x);
+      fx(1) = -pi2*sin(pi2*x)
+      fy(1) = 0;
+
+      f(2)  = sin(pi2*x);
+      fx(2) = pi2*cos(pi2*x)
+      fy(2) = 0;
+
+      f(3)  = sin(pi2*y);
+      fx(3) = 0;
+      fy(3) = pi2*cos(pi2*y);
+
+      g(1)  = R
+      g(2)  = R
+      g(3)  = r1
+
+      gx(1) = Rx
+      gx(2) = Rx
+      gx(3) = r1x
+
+      gy(1) = Ry
+      gy(2) = Ry
+      gy(3) = r1y
+
+      if (compute_covariant) then
+          do k = 1,3
+              t(k,1) = gx(k)*f(k) + g(k)*fx(k);
+              t(k,2) = gy(k)*f(k) + g(k)*fy(k);
+          enddo
+      endif
+
+      if (compute_contravariant) then
+          do k = 1,3
+              t1(k) = t(k,1)
+              t2(k) = t(k,2)
+          enddo
+
+c         # Compute grad psi(xi,eta) 
+          a11 = torus_dot(t1,t1)
+          a22 = torus_dot(t2,t2)
+          a12 = torus_dot(t1,t2)
+          a21 = a12
+
+c         # Determinant
+          det = a11*a22 - a12*a21
+
+c         # Contravariant vectors
+          a11inv = a22/det
+          a22inv = a11/det
+          a12inv = -a12/det
+          a21inv = -a21/det     
+          do k = 1,3
+              tinv(k,1) = a11inv*t(k,1) + a12inv*t(k,1)
+              tinv(k,2) = a21inv*t(k,1) + a22inv*t(k,2)
+          end do
+      endif
+
+      if (compute_derivatives) then
+          fxx(1) = -pi4*cos(pi2*x)
+          fyy(1) = 0;
+          fxy(1) = 0;
+
+          fxx(2) = -pi4*sin(pi2*x)
+          fyy(2) = 0;
+          fxy(2) = 0;
+
+          fxx(3) = 0;
+          fxy(3) = 0;
+          fyy(3) = -pi4*sin(pi2*y)
+
+          gxx(1) = Rxx
+          gxx(2) = Rxx
+          gxx(3) = r1xx
+
+          gyy(1) = Ryy
+          gyy(2) = Ryy
+          gyy(3) = r1yy
+
+          gxy(1) = Rxy
+          gxy(2) = Rxy
+          gxy(3) = r1xy
+
+          do k = 1,3
+c             # d(t1)/dx = d(g*fx + gx*f)/dx
+              tderivs(k,1,1) = g(k)*fxx(k) + 2*fx(k)*gx(k) + gxx(k)*f(k)
+
+c             # d(t1)/dy = d(g*fx + gx*f)/dy       
+              tderivs(k,1,2) = g(k)*fxy(k) + gy(k)*fx(k) + 
+     &                    gx(k)*fy(k) + gxy(k)*f(k)
+
+c             # d(t2)/dx = d(g*fy + gy*f)/dx       
+              tderivs(k,2,1) = g(k)*fxy(k) + gx(k)*fy(k) + 
+     &                    gy(k)*fx(k) + gxy(k)*f(k)
+
+c             # d(t2)/dy = d(g*fy + gy*f)/dy         
+              tderivs(k,2,2) = g(k)*fyy(k) + 2*fy(k)*gy(k) + gyy(k)*f(k)
+          enddo
       endif
 
       end
 
-      subroutine torus_basic_map(xc1,yc1,u1,u2,coderiv1,
-     &                           coderiv2,tau1,tau2)
-
-      implicit none
-      double precision xc1, yc1, u1, u2, tau1(3), tau2(3)
-      double precision coderiv1(2), coderiv2(2)
-      double precision u11, u22, u12, u21
-      double precision torus_dot
-
-      double precision pi
-      common /compi/ pi
-
-      integer example
-      common /example_comm/ example  
-
-      integer mapping, map_save
-      common /mapping_comm/ mapping
-
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
-
-      double precision alpha
-      common /torus_comm/ alpha
-
-      double precision s
-      integer k
-
-      map_save = mapping
-      mapping = 0
-      if (example .eq. 0) then
-c         # Rigid body rotation 
-c         # Counter clockwise?             
-          u1 = revs_per_s
-          u2 = 0
-
-c             # Compute covariant derivatives
-          u11 = 0
-          u21 = 0
-          call torus_covariant_derivative(xc1,yc1,1,u1,u2,
-     &                                    u11,u21,coderiv1)
-
-          u12 = 0
-          u22 = 0
-          call torus_covariant_derivative(xc1,yc1,2,u1,u2,
-     &                                    u12,u22,coderiv2)
-
-          call torus_covariant_basis(xc1,yc1,tau1,tau2)
-          
-      elseif (example .eq. 1) then
-      endif
-
-      mapping = map_save     
-      end
-
-      subroutine torus_velocity_components(xc1,yc1,u1,u2,coderiv1,
-     &                                     coderiv2)
+      subroutine torus_transform_coordinates(a,b,x,y,mapping)
       implicit none
 
-      double precision xc1, yc1, u1, u2
-      double precision coderiv1(2), coderiv2(2)
-      double precision coderiv01(2), coderiv02(2)
-      double precision t1(3), t2(3), s1(3), s2(3)
-      double precision m11, m12, m21, m22, v1, v2, det
-      double precision minv11, minv22, minv12, minv21
-      double precision u11, u22, u12, u21
-      double precision torus_dot
-
-      double precision xp,yp,zp,xc2, yc2
-      integer blockno_dummy
-
-      integer*8 cont, get_context
-
-      double precision pi
-      common /compi/ pi
-
-      integer example
-      common /example_comm/ example  
-
+      double precision x,y, a,b
       integer mapping
-      common /mapping_comm/ mapping
+      double precision l0(4), l1(4), l2(4)
 
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
+      data l0 /1., 0., 0., 1./
+      data l1 /1., 0., 1., 1./
+      data l2 /1., 1., 1., 0./
 
-      double precision alpha
-      common /torus_comm/ alpha
-
-      double precision s
-      integer k
-
-      cont = get_context()
-
-      if (example .eq. 0) then
-c         # Rigid body rotation 
-          if (mapping .eq. 0) then
-c             # Counter clockwise? 
-              call  torus_basic_map(xc1,yc1,u1,u2,coderiv1,
-     &                              coderiv2,t1,t2)
-          elseif (mapping .eq. 1) then
-c             # Twisted torus
-
-c             # First, invert map to get (xc,yc) for this point in 
-c             # the regular torus map.              
-c             # Do not map (xc1,yc1) to brick, since mapping was done above
-              blockno_dummy = -1  
-              call fclaw2d_map_c2m(cont,blockno_dummy,xc1,yc1,xp,yp,zp)
-              call mapc2m_torus_invert(xp,yp,zp,xc2,yc2,alpha)
-
-              call  torus_basic_map(xc2,yc2,v1,v2,coderiv01,
-     &                              coderiv02,t1,t2)
-
-              call torus_contravariant_basis(xc1,yc1,s1,s2)   
-
-c             # Tensor to handle change of basis
-              m11 = torus_dot(t1,s1)
-              m12 = torus_dot(t2,s1)
-              m21 = torus_dot(t1,s2)
-              m22 = torus_dot(t2,s2)
-
-              u1 = m11*v1 + m12*v2
-              u2 = m21*v1 + m22*v2
-
-c             # Compute covariant derivatives.  Use mapping=0 basis
-c             # and transform
-              coderiv1(1) = m11*coderiv01(1) + m12*coderiv01(2)
-              coderiv1(2) = m21*coderiv01(1) + m22*coderiv01(2)
-
-
-              coderiv2(1) = m11*coderiv02(1) + m12*coderiv02(2)
-              coderiv2(2) = m21*coderiv02(1) + m22*coderiv02(2)
-
-c              write(6,100) coderiv01(1), coderiv01(2), 
-c     &                 coderiv02(1), coderiv02(2)
-c              write(6,100) coderiv1(1), coderiv1(2), 
-c     &                 coderiv2(1), coderiv2(2)
-c              write(6,*) ' '
-100           format(4F24.16)              
-
-          endif
-
-      elseif (example .eq. 1) then
-c         # Some other velocity field (div u not necessarily zero)
-          if (mapping .eq. 0) then
-c             # Velocity field with divergence        
-              s = sqrt(2.d0)
-              u1 = s*cos(8*pi*xc1)
-              u2 = s*sin(8*pi*yc1)   
-
-
-c             # Compute covariant derivatives
-              u11 = -8*pi*s*sin(8*pi*xc1)
-              u21 = 0
-              call torus_covariant_derivative(xc1,yc1,1,u1,u2,
-     &                                        u11,u21,coderiv1)
-
-              u12 = 0
-              u22 = 8*pi*s*cos(8*pi*xc1) 
-              call torus_covariant_derivative(xc1,yc1,2,u1,u2,
-     &                                        u12,u22,coderiv2)
-
-              call torus_covariant_basis(xc1,yc1,tau1,tau2)
-    
-                       
-          elseif (mapping .eq. 1) then
-c             #  velocity components defined in terms of twisted torus           
-          endif   
+      if (mapping .eq. 0) then
+          x = a
+          y = b
+      elseif (mapping .eq. 1)  then
+          x = l1(1)*a + l1(2)*b
+          y = l1(3)*a + l1(4)*b
+      elseif (mapping .eq. 2) then
+          x = l2(1)*a + l2(2)*b
+          y = l2(3)*a + l2(4)*b
       endif
 
       end

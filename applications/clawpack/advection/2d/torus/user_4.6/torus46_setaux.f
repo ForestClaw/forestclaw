@@ -1,7 +1,7 @@
       subroutine torus46_setaux(mbc,mx,my,
      &      xlower,ylower,dx,dy,maux,aux,blockno,
-     &      area, edgelengths,
-     &      xnormals,ynormals,surfnormals)
+     &      area, edgelengths,xnormals,ynormals,
+     &      surfnormals)
       implicit none
 
       integer mbc, mx,my, meqn, maux
@@ -72,11 +72,15 @@ c           # x-face and y-face edge lengths (6,7)
       integer mx,my,mbc,maux,blockno
       double precision dx,dy, xlower,ylower
 
-      double precision xc,yc
+      double precision xc, yc
       double precision xc1, yc1, zc1, xc2, yc2, zc2
+      double precision x,y, x1,y1,x2,y2
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
       integer*8 cont, get_context
+
+      integer mapping
+      common /mapping_comm/ mapping
 
       integer i,j
       double precision vn
@@ -99,7 +103,11 @@ c           # x-face - lower vertex
 c           # Map the brick to a unit square      
             call fclaw2d_map_brick2c(cont, blockno,xc,yc,xc2,yc2,zc2)
 
-            call torus_edge_velocity(xc1,yc1,xc2,yc2,dy,vn)
+c           # [x;y] = a*e1 + b*e1 = L*[a;b]            
+            call torus_transform_coordinates(xc1,yc1,x1,y1,mapping)
+            call torus_transform_coordinates(xc2,yc2,x2,y2,mapping)
+
+            call torus_edge_velocity(x1,y1,x2,y2,dy,vn)
             aux(i,j,2) = vn
          enddo
       enddo
@@ -119,7 +127,10 @@ c           # y-face - left vertex
             yc = ylower + (j-1)*dy
             call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc2,yc2,zc2)
 
-            call torus_edge_velocity(xc1,yc1,xc2,yc2,dx,vn)
+            call torus_transform_coordinates(xc1,yc1,x1,y1,mapping)
+            call torus_transform_coordinates(xc2,yc2,x2,y2,mapping)
+
+            call torus_edge_velocity(x1,y1,x2,y2,dx,vn)
             aux(i,j,3) = -vn
          enddo
       enddo
@@ -141,7 +152,10 @@ c           # y-face - left vertex
 
       double precision nl(3), nr(3), nb(3), nt(3)
       double precision urrot, ulrot, ubrot, utrot
+      double precision x,y
 
+      integer mapping
+      common /mapping_comm/ mapping
 
       integer*8 cont, get_context
 
@@ -161,7 +175,8 @@ c           # This is not the torus mapping, but rather maps the brick to
 c           # a unit square      
             call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
-            call torus_center_velocity(xc1,yc1,vel)
+            call torus_transform_coordinates(xc1,yc1,x,y,mapping)
+            call torus_center_velocity(x,y,vel)
 
 c           # subtract out normal components
             do k = 1,3

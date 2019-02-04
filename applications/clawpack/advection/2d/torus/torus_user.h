@@ -51,6 +51,7 @@ typedef struct user_options
     int color_equation;
 
     double alpha;     /* Ratio of inner radius to outer radius */
+    double beta;
     double revs_per_s;
 
 
@@ -63,7 +64,8 @@ user_options_t;
 #define TORUS_SETPROB FCLAW_F77_FUNC(torus_setprob,TORUS_SETPROB)
 void TORUS_SETPROB(const int* example, const int* mapping, 
                    const int* initial_condition,
-                   const double* alpha, const double* revs_per_s,
+                   const double* alpha, const double *beta, 
+                   const double* revs_per_s,
                    const int *ceqn_in);
 
 void torus_link_solvers(fclaw2d_global_t *glob);
@@ -94,7 +96,8 @@ fclaw2d_map_context_t *
                            const double shift[],
                            const double rotate[],
                            const double alpha,
-                           const int example);
+                           const double beta,
+                           const int mapping);
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
                                              const double scale[],

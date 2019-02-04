@@ -113,7 +113,8 @@ void torus_problem_setup(fclaw2d_global_t *glob)
     const user_options_t* user = torus_get_options(glob);
     TORUS_SETPROB(&user->example, &user->mapping, 
                   &user->initial_condition, 
-                  &user->alpha, &user->revs_per_s,
+                  &user->alpha, &user->beta, 
+                  &user->revs_per_s,
                   &user->color_equation);
 }
 
