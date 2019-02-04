@@ -68,6 +68,8 @@ struct fclaw2d_global
     struct fclaw2d_domain *domain;
 
     struct fclaw2d_diagnostics_accumulator *acc;
+
+    void *user;
 };
 
 struct fclaw2d_global_iterate
