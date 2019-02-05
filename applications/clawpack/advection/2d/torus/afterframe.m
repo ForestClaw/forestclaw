@@ -90,7 +90,7 @@ end
 
 yrbcolormap;
 % colormap(parula);
-% showgridlines(1:5);
+showgridlines(1:5);
 showpatchborders;
 % hidepatchborders;
 setpatchborderprops('linewidth',1);
@@ -107,7 +107,7 @@ end
 %camlight
 
 % view(vfront);
-view(2);
+view(3);
 
 prt = false;
 NoQuery = false;
