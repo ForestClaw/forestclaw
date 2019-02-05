@@ -440,6 +440,7 @@ void outstyle_3(fclaw2d_global_t *glob)
         if (n % nstep_inner == 0)
         {
             iframe++;
+            fclaw2d_diagnostics_gather(glob,init_flag);
             fclaw2d_output_frame(glob,iframe);
         }
     }
