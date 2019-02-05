@@ -43,6 +43,8 @@ void torus_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
+    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
+
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */
     patch_vt->setup   = &torus_patch_setup;
 
@@ -68,10 +70,11 @@ void torus_link_solvers(fclaw2d_global_t *glob)
             clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
             /* Include error in output files */
-#if 1            
-            clawpatch_vt->fort_header_ascii   = &TORUS46_FORT_HEADER_ASCII;
-            clawpatch_vt->cb_output_ascii     = &cb_torus_output_ascii;
-#endif            
+            if (fclaw_opt->compute_error)
+            {
+                clawpatch_vt->fort_header_ascii   = &TORUS46_FORT_HEADER_ASCII;
+                clawpatch_vt->cb_output_ascii     = &cb_torus_output_ascii;                
+            }
         }
 
         if(user->color_equation)

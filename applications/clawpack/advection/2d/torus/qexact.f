@@ -1,12 +1,12 @@
 c     # ---------------------------------------------------------------      
-      double precision function qexact(xc1,yc1,t)
+      double precision function qexact(x,y,t)
       implicit none
 
       external torus_rhs_divfree
       external torus_rhs_nondivfree
       external solout
 
-      double precision xc1,yc1,t
+      double precision x,y,t
       double precision xc0, yc0
 
       integer blockno_dummy
@@ -58,8 +58,8 @@ c     # Trace back solution to initial position
 c     # ------------------------------------------
 
 c     # Initial conditions for ODE;  
-      sigma(1) = xc1
-      sigma(2) = yc1
+      sigma(1) = x
+      sigma(2) = y
 
       call dopri5(2,torus_rhs_divfree,t0,sigma,tfinal,
      &            rtol,atol,itol,
@@ -81,7 +81,7 @@ c     # Do not map (xc1,yc1) to brick, since mapping was done above
 
       q0 = q0_physical(xp,yp,zp)
       
-      evolve_q = .true.
+      evolve_q = .false.
       if (evolve_q) then
 c         # We now need to evolve q along with (xc0,yc0)
           sigma(1) = xc0
@@ -104,11 +104,11 @@ c         # We now need to evolve q along with (xc0,yc0)
               stop
           endif
 
-          if (abs(sigma(1)-xc1) .gt. 1e-12) then
+          if (abs(sigma(1)-x) .gt. 1e-12) then
               write(6,*) 'qexact,f : Did not evolve xc1 correctly'
               stop
           endif
-          if (abs(sigma(2)-yc1) .gt. 1e-12) then
+          if (abs(sigma(2)-y) .gt. 1e-12) then
               write(6,*) 'qexact.f : Did not evolve yc1 correctly'
               stop
           endif
@@ -164,20 +164,14 @@ c     # ---------------------------------------------------------------
       integer mapping
       common /mapping_comm/ mapping
 
-      double precision alpha
-      common /torus_comm/ alpha
+      double precision alpha, beta
+      common /torus_comm/ alpha, beta
 
 c     # Sphere centered at (1,0,r0) on torus
       r0 = alpha
-      if (mapping .le. 1) then
-          x0 = 1.0
-          y0 = 0.0
-          z0 = r0
-      else
-          x0 = 0.5
-          y0 = 0.5
-          z0 = 0
-      endif
+      x0 = 1.0
+      y0 = 0.0
+      z0 = r0
 
       r = sqrt((xp - x0)**2 + (yp-y0)**2 + (zp-z0)**2)
       q0 = Hsmooth(r + r0) - Hsmooth(r - r0)

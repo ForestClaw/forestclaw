@@ -42,7 +42,7 @@ c              # Discontinuous solution
                call cellave2(blockno,xlow,ylow,dx,dy,w)
                q(i,j,1) = w
             elseif (initchoice .eq. 1) then
-   
+
                call fclaw2d_map_c2m(cont,
      &                blockno,xc,yc,xp,yp,zp)
 

@@ -68,7 +68,7 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
     double xc1,yc1,zc1;
     double alpha, beta;
     double L[4];
-    double a,b, r, R, pi, pi2;
+    double x,y, r, R, pi, pi2;
     int i;
 
     pi = M_PI;
@@ -97,16 +97,16 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
         L[i] = cont->user_double[2+i];
     }
 
-    /* Map to non-orthogonal coordinates */
-    a = L[0]*xc1 + L[1]*yc1;
-    b = L[2]*xc1 + L[3]*yc1;
+    /* Map from (a1,a2) back to (xi,eta) */
+    x = L[0]*xc1 + L[1]*yc1;
+    y = L[2]*xc1 + L[3]*yc1;
 
-    r = alpha*(1 + beta*sin(pi2*a));
-    R = 1 + r*cos(pi2*b);
+    r = alpha*(1 + beta*sin(pi2*x));
+    R = 1 + r*cos(pi2*y);
     
-    *xp = R*cos(pi2*a);
-    *yp = R*sin(pi2*a);
-    *zp = r*sin(pi2*b);
+    *xp = R*cos(pi2*x);
+    *yp = R*sin(pi2*x);
+    *zp = r*sin(pi2*y);
 
 /*    
     int example = cont->user_int[0];

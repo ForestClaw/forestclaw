@@ -11,7 +11,7 @@ c     # ------------------------------------------------------------
       double precision x, y
 
       double precision pi, pi2
-      common /compi/ pi
+      common /compi/ pi, pi2
 
       double precision alpha, beta
       common /torus_comm/ alpha, beta
@@ -20,8 +20,6 @@ c     # ------------------------------------------------------------
       common /stream_comm/ revs_per_s
 
       double precision psi
-
-      pi2 = 2*pi      
 
       if (beta .ne. 0) then
           write(6,'(A,A)') 'psi (psi.f) : Streamfunction only works ',
@@ -43,13 +41,16 @@ c     # ------------------------------------------------------------
       double precision pi, pi2
       common /compi/ pi, pi2
 
+      double precision revs_per_s
+      common /stream_comm/ revs_per_s
+
       integer example
       common /example_comm/ example  
 
       double precision s
 
       if (example .eq. 0) then
-          u(1) = 1
+          u(1) = revs_per_s
           u(2) = 0
       elseif (example .eq. 1) then
           s = sqrt(2.d0)
@@ -69,13 +70,16 @@ c     # ------------------------------------------------------------
       double precision pi, pi2
       common /compi/ pi, pi2
 
+      double precision revs_per_s
+      common /stream_comm/ revs_per_s
+
       integer example
       common /example_comm/ example  
 
       double precision s, pim
 
       if (example .eq. 0) then
-          u(1) = 1
+          u(1) = revs_per_s
           u(2) = 0
           uderivs(1) = 0
           uderivs(2) = 0
@@ -125,8 +129,7 @@ c     # Stream function for rigid body rotation.
 
       end
 
-      subroutine torus_covariant_basis_complete(x,y, t, tinv,
-     &                                          tderivs, flag) 
+      subroutine torus_basis_complete(x,y, t, tinv,tderivs, flag)
       implicit none
       
       double precision x,y 
@@ -146,11 +149,11 @@ c     # Stream function for rigid body rotation.
       double precision t1(3), t2(3), a11, a12, a22, a21
       double precision det, a11inv, a22inv, a12inv, a21inv
       double precision pi4
-      integer b(3), torus_dot
+      integer torus_dot
 
-      integer k, kk
+      integer k, kk, i
       logical compute_covariant, compute_contravariant
-      logical compute_derivatives
+      logical compute_derivatives, b(32)
 
       if (flag > 7) then
           write(6,*) 'psi.f : flag > 7'
@@ -167,16 +170,13 @@ c     # flag = 6      NA
 c     # flag = 7      Covariant + contravariant + derivatives
 
 
-      k = 1
-      do while (flag > 0)
-          b(k) = mod(flag,2)
-          x = flag/2
-          k = k + 1
+      do i = 1,bit_size(flag)
+          b(i) = btest(flag,i-1)          
       enddo
 
-      compute_covariant     = (b(1) .eq. 1) .or. (b(2) .eq. 1) 
-      compute_contravariant = b(2) .eq. 1
-      compute_derivatives   = b(3) .eq. 1
+      compute_covariant     = b(1) .or. b(2)
+      compute_contravariant = b(2)
+      compute_derivatives   = b(3)
 
       pi4 = pi2*pi2
 
@@ -295,7 +295,7 @@ c             # d(t2)/dy = d(g*fy + gy*f)/dy
       subroutine torus_transform_coordinates(a,b,x,y,mapping)
       implicit none
 
-      double precision x,y, a,b
+      double precision a,b, x,y
       integer mapping
       double precision l0(4), l1(4), l2(4)
 

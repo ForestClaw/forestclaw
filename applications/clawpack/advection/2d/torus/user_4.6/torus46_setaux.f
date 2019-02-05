@@ -206,6 +206,7 @@ c           # Subtract out component in the normal direction
             aux(i,j,3) = urrot
             aux(i,j,4) = ubrot
             aux(i,j,5) = utrot
+c            write(6,*) vel(1), vel(2), vel(3)
          enddo
       enddo
 

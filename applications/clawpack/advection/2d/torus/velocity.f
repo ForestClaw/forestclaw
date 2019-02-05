@@ -88,7 +88,7 @@ c         # v = nvec x grad \Psi
 c         # Vector field defined as u1*tau1 + u2*tau2    
 
           call torus_covariant_basis(x, y, t1,t2)
-          call torus_velocity_components(x,y,u, uderivs)
+          call torus_velocity_components(x,y,u)
 
           do k = 1,3
               vel(k) = u(1)*t1(k) + u(2)*t2(k)
@@ -101,17 +101,18 @@ c         # Vector field defined as u1*tau1 + u2*tau2
       implicit none
 
       double precision x,y,t1(3),t2(3)
-      double precision t(3,2),tderivs(3,2,2)
+      double precision t(3,2),tinv(3,2), tderivs(3,2,2)
       integer flag, k
 
 c     # Compute covariant derivatives only
       flag = 1
-      call torus_covariant_basis_complete(x,y, t, tderivs, flag)
+      call torus_basis_complete(x,y, t, tinv, tderivs, flag)
 
       do k = 1,3
           t1(k) = t(k,1)
           t2(k) = t(k,2)
       enddo
+c      write(6,*) t1(1), t1(2), t1(3)
 
       end
 
@@ -126,8 +127,8 @@ c     # Compute covariant derivatives only
 
 
       flag = 3
-      call torus_covariant_basis_complete(x,y, t, tinv,
-     &                                    tderivs, flag) 
+      call torus_basis_complete(x,y, t, tinv,tderivs, flag)
+                                          
 
       do k = 1,3
           t1inv(k) = tinv(k,1)
@@ -155,8 +156,8 @@ c     # Compute covariant derivatives only
 c     # Compute covariant and derivatives
 
       flag = 7
-      call torus_covariant_basis_complete(x,y, t, tinv,
-     &                                    tderivs, flag) 
+      call torus_basis_complete(x,y, t, tinv,tderivs, flag)
+                                          
 
       do k = 1,3
           s(k,1) = tinv(k,1)
@@ -241,7 +242,7 @@ c     # This is a clockwise velocity field ?
 
 
       double precision x,y, q
-      double precision u(2), uderivs(4)
+      double precision u(2)
       double precision divu, torus_divergence
 
 c     # Track evolution of these three quantities
@@ -249,7 +250,7 @@ c     # Track evolution of these three quantities
       y = sigma(2)
       q = sigma(3)
 
-      call torus_velocity_components(x,y,u, uderivs)
+      call torus_velocity_components(x,y,u)
 
       divu = torus_divergence(x,y)
 
