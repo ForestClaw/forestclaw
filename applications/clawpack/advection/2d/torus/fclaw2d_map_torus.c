@@ -68,58 +68,29 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
     double xc1,yc1,zc1;
     double alpha, beta;
     double L[4];
-    double x,y, r, R, pi, pi2;
+    double x,y;
     int i;
-
-    pi = M_PI;
-    pi2 = 2*pi;
-
-    /* Scale brick mapping to [0,1]x[0,1] */
-    if (blockno >= 0)
-    {
-        /* Data is not already in brick domain */
-        FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
-    }
-    else
-    {
-        xc1 = xc;
-        yc1 = yc;
-        zc1 = 0;
-    }
 
     /* blockno is ignored in the current torus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
     alpha = cont->user_double[0];
     beta = cont->user_double[1];
 
+    /* Data is not already in brick domain */
+    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+
+    /* Map from orthogonal coordinates to non-orthogonal coordinates */
     for(i=0; i < 4; i++)
     {
         L[i] = cont->user_double[2+i];
     }
 
-    /* Map from (a1,a2) back to (xi,eta) */
+    /* Map from (a1,a2) back to (x,y) */
     x = L[0]*xc1 + L[1]*yc1;
     y = L[2]*xc1 + L[3]*yc1;
 
-    r = alpha*(1 + beta*sin(pi2*x));
-    R = 1 + r*cos(pi2*y);
-    
-    *xp = R*cos(pi2*x);
-    *yp = R*sin(pi2*x);
-    *zp = r*sin(pi2*y);
+    MAPC2M_TORUS(&blockno,&x,&y,xp,yp,zp,&alpha,&beta);
 
-/*    
-    int example = cont->user_int[0];
-    if (example == 0)
-    {
-        MAPC2M_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha);
-    }
-    else if (example == 1)
-    {
-        MAPC2M_TWISTED_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha);
-    }
-    rotate_map(cont,xp,yp,zp);
-*/    
 }
 
 fclaw2d_map_context_t *
@@ -134,7 +105,7 @@ fclaw2d_map_context_t *
     int i;
     double l0[4] = {1.,  0.,  0.,  1.};
     double l1[4] = {1.,  0.,  1.,  1.};
-    double l2[4] = {1.,  1.,  1.,  0.};
+    double l2[4] = {1.,  -1.,  1.,  0.};
 
     fclaw2d_map_context_t *cont;
 
