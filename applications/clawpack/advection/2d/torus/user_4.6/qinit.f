@@ -19,9 +19,6 @@
       integer initchoice
       common /initchoice_comm/ initchoice
 
-      double precision pi
-      common /compi/ pi
-
       blockno = fc2d_clawpack46_get_block()
 
       cont = get_context()
@@ -43,8 +40,7 @@ c              # Discontinuous solution
                q(i,j,1) = w
             elseif (initchoice .eq. 1) then
 
-               call fclaw2d_map_c2m(cont,
-     &                blockno,xc,yc,xp,yp,zp)
+               call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
 
                q(i,j,1) = q0_physical(xp,yp,zp)
             elseif (initchoice .eq. 2) then

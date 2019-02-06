@@ -108,7 +108,7 @@ c           # [x;y] = a*e1 + b*e1 = L*[a;b]
             call torus_transform_coordinates(xc2,yc2,x2,y2,mapping)
 
             call torus_edge_velocity(x1,y1,x2,y2,dy,vn)
-            aux(i,j,2) = vn
+            aux(i,j,2) = -vn
          enddo
       enddo
 
@@ -131,7 +131,7 @@ c           # y-face - left vertex
             call torus_transform_coordinates(xc2,yc2,x2,y2,mapping)
 
             call torus_edge_velocity(x1,y1,x2,y2,dx,vn)
-            aux(i,j,3) = -vn
+            aux(i,j,3) = vn
          enddo
       enddo
 
@@ -206,7 +206,6 @@ c           # Subtract out component in the normal direction
             aux(i,j,3) = urrot
             aux(i,j,4) = ubrot
             aux(i,j,5) = utrot
-c            write(6,*) vel(1), vel(2), vel(3)
          enddo
       enddo
 

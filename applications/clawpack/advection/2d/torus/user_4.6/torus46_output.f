@@ -12,7 +12,7 @@
       matunit1 = 10
       matunit2 = 15
 
-      mfields = meqn + 2  !! Include error and exact solution
+      mfields = meqn + 3  !! Include error, exact solution and divergence
       open(unit=matunit2,file=matname2)
       write(matunit2,1000) time,mfields,ngrids,maux,2
  1000 format(e30.20,'    time', /,
@@ -42,13 +42,18 @@
       integer patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy,time
       double precision xc,yc,qc,qexact
-      double precision xc1, yc1, zc1
+      double precision xc1, yc1, zc1, x,y
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer matunit1
       integer i,j,mq
+
+      integer mapping
+      common /mapping_comm/ mapping
+
+      double precision divu, torus_divergence
 
       integer*8 cont, get_context
 
@@ -79,19 +84,21 @@
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
             call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-            if (time .gt. 0) then
-                qc = qexact(xc1, yc1,time)
-            else
+            call torus_transform_coordinates(xc1,yc1,x,y,mapping)
+            if (time .eq. 0) then
                 qc = q(i,j,1)
+            else
+                qc = qexact(blockno, x, y,time)
             endif
             if (abs(qc) .lt. 1d-99) then
                qc = 0.d0
             endif
+            divu = torus_divergence(x,y)
             if (abs(error(i,j,1)) .lt. 1d-99) then
                error(i,j,1) = 0.d0
             endif
             write(matunit1,120) (q(i,j,mq),mq=1,meqn),qc,
-     &            error(i,j,1)
+     &            error(i,j,1), divu
          enddo
          write(matunit1,*) ' '
       enddo

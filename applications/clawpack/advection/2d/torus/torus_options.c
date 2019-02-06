@@ -43,6 +43,9 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "color-equation", &user_opt->color_equation, 0,
                         "[user]  Solve color-equation using edge velocities [1]");
 
+    sc_options_add_bool (opt, 0, "use-stream", &user_opt->use_stream, 0,
+                        "[user]  Use streamfunction [0]");
+
     sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
                            "[user] Ratio r/R, r=outer radius, R=inner radius " \
                            "(used for torus) [0.4]");
@@ -75,6 +78,11 @@ torus_check(user_options_t *user_opt)
     {
         fclaw_global_essentialf
             ("Option --user:example must be 0 or 1\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    if (user_opt->use_stream == 1 && user_opt->example != 0)
+    {
+        fclaw_global_essentialf("use_stream == 1 and example != 0.\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;

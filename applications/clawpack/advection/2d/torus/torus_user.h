@@ -49,6 +49,7 @@ typedef struct user_options
     int mapping; 
     int initial_condition;  /* Smooth or non-smooth */
     int color_equation;
+    int use_stream;
 
     double alpha;     /* Ratio of inner radius to outer radius */
     double beta;
@@ -64,9 +65,11 @@ user_options_t;
 #define TORUS_SETPROB FCLAW_F77_FUNC(torus_setprob,TORUS_SETPROB)
 void TORUS_SETPROB(const int* example, const int* mapping, 
                    const int* initial_condition,
-                   const double* alpha, const double *beta, 
+                   const double* alpha, 
+                   const double *beta, 
                    const double* revs_per_s,
-                   const int *ceqn_in);
+                   const int *ceqn_in,
+                   const int *use_stream_in);
 
 void torus_link_solvers(fclaw2d_global_t *glob);
 

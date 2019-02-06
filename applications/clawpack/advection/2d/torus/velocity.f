@@ -12,11 +12,13 @@ c     #      u = n cross grad \Psi  (div u = 0)
 c     # 
 c     # or using basis functions
 c     # 
-c     #      u = u1*tau1 + u2*tau2   (div u might not be zero)
+c     #      u = u1*t1 + u2*t2   (div u might not be zero)
 c     # 
 c     # NOTE: All arguments to routines here should be in computational 
-c     # coordinates (xi,eta) in [0,1]x[0,1].  Mapping from brick domains
-c     # to [0,1]x[0,1] should be done from calling routines.
+c     # coordinates (x,y) in [0,1]x[0,1].  Mapping from brick domains
+c     # to [0,1]x[0,1] should be done from calling routines, as should 
+c     # any mappings that convert from an orthogonal coordinate system
+c     # to a non-orthogonal system.
 c     # ------------------------------------------------------------
 
 
@@ -45,7 +47,6 @@ c     # ------------------------------------------------------------
       double precision t1(3), t2(3)
       double precision t1inv(3), t2inv(3)
       double precision nvec(3), gradpsi(3), sv
-      logical use_stream
 
       double precision p, px, py
       double precision u(2), uderivs(2)
@@ -56,11 +57,12 @@ c     # ------------------------------------------------------------
       integer example
       common /example_comm/ example  
 
+      integer use_stream
+      common /velocity_comm/ use_stream
+
       integer k
 
-      use_stream = .false.
-
-      if (example .eq. 0 .and. use_stream) then
+      if (example .eq. 0 .and. use_stream .eq. 1) then
 c         # Divergence free velocity field : u = n cross \Psi  
           call torus_psi_derivs(x,y,p,px,py)
 
@@ -71,11 +73,8 @@ c         # Divergence free velocity field : u = n cross \Psi
               gradpsi(k) = px*t1inv(k) + py*t2inv(k)
           end do
 
-c         # Get surface normal
-c          call torus_covariant_basis(a,b,t1,t2)
-
 c         Outward directed normal          
-          call torus_cross(t2inv,t1inv,nvec,sv)
+          call torus_cross(t1inv,t2inv,nvec,sv)
 
 c         # Normalize surface normal
           do k = 1,3
@@ -112,7 +111,6 @@ c     # Compute covariant derivatives only
           t1(k) = t(k,1)
           t2(k) = t(k,2)
       enddo
-c      write(6,*) t1(1), t1(2), t1(3)
 
       end
 
@@ -191,9 +189,19 @@ c     # Get g(i,j,k), g = \Gamma(i,j,k)
       call torus_christoffel_sym(x,y,g) 
 
       D11 = uderivs(1) + u(1)*g(1,1,1) + u(2)*g(1,1,2)
-      D22 = uderivs(2) + u(1)*g(2,2,1) + u(2)*g(2,2,2)
-      
+      D22 = uderivs(4) + u(1)*g(2,2,1) + u(2)*g(2,2,2)
+
       torus_divergence = D11 + D22
+
+c      torus_divergence = g(1,1,1)    !! 0
+c      torus_divergence = g(1,1,2)    !! 1.67865983e+01  
+c      torus_divergence = g(1,2,1)    !! 2.74215323e+00
+c      torus_divergence = g(1,2,2)    !! 0
+c      torus_divergence = g(2,1,1)    !! 2.74215323e+00
+c      torus_divergence = g(2,1,2)    !! 0
+c      torus_divergence = g(2,2,1)    !! 0
+c      torus_divergence = g(2,2,2)    !! 0
+
       end
 
 
@@ -206,38 +214,48 @@ c     # ----------------------------------------------------------------
       subroutine torus_rhs_divfree(n,t,sigma,f,rpar,ipar)
       implicit none
 
-      integer n, ipar
+      integer n, ipar(2)
       double precision t, sigma(n), f(n), rpar
 
 
       integer m, i
-      double precision x,y, q, u1,u2
+      double precision xc1,yc1, q, u1,u2, x,y
       double precision p, px, py
       double precision t1(3), t2(3), t1xt2(3), w
+      double precision u(2)
+
+      integer example, use_stream
 
       x = sigma(1)
       y = sigma(2)
 
-      call torus_covariant_basis(x,y,t1,t2)
-      call torus_psi_derivs(x,y,p, px,py)
+      example = ipar(1)
+      use_stream = ipar(2)
 
-c     # Compute u dot grad q in computational coordinates
-      call torus_cross(t1,t2,t1xt2,w);
+      if (example .eq. 0 .and. use_stream .eq. 1) then
+          call torus_psi_derivs(x,y,p,px,py)
 
-c     # Evolve contravariant components of velocity field          
-      u1 = -py/w
-      u2 = px/w
+c         # Compute u dot grad q in computational coordinates
+          call torus_covariant_basis(x,y,t1,t2)
+          call torus_cross(t1,t2,t1xt2,w);
 
-c     # This is a clockwise velocity field ? 
-      f(1) = u1
-      f(2) = u2
+c         # Evolve contravariant components of velocity field  
+          u(1) = -py/w
+          u(2) = px/w
+      else
+          call torus_velocity_components(x,y,u)
+      endif
+
+c     # We are tracing these back, so use negative velocities        
+      f(1) = -u(1)
+      f(2) = -u(2)
 
       end
 
       subroutine torus_rhs_nondivfree(n,t,sigma,f,rpar,ipar)
       implicit none
 
-      integer n, ipar
+      integer n, ipar(2)
       double precision t, sigma(n), f(n), rpar
 
 
@@ -245,12 +263,32 @@ c     # This is a clockwise velocity field ?
       double precision u(2)
       double precision divu, torus_divergence
 
+      double precision t1(3), t2(3), t1xt2(3), w
+      double precision p,px,py
+      integer example, use_stream
+
 c     # Track evolution of these three quantities
+
       x = sigma(1)
       y = sigma(2)
       q = sigma(3)
 
-      call torus_velocity_components(x,y,u)
+      example = ipar(1)
+      use_stream = ipar(2)
+
+      if (example .eq. 0 .and. use_stream .eq. 1) then
+          call torus_psi_derivs(x,y,p,px,py)
+
+c         # Compute u dot grad q in computational coordinates
+          call torus_covariant_basis(x,y,t1,t2)
+          call torus_cross(t1,t2,t1xt2,w);
+
+c         # Evolve contravariant components of velocity field  
+          u(1) = -py/w
+          u(2) = px/w
+      else
+          call torus_velocity_components(x,y,u)
+      endif
 
       divu = torus_divergence(x,y)
 

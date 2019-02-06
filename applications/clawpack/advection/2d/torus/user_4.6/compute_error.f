@@ -15,6 +15,8 @@
 
       integer mapping
       common /mapping_comm/ mapping
+
+      double precision divu, torus_divergence
       
       cont = get_context()
 
@@ -25,13 +27,13 @@ c     # Assume a single field variable only
             xc = xlower + (i-0.5)*dx
 
             call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-
-
             call torus_transform_coordinates(xc1,yc1,x,y,mapping)
+            divu = torus_divergence(x,y)
+
             if (t .eq. 0) then
                error(i,j,1) = 0
             else
-               error(i,j,1) = q(i,j,1) - qexact(x,y,t);
+               error(i,j,1) = q(i,j,1) - qexact(blockno, x,y,t);
             endif
          enddo
       enddo

@@ -27,9 +27,38 @@ c     # ------------------------------------------------------------
           stop
       endif
 
-      psi = (pi2*revs_per_s)* alpha*(pi2*y + alpha*sin(pi2*y))
+      psi = -pi2*revs_per_s*alpha*(pi2*y + alpha*sin(pi2*y))
 
       torus_psi = psi
+
+      end
+
+
+      subroutine torus_psi_derivs(x,y,p,px,py)
+      implicit none
+
+      double precision x, y
+      double precision p, px, py
+
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
+      double precision alpha, beta
+      common /torus_comm/ alpha,beta
+
+      double precision revs_per_s
+      common /stream_comm/ revs_per_s
+
+      if (beta .ne. 0) then
+          write(6,'(A,A)') 'psi (psi.f) : Streamfunction only works ',
+     &         'for beta == 0'
+          stop
+      endif
+
+c     # Stream function for rigid body rotation.      
+      p = -(pi2*revs_per_s)*alpha*(pi2*y + alpha*sin(pi2*y))
+      px = 0
+      py = -(pi2)**2*revs_per_s*alpha*(1 + alpha*cos(pi2*y))
 
       end
 
@@ -53,9 +82,11 @@ c     # ------------------------------------------------------------
           u(1) = revs_per_s
           u(2) = 0
       elseif (example .eq. 1) then
-          s = sqrt(2.d0)
-          u(1) = s*cos(8*pi*x)
-          u(2) = s*sin(8*pi*y)   
+c          s = sqrt(2.d0)
+c          u(1) = s*cos(8*pi*x)
+c          u(2) = s*sin(8*pi*y)   
+           u(1) = 0
+           u(2) = 1
       endif
 
 
@@ -86,48 +117,26 @@ c     # ------------------------------------------------------------
           uderivs(3) = 0
           uderivs(4) = 0
       elseif (example .eq. 1) then
-          s = sqrt(2.d0)
-          pim = 8*pi
-          u(1) = s*cos(pim*x)
-          u(2) = s*sin(pim*y)   
-c         # uderivs = [u1x u1y; u2x u2y]          
-          uderivs(1) = -s*pim*sin(pim*x)
-          uderivs(2) = 0;
-          uderivs(3) = 0; 
-          uderivs(4) = s*pim*cos(pim*y)
+c         s = sqrt(2.d0)
+c         pim = 8*pi
+c         u(1) = s*cos(pim*x)
+c         u(2) = s*sin(pim*y)   
+cc        # uderivs = [u1x u1y; u2x u2y]          
+c         uderivs(1) = -s*pim*sin(pim*x)
+c         uderivs(2) = 0;
+c         uderivs(3) = 0; 
+c         uderivs(4) = s*pim*cos(pim*y)
+          u(1) = 0
+          u(2) = 1
+          uderivs(1) = 0
+          uderivs(2) = 0
+          uderivs(3) = 0
+          uderivs(4) = 0           
       endif
 
 
       end
 
-
-      subroutine torus_psi_derivs(x,y,p,px,py)
-      implicit none
-
-      double precision x, y
-      double precision p, px, py
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision alpha, beta
-      common /torus_comm/ alpha,beta
-
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
-
-      if (beta .ne. 0) then
-          write(6,'(A,A)') 'psi (psi.f) : Streamfunction only works ',
-     &         'for beta == 0'
-          stop
-      endif
-
-c     # Stream function for rigid body rotation.      
-      p = (pi2*revs_per_s)*alpha*(pi2*y + alpha*sin(pi2*y))
-      px = 0
-      py = (pi2)**2*revs_per_s*alpha*(1 + alpha*cos(pi2*y))
-
-      end
 
       subroutine torus_basis_complete(x,y, t, tinv,tderivs, flag)
       implicit none
@@ -149,7 +158,7 @@ c     # Stream function for rigid body rotation.
       double precision t1(3), t2(3), a11, a12, a22, a21
       double precision det, a11inv, a22inv, a12inv, a21inv
       double precision pi4
-      integer torus_dot
+      double precision torus_dot
 
       integer k, kk, i
       logical compute_covariant, compute_contravariant
@@ -189,7 +198,7 @@ c     # flag = 7      Covariant + contravariant + derivatives
       Rxx   = r1xx*sin(pi2*y)
       Ry    = -pi2*r1*sin(pi2*y)
       Ryy   = -pi4*r1*cos(pi2*y)
-      Rxy   = pi2*r1x*cos(pi2*y)
+      Rxy   = -pi2*r1x*cos(pi2*y)
 
       f(1)  = cos(pi2*x);
       fx(1) = -pi2*sin(pi2*x)
@@ -301,7 +310,10 @@ c             # d(t2)/dy = d(g*fy + gy*f)/dy
 
       data l0 /1., 0., 0., 1./
       data l1 /1., 0., 1., 1./
-      data l2 /1., 1., 1., 0./
+      data l2 /1., -1., 1., 0./
+
+c     # This compute (x,y) from a1*t1 + a2*t2, where
+c     # t1, t2 are the columns of the matrix L.
 
       if (mapping .eq. 0) then
           x = a

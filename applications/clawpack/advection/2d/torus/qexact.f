@@ -1,16 +1,36 @@
-c     # ---------------------------------------------------------------      
-      double precision function qexact(x,y,t)
+c     # ---------------------------------------------------
+c     # Trace back solution to initial position     
+c     # Input arguments should be the coordinates
+c     # for the canonical torus mapping in terms of 
+c     # (x,y)
+c     #       
+c     #   T = (R*cos(2*pi*x), R*sin(2*pi*x), r*sin(2*pi*y))
+c     #
+c     #        r = alpha*(1 + beta*sin(2*pi*x))
+c     #        R = 1 + r*cos(2*pi*y)
+c     # 
+c     # The solution proceeds in two steps. If we are
+c     # solving an incompressible problem, we only need
+c     # to evolve (x(t), y(t)).  If we have a compressible
+c     # problem, we first evolve (x(t),y(t)) back to a starting
+c     # location (x0,y0), and then evolve x, y and q from 
+c     # the starting location back to final position.
+c     # --------------------------------------------------------
+
+      double precision function qexact(blockno, x,y,tfinal)
       implicit none
 
       external torus_rhs_divfree
       external torus_rhs_nondivfree
       external solout
 
-      double precision x,y,t
+      double precision x,y,tfinal
+      integer blockno
+
       double precision xc0, yc0
 
-      integer blockno_dummy
-      double precision t0, tfinal
+c      integer blockno_dummy
+      double precision t0
       double precision xp,yp,zp
 
       double precision sigma(3), rtol, atol
@@ -23,12 +43,24 @@ c     # ---------------------------------------------------------------
 
       double precision work(lwork), rpar
       double precision q0_physical, q0
-      integer iwork(liwork), ipar, idid
+      integer iwork(liwork), ipar(2), idid
+
+      double precision tol
 
       logical evolve_q
 
+      double precision alpha, beta
+      common /torus_comm/ alpha, beta
+
       integer example
-      common /example_comm/ example  
+      common /example_comm/ example
+
+      integer use_stream
+      common /velocity_comm/ use_stream
+
+      integer initchoice
+      common /initchoice_comm/ initchoice
+
 
       integer*8 cont, get_context
 
@@ -50,16 +82,15 @@ c     # ------------------------------------------
       enddo
 
 
+c     # Evolve from t=t0 to t=tfinal
       t0 = 0
-      tfinal = t
 
-c     # ------------------------------------------
-c     # Trace back solution to initial position     
-c     # ------------------------------------------
-
-c     # Initial conditions for ODE;  
+c     # Initial conditions for ODE
       sigma(1) = x
       sigma(2) = y
+
+      ipar(1) = example
+      ipar(2) = use_stream
 
       call dopri5(2,torus_rhs_divfree,t0,sigma,tfinal,
      &            rtol,atol,itol,
@@ -75,15 +106,22 @@ c     # Initial position traced back from (xc1,yc1)
       xc0 = sigma(1)
       yc0 = sigma(2)
 
-c     # Do not map (xc1,yc1) to brick, since mapping was done above
-      blockno_dummy = -1  
-      call fclaw2d_map_c2m(cont,blockno_dummy,xc0,yc0,xp,yp,zp)
+      call mapc2m_torus(blockno,xc0,yc0,xp,yp,zp,alpha,beta)
 
-      q0 = q0_physical(xp,yp,zp)
+      if (initchoice .eq. 0) then
+          write(6,*) 'qexact.f : initchoice .eq. 0 not defined'
+          stop
+      elseif (initchoice .eq. 1) then
+          q0 = q0_physical(xp,yp,zp)
+      elseif (initchoice .eq. 2) then
+          q0 = 1.d0
+      endif
+
       
-      evolve_q = .false.
+      evolve_q = .true.
       if (evolve_q) then
-c         # We now need to evolve q along with (xc0,yc0)
+c         # We now need to evolve q along with (x,y), starting from
+c         # from (xc0,yc0)
           sigma(1) = xc0
           sigma(2) = yc0
           sigma(3) = q0
@@ -99,19 +137,31 @@ c         # We now need to evolve q along with (xc0,yc0)
      &                solout,iout, work,lwork,iwork,liwork,
      &                rpar,ipar,idid)
 
+
           if (idid .ne. 1) then
               write(6,*) 'DOPRI5 : idid .ne. 1'
               stop
           endif
 
-          if (abs(sigma(1)-x) .gt. 1e-12) then
-              write(6,*) 'qexact,f : Did not evolve xc1 correctly'
+          tol = 1e-12
+          if (abs(sigma(1)-x) .gt. tol) then
+              write(6,*) 'qexact,f : Did not evolve x correctly'
+              write(6,100) xc0,yc0
+              write(6,100) x,y
+              write(6,100) sigma(1), sigma(2)
+              write(6,105) abs(x-sigma(1)), abs(y-sigma(2))
               stop
           endif
-          if (abs(sigma(2)-y) .gt. 1e-12) then
-              write(6,*) 'qexact.f : Did not evolve yc1 correctly'
+          if (abs(sigma(2)-y) .gt. tol) then
+              write(6,*) 'qexact.f : Did not evolve y correctly'
+              write(6,100) xc0,yc0
+              write(6,100) x,y
+              write(6,100) sigma(1), sigma(2)
+              write(6,105) abs(x-sigma(1)), abs(y-sigma(2))
               stop
           endif
+100       format(2F24.16)
+105       format(2E24.4)          
 
           qexact = sigma(3)
       else
@@ -130,29 +180,6 @@ c     # Dummy routine
 
 
 c     # ---------------------------------------------------------------      
-      double precision function q0(xc1,yc1)
-      implicit none
-
-      integer blockno
-      double precision xc1, yc1
-
-      integer*8 cont, get_context
-      double precision xp, yp, zp
-      double precision q0_physical
-      integer blockno_dummy
-
-      cont = get_context()
-
-      blockno_dummy = -1
-      call fclaw2d_map_c2m(cont,
-     &      blockno_dummy,xc1,yc1,xp,yp,zp)
-
-      q0 = q0_physical(xp,yp,zp)
-
-      end
-
-
-c     # ---------------------------------------------------------------      
       double precision function q0_physical(xp,yp,zp)
       implicit none
 
@@ -160,9 +187,6 @@ c     # ---------------------------------------------------------------
 
       double precision r,r0, x0, y0, z0, q0
       double precision Hsmooth
-
-      integer mapping
-      common /mapping_comm/ mapping
 
       double precision alpha, beta
       common /torus_comm/ alpha, beta

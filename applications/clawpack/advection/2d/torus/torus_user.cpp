@@ -118,7 +118,8 @@ void torus_problem_setup(fclaw2d_global_t *glob)
                   &user->initial_condition, 
                   &user->alpha, &user->beta, 
                   &user->revs_per_s,
-                  &user->color_equation);
+                  &user->color_equation,
+                  &user->use_stream);
 }
 
 
