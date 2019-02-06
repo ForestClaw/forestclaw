@@ -3,7 +3,7 @@ global map_isflat;
 
 
 map = 'torus';
-map = 'twisted_torus2';
+% map = 'twisted_torus';
 % map = 'flat';
 % map = 'cart';
 
@@ -13,7 +13,7 @@ switch map
     case 'twisted_torus'
        L = [1 0; 1 1];
     case 'twisted_torus2'
-       L = [1 1; 1 0];
+       L = [1 -1; 1 0];
 end
 
 a = @(x,y) L(1,1)*x + L(1,2)*y;

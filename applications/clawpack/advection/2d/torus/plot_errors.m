@@ -1,11 +1,13 @@
-function plot_errors(e)
+function plot_errors(e,idx)
 close all
 
 Nvec = e(:,1);
 n = length(Nvec);
 
 c = {'r','b','g'};
-idx = 5:n;
+if (nargin == 1)
+    idx = 1:n;
+end
 lh = zeros(3,1);
 lstr = {'1-norm','2-norm','inf-norm'};
 for i = 1:3
@@ -37,6 +39,7 @@ fprintf('          Convergence rates\n');
 fprintf('%s\n',double('-')*ones(1,37));
 cr = [Nvec(2:end) Nvec(1:end-1) conv_rates];
 fprintf('%4d/%4d %8.4f %8.4f %8.4f\n',cr');
+
 
 
 end
