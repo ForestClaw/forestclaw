@@ -40,7 +40,7 @@ c     # Capacity : entry (1)
       enddo
 
       if (color_equation .eq. 1) then
-c         # Edge velocities : entries (2-3)      
+c         # Edge velocities using a streamfunction : entries (2-3)      
           call torus46_set_edge_velocities(mx,my,mbc,dx,dy,
      &          blockno,xlower,ylower,aux,maux)
       else
