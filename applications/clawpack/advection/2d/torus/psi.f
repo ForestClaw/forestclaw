@@ -189,16 +189,39 @@ c     # flag = 7      Covariant + contravariant + derivatives
 
       pi4 = pi2*pi2
 
+c     # Torus mapping
+c     #
+c     #    r1 = alpha*(1 + beta*sin(pi2*x))
+c     #    R = 1 + r1*cos(pi2*y)
+c     #
+c     #    xp =  R*cos(pi2*x)
+c     #    yp =  R*sin(pi2*x)
+c     #    zp = r1*sin(pi2*y)
+c     #
+c     #  Express X,Y,Z as 
+c     # 
+c     #     X(x,y) = g(x,y)*f(x,y) == g(1)*f(1)
+c     #     Y(x,y) = g(x,y)*f(x,y) == g(2)*f(2)
+c     #     Z(x,y) = g(x,y)*f(x,y) == g(3)*f(3)
+c     # 
+c     # Compute derivatives and use product rule to get higher order
+c     # derivatives, i.e. 
+c     #
+c     #     dX/dx = g(1)*fx(1) + gx(1)*f(1)
+c     #     dY/dx = g(2)*fx(2) + gx(2)*f(2)
+c     #     dZ/dx = g(3)*fx(3) + gx(3)*f(3)
+c     #
+
       r1    = alpha*(1 + beta*sin(pi2*x))
       r1x   = pi2*alpha*beta*cos(pi2*x)
       r1xx  = -pi4*alpha*beta*sin(pi2*x)
 
-      R     = 1 + r1*cos(pi2*y)
-      Rx    = r1x*sin(pi2*y)
-      Rxx   = r1xx*sin(pi2*y)
-      Ry    = -pi2*r1*sin(pi2*y)
-      Ryy   = -pi4*r1*cos(pi2*y)
-      Rxy   = -pi2*r1x*cos(pi2*y)
+      R     = 1 +   r1*cos(pi2*y)
+      Rx    =      r1x*cos(pi2*y)
+      Rxx   =     r1xx*cos(pi2*y)
+      Ry    =  -pi2*r1*sin(pi2*y)
+      Ryy   =  -pi4*r1*cos(pi2*y)
+      Rxy   = -pi2*r1x*sin(pi2*y)
 
       f(1)  = cos(pi2*x);
       fx(1) = -pi2*sin(pi2*x)
@@ -252,7 +275,7 @@ c         # Contravariant vectors
           a12inv = -a12/det
           a21inv = -a21/det     
           do k = 1,3
-              tinv(k,1) = a11inv*t(k,1) + a12inv*t(k,1)
+              tinv(k,1) = a11inv*t(k,1) + a12inv*t(k,2)
               tinv(k,2) = a21inv*t(k,1) + a22inv*t(k,2)
           end do
       endif

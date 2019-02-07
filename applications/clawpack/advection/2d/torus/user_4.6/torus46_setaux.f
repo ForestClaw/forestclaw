@@ -138,7 +138,7 @@ c           # y-face - left vertex
       end
 
       subroutine torus46_set_center_velocities(mx,my,mbc,
-     &      dx,dy,blockno,xlower,ylower,
+     &          dx,dy,blockno,xlower,ylower,
      &          edgelengths,xnormals,ynormals,surfnormals,
      &          aux, maux)
       implicit none

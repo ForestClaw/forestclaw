@@ -33,7 +33,7 @@
 
       subroutine torus46_fort_write_file(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
-     &      q,error,time, patch_num,level,blockno,mpirank)
+     &      q,error,soln, time, patch_num,level,blockno,mpirank)
 
       implicit none
 
@@ -45,6 +45,7 @@
       double precision xc1, yc1, zc1, x,y
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer matunit1
@@ -81,22 +82,24 @@
                   q(i,j,mq) = 0.d0
                endif
             enddo
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
-            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-            call torus_transform_coordinates(xc1,yc1,x,y,mapping)
-            if (time .eq. 0) then
-                qc = q(i,j,1)
-            else
-                qc = qexact(blockno, x, y,time)
-            endif
+c            xc = xlower + (i-0.5)*dx
+c            yc = ylower + (j-0.5)*dy
+c            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+c            call torus_transform_coordinates(xc1,yc1,x,y,mapping)
+c            if (time .eq. 0) then
+c                qc = q(i,j,1)
+c            else
+c                qc = qexact(blockno, x, y,time)
+c            endif
+            qc = q(i,j,1)
             if (abs(qc) .lt. 1d-99) then
                qc = 0.d0
             endif
-            divu = torus_divergence(x,y)
             if (abs(error(i,j,1)) .lt. 1d-99) then
                error(i,j,1) = 0.d0
             endif
+c            divu = torus_divergence(x,y)
+            divu = 0
             write(matunit1,120) (q(i,j,mq),mq=1,meqn),qc,
      &            error(i,j,1), divu
          enddo

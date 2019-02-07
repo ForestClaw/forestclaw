@@ -188,8 +188,8 @@ c     # Get g(i,j,k), g = \Gamma(i,j,k)
       call torus_velocity_derivs(x,y,u,uderivs)
       call torus_christoffel_sym(x,y,g) 
 
-      D11 = uderivs(1) + u(1)*g(1,1,1) + u(2)*g(1,1,2)
-      D22 = uderivs(4) + u(1)*g(2,2,1) + u(2)*g(2,2,2)
+      D11 = uderivs(1) + u(1)*g(1,1,1) + u(2)*g(1,2,1)
+      D22 = uderivs(4) + u(1)*g(2,1,2) + u(2)*g(2,2,2)
 
       torus_divergence = D11 + D22
 

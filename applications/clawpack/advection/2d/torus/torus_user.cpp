@@ -203,7 +203,7 @@ void cb_torus_output_ascii (fclaw2d_domain_t * domain,
     int level;
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy, time;
-    double *q, *error;
+    double *q, *error, *soln;
     int iframe;
 
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
@@ -229,6 +229,7 @@ void cb_torus_output_ascii (fclaw2d_domain_t * domain,
 
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
     error = fclaw2d_clawpatch_get_error(glob,this_patch);
+    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
 
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
@@ -240,7 +241,7 @@ void cb_torus_output_ascii (fclaw2d_domain_t * domain,
         TORUS46_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
                                 &xlower,&ylower,
                                 &dx,&dy,
-                                q,error,&time, 
+                                q,error,soln, &time, 
                                 &patch_num,&level,
                                 &this_block_idx,
                                 &glob->mpirank);

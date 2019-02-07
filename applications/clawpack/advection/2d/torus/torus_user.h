@@ -117,7 +117,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
 void TORUS46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
                            double *dx, double *dy, double *xlower,
                            double *ylower, double *t, double q[],
-                           double error[]);
+                           double error[], double soln[]);
 #endif
 
 
@@ -138,7 +138,7 @@ void     TORUS46_FORT_WRITE_FILE(char* matname1,
                                  int* meqn,      int* mbc,
                                  double* xlower, double* ylower,
                                  double* dx,     double* dy,
-                                 double q[],     double error[],
+                                 double q[],     double error[], double soln[],
                                  double *time,
                                  int* patch_num, int* level,
                                  int* blockno,   int* mpirank);
