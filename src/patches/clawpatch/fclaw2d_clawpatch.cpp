@@ -225,6 +225,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	if (fclaw_opt->compute_error)
 	{
 		cp->griderror.define(box,cp->meqn);
+		cp->exactsolution.define(box,cp->meqn);
 	}
 
 	if (clawpatch_opt->maux > 0)
@@ -1228,6 +1229,13 @@ double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,
 {
 	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
 	return cp->griderror.dataPtr();
+}
+
+double* fclaw2d_clawpatch_get_exactsoln(fclaw2d_global_t* glob,
+									fclaw2d_patch_t* this_patch)
+{
+	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
+	return cp->exactsolution.dataPtr();
 }
 
 void* flaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
