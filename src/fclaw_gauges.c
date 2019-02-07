@@ -25,15 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_gauges.h>
 
-#if 0
-#include "fc2d_geoclaw_gauges_default.h"
-
-#include "fc2d_geoclaw_options.h"
-
-#include "fc2d_geoclaw.h"
-#include "fc2d_geoclaw_fort.h"
-#endif
-
 #include "fclaw2d_options.h"
 #include <fclaw2d_global.h>
 #include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
