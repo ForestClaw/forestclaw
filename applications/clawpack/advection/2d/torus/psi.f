@@ -342,11 +342,11 @@ c     # t1, t2 are the columns of the matrix L.
           x = a
           y = b
       elseif (mapping .eq. 1)  then
-          x = l1(1)*a + l1(2)*b
-          y = l1(3)*a + l1(4)*b
+          x = a*l1(1) + b*l1(2)
+          y = a*l1(3) + b*l1(4)
       elseif (mapping .eq. 2) then
-          x = l2(1)*a + l2(2)*b
-          y = l2(3)*a + l2(4)*b
+          x = a*l2(1) + b*l2(2)
+          y = a*l2(3) + b*l2(4)
       endif
 
       end
