@@ -1,5 +1,4 @@
 setviews;
-global map_isflat;
 
 plot_contour = false;
 plot_qtrue = false;
@@ -35,7 +34,7 @@ caxis([0, 1]);
 colorbar
 axis off;
 
-view(2);
+view(vbot);
 
 if (mq >= 3)
     caxis([qmin,qmax]);
