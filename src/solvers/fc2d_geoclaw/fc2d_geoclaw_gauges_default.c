@@ -246,7 +246,7 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
 void geoclaw_print_gauges_default(fclaw2d_global_t *glob, 
                                   fclaw_gauge_t *gauge) 
 {
-    int k, kmax;
+    int k, kmax, id;
     geoclaw_user_t **gauge_buffer;
 
     char filename[15];  /* gaugexxxxx.txt + EOL character */
@@ -256,7 +256,8 @@ void geoclaw_print_gauges_default(fclaw2d_global_t *glob,
        start at 0 and with kmax-1 */
     fclaw_gauge_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
 
-    sprintf(filename,"gauge%05d.txt",gauge->num);
+    id = fclaw_gauge_get_id(glob,gauge);
+    sprintf(filename,"gauge%05d.txt",id);
     fp = fopen(filename, "a");
     for(k = 0; k < kmax; k++)
     {

@@ -454,6 +454,13 @@ void fclaw_gauge_get_data(fclaw2d_global_t *glob,
     *t2 = g->t2;
 }
 
+int fclaw_gauge_get_id(fclaw2d_global_t *glob, 
+                          fclaw_gauge_t *g)
+{
+    return g->num;
+}
+
+
 void fclaw_gauge_get_buffer(fclaw2d_global_t *glob,
                             fclaw_gauge_t *g,
                             int *kmax, void*** gauge_buffer)

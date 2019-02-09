@@ -145,6 +145,10 @@ void fclaw_gauge_get_data(struct fclaw2d_global *glob,
                           double *xc, double *yc, 
                           double  *t1, double *t2);
 
+int fclaw_gauge_get_id(struct fclaw2d_global *glob, 
+                       struct fclaw_gauge *g);
+    
+
 void fclaw_gauge_set_buffer_entry(struct fclaw2d_global *glob,
                                   struct fclaw_gauge* g,
                                   void* guser);
