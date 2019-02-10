@@ -70,8 +70,8 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     fclaw_gauge_acc_t* gauge_acc;
     fclaw_gauge_t *gauges;
     int i, num_gauges;
-    int* block_offsets;
-    double* coordinates;
+    int* bo;
+    double* c;
 
     const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
 
@@ -136,12 +136,6 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
                                                  num_blocks+1);
     gauge_info.coordinates = sc_array_new_count(2*sizeof(double), num_gauges);
 
-    /* Get address of first entry in sc_array */
-#if 0    
-    block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, 0);
-    coordinates = (double*) sc_array_index_int(gauge_info.coordinates, 0);
-#endif    
-
     if (is_brick)
     {
         /* We don't know how the blocks are arranged in the brick domain
@@ -164,8 +158,8 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
 
         number_of_gauges_set = 0;
-        block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets,0);
-        block_offsets[0] = 0;
+        bo = (int*) sc_array_index_int(gauge_info.block_offsets,0);
+        bo[0] = 0;
         for (nb = 0; nb < num_blocks; nb++)
         {
             /* Scale local block coordinates to global 
@@ -192,15 +186,15 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
                     gauges[i].blockno = nb;     /* gauge[i] is in block nb */
 
                     /* This scales coordinates to [0,mi]x[0,mj] */
-                    coordinates = (double*) sc_array_index_int(gauge_info.coordinates, ng);
-                    coordinates[0] = mi*(x - xll);
-                    coordinates[1] = mj*(y - yll);
+                    c = (double*) sc_array_index_int(gauge_info.coordinates, ng);
+                    c[0] = mi*(x - xll);
+                    c[1] = mj*(y - yll);
                     gauges[i].location_in_results = ng;
                     number_of_gauges_set++;
                 }
             }
-            block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, nb+1);
-            block_offsets[0] = number_of_gauges_set;
+            bo = (int*) sc_array_index_int(gauge_info.block_offsets, nb+1);
+            bo[0] = number_of_gauges_set;
         }
     }
     else
@@ -211,17 +205,17 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
             gauges[i].location_in_results = i;
         }
 
-        block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets,0);
-        block_offsets[0] = 0;
-        
-        block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets,1);
-        block_offsets[0] = num_gauges;
+        bo = (int*) sc_array_index_int(gauge_info.block_offsets,0);
+        bo[0] = 0;
+
+        bo = (int*) sc_array_index_int(gauge_info.block_offsets,1);
+        bo[0] = num_gauges;
 
         for (i = 0; i < num_gauges; ++i)
         {
-            coordinates = (double*) sc_array_index_int(gauge_info.coordinates, i);
-            coordinates[0] = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
-            coordinates[1] = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
+            c = (double*) sc_array_index_int(gauge_info.coordinates, i);
+            c[0] = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
+            c[1] = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
         }
     }
 }

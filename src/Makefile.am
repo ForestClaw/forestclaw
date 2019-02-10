@@ -107,7 +107,6 @@ libforestclaw_compiled_sources = \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/fclaw2d_map_nomap.c \
 	src/mappings/fclaw2d_map_nomap_brick.c \
-	src/fortran_source2d/fclaw2d_interpolate_util.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f \
 	src/fortran_source2d/philim.f
