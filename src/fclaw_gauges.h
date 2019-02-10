@@ -46,8 +46,10 @@ typedef struct fclaw_gauge
     int is_local;
     int patchno;
 
-    double xc;
+    /* Relative to [ax,ay]x[bx,by] set in fclaw2d_options */
+    double xc;   
     double yc;
+
     double t1;   /* Tstart */
     double t2;   /* Tend */
     int num;     /* Gauge number 1001, 1002, 1003, ...*/
@@ -59,6 +61,9 @@ typedef struct fclaw_gauge
     /* Store data in buffer before outputting gauges */
     int next_buffer_location;     /* Where are we in the gauge output */
     void **buffer;
+
+    void* user_data;  /* Data about each gauge that doesn't change */
+
 } fclaw_gauge_t;
 
 struct fclaw2d_global;
@@ -159,6 +164,14 @@ void fclaw_gauge_get_buffer(struct fclaw2d_global *glob,
 
 void fclaw_gauge_buffer_reset(struct fclaw2d_global *glob, 
                               struct fclaw_gauge *g);
+
+
+void fclaw_gauge_set_user_data(struct fclaw2d_global *glob,
+                               struct fclaw_gauge* g,
+                               void* user);
+
+void* fclaw_gauge_get_user_data(struct fclaw2d_global *glob,
+                                struct fclaw_gauge* g);
 
 
 #ifdef __cplusplus

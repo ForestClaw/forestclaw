@@ -70,6 +70,8 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     fclaw_gauge_acc_t* gauge_acc;
     fclaw_gauge_t *gauges;
     int i, num_gauges;
+    int* block_offsets;
+    double* coordinates;
 
     const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
 
@@ -115,25 +117,37 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     /* -----------------------------------------------------
        Set up block offsets and coordinate list for p4est
        search function
+
+       Basic idea : Create a list of gauges for each block.
+
+          -- For each block j, loop over all gauges.  If 
+             gauge[i] is in block[j], add gauge[i] to 
+             block[j] list of gauges. 
+
        ----------------------------------------------------- */
 
     fclaw2d_map_context_t* cont = glob->cont;
 
     int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
 
-    gauge_info.block_offsets = sc_array_new_size(sizeof(int), 
-                                                 glob->domain->num_blocks+1);
-    gauge_info.coordinates = sc_array_new_size(2*sizeof(double), num_gauges);
+    int num_blocks = glob->domain->num_blocks;
 
-    int *block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, 0);
-    double *coordinates = (double*) sc_array_index_int(gauge_info.coordinates, 0);
+    gauge_info.block_offsets = sc_array_new_count(sizeof(int), 
+                                                 num_blocks+1);
+    gauge_info.coordinates = sc_array_new_count(2*sizeof(double), num_gauges);
+
+    /* Get address of first entry in sc_array */
+#if 0    
+    block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, 0);
+    coordinates = (double*) sc_array_index_int(gauge_info.coordinates, 0);
+#endif    
 
     if (is_brick)
     {
         /* We don't know how the blocks are arranged in the brick domain
            so we reverse engineer this information
         */
-        int nb,mi,mj;
+        int nb,mi,mj,ng;
         double x,y;
         double z;
         double xll,yll;
@@ -150,28 +164,43 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
 
         number_of_gauges_set = 0;
+        block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets,0);
         block_offsets[0] = 0;
-        for (nb = 0; nb < glob->domain->num_blocks; ++nb)
+        for (nb = 0; nb < num_blocks; nb++)
         {
-            /* Scale to [0,1]x[0,1], based on blockno */
+            /* Scale local block coordinates to global 
+               [0,1]x[0,1] coordinates.
+
+               Example : 4 x 1 arrangement of blocks 
+               The point [0.5,0.5] in block 1  will map to
+               the point (0.125,0.5) in [0,1]x[0,1].  
+
+               We can't do this directly, because we don't know 
+               (easily) how the blocks are numbered in the 
+               brick grid */ 
+
             fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
             fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);
             for(i = 0; i < num_gauges; i++)
             {
-                /* Map gauge to global [0,1]x[0,1] space */
+                /* Map global gauge to global [0,1]x[0,1] space */
                 x = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
                 y = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
                 if (xll <= x && x <= xur && yll <= y && y <= yur)
                 {
-                    int ng = number_of_gauges_set;
-                    gauges[i].blockno = nb;
-                    coordinates[2*ng] = mi*(x - xll);
-                    coordinates[2*ng+1] = mj*(y - yll);
+                    ng = number_of_gauges_set;
+                    gauges[i].blockno = nb;     /* gauge[i] is in block nb */
+
+                    /* This scales coordinates to [0,mi]x[0,mj] */
+                    coordinates = (double*) sc_array_index_int(gauge_info.coordinates, ng);
+                    coordinates[0] = mi*(x - xll);
+                    coordinates[1] = mj*(y - yll);
                     gauges[i].location_in_results = ng;
                     number_of_gauges_set++;
                 }
             }
-            block_offsets[nb+1] = number_of_gauges_set;
+            block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, nb+1);
+            block_offsets[0] = number_of_gauges_set;
         }
     }
     else
@@ -182,13 +211,17 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
             gauges[i].location_in_results = i;
         }
 
+        block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets,0);
         block_offsets[0] = 0;
-        block_offsets[1] = num_gauges;
+        
+        block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets,1);
+        block_offsets[0] = num_gauges;
 
         for (i = 0; i < num_gauges; ++i)
         {
-            coordinates[2*i] = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
-            coordinates[2*i+1] = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
+            coordinates = (double*) sc_array_index_int(gauge_info.coordinates, i);
+            coordinates[0] = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
+            coordinates[1] = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
         }
     }
 }
@@ -475,6 +508,19 @@ void fclaw_gauge_set_buffer_entry(fclaw2d_global_t *glob,
 {
     int k = g->next_buffer_location;
     g->buffer[k] = guser;
+}
+
+void fclaw_gauge_set_user_data(fclaw2d_global_t *glob,
+                               fclaw_gauge_t* g,
+                               void* user)
+{
+    g->user_data = user;
+}
+
+void* fclaw_gauge_get_user_data(fclaw2d_global_t *glob,
+                                  fclaw_gauge_t* g)
+{
+    return g->user_data;
 }
 
 
