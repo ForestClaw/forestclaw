@@ -146,7 +146,8 @@ struct fclaw_options
     int time_sync;
 
     /* Gauges */
-    int gauge_buffer_length;   
+    int output_gauges;
+    int gauge_buffer_length;       
 
     /* Mapping functions */
     int manifold;
