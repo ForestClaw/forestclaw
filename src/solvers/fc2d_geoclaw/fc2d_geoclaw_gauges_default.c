@@ -198,6 +198,34 @@ void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob,
     }
 }
 
+void geoclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob, 
+                                        fclaw2d_block_t *block,
+                                        int blockno, 
+                                        fclaw_gauge_t *g,
+                                        double *xc, double *yc)
+{
+    /*  
+       Map gauge to normalized coordinates in a global [0,1]x[0,1]  domain.
+
+       Gauge coordinates (g->xc,g->yc) are whatever the user supplied above 
+
+       Return normalized (xc,yc) coordinates for gauge.
+    */
+
+    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double ax,bx,ay,by;
+
+    ax = fclaw_opt->ax;
+    bx = fclaw_opt->bx;
+    ay = fclaw_opt->ay;
+    by = fclaw_opt->by;
+
+    /* Map global gauge to global [0,1]x[0,1] space */
+    *xc = (g->xc - ax)/(bx-ax);
+    *yc = (g->yc - ay)/(by-ay);
+}
+
+
 void geoclaw_gauge_update_default(fclaw2d_global_t* 
                                   glob, fclaw2d_block_t* block,
                                   fclaw2d_patch_t* patch, 
