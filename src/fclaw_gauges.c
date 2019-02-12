@@ -438,7 +438,7 @@ void fclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob,
 {
     const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
     FCLAW_ASSERT(gauge_vt->normalize_coordinates != NULL);
-    return gauge_vt->normalize_coordinates(glob, block,blockno,g,xc,yc);    
+    gauge_vt->normalize_coordinates(glob, block,blockno,g,xc,yc);    
 }
 
 
