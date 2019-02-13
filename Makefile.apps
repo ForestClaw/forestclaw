@@ -72,6 +72,21 @@ include src/solvers/fc3d_ash3d/test_cases/ash3d.apps
 endif
 
 # ----------------------------------
+# SWBLI project
+# ----------------------------------
+if FCLAW_ENABLE_SWBLI
+
+## Solver library
+include src/patches/clawpatch/Makefile.am
+include src/solvers/fc2d_swbli/Makefile.am
+
+## Applications
+include src/solvers/fc2d_swbli/examples/swbli/Makefile.am
+
+endif
+
+
+# ----------------------------------
 # CudaClaw library and examples
 # ----------------------------------
 if FCLAW_ENABLE_CUDACLAW
