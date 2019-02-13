@@ -55,7 +55,7 @@ c     # This should be refratio*refratio.
       integer i2(0:rr2-1),j2(0:rr2-1)
       double precision kc
 
-      logical is_valid_average, skip_this_grid
+      logical fclaw2d_clawpatch_is_valid_average, skip_this_grid
       double precision af_sum, qv(0:rr2-1)
 
       is_manifold = manifold .eq. 1
@@ -83,7 +83,8 @@ c                 # ibc = 2 corresponds to the second layer
                      ic = mx+ibc
                   endif
 
-                  call fclaw2d_transform_face_half(ic,jc,i2,j2,
+                  call 
+     &       fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2,
      &                  transform_cptr)
 c                 # ---------------------------------------------
 c                 # Two 'half-size' neighbors will be passed into
@@ -95,7 +96,8 @@ c                 # grid.
 c                 # ---------------------------------------------
                   skip_this_grid = .false.
                   do m = 0,r2-1
-                     if (.not. is_valid_average(i2(m),j2(m),mx,my))
+                     if (.not. 
+     &       fclaw2d_clawpatch_is_valid_average(i2(m),j2(m),mx,my))
      &                     then
                         skip_this_grid = .true.
                         exit
@@ -146,11 +148,13 @@ c           # idir = 1 (faces 2,3)
                      jc = my+jbc
                   endif
 
-                  call fclaw2d_transform_face_half(ic,jc,i2,j2,
+                  call 
+     &       fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2,
      &                  transform_cptr)
                   skip_this_grid = .false.
                   do m = 0,r2-1
-                     if (.not. is_valid_average(i2(m),j2(m),mx,my))
+                     if (.not. 
+     &          fclaw2d_clawpatch_is_valid_average(i2(m),j2(m),mx,my))
      &                     then
                         skip_this_grid = .true.
                      endif
@@ -245,7 +249,7 @@ c           # Average fine grid corners onto coarse grid ghost corners
 
 c           # Again, a fake routine until the real one is
 c           # available (be sure to pass in (i1,j1)
-            call fclaw2d_transform_corner_half(i1,j1,i2,j2,
+            call fclaw2d_clawpatch_transform_corner_half(i1,j1,i2,j2,
      &            transform_cptr)
             if (is_manifold) then
                do mq = 1,meqn

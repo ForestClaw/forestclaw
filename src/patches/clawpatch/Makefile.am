@@ -27,6 +27,7 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_utils.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_average.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_copy.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_interpolate.f \

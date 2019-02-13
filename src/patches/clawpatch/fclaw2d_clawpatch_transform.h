@@ -55,29 +55,30 @@ void fclaw2d_clawpatch_face_transformation_intra (int ftransform[]);
 
 /* ----------------------------- Called from Fortran ---------------------------------- */
 
-#define FCLAW2D_TRANSFORM_FACE FCLAW_F77_FUNC_(fclaw2d_transform_face, \
-                                              FCLAW2D_TRANSFORM_FACE)
-void FCLAW2D_TRANSFORM_FACE (const int *i1, const int *j1,
-                             int *i2, int *j2,
-                             struct fclaw2d_patch_transform_data** ptdata);
+#define FCLAW2D_CLAWPATCH_TRANSFORM_FACE FCLAW_F77_FUNC_(fclaw2d_clawpatch_transform_face, \
+                                                         FCLAW2D_CLAWPATCH_TRANSFORM_FACE)
+void FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
+                                       int *i2, int *j2,
+                                       struct fclaw2d_patch_transform_data** ptdata);
 
-#define FCLAW2D_TRANSFORM_FACE_HALF FCLAW_F77_FUNC_(fclaw2d_transform_face_half, \
-                                                    FCLAW2D_TRANSFORM_FACE_HALF)
-void FCLAW2D_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
-                                  int i2[], int j2[],
-                                  struct fclaw2d_patch_transform_data** ptdata);
+#define FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF FCLAW_F77_FUNC_(fclaw2d_clawpatch_transform_face_half, \
+                                                              FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF)
+void FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
+                                            int i2[], int j2[],
+                                            struct fclaw2d_patch_transform_data** ptdata);
 
-#define FCLAW2D_TRANSFORM_CORNER FCLAW_F77_FUNC_(fclaw2d_transform_corner, \
-                                                 FCLAW2D_TRANSFORM_CORNER)
-void FCLAW2D_TRANSFORM_CORNER (const int *i1, const int *j1,
-                               int *i2, int *j2,
-                               struct fclaw2d_patch_transform_data** ptdata);
+#define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER FCLAW_F77_FUNC_(fclaw2d_clawpatch_transform_corner, \
+                                                           FCLAW2D_CLAWPATCH_TRANSFORM_CORNER)
+void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
+                                         int *i2, int *j2,
+                                         struct fclaw2d_patch_transform_data** ptdata);
 
-#define FCLAW2D_TRANSFORM_CORNER_HALF FCLAW_F77_FUNC_(fclaw2d_transform_corner_half, \
-                                                      FCLAW2D_TRANSFORM_CORNER_HALF)
-void FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
-                                    int i2[], int j2[],
-                                    struct fclaw2d_patch_transform_data** ptdata);
+#define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF FCLAW_F77_FUNC_(fclaw2d_clawpatch_transform_corner_half, \
+                                                                FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF)
+
+void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
+                                              int i2[], int j2[],
+                                              struct fclaw2d_patch_transform_data** ptdata);
 
 #ifdef __cplusplus
 #if 0
@@ -86,4 +87,4 @@ void FCLAW2D_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
 }
 #endif
 
-#endif /* !FCLAW2D_TRANSFORM_H */
+#endif /* !FCLAW2D_CLAWPATCH_TRANSFORM_H */

@@ -152,7 +152,8 @@ c     # ----------------------------------------------------------------------
       integer mq, ibc, jbc, ii, jj, ifine, jfine
       integer ic, jc, mth
       double precision gradx, grady, shiftx, shifty
-      double precision sl, sr, qc, value, compute_slopes
+      double precision sl, sr, qc, value
+      double precision fclaw2d_clawpatch_compute_slopes
 
       mth = 5
 
@@ -175,11 +176,11 @@ c     # This may not even matter
          qc = qcoarse(mq,ic,jc)
          sl = (qc - qcoarse(mq,ic-1,jc))
          sr = (qcoarse(mq,ic+1,jc) - qc)
-         gradx = compute_slopes(sl,sr,mth)
+         gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
          sl = (qc - qcoarse(mq,ic,jc-1))
          sr = (qcoarse(mq,ic,jc+1) - qc)
-         grady = compute_slopes(sl,sr,mth)
+         grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
 c        # Loop over fine grid ghost cells
          do ibc = 1,mbc
