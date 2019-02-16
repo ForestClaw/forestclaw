@@ -45,7 +45,7 @@ c     # This should be refratio*refratio.
       logical fclaw2d_clawpatch_is_valid_interp
       logical skip_this_grid
 
-      integer a(2,2)
+      integer a(2,2), f(2)
       integer ii,jj,dc(2),df(2,0:rr2-1),iff,jff
       double precision shiftx(0:rr2-1),shifty(0:rr2-1)
 
@@ -58,7 +58,7 @@ c     # This should be refratio*refratio.
       endif
 
 
-      call fclaw2d_clawpatch_build_transform(transform_ptr,a)
+      call fclaw2d_clawpatch_build_transform(transform_ptr,a,f)
 
 c     # This needs to be written for refratios .ne. 2.
       m = 0
@@ -198,7 +198,7 @@ c     # This should be refratio*refratio.
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
 
-      integer a(2,2)
+      integer a(2,2), f(2)
       integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
       double precision shiftx(0:rr2-1), shifty(0:rr2-1)
       logical check_indices
@@ -210,7 +210,7 @@ c     # This should be refratio*refratio.
          stop
       endif
 
-      call fclaw2d_clawpatch_build_transform(transform_ptr,a)
+      call fclaw2d_clawpatch_build_transform(transform_ptr,a,f)
 
       m = 0
       do jj = 0,1

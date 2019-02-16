@@ -228,6 +228,7 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_keyvalue_set_int (kv, "counters",  FCLAW_TIMER_PRIORITY_COUNTERS);
     sc_keyvalue_set_int (kv, "details",   FCLAW_TIMER_PRIORITY_DETAILS);
     sc_keyvalue_set_int (kv, "extra",     FCLAW_TIMER_PRIORITY_EXTRA);
+    sc_keyvalue_set_int (kv, "all",       FCLAW_TIMER_PRIORITY_EXTRA);
     sc_options_add_keyvalue (opt, 0, "report-timing-verbosity", 
                              &fclaw_opt->report_timing_verbosity,
                              "summary", kv, "Set verbosity for timing output [summary]");

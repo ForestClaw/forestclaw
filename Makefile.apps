@@ -6,7 +6,7 @@
 if FCLAW_ENABLE_CLAWPACK
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
 include src/solvers/fc2d_clawpack4.6/Makefile.am

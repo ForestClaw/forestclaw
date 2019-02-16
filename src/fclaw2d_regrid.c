@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_gauges.h>
 
-#include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_partition.h>
@@ -96,7 +95,7 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
         if (family_coarsened == 1)
         {
             int igrid;
-            for (igrid = 0; igrid < NumSiblings; igrid++)
+            for (igrid = 0; igrid < 4; igrid++)
             {
                 int fine_patchno = fine0_patchno + igrid;
                 fclaw2d_patch_mark_coarsen(domain,blockno, fine_patchno);
@@ -142,7 +141,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         fclaw2d_patch_t *coarse_patch = old_patch;
 
         int i;
-        for (i = 0; i < NumSiblings; i++)
+        for (i = 0; i < 4; i++)
         {
             fclaw2d_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
