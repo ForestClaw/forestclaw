@@ -4,7 +4,7 @@ import os
 import subprocess
 import random
 
-np = 4
+np = 2
 exec = "shockbubble"
 
 arg_list = ["mpirun","-n",str(np),exec,"--inifile=timing.ini"]
@@ -13,4 +13,4 @@ outfile = "{:s}_0000{:d}.o{:d}".format(np,jobid)
 f = open(outfile,'w')
 po = subprocess.Popen(arg_list,stdout=f)
 print("Starting process {:d} with jobid {:d} on {:d} processor(s).".format(po.pid,jobid,np))
-# po.wait()
+#po.wait()
