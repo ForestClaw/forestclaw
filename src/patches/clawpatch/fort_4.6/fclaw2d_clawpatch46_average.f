@@ -154,7 +154,7 @@ c           # idir = 1 (faces 2,3)
                   skip_this_grid = .false.
                   do m = 0,r2-1
                      if (.not. 
-     &          fclaw2d_clawpatch_is_valid_average(i2(m),j2(m),mx,my))
+     &      fclaw2d_clawpatch_is_valid_average(i2(m),j2(m),mx,my))
      &                     then
                         skip_this_grid = .true.
                      endif
