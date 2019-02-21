@@ -258,7 +258,7 @@ c             # Compute covariant derivatives
               call torus_covariant_derivative(xc1,yc1,2,u1,u2,
      &                                        u12,u22,coderiv2)
 
-              call torus_covariant_basis(xc1,yc1,tau1,tau2)
+              call torus_covariant_basis(xc1,yc1,t1,t2)
     
                        
           elseif (mapping .eq. 1) then
