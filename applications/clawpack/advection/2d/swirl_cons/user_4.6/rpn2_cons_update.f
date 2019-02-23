@@ -9,8 +9,8 @@
       double precision u
       integer m
 
-c     # Velocity projected onto faces is just 
-      u = auxvec_center(1 + idir)
+c     # Cell-centered velocities         
+      u = auxvec_center(2 + iface)
 
       do m = 1,meqn
           flux(m) = u*q(m)

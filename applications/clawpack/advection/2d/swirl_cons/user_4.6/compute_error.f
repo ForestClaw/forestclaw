@@ -29,10 +29,10 @@ c     # Assume a single field variable only
                soln(i,j,1) = q(i,j,1)
             else
                call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-               call torus_transform_coordinates(xc1,yc1,x,y,mapping)
+               call swirl_transform_coordinates(xc1,yc1,x,y,mapping)
                soln(i,j,1) = qexact(blockno,x,y,t)
             endif
-            error(i,j,1) = q(i,j,1) - soln(i,j,1)
+            error(i,j,1) = q(i,j,1) - soln(i,j,1)            
          enddo
       enddo
 

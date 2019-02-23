@@ -41,7 +41,12 @@ typedef struct user_options
     int rp_solver;
     int example;
     int mapping;
-    double alpha;
+
+    double alpha;    /* Used by five-patch mapping */
+
+    int initial_condition;  /* Smooth or non-smooth */
+    int color_equation;
+    int use_stream;
 
     double *center;
     const char *center_string;
@@ -54,7 +59,9 @@ struct fclaw2d_global;
 struct fclaw2d_patch;
 
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(int* example);
+void SWIRL_SETPROB(const int* example, const int* mapping, const int* initchoice,
+                   const int* color_equation, const int* use_stream,
+                   const double* alpha);
 
 void swirlcons_link_solvers(struct fclaw2d_global *glob);
 
@@ -106,10 +113,6 @@ void SWIRL46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
                            double *dx, double *dy, double *xlower,
                            double *ylower, double *t, double q[],
                            double error[], double soln[]);
-
-
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(int* example);
 
 
 #define RPN2CONS_QS FCLAW_F77_FUNC(rpn2cons_qs,RPN2CONS_QS)
@@ -200,6 +203,22 @@ void CLAWPACK46_SETAUX_MANIFOLD(const int* mbc,
                             double area[],double edgelengths[],
                             double xnormals[],double ynormals[],
                             double surfnormals[]);
+
+#define SWIRL46_SETAUX FCLAW_F77_FUNC(swirl46_setaux, SWIRL46_SETAUX)
+
+void SWIRL46_SETAUX(const int* mbc,
+                            const int* mx, const int* my,
+                            const double* xlower, const double* ylower,
+                            const double* dx, const double* dy,
+                            const int* maux, double aux[],
+                            const int* blockno,
+                            double area[],double edgelengths[],
+                            double xnormals[],double ynormals[],
+                            double surfnormals[]);
+
+
+
+
 
 #ifdef __cplusplus
 #if 0

@@ -42,8 +42,9 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
-    fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
-    const user_options_t* user = swirlcons_get_options(glob);
+
+    fc2d_clawpack46_options_t  *clawopt = fc2d_clawpack46_get_options(glob);
+    const user_options_t*          user = swirlcons_get_options(glob);
 
     /* ForestClaw functions */
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
@@ -69,7 +70,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
             switch(user->rp_solver)
             {
                 case 1:  /* QS */
-                    clawpack46_vt->fort_rpn2      = &RPN2CONS_QS;
+                    //clawpack46_vt->fort_rpn2      = &RPN2CONS_QS;
                 case 2:  /* WD */
                     clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
                 case 3:  /* EC */
@@ -89,7 +90,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
             switch(user->rp_solver)
             {
                 case 1:  /* QS */
-                    clawpack46_vt->fort_rpn2      = &RPN2CONS_QS_MANIFOLD; 
+                    //clawpack46_vt->fort_rpn2      = &RPN2CONS_QS_MANIFOLD; 
                 case 2:  /* WD */
                     clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
                 case 3:  /* EC */
@@ -111,15 +112,16 @@ void swirlcons_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = swirlcons_get_options(glob);
 
-    int ex = user->example;
-    SWIRL_SETPROB(&ex);
+    SWIRL_SETPROB(&user->example,&user->mapping,&user->initial_condition,
+                  &user->color_equation, &user->use_stream,
+                  &user->alpha);
 }
 
 
 void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
-                                    int this_block_idx,
-                                    int this_patch_idx)
+                                    int blockno,
+                                    int patchno)
 {
     const user_options_t* user = swirlcons_get_options(glob);
 
@@ -148,19 +150,21 @@ void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
     switch(user->mapping)
     {
         case 0:  /* No map */
+#if 0            
             int maxmx, maxmy;
             maxmx = mx;
             maxmy = my;
             CLAWPACK46_SETAUX(&maxmx, &maxmy, &mbc,&mx,&my,&xlower,&ylower,
                               &dx,&dy,&maux,aux);
+#endif                              
             break;
         case 1: /* cart map */
         case 2: /* fivepatch */
         case 3: /* bilinear */
-            CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                                       &dx,&dy,&maux,aux,&this_block_idx,
-                                       xp,yp,zp,area,
-                                       edgelengths,xnormals,ynormals,surfnormals);
+            SWIRL46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
+                           &dx,&dy,&maux,aux,&blockno,
+                           area,
+                           edgelengths,xnormals,ynormals,surfnormals);
             break;
     }
 }

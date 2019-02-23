@@ -98,7 +98,7 @@ c              # Edge between ghost cell and interior cell
       do i = 1,mx
 c        # bottom side 0 = in; 1 = out0
          do k = 0,1
-            iface = k
+            iface = k + 2
             do m = 1,maux
 c              # Cell centered values                
                auxvec_center(m) = aux(i,1-k,m)
@@ -118,7 +118,7 @@ c              # Edge between ghost cell and interior cell
 
 c        # Top side 0 = in; 1 = out
          do k = 0,1
-            iface = 1-k
+            iface = 3-k
             do m = 1,maux
 c              # Cell centered values                
                auxvec_center(m) = aux(i,my+k,m)
