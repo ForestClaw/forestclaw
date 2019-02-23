@@ -54,11 +54,16 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
 
     patch_vt->setup   = &swirlcons_patch_setup_manifold;
 
+    clawpatch_vt->fort_compute_patch_error = &SWIRL46_COMPUTE_ERROR;
 
     clawopt->use_fwaves = 0;
     switch(user->mapping)
     {
         case 0:
+
+            printf("Version without mapping does not work\n");
+            exit(0);
+
             clawpack46_vt->fort_rpt2      = &RPT2CONS;
             clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
             switch(user->rp_solver)
@@ -88,7 +93,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
                 case 2:  /* WD */
                     clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
                 case 3:  /* EC */
-                    clawpack46_vt->fort_rpn2      = &RPN2CONS_EC;                 
+                    clawpack46_vt->fort_rpn2      = &RPN2CONS_EC_MANIFOLD;                 
                 case 4:  /* FW */
                     clawopt->use_fwaves = 1;
                     clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 

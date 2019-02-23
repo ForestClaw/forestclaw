@@ -13,6 +13,7 @@ applications_clawpack_advection_2d_swirl_cons_swirlcons_SOURCES = \
 	applications/clawpack/advection/2d/swirl_cons/setprob.f \
 	applications/clawpack/advection/2d/swirl_cons/fdisc.f \
 	applications/clawpack/advection/2d/swirl_cons/velocity_field.f \
+	applications/clawpack/advection/2d/swirl_cons/user_4.6/compute_error.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/swirl_cons/user_4.6/clawpack46_setaux_manifold.f \

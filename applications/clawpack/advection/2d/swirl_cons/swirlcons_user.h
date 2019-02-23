@@ -100,6 +100,14 @@ const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob);
 
 /* ---------------------------- Fortran headers --------------------------------------- */
 
+#define SWIRL46_COMPUTE_ERROR FCLAW_F77_FUNC(swirl46_compute_error,SWIRL46_COMPUTE_ERROR)
+
+void SWIRL46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                           double *dx, double *dy, double *xlower,
+                           double *ylower, double *t, double q[],
+                           double error[], double soln[]);
+
+
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
 void SWIRL_SETPROB(int* example);
 
@@ -166,7 +174,7 @@ void RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const i
 
 #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
 
-void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir,
+void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
                       double q[], double aux_center[], double aux_edge[], double flux[]);
 
 
@@ -174,6 +182,7 @@ void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir,
                                                  RPN2_CONS_UPDATE_MANIFOLD)
 
 void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir,
+                               const int* iface,
                                double q[], double aux_center[], double aux_edge[],
                                double flux[]);
 
