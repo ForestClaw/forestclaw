@@ -16,7 +16,6 @@ v	applications/clawpack/advection/2d/torus/psi.f \
 	applications/clawpack/advection/2d/torus/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/torus/user_4.6/compute_error.f \
 	applications/clawpack/advection/2d/torus/user_4.6/torus46_setaux.f \
-	applications/clawpack/advection/2d/torus/user_4.6/clawpack46_src2.f \
 	applications/clawpack/advection/2d/torus/user_4.6/torus46_output.f \
 	applications/clawpack/advection/2d/torus/user_4.6/tag4refinement.f \
 	applications/clawpack/advection/2d/torus/user_4.6/tag4coarsening.f \
