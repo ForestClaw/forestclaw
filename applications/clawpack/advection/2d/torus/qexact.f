@@ -72,8 +72,8 @@ c     # ------------------------------------------
 c     # Numerical parameters
 c     # ------------------------------------------
       itol = 0
-      rtol = 1.d-10
-      atol = 1.d-10
+      rtol = 1.d-12
+      atol = 1.d-12
       iout = 0
 
       do i = 1,20
@@ -143,7 +143,7 @@ c         # from (xc0,yc0)
               stop
           endif
 
-          tol = 1e-12
+          tol = 1e-8
           if (abs(sigma(1)-x) .gt. tol) then
               write(6,*) 'qexact,f : Did not evolve x correctly'
               write(6,100) xc0,yc0

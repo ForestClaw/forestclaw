@@ -82,9 +82,9 @@ c     # Stream function for rigid body rotation.
           u(1) = revs_per_s
           u(2) = 0
       elseif (example .eq. 1) then
-c          s = sqrt(2.d0)
-c          u(1) = s*cos(8*pi*x)
-c          u(2) = s*sin(8*pi*y)   
+c           s = sqrt(2.d0)
+c           u(1) = s*cos(8*pi*x)
+c           u(2) = s*sin(8*pi*y)   
            u(1) = 0
            u(2) = 1
       endif
@@ -117,15 +117,15 @@ c          u(2) = s*sin(8*pi*y)
           uderivs(3) = 0
           uderivs(4) = 0
       elseif (example .eq. 1) then
-c         s = sqrt(2.d0)
-c         pim = 8*pi
-c         u(1) = s*cos(pim*x)
-c         u(2) = s*sin(pim*y)   
-cc        # uderivs = [u1x u1y; u2x u2y]          
-c         uderivs(1) = -s*pim*sin(pim*x)
-c         uderivs(2) = 0;
-c         uderivs(3) = 0; 
-c         uderivs(4) = s*pim*cos(pim*y)
+c          s = sqrt(2.d0)
+c          pim = 8*pi
+c          u(1) = s*cos(pim*x)
+c          u(2) = s*sin(pim*y)   
+cc         # uderivs = [u1x u1y; u2x u2y]          
+c          uderivs(1) = -s*pim*sin(pim*x)
+c          uderivs(2) = 0;
+c          uderivs(3) = 0; 
+c          uderivs(4) = s*pim*cos(pim*y)
           u(1) = 0
           u(2) = 1
           uderivs(1) = 0
