@@ -323,8 +323,8 @@ c     # Get (ig,jg) for grid from linear (igrid) coordinates
       jc_add = jg*my/p4est_refineFactor
 
       do mq = 1,meqn
-         do i = i1,i2
-            do j = j1,j2
+         do j = j1,j2
+            do i = i1,i2
                ic = i + ic_add
                jc = j + jc_add
                qc = qcoarse(ic,jc,mq)
