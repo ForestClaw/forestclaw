@@ -217,6 +217,49 @@ void SWIRL46_SETAUX(const int* mbc,
                             double surfnormals[]);
 
 
+#define  SWIRL46_FORT_WRITE_FILE FCLAW_F77_FUNC(swirl46_fort_write_file,  \
+                                                SWIRL46_FORT_WRITE_FILE)
+void     SWIRL46_FORT_WRITE_FILE(char* matname1,
+                                 int* mx,        int* my,
+                                 int* meqn,      int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* dx,     double* dy,
+                                 double q[],     double error[], double soln[],
+                                 double *time,
+                                 int* patch_num, int* level,
+                                 int* blockno,   int* mpirank);
+
+#define SWIRL46_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(swirl46_fort_header_ascii, \
+                        SWIRL46_FORT_HEADER_ASCII)
+void SWIRL46_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                               double* time, int* meqn, int* maux, 
+                               int* ngrids);
+
+
+#define SWIRL46_TAG4REFINEMENT FCLAW_F77_FUNC(swirl46_tag4refinement, \
+                                              SWIRL46_TAG4REFINEMENT)
+void  SWIRL46_TAG4REFINEMENT(const int* mx,const int* my,
+                             const int* mbc,const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q[],
+                             const double* tag_threshold,
+                             const int* init_flag,
+                             int* tag_patch);
+
+#define  SWIRL46_TAG4COARSENING FCLAW_F77_FUNC(swirl46_tag4coarsening, \
+                                              SWIRL46_TAG4COARSENING)
+void  SWIRL46_TAG4COARSENING(const int* mx, const int* my,
+                             const int* mbc, const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q0[],double q1[],
+                             double q2[],double q3[],
+                             const double* tag_threshold,
+                             int* tag_patch);
 
 
 

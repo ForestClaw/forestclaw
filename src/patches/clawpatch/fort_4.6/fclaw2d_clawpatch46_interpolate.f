@@ -379,6 +379,7 @@ c     # ------------------------------------------------------
       integer i,j,ii, jj, ifine, jfine, m, ig, jg, ic_add, jc_add
       double precision kf, kc, r2, sum, cons_diff, qf, qc
 
+
       p4est_refineFactor = 2
       refratio = 2
 

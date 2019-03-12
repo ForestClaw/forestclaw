@@ -108,8 +108,10 @@ c     # Map to [-1,1]x[-1,1]
       call mapc2m_cart(blockno,xc0,yc0,xc1,yc1,zp)
 
 c     # Map to [0,1]x[0,1]      
-      xp = (1 + xc0)/2.d0
-      yp = (1 + yc0)/2.d0
+c      xp = (1 + xc0)/2.d0
+c      yp = (1 + yc0)/2.d0
+      xp = xc0
+      yp = yc0
 
       if (initchoice .eq. 0) then
           write(6,*) 'qexact.f : initchoice .eq. 0 not defined'
@@ -188,6 +190,7 @@ c     # ---------------------------------------------------------------
       double precision xp, yp, zp
 
       double precision x0, y0, z0, q0, r0, r
+      double precision xpp, ypp
       double precision Hsmooth
 
 c     # Sphere centered at (0.5,0.5,0) on swirl
@@ -196,7 +199,23 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
       z0 = 0
       r0 = 0.2   !! radius of sphere
 
-      r = sqrt((xp - x0)**2 + (yp-y0)**2)
+c     # modulo(A,P) = A - floor(A/P)*P
+c      write(6,*) 'mod(6.1,1.d0)  ', modulo(6.1d0,1.d0)
+c      write(6,*) 'mod(0.5,1.d0)  ', modulo(0.5d0,1.d0)
+c      write(6,*) 'mod(-0.5,1.d0) ', modulo(-0.5d0,1.d0)
+c      write(6,*) 'mod(-1.3,1.d0) ', modulo(-1.3d0,1.d0)
+c      write(6,*) ' '
+c      write(6,*) 'mod(6.1,1.d0)  ', 6.1d0 - floor(6.1d0)
+c      write(6,*) 'mod(0.5,1.d0)  ', 0.5d0 - floor(0.5d0)
+c      write(6,*) 'mod(-0.5,1.d0) ', -0.5d0 - floor(-0.5d0)
+c      write(6,*) 'mod(-1.3,1.d0) ', -1.3d0 - floor(-1.3d0)
+c      stop
+
+      xpp = modulo(xp,1.d0)
+      ypp = modulo(yp,1.d0)
+
+
+      r = sqrt((xpp - x0)**2 + (ypp-y0)**2)
       q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
 
       q0_physical = q0
