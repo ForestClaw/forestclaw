@@ -21,12 +21,6 @@
       integer initchoice
       common /initchoice_comm/ initchoice
 
-      double precision pi
-      common /compi/ pi
-
-      integer example
-      common /comex/ example
-
       cont = get_context()
 
       blockno = fc2d_clawpack46_get_block()
@@ -47,7 +41,7 @@ c                 # Discontinuous solution
                   q(i,j,1) = q0_physical(xp,yp,zp)
               elseif (initchoice .eq. 2) then
                   q(i,j,1) = 1.d0
-              elseif (example .eq. 3) then
+              elseif (initchoice .eq. 3) then
                   if (fclaw2d_map_is_used(cont)) then
                       call fclaw2d_map_c2m(cont,
      &                           blockno,xc,yc,xp,yp,zp)

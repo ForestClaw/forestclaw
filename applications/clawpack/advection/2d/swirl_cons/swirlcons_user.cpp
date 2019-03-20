@@ -58,12 +58,6 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     /* ForestClaw functions */
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
-    /* ClawPatch specific functions */
-#if 0    
-    clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
-    clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
-#endif    
-
     patch_vt->setup   = &swirlcons_patch_setup_manifold;
 
     clawpatch_vt->fort_compute_patch_error = &SWIRL46_COMPUTE_ERROR;
