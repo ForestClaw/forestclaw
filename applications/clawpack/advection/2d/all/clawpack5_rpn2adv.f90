@@ -12,18 +12,38 @@ SUBROUTINE clawpack5_rpn2adv(ixy,maxm,meqn,mwaves,maux,mbc, &
     DOUBLE PRECISION auxl(maux,1-mbc:maxm+mbc)
     DOUBLE PRECISION auxr(maux,1-mbc:maxm+mbc)
 
-    INTEGER iface, i, i1, mq
+    INTEGER iface, i, mq, mw
+
+
+    double precision delta(meqn)
 
     iface = ixy
     DO i = 2-mbc, mx+mbc
         do mq = 1,meqn
-            wave(mq,1,i) = ql(mq,i) - qr(mq,i-1)
-        enddo
-        s(1,i) = auxl(ixy,i)
-        DO mq = 1,meqn
-            amdq(mq,i) = dmin1(auxl(iface,i), 0.d0) * wave(mq,1,i)
-            apdq(mq,i) = dmax1(auxl(iface,i), 0.d0) * wave(mq,1,i)
-        ENDDO
+            do mw = 1,mwaves
+                wave(mq,mw,i) = 0
+            end do
+        end do
+
+        do mq = 1,meqn
+            delta(mq) = ql(mq,i) - qr(mq,i-1)
+            do mw = 1,mwaves
+                wave(mq,mw,i) = delta(mq)
+            end do
+        end do
+
+        do mw = 1,mwaves
+            s(mw,i) = auxl(iface,i)
+        end do
+
+        do mq = 1,meqn
+            amdq(mq,i) = 0
+            apdq(mq,i) = 0
+            do mw = 1,mwaves
+               amdq(mq,i) = amdq(mq,i) + min(s(mw,i), 0.d0) * wave(mq,mw,i)
+               apdq(mq,i) = apdq(mq,i) + max(s(mw,i), 0.d0) * wave(mq,mw,i)
+            end do
+        end do
     END DO
 
     RETURN

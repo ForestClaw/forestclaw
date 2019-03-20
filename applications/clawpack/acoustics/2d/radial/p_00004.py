@@ -5,7 +5,7 @@ import subprocess
 import random
 
 np = 4
-exec="swirl"
+exec = "radial"
 
 arg_list = ["mpirun","-n",str(np),exec,"--inifile=timing.ini"]
 jobid = random.randint(1000,9999)

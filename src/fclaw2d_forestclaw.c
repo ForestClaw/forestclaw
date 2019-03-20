@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 
 #include <fclaw2d_global.h>
+#include <fclaw2d_patch.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw_gauges.h>
@@ -33,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_initialize();
+    fclaw2d_patch_vtable_initialize();
     fclaw2d_diagnostics_vtable_initialize();
     fclaw_gauges_vtable_initialize();    
 }

@@ -280,7 +280,7 @@ c     # grid cells
 
       logical is_valid_average, skip_this_grid
 
-      call build_transform(transform_cptr,a,f)
+      call fclaw2d_clawpatch_build_transform(transform_cptr,a,f)
 
 c     # This is here to test the normal_match value; eventually, it
 c     # should go away.      
@@ -365,13 +365,14 @@ c         # First column is A*[1;0]
               do jc = 1,my
                   if (iface_coarse .eq. 0) then
                       ic = 1
-                      call fclaw2d_transform_face_half(ic,jc,i2,j2,
-     &                     transform_cptr)
+                      call fclaw2d_clawpatch_transform_face_half(ic,jc,
+     &                     i2,j2,transform_cptr)
                       deltac = 0
                       areac = area0(jc)
                       if (.not. skip_this_grid(idir,i2,j2,mx,my)) then
                           fp = qfine_dummy(i2(0),j2(0),mq)
-                          call fclaw2d_transform_face_half(ic+1,jc,
+                          call 
+     &                fclaw2d_clawpatch_transform_face_half(ic+1,jc,
      &                         i2,j2,transform_cptr)
 c                         # Check for validity?                          
                           ef = sc*qfine_dummy(i2(0),j2(0),mq)
@@ -380,14 +381,16 @@ c                         # Check for validity?
                       endif
                   elseif (iface_coarse .eq. 1) then
                       ic = mx
-                      call fclaw2d_transform_face_half(ic,jc,i2,j2,
+                      call 
+     &         fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2,
      &                      transform_cptr)
                       deltac = 0
                       areac = area1(jc)
                       if (.not. skip_this_grid(idir,i2,j2,mx,my)) then
                           fm = qfine_dummy(i2(0),j2(0),mq)
     
-                          call fclaw2d_transform_face_half(ic-1,jc,
+                          call 
+     &       fclaw2d_clawpatch_transform_face_half(ic-1,jc,
      &                          i2,j2,transform_cptr)
                           ef = sc*qfine_dummy(i2(0),j2(0),mq)
     
@@ -407,13 +410,15 @@ c         # Second column is A*[0;1]
               do ic = 1,mx                  
                   if (iface_coarse .eq. 2) then
                       jc = 1
-                      call fclaw2d_transform_face_half(ic,jc,i2,j2,
+                      call 
+     &     fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2,
      &                      transform_cptr)
                       deltac = 0
                       areac = area2(ic)
                       if (.not. skip_this_grid(idir,i2,j2,mx,my)) then                
                           gp = qfine_dummy(i2(0),j2(0),mq)
-                          call fclaw2d_transform_face_half(ic,jc+1,
+                          call 
+     &      fclaw2d_clawpatch_transform_face_half(ic,jc+1,
      &                         i2,j2,transform_cptr)
                           ef = sc*qfine_dummy(i2(0),j2(0),mq)
     
@@ -422,13 +427,15 @@ c         # Second column is A*[0;1]
                       endif
                   else if (iface_coarse .eq. 3) then
                       jc = my
-                      call fclaw2d_transform_face_half(ic,jc,i2,j2,
+                      call 
+     &       fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2,
      &                      transform_cptr)
                       deltac = 0
                       areac = area3(ic)
                       if (.not. skip_this_grid(idir,i2,j2,mx,my)) then                   
                           gm = qfine_dummy(i2(0),j2(0),mq)
-                          call fclaw2d_transform_face_half(ic,jc-1,
+                          call 
+     &         fclaw2d_clawpatch_transform_face_half(ic,jc-1,
      &                          i2,j2,transform_cptr)
                           ef = sc*qfine_dummy(i2(0),j2(0),mq)
     
@@ -554,10 +561,12 @@ c                 # x-direction (idir == 0)
                   j1 = j
                   if (this_iface .eq. 0) then
                       i1 = 1
-                      call fclaw2d_transform_face(i1,j1,i2,j2,
+                      call 
+     &       fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
      &                      transform_cptr)
                       fp = qthis_dummy(i2,j2,mq)
-                      call fclaw2d_transform_face(i1+1,j1,i2,j2,
+                      call 
+     &       fclaw2d_clawpatch_transform_face(i1+1,j1,i2,j2,
      &                      transform_cptr)
                       ef = sc*qthis_dummy(i2,j2,mq)
 
@@ -566,10 +575,12 @@ c                 # x-direction (idir == 0)
 
                   else
                       i1 = mx
-                      call fclaw2d_transform_face(i1,j1,i2,j2,
+                      call 
+     &       fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
      &                      transform_cptr)
                       fm = qthis_dummy(i2,j2,mq)
-                      call fclaw2d_transform_face(i1-1,j1,i2,j2,
+                      call 
+     &       fclaw2d_clawpatch_transform_face(i1-1,j1,i2,j2,
      &                      transform_cptr)
                       ef = sc*qthis_dummy(i2,j2,mq)
 
@@ -591,11 +602,11 @@ c                 # y-direction (idir == 1)
                   i1 = i
                   if (this_iface .eq. 2) then
                       j1 = 1
-                      call fclaw2d_transform_face(i1,j1,i2,j2,
-     &                      transform_cptr)
+                      call fclaw2d_clawpatch_transform_face(i1,j1,
+     &                 i2,j2,transform_cptr)
                       gp = qthis_dummy(i2,j2,mq)
-                      call fclaw2d_transform_face(i1,j1+1,i2,j2,
-     &                      transform_cptr)
+                      call fclaw2d_clawpatch_transform_face(i1,j1+1,
+     &                      i2,j2,transform_cptr)
                       ef = sc*qthis_dummy(i2,j2,mq)
 
                       delta = (ef-efthis2(i1,mq,0))-(gp-gpthis2(i1,mq))
@@ -606,12 +617,12 @@ c                     # Coarse grid is bottom grid; fine is top grid
 c                     # efc3(0) is flux stored in the coarse grid 
 c                     # interior cell.    
                       j1 = my
-                      call fclaw2d_transform_face(i1,j1,i2,j2,
-     &                      transform_cptr)
+                      call fclaw2d_clawpatch_transform_face(i1,j1,
+     &                        i2,j2,transform_cptr)
 c                      write(6,*) this_iface, i1, j1, i2, j2
                       gm = qthis_dummy(i2,j2,mq)
-                      call fclaw2d_transform_face(i1,j1-1,i2,j2,
-     &                      transform_cptr)
+                      call fclaw2d_clawpatch_transform_face(i1,j1-1,
+     &                         i2,j2,transform_cptr)
                       ef = sc*qthis_dummy(i2,j2,mq)
 
                      delta = (efthis3(i1,mq,0)-ef)-(gm-gmthis3(i1,mq))
@@ -681,21 +692,21 @@ c     # calls to T.
 
       i1 = 0
       j1 = 0
-      call fclaw2d_transform_face(i1,j1,icn,jcn,
+      call fclaw2d_clawpatch_transform_face(i1,j1,icn,jcn,
      &      transform_ptr)
       f(1) = icn
       f(2) = jcn
 
       i1 = 1
       j1 = 0
-      call fclaw2d_transform_face(i1,j1,icn,jcn,
+      call fclaw2d_clawpatch_transform_face(i1,j1,icn,jcn,
      &      transform_ptr)
       a(1,1) = icn - f(1)
       a(2,1) = jcn - f(2)
 
       i1 = 0
       j1 = 1
-      call fclaw2d_transform_face(i1,j1,icn,jcn,
+      call fclaw2d_clawpatch_transform_face(i1,j1,icn,jcn,
      &      transform_ptr)
       a(1,2) = icn - f(1)
       a(2,2) = jcn - f(2)

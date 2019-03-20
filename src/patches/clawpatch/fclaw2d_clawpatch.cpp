@@ -43,8 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
-
-#include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_options.h>
 

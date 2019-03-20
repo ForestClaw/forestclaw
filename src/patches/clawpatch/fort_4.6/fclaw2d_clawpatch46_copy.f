@@ -42,7 +42,7 @@ c                 # x-direction (idir == 0)
                      i1 = mx+ibc
                      j1 = j
                   endif
-                  call fclaw2d_transform_face(i1,j1,i2,j2,
+                  call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
      &                  transform_ptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
                enddo
@@ -59,7 +59,7 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call fclaw2d_transform_face(i1,j1,i2,j2,
+                  call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
      &                  transform_ptr)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
                enddo
@@ -101,7 +101,7 @@ c     # Do exchanges for all corners
 
 c              # this routine is not yet complete, but the complete one
 c              # can now be dropped in.
-               call fclaw2d_transform_corner(i1,j1,i2,j2,
+               call fclaw2d_clawpatch_transform_corner(i1,j1,i2,j2,
      &               transform_ptr)
                qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
             enddo

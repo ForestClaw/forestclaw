@@ -198,6 +198,34 @@ void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob,
     }
 }
 
+void geoclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob, 
+                                        fclaw2d_block_t *block,
+                                        int blockno, 
+                                        fclaw_gauge_t *g,
+                                        double *xc, double *yc)
+{
+    /*  
+       Map gauge to normalized coordinates in a global [0,1]x[0,1]  domain.
+
+       Gauge coordinates (g->xc,g->yc) are whatever the user supplied above 
+
+       Return normalized (xc,yc) coordinates for gauge.
+    */
+
+    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double ax,bx,ay,by;
+
+    ax = fclaw_opt->ax;
+    bx = fclaw_opt->bx;
+    ay = fclaw_opt->ay;
+    by = fclaw_opt->by;
+
+    /* Map global gauge to global [0,1]x[0,1] space */
+    *xc = (g->xc - ax)/(bx-ax);
+    *yc = (g->yc - ay)/(by-ay);
+}
+
+
 void geoclaw_gauge_update_default(fclaw2d_global_t* 
                                   glob, fclaw2d_block_t* block,
                                   fclaw2d_patch_t* patch, 
@@ -246,7 +274,7 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
 void geoclaw_print_gauges_default(fclaw2d_global_t *glob, 
                                   fclaw_gauge_t *gauge) 
 {
-    int k, kmax;
+    int k, kmax, id;
     geoclaw_user_t **gauge_buffer;
 
     char filename[15];  /* gaugexxxxx.txt + EOL character */
@@ -256,7 +284,8 @@ void geoclaw_print_gauges_default(fclaw2d_global_t *glob,
        start at 0 and with kmax-1 */
     fclaw_gauge_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
 
-    sprintf(filename,"gauge%05d.txt",gauge->num);
+    id = fclaw_gauge_get_id(glob,gauge);
+    sprintf(filename,"gauge%05d.txt",id);
     fp = fopen(filename, "a");
     for(k = 0; k < kmax; k++)
     {

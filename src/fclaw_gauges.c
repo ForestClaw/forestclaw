@@ -25,15 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_gauges.h>
 
-#if 0
-#include "fc2d_geoclaw_gauges_default.h"
-
-#include "fc2d_geoclaw_options.h"
-
-#include "fc2d_geoclaw.h"
-#include "fc2d_geoclaw_fort.h"
-#endif
-
 #include "fclaw2d_options.h"
 #include <fclaw2d_global.h>
 #include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
@@ -79,6 +70,19 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     fclaw_gauge_acc_t* gauge_acc;
     fclaw_gauge_t *gauges;
     int i, num_gauges;
+    int* bo;
+    double* c;
+
+    int nb,mi,mj,ng;
+    double x,y;
+    double z;
+    double xll,yll;
+    double xur,yur;
+    int number_of_gauges_set, buffer_len;
+    int is_brick, num_blocks;
+
+    double x0,y0,x1,y1;
+    int gauge_in_block;
 
     const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
 
@@ -87,70 +91,69 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
        GeoClaw of the files gauges.data (created with make_data.py) and 
        gauge output files (e.g. gauge00123.txt)
        ---------------------------------------------------------------- */
-    
-    fclaw_set_gauge_data(glob, &gauges, &num_gauges);
 
-    /* Set diagnostic accumulutor info  */
     gauge_acc = FCLAW_ALLOC(fclaw_gauge_acc_t,1);
+    if (!fclaw_opt->output_gauges)
+    {
+        num_gauges = 0;
+        gauge_acc->gauges = NULL;
+
+    }
+    else
+    {
+        fclaw_set_gauge_data(glob, &gauges, &num_gauges);
+
+        /* Set diagnostic accumulutor info  */
+        gauge_acc->gauges = gauges;  /* Might be NULL */    
+    }
     *acc = gauge_acc;
     gauge_acc->num_gauges = num_gauges;
-    gauge_acc->gauges = gauges;  /* Might be NULL */
 
-    if (num_gauges == 0)
+
+    if (num_gauges > 0)
     {
-        // gauge_info.block_offsets = NULL;
-        // gauge_info.coordinates = NULL;
-        return;
-    }
+        fclaw_create_gauge_files(glob,gauges,num_gauges);    
 
-    fclaw_create_gauge_files(glob,gauges,num_gauges);    
+        /* ------------------------------------------------------------------
+           Finish setting gauges with ForestClaw specific info 
+           For  q_gauges, users must still allocate space for variables to be
+           stored in the print buffer.
+           ---------------------------------------------------------------- */
+        buffer_len = fclaw_opt->gauge_buffer_length;
+        for(i = 0; i < num_gauges; i++)
+        {
+            gauges[i].last_time = gauges[i].t1;
+            gauges[i].patchno = -1;
+            gauges[i].blockno = -1;
+            gauges[i].location_in_results = -1;
+            gauges[i].buffer = FCLAW_ALLOC(void*,buffer_len);  /* Array of generic ptrs */
+            gauges[i].next_buffer_location = 0;
+        }       
 
-    /* ------------------------------------------------------------------
-        Finish setting gauges with ForestClaw specific info 
-        For  q_gauges, users must still allocate space for variables to be
-        stored in the print buffer.
-        ---------------------------------------------------------------- */
-    int buffer_len = fclaw_opt->gauge_buffer_length;
-    for(i = 0; i < num_gauges; i++)
-    {
-        gauges[i].last_time = gauges[i].t1;
-        gauges[i].patchno = -1;
-        gauges[i].blockno = -1;
-        gauges[i].location_in_results = -1;
-        gauges[i].buffer = FCLAW_ALLOC(void*,buffer_len);  /* Array of generic ptrs */
-        gauges[i].next_buffer_location = 0;
-    }       
+        /* -----------------------------------------------------
+           Set up block offsets and coordinate list for p4est
+           search function
 
-    /* -----------------------------------------------------
-       Set up block offsets and coordinate list for p4est
-       search function
-       ----------------------------------------------------- */
+           Basic idea : Create a list of gauges for each block.
 
-    fclaw2d_map_context_t* cont = glob->cont;
+          -- For each block j, loop over all gauges.  If 
+             gauge[i] is in block[j], add gauge[i] to 
+             block[j] list of gauges. 
 
-    int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+          ----------------------------------------------------- */
 
-    gauge_info.block_offsets = sc_array_new_size(sizeof(int), 
-                                                 glob->domain->num_blocks+1);
-    gauge_info.coordinates = sc_array_new_size(2*sizeof(double), num_gauges);
+        fclaw2d_map_context_t* cont = glob->cont;
 
-    int *block_offsets = (int*) sc_array_index_int(gauge_info.block_offsets, 0);
-    double *coordinates = (double*) sc_array_index_int(gauge_info.coordinates, 0);
+        is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
 
-    if (is_brick)
-    {
+        num_blocks = glob->domain->num_blocks;
+
+        gauge_info.block_offsets = sc_array_new_count(sizeof(int), 
+                                                      num_blocks+1);
+        gauge_info.coordinates = sc_array_new_count(2*sizeof(double), num_gauges);
+
         /* We don't know how the blocks are arranged in the brick domain
-           so we reverse engineer this information
-        */
-        int nb,mi,mj;
-        double x,y;
-        double z;
-        double xll,yll;
-        double xur,yur;
-        int number_of_gauges_set;
-
-
-        double x0,y0,x1,y1;
+           so we reverse engineer this information */
         x0 = 0;
         y0 = 0;
         x1 = 1;
@@ -158,46 +161,67 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 
         FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
 
+        fclaw2d_block_t *blocks = glob->domain->blocks;
+
         number_of_gauges_set = 0;
-        block_offsets[0] = 0;
-        for (nb = 0; nb < glob->domain->num_blocks; ++nb)
+        bo = (int*) sc_array_index_int(gauge_info.block_offsets,0);
+        bo[0] = 0;
+        for (nb = 0; nb < num_blocks; nb++)
         {
-            /* Scale to [0,1]x[0,1], based on blockno */
-            fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
-            fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);
+            fclaw2d_block_t *block = &blocks[nb];
+            if (is_brick)
+            {
+                /* Scale local block coordinates to global 
+                [0,1]x[0,1] coordinates.
+
+                Example : 4 x 1 arrangement of blocks 
+                The point [0.5,0.5] in block 1  will map to
+                the point (0.125,0.5) in [0,1]x[0,1].  
+
+                We can't do this directly, because we don't know 
+                (easily) how the blocks are numbered in the 
+                brick grid */ 
+
+                fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
+                fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);                
+            }
+            else
+            {
+                /* eventually, we should set up the brick domain so that it 
+                   defaults to these values */
+                xll = x0;
+                yll = y0;
+                xur = x1;
+                yur = y1;
+            }
             for(i = 0; i < num_gauges; i++)
             {
-                /* Map gauge to global [0,1]x[0,1] space */
-                x = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
-                y = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
-                if (xll <= x && x <= xur && yll <= y && y <= yur)
+                /* Map gauge to global [0,1]x[0,1] space. This works for the brick
+                   but not clear what happens for the cubed sphere */
+                fclaw_gauge_normalize_coordinates(glob,block,nb,&gauges[i],&x,&y);
+
+                gauge_in_block = (xll <= x && x <= xur && yll <= y && y <= yur);
+                if (gauge_in_block)
                 {
-                    int ng = number_of_gauges_set;
-                    gauges[i].blockno = nb;
-                    coordinates[2*ng] = mi*(x - xll);
-                    coordinates[2*ng+1] = mj*(y - yll);
+                    ng = number_of_gauges_set;
+                    gauges[i].blockno = nb;     /* gauge[i] is in block nb */
+
+                    /* Store gauge coordinates in global brick domain.
+                       This assumes that coordinates are in a global brick
+                       domain in [0,mi]x[0,mj].  This may not work for the 
+                       cubed sphere case */
+
+                    c = (double*) sc_array_index_int(gauge_info.coordinates, ng);
+                    c[0] = mi*(x - xll);
+                    c[1] = mj*(y - yll);
+
+                    /* Store location of this gauge in a global list */
                     gauges[i].location_in_results = ng;
                     number_of_gauges_set++;
                 }
             }
-            block_offsets[nb+1] = number_of_gauges_set;
-        }
-    }
-    else
-    {
-        for(i = 0; i < num_gauges; i++)
-        {
-            gauges[i].blockno = 0;
-            gauges[i].location_in_results = i;
-        }
-
-        block_offsets[0] = 0;
-        block_offsets[1] = num_gauges;
-
-        for (i = 0; i < num_gauges; ++i)
-        {
-            coordinates[2*i] = (gauges[i].xc - fclaw_opt->ax)/(fclaw_opt->bx-fclaw_opt->ax);
-            coordinates[2*i+1] = (gauges[i].yc - fclaw_opt->ay)/(fclaw_opt->by-fclaw_opt->ay);
+            bo = (int*) sc_array_index_int(gauge_info.block_offsets, nb+1);
+            bo[0] = number_of_gauges_set;        
         }
     }
 }
@@ -406,6 +430,18 @@ void fclaw_create_gauge_files(fclaw2d_global_t* glob,
 
 }
 
+void fclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob, 
+                                      fclaw2d_block_t *block,
+                                      int blockno, 
+                                      fclaw_gauge_t *g,
+                                      double *xc, double *yc)
+{
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
+    FCLAW_ASSERT(gauge_vt->normalize_coordinates != NULL);
+    gauge_vt->normalize_coordinates(glob, block,blockno,g,xc,yc);    
+}
+
+
 void  fclaw_update_gauge(fclaw2d_global_t* glob, 
                          fclaw2d_block_t *block,
                          fclaw2d_patch_t *patch,
@@ -463,6 +499,13 @@ void fclaw_gauge_get_data(fclaw2d_global_t *glob,
     *t2 = g->t2;
 }
 
+int fclaw_gauge_get_id(fclaw2d_global_t *glob, 
+                          fclaw_gauge_t *g)
+{
+    return g->num;
+}
+
+
 void fclaw_gauge_get_buffer(fclaw2d_global_t *glob,
                             fclaw_gauge_t *g,
                             int *kmax, void*** gauge_buffer)
@@ -477,6 +520,19 @@ void fclaw_gauge_set_buffer_entry(fclaw2d_global_t *glob,
 {
     int k = g->next_buffer_location;
     g->buffer[k] = guser;
+}
+
+void fclaw_gauge_set_user_data(fclaw2d_global_t *glob,
+                               fclaw_gauge_t* g,
+                               void* user)
+{
+    g->user_data = user;
+}
+
+void* fclaw_gauge_get_user_data(fclaw2d_global_t *glob,
+                                  fclaw_gauge_t* g)
+{
+    return g->user_data;
 }
 
 

@@ -6,7 +6,8 @@ c     # interpolate_corner_ghost
 c     # interpolate_to_fine_patch
 c     #
 c     # Other routines :
-c     # compute_slopes (for limited function reconstruction)
+c     # fclaw2d_clawpatch_compute_slopes 
+c     # (for limited function reconstruction)
 c     # fixcapaq (to preserve conservation)
 c     #
 c     # Note that fixcapaq is only used when regridding;  ghost
@@ -37,13 +38,13 @@ c     # ----------------------------------------------------------
       integer j, jc1, jc2, jbc, jfine,j1
       integer ic_add, jc_add, ic, jc, mth
       double precision gradx, grady, qc, sl, sr, value
-      double precision compute_slopes
+      double precision fclaw2d_clawpatch_compute_slopes
 
 c     # This should be refratio*refratio.
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
-      logical is_valid_interp
+      logical fclaw2d_clawpatch_is_valid_interp
       logical skip_this_grid
 
       integer a(2,2), f(2)
@@ -59,7 +60,7 @@ c     # This should be refratio*refratio.
       endif
 
 
-      call build_transform(transform_ptr,a,f)
+      call fclaw2d_clawpatch_build_transform(transform_ptr,a,f)
 
 c     # This needs to be written for refratios .ne. 2.
       m = 0
@@ -94,11 +95,12 @@ c           # this ensures that we get 'hanging' corners
             do jc = 1,mx
                i1 = ic
                j1 = jc
-               call fclaw2d_transform_face_half(i1,j1,i2,j2,
+               call fclaw2d_clawpatch_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
                skip_this_grid = .false.
                do m = 0,r2-1
-                  if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
+                  if (.not. 
+     &        fclaw2d_clawpatch_is_valid_interp(i2(m),j2(m),mx,my,mbc))
      &                  then
                      skip_this_grid = .true.
                      exit
@@ -111,11 +113,11 @@ c                 # really computing slopes, but rather just differences.
 c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
                   sl = (qc - qcoarse(ic-1,jc,mq))
                   sr = (qcoarse(ic+1,jc,mq) - qc)
-                  gradx = compute_slopes(sl,sr,mth)
+                  gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
                   sl = (qc - qcoarse(ic,jc-1,mq))
                   sr = (qcoarse(ic,jc+1,mq) - qc)
-                  grady = compute_slopes(sl,sr,mth)
+                  grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
@@ -134,7 +136,7 @@ c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
             do ic = 1,mx
     1          i1 = ic
                j1 = jc
-               call fclaw2d_transform_face_half(i1,j1,i2,j2,
+               call fclaw2d_clawpatch_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
 c              # ---------------------------------------------
 c              # Two 'half-size' neighbors will be passed into
@@ -146,7 +148,8 @@ c              # grid.
 c              # ---------------------------------------------
                skip_this_grid = .false.
                do m = 0,r2-1
-                  if (.not. is_valid_interp(i2(m),j2(m),mx,my,mbc))
+                  if (.not. 
+     &       fclaw2d_clawpatch_is_valid_interp(i2(m),j2(m),mx,my,mbc))
      &                  then
                      skip_this_grid = .true.
                      exit
@@ -157,11 +160,11 @@ c              # ---------------------------------------------
 
                   sl = (qc - qcoarse(ic-1,jc,mq))
                   sr = (qcoarse(ic+1,jc,mq) - qc)
-                  gradx = compute_slopes(sl,sr,mth)
+                  gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
                   sl = (qc - qcoarse(ic,jc-1,mq))
                   sr = (qcoarse(ic,jc+1,mq) - qc)
-                  grady = compute_slopes(sl,sr,mth)
+                  grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
@@ -189,7 +192,7 @@ c              # ---------------------------------------------
 
       integer ic, jc, mq, ibc,jbc, mth,i,j
       double precision qc, sl, sr, gradx, grady
-      double precision compute_slopes, value
+      double precision fclaw2d_clawpatch_compute_slopes, value
 
 c     # This should be refratio*refratio.
       integer i1,j1,m, r2
@@ -200,7 +203,7 @@ c     # This should be refratio*refratio.
       integer a(2,2), f(2)
       integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
       double precision shiftx(0:rr2-1), shifty(0:rr2-1)
-      logical check_indices
+      logical fclaw2d_clawpatch_check_indices
 
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
@@ -209,7 +212,7 @@ c     # This should be refratio*refratio.
          stop
       endif
 
-      call build_transform(transform_ptr,a,f)
+      call fclaw2d_clawpatch_build_transform(transform_ptr,a,f)
 
       m = 0
       do jj = 0,1
@@ -250,7 +253,7 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
 c     # Interpolate coarse grid corners to fine grid corner ghost cells
       i1 = ic
       j1 = jc
-      call fclaw2d_transform_corner_half(i1,j1,i2,j2,
+      call fclaw2d_clawpatch_transform_corner_half(i1,j1,i2,j2,
      &      transform_ptr)
 
       do mq = 1,meqn
@@ -261,11 +264,11 @@ c        # really computing slopes, but rather just differences.
 c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
          sl = (qc - qcoarse(ic-1,jc,mq))
          sr = (qcoarse(ic+1,jc,mq) - qc)
-         gradx = compute_slopes(sl,sr,mth)
+         gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
          sl = (qc - qcoarse(ic,jc-1,mq))
          sr = (qcoarse(ic,jc+1,mq) - qc)
-         grady = compute_slopes(sl,sr,mth)
+         grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
          do m = 0,rr2-1
             iff = i2(0) + df(1,m)
@@ -297,7 +300,7 @@ c     # Conservative intepolation to fine grid patch
       integer ii, jj, i,j, i1, i2, j1, j2, ig, jg, mq, mth
       integer ic,jc,ic_add, jc_add
       double precision qc, shiftx, shifty, sl, sr, gradx, grady
-      double precision compute_slopes
+      double precision fclaw2d_clawpatch_compute_slopes
 
       integer p4est_refineFactor,refratio
 
@@ -320,8 +323,8 @@ c     # Get (ig,jg) for grid from linear (igrid) coordinates
       jc_add = jg*my/p4est_refineFactor
 
       do mq = 1,meqn
-         do i = i1,i2
-            do j = j1,j2
+         do j = j1,j2
+            do i = i1,i2
                ic = i + ic_add
                jc = j + jc_add
                qc = qcoarse(ic,jc,mq)
@@ -331,11 +334,11 @@ c              # really computing slopes, but rather just differences.
 c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
                sl = (qc - qcoarse(ic-1,jc,mq))
                sr = (qcoarse(ic+1,jc,mq) - qc)
-               gradx = compute_slopes(sl,sr,mth)
+               gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
                sl = (qc - qcoarse(ic,jc-1,mq))
                sr = (qcoarse(ic,jc+1,mq) - qc)
-               grady = compute_slopes(sl,sr,mth)
+               grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
 c              # Fill in refined values on coarse grid cell (ic,jc)
                do ii = 1,refratio
@@ -430,3 +433,5 @@ c     # -------------------------------------------------------
       enddo
 
       end
+
+

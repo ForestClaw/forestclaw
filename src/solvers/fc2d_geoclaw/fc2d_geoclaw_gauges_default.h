@@ -40,12 +40,19 @@ struct fclaw2d_patch;
 struct fclaw2d_block;
 
 void geoclaw_read_gauges_data_default(struct fclaw2d_global *glob, 
-                              struct fclaw_gauge **gauges, 
-                              int *num);
+                                      struct fclaw_gauge **gauges, 
+                                      int *num);
 
 void geoclaw_create_gauge_files_default(struct fclaw2d_global *glob, 
-                                struct fclaw_gauge *gauges, 
-                                int num_gauges);
+                                        struct fclaw_gauge *gauges, 
+                                        int num_gauges);
+
+void geoclaw_gauge_normalize_coordinates(struct fclaw2d_global *glob, 
+                                         struct fclaw2d_block *block,
+                                         int blockno, 
+                                         struct fclaw_gauge *g,
+                                         double *xc, double *yc);
+
 
 void geoclaw_gauge_update_default(struct fclaw2d_global* glob, 
                                   struct fclaw2d_block* block,

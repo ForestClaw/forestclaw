@@ -3,7 +3,7 @@
      &      imp,asdq,bmasdq,bpasdq)
       implicit none
 
-      integer ixy,maxm, meqn, mwaves, mbc, mx, imp, m
+      integer ixy,maxm, meqn, mwaves, mbc, mx, imp
       double precision     ql(1-mbc:maxm+mbc, meqn)
       double precision     qr(1-mbc:maxm+mbc, meqn)
       double precision   asdq(1-mbc:maxm+mbc, meqn)
@@ -13,14 +13,14 @@
       double precision   aux2(1-mbc:maxm+mbc, 2)
       double precision   aux3(1-mbc:maxm+mbc, 2)
 
-      integer kv, i, i1
+      integer kv, i, i1, mq
 
       kv = 3-ixy  !#  = 1 if ixy=2  or  = 2 if ixy=1
       do i = 2-mbc,mx+mbc
          i1 = i-2+imp    !#  =  i-1 for amdq,  i for apdq
-         do m = 1,meqn
-            bmasdq(i,m) = min(aux2(i1,kv), 0.d0) * asdq(i,m)
-            bpasdq(i,m) = max(aux3(i1,kv), 0.d0) * asdq(i,m)
+         do mq = 1,meqn
+            bmasdq(i,mq) = min(aux2(i1,kv), 0.d0) * asdq(i,mq)
+            bpasdq(i,mq) = max(aux3(i1,kv), 0.d0) * asdq(i,mq)
          enddo
       enddo
 

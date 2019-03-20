@@ -22,8 +22,8 @@ SUBROUTINE clawpack5_b4step2(mbc,mx,my,meqn,q, &
 
   vt = dcos(pi2*(time+dt/2.d0)/tperiod)
 
-  DO i=1-mbc,mx+mbc
-     DO  j=1-mbc,my+mbc
+  DO  j=1-mbc,my+mbc
+    DO i=1-mbc,mx+mbc
         !! # coordinates of lower left corner of grid cell:
         xll = xlower + (i-1)*dx
         yll = ylower + (j-1)*dy

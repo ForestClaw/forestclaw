@@ -112,6 +112,9 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     /* -------------------------------------- Gauges  --------------------------------- */
     /* Gauge options */
+    sc_options_add_bool (opt, 0, "output-gauges", &fclaw_opt->output_gauges, 0,
+                            "Print gauge output [F]");
+
     sc_options_add_int(opt, 0, "gauge-buffer-length",
                        &fclaw_opt->gauge_buffer_length, 1,
                        "Number of lines of gauge output to buffer before printing [1]");
@@ -225,6 +228,7 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_keyvalue_set_int (kv, "counters",  FCLAW_TIMER_PRIORITY_COUNTERS);
     sc_keyvalue_set_int (kv, "details",   FCLAW_TIMER_PRIORITY_DETAILS);
     sc_keyvalue_set_int (kv, "extra",     FCLAW_TIMER_PRIORITY_EXTRA);
+    sc_keyvalue_set_int (kv, "all",       FCLAW_TIMER_PRIORITY_EXTRA);
     sc_options_add_keyvalue (opt, 0, "report-timing-verbosity", 
                              &fclaw_opt->report_timing_verbosity,
                              "summary", kv, "Set verbosity for timing output [summary]");

@@ -53,9 +53,10 @@
 
 
       if (meqn .gt. 5) then
-         write(6,'(A,A,A)')
+         write(6,'(A,A,A,I5,A)')     
      &         'Warning (fclaw2d_fort_write_grid_header.f) ',
-     &         ': meqn > 5; change format statement 120.'
+     &         ': meqn > 5; change format statement 120.', 
+     &         '(meqn = ',meqn,')'
          stop
       endif
 

@@ -875,6 +875,7 @@ void fc2d_geoclaw_solver_initialize()
 
     gauges_vt->set_gauge_data     = geoclaw_read_gauges_data_default;
     gauges_vt->create_gauge_files = geoclaw_create_gauge_files_default; 
+    gauges_vt->normalize_coordinates = geoclaw_gauge_normalize_coordinates;
 
     gauges_vt->update_gauge       = geoclaw_gauge_update_default;
     gauges_vt->print_gauge_buffer = geoclaw_print_gauges_default;
