@@ -17,6 +17,26 @@ include applications/clawpack/clawpack.apps
 
 endif
 
+# --------------------------------------------
+# Multigrid solver
+# --------------------------------------------
+
+if FCLAW_ENABLE_MULTIGRID
+
+## Patches needed for multigrid solver
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+include src/solvers/fc2d_multigrid/Makefile.am
+
+
+## Multigrid test
+include applications/elliptic/mgtest/Makefile.am
+
+
+endif
+
+
 
 # ----------------------------------
 # Projects under development

@@ -42,6 +42,9 @@ FCLAW_ARG_ENABLE([development], [Enable general applications under development],
 FCLAW_ARG_ENABLE([swbli], [Enable swbli project],
                  [SWBLI])
 
+FCLAW_ARG_ENABLE([multigrid], [Enable multigrid solver],
+                 [MULTIGRID])
+
 echo "o---------------------------------------"
 echo "| Checking MPI and related programs"
 echo "o---------------------------------------"
