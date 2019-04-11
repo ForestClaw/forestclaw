@@ -144,6 +144,13 @@ double fclaw2d_patch_single_step_update(struct fclaw2d_global *glob,
                                         double t,
                                         double dt, void* user);
 
+void fclaw2d_patch_set_rhs(struct fclaw2d_global *glob,
+                           struct fclaw2d_patch *patch,
+                           int blockno,
+                           int patchno,
+                           void* user);
+
+
 /* -------------------------------- time stepping ------------------------------------- */
 
 void fclaw2d_patch_restore_step(struct fclaw2d_global* glob,
@@ -425,6 +432,14 @@ typedef double (*fclaw2d_patch_single_step_update_t)(struct fclaw2d_global *glob
                                                      double dt,
                                                      void* user);
 
+
+typedef void (*fclaw2d_patch_rhs_t)(struct fclaw2d_global *glob,
+                                    struct fclaw2d_patch *patch,
+                                    int blockno,
+                                    int patchno,
+                                    void* user);
+
+
 /* ----------------------------- Time stepping (typedefs) ----------------------------- */
 
 typedef void (*fclaw2d_patch_setup_timeinterp_t)(struct fclaw2d_global *glob,
@@ -642,6 +657,7 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_initialize_t            initialize;
     fclaw2d_patch_physical_bc_t           physical_bc;
     fclaw2d_patch_single_step_update_t    single_step_update;
+    fclaw2d_patch_rhs_t                   rhs;
 
     /* Time stepping */
     fclaw2d_patch_restore_step_t          restore_step;
