@@ -244,8 +244,10 @@ void fclaw2d_patch_initialize(fclaw2d_global_t *glob,
 							  int this_patch_idx)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-	FCLAW_ASSERT(patch_vt->initialize != NULL);
-	patch_vt->initialize(glob,this_patch,this_block_idx,this_patch_idx);
+    if (patch_vt->initialize != NULL)
+    {
+        patch_vt->initialize(glob,this_patch,this_block_idx,this_patch_idx);
+    }
 }
 
 
@@ -279,6 +281,20 @@ double fclaw2d_patch_single_step_update(fclaw2d_global_t *glob,
     double maxcfl = patch_vt->single_step_update(glob,this_patch,this_block_idx,
                                                    this_patch_idx,t,dt, user);
     return maxcfl;
+}
+
+
+void fclaw2d_patch_set_rhs(fclaw2d_global_t *glob,
+                           fclaw2d_patch_t *patch,
+                           int blockno,
+                           int patchno,
+                           void* user)
+{
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    
+    FCLAW_ASSERT(patch_vt->rhs != NULL);
+
+    patch_vt->rhs(glob,patch, blockno, patchno,user);
 }
 
 
