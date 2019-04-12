@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 
+#include <p4est_bits.h>
+#include <p4est_wrap.h>
 
 typedef struct mg_copy_info
 {
@@ -123,7 +125,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
     int copy_mode = 0;
     multigrid_copy_data(glob,qsoln,copy_mode);
 
-#if 0
+#if 1
     /* A start ... */
 
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
