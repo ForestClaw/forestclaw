@@ -125,7 +125,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
     int copy_mode = 0;
     multigrid_copy_data(glob,qsoln,copy_mode);
 
-#if 1
+#if 0
     /* A start ... */
 
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
