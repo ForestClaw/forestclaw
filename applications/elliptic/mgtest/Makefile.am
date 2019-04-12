@@ -8,7 +8,10 @@ applications_elliptic_mgtest_mgtest_SOURCES = \
 	applications/elliptic/mgtest/mgtest_user.h \
 	applications/elliptic/mgtest/mgtest_options.c \
 	applications/elliptic/mgtest/fortran/setprob.f90 \
-	applications/elliptic/mgtest/fortran/mgtest_fort_rhs.f90
+	applications/elliptic/mgtest/fortran/mgtest_fort_rhs.f90 \
+	applications/elliptic/mgtest/fortran/mgtest_tag4refinement.f90 \
+	applications/elliptic/mgtest/fortran/mgtest_tag4coarsening.f90
+
 
 EXTRA_DIST += \
 	applications/elliptic/mgtest/fclaw_options.ini

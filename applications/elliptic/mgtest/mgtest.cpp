@@ -27,6 +27,9 @@
 
 #include <fclaw2d_include_all.h>
 
+#include <fclaw2d_output.h>
+
+
 #include <fclaw2d_elliptic_solver.h>
 
 #include <fclaw2d_clawpatch_options.h>
@@ -34,6 +37,7 @@
 
 #include <fc2d_multigrid.h>
 #include <fc2d_multigrid_options.h>
+
 
 
 
@@ -84,6 +88,9 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_initialize(glob);
 
     fclaw2d_elliptic_solve(glob);
+
+    int Frame = 0;
+    fclaw2d_output_frame(glob,Frame);
 
     fclaw2d_finalize(glob);
 }

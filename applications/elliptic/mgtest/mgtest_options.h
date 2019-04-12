@@ -42,6 +42,7 @@ typedef struct mgtest_options
     /* Put any user options here */
     int rhs_choice;
 
+    double alpha;
     double x0;
     double y0; 
 

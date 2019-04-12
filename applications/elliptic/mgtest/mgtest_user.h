@@ -54,7 +54,7 @@ void MGTEST_FORT_RHS(const int* mbc, const int* mx, const int* my,
 
 #define MGTEST_SETPROB FCLAW_F77_FUNC(mgtest_setprob,MGTEST_SETPROB)
 
-void MGTEST_SETPROB(const int* rhs_choice, 
+void MGTEST_SETPROB(const int* rhs_choice, const double *alpha,
                     const double* x0, const double* y0,
                     const double* a,  const double* b);
 

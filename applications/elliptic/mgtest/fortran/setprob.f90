@@ -1,15 +1,15 @@
-subroutine mgtest_setprob(rhs_in, x0_in, y0_in, a_in, b_in)
+subroutine mgtest_setprob(rhs_in, alpha_in, x0_in, y0_in, a_in, b_in)
     implicit none
 
 
     INTEGER rhs_in
-    DOUBLE PRECISION x0_in, y0_in, a_in, b_in
+    DOUBLE PRECISION alpha_in, x0_in, y0_in, a_in, b_in
 
     INTEGER rhs_choice
     COMMON /common_rhs_int/ rhs_choice
 
-    DOUBLE PRECISION x0,y0,a,b
-    COMMON /common_rhs_double/ x0,y0,a,b
+    DOUBLE PRECISION alpha, x0,y0,a,b
+    COMMON /common_rhs_double/ alpha, x0,y0,a,b
 
     DOUBLE PRECISION pi,pi2
     COMMON /common_pi/ pi, pi2
@@ -19,6 +19,7 @@ subroutine mgtest_setprob(rhs_in, x0_in, y0_in, a_in, b_in)
 
     rhs_choice = rhs_in
 
+    alpha = alpha_in
     x0 = x0_in
     y0 = y0_in
 

@@ -29,17 +29,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_fort.h>
 
 #include <fc2d_multigrid.h>
 
 #include <fclaw2d_elliptic_solver.h>
 
+
 static
 void mgtest_rhs(fclaw2d_global_t *glob,
                 fclaw2d_patch_t *patch,
                 int blockno,
-                int patchno,
-                void* user);
+                int patchno);
     
 
 void mgtest_link_solvers(fclaw2d_global_t *glob)
@@ -50,10 +51,16 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     /* RHS function */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
     patch_vt->rhs = mgtest_rhs;
+    patch_vt->initialize = mgtest_rhs;   /* To get an initial refinement */
 
     /* Only needed if Fortran subroutine is useful and can be customized */
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
     mg_vt->fort_rhs = &MGTEST_FORT_RHS;
+
+    /* Clawpatch tagging routines */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
+    clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 
 
     /* Do something with user options? */
@@ -64,18 +71,17 @@ void mgtest_problem_setup(fclaw2d_global_t* glob)
 {
     const mgtest_options_t* user = mgtest_get_options(glob);
 
-    MGTEST_SETPROB(&user->rhs_choice, 
+    MGTEST_SETPROB(&user->rhs_choice, &user->alpha,
                    &user->x0, &user->y0, 
                    &user->a, &user->b);
-    }
+}
 
 
 static
 void mgtest_rhs(fclaw2d_global_t *glob,
                 fclaw2d_patch_t *patch,
                 int blockno,
-                int patchno,
-                void* user)
+                int patchno)
 {
     int mx,my,mbc,meqn;
     double dx,dy,xlower,ylower;
