@@ -73,6 +73,9 @@ public :
 
     fclaw2d_metric_patch_t *mp;
 
+    /* Extra storage needed by the solver(s) */
+    void* solver_data;
+
     /* User data*/ 
     void* user_data;
 };
