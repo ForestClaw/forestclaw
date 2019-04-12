@@ -56,7 +56,7 @@ void cb_multigrid_copy_data(fclaw2d_domain_t *domain,
 
     int mx,my,mbc,meqn;
 
-    int global_num, level;
+    int global_num, local_num, level;
     double *q; 
 
     fclaw2d_clawpatch_options_t *clawpatch_opt;
@@ -74,20 +74,27 @@ void cb_multigrid_copy_data(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_soln_data(g->glob,patch,&q,&meqn);
     FCLAW_ASSERT(meqn == 1);
 
+    /* For blockno = 0, we have 
+               patchno == local_num.
+       For blockno > 0, the patchno resets on each new block and we have
+               patchno + block->num_patches_before = local_num. 
+
+       Below, we want to use the local_num to index into local array 
+       storing all patches on this processor. */
     fclaw2d_patch_get_info(domain,patch, blockno, patchno,
-                           &global_num, &level);
+                           &global_num, &local_num, &level);
 
     size_t size = (mx+2*mbc)*(my+2*mbc);
 
     if (cpinfo->copy_mode == 0)
     {
         /* Copy to cpinfo->sdata; */
-        memcpy(&cpinfo->sdata[global_num*size],q,size);        
+        memcpy(&cpinfo->sdata[local_num*size],q,size);        
     }
     else
     {
         /* Copy from cpinfo->sdata; */
-        memcpy(q,&cpinfo->sdata[global_num*size],size);                
+        memcpy(q,&cpinfo->sdata[local_num*size],size);                
     }
 
 }
