@@ -816,13 +816,20 @@ fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
 void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
 							fclaw2d_patch_t * patch,
 							int blockno, int patchno,
-							int *global_num, int *level)
+							int *global_num, int *local_num, 
+                            int *level)
 
 {
 	fclaw2d_block_t *block = &domain->blocks[blockno];
 
-	*global_num = domain->global_num_patches_before +
-		(block->num_patches_before + patchno);
+    /* For blockno = 0, we have 
+               patchno == local_num.
+       For blockno > 0, the patchno resets on each new block and we have
+               patchno + block->num_patches_before = local_num.  */
+
+    *local_num = block->num_patches_before + patchno;
+
+	*global_num = domain->global_num_patches_before + *local_num;
 
 	*level = patch->level;
 
@@ -835,7 +842,9 @@ void fclaw2d_patch_get_info2(fclaw2d_domain_t * domain,
 							int *global_num, int *level)
 
 {
-	
+
+    /* I don't completely trust this that blockno and patchno are consistent
+       with p4est numbering. */
 	fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
 	*this_patch_idx = pdata->patch_idx;
 	*this_block_idx = pdata->block_idx;
