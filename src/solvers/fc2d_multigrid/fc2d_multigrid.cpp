@@ -26,22 +26,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_multigrid.h"
 #include "fc2d_multigrid_options.h"
 
-#include <fclaw2d_clawpatch.hpp>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch_diagnostics.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
-#include <fclaw2d_clawpatch_fort.h>
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_defs.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#if 0
+#include <fclaw2d_options.h>
+#include <fclaw2d_clawpatch_options.h>
+#endif
+
+
+#include <fclaw2d_domain.h>
+#include <p4est_bits.h>
+#include <p4est_wrap.h>
+
 
 
 static fc2d_multigrid_vtable_t s_multigrid_vt;
@@ -56,11 +60,10 @@ void multigrid_setup_solver(fclaw2d_global_t *glob)
 
 
 static
-void cb_multigrid_rhs(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *patch,
-                      int blockno,
-                      int patchno,
-                      void* user)
+void multigrid_rhs(fclaw2d_global_t *glob,
+                   fclaw2d_patch_t *patch,
+                   int blockno,
+                   int patchno)
 {
 	int mx,my,mbc, meqn;
 	double dx,dy,xlower,ylower;
@@ -84,58 +87,8 @@ void cb_multigrid_rhs(fclaw2d_global_t *glob,
 static
 void multigrid_solve(fclaw2d_global_t* glob)
 {
-	/* Solve the problem here! */
+	fc2d_multigrid_solve(glob);
 }
-
-#if 0
-static
-void multigrid_bc2(fclaw2d_global_t *glob,
-                   fclaw2d_patch_t *this_patch,
-                   int this_block_idx,
-                   int this_patch_idx,
-                   double t,
-                   double dt,
-                   int intersects_phys_bdry[],
-                   int time_interp)
-	{
-	fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
-
-	fc2d_multigrid_options_t *mg_options = fc2d_multigrid_get_options(glob);
-
-	//FCLAW_ASSERT(mg_vt->fort_bc2 != NULL);
-
-	int mx,my,mbc,meqn,maux,maxmx,maxmy;
-	double xlower,ylower,dx,dy;
-	double *aux,*q;
-
-	fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
-								&xlower,&ylower,&dx,&dy);
-
-	//fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-
-	int *block_mthbc = mg_options->mthbc;
-
-	/* Set a local copy of mthbc that can be used for a patch. */
-	int mthbc[4];
-	for(int i = 0; i < 4; i++)
-	{
-		if (intersects_phys_bdry[i])
-		{
-			mthbc[i] = block_mthbc[i];
-		}
-		else
-		{
-			mthbc[i] = -1;
-		}
-	}
-
-#if 0	
-	claw46_vt->fort_bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
-						&dx,&dy,q,&maux,aux,&t,&dt,mthbc);
-#endif	
-}
-
-#endif
 
 /* ---------------------------------- Output functions -------------------------------- */
 
@@ -174,7 +127,6 @@ void fc2d_multigrid_solver_initialize()
 
 
 	fc2d_multigrid_vtable_t*  mg_vt = multigrid_vt_init();	
-	// mg_vt->setup = multigrid_setup_solver;
 
     //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -185,7 +137,7 @@ void fc2d_multigrid_solver_initialize()
 
 	/* These could be over-written by user specific settings */
 	fclaw2d_patch_vtable_t*   patch_vt = fclaw2d_patch_vt();  
-	patch_vt->rhs            = cb_multigrid_rhs;  /* Calls FORTRAN routine */
+	patch_vt->rhs            = multigrid_rhs;  /* Calls FORTRAN routine */
 	patch_vt->setup          = NULL;
 
     
@@ -199,9 +151,6 @@ void fc2d_multigrid_solver_initialize()
 
 
 /* ----------------------------- User access to solver functions --------------------------- */
-
-
-/* These are here in case the user wants to call Clawpack routines directly */
 
 fc2d_multigrid_vtable_t* fc2d_multigrid_vt()
 {

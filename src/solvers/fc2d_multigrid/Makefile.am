@@ -7,7 +7,8 @@ libmultigrid_installed_headers = \
 
 libmultigrid_compiled_sources = \
 	src/solvers/fc2d_multigrid/fc2d_multigrid.cpp \
-	src/solvers/fc2d_multigrid/fc2d_multigrid_options.c
+	src/solvers/fc2d_multigrid/fc2d_multigrid_options.c \
+	src/solvers/fc2d_multigrid/fc2d_multigrid_solve.c
 
 
 ## Name of library to build

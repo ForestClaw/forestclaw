@@ -1228,11 +1228,34 @@ double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,
 	return cp->griderror.dataPtr();
 }
 
-void* flaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
-                                 fclaw2d_patch_t* this_patch)
+void* fclaw2d_clawpatch_get_user_data(fclaw2d_global_t* glob,
+                                 fclaw2d_patch_t* patch)
 {
-    fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
+    fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
     return cp->user_data;
+}
+
+void fclaw2d_clawpatch_set_user_data(fclaw2d_global_t* glob,
+                                    fclaw2d_patch_t* patch,
+                                    void *udata)
+{
+    fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+    cp->user_data = udata;
+}
+
+void* fclaw2d_clawpatch_get_solver_data(fclaw2d_global_t* glob,
+                                       fclaw2d_patch_t* patch)
+{
+    fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+    return cp->solver_data;
+}
+
+void fclaw2d_clawpatch_set_solver_data(fclaw2d_global_t* glob,
+                                       fclaw2d_patch_t* patch,
+                                       void *sdata)
+{
+    fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+    cp->solver_data = sdata;
 }
 
 size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob)

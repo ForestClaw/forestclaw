@@ -64,7 +64,7 @@ void cb_elliptic_rhs(fclaw2d_domain_t *domain,
     /* Check that the user has set the right hand side function */
     FCLAW_ASSERT(patch_vt->rhs != NULL);
 
-    patch_vt->rhs(g->glob,patch,blockno, patchno,user);    
+    patch_vt->rhs(g->glob,patch,blockno, patchno);    
 }
 
 static

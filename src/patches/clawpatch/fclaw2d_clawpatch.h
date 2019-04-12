@@ -172,9 +172,23 @@ double* fclaw2d_clawpatch_get_error(struct fclaw2d_global* glob,
 
 size_t fclaw2d_clawpatch_size(struct fclaw2d_global *glob);
 
-void* flaw2d_clawpatch_user_data(struct fclaw2d_global* glob,
-                                 struct fclaw2d_patch* this_patch);
 
+
+void* fclaw2d_clawpatch_get_user_data(struct fclaw2d_global* glob,
+                                      struct fclaw2d_patch* patch);
+
+
+void fclaw2d_clawpatch_set_user_data(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch* patch,
+                                     void* udata);
+
+void* fclaw2d_clawpatch_get_solver_data(struct fclaw2d_global* glob,
+                                        struct fclaw2d_patch* patch);
+
+
+void fclaw2d_clawpatch_set_solver_data(struct fclaw2d_global* glob,
+                                       struct fclaw2d_patch* patch,
+                                       void* sdata);
 
 
 /* These should be renamed to time_interp data */

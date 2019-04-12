@@ -287,14 +287,13 @@ double fclaw2d_patch_single_step_update(fclaw2d_global_t *glob,
 void fclaw2d_patch_set_rhs(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *patch,
                            int blockno,
-                           int patchno,
-                           void* user)
+                           int patchno)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     
     FCLAW_ASSERT(patch_vt->rhs != NULL);
 
-    patch_vt->rhs(glob,patch, blockno, patchno,user);
+    patch_vt->rhs(glob,patch, blockno, patchno);
 }
 
 
@@ -815,17 +814,17 @@ fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
 
 /* Use this one if you have the patch or block number */
 void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
-							fclaw2d_patch_t * this_patch,
-							int this_block_idx, int this_patch_idx,
+							fclaw2d_patch_t * patch,
+							int blockno, int patchno,
 							int *global_num, int *level)
 
 {
-	fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+	fclaw2d_block_t *block = &domain->blocks[blockno];
 
 	*global_num = domain->global_num_patches_before +
-		(this_block->num_patches_before + this_patch_idx);
+		(block->num_patches_before + patchno);
 
-	*level = this_patch->level;
+	*level = patch->level;
 
 }
 

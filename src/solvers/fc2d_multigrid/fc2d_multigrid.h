@@ -50,6 +50,11 @@ typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* mbc,
                                            const double* dx, const double* dy,
                                            double rhs[]);
 
+
+/* -------------------------- Solver and utilities ------------------------------------ */
+
+void fc2d_multigrid_solve(struct fclaw2d_global *glob);
+
 /* --------------------------------- Virtual table ------------------------------------ */
 
 struct fc2d_multigrid_vtable
@@ -75,17 +80,6 @@ void fc2d_multigrid_rhs(struct fclaw2d_global* glob,
                         struct fclaw2d_patch *patch,
                         int blockno,
                         int patchno);
-
-#if 0
-void fc2d_multigrid_bc2(struct fclaw2d_global *glob,
-						 struct fclaw2d_patch *patch,
-						 int blockno,
-						 int this_patch_idx,
-						 double t,
-						 double dt,
-						 int intersects_bc[],
-						 int time_interp);
-#endif
 
 #ifdef __cplusplus
 #if 0
