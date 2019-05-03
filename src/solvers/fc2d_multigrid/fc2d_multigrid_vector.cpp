@@ -17,10 +17,18 @@ fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn) {
     ns[1] = clawpatch_opt->my;
 
     mbc = clawpatch_opt->mbc;
+    mbc = clawpatch_opt->mbc;
 
+    // clawpack5
+    /*
     strides[0] = 1;
     strides[1] = ns[0] + 2 * mbc;
     eqn_stride = strides[1] * (ns[1] + 2 * mbc);
+    */
+    // clawpack4
+    eqn_stride = 1;
+    strides[0] = clawpatch_opt->meqn;
+    strides[1] = strides[0] * (ns[0] + 2 * mbc);
 
     num_local_patches = domain->local_num_patches;
     patch_data.resize(num_local_patches);
