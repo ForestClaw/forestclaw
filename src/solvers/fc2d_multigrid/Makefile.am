@@ -8,15 +8,16 @@ libmultigrid_installed_headers = \
 libmultigrid_compiled_sources = \
 	src/solvers/fc2d_multigrid/fc2d_multigrid.cpp \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_options.c \
-	src/solvers/fc2d_multigrid/fc2d_multigrid_solve.c
+	src/solvers/fc2d_multigrid/fc2d_multigrid_solve.cpp \
+	src/solvers/fc2d_multigrid/fc2d_multigrid_vector.cpp 
 
 
 ## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_multigrid/libmultigrid.la
 
 ## Named variables that can be referenced from other libraries/apps
-FCLAW_MULTIGRID_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_multigrid 
-FCLAW_MULTIGRID_LDADD    = @top_builddir@/src/solvers/fc2d_multigrid/libmultigrid.la
+FCLAW_MULTIGRID_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_multigrid -I/home/nvgba/cool/pressurePoissonSolver/src
+FCLAW_MULTIGRID_LDADD    = @top_builddir@/src/solvers/fc2d_multigrid/libmultigrid.la $(TE_LIBS) -lThunderegg -lpetsc
 
 ## Sources needed to build this library
 src_solvers_fc2d_multigrid_libmultigrid_la_SOURCES = \
