@@ -163,6 +163,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_H2H);
     FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_H2D);
     FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_D2H);
+    FCLAW2D_STATS_SET (stats, glob, ELLIPTIC_SOLVE);
     FCLAW2D_STATS_SET (stats, glob, EXTRA1);
     FCLAW2D_STATS_SET (stats, glob, EXTRA2);
     FCLAW2D_STATS_SET (stats, glob, EXTRA3);
@@ -181,6 +182,9 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     /* compute arithmetic mean of total advance steps per processor */
     sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_COUNTER],
                    glob->count_single_step,"ADVANCE_STEPS_COUNTER");
+
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_ELLIPTIC_GRIDS_COUNTER],
+                   glob->count_elliptic_grids,"ELLIPTIC_GRIDS_COUNTER");
 
     /* Compute the arithmetic mean of grids per processor */
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],gpp,"GRIDS_PER_PROC");

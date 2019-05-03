@@ -340,8 +340,6 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 		fclaw2d_time_sync(glob,minlevel,maxlevel);
 	}
 
-
-
 	delete_timestep_counters(&ts_counter);
 
 	/* Stop the timer */

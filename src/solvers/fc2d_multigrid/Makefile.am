@@ -16,8 +16,15 @@ libmultigrid_compiled_sources = \
 lib_LTLIBRARIES += src/solvers/fc2d_multigrid/libmultigrid.la
 
 ## Named variables that can be referenced from other libraries/apps
-FCLAW_MULTIGRID_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_multigrid -I/home/nvgba/cool/pressurePoissonSolver/src
-FCLAW_MULTIGRID_LDADD    = @top_builddir@/src/solvers/fc2d_multigrid/libmultigrid.la $(TE_LIBS) -lThunderegg -lpetsc
+FCLAW_MULTIGRID_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_multigrid \
+	                       -I/Users/calhoun/projects/GEM3d/code/install/include \
+	                       -I/Users/calhoun/software/PETSc/local/include \
+	                       -I/opt/local/include
+
+FCLAW_MULTIGRID_LDADD    = @top_builddir@/src/solvers/fc2d_multigrid/libmultigrid.la \
+	                       $(TE_LIBS) -lThunderegg \
+	                       -L/opt/local/lib -lfftw3 \
+	                       -L/Users/calhoun/software/PETSc/local/lib -lpetsc
 
 ## Sources needed to build this library
 src_solvers_fc2d_multigrid_libmultigrid_la_SOURCES = \

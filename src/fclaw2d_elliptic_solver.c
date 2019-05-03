@@ -105,6 +105,7 @@ void elliptic_solve(fclaw2d_global_t *glob)
 
 void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
 {
+    fclaw2d_domain_t* domain = glob->domain;
 
     /* Any solver related setup that should happen before each solve */
     elliptic_setup_solver(glob);
@@ -113,7 +114,12 @@ void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
     elliptic_rhs(glob);
 
     /* Pass p4est point to elliptic solver, solve and transfer solution back. */
+    glob->count_elliptic_grids +=  domain->local_num_patches;
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE]);    
+
     elliptic_solve(glob);
+    
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE]);    
 }
 
 /*---------------------------- Virtual table functions -------------------------------- */
