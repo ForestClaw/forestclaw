@@ -98,16 +98,16 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M);
 
-    printf("Iterations: %i\n", its);
-    printf("f-2norm: %f\n", f->twoNorm());
-    printf("f-infnorm: %f\n", f->infNorm());
-    printf("u-2norm: %f\n", u->twoNorm());
-    printf("u-infnorm: %f\n\n", u->infNorm());
+    fclaw_global_productionf("Iterations: %i\n", its);
+    fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
+    fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
+    fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());
+    fclaw_global_productionf("u-infnorm: %f\n\n", u->infNorm());
 
     // copy solution into rhs
     f->copy(u);
-    printf("Checking if copy function works:\n");
-    printf("fcopy-2norm: %f\n", f->twoNorm());
-    printf("fcopy-infnorm: %f\n\n", f->infNorm());
+    fclaw_global_productionf("Checking if copy function works:\n");
+    fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
+    fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
 }
 }
