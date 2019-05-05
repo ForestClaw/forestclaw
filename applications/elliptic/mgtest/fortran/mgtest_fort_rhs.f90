@@ -15,7 +15,7 @@ subroutine mgtest_fort_rhs(mbc,mx,my,xlower,ylower,dx,dy,q)
     COMMON /common_pi/ pi, pi2
 
     INTEGER i,j
-    DOUBLE PRECISION x,y,r,r2, r0, hsmooth
+    DOUBLE PRECISION x,y,r, r2, r0, hsmooth, hsmooth_deriv
 
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc
@@ -29,7 +29,14 @@ subroutine mgtest_fort_rhs(mbc,mx,my,xlower,ylower,dx,dy,q)
             elseif (rhs_choice .eq. 3) then
                 r0 = 0.25
                 r = sqrt((x-0.5)**2 + (y-0.5)**2)
-                q(i,j) = Hsmooth(r + r0) - Hsmooth(r - r0)
+!!                if (r .le. 0.25) then
+!!                    q(i,j) = 50.d0
+!!                else
+!!                    q(i,j) = 0
+!!                endif
+
+!!                q(i,j) = Hsmooth(r + r0) - Hsmooth(r - r0)
+                q(i,j) = hsmooth_deriv(r + r0) - hsmooth_deriv(r - r0)
             endif
         end do
     end do
@@ -40,11 +47,22 @@ end subroutine mgtest_fort_rhs
 double precision function Hsmooth(r)
     implicit none
 
-    double precision r
+    double precision r, a
 
-    Hsmooth = (tanh(r/0.02d0) + 1)/2.
+    a = 0.015625d0
+    Hsmooth = (tanh(r/a) + 1)/2.
 
 end function Hsmooth
+
+double precision function Hsmooth_deriv(r)
+    implicit none
+
+    double precision r, a
+
+    a = 0.015625d0
+    Hsmooth_deriv = (1/a)*(1./cosh(r/a))**2/2.
+
+end function Hsmooth_deriv
 
 
 

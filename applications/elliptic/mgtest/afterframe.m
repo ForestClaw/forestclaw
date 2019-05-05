@@ -12,24 +12,38 @@ setpatchborderprops('linewidth',1);
 
 view(2);
 
-rhs_choice = 3;
+rhs_choice = 0;
+circle = [];
 if rhs_choice == 3
     th = linspace(0,2*pi,500);
     r = 0.25;
     hold on;
-    plot(r*cos(th)+0.5,r*sin(th)+0.5,'k','linewidth',2);
+    circle = plot(r*cos(th)+0.5,r*sin(th)+0.5,'k','linewidth',2);
     hold off;
 end
 
+% cm = [0 0 0; 0 0 1; 0 1 0; 0 1 1; 1 0 0; 1 0 1; 1 1 0];
+% colormap(cm);
+
+colormap(parula);
+
 NoQuery = 0;
-prt = false;
+prt = true;
 if (prt)
-  filename = framename(Frame,'swirl0000','png');
-  print('-dpng',filename);
+    hidepatchborders;
+    if (ishandle(circle))
+        delete(circle);
+    end
+    mx = 8;
+    maxlevel = 7;
+    dpi = 2^7;    % fix at 128
+    
+    eff_res = mx*2^maxlevel;
+    figsize = (eff_res/dpi)*[1,1];
+    prefix = 'plot';
+    plot_tikz_fig(Frame,figsize,prefix,dpi)
 end
 
 shg
 
-clear afterframe;
-clear mapc2m;
-clear mapc2m_fivepatch;
+clear afterframe
