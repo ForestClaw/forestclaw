@@ -63,7 +63,6 @@ echo "o---------------------------------------"
 SC_CHECK_LIBRARIES([FCLAW])
 P4EST_CHECK_LIBRARIES([FCLAW])
 FCLAW_CHECK_LIBRARIES([FCLAW])
-PKG_CHECK_MODULES(TE,Thunderegg)
 
 echo "o---------------------------------------"
 echo "| Checking headers"
