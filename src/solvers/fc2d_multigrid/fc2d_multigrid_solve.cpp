@@ -89,8 +89,17 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
     shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh));
 
     // create gmg preconditioner
+    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    GMG::CycleOpts copts;
+    copts.max_levels = mg_opt->max_levels;
+    copts.patches_per_proc = mg_opt->patches_per_proc;
+    copts.pre_sweeps = mg_opt->pre_sweeps;
+    copts.post_sweeps = mg_opt->post_sweeps;
+    copts.mid_sweeps = mg_opt->mid_sweeps;
+    copts.coarse_sweeps = mg_opt->coarse_sweeps;
+    copts.cycle_type = mg_opt->cycle_type;
     shared_ptr<Operator<2>> M =
-        GMG::CycleFactory2d::getCycle("gmg.json", dcg, solver, op, interp);
+        GMG::CycleFactory2d::getCycle(copts, dcg, solver, op, interp);
 
     // solve
     shared_ptr<VectorGenerator<2>> vg(new DomainCollectionVG<2>(dc));

@@ -48,6 +48,27 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "vtk-out", &mg_opt->vtk_out, 0,
                            "Output VTK formatted data [F]");
 
+    sc_options_add_int (opt, 0, "max-levels", &mg_opt->max_levels, 0,
+                           "The max number of levels in GMG cycle. 0 means no limit. [0]");
+
+    sc_options_add_double (opt, 0, "patches-per-proc", &mg_opt->patches_per_proc, 0,
+                           "Lowest level is guaranteed to have at least this number of "
+                           "patches per processor. [0]");
+
+    sc_options_add_int (opt, 0, "pre-sweeps", &mg_opt->pre_sweeps, 1,
+                           "Number of sweeps on down cycle [1]");
+
+    sc_options_add_int (opt, 0, "post-sweeps", &mg_opt->post_sweeps, 1,
+                           "Number of sweeps on up cycle [1]");
+
+    sc_options_add_int (opt, 0, "mid-sweeps", &mg_opt->mid_sweeps, 1,
+                           "Number of sweeps inbetween up and down [1]");
+
+    sc_options_add_int (opt, 0, "coarse-sweeps", &mg_opt->coarse_sweeps, 1,
+                           "Number of sweeps on coarse level [1]");
+
+    sc_options_add_string (opt, 0, "cycle-type", &mg_opt->cycle_type, "V",
+                           "Cycle type [V]");
 
     mg_opt->is_registered = 1;
     return NULL;

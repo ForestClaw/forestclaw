@@ -53,6 +53,15 @@ struct fc2d_multigrid_options
     int vtk_out;
 
     int is_registered;
+
+    /* multigrid settings */
+    int max_levels;
+    double patches_per_proc;
+    int pre_sweeps;
+    int post_sweeps;
+    int mid_sweeps;
+    int coarse_sweeps;
+    const char *cycle_type;
 };
 
 fclaw_exit_type_t fc2d_multigrid_postprocess (fc2d_multigrid_options_t *
