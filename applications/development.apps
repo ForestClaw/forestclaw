@@ -14,6 +14,9 @@
 ## swirl_cons (square)
 #include applications/clawpack/advection/2d/swirl_cons/Makefile.am
 
+## swirl_basilisk (square)
+include applications/clawpack/advection/2d/swirl_basilisk/Makefile.am
+
 ## swirl_cons (square)
 #include applications/clawpack/advection/2d/swirl/Makefile.am
 
