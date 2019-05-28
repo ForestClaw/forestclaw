@@ -16,6 +16,7 @@ subroutine mgtest_fort_rhs(mbc,mx,my,xlower,ylower,dx,dy,q)
 
     INTEGER i,j
     DOUBLE PRECISION x,y,r, r2, r0, hsmooth, hsmooth_deriv
+    double precision rx, ry, rxx, ryy, qxx, qyy
 
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc
@@ -23,18 +24,22 @@ subroutine mgtest_fort_rhs(mbc,mx,my,xlower,ylower,dx,dy,q)
             y = ylower + (j-0.5)*dy
             if (rhs_choice .eq. 1) then
                 r2 = (x-x0)**2 + (y-y0)**2
-                q(i,j) = exp(-alpha*r2)
+                r = sqrt(r2)
+                rx = 2*(x-x0)
+                rxx = 2
+                ry = 2*(y-y0)
+                ryy = 2
+                qxx = exp(-alpha*r2)*(-2*alpha*(r*rxx + rx**2)  & 
+                        + 4*alpha**2*(r*rx)**2)
+                qyy = exp(-alpha*r2)*(-2*alpha*(r*ryy + ry**2)  & 
+                        + 4*alpha**2*(r*ry)**2)
+                q(i,j) = qxx + qyy
             elseif (rhs_choice .eq. 2) then
-                q(i,j) = sin(pi*a*x)*sin(pi*b*y)
+!!               # q(x,y) = sin(pi*a*x)*sin(pi*b*y) 
+                q(i,j) = -(pi**2*(a**2 + b**2))*sin(pi*a*x)*sin(pi*b*y)               
             elseif (rhs_choice .eq. 3) then
                 r0 = 0.25
                 r = sqrt((x-0.5)**2 + (y-0.5)**2)
-!!                if (r .le. 0.25) then
-!!                    q(i,j) = 50.d0
-!!                else
-!!                    q(i,j) = 0
-!!                endif
-
 !!                q(i,j) = Hsmooth(r + r0) - Hsmooth(r - r0)
                 q(i,j) = hsmooth_deriv(r + r0) - hsmooth_deriv(r - r0)
             endif
@@ -63,7 +68,5 @@ double precision function Hsmooth_deriv(r)
     Hsmooth_deriv = (1/a)*(1./cosh(r/a))**2/2.
 
 end function Hsmooth_deriv
-
-
 
 
