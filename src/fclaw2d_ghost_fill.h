@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_GHOST_FILL_H
 #define FCLAW2D_GHOST_FILL_H
 
-#include <fclaw_timer.h>
+#include <fclaw_timer.h>    /* Needed for definition of timer names */
 
 #ifdef __cplusplus
 extern "C"
