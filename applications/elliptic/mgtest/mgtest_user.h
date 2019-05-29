@@ -59,6 +59,14 @@ void MGTEST_SETPROB(const int* rhs_choice, const double *alpha,
                     const double* a,  const double* b);
 
 
+#define MGTEST_COMPUTE_ERROR FCLAW_F77_FUNC(mgtest_compute_error,MGTEST_COMPUTE_ERROR)
+
+void MGTEST_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                           double *dx, double *dy, double *xlower,
+                           double *ylower, double *t, double q[],
+                           double error[]);
+
+
 #ifdef __cplusplus
 #if 0
 {

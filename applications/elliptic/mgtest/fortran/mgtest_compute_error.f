@@ -25,7 +25,7 @@ c           # Map each block (in [0,1]x[0,1]) to single domain in
 c           # [0,1]x[0,1]
             call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
-            error(i,j,1) = q(i,j,1) - qexact(xc1,yc1)
+            error(i,j,1) = q(i,j,1) - mgtest_qexact(xc1,yc1)
          enddo
       enddo
 

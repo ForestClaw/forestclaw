@@ -28,7 +28,7 @@
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_output.h>
-
+#include <fclaw2d_diagnostics.h>
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -37,8 +37,6 @@
 
 #include <fc2d_multigrid.h>
 #include <fc2d_multigrid_options.h>
-
-
 
 
 static
@@ -96,13 +94,28 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
+
+    /* Set up grid and RHS */
     fclaw2d_initialize(glob);
 
+    /* Compute sum of RHS; reset error accumulators */
+    int init_flag = 1;  
+    fclaw2d_diagnostics_gather(glob,init_flag);
+    init_flag = 0;
+
+    /* Solve the elliptic problem */
     fclaw2d_elliptic_solve(glob);
 
+    /* Compute error, compute conservation */
+    fclaw2d_diagnostics_gather(glob, init_flag);                
+
+    /* Output solution */
     int Frame = 0;
     fclaw2d_output_frame(glob,Frame);
 
+    /* ---------------------------------------------------------------
+       Finalize
+       --------------------------------------------------------------- */
     fclaw2d_finalize(glob);
 }
 

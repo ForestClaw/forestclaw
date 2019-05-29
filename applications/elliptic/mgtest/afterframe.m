@@ -1,6 +1,6 @@
-ax = 0;
+ax = -1;
 bx = 1;
-ay = 0;
+ay = -1;
 by = 1;
 s = 1e-2;
 axis([ax-s bx+s ay-s by+s])
@@ -28,7 +28,7 @@ end
 colormap(parula);
 
 NoQuery = 0;
-prt = true;
+prt = false;
 if (prt)
     hidepatchborders;
     if (ishandle(circle))

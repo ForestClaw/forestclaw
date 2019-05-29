@@ -9,6 +9,8 @@ applications_elliptic_mgtest_mgtest_SOURCES = \
 	applications/elliptic/mgtest/mgtest_options.c \
 	applications/elliptic/mgtest/fortran/setprob.f90 \
 	applications/elliptic/mgtest/fortran/mgtest_fort_rhs.f90 \
+	applications/elliptic/mgtest/fortran/mgtest_compute_error.f90 \
+	applications/elliptic/mgtest/fortran/mgtest_qexact.f90 \
 	applications/elliptic/mgtest/fortran/mgtest_tag4refinement.f90 \
 	applications/elliptic/mgtest/fortran/mgtest_tag4coarsening.f90
 

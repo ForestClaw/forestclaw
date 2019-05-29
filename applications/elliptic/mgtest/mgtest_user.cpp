@@ -47,6 +47,7 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
     fclaw_vt->problem_setup = &mgtest_problem_setup;  
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
     /* RHS function */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
@@ -57,8 +58,11 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
     mg_vt->fort_rhs = &MGTEST_FORT_RHS;
 
+    /* Compute the error */
+    clawpatch_vt->fort_compute_patch_error = &MGTEST_COMPUTE_ERROR;
+
+
     /* Clawpatch tagging routines */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 
