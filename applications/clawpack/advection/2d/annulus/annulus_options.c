@@ -42,8 +42,20 @@ annulus_register(user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "refine-pattern", &user->refine_pattern, 0,
                         "[user] 0 = constant theta; 1 = constant_r [0]");
 
-    sc_options_add_int (opt, 0, "initial-condition", &user->initial_condition, 0,
-                        "[user] Initial condition 0=non-smooth; 1=smooth; 2=constant [1]");
+    sc_options_add_int (opt, 0, "initchoice", &user->initchoice, 0,
+                        "[user] Initchoice 0=non-smooth; 1=smooth; 2=constant [1]");
+
+    sc_options_add_double (opt, 0, "revs-per-s", &user->revs_per_s, 0.5,
+                           "[user] Revolutions per second [0.5]");
+
+    sc_options_add_double (opt, 0, "twist", &user->twist, 0.2,
+                           "[user] Twist in annulus mapping [0.2]");
+
+    sc_options_add_double (opt, 0, "vertical_speed", &user->vertical_speed, 0.,
+                           "[user] Vertical speed [0]");
+
+    sc_options_add_double (opt, 0, "init_radius", &user->init_radius, 0.125,
+                           "[user] Initial radius used in initial conditions [0.125]");
 
     sc_options_add_bool (opt, 0, "color-equation", &user->color_equation, 0,
                         "[user]  Solve color-equation using edge velocities [1]");
@@ -54,11 +66,10 @@ annulus_register(user_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "beta", &user->beta, 0.0,
                            "[user] Inner radius of annulus [0.4]");
 
-    sc_options_add_double (opt, 0, "revs-per-s", &user->revs_per_s, 0.5,
-                           "[user] Revolutions per second [0.5]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
-                        "[user] Clawpack version (4 or 5) [5]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
+                        "[user] Clawpack version (4 or 5) [4]");
 
     user->is_registered = 1;
     return NULL;

@@ -43,14 +43,16 @@ typedef struct user_options
 {
     int example;
     int mapping; 
-    int initial_condition;  /* Smooth or non-smooth */
+    int initchoice;  /* Smooth or non-smooth */
+    double revs_per_s;
+    double twist;
+    double vertical_speed;
+    double init_radius;
     int color_equation;
     int use_stream;
-
+    double beta;    /* Ratio of inner radius to outer radius */
     int refine_pattern;
 
-    double beta;            /* Ratio of inner radius to outer radius */
-    double revs_per_s;
     int claw_version;
 
     int is_registered;
@@ -92,6 +94,7 @@ fclaw2d_map_context_t *
                              const double shift[],
                              const double rotate[],
                              const double beta,
+                             const double twist,
                              const int mapping);
 
 

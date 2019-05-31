@@ -11,29 +11,29 @@
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
-
       integer example
       common /example_comm/ example
-
-      double precision beta
-      common /annulus_comm/ beta
-
-      integer use_stream
-      common /velocity_comm/ use_stream
 
       integer mapping
       common /mapping_comm/ mapping
 
-      integer refine_pattern
-      common /refine_comm/ refine_pattern
-
       integer initchoice
       common /initchoice_comm/ initchoice
 
+      double precision revs_per_s
+      common /stream_comm/ revs_per_s
+
       integer color_equation
-      common /eqn_comm/ color_equation
+      common /eqn_comm/ color_equation      
+
+      integer use_stream
+      common /velocity_comm/ use_stream
+
+      double precision beta
+      common /annulus_comm/ beta
+
+      integer refine_pattern
+      common /refine_comm/ refine_pattern
 
       pi = 4.d0*atan(1.d0)
       pi2 = 2*pi
