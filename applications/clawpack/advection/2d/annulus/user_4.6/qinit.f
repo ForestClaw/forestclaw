@@ -44,3 +44,45 @@
 
       return
       end
+
+c     # ---------------------------------------------------------------      
+      double precision function q0_physical(xp,yp,zp)
+      implicit none
+
+      double precision xp, yp, zp
+
+      double precision r,r0, x0, y0, z0, q0, ravg
+      double precision Hsmooth
+
+      double precision beta
+      common /annulus_comm/ beta
+
+      double precision init_radius
+      common /initradius_comm/ init_radius
+
+c     # Sphere centered at (x0,0,0) on annulus
+c     # Outer radius  = 1; inner radius = beta
+c     # average inner and outer radii to center sphere
+      r0 = init_radius
+      ravg = (1 + beta)/2.d0
+      x0 = -ravg
+      y0 = 0
+
+      r = sqrt((xp - x0)**2 + (yp - y0)**2)
+      q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
+
+      q0_physical = q0
+
+      end
+
+c     # ---------------------------------------------------------------      
+      double precision function Hsmooth(r)
+      implicit none
+
+      double precision r
+
+      Hsmooth = (tanh(r/0.02d0) + 1)/2.d0
+
+      end
+
+
