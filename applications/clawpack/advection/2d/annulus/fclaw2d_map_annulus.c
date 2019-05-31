@@ -99,12 +99,13 @@ fclaw2d_map_context_t *
                              const double scale[],
                              const double shift[],
                              const double rotate[],
-                             const double beta, 
+                             const double beta, const double twist,
                              const int mapping)
 {
     int i;
     double l0[4] = {1.,  0.,  0.,  1.};
-    double l1[4] = {1.,  -0.2,  0.,  1.};
+    double l1[4] = {1.,  0,  0.,  1.};
+    l1[1] = twist;
 
     fclaw2d_map_context_t *cont;
 
