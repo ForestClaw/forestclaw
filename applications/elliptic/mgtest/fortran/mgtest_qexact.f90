@@ -15,6 +15,7 @@ double precision function mgtest_qexact(x,y)
     INTEGER i,j
     DOUBLE PRECISION q, r, r2, r0, hsmooth, hsmooth_deriv
 
+
     if (rhs_choice .eq. 1) then
         r2 = (x-x0)**2 + (y-y0)**2
         q = exp(-alpha/2.d0*r2)

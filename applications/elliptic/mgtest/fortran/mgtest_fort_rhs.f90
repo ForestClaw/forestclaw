@@ -22,7 +22,7 @@ subroutine mgtest_fort_rhs(mbc,mx,my,xlower,ylower,dx,dy,q)
             x = xlower + (i-0.5)*dx
             y = ylower + (j-0.5)*dy
             if (rhs_choice .eq. 1) then
-                r2 = (x-x0)**2 + (y-y0)**2
+                r2 = (x-x0)**2 + (y-y0)**2                
                 q(i,j) = exp(-alpha/2.d0*r2)*(alpha**2*r2 - 2*alpha)
             elseif (rhs_choice .eq. 2) then
 !!               # q(x,y) = sin(pi*a*x)*sin(pi*b*y) 
