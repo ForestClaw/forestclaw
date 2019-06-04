@@ -1,33 +1,65 @@
+global square;
+
 setviews;
+
+if (PlotType == 4)
+    axis([0,sqrt(2),-2,2]);
+    set(gca,'box','on');
+    ca = 1.1*[-max([qmin,qmax]),max([qmin,qmax])];
+    % ylim(ca);    
+    fprintf('qmin = %24.16e\n',qmin);
+    fprintf('qmax = %24.16e\n',qmax);
+    shg
+    return
+end
+
 
 alpha = 0.4;
 s = 1e-2;    
-alim = [-1-alpha,1+alpha];
+alim = [-1,1];
 axis([alim alim]);
 daspect([1 1 1]);
 view(vtop)
 
-yrbcolormap;
+% yrbcolormap;
 
 showpatchborders(1:10);
 setpatchborderprops('linewidth',1)
-caxis([0,1])
 
 fprintf('qmin = %24.16e\n',qmin);
 fprintf('qmax = %24.16e\n',qmax);
 
 if (mq == 3)
     % Plot the error
-    ca = [-max([qmin,qmax]),max([qmin,qmax])];
-else    
-    % Plot the solution
-    yrbcolormap;
-    ca = [0,1];
+    cmax = max(abs([qmin,qmax]));
+    ca = [-cmax,cmax];
 end
 
-% caxis(ca);
-caxis([-1,1]*1e-8)
+colormap(parula);
+cmax = max(abs([qmin,qmax]));
+ca = [-cmax,cmax];
+caxis(ca);
+% caxis([-1,1])
+% colorbar
+caxis([-1,1]*1e-12);
 
+showgridlines;
+showpatchborders;
+
+if square
+    axis([0,1,0,1]);
+end
+
+% hidegridlines
+% hidepatchborders
+
+% figure(2)
+% plot(ycenter,q(1,:),'.-','markersize',20);
+% ylim([-1,2]);
+% shg
+% input('Hit enter to continue : ');
+
+figure(1)
 
 
 %

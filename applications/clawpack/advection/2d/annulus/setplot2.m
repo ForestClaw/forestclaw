@@ -31,5 +31,11 @@ ContourValues = [];
 
 %---------------------------------
 
+% For usermap1d (Plottype4)
+x0 = 0;
+y0 = 0;
+
+ScatterStyle = {'.'};
+
 ShowUnderOverShoots = 0;
 PlotParallelPartitions=0;
