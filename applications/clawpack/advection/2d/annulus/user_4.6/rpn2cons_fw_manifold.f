@@ -26,7 +26,7 @@
 c        # left-right : 2,3
 c        # top-bottom : 4,5         
          urrot = g*auxl(i,  2 + 2*idir)   !! Left edge of right cell
-         ulrot = g*auxl(i-1,3 + 2*idir)   !! Right edge of left cell
+         ulrot = g*auxr(i-1,3 + 2*idir)   !! Right edge of left cell
 
          qrr = ql(i,1)
          qll = qr(i-1,1)

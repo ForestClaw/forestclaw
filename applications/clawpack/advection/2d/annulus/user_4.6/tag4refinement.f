@@ -29,6 +29,8 @@
       double precision qmin, qmax, xc, yc, xc1, yc1, zc1
       double precision r, rrefine, x,y, rw, ravg, th
       logical constant_theta, constant_r
+
+      double precision t1, t2
       
 
       tag_patch = 0
@@ -53,7 +55,9 @@ c     # Refine based only on first variable in system.
             r = beta + (1-beta)*yc1
             th = pi2*xc1
 c           # constant_theta = cos(th) .lt. 0 .and. abs(sin(th)) .lt. 0.5
-            constant_theta = pi .le. th .and. th .le. 1.25*pi
+            t1 = pi-pi/8.0
+            t2 = pi+pi/8.0
+            constant_theta = t1 .le. th .and. th .le. t2
             constant_r = r > ravg                
             if (refine_pattern .eq. 0 .and. constant_theta) then 
                 tag_patch = 1

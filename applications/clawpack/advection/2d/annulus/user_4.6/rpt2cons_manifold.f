@@ -16,47 +16,27 @@
       double precision   aux3(1-mbc:maxm+mbc, *)
 
 
-      integer i, i1, k, idir
-      double precision vrrot, vlrot, g, vhat
-
-c     # ixy = 1 --> idir = 1
-c     # ixy = 2 --> idir = 0
-      idir = 2-ixy
+      integer i, i1, k, idir, iface, m
+      double precision gp, gm, vp, vm
 
       do i = 2-mbc, mx+mbc
           i1 = i-2+imp    !#  =  i-1 for amdq,  i for apdq
+          if (ixy .eq. 1) then
+             gm = aux2(i1,7)      !! Bottom edge length
+             gp = aux3(i1,7)      !! Top edge length
+             vm = gm*aux2(i1,4)   !! cell-velocity projected to bottom edge
+             vp = gp*aux2(i1,5)   !! cell-velocity projected to top edge
+          else
+             gm = aux2(i1,6)      !! Left edge length
+             gp = aux3(i1,6)      !! Right edge length
+             vm = gm*aux2(i1,2)   !! cell-velocity projected to left edge
+             vp = gp*aux2(i1,3)   !! cell-velocity projected to right edge
+          endif
 
-c         # -----------------------------------------
-c         # Lower faces - cell centered velocities
-c         # -----------------------------------------
-           
-c         # 6-7    Edge lengths (x-face, y-face)
-          g = aux2(i1,6+idir)
-
-c         # left-right : 2,3
-c         # top-bottom : 4,5         
-          vrrot = g*aux2(i,  2 + 2*idir)   !! Left edge of right cell
-          vlrot = g*aux2(i-1,3 + 2*idir)   !! Right edge of left cell
-
-          vhat = (vrrot + vlrot)/2.0
-
-          bmasdq(i,1) = min(vhat,0.d0)*asdq(i,1)
-
-c         # -----------------------------------------
-c         # Upper faces - cell centered velocities
-c         # -----------------------------------------
-
-          g = aux3(i1,6+idir)
-
-c         # left-right : 2,3
-c         # top-bottom : 4,5         
-          vrrot = g*aux3(i,  2 + 2*idir)   !! Left edge of right cell
-          vlrot = g*aux3(i-1,3 + 2*idir)   !! Right edge of left cell
-
-          vhat = (vrrot + vlrot)/2.0
-
-          bpasdq(i,1) = max(vhat,0.d0)*asdq(i,1)
-
+          do m = 1,meqn
+              bmasdq(i,m) = min(vm,0.d0)*asdq(i,m)
+              bpasdq(i,m) = max(vp,0.d0)*asdq(i,m)
+          end do
       enddo
 
 

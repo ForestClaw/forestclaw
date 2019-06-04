@@ -66,6 +66,10 @@ void annulus_problem_setup(fclaw2d_global_t *glob);
 
 #define SETPROB_ANNULUS FCLAW_F77_FUNC(setprob_annulus, \
                                        SETPROB_ANNULUS)
+
+void SETPROB_ANNULUS(void); 
+
+#if 0
 void SETPROB_ANNULUS(const int* example, 
                      const int* mapping, 
                      const int* initial_condition,
@@ -74,6 +78,7 @@ void SETPROB_ANNULUS(const int* example,
                      const int *use_stream_in,
                      const double* beta,
                      const int* refine_pattern);
+#endif                     
 
 
 void annulus_patch_setup(fclaw2d_global_t *glob,
@@ -129,6 +134,7 @@ void ANNULUS46_SETAUX(const int* mbc, const int* mx, const int* my,
                     double xd[], double yd[], double zd[],
                     double edgelengths[], 
                     double xnormals[], double ynormals[], 
+                    double xtangents[], double ytangents[], 
                     double surfnormals[]);
 
 
@@ -212,6 +218,13 @@ void RPN2_CONS_UPDATE_ZERO(const int* meqn, const int* maux, const int* idir,
                            double flux[]);
 
 
+#define ANNULUS46_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(annulus46_rpt2adv_manifold, \
+                                                   ANNULUS46_RPT2ADV_MANIFOLD)
+void ANNULUS46_RPT2ADV_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
+                                 const int* mwaves,
+                                 const int* mbc, const int* mx, double ql[], double qr[],
+                                 double aux1[], double aux2[], double aux3[], const int* imp,
+                                 double dsdq[], double bmasdq[], double bpasdq[]);
 
 
 #ifdef __cplusplus

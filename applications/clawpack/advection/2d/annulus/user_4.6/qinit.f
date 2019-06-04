@@ -15,10 +15,15 @@
 
       integer*8 cont, get_context
 
-      double precision q0_physical
-
       integer initchoice
       common /initchoice_comm/ initchoice
+
+      double precision beta
+      common /annulus_comm/ beta
+
+      double precision q0_physical, ravg, r
+      integer j1, j2
+
 
       cont = get_context()
 
@@ -36,8 +41,26 @@
                yc = ylower + (j-0.5)*dy
                call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)                  
                q(i,j,1) = q0_physical(xp,yp,zp)
+            elseif (initchoice .eq. 2) then
+               xc = xlower + (i-0.5)*dx
+               yc = ylower + (j-0.5)*dy
+               call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)                  
+               r = sqrt(xp**2 + yp**2)
+               ravg = (1 + beta)/2.d0
+               j1 = mx/4+1
+               j2 = 3*mx/4
+c               if (r > ravg) then
+               if (j .ge. j1 .and. j .le. j2) then
+                  q(i,j,1) = 1.d0
+               else
+                  q(i,j,1) = 0.d0
+               endif
+
             else
-               q(i,j,1) = 1.d0
+                  q(i,j,1) = 1.d0
+
+c               write(6,*) 'qinit.f : init choice should be 0,1,2'
+c               stop
             endif
          enddo
       enddo

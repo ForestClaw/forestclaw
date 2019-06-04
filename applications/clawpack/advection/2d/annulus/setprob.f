@@ -1,12 +1,8 @@
-      subroutine setprob_annulus(example_in,mapping_in, ic_in, 
-     &     revs_per_s_in, ceqn_in, use_stream_in, beta_in,
-     &     refine_pattern_in)
+      subroutine setprob_annulus()
       implicit none
 
-
-      integer example_in, mapping_in, ic_in, ceqn_in      
-      integer use_stream_in, refine_pattern_in
-      double precision beta_in, revs_per_s_in
+      integer iunit
+      character(len=25) fname      
 
       double precision pi, pi2
       common /compi/ pi, pi2
@@ -17,15 +13,23 @@
       integer mapping
       common /mapping_comm/ mapping
 
+      double precision twist
+      common /twist_comm/ twist
+
       integer initchoice
       common /initchoice_comm/ initchoice
 
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
+      double precision init_radius
+      common /initradius_comm/ init_radius
 
+      double precision revs_per_s, vertical_speed
+      common /stream_comm/ revs_per_s, vertical_speed
+
+c     # Must use edge velocities
       integer color_equation
-      common /eqn_comm/ color_equation      
+      common /eqn_comm/ color_equation
 
+c     # used only for edge velocities
       integer use_stream
       common /velocity_comm/ use_stream
 
@@ -38,17 +42,29 @@
       pi = 4.d0*atan(1.d0)
       pi2 = 2*pi
 
-      example = example_in
-      mapping = mapping_in
-      refine_pattern = refine_pattern_in
+      iunit = 10
+      fname = 'setprob.data'      
+      open(iunit,file=fname)
 
-      beta = beta_in
+      read(iunit,*) example
+      read(iunit,*) mapping
+      read(iunit,*) initchoice
+      read(iunit,*) revs_per_s
+      read(iunit,*) twist
+      read(iunit,*) vertical_speed
+      read(iunit,*) color_equation
+      read(iunit,*) use_stream
+      read(iunit,*) beta
+      read(iunit,*) refine_pattern
+      read(iunit,*) init_radius    !! radius
+      close(iunit)
 
-      initchoice = ic_in
-
-      revs_per_s = revs_per_s_in
-
-      color_equation = ceqn_in
-      use_stream = use_stream_in
+      open(iunit,file='twist.dat')
+      if (mapping == 0) then
+            write(iunit,*) 0.0
+      else
+            write(iunit,*) twist
+      endif
+      close(iunit)
 
       end

@@ -1,7 +1,7 @@
       subroutine annulus46_setaux(mbc,mx,my,
      &      xlower,ylower,dx,dy,maux,aux,blockno,
      &      area, xd,yd,zd, edgelengths,xnormals,ynormals,
-     &      surfnormals)
+     &      xtangents, ytangents, surfnormals)
       implicit none
 
       integer mbc, mx,my, meqn, maux
@@ -47,7 +47,8 @@ c         # Edge velocities using a streamfunction : entries (2-3)
 c         # Center velocities : entries (2-5)      
           call annulus46_set_center_velocities(mx,my,mbc,dx,dy,
      &          blockno,xlower,ylower,
-     &          edgelengths,xnormals,ynormals,surfnormals,
+     &          edgelengths,xnormals,ynormals,
+     &          xtangents, ytangents, surfnormals,
      &          aux, maux)
 
 c         # Needed to scale speeds in Riemann solver when using
@@ -112,7 +113,8 @@ c               # x-face and y-face edge lengths (6,7)
 
       subroutine annulus46_set_center_velocities(mx,my,mbc,
      &          dx,dy,blockno,xlower,ylower,
-     &          edgelengths,xnormals,ynormals,surfnormals,
+     &          edgelengths,xnormals,ynormals,
+     &          xtangents, ytangents, surfnormals,
      &          aux, maux)
       implicit none
 
@@ -124,11 +126,13 @@ c               # x-face and y-face edge lengths (6,7)
       double precision nv(3), vel(3), vdotn, annulus_dot
 
       double precision nl(3), nr(3), nb(3), nt(3)
+      double precision tl(3), tr(3), tb(3), tt(3)
       double precision urrot, ulrot, ubrot, utrot
 
       integer*8 cont, get_context
 
       integer i,j, k
+      double precision wl(3), wb(3)
 
       integer mapping
       common /mapping_comm/ mapping
@@ -169,10 +173,20 @@ c           # Subtract out component in the normal direction
                 nt(k)  = ynormals(i,  j+1,k)
             enddo
 
+            do k = 1,3
+                tl(k)  = xtangents(i,  j,  k)
+                tr(k)  = xtangents(i+1,j,  k)
+                tb(k)  = ytangents(i,  j,  k)
+                tt(k)  = ytangents(i,  j+1,k)
+            enddo
+
             ulrot = nl(1)*vel(1) + nl(2)*vel(2) + nl(3)*vel(3)
             urrot = nr(1)*vel(1) + nr(2)*vel(2) + nr(3)*vel(3)
             ubrot = nb(1)*vel(1) + nb(2)*vel(2) + nb(3)*vel(3)
             utrot = nt(1)*vel(1) + nt(2)*vel(2) + nt(3)*vel(3)
+
+c            write(6,100) nb(1), nb(2), ubrot
+100         format(3F16.8)            
 
             aux(i,j,2) = ulrot
             aux(i,j,3) = urrot
@@ -180,8 +194,21 @@ c           # Subtract out component in the normal direction
             aux(i,j,5) = utrot
          enddo
       enddo
+c      stop
 
       end
+
+      subroutine setaux_cross(u,v,w)
+      implicit none
+
+      double precision u(3), v(3), w(3)
+
+      w(1) =  u(2)*v(3) - u(3)*v(2)
+      w(2) = -u(1)*v(3) + u(3)*v(1)
+      w(3) =  u(1)*v(2) - u(2)*v(1)
+
+      end
+
 
 
 

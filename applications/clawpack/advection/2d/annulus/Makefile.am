@@ -23,6 +23,7 @@ applications_clawpack_advection_2d_annulus_annulus_SOURCES = \
 	applications/clawpack/advection/2d/annulus/user_4.6/tag4refinement.f \
 	applications/clawpack/advection/2d/annulus/user_4.6/tag4coarsening.f \
 	applications/clawpack/advection/2d/annulus/user_4.6/compute_error.f \
+	applications/clawpack/advection/2d/annulus/user_4.6/annulus46_rpt2adv_manifold.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f \
 	applications/clawpack/advection/2d/annulus/user_5.0/qinit.f90 \

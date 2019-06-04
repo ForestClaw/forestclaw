@@ -89,6 +89,7 @@ fclaw2d_map_c2m_annulus (fclaw2d_map_context_t * cont, int blockno,
        a single "logical" block in [0,1]x[0,1] */
     beta = cont->user_double[0];
     MAPC2M_ANNULUS(&blockno,&x,&y,xp,yp,zp,&beta);
+    //printf("%12.4f %12.4f %12.4f %12.4f %12.4f %12.4f\n",x,y,*xp,*yp,*zp,beta);
 
     //scale_map(cont,xp,yp,zp);
     //rotate_map(cont,xp,yp,zp);
@@ -104,7 +105,7 @@ fclaw2d_map_context_t *
 {
     int i;
     double l0[4] = {1.,  0.,  0.,  1.};
-    double l1[4] = {1.,  0,  0.,  1.};
+    double l1[4] = {1.,  -999.,  0.,  1.};
     l1[1] = twist;
 
     fclaw2d_map_context_t *cont;

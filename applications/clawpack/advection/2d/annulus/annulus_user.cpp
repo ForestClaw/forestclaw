@@ -65,6 +65,10 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
 
         clawpack46_vt->fort_qinit   = CLAWPACK46_QINIT;
+#if 0 
+        /* Doesn't really work with transverse solvers */
+        clawpack46_vt->fort_bc2     = CLAWPACK46_BC2;  /* Replace default version */
+#endif        
 
         clawpatch_vt->fort_compute_patch_error = &ANNULUS46_COMPUTE_ERROR;
         clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
@@ -80,8 +84,9 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
         else
         {
             clawopt->use_fwaves = 1;
-            clawpack46_vt->fort_rpn2      = &RPN2CONS_FW_MANIFOLD; 
+            clawpack46_vt->fort_rpn2      = &RPN2CONS_FW_MANIFOLD;   
             clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
+            //clawpack46_vt->fort_rpt2      = &ANNULUS46_RPT2ADV_MANIFOLD;      
             clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
         }
 
@@ -111,32 +116,27 @@ void annulus_problem_setup(fclaw2d_global_t *glob)
     {
 
         FILE *f = fopen("setprob.data","w");
-        fprintf(f,"%-24d   %s",user->example,       "\% example\n");    
-        fprintf(f,"%-24d   %s",user->mapping,       "\% mapping\n");   
-        fprintf(f,"%-24d   %s",user->initchoice,    "\% initchoice\n");    
+        fprintf(f,  "%-24d   %s",user->example,       "\% example\n");    
+        fprintf(f,  "%-24d   %s",user->mapping,       "\% mapping\n");   
+        fprintf(f,  "%-24d   %s",user->initchoice,    "\% initchoice\n");    
         fprintf(f,"%-24.4f   %s",user->revs_per_s,    "\% revs_per_s\n");    
         fprintf(f,"%-24.4f   %s",user->twist,         "\% twist\n");    
         fprintf(f,"%-24.4f   %s",user->vertical_speed,"\% vertical_speed\n");    
-        fprintf(f,"%-24d   %s",user->color_equation,"\% color_equation\n");    
-        fprintf(f,"%-24d   %s",user->use_stream,    "\% use_stream\n");    
+        fprintf(f,  "%-24d   %s",user->color_equation,"\% color_equation\n");    
+        fprintf(f,  "%-24d   %s",user->use_stream,    "\% use_stream\n");    
         fprintf(f,"%-24.4f   %s",user->beta,          "\% beta\n");    
-        fprintf(f,"%-24d   %s",user->refine_pattern,"\% refine_pattern\n");    
+        fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refine_pattern\n");    
         fprintf(f,"%-24.4f   %s",user->init_radius,   "\% init_radius\n");    
         fclose(f);
-        exit(0);
     }
- 
 
-#if 0
-    SETPROB_ANNULUS(&user->example,
-                    &user->mapping,
-                    &user->initchoice,
-                    &user->revs_per_s,
-                    &user->color_equation, 
-                    &user->use_stream,
-                    &user->beta,
-                    &user->refine_pattern);
-#endif                    
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+
+    SETPROB_ANNULUS();  /* Reads file created above */
+ 
 }
 
 
@@ -175,7 +175,8 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
         ANNULUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
                          &dx,&dy,&maux,aux,&blockno,
                          area,xd,yd,zd,
-                         edgelengths,xnormals,ynormals,surfnormals);
+                         edgelengths,xnormals,ynormals,
+                         xtangents, ytangents, surfnormals);
     }
     else if(user->claw_version == 5)
     {
