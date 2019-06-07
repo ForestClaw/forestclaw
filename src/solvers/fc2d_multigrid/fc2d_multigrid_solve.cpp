@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_vtk.h>
 
 #include <fclaw2d_global.h>
+#include <fclaw2d_map.h>
+#include <fclaw2d_options.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_vtable.h>
 
@@ -50,24 +52,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Thunderegg/PatchSolvers/FftwPatchSolver.h>
 using namespace std;
 extern "C" {
+
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
     // this should be moved somewhere else
     PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
     // create thunderegg vector for eqn 0
-    std::shared_ptr<Vector<2>> f(new fc2d_multigrid_vector(glob, 0));
+    shared_ptr<Vector<2>> f(new fc2d_multigrid_vector(glob, 0));
 
     // get patch size
     fclaw2d_clawpatch_options_t *clawpatch_opt =
         fclaw2d_clawpatch_get_options(glob);
-    std::array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+    array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
 
     // get p4est structure
     fclaw2d_domain_t *domain = glob->domain;
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
+    // create map function
+    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+
+    P4estDCG::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y,
+                                     double &x, double &y) {
+        if (fclaw_opt->manifold) {
+            // map?
+        } else {
+            x = fclaw_opt->ax + (fclaw_opt->bx - fclaw_opt->ax) * unit_x;
+            y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * unit_y;
+        }
+    };
+
     // generates levels of patches for GMG
-    shared_ptr<P4estDCG> dcg(new P4estDCG(wrap->p4est, ns));
+    shared_ptr<P4estDCG> dcg(new P4estDCG(wrap->p4est, ns, false, bmf));
 
     // get finest level
     shared_ptr<DomainCollection<2>> dc = dcg->getFinestDC();
