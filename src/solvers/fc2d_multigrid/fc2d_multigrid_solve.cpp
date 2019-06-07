@@ -54,6 +54,12 @@ using namespace std;
 extern "C" {
 
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
+    // get needed options
+    fclaw2d_clawpatch_options_t *clawpatch_opt =
+        fclaw2d_clawpatch_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+
     // this should be moved somewhere else
     PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
@@ -61,8 +67,6 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
     shared_ptr<Vector<2>> f(new fc2d_multigrid_vector(glob, 0));
 
     // get patch size
-    fclaw2d_clawpatch_options_t *clawpatch_opt =
-        fclaw2d_clawpatch_get_options(glob);
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
 
     // get p4est structure
@@ -70,8 +74,6 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
     // create map function
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-
     P4estDCG::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y,
                                      double &x, double &y) {
         if (fclaw_opt->manifold) {
@@ -82,8 +84,15 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
         }
     };
 
+    // create neumann function
+    IsNeumannFunc<2> inf = [&](Side<2> s, const array<double, 2> &lower,
+                               const array<double, 2> &upper) {
+        printf("BC: %i\n", mg_opt->boundary_conditions[s.toInt()] == 2);
+        return mg_opt->boundary_conditions[s.toInt()] == 2;
+    };
+
     // generates levels of patches for GMG
-    shared_ptr<P4estDCG> dcg(new P4estDCG(wrap->p4est, ns, false, bmf));
+    shared_ptr<P4estDCG> dcg(new P4estDCG(wrap->p4est, ns, inf, bmf));
 
     // get finest level
     shared_ptr<DomainCollection<2>> dc = dcg->getFinestDC();
@@ -105,7 +114,6 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
     shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh));
 
     // create gmg preconditioner
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
     GMG::CycleOpts copts;
     copts.max_levels = mg_opt->max_levels;
     copts.patches_per_proc = mg_opt->patches_per_proc;
