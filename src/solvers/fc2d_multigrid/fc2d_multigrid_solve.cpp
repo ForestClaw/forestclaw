@@ -48,99 +48,102 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Thunderegg/FivePtPatchOperator.h>
 #include <Thunderegg/GMG/CycleFactory2d.h>
 #include <Thunderegg/Operators/SchurDomainOp.h>
-#include <Thunderegg/P4estDCG.h>
+#include <Thunderegg/P4estDomGen.h>
 #include <Thunderegg/PatchSolvers/FftwPatchSolver.h>
 using namespace std;
 extern "C" {
 
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
-    // get needed options
-    fclaw2d_clawpatch_options_t *clawpatch_opt =
-        fclaw2d_clawpatch_get_options(glob);
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+  // get needed options
+  fclaw2d_clawpatch_options_t *clawpatch_opt =
+      fclaw2d_clawpatch_get_options(glob);
+  fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+  fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
 
-    // this should be moved somewhere else
-    PetscInitialize(nullptr, nullptr, nullptr, nullptr);
+  // this should be moved somewhere else
+  PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
-    // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f(new fc2d_multigrid_vector(glob, 0));
+  // create thunderegg vector for eqn 0
+  shared_ptr<Vector<2>> f(new fc2d_multigrid_vector(glob, 0));
 
-    // get patch size
-    array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+  // get patch size
+  array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
 
-    // get p4est structure
-    fclaw2d_domain_t *domain = glob->domain;
-    p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
+  // get p4est structure
+  fclaw2d_domain_t *domain = glob->domain;
+  p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
-    // create map function
-    P4estDCG::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y,
-                                     double &x, double &y) {
-        if (fclaw_opt->manifold) {
-            // map?
-        } else {
-            x = fclaw_opt->ax + (fclaw_opt->bx - fclaw_opt->ax) * unit_x;
-            y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * unit_y;
-        }
-    };
+  // create map function
+  P4estDomGen::BlockMapFunc bmf = [&](int block_no, double unit_x,
+                                      double unit_y, double &x, double &y) {
+    double block_x = block_no % fclaw_opt->mi;
+    double block_y = block_no / fclaw_opt->mj;
 
-    // create neumann function
-    IsNeumannFunc<2> inf = [&](Side<2> s, const array<double, 2> &lower,
-                               const array<double, 2> &upper) {
-        printf("BC: %i\n", mg_opt->boundary_conditions[s.toInt()] == 2);
-        return mg_opt->boundary_conditions[s.toInt()] == 2;
-    };
+    double brick_domain_x = (block_x + unit_x) / fclaw_opt->mi;
+    double brick_domain_y = (block_y + unit_y) / fclaw_opt->mj;
 
-    // generates levels of patches for GMG
-    shared_ptr<P4estDCG> dcg(new P4estDCG(wrap->p4est, ns, inf, bmf));
+    x = fclaw_opt->ax + (fclaw_opt->bx - fclaw_opt->ax) * brick_domain_x;
+    y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * brick_domain_y;
+  };
 
-    // get finest level
-    shared_ptr<DomainCollection<2>> dc = dcg->getFinestDC();
+  // create neumann function
+  IsNeumannFunc<2> inf = [&](Side<2> s, const array<double, 2> &lower,
+                             const array<double, 2> &upper) {
+    return mg_opt->boundary_conditions[s.toInt()] == 2;
+  };
 
-    // define operators for problems
-    // set the patch solver
-    shared_ptr<PatchSolver<2>> solver(new FftwPatchSolver<2>(*dc));
+  // generates levels of patches for GMG
+  shared_ptr<P4estDomGen> domain_gen(
+      new P4estDomGen(wrap->p4est, ns, inf, bmf));
 
-    // patch operator
-    shared_ptr<PatchOperator<2>> op(new FivePtPatchOperator());
+  // get finest level
+  shared_ptr<Domain<2>> te_domain = domain_gen->getFinestDomain();
 
-    // interface interpolator
-    shared_ptr<IfaceInterp<2>> interp(new BilinearInterpolator());
+  // define operators for problems
+  // set the patch solver
+  shared_ptr<PatchSolver<2>> solver(new FftwPatchSolver<2>(*te_domain));
 
-    // create SchurHelper
-    shared_ptr<SchurHelper<2>> sh(new SchurHelper<2>(dc, solver, op, interp));
+  // patch operator
+  shared_ptr<PatchOperator<2>> op(new FivePtPatchOperator());
 
-    // create matrix
-    shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh));
+  // interface interpolator
+  shared_ptr<IfaceInterp<2>> interp(new BilinearInterpolator());
 
-    // create gmg preconditioner
-    GMG::CycleOpts copts;
-    copts.max_levels = mg_opt->max_levels;
-    copts.patches_per_proc = mg_opt->patches_per_proc;
-    copts.pre_sweeps = mg_opt->pre_sweeps;
-    copts.post_sweeps = mg_opt->post_sweeps;
-    copts.mid_sweeps = mg_opt->mid_sweeps;
-    copts.coarse_sweeps = mg_opt->coarse_sweeps;
-    copts.cycle_type = mg_opt->cycle_type;
-    shared_ptr<Operator<2>> M =
-        GMG::CycleFactory2d::getCycle(copts, dcg, solver, op, interp);
+  // create SchurHelper
+  shared_ptr<SchurHelper<2>> sh(
+      new SchurHelper<2>(te_domain, solver, op, interp));
 
-    // solve
-    shared_ptr<VectorGenerator<2>> vg(new DomainCollectionVG<2>(dc));
-    shared_ptr<Vector<2>> u = vg->getNewVector();
+  // create matrix
+  shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh));
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M);
+  // create gmg preconditioner
+  GMG::CycleOpts copts;
+  copts.max_levels = mg_opt->max_levels;
+  copts.patches_per_proc = mg_opt->patches_per_proc;
+  copts.pre_sweeps = mg_opt->pre_sweeps;
+  copts.post_sweeps = mg_opt->post_sweeps;
+  copts.mid_sweeps = mg_opt->mid_sweeps;
+  copts.coarse_sweeps = mg_opt->coarse_sweeps;
+  copts.cycle_type = mg_opt->cycle_type;
+  shared_ptr<Operator<2>> M =
+      GMG::CycleFactory2d::getCycle(copts, domain_gen, solver, op, interp);
 
-    fclaw_global_productionf("Iterations: %i\n", its);
-    fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
-    fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());
-    fclaw_global_productionf("u-infnorm: %f\n\n", u->infNorm());
+  // solve
+  shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(te_domain));
+  shared_ptr<Vector<2>> u = vg->getNewVector();
 
-    // copy solution into rhs
-    f->copy(u);
-    fclaw_global_productionf("Checking if copy function works:\n");
-    fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
+  int its = BiCGStab<2>::solve(vg, A, u, f, M);
+
+  fclaw_global_productionf("Iterations: %i\n", its);
+  fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
+  fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
+  fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());
+  fclaw_global_productionf("u-infnorm: %f\n\n", u->infNorm());
+
+  // copy solution into rhs
+  f->copy(u);
+  fclaw_global_productionf("Checking if copy function works:\n");
+  fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
+  fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
 }
 }
