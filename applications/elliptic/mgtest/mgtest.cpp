@@ -49,6 +49,11 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
  
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
+
+    /* Brick domains don't yet work */
+    FCLAW_ASSERT(mi == 1);
+    FCLAW_ASSERT(mj == 1);
+
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
