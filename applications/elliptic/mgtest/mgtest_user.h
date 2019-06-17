@@ -47,8 +47,8 @@ void mgtest_problem_setup(fclaw2d_global_t* glob);
 
 #define MGTEST_FORT_RHS FCLAW_F77_FUNC(mgtest_fort_rhs,MGTEST_FORT_RHS)
 
-void MGTEST_FORT_RHS(const int* mbc, const int* mx, const int* my, 
-                     const double *xlower, const double *ylower,
+void MGTEST_FORT_RHS(const int* blockno, const int* mbc, const int* mx, 
+                     const int* my, const double *xlower, const double *ylower,
                      const double* dx, const double* dy, double q[]);
 
 

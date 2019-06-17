@@ -32,6 +32,12 @@ end
 Nvec = e(:,1);
 n = length(Nvec);
 
+if (length(idx) == 1)
+    i1 = min([idx,n]);
+    idx = i1:n;
+end
+    
+
 c = {'r','b','g'};
 if (nargin == 1)
     idx = 1:n;
@@ -94,7 +100,7 @@ else
     fprintf('%s\n',double('-')*ones(1,39));
 end
     
-ylim([1e-9,1e-2]);
+ylim([1e-9,1e1]);
 
 
 end
