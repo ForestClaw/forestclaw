@@ -36,15 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 
-#if 0
-#include <fclaw2d_options.h>
-#include <fclaw2d_clawpatch_options.h>
-#endif
-
-
 #include <fclaw2d_domain.h>
-#include <p4est_bits.h>
-#include <p4est_wrap.h>
 
 
 
@@ -80,7 +72,7 @@ void multigrid_rhs(fclaw2d_global_t *glob,
 	FCLAW_ASSERT(meqn == 1);
 
 	/* Compute right hand side */
-	mg_vt->fort_rhs(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
+	mg_vt->fort_rhs(&blockno, &mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
 }
 
 
