@@ -51,6 +51,13 @@ typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* blockno,
                                            const double* dx, const double* dy,
                                            double rhs[]);
 
+typedef void (*fc2d_multigrid_fort_bc_t)(int* blockno, 
+                                         int* mx, int* my, int *mbc,
+                                         double* xlower, double* ylower,
+                                         double* dx,double* dy,
+                                         int intersects_bc[],
+                                         int bc_type[],
+                                         double *q);
 
 /* -------------------------- Solver and utilities ------------------------------------ */
 
@@ -62,7 +69,8 @@ struct fc2d_multigrid_vtable
 {
 
 	/* Fortran routines */
-	fc2d_multigrid_fort_rhs_t       fort_rhs;	
+	fc2d_multigrid_fort_rhs_t   fort_rhs;	
+    fc2d_multigrid_fort_bc_t    fort_apply_bc;
 	int is_set;
 
 };

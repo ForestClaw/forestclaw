@@ -75,7 +75,6 @@ void multigrid_rhs(fclaw2d_global_t *glob,
 	mg_vt->fort_rhs(&blockno, &mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
 }
 
-
 static
 void multigrid_solve(fclaw2d_global_t* glob)
 {
@@ -135,7 +134,8 @@ void fc2d_multigrid_solver_initialize()
     
     fclaw2d_elliptic_vtable_t *elliptic_vt = fclaw2d_elliptic_vt();
     elliptic_vt->setup = multigrid_setup_solver;
-    elliptic_vt->solve = multigrid_solve;
+    elliptic_vt->solve = multigrid_solve;    
+    // elliptic_vt->apply_bc = fc2d_multigrid_bc_default;
     // RHS is set using default RHS in elliptic_solve.
 
 	mg_vt->is_set = 1;
