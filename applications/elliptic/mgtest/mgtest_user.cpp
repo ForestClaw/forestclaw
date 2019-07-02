@@ -51,8 +51,8 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
 
     /* RHS function */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
-    patch_vt->rhs = mgtest_rhs;
-    patch_vt->initialize = mgtest_rhs;   /* To get an initial refinement */
+    patch_vt->rhs = mgtest_rhs;          /* Overwrites default */
+    patch_vt->initialize = mgtest_rhs;   /* Get an initial refinement */
 
     /* Only needed if Fortran subroutine is useful and can be customized */
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
@@ -102,7 +102,7 @@ void mgtest_rhs(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     /* Or some other suitable function that sets up rhs on patches */
-    mg_vt->fort_rhs(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
+    mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
 }
 
 

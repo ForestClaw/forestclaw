@@ -44,7 +44,8 @@ typedef  struct fc2d_multigrid_vtable  fc2d_multigrid_vtable_t;
 
 /* --------------------------- Fortran defs solver functions -------------------------- */
 
-typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* mbc,
+typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* blockno, 
+                                           const int* mbc,
                                            const int* mx, const int* my,
                                            const double* xlower, const double* ylower,
                                            const double* dx, const double* dy,
