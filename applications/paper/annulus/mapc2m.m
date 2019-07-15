@@ -13,6 +13,11 @@ end
 twist = load('twist.dat');
 beta = 0.4;
 
+t1 = 0.125;
+t2 = 0.375;
+theta = [t1, t2];
+
+
 switch map
     case {'annulus','cart'}
        L = eye(2);
@@ -34,7 +39,7 @@ switch map
         yp = b(xc1,yc1);
         zp = 0*xc1;
     otherwise
-        [xp,yp,zp] = mapc2m_annulus(a(xc1,yc1),b(xc1,yc1),beta);
+        [xp,yp,zp] = mapc2m_annulus(a(xc1,yc1),b(xc1,yc1),beta,theta);
 end
 
 end
