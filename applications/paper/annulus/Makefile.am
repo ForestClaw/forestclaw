@@ -11,9 +11,8 @@ applications_paper_annulus_annulus_SOURCES = \
 	applications/paper/annulus/dopri5.f \
 	applications/paper/annulus/qexact.f \
 	applications/paper/annulus/fdisc.f \
-	applications/paper/annulus/psi.f \
 	applications/paper/annulus/annulus_psi.f \
-	applications/paper/annulus/velocity.f \
+	applications/paper/annulus/annulus_velocity.f \
 	applications/paper/annulus/user_4.6/qinit.f \
 	applications/paper/annulus/user_4.6/rpn2cons_fw_manifold.f \
 	applications/paper/annulus/user_4.6/rpt2cons_manifold.f \
@@ -25,6 +24,7 @@ applications_paper_annulus_annulus_SOURCES = \
 	applications/paper/annulus/user_4.6/compute_error.f \
 	applications/paper/annulus/user_4.6/annulus46_rpt2adv_manifold.f \
 	applications/paper/annulus/user_5.0/qinit.f90 \
+	applications/paper/annulus/user_5.0/psi.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
