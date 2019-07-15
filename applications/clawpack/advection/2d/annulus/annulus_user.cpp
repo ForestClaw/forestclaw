@@ -32,70 +32,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-#include "fclaw2d_clawpatch_options.h"
-#include <fc2d_clawpack46_options.h>
-
-
 #include "../all/advection_user_fort.h"
-
-
-static
-void cb_annulus_output_ascii (fclaw2d_domain_t * domain,
-                              fclaw2d_patch_t * this_patch,
-                              int this_block_idx, int this_patch_idx,
-                              void *user);
 
 
 void annulus_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t           *vt            = fclaw2d_vt();
-    fclaw2d_patch_vtable_t     *patch_vt      = fclaw2d_patch_vt();
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt  = fclaw2d_clawpatch_vt();
-    //fc2d_clawpack46_vtable_t   *clawpack46_vt = fc2d_clawpack46_vt();
+    const user_options_t   *user      =  annulus_get_options(glob);
 
-    fclaw_options_t          *fclaw_opt = fclaw2d_get_options(glob);
-    const user_options_t          *user = annulus_get_options(glob);
+    fclaw2d_vtable_t           *vt           = fclaw2d_vt();
+    fclaw2d_patch_vtable_t     *patch_vt     = fclaw2d_patch_vt();
 
     vt->problem_setup  = &annulus_problem_setup;
     patch_vt->setup    = &annulus_patch_setup;
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_options_t  *clawopt     = fc2d_clawpack46_get_options(glob);
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
-
         clawpack46_vt->fort_qinit   = CLAWPACK46_QINIT;
-#if 0 
-        /* Doesn't really work with transverse solvers */
-        clawpack46_vt->fort_bc2     = CLAWPACK46_BC2;  /* Replace default version */
-#endif        
-
-        clawpatch_vt->fort_compute_patch_error = &ANNULUS46_COMPUTE_ERROR;
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
-
-        if (user->color_equation)
-        {
-            clawopt->use_fwaves = 0;
-            clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
-            clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
-            clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_ZERO;
-        }
-        else
-        {
-            clawopt->use_fwaves = 1;
-            clawpack46_vt->fort_rpn2      = &RPN2CONS_FW_MANIFOLD;   
-            clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
-            //clawpack46_vt->fort_rpt2      = &ANNULUS46_RPT2ADV_MANIFOLD;      
-            clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
-        }
-
-
-        if (fclaw_opt->compute_error)
-        {
-            clawpatch_vt->fort_header_ascii   = &ANNULUS46_FORT_HEADER_ASCII;
-            clawpatch_vt->cb_output_ascii     = &cb_annulus_output_ascii;                
-        }
+        clawpack46_vt->fort_rpn2    = CLAWPACK46_RPN2ADV_MANIFOLD;
+        clawpack46_vt->fort_rpt2    = CLAWPACK46_RPT2ADV_MANIFOLD;
     }
     else if (user->claw_version == 5)
     {
@@ -111,48 +66,19 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
 void annulus_problem_setup(fclaw2d_global_t *glob)
 {
     const user_options_t *user = annulus_get_options(glob);
-
-    if (glob->mpirank == 0)
-    {
-
-        FILE *f = fopen("setprob.data","w");
-        fprintf(f,  "%-24d   %s",user->example,       "\% example\n");    
-        fprintf(f,  "%-24d   %s",user->mapping,       "\% mapping\n");   
-        fprintf(f,  "%-24d   %s",user->initchoice,    "\% initchoice\n");    
-        fprintf(f,"%-24.4f   %s",user->revs_per_s,    "\% revs_per_s\n");    
-        fprintf(f,"%-24.4f   %s",user->twist,         "\% twist\n");    
-        fprintf(f,"%-24.4f   %s",user->cart_speed,    "\% cart_speed\n");    
-        fprintf(f,  "%-24d   %s",user->color_equation,"\% color_equation\n");    
-        fprintf(f,  "%-24d   %s",user->use_stream,    "\% use_stream\n");    
-        fprintf(f,"%-24.4f   %s",user->beta,          "\% beta\n");    
-        fprintf(f,"%-12.4f%-12.4f    %s",user->theta[0],user->theta[1],"\% beta\n");    
-        fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refine_pattern\n");    
-        fprintf(f,"%-24.4f   %s",user->init_radius,   "\% init_radius\n");    
-        fclose(f);
-    }
-
-    /* We want to make sure node 0 gets here before proceeding */
-#ifdef FCLAW_ENABLE_MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
-
-    SETPROB_ANNULUS();  /* Reads file created above */
- 
+    SETPROB_ANNULUS(&user->beta);
 }
 
 
 void annulus_patch_setup(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,
-                         int blockno,
-                         int patchno)
+                         int this_block_idx,
+                         int this_patch_idx)
 {
     int mx,my,mbc,maux;
     double xlower,ylower,dx,dy;
     double *aux,*xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
-    double *curvature, *surfnormals;
-    double *edgelengths;
-    double *xnormals, *ynormals, *xtangents, *ytangents;
     const user_options_t* user = annulus_get_options(glob);
 
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
@@ -163,78 +89,14 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
-    fclaw2d_clawpatch_metric_scalar(glob, this_patch,&area,&edgelengths,
-                                    &curvature);
-
-    fclaw2d_clawpatch_metric_vector(glob,this_patch,
-                                    &xnormals, &ynormals,
-                                    &xtangents, &ytangents,
-                                    &surfnormals);
-
     if (user->claw_version == 4)
     {
-        ANNULUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
-                         &dx,&dy,&maux,aux,&blockno,
-                         area,xd,yd,zd,
-                         edgelengths,xnormals,ynormals,
-                         xtangents, ytangents, surfnormals);
+        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
+                               &maux,aux,&this_block_idx,xd,yd,zd,area);
     }
     else if(user->claw_version == 5)
     {
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                              &maux,aux,&blockno,xd,yd,zd,area);
+                              &maux,aux,&this_block_idx,xd,yd,zd,area);
     }
 }
-
-
-static
-void cb_annulus_output_ascii (fclaw2d_domain_t * domain,
-                              fclaw2d_patch_t * this_patch,
-                              int this_block_idx, int this_patch_idx,
-                              void *user)
-{
-    int patch_num;
-    int level;
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy, time;
-    double *q, *error, *soln;
-    int iframe;
-
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
-
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
-
-
-    iframe = *((int *) s->user);
-
-    time = glob->curr_time;
-
-
-    /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_block_idx,this_patch_idx,
-                           &patch_num,&level);
-    
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
-
-    char fname[BUFSIZ];
-    snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
-
-
-    /* Here, we pass in q and the error, so need special headers and files */
-    ANNULUS46_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
-                              &xlower,&ylower,
-                              &dx,&dy,
-                              q,error,soln, &time, 
-                              &patch_num,&level,
-                              &this_block_idx,
-                              &glob->mpirank);
-}
-

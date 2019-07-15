@@ -66,32 +66,21 @@ fclaw2d_map_c2m_annulus (fclaw2d_map_context_t * cont, int blockno,
                        double *xp, double *yp, double *zp)
 {
     double xc1,yc1,zc1;
-    double beta, theta[2];
-    double L[4];
-    double x,y;
-    int i;
-
-    beta     = cont->user_double[0];
-    theta[0] = cont->user_double[1];
-    theta[1] = cont->user_double[2];
 
     /* Scale's brick mapping to [0,1]x[0,1] */
     /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-    /* Map from orthogonal coordinates to non-orthogonal coordinates */
-    for(i = 0; i < 4; i++)
-    {
-        L[i] = cont->user_double[3+i];
-    }
-
-    /* Map from (a1,a2) back to (x,y) */
-    x = L[0]*xc1 + L[1]*yc1;
-    y = L[2]*xc1 + L[3]*yc1;
-
     /* blockno is ignored in the current annulus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
-    MAPC2M_ANNULUS(&blockno,&x,&y,xp,yp,zp,&beta,theta);
+    double beta = cont->user_double[0];
+    double theta[2];
+    theta[0] = cont->user_double[1];
+    theta[1] = cont->user_double[2];
+    MAPC2M_ANNULUS(&blockno,&xc1,&yc1,xp,yp,zp,&beta,theta);
+
+
+    rotate_map(cont,xp,yp,zp);
 }
 
 fclaw2d_map_context_t *
@@ -99,14 +88,9 @@ fclaw2d_map_context_t *
                              const double scale[],
                              const double shift[],
                              const double rotate[],
-                             const double beta, const double theta[],
-                             const int mapping)
+                             const double beta,
+                             const double theta[])
 {
-    int i;
-    double l0[4] = {1.,  0.,  0.,  1.};
-    double l1[4] = {1.,  -999.,  0.,  1.};
-    /* l1[1] = twist; */
-
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
@@ -116,21 +100,6 @@ fclaw2d_map_context_t *
     cont->user_double[0] = beta;
     cont->user_double[1] = theta[0];
     cont->user_double[2] = theta[1];
-
-    for(i = 0; i < 4; i++)
-    {
-        if (mapping == 0)
-        {
-            /* Regular torus mapping.  L given rowwise*/
-            cont->user_double[3+i] = l0[i];
-        }
-        else if (mapping == 1)
-        {
-            cont->user_double[3+i] = l1[i];
-        }
-    }
-
-    cont->user_int[0] = mapping;  /* Might not be used */
 
     set_scale(cont,scale);
     set_shift(cont,shift);

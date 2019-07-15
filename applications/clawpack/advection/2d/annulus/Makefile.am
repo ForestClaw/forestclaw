@@ -8,26 +8,14 @@ applications_clawpack_advection_2d_annulus_annulus_SOURCES = \
 	applications/clawpack/advection/2d/annulus/annulus_user.cpp \
 	applications/clawpack/advection/2d/annulus/fclaw2d_map_annulus.c \
 	applications/clawpack/advection/2d/annulus/setprob.f \
-	applications/clawpack/advection/2d/annulus/dopri5.f \
-	applications/clawpack/advection/2d/annulus/qexact.f \
 	applications/clawpack/advection/2d/annulus/fdisc.f \
 	applications/clawpack/advection/2d/annulus/psi.f \
-	applications/clawpack/advection/2d/annulus/annulus_psi.f \
-	applications/clawpack/advection/2d/annulus/velocity.f \
 	applications/clawpack/advection/2d/annulus/user_4.6/qinit.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/rpn2cons_fw_manifold.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/rpt2cons_manifold.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/rpn2cons_update_manifold.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/annulus46_setaux.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/annulus46_output.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/tag4refinement.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/tag4coarsening.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/compute_error.f \
-	applications/clawpack/advection/2d/annulus/user_4.6/annulus46_rpt2adv_manifold.f \
+	applications/clawpack/advection/2d/annulus/user_5.0/qinit.f90 \
+	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
+	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f \
-	applications/clawpack/advection/2d/annulus/user_5.0/qinit.f90 \
-	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 

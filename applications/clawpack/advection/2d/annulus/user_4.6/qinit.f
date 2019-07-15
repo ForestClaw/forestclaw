@@ -10,102 +10,18 @@
 
       integer i,j
       integer blockno, fc2d_clawpack46_get_block
-      double precision xlow, ylow, w, xc, yc
-      double precision xp, yp, zp
-
-      integer*8 cont, get_context
-
-      integer initchoice
-      common /initchoice_comm/ initchoice
-
-      double precision beta
-      common /annulus_comm/ beta
-
-      double precision q0_physical, ravg, r
-      integer j1, j2
-
-
-      cont = get_context()
+      double precision xlow, ylow, w
 
       blockno = fc2d_clawpack46_get_block()
 
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
-            if (initchoice .eq. 0) then
-               xlow = xlower + (i-1)*dx
-               ylow = ylower + (j-1)*dy
-               call cellave2(blockno,xlow,ylow,dx,dy,w)
-               q(i,j,1) = w
-            elseif (initchoice .eq. 1) then
-               xc = xlower + (i-0.5)*dx
-               yc = ylower + (j-0.5)*dy
-               call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)                  
-               q(i,j,1) = q0_physical(xp,yp,zp)
-            elseif (initchoice .eq. 2) then
-               xc = xlower + (i-0.5)*dx
-               yc = ylower + (j-0.5)*dy
-               call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)                  
-               r = sqrt(xp**2 + yp**2)
-               ravg = (1 + beta)/2.d0
-               j1 = mx/4+1
-               j2 = 3*mx/4
-c               if (r > ravg) then
-               if (j .ge. j1 .and. j .le. j2) then
-                  q(i,j,1) = 1.d0
-               else
-                  q(i,j,1) = 0.d0
-               endif
-
-            else
-                  q(i,j,1) = 1.d0
-
-c               write(6,*) 'qinit.f : init choice should be 0,1,2'
-c               stop
-            endif
+            xlow = xlower + (i-1)*dx
+            ylow = ylower + (j-1)*dy
+            call cellave2(blockno,xlow,ylow,dx,dy,w)
+            q(i,j,1) = w
          enddo
       enddo
 
       return
       end
-
-c     # ---------------------------------------------------------------      
-      double precision function q0_physical(xp,yp,zp)
-      implicit none
-
-      double precision xp, yp, zp
-
-      double precision r,r0, x0, y0, z0, q0, ravg
-      double precision Hsmooth
-
-      double precision beta
-      common /annulus_comm/ beta
-
-      double precision init_radius
-      common /initradius_comm/ init_radius
-
-c     # Sphere centered at (x0,0,0) on annulus
-c     # Outer radius  = 1; inner radius = beta
-c     # average inner and outer radii to center sphere
-      r0 = init_radius
-      ravg = (1 + beta)/2.d0
-      x0 = -ravg
-      y0 = 0
-
-      r = sqrt((xp - x0)**2 + (yp - y0)**2)
-      q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
-
-      q0_physical = q0
-
-      end
-
-c     # ---------------------------------------------------------------      
-      double precision function Hsmooth(r)
-      implicit none
-
-      double precision r
-
-      Hsmooth = (tanh(r/0.02d0) + 1)/2.d0
-
-      end
-
-

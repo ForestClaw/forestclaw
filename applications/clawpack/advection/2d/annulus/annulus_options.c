@@ -32,47 +32,15 @@ static int s_user_options_package_id = -1;
 static void *
 annulus_register(user_options_t *user, sc_options_t * opt)
 {
-    /* [user] User options */
-    sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0=rigid body rot.; 1=other velocity [0]");
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
+                        "[user] Clawpack version (4 or 5) [5]");
 
-    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
-                        "[user] 0 = annulus; 1 = twisted annulus [0]");
-
-    sc_options_add_int (opt, 0, "refine-pattern", &user->refine_pattern, 0,
-                        "[user] 0 = constant theta; 1 = constant_r [0]");
-
-    sc_options_add_int (opt, 0, "initchoice", &user->initchoice, 0,
-                        "[user] Initchoice 0=non-smooth; 1=smooth; 2=constant [1]");
-
-    sc_options_add_double (opt, 0, "revs-per-s", &user->revs_per_s, 0.5,
-                           "[user] Revolutions per second [0.5]");
-
-    sc_options_add_double (opt, 0, "twist", &user->twist, 0.2,
-                           "[user] Twist in annulus mapping [0.2]");
-
-    sc_options_add_double (opt, 0, "cart_speed", &user->cart_speed, 0.,
-                           "[user] Cartesian speed [1]");
-
-    sc_options_add_double (opt, 0, "init_radius", &user->init_radius, 0.125,
-                           "[user] Initial radius used in initial conditions [0.125]");
-
-    sc_options_add_bool (opt, 0, "color-equation", &user->color_equation, 0,
-                        "[user]  Solve color-equation using edge velocities [1]");
-
-    sc_options_add_bool (opt, 0, "use-stream", &user->use_stream, 0,
-                        "[user]  Use streamfunction [0]");
-
-    sc_options_add_double (opt, 0, "beta", &user->beta, 0.0,
+    sc_options_add_double (opt, 0, "beta", &user->beta, 0.4,
                            "[user] Inner radius of annulus [0.4]");
-
 
     fclaw_options_add_double_array (opt, 0, "theta", 
                                     &user->theta_string,"0 1",&user->theta,2,
                                     "[user] theta range [0,1]");
-
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
-                        "[user] Clawpack version (4 or 5) [4]");
 
     user->is_registered = 1;
     return NULL;
@@ -86,30 +54,17 @@ annulus_postprocess(user_options_t *user)
     return FCLAW_NOEXIT;
 }
 
-
 static fclaw_exit_type_t
 annulus_check(user_options_t *user)
 {
-    if (user->example < 0 || user->example > 1)
+    if (user->theta[0] > user->theta[1]) 
     {
         fclaw_global_essentialf
-            ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    if (user->use_stream == 1 && user->example != 0)
-    {
-        fclaw_global_essentialf("use_stream == 1 and example != 0.\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    if (user->mapping < 0 || user->mapping > 1)
-    {
-        fclaw_global_essentialf("Option --user:mapping must be 0 or 1.\n");
+            ("Option --user:theta : theta[0] > theta[1]\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;
-
 }
-
 
 static void
 annulus_destroy (user_options_t *user)
@@ -163,7 +118,6 @@ options_check(fclaw_app_t *app, void *package,void *registered)
 
     return annulus_check(user_opt);
 }
-
 
 static void
 options_destroy (fclaw_app_t * app, void *package, void *registered)
