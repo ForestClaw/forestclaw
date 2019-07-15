@@ -15,7 +15,7 @@
 include applications/clawpack/advection/2d/swirl_cons/Makefile.am
 
 ## annulus (square)
-include applications/clawpack/advection/2d/annulus/Makefile.am
+include applications/paper/annulus/Makefile.am
 
 ## swirl (square)
 #include applications/clawpack/advection/2d/swirl/Makefile.am
