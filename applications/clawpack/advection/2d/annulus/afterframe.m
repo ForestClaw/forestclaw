@@ -17,7 +17,7 @@ end
 alpha = 0.4;
 s = 1e-2;    
 alim = [-1,1];
-axis([alim alim]);
+axis([-1,1 0,1]);
 daspect([1 1 1]);
 view(vtop)
 
@@ -39,11 +39,23 @@ colormap(parula);
 cmax = max(abs([qmin,qmax]));
 ca = [-cmax,cmax];
 caxis(ca);
-% caxis([-1,1])
+caxis([-1,1])
 % colorbar
-caxis([-1,1]*1e-12);
+% caxis([-1,1]*1e-12);
 
-showgridlines;
+axis([-0.707106781186547   0.707106781186548   0.282842712474619,1]);
+
+th = 2*pi*linspace(0.25-1/32,0.25+1/32,200);
+xpath = ravg*cos(th);
+ypath = ravg*sin(th);
+ravg = 0.7;
+hold on;
+plot(xpath,ypath,'k','linewidth',2);
+plot(xpath([1,end]),ypath([1 end]),'k','linewidth',2);
+hold off;
+
+
+% showgridlines;
 showpatchborders;
 
 if square
