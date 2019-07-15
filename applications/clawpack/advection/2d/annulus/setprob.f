@@ -22,8 +22,8 @@
       double precision init_radius
       common /initradius_comm/ init_radius
 
-      double precision revs_per_s, vertical_speed
-      common /stream_comm/ revs_per_s, vertical_speed
+      double precision revs_per_s, cart_speed
+      common /stream_comm/ revs_per_s, cart_speed
 
 c     # Must use edge velocities
       integer color_equation
@@ -33,8 +33,8 @@ c     # used only for edge velocities
       integer use_stream
       common /velocity_comm/ use_stream
 
-      double precision beta
-      common /annulus_comm/ beta
+      double precision beta, theta(2)
+      common /annulus_comm/ beta, theta
 
       integer refine_pattern
       common /refine_comm/ refine_pattern
@@ -51,10 +51,11 @@ c     # used only for edge velocities
       read(iunit,*) initchoice
       read(iunit,*) revs_per_s
       read(iunit,*) twist
-      read(iunit,*) vertical_speed
+      read(iunit,*) cart_speed
       read(iunit,*) color_equation
       read(iunit,*) use_stream
       read(iunit,*) beta
+      read(iunit,*) theta(1), theta(2)
       read(iunit,*) refine_pattern
       read(iunit,*) init_radius    !! radius
       close(iunit)

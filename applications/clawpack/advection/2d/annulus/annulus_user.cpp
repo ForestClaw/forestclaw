@@ -121,10 +121,11 @@ void annulus_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24d   %s",user->initchoice,    "\% initchoice\n");    
         fprintf(f,"%-24.4f   %s",user->revs_per_s,    "\% revs_per_s\n");    
         fprintf(f,"%-24.4f   %s",user->twist,         "\% twist\n");    
-        fprintf(f,"%-24.4f   %s",user->vertical_speed,"\% vertical_speed\n");    
+        fprintf(f,"%-24.4f   %s",user->cart_speed,    "\% cart_speed\n");    
         fprintf(f,  "%-24d   %s",user->color_equation,"\% color_equation\n");    
         fprintf(f,  "%-24d   %s",user->use_stream,    "\% use_stream\n");    
         fprintf(f,"%-24.4f   %s",user->beta,          "\% beta\n");    
+        fprintf(f,"%-12.4f%-12.4f    %s",user->theta[0],user->theta[1],"\% beta\n");    
         fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refine_pattern\n");    
         fprintf(f,"%-24.4f   %s",user->init_radius,   "\% init_radius\n");    
         fclose(f);

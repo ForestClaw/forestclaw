@@ -16,8 +16,8 @@
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision beta
-      common /annulus_comm/ beta
+      double precision beta, theta(2)
+      common /annulus_comm/ beta, theta
 
       integer mapping
       common /mapping_comm/ mapping
@@ -30,8 +30,7 @@
       double precision r, rrefine, x,y, rw, ravg, th
       logical constant_theta, constant_r
 
-      double precision t1, t2
-      
+
 
       tag_patch = 0
 
@@ -53,11 +52,10 @@ c     # Refine based only on first variable in system.
             call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
             r = beta + (1-beta)*yc1
-            th = pi2*xc1
+            th = pi2*(theta(1) + (theta(2)-theta(1))*xc1)
 c           # constant_theta = cos(th) .lt. 0 .and. abs(sin(th)) .lt. 0.5
-            t1 = pi-pi/8.0
-            t2 = pi+pi/8.0
-            constant_theta = t1 .le. th .and. th .le. t2
+            !! constant_theta = t1 .le. th .and. th .le. t2
+            constant_theta = th .gt. pi/2.d0
             constant_r = r > ravg                
             if (refine_pattern .eq. 0 .and. constant_theta) then 
                 tag_patch = 1

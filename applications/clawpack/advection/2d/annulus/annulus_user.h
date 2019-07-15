@@ -46,11 +46,15 @@ typedef struct user_options
     int initchoice;  /* Smooth or non-smooth */
     double revs_per_s;
     double twist;
-    double vertical_speed;
+    double cart_speed;
     double init_radius;
     int color_equation;
     int use_stream;
     double beta;    /* Ratio of inner radius to outer radius */
+
+    const char *theta_string;
+    double *theta;  /* Theta range */
+
     int refine_pattern;
 
     int claw_version;
@@ -99,7 +103,7 @@ fclaw2d_map_context_t *
                              const double shift[],
                              const double rotate[],
                              const double beta,
-                             const double twist,
+                             const double theta[],
                              const int mapping);
 
 

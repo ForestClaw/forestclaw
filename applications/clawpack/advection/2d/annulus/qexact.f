@@ -49,8 +49,8 @@ c      integer blockno_dummy
 
       logical evolve_q
 
-      double precision beta
-      common /annulus_comm/ beta
+      double precision beta, theta(2)
+      common /annulus_comm/ beta, theta
 
       integer example
       common /example_comm/ example
@@ -106,7 +106,7 @@ c     # Initial position traced back from (xc1,yc1)
       xc0 = sigma(1)
       yc0 = sigma(2)
 
-      call mapc2m_annulus(blockno,xc0,yc0,xp,yp,zp,beta)
+      call mapc2m_annulus(blockno,xc0,yc0,xp,yp,zp,beta,theta)
 
       if (initchoice .eq. 0) then
           write(6,*) 'qexact.f : initchoice .eq. 0 not defined'

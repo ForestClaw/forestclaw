@@ -51,8 +51,8 @@ annulus_register(user_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "twist", &user->twist, 0.2,
                            "[user] Twist in annulus mapping [0.2]");
 
-    sc_options_add_double (opt, 0, "vertical_speed", &user->vertical_speed, 0.,
-                           "[user] Vertical speed [0]");
+    sc_options_add_double (opt, 0, "cart_speed", &user->cart_speed, 0.,
+                           "[user] Cartesian speed [1]");
 
     sc_options_add_double (opt, 0, "init_radius", &user->init_radius, 0.125,
                            "[user] Initial radius used in initial conditions [0.125]");
@@ -67,6 +67,9 @@ annulus_register(user_options_t *user, sc_options_t * opt)
                            "[user] Inner radius of annulus [0.4]");
 
 
+    fclaw_options_add_double_array (opt, 0, "theta", 
+                                    &user->theta_string,"0 1",&user->theta,2,
+                                    "[user] theta range [0,1]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
                         "[user] Clawpack version (4 or 5) [4]");
@@ -76,28 +79,29 @@ annulus_register(user_options_t *user, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-annulus_postprocess(user_options_t *user_opt)
+annulus_postprocess(user_options_t *user)
 {
-    /* nothing to post-process yet ... */
+    fclaw_options_convert_double_array (user->theta_string, &user->theta, 2);
+
     return FCLAW_NOEXIT;
 }
 
 
 static fclaw_exit_type_t
-annulus_check(user_options_t *user_opt)
+annulus_check(user_options_t *user)
 {
-    if (user_opt->example < 0 || user_opt->example > 1)
+    if (user->example < 0 || user->example > 1)
     {
         fclaw_global_essentialf
             ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
-    if (user_opt->use_stream == 1 && user_opt->example != 0)
+    if (user->use_stream == 1 && user->example != 0)
     {
         fclaw_global_essentialf("use_stream == 1 and example != 0.\n");
         return FCLAW_EXIT_QUIET;
     }
-    if (user_opt->mapping < 0 || user_opt->mapping > 1)
+    if (user->mapping < 0 || user->mapping > 1)
     {
         fclaw_global_essentialf("Option --user:mapping must be 0 or 1.\n");
         return FCLAW_EXIT_QUIET;
@@ -110,7 +114,7 @@ annulus_check(user_options_t *user_opt)
 static void
 annulus_destroy (user_options_t *user)
 {
-    /* Nothing to destroy */
+    FCLAW_FREE (user->theta);
 }
 
 /* ------- Generic option handling routines that call above routines ----- */

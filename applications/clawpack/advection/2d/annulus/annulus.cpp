@@ -64,7 +64,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);
     cont = fclaw2d_map_new_annulus(brick,fclaw_opt->scale,fclaw_opt->shift,
-                                   rotate,user->beta, user->twist, user->mapping);
+                                   rotate,user->beta, user->theta, user->mapping);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
 

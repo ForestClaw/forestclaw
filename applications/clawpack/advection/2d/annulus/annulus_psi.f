@@ -13,8 +13,8 @@ c     # ------------------------------------------------------------
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
+      double precision revs_per_s, cart_speed
+      common /stream_comm/ revs_per_s, cart_speed
 
       integer example
       common /example_comm/ example  
@@ -37,8 +37,8 @@ c     # annulus : Solid body rotation
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
+      double precision revs_per_s, cart_speed
+      common /stream_comm/ revs_per_s, cart_speed
 
       double precision r, r2, rx, ry
 
@@ -65,8 +65,8 @@ c     # annulus_psi = 0.5d0*pi2*revs_per_s*r2
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
+      double precision revs_per_s, cart_speed
+      common /stream_comm/ revs_per_s, cart_speed
 
       integer example
       common /example_comm/ example  
@@ -87,15 +87,20 @@ c     # uderivs not used here
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
+      double precision revs_per_s, cart_speed
+      common /stream_comm/ revs_per_s, cart_speed
+
+      double precision beta, theta(2)
+      common /annulus_comm/ beta, theta
 
       integer example
       common /example_comm/ example  
 
       double precision s, pim, u1x, u1y, u2x, u2y
+      double precision vs, r, t1(3), t2(3), vcart(3)
+      double precision t1_norm2, t2_norm2, t1_dot_vcart, t2_dot_vcart
+      double precision annulus_dot
       integer k
-
 
 c     # uderivs(1) = u1x      
 c     # uderivs(2) = u1y      
@@ -107,6 +112,11 @@ c     # uderivs(4) = u2y
       u2x = 0
       u2y = 0
 
+      call annulus_covariant_basis(x, y, t1,t2) 
+
+      t1_norm2 = annulus_dot(t1,t1)
+      t2_norm2 = annulus_dot(t2,t2)
+
 c     # Set non-zeros derivs only
       s = sqrt(2.d0)
       if (example .eq. 0) then
@@ -114,12 +124,25 @@ c        # Rigid body rotation
          u(1) = revs_per_s
          u(2) = 0
       elseif (example .eq. 1) then
+c        # Vertical velocity
+         vcart(1) = cart_speed
+         vcart(2) = 0
+         vcart(3) = 0
+
+         t1_dot_vcart = annulus_dot(t1,vcart)
+         t2_dot_vcart = annulus_dot(t2,vcart)
+
+         u(1) = t1_dot_vcart/t1_norm2         
+         u(2) = t2_dot_vcart/t2_norm2
+         
+         !! And now figure out derivatives using Christoffel symbols ...
+      elseif (example .eq. 2) then
 c        # Conservative for all solvers (rp=1,2,3,4)               
          u(1) = s*(cos(pi*x)**2 + 0.5d0)         
          u(2) = s*(sin(pi*y)**2 + 0.5d0)
          u1x = -pi*s*sin(pi*x)
          u2y =  pi*s*cos(pi*y)
-      elseif (example .eq. 2) then
+      elseif (example .eq. 3) then
          u(1) = s*(cos(pi*x)**2 - 0.5d0)
          u(2) = s*(sin(pi*y)**2 - 0.5d0)
          u1x = -pi*s*sin(pi*x)
@@ -148,8 +171,8 @@ c        # Conservative for all solvers (rp=1,2,3,4)
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision beta
-      common /annulus_comm/ beta
+      double precision beta, theta_vec(2)
+      common /annulus_comm/ beta, theta_vec
 
       double precision r1, r1x, r1xx, r1y, r1yy, r1xy
       double precision R,  Rx,  Rxx,  Ry,  Ryy,  Rxy
@@ -164,6 +187,8 @@ c        # Conservative for all solvers (rp=1,2,3,4)
       integer k, kk, i
       logical compute_covariant, compute_contravariant
       logical compute_derivatives, b(32)
+
+      double precision theta, thetax, thetay
 
       if (flag > 7) then
           write(6,*) 'psi.f : flag > 7'
@@ -195,16 +220,20 @@ c      r = beta + (1-beta)*yc
 c      xp = r*cos(2*pi*xc)
 c      yp = r*sin(2*pi*xc)
 
+      theta = pi2*(theta_vec(1) + (theta_vec(2)-theta_vec(1))*x)
+      thetax = pi2*(theta_vec(2)-theta_vec(1))
+      thetay = 0
+
       r = beta + (1-beta)*y
       rx = 0
       ry = 1-beta
       if (compute_covariant) then
-          t(1,1) = -pi2*r*sin(pi2*x)
-          t(2,1) = pi2*r*cos(pi2*x)
+          t(1,1) = -thetax*r*sin(theta)
+          t(2,1) = thetax*r*cos(theta)
           t(3,1) = 0
 
-          t(1,2) = ry*cos(pi2*x)
-          t(2,2) = ry*sin(pi2*x)
+          t(1,2) = ry*cos(theta)
+          t(2,2) = ry*sin(theta)
           t(3,2) = 0
 
       endif
@@ -216,12 +245,12 @@ c      yp = r*sin(2*pi*xc)
       Ryy   = 0
       Rxy   = 0
 
-      f(1)  = cos(pi2*x);
-      fx(1) = -pi2*sin(pi2*x)
+      f(1)  = cos(theta);
+      fx(1) = -thetax*sin(theta)
       fy(1) = 0
 
-      f(2)  = sin(pi2*x);
-      fx(2) = pi2*cos(pi2*x)
+      f(2)  = sin(theta);
+      fx(2) = thetax*cos(theta)
       fy(2) = 0
 
       f(3) = 0
@@ -274,11 +303,11 @@ c         # Contravariant vectors
       endif
 
       if (compute_derivatives) then
-          fxx(1) = -pi4*cos(pi2*x)
+          fxx(1) = -thetax**2*cos(theta)
           fyy(1) = 0
           fxy(1) = 0
 
-          fxx(2) = -pi4*sin(pi2*x)
+          fxx(2) = -thetax**2*sin(theta)
           fyy(2) = 0
           fxy(2) = 0
 
