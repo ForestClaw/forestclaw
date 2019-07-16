@@ -14,27 +14,14 @@
 ## swirl_cons (square)
 include applications/clawpack/advection/2d/swirl_cons/Makefile.am
 
-## annulus (square)
+## annulus (Conservation test)
 include applications/paper/annulus/Makefile.am
 
-## swirl (square)
-#include applications/clawpack/advection/2d/swirl/Makefile.am
-
-## filament (original)
-include applications/clawpack/advection/2d/filament/Makefile.am
-
-## replicated (original)
-#include applications/clawpack/advection/2d/replicated/Makefile.am
+## torus (Accuracy test)
+include applications/paper/torus/Makefile.am
 
 ## torus_error (original)
 #include applications/clawpack/advection/2d/torus_error/Makefile.am
-
-## torus (original)
-include applications/clawpack/advection/2d/torus/Makefile.am
-
-
-## shockbubble (original)
-# include applications/clawpack/euler/2d/shockbubble/Makefile.am
 
 ## shockbubble (square)
 # include applications/clawpack/euler/2d/shockbubble_debug/Makefile.am
