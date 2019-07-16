@@ -92,7 +92,9 @@ annulus_check(user_options_t *user)
 {
     if (user->example < 0 || user->example > 1)
     {
-0]    }
+        fclaw_global_essentialf("example must 0 or 1\n");
+        return FCLAW_EXIT_QUIET;        
+    }
     if (user->use_stream == 1 && user->example != 0)
     {
         fclaw_global_essentialf("use_stream == 1 and example != 0.\n");

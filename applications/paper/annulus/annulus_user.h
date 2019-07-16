@@ -66,29 +66,11 @@ user_options_t;
 
 void annulus_link_solvers(fclaw2d_global_t *glob);
 
-void annulus_problem_setup(fclaw2d_global_t *glob);
-
 #define SETPROB_ANNULUS FCLAW_F77_FUNC(setprob_annulus, \
                                        SETPROB_ANNULUS)
-
 void SETPROB_ANNULUS(void); 
 
-#if 0
-void SETPROB_ANNULUS(const int* example, 
-                     const int* mapping, 
-                     const int* initial_condition,
-                     const double* revs_per_s,
-                     const int *ceqn_in,
-                     const int *use_stream_in,
-                     const double* beta,
-                     const int* refine_pattern);
-#endif                     
 
-
-void annulus_patch_setup(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx);
 
 user_options_t* annulus_options_register (fclaw_app_t * app,
                                           const char *configfile);

@@ -23,13 +23,8 @@ applications_paper_annulus_annulus_SOURCES = \
 	applications/paper/annulus/user_4.6/tag4coarsening.f \
 	applications/paper/annulus/user_4.6/compute_error.f \
 	applications/paper/annulus/user_4.6/annulus46_rpt2adv_manifold.f \
-	applications/paper/annulus/user_5.0/qinit.f90 \
-	applications/paper/annulus/user_5.0/psi.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
-	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f \
-	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
-	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
-	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
+	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f
 
 EXTRA_DIST += \
 	applications/paper/annulus/regression.ini \
