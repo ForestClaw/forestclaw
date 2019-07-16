@@ -10,9 +10,31 @@
       double precision u,v,w,urot, nv(3)
       integer k
 
-c     # Get cell-centered velocity projected to face 
-c     # 'iface' (in 0,1,2,3) 
-      urot = auxvec_center(2+iface)
+cc     # Cell-centered velocities         
+c      u = auxvec_center(4)
+c      v = auxvec_center(5)
+c      w = auxvec_center(6)
+
+c     # x-face normal : (9-11)
+c     # y-face normal : (12-14)       
+c      do k = 1,3
+c          if (idir .eq. 0) then
+c              nv(k) = auxvec_edge(9+k-1)
+c          else
+c              nv(k) = auxvec_edge(12+k-1)
+c          endif
+c      enddo
+
+c     # Get flux in direction normal to idir-face
+c      urot = u*nv(1) + v*nv(2) + w*nv(3)
+
+      if (iface .eq. 0) then
+c         # x faces faces        
+          urot = auxvec_center(2+2*idir)  !! Left edge or bottom edge
+      else
+c         # y faces faces        
+          urot = auxvec_center(3+2*idir)
+      endif
 
 c     #  f(q) = (n dot u)*q
       do m = 1,meqn

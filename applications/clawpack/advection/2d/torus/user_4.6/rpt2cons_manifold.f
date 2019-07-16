@@ -30,7 +30,6 @@ c         # -----------------------------------------
 c         # Lower faces - cell centered velocities
 c         # -----------------------------------------
            
-c         # 6-7    Edge lengths (x-face, y-face)
           g = aux2(i1,6+idir)
 
 c         # left-right : 2,3

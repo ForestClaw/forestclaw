@@ -65,32 +65,14 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
-    double xc1,yc1,zc1;
-    double alpha, beta;
-    double L[4];
-    double x,y;
-    int i;
-
-    /* blockno is ignored in the current torus mapping;  it just assumes
-       a single "logical" block in [0,1]x[0,1] */
-    alpha = cont->user_double[0];
-    beta = cont->user_double[1];
 
     /* Data is not already in brick domain */
+    double xc1,yc1,zc1;
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-    /* Map from orthogonal coordinates to non-orthogonal coordinates */
-    for(i=0; i < 4; i++)
-    {
-        L[i] = cont->user_double[2+i];
-    }
-
-    /* Map from (a1,a2) back to (x,y) */
-    x = L[0]*xc1 + L[1]*yc1;
-    y = L[2]*xc1 + L[3]*yc1;
-
-    MAPC2M_TORUS(&blockno,&x,&y,xp,yp,zp,&alpha,&beta);
-
+    double alpha = cont->user_double[0];
+    double beta = cont->user_double[1];
+    MAPC2M_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha,&beta);
 }
 
 fclaw2d_map_context_t *
@@ -99,13 +81,9 @@ fclaw2d_map_context_t *
                            const double shift[],
                            const double rotate[],
                            const double alpha,
-                           const double beta,
-                           const int mapping)
+                           const double beta)
 {
     int i;
-    double l0[4] = {1.,  0.,  0.,  1.};
-    double l1[4] = {1.,  0.,  1.,  1.};
-    double l2[4] = {1.,  -1.,  1.,  0.};
 
     fclaw2d_map_context_t *cont;
 
@@ -115,25 +93,6 @@ fclaw2d_map_context_t *
 
     cont->user_double[0] = alpha;
     cont->user_double[1] = beta;
-
-    for(i = 0; i < 4; i++)
-    {
-        if (mapping == 0)
-        {
-            /* Regular torus mapping.  L given rowwise*/
-            cont->user_double[2+i] = l0[i];
-        }
-        else if (mapping == 1)
-        {
-            cont->user_double[2+i] = l1[i];
-        }
-        else if (mapping == 2)
-        {
-            cont->user_double[2+i] = l2[i];
-        }
-    }
-
-    cont->user_int[0] = mapping;  /* Might not be used */
 
     /* Are we really using these? */
     set_scale(cont,scale);

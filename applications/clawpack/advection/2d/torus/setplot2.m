@@ -11,7 +11,7 @@ PlotType = 1;                % type of plot to produce:
 
 mq = 1;                      % which component of q to plot
 UserVariable = 0;            % set to 1 to specify a user-defined variable
-UserVariableFile = 'errornorm';      % name of m-file mapping data to q
+UserVariableFile = ' ';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
 Manifold = 1;
 ReadBlockNumber = 1;

@@ -1,45 +1,29 @@
 setviews;
 
-plot_contour = false;
-plot_qtrue = false;
+alpha = 0.4;
+period = 0;
 
-if plot_contour
-    yrbcolormap;
-    hold on;
-    % assume we are doing the Gaussian problem with error
-    [xp,yp,zp] = torus_soln_contour(t,alpha,R,period);
-    plot3(xp,yp,zp,'k','linewidth',2);
-    hold off;
-    hidepatchborders;
-    view(3)
-    % camlight;
-    axis off
+if (ShowUnderOverShoots)
+    qlo = 0;
+    qhi = 1;
+    colorbar_underover(under_label,over_label);
 end
 
-fprintf('%6s %16.8e\n','qmin',qmin);
-fprintf('%6s %16.8e\n\n','qmax',qmax);
-
-% yrbcolormap;
-colormap(parula);
-
-% showgridlines(1:5);
-
+yrbcolormap;
 showpatchborders;
-% hidepatchborders;
 setpatchborderprops('linewidth',1);
-
 daspect([1,1,1]);
 
-caxis([0, 1]);
-colorbar
-axis off;
+caxis([0 1])
 
-view(vbot);
-
-if (mq >= 3)
-    caxis([qmin,qmax]);
-    colorbar;
+o = findobj('type','Light');
+if ishandle(o)
+    delete(o);
 end
+%camlight
+
+view(3);
+% view(vtop);
 
 prt = false;
 NoQuery = false;

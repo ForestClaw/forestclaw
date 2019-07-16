@@ -27,12 +27,11 @@ c     # ------------------------------------------------------------
           stop
       endif
 
-      psi = -pi2*revs_per_s*alpha*(pi2*y + alpha*sin(pi2*y))
+      psi = pi2*revs_per_s*alpha*(pi2*y + alpha*sin(pi2*y))
 
       torus_psi = psi
 
       end
-
 
       subroutine torus_psi_derivs(x,y,p,px,py)
       implicit none
@@ -56,11 +55,12 @@ c     # ------------------------------------------------------------
       endif
 
 c     # Stream function for rigid body rotation.      
-      p = -(pi2*revs_per_s)*alpha*(pi2*y + alpha*sin(pi2*y))
+      p = (pi2*revs_per_s)*alpha*(pi2*y + alpha*sin(pi2*y))
       px = 0
-      py = -(pi2)**2*revs_per_s*alpha*(1 + alpha*cos(pi2*y))
+      py = (pi2)**2*revs_per_s*alpha*(1 + alpha*cos(pi2*y))
 
       end
+
 
       subroutine torus_velocity_components(x,y,u)
       implicit none
@@ -74,17 +74,12 @@ c     # Stream function for rigid body rotation.
       common /stream_comm/ revs_per_s
 
       integer example
-      common /example_comm/ example  
-
-      double precision s
+      common /example_comm/ example      
 
       if (example .eq. 0) then
           u(1) = revs_per_s
           u(2) = 0
       elseif (example .eq. 1) then
-c           s = sqrt(2.d0)
-c           u(1) = s*cos(8*pi*x)
-c           u(2) = s*sin(8*pi*y)   
            u(1) = 0
            u(2) = 1
       endif
@@ -92,50 +87,6 @@ c           u(2) = s*sin(8*pi*y)
 
       end
 
-      subroutine torus_velocity_derivs(x,y,u,uderivs)
-      implicit none
-
-      double precision x, y, u(2)
-      double precision uderivs(4)
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
-
-      integer example
-      common /example_comm/ example  
-
-      double precision s, pim
-
-      if (example .eq. 0) then
-          u(1) = revs_per_s
-          u(2) = 0
-          uderivs(1) = 0
-          uderivs(2) = 0
-          uderivs(3) = 0
-          uderivs(4) = 0
-      elseif (example .eq. 1) then
-c          s = sqrt(2.d0)
-c          pim = 8*pi
-c          u(1) = s*cos(pim*x)
-c          u(2) = s*sin(pim*y)   
-cc         # uderivs = [u1x u1y; u2x u2y]          
-c          uderivs(1) = -s*pim*sin(pim*x)
-c          uderivs(2) = 0;
-c          uderivs(3) = 0; 
-c          uderivs(4) = s*pim*cos(pim*y)
-          u(1) = 0
-          u(2) = 1
-          uderivs(1) = 0
-          uderivs(2) = 0
-          uderivs(3) = 0
-          uderivs(4) = 0           
-      endif
-
-
-      end
 
 
       subroutine torus_basis_complete(x,y, t, tinv,tderivs, flag)
@@ -323,35 +274,4 @@ c             # d(t2)/dy = d(g*fy + gy*f)/dy
       endif
 
       end
-
-      subroutine torus_transform_coordinates(a,b,x,y,mapping)
-      implicit none
-
-      double precision a,b, x,y
-      integer mapping
-      double precision l0(4), l1(4), l2(4)
-
-      data l0 /1., 0., 0., 1./
-      data l1 /1., 0., 1., 1./
-      data l2 /1., -1., 1., 0./
-
-c     # This compute (x,y) from a1*t1 + a2*t2, where
-c     # t1, t2 are the columns of the matrix L.
-
-      if (mapping .eq. 0) then
-          x = a
-          y = b
-      elseif (mapping .eq. 1)  then
-          x = a*l1(1) + b*l1(2)
-          y = a*l1(3) + b*l1(4)
-      elseif (mapping .eq. 2) then
-          x = a*l2(1) + b*l2(2)
-          y = a*l2(3) + b*l2(4)
-      endif
-
-      end
-
-
-
-
 

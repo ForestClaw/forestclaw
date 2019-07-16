@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
-                                user_options_t* user_opt)
+                                user_options_t* user)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -64,21 +64,13 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     b = 1;
 
     /* This does both the regular torus and the twisted torus */
-    switch(user_opt->mapping)
-    {
-        /* Got rid of Cartesian mapping */
-        case 0:
-        case 1:
-        case 2:
-            conn  = p4est_connectivity_new_brick(mi,mj,a,b);
-            brick = fclaw2d_map_new_brick(conn,mi,mj);
-            cont  = fclaw2d_map_new_torus(brick,fclaw_opt->scale,
-                                          fclaw_opt->shift,
-                                          rotate,
-                                          user_opt->alpha,
-                                          user_opt->beta,
-                                          user_opt->mapping);            
-    }
+    conn  = p4est_connectivity_new_brick(mi,mj,a,b);
+    brick = fclaw2d_map_new_brick(conn,mi,mj);
+    cont  = fclaw2d_map_new_torus(brick,fclaw_opt->scale,
+                                  fclaw_opt->shift,
+                                  rotate,
+                                  user->alpha,
+                                  user->beta);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, 
                                           fclaw_opt->minlevel, 
@@ -92,25 +84,32 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t  *user_opt;
+    const user_options_t  *user;
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user_opt = torus_get_options(glob);
+    user = torus_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
-    if (user_opt->claw_version == 4)
+    if (user->claw_version == 4)
     {
         fc2d_clawpack46_solver_initialize();
     }
-    else if (user_opt->claw_version == 5)
+    else if (user->claw_version == 5)
     {
+        fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+        if (fclaw_opt->time_sync != 0)
+        {
+            fclaw_global_essentialf("Conservation correction not yet implemented in " \
+                                    " claw-version=5.\n");
+            exit(0);
+        }
         fc2d_clawpack5_solver_initialize();
     }
 
@@ -133,7 +132,7 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    user_options_t              *user_opt;
+    user_options_t              *user;
     fclaw_options_t             *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
@@ -153,7 +152,7 @@ main (int argc, char **argv)
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    user_opt =                    torus_options_register(app,"fclaw_options.ini");  
+    user =                    torus_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -165,7 +164,7 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
         
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
+        domain = create_domain(mpicomm, fclaw_opt, user);
 
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();
@@ -176,7 +175,7 @@ main (int argc, char **argv)
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
-        torus_options_store             (glob, user_opt);
+        torus_options_store             (glob, user);
 
         /* Run the program */
         run_program(glob);
