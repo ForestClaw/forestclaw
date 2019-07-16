@@ -39,6 +39,9 @@ FCLAW_ARG_ENABLE([cudaclaw], [Enable cudaclaw library and application],
 FCLAW_ARG_ENABLE([development], [Enable general applications under development],
                  [DEVELOPMENT])
 
+FCLAW_ARG_ENABLE([paper], [Enable examples applications from paper],
+                 [PAPER])
+
 FCLAW_ARG_ENABLE([swbli], [Enable swbli project],
                  [SWBLI])
 

@@ -1,0 +1,14 @@
+## -------------------------- SISC paper apps -----------------------------
+##  These are not guaranteed to compile or may not be available with 
+## standard distribution
+## ------------------------------------------------------------------------
+
+## annulus (Conservation test)
+include applications/paper/annulus/Makefile.am
+
+## torus (Accuracy test)
+include applications/paper/torus/Makefile.am
+
+
+
+

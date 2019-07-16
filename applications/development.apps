@@ -14,12 +14,6 @@
 ## swirl_cons (square)
 include applications/clawpack/advection/2d/swirl_cons/Makefile.am
 
-## annulus (Conservation test)
-include applications/paper/annulus/Makefile.am
-
-## torus (Accuracy test)
-include applications/paper/torus/Makefile.am
-
 ## torus_error (original)
 #include applications/clawpack/advection/2d/torus_error/Makefile.am
 
