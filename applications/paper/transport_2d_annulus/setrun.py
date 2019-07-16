@@ -66,7 +66,7 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = original (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 1
+    qad_mode = 0
 
     maux = 9
     use_fwaves = True

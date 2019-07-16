@@ -200,12 +200,12 @@ SUBROUTINE annulus46_set_center_velocities(mx,my,mbc, &
 !!        DO k = 1,3
 !!           nv(k) = surfnormals(i,j,k)
 !!        ENDDO
-
+!!
 !!        vdotn = annulus_dot(vel,nv)
-
-        DO k = 1,3
+!!
+!!        DO k = 1,3
 !!           vel(k) = vel(k) - vdotn*nv(k)
-        END DO
+!!        END DO
 
         DO k = 1,3
            nl(k)  = xnormals(i,  j,  k)
