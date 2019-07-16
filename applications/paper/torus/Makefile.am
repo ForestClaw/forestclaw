@@ -6,7 +6,6 @@ applications_paper_torus_torus_SOURCES = \
 	applications/paper/torus/torus_user.h \
 	applications/paper/torus/torus_user.cpp \
 	applications/paper/torus/fclaw2d_map_torus.c \
-	applications/paper/torus/fclaw2d_map_cart.c \
 	applications/paper/torus/setprob.f \
 	applications/paper/torus/torus_velocity.f \
 v	applications/paper/torus/torus_psi.f \
