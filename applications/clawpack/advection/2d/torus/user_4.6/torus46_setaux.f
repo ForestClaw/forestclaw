@@ -11,10 +11,7 @@
 
       integer i,j, k
       double precision dxdy
-
-      integer example
-      common /example_comm/ example  
-
+     
       integer color_equation
       common /eqn_comm/ color_equation      
 

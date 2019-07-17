@@ -2,6 +2,7 @@
 ##  These are not guaranteed to compile or may not be available with 
 ## standard distribution
 ## ------------------------------------------------------------------------
+
 ## Third order scalar advection
 #include applications/clawpack/advection/2d/adv_order3/Makefile.am
 
@@ -17,23 +18,8 @@
 ## swirl_basilisk (square)
 include applications/clawpack/advection/2d/swirl_basilisk/Makefile.am
 
-## swirl_cons (square)
-#include applications/clawpack/advection/2d/swirl/Makefile.am
-
-## filament (original)
-#include applications/clawpack/advection/2d/filament/Makefile.am
-
-## replicated (original)
-#include applications/clawpack/advection/2d/replicated/Makefile.am
-
 ## torus_error (original)
 #include applications/clawpack/advection/2d/torus_error/Makefile.am
-
-## torus (original)
-#include applications/clawpack/advection/2d/torus/Makefile.am
-
-## shockbubble (original)
-# include applications/clawpack/euler/2d/shockbubble/Makefile.am
 
 ## shockbubble (square)
 # include applications/clawpack/euler/2d/shockbubble_debug/Makefile.am

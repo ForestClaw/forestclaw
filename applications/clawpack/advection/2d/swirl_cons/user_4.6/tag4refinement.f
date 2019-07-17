@@ -1,4 +1,4 @@
-      subroutine tag4refinement(mx,my,mbc,
+      subroutine clawpack46_tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
      &      q, tag_threshold, init_flag,tag_patch)
       implicit none
@@ -30,7 +30,8 @@ c     # Refine based only on first variable in system.
          do i = 1,mx
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if (q(i,j,mq) .gt. tag_threshold) then
+            if (q(i,j,mq) .gt. tag_threshold .and. 
+     &          q(i,j,mq) .lt. 1-tag_threshold) then
                tag_patch = 1
                return
             endif

@@ -53,10 +53,19 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
 {
     fclaw2d_map_context_t *cont = *pcont;
 
-    FCLAW_ASSERT(cont->brick != NULL);
-    fclaw2d_map_context_t *brick = cont->brick;
-    
-    brick->mapc2m (brick, *blockno, *xc, *yc, xp, yp, zp);
+    if (cont->brick != NULL)
+    {
+        fclaw2d_map_context_t *brick = cont->brick;    
+        brick->mapc2m (brick, *blockno, *xc, *yc, xp, yp, zp);
+    }
+    else
+    {
+        /* We only have one tree */
+        FCLAW_ASSERT(blockno == 0);
+        *xp = *xc;
+        *yp = *yc;
+        *zp = 0;
+    }
 }
 
 

@@ -35,6 +35,21 @@ include applications/development.apps
 
 endif
 
+# ----------------------------------
+# Projects for paper
+# ----------------------------------
+if FCLAW_ENABLE_PAPER
+
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+
+# Development projects
+include applications/paper.apps
+
+endif
 
 
 # ----------------------------------

@@ -1,10 +1,10 @@
-      subroutine  rpn2_cons_update_manifold(meqn,maux, idir, q,
+      subroutine  rpn2cons_update_manifold(meqn,maux, idir, iface, q,
      &                                     auxvec_center,
      &                                     auxvec_edge,flux)
 
       implicit none
 
-      integer meqn,maux,idir, k
+      integer meqn,maux,idir, k, iface
       double precision q(meqn), flux(meqn)
       double precision auxvec_center(maux), auxvec_edge(maux)
       double precision u,v,urot

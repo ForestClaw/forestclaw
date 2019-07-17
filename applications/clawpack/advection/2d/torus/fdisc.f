@@ -6,12 +6,13 @@
       integer*8 cont, get_context
       double precision th, tp, r2, w1, w2, thc, g, r
 
-      double precision pi
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
-      double precision alpha, revs_per_s
-      common /torus_comm/ alpha, revs_per_s
+      double precision alpha, beta
+      common /torus_comm/ alpha, beta
 
+      double precision a
 
       cont = get_context()
 
@@ -23,11 +24,8 @@
       w1 = pi/8.d0
       w2 = pi/4.0
 
-c     # atan2(y,x) \in [-pi,pi]      
+c     # atan2(y,x) \in [-pi,pi]            
       th = atan2(yp,xp)
-
-c     # asin(zp/alpha) \in [-pi/2,pi/2]      
-      g = asin(zp/alpha)
 
 c     # Distance from thc
       r2 = (th-thc)**2

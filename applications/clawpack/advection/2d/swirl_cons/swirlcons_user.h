@@ -41,7 +41,12 @@ typedef struct user_options
     int rp_solver;
     int example;
     int mapping;
-    double alpha;
+
+    double alpha;    /* Used by five-patch mapping */
+
+    int initial_condition;  /* Smooth or non-smooth */
+    int color_equation;
+    int use_stream;
 
     double *center;
     const char *center_string;
@@ -54,7 +59,9 @@ struct fclaw2d_global;
 struct fclaw2d_patch;
 
 #define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(int* example);
+void SWIRL_SETPROB(const int* example, const int* mapping, const int* initchoice,
+                   const int* color_equation, const int* use_stream,
+                   const double* alpha);
 
 void swirlcons_link_solvers(struct fclaw2d_global *glob);
 
@@ -100,8 +107,12 @@ const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob);
 
 /* ---------------------------- Fortran headers --------------------------------------- */
 
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(int* example);
+#define SWIRL46_COMPUTE_ERROR FCLAW_F77_FUNC(swirl46_compute_error,SWIRL46_COMPUTE_ERROR)
+
+void SWIRL46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                           double *dx, double *dy, double *xlower,
+                           double *ylower, double *t, double q[],
+                           double error[], double soln[]);
 
 
 #define RPN2CONS_QS FCLAW_F77_FUNC(rpn2cons_qs,RPN2CONS_QS)
@@ -166,7 +177,7 @@ void RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const i
 
 #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
 
-void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir,
+void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
                       double q[], double aux_center[], double aux_edge[], double flux[]);
 
 
@@ -174,6 +185,7 @@ void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir,
                                                  RPN2_CONS_UPDATE_MANIFOLD)
 
 void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir,
+                               const int* iface,
                                double q[], double aux_center[], double aux_edge[],
                                double flux[]);
 
@@ -191,6 +203,65 @@ void CLAWPACK46_SETAUX_MANIFOLD(const int* mbc,
                             double area[],double edgelengths[],
                             double xnormals[],double ynormals[],
                             double surfnormals[]);
+
+#define SWIRL46_SETAUX FCLAW_F77_FUNC(swirl46_setaux, SWIRL46_SETAUX)
+
+void SWIRL46_SETAUX(const int* mbc,
+                            const int* mx, const int* my,
+                            const double* xlower, const double* ylower,
+                            const double* dx, const double* dy,
+                            const int* maux, double aux[],
+                            const int* blockno,
+                            double area[],double edgelengths[],
+                            double xnormals[],double ynormals[],
+                            double surfnormals[]);
+
+
+#define  SWIRL46_FORT_WRITE_FILE FCLAW_F77_FUNC(swirl46_fort_write_file,  \
+                                                SWIRL46_FORT_WRITE_FILE)
+void     SWIRL46_FORT_WRITE_FILE(char* matname1,
+                                 int* mx,        int* my,
+                                 int* meqn,      int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* dx,     double* dy,
+                                 double q[],     double error[], double soln[],
+                                 double *time,
+                                 int* patch_num, int* level,
+                                 int* blockno,   int* mpirank);
+
+#define SWIRL46_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(swirl46_fort_header_ascii, \
+                        SWIRL46_FORT_HEADER_ASCII)
+void SWIRL46_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                               double* time, int* meqn, int* maux, 
+                               int* ngrids);
+
+
+#define SWIRL46_TAG4REFINEMENT FCLAW_F77_FUNC(swirl46_tag4refinement, \
+                                              SWIRL46_TAG4REFINEMENT)
+void  SWIRL46_TAG4REFINEMENT(const int* mx,const int* my,
+                             const int* mbc,const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q[],
+                             const double* tag_threshold,
+                             const int* init_flag,
+                             int* tag_patch);
+
+#define  SWIRL46_TAG4COARSENING FCLAW_F77_FUNC(swirl46_tag4coarsening, \
+                                              SWIRL46_TAG4COARSENING)
+void  SWIRL46_TAG4COARSENING(const int* mx, const int* my,
+                             const int* mbc, const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q0[],double q1[],
+                             double q2[],double q3[],
+                             const double* tag_threshold,
+                             int* tag_patch);
+
+
 
 #ifdef __cplusplus
 #if 0

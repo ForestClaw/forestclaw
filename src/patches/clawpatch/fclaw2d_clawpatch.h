@@ -170,6 +170,9 @@ double* fclaw2d_clawpatch_get_q(struct fclaw2d_global* glob,
 double* fclaw2d_clawpatch_get_error(struct fclaw2d_global* glob,
                                     struct fclaw2d_patch* this_patch);
 
+double* fclaw2d_clawpatch_get_exactsoln(struct fclaw2d_global* glob,
+                                        struct fclaw2d_patch* this_patch);
+
 size_t fclaw2d_clawpatch_size(struct fclaw2d_global *glob);
 
 void* flaw2d_clawpatch_user_data(struct fclaw2d_global* glob,

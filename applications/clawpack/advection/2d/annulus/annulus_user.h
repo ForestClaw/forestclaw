@@ -41,6 +41,10 @@ typedef struct user_options
 {
     int example;
     double beta;  /* Ratio of inner radius to outer radius */
+
+    const char *theta_string;
+    double *theta;  /* Theta range */
+
     int claw_version;
 
     int is_registered;
@@ -72,7 +76,8 @@ fclaw2d_map_context_t *
                              const double scale[],
                              const double shift[],
                              const double rotate[],
-                             const double alpha);
+                             const double alpha,
+                             const double theta[]);
 
 #ifdef __cplusplus
 #if 0
