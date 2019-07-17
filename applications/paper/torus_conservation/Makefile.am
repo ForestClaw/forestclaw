@@ -17,9 +17,7 @@ v	applications/paper/torus_conservation/torus_psi.f \
 	applications/paper/torus_conservation/user_4.6/tag4coarsening.f \
 	applications/paper/torus_conservation/user_4.6/rpn2cons_fw_manifold.f \
     applications/paper/torus_conservation/user_4.6/rpt2cons_manifold.f \
-	applications/paper/torus_conservation/user_4.6/rpn2cons_update_manifold.f \
-	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
-	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f
+	applications/paper/torus_conservation/user_4.6/rpn2cons_update_manifold.f
 
 
 
