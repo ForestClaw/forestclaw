@@ -3,11 +3,18 @@
 ## standard distribution
 ## ------------------------------------------------------------------------
 
+# ------------------------- Conservation ----------------------------------
 ## annulus (Conservation test)
 include applications/paper/annulus/Makefile.am
 
+## torus (Conservation test)
+include applications/paper/torus_conservation/Makefile.am
+
+
+# ------------------------- Acccuracy ----------------------------------
 ## torus (Accuracy test)
 include applications/paper/torus/Makefile.am
+
 
 
 
