@@ -1,6 +1,3 @@
-c      subroutine rpt2cons_manifold(ixy,maxm,meqn,mwaves,mbc,mx,
-c     &                       ql,qr,aux1,aux2,aux3,imp,asdq,
-c     &                       bmasdq,bpasdq)
       subroutine rpt2cons_manifold(ixy,imp,maxm,meqn,mwaves,maux,
      &               mbc,mx,ql,qr,
      &               aux1,aux2,aux3,asdq,bmasdq,bpasdq)
