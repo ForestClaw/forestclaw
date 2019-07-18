@@ -66,7 +66,7 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = original (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 0
+    qad_mode = 1
 
     maux = 9
     use_fwaves = True
@@ -80,14 +80,10 @@ def setrun(claw_pkg='amrclaw'):
     # example 0 : Rigid body rotation (possibly using a streamfunction)
     # Make vertical speed small so we leave grid
     probdata.add_param('example',                example,           'example')
-    probdata.add_param('mapping',                0,           'mapping')
     probdata.add_param('initial condition',      initial_choice,    'init_choice')
     probdata.add_param('revolutions per second', rps,               'rps')
-    probdata.add_param('Twist factor',           0,                 'twist')
     probdata.add_param('Cart.    speed',         cart_speed,        'cart_speed')
     probdata.add_param('initial radius',         0.05,              'init_radius')
-    probdata.add_param('color equation',         0,    'color_equation')
-    probdata.add_param('use stream function',    0,                 'use_stream')
     probdata.add_param('beta',                   0.4,               'beta')
     probdata.add_param('theta1',                 0.125,             'theta(1)')
     probdata.add_param('theta2',                 0.375,             'theta(2)')
@@ -251,17 +247,18 @@ def setrun(claw_pkg='amrclaw'):
 
 
     # ----------------------------------------------------------------
-    # Color equation (edge velocities)
-    # 1      capacity
-    # 2-3    Edge velocities
-    #
+
     # Conservative form (cell-centered velocities)
-    # 2-5    Cell-centered velocities projected onto four edge normals
-    # 6-7    Edge lengths (x-face, y-face)
+    # 1      capacity
+    # 2-3    Cell-centered velocities projected 
+    # 4-5    normal at x face
+    # 6-7    normal at y face
+    # 8-9    edgelengths at x/y faces
     # ----------------------------------------------------------------
 
     if (qad_mode in [0,1]):
-        amrdata.aux_type = ['capacity'] + ['xleft','center','yleft','center']*2
+        amrdata.aux_type = ['capacity'] + ['center']*2 + ['xleft']*2 + \
+                 ['yleft']*2 + ['xleft','yleft']
     else:
         amrdata.aux_type = ['capacity'] + ['center']*8
 
