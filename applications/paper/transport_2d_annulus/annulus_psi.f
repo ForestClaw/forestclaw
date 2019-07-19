@@ -5,138 +5,40 @@ c     # Stream function depends on these global variables
 c     #         example (0=incompressible; 1=compressible)
 c     #         mapping (0=annulus; 1=twisted annulus)
 c     # ------------------------------------------------------------
-      double precision function annulus_psi(x,y)
+
+
+
+      subroutine annulus_velocity_components(x,y,t,u)
       implicit none
 
-      double precision x, y
+      double precision x, y, u(2), t
 
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
-
-      integer example
-      common /example_comm/ example  
-
-      double precision r2, w
-
-c     # Formulation below assumes that (x,y) are in physical 
-c     # coordinates;  
-c           
-      if (example .eq. 0) then
-c         # annulus : Solid body rotation
-          r2 = x**2 + y**2
-          annulus_psi = -0.5d0*pi2*revs_per_s*r2
-      else
-c         # cart velocity
-          annulus_psi = cart_speed*x
-      endif
-
-      end
-
-
-      subroutine annulus_psi_derivs(x,y,p,px,py)
-      implicit none
-
-      double precision x, y
-      double precision p, px, py
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
-
-      integer example
-      common /example_comm/ example  
-
-      double precision r, r2, rx, ry
-
-c     # r2 = x**2 + y**2
-c     # annulus_psi = 0.5d0*pi2*revs_per_s*r2
-
-      if (example .eq. 0) then
-c         # Rigid body rotation        
-          r2 = x**2 + y**2
-          r = sqrt(r)
-          rx = x/r
-          ry = y/r
-
-          p = -0.5d0*pi2*revs_per_s*r2
-          px = -pi2*revs_per_s*r*rx
-          py = -pi2*revs_per_s*r*ry
-      else
-          p = cart_speed*x
-          px = cart_speed
-          py = 0
-      endif
-
-      end
-
-      subroutine annulus_velocity_components(x,y,u)
-      implicit none
-
-      double precision x, y, u(2)
-      double precision uderivs(4)
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
-
-      integer example
-      common /example_comm/ example  
-
-      double precision s
-
-c     # uderivs not used here
-      call annulus_velocity_derivs(x,y,u,uderivs)
-
-      end
-
-      subroutine annulus_velocity_derivs(x,y,u,uderivs)
-      implicit none
-
-      double precision x, y, u(2)
-      double precision uderivs(4)
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
-
-      integer example
-      common /example_comm/ example  
+      double precision revs_per_s, cart_speed, amplitude, freq
+      common /stream_comm/ revs_per_s, cart_speed, amplitude, freq
 
       double precision beta, theta(2)
       common /annulus_comm/ beta, theta
 
+      integer example
+      common /example_comm/ example  
 
-      double precision s, pim, u1x, u1y, u2x, u2y
-      double precision vs, r, t1(3), t2(3), vcart(3)
-      double precision t1_norm, t2_norm, t1_dot_vcart, t2_dot_vcart
-      double precision annulus_dot
+      double precision t1(3), t2(3)
+      double precision t1_norm2, t2_norm2
+      double precision vcart(3), annulus_dot
+      double precision t1_dot_vcart, t2_dot_vcart
+      double precision xp,yp,zp, ravg, xc, d, tfinal, A
 
-      integer k
 
+      call annulus_covariant_basis(x, y, t1,t2) 
 
-c     # uderivs(1) = u1x      
-c     # uderivs(2) = u1y      
-c     # uderivs(3) = u2x      
-c     # uderivs(4) = u2y      
+      t1_norm2 = annulus_dot(t1,t1)
+      t2_norm2 = annulus_dot(t2,t2)
 
-      u1x = 0
-      u1y = 0
-      u2x = 0
-      u2y = 0
-
-c      r = beta + (1-beta)*yc
-c      xp = r*cos(2*pi*xc)
-c      yp = r*sin(2*pi*xc)
-
+c     # Horizontal velocity
+      call annulus_covariant_basis(x, y, t1,t2) 
 
 c     # Set non-zeros derivs only
       if (example .eq. 0) then
@@ -144,31 +46,28 @@ c        # Rigid body rotation
          u(1) = revs_per_s
          u(2) = 0
       elseif (example .eq. 1) then
-c        # Vertical velocity
-         call annulus_covariant_basis(x, y, t1,t2) 
          vcart(1) = cart_speed
          vcart(2) = 0
          vcart(3) = 0
 
-         t1_norm = annulus_dot(t1,t1)
-         t2_norm = annulus_dot(t2,t2)
          t1_dot_vcart = annulus_dot(t1,vcart)
          t2_dot_vcart = annulus_dot(t2,vcart)
 
-         u(1) = t1_dot_vcart/t1_norm         
-         u(2) = t2_dot_vcart/t2_norm
-         
-         !! And now figure out derivatives using Christoffel symbols ...
-      else
-         write(6,'(A,A)') 'annulus_psi : ',
-     &              'No valid example provided'
-         stop
-      endif
+         u(1) = t1_dot_vcart/t1_norm2         
+         u(2) = t2_dot_vcart/t2_norm2
+      elseif (example .eq. 2) then
+         A = amplitude
+         tfinal = 0.25
+         vcart(1) = cart_speed
+         vcart(2) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
+         vcart(3) = 0
 
-      uderivs(1) = u1x
-      uderivs(2) = u1y
-      uderivs(3) = u2x
-      uderivs(4) = u2y
+         t1_dot_vcart = annulus_dot(t1,vcart)
+         t2_dot_vcart = annulus_dot(t2,vcart)
+
+         u(1) = t1_dot_vcart/t1_norm2         
+         u(2) = t2_dot_vcart/t2_norm2
+      endif
 
       end
 

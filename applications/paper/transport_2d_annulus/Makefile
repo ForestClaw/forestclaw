@@ -41,7 +41,7 @@ include $(AMRLIB)/Makefile.amr_2d
 
 EXCLUDE_MODULES = \
 
-EXCLUDE_SOURCES = setaux.f90 flag2refine2.f90 qad.f
+EXCLUDE_SOURCES = setaux.f90 flag2refine2.f90 qad.f b4step2.f
 
 # ----------------------------------------
 # List of custom sources for this program:
@@ -56,6 +56,7 @@ SOURCES = \
   qinit.f \
   fdisc.f \
   cellave2.f \
+  b4step2.f \
   mapc2m_annulus.f \
   annulus_setaux.f90 \
   flag2refine2.f90 \

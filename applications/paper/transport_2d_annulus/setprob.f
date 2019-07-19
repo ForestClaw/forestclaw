@@ -1,15 +1,6 @@
       subroutine setprob()
       implicit none
 
-c     example_in,
-c     mapping_in, 
-c     ic_in, 
-c     revs_per_s_in, 
-c     ceqn_in, 
-c     use_stream_in, 
-c     beta_in
-
-
       integer iunit
       character(len=25) fname      
 
@@ -19,14 +10,11 @@ c     beta_in
       integer example
       common /example_comm/ example
 
-      integer initchoice
-      common /initchoice_comm/ initchoice
-
       double precision init_radius
       common /initradius_comm/ init_radius
 
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
+      double precision revs_per_s, cart_speed, amplitude, freq
+      common /stream_comm/ revs_per_s, cart_speed, amplitude, freq
 
       double precision beta, theta(2)
       common /annulus_comm/ beta, theta
@@ -48,9 +36,10 @@ c     beta_in
       call opendatafile(iunit, fname)
 
       read(iunit,*) example
-      read(iunit,*) initchoice
       read(iunit,*) revs_per_s
       read(iunit,*) cart_speed
+      read(iunit,*) amplitude
+      read(iunit,*) freq
       read(iunit,*) init_radius    !! radius
       read(iunit,*) beta
       read(iunit,*) theta(1)
@@ -65,5 +54,14 @@ c     beta_in
       read(iunit,*) refine_pattern
       read(iunit,*) qad_mode
       close(iunit)
+
+      open(10,file='mapping.dat')
+      write(10,*) amplitude
+      write(10,*) init_radius
+      write(10,*) beta
+      write(10,*) theta(1)
+      write(10,*) theta(2)
+      write(10,*) freq
+      close(10)
 
       end

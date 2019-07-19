@@ -1,8 +1,10 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-beta = 0.4;
-t1 = 0.125;
-t2 = 0.375;
+d = load('_output/mapping.dat');
+
+beta = d(3);
+t1 = d(4);
+t2 = d(5);
 theta = [t1, t2];
 
 

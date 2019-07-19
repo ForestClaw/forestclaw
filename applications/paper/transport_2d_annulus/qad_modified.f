@@ -47,7 +47,7 @@ c      #  ok as long as meqn, mwaves < maxvar
        dimension amdq(nvar,max1dp1),  apdq(nvar,max1dp1)
        dimension auxl(maxaux*max1dp1),  auxr(maxaux*max1dp1)
 
-       integer idir, iface
+       integer idir, iface, sgn
        logical use_fix
 c
 c  WARNING: auxl,auxr dimensioned at max possible, but used as if
@@ -392,6 +392,7 @@ c          # Re-purpose user Riemann solver
            call rpn2(2,max1dp1-2*nghost,nvar,mwaves,maux,nghost,
      &               nr+1-2*nghost,ql,qr,auxl,auxr,wave,s,amdq,apdq)
        endif
+       
 
 c
 c we have the wave. for side 4. add into sdflxm
@@ -469,8 +470,7 @@ c       # Call user defined function to compute fluxes.  The resulting
 c       # flux should be those projected onto face 'iface_cell' and 
 c       # scaled by edgelength/dx or edgelength/dy.
 c       #
-c       # For equations in non-conservative form, the fluxes can be
-c       # set to 0
+c       # The cell edge is the same for both coarse and fine.
         call rpn2qad_flux(meqn,maux,idir,iface_cell,qvl,auxvl,fluxl)
         call rpn2qad_flux(meqn,maux,idir,iface_cell,qvr,auxvr,fluxr)
 

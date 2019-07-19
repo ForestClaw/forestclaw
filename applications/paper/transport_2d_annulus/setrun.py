@@ -26,21 +26,24 @@ def setrun(claw_pkg='amrclaw'):
     # Physical problem parameters
     # ---------------------------
 
-    example = 1          # 0 = rigid body rotation; 1 = horizontal flow
+    # 0 = rigid body rotation; 
+    # 1 = horizontal flow
+    # 2 = sine patch
+    example = 2          
 
-    initial_choice = 0   # 0 = discontinuous;   1 = smooth; 2 = constant
-    
     refine_pattern = 1   # 0 = constant theta;  1 = constant_r
 
     rps   = -1                          # units of theta/second (example=0)
     cart_speed = 1.092505803290319      # Horizontal speed (example=1)
+    amplitude = 0.05                    # Amplitude for sine path
+    freq = 1                          # Frequency for sine path
 
     # ---------------
     # Grid parameters
     # ---------------
+    grid_mx = 32    # Size of ForestClaw grids
     mi = 4          # Number of ForestClaw blocks
     mj = 2     
-    grid_mx = 32    # Size of ForestClaw grids
     mx = mi*grid_mx
     my = mj*grid_mx
 
@@ -66,9 +69,9 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = original (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 1
+    qad_mode = 3
 
-    maux = 9
+    maux = 15
     use_fwaves = True
 
     #------------------------------------------------------------------
@@ -80,9 +83,10 @@ def setrun(claw_pkg='amrclaw'):
     # example 0 : Rigid body rotation (possibly using a streamfunction)
     # Make vertical speed small so we leave grid
     probdata.add_param('example',                example,           'example')
-    probdata.add_param('initial condition',      initial_choice,    'init_choice')
     probdata.add_param('revolutions per second', rps,               'rps')
     probdata.add_param('Cart.    speed',         cart_speed,        'cart_speed')
+    probdata.add_param('amplitude',              amplitude,         'amplitude')
+    probdata.add_param('freq',                   freq,              'freq')
     probdata.add_param('initial radius',         0.05,              'init_radius')
     probdata.add_param('beta',                   0.4,               'beta')
     probdata.add_param('theta1',                 0.125,             'theta(1)')
@@ -94,7 +98,7 @@ def setrun(claw_pkg='amrclaw'):
     probdata.add_param('maxlevel',       maxlevel,       'maxlevel')
     probdata.add_param('reffactor',      ratioxy,        'reffactor')
     probdata.add_param('refine_pattern', refine_pattern, 'refine_pattern')
-    probdata.add_param('qad_new',        qad_mode,       'qad_mode')
+    probdata.add_param('qad_mode',        qad_mode,       'qad_mode')
 
     #------------------------------------------------------------------
     # Standard Clawpack parameters to be written to claw.data:
@@ -256,12 +260,12 @@ def setrun(claw_pkg='amrclaw'):
     # 8-9    edgelengths at x/y faces
     # ----------------------------------------------------------------
 
-    if (qad_mode in [0,1]):
-        amrdata.aux_type = ['capacity'] + ['center']*2 + ['xleft']*2 + \
-                 ['yleft']*2 + ['xleft','yleft']
+    if qad_mode in [0,1]:
+        amrdata.aux_type = ['capacity'] + ['center']*2 + ['xleft']*4 + \
+        ['yleft']*4 + ['xleft']*2 + ['yleft']*2
     else:
-        amrdata.aux_type = ['capacity'] + ['center']*8
-
+        # Each cell has data for all four faces
+        amrdata.aux_type = ['capacity'] + ['center']*14
 
     #  ----- For developers -----
     # Toggle debugging print statements:

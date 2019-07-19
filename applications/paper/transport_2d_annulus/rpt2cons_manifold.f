@@ -41,12 +41,12 @@ c         # -----------------------------------------
 c         # Lower faces - cell centered velocities
 c         # -----------------------------------------
            
-c         # left : 8
-c         # bottom : 9
-          g = aux2(9-idir,i1)
+c         # left/right : 12,13
+c         # bottom/top : 14,15
+          g = aux2(14-2*idir,i1)
 
-          nv(1) = aux2(6-2*idir,i1)
-          nv(2) = aux2(6-2*idir+1,i1)
+          nv(1) = aux2(8-4*idir,i1)
+          nv(2) = aux2(9-4*idir,i1)
 
           ur(1) = aux2(2,i1)
           ur(2) = aux2(3,i1)
@@ -65,9 +65,9 @@ c         # -----------------------------------------
 c         # Upper faces - cell centered velocities
 c         # -----------------------------------------
 
-          g = aux3(9-idir,i1)
-          nv(1) = aux3(6-2*idir,i1)
-          nv(2) = aux3(6-2*idir+1,i1)
+          g = aux3(14-2*idir,i1)
+          nv(1) = aux3(8-4*idir,i1)
+          nv(2) = aux3(9-4*idir,i1)
           ur(1) = aux2(2,i1)
           ur(2) = aux2(3,i1)
 
