@@ -16,8 +16,8 @@ c     # ------------------------------------------------------------
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s, cart_speed, amplitude, freq
-      common /stream_comm/ revs_per_s, cart_speed, amplitude, freq
+      double precision revs_per_s, vcart(2), amplitude, freq
+      common /stream_comm/ revs_per_s, vcart, amplitude, freq
 
       double precision beta, theta(2)
       common /annulus_comm/ beta, theta
@@ -27,7 +27,7 @@ c     # ------------------------------------------------------------
 
       double precision t1(3), t2(3)
       double precision t1_norm2, t2_norm2
-      double precision vcart(3), annulus_dot
+      double precision vc(3), annulus_dot
       double precision t1_dot_vcart, t2_dot_vcart
       double precision xp,yp,zp, ravg, xc, d, tfinal, A
 
@@ -42,33 +42,45 @@ c     # Horizontal velocity
 
 c     # Set non-zeros derivs only
       if (example .eq. 0) then
-c        # Rigid body rotation        
-         u(1) = revs_per_s
-         u(2) = 0
-      elseif (example .eq. 1) then
-         vcart(1) = cart_speed
-         vcart(2) = 0
-         vcart(3) = 0
+c         # Rigid body rotation        
+          u(1) = revs_per_s
+          u(2) = 0
+      else
+          if (example .eq. 1) then
+              vc(1) = vcart(1)
+              vc(2) = vcart(2)
+              vc(3) = 0
+          elseif (example .eq. 2) then
+              A = amplitude
+              tfinal = 0.25
+              if (vcart(2) .eq. 0) then
+                  vc(1) = vcart(1)
+                  vc(2) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
+              else
+                  vc(1) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
+                  vc(2) = vcart(2)
+              endif
+          elseif (example .eq. 3) then
+              A = amplitude
+              tfinal = 0.25
+              if (vcart(2) .eq. 0) then
+c             # Horizontal flow          
+                  vc(1) = vcart(1)*pi*sin(pi*t/tfinal)/2.d0
+                  vc(2) = 0
+              else
+                  vc(1) = 0
+                  vc(2) = vcart(1)*pi*sin(pi*t/tfinal)/2.d0
+              endif
+         endif
+         vc(3) = 0
 
-         t1_dot_vcart = annulus_dot(t1,vcart)
-         t2_dot_vcart = annulus_dot(t2,vcart)
+         t1_dot_vcart = annulus_dot(t1,vc)
+         t2_dot_vcart = annulus_dot(t2,vc)
 
          u(1) = t1_dot_vcart/t1_norm2         
          u(2) = t2_dot_vcart/t2_norm2
-      elseif (example .eq. 2) then
-         A = amplitude
-         tfinal = 0.25
-         vcart(1) = cart_speed
-         vcart(2) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
-         vcart(3) = 0
 
-         t1_dot_vcart = annulus_dot(t1,vcart)
-         t2_dot_vcart = annulus_dot(t2,vcart)
-
-         u(1) = t1_dot_vcart/t1_norm2         
-         u(2) = t2_dot_vcart/t2_norm2
       endif
-
       end
 
 

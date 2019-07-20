@@ -76,7 +76,7 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
     REAL(kind=8) :: x_c,y_c,x_low,y_low,x_hi,y_hi
     REAL(kind=8) :: dqi(meqn), dqj(meqn), dq(meqn)
     REAL(kind=8) :: qmin, qmax, r, ravg, rw, th
-    LOGICAL constant_theta, constant_r, constant_r2
+    LOGICAL constant_theta, constant_r
 
     DOUBLE precision pi, pi2
     COMMON /compi/ pi, pi2
@@ -84,8 +84,8 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
     DOUBLE PRECISION beta, theta(2)
     COMMON /annulus_comm/ beta, theta
 
-    INTEGER refine_pattern
-    COMMON /refine_comm/ refine_pattern
+    INTEGER refine_pattern, rotate_position
+    COMMON /refine_comm/ refine_pattern, rotate_position
 
     double precision t1, t2
 
@@ -124,17 +124,12 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
             if(amrflags(i,j) == UNSET) then
                 r = beta + (1-beta)*y_c
                 th = pi2*(theta(1) + (theta(2)-theta(1))*x_c)
-!!                constant_theta = cos(th) .lt. 0 .and. abs(sin(th)) .lt. 0.5
-                constant_theta = th .gt. pi/2.d0
+                constant_theta = th .gt. (0.5 + rotate_position*0.25)*pi
                 constant_r = r > ravg      
-                constant_r2 = r < ravg          
                 if (refine_pattern .eq. 0 .and. constant_theta) then 
                     amrflags(i,j) = DOFLAG
                     cycle x_loop
                 elseif (refine_pattern .eq. 1 .and. constant_r) then
-                    amrflags(i,j) = DOFLAG
-                    cycle x_loop
-                elseif (refine_pattern .eq. 2 .and. constant_r2) then
                     amrflags(i,j) = DOFLAG
                     cycle x_loop
                 endif

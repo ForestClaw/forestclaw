@@ -7,15 +7,13 @@
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      integer mapping
-      common /mapping_comm/ mapping
-
       double precision beta, theta(2)
       common /annulus_comm/ beta, theta
 
       double precision t1, t2, t
 
-      call annulus_transform_coordinates(ac,bc,xc,yc,mapping)
+      xc = ac
+      yc = bc
 
       t1 = theta(1)
       t2 = theta(2)

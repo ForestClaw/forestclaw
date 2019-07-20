@@ -4,17 +4,20 @@ setviews;
 d = load('_output/mapping.dat');
 A = d(1);
 rinit = d(2);
-beta = d(3);
-freq = d(6);
+pstart = d(3:4)';
+beta = d(5);
+theta = d(6:7);
+vcart = d(8:9);
+freq = d(10);
 
 tfinal = 0.25;
-vcart = 1.092505803290319;
-dlen = vcart*tfinal;
+dlen = max(abs(vcart))*tfinal;
 
-ravg = (1 + beta)/2;
-thc = pi/2*(1 + 1/8);
-pstart = [ravg*cos(thc),ravg*sin(thc)];
-pend = pstart + [dlen, 0];
+if (vcart(2) == 0)
+    pend = pstart + [dlen, 0]*vcart(1)/abs(vcart(1));
+else
+    pend = pstart + [0,dlen]*vcart(2)/abs(vcart(2));
+end
 
 fprintf('%10s %24.16e\n','qmin',qmin);
 fprintf('%10s %24.16e\n','qmax',qmax);
@@ -34,10 +37,24 @@ caxis([-1,1]);
 
 set(gca,'fontsize',16);
 
-% axis([-0.707106781186547   0.707106781186548   0.282842712474619,1]);
+%axis([-0.707106781186547   0.707106781186548   0.282842712474619,1]);
 
-axis([-0.211745637207774, 0.211745637207774, 0.5, 0.85])
+rotate_position = 4*mean(theta) - 1;
 
+if (rotate_position == 0)
+    % Top
+    axis([-0.211745637207774, 0.211745637207774, 0.5, 0.85])
+elseif (rotate_position == 1)
+    % left
+    axis([-0.85,-0.5,-0.211745637207774, 0.211745637207774])
+elseif (rotate_position == 2)
+    % bottom
+    axis([-0.211745637207774, 0.211745637207774, -0.85, -0.5])
+else
+    % right
+    axis([0.5,0.85,-0.211745637207774, 0.211745637207774])
+end
+%axis image
 
 % showgridlines;
 
@@ -47,10 +64,17 @@ if (plot_path)
     % Plot path
     tvec = linspace(0,tfinal,200);
     
-    xpath = pstart(1) + tvec*vcart;
-    ypath = pstart(2) + A*sin(2*pi*freq*tvec/tfinal);
+    %{
+    if (vcart(2) == 0)
+       xpath = pstart(1) + tvec*vcart(1);
+       ypath = pstart(2) + A*sin(2*pi*freq*tvec/tfinal);         
+    else
+        xpath = pstart(1) + A*sin(2*pi*freq*tvec/tfinal);
+        ypath = pstart(2) + tvec*vcart(2);
+    end
     
     p_path = plot(xpath,ypath,'k','linewidth',2);
+    %}
     hold on;
 
     % Plot start and endpoints
@@ -63,9 +87,16 @@ if (plot_path)
     th = linspace(0,2*pi,N+1);
     x0 = rinit*cos(th) + pstart(1);
     y0 = rinit*sin(th) + pstart(2);
-        
-    xth = x0 + t*vcart;
-    yth = y0 + A*sin(2*pi*freq*t/tfinal);
+
+    if (vcart(2) == 0)
+%         xth = x0 + t*vcart(1);
+%         yth = y0 + A*sin(2*pi*freq*t/tfinal);
+          xth = x0 + (dlen/2)*(1-cos(pi*t/tfinal));
+          yth = y0;
+    else
+        xth = x0 + A*sin(2*pi*freq*t/tfinal);
+        yth = y0 + t*vcart(2);
+    end
         
     plot(xth,yth,'k','linewidth',2);
     hold off

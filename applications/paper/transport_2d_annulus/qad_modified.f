@@ -49,6 +49,7 @@ c      #  ok as long as meqn, mwaves < maxvar
 
        integer idir, iface, sgn
        logical use_fix
+
 c
 c  WARNING: auxl,auxr dimensioned at max possible, but used as if
 c  they were dimensioned as the real maux by max1dp1. Would be better
@@ -74,6 +75,9 @@ c
        nr = mitot-2*nghost
        level = node(nestlevel, mptr)
        index = 0
+
+       dx_comm = hx
+       dy_comm = hy
 
 c
 c--------
@@ -426,6 +430,7 @@ c      # how can this be right - where is the integrated src term used?
 
       implicit none
       integer mx, meqn, maux, mbc, idir, iface
+      double precision dx,dy
       double precision ql(meqn,0:mx-1),   qr(meqn,mx)
       double precision auxl(maux,0:mx-1), auxr(maux,mx)
 
@@ -437,7 +442,7 @@ c     # automatically allocated
       double PRECISION auxvl(maux), auxvr(maux)
       double PRECISION fluxl(meqn), fluxr(meqn)
 
-      double precision fd
+      double precision fd, scale
       integer m,i, iface_cell
 
 c     # idir refers to direction of the Riemann solver

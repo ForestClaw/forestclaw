@@ -29,7 +29,8 @@ def setrun(claw_pkg='amrclaw'):
     # 0 = rigid body rotation; 
     # 1 = horizontal flow
     # 2 = sine patch
-    example = 2          
+    # 3 = horizontal flow with variable speed
+    example = 3          
 
     refine_pattern = 1   # 0 = constant theta;  1 = constant_r
 
@@ -37,6 +38,33 @@ def setrun(claw_pkg='amrclaw'):
     cart_speed = 1.092505803290319      # Horizontal speed (example=1)
     amplitude = 0.05                    # Amplitude for sine path
     freq = 1                          # Frequency for sine path
+
+    beta = 0.4
+
+    # 0 : top position (12 o'clock)
+    # 1 : left position (9 o'clock)
+    # 2 : bottom position (6 o'clock)
+    # 3 : right position (3 o'clock)
+    rotate_position = 0
+
+    flow_direction = 1
+
+    cart_speed = flow_direction*cart_speed
+
+    if rotate_position == 0:
+        vcart = [cart_speed,0]
+    elif rotate_position == 1:
+        vcart = [0,cart_speed]
+    elif rotate_position == 2:
+        vcart = [-cart_speed, 0]
+    else:
+        vcart = [0,-cart_speed]    
+
+    theta = np.array([0.125,0.375])  + 0.25*rotate_position
+ 
+    t0 = np.pi/2*(1 + rotate_position + flow_direction*(1/8))
+    ravg = (1 + beta)/2
+    initial_location = ravg*np.array([np.cos(t0), np.sin(t0)])
 
     # ---------------
     # Grid parameters
@@ -69,7 +97,7 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = original (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 3
+    qad_mode = 2
 
     maux = 15
     use_fwaves = True
@@ -84,13 +112,16 @@ def setrun(claw_pkg='amrclaw'):
     # Make vertical speed small so we leave grid
     probdata.add_param('example',                example,           'example')
     probdata.add_param('revolutions per second', rps,               'rps')
-    probdata.add_param('Cart.    speed',         cart_speed,        'cart_speed')
+    probdata.add_param('vcart[0]',               vcart[0],          'vcart[0]')
+    probdata.add_param('vcart[1]',               vcart[1],          'vcart[1]')
     probdata.add_param('amplitude',              amplitude,         'amplitude')
     probdata.add_param('freq',                   freq,              'freq')
     probdata.add_param('initial radius',         0.05,              'init_radius')
-    probdata.add_param('beta',                   0.4,               'beta')
-    probdata.add_param('theta1',                 0.125,             'theta(1)')
-    probdata.add_param('theta2',                 0.375,             'theta(2)')
+    probdata.add_param('initial_location[0]',    initial_location[0], 'initial_location[0]')
+    probdata.add_param('initial_location[1]',    initial_location[1], 'initial_location[1]')
+    probdata.add_param('beta',                   beta,               'beta')
+    probdata.add_param('theta1',                 theta[0],          'theta(1)')
+    probdata.add_param('theta2',                 theta[1],          'theta(2)')
 
     probdata.add_param('grid_mx',        grid_mx,        'grid_mx')
     probdata.add_param('mi',             mi,             'mi')
@@ -98,6 +129,7 @@ def setrun(claw_pkg='amrclaw'):
     probdata.add_param('maxlevel',       maxlevel,       'maxlevel')
     probdata.add_param('reffactor',      ratioxy,        'reffactor')
     probdata.add_param('refine_pattern', refine_pattern, 'refine_pattern')
+    probdata.add_param('rotate_position', rotate_position, 'rotate_position')
     probdata.add_param('qad_mode',        qad_mode,       'qad_mode')
 
     #------------------------------------------------------------------
