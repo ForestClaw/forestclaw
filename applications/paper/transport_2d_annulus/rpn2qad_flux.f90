@@ -9,7 +9,7 @@ SUBROUTINE  rpn2qad_flux(meqn,maux,idir,iface,q,auxvec,flux)
     DOUBLE PRECISION auxvec(maux)
 
     DOUBLE PRECISION urot, g, nv(2), u(2)
-    DOUBLE PRECISION m
+    integer m
 
     g = auxvec(12+iface)  !! Edge length for iface = 0,1,2,3
 

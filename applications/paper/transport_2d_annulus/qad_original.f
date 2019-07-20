@@ -307,6 +307,8 @@ c                # preserves conservation in incompressible flow:
                endif
  405         continue
           endif
+        do 410 ivar = 1, nvar
+          ql(ivar,i-nghost+1) = valbig(ivar,i,nghost)
  410      continue
 
        lind = 0

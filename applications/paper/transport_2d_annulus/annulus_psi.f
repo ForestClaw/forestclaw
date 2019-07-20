@@ -16,8 +16,8 @@ c     # ------------------------------------------------------------
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s, vcart(2), amplitude, freq
-      common /stream_comm/ revs_per_s, vcart, amplitude, freq
+      double precision revs_per_s, vcart(2), amp, freq,cart_speed
+      common /stream_comm/ revs_per_s, vcart, amp, freq, cart_speed
 
       double precision beta, theta(2)
       common /annulus_comm/ beta, theta
@@ -30,6 +30,7 @@ c     # ------------------------------------------------------------
       double precision vc(3), annulus_dot
       double precision t1_dot_vcart, t2_dot_vcart
       double precision xp,yp,zp, ravg, xc, d, tfinal, A
+      double precision r, th, w, nc
 
 
       call annulus_covariant_basis(x, y, t1,t2) 
@@ -51,26 +52,25 @@ c         # Rigid body rotation
               vc(2) = vcart(2)
               vc(3) = 0
           elseif (example .eq. 2) then
-              A = amplitude
+              A = amp
               tfinal = 0.25
-              if (vcart(2) .eq. 0) then
-                  vc(1) = vcart(1)
-                  vc(2) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
-              else
-                  vc(1) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
-                  vc(2) = vcart(2)
-              endif
+              vc(1) = cart_speed
+              vc(2) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
           elseif (example .eq. 3) then
-              A = amplitude
+              A = amp
               tfinal = 0.25
-              if (vcart(2) .eq. 0) then
-c             # Horizontal flow          
-                  vc(1) = vcart(1)*pi*sin(pi*t/tfinal)/2.d0
-                  vc(2) = 0
-              else
-                  vc(1) = 0
-                  vc(2) = vcart(1)*pi*sin(pi*t/tfinal)/2.d0
-              endif
+              vc(1) = cart_speed*pi*sin(pi*t/tfinal)/2.d0
+              vc(2) = 0
+         elseif (example .eq. 4) then
+             r = beta + (1-beta)*y
+             th = theta(1) + (theta(2)-theta(1))*x
+             w = 0.5
+             vc(1) = -(1-w)*pi2*r*sin(pi2*th)
+             vc(2) = (1+w)*pi2*r*cos(pi2*th)
+             nc = sqrt(vc(1)**2 + vc(2)**2)
+
+             vc(1) = -vc(1)/nc
+             vc(2) = -vc(2)/nc
          endif
          vc(3) = 0
 

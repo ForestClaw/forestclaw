@@ -84,8 +84,8 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
     DOUBLE PRECISION beta, theta(2)
     COMMON /annulus_comm/ beta, theta
 
-    INTEGER refine_pattern, rotate_position
-    COMMON /refine_comm/ refine_pattern, rotate_position
+    INTEGER refine_pattern
+    COMMON /refine_comm/ refine_pattern
 
     double precision t1, t2
 
@@ -124,7 +124,7 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
             if(amrflags(i,j) == UNSET) then
                 r = beta + (1-beta)*y_c
                 th = pi2*(theta(1) + (theta(2)-theta(1))*x_c)
-                constant_theta = th .gt. (0.5 + rotate_position*0.25)*pi
+                constant_theta = th .gt. pi/2
                 constant_r = r > ravg      
                 if (refine_pattern .eq. 0 .and. constant_theta) then 
                     amrflags(i,j) = DOFLAG

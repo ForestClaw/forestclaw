@@ -30,7 +30,7 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = horizontal flow
     # 2 = sine patch
     # 3 = horizontal flow with variable speed
-    example = 3          
+    example = 1          
 
     refine_pattern = 1   # 0 = constant theta;  1 = constant_r
 
@@ -41,28 +41,11 @@ def setrun(claw_pkg='amrclaw'):
 
     beta = 0.4
 
-    # 0 : top position (12 o'clock)
-    # 1 : left position (9 o'clock)
-    # 2 : bottom position (6 o'clock)
-    # 3 : right position (3 o'clock)
-    rotate_position = 0
+    vcart = [cart_speed,0]
 
-    flow_direction = 1
-
-    cart_speed = flow_direction*cart_speed
-
-    if rotate_position == 0:
-        vcart = [cart_speed,0]
-    elif rotate_position == 1:
-        vcart = [0,cart_speed]
-    elif rotate_position == 2:
-        vcart = [-cart_speed, 0]
-    else:
-        vcart = [0,-cart_speed]    
-
-    theta = np.array([0.125,0.375])  + 0.25*rotate_position
+    theta = [0.125,0.375]
  
-    t0 = np.pi/2*(1 + rotate_position + flow_direction*(1/8))
+    t0 = np.pi/2*(1 + (1/8))
     ravg = (1 + beta)/2
     initial_location = ravg*np.array([np.cos(t0), np.sin(t0)])
 
@@ -78,9 +61,14 @@ def setrun(claw_pkg='amrclaw'):
     # -------------
     # Time stepping
     # -------------
-    dt_initial = 2.5e-3        # Stable for level 1
-    nout = 100                 # 400 steps => T=2
-    nsteps = 10
+    if example in [0,1,2]:
+        dt_initial = 2.5e-3
+        nout = 100                 # 400 steps => T=2
+        nsteps = 10
+    elif example == 4:
+        dt_initial = 2.5e-3        # Stable for level 1
+        nout = 100
+        nsteps = 10
 
     # ------------------
     # AMRClaw parameters
@@ -97,7 +85,7 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = original (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 2
+    qad_mode = 1
 
     maux = 15
     use_fwaves = True
@@ -112,6 +100,7 @@ def setrun(claw_pkg='amrclaw'):
     # Make vertical speed small so we leave grid
     probdata.add_param('example',                example,           'example')
     probdata.add_param('revolutions per second', rps,               'rps')
+    probdata.add_param('cart_speed',             cart_speed,        'cart_speed')
     probdata.add_param('vcart[0]',               vcart[0],          'vcart[0]')
     probdata.add_param('vcart[1]',               vcart[1],          'vcart[1]')
     probdata.add_param('amplitude',              amplitude,         'amplitude')
@@ -129,7 +118,6 @@ def setrun(claw_pkg='amrclaw'):
     probdata.add_param('maxlevel',       maxlevel,       'maxlevel')
     probdata.add_param('reffactor',      ratioxy,        'reffactor')
     probdata.add_param('refine_pattern', refine_pattern, 'refine_pattern')
-    probdata.add_param('rotate_position', rotate_position, 'rotate_position')
     probdata.add_param('qad_mode',        qad_mode,       'qad_mode')
 
     #------------------------------------------------------------------
@@ -294,7 +282,7 @@ def setrun(claw_pkg='amrclaw'):
 
     if qad_mode in [0,1]:
         amrdata.aux_type = ['capacity'] + ['center']*2 + ['xleft']*4 + \
-        ['yleft']*4 + ['xleft']*2 + ['yleft']*2
+              ['yleft']*4 + ['xleft']*2 + ['yleft']*2
     else:
         # Each cell has data for all four faces
         amrdata.aux_type = ['capacity'] + ['center']*14
