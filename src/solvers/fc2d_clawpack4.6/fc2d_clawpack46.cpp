@@ -313,7 +313,8 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 		double *auxvec_edge = FCLAW_ALLOC(double, maux);
 		double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
-		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,&dt,
+		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,
+		                                &this_block_idx,&this_patch_idx, &dt,
 										  cr->edgelengths[0], 
 										  cr->edgelengths[1], 
 										  cr->edgelengths[2], 

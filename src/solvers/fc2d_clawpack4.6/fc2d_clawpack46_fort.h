@@ -82,7 +82,7 @@ void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
 														 CLAWPACK46_TIME_SYNC_STORE_FLUX)
 
 void CLAWPACK46_TIME_SYNC_STORE_FLUX(int* mx,int* my, int* mbc, int* meqn,
-									   int* maux, double* dt,
+									   int* maux, int* blockno, int* patchno, double* dt,
 									   double* el0, 
 									   double* el1, 
 									   double* el2, 

@@ -21,13 +21,13 @@ c    # These will be stored for each grid and used to compute
 c    # corrections.
 c    # -----------------------------------------------------------------
       subroutine clawpack46_time_sync_store_flux(mx,my,mbc,meqn,
-     &      maux, dt,el0, el1, el2, el3,q, aux,
+     &      maux, blockno, patchno, dt,el0, el1, el2, el3,q, aux,
      &      flux0,flux1,flux2,flux3,
      &      rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
 
       implicit none
 
-      integer mx,my,mbc,meqn, maux
+      integer mx,my,mbc,meqn, maux, blockno, patchno
       double precision dt
 
       double precision el0(my), el1(my), el2(mx), el3(mx)
