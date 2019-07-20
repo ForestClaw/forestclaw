@@ -61,7 +61,7 @@ def setrun(claw_pkg='amrclaw'):
     # -------------
     # Time stepping
     # -------------
-    if example in [0,1,2]:
+    if example in [0,1,2,3]:
         dt_initial = 2.5e-3
         nout = 100                 # 400 steps => T=2
         nsteps = 10
