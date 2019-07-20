@@ -47,14 +47,11 @@ void annulus_problem_setup(fclaw2d_global_t *glob)
     {
 
         FILE *f = fopen("setprob.data","w");
-        fprintf(f,  "%-24d   %s",user->example,       "\% example\n");    
-        fprintf(f,  "%-24d   %s",user->mapping,       "\% mapping\n");   
-        fprintf(f,  "%-24d   %s",user->initchoice,    "\% initchoice\n");    
-        fprintf(f,"%-24.4f   %s",user->revs_per_s,    "\% revs_per_s\n");    
-        fprintf(f,"%-24.4f   %s",user->twist,         "\% twist\n");    
-        fprintf(f,"%-24.4f   %s",user->cart_speed,    "\% cart_speed\n");    
-        fprintf(f,  "%-24d   %s",user->color_equation,"\% color_equation\n");    
-        fprintf(f,  "%-24d   %s",user->use_stream,    "\% use_stream\n");    
+        fprintf(f,  "%-24d   %s",user->example,       "\% example\n");  
+        fprintf(f,"%-24.4f   %s",user->revs_per_s,    "\% revs_per_s\n"); 
+        fprintf(f,"%-24.4f   %s",user->cart_speed,    "\% cart_speed\n"); 
+        fprintf(f,"%-24.4f   %s",user->amplitude,     "\% amplitude\n");    
+        fprintf(f,"%-24.4f   %s",user->freq,          "\% freq\n");         
         fprintf(f,"%-24.4f   %s",user->beta,          "\% beta\n");    
         fprintf(f,"%-12.4f%-12.4f    %s",user->theta[0],user->theta[1],"\% beta\n");    
         fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refine_pattern\n");    
@@ -85,7 +82,6 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
     double *curvature, *surfnormals;
     double *edgelengths;
     double *xnormals, *ynormals, *xtangents, *ytangents;
-    const user_options_t* user = annulus_get_options(glob);
 
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -103,126 +99,55 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
                                     &xtangents, &ytangents,
                                     &surfnormals);
 
-    if (user->claw_version == 4)
-    {
-        ANNULUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
-                         &dx,&dy,&maux,aux,&blockno,
-                         area,xd,yd,zd,
-                         edgelengths,xnormals,ynormals,
-                         xtangents, ytangents, surfnormals);
-    }
-#if 0
-    else if(user->claw_version == 5)
-    {
-        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                              &maux,aux,&blockno,xd,yd,zd,area);
-    }
-#endif    
-}
-
-
-static
-void cb_annulus_output_ascii (fclaw2d_domain_t * domain,
-                              fclaw2d_patch_t * this_patch,
-                              int this_block_idx, int this_patch_idx,
-                              void *user)
-{
-    int patch_num;
-    int level;
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy, time;
-    double *q, *error, *soln;
-    int iframe;
-
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
-
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
-
-
-    iframe = *((int *) s->user);
-
-    time = glob->curr_time;
-
-
-    /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_block_idx,this_patch_idx,
-                           &patch_num,&level);
-    
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
-
-    char fname[BUFSIZ];
-    snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
-
-
-    /* Here, we pass in q and the error, so need special headers and files */
-    ANNULUS46_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
-                              &xlower,&ylower,
-                              &dx,&dy,
-                              q,error,soln, &time, 
-                              &patch_num,&level,
-                              &this_block_idx,
-                              &glob->mpirank);
+    ANNULUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
+                     &dx,&dy,&maux,aux,&blockno,
+                     area,xd,yd,zd,
+                     edgelengths,xnormals,ynormals,
+                     xtangents, ytangents, surfnormals);
 }
 
 
 void annulus_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t           *vt            = fclaw2d_vt();
-    fclaw2d_patch_vtable_t     *patch_vt      = fclaw2d_patch_vt();
+    /* ForestClaw virtual functions */
+    fclaw2d_vtable_t  *vt = fclaw2d_vt();
+    vt->problem_setup = &annulus_problem_setup;
+
+    /* Patch virtual functions */
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    patch_vt->setup = &annulus_patch_setup;
+
+    /* Clawpatch virtual table */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt  = fclaw2d_clawpatch_vt();
-    //fc2d_clawpack46_vtable_t   *clawpack46_vt = fc2d_clawpack46_vt();
+    clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+    clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
-    fclaw_options_t          *fclaw_opt = fclaw2d_get_options(glob);
-    const user_options_t          *user = annulus_get_options(glob);
+    /* Clawpack options */
+    fc2d_clawpack46_options_t  *clawopt       = fc2d_clawpack46_get_options(glob);
+    clawopt->use_fwaves = 1;
 
-    vt->problem_setup  = &annulus_problem_setup;
-    patch_vt->setup    = &annulus_patch_setup;
-
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_options_t  *clawopt     = fc2d_clawpack46_get_options(glob);
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
-
-        clawpack46_vt->fort_qinit   = CLAWPACK46_QINIT;
-#if 0 
-        /* Doesn't really work with transverse solvers */
-        clawpack46_vt->fort_bc2     = CLAWPACK46_BC2;  /* Replace default version */
-#endif        
-
-        clawpatch_vt->fort_compute_patch_error = &ANNULUS46_COMPUTE_ERROR;
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
-
-        clawopt->use_fwaves = 1;
-        clawpack46_vt->fort_rpn2      = &RPN2CONS_FW_MANIFOLD;   
-        clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
-        //clawpack46_vt->fort_rpt2      = &ANNULUS46_RPT2ADV_MANIFOLD;      
-        clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+    /* Clawpack virtual functions */
+    fc2d_clawpack46_vtable_t   *clawpack46_vt = fc2d_clawpack46_vt();
+    clawpack46_vt->fort_qinit = &CLAWPACK46_QINIT;
 
 
-        if (fclaw_opt->compute_error)
-        {
-            clawpatch_vt->fort_header_ascii   = &ANNULUS46_FORT_HEADER_ASCII;
-            clawpatch_vt->cb_output_ascii     = &cb_annulus_output_ascii;                
-        }
-    }
-#if 0    
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
-        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-        claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
-    }
-#endif    
+    /* Get different refinement patterns */
+    clawpack46_vt->fort_rpn2 = &RPN2CONS_FW_MANIFOLD;   
+    clawpack46_vt->fort_rpt2 = &RPT2CONS_MANIFOLD;    
+
+
+    /* Time dependent velocity field */
+    const user_options_t *user = annulus_get_options(glob);
+    if (user->example == 2 || user->example == 3) 
+        clawpack46_vt->fort_b4step2 = &CLAWPACK46_B4STEP2;        
+
+
+    /* Forestclaw equivalent of QAD */
+    if (user->flux_correction) 
+        clawpack46_vt->fort_rpn2_cons = &RPN2QAD_FLUX;        
+    else
+        clawpack46_vt->fort_rpn2_cons = &RPN2QAD_ZERO;
+
 }
 
 

@@ -1,79 +1,80 @@
-global square;
-
 setviews;
 
-if (PlotType == 4)
-    axis([0,sqrt(2),-2,2]);
-    set(gca,'box','on');
-    ca = 1.1*[-max([qmin,qmax]),max([qmin,qmax])];
-    % ylim(ca);    
-    fprintf('qmin = %24.16e\n',qmin);
-    fprintf('qmax = %24.16e\n',qmax);
-    shg
-    return
-end
+% Geometry
+[example,A,rinit,beta,theta,freq,cart_speed] = read_vars();
+
+tfinal = 0.25;
+vcart = 1.092505803290319;
+dlen = vcart*tfinal;
+
+ravg = (1 + beta)/2;
+thc = pi/2*(1 + 1/8);
+pstart = [ravg*cos(thc),ravg*sin(thc)];
+pend = pstart + [dlen, 0];
+
+fprintf('%10s %24.16e\n','qmin',qmin);
+fprintf('%10s %24.16e\n','qmax',qmax);
 
 
-alpha = 0.4;
 s = 1e-2;    
 alim = [-1,1];
-axis([-1,1 0,1]);
+axis([alim alim]);
 daspect([1 1 1]);
 view(vtop)
-
-% yrbcolormap;
 
 showpatchborders(1:10);
 setpatchborderprops('linewidth',1)
 
-fprintf('qmin = %24.16e\n',qmin);
-fprintf('qmax = %24.16e\n',qmax);
 
-if (mq == 3)
-    % Plot the error
-    cmax = max(abs([qmin,qmax]));
-    ca = [-cmax,cmax];
-end
+caxis([-1,1]);
 
-colormap(parula);
-cmax = max(abs([qmin,qmax]));
-ca = [-cmax,cmax];
-caxis(ca);
-caxis([-1,1])
-% colorbar
-% caxis([-1,1]*1e-12);
+set(gca,'fontsize',16);
 
 axis([-0.707106781186547   0.707106781186548   0.282842712474619,1]);
 
-beta = 0.4;
-ravg = (1 + beta)/2;
-th = 2*pi*linspace(0.25-1/32,0.25+1/32,200);
-xpath = ravg*cos(th);
-ypath = ravg*sin(th);
-ravg = 0.7;
-hold on;
-plot(xpath,ypath,'k','linewidth',2);
-plot(xpath([1,end]),ypath([1 end]),'k','linewidth',2);
-hold off;
+%axis([-0.211745637207774, 0.211745637207774, 0.5, 0.85])
 
 
 % showgridlines;
-showpatchborders;
 
-if square
-    axis([0,1,0,1]);
+plot_path = true;
+if (plot_path)    
+    hold on;
+    
+    N = 128;
+    th0 = linspace(0,2*pi,N+1);
+    x0 = rinit*cos(th) + pstart(1);
+    y0 = rinit*sin(th) + pstart(2);
+        
+    if (t > 0)
+        Y0 = [x0(:); y0(:)];    
+        [tout,yout] = ode45(@vel_ellipse,[0,t],Y0);
+        xth = yout(end,1:N+1)';
+        yth = yout(end,N+2:end)';
+    else
+        xth = x0;
+        yth = y0;
+    end
+        
+    plot(xth,yth,'k','linewidth',2);
+    hold off
+    
+    if (example == 4)
+        hold on;        
+        t1 = theta(1);
+        t2 = theta(2);
+        t0 = atan2(y0,x0);
+        m = t0 < 0;
+        t0(m) = t0(m) + 2*pi;
+        t0 = t0/(2*pi);
+        xm = (t0-t1)/(t2-t1);
+        rm = sqrt(x0.^2 + y0.^2);
+        ym = (rm-beta)/(1-beta);
+        % hq = ellipse_vel(4,1.5,xm,ym);
+        % set(hq,'linewidth',2,'color','k');
+        hold off
+    end
 end
-
-% hidegridlines
-% hidepatchborders
-
-% figure(2)
-% plot(ycenter,q(1,:),'.-','markersize',20);
-% ylim([-1,2]);
-% shg
-% input('Hit enter to continue : ');
-
-figure(1)
 
 
 %

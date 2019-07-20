@@ -42,14 +42,12 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    int mapping; 
-    int initchoice;  /* Smooth or non-smooth */
+    int flux_correction;
     double revs_per_s;
-    double twist;
     double cart_speed;
+    double amplitude;
+    double freq;
     double init_radius;
-    int color_equation;
-    int use_stream;
     double beta;    /* Ratio of inner radius to outer radius */
 
     const char *theta_string;
@@ -85,32 +83,12 @@ fclaw2d_map_context_t *
                              const double shift[],
                              const double rotate[],
                              const double beta,
-                             const double theta[],
-                             const int mapping);
+                             const double theta[]);
 
 
 /* ----------------------
    Clawpack 4.6 headers
    ---------------------- */
-#if 1
-#define TORUS46_COMPUTE_ERROR FCLAW_F77_FUNC(torus46_compute_error,TORUS46_COMPUTE_ERROR)
-
-void TORUS46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
-                           double *dx, double *dy, double *xlower,
-                           double *ylower, double *t, double q[],
-                           double error[], double soln[]);
-#endif
-
-#define ANNULUS46_COMPUTE_ERROR FCLAW_F77_FUNC(annulus46_compute_error, \
-                                             ANNULUS46_COMPUTE_ERROR)
-
-void ANNULUS46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
-                           double *dx, double *dy, double *xlower,
-                           double *ylower, double *t, double q[],
-                           double error[], double soln[]);
-
-
-
 #define ANNULUS46_SETAUX  FCLAW_F77_FUNC(annulus46_setaux, ANNULUS46_SETAUX)
 void ANNULUS46_SETAUX(const int* mbc, const int* mx, const int* my,
                     const double* xlower, const double* ylower,
@@ -195,13 +173,19 @@ void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir
                                double aux_center[], double aux_edge[],
                                double flux[]);
 
-#define RPN2_CONS_UPDATE_ZERO FCLAW_F77_FUNC(rpn2_cons_update_zero, \
-                                             RPN2_CONS_UPDATE_ZERO)
 
-void RPN2_CONS_UPDATE_ZERO(const int* meqn, const int* maux, const int* idir,
-                           const int* iface,
-                           double q[], double aux_center[], double aux_edge[],
-                           double flux[]);
+#define RPN2QAD_FLUX FCLAW_F77_FUNC(rpn2qad_flux, RPN2QAD_FLUX)
+void RPN2QAD_FLUX(const int* meqn, const int* maux, const int* idir,
+                               const int* iface, double q[], 
+                               double auxvec[], double aux_edge[],
+                               double flux[]);
+
+
+#define RPN2QAD_ZERO FCLAW_F77_FUNC(rpn2qad_zero,RPN2QAD_ZERO)
+
+void RPN2QAD_ZERO (const int* meqn, const int* maux, const int* idir,
+                   const int* iface, double q[], double aux_center[], 
+                   double aux_edge[], double flux[]);
 
 
 #define ANNULUS46_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(annulus46_rpt2adv_manifold, \
