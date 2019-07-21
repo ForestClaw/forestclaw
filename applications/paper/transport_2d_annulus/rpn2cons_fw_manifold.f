@@ -47,6 +47,11 @@ c        # bottom-edge : 6,7
          qrr = ql(1,i)
          qll = qr(1,i-1)
 
+         if (qad_debug) then
+!!            qrr = 1.d0
+!!            qll = 1.d0
+         endif
+
 c        # Use Roe-average values         
          uhat = (ulrot + urrot)/2.d0
 

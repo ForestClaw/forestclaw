@@ -30,7 +30,7 @@ c     # ------------------------------------------------------------
       double precision vc(3), annulus_dot
       double precision t1_dot_vcart, t2_dot_vcart
       double precision xp,yp,zp, ravg, xc, d, tfinal, A
-      double precision r, th, w, nc
+      double precision r, th, w, nc, vcr(2)
 
 
       call annulus_covariant_basis(x, y, t1,t2) 
@@ -44,7 +44,7 @@ c     # Horizontal velocity
 c     # Set non-zeros derivs only
       if (example .eq. 0) then
 c         # Rigid body rotation        
-          u(1) = revs_per_s
+          u(1) = -revs_per_s
           u(2) = 0
       else
           if (example .eq. 1) then
@@ -62,9 +62,14 @@ c         # Rigid body rotation
               vc(1) = cart_speed*pi*sin(pi*t/tfinal)/2.d0
               vc(2) = 0
          elseif (example .eq. 4) then
+              A = amp
+              tfinal = 0.25
+              vc(1) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
+              vc(2) = cart_speed*pi*sin(pi*t/tfinal)/2.d0
+         elseif (example .eq. 5) then
              r = beta + (1-beta)*y
              th = theta(1) + (theta(2)-theta(1))*x
-             w = 0.5
+             w = amp
              vc(1) = -(1-w)*pi2*r*sin(pi2*th)
              vc(2) = (1+w)*pi2*r*cos(pi2*th)
              nc = sqrt(vc(1)**2 + vc(2)**2)

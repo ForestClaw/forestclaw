@@ -17,7 +17,7 @@
 
       call mapc2m_annulus(xc,yc,xp,yp,zp)
 
-c      ravg = (1 + beta)/2.d0
+      ravg = (1 + beta)/2.d0
 c      th = pi2*((0.25 + 1.d0/32.d0) + 0.25)
       x0 = init_location(1)
       y0 = init_location(2)

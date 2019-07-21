@@ -10,6 +10,7 @@ from __future__ import absolute_import
 import os
 import numpy as np
 
+
 #------------------------------
 def setrun(claw_pkg='amrclaw'):
 #------------------------------
@@ -30,29 +31,35 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = horizontal flow
     # 2 = sine patch
     # 3 = horizontal flow with variable speed
-    example = 1          
+    example = 3          
 
-    refine_pattern = 1   # 0 = constant theta;  1 = constant_r
+    refine_pattern = 0   # 0 = constant theta;  1 = constant_r
 
     rps   = -1                          # units of theta/second (example=0)
     cart_speed = 1.092505803290319      # Horizontal speed (example=1)
-    amplitude = 0.05                    # Amplitude for sine path
+    amplitude = 0.05                   # Amplitude for sine path
     freq = 1                          # Frequency for sine path
 
+    # Region occupied by annulus
     beta = 0.4
+    theta = [0.125,0.375]
 
+    # Example 1 (constant horizontal speed)
     vcart = [cart_speed,0]
 
-    theta = [0.125,0.375]
- 
-    t0 = np.pi/2*(1 + (1/8))
-    ravg = (1 + beta)/2
-    initial_location = ravg*np.array([np.cos(t0), np.sin(t0)])
+    if example in [0,1,2,3] :
+        ravg = (1 + beta)/2
+        t0 = np.pi/2*(1 + (1/8))
+        initial_location = ravg*np.array([np.cos(t0), np.sin(t0)])
+    elif example in [4]:
+        # Vertical motion
+        r0 = beta + 0.25*(1-beta)
+        initial_location = [0,r0]
 
     # ---------------
     # Grid parameters
     # ---------------
-    grid_mx = 32    # Size of ForestClaw grids
+    grid_mx = 64    # Size of ForestClaw grids
     mi = 4          # Number of ForestClaw blocks
     mj = 2     
     mx = mi*grid_mx
@@ -62,13 +69,13 @@ def setrun(claw_pkg='amrclaw'):
     # Time stepping
     # -------------
     if example in [0,1,2,3]:
-        dt_initial = 2.5e-3
-        nout = 100                 # 400 steps => T=2
-        nsteps = 10
+        dt_initial = 1.25e-3
+        nout = 200                 # 400 steps => T=2
+        nsteps = 20
     elif example == 4:
-        dt_initial = 2.5e-3        # Stable for level 1
-        nout = 100
-        nsteps = 10
+        dt_initial = 1.25e-3        # Stable for level 1
+        nout = 200
+        nsteps = 20
 
     # ------------------
     # AMRClaw parameters
@@ -83,7 +90,7 @@ def setrun(claw_pkg='amrclaw'):
 
     # 0 = no qad
     # 1 = original qad
-    # 2 = original (fixed to include call to rpn2qad)
+    # 2 = modified (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
     qad_mode = 1
 

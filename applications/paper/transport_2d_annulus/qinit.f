@@ -10,6 +10,9 @@
       integer i,j, blockno
       double precision xlow, ylow, w
 
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
       blockno = 0
 
       do j = 1-mbc,my+mbc

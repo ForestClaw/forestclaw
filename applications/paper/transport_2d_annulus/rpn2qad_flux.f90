@@ -20,6 +20,7 @@ SUBROUTINE  rpn2qad_flux(meqn,maux,idir,iface,q,auxvec,flux)
     nv(2) = auxvec(5+2*iface)
 
     urot = g*(nv(1)*u(1) + nv(2)*u(2))
+    
 
     DO m = 1,meqn
         !! # Scaling done here (unlike in ForestClaw)    

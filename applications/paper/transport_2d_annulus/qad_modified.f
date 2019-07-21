@@ -50,6 +50,10 @@ c      #  ok as long as meqn, mwaves < maxvar
        integer idir, iface, sgn
        logical use_fix
 
+      logical qad_debug
+      common /debug_common/ qad_debug
+
+
 c
 c  WARNING: auxl,auxr dimensioned at max possible, but used as if
 c  they were dimensioned as the real maux by max1dp1. Would be better
@@ -60,6 +64,7 @@ c  So need to access using your own indexing into auxl,auxr.
        data qprint/.false./
        data use_fix /.true./
 
+       qad_debug = .true.
 c
 c      aux is auxiliary array with user parameters needed in Riemann solvers
 c          on fine grid corresponding to valbig
@@ -75,9 +80,6 @@ c
        nr = mitot-2*nghost
        level = node(nestlevel, mptr)
        index = 0
-
-       dx_comm = hx
-       dy_comm = hy
 
 c
 c--------
@@ -421,6 +423,9 @@ c      # for source terms:
 c      # how can this be right - where is the integrated src term used?
            endif
            
+       qad_debug = .false.
+
+
        return
        end
 
