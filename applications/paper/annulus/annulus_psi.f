@@ -30,7 +30,7 @@ c     # ------------------------------------------------------------
       double precision vcart(3), annulus_dot
       double precision t1_dot_vcart, t2_dot_vcart
       double precision xp,yp,zp, ravg, xc, d, tfinal, A
-      double precision r, w, th, nc
+      double precision r, w, th, nc, vcr(2)
 
 
       call annulus_covariant_basis(x, y, t1,t2) 
@@ -48,8 +48,11 @@ c        # Rigid body rotation
          u(2) = 0
       else
           if (example .eq. 1) then
-              vcart(1) = cart_speed
-              vcart(2) = 0
+              call random_number(vcr)
+
+              w = 0
+              vcart(1) = cart_speed + w*(-1+2*vcr(1))
+              vcart(2) = w*(-1+2*vcr(2))
               vcart(3) = 0
           elseif (example .eq. 2) then
               A = amplitude

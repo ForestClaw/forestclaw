@@ -42,7 +42,6 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    int flux_correction;
     double revs_per_s;
     double cart_speed;
     double amplitude;

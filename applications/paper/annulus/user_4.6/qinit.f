@@ -20,7 +20,6 @@
             ylow = ylower + (j-1)*dy
             call cellave2(blockno,xlow,ylow,dx,dy,w)
             q(i,j,1) = w
-c            q(i,j,1)= 1
          enddo
       enddo
 

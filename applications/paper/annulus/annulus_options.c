@@ -36,9 +36,6 @@ annulus_register(user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 0=rigid body rot.; 1=other velocity [0]");
 
-    sc_options_add_bool (opt, 0, "flux-correction", &user->flux_correction, 1,
-                        "[user] Include flux correction [T]");
-
     sc_options_add_int (opt, 0, "refine-pattern", &user->refine_pattern, 0,
                         "[user] 0 = constant theta; 1 = constant_r [0]");
 
@@ -83,7 +80,7 @@ annulus_postprocess(user_options_t *user)
 static fclaw_exit_type_t
 annulus_check(user_options_t *user)
 {
-    if (user->example < 0 || user->example > 4)
+    if (user->example < 0 || user->example > 5)
     {
         fclaw_global_essentialf("example must be in [0-4]\n");
         return FCLAW_EXIT_QUIET;        
