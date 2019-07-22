@@ -50,14 +50,13 @@ EXCLUDE_SOURCES = setaux.f90 flag2refine2.f90 qad.f b4step2.f
 MODULES = \
 
 SOURCES = \
-  velocity.f \
-  annulus_psi.f \
   setprob.f \
   qinit.f \
   fdisc.f \
   cellave2.f \
   b4step2.f \
   mapc2m_annulus.f \
+  annulus_velocity.f \
   annulus_setaux.f90 \
   flag2refine2.f90 \
   qad_choice.f90 \

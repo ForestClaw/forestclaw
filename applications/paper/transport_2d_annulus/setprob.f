@@ -28,6 +28,9 @@
       integer qad_mode
       common /qad_comm/ qad_mode      
 
+      double precision setaux_time
+      common /setaux_comm/ setaux_time
+
       pi = 4.d0*atan(1.d0)
       pi2 = 2*pi
 
@@ -72,5 +75,7 @@
       write(10,*) cart_speed
       write(10,*) freq
       close(10)
+
+      setaux_time = 0
 
       end

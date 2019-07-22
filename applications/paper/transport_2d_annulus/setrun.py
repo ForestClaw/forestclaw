@@ -31,13 +31,14 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = horizontal flow
     # 2 = sine patch
     # 3 = horizontal flow with variable speed
-    example = 3          
+    # 4 = time dependent in both x and y
+    # 5 = spatially dependent
+    example = 4          
 
     refine_pattern = 0   # 0 = constant theta;  1 = constant_r
 
     rps   = -1                          # units of theta/second (example=0)
     cart_speed = 1.092505803290319      # Horizontal speed (example=1)
-    amplitude = 0.05                   # Amplitude for sine path
     freq = 1                          # Frequency for sine path
 
     # Region occupied by annulus
@@ -46,6 +47,9 @@ def setrun(claw_pkg='amrclaw'):
 
     # Example 1 (constant horizontal speed)
     vcart = [cart_speed,0]
+
+    # Example  2
+    amplitude = 0.05
 
     if example in [0,1,2,3] :
         ravg = (1 + beta)/2
@@ -59,7 +63,7 @@ def setrun(claw_pkg='amrclaw'):
     # ---------------
     # Grid parameters
     # ---------------
-    grid_mx = 64    # Size of ForestClaw grids
+    grid_mx = 32    # Size of ForestClaw grids
     mi = 4          # Number of ForestClaw blocks
     mj = 2     
     mx = mi*grid_mx
@@ -69,9 +73,9 @@ def setrun(claw_pkg='amrclaw'):
     # Time stepping
     # -------------
     if example in [0,1,2,3]:
-        dt_initial = 1.25e-3
-        nout = 200                 # 400 steps => T=2
-        nsteps = 20
+        dt_initial = 2.5e-3
+        nout = 100                 # 400 steps => T=2
+        nsteps = 10
     elif example == 4:
         dt_initial = 1.25e-3        # Stable for level 1
         nout = 200
@@ -92,7 +96,7 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = modified (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 1
+    qad_mode = 2
 
     maux = 15
     use_fwaves = True

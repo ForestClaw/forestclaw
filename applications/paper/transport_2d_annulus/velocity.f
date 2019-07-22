@@ -1,16 +1,5 @@
 c     # ------------------------------------------------------------
-c     # Compute edge centered and cell-centered velocity fields
-c     # 
-c     # Edge : Compute velocity from a stream function.  
-c     # This defines the average velocity at each edge
-c     # 
-c     #      u = curl \Psi  (div u = 0)
-c     # 
-c     # Center : Defines cell-centered velocities from a streamfunction
-c     # 
-c     #      u = n cross grad \Psi  (div u = 0)
-c     # 
-c     # or using basis functions
+c     # Define cell centered velocity field using basis functions
 c     # 
 c     #      u = u1*t1 + u2*t2   (div u might not be zero)
 c     # 
@@ -23,8 +12,6 @@ c     # ------------------------------------------------------------
 
 
 c     # ------------------------------------------------------------
-c     # Center : u = n cross grad \Psi   (div u = 0)
-c     # 
 c     # Center : u = u1*tau1 + u2*tau2   (div u might not be zero)
 c     # ------------------------------------------------------------
       subroutine annulus_center_velocity(x,y,t,vel)
@@ -62,27 +49,6 @@ c     # Compute covariant derivatives only
           t1(k) = t(k,1)
           t2(k) = t(k,2)
       enddo
-
-      end
-
-
-      subroutine annulus_contravariant_basis(x,y,t1inv,t2inv)
-      implicit none
-
-      double precision x,y
-      double precision t1inv(3), t2inv(3)
-      double precision t(3,2), tinv(3,2), tderivs(3,2,2)
-      integer k, flag
-
-
-      flag = 3
-      call annulus_basis_complete(x,y, t, tinv,tderivs, flag)
-                                          
-
-      do k = 1,3
-          t1inv(k) = tinv(k,1)
-          t2inv(k) = tinv(k,2)
-      end do
 
       end
 

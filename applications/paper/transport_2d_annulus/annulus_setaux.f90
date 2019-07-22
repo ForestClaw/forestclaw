@@ -20,6 +20,7 @@ SUBROUTINE setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
 
     area_check = .false.
 
+
     !! Figure out level of current grid so we can compute areas
     !! in a conservative manner
     dx0 = 1.d0/(mi*grid_mx)
@@ -97,29 +98,6 @@ SUBROUTINE setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
         ENDDO
     ENDDO
 
-    open(10,file='metric.dat')
-    if (mx .eq. 8) then        
-        !! coarse grid
-        write(10,*) ' '
-        write(10,*) '% coarse grid'
-        do i = 1,mx
-            write(10,105) i,aux(2,i,5),aux(3,i,5)
-        end do
-    endif
-105 format(I5,3F24.16)            
-    close(10)
-
-    open(10,file='metric.dat',position='append')
-    if (mx .eq. 16) then
-        !! fine grid
-        write(10,*) ' '
-        write(10,*) '% fine grid'
-        do i = 1,mx
-            write(10,105) i,aux(2,i,0),aux(3,i,0)
-        end do
-    endif
-    close(10)
-
 END SUBROUTINE setaux
 
 
@@ -138,8 +116,14 @@ SUBROUTINE annulus46_set_center_velocities(mx,my,mbc,dx,dy,blockno, &
 
     INTEGER i,j, k
 
+    double precision setaux_time
+    common /setaux_comm/ setaux_time
+
+
     INCLUDE "metric_terms.i"
 
+!!  This is needed so that aux arrays get set properly.
+    t = setaux_time
 
     !! # Cell-centered velocities : entries (4,5,6)
     DO i = 1-mbc,mx+mbc

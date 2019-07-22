@@ -36,16 +36,14 @@ axis([-0.707106781186547   0.707106781186548   0.282842712474619,1]);
 
 %axis([-0.211745637207774, 0.211745637207774, 0.5, 0.85])
 
-% showgridlines;
-
 plot_path = true;
 if (plot_path)    
     hold on;
     
     N = 128;
     th0 = linspace(0,2*pi,N+1);
-    x0 = rinit*cos(th) + pstart(1);
-    y0 = rinit*sin(th) + pstart(2);
+    x0 = rinit*cos(th0) + pstart(1);
+    y0 = rinit*sin(th0) + pstart(2);
     
     Y0 = pstart(:);
     [tout,yout] = ode45(@vel_ellipse,[0,tfinal],Y0);

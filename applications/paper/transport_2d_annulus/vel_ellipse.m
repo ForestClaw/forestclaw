@@ -45,7 +45,8 @@ else
     elseif example == 4
         % Vertical motion
         vc1 = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
-        vc2 = cart_speed*pi*sin(pi*t/tfinal)/2.d0;
+%        vc2 = cart_speed*pi*sin(pi*t/tfinal)/2.d0;
+        vc2 = cart_speed;
     elseif example == 5
         X = u(1:N);
         Y = u(N+1:end);
