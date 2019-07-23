@@ -194,8 +194,8 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
             IF (hstartest + bL .LT. bR) THEN
                 !!right state should become ghost values that mirror left for wall problem
                 !! bR=hstartest+bL
-                wall(1) = 0.d0
                 wall(2) = 0.d0
+                wall(3) = 0.d0
                 hR = hL
                 huR = -huL
                 bR = bL
@@ -264,8 +264,8 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
         DO mw = 1,mwaves
             s(i,mw) = sw(mw)
             fwave(i,1,mw) = fw(1,mw)
-            fwave(i,2,mw) = fw(2,mw)
-            fwave(i,3,mw) = fw(3,mw)
+            fwave(i,mu,mw) = fw(2,mw)
+            fwave(i,mv,mw) = fw(3,mw)
         ENDDO
 
 30  CONTINUE
