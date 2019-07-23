@@ -80,7 +80,7 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
     integer ii_com, jj_com
     common /common_ii/ ii_com, jj_com
 
-    use_simple = .true.
+    use_simple = .false.
 
 !!  no pressure forcing
     pL = 0
@@ -111,7 +111,7 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
         END DO
 
 !!        !set normal direction
-         if (ixy.eq.1) then
+         if (ixy .eq. 1) then
             mu=2
             mv=3
          else
@@ -127,7 +127,7 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
             qr(i-1,3) = 0.d0
         ENDIF
 
-        IF (ql(i,1).LT.0.d0) THEN
+        IF (ql(i,1) .LT. 0.d0) THEN
             ql(i,1) = 0.d0
             ql(i,2) = 0.d0
             ql(i,3) = 0.d0
@@ -153,8 +153,8 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 !!             pR = auxl(pressure_index, i)
 !!         end if
 
-         hvL = qr(mv,i-1) 
-         hvR = ql(mv,i)        
+         hvL = qr(i-1,mv) 
+         hvR = ql(i,mv)        
 
         !!check for wet/dry boundary
         IF (hR .GT. dry_tolerance) THEN
