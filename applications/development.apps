@@ -3,7 +3,7 @@
 ## standard distribution
 ## ------------------------------------------------------------------------
 ## Third order scalar advection
-#include applications/clawpack/advection/2d/adv_order3/Makefile.am
+include applications/clawpack/advection/2d/adv_order3/Makefile.am
 
 ## Shallow water on the sphere (D. Calhoun)
 #include applications/clawpack/shallow/2d/sphere/Makefile.am
