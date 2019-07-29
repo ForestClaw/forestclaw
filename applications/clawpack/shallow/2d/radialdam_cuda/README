@@ -1,0 +1,15 @@
+
+Radial dam-break problem for 2D shallow water equations.
+
+Subdirectory 1drad contains code to solve 1d radially symmetric equations
+on a fine grid.  First run this code.
+
+After running 2d code, with same set of output times as in 1drad,
+use the following matlab commands to compare the two:
+
+>> plotclaw2
+>>  [ advance to desired frame]
+>> error2drad
+
+Note: this sets PlotType=4 to give a scatter plot of q as a function of r.
+

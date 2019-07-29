@@ -33,166 +33,61 @@
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack46.h>
 
-static int s_user_options_package_id = -1;
-
-static void *
-swirlcons_register (user_options_t *user, sc_options_t * opt)
-{
-    sc_options_add_int (opt, 0, "example", &user->example, 1,
-                           "1 : u(x) > 0; 2: u(x) changes sign (1,2) [1]");
-
-    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 1,
-                           "Conservative riemann solver (1-4) [T]");
-    user->is_registered = 1;
-
-    return NULL;
-}
-
-static fclaw_exit_type_t
-swirlcons_postprocess(user_options_t *user)
-{
-    /* nothing to post-process yet ... */
-    return FCLAW_NOEXIT;
-}
-
-
-static fclaw_exit_type_t
-swirlcons_check (user_options_t *user)
-{
-    /* Nothing to check ? */
-    return FCLAW_NOEXIT;
-}
-
-static void
-swirlcons_destroy(user_options_t *user)
-{
-    /* Nothing to destroy */
-}
-
-/* ------- Generic option handling routines that call above routines ----- */
-static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (opt != NULL);
-
-    user = (user_options_t*) package;
-
-    return swirlcons_register(user,opt);
-}
-
-static fclaw_exit_type_t
-options_postprocess (fclaw_app_t * a, void *package, void *registered)
-{
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    /* errors from the key-value options would have showed up in parsing */
-    user_options_t *user = (user_options_t *) package;
-
-    /* post-process this package */
-    FCLAW_ASSERT(user->is_registered);
-
-    /* Convert strings to arrays */
-    return swirlcons_postprocess (user);
-}
-
-
-static fclaw_exit_type_t
-options_check(fclaw_app_t *app, void *package,void *registered)
-{
-    user_options_t           *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT(registered == NULL);
-
-    user = (user_options_t*) package;
-
-    return swirlcons_check(user);
-}
-
-static void
-options_destroy (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    user = (user_options_t*) package;
-    FCLAW_ASSERT (user->is_registered);
-
-    swirlcons_destroy (user);
-
-    FCLAW_FREE (user);
-}
-
-
-static const fclaw_app_options_vtable_t options_vtable_user =
-{
-    options_register,
-    options_postprocess,
-    options_check,
-    options_destroy
-};
-
-/* ------------- User options access functions --------------------- */
-
 static
-user_options_t* swirlcons_options_register (fclaw_app_t * app,
-                                       const char *configfile)
-{
-    user_options_t *user;
-    FCLAW_ASSERT (app != NULL);
-
-    user = FCLAW_ALLOC (user_options_t, 1);
-    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
-                                user);
-
-    fclaw_app_set_attribute(app,"user",user);
-    return user;
-}
-
-static 
-void swirlcons_options_store (fclaw2d_global_t* glob, user_options_t* user)
-{
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
-}
-
-const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob)
-{
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
-}
-/* ------------------------- ... and here ---------------------------- */
-
-static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
+                                user_options_t *user)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    /* Map unit square to disk using mapc2m_disk.f */
-    gparms->manifold = 0;
-    // conn = p4est_connectivity_new_unitsquare();
-    int mi = 1, mj = 1;
-    int a = gparms->periodic_x;
-    int b = gparms->periodic_y;
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont = fclaw2d_map_new_nomap_brick(brick);
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
+    int a = fclaw_opt->periodic_x;
+    int b = fclaw_opt->periodic_y;
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+    double rotate[2];
+    rotate[0] = 0;
+    rotate[1] = 0;
+
+    switch (user->mapping) {
+    case 0:
+        /* Square brick domain */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_nomap_brick(brick);
+        break;
+
+    case 1:
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_cart(brick,fclaw_opt->scale,
+                                    fclaw_opt->shift,
+                                    rotate);
+        break;
+        
+    case 2:
+        /* Five patch square domain */
+        conn = p4est_connectivity_new_disk (1,1);
+        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,fclaw_opt->shift,
+                                          rotate,user->alpha);
+        break;
+
+    case 3:
+        /* bilinear square domain */
+        conn = p4est_connectivity_new_brick (mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_bilinear (brick, fclaw_opt->scale,fclaw_opt->shift,
+                                          rotate,user->center);
+        break;
+
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
+
+
+    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
     return domain;
@@ -207,8 +102,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     fc2d_clawpack46_solver_initialize();
@@ -263,7 +157,7 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt);
+        domain = create_domain(mpicomm, fclaw_opt,user_opt);
     
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();

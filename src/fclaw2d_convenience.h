@@ -131,6 +131,16 @@ void fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
  */
 void fclaw2d_domain_complete (fclaw2d_domain_t * domain);
 
+/** Write VTK file(s) for a domain structure.
+ *  Each patch is drawn as one rectangle.
+ *  We ignore any geometric transformations
+ *  and use the vertex locations specified in the p4est's connectivity.
+ * \param [in] domain           A valid domain structure.  Is not changed.
+ * \param [in] basename         Filename prefix passed to p4est_vtk functions.
+ */
+void fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain,
+                               const char *basename);
+
 /** Print patch number by level on all processors */
 void fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int log_priority);
 

@@ -1,21 +1,32 @@
-      subroutine torus_setprob(example_in,alpha_in)
+      subroutine torus_setprob()
       implicit none
 
-      double precision pi
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
-      double precision alpha_in, alpha
-      common /toruscomm/ alpha
+      double precision alpha, beta
+      common /torus_comm/ alpha, beta
 
-      integer example_in, example
-      common /excomm_example/ example
+      integer example
+      common /example_comm/ example
 
-      double precision revs_per_sec_comm, r0_comm
-      common /comm_torus/ revs_per_sec_comm, r0_comm
+      double precision revs_per_s
+      common /stream_comm/ revs_per_s
+
+      integer color_equation
+      common /eqn_comm/ color_equation
 
       pi = 4.d0*atan(1.d0)
+      pi2 = 2*pi
 
-      example = example_in
-      alpha = alpha_in
+      open(10,file='setprob.data')
+      read(10,*) example
+      read(10,*) alpha
+      read(10,*) beta
+      read(10,*) revs_per_s
+      read(10,*) color_equation
+      close(10)
+
+      
 
       end

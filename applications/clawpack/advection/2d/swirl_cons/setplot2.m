@@ -13,7 +13,7 @@ mq = 1;                      % which component of q to plot
 UserVariable = 0;            % set to 1 to specify a user-defined variable
 UserVariableFile = ' ';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
-Manifold = 0;
+Manifold = 1;
 ReadBlockNumber = 1;
 MaxFrames = 1000;            % max number of frames to loop over
 MaxLevels = 30;
@@ -31,8 +31,8 @@ ContourValues = [];
 
 %---------------------------------
 
-UserMap1d = 0;
-ScatterStyle = setplotstyle('ko','go','yo','mx','bo','ro');
+UserMap1d = 1;
+ScatterStyle = setplotstyle('ro','go','ro','go','bo','ro');
 
 ShowUnderOverShoots = 0;
 PlotParallelPartitions = 0;

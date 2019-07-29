@@ -23,26 +23,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// #include <fclaw2d_forestclaw.h>
 #include <fclaw_options.h>
+#include <fclaw_timer.h>
 #include <fclaw_mpi.h>
+
+/* Get whatever definitions exist already */
+#ifdef FCLAW_HAVE_FENV_H
+#ifndef __USE_GNU
+#define __USE_GNU
+#endif
+#include <fenv.h>
+#endif
 
 /* Use as an alternate to GNU feenableexcept */
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
 #include <fp_exception_glibc_extension.h>
 #endif
 
-#include <fenv.h>
+#ifdef FCLAW_HAVE_SIGNAL_H
 #include <signal.h>
+#endif
 
 #ifdef FCLAW_HAVE_UNISTD_H
 #include <unistd.h>    /* To get process ids */
 #endif
 
-
 static void* 
 fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 {
+    sc_keyvalue_t *kv;
+
     /* -------------------------- Time stepping control ------------------------------- */
 
     sc_options_add_double (opt, 0, "initial_dt", &fclaw_opt->initial_dt, 0.1,
@@ -88,11 +98,26 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "weighted_partition", &fclaw_opt->weighted_partition, 0,
                          "Weight grids when partitioning [F]");
 
+    /* ------------------------------ Conservation fix -------------------------------- */
+
+    sc_options_add_bool (opt, 0, "time-sync", &fclaw_opt->time_sync, 0,
+                         "Synchronize coarse/fine grids to include conservation fix [F]");
+
+
     /* ------------------------------- Output options --------------------------------- */
 
     sc_options_add_bool (opt, 0, "output", &fclaw_opt->output, 0,
                             "Enable output [F]");
 
+
+    /* -------------------------------------- Gauges  --------------------------------- */
+    /* Gauge options */
+    sc_options_add_bool (opt, 0, "output-gauges", &fclaw_opt->output_gauges, 0,
+                            "Print gauge output [F]");
+
+    sc_options_add_int(opt, 0, "gauge-buffer-length",
+                       &fclaw_opt->gauge_buffer_length, 1,
+                       "Number of lines of gauge output to buffer before printing [1]");
 
     /* -------------------------------- tikz output ----------------------------------- */
     sc_options_add_bool (opt, 0, "tikz-out", &fclaw_opt->tikz_out, 0,
@@ -113,8 +138,8 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                            "png","Figure suffix for plotting [png]");    
 
     sc_options_add_bool (opt, 0, "tikz-mesh-only", 
-                         &fclaw_opt->tikz_mesh_only,1,
-                         "Plot mesh only  .tex file [1]");    
+                         &fclaw_opt->tikz_mesh_only,0,
+                         "Do not include .png file in tikz .tex output [0]");    
 
     /* Deprecated */
     sc_options_add_bool (opt, 0, "tikz-plot-fig", &fclaw_opt->tikz_plot_fig,1,
@@ -194,6 +219,20 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "report-timing",
                          &fclaw_opt->report_timing,1,
                          "Report timing results [T]");
+
+    /* Set verbosity level for reporting timing */
+    kv = fclaw_opt->kv_timing_verbosity = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv, "wall",      FCLAW_TIMER_PRIORITY_WALL);
+    sc_keyvalue_set_int (kv, "summary",   FCLAW_TIMER_PRIORITY_SUMMARY);
+    sc_keyvalue_set_int (kv, "exclusive", FCLAW_TIMER_PRIORITY_EXCLUSIVE);
+    sc_keyvalue_set_int (kv, "counters",  FCLAW_TIMER_PRIORITY_COUNTERS);
+    sc_keyvalue_set_int (kv, "details",   FCLAW_TIMER_PRIORITY_DETAILS);
+    sc_keyvalue_set_int (kv, "extra",     FCLAW_TIMER_PRIORITY_EXTRA);
+    sc_keyvalue_set_int (kv, "all",       FCLAW_TIMER_PRIORITY_EXTRA);
+    sc_options_add_keyvalue (opt, 0, "report-timing-verbosity", 
+                             &fclaw_opt->report_timing_verbosity,
+                             "summary", kv, "Set verbosity for timing output [summary]");
+
 
     /* ---------------------------- Ghost packing options ----------------------------- */
 
@@ -322,7 +361,8 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
     if (fclaw_opt->trapfpe)
     {
         fclaw_global_infof("Enabling floating point traps\n");
-        feenableexcept(FE_INVALID);
+        // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
+        feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
     }
 
     return FCLAW_NOEXIT;
@@ -334,6 +374,9 @@ fclaw_options_destroy(fclaw_options_t* fclaw_opt)
     FCLAW_FREE (fclaw_opt->scale);
     FCLAW_FREE (fclaw_opt->shift);
     FCLAW_FREE (fclaw_opt->tikz_figsize);
+
+    FCLAW_ASSERT (fclaw_opt->kv_timing_verbosity != NULL);
+    sc_keyvalue_destroy (fclaw_opt->kv_timing_verbosity);
 }
 
 

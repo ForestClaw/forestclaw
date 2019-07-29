@@ -1,0 +1,15 @@
+This example tries to understand why gdb produces the error : 
+
+    a=<error reading variable: value requires 2113902080 bytes, which is more than     max-value-size>, 
+        val=3.1415899999999999) at array.f:1
+
+
+Seems that it is related to the double* being in a struct.         
+
+
+
+
+
+
+
+

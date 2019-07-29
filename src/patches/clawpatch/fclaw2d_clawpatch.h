@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>       /* Need patch callback def */
 
 #include <fclaw2d_clawpatch_fort.h>
+#include <fclaw2d_clawpatch_conservation.h>
 
 
 #ifdef __cplusplus
@@ -42,17 +43,31 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
+typedef void (*clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
+                                          struct fclaw2d_patch *patch,
+                                          void* user);
+/* --------------------------------- Typedefs ----------------------------------------- */
+
+typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob,
+                                                     struct fclaw2d_patch *this_patch,
+                                                     double *qpack,
+                                                     int frsize, 
+                                                     fclaw2d_clawpatch_packmode_t packmode,
+                                                     int *ierror);
+
+
 /* ---------------------------- Virtual table ------------------------------------ */
 
 /* members of this structure provide the only access to above functions */
 
 void fclaw2d_clawpatch_vtable_initialize(int claw_version);
 
-
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
 struct fclaw2d_clawpatch_vtable
 {
+    clawpatch_set_user_data_t              set_user_data;
+
     /* ghost filling functions */
     clawpatch_fort_copy_face_t             fort_copy_face;
     clawpatch_fort_average_face_t          fort_average_face;
@@ -67,6 +82,11 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_fort_average2coarse_t        fort_average2coarse;
     clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
+    /* Conservation update */
+    clawpatch_fort_time_sync_f2c_t         fort_time_sync_f2c;
+    clawpatch_fort_time_sync_samesize_t    fort_time_sync_samesize;
+    clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
+
     /* output functions (ascii) */
     clawpatch_fort_header_ascii_t          fort_header_ascii;
 
@@ -79,6 +99,7 @@ struct fclaw2d_clawpatch_vtable
     /* ghost patch functions */
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
     clawpatch_fort_local_ghost_pack_aux_t  fort_local_ghost_pack_aux;
+    
 
     /* diagnostic functions */
     clawpatch_fort_error_t                 fort_compute_patch_error;
@@ -105,6 +126,17 @@ void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
                                  double* xlower, double* ylower,
                                  double* dx, double* dy);
 
+
+void fclaw2d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch* this_patch,
+                                     double **area,double **edgelengths,
+                                     double **curvature);
+
+void fclaw2d_clawpatch_metric_vector(struct fclaw2d_global* glob,
+                                     struct fclaw2d_patch* this_patch,
+                                     double **xnormals, double **ynormals,
+                                     double **xtangents, double **ytangents,
+                                     double **surfnormals);
 
 void fclaw2d_clawpatch_metric_data(struct fclaw2d_global* glob,
                                    struct fclaw2d_patch* this_patch,
@@ -138,8 +170,17 @@ double* fclaw2d_clawpatch_get_q(struct fclaw2d_global* glob,
 double* fclaw2d_clawpatch_get_error(struct fclaw2d_global* glob,
                                     struct fclaw2d_patch* this_patch);
 
+double* fclaw2d_clawpatch_get_exactsoln(struct fclaw2d_global* glob,
+                                        struct fclaw2d_patch* this_patch);
+
 size_t fclaw2d_clawpatch_size(struct fclaw2d_global *glob);
 
+void* flaw2d_clawpatch_user_data(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch* this_patch);
+
+
+
+/* These should be renamed to time_interp data */
 void fclaw2d_clawpatch_timesync_data(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* this_patch,
                                      int time_interp,
@@ -148,6 +189,12 @@ void fclaw2d_clawpatch_timesync_data(struct fclaw2d_global* glob,
 double* fclaw2d_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
                                          struct fclaw2d_patch* this_patch,
                                          int time_interp);
+
+struct fclaw2d_clawpatch_registers* 
+fclaw2d_clawpatch_get_registers(struct fclaw2d_global* glob,
+                                struct fclaw2d_patch* this_patch);
+
+
 
 #ifdef __cplusplus
 #if 0

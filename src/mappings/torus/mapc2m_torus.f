@@ -1,18 +1,20 @@
-      subroutine mapc2m_torus(blockno,xc,yc,xp,yp,zp,alpha)
+      subroutine mapc2m_torus(blockno,xc,yc,xp,yp,zp,alpha, beta)
       implicit none
 
       integer blockno
       double precision xc,yc,xp,yp,zp
-      double precision alpha, r
+      double precision alpha, beta, r1, R
 
-      double precision pi
 
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
-      r = 1 + alpha*cos(2*pi*yc)
+      r1 = alpha*(1 + beta*sin(pi2*xc))
+      R = 1 + r1*cos(pi2*yc)
 
-      xp = r*cos(2*pi*xc)
-      yp = r*sin(2*pi*xc)
-      zp = alpha*sin(2*pi*yc)
+      xp = R*cos(pi2*xc)
+      yp = R*sin(pi2*xc)
+      zp = r1*sin(pi2*yc)
 
       end
+

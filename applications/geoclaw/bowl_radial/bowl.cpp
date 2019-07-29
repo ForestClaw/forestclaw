@@ -59,8 +59,7 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw2d_domain_data_new(*domain);
 
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     fc2d_geoclaw_solver_initialize();
 
@@ -73,7 +72,6 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
-
     fclaw2d_finalize(glob);
 }
 

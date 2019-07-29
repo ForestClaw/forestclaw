@@ -30,10 +30,74 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 /* Two versions of Clawpack */
+#include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-#include "../all/advection_user_fort.h"
+#include "advection_user_fort.h"
+
+static
+void torus_problem_setup(fclaw2d_global_t *glob)
+{
+    const user_options_t* user = torus_get_options(glob);
+
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24d   %s",user->example,"\% example\n");
+        fprintf(f,  "%-24.6f   %s",user->alpha,"\% alpha\n");
+        fprintf(f,  "%-24.6f   %s",user->beta,"\% beta\n");
+        fprintf(f,  "%-24.6f   %s",user->revs_per_s,"\% revs_per_second\n");
+        fprintf(f,  "%-24d   %s",user->color_equation,"\% color_equation\n");    
+        fclose(f);
+    }
+    fclaw2d_domain_barrier (glob->domain);
+    TORUS_SETPROB();
+}
+
+static
+void torus_patch_setup(fclaw2d_global_t *glob,
+                       fclaw2d_patch_t *patch,
+                       int blockno,
+                       int patchno)
+{
+    const user_options_t* user = torus_get_options(glob);
+
+    int mx,my,mbc,maux;
+    double xlower,ylower,dx,dy;
+    double *aux,*edgelengths,*area, *curvature;
+    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
+
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
+                                    &curvature);
+
+    fclaw2d_clawpatch_metric_vector(glob,patch,
+                                    &xnormals, &ynormals,
+                                    &xtangents, &ytangents,
+                                    &surfnormals);
+
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+
+    if (user->claw_version == 4)
+    {
+        /* Handles both non-conservative (ex 1-2) and conservative (ex 3-4) forms */
+        FCLAW_ASSERT(maux == 7);
+        TORUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
+                       &dx,&dy,&maux,aux,&blockno,
+                       area, edgelengths,xnormals,ynormals, 
+                       surfnormals);
+    }
+    else if (user->claw_version == 5)
+    {
+        /* Only works for advection in non-conservative form */
+        fc2d_clawpack5_setaux(glob,patch,blockno,patchno);
+        fc2d_clawpack5_set_capacity(glob,patch,blockno,patchno);
+    }
+}
+
 
 void torus_link_solvers(fclaw2d_global_t *glob)
 {
@@ -47,12 +111,31 @@ void torus_link_solvers(fclaw2d_global_t *glob)
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_options_t *claw46_opt = fc2d_clawpack46_get_options(glob);
 
-        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
-        claw46_vt->fort_setaux    = &TORUS46_SETAUX;  /* Do not need the mapped setaux */
-        claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
-        claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
+        claw46_vt->fort_qinit = &CLAWPACK46_QINIT;
 
+        if(user->color_equation)
+        {
+            claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
+            claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
+
+            /* Flux function (set to zero for non-conservative fix) */
+            claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_ZERO;
+        }
+        else
+        {
+                /* Solve conservative equation using cell-centered velocity */
+                /* Fwaves give best accuracy */
+                claw46_opt->use_fwaves = 1;
+                claw46_vt->fort_rpn2 = RPN2CONS_FW_MANIFOLD; 
+
+                /* Transverse solver : Conservative form */
+                claw46_vt->fort_rpt2  = &RPT2CONS_MANIFOLD;  
+
+                /* Flux function (for conservative fix) */
+                claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+        }
     }
     else if (user->claw_version == 5)
     {
@@ -62,33 +145,6 @@ void torus_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_setaux    = &TORUS5_SETAUX;
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
-
-    }
-}
-
-void torus_problem_setup(fclaw2d_global_t *glob)
-{
-    const user_options_t* user = torus_get_options(glob);
-    TORUS_SETPROB(&user->example,&user->alpha);
-}
-
-void torus_patch_setup(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx)
-{
-    const user_options_t* user = torus_get_options(glob);
-
-    /* We use the non-mapped setaux routine, but need to set capacity */
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_setaux(glob,this_patch,this_block_idx,this_patch_idx);
-        fc2d_clawpack46_set_capacity(glob,this_patch,this_block_idx,this_patch_idx);
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_setaux(glob,this_patch,this_block_idx,this_patch_idx);
-        fc2d_clawpack5_set_capacity(glob,this_patch,this_block_idx,this_patch_idx);
     }
 }
 

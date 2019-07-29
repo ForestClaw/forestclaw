@@ -53,7 +53,7 @@ c         compute_slopes = sc
 
       end
 
-      subroutine build_transform(transform_ptr,a)
+      subroutine build_transform(transform_ptr,a,f)
       implicit none
 
       integer a(2,2)

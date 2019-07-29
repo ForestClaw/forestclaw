@@ -36,167 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-static int s_user_options_package_id = -1;
-
-static void *
-torus_register (user_options_t *user_opt, sc_options_t * opt)
-{
-    /* [user] User options */
-    sc_options_add_int (opt, 0, "example", &user_opt->example, 0,
-                        "[user] 0 = torus; 1 = twisted torus [0]");
-
-    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
-                        "[user] Clawpack version (4 or 5) [5]");
-
-
-    sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
-                           "[user] Ratio r/R, r=outer radius, R=inner radius " \
-                           "(used for torus) [0.4]");
-
-    user_opt->is_registered = 1;
-    return NULL;
-}
-
-static fclaw_exit_type_t
-torus_postprocess(user_options_t *user_opt)
-{
-    /* nothing to post-process yet ... */
-    return FCLAW_NOEXIT;
-}
-
-
-static fclaw_exit_type_t
-torus_check(user_options_t *user_opt)
-{
-    if (user_opt->example < 0 || user_opt->example > 1)
-    {
-        fclaw_global_essentialf
-            ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    return FCLAW_NOEXIT;
-
-}
-
-static void
-torus_destroy(user_options_t *user_opt)
-{
-    /* Nothing to destroy */
-}
-
-
-/* ------- Generic option handling routines that call above routines ----- */
-static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
-{
-    user_options_t *user_opt;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (opt != NULL);
-
-    user_opt = (user_options_t*) package;
-
-    return torus_register(user_opt,opt);
-}
-
-static fclaw_exit_type_t
-options_postprocess (fclaw_app_t * a, void *package, void *registered)
-{
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    /* errors from the key-value options would have showed up in parsing */
-    user_options_t *user_opt = (user_options_t *) package;
-
-    /* post-process this package */
-    FCLAW_ASSERT(user_opt->is_registered);
-
-    /* Convert strings to arrays */
-    return torus_postprocess (user_opt);
-}
-
-
-static fclaw_exit_type_t
-options_check(fclaw_app_t *app, void *package,void *registered)
-{
-    user_options_t           *user_opt;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT(registered == NULL);
-
-    user_opt = (user_options_t*) package;
-
-    return torus_check(user_opt);
-}
-
-static void
-options_destroy (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t *user_opt;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    user_opt = (user_options_t*) package;
-    FCLAW_ASSERT (user_opt->is_registered);
-
-    torus_destroy (user_opt);
-
-    FCLAW_FREE (user_opt);
-}
-
-
-static const fclaw_app_options_vtable_t options_vtable_user =
-{
-    options_register,
-    options_postprocess,
-    options_check,
-    options_destroy
-};
-
-/* ------------- User options access functions --------------------- */
-
-static
-user_options_t* torus_options_register (fclaw_app_t * app,
-                                       const char *configfile)
-{
-    user_options_t *user_opt;
-    FCLAW_ASSERT (app != NULL);
-
-    user_opt = FCLAW_ALLOC (user_options_t, 1);
-    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
-                                user_opt);
-
-    fclaw_app_set_attribute(app,"user",user_opt);
-    return user_opt;
-}
-
-static 
-void torus_options_store (fclaw2d_global_t* glob, user_options_t* user)
-{
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
-}
-
-const user_options_t* torus_get_options(fclaw2d_global_t* glob)
-{
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
-}
-/* ------------------------- ... and here ---------------------------- */
-
-
-
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
-                                user_options_t* user_opt)
+                                user_options_t* user)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -225,8 +69,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     cont  = fclaw2d_map_new_torus(brick,fclaw_opt->scale,
                                   fclaw_opt->shift,
                                   rotate,
-                                  user_opt->alpha,
-                                  user_opt->example);
+                                  user->alpha,
+                                  user->beta);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, 
                                           fclaw_opt->minlevel, 
@@ -240,26 +84,32 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t  *user_opt;
+    const user_options_t  *user;
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user_opt = torus_get_options(glob);
+    user = torus_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
-    if (user_opt->claw_version == 4)
+    if (user->claw_version == 4)
     {
         fc2d_clawpack46_solver_initialize();
     }
-    else if (user_opt->claw_version == 5)
+    else if (user->claw_version == 5)
     {
+        fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+        if (fclaw_opt->time_sync != 0)
+        {
+            fclaw_global_essentialf("Conservation correction not yet implemented in " \
+                                    " claw-version=5.\n");
+            exit(0);
+        }
         fc2d_clawpack5_solver_initialize();
     }
 
@@ -282,7 +132,7 @@ main (int argc, char **argv)
 
     /* Options */
     sc_options_t                *options;
-    user_options_t              *user_opt;
+    user_options_t              *user;
     fclaw_options_t             *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
@@ -302,7 +152,7 @@ main (int argc, char **argv)
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    user_opt =                    torus_options_register(app,"fclaw_options.ini");  
+    user =                    torus_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -314,7 +164,7 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
         
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
+        domain = create_domain(mpicomm, fclaw_opt, user);
 
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();
@@ -325,7 +175,7 @@ main (int argc, char **argv)
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
-        torus_options_store             (glob, user_opt);
+        torus_options_store             (glob, user);
 
         /* Run the program */
         run_program(glob);

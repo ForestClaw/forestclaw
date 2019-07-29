@@ -216,17 +216,19 @@ fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
     FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
 }
 
-fclaw2d_patch_t *
+static fclaw2d_patch_t *
 fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)
 {
     fclaw2d_block_t *block;
 
+#if 0
     /* remote patch */
     if (blockno == -1)
     {
         FCLAW_ASSERT (0 <= patchno && patchno < domain->num_ghost_patches);
         return domain->ghost_patches + patchno;
     }
+#endif
 
     /* local patch */
     FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
@@ -361,6 +363,52 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
     }
 
     return anyboundary;
+}
+
+#ifdef FCLAW_ENABLE_DEBUG
+static const int normal_out[4] = { 0, 1, 0, 1 };
+#endif
+
+int
+fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
+                            int blockno, int patchno, int faceno)
+{
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_t *p4est = wrap->p4est;
+    p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
+    int qtfi;
+    p4est_locidx_t totalleaf;
+    p4est_tree_t *tree;
+#ifdef FCLAW_ENABLE_DEBUG
+    fclaw2d_block_t *block;
+#endif
+
+    /* are we sane */
+    FCLAW_ASSERT (domain->pp_owned);
+
+    /* check input parameters */
+    FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    FCLAW_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+    FCLAW_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+#ifdef FCLAW_ENABLE_DEBUG
+    block = domain->blocks + blockno;
+#endif
+    FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
+
+    /* access p4est tree and element for indexing into mesh */
+    tree = p4est_tree_array_index (p4est->trees, (p4est_topidx_t) blockno);
+    totalleaf = tree->quadrants_offset + (p4est_locidx_t) patchno;
+    FCLAW_ASSERT (0 <= totalleaf && totalleaf < p4est->local_num_quadrants);
+
+    /* access face number of the neighbor */
+    FCLAW_ASSERT (0 <= faceno && faceno < P4EST_FACES);
+    qtfi = (int) mesh->quad_to_face[P4EST_FACES * totalleaf + faceno];
+    FCLAW_ASSERT (qtfi >= 0 || qtfi + 8 == (qtfi & 7));
+    FCLAW_ASSERT ((normal_out[faceno] ^ normal_out[qtfi & 3]) ==
+                  ((faceno + qtfi) & 1));
+
+    /* we return true if the last bit of the two face numbers differs */
+    return (faceno + qtfi) & 1;
 }
 
 static void
@@ -1109,7 +1157,7 @@ fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
         patch->level + 1 : patch->level;
 #endif
 
-    patch->target_level =  patch->level + 1;
+    patch->target_level = patch->level + 1;
     patch->target_level = SC_MIN (patch->target_level, P4EST_QMAXLEVEL);
 
     /* if we do smooth refinement, all marking is done inside adapt */
@@ -1934,3 +1982,22 @@ fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
         SC_CHECK_MPI (mpiret);
     }
 }
+
+#if 0
+
+/* This is how it used to work.  Never needed it */
+
+/** Access a local or off-processor patch by its block and patch number.
+ * \param [in] domain   Valid domain.
+ * \param [in] blockno  For a local patch the number of the block.
+ *                      To request a remote patch set this number to -1.
+ * \param [in] patchno  For a local patch the number of the patch
+ *                      relative to its block.  Otherwise the number
+ *                      of the remote patch as returned by
+ *                      \ref fclaw2d_patch_face_neighbors and friends.
+ * \return              The patch that was requested.
+ */
+fclaw2d_patch_t *fclaw2d_domain_get_patch (fclaw2d_domain_t * domain,
+                                           int blockno, int patchno);
+
+#endif

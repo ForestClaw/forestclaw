@@ -37,6 +37,7 @@ extern "C"
 struct fclaw2d_global;
 
 void fclaw2d_problem_setup(struct fclaw2d_global *glob);
+void fclaw2d_vtables_initialize(struct fclaw2d_global *glob);
 
 void fclaw2d_initialize (struct fclaw2d_global *glob);
 void fclaw2d_run (struct fclaw2d_global *glob);

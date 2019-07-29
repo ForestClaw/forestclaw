@@ -39,6 +39,7 @@ typedef struct {
     double area;
     double *mass;
     double *mass0;  /* Mass at initial time */
+    double c_kahan;  
 } error_info_t;
 
 
@@ -59,6 +60,7 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
     error_data->mass   = FCLAW_ALLOC_ZERO(double,meqn);
     error_data->mass0  = FCLAW_ALLOC_ZERO(double,meqn);
     error_data->area = 0;
+    error_data->c_kahan = 0;      // For accurate summation
 
     *acc_patch = error_data;
 
@@ -85,6 +87,7 @@ void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
         error_data->mass[m]= 0;
     }
     error_data->area = 0;
+    error_data->c_kahan = 0;
 }
 
 
@@ -119,12 +122,13 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
 
     if (gparms->compute_error && clawpatch_vt->fort_compute_patch_error != NULL)
     {
-        double *error;
+        double *error, *soln;
         t = s->glob->curr_time;
         error = fclaw2d_clawpatch_get_error(s->glob,this_patch);
+        soln = fclaw2d_clawpatch_get_exactsoln(s->glob,this_patch);
 
         clawpatch_vt->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
-                                              &xlower,&ylower, &t, q, error);
+                                              &xlower,&ylower, &t, q, error, soln);
 
         /* Accumulate sums and maximums needed to compute error norms */
         clawpatch_vt->fort_compute_error_norm(&this_block_idx, &mx, &my, &mbc, &meqn, 
@@ -135,7 +139,8 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     if (gparms->conservation_check && clawpatch_vt->fort_conservation_check != NULL)
     {
         clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy,
-                                              area, q, error_data->mass);
+                                              area, q, error_data->mass,
+                                              &error_data->c_kahan);
     }
 }
 
@@ -185,8 +190,10 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
 
             error_norm[i2]   = fclaw2d_domain_global_sum(domain, error_data->local_error[i2]);
             error_norm[i2] /= total_area;
+            error_norm[i2] = sqrt(error_norm[i2]);
 
-            error_norm[iinf] = fclaw2d_domain_global_maximum(domain, error_data->local_error[iinf]);
+            error_norm[iinf] = fclaw2d_domain_global_maximum(domain, 
+                                                             error_data->local_error[iinf]);
 
             fclaw_global_essentialf("error[%d] =  %8.4e  %8.4e %8.4e\n",m,
                                     error_norm[i1], error_norm[i2],error_norm[iinf]);

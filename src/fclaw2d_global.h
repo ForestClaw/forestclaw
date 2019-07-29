@@ -42,20 +42,6 @@ typedef struct fclaw2d_global fclaw2d_global_t;
 typedef struct fclaw2d_global_iterate fclaw2d_global_iterate_t;
 
 struct fclaw2d_global
-
-#if 0
-#define FCLAW2D_NUM_CORNERS 4
-extern const int NumCorners;
-
-#define FCLAW2D_NUM_SIBLINGS 4
-extern const int NumSiblings;
-
-extern const int PatchDim;
-
-extern const int RefineDim;
-
-typedef struct fclaw2d_global
-#endif
 {
     int count_amr_advance;
     int count_ghost_exchange;
@@ -82,6 +68,8 @@ typedef struct fclaw2d_global
     struct fclaw2d_domain *domain;
 
     struct fclaw2d_diagnostics_accumulator *acc;
+
+    void *user;
 };
 
 struct fclaw2d_global_iterate

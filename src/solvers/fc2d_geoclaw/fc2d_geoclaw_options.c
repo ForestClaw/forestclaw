@@ -83,7 +83,8 @@ geoclaw_register (fc2d_geoclaw_options_t *geo_opt, sc_options_t * opt)
 
     fclaw_options_add_double_array (opt, 0, "speed_tolerance_c",
                                     &geo_opt->speed_tolerance_c_string, NULL,
-                                    &geo_opt->speed_tolerance_c, geo_opt->speed_tolerance_entries_c,
+                                    &geo_opt->speed_tolerance_c, 
+                                    geo_opt->speed_tolerance_entries_c,
                                     "[geoclaw] Coarsen criteria: speed tolerance [NULL]");
 
     sc_options_add_int (opt, 0, "mbathy", &geo_opt->mbathy, 1,

@@ -59,6 +59,11 @@ void latlong_patch_setup_manifold(fclaw2d_global_t *glob,
                                   int this_patch_idx);
 
 
+user_options_t*  latlong_options_register (fclaw_app_t * app,
+                                           const char *configfile);\
+
+void latlong_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 const user_options_t* latlong_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t *

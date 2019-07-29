@@ -41,6 +41,10 @@ typedef struct user_options
 {
     int example;
     double beta;  /* Ratio of inner radius to outer radius */
+
+    const char *theta_string;
+    double *theta;  /* Theta range */
+
     int claw_version;
 
     int is_registered;
@@ -60,6 +64,10 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
                          int this_block_idx,
                          int this_patch_idx);
 
+user_options_t* annulus_options_register (fclaw_app_t * app,
+                                          const char *configfile);
+
+void annulus_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* annulus_get_options(fclaw2d_global_t *glob);
 
@@ -68,7 +76,8 @@ fclaw2d_map_context_t *
                              const double scale[],
                              const double shift[],
                              const double rotate[],
-                             const double alpha);
+                             const double alpha,
+                             const double theta[]);
 
 #ifdef __cplusplus
 #if 0

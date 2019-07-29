@@ -36,102 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-static int s_user_options_package_id = -1;
-
-
-
-static void *
-quadrants_register (user_options_t *user, sc_options_t * opt)
-{
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
-                        "[user] Clawpack version (4 or 5) [5]");
-
-    /* [user] User options */
-    sc_options_add_double (opt, 0, "gamma", &user->gamma, 1.4, "[user] gamma [1.4]");
-
-    user->is_registered = 1;
-    return NULL;
-}
-
-static void
-quadrants_destroy(user_options_t *user)
-{
-    /* Nothing to destroy */
-}
-
-/* ------- Generic option handling routines that call above routines ----- */
-static void*
-options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (opt != NULL);
-
-    user = (user_options_t*) package;
-
-    return quadrants_register(user,opt);
-}
-
-static void
-options_destroy (fclaw_app_t * app, void *package, void *registered)
-{
-    user_options_t *user;
-
-    FCLAW_ASSERT (app != NULL);
-    FCLAW_ASSERT (package != NULL);
-    FCLAW_ASSERT (registered == NULL);
-
-    user = (user_options_t*) package;
-    FCLAW_ASSERT (user->is_registered);
-
-    quadrants_destroy (user);
-
-    FCLAW_FREE (user);
-}
-
-
-static const fclaw_app_options_vtable_t options_vtable_user =
-{
-    options_register,
-    NULL,
-    NULL,
-    options_destroy
-};
-
-/* ------------- User options access functions --------------------- */
-
-static
-user_options_t* quadrants_options_register (fclaw_app_t * app,
-                                          const char *configfile)
-{
-    user_options_t *user;
-    FCLAW_ASSERT (app != NULL);
-
-    user = FCLAW_ALLOC (user_options_t, 1);
-    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
-                                user);
-
-    fclaw_app_set_attribute(app,"user",user);
-    return user;
-}
-
-static 
-void quadrants_options_store (fclaw2d_global_t* glob, user_options_t* user)
-{
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
-}
-
-user_options_t* quadrants_get_options(fclaw2d_global_t* glob)
-{
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
-}
-/* ------------------------- ... and here ---------------------------- */
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt)
@@ -166,8 +70,7 @@ void run_program(fclaw2d_global_t* glob)
     user_opt = quadrants_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)

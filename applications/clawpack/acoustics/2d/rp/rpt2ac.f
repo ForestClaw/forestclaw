@@ -32,17 +32,17 @@ c
 c
       do 20 i = 2-mbc, mx+mbc
          a1 = (-asdq(i,1) + zz*asdq(i,mv)) / (2.d0*zz)
-         a2 = (asdq(i,1) + zz*asdq(i,mv)) / (2.d0*zz)
+         a2 = ( asdq(i,1) + zz*asdq(i,mv)) / (2.d0*zz)
 c
 c        # The down-going flux difference bmasdq is the product  -c * wave
 c
-         bmasdq(i,1) = cc * a1*zz
+         bmasdq(i,1)  = cc * a1*zz
          bmasdq(i,mu) = 0.d0
          bmasdq(i,mv) = -cc * a1
 c
 c        # The up-going flux difference bpasdq is the product  c * wave
 c
-         bpasdq(i,1) = cc * a2*zz
+         bpasdq(i,1)  = cc * a2*zz
          bpasdq(i,mu) = 0.d0
          bpasdq(i,mv) = cc * a2
 c

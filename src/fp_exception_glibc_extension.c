@@ -56,12 +56,17 @@ To compile it under Linux, execute:
   cc -DLINUX -lm -o fe-handling fe-handling-example.c
 */
 
-/* Added this ifdef to compile the file conditionally */
-/* Question: why does this file not include fp_exception_glibc_extension.h? */
-#include <fp_exception_glibc_extension.h>
+/* Need this to evaluate the FCLAW_HAVE_ definitions */
 #include <fclaw_config.h>
 
+/* We only do something if we need the feenableexcept replacement.
+   Otherwise this file noops. */
 #ifndef FCLAW_HAVE_FEENABLEEXCEPT
+
+/* Added this ifdef to compile the file conditionally */
+/* Question: why does this file not include fp_exception_glibc_extension.h? */
+/* Answer: now it does -- is this how we like it? */
+#include <fp_exception_glibc_extension.h>
 
 #ifdef FCLAW_HAVE_SIGNAL_H
 #include <signal.h>
@@ -89,7 +94,9 @@ http://graphviz.sourcearchive.com/documentation/2.16/gvrender__pango_8c-source.h
 /* END quote */
 #endif // LINUX
 
+#ifdef FCLAW_HAVE_FENV_H
 #include <fenv.h>
+#endif
 
 #define DEFINED_PPC      (defined(__ppc__) || defined(__ppc64__))
 #define DEFINED_INTEL    (defined(__i386__) || defined(__x86_64__))

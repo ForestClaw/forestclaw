@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
+#include <fclaw2d_vtable.h>
 
 #include "fclaw_math.h"
 
@@ -57,6 +58,9 @@ static
 void restore_time_step(fclaw2d_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
+
+    //fclaw_options_t *fopt = fclaw2d_get_options(glob);
+    //fclaw2d_time_sync_reset(glob,fopt->minlevel,fopt->maxlevel,0);
 }
 
 static
@@ -270,7 +274,10 @@ void outstyle_1(fclaw2d_global_t *glob)
             }
             glob->curr_time = t_curr;
 
-            fclaw2d_diagnostics_gather(glob, init_flag);
+            if (fclaw_opt->advance_one_step)
+            {
+                fclaw2d_diagnostics_gather(glob, init_flag);                
+            }
 
             if (fclaw_opt->regrid_interval > 0)
             {
@@ -283,6 +290,7 @@ void outstyle_1(fclaw2d_global_t *glob)
         }
 
         /* Output file at every outer loop iteration */
+        fclaw2d_diagnostics_gather(glob, init_flag);
         glob->curr_time = t_curr;
         iframe++;
         fclaw2d_output_frame(glob,iframe);
@@ -312,6 +320,9 @@ void outstyle_3(fclaw2d_global_t *glob)
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     double initial_dt = fclaw_opt->initial_dt;
+
+
+    //fclaw2d_time_sync_reset(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,1);
 
     double t0 = 0;
     double dt_minlevel = initial_dt;
@@ -375,7 +386,7 @@ void outstyle_3(fclaw2d_global_t *glob)
                           fclaw_opt->maxlevel : fclaw_opt->minlevel;
 
         fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
-                                 "%8.3f; Final time = %12.4f\n",
+                                 "%12.6f; Final time = %12.4f\n",
                                  level2print,
                                  (*domain)->global_minlevel,
                                  (*domain)->global_maxlevel,
@@ -421,10 +432,15 @@ void outstyle_3(fclaw2d_global_t *glob)
             }
         }
 
+        if (fclaw_opt->advance_one_step)
+        {
+            //fclaw2d_diagnostics_gather(glob,init_flag);
+        }
+
         if (n % nstep_inner == 0)
         {
-            fclaw2d_diagnostics_gather(glob,init_flag);
             iframe++;
+            fclaw2d_diagnostics_gather(glob,init_flag);
             fclaw2d_output_frame(glob,iframe);
         }
     }

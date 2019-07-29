@@ -325,7 +325,8 @@ double clawpack5_update(fclaw2d_global_t *glob,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
-                        double dt)
+                        double dt,
+                        void* user)
 {    
     fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
 
@@ -334,15 +335,20 @@ double clawpack5_update(fclaw2d_global_t *glob,
 
     if (claw5_vt->b4step2 != NULL)
     {
+        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
         claw5_vt->b4step2(glob,
                           this_patch,
                           this_block_idx,
                           this_patch_idx,t,dt);
+        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
     }
+
+    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
     double maxcfl = clawpack5_step2(glob,
                                     this_patch,
                                     this_block_idx,
                                     this_patch_idx,t,dt);
+    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
     if (clawpack_options->src_term > 0 && claw5_vt->src2 != NULL)
     {

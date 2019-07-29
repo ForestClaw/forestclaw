@@ -14,7 +14,7 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
 !     Converted to f90 2012-1-04 (KTM)
 !
 
-    use amr_module
+    use clawpack5_amr_module
 
     implicit none
 

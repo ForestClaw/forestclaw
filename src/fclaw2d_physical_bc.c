@@ -55,7 +55,7 @@ void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
 
     t_info = (fclaw2d_physical_time_info_t*) s->user;
 
-    int intersects_bc[NumFaces];
+    int intersects_bc[FCLAW2D_NUMFACES];
 
     /* Time dt should not be passed in here. If BCs are obtained by 
        evolving an ODE, then we should really evolve the ODE at the same time 
@@ -82,10 +82,10 @@ void fclaw2d_physical_get_bc(fclaw2d_global_t *glob,
                              int *intersects_bdry)
 {
     // const int numfaces = get_faces_per_patch(domain);
-    int bdry[NumFaces];
+    int bdry[FCLAW2D_NUMFACES];
     fclaw2d_patch_boundary_type(glob->domain,this_block_idx,this_patch_idx,bdry);
     int i;
-    for(i = 0; i < NumFaces; i++)
+    for(i = 0; i < FCLAW2D_NUMFACES; i++)
     {
         // Physical boundary conditions
         intersects_bdry[i] = bdry[i] == 1;

@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FC2D_GEOCLAW_FORT_H
 #define FC2D_GEOCLAW_FORT_H
 
+#include <fclaw_base.h>  /* Needed for FCLAW_F77_FUNC macro */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -35,9 +37,87 @@ extern "C"
 #endif
 
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
-struct geoclaw_gauge;
 
-/* -------------------------------- Clawpack functions ------------------------------- */
+
+/* --------------------------------------- Typedefs ----------------------------------- */
+
+typedef void (*fc2d_geoclaw_setprob_t)();
+
+
+typedef void (*fc2d_geoclaw_bc2_t)(const int* meqn, const int* mbc,
+                                   const int* mx, const int* my,
+                                   const double* xlower, const double* ylower,
+                                   const double* dx, const double* dy,
+                                   const double q[], const int* maux,
+                                   const double aux[], const double* t,
+                                   const double* dt, const int mthbc[]);
+
+typedef  void (*fc2d_geoclaw_qinit_t)(const int* meqn,const int* mbc,
+                                      const int* mx, const int* my,
+                                      const double* xlower, const double* ylower,
+                                      const double* dx, const double* dy,
+                                      double q[], const int* maux, double aux[]);
+
+typedef void (*fc2d_geoclaw_setaux_t)(const int* mbc,
+                                      const int* mx, const int* my,
+                                      const double* xlower, const double* ylower,
+                                      const double* dx, const double* dy,
+                                      const int* maux, double aux[],
+                                      const int* is_ghost, const int* nghost,
+                                      const int* mint);
+
+typedef void (*fc2d_geoclaw_b4step2_t)(const int* mbc,
+                                       const int* mx, const int* my, const int* meqn,
+                                       double q[], const double* xlower,
+                                       const double* ylower,
+                                       const double* dx, const double* dy,
+                                       const double* t, const double* dt,
+                                       const int* maux, double aux[]);
+
+typedef void (*fc2d_geoclaw_src2_t)(const int* meqn,
+                                    const int* mbc, const int* mx,const int* my,
+                                    const double* xlower, const double* ylower,
+                                    const double* dx, const double* dy, double q[],
+                                    const int* maux, double aux[], const double* t,
+                                    const double* dt);
+
+
+typedef void (*fc2d_geoclaw_rpn2_t)(const int* ixy,const int* maxm, const int* meqn,
+                                    const int* mwaves, const int* maux,
+                                    const int* mbc,const int* mx,
+                                    double ql[], double qr[], double auxl[], 
+                                    double auxr[],
+                                    double fwave[], double s[],double amdq[], 
+                                    double apdq[]);
+
+typedef void (*fc2d_geoclaw_rpt2_t)(const int* ixy, const int* imp, const int* maxm, 
+                                    const int* meqn,
+                                    const int* mwaves, const int* maux, const int* mbc,
+                                    const int* mx,
+                                    double ql[], double qr[], double aux1[], 
+                                    double aux2[],
+                                    double aux3[],  double asdq[],
+                                    double bmasdq[], double bpasdq[]);
+
+
+typedef void (*fc2d_geoclaw_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
+                                     const int* maux,const int* mbc,const int* mx,
+                                     double q1d[], double dtdx1d[],
+                                     double aux1[], double aux2[], double aux3[],
+                                     double faddm[],double faddp[], double gaddm[],
+                                     double gaddp[],double cfl1d[], double wave[],
+                                     double s[], double amdq[],double apdq[],
+                                     double cqxx[],
+                                     double bmasdq[], double bpasdq[],
+                                     fc2d_geoclaw_rpn2_t rpn2,
+                                     fc2d_geoclaw_rpt2_t rpt2);
+
+typedef void (*fc2d_geoclaw_fluxfun_t)(const int* meqn, double q[], double aux[],
+                                       double fq[]);
+
+
+
+/* ---------------------------------- GeoClaw functions ------------------------------- */
 
 
 #define FC2D_GEOCLAW_BC2 FCLAW_F77_FUNC(fc2d_geoclaw_bc2, FC2D_GEOCLAW_BC2)
@@ -116,25 +196,16 @@ void FC2D_GEOCLAW_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
                                const int *mcapa, const int* maux, double aux[]);
 
 
-/* --------------------------------- Gauge functions ------------------------------- */
-
-#define FC2D_GEOCLAW_GAUGES_GETNUM FCLAW_F77_FUNC(fc2d_geoclaw_gauges_getnum, \
-                                                  FC2D_GEOCLAW_GAUGES_GETNUM)
-int FC2D_GEOCLAW_GAUGES_GETNUM(char fname[]);
-
-#define FC2D_GEOCLAW_GAUGES_INIT FCLAW_F77_FUNC(fc2d_geoclaw_gauges_init,  \
-                                           FC2D_GEOCLAW_GAUGES_INIT)
-void FC2D_GEOCLAW_GAUGES_INIT(const int* restart, const int* meqn, const int* num_gauges,
-                              struct geoclaw_gauge *gauges, char fname[]);
+/* --------------------------------- Gauge functions ---------------------------------- */
 
 #define FC2D_GEOCLAW_UPDATE_GAUGE FCLAW_F77_FUNC(fc2d_geoclaw_update_gauge, \
                                             FC2D_GEOCLAW_UPDATE_GAUGE)
 void FC2D_GEOCLAW_UPDATE_GAUGE (int* mx,int* my,int* mbc,int* meqn,double* xlower,
                                 double* ylower,double* dx,double* dy,double q[],
-                                int* maux,double aux[],double* xc,double* yc,double var[],
-                                double* eta);
+                                int* maux,double aux[],double* xc,double* yc,
+                                double qvar[], double avar[]);
 
-/* ------------------------------ Time stepping functions ---------------------------- */
+/* ------------------------------- Time stepping functions ---------------------------- */
 
 
 #define FC2D_GEOCLAW_STEP2_WRAP FCLAW_F77_FUNC(fc2d_geoclaw_step2_wrap, \
@@ -182,96 +253,121 @@ void FC2D_GEOCLAW_FORT_TIMEINTERP(const int *mx, const int* my, const int* mbc,
                                     double qinterp[],const double* alpha,
                                     const int* ierror);
 
-/* --------------------------------- Regridding functions ------------------------------ */
+/* -------------------------------- Regridding functions ------------------------------ */
 
-#define FC2D_GEOCLAW_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(fc2d_geoclaw_fort_tag4refinement, \
-                                                        FC2D_GEOCLAW_FORT_TAG4REFINEMENT)
+#define FC2D_GEOCLAW_FORT_TAG4REFINEMENT \
+                              FCLAW_F77_FUNC(fc2d_geoclaw_fort_tag4refinement,\
+                              FC2D_GEOCLAW_FORT_TAG4REFINEMENT)
 void FC2D_GEOCLAW_FORT_TAG4REFINEMENT(int* mx,int* my, int* mbc, int *meqn,int*maux,
                                       double * xlower,double * ylower,
                                       double* dx,double* dy, double*t, int* blockno,
-                                      double q[], double aux[], int* mbathy, int* level,int* maxlevel,
+                                      double q[], double aux[], int* mbathy, 
+                                      int* level,int* maxlevel,
                                       int* init_flag,int* tag_patch);
 
-#define FC2D_GEOCLAW_FORT_TAG4COARSENING FCLAW_F77_FUNC(fc2d_geoclaw_fort_tag4coarsening, \
-                                                        FC2D_GEOCLAW_FORT_TAG4COARSENING)
-void FC2D_GEOCLAW_FORT_TAG4COARSENING(int* blockno,int* mx,int* my,int* mbc,int* meqn, int* maux,
-                                      double xlower[],double ylower[],double* dx,double* dy,
-                                      double* t, double q0[], double q1[], double q2[], double q3[],
-                                      double aux0[], double aux1[], double aux2[], double aux3[],
-                                      int* mbathy, int* level, int* maxlevel, double* dry_tolerance_c,
-                                      double* wave_tolerance_c, int* speed_tolerance_entries_c,
+#define FC2D_GEOCLAW_FORT_TAG4COARSENING \
+                             FCLAW_F77_FUNC(fc2d_geoclaw_fort_tag4coarsening, \
+                             FC2D_GEOCLAW_FORT_TAG4COARSENING)
+void FC2D_GEOCLAW_FORT_TAG4COARSENING(int* blockno,int* mx,int* my,int* mbc,
+                                      int* meqn, int* maux,
+                                      double xlower[],double ylower[],
+                                      double* dx,double* dy,
+                                      double* t, double q0[], double q1[], 
+                                      double q2[], double q3[],
+                                      double aux0[], double aux1[], 
+                                      double aux2[], double aux3[],
+                                      int* mbathy, int* level, int* maxlevel, 
+                                      double* dry_tolerance_c,
+                                      double* wave_tolerance_c, 
+                                      int* speed_tolerance_entries_c,
                                       double speed_tolerance_c[], int* tag_patch);
 
-#define FC2D_GEOCLAW_FORT_INTERPOLATE2FINE FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate2fine, \
-                                                          FC2D_GEOCLAW_FORT_INTERPOLATE2FINE)
-void FC2D_GEOCLAW_FORT_INTERPOLATE2FINE(int* mx,int* my,int* mbc,int* meqn, double qcoarse[],
-                                        double qfine[], int* maux, double aux_coarse[],
-                                        double aux_fine[], int* mbathy, int* p4est_refineFactor,int* refratio,
+#define FC2D_GEOCLAW_FORT_INTERPOLATE2FINE \
+                        FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate2fine, \
+                        FC2D_GEOCLAW_FORT_INTERPOLATE2FINE)
+void FC2D_GEOCLAW_FORT_INTERPOLATE2FINE(int* mx,int* my,int* mbc,int* meqn, 
+                                        double qcoarse[], double qfine[], 
+                                        int* maux, double aux_coarse[],
+                                        double aux_fine[], int* mbathy, 
+                                        int* p4est_refineFactor,int* refratio,
                                         int* igrid);
 
-#define FC2D_GEOCLAW_FORT_AVERAGE2COARSE FCLAW_F77_FUNC(fc2d_geoclaw_fort_average2coarse, \
-                                                        FC2D_GEOCLAW_FORT_AVERAGE2COARSE)
-void FC2D_GEOCLAW_FORT_AVERAGE2COARSE(int* mx,int* my,int* mbc,int* meqn, double qcoarse[],
-                                      double qfine[], int* maux, double aux_coarse[],
-                                      double aux_fine[], int* mcapa, int* mbathy, int* p4est_refineFactor,
-                                      int* refratio, int* igrid);
+#define FC2D_GEOCLAW_FORT_AVERAGE2COARSE \
+                            FCLAW_F77_FUNC(fc2d_geoclaw_fort_average2coarse, \
+                            FC2D_GEOCLAW_FORT_AVERAGE2COARSE)
+void FC2D_GEOCLAW_FORT_AVERAGE2COARSE(int* mx,int* my,int* mbc,int* meqn, 
+                                      double qcoarse[], double qfine[], 
+                                      int* maux, double aux_coarse[],
+                                      double aux_fine[], int* mcapa, int* mbathy, 
+                                      int* p4est_refineFactor, int* refratio, int* igrid);
 
 /* ---------------------------- Ghost filling - patch specific -------------------------- */
 
-#define FC2D_GEOCLAW_FORT_COPY_FACE FCLAW_F77_FUNC(fc2d_geoclaw_fort_copy_face, \
-                                                     FC2D_GEOCLAW_FORT_COPY_FACE)
+#define FC2D_GEOCLAW_FORT_COPY_FACE \
+                          FCLAW_F77_FUNC(fc2d_geoclaw_fort_copy_face, \
+                          FC2D_GEOCLAW_FORT_COPY_FACE)
 
-void FC2D_GEOCLAW_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, const int* meqn,
-                                   double qthis[],double qneighbor[], const int* a_idir,
-                                   struct fclaw2d_patch_transform_data** transform_cptr);
+void FC2D_GEOCLAW_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, 
+                                 const int* meqn, double qthis[], double qneighbor[], 
+                                 const int* a_idir,
+                                 struct fclaw2d_patch_transform_data** transform_cptr);
 
 
-#define FC2D_GEOCLAW_FORT_AVERAGE_FACE FCLAW_F77_FUNC(fc2d_geoclaw_fort_average_face, \
-                                                        FC2D_GEOCLAW_FORT_AVERAGE_FACE)
-void FC2D_GEOCLAW_FORT_AVERAGE_FACE(const int* mx,const int* my,const int* mbc,const int* meqn,
-                                    double qcoarse[],double qfine[],const int* maux,
-                                    double auxcoarse[],double auxfine[],const int* mcapa,
-                                    const int* mbathy,const int* idir,const int* iface_coarse,
-                                    const int* p4est_refineFactor,const int* refratio,
-                                    const int* igrid,const int* manifold,
+#define FC2D_GEOCLAW_FORT_AVERAGE_FACE \
+                            FCLAW_F77_FUNC(fc2d_geoclaw_fort_average_face, \
+                            FC2D_GEOCLAW_FORT_AVERAGE_FACE)
+void FC2D_GEOCLAW_FORT_AVERAGE_FACE(const int* mx,const int* my,const int* mbc, 
+                                    const int* meqn, double qcoarse[], 
+                                    double qfine[],const int* maux,
+                                    double auxcoarse[], double auxfine[], 
+                                    const int* mcapa, const int* mbathy, 
+                                    const int* idir, const int* iface_coarse,
+                                    const int* p4est_refineFactor, const int* refratio,
+                                    const int* igrid, const int* manifold,
                                     struct fclaw2d_patch_transform_data** transform_data);
 
-#define FC2D_GEOCLAW_FORT_INTERPOLATE_FACE FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate_face, \
-                                                          FC2D_GEOCLAW_FORT_INTERPOLATE_FACE)
+#define FC2D_GEOCLAW_FORT_INTERPOLATE_FACE \
+                               FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate_face, \
+                               FC2D_GEOCLAW_FORT_INTERPOLATE_FACE)
 void FC2D_GEOCLAW_FORT_INTERPOLATE_FACE(const int* mx, const int* my, const int* mbc,
-                                          const int* meqn,
-                                          double qcoarse[],double qfine[],
-                                          const int* maux, double aux_coarse[],
-                                          double aux_fine[], const int* mbathy,
-                                          const int* idir, const int* iside,
-                                          const int* num_neighbors,
-                                          const int* refratio, const int* igrid,
-                                          struct fclaw2d_patch_transform_data** transform_cptr);
+                                        const int* meqn,
+                                        double qcoarse[],double qfine[],
+                                        const int* maux, double aux_coarse[],
+                                        double aux_fine[], const int* mbathy,
+                                        const int* idir, const int* iside,
+                                        const int* num_neighbors,
+                                        const int* refratio, const int* igrid,
+                                        struct fclaw2d_patch_transform_data** transform_cptr);
 
 
-#define FC2D_GEOCLAW_FORT_COPY_CORNER FCLAW_F77_FUNC(fc2d_geoclaw_fort_copy_corner, \
-                                                       FC2D_GEOCLAW_FORT_COPY_CORNER)
+#define FC2D_GEOCLAW_FORT_COPY_CORNER \
+                         FCLAW_F77_FUNC(fc2d_geoclaw_fort_copy_corner, \
+                         FC2D_GEOCLAW_FORT_COPY_CORNER)
 void FC2D_GEOCLAW_FORT_COPY_CORNER(const int* mx, const int* my, const int* mbc,
                                    const int* meqn, double this_q[],double neighbor_q[],
                                    const int* a_corner,
                                    struct fclaw2d_patch_transform_data** transform_cptr);
 
-#define FC2D_GEOCLAW_FORT_AVERAGE_CORNER FCLAW_F77_FUNC(fc2d_geoclaw_fort_average_corner, \
-                                                          FC2D_GEOCLAW_FORT_AVERAGE_CORNER)
+#define FC2D_GEOCLAW_FORT_AVERAGE_CORNER \
+                            FCLAW_F77_FUNC(fc2d_geoclaw_fort_average_corner, \
+                            FC2D_GEOCLAW_FORT_AVERAGE_CORNER)
 void FC2D_GEOCLAW_FORT_AVERAGE_CORNER(const int* mx, const int* my, const int* mbc,
                                       const int* meqn, const int* a_refratio,
-                                      double qcoarse[], double qfine[], const int* maux,
-                                      double auxcoarse[], double auxfine[], const int* mcapa,
+                                      double qcoarse[], double qfine[], 
+                                      const int* maux, double auxcoarse[], 
+                                      double auxfine[],  const int* mcapa,
                                       const int* mbathy, const int* manifold,
                                       const int* a_corner, 
                                       struct fclaw2d_patch_transform_data** transform_cptr);
     
-#define FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate_corner, \
-                                                             FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER)
+#define FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER \
+                              FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate_corner, \
+                              FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER)
 void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const int* mbc,
-                                          const int* meqn, const int* a_refratio, double qcoarse[],
-                                          double qfine[], const int* maux, double aux_coarse[],
-                                          double aux_fine[], const int* mbathy, const int* a_corner,
+                                          const int* meqn, const int* a_refratio, 
+                                          double qcoarse[], double qfine[], const int* maux, 
+                                          double aux_coarse[], double aux_fine[], 
+                                          const int* mbathy, const int* a_corner,
                                           struct fclaw2d_patch_transform_data** transform_cptr);
 
 
@@ -281,29 +377,35 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, const in
 
 #define FC2D_GEOCLAW_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_geoclaw_fort_write_header,\
                                                       FC2D_GEOCLAW_FORT_WRITE_HEADER)
-void FC2D_GEOCLAW_FORT_WRITE_HEADER(int* iframe,double* time,int* meqn,int* maux,int* ngrids);
+void FC2D_GEOCLAW_FORT_WRITE_HEADER(int* iframe, double* time, int* meqn, 
+                                    int* maux, int* ngrids);
 
 #define FC2D_GEOCLAW_FORT_WRITE_FILE FCLAW_F77_FUNC(fc2d_geoclaw_fort_write_file, \
                                                     FC2D_GEOCLAW_FORT_WRITE_FILE)
-void FC2D_GEOCLAW_FORT_WRITE_FILE(int* mx,int* my,int* meqn,int* maux,int* mbathy,int* mbc,
-                             double* xlower,double* ylower,double* dx,double* dy,
-                             double q[],double aux[],int* iframe,int* patch_num,int* level,
-                             int* blockno,int* mpirank);
+void FC2D_GEOCLAW_FORT_WRITE_FILE(int* mx,int* my,int* meqn,int* maux, 
+                                  int* mbathy,int* mbc, 
+                                  double* xlower, double* ylower, 
+                                  double* dx,double* dy,
+                                  double q[], double aux[], int* iframe, 
+                                  int* patch_num,int* level,
+                                  int* blockno,int* mpirank);
 
 
 /* ---------------------------------- Parallel ghost patches  -------------------------------- */
 
 
-#define FC2D_GEOCLAW_LOCAL_GHOST_PACK FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack, \
-                                                     FC2D_GEOCLAW_LOCAL_GHOST_PACK)
+#define FC2D_GEOCLAW_LOCAL_GHOST_PACK \
+                               FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack, \
+                               FC2D_GEOCLAW_LOCAL_GHOST_PACK)
 void  FC2D_GEOCLAW_LOCAL_GHOST_PACK(int *mx, int *my, int *mbc,
                                           int *meqn, int *mint,
                                           double qdata[], double area[],
                                           double qpack[], int *psize,
                                           int *packmode, int *ierror);
 
-#define FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack_aux, \
-                                                     FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX)
+#define FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX \
+                              FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack_aux, \
+                              FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX)
 void  FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(int *mx, int *my, int *mbc,
                                         int *maux, int *mint,
                                         double auxdata[], double auxpack[],
@@ -312,30 +414,34 @@ void  FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(int *mx, int *my, int *mbc,
 /* ------------------------------ Diagnostics functions ---------------------------- */
 
 
-#define FC2D_GEOCLAW_FORT_CONSERVATION_CHECK FCLAW_F77_FUNC(fc2d_geoclaw_fort_conservation_check, \
-                                                              FC2D_GEOCLAW_FORT_CONSERVATION_CHECK)
+#define FC2D_GEOCLAW_FORT_CONSERVATION_CHECK \
+                       FCLAW_F77_FUNC(fc2d_geoclaw_fort_conservation_check, \
+                       FC2D_GEOCLAW_FORT_CONSERVATION_CHECK)
 
 void FC2D_GEOCLAW_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                             double *dx, double *dy,
                                             double* area, double *q, double* sum);
 
-#define FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA FCLAW_F77_FUNC(fc2d_geoclaw_fort_compute_patch_area, \
-                                                              FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA)
+#define FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA \
+                      FCLAW_F77_FUNC(fc2d_geoclaw_fort_compute_patch_area, \
+                      FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA)
 
 double FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double* dx,
                                               double* dy, double area[]);
 
 
 
-#define FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM FCLAW_F77_FUNC(fc2d_geoclaw_fort_compute_error_norm, \
-                                                              FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM)
+#define FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM \
+                              FCLAW_F77_FUNC(fc2d_geoclaw_fort_compute_error_norm, \
+                              FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM)
 
-void FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM(int* blockno, int *mx, int *my, int *mbc, int *meqn,
-                                            double *dx, double *dy, double area[],
-                                            double error[], double error_norm[]);
+void FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM(int* blockno, int *mx, int *my, int *mbc, 
+                                          int *meqn, double *dx, double *dy, 
+                                          double area[], double error[], 
+                                          double error_norm[]);
 
 
-/* -------------------------- Misc GeoClaw specific functions -------------------------- */
+/* -------------------------- Misc GeoClaw specific functions ------------------------- */
 
 #define FC2D_GEOCLAW_TOPO_UPDATE FCLAW_F77_FUNC(fc2d_geoclaw_topo_update, \
                                            FC2D_GEOCLAW_TOPO_UPDATE)

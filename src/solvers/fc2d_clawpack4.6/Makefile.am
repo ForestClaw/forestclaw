@@ -10,6 +10,7 @@ libclawpack4_6_installed_headers = \
 libclawpack4_6_compiled_sources = \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.cpp \
 	src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.c \
+    src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_time_sync.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_inlinelimiter.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_set_capacity.f \
 	src/solvers/fc2d_clawpack4.6/fortran_source/clawpack46_block.f \

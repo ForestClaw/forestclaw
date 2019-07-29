@@ -25,17 +25,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_timer.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_options.h>
 
 #include <fclaw2d_partition.h>
 #include <sc_statistics.h>
 #include <fclaw2d_domain.h>
 
-#define FCLAW2D_STATS_SET(stats,glob,NAME) do {                               \
-    SC_CHECK_ABORT (!(glob)->timers[FCLAW2D_TIMER_ ## NAME].running,          \
-                    "Timer " #NAME " still running in fclaw2d_domain_finalize");              \
-    sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                           \
-                   (glob)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME); \
+#define  PRIORITY_WALL          FCLAW_TIMER_PRIORITY_WALL
+#define  PRIORITY_EXCLUSIVE1    FCLAW_TIMER_PRIORITY_SUMMARY
+#define  PRIORITY_EXCLUSIVE2    FCLAW_TIMER_PRIORITY_EXCLUSIVE
+#define  PRIORITY_COUNTERS1     FCLAW_TIMER_PRIORITY_COUNTERS
+#define  PRIORITY_COUNTERS2     FCLAW_TIMER_PRIORITY_DETAILS
+#define  PRIORITY_REGRID        FCLAW_TIMER_PRIORITY_DETAILS
+#define  PRIORITY_PARTITION     FCLAW_TIMER_PRIORITY_DETAILS
+#define  PRIORITY_ADVANCE       FCLAW_TIMER_PRIORITY_DETAILS
+#define  PRIORITY_GHOST         FCLAW_TIMER_PRIORITY_DETAILS
+#define  PRIORITY_SEARCH        FCLAW_TIMER_PRIORITY_DETAILS
+#define  PRIORITY_COMM          FCLAW_TIMER_PRIORITY_DETAILS
+#define  PRIORITY_CUDA          FCLAW_TIMER_PRIORITY_CUDA
+#define  PRIORITY_EXTRA         FCLAW_TIMER_PRIORITY_EXTRA
+
+
+#define FCLAW2D_STATS_SET(stats,glob,NAME) do {               \
+    SC_CHECK_ABORT (!(glob)->timers[FCLAW2D_TIMER_ ## NAME].running,              \
+                    "Timer " #NAME " still running in fclaw2d_domain_finalize");  \
+    sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                              \
+                   (glob)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME);     \
 } while (0)
+
+#define FCLAW2D_STATS_SET_GROUP(stats,NAME,GROUP) do {                  \
+    sc_stats_set_group_prio ((stats) + FCLAW2D_TIMER_ ## NAME,          \
+                   GROUP_ ## GROUP, PRIORITY_ ## GROUP);    \
+} while (0)
+
+
 
 /* -----------------------------------------------------------------
    Work with timers
@@ -83,10 +106,28 @@ fclaw2d_timer_stop (fclaw2d_timer_t *timer)
     }
 }
 
+/* Don't put timers inside of any step update functions when using OPENMP */
+void fclaw2d_timer_start_threadsafe(fclaw2d_timer_t *timer)
+{
+#if !defined(_OPENMP)
+    fclaw2d_timer_start(timer);
+#endif    
+}
+
+void fclaw2d_timer_stop_threadsafe(fclaw2d_timer_t *timer)
+{
+#if !defined(_OPENMP)
+    fclaw2d_timer_stop(timer);
+#endif    
+}
+
 void
 fclaw2d_timer_report(fclaw2d_global_t *glob)
 {
     sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
+
+
+    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_WALLTIME]);
 
@@ -104,8 +145,11 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET (stats, glob, WALLTIME);
     FCLAW2D_STATS_SET (stats, glob, REGRID_BUILD);
     FCLAW2D_STATS_SET (stats, glob, REGRID_TAGGING);
+    FCLAW2D_STATS_SET (stats, glob, TIMESYNC);
     FCLAW2D_STATS_SET (stats, glob, PARTITION);
     FCLAW2D_STATS_SET (stats, glob, PARTITION_BUILD);
+    FCLAW2D_STATS_SET (stats, glob, ADVANCE_STEP2);
+    FCLAW2D_STATS_SET (stats, glob, ADVANCE_B4STEP2);
     FCLAW2D_STATS_SET (stats, glob, GHOSTPATCH_BUILD);
     FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_COPY);
     FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_AVERAGE);
@@ -115,6 +159,10 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_STEP2);
     FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_STEP3);
     FCLAW2D_STATS_SET (stats, glob, NEIGHBOR_SEARCH);
+    FCLAW2D_STATS_SET (stats, glob, CUDA_ALLOCATE);
+    FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_H2H);
+    FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_H2D);
+    FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_D2H);
     FCLAW2D_STATS_SET (stats, glob, EXTRA1);
     FCLAW2D_STATS_SET (stats, glob, EXTRA2);
     FCLAW2D_STATS_SET (stats, glob, EXTRA3);
@@ -134,42 +182,20 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_COUNTER],
                    glob->count_single_step,"ADVANCE_STEPS_COUNTER");
 
-    /* Compute the inverse harmonic mean of total advance steps per processor.  */
-    int c = glob->count_single_step;
-    glob->count_single_step = (c > 0) ? c : 1;   /* To avoid division by 0 */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_ADVANCE_STEPS_INV_HMEAN],
-                   1.0/glob->count_single_step,"ADVANCE_STEPS_INV_HMEAN");
-
     /* Compute the arithmetic mean of grids per processor */
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC],gpp,"GRIDS_PER_PROC");
 
-    /* Compute the inverse harmonic mean of grids per processor  */
-    gpp = (gpp == 0) ? 1 : gpp; 
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_PER_PROC_INV_HMEAN],1.0/gpp,
-                   "GRIDS_PER_PROC_INV_HMEAN");
-
-    /* Compute the arithmetic mean of grids per processor */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY],glb,
-                   "GRIDS_LOCAL_BOUNDARY");
-
-    /* Compute the arithmetic mean of grids per processor */
+    /* Compute the arithmetic mean of grids in the interior */
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_INTERIOR],gint,
                    "GRIDS_INTERIOR");
 
-    /* Ratio of grids on the local boundary to grids per proc */
-    glb = glb == 0 ? 1 : glb; /* This might happen in the 1-proc case. */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY_RATIO],gint/glb,
-                    "GRIDS_LOCAL_BOUNDARY_RATIO");
+    /* Compute the arithmetic mean of local grids on the boundary */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_LOCAL_BOUNDARY],glb,
+                   "GRIDS_LOCAL_BOUNDARY");
 
-    /* Compute the arithmetic mean of grids per processor */
+    /* Compute the arithmetic mean of remote grids on the boundary */
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY],grb,
                    "GRIDS_REMOTE_BOUNDARY");
-
-    /* Compute the arithmetic mean of grids per processor */
-    /* We might have zero processors on the remote boundary */
-    grb = grb == 0 ? 1 : grb;
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY_RATIO],gint/grb,
-                   "GRIDS_REMOTE_BOUNDARY_RATIO");
 
     sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
                    glob->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
@@ -186,29 +212,120 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
                     glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative),
                    "UNACCOUNTED");
 
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_COMM],
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_GLOBAL_COMM],
                    glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative,
-                   "FCLAW2D_TIMER_COMM");
+                   "FCLAW2D_TIMER_GLOBAL_COMM");
 
-    /* Just subtracting FCLAW2D_TIMER_COMM here doesn't work ... */
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_LOCAL],
+    /* Just subtracting FCLAW2D_TIMER_GLOBAL here doesn't work ... */
+    sc_stats_set1 (&stats[FCLAW2D_TIMER_LOCAL_COMM],
                    glob->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
                    (glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
                    glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
                     glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative),
-                   "FCLAW2D_TIMER_LOCAL");
+                   "FCLAW2D_TIMER_LOCAL_COMM");
 
 
+    /* --------------------------------- Set stats groups ------------------------------*/
+
+    /* Names for timer groups */
+    enum 
+    {
+        GROUP_NONE = -1,
+        GROUP_EXCLUSIVE1,
+        GROUP_EXCLUSIVE2,
+        GROUP_WALL,
+        GROUP_COUNTERS1,
+        GROUP_COUNTERS2,        
+        GROUP_COMM,
+        GROUP_REGRID,
+        GROUP_PARTITION,
+        GROUP_ADVANCE,
+        GROUP_GHOST,
+        GROUP_SEARCH,
+        GROUP_CUDA,
+        GROUP_EXTRA,
+        GROUP_COUNT
+    };
+
+    FCLAW2D_STATS_SET_GROUP(stats,WALLTIME,              WALL);
+
+    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE,               EXCLUSIVE1);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL,             EXCLUSIVE1);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTPATCH_COMM,       EXCLUSIVE1);
+    FCLAW2D_STATS_SET_GROUP(stats,REGRID,                EXCLUSIVE1);
+    FCLAW2D_STATS_SET_GROUP(stats,ADAPT_COMM,            EXCLUSIVE1);
+
+    FCLAW2D_STATS_SET_GROUP(stats,INIT,                  EXCLUSIVE2);
+    FCLAW2D_STATS_SET_GROUP(stats,OUTPUT,                EXCLUSIVE2);
+    FCLAW2D_STATS_SET_GROUP(stats,DIAGNOSTICS,           EXCLUSIVE2);
+    FCLAW2D_STATS_SET_GROUP(stats,PARTITION_COMM,        EXCLUSIVE2);
+    FCLAW2D_STATS_SET_GROUP(stats,DIAGNOSTICS_COMM,      EXCLUSIVE2);
+    FCLAW2D_STATS_SET_GROUP(stats,CFL_COMM,              EXCLUSIVE2);
+    FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE2);
+
+    FCLAW2D_STATS_SET_GROUP(stats,LOCAL_COMM,            COMM);
+    FCLAW2D_STATS_SET_GROUP(stats,GLOBAL_COMM,           COMM);
+
+    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_STEPS_COUNTER, COUNTERS1);
+    FCLAW2D_STATS_SET_GROUP(stats,GRIDS_PER_PROC,        COUNTERS1);
+
+    FCLAW2D_STATS_SET_GROUP(stats,GRIDS_INTERIOR,        COUNTERS2);
+    FCLAW2D_STATS_SET_GROUP(stats,GRIDS_LOCAL_BOUNDARY,  COUNTERS2);
+    FCLAW2D_STATS_SET_GROUP(stats,GRIDS_REMOTE_BOUNDARY, COUNTERS2);
+
+    FCLAW2D_STATS_SET_GROUP(stats,REGRID_BUILD,          REGRID);
+    FCLAW2D_STATS_SET_GROUP(stats,REGRID_TAGGING,        REGRID);
+
+    FCLAW2D_STATS_SET_GROUP(stats,PARTITION,             PARTITION);  
+    FCLAW2D_STATS_SET_GROUP(stats,PARTITION_BUILD,       PARTITION);
+
+    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_STEP2,         ADVANCE);
+    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_B4STEP2,       ADVANCE);
+
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTPATCH_BUILD,      GHOST);
+    FCLAW2D_STATS_SET_GROUP(stats,TIMESYNC,              GHOST);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_COPY,        GHOST);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_AVERAGE,     GHOST);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_INTERP,      GHOST);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_PHYSBC,      GHOST);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_STEP1,       GHOST);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_STEP2,       GHOST);
+    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_STEP3,       GHOST);
+
+    FCLAW2D_STATS_SET_GROUP(stats,NEIGHBOR_SEARCH,       SEARCH);
+
+    FCLAW2D_STATS_SET_GROUP(stats,CUDA_ALLOCATE,         CUDA);
+    FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY_H2H,      CUDA);
+    FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY_H2D,      CUDA);
+    FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY_D2H,      CUDA);
+
+
+    FCLAW2D_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
+    FCLAW2D_STATS_SET_GROUP(stats,EXTRA2,                EXTRA);
+    FCLAW2D_STATS_SET_GROUP(stats,EXTRA3,                EXTRA);
+    FCLAW2D_STATS_SET_GROUP(stats,EXTRA4,                EXTRA);
+
+
+    /* Get a partial sum of timers not accounted for in reported summary */
+    int priority = fclaw_opt->report_timing_verbosity;  /* Make this an option */
+
+    /* ----------------------------------- Compute timers ------------------------------*/
+
+    /* This does all-reduce, etc to set stats */
     sc_stats_compute (glob->mpicomm, FCLAW2D_TIMER_COUNT, stats);
 
-    sc_stats_print (sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
-                    stats, 1, 0);
+    /* ------------------------------------ Print timers ------------------------------*/
+
+
+    sc_stats_print_ext(sc_package_id, SC_LP_ESSENTIAL, FCLAW2D_TIMER_COUNT,
+                       stats,sc_stats_group_all,priority,1,0);
+
 
     SC_GLOBAL_ESSENTIALF ("Procs %d advance %d %g exchange %d %g "
                           "regrid %d %d %g\n", glob->mpisize,

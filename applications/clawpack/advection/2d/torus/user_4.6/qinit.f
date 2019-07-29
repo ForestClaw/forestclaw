@@ -7,31 +7,18 @@
       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
       double precision aux(1-mbc:mx+mbc, 1-mbc:my+mbc, maux)
 
-      integer i,j
-      double precision xlow, ylow, w, xc,yc, q0, t0
+      integer i,j, blockno, fc2d_clawpack46_get_block
+      double precision xlow, ylow, w
 
-      integer blockno, fc2d_clawpack46_get_block
+      blockno = fc2d_clawpack46_get_block();
 
-      integer example
-      common /comm_example/ example
-
-      blockno = fc2d_clawpack46_get_block()
-
-      t0 = 0.d0
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
-            if (example .eq. 0) then
-c              # Discontinuous solution
-               xlow = xlower + (i-1)*dx
-               ylow = ylower + (j-1)*dy
-               call cellave2(blockno,xlow,ylow,dx,dy,w)
-               q(i,j,1) = w
-            elseif (example .eq. 1) then
-c              # Smooth solution for computing the error
-               xc = xlower + (i-0.5)*dx
-               yc = ylower + (j-0.5)*dy
-               q(i,j,1) = q0(blockno,xc,yc)
-            endif
+c           # Discontinuous solution
+            xlow = xlower + (i-1)*dx
+            ylow = ylower + (j-1)*dy
+            call cellave2(blockno,xlow,ylow,dx,dy,w)
+            q(i,j,1) = w
          enddo
       enddo
 

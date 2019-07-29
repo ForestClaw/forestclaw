@@ -59,6 +59,12 @@ void CLAWPACK46_RPN2_EULER5(const int* ixy, const int* maxm, const int* meqn,
                             double ql[], double qr[], double auxl[], double auxr[],
                             double wave[], double s[], double amdq[], double apdq[]);
 
+#define CLAWPACK46_RPT2_EULER3 FCLAW_F77_FUNC(clawpack46_rpt2_euler3, CLAWPACK46_RPT2_EULER3)
+void CLAWPACK46_RPT2_EULER3(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                            const int* mbc, const int* mx, double ql[], double qr[],
+                            double aux1[], double aux2[], double aux3[], const int* imp,
+                            double dsdq[], double bmasdq[], double bpasdq[]);
+
 
 #define CLAWPACK46_RPT2_EULER4 FCLAW_F77_FUNC(clawpack46_rpt2_euler4, CLAWPACK46_RPT2_EULER4)
 void CLAWPACK46_RPT2_EULER4(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,

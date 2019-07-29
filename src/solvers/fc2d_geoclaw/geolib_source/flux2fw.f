@@ -146,7 +146,7 @@ c   # Set fadd for the donor-cell upwind method (Godunov)
          if (coordinate_system.eq.2) then
               if (ixy.eq.1) then
                    dxdc=earth_radius*deg2rad
-              else
+              else  
                   dxdc=earth_radius*cos(aux2(3,i))*deg2rad
 !                  if (ixy.eq.2) dxdc=earth_radius*cos(aux2(3,i))*deg2rad  !why test again
               endif
@@ -182,7 +182,7 @@ c     -----------------------------------------------------------
 c
 c     # apply limiter to fwaves:
       if (limit) call fc2d_geoclaw_limiter(maxm,meqn,mwaves,mbc,mx,
-     &      fwave,s,mthlim)
+     &           fwave,s,mthlim)
 c
       do 120 i = 1, mx+1
 c

@@ -61,7 +61,6 @@ logical function allowflag(x,y,t,level)
             endif
         endif
     enddo
-    
     do m=1,num_regions
         if (level < regions(m)%max_level) then
             if (x > regions(m)%x_low .and. x <  regions(m)%x_hi.and. &

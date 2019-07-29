@@ -9,6 +9,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_timer.h \
 	src/fclaw_package.h \
 	src/fclaw_options.h \
+	src/fclaw_gauges.h \
 	src/fclaw_mpi.h \
 	src/fclaw_math.h \
 	src/forestclaw2d.h \
@@ -25,6 +26,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
+	src/fclaw2d_time_sync.h \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost_fill.h \
@@ -50,6 +52,7 @@ libforestclaw_internal_headers =
 libforestclaw_compiled_sources = \
 	src/fclaw_base.c \
 	src/fclaw_options.c \
+	src/fclaw_gauges.c \
 	src/fclaw_package.c \
 	src/fclaw_math.c \
 	src/fclaw_timer.c \
@@ -79,6 +82,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_timeinterp.c \
 	src/fclaw2d_initialize.c \
 	src/fclaw2d_finalize.c \
+	src/fclaw2d_time_sync.c \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
 	src/fclaw2d_farraybox.cpp \
@@ -89,8 +93,8 @@ libforestclaw_compiled_sources = \
 	src/mappings/scale_rot_map.f \
 	src/mappings/map_query.f \
 	src/mappings/cart/mapc2m_cart.f \
+	src/mappings/bilinear/mapc2m_bilinear.f \
 	src/mappings/annulus/mapc2m_annulus.f \
-	src/mappings/brick/write_brick_data.f \
 	src/mappings/identity/mapc2m_identity.f \
 	src/mappings/pillowdisk/mapc2m_pillowdisk.f \
 	src/mappings/squareddisk/mapc2m_squareddisk.f \
@@ -103,7 +107,6 @@ libforestclaw_compiled_sources = \
 	src/mappings/latlong/mapc2m_latlong.f \
 	src/mappings/fclaw2d_map_nomap.c \
 	src/mappings/fclaw2d_map_nomap_brick.c \
-	src/fortran_source2d/fclaw2d_interpolate_util.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/fdisc.f \
 	src/fortran_source2d/philim.f

@@ -110,7 +110,7 @@ clawpack5_check (fc2d_clawpack5_options_t * clawopt,
     }
 
     /* There is probably a better place to do this */    
-    SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
+    CLAWPACK5_SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
                    clawopt->mthlim, clawopt->method);
 
     /* Should also check mthbc, mthlim, etc. */

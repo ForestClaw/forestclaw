@@ -74,7 +74,11 @@ fclaw2d_map_c2m_annulus (fclaw2d_map_context_t * cont, int blockno,
     /* blockno is ignored in the current annulus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
     double beta = cont->user_double[0];
-    MAPC2M_ANNULUS(&blockno,&xc1,&yc1,xp,yp,zp,&beta);
+    double theta[2];
+    theta[0] = cont->user_double[1];
+    theta[1] = cont->user_double[2];
+    MAPC2M_ANNULUS(&blockno,&xc1,&yc1,xp,yp,zp,&beta,theta);
+
 
     rotate_map(cont,xp,yp,zp);
 }
@@ -84,7 +88,8 @@ fclaw2d_map_context_t *
                              const double scale[],
                              const double shift[],
                              const double rotate[],
-                             const double beta)
+                             const double beta,
+                             const double theta[])
 {
     fclaw2d_map_context_t *cont;
 
@@ -93,6 +98,8 @@ fclaw2d_map_context_t *
     cont->mapc2m = fclaw2d_map_c2m_annulus;
 
     cont->user_double[0] = beta;
+    cont->user_double[1] = theta[0];
+    cont->user_double[2] = theta[1];
 
     set_scale(cont,scale);
     set_shift(cont,shift);

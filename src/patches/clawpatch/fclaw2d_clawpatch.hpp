@@ -48,6 +48,12 @@ public :
     FArrayBox griddata_time_interpolated;
     FArrayBox griderror;
 
+    /* For diagnostics */
+    FArrayBox exactsolution;
+
+    /* Registers for accumulating mismatches at coarse/fine interfaces */
+    struct fclaw2d_clawpatch_registers *registers;
+
     /* Grid info */
     int mx;           
     int my;           
@@ -69,6 +75,9 @@ public :
     int blockno;
 
     fclaw2d_metric_patch_t *mp;
+
+    /* User data*/ 
+    void* user_data;
 };
 
 fclaw2d_clawpatch_t* 

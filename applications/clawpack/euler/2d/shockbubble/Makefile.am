@@ -5,7 +5,9 @@ bin_PROGRAMS += applications/clawpack/euler/2d/shockbubble/shockbubble
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/shockbubble.cpp \
+	applications/clawpack/euler/2d/shockbubble/shockbubble_options.c \
 	applications/clawpack/euler/2d/shockbubble/shockbubble_user.cpp \
+	applications/clawpack/euler/2d/shockbubble/shockbubble_user.h \
 	applications/clawpack/euler/2d/shockbubble/fdisc.f \
 	applications/clawpack/euler/2d/shockbubble/setprob.f \
 	applications/clawpack/euler/2d/shockbubble/user_4.6/qinit.f \
@@ -20,6 +22,7 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/src2.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4coarsening.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4refinement.f90 \
+	applications/clawpack/euler/2d/rp/euler_user_fort.h \
 	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler4.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpt2_euler4.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler5.f \
@@ -29,18 +32,11 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/rp/clawpack5_rpn2_euler5.f90 \
 	applications/clawpack/euler/2d/rp/clawpack5_rpt2_euler5.f90
 
-# These files will be installed locally
-shockbubble_headers = \
-	applications/clawpack/euler/2d/shockbubble/shockbubble_user.h \
-	applications/clawpack/euler/2d/rp/euler_user_fort.h
-
-shockbubble_inifiles = \
+EXTRA_DIST += \
 	applications/clawpack/euler/2d/shockbubble/fclaw_options.ini \
-	applications/clawpack/euler/2d/shockbubble/regression.ini
-
-applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES += \
-	$(shockbubble_headers) \
-	$(shockbubble_inifiles)
+	applications/clawpack/euler/2d/shockbubble/regression.ini \
+	applications/clawpack/euler/2d/shockbubble/afterframe.m \
+	applications/clawpack/euler/2d/shockbubble/setplot2.m
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_CPPFLAGS = \
         $(AM_CPPFLAGS) \

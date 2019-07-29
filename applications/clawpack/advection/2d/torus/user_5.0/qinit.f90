@@ -10,27 +10,17 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower, &
   DOUBLE PRECISION xlow, ylow, w, xc,yc, q0
   INTEGER i,j
 
-  INTEGER blockno, fc2d_clawpack46_get_block
+  INTEGER blockno, fc2d_clawpack5_get_block
 
-  INTEGER example
-  COMMON /comm_example/ example
-
-  blockno = fc2d_clawpack46_get_block()
+  blockno = fc2d_clawpack5_get_block()
 
   DO j = 1-mbc,my+mbc
      DO i = 1-mbc,mx+mbc
-        IF (example .EQ. 0) THEN
-           !! # Discontinuous solution
-           xlow = xlower + (i-1)*dx
-           ylow = ylower + (j-1)*dy
-           CALL cellave2(blockno,xlow,ylow,dx,dy,w)
-           q(1,i,j) = w
-        ELSEIF (example .EQ. 1) THEN
-           !! # Smooth solution for computing the error
-           xc = xlower + (i-0.5)*dx
-           yc = ylower + (j-0.5)*dy
-           q(1,i,j) = q0(blockno,xc,yc)
-        ENDIF
+         !! # Discontinuous solution
+         xlow = xlower + (i-1)*dx
+         ylow = ylower + (j-1)*dy
+         CALL cellave2(blockno,xlow,ylow,dx,dy,w)
+         q(1,i,j) = w
      ENDDO
   ENDDO
 

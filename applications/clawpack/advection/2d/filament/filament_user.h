@@ -47,6 +47,11 @@ typedef struct user_options
 } user_options_t;
 
 
+user_options_t* filament_options_register (fclaw_app_t * app,
+                                           const char *configfile);
+
+void filament_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 const user_options_t* filament_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
@@ -82,6 +87,12 @@ void filament_patch_setup_manifold(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *this_patch,
                                    int this_block_idx,
                                    int this_patch_idx);
+
+
+#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+
+void RPN2_CONS_UPDATE(int* meqn, int* maux, int* idir,
+                      double q[], double aux[], double flux[]);
 
 
 #ifdef __cplusplus

@@ -67,7 +67,7 @@ c
                yc0 = yy(i)
                xc1 = xx(i+1)
                yc1 = yy(i+1)
-               ss = zeroin(blockno,0.d0, 1.d0, fss, 1d-8)
+               ss = zeroin(blockno,0.d0, 1.d0, fss, 1.d-14)
 c              write(27,*) 'xc,yc,ss:',xc0,yc0,xc1,yc1,ss
                x(iv) = xx(i) + ss*(xx(i+1)-xx(i))
                y(iv) = yy(i) + ss*(yy(i+1)-yy(i))
@@ -159,7 +159,7 @@ c  compute eps, the relative machine precision
 c
       eps = 1.d0
    10 eps = eps/2.d0
-      tol1 = 1.0 + eps
+      tol1 = 1.d0 + eps
       if (tol1 .gt. 1.d0) go to 10
 c
 c initialization
@@ -202,8 +202,8 @@ c
 c linear interpolation
 c
       s = fb/fa
-      p = 2.0*xm*s
-      q = 1.0 - s
+      p = 2.d0*xm*s
+      q = 1.d0 - s
       go to 60
 c
 c inverse quadratic interpolation

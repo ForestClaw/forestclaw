@@ -71,15 +71,16 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
-    clawpatch_vt->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,&xlower,&ylower,&dx,&dy,q,
+    clawpatch_vt->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,
+                                    &xlower,&ylower,&dx,&dy,q,
                                     &patch_num,&level,&this_block_idx,
-                                    &glob->domain->mpirank);
+                                    &glob->mpirank);
 }
 
 
 /* This function isn't virtualized;  should it be? */
 static
-void fclaw2d_clawpatch_header_ascii(fclaw2d_global_t* glob, int iframe)
+void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -117,9 +118,9 @@ void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe)
        Use only for small numbers of processors. */
     fclaw2d_domain_serialization_enter (domain);
 
-    if (domain->mpirank == 0)
+    if (glob->mpirank == 0)
     {
-        fclaw2d_clawpatch_header_ascii(glob,iframe);
+        fclaw2d_clawpatch_time_header_ascii(glob,iframe);
     }
 
     /* Write out each patch to fort.qXXXX */

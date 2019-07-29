@@ -37,12 +37,21 @@ extern "C"
 
 struct fclaw2d_global;
 
-typedef struct single_step_data
+typedef struct fclaw2d_single_step_buffer_data
+{
+    int total_count;
+    int iter;
+    void* user;    
+} fclaw2d_single_step_buffer_data_t;
+
+
+typedef struct fclaw2d_single_step_data
 {
     double t;
     double dt;
     double maxcfl;
-} single_step_data_t;
+    fclaw2d_single_step_buffer_data_t buffer_data;
+} fclaw2d_single_step_data_t;
 
 double fclaw2d_update_single_step(struct fclaw2d_global *glob,
                                   int level,

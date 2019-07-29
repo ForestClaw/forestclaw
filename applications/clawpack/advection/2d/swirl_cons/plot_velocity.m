@@ -8,7 +8,9 @@ N = 200;  % For hi-res plots
 
 example = ex;
 
-% Quiver plot
+% -----------------------------------------
+% Quiver plot of velocity field
+% -----------------------------------------
 figure(1);
 
 x = linspace(0,1,M+1);
@@ -19,14 +21,20 @@ y = x;
 
 s = 1.5;
 quiver(xm,ym,um,vm,s);
+hold on;
+plot([0 1 1 0 0],[0 0 1 1 0],'k');
+
 daspect([1 1 1]);
-axis([0 1 0 1]);
+s = 0.05;
+axis([-s 1+s -s 1+s]);
 title(sprintf('Example %d : Velocity',ex),'fontsize',18);
 set(gca,'fontsize',16);
 xlabel('x','fontsize',16);
 ylabel('y','fontsize',16);
 
-% Contour plot of magnitude
+% -----------------------------------------
+% Contour plot of magnitude sqrt(u^2 + v^2)
+% -----------------------------------------
 figure(2);
 clf
 
@@ -43,8 +51,21 @@ contour(xm,ym,mm,21);
 fprintf('%-10s %12.4e\n','min(mm)',min(mm(:)));
 fprintf('%-10s %12.4e\n','max(mm)',max(mm(:)));
 
-
-caxis([0 1]);
+switch example
+    case 0
+        smin = sqrt(2);
+        smax = 3*sqrt(2);
+    case 1
+        smin = 0.5;
+        smax = 1.5;
+    case 2
+        smin = 0;
+        smax = 0.5;
+    case 3
+        smin = 0;
+        smax = 2*sqrt(2);
+end
+caxis([smin smax]);
 daspect([1 1 1]);
 axis([0 1 0 1]);
 colorbar;
@@ -52,7 +73,9 @@ colorbar;
 title('Speed','fontsize',18);
 
 
+% -----------------------------------------
 % Divergence plot
+% -----------------------------------------
 figure(3)
 % plot divergence
 xe = linspace(0,1,10*N + 1);
@@ -92,15 +115,24 @@ function [u,v] = vel(x,y)
 
 global example
 
-if (example == 1)
-    a = 0.5;
-else
-    a = -0.5;
-end
+switch example
+    case 0
+        ucc = @(x,y) cos(2*pi*x) + 2.d0;
+        vcc = @(x,y) cos(2*pi*y) + 2.d0;        
+    case {1,2}        
+        if (example == 1)
+            a = 0.5;
+        else
+            a = -0.5;
+        end
 
-s = sqrt(2)/2;
-ucc = @(x,y) s*(cos(pi*x).^2 + a);
-vcc = @(x,y) s*(sin(pi*y).^2 + a);
+        s = sqrt(2)/2;
+        ucc = @(x,y) s*(cos(pi*x).^2 + a);
+        vcc = @(x,y) s*(sin(pi*y).^2 + a);
+    case 3
+        ucc = @(x,y) sin(2*pi*x);
+        vcc = @(x,y) sin(2*pi*y);
+end
 
 u = ucc(x,y);
 v = vcc(x,y);

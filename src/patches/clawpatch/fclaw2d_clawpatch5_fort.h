@@ -255,7 +255,8 @@ void FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII(char* matname1, char* matname2,
 
 void FCLAW2D_CLAWPATCH5_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                                 double *dx, double *dy,
-                                                double* area, double *q, double* sum);
+                                                double* area, double *q, double* sum,
+                                                double *c_kahan);
 
 #define FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA \
                       FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_compute_patch_area, \

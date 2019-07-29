@@ -1,6 +1,5 @@
       subroutine clawpack46_rpn2adv(ixy,maxm,meqn,mwaves,
-     &      mbc,mx,ql,qr,
-     &      auxl,auxr,wave,s,amdq,apdq)
+     &      mbc,mx,ql,qr, auxl,auxr,wave,s,amdq,apdq)
 c
       implicit none
 
@@ -19,7 +18,7 @@ c
       parameter(meqn1 = 10)
       double precision delta(meqn1)
 
-      integer i,m,mw, iface, m1, m2, get_vflag, vflag
+      integer i,mq,mw, iface
 
       if (meqn1 .lt. meqn) then
          write(6,*) 'rpn2noncons : meqn1 .lt. meqn'
@@ -28,24 +27,32 @@ c
 
       iface = ixy
       do i = 2-mbc, mx+mbc
-         do m1 = 1,meqn
-            do m2 = 1,meqn
-               wave(i,m1,m2) = 0
+         do mq = 1,meqn
+            do mw = 1,mwaves
+               wave(i,mq,mw) = 0
             enddo
          enddo
 
-         do m = 1,meqn
-            delta(m) = ql(i,m) - qr(i-1,m)
-            wave(i,m,m) = delta(m)
-            s(i,m) = auxl(i,iface)
+         do mq = 1,meqn
+            delta(mq) = ql(i,mq) - qr(i-1,mq)
+            do mw = 1,mwaves
+               wave(i,mq,mw) = delta(mq)
+            end do
+         end do
+
+         do mw = 1,mwaves
+c           # This assumes that meqn == mwaves            
+            s(i,mw) = auxl(i,iface)
          enddo
 
-         do m = 1,meqn
-            amdq(i,m) = 0
-            apdq(i,m) = 0
+         do mq = 1,meqn
+            amdq(i,mq) = 0
+            apdq(i,mq) = 0
             do mw = 1,mwaves
-               amdq(i,m) = amdq(i,m) + min(s(i,mw), 0.d0) * wave(i,m,mw)
-               apdq(i,m) = apdq(i,m) + max(s(i,mw), 0.d0) * wave(i,m,mw)
+               amdq(i,mq) = amdq(i,mq) + min(s(i,mw), 0.d0) * 
+     &                wave(i,mq,mw)
+               apdq(i,mq) = apdq(i,mq) + max(s(i,mw), 0.d0) * 
+     &                wave(i,mq,mw)
             enddo
          enddo
       enddo

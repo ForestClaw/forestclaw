@@ -25,51 +25,50 @@ c
      &		      hr(-2:maxm2)
 c
       if (-2.gt.1-mbc .or. maxm2 .lt. maxm+mbc) then
-	 write(6,*) 'need to increase maxm2 in rpB'
-	 stop
+          write(6,*) 'need to increase maxm2 in rpB'
+          stop
       endif
 c
       if (ixy.eq.1) then
-	  mu = 2
-	  mv = 3
-	else
-	  mu = 3
-	  mv = 2
-	endif
+	      mu = 2
+          mv = 3
+      else
+          mu = 3
+          mv = 2
+      endif
 c
-        do 20 i = 2-mbc, mx+mbc
-           a1 = (0.50d0/a(i))*((v(i)+a(i))*asdq(i,1)-asdq(i,mv))
-           a2 = asdq(i,mu) - u(i)*asdq(i,1)
-           a3 = (0.50d0/a(i))*(-(v(i)-a(i))*asdq(i,1)+asdq(i,mv))
+      do i = 2-mbc, mx+mbc
+          a1 = ((v(i)+a(i))*asdq(i,1)-asdq(i,mv))/(2*a(i))
+          a2 = asdq(i,mu) - u(i)*asdq(i,1)
+          a3 = (-(v(i)-a(i))*asdq(i,1)+asdq(i,mv))/(2*a(i))
 c
-            waveb(1,1) = a1
-            waveb(mu,1) = a1*u(i)
-            waveb(mv,1) = a1*(v(i)-a(i))
-            sb(1) = v(i) - a(i)
-c
-            waveb(1,2) = 0.0d0
-            waveb(mu,2) = a2
-            waveb(mv,2) = 0.0d0
-	    sb(2) = v(i)
-c
-            waveb(1,3) = a3
-            waveb(mu,3) = a3*u(i)
-            waveb(mv,3) = a3*(v(i)+a(i))
-            sb(3) = v(i) + a(i)
-c
-c           # compute the flux differences bmasdq and bpasdq
-c
-	    do 10 m=1,meqn
-	       bmasdq(i,m) = 0.d0
-	       bpasdq(i,m) = 0.d0
-	       do 10 mw=1,mwaves
-		  bmasdq(i,m) = bmasdq(i,m)
+          waveb(1,1) = a1
+          waveb(mu,1) = a1*u(i)
+          waveb(mv,1) = a1*(v(i)-a(i))
+          sb(1) = v(i) - a(i)
+
+          waveb(1,2) = 0.0d0
+          waveb(mu,2) = a2
+          waveb(mv,2) = 0.0d0
+          sb(2) = v(i)
+
+          waveb(1,3) = a3
+          waveb(mu,3) = a3*u(i)
+          waveb(mv,3) = a3*(v(i)+a(i))
+          sb(3) = v(i) + a(i)
+
+c         # compute the flux differences bmasdq and bpasdq
+
+          do m=1,meqn
+              bmasdq(i,m) = 0.d0
+              bpasdq(i,m) = 0.d0
+              do mw=1,mwaves
+                  bmasdq(i,m) = bmasdq(i,m)
      &			       + dmin1(sb(mw), 0.d0) * waveb(m,mw)
-		  bpasdq(i,m) = bpasdq(i,m)
+                  bpasdq(i,m) = bpasdq(i,m)
      &			       + dmax1(sb(mw), 0.d0) * waveb(m,mw)
-   10             continue
-c
-   20          continue
-c
+               enddo
+           enddo
+      enddo 
       return
       end

@@ -21,20 +21,29 @@ echo "o---------------------------------------"
 echo "| Checking options"
 echo "o---------------------------------------"
 
-FCLAW_ARG_ENABLE([debug], [enable debug mode (assertions and extra checks)],
+FCLAW_ARG_ENABLE([debug], [Enable debug mode (assertions and extra checks)],
                  [DEBUG])
                  
-FCLAW_ARG_ENABLE([geoclaw], [enable geoclaw library and applications],
+FCLAW_ARG_ENABLE([geoclaw], [Enable geoclaw library and applications],
                  [GEOCLAW])
 
 FCLAW_ARG_ENABLE([ash3d], [enable ash3d library and applications],
                  [ASH3D])
 
-FCLAW_ARG_ENABLE([clawpack], [enable clawpack libraries 4.6 and 5.0 and applications],
+FCLAW_ARG_ENABLE([clawpack], [Enable clawpack libraries 4.6 and 5.0 and applications],
                  [CLAWPACK])
 
-FCLAW_ARG_ENABLE([development], [enable applications under development],
+FCLAW_ARG_ENABLE([cudaclaw], [Enable cudaclaw library and application],
+                 [CUDACLAW])
+
+FCLAW_ARG_ENABLE([development], [Enable general applications under development],
                  [DEVELOPMENT])
+
+FCLAW_ARG_ENABLE([paper], [Enable examples applications from paper],
+                 [PAPER])
+
+FCLAW_ARG_ENABLE([swbli], [Enable swbli project],
+                 [SWBLI])
 
 echo "o---------------------------------------"
 echo "| Checking MPI and related programs"
@@ -79,6 +88,8 @@ P4EST_AS_SUBPACKAGE([FCLAW])
 AM_CONDITIONAL([FCLAW_DIST_DENY], [test "x$FCLAW_DIST_DENY" != x])
 AC_SUBST([FCLAW_DISTCLEAN])
 
+AX_CHECK_CUDA()
+
 # Print summary.
 AC_DEFINE_UNQUOTED(CPP,         ["${CPP}"],         [C preprocessor])
 AC_DEFINE_UNQUOTED(CPPFLAGS,    ["${CPPFLAGS}"],    [C preprocessor flags])
@@ -88,6 +99,9 @@ AC_DEFINE_UNQUOTED(CC,          ["${CC}"],          [C compiler])
 AC_DEFINE_UNQUOTED(CFLAGS,      ["${CFLAGS}"],      [C compiler flags])
 AC_DEFINE_UNQUOTED(CXX,         ["${CXX}"],         [C++ compiler])
 AC_DEFINE_UNQUOTED(CXXFLAGS,    ["${CXXFLAGS}"],    [C++ compiler flags])
+AC_DEFINE_UNQUOTED(NVCC,        ["${NVCC}"],        [Nvidia C/C++ compiler])
+AC_DEFINE_UNQUOTED(CUDA_CFLAGS, ["${CUDA_CFLAGS}"], [Nvidia C/C++ flags])
+AC_DEFINE_UNQUOTED(CUDA_LDFLAGS,["${CUDA_LDFLAGS}"],[Nvidia LD flags])
 AC_DEFINE_UNQUOTED(LDFLAGS,     ["${LDFLAGS}"],     [Linker flags])
 AC_DEFINE_UNQUOTED(LIBS,        ["${LIBS}"],        [Libraries])
 AC_DEFINE_UNQUOTED(FLIBS,       ["${FLIBS}"],       [Fortran libraries])
@@ -95,17 +109,20 @@ AC_DEFINE_UNQUOTED(FLIBS,       ["${FLIBS}"],       [Fortran libraries])
 echo "o----------------------------------"
 echo "| Results for ForestClaw are"
 echo "o----------------------------------"
-echo "| CPP:         $CPP"
-echo "| CPPFLAGS:    $CPPFLAGS"
-echo "| F77:         $F77"
-echo "| FFLAGS:      $FFLAGS"
-echo "| CC:          $CC"
-echo "| CFLAGS:      $CFLAGS"
-echo "| CXX:         $CXX"
-echo "| CXXFLAGS:    $CXXFLAGS"
-echo "| LDFLAGS:     $LDFLAGS"
-echo "| LIBS:        $LIBS"
-echo "| FLIBS:       $FLIBS"
+echo "| CPP:             $CPP"
+echo "| CPPFLAGS:        $CPPFLAGS"
+echo "| F77:             $F77"
+echo "| FFLAGS:          $FFLAGS"
+echo "| CC:              $CC"
+echo "| CFLAGS:          $CFLAGS"
+echo "| CXX:             $CXX"
+echo "| CXXFLAGS:        $CXXFLAGS"
+echo "| NVCC:            $NVCC"
+echo "| CUDA_CFLAGS:     $CUDA_CFLAGS"
+echo "| CUDA_LDFLAGS:    $CUDA_LDFLAGS"
+echo "| LDFLAGS:         $LDFLAGS"
+echo "| LIBS:            $LIBS"
+echo "| FLIBS:           $FLIBS"
 echo "o----------------------------------"
 
 # Create output files.

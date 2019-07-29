@@ -58,7 +58,7 @@ void get_corner_type(fclaw2d_global_t* glob,
     fclaw2d_domain_t *domain = glob->domain;
 
     // p4est has tons of lookup table like this, can be exposed similarly
-    int corner_faces[SpaceDim];
+    int corner_faces[FCLAW2D_SPACEDIM];
     fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
 
     /* Both faces are at a physical boundary */
@@ -199,7 +199,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                remote face number.  The remote face number encodes the
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
-            int rproc[RefineFactor];
+            int rproc[FCLAW2D_REFINEFACTOR];
             int rpatchno;
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw2d_patch_face_neighbors(domain,
@@ -261,8 +261,8 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
         {
             *block_corner_count = 2;
             has_corner_neighbor = 1;
-            int rpatchno[RefineFactor];
-            int rproc[RefineFactor];
+            int rpatchno[FCLAW2D_REFINEFACTOR];
+            int rproc[FCLAW2D_REFINEFACTOR];
             int rfaceno;
 
             /* Use only faces 0 or 1 to get block data. */
@@ -282,7 +282,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             {
                 /* igrid = 0 at corners 0,1 and (R-1) at corners 2,3,
                    where R = refinement factor */
-                igrid = (icorner/2)*(RefineFactor - 1);
+                igrid = (icorner/2)*(FCLAW2D_REFINEFACTOR - 1);
             }
             else
             {
@@ -347,8 +347,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
     int average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
     int interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
 
-    int intersects_bdry[NumFaces];
-    int intersects_block[NumFaces];
+    int intersects_bdry[FCLAW2D_NUMFACES];
+    int intersects_block[FCLAW2D_NUMFACES];
     int is_block_corner;
     int is_interior_corner;
     int block_corner_count;
