@@ -12,6 +12,7 @@ applications_clawpack_advection_2d_adv_order3_periodic_SOURCES = \
 	applications/clawpack/advection/2d/adv_order3/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/adv_order3/user_4.6/rpn2.f \
 	applications/clawpack/advection/2d/adv_order3/user_4.6/rpt2.f \
+	applications/clawpack/advection/2d/adv_order3/user_4.6/flux2.f \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv.f90
 
