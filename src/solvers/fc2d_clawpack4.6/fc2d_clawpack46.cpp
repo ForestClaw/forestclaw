@@ -343,15 +343,17 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 	int ierror = 0;
 	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
+#if 0	
 	clawpack46_fort_flux2_t flux2 = clawpack_options->use_fwaves ?
 									 CLAWPACK46_FLUX2FW : CLAWPACK46_FLUX2;
+#endif									 
 
 	/* NOTE: qold will be overwritten in this step */
 	CLAWPACK46_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
 						  clawpack_options->mthlim, &clawpack_options->mcapa,
 						  &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
 						  work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
-						  claw46_vt->fort_rpn2, claw46_vt->fort_rpt2,flux2,
+						  claw46_vt->fort_rpn2, claw46_vt->fort_rpt2,claw46_vt->flux2,
 						  block_corner_count, &ierror);
 
 	FCLAW_ASSERT(ierror == 0);
@@ -481,6 +483,17 @@ void fc2d_clawpack46_solver_initialize()
 	/* Wrappers so that user can change argument list */
 	claw46_vt->b4step2                       = clawpack46_b4step2;
 	claw46_vt->src2                          = clawpack46_src2;
+
+
+	//const fc2d_clawpack46_options_t* clawpack_options = fc2d_clawpack46_options(glob);
+	if  (0)
+	{
+		claw46_vt->flux2 = &CLAWPACK46_FLUX2FW;
+	}
+	else
+	{
+		claw46_vt->flux2 = &CLAWPACK46_FLUX2;		
+	}
 
 	/* Required functions  - error if NULL */
 	claw46_vt->fort_bc2       = CLAWPACK46_BC2_DEFAULT;

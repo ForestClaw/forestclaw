@@ -53,9 +53,9 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
 
         clawpack46_vt->flux2 = &PERIODIC_FLUX2;
-        //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        //clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
-        //clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
+        clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
 
         //clawpack46_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
     }
