@@ -18,10 +18,12 @@
 
       integer i, i1, k, idir, iface
       double precision vrrot, vlrot, g, vhat
+      double precision nv(2), ul(2), ur(2)
 
-c     # ixy = 1 --> idir = 1
-c     # ixy = 2 --> idir = 0
-      idir = 2-ixy
+c     # idir = direction of normal solve
+c     # ixy = 1 --> idir = 0
+c     # ixy = 2 --> idir = 1
+      idir = ixy-1
 
 c     # iface = 2*(2-ixy)
       if (ixy .eq. 1) then
@@ -39,14 +41,21 @@ c         # -----------------------------------------
 c         # Lower faces - cell centered velocities
 c         # -----------------------------------------
            
-c         # 6-7 (left-right)
-c         # 8-9 (bottom-top)
-          g = aux2(6 + 2*idir,i1)
+c         # left/right : 12,13
+c         # bottom/top : 14,15
+          g = aux2(14-2*idir,i1)
 
-c         # left-right : 2,3
-c         # bottom-top : 4,5         
-          vrrot = g*aux2(2 + 2*idir,i1)   !! Left edge of right cell
-          vlrot = g*aux1(3 + 2*idir,i1)   !! Right edge of left cell
+          nv(1) = aux2(8-4*idir,i1)
+          nv(2) = aux2(9-4*idir,i1)
+
+          ur(1) = aux2(2,i1)
+          ur(2) = aux2(3,i1)
+
+          ul(1) = aux1(2,i1)
+          ul(2) = aux1(3,i1)
+
+          vrrot = g*(nv(1)*ur(1) + nv(2)*ur(2))
+          vlrot = g*(nv(1)*ul(1) + nv(2)*ul(2))            
 
           vhat = (vrrot + vlrot)/2.0
 
@@ -56,12 +65,17 @@ c         # -----------------------------------------
 c         # Upper faces - cell centered velocities
 c         # -----------------------------------------
 
-          g = aux3(6+2*idir,i1)
+          g = aux3(14-2*idir,i1)
+          nv(1) = aux3(8-4*idir,i1)
+          nv(2) = aux3(9-4*idir,i1)
+          ur(1) = aux2(2,i1)
+          ur(2) = aux2(3,i1)
 
-c         # left-right : 2,3
-c         # bottom-top : 4,5         
-          vrrot = g*aux3(2 + 2*idir,i1)   !! Left edge of right cell
-          vlrot = g*aux2(3 + 2*idir,i1)   !! Right edge of left cell
+          ul(1) = aux1(2,i1)
+          ul(2) = aux1(3,i1)
+
+          vrrot = g*(nv(1)*ur(1) + nv(2)*ur(2))
+          vlrot = g*(nv(1)*ul(1) + nv(2)*ul(2))            
 
           vhat = (vrrot + vlrot)/2.0
 

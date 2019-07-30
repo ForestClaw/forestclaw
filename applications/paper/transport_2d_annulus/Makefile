@@ -24,7 +24,7 @@ OVERWRITE ?= True                   # False ==> make a copy of OUTDIR first
 # Environment variable FC should be set to fortran compiler, e.g. gfortran
 
 # Compiler flags can be specified here or set as an environment variable
-FFLAGS ?=  -O0 -g
+FFLAGS ?=  -O2
 
 # ---------------------------------
 # package sources for this program:
@@ -41,7 +41,7 @@ include $(AMRLIB)/Makefile.amr_2d
 
 EXCLUDE_MODULES = \
 
-EXCLUDE_SOURCES = setaux.f90 flag2refine2.f90 qad.f
+EXCLUDE_SOURCES = setaux.f90 flag2refine2.f90 qad.f b4step2.f
 
 # ----------------------------------------
 # List of custom sources for this program:
@@ -50,13 +50,13 @@ EXCLUDE_SOURCES = setaux.f90 flag2refine2.f90 qad.f
 MODULES = \
 
 SOURCES = \
-  velocity.f \
-  annulus_psi.f \
   setprob.f \
   qinit.f \
   fdisc.f \
   cellave2.f \
+  b4step2.f \
   mapc2m_annulus.f \
+  annulus_velocity.f \
   annulus_setaux.f90 \
   flag2refine2.f90 \
   qad_choice.f90 \
@@ -67,8 +67,6 @@ SOURCES = \
   fclaw2d_metric_default_fort.f \
   rpn2cons_fw_manifold.f \
   rpt2cons_manifold.f \
-  rpn2adv_manifold.f \
-  rpt2adv_manifold.f \
   rpn2.f \
   rpt2.f
 

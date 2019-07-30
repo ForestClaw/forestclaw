@@ -31,16 +31,21 @@ def setrun(claw_pkg='amrclaw'):
     use_fixed_dt = True
 
     outstyle = 3
-    nout = 30
+    nout = 5
     nstep = 1
 
     example = 0
+
+    # 0 :   q = 1 in [0.25,0.75]x[0.25x0.75]   (mass does not cross boundary)
+    # 1 :   q = 1 in [0,1]x[0,1]               (mass crosses boundary)
+    init_choice = 0      
+
     alpha = 0.4
-    beta = 0
+    beta = 0.5
 
 
-    maxlevel = 3
-    ratioxy = 4
+    maxlevel = 2
+    ratioxy = 2
     ratiok = 1
 
 
@@ -69,6 +74,7 @@ def setrun(claw_pkg='amrclaw'):
     # c      example_in,mapping_in, ic_in, alpha_in,rps_in)
 
     probdata.add_param('example',        example,        'example')
+    probdata.add_param('init_choice',    init_choice,    'init_choice')
     probdata.add_param('alpha',          alpha,          'alpha')
     probdata.add_param('beta',           beta,           'beta')
 
@@ -220,25 +226,23 @@ def setrun(claw_pkg='amrclaw'):
 
     amrdata.flag2refine = True      # use this?
 
-    amrdata.regrid_interval = 3
-    amrdata.regrid_buffer_width  = 3
+    amrdata.regrid_interval = 1
+    amrdata.regrid_buffer_width  = 0
     amrdata.clustering_cutoff = 0.800000
     amrdata.verbosity_regrid = 0
 
     # ----------------------------------------------------------------
     # For torus problem
     # 1        capacity
-    # 2-3      Edge velocities
-    # 4-6      Cell-centered velocities (x,y,z)
-    # 7-8      Edge lengths (x-face, y-face)
-    # 9-11     x-face normals
-    # 12-14    y-face normals
+    # 2-5      Velocities projected onto left/right/top/bottom edges
+    # 6-9      Edge lengths (normalized by dx or dy)
+    # 
+    # All values are "center" values, since each cell stores 
+    # data for all four faces.  This means that duplicate information
+    # is stored, but we have to do it this way for conservation fix.
     # ----------------------------------------------------------------
 
-    if (qad_mode in [0,1]):
-        amrdata.aux_type = ['capacity'] + ['xleft','center','yleft','center']*2
-    else:
-        amrdata.aux_type = ['capacity'] + ['center']*8
+    amrdata.aux_type = ['capacity'] + ['center']*8
 
     #  ----- For developers -----
     # Toggle debugging print statements:

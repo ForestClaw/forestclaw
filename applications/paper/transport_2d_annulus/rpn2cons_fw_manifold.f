@@ -1,6 +1,5 @@
       subroutine rpn2cons_fw_manifold(ixy,maxm,meqn,mwaves,maux,mbc,
-     &                            mx,ql,qr,
-     &                            auxl,auxr,fwave,s,amdq,apdq)
+     &                            mx,ql,qr,auxl,auxr,fwave,s,amdq,apdq)
       implicit none
 
       integer maxm, mbc,mwaves,meqn,maux, mx
@@ -18,20 +17,40 @@
       integer i, iface, m, idir
       double precision qll,qrr
       double precision urrot, ulrot, g, uhat
+      double precision nv(2), ur(2), ul(2)
+      double precision g1, g2, n1, n2
+
+      logical qad_debug
+      common /debug_common/ qad_debug
 
       idir = ixy-1
-      do i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+2
          !! Edge length;  assumes that edge length is stored at the 
          !! left edge.
-         g = auxl(6 + 2*idir,i)  
+         g = auxl(12 + 2*idir,i)  
 
-c        # left-right : 2,3
-c        # bottom-top : 4,5         
-         urrot = g*auxl(2 + 2*idir,i)     !! Left edge of right cell
-         ulrot = g*auxr(3 + 2*idir,i-1)   !! Right edge of left cell
+c        # Cell-centered values
+         ur(1) = auxl(2,i)
+         ur(2) = auxl(3,i)
+
+         ul(1) = auxr(2,i-1)
+         ul(2) = auxr(3,i-1)
+
+c        # left edge   : 4,5
+c        # bottom-edge : 6,7
+         nv(1) = auxl(4 + 4*idir,i)
+         nv(2) = auxl(5 + 4*idir,i)
+
+         urrot = g*(nv(1)*ur(1) + nv(2)*ur(2))
+         ulrot = g*(nv(1)*ul(1) + nv(2)*ul(2))
 
          qrr = ql(1,i)
          qll = qr(1,i-1)
+
+         if (qad_debug) then
+!!            qrr = 1.d0
+!!            qll = 1.d0
+         endif
 
 c        # Use Roe-average values         
          uhat = (ulrot + urrot)/2.d0

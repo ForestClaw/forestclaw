@@ -131,7 +131,7 @@ c                # from the cell corresponding  to q
          endif
        endif
  
-c      # Side 1
+c      # Side 1 (left)
        if (use_fix) then
 c          # Compute f(ql) - f(qr) explicitly        
            idir = 0
@@ -139,7 +139,7 @@ c          # Compute f(ql) - f(qr) explicitly
            call rpn2qad(nc,nvar,maux,nghost, idir, iface, 
      &                  ql,qr,auxl,auxr,amdq,apdq)
        else
-c          # Re-purpose user Riemann solver       
+c          # Re-purpose user Riemann solver;   
            call rpn2(1,max1dp1-2*nghost,nvar,mwaves,maux,nghost,
      &               nc+1-2*nghost,ql,qr,auxl,auxr,wave,s,amdq,apdq)
        endif           
@@ -225,7 +225,7 @@ c                # same as the fine grid variable, i.e. edges match.
          endif
        endif
 
-c      # Side 2 
+c      # Side 2  (top)
        if (use_fix) then
 c          # Compute f(ql) - f(qr) explicitly        
            idir = 1
@@ -300,7 +300,7 @@ c                # preserves conservation in incompressible flow:
             enddo
        endif
 
-c      # Side 3
+c      # Side 3 (right)
        if (use_fix) then
 c          # Compute f(ql) - f(qr) explicitly        
            idir = 0
@@ -380,7 +380,7 @@ c                # preserves conservation in incompressible flow:
             enddo
        endif
 
-c      # Side 4
+c      # Side 4 (bottom)
        if (use_fix) then
 c          # Compute f(ql) - f(qr) explicitly        
            idir = 1

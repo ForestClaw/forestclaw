@@ -306,14 +306,16 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 		  fclaw2d_clawpatch_get_registers(glob,this_patch);
 
 	/* Evaluate fluxes needed in correction terms */
-	if (claw46_vt->fort_rpn2_cons != NULL && fclaw_opt->time_sync)
+	if (fclaw_opt->time_sync && fclaw_opt->flux_correction)
 	{
+		FCLAW_ASSERT(claw46_vt->fort_rpn2_cons != NULL);
 		double *qvec   = FCLAW_ALLOC(double, meqn);
 		double *auxvec_center = FCLAW_ALLOC(double, maux);
 		double *auxvec_edge = FCLAW_ALLOC(double, maux);
 		double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
-		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,&dt,
+		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,
+		                                &this_block_idx,&this_patch_idx, &dt,
 										  cr->edgelengths[0], 
 										  cr->edgelengths[1], 
 										  cr->edgelengths[2], 
@@ -358,15 +360,21 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 	FCLAW_ASSERT(ierror == 0);
 
-	CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES(&mx,&my,&mbc,&meqn, &dt, &dx, 
-	                                        &dy, &this_patch_idx,
-											cr->edgelengths[0],cr->edgelengths[1],
-											cr->edgelengths[2],cr->edgelengths[3],
-											fp,fm,gp,gm,
-											cr->fp[0],cr->fp[1],
-											cr->fm[0],cr->fm[1],
-											cr->gp[0],cr->gp[1],
-											cr->gm[0],cr->gm[1]);
+	if (fclaw_opt->time_sync && fclaw_opt->fluctuation_correction)
+	{
+
+		CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES(&mx,&my,&mbc,&meqn, &dt, &dx, 
+		                                      &dy, &this_patch_idx,
+		                                      cr->edgelengths[0],
+		                                      cr->edgelengths[1],
+		                                      cr->edgelengths[2],
+		                                      cr->edgelengths[3],
+		                                      fp,fm,gp,gm,
+		                                      cr->fp[0],cr->fp[1],
+		                                      cr->fm[0],cr->fm[1],
+		                                      cr->gp[0],cr->gp[1],
+		                                      cr->gm[0],cr->gm[1]);
+	}		
 
 
 	delete [] fp;

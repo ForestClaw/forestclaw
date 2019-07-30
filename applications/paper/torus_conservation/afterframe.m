@@ -15,8 +15,8 @@ setpatchborderprops('linewidth',1);
 daspect([1,1,1]);
 
 caxis([0, 1]);
-colorbar
 axis off;
+set(gca,'clipping','off');
 
 view(3);
 

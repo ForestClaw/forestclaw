@@ -47,8 +47,13 @@ c      #  ok as long as meqn, mwaves < maxvar
        dimension amdq(nvar,max1dp1),  apdq(nvar,max1dp1)
        dimension auxl(maxaux*max1dp1),  auxr(maxaux*max1dp1)
 
-       integer idir, iface
+       integer idir, iface, sgn
        logical use_fix
+
+      logical qad_debug
+      common /debug_common/ qad_debug
+
+
 c
 c  WARNING: auxl,auxr dimensioned at max possible, but used as if
 c  they were dimensioned as the real maux by max1dp1. Would be better
@@ -59,6 +64,7 @@ c  So need to access using your own indexing into auxl,auxr.
        data qprint/.false./
        data use_fix /.true./
 
+       qad_debug = .true.
 c
 c      aux is auxiliary array with user parameters needed in Riemann solvers
 c          on fine grid corresponding to valbig
@@ -392,6 +398,7 @@ c          # Re-purpose user Riemann solver
            call rpn2(2,max1dp1-2*nghost,nvar,mwaves,maux,nghost,
      &               nr+1-2*nghost,ql,qr,auxl,auxr,wave,s,amdq,apdq)
        endif
+       
 
 c
 c we have the wave. for side 4. add into sdflxm
@@ -416,6 +423,9 @@ c      # for source terms:
 c      # how can this be right - where is the integrated src term used?
            endif
            
+       qad_debug = .false.
+
+
        return
        end
 
@@ -425,6 +435,7 @@ c      # how can this be right - where is the integrated src term used?
 
       implicit none
       integer mx, meqn, maux, mbc, idir, iface
+      double precision dx,dy
       double precision ql(meqn,0:mx-1),   qr(meqn,mx)
       double precision auxl(maux,0:mx-1), auxr(maux,mx)
 
@@ -436,7 +447,7 @@ c     # automatically allocated
       double PRECISION auxvl(maux), auxvr(maux)
       double PRECISION fluxl(meqn), fluxr(meqn)
 
-      double precision fd
+      double precision fd, scale
       integer m,i, iface_cell
 
 c     # idir refers to direction of the Riemann solver
@@ -469,8 +480,7 @@ c       # Call user defined function to compute fluxes.  The resulting
 c       # flux should be those projected onto face 'iface_cell' and 
 c       # scaled by edgelength/dx or edgelength/dy.
 c       #
-c       # For equations in non-conservative form, the fluxes can be
-c       # set to 0
+c       # The cell edge is the same for both coarse and fine.
         call rpn2qad_flux(meqn,maux,idir,iface_cell,qvl,auxvl,fluxl)
         call rpn2qad_flux(meqn,maux,idir,iface_cell,qvr,auxvr,fluxr)
 

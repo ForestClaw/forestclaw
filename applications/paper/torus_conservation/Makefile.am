@@ -12,7 +12,6 @@ v	applications/paper/torus_conservation/torus_psi.f \
 	applications/paper/torus_conservation/fdisc.f \
 	applications/paper/torus_conservation/user_4.6/qinit.f \
 	applications/paper/torus_conservation/user_4.6/torus46_setaux.f \
-	applications/paper/torus_conservation/user_4.6/torus46_output.f \
 	applications/paper/torus_conservation/user_4.6/tag4refinement.f \
 	applications/paper/torus_conservation/user_4.6/tag4coarsening.f \
 	applications/paper/torus_conservation/user_4.6/rpn2cons_fw_manifold.f \

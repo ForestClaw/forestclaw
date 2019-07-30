@@ -14,6 +14,9 @@
       double precision alpha, beta
       common /torus_comm/ alpha, beta
 
+      integer init_choice
+      common /initchoice_comm/ init_choice
+
       integer maxlevel, rfactor, grid_mx, mi, mj
       common /amr_comm/ maxlevel, rfactor, grid_mx, mi, mj
 
@@ -29,6 +32,7 @@
       call opendatafile(iunit, fname)
 
       read(iunit,*) example
+      read(iunit,*) init_choice
       read(iunit,*) alpha
       read(iunit,*) beta
 

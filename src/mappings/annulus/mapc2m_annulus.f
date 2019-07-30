@@ -4,8 +4,8 @@
       integer blockno
       double precision xc,yc,xp,yp,zp, beta, theta(2)
 
-      double precision pi
-      common /compi/ pi
+      double precision pi,pi2
+      common /compi/ pi,pi2
 
       double precision t1, t2, t, r
 

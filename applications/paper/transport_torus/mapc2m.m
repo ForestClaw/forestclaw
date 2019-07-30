@@ -5,7 +5,7 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 % beta = d(3);
 
 alpha = 0.4;
-beta = 0;
+beta = 0.5;
 
 [xp,yp,zp] = mapc2m_torus(xc,yc,alpha,beta);
    

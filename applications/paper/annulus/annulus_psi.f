@@ -5,90 +5,19 @@ c     # Stream function depends on these global variables
 c     #         example (0=incompressible; 1=compressible)
 c     #         mapping (0=annulus; 1=twisted annulus)
 c     # ------------------------------------------------------------
-      double precision function annulus_psi(x,y)
+
+
+
+      subroutine annulus_velocity_components(x,y,t,u)
       implicit none
 
-      double precision x, y
+      double precision x, y, u(2), t
 
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
-
-      integer example
-      common /example_comm/ example  
-
-      double precision r2
-
-c     # annulus : Solid body rotation
-      r2 = x**2 + y**2
-      annulus_psi = -0.5d0*pi2*revs_per_s*r2
-
-      end
-
-
-      subroutine annulus_psi_derivs(x,y,p,px,py)
-      implicit none
-
-      double precision x, y
-      double precision p, px, py
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
-
-      double precision r, r2, rx, ry
-
-c     # r2 = x**2 + y**2
-c     # annulus_psi = 0.5d0*pi2*revs_per_s*r2
-
-      r2 = x**2 + y**2
-      r = sqrt(r)
-      rx = x/r
-      ry = y/r
-
-      p = 0.5d0*pi2*revs_per_s*r2
-      px = pi2*revs_per_s*r*rx
-      py = pi2*revs_per_s*r*ry
-
-      end
-
-      subroutine annulus_velocity_components(x,y,u)
-      implicit none
-
-      double precision x, y, u(2)
-      double precision uderivs(4)
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
-
-      integer example
-      common /example_comm/ example  
-
-      double precision s
-
-c     # uderivs not used here
-      call annulus_velocity_derivs(x,y,u,uderivs)
-
-      end
-
-      subroutine annulus_velocity_derivs(x,y,u,uderivs)
-      implicit none
-
-      double precision x, y, u(2)
-      double precision uderivs(4)
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
+      double precision revs_per_s, cart_speed, amplitude, freq
+      common /stream_comm/ revs_per_s, cart_speed, amplitude, freq
 
       double precision beta, theta(2)
       common /annulus_comm/ beta, theta
@@ -96,67 +25,65 @@ c     # uderivs not used here
       integer example
       common /example_comm/ example  
 
-      double precision s, pim, u1x, u1y, u2x, u2y
-      double precision vs, r, t1(3), t2(3), vcart(3)
-      double precision t1_norm2, t2_norm2, t1_dot_vcart, t2_dot_vcart
-      double precision annulus_dot
-      integer k
+      double precision t1(3), t2(3)
+      double precision t1_norm2, t2_norm2
+      double precision vcart(3), annulus_dot
+      double precision t1_dot_vcart, t2_dot_vcart
+      double precision xp,yp,zp, ravg, xc, d, tfinal, A
+      double precision r, w, th, nc, vcr(2)
 
-c     # uderivs(1) = u1x      
-c     # uderivs(2) = u1y      
-c     # uderivs(3) = u2x      
-c     # uderivs(4) = u2y      
-
-      u1x = 0
-      u1y = 0
-      u2x = 0
-      u2y = 0
 
       call annulus_covariant_basis(x, y, t1,t2) 
 
       t1_norm2 = annulus_dot(t1,t1)
       t2_norm2 = annulus_dot(t2,t2)
 
+c     # Horizontal velocity
+      call annulus_covariant_basis(x, y, t1,t2) 
+
 c     # Set non-zeros derivs only
-      s = sqrt(2.d0)
       if (example .eq. 0) then
 c        # Rigid body rotation        
          u(1) = revs_per_s
          u(2) = 0
-      elseif (example .eq. 1) then
-c        # Vertical velocity
-         vcart(1) = cart_speed
-         vcart(2) = 0
-         vcart(3) = 0
-
-         t1_dot_vcart = annulus_dot(t1,vcart)
-         t2_dot_vcart = annulus_dot(t2,vcart)
-
-         u(1) = t1_dot_vcart/t1_norm2         
-         u(2) = t2_dot_vcart/t2_norm2
-         
-         !! And now figure out derivatives using Christoffel symbols ...
-      elseif (example .eq. 2) then
-c        # Conservative for all solvers (rp=1,2,3,4)               
-         u(1) = s*(cos(pi*x)**2 + 0.5d0)         
-         u(2) = s*(sin(pi*y)**2 + 0.5d0)
-         u1x = -pi*s*sin(pi*x)
-         u2y =  pi*s*cos(pi*y)
-      elseif (example .eq. 3) then
-         u(1) = s*(cos(pi*x)**2 - 0.5d0)
-         u(2) = s*(sin(pi*y)**2 - 0.5d0)
-         u1x = -pi*s*sin(pi*x)
-         u2y =  pi*s*cos(pi*y)
       else
-         write(6,'(A,A)') 'annulus_psi : ',
-     &              'No valid example provided'
-         stop
-      endif
+          if (example .eq. 1) then
+              call random_number(vcr)
 
-      uderivs(1) = u1x
-      uderivs(2) = u1y
-      uderivs(3) = u2x
-      uderivs(4) = u2y
+              w = 0
+              vcart(1) = cart_speed + w*(-1+2*vcr(1))
+              vcart(2) = w*(-1+2*vcr(2))
+              vcart(3) = 0
+          elseif (example .eq. 2) then
+              A = amplitude
+              tfinal = 0.25
+              vcart(1) = cart_speed
+              vcart(2) = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
+          elseif (example .eq. 3) then
+              A = amplitude
+              tfinal = 0.25
+              vcart(1) = cart_speed*pi*sin(pi*t/tfinal)/2.d0
+              vcart(2) = 0
+         elseif (example .eq. 4) then
+             r = beta + (1-beta)*y
+             th = theta(1) + (theta(2)-theta(1))*x
+             w = 0.5
+             vcart(1) = -(1-w)*pi2*r*sin(pi2*th)
+             vcart(2) = (1+w)*pi2*r*cos(pi2*th)
+             nc = sqrt(vcart(1)**2 + vcart(2)**2)
+
+             vcart(1) = -vcart(1)/nc
+             vcart(2) = -vcart(2)/nc
+         endif
+
+          vcart(3) = 0
+
+          t1_dot_vcart = annulus_dot(t1,vcart)
+          t2_dot_vcart = annulus_dot(t2,vcart)
+
+          u(1) = t1_dot_vcart/t1_norm2         
+          u(2) = t2_dot_vcart/t2_norm2
+      endif
 
       end
 
@@ -345,39 +272,5 @@ c             # d(t2)/dy = d(g*fy + gy*f)/dy
       endif
 
       end
-
-      subroutine annulus_transform_coordinates(a,b,x,y,mapping)
-      implicit none
-
-      double precision a,b, x,y
-      integer mapping
-      double precision l0(4), l1(4)
-
-      double precision twist
-      common /twist_comm/ twist
-
-      data l0 /1., 0., 0., 1./
-      data l1 /1., -0.2d0, 0., 1./
-
-      l1(2) = twist
-
-c     # This compute (x,y) from a1*t1 + a2*t2, where
-c     # t1, t2 are the columns of the matrix L.
-
-c      x = a
-c      y = b
-  
-      if (mapping .eq. 0) then
-          x = a
-          y = b
-      elseif (mapping .eq. 1) then
-          x = a*l1(1) + b*l1(2)
-          y = a*l1(3) + b*l1(4)
-      endif
-
-      end
-
-
-
 
 
