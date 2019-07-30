@@ -75,6 +75,38 @@ void PERIODIC_FLUX2(const int* ixy,const int* maxm, const int* meqn,
                       int method[], int mthlim[]);
 
 
+#define PERIODIC_FORT_INTERPOLATE2FINE FCLAW_F77_FUNC( \
+            periodic_fort_interpolate2fine, PERIODIC_FORT_INTERPOLATE2FINE)
+void PERIODIC_FORT_INTERPOLATE2FINE(const int* mx,const int* my,const int* mbc,
+                                    const int* meqn, double qcoarse[], double qfine[],
+                                    double areacoarse[], double areafine[],
+                                    const int* igrid,const int* manifold);
+
+#define PERIODIC_FORT_INTERPOLATE_FACE \
+              FCLAW_F77_FUNC(periodic_fort_interpolate_face, \
+                             PERIODIC_FORT_INTERPOLATE_FACE)
+void PERIODIC_FORT_INTERPOLATE_FACE(const int* mx, const int* my, 
+                                               const int* mbc,const int* meqn,
+                                               double qcoarse[],double qfine[],
+                                               const int* idir, const int* iside,
+                                               const int* num_neighbors,
+                                               const int* refratio, const int* igrid,
+                                               struct fclaw2d_patch_transform_data** 
+                                               transform_cptr);
+
+#define PERIODIC_FORT_INTERPOLATE_CORNER \
+      FCLAW_F77_FUNC(periodic_fort_interpolate_corner, \
+                     PERIODIC_FORT_INTERPOLATE_CORNER)
+void PERIODIC_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, 
+                                                 const int* mbc,const int* meqn, 
+                                                 const int* a_refratio, double this_q[],
+                                                 double neighbor_q[], const int* a_corner,
+                                                 struct fclaw2d_patch_transform_data** 
+                                                 transform_cptr);
+
+
+
+
 
 #ifdef __cplusplus
 #if 0
