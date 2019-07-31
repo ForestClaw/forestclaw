@@ -31,8 +31,8 @@ c     # Refine based only on first variable in system.
             xc = xlower + (i-0.5)*dx
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if (abs(q(i,j,mq)) .gt. tag_threshold) then
-c            if (xc > 0.5) then
+c            if (abs(q(i,j,mq)) .gt. tag_threshold) then
+            if (xc > 0.5) then
                tag_patch = 1
                return
             endif

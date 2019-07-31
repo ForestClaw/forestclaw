@@ -107,6 +107,20 @@ void PERIODIC_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
 
 
 
+#define PERIODIC_COMPUTE_ERROR FCLAW_F77_FUNC(periodic_compute_error,PERIODIC_COMPUTE_ERROR)
+
+void PERIODIC_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                           double *dx, double *dy, double *xlower,
+                           double *ylower, double *t, double q[],
+                           double error[], double soln[]);
+
+#define RPN2CONS_UPDATE FCLAW_F77_FUNC(rpn2cons_update,RPN2CONS_UPDATE)
+
+void RPN2CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
+                      double q[], double aux_center[], double aux_edge[], double flux[]);
+
+
+
 
 #ifdef __cplusplus
 #if 0
