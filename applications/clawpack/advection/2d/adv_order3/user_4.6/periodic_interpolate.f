@@ -102,10 +102,11 @@ c     # Create map :
          if (idir .eq. 0) then
 c           # this ensures that we get 'hanging' corners
 
+            do ibc = 1,mbc/2
             if (iface_coarse .eq. 0) then
-               ic = 1
+               ic = ibc
             elseif (iface_coarse .eq. 1) then
-               ic = mx
+               ic = mx + ibc - 1
             endif
             do jc = 1,mx
                i1 = ic
@@ -149,6 +150,7 @@ c                 # This is the right hand side of the LLSQ problem
                      qfine(iff,jff,mq) = qc + value
                   end do
                endif
+            enddo
             enddo
          else
             if (iface_coarse .eq. 2) then
@@ -284,18 +286,20 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
 
       mth = 5
 
+      do ibc = 1,mbc/2
+          do jbc = 1,mbc/2
       if (icorner_coarse .eq. 0) then
-         ic = 1
-         jc = 1
+         ic = ibc
+         jc = jbc
       elseif (icorner_coarse .eq. 1) then
-         ic = mx
-         jc = 1
+         ic = mx + ibc-1
+         jc = jbc
       elseif (icorner_coarse .eq. 2) then
-         ic = 1
-         jc = my
+         ic = ibc
+         jc = my + jbc-1
       elseif (icorner_coarse .eq. 3) then
-         ic = mx
-         jc = my
+         ic = mx + ibc-1
+         jc = my + jbc-1
       endif
 
 c     # Interpolate coarse grid corners to fine grid corner ghost cells
@@ -332,6 +336,8 @@ c        # This is the right hand side of the LLSQ problem
             qfine(iff,jff,mq) = qc + value
          enddo
 
+      enddo
+      enddo 
       enddo
 
       end

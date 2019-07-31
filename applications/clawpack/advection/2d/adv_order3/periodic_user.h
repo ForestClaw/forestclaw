@@ -121,6 +121,28 @@ void RPN2CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const in
 
 
 
+#define  PERIODIC_FORT_WRITE_FILE FCLAW_F77_FUNC(periodic_fort_write_file,  \
+                                                PERIODIC_FORT_WRITE_FILE)
+void     PERIODIC_FORT_WRITE_FILE(char* matname1,
+                                 int* mx,        int* my,
+                                 int* meqn,      int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* dx,     double* dy,
+                                 double q[],     double error[], double soln[],
+                                 double *time,
+                                 int* patch_num, int* level,
+                                 int* blockno,   int* mpirank);
+
+#define PERIODIC_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(periodic_fort_header_ascii, \
+                        PERIODIC_FORT_HEADER_ASCII)
+void PERIODIC_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                               double* time, int* meqn, int* maux, 
+                               int* ngrids);
+
+
+
+
 
 #ifdef __cplusplus
 #if 0
