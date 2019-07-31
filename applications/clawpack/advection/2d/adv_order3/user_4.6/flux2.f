@@ -202,12 +202,6 @@ c      # apply limiter to waves:
 c       if (limit) call limiter3(maxmx,meqn,mwaves,mbc,mx,wave,s,
 c     &                         dtdx,phi,mthlim)
 
-         do i=1-mbc, mx+mbc
-            do m=1, meqn
-c               faddm(i,m) = 0.d0
-c               faddp(i,m) = 0.d0
-            enddo
-         enddo
          do i=1-mbc,mx+mbc
             do m=1,meqn
                cqxx(i,m) = 0.d0
