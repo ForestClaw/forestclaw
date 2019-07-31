@@ -124,11 +124,11 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
         }
 
 
-        clawpack46_vt->flux2 = &PERIODIC_FLUX2;
 
         fc2d_clawpack46_options_t *claw46_opt = fc2d_clawpack46_get_options(glob);
         if (claw46_opt->order[0] == 3)
         {
+            clawpack46_vt->flux2 = &PERIODIC_FLUX2;
             clawpatch_vt->fort_interpolate_face   = &PERIODIC_FORT_INTERPOLATE_FACE;
             clawpatch_vt->fort_interpolate_corner = &PERIODIC_FORT_INTERPOLATE_CORNER;
             clawpatch_vt->fort_interpolate2fine   = &PERIODIC_FORT_INTERPOLATE2FINE;

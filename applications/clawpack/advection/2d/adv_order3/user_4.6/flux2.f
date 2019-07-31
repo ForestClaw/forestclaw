@@ -131,7 +131,7 @@ c
 c
 c     # Set qadd for the donor-cell upwind method (Godunov)
       do 41 m=1,meqn
-         do 40 i=1,mx+1
+         do 40 i=2-mbc,mx+mbc-1
             faddp(i,m) = faddp(i,m) - apdq(i,m)
             faddm(i,m) = faddm(i,m) + amdq(i,m)
    40    continue
@@ -234,7 +234,7 @@ c
       if (method(2).gt.1 .and. method(3).eq.2) then
 c        # incorporate cqxx into amdq and apdq so that it is split also.
          do 151 m=1,meqn
-            do 150 i = 1, mx+1
+            do 150 i = 1-mbc, mx+mbc
                amdq(i,m) = amdq(i,m) + cqxx2(i,m)
                apdq(i,m) = apdq(i,m) - cqxx2(i,m)
   150       continue
@@ -243,7 +243,7 @@ c        # incorporate cqxx into amdq and apdq so that it is split also.
       if (method(2).gt.1 .and. method(3).eq.3) then
 c        # incorporate cqxx into amdq and apdq so that it is split also.
          do 152 m=1,meqn
-            do 153 i = 1, mx+1
+            do 153 i = 1-mbc, mx+mbc
                amdq(i,m) = amdq(i,m) + cqxx(i,m)
                apdq(i,m) = apdq(i,m) - cqxx(i,m)
  153        continue

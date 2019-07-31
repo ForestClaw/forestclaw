@@ -287,7 +287,7 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
       mth = 5
 
       do ibc = 1,mbc/2
-          do jbc = 1,mbc/2
+      do jbc = 1,mbc/2
       if (icorner_coarse .eq. 0) then
          ic = ibc
          jc = jbc
