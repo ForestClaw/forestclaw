@@ -1,7 +1,13 @@
 function plot_errors(e,idx,compare)
 
-if (nargin < 3)
+l = size(e,1);
+
+if (nargin < 3)    
     compare = false;
+    if (nargin < 2)
+        n = size(e,1);
+        idx = 1:n;
+    end
 end
 
 lh = zeros(3,1);
@@ -27,16 +33,16 @@ else
     end
 end
 
-
-
 Nvec = e(:,1);
 n = length(Nvec);
 
-if (length(idx) == 1)
-    i1 = min([idx,n]);
-    idx = i1:n;
+i1 = min(idx);
+if (i1 > n)
+    error('min(idx) > length(e)');
 end
-    
+
+i2 = min([max(idx),n]);
+idx = i1:i2;
 
 c = {'r','b','g'};
 if (nargin == 1)
