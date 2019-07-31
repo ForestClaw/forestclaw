@@ -28,6 +28,10 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
       tag_patch = 1
+
+      tag_patch = 0
+      return
+
       mq = 1
       qmin = q0(1,1,mq)
       qmax = q0(1,1,mq)

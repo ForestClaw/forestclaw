@@ -183,7 +183,7 @@ c
 
       if(method(2).eq.3) then
 c        # use 3rd order accurate method
-         do i=2-mbc, mx+mbc
+         do i=2-mbc, mx+mbc-1
             dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
             do m=1, meqn
                do mw=1, mwaves
@@ -202,7 +202,7 @@ c      # apply limiter to waves:
 c       if (limit) call limiter3(maxmx,meqn,mwaves,mbc,mx,wave,s,
 c     &                         dtdx,phi,mthlim)
 
-         do i=1-mbc,mx+mbc
+         do i=2-mbc,mx+mbc
             do m=1,meqn
                cqxx(i,m) = 0.d0
                cqxx2(i,m) = 0.d0
@@ -262,7 +262,7 @@ c     # split the left-going flux difference into down-going and up-going:
 c
 c     # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
       do 161 m=1,meqn
-         do 160 i = 1, mx+1
+         do 160 i = 2-mbc, mx+mbc
                gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(i,m)
                gaddm(i-1,m,1) = gaddm(i-1,m,1) - gupdate
                gaddp(i-1,m,1) = gaddp(i-1,m,1) - gupdate
@@ -279,7 +279,7 @@ c     # split the right-going flux difference into down-going and up-going:
 c
 c     # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
       do 181 m=1,meqn
-         do 180 i = 1, mx+1
+         do 180 i = 2-mbc, mx+mbc
                gupdate = 0.5d0*dtdx1d(i) * bmasdq(i,m)
                gaddm(i,m,1) = gaddm(i,m,1) - gupdate
                gaddp(i,m,1) = gaddp(i,m,1) - gupdate
