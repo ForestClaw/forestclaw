@@ -335,13 +335,13 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 
 	int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
-	double* work = new double[mwork];
+	double* work = FCLAW_ALLOC(double,mwork);
 
 	int size = meqn*(mx+2*mbc)*(my+2*mbc);
-	double* fp = new double[size];
-	double* fm = new double[size];
-	double* gp = new double[size];
-	double* gm = new double[size];
+	double* fp = FCLAW_ALLOC(double,size);
+	double* fm = FCLAW_ALLOC(double,size);
+	double* gp = FCLAW_ALLOC(double,size);
+	double* gm = FCLAW_ALLOC(double,size);
 
 	int ierror = 0;
 	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
@@ -377,12 +377,11 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	}		
 
 
-	delete [] fp;
-	delete [] fm;
-	delete [] gp;
-	delete [] gm;
-
-	delete [] work;
+	FCLAW_FREE(fp);
+	FCLAW_FREE(fm);
+	FCLAW_FREE(gp);
+	FCLAW_FREE(gm);
+	FCLAW_FREE(work);
 
 	return cflgrid;
 }
