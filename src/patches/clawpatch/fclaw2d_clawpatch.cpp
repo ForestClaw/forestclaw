@@ -54,7 +54,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
 
+
+
+
 /* ------------------------------- Static function defs ------------------------------- */
+
+/* Added to turn off time_interp */
+static int fill_ghost(int time_interp)
+{
+	return !time_interp;
+	//return 1;
+}
+
 
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
@@ -391,10 +402,14 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
 	my = clawpatch_opt->my;
 	mbc = clawpatch_opt->mbc;
 
+	/* This routine might be called between two time-sync patches */
 	fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
 	fclaw2d_clawpatch_timesync_data(glob,neighbor_patch,time_interp,&qneighbor,&meqn);
 
-	clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+	}
 }
 
 static
@@ -462,8 +477,11 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
 	my = clawpatch_opt->my;
 	mbc = clawpatch_opt->mbc;
 
-	clawpatch_vt->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iface_coarse,
-										&p4est_refineFactor,&refratio,&igrid,&transform_data);
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iface_coarse,
+		                                    &p4est_refineFactor,&refratio,&igrid,&transform_data);
+	}
 }
 
 static
@@ -479,7 +497,7 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
 	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
 	int meqn,mx,my,mbc;
-	double *qthis, *qcorner;
+	double *qthis, *qcorner;  
 	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
 	mx = clawpatch_opt->mx;
@@ -489,9 +507,11 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
 	fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
 	fclaw2d_clawpatch_timesync_data(glob,corner_patch,time_interp,&qcorner,&meqn);
 
-	clawpatch_vt->fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,
-								   &transform_data);
-
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,
+		                               &transform_data);
+	}
 }
 
 
@@ -529,10 +549,13 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
 	mbc = clawpatch_opt->mbc;
 
 	int manifold = fclaw_opt->manifold;
-	clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,
-									  &refratio,qcoarse,qfine,
-									  areacoarse,areafine,
-									  &manifold,&coarse_corner,&transform_data);
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,
+		                                  &refratio,qcoarse,qfine,
+		                                  areacoarse,areafine,
+		                                  &manifold,&coarse_corner,&transform_data);
+	}
 }
 
 static
@@ -564,9 +587,13 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
 	qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-	clawpatch_vt->fort_interpolate_corner(&mx,&my,&mbc,&meqn,
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_interpolate_corner(&mx,&my,&mbc,&meqn,
 										  &refratio,qcoarse,qfine,
-										  &coarse_corner,&transform_data);
+										  &coarse_corner,&transform_data);	
+	}
+
 }
 
 
