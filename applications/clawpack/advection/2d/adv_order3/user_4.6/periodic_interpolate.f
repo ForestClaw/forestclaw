@@ -106,7 +106,7 @@ c           # this ensures that we get 'hanging' corners
             if (iface_coarse .eq. 0) then
                ic = ibc
             elseif (iface_coarse .eq. 1) then
-               ic = mx + ibc - 1
+               ic = mx - ibc + 1
             endif
             do jc = 1,mx
                i1 = ic
@@ -149,14 +149,15 @@ c                 # This is the right hand side of the LLSQ problem
      &                       pv(4)*shiftx(m)*shifty(m)
                      qfine(iff,jff,mq) = qc + value
                   end do
-               endif
-            enddo
-            enddo
+               endif    !! Don't skip this grid
+            enddo       !! jc loop
+            enddo       !! ibc loop
          else
+            do jbc = 1,mbc/2
             if (iface_coarse .eq. 2) then
-               jc = 1
+               jc = jbc
             elseif (iface_coarse .eq. 3) then
-               jc = my
+               jc = my - jbc + 1
             endif
             do ic = 1,mx
     1          i1 = ic
@@ -208,7 +209,8 @@ c                 # This is the right hand side of the LLSQ problem
                      qfine(iff,jff,mq) = qc + value
                   end do
                endif                    !! Don't skip this grid
-            enddo                       !! i loop
+            enddo                       !! ic loop
+            enddo                       !! end of jbc loop
          endif                          !! end idir branch
       enddo                             !! endo mq loop
 
@@ -292,14 +294,14 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
          ic = ibc
          jc = jbc
       elseif (icorner_coarse .eq. 1) then
-         ic = mx + ibc-1
+         ic = mx - ibc + 1
          jc = jbc
       elseif (icorner_coarse .eq. 2) then
          ic = ibc
-         jc = my + jbc-1
+         jc = my - jbc+1
       elseif (icorner_coarse .eq. 3) then
-         ic = mx + ibc-1
-         jc = my + jbc-1
+         ic = mx - ibc+1
+         jc = my - jbc+1
       endif
 
 c     # Interpolate coarse grid corners to fine grid corner ghost cells
