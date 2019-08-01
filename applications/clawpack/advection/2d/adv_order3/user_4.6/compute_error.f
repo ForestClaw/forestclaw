@@ -74,12 +74,4 @@ c            yc = ylower + (j-0.5)*dy
       end
 
 
-      double precision function q0(x,y)
-      implicit none
-
-      double precision x,y
-
-      q0 = dsin(8d0*datan(1d0)*x)*dsin(8d0*datan(1d0)*y)
-
-      end
 

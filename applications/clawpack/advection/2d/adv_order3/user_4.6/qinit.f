@@ -43,7 +43,7 @@ c
             do 33 k=0,2
                do 44 l=0,2                  
                   q(i,j,1)=q(i,j,1)+(1d0/36d0)*a(k+1,l+1)
-     &                     * f(dx*k/2d0+xi,dy*l/2d0+yj)
+     &                     * q0(dx*k/2d0+xi,dy*l/2d0+yj)                  
    44             continue
    33          continue
    12       continue
@@ -51,3 +51,14 @@ c
 
       return
       end
+
+      double precision function q0(x,y)
+      implicit none
+
+      double precision x,y
+
+      q0 = dsin(8d0*datan(1d0)*x)*dsin(8d0*datan(1d0)*y)
+
+      end
+
+

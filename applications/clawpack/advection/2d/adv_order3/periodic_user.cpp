@@ -129,9 +129,11 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
         if (claw46_opt->order[0] == 3)
         {
             clawpack46_vt->flux2 = &PERIODIC_FLUX2;
+#if 1            
             clawpatch_vt->fort_interpolate_face   = &PERIODIC_FORT_INTERPOLATE_FACE;
             clawpatch_vt->fort_interpolate_corner = &PERIODIC_FORT_INTERPOLATE_CORNER;
             clawpatch_vt->fort_interpolate2fine   = &PERIODIC_FORT_INTERPOLATE2FINE;
+#endif            
         }
     }
 #if 0    
@@ -150,8 +152,17 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
 
 void periodic_problem_setup(fclaw2d_global_t* glob)
 {
-    //const user_options_t* user = periodic_get_options(glob);
+    const user_options_t* user = periodic_get_options(glob);
 
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,    "%20d    %s",user->example,"\% example\n");
+        fprintf(f, "%20.16f    %s",user->ubar,"\% ubar\n");
+        fprintf(f, "%20.16f    %s",user->vbar,"\% vbar\n");
+        fclose(f);
+    }
+    fclaw2d_domain_barrier (glob->domain);
     PERIODIC_SETPROB();
 }
 

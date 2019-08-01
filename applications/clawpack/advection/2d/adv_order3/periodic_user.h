@@ -40,6 +40,11 @@ extern "C"
 
 typedef struct user_options
 {
+    int example; 
+    
+    double ubar;
+    double vbar;
+
     int claw_version;
     int is_registered;
 

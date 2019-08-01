@@ -32,7 +32,7 @@ c     # Refine based only on first variable in system.
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
 c            if (abs(q(i,j,mq)) .gt. tag_threshold) then
-            if (xc > 0.5) then
+            if (abs(xc-0.5) < 0.25) then
                tag_patch = 1
                return
             endif
