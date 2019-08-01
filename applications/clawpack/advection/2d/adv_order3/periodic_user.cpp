@@ -124,7 +124,6 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
         }
 
 
-
         fc2d_clawpack46_options_t *claw46_opt = fc2d_clawpack46_get_options(glob);
         if (claw46_opt->order[0] == 3)
         {

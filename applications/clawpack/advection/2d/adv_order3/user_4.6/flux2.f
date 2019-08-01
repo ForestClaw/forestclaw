@@ -181,26 +181,41 @@ c
   120       continue
       endif
 
-      if(method(2).eq.3) then
+      if(method(2) .eq. 3) then
 c        # use 3rd order accurate method
          do i=2-mbc, mx+mbc-1
             dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
             do m=1, meqn
                do mw=1, mwaves
-                 if(s(i,mw).gt.0.d0) then
-                    phi(i,m,mw) = 1. - (1.+dtdxave*dabs(s(i,mw)))/3.d0
-     &              *(wave(i,m,mw)-wave(i-1,m,mw))/(wave(i,m,mw)+1.d-15)
-                 else
-                    phi(i,m,mw) = 1. - (1.+dtdxave*dabs(s(i,mw)))/3.d0
-     &              *(wave(i,m,mw)-wave(i+1,m,mw))/(wave(i,m,mw)+1.d-15)
-                 endif
-c                 phi(i,m,mw) = 1.d0
+                if (ixy .eq. 1) then
+c                    write(6,101) ixy, i, jcom, wave(i,m,mw)
+                else 
+c                    write(6,101) ixy, icom,i,wave(i,m,mw)
+                endif
+101             format(3I5,E24.16)                
+                if (wave(i,m,mw) .eq. 0) then
+                    phi(i,m,mw) = 1
+                else
+                    if(s(i,mw) .gt. 0.d0) then
+                        phi(i,m,mw) = 1. - 
+     &                      (1.+dtdxave*dabs(s(i,mw)))/3.d0
+     &                     *(wave(i,m,mw)-wave(i-1,m,mw))
+     &                           /(wave(i,m,mw))
+                    else                  
+                        phi(i,m,mw) = 1. - 
+     &                       (1.+dtdxave*dabs(s(i,mw)))/3.d0
+     &                     *(wave(i,m,mw)-wave(i+1,m,mw))
+     &                        /(wave(i,m,mw))
+                    endif
+                endif
+c               phi(i,m,mw) = 1.d0
                enddo
             enddo 
          enddo
 c      # apply limiter to waves:
-c       if (limit) call limiter3(maxmx,meqn,mwaves,mbc,mx,wave,s,
-c     &                         dtdx,phi,mthlim)
+
+c       if (limit) call limiter3(maxm,meqn,mwaves,mbc,mx,wave,s,
+c     &                         dtdx1d,phi,mthlim)
 
          do i=2-mbc,mx+mbc
             do m=1,meqn

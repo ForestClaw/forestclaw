@@ -82,9 +82,6 @@
                   q(i,j,mq) = 0.d0
                endif
             enddo
-            if (abs(qc) .lt. 1d-99) then
-               qc = 0.d0
-            endif
             if (abs(error(i,j,1)) .lt. 1d-99) then
                error(i,j,1) = 0.d0
             endif

@@ -34,6 +34,8 @@ c      integer*8 cont, get_context
 
 c      cont = get_context()
 
+      write(6,*) 'Computing the error'        
+
 
       do j = 1-mbc,my+mbc
          do  i = 1-mbc,mx+mbc
@@ -47,12 +49,12 @@ c     # Assume a single field variable only
 c            xc = xlower + (i-0.5)*dx
 c            yc = ylower + (j-0.5)*dy
 
-            if (t .eq. 0) then               
+            if (t .eq. 0) then       
                soln(i,j,1) = q(i,j,1)
             else
                if (example .eq. 0) then
                   xi = xlower + (i-1d0)*dx
-                  yj = ylower + (j-1d0)*dy
+                  yj = ylower + (j-1d0)*dy                  
                   do k = 0,2
                      do l = 0,2     
                         xk = xi + k*dx/2 - ubar*t
@@ -65,21 +67,23 @@ c            yc = ylower + (j-0.5)*dy
                    write(6,*) 'Discontinuous solution; '
                    stop
                 elseif (example .eq. 2) then
+                  write(6,*) 'computing the error ...'
                   xi = xlower + (i-1)*dx
                   yj = ylower + (j-1)*dy
                   do k = 0,2
                      do l = 0,2     
                         xk = modulo(xi + k*dx/2 - ubar*t,1.d0)
-                        yk = modulo(yj + l*dy/2 - vbar*t,1.d0)
+                        yk = modulo(yj + l*dy/2 - vbar*t, 1.d0)
                         soln(i,j,1) = soln(i,j,1) + 
      &                      (1d0/36d0)*a(k+1,l+1)*q0(xk,yk)
                       end do
-                   end do                   
+                   end do   
                 endif
              endif
              error(i,j,1) = q(i,j,1) - soln(i,j,1)
          enddo
       enddo
+
 
 
       end
