@@ -29,10 +29,12 @@ c     # Refine based only on first variable in system.
       do j = 1,my
          do i = 1,mx
             xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
 c            if (abs(q(i,j,mq)) .gt. tag_threshold) then
-            if (abs(xc-0.5) < 0.25) then
+c            if (abs(yc-0.5) < 0.25) then
+            if (qmax-qmin .gt. tag_threshold) then
                tag_patch = 1
                return
             endif

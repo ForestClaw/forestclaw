@@ -29,9 +29,6 @@ c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
       tag_patch = 1
 
-      tag_patch = 0
-      return
-
       mq = 1
       qmin = q0(1,1,mq)
       qmax = q0(1,1,mq)
@@ -71,8 +68,8 @@ c     # not be coarsened.
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if (abs(q(i,j,mq)) .gt. coarsen_threshold) then
-c            if ((qmax-qmin) .gt. coarsen_threshold) then
+c            if (abs(q(i,j,mq)) .gt. coarsen_threshold) then
+            if ((qmax-qmin) .gt. coarsen_threshold) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
                tag_patch = 0

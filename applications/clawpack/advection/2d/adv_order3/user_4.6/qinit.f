@@ -55,9 +55,17 @@ c
       double precision function q0(x,y)
       implicit none
 
-      double precision x,y
+      double precision x,y, r
 
-      q0 = dsin(8d0*datan(1d0)*x)*dsin(8d0*datan(1d0)*y)
+c      q0 = dsin(8d0*datan(1d0)*x)*dsin(8d0*datan(1d0)*y)
+ 
+       r = sqrt((x-0.5)**2 + (y-0.5)**2)
+       if (r .le. 0.2) then
+           q0 = 1
+       else
+           q0 = 0
+       endif
+
 
       end
 
