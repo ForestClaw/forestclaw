@@ -309,10 +309,10 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	if (fclaw_opt->time_sync && fclaw_opt->flux_correction)
 	{
 		FCLAW_ASSERT(claw46_vt->fort_rpn2_cons != NULL);
-		double *qvec   = FCLAW_ALLOC(double, meqn);
+		double *qvec          = FCLAW_ALLOC(double, meqn);
 		double *auxvec_center = FCLAW_ALLOC(double, maux);
-		double *auxvec_edge = FCLAW_ALLOC(double, maux);
-		double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
+		double *auxvec_edge   = FCLAW_ALLOC(double, maux);
+		double *flux          = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
 		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,
 		                                &this_block_idx,&this_patch_idx, &dt,
@@ -336,6 +336,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 	int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
 	double* work = FCLAW_ALLOC(double,mwork);
+	//double *work = new double[mwork];
 
 	int size = meqn*(mx+2*mbc)*(my+2*mbc);
 	double* fp = FCLAW_ALLOC(double,size);
