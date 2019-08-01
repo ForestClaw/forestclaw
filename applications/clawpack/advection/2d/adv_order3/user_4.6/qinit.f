@@ -32,7 +32,7 @@ c
 
       do 20 j=1-mbc,my+mbc
          do 10 i=1-mbc,mx+mbc
-            q(i,j,1)=0d0
+            q(i,j,1)=0
    10       continue
    20    continue
 
@@ -55,18 +55,42 @@ c
       double precision function q0(x,y)
       implicit none
 
-      double precision x,y, r
+      double precision x,y
 
-c      q0 = dsin(8d0*datan(1d0)*x)*dsin(8d0*datan(1d0)*y)
+      integer example
+      common /example_comm/ example  
+
+      double precision r, r0, x0, y0, Hsmooth
+
  
-       r = sqrt((x-0.5)**2 + (y-0.5)**2)
-       if (r .le. 0.2) then
-           q0 = 1
-       else
-           q0 = 0
-       endif
+      if (example .eq. 0) then
+          q0 = dsin(8d0*datan(1d0)*x)*dsin(8d0*datan(1d0)*y)
+      elseif (example .eq. 1) then
+          r = sqrt((x-0.5)**2 + (y-0.5)**2)
+          if (r .le. 0.2) then
+              q0 = 1
+          else
+              q0 = 0
+          endif
+      elseif (example .eq. 2) then
+          x0 = 0.5
+          y0 = 0.5
+          r0 = 0.2
+          r = sqrt((x - x0)**2 + (y-y0)**2)
+          q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
+      endif
 
 
       end
+
+      double precision function Hsmooth(r)
+      implicit none
+
+      double precision r
+
+      Hsmooth = (tanh(r/0.02d0) + 1)/2.d0
+
+      end
+
 
 

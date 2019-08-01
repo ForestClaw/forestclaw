@@ -13,8 +13,12 @@
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
+      integer example
+      common /example_comm/ example  
+
+
       integer i,j, mq
-      double precision qmin, qmax, xc, yc
+      double precision qmin, qmax, xc, yc, qx, qy
       
 
 
@@ -30,14 +34,29 @@ c     # Refine based only on first variable in system.
          do i = 1,mx
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            qmin = min(q(i,j,mq),qmin)
-            qmax = max(q(i,j,mq),qmax)
-c            if (abs(q(i,j,mq)) .gt. tag_threshold) then
-c            if (abs(yc-0.5) < 0.25) then
-            if (qmax-qmin .gt. tag_threshold) then
-               tag_patch = 1
-               return
+            if (example .eq. 0) then
+               qmin = min(q(i,j,mq),qmin)
+               qmax = max(q(i,j,mq),qmax)
+               if (qmax-qmin .gt. tag_threshold) then
+                  tag_patch = 1
+                  return
+               endif            
+            elseif (example .eq. 1) then
+               if (abs(q(i,j,mq)) .gt. tag_threshold) then
+                   tag_patch = 1
+                   return
+               endif
+            elseif (example .eq. 2) then
+               qx = (q(i+1,j,1)-q(i-1,j,1))/(2*dx)
+               qy = (q(i,j+1,1)-q(i,j-1,1))/(2*dy)
+               if (abs(qx) .gt. tag_threshold .or.
+     &               abs(qy) .gt. tag_threshold) then
+                  tag_patch = 1
+                  return
+               endif
             endif
+c           #  static refinement
+c           if (abs(yc-0.5) < 0.25) then
          enddo
       enddo
 

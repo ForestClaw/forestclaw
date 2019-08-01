@@ -1,7 +1,17 @@
 daspect([1,1,1]);
 
 colormap(parula);
-% caxis([-1,1]);
+
+if (mq == 1)
+   caxis([-1,1]);
+   cv = linspace(-1,1,21);
+   cv([1 end]) = [];
+   % drawcontourlines(cv);
+   setcontourlineprops('linewidth',2);
+else
+   c = max(abs([qmin,qmax]));
+   caxis([-c,c]);
+end
 
 showpatchborders;
 
@@ -14,7 +24,7 @@ if (ShowUnderOverShoots)
     qhi = u.value_upper;
     under_label = sprintf('%3.1f - %7.1e',qlo,qlo-qmin);
     over_label = sprintf('%3.1f + %7.1e',qhi,qmax-qhi);
-    % colorbar_underover(under_label,over_label);
+    colorbar_underover(under_label,over_label);
 end
     
 

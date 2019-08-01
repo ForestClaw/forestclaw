@@ -12,9 +12,6 @@
 
 c      integer*8 cont, get_context
 
-      integer mapping
-      common /mapping_comm/ mapping
-
       integer example
       common /example_comm/ example  
 
@@ -64,6 +61,20 @@ c            yc = ylower + (j-0.5)*dy
      &                      (1d0/36d0)*a(k+1,l+1)*q0(xk,yk)
                       end do
                    end do
+                elseif (example .eq. 1) then
+                   write(6,*) 'Discontinuous solution; '
+                   stop
+                elseif (example .eq. 2) then
+                  xi = xlower + (i-1)*dx
+                  yj = ylower + (j-1)*dy
+                  do k = 0,2
+                     do l = 0,2     
+                        xk = modulo(xi + k*dx/2 - ubar*t,1.d0)
+                        yk = modulo(yj + l*dy/2 - vbar*t,1.d0)
+                        soln(i,j,1) = soln(i,j,1) + 
+     &                      (1d0/36d0)*a(k+1,l+1)*q0(xk,yk)
+                      end do
+                   end do                   
                 endif
              endif
              error(i,j,1) = q(i,j,1) - soln(i,j,1)
