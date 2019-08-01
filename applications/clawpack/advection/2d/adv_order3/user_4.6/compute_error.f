@@ -34,9 +34,6 @@ c      integer*8 cont, get_context
 
 c      cont = get_context()
 
-      write(6,*) 'Computing the error'        
-
-
       do j = 1-mbc,my+mbc
          do  i = 1-mbc,mx+mbc
             soln(i,j,1) = 0d0
@@ -67,7 +64,6 @@ c            yc = ylower + (j-0.5)*dy
                    write(6,*) 'Discontinuous solution; '
                    stop
                 elseif (example .eq. 2) then
-                  write(6,*) 'computing the error ...'
                   xi = xlower + (i-1)*dx
                   yj = ylower + (j-1)*dy
                   do k = 0,2

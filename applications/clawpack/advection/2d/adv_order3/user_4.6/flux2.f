@@ -183,7 +183,7 @@ c
 
       if(method(2) .eq. 3) then
 c        # use 3rd order accurate method
-         do i=2-mbc, mx+mbc-1
+         do i=3-mbc, mx+mbc-1
             dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
             do m=1, meqn
                do mw=1, mwaves
@@ -214,8 +214,8 @@ c               phi(i,m,mw) = 1.d0
          enddo
 c      # apply limiter to waves:
 
-c       if (limit) call limiter3(maxm,meqn,mwaves,mbc,mx,wave,s,
-c     &                         dtdx1d,phi,mthlim)
+       if (limit) call limiter3(maxm,meqn,mwaves,mbc,mx,wave,s,
+     &                         dtdx1d,phi,mthlim)
 
          do i=2-mbc,mx+mbc
             do m=1,meqn
