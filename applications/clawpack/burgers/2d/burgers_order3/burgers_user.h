@@ -113,6 +113,20 @@ void RPN2CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const in
 
 
 
+#define CLAWPACK46_RPN2BU    FCLAW_F77_FUNC(clawpack46_rpn2bu,CLAWPACK46_RPN2BU)
+void CLAWPACK46_RPN2BU(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                     const int* mbc,const int* mx, double ql[], double qr[],
+                     double auxl[], double auxr[], double wave[],
+                     double s[], double amdq[], double apdq[]);
+
+#define CLAWPACK46_RPT2BU    FCLAW_F77_FUNC(clawpack46_rpt2bu, CLAWPACK46_RPT2BU)
+void CLAWPACK46_RPT2BU(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                       const int* mbc, const int* mx, double ql[], double qr[],
+                       double aux1[], double aux2[], double aux3[], const int* imp,
+                       double dsdq[], double bmasdq[], double bpasdq[]);
+
+
+
 #ifdef __cplusplus
 #if 0
 {

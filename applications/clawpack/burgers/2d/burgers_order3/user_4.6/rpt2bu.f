@@ -6,7 +6,7 @@ cc     =====================================================
 
 c
 c     =====================================================
-      subroutine clawpack46_rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
+      subroutine clawpack46_rpt2bu(ixy,maxm,meqn,mwaves,mbc,mx,
      &                  q,ql,aux1,aux2,aux3,
      &                  imp,asdq,bmasdq,bpasdq)
 c     =====================================================

@@ -25,6 +25,9 @@ c     computes point values of the conserved quantities
          enddo
       enddo
 
+c     # Use cell-averaged values instead of pointwise values at 
+c     # last layers of ghost cells (where we cannot compute the
+c     # Laplacian.)
       do j = 1-mbc,my+mbc
           aux(1-mbc,j,1) = q(1-mbc,j,1)
           aux(mx+mbc,j,1) = q(mx+mbc,j,1)
