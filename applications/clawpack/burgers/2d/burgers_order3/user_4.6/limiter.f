@@ -26,7 +26,7 @@ c
       do 50 mw=1,mwaves
          if (mthlim(mw) .ge. 1) go to 50
          dotr = 0.d0
-         do 40 i = 0, mx+1
+         do 40 i = 2-mbc, mx+mbc-1
             wnorm2 = 0.d0
             dotl = dotr
             dotr = 0.d0

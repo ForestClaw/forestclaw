@@ -29,7 +29,7 @@ c
 c     # x- and y- Riemann problems are identical, so it doesn't matter if
 c     # ixy=1 or 2.
 c
-          do 10 i = 2-mbc, mx+mbc-1
+          do 10 i = 4-mbc, mx+mbc-3
             
 c            sb = (7d0*(q(i,1)+q(i-1,1))-q(i-2,1)-q(i+1,1))/12d0
              sb = 0.5*(q(i,1)+q(i-1,1))

@@ -37,17 +37,17 @@
 #include <fc2d_clawpack5.h>
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    int mi = gparms->mi;
-    int mj = gparms->mj;
-    int a = gparms->periodic_x;
-    int b = gparms->periodic_y;
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
+    int a = fclaw_opt->periodic_x;
+    int b = fclaw_opt->periodic_y;
 
     /* Map unit square to disk using mapc2m_disk.f */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
@@ -55,7 +55,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
     cont = fclaw2d_map_new_nomap_brick(brick);
 
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
     return domain;

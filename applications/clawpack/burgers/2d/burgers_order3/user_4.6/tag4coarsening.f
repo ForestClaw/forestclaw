@@ -80,9 +80,17 @@ c     # not be coarsened.
                qmin = min(q(i,j,mq),qmin)
                qmax = max(q(i,j,mq),qmax)
                if (qmax-qmin .gt. coarsen_threshold) then
+
                   tag_patch = 0
                   return
                endif            
+c               qx = (q(i+1,j,1)-q(i-1,j,1))/(2*dx)
+c               qy = (q(i,j+1,1)-q(i,j-1,1))/(2*dy)
+c               if (abs(qx) .gt. coarsen_threshold .or.
+c     &               abs(qy) .gt. coarsen_threshold) then
+c                  tag_patch = 0
+c                  return
+c               endif
             elseif (example .eq. 1) then
                if (abs(q(i,j,mq)) .gt. coarsen_threshold) then
                    tag_patch = 0
@@ -98,15 +106,6 @@ c     # not be coarsened.
                endif
             endif
 
-c            qmin = min(q(i,j,mq),qmin)
-c            qmax = max(q(i,j,mq),qmax)
-cc            if (abs(q(i,j,mq)) .gt. coarsen_threshold) then
-c            if ((qmax-qmin) .gt. coarsen_threshold) then
-cc              # We won't coarsen this family because at least one
-cc              # grid fails the coarsening test.
-c               tag_patch = 0
-c               return
-c            endif
          enddo
       enddo
 
