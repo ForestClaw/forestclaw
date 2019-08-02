@@ -32,5 +32,5 @@ ContourValues = [];
 %---------------------------------
 
 
-ShowUnderOverShoots = 0;
-PlotParallelPartitions=0;
+ShowUnderOverShoots = 1;
+PlotParallelPartitions = 0;

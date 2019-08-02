@@ -187,12 +187,6 @@ c        # use 3rd order accurate method
             dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
             do m=1, meqn
                do mw=1, mwaves
-                if (ixy .eq. 1) then
-c                    write(6,101) ixy, i, jcom, wave(i,m,mw)
-                else 
-c                    write(6,101) ixy, icom,i,wave(i,m,mw)
-                endif
-101             format(3I5,E24.16)                
                 if (wave(i,m,mw) .eq. 0) then
                     phi(i,m,mw) = 1
                 else
