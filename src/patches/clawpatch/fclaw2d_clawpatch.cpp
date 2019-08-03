@@ -55,8 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch5_fort.h>
 
 
-
-
 /* ------------------------------- Static function defs ------------------------------- */
 
 /* Added to turn off time_interp */
@@ -239,7 +237,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
 	if (clawpatch_opt->maux > 0)
 	{
-	  cp->aux.define(box,cp->maux);
+		cp->aux.define(box,cp->maux);
 	}
 
 	if (fclaw_opt->manifold)
