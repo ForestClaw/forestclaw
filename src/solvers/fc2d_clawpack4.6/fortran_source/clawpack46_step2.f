@@ -100,7 +100,7 @@ c
 c     # perform x-sweeps
 c     ==================
 c
-      do 50 j = 1-mbc,my+mbc-1
+      do 50 j = 2-mbc,my+mbc-1
 c
 c        # copy data along a slice into 1d arrays:
          do m=1,meqn
@@ -188,7 +188,7 @@ c     # perform y sweeps
 c     ==================
 c
 c
-      do 100 i = 1-mbc, mx+mbc-1
+      do 100 i = 2-mbc, mx+mbc-1
 c
 c        # copy data along a slice into 1d arrays:
          do m=1,meqn
