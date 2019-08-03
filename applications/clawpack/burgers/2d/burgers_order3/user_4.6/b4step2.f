@@ -15,15 +15,26 @@ c     # dummy routine
       implicit double precision (a-h,o-z)
       dimension q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, meqn)
       dimension aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
+      double precision fp(-1:1,-1:1), qavg(-1:1,-1:1)
+      double precision qp, qlap, flap
+
+      integer i,j,ii,jj
 c
 c     computes point values of the conserved quantities    
       do i=2-mbc, mx+mbc-1
          do j=2-mbc, my+mbc-1
-            aux(i,j,1) = q(i,j,1)
-     &             -(q(i-1,j,1)-2.d0*q(i,j,1)+q(i+1,j,1))/24d0
-     &            - (q(i,j-1,1)-2.d0*q(i,j,1)+q(i,j+1,1))/24d0
-         enddo
-      enddo
+            do ii = -1,1
+                do jj = -1,1
+                  qavg(ii,jj) = q(i+ii,j+jj,1)
+                end do
+            end do
+            qlap = (qavg(-1,0) + qavg(1,0) + qavg(0,-1) + 
+     &                    qavg(0,1) - 4*qavg(0,0))
+
+c           # Compute pointwise from average values          
+            aux(i,j,1) = qavg(0,0) - qlap/24.
+        end do
+      end do
 
 c     # Use cell-averaged values instead of pointwise values at 
 c     # last layers of ghost cells (where we cannot compute the
@@ -38,5 +49,22 @@ c     # Laplacian.)
           aux(i,my+mbc,1) = q(i,my+mbc,1)
       enddo 
      
+
+
+      do i=2-mbc, mx+mbc-1
+         do j=2-mbc, my+mbc-1
+            do ii = -1,1
+                do jj = -1,1
+                  qp = aux(i+ii,j+jj,1)
+                  fp(ii,jj) = 0.5*qp**2
+                end do
+            end do
+            flap = (fp(-1,0) + fp(1,0) + fp(0,-1) + 
+     &                  fp(0,1) - 4*fp(0,0))
+            aux(i,j,2) = fp(0,0) + flap/24.
+        end do
+      end do
+            
+
       return
       end

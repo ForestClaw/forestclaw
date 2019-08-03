@@ -122,7 +122,10 @@ c     # solve Riemann problem at each interface and compute Godunov updates
 c     ---------------------------------------------------------------------
 c
 
-      call rpn2(ixy,maxm,meqn,mwaves,mbc,mx,q1d,aux2,aux1,aux3,
+c      call rpn2(ixy,maxm,meqn,mwaves,mbc,mx,q1d,aux2,aux1,aux3,
+c     &        wave,s,amdq,apdq)      
+
+      call rpn2(ixy,maxm,meqn,mwaves,mbc,mx,q1d,q1d,aux2,aux2,
      &        wave,s,amdq,apdq)      
 c
 c     # Set qadd for the donor-cell upwind method (Godunov)

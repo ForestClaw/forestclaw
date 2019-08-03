@@ -45,7 +45,7 @@ void burgers_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();        
 
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
-        //clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE;
+        clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE;
 
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
         clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;

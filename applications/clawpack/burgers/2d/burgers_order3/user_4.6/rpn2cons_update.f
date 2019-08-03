@@ -7,22 +7,14 @@
       integer meqn,maux,idir, m, iface
       double precision q(meqn), flux(meqn)
       double precision auxvec_center(maux), auxvec_edge(maux)
-      double precision urot
-
-      double precision ubar, vbar
-      common /comrp/ ubar,vbar
-
-
-      if (idir .eq. 0) then
-         urot = ubar
-      else
-         urot = vbar
-      endif
+      double precision fp
 
 c     #  f(q) = (n dot u)*q
+
+      fp = auxvec_center(2)
       do m = 1,meqn
 c         # Don't multiply by edgelength (scaling is done elsewhere)
-          flux(m) = urot*q(m)
+          flux(m) = fp
       enddo
 
       end

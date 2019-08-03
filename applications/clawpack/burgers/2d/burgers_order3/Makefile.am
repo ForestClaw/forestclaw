@@ -14,6 +14,7 @@ applications_clawpack_burgers_2d_burgers_order3_burgers_SOURCES = \
 	applications/clawpack/burgers/2d/burgers_order3/user_4.6/rpn2bu.f \
 	applications/clawpack/burgers/2d/burgers_order3/user_4.6/rpt2bu.f \
 	applications/clawpack/burgers/2d/burgers_order3/user_4.6/flux2.f \
+	applications/clawpack/burgers/2d/burgers_order3/user_4.6/rpn2cons_update.f \
 	applications/clawpack/burgers/2d/rp/clawpack46_rpn2_burgers.f  \
 	applications/clawpack/burgers/2d/rp/clawpack46_rpt2_burgers.f  \
 	applications/clawpack/burgers/2d/burgers_order3/user_4.6/tag4refinement.f \
