@@ -6,7 +6,7 @@ n1 = Frame+10000;
 fname = [dir, 'fort.',num2str(n1)];
 fname(length(dir)+6) = 't';
 
-if ~exist(fname,file)
+if ~exist(fname,'file')
     amr = {};
     t = [];
     disp(' ');
@@ -26,7 +26,7 @@ fclose(fid);
 
 % change the file name to read the q data:
 fname(length(dir) + 6) = 'q';
-if ~exist(fname,file)
+if ~exist(fname,'file')
     amr = {};
     t = [];
     return;
