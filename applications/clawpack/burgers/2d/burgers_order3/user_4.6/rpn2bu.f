@@ -65,13 +65,14 @@ c        ------------------------------------------------------
          amdq(i,1) = -dmin1(sign(1d0,s(i,1)), 0.d0) * wave(i,1,1)
          apdq(i,1) =  dmax1(sign(1d0,s(i,1)), 0.d0) * wave(i,1,1)
 
-         if (efix) then
+c         if (efix) then
 c           # entropy fix for transonic rarefactions:
 c            if (q(i-1,1).lt.0.d0 .and. q(i,1).gt.0.d0) then
 c               amdq(i,1) = - f(i-1,1)  
 c               apdq(i,1) =   f(i,1)    
 c               endif
 c            endif
+
    30   continue
 c
       return
