@@ -39,6 +39,10 @@ c           # Compute pointwise from average values
 c     # Use cell-averaged values instead of pointwise values at 
 c     # last layers of ghost cells (where we cannot compute the
 c     # Laplacian.)
+c     #
+c     # Instead, use : 
+c     # (2, -5, 4, -1) for second order one-sided derivative 
+c     # approximation to second derivative 
       do j = 1-mbc,my+mbc
           aux(1-mbc,j,1) = q(1-mbc,j,1)
           aux(mx+mbc,j,1) = q(mx+mbc,j,1)
@@ -50,7 +54,6 @@ c     # Laplacian.)
       enddo 
      
 
-
       do i=2-mbc, mx+mbc-1
          do j=2-mbc, my+mbc-1
             do ii = -1,1
@@ -59,6 +62,7 @@ c     # Laplacian.)
                   fp(ii,jj) = 0.5*qp**2
                 end do
             end do
+c           # Compute the average flux from pointwise values            
             flap = (fp(-1,0) + fp(1,0) + fp(0,-1) + 
      &                  fp(0,1) - 4*fp(0,0))
             aux(i,j,2) = fp(0,0) + flap/24.
