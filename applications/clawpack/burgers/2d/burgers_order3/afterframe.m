@@ -24,6 +24,16 @@ if (PlotType == 1)
 elseif (PlotType == 4)
     s = 0.1;
     axis([0,1,-1-s,1+s]);
+        
+    if (exist('href','var'))
+        if (ishandle(href))
+            delete(href);
+        end
+    end
+    
+    [amrdata_ref,tref] = readamrdata_forestclaw(2,Frame,'./fort_2nd_maxlevel6/');  
+    lstyle = {'ro-','go-','bo-','mo-'};
+    href = plotframe2ez(amrdata_ref,mq,lstyle,@map1d);
 end
 
 

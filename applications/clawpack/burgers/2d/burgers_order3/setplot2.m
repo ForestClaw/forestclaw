@@ -33,7 +33,9 @@ ContourValues = [];
 
 
 UserMap1d = 1;
-LineStyle = {'r.-','g.-','b.-','m.-'};
+% LineStyle = {'r.-','g.-','b.-','m.-'};
+LineStyle = {'k.-'};
+    
 % ScatterStyle= {'r.','g.','b.','m.'};
 
 
