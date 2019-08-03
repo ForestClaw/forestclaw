@@ -3,7 +3,7 @@ OutputDir = './';            % Default (reassign them here anyway)
 
 ForestClaw = 1;     % Plot using ForestClaw preferences.
 
-PlotType = 4;                % type of plot to produce:
+PlotType = 1;                % type of plot to produce:
 			     % 1 = pseudo-color (pcolor)
 			     % 2 = contour
 			     % 3 = Schlieren
