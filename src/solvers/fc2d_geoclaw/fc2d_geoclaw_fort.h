@@ -420,7 +420,8 @@ void  FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(int *mx, int *my, int *mbc,
 
 void FC2D_GEOCLAW_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                             double *dx, double *dy,
-                                            double* area, double *q, double* sum);
+                                            double* area, double *q, double* sum,
+                                            double *c_kahan);
 
 #define FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA \
                       FCLAW_F77_FUNC(fc2d_geoclaw_fort_compute_patch_area, \
