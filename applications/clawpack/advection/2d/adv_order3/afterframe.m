@@ -3,7 +3,7 @@ daspect([1,1,1]);
 colormap(parula);
 
 if (mq == 1)
-   caxis([-1,1]);
+   % caxis([-1,1]);
    cv = linspace(-1,1,21);
    cv([1 end]) = [];
    % drawcontourlines(cv);
