@@ -19,14 +19,18 @@
       double precision qll,qrr
       double precision urrot, ulrot, g, uhat
 
+c     # Riemann solver assumes that there is unique edge between
+c     # each cell.  This is not true when solving between coarse 
+c     # and fine grids (in qad fix). 
+
       idir = ixy-1
       do i = 2-mbc, mx+mbc
-         !! Edge length;  assumes that edge length is stored at the 
-         !! left edge.
+         !! Single edge between left and right states
          g = auxl(6 + 2*idir,i)  
 
-c        # left-right : 2,3
-c        # bottom-top : 4,5         
+c        # Projected velocity stored in each cell.  
+c        # 2-3 : velocities project to left-right edges of each cell
+c        # 4-5 : velocities project to top-bottom edges of each cell
          urrot = g*auxl(2 + 2*idir,i)     !! Left edge of right cell
          ulrot = g*auxr(3 + 2*idir,i-1)   !! Right edge of left cell
 

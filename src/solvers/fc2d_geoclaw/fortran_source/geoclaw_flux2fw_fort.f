@@ -1,7 +1,7 @@
 c
 c
 c     =====================================================
-      subroutine flux2(ixy,maxm,meqn,maux,mbc,mx,
+      subroutine fc2d_geoclaw_flux2(ixy,maxm,meqn,maux,mbc,mx,
      &                 q1d,dtdx1d,aux1,aux2,aux3,
      &                 faddm,faddp,gaddm,gaddp,cfl1d,
      &                 rpn2,rpt2)
@@ -181,8 +181,9 @@ c     # modify F fluxes for second order q_{xx} correction terms:
 c     -----------------------------------------------------------
 c
 c     # apply limiter to fwaves:
-      if (limit) call fc2d_geoclaw_limiter(maxm,meqn,mwaves,mbc,mx,
-     &           fwave,s,mthlim)
+      if (limit) 
+     &      call fc2d_geoclaw_limiter(maxm,meqn,mwaves,
+     &                                mbc,mx,fwave,s,mthlim)
 c
       do 120 i = 1, mx+1
 c

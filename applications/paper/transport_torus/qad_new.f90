@@ -88,9 +88,6 @@ SUBROUTINE qad_new(valbig,mitot,mjtot,nvar, &
   mxc = mx/lratiox
   myc = my/lratioy
 
-  write(6,*) mx,my,lratiox,lratioy
-  stop
-
   !! Redimension arrays to use indexing that starts at 1-mbc, etc
   q(1:meqn,1-mbc:mx+mbc,1-mbc:my+mbc) => valbig
 

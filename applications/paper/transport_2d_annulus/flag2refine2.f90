@@ -124,9 +124,8 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
             if(amrflags(i,j) == UNSET) then
                 r = beta + (1-beta)*y_c
                 th = pi2*(theta(1) + (theta(2)-theta(1))*x_c)
-!!                constant_theta = cos(th) .lt. 0 .and. abs(sin(th)) .lt. 0.5
-                constant_theta = th .gt. pi/2.d0
-                constant_r = r > ravg                
+                constant_theta = th .gt. pi/2
+                constant_r = r > ravg      
                 if (refine_pattern .eq. 0 .and. constant_theta) then 
                     amrflags(i,j) = DOFLAG
                     cycle x_loop

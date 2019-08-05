@@ -46,6 +46,7 @@ c      #  ok as long as meqn, mwaves < maxvar
        dimension wave(nvar,mwaves,max1dp1), s(mwaves,max1dp1)
        dimension amdq(nvar,max1dp1),  apdq(nvar,max1dp1)
        dimension auxl(maxaux*max1dp1),  auxr(maxaux*max1dp1)
+
 c
 c  WARNING: auxl,auxr dimensioned at max possible, but used as if
 c  they were dimensioned as the real maux by max1dp1. Would be better

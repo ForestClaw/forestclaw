@@ -144,6 +144,8 @@ struct fclaw_options
 
     /* Conservation */
     int time_sync;
+    int flux_correction;
+    int fluctuation_correction;
 
     /* Gauges */
     int output_gauges;

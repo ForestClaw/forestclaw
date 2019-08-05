@@ -10,6 +10,7 @@ from __future__ import absolute_import
 import os
 import numpy as np
 
+
 #------------------------------
 def setrun(claw_pkg='amrclaw'):
 #------------------------------
@@ -26,30 +27,59 @@ def setrun(claw_pkg='amrclaw'):
     # Physical problem parameters
     # ---------------------------
 
-    example = 1          # 0 = rigid body rotation; 1 = horizontal flow
+    # 0 = rigid body rotation; 
+    # 1 = horizontal flow
+    # 2 = sine patch
+    # 3 = horizontal flow with variable speed
+    # 4 = time dependent in both x and y
+    # 5 = spatially dependent
+    example = 4          
 
-    initial_choice = 0   # 0 = discontinuous;   1 = smooth; 2 = constant
-    
-    refine_pattern = 1   # 0 = constant theta;  1 = constant_r
+    refine_pattern = 0   # 0 = constant theta;  1 = constant_r
 
     rps   = -1                          # units of theta/second (example=0)
     cart_speed = 1.092505803290319      # Horizontal speed (example=1)
+    freq = 1                          # Frequency for sine path
+
+    # Region occupied by annulus
+    beta = 0.4
+    theta = [0.125,0.375]
+
+    # Example 1 (constant horizontal speed)
+    vcart = [cart_speed,0]
+
+    # Example  2
+    amplitude = 0.05
+
+    if example in [0,1,2,3] :
+        ravg = (1 + beta)/2
+        t0 = np.pi/2*(1 + (1/8))
+        initial_location = ravg*np.array([np.cos(t0), np.sin(t0)])
+    elif example in [4]:
+        # Vertical motion
+        r0 = beta + 0.25*(1-beta)
+        initial_location = [0,r0]
 
     # ---------------
     # Grid parameters
     # ---------------
+    grid_mx = 32    # Size of ForestClaw grids
     mi = 4          # Number of ForestClaw blocks
     mj = 2     
-    grid_mx = 32    # Size of ForestClaw grids
     mx = mi*grid_mx
     my = mj*grid_mx
 
     # -------------
     # Time stepping
     # -------------
-    dt_initial = 2.5e-3        # Stable for level 1
-    nout = 100                 # 400 steps => T=2
-    nsteps = 10
+    if example in [0,1,2,3]:
+        dt_initial = 2.5e-3
+        nout = 100                 # 400 steps => T=2
+        nsteps = 10
+    elif example == 4:
+        dt_initial = 1.25e-3        # Stable for level 1
+        nout = 200
+        nsteps = 20
 
     # ------------------
     # AMRClaw parameters
@@ -64,11 +94,11 @@ def setrun(claw_pkg='amrclaw'):
 
     # 0 = no qad
     # 1 = original qad
-    # 2 = original (fixed to include call to rpn2qad)
+    # 2 = modified (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 0
+    qad_mode = 2
 
-    maux = 9
+    maux = 15
     use_fwaves = True
 
     #------------------------------------------------------------------
@@ -80,17 +110,18 @@ def setrun(claw_pkg='amrclaw'):
     # example 0 : Rigid body rotation (possibly using a streamfunction)
     # Make vertical speed small so we leave grid
     probdata.add_param('example',                example,           'example')
-    probdata.add_param('mapping',                0,           'mapping')
-    probdata.add_param('initial condition',      initial_choice,    'init_choice')
     probdata.add_param('revolutions per second', rps,               'rps')
-    probdata.add_param('Twist factor',           0,                 'twist')
-    probdata.add_param('Cart.    speed',         cart_speed,        'cart_speed')
+    probdata.add_param('cart_speed',             cart_speed,        'cart_speed')
+    probdata.add_param('vcart[0]',               vcart[0],          'vcart[0]')
+    probdata.add_param('vcart[1]',               vcart[1],          'vcart[1]')
+    probdata.add_param('amplitude',              amplitude,         'amplitude')
+    probdata.add_param('freq',                   freq,              'freq')
     probdata.add_param('initial radius',         0.05,              'init_radius')
-    probdata.add_param('color equation',         0,    'color_equation')
-    probdata.add_param('use stream function',    0,                 'use_stream')
-    probdata.add_param('beta',                   0.4,               'beta')
-    probdata.add_param('theta1',                 0.125,             'theta(1)')
-    probdata.add_param('theta2',                 0.375,             'theta(2)')
+    probdata.add_param('initial_location[0]',    initial_location[0], 'initial_location[0]')
+    probdata.add_param('initial_location[1]',    initial_location[1], 'initial_location[1]')
+    probdata.add_param('beta',                   beta,               'beta')
+    probdata.add_param('theta1',                 theta[0],          'theta(1)')
+    probdata.add_param('theta2',                 theta[1],          'theta(2)')
 
     probdata.add_param('grid_mx',        grid_mx,        'grid_mx')
     probdata.add_param('mi',             mi,             'mi')
@@ -98,7 +129,7 @@ def setrun(claw_pkg='amrclaw'):
     probdata.add_param('maxlevel',       maxlevel,       'maxlevel')
     probdata.add_param('reffactor',      ratioxy,        'reffactor')
     probdata.add_param('refine_pattern', refine_pattern, 'refine_pattern')
-    probdata.add_param('qad_new',        qad_mode,       'qad_mode')
+    probdata.add_param('qad_mode',        qad_mode,       'qad_mode')
 
     #------------------------------------------------------------------
     # Standard Clawpack parameters to be written to claw.data:
@@ -251,20 +282,21 @@ def setrun(claw_pkg='amrclaw'):
 
 
     # ----------------------------------------------------------------
-    # Color equation (edge velocities)
-    # 1      capacity
-    # 2-3    Edge velocities
-    #
+
     # Conservative form (cell-centered velocities)
-    # 2-5    Cell-centered velocities projected onto four edge normals
-    # 6-7    Edge lengths (x-face, y-face)
+    # 1      capacity
+    # 2-3    Cell-centered velocities projected 
+    # 4-5    normal at x face
+    # 6-7    normal at y face
+    # 8-9    edgelengths at x/y faces
     # ----------------------------------------------------------------
 
-    if (qad_mode in [0,1]):
-        amrdata.aux_type = ['capacity'] + ['xleft','center','yleft','center']*2
+    if qad_mode in [0,1]:
+        amrdata.aux_type = ['capacity'] + ['center']*2 + ['xleft']*4 + \
+              ['yleft']*4 + ['xleft']*2 + ['yleft']*2
     else:
-        amrdata.aux_type = ['capacity'] + ['center']*8
-
+        # Each cell has data for all four faces
+        amrdata.aux_type = ['capacity'] + ['center']*14
 
     #  ----- For developers -----
     # Toggle debugging print statements:

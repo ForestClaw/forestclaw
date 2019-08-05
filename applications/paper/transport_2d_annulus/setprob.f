@@ -1,15 +1,6 @@
       subroutine setprob()
       implicit none
 
-c     example_in,
-c     mapping_in, 
-c     ic_in, 
-c     revs_per_s_in, 
-c     ceqn_in, 
-c     use_stream_in, 
-c     beta_in
-
-
       integer iunit
       character(len=25) fname      
 
@@ -19,28 +10,11 @@ c     beta_in
       integer example
       common /example_comm/ example
 
-      integer mapping
-      common /mapping_comm/ mapping
+      double precision init_radius, init_location(2)
+      common /initradius_comm/ init_radius, init_location
 
-      double precision twist
-      common /twist_comm/ twist
-
-      integer initchoice
-      common /initchoice_comm/ initchoice
-
-      double precision init_radius
-      common /initradius_comm/ init_radius
-
-      double precision revs_per_s, cart_speed
-      common /stream_comm/ revs_per_s, cart_speed
-
-c     # Must use edge velocities
-      integer color_equation
-      common /eqn_comm/ color_equation
-
-c     # used only for edge velocities
-      integer use_stream
-      common /velocity_comm/ use_stream
+      double precision revs_per_s, vcart(2),amp, freq, cart_speed
+      common /stream_comm/ revs_per_s, vcart, amp, freq, cart_speed
 
       double precision beta, theta(2)
       common /annulus_comm/ beta, theta
@@ -54,6 +28,9 @@ c     # used only for edge velocities
       integer qad_mode
       common /qad_comm/ qad_mode      
 
+      double precision setaux_time
+      common /setaux_comm/ setaux_time
+
       pi = 4.d0*atan(1.d0)
       pi2 = 2*pi
 
@@ -62,18 +39,18 @@ c     # used only for edge velocities
       call opendatafile(iunit, fname)
 
       read(iunit,*) example
-      read(iunit,*) mapping
-      read(iunit,*) initchoice
       read(iunit,*) revs_per_s
-      read(iunit,*) twist
       read(iunit,*) cart_speed
+      read(iunit,*) vcart(1)
+      read(iunit,*) vcart(2)
+      read(iunit,*) amp
+      read(iunit,*) freq
       read(iunit,*) init_radius    !! radius
-      read(iunit,*) color_equation
-      read(iunit,*) use_stream
+      read(iunit,*) init_location(1)
+      read(iunit,*) init_location(2)
       read(iunit,*) beta
       read(iunit,*) theta(1)
       read(iunit,*) theta(2)
-
 
       read(iunit,*) grid_mx
       read(iunit,*) mi
@@ -83,5 +60,22 @@ c     # used only for edge velocities
       read(iunit,*) refine_pattern
       read(iunit,*) qad_mode
       close(iunit)
+
+      open(10,file='mapping.dat')
+      write(10,*) example
+      write(10,*) amp
+      write(10,*) init_radius
+      write(10,*) init_location(1)
+      write(10,*) init_location(2)
+      write(10,*) beta
+      write(10,*) theta(1)
+      write(10,*) theta(2)
+      write(10,*) vcart(1)
+      write(10,*) vcart(2)
+      write(10,*) cart_speed
+      write(10,*) freq
+      close(10)
+
+      setaux_time = 0
 
       end

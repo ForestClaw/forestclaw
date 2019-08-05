@@ -14,6 +14,7 @@ axis off;
 
 % view(vfront);
 view(3)
+set(gca,'clipping','off');
 
 prt = false;
 NoQuery = false;

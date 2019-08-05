@@ -140,8 +140,9 @@ SUBROUTINE fc2d_geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
         jcom = j
 
         ! Compute modifications fadd and gadd to fluxes along this slice:
-        call flux2(1,maxm,meqn,maux,mbc,mx,q1d,dtdx1d,aux1,aux2,aux3, &
-                   faddm,faddp,gaddm,gaddp,cfl1d,rpn2,rpt2)
+        call fc2d_geoclaw_flux2(1,maxm,meqn,maux,mbc,mx, &
+                                q1d,dtdx1d,aux1,aux2,aux3, &
+                                faddm,faddp,gaddm,gaddp,cfl1d,rpn2,rpt2)
 
         cflgrid = max(cflgrid,cfl1d)
         ! write(53,*) 'x-sweep: ',cfl1d,cflgrid
@@ -213,8 +214,9 @@ SUBROUTINE fc2d_geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
         icom = i
 
         ! Compute modifications fadd and gadd to fluxes along this slice
-        call flux2(2,maxm,meqn,maux,mbc,my,q1d,dtdy1d,aux1,aux2,aux3, &
-                   faddm,faddp,gaddm,gaddp,cfl1d,rpn2,rpt2)
+        call fc2d_geoclaw_flux2(2,maxm,meqn,maux,mbc,my,q1d, & 
+                                dtdy1d,aux1,aux2,aux3, &
+                                faddm,faddp,gaddm,gaddp,cfl1d,rpn2,rpt2)
 
         cflgrid = max(cflgrid,cfl1d)
         ! write(53,*) 'y-sweep: ',cfl1d,cflgrid
