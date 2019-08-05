@@ -640,7 +640,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
     double xlower,ylower,dx,dy;
     int mx,my,mbc,meqn;
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+//    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
