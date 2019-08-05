@@ -126,8 +126,9 @@ contains
     ! ==========================================================================
     !  set_friction_field - 
     ! ==========================================================================
+
     subroutine set_friction_field(mx, my, num_ghost, num_aux, xlower, ylower, &
-                                  dx, dy, aux)
+                                  dx, dy, aux, is_ghost,nghost,mint)
 
         use geoclaw_module, only: sea_level
 
@@ -136,6 +137,10 @@ contains
         ! Input
         integer, intent(in) :: mx, my, num_ghost, num_aux
         real(kind=8), intent(in) :: xlower, ylower, dx, dy
+
+        logical*1, intent(in) :: is_ghost
+        integer, intent(in) :: nghost, mint
+
         real(kind=8), intent(in out) :: aux(num_aux,                           &
                                             1-num_ghost:mx+num_ghost,&
                                             1-num_ghost:my+num_ghost)
@@ -148,7 +153,12 @@ contains
             ! Set region based coefficients
             do m=1, num_friction_regions
                 do i=1 - num_ghost, mx + num_ghost
-                    do j=1 - num_ghost, my + num_ghost                        
+                    do j=1 - num_ghost, my + num_ghost    
+                       if (is_ghost .and. geoclaw & 
+                               ghost_invalid(i,j,mx,my,nghost,mint)) then
+                            cycle
+                        endif
+
                         x = xlower + (i-0.5d0) * dx
                         y = ylower + (j-0.5d0) * dy
                         if (friction_regions(m)%lower(1) < x .and.   &
@@ -177,6 +187,21 @@ contains
         end if
 
     end subroutine set_friction_field
+
+    logical function geoclaw_ghost_invalid(i,j,mx,my,nghost,mint)
+        implicit none
+        integer, intent(in) :: i,j,nghost,mint,mx,my
+        logical :: inner, outer
+
+        inner = (i .gt. mint .and. i .lt. mx-mint+1) .and. &
+                (j .gt. mint .and. j .lt. my-mint+1)
+
+        outer = (i .lt. 1-nghost) .or. (i .gt. mx+nghost) .or. &
+                (j .lt. 1-nghost) .or. (j .gt. my+nghost)
+
+        ghost_invalid = (inner .or. outer)
+    end function ghost_invalid
+
 
 
     ! ==========================================================================
