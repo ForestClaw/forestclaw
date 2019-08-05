@@ -154,8 +154,8 @@ contains
             do m=1, num_friction_regions
                 do i=1 - num_ghost, mx + num_ghost
                     do j=1 - num_ghost, my + num_ghost    
-                       if (is_ghost .and. geoclaw & 
-                               ghost_invalid(i,j,mx,my,nghost,mint)) then
+                       if (is_ghost .and. & 
+                geoclaw_ghost_invalid(i,j,mx,my,nghost,mint)) then
                             cycle
                         endif
 
@@ -199,8 +199,8 @@ contains
         outer = (i .lt. 1-nghost) .or. (i .gt. mx+nghost) .or. &
                 (j .lt. 1-nghost) .or. (j .gt. my+nghost)
 
-        ghost_invalid = (inner .or. outer)
-    end function ghost_invalid
+        geoclaw_ghost_invalid = (inner .or. outer)
+    end function geoclaw_ghost_invalid
 
 
 
