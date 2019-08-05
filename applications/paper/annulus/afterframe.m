@@ -41,8 +41,8 @@ if (plot_path && example ~= 5)
     
     N = 128;
     th0 = linspace(0,2*pi,N+1);
-    x0 = rinit*cos(th) + pstart(1);
-    y0 = rinit*sin(th) + pstart(2);
+    x0 = rinit*cos(th0) + pstart(1);
+    y0 = rinit*sin(th0) + pstart(2);
 
     Y0 = pstart(:);
     [tout,yout] = ode45(@vel_ellipse,[0,tfinal],Y0);
