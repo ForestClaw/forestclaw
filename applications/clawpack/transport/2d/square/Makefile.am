@@ -24,8 +24,6 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/user_4.6/compute_error.f \
 	applications/clawpack/transport/2d/square/user_4.6/qinit.f \
 	applications/clawpack/transport/2d/square/user_4.6/square_setaux.f \
-	applications/clawpack/transport/2d/square/user_4.6/rpn2cons_fw.f \
-	applications/clawpack/transport/2d/square/user_4.6/rpt2cons.f \
 	applications/clawpack/transport/2d/square/user_4.6/rpn2cons_fw_manifold.f \
 	applications/clawpack/transport/2d/square/user_4.6/rpt2cons_manifold.f \
 	applications/clawpack/transport/2d/square/user_4.6/rpn2cons_update_manifold.f \
