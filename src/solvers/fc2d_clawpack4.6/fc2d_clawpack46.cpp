@@ -335,21 +335,20 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 
 	int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
-	double* work = new double[mwork];
+	double* work = FCLAW_ALLOC(double,mwork);
 
 	int size = meqn*(mx+2*mbc)*(my+2*mbc);
-	double* fp = new double[size];
-	double* fm = new double[size];
-	double* gp = new double[size];
-	double* gm = new double[size];
+	double* fp = FCLAW_ALLOC(double,size);
+	double* fm = FCLAW_ALLOC(double,size);
+	double* gp = FCLAW_ALLOC(double,size);
+	double* gm = FCLAW_ALLOC(double,size);
 
 	int ierror = 0;
 	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
 
-	const fc2d_clawpack46_options_t* clawpack_options = fc2d_clawpack46_options(glob);
 	if (claw46_vt->flux2 == NULL)
 	{
-		claw46_vt->flux2 = (clawpack_options->use_fwaves) ? &CLAWPACK46_FLUX2FW : 
+		claw46_vt->flux2 = (clawpack_options->use_fwaves != 0) ? &CLAWPACK46_FLUX2FW : 
 		                       &CLAWPACK46_FLUX2;	
 	}
 
@@ -380,12 +379,11 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	}		
 
 
-	delete [] fp;
-	delete [] fm;
-	delete [] gp;
-	delete [] gm;
-
-	delete [] work;
+	FCLAW_FREE(fp);
+	FCLAW_FREE(fm);
+	FCLAW_FREE(gp);
+	FCLAW_FREE(gm);
+	FCLAW_FREE(work);
 
 	return cflgrid;
 }
@@ -494,6 +492,10 @@ void fc2d_clawpack46_solver_initialize()
 	/* Wrappers so that user can change argument list */
 	claw46_vt->b4step2                       = clawpack46_b4step2;
 	claw46_vt->src2                          = clawpack46_src2;
+
+	/* This will either be user defined (for development purposes) or set before
+	   call to step2 */
+	// claw46_vt->flux2 = NULL; 
 
 	/* Required functions  - error if NULL */
 	claw46_vt->fort_bc2       = CLAWPACK46_BC2_DEFAULT;
