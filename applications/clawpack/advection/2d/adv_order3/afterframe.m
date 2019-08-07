@@ -8,9 +8,11 @@ if (mq == 1)
    cv([1 end]) = [];
    % drawcontourlines(cv);
    setcontourlineprops('linewidth',2);
+   c = max(abs([qmin,qmax]));
+   caxis([-1,1]*c);
 else
    c = max(abs([qmin,qmax]));
-   caxis([-c,c]);
+   caxis([-1,1]*c);
 end
 
 showpatchborders;
