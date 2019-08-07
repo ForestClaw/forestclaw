@@ -31,7 +31,7 @@ include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/solvers/fc2d_clawpack5/Makefile.am
 
 # Development projects
-include applications/development.apps
+# include applications/development.apps
 
 endif
 
