@@ -3,12 +3,6 @@
 ## standard distribution
 ## ------------------------------------------------------------------------
 
-## Third order scalar advection
-#include applications/clawpack/advection/2d/adv_order3/Makefile.am
-
-## Third order burgers
-include applications/clawpack/burgers/2d/burgers_order3/Makefile.am
-
 ## Shallow water on the sphere (D. Calhoun)
 #include applications/clawpack/shallow/2d/sphere/Makefile.am
 
@@ -36,6 +30,15 @@ include applications/clawpack/burgers/2d/burgers_order3/Makefile.am
 ## Conservative advection (transport) on a square
 include applications/clawpack/transport/2d/square/Makefile.am
 
+## -----------------------------------------------------------
+## Some third order examples
+## -----------------------------------------------------------
+
+## Burders
+include applications/clawpack/burgers/2d/burgers_order3/Makefile.am
+
+## Advection 
+include applications/clawpack/advection/2d/adv_order3/Makefile.am
 
 ## ---------------------------
 ## No solver
