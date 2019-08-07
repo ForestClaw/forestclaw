@@ -65,7 +65,9 @@ static void
                                double *xp, double *yp, double *zp)
 {
 
-    printf("The Cartesian map should not be used\n");
+    fclaw2d_global_essential("You are calling a mapping function but using the "\
+                             "''nomap'' map.  Use the ''identity''\n map if you "\
+                             "like to test mapping for the trivial case.");
     exit(0);
 }
 
