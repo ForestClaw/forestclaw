@@ -48,6 +48,8 @@ void square_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24.6f   %s",user->alpha,"\% alpha\n");
         fprintf(f,  "%-24.6f   %s",user->center[0],"\% x0\n");
         fprintf(f,  "%-24.6f   %s",user->center[1],"\% y0\n");
+        fprintf(f,  "%-24.6f   %s",user->velocity[0],"\% u\n");
+        fprintf(f,  "%-24.6f   %s",user->velocity[1],"\% v\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);

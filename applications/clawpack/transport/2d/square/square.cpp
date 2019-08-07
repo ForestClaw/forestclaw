@@ -105,9 +105,6 @@ void run_program(fclaw2d_global_t* glob)
        Run
        --------------------------------------------------------------- */
 
-    fc2d_clawpack46_options_t  *claw46_opt = fc2d_clawpack46_get_options(glob);
-    // claw46_opt->use_fwaves = 1;
-
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
     fclaw2d_finalize(glob);

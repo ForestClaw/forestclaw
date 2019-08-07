@@ -49,6 +49,10 @@ square_register (user_options_t *user, sc_options_t * opt)
                                     &user->center, 2, 
                                     "Center point for bilinear mapping  [0,0]");
 
+    fclaw_options_add_double_array (opt, 0, "velocity", &user->velocity_string, "1 1",
+                                    &user->velocity, 2, 
+                                    "Constant velocity for example 0  [1,1]");
+
     user->is_registered = 1;
 
     return NULL;
@@ -58,6 +62,7 @@ static fclaw_exit_type_t
 square_postprocess(user_options_t *user)
 {
     fclaw_options_convert_double_array(user->center_string, &user->center,2);
+    fclaw_options_convert_double_array(user->velocity_string, &user->velocity,2);
 
     return FCLAW_NOEXIT;
 }
@@ -73,6 +78,7 @@ square_check (user_options_t *user)
 static void
 square_destroy(user_options_t *user)
 {
+    fclaw_options_destroy_array (user->velocity);
     fclaw_options_destroy_array (user->center);
 }
 

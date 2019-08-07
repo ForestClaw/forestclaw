@@ -45,6 +45,9 @@ typedef struct user_options
 
     int initial_condition;  /* Smooth or non-smooth */
 
+    double *velocity;
+    const char *velocity_string;
+
     double *center;
     const char *center_string;
 

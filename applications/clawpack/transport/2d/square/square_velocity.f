@@ -33,6 +33,9 @@ c     # ------------------------------------------------------------
       integer example
       common /example_comm/ example  
 
+      double precision velocity(2)
+      common /velocity_comm/ velocity      
+
       double precision s, pim, u1x, u1y, u2x, u2y
       integer k
 
@@ -50,8 +53,8 @@ c     # uderivs(4) = u2y
 c     # Set non-zeros derivs only
       s = sqrt(2.d0)
       if (example .eq. 0) then
-         u(1) = 1
-         u(2) = 1
+         u(1) = velocity(1)
+         u(2) = velocity(2)
       elseif (example .eq. 1) then
 c        # No sonic points, i.e. velocity field > 0
          u(1) = s*(cos(pi*x)**2 + 0.5d0)         
@@ -64,25 +67,6 @@ c        # Velocity field crosses 0
          u(2) = s*(sin(pi*y)**2 - 0.5d0)
          u1x = -pi*s*sin(pi*x)
          u2y =  pi*s*cos(pi*y)
-      else if (example .ge. 3) then         
-c         u = 1
-c         u = s*(sin(pi*yc)**2 + 0.5d0)
-c         u = s*sin(pi*yc)
-
-c         v = 0
-c         v = -s*(sin(pi*xc)**2 + 0.5d0)
-c         v = s*sin(pi*xc)
-
-c         r = sqrt((x-0.5d0)**2 + (y-0.5d0)**2)
-
-c        # Rigid body rotation
-c        psi = r**2
-c         u(1) = 2*(yc-0.5)
-c         u(2) = -2*(xc-0.5)
- 
-c        # Filament formation (negative for clockwise rotation)
-c         psi = (4.d0/3.d0)*r**3
-
       else
          write(6,'(A,A)') 'clawpack46_setaux : ',
      &              'No valid example provided'

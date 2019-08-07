@@ -42,6 +42,7 @@ c                 # Discontinuous solution
               elseif (initchoice .eq. 2) then
                   q(i,j,1) = 1.d0
               elseif (initchoice .eq. 3) then
+c                 # Not sure what this one is about
                   if (fclaw2d_map_is_used(cont)) then
                       call fclaw2d_map_c2m(cont,
      &                           blockno,xc,yc,xp,yp,zp)
