@@ -349,7 +349,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	if (claw46_vt->flux2 == NULL)
 	{
 		claw46_vt->flux2 = (clawpack_options->use_fwaves != 0) ? &CLAWPACK46_FLUX2FW : 
-		                       &CLAWPACK46_FLUX2;	
+		&CLAWPACK46_FLUX2;	
 	}
 
 	/* NOTE: qold will be overwritten in this step */
@@ -492,10 +492,6 @@ void fc2d_clawpack46_solver_initialize()
 	/* Wrappers so that user can change argument list */
 	claw46_vt->b4step2                       = clawpack46_b4step2;
 	claw46_vt->src2                          = clawpack46_src2;
-
-	/* This will either be user defined (for development purposes) or set before
-	   call to step2 */
-	// claw46_vt->flux2 = NULL; 
 
 	/* Required functions  - error if NULL */
 	claw46_vt->fort_bc2       = CLAWPACK46_BC2_DEFAULT;

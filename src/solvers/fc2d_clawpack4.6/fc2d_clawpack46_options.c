@@ -99,14 +99,6 @@ clawpack46_check(fc2d_clawpack46_options_t *clawopt,
     clawopt->method[5] = clawopt->mcapa;
     clawopt->method[6] = clawpatch_opt->maux;
 
-#if 0
-    if (clawopt->use_fwaves)
-    {
-        fclaw_global_essentialf("clawpack46 : fwaves not yet implemented\n");
-        return FCLAW_EXIT_QUIET;
-    }
-#endif    
-
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
     {
         fclaw_global_essentialf("clawpack46 : bad maux/mcapa combination\n");
