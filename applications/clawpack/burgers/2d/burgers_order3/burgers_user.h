@@ -108,6 +108,16 @@ void PERIODIC_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
 void RPN2CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
                       double q[], double aux_center[], double aux_edge[], double flux[]);
 
+
+#define RPN2CONS_UPDATE_ORDER2 FCLAW_F77_FUNC(rpn2cons_update_order2, \
+                                              RPN2CONS_UPDATE_ORDER2)
+
+void RPN2CONS_UPDATE_ORDER2(const int* meqn, const int* maux, 
+                            const int* idir, const int* iface,
+                            double q[], double aux_center[], 
+                            double aux_edge[], double flux[]);
+
+
 #define CLAWPACK46_RPN2BU    FCLAW_F77_FUNC(clawpack46_rpn2bu,CLAWPACK46_RPN2BU)
 void CLAWPACK46_RPN2BU(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
                      const int* mbc,const int* mx, double ql[], double qr[],

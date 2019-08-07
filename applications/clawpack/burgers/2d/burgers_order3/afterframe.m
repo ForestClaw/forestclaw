@@ -31,7 +31,7 @@ elseif (PlotType == 4)
         end
     end
     
-    [amrdata_ref,tref] = readamrdata_forestclaw(2,Frame,'./fort_2nd_maxlevel6/');  
+    [amrdata_ref,tref] = readamrdata_forestclaw(2,Frame,'./fort_compare/');  
     lstyle = {'ro-','go-','bo-','mo-'};
     href = plotframe2ez(amrdata_ref,mq,lstyle,@map1d);
 end
