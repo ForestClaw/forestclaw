@@ -7,8 +7,9 @@ c    # -------------------------------------------------------------------------
 
       integer mx,my,mbc,meqn
       double precision dx, dy, dxdy
-      double precision sum(meqn)
+      double precision sum(meqn), c_kahan
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision c, t, y
 
       include 'metric_terms.i'
 
@@ -23,7 +24,11 @@ c    # -------------------------------------------------------------------------
          if (fclaw2d_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
-                  sum(m) = sum(m) + q(m,i,j)*area(i,j)
+                  y = q(i,j,m)*area(i,j) - c_kahan
+                  t = sum(m) + y
+                  c_kahan = (t-sum(m)) - y
+                  sum(m) = t
+c                  sum(m) = sum(m) + q(m,i,j)*area(i,j)
                enddo
             enddo
          else

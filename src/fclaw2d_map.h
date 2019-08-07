@@ -74,6 +74,15 @@ typedef void (*fclaw2d_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
                                    double xc, double yc,
                                    double *xp, double *yp, double *zp);
 
+
+
+/* Covariant and contravariant basis vectors needed for exact solution */
+typedef void (*fclaw2d_map_c2m_basis_t)(fclaw2d_map_context_t * cont, int blockno,
+                                        double xc, double yc, 
+                                        double *t, double *tinv, 
+                                        double *tderivs, int flag);
+
+
 /** Destructor for a fclaw2d_map_context.
  */
 typedef void (*fclaw2d_map_destroy_t) (fclaw2d_map_context_t * cont);
@@ -83,8 +92,9 @@ typedef void (*fclaw2d_map_destroy_t) (fclaw2d_map_context_t * cont);
  */
 struct fclaw2d_map_context
 {
-    fclaw2d_map_query_t query;
-    fclaw2d_map_c2m_t mapc2m;
+    fclaw2d_map_query_t       query;
+    fclaw2d_map_c2m_t         mapc2m;
+    fclaw2d_map_c2m_basis_t   basis;
     fclaw2d_map_destroy_t destroy;
     int user_int[16];
     double user_double[16];
@@ -143,6 +153,16 @@ void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** cont,
 void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
                       const double *xc, const double *yc,
                       double *xp, double *yp, double *zp);
+
+
+#define FCLAW2D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw2d_map_c2m_basis, \
+                                              FCLAW2D_MAP_C2M_BASIS)
+
+void FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont, int *blockno,
+                            const double *xc, const double *yc,
+                            double *t, double *tinv, double *tderivs,
+                            int * flag);
+
 
 #define FCLAW2D_MAP_BRICK2C FCLAW_F77_FUNC_(fclaw2d_map_brick2c,FCLAW2D_MAP_BRICK2C)
 

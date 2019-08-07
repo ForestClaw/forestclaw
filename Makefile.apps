@@ -47,7 +47,7 @@ include src/patches/clawpatch/Makefile.am
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 
 # Development projects
-include applications/paper.apps
+# include applications/paper.apps
 
 endif
 
@@ -79,10 +79,10 @@ endif
 if FCLAW_ENABLE_ASH3D
 
 ## Solver library
-include src/solvers/fc3d_ash3d/Makefile.am
+#include src/solvers/fc3d_ash3d/Makefile.am
 
 ## Applications
-include src/solvers/fc3d_ash3d/test_cases/ash3d.apps
+#include src/solvers/fc3d_ash3d/test_cases/ash3d.apps
 
 endif
 
@@ -93,10 +93,11 @@ if FCLAW_ENABLE_SWBLI
 
 ## Solver library
 include src/patches/clawpatch/Makefile.am
-include src/solvers/fc2d_swbli/Makefile.am
+
+#include src/solvers/fc2d_swbli/Makefile.am
 
 ## Applications
-include src/solvers/fc2d_swbli/examples/swbli/Makefile.am
+#include src/solvers/fc2d_swbli/examples/swbli/Makefile.am
 
 endif
 
@@ -107,16 +108,16 @@ endif
 if FCLAW_ENABLE_CUDACLAW
 
 ## Patches needed for Clawpack solvers
-include src/patches/clawpatch/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5/Makefile.am
-include src/solvers/fc2d_cudaclaw/Makefile.am
-
-include applications/clawpack/advection/2d/swirl_cuda/Makefile.am
-include applications/clawpack/shallow/2d/radialdam_cuda/Makefile.am
-include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am
-include applications/clawpack/euler/2d/shockbubble_cuda/Makefile.am
+#include src/solvers/fc2d_clawpack4.6/Makefile.am
+#include src/solvers/fc2d_clawpack5/Makefile.am
+#include src/solvers/fc2d_cudaclaw/Makefile.am
+#
+#include applications/clawpack/advection/2d/swirl_cuda/Makefile.am
+#include applications/clawpack/shallow/2d/radialdam_cuda/Makefile.am
+#include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am
+#include applications/clawpack/euler/2d/shockbubble_cuda/Makefile.am
 
 
 endif
