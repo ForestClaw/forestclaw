@@ -38,6 +38,7 @@ extern "C"
 #endif
 #endif
 
+/* ------------------------------------- Options ---------------------------------------*/
 typedef struct user_options
 {
     int example; 
@@ -50,17 +51,16 @@ typedef struct user_options
 
 } user_options_t;
 
-void periodic_link_solvers(fclaw2d_global_t *glob);
 
-void periodic_problem_setup(fclaw2d_global_t* glob);
-
-/* ------------------------------------- Options ---------------------------------------*/
-user_options_t* periodic_options_register (fclaw_app_t * app,
-                                        const char *configfile);
+user_options_t* periodic_options_register (fclaw_app_t * app, const char *configfile);
 
 void periodic_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* periodic_get_options(fclaw2d_global_t* glob);
+
+/* ------------------- Public functions defined in periodic_user -----------------------*/
+
+void periodic_link_solvers(fclaw2d_global_t *glob);
 
 /* ------------------------------------ Fortran ----------------------------------------*/
 #define PERIODIC_SETPROB FCLAW_F77_FUNC(periodic_setprob, PERIODIC_SETPROB)
@@ -68,16 +68,16 @@ void PERIODIC_SETPROB();
 
 #define PERIODIC_FLUX2 FCLAW_F77_FUNC(periodic_flux2,PERIODIC_FLUX2)
 void PERIODIC_FLUX2(const int* ixy,const int* maxm, const int* meqn,
-                      const int* maux,const int* mbc,const int* mx,
-                      double q1d[], double dtdx1d[],
-                      double aux1[], double aux2[], double aux3[],
-                      double faddm[],double faddp[], double gaddm[],
-                      double gaddp[],double cfl1d[], double fwave[],
-                      double s[], double amdq[],double apdq[],double cqxx[],
-                      double bmasdq[], double bpasdq[],
-                      clawpack46_fort_rpn2_t rpn2, clawpack46_fort_rpt2_t rpt2,
-                      const int* mwaves, const int* mcapa,
-                      int method[], int mthlim[]);
+                    const int* maux,const int* mbc,const int* mx,
+                    double q1d[], double dtdx1d[],
+                    double aux1[], double aux2[], double aux3[],
+                    double faddm[],double faddp[], double gaddm[],
+                    double gaddp[],double cfl1d[], double fwave[],
+                    double s[], double amdq[],double apdq[],double cqxx[],
+                    double bmasdq[], double bpasdq[],
+                    clawpack46_fort_rpn2_t rpn2, clawpack46_fort_rpt2_t rpt2,
+                    const int* mwaves, const int* mcapa,
+                    int method[], int mthlim[]);
 
 
 #define PERIODIC_FORT_INTERPOLATE2FINE FCLAW_F77_FUNC( \
@@ -146,7 +146,10 @@ void PERIODIC_FORT_HEADER_ASCII(char* matname1, char* matname2,
                                int* ngrids);
 
 
+/* ------------------------------- Other Fortran headers -------------------------------*/
 
+/* Other headers (e.g. clawpack46_rpn2, clawpack2_rpt2) are  provided by default in 
+   src/solvers/fc2d_clawpack4.6/clawpack46_fort_user.h */
 
 
 #ifdef __cplusplus

@@ -75,7 +75,7 @@ c
       elseif (example .eq. 2) then
           x0 = 0.5
           y0 = 0.5
-          r0 = 0.2
+          r0 = 0.2d0
           r = sqrt((x - x0)**2 + (y-y0)**2)
           q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
       endif
