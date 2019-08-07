@@ -1,3 +1,5 @@
+example = read_vars();
+
 s = 0.0;
 axis([-s 1+s -s 1+s])
 daspect([1 1 1]);
@@ -18,18 +20,16 @@ if (mq == 3)
     ca = [-max([qmin,qmax]),max([qmin,qmax])];
 else    
     % Plot the solution
-    ca = [0,5];
+    ca = [-0.3,1];
 end
 
 colormap(parula);
-colorbar;
 caxis(ca);
 
 showpatchborders;
 setpatchborderprops('linewidth',1);
 hidegridlines;
 
-example = 2;
 if (example == 0)
     hold on;
     refine_threshold = 0.005;
@@ -43,14 +43,13 @@ end
 view(2)
 
 % This is used for creating vectorized PDFs
-prt_tikz = false;
+prt_tikz = true;
 if (prt_tikz)
-    figsize = [64,64];  % Should match tikz figsize.
-    maxlevel = 8;
+    figsize = [8,8];  % Should match tikz figsize.
+    maxlevel = 7;
     dpi = mx*2^maxlevel/figsize(1);
     prefix = 'plot';    
-    % caxis([-1,1]*5e-6)
-    caxis(ca/10);
+    caxis([-0.3,1]);
     plot_tikz_fig(Frame,figsize,prefix,dpi);    
 end
 

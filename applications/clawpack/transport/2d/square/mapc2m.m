@@ -1,6 +1,6 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-[example,mapping,ic,alpha,center] = read_vars();
+[~,mapping,~,~,center] = read_vars();
 
 map_list = {'identity','cart','fivepatch','bilinear'};
 map = map_list{mapping+1};
@@ -47,7 +47,6 @@ switch map
         yp = yp/scale + shift(2);
         
     case 'bilinear'
-        center = load('center.dat');
         [xp,yp,~] = mapc2m_bilinear(xc,yc,center);
         xp = xp/scale + shift(1);
         yp = yp/scale + shift(2);
