@@ -349,7 +349,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	if (claw46_vt->flux2 == NULL)
 	{
 		claw46_vt->flux2 = (clawpack_options->use_fwaves != 0) ? &CLAWPACK46_FLUX2FW : 
-		&CLAWPACK46_FLUX2;	
+		                       &CLAWPACK46_FLUX2;	
 	}
 
 	/* NOTE: qold will be overwritten in this step */
