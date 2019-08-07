@@ -65,9 +65,9 @@ static void
                                double *xp, double *yp, double *zp)
 {
 
-    fclaw2d_global_essential("You are calling a mapping function but using the "\
-                             "''nomap'' map.  Use the ''identity''\n map if you "\
-                             "like to test mapping for the trivial case.");
+    fclaw_global_essentialf("You are calling a mapping function but using the "\
+                            "''nomap'' map.  Use the ''identity''\n map if you "\
+                            "like to test mapping for the trivial case.");
     exit(0);
 }
 
