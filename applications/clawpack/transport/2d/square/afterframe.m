@@ -18,7 +18,7 @@ if (mq == 3)
     ca = [-max([qmin,qmax]),max([qmin,qmax])];
 else    
     % Plot the solution
-    ca = [0,16];
+    ca = [0,5];
 end
 
 colormap(parula);
