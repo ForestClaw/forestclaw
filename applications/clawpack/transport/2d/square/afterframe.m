@@ -17,13 +17,17 @@ if (ShowUnderOverShoots == 1)
 end
 if (mq == 3)
     % Plot the error
-    ca = [-max([qmin,qmax]),max([qmin,qmax])];
+    c = max([qmin,qmax]);
+    ca = [-c,c];    
 else    
     % Plot the solution
     ca = [-0.3,1];
 end
 
 colormap(parula);
+if (mq == 3)
+    %colorbar
+end
 caxis(ca);
 
 showpatchborders;
@@ -32,9 +36,9 @@ hidegridlines;
 
 if (example == 0)
     hold on;
-    refine_threshold = 0.005;
+    refine_threshold = 0.5;
     u = 1;
-    v = 1;
+    v = 0.5;
     maxlevel = 5;  % Doesn't have to match true maxlevel
     plot_refine_contours(mx,maxlevel,t,u,v,refine_threshold);
     hold off;
@@ -43,7 +47,7 @@ end
 view(2)
 
 % This is used for creating vectorized PDFs
-prt_tikz = true;
+prt_tikz = false;
 if (prt_tikz)
     figsize = [8,8];  % Should match tikz figsize.
     maxlevel = 7;

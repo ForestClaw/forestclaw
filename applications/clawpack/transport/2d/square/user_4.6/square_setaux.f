@@ -61,6 +61,9 @@ c           # x-face and y-face edge lengths (6,7)
       double precision dx,dy, xlower,ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
+      integer mapping
+      common /mapping_comm/ mapping
+
       double precision xc,yc
       double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, map_dot
 
@@ -84,9 +87,15 @@ c     # Cell-centered velocities : entries (4,5,6)
 
 c           # This is not the square mapping, but rather maps the brick to
 c           # a unit square      
-            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-
-            call square_center_velocity(blockno, xc1,yc1,vel)
+            if (mapping .eq. 0) then
+                call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+                call square_center_velocity(blockno, xc1,yc1,vel)
+            elseif (mapping .eq. 1) then
+c               # Cart mapping              
+            elseif (mapping .eq. 2) then
+c               # Five-patch mapping              
+                call square_center_velocity(blockno, xc,yc,vel)
+            endif
 
 c           # subtract out normal components
             do k = 1,3

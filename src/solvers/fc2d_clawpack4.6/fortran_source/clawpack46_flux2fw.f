@@ -129,7 +129,7 @@ c
      &          aux2,aux2,fwave,s,amdq,apdq)
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
-      do 40 i=1,mx+1
+      do 40 i=2-mbc,mx+mbc-1
          do 40 m=1,meqn
             faddp(i,m) = faddp(i,m) - apdq(i,m)
             faddm(i,m) = faddm(i,m) + amdq(i,m)
@@ -154,7 +154,7 @@ c     # apply limiter to fwaves:
       if (limit) call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
      &      fwave,s,mthlim)
 c
-      do 120 i = 1, mx+1
+      do 120 i = 2-mbc, mx+mbc-1
 c
 c        # For correction terms below, need average of dtdx in cell
 c        # i-1 and i.  Compute these and overwrite dtdx1d:
@@ -181,7 +181,7 @@ c
 c
        if (method(3).eq.2) then
 c         # incorporate cqxx into amdq and apdq so that it is split also.
-          do 150 i = 1, mx+1
+          do 150 i = 2-mbc, mx+mbc-1
              do 150 m=1,meqn
                 amdq(i,m) = amdq(i,m) + cqxx(i,m)
                 apdq(i,m) = apdq(i,m) - cqxx(i,m)
@@ -200,7 +200,7 @@ c     # split the left-going flux difference into down-going and up-going:
 c
 c     # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
       do 160 m=1,meqn
-          do 160 i = 1, mx+1
+          do 160 i = 2-mbc, mx+mbc
                gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(i,m)
                gaddm(i-1,m,1) = gaddm(i-1,m,1) - gupdate
                gaddp(i-1,m,1) = gaddp(i-1,m,1) - gupdate
@@ -217,7 +217,7 @@ c     # split the right-going flux difference into down-going and up-going:
 c
 c     # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
       do 180 m=1,meqn
-          do 180 i = 1, mx+1
+          do 180 i = 2-mbc, mx+mbc
                gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(i,m)
                gaddm(i,m,1) = gaddm(i,m,1) - gupdate
                gaddp(i,m,1) = gaddp(i,m,1) - gupdate

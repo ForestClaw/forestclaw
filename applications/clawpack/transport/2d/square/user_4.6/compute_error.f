@@ -10,6 +10,9 @@
 
       integer*8 cont, get_context
 
+      integer mapping
+      common /mapping_comm/ mapping
+
       integer i,j,m
       double precision xc,yc, qexact
       double precision xc1, yc1, zc1, x,y
@@ -25,10 +28,16 @@ c     # Assume a single field variable only
             if (t .eq. 0) then
                soln(i,j,1) = q(i,j,1)
             else
-               call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-               soln(i,j,1) = qexact(blockno,x,y,t)
+               if (mapping .le. 1) then
+                  call fclaw2d_map_brick2c(cont,blockno,xc,yc,
+     &                   xc1,yc1,zc1)
+               else
+                  xc1 = xc
+                  yc1 = yc
+               endif
+               soln(i,j,1) = qexact(blockno,xc1,yc1,t)
             endif
-            error(i,j,1) = q(i,j,1) - soln(i,j,1)            
+            error(i,j,1) = q(i,j,1) - soln(i,j,1)
          enddo
       enddo
 

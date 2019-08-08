@@ -23,11 +23,14 @@ c     # --------------------------------------------------------
       external map_rhs_divfree, map_rhs_nondivfree
       external solout
 
+      integer mapping
+      common /mapping_comm/ mapping
+
       double precision x,y,tfinal
       integer blockno
 
       double precision xc0, yc0
-      double precision xc1, yc1
+c      double precision xc1, yc1
 
 c      integer blockno_dummy
       double precision t0
@@ -78,7 +81,8 @@ c     # Initial conditions for ODE
 
       ipar(1) = blockno
 
-      call dopri5(2,map_rhs_nondivfree,t0,sigma,tfinal,
+c     # This traces the velocity field back to the origin.
+      call dopri5(2,map_rhs_divfree,t0,sigma,tfinal,
      &            rtol,atol,itol,
      &            solout,iout, work,lwork,iwork,liwork,
      &            rpar,ipar,idid)
@@ -92,19 +96,24 @@ c     # Initial position traced back from (xc1,yc1)
       xc0 = sigma(1)
       yc0 = sigma(2)
 
-c     # Map to [-1,1]x[-1,1]      
-      call mapc2m_cart(blockno,xc0,yc0,xc1,yc1,zp)
-
-c     # Map to [0,1]x[0,1]      
-c      xp = (1 + xc0)/2.d0
-c      yp = (1 + yc0)/2.d0
-      xp = xc0
-      yp = yc0
+      if (mapping .eq. 0) then
+        xp = xc0
+        yp = yc0
+        zp = 0
+      elseif (mapping .eq. 1) then
+         write(6,*) 'qexact : Cartesian map'
+         stop
+      elseif (mapping .eq. 2) then
+c        # Five patch        
+         call fclaw2d_map_c2m(cont,
+     &         blockno,xc0,yc0,xp,yp,zp)        
+      endif
 
       q0 = q0_physical(xp,yp,zp)
       
-      evolve_q = .true.
+      evolve_q = .false.
       if (evolve_q) then
+c         # Variable coefficient case        
 c         # We now need to evolve q along with (x,y), starting from
 c         # from (xc0,yc0)
           sigma(1) = xc0

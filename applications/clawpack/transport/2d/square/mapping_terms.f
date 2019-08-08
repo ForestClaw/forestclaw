@@ -158,5 +158,43 @@ c     # ----------------------------------------------------------------
 
 
 
+      subroutine map_contravariant(t,tinv)
+      implicit none
+
+      double precision t(3,2), tinv(3,2)
+
+      double precision t1(3), t2(3)
+      integer k
+
+      double precision a11, a22, a12, a21, det, map_dot
+      double precision a11inv, a22inv, a12inv, a21inv
+
+      do k = 1,3
+          t1(k) = t(k,1)
+          t2(k) = t(k,2)
+      enddo
+
+c     # Compute grad psi(xi,eta) 
+      a11 = map_dot(t1,t1)
+      a22 = map_dot(t2,t2)
+      a12 = map_dot(t1,t2)
+      a21 = a12
+
+c     # Determinant
+      det = a11*a22 - a12*a21
+
+c     # Contravariant vectors
+      a11inv = a22/det
+      a22inv = a11/det
+      a12inv = -a12/det
+      a21inv = -a21/det     
+      do k = 1,3
+        tinv(k,1) = a11inv*t(k,1) + a12inv*t(k,2)
+        tinv(k,2) = a21inv*t(k,1) + a22inv*t(k,2)
+      end do
+
+      end
+
+
 
 

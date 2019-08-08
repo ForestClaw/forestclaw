@@ -59,14 +59,14 @@ c     # Set non-zeros derivs only
 c        # No sonic points, i.e. velocity field > 0
          u(1) = s*(cos(pi*x)**2 + 0.5d0)         
          u(2) = s*(sin(pi*y)**2 + 0.5d0)
-         u1x = -pi*s*sin(pi*x)
-         u2y =  pi*s*cos(pi*y)
+         u1x = -2*pi*s*cos(pi*x)*sin(pi*x)
+         u2y =  2*pi*s*sin(pi*y)*cos(pi*y)
       elseif (example .eq. 2) then
 c        # Velocity field crosses 0
          u(1) = s*(cos(pi*x)**2 - 0.5d0)
          u(2) = s*(sin(pi*y)**2 - 0.5d0)
-         u1x = -pi*s*sin(pi*x)
-         u2y =  pi*s*cos(pi*y)
+         u1x = -2*pi*s*cos(pi*x)*sin(pi*x)
+         u2y =  2*pi*s*sin(pi*y)*cos(pi*y)
       else
          write(6,'(A,A)') 'clawpack46_setaux : ',
      &              'No valid example provided'
@@ -101,12 +101,15 @@ c     # ------------------------------------------------------------
 
 c     # Vector field defined as u1*tau1 + u2*tau2    
 
-      call map_covariant_basis(blockno, x, y, t1,t2)
+c      call map_covariant_basis(blockno, x, y, t1,t2)
       call velocity_components(blockno, x,y,u)
 
-      do k = 1,3
-        vel(k) = u(1)*t1(k) + u(2)*t2(k)
+
+c     # Velocities are all given in terms of Cartesian components   
+      do k = 1,2
+        vel(k) = u(k)
       enddo
+      vel(3) = 0
         
       end
 
