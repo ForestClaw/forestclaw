@@ -26,6 +26,9 @@ c     # --------------------------------------------------------
       integer mapping
       common /mapping_comm/ mapping
 
+      integer example
+      common /example_comm/ example
+
       double precision x,y,tfinal
       integer blockno
 
@@ -105,13 +108,21 @@ c     # Initial position traced back from (xc1,yc1)
          stop
       elseif (mapping .eq. 2) then
 c        # Five patch        
-         call fclaw2d_map_c2m(cont,
-     &         blockno,xc0,yc0,xp,yp,zp)        
+c         call fclaw2d_map_c2m(cont,
+c     &         blockno,xc0,yc0,xp,yp,zp)        
       endif
+      xp = xc0
+      yp = yc0
+      zp = 0
 
       q0 = q0_physical(xp,yp,zp)
       
-      evolve_q = .false.
+c     # Evolve q along characteristics for variable coefficient case      
+      if (example .eq. 0) then
+           evolve_q = .false.
+      else
+           evolve_q = .true.
+      endif
       if (evolve_q) then
 c         # Variable coefficient case        
 c         # We now need to evolve q along with (x,y), starting from

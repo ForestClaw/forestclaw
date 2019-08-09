@@ -14,9 +14,7 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/setprob.f \
 	applications/clawpack/transport/2d/square/q0.f \
 	applications/clawpack/transport/2d/square/fdisc.f \
-	applications/clawpack/transport/2d/square/cart_basis.f \
-	applications/clawpack/transport/2d/square/fivepatch_basis.f \
-	applications/clawpack/transport/2d/square/identity_basis.f \
+	applications/clawpack/transport/2d/square/square_basis.f \
 	applications/clawpack/transport/2d/square/mapping_terms.f \
 	applications/clawpack/transport/2d/square/square_velocity.f \
 	applications/clawpack/transport/2d/square/qexact.f \

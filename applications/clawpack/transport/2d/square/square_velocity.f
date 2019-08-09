@@ -1,9 +1,8 @@
 c     # ------------------------------------------------------------
-c     # Streamfunction, velocity components and derivatives
+c     # Prescribes velocity fields for the unit square ([0.1]x[0,1]).
 c     # 
-c     # Stream function depends on these global variables
-c     #         example (0=incompressible; 1=compressible)
-c     #         mapping (0=swirl; 1=twisted swirl)
+c     # Assumes all components are given in coordinates relative to 
+c     # the standard basis (1,0) and (0,1). 
 c     # ------------------------------------------------------------
 
 
@@ -68,7 +67,7 @@ c        # Velocity field crosses 0
          u1x = -2*pi*s*cos(pi*x)*sin(pi*x)
          u2y =  2*pi*s*sin(pi*y)*cos(pi*y)
       else
-         write(6,'(A,A)') 'clawpack46_setaux : ',
+         write(6,'(A,A)') 'square_velocity : ',
      &              'No valid example provided'
          stop
       endif
@@ -102,6 +101,8 @@ c     # ------------------------------------------------------------
 c     # Vector field defined as u1*tau1 + u2*tau2    
 
 c      call map_covariant_basis(blockno, x, y, t1,t2)
+
+c     # Velocity components are given in Cartesian components
       call velocity_components(blockno, x,y,u)
 
 

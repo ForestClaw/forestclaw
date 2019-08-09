@@ -10,10 +10,10 @@ extern "C"
 #endif
 #endif
 
-#define FIVEPATCH_BASIS_COMPLETE FCLAW_F77_FUNC(fivepatch_basis_complete, \
-                            FIVEPATCH_BASIS_COMPLETE)
+#define SQUARE_BASIS_COMPLETE FCLAW_F77_FUNC(square_basis_complete, \
+                            SQUARE_BASIS_COMPLETE)
 
-void FIVEPATCH_BASIS_COMPLETE(const int* blockno, const double* x, const double *y,
+void SQUARE_BASIS_COMPLETE(const int* blockno, const double* x, const double *y,
                               double t[], double tinv[], double uderivs[], 
                               const int* flag);
 
@@ -72,7 +72,12 @@ fclaw2d_map_c2m_basis_fivepatch(fclaw2d_map_context_t * cont, int blockno,
                                double *t, double *tinv, 
                                double *tderivs, int flag)
 {
-    FIVEPATCH_BASIS_COMPLETE(&blockno, &xc,&yc, t, tinv, tderivs, &flag);
+
+    /* Get physical coordinates in unit square */
+    double xc1, yc1, zc1;
+    cont->mapc2m(cont,blockno,xc,yc,&xc1,&yc1,&zc1);
+    
+    SQUARE_BASIS_COMPLETE(&blockno, &xc1,&yc1, t, tinv, tderivs, &flag);
 }
 
 

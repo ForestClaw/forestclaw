@@ -28,13 +28,14 @@ c     # Assume a single field variable only
             if (t .eq. 0) then
                soln(i,j,1) = q(i,j,1)
             else
-               if (mapping .le. 1) then
-                  call fclaw2d_map_brick2c(cont,blockno,xc,yc,
-     &                   xc1,yc1,zc1)
-               else
-                  xc1 = xc
-                  yc1 = yc
-               endif
+c              # Map computational coordinates to unit square               
+               call fclaw2d_map_c2m(cont,blockno,xc,yc,
+     &                              xc1,yc1,zc1)
+c               if (mapping .le. 1) then
+c                  call fclaw2d_map_brick2c(cont,blockno,xc,yc,
+c     &                   xc1,yc1,zc1)
+c               else
+c               endif
                soln(i,j,1) = qexact(blockno,xc1,yc1,t)
             endif
             error(i,j,1) = q(i,j,1) - soln(i,j,1)

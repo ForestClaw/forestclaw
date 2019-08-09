@@ -12,6 +12,12 @@ extern "C"
 #endif
 #endif
 
+#define SQUARE_BASIS_COMPLETE FCLAW_F77_FUNC(square_basis_complete, SQUARE_BASIS_COMPLETE)
+
+void SQUARE_BASIS_COMPLETE(const int* blockno, const double* x, const double *y,
+                          double t[], double tinv[], double uderivs[], 
+                          const int* flag);
+
 static int
 fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -71,7 +77,7 @@ fclaw2d_map_c2m_basis_cart(fclaw2d_map_context_t * cont, int blockno,
     double xc1, yc1, zc1;
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-    CART_BASIS_COMPLETE(&blockno, &xc1,&yc1, t, tinv, tderivs, &flag);
+    SQUARE_BASIS_COMPLETE(&blockno, &xc1,&yc1, t, tinv, tderivs, &flag);
 }
 
 

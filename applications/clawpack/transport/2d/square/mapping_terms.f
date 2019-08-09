@@ -2,11 +2,11 @@ c     # ------------------------------------------------------------
 c     # 
 c     # Mapping terms needed to compute exact solution
 c     # 
-c     # NOTE: All arguments to routines here should be in computational 
-c     # coordinates (x,y) in [0,1]x[0,1].  Mapping from brick domains
-c     # to [0,1]x[0,1] should be done from calling routines, as should 
-c     # any mappings that convert from an orthogonal coordinate system
-c     # to a non-orthogonal system.
+c     # These routines all rely on a basis function that returns 
+c     # covariant and contravariant vectors for the domain.  For 
+c     # example, the square domain uses basis vectors (1,0) and (0,1).
+c     # whereas the annular domain uses the usual polar coordinate basis
+c     # vectors.
 c     # ------------------------------------------------------------
 
 
@@ -157,7 +157,8 @@ c     # ----------------------------------------------------------------
       end
 
 
-
+c     # Compute contravariant basis vectors from the 
+c     # covariant basis.
       subroutine map_contravariant(t,tinv)
       implicit none
 
