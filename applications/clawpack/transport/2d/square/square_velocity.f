@@ -6,24 +6,22 @@ c     # the standard basis (1,0) and (0,1).
 c     # ------------------------------------------------------------
 
 
-      subroutine velocity_components(blockno,x,y,u)
+      subroutine velocity_components(x,y,u)
       implicit none
 
       double precision x, y, u(2)
-      integer blockno
       double precision uderivs(4)
 
       double precision s
 
-      call velocity_derivs(blockno, x,y,u,uderivs)
+      call velocity_derivs(x,y,u,uderivs)
 
       end
 
-      subroutine velocity_derivs(blockno,x,y,u,uderivs)
+      subroutine velocity_derivs(x,y,u,uderivs)
       implicit none
 
       double precision x, y, u(2)
-      integer blockno
       double precision uderivs(4)
 
       double precision pi, pi2
@@ -83,11 +81,10 @@ c        # Velocity field crosses 0
 c     # ------------------------------------------------------------
 c     # Center : u = u1*tau1 + u2*tau2   (div u might not be zero)
 c     # ------------------------------------------------------------
-      subroutine square_center_velocity(blockno, x,y,vel)
+      subroutine square_center_velocity(x,y,vel)
       implicit none
 
       double precision x,y,vel(3)
-      integer blockno
 
       double precision t1(3), t2(3)
       double precision t1inv(3), t2inv(3)
@@ -98,12 +95,8 @@ c     # ------------------------------------------------------------
 
       integer k
 
-c     # Vector field defined as u1*tau1 + u2*tau2    
-
-c      call map_covariant_basis(blockno, x, y, t1,t2)
-
 c     # Velocity components are given in Cartesian components
-      call velocity_components(blockno, x,y,u)
+      call velocity_components(x,y,u)
 
 
 c     # Velocities are all given in terms of Cartesian components   

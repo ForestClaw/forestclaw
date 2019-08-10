@@ -12,11 +12,12 @@ extern "C"
 #endif
 #endif
 
-#define SQUARE_BASIS_COMPLETE FCLAW_F77_FUNC(square_basis_complete, SQUARE_BASIS_COMPLETE)
+#define SQUARE_BASIS_COMPLETE FCLAW_F77_FUNC(square_basis_complete, \
+                                             SQUARE_BASIS_COMPLETE)
 
-void SQUARE_BASIS_COMPLETE(const int* blockno, const double* x, const double *y,
-                          double t[], double tinv[], double uderivs[], 
-                          const int* flag);
+void SQUARE_BASIS_COMPLETE(const double* x, const double *y,
+                           double t[], double tinv[], double uderivs[], 
+                           const int* flag);
 
 static int
 fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
@@ -68,16 +69,14 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
-fclaw2d_map_c2m_basis_cart(fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_basis_cart(fclaw2d_map_context_t * cont,
                            double xc, double yc, 
                            double *t, double *tinv, 
                            double *tderivs, int flag)
 {
-    /* Brick mapping to computational coordinates [0,1]x[0,1] */
-    double xc1, yc1, zc1;
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
-
-    SQUARE_BASIS_COMPLETE(&blockno, &xc1,&yc1, t, tinv, tderivs, &flag);
+    /* Mapping must work for single Cartesian grid.   
+       [xc,yc] \in [0,1]x[0,1] */
+    SQUARE_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
 }
 
 

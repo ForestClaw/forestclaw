@@ -1,9 +1,9 @@
-      subroutine identity_basis_complete(blockno, x,y, t, 
+      subroutine identity_basis_complete(x,y, t, 
      &                                   tinv,tderivs, flag)
       implicit none
       
       double precision x,y 
-      integer flag, blockno
+      integer flag
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
 
       integer k, kk, i

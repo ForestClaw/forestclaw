@@ -17,7 +17,7 @@ c     # location (x0,y0), and then evolve x, y and q from
 c     # the starting location back to final position.
 c     # --------------------------------------------------------
 
-      double precision function qexact(blockno, x,y,tfinal)
+      double precision function qexact(x,y,tfinal)
       implicit none
 
       external map_rhs_divfree, map_rhs_nondivfree
@@ -82,7 +82,6 @@ c     # Initial conditions for ODE
       sigma(1) = x
       sigma(2) = y
 
-      ipar(1) = blockno
 
 c     # This traces the velocity field back to the origin.
       call dopri5(2,map_rhs_divfree,t0,sigma,tfinal,
@@ -99,18 +98,8 @@ c     # Initial position traced back from (xc1,yc1)
       xc0 = sigma(1)
       yc0 = sigma(2)
 
-      if (mapping .eq. 0) then
-        xp = xc0
-        yp = yc0
-        zp = 0
-      elseif (mapping .eq. 1) then
-         write(6,*) 'qexact : Cartesian map'
-         stop
-      elseif (mapping .eq. 2) then
-c        # Five patch        
-c         call fclaw2d_map_c2m(cont,
-c     &         blockno,xc0,yc0,xp,yp,zp)        
-      endif
+c     # Our physical domain is a unit square, which is the same
+c     # as our computational domain
       xp = xc0
       yp = yc0
       zp = 0
@@ -202,14 +191,12 @@ c     # ----------------------------------------------------------------
       double precision p, px, py
       double precision t1(3), t2(3), t1xt2(3), w
       double precision u(2)
-      integer blockno
 
       x = sigma(1)
       y = sigma(2)
 
-      blockno = ipar(1)
 
-      call velocity_components(blockno,x,y,u)
+      call velocity_components(x,y,u)
 
 c     # We are tracing these back, so use negative velocities        
       f(1) = -u(1)
@@ -230,7 +217,6 @@ c     # We are tracing these back, so use negative velocities
 
       double precision t1(3), t2(3), t1xt2(3), w
       double precision p,px,py
-      integer blockno
 
 c     # Track evolution of these three quantities
 
@@ -238,11 +224,9 @@ c     # Track evolution of these three quantities
       y = sigma(2)
       q = sigma(3)
 
-      blockno = ipar(1)
+      call velocity_components(x,y,u)
 
-      call velocity_components(blockno, x,y,u)
-
-      divu = map_divergence(blockno, x,y)
+      divu = map_divergence(x,y)
 
       f(1) = u(1)
       f(2) = u(2)
