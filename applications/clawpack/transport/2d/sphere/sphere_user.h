@@ -42,6 +42,9 @@ typedef struct user_options
     int mapping;
     int initial_condition;
 
+    double *omega;
+    const char* omega_string;
+
     double kappa;
     double period;     /* formerly tfinal */
 
@@ -159,7 +162,6 @@ void SPHERE_FORT_HEADER_ASCII(char* matname1, char* matname2,
                                int* ngrids);
 
 
-#if 0
 #define SPHERE_TAG4REFINEMENT FCLAW_F77_FUNC(sphere_tag4refinement, \
                                               SPHERE_TAG4REFINEMENT)
 void  SPHERE_TAG4REFINEMENT(const int* mx,const int* my,
@@ -167,11 +169,10 @@ void  SPHERE_TAG4REFINEMENT(const int* mx,const int* my,
                              const double* xlower, const double* ylower,
                              const double* dx, const double* dy,
                              const int* blockno,
-                             double q[],
+                             double q[], double curvature[],
                              const double* tag_threshold,
                              const int* init_flag,
                              int* tag_patch);
-
 
 #define  SPHERE_TAG4COARSENING FCLAW_F77_FUNC(sphere_tag4coarsening, \
                                               SPHERE_TAG4COARSENING)
@@ -182,9 +183,11 @@ void  SPHERE_TAG4COARSENING(const int* mx, const int* my,
                              const int* blockno,
                              double q0[],double q1[],
                              double q2[],double q3[],
+                             double c0[],double c1[],
+                             double c2[],double c3[],
                              const double* tag_threshold,
                              int* tag_patch);
-#endif
+
 
 #ifdef __cplusplus
 #if 0

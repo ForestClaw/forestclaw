@@ -8,8 +8,9 @@ c     # fclaw2d_fort_average2coarse
 c     # --------------------------------------------
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine clawpack46_tag4coarsening(mx,my,mbc,meqn,
+      subroutine sphere_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
+     &      c0, c1, c2, c3,
      &      coarsen_threshold, tag_patch)
       implicit none
 
@@ -21,6 +22,12 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       double precision q1(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision q2(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision q3(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      double precision   c0(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   c1(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   c2(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision   c3(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
 
       integer i,j, mq
       double precision qmin, qmax
@@ -36,24 +43,24 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call user_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
+      call user_get_minmax(mx,my,mbc,meqn,mq,q0,c0,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call user_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
+      call user_get_minmax(mx,my,mbc,meqn,mq,q1,c1,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call user_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
+      call user_get_minmax(mx,my,mbc,meqn,mq,q2,c2,qmin,qmax,
      &      coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call user_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
+      call user_get_minmax(mx,my,mbc,meqn,mq,q3,c3,qmin,qmax,
      &      coarsen_threshold,tag_patch)
 
       end
 
-      subroutine user_get_minmax(mx,my,mbc,meqn,mq,q,
+      subroutine user_get_minmax(mx,my,mbc,meqn,mq,q,curvature,
      &      qmin,qmax,tag_threshold,tag_patch)
 
       implicit none
@@ -61,6 +68,7 @@ c     # not be coarsened.
       double precision tag_threshold
       double precision qmin,qmax
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision curvature(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer initchoice
       common /initchoice_comm/ initchoice
@@ -69,33 +77,20 @@ c     # not be coarsened.
       common /example_comm/ example
 
       logical refine
-
+      double precision refine_curvature
 
       integer i,j
 
+      refine_curvature = tag_threshold
+
+
       do i = 1,mx
          do j = 1,my
-            qmin = min(q(i,j,mq),qmin)
-            qmax = max(q(i,j,mq),qmax)
-            if (initchoice .le. 1) then
-               if (example .eq. 0) then
-                   refine = q(i,j,mq) .gt. tag_threshold .and. 
-     &                q(i,j,mq) .lt. 1-tag_threshold
-               else
-                    refine = q(i,j,mq) .gt. tag_threshold
-               endif
-            elseif (initchoice .eq. 2) then
-                refine = q(i,j,mq) .gt.  tag_threshold              
-            else                
-                write(6,'(A,A)') 'Refining not yet defined for ',
-     &                  'example > 0'
-                stop
-            endif
-            if (refine) then
-c               # Criteria for coarsening not satisfied.
-                tag_patch = 0
-                return
-            endif
+             if (abs(curvature(i,j)-1) .gt. 
+     &           refine_curvature) then
+                 tag_patch = 0
+                 return
+             endif
          enddo
       enddo
 

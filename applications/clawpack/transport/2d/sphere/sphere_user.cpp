@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
 
+#include <fclaw2d_block.h>
+
 static
 void sphere_problem_setup(fclaw2d_global_t* glob)
 {
@@ -47,12 +49,13 @@ void sphere_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24d   %s",user->initial_condition,"\% initial_condition\n");
         fprintf(f,  "%-24.16f   %s",user->kappa,"\% kappa\n");
         fprintf(f,  "%-24.16f   %s",user->period,"\% period\n");
+        fprintf(f,  "%-24.16f   %s",user->omega[0],"\% omega[0]\n");
+        fprintf(f,  "%-24.16f   %s",user->omega[1],"\% omega[1]\n");
+        fprintf(f,  "%-24.16f   %s",user->omega[2],"\% omega[2]\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
     SPHERE_SETPROB();
-
-
 }
 
 void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
@@ -88,6 +91,104 @@ void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
     SPHERE_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
                   &dx,&dy, &t, area, edgelengths,xnormals,ynormals,
                   surfnormals, aux, &maux);
+}
+
+
+static
+int sphere_tag4refinement(fclaw2d_global_t *glob,
+                          fclaw2d_patch_t *patch,
+                          int blockno, int patchno,
+                          int initflag)
+{
+    //fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+
+
+    int mx,my,mbc;
+    double xlower, ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double refine_threshold = fclaw_opt->refine_threshold;
+
+    double *area, *edgelengths, *curvature;
+    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
+                                    &curvature);
+
+    int tag_patch = 0;
+#if 0
+    //int *corner_count = fclaw2d_patch_block_corner_count(glob,patch);
+
+    int intersects_block[4];
+    fclaw2d_block_get_block_boundary(glob, patch, intersects_block);
+    int block_edge = 0;
+    for(int k = 0; k < 4; k++)
+    {
+        if (intersects_block[k] == 1)
+        {
+            block_edge = 1;
+            break;
+        }
+    }
+    if (block_edge)
+    {
+        tag_patch = 1;
+    }
+#endif
+    SPHERE_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                          &blockno, q, curvature, &refine_threshold,
+                          &initflag,&tag_patch);
+    return tag_patch;
+}
+
+static
+int sphere_tag4coarsening(fclaw2d_global_t *glob,
+                          fclaw2d_patch_t *fine_patches,
+                          int blockno,
+                          int patchno)
+{
+    //fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+
+    int tag_patch,igrid;
+    fclaw2d_patch_t *patch0;
+
+    patch0 = &fine_patches[0];
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double coarsen_threshold = fclaw_opt->coarsen_threshold;
+
+    int mx,my,mbc,meqn;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *c[4], *q[4];
+    for (igrid = 0; igrid < 4; igrid++)
+    {
+        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+
+        double *area, *edgelengths;
+        fclaw2d_clawpatch_metric_scalar(glob, &fine_patches[igrid],
+                                        &area,&edgelengths,
+                                        &c[igrid]);
+
+    }
+
+    tag_patch = 0;
+#if 0    
+    SPHERE_TAG4COARSENING(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                          &blockno, 
+                          q[0],q[1],q[2],q[3],
+                          c[0],c[1],c[2],c[3],
+                          &coarsen_threshold,&tag_patch);
+#endif                          
+    return tag_patch == 1;
 }
 
 
@@ -165,6 +266,8 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
 
     fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
     patch_vt->setup   = &sphere_patch_setup_manifold;
+    patch_vt->tag4refinement = sphere_tag4refinement;
+    patch_vt->tag4coarsening = sphere_tag4coarsening;
 
     fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
     clawpack46_vt->b4step2        = sphere_b4step2;
@@ -176,8 +279,8 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     /* Clawpatch functions */
     //const user_options_t* user = sphere_get_options(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;        
+    // clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+    //clawpatch_vt->fort_tag4coarsening = &SPHERE_TAG4COARSENING;        
 
     /* Include error in output files */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);

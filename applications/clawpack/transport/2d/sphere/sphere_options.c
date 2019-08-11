@@ -48,6 +48,9 @@ sphere_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "period", &user->period, 0.4,
                            "[user] Period (set to tfinal) [0.4]");
 
+    fclaw_options_add_double_array (opt, 0, "omega", &user->omega_string, "0 0 1",
+                                    &user->omega, 3, 
+                                    "Axis of rotation (example 0)  [0,0,1]");
 
     user->is_registered = 1;
 
@@ -57,6 +60,7 @@ sphere_register (user_options_t *user, sc_options_t * opt)
 static fclaw_exit_type_t
 sphere_postprocess(user_options_t *user)
 {
+    fclaw_options_convert_double_array(user->omega_string, &user->omega,3);
     return FCLAW_NOEXIT;
 }
 
@@ -71,6 +75,7 @@ sphere_check (user_options_t *user)
 static void
 sphere_destroy(user_options_t *user)
 {
+    fclaw_options_destroy_array (user->omega);
 }
 
 /* ------- Generic option handling routines that call above routines ----- */

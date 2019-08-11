@@ -7,6 +7,12 @@ c     # covariant and contravariant vectors for the domain.  For
 c     # example, the square domain uses basis vectors (1,0) and (0,1).
 c     # whereas the annular domain uses the usual polar coordinate basis
 c     # vectors.
+c     # 
+c     # NOTE : The blockno should only be used if the underlying domain
+c     # cannot be described by a single Cartesian domain.  The 
+c     # cubedsphere for example, is a multiblock description of 
+c     # the spherical coordinate system.  But the spherical coordinate 
+c     # system can be described with a single Cartesian block.
 c     # ------------------------------------------------------------
 
 
@@ -15,7 +21,7 @@ c     # ------------------------------------------------------------
 
       double precision x,y,t1(3),t2(3)
       double precision t(3,2),tinv(3,2), tderivs(3,2,2)
-      integer flag, k, blockno
+      integer flag, k
 
       integer*8 cont, get_context
 
@@ -23,8 +29,7 @@ c     # ------------------------------------------------------------
 
 c     # Compute covariant derivatives only
       flag = 1
-      blockno = 999
-      call fclaw2d_map_c2m_basis(cont, blockno, 
+      call fclaw2d_map_c2m_basis(cont, 
      &                 x,y, t, tinv, tderivs, flag)
 
       do k = 1,3
@@ -41,15 +46,14 @@ c     # Compute covariant derivatives only
       double precision x,y
       double precision t1inv(3), t2inv(3)
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
-      integer k, flag, blockno
+      integer k, flag
 
       integer*8 cont, get_context
 
       cont = get_context()
 
       flag = 3
-      blockno = 999
-      call fclaw2d_map_c2m_basis(cont, blockno, 
+      call fclaw2d_map_c2m_basis(cont, 
      &             x,y, t, tinv,tderivs, flag)
                                           
 
@@ -74,7 +78,7 @@ c     # Compute covariant derivatives only
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
       double precision s(3,2), tij(3), sk(3)
 
-      integer i,j,k, m, flag, blockno
+      integer i,j,k, m, flag
 
       integer*8 cont, get_context
 
@@ -83,8 +87,7 @@ c     # Compute covariant derivatives only
 
 c     # Compute covariant and derivatives
       flag = 7
-      blockno = 999
-      call fclaw2d_map_c2m_basis(cont, blockno, 
+      call fclaw2d_map_c2m_basis(cont,  
      &             x,y, t, tinv,tderivs, flag)
                                           
 
@@ -112,17 +115,27 @@ c     # Compute covariant and derivatives
 
       double precision x,y
 
-      double precision u(2), uderivs(4), g(2,2,2)
-      double precision D11, D22
+      double precision u(2), vcart(3), derivs(4)
+      double precision D11, D22, g(2,2,2)
+      integer flag
 
 c     # Get g(i,j,k), g = \Gamma(i,j,k)
-      call velocity_derivs(x,y,u,uderivs)
-      call map_christoffel_sym(x,y,g) 
+      call velocity_derivs(x,y,u,vcart,derivs,flag)
 
-      D11 = uderivs(1) + u(1)*g(1,1,1) + u(2)*g(1,2,1)
-      D22 = uderivs(4) + u(1)*g(2,1,2) + u(2)*g(2,2,2)
+      if (flag .eq. 0) then
+c         # Velocity and derivatives are given in 
+c         # spherical components       
+          call map_christoffel_sym(x,y,g) 
 
-      map_divergence = D11 + D22
+          D11 = derivs(1) + u(1)*g(1,1,1) + u(2)*g(1,2,1)
+          D22 = derivs(4) + u(1)*g(2,1,2) + u(2)*g(2,2,2)
+
+          map_divergence = D11 + D22
+      else
+c         # Velocity and derivatives are given in 
+c         # Cartesian components        
+          map_divergence = derivs(1) + derivs(2) + derivs(3)
+      endif
 
       end
 

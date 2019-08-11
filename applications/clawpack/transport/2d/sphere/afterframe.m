@@ -1,3 +1,5 @@
+setviews;
+
 example = read_vars();
 
 s = 0.0;
@@ -35,7 +37,9 @@ setpatchborderprops('linewidth',1);
 hidegridlines;
 
 view([ 59.297571594931483, 8.368467153284623]);
+view([1.527452862277914e+02, 1.780446485025879]);
 % view(3)
+% view(vtop);
 
 NoQuery = 0;
 prt = false;

@@ -4,23 +4,24 @@ c     #
 c     # Assumes all components are given in coordinates relative to 
 c     # the standard basis (1,0) and (0,1). 
 c     # ------------------------------------------------------------
-
-
-      subroutine velocity_components(x,y,t, u)
+   
+      subroutine velocity_components(x,y,t, u, vcart,flag)
       implicit none
 
-      double precision x, y, t, u(2)
-      double precision uderivs(4)
+      double precision x, y, t, u(2),vcart(3)
+      double precision derivs(4)
+      integer flag
 
-      call velocity_derivs(x,y,t, u,uderivs)
+      call velocity_derivs(x,y,t, u,vcart, derivs, flag)
 
       end
 
-      subroutine velocity_derivs(x,y,t, u,uderivs)
+      subroutine velocity_derivs(x,y,t, u, vcart, derivs, flag)
       implicit none
 
       double precision x, y, t, u(2)
-      double precision uderivs(4)
+      double precision derivs(4)
+      integer flag
 
       double precision pi, pi2
       common /compi/ pi, pi2
@@ -28,14 +29,18 @@ c     # ------------------------------------------------------------
       integer example
       common /example_comm/ example        
 
+      double precision omega(3)
+      common /rotation_comm/ omega
+
       double precision kappa, period
       common /wind_comm/ kappa, period      
 
-      double precision kdiv2, kdiv4, tp, lp
       double precision u1x, u1y, u2x, u2y
-      double precision phi, phix, phiy
-      double precision theta, thetax, thetay
-      integer k
+      double precision phi, theta
+
+      double precision tp, lp
+      double precision t1(3), t2(3), xp, yp, zp, w
+      double precision rv(3), vcart(3)
 
 
 c     # uderivs(1) = u1x      
@@ -43,65 +48,118 @@ c     # uderivs(2) = u1y
 c     # uderivs(3) = u2x      
 c     # uderivs(4) = u2y      
 
-      call map_comp2angles(x,y,phi,theta)
+      call map_comp2spherical(x,y,phi,theta)
 
       u1x = 0
       u1y = 0
       u2x = 0
       u2y = 0
 
-      kdiv2 = kappa/2.d0
-      kdiv4 = kappa/4.d0
-      tp = t/period
-
-      lp = phi - pi2*tp
+      flag = 0
 
       if (example .eq. 0) then
-c         u(1) = -kdiv2*sin(lp/2.d0)**2*sin(2*theta)*cos(pi*tp) +
-c     &                2*pi*cos(theta)/period
-c         u(2) = kdiv4*sin(lp)*(cos(theta)**3)*cos(pi*tp)
+          flag = 1
+          call mapc2m_spherical(x,y,xp,yp,zp)
+          rv(1) = xp
+          rv(2) = yp
+          rv(3) = zp
+          call map_cross(omega,rv, vcart,w)
 
-          u(1) = 1
-          u(2) = 0
+c         # Define (du(1)/dx, du(2)/dy, du(3)/dz)          
+          derivs(1) = 0
+          derivs(2) = 0
+          derivs(3) = 0
+      elseif (example .eq. 1) then
+          flag = 0
+          tp = t/period         
+          lp = phi - pi2*tp
 
+          u(1) = 10/period*sin(lp)**2*sin(2*theta)*cos(pi*tp) +
+     &                    2*pi*cos(theta)/period
+          u(2) = 10/period*sin(2*lp)*cos(theta)*cos(pi*tp)
+          
 c         u1x = -2*pi*s*cos(pi*x)*sin(pi*x)
 c         u2y =  2*pi*s*sin(pi*y)*cos(pi*y)
+
+      elseif (example .eq. 2) then
+          flag = 0
+          u(1) = -5/period*sin(lp/2.d0)**2*sin(2*theta)*
+     &                    cos(theta)**2*cos(pi*tp) +
+     &                    2*pi*cos(theta)/period
+          u(2) = 5/(2*period)*sin(lp)*cos(theta)**3*cos(pi*tp)
       else
          write(6,'(A,A)') 'sphere_velocity : ',
      &              'No valid example provided'
          stop
       endif
 
-      uderivs(1) = u1x
-      uderivs(2) = u1y
-      uderivs(3) = u2x
-      uderivs(4) = u2y
+      if (flag .eq. 0) then
+          derivs(1) = u1x
+          derivs(2) = u1y
+          derivs(3) = u2x
+          derivs(4) = u2y
+      endif          
+
+      end
+
+
+      subroutine velocity_components_cart(x,y,t,vcart)
+      implicit none
+
+      double precision x,y,t, vcart(3)
+      double precision u(2), t1(3), t2(3)
+      integer flag, k
+
+
+      call velocity_components(x,y,t, u,vcart,flag)
+
+      if (flag .eq. 0) then
+c         # Velocity components are given in Cartesian components
+          call map_covariant_basis(x, y, t1,t2)
+
+          do k = 1,3
+              vcart(k) = u(1)*t1(k) + u(2)*t2(k)
+          enddo
+      endif
 
       end
 
 
 c     # ------------------------------------------------------------
-c     # Center : u = u1*tau1 + u2*tau2   (div u might not be zero)
+c     # Called from qexact
 c     # ------------------------------------------------------------
-      subroutine sphere_center_velocity(x,y,t, vel)
+      subroutine velocity_components_spherical(x,y,t,u)
       implicit none
 
-      double precision x,y,t, vel(3)
+      double precision x,y,t, u(2)
+      double precision vcart(3), t1(3), t2(3)
+      double precision t1n2, t2n2, map_dot
+      integer flag
 
-      double precision t1(3), t2(3), u(2)
+      call velocity_components(x,y,t, u,vcart,flag)
 
-      integer k
+      if (flag .eq. 1) then
+c         # Velocity components are given in Cartesian components
+          call map_covariant_basis(x, y, t1,t2)
+          t1n2 = map_dot(t1,t1)
+          t2n2 = map_dot(t2,t2)
+          u(1) = map_dot(vcart,t1)/t1n2
+          u(2) = map_dot(vcart,t2)/t2n2
+      endif
 
-c     # Vector field defined as u1*tau1 + u2*tau2    
+      end
 
-      call map_covariant_basis(x, y, t1,t2)
-      call velocity_components(x,y,t, u)
 
-c     # Velocities are all given in terms of Cartesian components   
-      do k = 1,3
-        vel(k) = u(1)*t1(k) + u(2)*t2(k)
-      enddo
-        
+c     # ------------------------------------------------------------
+c     # Public interface (called from setaux)
+c     # ------------------------------------------------------------
+      subroutine sphere_center_velocity(x,y,t,vcart)
+      implicit none
+
+      double precision x,y,t, vcart(3)
+
+      call velocity_components_cart(x,y,t,vcart)
+
       end
 
 

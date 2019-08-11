@@ -1,34 +1,33 @@
       double precision function  fdisc(blockno,xc,yc)
       implicit none
 
-      double precision xc,yc
+      double precision xc,yc, phi, theta
       integer blockno
 
-      integer example
-      common /example_comm/ example
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
+      integer initchoice
+      common /initchoice_comm/ initchoice
 
       integer*8 cont, get_context
-      logical fclaw2d_map_is_used
 
       double precision xp, yp, zp
-      double precision dxc, xm, ym, w, wx, wy
 
       double precision r, r0
 
-
       cont = get_context()
 
-      if (fclaw2d_map_is_used(cont)) then
-         call fclaw2d_map_c2m(cont,
+      call fclaw2d_map_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)
-      else
-         xp = xc
-         yp = yc
-      endif
 
-      r0 = 0.2
-      r = sqrt((xp-0.5)**2 + (yp-0.5)**2)
-      fdisc = r - r0
+      call map2spherical(xp,yp,zp,phi,theta)
+
+      fdisc = abs(theta-pi) - pi/6
+
+c      r0 = 0.2
+c      r = sqrt((xp-0.5)**2 + (yp-0.5)**2)
+c      fdisc = r - r0
 
 
       end

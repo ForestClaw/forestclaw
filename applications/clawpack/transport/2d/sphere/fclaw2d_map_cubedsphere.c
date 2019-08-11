@@ -75,24 +75,11 @@ fclaw2d_map_query_cubedsphere (fclaw2d_map_context_t * cont, int query_identifie
 
 
 static void
-fclaw2d_map_c2m_basis_cubedsphere(fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_basis_cubedsphere(fclaw2d_map_context_t * cont,
                                   double xc, double yc, 
                                   double *t, double *tinv, 
                                   double *tderivs, int flag)
 {
-
-#if 0
-    /* Get physical coordinates in unit sphere from (blockno,xc,yc) used
-       for cubed sphere */
-    double xp, yp, zp;
-    cont->mapc2m(cont,blockno,xc,yc,&xp,&yp,&zp);
-
-    /* Map physical coordinates to spherical computational coordinates
-       [0,1]x[0,1] */
-    double xc1, yc1;
-    MAP2COMP(&xp,&yp,&zp,&xc1,&yc1);
-#endif    
-    
     SPHERE_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
 }
 
