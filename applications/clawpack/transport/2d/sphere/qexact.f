@@ -38,19 +38,19 @@ c      integer blockno_dummy
       double precision t0
       double precision xp,yp,zp
 
-      double precision sigma(3), rtol, atol
+      double precision sigma(4), rtol, atol
       integer itol, iout
 
       integer Nmax, lwork,nrdens, liwork
-      parameter(Nmax=3, nrdens=0)
+      parameter(Nmax=4, nrdens=0)
       parameter(lwork=8*Nmax+5*nrdens+21)
       parameter(liwork=nrdens+21)
 
-      double precision work(lwork), rpar
+      double precision work(lwork), rpar(10)
       double precision q0_physical, q0
       integer iwork(liwork), ipar(2), idid
 
-      double precision tol
+      double precision tol, tt
 
       logical evolve_q
 
@@ -80,6 +80,9 @@ c     # Evolve from t=t0 to t=tfinal
 c     # Initial conditions for ODE
       sigma(1) = x
       sigma(2) = y
+c      sigma(3) = tfinal
+
+      rpar(1) = tfinal
 
 c     # This traces the velocity field back to the origin.
       call dopri5(2,map_rhs_divfree,t0,sigma,tfinal,
@@ -95,6 +98,14 @@ c     # This traces the velocity field back to the origin.
 c     # Initial position in [0,1]x[0,1]
       xc0 = sigma(1)
       yc0 = sigma(2)
+c      tt = sigma(3)
+c
+c      if (abs(tt) > 1e-12) then
+c          write(6,*) 'qexact : Time .ne. 0; t = ', 
+c     &           tt
+c          stop
+c      endif
+
 
       call mapc2m_spherical(xc0,yc0,xp,yp,zp)
 
@@ -113,6 +124,7 @@ c         # from (xc0,yc0)
           sigma(1) = xc0
           sigma(2) = yc0
           sigma(3) = q0
+c          sigma(4) = 0
 
           do i = 1,20
               work(i) = 0
@@ -176,19 +188,21 @@ c     # ----------------------------------------------------------------
       implicit none
 
       integer n, ipar(2)
-      double precision t, sigma(n), f(n), rpar
+      double precision t, sigma(n), f(n), rpar(10)
 
 
-      double precision x,y, u(2)
+      double precision x,y, u(2), tt, tt1
 
       x = sigma(1)
       y = sigma(2)
 
-      call velocity_components_spherical(x,y,t,u)
+      tt = rpar(1) - t
+      call velocity_components_spherical(x,y,tt,u)
 
 c     # We are tracing these back, so use negative velocities        
       f(1) = -u(1)
       f(2) = -u(2)
+c      f(3) = -1       !! time marches backwards
 
       end
 
@@ -199,7 +213,7 @@ c     # We are tracing these back, so use negative velocities
       double precision t, sigma(n), f(n), rpar
 
 
-      double precision x,y, q
+      double precision x,y, q, tt
       double precision u(2)
       double precision divu, map_divergence
 
@@ -212,11 +226,12 @@ c     # Track evolution of these three quantities
 
       call velocity_components_spherical(x,y,t, u)
 
-      divu = map_divergence(x,y,t)
+      divu = map_divergence(x,y,tt)
 
       f(1) = u(1)
       f(2) = u(2)
-      f(3) = -divu*q   !! Non-conservative case
+      f(3) = -divu*q   !! Divergenct case
+c      f(4) = 1         !! Time marches forward
 
       end
 

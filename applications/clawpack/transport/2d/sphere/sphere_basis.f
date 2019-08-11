@@ -63,18 +63,18 @@ c      phi = -pi/2.d0 + pi*y
 c      phix = 0
 c      phiy = pi
 
-      call map_comp2spherical_derivs(x,y,phi,theta,
+      call map_comp2spherical_derivs(x,y,theta,phi,
      &                     thetax, thetay, phix, phiy)
 
 
       if (compute_covariant) then
-          t(1,1) = -thetax*cos(phi)*sin(theta)
-          t(2,1) = thetax*cos(phi)*cos(theta)
-          t(3,1) = 0
-
-          t(1,2) = -phiy*sin(phi)*cos(theta)
-          t(2,2) = -phiy*sin(phi)*sin(theta)
-          t(3,2) = phiy*cos(phi)          
+c          t(1,1) = -thetax*cos(phi)*sin(theta)
+c          t(2,1) = thetax*cos(phi)*cos(theta)
+c          t(3,1) = 0
+c
+c          t(1,2) = -phiy*sin(phi)*cos(theta)
+c          t(2,2) = -phiy*sin(phi)*sin(theta)
+c          t(3,2) = phiy*cos(phi)          
       endif
 
 c     # Express T(x,y) = g(y)*f(x)
@@ -110,8 +110,8 @@ c     #
 
       if (compute_covariant) then
           do k = 1,3
-c              t(k,1) = gx(k)*f(k) + g(k)*fx(k);
-c              t(k,2) = gy(k)*f(k) + g(k)*fy(k);
+              t(k,1) = gx(k)*f(k) + g(k)*fx(k);
+              t(k,2) = gy(k)*f(k) + g(k)*fy(k);
           enddo
       endif
 
@@ -175,7 +175,7 @@ c             # d(t2)/dy = d(g*fy + gy*f)/dy
 c     # Map computatinoal coordinates in [0,1]x[0,1]
 c     # to physical coordinates      
 
-      call map_comp2spherical(xc,yc,phi,theta)
+      call map_comp2spherical(xc,yc,theta,phi)
 
 c         xp = cos(phi)*cos(theta)
 c         yp = cos(phi)*sin(theta)
@@ -189,7 +189,7 @@ c         zp = sin(phi)
       end
 
 
-      subroutine map_comp2spherical(xc,yc,phi,theta)
+      subroutine map_comp2spherical(xc,yc,theta,phi)
       implicit none
 
       double precision xc,yc,theta, thetax, thetay
@@ -201,12 +201,12 @@ c         zp = sin(phi)
 c     # Map xc in [0,1] to theta in [0,2*pi]
 c     # Map yc in [0,1] to phi in [-pi/2,pi/2]      
 
-      call map_comp2spherical_derivs(xc,yc,phi,theta,
+      call map_comp2spherical_derivs(xc,yc,theta,phi,
      &               thetax, thetay, phix, phiy)
 
       end
 
-      subroutine map_comp2spherical_derivs(xc,yc,phi,theta,
+      subroutine map_comp2spherical_derivs(xc,yc,theta,phi,
      &      thetax, thetay, phix, phiy)
       implicit none
 
@@ -219,7 +219,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 c     # Map xc in [0,1] to theta in [0,2*pi]
 c     # Map yc in [0,1] to phi in [-pi/2,pi/2]      
 
-      theta = pi2*xc
+      theta = pi2*(xc-0.5)
       thetax = pi2
       thetay= 0
 
@@ -229,7 +229,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 
       end
 
-      subroutine map_spherical2comp(phi,theta,xc,yc)
+      subroutine map_spherical2comp(theta,phi,xc,yc)
       implicit none
 
       double precision xc,yc,phi,theta
@@ -241,12 +241,12 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 c     # Map xc in [0,1] to theta in [0,2*pi]
 c     # Map yc in [0,1] to phi in [-pi/2,pi/2]      
 
-      xc = theta/pi2
+      xc = 0.5 + theta/pi2
       yc = (phi + pi/2)/pi
 
       end
 
-      subroutine map2spherical(xp,yp,zp,phi,theta)
+      subroutine map2spherical(xp,yp,zp,theta,phi)
       implicit none
 
       double precision xp,yp,zp,phi,theta
@@ -258,7 +258,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
       phi = pi/2 - acos(zp) 
       theta = atan2(yp,xp)
       if (theta < 0) then
-          theta = theta + pi2
+c          theta = theta + pi2
       endif
 
 
@@ -274,9 +274,9 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 
       double precision phi, theta
 
-      call map2spherical(xp,yp,zp,phi,theta)
+      call map2spherical(xp,yp,zp,theta,phi)
 
-      call map_spherical2comp(phi,theta,xc,yc)
+      call map_spherical2comp(theta,phi,xc,yc)
 
       end
 

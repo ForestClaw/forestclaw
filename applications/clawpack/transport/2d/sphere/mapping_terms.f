@@ -110,17 +110,17 @@ c     # Compute covariant and derivatives
 
       end
 
-      double precision function map_divergence(x,y)
+      double precision function map_divergence(x,y, t)
       implicit none
 
-      double precision x,y
+      double precision x,y, t
 
       double precision u(2), vcart(3), derivs(4)
       double precision D11, D22, g(2,2,2)
       integer flag
 
 c     # Get g(i,j,k), g = \Gamma(i,j,k)
-      call velocity_derivs(x,y,u,vcart,derivs,flag)
+      call velocity_derivs(x,y,t, u,vcart,derivs,flag)
 
       if (flag .eq. 0) then
 c         # Velocity and derivatives are given in 
@@ -207,6 +207,59 @@ c     # Contravariant vectors
       end do
 
       end
+
+      subroutine map_diff_normalized(x,y,u, uderivs, 
+     &         uderivs_norm)
+      implicit  none
+
+      double precision x,y,u(2), uderivs(4), uderivs_norm(4)
+
+      integer*8 cont, get_context
+
+      double precision t(3,2), tinv(3,2), tderivs(3,2,2)
+      double precision t1(3), t2(3), t1n2, t2n2
+      double precision t1x(3), t1y(3), t2x(3), t2y(3)
+      double precision t1n3, t2n3
+      double precision map_dot
+      integer flag, k
+
+      cont = get_context()
+
+      flag = 7
+      call fclaw2d_map_c2m_basis(cont,x,y,t,tinv,
+     &                           tderivs,flag)
+
+      do k = 1,3
+          t1(k) = t(k,1)
+          t2(k) = t(k,2)
+          t1x(k) = tderivs(k,1,1)
+          t1y(k) = tderivs(k,1,2)
+          t2x(k) = tderivs(k,2,1)
+          t2y(k) = tderivs(k,2,2)
+      enddo
+
+      t1n2 = map_dot(t1,t1)
+      t2n2 = map_dot(t2,t2)
+
+      t1n3 = t1n2*sqrt(t1n2)
+      t2n3 = t2n2*sqrt(t2n2)
+
+c     # d(u1/t1n)/dx      
+      uderivs_norm(1) = (t1n2*uderivs(1) - u(1)*map_dot(t1x,t1))/t1n3
+
+c     # d(u1/t1n)/dy      
+      uderivs_norm(2) = (t1n2*uderivs(2) - u(1)*map_dot(t1y,t1))/t1n3
+
+c     # d(u2/t2n)/dx      
+      uderivs_norm(3) = (t2n2*uderivs(3) - u(2)*map_dot(t2x,t2))/t2n3
+
+c     # d(u2/t2n)/dy
+      uderivs_norm(4) = (t2n2*uderivs(4) - u(2)*map_dot(t2y,t2))/t2n3
+
+
+
+      end
+
 
 
 
