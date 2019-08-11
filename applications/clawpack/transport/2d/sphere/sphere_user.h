@@ -133,26 +133,36 @@ void SPHERE_BASIS_COMPLETE(const double* x, const double *y,
 
 #define SPHERE_SETAUX FCLAW_F77_FUNC(sphere_setaux, SPHERE_SETAUX)
 
+
 void SPHERE_SETAUX(const int* blockno, const int* mx, const int* my,
                    const int* mbc, const double* xlower, const double* ylower,
-                   const double* dx, const double* dy, const double* t,
+                   const double* dx, const double* dy, 
                    double area[],double edgelengths[],
-                   double xnormals[],double ynormals[],
-                   double surfnormals[],
+                   double xp[], double yp[], double zp[],
                    double aux[],const int* maux);
+
+
+#define SPHERE_SET_VELOCITIES FCLAW_F77_FUNC(sphere_set_velocities, \
+                                             SPHERE_SET_VELOCITIES)
+
+void SPHERE_SET_VELOCITIES(const int* blockno, const int* mx, const int* my,
+                   const int* mbc, const double* dx, const double* dy,
+                   const double* xlower, const double* ylower,
+                   const double *t, double xnormals[],double ynormals[],
+                   double surfnormals[], double aux[],const int* maux);
 
 
 #define  SPHERE_FORT_WRITE_FILE FCLAW_F77_FUNC(sphere_fort_write_file,  \
                                                 SPHERE_FORT_WRITE_FILE)
-void     SPHERE_FORT_WRITE_FILE(char* matname1,
-                                 int* mx,        int* my,
-                                 int* meqn,      int* mbc,
-                                 double* xlower, double* ylower,
-                                 double* dx,     double* dy,
-                                 double q[],     double error[], double soln[],
-                                 double *time,
-                                 int* patch_num, int* level,
-                                 int* blockno,   int* mpirank);
+void  SPHERE_FORT_WRITE_FILE(char* matname1,
+                             int* mx,        int* my,
+                             int* meqn,      int* mbc,
+                             double* xlower, double* ylower,
+                             double* dx,     double* dy,
+                             double q[],     double error[], double soln[],
+                             double *time,
+                             int* patch_num, int* level,
+                             int* blockno,   int* mpirank);
 
 #define SPHERE_FORT_HEADER_ASCII \
          FCLAW_F77_FUNC(sphere_fort_header_ascii, \

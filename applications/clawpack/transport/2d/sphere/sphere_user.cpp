@@ -63,36 +63,65 @@ void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
                                     int blockno,
                                     int patchno)
 {
-    //const user_options_t* user = sphere_get_options(glob);
-
-    int mx,my,mbc,maux;
+    int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    double *aux,*edgelengths,*area, *curvature;
-    double *xp, *yp, *zp, *xd, *yd, *zd;
-    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
+    double *xp, *yp, *zp, *xd, *yd, *zd, *area;
     fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
+    double *edgelengths,*curvature;
     fclaw2d_clawpatch_metric_scalar(glob, this_patch,&area,&edgelengths,
                                     &curvature);
 
+    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
     fclaw2d_clawpatch_metric_vector(glob,this_patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);
 
-    double t = glob->curr_time;
+    double *aux;
+    int maux;
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     SPHERE_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
-                  &dx,&dy, &t, area, edgelengths,xnormals,ynormals,
-                  surfnormals, aux, &maux);
+                  &dx,&dy, area, edgelengths,xp,yp,zp,
+                  aux, &maux);
 }
 
+
+static
+void sphere_b4step2(fclaw2d_global_t *glob,
+                    fclaw2d_patch_t *this_patch,
+                    int blockno,
+                    int patchno,
+                    double t, double dt)
+
+{
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
+    fclaw2d_clawpatch_metric_vector(glob,this_patch,
+                                    &xnormals, &ynormals,
+                                    &xtangents, &ytangents,
+                                    &surfnormals);
+
+    double *aux;
+    int maux;
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+
+
+    SPHERE_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
+                          &dx, &dy, &xlower, &ylower,
+                          &t, xnormals,ynormals, surfnormals,
+                          aux,&maux);
+
+}
 
 static
 int sphere_tag4refinement(fclaw2d_global_t *glob,
@@ -100,10 +129,6 @@ int sphere_tag4refinement(fclaw2d_global_t *glob,
                           int blockno, int patchno,
                           int initflag)
 {
-    //fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
-
-
-
     int mx,my,mbc;
     double xlower, ylower,dx,dy;
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
@@ -160,9 +185,6 @@ int sphere_tag4coarsening(fclaw2d_global_t *glob,
 
     patch0 = &fine_patches[0];
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    double coarsen_threshold = fclaw_opt->coarsen_threshold;
-
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
     fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
@@ -181,7 +203,10 @@ int sphere_tag4coarsening(fclaw2d_global_t *glob,
     }
 
     tag_patch = 0;
+
 #if 0    
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double coarsen_threshold = fclaw_opt->coarsen_threshold;
     SPHERE_TAG4COARSENING(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
                           &blockno, 
                           q[0],q[1],q[2],q[3],
@@ -191,18 +216,6 @@ int sphere_tag4coarsening(fclaw2d_global_t *glob,
     return tag_patch == 1;
 }
 
-
-static
-void sphere_b4step2(fclaw2d_global_t *glob,
-                    fclaw2d_patch_t *this_patch,
-                    int blockno,
-                    int patchno,
-                    double t, double dt)
-
-{
-    /* This may be overkill - it resets everything */
-    sphere_patch_setup_manifold(glob, this_patch, blockno, patchno);
-}
 
 
 static

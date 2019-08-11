@@ -1,15 +1,15 @@
       subroutine sphere_setaux(blockno, mx,my,mbc,
-     &      xlower,ylower,dx,dy, t, area, edgelengths,
-     &      xnormals,ynormals, surfnormals, aux, maux)
+     &      xlower,ylower,dx,dy, area, edgelengths, xp,yp,zp,
+     &      aux, maux)
       implicit none
 
       integer mbc, mx,my, meqn, maux
       integer blockno
-      double precision dx,dy, xlower, ylower, t
+      double precision dx,dy, xlower, ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
       integer i,j, k
-      double precision dxdy
+      double precision dxdy, xc1, yc1
 
       include "metric_terms.i"
 
@@ -19,6 +19,7 @@ c     # 1      capacity
 c     # 2-3    Edge velocities at left/right x faces
 c     # 4-5    Edge velocities at top/bottom y faces
 c     # 6-7    Edge lengths (x-faces, y-faces)
+c     3 8-9    Spherical coordinates
 c     # ----------------------------------------------------------------
 
 
@@ -31,11 +32,11 @@ c     # Capacity : entry (1)
          enddo
       enddo
 
-c     # Center velocities : entries (2-5)            
-      call sphere_set_center_velocities(blockno, mx,my,mbc,dx,dy,
-     &          xlower,ylower,t,
-     &          edgelengths,xnormals,ynormals,surfnormals,
-     &          aux, maux)
+cc     # Center velocities : entries (2-5)            
+c      call sphere_set_center_velocities(blockno, mx,my,mbc,dx,dy,
+c     &          xlower,ylower,t,
+c     &          edgelengths,xnormals,ynormals,surfnormals,
+c     &          aux, maux)
 
 c     # Needed to scale speeds in Riemann solver when using
 c     # cell-centered velocities
@@ -47,13 +48,23 @@ c           # x-face and y-face edge lengths (6,7)
          enddo
       enddo
 
+      do i = 1-mbc,mx+mbc
+          do j = 1-mbc,my+mbc
+c             # Map to spherical coordinates in [0,1]x[0,1]
+              call map2comp(xp(i,j),yp(i,j),zp(i,j),xc1,yc1)
+
+              aux(i,j,8) = xc1
+              aux(i,j,9) = yc1
+          end do
+      end do
+
       return
       end
 
 
-      subroutine sphere_set_center_velocities(blockno, 
+      subroutine sphere_set_velocities(blockno, 
      &          mx,my,mbc,dx,dy,xlower,ylower, t, 
-     &          edgelengths,xnormals,ynormals,surfnormals,
+     &          xnormals,ynormals,surfnormals,
      &          aux, maux)
       implicit none
 
@@ -72,8 +83,6 @@ c           # x-face and y-face edge lengths (6,7)
 
       double precision nl(3), nr(3), nb(3), nt(3)
       double precision urrot, ulrot, ubrot, utrot
-      double precision x,y, phi, theta
-      double precision xpp,ypp,zpp
 
       integer*8 cont, get_context
 
@@ -86,16 +95,9 @@ c           # x-face and y-face edge lengths (6,7)
 c     # Cell-centered velocities : entries (4,5,6) 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
 
-c           # This is not the sphere mapping, but rather maps the brick to
-c           # a unit sphere      
-c           # Sphere mapping
-            call fclaw2d_map_c2m(cont,blockno,xc,yc,xpp,ypp,zpp)
-
-c           # Map to spherical coordinates
-            call map2comp(xpp,ypp,zpp,xc1,yc1)
+            xc1 = aux(i,j,8)
+            yc1 = aux(i,j,9)
 
             call sphere_center_velocity(xc1,yc1,t, vel)
 
@@ -117,7 +119,6 @@ c           # Subtract out component in the normal direction
                 nb(k)  = ynormals(i,  j,  k)
                 nt(k)  = ynormals(i,  j+1,k)
             enddo
-
 
             ulrot = map_dot(nl,vel)
             urrot = map_dot(nr,vel)
