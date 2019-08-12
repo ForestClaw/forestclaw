@@ -112,7 +112,7 @@ c             # u = U(1) component
               gu1x = 2*cos(2*th)*thx
               gu1y = 2*cos(2*th)*thy
 
-              ucomp(1) = cu1*fu1*gu1
+              ucomp(1) = cu1*fu1*gu1 + pi2*cos(th)/period
  
               u1x = cu1*(fu1*gu1x + fu1x*gu1) + 
      &                  -(pi2/period)*sin(th)*thx
