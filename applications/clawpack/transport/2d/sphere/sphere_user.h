@@ -179,8 +179,7 @@ void  SPHERE_TAG4REFINEMENT(const int* mx,const int* my,
                              const double* xlower, const double* ylower,
                              const double* dx, const double* dy,
                              const int* blockno,
-                             double q[], double curvature[],
-                             const double* tag_threshold,
+                             double q[], const double* tag_threshold,
                              const int* init_flag,
                              int* tag_patch);
 
@@ -193,8 +192,6 @@ void  SPHERE_TAG4COARSENING(const int* mx, const int* my,
                              const int* blockno,
                              double q0[],double q1[],
                              double q2[],double q3[],
-                             double c0[],double c1[],
-                             double c2[],double c3[],
                              const double* tag_threshold,
                              int* tag_patch);
 
