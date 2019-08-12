@@ -99,18 +99,22 @@ c             # From Nair and Lauritzen 2010 (Case 2; kappa = 2)
 c             # u = kappa*sin(lp)**2*sin(2*th)*cos(pi*t/Tfinal) +
 c             #           2*pi*cos(th)/Tfinal
  
-              ucomp(1) = 10.0/period*sin(lp)**2*sin(2*th)*cos(pi*tp) +
-     &                            pi2*cos(th)/period
-
               cu1 = 10.0/period*cos(pi*tp)
 
               fu1 = sin(lp)**2
               fu1x = 2*sin(lp)*cos(lp)*lpx
               fu1y = 2*sin(lp)*cos(lp)*lpy
+
               gu1 = sin(2*th)
               gu1x = 2*thx*cos(2*th)
               gu1y = 2*thy*cos(2*th)
 
+c             ucomp(1) = 10.0/period*sin(lp)**2*sin(2*th)*cos(pi*tp) +
+c     &                            pi2*cos(th)/period
+
+              ucomp(1) = cu1*fu1*gu1
+
+ 
               u1x = cu1*(fu1*gu1x + fu1x*gu1) + 
      &                  -(pi2/period)*sin(th)*thx
 
@@ -118,7 +122,6 @@ c             #           2*pi*cos(th)/Tfinal
      &                  -(pi2/period)*sin(th)*thy
 
 c             # v = kappa*sin(2*lp)*cos(th)*cos(pi*t/Tfinal)
-              ucomp(2) = 10.0/period*sin(2*lp)*cos(th)*cos(pi*tp)
 
               cu2 = 10.0/period*cos(pi*tp)
 
@@ -128,6 +131,9 @@ c             # v = kappa*sin(2*lp)*cos(th)*cos(pi*t/Tfinal)
               gu2 = cos(th)
               gu2x = -thx*sin(th)
               gu2y = -thy*sin(th)
+
+c              ucomp(2) = 10.0/period*sin(2*lp)*cos(th)*cos(pi*tp)
+              ucomp(2) = cu2*fu2*gu2
 
               u2x = cu2*(fu2*gu2x + fu2x*gu2)
               u2y = cu2*(fu2*gu2y + fu2y*gu2)
@@ -142,42 +148,38 @@ c             # v = kappa*sin(2*lp)*cos(th)*cos(pi*t/Tfinal)
           elseif (example .eq. 2) then
 c              # Nair and Lauritzen (2010) Case 3 (kappa = 2)            
 c             u = -(kappa/2.d0)*sin(lp/2.d0)**2*sin(2*th)*cos(th)**2
-c                    *cos(pi*t/Tfinal) +
-c    &               2*pi*cth/Tfinal
-
-              ucomp(1) = -5.d0/period*sin(lp/2.d0)**2*sin(2*th)*
-     &                    cos(th)**2*cos(pi*tp) +
-     &                    pi2*cos(th)/period
+c                    *cos(pi*t/Tfinal) + 2*pi*cos(th)/Tfinal
 
               cu1 = -5.d0/period*cos(pi*tp)
 
-              fu1 = sin(lp/2)**2
-              fu1x = 2*sin(lp/2)*cos(lp/2)*lpx/2
-              fu1y = 2*sin(lp/2)*cos(lp/2)*lpy/2
+              fu1 = sin(lp/2.d0)**2
+              fu1x = 2.d0*sin(lp/2)*cos(lp/2)*lpx/2.d0
+              fu1y = 2.d0*sin(lp/2)*cos(lp/2)*lpy/2.d0
 
               gu1 = sin(2*th)
-              gu1x = 2*thx*cos(2*th)
-              gu1y = 2*thy*cos(2*th)
+              gu1x = 2.d0*thx*cos(2*th)
+              gu1y = 2.d0*thy*cos(2*th)
 
               hu1  = cos(th)**2
-              hu1x = -2*cos(th)*sin(th)*thx
-              hu1y = -2*cos(th)*sin(th)*thy
+              hu1x = -2.d0*cos(th)*sin(th)*thx
+              hu1y = -2.d0*cos(th)*sin(th)*thy
 
               gh = gu1*hu1
               ghx = gu1*hu1x + gu1x*hu1
               ghy = gu1*hu1y + gu1y*hu1
 
+c              ucomp(1) = -5.d0/period*sin(lp/2.d0)**2*sin(2*th)*
+c     &                    cos(th)**2*cos(pi*tp) +
+c     &                    pi2*cos(th)/period
 
-              u1x = cu1*(fu1*ghx + fu1x*gh) + 
-     &                  -(pi2/period)*sin(th)*thx
+              ucomp(1) = cu1*fu1*gu1*hu1 + pi2*cos(th)/period
 
-              u1y = cu1*(fu1*ghy + fu1y*gh) + 
-     &                  -(pi2/period)*sin(th)*thy
+
+              u1x = cu1*(fu1*ghx + fu1x*gh) - (pi2/period)*sin(th)*thx
+              u1y = cu1*(fu1*ghy + fu1y*gh) - (pi2/period)*sin(th)*thy
 
 
 c             v = (kappa/4.d0)*sin(lp)*(cos(th)**3)*cos(pi*t/Tfinal)
-              ucomp(2) = 5.d0/(2.d0*period)*sin(lp)*
-     &               cos(th)**3*cos(pi*tp)
 
               cu2 = 5.d0/(2.d0*period)*cos(pi*tp)
 
@@ -186,8 +188,13 @@ c             v = (kappa/4.d0)*sin(lp)*(cos(th)**3)*cos(pi*t/Tfinal)
               fu2y = cos(lp)*lpy
 
               gu2 = cos(th)**3
-              gu2x = -3*thx*cos(th)**2*sin(th)
-              gu2y = -3*thy*cos(2*th)**2*sin(th)
+              gu2x = -3.d0*cos(th)**2*sin(th)*thx
+              gu2y = -3.d0*cos(th)**2*sin(th)*thy
+
+c              ucomp(2) = 5.d0/(2.d0*period)*sin(lp)*
+c     &               cos(th)**3*cos(pi*tp)
+
+              ucomp(2) = cu2*fu2*gu2
 
               u2x = cu2*(fu2*gu2x + fu2x*gu2)
               u2y = cu2*(fu2*gu2y + fu2y*gu2)

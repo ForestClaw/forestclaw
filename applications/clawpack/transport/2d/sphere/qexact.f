@@ -46,7 +46,7 @@ c      integer blockno_dummy
       parameter(lwork=8*Nmax+5*nrdens+21)
       parameter(liwork=nrdens+21)
 
-      double precision work(lwork), rpar(10)
+      double precision work(lwork), rpar(1)
       double precision q0_physical, q0
       integer iwork(liwork), ipar(2), idid
 
@@ -80,7 +80,6 @@ c     # Evolve from t=t0 to t=tfinal
 c     # Initial conditions for ODE
       sigma(1) = x
       sigma(2) = y
-c      sigma(3) = tfinal
 
       rpar(1) = tfinal
 
@@ -98,14 +97,6 @@ c     # This traces the velocity field back to the origin.
 c     # Initial position in [0,1]x[0,1]
       xc0 = sigma(1)
       yc0 = sigma(2)
-c      tt = sigma(3)
-c
-c      if (abs(tt) > 1e-12) then
-c          write(6,*) 'qexact : Time .ne. 0; t = ', 
-c     &           tt
-c          stop
-c      endif
-
 
       call mapc2m_spherical(xc0,yc0,xp,yp,zp)
 
@@ -124,7 +115,6 @@ c         # from (xc0,yc0)
           sigma(1) = xc0
           sigma(2) = yc0
           sigma(3) = q0
-c          sigma(4) = 0
 
           do i = 1,20
               work(i) = 0
@@ -188,21 +178,22 @@ c     # ----------------------------------------------------------------
       implicit none
 
       integer n, ipar(2)
-      double precision t, sigma(n), f(n), rpar(10)
+      double precision t, sigma(n), f(n), rpar(1)
 
 
-      double precision x,y, u(2), tt, tt1
+      double precision x,y, u(2), tt, tfinal
 
       x = sigma(1)
       y = sigma(2)
 
-      tt = rpar(1) - t
+      tfinal = rpar(1)
+
+      tt = tfinal - t
       call velocity_components_spherical(x,y,tt,u)
 
 c     # We are tracing these back, so use negative velocities        
       f(1) = -u(1)
       f(2) = -u(2)
-c      f(3) = -1       !! time marches backwards
 
       end
 
@@ -231,7 +222,6 @@ c     # Track evolution of these three quantities
       f(1) = u(1)
       f(2) = u(2)
       f(3) = -divu*q   !! Divergenct case
-c      f(4) = 1         !! Time marches forward
 
       end
 

@@ -220,7 +220,8 @@ c     # Contravariant vectors
       double precision t1(3), t2(3), t1n2, t2n2
       double precision t1x(3), t1y(3), t2x(3), t2y(3)
       double precision t1n3, t2n3
-      double precision map_dot
+      double precision map_dot, map_quotient_rule
+      double precision t1n, t2n, dt1ndx, dt1ndy,dt2ndx,dt2ndy
       integer flag, k
 
       cont = get_context()
@@ -241,25 +242,48 @@ c     # Contravariant vectors
       t1n2 = map_dot(t1,t1)
       t2n2 = map_dot(t2,t2)
 
-      t1n3 = t1n2*sqrt(t1n2)
-      t2n3 = t2n2*sqrt(t2n2)
+      t1n = sqrt(t1n2)
+      t2n = sqrt(t2n2)
+
+
+c     # d(norm(t1))/dx = d(sqrt(t1 dot t1))/dx      
+      dt1ndx = map_dot(t1,t1x)/t1n
+      dt1ndy = map_dot(t1,t1y)/t1n
+
+      dt2ndx = map_dot(t2,t2x)/t2n
+      dt2ndy = map_dot(t2,t2y)/t2n
+
 
 c     # d(u1/t1n)/dx      
-      uderivs_norm(1) = (t1n2*uderivs(1) - u(1)*map_dot(t1x,t1))/t1n3
+c      uderivs_norm(1) = (t1n2*uderivs(1) - u(1)*map_dot(t1x,t1))/t1n3
+      uderivs_norm(1) = map_quotient_rule(u(1),t1n,uderivs(1),dt1ndx)
 
 c     # d(u1/t1n)/dy      
-      uderivs_norm(2) = (t1n2*uderivs(2) - u(1)*map_dot(t1y,t1))/t1n3
+c      uderivs_norm(2) = (t1n2*uderivs(2) - u(1)*map_dot(t1y,t1))/t1n3
+      uderivs_norm(2) = map_quotient_rule(u(1),t1n,uderivs(2),dt1ndy)
 
 c     # d(u2/t2n)/dx      
-      uderivs_norm(3) = (t2n2*uderivs(3) - u(2)*map_dot(t2x,t2))/t2n3
+c      uderivs_norm(3) = (t2n2*uderivs(3) - u(2)*map_dot(t2x,t2))/t2n3
+      uderivs_norm(3) = map_quotient_rule(u(2),t2n,uderivs(3),dt2ndx)
 
 c     # d(u2/t2n)/dy
-      uderivs_norm(4) = (t2n2*uderivs(4) - u(2)*map_dot(t2y,t2))/t2n3
+c      uderivs_norm(4) = (t2n2*uderivs(4) - u(2)*map_dot(t2y,t2))/t2n3
+      uderivs_norm(4) = map_quotient_rule(u(2),t2n,uderivs(4),dt2ndy)
 
 
 
       end
 
+
+      double precision function map_quotient_rule(f,g,fx,gx)
+      implicit none
+
+      double precision f,g,fx,gx
+
+c     # d(f/g)/dx = (g*fx - f*gx)/g^2
+      map_quotient_rule = (g*fx - f*gx)/g**2
+
+      end
 
 
 
