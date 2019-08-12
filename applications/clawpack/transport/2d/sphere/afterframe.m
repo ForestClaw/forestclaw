@@ -38,7 +38,8 @@ hidegridlines;
 
 view([ 59.297571594931483, 8.368467153284623]);
 view([1.527452862277914e+02, 1.780446485025879]);
-% view(3)
+view(3)
+view(vleft);
 % view(vtop);
 
 NoQuery = 0;

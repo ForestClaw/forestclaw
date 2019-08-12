@@ -64,8 +64,8 @@ c     # ------------------------------------------
 c     # Numerical parameters
 c     # ------------------------------------------
       itol = 0
-      rtol = 1.d-12
-      atol = 1.d-12
+      rtol = 1.d-14
+      atol = 1.d-14
       iout = 0
 
       do i = 1,20
@@ -132,7 +132,7 @@ c         # from (xc0,yc0)
               stop
           endif
 
-          tol = 1e-8
+          tol = 1e-12
           if (abs(sigma(1)-x) .gt. tol) then
               write(6,*) 'qexact.f : Did not evolve x correctly'
               write(6,100) xc0,yc0
@@ -217,11 +217,11 @@ c     # Track evolution of these three quantities
 
       call velocity_components_spherical(x,y,t, u)
 
-      divu = map_divergence(x,y,tt)
+      divu = map_divergence(x,y,t)
 
       f(1) = u(1)
       f(2) = u(2)
-      f(3) = -divu*q   !! Divergenct case
+      f(3) = -divu*q   !! Divergent case
 
       end
 

@@ -149,7 +149,7 @@ c             # d(t2)/dy = d(g*fy + gy*f)/dy
       double precision xc,yc,xp,yp,zp
       double precision phi, theta
 
-c     # Map computatinoal coordinates in [0,1]x[0,1]
+c     # Map computational coordinates in [0,1]x[0,1]
 c     # to physical coordinates      
 
       call map_comp2spherical(xc,yc,theta,phi)
@@ -171,7 +171,7 @@ c     # to physical coordinates
       double precision pi, pi2
       common /compi/ pi, pi2
 
-c     # Map xc in [0,1] to theta in [0,2*pi]
+c     # Map xc in [0,1] to theta in [-pi,pi]
 c     # Map yc in [0,1] to phi in [-pi/2,pi/2]      
 
       call map_comp2spherical_derivs(xc,yc,theta,phi,
@@ -196,7 +196,8 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
       thetax = pi2
       thetay= 0
 
-      phi = -pi/2 + pi*yc
+c      phi = -pi/2.d0 + pi*yc
+      phi = (yc - 0.5)*pi
       phix = 0
       phiy = pi
 
@@ -215,7 +216,7 @@ c     # Map xc in [0,1] to theta in [0,2*pi]
 c     # Map yc in [0,1] to phi in [-pi/2,pi/2]      
 
       xc = theta/pi2
-      yc = (phi + pi/2)/pi
+      yc = (phi + pi/2.d0)/pi
 
       end
 
@@ -228,8 +229,8 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
       common /compi/ pi, pi2
 
 
-      phi = pi/2 - acos(zp) 
-      theta = atan2(yp,xp)
+      phi = asin(zp)          !! returns value in [-pi/2, pi/2]
+      theta = atan2(yp,xp)    !! returns value in [-pi, pi]
       if (theta < 0) then
           theta = theta + pi2
       endif

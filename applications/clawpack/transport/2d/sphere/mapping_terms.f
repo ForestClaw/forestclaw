@@ -225,8 +225,7 @@ c     # Contravariant vectors
       cont = get_context()
 
       flag = 7
-      call fclaw2d_map_c2m_basis(cont,x,y,t,tinv,
-     &                           tderivs,flag)
+      call fclaw2d_map_c2m_basis(cont,x,y,t,tinv, tderivs,flag)
 
       do k = 1,3
           t1(k) = t(k,1)

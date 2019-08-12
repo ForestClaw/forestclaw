@@ -48,7 +48,11 @@ c     # ------------------------------------------------------------
       double precision cu2, fu2, fu2x, fu2y, gu2, gu2x, gu2y
       double precision hu1, hu1x, hu1y, hu2, hu2x, hu2y
       double precision gh, ghx, ghy
+      double precision zf, zfx, zfy
       double precision uderivs_comp(4), ucomp(2)
+      logical zonal_flow
+
+      integer k
 
 c     # uderivs(1) = u1x      
 c     # uderivs(2) = u1y      
@@ -94,6 +98,7 @@ c         # kappa = 10/period
           thy = phiy
 
           if (example .eq. 1) then
+
 c             # --------------------------------------------------
 c             # From Nair and Lauritzen 2010 (Case 4; kappa = 2) 
 c             # u = kappa*sin(lp)**2*sin(2*th)*cos(pi*t/Tfinal) +
@@ -138,34 +143,59 @@ c             # v = U(2) component
               u2y = cu2*(fu2*gu2y + fu2y*gu2)
 
           elseif (example .eq. 2) then
+cc            # Velocity of spherical coordinates (from my original code)
+c             u = -(kappa/2.d0)*sin(lp/2.d0)**2*sin(2*th)*cos(pi*t/Tfinal) +
+c    &                2*pi*cth/Tfinal
+c             v = (kappa/4.d0)*sin(lp)*(cth**3)*cos(pi*t/Tfinal)
+
+
 c             # -----------------------------------------------------
-c              # Nair and Lauritzen (2010) Case 3 (kappa = 2)            
+c             # Nair and Lauritzen (2010) Case 3 (kappa = 2)   
+c             # with background zonal flow         
+c             #
 c             u = -(kappa/2.d0)*sin(lp/2.d0)**2*sin(2*th)*cos(th)**2
 c                    *cos(pi*t/Tfinal) + 2*pi*cos(th)/Tfinal
 c             v = (kappa/4.d0)*sin(lp)*(cos(th)**3)*cos(pi*t/Tfinal)
 c             # -----------------------------------------------------
 
+c             !! From 2010 paper (no lp; no zonal flow)
+              zonal_flow = .false.
+              lp = theta              
+  
 c             # U(1) component 
-              cu1 = -5.d0/period*cos(pi*tp)
+              cu1 = -5.d0/period*cos(pi*tp)  
 
               fu1 = sin(lp/2.d0)**2
               fu1x = 2.d0*sin(lp/2)*cos(lp/2)*lpx/2.d0
               fu1y = 2.d0*sin(lp/2)*cos(lp/2)*lpy/2.d0
 
               gu1 = sin(2*th)
-              gu1x = 2.d0*thx*cos(2*th)
-              gu1y = 2.d0*thy*cos(2*th)
+              gu1x = 2.d0*cos(2*th)*thx
+              gu1y = 2.d0*cos(2*th)*thy
 
               hu1  = cos(th)**2
               hu1x = -2.d0*cos(th)*sin(th)*thx
               hu1y = -2.d0*cos(th)*sin(th)*thy
 
+
+              if (zonal_flow) then
+                  zf = (pi2/period)*cos(th)
+                  zfx = -(pi2/period)*sin(th)*thx
+                  zfy = 0
+              else
+                  zf = 0
+                  zfx = 0
+                  zfy = 0
+              endif
+
               gh = gu1*hu1
               ghx = gu1*hu1x + gu1x*hu1
               ghy = gu1*hu1y + gu1y*hu1
 
-              u1x = cu1*(fu1*ghx + fu1x*gh) - (pi2/period)*sin(th)*thx
-              u1y = cu1*(fu1*ghy + fu1y*gh) - (pi2/period)*sin(th)*thy
+              ucomp(1) = cu1*fu1*gu1*hu1 + zf
+
+              u1x = cu1*(fu1*ghx + fu1x*gh) + zfx
+              u1y = cu1*(fu1*ghy + fu1y*gh) + zfy
 
 
 c             # U(2) component 
@@ -227,7 +257,8 @@ c         # Normalize covariant vectors
       call velocity_components(x,y,t, u,vcart,flag)
 
       if (flag .eq. 0) then
-c         # Velocity components are given in Cartesian components
+c         # Velocity components are given in spherical components
+c         # and must be converted to Cartesian
           call map_covariant_basis(x, y, t1,t2)
 
           do k = 1,3

@@ -80,6 +80,8 @@ fclaw2d_map_c2m_basis_cubedsphere(fclaw2d_map_context_t * cont,
                                   double *t, double *tinv, 
                                   double *tderivs, int flag)
 {
+    /* These coordinates are in [0,1]x[0,1] and are mapped to 
+       [theta,phi] using mappings in sphere_basis.f */
     SPHERE_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
 }
 
@@ -95,8 +97,7 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
     scale_map(cont,xp,yp,zp);
 }
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_cubedsphere(const double scale[])
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[])
 {
     fclaw2d_map_context_t *cont;
 
