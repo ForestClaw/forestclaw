@@ -56,12 +56,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* ------------------------------- Static function defs ------------------------------- */
 
+#if 0
 /* Added to turn off time_interp */
 static int fill_ghost(int time_interp)
 {
 	//return !time_interp;
 	return 1;
 }
+#endif
 
 
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;

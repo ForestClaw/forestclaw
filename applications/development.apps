@@ -33,6 +33,8 @@
 ## Conservative advection (transport) on a square
 include applications/clawpack/transport/2d/square/Makefile.am
 
+## Conservative advection (transport) on a sphere
+include applications/clawpack/transport/2d/sphere/Makefile.am
 
 ## ---------------------------
 ## No solver
