@@ -51,31 +51,9 @@ c         xp = cos(phi)*cos(theta)
 c         yp = cos(phi)*sin(theta)
 c         zp = sin(phi)
 c     # ---------------------------
-
  
-cc     # Longitude
-c      theta = pi2*x
-c      thetax = pi2
-c      thetay = 0
-c
-cc     # Latitude
-c      phi = -pi/2.d0 + pi*y
-c      phix = 0
-c      phiy = pi
-
       call map_comp2spherical_derivs(x,y,theta,phi,
      &                     thetax, thetay, phix, phiy)
-
-
-      if (compute_covariant) then
-c          t(1,1) = -thetax*cos(phi)*sin(theta)
-c          t(2,1) = thetax*cos(phi)*cos(theta)
-c          t(3,1) = 0
-c
-c          t(1,2) = -phiy*sin(phi)*cos(theta)
-c          t(2,2) = -phiy*sin(phi)*sin(theta)
-c          t(3,2) = phiy*cos(phi)          
-      endif
 
 c     # Express T(x,y) = g(y)*f(x)
 c     #
@@ -171,15 +149,10 @@ c             # d(t2)/dy = d(g*fy + gy*f)/dy
       double precision xc,yc,xp,yp,zp
       double precision phi, theta
 
-
 c     # Map computatinoal coordinates in [0,1]x[0,1]
 c     # to physical coordinates      
 
       call map_comp2spherical(xc,yc,theta,phi)
-
-c         xp = cos(phi)*cos(theta)
-c         yp = cos(phi)*sin(theta)
-c         zp = sin(phi)
 
       xp = cos(phi)*cos(theta)
       yp = cos(phi)*sin(theta)
@@ -219,7 +192,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 c     # Map xc in [0,1] to theta in [0,2*pi]
 c     # Map yc in [0,1] to phi in [-pi/2,pi/2]      
 
-      theta = pi2*(xc-0.5)
+      theta = pi2*xc
       thetax = pi2
       thetay= 0
 
@@ -241,7 +214,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 c     # Map xc in [0,1] to theta in [0,2*pi]
 c     # Map yc in [0,1] to phi in [-pi/2,pi/2]      
 
-      xc = 0.5 + theta/pi2
+      xc = theta/pi2
       yc = (phi + pi/2)/pi
 
       end
@@ -258,7 +231,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
       phi = pi/2 - acos(zp) 
       theta = atan2(yp,xp)
       if (theta < 0) then
-c          theta = theta + pi2
+          theta = theta + pi2
       endif
 
 

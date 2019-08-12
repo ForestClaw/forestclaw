@@ -53,8 +53,7 @@ c     # Compute covariant derivatives only
       cont = get_context()
 
       flag = 3
-      call fclaw2d_map_c2m_basis(cont, 
-     &             x,y, t, tinv,tderivs, flag)
+      call fclaw2d_map_c2m_basis(cont, x,y, t, tinv,tderivs, flag)
                                           
 
       do k = 1,3
@@ -87,8 +86,7 @@ c     # Compute covariant derivatives only
 
 c     # Compute covariant and derivatives
       flag = 7
-      call fclaw2d_map_c2m_basis(cont,  
-     &             x,y, t, tinv,tderivs, flag)
+      call fclaw2d_map_c2m_basis(cont, x,y, t,tinv,tderivs,flag)
                                           
 
       do k = 1,3

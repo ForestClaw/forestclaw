@@ -94,11 +94,14 @@ c         # kappa = 10/period
           thy = phiy
 
           if (example .eq. 1) then
-
-c             # From Nair and Lauritzen 2010 (Case 2; kappa = 2) 
+c             # --------------------------------------------------
+c             # From Nair and Lauritzen 2010 (Case 4; kappa = 2) 
 c             # u = kappa*sin(lp)**2*sin(2*th)*cos(pi*t/Tfinal) +
 c             #           2*pi*cos(th)/Tfinal
- 
+c             # v = kappa*sin(2*lp)*cos(th)*cos(pi*t/Tfinal)
+c             # --------------------------------------------------
+
+c             # u = U(1) component 
               cu1 = 10.0/period*cos(pi*tp)
 
               fu1 = sin(lp)**2
@@ -106,14 +109,10 @@ c             #           2*pi*cos(th)/Tfinal
               fu1y = 2*sin(lp)*cos(lp)*lpy
 
               gu1 = sin(2*th)
-              gu1x = 2*thx*cos(2*th)
-              gu1y = 2*thy*cos(2*th)
-
-c             ucomp(1) = 10.0/period*sin(lp)**2*sin(2*th)*cos(pi*tp) +
-c     &                            pi2*cos(th)/period
+              gu1x = 2*cos(2*th)*thx
+              gu1y = 2*cos(2*th)*thy
 
               ucomp(1) = cu1*fu1*gu1
-
  
               u1x = cu1*(fu1*gu1x + fu1x*gu1) + 
      &                  -(pi2/period)*sin(th)*thx
@@ -121,35 +120,32 @@ c     &                            pi2*cos(th)/period
               u1y = cu1*(fu1*gu1y + fu1y*gu1) + 
      &                  -(pi2/period)*sin(th)*thy
 
-c             # v = kappa*sin(2*lp)*cos(th)*cos(pi*t/Tfinal)
 
+c             # v = U(2) component 
               cu2 = 10.0/period*cos(pi*tp)
 
               fu2 = sin(2*lp)
-              fu2x = 2*sin(lp)*lpx
-              fu2y = 2*sin(lp)*lpy
+              fu2x = 2*cos(2*lp)*lpx
+              fu2y = 2*cos(2*lp)*lpy
+
               gu2 = cos(th)
               gu2x = -thx*sin(th)
               gu2y = -thy*sin(th)
 
-c              ucomp(2) = 10.0/period*sin(2*lp)*cos(th)*cos(pi*tp)
               ucomp(2) = cu2*fu2*gu2
 
               u2x = cu2*(fu2*gu2x + fu2x*gu2)
               u2y = cu2*(fu2*gu2y + fu2y*gu2)
 
-              uderivs_comp(1) = u1x
-              uderivs_comp(2) = u1y
-              uderivs_comp(3) = u2x
-              uderivs_comp(4) = u2y
-
-              call  map_diff_normalized(x,y,ucomp, uderivs_comp, 
-     &                                  derivs)              
           elseif (example .eq. 2) then
+c             # -----------------------------------------------------
 c              # Nair and Lauritzen (2010) Case 3 (kappa = 2)            
 c             u = -(kappa/2.d0)*sin(lp/2.d0)**2*sin(2*th)*cos(th)**2
 c                    *cos(pi*t/Tfinal) + 2*pi*cos(th)/Tfinal
+c             v = (kappa/4.d0)*sin(lp)*(cos(th)**3)*cos(pi*t/Tfinal)
+c             # -----------------------------------------------------
 
+c             # U(1) component 
               cu1 = -5.d0/period*cos(pi*tp)
 
               fu1 = sin(lp/2.d0)**2
@@ -168,19 +164,11 @@ c                    *cos(pi*t/Tfinal) + 2*pi*cos(th)/Tfinal
               ghx = gu1*hu1x + gu1x*hu1
               ghy = gu1*hu1y + gu1y*hu1
 
-c              ucomp(1) = -5.d0/period*sin(lp/2.d0)**2*sin(2*th)*
-c     &                    cos(th)**2*cos(pi*tp) +
-c     &                    pi2*cos(th)/period
-
-              ucomp(1) = cu1*fu1*gu1*hu1 + pi2*cos(th)/period
-
-
               u1x = cu1*(fu1*ghx + fu1x*gh) - (pi2/period)*sin(th)*thx
               u1y = cu1*(fu1*ghy + fu1y*gh) - (pi2/period)*sin(th)*thy
 
 
-c             v = (kappa/4.d0)*sin(lp)*(cos(th)**3)*cos(pi*t/Tfinal)
-
+c             # U(2) component 
               cu2 = 5.d0/(2.d0*period)*cos(pi*tp)
 
               fu2 = sin(lp)
@@ -191,23 +179,28 @@ c             v = (kappa/4.d0)*sin(lp)*(cos(th)**3)*cos(pi*t/Tfinal)
               gu2x = -3.d0*cos(th)**2*sin(th)*thx
               gu2y = -3.d0*cos(th)**2*sin(th)*thy
 
-c              ucomp(2) = 5.d0/(2.d0*period)*sin(lp)*
-c     &               cos(th)**3*cos(pi*tp)
-
               ucomp(2) = cu2*fu2*gu2
 
               u2x = cu2*(fu2*gu2x + fu2x*gu2)
               u2y = cu2*(fu2*gu2y + fu2y*gu2)
 
-              uderivs_comp(1) = u1x
-              uderivs_comp(2) = u1y
-              uderivs_comp(3) = u2x
-              uderivs_comp(4) = u2y
+          endif
+c         # ------------------------------
+c         # Store derivatives
+c         # ------------------------------
 
-              call  map_diff_normalized(x,y,ucomp, uderivs_comp, 
+          uderivs_comp(1) = u1x
+          uderivs_comp(2) = u1y
+          uderivs_comp(3) = u2x
+          uderivs_comp(4) = u2y
+
+c         # compute d(u1/norm(t1))/dx
+c         # compute d(u1/norm(t1))/dy
+c         # compute d(u2/norm(t2))/dx
+c         # compute d(u2/norm(t2))/dy
+          call  map_diff_normalized(x,y,ucomp, uderivs_comp, 
      &                                  derivs)              
 
-          endif
 c         # Normalize covariant vectors          
           call map_covariant_basis(x, y, t1,t2)
           t1n2 = map_dot(t1,t1)

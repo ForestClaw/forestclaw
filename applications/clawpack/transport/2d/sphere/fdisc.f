@@ -21,7 +21,7 @@
       call fclaw2d_map_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)
 
-      call map2spherical(xp,yp,zp,phi,theta)
+      call map2spherical(xp,yp,zp,theta,phi)
 
       fdisc = abs(theta-pi) - pi/6
 

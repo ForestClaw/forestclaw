@@ -32,12 +32,6 @@ c     # Capacity : entry (1)
          enddo
       enddo
 
-cc     # Center velocities : entries (2-5)            
-c      call sphere_set_center_velocities(blockno, mx,my,mbc,dx,dy,
-c     &          xlower,ylower,t,
-c     &          edgelengths,xnormals,ynormals,surfnormals,
-c     &          aux, maux)
-
 c     # Needed to scale speeds in Riemann solver when using
 c     # cell-centered velocities
       do i = 1-mbc,mx+mbc
@@ -62,21 +56,17 @@ c             # Map to spherical coordinates in [0,1]x[0,1]
       end
 
 
-      subroutine sphere_set_velocities(blockno, 
-     &          mx,my,mbc,dx,dy,xlower,ylower, t, 
-     &          xnormals,ynormals,surfnormals,
-     &          aux, maux)
+      subroutine sphere_set_velocities(blockno, mx,my,mbc,
+     &        dx,dy,xlower,ylower, t, xnormals,ynormals,
+     &        surfnormals, aux, maux)
       implicit none
 
       integer mx,my,mbc,maux,blockno
       double precision dx,dy, xlower,ylower, t
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      integer mapping
-      common /mapping_comm/ mapping
+c      double precision pi, pi2
+c      common /compi/ pi, pi2
 
       double precision xc,yc
       double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, map_dot

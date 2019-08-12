@@ -82,8 +82,8 @@ void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
                                     &xtangents, &ytangents,
                                     &surfnormals);
 
-    double *aux;
     int maux;
+    double *aux;
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     SPHERE_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
@@ -114,7 +114,6 @@ void sphere_b4step2(fclaw2d_global_t *glob,
     double *aux;
     int maux;
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-
 
     SPHERE_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
                           &dx, &dy, &xlower, &ylower,
