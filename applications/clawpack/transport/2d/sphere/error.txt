@@ -138,15 +138,22 @@ Cubed sphere (uniform)
  1024/  512   1.8753   1.8550   1.6946   0.9995
 ------------------------------------------------
 
+# ----------------------------------
+# Nair and Lauritzen test cases
+# Example 1 : non-divergent
+# Example 2 : divergent
+# ----------------------------------
 
--- Example 1
+-- Example 1 - non-divergent Nair and Lauritzen test case 4
 -- Uniform 
 -- Using divergent-free velocity field
 -- 16x16 patches
--- dt = 2e-2; nout=25; nstep=25
+-- dt = 2e-2; 
+-- nout=25; nstep=25
 -- CFL =  0.736584
 -- tfinal = 0.5
--- WITH conservation fix (conservation error shown)
+-- WITH conservation fix 
+-- CONVERGES
 
 16    3.7977e-02  1.0119e-01 6.7853e-01
 32    2.5025e-02  7.5122e-02 5.9564e-01
@@ -167,7 +174,7 @@ Cubed sphere (uniform)
 ---------------------------------------
 
 
--- Example 2
+-- Example 2 - Divergent Nair and Lauritzen test case
 -- Uniform 
 -- Using divergent-free velocity field
 -- 32x32 patches
@@ -211,13 +218,15 @@ Cubed sphere (uniform)
                          Monday 8/12/2019
 --------------------------------------------------------------------------
 
--- Reproducing Rigid body rotation problem from Saturday
+-- Reproducing rigid body rotation problem from Saturday
 -- omega = 0.504044089748692   0.215303047183433   0.836411473775283
 -- 16x16 patches
 -- dt = 5e-2; nout=10; nstep=10
 -- CFL =  0.736584
 -- tfinal = 0.5
 -- With conservation fix
+
+-- Code at SHA : 2375077edde7763530
 
 # --------------------------------------
 # From Saturday
@@ -230,5 +239,47 @@ Cubed sphere (uniform)
 512   3.4036e-04  2.5648e-03 4.9120e-02    % 87.8269 seconds
 1024  8.8340e-05  6.8974e-04 1.5175e-02    % 593.398
 
-
+# --------------------------------------
+# Today - checks out. 
+# --------------------------------------
 16    2.3872e-02  7.3848e-02 5.1378e-01
+32    1.4804e-02  5.2970e-02 4.3521e-01
+.......
+
+
+-- REPRODUCING Laurtizen results from Saturday
+
+-- (from Saturday)
+-- Example 1 - non-divergent Nair and Lauritzen test case 4
+-- Uniform 
+-- Using divergent-free velocity field
+-- 16x16 patches
+-- dt = 2e-2; 
+-- nout=25; nstep=25
+-- CFL =  0.736584
+-- tfinal = 0.5
+-- WITH conservation fix 
+-- CONVERGES
+
+
+# --------------------------------------
+# From Saturday
+# --------------------------------------
+16    3.7977e-02  1.0119e-01 6.7853e-01
+32    2.5025e-02  7.5122e-02 5.9564e-01
+64    1.4937e-02  5.2282e-02 4.5305e-01
+128   7.9188e-03  3.3197e-02 3.4287e-01     
+256   3.4000e-03  1.7739e-02 2.6010e-01     % 84.0557
+512   1.1160e-03  7.3439e-03 1.3659e-01     % 517.75 s
+1024  2.9892e-04  2.3120e-03 5.7446e-02     % 2977.18  (32x32 patches)
+
+
+# --------------------------------------
+# Today - doesn't check out (:-((
+# --------------------------------------
+
+
+
+
+
+
