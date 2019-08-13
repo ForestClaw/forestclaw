@@ -1,9 +1,15 @@
 setviews;
 
+global flat
+
 example = read_vars();
 
-s = 0.0;
-axis([-1-s 1+s -1-s 1+s])
+if (flat)
+    axis([0, 2*pi,  -pi/2, pi/2]);
+else
+    s = 0.0;
+    axis([-1-s 1+s -1-s 1+s])
+end    
 daspect([1 1 1]);
 axis on;
 
@@ -21,6 +27,7 @@ if (mq == 3)
     % Plot the error
     c = max([qmin,qmax]);
     ca = [-c,c];    
+    ca = [-1,1]*1e-3;
 else    
     % Plot the solution
     ca = [-0.3,1];
@@ -36,11 +43,19 @@ showpatchborders;
 setpatchborderprops('linewidth',1);
 hidegridlines;
 
-view([ 59.297571594931483, 8.368467153284623]);
-view([1.527452862277914e+02, 1.780446485025879]);
-view(3)
-view(vleft);
-% view(vtop);
+if (~flat)
+    view([ 59.297571594931483, 8.368467153284623]);
+    view([1.527452862277914e+02, 1.780446485025879]);
+    view(3)
+    % view(vtop);
+    % view(vtop);
+    hold on;
+    th = linspace(-pi/2, pi/2,500);
+    plot3(cos(th),0*th,sin(th),'k','linewidth',4);
+    th = linspace(pi/32, 2*pi-pi/32,500);
+    plot3(cos(th),sin(th),0*th,'k','linewidth',4);
+    hold off;
+end
 
 NoQuery = 0;
 prt = false;

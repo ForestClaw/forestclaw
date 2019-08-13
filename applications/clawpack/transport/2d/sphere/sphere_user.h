@@ -73,7 +73,8 @@ void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
 user_options_t* sphere_options_register (fclaw_app_t * app, const char *configfile);
 
 /* --------------------------------- Mappings ----------------------------------------- */
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[]);
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[], 
+                                                    const double rotate[]);
 
 fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere(const double scale[]);
 

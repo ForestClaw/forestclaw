@@ -44,10 +44,15 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
+    double rotate[2];
+    rotate[0] = fclaw_opt->phi;
+    rotate[1] = fclaw_opt->theta;
+
     switch (user_opt->mapping) {
     case 0:
         conn = p4est_connectivity_new_cubed();
-        cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale);
+        cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale,
+                                           rotate);
         break;
     case 1:
         conn = p4est_connectivity_new_pillow();

@@ -94,10 +94,12 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_CUBEDSPHERE(&blockno, &xc,&yc,xp,yp,zp);
 
+    rotate_map(cont,xp,yp,zp);
     scale_map(cont,xp,yp,zp);
 }
 
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[])
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[],
+                                                    const double rotate[])
 {
     fclaw2d_map_context_t *cont;
 
@@ -105,6 +107,8 @@ fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[])
     cont->query = fclaw2d_map_query_cubedsphere;
     cont->mapc2m = fclaw2d_map_c2m_cubedsphere;
     cont->basis = fclaw2d_map_c2m_basis_cubedsphere;
+
+    set_rotate(cont,rotate);
 
     set_scale(cont,scale); 
 

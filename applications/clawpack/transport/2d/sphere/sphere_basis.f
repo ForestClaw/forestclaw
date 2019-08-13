@@ -228,13 +228,11 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
       double precision pi, pi2
       common /compi/ pi, pi2
 
-
       phi = asin(zp)          !! returns value in [-pi/2, pi/2]
       theta = atan2(yp,xp)    !! returns value in [-pi, pi]
       if (theta < 0) then
           theta = theta + pi2
       endif
-
 
       end
 

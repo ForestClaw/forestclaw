@@ -244,17 +244,95 @@ Cubed sphere (uniform)
 
 
 -- ADAPTIVE
--- Example 2 - Divergent Nair and Lauritzen test case
+-- Example 2 - Divergent Nair and Lauritzen test case 3
 -- Using divergent-free velocity field
 -- 32x32 patches; start at minlevel=1  (since 25 not divisible by 2)
 -- dt = 2e-2; nout=25; nstep=25
 -- CFL =  0.627087
 -- tfinal = 0.5
 -- WITH conservation fix 
+-- refinement criteria : 0.005/0.001
+-- no zonal wind
+-- initial condition 1 (smooth hump)
+-- NOTE : Times include time to compute error and print output
+-- CONVERGES
+
+64     5.4277e-03  2.7198e-02 3.7039e-01        1.73421
+128    2.1264e-03  1.2963e-02 2.3653e-01        7.44052 
+256    6.5063e-04  4.7372e-03 1.3092e-01       21.3923
+512    1.7448e-04  1.3604e-03 5.7892e-02       66.7794
+1024   4.4024e-05  3.4631e-04 2.3966e-02      214.378
+2048   1.1025e-05  8.5205e-05 1.0239e-02      902.509 
+4096   2.7913e-06  2.0828e-05 4.7707e-03     5711.53 
+
+          Convergence rates
+------------------------------------------------
+  128/   64   1.3519   1.0691   0.6470  -2.1011
+  256/  128   1.7085   1.4523   0.8533  -1.5236
+  512/  256   1.8988   1.8000   1.1772  -1.6423
+ 1024/  512   1.9867   1.9739   1.2724  -1.6827
+ 2048/ 1024   1.9975   2.0231   1.2269  -2.0738
+------------------------------------------------
 
 
+-- Uniform
+-- Example 2 - Divergent Nair and Lauritzen test case 3
+-- Using divergent-free velocity field
+-- 32x32 patches; start at minlevel=1  (since 25 not divisible by 2)
+-- dt = 2e-2; nout=25; nstep=25
+-- CFL =  0.627087
+-- tfinal = 0.5
+-- WITH conservation fix 
+-- refinement criteria : 0.005/0.001
+-- no zonal wind
+-- initial condition : q = 1
+-- NOTE : Times include time to compute error and print output
+-- CONVERGES (only first order)
+
+64    3.2176e-04  7.3486e-04 1.4469e-02
+128   1.4777e-04  3.1095e-04 8.5239e-03
+256   6.8758e-05  1.3258e-04 4.6648e-03
+512   3.2542e-05  5.6778e-05 2.2585e-03
+1024  1.5634e-05  2.4939e-05 1.1903e-03
 
 
+          Convergence rates
+---------------------------------------
+  128/   64   1.1226   1.2408   0.7634
+  256/  128   1.1038   1.2298   0.8697
+  512/  256   1.0792   1.2235   1.0465
+ 1024/  512   1.0576   1.1869   0.9240    
+---------------------------------------
 
 
+-- ADAPTIVE
+-- Example 2 - Divergent Nair and Lauritzen test case 3
+-- Using divergent-free velocity field
+-- 32x32 patches; start at minlevel=1  (since 25 not divisible by 2)
+-- dt = 2e-2; nout=25; nstep=25
+-- CFL =  0.627087
+-- tfinal = 0.5
+-- WITH conservation fix 
+-- refinement criteria : 0.005/0.001
+-- no zonal wind
+-- initial condition : q = smooth hump
+-- rotate : theta = 1.570796326794897; phi = -0.785398163397448  
+-- rotated so humps are on triple points.
 
+-- NOTE : Times include time to compute error and print output
+-- CONVERGES 
+
+
+64     4.4775e-03  2.3540e-02 3.6378e-01
+128    1.7710e-03  1.1163e-02 2.0943e-01
+256    5.4732e-04  4.0699e-03 9.4619e-02
+512    1.4782e-04  1.1693e-03 3.1602e-02
+1024   3.7532e-05  2.9839e-04 9.9594e-03
+
+         Convergence rates
+---------------------------------------
+  128/   64   1.3381   1.0764   0.7966
+  256/  128   1.6941   1.4557   1.1463
+  512/  256   1.8885   1.7993   1.5821
+ 1024/  512   1.9776   1.9704   1.6659
+---------------------------------------

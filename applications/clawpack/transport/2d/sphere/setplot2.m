@@ -31,6 +31,7 @@ ContourValues = [];
 
 %---------------------------------
 
+UserColorMapping = 0;
 UserMap1d = 1;
 ScatterStyle = setplotstyle('ro','go','ro','go','bo','ro');
 

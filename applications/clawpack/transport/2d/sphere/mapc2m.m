@@ -1,13 +1,17 @@
 
 function [xp,yp,zp] = mapc2m(xc1,yc1)
 
-global notpillowsphere;
+global notpillowsphere flat;
+
+flat = false;
 
 map_list = {'cubedsphere', 'pillowpshere'};
 
 [example,mapping,ic,~, ~] = read_vars();
 
 map = map_list{mapping+1};
+
+map = 'cubedsphere_flat';
 
 switch map
     case 'pillowsphere'
@@ -32,17 +36,9 @@ switch map
                 xp = xp + s;
             otherwise
         end
-        %{
-            case 2
-                xp = xp + s;
-            case 3
-                yp = yp - s;
-            case 4
-                yp = yp + s;
-            case 5
-                zp = zp + s;
-        end
-        %}
+    case 'cubedsphere_flat'
+        flat = true;
+        [xp,yp,zp] = mapc2m_cubedsphere_flat(xc1,yc1);
 end
 
 

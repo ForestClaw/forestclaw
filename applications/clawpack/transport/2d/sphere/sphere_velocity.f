@@ -106,6 +106,8 @@ c             #           2*pi*cos(th)/Tfinal
 c             # v = kappa*sin(2*lp)*cos(th)*cos(pi*t/Tfinal)
 c             # --------------------------------------------------
 
+              zonal_flow = .true.
+
 c             # u = U(1) component 
               cu1 = 10.0/period*cos(pi*tp)
 
@@ -117,13 +119,19 @@ c             # u = U(1) component
               gu1x = 2*cos(2*th)*thx
               gu1y = 2*cos(2*th)*thy
 
-              ucomp(1) = cu1*fu1*gu1 + pi2*cos(th)/period
- 
-              u1x = cu1*(fu1*gu1x + fu1x*gu1) + 
-     &                  -(pi2/period)*sin(th)*thx
+              if (zonal_flow) then
+                  zf = (pi2/period)*cos(th)
+                  zfx = -(pi2/period)*sin(th)*thx
+                  zfy = 0
+              else
+                  zf = 0
+                  zfx = 0
+                  zfy = 0
+              endif
 
-              u1y = cu1*(fu1*gu1y + fu1y*gu1) + 
-     &                  -(pi2/period)*sin(th)*thy
+              ucomp(1) = cu1*fu1*gu1 + zf
+              u1x = cu1*(fu1*gu1x + fu1x*gu1) + zfx
+              u1y = cu1*(fu1*gu1y + fu1y*gu1) + zfy
 
 
 c             # v = U(2) component 
@@ -176,7 +184,6 @@ c             # U(1) component
               hu1  = cos(th)**2
               hu1x = -2.d0*cos(th)*sin(th)*thx
               hu1y = -2.d0*cos(th)*sin(th)*thy
-
 
               if (zonal_flow) then
                   zf = (pi2/period)*cos(th)

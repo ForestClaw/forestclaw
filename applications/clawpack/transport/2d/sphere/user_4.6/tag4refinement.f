@@ -25,8 +25,6 @@
 
       cont = get_context()
 
-      tag_patch = 0
-
 c     # Refine based only on first variable in system.
       refine = .false.
       mq = 1
