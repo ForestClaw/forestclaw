@@ -67,10 +67,8 @@ function setcolors(p,x,y,z,q)
 
 
 b = getblocknumber();
-
-bc = [0,1,2,3,4,5,5,0,3];
 c = {'r','b','g','y','c','m'};
 
-set(p,'facecolor',c{bc(b+1)+1});
+set(p,'facecolor',c{b+1});
 
 end

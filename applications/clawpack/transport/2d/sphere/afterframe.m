@@ -28,9 +28,16 @@ if (mq == 3)
     c = max([qmin,qmax]);
     ca = [-c,c];    
     ca = [-1,1]*1e-3;
-else    
-    % Plot the solution
-    ca = [-0.3,1];
+else
+    if (example == 3)
+        if Frame > 0 && Frame < 10
+            ca = [0,3.1];
+        else
+            ca = [-0.2,1];
+        end
+    else
+        ca = [0,1];
+    end
 end
 
 colormap(parula);
@@ -56,6 +63,10 @@ if (~flat)
     plot3(cos(th),sin(th),0*th,'k','linewidth',4);
     hold off;
 end
+
+cv = linspace(0.1,3.1,20);
+cv([1 end]) = [];
+% drawcontourlines(cv);
 
 NoQuery = 0;
 prt = false;

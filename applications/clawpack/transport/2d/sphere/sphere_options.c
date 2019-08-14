@@ -42,12 +42,6 @@ sphere_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "initial-condition", &user->initial_condition, 0,
                         "[user] Initial condition : 0=non-smooth; 1=smooth [1]");
 
-    sc_options_add_double (opt, 0, "kappa", &user->kappa, 0.4,
-                           "[user] Kappa [0.4]");
-
-    sc_options_add_double (opt, 0, "period", &user->period, 0.4,
-                           "[user] Period (set to tfinal) [0.4]");
-
     fclaw_options_add_double_array (opt, 0, "omega", &user->omega_string, "0 0 1",
                                     &user->omega, 3, 
                                     "Axis of rotation (example 0)  [0,0,1]");

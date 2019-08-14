@@ -41,12 +41,10 @@ typedef struct user_options
     int example;
     int mapping;
     int initial_condition;
+    int refine_pattern;
 
     double *omega;
     const char* omega_string;
-
-    double kappa;
-    double period;     /* formerly tfinal */
 
     int is_registered;
 
@@ -179,7 +177,7 @@ void  SPHERE_TAG4REFINEMENT(const int* mx,const int* my,
                              const int* mbc,const int* meqn,
                              const double* xlower, const double* ylower,
                              const double* dx, const double* dy,
-                             const int* blockno,
+                             const double *t, const int* blockno,
                              double q[], const double* tag_threshold,
                              const int* init_flag,
                              int* tag_patch);
@@ -190,6 +188,7 @@ void  SPHERE_TAG4COARSENING(const int* mx, const int* my,
                              const int* mbc, const int* meqn,
                              const double* xlower, const double* ylower,
                              const double* dx, const double* dy,
+                             const double *t, 
                              const int* blockno,
                              double q0[],double q1[],
                              double q2[],double q3[],

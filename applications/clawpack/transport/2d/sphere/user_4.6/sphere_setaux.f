@@ -42,20 +42,15 @@ c           # x-face and y-face edge lengths (6,7)
          enddo
       enddo
 
-      open(10,file='mapping.dat',position='append')
       do i = 1-mbc,mx+mbc
           do j = 1-mbc,my+mbc
 c             # Map to spherical coordinates in [0,1]x[0,1]
               call map2comp(xp(i,j),yp(i,j),zp(i,j),xc1,yc1)
 
-              write(10,101) xp(i,j), yp(i,j), zp(i,j), xc1, yc1
-101           format(5F16.8)              
-
               aux(i,j,8) = xc1
               aux(i,j,9) = yc1
           end do
       end do
-      close(10)
 
       return
       end

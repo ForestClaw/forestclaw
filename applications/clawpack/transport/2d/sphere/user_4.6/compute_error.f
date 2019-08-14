@@ -10,15 +10,25 @@
 
       integer*8 cont, get_context
 
-      integer mapping
-      common /mapping_comm/ mapping
+      integer example
+      common /example_comm/ example
 
       integer i,j,m
       double precision xc,yc, qexact
       double precision xc1, yc1, zc1, x,y
       double precision xp, yp, zp
+      integer flow_flag
 
       cont = get_context()
+
+      if (example .ne. 3) then
+c          # Divergent flow         
+           flow_flag = 0
+      else
+c          # non-divergent flow         
+           flow_flag = 1
+      endif
+
 
 c     # Assume a single field variable only
       do j = 1,my
@@ -33,7 +43,7 @@ c              # Map computational coordinates to unit square
                call fclaw2d_map_c2m(cont,blockno,xc,yc,
      &                              xp, yp, zp)
                call map2comp(xp,yp,zp,xc1,yc1)
-               soln(i,j,1) = qexact(xc1,yc1,t)
+               soln(i,j,1) = qexact(xc1,yc1,t,flow_flag)
             endif
             error(i,j,1) = q(i,j,1) - soln(i,j,1)
          enddo

@@ -1,5 +1,4 @@
-      subroutine sphere_basis_complete(x,y, t, 
-     &               tinv,tderivs, flag)
+      subroutine sphere_basis_complete(x,y, t, tinv,tderivs, flag)
       implicit none
       
       double precision x,y 
