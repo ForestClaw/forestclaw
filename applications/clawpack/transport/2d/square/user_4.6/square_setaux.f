@@ -61,6 +61,9 @@ c           # x-face and y-face edge lengths (6,7)
       double precision dx,dy, xlower,ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
+      integer mapping
+      common /mapping_comm/ mapping
+
       double precision xc,yc
       double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, map_dot
 
@@ -82,11 +85,12 @@ c     # Cell-centered velocities : entries (4,5,6)
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
 
-c           # This is not the square mapping, but rather maps the brick to
-c           # a unit square      
-            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-
-            call square_center_velocity(blockno, xc1,yc1,vel)
+c           # Map to unit square.  For this special case, the physical
+c           # domain and the computational domain is [0,1]x[0,1] so 
+c           # we can use mapping.  Otherwise, we would need to use 
+c           # a brick mapping, or possibly invert mapping.
+            call fclaw2d_map_c2m(cont,blockno,xc,yc,xc1,yc1,zc1)
+            call square_center_velocity(xc1,yc1,vel)
 
 c           # subtract out normal components
             do k = 1,3

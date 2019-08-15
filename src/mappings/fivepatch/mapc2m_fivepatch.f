@@ -3,7 +3,7 @@ C     # This returns a unit square map in [-1,1]x[-1,1]
       implicit none
 
       integer blockno
-      double precision xc,yc,xp,yp,zp,alpha, xc_in, yc_in
+      double precision xc,yc,xp,yp,zp,alpha
       double precision xc1, yc1
 
       if (blockno .eq. 2) then

@@ -77,7 +77,7 @@ typedef void (*fclaw2d_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
 
 
 /* Covariant and contravariant basis vectors needed for exact solution */
-typedef void (*fclaw2d_map_c2m_basis_t)(fclaw2d_map_context_t * cont, int blockno,
+typedef void (*fclaw2d_map_c2m_basis_t)(fclaw2d_map_context_t * cont, 
                                         double xc, double yc, 
                                         double *t, double *tinv, 
                                         double *tderivs, int flag);
@@ -158,7 +158,7 @@ void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
 #define FCLAW2D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw2d_map_c2m_basis, \
                                               FCLAW2D_MAP_C2M_BASIS)
 
-void FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont, int *blockno,
+void FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont, 
                             const double *xc, const double *yc,
                             double *t, double *tinv, double *tderivs,
                             int * flag);

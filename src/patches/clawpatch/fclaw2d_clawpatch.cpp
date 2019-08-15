@@ -56,6 +56,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* ------------------------------- Static function defs ------------------------------- */
 
+#if 0
+/* Added to turn off time_interp */
+static int fill_ghost(int time_interp)
+{
+	//return !time_interp;
+	return 1;
+}
+#endif
+
+
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
 static
@@ -575,67 +585,73 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
 
 static
 int clawpatch_tag4refinement(fclaw2d_global_t *glob,
-							 fclaw2d_patch_t *this_patch,
+							 fclaw2d_patch_t *patch,
 							 int blockno, int patchno,
 							 int initflag)
 {
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+	int mx,my,mbc;
+	double xlower,ylower,dx,dy;
+	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+								&xlower,&ylower,&dx,&dy);
+	int meqn;
+	double *q;
+	fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+	double refine_threshold = fclaw_opt->refine_threshold;
 
-	int mx,my,mbc,meqn;
-	double xlower,ylower,dx,dy;
-	double *q;
 	int tag_patch;
-	double refine_threshold;
-
-	refine_threshold = fclaw_opt->refine_threshold;
-
-	fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-								&xlower,&ylower,&dx,&dy);
-
-	fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-
-	tag_patch = 0;
-	clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-									  &blockno, q,&refine_threshold,
-									  &initflag,&tag_patch);
+	if (refine_threshold < 0) 
+	{
+		/* Always refine */
+		tag_patch = 1;
+	}
+	else
+	{
+		tag_patch = 0;	
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,
+		                                  &dx,&dy, &blockno, q,
+		                                  &refine_threshold,
+		                                  &initflag,&tag_patch);
+	}
 	return tag_patch;
 }
 
 static
 int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 							 fclaw2d_patch_t *fine_patches,
-							 int blockno,
-							 int patchno)
+							 int blockno, int patchno)
 {
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
-
-	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-
-	int mx,my,mbc,meqn;
+	int mx,my,mbc;
 	double xlower,ylower,dx,dy;
-	double *q[4];
-	int tag_patch,igrid;
-	double coarsen_threshold;
-	fclaw2d_patch_t *patch0;
-
-	patch0 = &fine_patches[0];
-
-	coarsen_threshold = fclaw_opt->coarsen_threshold;
-
+	fclaw2d_patch_t *patch0 = &fine_patches[0];
 	fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
-	for (igrid = 0; igrid < 4; igrid++)
+	int meqn;
+	double *q[4];
+	for (int igrid = 0; igrid < 4; igrid++)
 	{
 		fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
 	}
 
-	tag_patch = 0;
-	clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-									  &blockno, q[0],q[1],q[2],q[3],
-									  &coarsen_threshold,&tag_patch);
+	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+	double coarsen_threshold = fclaw_opt->coarsen_threshold;
+
+	int tag_patch = 0;
+	if (coarsen_threshold > 0) 
+	{		
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,
+		                                  &xlower,&ylower,&dx,&dy,
+		                                  &blockno, q[0],q[1],q[2],q[3],
+		                                  &coarsen_threshold,&tag_patch);
+	}
+	else
+	{
+		/* Never coarsen */
+	}
 	return tag_patch == 1;
 }
 

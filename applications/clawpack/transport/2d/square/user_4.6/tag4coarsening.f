@@ -8,7 +8,7 @@ c     # fclaw2d_fort_average2coarse
 c     # --------------------------------------------
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine clawpack46_tag4coarsening(mx,my,mbc,meqn,
+      subroutine square_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -54,39 +54,47 @@ c     # not be coarsened.
       end
 
       subroutine user_get_minmax(mx,my,mbc,meqn,mq,q,
-     &      qmin,qmax,coarsen_threshold,tag_patch)
+     &      qmin,qmax,tag_threshold,tag_patch)
 
       implicit none
       integer mx,my,mbc,meqn,mq,tag_patch
-      double precision coarsen_threshold
+      double precision tag_threshold
       double precision qmin,qmax
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
+      integer initchoice
+      common /initchoice_comm/ initchoice
+
       integer example
       common /example_comm/ example
-      
+
+      logical refine
+
+
       integer i,j
 
       do i = 1,mx
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if (example .eq. 0) then
-                if (q(i,j,mq) .gt. coarsen_threshold .and. 
-     &                 q(i,j,mq) .lt. 1-coarsen_threshold) then
-c                    # We won't coarsen this family because at least one
-c                    # grid fails the coarsening test.
-                     tag_patch = 0
-                     return
-                endif
-            elseif (example .eq. 1 .or. example .eq. 2) then
-                if (q(i,j,mq) .gt.  coarsen_threshold) then
-                    tag_patch = 0
-                    return
-                endif
-            else
-                write(6,'(A,A)') 'Coarsening not yet defined for ',
-     &                             'example > 0'
+            if (initchoice .le. 1) then
+               if (example .eq. 0) then
+                   refine = q(i,j,mq) .gt. tag_threshold .and. 
+     &                q(i,j,mq) .lt. 1-tag_threshold
+               else
+                    refine = q(i,j,mq) .gt. tag_threshold
+               endif
+            elseif (initchoice .eq. 2) then
+                refine = q(i,j,mq) .gt.  tag_threshold              
+            else                
+                write(6,'(A,A)') 'Refining not yet defined for ',
+     &                  'example > 0'
+                stop
+            endif
+            if (refine) then
+c               # Criteria for coarsening not satisfied.
+                tag_patch = 0
+                return
             endif
          enddo
       enddo

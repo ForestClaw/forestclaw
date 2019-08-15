@@ -16,6 +16,12 @@ void MAPC2M_BILINEAR(int* blockno, double* xc, double *yc,
                      double *xp, double *yp, double *zp,
                      double *center);
 
+#define SQUARE_BASIS_COMPLETE FCLAW_F77_FUNC(square_basis_complete, \
+                                             SQUARE_BASIS_COMPLETE)
+
+void SQUARE_BASIS_COMPLETE(const double* x, const double *y,
+                           double t[], double tinv[], double uderivs[], 
+                           const int* flag);
 
 static int
 fclaw2d_map_query_bilinear (fclaw2d_map_context_t * cont, int query_identifier)
@@ -69,23 +75,24 @@ fclaw2d_map_query_bilinear (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
+fclaw2d_map_c2m_basis_bilinear(fclaw2d_map_context_t * cont,
+                               double xc, double yc, 
+                               double *t, double *tinv, 
+                               double *tderivs, int flag)
+{
+    /* Mapping must work for single Cartesian grid.   
+       [xc,yc] \in [0,1]x[0,1] */
+    SQUARE_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
+}
+
+
+static void
 fclaw2d_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
                          double xc, double yc,
                          double *xp, double *yp, double *zp)
 {
     /* Brick mapping to computational coordinates [0,1]x[0,1] */
     double center[2];
-
-    /* Don't scale brick domain into [0,1].  Instead, mapping is more conveniently
-       implemented using native block coordinates, where each block is in 
-       [0,1]x[0,1] */
-#if 0    
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
-    xc1 = xc;
-    yc1 = yc;
-#endif    
-
-
     center[0] = cont->user_double[0];
     center[1] = cont->user_double[1];
 
@@ -108,6 +115,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
     cont = FCLAW_ALLOC_ZERO(fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_bilinear;
     cont->mapc2m = fclaw2d_map_c2m_bilinear;
+    cont->basis = fclaw2d_map_c2m_basis_bilinear;
     cont->brick = brick;
 
 
