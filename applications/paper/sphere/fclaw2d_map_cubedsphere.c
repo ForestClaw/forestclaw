@@ -18,9 +18,11 @@ void SPHERE_BASIS_COMPLETE(const double* x, const double *y,
                            double t[], double tinv[], double uderivs[], 
                            const int* flag);
 
+#if 0
 #define MAP2COMP FCLAW_F77_FUNC(map2comp,MAP2COMP)
 
 void MAP2COMP(double* xp, double* yp, double* zp, double* xc1, double* yc1);
+#endif
 
 
 

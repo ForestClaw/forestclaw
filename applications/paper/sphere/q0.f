@@ -103,40 +103,6 @@ c     # ---------------------------------------------------------------
 
       end
 
-c     # ---------------------------------------------------------------      
-      double precision function q0_test_refine(xp,yp,zp)
-      implicit none
-
-      double precision xp, yp, zp
-
-      double precision pi, pi2
-      common /compi/ pi, pi2
-
-      double precision q0, x0(2), y0(2), z0(2), r0, r
-      integer k
-
-      x0(1) = cos(5*pi/6.d0)
-      x0(2) = cos(7*pi/6.d0)
-      y0(1) = 0.5
-      y0(2) = -0.5
-      z0(1) = 0
-      z0(2) = 0
-
-      r0 = 0.5
-      q0 = 0
-      do  k = 1,2
-          r = sqrt((xp - x0(k))**2 + (yp-y0(k))**2 
-     &                 + (zp-z0(k))**2)
-          if (r .le. r0) then
-              q0 = 1
-          endif
-      end do
-
-      q0_test_refine = q0
-
-      end
-
-
       double precision function q0_init(xc,yc)
       implicit none 
 

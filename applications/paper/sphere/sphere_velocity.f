@@ -1,22 +1,20 @@
 c     # ------------------------------------------------------------
 c     # Prescribes velocity fields for the unit sphere.
 c     # 
-c     # Assumes all components are given in coordinates relative to 
-c     # the standard basis (1,0) and (0,1). 
 c     # ------------------------------------------------------------
    
-      subroutine velocity_components_spherical(x,y,t, u, vcart,flag)
-      implicit none
+c      subroutine sphere_velocity_components(x,y,t, u, vcart,flag)
+c      implicit none
+c
+c      double precision x, y, t, u(2),vcart(3)
+c      double precision derivs(4)
+c      integer flag
+c
+c      call sphere_velocity_derivs(x,y,t, u,vcart, derivs, flag)
+c
+c      end
 
-      double precision x, y, t, u(2),vcart(3)
-      double precision derivs(4)
-      integer flag
-
-      call velocity_derivs(x,y,t, u,vcart, derivs, flag)
-
-      end
-
-      subroutine velocity_derivs(x,y,t, u, vcart, derivs, flag)
+      subroutine sphere_velocity_derivs(x,y,t, u, vcart, derivs, flag)
       implicit none
 
       double precision x, y, t, u(2)
@@ -279,16 +277,25 @@ c         # "Normalized" flow field
 
       end
 
+c     # ----------------------------------------------------------------
+c     #                       Public interface
+c     # ----------------------------------------------------------------
 
+
+c     # ---------------------------------------------
+c     # Called from setaux
+c     # 
+c     #    -- used to compute velocity at faces
+c     # ---------------------------------------------
       subroutine velocity_components_cart(x,y,t,vcart)
       implicit none
 
-      double precision x,y,t, vcart(3)
-      double precision u(2), t1(3), t2(3)
+      double precision x,y,t, u(2), vcart(3), uderivs(4)
+      double precision t1(3), t2(3)
       integer flag, k
 
 
-      call velocity_components_spherical(x,y,t, u,vcart,flag)
+      call sphere_velocity_derivs(x,y,t, u,vcart,uderivs,flag)
 
       if (flag .eq. 0) then
 c         # Velocity components are given in spherical components
@@ -304,20 +311,22 @@ c         # and must be converted to Cartesian
 
 
 c     # ------------------------------------------------------------
-c     # Called from qexact
+c     # Called from map_divergence
+c     # 
+c     #    -- Needed to define ODE system to get exact solution
 c     # ------------------------------------------------------------
-      subroutine velocity_components(x,y,t,u)
+      subroutine velocity_derivs(x,y,t, u, vcart, derivs, flag)
       implicit none
 
-      double precision x,y,t, u(2)
-      double precision vcart(3), t1(3), t2(3)
-      double precision t1n2, t2n2, map_dot
+      double precision x,y,t, u(2), vcart(3), derivs(4)
+      double precision t1(3), t2(3), t1n2, t2n2, map_dot
       integer flag
 
-      call velocity_components_spherical(x,y,t, u,vcart,flag)
+      call sphere_velocity_derivs(x,y,t, u,vcart,derivs,flag)
 
       if (flag .eq. 1) then
 c         # Velocity components are given in Cartesian components
+c         # Derivatives are automatically given in terms of basis.
           call map_covariant_basis(x, y, t1,t2)
           t1n2 = map_dot(t1,t1)
           t2n2 = map_dot(t2,t2)
@@ -327,18 +336,33 @@ c         # Velocity components are given in Cartesian components
 
       end
 
+c     # ------------------------------------------------------------
+c     # Called from qexact
+c     # 
+c     #  -- components relative to basis are needed.
+c     # ------------------------------------------------------------
+      subroutine velocity_components(x,y,t,u)
+      implicit none
+
+      double precision x,y,t, u(2), vcart(3), derivs(4)
+      integer flag
+
+      call velocity_derivs(x,y,t, u,vcart,derivs,flag)
+
+      end
+
 
 c     # ------------------------------------------------------------
 c     # Public interface (called from setaux)
 c     # ------------------------------------------------------------
-      subroutine sphere_center_velocity(x,y,t,vcart)
-      implicit none
-
-      double precision x,y,t, vcart(3)
-
-      call velocity_components_cart(x,y,t,vcart)
-
-      end
+c      subroutine sphere_center_velocity(x,y,t,vcart)
+c      implicit none
+c
+c      double precision x,y,t, vcart(3)
+c
+c      call velocity_components_cart(x,y,t,vcart)
+c
+c      end
 
 
 

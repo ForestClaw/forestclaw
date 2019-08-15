@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/paper/sphere/sphere
 
-applications_paper_sphere_SOURCES = \
+applications_paper_sphere_sphere_SOURCES = \
 	applications/paper/sphere/sphere.cpp \
 	applications/paper/sphere/sphere_user.cpp \
 	applications/paper/sphere/sphere_user.h \
@@ -32,14 +32,14 @@ EXTRA_DIST += \
 	applications/paper/sphere/afterframe.m \
 	applications/paper/sphere/setplot2.m
 
-applications_paper_sphere_CPPFLAGS = \
+applications_paper_sphere_sphere_CPPFLAGS = \
 	    -I@top_srcdir@/applications/clawpack/advection/2d/all  \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_paper_sphere_LDADD = \
+applications_paper_sphere_sphere_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \

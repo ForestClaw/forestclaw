@@ -1,6 +1,6 @@
       subroutine sphere_setaux(blockno, mx,my,mbc,
-     &      xlower,ylower,dx,dy, area, edgelengths, xp,yp,zp,
-     &      aux, maux)
+     &      xlower,ylower,dx,dy, area, edgelengths, 
+     &      xp,yp,zp, aux, maux)
       implicit none
 
       integer mbc, mx,my, meqn, maux
@@ -65,22 +65,19 @@ c             # Map to spherical coordinates in [0,1]x[0,1]
       double precision dx,dy, xlower,ylower, t
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
-c      double precision pi, pi2
-c      common /compi/ pi, pi2
-
       double precision xc,yc
       double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, map_dot
 
       double precision nl(3), nr(3), nb(3), nt(3)
       double precision urrot, ulrot, ubrot, utrot
 
-      integer*8 cont, get_context
+c      integer*8 cont, get_context
 
       integer i,j, k
 
       include "metric_terms.i"
 
-      cont = get_context()
+c      cont = get_context()
 
 c     # Cell-centered velocities : entries (4,5,6) 
       do i = 1-mbc,mx+mbc
@@ -89,7 +86,7 @@ c     # Cell-centered velocities : entries (4,5,6)
             xc1 = aux(i,j,8)
             yc1 = aux(i,j,9)
 
-            call sphere_center_velocity(xc1,yc1,t, vel)
+            call velocity_components_cart(xc1,yc1,t, vel)
 
 c           # subtract out normal components
             do k = 1,3
