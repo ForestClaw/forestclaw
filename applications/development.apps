@@ -4,7 +4,7 @@
 ## ------------------------------------------------------------------------
 
 ## Third order scalar advection
-include applications/clawpack/advection/2d/adv_order3/Makefile.am
+#include applications/clawpack/advection/2d/adv_order3/Makefile.am
 
 ## Shallow water on the sphere (D. Calhoun)
 #include applications/clawpack/shallow/2d/sphere/Makefile.am
@@ -22,13 +22,16 @@ include applications/clawpack/advection/2d/adv_order3/Makefile.am
 #include applications/clawpack/advection/2d/torus_error/Makefile.am
 
 ## shockbubble (square)
-# include applications/clawpack/euler/2d/shockbubble_debug/Makefile.am
+#include applications/clawpack/euler/2d/shockbubble_debug/Makefile.am
 
 ## periodic (original)
 #include applications/clawpack/advection/2d/periodic/Makefile.am
 
 ## bump (original)
 #include applications/clawpack/shallow/2d/bump/Makefile.am
+
+## Conservative advection (transport) on a square
+#include applications/clawpack/transport/2d/square/Makefile.am
 
 
 ## ---------------------------
