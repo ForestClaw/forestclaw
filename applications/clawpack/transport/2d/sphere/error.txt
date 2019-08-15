@@ -343,7 +343,7 @@ Cubed sphere (uniform)
 --------------------------------------------------------------------------
 
 
--- UNIFORM
+-- UNIFORM - Case 4
 -- Example 4 - non-divergent Nair and Lauritzen test case 4 (with zonal flow)
 -- 32x32 patches; start at minlevel=1  
 -- dt = 5e-3; nout=100; nstep=100
@@ -372,8 +372,8 @@ Cubed sphere (uniform)
 
 
 
--- ADAPTIVE
--- Example 4 - non-divergent Nair and Lauritzen test case 4 (with zonal flow)
+-- ADAPTIVE - Case 4
+-- Case 4 - non-divergent Nair and Lauritzen test case 4 (with zonal flow)
 -- 32x32 patches
 -- refinement criteria : 0.105/0.101
 -- dt = 1e-2; nout=50; nstep=50 at minlevel=0
@@ -401,3 +401,59 @@ Cubed sphere (uniform)
  1024/  512   1.8849   1.6680   1.2488  -2.2581
  2048/ 1024   1.8554   1.8877   1.4473  -2.5489
 ------------------------------------------------
+
+
+--------------------------------------------------------------------------
+                         Wednesday 8/13/2019
+--------------------------------------------------------------------------
+
+-- UNIFORM - Case 3
+-- Divergent Nair and Lauritzen test case 3
+-- Using divergent velocity field
+-- 32x32 patches; start at minlevel=1  (since 25 not divisible by 2)
+-- dt = 2e-2; nout=125; nstep=25
+-- CFL =  0.627087
+-- tfinal = 2.5
+-- WITH conservation fix 
+-- no zonal wind
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
+-- exact and computed maximum also shown
+
+ 
+64         1.6483e-02  7.8313e-02 1.7863e+00
+128        9.0525e-03  5.0476e-02 1.1621e+00      % 4.22349672e+00  5.23021635e+00
+256        4.2379e-03  2.8135e-02 6.5960e-01      % 4.22973088e+00  4.88158530e+00
+512        1.5688e-03  1.2709e-02 3.5473e-01      % 4.23085504e+00  4.39828668e+00
+1024       4.6648e-04  4.4924e-03 1.6614e-01      % 4.23085504e+00  4.39828668e+00
+2048
+
+          Convergence rates
+---------------------------------------
+  128/   64   0.8646   0.6337   0.6202
+  256/  128   1.0950   0.8432   0.8171
+  512/  256   1.4337   1.1465   0.8949
+ 1024/  512   1.7498   1.5003   1.0943
+---------------------------------------
+
+
+--------------------------------------------------------------------------
+                         Thursday 8/13/2019
+--------------------------------------------------------------------------
+
+
+-- UNIFORM - Case 4
+-- non-divergent Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : 0.105/0.101
+-- dt = 1e-2; 
+-- CFL =  0.9 <---------------- Variable time step
+-- tfinal = 2.5 <-------------- Longer time
+-- WITH conservation fix 
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
+
+
+32    6.9423e-02  1.5313e-01 8.7430e-01
+64    4.0041e-02  1.0766e-01 7.2165e-01
+128   2.5894e-02  7.5171e-02 5.9308e-01
+256   1.6730e-02  5.6238e-02 4.8070e-01
+512   
