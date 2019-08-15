@@ -36,16 +36,21 @@ extern "C"
 #endif
 #endif
 
+#if 0
+/* Needed so syntax highlighing works */
+#endif
+
+
 typedef struct user_options
 {
     int example;
     int mapping;
-    int use_wavelets;
+
+    int initial_condition;  /* Smooth or non-smooth */
 
     double alpha;    /* Used by five-patch mapping */
 
 
-    int initial_condition;  /* Smooth or non-smooth */
 
     double *velocity;
     const char *velocity_string;
@@ -150,6 +155,28 @@ void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir
                                double flux[]);
 
 
+#define SQUARE_SETAUX FCLAW_F77_FUNC(square_setaux, SQUARE_SETAUX)
+
+void SQUARE_SETAUX(const int* blockno, const int* mx, const int* my,
+                   const int* mbc, const double* xlower, const double* ylower,
+                   const double* dx, const double* dy, 
+                   double area[],double edgelengths[],
+                   double xp[], double yp[], double zp[],
+                   double aux[],const int* maux);
+
+
+#define SQUARE_SET_VELOCITIES FCLAW_F77_FUNC(square_set_velocities, \
+                                             SQUARE_SET_VELOCITIES)
+
+void SQUARE_SET_VELOCITIES(const int* blockno, const int* mx, const int* my,
+                   const int* mbc, const double* dx, const double* dy,
+                   const double* xlower, const double* ylower,
+                   const double *t, double xnormals[],double ynormals[],
+                   double surfnormals[], double aux[],const int* maux);
+
+
+
+#if 0
 #define CART_BASIS_COMPLETE FCLAW_F77_FUNC(cart_basis_complete, CART_BASIS_COMPLETE)
 
 void CART_BASIS_COMPLETE(const int* blockno, const double* x, const double *y,
@@ -166,7 +193,7 @@ void SQUARE_SETAUX(const int* blockno, const int* mx, const int* my,
                    double xnormals[],double ynormals[],
                    double surfnormals[],
                    double aux[],const int* maux);
-
+#endif
 
 #define  SQUARE_FORT_WRITE_FILE FCLAW_F77_FUNC(square_fort_write_file,  \
                                                 SQUARE_FORT_WRITE_FILE)
@@ -188,18 +215,6 @@ void SQUARE_FORT_HEADER_ASCII(char* matname1, char* matname2,
                                int* ngrids);
 
 
-#define SQUARE_TAG4REFINEMENT_WAVELET FCLAW_F77_FUNC(square_tag4refinement_wavelet, \
-                                              SQUARE_TAG4REFINEMENT_WAVELET)
-void  SQUARE_TAG4REFINEMENT_WAVELET(const int* mx,const int* my,
-                             const int* mbc,const int* meqn,
-                             const double* xlower, const double* ylower,
-                             const double* dx, const double* dy,
-                             const int* blockno,
-                             double q[],
-                             const double* tag_threshold,
-                             const int* init_flag,
-                             int* tag_patch);
-
 #define SQUARE_TAG4REFINEMENT FCLAW_F77_FUNC(square_tag4refinement, \
                                               SQUARE_TAG4REFINEMENT)
 void  SQUARE_TAG4REFINEMENT(const int* mx,const int* my,
@@ -212,9 +227,9 @@ void  SQUARE_TAG4REFINEMENT(const int* mx,const int* my,
                              const int* init_flag,
                              int* tag_patch);
 
-#define  SQUARE_TAG4COARSENING_WAVELET FCLAW_F77_FUNC(square_tag4coarsening_wavelet, \
-                                              SQUARE_TAG4COARSENING_WAVELET)
-void  SQUARE_TAG4COARSENING_WAVELET(const int* mx, const int* my,
+#define  SQUARE_TAG4COARSENING FCLAW_F77_FUNC(square_tag4coarsening, \
+                                              SQUARE_TAG4COARSENING)
+void  SQUARE_TAG4COARSENING(const int* mx, const int* my,
                              const int* mbc, const int* meqn,
                              const double* xlower, const double* ylower,
                              const double* dx, const double* dy,
@@ -225,9 +240,24 @@ void  SQUARE_TAG4COARSENING_WAVELET(const int* mx, const int* my,
                              int* tag_patch);
 
 
-#define  SQUARE_TAG4COARSENING FCLAW_F77_FUNC(square_tag4coarsening, \
-                                              SQUARE_TAG4COARSENING)
-void  SQUARE_TAG4COARSENING(const int* mx, const int* my,
+
+
+#if 0
+#define SQUARE_TAG4REFINEMENT_WAVELET FCLAW_F77_FUNC(square_tag4refinement_wavelet, \
+                                              SQUARE_TAG4REFINEMENT_WAVELET)
+void  SQUARE_TAG4REFINEMENT_WAVELET(const int* mx,const int* my,
+                             const int* mbc,const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q[],
+                             const double* tag_threshold,
+                             const int* init_flag,
+                             int* tag_patch);
+
+#define  SQUARE_TAG4COARSENING_WAVELET FCLAW_F77_FUNC(square_tag4coarsening_wavelet, \
+                                              SQUARE_TAG4COARSENING_WAVELET)
+void  SQUARE_TAG4COARSENING_WAVELET(const int* mx, const int* my,
                              const int* mbc, const int* meqn,
                              const double* xlower, const double* ylower,
                              const double* dx, const double* dy,
@@ -269,6 +299,7 @@ void PERIODIC_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
                                     double qcoarse[], double qfine[],
                                     double areacoarse[], double areafine[],
                                     const int* igrid, const int* manifold);
+#endif                                    
 
 
 #ifdef __cplusplus

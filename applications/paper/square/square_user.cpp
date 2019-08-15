@@ -59,38 +59,43 @@ void square_problem_setup(fclaw2d_global_t* glob)
 }
 
 void square_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *this_patch,
+                                    fclaw2d_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
-    //const user_options_t* user = square_get_options(glob);
-
-    int mx,my,mbc,maux;
+    int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    double *aux,*edgelengths,*area, *curvature;
-    double *xp, *yp, *zp, *xd, *yd, *zd;
-    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+    double *xp, *yp, *zp, *xd, *yd, *zd, *area;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fclaw2d_clawpatch_metric_scalar(glob, this_patch,&area,&edgelengths,
+    double *edgelengths,*curvature;
+    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
                                     &curvature);
 
-    fclaw2d_clawpatch_metric_vector(glob,this_patch,
-                                    &xnormals, &ynormals,
-                                    &xtangents, &ytangents,
-                                    &surfnormals);
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    double *aux;
+    int maux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);    
 
     SQUARE_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
-                  &dx,&dy, area, edgelengths,xnormals,ynormals,
-                  surfnormals, aux, &maux);
-    }
+                  &dx,&dy, area, edgelengths,xp,yp,zp,
+                  aux, &maux);
+
+
+    /* Assume that velocities don't depend on t */
+    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
+    fclaw2d_clawpatch_metric_vector(glob,patch, &xnormals, &ynormals, 
+                                    &xtangents, &ytangents, &surfnormals);
+
+    double t = 0; /* Not used */
+    SQUARE_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
+                          &dx, &dy, &xlower, &ylower,
+                          &t, xnormals,ynormals, surfnormals,
+                          aux,&maux);
+}
 
 static
 void cb_square_output_ascii (fclaw2d_domain_t * domain,
@@ -151,34 +156,20 @@ void square_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &square_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
-    patch_vt->setup   = &square_patch_setup_manifold;
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    patch_vt->setup = &square_patch_setup_manifold;
 
     fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
-    clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
-    clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
-    clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
+    clawpack46_vt->fort_qinit  = &CLAWPACK46_QINIT;
+    clawpack46_vt->fort_rpn2   = &RPN2CONS_FW_MANIFOLD; 
+    clawpack46_vt->fort_rpt2   = &RPT2CONS_MANIFOLD;      
     clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
     /* Clawpatch functions */
-    const user_options_t* user = square_get_options(glob);
+    //const user_options_t* user = square_get_options(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    if (user->use_wavelets)
-    {
-        clawpatch_vt->fort_tag4refinement = &SQUARE_TAG4REFINEMENT_WAVELET;
-        clawpatch_vt->fort_tag4coarsening = &SQUARE_TAG4COARSENING_WAVELET;
-    }
-    else
-    {
-        clawpatch_vt->fort_tag4refinement = &SQUARE_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &SQUARE_TAG4COARSENING;        
-    }
-
-#if 0
-    clawpatch_vt->fort_interpolate_face   = PERIODIC_FORT_INTERPOLATE_FACE;
-    clawpatch_vt->fort_interpolate_corner = PERIODIC_FORT_INTERPOLATE_CORNER;
-    clawpatch_vt->fort_interpolate2fine   = PERIODIC_FORT_INTERPOLATE2FINE;
-#endif    
+    clawpatch_vt->fort_tag4refinement = &SQUARE_TAG4REFINEMENT;
+    clawpatch_vt->fort_tag4coarsening = &SQUARE_TAG4COARSENING;        
 
     /* Include error in output files */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);

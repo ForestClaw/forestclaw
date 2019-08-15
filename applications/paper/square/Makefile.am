@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/paper/square/square
 
-applications_paper_square_SOURCES = \
+applications_paper_square_square_SOURCES = \
 	applications/paper/square/square.cpp \
 	applications/paper/square/square_user.cpp \
 	applications/paper/square/square_user.h \
@@ -20,7 +20,6 @@ applications_paper_square_SOURCES = \
 	applications/paper/square/qexact.f \
 	applications/paper/square/dopri5.f \
 	applications/paper/square/user_4.6/square_output.f \
-	applications/paper/square/user_4.6/periodic_interpolate.f \
 	applications/paper/square/user_4.6/compute_error.f \
 	applications/paper/square/user_4.6/qinit.f \
 	applications/paper/square/user_4.6/square_setaux.f \
@@ -28,23 +27,21 @@ applications_paper_square_SOURCES = \
 	applications/paper/square/user_4.6/rpt2cons_manifold.f \
 	applications/paper/square/user_4.6/rpn2cons_update_manifold.f \
 	applications/paper/square/user_4.6/tag4coarsening.f \
-	applications/paper/square/user_4.6/tag4refinement.f \
-	applications/paper/square/user_4.6/tag4coarsening_wavelet.f \
-	applications/paper/square/user_4.6/tag4refinement_wavelet.f
+	applications/paper/square/user_4.6/tag4refinement.f
 
 EXTRA_DIST += \
 	applications/paper/square/fclaw_options.ini \
 	applications/paper/square/afterframe.m \
 	applications/paper/square/setplot2.m
 
-applications_paper_square_CPPFLAGS = \
+applications_paper_square_square_CPPFLAGS = \
 	    -I@top_srcdir@/applications/clawpack/advection/2d/all  \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_paper_square_LDADD = \
+applications_paper_square_square_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \

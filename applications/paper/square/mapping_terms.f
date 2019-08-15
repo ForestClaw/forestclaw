@@ -7,6 +7,12 @@ c     # covariant and contravariant vectors for the domain.  For
 c     # example, the square domain uses basis vectors (1,0) and (0,1).
 c     # whereas the annular domain uses the usual polar coordinate basis
 c     # vectors.
+c     # 
+c     # NOTE : The blockno should only be used if the underlying domain
+c     # cannot be described by a single Cartesian domain.  The 
+c     # cubedsphere for example, is a multiblock description of 
+c     # the spherical coordinate system.  But the spherical coordinate 
+c     # system can be described with a single Cartesian block.
 c     # ------------------------------------------------------------
 
 
@@ -47,8 +53,7 @@ c     # Compute covariant derivatives only
       cont = get_context()
 
       flag = 3
-      call fclaw2d_map_c2m_basis(cont,
-     &             x,y, t, tinv,tderivs, flag)
+      call fclaw2d_map_c2m_basis(cont, x,y, t, tinv,tderivs, flag)
                                           
 
       do k = 1,3
@@ -81,8 +86,7 @@ c     # Compute covariant derivatives only
 
 c     # Compute covariant and derivatives
       flag = 7
-      call fclaw2d_map_c2m_basis(cont, 
-     &             x,y, t, tinv,tderivs, flag)
+      call fclaw2d_map_c2m_basis(cont, x,y, t,tinv,tderivs,flag)
                                           
 
       do k = 1,3
@@ -104,22 +108,32 @@ c     # Compute covariant and derivatives
 
       end
 
-      double precision function map_divergence(x,y)
+      double precision function map_divergence(x,y, t)
       implicit none
 
-      double precision x,y
+      double precision x,y, t
 
-      double precision u(2), uderivs(4), g(2,2,2)
-      double precision D11, D22
+      double precision u(2), vcart(3), derivs(4)
+      double precision D11, D22, g(2,2,2)
+      integer flag
 
 c     # Get g(i,j,k), g = \Gamma(i,j,k)
-      call velocity_derivs(x,y,u,uderivs)
-      call map_christoffel_sym(x,y,g) 
+      call velocity_derivs(x,y,t, u,vcart,derivs,flag)
 
-      D11 = uderivs(1) + u(1)*g(1,1,1) + u(2)*g(1,2,1)
-      D22 = uderivs(4) + u(1)*g(2,1,2) + u(2)*g(2,2,2)
+      if (flag .eq. 0) then
+c         # Velocity and derivatives are given in 
+c         # spherical components       
+          call map_christoffel_sym(x,y,g) 
 
-      map_divergence = D11 + D22
+          D11 = derivs(1) + u(1)*g(1,1,1) + u(2)*g(1,2,1)
+          D22 = derivs(4) + u(1)*g(2,1,2) + u(2)*g(2,2,2)
+
+          map_divergence = D11 + D22
+      else
+c         # Velocity and derivatives are given in 
+c         # Cartesian components        
+          map_divergence = derivs(1) + derivs(2) + derivs(3)
+      endif
 
       end
 
@@ -189,6 +203,82 @@ c     # Contravariant vectors
         tinv(k,1) = a11inv*t(k,1) + a12inv*t(k,2)
         tinv(k,2) = a21inv*t(k,1) + a22inv*t(k,2)
       end do
+
+      end
+
+      subroutine map_diff_normalized(x,y,u, uderivs, 
+     &         uderivs_norm)
+      implicit  none
+
+      double precision x,y,u(2), uderivs(4), uderivs_norm(4)
+
+      integer*8 cont, get_context
+
+      double precision t(3,2), tinv(3,2), tderivs(3,2,2)
+      double precision t1(3), t2(3), t1n2, t2n2
+      double precision t1x(3), t1y(3), t2x(3), t2y(3)
+      double precision t1n3, t2n3
+      double precision map_dot, map_quotient_rule
+      double precision t1n, t2n, dt1ndx, dt1ndy,dt2ndx,dt2ndy
+      integer flag, k
+
+      cont = get_context()
+
+      flag = 7
+      call fclaw2d_map_c2m_basis(cont,x,y,t,tinv, tderivs,flag)
+
+      do k = 1,3
+          t1(k) = t(k,1)
+          t2(k) = t(k,2)
+          t1x(k) = tderivs(k,1,1)
+          t1y(k) = tderivs(k,1,2)
+          t2x(k) = tderivs(k,2,1)
+          t2y(k) = tderivs(k,2,2)
+      enddo
+
+      t1n2 = map_dot(t1,t1)
+      t2n2 = map_dot(t2,t2)
+
+      t1n = sqrt(t1n2)
+      t2n = sqrt(t2n2)
+
+
+c     # d(norm(t1))/dx = d(sqrt(t1 dot t1))/dx      
+      dt1ndx = map_dot(t1,t1x)/t1n
+      dt1ndy = map_dot(t1,t1y)/t1n
+
+      dt2ndx = map_dot(t2,t2x)/t2n
+      dt2ndy = map_dot(t2,t2y)/t2n
+
+
+c     # d(u1/t1n)/dx      
+c      uderivs_norm(1) = (t1n2*uderivs(1) - u(1)*map_dot(t1x,t1))/t1n3
+      uderivs_norm(1) = map_quotient_rule(u(1),t1n,uderivs(1),dt1ndx)
+
+c     # d(u1/t1n)/dy      
+c      uderivs_norm(2) = (t1n2*uderivs(2) - u(1)*map_dot(t1y,t1))/t1n3
+      uderivs_norm(2) = map_quotient_rule(u(1),t1n,uderivs(2),dt1ndy)
+
+c     # d(u2/t2n)/dx      
+c      uderivs_norm(3) = (t2n2*uderivs(3) - u(2)*map_dot(t2x,t2))/t2n3
+      uderivs_norm(3) = map_quotient_rule(u(2),t2n,uderivs(3),dt2ndx)
+
+c     # d(u2/t2n)/dy
+c      uderivs_norm(4) = (t2n2*uderivs(4) - u(2)*map_dot(t2y,t2))/t2n3
+      uderivs_norm(4) = map_quotient_rule(u(2),t2n,uderivs(4),dt2ndy)
+
+
+
+      end
+
+
+      double precision function map_quotient_rule(f,g,fx,gx)
+      implicit none
+
+      double precision f,g,fx,gx
+
+c     # d(f/g)/dx = (g*fx - f*gx)/g^2
+      map_quotient_rule = (g*fx - f*gx)/g**2
 
       end
 

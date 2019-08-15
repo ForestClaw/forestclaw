@@ -1,9 +1,9 @@
-      subroutine square_basis_complete(blockno, x,y, t, 
+      subroutine square_basis_complete(x,y, t, 
      &                                   tinv,tderivs, flag)
       implicit none
       
       double precision x,y 
-      integer flag, blockno
+      integer flag
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
 
       integer k, kk, i
@@ -11,7 +11,7 @@
       logical compute_derivatives, b(32)
 
       if (flag > 7) then
-          write(6,*) 'psi.f : flag > 7'
+          write(6,*) 'square_basis_complete : flag > 7'
           stop
       endif
 
@@ -66,6 +66,17 @@ c             # d(t2)/dy = d(g*fy + gy*f)/dy
               tderivs(k,2,2) = 0
           enddo
       endif
+
+      end
+
+
+      subroutine map2comp(xp,yp,zp,xc,yc)
+      implicit none
+
+      double precision xp,yp,zp, xc,yc
+
+      xc = xp
+      yc = yp
 
       end
 

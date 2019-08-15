@@ -14,7 +14,9 @@ c     # ---------------------------------------------------------------
 
 
 c     # Sphere centered at (0.5,0.5,0) on swirl
-      if (initchoice .le. 1) then
+      if (initchoice .eq. 2) then
+          q0 = 1.d0
+      elseif (initchoice .le. 1) then
           x0 = 0.5
           y0 = 0.5
           z0 = 0
@@ -25,8 +27,6 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
 
           r = sqrt((xpp - x0)**2 + (ypp-y0)**2)
           q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
-      elseif (initchoice .eq. 2) then
-          q0 = 1.d0
       endif
 
       q0_physical = q0
@@ -42,6 +42,25 @@ c     # ---------------------------------------------------------------
       Hsmooth = (tanh(r/0.02d0) + 1)/2.d0
 
       end
+
+
+
+      double precision function q0_init(xc,yc)
+      implicit none 
+
+      double precision xc,yc
+
+      integer example
+      common /example_comm/ example
+
+      double precision zc, q0
+      double precision q0_physical
+
+      zc = 0
+      q0_init = q0_physical(xc,yc,zc)
+
+      end
+
 
 
 
