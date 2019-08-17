@@ -13,16 +13,16 @@ c     # ------------------------------------------------------------
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision revs_per_s
-      common /stream_comm/ revs_per_s
+      double precision revs_per_s, cart_speed
+      common /stream_comm/ revs_per_s, cart_speed
 
       integer example
       common /example_comm/ example  
 
       double precision s, pim
 
-      flag = 0
       if (example .eq. 0) then
+          flag = 0
           u(1) = revs_per_s
           u(2) = 0
           derivs(1) = 0
@@ -30,6 +30,15 @@ c     # ------------------------------------------------------------
           derivs(3) = 0
           derivs(4) = 0
       elseif (example .eq. 1) then
+          flag = 1
+          vcart(1)  = cart_speed
+          vcart(2) = 0
+          vcart(3) = 0
+          derivs(1) = 0
+          derivs(2) = 0
+          derivs(3) = 0
+      elseif (example .eq. 2) then
+          flag = 0
           s = sqrt(2.d0)
           pim = 8*pi
           u(1) = s*cos(pim*x)

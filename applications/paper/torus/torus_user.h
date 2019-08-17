@@ -48,11 +48,14 @@ typedef struct user_options
     int example;
     int mapping; 
     int initial_condition;  /* Smooth or non-smooth */
+    int refine_pattern;
 
     double alpha;     /* Ratio of inner radius to outer radius */
     double beta;
 
+
     double revs_per_s;
+    double cart_speed;
 
     int claw_version;
 

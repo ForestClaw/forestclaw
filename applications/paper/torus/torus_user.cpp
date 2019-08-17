@@ -47,9 +47,11 @@ void torus_problem_setup(fclaw2d_global_t *glob)
         FILE *f = fopen("setprob.data","w");
         fprintf(f,  "%-24d   %s",user->example,"\% example\n");
         fprintf(f,  "%-24d   %s",user->initial_condition,"\% initial_condition\n");
+        fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refine_pattern\n");
         fprintf(f,  "%-24.6f   %s",user->alpha,"\% alpha\n");
         fprintf(f,  "%-24.6f   %s",user->beta,"\% beta\n");
         fprintf(f,  "%-24.6f   %s",user->revs_per_s,"\% revs_per_second\n");
+        fprintf(f,  "%-24.6f   %s",user->cart_speed,"\% cart_speed\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);

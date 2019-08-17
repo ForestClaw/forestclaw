@@ -1,6 +1,6 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-[~,~,alpha,beta,~] = read_vars();
+[~,~,~,alpha,beta,~] = read_vars();
 
 
 % Find center to expand radius around.

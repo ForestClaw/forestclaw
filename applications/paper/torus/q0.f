@@ -17,7 +17,7 @@ c     # ---------------------------------------------------------------
       common /torus_comm/ alpha, beta
 
       double precision x0, y0, z0
-      double precision q0, Hsmooth, r, r0
+      double precision q0, Hsmooth, r, r0, th
       integer k
 
 c     # Sphere centered at (0.5,0.5,0) on swirl
@@ -25,10 +25,16 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
           q0 = 1.d0
       elseif (initchoice .eq. 2) then
 c         # Sphere centered at (1,0,r0) on torus
-          r0 = alpha
-          x0 = 1.0
-          y0 = 0.0
-          z0 = r0
+          th = pi2*(0.25 + 1.d0/16.d0)
+          r0 = 0.15
+          x0 = cos(th)
+          y0 = sin(th)
+          z0 = alpha
+
+c          r0 = alpha
+c          x0 = 0.0
+c          y0 = 1.0
+c          z0 = r0
 
           r = sqrt((xp - x0)**2 + (yp-y0)**2 + (zp-z0)**2)
           q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
