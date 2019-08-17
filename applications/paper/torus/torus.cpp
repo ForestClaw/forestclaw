@@ -45,31 +45,21 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    /* Used locally */
-    double pi = M_PI;
-    double rotate[2];
-    int mi, mj, a,b;    
-
     /* ---------------------------------------------------------------
        Mapping geometry
        --------------------------------------------------------------- */
-    mi = fclaw_opt->mi;
-    mj = fclaw_opt->mj;
-    rotate[0] = pi*fclaw_opt->theta/180.0;
-    rotate[1] = 0;  /* Don't rotate through phi */
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
 
-    a = 1;  /* Torus is periodic in both directions */
-    b = 1;
+    int a = 1;  /* Torus is periodic in both directions */
+    int b = 1;
 
     /* This does both the regular torus and the twisted torus */
     conn  = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);
     cont  = fclaw2d_map_new_torus(brick,fclaw_opt->scale,
-                                  fclaw_opt->shift,
-                                  rotate,
                                   user_opt->alpha,
-                                  user_opt->beta,
-                                  user_opt->mapping);            
+                                  user_opt->beta);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, 
                                           fclaw_opt->minlevel, 

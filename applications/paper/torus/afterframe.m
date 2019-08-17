@@ -1,8 +1,6 @@
 setviews;
 
 plot_contour = false;
-plot_qtrue = false;
-
 if plot_contour
     yrbcolormap;
     hold on;
@@ -22,10 +20,7 @@ fprintf('%6s %16.8e\n\n','qmax',qmax);
 % yrbcolormap;
 colormap(parula);
 
-% showgridlines(1:5);
-
 showpatchborders;
-% hidepatchborders;
 setpatchborderprops('linewidth',1);
 
 daspect([1,1,1]);
@@ -34,7 +29,8 @@ caxis([0, 1]);
 colorbar
 axis off;
 
-view(vbot);
+view(3);
+view(vtop);
 
 if (mq >= 3)
     caxis([qmin,qmax]);

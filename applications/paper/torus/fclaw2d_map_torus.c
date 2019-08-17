@@ -10,6 +10,15 @@ extern "C"
 #endif
 #endif
 
+
+#define TORUS_BASIS_COMPLETE FCLAW_F77_FUNC(torus_basis_complete, \
+                            TORUS_BASIS_COMPLETE)
+
+void TORUS_BASIS_COMPLETE(const double* x, const double *y,
+                           double t[], double tinv[], double uderivs[], 
+                           const int* flag);
+
+
 static int
 fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -61,86 +70,52 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
+fclaw2d_map_c2m_basis_torus(fclaw2d_map_context_t * cont,
+                            double xc, double yc, 
+                            double *t, double *tinv, 
+                            double *tderivs, int flag)
+{
+    /* These coordinates are in [0,1]x[0,1] and are mapped to 
+       [theta,phi] using mappings in sphere_basis.f */
+    TORUS_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
+}
+
+
+static void
 fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
-    double xc1,yc1,zc1;
-    double alpha, beta;
-    double L[4];
-    double x,y;
-    int i;
-
-    /* blockno is ignored in the current torus mapping;  it just assumes
-       a single "logical" block in [0,1]x[0,1] */
-    alpha = cont->user_double[0];
-    beta = cont->user_double[1];
+    double alpha = cont->user_double[0];
+    double beta = cont->user_double[1];
 
     /* Data is not already in brick domain */
+    double xc1,yc1,zc1; /* We don't need zc1 - we are we computing it? */
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-    /* Map from orthogonal coordinates to non-orthogonal coordinates */
-    for(i=0; i < 4; i++)
-    {
-        L[i] = cont->user_double[2+i];
-    }
-
-    /* Map from (a1,a2) back to (x,y) */
-    x = L[0]*xc1 + L[1]*yc1;
-    y = L[2]*xc1 + L[3]*yc1;
-
-    MAPC2M_TORUS(&blockno,&x,&y,xp,yp,zp,&alpha,&beta);
+    MAPC2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
 
 }
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
                            const double scale[],
-                           const double shift[],
-                           const double rotate[],
                            const double alpha,
-                           const double beta,
-                           const int mapping)
+                           const double beta)
 {
-    int i;
-    double l0[4] = {1.,  0.,  0.,  1.};
-    double l1[4] = {1.,  0.,  1.,  1.};
-    double l2[4] = {1.,  -1.,  1.,  0.};
-
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_torus;
     cont->mapc2m = fclaw2d_map_c2m_torus;
+    cont->basis = fclaw2d_map_c2m_basis_torus;
+
+    cont->brick = brick;
 
     cont->user_double[0] = alpha;
     cont->user_double[1] = beta;
 
-    for(i = 0; i < 4; i++)
-    {
-        if (mapping == 0)
-        {
-            /* Regular torus mapping.  L given rowwise*/
-            cont->user_double[2+i] = l0[i];
-        }
-        else if (mapping == 1)
-        {
-            cont->user_double[2+i] = l1[i];
-        }
-        else if (mapping == 2)
-        {
-            cont->user_double[2+i] = l2[i];
-        }
-    }
-
-    cont->user_int[0] = mapping;  /* Might not be used */
-
-    /* Are we really using these? */
     set_scale(cont,scale);
-    set_shift(cont,shift);
-    set_rotate(cont,rotate);
-
-    cont->brick = brick;
 
     return cont;
 }

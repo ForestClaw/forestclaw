@@ -8,15 +8,19 @@ applications_paper_torus_torus_SOURCES = \
 	applications/paper/torus/fclaw2d_map_torus.c \
 	applications/paper/torus/setprob.f \
 	applications/paper/torus/torus_velocity.f \
-v	applications/paper/torus/torus_psi.f \
+	applications/paper/torus/torus_basis.f \
+	applications/paper/torus/mapping_terms.f \
 	applications/paper/torus/dopri5.f \
-	applications/paper/torus/fdisc.f \
 	applications/paper/torus/qexact.f \
+	applications/paper/torus/q0.f \
+	applications/paper/torus/fdisc.f \
 	applications/paper/torus/user_4.6/qinit.f \
 	applications/paper/torus/user_4.6/compute_error.f \
-	applications/paper/torus/user_4.6/torus46_setaux.f \
+	applications/paper/torus/user_4.6/torus_setaux.f \
 	applications/paper/torus/user_4.6/torus46_output.f \
 	applications/paper/torus/user_4.6/tag4refinement.f \
+	applications/paper/torus/user_4.6/torus_tag4coarsening.f \
+	applications/paper/torus/user_4.6/torus_tag4refinement.f \
 	applications/paper/torus/user_4.6/tag4coarsening.f \
 	applications/paper/torus/user_4.6/rpn2cons_fw_manifold.f \
     applications/paper/torus/user_4.6/rpt2cons_manifold.f \
