@@ -202,6 +202,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
       implicit none
 
       double precision xc,yc,theta, phi
+      double precision  thetax, thetay, phix, phiy
 
       double precision pi, pi2
       common /compi/ pi, pi2
@@ -209,21 +210,27 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
       double precision alpha, beta, theta_range(2), phi_range(2)
       common /torus_comm/ alpha, beta, theta_range, phi_range
 
-      double precision  thetax, thetay, phix, phiy
+      double precision tr1, tr2, pr1, pr2
 
 
 c     # Map xc in [0,1] to theta in [0,2*pi]
 c     # Map yc in [0,1] to phi in [-pi/2,pi/2]      
 
-      theta = pi2*(theta_range(1) + 
-     &              (theta_range(2) - theta_range(1))*xc)
-      thetax = pi2*(theta_range(2) - theta_range(1))
+
+      tr1 = pi2*theta_range(1)
+      tr2 = pi2*theta_range(2)
+
+      theta = tr1 + (tr2-tr1)*xc
+      thetax = tr2-tr1
       thetay = 0
 
-c      phi = -pi/2.d0 + pi*yc
-      phi = pi2*(phi_range(1) + (phi_range(2) - phi_range(1))*yc)
+
+      pr1 = pi2*phi_range(1)
+      pr2 = pi2*phi_range(2)
+
+      phi = pr1 + (pr2-pr1)*yc
       phix = 0
-      phiy = pi2*(phi_range(2) - phi_range(1))
+      phiy = pr2-pr1
 
       end
 
@@ -265,7 +272,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
       double precision alpha, beta, theta_range(2), phi_range(2)
       common /torus_comm/ alpha, beta, theta_range, phi_range
 
-      double precision r1
+      double precision r1, r
 
 c      r1 = alpha*(1 + beta*sin(pi2*xc))
 c      R = 1 + r1*cos(pi2*yc)
@@ -281,11 +288,24 @@ c      zp = r1*sin(pi2*yc)
       endif
 
       r1 = alpha*(1 + beta*sin(theta))
-      if (r1 .ne. 0) then
-          phi = asin(zp/r1)
-      else
-          phi = 0
+      if (r1 .eq. 0) then
+          write(6,*) 'torus_basis.f : r1 .eq. 0'
+          stop
       endif
+      phi = asin(zp/r1)
+      r = sqrt(xp**2 + yp**2)
+      if (r .le. 1) then
+          if (phi .gt. 0) then
+              phi = pi - phi
+          else
+              phi = -pi - phi
+          endif
+      endif
+      if (phi < 0) then
+          phi = phi + pi2
+      endif
+
+
 
       end
 
