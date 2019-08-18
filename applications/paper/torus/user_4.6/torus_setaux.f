@@ -9,7 +9,7 @@
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
       integer i,j, k
-      double precision dxdy, xc1, yc1, zc1, xc,yc
+      double precision dxdy, xc1, yc1, zc1, xc,yc, theta, phi
 
       integer*8 cont, get_context      
 
@@ -48,11 +48,10 @@ c           # x-face and y-face edge lengths (6,7)
 
       do i = 1-mbc,mx+mbc
           do j = 1-mbc,my+mbc
-              xc = xlower + (i-0.5)*dx
-              yc = ylower + (j-0.5)*dy
+c              xc = xlower + (i-0.5)*dx
+c              yc = ylower + (j-0.5)*dy
 
-              call map2comp(blockno, xc,yc, 
-     &                     xp(i,j),yp(i,j),zp(i,j),xc1,yc1)
+              call map2comp(xp(i,j),yp(i,j),zp(i,j),xc1,yc1)
 
 c             # Torus map 
               aux(i,j,8) = xc1

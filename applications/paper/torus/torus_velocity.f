@@ -39,6 +39,14 @@ c     # ------------------------------------------------------------
           derivs(3) = 0
       elseif (example .eq. 2) then
           flag = 0
+          u(1) = 0
+          u(2) = revs_per_s
+          derivs(1) = 0
+          derivs(2) = 0
+          derivs(3) = 0
+          derivs(4) = 0
+      elseif (example .eq. 2) then
+          flag = 0
           s = sqrt(2.d0)
           pim = 8*pi
           u(1) = s*cos(pim*x)

@@ -51,8 +51,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
 
-    int a = 1;  /* Torus is periodic in both directions */
-    int b = 1;
+    int a = fclaw_opt->periodic_x;  /* Torus is periodic in both directions */
+    int b = fclaw_opt->periodic_y;
 
     /* This does both the regular torus and the twisted torus */
     conn  = p4est_connectivity_new_brick(mi,mj,a,b);

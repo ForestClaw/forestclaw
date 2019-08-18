@@ -25,16 +25,11 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
           q0 = 1.d0
       elseif (initchoice .eq. 2) then
 c         # Sphere centered at (1,0,r0) on torus
-          th = pi2*(0.25 + 1.d0/16.d0)
-          r0 = 0.15
+          th = pi2*(0.25 + 1.d0/32.d0)
+          r0 = 0.05
           x0 = cos(th)
           y0 = sin(th)
           z0 = alpha
-
-c          r0 = alpha
-c          x0 = 0.0
-c          y0 = 1.0
-c          z0 = r0
 
           r = sqrt((xp - x0)**2 + (yp-y0)**2 + (zp-z0)**2)
           q0 = Hsmooth(r + r0) - Hsmooth(r - r0)

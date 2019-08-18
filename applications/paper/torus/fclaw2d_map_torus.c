@@ -11,6 +11,13 @@ extern "C"
 #endif
 
 
+#define MAPC2M_TORUS2 FCLAW_F77_FUNC(mapc2m_torus2,MAPC2M_TORUS2)
+
+void MAPC2M_TORUS2(const double* xc1, const double *yc1, 
+                   double* xp, double *yp, double *zp,
+                   const double* alpha, const double* beta);
+
+
 #define TORUS_BASIS_COMPLETE FCLAW_F77_FUNC(torus_basis_complete, \
                             TORUS_BASIS_COMPLETE)
 
@@ -93,7 +100,7 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
     double xc1,yc1,zc1; /* We don't need zc1 - we are we computing it? */
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-    MAPC2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
+    MAPC2M_TORUS2(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
 
 }
 

@@ -44,6 +44,14 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "beta", &user_opt->beta, 0.0,
                            "[user] beta > 0 gives variable cross section [0]");
 
+    fclaw_options_add_double_array (opt, 0, "theta", 
+                                    &user_opt->theta_string,"0 1",&user_opt->theta,2,
+                                    "[user] theta range [0,1]");    
+
+    fclaw_options_add_double_array (opt, 0, "phi", 
+                                    &user_opt->phi_string,"0 1",&user_opt->phi,2,
+                                    "[user] phi range [0,1]");    
+
     sc_options_add_int (opt, 0, "refine-pattern", &user_opt->refine_pattern, 0,
                            "[user] Refinement pattern [0]");
 
@@ -63,7 +71,8 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
 static fclaw_exit_type_t
 torus_postprocess(user_options_t *user_opt)
 {
-    /* nothing to post-process yet ... */
+    fclaw_options_convert_double_array (user_opt->phi_string, &user_opt->phi, 2);
+    fclaw_options_convert_double_array (user_opt->theta_string, &user_opt->theta, 2);
     return FCLAW_NOEXIT;
 }
 
@@ -71,12 +80,7 @@ torus_postprocess(user_options_t *user_opt)
 static fclaw_exit_type_t
 torus_check(user_options_t *user_opt)
 {
-    if (user_opt->example < 0 || user_opt->example > 1)
-    {
-        fclaw_global_essentialf
-            ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
-    }
+    /* Nothing to check */
     return FCLAW_NOEXIT;
 
 }
@@ -84,7 +88,8 @@ torus_check(user_options_t *user_opt)
 static void
 torus_destroy(user_options_t *user_opt)
 {
-    /* Nothing to destroy */
+    FCLAW_FREE (user_opt->theta);
+    FCLAW_FREE (user_opt->phi);
 }
 
 

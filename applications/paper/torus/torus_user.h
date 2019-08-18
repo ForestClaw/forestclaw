@@ -53,6 +53,11 @@ typedef struct user_options
     double alpha;     /* Ratio of inner radius to outer radius */
     double beta;
 
+    double *theta;
+    const char* theta_string;
+
+    double *phi;
+    const char* phi_string;
 
     double revs_per_s;
     double cart_speed;

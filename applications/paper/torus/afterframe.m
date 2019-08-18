@@ -19,7 +19,7 @@ end
 fprintf('%6s %16.8e\n','qmin',qmin);
 fprintf('%6s %16.8e\n\n','qmax',qmax);
 
-th = 2*pi*(0.25 + 1.d0/16.d0);
+th = 2*pi*(0.25 + 1.d0/32.d0);
 x0 = cos(th);
 y0 = sin(th);
 z0 = alpha + 0.01;

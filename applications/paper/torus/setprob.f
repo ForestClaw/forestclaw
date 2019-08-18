@@ -13,8 +13,8 @@
       integer refine_pattern
       common /refine_comm/ refine_pattern
 
-      double precision alpha, beta
-      common /torus_comm/ alpha, beta
+      double precision alpha, beta, theta_range(2), phi_range(2)
+      common /torus_comm/ alpha, beta, theta_range, phi_range
 
       double precision revs_per_s, cart_speed
       common /stream_comm/ revs_per_s, cart_speed
@@ -30,6 +30,10 @@
       read(10,*) beta
       read(10,*) revs_per_s
       read(10,*) cart_speed
+      read(10,*) theta_range(1)
+      read(10,*) theta_range(2)
+      read(10,*) phi_range(1)
+      read(10,*) phi_range(2)
       close(10)
 
       end

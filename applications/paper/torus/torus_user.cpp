@@ -52,6 +52,10 @@ void torus_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24.6f   %s",user->beta,"\% beta\n");
         fprintf(f,  "%-24.6f   %s",user->revs_per_s,"\% revs_per_second\n");
         fprintf(f,  "%-24.6f   %s",user->cart_speed,"\% cart_speed\n");
+        fprintf(f,  "%-24.8f   %s",user->theta[0],"\% theta_range[0]\n");    
+        fprintf(f,  "%-24.8f   %s",user->theta[1],"\% theta_range[1]\n");    
+        fprintf(f,  "%-24.8f   %s",user->phi[0],"\% phi_range[0]\n");    
+        fprintf(f,  "%-24.8f   %s",user->phi[1],"\% phi_range[1]\n");    
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
