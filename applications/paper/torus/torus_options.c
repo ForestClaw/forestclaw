@@ -44,6 +44,10 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "beta", &user_opt->beta, 0.0,
                            "[user] beta > 0 gives variable cross section [0]");
 
+    sc_options_add_double (opt, 0, "init-radius", &user_opt->init_radius, 0.1,
+                           "[user] Initial radius [0.1]");
+
+
     fclaw_options_add_double_array (opt, 0, "theta", 
                                     &user_opt->theta_string,"0 1",&user_opt->theta,2,
                                     "[user] theta range [0,1]");    

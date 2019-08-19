@@ -41,6 +41,7 @@ colorbar
 axis off;
 
 view(vtop);
+% view([1.5,45]);
 
 if (mq >= 3)
     caxis([qmin,qmax]);

@@ -292,6 +292,9 @@ c      zp = r1*sin(pi2*yc)
           write(6,*) 'torus_basis.f : r1 .eq. 0'
           stop
       endif
+
+c     # Phi in [-pi/2, pi/2];  We need to transform it to 
+c     # [0,2*pi]      
       phi = asin(zp/r1)
       r = sqrt(xp**2 + yp**2)
       if (r .le. 1) then

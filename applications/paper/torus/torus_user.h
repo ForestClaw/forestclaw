@@ -52,6 +52,7 @@ typedef struct user_options
 
     double alpha;     /* Ratio of inner radius to outer radius */
     double beta;
+    double init_radius;
 
     double *theta;
     const char* theta_string;

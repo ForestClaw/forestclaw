@@ -14,6 +14,9 @@
       integer example
       common /example_comm/ example  
 
+      double precision init_radius
+      common /initradius_comm/ init_radius
+
       integer*8 cont, get_context
       double precision th, r0,x0,y0,z0,r
       double precision xc1, yc1
@@ -23,9 +26,9 @@
       call fclaw2d_map_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
 
+      r0 = init_radius
       if (example .eq. 0 .or. example .eq. 1) then
           th = pi2*(0.25 + 1.d0/32.d0)
-          r0 = 0.05
           x0 = cos(th)
           y0 = sin(th)
           z0 = alpha
@@ -33,7 +36,6 @@
           xc1 = 0.25
           yc1 = 0.125
           call mapc2m_torus(xc1,yc1,x0,y0,z0,alpha,beta)
-          r0 = 0.05
       endif
 
 c     # Distance from thc
