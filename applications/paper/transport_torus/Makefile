@@ -59,7 +59,7 @@ SOURCES = \
   mapc2m_torus.f \
   cellave2.f \
   fdisc.f \
-  torus46_setaux.f90 \
+  torus_setaux.f90 \
   flag2refine2.f90 \
   fclaw2d_metric_default_fort.f \
   qad_choice.f90 \
