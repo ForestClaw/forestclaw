@@ -7,25 +7,28 @@
       double precision q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
       double precision aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
 
+      integer initchoice
+      common /initchoice_comm/ initchoice
+
       integer i,j
-      double precision xc,yc
+      double precision xc,yc, xlow, ylow,w,xp,yp,zp
+      double precision q0_physical
+      integer blockno
 
-      integer init_choice
-      common /initchoice_comm/ init_choice
-
+      blockno = 0
       do j = 1-mbc,my+mbc
           do i = 1-mbc,mx+mbc     
               xc = xlower + (i-0.5)*dx
               yc = ylower + (j-0.5)*dy
-              if (init_choice .eq. 0) then
-                  if (abs(xc-0.5) .le. 0.25 
-     &                    .and. abs(yc-0.5) .le. 0.25) then
-                      q(1,i,j) = 1.d0
-                  else
-                      q(1,i,j) = 0.d0
-                  endif
-              elseif (init_choice .eq. 1) then
-                  q(1,i,j) = 1.d0
+              if (initchoice .eq. 0) then
+c                 # Discontinuous solution
+                  xlow = xlower + (i-1)*dx
+                  ylow = ylower + (j-1)*dy
+                  call cellave2(blockno,xlow,ylow,dx,dy,w)
+                  q(1,i,j) = w
+              elseif (initchoice .ge. 1) then               
+                  call mapc2m_torus(xc,yc,xp,yp,zp)
+                  q(1,i,j) = q0_physical(xp,yp,zp)
               endif
           enddo
       enddo

@@ -27,31 +27,46 @@ def setrun(claw_pkg='amrclaw'):
     # -------------------------------------------------
 
     refine_threshold = 15     # Refine everywhere
-    dt_initial = 4e-3          # Stable for level 1
     use_fixed_dt = True
 
+    mx = 32
+    dt_initial = 5e-3          # Stable for level 1
+
+    nout = 100
+    nstep = 10
+
     outstyle = 3
-    nout = 5
-    nstep = 1
 
-    example = 0
+    # 0 : Rotation u = (omega,0)
+    # 1 : Inward rotation u = (0,omega)
+    # 2 : Cartesian flow  V = (u,v,w)
+    # 3 : Trig. example.
+    example = 1
 
-    # 0 :   q = 1 in [0.25,0.75]x[0.25x0.75]   (mass does not cross boundary)
-    # 1 :   q = 1 in [0,1]x[0,1]               (mass crosses boundary)
+    refine_pattern = 2
+
+    # 0 :   discontinuous initial conditions
+    # 1 :   smooth initial condition
     init_choice = 0      
 
-    alpha = 0.4
-    beta = 0.5
+    alpha = 0.3
+    beta = 0
 
+    theta_range = [0.125, 0.375]
+    phi_range = [0,1]
+
+    init_radius = 0.10
+
+    revs_per_s = 1
+    cart_speed = 0.765366864730180 
 
     maxlevel = 2
     ratioxy = 2
     ratiok = 1
 
-
-    grid_mx = 32
-    mi = 5
-    mj = 2
+    grid_mx = mx
+    mi = 2
+    mj = 4
     mx = mi*grid_mx
     my = mj*grid_mx
 
@@ -60,9 +75,9 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = original (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 3
+    qad_mode = 0
 
-    maux = 9
+    maux = 11
     use_fwaves = True
 
 
@@ -71,13 +86,19 @@ def setrun(claw_pkg='amrclaw'):
     #------------------------------------------------------------------
 
     probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
-    # c      example_in,mapping_in, ic_in, alpha_in,rps_in)
-
     probdata.add_param('example',        example,        'example')
     probdata.add_param('init_choice',    init_choice,    'init_choice')
+    probdata.add_param('refine_pattern', refine_pattern, 'refine_pattern')
     probdata.add_param('alpha',          alpha,          'alpha')
     probdata.add_param('beta',           beta,           'beta')
-
+    probdata.add_param('init_radius',    init_radius,    'init_radius')
+    probdata.add_param('revs_per_s',     revs_per_s,     'revs_per_s')
+    probdata.add_param('cart_speed',     cart_speed,     'cart_speed')
+    probdata.add_param('theta0',         theta_range[0], 'theta[0]')
+    probdata.add_param('theta1',         theta_range[1], 'theta[1]')
+    probdata.add_param('phi0',           phi_range[0],   'phi[0]')
+    probdata.add_param('phi1',           phi_range[1],   'phi[1]')
+  
     probdata.add_param('grid_mx',        grid_mx,        'grid_mx')
     probdata.add_param('mi',             mi,             'mi')
     probdata.add_param('mj',             mj,             'mj')
@@ -242,7 +263,7 @@ def setrun(claw_pkg='amrclaw'):
     # is stored, but we have to do it this way for conservation fix.
     # ----------------------------------------------------------------
 
-    amrdata.aux_type = ['capacity'] + ['center']*8
+    amrdata.aux_type = ['capacity'] + ['center']*10
 
     #  ----- For developers -----
     # Toggle debugging print statements:

@@ -476,8 +476,8 @@ c       # set to 0
 
         do m = 1,meqn
 c           # Note that we don't scale fluxc by 0.5 (as in paper). 
-c           # This scaling is taken into account by scaling done
-c           # in fluxes.          
+c           # This scaling is taken into account by edgelength 
+c           # scaling done done in call to rpn2qad_flux, above.
             fd = fluxl(m) - fluxr(m)
             apdq(m,i) = 0.5*fd  
             amdq(m,i) = 0.5*fd

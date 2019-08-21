@@ -51,10 +51,14 @@ MODULES = \
 
 SOURCES = \
   torus_velocity.f \
-  torus_psi.f \
+  torus_basis.f \
+  mapping_terms.f \
   setprob.f \
   qinit.f \
+  q0.f \
   mapc2m_torus.f \
+  cellave2.f \
+  fdisc.f \
   torus46_setaux.f90 \
   flag2refine2.f90 \
   fclaw2d_metric_default_fort.f \

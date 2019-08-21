@@ -16,6 +16,8 @@ SUBROUTINE setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
     INTEGER maxlevel, rfactor, grid_mx, mi, mj
     COMMON /amr_comm/ maxlevel, rfactor, grid_mx, mi, mj
 
+    double precision xc1, yc1
+
     INCLUDE "metric_terms.i"
 
     area_check = .false.
@@ -79,14 +81,6 @@ SUBROUTINE setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
 
     endif
 
-    CALL torus46_set_center_velocities(mx,my,mbc,dx,dy, &
-                                     blockno,xlower,ylower, &
-                                     edgelengths,xnormals,ynormals, &
-                                     surfnormals, aux, maux)
-
-    !! # Needed to scale speeds in Riemann solver when using
-    !! # cell-centered velocities
-
     DO i = 1-mbc,mx+mbc
         DO j = 1-mbc,my+mbc
             !! Need to store all four edge lengths in each cell, since they are all
@@ -97,6 +91,23 @@ SUBROUTINE setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
             aux(9,i,j) = edgelengths(i,  j+1,2)/dx
         ENDDO    
     ENDDO
+
+    do i = 1-mbc,mx+mbc
+        do j = 1-mbc,my+mbc
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
+
+!!          # Torus map 
+            aux(10,i,j) = xc
+            aux(11,i,j) = yc
+        end do
+    end do
+
+
+    CALL torus46_set_center_velocities(mx,my,mbc,dx,dy, &
+                                     blockno,xlower,ylower, &
+                                     edgelengths,xnormals,ynormals, &
+                                     surfnormals, aux, maux)
 
 END SUBROUTINE setaux
 
@@ -114,30 +125,35 @@ SUBROUTINE torus46_set_center_velocities(mx,my,mbc, &
   DOUBLE PRECISION aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
   DOUBLE PRECISION xc,yc,x,y,z
-  DOUBLE PRECISION nv(3), vel(3), vdotn, torus_dot
+  DOUBLE PRECISION nv(3), vel(3), vdotn, map_dot
+
+  double precision revs_per_s, cart_speed
+  common /stream_comm/ revs_per_s, cart_speed
+
 
   DOUBLE PRECISION nl(3), nr(3), nb(3), nt(3)
   DOUBLE PRECISION urrot, ulrot, ubrot, utrot
+  double precision t, xc1, yc1, t1(3), t2(3)
+  double precision tinv1(3), tinv2(3), t2n
 
   INTEGER i,j, k
 
   INCLUDE "metric_terms.i"
 
   !! # Cell-centered velocities : entries (4,5,6)
+  t = 0
   DO i = 1-mbc,mx+mbc
      DO j = 1-mbc,my+mbc
-        xc = xlower + (i-0.5)*dx
-        yc = ylower + (j-0.5)*dy
-
-        CALL torus_center_velocity(xc,yc,vel)
-
+        xc = aux(10,i,j)
+        yc = aux(11,i,j)
+        CALL velocity_components_cart(xc,yc,t, vel)
 
         !! # Subtract out component in the normal direction
         DO k = 1,3
            nv(k) = surfnormals(i,j,k)
         ENDDO
 
-        vdotn = torus_dot(vel,nv)
+        vdotn = map_dot(vel,nv)
 
         DO k = 1,3
             vel(k) = vel(k) - vdotn*nv(k)
@@ -150,6 +166,7 @@ SUBROUTINE torus46_set_center_velocities(mx,my,mbc, &
            nt(k)  = ynormals(i,  j+1,k)
         ENDDO
 
+
         ulrot = nl(1)*vel(1) + nl(2)*vel(2) + nl(3)*vel(3)
         urrot = nr(1)*vel(1) + nr(2)*vel(2) + nr(3)*vel(3)
         ubrot = nb(1)*vel(1) + nb(2)*vel(2) + nb(3)*vel(3)
@@ -161,4 +178,5 @@ SUBROUTINE torus46_set_center_velocities(mx,my,mbc, &
         aux(5,i,j) = utrot
      ENDDO
   ENDDO
+  stop
 END SUBROUTINE torus46_set_center_velocities
