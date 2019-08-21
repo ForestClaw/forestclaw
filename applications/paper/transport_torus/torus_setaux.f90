@@ -178,5 +178,4 @@ SUBROUTINE torus46_set_center_velocities(mx,my,mbc, &
         aux(5,i,j) = utrot
      ENDDO
   ENDDO
-  stop
 END SUBROUTINE torus46_set_center_velocities

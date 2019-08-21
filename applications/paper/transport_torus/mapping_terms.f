@@ -23,15 +23,15 @@ c     # ------------------------------------------------------------
       double precision t(3,2),tinv(3,2), tderivs(3,2,2)
       integer flag, k
 
-!!      integer*8 cont, get_context
+      integer*8 cont, get_context
 
-!!      cont = get_context()
+      cont = get_context()
 
 c     # Compute covariant derivatives only
       flag = 1
-      call torus_basis_complete(x,y,t,tinv,tderivs,flag)
-c      call fclaw2d_map_c2m_basis(cont, 
-c     &                 x,y, t, tinv, tderivs, flag)
+c      call torus_basis_complete(x,y,t,tinv,tderivs,flag)
+      call fclaw2d_map_c2m_basis(cont, 
+     &                 x,y, t, tinv, tderivs, flag)
 
       do k = 1,3
           t1(k) = t(k,1)
@@ -49,9 +49,9 @@ c     &                 x,y, t, tinv, tderivs, flag)
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
       integer k, flag
 
-!!      integer*8 cont, get_context
+      integer*8 cont, get_context
 
-!!      cont = get_context()
+      cont = get_context()
 
       flag = 3
 c      call fclaw2d_map_c2m_basis(cont, x,y, t, tinv,tderivs, flag)
@@ -81,16 +81,16 @@ c      call fclaw2d_map_c2m_basis(cont, x,y, t, tinv,tderivs, flag)
 
       integer i,j,k, m, flag
 
-!!      integer*8 cont, get_context
+      integer*8 cont, get_context
 
-!!      cont = get_context()
+      cont = get_context()
 
 
 c     # Compute covariant and derivatives
       flag = 7
-c      call fclaw2d_map_c2m_basis(cont, x,y, t,tinv,tderivs,flag)
+      call fclaw2d_map_c2m_basis(cont, x,y, t,tinv,tderivs,flag)
   
-      call torus_basis_complete(x,y,t,tinv,tderivs,flag)
+c      call torus_basis_complete(x,y,t,tinv,tderivs,flag)
                                           
 
       do k = 1,3
@@ -216,7 +216,7 @@ c     # Contravariant vectors
 
       double precision x,y,u(2), uderivs(4), uderivs_norm(4)
 
-!!      integer*8 cont, get_context
+      integer*8 cont, get_context
 
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
       double precision t1(3), t2(3), t1n2, t2n2
@@ -226,11 +226,11 @@ c     # Contravariant vectors
       double precision t1n, t2n, dt1ndx, dt1ndy,dt2ndx,dt2ndy
       integer flag, k
 
-!!      cont = get_context()
+      cont = get_context()
 
       flag = 7
-c      call fclaw2d_map_c2m_basis(cont,x,y,t,tinv, tderivs,flag)
-      call torus_basis_complete(x,y,t,tinv,tderivs,flag)
+      call fclaw2d_map_c2m_basis(cont,x,y,t,tinv, tderivs,flag)
+c      call torus_basis_complete(x,y,t,tinv,tderivs,flag)
 
       do k = 1,3
           t1(k) = t(k,1)

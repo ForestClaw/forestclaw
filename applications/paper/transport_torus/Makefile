@@ -56,6 +56,7 @@ SOURCES = \
   setprob.f \
   qinit.f \
   q0.f \
+  fclaw_utils.f \
   mapc2m_torus.f \
   cellave2.f \
   fdisc.f \
