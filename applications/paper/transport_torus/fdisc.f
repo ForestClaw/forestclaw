@@ -20,7 +20,7 @@
       double precision th, r0,x0,y0,z0,r
       double precision xc1, yc1, theta,phi
 
-      call mapc2m_torus(xc,yc,xp,yp,zp)
+      call mapc2m_torus2(xc,yc,xp,yp,zp)
 
       r0 = init_radius
       if (example .eq. 0) then
@@ -31,7 +31,7 @@
       elseif (example .eq. 1) then
           xc1 = 0.5
           yc1 = 0.125
-          call mapc2m_torus(xc1,yc1,x0,y0,z0)
+          call mapc2m_torus2(xc1,yc1,x0,y0,z0)
       else
          write(6,*) 'fdisc.f : example .gt. 1'
          stop

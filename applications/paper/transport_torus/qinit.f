@@ -27,7 +27,7 @@ c                 # Discontinuous solution
                   call cellave2(blockno,xlow,ylow,dx,dy,w)
                   q(1,i,j) = w
               elseif (initchoice .ge. 1) then               
-                  call mapc2m_torus(xc,yc,xp,yp,zp)
+                  call mapc2m_torus2(xc,yc,xp,yp,zp)
                   q(1,i,j) = q0_physical(xp,yp,zp)
               endif
           enddo

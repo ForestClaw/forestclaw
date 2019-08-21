@@ -62,7 +62,7 @@ c     # ---------------------------------------------------------------
       double precision xp, yp, zp
       double precision q0_physical
 
-      call mapc2m_torus(xc,yc,xp,yp,zp,alpha,beta)
+      call mapc2m_torus2(xc,yc,xp,yp,zp)
       q0_init = q0_physical(xp,yp,zp)
 
       end
