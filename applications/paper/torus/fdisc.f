@@ -27,15 +27,15 @@
      &      blockno,xc,yc,xp,yp,zp)
 
       r0 = init_radius
-      if (example .eq. 0 .or. example .eq. 1) then
+      if (example .eq. 0) then
           th = pi2*(0.25 + 1.d0/32.d0)
           x0 = cos(th)
           y0 = sin(th)
           z0 = alpha
-      elseif (example .eq. 2) then
-          xc1 = 0.25
+      elseif (example .eq. 1) then
+          xc1 = 0.5
           yc1 = 0.125
-          call mapc2m_torus(xc1,yc1,x0,y0,z0,alpha,beta)
+          call mapc2m_torus2(xc1,yc1,x0,y0,z0)
       endif
 
 c     # Distance from thc

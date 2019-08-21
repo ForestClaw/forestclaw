@@ -5,12 +5,12 @@ applications_paper_torus_torus_SOURCES = \
 	applications/paper/torus/torus_options.c \
 	applications/paper/torus/torus_user.h \
 	applications/paper/torus/torus_user.cpp \
+v	applications/paper/torus/setprob.f \
 	applications/paper/torus/fclaw2d_map_torus.c \
-	applications/paper/torus/mapc2m_torus2.f \
-	applications/paper/torus/setprob.f \
-	applications/paper/torus/torus_velocity.f \
-	applications/paper/torus/torus_basis.f \
-	applications/paper/torus/mapping_terms.f \
+	applications/paper/all/mapc2m_torus.f \
+	applications/paper/all/torus_velocity.f \
+	applications/paper/all/torus_basis.f \
+	applications/paper/all/mapping_terms.f \
 	applications/paper/torus/dopri5.f \
 	applications/paper/torus/qexact.f \
 	applications/paper/torus/q0.f \
@@ -25,9 +25,7 @@ applications_paper_torus_torus_SOURCES = \
 	applications/paper/torus/user_4.6/tag4coarsening.f \
 	applications/paper/torus/user_4.6/rpn2cons_fw_manifold.f \
     applications/paper/torus/user_4.6/rpt2cons_manifold.f \
-	applications/paper/torus/user_4.6/rpn2cons_update_manifold.f \
-	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
-	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f
+	applications/paper/torus/user_4.6/rpn2cons_update_manifold.f
 
 
 

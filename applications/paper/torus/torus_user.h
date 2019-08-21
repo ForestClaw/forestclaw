@@ -83,8 +83,7 @@ void torus_options_store (fclaw2d_global_t* glob, user_options_t* user);
 const user_options_t* torus_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick, const double scale[],
-                           const double alpha, const double beta);
+    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick, const double scale[]);
 
 /* ----------------------
    Clawpack 4.6 headers
