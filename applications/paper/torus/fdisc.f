@@ -27,7 +27,7 @@
      &      blockno,xc,yc,xp,yp,zp)
 
       r0 = init_radius
-      if (example .eq. 0) then
+      if (example .eq. 0 .or. example .eq. 2) then
           th = pi2*(0.25 + 1.d0/32.d0)
           x0 = cos(th)
           y0 = sin(th)
