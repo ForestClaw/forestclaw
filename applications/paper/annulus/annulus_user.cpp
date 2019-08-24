@@ -53,7 +53,7 @@ void annulus_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,"%-24.4f   %s",user->amplitude,     "\% amplitude\n");    
         fprintf(f,"%-24.4f   %s",user->freq,          "\% freq\n");         
         fprintf(f,"%-24.4f   %s",user->beta,          "\% beta\n");    
-        fprintf(f,"%-12.4f%-12.4f    %s",user->theta[0],user->theta[1],"\% beta\n");    
+        fprintf(f,"%-12.4f%-12.4f    %s",user->theta[0],user->theta[1],"\% theta(2)\n");    
         fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refine_pattern\n");    
         fprintf(f,"%-24.4f   %s",user->init_radius,   "\% init_radius\n");    
         fclose(f);
@@ -71,41 +71,76 @@ void annulus_problem_setup(fclaw2d_global_t *glob)
 
 static
 void annulus_patch_setup(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
-                         int blockno,
-                         int patchno)
+                         fclaw2d_patch_t *patch,
+                         int blockno, int patchno)
 {
-    int mx,my,mbc,maux;
+    int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    double *aux,*xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    double *curvature, *surfnormals;
-    double *edgelengths;
-    double *xnormals, *ynormals, *xtangents, *ytangents;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
 
+    double *xp, *yp, *zp, *xd, *yd, *zd, *area;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+                                  &xd,&yd,&zd,&area);
+
+    double *edgelengths,*curvature;
+    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
+                                    &curvature);
+
+    int maux;
+    double *aux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    ANNULUS_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
+                  &dx,&dy, area, edgelengths,xp,yp,zp,
+                  aux, &maux);
+
+
+    const user_options_t *user = annulus_get_options(glob);
+    if (user->example <= 3)
+    {
+        double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
+        fclaw2d_clawpatch_metric_vector(glob,patch,
+                                        &xnormals, &ynormals,
+                                        &xtangents, &ytangents,
+                                        &surfnormals);
+
+        double t = 0; /* Not used since velocity field is not time dependent */
+        ANNULUS_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
+                               &dx, &dy, &xlower, &ylower,
+                               &t, xnormals,ynormals, surfnormals,
+                               aux,&maux);
+    }
+}
+
+
+static
+void annulus_b4step2(fclaw2d_global_t *glob,
+                    fclaw2d_patch_t *this_patch,
+                    int blockno,
+                    int patchno,
+                    double t, double dt)
+
+{
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-
-    fclaw2d_clawpatch_metric_scalar(glob, this_patch,&area,&edgelengths,
-                                    &curvature);
-
+    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
     fclaw2d_clawpatch_metric_vector(glob,this_patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);
 
-    ANNULUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
-                     &dx,&dy,&maux,aux,&blockno,
-                     area,xd,yd,zd,
-                     edgelengths,xnormals,ynormals,
-                     xtangents, ytangents, surfnormals);
-}
+    double *aux;
+    int maux;
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
+    ANNULUS_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
+                           &dx, &dy, &xlower, &ylower,
+                           &t, xnormals,ynormals, surfnormals,
+                           aux,&maux);
+}
 
 void annulus_link_solvers(fclaw2d_global_t *glob)
 {
@@ -124,23 +159,23 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
 
     /* Clawpack options */
     fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
-    clawopt->use_fwaves = 1;
+    if (clawopt->use_fwaves == 0) 
+    {
+        fclaw_global_essentialf("annulus_link_solvers : option 'use-fwaves' must be set to 1\n");
+        exit(0);
+    }
 
     /* Clawpack virtual functions */
     fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
     clawpack46_vt->fort_qinit = &CLAWPACK46_QINIT;
-
-
-    /* Get different refinement patterns */
     clawpack46_vt->fort_rpn2 = &RPN2CONS_FW_MANIFOLD;   
     clawpack46_vt->fort_rpt2 = &RPT2CONS_MANIFOLD;    
+    clawpack46_vt->fort_rpn2_cons = &RPN2QAD_FLUX;        
 
     /* Time dependent velocity field */
     const user_options_t *user = annulus_get_options(glob);
-    if (user->example >= 2 && user->example <= 4) 
-        clawpack46_vt->fort_b4step2 = &CLAWPACK46_B4STEP2;        
-
-    clawpack46_vt->fort_rpn2_cons = &RPN2QAD_FLUX;        
+    if (user->example > 3)
+        clawpack46_vt->b4step2 = annulus_b4step2;
 }
 
 
