@@ -121,7 +121,7 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
             if(amrflags(i,j) == UNSET) then
                 xc = xlower + (i-0.5)*dx
                 yc = ylower + (j-0.5)*dy
-                th = pi2*(theta_range(1) + (theta_range(2)-theta_range(1))*x_c)
+                th = pi2*(theta_range(1) + (theta_range(2)-theta_range(1))*xc)
                 constant_theta = th .gt. pi/2
                 constant_r = abs(yc-0.5) .gt. 0.25
                 if (refine_pattern .eq. 1 .and. constant_theta) then 
