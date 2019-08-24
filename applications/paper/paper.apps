@@ -1,0 +1,24 @@
+## -------------------------- SISC paper apps -----------------------------
+##  These are not guaranteed to compile or may not be available with 
+## standard distribution
+## ------------------------------------------------------------------------
+
+# ------------------------- Conservation ----------------------------------
+## square (Conservation test)
+include applications/paper/square/Makefile.am
+
+## annulus (Conservation test)
+include applications/paper/annulus/Makefile.am
+
+## torus (Conservation test)
+include applications/paper/torus/Makefile.am
+
+## sphere (Conservation test)
+include applications/paper/sphere/Makefile.am
+
+
+
+
+
+
+
