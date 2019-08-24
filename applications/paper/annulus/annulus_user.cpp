@@ -167,9 +167,9 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
 
     /* Clawpack virtual functions */
     fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
-    clawpack46_vt->fort_qinit = &CLAWPACK46_QINIT;
-    clawpack46_vt->fort_rpn2 = &RPN2CONS_FW_MANIFOLD;   
-    clawpack46_vt->fort_rpt2 = &RPT2CONS_MANIFOLD;    
+    clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
+    clawpack46_vt->fort_rpn2      = &RPN2CONS_FW_MANIFOLD;   
+    clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;    
     clawpack46_vt->fort_rpn2_cons = &RPN2QAD_FLUX;        
 
     /* Time dependent velocity field */

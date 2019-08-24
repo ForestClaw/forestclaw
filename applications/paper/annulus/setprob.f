@@ -11,7 +11,7 @@
       common /example_comm/ example
 
       double precision revs_per_s, cart_speed, amplitude,freq
-      common /stream_comm/ revs_per_s, cart_speed, amplitude, freq
+      common /velocity_comm/ revs_per_s, cart_speed, amplitude, freq
 
       double precision beta, theta(2)
       common /annulus_comm/ beta, theta

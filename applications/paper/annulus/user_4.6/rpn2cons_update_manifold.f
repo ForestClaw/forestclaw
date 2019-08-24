@@ -7,7 +7,7 @@
       integer meqn,maux,idir, m, iface
       double precision q(meqn), flux(meqn)
       double precision auxvec_center(maux), auxvec_edge(maux)
-      double precision urot
+      double precision u,v,w,urot, nv(3)
       integer k
 
 c     # Get cell-centered velocity projected to face 

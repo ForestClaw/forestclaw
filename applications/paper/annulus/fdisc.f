@@ -33,7 +33,7 @@ c         # Annular or horizontal flow
       elseif (example .eq. 2) then
 c         # Vertical flow              
           th = pi/2
-          rc = beta + (1-beta)*0.75
+          rc = beta + (1-beta)*0.625d0
           x0 = rc*cos(th)
           y0 = rc*sin(th)
       endif

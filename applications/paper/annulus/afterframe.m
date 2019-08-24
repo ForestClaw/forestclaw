@@ -7,10 +7,18 @@ tfinal = 0.25;
 vcart = 1.092505803290319;
 dlen = vcart*tfinal;
 
-ravg = (1 + beta)/2;
-thc = pi/2*(1 + 1/8);
-pstart = [ravg*cos(thc),ravg*sin(thc)];
-pend = pstart + [dlen, 0];
+
+if example ~= 2
+    r = (1 + beta)/2;
+    thc = pi/2*(1 + 1/8);
+    dadd = [dlen,0];
+else
+    r = beta + (1-beta)*0.625;
+    thc = pi/2;
+    dadd = 0.5*[0,-dlen];
+end
+pstart = [r*cos(thc),r*sin(thc)];
+pend = pstart + dadd;
 
 fprintf('%10s %24.16e\n','qmin',qmin);
 fprintf('%10s %24.16e\n','qmax',qmax);
@@ -36,7 +44,7 @@ axis([-0.707106781186547   0.707106781186548   0.282842712474619,1]);
 
 
 plot_path = true;
-if (plot_path && example ~= 5)    
+if (plot_path && example ~= 3)    
     hold on;
     
     N = 128;

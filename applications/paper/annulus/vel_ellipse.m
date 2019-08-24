@@ -42,20 +42,23 @@ else
         vc1 = cart_speed;
         vc2 = 0;                
     elseif example == 2
-        vc1 = cart_speed;
-        vc2 = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
+        vc1 = 0;
+        vc2 = -0.5*cart_speed;
     elseif example == 3
-        vc1 = cart_speed*pi*sin(pi*t/tfinal)/2.d0;
-        vc2 = 0;
-    elseif example == 4
         w = 0.5;
-        
         vc1 = -(1-w)*pi2*r.*sin(pi2*th);
         vc2 =  (1+w)*pi2*r.*cos(pi2*th);
         nc = sqrt(vc1.^2 + vc2.^2);
         
         vc1 = -vc1./nc;
         vc2 = -vc2./nc;   
+    elseif example == 4
+        vc1 = cart_speed;
+        vc2 = pi2*A*cos(freq*pi2*t/tfinal)/tfinal;
+    elseif example == 5
+        vc1 = cart_speed*pi*sin(pi*t/tfinal)/2.d0;
+        vc2 = 0;
+        
     end
 end
 
