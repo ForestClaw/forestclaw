@@ -24,14 +24,13 @@ c     # ------------------------------------------------------------
       common /compi/ pi, pi2
 
       double precision revs_per_s, cart_speed, amplitude, freq
-      common /stream_comm/ revs_per_s, cart_speed, amplitude, freq
+      common /velocity_comm/ revs_per_s, cart_speed, amplitude, freq
 
       integer example
       common /example_comm/ example  
 
       double precision xp,yp,zp, ravg, xc, d, tfinal, A
       double precision r, theta, w, nc
-
 
 c     # Set non-zeros derivs only
       if (example .eq. 0) then
@@ -53,7 +52,7 @@ c        # Rigid body rotation
               vcart(2) = 0
           elseif (example .eq. 2) then
               vcart(1) = 0
-              vcart(2) = cart_speed
+              vcart(2) = -0.5*cart_speed
           elseif (example .eq. 3) then
              call map_comp2annulus(x,y,theta,r)
              w = 0.5
