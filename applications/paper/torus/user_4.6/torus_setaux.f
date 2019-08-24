@@ -48,12 +48,13 @@ c           # x-face and y-face edge lengths (6,7)
 
       do i = 1-mbc,mx+mbc
           do j = 1-mbc,my+mbc
-c              xc = xlower + (i-0.5)*dx
-c              yc = ylower + (j-0.5)*dy
+              xc = xlower + (i-0.5)*dx
+              yc = ylower + (j-0.5)*dy
 
-              call map2comp(xp(i,j),yp(i,j),zp(i,j),xc1,yc1)
+               call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
-c             # Torus map 
+c              call map2comp(xp(i,j),yp(i,j),zp(i,j),xc1,yc1)
+
               aux(i,j,8) = xc1
               aux(i,j,9) = yc1
           end do
