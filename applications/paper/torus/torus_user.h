@@ -72,6 +72,11 @@ user_options_t;
 #define TORUS_SETPROB FCLAW_F77_FUNC(torus_setprob,TORUS_SETPROB)
 void TORUS_SETPROB();
 
+#define COMPUTE_EXACT FCLAW_F77_FUNC(compute_exact, COMPUTE_EXACT)
+void COMPUTE_EXACT();
+
+
+
 void torus_link_solvers(fclaw2d_global_t *glob);
 
 user_options_t* torus_options_register (fclaw_app_t * app,

@@ -9,6 +9,9 @@
       double precision tag_threshold
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
       integer example
       common /example_comm/ example      
 
@@ -25,7 +28,8 @@
 
       integer i,j, mq
       double precision qmin, qmax, xc, yc
-      double precision r, ravg, xp,yp,zp
+      double precision r, ravg, xp,yp,zp, theta, phi
+      double precision xc1, yc1, zc1
       logical refine
 
       cont = get_context()
@@ -44,8 +48,11 @@
                 if (refine_pattern .eq. 1) then
                     refine = xp .lt. 0
                 elseif (refine_pattern .eq. 2) then
-                    r = sqrt(xp**2 + yp**2)
-                    refine = r .gt. 1.d0
+c                    r = sqrt(xp**2 + yp**2)
+                     call fclaw2d_map_brick2c(cont,blockno,xc,yc,
+     &                        xc1,yc1,zc1)
+                    call map_comp2torus(xc1,yc1,theta,phi)
+                    refine = abs(phi - pi) > pi/2.d0
                 endif
             endif
             if (refine) then
