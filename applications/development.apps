@@ -30,11 +30,14 @@
 ## bump (original)
 #include applications/clawpack/shallow/2d/bump/Makefile.am
 
-## Conservative advection (transport) on a square
+## Transport on a square
 include applications/paper/square/Makefile.am
 
-## Conservative advection (transport) on a sphere
-include applications/sphere/Makefile.am
+## Transport on a sphere
+include applications/paper/sphere/Makefile.am
+
+## Transport on a torus
+include applications/paper/sphere/Makefile.am
 
 ## ---------------------------
 ## No solver

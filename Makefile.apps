@@ -47,7 +47,7 @@ include src/patches/clawpatch/Makefile.am
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 
 # Development projects
-# include applications/paper.apps
+include applications/paper/paper.apps
 
 endif
 
