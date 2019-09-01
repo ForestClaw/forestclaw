@@ -3,14 +3,17 @@ libmultigrid_generated_headers =
 
 libmultigrid_installed_headers = \
 	src/solvers/fc2d_multigrid/fc2d_multigrid.h \
-	src/solvers/fc2d_multigrid/fc2d_multigrid_options.h
+	src/solvers/fc2d_multigrid/fc2d_multigrid_options.h \
+	src/solvers/fc2d_multigrid/fc2d_multigrid_physical_bc.h
 
 libmultigrid_compiled_sources = \
 	src/solvers/fc2d_multigrid/fc2d_multigrid.cpp \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_options.c \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_solve.cpp \
-	src/solvers/fc2d_multigrid/fc2d_multigrid_vector.cpp 
-
+	src/solvers/fc2d_multigrid/fc2d_multigrid_vector.cpp \
+	src/solvers/fc2d_multigrid/fc2d_multigrid_physical_bc.c \
+	src/solvers/fc2d_multigrid/fort_4.6/multigrid_apply_bc_default.f90 \
+	src/solvers/fc2d_multigrid/fort_4.6/multigrid_eval_bc_default.f90
 
 ## Name of library to build
 lib_LTLIBRARIES += src/solvers/fc2d_multigrid/libmultigrid.la

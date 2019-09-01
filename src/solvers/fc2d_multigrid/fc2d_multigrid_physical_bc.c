@@ -26,22 +26,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_multigrid_physical_bc.h"
 
-#if 0
+#include "fc2d_multigrid.h"
 #include "fc2d_multigrid_options.h"
 
 #include <fclaw2d_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_output_ascii.h> 
-#include <fclaw2d_clawpatch_output_vtk.h>
-
-#include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
-#include <fclaw2d_vtable.h>
-
 #include <fclaw2d_domain.h>
-#endif
-
+#include <fclaw2d_patch.h>
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_physical_bc.h>
 
 void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *patch,
@@ -51,10 +45,9 @@ void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
 
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_multigrid_physical_time_info_t *tinfo = 
-              (fclaw2d_physical_time_info_t*) s->user;
+    fc2d_multigrid_time_info_t *tinfo = (fc2d_multigrid_time_info_t*) s->user;
 
-    double t = tinfo.t;
+    double t = tinfo->t;
 
 
     /* Determine which faces are at the physical boundary */
@@ -63,23 +56,23 @@ void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
 
     int mx, my, mbc;
     double xlower, ylower, dx, dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
     double *rhs;
-    fclaw2d_clawpatch_soln_data(glob,patch,&rhs,&meqn);
+    fclaw2d_clawpatch_soln_data(s->glob,patch,&rhs,&meqn);
     FCLAW_ASSERT(meqn == 1);
 
 
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
 
     const fc2d_multigrid_options_t* mg_options;
-    mg_options = fc2d_multigrid_get_options(glob);
+    mg_options = fc2d_multigrid_get_options(s->glob);
 
-    mg_vt->fort_apply_bc(&blockno, &mx, &my, &mbc, &xlower, &ylower,
-                         &dx,&dy,intersects_bc,
-                         mg_options->boundary_conditions,rhs);
+    mg_vt->fort_apply_bc(&blockno, &mx, &my, &mbc, &meqn, &xlower, &ylower,
+                         &dx,&dy,&t, intersects_bc,
+                         mg_options->boundary_conditions,rhs, mg_vt->fort_eval_bc);
 
 
 
@@ -116,13 +109,13 @@ void fc2d_multigrid_physical_get_bc(fclaw2d_global_t *glob,
    ----------------------------------------------------------------------------- */
 
 void fc2d_multigrid_physical_bc(fclaw2d_global_t *glob,
-                                double t)
+                             double t)
 {
 
     fc2d_multigrid_time_info_t tinfo;
     tinfo.t = t;
-    fclaw2d_global_iterate_level(glob, level,
-                                 cb_multigrid_physical_bc,
-                                 (void *) &t_info);
+    fclaw2d_global_iterate_patches(glob,
+                                   cb_fc2d_multigrid_physical_bc,
+                                   (void *) &tinfo);
 }
 
