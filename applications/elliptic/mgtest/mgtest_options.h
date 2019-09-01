@@ -40,7 +40,7 @@ extern "C"
 typedef struct mgtest_options
 {
     /* Put any user options here */
-    int rhs_choice;
+    int example;
 
     double alpha;
     double x0;

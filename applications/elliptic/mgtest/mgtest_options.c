@@ -32,23 +32,23 @@ mgtest_register (mgtest_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
 
-    sc_options_add_int (opt, 0, "rhs-choice", &user->rhs_choice, 1,
-                           "[user] RHS choice [1]");
+    sc_options_add_int (opt, 0, "example", &user->example, 1,
+                           "[user] Example [1]");
 
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 20,
-                           "alpha (used rhs_choice == 1) [0.5]");
+                           "alpha (used example == 1) [0.5]");
 
     sc_options_add_double (opt, 0, "x0", &user->x0, 0.5,
-                           "x-location of center (used in rhs_choice == 1) [0.5]");
+                           "x-location of center (used in example == 1) [0.5]");
 
     sc_options_add_double (opt, 0, "y0", &user->y0, 0.5,
-                           "y-location of center (used in rhs_choice == 1) [0.5]");
+                           "y-location of center (used in example == 1) [0.5]");
 
     sc_options_add_double (opt, 0, "a", &user->a, 2,
-                           "x-frequency (used in rhs_choice == 2) [2]");
+                           "x-frequency (used in example == 2) [2]");
 
     sc_options_add_double (opt, 0, "b", &user->b, 2,
-                           "y-frequency of center (used in rhs_choice == 2) [2]");
+                           "y-frequency of center (used in example == 2) [2]");
 
     user->is_registered = 1;
 

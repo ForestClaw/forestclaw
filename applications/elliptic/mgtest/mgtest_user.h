@@ -27,7 +27,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MGTEST_USER_H
 
 #include <fclaw2d_include_all.h>
+
+#include <fc2d_multigrid.h>
+
 #include "mgtest_options.h"
+
 
 #ifdef __cplusplus
 extern "C"
@@ -41,9 +45,12 @@ extern "C"
 
 void mgtest_link_solvers(fclaw2d_global_t *glob);
 
-void mgtest_problem_setup(fclaw2d_global_t* glob);
-
 /* --------------------------- Fortran functions ---------------------------------------*/
+
+#define MGTEST_SETPROB FCLAW_F77_FUNC(mgtest_setprob,MGTEST_SETPROB)
+
+void MGTEST_SETPROB();
+
 
 #define MGTEST_FORT_RHS FCLAW_F77_FUNC(mgtest_fort_rhs,MGTEST_FORT_RHS)
 
@@ -52,12 +59,6 @@ void MGTEST_FORT_RHS(const int* blockno, const int* mbc, const int* mx,
                      const double* dx, const double* dy, double q[]);
 
 
-#define MGTEST_SETPROB FCLAW_F77_FUNC(mgtest_setprob,MGTEST_SETPROB)
-
-void MGTEST_SETPROB(const int* rhs_choice, const double *alpha,
-                    const double* x0, const double* y0,
-                    const double* a,  const double* b);
-
 
 #define MGTEST_COMPUTE_ERROR FCLAW_F77_FUNC(mgtest_compute_error,MGTEST_COMPUTE_ERROR)
 
@@ -65,6 +66,22 @@ void MGTEST_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
                            double *dx, double *dy, double *xlower,
                            double *ylower, double *t, double q[],
                            double error[]);
+
+
+#define MGTEST_FORT_APPLY_BC FCLAW_F77_FUNC(mgtest_fort_apply_bc, \
+                                            MGTEST_FORT_APPLY_BC)
+
+void MGTEST_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my, 
+                     const  int* mbc, const  int* meqn, 
+                     const double* xlower, const double* ylower,
+                     const double* dx, const double* dy, const double* t,
+                     int intersects_bc[], int mthbc[], 
+                     double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc);
+
+
+#define MGTEST_FORT_EVAL_BC FCLAW_F77_FUNC(mgtest_fort_eval_bc, MGTEST_FORT_EVAL_BC)
+
+double MGTEST_FORT_EVAL_BC(const int* iface, const double* t,const double* x, const double* y);
 
 
 #ifdef __cplusplus
