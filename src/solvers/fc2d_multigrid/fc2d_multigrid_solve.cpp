@@ -23,6 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fc2d_multigrid_solve.h"
+
 #include "fc2d_multigrid.h"
 #include "fc2d_multigrid_options.h"
 #include "fc2d_multigrid_vector.hpp"
@@ -50,8 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Thunderegg/Operators/SchurDomainOp.h>
 #include <Thunderegg/P4estDomGen.h>
 #include <Thunderegg/PatchSolvers/FftwPatchSolver.h>
+
 using namespace std;
-extern "C" {
 
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   // get needed options
@@ -146,4 +148,4 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
   fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
 }
-}
+

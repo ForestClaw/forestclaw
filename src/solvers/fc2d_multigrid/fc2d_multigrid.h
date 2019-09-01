@@ -26,8 +26,6 @@
 #ifndef FC2D_MULTIGRID_H
 #define FC2D_MULTIGRID_H
 
-#include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -51,6 +49,16 @@ typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* blockno,
                                            const double* dx, const double* dy,
                                            double rhs[]);
 
+typedef double (*fc2d_multigrid_fort_eval_bc_t)(const int *iface, const double *t, 
+                                                const double *x, const double *y);
+
+typedef void (*fc2d_multigrid_fort_apply_bc_t)(const int* blockno, const  int* mx, const  int* my, 
+                                               const  int* mbc, const  int* meqn, 
+                                               const double* xlower, const double* ylower,
+                                               const double* dx, const double* dy, 
+                                               const double *t, 
+                                               int intersects_bc[], int mthbc[], 
+                                               double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc);
 
 /* -------------------------- Solver and utilities ------------------------------------ */
 
@@ -62,7 +70,10 @@ struct fc2d_multigrid_vtable
 {
 
 	/* Fortran routines */
-	fc2d_multigrid_fort_rhs_t       fort_rhs;	
+	fc2d_multigrid_fort_rhs_t        fort_rhs;	
+    fc2d_multigrid_fort_apply_bc_t   fort_apply_bc;
+    fc2d_multigrid_fort_eval_bc_t    fort_eval_bc;
+    
 	int is_set;
 
 };

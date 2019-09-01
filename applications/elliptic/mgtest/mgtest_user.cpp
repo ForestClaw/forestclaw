@@ -32,52 +32,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_fort.h>
 
 #include <fc2d_multigrid.h>
+#include <fc2d_multigrid_fort.h>
+#include <fc2d_multigrid_options.h>
+#include <fc2d_multigrid_physical_bc.h>
 
 #include <fclaw2d_elliptic_solver.h>
 
 
 static
-void mgtest_rhs(fclaw2d_global_t *glob,
-                fclaw2d_patch_t *patch,
-                int blockno,
-                int patchno);
-    
-
-void mgtest_link_solvers(fclaw2d_global_t *glob)
+void mgtest_problem_setup(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
-    fclaw_vt->problem_setup = &mgtest_problem_setup;  
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        const mgtest_options_t* user = mgtest_get_options(glob);
 
-    /* RHS function */
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
-    patch_vt->rhs = mgtest_rhs;          /* Overwrites default */
-    patch_vt->initialize = mgtest_rhs;   /* Get an initial refinement */
+        fprintf(f,  "%-24d   %s",  user->example,"\% example\n");
+        fprintf(f,  "%-24.6f   %s",user->alpha,  "\% alpha\n");
+        fprintf(f,  "%-24.6f   %s",user->x0,     "\% x0\n");
+        fprintf(f,  "%-24.6f   %s",user->y0,     "\% y0\n");
+        fprintf(f,  "%-24.6f   %s",user->a,      "\% a\n");
+        fprintf(f,  "%-24.6f   %s",user->b,      "\% b\n");
 
-    /* Only needed if Fortran subroutine is useful and can be customized */
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
-    mg_vt->fort_rhs = &MGTEST_FORT_RHS;
+        fc2d_multigrid_options_t*  mg_opt = fc2d_multigrid_get_options(glob);    
+        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[0],  "\% bc[0]\n");
+        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[1],  "\% bc[1]\n");
+        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[2],  "\% bc[2]\n");
+        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[3],  "\% bc[3]\n");
 
-    /* Compute the error */
-    clawpatch_vt->fort_compute_patch_error = &MGTEST_COMPUTE_ERROR;
-
-
-    /* Clawpatch tagging routines */
-    clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
-
-
-    /* Do something with user options? */
-    //const user_options_t* user_opt = mgtest_get_options(glob);
-}
-
-void mgtest_problem_setup(fclaw2d_global_t* glob)
-{
-    const mgtest_options_t* user = mgtest_get_options(glob);
-
-    MGTEST_SETPROB(&user->rhs_choice, &user->alpha,
-                   &user->x0, &user->y0, 
-                   &user->a, &user->b);
+        fclose(f);
+    }
+    fclaw2d_domain_barrier (glob->domain);
+    MGTEST_SETPROB(); /* This file reads the file just created above */
 }
 
 
@@ -106,6 +92,32 @@ void mgtest_rhs(fclaw2d_global_t *glob,
 }
 
 
+void mgtest_link_solvers(fclaw2d_global_t *glob)
+{
+    /* ForestClaw vtable */
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw_vt->problem_setup = &mgtest_problem_setup;  
 
+    /* Patch : RHS function */
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    patch_vt->rhs = mgtest_rhs;          /* Overwrites default */
+    patch_vt->initialize = mgtest_rhs;   /* Get an initial refinement */
 
+    /* Multigrid vtable */
+    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+    mg_vt->fort_rhs      = &MGTEST_FORT_RHS;
+    mg_vt->fort_apply_bc = &MGTEST_FORT_APPLY_BC;
+    mg_vt->fort_eval_bc  = &MGTEST_FORT_EVAL_BC;   // For non-homogeneous BCs
+
+    /* Clawpatch : Compute the error */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    clawpatch_vt->fort_compute_patch_error = &MGTEST_COMPUTE_ERROR;
+
+    // tagging routines
+    clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
+    clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
+
+    /* Do something with user options? */
+    //const user_options_t* user_opt = mgtest_get_options(glob);
+}
 

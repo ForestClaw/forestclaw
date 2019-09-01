@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_multigrid.h"
 #include "fc2d_multigrid_options.h"
+#include "fc2d_multigrid_physical_bc.h"
+#include "fc2d_multigrid_fort.h"
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -75,10 +77,12 @@ void multigrid_rhs(fclaw2d_global_t *glob,
 	mg_vt->fort_rhs(&blockno, &mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
 }
 
-
 static
 void multigrid_solve(fclaw2d_global_t* glob)
 {
+    // Apply non-homogeneous boundary conditions 
+    fc2d_multigrid_physical_bc(glob);
+
 	fc2d_multigrid_solve(glob);
 }
 
@@ -117,9 +121,6 @@ void fc2d_multigrid_solver_initialize()
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
 	fclaw2d_clawpatch_vtable_initialize(claw_version);
 
-
-	fc2d_multigrid_vtable_t*  mg_vt = multigrid_vt_init();	
-
     //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
 
 
@@ -135,8 +136,13 @@ void fc2d_multigrid_solver_initialize()
     
     fclaw2d_elliptic_vtable_t *elliptic_vt = fclaw2d_elliptic_vt();
     elliptic_vt->setup = multigrid_setup_solver;
-    elliptic_vt->solve = multigrid_solve;
-    // RHS is set using default RHS in elliptic_solve.
+    elliptic_vt->solve = multigrid_solve;    
+    elliptic_vt->apply_bc = fc2d_multigrid_physical_bc;
+
+
+	fc2d_multigrid_vtable_t*  mg_vt = multigrid_vt_init();	
+    mg_vt->fort_apply_bc = &MULTIGRID_FORT_APPLY_BC_DEFAULT;
+    mg_vt->fort_eval_bc  = &MULTIGRID_FORT_EVAL_BC_DEFAULT;
 
 	mg_vt->is_set = 1;
 }
