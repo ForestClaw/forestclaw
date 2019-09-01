@@ -23,7 +23,7 @@ c    # -------------------------------------------------------------------------
       do m = 1,meqn
          if (fclaw2d_map_is_used(cont)) then
 C            sum(m) = 0
-c            c = 0
+c            c_kahan = 0
             do j = 1,my
                do i = 1,mx
                   y = q(i,j,m)*area(i,j) - c_kahan

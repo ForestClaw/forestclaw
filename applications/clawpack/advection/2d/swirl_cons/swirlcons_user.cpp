@@ -36,35 +36,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user_fort.h"  
 
+static
+void cb_swirl_output_ascii (fclaw2d_domain_t * domain,
+                            fclaw2d_patch_t * this_patch,
+                            int this_block_idx, int this_patch_idx,
+                            void *user);
+
+
 void swirlcons_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t                     *vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
-    fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
-    const user_options_t* user = swirlcons_get_options(glob);
+
+    fc2d_clawpack46_options_t  *clawopt = fc2d_clawpack46_get_options(glob);
+    const user_options_t*          user = swirlcons_get_options(glob);
+
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 
     /* ForestClaw functions */
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
 
-    /* ClawPatch specific functions */
-    clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
-    clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
-
     patch_vt->setup   = &swirlcons_patch_setup_manifold;
 
+    clawpatch_vt->fort_compute_patch_error = &SWIRL46_COMPUTE_ERROR;
 
     clawopt->use_fwaves = 0;
     switch(user->mapping)
     {
         case 0:
+
+            printf("Version without mapping does not work\n");
+            exit(0);
+
             clawpack46_vt->fort_rpt2      = &RPT2CONS;
             clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
             switch(user->rp_solver)
             {
                 case 1:  /* QS */
-                    clawpack46_vt->fort_rpn2      = &RPN2CONS_QS;
+                    //clawpack46_vt->fort_rpn2      = &RPN2CONS_QS;
                 case 2:  /* WD */
                     clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
                 case 3:  /* EC */
@@ -84,17 +95,34 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
             switch(user->rp_solver)
             {
                 case 1:  /* QS */
-                    clawpack46_vt->fort_rpn2      = &RPN2CONS_QS_MANIFOLD; 
+                    //clawpack46_vt->fort_rpn2      = &RPN2CONS_QS_MANIFOLD; 
                 case 2:  /* WD */
                     clawpack46_vt->fort_rpn2      = &RPN2CONS_WD; 
                 case 3:  /* EC */
-                    clawpack46_vt->fort_rpn2      = &RPN2CONS_EC;                 
+                    clawpack46_vt->fort_rpn2      = &RPN2CONS_EC_MANIFOLD;                 
                 case 4:  /* FW */
                     clawopt->use_fwaves = 1;
                     clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
             }
-            /* Patch specific functions */
 
+            if (user->initial_condition == 0)
+            {
+                /* Initial condition is 0/1 field; Use absolute jump in solution */            
+            }
+            else
+            {
+                /* Smooth initial condition for accuracy problem : 
+                   We should use a divided differences for tagging */
+                clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
+                clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+
+                /* Include error in output files */
+                if (fclaw_opt->compute_error)
+                {
+                    clawpatch_vt->fort_header_ascii   = &SWIRL46_FORT_HEADER_ASCII;
+                    clawpatch_vt->cb_output_ascii     = &cb_swirl_output_ascii;                
+                }
+            }
 
             break;
     }
@@ -106,15 +134,16 @@ void swirlcons_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = swirlcons_get_options(glob);
 
-    int ex = user->example;
-    SWIRL_SETPROB(&ex);
+    SWIRL_SETPROB(&user->example,&user->mapping,&user->initial_condition,
+                  &user->color_equation, &user->use_stream,
+                  &user->alpha);
 }
 
 
 void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
                                     fclaw2d_patch_t *this_patch,
-                                    int this_block_idx,
-                                    int this_patch_idx)
+                                    int blockno,
+                                    int patchno)
 {
     const user_options_t* user = swirlcons_get_options(glob);
 
@@ -143,22 +172,78 @@ void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
     switch(user->mapping)
     {
         case 0:  /* No map */
+#if 0            
             int maxmx, maxmy;
             maxmx = mx;
             maxmy = my;
             CLAWPACK46_SETAUX(&maxmx, &maxmy, &mbc,&mx,&my,&xlower,&ylower,
                               &dx,&dy,&maux,aux);
+#endif                              
             break;
         case 1: /* cart map */
         case 2: /* fivepatch */
         case 3: /* bilinear */
-            CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                                       &dx,&dy,&maux,aux,&this_block_idx,
-                                       xp,yp,zp,area,
-                                       edgelengths,xnormals,ynormals,surfnormals);
+            SWIRL46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
+                           &dx,&dy,&maux,aux,&blockno,
+                           area,
+                           edgelengths,xnormals,ynormals,surfnormals);
             break;
     }
 }
+
+static
+void cb_swirl_output_ascii (fclaw2d_domain_t * domain,
+                            fclaw2d_patch_t * this_patch,
+                            int this_block_idx, int this_patch_idx,
+                            void *user)
+{
+    int patch_num;
+    int level;
+    int mx,my,mbc,meqn;
+    double xlower,ylower,dx,dy, time;
+    double *q, *error, *soln;
+    int iframe;
+
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+
+    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
+
+
+    iframe = *((int *) s->user);
+
+    time = glob->curr_time;
+
+
+    /* Get info not readily available to user */
+    fclaw2d_patch_get_info(glob->domain,this_patch,
+                           this_block_idx,this_patch_idx,
+                           &patch_num,&level);
+    
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    error = fclaw2d_clawpatch_get_error(glob,this_patch);
+    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+
+    char fname[BUFSIZ];
+    snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
+
+
+    /* Here, we pass in q and the error, so need special headers and files */
+    SWIRL46_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
+                            &xlower,&ylower,
+                            &dx,&dy,
+                            q,error,soln, &time, 
+                            &patch_num,&level,
+                            &this_block_idx,
+                            &glob->mpirank);
+}
+
+
+
 
 
 

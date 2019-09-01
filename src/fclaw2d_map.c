@@ -47,16 +47,40 @@ FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
     cont->mapc2m (cont, *blockno, *xc, *yc, xp, yp, zp);
 }
 
+
+/* This function can be called from Fortran inside of ClawPatch. */
+void
+FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont, int *blockno,
+                       const double *xc, const double *yc,
+                       double *t, double *tinv, double *tderivs,
+                       int *flag)
+{
+    fclaw2d_map_context_t *cont = *pcont;
+    FCLAW_ASSERT(cont->basis != NULL);
+
+    cont->basis (cont, *blockno, *xc, *yc, t, tinv, tderivs, *flag);
+}
+
+
 void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
                           const double *xc, const double *yc,
                           double *xp, double *yp, double *zp)
 {
     fclaw2d_map_context_t *cont = *pcont;
 
-    FCLAW_ASSERT(cont->brick != NULL);
-    fclaw2d_map_context_t *brick = cont->brick;
-    
-    brick->mapc2m (brick, *blockno, *xc, *yc, xp, yp, zp);
+    if (cont->brick != NULL)
+    {
+        fclaw2d_map_context_t *brick = cont->brick;    
+        brick->mapc2m (brick, *blockno, *xc, *yc, xp, yp, zp);
+    }
+    else
+    {
+        /* We only have one tree */
+        FCLAW_ASSERT(blockno == 0);
+        *xp = *xc;
+        *yp = *yc;
+        *zp = 0;
+    }
 }
 
 

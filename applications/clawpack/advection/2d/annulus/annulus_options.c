@@ -38,14 +38,38 @@ annulus_register(user_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "beta", &user->beta, 0.4,
                            "[user] Inner radius of annulus [0.4]");
 
+    fclaw_options_add_double_array (opt, 0, "theta", 
+                                    &user->theta_string,"0 1",&user->theta,2,
+                                    "[user] theta range [0,1]");
+
     user->is_registered = 1;
     return NULL;
+}
+
+static fclaw_exit_type_t
+annulus_postprocess(user_options_t *user)
+{
+    fclaw_options_convert_double_array (user->theta_string, &user->theta, 2);
+
+    return FCLAW_NOEXIT;
+}
+
+static fclaw_exit_type_t
+annulus_check(user_options_t *user)
+{
+    if (user->theta[0] > user->theta[1]) 
+    {
+        fclaw_global_essentialf
+            ("Option --user:theta : theta[0] > theta[1]\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    return FCLAW_NOEXIT;
 }
 
 static void
 annulus_destroy (user_options_t *user)
 {
-    /* Nothing to destroy */
+    FCLAW_FREE (user->theta);
 }
 
 /* ------- Generic option handling routines that call above routines ----- */
@@ -61,6 +85,38 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     user = (user_options_t*) package;
 
     return annulus_register(user,opt);
+}
+
+static fclaw_exit_type_t
+options_postprocess (fclaw_app_t * a, void *package, void *registered)
+{
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* errors from the key-value options would have showed up in parsing */
+    user_options_t *user_opt = (user_options_t *) package;
+
+    /* post-process this package */
+    FCLAW_ASSERT(user_opt->is_registered);
+
+    /* Convert strings to arrays */
+    return annulus_postprocess (user_opt);
+}
+
+
+static fclaw_exit_type_t
+options_check(fclaw_app_t *app, void *package,void *registered)
+{
+    user_options_t           *user_opt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT(registered == NULL);
+
+    user_opt = (user_options_t*) package;
+
+    return annulus_check(user_opt);
 }
 
 static void
@@ -85,8 +141,8 @@ static const
 fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register,
-    NULL,
-    NULL,
+    options_postprocess,
+    options_check,
     options_destroy,
 };
 

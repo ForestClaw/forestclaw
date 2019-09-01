@@ -339,7 +339,8 @@ double geoclaw_update(fclaw2d_global_t *glob,
                       int this_block_idx,
                       int this_patch_idx,
                       double t,
-                      double dt)
+                      double dt,
+                      void* user)
 {
     const fc2d_geoclaw_options_t* geoclaw_options;
     geoclaw_options = fc2d_geoclaw_get_options(glob);

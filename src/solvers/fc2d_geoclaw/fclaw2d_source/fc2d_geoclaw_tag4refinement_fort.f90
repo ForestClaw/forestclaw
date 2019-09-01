@@ -13,7 +13,7 @@ SUBROUTINE fc2d_geoclaw_fort_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
   USE qinit_module, ONLY: x_low_qinit,x_hi_qinit,y_low_qinit,y_hi_qinit
   USE qinit_module, ONLY: min_level_qinit,qinit_type
 
-  USE storm_module, ONLY: storm_type, wind_refine, R_refine, storm_location
+  USE storm_module, ONLY: storm_specification_type, wind_refine, R_refine, storm_location
   USE storm_module, ONLY: wind_forcing, wind_index, wind_refine
 
   USE regions_module, ONLY: num_regions, regions, region_type
@@ -58,7 +58,7 @@ SUBROUTINE fc2d_geoclaw_fort_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
         !! ************* Storm Based Refinement ****************
         !! Check to see if we are some specified distance from the eye of
         !! the storm and refine if we are
-        if (storm_type > 0) then
+        if (storm_specification_type > 0) then
            R_eye = storm_location(t)
            do m=1,size(R_refine,1)
               if (coordinate_system == 2) then

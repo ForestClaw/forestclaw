@@ -19,26 +19,27 @@ c
       parameter(meqn1 = 10)
       double precision delta(meqn1)
 
-      integer i,m,mw, iface, m1, m2, get_vflag, vflag
+      integer i,m
 
       if (meqn1 .lt. meqn) then
          write(6,*) 'rpn2noncons : meqn1 .lt. meqn'
          stop
       endif
 
-      iface = ixy
       do i = 2-mbc, mx+mbc
          do m = 1,meqn
-            wave(i,1,m) = ql(i,m) - qr(i-1,m)
+            wave(i,m,1) = ql(i,m) - qr(i-1,m)
          enddo
 
-         s(i,1) = auxl(i,1 + iface)
+         s(i,1) = auxl(i,1 + ixy)
 
          do m = 1,meqn
             amdq(i,m) = min(s(i,1), 0.d0) * wave(i,m,1)
             apdq(i,m) = max(s(i,1), 0.d0) * wave(i,m,1)
          enddo
+c         write(6,*) s(i,1), wave(i,1,1)         
       enddo
+c      write(6,*) ' '
 
       return
       end

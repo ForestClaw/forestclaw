@@ -33,24 +33,32 @@ static int s_user_options_package_id = -1;
 static void *
 swirlcons_register (user_options_t *user, sc_options_t * opt)
 {
+    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 1,
+                           "Conservative riemann solver (1-4) [T]");
+
     sc_options_add_int (opt, 0, "example", &user->example, 1,
                            "Velocity field choice (0-3) [1]");
 
+    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
+                           "1 : u(x) > 0; 2: u(x) changes sign (1,2) [1]");
+
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
-                           "Mapping parameter alpha [0.4]");
+                           "[user] Used in five-patch mapping [0.4]");
+
+    sc_options_add_int (opt, 0, "initial-condition", &user->initial_condition, 0,
+                        "[user] Initial condition : 0=non-smooth; 1=smooth [1]");
+
+    sc_options_add_bool (opt, 0, "color-equation", &user->color_equation, 0,
+                        "[user]  Solve color-equation using edge velocities [1]");
+
+    sc_options_add_bool (opt, 0, "use-stream", &user->use_stream, 0,
+                        "[user]  Use streamfunction [0]");
+
 
     fclaw_options_add_double_array (opt, 0, "center", &user->center_string, "0 0",
                                     &user->center, 2, 
                                     "Center point for bilinear mapping  [0,0]");
 
-    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 3,
-                           "Conservative Riemann solver (1-4) [3]");
-
-    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
-                           "1 : u(x) > 0; 2: u(x) changes sign (1,2) [1]");
-
-    sc_options_add_int (opt, 0, "rp-solver", &user->rp_solver, 1,
-                           "Conservative riemann solver (1-4) [T]");
     user->is_registered = 1;
 
     return NULL;

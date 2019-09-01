@@ -326,9 +326,9 @@ def setplot(plotdata):
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = 'all' # list of frames to print
-    plotdata.print_gaugenos = 'all'  # list of gauges to print
-    plotdata.print_fignos = [300]            # list of figures to print
+    plotdata.print_framenos = 'all'          # list of frames to print
+    plotdata.print_gaugenos = 'all'          # list of gauges to print
+    plotdata.print_fignos = [0,10,300]            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
     plotdata.html_movie = 'JSAnimation'
@@ -338,7 +338,7 @@ def setplot(plotdata):
     plotdata.latex_makepdf = False           # also run pdflatex?
     plotdata.format = 'forestclaw'                # Format of output
 
-    return plotdata
+    return plotdata 
 
 if __name__=="__main__":
     from clawpack.visclaw.plotclaw import plotclaw

@@ -306,14 +306,16 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 		  fclaw2d_clawpatch_get_registers(glob,this_patch);
 
 	/* Evaluate fluxes needed in correction terms */
-	if (claw46_vt->fort_rpn2_cons != NULL && fclaw_opt->time_sync)
+	if (fclaw_opt->time_sync && fclaw_opt->flux_correction)
 	{
+		FCLAW_ASSERT(claw46_vt->fort_rpn2_cons != NULL);
 		double *qvec   = FCLAW_ALLOC(double, meqn);
 		double *auxvec_center = FCLAW_ALLOC(double, maux);
 		double *auxvec_edge = FCLAW_ALLOC(double, maux);
 		double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
-		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,&dt,
+		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,
+		                                &this_block_idx,&this_patch_idx, &dt,
 										  cr->edgelengths[0], 
 										  cr->edgelengths[1], 
 										  cr->edgelengths[2], 
@@ -333,46 +335,55 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 
 	int mwork = (maxm+2*mbc)*(12*meqn + (meqn+1)*mwaves + 3*maux + 2);
-	double* work = new double[mwork];
+	double* work = FCLAW_ALLOC(double,mwork);
 
 	int size = meqn*(mx+2*mbc)*(my+2*mbc);
-	double* fp = new double[size];
-	double* fm = new double[size];
-	double* gp = new double[size];
-	double* gm = new double[size];
+	double* fp = FCLAW_ALLOC(double,size);
+	double* fm = FCLAW_ALLOC(double,size);
+	double* gp = FCLAW_ALLOC(double,size);
+	double* gm = FCLAW_ALLOC(double,size);
 
 	int ierror = 0;
 	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
-	clawpack46_fort_flux2_t flux2 = clawpack_options->use_fwaves ?
-									 CLAWPACK46_FLUX2FW : CLAWPACK46_FLUX2;
+
+	if (claw46_vt->flux2 == NULL)
+	{
+		claw46_vt->flux2 = (clawpack_options->use_fwaves != 0) ? &CLAWPACK46_FLUX2FW : 
+		                       &CLAWPACK46_FLUX2;	
+	}
 
 	/* NOTE: qold will be overwritten in this step */
 	CLAWPACK46_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
 						  clawpack_options->mthlim, &clawpack_options->mcapa,
 						  &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
 						  work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
-						  claw46_vt->fort_rpn2, claw46_vt->fort_rpt2,flux2,
+						  claw46_vt->fort_rpn2, claw46_vt->fort_rpt2,claw46_vt->flux2,
 						  block_corner_count, &ierror);
 
 	FCLAW_ASSERT(ierror == 0);
 
-	CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES(&mx,&my,&mbc,&meqn, &dt, &dx, 
-	                                        &dy, &this_patch_idx,
-											cr->edgelengths[0],cr->edgelengths[1],
-											cr->edgelengths[2],cr->edgelengths[3],
-											fp,fm,gp,gm,
-											cr->fp[0],cr->fp[1],
-											cr->fm[0],cr->fm[1],
-											cr->gp[0],cr->gp[1],
-											cr->gm[0],cr->gm[1]);
+	if (fclaw_opt->time_sync && fclaw_opt->fluctuation_correction)
+	{
+
+		CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES(&mx,&my,&mbc,&meqn, &dt, &dx, 
+		                                      &dy, &this_patch_idx,
+		                                      cr->edgelengths[0],
+		                                      cr->edgelengths[1],
+		                                      cr->edgelengths[2],
+		                                      cr->edgelengths[3],
+		                                      fp,fm,gp,gm,
+		                                      cr->fp[0],cr->fp[1],
+		                                      cr->fm[0],cr->fm[1],
+		                                      cr->gp[0],cr->gp[1],
+		                                      cr->gm[0],cr->gm[1]);
+	}		
 
 
-	delete [] fp;
-	delete [] fm;
-	delete [] gp;
-	delete [] gm;
-
-	delete [] work;
+	FCLAW_FREE(fp);
+	FCLAW_FREE(fm);
+	FCLAW_FREE(gp);
+	FCLAW_FREE(gm);
+	FCLAW_FREE(work);
 
 	return cflgrid;
 }

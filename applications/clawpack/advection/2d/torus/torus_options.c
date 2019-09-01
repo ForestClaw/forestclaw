@@ -32,26 +32,23 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
 {
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user_opt->example, 0,
-                        "[user] 0 = torus; 1 = twisted torus [0]");
-
-    sc_options_add_int (opt, 0, "mapping", &user_opt->mapping, 0,
-                        "[user] 0 = torus; 1 = twisted torus [0]");
-
-    sc_options_add_int (opt, 0, "initial-condition", &user_opt->initial_condition, 0,
-                        "[user] Initial condition : 0=non-smooth; 1=smooth [1]");
-
-    sc_options_add_bool (opt, 0, "color-equation", &user_opt->color_equation, 0,
-                        "[user]  Solve color-equation using edge velocities [1]");
+                           "[user] Example [0] ");
 
     sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
                            "[user] Ratio r/R, r=outer radius, R=inner radius " \
                            "(used for torus) [0.4]");
 
-    sc_options_add_double (opt, 0, "revs-per-s", &user_opt->revs_per_s, 0.5,
+    sc_options_add_double (opt, 0, "beta", &user_opt->beta, 0.4,
+                           "[user] For torus with oscillations [0]");
+
+    sc_options_add_double (opt, 0, "revs_per_s", &user_opt->revs_per_s, 0.4,
                            "[user] Revolutions per second [0.5]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
-                        "[user] Clawpack version (4 or 5) [5]");
+    sc_options_add_bool (opt, 0, "color-equation", &user_opt->color_equation, 1,
+                           "[user] User color equation [T]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 4,
+                        "[user] Clawpack version (4 or 5) [4]");
 
     user_opt->is_registered = 1;
     return NULL;
@@ -66,13 +63,22 @@ torus_postprocess(user_options_t *user_opt)
 
 
 static fclaw_exit_type_t
-torus_check(user_options_t *user_opt)
+torus_check(user_options_t *user)
 {
-    if (user_opt->example < 0 || user_opt->example > 1)
+    if (user->claw_version == 5) 
     {
-        fclaw_global_essentialf
-            ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
+        if (user->beta != 0)
+        {
+            fclaw_global_essentialf("Non-zero beta not implemented for "\
+                                    "claw-version == 5\n");
+            return FCLAW_EXIT_QUIET;
+        }
+        if (user->color_equation == 0)
+        {
+            fclaw_global_essentialf("Transport equation (color_equation == 0) not "\
+                                    "implemented in claw-version == 5\n");
+            return FCLAW_EXIT_QUIET;            
+        }
     }
     return FCLAW_NOEXIT;
 

@@ -172,7 +172,7 @@ typedef void (*clawpatch_fort_output_ascii_t)(char* matname1,
 typedef void (*clawpatch_fort_error_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
 									   double *dx, double *dy, double *xlower,
 									   double *ylower, double *t, double q[],
-									   double error[]);
+									   double error[], double soln[]);
 
 typedef void (*clawpatch_fort_conscheck_t)(int *mx, int *my, int* mbc, int* meqn,
 										   double *dx, double *dy,
