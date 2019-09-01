@@ -64,7 +64,7 @@ void MGTEST_SETPROB(const int* rhs_choice, const double *alpha,
 void MGTEST_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
                            double *dx, double *dy, double *xlower,
                            double *ylower, double *t, double q[],
-                           double error[]);
+                           double error[], double soln[]);
 
 
 #ifdef __cplusplus
