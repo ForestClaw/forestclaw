@@ -1237,7 +1237,7 @@ double* fclaw2d_clawpatch_get_exactsoln(fclaw2d_global_t* glob,
 }
 
 void* flaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
-                                 fclaw2d_patch_t* this_patch)
+                                 fclaw2d_patch_t* patch)
 {
     fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
     return cp->user_data;
