@@ -73,6 +73,7 @@ struct fc2d_multigrid_vtable
 	fc2d_multigrid_fort_rhs_t        fort_rhs;	
     fc2d_multigrid_fort_apply_bc_t   fort_apply_bc;
     fc2d_multigrid_fort_eval_bc_t    fort_eval_bc;
+    
 	int is_set;
 
 };

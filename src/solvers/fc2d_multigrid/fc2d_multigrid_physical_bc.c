@@ -108,12 +108,11 @@ void fc2d_multigrid_physical_get_bc(fclaw2d_global_t *glob,
    Public interface : Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
-void fc2d_multigrid_physical_bc(fclaw2d_global_t *glob,
-                             double t)
+void fc2d_multigrid_physical_bc(fclaw2d_global_t *glob)
 {
 
     fc2d_multigrid_time_info_t tinfo;
-    tinfo.t = t;
+    tinfo.t = glob->curr_time;
     fclaw2d_global_iterate_patches(glob,
                                    cb_fc2d_multigrid_physical_bc,
                                    (void *) &tinfo);
