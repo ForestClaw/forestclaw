@@ -3,7 +3,7 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 
 global notpillowsphere flat;
 
-flat = false;
+flat = true;
 
 map_list = {'cubedsphere', 'pillowpshere'};
 
@@ -11,7 +11,9 @@ map_list = {'cubedsphere', 'pillowpshere'};
 
 map = map_list{mapping+1};
 
-map = 'cubedsphere_flat';
+if (flat)
+    map = 'cubedsphere_flat';
+end
 
 switch map
     case 'pillowsphere'

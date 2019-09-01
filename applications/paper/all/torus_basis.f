@@ -293,6 +293,10 @@ c      zp = r1*sin(pi2*yc)
 
 c     # Phi in [-pi/2, pi/2];  We need to transform it to 
 c     # [0,2*pi]      
+      if (abs(zp/r1) .gt. 1) then
+          write(6,*) 'abs(zp/r1) .gt. 1'
+          stop
+      endif
       phi = asin(zp/r1)
       r = sqrt(xp**2 + yp**2)
       if (r .le. 1) then

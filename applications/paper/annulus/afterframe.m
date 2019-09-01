@@ -4,7 +4,7 @@ setviews;
 [example,A,rinit,beta,theta,freq,cart_speed] = read_vars();
 
 tfinal = 0.25;
-vcart = 1.092505803290319;
+vcart = cart_speed;
 dlen = vcart*tfinal;
 
 
@@ -13,9 +13,9 @@ if example ~= 2
     thc = pi/2*(1 + 1/8);
     dadd = [dlen,0];
 else
-    r = beta + (1-beta)*0.625;
+    r = beta + (1-beta)*0.5625;
     thc = pi/2;
-    dadd = 0.5*[0,-dlen];
+    dadd = [0,dlen];
 end
 pstart = [r*cos(thc),r*sin(thc)];
 pend = pstart + dadd;
@@ -40,7 +40,7 @@ set(gca,'fontsize',16);
 
 axis([-0.707106781186547   0.707106781186548   0.282842712474619,1]);
 
-%axis([-0.211745637207774, 0.211745637207774, 0.5, 0.85])
+axis([-0.211745637207774, 0.211745637207774, 0.5, 0.85])
 
 
 plot_path = true;

@@ -69,10 +69,13 @@ c     # uderivs(4) = u2y
       if (example .eq. 0) then
           flag = 1
           call mapc2m_spherical(x,y,xp,yp,zp)
-          rv(1) = xp
-          rv(2) = yp
-          rv(3) = zp
-          call map_cross(omega,rv, vcart,w)
+c          rv(1) = xp
+c          rv(2) = yp
+c          rv(3) = zp
+c          call map_cross(omega,rv, vcart,w)
+          vcart(1) = 1
+          vcart(2) = 1
+          vcart(3) = 1
 
 c         # Define (du(1)/dx, du(2)/dy, du(3)/dz)          
           derivs(1) = 0

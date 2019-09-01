@@ -52,7 +52,7 @@ c        # Rigid body rotation
               vcart(2) = 0
           elseif (example .eq. 2) then
               vcart(1) = 0
-              vcart(2) = -0.5*cart_speed
+              vcart(2) = cart_speed
           elseif (example .eq. 3) then
              call map_comp2annulus(x,y,theta,r)
              w = 0.5

@@ -118,19 +118,12 @@ c     # ------------------------------------------------------------
 
       if (flag .eq. 1) then
 c         # Velocity components are given in Cartesian components
-          call map_covariant_basis(x, y, t1,t2)
-          t1n2 = map_dot(t1,t1)
-          t2n2 = map_dot(t2,t2)
-          u(1) = map_dot(vcart,t1)/t1n2
-          u(2) = map_dot(vcart,t2)/t2n2
+          call map_contravariant_basis(x, y, t1inv,t2inv)
+          u(1) = map_dot(vcart,t1inv)
+          u(2) = map_dot(vcart,t2inv)
 
-c          call map_contravariant_basis(x, y, t1inv,t2inv)
-c          # Convert Cartesian derivatives to u(1),u(2) derivatives
-c          # 
-c          #   grad v1 = (dv1/dx)*t1c + (dv1/dy)*t2c + (dv1/dz)*t3c
-c          #   grad v2 = (dv2/dx)*t1c + (dv2/dy)*t2c + (dv2/dz)*t3c
-c          # .....
-c          # Don't think this is needed ...
+c         # Need to convert derivatives to derivatives with respect
+c         # to computational coordinates.          
 
       endif
 

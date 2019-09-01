@@ -33,7 +33,7 @@ else
         if Frame > 0 && Frame < 10
             ca = [0,3.1];
         else
-            ca = [-0.2,1];
+            ca = [-0.2,10];
         end
     else
         ca = [0,1];

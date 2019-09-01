@@ -30,10 +30,10 @@ def setrun(claw_pkg='amrclaw'):
     use_fixed_dt = True
 
     mx = 32
-    dt_initial = 1e-2          # Stable for level 1
+    dt_initial = 5e-3          # Stable for level 1
 
-    nout = 25
-    nstep = 25
+    nout = 40
+    nstep = 40
 
     outstyle = 3
 
@@ -41,12 +41,12 @@ def setrun(claw_pkg='amrclaw'):
     # 1 : Inward rotation u = (0,omega)
     # 2 : Cartesian flow  V = (u,v,w)
     # 3 : Trig. example.
-    example = 0
+    example = 1
 
     # 0 : Usual refinement (not used)
     # 1 : constant theta
     # 2 : constant r
-    refine_pattern = 1
+    refine_pattern = 2
 
     # 0 :   discontinuous initial conditions
     # 1 :   smooth initial condition
@@ -61,9 +61,9 @@ def setrun(claw_pkg='amrclaw'):
     init_radius = 0.10
 
     if example == 0:
-        revs_per_s = -1
+        revs_per_s = -1.25
     elif example == 1:
-        revs_per_s = 1
+        revs_per_s = 1.25
 
     cart_speed = 0.765366864730180 
 
@@ -198,7 +198,7 @@ def setrun(claw_pkg='amrclaw'):
     #   2 or 'superbee' ==> superbee
     #   3 or 'vanleer'  ==> van Leer
     #   4 or 'mc'       ==> MC limiter
-    clawdata.limiter = ['vanleer']
+    clawdata.limiter = ['minmod']
 
     clawdata.use_fwaves = True    # True ==> use f-wave version of algorithms
     clawdata.source_split = 0

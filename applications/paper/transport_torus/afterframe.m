@@ -10,7 +10,7 @@ daspect([1,1,1]);
 colorbar;
 
 caxis([-0.2,1])
-caxis([-1,1]*1e-15);
+% caxis([-1,1]*1e-15);
 axis off;
 
 % view(vfront);

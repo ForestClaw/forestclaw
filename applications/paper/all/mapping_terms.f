@@ -125,13 +125,14 @@ c         # Velocity and derivatives are given in
 c         # spherical components       
           call map_christoffel_sym(x,y,g) 
 
-          D11 = derivs(1) + u(1)*g(1,1,1) + u(2)*g(1,2,1)
-          D22 = derivs(4) + u(1)*g(2,1,2) + u(2)*g(2,2,2)
+          D11 = derivs(1) + u(1)*g(1,1,1) + u(2)*g(2,1,1)
+          D22 = derivs(4) + u(1)*g(1,2,2) + u(2)*g(2,2,2)
 
           map_divergence = D11 + D22
       else
 c         # Velocity and derivatives are given in 
 c         # Cartesian components        
+c          write(6,*) 'map_divergence : Cannot use Cartesian divergence'
           map_divergence = derivs(1) + derivs(2) + derivs(3)
       endif
 

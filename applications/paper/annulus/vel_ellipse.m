@@ -43,7 +43,7 @@ else
         vc2 = 0;                
     elseif example == 2
         vc1 = 0;
-        vc2 = -0.5*cart_speed;
+        vc2 = cart_speed;
     elseif example == 3
         w = 0.5;
         vc1 = -(1-w)*pi2*r.*sin(pi2*th);

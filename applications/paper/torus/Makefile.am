@@ -5,7 +5,8 @@ applications_paper_torus_torus_SOURCES = \
 	applications/paper/torus/torus_options.c \
 	applications/paper/torus/torus_user.h \
 	applications/paper/torus/torus_user.cpp \
-v	applications/paper/torus/setprob.f \
+	applications/paper/torus/setprob.f \
+	applications/paper/torus/compute_exact.f90 \
 	applications/paper/torus/fclaw2d_map_torus.c \
 	applications/paper/all/mapc2m_torus.f \
 	applications/paper/all/torus_velocity.f \
