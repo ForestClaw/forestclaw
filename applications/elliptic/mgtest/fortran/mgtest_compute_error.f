@@ -22,10 +22,7 @@ c     # Assume a single field variable only
          do i = 1,mx
             xc = xlower + (i-0.5)*dx
 
-c           # Map each block (in [0,1]x[0,1]) to single domain in 
-c           # [0,1]x[0,1]
-c            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-            soln(i,j,1) = mgtest_qexact(xc,yc)
+            soln(i,j,1) = mgtest_qexact(xc1,yc1)
             error(i,j,1) = q(i,j,1) - soln(i,j,1)
          enddo
       enddo
