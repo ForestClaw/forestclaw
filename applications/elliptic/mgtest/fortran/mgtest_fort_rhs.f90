@@ -5,13 +5,9 @@ subroutine mgtest_fort_rhs(blockno, mbc,mx,my,xlower,ylower,dx,dy,q)
     DOUBLE PRECISION xlower,ylower,dx,dy
     DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    INTEGER*8 cont, get_context
-
     INTEGER i,j
     DOUBLE PRECISION xc,yc, xc1, yc1, zc1, mgtest_qexact_rhs
     INTEGER blockno
-
-    cont = get_context()
 
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc
