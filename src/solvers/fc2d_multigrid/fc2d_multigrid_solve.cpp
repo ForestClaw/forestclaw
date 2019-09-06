@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_map.h>
+#include <fclaw2d_map_brick.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_vtable.h>
@@ -76,16 +77,12 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
   // create map function
-  P4estDomGen::BlockMapFunc bmf = [&](int block_no, double unit_x,
+  P4estDomGen::BlockMapFunc bmf = [&](int block_no, double unit_x,      
                                       double unit_y, double &x, double &y) {
-    double block_x = block_no % fclaw_opt->mi;
-    double block_y = block_no / fclaw_opt->mj;
-
-    double brick_domain_x = (block_x + unit_x) / fclaw_opt->mi;
-    double brick_domain_y = (block_y + unit_y) / fclaw_opt->mj;
-
-    x = fclaw_opt->ax + (fclaw_opt->bx - fclaw_opt->ax) * brick_domain_x;
-    y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * brick_domain_y;
+    double x1,y1,z1;
+    FCLAW2D_MAP_BRICK2C(&glob->cont,&block_no,&unit_x, &unit_y, &x1, &y1, &z1);
+    x = fclaw_opt->ax + (fclaw_opt->bx - fclaw_opt->ax) * x1;
+    y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * y1;
   };
 
   // create neumann function
