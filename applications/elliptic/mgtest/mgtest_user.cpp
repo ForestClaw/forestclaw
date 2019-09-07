@@ -47,19 +47,36 @@ void mgtest_problem_setup(fclaw2d_global_t *glob)
         FILE *f = fopen("setprob.data","w");
         const mgtest_options_t* user = mgtest_get_options(glob);
 
-        fprintf(f,  "%-24d   %s",  user->example,"\% example\n");
-        fprintf(f,  "%-24d   %s",  user->beta_choice,"\% beta_choice\n");
-        fprintf(f,  "%-24.6f   %s",user->alpha,  "\% alpha\n");
-        fprintf(f,  "%-24.6f   %s",user->x0,     "\% x0\n");
-        fprintf(f,  "%-24.6f   %s",user->y0,     "\% y0\n");
-        fprintf(f,  "%-24.6f   %s",user->a,      "\% a\n");
-        fprintf(f,  "%-24.6f   %s",user->b,      "\% b\n");
+        fprintf(f,  "%-24d   %s",  user->example,    "%% example\n");
+        fprintf(f,  "%-24d   %s",  user->beta_choice,"%% beta_choice\n");
+        fprintf(f,  "%-24.6f   %s",user->alpha,      "%% alpha\n");
+        fprintf(f,  "%-24.6f   %s",user->x0,         "%% x0\n");
+        fprintf(f,  "%-24.6f   %s",user->y0,         "%% y0\n");
+        fprintf(f,  "%-24.6f   %s",user->a,          "%% a\n");
+        fprintf(f,  "%-24.6f   %s",user->b,          "%% b\n");
+        fprintf(f,  "%-24.6f   %s",user->eps_disk,   "%% eps_disk\n");
+        fprintf(f,  "%-24.6d   %s",user->m_polar,    "%% m_polar\n");
+        for(int i = 0; i < user->m_polar; i++)
+            fprintf(f,"%-24.6f   %% x0[%d]\n",user->x0_polar[i],i); 
+
+        for(int i = 0; i < user->m_polar; i++)
+            fprintf(f,"%-24.6f   %% y0[%d]\n",user->y0_polar[i],i);            
+
+        for(int i = 0; i < user->m_polar; i++)
+            fprintf(f,"%-24.6f   %% r0[%d]\n",user->r0_polar[i],i);            
+
+        for(int i = 0; i < user->m_polar; i++)
+            fprintf(f,"%-24.6f   %% r1[%d]\n",user->r1_polar[i],i);            
+
+        for(int i = 0; i < user->m_polar; i++)
+            fprintf(f,"%-24d   %% n[%d]\n",user->n_polar[i],i);            
 
         fc2d_multigrid_options_t*  mg_opt = fc2d_multigrid_get_options(glob);    
-        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[0],  "\% bc[0]\n");
-        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[1],  "\% bc[1]\n");
-        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[2],  "\% bc[2]\n");
-        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[3],  "\% bc[3]\n");
+        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[0],  "%% bc[0]\n");
+        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[1],  "%% bc[1]\n");
+        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[2],  "%% bc[2]\n");
+        fprintf(f,  "%24d      %s",mg_opt->boundary_conditions[3],  "%% bc[3]\n");
+
 
         fclose(f);
     }
@@ -167,8 +184,12 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 
     // Output routines
-    clawpatch_vt->fort_header_ascii = &MGTEST_FORT_HEADER_ASCII;
-    clawpatch_vt->cb_output_ascii = cb_mgtest_output_ascii;
+    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    if (fclaw_opt->compute_error) 
+    {
+        clawpatch_vt->fort_header_ascii = &MGTEST_FORT_HEADER_ASCII;
+        clawpatch_vt->cb_output_ascii = cb_mgtest_output_ascii;        
+    }
 
     /* Do something with user options? */
     //const user_options_t* user_opt = mgtest_get_options(glob);

@@ -22,17 +22,28 @@ if rhs_choice == 3
     hold off;
 end
 
-figure(2);
-clf;
-h = surf(xcenter,ycenter,q);
+if (length(amrdata) == 1)
+    figure(2);
+    clf;    
+    h = surf(xcenter,ycenter,q);
+    set(h,'edgecolor','none');
+    view(3);
+    axis square;
+    figure(1);
+end
 
-figure(1);
+if (mq == 3)
+    fprintf('%10s %12.4e\n','qmin',qmin);
+    fprintf('%10s %12.4e\n','qmax',qmax);
+end    
 
 
 % cm = [0 0 0; 0 0 1; 0 1 0; 0 1 1; 1 0 0; 1 0 1; 1 1 0];
 % colormap(cm);
 
 colormap(parula);
+
+colorbar;
 
 NoQuery = 0;
 prt = false;

@@ -49,6 +49,7 @@ END SUBROUTINE mgtest_qexact_gradient
 
 
 SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
+    use hsmooth_mod, only : m_polar, x0_polar, y0_polar
     IMPLICIT NONE
 
     DOUBLE PRECISION x,y, q, qlap, grad(2)
@@ -64,9 +65,11 @@ SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
     COMMON /compi/ pi, pi2
 
     INTEGER i,j
-    DOUBLE PRECISION r, r2, r0
-    double precision hsmooth, hsmooth_deriv, hsmooth_laplacian
-    DOUBLE PRECISION rx,ry,qx,qy, grad_beta
+    DOUBLE PRECISION r, r2, theta
+    double precision hsmooth, h_grad(2), hsmooth_laplacian
+    DOUBLE PRECISION qx,qy, dqdr, t1(2), t2(2)
+    double precision q1, qx1, qy1, qlap1, x0p,y0p
+    integer id
 
     if (example .eq. 0) then
         q = x + y
@@ -74,38 +77,46 @@ SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
         qy = 1
         qlap = 0
     elseif (example .eq. 1) then
+        !! example in polar coordinates (r)
         r2 = (x-x0)**2 + (y-y0)**2
-        q = exp(-alpha/2.d0*r2) + 1
+        q1 = exp(-alpha/2.d0*r2)
+        q = q1 + 1
         if (flag .ge. 1) then
-            rx = (x-x0)/sqrt(r2)
-            ry = (y-y0)/sqrt(r2)
-            qx = -alpha*r*rx*q
-            qy = -alpha*r*ry*q
+            r = sqrt(r2)
+            t1(1) = (x-x0)/r
+            t1(2) = (y-y0)/r
+            dqdr = -alpha*r*q1
+            qx = dqdr*t1(1)  !! Cartesian components of gradient
+            qy = dqdr*t1(2)
             if (flag .eq. 2) then
-                qlap = exp(-alpha/2.d0*r2)*(alpha**2*r2 - 2*alpha)
+                qlap = alpha*exp(-alpha/2.d0*r2)*(alpha*r2 - 2)
             endif
         endif
     elseif (example .eq. 2) then
+        !! Example in Cartesian coordinates
         q = sin(pi*a*x)*cos(pi*b*y)
         if (flag .ge. 1) then
-            qx = pi*a*cos(pi*a*x)*cos(pi*b*y)
+            qx =  pi*a*cos(pi*a*x)*cos(pi*b*y)
             qy = -pi*b*sin(pi*a*x)*sin(pi*b*y)
             if (flag .eq. 2 ) then
                 qlap = -(pi**2*(a**2 + b**2))*sin(pi*a*x)*cos(pi*b*y)
             endif
         endif
     elseif (example .eq. 3) then
-        !! Variable coefficient problem
+        !! d/(dx)((1 - x) x (1 - y) y exp(x y)) = (y - 1) y e^(x y) (x^2 y - (y - 2) x - 1)
         !! d/(dy)((1 - x) x (1 - y) y exp(x y)) = (x - 1) x e^(x y) (x y^2 - (x - 2) y - 1)
         q = (1-x)*x*(1-y)*y*exp(x*y)
 
         if (flag .ge. 1) then
-            qx = (x - 1)*x*exp(x*y)*(x*y**2 - (x - 2)*y - 1)
-            qy = (y - 1)*x*exp(x*y)*(x*y**2 - (x - 2)*y - 1)
+            qx = (y - 1)*y*exp(x*y)*(x**2*y - (y - 2)*x - 1)
+            qy = (x - 1)*x*exp(x*y)*(x*y**2 - (x - 2)*y - 1)
             if (flag .eq. 2) then
-                !!Δ((1 - x) x (1 - y) y e^(x y)) = e^(x y) (x^4 (y - 1) y - 
-                !!x^3 (y^2 - 5 y + 2) +  x^2 
-                !!(y^4 - y^3 - 4 y + 4) - x (y^4 - 5 y^3 + 4 y^2 + 2) - 2 (y - 1)^2 y)
+                !!Δ((1 - x) x (1 - y) y e^(x y)) = 
+                !! e^(x y) (x^4 (y - 1) y 
+                !! - x^3 (y^2 - 5 y + 2) 
+                !! + x^2 (y^4 - y^3 - 4 y + 4) 
+                !! - x (y^4 - 5 y^3 + 4 y^2 + 2) 
+                !! - 2 (y - 1)^2 y)
                 qlap = exp(x*y)*(x**4*(y - 1)*y & 
                                  - x**3*(y**2 - 5*y + 2) & 
                                  + x**2*(y**4 - y**3 - 4*y + 4) & 
@@ -114,18 +125,38 @@ SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
             endif
         endif
     elseif (example .eq. 4) then
-        r0 = 0.25
-        r = sqrt((x-0.5)**2 + (y-0.5)**2)
-        q = hsmooth(r + x0) - hsmooth(r - y0)
-        if (flag .ge. 1) then
-            rx = (x-x0)/sqrt(r2)
-            ry = (y-y0)/sqrt(r2)
-            qx = (hsmooth_deriv(r + r0) - hsmooth_deriv(r - r0))*rx
-            qy = (hsmooth_deriv(r + r0) - hsmooth_deriv(r - r0))*ry
-            if (flag .eq. 2) then
-                qlap = hsmooth_laplacian(r+r0) - hsmooth_laplacian(r-r0)
+        q = 0
+        qx = 0
+        qy = 0
+        qlap = 0
+        do id = 1,m_polar
+            x0p = x0_polar(id)
+            y0p = y0_polar(id)
+            r = sqrt((x-x0p)**2 + (y-y0p)**2)
+            theta = atan2(y-y0p,x-x0p)        
+            q1 = 1 - hsmooth(id,r,theta)
+            if (flag .ge. 1) then
+                !! Assume mapping is T(r,theta)
+                t1(1) = cos(theta)
+                t1(2) = sin(theta) 
+                t2(1) = -r*sin(theta)
+                t2(2) = r*cos(theta)
+
+                !! Cartesian components of the gradient
+                call hsmooth_grad(id,r,theta,h_grad)
+                qx1 = -(h_grad(1)*t1(1) + h_grad(2)*t2(1))   
+                qy1 = -(h_grad(1)*t1(2) + h_grad(2)*t2(2))   
+
+                !! Laplacian
+                if (flag .eq. 2) then
+                    qlap1 = -hsmooth_laplacian(id,r,theta)
+                endif
             endif
-        endif
+            q = q + q1
+            qx = qx + qx1
+            qy = qy + qy1
+            qlap = qlap + qlap1
+        enddo
     endif
     if (flag .ge. 1) then
         grad(1) = qx
@@ -134,47 +165,13 @@ SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
 
 end subroutine mgtest_qexact_complete
 
-
-double precision function Hsmooth(r)
+double precision function sech(x)
     implicit none
 
-    double precision r, a
+    double precision x
 
-    a = 0.015625d0
-    Hsmooth = (tanh(r/a) + 1)/2.
-
-end function Hsmooth
-
-!! Compute derivatives with respect to r
-DOUBLE PRECISION function Hsmooth_deriv(r)
-    implicit none
-
-    double precision r,a, sech2
-
-    a = 0.015625d0
-    sech2 = (1./cosh(r/a))**2
-    Hsmooth_deriv = sech2/(2*a)
-
-end function Hsmooth_deriv
-
-!! Compute Laplacian 
-double precision function Hsmooth_laplacian(r)
-    implicit none
-
-    double precision r, a, sech2, a2
-
-    a = 0.015625d0
-    sech2 = (1.d0/cosh(r/a))**2
-    a2 = a**2
-
-    if (r .eq. 0) then
-        write(6,*) 'r == 0)'
-        stop
-    endif
-    Hsmooth_laplacian = (a-2*r*tanh(r/a))*sech2/(2*a2*r)
-
-end function Hsmooth_laplacian
-
+    sech = 1.d0/cosh(x)
+end function sech
 
 subroutine mgtest_beta(x,y,b,grad)
     implicit none
@@ -186,7 +183,7 @@ subroutine mgtest_beta(x,y,b,grad)
 
     DOUBLE PRECISION pi,pi2
     COMMON /compi/ pi, pi2
-    
+
     DOUBLE PRECISION bx, by
 
     if (beta_choice .eq. 0) then

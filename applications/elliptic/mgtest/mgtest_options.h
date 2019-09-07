@@ -50,6 +50,25 @@ typedef struct mgtest_options
     double a; 
     double b;
 
+    double eps_disk;
+    
+    int m_polar;    // number of polar flowers
+
+    double *x0_polar;
+    const char* x0_polar_string;
+
+    double *y0_polar;
+    const char* y0_polar_string;
+
+    double *r0_polar;
+    const char* r0_polar_string;
+
+    double *r1_polar;
+    const char* r1_polar_string;
+
+    int *n_polar;
+    const char* n_polar_string;
+
     int is_registered;
 
 } mgtest_options_t;

@@ -53,6 +53,29 @@ mgtest_register (mgtest_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "b", &user->b, 2,
                            "y-frequency of center (used in example == 2) [2]");
 
+    /* For disk */
+    sc_options_add_double (opt, 0, "eps-disk", &user->eps_disk, 0.015625,
+                           "eps_disk defines sharpness of the interface [0.015625]");
+
+    /* Parameters for polar plots */
+    sc_options_add_int (opt, 0, "m-polar", &user->m_polar, 1,
+                           "m_polar number of polar flowers [1]");
+
+    fclaw_options_add_double_array (opt, 0, "x0-polar", &user->x0_polar_string,"0",
+        &user->x0_polar,user->m_polar,"(polar plots) x location of center [0]");
+
+    fclaw_options_add_double_array (opt, 0, "y0-polar", &user->y0_polar_string,"0",
+        &user->y0_polar,user->m_polar, "(polar plots) y location of center [0]");
+
+    fclaw_options_add_double_array (opt, 0, "r0-polar", &user->r0_polar_string, "0.25",
+        &user->r0_polar,user->m_polar, "(polar plots) r0-polar radius for polar disks [0.25]");
+
+    fclaw_options_add_double_array (opt, 0, "r1-polar", &user->r1_polar_string, "0.35",
+        &user->r1_polar,user->m_polar,"(polar plots) r1-polar length of polar petals [0.35]");
+
+    fclaw_options_add_int_array (opt, 0, "n-polar", &user->n_polar_string, "4",
+        &user->n_polar,user->m_polar,"(polar plots) n_polar number of polar petals [4]");
+
     user->is_registered = 1;
 
     return NULL;
@@ -61,6 +84,12 @@ mgtest_register (mgtest_options_t *user, sc_options_t * opt)
 static fclaw_exit_type_t
 mgtest_postprocess(mgtest_options_t *user)
 {
+    fclaw_options_convert_double_array (user->x0_polar_string,&user->x0_polar,user->m_polar);
+    fclaw_options_convert_double_array (user->y0_polar_string,&user->y0_polar,user->m_polar);
+    fclaw_options_convert_double_array (user->r0_polar_string,&user->r0_polar,user->m_polar);
+    fclaw_options_convert_double_array (user->r1_polar_string,&user->r1_polar,user->m_polar);
+    fclaw_options_convert_int_array (user->n_polar_string, &user->n_polar, user->m_polar);
+
     /* nothing to post-process yet ... */
     return FCLAW_NOEXIT;
 }
@@ -76,6 +105,11 @@ mgtest_check (mgtest_options_t *user)
 static void
 mgtest_destroy(mgtest_options_t *user)
 {
+    fclaw_options_destroy_array (user->x0_polar);
+    fclaw_options_destroy_array (user->y0_polar);
+    fclaw_options_destroy_array (user->r0_polar);
+    fclaw_options_destroy_array (user->r1_polar);
+    fclaw_options_destroy_array (user->n_polar);
     /* Nothing to destroy */
 }
 
