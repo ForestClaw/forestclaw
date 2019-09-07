@@ -48,6 +48,7 @@ void mgtest_problem_setup(fclaw2d_global_t *glob)
         const mgtest_options_t* user = mgtest_get_options(glob);
 
         fprintf(f,  "%-24d   %s",  user->example,"\% example\n");
+        fprintf(f,  "%-24d   %s",  user->beta_choice,"\% beta_choice\n");
         fprintf(f,  "%-24.6f   %s",user->alpha,  "\% alpha\n");
         fprintf(f,  "%-24.6f   %s",user->x0,     "\% x0\n");
         fprintf(f,  "%-24.6f   %s",user->y0,     "\% y0\n");
@@ -92,6 +93,53 @@ void mgtest_rhs(fclaw2d_global_t *glob,
 }
 
 
+static
+void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
+                            fclaw2d_patch_t * patch,
+                            int blockno, int patchno,
+                            void *user)
+{
+    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    int iframe = *((int *) s->user);
+
+    /* Get info not readily available to user */
+    int global_num, local_num;
+    int level;
+    fclaw2d_patch_get_info(glob->domain,patch,
+                           blockno,patchno,
+                           &global_num,&local_num, &level);
+    
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    double *error = fclaw2d_clawpatch_get_error(glob,patch);
+    double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+
+    char fname[BUFSIZ];
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
+
+    /* The fort routine is defined by a clawpack solver and handles 
+       the layout of q in memory (i,j,m) or (m,i,j), etc */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
+
+    MGTEST_FORT_OUTPUT_ASCII(fname,&mx,&my,&meqn,&mbc,
+                             &xlower,&ylower,&dx,&dy,q,
+                             soln, error,
+                             &global_num,&level,&blockno,
+                             &glob->mpirank);
+}
+
+
+
 void mgtest_link_solvers(fclaw2d_global_t *glob)
 {
     /* ForestClaw vtable */
@@ -107,10 +155,8 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
     mg_vt->fort_rhs      = &MGTEST_FORT_RHS;
     
-#if 0    
     mg_vt->fort_apply_bc = &MGTEST_FORT_APPLY_BC;
     mg_vt->fort_eval_bc  = &MGTEST_FORT_EVAL_BC;   // For non-homogeneous BCs
-#endif    
 
     /* Clawpatch : Compute the error */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -119,6 +165,10 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     // tagging routines
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
+
+    // Output routines
+    clawpatch_vt->fort_header_ascii = &MGTEST_FORT_HEADER_ASCII;
+    clawpatch_vt->cb_output_ascii = cb_mgtest_output_ascii;
 
     /* Do something with user options? */
     //const user_options_t* user_opt = mgtest_get_options(glob);

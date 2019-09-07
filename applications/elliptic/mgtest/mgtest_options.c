@@ -35,6 +35,9 @@ mgtest_register (mgtest_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user->example, 1,
                            "[user] Example [1]");
 
+    sc_options_add_int (opt, 0, "beta-choice", &user->beta_choice, 1,
+                           "[user] Beta choice [0]");
+
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 20,
                            "alpha (used example == 1) [0.5]");
 

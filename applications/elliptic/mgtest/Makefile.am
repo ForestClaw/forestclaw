@@ -14,7 +14,8 @@ applications_elliptic_mgtest_mgtest_SOURCES = \
 	applications/elliptic/mgtest/fortran/mgtest_apply_bc.f90 \
 	applications/elliptic/mgtest/fortran/mgtest_eval_bc.f90 \
 	applications/elliptic/mgtest/fortran/mgtest_tag4refinement.f90 \
-	applications/elliptic/mgtest/fortran/mgtest_tag4coarsening.f90
+	applications/elliptic/mgtest/fortran/mgtest_tag4coarsening.f90 \
+	applications/elliptic/mgtest/fortran/mgtest_output.f90
 
 
 EXTRA_DIST += \

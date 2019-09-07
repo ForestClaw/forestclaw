@@ -13,10 +13,6 @@ subroutine mgtest_fort_rhs(blockno, mbc,mx,my,xlower,ylower,dx,dy,q)
         do j = 1-mbc,my+mbc
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-
-            !! This should only be required for mapped domains
-            !! call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-
             q(i,j) =  mgtest_qexact_rhs(xc,yc)
         end do
     end do

@@ -5,7 +5,7 @@ by = 1;
 s = 1e-2;
 axis([ax-s bx+s ay-s by+s])
 daspect([1 1 1]);
-axis off;
+% axis off;
 
 showpatchborders;
 setpatchborderprops('linewidth',1);
@@ -21,6 +21,13 @@ if rhs_choice == 3
     circle = plot(r*cos(th)+0.5,r*sin(th)+0.5,'k','linewidth',2);
     hold off;
 end
+
+figure(2);
+clf;
+h = surf(xcenter,ycenter,q);
+
+figure(1);
+
 
 % cm = [0 0 0; 0 0 1; 0 1 0; 0 1 1; 1 0 0; 1 0 1; 1 1 0];
 % colormap(cm);

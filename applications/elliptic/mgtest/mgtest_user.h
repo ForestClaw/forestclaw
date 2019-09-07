@@ -84,6 +84,31 @@ void MGTEST_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my,
 double MGTEST_FORT_EVAL_BC(const int* iface, const double* t,const double* x, const double* y);
 
 
+
+/* ----------------------------- Fortran - output functions --------------------------- */
+
+#define  MGTEST_FORT_OUTPUT_ASCII \
+           FCLAW_F77_FUNC(mgtest_fort_output_ascii, \
+                          MGTEST_FORT_OUTPUT_ASCII)
+void MGTEST_FORT_OUTPUT_ASCII(char* matname1,
+                              int* mx,        int* my,
+                              int* meqn,      int* mbc,
+                              double* xlower, double* ylower,
+                              double* dx,     double* dy,
+                              double q[],double soln[], double error[],
+                              int* patch_num, int* level,
+                              int* blockno,   int* mpirank);
+
+#define MGTEST_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(mgtest_fort_header_ascii, \
+                        MGTEST_FORT_HEADER_ASCII)
+void MGTEST_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                              double* time, int* meqn, int* maux, 
+                              int* ngrids);
+
+
+
+
 #ifdef __cplusplus
 #if 0
 {

@@ -41,6 +41,7 @@ typedef struct mgtest_options
 {
     /* Put any user options here */
     int example;
+    int beta_choice;
 
     double alpha;
     double x0;

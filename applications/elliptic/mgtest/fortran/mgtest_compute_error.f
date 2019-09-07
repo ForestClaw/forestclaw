@@ -18,8 +18,8 @@
 
 c     # Assume a single field variable only
       do j = 1,my
-         yc = ylower + (j-0.5)*dy
          do i = 1,mx
+            yc = ylower + (j-0.5)*dy
             xc = xlower + (i-0.5)*dx
 
             soln(i,j,1) = mgtest_qexact(xc,yc)

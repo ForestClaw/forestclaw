@@ -50,12 +50,6 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
 
-#if 0
-    /* Brick domains don't yet work */
-    FCLAW_ASSERT(mi == 1);
-    FCLAW_ASSERT(mj == 1);
-#endif    
-
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
@@ -63,12 +57,6 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);
     cont = fclaw2d_map_new_nomap_brick(brick);
-
-#if 0    
-    fclaw_opt->manifold = 0;
-    conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
-#endif
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
@@ -105,6 +93,10 @@ void run_program(fclaw2d_global_t* glob)
     /* Set up grid and RHS */
     fclaw2d_initialize(glob);
 
+    /* Output rhs */
+    int Frame = 0;
+    fclaw2d_output_frame(glob,Frame);
+
     /* Compute sum of RHS; reset error accumulators */
     int init_flag = 1;  
     fclaw2d_diagnostics_gather(glob,init_flag);
@@ -117,7 +109,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_diagnostics_gather(glob, init_flag);                
 
     /* Output solution */
-    int Frame = 0;
+    Frame = 1;
     fclaw2d_output_frame(glob,Frame);
 
     /* ---------------------------------------------------------------
