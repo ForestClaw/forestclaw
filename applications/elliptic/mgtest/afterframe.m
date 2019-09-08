@@ -12,30 +12,40 @@ setpatchborderprops('linewidth',1);
 
 view(2);
 
-rhs_choice = 0;
-circle = [];
-if rhs_choice == 3
-    th = linspace(0,2*pi,500);
-    r = 0.25;
-    hold on;
-    circle = plot(r*cos(th)+0.5,r*sin(th)+0.5,'k','linewidth',2);
-    hold off;
-end
-
 if (length(amrdata) == 1)
+    % We are only on a single grid
     figure(2);
     clf;    
     h = surf(xcenter,ycenter,q);
     set(h,'edgecolor','none');
     view(3);
     axis square;
+    set(gcf,'color','k');
+    set(gcf,'clipping','off');
+    axis off;
+    camlight;
     figure(1);
 end
+if Frame == 0 && mq == 1
+    caxis([-1,1]*1e-3);
+end
+if Frame == 1 && mq == 1
+    caxis([-0.2,1]);
+end
 
-if (mq == 3)
-    fprintf('%10s %12.4e\n','qmin',qmin);
-    fprintf('%10s %12.4e\n','qmax',qmax);
+fprintf('%10s %12.4e\n','qmin',qmin);
+fprintf('%10s %12.4e\n','qmax',qmax);
+
+
+if (Frame == 1 && mq == 3)
+    cmax = max(abs([qmin,qmax]));
+    caxis([-cmax,cmax]);
 end    
+
+hold on;
+plot_stars();
+hold off;
+
 
 
 % cm = [0 0 0; 0 0 1; 0 1 0; 0 1 1; 1 0 0; 1 0 1; 1 1 0];
