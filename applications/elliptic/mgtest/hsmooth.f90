@@ -1,6 +1,6 @@
 module hsmooth_mod
     implicit none
-    integer :: m_polar
+    integer :: m_polar = -1
 
     double precision, dimension(:), allocatable :: x0_polar,y0_polar
     double precision, dimension(:), allocatable :: r0_polar,r1_polar
@@ -11,6 +11,11 @@ module hsmooth_mod
 contains
     subroutine allocate_polar_arrays()
         implicit none
+
+        if (m_polar .lt. 0) then
+            write(6,*) 'hsmooth:allocate_polar_array : m_polar is not defined'
+            stop
+        endif
 
         allocate(x0_polar(m_polar), y0_polar(m_polar),r0_polar(m_polar), & 
                  r1_polar(m_polar), n_polar(m_polar))
