@@ -9,7 +9,8 @@ c    # -------------------------------------------------------------------------
       double precision dx, dy, dxdy
       double precision sum(meqn), c_kahan
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision c, t, y
+      double precision c, t, y, area_ij
+      logical use_kahan
 
       include 'metric_terms.i'
 
@@ -17,29 +18,27 @@ c    # -------------------------------------------------------------------------
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
+      use_kahan = .true.
+
       cont = get_context()
 
-      dxdy = dx*dy
+      area_ij = dx*dy  !! Area in each mesh cell is constant
       do m = 1,meqn
-         if (fclaw2d_map_is_used(cont)) then
-C            sum(m) = 0
-c            c_kahan = 0
-            do j = 1,my
-               do i = 1,mx
-                  y = q(i,j,m)*area(i,j) - c_kahan
+         do j = 1,my
+            do i = 1,mx
+               if (fclaw2d_map_is_used(cont)) then
+                  area_ij = area(i,j)  !! Area varies
+               endif
+               if (use_kahan) then
+                  y = q(i,j,m)*area_ij - c_kahan
                   t = sum(m) + y
                   c_kahan = (t-sum(m)) - y
                   sum(m) = t
-c                  sum(m) = sum(m) + q(i,j,m)*area(i,j)
-               enddo
+               else
+                  sum(m) = sum(m) + q(i,j,m)*area_ij
+               endif
             enddo
-         else
-            do j = 1,my
-               do i = 1,mx
-                  sum(m) = sum(m) + q(i,j,m)*dxdy
-               enddo
-            enddo
-         endif
+         enddo
       enddo
 
       end
