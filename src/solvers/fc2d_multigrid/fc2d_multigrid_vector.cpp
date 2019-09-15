@@ -5,6 +5,9 @@
 #include <fclaw2d_patch.h>
 #include "fc2d_multigrid.h"
 #include "fc2d_multigrid_options.h"
+
+using namespace Thunderegg;
+
 fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn) {
     fclaw2d_clawpatch_options_t *clawpatch_opt =
         fclaw2d_clawpatch_get_options(glob);
@@ -66,3 +69,4 @@ const LocalData<2> fc2d_multigrid_vector::getLocalData(
     int local_patch_id) const {
     return getLocalDataPriv(local_patch_id);
 }
+void fc2d_multigrid_vector::setNumGhostPatches(int num_ghost_patches){};

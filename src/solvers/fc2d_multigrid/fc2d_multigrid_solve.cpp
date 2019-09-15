@@ -48,13 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Thunderegg/BiCGStab.h>
 #include <Thunderegg/BilinearInterpolator.h>
-#include <Thunderegg/FivePtPatchOperator.h>
+#include <Thunderegg/Poisson/StarPatchOperator.h>
 #include <Thunderegg/GMG/CycleFactory2d.h>
-#include <Thunderegg/Operators/SchurDomainOp.h>
+#include <Thunderegg/SchurDomainOp.h>
 #include <Thunderegg/P4estDomGen.h>
-#include <Thunderegg/PatchSolvers/FftwPatchSolver.h>
+#include <Thunderegg/Poisson/FftwPatchSolver.h>
 
 using namespace std;
+using namespace Thunderegg;
+using namespace Thunderegg::Poisson;
 
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   // get needed options
@@ -98,22 +100,21 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   // get finest level
   shared_ptr<Domain<2>> te_domain = domain_gen->getFinestDomain();
 
+  // create SchurHelper
+  shared_ptr<SchurHelper<2>> sh(new SchurHelper<2>(te_domain));
+
   // define operators for problems
+  // interface interpolator
+  shared_ptr<IfaceInterp<2>> interp(new BilinearInterpolator(sh));
+
   // set the patch solver
-  shared_ptr<PatchSolver<2>> solver(new FftwPatchSolver<2>(*te_domain));
+  shared_ptr<PatchSolver<2>> solver(new FftwPatchSolver<2>(sh));
 
   // patch operator
-  shared_ptr<PatchOperator<2>> op(new FivePtPatchOperator());
-
-  // interface interpolator
-  shared_ptr<IfaceInterp<2>> interp(new BilinearInterpolator());
-
-  // create SchurHelper
-  shared_ptr<SchurHelper<2>> sh(
-      new SchurHelper<2>(te_domain, solver, op, interp));
+  shared_ptr<PatchOperator<2>> op(new StarPatchOperator<2>(sh));
 
   // create matrix
-  shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh));
+  shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh, interp, op));
 
   // create gmg preconditioner
   GMG::CycleOpts copts;
