@@ -48,15 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Thunderegg/BiCGStab.h>
 #include <Thunderegg/BilinearInterpolator.h>
-#include <Thunderegg/Poisson/StarPatchOperator.h>
+#include <Thunderegg/BiCGStabSolver.h>
+#include <Thunderegg/VarPoisson/StarPatchOperator.h>
 #include <Thunderegg/GMG/CycleFactory2d.h>
 #include <Thunderegg/SchurDomainOp.h>
 #include <Thunderegg/P4estDomGen.h>
-#include <Thunderegg/Poisson/FftwPatchSolver.h>
 
 using namespace std;
 using namespace Thunderegg;
-using namespace Thunderegg::Poisson;
+using namespace Thunderegg::VarPoisson;
 
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   // get needed options
@@ -64,6 +64,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
       fclaw2d_clawpatch_get_options(glob);
   fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
   fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+  fc2d_multigrid_vtable_t *mg_vt = fc2d_multigrid_vt();
 
   // this should be moved somewhere else
   PetscInitialize(nullptr, nullptr, nullptr, nullptr);
@@ -107,11 +108,26 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   // interface interpolator
   shared_ptr<IfaceInterp<2>> interp(new BilinearInterpolator(sh));
 
-  // set the patch solver
-  shared_ptr<PatchSolver<2>> solver(new FftwPatchSolver<2>(sh));
-
   // patch operator
-  shared_ptr<PatchOperator<2>> op(new StarPatchOperator<2>(sh));
+
+  // get beta function
+  auto beta_func = [&](const std::array<double,2>& coord){
+      double beta;
+      double grad[2];
+      mg_vt->fort_beta(&coord[0],&coord[1],&beta,grad);
+      return beta;
+  };
+
+  // create vector for beta
+  auto beta_vec = PetscVector<2>::GetNewVector(te_domain);
+  DomainTools<2>::setValues(te_domain, beta_vec, beta_func);
+
+  shared_ptr<PatchOperator<2>> op(new StarPatchOperator<2>(beta_vec, beta_func, sh, interp));
+
+  // set the patch solver
+  shared_ptr<PatchSolver<2>> solver(new BiCGStabSolver<2>(sh, op,
+                                                          mg_opt->patch_bcgs_tol,
+                                                          mg_opt->patch_bcgs_max_it));
 
   // create matrix
   shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh, interp, op));

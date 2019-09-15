@@ -70,6 +70,12 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
     sc_options_add_string (opt, 0, "cycle-type", &mg_opt->cycle_type, "V",
                            "Cycle type [V]");
 
+    sc_options_add_double (opt, 0, "patch-bcgs-tol", &mg_opt->patch_bcgs_tol, 1e-1,
+                           "Tolerance for patch-based bcgs solver [1e-1]");
+
+    sc_options_add_int (opt, 0, "patch-bcgs-max-it", &mg_opt->patch_bcgs_max_it, 1000,
+                           "Max allowed iterations for patch-based bcgs solver [1000]");
+
     mg_opt->is_registered = 1;
     return NULL;
 }

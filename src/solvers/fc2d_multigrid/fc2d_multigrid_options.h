@@ -62,6 +62,10 @@ struct fc2d_multigrid_options
     int mid_sweeps;
     int coarse_sweeps;
     const char *cycle_type;
+
+    /* bicgstab patch solver settings*/
+    int patch_bcgs_max_it;
+    double patch_bcgs_tol;
 };
 
 fclaw_exit_type_t fc2d_multigrid_postprocess (fc2d_multigrid_options_t *
