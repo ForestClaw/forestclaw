@@ -55,6 +55,19 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
                 h = dy
             endif
 
+            !! Discretize the boundary conditions as : 
+            !!
+            !!     a*(qI + qg)/2 + b*(qg - qI)/dx = g
+            !! 
+            !! where gI is the interior q values and qg is             
+            !! the ghost cell value.  Solve for qg : 
+            !! 
+            !!     qg = (g - d1*qI)/d2
+            !!
+            !!     d1 = (a/2 - g/h)
+            !!     d2 = (a/2 + b/h)  !! == d in code below
+            !!
+            !! Here, we set qg = g/d2
             d = (a/2.d0 + b/h)  
             if (d .eq. 0) then
                 write(6,*) 'mgtest_fort_apply_bc : ill-defined BCs'
@@ -105,7 +118,8 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
         endif
     enddo
 
-    !! Ghost cells now all filled in.  Now apply Laplacian
+    !! Ghost cells now all filled in.  Now apply variable coefficent
+    !! Laplace operator
 
     !! This could be done more efficiently
     dx2 = dx*dx
