@@ -49,6 +49,11 @@ typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* blockno,
                                            const double* dx, const double* dy,
                                            double rhs[]);
 
+typedef  void (*fc2d_multigrid_fort_beta_t)(const double* x,
+                                            const double* y,
+                                            const double* beta,
+                                            double grad[]);
+
 typedef double (*fc2d_multigrid_fort_eval_bc_t)(const int *iface, const double *t, 
                                                 const double *x, const double *y);
 
@@ -71,6 +76,7 @@ struct fc2d_multigrid_vtable
 
 	/* Fortran routines */
 	fc2d_multigrid_fort_rhs_t        fort_rhs;	
+	fc2d_multigrid_fort_beta_t        fort_beta;	
     fc2d_multigrid_fort_apply_bc_t   fort_apply_bc;
     fc2d_multigrid_fort_eval_bc_t    fort_eval_bc;
     

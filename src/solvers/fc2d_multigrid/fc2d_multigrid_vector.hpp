@@ -3,7 +3,7 @@
 /**
  * @brief Wrapper class for forestclaw data acess
  */
-class fc2d_multigrid_vector : public Vector<2> {
+class fc2d_multigrid_vector : public Thunderegg::Vector<2> {
    private:
     /**
      * @brief the number of cells in each direction on each patch
@@ -36,11 +36,12 @@ class fc2d_multigrid_vector : public Vector<2> {
     static void enumeratePatchData(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *patch, int blockno,
                                    int patchno, void *user);
-    LocalData<2> getLocalDataPriv(int local_patch_id) const;
+    Thunderegg::LocalData<2> getLocalDataPriv(int local_patch_id) const;
 
    public:
     fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn);
 
-    LocalData<2> getLocalData(int local_patch_id);
-    const LocalData<2> getLocalData(int local_patch_id) const;
+    Thunderegg::LocalData<2> getLocalData(int local_patch_id) override;
+    const Thunderegg::LocalData<2> getLocalData(int local_patch_id) const override;
+    void setNumGhostPatches(int num_ghost_patches) override;
 };

@@ -171,6 +171,8 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     /* Multigrid vtable */
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
     mg_vt->fort_rhs      = &MGTEST_FORT_RHS;
+
+    mg_vt->fort_beta      = &MGTEST_FORT_BETA;
     
     mg_vt->fort_apply_bc = &MGTEST_FORT_APPLY_BC;
     mg_vt->fort_eval_bc  = &MGTEST_FORT_EVAL_BC;   // For non-homogeneous BCs
