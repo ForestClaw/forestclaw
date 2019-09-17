@@ -52,7 +52,10 @@ dnl This macro bundles the checks for all libraries and link tests
 dnl that are required by ForestClaw.  It can be used by other packages that
 dnl link to ForestClaw to add appropriate options to LIBS.
 dnl
-AC_DEFUN([FCLAW_CHECK_LIBRARIES],)
+AC_DEFUN([FCLAW_CHECK_LIBRARIES],
+[
+FCLAW_CHECK_THUNDEREGG([$1])
+])
 
 dnl FCLAW_FINAL_MESSAGES(PREFIX)
 dnl This macro prints messages at the end of the configure run.

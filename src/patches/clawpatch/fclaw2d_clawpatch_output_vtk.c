@@ -414,7 +414,7 @@ fclaw2d_vtk_write_data (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s)
 
     /* collectively open the file in append mode and reserve space */
     mpiret = MPI_File_open (glob->mpicomm, s->filename,
-                            MPI_MODE_WRONLY | MPI_MODE_APPEND |
+                            MPI_MODE_RDWR | MPI_MODE_APPEND |
                             MPI_MODE_UNIQUE_OPEN, MPI_INFO_NULL, &s->mpifile);
     SC_CHECK_MPI (mpiret);
     mpiret = MPI_File_get_position (s->mpifile, &s->mpibegin);

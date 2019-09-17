@@ -144,6 +144,12 @@ double fclaw2d_patch_single_step_update(struct fclaw2d_global *glob,
                                         double t,
                                         double dt, void* user);
 
+void fclaw2d_patch_set_rhs(struct fclaw2d_global *glob,
+                           struct fclaw2d_patch *patch,
+                           int blockno,
+                           int patchno);
+
+
 /* -------------------------------- time stepping ------------------------------------- */
 
 void fclaw2d_patch_restore_step(struct fclaw2d_global* glob,
@@ -352,20 +358,15 @@ void fclaw2d_patch_time_sync_reset_samesize(struct fclaw2d_global* glob,
 #endif                                            
 
 /* ------------------------------ Misc access functions ------------------------------- */
-void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
+
+/* I don't completely trust this routine */
+void fclaw2d_patch_get_info2(struct fclaw2d_domain * domain,
 							struct fclaw2d_patch * this_patch,
-							int this_block_idx, int this_patch_idx,
-							int *global_num, int *level);
-
-
-void fclaw2d_patch_get_info2(fclaw2d_domain_t * domain,
-							fclaw2d_patch_t * this_patch,
 							int *this_block_idx, int *this_patch_idx,
 							int *global_num, int *level);
 
-
 void*
-fclaw2d_patch_get_user_patch(fclaw2d_patch_t* patch);
+fclaw2d_patch_get_user_patch(struct fclaw2d_patch* patch);
 
 #if 0
 struct fclaw2d_patch_data*
@@ -424,6 +425,13 @@ typedef double (*fclaw2d_patch_single_step_update_t)(struct fclaw2d_global *glob
                                                      double t,
                                                      double dt,
                                                      void* user);
+
+
+typedef void (*fclaw2d_patch_rhs_t)(struct fclaw2d_global *glob,
+                                    struct fclaw2d_patch *patch,
+                                    int blockno,
+                                    int patchno);
+
 
 /* ----------------------------- Time stepping (typedefs) ----------------------------- */
 
@@ -642,6 +650,7 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_initialize_t            initialize;
     fclaw2d_patch_physical_bc_t           physical_bc;
     fclaw2d_patch_single_step_update_t    single_step_update;
+    fclaw2d_patch_rhs_t                   rhs;
 
     /* Time stepping */
     fclaw2d_patch_restore_step_t          restore_step;
@@ -707,10 +716,10 @@ void fclaw2d_patch_vtable_initialize();
 
 /* ------------------------------ Misc access functions ------------------------------- */
 void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
-							struct fclaw2d_patch * this_patch,
-							int this_block_idx, int this_patch_idx,
-							int *global_num, int *level);
-
+                            struct fclaw2d_patch * patch,
+                            int blockno, int patchno,
+                            int *global_num, int* local_num, 
+                            int *level);
 
 void*
 fclaw2d_patch_get_user_patch(struct fclaw2d_patch* patch);
