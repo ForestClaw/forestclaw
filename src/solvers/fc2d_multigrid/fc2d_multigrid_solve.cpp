@@ -96,7 +96,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
 
   // generates levels of patches for GMG
   shared_ptr<P4estDomGen> domain_gen(
-      new P4estDomGen(wrap->p4est, ns, inf, bmf));
+      new P4estDomGen(wrap->p4est, ns, clawpatch_opt->mbc,inf, bmf));
 
   // get finest level
   shared_ptr<Domain<2>> te_domain = domain_gen->getFinestDomain();
@@ -120,7 +120,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
 
   // create vector for beta
   auto beta_vec = PetscVector<2>::GetNewVector(te_domain);
-  DomainTools<2>::setValues(te_domain, beta_vec, beta_func);
+  DomainTools<2>::setValuesWithGhost(te_domain, beta_vec, beta_func);
 
   shared_ptr<PatchOperator<2>> op(new StarPatchOperator<2>(beta_vec, beta_func, sh, interp));
 
@@ -148,7 +148,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(te_domain));
   shared_ptr<Vector<2>> u = vg->getNewVector();
 
-  int its = BiCGStab<2>::solve(vg, A, u, f, M);
+  int its = BiCGStab<2>::solve(vg, A, u, f, nullptr);
 
   fclaw_global_productionf("Iterations: %i\n", its);
   fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());

@@ -20,7 +20,6 @@ fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn) {
     ns[1] = clawpatch_opt->my;
 
     mbc = clawpatch_opt->mbc;
-    mbc = clawpatch_opt->mbc;
 
     // clawpack5
     /*
@@ -60,7 +59,7 @@ void fc2d_multigrid_vector::enumeratePatchData(fclaw2d_domain_t *domain,
                                  vec.mbc * vec.strides[1];
 }
 LocalData<2> fc2d_multigrid_vector::getLocalDataPriv(int local_patch_id) const {
-    return LocalData<2>(patch_data[local_patch_id], strides, ns);
+    return LocalData<2>(patch_data[local_patch_id], strides, ns,mbc);
 }
 LocalData<2> fc2d_multigrid_vector::getLocalData(int local_patch_id) {
     return getLocalDataPriv(local_patch_id);
