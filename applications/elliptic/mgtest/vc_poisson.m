@@ -24,9 +24,9 @@ np = 1;    % Norm to plot (1,2,3)
 
 % Numerical parameters
 N0 = 32;
-nvec = N0*2.^(0:5);
+nvec = N0*2.^(0:4);
 
-tol = 1e-12;
+tol = 1e-14;
 maxit = 1e6;
 
 area = (b-a)^2;
@@ -246,7 +246,6 @@ f  = exp(x.*y).*(x5.*(y-1).*y2 ...
     - x2.*(y5 - 7*y4 + 6*y3 + 8*y - 5) ...
     - 2*x.*(2*y4 - 6*y3 + 4*y2 + 1) ...
     + y.*(-3*y2 + 5*y - 2));
-
 
 end
 

@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
+#include <fclaw2d_output.h>
 
 #include <fclaw2d_domain.h>
 
@@ -82,6 +83,10 @@ void multigrid_solve(fclaw2d_global_t* glob)
 {
     // Apply non-homogeneous boundary conditions 
     fc2d_multigrid_physical_bc(glob);
+
+    int Frame = 1;
+    fclaw2d_output_frame(glob,Frame);
+
 
 	fc2d_multigrid_solve(glob);
 }
