@@ -72,8 +72,8 @@ SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
     integer id
 
     if (example .eq. 0) then
-        q = x + y
-        qx = 1
+        q = y
+        qx = 0
         qy = 1
         qlap = 0
     elseif (example .eq. 1) then

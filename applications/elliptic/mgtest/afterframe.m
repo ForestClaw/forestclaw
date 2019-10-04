@@ -1,6 +1,6 @@
-ax = -1;
+ax cd = 0;
 bx = 1;
-ay = -1;
+ay = 0;
 by = 1;
 s = 1e-2;
 axis([ax-s bx+s ay-s by+s])
@@ -15,14 +15,16 @@ setpatchborderprops('linewidth',1);
 
 if Frame == 0 
     if mq == 1
-        caxis([-1,1]*1e-3);
+        % caxis([-1,1]*1e-3);
     end
-elseif Frame == 1 
+elseif Frame == 1
+    caxis([0,2]);
+    % no color axis
+elseif Frame == 2 
     if mq == 1
         caxis([-0.2,1]);
-    elseif mq == 3
-        cmax = max(abs([qmin,qmax]));
-        caxis([-cmax,cmax]);
+    elseif mq == 3        
+        caxis([0,2]);
     end
 end
 
@@ -30,7 +32,7 @@ colormap(parula);
 colorbar;
 
 hold on;
-plot_stars();
+% plot_stars();
 hold off;
 
 NoQuery = 0;
@@ -54,15 +56,18 @@ if (length(amrdata) == 1)
     % We are only on a single grid
     figure(2);
     clf;    
-    h = surf(xcenter,ycenter,q);
+    h = surf(xcenter,ycenter,q');
     set(h,'edgecolor','none');
     view(3);
     axis square;
-    set(gcf,'color','k');
-    set(gcf,'clipping','off');
-    axis off;
-    camlight;
+%     set(gcf,'color','k');
+%     set(gcf,'clipping','off');
+%     axis off;
+%     camlight;
 end
+
+xlabel('x','fontsize',16);
+ylabel('y','fontsize',16);
 
 figure(1);
 
