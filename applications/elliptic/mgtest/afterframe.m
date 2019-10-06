@@ -1,4 +1,4 @@
-ax cd = 0;
+ax = 0;
 bx = 1;
 ay = 0;
 by = 1;
@@ -13,6 +13,9 @@ fprintf('%10s %12.4e\n','qmax',qmax);
 showpatchborders;
 setpatchborderprops('linewidth',1);
 
+cv = linspace(0,1,11);
+drawcontourlines(cv);
+
 if Frame == 0 
     if mq == 1
         % caxis([-1,1]*1e-3);
@@ -22,7 +25,7 @@ elseif Frame == 1
     % no color axis
 elseif Frame == 2 
     if mq == 1
-        caxis([-0.2,1]);
+        caxis([0,2]);
     elseif mq == 3        
         caxis([0,2]);
     end

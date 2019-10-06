@@ -20,8 +20,8 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc
             x = xlower + (i-0.5)*dx
-            y = ylower + (i-0.5)*dy
-            call mgtest_beta(x,y,val_beta,grad_beta(2))
+            y = ylower + (j-0.5)*dy
+            call mgtest_beta(x,y,val_beta,grad_beta)
             beta(i,j,1) = val_beta
 
             q(i,j) = 0
@@ -122,8 +122,6 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
     !! Laplace operator
 
     !! This could be done more efficiently
-    dx2 = dx*dx
-    dy2 = dy*dy
     do i = 1,mx
         do j = 1,my            
             flux(0) = beta(i,j,2)*(q(i,j) - q(i-1,j))/dx
