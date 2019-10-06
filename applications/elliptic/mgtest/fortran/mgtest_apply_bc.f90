@@ -1,3 +1,21 @@
+!! This applies general non-homogeneous boundary conditions by 
+!! modifying the right hand side side with non-zero corrections.
+!!
+!! The general boundary conditions can be written as 
+!! 
+!!        a(x,y)*q(x,y) + b(x,y)*q_n(x,y) = g(x,y)
+!!
+!! on the boundary of a square domain.  Below, we only implement the 
+!! case a = 1 or b = 1 (but not both).  This can be easily modified following
+!! the comments below. 
+!!
+!! The approach below requires that the term
+!!
+!!        (a(x,y)/2.d0 + b(x,y)/h)
+!!
+!! where h = dx or h = dy, is non-zero.
+!!
+
 subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
     dx,dy,t,intersects_bc,bctype,rhs,g_bc)
 
@@ -7,12 +25,12 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
     double precision xlower,ylower,dx,dy,t,g_bc
     double precision rhs(1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    !! Dummy argument needed to apply BC
-    double precision q(1-mbc:mx+mbc,1-mbc:my+mbc)
+    !! Dummy arrays needed to apply boundary conditions
+    double precision qh(1-mbc:mx+mbc,1-mbc:my+mbc)
     double precision beta(1-mbc:mx+mbc,1-mbc:my+mbc,3)
 
     integer i,j, iface, idir, i1, ig, j1, jg
-    double precision d, h, x, y, g, dx2, dy2
+    double precision d, h, x, y, g
     double precision a,b
     double precision val_beta, grad_beta(2), div_beta_grad_u, flux(0:3)
 
@@ -23,8 +41,7 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
             y = ylower + (j-0.5)*dy
             call mgtest_beta(x,y,val_beta,grad_beta)
             beta(i,j,1) = val_beta
-
-            q(i,j) = 0
+            qh(i,j) = 0
         end do
     end do
 
@@ -40,7 +57,7 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
         if (intersects_bc(iface) .ne. 0) then
             idir = iface/2   !! direction : 0 or 1
 
-            !! customize this if a,b depend on x
+            !! customize this for more general boundary conditions
             if (bctype(iface) .eq. 1) then
                 a = 1
                 b = 0
@@ -92,7 +109,7 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
                     g = g_bc(iface,t,x,y)
 
                     !! Assume uI == 0
-                    q(ig,j) = g/d
+                    qh(ig,j) = g/d
                 end do
             elseif (idir .eq. 1) then
                 if (iface .eq. 2) then
@@ -112,7 +129,7 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
                     g = g_bc(iface,t,x,y)
 
                     !! Assume uI == 0
-                    q(i,jg) = g/d
+                    qh(i,jg) = g/d
                 end do
             endif
         endif
@@ -121,15 +138,18 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
     !! Ghost cells now all filled in.  Now apply variable coefficent
     !! Laplace operator
 
-    !! This could be done more efficiently
+    !! 
     do i = 1,mx
-        do j = 1,my            
-            flux(0) = beta(i,j,2)*(q(i,j) - q(i-1,j))/dx
-            flux(1) = beta(i+1,j,2)*(q(i+1,j) - q(i,j))/dx
-            flux(2) = beta(i,j,3)*(q(i,j) - q(i,j-1))/dy
-            flux(3) = beta(i,j+1,3)*(q(i,j+1) - q(i,j))/dy
-            div_beta_grad_u = (flux(1) - flux(0))/dx + (flux(3) - flux(2))/dy
-            rhs(i,j) = rhs(i,j) - div_beta_grad_u
+        do j = 1,my
+            if ((j .eq. 1 .or. j .eq. my) .or. & 
+                (i .eq. 1 .or. i .eq. mx)) then
+                flux(0) = beta(i,j,2)*(qh(i,j) - qh(i-1,j))/dx
+                flux(1) = beta(i+1,j,2)*(qh(i+1,j) - qh(i,j))/dx
+                flux(2) = beta(i,j,3)*(qh(i,j) - qh(i,j-1))/dy
+                flux(3) = beta(i,j+1,3)*(qh(i,j+1) - qh(i,j))/dy
+                div_beta_grad_u = (flux(1) - flux(0))/dx + (flux(3) - flux(2))/dy
+                rhs(i,j) = rhs(i,j) - div_beta_grad_u
+            endif
         end do
     end do 
 
