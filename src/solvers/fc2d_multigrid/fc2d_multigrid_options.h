@@ -54,7 +54,11 @@ struct fc2d_multigrid_options
 
     int is_registered;
 
-    /* multigrid settings */
+    /* bicgstab settings */
+    int mg_prec;
+    int max_it;
+    double tol;
+    /* multigrid cyle settings */
     int max_levels;
     double patches_per_proc;
     int pre_sweeps;
