@@ -47,8 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_wrap.h>
 
 #include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/BilinearInterpolator.h>
-#include <Thunderegg/BiCGStabSolver.h>
+#include <Thunderegg/Schur/BilinearInterpolator.h>
+#include <Thunderegg/Schur/BiCGStabSolver.h>
 #include <Thunderegg/VarPoisson/StarPatchOperator.h>
 #include <Thunderegg/GMG/CycleFactory2d.h>
 #include <Thunderegg/SchurDomainOp.h>
@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 using namespace Thunderegg::VarPoisson;
 
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
