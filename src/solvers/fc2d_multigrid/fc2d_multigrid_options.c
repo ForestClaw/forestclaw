@@ -48,6 +48,15 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "vtk-out", &mg_opt->vtk_out, 0,
                            "Output VTK formatted data [F]");
 
+    sc_options_add_bool (opt, 0, "mg-prec", &mg_opt->mg_prec, 1,
+                           "Use multigrid preconditioner [T]");
+
+    sc_options_add_int (opt, 0, "max-it", &mg_opt->max_it, 10000,
+                           "Max iterations for BiCGStab solver. [10000]");
+
+    sc_options_add_double (opt, 0, "tol", &mg_opt->tol, 1e-12,
+                           "Tolerance for BiCGStab solver. [1e-12]");
+
     sc_options_add_int (opt, 0, "max-levels", &mg_opt->max_levels, 0,
                            "The max number of levels in GMG cycle. 0 means no limit. [0]");
 

@@ -47,8 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_wrap.h>
 
 #include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/BilinearInterpolator.h>
-#include <Thunderegg/BiCGStabSolver.h>
+#include <Thunderegg/Schur/BilinearInterpolator.h>
+#include <Thunderegg/Schur/BiCGStabSolver.h>
 #include <Thunderegg/VarPoisson/StarPatchOperator.h>
 #include <Thunderegg/GMG/CycleFactory2d.h>
 #include <Thunderegg/SchurDomainOp.h>
@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 using namespace Thunderegg::VarPoisson;
 
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
@@ -133,22 +134,24 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh, interp, op));
 
   // create gmg preconditioner
-  GMG::CycleOpts copts;
-  copts.max_levels = mg_opt->max_levels;
-  copts.patches_per_proc = mg_opt->patches_per_proc;
-  copts.pre_sweeps = mg_opt->pre_sweeps;
-  copts.post_sweeps = mg_opt->post_sweeps;
-  copts.mid_sweeps = mg_opt->mid_sweeps;
-  copts.coarse_sweeps = mg_opt->coarse_sweeps;
-  copts.cycle_type = mg_opt->cycle_type;
-  shared_ptr<Operator<2>> M =
-      GMG::CycleFactory2d::getCycle(copts, domain_gen, solver, op, interp);
+  shared_ptr<Operator<2>> M;
+  if(mg_opt->mg_prec){
+    GMG::CycleOpts copts;
+    copts.max_levels = mg_opt->max_levels;
+    copts.patches_per_proc = mg_opt->patches_per_proc;
+    copts.pre_sweeps = mg_opt->pre_sweeps;
+    copts.post_sweeps = mg_opt->post_sweeps;
+    copts.mid_sweeps = mg_opt->mid_sweeps;
+    copts.coarse_sweeps = mg_opt->coarse_sweeps;
+    copts.cycle_type = mg_opt->cycle_type;
+    M = GMG::CycleFactory2d::getCycle(copts, domain_gen, solver, op, interp);
+  }
 
   // solve
   shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(te_domain));
   shared_ptr<Vector<2>> u = vg->getNewVector();
 
-  int its = BiCGStab<2>::solve(vg, A, u, f, nullptr);
+  int its = BiCGStab<2>::solve(vg, A, u, f, nullptr, mg_opt->max_it, mg_opt->tol);
 
   fclaw_global_productionf("Iterations: %i\n", its);
   fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
