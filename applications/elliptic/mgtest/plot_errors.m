@@ -96,6 +96,9 @@ else
     idx = 2:4;
 end
 conv_rates = log(e(1:end-1,idx)./e(2:end,idx))/log(2);
+% Get convergence as function of (N^2). 
+conv_rates(:,end) = log(e(1:end-1,idx(end))./e(2:end,idx(end)))/log(4);
+
 fprintf('\n');
 fprintf('          Convergence rates\n');
 cr = [Nvec(2:end) Nvec(1:end-1) conv_rates];
