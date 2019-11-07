@@ -342,8 +342,6 @@ c
           ifine = (i-1)*lratiox
           do 440 ivar = 1, nvar
             do 450 l = 1, lratiox
-c              write(6,101) ifine + l + 1, amdq(ivar,ifine+l+1) 
-c     &                  + apdq(ivar,ifine+l+1)
               svdflx(ivar,influx) = svdflx(ivar,influx) 
      .                     + amdq(ivar,ifine+l+1) * hx * delt
      .                     + apdq(ivar,ifine+l+1) * hx * delt
@@ -351,7 +349,8 @@ c     &                  + apdq(ivar,ifine+l+1)
  440       continue
  430    continue
 
-101     format(I5, F24.16)
+ 101    format(I5, F24.16)
+
  499   continue
 
 c      # for source terms:

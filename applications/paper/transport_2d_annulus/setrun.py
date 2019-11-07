@@ -95,7 +95,7 @@ def setrun(claw_pkg='amrclaw'):
     # 0 = no qad
     # 1 = original qad
     # 2 = modified (fixed to include call to rpn2qad)
-    # 3 = new qad (should be equivalent to 2)
+    # 3 = new qad (equivalent to 2 but uses f90)
     qad_mode = 1
 
     maux = 15

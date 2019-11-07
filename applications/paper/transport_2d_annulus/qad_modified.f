@@ -402,7 +402,7 @@ c
  440       continue
  430    continue
 
-101     format(I5, F24.16)        
+ 101    format(I5, F24.16)
 
  499   continue
 
@@ -469,7 +469,6 @@ c       # Call user defined function to compute fluxes.  The resulting
 c       # flux should be those projected onto face 'iface_cell' and 
 c       # scaled by edgelength/dx or edgelength/dy.
 c       #
-c       # The cell edge is the same for both coarse and fine.
         call rpn2qad_flux(meqn,maux,idir,iface_cell,qvl,auxvl,fluxl)
         call rpn2qad_flux(meqn,maux,idir,iface_cell,qvr,auxvr,fluxr)
 
