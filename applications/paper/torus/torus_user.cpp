@@ -110,38 +110,33 @@ void cb_torus_output_ascii (fclaw2d_domain_t * domain,
                             int blockno, int patchno,
                             void *user)
 {
-    int patch_num;
-    int level;
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy, time;
-    double *q, *error, *soln;
-    int iframe;
-
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
     fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
 
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
-    const user_options_t           *user_opt =  torus_get_options(glob);
+    const user_options_t *user_opt =  torus_get_options(glob);
 
-
-    iframe = *((int *) s->user);
-
-    time = glob->curr_time;
+    int iframe = *((int *) s->user);
+    double time = glob->curr_time;
 
 
     /* Get info not readily available to user */
+    int level,patch_num, global_num;
     fclaw2d_patch_get_info(glob->domain,this_patch,
                            blockno,patchno,
-                           &patch_num,&level);
+                           &global_num, &patch_num,&level);
     
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
+    int meqn;
+    double* q;
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    double* error = fclaw2d_clawpatch_get_error(glob,this_patch);
+    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
 
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
