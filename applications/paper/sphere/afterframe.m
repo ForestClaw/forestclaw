@@ -4,15 +4,7 @@ global flat
 
 example = read_vars();
 
-if (flat)
-    axis([0, 2*pi,  -pi/2, pi/2]);
-else
-    s = 0.0;
-    axis([-1-s 1+s -1-s 1+s])
-end    
-daspect([1 1 1]);
-axis on;
-
+% Data info
 fprintf('%-10s %16.8e\n','qmin',qmin);
 fprintf('%-10s %16.8e\n','qmax',qmax);
 
@@ -21,7 +13,7 @@ if (ShowUnderOverShoots == 1)
     qhi = 1;
     under_label = sprintf('%3.1f - %7.1e',qlo,qlo-qmin);
     over_label = sprintf('%3.1f + %7.1e',qhi,qmax-qhi);
-    colorbar_underover(under_label,over_label);
+    colorbar_underover(under_label,over_labcel);
 end
 if (mq == 3)
     % Plot the error
@@ -40,15 +32,29 @@ else
     end
 end
 
+% Color axis
 colormap(parula);
 if (mq == 3)
-    %colorbar
+    colorbar
 end
 caxis(ca);
 
+% AMR Patches
 showpatchborders;
 setpatchborderprops('linewidth',1);
 hidegridlines;
+
+% Grid axes
+if (flat)
+    axis([0, 2*pi,  -pi/2, pi/2]);
+else
+    s = 0.0;
+    axis([-1-s 1+s -1-s 1+s])
+end    
+daspect([1 1 1]);
+axis on;
+set(gca,'fontsize',16);
+
 
 if (~flat)
     view([ 59.297571594931483, 8.368467153284623]);

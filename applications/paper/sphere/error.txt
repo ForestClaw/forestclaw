@@ -382,6 +382,7 @@ Cubed sphere (uniform)
 -- WITH conservation fix 
 -- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
 -- NOTE : Times do NOT include time to compute error or output files
+-- See Saturday 11/09/2019 (same results)
 
 
 32     2.2680e-02  6.7832e-02 5.3710e-01         0.0999129   % 0.105/0.101
@@ -408,7 +409,7 @@ Cubed sphere (uniform)
 --------------------------------------------------------------------------
 
 -- UNIFORM - Case 3
--- Divergent Nair and Lauritzen test case 3
+-- Divergent flow field (Nair and Lauritzen test case 3)
 -- Using divergent velocity field
 -- 32x32 patches; start at minlevel=1  (since 25 not divisible by 2)
 -- dt = 2e-2; nout=125; nstep=25
@@ -457,3 +458,98 @@ Cubed sphere (uniform)
 128   2.5894e-02  7.5171e-02 5.9308e-01
 256   1.6730e-02  5.6238e-02 4.8070e-01
 512   
+
+
+--------------------------------------------------------------------------
+                         Saturday 11/09/2019
+--------------------------------------------------------------------------
+
+-- UNIFORM - Case 4
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : 0.105/0.101
+-- dt = 1e-2; (fixed time step; outstyle = 3)
+-- tfinal = 0.5 
+-- WITH conservation fix 
+-- no limiters
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
+-- Levels 0-0, 1-1, 2-2, 3-3, 4-4, etc. 
+-- See Tuesday 8/13/2019 (same results)
+-- Results run on four cores
+-- Times include output and error calculation
+-- Smooth-refine = 4 for all runs
+
+
+32     2.2680e-02  6.7832e-02 5.3710e-01        0.810103 
+64     1.3511e-02  4.7165e-02 4.0710e-01        3.8829
+128    7.1525e-03  2.9932e-02 3.0984e-01       13.6952
+256    3.0674e-03  1.5985e-02 2.3382e-01       73.9648
+512    1.0061e-03  6.6145e-03 1.2287e-01      423.885 
+1024   2.6940e-04  2.0815e-03 5.1700e-02     2786.04
+
+          Convergence rates
+------------------------------------------------
+   64/   32   0.7473   0.5242   0.3998  -2.2610
+  128/   64   0.9176   0.6560   0.3939  -1.8185
+  256/  128   1.2214   0.9050   0.4061  -2.4332
+  512/  256   1.6082   1.2730   0.9283  -2.5188
+ 1024/  512   1.9010   1.6680   1.2489  -2.7165
+------------------------------------------------
+
+-- ADAPTIVE - Case 4
+-- same as above. 
+-- Times do NOT include output and error calculation
+-- Smooth-refine = 4 for all runs
+
+
+32      2.2680e-02  6.7832e-02 5.3710e-01         0.104797
+64      1.3522e-02  4.7166e-02 4.0710e-01         0.929982 
+128     7.1649e-03  2.9932e-02 3.0976e-01         4.65905
+256     3.0785e-03  1.5985e-02 2.3384e-01        20.6278
+512     1.0106e-03  6.6145e-03 1.2287e-01        96.834
+1024    2.7331e-04  2.0815e-03 5.1702e-02       486.65
+2048    
+
+          Convergence rates
+------------------------------------------------
+   64/   32   0.7461   0.5242   0.3998  -3.1496
+  128/   64   0.9163   0.6561   0.3942  -2.3248
+  256/  128   1.2187   0.9050   0.4056  -2.1465
+  512/  256   1.6070   1.2730   0.9284  -2.2309
+ 1024/  512   1.8866   1.6680   1.2488  -2.3293
+------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------
+                         Sunday 11/10/2019
+--------------------------------------------------------------------------
+
+-- UNIFORM - Case 3
+-- Divergent flow field (Nair and Lauritzen test case 3)
+-- Using divergent velocity field
+-- 32x32 patches; start at minlevel=1  (since 25 not divisible by 2)
+-- dt = 2e-2; nout=125; nstep=25
+-- Max CFL (at first time step, on 64x64 problem) =  0.627087
+-- tfinal = 2.5
+-- WITH conservation fix 
+-- no zonal wind
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
+-- exact and computed maximum also shown
+-- Compare with results on Wednesday 8/13 (results are the same). 
+
+
+64     1.6483e-02  7.8313e-02 1.7863e+00
+128    9.0525e-03  5.0476e-02 1.1621e+00
+256    4.2379e-03  2.8135e-02 6.5960e-01
+512    .... (save as 8/13 results) .....
+
+
+
+
+
+
+
+

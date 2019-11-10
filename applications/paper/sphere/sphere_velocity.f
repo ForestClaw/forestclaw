@@ -102,10 +102,9 @@ c         # Lauritzen : (lambda,th)  <----> (theta,phi) (here)
           if (example .eq. 1) then
 
 c             # --------------------------------------------------
-c             # From Nair and Lauritzen 2010 (Case 1; kappa = 2) 
-c             # u = kappa*sin(lp)**2*sin(2*th)*cos(pi*t/Tfinal) +
-c             #           2*pi*cos(th)/Tfinal
-c             # v = kappa*sin(2*lp)*cos(th)*cos(pi*t/Tfinal)
+c             # From Nair and Lauritzen 2010 (Case 1; kappa = 2.4) 
+c             # u = kappa*sin(lp/2)**2*sin(2*th)*cos(pi*t/Tfinal)
+c             # v = kappa/2*sin(lp/2)*cos(th)**2*cos(pi*t/Tfinal)
 c             # --------------------------------------------------
 
               kappa = 2.4
@@ -147,12 +146,12 @@ c             # v = U(2) component
 
 c             # --------------------------------------------------
 c             # From Nair and Lauritzen 2010 (Case 4; kappa = 2) 
-c             # u = kappa*sin(lp)**2*sin(2*th)*cos(pi*t/Tfinal) +
-c             #           2*pi*cos(th)/Tfinal
+c             # u = kappa*sin(lp)**2*sin(2*th)*cos(pi*t/Tfinal)
 c             # v = kappa*sin(2*lp)*cos(th)*cos(pi*t/Tfinal)
 c             # --------------------------------------------------
 
               kappa = 2
+
               if (example .eq. 4) then
                   lp = theta - pi2*tp
 
@@ -161,6 +160,7 @@ c                 # Zonal flow
                   zfx = -(pi2/period)*sin(th)*thx
                   zfy = 0
               else
+                  lp = theta
                   zf = 0
                   zfx = 0
                   zfy = 0
@@ -200,19 +200,18 @@ c             # v = U(2) component
 
           elseif (example .eq. 3) then
 c             # -----------------------------------------------------
-c             # Nair and Lauritzen (2010) Case 3 (kappa = 2)   
+c             # Nair and Lauritzen (2010) Case 3 (kappa = 1)   
 c             # with background zonal flow         
 c             #
-c             u = -(kappa/2.d0)*sin(lp/2.d0)**2*sin(2*th)*cos(th)**2
-c                    *cos(pi*t/Tfinal) + 2*pi*cos(th)/Tfinal
-c             v = (kappa/4.d0)*sin(lp)*(cos(th)**3)*cos(pi*t/Tfinal)
+c             u = -kappa*sin(lp/2)**2*sin(2*th)*cos(th)**2*cos(pi*t/Tfinal) 
+c             v = (kappa/2)*sin(lp)*(cos(th)**3)*cos(pi*t/Tfinal)
 c             # -----------------------------------------------------
   
 c             # U(1) component 
               kappa = 2
-              cu1 = -5.d0/period*cos(pi*tp)  
+              cu1 = kappa*cos(pi*tp)  
 
-              fu1 = sin(lp/2.d0)**2
+              fu1 = -sin(lp/2.d0)**2
               fu1x = 2.d0*sin(lp/2)*cos(lp/2)*lpx/2.d0
               fu1y = 2.d0*sin(lp/2)*cos(lp/2)*lpy/2.d0
 
@@ -234,7 +233,7 @@ c             # U(1) component
               u1y = cu1*(fu1*ghy + fu1y*gh)
 
 c             # U(2) component 
-              cu2 = 5.d0/(2.d0*period)*cos(pi*tp)
+              cu2 = 0.5d0*cos(pi*tp)
 
               fu2 = sin(lp)
               fu2x = cos(lp)*lpx

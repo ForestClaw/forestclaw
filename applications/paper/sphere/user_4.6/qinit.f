@@ -36,8 +36,6 @@ c                 # Discontinuous solution
                   ylow = ylower + (j-1)*dy
                   call cellave2(blockno,xlow,ylow,dx,dy,w)
                   q(i,j,1) = w
-              elseif (initchoice .eq. 1) then
-                  q(i,j,1) = 1.d0
               else
                   call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)                  
                   q(i,j,1) = q0_physical(xp,yp,zp)                  
