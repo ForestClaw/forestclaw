@@ -242,6 +242,7 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
                             q,error,soln, aux, 
                             &time, &global_num,&level,
                             &this_block_idx,
+                            &fclaw_opt->compute_error, 
                             &glob->mpirank);
 }
 
