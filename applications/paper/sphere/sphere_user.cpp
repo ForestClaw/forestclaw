@@ -209,10 +209,10 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
 
 
     /* Get info not readily available to user */
-    int patch_num, global_num, level;
+    int local_num, global_num, level;
     fclaw2d_patch_get_info(glob->domain,this_patch,
                            this_block_idx,this_patch_idx,
-                           &global_num, &patch_num,&level);
+                           &global_num, &local_num,&level);
     
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -225,18 +225,24 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
     double* error = fclaw2d_clawpatch_get_error(glob,this_patch);
     double* soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
 
+    double *aux;
+    int maux;
+    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+
+
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
 
     /* Here, we pass in q and the error, so need special headers and files */
-    SPHERE_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
+    SPHERE_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,&maux,
                             &xlower,&ylower,
                             &dx,&dy,
-                            q,error,soln, &time, 
-                            &patch_num,&level,
+                            q,error,soln, aux, 
+                            &time, &global_num,&level,
                             &this_block_idx,
+                            &fclaw_opt->compute_error, 
                             &glob->mpirank);
 }
 
@@ -261,13 +267,14 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
     /* Include error in output files */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    clawpatch_vt->fort_header_ascii   = &SPHERE_FORT_HEADER_ASCII;
+    clawpatch_vt->cb_output_ascii     = &cb_sphere_output_ascii;                
+
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error)
     {
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
         clawpatch_vt->fort_compute_patch_error = &SPHERE_COMPUTE_ERROR;
-        clawpatch_vt->fort_header_ascii   = &SPHERE_FORT_HEADER_ASCII;
-        clawpatch_vt->cb_output_ascii     = &cb_sphere_output_ascii;                
     }
  }
 

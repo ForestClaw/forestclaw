@@ -155,13 +155,15 @@ void SPHERE_SET_VELOCITIES(const int* blockno, const int* mx, const int* my,
                                                 SPHERE_FORT_WRITE_FILE)
 void  SPHERE_FORT_WRITE_FILE(char* matname1,
                              int* mx,        int* my,
-                             int* meqn,      int* mbc,
+                             int* meqn,      int* mbc, int* maux,
                              double* xlower, double* ylower,
                              double* dx,     double* dy,
-                             double q[],     double error[], double soln[],
+                             double q[],     double error[], 
+                             double soln[],  double aux[],
                              double *time,
                              int* patch_num, int* level,
-                             int* blockno,   int* mpirank);
+                             int* blockno,   const int* compute_error,
+                             int* mpirank);
 
 #define SPHERE_FORT_HEADER_ASCII \
          FCLAW_F77_FUNC(sphere_fort_header_ascii, \

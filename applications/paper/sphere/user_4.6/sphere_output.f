@@ -12,7 +12,7 @@
       matunit1 = 10
       matunit2 = 15
 
-      mfields = meqn + 2  !! Include error and exact solution
+      mfields = meqn + 3  !! Include error and exact solution and area
       open(unit=matunit2,file=matname2)
       write(matunit2,1000) time,mfields,ngrids,maux,2
  1000 format(e30.20,'    time', /,
@@ -28,18 +28,16 @@
 
       end
 
-
-
-
       subroutine sphere_fort_write_file(matname1,
-     &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
-     &      q,error,soln, time, patch_num,level,blockno,mpirank)
-
+     &      mx,my,meqn,mbc, maux, xlower,ylower, dx,dy,
+     &      q,error,soln, aux, time, patch_num,level,blockno,
+     &      compute_error, mpirank)
       implicit none
 
       character*10 matname1
-      integer meqn,mbc,mx,my
+      integer meqn,mbc,mx,my, maux
       integer patch_num, level, blockno, mpirank
+      integer compute_error
       double precision xlower, ylower,dx,dy,time
       double precision xc,yc,qc,qexact
       double precision xc1, yc1, zc1, x,y
@@ -47,6 +45,8 @@
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision err
 
       integer matunit1
       integer i,j,mq
@@ -84,16 +84,21 @@ c      double precision swirl_divergence, divu
                   q(i,j,mq) = 0.d0
                endif
             enddo
-            qc = soln(i,j,1)
-            if (abs(qc) .lt. 1d-99) then
-               qc = 0.d0
-            endif
-            if (abs(error(i,j,1)) .lt. 1d-99) then
-               error(i,j,1) = 0.d0
-            endif
-c            divu = swirl_divergence(xc,yc)
+            if (compute_error == 1) then 
+                qc = soln(i,j,1)
+                if (abs(qc) .lt. 1d-99) then
+                  qc = 0.d0
+                endif
+                if (abs(error(i,j,1)) .lt. 1d-99) then
+                    error(i,j,1) = 0.d0
+                endif
+                err = error(i,j,1)
+            else
+                qc = q(i,j,1)
+                err = 0
+            end if
             write(matunit1,120) (q(i,j,mq),mq=1,meqn),qc,
-     &            error(i,j,1)
+     &            err, aux(i,j,1)*dx*dy
          enddo
          write(matunit1,*) ' '
       enddo
@@ -105,17 +110,18 @@ c     # This statement is checked above (meqn <= 5)
       end
 
       subroutine swirl46_fort_write_grid_header
-     &      (matunit1, mx,my,xlower,ylower, dx,dy,patch_num,level,
+     &      (matunit1, mx,my,xlower,ylower, dx,dy,global_patchno,level,
      &      blockno,mpirank)
 
       implicit none
 
       integer matunit1, mx, my
-      integer patch_num, level, blockno, mpirank
+      integer global_patchno, level, blockno, mpirank
       double precision xlower, ylower,dx,dy
 
 
-      write(matunit1,1001) patch_num, level, blockno, mpirank, mx, my
+      write(matunit1,1001) global_patchno, level, blockno, mpirank, 
+     &               mx, my
  1001 format(i5,'                 grid_number',/,
      &       i5,'                 AMR_level',/,
      &       i5,'                 block_number',/,
