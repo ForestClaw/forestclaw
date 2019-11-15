@@ -47,12 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_wrap.h>
 
 #include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/Schur/BilinearInterpolator.h>
-#include <Thunderegg/Schur/BiCGStabSolver.h>
+#include <Thunderegg/BiCGStabPatchSolver.h>
 #include <Thunderegg/VarPoisson/StarPatchOperator.h>
-#include <Thunderegg/GMG/CycleFactory2d.h>
+#include <Thunderegg/GMG/AvgRstr.h>
+#include <Thunderegg/GMG/DrctIntp.h>
 #include <Thunderegg/SchurDomainOp.h>
 #include <Thunderegg/P4estDomGen.h>
+#include <Thunderegg/GMG/CycleFactory.h>
+#include <Thunderegg/BiLinearGhostFiller.h>
 
 using namespace std;
 using namespace Thunderegg;
@@ -102,14 +104,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   // get finest level
   shared_ptr<Domain<2>> te_domain = domain_gen->getFinestDomain();
 
-  // create SchurHelper
-  shared_ptr<SchurHelper<2>> sh(new SchurHelper<2>(te_domain));
-
   // define operators for problems
-  // interface interpolator
-  shared_ptr<IfaceInterp<2>> interp(new BilinearInterpolator(sh));
-
-  // patch operator
 
   // get beta function
   auto beta_func = [&](const std::array<double,2>& coord){
@@ -123,19 +118,23 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   auto beta_vec = PetscVector<2>::GetNewVector(te_domain);
   DomainTools<2>::setValuesWithGhost(te_domain, beta_vec, beta_func);
 
-  shared_ptr<PatchOperator<2>> op(new StarPatchOperator<2>(beta_vec, beta_func, sh, interp));
+  // ghost filler
+  auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
+  // patch operator
+  auto op = make_shared<StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
 
   // set the patch solver
-  shared_ptr<PatchSolver<2>> solver(new BiCGStabSolver<2>(sh, op,
+  auto  solver = make_shared<BiCGStabPatchSolver<2>>(te_domain, ghost_filler, op,
                                                           mg_opt->patch_bcgs_tol,
-                                                          mg_opt->patch_bcgs_max_it));
+                                                          mg_opt->patch_bcgs_max_it);
 
   // create matrix
-  shared_ptr<Operator<2>> A(new SchurDomainOp<2>(sh, interp, op));
+  shared_ptr<Operator<2>> A = op;
 
   // create gmg preconditioner
   shared_ptr<Operator<2>> M;
   if(mg_opt->mg_prec){
+    // options
     GMG::CycleOpts copts;
     copts.max_levels = mg_opt->max_levels;
     copts.patches_per_proc = mg_opt->patches_per_proc;
@@ -144,7 +143,15 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
     copts.mid_sweeps = mg_opt->mid_sweeps;
     copts.coarse_sweeps = mg_opt->coarse_sweeps;
     copts.cycle_type = mg_opt->cycle_type;
-    M = GMG::CycleFactory2d::getCycle(copts, domain_gen, solver, op, interp);
+
+    //generators for levels
+    BiLinearGhostFiller::Generator filler_gen(ghost_filler);
+    StarPatchOperator<2>::Generator   op_gen(op, filler_gen);
+		BiCGStabPatchSolver<2>::Generator smooth_gen(solver, filler_gen, op_gen);
+		GMG::AvgRstr<2>::Generator        restrictor_gen;
+		GMG::DrctIntp<2>::Generator       interpolator_gen;
+    M = GMG::CycleFactory<2>::getCycle(copts, domain_gen, restrictor_gen, interpolator_gen,
+                                       smooth_gen, op_gen);
   }
 
   // solve
