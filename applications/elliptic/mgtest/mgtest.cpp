@@ -93,15 +93,15 @@ void run_program(fclaw2d_global_t* glob)
     /* Set up grid and RHS */
     fclaw2d_initialize(glob);
 
-    /* Output rhs */
-    int Frame = 0;
-    fclaw2d_output_frame(glob,Frame);
-
     /* Compute sum of RHS; reset error accumulators */
     int init_flag = 1;  
     fclaw2d_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
+    /* Output rhs */
+    int Frame = 0;
+    fclaw2d_output_frame(glob,Frame);
+ 
     /* Solve the elliptic problem */
     fclaw2d_elliptic_solve(glob);
 
