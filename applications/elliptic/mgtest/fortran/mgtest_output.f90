@@ -68,13 +68,19 @@ subroutine mgtest_fort_output_ascii(matname1, &
             do mq = 1,meqn
                 if (abs(q(i,j,mq)) .lt. 1d-99) then
                     q(i,j,mq) = 0.d0
+                elseif (abs(q(i,j,mq)) .gt. 1d99) then
+                    q(i,j,mq) = 1d99
                 endif
             end do
             if (abs(error(i,j,1)) .lt. 1d-99) then
                 error(i,j,1) = 0.d0
+            elseif (abs(error(i,j,1)) .gt. 1d99) then
+                error(i,j,1) = 1d99
             endif
             if (abs(soln(i,j,1)) .lt. 1d-99) then
                 soln(i,j,1) = 0.d0
+            elseif (abs(soln(i,j,1)) .gt. 1d99) then
+                soln(i,j,1) = 1d99
             endif
             write(matunit1,120) (q(i,j,mq),mq=1,meqn), soln(i,j,1), error(i,j,1)
         end do

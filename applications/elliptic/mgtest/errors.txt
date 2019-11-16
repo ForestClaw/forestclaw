@@ -419,7 +419,7 @@ Adding inhomogeneous boundary conditions
 # r1-polar = 0.45
 # n-polar = 6
 # Dirichlet conditions
-# CONVERGES
+# CONVERGES - See plots in Slack (Saturday Sept. 7th)
 
 
 32      7.7445e+00  1.1885e+01 5.1902e+01
@@ -441,6 +441,7 @@ Adding inhomogeneous boundary conditions
  2048/ 1024   2.0091   2.0165   2.0395
  4096/ 2048   2.0022   2.0040   2.0056
 ---------------------------------------
+
 
 
 # Example 4 - Stars - single grid, single star
@@ -606,5 +607,52 @@ N           1-norm       2-norm   inf-norm    iterations
  1024/  512   2.0000   2.0000   1.9980  -1.3033
 ------------------------------------------------
 
+------------------------------------------------------------------------------------------
+                                 Friday November 15, 2019
+------------------------------------------------------------------------------------------
+
+# Refinement works with ghost cells
+# 
+# Test star problem : 
+# 
+# example = 4; beta_choice = 0
+#     m-polar = 1
+#     x0-polar = -0.89123
+#     y0-polar = 0.00345
+#     r0-polar = 0.4
+#     r1-polar = 0.45
+#     n-polar = 6
+# 
+# Uniform refinement (levels 0 to 5)
+# mx = 32
+
+   32   7.7445e+00  1.1885e+01 5.1902e+01      95
+   64   4.4209e+00  6.5833e+00 2.7444e+01     173 
+  128   4.4653e-01  7.7146e-01 5.5362e+00     344
+  256   2.8612e-02  6.1147e-02 8.5492e-01     723 
+  512   8.4768e-04  1.5904e-03 2.8778e-02    1382 
+ 1024   2.9232e-05  2.3286e-04 5.3494e-03    3258
+ 2048   7.2633e-06  5.7576e-05 1.3012e-03    6450
+ 4096
+
+
+# Same as above
+# Adaptive refinement (levels 0 to 5)
+# example = 4; beta_choice = 0
+#     m-polar = 1
+#     x0-polar = 0
+#     y0-polar = 0
+#     r0-polar = 0.4
+#     r1-polar = 0.45
+#     n-polar = 6
+# mx = 8
+# minlevel = 2; maxlevel = 2,3,4,5,6
+# 
+
+     8    2.1178e+00  3.0817e+00 1.4417e+01
+    16    2.2834e+01  3.0992e+01 8.2068e+01
+    32    4.4660e-01  7.7154e-01 5.5364e+00
+
+       
 
 

@@ -109,7 +109,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_diagnostics_gather(glob, init_flag);                
 
     /* Output solution */
-    Frame = 2;
+    Frame = 1;
     fclaw2d_output_frame(glob,Frame);
 
     /* ---------------------------------------------------------------
