@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct {
     double* local_error;  /* meqn x 3 array of errors on a patch */
+    double* global_error; /* meqn x 3 array of errors after gather */
     double area;
     double *mass;
     double *mass0;  /* Mass at initial time */
@@ -57,6 +58,7 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
 
     /* Allocate memory for 1-norm, 2-norm, and inf-norm errors */
     error_data->local_error  = FCLAW_ALLOC_ZERO(double,3*meqn);
+    error_data->global_error  = FCLAW_ALLOC_ZERO(double,3*meqn);
     error_data->mass   = FCLAW_ALLOC_ZERO(double,meqn);
     error_data->mass0  = FCLAW_ALLOC_ZERO(double,meqn);
     error_data->area = 0;
@@ -165,38 +167,36 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     
-    int meqn;
-    double total_area;
-
-    meqn = clawpatch_opt->meqn;  /* clawpatch->meqn */
+    int meqn = clawpatch_opt->meqn;  /* clawpatch->meqn */
 
     if (gparms->compute_error != 0)
     {
-        double *error_norm;
-        int m;
-
-        total_area = fclaw2d_domain_global_sum(domain, error_data->area);
+        double total_area = fclaw2d_domain_global_sum(domain, error_data->area);
         FCLAW_ASSERT(total_area != 0);
 
-        error_norm = FCLAW_ALLOC_ZERO(double,3*meqn);
-        for (m = 0; m < meqn; m++)
+        double *error_norm = FCLAW_ALLOC_ZERO(double,3*meqn);
+        for (int m = 0; m < meqn; m++)
         {
             int i1 = m;            /* 1-norm */
             int i2 = meqn + m;     /* 2-norm */
-            int iinf = 2*meqn + m; /* inf-norm */
+            int i3 = 2*meqn + m; /* inf-norm */
 
-            error_norm[i1]   = fclaw2d_domain_global_sum(domain, error_data->local_error[i1]);
+            error_norm[i1]  = fclaw2d_domain_global_sum(domain, error_data->local_error[i1]);
             error_norm[i1] /= total_area;
 
-            error_norm[i2]   = fclaw2d_domain_global_sum(domain, error_data->local_error[i2]);
+            error_norm[i2]  = fclaw2d_domain_global_sum(domain, error_data->local_error[i2]);
             error_norm[i2] /= total_area;
             error_norm[i2] = sqrt(error_norm[i2]);
 
-            error_norm[iinf] = fclaw2d_domain_global_maximum(domain, 
-                                                             error_data->local_error[iinf]);
+            error_norm[i3] = fclaw2d_domain_global_maximum(domain, 
+                                                           error_data->local_error[i3]);
+
+            error_data->global_error[i1] = error_norm[i1];
+            error_data->global_error[i2] = error_norm[i2];
+            error_data->global_error[i3] = error_norm[i3];
 
             fclaw_global_essentialf("error[%d] =  %8.4e  %8.4e %8.4e\n",m,
-                                    error_norm[i1], error_norm[i2],error_norm[iinf]);
+                                    error_norm[i1], error_norm[i2],error_norm[i3]);
         }
         FCLAW_FREE(error_norm);
     }
@@ -204,11 +204,8 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
 
     if (gparms->conservation_check != 0)
     {
-        double *total_mass;
-        int m;
-
-        total_mass = FCLAW_ALLOC_ZERO(double,meqn);
-        for(m = 0; m < meqn; m++)
+        double *total_mass = FCLAW_ALLOC_ZERO(double,meqn);
+        for(int m = 0; m < meqn; m++)
         {
             total_mass[m] = fclaw2d_domain_global_sum(domain, error_data->mass[m]);
 
@@ -232,6 +229,7 @@ void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
     FCLAW_FREE(error_data->mass);
     FCLAW_FREE(error_data->mass0);
     FCLAW_FREE(error_data->local_error);
+    FCLAW_FREE(error_data->global_error);
     FCLAW_FREE(error_data);
     *patch_acc = NULL;
 }
