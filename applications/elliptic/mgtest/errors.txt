@@ -614,16 +614,16 @@ N           1-norm       2-norm   inf-norm    iterations
 # Refinement works with ghost cells
 # 
 # Test star problem : 
+# UNIFORM refinement (levels 0 to 5)
 # 
 # example = 4; beta_choice = 0
 #     m-polar = 1
-#     x0-polar = -0.89123
+#     x0-polar = -0.89123            < ------------- Star at left edge
 #     y0-polar = 0.00345
 #     r0-polar = 0.4
 #     r1-polar = 0.45
 #     n-polar = 6
 # 
-# Uniform refinement (levels 0 to 5)
 # mx = 32
 
    32   7.7445e+00  1.1885e+01 5.1902e+01      95
@@ -633,14 +633,39 @@ N           1-norm       2-norm   inf-norm    iterations
   512   8.4768e-04  1.5904e-03 2.8778e-02    1382 
  1024   2.9232e-05  2.3286e-04 5.3494e-03    3258
  2048   7.2633e-06  5.7576e-05 1.3012e-03    6450
- 4096
 
 
 # Same as above
-# Adaptive refinement (levels 0 to 5)
+# ADAPTIVE refinement (levels 0 to 5)
 # example = 4; beta_choice = 0
 #     m-polar = 1
-#     x0-polar = 0
+#     x0-polar = -0.89123          # <--------- left edge
+#     y0-polar = 0.00345
+#     r0-polar = 0.4
+#     r1-polar = 0.45
+#     n-polar = 6
+# mx = 8
+# minlevel = 2; maxlevel = 2,3,4,5,6
+# 
+
+# eff. res
+    32       7.7445e+00  1.1885e+01 5.1902e+01         91         0.252911
+    64       4.4214e+00  6.5839e+00 2.7446e+01        186         1.34208
+   128       4.4660e-01  7.7154e-01 5.5364e+00        380         7.46536
+   256       2.8615e-02  6.1150e-02 8.5493e-01        814        46.0395
+   512       8.4776e-04  1.5905e-03 2.8778e-02       1456       226.223
+  1024       2.9233e-05  2.3286e-04 5.3494e-03       2938      1403.57 
+       
+
+------------------------------------------------------------------------------------------
+                                 Saturday November 16, 2019
+------------------------------------------------------------------------------------------
+
+# Stars = centered
+# ADAPTIVE refinement (levels 0 to 5)
+# example = 4; beta_choice = 0
+#     m-polar = 1
+#     x0-polar = 0              # < ------------  Star at center
 #     y0-polar = 0
 #     r0-polar = 0.4
 #     r1-polar = 0.45
@@ -649,10 +674,38 @@ N           1-norm       2-norm   inf-norm    iterations
 # minlevel = 2; maxlevel = 2,3,4,5,6
 # 
 
-     8    2.1178e+00  3.0817e+00 1.4417e+01
-    16    2.2834e+01  3.0992e+01 8.2068e+01
-    32    4.4660e-01  7.7154e-01 5.5364e+00
+# eff. res
+     32    2.1178e+00  3.0817e+00 1.4417e+01        57        0.176493
+     64    2.2834e+01  3.0992e+01 8.2068e+01       131        1.24076
+    128    7.4882e+00  1.0203e+01 2.9308e+01       270        7.47085
+    256    8.2251e-02  1.1877e-01 6.6996e-01       545       50.8162
+    512    2.6846e-03  3.7757e-03 3.0621e-02      1008      265.76 
+   1024    4.9661e-05  3.0483e-04 5.3267e-03      2338     2076.45 
+   2048 
 
-       
+
+# Stars = centered
+# UNIFORM refinement (levels 0 to 6)
+# example = 4; beta_choice = 0
+#     m-polar = 1
+#     x0-polar = 0              # < ------------  Star at center
+#     y0-polar = 0
+#     r0-polar = 0.4
+#     r1-polar = 0.45
+#     n-polar = 6
+# mx = 32
+# minlevel = 0 = maxlevel = 0,1,2,3,4,5,6
+# 
+
+
+    32    2.1178e+00  3.0817e+00 1.4417e+01       57      0.0258974
+    64    2.2826e+01  3.0984e+01 8.2054e+01      106      0.0932948
+   128    7.4875e+00  1.0202e+01 2.9305e+01      210      0.645873
+   256    8.2243e-02  1.1877e-01 6.6995e-01      423      5.47551
+   512    2.6844e-03  3.7755e-03 3.0620e-02      850     44.9771
+  1024    4.9661e-05  3.0483e-04 5.3267e-03     1898    407.144  
+  2048    1.2345e-05  7.5341e-05 1.3020e-03     4439   3833.95
+
+
 
 

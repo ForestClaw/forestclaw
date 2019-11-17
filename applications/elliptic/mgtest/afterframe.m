@@ -1,43 +1,82 @@
-ax = 0;
+
+% Solution or error data
+fprintf('%10s %12.4e\n','qmin',qmin);
+fprintf('%10s %12.4e\n','qmax',qmax);
+
+% Mesh features
+showpatchborders;
+setpatchborderprops('linewidth',1);
+
+% Set color axis and title strings
+if Frame == 0 
+    if mq == 1
+        % RHS 
+        caxis([-0.01, 0.01]);
+        tstr = 'RHS';
+    else
+        error('Only print out RHS for Frame == 0');
+    end
+elseif Frame == 1
+    if mq == 1
+        % Computed olution
+        caxis([-0.2, 1]);
+        tstr = 'Computed solution';
+    elseif mq == 2
+        % Exact solution
+        caxis([-0.2, 1]);
+        tstr = 'Exact solution';
+    elseif mq == 3        
+        % Error
+        caxis([-1,1]*1e-2);
+        tstr = 'Error';
+    end
+end
+
+% Contour lines
+cv = linspace(0,1,11);
+% drawcontourlines(cv);
+
+
+% Color map and axis
+colormap(parula);
+colorbar;
+
+% Add some extra info
+hold on;
+plot_stars();
+hold off;
+
+% Surface plot
+if (length(amrdata) == 1)
+    % We are only on a single grid
+    figure(2);
+    clf;    
+    h = surf(xcenter,ycenter,q');
+    set(h,'edgecolor','none');
+    view(3);
+    axis square;
+%     set(gcf,'color','k');
+%     set(gcf,'clipping','off');
+%     axis off;
+%     camlight;
+    figure(1);
+end
+
+% Axis labels
+ax = -1;
 bx = 1;
-ay = 0;
+ay = -1;
 by = 1;
 s = 1e-2;
 axis([ax-s bx+s ay-s by+s])
 daspect([1 1 1]);
-% axis off;
 
-fprintf('%10s %12.4e\n','qmin',qmin);
-fprintf('%10s %12.4e\n','qmax',qmax);
+xlabel('x','fontsize',16);
+ylabel('y','fontsize',16);
 
-showpatchborders;
-setpatchborderprops('linewidth',1);
+title(tstr,'fontsize',18);
 
-cv = linspace(0,1,11);
-drawcontourlines(cv);
-
-if Frame == 0 
-    if mq == 1
-        % caxis([-1,1]*1e-3);
-    end
-elseif Frame == 1
-    caxis([0,2]);
-    % no color axis
-elseif Frame == 2 
-    if mq == 1
-        caxis([0,2]);
-    elseif mq == 3        
-        caxis([0,2]);
-    end
-end
-
-colormap(parula);
-colorbar;
-
-hold on;
-% plot_stars();
-hold off;
-
+        
 NoQuery = 0;
 prt = false;
 if (prt)
@@ -55,24 +94,7 @@ if (prt)
     plot_tikz_fig(Frame,figsize,prefix,dpi)
 end
 
-if (length(amrdata) == 1)
-    % We are only on a single grid
-    figure(2);
-    clf;    
-    h = surf(xcenter,ycenter,q');
-    set(h,'edgecolor','none');
-    view(3);
-    axis square;
-%     set(gcf,'color','k');
-%     set(gcf,'clipping','off');
-%     axis off;
-%     camlight;
-end
 
-xlabel('x','fontsize',16);
-ylabel('y','fontsize',16);
-
-figure(1);
 
 
 shg

@@ -1,6 +1,6 @@
 function plot_errors(e,idx,compare)
 
-l = size(e,1);
+% l = size(e,1);
 
 if (nargin < 3)    
     compare = false;
@@ -90,29 +90,26 @@ xlim([2^(p0-0.5), 2^(p1+0.5)]);
 
 set(gca,'fontsize',16);
 
-if (size(e,2) == 5)
-    idx = [2:5];
-else
-    idx = 2:4;
-end
+m2 = size(e,2);
+idx = 2:m2;
+        
 conv_rates = log(e(1:end-1,idx)./e(2:end,idx))/log(2);
-% Get convergence as function of (N^2). 
-conv_rates(:,end) = log(e(1:end-1,idx(end))./e(2:end,idx(end)))/log(4);
+cr_data = [Nvec(2:end) Nvec(1:end-1) conv_rates]';
 
+% Create variable lenght print string
+cr_cols = size(conv_rates,2);
+cr_str = kron(ones(1,cr_cols),double('%8.4f '));
+print_str = sprintf('%s %s\\n','%5d/%5d',cr_str); 
+
+% Draw line
+cr_len = 12 + 9*cr_cols;
+cr_line = double('-')*ones(1,cr_len);
+
+% Print table
 fprintf('\n');
 fprintf('          Convergence rates\n');
-cr = [Nvec(2:end) Nvec(1:end-1) conv_rates];
-if (size(e,2) == 5)
-    fprintf('%s\n',double('-')*ones(1,48));
-    fprintf('%5d/%5d %8.4f %8.4f %8.4f %8.4f\n',cr');
-    fprintf('%s\n',double('-')*ones(1,48));
-else
-    fprintf('%s\n',double('-')*ones(1,39));
-    fprintf('%5d/%5d %8.4f %8.4f %8.4f\n',cr');
-    fprintf('%s\n',double('-')*ones(1,39));
-end
+fprintf('%s\n',cr_line);
+fprintf(print_str,cr_data);
+fprintf('%s\n',cr_line);
     
-% ylim([1e-8,1e-1]);
-
-
 end

@@ -67,7 +67,7 @@ double precision function Hsmooth(id,r,theta)
     a = eps_disk
 
     P = polar_interface(id,theta)
-    Hsmooth = (tanh((r-P)/a) + 1)/2
+    Hsmooth = (tanh((r-P)/a) + 1)/2.d0
 
 end function Hsmooth
 

@@ -24,7 +24,7 @@
 */
 
 #include "mgtest_user.h"
-
+    
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_output.h>
