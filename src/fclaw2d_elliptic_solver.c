@@ -120,6 +120,8 @@ void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
     elliptic_solve(glob);
     
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE]);    
+
+    /* Store global error in EXTRA1, EXTRA2, EXTRA3 ? */
 }
 
 /*---------------------------- Virtual table functions -------------------------------- */
