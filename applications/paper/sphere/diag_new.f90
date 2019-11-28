@@ -147,44 +147,49 @@ CONTAINS
   !
   ! linit = .TRUE. if t=0 else .FALSE.
   !
-  
+
 SUBROUTINE filament_diag(K,f1,dA,fila_t0,linit)
     IMPLICIT NONE
     INTEGER, INTENT(IN)                    :: K
-    REAL   , DIMENSION(K)  , INTENT(IN)    :: f1, dA
-    REAL   , DIMENSION(100), INTENT(INOUT) :: fila_t0
-    LOGICAL                , INTENT(IN)    :: linit
+    REAL(kind=8)   , DIMENSION(K)  , INTENT(IN)    :: f1, dA
+    REAL(kind=8)   , DIMENSION(100), INTENT(INOUT) :: fila_t0
+    LOGICAL        , INTENT(IN)    :: linit
     !
     ! local workspace
     !
-    REAL    :: threshold,tiny
-    REAL    :: out, a
+    REAL(kind=8) :: threshold,tiny
+    REAL(kind=8) :: area_out, a, area_in
     INTEGER :: j,jk,jlevels
 
-    tiny=1.0E-12
-    !
+    tiny=1.0d-12
+    
     OPEN (unit = 31, file='filament.dat',status='replace')
     jlevels = 18
     DO jk = 0,jlevels
        threshold = 0.1d0 + jk/20.d0
-       out = 0.0
+       area_out = 0.0
+       area_in = 0
        DO j = 1,K
           IF (f1(j) .GE. threshold-tiny) THEN
-             out = out + dA(j)
+             area_out = area_out + dA(j)
+          else
+             area_in = area_in + dA(j)
           END IF
        END DO
        IF (linit) THEN
-          fila_t0(jk) = out
+          fila_t0(jk) = area_out
        ELSE
           IF (fila_t0(jk) .EQ. 0) THEN
              a = 0.d0
           ELSE
-             a = 100*out/fila_t0(jk)
+             a = 100*area_out/fila_t0(jk)
           ENDIF
-          WRITE(31,100) threshold,a
+          WRITE(31,100) threshold,a, fila_t0(jk)
        END IF
+       write(6,110) threshold,area_out, area_in, area_out+area_in
     END DO
     CLOSE(31)
-100 FORMAT(F5.2,F8.2)
+100 FORMAT(F12.2,F12.4, F24.16)
+110 FORMAT(F12.2,4F24.16)
   END SUBROUTINE filament_diag
 END MODULE diag

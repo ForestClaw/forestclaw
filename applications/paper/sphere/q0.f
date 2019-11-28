@@ -30,8 +30,8 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
       elseif (initchoice .eq. 2) then
           x0(1) = cos(5*pi/6.d0)
           x0(2) = cos(7*pi/6.d0)
-          y0(1) = 0.5
-          y0(2) = -0.5
+          y0(1) = 0.5d0
+          y0(2) = -0.5d0
           z0(1) = 0
           z0(2) = 0
 
@@ -42,7 +42,7 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
      &                 + (zp-z0(k))**2)
               q0 = q0 + Hsmooth(r + r0) - Hsmooth(r - r0)
           end do
-          q0 = 0.1 + 0.9*q0
+          q0 = 0.1d0 + 0.9d0*q0
       elseif (initchoice .ge. 3) then
 c         # Cosine Bells        
           hmax = 1

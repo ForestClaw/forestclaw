@@ -2,16 +2,17 @@ function [theta,phi,z] = mapc2m_cubedsphere_flat(xc,yc)
 
 [xp,yp,zp] = mapc2m_cubedsphere(xc,yc);
 
-phi = asin(zp);
-theta = atan2(yp,xp);
+phi = asin(zp);        % in [-pi/2, pi/2]
+theta = atan2(yp,xp);  % in [-pi, pi]
 
 mzero = (xp == 0) & (yp == 0);
 theta(mzero) = nan;
 
+% Flag = 0 : Return theta in [-pi, pi]
+% Flag = 1 : Return theta in [0, pi]
 theta = fix_block(theta,1);
 
 %{
-blockno = getblocknumber();
 
 tol = pi/2;
 switch blockno
@@ -41,7 +42,7 @@ end
 
 function theta = fix_block(theta,flag)
 
-% Return theta in [-pi,pi]
+% First, transform theta to [-pi,pi]
 t = theta;
 m = theta < 0;
 t(m) = t(m) + 2*pi;

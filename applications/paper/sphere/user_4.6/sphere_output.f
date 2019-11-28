@@ -30,28 +30,24 @@
 
       subroutine sphere_fort_write_file(matname1,
      &      mx,my,meqn,mbc, maux, xlower,ylower, dx,dy,
-     &      q,error,soln, aux, time, patch_num,level,blockno,
-     &      compute_error, mpirank)
+     &      q,error,soln, aux, time, global_patchno,level,
+     &      blockno, compute_error, mpirank)
       implicit none
 
       character*10 matname1
       integer meqn,mbc,mx,my, maux
-      integer patch_num, level, blockno, mpirank
+      integer global_patchno, level, blockno, mpirank
       integer compute_error
       double precision xlower, ylower,dx,dy,time
-      double precision xc,yc,qc,qexact
-      double precision xc1, yc1, zc1, x,y
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-      double precision err
 
+      double precision err, area, qc
       integer matunit1
       integer i,j,mq
-
-c      double precision swirl_divergence, divu
 
       integer mapping
       common /mapping_comm/ mapping
@@ -64,9 +60,8 @@ c      double precision swirl_divergence, divu
       open(matunit1,file=matname1,position='append');
 
       call swirl46_fort_write_grid_header(matunit1,
-     &      mx,my,xlower,ylower, dx,dy,patch_num,level,
+     &      mx,my,xlower,ylower, dx,dy,global_patchno,level,
      &      blockno,mpirank)
-
 
       if (meqn .gt. 5) then
          write(6,'(A,A,A)')
@@ -77,8 +72,6 @@ c      double precision swirl_divergence, divu
 
       do j = 1,my
          do i = 1,mx
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
             do mq = 1,meqn
                if (abs(q(i,j,mq)) .lt. 1d-99) then
                   q(i,j,mq) = 0.d0
@@ -97,8 +90,9 @@ c      double precision swirl_divergence, divu
                 qc = q(i,j,1)
                 err = 0
             end if
+            area = aux(i,j,1)*dx*dy
             write(matunit1,120) (q(i,j,mq),mq=1,meqn),qc,
-     &            err, aux(i,j,1)*dx*dy
+     &            err, area
          enddo
          write(matunit1,*) ' '
       enddo

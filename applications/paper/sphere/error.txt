@@ -478,6 +478,7 @@ Cubed sphere (uniform)
 -- Results run on four cores
 -- Times include output and error calculation
 -- Smooth-refine = 4 for all runs
+-- Timings done on 4 processors
 
 
 32     2.2680e-02  6.7832e-02 5.3710e-01        0.810103 
@@ -508,7 +509,7 @@ Cubed sphere (uniform)
 256     3.0785e-03  1.5985e-02 2.3384e-01        20.6278
 512     1.0106e-03  6.6145e-03 1.2287e-01        96.834
 1024    2.7331e-04  2.0815e-03 5.1702e-02       486.65
-2048    
+2048    7.5565e-5   5.6251e-04 1.8960e-02      1626.81         % Computed on MacPro
 
           Convergence rates
 ------------------------------------------------
@@ -545,6 +546,34 @@ Cubed sphere (uniform)
 128    9.0525e-03  5.0476e-02 1.1621e+00
 256    4.2379e-03  2.8135e-02 6.5960e-01
 512    .... (save as 8/13 results) .....
+
+
+--------------------------------------------------------------------------
+                         Monday 11/11/2019
+--------------------------------------------------------------------------
+
+
+-- ADAPTIVE - Case 4
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 30x30 patches
+-- refinement criteria : 0.105/0.101
+-- dt = 1e-2; (fixed time step; outstyle = 3)
+-- tfinal = 2.5 
+-- WITH conservation fix 
+-- no limiters
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
+-- Levels 0-0, 0-1, 0-2, 3-3, 4-4, etc. 
+-- Results run on four cores
+-- Times include output and error calculation
+-- Smooth-refine = 4 for all runs
+-- Timings done on 4 processors
+
+
+    30     5.2390e-02  1.2806e-01 7.7596e-01
+    60     3.0571e-02  8.0865e-02 6.2068e-01
+   120     2.1703e-02  6.6521e-02 5.7601e-01
+   240      
+
 
 
 
