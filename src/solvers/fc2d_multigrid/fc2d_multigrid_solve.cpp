@@ -99,7 +99,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
 
   // generates levels of patches for GMG
   shared_ptr<P4estDomGen> domain_gen(
-      new P4estDomGen(wrap->p4est, ns, clawpatch_opt->mbc,inf, bmf));
+      new P4estDomGen(wrap->p4est, ns, 1,inf, bmf));
 
   // get finest level
   shared_ptr<Domain<2>> te_domain = domain_gen->getFinestDomain();
