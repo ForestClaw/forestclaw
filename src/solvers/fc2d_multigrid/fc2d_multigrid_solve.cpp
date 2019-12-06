@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Thunderegg/BiCGStab.h>
 #include <Thunderegg/BiCGStabPatchSolver.h>
 #include <Thunderegg/VarPoisson/StarPatchOperator.h>
-#include <Thunderegg/GMG/AvgRstr.h>
+#include <Thunderegg/GMG/LinearRestrictor.h>
 #include <Thunderegg/GMG/DrctIntp.h>
 #include <Thunderegg/SchurDomainOp.h>
 #include <Thunderegg/P4estDomGen.h>
@@ -99,7 +99,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
 
   // generates levels of patches for GMG
   shared_ptr<P4estDomGen> domain_gen(
-      new P4estDomGen(wrap->p4est, ns, clawpatch_opt->mbc,inf, bmf));
+      new P4estDomGen(wrap->p4est, ns, 1,inf, bmf));
 
   // get finest level
   shared_ptr<Domain<2>> te_domain = domain_gen->getFinestDomain();
@@ -148,7 +148,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
     BiLinearGhostFiller::Generator filler_gen(ghost_filler);
     StarPatchOperator<2>::Generator   op_gen(op, filler_gen);
 		BiCGStabPatchSolver<2>::Generator smooth_gen(solver, filler_gen, op_gen);
-		GMG::AvgRstr<2>::Generator        restrictor_gen;
+		GMG::LinearRestrictor<2>::Generator        restrictor_gen;
 		GMG::DrctIntp<2>::Generator       interpolator_gen;
     M = GMG::CycleFactory<2>::getCycle(copts, domain_gen, restrictor_gen, interpolator_gen,
                                        smooth_gen, op_gen);
@@ -158,7 +158,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob) {
   shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(te_domain));
   shared_ptr<Vector<2>> u = vg->getNewVector();
 
-  int its = BiCGStab<2>::solve(vg, A, u, f, nullptr, mg_opt->max_it, mg_opt->tol);
+  int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
 
   fclaw_global_productionf("Iterations: %i\n", its);
   fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
