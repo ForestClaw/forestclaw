@@ -60,7 +60,7 @@
 [fclaw]    prefix                               fort
 [fclaw]    vtkspace                             0
 [fclaw]    init_ghostcell                       false
-[fclaw]    minlevel                             3
+[fclaw]    minlevel                             0
 [fclaw]    maxlevel                             3
 [fclaw]    regrid_interval                      1
 [fclaw]    refratio                             2
@@ -102,9 +102,9 @@
 [fclaw]    multigrid:boundary_conditions        1 1 1 1
 [fclaw]    multigrid:ascii-out                  true
 [fclaw]    multigrid:vtk-out                    false
-[fclaw]    multigrid:mg-prec                    false
+[fclaw]    multigrid:mg-prec                    true
 [fclaw]    multigrid:max-it                     100000
-[fclaw]    multigrid:tol                        1e-12
+[fclaw]    multigrid:tol                        1e-14
 [fclaw]    multigrid:max-levels                 0
 [fclaw]    multigrid:patches-per-proc           0
 [fclaw]    multigrid:pre-sweeps                 1
@@ -112,7 +112,7 @@
 [fclaw]    multigrid:mid-sweeps                 1
 [fclaw]    multigrid:coarse-sweeps              1
 [fclaw]    multigrid:cycle-type                 V
-[fclaw]    multigrid:patch-bcgs-tol             1e-12
+[fclaw]    multigrid:patch-bcgs-tol             0.1
 [fclaw]    multigrid:patch-bcgs-max-it          10000
 [fclaw]    user:example                         4
 [fclaw]    user:beta-choice                     0
@@ -129,34 +129,34 @@
 [fclaw]    user:r1-polar                        0.45
 [fclaw]    user:n-polar                         6
 [fclaw] Arguments: none
-[p4est 0] Local minimum/maximum levels:  3  3
-[p4est] Global minimum/maximum levels:  3  3
-[p4est 0] Patches on level  3:        64
+[p4est 0] Local minimum/maximum levels:  0  0
+[p4est] Global minimum/maximum levels:  0  0
+[p4est 0] Patches on level  0:         1
 [fclaw] Max threads set to 0
 [fclaw] error[0] =  1.9169e+02  1.1670e+03 1.6435e+04
-[fclaw] sum[0] =    1.1332208570928675e+00    0.0000000000000000e+00
+[fclaw] sum[0] =    1.1332208570928688e+00    0.0000000000000000e+00
 [fclaw] Output Frame    0  at time   0.00000000e+00
 
-[fclaw] Iterations: 423
+[fclaw] Iterations: 12
 [fclaw] f-2norm: 298738.271888
 [fclaw] f-infnorm: 16433.727606
-[fclaw] u-2norm: 73.346115
-[fclaw] u-infnorm: 0.916920
+[fclaw] u-2norm: 73.290937
+[fclaw] u-infnorm: 0.916917
 
 [fclaw] Checking if copy function works:
-[fclaw] fcopy-2norm: 73.346115
-[fclaw] fcopy-infnorm: 0.916920
+[fclaw] fcopy-2norm: 73.290937
+[fclaw] fcopy-infnorm: 0.916917
 
-[fclaw] error[0] =  8.2243e-02  1.1877e-01 6.6995e-01
-[fclaw] sum[0] =    2.2560913157976337e-01    9.0761172551310410e-01
+[fclaw] error[0] =  8.2245e-02  1.1877e-01 6.6995e-01
+[fclaw] sum[0] =    2.2560234035754981e-01    9.0761851673531901e-01
 [fclaw] Output Frame    1  at time   0.00000000e+00
 
 [fclaw] Finalizing run
 [libsc] Statistics for   INIT
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0.0291404 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 0.0291404
-[libsc]    Maximum attained at rank       0: 0.0291404
+[libsc]    Mean value (std. dev.):           0.0322466 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.0322466
+[libsc]    Maximum attained at rank       0: 0.0322466
 [libsc] Statistics for   ADVANCE
 [libsc]    Global number of values:       1
 [libsc]    Mean value (std. dev.):           0 (0)
@@ -174,34 +174,34 @@
 [libsc]    Maximum attained at rank       0: 0
 [libsc] Statistics for   DIAGNOSTICS
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0.0143587 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 0.0143587
-[libsc]    Maximum attained at rank       0: 0.0143587
+[libsc]    Mean value (std. dev.):           0.011034 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.011034
+[libsc]    Maximum attained at rank       0: 0.011034
 [libsc] Statistics for   OUTPUT
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0.442854 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 0.442854
-[libsc]    Maximum attained at rank       0: 0.442854
+[libsc]    Mean value (std. dev.):           0.304171 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.304171
+[libsc]    Maximum attained at rank       0: 0.304171
 [libsc] Statistics for   GHOSTPATCH_COMM
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           1.46702e-05 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 1.46702e-05
-[libsc]    Maximum attained at rank       0: 1.46702e-05
+[libsc]    Mean value (std. dev.):           4.90249e-05 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 4.90249e-05
+[libsc]    Maximum attained at rank       0: 4.90249e-05
 [libsc] Statistics for   ADAPT_COMM
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0 (0)
-[libsc]    Minimum attained at rank       0: 0
-[libsc]    Maximum attained at rank       0: 0
+[libsc]    Mean value (std. dev.):           0.0006953 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.0006953
+[libsc]    Maximum attained at rank       0: 0.0006953
 [libsc] Statistics for   PARTITION_COMM
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0 (0)
-[libsc]    Minimum attained at rank       0: 0
-[libsc]    Maximum attained at rank       0: 0
+[libsc]    Mean value (std. dev.):           2.3151e-05 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 2.3151e-05
+[libsc]    Maximum attained at rank       0: 2.3151e-05
 [libsc] Statistics for   DIAGNOSTICS_COMM
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           5.24011e-05 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 5.24011e-05
-[libsc]    Maximum attained at rank       0: 5.24011e-05
+[libsc]    Mean value (std. dev.):           3.8402e-05 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 3.8402e-05
+[libsc]    Maximum attained at rank       0: 3.8402e-05
 [libsc] Statistics for   CFL_COMM
 [libsc]    Global number of values:       1
 [libsc]    Mean value (std. dev.):           0 (0)
@@ -209,14 +209,14 @@
 [libsc]    Maximum attained at rank       0: 0
 [libsc] Statistics for   WALLTIME
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           5.93231 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 5.93231
-[libsc]    Maximum attained at rank       0: 5.93231
+[libsc]    Mean value (std. dev.):           1.18642 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 1.18642
+[libsc]    Maximum attained at rank       0: 1.18642
 [libsc] Statistics for   UNACCOUNTED
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           5.44589 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 5.44589
-[libsc]    Maximum attained at rank       0: 5.44589
+[libsc]    Mean value (std. dev.):           0.838161 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.838161
+[libsc]    Maximum attained at rank       0: 0.838161
 [libsc] Statistics for   ADVANCE_STEPS_COUNTER
 [libsc]    Global number of values:       1
 [libsc]    Mean value (std. dev.):           0 (0)
@@ -244,14 +244,14 @@
 [libsc]    Maximum attained at rank       0: 0
 [libsc] Statistics for   REGRID_BUILD
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0.0246192 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 0.0246192
-[libsc]    Maximum attained at rank       0: 0.0246192
+[libsc]    Mean value (std. dev.):           0.0266924 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.0266924
+[libsc]    Maximum attained at rank       0: 0.0266924
 [libsc] Statistics for   REGRID_TAGGING
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0 (0)
-[libsc]    Minimum attained at rank       0: 0
-[libsc]    Maximum attained at rank       0: 0
+[libsc]    Mean value (std. dev.):           3.08729e-05 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 3.08729e-05
+[libsc]    Maximum attained at rank       0: 3.08729e-05
 [libsc] Statistics for   TIMESYNC
 [libsc]    Global number of values:       1
 [libsc]    Mean value (std. dev.):           0 (0)
@@ -259,19 +259,19 @@
 [libsc]    Maximum attained at rank       0: 0
 [libsc] Statistics for   GHOSTPATCH_BUILD
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           2.80887e-06 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 2.80887e-06
-[libsc]    Maximum attained at rank       0: 2.80887e-06
+[libsc]    Mean value (std. dev.):           8.53301e-06 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 8.53301e-06
+[libsc]    Maximum attained at rank       0: 8.53301e-06
 [libsc] Statistics for   PARTITION
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0 (0)
-[libsc]    Minimum attained at rank       0: 0
-[libsc]    Maximum attained at rank       0: 0
+[libsc]    Mean value (std. dev.):           0.000350503 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.000350503
+[libsc]    Maximum attained at rank       0: 0.000350503
 [libsc] Statistics for   PARTITION_BUILD
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           0 (0)
-[libsc]    Minimum attained at rank       0: 0
-[libsc]    Maximum attained at rank       0: 0
+[libsc]    Mean value (std. dev.):           0.000341925 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.000341925
+[libsc]    Maximum attained at rank       0: 0.000341925
 [libsc] Statistics for   ADVANCE_STEP2
 [libsc]    Global number of values:       1
 [libsc]    Mean value (std. dev.):           0 (0)
@@ -319,19 +319,19 @@
 [libsc]    Maximum attained at rank       0: 0
 [libsc] Statistics for   NEIGHBOR_SEARCH
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           9.23593e-06 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 9.23593e-06
-[libsc]    Maximum attained at rank       0: 9.23593e-06
+[libsc]    Mean value (std. dev.):           1.46269e-05 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 1.46269e-05
+[libsc]    Maximum attained at rank       0: 1.46269e-05
 [libsc] Statistics for   FCLAW2D_TIMER_LOCAL_COMM
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           5.93225 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 5.93225
-[libsc]    Maximum attained at rank       0: 5.93225
+[libsc]    Mean value (std. dev.):           1.18561 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 1.18561
+[libsc]    Maximum attained at rank       0: 1.18561
 [libsc] Statistics for   FCLAW2D_TIMER_GLOBAL_COMM
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           6.70713e-05 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 6.70713e-05
-[libsc]    Maximum attained at rank       0: 6.70713e-05
+[libsc]    Mean value (std. dev.):           0.000805878 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.000805878
+[libsc]    Maximum attained at rank       0: 0.000805878
 [libsc] Statistics for   CUDA_ALLOCATE
 [libsc]    Global number of values:       1
 [libsc]    Mean value (std. dev.):           0 (0)
@@ -354,14 +354,14 @@
 [libsc]    Maximum attained at rank       0: 0
 [libsc] Statistics for   ELLIPTIC_GRIDS_COUNTER
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           64 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 64
-[libsc]    Maximum attained at rank       0: 64
+[libsc]    Mean value (std. dev.):           52 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 52
+[libsc]    Maximum attained at rank       0: 52
 [libsc] Statistics for   ELLIPTIC_SOLVE
 [libsc]    Global number of values:       1
-[libsc]    Mean value (std. dev.):           5.42366 (0 = 0%)
-[libsc]    Minimum attained at rank       0: 5.42366
-[libsc]    Maximum attained at rank       0: 5.42366
+[libsc]    Mean value (std. dev.):           0.819421 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 0.819421
+[libsc]    Maximum attained at rank       0: 0.819421
 [libsc] Statistics for   EXTRA1
 [libsc]    Global number of values:       1
 [libsc]    Mean value (std. dev.):           0 (0)

@@ -10,6 +10,7 @@ if sys.argv.__len__() == 1:
     print("Usage")
     print("      python p_00001.py  <mx> <minlevel> <maxlevel>")
     print("")
+    sys.exit()
 elif sys.argv.__len__() == 4:
     mx = my = int(sys.argv[1])
     minlevel = int(sys.argv[2])
