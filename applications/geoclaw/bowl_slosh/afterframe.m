@@ -6,8 +6,10 @@ if (PlotType == 1)
     hold on;
     
     % Patches
-    % showpatchborders;
-    setpatchborderprops('linewidth',1);
+    showgridlines(1:6);
+    showpatchborders(1:6);
+    % hidepatchborders(5);
+    setpatchborderprops('linewidth',2);
     set(gca,'zlim',[-20 1]);   % Need so that all patchborders show up
     
     colormap(parula);
@@ -36,7 +38,7 @@ if (PlotType == 1)
     B = h0*(xem.^2 + yem.^2)/a^2 - h0;
     eta1 = sigma*h0/a.^2 * (2*xem*cos(omega*t) + 2.*yem*sin(omega*t) -sigma);
     
-    contour(xem,yem,B-eta1,[0 0],'k','linewidth',5);
+    % contour(xem,yem,B-eta1,[0 0],'k','linewidth',5);
    
     hold off;
 
@@ -63,10 +65,14 @@ else
     hold off;
 end
 
+title(sprintf('slosh (fclaw) at time %g',t),'fontsize',18);
+
 NoQuery = 0;
 prt = false;
+MaxFrames = 16;
 if (prt)
-    filename = framename(Frame,'bowl0000','png');
+    filename = sprintf('bowl%04d.png',Frame);
+    fprintf('Print file %s\n',filename);
     print('-dpng',filename);
 end
 
