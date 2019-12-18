@@ -1,0 +1,1 @@
+Same as previous results, but BICG tolerance set to 1e-10 (instead of 1e-14)

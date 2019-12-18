@@ -782,6 +782,7 @@ SINGLE GRID times (patch-bicg-tol = 1e-14)
 # mx = 32
 # minlevel = 0; maxlevel = 0,1,2,3,4,5,6
 # Patch tolerance : 1e-1
+# Tolerance = 1e-14
 
 
    32     2.1178e+00  3.0817e+00 1.4417e+01        1      0.0256443
@@ -820,4 +821,32 @@ SINGLE GRID times (patch-bicg-tol = 1e-14)
 
 
 
+------------------------------------------------------------------------------------------
+                                 Friday December 13 , 2019
+------------------------------------------------------------------------------------------
+
+
+# Stars = centered
+# UNIFORM REFINEMENT
+# example = 4; beta_choice = 0
+#     m-polar = 1
+#     x0-polar = 0              # < ------------  Star at center
+#     y0-polar = 0
+#     r0-polar = 0.4
+#     r1-polar = 0.45
+#     n-polar = 6
+# mx = 32
+# minlevel = 0; maxlevel = 0,1,2,3,4,5,6
+# Patch tolerance : 1e-1
+# Tolerance = 1e-10           < ----------
+
+
+   32    0.0103
+   64    0.0571
+  128    0.1968
+  256    0.8105
+  512    3.4717
+ 1024   16.6148
+ 2048   88.2925   
+ 4096  342.664
 
