@@ -64,7 +64,7 @@ c     # not be coarsened.
       implicit none
       integer mx,my,mbc,meqn,mq,tag_patch, blockno
       double precision tag_threshold, t, xlower, ylower, dx,dy
-      double precision qmin,qmax
+      double precision qmin,qmax, lap
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer initchoice
@@ -90,6 +90,11 @@ c     # In case we need to call the physical mapping
          do j = 1,my
              xc = xlower + (i-0.5)*dx
              yc = ylower + (j-0.5)*dy
+c            lap = (q(i+1,j,1) + q(i-1,j,1) + q(i,j+1,1) + q(i,j-1,1)
+c     &            - 4*q(i,j,1))/dx**2
+c            if (abs(lap) .gt. tag_threshold) then
+c                  refine = .true.
+c            endif
              if (initchoice .le. 3) then
                  refine = q(i,j,mq) .gt.  tag_threshold              
              endif

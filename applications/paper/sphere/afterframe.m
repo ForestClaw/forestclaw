@@ -18,8 +18,7 @@ end
 if (mq == 3)
     % Plot the error
     c = max([qmin,qmax]);
-    ca = [-c,c];    
-    ca = [-1,1]*1e-3;
+    ca = [-1,1]*5e-4;
 else
     if (example == 3)
         if Frame > 0 && Frame < 10
@@ -28,7 +27,7 @@ else
             ca = [-0.2,10];
         end
     else
-        ca = [0,1];
+        ca = [-0.2,1];
     end
 end
 

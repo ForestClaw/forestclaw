@@ -10,7 +10,7 @@ close all
 % 4 - Montonized Centered
 
 nolim = true;
-withlim = [false, false, false, true];  % Use limiter ID
+withlim = [true, false, false, false];  % Use limiter ID
 levels = [true, true, true, true];
 uniform = true;
 adapt = false;
@@ -273,7 +273,7 @@ function s = add_to_plot(fname,lstr,n,c,sty,lstyle,ms,add2plot)
 s = struct('file',[],'lstr',[],'n',[],'color',[],'sym',[],...
     'size',[],'add2plot',[]);
 
-s.dir = 'filament';
+s.dir = 'filament_data';
 s.file = fname;
 s.lstr = lstr;
 s.n = n;

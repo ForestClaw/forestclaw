@@ -28,8 +28,8 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
       if (initchoice .eq. 1) then
           q0 = 1.d0
       elseif (initchoice .eq. 2) then
-          x0(1) = cos(5*pi/6.d0)
-          x0(2) = cos(7*pi/6.d0)
+          x0(1) = cos(pi/6.d0)
+          x0(2) = cos(-pi/6.d0)
           y0(1) = 0.5d0
           y0(2) = -0.5d0
           z0(1) = 0

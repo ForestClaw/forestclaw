@@ -562,7 +562,7 @@ Cubed sphere (uniform)
 -- WITH conservation fix 
 -- no limiters
 -- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
--- Levels 0-0, 0-1, 0-2, 3-3, 4-4, etc. 
+-- Levels 0-0, 0-1, 0-2, 0-3, 0-4, etc. 
 -- Results run on four cores
 -- Times include output and error calculation
 -- Smooth-refine = 4 for all runs
@@ -576,9 +576,238 @@ Cubed sphere (uniform)
 
 
 
+--------------------------------------------------------------------------
+                         Friday 11/29/2019
+--------------------------------------------------------------------------
+
+
+-- ADAPTIVE - Case 4  (T=2.5)
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 30x30 patches
+-- refinement criteria : 0.11/0.105
+-- dt = 5e-3; (fixed time step; outstyle = 3)
+-- tfinal = 2.5 
+-- WITH conservation fix 
+-- no limiters
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
+-- Levels 1-1, 1-1, 1-2, 1-3, 1-4, etc. 
+-- Smooth-refine = maxlevel for all runs
+-- Timings done on 4 processors
+-- "minimal resolution"  : 2-norm error ~ 0.033 : 0.1118 degrees.
+
+
+    60     5.2390e-02  1.2806e-01 7.7596e-01     1.5
+   120     3.0571e-02  8.0865e-02 6.2068e-01     0.75
+   240     2.1702e-02  6.6521e-02 5.7601e-01     0.375
+   480     1.2962e-02  4.5721e-02 4.5886e-01     0.1875 
+   960     6.8822e-03  2.9514e-02 3.7215e-01     0.09375
+  1920     3.0744e-03  1.6552e-02 2.7873e-01     0.046875
+
+
+          Convergence rates
+---------------------------------------
+  120/   60   0.7771   0.6632   0.3221
+  240/  120   0.4943   0.2817   0.1078
+  480/  240   0.7435   0.5410   0.3280
+  960/  480   0.9133   0.6315   0.3022
+ 1920/  960   1.1626   0.8344   0.4170
+---------------------------------------
 
 
 
+--------------------------------------------------------------------------
+                         Saturday 11/30/2019
+--------------------------------------------------------------------------
+
+
+-- ADAPTIVE - Case 4 (T=2.5)
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 30x30 patches
+-- refinement criteria : 0.11/0.105
+-- dt = 5e-3; (fixed time step; outstyle = 3;  CFL <= 0.786851 (at first time step))
+-- tfinal = 2.5 
+-- WITH conservation fix 
+-- WITH limiters (mthlim = 4; MC)
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
+-- Levels 1-1, 1-1, 1-2, 1-3, 1-4, 1-5, 1-6, 1-7
+-- Smooth-refine = maxlevel for all runs
+-- Timings done on 4 processors
+
+
+      60   2.7175e-02  8.1001e-02 5.4795e-01        1.5
+     120   1.3200e-02  5.1187e-02 3.7564e-01        0.75        
+     240   6.7223e-03  3.2269e-02 2.9315e-01        0.375
+     480   3.1186e-03  1.8074e-02 2.2634e-01        0.1875
+     960   1.4162e-03  8.7837e-03 1.4811e-01        0.09375
+    1920
+
+
+         Convergence rates
+------------------------------------------------
+  120/   60   1.0417   0.6622   0.5447   1.0000
+  240/  120   0.9735   0.6656   0.3577   1.0000
+  480/  240   1.1081   0.8362   0.3731   1.0000
+  960/  480   1.1389   1.0410   0.6118   1.0000
+------------------------------------------------
+
+
+-- ADAPTIVE - Case 4 (T=5.0)
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : 0.11/0.105
+-- dt \approx 1e-2; CFL= 0.9;  variable time step
+-- tfinal = 0.5 
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
+-- Levels 0-1, 0-1, 0-2, 0-3, 0-4, 0-5, 0-6, 1-7
+-- Smooth-refine = maxlevel for all runs
+-- WITH conservation fix 
+-- NO limiters 
+-- NO subcycling
+-- Matches PNG file in paper (fewest numerical artifacts)
+
+Error at t = 0.5
+    32    
+    64
+   128
+   256
+   512     
+  1024    2.6335e-04  2.0049e-03 5.1426e-02      
+
+
+Error at t = 2.5
+    32    
+    64
+   128
+   256
+   512     
+  1024    4.8600e-03  2.4402e-02 3.4082e-01     
+
+
+Error at t = 5.0
+    32    
+    64
+   128
+   256
+   512     
+  1024    7.2338e-03  3.1207e-02 3.7790e-01
 
 
 
+-- ADAPTIVE - Case 4 (T=5.0)
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : 0.11/0.105
+-- dt \approx 1e-2; CFL= 0.9;  variable time step
+-- tfinal = 5.0
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
+-- Levels 0-1, 0-1, 0-2, 0-3, 0-4, 0-5, 0-6, 1-7
+-- Smooth-refine = maxlevel for all runs
+-- WITH conservation fix 
+-- WITH limiters  (minmod)
+-- NO subcycling (this created the nasty artifacts)
+-- Matches PNG file in paper (fewest numerical artifacts)
+-- Walltime (11190.7)
+
+Error at t = 0.5
+    32    
+    64
+   128
+   256
+   512     
+  1024    2.1028e-04  1.2529e-03 2.0394e-02      
+
+
+Error at t = 2.5
+    32    
+    64
+   128
+   256
+   512     
+  1024   3.2161e-03  1.7263e-02 2.0148e-01       
+
+
+Error at t = 5.0
+    32    
+    64
+   128
+   256
+   512     
+  1024    4.7019e-03  2.2876e-02 2.2702e-01
+
+
+
+-- ADAPTIVE - Case 4 (T=5.0)
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : 0.11/0.105
+-- dt \approx 1e-2; CFL= 0.9;  variable time step
+-- tfinal = 5.0
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
+-- Levels 0-1, 0-1, 0-2, 0-3, 0-4, 0-5, 0-6, 1-7
+-- Smooth-refine = maxlevel for all runs
+-- WITH conservation fix 
+-- WITH limiters  (MC)
+-- NO subcycling (this created the nasty artifacts)
+-- Matches PNG file in paper (fewest numerical artifacts)
+
+
+Error at t = 0.5 (with MC limiter)
+    32     1.1865e-02  4.5758e-02 3.2434e-01
+    64     5.2623e-03  2.5598e-02 2.4739e-01
+   128     1.9339e-03  1.1766e-02 1.6369e-01 
+   256     7.1718e-04  4.9554e-03 9.1958e-02
+   512     2.4276e-04  1.8095e-03 4.4056e-02
+  1024     7.0643e-05  4.9927e-04 1.4021e-02
+  2048     2.8678e-05  1.8447e-04 4.0423e-03
+
+         Convergence rates
+---------------------------------------
+   64/   32   1.1729   0.8380   0.3907
+  128/   64   1.4442   1.1214   0.5958
+  256/  128   1.4311   1.2476   0.8319
+  512/  256   1.5628   1.4534   1.0616
+ 1024/  512   1.7809   1.8577   1.6517
+ 2048/ 1024   1.3006   1.4364   1.7943
+---------------------------------------
+
+
+
+Error at t = 2.5   (with MC limiter)
+    32     4.5502e-02  1.1849e-01 6.6625e-01
+    64     2.2488e-02  7.1859e-02 5.2248e-01
+   128     1.1304e-02  4.6725e-02 3.7284e-01
+   256     5.2732e-03  2.7848e-02 3.0462e-01
+   512     2.1586e-03  1.4373e-02 2.2023e-01
+  1024     7.9900e-04  6.2159e-03 1.2962e-01
+  2048     2.9622e-04  2.4867e-03 6.3886e-02
+
+          Convergence rates
+---------------------------------------
+   64/   32   1.0168   0.7215   0.3507
+  128/   64   0.9923   0.6210   0.4868
+  256/  128   1.1001   0.7466   0.2915
+  512/  256   1.2886   0.9542   0.4680
+ 1024/  512   1.4338   1.2093   0.7647
+ 2048/ 1024   1.4315   1.3217   1.0207
+---------------------------------------
+
+
+
+Error at t = 5.0   (with MC limiter)
+    32    5.4134e-02  1.3387e-01 6.7630e-01
+    64    2.8837e-02  8.4892e-02 5.5799e-01
+   128    1.4202e-02  5.3699e-02 3.9672e-01
+   256    7.0143e-03  3.3345e-02 3.0563e-01 
+   512    3.0111e-03  1.8072e-02 2.2776e-01 
+  1024    1.1164e-03  8.0222e-03 1.3682e-01
+  2048    4.1514e-04  3.2442e-03 6.8503e-02   % <---- Time at 4.5 (inf rate taken from Matlab)
+
+            Convergence rates
+---------------------------------------
+   64/   32   0.9086   0.6571   0.2774
+  128/   64   1.0218   0.6607   0.4921
+  256/  128   1.0177   0.6874   0.3763
+  512/  256   1.2200   0.8837   0.4243
+ 1024/  512   1.4314   1.1717   0.7352
+ 2048/ 1024   1.4272   1.3061   0.9935
+---------------------------------------

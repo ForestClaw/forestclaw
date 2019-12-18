@@ -21,7 +21,7 @@
       integer*8 cont, get_context
 
       integer i,j, mq
-      double precision qmin, qmax, xc, yc
+      double precision qmin, qmax, xc, yc, lap
       logical refine
 
       cont = get_context()
@@ -31,8 +31,13 @@ c     # Refine based only on first variable in system.
       mq = 1
       do j = 1,my
          do i = 1,mx
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
+c            xc = xlower + (i-0.5)*dx
+c            yc = ylower + (j-0.5)*dy
+c            lap = (q(i+1,j,1) + q(i-1,j,1) + q(i,j+1,1) + q(i,j-1,1)
+c     &            - 4*q(i,j,1))/dx**2
+c            if (abs(lap) .gt. tag_threshold) then
+c                  refine = .true.
+c            endif
             if (init choice .le. 3) then
                 refine = q(i,j,mq) .gt.  tag_threshold              
             endif
