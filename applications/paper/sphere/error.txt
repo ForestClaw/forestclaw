@@ -629,7 +629,7 @@ Cubed sphere (uniform)
 -- WITH conservation fix 
 -- WITH limiters (mthlim = 4; MC)
 -- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
--- Levels 1-1, 1-1, 1-2, 1-3, 1-4, 1-5, 1-6, 1-7
+-- Levels 1-1, 1-2, 1-3, 1-4, 1-5, 1-6, 1-7
 -- Smooth-refine = maxlevel for all runs
 -- Timings done on 4 processors
 
@@ -697,7 +697,7 @@ Error at t = 5.0
 -- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
 -- 32x32 patches
 -- refinement criteria : 0.11/0.105
--- dt \approx 1e-2; CFL= 0.9;  variable time step
+-- dt \approx 1e-2; CFL= 0.9;  VARIABLE time step
 -- tfinal = 5.0
 -- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
 -- Levels 0-1, 0-1, 0-2, 0-3, 0-4, 0-5, 0-6, 1-7
@@ -740,7 +740,7 @@ Error at t = 5.0
 -- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
 -- 32x32 patches
 -- refinement criteria : 0.11/0.105
--- dt \approx 1e-2; CFL= 0.9;  variable time step
+-- dt \approx 1e-2; CFL= 0.9;  VARIABLE time step  <----------
 -- tfinal = 5.0
 -- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
 -- Levels 0-1, 0-1, 0-2, 0-3, 0-4, 0-5, 0-6, 1-7
@@ -750,6 +750,7 @@ Error at t = 5.0
 -- NO subcycling (this created the nasty artifacts)
 -- Matches PNG file in paper (fewest numerical artifacts)
 
+-- Compares with results from Wednesday 1/8/2020
 
 Error at t = 0.5 (with MC limiter)
     32     1.1865e-02  4.5758e-02 3.2434e-01
@@ -759,6 +760,8 @@ Error at t = 0.5 (with MC limiter)
    512     2.4276e-04  1.8095e-03 4.4056e-02
   1024     7.0643e-05  4.9927e-04 1.4021e-02
   2048     2.8678e-05  1.8447e-04 4.0423e-03
+  4096     2.3714e-05  1.5423e-04 7.0735e-03  % <--- Computed on MacPro;  bad artifacts
+
 
          Convergence rates
 ---------------------------------------
@@ -811,3 +814,85 @@ Error at t = 5.0   (with MC limiter)
  1024/  512   1.4314   1.1717   0.7352
  2048/ 1024   1.4272   1.3061   0.9935
 ---------------------------------------
+
+--------------------------------------------------------------------------
+                         Tuesday 1/7/2020
+--------------------------------------------------------------------------
+
+
+-- ADAPTIVE - Case 4 (T=0.5)
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : 0.11/0.105
+-- dt \approx 1e-2; CFL= 0.9;  FIXED time step
+-- tfinal = 0.5; 50 time steps
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
+-- Levels 0-1, 0-1, 0-2, 0-3, 0-4, 0-5, 0-6, 1-7
+-- Smooth-refine = maxlevel for all runs
+-- WITH conservation fix 
+-- WITH limiters  (MC)
+-- NO subcycling (this created the nasty artifacts)
+-- Matches PNG file in paper (fewest numerical artifacts)
+-- Compares exactly (to four digits) to MacPro results
+
+-- Times include output time and time computing the error. 
+-- NO strange  artifacts at maxlevel=7 run! 
+
+
+
+Error at t = 5.0   (with MC limiter)
+    32   1.1983e-02  4.6041e-02 3.2290e-01 
+    64   5.3346e-03  2.5840e-02 2.5107e-01 
+   128   1.9736e-03  1.1952e-02 1.6349e-01 
+   256   7.4006e-04  5.0943e-03 9.1957e-02 
+   512   2.6030e-04  1.9440e-03 4.5706e-02  
+  1024   7.4033e-05  5.2823e-04 1.4555e-02     % 655s on MacBook;  328s on MacPro
+  2048   2.7408e-05  1.7064e-04 4.0395e-03     % 1519s on MacPro (12 procs)
+  4096   1.3963e-05  7.2457e-05 1.5629e-03     % 7976s on MacPro (12 procs); NO artifacts
+
+         Convergence rates
+---------------------------------------
+   64/   32   1.1675   0.8333   0.3630
+  128/   64   1.4346   1.1124   0.6189
+  256/  128   1.4151   1.2303   0.8302
+  512/  256   1.5075   1.3899   1.0086
+ 1024/  512   1.8139   1.8798   1.6509
+ 2048/ 1024   1.4336   1.6302   1.8493
+ 4096/ 2048   0.9730   1.2358   1.3700
+---------------------------------------
+
+
+--------------------------------------------------------------------------
+                         Wednesday 1/8/2020
+--------------------------------------------------------------------------
+
+
+-- ADAPTIVE - Case 4 (T=0.5)
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : 0.11/0.105
+-- dt \approx 1e-2; CFL= 0.9;  VARIABLE time step   <-------
+-- tfinal = 0.5; approx. 42 time steps. 
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)  (H = Hsmooth)
+-- Levels 0-1, 0-1, 0-2, 0-3, 0-4, 0-5, 0-6, 1-7
+-- Smooth-refine = maxlevel for all runs
+-- WITH conservation fix 
+-- WITH limiters  (MC)
+-- NO subcycling (this created the nasty artifacts)
+-- Matches PNG file in paper (fewest numerical artifacts)
+-- Compares exactly (to four digits) to MacPro results
+-- 4096 run uses 0.101/0.1005 for refinement/coarsening criteria. 
+
+-- Times include output time and time computing the error. 
+
+-- See results from Saturday 11/30/2019
+
+    32    1.1865e-02  4.5758e-02   3.2434e-01
+    64    5.2623e-03  2.5598e-02   2.4739e-01
+   128    1.9339e-03  1.1766e-02   1.6369e-01
+   256    7.1718e-04  4.9554e-03   9.1958e-02
+   512    2.4276e-04  1.8095e-03   4.4056e-02       % Computed on MacPro
+  1042    7.0643e-05  4.9927e-04   1.4021e-02       % Computed on MacPro
+  2048    2.8678e-05  1.8447e-04   4.0423e-03       % Computed on MacPro
+  4096    1.5458e-05  8.6489e-05   1.7266e-03       % Computed on MacPro (7286s)
+
