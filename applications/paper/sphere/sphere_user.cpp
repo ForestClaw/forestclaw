@@ -51,6 +51,8 @@ void sphere_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24.16f   %s",user->omega[1],"\% omega[1]\n");
         fprintf(f,  "%-24.16f   %s",user->omega[2],"\% omega[2]\n");
         fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refinement_pattern\n");
+        fprintf(f,  "%-24.16f   %s",user->b_init,"\% b_init\n");
+        fprintf(f,  "%-24.16f   %s",user->c_init,"\% c_init\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);

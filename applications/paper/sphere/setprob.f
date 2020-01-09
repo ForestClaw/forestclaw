@@ -23,6 +23,9 @@
       double precision x0(2), y0(2), z0(2)
       common /qinit_comm/ x0, y0, z0
 
+      double precision b_init, c_init
+      common /init_parms/ b_init, c_init
+
       pi = 4.d0*atan(1.d0)
       pi2 = 2*pi
 
@@ -34,7 +37,10 @@
       read(10,*) omega(2)
       read(10,*) omega(3)
       read(10,*) refine_pattern
+      read(10,*) b_init
+      read(10,*) c_init
       close(10)
+
 
 c    # Center for two disks  
       if (example .eq. 0) then

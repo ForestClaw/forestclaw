@@ -16,6 +16,9 @@ c     # ---------------------------------------------------------------
       integer initchoice
       common /initchoice_comm/ initchoice
 
+      double precision b_init, c_init
+      common /init_parms/ b_init, c_init
+
 
       double precision q0, r0, r, cb(2)
       double precision theta, th, thc(2)
@@ -28,6 +31,8 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
       if (initchoice .eq. 1) then
           q0 = 1.d0
       elseif (initchoice .eq. 2) then
+          b = b_init
+          c = c_init
           x0(1) = cos(pi/6.d0)
           x0(2) = cos(-pi/6.d0)
           y0(1) = 0.5d0
@@ -42,12 +47,12 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
      &                 + (zp-z0(k))**2)
               q0 = q0 + Hsmooth(r + r0) - Hsmooth(r - r0)
           end do
-          q0 = 0.1d0 + 0.9d0*q0
+          q0 = b + c*q0
       elseif (initchoice .ge. 3) then
 c         # Cosine Bells        
           hmax = 1
-          b = 0.1d0
-          c = 0.9d0
+          b = b_init
+          c = c_init
           r0 = 0.5d0
 
           call map2spherical(xp,yp,zp,theta,phi)

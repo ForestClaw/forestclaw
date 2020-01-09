@@ -43,6 +43,9 @@ typedef struct user_options
     int initial_condition;
     int refine_pattern;
 
+    double b_init;
+    double c_init;
+
     double *omega;
     const char* omega_string;
 

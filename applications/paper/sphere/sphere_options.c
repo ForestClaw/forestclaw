@@ -42,6 +42,12 @@ sphere_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "initial-condition", &user->initial_condition, 0,
                         "[user] Initial condition : 0=non-smooth; 1=smooth [1]");
 
+    sc_options_add_double (opt, 0, "b_init", &user->b_init, 0,
+                        "[user] q0 = b_init + c_init*H(x) [0.1]");
+
+    sc_options_add_double (opt, 0, "c_init", &user->c_init, 0,
+                        "[user] q0 = b_init + c_init*H(x) [0.9]");
+
     fclaw_options_add_double_array (opt, 0, "omega", &user->omega_string, "0 0 1",
                                     &user->omega, 3, 
                                     "Axis of rotation (example 0)  [0,0,1]");
