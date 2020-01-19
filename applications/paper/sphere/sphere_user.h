@@ -45,6 +45,9 @@ typedef struct user_options
 
     double b_init;
     double c_init;
+    double sharpness;
+
+    int curvature_correction;
 
     double *omega;
     const char* omega_string;

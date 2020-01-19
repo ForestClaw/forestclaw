@@ -161,12 +161,15 @@ SUBROUTINE filament_diag(K,f1,dA,fila_t0,linit)
     REAL(kind=8) :: area_out, a, area_in
     INTEGER :: j,jk,jlevels
 
-    tiny=1.0d-12
+    double precision b_init
+
+    tiny = 1.0d-8
+    b_init = 0.0d0
     
     OPEN (unit = 31, file='filament.dat',status='replace')
-    jlevels = 18
+    jlevels = 20
     DO jk = 0,jlevels
-       threshold = 0.1d0 + jk/20.d0
+       threshold = b_init + jk/20.d0
        area_out = 0.0
        area_in = 0
        DO j = 1,K
@@ -184,12 +187,12 @@ SUBROUTINE filament_diag(K,f1,dA,fila_t0,linit)
           ELSE
              a = 100*area_out/fila_t0(jk)
           ENDIF
-          WRITE(31,100) threshold,a, fila_t0(jk)
+          WRITE(31,100) threshold, a, fila_t0(jk)
        END IF
-       write(6,110) threshold,area_out, area_in, area_out+area_in
+       write(6,110) threshold,area_out, area_in, area_out+area_in, fila_t0(jk)
     END DO
     CLOSE(31)
 100 FORMAT(F12.2,F12.4, F24.16)
-110 FORMAT(F12.2,4F24.16)
+110 FORMAT(F12.2,5F24.16)
   END SUBROUTINE filament_diag
 END MODULE diag

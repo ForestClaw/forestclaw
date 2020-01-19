@@ -53,6 +53,8 @@ void sphere_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refinement_pattern\n");
         fprintf(f,  "%-24.16f   %s",user->b_init,"\% b_init\n");
         fprintf(f,  "%-24.16f   %s",user->c_init,"\% c_init\n");
+        fprintf(f,  "%-24.16f   %s",user->sharpness,"\% sharpness\n");
+        fprintf(f,  "%-24d   %s",user->curvature_correction,"\% Curvature correction\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);

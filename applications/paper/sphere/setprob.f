@@ -26,6 +26,13 @@
       double precision b_init, c_init
       common /init_parms/ b_init, c_init
 
+      double precision sharpness
+      common /hsmooth_parms/ sharpness
+
+      integer curvature_correction
+      common /conservation_com/ curvature_correction
+
+
       pi = 4.d0*atan(1.d0)
       pi2 = 2*pi
 
@@ -39,6 +46,8 @@
       read(10,*) refine_pattern
       read(10,*) b_init
       read(10,*) c_init
+      read(10,*) sharpness
+      read(10,*) curvature_correction;
       close(10)
 
 

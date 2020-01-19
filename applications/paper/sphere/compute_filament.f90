@@ -87,6 +87,7 @@ PROGRAM compute_filament
     write(6,101) 'Mass at time ',t0,' : ', s
 101 format(A,F6.4,A,F24.16)    
     linit = .TRUE.
+    !! This call sets fila_t0
     CALL filament_diag(Kmax,f0,dA,fila_t0,linit)
 
 !! -----------------------------------------------------------
@@ -138,6 +139,11 @@ PROGRAM compute_filament
 
         DO j = 1,my
             DO i = 1,mx
+                !! Read data from fort.q file
+                !! f1(k) : Computed solution
+                !! f2(k) : Exact solution (or computed solution, if error is not computed)
+                !! err   : Error 
+                !! dA(k) : Area element
                 READ(10,*) f1(k),f2(k),err, dA(k)
                 s = s + f1(k)*dA(k)
                 k = k + 1
@@ -148,6 +154,7 @@ PROGRAM compute_filament
 
     write(6,101) 'Mass at time ',t1,' : ', s
     linit = .FALSE.
+    !! This call uses initial data in fila_t0
     CALL filament_diag(Kmax,f1,dA,fila_t0,linit)
 
 END PROGRAM compute_filament

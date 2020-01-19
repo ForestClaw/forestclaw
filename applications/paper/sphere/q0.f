@@ -34,7 +34,7 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
           b = b_init
           c = c_init
           x0(1) = cos(pi/6.d0)
-          x0(2) = cos(-pi/6.d0)
+          x0(2) = cos(pi/6.d0)
           y0(1) = 0.5d0
           y0(2) = -0.5d0
           z0(1) = 0
@@ -45,7 +45,7 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
           do  k = 1,2
               r = sqrt((xp - x0(k))**2 + (yp-y0(k))**2 
      &                 + (zp-z0(k))**2)
-              q0 = q0 + Hsmooth(r + r0) - Hsmooth(r - r0)
+              q0 = q0 + 1 - Hsmooth(r - r0)
           end do
           q0 = b + c*q0
       elseif (initchoice .ge. 3) then
@@ -100,11 +100,14 @@ c         # Cosine Bells
 
 c     # ---------------------------------------------------------------      
       double precision function Hsmooth(r)
-      implicit none
+      implicit none      
 
       double precision r
 
-      Hsmooth = (tanh(r/0.02d0) + 1)/2.d0
+      double precision sharpness
+      common /hsmooth_parms/ sharpness
+
+      Hsmooth = (tanh(r/sharpness) + 1)/2.d0
 
       end
 

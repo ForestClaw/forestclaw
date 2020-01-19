@@ -71,6 +71,9 @@ c             # Map to spherical coordinates in [0,1]x[0,1]
       double precision nl(3), nr(3), nb(3), nt(3)
       double precision urrot, ulrot, ubrot, utrot
 
+      integer curvature_correction
+      common /conservation_com/ curvature_correction
+
 c      integer*8 cont, get_context
 
       integer i,j, k
@@ -93,12 +96,13 @@ c           # subtract out normal components
                 nv(k) = surfnormals(i,j,k)
             enddo
 
-            vdotn = map_dot(vel,nv)
-
 c           # Subtract out component in the normal direction
-            do k = 1,3
-                vel(k) = vel(k) - vdotn*nv(k)
-            end do
+            if (curvature_correction .ne. 0) then
+                vdotn = map_dot(vel,nv)
+                do k = 1,3
+                    vel(k) = vel(k) - vdotn*nv(k)
+                end do
+            endif
 
             do k = 1,3
                 nl(k)  = xnormals(i,  j,  k)

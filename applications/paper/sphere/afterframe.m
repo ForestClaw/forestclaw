@@ -18,7 +18,7 @@ end
 if (mq == 3)
     % Plot the error
     c = max([qmin,qmax]);
-    ca = [-1,1]*5e-4;
+    ca = [-1,1]*1e-4;
 else
     if (example == 3)
         if Frame > 0 && Frame < 10
@@ -63,9 +63,9 @@ if (~flat)
     % view(vtop);
     hold on;
     th = linspace(-pi/2, pi/2,500);
-    plot3(cos(th),0*th,sin(th),'k','linewidth',4);
+    % plot3(cos(th),0*th,sin(th),'k','linewidth',4);
     th = linspace(pi/32, 2*pi-pi/32,500);
-    plot3(cos(th),sin(th),0*th,'k','linewidth',4);
+    % plot3(cos(th),sin(th),0*th,'k','linewidth',4);
     hold off;
 end
 
@@ -73,10 +73,23 @@ cv = linspace(0.1,3.1,20);
 cv([1 end]) = [];
 % drawcontourlines(cv);
 
+%{
+delete(get(gca,'title'));
+o = findobj('Type','colorbar');
+delete(o);
+set(gca,'clipping','off')
+view([-37.5000, 30]);
+zoom(1.5);
+axis off;
+%}
+
+view(2);
+
 NoQuery = 0;
-prt = false;
+MaxFrames = 10;
+prt = true;
 if (prt)
-    filename = framename(Frame,'swirl0000','png');
+    filename = sprintf('maxlevel3/errs_maxlevel3_sync_Frame%02d',Frame);
     print('-dpng',filename);
 end
 
