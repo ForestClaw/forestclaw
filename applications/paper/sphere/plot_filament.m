@@ -2,6 +2,8 @@ function plot_filament(dir)
 
 close all
 
+global show_degs
+
 % Limiters
 % 0 - no limiter
 % 1 - Minmod
@@ -9,11 +11,18 @@ close all
 % 3 - Van Leer
 % 4 - Montonized Centered
 
+
 nolim = false;
 withlim = [false, false, false, true];  % Use limiter ID
-levels = [true, true, true, false];      % Levels 1,2,3,4
+levels = [true, true, true, true];      % Levels 1,2,3,4
 uniform = false;
 adapt = true;
+
+info = struct('nolim',nolim,'withlim',withlim,'levels',levels,...
+    'uniform',uniform,'adapt',adapt);
+
+show_degs = true;
+plot_last = false;
 
 lsu = ':';  % line style for uniform
 lsa = '-'; % line style for adaptive
@@ -25,225 +34,238 @@ nfiles_max = 30;   % Maximum number of files
 % ------------------------- Initial conditions ----------------------------
 fname = 'level2_uniform_nolim_t0.dat';
 lstr = sprintf('t=0.0');
-s = add_to_plot(dir,fname,lstr,nf,'r','.',lsu,30,false);
+s(nf) = add_to_plot(dir,fname,lstr,nf,'r','.',lsu,30,false);
 nf = nf+1;
 
 % -------------------------------- Test -----------------------------------
 add2plot = false;
 fname = 'filament.dat';
 lstr = sprintf('TEST');
-s = add_to_plot(dir,fname,lstr,nf,'k','.','-',30,add2plot);
+s(nf) = add_to_plot(dir,fname,lstr,nf,'k','.','-',30,add2plot);
 nf = nf+1;
 
-% ----------------------------- MAXLEVEL=1 --------------------------------
-maxlevel=1;
-deg_eff = 90/(mx*2^maxlevel);
-deg_eff = (mx*2^maxlevel);
+% --------------------------- MAXLEVEL = 1 --------------------------------
+maxlevel = 1;
 sym_color = 'r';
 
-add2plot = nolim & levels(1) & uniform;
+lim = 0;
+add2plot = nolim & levels(maxlevel) & info.uniform;
 fname = 'level1_uniform_nolim_t2.5.dat';
-lstr = sprintf('%.2f^o (U,0)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsu,30,add2plot);
 nf = nf+1;
 
-add2plot = withlim(1) & levels(1) & uniform;
+lim = 1;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level1_uniform_withlim_1_t2.5.dat';
-lstr = sprintf('%.2f^o (U,1)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'s',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(2) & levels(1) & uniform;
+lim = 2;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level1_uniform_withlim_2_t2.5.dat';
-lstr = sprintf('%.2f^o (U,2)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'d',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(3) & levels(1)  & uniform; 
+lim = 3;
+add2plot = withlim(lim) & levels(maxlevel)  & info.uniform; 
 fname = 'level1_uniform_withlim_3_t2.5.dat';
-lstr = sprintf('%.2f^o (U,3)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'*',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(4) & levels(1) & uniform;
+lim = 4;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level1_uniform_withlim_4_t2.5.dat';
-lstr = sprintf('%.2f^o (U,4)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsu,10,add2plot);
 nf = nf+1;
 
 % ------------- ADAPT ----------------
 
-add2plot = nolim & levels(1) & adapt;
+lim = 0;
+add2plot = nolim & levels(maxlevel) & info.adapt;
 fname = 'level1_adapt_nolim_t2.5.dat';
-% lstr = sprintf('%.2f^o (A,0)',deg_eff);
-lstr = sprintf('%d',deg_eff);
-s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsa,30,add2plot);
+lstr = legend_str(mx,maxlevel,lim,info);
+s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsa,15,add2plot);
 nf = nf+1;
 
 % Adaptive runs only done for limiter=4
-add2plot = withlim(4) & levels(1) & adapt;
+lim =4;
+add2plot = withlim(4) & levels(maxlevel) & info.adapt;
 fname = 'level1_adapt_withlim_4_t2.5.dat';
-% lstr = sprintf('%.2f^o (A,4)',deg_eff);
-lstr = sprintf('%d',deg_eff);
-s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsa,10,add2plot);
+lstr = legend_str(mx,maxlevel,lim,info);
+s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsa,8,add2plot);
 nf = nf+1;
 
 % --------------------------- MAXLEVEL=2 ----------------------------------
 maxlevel=2;
-deg_eff = 90/(mx*2^maxlevel);
-deg_eff = (mx*2^maxlevel);
+%[deg_eff,lstr] = legend_info(mx,maxlevel);
 sym_color = 'b';
 
-add2plot = nolim & levels(2) & uniform;
+lim = 0;
+add2plot = nolim & levels(maxlevel) & info.uniform;
 fname = 'level2_uniform_nolim_t2.5.dat';
-lstr = sprintf('%.2f^o (U,0)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsu,30,add2plot);
 nf = nf+1;
 
-add2plot = withlim(1) & levels(2) & uniform;
+lim = 1;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level2_uniform_withlim_1_t2.5.dat';
-lstr = sprintf('%.2f^o (U,1)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'s',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(2) & levels(2) & uniform;
+lim = 2;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level2_uniform_withlim_2_t2.5.dat';
-lstr = sprintf('%.2f^o (U,2)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'d',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(3) & levels(2) & uniform; 
+lim = 3;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform; 
 fname = 'level2_uniform_withlim_3_t2.5.dat';
-lstr = sprintf('%.2f^o (U,3)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'*',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(4) & levels(2) & uniform;
+lim = 4;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level2_uniform_withlim_4_t2.5.dat';
-lstr = sprintf('%.2f^o (U,4)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsu,10,add2plot);
 nf = nf+1;
 
 % ------------- ADAPT ---------------------
-
-add2plot = nolim & levels(2) & adapt;
+lim = 0;
+add2plot = nolim & levels(maxlevel) & info.adapt;
 fname = 'level2_adapt_nolim_t2.5.dat';
-% lstr = sprintf('%.2f^o (A,0)',deg_eff);
-lstr = sprintf('%d',deg_eff);
-s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsa,30,add2plot);
+lstr = legend_str(mx,maxlevel,lim,info);
+s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsa,20,add2plot);
 nf = nf+1;
 
-add2plot = withlim(4) & levels(2) & adapt;
+lim = 4;
+add2plot = withlim(lim) & levels(maxlevel) & info.adapt;
 fname = 'level2_adapt_withlim_4_t2.5.dat';
-%lstr = sprintf('%.2f^o (A,4)',deg_eff);
-lstr = sprintf('%d',deg_eff);
-s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsa,10,add2plot);
+lstr = legend_str(mx,maxlevel,lim,info);
+s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsa,8,add2plot);
 nf = nf+1;
 
 % --------------------------- MAXLEVEL=3 ----------------------------------
 maxlevel=3;
-deg_eff = 90/(mx*2^maxlevel);
-deg_eff = (mx*2^maxlevel);
 sym_color = 'g';
 
-add2plot = nolim & levels(3) & uniform;
+lim = 0;
+add2plot = nolim & levels(3) & info.uniform;
 fname = 'level3_uniform_nolim_t2.5.dat';
-lstr = sprintf('%.2f^o (U,0)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsu,30,add2plot);
 nf = nf+1;
 
-add2plot = withlim(1) & levels(3) & uniform;
+lim = 1;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level3_uniform_withlim_1_t2.5.dat';
-lstr = sprintf('%.2f^o (U,1)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'s',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(2) & levels(3) & uniform;
+lim = 2;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level3_uniform_withlim_2_t2.5.dat';
-lstr = sprintf('%.2f^o (U,2)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'d',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(3) & levels(3) & uniform;
+lim = 3;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level3_uniform_withlim_3_t2.5.dat';
-lstr = sprintf('%.2f^o (U,3)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'*',lsu,10,add2plot);
 nf = nf+1;
 
-add2plot = withlim(4) & levels(3) & uniform;
+lim = 4;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level3_uniform_withlim_4_t2.5.dat';
-lstr = sprintf('%.2f^o (U,4)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsu,10,add2plot);
 nf = nf+1;
 
 % ------------- ADAPT ---------------------
-add2plot = nolim & levels(3) & adapt;
+lim = 0;
+add2plot = nolim & levels(maxlevel) & info.adapt;
 fname = 'level3_adapt_nolim_t2.5.dat';
-%lstr = sprintf('%.2f^o (A,0)',deg_eff);
-lstr = sprintf('%d',deg_eff);
-s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsa,30,add2plot);
+lstr = legend_str(mx,maxlevel,lim,info);
+s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsa,20,add2plot);
 nf = nf+1;
 
-add2plot = withlim(4) & levels(3) & adapt;
+lim = 4;
+add2plot = withlim(lim) & levels(maxlevel) & info.adapt;
 fname = 'level3_adapt_withlim_4_t2.5.dat';
-%lstr = sprintf('%.2f^o (A,4)',deg_eff);
-lstr = sprintf('%d',deg_eff);
-s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsa,10,add2plot);
+lstr = legend_str(mx,maxlevel,lim,info);
+s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsa,8,add2plot);
 nf = nf+1;
 
 % ---------------------------- MAXLEVEL=4 ---------------------------------
-maxlevel=4;
-deg_eff = 90/(mx*2^maxlevel);
+maxlevel = 4;
 sym_color = 'm';
 
-add2plot = nolim  & levels(4) & uniform;
+lim = 0;
+add2plot = nolim  & levels(maxlevel) & info.uniform;
 fname = 'level4_uniform_nolim_t2.5.dat';
-lstr = sprintf('%.2f^o (U,0)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsu,30,add2plot);
 nf = nf + 1;
 
-add2plot = withlim(1) & levels(4) & uniform;
+lim = 1;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level4_uniform_withlim_1_t2.5.dat';
-lstr = sprintf('%.2f^o (U,1)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'s',lsu,10,add2plot);
 nf = nf + 1;
 
-add2plot = withlim(2) & levels(4) & uniform;
+lim = 2;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level4_uniform_withlim_2_t2.5.dat';
-lstr = sprintf('%.2f^o (U,2)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'d',lsu,10,add2plot);
 nf = nf + 1;
 
-add2plot = withlim(3) & levels(4) & uniform;
+lim = 3;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level4_uniform_withlim_3_t2.5.dat';
-lstr = sprintf('%.2f^o (U,3)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'*',lsu,10,add2plot);
 nf = nf + 1;
 
-add2plot = withlim(4) & levels(4) & uniform;
+lim = 4;
+add2plot = withlim(lim) & levels(maxlevel) & info.uniform;
 fname = 'level4_uniform_withlim_4_t2.5.dat';
-lstr = sprintf('%.2f^o (U,4)',deg_eff);
+lstr = legend_str(mx,maxlevel,lim,info);
 s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsu,10,add2plot);
 nf = nf + 1;
 
 % ------------- ADAPT ---------------------
-add2plot = nolim  & levels(4) & adapt;
+lim = 0;
+add2plot = nolim  & levels(maxlevel) & info.adapt;
 fname = 'level4_adapt_nolim_t2.5.dat';
-%lstr = sprintf('%.2f^o (A,0)',deg_eff);
-lstr = sprintf('%d',deg_eff);
-s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsa,30,add2plot);
+lstr = legend_str(mx,maxlevel,lim,info);
+s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'.',lsa,20,add2plot);
 nf = nf + 1;
 
-add2plot = withlim(4)  & levels(4) & adapt;
+lim = 4;
+add2plot = withlim(lim)  & levels(maxlevel) & info.adapt;
 fname = 'level4_adapt_withlim_4_t2.5.dat';
-%lstr = sprintf('%.2f^o (A,4)',deg_eff);
-lstr = sprintf('%d',deg_eff);
-s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsa,10,add2plot);
+lstr = legend_str(mx,maxlevel,lim,info);
+s(nf) = add_to_plot(dir,fname,lstr,nf,sym_color,'v',lsa,8,add2plot);
 nf = nf + 1;
 
 % -------------------------------------------------------------------------
 
-if (nf > nfiles_max+1)
+if (nf ~= nfiles_max+1)
     error('Maxinum number of files exceeded');
 end
 
@@ -258,7 +280,9 @@ for i = 1:nfiles_max
         fn = [s(i).dir,'/',s(i).file];
         fprintf('Plotting results for ''%s''\n',fn);
         d = load(fn);
-        d(end,:) = nan;
+        if (~plot_last)
+            d(end,:) = nan;
+        end
         p(i) = ...
             plot(d(:,1),d(:,2),'color',s(i).color,'marker',...
                 s(i).sym,'markersize',s(i).size);
@@ -296,5 +320,27 @@ s.sym = sty;
 s.size = ms;
 s.add2plot = add2plot;
 s.line_style = lstyle;
+
+end
+
+function lstr = legend_str(mx,maxlevel,lim,info)
+
+global show_degs
+
+if (info.adapt)
+    astr = 'A';
+end
+if (info.uniform)
+    astr = 'U';
+end
+limstr = sprintf('%d',lim);
+
+if (show_degs)
+    deg_eff = 90/(mx*2^maxlevel);
+    lstr = sprintf('%.2f^o (%s,%d)',deg_eff,astr,lim);
+else
+    deg_eff = (mx*2^maxlevel);
+    lstr = sprintf('%d (%s,%d)',deg_eff,astr,limstr);
+end
 
 end
