@@ -69,31 +69,31 @@ void bump_link_solvers(fclaw2d_global_t *glob)
             clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
             clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
         }
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_vtable_t    *claw5_vt = fc2d_clawpack5_vt();
-
-        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-
-        if (user->example == 0)
+        else if (user->claw_version == 5)
         {
-            claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
-            claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
-        }
-        else if (user->example == 1)
-        {
-            fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-            fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
+            fc2d_clawpack5_vtable_t    *claw5_vt = fc2d_clawpack5_vt();
 
-            patch_vt->setup = &bump_patch_setup;
+            claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
 
-            claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
-            claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
+            if (user->example == 0)
+            {
+                claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
+                claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
+            }
+            else if (user->example == 1)
+            {
+                fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+                fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
 
-            /* Avoid tagging block corners in 5 patch example*/
-            clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-            clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+                patch_vt->setup = &bump_patch_setup;
+
+                claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
+                claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
+
+                /* Avoid tagging block corners in 5 patch example*/
+                clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
+                clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+            }
         }
     }
 }
