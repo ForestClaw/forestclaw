@@ -52,6 +52,16 @@ typedef struct user_options
 } user_options_t;
 
 
+/* --------------------------------------- Cuda ----------------------------------------*/
+
+void bump_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+void bump_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
+
+void bump_setprob_cuda(double grav);
+
+
+/* --------------------------------------- non-Cuda ----------------------------------------*/
+
 #define BUMP_SETPROB FCLAW_F77_FUNC(bump_setprob, BUMP_SETPROB)
 void BUMP_SETPROB();
 
@@ -68,6 +78,8 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double ynormals[], double ytangents[],
                            double surfnormals[],
                            double area[]);
+
+
 
 void bump_problem_setup(fclaw2d_global_t *glob);
 void bump_link_solvers(fclaw2d_global_t *glob);
