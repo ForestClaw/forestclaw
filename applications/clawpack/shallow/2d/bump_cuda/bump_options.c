@@ -32,7 +32,7 @@ bump_register (user_options_t* user, sc_options_t * opt)
 {
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0, "[user] example [0]");
-    sc_options_add_int (opt, 0, "cuda", &user->cuda, 0, "[user] cuda [T]");
+    sc_options_add_bool (opt, 0, "cuda", &user->cuda, 1, "[user] cuda [T]");
     sc_options_add_int (opt, 0, "mapping", &user->mapping, 0, "[user] mapping [0]");
 
     sc_options_add_double (opt, 0, "gravity",     &user->gravity,     1.0, "[user] gravity [1.0]");

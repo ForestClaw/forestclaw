@@ -45,8 +45,6 @@ void bump_link_solvers(fclaw2d_global_t *glob)
         fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt();
 
         cuclaw_vt->fort_qinit     = &CLAWPACK46_QINIT;
-        // cuclaw_vt->fort_rpn2      = &CLAWPACK46_RPN2;
-        // cuclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2;
 
         bump_assign_rpn2(&cuclaw_vt->cuda_rpn2);
         FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
