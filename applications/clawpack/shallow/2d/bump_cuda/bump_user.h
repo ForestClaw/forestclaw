@@ -26,6 +26,8 @@
 #ifndef BUMP_USER_H
 #define BUMP_USER_H
 
+#include <fc2d_cudaclaw.h>
+
 #include <fclaw2d_include_all.h>
 
 #ifdef __cplusplus
