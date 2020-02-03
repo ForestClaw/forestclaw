@@ -23,7 +23,7 @@ applications_clawpack_shallow_2d_bump_cuda_bump_SOURCES = \
 	applications/clawpack/shallow/2d/rp/clawpack5_rpt2.f90 \
 	applications/clawpack/shallow/2d/rp/clawpack5_rpn2_manifold.f90 \
 	applications/clawpack/shallow/2d/rp/clawpack5_rpt2_manifold.f90 \
-	applications/clawpack/shallow/2d/radialdam_cuda/user_cuda/rpn2shallow.cu
+	applications/clawpack/shallow/2d/bump_cuda/user_cuda/rpn2shallow.cu
 
 EXTRA_DIST += \
 	applications/clawpack/shallow/2d/bump_cuda/fclaw_options.ini \
