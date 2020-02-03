@@ -16,10 +16,10 @@ void bump_setprob_cuda(double grav)
 
 
 __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves, 
-    								  int maux, double ql[], double qr[], 
-                              	  	  double auxl[], double auxr[],
-                              	  	  double wave[], double s[], 
-                              	  	  double amdq[], double apdq[])
+                                 int maux, double ql[], double qr[], 
+                                 double auxl[], double auxr[],
+                                 double wave[], double s[], 
+                                 double amdq[], double apdq[])
 {
     //assert(mwaves == 3);
     //assert(meqn == 3);
@@ -98,10 +98,10 @@ void bump_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2)
 
 
 __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
-                                      double ql[], double qr[], 
-                                      double aux1[], double aux2[], double aux3[],
-                                      int imp, double asdq[],
-                                      double bmasdq[], double bpasdq[])
+                                 double ql[], double qr[], 
+                                 double aux1[], double aux2[], double aux3[],
+                                 int imp, double asdq[],
+                                 double bmasdq[], double bpasdq[])
 {
 
     double alpha1, alpha2, alpha3;

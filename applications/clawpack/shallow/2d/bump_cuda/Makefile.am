@@ -48,7 +48,7 @@ applications_clawpack_shallow_2d_bump_cuda_bump_LDADD = \
         $(FCLAW_CUDACLAW_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD) \
-		$(BUMPDIR_DIR)/user_cuda/devicelink.o
+		$(BUMP_DIR)/user_cuda/devicelink.o
 
 ## nvcc -dlink has to b called after everything for the executable has been compiled.
 ## this generates a single object file with all of the linked  device code.
