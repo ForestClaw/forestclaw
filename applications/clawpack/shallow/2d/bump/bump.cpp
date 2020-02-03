@@ -46,12 +46,6 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    /* Local variables */
-    double rotate[2];
-
-    rotate[0] = fclaw_opt->phi;
-    rotate[1] = fclaw_opt->theta;
-
     switch (user->example)
     {
     case 0:
@@ -60,8 +54,10 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_nomap();
         break;
     case 1:
+        printf("Warning : Five patch square not tested.");
+        exit(0);
         conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale,fclaw_opt->shift,rotate);
+        cont = fclaw2d_map_new_fivepatch(fclaw_opt->scale,user->alpha);
         break;
     default:
         SC_ABORT_NOT_REACHED ();
@@ -76,14 +72,12 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t           *user_opt;
-
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user_opt = bump_get_options(glob);
+    user_options_t* user_opt = bump_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);

@@ -31,16 +31,12 @@ static void *
 bump_register (user_options_t* user, sc_options_t * opt)
 {
     /* [user] User options */
-    sc_options_add_int (opt, 0, "example", &user->example, 0, "[user] 0 - nomap; 1 - disk [0]");
+    sc_options_add_int (opt, 0, "example", &user->example, 0, "[user] example [0]");
+    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0, "[user] mapping [0]");
 
-    sc_options_add_double (opt, 0, "g",     &user->g,     1.0, "[user] g [1.0]");
-    sc_options_add_double (opt, 0, "x0",    &user->x0,    0.0, "[user] x0 [0.0]");
-    sc_options_add_double (opt, 0, "y0",    &user->y0,    0.0, "[user] y0 [0.0]");
-    sc_options_add_double (opt, 0, "r0",    &user->r0,    0.5, "[user] r0 [0.5]");
-    sc_options_add_double (opt, 0, "hin",   &user->hin,   2.0, "[user] hin [2.0]");
-    sc_options_add_double (opt, 0, "hout",  &user->hout,  1.0, "[user] hout [1.0]");
-
-    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4, "[user] alpha (for 5-patch map) [0.4]");
+    sc_options_add_double (opt, 0, "gravity",     &user->gravity,     1.0, "[user] gravity [1.0]");
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4, 
+                           "[user] alpha (for 5-patch map) [0.4]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                            "Clawpack_version (4 or 5) [5]");
@@ -52,11 +48,11 @@ bump_register (user_options_t* user, sc_options_t * opt)
 static fclaw_exit_type_t
 bump_check (user_options_t *user)
 {
-    if (user->example < 0 || user->example > 1) {
-        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
+    if (user->example != 0) {
+        fclaw_global_essentialf ("Option --user:example must be 0\n");
         return FCLAW_EXIT_QUIET;
     }
-    if (user->example == 1 && user->claw_version == 4)
+    if (user->mapping == 1 && user->claw_version == 4)
     {
         fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
         return FCLAW_EXIT_QUIET;

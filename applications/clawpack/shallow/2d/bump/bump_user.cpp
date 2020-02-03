@@ -87,8 +87,15 @@ void bump_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = bump_get_options(glob);
 
-    bump_SETPROB(&user->g, &user->x0, &user->y0, &user->r0,
-                      &user->hin, &user->hout, &user->example);
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24d   %s",user->example,"\% example\n");
+        fprintf(f,  "%-24.16f   %s",user->gravity,"\% gravity\n");
+        fclose(f);
+    }
+    fclaw2d_domain_barrier (glob->domain);
+    BUMP_SETPROB();
 }
 
 

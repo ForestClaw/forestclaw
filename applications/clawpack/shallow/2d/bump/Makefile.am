@@ -7,9 +7,8 @@ applications_clawpack_shallow_2d_bump_bump_SOURCES = \
 	applications/clawpack/shallow/2d/bump/bump_options.c \
 	applications/clawpack/shallow/2d/bump/bump_user.cpp \
 	applications/clawpack/shallow/2d/bump/bump_user.h \
-	applications/clawpack/shallow/2d/bump/fclaw2d_map_pillowdisk.c \
+	applications/clawpack/shallow/2d/bump/fclaw2d_map_fivepatch.c \
 	applications/clawpack/shallow/2d/bump/setprob.f \
-	applications/clawpack/shallow/2d/bump/fdisc.f \
 	applications/clawpack/shallow/2d/bump/user_4.6/qinit.f \
 	applications/clawpack/shallow/2d/bump/user_4.6/tag4refinement.f90 \
 	applications/clawpack/shallow/2d/bump/user_4.6/tag4coarsening.f90 \

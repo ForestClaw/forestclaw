@@ -38,26 +38,21 @@ extern "C"
 
 typedef struct user_options
 {
-    double g;
-    double x0;
-    double y0;
-    double r0;
-    double hin;
-    double hout;
+    int example;
 
+    double gravity;
+
+    int mapping; 
     double alpha;
 
     int claw_version;
-    int example;
 
     int is_registered;
 } user_options_t;
 
 
-#define bump_SETPROB FCLAW_F77_FUNC(bump_setprob, bump_SETPROB)
-void bump_SETPROB(const double *grav, const double* x0, const double* y0,
-                       const double* r0, const double* hin,
-                       const double* hinf, const int* example);
+#define BUMP_SETPROB FCLAW_F77_FUNC(bump_setprob, BUMP_SETPROB)
+void BUMP_SETPROB();
 
 
 #define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
@@ -95,9 +90,8 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double rotate[],
                                                    const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
-                                                  const double shift[],
-                                                  const double rotate[]);
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                  const double alpha);
 
 
 #ifdef __cplusplus
