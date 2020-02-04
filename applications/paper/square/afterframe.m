@@ -1,9 +1,8 @@
 example = read_vars();
 
 s = 0.0;
-axis([-s 1+s -s 1+s])
-daspect([1 1 1]);
-axis on;
+axis([-s, 1+s, -s, 1+s])
+axis square;
 
 fprintf('%-10s %16.8e\n','qmin',qmin);
 fprintf('%-10s %16.8e\n','qmax',qmax);
@@ -36,8 +35,8 @@ hidegridlines;
 
 if (example == 0)
     hold on;
-    refine_threshold = 0.5;
-    u = 1;
+    refine_threshold = 0.1;
+    u = 1;   % (u,v) = velocity
     v = 0.5;
     maxlevel = 5;  % Doesn't have to match true maxlevel
     plot_refine_contours(mx,maxlevel,t,u,v,refine_threshold);
