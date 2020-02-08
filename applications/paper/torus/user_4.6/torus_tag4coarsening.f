@@ -16,7 +16,6 @@
       double precision qmin, qmax
 
       tag_patch = 0
-      return
 
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
@@ -73,17 +72,38 @@ c     # not be coarsened.
 
       double precision xc,yc, r, xp, yp,zp
       logical refine
-      integer i,j
+      integer i,j, init_flag
 
 c     # In case we need to call the physical mapping
       cont = get_context()
 
+      init_flag = 0
+
+
+
       refine = .false.
+      call torus_tag4refinement(mx,my,mbc,
+     &      meqn, xlower,ylower,dx,dy,blockno,
+     &      q, tag_threshold, init_flag,refine)
+
+      tag_patch = 1
+
+      if (refine) then
+          tag_patch = 0
+      else
+          tag_patch = 1
+      endif
+
+
+
+      return
+
+
       do i = 1,mx
           do j = 1,my
-
               if (refine_pattern .eq. 0) then
-                  refine = q(i,j,mq) .gt.  tag_threshold              
+                  refine = (q(i,j,mq) .gt.  tag_threshold) .and.
+     &             (q(i,j,mq) .lt. 1-tag_threshold)
               else
                   xc = xlower + (i-0.5)*dx
                   yc = ylower + (j-0.5)*dy

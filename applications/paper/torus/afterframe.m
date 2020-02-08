@@ -19,14 +19,17 @@ end
 fprintf('%6s %16.8e\n','qmin',qmin);
 fprintf('%6s %16.8e\n\n','qmax',qmax);
 
-th = 2*pi*(0.25 + 1.d0/32.d0);
-x0 = cos(th);
-y0 = sin(th);
-z0 = alpha + 0.01;
-hold on;
-plot3(x0,y0,z0,'k.','markersize',30);
-plot3(-x0,y0,z0,'k.','markersize',30);
-hold off;
+conservation_torus = false;
+if (conservation_torus)
+    th = 2*pi*(0.25 + 1.d0/32.d0);
+    x0 = cos(th);
+    y0 = sin(th);
+    z0 = alpha + 0.01;
+    hold on;
+    plot3(x0,y0,z0,'k.','markersize',30);
+    plot3(-x0,y0,z0,'k.','markersize',30);
+    hold off;
+end
 
 % yrbcolormap;
 colormap(parula);
@@ -40,13 +43,15 @@ caxis([-0.2, 1]);
 colorbar
 axis off;
 
-view(vtop);
-% view([1.5,45]);
+%view(vtop);
 
 if (mq >= 3)
     caxis([qmin,qmax]);
     colorbar;
 end
+
+set(gcf,'clipping','off')
+set(gca,'clipping','off');
 
 prt = false;
 NoQuery = false;

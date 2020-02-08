@@ -28,14 +28,13 @@ c     # Sphere centered at (0.5,0.5,0) on swirl
       if (initchoice .eq. 1) then
           q0 = 1.d0
       elseif (initchoice .eq. 2) then
-          x0 = 1 - alpha
+          x0 = 1
           y0 = 0
           z0 = alpha
-          z0 = 0
 
           r = sqrt((xp - x0)**2 + (yp-y0)**2 + (zp-z0)**2)
-          q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
-          q0 = 0.1 + 0.9*q0
+          !!q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
+          q0 = 1 - Hsmooth(r - r0)
       endif
       q0_physical = q0
 

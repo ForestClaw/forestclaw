@@ -39,7 +39,8 @@
       do j = 1,my
          do i = 1,mx
             if (refine_pattern .eq. 0) then
-                refine = q(i,j,mq) .gt.  tag_threshold              
+                refine = (q(i,j,mq) .gt.  tag_threshold) .and.
+     &                   (q(i,j,mq) .lt. 1-tag_threshold)
             else
                 xc = xlower + (i-0.5)*dx
                 yc = ylower + (j-0.5)*dy
@@ -64,4 +65,3 @@ c                    r = sqrt(xp**2 + yp**2)
 
 
       end
-
