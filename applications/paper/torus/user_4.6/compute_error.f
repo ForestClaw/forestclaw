@@ -23,10 +23,10 @@
       cont = get_context()
 
       if (example .eq. 0) then
-c          # Divergent flow         
+c          # non-divergent flow         
            flow_flag = 0
       else
-c          # non-divergent flow         
+c          # Divergent flow         
            flow_flag = 1
       endif
 

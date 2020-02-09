@@ -34,21 +34,20 @@ end
 % yrbcolormap;
 colormap(parula);
 
+if (mq == 3)
+    c = max([abs(qmin),abs(qmax)]);
+    caxis([-c,c]);
+else
+    caxis([-0.2, 1]);    
+end
+colorbar
+
 showpatchborders;
 setpatchborderprops('linewidth',1);
 
 daspect([1,1,1]);
 
-caxis([-0.2, 1]);
-colorbar
 axis off;
-
-%view(vtop);
-
-if (mq >= 3)
-    caxis([qmin,qmax]);
-    colorbar;
-end
 
 set(gcf,'clipping','off')
 set(gca,'clipping','off');

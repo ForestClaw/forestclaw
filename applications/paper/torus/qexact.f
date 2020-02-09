@@ -145,25 +145,20 @@ c         # Tracing forwards
               stop
           endif
 
-          tol = 1e-12
+          tol = atol
           if (abs(sigma(1)-x) .gt. tol) then
               write(6,*) 'qexact.f : Did not evolve x correctly'
-              write(6,100) xc0,yc0
-              write(6,100) x,y
-              write(6,100) sigma(1), sigma(2)
-              write(6,105) abs(x-sigma(1)), abs(y-sigma(2))
+              write(6,100) xc0, x, sigma(1), abs(x-sigma(1))
+              write(6,*)' '
               stop
           endif
           if (abs(sigma(2)-y) .gt. tol) then
               write(6,*) 'qexact.f : Did not evolve y correctly'
-              write(6,100) xc0,yc0
-              write(6,100) x,y
-              write(6,100) sigma(1), sigma(2)
-              write(6,105) abs(x-sigma(1)), abs(y-sigma(2))
+              write(6,100) xc0,x, sigma(2), abs(y-sigma(2))
+              write(6,*)' '
               stop
           endif
-100       format(2F24.16)
-105       format(2E24.4)          
+100       format(3F24.16, E24.4)
 
           qexact = sigma(3)
       else
