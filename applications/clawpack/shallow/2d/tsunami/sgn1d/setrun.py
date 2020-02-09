@@ -54,10 +54,11 @@ def setrun(claw_pkg='Classic'):
         tsteps = [ 35.0, 90.0, 700.0, 2000.0]   # If outstyle = 2
     else:
         nout = 20
-        nsteps = 20    # If outstyle = 3
+        nsteps = 1    # If outstyle = 3
 
-    dt_initial = 0.1047505286036417
-    dt_variable = True
+    # dt_initial = 0.1047505286036417
+    dt_initial = 0.05
+    dt_variable = False
 
     limiter = 'minmod'      # 7 = generalized minmod
 

@@ -10,7 +10,7 @@ hvec(1) = getlegendinfo();  % Get info from basic plot
 plot_swe = true;   % High res - 2^15
 
 if (plot_swe)
-    [amrdata_swe,t_swe] = readamrdata(1,Frame,'sgn1d/_output_swe', ...
+    [amrdata_swe,t_swe] = readamrdata(1,Frame,'sgn1d/_output', ...
         'ascii');
     tol = 1e-6;
     if (abs(t_swe - t) > tol)
