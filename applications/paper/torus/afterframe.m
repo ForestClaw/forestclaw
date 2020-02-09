@@ -2,10 +2,11 @@ setviews;
 
 [~,~,~,alpha,beta,~] = read_vars();
 
-plot_contour = false;
+plot_contour = true;
 if plot_contour
     yrbcolormap;
     hold on;
+    R = 1.25;
     % assume we are doing the Gaussian problem with error
     [xp,yp,zp] = torus_soln_contour(t,alpha,R,period);
     plot3(xp,yp,zp,'k','linewidth',2);

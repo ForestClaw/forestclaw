@@ -17,6 +17,7 @@ end
 if (mq == 3)
     % Plot the error
     c = max([qmin,qmax]);
+    c = 3e-3;
     ca = [-c,c];    
 else    
     % Plot the solution
@@ -35,7 +36,7 @@ hidegridlines;
 
 if (example == 0)
     hold on;
-    refine_threshold = 0.1;
+    refine_threshold = 0.05;
     u = 1;   % (u,v) = velocity
     v = 0.5;
     maxlevel = 5;  % Doesn't have to match true maxlevel
@@ -46,22 +47,23 @@ end
 view(2)
 
 % This is used for creating vectorized PDFs
-prt_tikz = false;
+prt_tikz = true;
 if (prt_tikz)
-    figsize = [8,8];  % Should match tikz figsize.
-    maxlevel = 7;
+    hidepatchborders;
+    figsize = [16,16];  % Should match tikz figsize.
+    maxlevel = 6;
     dpi = mx*2^maxlevel/figsize(1);
     prefix = 'plot';    
-    caxis([-0.3,1]);
+    caxis(ca);
     plot_tikz_fig(Frame,figsize,prefix,dpi);    
 end
 
 
 
 NoQuery = 0;
-prt = false;
+prt = true;
 if (prt)
-    filename = framename(Frame,'swirl0000','png');
+    filename = framename(Frame,'square0000','png');
     print('-dpng',filename);
 end
 

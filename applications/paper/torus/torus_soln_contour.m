@@ -22,7 +22,7 @@ if (nargin < 4)
     period = 0;   % Won't be used.
     if (nargin < 2)
         alpha = 0.4;
-        revs_per_sec = 0.5;
+        revs_per_sec = 0.25;
         period = 16;
     end
 end
