@@ -153,8 +153,8 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 !!             pR = auxl(pressure_index, i)
 !!         end if
 
-         hvL = qr(mv,i-1) 
-         hvR = ql(mv,i)        
+         hvL = qr(i-1,mv) 
+         hvR = ql(i,mv)        
 
         !!check for wet/dry boundary
         IF (hR .GT. dry_tolerance) THEN
