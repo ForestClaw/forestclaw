@@ -35,15 +35,24 @@ end
 colormap(parula);
 
 if (mq == 3)
-    c = max([abs(qmin),abs(qmax)]);
-    caxis([-c,c]);
+    caxis([-1,1]*1e-3);
 else
-    caxis([-0.2, 1]);    
+    if Frame == 0
+        caxis([-0.3,1.0]);
+    else
+        if (mq == 1)
+            caxis([-0.7,2.1])    
+        else
+            caxis([-1,1]*1e-3);
+        end
+    end
 end
-colorbar
 
 showpatchborders;
 setpatchborderprops('linewidth',1);
+
+hc = colorbar;
+set(hc,'fontsize',16);
 
 daspect([1,1,1]);
 
@@ -52,12 +61,19 @@ axis off;
 set(gcf,'clipping','off')
 set(gca,'clipping','off');
 
-prt = false;
+view([0,27]);
+
+prt = true;
 NoQuery = false;
 if (prt)
     delete(get(gca,'title'));
-    fname = sprintf('torus%02d.png',Frame);
-    print('-dpng','-r640',fname);
+    if (mq == 1)
+        fname = sprintf('soln_torus%02d.png',Frame);
+    else
+        hidepatchborders(6);
+        fname = sprintf('error_torus%02d.png',Frame);
+    end
+    print('-dpng','-r240',fname);
 end
 shg
 

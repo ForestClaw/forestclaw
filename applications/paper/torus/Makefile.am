@@ -20,10 +20,8 @@ applications_paper_torus_torus_SOURCES = \
 	applications/paper/torus/user_4.6/compute_error.f \
 	applications/paper/torus/user_4.6/torus_setaux.f \
 	applications/paper/torus/user_4.6/torus46_output.f \
-	applications/paper/torus/user_4.6/tag4refinement.f \
 	applications/paper/torus/user_4.6/torus_tag4coarsening.f \
 	applications/paper/torus/user_4.6/torus_tag4refinement.f \
-	applications/paper/torus/user_4.6/tag4coarsening.f \
 	applications/paper/torus/user_4.6/rpn2cons_fw_manifold.f \
     applications/paper/torus/user_4.6/rpt2cons_manifold.f \
 	applications/paper/torus/user_4.6/rpn2cons_update_manifold.f

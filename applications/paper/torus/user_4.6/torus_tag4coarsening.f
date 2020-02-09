@@ -3,8 +3,7 @@
      &      coarsen_threshold, tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch
-      integer blockno
+      integer mx,my, mbc, meqn, tag_patch, blockno
       double precision xlower(0:3), ylower(0:3), dx, dy
       double precision coarsen_threshold
       double precision q0(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -51,11 +50,11 @@ c     # not be coarsened.
 
       subroutine user_check_refine(blockno, mx,my,mbc,meqn, 
      &      xlower, ylower, dx,dy, mq,q,
-     &      qmin,qmax,tag_threshold,tag_patch)
+     &      qmin,qmax,coarsen_threshold,tag_patch)
 
       implicit none
       integer mx,my,mbc,meqn,mq,tag_patch, blockno
-      double precision tag_threshold, t, xlower, ylower, dx,dy
+      double precision coarsen_threshold, t, xlower, ylower, dx,dy
       double precision qmin,qmax
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -66,7 +65,7 @@ c     # not be coarsened.
       refine = .false.
 
       call torus_tag4refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
-     &      blockno, q, tag_threshold, init_flag,refine)
+     &      blockno, q, coarsen_threshold, init_flag,refine)
 
       if (refine) then
           tag_patch = 0
