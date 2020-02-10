@@ -2,8 +2,8 @@ c
 c
 c     =====================================================
       subroutine clawpack46_flux2fw(ixy,maxm,meqn,maux,mbc,mx,
-     &      q1d,dtdx1d,aux1,aux2,aux3,
-     &      faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
+     &                              q1d,dtdx1d,aux1,aux2,aux3,
+     &                  faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
      &      amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
      &      mwaves,mcapa,method,mthlim)
 c     =====================================================
@@ -126,7 +126,8 @@ c     # solve Riemann problem at each interface and compute Godunov updates
 c     ---------------------------------------------------------------------
 c
       call rpn2(ixy,maxm,meqn,mwaves,mbc,mx,q1d,q1d,
-     &          aux2,aux2,fwave,s,amdq,apdq)
+     &          aux2,aux2,fwave,s,amdq,apdq,maux)
+
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
       do 40 i=1,mx+1
