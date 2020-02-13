@@ -7,13 +7,13 @@ applications_clawpack_shallow_2d_tsunami_tsunami_SOURCES = \
 	applications/clawpack/shallow/2d/tsunami/tsunami_user.h \
 	applications/clawpack/shallow/2d/tsunami/setprob.f \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/qinit.f90 \
+	applications/clawpack/shallow/2d/tsunami/user_4.6/setaux.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/tag4refinement.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/tag4coarsening.f90 \
-	applications/clawpack/shallow/2d/tsunami/swe/rpn2_geoclaw.f90 \
-	applications/clawpack/shallow/2d/tsunami/swe/rpt2_geoclaw.f90 \
-	applications/clawpack/shallow/2d/tsunami/swe/bathy.f90 \
-	applications/clawpack/shallow/2d/tsunami/swe/setaux.f90 \
-	applications/clawpack/shallow/2d/tsunami/swe/geoclaw_riemann_utils.f90
+	applications/clawpack/shallow/2d/tsunami/bathy.f90 \
+	applications/clawpack/shallow/2d/rp/rpn2_tsunami.f90 \
+	applications/clawpack/shallow/2d/rp/rpt2_geoclaw.f90 \
+	applications/clawpack/shallow/2d/rp/geoclaw_riemann_utils.f90
 
 EXTRA_DIST += \
 	applications/clawpack/shallow/2d/tsunami/fclaw_options.ini \

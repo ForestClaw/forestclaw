@@ -86,7 +86,7 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 
     integer i1, i2
 
-    use_simple = .true.
+    use_simple = .false.
 
 !!  no pressure forcing
     pL = 0

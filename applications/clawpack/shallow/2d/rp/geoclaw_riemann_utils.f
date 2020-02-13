@@ -310,6 +310,8 @@ c        !solve for beta(k) using Cramers Rule=================
 
 
 c-----------------------------------------------------------------------
+
+c     # Current GeoClaw comments this out of main rpn2_geoclaw.f90
       subroutine riemann_ssqfwave(maxiter,meqn,mwaves,hL,hR,huL,huR,
      &    hvL,hvR,bL,bR,uL,uR,vL,vR,phiL,phiR,pL,pR,sE1,sE2,drytol,g,
      &    rho,sw,fw)
@@ -497,6 +499,8 @@ c               hustar=huL+alpha1*sE1
 
 
 c-----------------------------------------------------------------------
+c     # Current GeoClaw comments this out of main rpn2_geoclaw.f90
+c     # And this duplicates my "simple_riemann" code.
       subroutine riemann_fwave(meqn,mwaves,hL,hR,huL,huR,hvL,hvR,
      &            bL,bR,uL,uR,vL,vR,phiL,phiR,pL,pR,s1,s2,drytol,g,rho,
      &            sw,fw)
