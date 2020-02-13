@@ -8,7 +8,7 @@ c     # fclaw2d_fort_average2coarse
 c     # --------------------------------------------
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine clawpack46_tag4coarsening(mx,my,mbc,meqn,
+      subroutine tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, tag_patch)
       implicit none
@@ -67,7 +67,8 @@ c     # not be coarsened.
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if (q(i,j,mq) .gt. coarsen_threshold) then
+            if (abs(q(i,j,mq)) .gt. coarsen_threshold) then
+c            if ((qmax-qmin) .gt. coarsen_threshold) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
                tag_patch = 0

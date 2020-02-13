@@ -97,7 +97,6 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     {
         num_gauges = 0;
         gauge_acc->gauges = NULL;
-
     }
     else
     {
@@ -159,7 +158,15 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         x1 = 1;
         y1 = 1;
 
-        FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);
+        if (is_brick)
+        {
+            FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj);            
+        }
+        else
+        {
+            mi = 1;
+            mj = 1;
+        }
 
         fclaw2d_block_t *blocks = glob->domain->blocks;
 

@@ -1,11 +1,11 @@
 
       subroutine opendatafile(iunit, fname)
 c     #
-c     # Open the file fname and determine how many leading lines are
-c     # comments.  Then rewind and skip over the comment lines so that the
-c     # file is ready for reading data from.
-c     #
-c     # All comment lines must start with # in the first column.
+!> Open the file fname and determine how many leading lines are
+!! comments.  Then rewind and skip over the comment lines so that the
+!! file is ready for reading data from.
+!!
+!! All comment lines must start with # in the first column.
 
       integer iunit, line, commentlines
 

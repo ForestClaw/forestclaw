@@ -103,6 +103,12 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "time-sync", &fclaw_opt->time_sync, 0,
                          "Synchronize coarse/fine grids to include conservation fix [F]");
 
+    sc_options_add_bool (opt, 0, "flux-correction", &fclaw_opt->flux_correction, 1,
+                        "[user] Include flux correction [T]");
+
+    sc_options_add_bool (opt, 0, "fluctuation-correction", 
+                         &fclaw_opt->fluctuation_correction, 1,
+                        "[user] Include fluctuation correction [T]");
 
     /* ------------------------------- Output options --------------------------------- */
 

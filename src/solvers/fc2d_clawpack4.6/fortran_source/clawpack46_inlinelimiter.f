@@ -94,6 +94,15 @@ c           ------------------------------
             wlimitr = r
             go to 170
 c
+   60       continue
+c           ------------------------------
+c           # Generalized minmod
+c           ------------------------------
+            th = 1.3
+            wlimitr = dmax1(0.d0, dmin1(th*r,(1+r)/2.d0,th));
+            go to 170
+c
+
   170       continue
 c
 c           # apply limiter to waves:

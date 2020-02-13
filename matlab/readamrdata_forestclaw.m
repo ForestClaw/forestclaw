@@ -35,7 +35,7 @@ end
 fid = fopen(fname);
 disp(['Reading data from ',fname]);
 
-for ng = 1:ngrids,
+for ng = 1:ngrids
     
     % read parameters for this grid:
     
@@ -66,10 +66,10 @@ for ng = 1:ngrids,
         amrdata.data = fscanf(fid,'%g',[meqn,amrdata.mx*amrdata.my]);
     else
         amrdata.data = fscanf(fid,'%g',[meqn,amrdata.mx*amrdata.my*amrdata.mz]);
-    end;
+    end
     
     amr(ng) = amrdata;
     
-end;
+end
 
 fclose(fid);

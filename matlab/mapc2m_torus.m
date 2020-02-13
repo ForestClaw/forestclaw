@@ -4,15 +4,13 @@ if (nargin < 4)
     beta = 0;
 end
 
-r = alpha*(1 + beta*sin(2*pi*xc));
-R = 1 + r.*cos(2*pi*yc);
+pi2 = 2*pi;
 
-% at yc = 0.5,  R = 1-r(x);
-% X = (1-r(x))*cos(2*pi*x);
-% Y = (1-r(x))*sin(2*pi*x);
+r = alpha*(1 + beta*sin(pi2*xc));
+R = 1 + r.*cos(pi2*yc);
 
-xp = R.*cos(2*pi*xc);
-yp = R.*sin(2*pi*xc);
-zp = r.*sin(2*pi*yc);
+xp = R.*cos(pi2*xc);
+yp = R.*sin(pi2*xc);
+zp = r.*sin(pi2*yc);
 
 end

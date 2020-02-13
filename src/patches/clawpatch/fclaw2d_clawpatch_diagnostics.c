@@ -122,12 +122,13 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
 
     if (gparms->compute_error && clawpatch_vt->fort_compute_patch_error != NULL)
     {
-        double *error;
+        double *error, *soln;
         t = s->glob->curr_time;
         error = fclaw2d_clawpatch_get_error(s->glob,this_patch);
+        soln = fclaw2d_clawpatch_get_exactsoln(s->glob,this_patch);
 
         clawpatch_vt->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
-                                              &xlower,&ylower, &t, q, error);
+                                              &xlower,&ylower, &t, q, error, soln);
 
         /* Accumulate sums and maximums needed to compute error norms */
         clawpatch_vt->fort_compute_error_norm(&this_block_idx, &mx, &my, &mbc, &meqn, 
