@@ -24,18 +24,18 @@ endif
 if FCLAW_ENABLE_MULTIGRID
 
 ## Patches needed for multigrid solver
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/patches/clawpatch/Makefile.am
+#include src/solvers/fc2d_clawpack4.6/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-include src/solvers/fc2d_multigrid/Makefile.am
+#include src/solvers/fc2d_multigrid/Makefile.am
 
 
 ## Multigrid test
-include applications/clawpack/shallow/2d/tsunami/Makefile.am
+#include applications/clawpack/shallow/2d/tsunami/Makefile.am
 
 ## Tsunami example
-include applications/elliptic/mgtest/Makefile.am
+#include applications/elliptic/mgtest/Makefile.am
 
 
 endif
@@ -142,6 +142,7 @@ include src/solvers/fc2d_cudaclaw/Makefile.am
 include applications/clawpack/shallow/2d/tsunami_cuda/Makefile.am
 #include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am
 #include applications/clawpack/euler/2d/shockbubble_cuda/Makefile.am
+include applications/clawpack/shallow/2d/bump_cuda/Makefile.am
 
 
 endif
