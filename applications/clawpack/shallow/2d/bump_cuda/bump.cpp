@@ -165,7 +165,7 @@ main (int argc, char **argv)
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    cuclaw5_opt =         fc2d_cudaclaw_options_register(app,"fclaw_options.ini");
+    cuclaw_opt =          fc2d_cudaclaw_options_register(app,"fclaw_options.ini");
     user_opt =                bump_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
@@ -190,8 +190,8 @@ main (int argc, char **argv)
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
-        fc2d_cudaclaw_options_store     (glob, cuclaw5_opt);
-        bump_options_store         (glob, user_opt);
+        fc2d_cudaclaw_options_store     (glob, cuclaw_opt);
+        bump_options_store              (glob, user_opt);
 
         run_program(glob);
         
