@@ -18,7 +18,7 @@ SUBROUTINE clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my, &
     double precision :: a,b,h0
     common /common_initheight/ a,b,h0
 
-    DOUBLE PRECISION xc,yc,hl, hr, ur
+    DOUBLE PRECISION xc,yc,hl, hr, ur, ybar
     INTEGER i,j
 
 !!      
@@ -26,12 +26,15 @@ SUBROUTINE clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my, &
     hr = h0
     ur = 0.d0
 
+    ybar = ylower + my*dy/2.d0
+
+
     do i = 1-mbc,mx+mbc
         xc = xlower + (i-0.5)*dx  
         do j = 1-mbc,my+mbc
-            yc = ylower + (i-0.5)*dy
+            yc = ylower + (j-0.5)*dy
             if (abs(xc) .lt. b) then
-                q(i,j,1) = hl
+                q(i,j,1) = h0 + a*exp(-20*(yc-ybar)**2)
             else
                 q(i,j,1) = hr
             endif

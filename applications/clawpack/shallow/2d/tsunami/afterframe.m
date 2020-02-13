@@ -4,6 +4,17 @@ b = 12.2;
 
 L = 4000;
 
+%%{
+xlim([0,100])
+
+drawcontourlines(10);
+
+view(2)
+
+axis([0,64,min(yedge),max(yedge)])
+%%}
+
+%{
 hvec = zeros(1,2);
 hvec(1) = getlegendinfo();  % Get info from basic plot
 
@@ -53,6 +64,8 @@ elseif mq == 2
     axis([x1,x2,-3.5,1]);
 end
 
+axis([x1,x2, -0.02, 1.0]);
+
 fprintf('qmin = %24.16e\n',qmin);
 fprintf('qmax = %24.16e\n',qmax);
 
@@ -62,6 +75,7 @@ set(gca,'fontsize',15);
 tstr = sprintf('t = %12.4f',t);
 title(tstr);
 set(gca,'box','on');
+%}
 
 
 % level = round(log(mx)/log(2));
