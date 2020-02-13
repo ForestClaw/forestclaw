@@ -9,6 +9,8 @@ SUBROUTINE clawpack46_setaux(maxmx,maxmy,mbc,mx,my, &
     INTEGER i, j, ibc, jbc
     DOUBLE PRECISION xc, bathy_compete, b, slope, d2xzb
 
+    write(6,*) 'Calling setaux ...'
+
     DO i = 1-mbc,mx+mbc
         DO j = 1-mbc,my+mbc
             xc = xlower + (i-0.5)*dx     

@@ -1,7 +1,7 @@
 !! =====================================================
 
-SUBROUTINE clawpack46_rpt2(ixy,imp,maxm,meqn,mwaves,mbc,mx, & 
-                   ql,qr,aux1,aux2,aux3,asdq,bmasdq,bpasdq)
+SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx, & 
+                   ql,qr,aux1,aux2,aux3,imp,asdq,bmasdq,bpasdq)
     
     IMPLICIT NONE
 !!

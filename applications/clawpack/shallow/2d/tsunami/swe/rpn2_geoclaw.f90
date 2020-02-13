@@ -1,7 +1,7 @@
 !!======================================================================
 
 SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, & 
-           ql, qr,auxl,auxr,fwave,s,amdq,apdq)
+           ql, qr,auxl,auxr,fwave,s,amdq,apdq,maux)
 
 !!======================================================================
 !!
@@ -48,13 +48,13 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
     INTEGER maxm,meqn,maux,mwaves,mbc,mx, ixy
 
     DOUBLE PRECISION  fwave(1-mbc:maxm+mbc,meqn, mwaves)
-    DOUBLE PRECISION  s(1-mbc:maxm+mbc,mwaves)
-    DOUBLE PRECISION   ql(1-mbc:maxm+mbc,meqn)
-    DOUBLE PRECISION   qr(1-mbc:maxm+mbc,meqn)
-    DOUBLE PRECISION  apdq(1-mbc:maxm+mbc,meqn)
-    DOUBLE PRECISION  amdq(1-mbc:maxm+mbc,meqn)
-    DOUBLE PRECISION  auxl(1-mbc:maxm+mbc,maux)
-    DOUBLE PRECISION  auxr(1-mbc:maxm+mbc,maux)
+    DOUBLE PRECISION      s(1-mbc:maxm+mbc,mwaves)
+    DOUBLE PRECISION     ql(1-mbc:maxm+mbc,meqn)
+    DOUBLE PRECISION     qr(1-mbc:maxm+mbc,meqn)
+    DOUBLE PRECISION   apdq(1-mbc:maxm+mbc,meqn)
+    DOUBLE PRECISION   amdq(1-mbc:maxm+mbc,meqn)
+    DOUBLE PRECISION   auxl(1-mbc:maxm+mbc,maux)
+    DOUBLE PRECISION   auxr(1-mbc:maxm+mbc,maux)
 
     DOUBLE PRECISION :: grav, dry_tolerance, sea_level
     COMMON /common_swe/ grav, dry_tolerance, sea_level
@@ -80,7 +80,13 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
     integer ii_com, jj_com
     common /common_ii/ ii_com, jj_com
 
-    use_simple = .false.
+    integer icom, jcom
+    double precision dtcom, dxcom, dycom, tcom
+    common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
+
+    integer i1, i2
+
+    use_simple = .true.
 
 !!  no pressure forcing
     pL = 0
@@ -90,9 +96,22 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 
     rho = -9999999.d0 !! To make sure this doesn't get used. 
 
+!!  !set normal direction
+    if (ixy .eq. 1) then
+        mu=2
+        mv=3
+    else
+        mu=3
+        mv=2
+    endif
+
     !loop through Riemann problems at each grid cell
     DO i = 2-mbc,mx+mbc
         ii_com = i
+
+        if (jcom .eq. 1) then
+!!            write(6,100) i, ql(i,1), ql(i,2), ql(i,3)
+        endif
 
         !! -----------------------Initializing-----------------------------------
         !! inform of a bad riemann problem from the start
@@ -109,16 +128,6 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
             fwave(i,2,mw) = 0.d0
             fwave(i,3,mw) = 0
         END DO
-
-!!        !set normal direction
-         if (ixy .eq. 1) then
-            mu=2
-            mv=3
-         else
-            mu=3
-            mv=2
-         endif
-
 
         !zero (small) negative values if they exist
         IF (qr(i-1,1) .LT. 0.d0) THEN
@@ -141,10 +150,8 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
         !! Riemann problem variables
         hL  = qr(i-1,1)
         hR  = ql(i,1)
-
         huL = qr(i-1,mu)
         huR = ql(i,mu)
-
         bL  = auxr(i-1,1)
         bR  = auxl(i,1)
 
@@ -241,12 +248,11 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 
         !!solve Riemann problem.
 
-        maxiter = 1
-
         if (use_simple) then                 
             CALL  simple_riemann(hR,uR,vr, hL,uL,vl, uhat,chat,bL, bR, &
                                  phiR,phiL,sw,fw)
         else
+            maxiter = 1
             jj_com = 1
             CALL riemann_aug_JCP(maxiter,3,3,hL,hR,huL, huR, & 
                                  hvL,hvR,bL,bR,uL,uR,vL,vR, phiL, phiR, &
@@ -267,6 +273,7 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
             fwave(i,mu,mw) = fw(2,mw)
             fwave(i,mv,mw) = fw(3,mw)
         ENDDO
+
 
 30  CONTINUE
     ENDDO
@@ -289,6 +296,17 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
             ENDIF
         ENDDO
     ENDDO
+
+    if (jcom .eq. 1) then
+        i1 = 10
+        i2 = 20
+        do i = i1, i2
+!!        write(6,100) i, s(i,1), s(i,2), s(i,3)
+!!            write(6,100) i, fwave(i,2,1), fwave(i,2,2), fwave(i,2,3)
+        end do
+    endif
+
+100 format(I5,4F24.16)     
 
     RETURN
 END SUBROUTINE clawpack46_rpn2

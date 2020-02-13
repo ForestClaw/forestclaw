@@ -79,7 +79,7 @@ SUBROUTINE rp1(maxm,meqn,mwaves,maux,mbc,mx,ql,&
   integer ii_com, jj_com
   common /common_ii/ ii_com, jj_com
 
-  use_simple = .false.
+  use_simple = .true.
 
   pL = 0
   pR = 0
@@ -95,6 +95,8 @@ SUBROUTINE rp1(maxm,meqn,mwaves,maux,mbc,mx,ql,&
   !loop through Riemann problems at each grid cell
   DO i = 2-mbc,mx+mbc
       ii_com = i
+
+!!      write(6,100) i, ql(1,i), ql(2,i), ql(3,i)
 
       !! -----------------------Initializing-----------------------------------
       !! inform of a bad riemann problem from the start
@@ -129,12 +131,12 @@ SUBROUTINE rp1(maxm,meqn,mwaves,maux,mbc,mx,ql,&
      ENDIF
 
      !! Riemann problem variables
-     hL = qr(1,i-1)
-     hR = ql(1,i)
+     hL  = qr(1,i-1)
+     hR  = ql(1,i)
      huL = qr(2,i-1)
      huR = ql(2,i)
-     bL = auxr(1,i-1)
-     bR = auxl(1,i)
+     bL  = auxr(1,i-1)
+     bR  = auxl(1,i)
 
      hvR = 0
      hvL = 0
@@ -247,6 +249,9 @@ SUBROUTINE rp1(maxm,meqn,mwaves,maux,mbc,mx,ql,&
         fwave(3,mw,i) = fw(3,mw)
      ENDDO
 
+!!     write(6,100) i, fw(3,1), fw(3,2), fw(3,3)
+
+
 30   CONTINUE
   ENDDO
 
@@ -268,6 +273,15 @@ SUBROUTINE rp1(maxm,meqn,mwaves,maux,mbc,mx,ql,&
         ENDIF
      ENDDO
   ENDDO
+
+  do i = 2-mbc,mx+mbc
+!!      write(6,100) i, amdq(3,i), apdq(3,i)
+!!    write(6,100) i, fwave(3,1,i), fwave(3,2,i), fwave(3,3,i)
+!!      write(6,100) fwave(1,3,i), fwave(2,3,i), fwave(3,3,i)
+!!        write(6,100) i, s(1,i), s(2,i), s(3,i)
+  end do
+
+100 format(I5,4F24.16)     
 
   RETURN
 END SUBROUTINE rp1

@@ -39,6 +39,7 @@ def setrun(claw_pkg='Classic'):
 
     # Physical parameters
     L = 4000.    # L = 4000
+    # L = 32
     ax = 0
     bx = L
 
@@ -53,8 +54,8 @@ def setrun(claw_pkg='Classic'):
         tfinal = 2000                  # If outstyle = 1
         tsteps = [ 35.0, 90.0, 700.0, 2000.0]   # If outstyle = 2
     else:
-        nout = 20
-        nsteps = 1    # If outstyle = 3
+        nout = 2000
+        nsteps = 50    # If outstyle = 3
 
     # dt_initial = 0.1047505286036417
     dt_initial = 0.05

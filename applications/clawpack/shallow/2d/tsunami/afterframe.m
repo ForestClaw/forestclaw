@@ -18,9 +18,9 @@ if (plot_swe)
     end
     hold on;
     if (UserVariable == 1)
-        [x_swe,~,h_swe] = plotframe1ez(amrdata_swe,mq,'b-',UserVariableFile);
+        [q_swe,x_swe,h_swe] = plotframe1ez(amrdata_swe,mq,'b*',UserVariableFile);
     else
-        [x_swe,~,h_swe] = plotframe1ez(amrdata_swe,mq,'b-');
+        [q_swe,x_swe,h_swe] = plotframe1ez(amrdata_swe,mq,'b*');
     end
     hvec(2) = h_swe;
 end
@@ -29,9 +29,12 @@ end
 if t <= 50
     w = 50;
     xticks = -w:10:w;
-else
+elseif (t < 75)
     w = 100;
     xticks = -w:20:w;
+else
+    w = 200;
+    xticks = -10:50:w;
 end
 
 
@@ -41,11 +44,13 @@ mask = hvec ~= 0;
 c = sqrt(g/h0);
 refframe = c*t;
 
+x1 = xticks(1);
+x2 = xticks(end);
 if (mq == 1)
-    % axis([-w,w, -0.02, 0.1]);
-    axis([-w,w, -0.02, 0.15]);
+    % axis([-w,w, -0.02, 0.1]);    
+    axis([x1,x2, -0.02, 0.15]);
 elseif mq == 2
-    axis([-w,w,-3.5,1]);
+    axis([x1,x2,-3.5,1]);
 end
 
 fprintf('qmin = %24.16e\n',qmin);
