@@ -45,7 +45,7 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
     IMPLICIT NONE
 
     !input
-    INTEGER maxm,meqn,maux,mwaves,mbc,mx, ixy
+    INTEGER maxm,meqn,mwaves,mbc,mx, ixy
 
     DOUBLE PRECISION  fwave(1-mbc:maxm+mbc,meqn, mwaves)
     DOUBLE PRECISION      s(1-mbc:maxm+mbc,mwaves)
@@ -53,8 +53,8 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
     DOUBLE PRECISION     qr(1-mbc:maxm+mbc,meqn)
     DOUBLE PRECISION   apdq(1-mbc:maxm+mbc,meqn)
     DOUBLE PRECISION   amdq(1-mbc:maxm+mbc,meqn)
-    DOUBLE PRECISION   auxl(1-mbc:maxm+mbc,maux)
-    DOUBLE PRECISION   auxr(1-mbc:maxm+mbc,maux)
+    DOUBLE PRECISION   auxl(1-mbc:maxm+mbc,*)
+    DOUBLE PRECISION   auxr(1-mbc:maxm+mbc,*)
 
     DOUBLE PRECISION :: grav, dry_tolerance, sea_level
     COMMON /common_swe/ grav, dry_tolerance, sea_level
@@ -70,6 +70,10 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 
     DOUBLE PRECISION  hvR, hvL, vR, vL
     double precision z
+
+    integer icom, jcom
+    double precision dtcom, dxcom, dycom, tcom
+    common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
     if (ixy .eq. 1) then
         mu=2
@@ -142,8 +146,8 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 !!            ENDIF
             !! if s == 0, returns 1
             z = sign(1.d0,s(i,mw))
-            amdq(i,1:3) = amdq(i,1:3) + (1-z)/2*fwave(i,1:3,mw)
-            apdq(i,1:3) = apdq(i,1:3) + (z+1)/2*fwave(i,1:3,mw)
+            amdq(i,1:3) = amdq(i,1:3) + (1-z)/2.0*fwave(i,1:3,mw)
+            apdq(i,1:3) = apdq(i,1:3) + (z+1)/2.0*fwave(i,1:3,mw)
         ENDDO
     ENDDO
 
@@ -158,7 +162,7 @@ SUBROUTINE simple_riemann(hr,ur,vr, hl,ul,vl, uhat,chat,bl, br, &
     DOUBLE PRECISION hr,ur,vr, hl,ul,vl, uhat, chat, phir, &
                phil,s(3), fwave(3,3), bl, bR
 
-    double precision fluxdiff(3),R(3,3), beta(3), hbar
+    double precision fluxdiff(3),beta(3), hbar
 
     DOUBLE PRECISION :: grav, dry_tolerance, sea_level
     COMMON /common_swe/ grav, dry_tolerance, sea_level
