@@ -11,7 +11,7 @@ applications_clawpack_shallow_2d_tsunami_cuda_tsunami_SOURCES = \
 	applications/clawpack/shallow/2d/tsunami_cuda/user_4.6/tag4coarsening.f90 \
 	applications/clawpack/shallow/2d/tsunami_cuda/user_4.6/bathy.f90 \
 	applications/clawpack/shallow/2d/tsunami_cuda/user_4.6/setaux.f90 \
-	applications/clawpack/shallow/2d/tsunami/user_cuda/rpn2_tsunami.cu \
+	applications/clawpack/shallow/2d/tsunami_cuda/user_cuda/rpn2_tsunami.cu \
 	applications/clawpack/shallow/2d/rp/rpn2_tsunami.f90 \
 	applications/clawpack/shallow/2d/rp/rpt2_tsunami.f90 \
 	applications/clawpack/shallow/2d/rp/geoclaw_riemann_utils.f90
