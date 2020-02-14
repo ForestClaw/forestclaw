@@ -142,8 +142,6 @@ void geoclaw_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2)
 }
 
 
-!! =====================================================
-
 __device__ void rpt2_geoclaw(int idir, int meqn, int mwaves, int maux,
                              double ql[], double qr[], 
                              double aux1[], double aux2[], double aux3[],
