@@ -165,9 +165,11 @@ __device__ void rpt2_geoclaw(int idir, int meqn, int mwaves, int maux,
     double ur = hur/hr;
     double vr = hvr/hr;
 
+#if 0
     double eta = hr  + aux2[0];
     double topo1 = aux1[0];
     double topo3 = aux3[0];
+#endif    
 
     /* Construct Roe variables */
     double hrs = sqrt(hr);
@@ -203,17 +205,17 @@ __device__ void rpt2_geoclaw(int idir, int meqn, int mwaves, int maux,
     beta[2] = (delf3/(s3-s1))-(s1*delf1/(s3-s1));
 
     double wave[9];
-    waveb[0]  = 1;
-    waveb[mu] = s2;
-    waveb[mv] = s1;
+    wave[0]  = 1;
+    wave[mu] = s2;
+    wave[mv] = s1;
 
-    waveb[meqn + 0]  = 0;
-    waveb[meqn + mu] = 1;
-    waveb[meqn + mv] = 0;
+    wave[meqn + 0]  = 0;
+    wave[meqn + mu] = 1;
+    wave[meqn + mv] = 0;
 
-    waveb[2*meqn + 0]  = 1;
-    waveb[2*meqn + mu] = s2;
-    waveb[2*meqn + mv] = s3;
+    wave[2*meqn + 0]  = 1;
+    wave[2*meqn + mu] = s2;
+    wave[2*meqn + mv] = s3;
 
 
     double szm[3], szp[3];
@@ -224,7 +226,7 @@ __device__ void rpt2_geoclaw(int idir, int meqn, int mwaves, int maux,
         szp[mw] = (1+z)/2*beta[mw];
     }
 
-    for(mq = 0; mq < meqn; mq++)
+    for(int mq = 0; mq < meqn; mq++)
     {
         bmasdq[mq]  = szm[0]*waveb[mq];
         bmasdq[mq] += szm[1]*waveb[meqn + mq];
@@ -296,11 +298,11 @@ __device__ void rpt2_geoclaw(int idir, int meqn, int mwaves, int maux,
         bpasdq[mq] += max(sb[1],0.)*waveb[meqn + mq];
         bpasdq[mq] += max(sb[2],0.)*waveb[2*meqn + mq];
     }
-}
+
 #endif
 
 
-__device__ cudaclaw_cuda_rpt2_t geoclaw_rpt2 = geoclaw_rpt2shallow;
+__device__ cudaclaw_cuda_rpt2_t geoclaw_rpt2 = rpt2_geoclaw;
 
 void geoclaw_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2)
 {
