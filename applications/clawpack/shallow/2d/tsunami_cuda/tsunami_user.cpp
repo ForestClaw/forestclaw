@@ -35,7 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void tsunami_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt();
-    vt->problem_setup = &tsunami_problem_setup;  /* Version-independent */
+    vt->problem_setup = &geoclaw_problem_setup;  /* Version-independent */
+
+    user_options_t* user = tsunami_get_options(glob);
 
     if (user->cuda)
     {

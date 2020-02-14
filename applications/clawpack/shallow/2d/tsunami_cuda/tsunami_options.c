@@ -34,7 +34,7 @@ tsunami_register (user_options_t* user, sc_options_t * opt)
 {
     /* [user] User options */
 
-    sc_options_add_double (opt, 0, "g",    &user->g, 1.0,  "[user] g [1.0]");
+    sc_options_add_double (opt, 0, "gravity",&user->gravity, 1.0,  "[user] gravity [1.0]");
     sc_options_add_double (opt, 0, "a",    &user->a, 0.1,  "[user] a [0.1]");
     sc_options_add_double (opt, 0, "b",    &user->b,  12,  "[user] b [12]");
     sc_options_add_double (opt, 0, "h0",    &user->h0,  12,  "[user] h0 [1]");

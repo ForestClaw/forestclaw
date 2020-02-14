@@ -39,7 +39,7 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    double g;
+    double gravity;
     double a;
     double b;
     double h0;
@@ -58,6 +58,15 @@ typedef struct user_options
 #define TSUNAMI_SETPROB FCLAW_F77_FUNC(tsunami_setprob, TSUNAMI_SETPROB)
 void TSUNAMI_SETPROB();
 
+
+/* --------------------------------------- Cuda ----------------------------------------*/
+
+void geoclaw_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+void geoclaw_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
+
+void geoclaw_setprob_cuda(double grav, double dry_tolerance, double sea_level);
+
+/* --------------------------------------- Cuda ----------------------------------------*/
 
 void tsunami_problem_setup(fclaw2d_global_t *glob);
 void tsunami_link_solvers(fclaw2d_global_t *glob);

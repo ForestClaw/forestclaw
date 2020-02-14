@@ -74,6 +74,7 @@ void run_program(fclaw2d_global_t* glob)
 
     /* Set domain dimensions so that we have square grid cells */
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    user_options_t* user_opt = tsunami_get_options(glob);
 
     double ax = fclaw_opt->ax;
     double bx = fclaw_opt->bx;
@@ -100,14 +101,7 @@ void run_program(fclaw2d_global_t* glob)
     }
     else
     {
-        if (user_opt->claw_version == 4)
-        {
-            fc2d_clawpack46_solver_initialize();
-        }
-        else if (user_opt->claw_version == 5)
-        {
-            fc2d_clawpack5_solver_initialize();
-        }
+        fc2d_clawpack46_solver_initialize();
     }
 
 
