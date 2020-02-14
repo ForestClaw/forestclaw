@@ -228,13 +228,13 @@ __device__ void rpt2_geoclaw(int idir, int meqn, int mwaves, int maux,
 
     for(int mq = 0; mq < meqn; mq++)
     {
-        bmasdq[mq]  = szm[0]*waveb[mq];
-        bmasdq[mq] += szm[1]*waveb[meqn + mq];
-        bmasdq[mq] += szm[2]*waveb[2*meqn + mq];
+        bmasdq[mq]  = szm[0]*wave[mq];
+        bmasdq[mq] += szm[1]*wave[meqn + mq];
+        bmasdq[mq] += szm[2]*wave[2*meqn + mq];
 
-        bpasdq[mq]  = szp[0]*waveb[mq];
-        bpasdq[mq] += szp[1]*waveb[meqn + mq];
-        bpasdq[mq] += szp[2]*waveb[2*meqn + mq];
+        bpasdq[mq]  = szp[0]*wave[mq];
+        bpasdq[mq] += szp[1]*wave[meqn + mq];
+        bpasdq[mq] += szp[2]*wave[2*meqn + mq];
     }
 }
 
