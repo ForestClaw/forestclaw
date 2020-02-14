@@ -71,7 +71,7 @@ void geoclaw_setprob_cuda(double grav, double dry_tolerance, double sea_level);
 
 /* --------------------------------------- Cuda ----------------------------------------*/
 
-void tsunami_problem_setup(fclaw2d_global_t *glob);
+void geoclaw_problem_setup(fclaw2d_global_t *glob);
 void tsunami_link_solvers(fclaw2d_global_t *glob);
 
 user_options_t* tsunami_options_register (fclaw_app_t * app,
