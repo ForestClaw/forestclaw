@@ -49,7 +49,7 @@ void cudaclaw_set_method_parameters(int *order_in, int *mthlim_in, int mwaves,
                                     int use_fwaves_in)
 {
     CHECK(cudaMemcpyToSymbol(order,order_in,2*sizeof(int)));
-    CHECK(cudaMemcpyToSymbol(use_fwaves,use_fwaves_in,sizeof(int)));
+    CHECK(cudaMemcpyToSymbol(use_fwaves,&use_fwaves_in,sizeof(int)));
     CHECK(cudaMemcpyToSymbol(mthlim,mthlim_in,mwaves*sizeof(int)));
 }
 
