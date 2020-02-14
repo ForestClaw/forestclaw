@@ -76,6 +76,9 @@ void run_program(fclaw2d_global_t* glob)
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     user_options_t* user_opt = tsunami_get_options(glob);
 
+    /* Initialize virtual table for ForestClaw */
+    fclaw2d_vtables_initialize(glob);    
+
     double ax = fclaw_opt->ax;
     double bx = fclaw_opt->bx;
     int mi = fclaw_opt->mi;
@@ -104,11 +107,6 @@ void run_program(fclaw2d_global_t* glob)
         fc2d_clawpack46_solver_initialize();
     }
 
-
-    /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
-
-    fc2d_clawpack46_solver_initialize();
 
     tsunami_link_solvers(glob);
 
