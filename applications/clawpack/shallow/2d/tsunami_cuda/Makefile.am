@@ -22,13 +22,28 @@ EXTRA_DIST += \
 	applications/clawpack/shallow/2d/tsunami_cuda/afterframe.m \
 	applications/clawpack/shallow/2d/tsunami_cuda/setplot2.m
 
+TSUNAMI_DIR = applications/clawpack/shallow/2d/tsunami_cuda
+
 applications_clawpack_shallow_2d_tsunami_cuda_tsunami_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
+        $(FCLAW_CUDACLAW_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_shallow_2d_tsunami_cuda_tsunami_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
+        $(FCLAW_CUDACLAW_LDADD) \
         $(FCLAW_LDADD)
+
+## nvcc -dlink has to b called after everything for the executable has been compiled.
+## this generates a single object file with all of the linked  device code.
+$(TSUNAMI_DIR)/user_cuda/devicelink.o : \
+    $(TSUNAMI_DIR)/user_cuda/rpn2_geoclaw.o \
+    src/solvers/fc2d_cudaclaw/libcudaclaw.la 
+		$(NVCC) -dlink  \
+		$(TSUNAMI_DIR)/user_cuda/rpn2_geoclaw.o \
+		src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a \
+		-o $(TSUNAMI_DIR)/user_cuda/devicelink.o 
+
