@@ -27,6 +27,7 @@
 #define TSUNAMI_USER_H
 
 #include <fclaw2d_include_all.h>
+#include <fc2d_cudaclaw.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -48,6 +49,8 @@ typedef struct user_options
     double alpha;
     double dry_tolerance;
     double sea_level;
+
+    int cuda;
 
     int claw_version;
 
