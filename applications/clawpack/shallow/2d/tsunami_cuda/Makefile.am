@@ -40,10 +40,10 @@ applications_clawpack_shallow_2d_tsunami_cuda_tsunami_LDADD = \
 ## nvcc -dlink has to b called after everything for the executable has been compiled.
 ## this generates a single object file with all of the linked  device code.
 $(TSUNAMI_DIR)/user_cuda/devicelink.o : \
-    $(TSUNAMI_DIR)/user_cuda/rpn2_geoclaw.o \
+    $(TSUNAMI_DIR)/user_cuda/rpn2_tsunami.o \
     src/solvers/fc2d_cudaclaw/libcudaclaw.la 
 		$(NVCC) -dlink  \
-		$(TSUNAMI_DIR)/user_cuda/rpn2_geoclaw.o \
+		$(TSUNAMI_DIR)/user_cuda/rpn2_tsunami.o \
 		src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a \
 		-o $(TSUNAMI_DIR)/user_cuda/devicelink.o 
 
