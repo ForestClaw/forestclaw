@@ -36,6 +36,7 @@
 
 __constant__ int order[2];
 __constant__ int mthlim[FC2D_CUDACLAW_MWAVES];
+__constant__ int use_fwaves;
 
 extern "C"
 {
@@ -44,9 +45,11 @@ int cudaclaw_check_parameters(int mwaves)
     return mwaves <= FC2D_CUDACLAW_MWAVES;
 }
 
-void cudaclaw_set_method_parameters(int *order_in, int *mthlim_in, int mwaves)
+void cudaclaw_set_method_parameters(int *order_in, int *mthlim_in, int mwaves, 
+                                    int use_fwaves_in)
 {
     CHECK(cudaMemcpyToSymbol(order,order_in,2*sizeof(int)));
+    CHECK(cudaMemcpyToSymbol(use_fwaves,use_fwaves_in,sizeof(int)));
     CHECK(cudaMemcpyToSymbol(mthlim,mthlim_in,mwaves*sizeof(int)));
 }
 
@@ -60,8 +63,8 @@ static
 __device__
 void cudaclaw_flux2_and_update(const int mx,   const int my, 
                                const int meqn, const int mbc,
-                               const int maux, const int mwaves, const 
-                               int mwork,
+                               const int maux, const int mwaves, 
+                               const int mwork,
                                const double xlower, const double ylower, 
                                const double dx,     const double dy,
                                double* __restrict__ qold,       double* __restrict__ aux, 
@@ -336,7 +339,14 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 for(mq = 0; mq < meqn; mq++)
                 {
                     I_q = I + mq*zs;
-                    cqxx = abs(s[mw])*(1.0 - abs(s[mw])*dtdx)*wave[mq];
+                    if (use_fwaves != 0)
+                    {
+                        cqxx = copysign(1.,s[mw])*(1.0 - fabs(s[mw])*dtdx)*wave[mq];
+                    }
+                    else
+                    {
+                        cqxx = fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wave[mq];
+                    }
 
                     fm[I_q] += 0.5*cqxx;   
                     fp[I_q] += 0.5*cqxx;  
@@ -398,7 +408,14 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 for(mq = 0; mq < meqn; mq++)
                 {
                     I_q = I + mq*zs;
-                    cqyy = abs(s[mw])*(1.0 - abs(s[mw])*dtdy)*wave[mq];
+                    if (use_fwaves != 0)
+                    {
+                        cqyy = copysign(1.,s[mw])*(1.0 - fabs(s[mw])*dtdx)*wave[mq];
+                    }
+                    else
+                    {
+                        cqyy = fabs(s[mw])*(1.0 - fabs(s[mw])*dtdx)*wave[mq];
+                    }
 
                     gm[I_q] += 0.5*cqyy;   
                     gp[I_q] += 0.5*cqyy;  

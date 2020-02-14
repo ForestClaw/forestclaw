@@ -99,7 +99,10 @@ void run_program(fclaw2d_global_t* glob)
         fc2d_cudaclaw_initialize_GPUs(glob);
 
         /* this has to be done after GPUs have been initialized */
-        cudaclaw_set_method_parameters(clawopt->order, clawopt->mthlim, clawopt->mwaves);
+        cudaclaw_set_method_parameters(clawopt->order, 
+                                       clawopt->mthlim, 
+                                       clawopt->mwaves,
+                                       clawtop->use_fwaves);
         fc2d_cudaclaw_solver_initialize();
     }
     else
