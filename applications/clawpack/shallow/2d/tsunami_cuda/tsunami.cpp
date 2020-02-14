@@ -102,7 +102,7 @@ void run_program(fclaw2d_global_t* glob)
         cudaclaw_set_method_parameters(clawopt->order, 
                                        clawopt->mthlim, 
                                        clawopt->mwaves,
-                                       clawtop->use_fwaves);
+                                       clawopt->use_fwaves);
         fc2d_cudaclaw_solver_initialize();
     }
     else
