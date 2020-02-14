@@ -64,14 +64,14 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
 }
 
 
-void tsunami_problem_setup(fclaw2d_global_t* glob)
+void geoclaw_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = tsunami_get_options(glob);
 
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
-        fprintf(f,"%-24.4f %s\n",user->g,"\% grav");
+        fprintf(f,"%-24.4f %s\n",user->gravity,"\% grav");
         fprintf(f,"%-24.4f %s\n",user->a,"\% a");
         fprintf(f,"%-24.4f %s\n",user->b,"\% b");
         fprintf(f,"%-24.4f %s\n",user->h0,"\% h0");
