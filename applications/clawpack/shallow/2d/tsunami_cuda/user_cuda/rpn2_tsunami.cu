@@ -63,14 +63,15 @@ __device__ void rpn2_geoclaw(int idir, int meqn, int mwaves,
 
 
         /* 1 wave speed of left state */
-        double sl = ul - sqrt(grav*hl);    
+        double sl = ul - sqrt(s_grav*hl);    
 
         /* 2 wave speed of right state */
-        double sr = ur + sqrt(grav*hr);    
+        double sr = ur + sqrt(s_grav*hr);    
 
         /* Roe speeds */
-        double uhat = (sqrt(grav*hl)*ul + sqrt(grav*hr)*ur)/(sqrt(grav*hr) + sqrt(grav*hl));
-        double chat = sqrt(grav*(hr + hl))/2;
+        double uhat = (sqrt(s_grav*hl)*ul + 
+                       sqrt(s_grav*hr)*ur)/(sqrt(s_grav*hr) + sqrt(s_grav*hl));
+        double chat = sqrt(s_grav*(hr + hl))/2;
 
         /* Compute wave speeds by comparing speeds above */
         s[0] = min(sl, uhat - chat);
@@ -79,11 +80,11 @@ __device__ void rpn2_geoclaw(int idir, int meqn, int mwaves,
         
         /* Flux differences */
         double fluxdiff[3];
-        double phir = grav*hr*hr/2 + hur*hur/hr;
-        double phil = grav*hl*hl/2 + hul*hul/hl;
+        double phir = s_grav*hr*hr/2 + hur*hur/hr;
+        double phil = s_grav*hl*hl/2 + hul*hul/hl;
 
         fluxdiff[0] = (hr*ur) - (hl*ul);
-        fluxdiff[1] = phir - phil + grav*hbar*(br - bl);
+        fluxdiff[1] = phir - phil + s_grav*hbar*(br - bl);
         fluxdiff[2] = hr*ur*vr - hl*ul*vl;
 
         /* Wave strengths */
@@ -102,7 +103,7 @@ __device__ void rpn2_geoclaw(int idir, int meqn, int mwaves,
         fwave[3+mv] = beta[1];
 
         fwave[6]    = beta[2];
-        fwave[6+mu] = beta[2]*s2[2];
+        fwave[6+mu] = beta[2]*s[2];
         fwave[6+mv] = beta[2]*vr;    
     }
     
@@ -178,11 +179,11 @@ __device__ void rpt2_geoclaw(int idir, int meqn, int mwaves, int maux,
     double uhat = (ur*hrs)/(hrs+hls) + (ul*hls)/(hrs + hls);
     double hhat = (hr + hl)/2;
 
-    double roe1 = vhat - sqrt(grav*hhat);
-    double roe3 = vhat + sqrt(grav*hhat);
+    double roe1 = vhat - sqrt(s_grav*hhat);
+    double roe3 = vhat + sqrt(s_grav*hhat);
 
-    double s1l = vl - sqrt(grav*hl);
-    double s3r = vr + sqrt(grav*hr);
+    double s1l = vl - sqrt(s_grav*hl);
+    double s3r = vr + sqrt(s_grav*hr);
 
     double s1 = min(roe1,s1l);
     double s3 = max(roe3,s3r);
