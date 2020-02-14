@@ -5,7 +5,7 @@
 #SBATCH --ntasks=4
 #SBATCH -N 2                 # number of nodes requested
 #SBATCH --tasks-per-node=2   # Each task gets exactly one GPU
-#SBATCH -t 00:10:00          # run time (hh:mm:ss) - 12.0 hours in this example.
+#SBATCH -t 01:00:00          # run time (hh:mm:ss) - 12.0 hours in this example.
 
 
 # --------------------------------------------------------
@@ -24,12 +24,15 @@
 
 # mpirun bump --user:cuda=T --clawpack46:mthlim="1" --clawpack46:order="2 2" --nout=100
 
-#srun --mpi=pmix_v2 bump \
-#     --user:cuda=T \
-#     --cudaclaw:mthlim="4" \
-#     --cudaclaw:order="2 2" \
-#     --clawpack46:mthlim="0" \
-#     --clawpack46:order="2 2"
+module load openmpi3/3.1.4
+module load cuda/10.1
 
-nvprof -o bump_prof bump --user:cuda=T --cudaclaw:mthlim="4" --cudaclaw:order="2 2" 
+mpirun bump \
+     --user:cuda=T \
+     --cudaclaw:order="1 0" \
+     --cudaclaw:mthlim="4" \
+     --clawpack46:order="1 0" \
+     --clawpack46:mthlim="4"
+
+# nvprof -o bump_prof srun --mpi=pmix_v2 bump --user:cuda=T --cudaclaw:mthlim="4" --cudaclaw:order="2 2" 
 
