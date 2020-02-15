@@ -202,17 +202,21 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             I_q = I + mq*zs;
             qr[mq] = qold[I_q];        /* Right */
-            ql[mq] = qold[I_q - 1];    /* Left  */
-            qd[mq] = qold[I_q - ys];   /* Down  */  
+            //ql[mq] = qold[I_q - 1];    /* Left  */
+            //qd[mq] = qold[I_q - ys];   /* Down  */  
         }
+        ql = qr;
+        qd = qr;
 
         for(m = 0; m < maux; m++)
         {
             I_aux = I + m*zs;
-            auxl[m] = aux[I_aux - 1];
             auxr[m] = aux[I_aux];
-            auxd[m] = aux[I_aux - ys];
+            //auxl[m] = aux[I_aux - 1];
+            //auxd[m] = aux[I_aux - ys];
         }                        
+        auxl = auxr;
+        auxd = auxl;
 
         /* ------------------------ Normal solve in X direction ------------------- */
             
