@@ -12,6 +12,8 @@ drawcontourlines(10);
 view(2)
 
 axis([0,64,min(yedge),max(yedge)])
+caxis([-1,1]*1e-4)
+
 %%}
 
 %{

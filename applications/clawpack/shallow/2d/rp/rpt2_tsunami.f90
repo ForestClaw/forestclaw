@@ -131,18 +131,18 @@ SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
 !!=====Determine some speeds necessary for the Jacobian=================
 
         vhat = (vr*dsqrt(hr))/(dsqrt(hr) + dsqrt(hl)) + & 
-               (vl*dsqrt(hl))/(dsqrt(hr)+dsqrt(hl))
+               (vl*dsqrt(hl))/(dsqrt(hr) + dsqrt(hl))
 
         uhat = (ur*dsqrt(hr))/(dsqrt(hr) + dsqrt(hl)) + & 
-              (ul*dsqrt(hl))/(dsqrt(hr)+dsqrt(hl))
+               (ul*dsqrt(hl))/(dsqrt(hr) + dsqrt(hl))
 
         hhat = (hr + hl)/2.d0
 
-        roe1 = vhat-dsqrt(g*hhat)
-        roe3 = vhat+dsqrt(g*hhat)
+        roe1 = vhat - dsqrt(g*hhat)
+        roe3 = vhat + dsqrt(g*hhat)
 
-        s1l = vl-dsqrt(g*hl)
-        s3r = vr+dsqrt(g*hr)
+        s1l = vl - dsqrt(g*hl)
+        s3r = vr + dsqrt(g*hr)
 
         s1 = dmin1(roe1,s1l)
         s3 = dmax1(roe3,s3r)

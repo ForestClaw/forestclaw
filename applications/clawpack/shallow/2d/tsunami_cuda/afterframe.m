@@ -4,6 +4,19 @@ b = 12.2;
 
 L = 4000;
 
+%%{
+xlim([0,100])
+
+drawcontourlines(10);
+
+view(2)
+
+axis([0,64,min(yedge),max(yedge)])
+
+caxis([-1,1]*1e-4)
+%%}
+
+%{
 hvec = zeros(1,2);
 hvec(1) = getlegendinfo();  % Get info from basic plot
 
@@ -26,16 +39,33 @@ if (plot_swe)
 end
 
 
+c = sqrt(g/h0);
+refframe = c*t;
+
+
+if t <= 50
+    w = 50;
+    xticks = -w:10:w + refframe;
+else
+    w = 50;
+    xticks = (-w:20:w) + refframe;
+end
+
+%{
 if t <= 50
     w = 50;
     xticks = -w:10:w;
 elseif (t < 75)
     w = 100;
     xticks = -w:20:w;
-else
+elseif (t < 200
     w = 200;
     xticks = -10:50:w;
+elseif (t < 400
+    w = 400;
+    xticks = -
 end
+%}
 
 
 % mask = [1,plot_swe, plot_bouss, plot_basilisk] == 1;
@@ -50,7 +80,7 @@ if (mq == 1)
     % axis([-w,w, -0.02, 0.1]);    
     axis([x1,x2, -0.02, 0.15]);
 elseif mq == 2
-    axis([x1,x2,-3.5,1]);
+    axis([x1,x2,-3.5,1.2]);
 end
 
 fprintf('qmin = %24.16e\n',qmin);
@@ -62,6 +92,7 @@ set(gca,'fontsize',15);
 tstr = sprintf('t = %12.4f',t);
 title(tstr);
 set(gca,'box','on');
+%}
 
 
 % level = round(log(mx)/log(2));

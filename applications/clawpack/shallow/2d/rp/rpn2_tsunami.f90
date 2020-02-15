@@ -75,6 +75,9 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
     double precision dtcom, dxcom, dycom, tcom
     common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
+    double precision szm(3), szp(3)
+    integer mq
+
     if (ixy .eq. 1) then
         mu=2
         mv=3
@@ -120,8 +123,8 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
         DO mw = 1,mwaves
             s(i,mw) = sw(mw)
             fwave(i,1,mw) = fw(1,mw)
-            fwave(i,mu,mw) = fw(2,mw)
-            fwave(i,mv,mw) = fw(3,mw)
+            fwave(i,2,mw) = fw(mu,mw)
+            fwave(i,3,mw) = fw(mv,mw)
         ENDDO
 
 
@@ -132,24 +135,43 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 
 
     !!============= compute fluctuations=============================================
-    amdq(:,1:3) = 0.d0
-    apdq(:,1:3) = 0.d0
-    DO i = 2-mbc,mx+mbc
-        DO  mw = 1,3
-!!            IF (s(i,mw) < 0.d0) THEN
-!!                amdq(i,1:3) = amdq(i,1:3) + fwave(i,1:3,mw)
-!!            ELSE IF (s(i,mw) > 0.d0) THEN
-!!                apdq(i,1:3)  = apdq(i,1:3) + fwave(i,1:3,mw)
-!!            ELSE
-!!                amdq(i,1:3) = amdq(i,1:3) + 0.5d0 * fwave(i,1:3,mw)
-!!                apdq(i,1:3) = apdq(i,1:3) + 0.5d0 * fwave(i,1:3,mw)
-!!            ENDIF
-            !! if s == 0, returns 1
+!!    amdq(:,1:3) = 0.d0
+!!    apdq(:,1:3) = 0.d0
+!!    DO i = 2-mbc,mx+mbc
+!!        DO  mw = 1,3
+!!!!            IF (s(i,mw) < 0.d0) THEN
+!!!!                amdq(i,1:3) = amdq(i,1:3) + fwave(i,1:3,mw)
+!!!!            ELSE IF (s(i,mw) > 0.d0) THEN
+!!!!                apdq(i,1:3)  = apdq(i,1:3) + fwave(i,1:3,mw)
+!!!!            ELSE
+!!!!                amdq(i,1:3) = amdq(i,1:3) + 0.5d0 * fwave(i,1:3,mw)
+!!!!                apdq(i,1:3) = apdq(i,1:3) + 0.5d0 * fwave(i,1:3,mw)
+!!!!            ENDIF
+!!            !! if s == 0, returns 1
+!!            z = sign(1.d0,s(i,mw))
+!!            amdq(i,1:3) = amdq(i,1:3) + (1-z)/2.0*fwave(i,1:3,mw)
+!!            apdq(i,1:3) = apdq(i,1:3) + (z+1)/2.0*fwave(i,1:3,mw)
+!!        ENDDO
+!!    ENDDO
+
+    do i = 2-mbc,mx+mbc
+        do mw = 1,mwaves
             z = sign(1.d0,s(i,mw))
-            amdq(i,1:3) = amdq(i,1:3) + (1-z)/2.0*fwave(i,1:3,mw)
-            apdq(i,1:3) = apdq(i,1:3) + (z+1)/2.0*fwave(i,1:3,mw)
-        ENDDO
-    ENDDO
+            szm(mw) = (1-z)/2
+            szp(mw) = (1+z)/2
+        end do
+
+        do mq = 1,meqn
+            amdq(i,mq) =              szm(1)*fwave(i,mq,1)
+            amdq(i,mq) = amdq(i,mq) + szm(2)*fwave(i,mq,2)
+            amdq(i,mq) = amdq(i,mq) + szm(3)*fwave(i,mq,3)
+
+            apdq(i,mq) =              szp(1)*fwave(i,mq,1)
+            apdq(i,mq) = apdq(i,mq) + szp(2)*fwave(i,mq,2)
+            apdq(i,mq) = apdq(i,mq) + szp(3)*fwave(i,mq,3)
+        enddo 
+    end do
+
 
     RETURN
 END SUBROUTINE clawpack46_rpn2
@@ -183,9 +205,9 @@ SUBROUTINE simple_riemann(hr,ur,vr, hl,ul,vl, uhat,chat,bl, br, &
     s(2) = 0.5d0 * (s(1) + s(3))
         
     !! Wave strengths
-    beta(1) = (s(3) * fluxdiff(1) - fluxdiff(2)) / (s(3) - s(1))
-    beta(3) = (fluxdiff(2) - s(1) * fluxdiff(1)) / (s(3) - s(1))
-    beta(2) = fluxdiff(3) - beta(1)*vl - beta(3)*vr
+    beta(1) = -(fluxdiff(2) - s(3) * fluxdiff(1)) / (s(3) - s(1))
+    beta(3) =  (fluxdiff(2) - s(1) * fluxdiff(1)) / (s(3) - s(1))
+    beta(2) =   fluxdiff(3) - beta(1)*vl - beta(3)*vr
 
     !! # Flux waves = beta*R
     fwave(1,1) = beta(1)
