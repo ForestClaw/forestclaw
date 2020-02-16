@@ -86,6 +86,12 @@ c
              if (auxtype(ma).eq."xleft") then
 c                # Assuming velocity at left-face, this fix
 c                # preserves conservation in incompressible flow:
+c                # -----------------------------------------------
+c                # This branch only gets referenced if 'use_fix' = false.
+c                # If 'use_fix = true', then all data is assumed
+c                # to be cell-centered, since each cell stores information
+c                # about all four faces.
+c                # -----------------------------------------------
                  auxl(iaddaux(ma,j-nghost+1)) = aux(ma,nghost+1,j)
                else
 c                # Normal case -- we set the aux arrays 
@@ -195,8 +201,9 @@ c          # skip over sides 2 and 4 in this case
              if (auxtype(ma).eq."yleft") then
 c                # Assuming velocity at bottom-face, this fix
 c                # preserves conservation in incompressible flow:
-c                # This assumes that the coarse grid aux variable is the 
-c                # same as the fine grid variable, i.e. edges match.
+c                # -----------------------------------------------
+c                # See note for "Side 1"
+c                # -----------------------------------------------
                  ifine = (ic-1)*lratiox + nghost + l
                  auxl(iaddaux(ma,lind+1)) = aux(ma,ifine,mjtot-nghost+1)
                else
@@ -280,8 +287,11 @@ c
          if (maux.gt.0) then
             do 324 ma=1,maux
              if (auxtype(ma).eq."xleft") then
-c                # Assuming velocity at left-face, this fix
+c                # Assuming velocity at bottom-face, this fix
 c                # preserves conservation in incompressible flow:
+c                # -----------------------------------------------
+c                # See note for "Side 1"
+c                # -----------------------------------------------
                  jfine = (jc-1)*lratioy + nghost + l
                  auxl(iaddaux(ma,lind+1)) = aux(ma,mitot-nghost+1,jfine)
                else
@@ -348,6 +358,9 @@ c
              if (auxtype(ma).eq."yleft") then
 c                # Assuming velocity at bottom-face, this fix
 c                # preserves conservation in incompressible flow:
+c                # -----------------------------------------------
+c                # See note for "Side 1"
+c                # -----------------------------------------------
                  auxl(iaddaux(ma,i-nghost+1)) = aux(ma,i,nghost+1)
                else
                  auxl(iaddaux(ma,i-nghost+1)) = aux(ma,i,nghost)
