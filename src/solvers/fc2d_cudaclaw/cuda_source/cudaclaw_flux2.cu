@@ -504,7 +504,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         double *const qr     = start;          /* meqn   */
         double *const ql     = qr + meqn;      /* meqn   */
-        double *const amdq   = ql + meqn;    /* meqn   */
+        double *const amdq   = ql + meqn;      /* meqn   */
         double *const aux1   = amdq + meqn;    /* 2*maux */
         double *const aux2   = aux1 + 2*maux;  /* 2*maux */
         double *const aux3   = aux2 + 2*maux;  /* 2*maux */
