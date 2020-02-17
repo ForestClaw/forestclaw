@@ -259,7 +259,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             double *const s      = auxd   + maux;         /* mwaves      */
             double *const wave   = s      + mwaves;       /* meqn*mwaves */
             double *const bmdq   = wave   + meqn*mwaves;  /* meqn        */
-            double *const bpdq   = amdq   + meqn;         /* meqn        */
+            double *const bpdq   = bmdq   + meqn;         /* meqn        */
 
             for(int mq = 0; mq < meqn; mq++)
             {
@@ -498,7 +498,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     double *const qr     = start;          /* meqn   */
     double *const ql     = qr + meqn;      /* meqn   */
-    double *const amdq   = ql + meqn;      /* meqn   */
+    double *const qd     = ql + meqn;      /* meqn   */
+    double *const amdq   = qd + meqn;      /* meqn   */
     double *const apdq   = amdq + meqn;    /* meqn   */
     double *const bmdq   = apdq + meqn;    /* meqn   */
     double *const bpdq   = bmdq + meqn;    /* meqn   */
