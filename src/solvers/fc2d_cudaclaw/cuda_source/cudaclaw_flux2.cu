@@ -213,7 +213,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 int I_aux = I + m*zs;
                 auxr[m] = aux[I_aux];
                 auxl[m] = aux[I_aux - 1];
-                auxd[m] = aux[I_aux - ys];
+                //auxd[m] = aux[I_aux - ys];
             }               
 
             
@@ -252,14 +252,28 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         {
             /* ------------------------ Normal solve in Y direction ------------------- */
-            double *const ql     = start;                 /* meqn        */
-            double *const qd     = ql     + meqn;         /* meqn        */
-            double *const auxl   = qd     + meqn;         /* maux        */
-            double *const auxd   = auxl   + maux;         /* maux        */
-            double *const s      = auxr   + maux;         /* mwaves      */
+            double *const qr     = start;                 /* meqn        */
+            double *const qd     = qr     + meqn;         /* meqn        */
+            double *const auxr   = qd     + meqn;         /* maux        */
+            double *const auxd   = auxr   + maux;         /* maux        */
+            double *const s      = auxd   + maux;         /* mwaves      */
             double *const wave   = s      + mwaves;       /* meqn*mwaves */
             double *const bmdq   = wave   + meqn*mwaves;  /* meqn        */
             double *const bpdq   = amdq   + meqn;         /* meqn        */
+
+            for(int mq = 0; mq < meqn; mq++)
+            {
+                int I_q = I + mq*zs;
+                qr[mq] = qold[I_q];        /* Right */
+                qd[mq] = qold[I_q - ys];   /* Down  */  
+            }
+
+            for(int m = 0; m < maux; m++)
+            {
+                int I_aux = I + m*zs;
+                auxr[m] = aux[I_aux];
+                auxd[m] = aux[I_aux - ys];
+            }               
 
             rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, bmdq, bpdq);
 
