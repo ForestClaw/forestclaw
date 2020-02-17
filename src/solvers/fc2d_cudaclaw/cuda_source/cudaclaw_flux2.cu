@@ -87,6 +87,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     double* start  = shared_mem + mwork*threadIdx.x;
 
+#if 0
     double *const ql     = start;                 /* meqn        */
     double *const qr     = ql     + meqn;         /* meqn        */
     double *const qd     = qr     + meqn;         /* meqn        */
@@ -104,6 +105,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     double *const aux3   = aux2   + 2*maux;       /* 2*maux      */
     double *const bmasdq = aux3   + 2*maux;       /* meqn        */
     double *const bpasdq = bmasdq + meqn;         /* meqn        */
+#endif    
 
 
     /* --------------------------------- Start code ----------------------------------- */
@@ -129,6 +131,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     int ifaces_y = my + 2*mbc-1;
     int num_ifaces = ifaces_x*ifaces_y;
 
+#if 0
     if (b4step2 != NULL)
     {
         for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
@@ -170,6 +173,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }      
         __syncthreads(); /* Needed to be sure all aux variables are available below */ 
     } 
+#endif    
 
     /* -------------------------- Compute fluctuations -------------------------------- */
 
@@ -186,83 +190,105 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        for(int mq = 0; mq < meqn; mq++)
         {
-            int I_q = I + mq*zs;
-            qr[mq] = qold[I_q];        /* Right */
-            ql[mq] = qold[I_q - 1];    /* Left  */
-            qd[mq] = qold[I_q - ys];   /* Down  */  
-        }
-
-        for(int m = 0; m < maux; m++)
-        {
-            int I_aux = I + m*zs;
-            auxr[m] = aux[I_aux];
-            auxl[m] = aux[I_aux - 1];
-            auxd[m] = aux[I_aux - ys];
-        }                        
-
-        /* ------------------------ Normal solve in X direction ------------------- */
-            
-        rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
-
-        for (int mq = 0; mq < meqn; mq++) 
-        {
-            int I_q = I + mq*zs;
-            fm[I_q] = amdq[mq];
-            fp[I_q] = -apdq[mq]; 
-            if (order[1] > 0)
+            /* ------------------------ Normal solve in X direction ------------------- */
+            double *const ql     = start;                 /* meqn        */
+            double *const qr     = ql     + meqn;         /* meqn        */
+            double *const auxl   = qr     + meqn;         /* maux        */
+            double *const auxr   = auxl   + maux;         /* maux        */
+            double *const s      = auxr   + maux;         /* mwaves      */
+            double *const wave   = s      + mwaves;       /* meqn*mwaves */
+            double *const amdq   = wave   + meqn*mwaves;  /* meqn        */
+            double *const apdq   = amdq   + meqn;         /* meqn        */
+            for(int mq = 0; mq < meqn; mq++)
             {
-                amdq_trans[I_q] = amdq[mq];                                        
-                apdq_trans[I_q] = apdq[mq];  
+                int I_q = I + mq*zs;
+                qr[mq] = qold[I_q];        /* Right */
+                ql[mq] = qold[I_q - 1];    /* Left  */
+                //qd[mq] = qold[I_q - ys];   /* Down  */  
             }
-        }
 
-        for(int mw = 0; mw < mwaves; mw++)
-        {
-            maxcfl = max(maxcfl,abs(s[mw]*dtdx));
+            for(int m = 0; m < maux; m++)
+            {
+                int I_aux = I + m*zs;
+                auxr[m] = aux[I_aux];
+                auxl[m] = aux[I_aux - 1];
+                auxd[m] = aux[I_aux - ys];
+            }               
 
-            if (order[0] == 2)
-            {                    
-                int I_speeds = I + mw*zs;
-                speeds[I_speeds] = s[mw];
-                for(int mq = 0; mq < meqn; mq++)
+            
+            rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+
+            for (int mq = 0; mq < meqn; mq++) 
+            {
+                int I_q = I + mq*zs;
+                fm[I_q] = amdq[mq];
+                fp[I_q] = -apdq[mq]; 
+                if (order[1] > 0)
                 {
-                    int k = mw*meqn + mq;
-                    int I_waves = I + k*zs;
-                    waves[I_waves] = wave[k];
+                    amdq_trans[I_q] = amdq[mq];                                        
+                    apdq_trans[I_q] = apdq[mq];  
+                }
+            }
+        
+
+            for(int mw = 0; mw < mwaves; mw++)
+            {
+                maxcfl = max(maxcfl,abs(s[mw]*dtdx));
+
+                if (order[0] == 2)
+                {                    
+                    int I_speeds = I + mw*zs;
+                    speeds[I_speeds] = s[mw];
+                    for(int mq = 0; mq < meqn; mq++)
+                    {
+                        int k = mw*meqn + mq;
+                        int I_waves = I + k*zs;
+                        waves[I_waves] = wave[k];
+                    }
                 }
             }
         }
 
-        /* ------------------------ Normal solve in Y direction ------------------- */
-        rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, bmdq, bpdq);
-
-        /* Set value at bottom interface of cell I */
-        for (int mq = 0; mq < meqn; mq++) 
         {
-            int I_q = I + mq*zs;
-            gm[I_q] = bmdq[mq];
-            gp[I_q] = -bpdq[mq]; 
-            if (order[1] > 0)
+            /* ------------------------ Normal solve in Y direction ------------------- */
+            double *const ql     = start;                 /* meqn        */
+            double *const qd     = ql     + meqn;         /* meqn        */
+            double *const auxl   = qd     + meqn;         /* maux        */
+            double *const auxd   = auxl   + maux;         /* maux        */
+            double *const s      = auxr   + maux;         /* mwaves      */
+            double *const wave   = s      + mwaves;       /* meqn*mwaves */
+            double *const bmdq   = wave   + meqn*mwaves;  /* meqn        */
+            double *const bpdq   = amdq   + meqn;         /* meqn        */
+
+            rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, bmdq, bpdq);
+
+            /* Set value at bottom interface of cell I */
+            for (int mq = 0; mq < meqn; mq++) 
             {
-                bmdq_trans[I_q] = bmdq[mq];                                                   
-                bpdq_trans[I_q] = bpdq[mq];
-            }
-        }
-
-        for(int mw = 0; mw < mwaves; mw++)
-        {
-            maxcfl = max(maxcfl,fabs(s[mw])*dtdy);
-
-            if (order[0] == 2)
-            {                    
-                int I_speeds = I + (mwaves + mw)*zs;
-                speeds[I_speeds] = s[mw];
-                for(int mq = 0; mq < meqn; mq++)
+                int I_q = I + mq*zs;
+                gm[I_q] = bmdq[mq];
+                gp[I_q] = -bpdq[mq]; 
+                if (order[1] > 0)
                 {
-                    int I_waves = I + ((mwaves + mw)*meqn + mq)*zs;
-                    waves[I_waves] = wave[mw*meqn + mq];
+                    bmdq_trans[I_q] = bmdq[mq];                                                   
+                    bpdq_trans[I_q] = bpdq[mq];
+                }
+            }
+
+            for(int mw = 0; mw < mwaves; mw++)
+            {
+                maxcfl = max(maxcfl,fabs(s[mw])*dtdy);
+
+                if (order[0] == 2)
+                {                    
+                    int I_speeds = I + (mwaves + mw)*zs;
+                    speeds[I_speeds] = s[mw];
+                    for(int mq = 0; mq < meqn; mq++)
+                    {
+                        int I_waves = I + ((mwaves + mw)*meqn + mq)*zs;
+                        waves[I_waves] = wave[mw*meqn + mq];
+                    }
                 }
             }
         }
@@ -291,8 +317,11 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int I = (iy + mbc-1)*ys + (ix + mbc);
 
             /* ------------------------------- X-directions --------------------------- */
+
+            double *s = start;
+            double *wave = s + mwaves;
             for(int mw = 0; mw < mwaves; mw++)
-            {
+            {                
                 int I_speeds = I + mw*zs;
                 s[mw] = speeds[I_speeds];
 
@@ -353,6 +382,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             /* Start at first non-ghost interior cell */
             int I = (iy + mbc)*ys + ix + mbc - 1;
 
+            double *s = start;
+            double *wave = s + mwaves;
             for(int mw = 0; mw < mwaves; mw++)
             {
                 /* ------------------------------- Y-directions --------------------------- */
@@ -451,6 +482,11 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     
     */              
 
+    double *const aux1   = start;                 /* 2*maux      */
+    double *const aux2   = aux1   + 2*maux;       /* 2*maux      */
+    double *const aux3   = aux2   + 2*maux;       /* 2*maux      */
+    double *const bmasdq = aux3   + 2*maux;       /* meqn        */
+    double *const bpasdq = bmasdq + meqn;         /* meqn        */
 
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
