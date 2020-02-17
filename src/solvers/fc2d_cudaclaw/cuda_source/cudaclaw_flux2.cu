@@ -244,7 +244,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 speeds[I_speeds] = s[mw];
                 for(int mq = 0; mq < meqn; mq++)
                 {
-                    k = mw*meqn + mq;
+                    int k = mw*meqn + mq;
                     int I_waves = I + k*zs;
                     waves[I_waves] = wave[k];
                 }
@@ -546,7 +546,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         for(int imp = 0; imp < 2; imp++)
         {
-            for(m = 0; m < maux; m++)
+            for(int m = 0; m < maux; m++)
             {
                 int I_aux = I + m*zs;
                 int k = imp*maux + m;
@@ -906,8 +906,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             for(int m = 0; m < maux; m++)
             {
-                I_aux = I + m*zs;
-                k = imp*maux + m;
+                int I_aux = I + m*zs;
+                int k = imp*maux + m;
                 aux1[k] = aux[I_aux - 1 + ys*(imp - 1)];
                 aux2[k] = aux[I_aux     + ys*(imp - 1)];
                 aux3[k] = aux[I_aux + 1 + ys*(imp - 1)];
