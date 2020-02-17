@@ -779,7 +779,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
 
         double *const qr     = start;          /* meqn   */
-        double *const qd     = qd + meqn;      /* meqn   */
+        double *const qd     = qr + meqn;      /* meqn   */
         double *const bmdq   = qd + meqn;    /* meqn   */
         double *const bpdq   = bmdq + meqn;    /* meqn   */
         double *const aux1   = bpdq + meqn;    /* 2*maux */
@@ -848,7 +848,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
 
         double *const qr     = start;          /* meqn   */
-        double *const qd     = qd + meqn;      /* meqn   */
+        double *const qd     = qr + meqn;      /* meqn   */
         double *const bmdq   = qd + meqn;    /* meqn   */
         double *const bpdq   = bmdq + meqn;    /* meqn   */
         double *const aux1   = bpdq + meqn;    /* 2*maux */
@@ -917,7 +917,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
 
         double *const qr     = start;          /* meqn   */
-        double *const qd     = qd + meqn;      /* meqn   */
+        double *const qd     = qr + meqn;      /* meqn   */
         double *const bmdq   = qd + meqn;    /* meqn   */
         double *const bpdq   = bmdq + meqn;    /* meqn   */
         double *const aux1   = bpdq + meqn;    /* 2*maux */
@@ -984,7 +984,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
 
         double *const qr     = start;          /* meqn   */
-        double *const qd     = qd + meqn;      /* meqn   */
+        double *const qd     = qr + meqn;      /* meqn   */
         double *const bmdq   = qd + meqn;    /* meqn   */
         double *const bpdq   = bmdq + meqn;    /* meqn   */
         double *const aux1   = bpdq + meqn;    /* 2*maux */
