@@ -106,22 +106,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     double *const bpasdq = bmasdq + meqn;         /* meqn        */
 
 
-#if 0
-    int mq, mw, m, k;
-    int I, I_q, I_aux, I_waves, I_speeds;
-    int ix,iy,ifaces_x, ifaces_y, num_ifaces;
-    int thread_index;
-
-    int i,j; /* Used for (i,j) indexing in patches  */
-    double maxcfl;
-    double wnorm2,dotr,dotl, wlimitr,r;
-    double cqxx;
-    double cqyy;
-    double gupdate;
-    int imp;
-#endif    
-
-
     /* --------------------------------- Start code ----------------------------------- */
 
     __shared__ double dtdx, dtdy;
@@ -343,7 +327,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 for(int mq = 0; mq < meqn; mq++)
                 {
                     double cqxx = (1.0 - fabs(s[mw])*dtdx)*wave[mq];
-                    cqxx += (use_fwaves) ? copysign(1.,s[mw]) : fabs(s[mw]);
+                    cqxx *= (use_fwaves) ? copysign(1.,s[mw]) : fabs(s[mw]);
 
                     int I_q = I + mq*zs;
                     fm[I_q] += 0.5*cqxx;   
