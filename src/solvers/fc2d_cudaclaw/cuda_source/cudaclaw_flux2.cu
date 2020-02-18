@@ -96,13 +96,16 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
         zs = (2*mbc + my)*xs*ys;
     }
     
+    __shared__ ifaces_x, ifaces_y, num_faces;
+    ifaces_x = mx + 2*mbc-1;
+    ifaces_y = my + 2*mbc-1;
+    num_ifaces = ifaces_x*ifaces_y;
+
     __syncthreads();
+
 
     double maxcfl = 0;
 
-    int ifaces_x = mx + 2*mbc-1;
-    int ifaces_y = my + 2*mbc-1;
-    int num_ifaces = ifaces_x*ifaces_y;
 
 #if 0
     if (b4step2 != NULL)
@@ -275,16 +278,16 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         zs = (2*mbc + my)*xs*ys;
     }
     
-    __syncthreads();
-
-
-    double maxcfl = 0;
-
     __shared__ int ifaces_x, ifaces_y, num_ifaces;
 
     ifaces_x = mx + 2*mbc-1;
     ifaces_y = my + 2*mbc-1;
     num_ifaces = ifaces_x*ifaces_y;
+
+    __syncthreads();
+
+
+    double maxcfl = 0;
 
 #if 0
     if (b4step2 != NULL)
