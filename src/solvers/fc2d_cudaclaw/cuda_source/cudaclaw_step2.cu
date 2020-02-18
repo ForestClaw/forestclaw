@@ -41,7 +41,6 @@ void cudaclaw_compute_speeds_batch (const int mx,    const int my,
                                     const int mwork,
                                     const double dt, const double t,
                                     cudaclaw_fluxes_t* array_fluxes_struct,
-                                    double * maxcflblocks,
                                     cudaclaw_cuda_speeds_t compute_speeds,
                                     cudaclaw_cuda_b4step2_t b4step2);
 
