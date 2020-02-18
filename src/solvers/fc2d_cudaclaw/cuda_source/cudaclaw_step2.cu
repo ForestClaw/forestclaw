@@ -32,6 +32,18 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                       cudaclaw_cuda_rpt2_t rpt2,
                                       cudaclaw_cuda_b4step2_t b4step2);
 
+__global__
+void cudaclaw_compute_speeds_batch (const int mx,    const int my, 
+                                    const int meqn,  const int mbc, 
+                                    const int maux,  const int mwaves, 
+                                    const int mwork,
+                                    const double dt, const double t,
+                                    cudaclaw_fluxes_t* array_fluxes_struct,
+                                    double * maxcflblocks,
+                                    cudaclaw_cuda_speeds_t compute_speeds,
+                                    cudaclaw_cuda_b4step2_t b4step2);
+
+
 double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
         int batch_size, double t, double dt)
@@ -148,7 +160,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         mwork = 2*(meqn + maux) + mwaves;
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
-        
+
         cudaclaw_compute_speeds_batch <<<grid,block,bytes>>>(mx,my,meqn, mbc, maux, mwaves,
                                                              mwork, dt, t, 
                                                              array_fluxes_struct_dev,
