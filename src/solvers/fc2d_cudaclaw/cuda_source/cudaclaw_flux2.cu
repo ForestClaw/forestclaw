@@ -465,8 +465,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }
     }
 
-
+    printf("here ...1\n");
     maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
+    printf("here ...2\n");
 
     //__syncthreads();  /* Does block reduce take care of this sync? */
 
@@ -541,6 +542,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             }
         }
 
+        printf("here ...3\n");
+
         ifaces_x = mx + 2;  
         ifaces_y = my + 1;
         num_ifaces = ifaces_x*ifaces_y;
@@ -608,6 +611,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }  
         __syncthreads();
     }  
+
+    printf("here ...4\n");
 
     /* ------------------------- First order final update ----------------------------- */
 
