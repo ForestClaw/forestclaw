@@ -96,7 +96,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
         zs = (2*mbc + my)*xs*ys;
     }
     
-    __shared__ ifaces_x, ifaces_y, num_faces;
+    __shared__ int ifaces_x, ifaces_y, num_faces;
     ifaces_x = mx + 2*mbc-1;
     ifaces_y = my + 2*mbc-1;
     num_ifaces = ifaces_x*ifaces_y;
