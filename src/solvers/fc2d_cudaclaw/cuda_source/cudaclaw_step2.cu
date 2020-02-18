@@ -171,16 +171,21 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
         cudaDeviceSynchronize();
 
-        cudaError_t code = cudaPeekAtLastError();
-        if (code != cudaSuccess) 
         {
-            fclaw_global_essentialf("ERROR (cudaclaw_step2 (compute_speeds).cu) : %s\n\n", 
-                                    cudaGetErrorString(code));
+
+            cudaError_t code = cudaPeekAtLastError();
+            if (code != cudaSuccess) 
+            {
+                fclaw_global_essentialf("ERROR (cudaclaw_step2 (compute_speeds).cu) : %s\n\n", 
+                                        cudaGetErrorString(code));
+    #if 0            
             fclaw_global_essentialf("    Most likely, too many threads per block were launched.  Set configure flag -DFC2D_CUDACLAW_BLOCK_SIZE=NNN\n");
             fclaw_global_essentialf("    where NNN is a multiple of 32 smaller than %d. " \
                                     "Do a clean build of the code and try again.\n", FC2D_CUDACLAW_BLOCK_SIZE);   
             fclaw_global_essentialf("    Shared memory exceeds 48kb : %0.2f\n\n",bytes_kb);            
-            exit(code);
+#endif            
+                exit(code);
+            }
         }
 
         /* Determine shared memory size */
@@ -203,17 +208,21 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                                               cuclaw_vt->cuda_b4step2);
         cudaDeviceSynchronize();
 
-        code = cudaPeekAtLastError();
-
-        if (code != cudaSuccess) 
         {
-            fclaw_global_essentialf("ERROR (cudaclaw_step2.cu) : %s\n", 
-                                    cudaGetErrorString(code));
+            cudaError_t code = cudaPeekAtLastError();
+
+            if (code != cudaSuccess) 
+            {
+                fclaw_global_essentialf("ERROR (cudaclaw_step2.cu) : %s\n", 
+                                        cudaGetErrorString(code));
+#if 0
             fclaw_global_essentialf("    Most likely, too many threads per block were launched.  Set configure flag -DFC2D_CUDACLAW_BLOCK_SIZE=NNN\n");
             fclaw_global_essentialf("    where NNN is a multiple of 32 smaller than %d. " \
                                     "Do a clean build of the code and try again.\n", FC2D_CUDACLAW_BLOCK_SIZE);   
             fclaw_global_essentialf("    Shared memory exceeds 48kb : %0.2f\n\n",bytes_kb);            
-            exit(code);
+#endif            
+                exit(code);
+            }
         }
     }
 	
