@@ -278,6 +278,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     
     __syncthreads();
 
+    printf("here ...0\n");
+
     double maxcfl = 0;
 
     int ifaces_x = mx + 2*mbc-1;
@@ -378,7 +380,10 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 auxl[m] = aux[I_aux - 1];
             }               
 
+            printf("here ...0a\n");
+
             rpn2(0, meqn, mwaves, maux, ql, qr, auxl, auxr, wave, s, amdq, apdq);
+            printf("here ...0b\n");
 
             for (int mq = 0; mq < meqn; mq++) 
             {
@@ -432,7 +437,10 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 auxd[m] = aux[I_aux - ys];
             }               
 
+            printf("here ...0c\n");
+
             rpn2(1, meqn, mwaves, maux, qd, qr, auxd, auxr, wave, s, bmdq, bpdq);
+            printf("here ...0d\n");
 
             /* Set value at bottom interface of cell I */
             for (int mq = 0; mq < meqn; mq++) 
