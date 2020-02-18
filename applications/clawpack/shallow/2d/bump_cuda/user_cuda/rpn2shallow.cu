@@ -80,13 +80,13 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
     for(int mq = 0; mq < meqn; mq++)
     {
         /* Loop-unrolling! loop over mwaves=3*/
-        bmasdq[mq]  = smin[0]*wave[mq];
-        bmasdq[mq] += smin[1]*wave[meqn + mq];
-        bmasdq[mq] += smin[2]*wave[2*meqn + mq];
-        
-        bpasdq[mq]  = smax[0]*wave[mq];
-        bpasdq[mq] += smax[1]*wave[meqn + mq];
-        bpasdq[mq] += smax[2]*wave[2*meqn + mq];
+        amdq[mq]  = smin[0]*wave[mq];
+        amdq[mq] += smin[1]*wave[meqn + mq];
+        amdq[mq] += smin[2]*wave[2*meqn + mq];
+
+        apdq[mq]  = smax[0]*wave[mq];
+        apdq[mq] += smax[1]*wave[meqn + mq];
+        apdq[mq] += smax[2]*wave[2*meqn + mq];
    }    
 }
 
