@@ -169,6 +169,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                                              cuclaw_vt->cuda_speeds,
                                                              cuclaw_vt->cuda_b4step2);
 
+        cudaDeviceSynchronize();
+
+        cudaError_t code = cudaPeekAtLastError();
         if (code != cudaSuccess) 
         {
             fclaw_global_essentialf("ERROR (cudaclaw_step2 (compute_speeds).cu) : %s\n\n", 
