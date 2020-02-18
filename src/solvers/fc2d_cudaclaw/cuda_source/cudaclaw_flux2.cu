@@ -59,7 +59,6 @@ void cudaclaw_set_method_parameters(int *order_in, int *mthlim_in, int mwaves,
 __device__ double cudaclaw_limiter(int lim_choice, double r);
 
 
-
 static
 __device__
 void cudaclaw_compute_speeds(const int mx,   const int my, 
@@ -72,7 +71,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
                              double *const maxcflblocks,
                              cudaclaw_cuda_speeds_t compute_speeds,
                              cudaclaw_cuda_b4step2_t b4step2,
-                             double dt)
+                             double t, double dt)
 {
     typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
     
@@ -1224,5 +1223,26 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                   maxcflblocks, rpn2, rpt2, b4step2, t,dt);
 }
 
+
+__global__
+void cudaclaw_compute_speeds_batch (const int mx,    const int my, 
+                                    const int meqn,  const int mbc, 
+                                    const int maux,  const int mwaves, 
+                                    const int mwork,
+                                    const double dt, const double t,
+                                    cudaclaw_fluxes_t* array_fluxes_struct,
+                                    double * maxcflblocks,
+                                    cudaclaw_cuda_speeds_t compute_speeds,
+                                    cudaclaw_cuda_b4step2_t b4step2)
+    {
+        cudaclaw_compute_speeds(mx,my,meqn,mbc,maux,mwaves,
+                                  array_fluxes_struct[blockIdx.z].xlower,
+                                  array_fluxes_struct[blockIdx.z].ylower,
+                                  array_fluxes_struct[blockIdx.z].dx,
+                                  array_fluxes_struct[blockIdx.z].dy,
+                                  array_fluxes_struct[blockIdx.z].qold_dev,
+                                  array_fluxes_struct[blockIdx.z].aux_dev,
+                                  maxcflblocks, speeds, b4step2, t, dt);
+}
 
 

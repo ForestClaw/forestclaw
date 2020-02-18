@@ -20,7 +20,7 @@ __device__ void bump_compute_speeds(int idir, int meqn, int mwaves, int maux,
                                     double s[])
 {
     int mu = 1+idir;
-    int mv = 2-idir;    
+    //int mv = 2-idir;    
 
     double h = (qr[0] + ql[0])/2.0;
     double hsqrtr = sqrt(qr[0]);
@@ -28,7 +28,7 @@ __device__ void bump_compute_speeds(int idir, int meqn, int mwaves, int maux,
     double hsq2 = hsqrtl + hsqrtr;
 
     double u = (qr[mu]/hsqrtr + ql[mu]/hsqrtl) / hsq2;
-    double v = (qr[mv]/hsqrtr + ql[mv]/hsqrtl) / hsq2;
+    // double v = (qr[mv]/hsqrtr + ql[mv]/hsqrtl) / hsq2;
     double a = sqrt(s_grav*h);    
 
     s[0] = u-a;
