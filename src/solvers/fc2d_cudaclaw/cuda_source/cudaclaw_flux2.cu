@@ -1199,7 +1199,6 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                       const int mwork,
                                       const double dt, const double t,
                                       cudaclaw_fluxes_t* array_fluxes_struct,
-                                      double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
                                       cudaclaw_cuda_rpt2_t rpt2,
                                       cudaclaw_cuda_b4step2_t b4step2)
