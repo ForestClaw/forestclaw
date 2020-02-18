@@ -80,7 +80,7 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
         apdq[mq] += smax[1]*wave[meqn + mq];
         apdq[mq] += smax[2]*wave[2*meqn + mq];
    }    
-#endif
+#else
     for(int mq = 0; mq < meqn; mq++)
     {
         amdq[mq] = 0;
@@ -90,16 +90,17 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
     {        
         double smin = (s[mw] <  0) ? s[mw] : 0.0;
         double smax = (s[mw] >= 0) ? s[mw] : 0.0; 
+        int idx = mw*meqn;
         
-        amdq[0] += smin*wave[0 + mw*meqn];
-        amdq[1] += smin*wave[1 + mw*meqn];
-        amdq[2] += smin*wave[2 + mw*meqn];
+        amdq[0] += smin*wave[0 + idx];
+        amdq[1] += smin*wave[1 + idx];
+        amdq[2] += smin*wave[2 + idx];
 
-        apdq[0] += smax*wave[0 + mw*meqn];
-        apdq[1] += smax*wave[1 + mw*meqn];
-        apdq[2] += smax*wave[2 + mw*meqn];
+        apdq[0] += smax*wave[0 + idx];
+        apdq[1] += smax*wave[1 + idx];
+        apdq[2] += smax*wave[2 + idx];
     }
-
+#endif
 }
 
 __device__ cudaclaw_cuda_rpn2_t bump_rpn2 = bump_rpn2shallow;
@@ -174,7 +175,7 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
         bpasdq[mq] += smax[1]*waveb[meqn + mq];
         bpasdq[mq] += smax[2]*waveb[2*meqn + mq];
     }
-#endif
+#else
 
     for(int mq = 0; mq < meqn; mq++)
     {
@@ -185,15 +186,17 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
     {        
         double smin = (sb[mw] <  0) ? sb[mw] : 0.0;
         double smax = (sb[mw] >= 0) ? sb[mw] : 0.0; 
+        int idx = mw*meqn;
 
-        bmasdq[0] += smin*waveb[0 + mw*meqn];
-        bmasdq[1] += smin*waveb[1 + mw*meqn];
-        bmasdq[2] += smin*waveb[2 + mw*meqn];
+        bmasdq[0] += smin*waveb[0 + idx];
+        bmasdq[1] += smin*waveb[1 + idx];
+        bmasdq[2] += smin*waveb[2 + idx];
 
-        bpasdq[0] += smax*waveb[0 + mw*meqn];
-        bpasdq[1] += smax*waveb[1 + mw*meqn];
-        bpasdq[2] += smax*waveb[2 + mw*meqn];
+        bpasdq[0] += smax*waveb[0 + idx];
+        bpasdq[1] += smax*waveb[1 + idx];
+        bpasdq[2] += smax*waveb[2 + idx];
     }
+#endif    
 
 }
 
