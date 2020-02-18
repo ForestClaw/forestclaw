@@ -135,7 +135,7 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
     sb[2] = v + a;
 
     double smin[3], smax[3];
-    for(int mq = 0; mq < meqn; mq++)
+    for(int mw = 0; mw < mwaves; mw++)
     {
         smin[mw] = (sb[mw] < 0) ? sb[mw] : 0.0;
         smax[mw] = (sb[mw] >= 0) ? sb[mw] : 0.0;
