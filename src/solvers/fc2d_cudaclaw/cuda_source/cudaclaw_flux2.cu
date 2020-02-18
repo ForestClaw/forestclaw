@@ -282,9 +282,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     __shared__ int ifaces_x, ifaces_y, num_ifaces;
 
-    int ifaces_x = mx + 2*mbc-1;
-    int ifaces_y = my + 2*mbc-1;
-    int num_ifaces = ifaces_x*ifaces_y;
+    ifaces_x = mx + 2*mbc-1;
+    ifaces_y = my + 2*mbc-1;
+    num_ifaces = ifaces_x*ifaces_y;
 
 #if 0
     if (b4step2 != NULL)
