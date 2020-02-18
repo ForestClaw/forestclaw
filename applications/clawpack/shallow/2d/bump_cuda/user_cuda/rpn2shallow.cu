@@ -74,8 +74,8 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
     double smin[3],smax[3];
     for(int mw = 0; mw < mwaves; mw++)
     {
-        smin[mw] = min(sb[mw],0);
-        smax[mw] = max(sb[mw],0);
+        smin[mw] = min(s[mw],0);
+        smax[mw] = max(s[mw],0);
     }
     for(mq = 0; mq < meqn; mq++)
     {
