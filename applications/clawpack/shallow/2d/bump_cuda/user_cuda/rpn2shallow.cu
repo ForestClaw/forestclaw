@@ -24,36 +24,28 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
     //assert(mwaves == 3);
     //assert(meqn == 3);
 
-	double h, hsqrtl, hsqrtr, hsq2, u, v, a;
-	double delta1, delta2, delta3;
-	double a1, a2, a3;
-
-    int mu, mv;
-    int mq;
-
-    mu = 1+idir;
-    mv = 2-idir;    
+    int mu = 1+idir;
+    int mv = 2-idir;    
 
     /* This should be true ... */
     //assert(qr[0] > 0);
     //assert(ql[0] > 0);
 
-	h = (qr[0] + ql[0])/2.0;
-	hsqrtr = sqrt(qr[0]);
-	hsqrtl = sqrt(ql[0]);
-	hsq2 = hsqrtl + hsqrtr;
+	double h = (qr[0] + ql[0])/2.0;
+	double hsqrtr = sqrt(qr[0]);
+	double hsqrtl = sqrt(ql[0]);
+	double hsq2 = hsqrtl + hsqrtr;
 
-	u = (qr[mu]/hsqrtr + ql[mu]/hsqrtl) / hsq2;
-	v = (qr[mv]/hsqrtr + ql[mv]/hsqrtl) / hsq2;
-	a = sqrt(s_grav*h);
-    // a = sqrt(abs(h));
+	double u = (qr[mu]/hsqrtr + ql[mu]/hsqrtl) / hsq2;
+	double v = (qr[mv]/hsqrtr + ql[mv]/hsqrtl) / hsq2;
+	double a = sqrt(s_grav*h);
 
-	delta1 = qr[0 ] -ql[0 ];
-	delta2 = qr[mu] -ql[mu];
-	delta3 = qr[mv] -ql[mv];
-	a1 = ( (u+a)*delta1 - delta2 )/(2*a);
-	a2 = -v*delta1 + delta3;
-	a3 = (-(u-a)*delta1 + delta2 )/(2*a);
+	double delta1 = qr[0 ] - ql[0 ];
+	double delta2 = qr[mu] - ql[mu];
+	double delta3 = qr[mv] - ql[mv];
+	double a1 = ( (u+a)*delta1 - delta2 )/(2*a);
+	double a2 = -v*delta1 + delta3;
+	double a3 = (-(u-a)*delta1 + delta2 )/(2*a);
     
     wave[0]  = a1;
     wave[mu] = a1*(u-a);
@@ -109,30 +101,22 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
                                  int imp, double asdq[],
                                  double bmasdq[], double bpasdq[])
 {
+    int mu = 1+idir;
+    int mv = 2-idir;    
 
-    double alpha1, alpha2, alpha3;
-    double h, hsqrtr, hsqrtl, hsq2, u,v,a;
-    double waveb[9], sb[3];
+    double h = (qr[0] + ql[0])/2.0;
+    double hsqrtr = sqrt(qr[0]);
+    double hsqrtl = sqrt(ql[0]);
+    double hsq2 = hsqrtl + hsqrtr;
 
-    int mu,mv;
-    int mq;
-
-    mu = 1+idir;
-    mv = 2-idir;    
-
-    h = (qr[0] + ql[0])/2.0;
-    hsqrtr = sqrt(qr[0]);
-    hsqrtl = sqrt(ql[0]);
-    hsq2 = hsqrtl + hsqrtr;
-
-    u = (qr[mu]/hsqrtr + ql[mu]/hsqrtl) / hsq2;
-    v = (qr[mv]/hsqrtr + ql[mv]/hsqrtl) / hsq2;
-    a = sqrt(s_grav*h);
+    double u = (qr[mu]/hsqrtr + ql[mu]/hsqrtl) / hsq2;
+    double v = (qr[mv]/hsqrtr + ql[mv]/hsqrtl) / hsq2;
+    double a = sqrt(s_grav*h);
 
 
-    alpha1 = ((v+a)*asdq[0] - asdq[mv])/(2.0*a);
-    alpha2 = asdq[mu] - u*asdq[0];
-    alpha3 = (-(v-a)*asdq[0] + asdq[mv])/(2.0*a);
+    double alpha1 = ((v+a)*asdq[0] - asdq[mv])/(2.0*a);
+    double alpha2 = asdq[mu] - u*asdq[0];
+    double alpha3 = (-(v-a)*asdq[0] + asdq[mv])/(2.0*a);
 
     waveb[0]  = alpha1;
     waveb[mu] = alpha1*u;
@@ -152,12 +136,12 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
     double smin[3], smax[3];
     for(int mq = 0; mq < meqn; mq++)
     {
-        smin[mw] = (s[mw] < 0) ? s[mw] : 0.0;
-        smax[mw] = (s[mw] >= 0) ? s[mw] : 0.0;
+        smin[mw] = (sb[mw] < 0) ? sb[mw] : 0.0;
+        smax[mw] = (sb[mw] >= 0) ? sb[mw] : 0.0;
     }
 
 
-    for(mq = 0; mq < meqn; mq++)
+    for(int mq = 0; mq < meqn; mq++)
     {
         /* Loop-unrolling! loop over mwaves=3*/
         bmasdq[mq]  = smin[0]*waveb[mq];
