@@ -1242,7 +1242,7 @@ void cudaclaw_compute_speeds_batch (const int mx,    const int my,
                                   array_fluxes_struct[blockIdx.z].dy,
                                   array_fluxes_struct[blockIdx.z].qold_dev,
                                   array_fluxes_struct[blockIdx.z].aux_dev,
-                                  maxcflblocks, speeds, b4step2, t, dt);
+                                  maxcflblocks, compute_speeds, b4step2, t, dt);
 }
 
 
