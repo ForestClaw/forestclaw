@@ -149,16 +149,24 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
     waveb[2*meqn + mv] = alpha3*(v+a);
     sb[2] = v + a;
 
+    double smin[3], smax[3];
+    for(int mq = 0; mq < meqn; mq++)
+    {
+        smin[mw] = (s[mw] < 0) ? s[mw] : 0.0;
+        smax[mw] = (s[mw] >= 0) ? s[mw] : 0.0;
+    }
+
+
     for(mq = 0; mq < meqn; mq++)
     {
         /* Loop-unrolling! loop over mwaves=3*/
-        bmasdq[mq]  = min(sb[0],0.)*waveb[mq];
-        bmasdq[mq] += min(sb[1],0.)*waveb[meqn + mq];
-        bmasdq[mq] += min(sb[2],0.)*waveb[2*meqn + mq];
+        bmasdq[mq]  = smin[0]*waveb[mq];
+        bmasdq[mq] += smin[1]*waveb[meqn + mq];
+        bmasdq[mq] += smin[2]*waveb[2*meqn + mq];
 
-        bpasdq[mq]  = max(sb[0],0.)*waveb[mq];
-        bpasdq[mq] += max(sb[1],0.)*waveb[meqn + mq];
-        bpasdq[mq] += max(sb[2],0.)*waveb[2*meqn + mq];
+        bpasdq[mq]  = smax[0]*waveb[mq];
+        bpasdq[mq] += smax[1]*waveb[meqn + mq];
+        bpasdq[mq] += smax[2]*waveb[2*meqn + mq];
     }
 }
 
