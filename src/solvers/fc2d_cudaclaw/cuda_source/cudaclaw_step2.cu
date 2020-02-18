@@ -155,9 +155,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         /* Configure kernel */
         {
 
+            /* Compute speeds */
             int block_size = FC2D_CUDACLAW_BLOCK_SIZE;
 
-#if 1
             dim3 block(block_size,1,1);
             dim3 grid(1,1,batch_size);
 
@@ -180,21 +180,14 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             {
                 fclaw_global_essentialf("ERROR (cudaclaw_step2 (compute_speeds).cu) : %s\n\n", 
                                         cudaGetErrorString(code));
-#if 0            
-            fclaw_global_essentialf("    Most likely, too many threads per block were launched.  Set configure flag -DFC2D_CUDACLAW_BLOCK_SIZE=NNN\n");
-            fclaw_global_essentialf("    where NNN is a multiple of 32 smaller than %d. " \
-                                    "Do a clean build of the code and try again.\n", FC2D_CUDACLAW_BLOCK_SIZE);   
-            fclaw_global_essentialf("    Shared memory exceeds 48kb : %0.2f\n\n",bytes_kb);            
-#endif            
                 exit(code);
             }
         }        
-#endif
 
         {
             /* Determine shared memory size */
-            //block_size = 192;
-            int block_size = thread_count;
+            int block_size = 192;
+            //int block_size = thread_count;
             dim3 block(block_size,1,1);
             dim3 grid(1,1,batch_size);
 
