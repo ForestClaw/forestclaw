@@ -163,7 +163,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        double *const qr     = start;                 /* meqn        */
+        double *const qr     = start;      /* meqn        */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
