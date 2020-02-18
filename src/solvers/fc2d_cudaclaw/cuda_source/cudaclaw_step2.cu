@@ -178,46 +178,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                     cudaGetErrorString(code));
             exit(code);
         }
+    }        
 
-
-        {
-            PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
-
-            /* Determine shared memory size */
-            int block_size = 288;
-            //int block_size = thread_count;
-            dim3 block(block_size,1,1);
-            dim3 grid(1,1,batch_size);
-
-            int mwork1 = 4*meqn + 2*maux + mwaves + meqn*mwaves;
-            int mwork2 = 5*meqn + 6*maux;
-            mwork = (mwork1 > mwork2) ? mwork1 : mwork2;
-            bytes_per_thread = sizeof(double)*mwork;
-            bytes = bytes_per_thread*block_size;
-
-            bytes_kb = bytes/1024.0;
-            //fclaw_global_essentialf("[fclaw] Shared memory  : %0.2f kb\n\n",bytes_kb);
-
-            cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
-                                                                  mwork, dt,t,
-                                                                  array_fluxes_struct_dev,
-                                                                  cuclaw_vt->cuda_rpn2,
-                                                                  cuclaw_vt->cuda_rpt2,
-                                                                  cuclaw_vt->cuda_b4step2);
-            cudaDeviceSynchronize();
-
-        
-            cudaError_t code = cudaPeekAtLastError();
-
-            if (code != cudaSuccess) 
-            {
-                fclaw_global_essentialf("ERROR (cudaclaw_step2.cu) : %s\n", 
-                                        cudaGetErrorString(code));
-                exit(code);
-            }
-        }
-    }
-	
     /* -------------------------------- Finish CFL ------------------------------------*/ 
     {
         PROFILE_CUDA_GROUP("Finish CFL",2);
@@ -236,6 +198,44 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaFree(cflgrid_dev);
     }
 
+
+    {
+        PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
+
+        /* Determine shared memory size */
+        int block_size = 256;
+        //int block_size = thread_count;
+        dim3 block(block_size,1,1);
+        dim3 grid(1,1,batch_size);
+
+        int mwork1 = 4*meqn + 2*maux + mwaves + meqn*mwaves;
+        int mwork2 = 5*meqn + 6*maux;
+        mwork = (mwork1 > mwork2) ? mwork1 : mwork2;
+        bytes_per_thread = sizeof(double)*mwork;
+        bytes = bytes_per_thread*block_size;
+
+        bytes_kb = bytes/1024.0;
+        //fclaw_global_essentialf("[fclaw] Shared memory  : %0.2f kb\n\n",bytes_kb);
+
+        cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
+                                                              mwork, dt,t,
+                                                              array_fluxes_struct_dev,
+                                                              cuclaw_vt->cuda_rpn2,
+                                                              cuclaw_vt->cuda_rpt2,
+                                                              cuclaw_vt->cuda_b4step2);
+        cudaDeviceSynchronize();
+
+        
+        cudaError_t code = cudaPeekAtLastError();
+
+        if (code != cudaSuccess) 
+        {
+            fclaw_global_essentialf("ERROR (cudaclaw_step2.cu) : %s\n", 
+                                    cudaGetErrorString(code));
+            exit(code);
+        }
+    }
+	
     /* -------------------------- Copy q back to host ----------------------------------*/ 
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY_D2H]);       
 
