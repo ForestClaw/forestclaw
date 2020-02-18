@@ -118,6 +118,7 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
     double alpha2 = asdq[mu] - u*asdq[0];
     double alpha3 = (-(v-a)*asdq[0] + asdq[mv])/(2.0*a);
 
+    double waveb[9], sb[3];
     waveb[0]  = alpha1;
     waveb[mu] = alpha1*u;
     waveb[mv] = alpha1*(v-a);
