@@ -280,9 +280,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     double maxcfl = 0;
 
-    int ifaces_x = mx + 2*mbc-1;
-    int ifaces_y = my + 2*mbc-1;
-    int num_ifaces = ifaces_x*ifaces_y;
+    __shared__ int ifaces_x = mx + 2*mbc-1;
+    __shared__ int ifaces_y = my + 2*mbc-1;
+    __shared__ int num_ifaces = ifaces_x*ifaces_y;
 
 #if 0
     if (b4step2 != NULL)
@@ -329,12 +329,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 #endif    
 
     /* -------------------------- Compute fluctuations -------------------------------- */
-
-#if 0
-    ifaces_x = mx + 2*mbc-1;
-    ifaces_y = my + 2*mbc-1;
-    num_ifaces = ifaces_x*ifaces_y;
-#endif    
 
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     {
@@ -471,12 +465,12 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
 
     /* ---------------------- Second order corrections and limiters --------------------*/  
-    
+
     if (order[0] == 2)
     {
-        int ifaces_x = mx + 1;  
-        int ifaces_y = my + 2;
-        int num_ifaces = ifaces_x*ifaces_y;
+        ifaces_x = mx + 1;  
+        ifaces_y = my + 2;
+        num_ifaces = ifaces_x*ifaces_y;
 
         for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
         { 
@@ -539,8 +533,12 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 }
             }
         }
+    }
 
+    __syncthreads();
 
+    if (order[0] == 2)
+    {
         ifaces_x = mx + 2;  
         ifaces_y = my + 1;
         num_ifaces = ifaces_x*ifaces_y;
