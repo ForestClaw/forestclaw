@@ -62,7 +62,7 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
     wave[mv + meqn*2] = a3*v;
     s[2] = u+a;
     
-#if 0
+#if 1
     double smin[3],smax[3];
     for(int mw = 0; mw < mwaves; mw++)
     {
@@ -155,7 +155,7 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
     waveb[2*meqn + mv] = alpha3*(v+a);
     sb[2] = v + a;
 
-#if 0
+#if 1
     double smin[3], smax[3];
     for(int mw = 0; mw < mwaves; mw++)
     {
