@@ -18,7 +18,7 @@
 #include <fc2d_cuda_profiler.h>
 #include <cub/cub.cuh>
 
-#define thread_count 192
+#define thread_count 224
 
 
 /* Put header here so it doesn't have to go in *.h file */
@@ -184,7 +184,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
 
             /* Determine shared memory size */
-            int block_size = 192;
+            int block_size = 224;
             //int block_size = thread_count;
             dim3 block(block_size,1,1);
             dim3 grid(1,1,batch_size);
