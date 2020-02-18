@@ -151,7 +151,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         bytes = bytes_per_thread*block_size;
 
         bytes_kb = bytes/1024.0;
-        fclaw_global_essentialf("[fclaw] Shared memory  : %0.2f kb\n\n",bytes_kb);
+        //fclaw_global_essentialf("[fclaw] Shared memory  : %0.2f kb\n\n",bytes_kb);
 
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork, dt,t,
