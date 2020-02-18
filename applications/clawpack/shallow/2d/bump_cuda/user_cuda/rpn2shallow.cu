@@ -62,7 +62,7 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
     wave[mv+meqn*2] = a3*v;
     s[2] = u+a;
     
-
+#if 0
     double smin[3],smax[3];
     for(int mw = 0; mw < mwaves; mw++)
     {
@@ -80,6 +80,26 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
         apdq[mq] += smax[1]*wave[meqn + mq];
         apdq[mq] += smax[2]*wave[2*meqn + mq];
    }    
+#endif
+    for(int m = 0; m < meqn*mwaves; m++)
+    {
+        amdq[m] = 0;
+        apdq[m] = 0;
+    }
+    for(int mw = 0; mw < mwaves; mw++)
+    {        
+        double smin = (s[mw] <  0) ? s[mw] : 0.0;
+        double smax = (s[mw] >= 0) ? s[mw] : 0.0; 
+        
+        amdq[0] += smin*wave[0 + mw*mwaves];
+        amdq[1] += smin*wave[1 + mw*mwaves];
+        amdq[2] += smin*wave[2 + mw*mwaves];
+
+        apdq[0] += smax*wave[0 + mw*mwaves];
+        apdq[1] += smax*wave[1 + mw*mwaves];
+        apdq[2] += smax*wave[2 + mw*mwaves];
+    }
+
 }
 
 __device__ cudaclaw_cuda_rpn2_t bump_rpn2 = bump_rpn2shallow;
@@ -134,16 +154,17 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
     waveb[2*meqn + mv] = alpha3*(v+a);
     sb[2] = v + a;
 
+#if 0
     double smin[3], smax[3];
     for(int mw = 0; mw < mwaves; mw++)
     {
         smin[mw] = (sb[mw] < 0) ? sb[mw] : 0.0;
-        smax[mw] = (sb[mw] >= 0) ? sb[mw] : 0.0;
+        smax[mw] = (sb[mw] >= 0) ? sb[mw] : 0.0;        
     }
 
 
     for(int mq = 0; mq < meqn; mq++)
-    {
+    {        
         /* Loop-unrolling! loop over mwaves=3*/
         bmasdq[mq]  = smin[0]*waveb[mq];
         bmasdq[mq] += smin[1]*waveb[meqn + mq];
@@ -153,6 +174,26 @@ __device__ void bump_rpt2shallow(int idir, int meqn, int mwaves, int maux,
         bpasdq[mq] += smax[1]*waveb[meqn + mq];
         bpasdq[mq] += smax[2]*waveb[2*meqn + mq];
     }
+#endif
+    for(int m = 0; m < meqn*mwaves; m++)
+    {
+        bmasdq[m] = 0;
+        bpasdq[m] = 0;
+    }
+    for(int mw = 0; mw < mwaves; mw++)
+    {        
+        double smin = (sb[mw] <  0) ? sb[mw] : 0.0;
+        double smax = (sb[mw] >= 0) ? sb[mw] : 0.0; 
+
+        bmasdq[0] += smin*waveb[0 + mw*mwaves];
+        bmasdq[1] += smin*waveb[1 + mw*mwaves];
+        bmasdq[2] += smin*waveb[2 + mw*mwaves];
+
+        bpasdq[0] += smax*waveb[0 + mw*mwaves];
+        bpasdq[1] += smax*waveb[1 + mw*mwaves];
+        bpasdq[2] += smax*waveb[2 + mw*mwaves];
+    }
+
 }
 
 
