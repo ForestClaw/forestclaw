@@ -253,9 +253,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                                cudaclaw_cuda_b4step2_t b4step2,
                                double t,double dt)
 {
-    //typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
+    typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
     
-    //__shared__ typename BlockReduce::TempStorage temp_storage;
+    __shared__ typename BlockReduce::TempStorage temp_storage;
 
     extern __shared__ double shared_mem[];
 
@@ -466,9 +466,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     }
 
 
-    //maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
+    maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
 
-    __syncthreads();  /* Does block reduce take care of this sync? */
+    //__syncthreads();  /* Does block reduce take care of this sync? */
 
 
     /* ---------------------- Second order corrections and limiters --------------------*/  
