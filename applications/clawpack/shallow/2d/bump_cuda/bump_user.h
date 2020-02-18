@@ -58,6 +58,7 @@ typedef struct user_options
 
 void bump_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 void bump_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
+void bump_assign_speeds(cudaclaw_cuda_speeds_t *speeds);
 
 void bump_setprob_cuda(double grav);
 

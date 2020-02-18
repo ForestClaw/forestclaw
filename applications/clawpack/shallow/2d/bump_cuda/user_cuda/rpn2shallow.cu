@@ -14,6 +14,40 @@ void bump_setprob_cuda(double grav)
     CHECK(cudaMemcpyToSymbol(s_grav,  &grav, sizeof(double)));
 }
 
+__device__ void bump_compute_speeds(int idir, int meqn, int mwaves, int maux,
+                                    double ql[], double  qr[],
+                                    double auxl[], double auxr[],
+                                    double s[])
+{
+    int mu = 1+idir;
+    int mv = 2-idir;    
+
+    double h = (qr[0] + ql[0])/2.0;
+    double hsqrtr = sqrt(qr[0]);
+    double hsqrtl = sqrt(ql[0]);
+    double hsq2 = hsqrtl + hsqrtr;
+
+    double u = (qr[mu]/hsqrtr + ql[mu]/hsqrtl) / hsq2;
+    double v = (qr[mv]/hsqrtr + ql[mv]/hsqrtl) / hsq2;
+    double a = sqrt(s_grav*h);    
+
+    s[0] = u-a;
+    s[1] = u;
+    s[2] = u+a;
+}
+
+__device__ cudaclaw_cuda_speeds_t bump_speeds = bump_compute_speeds;
+
+void bump_assign_speeds(cudaclaw_cuda_speeds_t *speeds)
+{
+    cudaError_t ce = cudaMemcpyFromSymbol(speeds, bump_speeds, sizeof(cudaclaw_cuda_speeds_t));
+    if(ce != cudaSuccess)
+    {
+        fclaw_global_essentialf("ERROR (bump_compute_speeds): %s\n",cudaGetErrorString(ce));
+        exit(0);
+    }    
+}
+
 
 __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves, 
                                  int maux, double ql[], double qr[], 
@@ -89,7 +123,7 @@ void bump_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2)
     cudaError_t ce = cudaMemcpyFromSymbol(rpn2, bump_rpn2, sizeof(cudaclaw_cuda_rpn2_t));
     if(ce != cudaSuccess)
     {
-        fclaw_global_essentialf("ERROR (bump_rpn2adv): %s\n",cudaGetErrorString(ce));
+        fclaw_global_essentialf("ERROR (bump_rpn2shallow): %s\n",cudaGetErrorString(ce));
         exit(0);
     }    
 }

@@ -51,6 +51,9 @@ void bump_link_solvers(fclaw2d_global_t *glob)
 
         bump_assign_rpt2(&cuclaw_vt->cuda_rpt2);
         FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);
+
+        bump_assign_speeds(&cuclaw_vt->cuda_speeds);
+        FCLAW_ASSERT(cuclaw_vt->cuda_speeds != NULL);
     }
     else 
     {
