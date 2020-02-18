@@ -160,6 +160,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         mwork = 2*(meqn + maux) + mwaves;
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
+        bytes_kb = bytes/1024.0;
 
         cudaclaw_compute_speeds_batch <<<grid,block,bytes>>>(mx,my,meqn, mbc, maux, mwaves,
                                                              mwork, dt, t, 
@@ -180,7 +181,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         }
 
         /* Determine shared memory size */
-        blocksize = 192;
+        block_size = 192;
         int mwork1 = 4*meqn + 2*maux + mwaves + meqn*mwaves;
         int mwork2 = 5*meqn + 6*maux;
         mwork = (mwork1 > mwork2) ? mwork1 : mwork2;
