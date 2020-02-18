@@ -177,6 +177,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     }
 	
     /* -------------------------------- Finish CFL ------------------------------------*/ 
+    if (0)
     {
         PROFILE_CUDA_GROUP("Finish CFL",2);
         void    *temp_storage_dev = NULL;
@@ -193,6 +194,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaFree(temp_storage_dev);
         cudaFree(cflgrid_dev);
     }
+    maxcfl = 0.9;
 
     /* -------------------------- Copy q back to host ----------------------------------*/ 
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY_D2H]);       
