@@ -68,10 +68,9 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
                              const int mwork,
                              const double xlower, const double ylower, 
                              const double dx,     const double dy,
-                             double *const qold,       double *const aux, 
-                             double *const speeds,
+                             double *const qold,  double *const aux, 
                              double *const maxcflblocks,
-                             cudaclaw_cuda_speeds_t speeds,
+                             cudaclaw_cuda_speeds_t compute_speeds,
                              cudaclaw_cuda_b4step2_t b4step2,
                              double dt)
 {
@@ -197,7 +196,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
                 auxl[m] = aux[I_aux - 1];
             }               
 
-            speeds(0, meqn, mwaves, maux, ql, qr, auxl, auxr, s);
+            compute_speeds(0, meqn, mwaves, maux, ql, qr, auxl, auxr, s);
         
             for(int mw = 0; mw < mwaves; mw++)
             {
@@ -223,7 +222,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
                 auxd[m] = aux[I_aux - ys];
             }               
 
-            speeds(1, meqn, mwaves, maux, qd, qr, auxd, auxr, s);
+            compute_speeds(1, meqn, mwaves, maux, qd, qr, auxd, auxr, s);
 
             for(int mw = 0; mw < mwaves; mw++)
             {
