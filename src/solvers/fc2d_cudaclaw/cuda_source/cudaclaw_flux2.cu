@@ -1235,7 +1235,7 @@ void cudaclaw_compute_speeds_batch (const int mx,    const int my,
                                     cudaclaw_cuda_speeds_t compute_speeds,
                                     cudaclaw_cuda_b4step2_t b4step2)
     {
-        cudaclaw_compute_speeds(mx,my,meqn,mbc,maux,mwaves,
+        cudaclaw_compute_speeds(mx,my,meqn,mbc,maux,mwaves,mwork,
                                   array_fluxes_struct[blockIdx.z].xlower,
                                   array_fluxes_struct[blockIdx.z].ylower,
                                   array_fluxes_struct[blockIdx.z].dx,
