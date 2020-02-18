@@ -80,14 +80,14 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
     for(int mq = 0; mq < meqn; mq++)
     {
         /* Loop-unrolling! loop over mwaves=3*/
-        bmasdq[mq]  = smin[0]*waveb[mq];
-        bmasdq[mq] += smin[1]*waveb[meqn + mq];
-        bmasdq[mq] += smin[2]*waveb[2*meqn + mq];
-
-        bpasdq[mq]  = smax[0]*waveb[mq];
-        bpasdq[mq] += smax[1]*waveb[meqn + mq];
-        bpasdq[mq] += smax[2]*waveb[2*meqn + mq];
-    }    
+        bmasdq[mq]  = smin[0]*wave[mq];
+        bmasdq[mq] += smin[1]*wave[meqn + mq];
+        bmasdq[mq] += smin[2]*wave[2*meqn + mq];
+        
+        bpasdq[mq]  = smax[0]*wave[mq];
+        bpasdq[mq] += smax[1]*wave[meqn + mq];
+        bpasdq[mq] += smax[2]*wave[2*meqn + mq];
+   }    
 }
 
 __device__ cudaclaw_cuda_rpn2_t bump_rpn2 = bump_rpn2shallow;
