@@ -152,11 +152,11 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
         /* Configure kernel */
         int block_size = FC2D_CUDACLAW_BLOCK_SIZE;
-        
+
+#if 0
         dim3 block(block_size,1,1);
         dim3 grid(1,1,batch_size);
 
-#if 0
         mwork = 2*(meqn + maux) + mwaves;
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
@@ -190,6 +190,9 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 #endif
         /* Determine shared memory size */
         //block_size = 192;
+        dim3 block(1,1,1);
+        dim3 grid(1,1,batch_size);
+
         int mwork1 = 4*meqn + 2*maux + mwaves + meqn*mwaves;
         int mwork2 = 5*meqn + 6*maux;
         mwork = (mwork1 > mwork2) ? mwork1 : mwork2;
