@@ -203,7 +203,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                                               cuclaw_vt->cuda_b4step2);
         cudaDeviceSynchronize();
 
-        cudaError_t code = cudaPeekAtLastError();
+        code = cudaPeekAtLastError();
 
         if (code != cudaSuccess) 
         {
