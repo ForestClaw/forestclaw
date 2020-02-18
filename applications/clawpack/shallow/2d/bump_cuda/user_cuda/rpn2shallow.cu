@@ -70,18 +70,24 @@ __device__ void bump_rpn2shallow(int idir, int meqn, int mwaves,
     wave[mv+meqn*2] = a3*v;
     s[2] = u+a;
     
+
+    double smin[3],smax[3];
+    for(int mw = 0; mw < mwaves; mw++)
+    {
+        smin[mw] = min(sb[mw],0);
+        smax[mw] = max(sb[mw],0);
+    }
     for(mq = 0; mq < meqn; mq++)
     {
         /* Loop-unrolling! loop over mwaves=3*/
-        amdq[mq]  = min(s[0],0.)*wave[mq];
-        amdq[mq] += min(s[1],0.)*wave[meqn + mq];
-        amdq[mq] += min(s[2],0.)*wave[2*meqn + mq];
+        bmasdq[mq]  = smin[0]*waveb[mq];
+        bmasdq[mq] += smin[1]*waveb[meqn + mq];
+        bmasdq[mq] += smin[2]*waveb[2*meqn + mq];
 
-        apdq[mq]  = max(s[0],0.)*wave[mq];
-        apdq[mq] += max(s[1],0.)*wave[meqn + mq];
-        apdq[mq] += max(s[2],0.)*wave[2*meqn + mq];
-
-    }
+        bpasdq[mq]  = smax[0]*waveb[mq];
+        bpasdq[mq] += smax[1]*waveb[meqn + mq];
+        bpasdq[mq] += smax[2]*waveb[2*meqn + mq];
+    }    
 }
 
 __device__ cudaclaw_cuda_rpn2_t bump_rpn2 = bump_rpn2shallow;
