@@ -703,7 +703,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             atomicAdd(&gp[I_q-1],-gupdate);
         }            
     }
-    __syncthreads();
+    //__syncthreads();
 
 
     /*     transverse-x
