@@ -206,6 +206,11 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
             for(int mw = 0; mw < mwaves; mw++)
             {
                 maxcfl = max(maxcfl,fabs(s[mw]*dtdx));
+                if (order[0] == 2)
+                {
+                    int I_speeds = I + mw*zs;
+                    speeds[I_speeds] = s[mw];
+                }
             }
         }
 
@@ -232,6 +237,11 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
             for(int mw = 0; mw < mwaves; mw++)
             {
                 maxcfl = max(maxcfl,fabs(s[mw])*dtdy);
+                if (order[0] == 2)
+                {                    
+                    int I_speeds = I + (mwaves + mw)*zs;
+                    speeds[I_speeds] = s[mw];
+                }
             }
         }
     }
@@ -977,9 +987,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc)*ys + (ix + mbc-1);
 
 
-        double *const qr     = qr_start + meqn*threadIdx.x;    
-        double *const qd     = ql_start + meqn*threadIdx.x;    
-        double *const bmdq   = apdq_start     + meqn*threadIdx.x;   
+        double *const qr     = qr_start    + meqn*threadIdx.x;    
+        double *const qd     = ql_start    + meqn*threadIdx.x;    
+        double *const bmdq   = apdq_start  + meqn*threadIdx.x;   
 
         double *const aux1   = start;    
         double *const aux2   = aux1 + 2*maux;  
