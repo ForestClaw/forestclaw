@@ -256,13 +256,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     extern __shared__ double shared_mem[];
 
     double *const q_start   = shared_mem;
-    double *const aux_start = q_start + meqn*blockDim.x;
-    double *const start     = aux_start + maux*blockDim.x;
-
-
-    //double *const qr   = q_start   + meqn*threadIdx.x;
-    //double *const auxr = aux_start + maux*threadIdx.x;
-
+    double *const aux_start = q_start  + meqn*blockDim.x;
+    double *const start     = aux_start + maux*blockDim.x + mwork*threadIdx.x;
 
     /* --------------------------------- Start code ----------------------------------- */
 
@@ -668,7 +663,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         
 
         //double *const qr     = start;          /* meqn   */
-        double *const qr = q_start + meqn*threadIdx.x;
+        double *const qr     = q_start + meqn*threadIdx.x;
         double *const ql     = start;      /* meqn   */
         double *const amdq   = ql + meqn;      /* meqn   */
         double *const aux1   = amdq + meqn;    /* 2*maux */
