@@ -255,7 +255,13 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     extern __shared__ double shared_mem[];
 
-    double* start  = shared_mem + mwork*threadIdx.x;
+    double *const q_start = shared_mem;
+    double *const aux_start = shared_mem + maux*BlockDim.x;
+
+    double *const qr   = q_start   + meqn*threadIdx.x;
+    double *const auxr = aux_start + maux*threadIdx.x;
+
+    double *const start  = aux_start + maux*BlockDim.x;
 
     /* --------------------------------- Start code ----------------------------------- */
 
@@ -336,14 +342,14 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        double *const qr     = start;                 /* meqn        */
+        //double *const qr     = start;                 /* meqn        */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
             qr[mq] = qold[I_q];        /* Right */
         }
 
-        double *const auxr   = qr      + meqn;         /* maux        */
+        //double *const auxr   = qr      + meqn;         /* maux        */
         for(int m = 0; m < maux; m++)
         {
             int I_aux = I + m*zs;
@@ -352,7 +358,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         {
             /* ------------------------ Normal solve in X direction ------------------- */
-            double *const ql     = auxr   + maux;         /* meqn        */
+            //double *const ql     = auxr   + maux;         /* meqn        */
+            double *const ql     = start   + maux;         /* meqn        */
             double *const auxl   = ql     + meqn;         /* maux        */
             double *const s      = auxl   + maux;         /* mwaves      */
             double *const wave   = s      + mwaves;       /* meqn*mwaves */
@@ -406,7 +413,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         {
             /* ------------------------ Normal solve in Y direction ------------------- */
-            double *const qd     = auxr   + maux;         /* meqn        */
+            double *const qd     = start   + maux;         /* meqn        */
             double *const auxd   = qd     + meqn;         /* maux        */
             double *const s      = auxd   + maux;         /* mwaves      */
             double *const wave   = s      + mwaves;       /* meqn*mwaves */
