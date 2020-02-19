@@ -1265,7 +1265,7 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                   array_fluxes_struct[blockIdx.z].bpdq_dev,
                                   array_fluxes_struct[blockIdx.z].waves_dev,
                                   array_fluxes_struct[blockIdx.z].speeds_dev, 
-                                  double * maxcflblocks,
+                                  maxcflblocks,
                                   rpn2, rpt2, b4step2, t,dt);
 }
 
