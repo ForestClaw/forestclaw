@@ -364,6 +364,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int I_aux = I + m*zs;
             auxr[m] = aux[I_aux];
         }               
+        __syncthreads();
 
         {
             /* ------------------------ Normal solve in X direction ------------------- */
