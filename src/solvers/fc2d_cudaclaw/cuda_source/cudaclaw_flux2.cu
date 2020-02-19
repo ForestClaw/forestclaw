@@ -342,14 +342,14 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        //double *const qr     = start;                 /* meqn        */
+        double *const qr     = start;                 /* meqn        */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
             qr[mq] = qold[I_q];        /* Right */
         }
 
-        //double *const auxr   = qr      + meqn;         /* maux        */
+        double *const auxr   = qr      + meqn;         /* maux        */
         for(int m = 0; m < maux; m++)
         {
             int I_aux = I + m*zs;
@@ -667,8 +667,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         
 
         //double *const qr     = start;          /* meqn   */
-        //double *const qr = q_start + meqn*threadIdx.x;
-
+        double *const qr = q_start + meqn*threadIdx.x;
         double *const ql     = start;      /* meqn   */
         double *const amdq   = ql + meqn;      /* meqn   */
         double *const aux1   = amdq + meqn;    /* 2*maux */
@@ -681,7 +680,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             int I_q = I + mq*zs;
 
-            //qr[mq] = qold[I_q];
+            qr[mq] = qold[I_q];
             ql[mq] = qold[I_q-1];
 
             amdq[mq] = amdq_trans[I_q];
@@ -746,8 +745,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
         //double *const qr     = start;          /* meqn   */
-        //double *const qr = q_start + meqn*theadIdx.x;
-
+        double *const qr     = q_start + meqn*theadIdx.x;
         double *const ql     = start;      /* meqn   */
         double *const amdq   = ql + meqn;      /* meqn   */
         double *const aux1   = amdq + meqn;    /* 2*maux */
@@ -759,7 +757,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             int I_q = I + mq*zs;
 
-            //qr[mq] = qold[I_q];
+            qr[mq] = qold[I_q];
             ql[mq] = qold[I_q-1];
 
             amdq[mq] = amdq_trans[I_q];
@@ -812,7 +810,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
-        //double *const qr     = start;          /* meqn   */
+        double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
         double *const ql     = start;      /* meqn   */
         double *const apdq   = ql + meqn;      /* meqn   */
         double *const aux1   = apdq + meqn;    /* 2*maux */
@@ -824,7 +822,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             int I_q = I + mq*zs;
 
-            //qr[mq] = qold[I_q];
+            qr[mq] = qold[I_q];
             ql[mq] = qold[I_q-1];
 
             apdq[mq] = apdq_trans[I_q];
@@ -886,7 +884,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
-        //double *const qr     = start;          /* meqn   */
+        double *const qr     = q_startt + meqn*theadIdx.x;          /* meqn   */
         double *const ql     = start;      /* meqn   */
         double *const apdq   = ql + meqn;      /* meqn   */
         double *const aux1   = apdq + meqn;    /* 2*maux */
@@ -899,7 +897,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int I_q = I + mq*zs;
 
             ql[mq] = qold[I_q-1];
-            //qr[mq] = qold[I_q];
+            qr[mq] = qold[I_q];
 
             apdq[mq] = apdq_trans[I_q];
         }            
@@ -960,7 +958,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc)*ys + (ix + mbc-1);
 
 
-        //double *const qr     = q_start + meqn*threadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*threadIdx.x;          /* meqn   */
         double *const qd     = start;      /* meqn   */
         double *const bmdq   = qd + meqn;      /* meqn   */
         double *const aux1   = bmdq + meqn;    /* 2*maux */
@@ -973,7 +971,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int I_q = I + mq*zs;
 
             qr[mq] = qold[I_q];
-            //qd[mq] = qold[I_q - ys];
+            qd[mq] = qold[I_q - ys];
 
             bmdq[mq] = bmdq_trans[I_q];
         }            
@@ -1036,7 +1034,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc)*ys + (ix + mbc-1);
 
 
-        //double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
         double *const qd     = start;      /* meqn   */
         double *const bmdq   = qd + meqn;      /* meqn   */
         double *const aux1   = bmdq + meqn;    /* 2*maux */
@@ -1049,7 +1047,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int I_q = I + mq*zs;
 
             qr[mq] = qold[I_q];
-            //qd[mq] = qold[I_q - ys];
+            qd[mq] = qold[I_q - ys];
 
             bmdq[mq] = bmdq_trans[I_q];
         }            
@@ -1104,7 +1102,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc)*ys + (ix + mbc-1);
 
 
-        //double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
         double *const qd     = start;      /* meqn   */
         double *const bpdq   = qd + meqn;      /* meqn   */
         double *const aux1   = bpdq + meqn;    /* 2*maux */
@@ -1117,7 +1115,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int I_q = I + mq*zs;
 
             qr[mq] = qold[I_q];
-            //qd[mq] = qold[I_q - ys];
+            qd[mq] = qold[I_q - ys];
 
             bpdq[mq] = bpdq_trans[I_q];
         }            
@@ -1180,7 +1178,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc)*ys + (ix + mbc-1);
 
 
-        //double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
         double *const qd     = start;      /* meqn   */
         double *const bpdq   = qd + meqn;      /* meqn   */
         double *const aux1   = bpdq + meqn;    /* 2*maux */
@@ -1193,7 +1191,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int I_q = I + mq*zs;
 
             qr[mq] = qold[I_q];
-            //qd[mq] = qold[I_q - ys];
+            qd[mq] = qold[I_q - ys];
 
             bpdq[mq] = bpdq_trans[I_q];
         }            
