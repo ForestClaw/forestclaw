@@ -79,7 +79,16 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
     extern __shared__ double shared_mem[];
 
-    double* start  = shared_mem + mwork*threadIdx.x;
+    //double* start  = shared_mem + mwork*threadIdx.x;
+
+    double *const qr_start    = shared_mem;
+    double *const ql_start    = qr_start    + meqn*blockDim.x;
+    double *const auxr_start  = ql_start    + meqn*blockDim.x;
+    double *const auxl_start  = auxr_start  + maux*blockDim.x;
+
+    int mwork1 = mwork - 2*(meqn+maux);
+    double *const start = auxl_start   + maux*blockDim.x + mwork1*threadIdx.x;
+
 
     /* --------------------------------- Start code ----------------------------------- */
 
@@ -160,14 +169,14 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        double *const qr     = start;      /* meqn        */
+        double *const qr     = qr_start + meqn*threadIdx.x;      /* meqn        */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
             qr[mq] = qold[I_q];        /* Right */
         }
 
-        double *const auxr   = qr      + meqn;         /* maux        */
+        double *const auxr   = auxr_start + maux*threadIdx.x;        /* maux        */
         for(int m = 0; m < maux; m++)
         {
             int I_aux = I + m*zs;
@@ -176,9 +185,9 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
         {
             /* ------------------------ get speeds in the X direction ------------------- */
-            double *const ql     = auxr   + maux;         /* meqn        */
-            double *const auxl   = ql     + meqn;         /* maux        */
-            double *const s      = auxl   + maux;         /* mwaves      */
+            double *const ql     = ql_start + meqn*threadIdx.x;         /* meqn        */
+            double *const auxl   = auxl_start     + maux*threadIdx.x;         /* maux        */
+            double *const s      = start;         /* mwaves      */
 
             for(int mq = 0; mq < meqn; mq++)
             {
@@ -202,9 +211,9 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
         {
             /* ------------------------ Normal solve in Y direction ------------------- */
-            double *const qd     = auxr   + maux;         /* meqn        */
-            double *const auxd   = qd     + meqn;         /* maux        */
-            double *const s      = auxd   + maux;         /* mwaves      */
+            double *const qd     = ql_start + meqn*threadIdx.x;     
+            double *const auxd   = auxl_start     + maux*threadIdx.x;  
+            double *const s      = start;         /* mwaves      */
 
             for(int mq = 0; mq < meqn; mq++)
             {
