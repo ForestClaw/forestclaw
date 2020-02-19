@@ -153,12 +153,6 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
     /* -------------------------- Compute speeds -------------------------------- */
 
-#if 0
-    ifaces_x = mx + 2*mbc-1;
-    ifaces_y = my + 2*mbc-1;
-    num_ifaces = ifaces_x*ifaces_y;
-#endif    
-
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     {
         int ix = thread_index % ifaces_x;
@@ -703,8 +697,10 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             int I_q = I + mq*zs;  
             double gupdate = 0.5*dtdx*bmasdq[mq];
-            gm[I_q - 1] -= gupdate;       
-            gp[I_q - 1] -= gupdate;   
+            //gm[I_q - 1] -= gupdate;       
+            //gp[I_q - 1] -= gupdate;   
+            atomicSub(&gm[I_q-1],gupdate);
+            atomicSub(&gp[I_q-1],gupdate);
         }            
     }
     __syncthreads();
