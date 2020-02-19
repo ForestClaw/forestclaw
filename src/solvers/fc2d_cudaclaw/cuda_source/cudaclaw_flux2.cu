@@ -409,7 +409,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 int I_q = I + mq*zs;
                 fm[I_q] = amdq[mq];
                 fp[I_q] = -apdq[mq]; 
-                if (order[1] > 0)
+                //if (order[1] > 0)
                 {
                     amdq_trans[I_q] = amdq[mq];                                        
                     apdq_trans[I_q] = apdq[mq];  
@@ -466,7 +466,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                 int I_q = I + mq*zs;
                 gm[I_q] = bmdq[mq];
                 gp[I_q] = -bpdq[mq]; 
-                if (order[1] > 0)
+                //if (order[1] > 0)
                 {
                     bmdq_trans[I_q] = bmdq[mq];                                                   
                     bpdq_trans[I_q] = bpdq[mq];
