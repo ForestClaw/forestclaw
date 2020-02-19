@@ -257,7 +257,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     double *const q_start   = shared_mem;
     double *const aux_start = q_start  + meqn*blockDim.x;
-    double *const start     = aux_start + maux*blockDim.x + mwork*threadIdx.x;
+    double *const start     = aux_start + maux*blockDim.x + (mwork-meqn-maux)*threadIdx.x;
 
     /* --------------------------------- Start code ----------------------------------- */
 
