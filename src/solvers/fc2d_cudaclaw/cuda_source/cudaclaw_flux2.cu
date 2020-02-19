@@ -685,8 +685,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         double *const qr     = qr_start + meqn*threadIdx.x;
         double *const ql     = ql_start + meqn*threadIdx.x;     
 
-        double *const amdq   = start;          
-        double *const aux1   = amdq + meqn;    
+        double *const amdq   = amdq_start     + meqn*threadIdx.x;          
+        double *const aux1   = start;    
         double *const aux2   = aux1 + 2*maux;  
         double *const aux3   = aux2 + 2*maux;  
         double *const bmasdq = aux3 + 2*maux;  
@@ -764,8 +764,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         double *const qr     = qr_start + meqn*threadIdx.x;
         double *const ql     = ql_start + meqn*threadIdx.x;     
 
-        double *const amdq   = start;          
-        double *const aux1   = amdq + meqn;    
+        double *const amdq   = amdq_start     + meqn*threadIdx.x;          
+        double *const aux1   = start;    
         double *const aux2   = aux1 + 2*maux;  
         double *const aux3   = aux2 + 2*maux;  
         double *const bmasdq = aux3 + 2*maux;  
@@ -830,8 +830,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         double *const qr     = qr_start + meqn*threadIdx.x;     
         double *const ql     = ql_start + meqn*threadIdx.x;     
 
-        double *const apdq   = start;         
-        double *const aux1   = apdq + meqn;   
+        double *const apdq   = apdq_start     + meqn*threadIdx.x;         
+        double *const aux1   = start;   
         double *const aux2   = aux1 + 2*maux; 
         double *const aux3   = aux2 + 2*maux; 
         double *const bmasdq = aux3 + 2*maux; 
@@ -904,9 +904,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         double *const qr     = qr_start + meqn*threadIdx.x;    
         double *const ql     = ql_start + meqn*threadIdx.x;    
+        double *const apdq   = apdq_start     + meqn*threadIdx.x;   
 
-        double *const apdq   = start;          
-        double *const aux1   = apdq + meqn;    
+        double *const aux1   = start;    
         double *const aux2   = aux1 + 2*maux;  
         double *const aux3   = aux2 + 2*maux;  
         double *const bmasdq = aux3 + 2*maux;  
@@ -979,9 +979,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         double *const qr     = qr_start + meqn*threadIdx.x;    
         double *const qd     = ql_start + meqn*threadIdx.x;    
+        double *const bmdq   = apdq_start     + meqn*threadIdx.x;   
 
-        double *const bmdq   = start;          
-        double *const aux1   = bmdq + meqn;    
+        double *const aux1   = start;    
         double *const aux2   = aux1 + 2*maux;  
         double *const aux3   = aux2 + 2*maux;  
         double *const bmasdq = aux3 + 2*maux;  
@@ -1056,9 +1056,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         double *const qr     = qr_start + meqn*threadIdx.x;      
         double *const qd     = ql_start + meqn*threadIdx.x;      
+        double *const bmdq   = apdq_start     + meqn*threadIdx.x;   
 
-        double *const bmdq   = start;         
-        double *const aux1   = bmdq + meqn;   
+        double *const aux1   = start;   
         double *const aux2   = aux1 + 2*maux; 
         double *const aux3   = aux2 + 2*maux; 
         double *const bmasdq = aux3 + 2*maux; 
@@ -1125,9 +1125,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         double *const qr     = qr_start + meqn*threadIdx.x;  
         double *const qd     = ql_start + meqn*threadIdx.x;  
+        double *const bpdq   = apdq_start     + meqn*threadIdx.x;   
 
-        double *const bpdq   = start;         
-        double *const aux1   = bpdq + meqn;   
+        double *const aux1   = start;  
         double *const aux2   = aux1 + 2*maux; 
         double *const aux3   = aux2 + 2*maux; 
         double *const bmasdq = aux3 + 2*maux; 
@@ -1201,9 +1201,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         double *const qr     = qr_start + meqn*threadIdx.x;    
         double *const qd     = ql_start + meqn*threadIdx.x;   
+        double *const bpdq   = apdq_start     + meqn*threadIdx.x;   
 
-        double *const bpdq   = start;          
-        double *const aux1   = bpdq + meqn;    
+        double *const aux1   = start;    
         double *const aux2   = aux1 + 2*maux;  
         double *const aux3   = aux2 + 2*maux;  
         double *const bmasdq = aux3 + 2*maux;  
