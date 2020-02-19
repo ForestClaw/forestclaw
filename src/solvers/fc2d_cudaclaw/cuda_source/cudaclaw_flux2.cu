@@ -255,8 +255,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     extern __shared__ double shared_mem[];
 
-    double *const q_start = shared_mem;
-    double *const aux_start = shared_mem + maux*blockDim.x;
+    double *const q_start   = shared_mem;
+    double *const aux_start = shared_mem + meqn*blockDim.x;
 
     double *const qr   = q_start   + meqn*threadIdx.x;
     double *const auxr = aux_start + maux*threadIdx.x;
