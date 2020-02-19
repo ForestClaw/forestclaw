@@ -148,7 +148,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     }
 
 
-    if (0)
     {
         PROFILE_CUDA_GROUP("Configure and call to compute speeds",6);  
 
@@ -182,7 +181,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     }        
 
     /* -------------------------------- Finish CFL ------------------------------------*/ 
-    if (0)
     {
         PROFILE_CUDA_GROUP("Finish CFL",2);
         void    *temp_storage_dev = NULL;
@@ -199,7 +197,6 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaFree(temp_storage_dev);
         cudaFree(cflgrid_dev);
     }
-    maxcfl = 0.5;
 
 
     {
