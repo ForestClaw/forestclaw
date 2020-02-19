@@ -68,6 +68,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
                              const double xlower, const double ylower, 
                              const double dx,     const double dy,
                              double *const qold,  double *const aux, 
+                             double *const speeds,
                              double *const maxcflblocks,
                              cudaclaw_cuda_speeds_t compute_speeds,
                              cudaclaw_cuda_b4step2_t b4step2,
@@ -1326,6 +1327,7 @@ void cudaclaw_compute_speeds_batch (const int mx,    const int my,
                                   array_fluxes_struct[blockIdx.z].dy,
                                   array_fluxes_struct[blockIdx.z].qold_dev,
                                   array_fluxes_struct[blockIdx.z].aux_dev,
+                                  array_fluxes_struct[blockIdx.z].speeds_dev, 
                                   maxcflblocks, compute_speeds, b4step2, t, dt);
 }
 
