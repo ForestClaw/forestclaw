@@ -29,6 +29,7 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                       const int mwork,
                                       const double dt, const double t,
                                       struct cudaclaw_fluxes* array_fluxes_struct_dev,
+                                      double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
                                       cudaclaw_cuda_rpt2_t rpt2,
                                       cudaclaw_cuda_b4step2_t b4step2);
@@ -148,6 +149,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     }
 
 
+#if 0
     {
         PROFILE_CUDA_GROUP("Configure and call to compute speeds",6);  
 
@@ -174,30 +176,12 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaError_t code = cudaPeekAtLastError();
         if (code != cudaSuccess) 
         {
-            fclaw_global_essentialf("ERROR (cudaclaw_step2 (compute_speeds).cu) : %s\n\n", 
+            fclaw_global_essentialf("ERROR (cudaclaw_step2.cu (compute_speeds)) : %s\n\n", 
                                     cudaGetErrorString(code));
             exit(code);
         }
     }        
-
-    /* -------------------------------- Finish CFL ------------------------------------*/ 
-    {
-        PROFILE_CUDA_GROUP("Finish CFL",2);
-        void    *temp_storage_dev = NULL;
-        size_t  temp_storage_bytes = 0;
-        double  *cflgrid_dev;
-
-        cudaMalloc(&cflgrid_dev, sizeof(double));  
-        CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
-                                            maxcflblocks_dev,cflgrid_dev,batch_size));
-        cudaMalloc(&temp_storage_dev, temp_storage_bytes);
-        CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
-                                            maxcflblocks_dev,cflgrid_dev,batch_size));
-        cudaMemcpy(&maxcfl, cflgrid_dev, sizeof(double),cudaMemcpyDeviceToHost);
-        cudaFree(temp_storage_dev);
-        cudaFree(cflgrid_dev);
-    }
-
+#endif    
 
     {
         PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
@@ -220,6 +204,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork, dt,t,
                                                               array_fluxes_struct_dev,
+                                                              double * maxcflblocks,
                                                               cuclaw_vt->cuda_rpn2,
                                                               cuclaw_vt->cuda_rpt2,
                                                               cuclaw_vt->cuda_b4step2);
@@ -235,6 +220,26 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
             exit(code);
         }
     }
+
+    /* -------------------------------- Finish CFL ------------------------------------*/ 
+    {
+        PROFILE_CUDA_GROUP("Finish CFL",2);
+        void    *temp_storage_dev = NULL;
+        size_t  temp_storage_bytes = 0;
+        double  *cflgrid_dev;
+
+        cudaMalloc(&cflgrid_dev, sizeof(double));  
+        CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
+                                            maxcflblocks_dev,cflgrid_dev,batch_size));
+        cudaMalloc(&temp_storage_dev, temp_storage_bytes);
+        CubDebugExit(cub::DeviceReduce::Max(temp_storage_dev,temp_storage_bytes,
+                                            maxcflblocks_dev,cflgrid_dev,batch_size));
+        cudaMemcpy(&maxcfl, cflgrid_dev, sizeof(double),cudaMemcpyDeviceToHost);
+        cudaFree(temp_storage_dev);
+        cudaFree(cflgrid_dev);
+    }
+
+
 	
     /* -------------------------- Copy q back to host ----------------------------------*/ 
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY_D2H]);       
