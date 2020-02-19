@@ -697,13 +697,13 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             int I_q = I + mq*zs;  
             double gupdate = 0.5*dtdx*bmasdq[mq];
-            //gm[I_q - 1] -= gupdate;       
-            //gp[I_q - 1] -= gupdate;   
-            atomicAdd(&gm[I_q-1],-gupdate);
-            atomicAdd(&gp[I_q-1],-gupdate);
+            gm[I_q - 1] -= gupdate;       
+            gp[I_q - 1] -= gupdate;   
+            //atomicAdd(&gm[I_q-1],-gupdate);
+            //atomicAdd(&gp[I_q-1],-gupdate);
         }            
     }
-    //__syncthreads();
+    __syncthreads();
 
 
     /*     transverse-x
