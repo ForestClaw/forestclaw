@@ -699,8 +699,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             double gupdate = 0.5*dtdx*bmasdq[mq];
             //gm[I_q - 1] -= gupdate;       
             //gp[I_q - 1] -= gupdate;   
-            atomicSub(&gm[I_q-1],gupdate);
-            atomicSub(&gp[I_q-1],gupdate);
+            atomicAdd(&gm[I_q-1],-gupdate);
+            atomicAdd(&gp[I_q-1],-gupdate);
         }            
     }
     __syncthreads();
