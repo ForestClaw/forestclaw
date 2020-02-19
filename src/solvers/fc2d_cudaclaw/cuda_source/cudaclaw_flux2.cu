@@ -377,13 +377,13 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
             for(int mq = 0; mq < meqn; mq++)
             {
-                int I_q = I + mq*zs;
                 if (ix > 1) 
                 {
-                    ql -= 1;
+                    ql -= meqn;
                 }
                 else
                 {
+                    int I_q = I + mq*zs;
                     ql[mq] = qold[I_q - 1];  
                 }
             }
