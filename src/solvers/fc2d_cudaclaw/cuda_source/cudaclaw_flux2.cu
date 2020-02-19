@@ -256,12 +256,13 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     extern __shared__ double shared_mem[];
 
     double *const q_start   = shared_mem;
-    double *const aux_start = shared_mem + meqn*blockDim.x;
+    double *const aux_start = q_start + meqn*blockDim.x;
+    double *const start     = aux_start + maux*blockDim.x;
 
-    double *const qr   = q_start   + meqn*threadIdx.x;
-    double *const auxr = aux_start + maux*threadIdx.x;
 
-    double *const start  = aux_start + maux*blockDim.x;
+    //double *const qr   = q_start   + meqn*threadIdx.x;
+    //double *const auxr = aux_start + maux*threadIdx.x;
+
 
     /* --------------------------------- Start code ----------------------------------- */
 
@@ -342,7 +343,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        double *const qr     = q_start + meqn*threadIdx.x;                 /* meqn        */
+        double *const qr  = q_start + meqn*threadIdx.x;                 /* meqn        */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
