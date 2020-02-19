@@ -169,14 +169,14 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        double *const qr     = qr_start + meqn*threadIdx.x;      /* meqn        */
+        double *const qr = qr_start + meqn*threadIdx.x;      /* meqn        */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
             qr[mq] = qold[I_q];        /* Right */
         }
 
-        double *const auxr   = auxr_start + maux*threadIdx.x;        /* maux        */
+        double *const auxr = auxr_start + maux*threadIdx.x;        /* maux        */
         for(int m = 0; m < maux; m++)
         {
             int I_aux = I + m*zs;
@@ -185,9 +185,9 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
         {
             /* ------------------------ get speeds in the X direction ------------------- */
-            double *const ql     = ql_start + meqn*threadIdx.x;         /* meqn        */
-            double *const auxl   = auxl_start     + maux*threadIdx.x;         /* maux        */
-            double *const s      = start;         /* mwaves      */
+            double *const ql     = ql_start    + meqn*threadIdx.x;       
+            double *const auxl   = auxl_start  + maux*threadIdx.x; 
+            double *const s      = start;       
 
             for(int mq = 0; mq < meqn; mq++)
             {
@@ -211,9 +211,9 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
         {
             /* ------------------------ Normal solve in Y direction ------------------- */
-            double *const qd     = ql_start + meqn*threadIdx.x;     
-            double *const auxd   = auxl_start     + maux*threadIdx.x;  
-            double *const s      = start;         /* mwaves      */
+            double *const qd     = ql_start    + meqn*threadIdx.x;     
+            double *const auxd   = auxl_start  + maux*threadIdx.x;  
+            double *const s      = start;      
 
             for(int mq = 0; mq < meqn; mq++)
             {
@@ -351,14 +351,14 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        double *const qr  = qr_start + meqn*threadIdx.x;                 /* meqn        */
+        double *const qr  = qr_start + meqn*threadIdx.x;        
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
             qr[mq] = qold[I_q];        /* Right */
         }
 
-        double *const auxr   = auxr_start + maux*threadIdx.x;         /* maux        */
+        double *const auxr   = auxr_start + maux*threadIdx.x;    
         for(int m = 0; m < maux; m++)
         {
             int I_aux = I + m*zs;
@@ -368,17 +368,24 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             /* ------------------------ Normal solve in X direction ------------------- */
             //double *const ql     = auxr   + maux;         /* meqn        */
-            double *const ql     = ql_start   + meqn*threadIdx.x;      
-            double *const auxl   = auxl_start + maux*threadIdx.x;    
-            double *const s      = start;         /* mwaves      */
-            double *const wave   = s      + mwaves;       /* meqn*mwaves */
-            double *const amdq   = wave   + meqn*mwaves;  /* meqn        */
-            double *const apdq   = amdq   + meqn;         /* meqn        */
+            double *ql     = ql_start    + meqn*threadIdx.x;      
+            double *const auxl   = auxl_start  + maux*threadIdx.x;    
+            double *const s      = start;      
+            double *const wave   = s      + mwaves;       
+            double *const amdq   = wave   + meqn*mwaves;  
+            double *const apdq   = amdq   + meqn;         
 
             for(int mq = 0; mq < meqn; mq++)
             {
                 int I_q = I + mq*zs;
-                ql[mq] = qold[I_q - 1];    /* Left  */
+                if (ix > 1) 
+                {
+                    ql -= 1;
+                }
+                else
+                {
+                    ql[mq] = qold[I_q - 1];  
+                }
             }
 
             for(int m = 0; m < maux; m++)
