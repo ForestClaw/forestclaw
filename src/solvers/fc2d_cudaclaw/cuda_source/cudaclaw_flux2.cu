@@ -244,14 +244,15 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                                double *const amdq_trans, double *const apdq_trans, 
                                double *const bmdq_trans, double *const bpdq_trans,
                                double *const waves,      double *const speeds,
+                               double *const maxcflblocks,
                                cudaclaw_cuda_rpn2_t rpn2,
                                cudaclaw_cuda_rpt2_t rpt2,
                                cudaclaw_cuda_b4step2_t b4step2,
                                double t,double dt)
 {
-    //typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
+    typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
     
-    //__shared__ typename BlockReduce::TempStorage temp_storage;
+    __shared__ typename BlockReduce::TempStorage temp_storage;
 
     extern __shared__ double shared_mem[];
 
@@ -388,12 +389,12 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
             for(int mw = 0; mw < mwaves; mw++)
             {
-                //maxcfl = max(maxcfl,fabs(s[mw]*dtdx));
+                maxcfl = max(maxcfl,fabs(s[mw]*dtdx));
 
                 if (order[0] == 2)
                 {                    
-                    //int I_speeds = I + mw*zs;
-                    //speeds[I_speeds] = s[mw];
+                    int I_speeds = I + mw*zs;
+                    speeds[I_speeds] = s[mw];
                     for(int mq = 0; mq < meqn; mq++)
                     {
                         int k = mw*meqn + mq;
@@ -442,12 +443,12 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
             for(int mw = 0; mw < mwaves; mw++)
             {
-                //maxcfl = max(maxcfl,fabs(s[mw])*dtdy);
+                maxcfl = max(maxcfl,fabs(s[mw])*dtdy);
 
                 if (order[0] == 2)
                 {                    
-                    //int I_speeds = I + (mwaves + mw)*zs;
-                    //speeds[I_speeds] = s[mw];
+                    int I_speeds = I + (mwaves + mw)*zs;
+                    speeds[I_speeds] = s[mw];
                     for(int mq = 0; mq < meqn; mq++)
                     {
                         int I_waves = I + ((mwaves + mw)*meqn + mq)*zs;
@@ -458,9 +459,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }
     }
 
-    //maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
+    maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
 
-    __syncthreads();  /* Does block reduce take care of this sync? */
+    //__syncthreads();  /* Does block reduce take care of this sync? */
 
 
     /* ---------------------- Second order corrections and limiters --------------------*/  
@@ -707,7 +708,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
  
             gupdate = 0.5*dtdx*bpasdq[mq];
             atomicAdd(&gm[I_q - 1 + ys],-gupdate);
-            atomicAdd(&gp[I_q - 1 + ys], -gupdate);
+            atomicAdd(&gp[I_q - 1 + ys],-gupdate);
 #endif            
         }            
     }
@@ -1242,6 +1243,7 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                       const int mwork,
                                       const double dt, const double t,
                                       cudaclaw_fluxes_t* array_fluxes_struct,
+                                      double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
                                       cudaclaw_cuda_rpt2_t rpt2,
                                       cudaclaw_cuda_b4step2_t b4step2)
@@ -1263,6 +1265,7 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                   array_fluxes_struct[blockIdx.z].bpdq_dev,
                                   array_fluxes_struct[blockIdx.z].waves_dev,
                                   array_fluxes_struct[blockIdx.z].speeds_dev, 
+                                  double * maxcflblocks,
                                   rpn2, rpt2, b4step2, t,dt);
 }
 
