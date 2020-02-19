@@ -342,14 +342,14 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        double *const qr     = start;                 /* meqn        */
+        double *const qr     = q_start + meqn*threadIdx.x;                 /* meqn        */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
             qr[mq] = qold[I_q];        /* Right */
         }
 
-        double *const auxr   = qr      + meqn;         /* maux        */
+        double *const auxr   = aux_start + maux*threadIdx.x;         /* maux        */
         for(int m = 0; m < maux; m++)
         {
             int I_aux = I + m*zs;
@@ -359,7 +359,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         {
             /* ------------------------ Normal solve in X direction ------------------- */
             //double *const ql     = auxr   + maux;         /* meqn        */
-            double *const ql     = start   + maux;         /* meqn        */
+            double *const ql     = start;         /* meqn        */
             double *const auxl   = ql     + meqn;         /* maux        */
             double *const s      = auxl   + maux;         /* mwaves      */
             double *const wave   = s      + mwaves;       /* meqn*mwaves */
@@ -413,7 +413,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         {
             /* ------------------------ Normal solve in Y direction ------------------- */
-            double *const qd     = start   + maux;         /* meqn        */
+            double *const qd     = start;         /* meqn        */
             double *const auxd   = qd     + meqn;         /* maux        */
             double *const s      = auxd   + maux;         /* mwaves      */
             double *const wave   = s      + mwaves;       /* meqn*mwaves */
@@ -745,7 +745,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
         //double *const qr     = start;          /* meqn   */
-        double *const qr     = q_start + meqn*theadIdx.x;
+        double *const qr     = q_start + meqn*threadIdx.x;
         double *const ql     = start;      /* meqn   */
         double *const amdq   = ql + meqn;      /* meqn   */
         double *const aux1   = amdq + meqn;    /* 2*maux */
@@ -810,7 +810,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
-        double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*threadIdx.x;          /* meqn   */
         double *const ql     = start;      /* meqn   */
         double *const apdq   = ql + meqn;      /* meqn   */
         double *const aux1   = apdq + meqn;    /* 2*maux */
@@ -884,7 +884,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
-        double *const qr     = q_startt + meqn*theadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*threadIdx.x;          /* meqn   */
         double *const ql     = start;      /* meqn   */
         double *const apdq   = ql + meqn;      /* meqn   */
         double *const aux1   = apdq + meqn;    /* 2*maux */
@@ -1034,7 +1034,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc)*ys + (ix + mbc-1);
 
 
-        double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*threadIdx.x;          /* meqn   */
         double *const qd     = start;      /* meqn   */
         double *const bmdq   = qd + meqn;      /* meqn   */
         double *const aux1   = bmdq + meqn;    /* 2*maux */
@@ -1102,7 +1102,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc)*ys + (ix + mbc-1);
 
 
-        double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*threadIdx.x;          /* meqn   */
         double *const qd     = start;      /* meqn   */
         double *const bpdq   = qd + meqn;      /* meqn   */
         double *const aux1   = bpdq + meqn;    /* 2*maux */
@@ -1178,7 +1178,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int I =  (iy + mbc)*ys + (ix + mbc-1);
 
 
-        double *const qr     = q_start + meqn*theadIdx.x;          /* meqn   */
+        double *const qr     = q_start + meqn*threadIdx.x;          /* meqn   */
         double *const qd     = start;      /* meqn   */
         double *const bpdq   = qd + meqn;      /* meqn   */
         double *const aux1   = bpdq + meqn;    /* 2*maux */
