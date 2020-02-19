@@ -204,7 +204,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
                                                               mwork, dt,t,
                                                               array_fluxes_struct_dev,
-                                                              maxcflblocks,
+                                                              maxcflblocks_dev,
                                                               cuclaw_vt->cuda_rpn2,
                                                               cuclaw_vt->cuda_rpt2,
                                                               cuclaw_vt->cuda_b4step2);
