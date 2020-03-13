@@ -158,7 +158,7 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
                                  LocalData<2> f) const 
 {
 
-    int mx = pinfo->ns[0];
+    int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
 #if 0    
     int mbc = pinfo->num_ghost_cells;
@@ -193,8 +193,37 @@ void fivePoint::apply(std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector
 void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> u,
                              LocalData<2> f) const 
 {
-    /* Move any ghost cell data to the right hand side */
-    ;
+    int mx = pinfo->ns[0]; 
+    int my = pinfo->ns[1];
+#if 0    
+    int mbc = pinfo->num_ghost_cells;
+    double xlower = pinfo->starts[0];
+    double ylower = pinfo->starts[1];
+#endif    
+    double dx = pinfo->spacings[0];
+    double dx2 = dx*dx;
+
+    double dy = pinfo->spacings[1];
+    double dy2 = dy*dy;
+
+    for(int j = 0; j < my; j++)
+    {
+        /* bool hasNbr(Side<D> s) */
+        if (pinfo->hasNbr(Side<2>::east))
+            f[{0,j}] += -u[{-1,j}]/dx2;
+
+        if (pinfo->hasNbr(Side<2>::west))
+            f[{mx-1,j}] += -u[{mx,j}]/dx2;
+    }
+
+    for(int i = 0; i < mx; i++)
+    {
+        if (pinfo->hasNbr(Side<2>::south))
+            f[{i,0}] += -u[{i,-1}]/dy2;
+
+        if (pinfo->hasNbr(Side<2>::north))
+            f[{i,my-1}] += -u[{i,my}]/dy2;
+    }
 }
  
 
@@ -210,9 +239,6 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 #if 0  
     fc2d_multigrid_vtable_t *mg_vt = fc2d_multigrid_vt();
 #endif  
-
-    // this should be moved somewhere else
-    PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
     // create thunderegg vector for eqn 0
     shared_ptr<Vector<2>> f(new fc2d_multigrid_vector(glob, 0));
@@ -260,7 +286,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create vector for beta
-    auto beta_vec = PetscVector<2>::GetNewVector(te_domain);
+    auto beta_vec = ValVector<2>::GetNewVector(te_domain);
     DomainTools<2>::setValuesWithGhost(te_domain, beta_vec, beta_coeff);
 
     // ghost filler
