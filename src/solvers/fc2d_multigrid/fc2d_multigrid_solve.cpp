@@ -76,7 +76,7 @@ public:
 
     void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> u,
                           LocalData<2> f) const;
-    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> u,
+    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
                        LocalData<2> f) const;
 
 
@@ -169,6 +169,35 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dx = pinfo->spacings[0];
 
 
+#if 0
+    //if physical boundary
+    if (!pinfo->hasNbr(Side<2>::east)){
+        auto ghosts = u.getGhostSliceOnSide(Side<2>::east,1);
+        for(int j = 0; j < my; j++){
+            ghosts[{j}] = -u[{0,j}];
+        }
+    }
+    if (!pinfo->hasNbr(Side<2>::west)){
+        auto ghosts = u.getGhostSliceOnSide(Side<2>::west,1);
+        for(int j = 0; j < my; j++){
+            ghosts[{j}] = -u[{mx-1,j}];
+        }
+    }
+
+    if (!pinfo->hasNbr(Side<2>::south)){
+        auto ghosts = u.getGhostSliceOnSide(Side<2>::south,1);
+        for(int i = 0; i < mx; i++){
+            ghosts[{i}] = -u[{i,0}];
+        }
+    }
+    if (!pinfo->hasNbr(Side<2>::north)){
+        auto ghosts = u.getGhostSliceOnSide(Side<2>::north,1);
+        for(int j = 0; j < my; j++){
+            ghosts[{j}] = -u[{mx-1,j}];
+        }
+    }
+#endif
+
     for(int i = 0; i < mx; i++)
     {
         for(int j = 0; j < my; j++)
@@ -190,7 +219,7 @@ void fivePoint::apply(std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector
 #endif
 
 
-void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> u,
+void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
                              LocalData<2> f) const 
 {
     int mx = pinfo->ns[0]; 
@@ -210,19 +239,31 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, const L
     {
         /* bool hasNbr(Side<D> s) */
         if (pinfo->hasNbr(Side<2>::east))
+        {
             f[{0,j}] += -u[{-1,j}]/dx2;
+            u[{-1,j}]=0;
+        }
 
         if (pinfo->hasNbr(Side<2>::west))
+        {
             f[{mx-1,j}] += -u[{mx,j}]/dx2;
+            u[{mx,j}]=0;
+        }
     }
 
     for(int i = 0; i < mx; i++)
     {
         if (pinfo->hasNbr(Side<2>::south))
+        {
             f[{i,0}] += -u[{i,-1}]/dy2;
+            u[{i,-1}]=0;
+        }
 
         if (pinfo->hasNbr(Side<2>::north))
+        {
             f[{i,my-1}] += -u[{i,my}]/dy2;
+            u[{i,my}]=0;
+        }
     }
 }
  
