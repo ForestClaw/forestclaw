@@ -94,12 +94,12 @@ SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
         endif
     elseif (example .eq. 2) then
         !! Example in Cartesian coordinates
-        q = sin(pi*a*x)*cos(pi*b*y)
+        q = cos(pi*a*x)*cos(pi*b*y)
         if (flag .ge. 1) then
             qx =  pi*a*cos(pi*a*x)*cos(pi*b*y)
             qy = -pi*b*sin(pi*a*x)*sin(pi*b*y)
             if (flag .eq. 2 ) then
-                qlap = -(pi**2*(a**2 + b**2))*sin(pi*a*x)*cos(pi*b*y)
+                qlap = -(pi**2*(a**2 + b**2))*cos(pi*a*x)*cos(pi*b*y)
             endif
         endif
     elseif (example .eq. 3) then
