@@ -154,12 +154,13 @@ fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
 
 
 void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                                 const LocalData<2> u,
+                                 LocalData<2> u,
                                  LocalData<2> f) const 
 {
 
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
+
 #if 0    
     int mbc = pinfo->num_ghost_cells;
     double xlower = pinfo->starts[0];
@@ -167,6 +168,35 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dy = pinfo->spacings[1];
 #endif    
     double dx = pinfo->spacings[0];
+
+
+    /* Apply homogeneous physical boundary conditions */
+    for(int j = 0; j < my; j++)
+    {
+        /* bool hasNbr(Side<D> s) */
+        if (!pinfo->hasNbr(Side<2>::west))
+        {
+            u[{-1,j}] = -u[{0,j}];
+        }
+
+        if (!pinfo->hasNbr(Side<2>::east))
+        {
+            u[{mx,j}] = -u[{mx-1,j}];;
+        }
+    }
+
+    for(int i = 0; i < mx; i++)
+    {
+        if (!pinfo->hasNbr(Side<2>::south))
+        {
+            u[{i,-1}] = -u[{i,0}];
+        }
+
+        if (!pinfo->hasNbr(Side<2>::north))
+        {
+            u[{i,my}] = -u[{i,my-1}];
+        }
+    }
 
 
 #if 0
@@ -219,8 +249,8 @@ void fivePoint::apply(std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector
 #endif
 
 
-void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
-                             LocalData<2> f) const 
+void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+                              LocalData<2> u, LocalData<2> f) const 
 {
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
@@ -238,13 +268,13 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalDa
     for(int j = 0; j < my; j++)
     {
         /* bool hasNbr(Side<D> s) */
-        if (pinfo->hasNbr(Side<2>::east))
+        if (pinfo->hasNbr(Side<2>::west))
         {
             f[{0,j}] += -u[{-1,j}]/dx2;
             u[{-1,j}]=0;
         }
 
-        if (pinfo->hasNbr(Side<2>::west))
+        if (pinfo->hasNbr(Side<2>::east))
         {
             f[{mx-1,j}] += -u[{mx,j}]/dx2;
             u[{mx,j}]=0;
@@ -345,6 +375,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
+
 #if 1  
     if(mg_opt->mg_prec)
     {
@@ -362,6 +393,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
         BiLinearGhostFiller::Generator filler_gen(ghost_filler);
         fivePoint::Generator   op_gen(op, filler_gen);
         BiCGStabPatchSolver<2>::Generator smooth_gen(solver, filler_gen, op_gen);
+
         GMG::LinearRestrictor<2>::Generator        restrictor_gen;
 		GMG::DrctIntp<2>::Generator       interpolator_gen;
         M = GMG::CycleFactory<2>::getCycle(copts, domain_gen, restrictor_gen, interpolator_gen,
