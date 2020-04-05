@@ -56,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Thunderegg/GMG/CycleFactory.h>
 #include <Thunderegg/BiLinearGhostFiller.h>
 
+#define USE_FIVEPOINT 0
+
 using namespace std;
 using namespace Thunderegg;
 //using namespace Thunderegg::Schur;
@@ -169,7 +171,6 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 #endif    
     double dx = pinfo->spacings[0];
 
-
     /* Apply homogeneous physical boundary conditions */
     for(int j = 0; j < my; j++)
     {
@@ -191,7 +192,6 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         {
             u[{i,-1}] = -u[{i,0}];
         }
-
         if (!pinfo->hasNbr(Side<2>::north))
         {
             u[{i,my}] = -u[{i,my-1}];
@@ -271,13 +271,13 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
         if (pinfo->hasNbr(Side<2>::west))
         {
             f[{0,j}] += -u[{-1,j}]/dx2;
-            u[{-1,j}]=0;
+            u[{-1,j}] = 0;
         }
 
         if (pinfo->hasNbr(Side<2>::east))
         {
             f[{mx-1,j}] += -u[{mx,j}]/dx2;
-            u[{mx,j}]=0;
+            u[{mx,j}] = 0;
         }
     }
 
@@ -362,8 +362,13 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
+
     // patch operator
+#if USE_FIVEPOINT    
     auto op = make_shared<fivePoint>(te_domain,ghost_filler);
+#else
+    auto op = make_shared<StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
+#endif    
 
     // set the patch solver
     auto  solver = make_shared<BiCGStabPatchSolver<2>>(te_domain, ghost_filler, op,
@@ -376,7 +381,6 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
 
-#if 1  
     if(mg_opt->mg_prec)
     {
         // options
@@ -391,7 +395,11 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 
         //generators for levels
         BiLinearGhostFiller::Generator filler_gen(ghost_filler);
+#if USE_FIVEPOINT        
         fivePoint::Generator   op_gen(op, filler_gen);
+#else
+        StarPatchOperator<2>::Generator   op_gen(op, filler_gen);
+#endif        
         BiCGStabPatchSolver<2>::Generator smooth_gen(solver, filler_gen, op_gen);
 
         GMG::LinearRestrictor<2>::Generator        restrictor_gen;
@@ -399,7 +407,6 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
         M = GMG::CycleFactory<2>::getCycle(copts, domain_gen, restrictor_gen, interpolator_gen,
                                            smooth_gen, op_gen);
     }
-#endif
 
     // solve
     shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(te_domain));
