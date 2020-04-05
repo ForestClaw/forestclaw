@@ -364,7 +364,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-#if USE_FIVEPOINT    
+#if USE_FIVEPOINT == 1
     auto op = make_shared<fivePoint>(te_domain,ghost_filler);
 #else
     auto op = make_shared<StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
@@ -395,7 +395,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 
         //generators for levels
         BiLinearGhostFiller::Generator filler_gen(ghost_filler);
-#if USE_FIVEPOINT        
+#if USE_FIVEPOINT == 1        
         fivePoint::Generator   op_gen(op, filler_gen);
 #else
         StarPatchOperator<2>::Generator   op_gen(op, filler_gen);
