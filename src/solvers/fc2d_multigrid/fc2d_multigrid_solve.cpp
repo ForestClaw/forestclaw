@@ -179,11 +179,13 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         {
             u[{-1,j}] = -u[{0,j}];
         }
+        //u[{-1,j}] = -u[{0,j}];
 
         if (!pinfo->hasNbr(Side<2>::east))
         {
             u[{mx,j}] = -u[{mx-1,j}];;
         }
+        //u[{mx,j}] = -u[{mx-1,j}];;
     }
 
     for(int i = 0; i < mx; i++)
@@ -192,10 +194,12 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         {
             u[{i,-1}] = -u[{i,0}];
         }
+        //u[{i,-1}] = -u[{i,0}];
         if (!pinfo->hasNbr(Side<2>::north))
         {
             u[{i,my}] = -u[{i,my-1}];
         }
+        //u[{i,my}] = -u[{i,my-1}];
     }
 
 
@@ -264,6 +268,8 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 
     double dy = pinfo->spacings[1];
     double dy2 = dy*dy;
+
+    //return;
 
     for(int j = 0; j < my; j++)
     {
