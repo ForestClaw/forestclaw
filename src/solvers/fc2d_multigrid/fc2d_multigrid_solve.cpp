@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Thunderegg/GMG/CycleFactory.h>
 #include <Thunderegg/BiLinearGhostFiller.h>
 
-#define USE_FIVEPOINT 0
+#define USE_FIVEPOINT 1
 
 using namespace std;
 using namespace Thunderegg;
@@ -203,16 +203,16 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     }
 
 
-#if 0
+#if 1
     //if physical boundary
-    if (!pinfo->hasNbr(Side<2>::east)){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::east,1);
+    if (!pinfo->hasNbr(Side<2>::west)){
+        auto ghosts = u.getGhostSliceOnSide(Side<2>::west,1);
         for(int j = 0; j < my; j++){
             ghosts[{j}] = -u[{0,j}];
         }
     }
-    if (!pinfo->hasNbr(Side<2>::west)){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::west,1);
+    if (!pinfo->hasNbr(Side<2>::east)){
+        auto ghosts = u.getGhostSliceOnSide(Side<2>::east,1);
         for(int j = 0; j < my; j++){
             ghosts[{j}] = -u[{mx-1,j}];
         }
@@ -226,8 +226,8 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     }
     if (!pinfo->hasNbr(Side<2>::north)){
         auto ghosts = u.getGhostSliceOnSide(Side<2>::north,1);
-        for(int j = 0; j < my; j++){
-            ghosts[{j}] = -u[{mx-1,j}];
+        for(int i = 0; i < mx; i++){
+            ghosts[{i}] = -u[{i,my-1}];
         }
     }
 #endif
@@ -276,14 +276,12 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
         /* bool hasNbr(Side<D> s) */
         if (pinfo->hasNbr(Side<2>::west))
         {
-            f[{0,j}] += -u[{-1,j}]/dx2;
-            u[{-1,j}] = 0;
+            f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
         }
 
         if (pinfo->hasNbr(Side<2>::east))
         {
-            f[{mx-1,j}] += -u[{mx,j}]/dx2;
-            u[{mx,j}] = 0;
+            f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
         }
     }
 
@@ -291,14 +289,12 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     {
         if (pinfo->hasNbr(Side<2>::south))
         {
-            f[{i,0}] += -u[{i,-1}]/dy2;
-            u[{i,-1}]=0;
+            f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
         }
 
         if (pinfo->hasNbr(Side<2>::north))
         {
-            f[{i,my-1}] += -u[{i,my}]/dy2;
-            u[{i,my}]=0;
+            f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
         }
     }
 }
