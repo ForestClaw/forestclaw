@@ -68,101 +68,168 @@ return
 end subroutine fc2d_geoclaw_fort_tag4coarsening
 
 
-subroutine check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
+SUBROUTINE check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
                        dx,dy,t,q,aux,mbathy,level,maxlevel, &
                        dry_tolerance_c, &
                        wave_tolerance_c,speed_tolerance_entries_c, &
                        speed_tolerance_c,tag_patch)
 
-USE geoclaw_module, ONLY: sea_level
-USE geoclaw_module, ONLY: spherical_distance, coordinate_system
+    USE geoclaw_module, ONLY: sea_level
+    USE geoclaw_module, ONLY: spherical_distance, coordinate_system
 
-USE topo_module, ONLY: tlowtopo,thitopo,xlowtopo,xhitopo,ylowtopo,yhitopo
-USE topo_module, ONLY: minleveltopo,mtopofiles
+    USE topo_module, ONLY: tlowtopo,thitopo,xlowtopo,xhitopo,ylowtopo,yhitopo
+    USE topo_module, ONLY: minleveltopo,mtopofiles
 
-USE topo_module, ONLY: tfdtopo,xlowdtopo,xhidtopo,ylowdtopo,yhidtopo
-USE topo_module, ONLY: minleveldtopo,num_dtopo
+    USE topo_module, ONLY: tfdtopo,xlowdtopo,xhidtopo,ylowdtopo,yhidtopo
+    USE topo_module, ONLY: minleveldtopo,num_dtopo
 
-USE qinit_module, ONLY: x_low_qinit,x_hi_qinit,y_low_qinit,y_hi_qinit
-USE qinit_module, ONLY: min_level_qinit,qinit_type
+    USE qinit_module, ONLY: x_low_qinit,x_hi_qinit,y_low_qinit,y_hi_qinit
+    USE qinit_module, ONLY: min_level_qinit,qinit_type
 
-USE storm_module, ONLY: storm_specification_type, wind_refine, R_refine, storm_location
-USE storm_module, ONLY: wind_forcing, wind_index, wind_refine
+    !!USE storm_module, ONLY: storm_specification_type, wind_refine, R_refine, storm_location
+    !!USE storm_module, ONLY: wind_forcing, wind_index, wind_refine
 
-USE regions_module, ONLY: num_regions, regions, region_type
-USE refinement_module
+    USE regions_module, ONLY: num_regions, regions, region_type
+    USE refinement_module
 
-implicit none
+    IMPLICIT NONE
 
-INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno, mbathy
-INTEGER level, maxlevel, clevel, speed_tolerance_entries_c
-DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
-DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
-DOUBLE PRECISION dry_tolerance_c
+    INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno, mbathy
+    INTEGER level, maxlevel, clevel, speed_tolerance_entries_c
+    DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
+    DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
+    DOUBLE PRECISION dry_tolerance_c
 
-DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-REAL(kind=8) aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+    DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    REAL(kind=8) aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-INTEGER i,j,k,m
-REAL(kind=8) :: x_c,y_c,x_low,y_low,x_hi,y_hi
-REAL(kind=8) :: speed, eta, ds
+    INTEGER i,j,k,m
+    REAL(kind=8) :: x_c,y_c,x_low,y_low,x_hi,y_hi
+    REAL(kind=8) :: speed, eta, ds
 
-!! Storm specific variables
-REAL(kind=8) :: R_eye(2), wind_speed
-LOGICAL allowcoarsen
+    !! Storm specific variables
+    !!REAL(kind=8) :: R_eye(2), wind_speed
 
-LOGICAL time_interval, space_interval
+    LOGICAL allowcoarsen
 
-tag_patch = 0
-t0 = 0
+    LOGICAL time_interval, space_interval
 
-!! If coarsened, level will become level - 1
-clevel = level - 1
+    REAL(kind=8) :: xupper, yupper
+    integer tag_patch_regions, fc2d_geoclaw_coarsen_using_regions
 
-!! Loop over interior points on this grid
-!! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
-y_loop: do j=1,my
-  y_low = ylower + (j - 1) * dy
-  y_c   = ylower + (j - 0.5d0) * dy
-  y_hi  = ylower + j * dy
+    tag_patch = 1
+    t0 = 1
 
-  x_loop: do i = 1,mx
-     x_low = xlower + (i - 1) * dx
-     x_c   = xlower + (i - 0.5d0) * dx
-     x_hi  = xlower + i * dx
-     !! Ignore the storm based refinement first
+    !! If coarsened, level will become level - 1
+    clevel = level - 1
 
-     !! Check that the grids is allowed to be coarsened or not
-     if (allowcoarsen(x_c,y_c,t,clevel)) then
-        if (q(1,i,j) > dry_tolerance_c) then
-           eta = q(1,i,j) + aux(mbathy,i,j)
-           if ( abs(eta - sea_level) < wave_tolerance_c) then
-              tag_patch = 1
-           else
-              tag_patch = 0
-              return
-           endif
-           !! Ignore the speed criteria first
-           ! speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
-           ! if ( abs(eta - sea_level) < wave_tolerance_c &
-           !     .and. speed < speed_tolerance_c(level)) then
-           !     tag_patch = 1
-           ! else
-           !     tag_patch = 0
-           !     return
-           ! endif
-        else
-          tag_patch = 1
-        endif
-     else
-        tag_patch = 0
+    xupper = xlower + mx*dx
+    yupper = ylower + my*dy
+
+    !! would we refine this patch based on regions criteria? 
+    !! If tag_patch_regions == 0 :  level < R.minlevel for some R; must refine --> can't coarsen
+    !! If tag_patch_regions == 1 :  level > R.maxlevel for all R; can't refine --> must coarsen
+    !! if tag_patch_regions == -1 : Inconclusive (use refinement criteria)
+    tag_patch_regions = fc2d_geoclaw_coarsen_using_regions(level,xlower,ylower,xupper,yupper,t)
+    if (tag_patch_regions .ge. 0) then
+        tag_patch = tag_patch_regions  
         return
-     endif
+    endif
 
-  enddo x_loop
-enddo y_loop
+    !! Loop over interior points on this grid
+    !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
+    y_loop: do j=1,my
+        y_low = ylower + (j - 1) * dy
+        y_c   = ylower + (j - 0.5d0) * dy
+        y_hi  = ylower + j * dy
 
-end subroutine check_patch
+        x_loop: do i = 1,mx
+            x_low = xlower + (i - 1) * dx
+            x_c   = xlower + (i - 0.5d0) * dx
+            x_hi  = xlower + i * dx
+
+            !! Check that the grids is allowed to be coarsened or not
+            !!if (allowcoarsen(x_c,y_c,t,clevel)) then
+            if (q(1,i,j) > dry_tolerance_c) then
+                eta = q(1,i,j) + aux(mbathy,i,j)
+                if ( abs(eta - sea_level) > wave_tolerance_c) then
+                    !! This patch fails the coarsening test
+                    tag_patch = 0
+                else
+                    tag_patch = 1
+                    return
+                endif
+                !! Ignore the speed criteria first
+                ! speed = sqrt(q(2,i,j)**2 + q(3,i,j)**2) / q(1,i,j)
+                ! if ( abs(eta - sea_level) < wave_tolerance_c &
+                !     .and. speed < speed_tolerance_c(level)) then
+                !     tag_patch = 1
+                ! else
+                !     tag_patch = 0
+                !     return
+                ! endif
+            else
+                !! we can always coarsen if we are on dry land
+                tag_patch = 1
+            endif
+!!     else
+!!        tag_patch = 0
+!!        return
+     !!endif
+
+        end do x_loop
+    end do y_loop
+
+END SUBROUTINE check_patch
+
+
+!! This looks almost like the refine version
+!! In the refine version, we don't allow refinement if level >= rmax
+!! In the coarsen version we allow coarsening only if level > rmax
+integer function fc2d_geoclaw_coarsen_using_regions(level,xlower,ylower,xupper,yupper,t)
+    USE regions_module
+    IMPLICIT NONE
+
+    REAL(kind=8) :: xlower,ylower,xupper,yupper,t
+    integer level
+
+    INTEGER rmax, m, tag_patch
+    LOGICAL region_found, fc2d_geoclaw_P_intersects_R
+
+    tag_patch = -1  !! inconclusive
+
+    !! Check to see if refinement is forced by regions :
+    !! If level < R.minlevel for any R : force refinement
+    !! If level >= R.maxlevel for all R : don't allow refinement
+    rmax = 0
+    region_found = .false.
+    DO m=1,num_regions
+        if (fc2d_geoclaw_P_intersects_R(xlower,ylower,xupper,yupper,t,regions(m))) then
+            region_found = .true.
+            if (level < regions(m)%min_level) then
+                !! level < R.minlevel for any R : force refinement (don't coarsen)
+                tag_patch = 0
+                return
+            endif
+            !! Collect largest max_level
+            if (regions(m)%max_level > rmax) then
+                rmax = regions(m)%max_level
+            endif
+        endif
+    end do
+    !! level >= R.maxlevel for all R : don't allow refinement
+    if (region_found) then
+        !! We can use regions as a criteria
+        if (level .gt. rmax) then
+            !! Force coarsening
+            tag_patch = 1
+        endif
+    endif
+
+    fc2d_geoclaw_coarsen_using_regions = tag_patch
+
+    return
+END FUNCTION fc2d_geoclaw_coarsen_using_regions
 
 
 logical function allowcoarsen(x,y,t,level)

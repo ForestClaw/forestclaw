@@ -100,6 +100,23 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.num_dim = num_dim
 
     # ---------------
+    # Gauges:
+    # ---------------
+    gauges = rundata.gaugedata.gauges
+
+    # for gauges append lines of the form  [gaugeno, x, y, t1, t2] (25200,inf)
+    gauges.append([1123, 203.52825, 20.9021333, 7.0*3600., 1.e9]) #Kahului
+    
+    #gauges.append([5680, 203.52333, 20.895, 7.0*3600., 1.e9]) #TG Kahului
+    # more accurate coordinates from Yong Wei at PMEL:  (25200,inf)
+    gauges.append([5680, 203.530944, 20.895, 7.0*3600., 1.e9]) #TG Kahului
+
+
+    ## Add one near epicenter - for testing 
+    gauges.append([1234, 144.851543, 33.090886, 0, 1.e9]) 
+
+
+    # ---------------
     # Size of system:
     # ---------------
 
@@ -321,30 +338,92 @@ def setrun(claw_pkg='geoclaw'):
     # ---------------
     regions = rundata.regiondata.regions
 
-    # Original regions from geoclaw
-    #regions.append([1, 2, 0., 1e9, 0, 360, -90, 90])
-    #regions.append([1, 3, 0., 5.*3600., 132., 220., 5., 40.])
+    # ------------------------------
+    # Regions
+    # ------------------------------
 
-    #regions.append([1, 3, 5.*3600.,  8.*3600., 180., 220., 5., 40.])
-    #regions.append([4, 4, 6.5*3600., 1e9, 202.5,204,20.4,21.4])
-    #regions.append([5, 5, 7.*3600., 1e9, 203.0, 203.7, 20.88333,21.])
-    ##regions.append([6, 6, 7.25*3600., 1e9, 203.516666,203.55,20.8875,20.905555])
-    #regions.append([6-f, 6-f, 7.25*3600., 1e9, 203.52,203.537,20.89,20.905])
-    ##regions.append([7, 7, 7.25*3600., 1e9, 203.52,203.535,20.892,20.904])
-    ##regions.append([6, 6, 7.*3600., 1e9, 203.25,203.36,20.84,20.90])
+    inf = 1e9
 
-    # ForestClaw regions
-    # regions.append([minlevel, minlevel+2, 0., 1e9, 0, 360, -90, 90])
+    # Not sure why these are included : 
     # regions.append([minlevel, minlevel+3, 0., 5.*3600., 132., 220., 5., 40.])
 
-    regions.append([minlevel, minlevel+3, 5.*3600.,  8.*3600., 180., 220., 5., 40.])
-    #regions.append([minlevel+7, minlevel+7, 6.5*3600., 1e9, 202.5,204,20.4,21.4])
-    #regions.append([9, 9, 7.*3600., 1e9, 203.0, 203.7, 20.88333,21.])
-    #regions.append([9, 9, 7.25*3600., 1e9, 203.52,203.537,20.89,20.905])
+    # Region describing topo region
+    # Data on topo extent extracted from Fujii.txydz
+    # 
+    # ------------------------------------------------------------------
+    # To match Geoclaw levels (N0 = mx = 22)
+    # 
+    #            GeoClaw              -->           ForestClaw
+    #
+    #  Levels   RR    RR.cumprod()             Levels   RR   RR.cumprod()     
+    #   1       (1)        (1)         -->       0     (1)        (1)
+    #   2       (5)        (5)         -->       2     (4)        (4)
+    #   3       (6)       (30)         -->       5     (8)       (32)
+    #   4       (4)      (120)         -->       7     (4)      (128)
+    #   5       (6)      (720)         -->       9     (4)      (512)
+    #   6      (30)    (21600)         -->       14   (32)    (16384)
+    # ------------------------------------------------------------------
 
-    #regions.append([6, 6, 7.25*3600., 1e9, 203.516666,203.55,20.8875,20.905555])
-    #regions.append([7, 7, 7.25*3600., 1e9, 203.52,203.535,20.892,20.904])
-    #regions.append([6, 6, 7.*3600., 1e9, 203.25,203.36,20.84,20.90])
+#    # Region 0  : Encompasses entire domain (limits refinement 
+#    # in upper 1/4 portion of domain)  (0, inf)
+#    regions.append([0, 2, 0., 1e9, 0, 360, -90, 90])
+#
+#    # Region 1  : Topo map at initial earthquake site;  Refine long enough to 
+#    # resolve initial disturbance.  (0,3600)
+#    regions.append([5, 5, 0., 1, 135., 150., 30., 40.])
+#
+#    # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
+#    regions.append([0, 5, 0., 5.*3600., 132., 220., 5., 40.])
+#
+#    # Region 3 :  Large region encompassing Hawaii Islands (18000,28800)
+#    regions.append([0, 5, 5.0*3600.,  8.0*3600, 180.0, 220.0,  5.0, 40.0])
+#
+#    # Region 4  : Includes Maui and Molokai (23400.0, inf)
+#    regions.append([7, 7, 6.5*3600.,  inf,      202.5, 204.0, 20.4, 21.4])
+#
+#    # Region 5  : Strip including north shore of Maui  (25200, inf)
+#    regions.append([9, 9, 7.*3600., inf, 203.0, 203.7, 20.88333, 21.])
+#
+#    # Region 6 : Port at Kailua  (26100.0, inf)
+#    regions.append([14, 14, 7.25*3600., inf, 203.52,203.537,20.89,20.905])
+
+    # ------------------------------------------------------------------
+    # Try to reduce amount of time spent in ghost filling
+    # To match Geoclaw levels (mx = 32)
+    # 
+    #            GeoClaw              -->           ForestClaw
+    #
+    #  Levels   RR      RR.cumprod()         Levels    RR      RR.cumprod()
+    #   1       (1)        (1)         -->       0     (1)        (1)
+    #   2       (5)        (5)         -->       2     (4)        (4)
+    #   3       (6)       (30)         -->       5     (8)       (32)
+    #   4       (4)      (120)         -->       6     (2)       (64)   < ---- only difference
+    #   5       (6)      (720)         -->       9     (8)      (512)
+    #   6      (30)    (21600)         -->      14    (32)    (16384)
+    # ------------------------------------------------------------------
+
+    # Region 0  : Encompasses entire domain (limits refinement 
+    # in upper 1/4 portion of domain)  (0, inf)
+    regions.append([0, 2, 0., 1e9, 0, 360, -90, 90])
+
+    # Region 1  : Topo map at initial earthquake site;  Refine long enough to 
+    # resolve initial disturbance.  (0,3600)
+    regions.append([5, 5, 0., 1, 135., 150., 30., 40.])
+
+    # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
+    regions.append([0, 5, 0., 5.*3600., 132., 220., 5., 40.])
+
+    # Region 3 :  Large region encompassing Hawaii Islands (18000,28800)
+    regions.append([0, 5, 5.0*3600.,  8.0*3600, 180.0, 220.0,  5.0, 40.0])
+
+    # Region 4  : Includes Maui and Molokai (23400.0, inf)
+    regions.append([6, 6, 6.5*3600.,  inf,      202.5, 204.0, 20.4, 21.4])
+
+    # Region 5  : Strip including north shore of Maui  (25200, inf)
+    regions.append([9, 9, 7.*3600., inf, 203.0, 203.7, 20.88333, 21.])
+
+    # Region 6 : Port at Kailua  (26100.0, inf)
+    regions.append([14, 14, 7.25*3600., inf, 203.52,203.537,20.89,20.905])
 
 
     # -------------------------------------------------------
@@ -403,7 +482,7 @@ def setgeo(rundata):
     # Refinement data
     refinement_data = rundata.refinement_data
     refinement_data.variable_dt_refinement_ratios = True
-    refinement_data.wave_tolerance = 0.02
+    refinement_data.wave_tolerance = 0.02    # Original setting : 0.016
     refinement_data.deep_depth = 200
     refinement_data.max_level_deep = 4
 
@@ -413,17 +492,17 @@ def setgeo(rundata):
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
 
     # == settopo.data values ==
-    f = 1   # Subtract 1 for ForestClaw
+    # Set minlevel=maxlevel=0
     topofiles = rundata.topo_data.topofiles
-    topofiles.append([3, minlevel, minlevel, 0.0, 1e10, './topo/etopo1min130E210E0N60N.asc'])
-    topofiles.append([3, minlevel, minlevel, 0.0, 1e10, './topo/hawaii_6s.txt'])
-    topofiles.append([3, minlevel, minlevel, 0., 1.e10, './topo/kahului_1s.txt'])
+    topofiles.append([3, 0, 0, 0.0, 1e10, './topo/etopo1min130E210E0N60N.asc'])
+    topofiles.append([3, 0, 0, 0.0, 1e10, './topo/hawaii_6s.txt'])
+    topofiles.append([3, 0, 0, 0., 1.e10, './topo/kahului_1s.txt'])
 
     # == setdtopo.data values ==
     # topo_data = rundata.topo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname]
-    rundata.dtopo_data.dtopofiles = [[1, minlevel+2, minlevel+3, './topo/Fujii.txydz']]
+    rundata.dtopo_data.dtopofiles = [[1, 0, 0,'./topo/Fujii.txydz']]
 
 
     # == setqinit.data values ==

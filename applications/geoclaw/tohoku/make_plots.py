@@ -137,11 +137,12 @@ def setplot(plotdata):
     plotfigure.kml_use_for_initial_view= True
     plotfigure.use_for_kml = True
 
-    # Resolution : numcells = [39, 22]; maxlevel = 4
-    # Refinement in setrun.py : [5, 6, 4]
+    # Resolution : prod(rr_factors)*22
     rcl = 2    # rcl*figsize = numcells
-    plotfigure.kml_dpi = rcl*5*6*4
-    plotfigure.kml_figsize = [19.5,11]
+    mx = 32
+    rr_factors = array([1,4,8,2])
+    plotfigure.kml_dpi = rr_factors.prod()
+    plotfigure.kml_figsize = mx*array([2,1])
 
     plotfigure.kml_tile_images = False
 
@@ -170,7 +171,7 @@ def setplot(plotdata):
 
 
     #-----------------------------------------
-    # Figures for gauges
+    # Gauge : figure 300
     #-----------------------------------------
     plotfigure = plotdata.new_plotfigure(name='Surface', figno=300, \
                     type='each_gauge')
@@ -189,12 +190,12 @@ def setplot(plotdata):
 
     # Plot topo as green curve:
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.show = True
+    plotitem.show = False
 
     def gaugetopo(current_data):
         q = current_data.q
-        h = q[:,0]
-        eta = q[:,3]
+        h = q[0,:]
+        eta = q[3,:]
         topo = eta - h
         return topo
 
@@ -204,7 +205,6 @@ def setplot(plotdata):
     def add_zeroline(current_data):
         from pylab import plot, legend, xticks, floor, xlim,ylim
         t = current_data.t
-        #legend(('surface','topography'),loc='lower left')
         plot(t, 0*t, 'k')
         #n = int(floor(t.max()/1800.)) + 2
         #xticks([1800*i for i in range(n)],[str(0.5*i) for i in range(n)])
@@ -212,10 +212,19 @@ def setplot(plotdata):
         #ylim(-0.5,0.5)
         print("+++ gaugeno = ",current_data.gaugeno)
 
-    plotaxes.ylimits = [-0.5, 0.5]
+    def add_legend_eta(current_data):
+        from pylab import legend
+        legend(('surface','topography'),loc='lower left')
+        add_zeroline(current_data)
+        legend(['Speed','u','v'],loc='upper left')
+
+    plotaxes.ylimits = [-1.5, 1.5]
     plotaxes.afteraxes = add_zeroline
 
 
+    #-----------------------------------------
+    # Gauge : figure 301 (speed, uvel, vvel)
+    #-----------------------------------------
     plotfigure = plotdata.new_plotfigure(name='Velocities', figno=301, \
                     type='each_gauge')
     plotfigure.clf_each_gauge = True
@@ -230,10 +239,10 @@ def setplot(plotdata):
     plotitem.show = True
     def speed(current_data):
         from numpy import where, sqrt
-        h = current_data.q[:,0]
+        h = current_data.q[0,:]
         h = where(h>0.01, h, 1.e6)
-        u = 100. * current_data.q[:,1] / h
-        v = 100. * current_data.q[:,2] / h
+        u = 100. * current_data.q[1,:] / h
+        v = 100. * current_data.q[2,:] / h
         s = sqrt(u**2 + v**2)
         return s
     plotitem.plot_var = speed
@@ -242,9 +251,9 @@ def setplot(plotdata):
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
     def uvel(current_data):
         from numpy import where, sqrt
-        h = current_data.q[:,0]
+        h = current_data.q[0,:]
         h = where(h>0.01, h, 1.e6)
-        u = 100. * current_data.q[:,1] / h
+        u = 100. * current_data.q[1,:] / h
         return u
     plotitem.plot_var = uvel
     plotitem.plotstyle = 'r-'
@@ -253,21 +262,22 @@ def setplot(plotdata):
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
     def vvel(current_data):
         from numpy import where, sqrt
-        h = current_data.q[:,0]
+        h = current_data.q[0,:]
         h = where(h>0.01, h, 1.e6)
-        v = 100. * current_data.q[:,2] / h
+        v = 100. * current_data.q[2,:] / h
         return v
     plotitem.plot_var = vvel
     plotitem.plotstyle = 'g-'
     plotitem.kwargs = {'linewidth':2}
 
-    def add_legend(current_data):
+    def add_legend_vel(current_data):
         from pylab import legend
-        legend(['u','v'],'upper left')
-        #legend(['Speed','u','v'],'upper left')
+        #legend(['u','v'],loc='upper left')
         add_zeroline(current_data)
+        legend(['Speed','u','v'],loc='upper left')
+
     plotaxes.ylimits = [-50,50]
-    plotaxes.afteraxes = add_legend
+    plotaxes.afteraxes = add_legend_vel
 
 
     #-----------------------------------------
@@ -278,9 +288,9 @@ def setplot(plotdata):
     plotdata.parallel = False
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = 'all'          # list of frames to print
+    plotdata.print_framenos = range(0,61)          # list of frames to print
     plotdata.print_gaugenos = 'all'            # list of gauges to print
-    plotdata.print_fignos = [4]            # list of figures to print
+    plotdata.print_fignos = [4,300]            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_movie = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
@@ -288,7 +298,6 @@ def setplot(plotdata):
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
-    plotdata.kml = True
 
     plotdata.kml = True
     #plotfigure.kml_url = 'http://math.boisestate.edu/~calhoun/visclaw/GoogleEarth/tohoku'
