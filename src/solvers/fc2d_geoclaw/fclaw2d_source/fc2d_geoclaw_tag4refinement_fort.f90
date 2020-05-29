@@ -47,38 +47,14 @@ SUBROUTINE fc2d_geoclaw_fort_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
     xupper = xlower + mx*dx
     yupper = ylower + my*dy
 
-
-!!    !! Check to see if refinement is forced by regions :
-!!    !! If level < R.minlevel for any R : force refinement
-!!    !! If level >= R.maxlevel for all R : don't allow refinement
-!!    rmax = 0
-!!    region_found = .false.
-!!    DO m=1,num_regions
-!!        if (fc2d_geoclaw_P_intersects_R(xlower,ylower,xupper,yupper,t,regions(m))) then
-!!            region_found = .true.
-!!            if (level < regions(m)%min_level) then
-!!                !! level < R.minlevel for any R : force refinement
-!!                tag_patch = 1
-!!                return
-!!            endif
-!!            !! Collect largest max_level
-!!            if (regions(m)%max_level > rmax) then
-!!                rmax = regions(m)%max_level
-!!            endif
-!!        endif
-!!    end do
-!!    !! level >= R.maxlevel for all R : don't allow refinement
-!!    if (region_found .and. level >= rmax) then
-!!        tag_patch = 0
-!!        return
-!!    endif
-
     tag_patch_regions = fc2d_geoclaw_refine_using_regions(level,xlower,ylower,xupper,yupper,t)
     if (tag_patch_regions .ge. 0) then
         !! Tagging based on regions is conclusive
         tag_patch = tag_patch_regions
         return
     endif
+
+    tag_patch = 0  !! Don't refine unless criteria below allows it.
 
     !! # Refine based only on first variable in system.
     !! Loop over interior points on this grid
@@ -220,25 +196,30 @@ INTEGER FUNCTION fc2d_geoclaw_refine_using_regions(level,xlower,ylower,xupper,yu
     REAL(kind=8) :: xlower,ylower,xupper,yupper,t
     integer level
 
-    INTEGER rmax, m, tag_patch
-    LOGICAL region_found, fc2d_geoclaw_P_intersects_R
+    INTEGER rmax, m, tag_patch, mmax
+    LOGICAL region_found, fc2d_geoclaw_P_intersects_R, inregion
 
-    tag_patch = -1  !! inconclusive
+    tag_patch = -1  !! use refinement criteria based on wave tolerance, etc
 
-    !! Check to see if refinement is forced by regions :
+    !! Check to see if refinement is forced by regions R:
     !! If level < R.minlevel for any R : force refinement
     !! If level >= R.maxlevel for all R : don't allow refinement
+    !! If none of the above, use usual refinement criteria
+    !! If this patch does not intersect any region, use refinement criteria
     rmax = 0
     region_found = .false.
+    mmax = 1
     DO m=1,num_regions
+        !!inregion = fc2d_geoclaw_P_intersects_R(xlower,ylower,xupper,yupper,t,regions(m))
         if (fc2d_geoclaw_P_intersects_R(xlower,ylower,xupper,yupper,t,regions(m))) then
             region_found = .true.
             if (level < regions(m)%min_level) then
-                !! level < R.minlevel for any R : force refinement
-                tag_patch = 1
+                !! level < R.minlevel for some R : force refinement
+                tag_patch = 1                
             endif
             !! Collect largest max_level
             if (regions(m)%max_level > rmax) then
+                mmax = m
                 rmax = regions(m)%max_level
             endif
         endif
@@ -247,6 +228,7 @@ INTEGER FUNCTION fc2d_geoclaw_refine_using_regions(level,xlower,ylower,xupper,yu
     if (region_found) then
         !! We can use regions as a criteria
         if (level .ge. rmax) then
+            !!write(6,'(A,I5,A,I5)') '---------------> level = ',level,'; rmax = ',rmax
             tag_patch = 0
         endif
     endif

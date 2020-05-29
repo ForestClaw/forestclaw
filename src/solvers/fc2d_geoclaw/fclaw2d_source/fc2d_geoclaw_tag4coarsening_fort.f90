@@ -22,7 +22,7 @@ implicit none
 
 INTEGER mx, my, mbc, meqn, maux, tag_patch, blockno, mbathy
 INTEGER level, maxlevel, speed_tolerance_entries_c
-DOUBLE PRECISION xlower(0:3), ylower(0:3), dx, dy, t, t0
+DOUBLE PRECISION xlower, ylower, dx, dy, t, t0
 DOUBLE PRECISION wave_tolerance_c, speed_tolerance_c(speed_tolerance_entries_c)
 DOUBLE PRECISION dry_tolerance_c
 
@@ -36,33 +36,46 @@ REAL(kind=8), INTENT(in) :: aux1(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 REAL(kind=8), INTENT(in) :: aux2(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 REAL(kind=8), INTENT(in) :: aux3(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-call check_patch(mx,my,mbc,meqn,maux,xlower(0),ylower(0), &
+double precision xv(0:3), yv(0:3)
+
+xv(0) = xlower
+xv(1) = xlower + dx*mx
+xv(2) = xlower
+xv(3) = xlower + dx*mx
+
+
+yv(0) = ylower
+yv(1) = ylower + dy*my
+yv(2) = ylower
+yv(3) = ylower + dy*my
+
+call check_patch(mx,my,mbc,meqn,maux,xv(0),yv(0), &
                  dx,dy,t,q0,aux0,mbathy,level,maxlevel, &
                  dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
-if (tag_patch == 0) return
+if (tag_patch == 0) return  !!  Can't coarsen
 
-call check_patch(mx,my,mbc,meqn,maux,xlower(1),ylower(1), &
+call check_patch(mx,my,mbc,meqn,maux,xv(1),yv(1), &
                  dx,dy,t,q1,aux1,mbathy,level,maxlevel, &
                  dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
-if (tag_patch == 0) return
+if (tag_patch == 0) return  !!  Can't coarsen  
 
-call check_patch(mx,my,mbc,meqn,maux,xlower(2),ylower(2), &
+call check_patch(mx,my,mbc,meqn,maux,xv(2),yv(2), &
                  dx,dy,t,q2,aux2,mbathy,level,maxlevel, &
                  dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
-if (tag_patch == 0) return
+if (tag_patch == 0) return  !!  Can't coarsen
 
-call check_patch(mx,my,mbc,meqn,maux,xlower(3),ylower(3), &
+call check_patch(mx,my,mbc,meqn,maux,xv(3),yv(3), &
                  dx,dy,t,q3,aux3,mbathy,level,maxlevel, &
                  dry_tolerance_c, &
                  wave_tolerance_c,speed_tolerance_entries_c, &
                  speed_tolerance_c, tag_patch)
-if (tag_patch == 0) return
+if (tag_patch == 0) return  !!  Can't coarsen
 
 return
 end subroutine fc2d_geoclaw_fort_tag4coarsening
@@ -115,9 +128,8 @@ SUBROUTINE check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
     LOGICAL time_interval, space_interval
 
     REAL(kind=8) :: xupper, yupper
-    integer tag_patch_regions, fc2d_geoclaw_coarsen_using_regions
+    INTEGER tag_patch_regions, fc2d_geoclaw_coarsen_using_regions
 
-    tag_patch = 1
     t0 = 1
 
     !! If coarsened, level will become level - 1
@@ -126,15 +138,18 @@ SUBROUTINE check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
     xupper = xlower + mx*dx
     yupper = ylower + my*dy
 
-    !! would we refine this patch based on regions criteria? 
     !! If tag_patch_regions == 0 :  level < R.minlevel for some R; must refine --> can't coarsen
     !! If tag_patch_regions == 1 :  level > R.maxlevel for all R; can't refine --> must coarsen
     !! if tag_patch_regions == -1 : Inconclusive (use refinement criteria)
+
+    !!write(6,'(5F12.4)') xlower, ylower, xupper, yupper, t
     tag_patch_regions = fc2d_geoclaw_coarsen_using_regions(level,xlower,ylower,xupper,yupper,t)
     if (tag_patch_regions .ge. 0) then
         tag_patch = tag_patch_regions  
         return
     endif
+
+    tag_patch = 1    !! Allow coarsening if nothing below prevents it
 
     !! Loop over interior points on this grid
     !! (i,j) grid cell is [x_low,x_hi] x [y_low,y_hi], cell center at (x_c,y_c)
@@ -149,14 +164,11 @@ SUBROUTINE check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
             x_hi  = xlower + i * dx
 
             !! Check that the grids is allowed to be coarsened or not
-            !!if (allowcoarsen(x_c,y_c,t,clevel)) then
             if (q(1,i,j) > dry_tolerance_c) then
                 eta = q(1,i,j) + aux(mbathy,i,j)
                 if ( abs(eta - sea_level) > wave_tolerance_c) then
                     !! This patch fails the coarsening test
                     tag_patch = 0
-                else
-                    tag_patch = 1
                     return
                 endif
                 !! Ignore the speed criteria first
@@ -168,15 +180,7 @@ SUBROUTINE check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
                 !     tag_patch = 0
                 !     return
                 ! endif
-            else
-                !! we can always coarsen if we are on dry land
-                tag_patch = 1
             endif
-!!     else
-!!        tag_patch = 0
-!!        return
-     !!endif
-
         end do x_loop
     end do y_loop
 
@@ -186,14 +190,15 @@ END SUBROUTINE check_patch
 !! This looks almost like the refine version
 !! In the refine version, we don't allow refinement if level >= rmax
 !! In the coarsen version we allow coarsening only if level > rmax
-integer function fc2d_geoclaw_coarsen_using_regions(level,xlower,ylower,xupper,yupper,t)
+
+INTEGER FUNCTION fc2d_geoclaw_coarsen_using_regions(level,xlower,ylower,xupper,yupper,t)
     USE regions_module
     IMPLICIT NONE
 
     REAL(kind=8) :: xlower,ylower,xupper,yupper,t
     integer level
 
-    INTEGER rmax, m, tag_patch
+    INTEGER rmax, m, tag_patch, mmax
     LOGICAL region_found, fc2d_geoclaw_P_intersects_R
 
     tag_patch = -1  !! inconclusive
@@ -213,8 +218,11 @@ integer function fc2d_geoclaw_coarsen_using_regions(level,xlower,ylower,xupper,y
             endif
             !! Collect largest max_level
             if (regions(m)%max_level > rmax) then
+                mmax = m
                 rmax = regions(m)%max_level
             endif
+            !!write(6,'(2I5,A,I5,A,I5,A,L5)') m, level, '   regions(m)%max_level = ', & 
+            !!regions(m)%max_level, '; rmax = ', rmax, '; in region : ', region_found            
         endif
     end do
     !! level >= R.maxlevel for all R : don't allow refinement
@@ -222,17 +230,31 @@ integer function fc2d_geoclaw_coarsen_using_regions(level,xlower,ylower,xupper,y
         !! We can use regions as a criteria
         if (level .gt. rmax) then
             !! Force coarsening
+            if (t .ge. 18000 .and. mmax .le. 3) then
+                !!write(6,'(A,I5,A,I5,A,I5)') 'mmax = ',mmax,'  level = ',level,'  rmax = ',rmax
+            endif
             tag_patch = 1
         endif
+    else
+        do m = 1,3
+            write(6,*) 'region m'
+            write(6,'(6F16.4)') regions(m)%t_low, regions(m)%t_hi, & 
+                 regions(m)%x_low, regions(m)%x_hi, regions(m)%y_low, regions(m)%y_hi
+            write(6,*) ' '
+        end do
+        write(6,*) xlower, ylower, xupper, yupper, t
+        write(6,*) 'No region found; t = ', t, '; level = ', level
+        stop
     endif
+    !!write(6,*) ' '
 
     fc2d_geoclaw_coarsen_using_regions = tag_patch
 
-    return
+    RETURN
 END FUNCTION fc2d_geoclaw_coarsen_using_regions
 
 
-logical function allowcoarsen(x,y,t,level)
+LOGICAL FUNCTION allowcoarsen(x,y,t,level)
 
 use amr_module, only: t0
 use geoclaw_module
