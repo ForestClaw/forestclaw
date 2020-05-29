@@ -140,7 +140,7 @@ def setplot(plotdata):
     # Resolution : prod(rr_factors)*22
     rcl = 2    # rcl*figsize = numcells
     mx = 32
-    rr_factors = array([1,4,8,2])
+    rr_factors = array([1,4,8,4])
     plotfigure.kml_dpi = rr_factors.prod()
     plotfigure.kml_figsize = mx*array([2,1])
 
@@ -214,12 +214,11 @@ def setplot(plotdata):
 
     def add_legend_eta(current_data):
         from pylab import legend
-        legend(('surface','topography'),loc='lower left')
+        legend(('Surface'),loc='lower left')
         add_zeroline(current_data)
-        legend(['Speed','u','v'],loc='upper left')
 
     plotaxes.ylimits = [-1.5, 1.5]
-    plotaxes.afteraxes = add_zeroline
+    plotaxes.afteraxes = add_legend_eta
 
 
     #-----------------------------------------
@@ -288,7 +287,7 @@ def setplot(plotdata):
     plotdata.parallel = False
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = range(0,61)          # list of frames to print
+    plotdata.print_framenos = range(0,101,2)          # list of frames to print
     plotdata.print_gaugenos = 'all'            # list of gauges to print
     plotdata.print_fignos = [4,300]            # list of figures to print
     plotdata.html = True                     # create html files of plots?

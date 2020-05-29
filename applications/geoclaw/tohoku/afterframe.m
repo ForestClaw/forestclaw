@@ -22,7 +22,7 @@ drawcontourlines(cv);
 set(gca,'color',[101,67,33]/255)
 
 hold on;
-% add_gauges();
+add_gauges();
 add_regions(t);
 hold off;
 

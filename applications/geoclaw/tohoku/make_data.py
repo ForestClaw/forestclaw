@@ -106,7 +106,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2] (25200,inf)
     gauges.append([1123, 203.52825, 20.9021333, 7.0*3600., 1.e9]) #Kahului
-    
+
     #gauges.append([5680, 203.52333, 20.895, 7.0*3600., 1.e9]) #TG Kahului
     # more accurate coordinates from Yong Wei at PMEL:  (25200,inf)
     gauges.append([5680, 203.530944, 20.895, 7.0*3600., 1.e9]) #TG Kahului
@@ -364,28 +364,28 @@ def setrun(claw_pkg='geoclaw'):
     #   6      (30)    (21600)         -->       14   (32)    (16384)
     # ------------------------------------------------------------------
 
-#    # Region 0  : Encompasses entire domain (limits refinement 
-#    # in upper 1/4 portion of domain)  (0, inf)
-#    regions.append([0, 2, 0., 1e9, 0, 360, -90, 90])
-#
-#    # Region 1  : Topo map at initial earthquake site;  Refine long enough to 
-#    # resolve initial disturbance.  (0,3600)
-#    regions.append([5, 5, 0., 1, 135., 150., 30., 40.])
-#
-#    # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
-#    regions.append([0, 5, 0., 5.*3600., 132., 220., 5., 40.])
-#
-#    # Region 3 :  Large region encompassing Hawaii Islands (18000,28800)
-#    regions.append([0, 5, 5.0*3600.,  8.0*3600, 180.0, 220.0,  5.0, 40.0])
-#
-#    # Region 4  : Includes Maui and Molokai (23400.0, inf)
-#    regions.append([7, 7, 6.5*3600.,  inf,      202.5, 204.0, 20.4, 21.4])
-#
-#    # Region 5  : Strip including north shore of Maui  (25200, inf)
-#    regions.append([9, 9, 7.*3600., inf, 203.0, 203.7, 20.88333, 21.])
-#
-#    # Region 6 : Port at Kailua  (26100.0, inf)
-#    regions.append([14, 14, 7.25*3600., inf, 203.52,203.537,20.89,20.905])
+    # Region 0  : Encompasses entire domain (limits refinement 
+    # in upper 1/4 portion of domain)  (0, inf)
+    regions.append([0, 1, 0., 1e9, 0, 360, -90, 90])
+
+    # Region 1  : Topo map at initial earthquake site;  Refine long enough to 
+    # resolve initial disturbance.  (0,3600)
+    regions.append([5, 5, 0., 1, 135., 150., 30., 40.])
+
+    # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
+    regions.append([0, 5, 0., 5.*3600., 132., 220., 5., 40.])
+
+    # Region 3 :  Large region encompassing Hawaii Islands (18000,28800)
+    regions.append([0, 5, 5.0*3600.,  8.0*3600, 180.0, 220.0,  5.0, 40.0])
+
+    # Region 4  : Includes Maui and Molokai (23400.0, inf)
+    regions.append([7, 7, 6.5*3600.,  inf,      202.5, 204.0, 20.4, 21.4])
+
+    # Region 5  : Strip including north shore of Maui  (25200, inf)
+    regions.append([9, 9, 7.*3600., inf, 203.0, 203.7, 20.88333, 21.])
+
+    # Region 6 : Port at Kailua  (26100.0, inf)
+    regions.append([14, 14, 7.25*3600., inf, 203.52,203.537,20.89,20.905])
 
     # ------------------------------------------------------------------
     # Try to reduce amount of time spent in ghost filling
@@ -402,28 +402,28 @@ def setrun(claw_pkg='geoclaw'):
     #   6      (30)    (21600)         -->      14    (32)    (16384)
     # ------------------------------------------------------------------
 
-    # Region 0  : Encompasses entire domain (limits refinement 
-    # in upper 1/4 portion of domain)  (0, inf)
-    regions.append([0, 2, 0., 1e9, 0, 360, -90, 90])
-
-    # Region 1  : Topo map at initial earthquake site;  Refine long enough to 
-    # resolve initial disturbance.  (0,3600)
-    regions.append([5, 5, 0., 1, 135., 150., 30., 40.])
-
-    # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
-    regions.append([0, 5, 0., 5.*3600., 132., 220., 5., 40.])
-
-    # Region 3 :  Large region encompassing Hawaii Islands (18000,28800)
-    regions.append([0, 5, 5.0*3600.,  8.0*3600, 180.0, 220.0,  5.0, 40.0])
-
-    # Region 4  : Includes Maui and Molokai (23400.0, inf)
-    regions.append([6, 6, 6.5*3600.,  inf,      202.5, 204.0, 20.4, 21.4])
-
-    # Region 5  : Strip including north shore of Maui  (25200, inf)
-    regions.append([9, 9, 7.*3600., inf, 203.0, 203.7, 20.88333, 21.])
-
-    # Region 6 : Port at Kailua  (26100.0, inf)
-    regions.append([14, 14, 7.25*3600., inf, 203.52,203.537,20.89,20.905])
+#    # Region 0  : Encompasses entire domain (limits refinement 
+#    # in upper 1/4 portion of domain)  (0, inf)
+#    regions.append([0, 1, 0., 1.0e9, 0, 360, -90, 90])
+#
+#    # Region 1  : Topo map at initial earthquake site;  
+#    # Extent of the region (including time component) is taken from the dtopo file.
+#    regions.append([5, 5, 0, 1, 135., 150., 30., 45.])
+#
+#    # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
+#    regions.append([0, 5, 0, 5*3600., 132., 220., 5., 40.])
+#
+#    # Region 3 :  Large region encompassing Hawaii Islands (18000,28800)
+#    regions.append([0, 5, 5.0*3600.,  8.0*3600, 180.0, 220.0,  5.0, 40.0])
+#
+#    # Region 4  : Includes Maui and Molokai (23400.0, inf)
+#    regions.append([6, 6, 6.5*3600.,  inf,      202.5, 204.0, 20.4, 21.4])
+#
+#    # Region 5  : Strip including north shore of Maui  (25200, inf)
+#    regions.append([9, 9, 7.*3600., inf, 203.0, 203.7, 20.88333, 21.])
+#
+#    # Region 6 : Port at Kailua  (26100.0, inf)
+#    regions.append([14, 14, 7.25*3600., inf, 203.52,203.537,20.89,20.905])
 
 
     # -------------------------------------------------------
@@ -482,7 +482,7 @@ def setgeo(rundata):
     # Refinement data
     refinement_data = rundata.refinement_data
     refinement_data.variable_dt_refinement_ratios = True
-    refinement_data.wave_tolerance = 0.02    # Original setting : 0.016
+    refinement_data.wave_tolerance = 0.016    # Original setting : 0.016
     refinement_data.deep_depth = 200
     refinement_data.max_level_deep = 4
 
