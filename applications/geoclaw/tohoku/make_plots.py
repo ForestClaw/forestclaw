@@ -290,8 +290,8 @@ def setplot(plotdata):
     plotdata.print_framenos = range(0,101,2)          # list of frames to print
     plotdata.print_gaugenos = 'all'            # list of gauges to print
     plotdata.print_fignos = [4,300]            # list of figures to print
-    plotdata.html = True                     # create html files of plots?
-    plotdata.html_movie = True                     # create html files of plots?
+    plotdata.html = False                     # create html files of plots?
+    plotdata.html_movie = False                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
     plotdata.latex = False                    # create latex file of plots?
     plotdata.latex_figsperline = 2           # layout of plots

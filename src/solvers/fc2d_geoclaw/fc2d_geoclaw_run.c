@@ -84,250 +84,25 @@ void save_time_step(fclaw2d_global_t *glob)
 
 
 /* -------------------------------------------------------------------------------
-   Output style 1
-   Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
-   -------------------------------------------------------------------------------- */
-static void outstyle_0(fclaw2d_global_t *glob)
-{
-
-    int iframe;
-
-    iframe = 0;
-    fclaw2d_output_frame(glob,iframe);
-
-    int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,init_flag);
-    init_flag = 0;
-
-    /* Here is where we might include a call to a static solver, for, say,
-       an elliptic solve. The initial grid might contain, for example, a
-       right hand side. */
-#if 0
-    vt.time_independent_solve(domain);
-
-    fclaw2d_diagnostics_run(domain);
-
-    iframe++;
-    fclaw2d_output_frame(glob,iframe);
-#endif
-
-}
-
-
-/* -------------------------------------------------------------------------------
-   Output style 1
-   Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
-   -------------------------------------------------------------------------------- */
-static
-void outstyle_1(fclaw2d_global_t *glob)
-{
-    fclaw2d_domain_t** domain = &glob->domain;
-
-    int iframe = 0;
-
-    fclaw2d_output_frame(glob,iframe);
-
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-
-    double final_time = fclaw_opt->tfinal;
-    int nout = fclaw_opt->nout;
-    double initial_dt = fclaw_opt->initial_dt;
-    int level_factor = pow_int(2,fclaw_opt->maxlevel - fclaw_opt->minlevel);
-    double dt_minlevel = initial_dt;
-
-
-    int init_flag = 1;  /* Store anything that needs to be stored */
-    fclaw2d_diagnostics_gather(glob,init_flag);
-    init_flag = 0;
-
-    double t0 = 0;
-
-    double dt_outer = (final_time-t0)/((double) nout);
-    double t_curr = t0;
-    int n_inner = 0;
-
-    int n;
-    for(n = 0; n < nout; n++)
-    {
-        double tstart = t_curr;
-
-        glob->curr_time = t_curr;
-        double tend = tstart + dt_outer;
-        while (t_curr < tend)
-        {
-            /* In case we have to reject this step */
-            if (!fclaw_opt->use_fixed_dt)
-            {
-                save_time_step(glob);
-            }
-
-            /* Use the tolerance to make sure we don't take a tiny time
-               step just to hit 'tend'.   We will take a slightly larger
-               time step now (dt_cfl + tol) rather than taking a time step
-               of 'dt_minlevel' now, followed a time step of only 'tol' in
-               the next step.  Of course if 'tend - t_curr > dt_minlevel',
-               then dt_minlevel doesn't change. */
-
-            double dt_step = dt_minlevel;
-            if (fclaw_opt->advance_one_step)
-            {
-                dt_step /= level_factor;
-            }
-
-            double tol = 1e-2*dt_step;
-            int took_small_step = 0;
-            int took_big_step = 0;
-            double dt_step_desired = dt_step;
-            if (!fclaw_opt->use_fixed_dt)
-            {
-                double small_step = tend-(t_curr+dt_step);
-                if (small_step  < tol)
-                {
-                    dt_step = tend - t_curr;  // <= 'dt_minlevel + tol'
-                    if (small_step < 0)
-                    {
-                        /* We have (tend-t_curr) < dt_minlevel, and
-                           we have to take a small step to hit tend */
-                        took_small_step = 1;
-                    }
-                    else
-                    {
-                        /* Take a bigger step now to avoid small step
-                           in next time step. */
-                        took_big_step = 1;
-                    }
-                }
-            }
-            glob->curr_dt = dt_step;  
-            double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
-
-            if (fclaw_opt->reduce_cfl)
-            {
-                /* If we are taking a variable time step, we have to reduce the 
-                   maxcfl so that every processor takes the same size dt */
-                fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
-                maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-                fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);                
-            }
-
-
-            double tc = t_curr + dt_step;
-            fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
-                                     "%8.3f; Final time = %12.4f\n",
-                                     fclaw_opt->minlevel,
-                                     (*domain)->global_minlevel,
-                                     (*domain)->global_maxlevel,
-                                     n_inner+1,dt_step,
-                                     maxcfl_step, tc);
-
-            if ((maxcfl_step > fclaw_opt->max_cfl) & fclaw_opt->reduce_cfl)
-            {
-                fclaw_global_essentialf("   WARNING : Maximum CFL exceeded; "    \
-                                        "retaking time step\n");
-
-                if (!fclaw_opt->use_fixed_dt)
-                {
-                    restore_time_step(glob);
-
-                    /* Modify dt_level0 from step used. */
-                    dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
-
-                    /* Got back to start of loop, without incrementing
-                       step counter or time level */
-                    continue;
-                }
-            }
-
-            /* We are happy with this step */
-            n_inner++;
-            t_curr += dt_step;
-
-
-            /* Update this step, if necessary */
-            if (!fclaw_opt->use_fixed_dt)
-            {
-                double step_fraction = 100.0*dt_step/dt_step_desired;
-                if (took_small_step)
-                {
-                    fclaw_global_infof("   WARNING : Took small time step which was " \
-                                       "%6.1f%% of desired dt.\n",
-                                       step_fraction);
-                }
-                if (took_big_step)
-                {
-                    fclaw_global_infof("   WARNING : Took big time step which was " \
-                                       "%6.1f%% of desired dt.\n",step_fraction);
-
-                }
-
-
-                /* New time step, which should give a cfl close to the
-                   desired cfl. */
-                double dt_new = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
-                if (!took_small_step)
-                {
-                    dt_minlevel = dt_new;
-                }
-                else
-                {
-                    /* use time step that would have been used had we
-                       not taken a small step */
-                }
-            }
-            glob->curr_time = t_curr;
-
-            if (fclaw_opt->advance_one_step)
-            {
-                fclaw2d_diagnostics_gather(glob, init_flag);                
-            }
-
-            if (fclaw_opt->regrid_interval > 0)
-            {
-                if (n_inner % fclaw_opt->regrid_interval == 0)
-                {
-                    fclaw_global_infof("regridding at step %d\n",n);
-                    fclaw2d_regrid(glob);
-                }
-            }
-        }
-
-        /* Output file at every outer loop iteration */
-        fclaw2d_diagnostics_gather(glob, init_flag);
-        glob->curr_time = t_curr;
-        iframe++;
-        fclaw2d_output_frame(glob,iframe);
-    }
-}
-
-#if 0
-static void outstyle_2(fclaw2d_global_t *glob)
-{
-    // fclaw2d_domain_t** domain = &glob->domain;
-    // Output time at specific time steps.
-}
-#endif
-
-
-/* -------------------------------------------------------------------------------
    Output style dtopo (Time step over any moving topography)
-
-    Several cases to consider : 
-    1.  
    -------------------------------------------------------------------------------- */
 static
 double step_dtopo(fclaw2d_global_t *glob, double tstart_outer, double tend_outer, 
                 double dtopo_interval[2], double dt_dtopo_max, int *took_step)
-{
+{    
     if (dtopo_interval[1] <= tstart_outer || tend_outer <= dtopo_interval[0])
     {
         /* dtopo_interval does not intersect [tstart,tend] */
+        fclaw_global_essentialf("step_dtopo : Shouldn't be here ...\n");
+        exit(0);
         *took_step = 0;
         return 0;
     }
 
     /* -----------------------------------------------------------------------
        Step 1 : 
-       Step to dtopo_interval[0];  Assume that dt0 is a stable time step.
+       Step to dtopo_interval[0], if needed.  Assume that dt0 is a stable time 
+       step.
        --------------------------------------------------------------------- */
 
     double tstart_local = tstart_outer;
@@ -401,12 +176,122 @@ double step_dtopo(fclaw2d_global_t *glob, double tstart_outer, double tend_outer
     /* We completed a step to tend_outer */
     *took_step = 1; 
     return maxcfl;
+}
 
-#if 0
-    while (t_curr < tend)
+
+/* -------------------------------------------------------------------------------
+   Output style 1
+   Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
+   -------------------------------------------------------------------------------- */
+static
+void outstyle_1(fclaw2d_global_t *glob)
+{
+    fclaw2d_domain_t** domain = &glob->domain;
+
+    int iframe = 0;
+
+    fclaw2d_output_frame(glob,iframe);
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+
+    double final_time = fclaw_opt->tfinal;
+    int nout = fclaw_opt->nout;
+    double initial_dt = fclaw_opt->initial_dt;
+    int level_factor = pow_int(2,fclaw_opt->maxlevel - fclaw_opt->minlevel);
+    double dt_minlevel = initial_dt;
+
+
+    int init_flag = 1;  /* Store anything that needs to be stored */
+    fclaw2d_diagnostics_gather(glob,init_flag);
+    init_flag = 0;
+
+    double t0 = 0;
+
+    double dt_outer = (final_time-t0)/((double) nout);
+    double t_curr = t0;
+    int n_inner = 0;
+
+    /* These have to eventually be set as options */
+    double dtopo_interval[2] = {0,1};
+    double dt_dtopo_max = 1;
+
+
+    int n;
+    for(n = 0; n < nout; n++)
     {
-        glob->curr_dt = dt_step;  
-        double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
+        double tstart = t_curr;
+
+        glob->curr_time = t_curr;
+        double tend = tstart + dt_outer;
+        while (t_curr < tend)
+        {
+            /* In case we have to reject this step */
+            if (!fclaw_opt->use_fixed_dt)
+            {
+                save_time_step(glob);
+            }
+
+            /* Use the tolerance to make sure we don't take a tiny time
+               step just to hit 'tend'.   We will take a slightly larger
+               time step now (dt_cfl + tol) rather than taking a time step
+               of 'dt_minlevel' now, followed a time step of only 'tol' in
+               the next step.  Of course if 'tend - t_curr > dt_minlevel',
+               then dt_minlevel doesn't change. */
+
+            double dt_step = dt_minlevel;
+            if (fclaw_opt->advance_one_step)
+            {
+                dt_step /= level_factor;
+            }
+
+            double tol = 1e-2*dt_step;
+            int took_small_step = 0;
+            int took_big_step = 0;
+            double dt_step_desired = dt_step;
+            if (!fclaw_opt->use_fixed_dt)
+            {
+                double small_step = tend-(t_curr+dt_step);
+                if (small_step  < tol)
+                {
+                    dt_step = tend - t_curr;  // <= 'dt_minlevel + tol'
+                    if (small_step < 0)
+                    {
+                        /* We have (tend-t_curr) < dt_minlevel, and
+                           we have to take a small step to hit tend */
+                        took_small_step = 1;
+                    }
+                    else
+                    {
+                        /* Take a bigger step now to avoid small step
+                           in next time step. */
+                        took_big_step = 1;
+                    }
+                }
+            }
+
+            double maxcfl_step;
+            double tc;
+            int took_dtopo_ step = 0;
+            double tstart_outer = t_curr;
+            double tend_outer = tstart_outer + dt_step;
+            if (!(dtopo_interval[1] <= tstart_outer || tend_outer <= dtopo_interval[0]))
+            {
+                /* See if we have to do some dtopo time stepping to resolve any time 
+                   dependent topography */
+                /* This will return 0 if we didn't take a step */
+                maxcfl_step = step_dtopo(glob, tstart_outer, tend_outer, 
+                                         dtopo_interval, dt_dtopo_max);
+                /* glob->curr_time has been updated */  
+                tc = glob->curr_time;
+            }
+            else
+            {
+                /* Just to a regular step */
+                glob->curr_dt = dt_step;
+                maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
+                tc = t_curr + dt_step;        
+            }
+
 
             if (fclaw_opt->reduce_cfl)
             {
@@ -418,7 +303,7 @@ double step_dtopo(fclaw2d_global_t *glob, double tstart_outer, double tend_outer
             }
 
 
-            double tc = t_curr + dt_step;
+            //double tc = t_curr + dt_step;
             fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
                                      "%8.3f; Final time = %12.4f\n",
                                      fclaw_opt->minlevel,
@@ -427,28 +312,30 @@ double step_dtopo(fclaw2d_global_t *glob, double tstart_outer, double tend_outer
                                      n_inner+1,dt_step,
                                      maxcfl_step, tc);
 
-            if ((maxcfl_step > fclaw_opt->max_cfl) & fclaw_opt->reduce_cfl)
-            {
-                fclaw_global_essentialf("   WARNING : Maximum CFL exceeded; "    \
+            if (!took_step)
+            {                
+                if ((maxcfl_step > fclaw_opt->max_cfl) & fclaw_opt->reduce_cfl)
+                {
+                    fclaw_global_essentialf("   WARNING : Maximum CFL exceeded; "    \
                                         "retaking time step\n");
 
-                if (!fclaw_opt->use_fixed_dt)
-                {
-                    restore_time_step(glob);
+                    if (!fclaw_opt->use_fixed_dt)
+                    {
+                        restore_time_step(glob);
 
-                    /* Modify dt_level0 from step used. */
-                    dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
+                        /* Modify dt_level0 from step used. */
+                        dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
 
-                    /* Got back to start of loop, without incrementing
-                       step counter or time level */
-                    continue;
+                        /* Got back to start of loop, without incrementing
+                        step counter or time level */
+                        continue;
+                    }
                 }
             }
 
             /* We are happy with this step */
             n_inner++;
             t_curr += dt_step;
-
 
             /* Update this step, if necessary */
             if (!fclaw_opt->use_fixed_dt)
@@ -504,8 +391,17 @@ double step_dtopo(fclaw2d_global_t *glob, double tstart_outer, double tend_outer
         iframe++;
         fclaw2d_output_frame(glob,iframe);
     }
-#endif    
 }
+
+#if 0
+static void outstyle_2(fclaw2d_global_t *glob)
+{
+    // fclaw2d_domain_t** domain = &glob->domain;
+    // Output time at specific time steps.
+}
+#endif
+
+
 
 
 
@@ -759,11 +655,15 @@ void fc2d_geoclaw_run(fclaw2d_global_t *glob)
 
     switch (fclaw_opt->outstyle)
     {
+    case 1:
+        outstyle_1(glob);
+        break;
     case 3:
         outstyle_3(glob);
         break;
-    case 0:
-    case 1:
+    case 4:
+        outstyle_4(glob);
+        break;
     case 2:
     default:
         fclaw_global_essentialf("Outstyle %d not implemented yet in GeoClaw run\n", fclaw_opt->outstyle);

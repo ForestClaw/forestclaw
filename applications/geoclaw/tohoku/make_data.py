@@ -351,7 +351,7 @@ def setrun(claw_pkg='geoclaw'):
     # Data on topo extent extracted from Fujii.txydz
     # 
     # ------------------------------------------------------------------
-    # To match Geoclaw levels (N0 = mx = 22)
+    # To match Geoclaw levels (N0 = mx = 16)
     # 
     #            GeoClaw              -->           ForestClaw
     #
@@ -370,7 +370,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # Region 1  : Topo map at initial earthquake site;  Refine long enough to 
     # resolve initial disturbance.  (0,3600)
-    regions.append([5, 5, 0., 1, 135., 150., 30., 40.])
+    regions.append([5, 5, 0., 1, 135., 150., 30., 45.])
 
     # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
     regions.append([0, 5, 0., 5.*3600., 132., 220., 5., 40.])
