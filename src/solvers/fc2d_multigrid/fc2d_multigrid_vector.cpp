@@ -8,7 +8,7 @@
 
 using namespace Thunderegg;
 
-fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn) {
+fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn):Vector<2>(MPI_COMM_WORLD) {
     fclaw2d_clawpatch_options_t *clawpatch_opt =
         fclaw2d_clawpatch_get_options(glob);
 
