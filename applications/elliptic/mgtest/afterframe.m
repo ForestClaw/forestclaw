@@ -18,7 +18,7 @@ if Frame == 0
     end
 elseif Frame == 1
     if mq == 1
-        % Computed olution
+        % Computed solution
         caxis([-0.2, 1]);
         tstr = 'Computed solution';
     elseif mq == 2
