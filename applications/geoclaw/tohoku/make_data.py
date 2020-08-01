@@ -112,8 +112,11 @@ def setrun(claw_pkg='geoclaw'):
     gauges.append([5680, 203.530944, 20.895, 7.0*3600., 1.e9]) #TG Kahului
 
 
-    ## Add one near epicenter - for testing 
-    gauges.append([1234, 144.851543, 33.090886, 0, 1.e9]) 
+    ## Add gauges for comparison with GeoClaw
+    gauges.append([1, 143.214480, 38.011905, 0, 1.e9])
+    gauges.append([2, 144.851543, 33.090886, 0, 1.e9]) 
+    gauges.append([3, 170.233553, 29.893284, 0, 1.e9])
+    gauges.append([4, 196.417438, 20.561113, 0, 1.e9])
 
 
     # ---------------
@@ -351,7 +354,7 @@ def setrun(claw_pkg='geoclaw'):
     # Data on topo extent extracted from Fujii.txydz
     # 
     # ------------------------------------------------------------------
-    # To match Geoclaw levels (N0 = mx = 22)
+    # To match Geoclaw levels (N0 = mx = 16)
     # 
     #            GeoClaw              -->           ForestClaw
     #
@@ -370,7 +373,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # Region 1  : Topo map at initial earthquake site;  Refine long enough to 
     # resolve initial disturbance.  (0,3600)
-    regions.append([5, 5, 0., 1, 135., 150., 30., 40.])
+    regions.append([5, 5, 0., 1, 135., 150., 30., 45.])
 
     # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
     regions.append([0, 5, 0., 5.*3600., 132., 220., 5., 40.])
