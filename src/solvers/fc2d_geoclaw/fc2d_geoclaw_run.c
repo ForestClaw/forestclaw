@@ -271,7 +271,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
             double maxcfl_step;
             double tc;
-            int took_dtopo_ step = 0;
+            int took_step = 0;
             double tstart_outer = t_curr;
             double tend_outer = tstart_outer + dt_step;
             if (!(dtopo_interval[1] <= tstart_outer || tend_outer <= dtopo_interval[0]))
@@ -280,7 +280,7 @@ void outstyle_1(fclaw2d_global_t *glob)
                    dependent topography */
                 /* This will return 0 if we didn't take a step */
                 maxcfl_step = step_dtopo(glob, tstart_outer, tend_outer, 
-                                         dtopo_interval, dt_dtopo_max);
+                                         dtopo_interval, dt_dtopo_max, &took_step);
                 /* glob->curr_time has been updated */  
                 tc = glob->curr_time;
             }
