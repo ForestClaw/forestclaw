@@ -11,18 +11,14 @@ import numpy as np
 from pdb import *
 
 # import topotools
+try:
+    FCLAW = os.environ['FCLAW']
+except:
+    raise Exception("*** Must First set FCLAW environment variable")
 
-topodir = './topo/'
+topodir = os.path.join(FCLAW, 'applications','geoclaw', 'scratch')
 if not os.path.isdir(topodir):
     raise Exception("*** Missing topo directory: %s" % topodir)
-
-try:
-    CLAW = os.environ['CLAW']
-except:
-    raise Exception("*** Must First set CLAW environment variable")
-
-scratch_dir = os.path.join(CLAW, 'geoclaw', 'scratch')
-
 
 minlevel = 3
 maxlevel = 7
@@ -312,9 +308,11 @@ def setrun(claw_pkg='geoclaw'):
     # List of refinement ratios at each level (length at least amr_level_max-1)
     # 2 degree, 24', 4', 1', 10", 1/3"
     amrdata.amr_levels_max = maxlevel    # Set to 3 for best results
-    amrdata.refinement_ratios_x = [5, 6, 4, 6, 30]
-    amrdata.refinement_ratios_y = [5, 6, 4, 6, 30]
-    amrdata.refinement_ratios_t = [5, 6, 4, 6, 30]
+
+    # Not used in ForestClaw
+    # amrdata.refinement_ratios_x = [5, 6, 4, 6, 30]
+    # amrdata.refinement_ratios_y = [5, 6, 4, 6, 30]
+    # amrdata.refinement_ratios_t = [5, 6, 4, 6, 30]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -497,15 +495,15 @@ def setgeo(rundata):
     # == settopo.data values ==
     # Set minlevel=maxlevel=0
     topofiles = rundata.topo_data.topofiles
-    topofiles.append([3, 0, 0, 0.0, 1e10, './topo/etopo1min130E210E0N60N.asc'])
-    topofiles.append([3, 0, 0, 0.0, 1e10, './topo/hawaii_6s.txt'])
-    topofiles.append([3, 0, 0, 0., 1.e10, './topo/kahului_1s.txt'])
+    topofiles.append([3, 0, 0, 0.0, 1e10, os.path.join(topodir,'etopo1min130E210E0N60N.asc')])
+    # topofiles.append([3, 0, 0, 0.0, 1e10, os.path.join(topodir,'hawaii_6s.txt')])
+    topofiles.append([3, 0, 0, 0., 1.e10, os.path.join(topodir,'kahului_1s.txt')])
 
     # == setdtopo.data values ==
     # topo_data = rundata.topo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname]
-    rundata.dtopo_data.dtopofiles = [[1, 0, 0,'./topo/Fujii.txydz']]
+    rundata.dtopo_data.dtopofiles = [[1, 0, 0,os.path.join(topodir,'fujii.txydz')]]
 
 
     # == setqinit.data values ==

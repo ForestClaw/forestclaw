@@ -10,13 +10,12 @@ function setplot is called to set the plot parameters.
 Set up the plot figures, axes, andd items to be done for each frame.
 
 this module is imported by the plotting routines and then the
-fucntion setplot is called to set the plot parameters.
+function setplot is called to set the plot parameters.
 
 """
 
 # import numpy as np
 from numpy import *
-import matplotlib.pyplot as plt
 
 #-------------------
 def setplot(plotdata):
@@ -72,77 +71,21 @@ def setplot(plotdata):
     plotdata.kml_starttime = [2011,3,11,5,46,0]  # [Y,M,D,H,M,S] (UTC)
     plotdata.kml_tz_offset = -9     # offset to UTC
 
-    plotdata.kml_publish = "http://math.boisestate.edu/~calhoun/visclaw/GoogleEarth/kmz"
-
-
-    #-----------------------------------------
-    # Figure for pcolor plot
-    #-----------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='Bathymetry', figno=0)
-    plotfigure.show = True   # Don't show this file in the html version
-
-    # Set up for axes in this figure:
-    plotaxes = plotfigure.new_plotaxes('pcolor')
-    plotaxes.title = 'Surface'
-    plotaxes.scaled = True
-
-    plotaxes.afteraxes = fixup
-    plotaxes.xlimits = [132.0, 210.0]
-    plotaxes.ylimits = [9.0, 53.0]
-
-    # Water
-    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    #plotitem.plot_var = geoplot.surface
-    plotitem.show = True
-    plotitem.plot_var = geoplot.surface_or_depth
-    plotitem.pcolor_cmap = geoplot.tsunami_colormap
-    plotitem.pcolor_cmin = -0.2
-    plotitem.pcolor_cmax = 0.2
-    plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [0,0,0]
-    plotitem.patchedges_show = 1
-
-    # Land
-    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    plotitem.show = True
-    plotitem.plot_var = geoplot.land
-    plotitem.pcolor_cmap = geoplot.land_colors
-    plotitem.pcolor_cmin = 0.0
-    plotitem.pcolor_cmax = 100.0
-    plotitem.add_colorbar = False
-    plotitem.amr_celledges_show = [1,1,0]
-    plotitem.patchedges_show = 1
-    plotaxes.xlimits = [202., 206.]
-    plotaxes.ylimits = [19., 21.]
-
-    # add contour lines of bathy if desired:
-    plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
-    plotitem.show = True
-    plotitem.plot_var = geoplot.topo
-    plotitem.contour_levels = linspace(-2000,0,5)
-    plotitem.amr_contour_colors = ['w']  # color on each level
-    plotitem.kwargs = {'linestyles':'solid','linewidths':1}
-    plotitem.amr_contour_show = [1,0,0]
-    plotitem.celledges_show = 0
-    plotitem.patchedges_show = 0
-
-
-
     #-------------------------------------------------------------------
     # Figure for KML files
     #--------------------------------------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='Sea Surface',figno=4)
+    plotfigure = plotdata.new_plotfigure(name='Sea Surface',figno=0)
     plotfigure.show = True   # Don't show this file in the html version
 
     plotfigure.kml_use_for_initial_view= True
     plotfigure.use_for_kml = True
 
-    # Resolution : prod(rr_factors)*22
-    rcl = 2    # rcl*figsize = numcells
-    mx = 32
+    # Resolution : prod(rr_factors)*mx
+    block_dim = array([2,1])
+    mx = 16
     rr_factors = array([1,4,8,4])
-    plotfigure.kml_dpi = rr_factors.prod()
-    plotfigure.kml_figsize = mx*array([2,1])
+    plotfigure.kml_dpi = rr_factors.prod()  # Finest level dpi
+    plotfigure.kml_figsize = mx*block_dim   # in inches
 
     plotfigure.kml_tile_images = False
 
@@ -289,7 +232,7 @@ def setplot(plotdata):
     plotdata.print_format = 'png'            # file format
     plotdata.print_framenos = range(0,101)          # list of frames to print
     plotdata.print_gaugenos = 'all'            # list of gauges to print
-    plotdata.print_fignos = [4,300]            # list of figures to print
+    plotdata.print_fignos = [0,300]            # list of figures to print
     plotdata.html = False                     # create html files of plots?
     plotdata.html_movie = False                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
@@ -299,7 +242,6 @@ def setplot(plotdata):
     plotdata.latex_makepdf = False           # also run pdflatex?
 
     plotdata.kml = True
-    #plotfigure.kml_url = 'http://math.boisestate.edu/~calhoun/visclaw/GoogleEarth/tohoku'
 
     return plotdata
 
