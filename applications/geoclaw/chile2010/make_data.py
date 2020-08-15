@@ -10,12 +10,12 @@ import os
 import numpy as np
 
 try:
-    CLAW = os.environ['CLAW']
+    FCLAW = os.environ['FCLAW']
 except:
-    raise Exception("*** Must first set CLAW enviornment variable")
+    raise Exception("*** Must first set FCLAW enviornment variable")
 
 # Scratch directory for storing topo and dtopo files:
-scratch_dir = os.path.join(CLAW, 'geoclaw', 'scratch')
+topodir = os.path.join(FCLAW, 'applications', 'geoclaw', 'scratch')
 
 
 #------------------------------
@@ -396,7 +396,7 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_path = os.path.join(scratch_dir, 'etopo10min120W60W60S0S.asc')
+    topo_path = os.path.join(topodir, 'etopo10min120W60W60S0S.asc')
 
     # Original code
     # topo_data.topofiles.append([2, 1, 3, 0., 1.e10, topo_path])
@@ -409,7 +409,7 @@ def setgeo(rundata):
     dtopo_data = rundata.dtopo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname]
-    dtopo_path = os.path.join(scratch_dir, 'dtopo_usgs100227.tt3')
+    dtopo_path = os.path.join(topodir, 'dtopo_usgs100227.tt3')
 
     # Original code
     # dtopo_data.dtopofiles.append([3,3,3,dtopo_path])
