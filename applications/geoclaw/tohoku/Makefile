@@ -15,7 +15,7 @@ output:
 	@echo "       $$ mpirun -n 4 tohoku"
 
 plots: 
-	${PYTHON} setplot.py
+	${PYTHON} make_plots.py
 
 kml: 
 	${PYTHON} make_kml.py

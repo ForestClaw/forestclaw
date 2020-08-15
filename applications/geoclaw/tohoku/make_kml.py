@@ -86,6 +86,7 @@ def setplot(plotdata):
     rr_factors = array([1,4,8,4])
     plotfigure.kml_dpi = rr_factors.prod()  # Finest level dpi
     plotfigure.kml_figsize = mx*block_dim   # in inches
+    print(plotfigure.kml_dpi*plotfigure.kml_figsize)
 
     plotfigure.kml_tile_images = False
 
