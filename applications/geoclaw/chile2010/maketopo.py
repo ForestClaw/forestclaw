@@ -8,6 +8,8 @@ but now they are explicit below.
 Call functions with makeplots==True to create plots of topo, slip, and dtopo.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 
 import clawpack.clawutil.data
@@ -18,7 +20,7 @@ except:
     raise Exception("*** Must first set FCLAW enviornment variable")
 
 # Scratch directory for storing topo and dtopo files:
-topodir = os.path.join(FCLAW, 'applications', 'geoclaw', 'scratch')
+scratch_dir = os.path.join(FCLAW, 'applications','geoclaw', 'scratch')
 
 def get_topo(makeplots=False):
     """
@@ -26,13 +28,13 @@ def get_topo(makeplots=False):
     """
     from clawpack.geoclaw import topotools
     topo_fname = 'etopo10min120W60W60S0S.asc'
-    url = 'http://www.geoclaw.org/topo/etopo/' + topo_fname
-    clawpack.clawutil.data.get_remote_file(url, output_dir=topodir, 
+    url = 'http://depts.washington.edu/clawpack/geoclaw/topo/etopo/' + topo_fname
+    clawpack.clawutil.data.get_remote_file(url, output_dir=scratch_dir, 
             file_name=topo_fname, verbose=True)
 
     if makeplots:
         from matplotlib import pyplot as plt
-        topo = topotools.Topography(os.path.join(topodir,topo_fname), topo_type=2)
+        topo = topotools.Topography(os.path.join(scratch_dir,topo_fname), topo_type=2)
         topo.plot()
         fname = os.path.splitext(topo_fname)[0] + '.png'
         plt.savefig(fname)
@@ -48,7 +50,7 @@ def make_dtopo(makeplots=False):
     from clawpack.geoclaw import dtopotools
     import numpy
 
-    dtopo_fname = os.path.join(topodir, "dtopo_usgs100227.tt3")
+    dtopo_fname = os.path.join(scratch_dir, "dtopo_usgs100227.tt3")
 
     # Specify subfault parameters for this simple fault model consisting
     # of a single subfault:

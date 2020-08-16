@@ -257,6 +257,7 @@ def setplot(plotdata):
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
+    plotdata.parallel = False
     plotdata.format = 'forestclaw'
 
     plotdata.kml = True
@@ -264,6 +265,9 @@ def setplot(plotdata):
     return plotdata
 
 if __name__=="__main__":
+    import matplotlib.pyplot as plt
+    plt.switch_backend('agg')
+
     from clawpack.visclaw.plotclaw import plotclaw
     plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')
     
