@@ -230,21 +230,18 @@ INTEGER FUNCTION fc2d_geoclaw_coarsen_using_regions(level,xlower,ylower,xupper,y
         !! We can use regions as a criteria
         if (level .gt. rmax) then
             !! Force coarsening
-            if (t .ge. 18000 .and. mmax .le. 3) then
-                !!write(6,'(A,I5,A,I5,A,I5)') 'mmax = ',mmax,'  level = ',level,'  rmax = ',rmax
-            endif
             tag_patch = 1
         endif
     else
-        do m = 1,3
-            write(6,*) 'region m'
-            write(6,'(6F16.4)') regions(m)%t_low, regions(m)%t_hi, & 
-                 regions(m)%x_low, regions(m)%x_hi, regions(m)%y_low, regions(m)%y_hi
-            write(6,*) ' '
-        end do
-        write(6,*) xlower, ylower, xupper, yupper, t
-        write(6,*) 'No region found; t = ', t, '; level = ', level
-        stop
+!!        do m = 1,3
+!!            write(6,*) 'region ', m
+!!            write(6,'(6F16.4)') regions(m)%t_low, regions(m)%t_hi, & 
+!!                 regions(m)%x_low, regions(m)%x_hi, regions(m)%y_low, regions(m)%y_hi
+!!            write(6,*) ' '
+!!        end do
+!!        write(6,*) xlower, ylower, xupper, yupper, t
+!!        write(6,*) 'No region found; t = ', t, '; level = ', level
+!!        stop
     endif
     !!write(6,*) ' '
 
