@@ -6,21 +6,21 @@ topo:
 	${PYTHON} maketopo.py  # Essentially maketopo.py
 
 data:
-	${PYTHON} make_data.py  # Essentially setrun.py
+	${PYTHON} setrun.py  # Essentially setrun.py
 
 output:
 	@echo "Usage : "
-	@echo "To run example in serial : "
-	@echo "       $$ ${EXE}"
-	@echo " "
-	@echo "To run example in parallel : "
-	@echo "       $$ mpirun -n 4 ${EXE}"
-	@echo " "
-	@echo "Running the serial example using options in fclaw_options.ini"
-	${EXE}
+	@echo "    To run example in serial : "
+	@echo "           $$ ${EXE}"
+	@echo "     "
+	@echo "    To run example in parallel : "
+	@echo "           $$ mpirun -n 4 ${EXE}"
+	@echo "     "
+
+	# ${EXE}
 
 plots: 
-	${PYTHON} make_plots.py   # Essentially setplot.py
+	${PYTHON} setplot.py   # Essentially setplot.py
 
 kml: 
-	${PYTHON} make_kml.py     # Version of setplot.py for creating KML files.
+	${PYTHON} setplot_kml.py     # Version of setplot.py for creating KML files.

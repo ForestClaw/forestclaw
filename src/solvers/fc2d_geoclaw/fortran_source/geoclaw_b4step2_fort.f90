@@ -44,6 +44,7 @@ SUBROUTINE fc2d_geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
 
     INTEGER :: is_ghost, mint, nghost
     REAL(KIND=8) :: tmin, tmax
+    LOGICAL :: dtint1, dtint2
 
     !! Check for NaNs in the solution
     CALL check4nans(meqn,mbc,mx,my,q,t,1)
@@ -68,8 +69,13 @@ SUBROUTINE fc2d_geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
         endif
     enddo
 
+    !! dtopo time is an interval [t0,tf]
+    dtint1 = (tmin .le. t .and. t .le. tmax) 
 
-    IF (tmin .le. t .and. t .le. tmax) THEN
+    !! dtopo time is instanteous;; [t0, \infty]
+    dtint2 = (tmin .eq. tmax) .and. t .ge. tmax
+
+    if (dtint1 .or. dtint2) then
         !! topo arrays might have been updated by dtopo more recently than
         !! aux arrays were set unless at least 1 step taken on all levels
         aux(1,:,:) = NEEDS_TO_BE_SET ! new system checks this val before setting

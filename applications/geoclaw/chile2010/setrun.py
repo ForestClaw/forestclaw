@@ -6,6 +6,8 @@ that will be read in by the Fortran code.
 
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 import numpy as np
 
@@ -15,7 +17,7 @@ except:
     raise Exception("*** Must first set FCLAW enviornment variable")
 
 # Scratch directory for storing topo and dtopo files:
-topodir = os.path.join(FCLAW, 'applications', 'geoclaw', 'scratch')
+scratch_dir = os.path.join(FCLAW, 'applications','geoclaw', 'scratch')
 
 
 #------------------------------
@@ -44,7 +46,7 @@ def setrun(claw_pkg='geoclaw'):
     #------------------------------------------------------------------
     # Problem-specific parameters to be written to setprob.data:
     #------------------------------------------------------------------
-
+    
     #probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
 
 
@@ -97,8 +99,8 @@ def setrun(claw_pkg='geoclaw'):
     # Index of aux array corresponding to capacity function, if there is one:
     clawdata.capa_index = 2
 
-
-
+    
+    
     # -------------
     # Initial time:
     # -------------
@@ -107,14 +109,12 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # Restart from checkpoint file of a previous run?
-    # Note: If restarting, you must also change the Makefile to set:
-    #    RESTART = True
     # If restarting, t0 above should be from original run, and the
-    # restart_file 'fort.chkNNNNN' specified below should be in
+    # restart_file 'fort.chkNNNNN' specified below should be in 
     # the OUTDIR indicated in Makefile.
 
-    clawdata.restart = False               # True to restart from prior results
-    clawdata.restart_file = 'fort.chk00036'  # File to use for restart data
+    clawdata.restart = False              # True to restart from prior results
+    clawdata.restart_file = 'fort.chk00096'  # File to use for restart data
 
     # -------------
     # Output times:
@@ -129,7 +129,7 @@ def setrun(claw_pkg='geoclaw'):
     if clawdata.output_style==1:
         # Output nout frames at equally spaced times up to tfinal:
         clawdata.num_output_times = 18
-        clawdata.tfinal = 32400.0
+        clawdata.tfinal = 9*3600.
         clawdata.output_t0 = True  # output at initial (or restart) time?
 
     elif clawdata.output_style == 2:
@@ -141,9 +141,9 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.output_step_interval = 1
         clawdata.total_steps = 3
         clawdata.output_t0 = True
+        
 
-
-    clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf'
+    clawdata.output_format = 'ascii'      # 'ascii' or 'binary' 
 
     clawdata.output_q_components = 'all'   # need all
     clawdata.output_aux_components = 'none'  # eta=h+B is in q
@@ -194,11 +194,11 @@ def setrun(claw_pkg='geoclaw'):
 
     # Order of accuracy:  1 => Godunov,  2 => Lax-Wendroff plus limiters
     clawdata.order = 2
-
+    
     # Use dimensional splitting? (not yet available for AMR)
     clawdata.dimensional_split = 'unsplit'
-
-    # For unsplit method, transverse_waves can be
+    
+    # For unsplit method, transverse_waves can be 
     #  0 or 'none'      ==> donor cell (only normal solver used)
     #  1 or 'increment' ==> corner transport of waves
     #  2 or 'all'       ==> corner transport of 2nd order corrections too
@@ -206,8 +206,8 @@ def setrun(claw_pkg='geoclaw'):
 
     # Number of waves in the Riemann solution:
     clawdata.num_waves = 3
-
-    # List of limiters to use for each wave family:
+    
+    # List of limiters to use for each wave family:  
     # Required:  len(limiter) == num_waves
     # Some options:
     #   0 or 'none'     ==> no limiter (Lax-Wendroff)
@@ -218,10 +218,10 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.limiter = ['mc', 'mc', 'mc']
 
     clawdata.use_fwaves = True    # True ==> use f-wave version of algorithms
-
+    
     # Source terms splitting:
     #   src_split == 0 or 'none'    ==> no source term (src routine never called)
-    #   src_split == 1 or 'godunov' ==> Godunov (1st order) splitting used,
+    #   src_split == 1 or 'godunov' ==> Godunov (1st order) splitting used, 
     #   src_split == 2 or 'strang'  ==> Strang (2nd order) splitting used,  not recommended.
     clawdata.source_split = 'godunov'
 
@@ -260,15 +260,15 @@ def setrun(claw_pkg='geoclaw'):
         # Do not checkpoint at all
         pass
 
-    elif clawdata.checkpt_style == 1:
+    elif np.abs(clawdata.checkpt_style) == 1:
         # Checkpoint only at tfinal.
         pass
 
-    elif clawdata.checkpt_style == 2:
-        # Specify a list of checkpoint times.
+    elif np.abs(clawdata.checkpt_style) == 2:
+        # Specify a list of checkpoint times.  
         clawdata.checkpt_times = [0.1,0.15]
 
-    elif clawdata.checkpt_style == 3:
+    elif np.abs(clawdata.checkpt_style) == 3:
         # Checkpoint every checkpt_interval timesteps (on Level 1)
         # and at the final time.
         clawdata.checkpt_interval = 5
@@ -279,13 +279,16 @@ def setrun(claw_pkg='geoclaw'):
     # ---------------
     amrdata = rundata.amrdata
 
+    # maximum size of patches in each direction (matters in parallel):
+    amrdata.max1d = 60
+
     # max number of refinement levels:
-    amrdata.amr_levels_max = 5
+    amrdata.amr_levels_max = 3
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [2,6,1,1]
-    amrdata.refinement_ratios_y = [2,6,1,1]
-    amrdata.refinement_ratios_t = [2,6,1,1]
+    amrdata.refinement_ratios_x = [2,6]
+    amrdata.refinement_ratios_y = [2,6]
+    amrdata.refinement_ratios_t = [2,6]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -297,6 +300,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # Flag using refinement routine flag2refine rather than richardson error
     amrdata.flag_richardson = False    # use Richardson?
+    amrdata.flag_richardson_tol = 0.002  # Richardson tolerance
     amrdata.flag2refine = True
 
     # steps to take on each level L between regriddings of level L+1:
@@ -311,9 +315,9 @@ def setrun(claw_pkg='geoclaw'):
     amrdata.clustering_cutoff = 0.700000
 
     # print info about each regridding up to this level:
-    amrdata.verbosity_regrid = 0
+    amrdata.verbosity_regrid = 0  
 
-    #  ----- For developers -----
+    #  ----- For developers ----- 
     # Toggle debugging print statements:
     amrdata.dprint = False      # print domain flags
     amrdata.eprint = False      # print err est flags
@@ -325,7 +329,7 @@ def setrun(claw_pkg='geoclaw'):
     amrdata.sprint = False      # space/memory output
     amrdata.tprint = True       # time step reporting each level
     amrdata.uprint = False      # update/upbnd reporting
-
+    
     # More AMR parameters can be set -- see the defaults in pyclaw/data.py
 
     # ---------------
@@ -334,14 +338,8 @@ def setrun(claw_pkg='geoclaw'):
     rundata.regiondata.regions = []
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-
-    # Original levels
-    # rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
-    # rundata.regiondata.regions.append([3, 3, 8000., 26000., -90,-80,-30,-15])
-
-    # Decrease region numbering for ForestClaw
-    rundata.regiondata.regions.append([5, 5, 0., 10000., -85,-72,-38,-25])
-    rundata.regiondata.regions.append([5, 5, 8000., 26000., -90,-80,-30,-15])
+    rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
+    rundata.regiondata.regions.append([3, 3, 8000., 26000., -90,-80,-30,-15])
 
     # ---------------
     # Gauges:
@@ -349,7 +347,7 @@ def setrun(claw_pkg='geoclaw'):
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
     rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
-
+    
 
     return rundata
     # end of function setrun
@@ -369,7 +367,7 @@ def setgeo(rundata):
     except:
         print("*** Error, this rundata has no geo_data attribute")
         raise AttributeError("Missing geo_data attribute")
-
+       
     # == Physics ==
     geo_data.gravity = 9.81
     geo_data.coordinate_system = 2
@@ -396,28 +394,15 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_path = os.path.join(topodir, 'etopo10min120W60W60S0S.asc')
-
-    # Original code
-    # topo_data.topofiles.append([2, 1, 3, 0., 1.e10, topo_path])
-
-    # For ForestClaw
-    topo_data.topofiles.append([2, 0, 5, 0., 1.e10, topo_path])
-
+    topo_path = os.path.join(scratch_dir, 'etopo10min120W60W60S0S.asc')
+    topo_data.topofiles.append([2, 1, 3, 0., 1.e10, topo_path])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname]
-    dtopo_path = os.path.join(topodir, 'dtopo_usgs100227.tt3')
-
-    # Original code
-    # dtopo_data.dtopofiles.append([3,3,3,dtopo_path])
-
-    # Increase levels for Forestclaw
-    dtopo_data.dtopofiles.append([3,5,5,dtopo_path])
-
-
+    dtopo_path = os.path.join(scratch_dir, 'dtopo_usgs100227.tt3')
+    dtopo_data.dtopofiles.append([3,3,3,dtopo_path])
     dtopo_data.dt_max_dtopo = 0.2
 
 
@@ -442,5 +427,9 @@ def setgeo(rundata):
 if __name__ == '__main__':
     # Set up run-time parameters and write all data files.
     import sys
+    from clawpack.geoclaw import kmltools
+
     rundata = setrun(*sys.argv[1:])
     rundata.write()
+
+    kmltools.make_input_data_kmls(rundata)
