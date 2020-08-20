@@ -89,7 +89,7 @@ def setplot(plotdata=None):
     plotitem.pcolor_cmin = -0.2
     plotitem.pcolor_cmax = 0.2
     plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [0,0,0]
+    plotitem.amr_celledges_show = [0,0,0,0,0]
     plotitem.patchedges_show = 1
 
     # Land
@@ -99,7 +99,7 @@ def setplot(plotdata=None):
     plotitem.pcolor_cmin = 0.0
     plotitem.pcolor_cmax = 100.0
     plotitem.add_colorbar = False
-    plotitem.amr_celledges_show = [1,1,0]
+    plotitem.amr_celledges_show = [0,0,0,0,0]
     plotitem.patchedges_show = 1
     plotaxes.xlimits = [-120,-60]
     plotaxes.ylimits = [-60,0]
@@ -111,7 +111,7 @@ def setplot(plotdata=None):
     plotitem.contour_levels = linspace(-3000,-3000,1)
     plotitem.amr_contour_colors = ['y']  # color on each level
     plotitem.kwargs = {'linestyles':'solid','linewidths':2}
-    plotitem.amr_contour_show = [1,0,0]  
+    plotitem.amr_contour_show = [0,0,0,0,0]  
     plotitem.celledges_show = 0
     plotitem.patchedges_show = 0
 
