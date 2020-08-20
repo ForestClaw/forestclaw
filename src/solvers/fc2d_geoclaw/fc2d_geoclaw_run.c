@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw_math.h"
 
+#include <fc2d_geoclaw_fort.h>
+
 
 
 /*  -----------------------------------------------------------------
@@ -88,7 +90,7 @@ void save_time_step(fclaw2d_global_t *glob)
    -------------------------------------------------------------------------------- */
 static
 double step_dtopo(fclaw2d_global_t *glob, double tstart_outer, double tend_outer, 
-                double dtopo_interval[2], double dt_dtopo_max, int *took_step)
+                double dtopo_interval[2], double dt_max_dtopo, int *took_step)
 {    
     if (dtopo_interval[1] <= tstart_outer || tend_outer <= dtopo_interval[0])
     {
@@ -140,10 +142,10 @@ double step_dtopo(fclaw2d_global_t *glob, double tstart_outer, double tend_outer
         tend_local = tend_outer;
     }
 
-    /* Step to dtopo_interval[0] + dt_dtopo with time step that does not exceed dt_dtopo_max
+    /* Step to dtopo_interval[0] + dt_dtopo with time step that does not exceed dt_max_dtopo
        Take at least two steps.   */
     double dt_dtopo = tend_local - tstart_local;
-    double dtmin = (dt_dtopo < dt_dtopo_max) ? dt_dtopo : dt_dtopo_max;
+    double dtmin = (dt_dtopo < dt_max_dtopo) ? dt_dtopo : dt_max_dtopo;
     int M = ceil(dt_dtopo/dtmin) + 1;
     double dt1 = dt_dtopo/M;   
 
@@ -212,8 +214,11 @@ void outstyle_1(fclaw2d_global_t *glob)
     int n_inner = 0;
 
     /* These have to eventually be set as options */
-    double dtopo_interval[2] = {0,1};
-    double dt_dtopo_max = 1;
+    //double dtopo_interval[2] = {0,1};
+
+    double dtopo_interval[2];
+    FC2D_GEOCLAW_GET_DTOPO_INTERVAL(&dtopo_interval[0],&dtopo_interval[1]);
+    double dt_max_dtopo = FC2D_GEOCLAW_GET_DT_MAX_DTOPO();
 
 
     int n;
@@ -280,7 +285,7 @@ void outstyle_1(fclaw2d_global_t *glob)
                    dependent topography */
                 /* This will return 0 if we didn't take a step */
                 maxcfl_step = step_dtopo(glob, tstart_outer, tend_outer, 
-                                         dtopo_interval, dt_dtopo_max, &took_step);
+                                         dtopo_interval, dt_max_dtopo, &took_step);
                 /* glob->curr_time has been updated */  
                 tc = glob->curr_time;
             }
@@ -450,7 +455,7 @@ void outstyle_3(fclaw2d_global_t *glob)
 
     /* These have to eventually be set as options */
     double dtopo_interval[2] = {0,1};
-    double dt_dtopo_max = 1;
+    double dt_max_dtopo = 1;
 
 
     int n = 0;
@@ -484,7 +489,7 @@ void outstyle_3(fclaw2d_global_t *glob)
                dependent topography */
             /* This will return 0 if we didn't take a step */
             maxcfl_step = step_dtopo(glob, tstart_outer, tend_outer, 
-                                     dtopo_interval, dt_dtopo_max, 
+                                     dtopo_interval, dt_max_dtopo, 
                                      &took_step);
             /* glob->curr_time has been updated */  
             tc = glob->curr_time;
