@@ -303,16 +303,16 @@ def setrun(claw_pkg='geoclaw'):
     # -----------------------------------------------
     amrdata = rundata.amrdata
 
-    maxlevel = 4
+    maxlevel = 15
 
     # List of refinement ratios at each level (length at least amr_level_max-1)
     # 2 degree, 24', 4', 1', 10", 1/3"
     amrdata.amr_levels_max = maxlevel    # Set to 3 for best results
 
     # Not used in ForestClaw
-    amrdata.refinement_ratios_x = [5, 6, 4, 6, 30]
-    amrdata.refinement_ratios_y = [5, 6, 4, 6, 30]
-    amrdata.refinement_ratios_t = [5, 6, 4, 6, 30]
+    amrdata.refinement_ratios_x = [2]*(maxlevel-1)
+    amrdata.refinement_ratios_y = [2]*(maxlevel-1)
+    amrdata.refinement_ratios_t = [2]*(maxlevel-1)
 
 
     # Specify type of each aux variable in amrdata.auxtype.

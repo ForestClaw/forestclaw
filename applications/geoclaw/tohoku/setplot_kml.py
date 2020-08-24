@@ -231,7 +231,7 @@ def setplot(plotdata):
     plotdata.parallel = False
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = range(0,101)          # list of frames to print
+    plotdata.print_framenos = 'all'          # list of frames to print
     plotdata.print_gaugenos = 'all'            # list of gauges to print
     plotdata.print_fignos = [0,300]            # list of figures to print
     plotdata.html = False                     # create html files of plots?
