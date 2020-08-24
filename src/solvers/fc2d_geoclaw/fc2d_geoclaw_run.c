@@ -213,11 +213,13 @@ void outstyle_1(fclaw2d_global_t *glob)
     double t_curr = t0;
     int n_inner = 0;
 
-    /* These have to eventually be set as options */
-    //double dtopo_interval[2] = {0,1};
-
+    /* Get interval by looping over all potential dtopo files and finding largest
+       brackting interval that contains all time intervals */
     double dtopo_interval[2];
     FC2D_GEOCLAW_GET_DTOPO_INTERVAL(&dtopo_interval[0],&dtopo_interval[1]);
+
+    /* Read dt_max_dtopo directly from the topo module (topo_module.f90).  
+    This value is set directly from dtopo.data (created by setrun.py).  */
     double dt_max_dtopo = FC2D_GEOCLAW_GET_DT_MAX_DTOPO();
 
 
@@ -453,9 +455,9 @@ void outstyle_3(fclaw2d_global_t *glob)
         }
     }
 
-    /* These have to eventually be set as options */
-    double dtopo_interval[2] = {0,1};
-    double dt_max_dtopo = 1;
+    double dtopo_interval[2];
+    FC2D_GEOCLAW_GET_DTOPO_INTERVAL(&dtopo_interval[0],&dtopo_interval[1]);
+    double dt_max_dtopo = FC2D_GEOCLAW_GET_DT_MAX_DTOPO();
 
 
     int n = 0;

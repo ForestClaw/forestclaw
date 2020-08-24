@@ -13,20 +13,14 @@ SUBROUTINE fc2d_geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
     !! This is for problems where q(1,i,j) is a depth.
     !! This should occur only because of rounding error.
     !!
-    !! Also calls movetopo if topography might be moving.
+    !! If topography has moved, then this also updates the aux arrays with new topography.
+    !! 
 
     USE geoclaw_module, ONLY: dry_tolerance
-    !!USE geoclaw_module, ONLY: g => grav
     USE topo_module, ONLY: num_dtopo  !!,topotime
     USE topo_module, ONLY: aux_finalized
-    !!USE topo_module, ONLY: xlowdtopo,xhidtopo,ylowdtopo,yhidtopo
     USE topo_module, ONLY: t0dtopo, tfdtopo
 
-    !!USE amr_module, ONLY: xlowdomain => xlower
-    !!USE amr_module, ONLY: ylowdomain => ylower
-    !!USE amr_module, ONLY: xhidomain => xupper
-    !!USE amr_module, ONLY: yhidomain => yupper
-    !!USE amr_module, ONLY: xperdom,yperdom,spheredom,NEEDS_TO_BE_SET
     USE amr_module, ONLY: NEEDS_TO_BE_SET
 
     !!USE storm_module, ONLY: set_storm_fields
@@ -45,10 +39,9 @@ SUBROUTINE fc2d_geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
     REAL(kind=8) :: h,u,v
 
     INTEGER :: is_ghost, mint, nghost
-    INTEGER :: fc2d_geoclaw_check_dtopotime, t_in_dtopo_interval
+    LOGICAL :: fc2d_geoclaw_check_dtopotime, t_in_dtopo_interval
 
-    REAL(KIND=8) :: tau
-    !! logical :: dtint1, dtint2
+    double precision :: tau
 
 
     !! Check for NaNs in the solution
@@ -62,27 +55,12 @@ SUBROUTINE fc2d_geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
         q(2:3,i,j) = 0.d0
     END FORALL
 
-!!    !! Get interval bracketing largest dtopo interval.  This is done so that we 
-!!    !! only check dtopo when needed.  
-!!    tmin = 1.d99
-!!    tmax = 0
-!!    do i = 1,num_dtopo
-!!        if (t0dtopo(i) < tmin) then
-!!            tmin = t0dtopo(i)
-!!        endif
-!!        if (tfdtopo(i) >= tmax) then
-!!            tmax = tfdtopo(i)
-!!        endif
-!!    enddo
-!!
-!!    !! dtopo time is an interval : t \in [tmin, tmax]
-!!    dtint1 = (tmin .le. t .and. t .le. tmax) 
-!!
-!!    !! dtopo time is instantaneous : t \in [tmin, \infty]
-!!    dtint2 = (tmin .eq. tmax) .and. t .ge. tmax
-
+    !! Determine if time is in dtopo interval.  If so, we need to update the 
+    !! aux array.  
     t_in_dtopo_interval = fc2d_geoclaw_check_dtopotime(t, tau)
-    if (t_in_dtopo_interval .eq. 1) then
+
+
+    if (t_in_dtopo_interval) then
         ! topo arrays might have been updated by dtopo more recently than
         ! aux arrays were set unless at least 1 step taken on all levels
         aux(1,:,:) = NEEDS_TO_BE_SET ! new system checks this val before setting
@@ -112,13 +90,11 @@ END FUNCTION fc2d_geoclaw_get_dt_max_dtopo
 SUBROUTINE fc2d_geoclaw_get_dtopo_interval(tmin, tmax)
     USE topo_module, ONLY: t0dtopo, tfdtopo, num_dtopo
 
-    implicit none
+    IMPLICIT NONE
 
     DOUBLE PRECISION, INTENT(OUT) ::  tmin, tmax
     integer :: i
 
-    !! Get interval bracketing largest dtopo interval.  This is done so that we 
-    !! only check dtopo when needed.  
     tmin = 1.d99
     tmax = 0
     do i = 1,num_dtopo
@@ -133,9 +109,7 @@ SUBROUTINE fc2d_geoclaw_get_dtopo_interval(tmin, tmax)
 END SUBROUTINE fc2d_geoclaw_get_dtopo_interval
 
 
-INTEGER FUNCTION fc2d_geoclaw_check_dtopotime(t, tau)
-    !!USE topo_module, ONLY: t0dtopo, tfdtopo
-
+LOGICAL FUNCTION fc2d_geoclaw_check_dtopotime(t, tau)
     IMPLICIT NONE
 
     DOUBLE PRECISION, INTENT(in) ::  t
@@ -148,23 +122,23 @@ INTEGER FUNCTION fc2d_geoclaw_check_dtopotime(t, tau)
     CALL fc2d_geoclaw_get_dtopo_interval(tmin, tmax)
 
     IF (tmin .lt. tmax) THEN
-        !! dtopo time is an interval : t \in [tmin, tmax]
+        !! dtopo time is a finite interval : dtopo interval is [tmin, tmax]
         tau = (t - tmin)/(tmax-tmin)
         if (tau .ge. 0 .and. tau .le. 1) then
-            fc2d_geoclaw_check_dtopotime = 1
+            fc2d_geoclaw_check_dtopotime = .true.
         else
-            fc2d_geoclaw_check_dtopotime = 0
+            fc2d_geoclaw_check_dtopotime = .false.            
         endif
     ELSE
         !! tmin == tmax : dtopo interval is [tmin, \infty]
         IF (t .ge. tmax) THEN
             !! t is in [tmin, \infty]
             tau = 1.d99
-            fc2d_geoclaw_check_dtopotime = 1
+            fc2d_geoclaw_check_dtopotime = .true.
         ELSE
             !! We haven't yet reached the dtopo interval
             tau = -1
-            fc2d_geoclaw_check_dtopotime = 0
+            fc2d_geoclaw_check_dtopotime = .false.
         ENDIF
     ENDIF
 
