@@ -247,5 +247,8 @@ def setplot(plotdata):
     return plotdata
 
 if __name__=="__main__":
+    import matplotlib.pyplot as plt
+    plt.switch_backend('agg')
+
     from clawpack.visclaw.plotclaw import plotclaw
     plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')    
