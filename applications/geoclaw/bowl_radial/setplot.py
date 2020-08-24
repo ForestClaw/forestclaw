@@ -68,7 +68,7 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = -0.9
     plotitem.pcolor_cmax = 0.9
     plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [1,1,0]
+    plotitem.amr_celledges_show = [0,0,0]
     plotitem.amr_patchedges_show = [1]
 
     # Land
@@ -341,6 +341,9 @@ def setplot(plotdata):
     return plotdata 
 
 if __name__=="__main__":
+    import matplotlib.pyplot as plt
+    plt.switch_backend('agg')
+
     from clawpack.visclaw.plotclaw import plotclaw
     plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')
 
