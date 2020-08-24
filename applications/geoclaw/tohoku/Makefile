@@ -1,21 +1,37 @@
 PYTHON=python
+EXE=tohoku
 
 topo:
-	${PYTHON} make_topo.py
+	${PYTHON} maketopo.py
 
 data:
-	${PYTHON} make_data.py
+	${PYTHON} setrun.py
 
 output:
-	@echo "Usage : "
+	@echo "Usage (output) : "
 	@echo "To run example in serial : "
-	@echo "       $$ tohoku"
+	@echo "       $$ ${EXE}"
 	@echo " "
 	@echo "To run example in parallel : "
-	@echo "       $$ mpirun -n 4 tohoku"
+	@echo "       $$ mpirun -n 4 ${EXE}"
 
 plots: 
-	${PYTHON} make_plots.py
+	${PYTHON} setplot.py
 
 kml: 
-	${PYTHON} make_kml.py
+	${PYTHON} setplot_kml.py
+
+usage:
+	@echo "Usage : "
+	@echo "To create data files needed by GeoClaw : "
+	@echo "       $$ make data"
+	@echo " "
+	@echo "To produce output"
+	@echo "       $$ make output"
+	@echo " "
+	@echo "To create plots using VisClaw"
+	@echo "       $$ make plots"
+	@echo " "
+	@echo "To create KMZ file for plotting in Google Earth"
+	@echo "       $$ make kml"
+
