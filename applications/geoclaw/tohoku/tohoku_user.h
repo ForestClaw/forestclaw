@@ -36,11 +36,7 @@ extern "C"
 #endif
 #endif
 
-
 void tohoku_link_solvers(fclaw2d_global_t *glob);
-
-/* Mappings */
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

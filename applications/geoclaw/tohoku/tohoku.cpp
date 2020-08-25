@@ -33,9 +33,6 @@
 #include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
 
-
-void fc2d_geoclaw_run(fclaw2d_global_t *glob);
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
 {
