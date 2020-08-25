@@ -31,3 +31,7 @@ ContourValues = [];
 
 ShowUnderOverShoots = 0;
 PlotParallelPartitions=0;
+
+UserColorMapping = 1;
+
+
