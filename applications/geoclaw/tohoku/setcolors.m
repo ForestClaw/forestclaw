@@ -67,6 +67,8 @@ function setcolors(p,x,y,z,q)
 
 cm = colormap;
 
+% Compute topography : eta = h + b --> b = eta - h
+
 % Map nan values to brown (land)
 cnew = [[101,67,33]/255; cm];
 
