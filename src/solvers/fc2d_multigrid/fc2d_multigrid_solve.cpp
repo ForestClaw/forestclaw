@@ -241,6 +241,25 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 }
  
 
+#if USE_FIVEPOINT == 0
+/**
+ * @brief Restrict the beta coefficient vector for the new domain
+ * 
+ * @param prev_beta_vec the finer beta vector
+ * @param prev_domain the previous (finer) domain
+ * @param curr_domain the current (coarser) domain
+ * @return shared_ptr<Vector<2>> the restricted beta vector
+ */
+shared_ptr<ValVector<2>> restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec, 
+                                        shared_ptr<Domain<2>> prev_domain, 
+                                        shared_ptr<Domain<2>> curr_domain)
+{
+    GMG::LinearRestrictor<2> restrictor(make_shared<GMG::InterLevelComm<2>>(curr_domain, prev_domain));
+    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain);
+    restrictor.restrict(new_beta_vec, prev_beta_vec);
+    return new_beta_vec;
+}
+#endif
 
 void fc2d_multigrid_solve(fclaw2d_global_t *glob) 
 {
@@ -360,6 +379,9 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
         //add intermediate levels
+#if USE_FIVEPOINT == 0
+        auto prev_beta_vec = beta_vec;
+#endif    
         auto prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
@@ -371,7 +393,9 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 #if USE_FIVEPOINT == 1
             patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
 #else
-            patch_operator = make_shared<StarPatchOperator<2>>(beta_vec,curr_domain,ghost_filler);
+            auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
+            patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+            prev_beta_vec = restricted_beta_vec;
 #endif    
             //smoother
             smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
@@ -400,7 +424,8 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 #if USE_FIVEPOINT == 1
         patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
 #else
-        patch_operator = make_shared<StarPatchOperator<2>>(beta_vec,curr_domain,ghost_filler);
+        auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
+        patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
 #endif    
         //smoother
         smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
