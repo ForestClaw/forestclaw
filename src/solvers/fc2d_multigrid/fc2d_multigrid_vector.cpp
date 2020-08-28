@@ -6,9 +6,26 @@
 #include "fc2d_multigrid.h"
 #include "fc2d_multigrid_options.h"
 
-using namespace Thunderegg;
+using namespace ThunderEgg;
 
-fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn):Vector<2>(MPI_COMM_WORLD) {
+/**
+ * @brief Get the number of local cells in the forestclaw domain
+ * 
+ * @param glob the forestclaw glob
+ * @return int the number of local cells
+ */
+static int get_num_local_cells(fclaw2d_global_t* glob){
+    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+
+    fclaw2d_domain_t *domain = glob->domain;
+
+    return domain->local_num_patches * clawpatch_opt->mx * clawpatch_opt->my;
+}
+
+fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn) : 
+    Vector<2>(MPI_COMM_WORLD, glob->domain->local_num_patches, get_num_local_cells(glob)) 
+{
+
     fclaw2d_clawpatch_options_t *clawpatch_opt =
         fclaw2d_clawpatch_get_options(glob);
 
@@ -32,8 +49,7 @@ fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn):Ve
     strides[0] = clawpatch_opt->meqn;
     strides[1] = strides[0] * (ns[0] + 2 * mbc);
 
-    num_local_patches = domain->local_num_patches;
-    patch_data.resize(num_local_patches);
+    patch_data.resize(domain->local_num_patches);
     fclaw2d_global_iterate_patches(glob, enumeratePatchData, this);
 }
 void fc2d_multigrid_vector::enumeratePatchData(fclaw2d_domain_t *domain,
@@ -68,4 +84,3 @@ const LocalData<2> fc2d_multigrid_vector::getLocalData(
     int local_patch_id) const {
     return getLocalDataPriv(local_patch_id);
 }
-void fc2d_multigrid_vector::setNumGhostPatches(int num_ghost_patches){};
