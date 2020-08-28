@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ThunderEgg/BiCGStab.h>
 #include <ThunderEgg/BiCGStabPatchSolver.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
+#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/GMG/AvgRstr.h>
 #include <ThunderEgg/GMG/DrctIntp.h>
@@ -333,9 +334,14 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 #endif    
 
     // set the patch solver
-    auto  solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                       mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it);
+    shared_ptr<PatchSolver<2>>  solver;
+    if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
+        solver = make_shared<BiCGStabPatchSolver<2>>(op,
+                                                     mg_opt->patch_bcgs_tol,
+                                                     mg_opt->patch_bcgs_max_it);
+    }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+        solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
+    }
 
     // create matrix
     shared_ptr<Operator<2>> A = op;
@@ -368,7 +374,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
         auto patch_operator = op;
 
         //smoother
-        auto smoother = solver;
+        shared_ptr<GMG::Smoother<2>> smoother = solver;
 
         //restrictor
         auto restrictor = make_shared<GMG::AvgRstr<2>>(make_shared<GMG::InterLevelComm<2>>(next_domain, curr_domain));
@@ -398,9 +404,14 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
             prev_beta_vec = restricted_beta_vec;
 #endif    
             //smoother
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
+            shared_ptr<GMG::Smoother<2>> smoother;
+            if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
+                smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                               mg_opt->patch_bcgs_tol,
+                                                               mg_opt->patch_bcgs_max_it);
+            }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+            }
 
             //restrictor
             auto restrictor = make_shared<GMG::AvgRstr<2>>(make_shared<GMG::InterLevelComm<2>>(next_domain, curr_domain));
@@ -428,9 +439,13 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
         patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
 #endif    
         //smoother
-        smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                       mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it);
+        if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
+            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                           mg_opt->patch_bcgs_tol,
+                                                           mg_opt->patch_bcgs_max_it);
+        }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+            smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+        }
 
         //interpolator
         auto interpolator = make_shared<GMG::DrctIntp<2>>(make_shared<GMG::InterLevelComm<2>>(curr_domain,prev_domain));

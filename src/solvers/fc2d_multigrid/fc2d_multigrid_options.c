@@ -79,6 +79,9 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
     sc_options_add_string (opt, 0, "cycle-type", &mg_opt->cycle_type, "V",
                            "Cycle type [V]");
 
+    sc_options_add_string (opt, 0, "patch-solver-type", &mg_opt->patch_solver_type, "BCGS",
+                           "Patch solver type. Can either be BCGS or FFT [BCGS]");
+
     sc_options_add_double (opt, 0, "patch-bcgs-tol", &mg_opt->patch_bcgs_tol, 1e-1,
                            "Tolerance for patch-based bcgs solver [1e-1]");
 

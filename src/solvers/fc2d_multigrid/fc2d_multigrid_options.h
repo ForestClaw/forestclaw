@@ -70,6 +70,7 @@ struct fc2d_multigrid_options
     /* bicgstab patch solver settings*/
     int patch_bcgs_max_it;
     double patch_bcgs_tol;
+    const char *patch_solver_type;
 };
 
 fclaw_exit_type_t fc2d_multigrid_postprocess (fc2d_multigrid_options_t *
