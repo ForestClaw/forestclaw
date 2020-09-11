@@ -2,7 +2,7 @@ setviews;
 
 [~,~,~,alpha,beta,~] = read_vars();
 
-plot_contour = true;
+plot_contour = false;
 if plot_contour
     yrbcolormap;
     hold on;
@@ -40,9 +40,11 @@ if (mq == 3)
 else
     if Frame == 0
         caxis([-0.3,1.0]);
+        caxis([-0.7,2.1])    
     else
         if (mq == 1)
             caxis([-0.7,2.1])    
+            % caxis([-0.3,1.0]);
         else
             caxis([-1,1]*1e-3);
         end
@@ -63,6 +65,7 @@ set(gcf,'clipping','off')
 set(gca,'clipping','off');
 
 view([0,27]);
+view(2);
 
 prt = true;
 NoQuery = false;
