@@ -33,6 +33,9 @@
 ## Conservative advection (transport) on a square
 #include applications/clawpack/transport/2d/square/Makefile.am
 
+## Shallow (tsunami, used for SGN equations)
+include applications/clawpack/shallow/2d/tsunami/Makefile.am
+
 
 ## ---------------------------
 ## No solver
