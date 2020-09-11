@@ -10,7 +10,7 @@ hvec(1) = getlegendinfo();  % Get info from basic plot
 plot_swe = true;   % High res - 2^15
 
 if (plot_swe)
-    [amrdata_swe,t_swe] = readamrdata(1,Frame,'sgn1d/_output_swe', ...
+    [amrdata_swe,t_swe] = readamrdata(1,Frame,'sgn1d/_output', ...
         'ascii');
     tol = 1e-6;
     if (abs(t_swe - t) > tol)
@@ -18,9 +18,9 @@ if (plot_swe)
     end
     hold on;
     if (UserVariable == 1)
-        [x_swe,~,h_swe] = plotframe1ez(amrdata_swe,mq,'b-',UserVariableFile);
+        [x_swe,~,h_swe] = plotframe1ez(amrdata_swe,mq,'b.',UserVariableFile);
     else
-        [x_swe,~,h_swe] = plotframe1ez(amrdata_swe,mq,'b-');
+        [x_swe,~,h_swe] = plotframe1ez(amrdata_swe,mq,'b.');
     end
     hvec(2) = h_swe;
 end
@@ -28,10 +28,10 @@ end
 
 if t <= 50
     w = 50;
-    xticks = -w:10:w;
+    xticks = 0:10:w;
 else
     w = 100;
-    xticks = -w:20:w;
+    xticks = 0:20:w;
 end
 
 
@@ -43,9 +43,11 @@ refframe = c*t;
 
 if (mq == 1)
     % axis([-w,w, -0.02, 0.1]);
-    axis([-w,w, -0.02, 0.15]);
+    ya = min([1.1*qmin,-0.02]);
+    yb = max([1.1*qmax,0.15]);
+    axis([0,w, ya,yb]);
 elseif mq == 2
-    axis([-w,w,-3.5,1]);
+    axis([0,w,-3.5,1]);
 end
 
 fprintf('qmin = %24.16e\n',qmin);
