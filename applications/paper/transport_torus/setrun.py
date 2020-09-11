@@ -26,54 +26,76 @@ def setrun(claw_pkg='amrclaw'):
     # Custom parameters
     # -------------------------------------------------
 
-    refine_threshold = 15     # Refine everywhere
+    refine_threshold = 0.05     # Refine everywhere
     use_fixed_dt = True
 
     mx = 32
-    dt_initial = 5e-3          # Stable for level 1
+    dt_initial = 5e-3
 
-    nout = 40
-    nstep = 40
+    # -1 : Always refine
+    #  0 : Usual refinement based on threshold
+    #  1 : constant theta
+    #  2 : constant r
+    refine_pattern = 1
+
+    f = 5
+
+    uniform = True
+    if uniform:
+        # No refinement;  just increase resolution on each patch
+        maxlevel = 1  
+        mx *= 2**f    # Coarsest level
+        dt_initial /= 2**f
+        nout = 5*2**f
+        nstep = 5*2**f
+
+
+    adapt = not uniform
+    if adapt:
+        # Refinement everywhere
+        refine_pattern = -1   # always adapt
+        refine_pattern = 0   # usual refinement
+        maxlevel = f + 1     # refine everywhere to this level
+        nout = 50            # Number of coarse grid steps
+        nstep = 50
 
     outstyle = 3
 
-    # 0 : Rotation u = (omega,0)
-    # 1 : Inward rotation u = (0,omega)
-    # 2 : Cartesian flow  V = (u,v,w)
-    # 3 : Trig. example.
-    example = 1
+    # 0 : Rigid body rotation
+    # 1 : Vertical flow u = (0,omega)
+    # 2 : Horizontal flow (doesn't work for the torus)
+    # 3 : Swirl example
+    example = 3
 
-    # 0 : Usual refinement (not used)
-    # 1 : constant theta
-    # 2 : constant r
-    refine_pattern = 2
 
-    # 0 :   discontinuous initial conditions
-    # 1 :   smooth initial condition
-    init_choice = 0      
+    # 0 : non-smooth; 
+    # 1 : q = 1  (for compressible velocity fields)
+    # 2 : smooth (for computing errors)
 
-    alpha = 0.3
+    init_choice = 2
+
+    alpha = 0.4
     beta = 0
 
-    theta_range = [0.125, 0.375]
+    # theta_range = [0.125, 0.375]
+    theta_range = [0,1]
     phi_range = [0,1]
 
-    init_radius = 0.10
+    init_radius = 0.4
 
     if example == 0:
-        revs_per_s = -1.25
-    elif example == 1:
-        revs_per_s = 1.25
+        revs_per_s = 1.0
+    elif example >= 1:
+        revs_per_s = 1.0
 
     cart_speed = 0.765366864730180 
 
-    maxlevel = 2
     ratioxy = 2
-    ratiok = 1
+    ratiok = 2
 
     grid_mx = mx
-    mi = 2
-    mj = 4
+    mi = 5
+    mj = 2
     mx = mi*grid_mx
     my = mj*grid_mx
 
@@ -82,7 +104,7 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = original (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 1
+    qad_mode = 2
 
     maux = 11
     use_fwaves = True
@@ -181,7 +203,7 @@ def setrun(claw_pkg='amrclaw'):
     # The current t, dt, and cfl will be printed every time step
     # at AMR levels <= verbosity.  Set verbosity = 0 for no printing.
     #   (E.g. verbosity == 2 means print only on levels 1 and 2.)
-    clawdata.verbosity = maxlevel
+    clawdata.verbosity = 1
 
     # ----------------------------------------------------
     # Clawpack parameters
@@ -210,11 +232,11 @@ def setrun(claw_pkg='amrclaw'):
 
     clawdata.num_ghost = 2
 
-    clawdata.bc_lower[0] = 'extrap'   # at xlower
-    clawdata.bc_upper[0] = 'extrap'   # at xupper
+    clawdata.bc_lower[0] = 'periodic'   # at xlower
+    clawdata.bc_upper[0] = 'periodic'   # at xupper
 
-    clawdata.bc_lower[1] = 'extrap'   # at ylower
-    clawdata.bc_upper[1] = 'extrap'   # at yupper
+    clawdata.bc_lower[1] = 'periodic'   # at ylower
+    clawdata.bc_upper[1] = 'periodic'   # at yupper
 
 
     # ---------------
@@ -255,7 +277,7 @@ def setrun(claw_pkg='amrclaw'):
     amrdata.flag2refine = True      # use this?
 
     amrdata.regrid_interval = 1
-    amrdata.regrid_buffer_width  = 0
+    amrdata.regrid_buffer_width  = 3
     amrdata.clustering_cutoff = 0.800000
     amrdata.verbosity_regrid = 0
 

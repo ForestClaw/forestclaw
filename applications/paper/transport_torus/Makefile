@@ -52,7 +52,7 @@ MODULES = \
 SOURCES = \
   setprob.f \
   qinit.f \
-  q0.f \
+  q0_new.f \
   fdisc.f \
   torus_setaux.f90 \
   fclaw_utils.f \
@@ -65,6 +65,9 @@ SOURCES = \
   rpn2qad_flux.f90 \
   rpn2cons_fw_manifold.f \
   rpt2cons_manifold.f \
+  compute_error.f \
+  qexact.f \
+  dopri5.f \
   rpn2.f \
   rpt2.f \
   ../all/torus_velocity.f \
