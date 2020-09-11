@@ -11,7 +11,7 @@ SUBROUTINE qad_new(valbig,mitot,mjtot,nvar, &
    maux,auxbig,auxc1d,delt,mptr)
 
   USE amr_module, only : timemult, nghost, max1d, maxaux, mwaves,nestlevel,rnode, &
-       auxtype, node, method
+       auxtype, node, method, max1d
   IMPLICIT NONE
 
   INTEGER mitot, mjtot, nvar, lenbc, lratiox, lratioy, maux
@@ -43,22 +43,21 @@ SUBROUTINE qad_new(valbig,mitot,mjtot,nvar, &
   !!      # local storage
 
   !! max1d is largest possible grid size (defined in amr_module.f90)
-  INTEGER max1dp1
-  PARAMETER (max1dp1 = max1d+1)
-  DOUBLE PRECISION wave(nvar,mwaves,max1dp1)
-  DOUBLE PRECISION s(mwaves,max1dp1)
-  DOUBLE PRECISION amdq(nvar,max1dp1)  
-  DOUBLE PRECISION apdq(nvar,max1dp1)
+  INTEGER :: max1dp1
+  DOUBLE PRECISION wave(nvar,mwaves,max1d+1)
+  DOUBLE PRECISION s(mwaves,max1d+1)
+  DOUBLE PRECISION amdq(nvar,max1d+1)  
+  DOUBLE PRECISION apdq(nvar,max1d+1)
 
-  DOUBLE PRECISION, TARGET :: auxlbig(maxaux*max1dp1)
-  DOUBLE PRECISION, TARGET :: auxrbig(maxaux*max1dp1)
+  DOUBLE PRECISION, TARGET :: auxlbig(maxaux*(max1d+1))
+  DOUBLE PRECISION, TARGET :: auxrbig(maxaux*(max1d+1))
 
   DOUBLE PRECISION, POINTER :: auxf(:,:)
   DOUBLE PRECISION, POINTER :: auxc(:,:)
 
   !! Temporary variables (used instead of ql,qr)
-  DOUBLE PRECISION qf(nvar,max1dp1)
-  DOUBLE PRECISION qc(nvar,max1dp1)
+  DOUBLE PRECISION qf(nvar,max1d+1)
+  DOUBLE PRECISION qc(nvar,max1d+1)
 
   DOUBLE PRECISION tgrid
   INTEGER nc, nr, level, index, l
@@ -69,6 +68,8 @@ SUBROUTINE qad_new(valbig,mitot,mjtot,nvar, &
   DOUBLE PRECISION dt, dx, dy, delta_fix
   INTEGER iface, idir
   LOGICAL prt
+
+  max1dp1 = max1d + 1
 
   tgrid = rnode(timemult, mptr)
   nr = mitot-2*nghost

@@ -41,11 +41,11 @@ c      # in rp2, but shouldn't matter since wave is not used in qad
 c      # and for other arrays it is only the last parameter that is wrong
 c      #  ok as long as meqn, mwaves < maxvar
 
-       parameter (max1dp1 = max1d+1)
-       dimension ql(nvar,max1dp1),    qr(nvar,max1dp1)
-       dimension wave(nvar,mwaves,max1dp1), s(mwaves,max1dp1)
-       dimension amdq(nvar,max1dp1),  apdq(nvar,max1dp1)
-       dimension auxl(maxaux*max1dp1),  auxr(maxaux*max1dp1)
+       integer max1dp1
+       dimension ql(nvar,max1d+1),    qr(nvar,max1d+1)
+       dimension wave(nvar,mwaves,max1d+1), s(mwaves,max1d+1)
+       dimension amdq(nvar,max1d+1),  apdq(nvar,max1d+1)
+       dimension auxl(maxaux*(max1d+1)),  auxr(maxaux*(max1d+1))
 c
 c  WARNING: auxl,auxr dimensioned at max possible, but used as if
 c  they were dimensioned as the real maux by max1dp1. Would be better
@@ -61,6 +61,8 @@ c      auxc1d is coarse grid stuff from around boundary, same format as qc1d
 c      auxl, auxr are work arrays needed to pass stuff to rpn2
 c      maux is the number of aux variables, which may be zero.
 c
+
+       max1dp1 = max1d+1
 
        tgrid = rnode(timemult, mptr)
        if (qprint) 
