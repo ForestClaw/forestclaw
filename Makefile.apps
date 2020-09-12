@@ -48,11 +48,11 @@ endif
 if FCLAW_ENABLE_DEVELOPMENT
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
-#include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 
 # Development projects
 include applications/development.apps
@@ -117,10 +117,6 @@ if FCLAW_ENABLE_SWBLI
 
 ## Solver library
 #include src/patches/clawpatch/Makefile.am
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
 #include src/solvers/fc2d_swbli/Makefile.am
 
 ## Applications
