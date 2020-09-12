@@ -8,17 +8,19 @@ but now they are explicit below.
 Call functions with makeplots==True to create plots of topo, slip, and dtopo.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 
 import clawpack.clawutil.data
 
 try:
-    CLAW = os.environ['CLAW']
+    FCLAW = os.environ['FCLAW']
 except:
-    raise Exception("*** Must first set CLAW enviornment variable")
+    raise Exception("*** Must first set FCLAW enviornment variable")
 
 # Scratch directory for storing topo and dtopo files:
-scratch_dir = os.path.join(CLAW, 'geoclaw', 'scratch')
+scratch_dir = os.path.join(FCLAW, 'applications','geoclaw', 'scratch')
 
 def get_topo(makeplots=False):
     """
@@ -26,7 +28,7 @@ def get_topo(makeplots=False):
     """
     from clawpack.geoclaw import topotools
     topo_fname = 'etopo10min120W60W60S0S.asc'
-    url = 'http://www.geoclaw.org/topo/etopo/' + topo_fname
+    url = 'http://depts.washington.edu/clawpack/geoclaw/topo/etopo/' + topo_fname
     clawpack.clawutil.data.get_remote_file(url, output_dir=scratch_dir, 
             file_name=topo_fname, verbose=True)
 

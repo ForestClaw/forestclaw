@@ -21,7 +21,12 @@ EXTRA_DIST += \
 	applications/geoclaw/bowl_slosh/plot_region.m
 
 applications_geoclaw_bowl_slosh_slosh_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_GEOCLAW_CPPFLAGS)
+        $(AM_CPPFLAGS) \
+        $(FCLAW_GEOCLAW_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_geoclaw_bowl_slosh_slosh_LDADD = \
-         $(LDADD) $(FCLAW_GEOCLAW_LDADD)
+         $(LDADD) \
+         $(FCLAW_GEOCLAW_LDADD) \
+         $(FCLAW_CLAWPATCH_LDADD) \
+         $(FCLAW_LDADD)

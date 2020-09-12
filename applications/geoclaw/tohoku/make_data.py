@@ -8,6 +8,21 @@ that will be read in by the Fortran code.
 
 import os
 import numpy as np
+from pdb import *
+
+# import topotools
+try:
+    FCLAW = os.environ['FCLAW']
+except:
+    raise Exception("*** Must First set FCLAW environment variable")
+
+topodir = os.path.join(FCLAW, 'applications','geoclaw', 'scratch')
+if not os.path.isdir(topodir):
+    raise Exception("*** Missing topo directory: %s" % topodir)
+
+minlevel = 3
+maxlevel = 7
+
 
 
 #------------------------------
@@ -30,6 +45,7 @@ def setrun(claw_pkg='geoclaw'):
     assert claw_pkg.lower() == 'geoclaw',  "Expected claw_pkg = 'geoclaw'"
 
     num_dim = 2
+
     rundata = data.ClawRunData(claw_pkg, num_dim)
 
     #------------------------------------------------------------------
@@ -49,6 +65,16 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # ---------------
+    # Parameters
+    # ---------------
+
+    mx = 32    # Ignored
+    my = 32
+
+
+
+
+    # ---------------
     # Spatial domain:
     # ---------------
 
@@ -56,17 +82,37 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.num_dim = num_dim
 
     # Lower and upper edge of computational domain:
-    clawdata.lower[0] = -100.0
-    clawdata.upper[0] = 100.0
+    clawdata.lower[0] = 132.0          # xlower
+    clawdata.upper[0] = 210.0          # xupper
+    clawdata.lower[1] = 9.0          # ylower
+    clawdata.upper[1] = 53.0          # yupper
 
-    clawdata.lower[1] = -100.0
-    clawdata.upper[1] = 100.0
+    # Number of grid cells (ignored by ForestClaw)
+    clawdata.num_cells[0] = mx      # mx
+    clawdata.num_cells[1] = my      # my
 
 
+    # Number of space dimensions:
+    clawdata.num_dim = num_dim
 
-    # Number of grid cells: Coarsest grid
-    clawdata.num_cells[0] = 400 # 50
-    clawdata.num_cells[1] = 400 # 50
+    # ---------------
+    # Gauges:
+    # ---------------
+    gauges = rundata.gaugedata.gauges
+
+    # for gauges append lines of the form  [gaugeno, x, y, t1, t2] (25200,inf)
+    gauges.append([1123, 203.52825, 20.9021333, 7.0*3600., 1.e9]) #Kahului
+
+    #gauges.append([5680, 203.52333, 20.895, 7.0*3600., 1.e9]) #TG Kahului
+    # more accurate coordinates from Yong Wei at PMEL:  (25200,inf)
+    gauges.append([5680, 203.530944, 20.895, 7.0*3600., 1.e9]) #TG Kahului
+
+
+    ## Add gauges for comparison with GeoClaw
+    gauges.append([1, 143.214480, 38.011905, 0, 1.e9])
+    gauges.append([2, 144.851543, 33.090886, 0, 1.e9]) 
+    gauges.append([3, 170.233553, 29.893284, 0, 1.e9])
+    gauges.append([4, 196.417438, 20.561113, 0, 1.e9])
 
 
     # ---------------
@@ -77,12 +123,10 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.num_eqn = 3
 
     # Number of auxiliary variables in the aux array (initialized in setaux)
-    clawdata.num_aux = 1
+    clawdata.num_aux = 3
 
     # Index of aux array corresponding to capacity function, if there is one:
-    clawdata.capa_index = 0
-
-
+    clawdata.capa_index = 2
 
     # -------------
     # Initial time:
@@ -112,21 +156,22 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.output_style = 1
 
     if clawdata.output_style==1:
-        # Output nout frames at equally spaced times up to tfinal:
-        clawdata.num_output_times = 24
-        clawdata.tfinal = 8.0
+        # Output ntimes frames at equally spaced times up to tfinal:
+        # Can specify num_output_times = 0 for no output
+        clawdata.num_output_times = 26
+        clawdata.tfinal = 13*3600.
         clawdata.output_t0 = True  # output at initial (or restart) time?
 
     elif clawdata.output_style == 2:
-        # Specify a list of output times.
-        clawdata.output_times = [0.5, 1.0]
+        # Specify a list or numpy array of output times:
+        # Include t0 if you want output at the initial time.
+        clawdata.output_times =  np.linspace(7,13,4)*3600.
 
     elif clawdata.output_style == 3:
-        # Output every iout timesteps with a total of ntot time steps:
+        # Output every step_interval timesteps over total_steps timesteps:
         clawdata.output_step_interval = 1
         clawdata.total_steps = 1
-        clawdata.output_t0 = True
-
+        clawdata.output_t0 = False  # output at initial (or restart) time?
 
     clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf'
 
@@ -143,7 +188,7 @@ def setrun(claw_pkg='geoclaw'):
     # The current t, dt, and cfl will be printed every time step
     # at AMR levels <= verbosity.  Set verbosity = 0 for no printing.
     #   (E.g. verbosity == 2 means print only on levels 1 and 2.)
-    clawdata.verbosity = 2
+    clawdata.verbosity = 1
 
 
 
@@ -164,11 +209,11 @@ def setrun(claw_pkg='geoclaw'):
 
     # Desired Courant number if variable dt used, and max to allow without
     # retaking step with a smaller dt:
-    clawdata.cfl_desired = 0.9
+    clawdata.cfl_desired = 0.75
     clawdata.cfl_max = 1.0
 
     # Maximum number of time steps to allow between output times:
-    clawdata.steps_max = 5000
+    clawdata.steps_max = 50000
 
 
 
@@ -252,48 +297,140 @@ def setrun(claw_pkg='geoclaw'):
         # and at the final time.
         clawdata.checkpt_interval = 5
 
-    # ---------------
+
+    # -----------------------------------------------
     # AMR parameters:
-    # ---------------
+    # -----------------------------------------------
     amrdata = rundata.amrdata
 
-    # max number of refinement levels:
-    amrdata.amr_levels_max = 1
+    maxlevel = 4
 
-    # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [2,4,4]
-    amrdata.refinement_ratios_y = [2,4,4]
-    amrdata.refinement_ratios_t = [2,4,4]
+    # List of refinement ratios at each level (length at least amr_level_max-1)
+    # 2 degree, 24', 4', 1', 10", 1/3"
+    amrdata.amr_levels_max = maxlevel    # Set to 3 for best results
+
+    # Not used in ForestClaw
+    amrdata.refinement_ratios_x = [5, 6, 4, 6, 30]
+    amrdata.refinement_ratios_y = [5, 6, 4, 6, 30]
+    amrdata.refinement_ratios_t = [5, 6, 4, 6, 30]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
     # This must be a list of length maux, each element of which is one of:
     #   'center',  'capacity', 'xleft', or 'yleft'  (see documentation).
 
-    amrdata.aux_type = ['center']
+    amrdata.aux_type = ['center','capacity','yleft']
 
 
     # Flag using refinement routine flag2refine rather than richardson error
     amrdata.flag_richardson = False    # use Richardson?
+
     amrdata.flag2refine = True
+    amrdata.flag2refine_tol = 0.5  # tolerance used in this routine
 
-    # steps to take on each level L between regriddings of level L+1:
     amrdata.regrid_interval = 3
-
-    # width of buffer zone around flagged points:
-    # (typically the same as regrid_interval so waves don't escape):
     amrdata.regrid_buffer_width  = 2
-
-    # clustering alg. cutoff for (# flagged pts) / (total # of cells refined)
-    # (closer to 1.0 => more small grids may be needed to cover flagged cells)
     amrdata.clustering_cutoff = 0.700000
-
-    # print info about each regridding up to this level:
     amrdata.verbosity_regrid = 0
 
 
-    #  ----- For developers -----
-    # Toggle debugging print statements:
+    # ---------------
+    # Regions:
+    # ---------------
+    regions = rundata.regiondata.regions
+
+    # ------------------------------
+    # Regions
+    # ------------------------------
+
+    inf = 1e9
+
+    # Not sure why these are included : 
+    # regions.append([minlevel, minlevel+3, 0., 5.*3600., 132., 220., 5., 40.])
+
+    # Region describing topo region
+    # Data on topo extent extracted from Fujii.txydz
+    # 
+    # ------------------------------------------------------------------
+    # To match Geoclaw levels (N0 = mx = 16)
+    # 
+    #            GeoClaw              -->           ForestClaw
+    #
+    #  Levels   RR    RR.cumprod()             Levels   RR   RR.cumprod()     
+    #   1       (1)        (1)         -->       0     (1)        (1)
+    #   2       (5)        (5)         -->       2     (4)        (4)
+    #   3       (6)       (30)         -->       5     (8)       (32)
+    #   4       (4)      (120)         -->       7     (4)      (128)
+    #   5       (6)      (720)         -->       9     (4)      (512)
+    #   6      (30)    (21600)         -->       14   (32)    (16384)
+    # ------------------------------------------------------------------
+
+    # Region 0  : Encompasses entire domain (limits refinement 
+    # in upper 1/4 portion of domain)  (0, inf)
+    regions.append([0, 1, 0., 1e9, 0, 360, -90, 90])
+
+    # Region 1  : Topo map at initial earthquake site;  Refine long enough to 
+    # resolve initial disturbance.  (0,3600)
+    regions.append([5, 5, 0., 1, 135., 150., 30., 45.])
+
+    # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
+    regions.append([0, 5, 0., 5.*3600., 132., 220., 5., 40.])
+
+    # Region 3 :  Large region encompassing Hawaii Islands (18000,28800)
+    regions.append([0, 5, 5.0*3600.,  8.0*3600, 180.0, 220.0,  5.0, 40.0])
+
+    # Region 4  : Includes Maui and Molokai (23400.0, inf)
+    regions.append([7, 7, 6.5*3600.,  inf,      202.5, 204.0, 20.4, 21.4])
+
+    # Region 5  : Strip including north shore of Maui  (25200, inf)
+    regions.append([9, 9, 7.*3600., inf, 203.0, 203.7, 20.88333, 21.])
+
+    # Region 6 : Port at Kailua  (26100.0, inf)
+    regions.append([14, 14, 7.25*3600., inf, 203.52,203.537,20.89,20.905])
+
+    # ------------------------------------------------------------------
+    # Try to reduce amount of time spent in ghost filling
+    # To match Geoclaw levels (mx = 32)
+    # 
+    #            GeoClaw              -->           ForestClaw
+    #
+    #  Levels   RR      RR.cumprod()         Levels    RR      RR.cumprod()
+    #   1       (1)        (1)         -->       0     (1)        (1)
+    #   2       (5)        (5)         -->       2     (4)        (4)
+    #   3       (6)       (30)         -->       5     (8)       (32)
+    #   4       (4)      (120)         -->       6     (2)       (64)   < ---- only difference
+    #   5       (6)      (720)         -->       9     (8)      (512)
+    #   6      (30)    (21600)         -->      14    (32)    (16384)
+    # ------------------------------------------------------------------
+
+#    # Region 0  : Encompasses entire domain (limits refinement 
+#    # in upper 1/4 portion of domain)  (0, inf)
+#    regions.append([0, 1, 0., 1.0e9, 0, 360, -90, 90])
+#
+#    # Region 1  : Topo map at initial earthquake site;  
+#    # Extent of the region (including time component) is taken from the dtopo file.
+#    regions.append([5, 5, 0, 1, 135., 150., 30., 45.])
+#
+#    # Region 2 : Large region encompassing most of lower portion of domain (0,18000)
+#    regions.append([0, 5, 0, 5*3600., 132., 220., 5., 40.])
+#
+#    # Region 3 :  Large region encompassing Hawaii Islands (18000,28800)
+#    regions.append([0, 5, 5.0*3600.,  8.0*3600, 180.0, 220.0,  5.0, 40.0])
+#
+#    # Region 4  : Includes Maui and Molokai (23400.0, inf)
+#    regions.append([6, 6, 6.5*3600.,  inf,      202.5, 204.0, 20.4, 21.4])
+#
+#    # Region 5  : Strip including north shore of Maui  (25200, inf)
+#    regions.append([9, 9, 7.*3600., inf, 203.0, 203.7, 20.88333, 21.])
+#
+#    # Region 6 : Port at Kailua  (26100.0, inf)
+#    regions.append([14, 14, 7.25*3600., inf, 203.52,203.537,20.89,20.905])
+
+
+    # -------------------------------------------------------
+    # For developers
+    #    -- Toggle debugging print statements:
+    # -------------------------------------------------------
     amrdata.dprint = False      # print domain flags
     amrdata.eprint = False      # print err est flags
     amrdata.edebug = False      # even more err est flags
@@ -302,64 +439,11 @@ def setrun(claw_pkg='geoclaw'):
     amrdata.pprint = False      # proj. of tagged points
     amrdata.rprint = False      # print regridding summary
     amrdata.sprint = False      # space/memory output
-    amrdata.tprint = False      # time step reporting each level
+    amrdata.tprint = True      # time step reporting each level
     amrdata.uprint = False      # update/upbnd reporting
 
-    # More AMR parameters can be set -- see the defaults in pyclaw/data.py
-
-    # == setregions.data values ==
-    regions = rundata.regiondata.regions
-    # to specify regions of refinement append lines of the form
-    #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    # regions.append([1, 1, 0., 1.e10, -100.,100., -100.,100.])
-    # regions.append([1, 2, 0., 1.e10,    0.,100.,    0.,100.])
-    # regions.append([2, 3, 3., 1.e10,   52., 72.,   52., 72.])
-    # regions.append([2, 3, 3., 1.e10,   75., 95.,   -10.,  10.])
-    # regions.append([2, 4, 3.4, 1.e10,   57., 68.,   57., 68.])
-    # regions.append([2, 4, 3.4, 1.e10,   83., 92.,   -4.,  4.])
-
-
-    # regions.append([2, 2, 0., 1.e10, -100.,100., -100.,100.])
-    # regions.append([2, 3, 0., 1.e10,    0.,100.,    0.,100.])
-    # regions.append([3, 4, 3., 1.e10,   52., 72.,   52., 72.])
-    # regions.append([3, 4, 3., 1.e10,   75., 95.,   -10.,  10.])
-    # regions.append([3, 5, 3.4, 1.e10,   57., 68.,   57., 68.])
-    # regions.append([3, 5, 3.4, 1.e10,   83., 92.,   -4.,  4.])
-
-    regions.append([3, 3, 0., 1.e10, -100.,100., -100.,100.])
-    regions.append([3, 4, 0., 1.e10,    0.,100.,    0.,100.])
-    regions.append([5, 6, 3., 1.e10,   52., 72.,   52., 72.])
-    regions.append([5, 6, 3., 1.e10,   75., 95.,   -10.,  10.])
-    regions.append([7, 8, 3.4, 1.e10,   57., 68.,   57., 68.])
-    regions.append([7, 8, 3.4, 1.e10,   83., 92.,   -4.,  4.])
-
-    # == setgauges.data values ==
-    # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
-    # rundata.gaugedata.add_gauge()
-
-    # gauges along x-axis:
-
-    
-    gaugeno = 0
-    for r in np.linspace(86., 93., 9):
-        gaugeno = gaugeno+1
-        x = r + .001  # shift a bit away from cell corners
-        y = .001
-        rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
-
-    # gauges along diagonal:
-    gaugeno = 100
-    for r in np.linspace(86., 93., 9):
-        gaugeno = gaugeno+1
-        x = (r + .001) / np.sqrt(2.)
-        y = (r + .001) / np.sqrt(2.)
-        rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
-
-    rundata.gaugedata.min_time_increment = 0.025
-    
 
     return rundata
-
     # end of function setrun
     # ----------------------
 
@@ -379,9 +463,11 @@ def setgeo(rundata):
         raise AttributeError("Missing geo_data attribute")
 
 
+    topofile = 'topos/TetonLarge.topo'
+
     # == Physics ==
     geo_data.gravity = 9.81
-    geo_data.coordinate_system = 1
+    geo_data.coordinate_system = 2   # LatLong coordinates
     geo_data.earth_radius = 6367.5e3
 
     # == Forcing Options
@@ -389,51 +475,58 @@ def setgeo(rundata):
 
     # == Algorithm and Initial Conditions ==
     geo_data.sea_level = 0.0
-    geo_data.dry_tolerance = 1e-3
+    geo_data.dry_tolerance = 1.e-3
     geo_data.friction_forcing = True
-    geo_data.manning_coefficient = 0.025
-    geo_data.friction_depth = 20.0
+    geo_data.manning_coefficient = 0.035
+    geo_data.friction_depth = 500
 
     # Refinement data
     refinement_data = rundata.refinement_data
-    refinement_data.wave_tolerance = 1.e-2
-    refinement_data.deep_depth = 1e2
-    refinement_data.max_level_deep = 5
     refinement_data.variable_dt_refinement_ratios = True
+    refinement_data.wave_tolerance = 0.016    # Original setting : 0.016
+    refinement_data.deep_depth = 200
+    refinement_data.max_level_deep = 4
 
     # == settopo.data values ==
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_data.topofiles.append([2, 2, 2, 0., 1.e10, 'bowl.topotype2'])
-    # topo_data.topofiles.append([2, 0, 0, 0., 1.e10, 'bowl.topotype2'])
+
+    # == settopo.data values ==
+    # Set minlevel=maxlevel=0
+    topofiles = rundata.topo_data.topofiles
+    topofiles.append([3, 0, 0, 0.0, 1e10, os.path.join(topodir,'etopo1min130E210E0N60N.asc')])
+    # topofiles.append([3, 0, 0, 0.0, 1e10, os.path.join(topodir,'hawaii_6s.txt')])
+    topofiles.append([3, 0, 0, 0., 1.e10, os.path.join(topodir,'kahului_1s.txt')])
 
     # == setdtopo.data values ==
-    dtopo_data = rundata.dtopo_data
+    # topo_data = rundata.topo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname]
+    rundata.dtopo_data.dtopofiles = [[1, 0, 0,os.path.join(topodir,'fujii.txydz')]]
+
 
     # == setqinit.data values ==
-    rundata.qinit_data.qinit_type = 4
+    rundata.qinit_data.qinit_type = 0
     rundata.qinit_data.qinitfiles = []
     # for qinit perturbations, append lines of the form: (<= 1 allowed for now!)
     #   [minlev, maxlev, fname]
-    rundata.qinit_data.qinitfiles.append([3, 3, 'hump.xyz'])
 
-    # == setfixedgrids.data values ==
-    # fixedgrids = rundata.fixed_grid_data.fixedgrids
+    # == fixedgrids.data values ==
     # for fixed grids append lines of the form
     # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
     #  ioutarrivaltimes,ioutsurfacemax]
+
+    rundata.fixed_grid_data.fixedgrids = []
+    fixedgrids = rundata.fixed_grid_data.fixedgrids
 
     return rundata
     # end of function setgeo
     # ----------------------
 
 
-
 if __name__ == '__main__':
     # Set up run-time parameters and write all data files.
     import sys
     rundata = setrun(*sys.argv[1:])
-    rundata.write()    
+    rundata.write()

@@ -1,5 +1,5 @@
 ! =========================================================
-! Check for NANs in solution q
+!> Check for NANs in solution q
 subroutine check4nans(meqn,mbc,mx,my,q,t,ichecknan)
 
     implicit none

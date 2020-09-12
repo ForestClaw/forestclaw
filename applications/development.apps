@@ -12,8 +12,8 @@
 ## Simple examples to test options handling, etc, but no solvers.
 #include applications/dummy/Makefile.am
 
-## swirl_cons (square)
-#include applications/clawpack/advection/2d/swirl_cons/Makefile.am
+## transport (square)
+#include applications/clawpack/transport/2d/swirl/Makefile.am
 
 ## swirl_basilisk (square)
 #include applications/clawpack/advection/2d/swirl_basilisk/Makefile.am

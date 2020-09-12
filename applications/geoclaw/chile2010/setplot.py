@@ -1,16 +1,28 @@
 
-"""
+""" 
 Set up the plot figures, axes, and items to be done for each frame.
 
 This module is imported by the plotting routines and then the
 function setplot is called to set the plot parameters.
+    
+""" 
 
-"""
-
+from __future__ import absolute_import
+from __future__ import print_function
 import numpy as np
+
+
+
+import os,sys
+if 'matplotlib' not in sys.modules:
+    import matplotlib
+    matplotlib.use('Agg')  # Use an image backend
+
 import matplotlib.pyplot as plt
 
 from clawpack.geoclaw import topotools
+from six.moves import range
+
 
 try:
     TG32412 = np.loadtxt('32412_notide.txt')
@@ -18,23 +30,27 @@ except:
     print("*** Could not load DART data file")
 
 #--------------------------
-def setplot(plotdata):
+def setplot(plotdata=None):
 #--------------------------
-
-    """
+    
+    """ 
     Specify what is to be plotted at each frame.
     Input:  plotdata, an instance of pyclaw.plotters.data.ClawPlotData.
     Output: a modified version of plotdata.
-
-    """
+    
+    """ 
 
 
     from clawpack.visclaw import colormaps, geoplot
     from numpy import linspace
 
-    plotdata.clearfigures()  # clear any old figures,axes,items data
+    if plotdata is None:
+        from clawpack.visclaw.data import ClawPlotData
+        plotdata = ClawPlotData()
 
-    plotdata.verbose = False
+
+    plotdata.clearfigures()  # clear any old figures,axes,items data
+    # plotdata.format = 'forestclaw'    # 'ascii' or 'binary' to match setrun.py
 
     # To plot gauge locations on pcolor or contour plot, use this as
     # an afteraxis function:
@@ -43,25 +59,7 @@ def setplot(plotdata):
         from clawpack.visclaw import gaugetools
         gaugetools.plot_gauge_locations(current_data.plotdata, \
              gaugenos='all', format_string='ko', add_labels=True)
-
-
-    #-----------------------------------------
-    # Some global kml flags
-    #-----------------------------------------
-    plotdata.kml_name = "Chile 2010"
-    plotdata.kml_starttime = [2010,2,27,6,34,0]  # Time of event in UTC [None]
-    plotdata.kml_tz_offset = 3    # Time zone offset (in hours) of event. [None]
-
-    plotdata.kml_index_fname = "Chile_2010"  # name for .kmz and .kml files ["_GoogleEarth"]
-
-    # Set to a URL where KMZ file will be published.
-    # plotdata.kml_publish = None
-
-    # Colormap range
-    cmin = -0.2
-    cmax = 0.2
-    cmap = geoplot.googleearth_transparent
-
+    
 
     #-----------------------------------------
     # Figure for surface
@@ -91,7 +89,7 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = -0.2
     plotitem.pcolor_cmax = 0.2
     plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [0,0,0]
+    plotitem.amr_celledges_show = [0,0,0,0,0]
     plotitem.patchedges_show = 1
 
     # Land
@@ -101,8 +99,8 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = 0.0
     plotitem.pcolor_cmax = 100.0
     plotitem.add_colorbar = False
-    plotitem.amr_celledges_show = [0,0,0]
-    plotitem.patchedges_show = 0
+    plotitem.amr_celledges_show = [0,0,0,0,0]
+    plotitem.patchedges_show = 1
     plotaxes.xlimits = [-120,-60]
     plotaxes.ylimits = [-60,0]
 
@@ -113,79 +111,9 @@ def setplot(plotdata):
     plotitem.contour_levels = linspace(-3000,-3000,1)
     plotitem.amr_contour_colors = ['y']  # color on each level
     plotitem.kwargs = {'linestyles':'solid','linewidths':2}
-    plotitem.amr_contour_show = [0,0,0]
+    plotitem.amr_contour_show = [0,0,0,0,0]  
     plotitem.celledges_show = 0
     plotitem.patchedges_show = 0
-
-    #-----------------------------------------------------------
-    # Figure for KML files
-    #----------------------------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='Sea Surface',figno=1)
-    plotfigure.show = True
-
-    plotfigure.use_for_kml = True
-    plotfigure.kml_use_for_initial_view = True
-    plotfigure.kml_show_figure = True
-
-    # These override any axes limits set below in plotaxes
-    plotfigure.kml_xlimits = [-120,-60]
-    plotfigure.kml_ylimits = [-60, 0.0];
-
-    # Resolution (should be consistent with data resolution)
-    maxlevel = 5
-    minlevel = 1  # (real minlevel; dont' overresolve the coarsest level)
-    mx = 16                    # Gridsize
-    minres = mx*2**minlevel
-    plotfigure.kml_figsize = [minres,minres]
-    plotfigure.kml_dpi = 2**(maxlevel-minlevel)   # Resolve all three levels
-    plotfigure.kml_tile_images = False    # Tile images for faster loading.  Requires GDAL [False]
-
-
-    # Water
-    plotaxes = plotfigure.new_plotaxes('kml')
-    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    plotitem.plot_var = geoplot.surface_or_depth
-    plotitem.pcolor_cmap = cmap
-    plotitem.pcolor_cmin = cmin
-    plotitem.pcolor_cmax = cmax
-
-    def kml_colorbar(filename):
-        geoplot.kml_build_colorbar(filename,cmap,cmin,cmax)
-
-    plotfigure.kml_colorbar = kml_colorbar
-
-    #-----------------------------------------------------------
-    # Figure for KML files (zoom)
-    #----------------------------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='Sea Surface (zoom)',figno=2)
-    plotfigure.show = True
-
-    plotfigure.use_for_kml = True
-    plotfigure.kml_use_for_initial_view = False  # Use large plot for view
-    plotfigure.kml_show_figure = False
-
-    # Set Google Earth bounding box and figure size
-    plotfigure.kml_xlimits = [-84,-74]
-    plotfigure.kml_ylimits = [-18,-4]
-    plotfigure.kml_figsize = [10,14]  # inches.
-
-    # Resolution
-    rcl = 10    # Over-resolve the coarsest level
-    plotfigure.kml_dpi = rcl*2*6       # Resolve all three levels
-    plotfigure.kml_tile_images = False  # Tile images for faster loading.
-
-
-    plotaxes = plotfigure.new_plotaxes('kml')
-    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    plotitem.plot_var = geoplot.surface_or_depth
-    plotitem.pcolor_cmap = cmap
-    plotitem.pcolor_cmin = cmin
-    plotitem.pcolor_cmax = cmax
-
-    def kml_colorbar(filename):
-        geoplot.kml_build_colorbar(filename,cmap,cmin,cmax)
-
-    plotfigure.kml_colorbar = kml_colorbar
 
 
     #-----------------------------------------
@@ -199,7 +127,7 @@ def setplot(plotdata):
     plotaxes = plotfigure.new_plotaxes()
     plotaxes.xlimits = 'auto'
     plotaxes.ylimits = 'auto'
-    # plotaxes.title = 'Surface'
+    plotaxes.title = 'Surface'
 
     # Plot surface as blue curve:
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
@@ -208,7 +136,7 @@ def setplot(plotdata):
 
     # Plot topo as green curve:
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.show = True
+    plotitem.show = False
 
     def gaugetopo(current_data):
         q = current_data.q
@@ -216,18 +144,18 @@ def setplot(plotdata):
         eta = q[3,:]
         topo = eta - h
         return topo
-
+        
     plotitem.plot_var = gaugetopo
     plotitem.plotstyle = 'g-'
 
     def add_zeroline(current_data):
         from pylab import plot, legend, xticks, floor, axis, xlabel
-        t = current_data.t
+        t = current_data.t 
         gaugeno = current_data.gaugeno
 
         if gaugeno == 32412:
             try:
-                plot(TG32412[:,0], TG32412[:,1], 'r')
+                plot(TG32412[:,0], TG32412[:,1], 'r',label='Obs')
                 legend(['GeoClaw','Obs'],loc='lower right')
             except: pass
             axis((0,t.max(),-0.3,0.3))
@@ -240,30 +168,55 @@ def setplot(plotdata):
     plotaxes.afteraxes = add_zeroline
 
 
-    #--------------------------------------------------------------
+    #-----------------------------------------
+    # Plots of timing (CPU and wall time):
 
+    def make_timing_plots(plotdata):
+        from clawpack.visclaw import plot_timing_stats
+        import os,sys
+        try:
+            timing_plotdir = plotdata.plotdir + '/_timing_figures'
+            os.system('mkdir -p %s' % timing_plotdir)
+            # adjust units for plots based on problem:
+            units = {'comptime':'seconds', 'simtime':'hours', 
+                     'cell':'millions'}
+            plot_timing_stats.make_plots(outdir=plotdata.outdir, 
+                                          make_pngs=True,
+                                          plotdir=timing_plotdir, 
+                                          units=units)
+        except:
+            print('*** Error making timing plots')
+
+    otherfigure = plotdata.new_otherfigure(name='timing plots',
+                    fname='_timing_figures/timing.html')
+    otherfigure.makefig = make_timing_plots
+
+
+    #-----------------------------------------
+    
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via pyclaw.plotters.frametools.printframes:
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = 'all'         # list of frames to print
-    plotdata.print_gaugenos =  'all'          # list of gauges to print
-    plotdata.print_fignos = 'all'           # list of figures to print
+    plotdata.print_framenos = 'all'          # list of frames to print
+    plotdata.print_gaugenos = 'all'          # list of gauges to print
+    plotdata.print_fignos = 'all'            # list of figures to print
     plotdata.html = True                     # create html files of plots?
-    plotdata.html_movie = 'JSAnimation'                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
-    plotdata.latex = False                    # create latex file of plots?
+    plotdata.latex = False                   # create latex file of plots?
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
-    plotdata.format = 'forestclaw'
-
-    plotdata.kml = True
+    plotdata.parallel = False                 # make multiple frame png's at once
 
     return plotdata
 
+
 if __name__=="__main__":
+    #import matplotlib.pyplot as plt
+    #plt.switch_backend('agg')
+
     from clawpack.visclaw.plotclaw import plotclaw
-    plotclaw(outdir='.',setplot=setplot,plotdir='_plots',format='forestclaw')
-    
+    plotclaw(outdir='.',setplot='setplot.py', plotdir='_plots',format='forestclaw')
+
