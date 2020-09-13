@@ -8,13 +8,13 @@ UserVariable = 1;
 UserVariableFile = 'surface_eta';
 MaxFrames = 1000;
 MaxLevels = 30;
-Manifold = 1;
+Manifold = 0;
 ReadBlockNumber = 1;
 PlotData =  ones(1,MaxLevels);
 PlotGrid =  zeros(1,MaxLevels);
 PlotGridEdges = zeros(1,MaxLevels);
 
-PlotType = 4;  % Scatter plot
+PlotType = 1;  % Scatter plot
 
 MappedGrid = 0;
 
@@ -24,7 +24,7 @@ ContourValues = [];
 % for scatter plot (PlotType==4):
 x0 = 0;
 y0 = 0;
-UserMap1d = 1;
-ScatterStyle = setplotstyle('ro','r*','cs','gp','bo','k*');
+UserMap1d = 0;
+ScatterStyle = setplotstyle('b-','r*','cs','gp','bo','k*');
 
 PlotParallelPartitions=0;

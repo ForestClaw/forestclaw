@@ -45,20 +45,21 @@ def setrun(claw_pkg='Classic'):
     # Time stepping parameters
     tfinal = 2000                  # If outstyle = 1
 
-    outstyle = 3
+    outstyle = 1
     if outstyle == 1:
         tfinal = 2000
-        nout = 80
+        tfinal = 90
+        nout = 18
     elif outstyle == 2:
         tfinal = 2000                  # If outstyle = 1
         tsteps = [ 35.0, 90.0, 700.0, 2000.0]   # If outstyle = 2
     else:
-        nout = 20
-        nsteps = 1    # If outstyle = 3
+        nout = 400
+        nsteps = 50    # If outstyle = 3
 
     dt_initial = 0.1047505286036417
     dt_initial = 0.8
-    dt_variable = False
+    dt_variable = True
 
     limiter = 'minmod'      # 7 = generalized minmod
 
@@ -67,8 +68,8 @@ def setrun(claw_pkg='Classic'):
     mx_grid = 32
     mi = 128
 
-    # mx = 2**12     # 2**15 = 32768, 2**7 = 128
-    mx = mx_grid*mi  # 2**5*2**7 = 2^12
+    mx = 2**15     # 2**15 = 32768, 2**7 = 128
+    # mx = mx_grid*mi  # 2**5*2**7 = 2^12
 
     maux = 3      # Store bathymetry
 
@@ -83,7 +84,7 @@ def setrun(claw_pkg='Classic'):
     probdata.add_param('sea_level',     0.0,   'Sea Level')
 
     # Set to -1 to turn off dispersion
-    probdata.add_param('breaking',      -1.0,  'Breaking slope') 
+    probdata.add_param('breaking',      1.0,  'Breaking slope') 
 
     # From S. Popinet's paper/website
     probdata.add_param('alpha',         1.153,  'Alpha (for dispersion)')
