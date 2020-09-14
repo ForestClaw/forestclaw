@@ -8,9 +8,9 @@ applications_paper_cylinder_cylinder_SOURCES = \
 	applications/paper/cylinder/setprob.f \
 	applications/paper/cylinder/compute_exact.f90 \
 	applications/paper/cylinder/fclaw2d_map_cylinder.c \
-	applications/paper/all/mapc2m_cylinder.f \
-	applications/paper/all/cylinder_velocity.f \
-	applications/paper/all/cylinder_basis.f \
+	applications/paper/all/mapc2m_cylinder.f90 \
+	applications/paper/all/cylinder_velocity.f90 \
+	applications/paper/all/cylinder_basis.f90 \
 	applications/paper/all/mapping_terms.f \
 	applications/paper/cylinder/dopri5.f \
 	applications/paper/cylinder/qexact.f \

@@ -37,33 +37,29 @@ cylinder_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "initial-condition", &user_opt->initial_condition, 0,
                         "[user] Initial condition : 0=non-smooth; 1=smooth [1]");
 
-    sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
-                           "[user] Ratio r/R, r=outer radius, R=inner radius " \
-                           "(used for cylinder) [0.4]");
-
-    sc_options_add_double (opt, 0, "beta", &user_opt->beta, 0.0,
-                           "[user] beta > 0 gives variable cross section [0]");
-
-    sc_options_add_double (opt, 0, "init-radius", &user_opt->init_radius, 0.1,
-                           "[user] Initial radius [0.1]");
-
-
-    fclaw_options_add_double_array (opt, 0, "theta", 
-                                    &user_opt->theta_string,"0 1",&user_opt->theta,2,
-                                    "[user] theta range [0,1]");    
-
-    fclaw_options_add_double_array (opt, 0, "phi", 
-                                    &user_opt->phi_string,"0 1",&user_opt->phi,2,
-                                    "[user] phi range [0,1]");    
-
     sc_options_add_int (opt, 0, "refine-pattern", &user_opt->refine_pattern, 0,
                            "[user] Refinement pattern [0]");
+
+    sc_options_add_double (opt, 0, "R", &user_opt->R, 1.0,
+                           "[user] Radius of cylinder [1]");
+
+    sc_options_add_double (opt, 0, "H", &user_opt->H, 1.0,
+                           "[user] Height of cylinder [1]");
+
+    sc_options_add_double (opt, 0, "r0", &user_opt->r0, 0.1,
+                           "[user] Initial radius [0.1]");
+
+    sc_options_add_double (opt, 0, "xc0", &user_opt->xc0, 0.5,
+                           "[user] Initial theta (in [0,1]) [0.5]");
+
+    sc_options_add_double (opt, 0, "yc0", &user_opt->yc0, 0.25,
+                           "[user] Initial height in [0,1]) [0.5]");
 
     sc_options_add_double (opt, 0, "revs-per-s", &user_opt->revs_per_s, 0.5,
                            "[user] Revolutions per second [0.5]");
 
-    sc_options_add_double (opt, 0, "cart_speed", &user_opt->cart_speed, 0.5,
-                           "[user] Cartesian speed [1]");
+    sc_options_add_double (opt, 0, "v-speed", &user_opt->v_speed, 0.5,
+                           "[user] Vertical speed [0.5]");
 
     sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
@@ -75,8 +71,7 @@ cylinder_register (user_options_t *user_opt, sc_options_t * opt)
 static fclaw_exit_type_t
 cylinder_postprocess(user_options_t *user_opt)
 {
-    fclaw_options_convert_double_array (user_opt->phi_string, &user_opt->phi, 2);
-    fclaw_options_convert_double_array (user_opt->theta_string, &user_opt->theta, 2);
+    /* Not used */
     return FCLAW_NOEXIT;
 }
 
@@ -92,8 +87,7 @@ cylinder_check(user_options_t *user_opt)
 static void
 cylinder_destroy(user_options_t *user_opt)
 {
-    FCLAW_FREE (user_opt->theta);
-    FCLAW_FREE (user_opt->phi);
+    /* Not used yet */
 }
 
 

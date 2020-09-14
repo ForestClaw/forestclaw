@@ -47,13 +47,13 @@
                 call fclaw2d_map_c2m(cont,blockno,xc,yc,
      &                                      xp, yp,zp);
                 if (refine_pattern .eq. 1) then
-                    refine = xp .lt. 0
+                    refine = xc .lt. 0.5
                 elseif (refine_pattern .eq. 2) then
 c                    r = sqrt(xp**2 + yp**2)
                      call fclaw2d_map_brick2c(cont,blockno,xc,yc,
      &                        xc1,yc1,zc1)
-                    call map_comp2cylinder(xc1,yc1,theta,phi)
-                    refine = abs(phi - pi) > pi/2.d0
+                    !!call map_comp2cylinder(xc1,yc1,theta,z)
+                    refine = yc .lt. 0.5
                 endif
             endif
             if (refine) then

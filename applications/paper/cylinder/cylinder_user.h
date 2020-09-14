@@ -46,22 +46,20 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    int mapping; 
     int initial_condition;  /* Smooth or non-smooth */
     int refine_pattern;
 
-    double alpha;     /* Ratio of inner radius to outer radius */
-    double beta;
-    double init_radius;
+    /* Radius and height of cylinder */
+    double R;
+    double H;
 
-    double *theta;
-    const char* theta_string;
+    /* Radius and center of initial disk */
+    double xc0;
+    double yc0;
+    double r0;
 
-    double *phi;
-    const char* phi_string;
-
-    double revs_per_s;
-    double cart_speed;
+    double revs_per_s;     /* radial speed */
+    double v_speed;             /* Vertical speed */
 
     int claw_version;
 
@@ -263,4 +261,4 @@ voiCYLINDER5_TAG4COARSENING(const int* mx, const int* my,
 }
 #endif
 
-#endif CYLINDER_USER_H */
+#endif /* CYLINDER_USER_H */

@@ -13,27 +13,20 @@ c     # ---------------------------------------------------------------
       integer initchoice
       common /initchoice_comm/ initchoice
 
-      double precision alpha, beta
-      common /torus_comm/ alpha, beta
+      double precision xc0, yc0, r0
+      common /cylinder_init_comm/ xc0, yc0, r0
 
-      double precision init_radius
-      common /initradius_comm/ init_radius
+      double precision xp0, yp0, zp0, r, q0, Hsmooth
 
-      double precision x0, y0, z0
-      double precision q0, Hsmooth, r, r0, th
       integer k
 
+      call mapc2m_cylinder(xc0,yc0,xp0,yp0,zp0)
+
 c     # Sphere centered at (0.5,0.5,0) on swirl
-      r0 = init_radius
       if (initchoice .eq. 1) then
           q0 = 1.d0
       elseif (initchoice .eq. 2) then
-          x0 = 1
-          y0 = 0
-          z0 = alpha
-
-          r = sqrt((xp - x0)**2 + (yp-y0)**2 + (zp-z0)**2)
-          !!q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
+          r = sqrt((xp - xp0)**2 + (yp-yp0)**2 + (zp-zp0)**2)
           q0 = 1 - Hsmooth(r - r0)
       endif
       q0_physical = q0

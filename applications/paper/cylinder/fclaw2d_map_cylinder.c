@@ -12,9 +12,9 @@ extern "C"
 
 
 
-#define MAPC2M_CYLINDER2 FCLAW_F77_FUNC(mapc2m_cylinder2,MAPC2M_CYLINDER2)
+#define MAPC2M_CYLINDER FCLAW_F77_FUNC(mapc2m_cylinder,MAPC2M_CYLINDER)
 
-void MAPC2M_CYLINDER2(const double* xc1, const double *yc1, 
+void MAPC2M_CYLINDER(const double* xc1, const double *yc1, 
                    double* xp, double *yp, double *zp);
 
 
@@ -97,13 +97,13 @@ fclaw2d_map_c2m_cylinder(fclaw2d_map_context_t * cont, int blockno,
     double xc1,yc1,zc1; /* We don't need zc1 - we are we computing it? */
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-    MAPC2M_CYLINDER2(&xc1,&yc1,xp,yp,zp);
+    MAPC2M_CYLINDER(&xc1,&yc1,xp,yp,zp);
 
 }
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_cylinder (fclaw2d_map_context_t* brick,
-                           const double scale[])
+                              const double scale[])
 {
     fclaw2d_map_context_t *cont;
 

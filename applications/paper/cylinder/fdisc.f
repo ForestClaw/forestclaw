@@ -8,38 +8,27 @@
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision alpha, beta
-      common /cylinder_comm/ alpha, beta
+      double precision r_cyl, h_cyl
+      common /cylinder_comm/ r_cyl, h_cyl
 
       integer example
       common /example_comm/ example  
 
-      double precision init_radius
-      common /initradius_comm/ init_radius
+      DOUBLE PRECISION xc0, yc0, r0
+      COMMON /cylinder_init_comm/ xc0, yc0, r0
+
 
       integer*8 cont, get_context
-      double precision th, r0,x0,y0,z0,r
-      double precision xc1, yc1
+      double precision xp0, yp0, zp0, r
 
       cont = get_context()
 
-      call fclaw2d_map_c2m(cont,
-     &      blockno,xc,yc,xp,yp,zp)
+      call fclaw2d_map_c2m(cont, blockno,xc,yc,xp,yp,zp)
 
-      r0 = init_radius
-      if (example .eq. 0 .or. example .eq. 2) then
-          th = pi2*(0.25 + 1.d0/32.d0)
-          x0 = cos(th)
-          y0 = sin(th)
-          z0 = alpha
-      elseif (example .eq. 1) then
-          xc1 = 0.5
-          yc1 = 0.125
-          call mapc2m_cylinder2(xc1,yc1,x0,y0,z0)
-      endif
+      call fclaw2d_map_c2m(cont, blockno,xc0,yc0,xp0,yp0,zp0)
 
 c     # Distance from thc
-      r = sqrt((xp-x0)**2 + (yp-y0)**2 + (zp-z0)**2)
+      r = sqrt((xp-xp0)**2 + (yp-yp0)**2 + (zp-zp0)**2)
 
       fdisc = r - r0 
 
