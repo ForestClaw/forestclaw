@@ -1,16 +1,23 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-[~,~,~,R,H,~,~,~,tr,pr] = read_vars();
+[~,~,~,R,H] = read_vars();
 
 
 % Find center to expand radius around.
 s = 0.00;
 [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
-th = 2*pi*xc1;
-xp = R*cos(th);
-yp = R*sin(th);
-zp = H*yc1;
 
-% [xp,yp,zp] = mapc2m_torus(xc2,yc2,alpha,beta);
+theta = 2*pi*xc1;
+z = yc1;
+
+
+xp = R*cos(theta);
+yp = R*sin(theta);
+zp = H*z;
+
+% xp = R.*cos(theta);
+% zp = R.*sin(theta);
+% yp = H*z;
+% zp(zp < 0) = nan;
 
 end

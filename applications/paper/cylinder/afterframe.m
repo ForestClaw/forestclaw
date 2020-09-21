@@ -20,10 +20,19 @@ end
 % yrbcolormap;
 colormap(parula);
 
-caxis([-0.2,1]);
-if (qmin < qmax)
-    caxis([qmin,qmax]);
+showgridlines;
+
+if (mq <= 2)
+    % computed or true solution
+    caxis([-0.2,1]);
+    if (qmin < qmax)
+        % caxis([qmin,qmax]);
+    end
+elseif (mq == 3)
+    % Error
+    caxis([-1,1]*1e-6);
 end
+    
 
 showpatchborders;
 setpatchborderprops('linewidth',1);
@@ -37,6 +46,8 @@ axis off;
 
 set(gcf,'clipping','off')
 set(gca,'clipping','off');
+
+view([42.17, 1.2]);
 
 prt = false;
 NoQuery = false;
