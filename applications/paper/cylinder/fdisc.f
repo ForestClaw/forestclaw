@@ -8,11 +8,11 @@
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision r_cyl, h_cyl
-      common /cylinder_comm/ r_cyl, h_cyl
-
       integer example
       common /example_comm/ example  
+
+      double precision r_cyl, h_cyl
+      common /cylinder_comm/ r_cyl, h_cyl
 
       DOUBLE PRECISION xc0, yc0, r0
       COMMON /cylinder_init_comm/ xc0, yc0, r0
@@ -28,8 +28,11 @@
       call fclaw2d_map_c2m(cont, blockno,xc0,yc0,xp0,yp0,zp0)
 
 c     # Distance from thc
-      r = sqrt((xp-xp0)**2 + (yp-yp0)**2 + (zp-zp0)**2)
+c      r = sqrt((xp-xp0)**2 + (yp-yp0)**2 + (zp-zp0)**2)
 
-      fdisc = r - r0 
+c      fdisc = r - r0 
+
+      r = abs(yc - .5d0)
+      fdisc = r - 0.25
 
       end

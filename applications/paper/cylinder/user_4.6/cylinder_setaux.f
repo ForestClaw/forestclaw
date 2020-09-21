@@ -42,7 +42,7 @@ c     # cell-centered velocities
          do j = 1-mbc,my+mbc
 c           # x-face and y-face edge lengths (6,7)      
             aux(i,j,6) = edgelengths(i,j,1)/dy
-            aux(i,j,7) = edgelengths(i,j,2)/dx
+            aux(i,j,7) = edgelengths(i,j,2)/dx            
          enddo
       enddo
 

@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_metric.h>
 #include <fclaw2d_clawpatch_options.h>
 
 /* Two versions of Clawpack */
@@ -35,6 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 
 #include "clawpack46_advection_user_fort.h"
+
+
+#if 0
+void cylinder_compute_area(fclaw2d_global_t *glob,
+                           fclaw2d_patch_t *this_patch,
+                           int blockno,
+                           int patchno);
+#endif                           
 
 
 static
@@ -48,13 +57,14 @@ void cylinder_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24d   %s",user->example,"\% example\n");
         fprintf(f,  "%-24d   %s",user->initial_condition,"\% initial_condition\n");
         fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refine_pattern\n");
-        fprintf(f,  "%-24.6f   %s",user->R,"\% R\n");
-        fprintf(f,  "%-24.6f   %s",user->H,"\% H\n");
-        fprintf(f,  "%-24.6f   %s",user->xc0,"\% xc0\n");
-        fprintf(f,  "%-24.6f   %s",user->yc0,"\% yc0\n");
-        fprintf(f,  "%-24.6f   %s",user->r0,"\% r0\n");
-        fprintf(f,  "%-24.6f   %s",user->revs_per_s,"\% revs_per_second\n");
-        fprintf(f,  "%-24.6f   %s",user->v_speed,"\% v_speed\n");
+        fprintf(f,  "%-24.16f   %s",user->R,"\% R\n");
+        fprintf(f,  "%-24.16f   %s",user->H,"\% H\n");
+        fprintf(f,  "%-24.16f   %s",user->xc0,"\% xc0\n");
+        fprintf(f,  "%-24.16f   %s",user->yc0,"\% yc0\n");
+        fprintf(f,  "%-24.16f   %s",user->r0,"\% r0\n");
+        fprintf(f,  "%-24.16f   %s",user->revs_per_s,"\% revs_per_second\n");
+        fprintf(f,  "%-24.16f   %s",user->v_speed,"\% v_speed\n");
+        fprintf(f,  "%-24d      %s",user->exact_metric,"\% exact_metric\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
@@ -161,6 +171,81 @@ void cb_cylinder_output_ascii (fclaw2d_domain_t * domain,
 #endif    
 }
 
+static
+void cylinder_compute_area(fclaw2d_global_t *glob,
+                           fclaw2d_patch_t *patch,
+                           int blockno,
+                           int patchno)
+{
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_metric_patch_grid_data(glob,patch,&mx,&my,&mbc,
+                                   &xlower,&ylower,&dx,&dy);
+
+    double *area = fclaw2d_metric_patch_get_area(patch);
+
+    int maxlevel = gparms->maxlevel;
+    int level = patch->level;
+    CYLINDER_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                          &blockno, &maxlevel, &level, area);
+}
+
+
+static
+void cylinder_compute_tensors(fclaw2d_global_t *glob,
+                              fclaw2d_patch_t *patch,
+                              int blockno,
+                              int patchno)
+{
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    double *xp,*yp,*zp;
+    double *xd,*yd,*zd;
+    double *xnormals, *ynormals;
+    double *xtangents, *ytangents;
+    double *edgelengths;
+    double *surfnormals, *curvature;
+    double *area;
+
+    fclaw2d_metric_patch_grid_data(glob,patch,&mx,&my,&mbc,
+                                   &xlower,&ylower,&dx,&dy);
+
+    fclaw2d_metric_patch_mesh_data(glob,patch,
+                                &xp,&yp,&zp,&xd,&yd,&zd,&area);
+
+    fclaw2d_metric_patch_mesh_data2(glob,patch,
+                                 &xnormals,&ynormals,
+                                 &xtangents,&ytangents,
+                                 &surfnormals,&edgelengths,
+                                 &curvature);
+
+    /* The user could set these to NULL to avoid doing these computations ... */
+
+    if (metric_vt->fort_compute_normals != NULL)
+    {
+        metric_vt->fort_compute_normals(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
+                                        xnormals,ynormals);
+    }
+
+    if (metric_vt->fort_compute_tangents != NULL)
+    {
+        int level=patch->level;
+        CYLINDER_COMPUTE_TANGENTS(&mx,&my,&mbc,&dx, &dy, &level,
+                                  xd,yd,zd,xtangents,ytangents,
+                                  edgelengths);
+    }
+
+    if (metric_vt->fort_compute_surf_normals != NULL)
+    {
+        metric_vt->fort_compute_surf_normals(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
+                                             curvature, surfnormals, area);
+    }
+}
+
 
 void cylinder_link_solvers(fclaw2d_global_t *glob)
 {
@@ -181,6 +266,20 @@ void cylinder_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_tag4refinement = &CYLINDER_TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &CYLINDER_TAG4COARSENING;
 
+
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    /* Area and edge lengths can be computed analytically  */
+    metric_vt->compute_area          = cylinder_compute_area;
+    // metric_vt->compute_area_ghost    = fclaw2d_metric_compute_area_ghost_default;
+    metric_vt->compute_tensors       = cylinder_compute_tensors;
+
+    /* Fortran files */
+    // metric_vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
+    // metric_vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
+    // metric_vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
+
+
+
     /* Include error in output files */
     const fclaw_options_t  *fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error)
@@ -193,6 +292,10 @@ void cylinder_link_solvers(fclaw2d_global_t *glob)
     /* Solve conservative equation using cell-centered velocity */
 
 }
+
+
+
+
 
 
 

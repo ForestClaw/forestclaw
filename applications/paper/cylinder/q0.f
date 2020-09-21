@@ -48,13 +48,13 @@ c     # ---------------------------------------------------------------
 
       double precision xc,yc
 
-      double precision alpha, beta
-      common /torus_comm/ alpha, beta
-
       double precision xp, yp, zp
       double precision q0_physical
 
-      call mapc2m_torus(xc,yc,xp,yp,zp,alpha,beta)
+      call mapc2m_cylinder(xc,yc,xp,yp,zp)
+
+      
+      
       q0_init = q0_physical(xp,yp,zp)
 
       end

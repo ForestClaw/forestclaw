@@ -49,6 +49,8 @@ typedef struct user_options
     int initial_condition;  /* Smooth or non-smooth */
     int refine_pattern;
 
+    int exact_metric;
+
     /* Radius and height of cylinder */
     double R;
     double H;
@@ -87,6 +89,28 @@ const user_options_t* cylinder_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_cylinder (fclaw2d_map_context_t* brick, const double scale[]);
+
+
+/* ----------------------
+   Mapping headers
+   ---------------------- */
+
+#define CYLINDER_COMPUTE_AREA FCLAW_F77_FUNC(cylinder_compute_area, \
+                                             CYLINDER_COMPUTE_AREA)
+
+void CYLINDER_COMPUTE_AREA(int *mx,int *my,int *mbc,double *dx, double *dy, 
+                           double *xlower, double *ylower, int *blockno, 
+                           int *maxlevel, int *level, double area[]);
+
+
+#define CYLINDER_COMPUTE_TANGENTS FCLAW_F77_FUNC(cylinder_compute_tangents, \
+                                                 CYLINDER_COMPUTE_TANGENTS)
+
+void CYLINDER_COMPUTE_TANGENTS(int* mx,int* my, int* mbc,double* dx, double* dy, 
+                               int* level, double *xd, double *yd, double* zd,
+                               double *xtangents,double* ytangents,
+                               double* edgelengths);
+
 
 /* ----------------------
    Clawpack 4.6 headers

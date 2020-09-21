@@ -40,10 +40,13 @@ cylinder_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "refine-pattern", &user_opt->refine_pattern, 0,
                            "[user] Refinement pattern [0]");
 
+    sc_options_add_int (opt, 0, "exact-metric", &user_opt->exact_metric, 0,
+                           "[user] Use exact metric [0]");
+
     sc_options_add_double (opt, 0, "R", &user_opt->R, 1.0,
                            "[user] Radius of cylinder [1]");
 
-    sc_options_add_double (opt, 0, "H", &user_opt->H, 1.0,
+    sc_options_add_double (opt, 0, "H", &user_opt->H, 6.283185307179586,
                            "[user] Height of cylinder [1]");
 
     sc_options_add_double (opt, 0, "r0", &user_opt->r0, 0.1,
@@ -72,6 +75,8 @@ static fclaw_exit_type_t
 cylinder_postprocess(user_options_t *user_opt)
 {
     /* Not used */
+    double pi = M_PI;
+    user_opt->H = 2*pi*user_opt->R;
     return FCLAW_NOEXIT;
 }
 

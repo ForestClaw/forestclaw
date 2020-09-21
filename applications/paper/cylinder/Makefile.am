@@ -7,6 +7,7 @@ applications_paper_cylinder_cylinder_SOURCES = \
 	applications/paper/cylinder/cylinder_user.cpp \
 	applications/paper/cylinder/setprob.f \
 	applications/paper/cylinder/compute_exact.f90 \
+	applications/paper/cylinder/cylinder_compute_area_fort.f90 \
 	applications/paper/cylinder/fclaw2d_map_cylinder.c \
 	applications/paper/all/mapc2m_cylinder.f90 \
 	applications/paper/all/cylinder_velocity.f90 \

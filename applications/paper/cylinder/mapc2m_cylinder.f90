@@ -14,11 +14,9 @@ SUBROUTINE mapc2m_cylinder(xc,yc,xp,yp,zp)
     CALL map_comp2cylinder(xc,yc,theta,z)
 
     
-    R = 
-
     xp = R_cyl*cos(theta)
     yp = R_cyl*sin(theta)
     zp = h_cyl*z
 
-END SUBROUTINE MAPC2M_CYLINDER
+END SUBROUTINE mapc2m_cylinder
 
