@@ -77,14 +77,6 @@ SUBROUTINE cylinder_compute_tangents(mx,my,mbc, dx,dy, level, &
     INTEGER N
     DOUBLE PRECISION hx, hy, dz, dth
 
-
-    !! level 0 : 1 patch wraps all the way around
-    !! level 1 : 2 patches needed to wrap
-!!    N = mx*2**level
-!!    dth = 2*pi/N
-!!    dxc = 2*r_cyl*sin(dth/2.d0)
-!!    hcz = h_cyl/N    
-
     dth = 2*pi*dx
     dz = h_cyl*dy
     if (exact_metric .eq. 1) then
