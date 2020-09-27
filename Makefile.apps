@@ -6,14 +6,14 @@
 if FCLAW_ENABLE_CLAWPACK
 
 ## Patches needed for Clawpack solvers
-include src/patches/clawpatch/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5/Makefile.am
+#include src/solvers/fc2d_clawpack4.6/Makefile.am
+#include src/solvers/fc2d_clawpack5/Makefile.am
 
 ## examples
-include applications/clawpack/clawpack.apps
+#include applications/clawpack/clawpack.apps
 
 endif
 
@@ -24,14 +24,14 @@ endif
 if FCLAW_ENABLE_DEVELOPMENT
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
-#include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 
 # Development projects
-#include applications/development.apps
+include applications/development.apps
 
 endif
 
@@ -59,13 +59,13 @@ endif
 if FCLAW_ENABLE_GEOCLAW
 
 ## Patches needed for GeoClaw solvers
-include src/patches/clawpatch/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
 ## Solver library
-include src/solvers/fc2d_geoclaw/Makefile.am
+#include src/solvers/fc2d_geoclaw/Makefile.am
 
 ## Examples
-include applications/geoclaw/geoclaw.apps
+#include applications/geoclaw/geoclaw.apps
 
 endif
 
@@ -91,8 +91,10 @@ endif
 # ----------------------------------
 if FCLAW_ENABLE_ACTIVEFLUX
 
-## Solver library
+## Patches needed for Active Flux solver
 include src/patches/clawpatch/Makefile.am
+
+## Solver library
 include src/solvers/fc2d_activeflux/Makefile.am
 
 ## Applications
