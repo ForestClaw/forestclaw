@@ -14,7 +14,7 @@ PlotData =  ones(1,MaxLevels);
 PlotGrid =  zeros(1,MaxLevels);
 PlotGridEdges = zeros(1,MaxLevels);
 
-PlotType = 1;  % Scatter plot
+PlotType = 4;  % Scatter plot
 
 MappedGrid = 0;
 

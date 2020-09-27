@@ -29,7 +29,7 @@ elseif (PlotType == 4)
     hvec = zeros(1,2);
     hvec(1) = getlegendinfo();  % Get info from basic plot
     
-    plot_swe = false;   % High res - 2^15
+    plot_swe = true;   % High res - 2^15
     
     if (plot_swe)
         [amrdata_swe,t_swe] = readamrdata(1,Frame,'sgn1d/_output', ...
