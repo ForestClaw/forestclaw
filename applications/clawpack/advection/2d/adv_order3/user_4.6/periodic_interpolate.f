@@ -22,7 +22,7 @@ c     # ----------------------------------------------------------
 c     # This routine is used for both mapped and non-mapped
 c     # cases.
 c     # ----------------------------------------------------------
-      subroutine fclaw2d_clawpatch46_fort_interpolate_face
+      subroutine periodic_fort_interpolate_face
      &      (mx,my,mbc,meqn,qcoarse,qfine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
      &      transform_ptr)
@@ -50,6 +50,21 @@ c     # This should be refratio*refratio.
       integer a(2,2), f(2)
       integer ii,jj,dc(2),df(2,0:rr2-1),iff,jff
       double precision shiftx(0:rr2-1),shifty(0:rr2-1)
+
+      double precision RinvQt(5,8), qv(8), pv(5)
+      integer k
+
+      data RinvQt /  -1.6666666666666663d-01, 1.6666666666666663d-01,
+     &      0.1d0, -0.25d0, 0.1d0, 0,
+     &      1.6666666666666663d-01, -0.2d0, 0, 0.3d0,
+     &      1.6666666666666663d-01, 1.6666666666666663d-01,
+     &      0.1d0, 0.25d0, 0.1d0, -1.6666666666666663d-01,
+     &      0, 0.3d0, 0, -0.2d0, 1.6666666666666663d-01,
+     &      0, 0.3d0, 0, -0.2d0, -1.6666666666666663d-01,
+     &     -1.6666666666666663d-01, 0.1d0, 0.25d0,
+     &      0.1d0, 0, -1.6666666666666663d-01, -0.2d0,
+     &      0, 0.3d0, 1.6666666666666663d-01,
+     &     -1.6666666666666663d-01, 0.1d0, -0.25d0, 0.1d0/
 
       mth = 5
       r2 = refratio*refratio
@@ -109,26 +124,34 @@ c           # this ensures that we get 'hanging' corners
                enddo
                if (.not. skip_this_grid) then
                   qc = qcoarse(ic,jc,mq)
-c                 # Compute limited slopes in both x and y. Note we are not
-c                 # really computing slopes, but rather just differences.
-c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
-                  sl = (qc - qcoarse(ic-1,jc,mq))
-                  sr = (qcoarse(ic+1,jc,mq) - qc)
-                  gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
-                  sl = (qc - qcoarse(ic,jc-1,mq))
-                  sr = (qcoarse(ic,jc+1,mq) - qc)
-                  grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+c                 # This is the right hand side of the LLSQ problem
+                  qv(1) = qcoarse(ic-1,jc+1,mq) - qc
+                  qv(2) = qcoarse(ic,  jc+1,mq) - qc 
+                  qv(3) = qcoarse(ic+1,jc+1,mq) - qc 
+                  qv(4) = qcoarse(ic-1,jc  ,mq) - qc 
+                  qv(5) = qcoarse(ic+1,jc  ,mq) - qc 
+                  qv(6) = qcoarse(ic-1,jc-1,mq) - qc 
+                  qv(7) = qcoarse(ic,  jc-1,mq) - qc 
+                  qv(8) = qcoarse(ic+1,jc-1,mq) - qc 
+
+                  do ii = 1,5
+                     pv(ii) = 0
+                     do k = 1,8
+                        pv(ii) = pv(ii) + RinvQt(ii,k)*qv(k)
+                     end do
+                  end do
 
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
                      jff = j2(0) + df(2,m)
-                     value = qc + gradx*shiftx(m) + grady*shifty(m)
-                     qfine(iff,jff,mq) = value
-                  enddo
-               endif
-            enddo
-            enddo
+                     value = pv(1)*shiftx(m) + pv(2)*shifty(m) + 
+     &                       pv(4)*shiftx(m)*shifty(m)
+                     qfine(iff,jff,mq) = qc + value
+                  end do
+               endif    !! Don't skip this grid
+            enddo       !! jc loop
+            enddo       !! ibc loop
          else
             do jbc = 1,mbc/2
             if (iface_coarse .eq. 2) then
@@ -161,30 +184,39 @@ c              # ---------------------------------------------
                if (.not. skip_this_grid) then
                   qc = qcoarse(ic,jc,mq)
 
-                  sl = (qc - qcoarse(ic-1,jc,mq))
-                  sr = (qcoarse(ic+1,jc,mq) - qc)
-                  gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+c                 # This is the right hand side of the LLSQ problem
+                  qv(1) = qcoarse(ic-1,jc+1,mq) - qc
+                  qv(2) = qcoarse(ic,  jc+1,mq) - qc 
+                  qv(3) = qcoarse(ic+1,jc+1,mq) - qc 
+                  qv(4) = qcoarse(ic-1,jc  ,mq) - qc 
+                  qv(5) = qcoarse(ic+1,jc  ,mq) - qc 
+                  qv(6) = qcoarse(ic-1,jc-1,mq) - qc 
+                  qv(7) = qcoarse(ic,  jc-1,mq) - qc 
+                  qv(8) = qcoarse(ic+1,jc-1,mq) - qc 
 
-                  sl = (qc - qcoarse(ic,jc-1,mq))
-                  sr = (qcoarse(ic,jc+1,mq) - qc)
-                  grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+                  do ii = 1,5
+                     pv(ii) = 0
+                     do k = 1,8
+                        pv(ii) = pv(ii) + RinvQt(ii,k)*qv(k)
+                     end do
+                  end do
 
                   do m = 0,rr2-1
                      iff = i2(0) + df(1,m)
                      jff = j2(0) + df(2,m)
-                     value = qc + gradx*shiftx(m) + grady*shifty(m)
-                     qfine(iff,jff,mq) = value
-                  enddo
-
+                     value = pv(1)*shiftx(m) + pv(2)*shifty(m) + 
+     &                       pv(4)*shiftx(m)*shifty(m)
+                     qfine(iff,jff,mq) = qc + value
+                  end do
                endif                    !! Don't skip this grid
-            enddo                       !! i loop
+            enddo                       !! ic loop
             enddo                       !! end of jbc loop
          endif                          !! end idir branch
       enddo                             !! endo mq loop
 
       end
 
-      subroutine fclaw2d_clawpatch46_fort_interpolate_corner
+      subroutine periodic_fort_interpolate_corner
      &      (mx,my,mbc,meqn,refratio,
      &      qcoarse,qfine,icorner_coarse,transform_ptr)
       implicit none
@@ -208,6 +240,22 @@ c     # This should be refratio*refratio.
       integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
       double precision shiftx(0:rr2-1), shifty(0:rr2-1)
       logical fclaw2d_clawpatch_check_indices
+
+      double precision RinvQt(5,8), qv(8), pv(5)
+      integer k
+
+      data RinvQt /  -1.6666666666666663d-01, 1.6666666666666663d-01,
+     &      0.1d0, -0.25d0, 0.1d0, 0,
+     &      1.6666666666666663d-01, -0.2d0, 0, 0.3d0,
+     &      1.6666666666666663d-01, 1.6666666666666663d-01,
+     &      0.1d0, 0.25d0, 0.1d0, -1.6666666666666663d-01,
+     &      0, 0.3d0, 0, -0.2d0, 1.6666666666666663d-01,
+     &      0, 0.3d0, 0, -0.2d0, -1.6666666666666663d-01,
+     &     -1.6666666666666663d-01, 0.1d0, 0.25d0,
+     &      0.1d0, 0, -1.6666666666666663d-01, -0.2d0,
+     &      0, 0.3d0, 1.6666666666666663d-01,
+     &     -1.6666666666666663d-01, 0.1d0, -0.25d0, 0.1d0/
+
 
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
@@ -250,10 +298,10 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
          jc = jbc
       elseif (icorner_coarse .eq. 2) then
          ic = ibc
-         jc = my - jbc + 1
+         jc = my - jbc+1
       elseif (icorner_coarse .eq. 3) then
-         ic = mx - ibc + 1
-         jc = my - jbc + 1
+         ic = mx - ibc+1
+         jc = my - jbc+1
       endif
 
 c     # Interpolate coarse grid corners to fine grid corner ghost cells
@@ -265,22 +313,29 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
       do mq = 1,meqn
          qc = qcoarse(ic,jc,mq)
 
-c        # Compute limited slopes in both x and y. Note we are not
-c        # really computing slopes, but rather just differences.
-c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
-         sl = (qc - qcoarse(ic-1,jc,mq))
-         sr = (qcoarse(ic+1,jc,mq) - qc)
-         gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+c        # This is the right hand side of the LLSQ problem
+         qv(1) = qcoarse(ic-1,jc+1,mq) - qc
+         qv(2) = qcoarse(ic,  jc+1,mq) - qc 
+         qv(3) = qcoarse(ic+1,jc+1,mq) - qc 
+         qv(4) = qcoarse(ic-1,jc  ,mq) - qc 
+         qv(5) = qcoarse(ic+1,jc  ,mq) - qc 
+         qv(6) = qcoarse(ic-1,jc-1,mq) - qc 
+         qv(7) = qcoarse(ic,  jc-1,mq) - qc 
+         qv(8) = qcoarse(ic+1,jc-1,mq) - qc 
 
-         sl = (qc - qcoarse(ic,jc-1,mq))
-         sr = (qcoarse(ic,jc+1,mq) - qc)
-         grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+         do ii = 1,5
+            pv(ii) = 0
+            do k = 1,8
+               pv(ii) = pv(ii) + RinvQt(ii,k)*qv(k)
+            end do
+         end do
 
          do m = 0,rr2-1
             iff = i2(0) + df(1,m)
             jff = j2(0) + df(2,m)
-            value = qc + gradx*shiftx(m) + grady*shifty(m)
-            qfine(iff,jff,mq) = value
+            value = pv(1)*shiftx(m) + pv(2)*shifty(m) + 
+     &                       pv(4)*shiftx(m)*shifty(m)
+            qfine(iff,jff,mq) = qc + value
          enddo
 
       enddo
@@ -291,7 +346,7 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
 
 
 c     # Conservative intepolation to fine grid patch
-      subroutine fclaw2d_clawpatch46_fort_interpolate2fine
+      subroutine periodic_fort_interpolate2fine
      &     (mx,my,mbc,meqn,qcoarse, qfine, areacoarse, 
      &      areafine, igrid, manifold)
       implicit none
@@ -311,6 +366,22 @@ c     # Conservative intepolation to fine grid patch
       double precision fclaw2d_clawpatch_compute_slopes
 
       integer p4est_refineFactor,refratio
+
+      double precision RinvQt(5,8), qv(8), pv(5)
+      double precision value
+      integer k, iff, jff
+
+      data RinvQt /  -1.6666666666666663d-01, 1.6666666666666663d-01,
+     &      0.1d0, -0.25d0, 0.1d0, 0, 1.6666666666666663d-01, 
+     &      -0.2d0, 0, 0.3d0, 1.6666666666666663d-01, 
+     &      1.6666666666666663d-01,
+     &      0.1d0, 0.25d0, 0.1d0, -1.6666666666666663d-01,
+     &      0, 0.3d0, 0, -0.2d0, 1.6666666666666663d-01,
+     &      0, 0.3d0, 0, -0.2d0, -1.6666666666666663d-01,
+     &     -1.6666666666666663d-01, 0.1d0, 0.25d0,
+     &      0.1d0, 0, -1.6666666666666663d-01, -0.2d0,
+     &      0, 0.3d0, 1.6666666666666663d-01,
+     &     -1.6666666666666663d-01, 0.1d0, -0.25d0, 0.1d0/
 
       p4est_refineFactor = 2
       refratio = 2
@@ -335,26 +406,37 @@ c     # Get (ig,jg) for grid from linear (igrid) coordinates
             do i = i1,i2
                ic = i + ic_add
                jc = j + jc_add
+
                qc = qcoarse(ic,jc,mq)
 
-c              # Compute limited slopes in both x and y. Note we are not
-c              # really computing slopes, but rather just differences.
-c              # Scaling is accounted for in 'shiftx' and 'shifty', below.
-               sl = (qc - qcoarse(ic-1,jc,mq))
-               sr = (qcoarse(ic+1,jc,mq) - qc)
-               gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+c              # This is the right hand side of the LLSQ problem
+               qv(1) = qcoarse(ic-1,jc+1,mq) - qc
+               qv(2) = qcoarse(ic,  jc+1,mq) - qc 
+               qv(3) = qcoarse(ic+1,jc+1,mq) - qc 
+               qv(4) = qcoarse(ic-1,jc  ,mq) - qc 
+               qv(5) = qcoarse(ic+1,jc  ,mq) - qc 
+               qv(6) = qcoarse(ic-1,jc-1,mq) - qc 
+               qv(7) = qcoarse(ic,  jc-1,mq) - qc 
+               qv(8) = qcoarse(ic+1,jc-1,mq) - qc 
+      
+               do ii = 1,5
+                  pv(ii) = 0
+                  do k = 1,8
+                     pv(ii) = pv(ii) + RinvQt(ii,k)*qv(k)
+                  end do
+               end do
 
-               sl = (qc - qcoarse(ic,jc-1,mq))
-               sr = (qcoarse(ic,jc+1,mq) - qc)
-               grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
 c              # Fill in refined values on coarse grid cell (ic,jc)
                do ii = 1,refratio
                   do jj = 1,refratio
                      shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
                      shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
-                     qfine((i-1)*refratio + ii,(j-1)*refratio + jj,mq)
-     &                     = qc + shiftx*gradx + shifty*grady
+                     iff = (i-1)*refratio + ii
+                     jff = (j-1)*refratio + jj
+                     value = pv(1)*shiftx + pv(2)*shifty + 
+     &                       pv(4)*shiftx*shifty
+                     qfine(iff,jff,mq) = qc + value
                   enddo
                enddo
             enddo
@@ -362,7 +444,7 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       enddo
 
       if (manifold .ne. 0) then
-         call fclaw2d_clawpatch46_fort_fixcapaq2(mx,my,mbc,meqn,
+         call periodic_fort_fixcapaq2(mx,my,mbc,meqn,
      &         qcoarse,qfine, areacoarse,areafine,igrid)
       endif
 
@@ -375,7 +457,7 @@ c     # So far, this is only used by the interpolation from
 c     # coarse to fine when regridding.  But maybe it should
 c     # be used by the ghost cell routines as well?
 c     # ------------------------------------------------------
-      subroutine fclaw2d_clawpatch46_fort_fixcapaq2(mx,my,mbc,meqn,
+      subroutine periodic_fort_fixcapaq2(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse,areafine,igrid)
       implicit none
 

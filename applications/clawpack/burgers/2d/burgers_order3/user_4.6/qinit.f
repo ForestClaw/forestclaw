@@ -17,9 +17,6 @@ c
       common /compi/ pi, pi2
 
 
-      f(x,y)=dsin(8d0*datan(1d0)*x)*dsin(8d0*datan(1d0)*y)
-
-
       a(1,1)=1d0
       a(1,2)=4d0
       a(1,3)=1d0
@@ -75,7 +72,7 @@ c
       elseif (example .eq. 2) then
           x0 = 0.5
           y0 = 0.5
-          r0 = 0.15d0
+          r0 = 0.2
           r = sqrt((x - x0)**2 + (y-y0)**2)
           q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
       endif

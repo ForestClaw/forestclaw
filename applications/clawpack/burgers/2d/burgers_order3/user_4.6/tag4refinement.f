@@ -38,22 +38,31 @@ c     # Refine based only on first variable in system.
                qmin = min(q(i,j,mq),qmin)
                qmax = max(q(i,j,mq),qmax)
                if (qmax-qmin .gt. tag_threshold) then
+
                   tag_patch = 1
                   return
                endif            
+c               qx = (q(i+1,j,1)-q(i-1,j,1))/(2*dx)
+c               qy = (q(i,j+1,1)-q(i,j-1,1))/(2*dy)
+c               if (abs(qx) .gt. tag_threshold .or.
+c     &               abs(qy) .gt. tag_threshold) then
+cc                if (xc .gt. 0.5) then
+c                  tag_patch = 1
+c                  return
+c               endif
             elseif (example .eq. 1) then
                if (abs(q(i,j,mq)) .gt. tag_threshold) then
                    tag_patch = 1
                    return
                endif
             elseif (example .eq. 2) then
-               qx = (q(i+1,j,1)-q(i-1,j,1))/(2*dx)
-               qy = (q(i,j+1,1)-q(i,j-1,1))/(2*dy)
-               if (abs(qx) .gt. tag_threshold .or.
-     &               abs(qy) .gt. tag_threshold) then
+               qmin = min(q(i,j,mq),qmin)
+               qmax = max(q(i,j,mq),qmax)
+               if (qmax-qmin .gt. tag_threshold) then
+
                   tag_patch = 1
                   return
-               endif
+               endif            
             endif
 c           #  static refinement
 c           if (abs(yc-0.5) < 0.25) then

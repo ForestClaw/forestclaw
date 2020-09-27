@@ -1,14 +1,16 @@
-      subroutine clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx,
-     &      ql,qr,auxl,auxr,wave,s,amdq,apdq)
+
+c     =====================================================
+      subroutine clawpack46_rpn2bu(ixy,maxm,meqn,mwaves,mbc,mx,ql,
+     &   qr,auxl,auxr, wave,s,amdq,apdq)
 c     =====================================================
 c
 c     # Riemann solver for Burgers' equation in 2d:
 c     #  u_t + 0.5*(u^2)_x + 0.5*(u^2)_y = 0
-c
+c     
 c     # On input, ql contains the state vector at the left edge of each cell
 c     #           qr contains the state vector at the right edge of each cell
 c
-c     # This data is along a slice in the x-direction if ixy=1
+c     # This data is along a slice in the x-direction if ixy=1 
 c     #                            or the y-direction if ixy=2.
 c     # On output, wave contains the waves,
 c     #            s the speeds,
@@ -24,37 +26,54 @@ c
 c
       dimension wave(1-mbc:maxm+mbc, meqn, mwaves)
       dimension    s(1-mbc:maxm+mbc, mwaves)
-      dimension   ql(1-mbc:maxm+mbc, meqn)
-      dimension   qr(1-mbc:maxm+mbc, meqn)
-      dimension  apdq(1-mbc:maxm+mbc, meqn)
-      dimension  amdq(1-mbc:maxm+mbc, meqn)
+      dimension    ql(1-mbc:maxm+mbc, meqn)
+      dimension    qr(1-mbc:maxm+mbc, meqn)
+      dimension    auxl(1-mbc:maxm+mbc,2)
+      dimension    auxr(1-mbc:maxm+mbc,2)
+
+
+c      dimension  qpx(1-mbc:maxm+mbc, meqn)
+      dimension    f(1-mbc:maxm+mbc, meqn)
+c      dimension   fp(1-mbc:maxm+mbc, meqn)
+c      dimension  fpx(1-mbc:maxm+mbc, meqn)
+
+      dimension apdq(1-mbc:maxm+mbc, meqn)
+      dimension amdq(1-mbc:maxm+mbc, meqn)
+
+      double precision favgl, favgr
+
       logical efix
+
 c
 c
 c     # x- and y- Riemann problems are identical, so it doesn't matter if
 c     # ixy=1 or 2.
 c
       efix = .false.
+
+      do 30 i=3-mbc,mx+mbc-2
 c
-      do 10 i = 2-mbc, mx+mbc
-c        # wave is jump in q, speed comes from R-H condition:
-         wave(i,1,1) = ql(i,1) - qr(i-1,1)
-         s(i,1) = 0.5d0*(qr(i-1,1) + ql(i,1))
+c        # Compute the wave and speed
 c
+         favgr = auxl(i,2)
+         favgl = auxr(i-1,2)
+         wave(i,1,1) = favgr - favgl
+         s(i,1) = 0.5*(qr(i-1,1)+ql(i,1))
+         
 c        # compute left-going and right-going flux differences:
 c        ------------------------------------------------------
-c
-         amdq(i,1) = dmin1(s(i,1), 0.d0) * wave(i,1,1)
-         apdq(i,1) = dmax1(s(i,1), 0.d0) * wave(i,1,1)
-c
-         if (efix) then
+         amdq(i,1) = -dmin1(sign(1d0,s(i,1)), 0.d0) * wave(i,1,1)
+         apdq(i,1) =  dmax1(sign(1d0,s(i,1)), 0.d0) * wave(i,1,1)
+
+c         if (efix) then
 c           # entropy fix for transonic rarefactions:
-            if (qr(i-1,1).lt.0.d0 .and. ql(i,1).gt.0.d0) then
-               amdq(i,1) = - 0.5d0 * qr(i-1,1)**2
-               apdq(i,1) =   0.5d0 * ql(i,1)**2
-               endif
-            endif
-   10   continue
+c            if (q(i-1,1).lt.0.d0 .and. q(i,1).gt.0.d0) then
+c               amdq(i,1) = - f(i-1,1)  
+c               apdq(i,1) =   f(i,1)    
+c               endif
+c            endif
+
+   30   continue
 c
       return
       end

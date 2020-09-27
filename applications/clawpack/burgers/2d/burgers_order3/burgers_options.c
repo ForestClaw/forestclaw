@@ -23,22 +23,16 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "periodic_user.h"
+#include "burgers_user.h"
 
 static int s_user_options_package_id = -1;
 
 static void *
-periodic_register (user_options_t *user, sc_options_t * opt)
+burgers_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                            "example [0]");
-
-    sc_options_add_double (opt, 0, "ubar", &user->ubar, 2,
-                           "ubar [2]");
-
-    sc_options_add_double (opt, 0, "vbar", &user->vbar, 0,
-                           "vbar [0]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                            "Clawpack_version (4 or 5) [5]");
@@ -49,7 +43,7 @@ periodic_register (user_options_t *user, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-periodic_postprocess(user_options_t *user)
+burgers_postprocess(user_options_t *user)
 {
     /* nothing to post-process yet ... */
     return FCLAW_NOEXIT;
@@ -57,14 +51,14 @@ periodic_postprocess(user_options_t *user)
 
 
 static fclaw_exit_type_t
-periodic_check (user_options_t *user)
+burgers_check (user_options_t *user)
 {
     /* Nothing to check ? */
     return FCLAW_NOEXIT;
 }
 
 static void
-periodic_destroy(user_options_t *user)
+burgers_destroy(user_options_t *user)
 {
     /* Nothing to destroy */
 }
@@ -81,7 +75,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     user = (user_options_t*) package;
 
-    return periodic_register(user,opt);
+    return burgers_register(user,opt);
 }
 
 static fclaw_exit_type_t
@@ -98,7 +92,7 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT(user->is_registered);
 
     /* Convert strings to arrays */
-    return periodic_postprocess (user);
+    return burgers_postprocess (user);
 }
 
 
@@ -113,7 +107,7 @@ options_check(fclaw_app_t *app, void *package,void *registered)
 
     user = (user_options_t*) package;
 
-    return periodic_check(user);
+    return burgers_check(user);
 }
 
 static void
@@ -128,7 +122,7 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     user = (user_options_t*) package;
     FCLAW_ASSERT (user->is_registered);
 
-    periodic_destroy (user);
+    burgers_destroy (user);
 
     FCLAW_FREE (user);
 }
@@ -144,7 +138,7 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 
 /* --------------------- Public interface access functions ---------------------------- */
 
-user_options_t* periodic_options_register (fclaw_app_t * app,
+user_options_t* burgers_options_register (fclaw_app_t * app,
                                        const char *configfile)
 {
     user_options_t *user;
@@ -158,14 +152,14 @@ user_options_t* periodic_options_register (fclaw_app_t * app,
     return user;
 }
 
-void periodic_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void burgers_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
     s_user_options_package_id = id;
 }
 
-const user_options_t* periodic_get_options(fclaw2d_global_t* glob)
+const user_options_t* burgers_get_options(fclaw2d_global_t* glob)
 {
     int id = s_user_options_package_id;
     return (user_options_t*) fclaw_package_get_options(glob, id);    
