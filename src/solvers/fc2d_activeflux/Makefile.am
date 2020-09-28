@@ -17,8 +17,12 @@ libactiveflux_compiled_sources = \
 	src/solvers/fc2d_activeflux/fortran_source/activeflux_flux2.f \
 	src/solvers/fc2d_activeflux/fortran_source/activeflux_flux2fw.f \
 	src/solvers/fc2d_activeflux/fortran_source/activeflux_inlinelimiter.f \
+	src/solvers/fc2d_activeflux/fortran_source/activeflux_limiter2.f \
+	src/solvers/fc2d_activeflux/fortran_source/activeflux_limiter3.f \
 	src/solvers/fc2d_activeflux/fortran_source/activeflux_step2.f \
-	src/solvers/fc2d_activeflux/fortran_source/activeflux_step2_wrap.f
+	src/solvers/fc2d_activeflux/fortran_source/activeflux_step2_wrap.f\
+	src/solvers/fc2d_activeflux/clawpatch/activeflux_interpolate.f \
+	src/solvers/fc2d_activeflux/clawpatch/activeflux_output.f
 
 
 ## Name of library to build

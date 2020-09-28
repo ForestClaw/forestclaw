@@ -51,24 +51,24 @@ extern "C"
 void SETPROB();
 
 #define activeflux_SETPROB FCLAW_F77_FUNC(activeflux_setprob,activeflux_SETPROB)
-void activeflux_SETPROB();
+void ACTIVEFLUX_SETPROB();
 
-#define activeflux_QINIT   FCLAW_F77_FUNC(activeflux_qinit,  activeflux_QINIT)
-void activeflux_QINIT(const int* maxmx, const int* maxmy, const int* meqn,
+#define ACTIVEFLUX_QINIT   FCLAW_F77_FUNC(activeflux_qinit,  ACTIVEFLUX_QINIT)
+void ACTIVEFLUX_QINIT(const int* maxmx, const int* maxmy, const int* meqn,
                       const int* mbc, const int* mx, const int* my,
                       const double* xlower, const double* ylower,
                       const double* dx, const double* dy,
                       double q[], const int* maux, double aux[]);
   
-#define activeflux_SETAUX  FCLAW_F77_FUNC(activeflux_setaux, activeflux_SETAUX)
-void activeflux_SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
+#define ACTIVEFLUX_SETAUX  FCLAW_F77_FUNC(activeflux_setaux, ACTIVEFLUX_SETAUX)
+void ACTIVEFLUX_SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
                        const int* mx, const int* my,
                        const double* xlower, const double* ylower,
                        const double* dx, const double* dy,
                        const int* maux, double aux[]);
 
-#define activeflux_BC2     FCLAW_F77_FUNC(activeflux_bc2,    activeflux_bc2)
-void activeflux_BC2(const int* maxmx, const int* maxmy, const int* meqn,
+#define ACTIVEFLUX_BC2     FCLAW_F77_FUNC(activeflux_bc2,    ACTIVEFLUX_bc2)
+void ACTIVEFLUX_BC2(const int* maxmx, const int* maxmy, const int* meqn,
                     const int* mbc, const int* mx, const int* my,
                     const double* xlower, const double* ylower,
                     const double* dx, const double* dy, const double q[],
@@ -76,40 +76,40 @@ void activeflux_BC2(const int* maxmx, const int* maxmy, const int* meqn,
                     const double* dt, const int mthbc[]);
 
 
-#define activeflux_B4STEP2 FCLAW_F77_FUNC(activeflux_b4step2,activeflux_B4STEP2)
-void activeflux_B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
+#define ACTIVEFLUX_B4STEP2 FCLAW_F77_FUNC(activeflux_b4step2,ACTIVEFLUX_B4STEP2)
+void ACTIVEFLUX_B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
                         const int* mx, const int* my, const int* meqn,
                         double q[], const double* xlower, const double* ylower,
                         const double* dx, const double* dy,
                         const double* t, const double* dt,
                         const int* maux, double aux[]);
 
-#define activeflux_SRC2    FCLAW_F77_FUNC(activeflux_src2,   activeflux_SRC2)
-void activeflux_SRC2(const int* maxmx, const int* maxmy, const int* meqn,
+#define ACTIVEFLUX_SRC2    FCLAW_F77_FUNC(activeflux_src2,   ACTIVEFLUX_SRC2)
+void ACTIVEFLUX_SRC2(const int* maxmx, const int* maxmy, const int* meqn,
                      const int* mbc, const int* mx,const int* my,
                      const double* xlower, const double* ylower,
                      const double* dx, const double* dy, double q[],
                      const int* maux, double aux[], const double* t,
                      const double* dt);
 
-#define activeflux_RPN2    FCLAW_F77_FUNC(activeflux_rpn2,   activeflux_RPN2)
-void activeflux_RPN2(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+#define ACTIVEFLUX_RPN2    FCLAW_F77_FUNC(activeflux_rpn2,   ACTIVEFLUX_RPN2)
+void ACTIVEFLUX_RPN2(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
                      const int* mbc,const int* mx, double ql[], double qr[],
                      double auxl[], double auxr[], double wave[],
                      double s[], double amdq[], double apdq[]);
 
-#define activeflux_RPT2    FCLAW_F77_FUNC(activeflux_rpt2,   activeflux_RPT2)
-void activeflux_RPT2(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+#define ACTIVEFLUX_RPT2    FCLAW_F77_FUNC(activeflux_rpt2,   ACTIVEFLUX_RPT2)
+void ACTIVEFLUX_RPT2(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
                      const int* mbc, const int* mx, double ql[], double qr[],
                      double aux1[], double aux2[], double aux3[], const int* imp,
                      double dsdq[], double bmasdq[], double bpasdq[]);
 
 
 
-#define activeflux_TAG4REFINEMENT FCLAW_F77_FUNC(activeflux_tag4refinement, \
-                                                 activeflux_TAG4REFINEMENT)
+#define ACTIVEFLUX_TAG4REFINEMENT FCLAW_F77_FUNC(activeflux_tag4refinement, \
+                                                 ACTIVEFLUX_TAG4REFINEMENT)
 
-void activeflux_TAG4REFINEMENT(const int* mx,const int* my,
+void ACTIVEFLUX_TAG4REFINEMENT(const int* mx,const int* my,
                                const int* mbc,const int* meqn,
                                const double* xlower, const double* ylower,
                                const double* dx, const double* dy,
@@ -121,10 +121,10 @@ void activeflux_TAG4REFINEMENT(const int* mx,const int* my,
 
 
 
-#define activeflux_TAG4COARSENING FCLAW_F77_FUNC(activeflux_tag4coarsening, \
-                                                activeflux_TAG4COARSENING)
+#define ACTIVEFLUX_TAG4COARSENING FCLAW_F77_FUNC(activeflux_tag4coarsening, \
+                                                ACTIVEFLUX_TAG4COARSENING)
 
-void activeflux_TAG4COARSENING(const int* mx, const int* my,
+void ACTIVEFLUX_TAG4COARSENING(const int* mx, const int* my,
                                const int* mbc, const int* meqn,
                                const double* xlower, const double* ylower,
                                const double* dx, const double* dy,
