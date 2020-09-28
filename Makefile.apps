@@ -98,7 +98,7 @@ include src/patches/clawpatch/Makefile.am
 include src/solvers/fc2d_activeflux/Makefile.am
 
 ## Applications
-#include src/solvers/fc2d_activeflux/examples/advection/2d/Makefile.am
+include src/solvers/fc2d_activeflux/examples/activeflux.apps
 
 endif
 
