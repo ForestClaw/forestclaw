@@ -46,6 +46,7 @@ void periodic_problem_setup(fclaw2d_global_t* glob)
     {
         FILE *f = fopen("setprob.data","w");
         fprintf(f,    "%20d    %s",user->example,"\% example\n");
+        fprintf(f,    "%20d    %s",user->refinement_strategy,"\% refinement stragegy\n");
         fprintf(f, "%20.16f    %s",user->ubar,"\% ubar\n");
         fprintf(f, "%20.16f    %s",user->vbar,"\% vbar\n");
         fclose(f);

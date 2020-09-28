@@ -10,6 +10,9 @@
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision xp,yp,zp
 
+      integer refinement_strategy
+      common /refinement_comm/ refinement_strategy
+
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
@@ -20,8 +23,6 @@
       integer i,j, mq
       double precision qmin, qmax, xc, yc, qx, qy
       
-
-
       tag_patch = 0
 
       cont = get_context()
@@ -61,7 +62,7 @@ c     # Refine based only on first variable in system.
                endif
             elseif (example .eq. 4) then
                xc = xlower + (i-0.5)*dx
-               yc = ylower + (j-0.5)*dy         
+               yc = ylower + (j-0.5)*dy
 c              #  static refinement
                if (abs(yc-0.5) < 0.25) then
                   tag_patch = 1
