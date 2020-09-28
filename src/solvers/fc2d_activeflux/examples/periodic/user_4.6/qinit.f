@@ -77,7 +77,8 @@ c
           y0 = 0.5
           r0 = 0.15d0
           r = sqrt((x - x0)**2 + (y-y0)**2)
-          q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
+c          q0 = Hsmooth(r + r0) - Hsmooth(r - r0)
+          q0 = 1 - Hsmooth(r - r0)
       endif
 
 
