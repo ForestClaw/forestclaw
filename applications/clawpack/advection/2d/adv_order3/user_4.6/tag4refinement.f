@@ -32,21 +32,26 @@ c     # Refine based only on first variable in system.
       qmax = q(1,1,mq)
       do j = 1,my
          do i = 1,mx
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
             if (example .eq. 0) then
+               if (q(i,j,mq) .gt. tag_threshold) then
+                   tag_patch = 1
+                   return
+               endif
+            elseif (example .eq. 1) then
+
                qmin = min(q(i,j,mq),qmin)
                qmax = max(q(i,j,mq),qmax)
                if (qmax-qmin .gt. tag_threshold) then
                   tag_patch = 1
                   return
                endif            
-            elseif (example .eq. 1) then
-               if (abs(q(i,j,mq)) .gt. tag_threshold) then
+            elseif (example .eq. 2) then
+               if (q(i,j,mq) .gt. tag_threshold .and.  
+     &               q(i,j,mq) .lt. 1-tag_threshold) then
                    tag_patch = 1
                    return
                endif
-            elseif (example .eq. 2) then
+            elseif (example .eq. 3) then
                qx = (q(i+1,j,1)-q(i-1,j,1))/(2*dx)
                qy = (q(i,j+1,1)-q(i,j-1,1))/(2*dy)
                if (abs(qx) .gt. tag_threshold .or.
@@ -54,9 +59,15 @@ c     # Refine based only on first variable in system.
                   tag_patch = 1
                   return
                endif
+            elseif (example .eq. 4) then
+               xc = xlower + (i-0.5)*dx
+               yc = ylower + (j-0.5)*dy         
+c              #  static refinement
+               if (abs(yc-0.5) < 0.25) then
+                  tag_patch = 1
+                  return
+               endif
             endif
-c           #  static refinement
-c           if (abs(yc-0.5) < 0.25) then
          enddo
       enddo
 

@@ -46,6 +46,8 @@ typedef struct user_options
     double ubar;
     double vbar;
 
+    int refinement_strategy;
+
     int claw_version;
     int is_registered;
 
