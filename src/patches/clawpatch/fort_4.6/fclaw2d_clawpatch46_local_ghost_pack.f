@@ -28,7 +28,7 @@
 
       packdata = packmode .eq. packq .or. packmode .eq. packarea
 
-      nghost = 2
+      nghost = mbc
       k = 1
 c     # Face 0
       do mq = 1,meqn
