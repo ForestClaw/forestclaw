@@ -121,12 +121,11 @@ void outstyle_1(fclaw2d_global_t *glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
 
-    int iframe = 0;
-
     int init_flag = 1;  /* Store anything that needs to be stored */
     fclaw2d_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
+    int iframe = 0;
     fclaw2d_output_frame(glob,iframe);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -433,13 +432,13 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         if (fclaw_opt->advance_one_step)
         {
-            fclaw2d_diagnostics_gather(glob,init_flag);
+            //fclaw2d_diagnostics_gather(glob,init_flag);
         }
 
         if (n % nstep_inner == 0)
         {
             iframe++;
-            //fclaw2d_diagnostics_gather(glob,init_flag);
+            fclaw2d_diagnostics_gather(glob,init_flag);
             fclaw2d_output_frame(glob,iframe);
         }
     }
