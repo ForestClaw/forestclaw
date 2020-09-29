@@ -39,7 +39,6 @@ c     # Refine based only on first variable in system.
                    return
                endif
             elseif (example .eq. 1) then
-
                qmin = min(q(i,j,mq),qmin)
                qmax = max(q(i,j,mq),qmax)
                if (qmax-qmin .gt. tag_threshold) then
@@ -61,9 +60,9 @@ c     # Refine based only on first variable in system.
                   return
                endif
             elseif (example .eq. 4) then
+c              #  static refinement
                xc = xlower + (i-0.5)*dx
                yc = ylower + (j-0.5)*dy
-c              #  static refinement
                if (abs(yc-0.5) < 0.25) then
                   tag_patch = 1
                   return
