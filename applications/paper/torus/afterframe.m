@@ -50,6 +50,7 @@ else
         end
     end
 end
+caxis([qmin,qmax]);
 
 showpatchborders;
 setpatchborderprops('linewidth',1);
@@ -63,9 +64,6 @@ axis off;
 
 set(gcf,'clipping','off')
 set(gca,'clipping','off');
-
-view([0,27]);
-view(2);
 
 prt = true;
 NoQuery = false;
