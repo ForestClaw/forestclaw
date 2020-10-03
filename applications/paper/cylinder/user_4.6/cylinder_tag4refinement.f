@@ -48,9 +48,9 @@
                 xc = xlower + (i-0.5)*dx
                 yc = ylower + (j-0.5)*dy
                 if (refine_pattern .eq. 1) then
-                    refine = xc .lt. 0.5
+                    refine = xc .gt. 0.5
                 elseif (refine_pattern .eq. 2) then
-                    refine = yc .lt. 0.5
+                    refine = yc .gt. 0.5
                 endif
             endif
             if (refine) then
