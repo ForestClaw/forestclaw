@@ -51,8 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
 #include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/GMG/AvgRstr.h>
-#include <ThunderEgg/GMG/DrctIntp.h>
+#include <ThunderEgg/GMG/DirectInterpolator.h>
 #include <ThunderEgg/P4estDomGen.h>
 #include <ThunderEgg/GMG/CycleBuilder.h>
 #include <ThunderEgg/BiLinearGhostFiller.h>
@@ -77,10 +76,12 @@ public:
     fivePoint(std::shared_ptr<const Domain<2>>      domain,
               std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
-    void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> u,
-                          LocalData<2> f) const;
-    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
-                       LocalData<2> f) const;
+    void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+                          const std::vector<LocalData<2>>& us,
+                          std::vector<LocalData<2>>& fs) const override;
+    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+                       const std::vector<LocalData<2>>& us,
+                       std::vector<LocalData<2>>& fs) const override;
 
 };
 
@@ -98,9 +99,13 @@ fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
 
 
 void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                                 LocalData<2> u,
-                                 LocalData<2> f) const 
+                                 const std::vector<LocalData<2>>& us,
+                                 std::vector<LocalData<2>>& fs) const 
 {
+    //const cast since u ghost values have to be modified
+    //ThunderEgg doesn't care if ghost values are modified, just don't modify the interior values.
+    LocalData<2>& u = const_cast<LocalData<2>&>(us[0]);
+    LocalData<2>& f = fs[0];
 
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
@@ -196,8 +201,12 @@ void fivePoint::apply(std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector
 
 
 void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                              LocalData<2> u, LocalData<2> f) const 
+                              const std::vector<LocalData<2>>& us, 
+                              std::vector<LocalData<2>>& fs) const 
 {
+    const LocalData<2>& u = us[0];
+    LocalData<2>& f = fs[0];
+
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
 #if 0    
@@ -275,7 +284,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f(new fc2d_multigrid_vector(glob, 0));
+    shared_ptr<Vector<2>> f = make_shared<fc2d_multigrid_vector>(glob);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -302,7 +311,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
     };
 
     // generates levels of patches for GMG
-    P4estDomGen domain_gen(wrap->p4est, ns, 1,inf, bmf);
+    P4estDomGen domain_gen(wrap->p4est, ns, 1, inf, bmf);
 
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
@@ -320,8 +329,8 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create vector for beta
-    auto beta_vec = ValVector<2>::GetNewVector(te_domain);
-    DomainTools<2>::setValuesWithGhost(te_domain, beta_vec, beta_coeff);
+    auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->meqn);
+    DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_coeff);
 
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
@@ -377,10 +386,10 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
         shared_ptr<GMG::Smoother<2>> smoother = solver;
 
         //restrictor
-        auto restrictor = make_shared<GMG::AvgRstr<2>>(make_shared<GMG::InterLevelComm<2>>(next_domain, curr_domain));
+        auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, clawpatch_opt->meqn);
 
         //vector generator
-        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain);
+        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->meqn);
 
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
@@ -414,13 +423,13 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
             }
 
             //restrictor
-            auto restrictor = make_shared<GMG::AvgRstr<2>>(make_shared<GMG::InterLevelComm<2>>(next_domain, curr_domain));
+            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, clawpatch_opt->meqn);
 
             //interpolator
-            auto interpolator = make_shared<GMG::DrctIntp<2>>(make_shared<GMG::InterLevelComm<2>>(curr_domain,prev_domain));
+            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->meqn);
 
             //vector generator
-            vg = make_shared<ValVectorGenerator<2>>(curr_domain);
+            vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->meqn);
 
             builder.addIntermediateLevel(patch_operator, smoother, restrictor, interpolator, vg);
 
@@ -448,10 +457,10 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
         }
 
         //interpolator
-        auto interpolator = make_shared<GMG::DrctIntp<2>>(make_shared<GMG::InterLevelComm<2>>(curr_domain,prev_domain));
+        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->meqn);
 
         //vector generator
-        vg = make_shared<ValVectorGenerator<2>>(curr_domain);
+        vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->meqn);
 
         builder.addCoarsestLevel(patch_operator, smoother, interpolator, vg);
 
@@ -459,7 +468,7 @@ void fc2d_multigrid_solve(fclaw2d_global_t *glob)
     }
 
     // solve
-    auto vg = make_shared<ValVectorGenerator<2>>(te_domain);
+    auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->meqn);
     shared_ptr<Vector<2>> u = vg->getNewVector();
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
