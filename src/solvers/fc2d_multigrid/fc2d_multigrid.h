@@ -40,6 +40,7 @@ struct fclaw2d_patch;
 typedef  struct fc2d_multigrid_vtable  fc2d_multigrid_vtable_t;
 
 
+
 /* --------------------------- Fortran defs solver functions -------------------------- */
 
 typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* blockno, 
@@ -65,9 +66,16 @@ typedef void (*fc2d_multigrid_fort_apply_bc_t)(const int* blockno, const  int* m
                                                int intersects_bc[], int mthbc[], 
                                                double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc);
 
+typedef void (*fc2d_multigrid_solve_t)(struct fclaw2d_global *glob);
+
 /* -------------------------- Solver and utilities ------------------------------------ */
 
-void fc2d_multigrid_solve(struct fclaw2d_global *glob);
+//void fc2d_multigrid_solve(struct fclaw2d_global *glob);
+
+void fc2d_multigrid_fivepoint_solve(struct fclaw2d_global *glob);
+
+fc2d_multigrid_vtable_t* fc2d_multigrid_vt();
+
 
 /* --------------------------------- Virtual table ------------------------------------ */
 
@@ -76,10 +84,13 @@ struct fc2d_multigrid_vtable
 
 	/* Fortran routines */
 	fc2d_multigrid_fort_rhs_t        fort_rhs;	
-	fc2d_multigrid_fort_beta_t        fort_beta;	
+	fc2d_multigrid_fort_beta_t       fort_beta;	
     fc2d_multigrid_fort_apply_bc_t   fort_apply_bc;
     fc2d_multigrid_fort_eval_bc_t    fort_eval_bc;
-    
+
+    /* Solver that defines patch operator and calls ThunderEgg solver */
+    fc2d_multigrid_solve_t           solve; 
+
 	int is_set;
 
 };

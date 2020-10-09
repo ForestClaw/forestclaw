@@ -84,7 +84,11 @@ void multigrid_solve(fclaw2d_global_t* glob)
     // Apply non-homogeneous boundary conditions 
     fc2d_multigrid_physical_bc(glob);
 
-	fc2d_multigrid_solve(glob);
+    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();  
+
+    FCLAW_ASSERT(mg_vt->solve != NULL);
+
+    mg_vt->solve(glob);
 }
 
 /* ---------------------------------- Output functions -------------------------------- */
@@ -144,6 +148,9 @@ void fc2d_multigrid_solver_initialize()
 	fc2d_multigrid_vtable_t*  mg_vt = multigrid_vt_init();	
     mg_vt->fort_apply_bc = &MULTIGRID_FORT_APPLY_BC_DEFAULT;
     mg_vt->fort_eval_bc  = &MULTIGRID_FORT_EVAL_BC_DEFAULT;
+
+    /* Default five-point solver */
+    mg_vt->solve = fc2d_multigrid_fivepoint_solve;
 
 	mg_vt->is_set = 1;
 }
