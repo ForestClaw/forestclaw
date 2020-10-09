@@ -42,8 +42,8 @@ FCLAW_ARG_ENABLE([development], [Enable general applications under development],
 FCLAW_ARG_ENABLE([paper], [Enable examples applications from paper],
                  [PAPER])
 
-FCLAW_ARG_ENABLE([swbli], [Enable swbli project],
-                 [SWBLI])
+FCLAW_ARG_ENABLE([activeflux], [Enable activeflux project],
+                 [ACTIVEFLUX])
 
 FCLAW_ARG_ENABLE([multigrid], [Enable multigrid solver],
                  [MULTIGRID])

@@ -6,6 +6,8 @@ applications_clawpack_shallow_2d_tsunami_tsunami_SOURCES = \
 	applications/clawpack/shallow/2d/tsunami/tsunami_user.cpp \
 	applications/clawpack/shallow/2d/tsunami/tsunami_user.h \
 	applications/clawpack/shallow/2d/tsunami/setprob.f \
+	applications/clawpack/shallow/2d/tsunami/sgn1d/sgn.f90 \
+	applications/clawpack/shallow/2d/tsunami/sgn1d/tri_solve.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/qinit.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/tag4refinement.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/tag4coarsening.f90 \
