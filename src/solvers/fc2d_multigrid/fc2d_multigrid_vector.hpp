@@ -18,9 +18,9 @@ class fc2d_multigrid_vector : public ThunderEgg::Vector<2> {
      */
     std::array<int, 2> strides;
     /**
-     * @brief the equation in the fclaw data that we are accessing
+     * @brief the number of equations
      */
-    int eqn;
+    int meqn;
     /**
      * @brief stride to next eqn in patch
      */
@@ -36,11 +36,11 @@ class fc2d_multigrid_vector : public ThunderEgg::Vector<2> {
     static void enumeratePatchData(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *patch, int blockno,
                                    int patchno, void *user);
-    ThunderEgg::LocalData<2> getLocalDataPriv(int local_patch_id) const;
+    ThunderEgg::LocalData<2> getLocalDataPriv(int component_index, int local_patch_id) const;
 
    public:
-    fc2d_multigrid_vector(fclaw2d_global_t *glob, int eqn);
+    fc2d_multigrid_vector(fclaw2d_global_t *glob);
 
-    ThunderEgg::LocalData<2> getLocalData(int local_patch_id) override;
-    const ThunderEgg::LocalData<2> getLocalData(int local_patch_id) const override;
+    ThunderEgg::LocalData<2> getLocalData(int component_index, int local_patch_id) override;
+    const ThunderEgg::LocalData<2> getLocalData(int component_index, int local_patch_id) const override;
 };
