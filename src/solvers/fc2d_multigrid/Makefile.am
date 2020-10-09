@@ -11,7 +11,8 @@ libmultigrid_compiled_sources = \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_options.c \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_vector.cpp \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_physical_bc.c \
-	src/solvers/fc2d_multigrid/operator/fc2d_multigrid_fivepoint.cpp \
+	src/solvers/fc2d_multigrid/fc2d_multigrid_solve.cpp \
+	src/solvers/fc2d_multigrid/operators/fc2d_multigrid_fivepoint.cpp \
 	src/solvers/fc2d_multigrid/fort_4.6/multigrid_apply_bc_default.f90 \
 	src/solvers/fc2d_multigrid/fort_4.6/multigrid_eval_bc_default.f90
 

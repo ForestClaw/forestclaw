@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "operators/fc2d_multigrid_fivepoint.h"
+#include "fc2d_multigrid_starpatch.h"
 
 #include "fc2d_multigrid.h"
 #include "fc2d_multigrid_options.h"
@@ -57,159 +57,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/ValVectorGenerator.h>
 
-#define USE_FIVEPOINT 1
-
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::VarPoisson;
 
+#if 0
 double beta_coeff(const std::array<double,2>& coord)
 {
     return 1.0;
 }  
-
-
-
-class fivePoint : public PatchOperator<2>
-{
-public:
-    fivePoint(std::shared_ptr<const Domain<2>>      domain,
-              std::shared_ptr<const GhostFiller<2>> ghost_filler);
-
-    void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                          const std::vector<LocalData<2>>& us,
-                          std::vector<LocalData<2>>& fs) const override;
-    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                       const std::vector<LocalData<2>>& us,
-                       std::vector<LocalData<2>>& fs) const override;
-
-};
-
-
-#if 0
-/* Store beta as member in fivePoint */
-void fivePoint::fivePoint>(beta_vec,te_domain,ghost_filler);
 #endif
 
 
-fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler) : PatchOperator<2>(domain,ghost_filler)
-{
-}
-
-
-void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                                 const std::vector<LocalData<2>>& us,
-                                 std::vector<LocalData<2>>& fs) const 
-{
-    //const cast since u ghost values have to be modified
-    //ThunderEgg doesn't care if ghost values are modified, just don't modify the interior values.
-    LocalData<2>& u = const_cast<LocalData<2>&>(us[0]);
-    LocalData<2>& f = fs[0];
-
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
-
-#if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
-    double dy = pinfo->spacings[1];
-#endif    
-    double dx = pinfo->spacings[0];
-
-    //if physical boundary
-    if (!pinfo->hasNbr(Side<2>::west())){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
-        for(int j = 0; j < my; j++){
-            ghosts[{j}] = -u[{0,j}];
-        }
-    }
-    if (!pinfo->hasNbr(Side<2>::east())){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
-        for(int j = 0; j < my; j++){
-            ghosts[{j}] = -u[{mx-1,j}];
-        }
-    }
-
-    if (!pinfo->hasNbr(Side<2>::south())){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
-        for(int i = 0; i < mx; i++){
-            ghosts[{i}] = -u[{i,0}];
-        }
-    }
-    if (!pinfo->hasNbr(Side<2>::north())){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
-        for(int i = 0; i < mx; i++){
-            ghosts[{i}] = -u[{i,my-1}];
-        }
-    }
-
-    for(int i = 0; i < mx; i++)
-    {
-        for(int j = 0; j < my; j++)
-        {
-            f[{i,j}] = (u[{i+1,j}] + u[{i-1,j}] + u[{i,j+1}] + u[{i,j-1}] - 4*u[{i,j}])/(dx*dx);
-        }
-    }
-}
-
-#if 0
-void fivePoint::apply(std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector<2>> f) const 
-{
-    //ghost_filler->fillGhost(u);
-    for (auto pinfo : domain->getPatchInfoVector()) {
-        applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-                         f->getLocalData(pinfo->local_index));
-    }
-}
-#endif
-
-
-void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                              const std::vector<LocalData<2>>& us, 
-                              std::vector<LocalData<2>>& fs) const 
-{
-    const LocalData<2>& u = us[0];
-    LocalData<2>& f = fs[0];
-
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
-#if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
-#endif    
-    double dx = pinfo->spacings[0];
-    double dx2 = dx*dx;
-
-    double dy = pinfo->spacings[1];
-    double dy2 = dy*dy;
-
-    //return;
-
-    for(int j = 0; j < my; j++)
-    {
-        /* bool hasNbr(Side<D> s) */
-        if (pinfo->hasNbr(Side<2>::west()))
-            f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
-
-        if (pinfo->hasNbr(Side<2>::east()))
-            f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
-    }
-
-    for(int i = 0; i < mx; i++)
-    {
-        if (pinfo->hasNbr(Side<2>::south()))
-            f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
-
-        if (pinfo->hasNbr(Side<2>::north()))
-            f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
-    }
-}
- 
-
-#if USE_FIVEPOINT == 0
 /**
  * @brief Restrict the beta coefficient vector for the new domain
  * 
@@ -227,9 +86,8 @@ shared_ptr<ValVector<2>> restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec,
     restrictor.restrict(new_beta_vec, prev_beta_vec);
     return new_beta_vec;
 }
-#endif
 
-void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob) 
+void fc2d_multigrid_starpatch_solve(fclaw2d_global_t *glob) 
 {
     // get needed options
     fclaw2d_clawpatch_options_t *clawpatch_opt =
@@ -281,10 +139,10 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
     auto beta_func = [&](const std::array<double,2>& coord){
         double beta;
         double grad[2];
-        mg_vt->fort_beta(&coord[0],&coord[1],&beta,grad);
-        return beta;
+        //mg_vt->fort_beta(&coord[0],&coord[1],&beta,grad);
+        return 1.0;
     };
-#endif  
+#endif    
 
     // create vector for beta
     auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->meqn);
@@ -294,11 +152,7 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-#if USE_FIVEPOINT == 1
-    auto op = make_shared<fivePoint>(te_domain,ghost_filler);
-#else
     auto op = make_shared<StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
-#endif    
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
@@ -352,9 +206,7 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
         //add intermediate levels
-#if USE_FIVEPOINT == 0
         auto prev_beta_vec = beta_vec;
-#endif    
         auto prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
@@ -363,13 +215,10 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-#if USE_FIVEPOINT == 1
-            patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
-#else
             auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
             patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
             prev_beta_vec = restricted_beta_vec;
-#endif    
+
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
             if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
@@ -399,12 +248,9 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-#if USE_FIVEPOINT == 1
-        patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
-#else
         auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
         patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
-#endif    
+
         //smoother
         if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
             smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,9 @@ extern "C"
 #endif
 
 
+struct fclaw2d_global; 
 
-
+void fc2d_multigrid_solve(struct fclaw2d_global *glob);
 
 #ifdef __cplusplus
 #if 0

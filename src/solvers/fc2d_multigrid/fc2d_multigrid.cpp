@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 
 #include <fclaw2d_domain.h>
+
+#include "fc2d_multigrid_solve.h"
+
+#include "operators/fc2d_multigrid_fivepoint.h"
+#include "operators/fc2d_multigrid_starpatch.h"
 
 
 
@@ -150,7 +155,7 @@ void fc2d_multigrid_solver_initialize()
     mg_vt->fort_eval_bc  = &MULTIGRID_FORT_EVAL_BC_DEFAULT;
 
     /* Default five-point solver */
-    mg_vt->solve = fc2d_multigrid_fivepoint_solve;
+    mg_vt->solve = fc2d_multigrid_solve;
 
 	mg_vt->is_set = 1;
 }

@@ -69,7 +69,6 @@ double beta_coeff(const std::array<double,2>& coord)
 }  
 
 
-
 class fivePoint : public PatchOperator<2>
 {
 public:

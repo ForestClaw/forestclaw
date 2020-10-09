@@ -72,8 +72,6 @@ typedef void (*fc2d_multigrid_solve_t)(struct fclaw2d_global *glob);
 
 //void fc2d_multigrid_solve(struct fclaw2d_global *glob);
 
-void fc2d_multigrid_fivepoint_solve(struct fclaw2d_global *glob);
-
 fc2d_multigrid_vtable_t* fc2d_multigrid_vt();
 
 
