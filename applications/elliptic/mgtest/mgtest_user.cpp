@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 
 All rights reserved.
 
@@ -105,7 +105,7 @@ void mgtest_rhs(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    /* Or some other suitable function that sets up rhs on patches */
+    /* This function supplies an analytic right hand side. */
     mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
 }
 
@@ -170,7 +170,7 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
 
     /* Multigrid vtable */
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
-    mg_vt->fort_rhs      = &MGTEST_FORT_RHS;
+    mg_vt->fort_rhs       = &MGTEST_FORT_RHS;
 
     mg_vt->fort_beta      = &MGTEST_FORT_BETA;
     
@@ -195,5 +195,6 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
 
     /* Do something with user options? */
     //const user_options_t* user_opt = mgtest_get_options(glob);
+
 }
 
