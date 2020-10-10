@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -79,14 +79,33 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
     sc_options_add_string (opt, 0, "cycle-type", &mg_opt->cycle_type, "V",
                            "Cycle type [V]");
 
-    sc_options_add_string (opt, 0, "patch-solver-type", &mg_opt->patch_solver_type, "BCGS",
-                           "Patch solver type. Can either be BCGS or FFT [BCGS]");
-
     sc_options_add_double (opt, 0, "patch-bcgs-tol", &mg_opt->patch_bcgs_tol, 1e-1,
                            "Tolerance for patch-based bcgs solver [1e-1]");
 
     sc_options_add_int (opt, 0, "patch-bcgs-max-it", &mg_opt->patch_bcgs_max_it, 1000,
                            "Max allowed iterations for patch-based bcgs solver [1000]");
+
+
+    /* Used by starpatch only */
+    sc_options_add_string (opt, 0, "patch-solver-type", &mg_opt->patch_solver_type, "BCGS",
+                           "Patch solver type. Can either be BCGS or FFT [BCGS]");
+
+    /* Set operator type (starpatch, fivepoint) */
+    sc_keyvalue_t *kv_op = mg_opt->kv_patch_operator = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv_op, "starpatch",  STARPATCH);     /* Uses patch-solver-type */
+    sc_keyvalue_set_int (kv_op, "fivepoint",  FIVEPOINT);     /* Uses FFT or BICG */
+    sc_keyvalue_set_int (kv_op, "varpoisson",  VARPOISSON);   /* Uses BICG */
+    sc_keyvalue_set_int (kv_op, "user_operator",  USER_OPERATOR);   /* Uses BICG */
+    sc_options_add_keyvalue (opt, 0, "patch_operator", &mg_opt->patch_operator,
+                             "fivepoint", kv_op, "Set patch operator type [fivepoint]");
+
+    /* Set solver type (FFT, BICG) */
+    sc_keyvalue_t *kv_s = mg_opt->kv_patch_solver = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv_s, "bicg", BICG);
+    sc_keyvalue_set_int (kv_s, "fft",  FFT);     
+    sc_keyvalue_set_int (kv_s, "user_solver",  USER_SOLVER);     
+    sc_options_add_keyvalue (opt, 0, "patch_solver", &mg_opt->patch_solver,
+                             "bicg", kv_s, "Set patch solver type [BICG]");
 
     mg_opt->is_registered = 1;
     return NULL;
@@ -113,6 +132,12 @@ static
 void multigrid_destroy (fc2d_multigrid_options_t * mg_opt)
 {
     fclaw_options_destroy_array (mg_opt->boundary_conditions);
+
+    FCLAW_ASSERT (mg_opt->kv_patch_operator != NULL);
+    sc_keyvalue_destroy (mg_opt->kv_patch_operator);
+
+    FCLAW_ASSERT (mg_opt->kv_patch_solver != NULL);
+    sc_keyvalue_destroy (mg_opt->kv_patch_solver);
 }
 
 /* ------------------------------------------------------

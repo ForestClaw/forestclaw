@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -57,18 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/ValVectorGenerator.h>
 
-#define USE_FIVEPOINT 1
-
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::VarPoisson;
-
-double beta_coeff(const std::array<double,2>& coord)
-{
-    return 1.0;
-}  
-
-
 
 class fivePoint : public PatchOperator<2>
 {
@@ -86,15 +77,10 @@ public:
 };
 
 
-#if 0
-/* Store beta as member in fivePoint */
-void fivePoint::fivePoint>(beta_vec,te_domain,ghost_filler);
-#endif
-
-
 fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
                      std::shared_ptr<const GhostFiller<2>> ghost_filler) : PatchOperator<2>(domain,ghost_filler)
 {
+    /* Nothing to construct yet */
 }
 
 
@@ -145,25 +131,11 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         }
     }
 
+    /* Five-point Laplacian */
     for(int i = 0; i < mx; i++)
-    {
         for(int j = 0; j < my; j++)
-        {
             f[{i,j}] = (u[{i+1,j}] + u[{i-1,j}] + u[{i,j+1}] + u[{i,j-1}] - 4*u[{i,j}])/(dx*dx);
-        }
-    }
 }
-
-#if 0
-void fivePoint::apply(std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector<2>> f) const 
-{
-    //ghost_filler->fillGhost(u);
-    for (auto pinfo : domain->getPatchInfoVector()) {
-        applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-                         f->getLocalData(pinfo->local_index));
-    }
-}
-#endif
 
 
 void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
@@ -186,8 +158,6 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dy = pinfo->spacings[1];
     double dy2 = dy*dy;
 
-    //return;
-
     for(int j = 0; j < my; j++)
     {
         /* bool hasNbr(Side<D> s) */
@@ -208,26 +178,6 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     }
 }
  
-
-#if USE_FIVEPOINT == 0
-/**
- * @brief Restrict the beta coefficient vector for the new domain
- * 
- * @param prev_beta_vec the finer beta vector
- * @param prev_domain the previous (finer) domain
- * @param curr_domain the current (coarser) domain
- * @return shared_ptr<Vector<2>> the restricted beta vector
- */
-shared_ptr<ValVector<2>> restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec, 
-                                        shared_ptr<Domain<2>> prev_domain, 
-                                        shared_ptr<Domain<2>> curr_domain)
-{
-    GMG::LinearRestrictor<2> restrictor(make_shared<GMG::InterLevelComm<2>>(curr_domain, prev_domain));
-    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain);
-    restrictor.restrict(new_beta_vec, prev_beta_vec);
-    return new_beta_vec;
-}
-#endif
 
 void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob) 
 {
@@ -274,40 +224,29 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
-    // define operators for problems
-
-#if 0
-    // get beta function
-    auto beta_func = [&](const std::array<double,2>& coord){
-        double beta;
-        double grad[2];
-        mg_vt->fort_beta(&coord[0],&coord[1],&beta,grad);
-        return beta;
-    };
-#endif  
-
-    // create vector for beta
-    auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->meqn);
-    DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_coeff);
-
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-#if USE_FIVEPOINT == 1
     auto op = make_shared<fivePoint>(te_domain,ghost_filler);
-#else
-    auto op = make_shared<StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
-#endif    
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
-    if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-        solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                     mg_opt->patch_bcgs_tol,
-                                                     mg_opt->patch_bcgs_max_it);
-    }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-        solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
+    switch (mg_opt->patch_solver)
+    {
+        case BICG:
+            solver = make_shared<BiCGStabPatchSolver<2>>(op,
+                                                         mg_opt->patch_bcgs_tol,
+                                                         mg_opt->patch_bcgs_max_it);
+            break;
+        case FFT:
+            /* This ignores the five point operator defined above and just uses the 
+               ThunderEgg operator 'Poisson'. */
+            solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
+            break;
+        default:
+            fclaw_global_essentialf("multigrid_fivepoint : No valid patch solver specified\n");
+            exit(0);            
     }
 
     // create matrix
@@ -352,9 +291,6 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
         //add intermediate levels
-#if USE_FIVEPOINT == 0
-        auto prev_beta_vec = beta_vec;
-#endif    
         auto prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
@@ -363,22 +299,31 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-#if USE_FIVEPOINT == 1
             patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
-#else
-            auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-            patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
-            prev_beta_vec = restricted_beta_vec;
-#endif    
+
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
-            if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-                smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                               mg_opt->patch_bcgs_tol,
-                                                               mg_opt->patch_bcgs_max_it);
-            }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+            switch (mg_opt->patch_solver)
+            {
+                case BICG:
+                    smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                                   mg_opt->patch_bcgs_tol,
+                                                                   mg_opt->patch_bcgs_max_it);
+                    break;
+                case FFT:
+                    smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+                    break;
+                default:
+                    fclaw_global_essentialf("multigrid_fivepoint : No valid " \
+                                            "patch solver specified\n");
+                    exit(0);            
             }
+
+#if 0
+            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                           mg_opt->patch_bcgs_tol,
+                                                           mg_opt->patch_bcgs_max_it);
+#endif                                                           
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, clawpatch_opt->meqn);
@@ -399,20 +344,30 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-#if USE_FIVEPOINT == 1
         patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
-#else
-        auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
-#endif    
+
         //smoother
-        if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
-        }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-            smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+        switch (mg_opt->patch_solver)
+        {
+            case BICG:
+                smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                               mg_opt->patch_bcgs_tol,
+                                                               mg_opt->patch_bcgs_max_it);
+                break;
+            case FFT:
+                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+                break;
+            default:
+                fclaw_global_essentialf("multigrid_fivepoint : No valid " \
+                                        "patch solver specified\n");
+                exit(0);            
         }
+
+#if 0
+        smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                       mg_opt->patch_bcgs_tol,
+                                                       mg_opt->patch_bcgs_max_it);
+#endif                                                       
 
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->meqn);
@@ -431,7 +386,7 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
 
-    fclaw_global_productionf("Iterations: %i\n", its);
+    fclaw_global_productionf("Iterations: %i\n", its);    
     fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
     fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
     fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());

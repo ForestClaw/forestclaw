@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "operators/fc2d_multigrid_fivepoint.h"
 #include "operators/fc2d_multigrid_starpatch.h"
+#include "operators/fc2d_multigrid_varpoisson.h"
 
 
 
@@ -91,9 +92,34 @@ void multigrid_solve(fclaw2d_global_t* glob)
 
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();  
 
-    FCLAW_ASSERT(mg_vt->solve != NULL);
+    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
 
-    mg_vt->solve(glob);
+    /* Should the operators be part of the multigrid library? Yes, for now, at least */
+    switch (mg_opt->patch_operator)
+    {
+        case STARPATCH:
+            mg_vt->patch_operator = fc2d_multigrid_starpatch_solve;
+            break;
+        case FIVEPOINT:
+            mg_vt->patch_operator = fc2d_multigrid_fivepoint_solve;
+            break;
+        case VARPOISSON:
+            mg_vt->patch_operator = fc2d_multigrid_varpoisson_solve;
+            break;
+        case USER_OPERATOR:
+            if (mg_vt->patch_operator == NULL)
+            {
+                fclaw_global_essentialf("multigrid_solve : User specified operator not set\n");
+                exit(0);
+            }
+        default:
+            break;
+            /* user has specified something, hopefully */
+    }
+    
+    FCLAW_ASSERT(mg_vt->patch_operator != NULL);
+
+    mg_vt->patch_operator(glob);
 }
 
 /* ---------------------------------- Output functions -------------------------------- */
@@ -154,8 +180,10 @@ void fc2d_multigrid_solver_initialize()
     mg_vt->fort_apply_bc = &MULTIGRID_FORT_APPLY_BC_DEFAULT;
     mg_vt->fort_eval_bc  = &MULTIGRID_FORT_EVAL_BC_DEFAULT;
 
-    /* Default five-point solver */
-    mg_vt->solve = fc2d_multigrid_fivepoint_solve;
+#if 0
+    /* Operator is specified in solve routine, above*/
+    mg_vt->patch_operator = NULL;
+#endif    
 
 	mg_vt->is_set = 1;
 }

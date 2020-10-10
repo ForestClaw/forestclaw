@@ -6,7 +6,8 @@ libmultigrid_installed_headers = \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_options.h \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_physical_bc.h \
 	src/solvers/fc2d_multigrid/operators/fc2d_multigrid_starpatch.h \
-	src/solvers/fc2d_multigrid/operators/fc2d_multigrid_fivepoint.h
+	src/solvers/fc2d_multigrid/operators/fc2d_multigrid_fivepoint.h \
+	src/solvers/fc2d_multigrid/operators/fc2d_multigrid_varpoisson.h
 
 libmultigrid_compiled_sources = \
 	src/solvers/fc2d_multigrid/fc2d_multigrid.cpp \
@@ -16,6 +17,7 @@ libmultigrid_compiled_sources = \
 	src/solvers/fc2d_multigrid/fc2d_multigrid_solve.cpp \
 	src/solvers/fc2d_multigrid/operators/fc2d_multigrid_starpatch.cpp \
 	src/solvers/fc2d_multigrid/operators/fc2d_multigrid_fivepoint.cpp \
+	src/solvers/fc2d_multigrid/operators/fc2d_multigrid_varpoisson.cpp \
 	src/solvers/fc2d_multigrid/fort_4.6/multigrid_apply_bc_default.f90 \
 	src/solvers/fc2d_multigrid/fort_4.6/multigrid_eval_bc_default.f90
 

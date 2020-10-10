@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ typedef void (*fc2d_multigrid_fort_apply_bc_t)(const int* blockno, const  int* m
                                                int intersects_bc[], int mthbc[], 
                                                double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc);
 
-typedef void (*fc2d_multigrid_solve_t)(struct fclaw2d_global *glob);
+typedef void (*fc2d_multigrid_operator_t)(struct fclaw2d_global *glob);
 
 /* -------------------------- Solver and utilities ------------------------------------ */
 
@@ -79,6 +79,8 @@ fc2d_multigrid_vtable_t* fc2d_multigrid_vt();
 
 struct fc2d_multigrid_vtable
 {
+    /* Solver that defines patch operator and calls ThunderEgg solver */
+    fc2d_multigrid_operator_t        patch_operator;  /* 'operator' is a keyword */
 
 	/* Fortran routines */
 	fc2d_multigrid_fort_rhs_t        fort_rhs;	
@@ -86,11 +88,7 @@ struct fc2d_multigrid_vtable
     fc2d_multigrid_fort_apply_bc_t   fort_apply_bc;
     fc2d_multigrid_fort_eval_bc_t    fort_eval_bc;
 
-    /* Solver that defines patch operator and calls ThunderEgg solver */
-    fc2d_multigrid_solve_t           solve; 
-
 	int is_set;
-
 };
 
 void fc2d_multigrid_solver_initialize(void);

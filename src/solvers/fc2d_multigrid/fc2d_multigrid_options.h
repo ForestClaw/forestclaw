@@ -40,9 +40,24 @@ struct fclaw2d_global;
 
 typedef struct fc2d_multigrid_options fc2d_multigrid_options_t;
 
+
+typedef enum {
+    STARPATCH = 0,  /* ThunderEgg operator */
+    FIVEPOINT,      /* Laplacian (no beta) */
+    VARPOISSON,      /* Variable Poisson operator */
+    USER_OPERATOR
+} fc2d_multigrid_operator_types;
+
+typedef enum {
+    FFT = 0,    /* Must use starpatch or fivepoint */
+    BICG,       /* Can be used with any operator */
+    USER_SOLVER
+} fc2d_multigrid_solver_types;
+
+
 struct fc2d_multigrid_options
 {
-    int mwaves;
+    int mfields;  /* Number of fields in the solution */
 
     /* Boundary conditions */
     int *boundary_conditions;
@@ -52,12 +67,11 @@ struct fc2d_multigrid_options
     int ascii_out;
     int vtk_out;
 
-    int is_registered;
-
     /* bicgstab settings */
     int mg_prec;
     int max_it;
     double tol;
+
     /* multigrid cyle settings */
     int max_levels;
     double patches_per_proc;
@@ -70,7 +84,18 @@ struct fc2d_multigrid_options
     /* bicgstab patch solver settings*/
     int patch_bcgs_max_it;
     double patch_bcgs_tol;
+
+    /* Used by starpatch only */
     const char *patch_solver_type;
+
+    int patch_operator;
+    sc_keyvalue_t *kv_patch_operator;
+
+    int patch_solver;
+    sc_keyvalue_t *kv_patch_solver;
+
+
+    int is_registered;
 };
 
 fclaw_exit_type_t fc2d_multigrid_postprocess (fc2d_multigrid_options_t *
