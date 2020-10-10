@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "mgtest_user.h"
+#include "mgtest_options.h"
 
 #include <fclaw2d_include_all.h>
 
@@ -35,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_multigrid_fort.h>
 #include <fc2d_multigrid_options.h>
 #include <fc2d_multigrid_physical_bc.h>
+#include <fc2d_multigrid_starpatch.h>
+#include <fc2d_multigrid_fivepoint.h>
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -194,7 +197,20 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     }
 
     /* Do something with user options? */
-    //const user_options_t* user_opt = mgtest_get_options(glob);
+    const mgtest_options_t* user = mgtest_get_options(glob);
+
+    switch (user->patch_operator)
+    {
+        case FIVEPOINT:
+            mg_vt->solve = fc2d_multigrid_fivepoint_solve;
+            break;
+        case STARPATCH:
+            mg_vt->solve = fc2d_multigrid_starpatch_solve;
+            break;
+        default:
+            fclaw_global_essentialf("No operator specified\n");
+            exit(0);
+    }
 
 }
 

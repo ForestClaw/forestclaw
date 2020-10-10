@@ -37,6 +37,14 @@ extern "C"
 #endif
 
 /* ------------------------------------- Options ---------------------------------------*/
+
+typedef enum {
+    STARPATCH = 0,
+    FIVEPOINT=1
+} mgtest_operator_types;
+
+
+
 typedef struct mgtest_options
 {
     /* Put any user options here */
@@ -52,6 +60,9 @@ typedef struct mgtest_options
 
     double eps_disk;
     
+    int patch_operator;
+    sc_keyvalue_t *kv_patch_operator;
+
     int m_polar;    // number of polar flowers
 
     double *x0_polar;
