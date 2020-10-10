@@ -76,7 +76,7 @@ shared_ptr<ValVector<2>> restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec,
 {
     GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, prev_beta_vec->getNumComponents(), true);
     auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, prev_beta_vec->getNumComponents());
-    restrictor.restrict(new_beta_vec, prev_beta_vec);
+    restrictor.restrict(prev_beta_vec, new_beta_vec);
     return new_beta_vec;
 }
 
