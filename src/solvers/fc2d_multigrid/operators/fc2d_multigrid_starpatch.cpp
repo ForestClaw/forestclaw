@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -61,13 +61,6 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::VarPoisson;
 
-#if 0
-double beta_coeff(const std::array<double,2>& coord)
-{
-    return 1.0;
-}  
-#endif
-
 
 /**
  * @brief Restrict the beta coefficient vector for the new domain
@@ -81,8 +74,8 @@ shared_ptr<ValVector<2>> restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec,
                                         shared_ptr<Domain<2>> prev_domain, 
                                         shared_ptr<Domain<2>> curr_domain)
 {
-    GMG::LinearRestrictor<2> restrictor(make_shared<GMG::InterLevelComm<2>>(curr_domain, prev_domain));
-    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain);
+    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, prev_beta_vec->getNumComponents(), true);
+    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, prev_beta_vec->getNumComponents());
     restrictor.restrict(new_beta_vec, prev_beta_vec);
     return new_beta_vec;
 }
@@ -134,19 +127,17 @@ void fc2d_multigrid_starpatch_solve(fclaw2d_global_t *glob)
 
     // define operators for problems
 
-#if 0
+#if 1
     // get beta function
     auto beta_func = [&](const std::array<double,2>& coord){
-        double beta;
-        double grad[2];
-        //mg_vt->fort_beta(&coord[0],&coord[1],&beta,grad);
-        return 1.0;
+        double beta = 1.0;
+        return beta;
     };
-#endif    
+#endif  
 
     // create vector for beta
     auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->meqn);
-    DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_coeff);
+    DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_func);
 
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);

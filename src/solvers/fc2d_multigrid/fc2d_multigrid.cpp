@@ -155,7 +155,7 @@ void fc2d_multigrid_solver_initialize()
     mg_vt->fort_eval_bc  = &MULTIGRID_FORT_EVAL_BC_DEFAULT;
 
     /* Default five-point solver */
-    mg_vt->solve = fc2d_multigrid_solve;
+    mg_vt->solve = fc2d_multigrid_fivepoint_solve;
 
 	mg_vt->is_set = 1;
 }
