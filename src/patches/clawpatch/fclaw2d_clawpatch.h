@@ -57,6 +57,13 @@ typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob
                                                      fclaw2d_clawpatch_packmode_t packmode,
                                                      int *ierror);
 
+/* ------------------------------ typedefs - output ----------------------------------- */
+
+typedef void (*clawpatch_time_header_t)(struct fclaw2d_global* glob, int iframe);
+
+
+/* ---------------------------- typedefs - diagnostics -------------------------------- */
+
 typedef void (*clawpatch_diagnostics_cons_t)(struct fclaw2d_global *glob,
                                              struct fclaw2d_patch *patch,
                                              int blockno,
@@ -100,6 +107,7 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
 
     /* output functions (ascii) */
+    clawpatch_time_header_t                time_header_ascii;
     clawpatch_fort_header_ascii_t          fort_header_ascii;
 
     fclaw2d_patch_callback_t               cb_output_ascii;    

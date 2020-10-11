@@ -1054,7 +1054,8 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	patch_vt->partition_unpack     = clawpatch_partition_unpack;
 
 	/* output functions */
-	clawpatch_vt->cb_output_ascii  = cb_clawpatch_output_ascii; 
+	clawpatch_vt->time_header_ascii  = fclaw2d_clawpatch_time_header_ascii;
+	clawpatch_vt->cb_output_ascii    = cb_clawpatch_output_ascii; 
 
 	/* Metric access */
 	patch_vt->metric_patch         = clawpatch_get_metric_patch;
@@ -1214,10 +1215,10 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_global_t* glob,
 }
 
 void fclaw2d_clawpatch_rhs_data(fclaw2d_global_t* glob,
-								 fclaw2d_patch_t* this_patch,
+								 fclaw2d_patch_t* patch,
 								 double **rhs, int *mfields)
 {
-	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
+	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
 	*rhs = cp->rhs.dataPtr();
 	*mfields = cp->mfields;
 }
