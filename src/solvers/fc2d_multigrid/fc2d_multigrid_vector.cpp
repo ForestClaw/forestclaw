@@ -34,7 +34,7 @@ fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob)
 
     fclaw2d_domain_t *domain = glob->domain;
 
-    mfields = clawpatch_opt->rhs_fields;
+    int mfields = clawpatch_opt->rhs_fields;
 
     ns[0] = clawpatch_opt->mx;
     ns[1] = clawpatch_opt->my;

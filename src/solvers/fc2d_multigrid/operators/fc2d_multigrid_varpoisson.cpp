@@ -262,7 +262,7 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
     };
 
     // create vector for beta
-    auto beta_vec = ValVector<2>::GetNewVector(te_domain, mg_opt->mfields);
+    auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->rhs_fields);
     DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_coeff);
 #endif
 
@@ -312,10 +312,10 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
 
         //restrictor
         auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                next_domain, mg_opt->mfields);
+                                                                next_domain, clawpatch_opt->rhs_fields);
 
         //vector generator
-        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, mg_opt->mfields);
+        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
 
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
@@ -337,13 +337,13 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
                                                            mg_opt->patch_bcgs_max_it);
 
             //restrictor
-            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, mg_opt->mfields);
+            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, clawpatch_opt->rhs_fields);
 
             //interpolator
-            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, mg_opt->mfields);
+            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
             //vector generator
-            vg = make_shared<ValVectorGenerator<2>>(curr_domain, mg_opt->mfields);
+            vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
 
             builder.addIntermediateLevel(patch_operator, smoother, restrictor, interpolator, vg);
 
@@ -363,10 +363,10 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
                                                        mg_opt->patch_bcgs_max_it);
 
         //interpolator
-        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, mg_opt->mfields);
+        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
         //vector generator
-        vg = make_shared<ValVectorGenerator<2>>(curr_domain, mg_opt->mfields);
+        vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
 
         builder.addCoarsestLevel(patch_operator, smoother, interpolator, vg);
 
@@ -374,7 +374,7 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
     }
 
     // solve
-    auto vg = make_shared<ValVectorGenerator<2>>(te_domain, mg_opt->mfields);
+    auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
     shared_ptr<Vector<2>> u = vg->getNewVector();
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);

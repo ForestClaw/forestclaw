@@ -57,8 +57,6 @@ typedef enum {
 
 struct fc2d_multigrid_options
 {
-    int mfields;  /* Number of fields in the solution */
-
     /* Boundary conditions */
     int *boundary_conditions;
     const char *bc_cond_string;

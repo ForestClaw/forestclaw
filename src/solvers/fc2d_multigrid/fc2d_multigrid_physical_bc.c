@@ -63,8 +63,6 @@ void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
     int mfields;
     double *rhs;
     fclaw2d_clawpatch_rhs_data(s->glob,patch,&rhs,&mfields);
-    FCLAW_ASSERT(mfields == 1);
-
 
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
 

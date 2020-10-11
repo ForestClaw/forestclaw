@@ -36,8 +36,10 @@ static void*
 multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
 {
 
+#if 0
     sc_options_add_int (opt, 0, "mfields", &mg_opt->mfields, 0,
                         "The number of fields in solution [1]");
+#endif                        
 
 
     /* Array of NumFaces=4 values */
