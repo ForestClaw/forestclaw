@@ -242,6 +242,68 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
 }
 
 
+int mgtest_tag4refinement(fclaw2d_global_t *glob,
+                             fclaw2d_patch_t *this_patch,
+                             int blockno, int patchno,
+                             int initflag)
+{
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+
+    int tag_patch;
+    double refine_threshold;
+
+    refine_threshold = fclaw_opt->refine_threshold;
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *rhs;
+    int mfields;
+    fclaw2d_clawpatch_rhs_data(glob,this_patch,&rhs,&mfields);
+
+    tag_patch = 0;
+    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
+                                      &blockno, rhs,&refine_threshold,
+                                      &initflag,&tag_patch);
+    return tag_patch;
+}
+
+static
+int mgtest_tag4coarsening(fclaw2d_global_t *glob,
+                             fclaw2d_patch_t *fine_patches,
+                             int blockno,
+                             int patchno)
+{
+    fclaw2d_patch_t *patch0 = &fine_patches[0];
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double coarsen_threshold = fclaw_opt->coarsen_threshold;
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *rhs[4];
+    int mfields;
+    for (int igrid = 0; igrid < 4; igrid++)
+    {
+        fclaw2d_clawpatch_rhs_data(glob,&fine_patches[igrid],&rhs[igrid],&mfields);
+    }
+
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+    int tag_patch = 0;
+    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
+                                      &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
+                                      &coarsen_threshold,&tag_patch);
+    return tag_patch == 1;
+}
+
 
 void mgtest_link_solvers(fclaw2d_global_t *glob)
 {
@@ -269,6 +331,8 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_compute_patch_error = &MGTEST_COMPUTE_ERROR;
 
     // tagging routines
+    patch_vt->tag4refinement       = mgtest_tag4refinement;
+    patch_vt->tag4coarsening       = mgtest_tag4coarsening;
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 
