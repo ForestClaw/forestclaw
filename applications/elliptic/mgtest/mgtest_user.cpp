@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_elliptic_solver.h>
 
 
+#include <fclaw2d_farraybox.hpp>
+
+
 static
 void mgtest_problem_setup(fclaw2d_global_t *glob)
 {
@@ -173,27 +176,25 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
 
-    int intersects_bc[4];
-    fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
-
 
     /* Need a better way to determine which diagnostic to do */
     double* area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
                                           area, rhs, error_data->rhs,
                                           &error_data->c_kahan);
-#if 0
     fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
 
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
 
+    int intersects_bc[4];
+    fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
+
     double t = glob->curr_time;
     int cons_check = 1;
     MGTEST_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
-                         &xlower, &ylower, &dx,&dy,&t, intersects_bc,
-                         mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
-                         &cons_check, error_data->boundary);
-#endif                         
+                              &xlower, &ylower, &dx,&dy,&t, intersects_bc,
+                              mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
+                              &cons_check, error_data->boundary);
 
 }
 
