@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include <fc2d_multigrid.h>
@@ -172,14 +173,8 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
 
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
-
     int intersects_bc[4];
     fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
-
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
-
-    double t = glob->curr_time;
 
 
     /* Need a better way to determine which diagnostic to do */
@@ -187,11 +182,56 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
                                           area, rhs, error_data->rhs,
                                           &error_data->c_kahan);
+#if 0
+    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+
+    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+
+    double t = glob->curr_time;
     int cons_check = 1;
     MGTEST_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
                          &xlower, &ylower, &dx,&dy,&t, intersects_bc,
                          mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
                          &cons_check, error_data->boundary);
+#endif                         
+
+}
+
+static
+void mgtest_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+{
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                fclaw2d_clawpatch_get_options(glob);
+    char matname1[20];
+    sprintf(matname1,"fort.q%04d",iframe);
+
+#if 0
+    FILE *f1 = fopen(matname1,"w");
+    fclose(f1);
+#endif    
+
+
+    char matname2[20];
+    sprintf(matname2,"fort.t%04d",iframe);
+
+    double time = glob->curr_time;
+
+    int ngrids = glob->domain->global_num_patches;
+
+    int mfields = clawpatch_opt->rhs_fields;  
+    int maux = clawpatch_opt->maux;
+
+
+    FILE *f2 = fopen(matname2,"w");
+    fprintf(f2,"%12.6f %23s\n%5d %30s\n%5d %30s\n%5d %30s\n%5d %30s\n",time,"time",
+            mfields+2,"mfields",ngrids,"ngrids",maux,"num_aux",2,"num_dim");
+    fclose(f2);
+
+#if 0
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    /* header writes out mfields+2 fields (computed soln, true soln, error); */
+    clawpatch_vt->fort_header_ascii(matname1,matname2,&time,&mfields,&maux,&ngrids);
+#endif    
 
 }
 
@@ -341,7 +381,8 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error) 
     {
-        clawpatch_vt->fort_header_ascii = &MGTEST_FORT_HEADER_ASCII;
+        clawpatch_vt->time_header_ascii = mgtest_time_header_ascii;
+        //clawpatch_vt->fort_header_ascii = &MGTEST_FORT_HEADER_ASCII;
         clawpatch_vt->cb_output_ascii = cb_mgtest_output_ascii;        
     }
 
