@@ -1,11 +1,11 @@
 subroutine multigrid_fort_apply_bc_default(blockno, mx, my,mbc,meqn,xlower,ylower, &
-    dx,dy,t,intersects_bc,bctype,rhs,g_bc)
+    dx,dy,t,intersects_bc,bctype,rhs,g_bc, cons_check, flux_sum)
 
     implicit none
 
     external g_bc
-    integer blockno, mx,my,mbc,meqn,intersects_bc(0:3),bctype(0:3)
-    double precision xlower,ylower,dx,dy, t
+    integer blockno, mx,my,mbc,meqn,intersects_bc(0:3),bctype(0:3), cons_check
+    double precision xlower,ylower,dx,dy, t, flux_sum(0:3)
     double precision rhs(1-mbc:mx+mbc,1-mbc:my+mbc)
 
     !! Dummy argument needed to apply BC

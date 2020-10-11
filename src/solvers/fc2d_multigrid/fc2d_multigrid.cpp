@@ -66,22 +66,23 @@ void multigrid_rhs(fclaw2d_global_t *glob,
                    int blockno,
                    int patchno)
 {
-	int mx,my,mbc, meqn;
-	double dx,dy,xlower,ylower;
-	double *q;
-
 	fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
 
 	FCLAW_ASSERT(mg_vt->fort_rhs != NULL); /* Must be initialized */
 
+    int mx,my,mbc;
+    double dx,dy,xlower,ylower;
 	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
-	fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
-	FCLAW_ASSERT(meqn == 1);
+    int mfields;
+    double *rhs;
+	fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+	FCLAW_ASSERT(mfields == 1);
 
 	/* Compute right hand side */
-	mg_vt->fort_rhs(&blockno, &mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
+	mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&mfields,
+                    &xlower,&ylower,&dx,&dy,rhs);
 }
 
 static
@@ -90,8 +91,7 @@ void multigrid_solve(fclaw2d_global_t* glob)
     // Apply non-homogeneous boundary conditions 
     fc2d_multigrid_physical_bc(glob);
 
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();  
-
+    fc2d_multigrid_vtable_t  *mg_vt  = fc2d_multigrid_vt();  
     fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
 
     /* Should the operators be part of the multigrid library? Yes, for now, at least */
@@ -159,7 +159,6 @@ void fc2d_multigrid_solver_initialize()
 
     //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
 
-
 	/* ForestClaw vtable items */
 	fclaw2d_vtable_t*   fclaw_vt = fclaw2d_vt();
 	fclaw_vt->output_frame      = multigrid_output;
@@ -168,13 +167,11 @@ void fc2d_multigrid_solver_initialize()
 	fclaw2d_patch_vtable_t*   patch_vt = fclaw2d_patch_vt();  
 	patch_vt->rhs            = multigrid_rhs;  /* Calls FORTRAN routine */
 	patch_vt->setup          = NULL;
-
     
     fclaw2d_elliptic_vtable_t *elliptic_vt = fclaw2d_elliptic_vt();
     elliptic_vt->setup = multigrid_setup_solver;
     elliptic_vt->solve = multigrid_solve;    
     elliptic_vt->apply_bc = fc2d_multigrid_physical_bc;
-
 
 	fc2d_multigrid_vtable_t*  mg_vt = multigrid_vt_init();	
     mg_vt->fort_apply_bc = &MULTIGRID_FORT_APPLY_BC_DEFAULT;

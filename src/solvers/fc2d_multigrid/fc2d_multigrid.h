@@ -46,6 +46,7 @@ typedef  struct fc2d_multigrid_vtable  fc2d_multigrid_vtable_t;
 typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* blockno, 
                                            const int* mbc,
                                            const int* mx, const int* my,
+                                           const int* mfields,
                                            const double* xlower, const double* ylower,
                                            const double* dx, const double* dy,
                                            double rhs[]);
@@ -64,7 +65,8 @@ typedef void (*fc2d_multigrid_fort_apply_bc_t)(const int* blockno, const  int* m
                                                const double* dx, const double* dy, 
                                                const double *t, 
                                                int intersects_bc[], int mthbc[], 
-                                               double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc);
+                                               double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc, 
+                                               int* cons_check, double flux_sum[]);
 
 typedef void (*fc2d_multigrid_operator_t)(struct fclaw2d_global *glob);
 

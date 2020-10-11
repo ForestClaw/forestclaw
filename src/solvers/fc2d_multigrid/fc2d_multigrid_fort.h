@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -44,12 +44,13 @@ extern "C"
                                                        MULTIGRID_FORT_APPLY_BC_DEFAULT)
 
 void MULTIGRID_FORT_APPLY_BC_DEFAULT(const int* blockno, const  int* mx, const  int* my, 
-                                     const  int* mbc, const  int* meqn, 
+                                     const  int* mbc, const  int* mfields, 
                                      const double* xlower, const double* ylower,
                                      const double* dx, const double* dy, 
                                      const double* t, 
                                      int intersects_bc[], int mthbc[], 
-                                     double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc);
+                                     double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc, 
+                                     int *cons_check, double flux_sum[]);
 
 
 #define MULTIGRID_FORT_EVAL_BC_DEFAULT FCLAW_F77_FUNC(multigrid_fort_eval_bc_default, \

@@ -20,7 +20,7 @@ class fc2d_multigrid_vector : public ThunderEgg::Vector<2> {
     /**
      * @brief the number of equations
      */
-    int meqn;
+    int mfields;
     /**
      * @brief stride to next eqn in patch
      */

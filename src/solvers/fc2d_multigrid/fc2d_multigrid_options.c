@@ -36,6 +36,10 @@ static void*
 multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
 {
 
+    sc_options_add_int (opt, 0, "mfields", &mg_opt->mfields, 0,
+                        "The number of fields in solution [1]");
+
+
     /* Array of NumFaces=4 values */
     fclaw_options_add_int_array (opt, 0, "boundary_conditions", 
                                  &mg_opt->bc_cond_string, "1 1 1 1",

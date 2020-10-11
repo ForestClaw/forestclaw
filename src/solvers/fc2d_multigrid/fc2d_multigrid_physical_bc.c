@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -59,20 +59,21 @@ void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    int meqn;
+    const fc2d_multigrid_options_t* mg_opt = fc2d_multigrid_get_options(s->glob);
+    int mfields;
     double *rhs;
-    fclaw2d_clawpatch_soln_data(s->glob,patch,&rhs,&meqn);
-    FCLAW_ASSERT(meqn == 1);
+    fclaw2d_clawpatch_rhs_data(s->glob,patch,&rhs,&mfields);
+    FCLAW_ASSERT(mfields == 1);
 
 
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
 
-    const fc2d_multigrid_options_t* mg_options;
-    mg_options = fc2d_multigrid_get_options(s->glob);
-
-    mg_vt->fort_apply_bc(&blockno, &mx, &my, &mbc, &meqn, &xlower, &ylower,
-                         &dx,&dy,&t, intersects_bc,
-                         mg_options->boundary_conditions,rhs, mg_vt->fort_eval_bc);
+    int cons_check = 0;
+    double flux_sum[4];
+    mg_vt->fort_apply_bc(&blockno, &mx, &my, &mbc, &mfields, 
+                         &xlower, &ylower, &dx,&dy,&t, intersects_bc,
+                         mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
+                         &cons_check, flux_sum);
 
 
 

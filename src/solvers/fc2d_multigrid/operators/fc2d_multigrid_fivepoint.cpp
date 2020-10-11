@@ -283,10 +283,10 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
         shared_ptr<GMG::Smoother<2>> smoother = solver;
 
         //restrictor
-        auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, clawpatch_opt->meqn);
+        auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, mg_opt->mfields);
 
         //vector generator
-        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->meqn);
+        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, mg_opt->mfields);
 
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
@@ -326,13 +326,13 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 #endif                                                           
 
             //restrictor
-            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, clawpatch_opt->meqn);
+            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, mg_opt->mfields);
 
             //interpolator
-            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->meqn);
+            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, mg_opt->mfields);
 
             //vector generator
-            vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->meqn);
+            vg = make_shared<ValVectorGenerator<2>>(curr_domain, mg_opt->mfields);
 
             builder.addIntermediateLevel(patch_operator, smoother, restrictor, interpolator, vg);
 
@@ -370,10 +370,10 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 #endif                                                       
 
         //interpolator
-        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->meqn);
+        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, mg_opt->mfields);
 
         //vector generator
-        vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->meqn);
+        vg = make_shared<ValVectorGenerator<2>>(curr_domain, mg_opt->mfields);
 
         builder.addCoarsestLevel(patch_operator, smoother, interpolator, vg);
 
@@ -381,21 +381,26 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
     }
 
     // solve
-    auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->meqn);
+    auto vg = make_shared<ValVectorGenerator<2>>(te_domain, mg_opt->mfields);
     shared_ptr<Vector<2>> u = vg->getNewVector();
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
 
     fclaw_global_productionf("Iterations: %i\n", its);    
-    fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
-    fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());
-    fclaw_global_productionf("u-infnorm: %f\n\n", u->infNorm());
+
+    /* Solution is copied to right hand side */
+    f->copy(u);
+
+#if 0    
+    fclaw_global_productionf("f-2norm:   %24.16f\n", f->twoNorm());
+    fclaw_global_productionf("f-infnorm: %24.16f\n", f->infNorm());
+    fclaw_global_productionf("u-2norm:   %24.16f\n", u->twoNorm());
+    fclaw_global_productionf("u-infnorm: %24.16f\n\n", u->infNorm());
 
     // copy solution into rhs
-    f->copy(u);
     fclaw_global_productionf("Checking if copy function works:\n");
-    fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
+    fclaw_global_productionf("fcopy-2norm:   %24.16f\n", f->twoNorm());
+    fclaw_global_productionf("fcopy-infnorm: %24.16f\n\n", f->infNorm());
+#endif    
 }
 
