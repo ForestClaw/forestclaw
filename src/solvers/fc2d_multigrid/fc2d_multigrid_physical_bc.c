@@ -68,10 +68,13 @@ void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
 
     int cons_check = 0;
     double flux_sum[4];
+
+#if 0
     mg_vt->fort_apply_bc(&blockno, &mx, &my, &mbc, &mfields, 
                          &xlower, &ylower, &dx,&dy,&t, intersects_bc,
                          mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
                          &cons_check, flux_sum);
+#endif                         
 
 
 
