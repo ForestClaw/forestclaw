@@ -168,44 +168,54 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         !! Ghost cells now all filled in.  Now apply variable coefficent
         !! Laplace operator
 
-        if (ccheck) then            
+        if (intersects_bc(0) .ne. 0) then
             do j = 1,my
-                flux(0) = beta(i,j,2)*(rhs(1,j,m) - qh(0,j,m))/dx
-                flux(1) = beta(i+1,j,2)*(qh(mx+1,j,m) - rhs(mx,j,m))/dx
-                if (intersects_bc(0) .ne. 0) then
-                    flux_sum(m) = flux_sum(m) - flux(0)*dy
+                if (ccheck) then
+                    flux(0) = beta(1,j,2)*(rhs(1,j,m) - qh(0,j,m))/dx
+                    flux_sum(m) = flux_sum(m) - flux(0)*dy    
+                else
+                    flux(0) = beta(1,j,2)*(qh(1,j,m) - qh(0,j,m))/dx
+                    rhs(1,j,m) = rhs(1,j,m) - (-flux(0)/dx)
                 endif
-                if (intersects_bc(1) .ne. 0) then
+            end do
+        endif            
+        
+        if (intersects_bc(1) .ne. 0) then
+            do j = 1,my
+                if (ccheck) then
+                    flux(1) = beta(mx+1,j,2)*(qh(mx+1,j,m) - rhs(mx,j,m))/dx
                     flux_sum(m) = flux_sum(m) + flux(1)*dy
+                else
+                    flux(1) = beta(mx+1,j,2)*(qh(mx+1,j,m) - qh(mx,j,m))/dx
+                    rhs(mx,j,m) = rhs(mx,j,m) - (flux(1)/dx)
                 endif
             end do
-
-            do i = 1,mx
-                flux(2) = beta(i,j,3)*(rhs(i,1,m) - qh(i,0,m))/dy
-                flux(3) = beta(i,j+1,3)*(qh(i,my+1,m) - rhs(i,my,m))/dy           
-                if (intersects_bc(2) .ne. 0) then
-                    flux_sum(m) = flux_sum(m) - flux(2)*dx
-                endif
-                if (intersects_bc(3) .ne. 0) then
-                    flux_sum(m) = flux_sum(m) + flux(3)*dx
-                endif
-            end do
-        else
-            do i = 1,mx
-                do j = 1,my
-                    if ((j .eq. 1 .or. j .eq. my) .or. & 
-                        (i .eq. 1 .or. i .eq. mx)) then                
-                        flux(0) = beta(i,j,2)*(qh(i,j,m) - qh(i-1,j,m))/dx
-                        flux(1) = beta(i+1,j,2)*(qh(i+1,j,m) - qh(i,j,m))/dx
-                        flux(2) = beta(i,j,3)*(qh(i,j,m) - qh(i,j-1,m))/dy
-                        flux(3) = beta(i,j+1,3)*(qh(i,j+1,m) - qh(i,j,m))/dy
-                        div_beta_grad_u = (flux(1) - flux(0))/dx + & 
-                            (flux(3) - flux(2))/dy
-                        rhs(i,j,m) = rhs(i,j,m) - div_beta_grad_u
-                    endif
-                end do
-            end do 
         endif
+
+        if (intersects_bc(2) .ne. 0) then
+            do i = 1,mx
+                if (ccheck) then
+                    flux(2) = beta(i,1,3)*(rhs(i,1,m) - qh(i,0,m))/dy
+                    flux_sum(m) = flux_sum(m) - flux(2)*dx
+                else
+                    flux(2) = beta(i,1,3)*(qh(i,1,m) - qh(i,0,m))/dy
+                    rhs(i,1,m) = rhs(i,1,m) - (-flux(2)/dy)
+                endif
+            end do
+        endif
+
+        if (intersects_bc(3) .ne. 0) then
+            do i = 1,mx
+                if (ccheck) then
+                    flux(3) = beta(i,my+1,3)*(qh(i,my+1,m) - rhs(i,my,m))/dy           
+                    flux_sum(m) = flux_sum(m) + flux(3)*dx
+                else
+                    flux(3) = beta(i,my+1,3)*(qh(i,my+1,m) - qh(i,my,m))/dy           
+                    rhs(i,my,m) = rhs(i,my,m) - (flux(3)/dy)
+                endif
+            end do
+        endif
+
     end do
 
 end subroutine mgtest_fort_apply_bc
