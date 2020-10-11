@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_conservation.h>
+#include <fclaw2d_clawpatch_diagnostics.h>
 
 
 #ifdef __cplusplus
@@ -43,10 +44,11 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
+
+/* --------------------------------- Typedefs ----------------------------------------- */
 typedef void (*clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
                                           struct fclaw2d_patch *patch,
                                           void* user);
-/* --------------------------------- Typedefs ----------------------------------------- */
 
 typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob,
                                                      struct fclaw2d_patch *this_patch,
@@ -55,7 +57,17 @@ typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob
                                                      fclaw2d_clawpatch_packmode_t packmode,
                                                      int *ierror);
 
+typedef void (*clawpatch_diagnostics_cons_t)(struct fclaw2d_global *glob,
+                                             struct fclaw2d_patch *patch,
+                                             int blockno,
+                                             int patchno,
+                                             error_info_t *error_data);
 
+typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
+                                              struct fclaw2d_patch *patch,
+                                              int blockno,
+                                              int patchno,
+                                              error_info_t *error_data);
 /* ---------------------------- Virtual table ------------------------------------ */
 
 /* members of this structure provide the only access to above functions */
@@ -102,10 +114,15 @@ struct fclaw2d_clawpatch_vtable
     
 
     /* diagnostic functions */
+    clawpatch_diagnostics_cons_t           conservation_check;
+    clawpatch_diagnostics_error_t          compute_error;
+
     clawpatch_fort_error_t                 fort_compute_patch_error;
     clawpatch_fort_conscheck_t             fort_conservation_check;
     clawpatch_fort_norm_t                  fort_compute_error_norm;
     clawpatch_fort_area_t                  fort_compute_patch_area;
+
+    /* Diagnostics */
 
     int is_set;
 };
@@ -162,6 +179,10 @@ void fclaw2d_clawpatch_soln_data(struct fclaw2d_global* glob,
 void fclaw2d_clawpatch_aux_data(struct fclaw2d_global *glob,
                                 struct fclaw2d_patch *this_patch,
                                 double **aux, int* maux);
+
+void fclaw2d_clawpatch_rhs_data(struct fclaw2d_global* glob,
+                                fclaw2d_patch_t* this_patch,
+                                double **rhs, int *mfields);
 
 double* fclaw2d_clawpatch_get_q(struct fclaw2d_global* glob,
                                 struct fclaw2d_patch* this_patch);

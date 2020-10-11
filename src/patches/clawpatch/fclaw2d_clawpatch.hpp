@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,9 @@ public :
     FArrayBox griddata_save;
     FArrayBox griddata_time_interpolated;
     FArrayBox griderror;
+
+    int mfields;  /* Number of fields in the rhs */
+    FArrayBox rhs;  /* For elliptic problems */
 
     /* For diagnostics */
     FArrayBox exactsolution;

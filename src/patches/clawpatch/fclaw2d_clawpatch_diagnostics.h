@@ -37,6 +37,20 @@ extern "C"
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
+typedef struct {
+    double* local_error;  /* meqn x 3 array of errors on a patch */
+    double* global_error; /* meqn x 3 array of errors after gather */
+    double area;
+    double *mass;
+    double *rhs;       /* Sum of rhs hand side */
+    double *boundary;  /* sum around boundary */
+    double *mass0;  /* Mass at initial time */
+    double c_kahan;  
+} error_info_t;
+
+/************************************* typedefs ******************************/
+
+/********************************* virtualized functions *****************************/
 void fclaw2d_clawpatch_diagnostics_initialize(struct fclaw2d_global *glob,
                                               void** patch_acc);
 
@@ -53,6 +67,19 @@ void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
                                             void** patch_acc);
 
 void fclaw2d_clawpatch_diagnostics_vtable_initialize();
+
+
+void fclaw2d_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
+                                                struct fclaw2d_patch *patch,
+                                                int blockno,
+                                                int patchno,
+                                                error_info_t *error_data);
+
+void fclaw2d_clawpatch_diagnostics_error_default(struct fclaw2d_global *glob,
+                                                 struct fclaw2d_patch *patch,
+                                                 int blockno,
+                                                 int patchno,
+                                                 error_info_t *error_data);
 
 
 #ifdef __cplusplus

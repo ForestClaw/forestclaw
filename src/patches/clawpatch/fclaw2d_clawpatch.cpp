@@ -147,6 +147,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	cp->blockno = blockno;
 	cp->meqn = clawpatch_opt->meqn;
 	cp->maux = clawpatch_opt->maux;
+	cp->mfields = clawpatch_opt->rhs_fields;
 
 	for (int icorner=0; icorner < 4; icorner++)
 	{
@@ -229,6 +230,11 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	if (clawpatch_opt->maux > 0)
 	{
 	  cp->aux.define(box,cp->maux);
+	}
+
+	if (clawpatch_opt->rhs_fields > 0)
+	{
+		cp->rhs.define(box,cp->mfields);
 	}
 
 	if (fclaw_opt->manifold)
@@ -1071,6 +1077,8 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 		clawpatch_vt->fort_output_ascii          = FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII;
 
 		/* Diagnostic functions */
+		clawpatch_vt->conservation_check         = fclaw2d_clawpatch_diagnostics_cons_default;
+		clawpatch_vt->compute_error              = fclaw2d_clawpatch_diagnostics_error_default;
 		clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
 		clawpatch_vt->fort_compute_error_norm    = FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM;
 		clawpatch_vt->fort_compute_patch_area    = FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA;
@@ -1185,6 +1193,7 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
 	*dy = cp->dy;
 }
 
+
 void fclaw2d_clawpatch_aux_data(fclaw2d_global_t *glob,
 								fclaw2d_patch_t *this_patch,
 								double **aux, int* maux)
@@ -1203,6 +1212,16 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_global_t* glob,
 	*q = cp->griddata.dataPtr();
 	*meqn = cp->meqn;
 }
+
+void fclaw2d_clawpatch_rhs_data(fclaw2d_global_t* glob,
+								 fclaw2d_patch_t* this_patch,
+								 double **rhs, int *mfields)
+{
+	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
+	*rhs = cp->rhs.dataPtr();
+	*mfields = cp->mfields;
+}
+
 
 double *fclaw2d_clawpatch_get_q(fclaw2d_global_t* glob,
 								fclaw2d_patch_t* this_patch)
