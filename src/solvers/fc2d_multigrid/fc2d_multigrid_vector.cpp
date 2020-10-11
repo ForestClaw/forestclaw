@@ -34,7 +34,7 @@ fc2d_multigrid_vector::fc2d_multigrid_vector(fclaw2d_global_t *glob)
 
     fclaw2d_domain_t *domain = glob->domain;
 
-    int mfields = clawpatch_opt->rhs_fields;
+    mfields = clawpatch_opt->rhs_fields;
 
     ns[0] = clawpatch_opt->mx;
     ns[1] = clawpatch_opt->my;
@@ -68,13 +68,13 @@ void fc2d_multigrid_vector::enumeratePatchData(fclaw2d_domain_t *domain,
                            &local_num, &level);
 
     int mfields;
-    fclaw2d_clawpatch_rhs_data(g->glob, patch, &vec.patch_data[local_num],
-                                &mfields);
+    double* rhs_ptr;
+    fclaw2d_clawpatch_rhs_data(g->glob, patch, &rhs_ptr, &mfields);
     // update point to point to non ghost cell
     for(int c = 0; c < mfields; c++){
-        vec.patch_data[local_num * mfields + c] += vec.eqn_stride * c +
-                                            vec.mbc * vec.strides[0] +
-                                            vec.mbc * vec.strides[1];
+        vec.patch_data[local_num * mfields + c] = rhs_ptr + vec.eqn_stride * c +
+                                                  vec.mbc * vec.strides[0] +
+                                                  vec.mbc * vec.strides[1];
     }
 }
 LocalData<2> fc2d_multigrid_vector::getLocalDataPriv(int component_index, int local_patch_id) const 
