@@ -38,12 +38,13 @@ extern "C"
 
 /* ------------------------------------- Options ---------------------------------------*/
 
+#if 0
 typedef enum {
-    STARPATCH = 0,
-    FIVEPOINT=1
+    STARPATCH = 0,  // ThunderEgg solver : Uses FFT
+    FIVEPOINT,      // Laplacian (no beta)
+    VARPOISSON      // Variable coefficient (uses beta)
 } mgtest_operator_types;
-
-
+#endif
 
 typedef struct mgtest_options
 {
@@ -60,8 +61,10 @@ typedef struct mgtest_options
 
     double eps_disk;
     
+#if 0    
     int patch_operator;
     sc_keyvalue_t *kv_patch_operator;
+#endif    
 
     int m_polar;    // number of polar flowers
 

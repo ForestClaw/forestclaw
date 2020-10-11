@@ -76,12 +76,15 @@ mgtest_register (mgtest_options_t *user, sc_options_t * opt)
     fclaw_options_add_int_array (opt, 0, "n-polar", &user->n_polar_string, "4",
         &user->n_polar,user->m_polar,"(polar plots) n_polar number of polar petals [4]");
 
+#if 0
     /* Set operator type (star, fivepoint) */
     sc_keyvalue_t *kv = user->kv_patch_operator = sc_keyvalue_new ();
     sc_keyvalue_set_int (kv, "starpatch",  STARPATCH);
     sc_keyvalue_set_int (kv, "fivepoint",  FIVEPOINT);
+    sc_keyvalue_set_int (kv, "varpoisson",  VARPOISSON);
     sc_options_add_keyvalue (opt, 0, "patch_operator", &user->patch_operator,
                              "fivepoint", kv, "[user] Set operator type [fivepoint]");
+#endif                             
 
     user->is_registered = 1;
 
@@ -118,8 +121,10 @@ mgtest_destroy(mgtest_options_t *user)
     fclaw_options_destroy_array (user->r1_polar);
     fclaw_options_destroy_array (user->n_polar);
 
+#if 0
     FCLAW_ASSERT (user->kv_patch_operator != NULL);
     sc_keyvalue_destroy (user->kv_patch_operator);
+#endif    
 }
 
 /* ------- Generic option handling routines that call above routines ----- */

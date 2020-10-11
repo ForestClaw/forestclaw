@@ -94,22 +94,107 @@ void mgtest_rhs(fclaw2d_global_t *glob,
                 int blockno,
                 int patchno)
 {
-    int mx,my,mbc,meqn;
+
+    int mx,my,mbc;
     double dx,dy,xlower,ylower;
-    double *q;
-
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
-
-    /* Compute right hand side */
-    FCLAW_ASSERT(mg_vt->fort_rhs != NULL);
-
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    int mfields;
+    double *rhs;
+    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+
+    /* Compute right hand side */
+    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+    FCLAW_ASSERT(mg_vt->fort_rhs != NULL);
 
     /* This function supplies an analytic right hand side. */
-    mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q);
+    mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&mfields, &xlower,&ylower,&dx,&dy,rhs);
+}
+
+
+static
+void mgtest_compute_error(fclaw2d_global_t *glob,
+                          fclaw2d_patch_t *patch,
+                          int blockno,
+                          int patchno,
+                          error_info_t *error_data)
+{
+    //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+
+    int mx, my, mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+
+    double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
+
+    /* Solution is stored in the RHS */
+    double *rhs;  
+    int mfields;
+    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+
+    if (clawpatch_vt->fort_compute_patch_error != NULL)
+    {
+        double t = glob->curr_time;
+        double* error = fclaw2d_clawpatch_get_error(glob,patch);
+        double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+
+        clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,&mfields,&dx,&dy,
+                                              &xlower,&ylower, &t, rhs, error, soln);
+
+        /* Accumulate sums and maximums needed to compute error norms */
+        FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
+        clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &mfields, 
+                                              &dx,&dy, area, error,
+                                              error_data->local_error);
+    }
+}
+
+
+static
+void mgtest_conservation_check(fclaw2d_global_t *glob,
+                               fclaw2d_patch_t *patch,
+                               int blockno,
+                               int patchno,
+                               error_info_t *error_data)
+{
+    int mx, my, mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    int mfields;
+    double *rhs;  /* Solution is stored in the right hand side */ 
+    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
+
+    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+
+    int intersects_bc[4];
+    fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
+
+    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+
+    double t = glob->curr_time;
+
+
+    double* area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
+    clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
+                                          area, rhs, error_data->rhs,
+                                          &error_data->c_kahan);
+    int cons_check = 1;
+    MGTEST_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
+                         &xlower, &ylower, &dx,&dy,&t, intersects_bc,
+                         mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
+                         &cons_check, error_data->boundary);
+
+#if 0
+#endif                                          
+
 }
 
 
@@ -135,9 +220,9 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double *q;
-    int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    double *rhs;
+    int mfields;
+    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     double *error = fclaw2d_clawpatch_get_error(glob,patch);
     double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
@@ -151,8 +236,8 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
-    MGTEST_FORT_OUTPUT_ASCII(fname,&mx,&my,&meqn,&mbc,
-                             &xlower,&ylower,&dx,&dy,q,
+    MGTEST_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
+                             &xlower,&ylower,&dx,&dy,rhs,
                              soln, error,
                              &global_num,&level,&blockno,
                              &glob->mpirank);
@@ -182,6 +267,7 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
 
     /* Clawpatch : Compute the error */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    clawpatch_vt->compute_error = mgtest_compute_error;
     clawpatch_vt->fort_compute_patch_error = &MGTEST_COMPUTE_ERROR;
 
     // tagging routines
@@ -189,6 +275,7 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 
     // Output routines
+
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error) 
     {
@@ -196,21 +283,18 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
         clawpatch_vt->cb_output_ascii = cb_mgtest_output_ascii;        
     }
 
-    /* Do something with user options? */
-    const mgtest_options_t* user = mgtest_get_options(glob);
+    clawpatch_vt->conservation_check = mgtest_conservation_check;        
 
-    switch (user->patch_operator)
+    /* Do something with user options? */
+    //const mgtest_options_t* user = mgtest_get_options(glob);
+
+    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+
+    if (mg_opt->patch_operator == USER_OPERATOR)
     {
-        case FIVEPOINT:
-            mg_vt->solve = fc2d_multigrid_fivepoint_solve;
-            break;
-        case STARPATCH:
-            mg_vt->solve = fc2d_multigrid_starpatch_solve;
-            break;
-        default:
-            fclaw_global_essentialf("No operator specified\n");
-            exit(0);
+        mg_vt->patch_operator = fc2d_multigrid_fivepoint_solve;        
     }
+
 
 }
 

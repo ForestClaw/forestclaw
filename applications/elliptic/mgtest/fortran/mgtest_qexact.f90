@@ -72,10 +72,10 @@ SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
     integer id
 
     if (example .eq. 0) then
-        q = x + y
-        qx = 1
-        qy = 1
-        qlap = 0
+        q = x**2 + y**2
+        qx = 2*x
+        qy = 2*y
+        qlap = 4
     elseif (example .eq. 1) then
         !! example in polar coordinates (r)
         r2 = (x-x0)**2 + (y-y0)**2

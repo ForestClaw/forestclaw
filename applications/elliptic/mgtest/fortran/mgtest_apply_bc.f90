@@ -1,6 +1,9 @@
 !! This applies general non-homogeneous boundary conditions by 
 !! modifying the right hand side side with non-zero corrections.
 !!
+!! If cons_check == 0 :  Apply inhomogeneous boundary conditions
+!! If cons_check == 1 :  Sum up fluxes around the boundary
+!!
 !! The general boundary conditions can be written as 
 !! 
 !!        a(x,y)*q(x,y) + b(x,y)*q_n(x,y) = g(x,y)
@@ -16,24 +19,30 @@
 !! where h = dx or h = dy, is non-zero.
 !!
 
-subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
-    dx,dy,t,intersects_bc,bctype,rhs,g_bc)
+subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
+    dx,dy,t,intersects_bc,bctype,rhs,g_bc,cons_check,flux_sum)
 
     implicit none
 
-    integer blockno, mx,my,mbc,meqn,intersects_bc(0:3),bctype(0:3)
-    double precision xlower,ylower,dx,dy,t,g_bc
-    double precision rhs(1-mbc:mx+mbc,1-mbc:my+mbc)
+    integer blockno, mx,my,mbc,mfields,intersects_bc(0:3),bctype(0:3)
+    integer cons_check
+    double precision xlower,ylower,dx,dy,t,g_bc, flux_sum(mfields)
+    double precision rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
 
     !! Dummy arrays needed to apply boundary conditions
-    double precision qh(1-mbc:mx+mbc,1-mbc:my+mbc)
+    double precision qh(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
     double precision beta(1-mbc:mx+mbc,1-mbc:my+mbc,3)
 
-    integer i,j, iface, idir, i1, ig, j1, jg
+    integer i,j, m, iface, idir, i1, ig, ic, j1, jg, jc
     double precision d, h, x, y, g
     double precision a,b
     double precision val_beta, grad_beta(2), div_beta_grad_u, flux(0:3)
+    double precision uI, dI
+    integer count
 
+    logical ccheck
+
+    ccheck = cons_check .ne. 0
 
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc
@@ -41,7 +50,6 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
             y = ylower + (j-0.5)*dy
             call mgtest_beta(x,y,val_beta,grad_beta)
             beta(i,j,1) = val_beta
-            qh(i,j) = 0
         end do
     end do
 
@@ -53,105 +61,152 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,meqn,xlower,ylower, &
     end do
 
 
-    do iface = 0,3
-        if (intersects_bc(iface) .ne. 0) then
-            idir = iface/2   !! direction : 0 or 1
+    do m = 1,mfields
 
-            !! customize this for more general boundary conditions
-            if (bctype(iface) .eq. 1) then
-                a = 1
-                b = 0
-            elseif (bctype(iface) .eq. 2) then
-                a = 0
-                b = 1
-            endif
+        !! Homogeneous array;  this is overkill - we don't need the entire array.
+        do i = 1-mbc,mx+mbc
+            do j = 1-mbc,my+mbc
+                qh(i,j,m) = 0
+            end do
+        end do
 
-            if (idir == 0) then
-                h = dx
-            else
-                h = dy
-            endif
+        do iface = 0,3
+            if (intersects_bc(iface) .ne. 0) then
+                idir = iface/2   !! direction : 0 or 1
 
-            !! Discretize the boundary conditions as : 
-            !!
-            !!     a*(qI + qg)/2 + b*(qg - qI)/dx = g
-            !! 
-            !! where gI is the interior q values and qg is             
-            !! the ghost cell value.  Solve for qg : 
-            !! 
-            !!     qg = (g - d1*qI)/d2
-            !!
-            !!     d1 = (a/2 - g/h)
-            !!     d2 = (a/2 + b/h)  !! == d in code below
-            !!
-            !! Here, we set qg = g/d2
-            d = (a/2.d0 + b/h)  
-            if (d .eq. 0) then
-                write(6,*) 'mgtest_fort_apply_bc : ill-defined BCs'
-                stop
-            endif
-
-            if (idir .eq. 0) then
-                if (iface .eq. 0) then
-                    i1 = 1
-                    ig = 0
-                elseif (iface .eq. 1) then
-                    i1 = mx+1
-                    ig = mx+1
+                !! customize this for more general boundary conditions
+                if (bctype(iface) .eq. 1) then
+                    a = 1
+                    b = 0
+                elseif (bctype(iface) .eq. 2) then
+                    a = 0
+                    b = 1
                 endif
-                !! location at interface
-                x = xlower + (i1 - 1)*dx    
 
-                do j = 1,my
-                    y = ylower + (j-0.5)*dy
-
-                    !! inhomogeneity
-                    g = g_bc(iface,t,x,y)
-
-                    !! Assume uI == 0
-                    qh(ig,j) = g/d
-                end do
-            elseif (idir .eq. 1) then
-                if (iface .eq. 2) then
-                    j1 = 1
-                    jg = 0
-                elseif (iface .eq. 3) then
-                    j1 = my+1
-                    jg = my+1
+                if (idir == 0) then
+                    h = dx
+                else
+                    h = dy
                 endif
-                !! location at interface
-                y = ylower + (j1 - 1)*dy
 
-                do i = 1,mx
-                    x = xlower + (i-0.5)*dx
+                !! Discretize the boundary conditions as : 
+                !!
+                !!     a*(qI + qg)/2 + b*(qg - qI)/ds = g
+                !! 
+                !! where gI is the interior q values and qg is             
+                !! the ghost cell value.  Solve for qg : 
+                !! 
+                !!     qg = (g - d1*qI)/d2
+                !!
+                !!     d1 = (a/2 - b/h)
+                !!     d2 = (a/2 + b/h)  !! == d in code below
+                !!
+                !! Here, we set qg = g/d2
+                dI = (a/2.d0 - b/h)  !! Needed for cons check
+                d = (a/2.d0 + b/h)  
+                if (d .eq. 0) then
+                    write(6,*) 'mgtest_fort_apply_bc : ill-defined BCs'
+                    stop
+                endif
 
-                    !! inhomogeneity
-                    g = g_bc(iface,t,x,y)
+                if (idir .eq. 0) then
+                    if (iface .eq. 0) then
+                        ic = 1  !! cell center
+                        i1 = 1
+                        ig = 0
+                    elseif (iface .eq. 1) then
+                        ic = mx  !! cell center
+                        i1 = mx+1
+                        ig = mx+1
+                    endif
+                    !! location at interface
+                    x = xlower + (i1 - 1)*dx    
 
-                    !! Assume uI == 0
-                    qh(i,jg) = g/d
-                end do
-            endif
-        endif
-    enddo
+                    do j = 1,my
+                        y = ylower + (j-0.5)*dy
 
-    !! Ghost cells now all filled in.  Now apply variable coefficent
-    !! Laplace operator
+                        !! inhomogeneity
+                        g = g_bc(iface,t,x,y)
 
-    !! 
-    do i = 1,mx
-        do j = 1,my
-            if ((j .eq. 1 .or. j .eq. my) .or. & 
-                (i .eq. 1 .or. i .eq. mx)) then
-                flux(0) = beta(i,j,2)*(qh(i,j) - qh(i-1,j))/dx
-                flux(1) = beta(i+1,j,2)*(qh(i+1,j) - qh(i,j))/dx
-                flux(2) = beta(i,j,3)*(qh(i,j) - qh(i,j-1))/dy
-                flux(3) = beta(i,j+1,3)*(qh(i,j+1) - qh(i,j))/dy
-                div_beta_grad_u = (flux(1) - flux(0))/dx + (flux(3) - flux(2))/dy
-                rhs(i,j) = rhs(i,j) - div_beta_grad_u
+                        !! Assume uI == 0
+                        uI = 0
+                        if (ccheck) then
+                            uI = rhs(ic,j,m)
+                        endif
+                        qh(ig,j,m) = (g - dI*uI)/d
+                    end do
+                elseif (idir .eq. 1) then
+                    if (iface .eq. 2) then
+                        jc = 1
+                        j1 = 1
+                        jg = 0
+                    elseif (iface .eq. 3) then
+                        jc = my
+                        j1 = my+1
+                        jg = my+1
+                    endif
+                    !! location at interface
+                    y = ylower + (j1 - 1)*dy
+
+                    do i = 1,mx
+                        x = xlower + (i-0.5)*dx
+
+                        !! inhomogeneity
+                        g = g_bc(iface,t,x,y)
+
+                        uI = 0
+                        if (ccheck) then
+                            uI = rhs(i,jc,m)
+                        endif
+
+                        qh(i,jg,m) = (g - dI*uI)/d
+                    end do
+                endif
             endif
         end do
-    end do 
+
+        !! Ghost cells now all filled in.  Now apply variable coefficent
+        !! Laplace operator
+
+        if (ccheck) then            
+            do j = 1,my
+                flux(0) = beta(i,j,2)*(rhs(1,j,m) - qh(0,j,m))/dx
+                flux(1) = beta(i+1,j,2)*(qh(mx+1,j,m) - rhs(mx,j,m))/dx
+                if (intersects_bc(0) .ne. 0) then
+                    flux_sum(m) = flux_sum(m) - flux(0)*dy
+                endif
+                if (intersects_bc(1) .ne. 0) then
+                    flux_sum(m) = flux_sum(m) + flux(1)*dy
+                endif
+            end do
+
+            do i = 1,mx
+                flux(2) = beta(i,j,3)*(rhs(i,1,m) - qh(i,0,m))/dy
+                flux(3) = beta(i,j+1,3)*(qh(i,my+1,m) - rhs(i,my,m))/dy           
+                if (intersects_bc(2) .ne. 0) then
+                    flux_sum(m) = flux_sum(m) - flux(2)*dx
+                endif
+                if (intersects_bc(3) .ne. 0) then
+                    flux_sum(m) = flux_sum(m) + flux(3)*dx
+                endif
+            end do
+        else
+            do i = 1,mx
+                do j = 1,my
+                    if ((j .eq. 1 .or. j .eq. my) .or. & 
+                        (i .eq. 1 .or. i .eq. mx)) then                
+                        flux(0) = beta(i,j,2)*(qh(i,j,m) - qh(i-1,j,m))/dx
+                        flux(1) = beta(i+1,j,2)*(qh(i+1,j,m) - qh(i,j,m))/dx
+                        flux(2) = beta(i,j,3)*(qh(i,j,m) - qh(i,j-1,m))/dy
+                        flux(3) = beta(i,j+1,3)*(qh(i,j+1,m) - qh(i,j,m))/dy
+                        div_beta_grad_u = (flux(1) - flux(0))/dx + & 
+                            (flux(3) - flux(2))/dy
+                        rhs(i,j,m) = rhs(i,j,m) - div_beta_grad_u
+                    endif
+                end do
+            end do 
+        endif
+    end do
 
 end subroutine mgtest_fort_apply_bc
 

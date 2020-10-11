@@ -55,8 +55,9 @@ void MGTEST_SETPROB();
 #define MGTEST_FORT_RHS FCLAW_F77_FUNC(mgtest_fort_rhs,MGTEST_FORT_RHS)
 
 void MGTEST_FORT_RHS(const int* blockno, const int* mbc, const int* mx, 
-                     const int* my, const double *xlower, const double *ylower,
-                     const double* dx, const double* dy, double q[]);
+                     const int* my, const int* mfields, 
+                     const double *xlower, const double *ylower,
+                     const double* dx, const double* dy, double rhs[]);
 
 
 #define MGTEST_FORT_BETA FCLAW_F77_FUNC(mgtest_beta,MGTEST_FORT_BETA)
@@ -65,7 +66,7 @@ void MGTEST_FORT_BETA(const double* x, const double* y, const double* b, double 
 
 #define MGTEST_COMPUTE_ERROR FCLAW_F77_FUNC(mgtest_compute_error,MGTEST_COMPUTE_ERROR)
 
-void MGTEST_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+void MGTEST_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* mfields,
                            double *dx, double *dy, double *xlower,
                            double *ylower, double *t, double q[],
                            double error[], double soln[]);
@@ -75,11 +76,12 @@ void MGTEST_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
                                             MGTEST_FORT_APPLY_BC)
 
 void MGTEST_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my, 
-                     const  int* mbc, const  int* meqn, 
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy, const double* t,
-                     int intersects_bc[], int mthbc[], 
-                     double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc);
+                          const  int* mbc, const  int* mfields, 
+                          const double* xlower, const double* ylower,
+                          const double* dx, const double* dy, const double* t,
+                          int intersects_bc[], int mthbc[], 
+                          double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc, 
+                          int* cons_check, double flux_sum[]);
 
 
 #define MGTEST_FORT_EVAL_BC FCLAW_F77_FUNC(mgtest_fort_eval_bc, MGTEST_FORT_EVAL_BC)
