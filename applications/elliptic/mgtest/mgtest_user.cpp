@@ -182,6 +182,7 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
     double t = glob->curr_time;
 
 
+    /* Need a better way to determine which diagnostic to do */
     double* area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
                                           area, rhs, error_data->rhs,
@@ -191,9 +192,6 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
                          &xlower, &ylower, &dx,&dy,&t, intersects_bc,
                          mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
                          &cons_check, error_data->boundary);
-
-#if 0
-#endif                                          
 
 }
 
