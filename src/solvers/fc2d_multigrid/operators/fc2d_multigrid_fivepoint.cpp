@@ -319,11 +319,6 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
                     exit(0);            
             }
 
-#if 0
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
-#endif                                                           
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, mg_opt->mfields);
@@ -363,11 +358,6 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
                 exit(0);            
         }
 
-#if 0
-        smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                       mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it);
-#endif                                                       
 
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, mg_opt->mfields);
