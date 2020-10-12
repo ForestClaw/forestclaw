@@ -56,7 +56,7 @@ void fclaw2d_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
 
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy,
                                           area, q, error_data->mass,
-                                          &error_data->c_kahan);
+                                          error_data->c_kahan);
 
 }
 

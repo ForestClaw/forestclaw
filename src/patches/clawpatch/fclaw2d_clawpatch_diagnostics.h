@@ -45,7 +45,7 @@ typedef struct {
     double *rhs;       /* Sum of rhs hand side */
     double *boundary;  /* sum around boundary */
     double *mass0;  /* Mass at initial time */
-    double c_kahan;  
+    double *c_kahan;  
 } error_info_t;
 
 /************************************* typedefs ******************************/

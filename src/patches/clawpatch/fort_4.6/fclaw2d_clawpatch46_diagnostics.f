@@ -7,7 +7,7 @@ c    # -------------------------------------------------------------------------
 
       integer mx,my,mbc,mfields
       double precision dx, dy, dxdy
-      double precision sum(mfields), c_kahan
+      double precision sum(mfields), c_kahan(mfields)
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
       double precision c, t, y
 
@@ -26,9 +26,9 @@ C            sum(m) = 0
 c            c_kahan = 0
             do j = 1,my
                do i = 1,mx
-                  y = q(i,j,m)*area(i,j) - c_kahan
+                  y = q(i,j,m)*area(i,j) - c_kahan(m)
                   t = sum(m) + y
-                  c_kahan = (t-sum(m)) - y
+                  c_kahan(m) = (t-sum(m)) - y
                   sum(m) = t
 c                  sum(m) = sum(m) + q(i,j,m)*area(i,j)
                enddo
@@ -36,11 +36,11 @@ c                  sum(m) = sum(m) + q(i,j,m)*area(i,j)
          else
             do j = 1,my
                do i = 1,mx
-!!                  y = q(i,j,m)*dxdy - c_kahan
-!!                  t = sum(m) + y
-!!                  c_kahan = (t-sum(m)) - y
-!!                  sum(m) = t
-                  sum(m) = sum(m) + q(i,j,m)*dxdy
+                  y = q(i,j,m)*dxdy - c_kahan(m)
+                  t = sum(m) + y
+                  c_kahan(m) = (t-sum(m)) - y
+                  sum(m) = t
+!!                  sum(m) = sum(m) + q(i,j,m)*dxdy
                enddo
             enddo
          endif
