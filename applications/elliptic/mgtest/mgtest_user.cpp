@@ -128,31 +128,38 @@ void mgtest_compute_error(fclaw2d_global_t *glob,
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
-    int mx, my, mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-
-    double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
-
-    /* Solution is stored in the RHS */
-    double *rhs;  
-    int mfields;
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
-
     if (clawpatch_vt->fort_compute_patch_error != NULL)
     {
+        int mx, my, mbc;
+        double xlower,ylower,dx,dy;
+        fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+
+        double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
+
+        /* Solution is stored in the RHS */
+        double *rhs, *err, *soln;  
+        int mfields;
+        fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+        fclaw2d_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
+        fclaw2d_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
+
         double t = glob->curr_time;
-        double* error = fclaw2d_clawpatch_get_error(glob,patch);
-        double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
 
         clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,&mfields,&dx,&dy,
-                                              &xlower,&ylower, &t, rhs, error, soln);
+                                              &xlower,&ylower, &t, rhs, err, soln);
 
+#if 1
         /* Accumulate sums and maximums needed to compute error norms */
+        double *local_error = FCLAW_ALLOC_ZERO(double,3*mfields);
         FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
         clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &mfields, 
-                                              &dx,&dy, area, error,
-                                              error_data->local_error);
+                                              &dx,&dy, area, err,local_error);
+
+        for(int m = 0; m < 3; m++)
+            error_data->local_error[m] = local_error[m];
+
+        FCLAW_FREE(local_error);
+#endif
     }
 }
 
