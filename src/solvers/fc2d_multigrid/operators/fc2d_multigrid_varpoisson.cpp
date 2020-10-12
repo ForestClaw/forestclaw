@@ -103,11 +103,11 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 {
     //const cast since u ghost values have to be modified
     //ThunderEgg doesn't care if ghost values are modified, just don't modify the interior values.
-    LocalData<2>& u = const_cast<LocalData<2>&>(us[0]);
-    LocalData<2>& f = fs[0];
 
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
+
+    int mfields = us.size();
 
 #if 0    
     int mbc = pinfo->num_ghost_cells;
@@ -117,36 +117,44 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 #endif    
     double dx = pinfo->spacings[0];
 
-    //if physical boundary
-    if (!pinfo->hasNbr(Side<2>::west())){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
-        for(int j = 0; j < my; j++){
-            ghosts[{j}] = -u[{0,j}];
-        }
-    }
-    if (!pinfo->hasNbr(Side<2>::east())){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
-        for(int j = 0; j < my; j++){
-            ghosts[{j}] = -u[{mx-1,j}];
-        }
-    }
+    for(int m = 0; m < mfields; m++)
+    {
+        LocalData<2>& u = const_cast<LocalData<2>&>(us[m]);
+        LocalData<2>& f = fs[m];
 
-    if (!pinfo->hasNbr(Side<2>::south())){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
-        for(int i = 0; i < mx; i++){
-            ghosts[{i}] = -u[{i,0}];
+        //if physical boundary
+        if (!pinfo->hasNbr(Side<2>::west()))
+        {
+            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+            for(int j = 0; j < my; j++){
+                ghosts[{j}] = -u[{0,j}];
+            }
         }
-    }
-    if (!pinfo->hasNbr(Side<2>::north())){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
-        for(int i = 0; i < mx; i++){
-            ghosts[{i}] = -u[{i,my-1}];
+        if (!pinfo->hasNbr(Side<2>::east())){
+            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+            for(int j = 0; j < my; j++){
+                ghosts[{j}] = -u[{mx-1,j}];
+            }
         }
-    }
 
-    for(int i = 0; i < mx; i++)
-        for(int j = 0; j < my; j++)
-            f[{i,j}] = (u[{i+1,j}] + u[{i-1,j}] + u[{i,j+1}] + u[{i,j-1}] - 4*u[{i,j}])/(dx*dx);
+        if (!pinfo->hasNbr(Side<2>::south())){
+            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+            for(int i = 0; i < mx; i++){
+                ghosts[{i}] = -u[{i,0}];
+            }
+        }
+        if (!pinfo->hasNbr(Side<2>::north())){
+            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+            for(int i = 0; i < mx; i++){
+                ghosts[{i}] = -u[{i,my-1}];
+            }
+        }
+
+        for(int i = 0; i < mx; i++)
+            for(int j = 0; j < my; j++)
+                f[{i,j}] = (u[{i+1,j}] + u[{i-1,j}] + u[{i,j+1}] + u[{i,j-1}] 
+                            - 4*u[{i,j}])/(dx*dx);
+    }
 }
 
 
@@ -154,8 +162,8 @@ void varpoisson::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
                               const std::vector<LocalData<2>>& us, 
                               std::vector<LocalData<2>>& fs) const 
 {
-    const LocalData<2>& u = us[0];
-    LocalData<2>& f = fs[0];
+
+    int mfields = us.size();
 
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
@@ -170,23 +178,29 @@ void varpoisson::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dy = pinfo->spacings[1];
     double dy2 = dy*dy;
 
-    for(int j = 0; j < my; j++)
+    for(int m = 0; m < mfields; m++)
     {
-        /* bool hasNbr(Side<D> s) */
-        if (pinfo->hasNbr(Side<2>::west()))
-            f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
+        const LocalData<2>& u = us[m];
+        LocalData<2>& f = fs[m];
 
-        if (pinfo->hasNbr(Side<2>::east()))
-            f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
-    }
+        for(int j = 0; j < my; j++)
+        {
+            /* bool hasNbr(Side<D> s) */
+            if (pinfo->hasNbr(Side<2>::west()))
+                f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
 
-    for(int i = 0; i < mx; i++)
-    {
-        if (pinfo->hasNbr(Side<2>::south()))
-            f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
+            if (pinfo->hasNbr(Side<2>::east()))
+                f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
+        }
 
-        if (pinfo->hasNbr(Side<2>::north()))
-            f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+        for(int i = 0; i < mx; i++)
+        {
+            if (pinfo->hasNbr(Side<2>::south()))
+                f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
+
+            if (pinfo->hasNbr(Side<2>::north()))
+                f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+        }
     }
 }
  
