@@ -148,18 +148,21 @@ void mgtest_compute_error(fclaw2d_global_t *glob,
         clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,&mfields,&dx,&dy,
                                               &xlower,&ylower, &t, rhs, err, soln);
 
-#if 1
         /* Accumulate sums and maximums needed to compute error norms */
+
+        // This is a hack to avoid creating new fields in the diagnostic struct
         double *local_error = FCLAW_ALLOC_ZERO(double,3*mfields);
         FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
         clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &mfields, 
                                               &dx,&dy, area, err,local_error);
 
-        for(int m = 0; m < 3; m++)
-            error_data->local_error[m] = local_error[m];
+        int mf = mfields-1;  /* Test last field */
+        error_data->local_error[0] += local_error[0+mf];
+        error_data->local_error[1] += local_error[mfields+mf];
+        error_data->local_error[2] = SC_MAX((local_error[2*mfields+mf]),
+                                            (error_data->local_error[2]));
 
         FCLAW_FREE(local_error);
-#endif
     }
 }
 
@@ -185,7 +188,7 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
 
 
     /* Need a better way to determine which diagnostic to do */
-    double* area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
+    double* area = fclaw2d_clawpatch_get_area(glob,patch);  
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
                                           area, rhs, error_data->rhs,
                                           &error_data->c_kahan);
@@ -198,12 +201,41 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
 
     double t = glob->curr_time;
     int cons_check = 1;
+
     MGTEST_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
-                              &xlower, &ylower, &dx,&dy,&t, intersects_bc,
-                              mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
-                              &cons_check, error_data->boundary);
+                         &xlower, &ylower, &dx,&dy,&t, intersects_bc,
+                         mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
+                         &cons_check, error_data->boundary);
 
 }
+
+static
+void mgtest_diagnostics_initialize(fclaw2d_global_t *glob,
+                                   void **acc_patch)
+{
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+
+    error_info_t *error_data;
+
+    int mfields = clawpatch_opt->rhs_fields;
+
+    error_data = FCLAW_ALLOC(error_info_t,1);
+
+    /* Allocate memory for 1-norm, 2-norm, and inf-norm errors */
+    error_data->local_error  = FCLAW_ALLOC_ZERO(double,3*mfields);
+    error_data->global_error  = FCLAW_ALLOC_ZERO(double,3*mfields);
+    error_data->mass   = FCLAW_ALLOC_ZERO(double,mfields);
+    error_data->mass0  = FCLAW_ALLOC_ZERO(double,mfields);
+    error_data->rhs   = FCLAW_ALLOC_ZERO(double,mfields);
+    error_data->boundary   = FCLAW_ALLOC_ZERO(double,mfields);
+    error_data->area = 0;
+    error_data->c_kahan = 0;      // For accurate summation
+
+    *acc_patch = error_data;
+
+}
+
+
 
 static
 void mgtest_time_header_ascii(fclaw2d_global_t* glob, int iframe)
@@ -394,11 +426,6 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
         clawpatch_vt->cb_output_ascii = cb_mgtest_output_ascii;        
     }
 
-    clawpatch_vt->conservation_check = mgtest_conservation_check;        
-
-    /* Do something with user options? */
-    //const mgtest_options_t* user = mgtest_get_options(glob);
-
     fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
 
     if (mg_opt->patch_operator == USER_OPERATOR)
@@ -407,5 +434,10 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     }
 
 
+    /* Diagnostics */
+    clawpatch_vt->conservation_check = mgtest_conservation_check;        
+
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
+    diag_vt->patch_init_diagnostics = mgtest_diagnostics_initialize;
 }
 

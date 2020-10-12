@@ -23,7 +23,9 @@ c     # Assume a single field variable only
             xc = xlower + (i-0.5)*dx
 
             soln(i,j,1) = mgtest_qexact(xc,yc)
-            error(i,j,1) = rhs(i,j,1) - soln(i,j,1)
+            do m = 1,mfields
+               error(i,j,m) = rhs(i,j,m) - soln(i,j,1)
+            end do
          enddo
       enddo
 
