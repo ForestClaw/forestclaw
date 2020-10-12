@@ -235,6 +235,11 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	if (clawpatch_opt->rhs_fields > 0)
 	{
 		cp->rhs.define(box,cp->mfields);
+		if (fclaw_opt->compute_error)
+		{
+			cp->elliptic_error.define(box,cp->mfields);
+			cp->elliptic_soln.define(box,cp->mfields);
+		}
 	}
 
 	if (fclaw_opt->manifold)
@@ -1220,6 +1225,24 @@ void fclaw2d_clawpatch_rhs_data(fclaw2d_global_t* glob,
 {
 	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
 	*rhs = cp->rhs.dataPtr();
+	*mfields = cp->mfields;
+}
+
+void fclaw2d_clawpatch_elliptic_error_data(fclaw2d_global_t* glob,
+                                           fclaw2d_patch_t* patch,
+                                           double **err, int *mfields)
+{
+	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+	*err = cp->elliptic_error.dataPtr();
+	*mfields = cp->mfields;
+}
+
+void fclaw2d_clawpatch_elliptic_soln_data(fclaw2d_global_t* glob,
+                                           fclaw2d_patch_t* patch,
+                                           double **soln, int *mfields)
+{
+	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+	*soln = cp->elliptic_soln.dataPtr();
 	*mfields = cp->mfields;
 }
 

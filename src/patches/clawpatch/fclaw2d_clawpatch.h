@@ -192,6 +192,15 @@ void fclaw2d_clawpatch_rhs_data(struct fclaw2d_global* glob,
                                 fclaw2d_patch_t* this_patch,
                                 double **rhs, int *mfields);
 
+void fclaw2d_clawpatch_elliptic_error_data(struct fclaw2d_global* glob,
+                                           struct fclaw2d_patch* patch,
+                                           double **err, int *mfields);
+
+void fclaw2d_clawpatch_elliptic_soln_data(struct fclaw2d_global* glob,
+                                          struct fclaw2d_patch* patch,
+                                          double **soln, int *mfields);
+
+
 double* fclaw2d_clawpatch_get_q(struct fclaw2d_global* glob,
                                 struct fclaw2d_patch* this_patch);
 

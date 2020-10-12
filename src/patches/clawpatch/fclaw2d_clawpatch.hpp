@@ -48,11 +48,14 @@ public :
     FArrayBox griddata_time_interpolated;
     FArrayBox griderror;
 
+    /* For diagnostics */
+    FArrayBox exactsolution;
+
     int mfields;  /* Number of fields in the rhs */
     FArrayBox rhs;  /* For elliptic problems */
 
-    /* For diagnostics */
-    FArrayBox exactsolution;
+    FArrayBox elliptic_error;  /* For elliptic problems */
+    FArrayBox elliptic_soln;  /* For elliptic problems */
 
     /* Registers for accumulating mismatches at coarse/fine interfaces */
     struct fclaw2d_clawpatch_registers *registers;
