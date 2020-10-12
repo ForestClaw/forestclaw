@@ -41,11 +41,15 @@ extern "C"
 #endif
 #endif
 
+
 /* --------------------------- Problem dependent functions -----------------------------*/
 
 void mgtest_link_solvers(fclaw2d_global_t *glob);
 
+
 /* --------------------------- Fortran functions ---------------------------------------*/
+
+
 
 #define MGTEST_SETPROB FCLAW_F77_FUNC(mgtest_setprob,MGTEST_SETPROB)
 

@@ -154,13 +154,15 @@ void mgtest_compute_error(fclaw2d_global_t *glob,
         double *local_error = FCLAW_ALLOC_ZERO(double,3*mfields);
         FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
         clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &mfields, 
-                                              &dx,&dy, area, err,local_error);
+                                              &dx,&dy, area, err,error_data->local_error);
 
+#if 0
         int mf = mfields-1;  /* Test last field */
         error_data->local_error[0] += local_error[0+mf];
         error_data->local_error[1] += local_error[mfields+mf];
         error_data->local_error[2] = SC_MAX((local_error[2*mfields+mf]),
                                             (error_data->local_error[2]));
+#endif                                        
 
         FCLAW_FREE(local_error);
     }
@@ -208,33 +210,6 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
                          &cons_check, error_data->boundary);
 
 }
-
-static
-void mgtest_diagnostics_initialize(fclaw2d_global_t *glob,
-                                   void **acc_patch)
-{
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-
-    error_info_t *error_data;
-
-    int mfields = clawpatch_opt->rhs_fields;
-
-    error_data = FCLAW_ALLOC(error_info_t,1);
-
-    /* Allocate memory for 1-norm, 2-norm, and inf-norm errors */
-    error_data->local_error  = FCLAW_ALLOC_ZERO(double,3*mfields);
-    error_data->global_error  = FCLAW_ALLOC_ZERO(double,3*mfields);
-    error_data->mass   = FCLAW_ALLOC_ZERO(double,mfields);
-    error_data->mass0  = FCLAW_ALLOC_ZERO(double,mfields);
-    error_data->rhs   = FCLAW_ALLOC_ZERO(double,mfields);
-    error_data->boundary   = FCLAW_ALLOC_ZERO(double,mfields);
-    error_data->area = 0;
-    error_data->c_kahan = 0;      // For accurate summation
-
-    *acc_patch = error_data;
-
-}
-
 
 
 static
@@ -438,6 +413,8 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->conservation_check = mgtest_conservation_check;        
 
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
-    diag_vt->patch_init_diagnostics = mgtest_diagnostics_initialize;
+    diag_vt->patch_init_diagnostics   = mgtest_diagnostics_initialize;
+    diag_vt->patch_reset_diagnostics  = mgtest_diagnostics_reset;
+    diag_vt->patch_gather_diagnostics = mgtest_diagnostics_gather;
 }
 

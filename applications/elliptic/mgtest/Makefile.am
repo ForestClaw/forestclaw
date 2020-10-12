@@ -7,6 +7,7 @@ applications_elliptic_mgtest_mgtest_SOURCES = \
 	applications/elliptic/mgtest/mgtest_user.cpp \
 	applications/elliptic/mgtest/mgtest_user.h \
 	applications/elliptic/mgtest/mgtest_options.c \
+	applications/elliptic/mgtest/mgtest_diagnostics.c \
 	applications/elliptic/mgtest/hsmooth.f90 \
 	applications/elliptic/mgtest/fortran/mgtest_setprob.f90 \
 	applications/elliptic/mgtest/fortran/mgtest_fort_rhs.f90 \
