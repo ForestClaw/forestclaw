@@ -68,13 +68,13 @@ typedef void (*clawpatch_diagnostics_cons_t)(struct fclaw2d_global *glob,
                                              struct fclaw2d_patch *patch,
                                              int blockno,
                                              int patchno,
-                                             error_info_t *error_data);
+                                             void *error_data);
 
 typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
                                               struct fclaw2d_patch *patch,
                                               int blockno,
                                               int patchno,
-                                              error_info_t *error_data);
+                                              void *error_data);
 /* ---------------------------- Virtual table ------------------------------------ */
 
 /* members of this structure provide the only access to above functions */

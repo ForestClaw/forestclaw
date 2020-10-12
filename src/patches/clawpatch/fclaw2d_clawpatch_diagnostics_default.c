@@ -38,8 +38,9 @@ void fclaw2d_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
                                                 fclaw2d_patch_t *patch,
                                                 int blockno,
                                                 int patchno,
-                                                error_info_t *error_data)
+                                                void *user)
 {
+    error_info_t* error_data = (error_info_t*) user;
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
@@ -64,8 +65,9 @@ void fclaw2d_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
                                                  fclaw2d_patch_t *patch,
                                                  int blockno,
                                                  int patchno,
-                                                 error_info_t *error_data)
+                                                 void *user)
 {
+    error_info_t* error_data = (error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();

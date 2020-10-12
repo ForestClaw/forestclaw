@@ -42,8 +42,6 @@ typedef struct {
     double* global_error; /* meqn x 3 array of errors after gather */
     double area;
     double *mass;
-    double *rhs;       /* Sum of rhs hand side */
-    double *boundary;  /* sum around boundary */
     double *mass0;  /* Mass at initial time */
     double *c_kahan;  
 } error_info_t;
@@ -73,13 +71,13 @@ void fclaw2d_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
                                                 struct fclaw2d_patch *patch,
                                                 int blockno,
                                                 int patchno,
-                                                error_info_t *error_data);
+                                                void *error_data);
 
 void fclaw2d_clawpatch_diagnostics_error_default(struct fclaw2d_global *glob,
                                                  struct fclaw2d_patch *patch,
                                                  int blockno,
                                                  int patchno,
-                                                 error_info_t *error_data);
+                                                 void *error_data);
 
 
 #ifdef __cplusplus
