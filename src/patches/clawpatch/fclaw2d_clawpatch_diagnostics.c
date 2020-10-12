@@ -165,6 +165,7 @@ void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     int check = gparms->compute_error || gparms->conservation_check;
     if (!check) return;
+
     fclaw2d_global_iterate_patches(glob, cb_compute_diagnostics, patch_acc);
 }
 
@@ -218,7 +219,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
 
     if (gparms->conservation_check != 0)
     {
-        if (mfields == 0)
+        if (mfields == meqn)
         {
             double *total_mass = FCLAW_ALLOC_ZERO(double,meqn);
             for(int m = 0; m < meqn; m++)
@@ -247,7 +248,8 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
                 if (init_flag)
                 {
                     total_mass[m] = fclaw2d_domain_global_sum(domain, error_data->rhs[m]);
-                    error_data->mass0[m] = total_mass[m];                }
+                    error_data->mass0[m] = total_mass[m];                
+                }
                 else
                 {
                     total_mass[m] = fclaw2d_domain_global_sum(domain, error_data->boundary[m]);

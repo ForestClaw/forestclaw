@@ -36,11 +36,11 @@ c                  sum(m) = sum(m) + q(i,j,m)*area(i,j)
          else
             do j = 1,my
                do i = 1,mx
-                  y = q(i,j,m)*dxdy - c_kahan
-                  t = sum(m) + y
-                  c_kahan = (t-sum(m)) - y
-                  sum(m) = t
-                  !!sum(m) = sum(m) + q(i,j,m)*dxdy
+!!                  y = q(i,j,m)*dxdy - c_kahan
+!!                  t = sum(m) + y
+!!                  c_kahan = (t-sum(m)) - y
+!!                  sum(m) = t
+                  sum(m) = sum(m) + q(i,j,m)*dxdy
                enddo
             enddo
          endif
@@ -83,13 +83,13 @@ c     # Compute area of a patch
 
 
       subroutine fclaw2d_clawpatch46_fort_compute_error_norm
-     &   (blockno, mx,my,mbc,meqn,dx,dy,area,error,error_norm)
+     &   (blockno, mx,my,mbc,mfields,dx,dy,area,error,error_norm)
       implicit none
 
-      integer mx,my,mbc,meqn, blockno
+      integer mx,my,mbc,mfields, blockno
       double precision dx, dy, dxdy, eij
-      double precision error_norm(meqn,3)
-      double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision error_norm(mfields,3)
+      double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
 
       include 'metric_terms.i'
 
@@ -101,7 +101,7 @@ c     # Compute area of a patch
 
 c     # error_norm(:) comes in with values;  do not initialize it here!
       dxdy = dx*dy
-      do m = 1,meqn
+      do m = 1,mfields
          if (fclaw2d_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
