@@ -121,8 +121,8 @@ void mgtest_compute(fclaw2d_domain_t *domain,
 void mgtest_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
-    int check = gparms->compute_error || gparms->conservation_check;
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    int check = fclaw_opt->compute_error || fclaw_opt->conservation_check;
     if (!check) return;
 
     fclaw2d_global_iterate_patches(glob, mgtest_compute, patch_acc);
@@ -138,12 +138,12 @@ void mgtest_diagnostics_gather(fclaw2d_global_t *glob,
     fclaw2d_domain_t *domain = glob->domain;
     
     mgtest_error_info_t *error_data = (mgtest_error_info_t*) patch_acc;
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     
     int mfields = clawpatch_opt->rhs_fields;  /* clawpatch->meqn */
 
-    if (gparms->compute_error != 0)
+    if (fclaw_opt->compute_error != 0)
     {
         double total_area = fclaw2d_domain_global_sum(domain, error_data->area);
         FCLAW_ASSERT(total_area != 0);
@@ -176,7 +176,7 @@ void mgtest_diagnostics_gather(fclaw2d_global_t *glob,
     }
 
 
-    if (gparms->conservation_check != 0)
+    if (fclaw_opt->conservation_check != 0)
     {
         double *total_mass = FCLAW_ALLOC_ZERO(double,mfields);
         for(int m = 0; m < mfields; m++)
@@ -200,7 +200,7 @@ void mgtest_diagnostics_gather(fclaw2d_global_t *glob,
 
 
 void mgtest_diagnostics_finalize(fclaw2d_global_t *glob,
-                                            void** patch_acc)
+                                 void** patch_acc)
 {
     mgtest_error_info_t *error_data = *((mgtest_error_info_t**) patch_acc);
     FCLAW_FREE(error_data->mass);

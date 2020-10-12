@@ -41,11 +41,11 @@ extern "C"
 typedef struct {
     double* local_error;  /* meqn x 3 array of errors on a patch */
     double* global_error; /* meqn x 3 array of errors after gather */
-    double area;
+    double *mass0;  /* Mass at initial time */
     double *mass;
+    double area;
     double *rhs;       /* Sum of rhs hand side */
     double *boundary;  /* sum around boundary */
-    double *mass0;  /* Mass at initial time */
     double *c_kahan;  
 } mgtest_error_info_t;
 
