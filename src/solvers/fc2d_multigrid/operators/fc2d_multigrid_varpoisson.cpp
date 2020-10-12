@@ -70,39 +70,40 @@ double varpoisson_beta_coeff(const std::array<double,2>& coord)
 
 class varpoisson : public PatchOperator<2>
 {
-public:
-    varpoisson(std::shared_ptr<const Domain<2>>      domain,
-              std::shared_ptr<const GhostFiller<2>> ghost_filler);
+    protected:
+    std::shared_ptr<const Vector<2>> beta;
 
-    void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                          const std::vector<LocalData<2>>& us,
-                          std::vector<LocalData<2>>& fs) const override;
-    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                       const std::vector<LocalData<2>>& us,
-                       std::vector<LocalData<2>>& fs) const override;
+    public:
+        varpoisson(std::shared_ptr<const Vector<2>> beta_vec, 
+                   std::shared_ptr<const Domain<2>> domain,
+                   std::shared_ptr<const GhostFiller<2>> ghost_filler);
+
+        void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+                              const std::vector<LocalData<2>>& us,
+                              std::vector<LocalData<2>>& fs) const override;
+
+        void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+                           const std::vector<LocalData<2>>& us,
+                           std::vector<LocalData<2>>& fs) const override;
 
 };
 
 
-#if 0
-/* Store beta as member in varpoisson */
-void varpoisson::varpoisson>(beta_vec,te_domain,ghost_filler);
-#endif
-
-
-varpoisson::varpoisson(std::shared_ptr<const Domain<2>>      domain,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler) : PatchOperator<2>(domain,ghost_filler)
+varpoisson::varpoisson(std::shared_ptr<const Vector<2>> coeffs,
+                       std::shared_ptr<const Domain<2>> domain,
+                       std::shared_ptr<const GhostFiller<2>> ghost_filler) : 
+                            PatchOperator<2>(domain,ghost_filler),
+                            beta(coeffs)
 {
-    /* Nothing to construct yet */
+    this->ghost_filler->fillGhost(this->beta);
 }
 
 
 void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                                 const std::vector<LocalData<2>>& us,
-                                 std::vector<LocalData<2>>& fs) const 
+                                  const std::vector<LocalData<2>>& us,
+                                  std::vector<LocalData<2>>& fs) const 
 {
-    //const cast since u ghost values have to be modified
-    //ThunderEgg doesn't care if ghost values are modified, just don't modify the interior values.
+    const LocalData<2>  b  = beta->getLocalData(0, pinfo->local_index);
 
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
@@ -113,9 +114,9 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     int mbc = pinfo->num_ghost_cells;
     double xlower = pinfo->starts[0];
     double ylower = pinfo->starts[1];
-    double dy = pinfo->spacings[1];
 #endif    
     double dx = pinfo->spacings[0];
+    double dy = pinfo->spacings[1];
 
     for(int m = 0; m < mfields; m++)
     {
@@ -150,10 +151,51 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             }
         }
 
-        for(int i = 0; i < mx; i++)
-            for(int j = 0; j < my; j++)
-                f[{i,j}] = (u[{i+1,j}] + u[{i-1,j}] + u[{i,j+1}] + u[{i,j-1}] 
-                            - 4*u[{i,j}])/(dx*dx);
+#if 1
+        for(int j = 0; j < my; j++)
+            for(int i = 0; i < mx; i++)
+            {
+                double b0 = (b[{i,j}]   + b[{i-1,j}])/2;
+                double b1 = (b[{i+1,j}] + b[{i,j}])/2;
+                double b2 = (b[{i,j}]   + b[{i,j-1}])/2;
+                double b3 = (b[{i,j+1}] + b[{i,j}])/2;
+                double flux[4];
+                flux[0] = b0*(u[{i,j}] - u[{i-1,j}])/dx;
+                flux[1] = b1*(u[{i+1,j}] - u[{i,j}])/dx;
+                flux[2] = b2*(u[{i,j}] - u[{i,j-1}])/dy;
+                flux[3] = b3*(u[{i,j+1}] - u[{i,j}])/dy;
+
+                f[{i,j}] = (flux[1]-flux[0])/dx + (flux[3] - flux[2])/dy;
+
+            }
+#endif
+
+#if 0
+        /* This is slightly slower */
+        for(int j = 0; j < my+1; j++)
+            for(int i = 0; i < mx+1; i++)
+            {
+                double b0 = (b[{i,j}]   + b[{i-1,j}])/2;
+                double flux0 = b0*(u[{i,j}] - u[{i-1,j}])/dx;
+
+                double b2 = (b[{i,j}] + b[{i,j-1}])/2;
+                double flux2 = b2*(u[{i,j}] - u[{i,j-1}])/dy;
+
+                if (i < mx)
+                    f[{i,j}] = -flux0/dx;
+
+                if (i > 0)
+                    f[{i-1,j}] += flux0/dx;
+
+                if (j < my)
+                    f[{i,j}] += -flux2/dy;
+
+                if (j > 0)
+                    f[{i,j-1}] += flux2/dy;
+
+            }
+#endif            
+
     }
 }
 
@@ -162,6 +204,8 @@ void varpoisson::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
                               const std::vector<LocalData<2>>& us, 
                               std::vector<LocalData<2>>& fs) const 
 {
+
+    const LocalData<2> b = beta->getLocalData(0, pinfo->local_index);
 
     int mfields = us.size();
 
@@ -185,21 +229,25 @@ void varpoisson::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 
         for(int j = 0; j < my; j++)
         {
-            /* bool hasNbr(Side<D> s) */
+            double b0 = (b[{0,j}] + b[{-1,j}])/2;
+            double b1 = (b[{mx,j}] + b[{mx-1,j}])/2;
+            /* bool hasNbr(Side<2> s) */
             if (pinfo->hasNbr(Side<2>::west()))
-                f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
+                f[{0,j}] += -b0*(u[{-1,j}]+u[{0,j}])/dx2;
 
             if (pinfo->hasNbr(Side<2>::east()))
-                f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
+                f[{mx-1,j}] += -b1*(u[{mx-1,j}]+u[{mx,j}])/dx2;
         }
 
         for(int i = 0; i < mx; i++)
         {
+            double b2 = (b[{i,0}] + b[{i,-1}])/2;
+            double b3 = (b[{i,my}] + b[{i,my-1}])/2;
             if (pinfo->hasNbr(Side<2>::south()))
-                f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
+                f[{i,0}] += -b2*(u[{i,-1}]+u[{i,0}])/dy2;
 
             if (pinfo->hasNbr(Side<2>::north()))
-                f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+                f[{i,my-1}] += -b3*(u[{i,my-1}]+u[{i,my}])/dy2;
         }
     }
 }
@@ -209,8 +257,10 @@ shared_ptr<ValVector<2>> varpoisson_restrict_beta_vec(shared_ptr<Vector<2>> prev
                                                       shared_ptr<Domain<2>> prev_domain, 
                                                       shared_ptr<Domain<2>> curr_domain)
 {
-    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, prev_beta_vec->getNumComponents(), true);
-    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, prev_beta_vec->getNumComponents());
+    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, 
+                                        prev_beta_vec->getNumComponents(), true);
+    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, 
+                                                   prev_beta_vec->getNumComponents());
     restrictor.restrict(prev_beta_vec, new_beta_vec);
     return new_beta_vec;
 }
@@ -227,10 +277,6 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
   
-#if 0  
-    fc2d_multigrid_vtable_t *mg_vt = fc2d_multigrid_vt();
-#endif  
-
     // create thunderegg vector for eqn 0
     shared_ptr<Vector<2>> f = make_shared<fc2d_multigrid_vector>(glob);
 
@@ -266,25 +312,29 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
 
     // define operators for problems
 
-#if 0
+
+    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+
+#if 1
     // get beta function
     auto beta_func = [&](const std::array<double,2>& coord){
         double beta;
         double grad[2];
         mg_vt->fort_beta(&coord[0],&coord[1],&beta,grad);
+        //beta = 1;
         return beta;
     };
 
     // create vector for beta
     auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->rhs_fields);
-    DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_coeff);
+    DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_func);
 #endif
 
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    auto op = make_shared<varpoisson>(te_domain,ghost_filler);
+    auto op = make_shared<varpoisson>(beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
@@ -334,6 +384,7 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
         //add intermediate levels
+        auto prev_beta_vec = beta_vec;
         auto prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
@@ -342,7 +393,10 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            patch_operator = make_shared<varpoisson>(curr_domain, ghost_filler);
+            auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, 
+                                                                    prev_domain, curr_domain);
+            patch_operator = make_shared<varpoisson>(restricted_beta_vec, curr_domain, ghost_filler);
+            prev_beta_vec = restricted_beta_vec;
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
@@ -351,10 +405,14 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
                                                            mg_opt->patch_bcgs_max_it);
 
             //restrictor
-            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, clawpatch_opt->rhs_fields);
+            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
+                                                                    next_domain, 
+                                                                    clawpatch_opt->rhs_fields);
 
             //interpolator
-            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
+            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
+                                                                        prev_domain, 
+                                                                        clawpatch_opt->rhs_fields);
 
             //vector generator
             vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
@@ -369,7 +427,9 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        patch_operator = make_shared<varpoisson>(curr_domain, ghost_filler);
+        auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
+        patch_operator = make_shared<varpoisson>(restricted_beta_vec, curr_domain, 
+                                                    ghost_filler);
 
         //smoother
         smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
@@ -377,7 +437,9 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
                                                        mg_opt->patch_bcgs_max_it);
 
         //interpolator
-        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
+        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
+                                                                    prev_domain, 
+                                                                    clawpatch_opt->rhs_fields);
 
         //vector generator
         vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
@@ -393,16 +455,19 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
 
+    // copy solution into rhs
+    f->copy(u);
     fclaw_global_productionf("Iterations: %i\n", its);    
+
+#if 0
     fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
     fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
     fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());
     fclaw_global_productionf("u-infnorm: %f\n\n", u->infNorm());
 
-    // copy solution into rhs
-    f->copy(u);
     fclaw_global_productionf("Checking if copy function works:\n");
     fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
     fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
+#endif    
 }
 
