@@ -38,22 +38,37 @@ extern "C"
 #endif
 #endif
 
+typedef struct {
+    double* local_error;  /* meqn x 3 array of errors on a patch */
+    double* global_error; /* meqn x 3 array of errors after gather */
+    double area;
+    double *mass;
+    double *rhs;       /* Sum of rhs hand side */
+    double *boundary;  /* sum around boundary */
+    double *mass0;  /* Mass at initial time */
+    double *c_kahan;  
+} mgtest_error_info_t;
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void mgtest_diagnostics_initialize(fclaw2d_global_t *glob,
-                                   void **acc_patch);
+void mgtest_diagnostics_initialize(fclaw2d_global_t *glob, void **acc_patch);
 
 
-void mgtest_diagnostics_reset(fclaw2d_global_t *glob,
-                              void* patch_acc);
+void mgtest_diagnostics_reset(fclaw2d_global_t *glob, void* patch_acc);
 
-void mgtest_diagnostics_gather(fclaw2d_global_t *glob,
-                               void* patch_acc,
+void mgtest_diagnostics_compute(fclaw2d_global_t* glob,
+                                           void* patch_acc);
+
+void mgtest_diagnostics_gather(fclaw2d_global_t *glob, void* patch_acc,
                                int init_flag);
 
-void mgtest_diagnostics_finalize(fclaw2d_global_t *glob,
-                                 void** patch_acc);
+void mgtest_diagnostics_finalize(fclaw2d_global_t *glob, void** patch_acc);
+
+void mgtest_compute_diagnostics(fclaw2d_domain_t *domain,
+                                fclaw2d_patch_t *patch,
+                                int blockno,
+                                int patchno,
+                                void* user);
 
 
 #ifdef __cplusplus

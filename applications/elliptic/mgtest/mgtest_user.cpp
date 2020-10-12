@@ -123,8 +123,9 @@ void mgtest_compute_error(fclaw2d_global_t *glob,
                           fclaw2d_patch_t *patch,
                           int blockno,
                           int patchno,
-                          error_info_t *error_data)
+                          void *user)
 {
+    mgtest_error_info_t* error_data = (mgtest_error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -133,7 +134,8 @@ void mgtest_compute_error(fclaw2d_global_t *glob,
     {
         int mx, my, mbc;
         double xlower,ylower,dx,dy;
-        fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+        fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,&xlower,
+                                    &ylower,&dx,&dy);
 
         double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
 
@@ -146,26 +148,17 @@ void mgtest_compute_error(fclaw2d_global_t *glob,
 
         double t = glob->curr_time;
 
-        clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,&mfields,&dx,&dy,
-                                              &xlower,&ylower, &t, rhs, err, soln);
+        clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,
+                                               &mfields,&dx,&dy,
+                                               &xlower,&ylower, &t, rhs, err, soln);
 
         /* Accumulate sums and maximums needed to compute error norms */
 
-        // This is a hack to avoid creating new fields in the diagnostic struct
-        double *local_error = FCLAW_ALLOC_ZERO(double,3*mfields);
         FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
         clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &mfields, 
-                                              &dx,&dy, area, err,error_data->local_error);
+                                              &dx,&dy, area, err,
+                                              error_data->local_error);
 
-#if 0
-        int mf = mfields-1;  /* Test last field */
-        error_data->local_error[0] += local_error[0+mf];
-        error_data->local_error[1] += local_error[mfields+mf];
-        error_data->local_error[2] = SC_MAX((local_error[2*mfields+mf]),
-                                            (error_data->local_error[2]));
-#endif                                        
-
-        FCLAW_FREE(local_error);
     }
 }
 
@@ -175,8 +168,9 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *patch,
                                int blockno,
                                int patchno,
-                               error_info_t *error_data)
+                               void *user)
 {
+    mgtest_error_info_t* error_data = (mgtest_error_info_t*) user;
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
@@ -221,7 +215,7 @@ void mgtest_time_header_ascii(fclaw2d_global_t* glob, int iframe)
     char matname1[20];
     sprintf(matname1,"fort.q%04d",iframe);
 
-#if 0
+#if 1
     FILE *f1 = fopen(matname1,"w");
     fclose(f1);
 #endif    
@@ -409,14 +403,15 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
         mg_vt->patch_operator = fc2d_multigrid_fivepoint_solve;        
     }
 
-
-    /* Diagnostics */
+    /* Diagnostics - most need to be modified because different number of fields are
+       used for the elliptic problem then for the hyperbolic problem */
     clawpatch_vt->conservation_check = mgtest_conservation_check;        
 
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
-    diag_vt->patch_init_diagnostics   = mgtest_diagnostics_initialize;
-    diag_vt->patch_reset_diagnostics  = mgtest_diagnostics_reset;
-    diag_vt->patch_gather_diagnostics = mgtest_diagnostics_gather;
+    diag_vt->patch_init_diagnostics     = mgtest_diagnostics_initialize;
+    diag_vt->patch_reset_diagnostics    = mgtest_diagnostics_reset;
+    diag_vt->patch_compute_diagnostics  = mgtest_diagnostics_compute;
+    diag_vt->patch_gather_diagnostics   = mgtest_diagnostics_gather;
     diag_vt->patch_finalize_diagnostics = mgtest_diagnostics_finalize;
 }
 

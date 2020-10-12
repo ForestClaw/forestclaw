@@ -37,13 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void mgtest_diagnostics_initialize(fclaw2d_global_t *glob,
                                    void **acc_patch)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+              fclaw2d_clawpatch_get_options(glob);
 
-    error_info_t *error_data;
+    mgtest_error_info_t *error_data;
 
     int mfields = clawpatch_opt->rhs_fields;
 
-    error_data = FCLAW_ALLOC(error_info_t,1);
+    error_data = FCLAW_ALLOC(mgtest_error_info_t,1);
 
     /* Allocate memory for 1-norm, 2-norm, and inf-norm errors */
     error_data->local_error  = FCLAW_ALLOC_ZERO(double,3*mfields);
@@ -62,7 +63,7 @@ void mgtest_diagnostics_initialize(fclaw2d_global_t *glob,
 void mgtest_diagnostics_reset(fclaw2d_global_t *glob,
                               void* patch_acc)
 {
-    error_info_t *error_data = (error_info_t*) patch_acc;
+    mgtest_error_info_t *error_data = (mgtest_error_info_t*) patch_acc;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     int mfields = clawpatch_opt->rhs_fields;
@@ -84,17 +85,49 @@ void mgtest_diagnostics_reset(fclaw2d_global_t *glob,
     error_data->area = 0;
 }
 
-#if 0
-void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
+static
+void mgtest_compute(fclaw2d_domain_t *domain,
+                    fclaw2d_patch_t *patch,
+                    int blockno,
+                    int patchno,
+                    void* user) //void *patch_acc)
+{
+    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
+    mgtest_error_info_t *error_data = (mgtest_error_info_t*) s->user; 
+
+    /* Accumulate area for final computation of error */
+    int mx, my, mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
+    FCLAW_ASSERT(clawpatch_vt->fort_compute_patch_area != NULL);
+    error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
+
+    /* Compute error */
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
+    if (fclaw_opt->compute_error)
+    {
+        clawpatch_vt->compute_error(s->glob, patch, blockno, patchno, error_data);
+    }
+
+    if (fclaw_opt->conservation_check)
+    {
+        clawpatch_vt->conservation_check(s->glob, patch, blockno, patchno, error_data);
+    }
+}
+
+void mgtest_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc)
 {
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     int check = gparms->compute_error || gparms->conservation_check;
     if (!check) return;
 
-    fclaw2d_global_iterate_patches(glob, cb_compute_diagnostics, patch_acc);
+    fclaw2d_global_iterate_patches(glob, mgtest_compute, patch_acc);
 }
-#endif
+
 
 
 /* Accumulate the errors computed above */
@@ -104,7 +137,7 @@ void mgtest_diagnostics_gather(fclaw2d_global_t *glob,
 {
     fclaw2d_domain_t *domain = glob->domain;
     
-    error_info_t *error_data = (error_info_t*) patch_acc;
+    mgtest_error_info_t *error_data = (mgtest_error_info_t*) patch_acc;
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     
@@ -165,18 +198,18 @@ void mgtest_diagnostics_gather(fclaw2d_global_t *glob,
     }
 }
 
+
 void mgtest_diagnostics_finalize(fclaw2d_global_t *glob,
-                                 void** patch_acc)
+                                            void** patch_acc)
 {
-    error_info_t *error_data = *((error_info_t**) patch_acc);
+    mgtest_error_info_t *error_data = *((mgtest_error_info_t**) patch_acc);
     FCLAW_FREE(error_data->mass);
     FCLAW_FREE(error_data->mass0);
     FCLAW_FREE(error_data->rhs);
-    FCLAW_FREE(error_data->boundary);    
+    FCLAW_FREE(error_data->boundary);
     FCLAW_FREE(error_data->c_kahan);
     FCLAW_FREE(error_data->local_error);
     FCLAW_FREE(error_data->global_error);
     FCLAW_FREE(error_data);
     *patch_acc = NULL;
 }
-
