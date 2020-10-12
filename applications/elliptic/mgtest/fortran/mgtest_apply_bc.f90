@@ -48,7 +48,7 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         do j = 1-mbc,my+mbc
             x = xlower + (i-0.5)*dx
             y = ylower + (j-0.5)*dy
-            call mgtest_beta(x,y,val_beta,grad_beta)
+            call mgtest_fort_beta(x,y,val_beta,grad_beta)
             beta(i,j,1) = val_beta
         end do
     end do

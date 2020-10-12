@@ -22,7 +22,7 @@ DOUBLE PRECISION function mgtest_qexact_rhs(x,y)
     integer flag
     double precision q,qlap,b, grad_q(2), grad_beta(2)
 
-    CALL mgtest_beta(x,y,b,grad_beta)
+    CALL mgtest_fort_beta(x,y,b,grad_beta)
 
     flag = 2
     CALL mgtest_qexact_complete(x,y,q,qlap,grad_q,flag)
@@ -173,7 +173,7 @@ double precision function sech(x)
     sech = 1.d0/cosh(x)
 end function sech
 
-subroutine mgtest_beta(x,y,b,grad)
+subroutine mgtest_fort_beta(x,y,b,grad)
     implicit none
 
     double precision x,y,b,grad(2)
@@ -203,5 +203,5 @@ subroutine mgtest_beta(x,y,b,grad)
     grad(1) = bx
     grad(2) = by
 
-end subroutine mgtest_beta
+end subroutine mgtest_fort_beta
 

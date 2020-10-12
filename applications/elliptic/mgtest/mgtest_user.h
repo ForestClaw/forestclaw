@@ -64,7 +64,7 @@ void MGTEST_FORT_RHS(const int* blockno, const int* mbc, const int* mx,
                      const double* dx, const double* dy, double rhs[]);
 
 
-#define MGTEST_FORT_BETA FCLAW_F77_FUNC(mgtest_beta,MGTEST_FORT_BETA)
+#define MGTEST_FORT_BETA FCLAW_F77_FUNC(mgtest_fort_beta,MGTEST_FORT_BETA)
 
 void MGTEST_FORT_BETA(const double* x, const double* y, const double* b, double grad[]);
 
