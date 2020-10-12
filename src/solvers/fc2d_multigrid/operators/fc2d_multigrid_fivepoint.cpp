@@ -169,8 +169,8 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 
     for(int m = 0; m < mfields; m++)
     {
-        const LocalData<2>& u = us[0];
-        LocalData<2>& f = fs[0];
+        const LocalData<2>& u = us[m];
+        LocalData<2>& f = fs[m];
         for(int j = 0; j < my; j++)
         {
             /* bool hasNbr(Side<D> s) */

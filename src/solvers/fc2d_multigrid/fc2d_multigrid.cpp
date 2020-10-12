@@ -91,7 +91,6 @@ void multigrid_solve(fclaw2d_global_t* glob)
     // Apply non-homogeneous boundary conditions 
     fc2d_multigrid_physical_bc(glob);
 
-#if 1
     fc2d_multigrid_vtable_t  *mg_vt  = fc2d_multigrid_vt();  
     fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
 
@@ -121,7 +120,6 @@ void multigrid_solve(fclaw2d_global_t* glob)
     FCLAW_ASSERT(mg_vt->patch_operator != NULL);
 
     mg_vt->patch_operator(glob);
-#endif    
 }
 
 /* ---------------------------------- Output functions -------------------------------- */
