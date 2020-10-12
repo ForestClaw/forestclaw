@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mgtest_user.h"
 #include "mgtest_options.h"
+#include "mgtest_diagnostics.h"
 
 #include <fclaw2d_include_all.h>
 
@@ -193,7 +194,7 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
     double* area = fclaw2d_clawpatch_get_area(glob,patch);  
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
                                           area, rhs, error_data->rhs,
-                                          &error_data->c_kahan);
+                                          error_data->c_kahan);
     fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
 
     fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
@@ -416,5 +417,6 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     diag_vt->patch_init_diagnostics   = mgtest_diagnostics_initialize;
     diag_vt->patch_reset_diagnostics  = mgtest_diagnostics_reset;
     diag_vt->patch_gather_diagnostics = mgtest_diagnostics_gather;
+    diag_vt->patch_finalize_diagnostics = mgtest_diagnostics_finalize;
 }
 

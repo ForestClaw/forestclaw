@@ -53,7 +53,7 @@ void mgtest_diagnostics_initialize(fclaw2d_global_t *glob,
     error_data->rhs   = FCLAW_ALLOC_ZERO(double,mfields);
     error_data->boundary   = FCLAW_ALLOC_ZERO(double,mfields);
     error_data->area = 0;
-    error_data->c_kahan = 0;      // For accurate summation
+    error_data->c_kahan = FCLAW_ALLOC_ZERO(double,mfields);   
 
     *acc_patch = error_data;
 
@@ -79,84 +79,12 @@ void mgtest_diagnostics_reset(fclaw2d_global_t *glob,
 
         error_data->rhs[m] = 0;
         error_data->boundary[m] = 0;
+        error_data->c_kahan[m] = 0;
     }
     error_data->area = 0;
-    error_data->c_kahan = 0;
 }
 
-
-/* Gather statistics (error, mass, area) in this callback, called
-   from fclaw2d_diagnostics_gather */
 #if 0
-static
-void cb_compute_diagnostics(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *patch,
-                            int blockno,
-                            int patchno,
-                            void* user) //void *patch_acc)
-{
-    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
-    error_info_t *error_data = (error_info_t*) s->user; 
-
-    /* Accumulate area for final computation of error */
-    int mx, my, mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
-    FCLAW_ASSERT(clawpatch_vt->fort_compute_patch_area != NULL);
-    error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
-
-    /* Compute error */
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
-    if (fclaw_opt->compute_error)
-    {
-        clawpatch_vt->compute_error(s->glob, patch, blockno, patchno, error_data);
-    }
-
-    if (fclaw_opt->conservation_check)
-    {
-        clawpatch_vt->conservation_check(s->glob, patch, blockno, patchno, error_data);
-    }
-
-#if 0
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
-
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-
-    double *area;
-    double *q;
-    int mx, my, mbc, meqn;
-    double xlower,ylower,dx,dy, t;
-
-    fclaw2d_clawpatch_grid_data(s->glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    area = fclaw2d_clawpatch_get_area(s->glob,this_patch);  /* Might be null */
-    fclaw2d_clawpatch_soln_data(s->glob,this_patch,&q,&meqn);
-
-    error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
-
-    if (fclaw_opt->compute_error && clawpatch_vt->fort_compute_patch_error != NULL)
-    {
-        double *error, *soln;
-        t = s->glob->curr_time;
-        error = fclaw2d_clawpatch_get_error(s->glob,this_patch);
-        soln = fclaw2d_clawpatch_get_exactsoln(s->glob,this_patch);
-
-        clawpatch_vt->fort_compute_patch_error(&this_block_idx, &mx,&my,&mbc,&meqn,&dx,&dy,
-                                              &xlower,&ylower, &t, q, error, soln);
-
-        /* Accumulate sums and maximums needed to compute error norms */
-        clawpatch_vt->fort_compute_error_norm(&this_block_idx, &mx, &my, &mbc, &meqn, 
-                                              &dx,&dy, area,
-                                              error, error_data->local_error);
-    }
-#endif    
-
-}
-
 void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc)
 {
@@ -237,32 +165,18 @@ void mgtest_diagnostics_gather(fclaw2d_global_t *glob,
     }
 }
 
-#if 0
-void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
-                                            void** patch_acc)
+void mgtest_diagnostics_finalize(fclaw2d_global_t *glob,
+                                 void** patch_acc)
 {
     error_info_t *error_data = *((error_info_t**) patch_acc);
     FCLAW_FREE(error_data->mass);
     FCLAW_FREE(error_data->mass0);
     FCLAW_FREE(error_data->rhs);
-    FCLAW_FREE(error_data->boundary);
+    FCLAW_FREE(error_data->boundary);    
+    FCLAW_FREE(error_data->c_kahan);
     FCLAW_FREE(error_data->local_error);
     FCLAW_FREE(error_data->global_error);
     FCLAW_FREE(error_data);
     *patch_acc = NULL;
 }
 
-
-void fclaw2d_clawpatch_diagnostics_vtable_initialize()
-{
-    /* diagnostic functions that apply to patches (error, conservation) */
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
-    
-    diag_vt->patch_init_diagnostics      = fclaw2d_clawpatch_diagnostics_initialize;
-    diag_vt->patch_compute_diagnostics   = fclaw2d_clawpatch_diagnostics_compute;
-    diag_vt->patch_gather_diagnostics    = fclaw2d_clawpatch_diagnostics_gather;
-    diag_vt->patch_reset_diagnostics     = fclaw2d_clawpatch_diagnostics_reset;
-    diag_vt->patch_finalize_diagnostics  = fclaw2d_clawpatch_diagnostics_finalize;
-
-}
-#endif

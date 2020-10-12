@@ -52,6 +52,9 @@ void mgtest_diagnostics_gather(fclaw2d_global_t *glob,
                                void* patch_acc,
                                int init_flag);
 
+void mgtest_diagnostics_finalize(fclaw2d_global_t *glob,
+                                 void** patch_acc);
+
 
 #ifdef __cplusplus
 #if 0
