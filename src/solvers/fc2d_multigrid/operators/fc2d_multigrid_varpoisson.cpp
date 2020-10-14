@@ -61,11 +61,13 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::VarPoisson;
 
+#if 0
 double varpoisson_beta_coeff(const std::array<double,2>& coord)
 {
     //double grad[2];
     return 1.0;
 }  
+#endif
 
 
 class varpoisson : public PatchOperator<2>
@@ -104,6 +106,7 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
                                   std::vector<LocalData<2>>& fs) const 
 {
     const LocalData<2>  b  = beta->getLocalData(0, pinfo->local_index);
+    //LocalData<2>& b = const_cast<LocalData<2>&>(beta[0]);
 
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
@@ -152,46 +155,52 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         }
 
 #if 1
+        double dx2 = 2*dx*dx;
+        double dy2 = 2*dy*dy;
         for(int j = 0; j < my; j++)
             for(int i = 0; i < mx; i++)
             {
-                double b0 = (b[{i,j}]   + b[{i-1,j}])/2;
-                double b1 = (b[{i+1,j}] + b[{i,j}])/2;
-                double b2 = (b[{i,j}]   + b[{i,j-1}])/2;
-                double b3 = (b[{i,j+1}] + b[{i,j}])/2;
-                double flux[4];
-                flux[0] = b0*(u[{i,j}] - u[{i-1,j}])/dx;
-                flux[1] = b1*(u[{i+1,j}] - u[{i,j}])/dx;
-                flux[2] = b2*(u[{i,j}] - u[{i,j-1}])/dy;
-                flux[3] = b3*(u[{i,j+1}] - u[{i,j}])/dy;
+                double b0 = (b[{i,j}]   + b[{i-1,j}]);
+                double b1 = (b[{i+1,j}] + b[{i,j}]);
+                double b2 = (b[{i,j}]   + b[{i,j-1}]);
+                double b3 = (b[{i,j+1}] + b[{i,j}]);
 
-                f[{i,j}] = (flux[1]-flux[0])/dx + (flux[3] - flux[2])/dy;
+                double flux[4];
+                flux[0] = b0*(u[{i,j}] - u[{i-1,j}]);
+                flux[1] = b1*(u[{i+1,j}] - u[{i,j}]);
+                flux[2] = b2*(u[{i,j}] - u[{i,j-1}]);
+                flux[3] = b3*(u[{i,j+1}] - u[{i,j}]);
+
+                f[{i,j}] = (flux[1]-flux[0])/dx2 + (flux[3] - flux[2])/dy2;
 
             }
 #endif
 
 #if 0
-        /* This is slightly slower */
+        double dx2 = 2*dx*dx;
+        double dy2 = 2*dy*dy;
+        /* This is considerably slower, despite the fact that it
+            computes half as many fluxes.  5.95s vs. 4.85s */
         for(int j = 0; j < my+1; j++)
             for(int i = 0; i < mx+1; i++)
             {
-                double b0 = (b[{i,j}]   + b[{i-1,j}])/2;
-                double flux0 = b0*(u[{i,j}] - u[{i-1,j}])/dx;
+                double b0 = (b[{i,j}]   + b[{i-1,j}]);
+                double flux0 = b0*(u[{i,j}] - u[{i-1,j}]);
 
-                double b2 = (b[{i,j}] + b[{i,j-1}])/2;
-                double flux2 = b2*(u[{i,j}] - u[{i,j-1}])/dy;
+                double b2 = (b[{i,j}] + b[{i,j-1}]);
+                double flux2 = b2*(u[{i,j}] - u[{i,j-1}]);
 
                 if (i < mx)
-                    f[{i,j}] = -flux0/dx;
+                    f[{i,j}] = -flux0/dx2;
 
                 if (i > 0)
-                    f[{i-1,j}] += flux0/dx;
+                    f[{i-1,j}] += flux0/dx2;
 
                 if (j < my)
-                    f[{i,j}] += -flux2/dy;
+                    f[{i,j}] += -flux2/dy2;
 
                 if (j > 0)
-                    f[{i,j-1}] += flux2/dy;
+                    f[{i,j-1}] += flux2/dy2;
 
             }
 #endif            
@@ -326,7 +335,9 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
     };
 
     // create vector for beta
-    auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->rhs_fields);
+
+    //auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->rhs_fields);
+    auto beta_vec = ValVector<2>::GetNewVector(te_domain, 1);
     DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_func);
 #endif
 
