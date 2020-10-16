@@ -87,12 +87,17 @@ void save_time_step(fclaw2d_global_t *glob)
 }
 
 static
-void swap_q_rhs(fclaw2d_domain_t *domain,
-          fclaw2d_patch_t *patch,
-          int blockno, int patchno,
-          void *user)
+void update_q(fclaw2d_domain_t *domain,
+              fclaw2d_patch_t *patch,
+              int blockno, int patchno,
+              void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *)user;
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(g->glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
 
     double* rhs;
     int mfields;
@@ -104,9 +109,7 @@ void swap_q_rhs(fclaw2d_domain_t *domain,
 
     FCLAW_ASSERT(mfields==meqn);
 
-    double *tmp = q;
-    q = rhs;
-    rhs = tmp;
+    HEAT_UPDATE_Q(&mbc,&mx,&my,&meqn,&mfields,q,rhs);
 } 
 
 
@@ -114,7 +117,7 @@ void swap_q_rhs(fclaw2d_domain_t *domain,
 static
 void heat_run_swap_rhs_q(fclaw2d_global_t *glob)
 {
-    fclaw2d_global_iterate_patches(glob, swap_q_rhs, NULL);
+    fclaw2d_global_iterate_patches(glob, update_q, NULL);
 }
 
 
@@ -185,7 +188,8 @@ void outstyle_1(fclaw2d_global_t *glob)
             heat_run_swap_rhs_q(glob);
 
             double tc = t_curr + dt_step;
-            fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; Final time = %12.4f\n",
+            fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; " \
+                                     "Final time = %12.4f\n",
                                      fclaw_opt->minlevel,
                                      (*domain)->global_minlevel,
                                      (*domain)->global_maxlevel,
