@@ -26,16 +26,14 @@ subroutine heat_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
 end subroutine heat_fort_rhs
 
 
-subroutine heat_update_q(mbc,mx,my,meqn,mfields,q,rhs)
+subroutine heat_update_q(mbc,mx,my,meqn,mfields,rhs,q)
     IMPLICIT NONE
 
     INTEGER mbc,mx,my, mfields, meqn
-    DOUBLE PRECISION xlower,ylower,dx,dy
     DOUBLE PRECISION rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)    
     DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-    INTEGER i,j, m, blockno
-    DOUBLE PRECISION tmp
+    INTEGER i,j
 
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc
