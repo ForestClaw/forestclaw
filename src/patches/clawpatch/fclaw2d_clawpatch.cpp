@@ -871,7 +871,7 @@ size_t clawpatch_ghost_pack_elems(fclaw2d_global_t* glob)
 	FCLAW_ASSERT(hole >= 0);
 
 	size_t psize = (wg - hole)*(meqn + packarea + packextra) + frsize;
-	FCLAW_ASSERT(psize > 0);
+	FCLAW_ASSERT(psize >= 0);
 
 	return psize;
 }    
@@ -1279,7 +1279,7 @@ double* fclaw2d_clawpatch_get_exactsoln(fclaw2d_global_t* glob,
 	return cp->exactsolution.dataPtr();
 }
 
-void* flaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
+void* fclaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* patch)
 {
     fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
