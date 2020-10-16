@@ -169,7 +169,7 @@ void outstyle_1(fclaw2d_global_t *glob)
                 /* May end up taking either larger or smaller step */
                 dt_step = tend - t_curr;
                 double p = dt_step/dt_step_fixed;
-                fclaw_global_essentialf("Took modified time step; dt = %.2f %% of dt\n",p);
+                fclaw_global_essentialf("Took modified time step; dt = %.4f (%.2f\%)\n",dt_step,p);
             }
             else
             {
