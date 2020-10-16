@@ -92,7 +92,7 @@ void update_q(fclaw2d_domain_t *domain,
               int blockno, int patchno,
               void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *)user;
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -109,13 +109,13 @@ void update_q(fclaw2d_domain_t *domain,
 
     FCLAW_ASSERT(mfields==meqn);
 
-    HEAT_UPDATE_Q(&mbc,&mx,&my,&meqn,&mfields,q,rhs);
+    HEAT_UPDATE_Q(&mbc,&mx,&my,&meqn,&mfields,rhs,q);
 } 
 
 
 
 static
-void heat_run_swap_rhs_q(fclaw2d_global_t *glob)
+void heat_run_update_q(fclaw2d_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob, update_q, NULL);
 }
@@ -171,8 +171,8 @@ void outstyle_1(fclaw2d_global_t *glob)
             {
                 /* May end up taking either larger or smaller step */
                 dt_step = tend - t_curr;
-                double p = dt_step/dt_step_fixed;
-                fclaw_global_essentialf("Took modified time step; dt = %.4f (%.2f\%)\n",dt_step,p);
+                //double p = dt_step/dt_step_fixed;
+                //fclaw_global_essentialf("Took modified time step; dt = %.4f (%.2f\%)\n",dt_step,p);
             }
             else
             {
@@ -184,8 +184,8 @@ void outstyle_1(fclaw2d_global_t *glob)
             /* Solve the elliptic problem */
             fclaw2d_elliptic_solve(glob);
 
-            /* swap pointers between RHS and q */
-            heat_run_swap_rhs_q(glob);
+            /* Update solution stored in RHS */
+            heat_run_update_q(glob);
 
             double tc = t_curr + dt_step;
             fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; " \
