@@ -77,6 +77,15 @@ void HEAT_INIT(const int* blockno, const int* mbc, const int* mx,
                double q[]);
 
 
+#define HEAT_UPDATE_Q FCLAW_F77_FUNC(heat_update_q,HEAT_UPDATE_Q)
+
+void HEAT_UPDATE_Q(const int* mbc, const int* mx, 
+                   const int* my, const int* meqn, 
+                   const int* mfields, double rhs[],
+                   double q[]);
+
+
+
 #define HEAT_FORT_BETA FCLAW_F77_FUNC(heat_fort_beta,HEAT_FORT_BETA)
 
 void HEAT_FORT_BETA(const double* x, const double* y, const double* b, double grad[]);
