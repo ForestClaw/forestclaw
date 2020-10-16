@@ -14,8 +14,9 @@ subroutine heat_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
         do j = 1-mbc,my+mbc
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            if (method .eq. 1) then
+            if (method .eq. 1) then  
                 rhs(i,j,1) = q(i,j,1)
+                q(i,j,1) = 0;
             else
                 write(6,*) 'heat_fort_rhs : no valid RHS side specified'
                 stop
