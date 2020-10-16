@@ -154,6 +154,7 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
                 double lap = (u[{i+1,j}] - 2*uij + u[{i-1,j}])/dx2 + 
                              (u[{i,j+1}] - 2*uij + u[{i,j-1}])/dy2;
                 /* Forward Euler method */
+
                 f[{i,j}] = uij - dt*lap;
             }
     
