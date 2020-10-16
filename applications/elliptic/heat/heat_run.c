@@ -182,7 +182,7 @@ void outstyle_1(fclaw2d_global_t *glob)
             fclaw2d_elliptic_solve(glob);
 
             /* swap pointers between RHS and q */
-            //heat_run_swap_rhs_q(glob);
+            heat_run_swap_rhs_q(glob);
 
             double tc = t_curr + dt_step;
             fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; Final time = %12.4f\n",
