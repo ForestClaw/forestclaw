@@ -40,6 +40,7 @@ subroutine heat_update_q(mbc,mx,my,meqn,mfields,rhs,q)
             q(i,j,1) = rhs(i,j,1)
         end do
     end do
+100 format(2F16.8)
 
 end subroutine heat_update_q
 

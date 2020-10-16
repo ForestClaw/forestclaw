@@ -105,7 +105,7 @@ void update_q(fclaw2d_domain_t *domain,
 
     double* q;
     int meqn;
-    fclaw2d_clawpatch_rhs_data(g->glob, patch, &q, &meqn);
+    fclaw2d_clawpatch_soln_data(g->glob, patch, &q, &meqn);
 
     FCLAW_ASSERT(mfields==meqn);
 
