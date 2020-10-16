@@ -185,7 +185,7 @@ void outstyle_1(fclaw2d_global_t *glob)
             //heat_run_swap_rhs_q(glob);
 
             double tc = t_curr + dt_step;
-            fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; Final time = %12\n",
+            fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; Final time = %12.4f\n",
                                      fclaw_opt->minlevel,
                                      (*domain)->global_minlevel,
                                      (*domain)->global_maxlevel,
