@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_multigrid_solve.h"
 
 #include "operators/fc2d_multigrid_fivepoint.h"
+#include "operators/fc2d_multigrid_heat.h"
 #include "operators/fc2d_multigrid_starpatch.h"
 #include "operators/fc2d_multigrid_varpoisson.h"
 
@@ -105,6 +106,9 @@ void multigrid_solve(fclaw2d_global_t* glob)
             break;
         case VARPOISSON:
             mg_vt->patch_operator = fc2d_multigrid_varpoisson_solve;
+            break;
+        case HEAT:
+            mg_vt->patch_operator = fc2d_multigrid_heat_solve;
             break;
         case USER_OPERATOR:
             if (mg_vt->patch_operator == NULL)

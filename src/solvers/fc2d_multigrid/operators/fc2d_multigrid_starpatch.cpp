@@ -132,7 +132,7 @@ void fc2d_multigrid_starpatch_solve(fclaw2d_global_t *glob)
     auto beta_func = [&](const std::array<double,2>& coord){
         double x = coord[0];
         double y = coord[1];
-        double beta = 1 + x*y;
+        double beta = 1 + 0*x*y;
         return beta;
     };
 #endif  

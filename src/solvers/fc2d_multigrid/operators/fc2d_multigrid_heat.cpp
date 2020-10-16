@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "operators/fc2d_multigrid_fivepoint.h"
+#include "operators/fc2d_multigrid_heat.h"
 
 #include "fc2d_multigrid.h"
 #include "fc2d_multigrid_options.h"
@@ -61,11 +61,11 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::VarPoisson;
 
-class fivePoint : public PatchOperator<2>
+class heat : public PatchOperator<2>
 {
 public:
-    fivePoint(std::shared_ptr<const Domain<2>>      domain,
-              std::shared_ptr<const GhostFiller<2>> ghost_filler);
+    heat(std::shared_ptr<const Domain<2>>      domain,
+              std::shared_ptr<const GhostFiller<2>> ghost_filler, double dt);
 
     void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                           const std::vector<LocalData<2>>& us,
@@ -74,17 +74,20 @@ public:
                        const std::vector<LocalData<2>>& us,
                        std::vector<LocalData<2>>& fs) const override;
 
+    double dt;  
+
 };
 
 
-fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler) : PatchOperator<2>(domain,ghost_filler)
+heat::heat(std::shared_ptr<const Domain<2>>      domain,
+                     std::shared_ptr<const GhostFiller<2>> ghost_filler, double dt) 
+                     : PatchOperator<2>(domain,ghost_filler)
 {
-    /* Nothing to construct yet */
+    this->dt = dt;
 }
 
 
-void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                                  const std::vector<LocalData<2>>& us,
                                  std::vector<LocalData<2>>& fs) const 
 {
@@ -140,6 +143,7 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 
         double dx2 = dx*dx;
         double dy2 = dy*dy;
+        double dt = this->dt;
 
 #if 1
         /* Five-point Laplacian */
@@ -147,8 +151,10 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             for(int i = 0; i < mx; i++)
             {
                 double uij = u[{i,j}];
-                f[{i,j}] = (u[{i+1,j}] - 2*uij + u[{i-1,j}])/dx2 + 
-                           (u[{i,j+1}] - 2*uij + u[{i,j-1}])/dy2;
+                double lap = (u[{i+1,j}] - 2*uij + u[{i-1,j}])/dx2 + 
+                             (u[{i,j+1}] - 2*uij + u[{i,j-1}])/dy2;
+                /* Forward Euler method */
+                f[{i,j}] = uij - dt*lap;
             }
     
 #else
@@ -171,7 +177,7 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 }
 
 
-void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
                               const std::vector<LocalData<2>>& us, 
                               std::vector<LocalData<2>>& fs) const 
 {
@@ -217,7 +223,7 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 }
  
 
-void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob) 
+void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob) 
 {
     // get needed options
     fclaw2d_clawpatch_options_t *clawpatch_opt =
@@ -266,7 +272,8 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    auto op = make_shared<fivePoint>(te_domain,ghost_filler);
+    double dt = glob->curr_dt;
+    auto op = make_shared<heat>(te_domain,ghost_filler,dt);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
@@ -283,7 +290,7 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
             solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
             break;
         default:
-            fclaw_global_essentialf("multigrid_fivepoint : No valid patch solver specified\n");
+            fclaw_global_essentialf("multigrid_heat : No valid patch solver specified\n");
             exit(0);            
     }
 
@@ -338,7 +345,7 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
+            patch_operator = make_shared<heat>(curr_domain, ghost_filler,dt);
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
@@ -353,7 +360,7 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
                     smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
                     break;
                 default:
-                    fclaw_global_essentialf("multigrid_fivepoint : No valid " \
+                    fclaw_global_essentialf("multigrid_heat : No valid " \
                                             "patch solver specified\n");
                     exit(0);            
             }
@@ -381,7 +388,7 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
+        patch_operator = make_shared<heat>(curr_domain, ghost_filler,dt);
 
         //smoother
         switch (mg_opt->patch_solver)
@@ -395,7 +402,7 @@ void fc2d_multigrid_fivepoint_solve(fclaw2d_global_t *glob)
                 smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
                 break;
             default:
-                fclaw_global_essentialf("multigrid_fivepoint : No valid " \
+                fclaw_global_essentialf("multigrid_heat : No valid " \
                                         "patch solver specified\n");
                 exit(0);            
         }

@@ -100,7 +100,8 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
     sc_keyvalue_t *kv_op = mg_opt->kv_patch_operator = sc_keyvalue_new ();
     sc_keyvalue_set_int (kv_op, "starpatch",  STARPATCH);     /* Uses patch-solver-type */
     sc_keyvalue_set_int (kv_op, "fivepoint",  FIVEPOINT);     /* Uses FFT or BICG */
-    sc_keyvalue_set_int (kv_op, "varpoisson",  VARPOISSON);   /* Uses BICG */
+    sc_keyvalue_set_int (kv_op, "varpoisson", VARPOISSON);   /* Uses BICG */
+    sc_keyvalue_set_int (kv_op, "heat",       HEAT);   /* Uses BICG */
     sc_keyvalue_set_int (kv_op, "user_operator",  USER_OPERATOR);   /* Uses BICG */
     sc_options_add_keyvalue (opt, 0, "patch_operator", &mg_opt->patch_operator,
                              "fivepoint", kv_op, "Set patch operator type [fivepoint]");

@@ -45,6 +45,7 @@ typedef enum {
     STARPATCH = 0,  /* ThunderEgg operator */
     FIVEPOINT,      /* Laplacian (no beta) */
     VARPOISSON,      /* Variable Poisson operator */
+    HEAT,      /* Variable Poisson operator */
     USER_OPERATOR
 } fc2d_multigrid_operator_types;
 
