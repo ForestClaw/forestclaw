@@ -18,7 +18,7 @@ include applications/clawpack/clawpack.apps
 endif
 
 # --------------------------------------------
-# Multigrid solver
+# ThunderEgg solver
 # --------------------------------------------
 
 if FCLAW_ENABLE_MULTIGRID
@@ -34,8 +34,11 @@ include src/solvers/fc2d_multigrid/Makefile.am
 ## Multigrid test
 include applications/clawpack/shallow/2d/tsunami/Makefile.am
 
-## Tsunami example
+## Elliptic example
 include applications/elliptic/mgtest/Makefile.am
+
+## Heat equation
+include applications/elliptic/heat/Makefile.am
 
 
 endif
