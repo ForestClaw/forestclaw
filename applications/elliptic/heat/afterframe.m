@@ -7,44 +7,26 @@ fprintf('%10s %12.4e\n','qmax',qmax);
 showpatchborders;
 setpatchborderprops('linewidth',1);
 
-% Set color axis and title strings
-if Frame == 0 
-    if mq == 1
-        % RHS 
-        caxis([-0.01, 0.01]);
-        tstr = 'RHS';
-    else
-        error('Only print out RHS for Frame == 0');
-    end
-elseif Frame == 1
-    if mq == 1
-        % Computed solution
-        caxis([-0.2, 1]);
-        tstr = 'Computed solution';
-    elseif mq == 2
-        % Exact solution
-        caxis([-0.2, 1]);
-        tstr = 'Exact solution';
-    elseif mq == 3        
-        % Error
-        caxis([-1,1]*1e-2);
-        tstr = 'Error';
-    end
+example = read_vars();
+switch example
+    case 1
+        ca = [0.9,2];
+    case 4
+        ca = [0,1];
 end
-
-% Contour lines
-cv = linspace(0,1,11);
-% drawcontourlines(cv);
-
+ca = [qmin,qmax];
+caxis(ca);
+cv = linspace(ca(1),ca(2),11);
+drawcontourlines(cv);
 
 % Color map and axis
 colormap(parula);
 colorbar;
 
 % Add some extra info
-hold on;
-plot_stars();
-hold off;
+% hold on;
+% plot_stars();
+% hold off;
 
 % Surface plot
 if (length(amrdata) == 1)
@@ -55,6 +37,7 @@ if (length(amrdata) == 1)
     set(h,'edgecolor','none');
     view(3);
     axis square;
+    % set(gca,'zlim',ca);
 %     set(gcf,'color','k');
 %     set(gcf,'clipping','off');
 %     axis off;
@@ -74,7 +57,7 @@ daspect([1 1 1]);
 xlabel('x','fontsize',16);
 ylabel('y','fontsize',16);
 
-title(tstr,'fontsize',18);
+% title(tstr,'fontsize',18);
 
         
 NoQuery = 0;
