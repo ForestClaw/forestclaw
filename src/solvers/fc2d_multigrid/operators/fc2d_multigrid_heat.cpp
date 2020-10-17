@@ -144,6 +144,7 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         double dx2 = dx*dx;
         double dy2 = dy*dy;
         double dt = this->dt;
+        double lambda = -1/dt;
 
 #if 1
         /* Five-point Laplacian */
@@ -155,7 +156,8 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
                              (u[{i,j+1}] - 2*uij + u[{i,j-1}])/dy2;
                 /* Forward Euler method */
 
-                f[{i,j}] = uij - dt*lap;
+                //f[{i,j}] = uij - dt*lap;
+                f[{i,j}] = lap + lambda*uij;
             }
     
 #else
@@ -198,7 +200,7 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dy = pinfo->spacings[1];
     double dy2 = dy*dy;
 
-    double dt = this->dt;
+    //double dt = this->dt;
 
     for(int m = 0; m < mfields; m++)
     {
@@ -209,14 +211,14 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
             /* bool hasNbr(Side<D> s) */
             if (pinfo->hasNbr(Side<2>::west()))
             {
-                //f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
-                f[{0,j}] += dt*(u[{-1,j}]+u[{0,j}])/dx2;
+                f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
+                //f[{0,j}] += dt*(u[{-1,j}]+u[{0,j}])/dx2;
             }
 
             if (pinfo->hasNbr(Side<2>::east()))
             {                
-                //f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
-                f[{mx-1,j}] += dt*(u[{mx-1,j}]+u[{mx,j}])/dx2;
+                f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
+                //f[{mx-1,j}] += dt*(u[{mx-1,j}]+u[{mx,j}])/dx2;
             }
         }
 
@@ -224,14 +226,14 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
         {
             if (pinfo->hasNbr(Side<2>::south()))
             {
-                //f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
-                f[{i,0}] += dt*(u[{i,-1}]+u[{i,0}])/dy2;                
+                f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
+                //f[{i,0}] += dt*(u[{i,-1}]+u[{i,0}])/dy2;                
             }                
 
             if (pinfo->hasNbr(Side<2>::north()))
             {
-                //f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
-                f[{i,my-1}] += dt*(u[{i,my-1}]+u[{i,my}])/dy2;
+                f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+                //f[{i,my-1}] += dt*(u[{i,my-1}]+u[{i,my}])/dy2;
             }
         }
     }
