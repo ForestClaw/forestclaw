@@ -272,8 +272,11 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
     int mfields;
     fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
-    double *error = fclaw2d_clawpatch_get_error(glob,patch);
-    double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    double *err;
+    fclaw2d_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
+
+    double *soln;
+    fclaw2d_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
 
     char fname[BUFSIZ];
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -286,7 +289,7 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
 
     MGTEST_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
                              &xlower,&ylower,&dx,&dy,rhs,
-                             soln, error,
+                             soln, err,
                              &global_num,&level,&blockno,
                              &glob->mpirank);
 }
