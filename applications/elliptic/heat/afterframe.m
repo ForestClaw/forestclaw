@@ -14,6 +14,7 @@ switch example
     case 4
         ca = [0,1];
 end
+ca = [qmin,qmax];
 caxis(ca);
 cv = linspace(ca(1),ca(2),11);
 drawcontourlines(cv);
