@@ -23,10 +23,10 @@ subroutine allencahn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
 !!         enddo
 !!      enddo
 
-    do i = 1-mbc,mx+mbc
-        do j = 1-mbc,my+mbc
+    do i = 1,mx
+        do j = 1,my
             u = q(i,j,1)
-            rhs(i,j,1) = lambda*u - (u-u**3)/D**2
+            rhs(i,j,1) = lambda*u !! - (u-u**3)/D**2
         end do
     end do
 

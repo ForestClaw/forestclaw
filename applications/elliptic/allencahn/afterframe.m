@@ -7,7 +7,8 @@ fprintf('%10s %12.4e\n','qmax',qmax);
 showpatchborders;
 setpatchborderprops('linewidth',1);
 
-ca = [0,1];
+ca = [-1,1];
+caxis(ca);
 
 % Contour lines
 cv = linspace(0,1,11);
@@ -27,6 +28,8 @@ if (length(amrdata) == 1)
     set(h,'edgecolor','none');
     view(3);
     axis square;
+    % view(vfront);
+    % set(gca,'zlim',[-1.1,1.1]);
 %     set(gcf,'color','k');
 %     set(gcf,'clipping','off');
 %     axis off;
@@ -46,9 +49,6 @@ daspect([1 1 1]);
 xlabel('x','fontsize',16);
 ylabel('y','fontsize',16);
 
-title(tstr,'fontsize',18);
-
-        
 NoQuery = 0;
 prt = false;
 if (prt)

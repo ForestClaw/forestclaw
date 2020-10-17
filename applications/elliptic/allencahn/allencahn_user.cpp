@@ -412,6 +412,7 @@ void allencahn_link_solvers(fclaw2d_global_t *glob)
 
     /* Patch : RHS function */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    patch_vt->physical_bc = fclaw2d_physical_bc_default;   /* Doesn't do anything */
     patch_vt->rhs = allencahn_rhs;          /* Overwrites default */
     patch_vt->initialize = allencahn_initialize;   /* Get an initial refinement */
 
