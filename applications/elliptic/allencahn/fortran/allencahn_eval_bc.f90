@@ -40,6 +40,6 @@ double precision function allencahn_dirichlet(iface,t,x,y)
     integer iface
     double precision t,x,y
 
-    allencahn_dirichlet = 0
+    allencahn_dirichlet = -1
 
 end function allencahn_dirichlet
