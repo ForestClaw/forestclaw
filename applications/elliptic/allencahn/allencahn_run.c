@@ -289,12 +289,6 @@ void outstyle_3(fclaw2d_global_t *glob)
             dt_step /= level_factor;
         }
 
-        /* In case we have to reject this step */
-        if (!fclaw_opt->use_fixed_dt)
-        {
-            save_time_step(glob);
-        }
-
         /* Get current domain data since it may change during regrid */
         glob->curr_dt = dt_step;
 
@@ -303,20 +297,6 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         /* Update solution stored in RHS */
         allencahn_run_update_q(glob);
-
-#if 0
-        double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
-
-        /* This is a collective communication - everybody needs to wait here. */
-        if (fclaw_opt->reduce_cfl)
-        {
-            /* If we are taking a variable time step, we have to reduce the 
-               maxcfl so that every processor takes the same size dt */
-            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
-            maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);     
-        }
-#endif        
 
         double tc = t_curr + dt_step;
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
@@ -329,38 +309,8 @@ void outstyle_3(fclaw2d_global_t *glob)
                                  (*domain)->global_maxlevel,
                                  n+1,dt_step,tc);
 
-#if 0
-        if (fclaw_opt->reduce_cfl & (maxcfl_step > fclaw_opt->max_cfl))
-        {
-            if (!fclaw_opt->use_fixed_dt)
-            {
-                fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-                restore_time_step(glob);
-
-                dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
-
-                /* Go back to start of loop without incrementing step counter or
-                   current time. */
-                continue;
-            }
-            else
-            {
-                fclaw_global_productionf("   WARNING : Maximum CFL exceeded\n");
-            }
-        }
-#endif        
-
-        /* We are happy with this time step */
         t_curr = tc;
         glob->curr_time = t_curr;
-
-#if 0
-        /* New time step, which should give a cfl close to the desired cfl. */
-        if (!fclaw_opt->use_fixed_dt)
-        {
-            dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
-        }
-#endif
 
         n++;  /* Increment outer counter */
 
@@ -374,9 +324,8 @@ void outstyle_3(fclaw2d_global_t *glob)
         }
 
         if (fclaw_opt->advance_one_step)
-        {
             fclaw2d_diagnostics_gather(glob,init_flag);
-        }
+        
 
         if (n % nstep_inner == 0)
         {
