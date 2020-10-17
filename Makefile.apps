@@ -40,6 +40,8 @@ include applications/elliptic/mgtest/Makefile.am
 ## Heat equation
 include applications/elliptic/heat/Makefile.am
 
+## Allencahn equation
+include applications/elliptic/allencahn/Makefile.am
 
 endif
 
