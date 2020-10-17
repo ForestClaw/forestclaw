@@ -7,9 +7,17 @@ fprintf('%10s %12.4e\n','qmax',qmax);
 showpatchborders;
 setpatchborderprops('linewidth',1);
 
-% Contour lines
-cv = linspace(0,1,11);
-% drawcontourlines(cv);
+example = read_vars();
+switch example
+    case 1
+        ca = [1,2];
+    case 4
+        ca = [0,1];
+end
+ca = [qmin,qmax];
+caxis(ca);
+cv = linspace(ca(1),ca(2),11);
+drawcontourlines(cv);
 
 % Color map and axis
 colormap(parula);
@@ -48,7 +56,7 @@ daspect([1 1 1]);
 xlabel('x','fontsize',16);
 ylabel('y','fontsize',16);
 
-title(tstr,'fontsize',18);
+% title(tstr,'fontsize',18);
 
         
 NoQuery = 0;

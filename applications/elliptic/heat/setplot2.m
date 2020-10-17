@@ -15,7 +15,7 @@ UserVariableFile = ' ';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
 Manifold = 0;
 ReadBlockNumber = 1;
-MaxFrames = 2;            % max number of frames to loop over
+MaxFrames = 1000;            % max number of frames to loop over
 MaxLevels = 30;
 PlotData =  ones(1,MaxLevels);   % Data on refinement level k is plotted only if
 			                     % k'th component is nonzero
