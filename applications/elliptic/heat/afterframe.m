@@ -10,11 +10,10 @@ setpatchborderprops('linewidth',1);
 example = read_vars();
 switch example
     case 1
-        ca = [1,2];
+        ca = [0.9,2];
     case 4
         ca = [0,1];
 end
-ca = [qmin,qmax];
 caxis(ca);
 cv = linspace(ca(1),ca(2),11);
 drawcontourlines(cv);
@@ -37,6 +36,7 @@ if (length(amrdata) == 1)
     set(h,'edgecolor','none');
     view(3);
     axis square;
+    set(gca,'zlim',ca);
 %     set(gcf,'color','k');
 %     set(gcf,'clipping','off');
 %     axis off;
