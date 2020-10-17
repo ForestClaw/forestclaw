@@ -27,7 +27,19 @@ double precision function heat_fort_eval_bc(iface,t,x,y)
     endif
 
     heat_fort_eval_bc = a*q + b*qn
+    !!heat_fort_eval_bc = 0
 
     return
     
 end function heat_fort_eval_bc
+
+
+double precision function heat_neumann(iface,t,x,y)
+    implicit none
+
+    integer iface
+    double precision t,x,y
+
+    heat_neumann = 0
+
+end function heat_neumann
