@@ -118,26 +118,26 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         if (!pinfo->hasNbr(Side<2>::west())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = u[{0,j}];
+                ghosts[{j}] = -u[{0,j}];
             }
         }
         if (!pinfo->hasNbr(Side<2>::east())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = u[{mx-1,j}];
+                ghosts[{j}] = -u[{mx-1,j}];
             }
         }
 
         if (!pinfo->hasNbr(Side<2>::south())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = u[{i,0}];
+                ghosts[{i}] = -u[{i,0}];
             }
         }
         if (!pinfo->hasNbr(Side<2>::north())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = u[{i,my-1}];
+                ghosts[{i}] = -u[{i,my-1}];
             }
         }
 
