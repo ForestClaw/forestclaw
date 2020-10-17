@@ -118,7 +118,7 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         if (!pinfo->hasNbr(Side<2>::west())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = u[{0,j}];
+                ghosts[{j}] = -u[{0,j}];
             }
         }
         if (!pinfo->hasNbr(Side<2>::east())){
@@ -131,7 +131,7 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         if (!pinfo->hasNbr(Side<2>::south())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = u[{i,0}];
+                ghosts[{i}] = -u[{i,0}];
             }
         }
         if (!pinfo->hasNbr(Side<2>::north())){
@@ -212,13 +212,11 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
             if (pinfo->hasNbr(Side<2>::west()))
             {
                 f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
-                //f[{0,j}] += dt*(u[{-1,j}]+u[{0,j}])/dx2;
             }
 
             if (pinfo->hasNbr(Side<2>::east()))
             {                
                 f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
-                //f[{mx-1,j}] += dt*(u[{mx-1,j}]+u[{mx,j}])/dx2;
             }
         }
 
@@ -227,13 +225,11 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
             if (pinfo->hasNbr(Side<2>::south()))
             {
                 f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
-                //f[{i,0}] += dt*(u[{i,-1}]+u[{i,0}])/dy2;                
             }                
 
             if (pinfo->hasNbr(Side<2>::north()))
             {
                 f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
-                //f[{i,my-1}] += dt*(u[{i,my-1}]+u[{i,my}])/dy2;
             }
         }
     }

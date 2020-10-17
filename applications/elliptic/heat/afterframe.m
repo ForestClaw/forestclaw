@@ -36,7 +36,7 @@ if (length(amrdata) == 1)
     set(h,'edgecolor','none');
     view(3);
     axis square;
-    set(gca,'zlim',ca);
+    % set(gca,'zlim',ca);
 %     set(gcf,'color','k');
 %     set(gcf,'clipping','off');
 %     axis off;
