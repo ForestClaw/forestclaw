@@ -152,7 +152,7 @@ void outstyle_1(fclaw2d_global_t *glob)
     double dt_outer = (final_time-t0)/((double) nout);
     double t_curr = t0;
     int n_inner = 0;
-    double dt_step_fixed = fclaw_opt->initial_dt;
+    //double dt_step_fixed = fclaw_opt->initial_dt;
 
 
     int n;
@@ -164,19 +164,25 @@ void outstyle_1(fclaw2d_global_t *glob)
         double tend = tstart + dt_outer;
         while (t_curr < tend)
         {
+            double dt_step = dt_minlevel;
+            if (fclaw_opt->advance_one_step)
+            {
+                dt_step /= level_factor;
+            }
+
             double tol = 0.01;
-            double dt_step;
-            double dt_small = t_curr + dt_step_fixed - tend;
-            if (abs(dt_small) < tol*dt_step_fixed)
+            double dt_small = t_curr + dt_step - tend;
+            if (dt_small < 0)
             {
                 /* May end up taking either larger or smaller step */
-                dt_step = tend - t_curr;
+                if (abs(dt_small) < tol*dt_step)
+                    dt_step = tend - t_curr;
                 //double p = dt_step/dt_step_fixed;
                 //fclaw_global_essentialf("Took modified time step; dt = %.4f (%.2f\%)\n",dt_step,p);
             }
             else
             {
-                dt_step = dt_step_fixed;
+                dt_step = tend - t_curr;
             }
 
             glob->curr_dt = dt_step;  
