@@ -7,7 +7,7 @@ fprintf('%10s %12.4e\n','qmax',qmax);
 showpatchborders;
 setpatchborderprops('linewidth',1);
 
-ca = [-1,1];
+ca = [-1.5,1];
 caxis(ca);
 
 % Contour lines
