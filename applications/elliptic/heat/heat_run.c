@@ -181,7 +181,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
             glob->curr_dt = dt_step;  
 
-            /* Solve the elliptic problem */
+            /* Solve the elliptic problem; RHS is set here */
             fclaw2d_elliptic_solve(glob);
 
             /* Update solution stored in RHS */

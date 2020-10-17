@@ -115,6 +115,10 @@ void HEAT_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my,
 double HEAT_FORT_EVAL_BC(const int* iface, const double* t,const double* x, const double* y);
 
 
+#define HEAT_NEUMANN FCLAW_F77_FUNC(heat_neumann, HEAT_NEUMANN)
+
+double HEAT_NEUMANN(const int* iface, const double* t,const double* x, const double* y);
+
 
 /* ----------------------------- Fortran - output functions --------------------------- */
 
