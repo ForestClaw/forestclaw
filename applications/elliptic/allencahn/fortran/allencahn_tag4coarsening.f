@@ -53,9 +53,9 @@ c     # not be coarsened.
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer i,j
 
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-            if (abs(q(i,j,1)) .gt. coarsen_threshold) then
+      do i = 1,mx
+         do j = 1,my
+            if ((q(i,j,1)+1) .gt. coarsen_threshold) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
                tag_patch = 0

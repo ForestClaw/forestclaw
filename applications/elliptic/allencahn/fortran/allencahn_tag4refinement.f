@@ -18,8 +18,8 @@ c     # Refine based only on first variable in system.
       mq = 1
       qmin = q(1,1,mq)
       qmax = q(1,1,mq)
-      do j = 1-mbc,my+mbc
-         do i = 1-mbc,mx+mbc
+      do j = 1,my
+         do i = 1,mx
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
             if ((q(i,j,1)+1) .gt. tag_threshold) then
