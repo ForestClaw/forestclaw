@@ -173,22 +173,28 @@ void heat_compute_error(fclaw2d_global_t *glob,
         double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
 
         /* Solution is stored in the RHS */
-        double *rhs, *err, *soln;  
-        int mfields;
-        fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+        double *q;
+        int meqn;
+        fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+        double *err = fclaw2d_clawpatch_get_error(glob,patch);
+        double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+
+#if 0
         fclaw2d_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
         fclaw2d_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
+#endif        
 
         double t = glob->curr_time;
 
         clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,
-                                               &mfields,&dx,&dy,
-                                               &xlower,&ylower, &t, rhs, err, soln);
+                                               &meqn,&dx,&dy,
+                                               &xlower,&ylower, &t, q, err, soln);
 
         /* Accumulate sums and maximums needed to compute error norms */
 
         FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
-        clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &mfields, 
+        clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &meqn, 
                                               &dx,&dy, area, err,
                                               error_data->local_error);
 
