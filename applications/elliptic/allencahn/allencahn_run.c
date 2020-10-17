@@ -297,6 +297,14 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         /* Get current domain data since it may change during regrid */
         glob->curr_dt = dt_step;
+
+        /* Solve the elliptic problem; RHS is set here */
+        fclaw2d_elliptic_solve(glob);
+
+        /* Update solution stored in RHS */
+        allencahn_run_update_q(glob);
+
+#if 0
         double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
 
         /* This is a collective communication - everybody needs to wait here. */
@@ -308,18 +316,20 @@ void outstyle_3(fclaw2d_global_t *glob)
             maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
             fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);     
         }
+#endif        
 
         double tc = t_curr + dt_step;
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
                           fclaw_opt->maxlevel : fclaw_opt->minlevel;
 
-        fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
-                                 "%12.6f; Final time = %12.4f\n",
+        fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; " \
+                                 "Final time = %12.4f\n",
                                  level2print,
                                  (*domain)->global_minlevel,
                                  (*domain)->global_maxlevel,
-                                 n+1,dt_step,maxcfl_step, tc);
+                                 n+1,dt_step,tc);
 
+#if 0
         if (fclaw_opt->reduce_cfl & (maxcfl_step > fclaw_opt->max_cfl))
         {
             if (!fclaw_opt->use_fixed_dt)
@@ -338,16 +348,19 @@ void outstyle_3(fclaw2d_global_t *glob)
                 fclaw_global_productionf("   WARNING : Maximum CFL exceeded\n");
             }
         }
+#endif        
 
         /* We are happy with this time step */
         t_curr = tc;
         glob->curr_time = t_curr;
 
+#if 0
         /* New time step, which should give a cfl close to the desired cfl. */
         if (!fclaw_opt->use_fixed_dt)
         {
             dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
         }
+#endif
 
         n++;  /* Increment outer counter */
 
