@@ -440,13 +440,15 @@ void heat_link_solvers(fclaw2d_global_t *glob)
 
     /* Diagnostics - most need to be modified because different number of fields are
        used for the elliptic problem then for the hyperbolic problem */
-    clawpatch_vt->conservation_check = heat_conservation_check;        
+    //clawpatch_vt->conservation_check = heat_conservation_check;        
 
+#if 0
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
     diag_vt->patch_init_diagnostics     = heat_diagnostics_initialize;
     diag_vt->patch_reset_diagnostics    = heat_diagnostics_reset;
     diag_vt->patch_compute_diagnostics  = heat_diagnostics_compute;
     diag_vt->patch_gather_diagnostics   = heat_diagnostics_gather;
     diag_vt->patch_finalize_diagnostics = heat_diagnostics_finalize;
+#endif    
 }
 
