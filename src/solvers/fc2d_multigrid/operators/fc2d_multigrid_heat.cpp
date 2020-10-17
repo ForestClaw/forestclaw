@@ -198,6 +198,8 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dy = pinfo->spacings[1];
     double dy2 = dy*dy;
 
+    double dt = this->dt;
+
     for(int m = 0; m < mfields; m++)
     {
         const LocalData<2>& u = us[m];
@@ -206,19 +208,31 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
         {
             /* bool hasNbr(Side<D> s) */
             if (pinfo->hasNbr(Side<2>::west()))
-                f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
+            {
+                //f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
+                f[{0,j}] += dt*(u[{-1,j}]+u[{0,j}])/dx2;
+            }
 
             if (pinfo->hasNbr(Side<2>::east()))
-                f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
+            {                
+                //f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
+                f[{mx-1,j}] += dt*(u[{mx-1,j}]+u[{mx,j}])/dx2;
+            }
         }
 
         for(int i = 0; i < mx; i++)
         {
             if (pinfo->hasNbr(Side<2>::south()))
-                f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
+            {
+                //f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
+                f[{i,0}] += dt*(u[{i,-1}]+u[{i,0}])/dy2;                
+            }                
 
             if (pinfo->hasNbr(Side<2>::north()))
-                f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+            {
+                //f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+                f[{i,my-1}] += dt*(u[{i,my-1}]+u[{i,my}])/dy2;
+            }
         }
     }
 }
