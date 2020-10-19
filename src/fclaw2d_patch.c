@@ -518,13 +518,14 @@ int fclaw2d_patch_tag4refinement(fclaw2d_global_t *glob,
 int fclaw2d_patch_tag4coarsening(fclaw2d_global_t *glob,
 									  fclaw2d_patch_t *fine_patches,
 									  int blockno,
-									  int patchno)
+									  int patchno,
+                                      int initflag)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 	FCLAW_ASSERT(patch_vt->tag4coarsening != NULL);
 
 	return patch_vt->tag4coarsening(glob,fine_patches,
-									blockno, patchno);
+									blockno, patchno,initflag);
 }
 
 void fclaw2d_patch_average2coarse(fclaw2d_global_t *glob,
