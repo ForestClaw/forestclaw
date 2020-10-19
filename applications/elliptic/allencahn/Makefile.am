@@ -10,6 +10,7 @@ applications_elliptic_allencahn_allencahn_SOURCES = \
 	applications/elliptic/allencahn/allencahn_options.c \
 	applications/elliptic/allencahn/hsmooth.f90 \
 	applications/elliptic/allencahn/fortran/allencahn_setprob.f90 \
+	applications/elliptic/allencahn/fortran/allencahn_bc2.f90 \
 	applications/elliptic/allencahn/fortran/allencahn_fort_rhs.f90 \
 	applications/elliptic/allencahn/fortran/allencahn_qinit.f \
 	applications/elliptic/allencahn/fortran/allencahn_qexact.f90 \
