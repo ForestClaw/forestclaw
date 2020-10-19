@@ -87,6 +87,9 @@ struct fc2d_multigrid_options
     /* Used by starpatch only */
     const char *patch_solver_type;
 
+    /* Operator parameters */
+    double lambda;  /* Used by HEAT operator */
+
     int patch_operator;
     sc_keyvalue_t *kv_patch_operator;
 

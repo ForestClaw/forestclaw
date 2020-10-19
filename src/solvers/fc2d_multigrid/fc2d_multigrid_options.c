@@ -92,6 +92,9 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
                            "Max allowed iterations for patch-based bcgs solver [1000]");
 
 
+    sc_options_add_double (opt, 0, "lambda", &mg_opt->lambda, 0,
+                           "lambda (used by heat operator) [0]");
+
     /* Used by starpatch only */
     sc_options_add_string (opt, 0, "patch-solver-type", &mg_opt->patch_solver_type, "BCGS",
                            "Patch solver type. Can either be BCGS or FFT [BCGS]");

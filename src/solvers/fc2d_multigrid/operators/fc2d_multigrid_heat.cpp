@@ -65,7 +65,7 @@ class heat : public PatchOperator<2>
 {
 public:
     heat(std::shared_ptr<const Domain<2>>      domain,
-              std::shared_ptr<const GhostFiller<2>> ghost_filler, double dt);
+              std::shared_ptr<const GhostFiller<2>> ghost_filler, double lambda);
 
     void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                           const std::vector<LocalData<2>>& us,
@@ -74,16 +74,16 @@ public:
                        const std::vector<LocalData<2>>& us,
                        std::vector<LocalData<2>>& fs) const override;
 
-    double dt;  
+    double lambda;  
 
 };
 
 
 heat::heat(std::shared_ptr<const Domain<2>>      domain,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler, double dt) 
+                     std::shared_ptr<const GhostFiller<2>> ghost_filler, double lambda) 
                      : PatchOperator<2>(domain,ghost_filler)
 {
-    this->dt = dt;
+    this->lambda = lambda;
 }
 
 
@@ -143,8 +143,6 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 
         double dx2 = dx*dx;
         double dy2 = dy*dy;
-        double dt = this->dt;
-        double lambda = -1/dt;
 
 #if 1
         /* Five-point Laplacian */
@@ -154,9 +152,7 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
                 double uij = u[{i,j}];
                 double lap = (u[{i+1,j}] - 2*uij + u[{i-1,j}])/dx2 + 
                              (u[{i,j+1}] - 2*uij + u[{i,j-1}])/dy2;
-                /* Forward Euler method */
 
-                //f[{i,j}] = uij - dt*lap;
                 f[{i,j}] = lap + lambda*uij;
             }
     
@@ -199,8 +195,6 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 
     double dy = pinfo->spacings[1];
     double dy2 = dy*dy;
-
-    //double dt = this->dt;
 
     for(int m = 0; m < mfields; m++)
     {
@@ -285,8 +279,8 @@ void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    double dt = glob->curr_dt;
-    auto op = make_shared<heat>(te_domain,ghost_filler,dt);
+    double lambda = mg_opt->lambda;
+    auto op = make_shared<heat>(te_domain,ghost_filler,lambda);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
@@ -358,7 +352,7 @@ void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            patch_operator = make_shared<heat>(curr_domain, ghost_filler,dt);
+            patch_operator = make_shared<heat>(curr_domain, ghost_filler,lambda);
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
@@ -401,7 +395,7 @@ void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        patch_operator = make_shared<heat>(curr_domain, ghost_filler,dt);
+        patch_operator = make_shared<heat>(curr_domain, ghost_filler,lambda);
 
         //smoother
         switch (mg_opt->patch_solver)
