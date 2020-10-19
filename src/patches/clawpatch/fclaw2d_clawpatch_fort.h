@@ -108,6 +108,7 @@ typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx, const int* my,
 												double q0[],double q1[],
 												double q2[],double q3[],
 												const double* tag_threshold,
+                                                const int* init_flag,
 												int* tag_patch);
 
 typedef void (*clawpatch_fort_interpolate2fine_t)(const int* mx, const int* my,
@@ -210,6 +211,7 @@ void TAG4COARSENING(const int* mx, const int* my,
 					double q0[],double q1[],
 					double q2[],double q3[],
 					const double* tag_threshold,
+                    const int* initflag,
 					int* tag_patch);
 
 #define INTERPOLATE2FINE FCLAW_F77_FUNC(interpolate2fine, INTERPOLATE2FINE)

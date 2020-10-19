@@ -260,7 +260,8 @@ int fclaw2d_patch_tag4refinement(struct fclaw2d_global *glob,
 int fclaw2d_patch_tag4coarsening(struct fclaw2d_global *glob,
 								 struct fclaw2d_patch *fine_patches,
 								 int blockno,
-								 int patchno);
+								 int patchno,
+                                 int initflag);
 
 void fclaw2d_patch_interpolate2fine(struct fclaw2d_global *glob,
 									struct fclaw2d_patch* coarse_patch,
@@ -515,7 +516,8 @@ typedef int (*fclaw2d_patch_tag4refinement_t)(struct fclaw2d_global *glob,
 typedef int (*fclaw2d_patch_tag4coarsening_t)(struct fclaw2d_global *glob,
 											   struct fclaw2d_patch *this_patch,
 											   int this_blockno,
-											   int this_patchno);
+											   int this_patchno,
+                                               int initflag);
 
 typedef void (*fclaw2d_patch_interpolate2fine_t)(struct fclaw2d_global *glob,
 												 struct fclaw2d_patch *coarse_patch,
