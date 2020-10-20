@@ -1,5 +1,5 @@
 subroutine heat_fort_rhs(blockno, mbc,mx,my,meqn,mfields, & 
-                         xlower,ylower,dx,dy,dt, method,q,rhs)
+                         xlower,ylower,dx,dy,lambda, method,q,rhs)
     IMPLICIT NONE
 
     INTEGER mbc,mx,my, mfields, meqn, method
@@ -9,8 +9,6 @@ subroutine heat_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
 
     INTEGER i,j, m, blockno
     DOUBLE PRECISION xc,yc, lambda
-
-    lambda = -1.d0/dt
 
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc
