@@ -3,23 +3,18 @@ subroutine heat_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
     IMPLICIT NONE
 
     INTEGER mbc,mx,my, mfields, meqn, method
-    DOUBLE PRECISION xlower,ylower,dx,dy, dt
+    DOUBLE PRECISION xlower,ylower,dx,dy, lambda
     DOUBLE PRECISION rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)    
     DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
     INTEGER i,j, m, blockno
-    DOUBLE PRECISION xc,yc, lambda
+    DOUBLE PRECISION xc,yc
 
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
-            if (method .eq. 1) then  
-                rhs(i,j,1) = lambda*q(i,j,1)
-            else
-                write(6,*) 'heat_fort_rhs : no valid RHS side specified'
-                stop
-            endif
+!!            xc = xlower + (i-0.5)*dx
+!!            yc = ylower + (j-0.5)*dy
+            rhs(i,j,1) = lambda*q(i,j,1)
         end do
     end do
 
