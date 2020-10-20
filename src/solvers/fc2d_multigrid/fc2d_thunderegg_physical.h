@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_MULTIGRID_PHYSICAL_BC_H
-#define FC2D_MULTIGRID_PHYSICAL_BC_H
+#ifndef FC2D_THUNDEREGG_PHYSICAL_BC_H
+#define FC2D_THUNDEREGG_PHYSICAL_BC_H
 
 #ifdef __cplusplus
 extern "C"
@@ -39,13 +39,13 @@ struct fclaw2d_domain;
 struct fclaw2d_patch;
 
 
-typedef struct fc2d_multigrid_time_info
+typedef struct fc2d_thunderegg_time_info
 {
     double t;
-} fc2d_multigrid_time_info_t;
+} fc2d_thunderegg_time_info_t;
 
 
-void fc2d_multigrid_physical_bc(struct fclaw2d_global *glob);
+void fc2d_thunderegg_physical_bc(struct fclaw2d_global *glob);
 
 
 #ifdef __cplusplus

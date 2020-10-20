@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_MULTIGRID_H
-#define FC2D_MULTIGRID_H
+#ifndef FC2D_THUNDEREGG_H
+#define FC2D_THUNDEREGG_H
 
 #ifdef __cplusplus
 extern "C"
@@ -37,13 +37,13 @@ extern "C"
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
-typedef  struct fc2d_multigrid_vtable  fc2d_multigrid_vtable_t;
+typedef  struct fc2d_thunderegg_vtable  fc2d_thunderegg_vtable_t;
 
 
 
 /* --------------------------- Fortran defs solver functions -------------------------- */
 
-typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* blockno, 
+typedef  void (*fc2d_thunderegg_fort_rhs_t)(const int* blockno, 
                                            const int* mbc,
                                            const int* mx, const int* my,
                                            const int* mfields,
@@ -51,59 +51,59 @@ typedef  void (*fc2d_multigrid_fort_rhs_t)(const int* blockno,
                                            const double* dx, const double* dy,
                                            double rhs[]);
 
-typedef  void (*fc2d_multigrid_fort_beta_t)(const double* x,
+typedef  void (*fc2d_thunderegg_fort_beta_t)(const double* x,
                                             const double* y,
                                             const double* beta,
                                             double grad[]);
 
-typedef double (*fc2d_multigrid_fort_eval_bc_t)(const int *iface, const double *t, 
+typedef double (*fc2d_thunderegg_fort_eval_bc_t)(const int *iface, const double *t, 
                                                 const double *x, const double *y);
 
-typedef void (*fc2d_multigrid_fort_apply_bc_t)(const int* blockno, const  int* mx, const  int* my, 
+typedef void (*fc2d_thunderegg_fort_apply_bc_t)(const int* blockno, const  int* mx, const  int* my, 
                                                const  int* mbc, const  int* meqn, 
                                                const double* xlower, const double* ylower,
                                                const double* dx, const double* dy, 
                                                const double *t, 
                                                int intersects_bc[], int mthbc[], 
-                                               double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc, 
+                                               double rhs[], fc2d_thunderegg_fort_eval_bc_t g_bc, 
                                                int* cons_check, double flux_sum[]);
 
-typedef void (*fc2d_multigrid_operator_t)(struct fclaw2d_global *glob);
+typedef void (*fc2d_thunderegg_operator_t)(struct fclaw2d_global *glob);
 
 /* -------------------------- Solver and utilities ------------------------------------ */
 
-//void fc2d_multigrid_solve(struct fclaw2d_global *glob);
+//void fc2d_thunderegg_solve(struct fclaw2d_global *glob);
 
-fc2d_multigrid_vtable_t* fc2d_multigrid_vt();
+fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt();
 
 
 /* --------------------------------- Virtual table ------------------------------------ */
 
-struct fc2d_multigrid_vtable
+struct fc2d_thunderegg_vtable
 {
     /* Solver that defines patch operator and calls ThunderEgg solver */
-    fc2d_multigrid_operator_t        patch_operator;  /* 'operator' is a keyword */
+    fc2d_thunderegg_operator_t        patch_operator;  /* 'operator' is a keyword */
 
 	/* Fortran routines */
-	fc2d_multigrid_fort_rhs_t        fort_rhs;	
-	fc2d_multigrid_fort_beta_t       fort_beta;	
-    fc2d_multigrid_fort_apply_bc_t   fort_apply_bc;
-    fc2d_multigrid_fort_eval_bc_t    fort_eval_bc;
+	fc2d_thunderegg_fort_rhs_t        fort_rhs;	
+	fc2d_thunderegg_fort_beta_t       fort_beta;	
+    fc2d_thunderegg_fort_apply_bc_t   fort_apply_bc;
+    fc2d_thunderegg_fort_eval_bc_t    fort_eval_bc;
 
 	int is_set;
 };
 
-void fc2d_multigrid_solver_initialize(void);
+void fc2d_thunderegg_solver_initialize(void);
 
-fc2d_multigrid_vtable_t* fc2d_multigrid_vt(void);
+fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(void);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */
 
-void fc2d_multigrid_setprob(struct fclaw2d_global* glob);
+void fc2d_thunderegg_setprob(struct fclaw2d_global* glob);
 
 
-void fc2d_multigrid_rhs(struct fclaw2d_global* glob,
+void fc2d_thunderegg_rhs(struct fclaw2d_global* glob,
                         struct fclaw2d_patch *patch,
                         int blockno,
                         int patchno);
@@ -116,4 +116,4 @@ void fc2d_multigrid_rhs(struct fclaw2d_global* glob,
 #endif
 
 
-#endif /* !FC2D_MULTIGRID_H */
+#endif /* !FC2D_THUNDEREGG_H */

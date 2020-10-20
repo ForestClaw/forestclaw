@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_MULTIGRID_OPTIONS_H
-#define FCLAW2D_MULTIGRID_OPTIONS_H
+#ifndef FCLAW2D_THUNDEREGG_OPTIONS_H
+#define FCLAW2D_THUNDEREGG_OPTIONS_H
 
 #include <fclaw_base.h>
 
@@ -38,7 +38,7 @@ extern "C"
 
 struct fclaw2d_global;
 
-typedef struct fc2d_multigrid_options fc2d_multigrid_options_t;
+typedef struct fc2d_thunderegg_options fc2d_thunderegg_options_t;
 
 
 typedef enum {
@@ -47,16 +47,16 @@ typedef enum {
     VARPOISSON,      /* Variable Poisson operator */
     HEAT,      /* Variable Poisson operator */
     USER_OPERATOR
-} fc2d_multigrid_operator_types;
+} fc2d_thunderegg_operator_types;
 
 typedef enum {
     FFT = 0,    /* Must use starpatch or fivepoint */
     BICG,       /* Can be used with any operator */
     USER_SOLVER
-} fc2d_multigrid_solver_types;
+} fc2d_thunderegg_solver_types;
 
 
-struct fc2d_multigrid_options
+struct fc2d_thunderegg_options
 {
     /* Boundary conditions */
     int *boundary_conditions;
@@ -71,7 +71,7 @@ struct fc2d_multigrid_options
     int max_it;
     double tol;
 
-    /* multigrid cyle settings */
+    /* thunderegg cyle settings */
     int max_levels;
     double patches_per_proc;
     int pre_sweeps;
@@ -97,25 +97,25 @@ struct fc2d_multigrid_options
     int is_registered;
 };
 
-fclaw_exit_type_t fc2d_multigrid_postprocess (fc2d_multigrid_options_t *
+fclaw_exit_type_t fc2d_thunderegg_postprocess (fc2d_thunderegg_options_t *
                                                mg_opt);
 
-fclaw_exit_type_t fc2d_multigrid_check (fc2d_multigrid_options_t * mg_opt);
+fclaw_exit_type_t fc2d_thunderegg_check (fc2d_thunderegg_options_t * mg_opt);
 
-void fc2d_multigrid_reset (fc2d_multigrid_options_t * mg_opt);
+void fc2d_thunderegg_reset (fc2d_thunderegg_options_t * mg_opt);
 
-fc2d_multigrid_options_t*  fc2d_multigrid_options_register (fclaw_app_t * app,
+fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
                                                               const char *configfile);
 
-void fc2d_multigrid_package_register(fclaw_app_t* app,
-                                     fc2d_multigrid_options_t* mg_opt);
+void fc2d_thunderegg_package_register(fclaw_app_t* app,
+                                     fc2d_thunderegg_options_t* mg_opt);
 
-fc2d_multigrid_options_t* fc2d_multigrid_get_options(struct fclaw2d_global *glob);
+fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(struct fclaw2d_global *glob);
 
-void fc2d_multigrid_options_store (struct fclaw2d_global* glob, 
-                                   fc2d_multigrid_options_t* mg_opt);
+void fc2d_thunderegg_options_store (struct fclaw2d_global* glob, 
+                                   fc2d_thunderegg_options_t* mg_opt);
 
-void fc2d_multigrid_output(struct fclaw2d_global *glob, int iframe);
+void fc2d_thunderegg_output(struct fclaw2d_global *glob, int iframe);
 
 
 #ifdef __cplusplus

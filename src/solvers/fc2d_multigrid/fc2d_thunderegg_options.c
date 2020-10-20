@@ -23,17 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fc2d_multigrid_options.h"
+#include "fc2d_thunderegg_options.h"
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_global.h>
 #include <fclaw_options.h>
 #include <fclaw_package.h>
 
-static int s_multigrid_options_package_id = -1;
+static int s_thunderegg_options_package_id = -1;
 
 static void*
-multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
+thunderegg_register (fc2d_thunderegg_options_t* mg_opt, sc_options_t * opt)
 {
 
 #if 0
@@ -46,7 +46,7 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
     fclaw_options_add_int_array (opt, 0, "boundary_conditions", 
                                  &mg_opt->bc_cond_string, "1 1 1 1",
                                  &mg_opt->boundary_conditions, 4,
-                                 "[multigrid] Physical boundary condition type [1 1 1 1]");
+                                 "[thunderegg] Physical boundary condition type [1 1 1 1]");
 
     sc_options_add_bool (opt, 0, "ascii-out", &mg_opt->ascii_out, 0,
                            "Output ASCII formatted data [F]");
@@ -55,7 +55,7 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
                            "Output VTK formatted data [F]");
 
     sc_options_add_bool (opt, 0, "mg-prec", &mg_opt->mg_prec, 1,
-                           "Use multigrid preconditioner [T]");
+                           "Use thunderegg preconditioner [T]");
 
     sc_options_add_int (opt, 0, "max-it", &mg_opt->max_it, 10000,
                            "Max iterations for BiCGStab solver. [10000]");
@@ -119,7 +119,7 @@ multigrid_register (fc2d_multigrid_options_t* mg_opt, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-multigrid_postprocess (fc2d_multigrid_options_t * mg_opt)
+thunderegg_postprocess (fc2d_thunderegg_options_t * mg_opt)
 {
     fclaw_options_convert_int_array (mg_opt->bc_cond_string, 
                                      &mg_opt->boundary_conditions,4);
@@ -129,14 +129,14 @@ multigrid_postprocess (fc2d_multigrid_options_t * mg_opt)
 
 
 static fclaw_exit_type_t
-multigrid_check(fc2d_multigrid_options_t *mg_opt,
+thunderegg_check(fc2d_thunderegg_options_t *mg_opt,
                  fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
     return FCLAW_NOEXIT;
 }
 
 static
-void multigrid_destroy (fc2d_multigrid_options_t * mg_opt)
+void thunderegg_destroy (fc2d_thunderegg_options_t * mg_opt)
 {
     fclaw_options_destroy_array (mg_opt->boundary_conditions);
 
@@ -155,71 +155,71 @@ void multigrid_destroy (fc2d_multigrid_options_t * mg_opt)
 static void*
 options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
-    fc2d_multigrid_options_t *mg_opt;
+    fc2d_thunderegg_options_t *mg_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
 
-    mg_opt = (fc2d_multigrid_options_t*) package;
+    mg_opt = (fc2d_thunderegg_options_t*) package;
 
-    return multigrid_register(mg_opt,opt);
+    return thunderegg_register(mg_opt,opt);
 }
 
 
 static fclaw_exit_type_t
 options_postprocess (fclaw_app_t * app, void *package, void *registered)
 {
-    fc2d_multigrid_options_t *mg_opt;
+    fc2d_thunderegg_options_t *mg_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    mg_opt = (fc2d_multigrid_options_t*) package;
+    mg_opt = (fc2d_thunderegg_options_t*) package;
     FCLAW_ASSERT (mg_opt->is_registered);
 
-    return multigrid_postprocess (mg_opt);
+    return thunderegg_postprocess (mg_opt);
 }
 
 
 static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
-    fc2d_multigrid_options_t *mg_opt;
+    fc2d_thunderegg_options_t *mg_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    mg_opt = (fc2d_multigrid_options_t*) package;
+    mg_opt = (fc2d_thunderegg_options_t*) package;
     FCLAW_ASSERT (mg_opt->is_registered);
 
     clawpatch_opt = (fclaw2d_clawpatch_options_t *)
         fclaw_app_get_attribute(app,"clawpatch",NULL);
     FCLAW_ASSERT(clawpatch_opt->is_registered);
 
-    return multigrid_check(mg_opt,clawpatch_opt);    
+    return thunderegg_check(mg_opt,clawpatch_opt);    
 }
 
 static void
 options_destroy (fclaw_app_t * app, void *package, void *registered)
 {
-    fc2d_multigrid_options_t *mg_opt;
+    fc2d_thunderegg_options_t *mg_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    mg_opt = (fc2d_multigrid_options_t*) package;
+    mg_opt = (fc2d_thunderegg_options_t*) package;
     FCLAW_ASSERT (mg_opt->is_registered);
 
-    multigrid_destroy (mg_opt);
+    thunderegg_destroy (mg_opt);
 
     FCLAW_FREE (mg_opt);
 }
 
-static const fclaw_app_options_vtable_t multigrid_options_vtable = {
+static const fclaw_app_options_vtable_t thunderegg_options_vtable = {
     options_register,
     options_postprocess,
     options_check,
@@ -229,29 +229,29 @@ static const fclaw_app_options_vtable_t multigrid_options_vtable = {
 /* ----------------------------------------------------------
    Public interface to clawpack options
    ---------------------------------------------------------- */
-fc2d_multigrid_options_t*  fc2d_multigrid_options_register (fclaw_app_t * app,
+fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
                                                               const char *configfile)
 {
-    fc2d_multigrid_options_t *mg_opt;
+    fc2d_thunderegg_options_t *mg_opt;
 
     FCLAW_ASSERT (app != NULL);
 
-    mg_opt = FCLAW_ALLOC (fc2d_multigrid_options_t, 1);
-    fclaw_app_options_register (app, "multigrid", configfile,
-                                &multigrid_options_vtable, mg_opt);
+    mg_opt = FCLAW_ALLOC (fc2d_thunderegg_options_t, 1);
+    fclaw_app_options_register (app, "thunderegg", configfile,
+                                &thunderegg_options_vtable, mg_opt);
     
-    fclaw_app_set_attribute(app,"multigrid",mg_opt);
+    fclaw_app_set_attribute(app,"thunderegg",mg_opt);
     return mg_opt;
 }
 
-fc2d_multigrid_options_t* fc2d_multigrid_get_options(fclaw2d_global_t *glob)
+fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(fclaw2d_global_t *glob)
 {
-    int id = s_multigrid_options_package_id;
-    return (fc2d_multigrid_options_t*) fclaw_package_get_options(glob,id);
+    int id = s_thunderegg_options_package_id;
+    return (fc2d_thunderegg_options_t*) fclaw_package_get_options(glob,id);
 }
 
-void fc2d_multigrid_options_store (fclaw2d_global_t* glob, fc2d_multigrid_options_t* mg_opt)
+void fc2d_thunderegg_options_store (fclaw2d_global_t* glob, fc2d_thunderegg_options_t* mg_opt)
 {
     int id = fclaw_package_container_add_pkg(glob,mg_opt);
-    s_multigrid_options_package_id = id;
+    s_thunderegg_options_package_id = id;
 }

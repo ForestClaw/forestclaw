@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_MULTIGRID_VARPOISSON_H
-#define FC2D_MULTIGRID_VARPOISSON_H
+#ifndef FC2D_THUNDEREGG_HEAT_H
+#define FC2D_THUNDEREGG_HEAT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -35,13 +35,15 @@ extern "C"
 #endif
 
 #if 0
-    /* Needed to fix syntax highlighting */
+    /* fix syntax highlighting */
 #endif    
 
 struct fclaw2d_global;
 
 
-void fc2d_multigrid_varpoisson_solve(struct fclaw2d_global *glob);
+void fc2d_thunderegg_heat_solve(struct fclaw2d_global *glob);
+
+/* Everything is defined in the .cpp function */
 
 
 #ifdef __cplusplus
@@ -52,5 +54,5 @@ void fc2d_multigrid_varpoisson_solve(struct fclaw2d_global *glob);
 #endif
 
 
-#endif /* !FC2D_MULTIGRID_VARPOISSON_H */
+#endif /* !FC2D_THUNDEREGG_FIVEPOINT_H */
 

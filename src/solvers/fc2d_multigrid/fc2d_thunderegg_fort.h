@@ -23,11 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_MULTIGRID_FORT_H
-#define FC2D_MULTIGRID_FORT_H
+#ifndef FC2D_THUNDEREGG_FORT_H
+#define FC2D_THUNDEREGG_FORT_H
 
 #include <fclaw_base.h>   /* Needed for FCLAW_F77_FUNC */
-#include "fc2d_multigrid.h"    /* Needed for fc2d_multigrid_fort_eval_bc_t def */
+#include "fc2d_thunderegg.h"    /* Needed for fc2d_thunderegg_fort_eval_bc_t def */
 
 #ifdef __cplusplus
 extern "C"
@@ -40,23 +40,23 @@ extern "C"
 
 /* - -------------------------------- BC functions ------------------------------------ */
 
-#define MULTIGRID_FORT_APPLY_BC_DEFAULT FCLAW_F77_FUNC(multigrid_fort_apply_bc_default, \
-                                                       MULTIGRID_FORT_APPLY_BC_DEFAULT)
+#define THUNDEREGG_FORT_APPLY_BC_DEFAULT FCLAW_F77_FUNC(thunderegg_fort_apply_bc_default, \
+                                                       THUNDEREGG_FORT_APPLY_BC_DEFAULT)
 
-void MULTIGRID_FORT_APPLY_BC_DEFAULT(const int* blockno, const  int* mx, const  int* my, 
+void THUNDEREGG_FORT_APPLY_BC_DEFAULT(const int* blockno, const  int* mx, const  int* my, 
                                      const  int* mbc, const  int* mfields, 
                                      const double* xlower, const double* ylower,
                                      const double* dx, const double* dy, 
                                      const double* t, 
                                      int intersects_bc[], int mthbc[], 
-                                     double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc, 
+                                     double rhs[], fc2d_thunderegg_fort_eval_bc_t g_bc, 
                                      int *cons_check, double flux_sum[]);
 
 
-#define MULTIGRID_FORT_EVAL_BC_DEFAULT FCLAW_F77_FUNC(multigrid_fort_eval_bc_default, \
-                                                      MULTIGRID_FORT_EVAL_BC_DEFAULT)
+#define THUNDEREGG_FORT_EVAL_BC_DEFAULT FCLAW_F77_FUNC(thunderegg_fort_eval_bc_default, \
+                                                      THUNDEREGG_FORT_EVAL_BC_DEFAULT)
 
-double MULTIGRID_FORT_EVAL_BC_DEFAULT(const int* iface, const double* t, const double* x, const double* y);
+double THUNDEREGG_FORT_EVAL_BC_DEFAULT(const int* iface, const double* t, const double* x, const double* y);
 
 
 #ifdef __cplusplus

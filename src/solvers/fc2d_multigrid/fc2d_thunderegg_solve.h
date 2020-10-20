@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_MULTIGRID_SOLVE_H
-#define FC2D_MULTIGRID_SOLVE_H
+#ifndef FC2D_THUNDEREGG_SOLVE_H
+#define FC2D_THUNDEREGG_SOLVE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -37,7 +37,7 @@ extern "C"
 
 struct fclaw2d_global; 
 
-void fc2d_multigrid_solve(struct fclaw2d_global *glob);
+void fc2d_thunderegg_solve(struct fclaw2d_global *glob);
 
 #ifdef __cplusplus
 #if 0
@@ -47,5 +47,5 @@ void fc2d_multigrid_solve(struct fclaw2d_global *glob);
 #endif
 
 
-#endif /* !FC2D_MULTIGRID_SOLVE_H */
+#endif /* !FC2D_THUNDEREGG_SOLVE_H */
 

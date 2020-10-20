@@ -23,11 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "operators/fc2d_multigrid_varpoisson.h"
+#include "operators/fc2d_thunderegg_fivepoint.h"
 
-#include "fc2d_multigrid.h"
-#include "fc2d_multigrid_options.h"
-#include "fc2d_multigrid_vector.hpp"
+#include "fc2d_thunderegg.h"
+#include "fc2d_thunderegg_options.h"
+#include "fc2d_thunderegg_vector.hpp"
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ThunderEgg/BiCGStab.h>
 #include <ThunderEgg/BiCGStabPatchSolver.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
-//#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
+#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/GMG/DirectInterpolator.h>
 #include <ThunderEgg/P4estDomGen.h>
@@ -61,57 +61,41 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::VarPoisson;
 
-#if 0
-double varpoisson_beta_coeff(const std::array<double,2>& coord)
+class fivePoint : public PatchOperator<2>
 {
-    //double grad[2];
-    return 1.0;
-}  
-#endif
+public:
+    fivePoint(std::shared_ptr<const Domain<2>>      domain,
+              std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
-
-class varpoisson : public PatchOperator<2>
-{
-    protected:
-    std::shared_ptr<const Vector<2>> beta;
-
-    public:
-        varpoisson(std::shared_ptr<const Vector<2>> beta_vec, 
-                   std::shared_ptr<const Domain<2>> domain,
-                   std::shared_ptr<const GhostFiller<2>> ghost_filler);
-
-        void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                              const std::vector<LocalData<2>>& us,
-                              std::vector<LocalData<2>>& fs) const override;
-
-        void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                           const std::vector<LocalData<2>>& us,
-                           std::vector<LocalData<2>>& fs) const override;
+    void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+                          const std::vector<LocalData<2>>& us,
+                          std::vector<LocalData<2>>& fs) const override;
+    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+                       const std::vector<LocalData<2>>& us,
+                       std::vector<LocalData<2>>& fs) const override;
 
 };
 
 
-varpoisson::varpoisson(std::shared_ptr<const Vector<2>> coeffs,
-                       std::shared_ptr<const Domain<2>> domain,
-                       std::shared_ptr<const GhostFiller<2>> ghost_filler) : 
-                            PatchOperator<2>(domain,ghost_filler),
-                            beta(coeffs)
+fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
+                     std::shared_ptr<const GhostFiller<2>> ghost_filler) : PatchOperator<2>(domain,ghost_filler)
 {
-    this->ghost_filler->fillGhost(this->beta);
+    /* Nothing to construct yet */
 }
 
 
-void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                                  const std::vector<LocalData<2>>& us,
-                                  std::vector<LocalData<2>>& fs) const 
+void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+                                 const std::vector<LocalData<2>>& us,
+                                 std::vector<LocalData<2>>& fs) const 
 {
-    const LocalData<2>  b  = beta->getLocalData(0, pinfo->local_index);
-    //LocalData<2>& b = const_cast<LocalData<2>&>(beta[0]);
+    //const cast since u ghost values have to be modified
+    //ThunderEgg doesn't care if ghost values are modified, just don't modify the interior values.
 
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+    //fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     int mfields = us.size();
+    int mx = pinfo->ns[0]; 
+    int my = pinfo->ns[1];
 
 #if 0    
     int mbc = pinfo->num_ghost_cells;
@@ -121,14 +105,14 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dx = pinfo->spacings[0];
     double dy = pinfo->spacings[1];
 
+
     for(int m = 0; m < mfields; m++)
     {
         LocalData<2>& u = const_cast<LocalData<2>&>(us[m]);
         LocalData<2>& f = fs[m];
 
         //if physical boundary
-        if (!pinfo->hasNbr(Side<2>::west()))
-        {
+        if (!pinfo->hasNbr(Side<2>::west())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = -u[{0,j}];
@@ -154,77 +138,53 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             }
         }
 
+        double dx2 = dx*dx;
+        double dy2 = dy*dy;
+
 #if 1
-        double dx2 = 2*dx*dx;
-        double dy2 = 2*dy*dy;
+        /* Five-point Laplacian */
         for(int j = 0; j < my; j++)
             for(int i = 0; i < mx; i++)
             {
-                double b0 = (b[{i,j}]   + b[{i-1,j}]);
-                double b1 = (b[{i+1,j}] + b[{i,j}]);
-                double b2 = (b[{i,j}]   + b[{i,j-1}]);
-                double b3 = (b[{i,j+1}] + b[{i,j}]);
+                double uij = u[{i,j}];
+                f[{i,j}] = (u[{i+1,j}] - 2*uij + u[{i-1,j}])/dx2 + 
+                           (u[{i,j+1}] - 2*uij + u[{i,j-1}])/dy2;
+            }
+    
+#else
 
+        /* Five-point Laplacian : Slightly slower than then above.*/
+        for(int j = 0; j < my; j++)
+            for(int i = 0; i < mx; i++)
+            {
+                double uij = u[{i,j}];
                 double flux[4];
-                flux[0] = b0*(u[{i,j}] - u[{i-1,j}]);
-                flux[1] = b1*(u[{i+1,j}] - u[{i,j}]);
-                flux[2] = b2*(u[{i,j}] - u[{i,j-1}]);
-                flux[3] = b3*(u[{i,j+1}] - u[{i,j}]);
-
+                flux[0] = (uij - u[{i-1,j}]);
+                flux[1] = (u[{i+1,j}] - uij);
+                flux[2] = (uij - u[{i,j-1}]);
+                flux[3] = (u[{i,j+1}] - uij);;
                 f[{i,j}] = (flux[1]-flux[0])/dx2 + (flux[3] - flux[2])/dy2;
-
             }
 #endif
-
-#if 0
-        double dx2 = 2*dx*dx;
-        double dy2 = 2*dy*dy;
-        /* This is considerably slower, despite the fact that it
-            computes half as many fluxes.  5.95s vs. 4.85s */
-        for(int j = 0; j < my+1; j++)
-            for(int i = 0; i < mx+1; i++)
-            {
-                double b0 = (b[{i,j}]   + b[{i-1,j}]);
-                double flux0 = b0*(u[{i,j}] - u[{i-1,j}]);
-
-                double b2 = (b[{i,j}] + b[{i,j-1}]);
-                double flux2 = b2*(u[{i,j}] - u[{i,j-1}]);
-
-                if (i < mx)
-                    f[{i,j}] = -flux0/dx2;
-
-                if (i > 0)
-                    f[{i-1,j}] += flux0/dx2;
-
-                if (j < my)
-                    f[{i,j}] += -flux2/dy2;
-
-                if (j > 0)
-                    f[{i,j-1}] += flux2/dy2;
-
-            }
-#endif            
-
     }
+    
 }
 
 
-void varpoisson::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
                               const std::vector<LocalData<2>>& us, 
                               std::vector<LocalData<2>>& fs) const 
 {
-
-    const LocalData<2> b = beta->getLocalData(0, pinfo->local_index);
-
-    int mfields = us.size();
-
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
 #if 0    
     int mbc = pinfo->num_ghost_cells;
     double xlower = pinfo->starts[0];
     double ylower = pinfo->starts[1];
 #endif    
+
+    int mfields = us.size();
+    int mx = pinfo->ns[0]; 
+    int my = pinfo->ns[1];
+
     double dx = pinfo->spacings[0];
     double dx2 = dx*dx;
 
@@ -235,59 +195,42 @@ void varpoisson::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     {
         const LocalData<2>& u = us[m];
         LocalData<2>& f = fs[m];
-
         for(int j = 0; j < my; j++)
         {
-            double b0 = (b[{0,j}] + b[{-1,j}])/2;
-            double b1 = (b[{mx,j}] + b[{mx-1,j}])/2;
-            /* bool hasNbr(Side<2> s) */
+            /* bool hasNbr(Side<D> s) */
             if (pinfo->hasNbr(Side<2>::west()))
-                f[{0,j}] += -b0*(u[{-1,j}]+u[{0,j}])/dx2;
+                f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
 
             if (pinfo->hasNbr(Side<2>::east()))
-                f[{mx-1,j}] += -b1*(u[{mx-1,j}]+u[{mx,j}])/dx2;
+                f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
         }
 
         for(int i = 0; i < mx; i++)
         {
-            double b2 = (b[{i,0}] + b[{i,-1}])/2;
-            double b3 = (b[{i,my}] + b[{i,my-1}])/2;
             if (pinfo->hasNbr(Side<2>::south()))
-                f[{i,0}] += -b2*(u[{i,-1}]+u[{i,0}])/dy2;
+                f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
 
             if (pinfo->hasNbr(Side<2>::north()))
-                f[{i,my-1}] += -b3*(u[{i,my-1}]+u[{i,my}])/dy2;
+                f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
         }
     }
 }
  
 
-shared_ptr<ValVector<2>> varpoisson_restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec, 
-                                                      shared_ptr<Domain<2>> prev_domain, 
-                                                      shared_ptr<Domain<2>> curr_domain)
-{
-    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, 
-                                        prev_beta_vec->getNumComponents(), true);
-    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, 
-                                                   prev_beta_vec->getNumComponents());
-    restrictor.restrict(prev_beta_vec, new_beta_vec);
-    return new_beta_vec;
-}
-
-
-
-/* Public interface - this function is virtualized */
-
-void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob) 
+void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob) 
 {
     // get needed options
     fclaw2d_clawpatch_options_t *clawpatch_opt =
-                        fclaw2d_clawpatch_get_options(glob);
+    fclaw2d_clawpatch_get_options(glob);
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
   
+#if 0  
+    fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
+#endif  
+
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_multigrid_vector>(glob);
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -319,38 +262,30 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
-    // define operators for problems
-
-
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
-
-#if 1
-    // get beta function
-    auto beta_func = [&](const std::array<double,2>& coord){
-        double beta;
-        double grad[2];
-        mg_vt->fort_beta(&coord[0],&coord[1],&beta,grad);
-        //beta = 1;
-        return beta;
-    };
-
-    // create vector for beta
-
-    //auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->rhs_fields);
-    auto beta_vec = ValVector<2>::GetNewVector(te_domain, 1);
-    DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_func);
-#endif
-
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    auto op = make_shared<varpoisson>(beta_vec,te_domain,ghost_filler);
+    auto op = make_shared<fivePoint>(te_domain,ghost_filler);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
-    solver = make_shared<BiCGStabPatchSolver<2>>(op,mg_opt->patch_bcgs_tol,
-                                                 mg_opt->patch_bcgs_max_it);
+    switch (mg_opt->patch_solver)
+    {
+        case BICG:
+            solver = make_shared<BiCGStabPatchSolver<2>>(op,
+                                                         mg_opt->patch_bcgs_tol,
+                                                         mg_opt->patch_bcgs_max_it);
+            break;
+        case FFT:
+            /* This ignores the five point operator defined above and just uses the 
+               ThunderEgg operator 'Poisson'. */
+            solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
+            break;
+        default:
+            fclaw_global_essentialf("thunderegg_fivepoint : No valid patch solver specified\n");
+            exit(0);            
+    }
 
     // create matrix
     shared_ptr<Operator<2>> A = op;
@@ -395,7 +330,6 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
         //add intermediate levels
-        auto prev_beta_vec = beta_vec;
         auto prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
@@ -404,31 +338,40 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, 
-                                                                    prev_domain, curr_domain);
-            patch_operator = make_shared<varpoisson>(restricted_beta_vec, curr_domain, ghost_filler);
-            prev_beta_vec = restricted_beta_vec;
+            patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
+            switch (mg_opt->patch_solver)
+            {
+                case BICG:
+                    smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                                   mg_opt->patch_bcgs_tol,
+                                                                   mg_opt->patch_bcgs_max_it);
+                    break;
+                case FFT:
+                    smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+                    break;
+                default:
+                    fclaw_global_essentialf("thunderegg_fivepoint : No valid " \
+                                            "patch solver specified\n");
+                    exit(0);            
+            }
+
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                    next_domain, 
-                                                                    clawpatch_opt->rhs_fields);
+                                                            next_domain, clawpatch_opt->rhs_fields);
 
             //interpolator
             auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                        prev_domain, 
-                                                                        clawpatch_opt->rhs_fields);
+                                                                prev_domain, clawpatch_opt->rhs_fields);
 
             //vector generator
             vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
 
-            builder.addIntermediateLevel(patch_operator, smoother, restrictor, interpolator, vg);
+            builder.addIntermediateLevel(patch_operator, smoother, restrictor, 
+                                         interpolator, vg);
 
             prev_domain = curr_domain;
             curr_domain = next_domain;
@@ -438,19 +381,28 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<varpoisson>(restricted_beta_vec, curr_domain, 
-                                                    ghost_filler);
+        patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
 
         //smoother
-        smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                       mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it);
+        switch (mg_opt->patch_solver)
+        {
+            case BICG:
+                smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                               mg_opt->patch_bcgs_tol,
+                                                               mg_opt->patch_bcgs_max_it);
+                break;
+            case FFT:
+                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+                break;
+            default:
+                fclaw_global_essentialf("thunderegg_fivepoint : No valid " \
+                                        "patch solver specified\n");
+                exit(0);            
+        }
+
 
         //interpolator
-        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                    prev_domain, 
-                                                                    clawpatch_opt->rhs_fields);
+        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
         //vector generator
         vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
@@ -466,19 +418,21 @@ void fc2d_multigrid_varpoisson_solve(fclaw2d_global_t *glob)
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
 
-    // copy solution into rhs
-    f->copy(u);
     fclaw_global_productionf("Iterations: %i\n", its);    
 
-#if 0
-    fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
-    fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());
-    fclaw_global_productionf("u-infnorm: %f\n\n", u->infNorm());
+    /* Solution is copied to right hand side */
+    f->copy(u);
 
+#if 0    
+    fclaw_global_productionf("f-2norm:   %24.16f\n", f->twoNorm());
+    fclaw_global_productionf("f-infnorm: %24.16f\n", f->infNorm());
+    fclaw_global_productionf("u-2norm:   %24.16f\n", u->twoNorm());
+    fclaw_global_productionf("u-infnorm: %24.16f\n\n", u->infNorm());
+
+    // copy solution into rhs
     fclaw_global_productionf("Checking if copy function works:\n");
-    fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
+    fclaw_global_productionf("fcopy-2norm:   %24.16f\n", f->twoNorm());
+    fclaw_global_productionf("fcopy-infnorm: %24.16f\n\n", f->infNorm());
 #endif    
 }
 

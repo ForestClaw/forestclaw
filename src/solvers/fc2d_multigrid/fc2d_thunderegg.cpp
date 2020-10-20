@@ -23,10 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fc2d_multigrid.h"
-#include "fc2d_multigrid_options.h"
-#include "fc2d_multigrid_physical_bc.h"
-#include "fc2d_multigrid_fort.h"
+#include "fc2d_thunderegg.h"
+#include "fc2d_thunderegg_options.h"
+#include "fc2d_thunderegg_physical_bc.h"
+#include "fc2d_thunderegg_fort.h"
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -41,33 +41,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_domain.h>
 
-#include "fc2d_multigrid_solve.h"
+#include "fc2d_thunderegg_solve.h"
 
-#include "operators/fc2d_multigrid_fivepoint.h"
-#include "operators/fc2d_multigrid_heat.h"
-#include "operators/fc2d_multigrid_starpatch.h"
-#include "operators/fc2d_multigrid_varpoisson.h"
+#include "operators/fc2d_thunderegg_fivepoint.h"
+#include "operators/fc2d_thunderegg_heat.h"
+#include "operators/fc2d_thunderegg_starpatch.h"
+#include "operators/fc2d_thunderegg_varpoisson.h"
 
 
 
-static fc2d_multigrid_vtable_t s_multigrid_vt;
+static fc2d_thunderegg_vtable_t s_thunderegg_vt;
 
-/* --------------------- Multigrid solver (required) ------------------------- */
+/* --------------------- ThunderEgg solver (required) ------------------------- */
 
 static
-void multigrid_setup_solver(fclaw2d_global_t *glob)
+void thunderegg_setup_solver(fclaw2d_global_t *glob)
 {
-	//fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+	//fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
 }
 
 
 static
-void multigrid_rhs(fclaw2d_global_t *glob,
+void thunderegg_rhs(fclaw2d_global_t *glob,
                    fclaw2d_patch_t *patch,
                    int blockno,
                    int patchno)
 {
-	fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+	fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
 
 	FCLAW_ASSERT(mg_vt->fort_rhs != NULL); /* Must be initialized */
 
@@ -87,33 +87,33 @@ void multigrid_rhs(fclaw2d_global_t *glob,
 }
 
 static
-void multigrid_solve(fclaw2d_global_t* glob)
+void thunderegg_solve(fclaw2d_global_t* glob)
 {
     // Apply non-homogeneous boundary conditions 
-    fc2d_multigrid_physical_bc(glob);
+    fc2d_thunderegg_physical_bc(glob);
 
-    fc2d_multigrid_vtable_t  *mg_vt  = fc2d_multigrid_vt();  
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    fc2d_thunderegg_vtable_t  *mg_vt  = fc2d_thunderegg_vt();  
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
-    /* Should the operators be part of the multigrid library? Yes, for now, at least */
+    /* Should the operators be part of the thunderegg library? Yes, for now, at least */
     switch (mg_opt->patch_operator)
     {
         case STARPATCH:
-            mg_vt->patch_operator = fc2d_multigrid_starpatch_solve;
+            mg_vt->patch_operator = fc2d_thunderegg_starpatch_solve;
             break;
         case FIVEPOINT:
-            mg_vt->patch_operator = fc2d_multigrid_fivepoint_solve;
+            mg_vt->patch_operator = fc2d_thunderegg_fivepoint_solve;
             break;
         case VARPOISSON:
-            mg_vt->patch_operator = fc2d_multigrid_varpoisson_solve;
+            mg_vt->patch_operator = fc2d_thunderegg_varpoisson_solve;
             break;
         case HEAT:
-            mg_vt->patch_operator = fc2d_multigrid_heat_solve;
+            mg_vt->patch_operator = fc2d_thunderegg_heat_solve;
             break;
         case USER_OPERATOR:
             if (mg_vt->patch_operator == NULL)
             {
-                fclaw_global_essentialf("multigrid_solve : User specified operator not set\n");
+                fclaw_global_essentialf("thunderegg_solve : User specified operator not set\n");
                 exit(0);
             }
         default:
@@ -129,10 +129,10 @@ void multigrid_solve(fclaw2d_global_t* glob)
 /* ---------------------------------- Output functions -------------------------------- */
 
 static
-void multigrid_output(fclaw2d_global_t *glob, int iframe)
+void thunderegg_output(fclaw2d_global_t *glob, int iframe)
 {
-	const fc2d_multigrid_options_t* mg_options;
-	mg_options = fc2d_multigrid_get_options(glob);
+	const fc2d_thunderegg_options_t* mg_options;
+	mg_options = fc2d_thunderegg_get_options(glob);
 
 	if (mg_options->ascii_out != 0)
 	{
@@ -150,13 +150,13 @@ void multigrid_output(fclaw2d_global_t *glob, int iframe)
 /* ------------------------------ Virtual functions  ---------------------------------- */
 
 static
-fc2d_multigrid_vtable_t* multigrid_vt_init()
+fc2d_thunderegg_vtable_t* thunderegg_vt_init()
 {
-	FCLAW_ASSERT(s_multigrid_vt.is_set == 0);
-	return &s_multigrid_vt;
+	FCLAW_ASSERT(s_thunderegg_vt.is_set == 0);
+	return &s_thunderegg_vt;
 }
 
-void fc2d_multigrid_solver_initialize()
+void fc2d_thunderegg_solver_initialize()
 {
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
 	fclaw2d_clawpatch_vtable_initialize(claw_version);
@@ -166,21 +166,21 @@ void fc2d_multigrid_solver_initialize()
 
 	/* ForestClaw vtable items */
 	fclaw2d_vtable_t*   fclaw_vt = fclaw2d_vt();
-	fclaw_vt->output_frame      = multigrid_output;
+	fclaw_vt->output_frame      = thunderegg_output;
 
 	/* These could be over-written by user specific settings */
 	fclaw2d_patch_vtable_t*   patch_vt = fclaw2d_patch_vt();  
-	patch_vt->rhs            = multigrid_rhs;  /* Calls FORTRAN routine */
+	patch_vt->rhs            = thunderegg_rhs;  /* Calls FORTRAN routine */
 	patch_vt->setup          = NULL;
     
     fclaw2d_elliptic_vtable_t *elliptic_vt = fclaw2d_elliptic_vt();
-    elliptic_vt->setup = multigrid_setup_solver;
-    elliptic_vt->solve = multigrid_solve;    
-    elliptic_vt->apply_bc = fc2d_multigrid_physical_bc;
+    elliptic_vt->setup = thunderegg_setup_solver;
+    elliptic_vt->solve = thunderegg_solve;    
+    elliptic_vt->apply_bc = fc2d_thunderegg_physical_bc;
 
-	fc2d_multigrid_vtable_t*  mg_vt = multigrid_vt_init();	
-    mg_vt->fort_apply_bc = &MULTIGRID_FORT_APPLY_BC_DEFAULT;
-    mg_vt->fort_eval_bc  = &MULTIGRID_FORT_EVAL_BC_DEFAULT;
+	fc2d_thunderegg_vtable_t*  mg_vt = thunderegg_vt_init();	
+    mg_vt->fort_apply_bc = &THUNDEREGG_FORT_APPLY_BC_DEFAULT;
+    mg_vt->fort_eval_bc  = &THUNDEREGG_FORT_EVAL_BC_DEFAULT;
 
 #if 0
     /* Operator is specified in solve routine, above*/
@@ -193,10 +193,10 @@ void fc2d_multigrid_solver_initialize()
 
 /* ----------------------------- User access to solver functions --------------------------- */
 
-fc2d_multigrid_vtable_t* fc2d_multigrid_vt()
+fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt()
 {
-	FCLAW_ASSERT(s_multigrid_vt.is_set != 0);
-	return &s_multigrid_vt;
+	FCLAW_ASSERT(s_thunderegg_vt.is_set != 0);
+	return &s_thunderegg_vt;
 }
 
 

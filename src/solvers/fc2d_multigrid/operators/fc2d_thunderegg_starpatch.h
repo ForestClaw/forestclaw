@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_MULTIGRID_FIVEPOINT_H
-#define FC2D_MULTIGRID_FIVEPOINT_H
+#ifndef FC2D_THUNDEREGG_STARPATCH_H
+#define FC2D_THUNDEREGG_STARPATCH_H
 
 #ifdef __cplusplus
 extern "C"
@@ -41,7 +41,7 @@ extern "C"
 struct fclaw2d_global;
 
 
-void fc2d_multigrid_fivepoint_solve(struct fclaw2d_global *glob);
+void fc2d_thunderegg_starpatch_solve(struct fclaw2d_global *glob);
 
 /* Everything is defined in the .cpp function */
 
@@ -54,5 +54,5 @@ void fc2d_multigrid_fivepoint_solve(struct fclaw2d_global *glob);
 #endif
 
 
-#endif /* !FC2D_MULTIGRID_FIVEPOINT_H */
+#endif /* !FC2D_THUNDEREGG_STARPATCH_H */
 

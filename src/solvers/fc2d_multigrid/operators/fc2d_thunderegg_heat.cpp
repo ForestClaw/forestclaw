@@ -23,11 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "operators/fc2d_multigrid_heat.h"
+#include "operators/fc2d_thunderegg_heat.h"
 
-#include "fc2d_multigrid.h"
-#include "fc2d_multigrid_options.h"
-#include "fc2d_multigrid_vector.hpp"
+#include "fc2d_thunderegg.h"
+#include "fc2d_thunderegg_options.h"
+#include "fc2d_thunderegg_vector.hpp"
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -94,7 +94,7 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     //const cast since u ghost values have to be modified
     //ThunderEgg doesn't care if ghost values are modified, just don't modify the interior values.
 
-    //fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    //fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     int mfields = us.size();
     int mx = pinfo->ns[0]; 
@@ -230,20 +230,20 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 }
  
 
-void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob) 
+void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob) 
 {
     // get needed options
     fclaw2d_clawpatch_options_t *clawpatch_opt =
     fclaw2d_clawpatch_get_options(glob);
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
   
 #if 0  
-    fc2d_multigrid_vtable_t *mg_vt = fc2d_multigrid_vt();
+    fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_multigrid_vector>(glob);
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -297,7 +297,7 @@ void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob)
             solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
             break;
         default:
-            fclaw_global_essentialf("multigrid_heat : No valid patch solver specified\n");
+            fclaw_global_essentialf("thunderegg_heat : No valid patch solver specified\n");
             exit(0);            
     }
 
@@ -367,7 +367,7 @@ void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob)
                     smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
                     break;
                 default:
-                    fclaw_global_essentialf("multigrid_heat : No valid " \
+                    fclaw_global_essentialf("thunderegg_heat : No valid " \
                                             "patch solver specified\n");
                     exit(0);            
             }
@@ -409,7 +409,7 @@ void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob)
                 smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
                 break;
             default:
-                fclaw_global_essentialf("multigrid_heat : No valid " \
+                fclaw_global_essentialf("thunderegg_heat : No valid " \
                                         "patch solver specified\n");
                 exit(0);            
         }

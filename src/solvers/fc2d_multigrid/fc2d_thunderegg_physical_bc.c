@@ -24,10 +24,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "fc2d_multigrid_physical_bc.h"
+#include "fc2d_thunderegg_physical_bc.h"
 
-#include "fc2d_multigrid.h"
-#include "fc2d_multigrid_options.h"
+#include "fc2d_thunderegg.h"
+#include "fc2d_thunderegg_options.h"
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_physical_bc.h>
 
-void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
+void cb_fc2d_thunderegg_physical_bc(fclaw2d_domain_t *domain,
                                    fclaw2d_patch_t *patch,
                                    int blockno,
                                    int patchno,
@@ -45,7 +45,7 @@ void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
 
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fc2d_multigrid_time_info_t *tinfo = (fc2d_multigrid_time_info_t*) s->user;
+    fc2d_thunderegg_time_info_t *tinfo = (fc2d_thunderegg_time_info_t*) s->user;
 
     double t = tinfo->t;
 
@@ -59,12 +59,12 @@ void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
     fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    const fc2d_multigrid_options_t* mg_opt = fc2d_multigrid_get_options(s->glob);
+    const fc2d_thunderegg_options_t* mg_opt = fc2d_thunderegg_get_options(s->glob);
     int mfields;
     double *rhs;
     fclaw2d_clawpatch_rhs_data(s->glob,patch,&rhs,&mfields);
 
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
 
     int cons_check = 0;
     double flux_sum[4];
@@ -88,7 +88,7 @@ void cb_fc2d_multigrid_physical_bc(fclaw2d_domain_t *domain,
 }
 
 /* This is needed by other routines, so we don't set it to static. */
-void fc2d_multigrid_physical_get_bc(fclaw2d_global_t *glob,
+void fc2d_thunderegg_physical_get_bc(fclaw2d_global_t *glob,
                                     int blockno,
                                     int patchno,
                                     int *intersects_bdry)
@@ -110,13 +110,13 @@ void fc2d_multigrid_physical_get_bc(fclaw2d_global_t *glob,
    Public interface : Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
-void fc2d_multigrid_physical_bc(fclaw2d_global_t *glob)
+void fc2d_thunderegg_physical_bc(fclaw2d_global_t *glob)
 {
 
-    fc2d_multigrid_time_info_t tinfo;
+    fc2d_thunderegg_time_info_t tinfo;
     tinfo.t = glob->curr_time;
     fclaw2d_global_iterate_patches(glob,
-                                   cb_fc2d_multigrid_physical_bc,
+                                   cb_fc2d_thunderegg_physical_bc,
                                    (void *) &tinfo);
 }
 

@@ -23,11 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fc2d_multigrid_solve.h"
+#include "fc2d_thunderegg_solve.h"
 
-#include "fc2d_multigrid.h"
-#include "fc2d_multigrid_options.h"
-#include "fc2d_multigrid_vector.hpp"
+#include "fc2d_thunderegg.h"
+#include "fc2d_thunderegg_options.h"
+#include "fc2d_thunderegg_vector.hpp"
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -270,20 +270,20 @@ shared_ptr<ValVector<2>> restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec,
 }
 #endif
 
-void fc2d_multigrid_solve(fclaw2d_global_t *glob) 
+void fc2d_thunderegg_solve(fclaw2d_global_t *glob) 
 {
     // get needed options
     fclaw2d_clawpatch_options_t *clawpatch_opt =
     fclaw2d_clawpatch_get_options(glob);
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
   
 #if 0  
-    fc2d_multigrid_vtable_t *mg_vt = fc2d_multigrid_vt();
+    fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_multigrid_vector>(glob);
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
