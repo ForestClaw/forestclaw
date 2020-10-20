@@ -89,7 +89,7 @@ void poisson_problem_setup(fclaw2d_global_t *glob)
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
-    poisson_SETPROB(); /* This file reads the file just created above */
+    POISSON_SETPROB(); /* This file reads the file just created above */
 }
 
 
@@ -199,7 +199,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
     double t = glob->curr_time;
     int cons_check = 1;
 
-    poisson_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
+    POISSON_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
                          &xlower, &ylower, &dx,&dy,&t, intersects_bc,
                          mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
                          &cons_check, error_data->boundary);
@@ -287,7 +287,7 @@ void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
-    poisson_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
+    POISSON_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
                              &xlower,&ylower,&dx,&dy,rhs,
                              soln, err,
                              &global_num,&level,&blockno,
@@ -372,17 +372,17 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
 
     /* Multigrid vtable */
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
-    mg_vt->fort_rhs       = &poisson_FORT_RHS;
+    mg_vt->fort_rhs       = &POISSON_FORT_RHS;
 
-    mg_vt->fort_beta      = &poisson_FORT_BETA;
+    mg_vt->fort_beta      = &POISSON_FORT_BETA;
     
-    mg_vt->fort_apply_bc = &poisson_FORT_APPLY_BC;
-    mg_vt->fort_eval_bc  = &poisson_FORT_EVAL_BC;   // For non-homogeneous BCs
+    mg_vt->fort_apply_bc = &POISSON_FORT_APPLY_BC;
+    mg_vt->fort_eval_bc  = &POISSON_FORT_EVAL_BC;   // For non-homogeneous BCs
 
     /* Clawpatch : Compute the error */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     clawpatch_vt->compute_error = poisson_compute_error;
-    clawpatch_vt->fort_compute_patch_error = &poisson_COMPUTE_ERROR;
+    clawpatch_vt->fort_compute_patch_error = &POISSON_COMPUTE_ERROR;
 
     // tagging routines
     patch_vt->tag4refinement       = poisson_tag4refinement;

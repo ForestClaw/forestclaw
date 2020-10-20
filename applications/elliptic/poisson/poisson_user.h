@@ -68,7 +68,7 @@ void POISSON_FORT_RHS(const int* blockno, const int* mbc, const int* mx,
 
 void POISSON_FORT_BETA(const double* x, const double* y, const double* b, double grad[]);
 
-#define poisson_COMPUTE_ERROR FCLAW_F77_FUNC(poisson_compute_error,POISSON_COMPUTE_ERROR)
+#define POISSON_COMPUTE_ERROR FCLAW_F77_FUNC(poisson_compute_error,POISSON_COMPUTE_ERROR)
 
 void POISSON_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* mfields,
                            double *dx, double *dy, double *xlower,
