@@ -100,11 +100,12 @@ heat::heat(fclaw2d_global_t *glob,
            std::shared_ptr<const GhostFiller<2>> ghost_filler) 
                     : PatchOperator<2>(domain,ghost_filler)
 {
+    /* User should call 'fc2d_thunderegg_heat_set_lambda' before calling elliptic solve */
     FCLAW_ASSERT(heat::lambda <= 0);
 
-    /* Get scalar in u_interior values when applying BCs : 
-       For Dirichlet (bctype=1),  scalar is -1 
-       For Neumann (bctype=2), scalar is 1 */
+    /* Get scale needed to apply homogeneuous Dirichlet conditions. 
+       For Dirichlet (bctype=1) :   scalar is -1 
+       For Neumann (bctype=2)   :   scalar is 1 */
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
     for(int m = 0; m < 4; m++)
     {
@@ -271,7 +272,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob);
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -402,11 +403,13 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                            next_domain, clawpatch_opt->rhs_fields);
+                                                                    next_domain, 
+                                                                    clawpatch_opt->rhs_fields);
 
             //interpolator
             auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                prev_domain, clawpatch_opt->rhs_fields);
+                                                                        prev_domain, 
+                                                                        clawpatch_opt->rhs_fields);
 
             //vector generator
             vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
@@ -455,7 +458,14 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
     // solve
     auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
+
+#if 1   
+    // Set starting conditions
+    shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
+#else
     shared_ptr<Vector<2>> u = vg->getNewVector();
+#endif    
+
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
 

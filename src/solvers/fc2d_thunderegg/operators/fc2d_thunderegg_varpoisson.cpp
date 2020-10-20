@@ -287,7 +287,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
   
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob);
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
