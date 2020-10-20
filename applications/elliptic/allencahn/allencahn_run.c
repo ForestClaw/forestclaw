@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_advance.h>
 #include <fclaw2d_regrid.h>
@@ -49,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     -- Time stepping, based on when output files should be created.
     ----------------------------------------------------------------- */
 
+#if 0
 static
 void cb_restore_time_step(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -85,6 +87,7 @@ void save_time_step(fclaw2d_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
 }
+#endif
 
 static
 void update_q(fclaw2d_domain_t *domain,
@@ -297,6 +300,11 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         /* Update solution stored in RHS */
         allencahn_run_update_q(glob);
+
+        int time_interp = 0;
+        fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
+                             time_interp,FCLAW2D_TIMER_NONE);
+
 
         double tc = t_curr + dt_step;
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?

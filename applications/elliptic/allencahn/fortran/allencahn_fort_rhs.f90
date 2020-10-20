@@ -14,19 +14,10 @@ subroutine allencahn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
 
     D = 0.001d0
 
-!!do j = 1,my
-!!         do i = 1,mx
-!!            u = q(i,j,1)
-!!
-!!c           # Treat only diffusion term explicitly
-!!            rhs(i,j,1) = (u-u**3)/D**2
-!!         enddo
-!!      enddo
-
-    do i = 1,mx
-        do j = 1,my
+    do j = 1,my
+        do i = 1,mx
             u = q(i,j,1)
-            rhs(i,j,1) = lambda*u !! - (u-u**3)/D**2
+            rhs(i,j,1) = lambda*u - (u-u**3)/D**2
         end do
     end do
 
@@ -42,8 +33,8 @@ subroutine allencahn_update_q(mbc,mx,my,meqn,mfields,rhs,q)
 
     INTEGER i,j
 
-    do i = 1-mbc,mx+mbc
-        do j = 1-mbc,my+mbc
+    do j = 1-mbc,my+mbc
+        do i = 1-mbc,mx+mbc
             q(i,j,1) = rhs(i,j,1)
         end do
     end do

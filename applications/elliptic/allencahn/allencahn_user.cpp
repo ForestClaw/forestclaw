@@ -265,7 +265,8 @@ static
 int allencahn_tag4coarsening(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *fine_patches,
                              int blockno,
-                             int patchno)
+                             int patchno,
+                             int initflag)
 {
     fclaw2d_patch_t *patch0 = &fine_patches[0];
 
@@ -289,8 +290,33 @@ int allencahn_tag4coarsening(fclaw2d_global_t *glob,
     int tag_patch = 0;
     clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
                                       &blockno, q[0],q[1],q[2],q[3],
-                                      &coarsen_threshold,&tag_patch);
+                                      &coarsen_threshold,&initflag,&tag_patch);
     return tag_patch == 1;
+}
+
+static
+void allencahn_bc2(fclaw2d_global_t *glob,
+                   fclaw2d_patch_t *patch,
+                   int block_idx,
+                   int patch_idx,
+                   double t,
+                   double dt,
+                   int intersects_bc[],
+                   int time_interp)
+{
+
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    ALLENCAHN_FORT_BC2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
+                           &dx,&dy,q,&t,&dt,intersects_bc);
 }
 
 
@@ -309,7 +335,7 @@ void allencahn_link_solvers(fclaw2d_global_t *glob)
 
     /* Patch : RHS function */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
-    patch_vt->physical_bc = fclaw2d_physical_bc_default;   /* Doesn't do anything */
+    patch_vt->physical_bc = allencahn_bc2;   /* Doesn't do anything */
     patch_vt->rhs = allencahn_rhs;          /* Overwrites default */
     patch_vt->initialize = allencahn_initialize;   /* Get an initial refinement */
 

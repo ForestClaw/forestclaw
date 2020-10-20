@@ -272,8 +272,11 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
     int mfields;
     fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
-    double *error = fclaw2d_clawpatch_get_error(glob,patch);
-    double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    double *err;
+    fclaw2d_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
+
+    double *soln;
+    fclaw2d_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
 
     char fname[BUFSIZ];
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -286,7 +289,7 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
 
     MGTEST_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
                              &xlower,&ylower,&dx,&dy,rhs,
-                             soln, error,
+                             soln, err,
                              &global_num,&level,&blockno,
                              &glob->mpirank);
 }
@@ -326,7 +329,8 @@ static
 int mgtest_tag4coarsening(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *fine_patches,
                              int blockno,
-                             int patchno)
+                             int patchno,
+                             int initflag)
 {
     fclaw2d_patch_t *patch0 = &fine_patches[0];
 
@@ -350,7 +354,7 @@ int mgtest_tag4coarsening(fclaw2d_global_t *glob,
     int tag_patch = 0;
     clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
-                                      &coarsen_threshold,&tag_patch);
+                                      &coarsen_threshold,&initflag,&tag_patch);
     return tag_patch == 1;
 }
 

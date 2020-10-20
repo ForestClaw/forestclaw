@@ -120,6 +120,17 @@ double ALLENCAHN_FORT_EVAL_BC(const int* iface, const double* t,const double* x,
 double ALLENCAHN_DIRICHLET(const int* iface, const double* t,const double* x, const double* y);
 
 
+
+#define ALLENCAHN_FORT_BC2 FCLAW_F77_FUNC(allencahn_fort_bc2, ALLENCAHN_FORT_BC2)
+
+void ALLENCAHN_FORT_BC2(const int* meqn, const int* mbc, 
+                        const int* mx, const int* my, 
+                        const double *xlower, const double *ylower, 
+                        const double *dx, const double *dy, 
+                        double q[], double* t, double *dt, 
+                        int intersects_bc[]);
+
+
 /* ----------------------------- Fortran - output functions --------------------------- */
 
 #define  ALLENCAHN_FORT_OUTPUT_ASCII \

@@ -12,7 +12,7 @@
 
       integer i,j,m
       double precision xc,yc, mgtest_qexact
-      double precision xc1, yc1, zc1
+      double precision xc1, yc1, zc1, r, s, e
 
       cont = get_context()
 
@@ -26,6 +26,7 @@ c     # Assume a single field variable only
             do m = 1,mfields
                error(i,j,m) = rhs(i,j,m) - soln(i,j,1)
             end do
+            continue
          enddo
       enddo
 
