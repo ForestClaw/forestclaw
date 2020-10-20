@@ -137,9 +137,9 @@ void heat_rhs(fclaw2d_global_t *glob,
 
     /* This function supplies an analytic right hand side. */
     int method = 1;
-    double dt = glob->curr_dt;
+    double lambda = fc2d_thunderegg_heat_get_lambda();     // heat::lambda also works
     HEAT_FORT_RHS(&blockno, &mbc, &mx, &my, &meqn, &mfields,
-                  &xlower, &ylower, &dx, &dy,&dt, &method,q,rhs);
+                  &xlower, &ylower, &dx, &dy,&lambda, &method,q,rhs);
 
 #if 0
     /* Compute right hand side */
@@ -201,49 +201,6 @@ void heat_compute_error(fclaw2d_global_t *glob,
     }
 }
 
-
-static
-void heat_conservation_check(fclaw2d_global_t *glob,
-                               fclaw2d_patch_t *patch,
-                               int blockno,
-                               int patchno,
-                               void *user)
-{
-    heat_error_info_t* error_data = (heat_error_info_t*) user;
-    int mx, my, mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    int mfields;
-    double *rhs;  /* Solution is stored in the right hand side */ 
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
-
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
-
-
-    /* Need a better way to determine which diagnostic to do */
-    double* area = fclaw2d_clawpatch_get_area(glob,patch);  
-    clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
-                                          area, rhs, error_data->rhs,
-                                          error_data->c_kahan);
-    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
-
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
-
-    int intersects_bc[4];
-    fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
-
-    double t = glob->curr_time;
-    int cons_check = 1;
-
-    HEAT_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
-                       &xlower, &ylower, &dx,&dy,&t, intersects_bc,
-                       mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
-                       &cons_check, error_data->boundary);
-
-}
 
 
 static
@@ -441,21 +398,5 @@ void heat_link_solvers(fclaw2d_global_t *glob)
         //clawpatch_vt->fort_header_ascii = &HEAT_FORT_HEADER_ASCII;
         clawpatch_vt->cb_output_ascii = cb_heat_output_ascii;        
     }
-
-
-
-
-    /* Diagnostics - most need to be modified because different number of fields are
-       used for the elliptic problem then for the hyperbolic problem */
-    //clawpatch_vt->conservation_check = heat_conservation_check;        
-
-#if 0
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
-    diag_vt->patch_init_diagnostics     = heat_diagnostics_initialize;
-    diag_vt->patch_reset_diagnostics    = heat_diagnostics_reset;
-    diag_vt->patch_compute_diagnostics  = heat_diagnostics_compute;
-    diag_vt->patch_gather_diagnostics   = heat_diagnostics_gather;
-    diag_vt->patch_finalize_diagnostics = heat_diagnostics_finalize;
-#endif    
 }
 

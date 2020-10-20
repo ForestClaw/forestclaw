@@ -32,6 +32,12 @@ struct fclaw2d_patch;
 struct fclaw2d_domain;
 struct fclaw2d_global;
 
+typedef enum fc2d_thunderegg_data_choice
+{
+    RHS=0,
+    SOLN
+}  fc2d_thunderegg_data_choice_t;
+
 /**
  * @brief Wrapper class for forestclaw data acess
  */
@@ -68,10 +74,15 @@ class fc2d_thunderegg_vector : public ThunderEgg::Vector<2> {
     static void enumeratePatchData(struct fclaw2d_domain *domain,
                                    struct fclaw2d_patch *patch, int blockno,
                                    int patchno, void *user);
+
+    static void set_start_value(struct fclaw2d_domain *domain,
+                                struct fclaw2d_patch *patch, int blockno,
+                                int patchno, void *user);
+
     ThunderEgg::LocalData<2> getLocalDataPriv(int component_index, int local_patch_id) const;
 
    public:
-    fc2d_thunderegg_vector(struct fclaw2d_global *glob);
+    fc2d_thunderegg_vector(struct fclaw2d_global *glob, int data_choice);
 
     ThunderEgg::LocalData<2> getLocalData(int component_index, int local_patch_id) override;
     const ThunderEgg::LocalData<2> getLocalData(int component_index, int local_patch_id) const override;

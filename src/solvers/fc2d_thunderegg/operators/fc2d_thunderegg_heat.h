@@ -43,7 +43,9 @@ struct fclaw2d_global;
 
 void fc2d_thunderegg_heat_solve(struct fclaw2d_global *glob);
 
-/* Everything is defined in the .cpp function */
+void fc2d_thunderegg_heat_set_lambda(double lambda);
+
+double fc2d_thunderegg_heat_get_lambda();
 
 
 #ifdef __cplusplus

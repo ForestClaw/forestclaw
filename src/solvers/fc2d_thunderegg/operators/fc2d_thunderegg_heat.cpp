@@ -64,8 +64,11 @@ using namespace ThunderEgg::VarPoisson;
 class heat : public PatchOperator<2>
 {
 public:
-    heat(std::shared_ptr<const Domain<2>>      domain,
-              std::shared_ptr<const GhostFiller<2>> ghost_filler, double lambda);
+    static double lambda;
+
+    heat(fclaw2d_global_t *glob, 
+         std::shared_ptr<const Domain<2>> domain,
+         std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
     void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                           const std::vector<LocalData<2>>& us,
@@ -74,16 +77,40 @@ public:
                        const std::vector<LocalData<2>>& us,
                        std::vector<LocalData<2>>& fs) const override;
 
-    double lambda;  
+    int s[4];  /* Determines sign when applying BCs */
 
 };
 
+/* Set static variable to default value;  lambda for this problem should be <= 0 */
+double heat::lambda{999};
 
-heat::heat(std::shared_ptr<const Domain<2>>      domain,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler, double lambda) 
-                     : PatchOperator<2>(domain,ghost_filler)
+void fc2d_thunderegg_heat_set_lambda(double lambda)
 {
-    this->lambda = lambda;
+    heat::lambda = lambda;
+
+}
+
+double fc2d_thunderegg_heat_get_lambda()
+{
+    return heat::lambda;
+}
+
+heat::heat(fclaw2d_global_t *glob,
+           std::shared_ptr<const Domain<2>> domain,
+           std::shared_ptr<const GhostFiller<2>> ghost_filler) 
+                    : PatchOperator<2>(domain,ghost_filler)
+{
+    /* User should call 'fc2d_thunderegg_heat_set_lambda' before calling elliptic solve */
+    FCLAW_ASSERT(heat::lambda <= 0);
+
+    /* Get scale needed to apply homogeneuous Dirichlet conditions. 
+       For Dirichlet (bctype=1) :   scalar is -1 
+       For Neumann (bctype=2)   :   scalar is 1 */
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
+    for(int m = 0; m < 4; m++)
+    {
+        s[m] = 2*mg_opt->boundary_conditions[m] - 3;
+    }
 }
 
 
@@ -108,7 +135,6 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dx = pinfo->spacings[0];
     double dy = pinfo->spacings[1];
 
-
     for(int m = 0; m < mfields; m++)
     {
         LocalData<2>& u = const_cast<LocalData<2>&>(us[m]);
@@ -118,31 +144,34 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         if (!pinfo->hasNbr(Side<2>::west())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = -u[{0,j}];
+                ghosts[{j}] = s[0]*u[{0,j}];
             }
         }
         if (!pinfo->hasNbr(Side<2>::east())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = -u[{mx-1,j}];
+                ghosts[{j}] = s[1]*u[{mx-1,j}];
             }
         }
 
         if (!pinfo->hasNbr(Side<2>::south())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = -u[{i,0}];
+                ghosts[{i}] = s[2]*u[{i,0}];
             }
         }
         if (!pinfo->hasNbr(Side<2>::north())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = -u[{i,my-1}];
+                ghosts[{i}] = s[3]*u[{i,my-1}];
             }
         }
 
         double dx2 = dx*dx;
         double dy2 = dy*dy;
+
+        /* Check already done at construction, but this is a double check */
+        FCLAW_ASSERT(lambda <= 0);
 
 #if 1
         /* Five-point Laplacian */
@@ -243,7 +272,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob);
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -279,8 +308,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    double lambda = -1/glob->curr_dt;
-    auto op = make_shared<heat>(te_domain,ghost_filler,lambda);
+    auto op = make_shared<heat>(glob,te_domain,ghost_filler);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
@@ -352,7 +380,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            patch_operator = make_shared<heat>(curr_domain, ghost_filler,lambda);
+            patch_operator = make_shared<heat>(glob,curr_domain, ghost_filler);
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
@@ -375,11 +403,13 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                            next_domain, clawpatch_opt->rhs_fields);
+                                                                    next_domain, 
+                                                                    clawpatch_opt->rhs_fields);
 
             //interpolator
             auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                prev_domain, clawpatch_opt->rhs_fields);
+                                                                        prev_domain, 
+                                                                        clawpatch_opt->rhs_fields);
 
             //vector generator
             vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
@@ -395,7 +425,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        patch_operator = make_shared<heat>(curr_domain, ghost_filler,lambda);
+        patch_operator = make_shared<heat>(glob,curr_domain, ghost_filler);
 
         //smoother
         switch (mg_opt->patch_solver)
@@ -428,7 +458,14 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
     // solve
     auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
+
+#if 1   
+    // Set starting conditions
+    shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
+#else
     shared_ptr<Vector<2>> u = vg->getNewVector();
+#endif    
+
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
 

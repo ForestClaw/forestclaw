@@ -36,30 +36,13 @@ subroutine heat_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
     integer i,j, m, iface, idir, i1, ig, ic, j1, jg, jc
     double precision d, h, x, y, g
     double precision a,b
-    double precision val_beta, grad_beta(2), div_beta_grad_u, flux(0:3)
+    double precision flux(0:3)
     double precision uI, dI
     integer count
 
     logical ccheck
 
     ccheck = cons_check .ne. 0
-
-    do i = 1-mbc,mx+mbc
-        do j = 1-mbc,my+mbc
-            x = xlower + (i-0.5)*dx
-            y = ylower + (j-0.5)*dy
-            call heat_fort_beta(x,y,val_beta,grad_beta)
-            beta(i,j,1) = val_beta
-        end do
-    end do
-
-    do i = 2-mbc,mx+mbc
-        do j = 2-mbc,my+mbc
-            beta(i,j,2) = (beta(i,j,1) + beta(i-1,j,1))/2.d0
-            beta(i,j,3) = (beta(i,j,1) + beta(i,j-1,1))/2.d0
-        end do
-    end do
-
 
     do m = 1,mfields
 
@@ -171,10 +154,10 @@ subroutine heat_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         if (intersects_bc(0) .ne. 0) then
             do j = 1,my
                 if (ccheck) then
-                    flux(0) = beta(1,j,2)*(rhs(1,j,m) - qh(0,j,m))/dx
+                    flux(0) = (rhs(1,j,m) - qh(0,j,m))/dx
                     flux_sum(m) = flux_sum(m) - flux(0)*dy    
                 else
-                    flux(0) = beta(1,j,2)*(qh(1,j,m) - qh(0,j,m))/dx
+                    flux(0) = (qh(1,j,m) - qh(0,j,m))/dx
                     rhs(1,j,m) = rhs(1,j,m) - (-flux(0)/dx)
                 endif
             end do
@@ -183,10 +166,10 @@ subroutine heat_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         if (intersects_bc(1) .ne. 0) then
             do j = 1,my
                 if (ccheck) then
-                    flux(1) = beta(mx+1,j,2)*(qh(mx+1,j,m) - rhs(mx,j,m))/dx
+                    flux(1) = (qh(mx+1,j,m) - rhs(mx,j,m))/dx
                     flux_sum(m) = flux_sum(m) + flux(1)*dy
                 else
-                    flux(1) = beta(mx+1,j,2)*(qh(mx+1,j,m) - qh(mx,j,m))/dx
+                    flux(1) = (qh(mx+1,j,m) - qh(mx,j,m))/dx
                     rhs(mx,j,m) = rhs(mx,j,m) - (flux(1)/dx)
                 endif
             end do
@@ -195,10 +178,10 @@ subroutine heat_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         if (intersects_bc(2) .ne. 0) then
             do i = 1,mx
                 if (ccheck) then
-                    flux(2) = beta(i,1,3)*(rhs(i,1,m) - qh(i,0,m))/dy
+                    flux(2) = (rhs(i,1,m) - qh(i,0,m))/dy
                     flux_sum(m) = flux_sum(m) - flux(2)*dx
                 else
-                    flux(2) = beta(i,1,3)*(qh(i,1,m) - qh(i,0,m))/dy
+                    flux(2) = (qh(i,1,m) - qh(i,0,m))/dy
                     rhs(i,1,m) = rhs(i,1,m) - (-flux(2)/dy)
                 endif
             end do
@@ -207,10 +190,10 @@ subroutine heat_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         if (intersects_bc(3) .ne. 0) then
             do i = 1,mx
                 if (ccheck) then
-                    flux(3) = beta(i,my+1,3)*(qh(i,my+1,m) - rhs(i,my,m))/dy           
+                    flux(3) = (qh(i,my+1,m) - rhs(i,my,m))/dy           
                     flux_sum(m) = flux_sum(m) + flux(3)*dx
                 else
-                    flux(3) = beta(i,my+1,3)*(qh(i,my+1,m) - qh(i,my,m))/dy           
+                    flux(3) = (qh(i,my+1,m) - qh(i,my,m))/dy           
                     rhs(i,my,m) = rhs(i,my,m) - (flux(3)/dy)
                 endif
             end do

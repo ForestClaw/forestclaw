@@ -15,7 +15,6 @@ libthunderegg_compiled_sources = \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg_options.c \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg_vector.cpp \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg_physical_bc.c \
-	src/solvers/fc2d_thunderegg/fc2d_thunderegg_solve.cpp \
 	src/solvers/fc2d_thunderegg/operators/fc2d_thunderegg_starpatch.cpp \
 	src/solvers/fc2d_thunderegg/operators/fc2d_thunderegg_fivepoint.cpp \
 	src/solvers/fc2d_thunderegg/operators/fc2d_thunderegg_varpoisson.cpp \

@@ -49,7 +49,7 @@ static int get_num_local_cells(fclaw2d_global_t* glob){
     return domain->local_num_patches * clawpatch_opt->mx * clawpatch_opt->my;
 }
 
-fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob)
+fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_choice)
     : Vector<2>( MPI_COMM_WORLD,
                  fclaw2d_clawpatch_get_options(glob)->rhs_fields,
                  glob->domain->local_num_patches, 
@@ -78,7 +78,23 @@ fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob)
     */
 
     patch_data.resize(domain->local_num_patches * clawpatch_opt->rhs_fields);
-    fclaw2d_global_iterate_patches(glob, enumeratePatchData, this);
+    switch (data_choice)
+    {
+        case RHS:
+            fclaw2d_global_iterate_patches(glob, enumeratePatchData, this);
+            break;
+        case SOLN:
+            /* Copy solution to start guess */
+            fclaw2d_global_iterate_patches(glob, set_start_value, this);
+            break;
+        default:
+            fclaw_global_essentialf("fc2d_thunderegg_vector : no valid data_choice specified\n");
+            exit(0);
+            break;
+    }    
+
+
+
 }
 void fc2d_thunderegg_vector::enumeratePatchData(fclaw2d_domain_t *domain,
                                                fclaw2d_patch_t *patch,
@@ -104,6 +120,43 @@ void fc2d_thunderegg_vector::enumeratePatchData(fclaw2d_domain_t *domain,
                                                   vec.mbc * vec.strides[1];
     }
 }
+
+void fc2d_thunderegg_vector::set_start_value(fclaw2d_domain_t *domain,
+                                             fclaw2d_patch_t *patch,
+                                             int blockno, int patchno,
+                                             void *user) 
+{
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *)user;
+
+
+    fc2d_thunderegg_vector &vec = *(fc2d_thunderegg_vector *)g->user;
+
+    int global_num, local_num, level;
+    fclaw2d_patch_get_info(domain, patch, blockno, patchno, &global_num,
+                           &local_num, &level);
+
+
+    int meqn;
+    double* q_ptr;
+    fclaw2d_clawpatch_soln_data(g->glob, patch, &q_ptr, &meqn);
+
+
+    int mfields;
+    double* rhs_ptr;
+    fclaw2d_clawpatch_rhs_data(g->glob, patch, &rhs_ptr, &mfields);
+    FCLAW_ASSERT(mfields == meqn);
+
+
+    // update point to point to non ghost cell
+    for(int c = 0; c < meqn; c++)
+    {
+        vec.patch_data[local_num * meqn + c] = q_ptr + vec.eqn_stride * c +
+                                                  vec.mbc * vec.strides[0] +
+                                                  vec.mbc * vec.strides[1];
+    }
+}
+
+
 LocalData<2> fc2d_thunderegg_vector::getLocalDataPriv(int component_index, int local_patch_id) const 
 {
     return LocalData<2>(patch_data[local_patch_id * mfields + component_index], strides, ns,mbc);
