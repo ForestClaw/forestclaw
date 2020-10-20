@@ -35,8 +35,8 @@
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch.h>
 
-#include <fc2d_multigrid.h>
-#include <fc2d_multigrid_options.h>
+#include <fc2d_thunderegg.h>
+#include <fc2d_thunderegg_options.h>
 
 
 static
@@ -80,10 +80,10 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
-    /* Test multigrid solver */
-    fc2d_multigrid_solver_initialize();
+    /* Test thunderegg solver */
+    fc2d_thunderegg_solver_initialize();
 
-    /* set up elliptic solver to use the multigrid solver */
+    /* set up elliptic solver to use the thunderegg solver */
     allencahn_link_solvers(glob);
 
     /* ---------------------------------------------------------------
@@ -113,7 +113,7 @@ main (int argc, char **argv)
     fclaw_options_t             *fclaw_opt;
 
     fclaw2d_clawpatch_options_t *clawpatch_opt;
-    fc2d_multigrid_options_t    *mg_opt;
+    fc2d_thunderegg_options_t    *mg_opt;
     allencahn_options_t              *user_opt;
 
     fclaw2d_global_t            *glob;
@@ -128,7 +128,7 @@ main (int argc, char **argv)
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    mg_opt =        fc2d_multigrid_options_register(app,"fclaw_options.ini");
+    mg_opt =        fc2d_thunderegg_options_register(app,"fclaw_options.ini");
     user_opt =                    allencahn_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
@@ -151,7 +151,7 @@ main (int argc, char **argv)
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
-        fc2d_multigrid_options_store    (glob, mg_opt);
+        fc2d_thunderegg_options_store    (glob, mg_opt);
         allencahn_options_store            (glob, user_opt);
 
         run_program(glob);

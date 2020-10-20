@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-#include <fc2d_multigrid.h>
+#include <fc2d_thunderegg.h>
 
 #include "heat_options.h"
 
@@ -106,7 +106,7 @@ void HEAT_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my,
                           const double* xlower, const double* ylower,
                           const double* dx, const double* dy, const double* t,
                           int intersects_bc[], int mthbc[], 
-                          double rhs[], fc2d_multigrid_fort_eval_bc_t g_bc, 
+                          double rhs[], fc2d_thunderegg_fort_eval_bc_t g_bc, 
                           int* cons_check, double flux_sum[]);
 
 

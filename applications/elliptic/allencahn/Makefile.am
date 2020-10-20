@@ -35,12 +35,12 @@ EXTRA_DIST += \
 
 applications_elliptic_allencahn_allencahn_CPPFLAGS = \
         $(AM_CPPFLAGS) \
-        $(FCLAW_MULTIGRID_CPPFLAGS) \
+        $(FCLAW_THUNDEREGG_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 
 applications_elliptic_allencahn_allencahn_LDADD = \
         $(LDADD) \
-        $(FCLAW_MULTIGRID_LDADD) \
+        $(FCLAW_THUNDEREGG_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD)
