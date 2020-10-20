@@ -33,12 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
-#include <fc2d_multigrid.h>
-#include <fc2d_multigrid_fort.h>
-#include <fc2d_multigrid_options.h>
-#include <fc2d_multigrid_physical_bc.h>
-#include <fc2d_multigrid_starpatch.h>
-#include <fc2d_multigrid_fivepoint.h>
+#include <fc2d_thunderegg.h>
+#include <fc2d_thunderegg_fort.h>
+#include <fc2d_thunderegg_options.h>
+#include <fc2d_thunderegg_physical_bc.h>
+#include <fc2d_thunderegg_starpatch.h>
+#include <fc2d_thunderegg_fivepoint.h>
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -78,7 +78,7 @@ void allencahn_problem_setup(fclaw2d_global_t *glob)
         for(int i = 0; i < user->m_polar; i++)
             fprintf(f,"%-24d   %% n[%d]\n",user->n_polar[i],i);            
 
-        fc2d_multigrid_options_t*  mg_opt = fc2d_multigrid_get_options(glob);    
+        fc2d_thunderegg_options_t*  mg_opt = fc2d_thunderegg_get_options(glob);    
         fprintf(f,  "%-24d   %s",mg_opt->boundary_conditions[0],  "% bc[0]\n");
         fprintf(f,  "%-24d   %s",mg_opt->boundary_conditions[1],  "% bc[1]\n");
         fprintf(f,  "%-24d   %s",mg_opt->boundary_conditions[2],  "% bc[2]\n");
@@ -324,7 +324,7 @@ void allencahn_link_solvers(fclaw2d_global_t *glob)
 {
 #if 0 
     /* These are listed here for reference */
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -340,7 +340,7 @@ void allencahn_link_solvers(fclaw2d_global_t *glob)
     patch_vt->initialize = allencahn_initialize;   /* Get an initial refinement */
 
     /* Multigrid vtable */
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
     //mg_vt->fort_rhs       = &ALLENCAHN_FORT_RHS;
 
     mg_vt->fort_beta      = &ALLENCAHN_FORT_BETA;
