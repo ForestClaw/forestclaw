@@ -187,6 +187,12 @@ void outstyle_1(fclaw2d_global_t *glob)
 
             glob->curr_dt = dt_step;  
 
+            /* Heat solver solves : \nabla^2 u + lambda*u = f; lambda <= 0 */
+
+            /* Set lambda for Backward Euler */
+            double lambda = -1/dt_step;
+            fc2d_thunderegg_heat_set_lambda(lambda);
+
             /* Solve the elliptic problem; RHS is set here */
             fclaw2d_elliptic_solve(glob);
 
