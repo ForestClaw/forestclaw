@@ -8,13 +8,15 @@ showpatchborders;
 setpatchborderprops('linewidth',1);
 
 example = read_vars();
+
+
+ca = [qmin,qmax];
 switch example
     case 1
         ca = [0.9,2];
     case 4
         ca = [0,1];
 end
-ca = [qmin,qmax];
 caxis(ca);
 cv = linspace(ca(1),ca(2),11);
 drawcontourlines(cv);
@@ -22,6 +24,22 @@ drawcontourlines(cv);
 % Color map and axis
 colormap(parula);
 colorbar;
+
+% Axis labels
+ax = -1;
+bx = 1;
+ay = -1;
+by = 1;
+s = 1e-2;
+axis([ax-s bx+s ay-s by+s])
+daspect([1 1 1]);
+
+xlabel('x','fontsize',16);
+ylabel('y','fontsize',16);
+
+% title(tstr,'fontsize',18);
+
+
 
 % Add some extra info
 % hold on;
@@ -37,27 +55,13 @@ if (length(amrdata) == 1)
     set(h,'edgecolor','none');
     view(3);
     axis square;
-    % set(gca,'zlim',ca);
+    set(gca,'zlim',ca);
 %     set(gcf,'color','k');
 %     set(gcf,'clipping','off');
 %     axis off;
 %     camlight;
     figure(1);
 end
-
-% Axis labels
-ax = -1;
-bx = 1;
-ay = -1;
-by = 1;
-s = 1e-2;
-axis([ax-s bx+s ay-s by+s])
-daspect([1 1 1]);
-
-xlabel('x','fontsize',16);
-ylabel('y','fontsize',16);
-
-% title(tstr,'fontsize',18);
 
         
 NoQuery = 0;
