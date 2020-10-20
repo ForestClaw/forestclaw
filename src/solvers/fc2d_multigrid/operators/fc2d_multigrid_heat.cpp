@@ -279,7 +279,7 @@ void fc2d_multigrid_heat_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    double lambda = mg_opt->lambda;
+    double lambda = -1/glob->curr_dt;
     auto op = make_shared<heat>(te_domain,ghost_filler,lambda);
 
     // set the patch solver
