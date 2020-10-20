@@ -1,4 +1,4 @@
-subroutine multigrid_fort_apply_bc_default(blockno, mx, my,mbc,meqn,xlower,ylower, &
+subroutine thunderegg_fort_apply_bc_default(blockno, mx, my,mbc,meqn,xlower,ylower, &
     dx,dy,t,intersects_bc,bctype,rhs,g_bc, cons_check, flux_sum)
 
     implicit none
@@ -42,7 +42,7 @@ subroutine multigrid_fort_apply_bc_default(blockno, mx, my,mbc,meqn,xlower,ylowe
 
             d = (a/2.d0 + b/h)
             if (d .eq. 0) then
-                write(6,*) 'multigrid_fort_apply_bc_default : ill-defined BCs'
+                write(6,*) 'thunderegg_fort_apply_bc_default : ill-defined BCs'
                 stop
             endif
 
@@ -103,5 +103,5 @@ subroutine multigrid_fort_apply_bc_default(blockno, mx, my,mbc,meqn,xlower,ylowe
         end if 
     end do
 
-end subroutine multigrid_fort_apply_bc_default
+end subroutine thunderegg_fort_apply_bc_default
 
