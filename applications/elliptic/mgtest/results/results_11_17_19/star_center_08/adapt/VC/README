@@ -1,5 +1,0 @@
-These runs used mx=8, which appears to be much too slow to really use effectively. 
-
-Note that the last run (eff. res = 2048) took over 14 hours and still did not finish. This may have been because we were also computing the error at the same time.  
-
-These timing results compare well with those done on 11/18 when error was not computed. 
