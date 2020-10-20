@@ -66,8 +66,9 @@ class heat : public PatchOperator<2>
 public:
     static double lambda;
 
-    heat(std::shared_ptr<const Domain<2>>      domain,
-              std::shared_ptr<const GhostFiller<2>> ghost_filler);
+    heat(fclaw2d_global_t *glob, 
+         std::shared_ptr<const Domain<2>> domain,
+         std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
     void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                           const std::vector<LocalData<2>>& us,
@@ -75,6 +76,8 @@ public:
     void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
                        const std::vector<LocalData<2>>& us,
                        std::vector<LocalData<2>>& fs) const override;
+
+    int s[4];  /* Determines sign when applying BCs */
 
 };
 
@@ -84,13 +87,29 @@ double heat::lambda{999};
 void fc2d_thunderegg_heat_set_lambda(double lambda)
 {
     heat::lambda = lambda;
+
 }
 
-heat::heat(std::shared_ptr<const Domain<2>> domain,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler) 
-                     : PatchOperator<2>(domain,ghost_filler)
+double fc2d_thunderegg_heat_get_lambda()
+{
+    return heat::lambda;
+}
+
+heat::heat(fclaw2d_global_t *glob,
+           std::shared_ptr<const Domain<2>> domain,
+           std::shared_ptr<const GhostFiller<2>> ghost_filler) 
+                    : PatchOperator<2>(domain,ghost_filler)
 {
     FCLAW_ASSERT(heat::lambda <= 0);
+
+    /* Get scalar in u_interior values when applying BCs : 
+       For Dirichlet (bctype=1),  scalar is -1 
+       For Neumann (bctype=2), scalar is 1 */
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
+    for(int m = 0; m < 4; m++)
+    {
+        s[m] = 2*mg_opt->boundary_conditions[m] - 3;
+    }
 }
 
 
@@ -115,7 +134,6 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     double dx = pinfo->spacings[0];
     double dy = pinfo->spacings[1];
 
-
     for(int m = 0; m < mfields; m++)
     {
         LocalData<2>& u = const_cast<LocalData<2>&>(us[m]);
@@ -125,26 +143,26 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         if (!pinfo->hasNbr(Side<2>::west())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = -u[{0,j}];
+                ghosts[{j}] = s[0]*u[{0,j}];
             }
         }
         if (!pinfo->hasNbr(Side<2>::east())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = -u[{mx-1,j}];
+                ghosts[{j}] = s[1]*u[{mx-1,j}];
             }
         }
 
         if (!pinfo->hasNbr(Side<2>::south())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = -u[{i,0}];
+                ghosts[{i}] = s[2]*u[{i,0}];
             }
         }
         if (!pinfo->hasNbr(Side<2>::north())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = -u[{i,my-1}];
+                ghosts[{i}] = s[3]*u[{i,my-1}];
             }
         }
 
@@ -289,7 +307,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    auto op = make_shared<heat>(te_domain,ghost_filler);
+    auto op = make_shared<heat>(glob,te_domain,ghost_filler);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
@@ -361,7 +379,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            patch_operator = make_shared<heat>(curr_domain, ghost_filler);
+            patch_operator = make_shared<heat>(glob,curr_domain, ghost_filler);
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
@@ -404,7 +422,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        patch_operator = make_shared<heat>(curr_domain, ghost_filler);
+        patch_operator = make_shared<heat>(glob,curr_domain, ghost_filler);
 
         //smoother
         switch (mg_opt->patch_solver)

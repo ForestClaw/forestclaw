@@ -114,6 +114,9 @@ void fc2d_thunderegg_rhs(struct fclaw2d_global* glob,
 /* Put this here so that user does not have to include fc2d_thunderegg_heat.h */
 void fc2d_thunderegg_heat_set_lambda(double lambda);
 
+double fc2d_thunderegg_heat_get_lambda();
+
+
 
 #ifdef __cplusplus
 #if 0
