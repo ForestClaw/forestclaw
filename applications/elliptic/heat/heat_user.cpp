@@ -365,7 +365,8 @@ static
 int heat_tag4coarsening(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *fine_patches,
                              int blockno,
-                             int patchno)
+                             int patchno,
+                             int initflag)
 {
     fclaw2d_patch_t *patch0 = &fine_patches[0];
 
@@ -389,7 +390,7 @@ int heat_tag4coarsening(fclaw2d_global_t *glob,
     int tag_patch = 0;
     clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
-                                      &coarsen_threshold,&tag_patch);
+                                      &coarsen_threshold,&initflag,&tag_patch);
     return tag_patch == 1;
 }
 
