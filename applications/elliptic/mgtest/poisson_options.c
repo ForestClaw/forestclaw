@@ -23,12 +23,12 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mgtest_user.h"
+#include "poisson_user.h"
 
 static int s_user_options_package_id = -1;
 
 static void *
-mgtest_register (mgtest_options_t *user, sc_options_t * opt)
+poisson_register (poisson_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
 
@@ -92,7 +92,7 @@ mgtest_register (mgtest_options_t *user, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-mgtest_postprocess(mgtest_options_t *user)
+poisson_postprocess(poisson_options_t *user)
 {
     fclaw_options_convert_double_array (user->x0_polar_string,&user->x0_polar,user->m_polar);
     fclaw_options_convert_double_array (user->y0_polar_string,&user->y0_polar,user->m_polar);
@@ -106,14 +106,14 @@ mgtest_postprocess(mgtest_options_t *user)
 
 
 static fclaw_exit_type_t
-mgtest_check (mgtest_options_t *user)
+poisson_check (poisson_options_t *user)
 {
     /* Nothing to check ? */
     return FCLAW_NOEXIT;
 }
 
 static void
-mgtest_destroy(mgtest_options_t *user)
+poisson_destroy(poisson_options_t *user)
 {
     fclaw_options_destroy_array (user->x0_polar);
     fclaw_options_destroy_array (user->y0_polar);
@@ -131,15 +131,15 @@ mgtest_destroy(mgtest_options_t *user)
 static void*
 options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
-    mgtest_options_t *user;
+    poisson_options_t *user;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (opt != NULL);
 
-    user = (mgtest_options_t*) package;
+    user = (poisson_options_t*) package;
 
-    return mgtest_register(user,opt);
+    return poisson_register(user,opt);
 }
 
 static fclaw_exit_type_t
@@ -150,43 +150,43 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT (registered == NULL);
 
     /* errors from the key-value options would have showed up in parsing */
-    mgtest_options_t *user = (mgtest_options_t *) package;
+    poisson_options_t *user = (poisson_options_t *) package;
 
     /* post-process this package */
     FCLAW_ASSERT(user->is_registered);
 
     /* Convert strings to arrays */
-    return mgtest_postprocess (user);
+    return poisson_postprocess (user);
 }
 
 
 static fclaw_exit_type_t
 options_check(fclaw_app_t *app, void *package,void *registered)
 {
-    mgtest_options_t           *user;
+    poisson_options_t           *user;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT(registered == NULL);
 
-    user = (mgtest_options_t*) package;
+    user = (poisson_options_t*) package;
 
-    return mgtest_check(user);
+    return poisson_check(user);
 }
 
 static void
 options_destroy (fclaw_app_t * app, void *package, void *registered)
 {
-    mgtest_options_t *user;
+    poisson_options_t *user;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    user = (mgtest_options_t*) package;
+    user = (poisson_options_t*) package;
     FCLAW_ASSERT (user->is_registered);
 
-    mgtest_destroy (user);
+    poisson_destroy (user);
 
     FCLAW_FREE (user);
 }
@@ -202,13 +202,13 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 
 /* --------------------- Public interface access functions ---------------------------- */
 
-mgtest_options_t* mgtest_options_register (fclaw_app_t * app,
+poisson_options_t* poisson_options_register (fclaw_app_t * app,
                                        const char *configfile)
 {
-    mgtest_options_t *user;
+    poisson_options_t *user;
     FCLAW_ASSERT (app != NULL);
 
-    user = FCLAW_ALLOC (mgtest_options_t, 1);
+    user = FCLAW_ALLOC (poisson_options_t, 1);
     fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
                                 user);
 
@@ -216,15 +216,15 @@ mgtest_options_t* mgtest_options_register (fclaw_app_t * app,
     return user;
 }
 
-void mgtest_options_store (fclaw2d_global_t* glob, mgtest_options_t* user)
+void poisson_options_store (fclaw2d_global_t* glob, poisson_options_t* user)
 {
     FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
     s_user_options_package_id = id;
 }
 
-const mgtest_options_t* mgtest_get_options(fclaw2d_global_t* glob)
+const poisson_options_t* poisson_get_options(fclaw2d_global_t* glob)
 {
     int id = s_user_options_package_id;
-    return (mgtest_options_t*) fclaw_package_get_options(glob, id);    
+    return (poisson_options_t*) fclaw_package_get_options(glob, id);    
 }

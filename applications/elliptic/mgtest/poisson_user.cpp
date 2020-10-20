@@ -24,9 +24,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mgtest_user.h"
-#include "mgtest_options.h"
-#include "mgtest_diagnostics.h"
+#include "poisson_user.h"
+#include "poisson_options.h"
+#include "poisson_diagnostics.h"
 
 #include <fclaw2d_include_all.h>
 
@@ -34,12 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
-#include <fc2d_multigrid.h>
-#include <fc2d_multigrid_fort.h>
-#include <fc2d_multigrid_options.h>
-#include <fc2d_multigrid_physical_bc.h>
-#include <fc2d_multigrid_starpatch.h>
-#include <fc2d_multigrid_fivepoint.h>
+#include <fc2d_thunderegg.h>
+#include <fc2d_thunderegg_fort.h>
+#include <fc2d_thunderegg_options.h>
+#include <fc2d_thunderegg_physical_bc.h>
+#include <fc2d_thunderegg_starpatch.h>
+#include <fc2d_thunderegg_fivepoint.h>
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -48,12 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static
-void mgtest_problem_setup(fclaw2d_global_t *glob)
+void poisson_problem_setup(fclaw2d_global_t *glob)
 {
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
-        const mgtest_options_t* user = mgtest_get_options(glob);
+        const poisson_options_t* user = poisson_get_options(glob);
 
         fprintf(f,  "%-24d   %s",  user->example,    "% example\n");
         fprintf(f,  "%-24d   %s",  user->beta_choice,"% beta_choice\n");
@@ -79,7 +79,7 @@ void mgtest_problem_setup(fclaw2d_global_t *glob)
         for(int i = 0; i < user->m_polar; i++)
             fprintf(f,"%-24d   %% n[%d]\n",user->n_polar[i],i);            
 
-        fc2d_multigrid_options_t*  mg_opt = fc2d_multigrid_get_options(glob);    
+        fc2d_thunderegg_options_t*  mg_opt = fc2d_thunderegg_get_options(glob);    
         fprintf(f,  "%-24d   %s",mg_opt->boundary_conditions[0],  "% bc[0]\n");
         fprintf(f,  "%-24d   %s",mg_opt->boundary_conditions[1],  "% bc[1]\n");
         fprintf(f,  "%-24d   %s",mg_opt->boundary_conditions[2],  "% bc[2]\n");
@@ -89,12 +89,12 @@ void mgtest_problem_setup(fclaw2d_global_t *glob)
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
-    MGTEST_SETPROB(); /* This file reads the file just created above */
+    poisson_SETPROB(); /* This file reads the file just created above */
 }
 
 
 static
-void mgtest_rhs(fclaw2d_global_t *glob,
+void poisson_rhs(fclaw2d_global_t *glob,
                 fclaw2d_patch_t *patch,
                 int blockno,
                 int patchno)
@@ -110,7 +110,7 @@ void mgtest_rhs(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     /* Compute right hand side */
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
     FCLAW_ASSERT(mg_vt->fort_rhs != NULL);
 
     /* This function supplies an analytic right hand side. */
@@ -119,13 +119,13 @@ void mgtest_rhs(fclaw2d_global_t *glob,
 
 
 static
-void mgtest_compute_error(fclaw2d_global_t *glob,
+void poisson_compute_error(fclaw2d_global_t *glob,
                           fclaw2d_patch_t *patch,
                           int blockno,
                           int patchno,
                           void *user)
 {
-    mgtest_error_info_t* error_data = (mgtest_error_info_t*) user;
+    poisson_error_info_t* error_data = (poisson_error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -164,13 +164,13 @@ void mgtest_compute_error(fclaw2d_global_t *glob,
 
 
 static
-void mgtest_conservation_check(fclaw2d_global_t *glob,
+void poisson_conservation_check(fclaw2d_global_t *glob,
                                fclaw2d_patch_t *patch,
                                int blockno,
                                int patchno,
                                void *user)
 {
-    mgtest_error_info_t* error_data = (mgtest_error_info_t*) user;
+    poisson_error_info_t* error_data = (poisson_error_info_t*) user;
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
@@ -189,9 +189,9 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
                                           area, rhs, error_data->rhs,
                                           error_data->c_kahan);
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
 
     int intersects_bc[4];
     fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
@@ -199,7 +199,7 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
     double t = glob->curr_time;
     int cons_check = 1;
 
-    MGTEST_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
+    poisson_FORT_APPLY_BC(&blockno, &mx, &my, &mbc, &mfields, 
                          &xlower, &ylower, &dx,&dy,&t, intersects_bc,
                          mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
                          &cons_check, error_data->boundary);
@@ -208,7 +208,7 @@ void mgtest_conservation_check(fclaw2d_global_t *glob,
 
 
 static
-void mgtest_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+void poisson_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
                 fclaw2d_clawpatch_get_options(glob);
@@ -247,7 +247,7 @@ void mgtest_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
 
 static
-void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
+void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
                             fclaw2d_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
@@ -287,7 +287,7 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
-    MGTEST_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
+    poisson_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
                              &xlower,&ylower,&dx,&dy,rhs,
                              soln, err,
                              &global_num,&level,&blockno,
@@ -295,7 +295,7 @@ void cb_mgtest_output_ascii(fclaw2d_domain_t * domain,
 }
 
 
-int mgtest_tag4refinement(fclaw2d_global_t *glob,
+int poisson_tag4refinement(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *this_patch,
                              int blockno, int patchno,
                              int initflag)
@@ -326,7 +326,7 @@ int mgtest_tag4refinement(fclaw2d_global_t *glob,
 }
 
 static
-int mgtest_tag4coarsening(fclaw2d_global_t *glob,
+int poisson_tag4coarsening(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *fine_patches,
                              int blockno,
                              int patchno,
@@ -359,34 +359,34 @@ int mgtest_tag4coarsening(fclaw2d_global_t *glob,
 }
 
 
-void mgtest_link_solvers(fclaw2d_global_t *glob)
+void poisson_link_solvers(fclaw2d_global_t *glob)
 {
     /* ForestClaw vtable */
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
-    fclaw_vt->problem_setup = &mgtest_problem_setup;  
+    fclaw_vt->problem_setup = &poisson_problem_setup;  
 
     /* Patch : RHS function */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
-    patch_vt->rhs = mgtest_rhs;          /* Overwrites default */
-    patch_vt->initialize = mgtest_rhs;   /* Get an initial refinement */
+    patch_vt->rhs = poisson_rhs;          /* Overwrites default */
+    patch_vt->initialize = poisson_rhs;   /* Get an initial refinement */
 
     /* Multigrid vtable */
-    fc2d_multigrid_vtable_t*  mg_vt = fc2d_multigrid_vt();
-    mg_vt->fort_rhs       = &MGTEST_FORT_RHS;
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    mg_vt->fort_rhs       = &poisson_FORT_RHS;
 
-    mg_vt->fort_beta      = &MGTEST_FORT_BETA;
+    mg_vt->fort_beta      = &poisson_FORT_BETA;
     
-    mg_vt->fort_apply_bc = &MGTEST_FORT_APPLY_BC;
-    mg_vt->fort_eval_bc  = &MGTEST_FORT_EVAL_BC;   // For non-homogeneous BCs
+    mg_vt->fort_apply_bc = &poisson_FORT_APPLY_BC;
+    mg_vt->fort_eval_bc  = &poisson_FORT_EVAL_BC;   // For non-homogeneous BCs
 
     /* Clawpatch : Compute the error */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    clawpatch_vt->compute_error = mgtest_compute_error;
-    clawpatch_vt->fort_compute_patch_error = &MGTEST_COMPUTE_ERROR;
+    clawpatch_vt->compute_error = poisson_compute_error;
+    clawpatch_vt->fort_compute_patch_error = &poisson_COMPUTE_ERROR;
 
     // tagging routines
-    patch_vt->tag4refinement       = mgtest_tag4refinement;
-    patch_vt->tag4coarsening       = mgtest_tag4coarsening;
+    patch_vt->tag4refinement       = poisson_tag4refinement;
+    patch_vt->tag4coarsening       = poisson_tag4coarsening;
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 
@@ -395,27 +395,27 @@ void mgtest_link_solvers(fclaw2d_global_t *glob)
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error) 
     {
-        clawpatch_vt->time_header_ascii = mgtest_time_header_ascii;
-        //clawpatch_vt->fort_header_ascii = &MGTEST_FORT_HEADER_ASCII;
-        clawpatch_vt->cb_output_ascii = cb_mgtest_output_ascii;        
+        clawpatch_vt->time_header_ascii = poisson_time_header_ascii;
+        //clawpatch_vt->fort_header_ascii = &poisson_FORT_HEADER_ASCII;
+        clawpatch_vt->cb_output_ascii = cb_poisson_output_ascii;        
     }
 
-    fc2d_multigrid_options_t *mg_opt = fc2d_multigrid_get_options(glob);
+    fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     if (mg_opt->patch_operator == USER_OPERATOR)
     {
-        mg_vt->patch_operator = fc2d_multigrid_fivepoint_solve;        
+        mg_vt->patch_operator = fc2d_thunderegg_fivepoint_solve;        
     }
 
     /* Diagnostics - most need to be modified because different number of fields are
        used for the elliptic problem then for the hyperbolic problem */
-    clawpatch_vt->conservation_check = mgtest_conservation_check;        
+    clawpatch_vt->conservation_check = poisson_conservation_check;        
 
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
-    diag_vt->patch_init_diagnostics     = mgtest_diagnostics_initialize;
-    diag_vt->patch_reset_diagnostics    = mgtest_diagnostics_reset;
-    diag_vt->patch_compute_diagnostics  = mgtest_diagnostics_compute;
-    diag_vt->patch_gather_diagnostics   = mgtest_diagnostics_gather;
-    diag_vt->patch_finalize_diagnostics = mgtest_diagnostics_finalize;
+    diag_vt->patch_init_diagnostics     = poisson_diagnostics_initialize;
+    diag_vt->patch_reset_diagnostics    = poisson_diagnostics_reset;
+    diag_vt->patch_compute_diagnostics  = poisson_diagnostics_compute;
+    diag_vt->patch_gather_diagnostics   = poisson_diagnostics_gather;
+    diag_vt->patch_finalize_diagnostics = poisson_diagnostics_finalize;
 }
 

@@ -1,4 +1,4 @@
-      subroutine mgtest_compute_error(blockno, mx,my,mbc,mfields,
+      subroutine poisson_compute_error(blockno, mx,my,mbc,mfields,
      &      dx,dy,xlower,ylower,t,rhs,error,soln)
       implicit none
 
@@ -11,7 +11,7 @@
       integer*8 cont, get_context
 
       integer i,j,m
-      double precision xc,yc, mgtest_qexact
+      double precision xc,yc, poisson_qexact
       double precision xc1, yc1, zc1, r, s, e
 
       cont = get_context()
@@ -22,7 +22,7 @@ c     # Assume a single field variable only
             yc = ylower + (j-0.5)*dy
             xc = xlower + (i-0.5)*dx
 
-            soln(i,j,1) = mgtest_qexact(xc,yc)
+            soln(i,j,1) = poisson_qexact(xc,yc)
             do m = 1,mfields
                error(i,j,m) = rhs(i,j,m) - soln(i,j,1)
             end do

@@ -23,7 +23,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mgtest_user.h"
+#include "poisson_user.h"
     
 #include <fclaw2d_include_all.h>
 
@@ -35,8 +35,8 @@
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch.h>
 
-#include <fc2d_multigrid.h>
-#include <fc2d_multigrid_options.h>
+#include <fc2d_thunderegg.h>
+#include <fc2d_thunderegg_options.h>
 
 
 static
@@ -67,9 +67,9 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    // const mgtest_options_t           *user_opt;
+    // const poisson_options_t           *user_opt;
 
-    // user_opt = mgtest_get_options(glob);
+    // user_opt = poisson_get_options(glob);
 
     /* ---------------------------------------------------------------
        Set domain data.
@@ -80,11 +80,11 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
-    /* Test multigrid solver */
-    fc2d_multigrid_solver_initialize();
+    /* Test thunderegg solver */
+    fc2d_thunderegg_solver_initialize();
 
-    /* set up elliptic solver to use the multigrid solver */
-    mgtest_link_solvers(glob);
+    /* set up elliptic solver to use the thunderegg solver */
+    poisson_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run
@@ -130,8 +130,8 @@ main (int argc, char **argv)
     fclaw_options_t             *fclaw_opt;
 
     fclaw2d_clawpatch_options_t *clawpatch_opt;
-    fc2d_multigrid_options_t    *mg_opt;
-    mgtest_options_t              *user_opt;
+    fc2d_thunderegg_options_t    *mg_opt;
+    poisson_options_t              *user_opt;
 
     fclaw2d_global_t            *glob;
     fclaw2d_domain_t            *domain;
@@ -145,8 +145,8 @@ main (int argc, char **argv)
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    mg_opt =        fc2d_multigrid_options_register(app,"fclaw_options.ini");
-    user_opt =                    mgtest_options_register(app,"fclaw_options.ini");  
+    mg_opt =        fc2d_thunderegg_options_register(app,"fclaw_options.ini");
+    user_opt =                    poisson_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -168,8 +168,8 @@ main (int argc, char **argv)
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
-        fc2d_multigrid_options_store    (glob, mg_opt);
-        mgtest_options_store            (glob, user_opt);
+        fc2d_thunderegg_options_store    (glob, mg_opt);
+        poisson_options_store            (glob, user_opt);
 
         run_program(glob);
 

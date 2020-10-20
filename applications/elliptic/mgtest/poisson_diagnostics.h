@@ -23,12 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef MGTEST_DIAGNOSTICS_H
-#define MGTEST_DIAGNOSTICS_H
+#ifndef poisson_DIAGNOSTICS_H
+#define poisson_DIAGNOSTICS_H
 
 #include <fclaw2d_include_all.h>
 
-#include <fc2d_multigrid.h>
+#include <fc2d_thunderegg.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -47,24 +47,24 @@ typedef struct {
     double *rhs;       /* Sum of rhs hand side */
     double *boundary;  /* sum around boundary */
     double *c_kahan;  
-} mgtest_error_info_t;
+} poisson_error_info_t;
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void mgtest_diagnostics_initialize(fclaw2d_global_t *glob, void **acc_patch);
+void poisson_diagnostics_initialize(fclaw2d_global_t *glob, void **acc_patch);
 
 
-void mgtest_diagnostics_reset(fclaw2d_global_t *glob, void* patch_acc);
+void poisson_diagnostics_reset(fclaw2d_global_t *glob, void* patch_acc);
 
-void mgtest_diagnostics_compute(fclaw2d_global_t* glob,
+void poisson_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc);
 
-void mgtest_diagnostics_gather(fclaw2d_global_t *glob, void* patch_acc,
+void poisson_diagnostics_gather(fclaw2d_global_t *glob, void* patch_acc,
                                int init_flag);
 
-void mgtest_diagnostics_finalize(fclaw2d_global_t *glob, void** patch_acc);
+void poisson_diagnostics_finalize(fclaw2d_global_t *glob, void** patch_acc);
 
-void mgtest_compute_diagnostics(fclaw2d_domain_t *domain,
+void poisson_compute_diagnostics(fclaw2d_domain_t *domain,
                                 fclaw2d_patch_t *patch,
                                 int blockno,
                                 int patchno,

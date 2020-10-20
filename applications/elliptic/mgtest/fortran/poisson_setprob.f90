@@ -1,4 +1,4 @@
-subroutine mgtest_setprob()
+subroutine poisson_setprob()
     use hsmooth_mod
     implicit none
 
@@ -46,4 +46,4 @@ subroutine mgtest_setprob()
     read(10,*) bc_type(3)
     close(10)
 
-end subroutine mgtest_setprob
+end subroutine poisson_setprob

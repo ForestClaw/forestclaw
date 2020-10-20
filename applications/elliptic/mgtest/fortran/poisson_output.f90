@@ -1,4 +1,4 @@
-subroutine mgtest_fort_header_ascii(matname1,matname2, time,mfields,maux,ngrids)
+subroutine poisson_fort_header_ascii(matname1,matname2, time,mfields,maux,ngrids)
     implicit none
 
     integer iframe,mfields,ngrids, maux
@@ -27,9 +27,9 @@ subroutine mgtest_fort_header_ascii(matname1,matname2, time,mfields,maux,ngrids)
     open(unit=matunit1,file=matname1,status='replace')
     close(matunit1)
 
-end subroutine mgtest_fort_header_ascii
+end subroutine poisson_fort_header_ascii
 
-subroutine mgtest_fort_output_ascii(matname1, & 
+subroutine poisson_fort_output_ascii(matname1, & 
          mx,my,mfields,mbc, xlower,ylower, dx,dy,  & 
          rhs,soln,error,patch_num,level,blockno,mpirank)
 
@@ -90,4 +90,4 @@ subroutine mgtest_fort_output_ascii(matname1, &
 
     close(matunit1)
 
-end subroutine mgtest_fort_output_ascii
+end subroutine poisson_fort_output_ascii

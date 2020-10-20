@@ -26,27 +26,27 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call mgtest_get_minmax(mx,my,mbc,meqn,
+      call poisson_get_minmax(mx,my,mbc,meqn,
      &      mq,q0,qmin,qmax, coarsen_threshold,initflag,tag_patch)
       if (tag_patch == 0) return
 
-      call mgtest_get_minmax(mx,my,mbc,meqn,
+      call poisson_get_minmax(mx,my,mbc,meqn,
      &              mq,q1,qmin,qmax, coarsen_threshold,
      &              initflag,tag_patch)
       if (tag_patch == 0) return
 
-      call mgtest_get_minmax(mx,my,mbc,meqn,
+      call poisson_get_minmax(mx,my,mbc,meqn,
      &              mq,q2,qmin,qmax,coarsen_threshold,
      &              initflag,tag_patch )
       if (tag_patch == 0) return
 
-      call mgtest_get_minmax(mx,my,mbc,meqn,
+      call poisson_get_minmax(mx,my,mbc,meqn,
      &      mq,q3,qmin,qmax,coarsen_threshold,
      &      initflag,tag_patch)
 
       end
 
-      subroutine mgtest_get_minmax(mx,my,mbc,meqn,mq,q,
+      subroutine poisson_get_minmax(mx,my,mbc,meqn,mq,q,
      &      qmin,qmax,coarsen_threshold,initflag,tag_patch)
 
       implicit none

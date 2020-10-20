@@ -1,4 +1,4 @@
-DOUBLE PRECISION function mgtest_qexact(x,y)
+DOUBLE PRECISION function poisson_qexact(x,y)
     IMPLICIT NONE
 
     DOUBLE PRECISION x,y
@@ -8,13 +8,13 @@ DOUBLE PRECISION function mgtest_qexact(x,y)
 
 
     flag = 0  !! Don't compute the gradient
-    call mgtest_qexact_complete(x,y,q,qlap,grad,flag)
+    call poisson_qexact_complete(x,y,q,qlap,grad,flag)
 
-    mgtest_qexact = q
+    poisson_qexact = q
 
-end function mgtest_qexact
+end function poisson_qexact
 
-DOUBLE PRECISION function mgtest_qexact_rhs(x,y)
+DOUBLE PRECISION function poisson_qexact_rhs(x,y)
     implicit none
 
     double precision x,y
@@ -22,18 +22,18 @@ DOUBLE PRECISION function mgtest_qexact_rhs(x,y)
     integer flag
     double precision q,qlap,b, grad_q(2), grad_beta(2)
 
-    CALL mgtest_fort_beta(x,y,b,grad_beta)
+    CALL poisson_fort_beta(x,y,b,grad_beta)
 
     flag = 2
-    CALL mgtest_qexact_complete(x,y,q,qlap,grad_q,flag)
+    CALL poisson_qexact_complete(x,y,q,qlap,grad_q,flag)
 
-    mgtest_qexact_rhs = grad_beta(1)*grad_q(1) +  grad_beta(2)*grad_q(2) + b*qlap
+    poisson_qexact_rhs = grad_beta(1)*grad_q(1) +  grad_beta(2)*grad_q(2) + b*qlap
 
-END FUNCTION mgtest_qexact_rhs
+END FUNCTION poisson_qexact_rhs
 
 
 
-SUBROUTINE mgtest_qexact_gradient(x,y,q,grad)
+SUBROUTINE poisson_qexact_gradient(x,y,q,grad)
     IMPLICIT NONE
 
     DOUBLE PRECISION x,y, q, grad(2)
@@ -42,13 +42,13 @@ SUBROUTINE mgtest_qexact_gradient(x,y,q,grad)
     DOUBLE PRECISION qlap
 
     flag = 1
-    CALL mgtest_qexact_complete(x,y,q,qlap,grad,flag)
+    CALL poisson_qexact_complete(x,y,q,qlap,grad,flag)
 
-END SUBROUTINE mgtest_qexact_gradient
+END SUBROUTINE poisson_qexact_gradient
 
 
 
-SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
+SUBROUTINE poisson_qexact_complete(x,y,q,qlap,grad,flag)
     use hsmooth_mod, only : m_polar, x0_polar, y0_polar
     IMPLICIT NONE
 
@@ -163,7 +163,7 @@ SUBROUTINE mgtest_qexact_complete(x,y,q,qlap,grad,flag)
         grad(2) = qy
     endif
 
-end subroutine mgtest_qexact_complete
+end subroutine poisson_qexact_complete
 
 double precision function sech(x)
     implicit none
@@ -173,7 +173,7 @@ double precision function sech(x)
     sech = 1.d0/cosh(x)
 end function sech
 
-subroutine mgtest_fort_beta(x,y,b,grad)
+subroutine poisson_fort_beta(x,y,b,grad)
     implicit none
 
     double precision x,y,b,grad(2)
@@ -203,5 +203,5 @@ subroutine mgtest_fort_beta(x,y,b,grad)
     grad(1) = bx
     grad(2) = by
 
-end subroutine mgtest_fort_beta
+end subroutine poisson_fort_beta
 

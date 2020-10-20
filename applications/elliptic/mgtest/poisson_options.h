@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef MGTEST_OPTIONS_H
-#define MGTEST_OPTIONS_H
+#ifndef POISSON_OPTIONS_H
+#define POISSON_OPTIONS_H
 
 #include <fclaw2d_include_all.h>
 
@@ -43,10 +43,10 @@ typedef enum {
     STARPATCH = 0,  // ThunderEgg solver : Uses FFT
     FIVEPOINT,      // Laplacian (no beta)
     VARPOISSON      // Variable coefficient (uses beta)
-} mgtest_operator_types;
+} poisson_operator_types;
 #endif
 
-typedef struct mgtest_options
+typedef struct poisson_options
 {
     /* Put any user options here */
     int example;
@@ -85,15 +85,15 @@ typedef struct mgtest_options
 
     int is_registered;
 
-} mgtest_options_t;
+} poisson_options_t;
 
 
-mgtest_options_t* mgtest_options_register (fclaw_app_t * app,
+poisson_options_t* poisson_options_register (fclaw_app_t * app,
                                            const char *configfile);
 
-void mgtest_options_store(fclaw2d_global_t* glob, mgtest_options_t* user);
+void poisson_options_store(fclaw2d_global_t* glob, poisson_options_t* user);
 
-const mgtest_options_t* mgtest_get_options(fclaw2d_global_t* glob);
+const poisson_options_t* poisson_get_options(fclaw2d_global_t* glob);
 
 
 #ifdef __cplusplus

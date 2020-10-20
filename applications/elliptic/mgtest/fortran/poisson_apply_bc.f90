@@ -19,7 +19,7 @@
 !! where h = dx or h = dy, is non-zero.
 !!
 
-subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
+subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
     dx,dy,t,intersects_bc,bctype,rhs,g_bc,cons_check,flux_sum)
 
     implicit none
@@ -48,7 +48,7 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         do j = 1-mbc,my+mbc
             x = xlower + (i-0.5)*dx
             y = ylower + (j-0.5)*dy
-            call mgtest_fort_beta(x,y,val_beta,grad_beta)
+            call poisson_fort_beta(x,y,val_beta,grad_beta)
             beta(i,j,1) = val_beta
         end do
     end do
@@ -105,7 +105,7 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
                 dI = (a/2.d0 - b/h)  !! Needed for cons check
                 d = (a/2.d0 + b/h)  
                 if (d .eq. 0) then
-                    write(6,*) 'mgtest_fort_apply_bc : ill-defined BCs'
+                    write(6,*) 'poisson_fort_apply_bc : ill-defined BCs'
                     stop
                 endif
 
@@ -218,5 +218,5 @@ subroutine mgtest_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
 
     end do
 
-end subroutine mgtest_fort_apply_bc
+end subroutine poisson_fort_apply_bc
 
