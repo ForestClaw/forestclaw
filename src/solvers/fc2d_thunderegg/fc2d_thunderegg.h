@@ -108,6 +108,13 @@ void fc2d_thunderegg_rhs(struct fclaw2d_global* glob,
                         int blockno,
                         int patchno);
 
+
+/* -------------------------------- Operator utilities -------------------------------- */
+
+/* Put this here so that user does not have to include fc2d_thunderegg_heat.h */
+void fc2d_thunderegg_heat_set_lambda(double lambda);
+
+
 #ifdef __cplusplus
 #if 0
 {

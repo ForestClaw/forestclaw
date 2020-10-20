@@ -64,8 +64,10 @@ using namespace ThunderEgg::VarPoisson;
 class heat : public PatchOperator<2>
 {
 public:
+    static double lambda;
+
     heat(std::shared_ptr<const Domain<2>>      domain,
-              std::shared_ptr<const GhostFiller<2>> ghost_filler, double lambda);
+              std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
     void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                           const std::vector<LocalData<2>>& us,
@@ -74,16 +76,21 @@ public:
                        const std::vector<LocalData<2>>& us,
                        std::vector<LocalData<2>>& fs) const override;
 
-    double lambda;  
-
 };
 
+/* Set static variable to default value;  lambda for this problem should be <= 0 */
+double heat::lambda{999};
 
-heat::heat(std::shared_ptr<const Domain<2>>      domain,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler, double lambda) 
+void fc2d_thunderegg_heat_set_lambda(double lambda)
+{
+    heat::lambda = lambda;
+}
+
+heat::heat(std::shared_ptr<const Domain<2>> domain,
+                     std::shared_ptr<const GhostFiller<2>> ghost_filler) 
                      : PatchOperator<2>(domain,ghost_filler)
 {
-    this->lambda = lambda;
+    FCLAW_ASSERT(heat::lambda <= 0);
 }
 
 
@@ -143,6 +150,9 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 
         double dx2 = dx*dx;
         double dy2 = dy*dy;
+
+        /* Check already done at construction, but this is a double check */
+        FCLAW_ASSERT(lambda <= 0);
 
 #if 1
         /* Five-point Laplacian */
@@ -279,8 +289,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    double lambda = -1/glob->curr_dt;
-    auto op = make_shared<heat>(te_domain,ghost_filler,lambda);
+    auto op = make_shared<heat>(te_domain,ghost_filler);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
@@ -352,7 +361,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            patch_operator = make_shared<heat>(curr_domain, ghost_filler,lambda);
+            patch_operator = make_shared<heat>(curr_domain, ghost_filler);
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
@@ -395,7 +404,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        patch_operator = make_shared<heat>(curr_domain, ghost_filler,lambda);
+        patch_operator = make_shared<heat>(curr_domain, ghost_filler);
 
         //smoother
         switch (mg_opt->patch_solver)
