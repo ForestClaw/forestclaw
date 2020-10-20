@@ -45,8 +45,8 @@ FCLAW_ARG_ENABLE([paper], [Enable examples applications from paper],
 FCLAW_ARG_ENABLE([activeflux], [Enable activeflux project],
                  [ACTIVEFLUX])
 
-FCLAW_ARG_ENABLE([multigrid], [Enable multigrid solver],
-                 [MULTIGRID])
+FCLAW_ARG_ENABLE([thunderegg], [Enable thunderegg solver],
+                 [THUNDEREGG])
 
 echo "o---------------------------------------"
 echo "| Checking MPI and related programs"

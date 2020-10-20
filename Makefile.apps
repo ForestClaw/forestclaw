@@ -21,21 +21,21 @@ endif
 # ThunderEgg solver
 # --------------------------------------------
 
-if FCLAW_ENABLE_MULTIGRID
+if FCLAW_ENABLE_THUNDEREGG
 
-## Patches needed for multigrid solver
+## Patches needed for thunderegg solver
 include src/solvers/fc2d_clawpack4.6/Makefile.am
 include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-include src/solvers/fc2d_multigrid/Makefile.am
+include src/solvers/fc2d_thunderegg/Makefile.am
 
 
 ## Multigrid test
-include applications/clawpack/shallow/2d/tsunami/Makefile.am
+#include applications/clawpack/shallow/2d/tsunami/Makefile.am
 
 ## Elliptic example
-include applications/elliptic/mgtest/Makefile.am
+include applications/elliptic/poisson/Makefile.am
 
 ## Heat equation
 include applications/elliptic/heat/Makefile.am
