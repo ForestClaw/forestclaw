@@ -137,7 +137,7 @@ void heat_rhs(fclaw2d_global_t *glob,
 
     /* This function supplies an analytic right hand side. */
     int method = 1;
-    double lambda = fc2d_thunderegg_heat_get_lambda();     // heat::lambda also works
+    double lambda = fc2d_thunderegg_heat_get_lambda();    
     HEAT_FORT_RHS(&blockno, &mbc, &mx, &my, &meqn, &mfields,
                   &xlower, &ylower, &dx, &dy,&lambda, &method,q,rhs);
 
@@ -312,7 +312,8 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_rhs_data(glob,this_patch,&rhs,&mfields);
 
     tag_patch = 0;
-    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
+    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&mfields,
+                                      &xlower,&ylower,&dx,&dy,
                                       &blockno, rhs,&refine_threshold,
                                       &initflag,&tag_patch);
     return tag_patch;
@@ -373,7 +374,7 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
     //mg_vt->fort_rhs       = &HEAT_FORT_RHS;
 
-    mg_vt->fort_beta      = &HEAT_FORT_BETA;
+    //mg_vt->fort_beta      = &HEAT_FORT_BETA;
     
     mg_vt->fort_apply_bc = &HEAT_FORT_APPLY_BC;
     mg_vt->fort_eval_bc  = &HEAT_NEUMANN;   // For non-homogeneous BCs
