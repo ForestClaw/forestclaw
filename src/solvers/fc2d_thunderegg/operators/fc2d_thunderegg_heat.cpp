@@ -236,10 +236,18 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
             {
                 f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
             }
+            else
+            {
+                //f[{0,j}] += -(u[{0,j}])/dx2;                
+            }
 
             if (pinfo->hasNbr(Side<2>::east()))
             {                
                 f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
+            }
+            else
+            {
+                //f[{mx-1,j}] += -(u[{mx-1,j}])/dx2;                
             }
         }
 
@@ -248,11 +256,19 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
             if (pinfo->hasNbr(Side<2>::south()))
             {
                 f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
-            }                
+            }
+            else
+            {
+                //f[{i,0}] += -(u[{i,0}])/dy2;                
+            }
 
             if (pinfo->hasNbr(Side<2>::north()))
             {
                 f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+            }
+            else
+            {
+                //f[{i,my-1}] += -(u[{i,my-1}])/dy2;                
             }
         }
     }
@@ -322,7 +338,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
 
-    if(mg_opt->mg_prec && domain_gen.hasCoarserDomain())
+    if (mg_opt->mg_prec && domain_gen.hasCoarserDomain())
     {
         // options
         GMG::CycleOpts copts;
@@ -421,7 +437,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     // solve
     auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
 
-#if 1   
+#if 0   
     // Set starting conditions
     shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
 #else
