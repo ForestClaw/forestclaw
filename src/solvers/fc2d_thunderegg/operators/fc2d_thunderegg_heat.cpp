@@ -312,22 +312,9 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
-    switch (mg_opt->patch_solver)
-    {
-        case BICG:
-            solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                         mg_opt->patch_bcgs_tol,
-                                                         mg_opt->patch_bcgs_max_it);
-            break;
-        case FFT:
-            /* This ignores the five point operator defined above and just uses the 
-               ThunderEgg operator 'Poisson'. */
-            solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
-            break;
-        default:
-            fclaw_global_essentialf("thunderegg_heat : No valid patch solver specified\n");
-            exit(0);            
-    }
+    solver = make_shared<BiCGStabPatchSolver<2>>(op,
+                                                 mg_opt->patch_bcgs_tol,
+                                                 mg_opt->patch_bcgs_max_it);
 
     // create matrix
     shared_ptr<Operator<2>> A = op;
@@ -364,10 +351,12 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
         //restrictor
         auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                next_domain, clawpatch_opt->rhs_fields);
+                                                                next_domain, 
+                                                                clawpatch_opt->rhs_fields);
 
         //vector generator
-        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
+        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, 
+                                                     clawpatch_opt->rhs_fields);
 
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
@@ -384,22 +373,9 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
-            switch (mg_opt->patch_solver)
-            {
-                case BICG:
-                    smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                                   mg_opt->patch_bcgs_tol,
-                                                                   mg_opt->patch_bcgs_max_it);
-                    break;
-                case FFT:
-                    smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
-                    break;
-                default:
-                    fclaw_global_essentialf("thunderegg_heat : No valid " \
-                                            "patch solver specified\n");
-                    exit(0);            
-            }
-
+            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                           mg_opt->patch_bcgs_tol,
+                                                           mg_opt->patch_bcgs_max_it);
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
@@ -428,23 +404,9 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
         patch_operator = make_shared<heat>(glob,curr_domain, ghost_filler);
 
         //smoother
-        switch (mg_opt->patch_solver)
-        {
-            case BICG:
-                smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                               mg_opt->patch_bcgs_tol,
-                                                               mg_opt->patch_bcgs_max_it);
-                break;
-            case FFT:
-                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
-                break;
-            default:
-                fclaw_global_essentialf("thunderegg_heat : No valid " \
-                                        "patch solver specified\n");
-                exit(0);            
-        }
-
-
+        smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
+                                                       mg_opt->patch_bcgs_tol,
+                                                       mg_opt->patch_bcgs_max_it);
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
