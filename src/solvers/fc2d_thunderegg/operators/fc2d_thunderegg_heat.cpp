@@ -72,7 +72,8 @@ public:
 
     void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                           const std::vector<LocalData<2>>& us,
-                          std::vector<LocalData<2>>& fs) const override;
+                          std::vector<LocalData<2>>& fs,
+                          bool interior_dirichlet) const override;
     void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
                        const std::vector<LocalData<2>>& us,
                        std::vector<LocalData<2>>& fs) const override;
@@ -116,7 +117,8 @@ heat::heat(fclaw2d_global_t *glob,
 
 void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                                  const std::vector<LocalData<2>>& us,
-                                 std::vector<LocalData<2>>& fs) const 
+                                 std::vector<LocalData<2>>& fs,
+                                 bool interior_dirichlet) const 
 {
     //const cast since u ghost values have to be modified
     //ThunderEgg doesn't care if ghost values are modified, just don't modify the interior values.
@@ -146,11 +148,21 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = s[0]*u[{0,j}];
             }
+        }else if(interior_dirichlet){
+            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+            for(int j = 0; j < my; j++){
+                ghosts[{j}] = -u[{0,j}];
+            }
         }
         if (!pinfo->hasNbr(Side<2>::east())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = s[1]*u[{mx-1,j}];
+            }
+        }else if(interior_dirichlet){
+            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+            for(int j = 0; j < my; j++){
+                ghosts[{j}] = -u[{mx-1,j}];
             }
         }
 
@@ -159,11 +171,21 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = s[2]*u[{i,0}];
             }
+        }else if(interior_dirichlet){
+            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+            for(int i = 0; i < mx; i++){
+                ghosts[{i}] = -u[{i,0}];
+            }
         }
         if (!pinfo->hasNbr(Side<2>::north())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = s[3]*u[{i,my-1}];
+            }
+        }else if(interior_dirichlet){
+            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+            for(int i = 0; i < mx; i++){
+                ghosts[{i}] = -u[{i,my-1}];
             }
         }
 

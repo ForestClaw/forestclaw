@@ -82,7 +82,8 @@ class varpoisson : public PatchOperator<2>
 
         void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                               const std::vector<LocalData<2>>& us,
-                              std::vector<LocalData<2>>& fs) const override;
+                              std::vector<LocalData<2>>& fs,
+                              bool interior_dirichlet) const override;
 
         void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
                            const std::vector<LocalData<2>>& us,
@@ -103,7 +104,8 @@ varpoisson::varpoisson(std::shared_ptr<const Vector<2>> coeffs,
 
 void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                                   const std::vector<LocalData<2>>& us,
-                                  std::vector<LocalData<2>>& fs) const 
+                                  std::vector<LocalData<2>>& fs,
+                                  bool interior_dirichlet) const 
 {
     const LocalData<2>  b  = beta->getLocalData(0, pinfo->local_index);
     //LocalData<2>& b = const_cast<LocalData<2>&>(beta[0]);
@@ -127,27 +129,27 @@ void varpoisson::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         LocalData<2>& f = fs[m];
 
         //if physical boundary
-        if (!pinfo->hasNbr(Side<2>::west()))
+        if (interior_dirichlet || !pinfo->hasNbr(Side<2>::west()))
         {
             auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = -u[{0,j}];
             }
         }
-        if (!pinfo->hasNbr(Side<2>::east())){
+        if (interior_dirichlet || !pinfo->hasNbr(Side<2>::east())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = -u[{mx-1,j}];
             }
         }
 
-        if (!pinfo->hasNbr(Side<2>::south())){
+        if (interior_dirichlet || !pinfo->hasNbr(Side<2>::south())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = -u[{i,0}];
             }
         }
-        if (!pinfo->hasNbr(Side<2>::north())){
+        if (interior_dirichlet || !pinfo->hasNbr(Side<2>::north())){
             auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = -u[{i,my-1}];
