@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_advance.h>
 #include <fclaw2d_regrid.h>
@@ -49,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     -- Time stepping, based on when output files should be created.
     ----------------------------------------------------------------- */
 
+#if 0
 static
 void cb_restore_time_step(fclaw2d_domain_t *domain,
                           fclaw2d_patch_t *this_patch,
@@ -85,6 +87,7 @@ void save_time_step(fclaw2d_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
 }
+#endif
 
 static
 void update_q(fclaw2d_domain_t *domain,
@@ -295,65 +298,37 @@ void outstyle_3(fclaw2d_global_t *glob)
             dt_step /= level_factor;
         }
 
-        /* In case we have to reject this step */
-        if (!fclaw_opt->use_fixed_dt)
-        {
-            save_time_step(glob);
-        }
-
         /* Get current domain data since it may change during regrid */
         glob->curr_dt = dt_step;
-        double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
+        /* Set lambda for Backward Euler */
+        double lambda = -1/dt_step;
+        fc2d_thunderegg_heat_set_lambda(lambda);
 
-        /* This is a collective communication - everybody needs to wait here. */
-        if (fclaw_opt->reduce_cfl)
-        {
-            /* If we are taking a variable time step, we have to reduce the 
-               maxcfl so that every processor takes the same size dt */
-            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
-            maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);     
-        }
+
+        /* Solve the elliptic problem; RHS is set here */
+        fclaw2d_elliptic_solve(glob);
+
+        /* Update solution stored in RHS */
+        heat_run_update_q(glob);
+
+        int time_interp = 0;
+        fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
+                             time_interp,FCLAW2D_TIMER_NONE);
+
 
         double tc = t_curr + dt_step;
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
                           fclaw_opt->maxlevel : fclaw_opt->minlevel;
 
-        fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; maxcfl (step) = " \
-                                 "%12.6f; Final time = %12.4f\n",
+        fclaw_global_productionf("Level %d (%d-%d) step %5d : dt = %12.3e; " \
+                                 "Final time = %12.4f\n",
                                  level2print,
                                  (*domain)->global_minlevel,
                                  (*domain)->global_maxlevel,
-                                 n+1,dt_step,maxcfl_step, tc);
+                                 n+1,dt_step,tc);
 
-        if (fclaw_opt->reduce_cfl & (maxcfl_step > fclaw_opt->max_cfl))
-        {
-            if (!fclaw_opt->use_fixed_dt)
-            {
-                fclaw_global_productionf("   WARNING : Maximum CFL exceeded; retaking time step\n");
-                restore_time_step(glob);
-
-                dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
-
-                /* Go back to start of loop without incrementing step counter or
-                   current time. */
-                continue;
-            }
-            else
-            {
-                fclaw_global_productionf("   WARNING : Maximum CFL exceeded\n");
-            }
-        }
-
-        /* We are happy with this time step */
         t_curr = tc;
         glob->curr_time = t_curr;
-
-        /* New time step, which should give a cfl close to the desired cfl. */
-        if (!fclaw_opt->use_fixed_dt)
-        {
-            dt_minlevel = dt_minlevel*fclaw_opt->desired_cfl/maxcfl_step;
-        }
 
         n++;  /* Increment outer counter */
 
@@ -367,9 +342,8 @@ void outstyle_3(fclaw2d_global_t *glob)
         }
 
         if (fclaw_opt->advance_one_step)
-        {
             fclaw2d_diagnostics_gather(glob,init_flag);
-        }
+        
 
         if (n % nstep_inner == 0)
         {
@@ -379,6 +353,8 @@ void outstyle_3(fclaw2d_global_t *glob)
         }
     }
 }
+
+
 
 
 static

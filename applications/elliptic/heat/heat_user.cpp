@@ -224,13 +224,14 @@ void heat_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
     int ngrids = glob->domain->global_num_patches;
 
-    int mfields = clawpatch_opt->rhs_fields;  
+    int meqn = clawpatch_opt->meqn;
     int maux = clawpatch_opt->maux;
 
 
+    int mfields = meqn + 1;
     FILE *f2 = fopen(matname2,"w");
     fprintf(f2,"%12.6f %23s\n%5d %30s\n%5d %30s\n%5d %30s\n%5d %30s\n",time,"time",
-            mfields+2,"mfields",ngrids,"ngrids",maux,"num_aux",2,"num_dim");
+            mfields,"mfields",ngrids,"ngrids",maux,"num_aux",2,"num_dim");
     fclose(f2);
 
 #if 0
@@ -264,9 +265,9 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double *rhs;
-    int mfields;
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     double *error = fclaw2d_clawpatch_get_error(glob,patch);
     double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
@@ -280,8 +281,8 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
-    HEAT_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
-                             &xlower,&ylower,&dx,&dy,rhs,
+    HEAT_FORT_OUTPUT_ASCII(fname,&mx,&my,&meqn,&mbc,
+                             &xlower,&ylower,&dx,&dy,q,
                              soln, error,
                              &global_num,&level,&blockno,
                              &glob->mpirank);
@@ -289,9 +290,9 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
 
 
 int heat_tag4refinement(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
-                             int blockno, int patchno,
-                             int initflag)
+                        fclaw2d_patch_t *this_patch,
+                        int blockno, int patchno,
+                        int initflag)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
@@ -307,24 +308,24 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double *rhs;
-    int mfields;
-    fclaw2d_clawpatch_rhs_data(glob,this_patch,&rhs,&mfields);
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     tag_patch = 0;
-    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&mfields,
+    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,
                                       &xlower,&ylower,&dx,&dy,
-                                      &blockno, rhs,&refine_threshold,
+                                      &blockno, q,&refine_threshold,
                                       &initflag,&tag_patch);
     return tag_patch;
 }
 
 static
 int heat_tag4coarsening(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *fine_patches,
-                             int blockno,
-                             int patchno,
-                             int initflag)
+                        fclaw2d_patch_t *fine_patches,
+                        int blockno,
+                        int patchno,
+                        int initflag)
 {
     fclaw2d_patch_t *patch0 = &fine_patches[0];
 
@@ -336,20 +337,45 @@ int heat_tag4coarsening(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double *rhs[4];
-    int mfields;
+    double *q[4];
+    int meqn;
     for (int igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_rhs_data(glob,&fine_patches[igrid],&rhs[igrid],&mfields);
+        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
     int tag_patch = 0;
-    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
-                                      &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
+    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                      &blockno, q[0],q[1],q[2],q[3],
                                       &coarsen_threshold,&initflag,&tag_patch);
     return tag_patch == 1;
+}
+
+static
+void heat_bc2(fclaw2d_global_t *glob,
+              fclaw2d_patch_t *patch,
+              int block_idx,
+              int patch_idx,
+              double t,
+              double dt,
+              int intersects_bc[],
+              int time_interp)
+{
+
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    HEAT_FORT_BC2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
+                  &dx,&dy,q,&t,&dt,intersects_bc);
 }
 
 
@@ -367,6 +393,7 @@ void heat_link_solvers(fclaw2d_global_t *glob)
 
     /* Patch : RHS function */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    patch_vt->physical_bc = heat_bc2;     
     patch_vt->rhs = heat_rhs;          /* Overwrites default */
     patch_vt->initialize = heat_initialize;   /* Get an initial refinement */
 
@@ -393,7 +420,7 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     // Output routines
 
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    if (fclaw_opt->compute_error) 
+    //if (fclaw_opt->compute_error) 
     {
         clawpatch_vt->time_header_ascii = heat_time_header_ascii;
         //clawpatch_vt->fort_header_ascii = &HEAT_FORT_HEADER_ASCII;
