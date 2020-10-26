@@ -55,7 +55,8 @@ c     # not be coarsened.
       double precision coarsen_threshold, dx,dy
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      double precision qij, qipj, qimj, qijp, qijm, qlap, dx2, dy2
+      double precision qvec(3), dmax, heat_eval_refinement
+
       integer i,j
 
 
@@ -64,19 +65,15 @@ c     # not be coarsened.
          return
       endif
 
-      dx2 = dx*dx
-      dy2 = dy*dy
+      do i = 1,mx+1
+         do j = 1,my+1
+            qvec(1) = q(i,j,mq)
+            qvec(2) = q(i-1,j,mq)
+            qvec(3) = q(i,j-1,mq)
 
-      do i = 1,mx
-         do j = 1,my
-            qij = q(i,j,mq)
-            qipj = q(i+1,j,mq)
-            qimj = q(i-1,j,mq)
-            qijp = q(i,j+1,mq)
-            qijm = q(i,j-1,mq)
-            qlap = (qipj - 2*qij + qimj)/dx2 + 
-     &             (qijp - 2*qij + qijm)/dy2            
-            if (abs(qlap) .gt. coarsen_threshold) then
+            dmax = heat_eval_refinement(qvec,dx,dy)
+
+            if (abs(dmax) .gt. coarsen_threshold) then
                tag_patch = 0
                return
             endif
