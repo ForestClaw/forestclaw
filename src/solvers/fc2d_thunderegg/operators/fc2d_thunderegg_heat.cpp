@@ -443,7 +443,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
         //smoother
         smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                       1e-12, /// mg_opt->patch_bcgs_tol,
+                                                       mg_opt->patch_bcgs_tol,
                                                        mg_opt->patch_bcgs_max_it);
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
@@ -459,7 +459,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     // solve
     auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
 
-#if 1   
+#if 0   
     // Set starting conditions
     shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
 #else
