@@ -30,8 +30,8 @@ subroutine heat_update_q(mbc,mx,my,meqn,mfields,rhs,q)
 
     INTEGER i,j
 
-    do i = 1-mbc,mx+mbc
-        do j = 1-mbc,my+mbc
+    do i = 1,mx
+        do j = 1,my
             q(i,j,1) = rhs(i,j,1)
         end do
     end do

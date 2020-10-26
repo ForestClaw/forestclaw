@@ -26,44 +26,58 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call heat_get_minmax(mx,my,mbc,meqn,
-     &      mq,q0,qmin,qmax, coarsen_threshold,initflag,tag_patch)
+      call heat_get_minmax(blockno, mx,my,mbc,meqn,
+     &      mq,q0,dx,dy, coarsen_threshold,initflag,tag_patch)
       if (tag_patch == 0) return
 
-      call heat_get_minmax(mx,my,mbc,meqn,
-     &              mq,q1,qmin,qmax, coarsen_threshold,initflag,
+      call heat_get_minmax(blockno, mx,my,mbc,meqn,
+     &              mq,q1,dx,dy, coarsen_threshold,initflag,
      &              tag_patch)
       if (tag_patch == 0) return
 
-      call heat_get_minmax(mx,my,mbc,meqn,
-     &              mq,q2,qmin,qmax,coarsen_threshold,initflag,
+      call heat_get_minmax(blockno, mx,my,mbc,meqn,
+     &              mq,q2,dx,dy,coarsen_threshold,initflag,
      &              tag_patch)
       if (tag_patch == 0) return
 
-      call heat_get_minmax(mx,my,mbc,meqn,
-     &      mq,q3,qmin,qmax,coarsen_threshold,initflag,
+      call heat_get_minmax(blockno, mx,my,mbc,meqn,
+     &      mq,q3,dx,dy,coarsen_threshold,initflag,
      &      tag_patch)
 
       end
 
-      subroutine heat_get_minmax(mx,my,mbc,meqn,mq,q,
-     &      qmin,qmax,coarsen_threshold,initflag,tag_patch)
+      subroutine heat_get_minmax(blockno, mx,my,mbc,meqn,mq,q,
+     &      dx,dy,coarsen_threshold,initflag,tag_patch)
       implicit none
 
       integer mx,my,mbc,meqn,mq,tag_patch,initflag
-      double precision coarsen_threshold
-      double precision qmin,qmax
+      integer blockno
+      double precision coarsen_threshold, dx,dy
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      double precision qvec(3), dmax, heat_eval_refinement
+
       integer i,j
 
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-            if (abs(q(i,j,1)) .gt. coarsen_threshold) then
-c              # We won't coarsen this family because at least one
-c              # grid fails the coarsening test.
+
+      if (initflag .ne. 0) then
+         tag_patch = 0
+         return
+      endif
+
+      do i = 1,mx+1
+         do j = 1,my+1
+            qvec(1) = q(i,j,mq)
+            qvec(2) = q(i-1,j,mq)
+            qvec(3) = q(i,j-1,mq)
+
+            dmax = heat_eval_refinement(qvec,dx,dy)
+
+            if (abs(dmax) .gt. coarsen_threshold) then
                tag_patch = 0
                return
             endif
+
          enddo
       enddo
 

@@ -41,9 +41,9 @@ double precision function heat_neumann(iface,t,x,y)
     double precision t,x,y
 
     if (iface .eq. 0) then
-        heat_neumann = -1
+        heat_neumann = 0
     elseif (iface .eq. 1) then
-        heat_neumann = 1
+        heat_neumann = 0
     else
         heat_neumann = 0
     endif

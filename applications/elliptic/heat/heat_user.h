@@ -142,6 +142,15 @@ void HEAT_FORT_HEADER_ASCII(char* matname1, char* matname2,
                               int* ngrids);
 
 
+#define HEAT_FORT_BC2 FCLAW_F77_FUNC(heat_fort_bc2, HEAT_FORT_BC2)
+
+void HEAT_FORT_BC2(const int* meqn, const int* mbc, 
+                   const int* mx, const int* my, 
+                   const double *xlower, const double *ylower, 
+                   const double *dx, const double *dy, 
+                   double q[], double* t, double *dt, 
+                   int intersects_bc[]);
+
 
 
 #ifdef __cplusplus

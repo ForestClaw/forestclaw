@@ -34,11 +34,27 @@ subroutine heat_setprob()
     read(10,*) m_polar
 
     call allocate_polar_arrays()
-    read(10,*) (x0_polar(i),i=1,m_polar)
-    read(10,*) (y0_polar(i),i=1,m_polar)
-    read(10,*) (r0_polar(i),i=1,m_polar)
-    read(10,*) (r1_polar(i),i=1,m_polar)
-    read(10,*) (n_polar(i) ,i=1,m_polar)
+    do i = 1,m_polar
+        read(10,*) x0_polar(i)
+    end do
+    do i = 1,m_polar
+        read(10,*) y0_polar(i)
+    end do
+    do i = 1,m_polar
+        read(10,*) r0_polar(i)
+    end do
+    do i = 1,m_polar
+        read(10,*) r1_polar(i)
+    end do
+    do i = 1,m_polar
+        read(10,*) n_polar(i)
+    end do
+
+!!    read(10,*) (x0_polar(i),i=1,m_polar)
+!!    read(10,*) (y0_polar(i),i=1,m_polar)
+!!    read(10,*) (r0_polar(i),i=1,m_polar)
+!!    read(10,*) (r1_polar(i),i=1,m_polar)
+!!    read(10,*) (n_polar(i) ,i=1,m_polar)
 
     read(10,*) bc_type(0)
     read(10,*) bc_type(1)

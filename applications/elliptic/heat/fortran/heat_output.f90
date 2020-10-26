@@ -45,6 +45,7 @@ subroutine heat_fort_output_ascii(matname1, &
     double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
     double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
+    double precision qvec(3), dmax, heat_eval_refinement
     integer matunit1
     integer i,j,mq
 
@@ -72,22 +73,33 @@ subroutine heat_fort_output_ascii(matname1, &
                     q(i,j,mq) = 1d99
                 endif
             end do
-            if (abs(error(i,j,1)) .lt. 1d-99) then
-                error(i,j,1) = 0.d0
-            elseif (abs(error(i,j,1)) .gt. 1d99) then
-                error(i,j,1) = 1d99
-            endif
-            if (abs(soln(i,j,1)) .lt. 1d-99) then
-                soln(i,j,1) = 0.d0
-            elseif (abs(soln(i,j,1)) .gt. 1d99) then
-                soln(i,j,1) = 1d99
-            endif
-            write(matunit1,120) (q(i,j,mq),mq=1,meqn), soln(i,j,1), error(i,j,1)
+!!            if (abs(error(i,j,1)) .lt. 1d-99) then
+!!                error(i,j,1) = 0.d0
+!!            elseif (abs(error(i,j,1)) .gt. 1d99) then
+!!                error(i,j,1) = 1d99
+!!            if (abs(soln(i,j,1)) .lt. 1d-99) then
+!!                soln(i,j,1) = 0.d0
+!!            elseif (abs(soln(i,j,1)) .gt. 1d99) then
+!!                soln(i,j,1) = 1d99
+!!            endif
+!!            write(matunit1,120) (q(i,j,mq),mq=1,meqn), qlap, error(i,j,1)
+!!            endif
+
+            qvec(1) = q(i,j,1)
+            qvec(2) = q(i-1,j,1)
+            qvec(3) = q(i,j-1,1)
+
+            dmax = heat_eval_refinement(qvec,dx,dy)
+
+            write(matunit1,120) (q(i,j,mq),mq=1,meqn), dmax
         end do
         write(matunit1,*) ' '
     end do
-120 format (5E26.16)
 
     close(matunit1)
+
+120 format (5E26.16)
+121 format (3I5,6E24.16)
+122 format (2I5,6E24.16)
 
 end subroutine heat_fort_output_ascii
