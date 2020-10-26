@@ -1,12 +1,12 @@
 function test_cons(f)
 
-global R H exact phi0 phi1 f_phi
+global R H exact phi0 phi1 f_phi exact_discrete
 
 if (nargin == 0)
     f = 0;
 end
 
-map = 'latlong';    % 'cylinder', 'latlong'
+map = 'cylinder';    % 'cylinder', 'latlong'
 
 switch map
     case {'cylinder'}
@@ -18,6 +18,8 @@ switch map
         tensors = @cylinder_tensors;
         
     case {'latlong'}
+        % Construct sphere by "blowing out" the cylinder, so that 
+        % cylinder fits exactly inside.  
         R = sqrt(pi^2 + 1);
         arc = pi/2 - acos(pi/R);
         phi0 = -0.5*arc/(pi/2);
@@ -27,7 +29,8 @@ switch map
 end
 
 exact = false;
-f_phi = 0.95;   % Fraction from 0 to 1;  0.5 is the equator
+exact_discrete = false;  % For spherical coordinates
+f_phi = 0.65;   % Fraction from 0 to 1;  0.5 is the equator
 
 minlevel = 1;
 maxlevel = 2;
@@ -42,8 +45,8 @@ dt = dt0/2^(minlevel-1);
 % ---------------------------------------
 e = @(h,R) R - sqrt(R^2 - (h/2).^2);
 
-% Area of coarse grid cell
-Ag = @(h,R) 0.5*e(h,R).*(h/2);
+% Area of the triangular gap
+Ag = @(h,R) e(h,R).*h/2;
 
 % Length of cell on fine grid
 len = @(h,R) sqrt(e(h,R).^2 + (h/2).^2);
@@ -59,8 +62,6 @@ Nf = mx*2^maxlevel;
 
 dxc = 1/Nc;
 dyc = 1/Nc;
-% dxf = dxc/2^(maxlevel-minlevel);
-% dyf = dyc/2^(maxlevel-minlevel);
 
 
 % Get tensors at places needed to compute velocity, edge lengths and 
@@ -77,7 +78,7 @@ uvel = u(1)*t1 + u(2)*t2;
 % k = kappa(dxc);
 % delta = -2*area_gap*k*un;    % un = f(Q) dot n_s
 
-H_gap = ec*nc - (ef1*nf1 + ef2*nf2);  % Vector : -2*Ac*k*ns
+H_gap = ec*nc - (ef1*nf1 + ef2*nf2);  % Vector : -2*Ag*k*ns
 delta = dot(H_gap,uvel);
 cl = dt*delta/Ac;   % mystery factor of 2*pi? 
 
@@ -88,12 +89,24 @@ fprintf('\n');
 ns = H_gap/norm(H_gap,2);
 fprintf('%20s (%.8f, %.8f, %.8f)\n','Ns',ns(1),ns(2),ns(3));
 fprintf('\n');
-phi = pi*(phi0 + (phi1 - phi0)*f_phi);
-h = 2*R*cos(phi)*sin(pi*dxc);
-area_gap = Ag(h,cos(phi)*R);
-k = norm(H_gap,2)/(2*area_gap);
+if (strcmp(map,'latlong'))
+    phi = pi*(phi0 + (phi1 - phi0)*f_phi);
+    dth = 2*pi*dxc;
+    h = 2*R*cos(phi)*sin(dth/2);
+    area_gap = Ag(h,R*cos(phi));
+    k = norm(H_gap,2)/(2*area_gap);
+    true_kappa = 1/R;
+else
+    dth = 2*pi*dxc;
+    h = 2*R*sin(dth/2);
+    area_gap = Ag(h,R);
+    k = norm(H_gap,2)/(2*area_gap);
+    k = kappa(h,R);
+    true_kappa = 0.5/R;
+end
 fprintf('%20s %24.16f\n','curvature',k);
-fprintf('%20s %24.16f\n','True curvature',1/R);
+fprintf('%20s %24.16f\n','True curvature',true_kappa);
+fprintf('%20s %24.8e\n','Curvature (error)',abs(true_kappa - k));
 fprintf('\n');
 fprintf('%20s %24.16f\n','dxc',ec);
 fprintf('%20s %24.16f\n','dxf',ef1);
@@ -136,7 +149,7 @@ mdpt = (ep1 + ep2)/2;
 dc = norm(ep1-ep2,2);
 
 % Coarse grid center (hc = dc/2;  center is half way down
-cc = mdpt + dc*mdir/4;
+cc = mdpt + dc*mdir/2;
 x = cc(1);
 y = cc(2);
 [t1,t2] = cylinder_basis(x,y);
@@ -144,8 +157,8 @@ y = cc(2);
 % Compute normals at coarse grid edge
 x = mdpt(1);
 y = mdpt(2);
-[~,~,n1,~] = cylinder_basis(x,y);
-nc = n1;   % Normal to bottom edge
+[~,~,~,n2] = cylinder_basis(x,y);
+nc = n2;   % Normal to bottom edge
 
 x = mdpt(1) + dc/4;
 y = mdpt(2);
@@ -202,78 +215,133 @@ end
 end
 
 
-function [ep1, ep2, mdir] = latlong_endpoints(dx,dy)
+function [ep1, ep2, ep3, mdir] = latlong_endpoints(dx,dy)
 
 global f_phi;
 
+% Endpoints are in (theta,phi) coordinates.
 % 0.5 is the equator
 ep1 = [0,f_phi];
 ep2 = [dx,f_phi];
+mdpt = (ep1 + ep2)/2;
 
 mdir = [0,-1];   % Direction of coarse grid center from midpoint of edge
+
+% Location of coarse grid center
+ep3 = mdpt + dy*mdir/2;
 
 end
 
 function [t1,t2,nc,nf1,nf2,ec,ef1,ef2,Ac,Af] = latlong_tensors(dx,dy)
 
-global R exact phi0 phi1
+global R exact phi0 phi1 exact_discrete
 
-[ep1,ep2,mdir] = latlong_endpoints(dx,dy);
+mysinc = @(x) sin(x)./x;
 
-% Midpoint and length of edge
+% Return endpoints of coarse grid cell, along with
+% direction to coarse grid center. 
+[ep1,ep2,ep3,mdir] = latlong_endpoints(dx,dy);
+
+% Midpoint and length of edge in (x,y) coordinates
 mdpt = (ep1 + ep2)/2;
-d = (ep2-ep1)/norm(ep2-ep1,2);
-dc = norm(ep1-ep2,2);
+dxc = norm(ep1-ep2,2);
+d1 = (ep2-ep1)/dxc;
+% d2 = mdir;
 
-% Coarse grid center (hc = dc/2;  center is half way down
-cc = mdpt + dc*mdir/4;
-x = cc(1);
-y = cc(2);
+% Compute tangents at center of coarse grid cell (needed for computing
+% velocity). 
+x = ep3(1);
+y = ep3(2);
 [t1,t2] = latlong_basis(x,y);
 
-% Compute normals at coarse grid edge
-x = mdpt(1);
-y = mdpt(2);
-[~,~,~,n2] = latlong_basis(x,y);
-nc = n2;   % Normal to bottom edge
-
-pf1 = ep1 + (dc/4)*d;
-x = pf1(1);
-y = pf1(2);
-[~,~,~,n2] = latlong_basis(x,y);
-nf1 = n2;   % Normal to bottom edge
-
-pf1 = ep1 + (3*dc/4)*d;
-x = pf1(1);
-y = pf1(2);
-[~,~,~,n2] = latlong_basis(x,y);
-nf2 = n2;   % Normal to bottom edge
-
-% Get edge lengths
-dth = 2*pi*dx;
-fe = pf1 + dc/4*d;
-fc = fe - (dc/4)*mdir;
-ye = fe(2);
-phi = pi*(phi0 + (phi1-phi0)*ye);
+% Assume phi is constant along coarse edge
+phi = pi*(phi0 + (phi1-phi0)*mdpt(2));
 dphi = pi*(phi1-phi0)*dy;
+
+theta = 2*pi*mdpt(1);  % x in [0,1]
+dth = 2*pi*dx;  % equal to dc ? 
+
+% pf1 = ep1 + (3*hc/4)*d;
+% fe = pf1 + dc/4*d;
+% %fc = fe - (dc/4)*mdir;  % center of fine grid ghost cell
+% ye = fe(2);
 Rphi = R*cos(phi);
+
 if (exact)
-    ec = Rphi*dth;
-    ef1 = ec/2;   
-    Af = R^2*cos(phi)*(2*pi*dx)*dphi;
+    Rphi = R*cos(phi);
+    
+    % Coarse grid edge lengths and normal
+    nc_average = [-sin(phi)*cos(theta)*mysinc(dth/2)
+                  -sin(phi)*sin(theta)*mysinc(dth/2)
+                  cos(phi)];
+    lcnc = Rphi*dth*nc_average;
+    ec = norm(lcnc,2);
+    nc = lcnc/ec;
+    
+    % Compute fine grid edge lengths and normal
+    b = (1-cos(dth/2))/(dth/2);
+    w = [sin(phi)*sin(theta)
+         -sin(phi)*cos(theta)
+         0];
+        
+    nf1_average = nc_average - b*w;
+    lfnf1 = Rphi*(dth/2)*nf1_average;
+    ef1 = norm(lfnf1,2);
+    nf1 = lfnf1/ef1;  
+
+    nf2_average = nc_average + b*w;
+    lfnf2 = Rphi*(dth/2)*nf2_average;
+    ef2 = norm(lfnf2,2);
+    nf2 = lfnf2/ef2;  
+
+    if (abs(ec*nc - (ef1*nf1 + ef2*nf2)) > 1e-12) 
+        error('Something went wrong with exact latlong formula');
+    end
+    
+    % Exact area of fine grid
+    Af = R^2*cos(phi)*dth*dphi;
+    Ac = 4*Af;
 else
-    ec = 2*Rphi*sin(dth/2);
+    % Compute discrete normals and edge lengths
+    
+    % Fine grid edge normals
+    pf1 = ep1 + (dxc/4)*d1;
+    x = pf1(1);
+    y = pf1(2);
+    [~,~,~,n2] = latlong_basis(x,y);
+    nf1 = n2;   % Normal to bottom edge
+
+    pf1 = ep1 + (3*dxc/4)*d1;
+    x = pf1(1);
+    y = pf1(2);
+    [~,~,~,n2] = latlong_basis(x,y);
+    nf2 = n2;   % Normal to bottom edge
+    
+    % Get fine grid edge lengths
     ef1 = 2*Rphi*sin(dth/4);
+    ef2 = 2*Rphi*sin(dth/4);
+    
+    % Compute coarse grid
+    if (exact_discrete)
+        lcnc = ef1*nf1 + ef2*nf2;
+        ec = norm(lcnc,2);
+        nc = lcnc/ec;
+    else
+        % Compute normals at coarse grid edge
+        x = mdpt(1);
+        y = mdpt(2);
+        [~,~,~,n2] = latlong_basis(x,y);
+        nc = n2;   % Normal to bottom edge    
+        ec = 2*Rphi*sin(dth/2);
+    end    
     ez = 2*R*sin(dth/4);
     Af = ef1*ez;
-end
-ef2 = ef1;
-
-% Areas
-Ac = 4*Af;
-
+    
+    % Areas
+    Ac = 4*Af;
 end
 
+end
 
 function [t1,t2,nx,ny] = latlong_basis(x,y)
 
