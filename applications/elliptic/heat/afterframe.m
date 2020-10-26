@@ -10,6 +10,8 @@ setpatchborderprops('linewidth',1);
 example = read_vars();
 
 
+qeq = 0.331844834878863;
+
 ca = [qmin,qmax];
 switch example
     case 1
@@ -17,10 +19,17 @@ switch example
     case 4
         ca = [0,1];
 end
+if mq == 1
+    ca = [-0.1,1.1];
+else
+    ca = [-1,1];
+end
 ca = [qmin,qmax];
 caxis(ca);
 cv = linspace(ca(1),ca(2),31);
 drawcontourlines(cv);
+
+hidepatchborders(7);
 
 % Color map and axis
 colormap(parula);
@@ -37,6 +46,7 @@ daspect([1 1 1]);
 
 xlabel('x','fontsize',16);
 ylabel('y','fontsize',16);
+set(gca,'fontsize',16);
 
 % title(tstr,'fontsize',18);
 
@@ -65,21 +75,19 @@ if (length(amrdata) == 1)
 end
 
         
-NoQuery = 0;
-prt = false;
+NoQuery = 1;
+prt = true;
 if (prt)
-    hidepatchborders;
-    if (ishandle(circle))
-        delete(circle);
-    end
-    mx = 8;
-    maxlevel = 7;
-    dpi = 2^7;    % fix at 128
-    
-    eff_res = mx*2^maxlevel;
-    figsize = (eff_res/dpi)*[1,1];
-    prefix = 'plot';
-    plot_tikz_fig(Frame,figsize,prefix,dpi)
+    fname = sprintf('rhs_%03d.png',Frame);
+    print('-dpng',fname);
+%     mx = 8;
+%     maxlevel = 7;
+%     dpi = 2^7;    % fix at 128
+%     
+%     eff_res = mx*2^maxlevel;
+%     figsize = (eff_res/dpi)*[1,1];
+%     prefix = 'plot';
+%     plot_tikz_fig(Frame,figsize,prefix,dpi)
 end
 
 
