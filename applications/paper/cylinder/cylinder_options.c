@@ -64,6 +64,10 @@ cylinder_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "v-speed", &user_opt->v_speed, 0.5,
                            "[user] Vertical speed [0.5]");
 
+    sc_options_add_int (opt, 0, "mapping", &user_opt->mapping, 0,
+                        "[user] Mapping : 0=cylinder; 1=latlong [0]");
+
+
     sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
 

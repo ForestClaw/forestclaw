@@ -275,14 +275,19 @@ SUBROUTINE map2comp(xp,yp,zp,xc,yc)
 
     DOUBLE PRECISION xp,yp,zp, xc,yc
 
+    INTEGER mapping 
+    COMMON /mapping_comm/ mapping
+
     DOUBLE PRECISION pi, pi2
     COMMON /compi/ pi, pi2
 
     DOUBLE PRECISION theta, z
 
-    CALL map2cylinder(xp,yp,zp,theta,z)
-
-    CALL map_cylinder2comp(theta,z,xc,yc)
+    if (mapping .eq. 0) then
+        CALL map2cylinder(xp,yp,zp,theta,z)
+    else
+        CALL map_latlong2comp(theta,z,xc,yc)
+    endif
 
 END SUBROUTINE map2comp
 

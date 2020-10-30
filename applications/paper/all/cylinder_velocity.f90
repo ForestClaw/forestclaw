@@ -56,11 +56,19 @@ END SUBROUTINE cylinder_velocity_derivs
 SUBROUTINE velocity_components_cart(x,y,t,vcart)
     IMPLICIT NONE
 
-    DOUBLE PRECISION x,y,t, u(2), vcart(3), uderivs(4)
-    DOUBLE PRECISION t1(3), t2(3)
+    DOUBLE PRECISION x,y,t, u(2), vcart(3)
+
+    INTEGER mapping 
+    COMMON /mapping_comm/ mapping
+
+    DOUBLE PRECISION t1(3), t2(3), uderivs(4)
     INTEGER cart_flag, k
 
-    CALL cylinder_velocity_derivs(x,y,t, u,vcart,uderivs,cart_flag)
+    if (mapping .eq. 0) then
+        CALL cylinder_velocity_derivs(x,y,t, u,vcart,uderivs,cart_flag)
+    else
+        CALL latlong_velocity_derivs(x,y,t, u,vcart,uderivs,cart_flag)
+    endif        
 
     IF (cart_flag .eq. 0) THEN
 !!      # Velocity components are given in spherical components
@@ -85,11 +93,19 @@ SUBROUTINE velocity_derivs(x,y,t, u, vcart, derivs, cart_flag)
     IMPLICIT NONE
 
     DOUBLE PRECISION x,y,t, u(2), vcart(3), derivs(4)
+
+    INTEGER mapping 
+    COMMON /mapping_comm/ mapping
+
     DOUBLE PRECISION t1(3), t2(3), t1n2, t2n2, map_dot
     DOUBLE PRECISION t1inv(3), t2inv(3)
     INTEGER cart_flag
 
-    CALL cylinder_velocity_derivs(x,y,t, u,vcart,derivs,cart_flag)
+    if (mapping .eq. 0) then
+        CALL cylinder_velocity_derivs(x,y,t, u,vcart,derivs,cart_flag)
+    else
+        CALL latlong_velocity_derivs(x,y,t, u,vcart,derivs,cart_flag)
+    endif
 
     IF (cart_flag .eq. 1) THEN
 !!      # Velocity components are given in Cartesian components

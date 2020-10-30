@@ -8,14 +8,18 @@ applications_paper_cylinder_cylinder_SOURCES = \
 	applications/paper/cylinder/setprob.f \
 	applications/paper/cylinder/compute_exact.f90 \
 	applications/paper/cylinder/cylinder_compute_area_fort.f90 \
+	applications/paper/cylinder/latlong_compute_area_fort.f90 \
 	applications/paper/cylinder/fclaw2d_map_cylinder.c \
-	applications/paper/all/mapc2m_cylinder.f90 \
-	applications/paper/all/cylinder_velocity.f90 \
-	applications/paper/all/cylinder_basis.f90 \
-	applications/paper/all/mapping_terms.f \
 	applications/paper/cylinder/dopri5.f \
 	applications/paper/cylinder/qexact.f \
 	applications/paper/cylinder/q0.f \
+	applications/paper/all/mapc2m_cylinder.f90 \
+	applications/paper/all/cylinder_velocity.f90 \
+	applications/paper/all/cylinder_basis.f90 \
+	applications/paper/all/mapc2m_latlong2.f90 \
+	applications/paper/all/latlong_velocity.f90 \
+	applications/paper/all/latlong_basis.f90 \
+	applications/paper/all/mapping_terms.f \
 	applications/paper/cylinder/fdisc.f \
 	applications/paper/cylinder/user_4.6/qinit.f \
 	applications/paper/cylinder/user_4.6/compute_error.f \

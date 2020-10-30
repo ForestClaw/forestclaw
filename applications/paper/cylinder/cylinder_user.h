@@ -63,6 +63,8 @@ typedef struct user_options
     double revs_per_s;     /* radial speed */
     double v_speed;             /* Vertical speed */
 
+    int mapping;   /* 0 - cylinder;  1 - latlong */
+
     int claw_version;
 
     int is_registered;
@@ -88,12 +90,13 @@ void cylinder_options_store (fclaw2d_global_t* glob, user_options_t* user);
 const user_options_t* cylinder_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_cylinder (fclaw2d_map_context_t* brick, const double scale[]);
+    fclaw2d_map_new_cylinder (fclaw2d_map_context_t* brick, const double scale[], 
+                              int mapping);
 
 
-/* ----------------------
-   Mapping headers
-   ---------------------- */
+/* --------------------------
+   Mapping headers - cylinder
+   -------------------------- */
 
 #define CYLINDER_COMPUTE_AREA FCLAW_F77_FUNC(cylinder_compute_area, \
                                              CYLINDER_COMPUTE_AREA)
@@ -110,6 +113,44 @@ void CYLINDER_COMPUTE_TANGENTS(int* mx,int* my, int* mbc,double* dx, double* dy,
                                int* level, double *xd, double *yd, double* zd,
                                double *xtangents,double* ytangents,
                                double* edgelengths);
+
+
+#define CYLINDER_COMPUTE_NORMALS FCLAW_F77_FUNC(cylinder_compute_normals, \
+                                              CYLINDER_COMPUTE_NORMALS)
+
+void CYLINDER_COMPUTE_NORMALS(int* mx,int* my,int* mbc,
+                              double xp[], double yp[], double zp[],
+                              double xd[], double yd[], double zd[],
+                              double xnormals[], double ynormals[]);
+
+/* --------------------------
+   Mapping headers - LATLONG
+   -------------------------- */
+
+#define LATLONG_COMPUTE_AREA FCLAW_F77_FUNC(latlong_compute_area, \
+                                             LATLONG_COMPUTE_AREA)
+
+void LATLONG_COMPUTE_AREA(int *mx,int *my,int *mbc,double *dx, double *dy, 
+                           double *xlower, double *ylower, int *blockno, 
+                           int *maxlevel, int *level, double area[]);
+
+
+#define LATLONG_COMPUTE_TANGENTS FCLAW_F77_FUNC(latlong_compute_tangents, \
+                                                 LATLONG_COMPUTE_TANGENTS)
+
+void LATLONG_COMPUTE_TANGENTS(int* mx,int* my, int* mbc,double* dx, double* dy, 
+                               int* level, double *xd, double *yd, double* zd,
+                               double *xtangents,double* ytangents,
+                               double* edgelengths);
+
+
+#define LATLONG_COMPUTE_NORMALS FCLAW_F77_FUNC(latlong_compute_normals, \
+                                              LATLONG_COMPUTE_NORMALS)
+
+void LATLONG_COMPUTE_NORMALS(int* mx,int* my,int* mbc,
+                             double xp[], double yp[], double zp[],
+                             double xd[], double yd[], double zd[],
+                             double xnormals[], double ynormals[]);
 
 
 /* ----------------------

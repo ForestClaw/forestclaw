@@ -26,6 +26,19 @@ void CYLINDER_BASIS_COMPLETE(const double* x, const double *y,
                            const int* flag);
 
 
+#define MAPC2M_LATLONG2 FCLAW_F77_FUNC(mapc2m_latlong2, MAPC2M_LATLONG2)
+
+void MAPC2M_LATLONG2(const double* xc1, const double *yc1, 
+                   double* xp, double *yp, double *zp);
+
+
+#define LATLONG_BASIS_COMPLETE FCLAW_F77_FUNC(latlong_basis_complete, \
+                            LATLONG_BASIS_COMPLETE)
+
+void LATLONG_BASIS_COMPLETE(const double* x, const double *y,
+                           double t[], double tinv[], double uderivs[], 
+                           const int* flag);
+
 static int
 fclaw2d_map_query_cylinder (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -84,7 +97,11 @@ fclaw2d_map_c2m_basis_cylinder(fclaw2d_map_context_t * cont,
 {
     /* These coordinates are in [0,1]x[0,1] and are mapped to 
        [theta,phi] using mappings in sphere_basis.f */
-    CYLINDER_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
+    int mapping = cont->user_int[0];
+    if (mapping == 0)
+        CYLINDER_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
+    else
+        LATLONG_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
 }
 
 
@@ -97,13 +114,16 @@ fclaw2d_map_c2m_cylinder(fclaw2d_map_context_t * cont, int blockno,
     double xc1,yc1,zc1; /* We don't need zc1 - we are we computing it? */
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-    MAPC2M_CYLINDER(&xc1,&yc1,xp,yp,zp);
-
+    int mapping = cont->user_int[0];
+    if (mapping == 0)
+        MAPC2M_CYLINDER(&xc1,&yc1,xp,yp,zp);
+    else
+        MAPC2M_LATLONG2(&xc1,&yc1,xp,yp,zp);
 }
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_cylinder (fclaw2d_map_context_t* brick,
-                              const double scale[])
+                              const double scale[], int mapping)
 {
     fclaw2d_map_context_t *cont;
 
@@ -113,6 +133,7 @@ fclaw2d_map_context_t *
     cont->basis = fclaw2d_map_c2m_basis_cylinder;
 
     cont->brick = brick;
+    cont->user_int[0] = mapping;
 
     set_scale(cont,scale);
 

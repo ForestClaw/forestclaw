@@ -65,6 +65,7 @@ void cylinder_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24.16f   %s",user->revs_per_s,"\% revs_per_second\n");
         fprintf(f,  "%-24.16f   %s",user->v_speed,"\% v_speed\n");
         fprintf(f,  "%-24d      %s",user->exact_metric,"\% exact_metric\n");
+        fprintf(f,  "%-24d      %s",user->mapping,"\% mapping\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
@@ -188,8 +189,14 @@ void cylinder_compute_area(fclaw2d_global_t *glob,
 
     int maxlevel = gparms->maxlevel;
     int level = patch->level;
-    CYLINDER_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                          &blockno, &maxlevel, &level, area);
+
+    const user_options_t* user = cylinder_get_options(glob);
+    if (user->mapping == 0)
+        CYLINDER_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                              &blockno, &maxlevel, &level, area);
+    else
+        LATLONG_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                              &blockno, &maxlevel, &level, area);
 }
 
 
@@ -225,20 +232,28 @@ void cylinder_compute_tensors(fclaw2d_global_t *glob,
 
     /* The user could set these to NULL to avoid doing these computations ... */
 
-    if (metric_vt->fort_compute_normals != NULL)
+    const user_options_t* user = cylinder_get_options(glob);
+    if (user->mapping == 0) 
     {
-        metric_vt->fort_compute_normals(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
-                                        xnormals,ynormals);
-    }
+        CYLINDER_COMPUTE_NORMALS(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
+                                     xnormals,ynormals);
 
-    if (metric_vt->fort_compute_tangents != NULL)
-    {
         int level=patch->level;
         CYLINDER_COMPUTE_TANGENTS(&mx,&my,&mbc,&dx, &dy, &level,
                                   xd,yd,zd,xtangents,ytangents,
                                   edgelengths);
-    }
+    }       
+    else
+    {
+        LATLONG_COMPUTE_NORMALS(&mx,&my,&mbc,xp,yp,zp,xd,yd,zd,
+                                     xnormals,ynormals);
 
+        int level=patch->level;
+        LATLONG_COMPUTE_TANGENTS(&mx,&my,&mbc,&dx, &dy, &level,
+                                  xd,yd,zd,xtangents,ytangents,
+                                  edgelengths);
+
+    }
     if (metric_vt->fort_compute_surf_normals != NULL)
     {
         metric_vt->fort_compute_surf_normals(&mx,&my,&mbc,xnormals,ynormals,edgelengths,
