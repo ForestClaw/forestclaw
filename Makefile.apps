@@ -43,6 +43,9 @@ include applications/elliptic/heat/Makefile.am
 ## Allencahn equation
 include applications/elliptic/allencahn/Makefile.am
 
+## Crystal growth
+include applications/elliptic/phasefield/Makefile.am
+
 endif
 
 
