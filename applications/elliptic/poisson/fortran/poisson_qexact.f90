@@ -3,12 +3,15 @@ DOUBLE PRECISION function poisson_qexact(x,y)
 
     DOUBLE PRECISION x,y
     
+    INTEGER example
+    COMMON /comm_example/ example
+
     INTEGER flag
     DOUBLE PRECISION grad(2), q, qlap
 
 
     flag = 0  !! Don't compute the gradient
-    call poisson_qexact_complete(x,y,q,qlap,grad,flag)
+    call poisson_qexact_complete(example, x,y,q,qlap,grad,flag)
 
     poisson_qexact = q
 
@@ -19,13 +22,16 @@ DOUBLE PRECISION function poisson_qexact_rhs(x,y)
 
     double precision x,y
 
+    INTEGER example
+    COMMON /comm_example/ example
+
     integer flag
     double precision q,qlap,b, grad_q(2), grad_beta(2)
 
     CALL poisson_fort_beta(x,y,b,grad_beta)
 
     flag = 2
-    CALL poisson_qexact_complete(x,y,q,qlap,grad_q,flag)
+    CALL poisson_qexact_complete(example,x,y,q,qlap,grad_q,flag)
 
     poisson_qexact_rhs = grad_beta(1)*grad_q(1) +  grad_beta(2)*grad_q(2) + b*qlap
 
@@ -48,15 +54,15 @@ END SUBROUTINE poisson_qexact_gradient
 
 
 
-SUBROUTINE poisson_qexact_complete(x,y,q,qlap,grad,flag)
+SUBROUTINE poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
     use hsmooth_mod, only : m_polar, x0_polar, y0_polar
     IMPLICIT NONE
 
     DOUBLE PRECISION x,y, q, qlap, grad(2)
-    INTEGER flag
+    INTEGER flag, example
 
-    INTEGER example
-    COMMON /comm_example/ example
+!!    INTEGER example
+!!    COMMON /comm_example/ example
 
     DOUBLE PRECISION alpha,x0,y0,a,b
     COMMON /comm_rhs/ alpha,x0,y0,a,b
