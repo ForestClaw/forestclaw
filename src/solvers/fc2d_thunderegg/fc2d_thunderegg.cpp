@@ -110,12 +110,14 @@ void thunderegg_solve(fclaw2d_global_t* glob)
         case HEAT:
             mg_vt->patch_operator = fc2d_thunderegg_heat_solve;
             break;
+#if 0
         case USER_OPERATOR:
             if (mg_vt->patch_operator == NULL)
             {
                 fclaw_global_essentialf("thunderegg_solve : User specified operator not set\n");
                 exit(0);
             }
+#endif            
         default:
             break;
             /* user has specified something, hopefully */

@@ -87,6 +87,10 @@ fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_
             /* Copy solution to start guess */
             fclaw2d_global_iterate_patches(glob, set_start_value, this);
             break;
+        case STORE_PHI:
+            /* Store phi at time level n for use in defining operator */
+            fclaw2d_global_iterate_patches(glob, store_phi, this);
+            break;
         default:
             fclaw_global_essentialf("fc2d_thunderegg_vector : no valid data_choice specified\n");
             exit(0);
@@ -145,6 +149,33 @@ void fc2d_thunderegg_vector::set_start_value(fclaw2d_domain_t *domain,
     double* rhs_ptr;
     fclaw2d_clawpatch_rhs_data(g->glob, patch, &rhs_ptr, &mfields);
     FCLAW_ASSERT(mfields == meqn);
+
+
+    // Store phi (second component in solution)
+    int c = 1;  /* Index into solution */
+    vec.patch_data[local_num * meqn + c] = q_ptr + vec.eqn_stride * c +
+                                           vec.mbc * vec.strides[0] +
+                                           vec.mbc * vec.strides[1];
+}
+
+void fc2d_thunderegg_vector::store_phi(fclaw2d_domain_t *domain,
+                                         fclaw2d_patch_t *patch,
+                                         int blockno, int patchno,
+                                         void *user) 
+{
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
+
+
+    fc2d_thunderegg_vector &vec = *(fc2d_thunderegg_vector *) g->user;
+
+    int global_num, local_num, level;
+    fclaw2d_patch_get_info(domain, patch, blockno, patchno, &global_num,
+                           &local_num, &level);
+
+
+    int meqn;
+    double* q_ptr;
+    fclaw2d_clawpatch_soln_data(g->glob, patch, &q_ptr, &meqn);
 
 
     // update point to point to non ghost cell
