@@ -36,7 +36,6 @@ typedef enum fc2d_thunderegg_data_choice
 {
     RHS=0,
     SOLN,
-    STORE_PHI,
 }  fc2d_thunderegg_data_choice_t;
 
 /**
@@ -80,9 +79,11 @@ class fc2d_thunderegg_vector : public ThunderEgg::Vector<2> {
                                 struct fclaw2d_patch *patch, int blockno,
                                 int patchno, void *user);
 
-    static void store_phi(struct fclaw2d_domain *domain,
-                          struct fclaw2d_patch *patch, int blockno,
-                          int patchno, void *user);
+#if 0
+    static void store_state(struct fclaw2d_domain *domain,
+                            struct fclaw2d_patch *patch, int blockno,
+                            int patchno, void *user);
+#endif                            
 
     ThunderEgg::LocalData<2> getLocalDataPriv(int component_index, int local_patch_id) const;
 
