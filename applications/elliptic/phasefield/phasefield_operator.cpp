@@ -59,37 +59,137 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/ValVectorGenerator.h>
 
+#include <stdlib.h>
+
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::VarPoisson;
 
 
-shared_ptr<ValVector<2>> restrict_phi_n(shared_ptr<Vector<2>> prev_phi_n_vec, 
-                                        shared_ptr<Domain<2>> prev_domain, 
-                                        shared_ptr<Domain<2>> curr_domain)
+double** allocate_2d_view(double* qmem, int mx, int my, int mbc)
 {
-    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, 
-                                        prev_phi_n_vec->getNumComponents(), true);
-    auto new_phi_n_vec = ValVector<2>::GetNewVector(curr_domain, 
-                                                   prev_phi_n_vec->getNumComponents());
-    restrictor.restrict(prev_phi_n_vec, new_phi_n_vec);
-    return new_phi_n_vec;
+    int rows = mx + 2*mbc;
+    int cols = my + 2*mbc; 
+
+    //double   *qmem = malloc(rows*cols*sizeof(double));
+    double **qrows = (double**) malloc(rows*sizeof(double*));
+
+    for(int i = 0; i < rows; i++)
+    {
+        qrows[i] = &qmem[cols*i + mbc];
+    }    
+    /* We want interior entries to start with index 0 and end at mx-1 or my-1 */
+    return &qrows[mbc];
+}
+
+void delete_2d_view(int mbc, double ***q)
+{
+    free(&(*q)[-mbc]);
+    *q = NULL;
 }
 
 
+void cb_store_phi(fclaw2d_domain_t *domain,
+                  fclaw2d_patch_t *patch,
+                  int blockno, int patchno,
+                  void *user) 
+{
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
+    fclaw2d_global_t *glob = (fclaw2d_global_t*) g->glob;
+
+    fclaw2d_clawpatch_options_t *clawpatch_opt =
+        fclaw2d_clawpatch_get_options(glob);
+
+#if 0
+    /* Can't figure out how to get this to work */
+    ValVector<2> *valvec = (ValVector<2>*) g->user;
+    int mbc_valvec = valvec->getNumGhostCells();
+    std::valarray<double> &vec = valvec->getValArray();
+#endif    
+
+    std::valarray<double> &vec = *(std::valarray<double>*) g->user;
+    int mbc_valvec = 1;
+
+    int meqn;
+    double* q_ptr;
+    fclaw2d_clawpatch_soln_data(g->glob, patch, &q_ptr, &meqn);
+
+    int global_num, local_num, level;
+    fclaw2d_patch_get_info(domain, patch, blockno, patchno, &global_num,
+                           &local_num, &level);
+
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
+
+    // Get pointer into ValVector data
+    int first_offset = 0;
+    int patch_stride = (mx+2*mbc)*(my + 2*mbc);
+    int local_patch_index = local_num;
+    int component_stride = 1;  /* ValVector designed with only one component */
+    int component_index = 0;   /* phi is first component */
+
+    double *data = &vec[patch_stride * local_patch_index + first_offset
+                         + component_stride * component_index];
+
+    double *qmem = q_ptr + patch_stride;  /* phi is second component */
+
+    /* Create 2d views into the data making copying easier */
+    double **phi = allocate_2d_view(qmem, mx,my,mbc);
+    double **phi_valvec = allocate_2d_view(data, mx,my,mbc_valvec);
+
+    /* Memcpy doesn't work, since a ValVector only has 1 layer of  ghost cells */
+    // memcpy(data,phi, patch_stride*sizeof(double));
+
+    /* Copy internal data and first layer of ghost cells */
+    int mv = mbc_valvec;
+    for(int i = -1; i < mx+1; i++)
+    {
+#if 1        
+        for(int j = -1; j < my+1; j++)
+            phi_valvec[i][j] = phi[i][j];
+#else        
+        memcpy(&phi_valvec[i][1-mv],&phi[i][1-mv],(mx+2*mv)*sizeof(double));
+#endif            
+    }
+
+    delete_2d_view(mbc,&phi);
+    delete_2d_view(mbc_valvec,&phi_valvec);
+}
+
+
+void copy_phi_to_ValVector(fclaw2d_global_t *glob, 
+                           shared_ptr<ValVector<2>>& valvec)
+{
+    std::valarray<double> &vec = valvec->getValArray();
+    fclaw2d_global_iterate_patches(glob, cb_store_phi, &vec);
+}
+
+
+shared_ptr<ValVector<2>> restrict_phi_n_vec(shared_ptr<Vector<2>> prev_beta_vec, 
+                                        shared_ptr<Domain<2>> prev_domain, 
+                                        shared_ptr<Domain<2>> curr_domain)
+{
+    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, prev_beta_vec->getNumComponents(), true);
+    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, prev_beta_vec->getNumComponents());
+    restrictor.restrict(prev_beta_vec, new_beta_vec);
+    return new_beta_vec;
+}
 
 class phasefield : public PatchOperator<2>
 {
 protected:
-    std::shared_ptr<fc2d_thunderegg_vector> phi_n;
-    fclaw2d_global_t *glob;
 
 public:
-    static double lambda;
+    std::shared_ptr<const ValVector<2>> phi_n;
 
-    phasefield(fclaw2d_global_t *glob_in, 
-         std::shared_ptr<const Domain<2>> domain,
-         std::shared_ptr<const GhostFiller<2>> ghost_filler);
+    static double lambda;
+    static fclaw2d_global_t *glob;
+
+    phasefield(fclaw2d_global_t *glob, 
+               std::shared_ptr<const ValVector<2>> phi_n_in,
+               std::shared_ptr<const Domain<2>> domain,
+               std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
     void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
                           const std::vector<LocalData<2>>& us,
@@ -103,15 +203,15 @@ public:
 
 };
 
-phasefield::phasefield(fclaw2d_global_t *glob_in,
-           std::shared_ptr<const Domain<2>> domain,
-           std::shared_ptr<const GhostFiller<2>> ghost_filler) 
-                    : PatchOperator<2>(domain,ghost_filler)
+phasefield::phasefield(fclaw2d_global_t *glob,
+               std::shared_ptr<const ValVector<2>> phi_n_in,
+               std::shared_ptr<const Domain<2>> domain,
+               std::shared_ptr<const GhostFiller<2>> ghost_filler) 
+    : PatchOperator<2>(domain,ghost_filler), phi_n(phi_n_in)
 {
     /* User should call 'fc2d_thunderegg_phasefield_set_lambda' before calling elliptic solve */
     FCLAW_ASSERT(phasefield::lambda <= 0);
-
-    glob = glob_in;
+    FCLAW_ASSERT(phasefield::glob != NULL);  /* Needed to read phasefield options */
 
     /* Get scale needed to apply homogeneous boundary conditions. 
        For Dirichlet (bctype=1) :   scalar is -1 
@@ -121,10 +221,6 @@ phasefield::phasefield(fclaw2d_global_t *glob_in,
     {
         s[m] = 2*mg_opt->boundary_conditions[m] - 3;
     }
-
-    /* Store phi at time level n */
-
-    phi_n = make_shared<fc2d_thunderegg_vector>(glob,STORE_PHI);
 }
 
 
@@ -250,6 +346,10 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     double  T = xi*xi;
 
 
+    /* Get local view into phi_n : component 0 */
+    LocalData<2> pn = phi_n->getLocalData(0,pinfo->local_index);
+    //printf("Apply patch operator\n");
+
     for(int j = 0; j < my; j++)
         for(int i = 0; i < mx; i++)
         {
@@ -261,7 +361,8 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             double lap_phi = (phi[{i+1,j}] - 2*phi_ij + phi[{i-1,j}])/dx2 + 
                              (phi[{i,j+1}] - 2*phi_ij + phi[{i,j-1}])/dy2;
 
-            double g0 = phi_ij*(1-phi_ij);
+            double pn_ij = pn[{i,j}];
+            double g0 = pn_ij*(1-pn_ij);
             double g = g0*g0;
             double S1 = c1*g;
             double S2 = c2*g;
@@ -292,7 +393,7 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 
 void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
                               const std::vector<LocalData<2>>& us, 
-                              std::vector<LocalData<2>>& fs) const 
+                              std::vector<LocalData<2>>& Aus) const 
 {
 #if 0    
     int mbc = pinfo->num_ghost_cells;
@@ -313,30 +414,33 @@ void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     for(int m = 0; m < mfields; m++)
     {
         const LocalData<2>& u = us[m];
-        LocalData<2>& f = fs[m];
+        LocalData<2>& Au = Aus[m];
         for(int j = 0; j < my; j++)
         {
             /* bool hasNbr(Side<D> s) */
             if (pinfo->hasNbr(Side<2>::west()))
-                f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
+                Au[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
 
             if (pinfo->hasNbr(Side<2>::east()))
-                f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
+                Au[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
         }
 
         for(int i = 0; i < mx; i++)
         {
             if (pinfo->hasNbr(Side<2>::south()))
-                f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
+                Au[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
 
             if (pinfo->hasNbr(Side<2>::north()))
-                f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+                Au[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
         }
     }
 }
  
 /* Set static variable to default value;  lambda for this problem should be <= 0 */
 double phasefield::lambda{999};
+fclaw2d_global_t *phasefield::glob{NULL};
+
+
 
 void phasefield_set_lambda(double lambda)
 {
@@ -358,6 +462,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
   
+    phasefield::glob = glob;
+
 #if 0  
     fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
 #endif  
@@ -395,11 +501,16 @@ void phasefield_solve(fclaw2d_global_t *glob)
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
+    /* Store phi at time level n */
+
+    auto beta_vec = ValVector<2>::GetNewVector(te_domain, 1);
+    copy_phi_to_ValVector(glob,beta_vec);
+
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    auto op = make_shared<phasefield>(glob,te_domain,ghost_filler);
+    auto op = make_shared<phasefield>(glob,beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
@@ -452,6 +563,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
         //add intermediate levels
+        auto prev_phi_n_vec = beta_vec;
         auto prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
@@ -460,7 +572,10 @@ void phasefield_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            patch_operator = make_shared<phasefield>(glob,curr_domain, ghost_filler);
+            auto restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, 
+                                                           prev_domain, curr_domain);
+            patch_operator = make_shared<phasefield>(glob,restricted_phi_n_vec,curr_domain, ghost_filler);
+            prev_phi_n_vec = restricted_phi_n_vec;
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
@@ -492,7 +607,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        patch_operator = make_shared<phasefield>(glob,curr_domain, ghost_filler);
+        auto restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, prev_domain, curr_domain);
+        patch_operator = make_shared<phasefield>(glob,restricted_phi_n_vec, curr_domain, ghost_filler);
 
         //smoother
         smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,

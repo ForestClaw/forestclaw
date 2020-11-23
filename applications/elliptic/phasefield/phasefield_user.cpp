@@ -338,7 +338,7 @@ void phasefield_link_solvers(fclaw2d_global_t *glob)
     mg_vt->patch_operator = phasefield_solve;
 
     mg_vt->fort_apply_bc = &PHASEFIELD_FORT_APPLY_BC;
-    mg_vt->fort_eval_bc  = &PHASEFIELD_DIRICHLET;   // For non-homogeneous BCs
+    mg_vt->fort_eval_bc  = &PHASEFIELD_NEUMANN;   // For non-homogeneous BCs
 
     // tagging routines
     patch_vt->tag4refinement       = phasefield_tag4refinement;
