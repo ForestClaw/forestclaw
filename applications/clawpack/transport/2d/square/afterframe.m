@@ -30,6 +30,7 @@ showpatchborders;
 setpatchborderprops('linewidth',1);
 hidegridlines;
 
+%{
 if (example == 0)
     hold on;
     refine_threshold = 0.005;
@@ -39,11 +40,12 @@ if (example == 0)
     plot_refine_contours(mx,maxlevel,t,u,v,refine_threshold);
     hold off;
 end
+%}
 
 view(2)
 
 % This is used for creating vectorized PDFs
-prt_tikz = true;
+prt_tikz = false;
 if (prt_tikz)
     figsize = [8,8];  % Should match tikz figsize.
     maxlevel = 7;
