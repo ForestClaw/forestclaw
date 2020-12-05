@@ -47,7 +47,7 @@ subroutine phasefield_update_q(mbc,mx,my,meqn,mfields,rhs,q)
     do m = 1,2
         do j = 1-mbc,my+mbc
             do i = 1-mbc,mx+mbc
-                q(i,j,1) = rhs(i,j,m)
+                q(i,j,m) = rhs(i,j,m)
             end do
         end do
     end do
