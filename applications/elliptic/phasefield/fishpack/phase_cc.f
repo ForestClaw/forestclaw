@@ -363,7 +363,7 @@ c        # ---------------------------------
             call out2(maxmx,maxmy,mx,my,ax,ay,dx,dy,phi,u,t,iframe)
          endif
   600    format('Writing frame ',I5,' at time t = ',1PE12.5)
-  601    format('Iteration ',I5,' at time t = ',1PE12.5)
+  601    format('Step ',I5,' at time t = ',1PE12.5)
 
 
       enddo

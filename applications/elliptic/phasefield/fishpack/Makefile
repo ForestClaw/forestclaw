@@ -1,4 +1,8 @@
+
+# TARGET = phase_cc
 TARGET = phase_iterative
+
+
 FC = gfortran
 F90 = gfortran
 FFLAGS = -O3
@@ -7,7 +11,7 @@ LINK = gfortran
 
 
 OBJECTS = \
-	./phase_iterative.o \
+	./$(TARGET).o \
 	./cellave.o \
 	./out2.o
 
