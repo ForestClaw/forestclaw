@@ -399,11 +399,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
     /* Store phi at time level n */
-
     shared_ptr<Vector<2>> beta_vec = make_shared<fc2d_thunderegg_vector>(glob,STORE_STATE);    
-
-    //auto beta_vec = ValVector<2>::GetNewVector(te_domain, 1);  // Or forestClaw vector 
-    //copy_phi_to_ValVector(glob,beta_vec);
 
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
