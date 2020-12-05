@@ -87,7 +87,7 @@ fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_
             /* Copy solution to start guess */
             fclaw2d_global_iterate_patches(glob, set_start_value, this);
             break;
-#if 0            
+#if 1            
         case STORE_STATE:
             /* Store phi at time level n for use in defining operator */
             fclaw2d_global_iterate_patches(glob, store_state, this);
@@ -156,8 +156,8 @@ void fc2d_thunderegg_vector::set_start_value(fclaw2d_domain_t *domain,
     }
 }
 
-#if 0
-void fc2d_thunderegg_vector::store_phi(fclaw2d_domain_t *domain,
+#if 1
+void fc2d_thunderegg_vector::store_state(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *patch,
                                          int blockno, int patchno,
                                          void *user) 
