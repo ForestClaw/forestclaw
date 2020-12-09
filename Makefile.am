@@ -20,6 +20,7 @@ EXTRA_DIST =
 LDADD = $(FLIBS)
 LINT_CSOURCES =
 TESTS =
+TEST_SOURCES =
 bin_PROGRAMS =
 check_PROGRAMS =
 include_HEADERS =
@@ -72,6 +73,9 @@ include src/Makefile.am
 
 # Examples
 include Makefile.apps
+
+# Tests
+include test/Makefile.am
 
 # ------------------------------------------------------------------
 

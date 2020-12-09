@@ -21,6 +21,9 @@ applications_elliptic_phasefield_phasefield_SOURCES = \
 	applications/elliptic/phasefield/fortran/phasefield_tag4coarsening.f90
 
 
+TEST_SOURCES += \
+	test/applications/elliptic/phasefield/phasefield_operator.cpp
+
 EXTRA_DIST += \
 	applications/elliptic/phasefield/fclaw_options.ini
 
