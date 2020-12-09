@@ -67,8 +67,8 @@ using namespace ThunderEgg::VarPoisson;
 
 
 shared_ptr<Vector<2>> restrict_phi_n_vec(shared_ptr<Vector<2>> prev_beta_vec, 
-                                        shared_ptr<Domain<2>> prev_domain, 
-                                        shared_ptr<Domain<2>> curr_domain)
+                                         shared_ptr<Domain<2>> prev_domain, 
+                                         shared_ptr<Domain<2>> curr_domain)
 {
     GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, prev_beta_vec->getNumComponents(), true);
     auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, prev_beta_vec->getNumComponents());
@@ -132,8 +132,10 @@ phasefield::phasefield(fclaw2d_global_t *glob,
     /* User should call 'fc2d_thunderegg_phasefield_set_lambda' before calling elliptic solve */
     FCLAW_ASSERT(phasefield::lambda <= 0);
 
+#if 0
     mg_opt = fc2d_thunderegg_get_options(glob);
     phase_opt = phasefield_get_options(glob);
+#endif    
 
     /* Get scale needed to apply homogeneous boundary conditions. 
        For Dirichlet (bctype=1) :   scalar is -1 
@@ -163,10 +165,10 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     double ylower = pinfo->starts[1];
 #endif    
 
+    /* Apply boundary conditions */
     for(int m = 0; m < mfields; m++)
     {
         LocalData<2>& u = const_cast<LocalData<2>&>(us[m]);
-        //LocalData<2>& f = fs[m];
 
         if (!pinfo->hasNbr(Side<2>::west()))
         {
@@ -263,10 +265,8 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     */
     double  T = xi*xi;
 
-
     /* Get local view into phi_n : component 1 */
     LocalData<2> pn = phi_n->getLocalData(1,pinfo->local_index);
-    //printf("Apply patch operator\n");
 
     for(int j = 0; j < my; j++)
         for(int i = 0; i < mx; i++)
@@ -279,6 +279,7 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             double lap_phi = (phi[{i+1,j}] - 2*phi_ij + phi[{i-1,j}])/dx2 + 
                              (phi[{i,j+1}] - 2*phi_ij + phi[{i,j-1}])/dy2;
 
+            /* Use phi_n from previous time step */
             double pn_ij = pn[{i,j}];
             double g0 = pn_ij*(1-pn_ij);
             double g = g0*g0;

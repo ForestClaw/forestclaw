@@ -18,7 +18,7 @@
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
       tag_patch = 1
-      mq = 1
+      mq = 2
       qmin = q0(1,1,mq)
       qmax = q0(1,1,mq)
 
@@ -56,21 +56,21 @@ c     # not be coarsened.
       integer i,j
       double precision qmin, qmax, qlow, qhi
 
-      qlow = -1
+      qlow = 0
       qhi = 1
 
       do i = 1,mx
          do j = 1,my
             if (initflag .ne. 0) then
-                qmin = min(q(i,j,1),qmin)
-                qmax = max(q(i,j,1),qmax)
+                qmin = min(q(i,j,mq),qmin)
+                qmax = max(q(i,j,mq),qmax)
                 if (qmax-qmin .gt. coarsen_threshold) then
                    tag_patch = 0
                    return
                 endif            
             else
-                if (q(i,j,1) .gt. qlow + coarsen_threshold .and. 
-     &               q(i,j,1) .lt. qhi - coarsen_threshold) then
+                if (q(i,j,mq) .ge. qlow + coarsen_threshold .and. 
+     &               q(i,j,mq) .le. qhi - coarsen_threshold) then
 c                   # We won't coarsen this family because at least one
 c                   # grid fails the coarsening test.
                     tag_patch = 0
