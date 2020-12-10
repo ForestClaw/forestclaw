@@ -263,7 +263,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
 #endif    
 
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, solver, mg_opt->max_it, mg_opt->tol);
+    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 

@@ -91,7 +91,7 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
     DomainTools::SetValues<2>(domain,x_just_ghosts,one,one);
     ghost_filler->fillGhost(x_just_ghosts);
     for(auto pinfo : domain->getPatchInfoVector()){
-        auto lds = y->getLocalDatas(pinfo->local_index);
+        auto lds = x_just_ghosts->getLocalDatas(pinfo->local_index);
         for(Side<2> s : Side<2>::getValues()){
             if(pinfo->hasNbr(s)){
                 for(int component = 0;component<2;component++){
@@ -105,8 +105,8 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
         }
     }
     x_just_ghosts->set(0);
-    DomainTools::SetValuesWithGhost<2>(domain,phi_n,two,two,two);
 
+    DomainTools::SetValuesWithGhost<2>(domain,phi_n,two,two,two);
 
     fc2d_thunderegg_options_t * mg_opt = new fc2d_thunderegg_options_t();
     mg_opt->boundary_conditions = new int[4]{1,1,1,1};
@@ -123,9 +123,14 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
     phasefield op(mg_opt, phase_opt, phi_n, domain, ghost_filler);
 
     op.apply(x,y);
-    op.apply(x_just_ghosts,y_expected);
+    for(auto pinfo : domain->getPatchInfoVector()){
+        auto x_lds = x_just_ghosts->getLocalDatas(pinfo->local_index);
+        auto y_lds = y_expected->getLocalDatas(pinfo->local_index);
+        op.applySinglePatch(pinfo,x_lds,y_lds,false);
+    }
     y_expected->scaleThenAdd(-1.0,y);
 
+    ghost_filler->fillGhost(x);
     for(auto pinfo : domain->getPatchInfoVector()){
         INFO("x_start: " <<pinfo->starts[0]);
         INFO("y_start: " <<pinfo->starts[1]);

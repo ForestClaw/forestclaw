@@ -1,4 +1,5 @@
 #include "phasefield_patch_operator.h"
+#include <ThunderEgg/ValVector.h>
 
 using namespace ThunderEgg;
 
@@ -12,7 +13,7 @@ double phasefield::getLambda(){
 }
 
 phasefield::phasefield(fclaw2d_global_t *glob,
-               std::shared_ptr<const Vector<2>> phi_n_in,
+               std::shared_ptr<const Vector<2>> phi_n,
                std::shared_ptr<const Domain<2>> domain,
                std::shared_ptr<const GhostFiller<2>> ghost_filler) 
     : phasefield(fc2d_thunderegg_get_options(glob),phasefield_get_options(glob),phi_n,domain,ghost_filler) 
@@ -212,7 +213,6 @@ void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
     int mbc = pinfo->num_ghost_cells;
     double xlower = pinfo->starts[0];
     double ylower = pinfo->starts[1];
-#endif    
 
     int mfields = us.size();
     int mx = pinfo->ns[0]; 
@@ -245,6 +245,51 @@ void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 
             if (pinfo->hasNbr(Side<2>::north()))
                 Au[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
+        }
+    }
+#endif    
+    ValVector<2> new_u(MPI_COMM_WORLD,pinfo->ns,1,us.size(),1);
+    ValVector<2> new_Au(MPI_COMM_WORLD,pinfo->ns,1,us.size(),1);
+    auto new_us = new_u.getLocalDatas(0);
+    auto new_Aus = new_Au.getLocalDatas(0);
+    int mx = pinfo->ns[0]; 
+    int my = pinfo->ns[1];
+    int mfields = us.size();
+    if(pinfo->hasNbr(Side<2>::west())){
+        for(int field=0; field<mfields; field++){
+            for(int j=0; j < my; j++){
+                new_us[field][{-1,j}]=us[field][{-1,j}]+us[field][{0,j}];
+            }
+        }
+    }
+    if(pinfo->hasNbr(Side<2>::east())){
+        for(int field=0; field<mfields; field++){
+            for(int j=0; j < my; j++){
+                new_us[field][{my,j}]=us[field][{my,j}]+us[field][{my-1,j}];
+            }
+        }
+    }
+    if(pinfo->hasNbr(Side<2>::south())){
+        for(int field=0; field<mfields; field++){
+            for(int i=0; i < mx; i++){
+                new_us[field][{i,-1}]=us[field][{i,-1}]+us[field][{i,0}];
+            }
+        }
+    }
+    if(pinfo->hasNbr(Side<2>::north())){
+        for(int field=0; field<mfields; field++){
+            for(int i=0; i < mx; i++){
+                new_us[field][{i,mx}]=us[field][{i,mx}]+us[field][{i,mx-1}];
+            }
+        }
+    }
+    applySinglePatch(pinfo,new_us,new_Aus,false);
+    //modify rhs
+    for(int field=0; field<mfields; field++){
+        for(int j=0; j < my; j++){
+            for(int i=0; i < mx; i++){
+                Aus[field][{i,j}]-=new_Aus[field][{i,j}];
+            }
         }
     }
 }
