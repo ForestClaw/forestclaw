@@ -1,5 +1,6 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
+#include "catch_reporter_automake.hpp"
 #include <mpi.h>
 
 int main(int argc, char *argv[])
