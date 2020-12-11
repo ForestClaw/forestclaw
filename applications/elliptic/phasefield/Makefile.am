@@ -2,7 +2,8 @@
 
 bin_PROGRAMS += applications/elliptic/phasefield/phasefield
 
-NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES = \
+applications_elliptic_phasefield_phasefield_SOURCES = \
+	applications/elliptic/phasefield/phasefield.cpp \
 	applications/elliptic/phasefield/phasefield_run.c \
 	applications/elliptic/phasefield/phasefield_operator.cpp \
 	applications/elliptic/phasefield/phasefield_operator.h \
@@ -21,13 +22,13 @@ NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES = \
 	applications/elliptic/phasefield/fortran/phasefield_tag4refinement.f90 \
 	applications/elliptic/phasefield/fortran/phasefield_tag4coarsening.f90
 
-applications_elliptic_phasefield_phasefield_SOURCES = \
-	applications/elliptic/phasefield/phasefield.cpp \
-	$(NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES)
+# applications_elliptic_phasefield_phasefield_SOURCES = \
+# 	applications/elliptic/phasefield/phasefield.cpp \
+# 	$(NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES)
 
-TEST_SOURCES += \
-	test/applications/elliptic/phasefield/phasefield_patch_operator.cpp \
-	$(NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES)
+#TEST_SOURCES += \
+#	test/applications/elliptic/phasefield/phasefield_patch_operator.cpp \
+#	$(NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES)
 
 EXTRA_DIST += \
 	applications/elliptic/phasefield/fclaw_options.ini
@@ -47,14 +48,13 @@ applications_elliptic_phasefield_phasefield_CPPFLAGS = \
         $(FCLAW_THUNDEREGG_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-TEST_CPPFLAGS += $(applications_elliptic_phasefield_phasefield_CPPFLAGS)
+# TEST_CPPFLAGS += $(applications_elliptic_phasefield_phasefield_CPPFLAGS)
 
 
 applications_elliptic_phasefield_phasefield_LDADD = \
         $(LDADD) \
         $(FCLAW_THUNDEREGG_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
-        $(FCLAW_LDADD) \
-		applications/elliptic/phasefield/libphasefield.a
+        $(FCLAW_LDADD)
 
-TEST_LDADD += $(applications_elliptic_phasefield_phasefield_LDADD)
+# TEST_LDADD += $(applications_elliptic_phasefield_phasefield_LDADD)
