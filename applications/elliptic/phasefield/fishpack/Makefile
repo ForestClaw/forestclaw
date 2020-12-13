@@ -22,10 +22,10 @@ all: $(OBJECTS)
 	$(LINK) $(OBJECTS) -o $(TARGET) $(LFLAGS)
 
 phase_iterative.o: phase_iterative.f90
-	$(F90) -c phase_iterative.f90
+	$(F90) -c phase_iterative.f90  ${FFLAGS}
 
 phase_cc.o: phase_cc.f
-	$(F90) -c phase_cc.f
+	$(F90) -c phase_cc.f ${FFLAGS}
 
 clean:
 	rm *.o $(TARGET)

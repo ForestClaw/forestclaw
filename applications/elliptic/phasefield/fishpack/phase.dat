@@ -1,6 +1,6 @@
 1024, 1024   % Grid data
 12           % domain_length ax bx ay by
-50,10000        % nstep, nout  (orig = 50,4000)
+250,8000        % nstep, nout  (orig = 250,8000)
 5d-4         % dt
 
 1728.d0	     % tm
