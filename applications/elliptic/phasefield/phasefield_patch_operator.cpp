@@ -209,14 +209,12 @@ void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
                               const std::vector<LocalData<2>>& us, 
                               std::vector<LocalData<2>>& Aus) const 
 {
-#if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
-
     int mfields = us.size();
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
+
+
+#if 0
 
     double dx = pinfo->spacings[0];
     double dx2 = dx*dx;
@@ -247,14 +245,11 @@ void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
                 Au[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
         }
     }
-#endif    
+#else    
     ValVector<2> new_u(MPI_COMM_WORLD,pinfo->ns,1,us.size(),1);
     ValVector<2> new_Au(MPI_COMM_WORLD,pinfo->ns,1,us.size(),1);
     auto new_us = new_u.getLocalDatas(0);
     auto new_Aus = new_Au.getLocalDatas(0);
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
-    int mfields = us.size();
     if(pinfo->hasNbr(Side<2>::west())){
         for(int field=0; field<mfields; field++){
             for(int j=0; j < my; j++){
@@ -292,6 +287,7 @@ void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
             }
         }
     }
+#endif    
 }
 
 const int *phasefield::getS() const{

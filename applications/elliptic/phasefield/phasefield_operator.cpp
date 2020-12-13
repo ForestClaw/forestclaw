@@ -255,7 +255,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
     // solve
     auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
 
-#if 0   
+#if 1
     // Set starting conditions
     shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
 #else
