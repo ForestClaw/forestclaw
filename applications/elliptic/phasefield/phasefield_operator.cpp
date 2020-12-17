@@ -143,7 +143,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
     shared_ptr<PatchSolver<2>>  solver;
     solver = make_shared<BiCGStabPatchSolver<2>>(op,
                                                  mg_opt->patch_bcgs_tol,
-                                                 mg_opt->patch_bcgs_max_it);
+                                                 mg_opt->patch_bcgs_max_it,
+                                                 true);
 
     // create matrix
     shared_ptr<Operator<2>> A = op;
@@ -208,7 +209,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
             shared_ptr<GMG::Smoother<2>> smoother;
             smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
                                                            mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
+                                                           mg_opt->patch_bcgs_max_it,
+                                                           true);
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
@@ -240,7 +242,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
         //smoother
         smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
                                                        mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it);
+                                                       mg_opt->patch_bcgs_max_it,
+                                                       true);
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
@@ -263,7 +266,9 @@ void phasefield_solve(fclaw2d_global_t *glob)
 #endif    
 
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
+    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol, 
+                                 nullptr, //no timer
+                                 true); //output iteration information to cout
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 
