@@ -64,16 +64,16 @@ void phasefield_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24.6f   %s",user->k,          "% k\n");
         fprintf(f,  "%-24.6f   %s",user->gamma,      "% gamma\n");
         fprintf(f,  "%-24.6f   %s",user->r0,         "% r0\n");
+        fprintf(f,  "%-24.6f   %s",user->x0,         "% x0\n");
+        fprintf(f,  "%-24.6f   %s",user->y0,         "% y0\n");
 
+#if 0
         const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
         double xlower = fclaw_opt->ax;
         double xupper = fclaw_opt->bx;
         double ylower = fclaw_opt->ay;
         double yupper = fclaw_opt->by;
-        double x0 = (xlower+xupper)/2;
-        double y0 = (ylower+yupper)/2;
-        fprintf(f,  "%-24.6f   %s",x0,         "% x0\n");
-        fprintf(f,  "%-24.6f   %s",y0,         "% y0\n");
+#endif        
 
         /* These are passed to fortran boundary condition routines */
         fc2d_thunderegg_options_t*  mg_opt = fc2d_thunderegg_get_options(glob);    

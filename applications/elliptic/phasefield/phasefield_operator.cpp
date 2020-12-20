@@ -258,7 +258,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
     // solve
     auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
 
-#if 1
+#if 0
     // Set starting conditions
     shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
 #else
@@ -268,7 +268,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
 
     int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol, 
                                  nullptr, //no timer
-                                 true); //output iteration information to cout
+                                 false); //output iteration information to cout
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 

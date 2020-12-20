@@ -245,7 +245,7 @@ void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
                 Au[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
         }
     }
-#else    
+#else       
     ValVector<2> new_u(MPI_COMM_WORLD,pinfo->ns,1,us.size(),1);
     ValVector<2> new_Au(MPI_COMM_WORLD,pinfo->ns,1,us.size(),1);
     auto new_us = new_u.getLocalDatas(0);
