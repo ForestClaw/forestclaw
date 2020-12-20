@@ -1,6 +1,6 @@
 
-# TARGET = phase_cc
-TARGET = phase_iterative
+TARGET = phase_cc
+# TARGET = phase_iterative
 
 
 FC = gfortran

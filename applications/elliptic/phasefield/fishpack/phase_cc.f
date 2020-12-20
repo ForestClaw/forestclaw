@@ -4,7 +4,7 @@
 
 c     # Grid parameters
       integer maxmx, maxmy
-      parameter(maxmx = 2**11, maxmy = 2**11)
+      parameter(maxmx = 2**12, maxmy = 2**12)
 
 
 c     # Model parameters
