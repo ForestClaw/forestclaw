@@ -86,10 +86,6 @@ void PHASEFIELD_UPDATE_Q(const int* mbc, const int* mx,
 
 
 
-#define PHASEFIELD_FORT_BETA FCLAW_F77_FUNC(phasefield_fort_beta,PHASEFIELD_FORT_BETA)
-
-void PHASEFIELD_FORT_BETA(const double* x, const double* y, const double* b, double grad[]);
-
 #define PHASEFIELD_COMPUTE_ERROR FCLAW_F77_FUNC(phasefield_compute_error,PHASEFIELD_COMPUTE_ERROR)
 
 void PHASEFIELD_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* mfields,
@@ -115,9 +111,9 @@ void PHASEFIELD_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my
 double PHASEFIELD_FORT_EVAL_BC(const int* iface, const double* t,const double* x, const double* y);
 
 
-#define PHASEFIELD_DIRICHLET FCLAW_F77_FUNC(phasefield_dirichlet, PHASEFIELD_DIRICHLET)
+#define PHASEFIELD_NEUMANN FCLAW_F77_FUNC(phasefield_neumann, PHASEFIELD_NEUMANN)
 
-double PHASEFIELD_DIRICHLET(const int* iface, const double* t,const double* x, const double* y);
+double PHASEFIELD_NEUMANN(const int* iface, const double* t,const double* x, const double* y);
 
 
 

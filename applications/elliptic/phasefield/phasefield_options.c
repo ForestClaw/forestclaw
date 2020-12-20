@@ -68,6 +68,11 @@ phasefield_register (phasefield_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "r0", &user->r0, 0.1,
                            "Radius of initial crystal [0.1]");
 
+    sc_options_add_double (opt, 0, "x0", &user->x0, 0,
+                           "x-location of initial seed [0]");
+    sc_options_add_double (opt, 0, "y0", &user->y0, 0,
+                           "y-location of initial seed [0]");
+
     user->is_registered = 1;
 
     return NULL;

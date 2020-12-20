@@ -14,7 +14,7 @@ subroutine phasefield_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
     DOUBLE PRECISION lambda, u, phi, g0, g, s1, s3, beta
 
     lambda = -1.d0/dt
-    beta = xi**2/m;
+    beta = xi**2/m_parm;
 
     do j = 1,my
         do i = 1,mx
@@ -47,7 +47,7 @@ subroutine phasefield_update_q(mbc,mx,my,meqn,mfields,rhs,q)
     do m = 1,2
         do j = 1-mbc,my+mbc
             do i = 1-mbc,mx+mbc
-                q(i,j,1) = rhs(i,j,m)
+                q(i,j,m) = rhs(i,j,m)
             end do
         end do
     end do

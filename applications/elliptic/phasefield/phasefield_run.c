@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "phasefield_user.h"
+#include "phasefield_operator.h"
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_patch.h>
@@ -151,7 +152,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
             /* Set lambda for Backward Euler */
             double lambda = -1/dt_step;
-            fc2d_thunderegg_heat_set_lambda(lambda);
+            phasefield_set_lambda(lambda);
 
             /* Solve the elliptic problem; RHS is set here */
             fclaw2d_elliptic_solve(glob);
@@ -259,7 +260,7 @@ void outstyle_3(fclaw2d_global_t *glob)
         glob->curr_dt = dt_step;
         /* Set lambda for Backward Euler */
         double lambda = -1/dt_step;
-        fc2d_thunderegg_heat_set_lambda(lambda);
+        phasefield_set_lambda(lambda);
 
 
         /* Solve the elliptic problem; RHS is set here */
