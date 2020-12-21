@@ -1,0 +1,95 @@
+/*
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#ifndef ADVECTION_USER_H
+#define ADVECTION_USER_H
+
+#include <fclaw_base.h>
+
+/* Fortran headers for user-defined fortran files
+   CLAWPACK46_BC2, CLAWPACK46_QINIT, CLAWPACK5_QINIT,
+   and so on */
+
+#include <clawpack46_user_fort.h>  
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}
+#endif
+#endif
+
+#define CLAWPACK46_RPN2ADV FCLAW_F77_FUNC(clawpack46_rpn2adv,CLAWPACK46_RPN2ADV)
+void CLAWPACK46_RPN2ADV(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                        const int* mbc,const int* mx, double ql[], double qr[],
+                        double auxl[], double auxr[], double wave[],
+                        double s[], double amdq[], double apdq[]);
+
+#define CLAWPACK46_RPT2ADV FCLAW_F77_FUNC(clawpack46_rpt2adv, CLAWPACK46_RPT2ADV)
+void CLAWPACK46_RPT2ADV(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                        const int* mbc, const int* mx, double ql[], double qr[],
+                        double aux1[], double aux2[], double aux3[], const int* imp,
+                        double dsdq[], double bmasdq[], double bpasdq[]);
+
+
+#define CLAWPACK46_RPN2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpn2adv_manifold, \
+                                                   CLAWPACK46_RPN2ADV_MANIFOLD)
+void CLAWPACK46_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, 
+                                 const int* mwaves,
+                                 const int* mbc,const int* mx, double ql[], double qr[],
+                                 double auxl[], double auxr[], double wave[],
+                                 double s[], double amdq[], double apdq[]);
+
+#define CLAWPACK46_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpt2adv_manifold, \
+                                                   CLAWPACK46_RPT2ADV_MANIFOLD)
+void CLAWPACK46_RPT2ADV_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
+                                 const int* mwaves,
+                                 const int* mbc, const int* mx, double ql[], double qr[],
+                                 double aux1[], double aux2[], double aux3[], const int* imp,
+                                 double dsdq[], double bmasdq[], double bpasdq[]);
+
+
+#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold, \
+                                               USER46_SETAUX_MANIFOLD)
+
+void USER46_SETAUX_MANIFOLD(const int* mbc,
+                            const int* mx, const int* my,
+                            const double* xlower, const double* ylower,
+                            const double* dx, const double* dy,
+                            const int* maux, double aux[],
+                            const int* blockno,
+                            double xd[], double yd[], double zd[],
+                            double area[]);
+
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
+}
+#endif
+
+#endif
