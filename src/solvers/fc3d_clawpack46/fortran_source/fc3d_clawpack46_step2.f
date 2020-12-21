@@ -2,7 +2,7 @@ c
 c     # Basic clawpack routine - with 4 additional arguments
 c     # mwaves, mcapa, method, mthlim + ierror
 c     ==========================================================
-      subroutine clawpack_step3(maxm,maxmx,maxmy,meqn,maux,mbc,
+      subroutine clawpack46_step2(maxm,maxmx,maxmy,meqn,maux,mbc,
      &      mx,my,qold,aux,dx,dy,dt,cflgrid,fm,fp,gm,gp,
      &      faddm,faddp,gaddm,gaddp,q1d,dtdx1d,dtdy1d,
      &      aux1,aux2,aux3,work,mwork,rpn2,rpt2,flux2,

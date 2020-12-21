@@ -1,4 +1,4 @@
-      subroutine clawpack_set_capacity(mx,my,mbc,dx,dy,
+      subroutine clawpack46_set_capacity(mx,my,mbc,dx,dy,
      &      area,mcapa,maux,aux)
       implicit none
 

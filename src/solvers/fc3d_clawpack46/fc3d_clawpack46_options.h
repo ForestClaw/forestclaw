@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPACK_OPTIONS_H
-#define FCLAW2D_CLAWPACK_OPTIONS_H
+#ifndef FC3D_CLAWPACK46_OPTIONS_H
+#define FC3D_CLAWPACK46_OPTIONS_H
 
 #include <fclaw_base.h>
 
@@ -37,9 +37,9 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-typedef struct fc3d_clawpack_options fc3d_clawpack_options_t;
+typedef struct fc3d_clawpack46_options fc3d_clawpack46_options_t;
 
-struct fc3d_clawpack_options
+struct fc3d_clawpack46_options
 {
     int mwaves;
 
@@ -64,24 +64,24 @@ struct fc3d_clawpack_options
     int is_registered;
 };
 
-fclaw_exit_type_t fc3d_clawpack_postprocess (fc3d_clawpack_options_t *
+fclaw_exit_type_t fc3d_clawpack46_postprocess (fc3d_clawpack46_options_t *
                                                clawopt);
 
-fclaw_exit_type_t fc3d_clawpack_check (fc3d_clawpack_options_t * clawopt);
+fclaw_exit_type_t fc3d_clawpack46_check (fc3d_clawpack46_options_t * clawopt);
 
-void fc3d_clawpack_reset (fc3d_clawpack_options_t * clawopt);
+void fc3d_clawpack46_reset (fc3d_clawpack46_options_t * clawopt);
 
-fc3d_clawpack_options_t*  fc3d_clawpack_options_register (fclaw_app_t * app,
+fc3d_clawpack46_options_t*  fc3d_clawpack46_options_register (fclaw_app_t * app,
                                                               const char *configfile);
 
-void fc3d_clawpack_package_register(fclaw_app_t* app,
-                                      fc3d_clawpack_options_t* clawopt);
+void fc3d_clawpack46_package_register(fclaw_app_t* app,
+                                      fc3d_clawpack46_options_t* clawopt);
 
-fc3d_clawpack_options_t* fc3d_clawpack_get_options(struct fclaw2d_global *glob);
+fc3d_clawpack46_options_t* fc3d_clawpack46_get_options(struct fclaw2d_global *glob);
 
-void fc3d_clawpack_options_store (struct fclaw2d_global* glob, fc3d_clawpack_options_t* clawopt);
+void fc3d_clawpack46_options_store (struct fclaw2d_global* glob, fc3d_clawpack46_options_t* clawopt);
 
-void fc3d_clawpack_output(struct fclaw2d_global *glob, int iframe);
+void fc3d_clawpack46_output(struct fclaw2d_global *glob, int iframe);
 
 
 #ifdef __cplusplus

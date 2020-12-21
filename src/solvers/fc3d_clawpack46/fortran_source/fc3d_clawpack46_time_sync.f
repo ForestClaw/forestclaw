@@ -20,7 +20,7 @@ c    #
 c    # These will be stored for each grid and used to compute
 c    # corrections.
 c    # -----------------------------------------------------------------
-      subroutine clawpack_time_sync_store_flux(mx,my,mbc,meqn,
+      subroutine clawpack46_time_sync_store_flux(mx,my,mbc,meqn,
      &      maux, blockno, patchno, dt,el0, el1, el2, el3,q, aux,
      &      flux0,flux1,flux2,flux3,
      &      rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
@@ -144,7 +144,7 @@ c    # This is called AFTER the step update.   This accumulates plus and
 c    # minus waves, scaled by dt*edge_length.  This scaling takes care 
 c    # of any division by 2 or 4. 
 c    # -----------------------------------------------------------------
-      subroutine clawpack_time_sync_accumulate_waves(mx,my,
+      subroutine clawpack46_time_sync_accumulate_waves(mx,my,
      &                                                 mbc,meqn,
      &      dt, dx,dy, patchno,
      &      el0, el1, el2, el3,
@@ -213,7 +213,7 @@ c    # -----------------------------------------------------------------
 c    # Add fine grid corrections to coarse grid.  
 c    # -----------------------------------------------------------------
 
-      subroutine clawpack_fort_time_sync_f2c (mx,my,mbc,meqn,
+      subroutine clawpack46_fort_time_sync_f2c (mx,my,mbc,meqn,
      &                                          idir, iface_coarse,
      &                                          coarse_blockno,
      &                                          fine_blockno,
@@ -455,7 +455,7 @@ c    # -----------------------------------------------------------------
 c    # Add wave corrections at same level interfaces.  This accounts for
 c    # metric mismatches that can occur at block boundaries.
 c    # -----------------------------------------------------------------
-      subroutine clawpack_fort_time_sync_samesize(mx,my,mbc,meqn,
+      subroutine clawpack46_fort_time_sync_samesize(mx,my,mbc,meqn,
      &                                          idir, this_iface,
      &                                          this_blockno, 
      &                                          neighbor_blockno,

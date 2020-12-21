@@ -1,7 +1,7 @@
 c
 c
 c     =====================================================
-      subroutine clawpack_inlinelimiter(maxm,meqn,mwaves,mbc,
+      subroutine clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,
      &      mx,wave,s,mthlim)
 c     =====================================================
 c

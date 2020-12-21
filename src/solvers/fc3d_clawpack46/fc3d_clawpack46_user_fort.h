@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CLAWPACK_USER_FORT_H
-#define CLAWPACK_USER_FORT_H
+#ifndef CLAWPACK46_USER_FORT_H
+#define CLAWPACK46_USER_FORT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -50,25 +50,25 @@ extern "C"
 #define SETPROB            FCLAW_F77_FUNC(setprob,           SETPROB)
 void SETPROB();
 
-#define CLAWPACK_SETPROB FCLAW_F77_FUNC(clawpack_setprob,CLAWPACK_SETPROB)
-void CLAWPACK_SETPROB();
+#define CLAWPACK46_SETPROB FCLAW_F77_FUNC(clawpack_setprob,CLAWPACK46_SETPROB)
+void CLAWPACK46_SETPROB();
 
-#define CLAWPACK_QINIT   FCLAW_F77_FUNC(clawpack_qinit,  CLAWPACK_QINIT)
-void CLAWPACK_QINIT(const int* maxmx, const int* maxmy, const int* meqn,
+#define CLAWPACK46_QINIT   FCLAW_F77_FUNC(clawpack46_qinit,  CLAWPACK46_QINIT)
+void CLAWPACK46_QINIT(const int* maxmx, const int* maxmy, const int* meqn,
                       const int* mbc, const int* mx, const int* my,
                       const double* xlower, const double* ylower,
                       const double* dx, const double* dy,
                       double q[], const int* maux, double aux[]);
   
-#define CLAWPACK_SETAUX  FCLAW_F77_FUNC(clawpack_setaux, CLAWPACK_SETAUX)
-void CLAWPACK_SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
+#define CLAWPACK46_SETAUX  FCLAW_F77_FUNC(clawpack46_setaux, CLAWPACK46_SETAUX)
+void CLAWPACK46_SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
                        const int* mx, const int* my,
                        const double* xlower, const double* ylower,
                        const double* dx, const double* dy,
                        const int* maux, double aux[]);
 
-#define CLAWPACK_BC2     FCLAW_F77_FUNC(clawpack_bc2,    CLAWPACK_bc2)
-void CLAWPACK_BC2(const int* maxmx, const int* maxmy, const int* meqn,
+#define CLAWPACK46_BC2     FCLAW_F77_FUNC(clawpack46_bc2,    CLAWPACK46_bc2)
+void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
                     const int* mbc, const int* mx, const int* my,
                     const double* xlower, const double* ylower,
                     const double* dx, const double* dy, const double q[],
@@ -76,40 +76,40 @@ void CLAWPACK_BC2(const int* maxmx, const int* maxmy, const int* meqn,
                     const double* dt, const int mthbc[]);
 
 
-#define CLAWPACK_B4STEP2 FCLAW_F77_FUNC(clawpack_b4step2,CLAWPACK_B4STEP2)
-void CLAWPACK_B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
+#define CLAWPACK46_B4STEP2 FCLAW_F77_FUNC(clawpack46_b4step2,CLAWPACK46_B4STEP2)
+void CLAWPACK46_B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
                         const int* mx, const int* my, const int* meqn,
                         double q[], const double* xlower, const double* ylower,
                         const double* dx, const double* dy,
                         const double* t, const double* dt,
                         const int* maux, double aux[]);
 
-#define CLAWPACK_SRC2    FCLAW_F77_FUNC(clawpack_src2,   CLAWPACK_SRC2)
-void CLAWPACK_SRC2(const int* maxmx, const int* maxmy, const int* meqn,
+#define CLAWPACK46_SRC2    FCLAW_F77_FUNC(clawpack46_src2,   CLAWPACK46_SRC2)
+void CLAWPACK46_SRC2(const int* maxmx, const int* maxmy, const int* meqn,
                      const int* mbc, const int* mx,const int* my,
                      const double* xlower, const double* ylower,
                      const double* dx, const double* dy, double q[],
                      const int* maux, double aux[], const double* t,
                      const double* dt);
 
-#define CLAWPACK_RPN2    FCLAW_F77_FUNC(clawpack_rpn2,   CLAWPACK_RPN2)
-void CLAWPACK_RPN2(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+#define CLAWPACK46_RPN2    FCLAW_F77_FUNC(clawpack46_rpn2,   CLAWPACK46_RPN2)
+void CLAWPACK46_RPN2(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
                      const int* mbc,const int* mx, double ql[], double qr[],
                      double auxl[], double auxr[], double wave[],
                      double s[], double amdq[], double apdq[]);
 
-#define CLAWPACK_RPT2    FCLAW_F77_FUNC(clawpack_rpt2,   CLAWPACK_RPT2)
-void CLAWPACK_RPT2(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+#define CLAWPACK46_RPT2    FCLAW_F77_FUNC(clawpack46_rpt2,   CLAWPACK46_RPT2)
+void CLAWPACK46_RPT2(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
                      const int* mbc, const int* mx, double ql[], double qr[],
                      double aux1[], double aux2[], double aux3[], const int* imp,
                      double dsdq[], double bmasdq[], double bpasdq[]);
 
 
 
-#define CLAWPACK_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack_tag4refinement, \
-                                                 CLAWPACK_TAG4REFINEMENT)
+#define CLAWPACK46_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack46_tag4refinement, \
+                                                 CLAWPACK46_TAG4REFINEMENT)
 
-void CLAWPACK_TAG4REFINEMENT(const int* mx,const int* my,
+void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my,
                                const int* mbc,const int* meqn,
                                const double* xlower, const double* ylower,
                                const double* dx, const double* dy,
@@ -121,10 +121,10 @@ void CLAWPACK_TAG4REFINEMENT(const int* mx,const int* my,
 
 
 
-#define CLAWPACK_TAG4COARSENING FCLAW_F77_FUNC(clawpack_tag4coarsening, \
-                                                CLAWPACK_TAG4COARSENING)
+#define CLAWPACK46_TAG4COARSENING FCLAW_F77_FUNC(clawpack46_tag4coarsening, \
+                                                CLAWPACK46_TAG4COARSENING)
 
-void CLAWPACK_TAG4COARSENING(const int* mx, const int* my,
+void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my,
                                const int* mbc, const int* meqn,
                                const double* xlower, const double* ylower,
                                const double* dx, const double* dy,

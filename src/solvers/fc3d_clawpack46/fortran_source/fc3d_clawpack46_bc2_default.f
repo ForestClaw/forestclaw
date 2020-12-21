@@ -1,4 +1,4 @@
-      subroutine clawpack_bc3_default(maxmx,maxmy,meqn,mbc,
+      subroutine clawpack46_bc2_default(maxmx,maxmy,meqn,mbc,
      &      mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc)
       implicit none
 
