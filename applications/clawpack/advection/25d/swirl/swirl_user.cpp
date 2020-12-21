@@ -28,10 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 /* Two versions of Clawpack */
-#include <fc3d_clawpack.h>
-#include <fc2d_clawpack5.h>
+#include <fc3d_clawpack46.h>
 
-#include "../../2d/all/advection_user_fort.h"
+#include "../all/advection_user_fort.h"
 
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
@@ -43,7 +42,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc3d_clawpack_vtable_t *clawpack46_vt = fc3d_clawpack_vt();        
+        fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt();        
 
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
@@ -51,6 +50,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
         clawpack46_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
     }
+#if 0
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
@@ -61,6 +61,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
         clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
         clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
     }
+#endif    
 }
 
 void swirl_problem_setup(fclaw2d_global_t* glob)
