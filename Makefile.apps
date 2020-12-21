@@ -86,21 +86,6 @@ if FCLAW_ENABLE_ASH3D
 
 endif
 
-# ----------------------------------
-# SWBLI project
-# ----------------------------------
-if FCLAW_ENABLE_SWBLI
-
-## Solver library
-#include src/patches/clawpatch/Makefile.am
-
-#include src/solvers/fc2d_swbli/Makefile.am
-
-## Applications
-#include src/solvers/fc2d_swbli/examples/swbli/Makefile.am
-
-endif
-
 
 # ----------------------------------
 # CudaClaw library and examples
@@ -119,10 +104,33 @@ if FCLAW_ENABLE_CUDACLAW
 #include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am
 #include applications/clawpack/euler/2d/shockbubble_cuda/Makefile.am
 
+endif
+
+# --------------------------------------------
+# Clawpack 3 libraries and examples
+# --------------------------------------------
+
+if FCLAW_ENABLE_CLAWPACK3
+
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+#include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc3d_clawpack46/Makefile.am    # clawpack 3
+
+## examples
+#include applications/development.apps
+include applications/clawpack/advection/25d/swirl/Makefile.am
+
 
 endif
 
+
+
+# --------------------------------------------
 # Include examples that use the low-level interface to p4est
 # They should always compile
+# --------------------------------------------
 
 include applications/lowlevel/Makefile.am
