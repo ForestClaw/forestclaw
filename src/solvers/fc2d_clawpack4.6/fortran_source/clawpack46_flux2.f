@@ -114,7 +114,7 @@ c
      &          aux2,aux2,wave,s,amdq,apdq)
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
-      do 40 i=1,mx+1
+      do 40 i=2-mbc, mx+mbc-1
          do 40 m=1,meqn
             faddp(i,m) = faddp(i,m) - apdq(i,m)
             faddm(i,m) = faddm(i,m) + amdq(i,m)
@@ -139,7 +139,7 @@ c     # apply limiter to waves:
       if (limit) call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
      &      wave,s,mthlim)
 c
-      do 120 i = 1, mx+1
+      do 120 i = 2-mbc, mx+mbc
 c
 c        # For correction terms below, need average of dtdx in cell
 c        # i-1 and i.  Compute these and overwrite dtdx1d:
@@ -167,7 +167,7 @@ c
 c
        if (method(2) .gt. 1 .and. method(3) .eq. 2) then
 c         # incorporate cqxx into amdq and apdq so that it is split also.
-          do 150 i = 1, mx+1
+          do 150 i = 2-mbc, mx+mbc-1
              do 150 m=1,meqn
                 amdq(i,m) = amdq(i,m) + cqxx(i,m)
                 apdq(i,m) = apdq(i,m) - cqxx(i,m)
@@ -181,13 +181,12 @@ c
 c
 c     # split the left-going flux difference into down-going and up-going:
       ilr = 1
-      call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
-     &          q1d,q1d,aux1,aux2,aux3,
+      call rpt2(ixy,maxm,meqn,mwaves,mbc,mx, q1d,q1d,aux1,aux2,aux3,
      &          ilr,amdq,bmasdq,bpasdq)
 c
 c     # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
       do 160 m=1,meqn
-          do 160 i = 1, mx+1
+          do 160 i = 2-mbc, mx+mbc
                gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(i,m)
                gaddm(i-1,m,1) = gaddm(i-1,m,1) - gupdate
                gaddp(i-1,m,1) = gaddp(i-1,m,1) - gupdate
@@ -200,13 +199,12 @@ c
 c     # split the right-going flux difference into down-going and up
 c              -going:
       ilr = 2
-      call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
-     &          q1d,q1d,aux1,aux2,aux3,
+      call rpt2(ixy,maxm,meqn,mwaves,mbc,mx, q1d,q1d,aux1,aux2,aux3,
      &          ilr,apdq,bmasdq,bpasdq)
 c
 c     # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
       do 180 m=1,meqn
-          do 180 i = 1, mx+1
+          do 180 i = 2-mbc, mx+mbc
                gupdate = 0.5d0*dtdx1d(i) * bmasdq(i,m)
                gaddm(i,m,1) = gaddm(i,m,1) - gupdate
                gaddp(i,m,1) = gaddp(i,m,1) - gupdate

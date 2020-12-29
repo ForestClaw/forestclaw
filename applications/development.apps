@@ -3,17 +3,14 @@
 ## standard distribution
 ## ------------------------------------------------------------------------
 
-## Third order scalar advection
-#include applications/clawpack/advection/2d/adv_order3/Makefile.am
-
 ## Shallow water on the sphere (D. Calhoun)
 #include applications/clawpack/shallow/2d/sphere/Makefile.am
 
 ## Simple examples to test options handling, etc, but no solvers.
 #include applications/dummy/Makefile.am
 
-## swirl_cons (square)
-#include applications/clawpack/advection/2d/swirl_cons/Makefile.am
+## transport (square)
+#include applications/clawpack/transport/2d/swirl/Makefile.am
 
 ## swirl_basilisk (square)
 #include applications/clawpack/advection/2d/swirl_basilisk/Makefile.am
@@ -30,14 +27,19 @@
 ## bump (original)
 #include applications/clawpack/shallow/2d/bump/Makefile.am
 
-## Transport on a square
-include applications/paper/square/Makefile.am
+## Shallow (tsunami, used for SGN equations)
+#include applications/clawpack/shallow/2d/tsunami/Makefile.am
 
-## Transport on a sphere
-include applications/paper/sphere/Makefile.am
+## -----------------------------------------------------------
+## Some third order examples
+## -----------------------------------------------------------
 
-## Transport on a torus
-include applications/paper/sphere/Makefile.am
+## Burgers
+#include applications/clawpack/burgers/2d/burgers_order3/Makefile.am
+
+## Advection 
+#include applications/clawpack/advection/2d/adv_order3/Makefile.am
+
 
 ## ---------------------------
 ## No solver

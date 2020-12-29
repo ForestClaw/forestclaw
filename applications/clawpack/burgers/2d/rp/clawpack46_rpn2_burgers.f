@@ -34,7 +34,7 @@ c
 c     # x- and y- Riemann problems are identical, so it doesn't matter if
 c     # ixy=1 or 2.
 c
-      efix = .true.
+      efix = .false.
 c
       do 10 i = 2-mbc, mx+mbc
 c        # wave is jump in q, speed comes from R-H condition:

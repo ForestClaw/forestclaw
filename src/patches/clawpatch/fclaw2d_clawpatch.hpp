@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -50,6 +50,12 @@ public :
 
     /* For diagnostics */
     FArrayBox exactsolution;
+
+    int mfields;  /* Number of fields in the rhs */
+    FArrayBox rhs;  /* For elliptic problems */
+
+    FArrayBox elliptic_error;  /* For elliptic problems */
+    FArrayBox elliptic_soln;  /* For elliptic problems */
 
     /* Registers for accumulating mismatches at coarse/fine interfaces */
     struct fclaw2d_clawpatch_registers *registers;

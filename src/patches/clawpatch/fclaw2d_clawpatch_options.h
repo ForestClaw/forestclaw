@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,7 @@ struct fclaw2d_clawpatch_options
     int mbc;
 
     int meqn;
+    int rhs_fields;
 
     /* Advanced options */
     int interp_stencil_width;

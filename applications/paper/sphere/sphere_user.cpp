@@ -166,7 +166,8 @@ static
 int sphere_tag4coarsening(fclaw2d_global_t *glob,
                           fclaw2d_patch_t *fine_patches,
                           int blockno,
-                          int patchno)
+                          int patchno,
+                          int initflag)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -192,7 +193,7 @@ int sphere_tag4coarsening(fclaw2d_global_t *glob,
         SPHERE_TAG4COARSENING(&mx,&my,&mbc,&meqn,
                               &xlower,&ylower,&dx,&dy,&t,
                               &blockno, q[0],q[1],q[2],q[3],
-                              &coarsen_threshold,&tag_patch);
+                              &coarsen_threshold,&initflag,&tag_patch);
     }
     return tag_patch == 1;
 }
