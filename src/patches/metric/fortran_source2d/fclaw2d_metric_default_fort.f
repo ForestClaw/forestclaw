@@ -159,6 +159,8 @@ c     # than in the rest of the mesh.
          enddo
       enddo
 
+      write(6,'(A,E24.16)') 'area = ', area(1,1)
+
       end
 
 
@@ -318,7 +320,6 @@ c     # Get x-face normals
          ENDDO
       ENDDO
 
-
       DO j = 1-mbc,my+mbc+1
          DO i =  -mbc,mx+mbc+1
 c           # Now do y-faces
@@ -338,7 +339,6 @@ c           # nv has unit length
             enddo
          enddo
       enddo
-
 
       end subroutine
 
@@ -372,7 +372,7 @@ c     # Get x-face normals
             tlen = sqrt(taup(1)**2 + taup(2)**2 + taup(3)**2)
 
             DO m = 1,3
-               xtangents(i,j,m) = taup(m)
+               xtangents(i,j,m) = taup(m)/tlen
             ENDDO
             edge_lengths(i,j,1) = tlen
          ENDDO
@@ -388,7 +388,7 @@ c           # Now do y-faces
 
 c           # nv has unit length
             do m = 1,3
-               ytangents(i,j,m) = taup(m)
+               ytangents(i,j,m) = taup(m)/tlen
             enddo
             edge_lengths(i,j,2) = tlen
          enddo

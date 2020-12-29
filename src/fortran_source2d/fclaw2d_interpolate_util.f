@@ -44,7 +44,7 @@ c        # chosen from centered (sc) slope
 
 c        # Do this to guarantee that ghost cells are used; this is a check
 c        # on the ghost-fill procedures.  Could raise an exception if face
-c        # a patch communicates with more two or more procs.  If this
+c        # of a patch communicates with two or more procs.  If this
 c        # is uncommented, also uncomment warning in fclaw2d_ghost_fill.cpp
 c         compute_slopes = sc
 

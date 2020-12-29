@@ -444,6 +444,9 @@ c         # Second column is A*[0;1]
                       endif
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
+                  if (jc .eq. 1) then
+c                    write(6,'(2I5, 2E24.16)') ic,jc,deltac,deltac/areac
+                  endif
               enddo
           enddo
       endif

@@ -44,7 +44,7 @@ applications_paper_torus_torus_CPPFLAGS = \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_paper_torus_LDADD = \
+applications_paper_torus_torus_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \

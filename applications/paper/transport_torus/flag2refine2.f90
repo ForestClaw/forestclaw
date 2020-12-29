@@ -50,6 +50,7 @@
 !! \param DOFLAG value to be assigned to amrflags for cells that do need refinement
 !
 ! ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
                             tolsp,q,aux,amrflags)
 
@@ -89,6 +90,7 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
     LOGICAL constant_theta, constant_r
 
     double precision xc,yc
+    logical refine
 
 
     ! Don't initialize flags, since they were already 
@@ -118,18 +120,29 @@ subroutine flag2refine2(mx,my,mbc,mbuff,meqn,maux,xlower,ylower,dx,dy,t,level, &
             ! Only check undivided differences if flag hasn't been set yet. 
             ! If flag == DONTFLAG then refinement is forbidden by a region, 
             ! if flag == DOFLAG checking is not needed
+
             if(amrflags(i,j) == UNSET) then
-                xc = xlower + (i-0.5)*dx
-                yc = ylower + (j-0.5)*dy
-                th = pi2*(theta_range(1) + (theta_range(2)-theta_range(1))*xc)
-                constant_theta = th .gt. pi/2
-                constant_r = abs(yc-0.5) .gt. 0.25
-                if (refine_pattern .eq. 1 .and. constant_theta) then 
+                if (refine_pattern .eq. -1) then
                     amrflags(i,j) = DOFLAG
-                    cycle x_loop
-                elseif (refine_pattern .eq. 2 .and. constant_r) then
-                    amrflags(i,j) = DOFLAG
-                    cycle x_loop
+                else if (refine_pattern .eq. 0) then
+                    refine = (q(1,i,j) .gt.  tolsp) .and. (q(1,i,j) .lt. 1-tolsp)
+
+                    if (refine) then
+                        amrflags(i,j) = DOFLAG
+                    endif
+                else
+                    xc = xlower + (i-0.5)*dx
+                    yc = ylower + (j-0.5)*dy
+                    th = pi2*(theta_range(1) + (theta_range(2)-theta_range(1))*xc)
+                    constant_theta = th .gt. pi/2
+                    constant_r = abs(yc-0.5) .gt. 0.25
+                    if (refine_pattern .eq. 1 .and. constant_theta) then 
+                        amrflags(i,j) = DOFLAG
+                        cycle x_loop
+                    elseif (refine_pattern .eq. 2 .and. constant_r) then
+                        amrflags(i,j) = DOFLAG
+                        cycle x_loop
+                    endif
                 endif
             endif
         enddo x_loop

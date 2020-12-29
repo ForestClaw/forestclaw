@@ -58,7 +58,7 @@ void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_metric_compute_normals_default(fclaw2d_global_t *glob,
+void fclaw2d_metric_compute_tensors_default(fclaw2d_global_t *glob,
                                             fclaw2d_patch_t *this_patch,
                                             int blockno,
                                             int patchno)
@@ -116,18 +116,15 @@ void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    int level, maxlevel,refratio;
-
-    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
-    level = this_patch->level;
-    maxlevel = gparms->maxlevel;
-    refratio = gparms->refratio;
-
     fclaw2d_metric_patch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                    &xlower,&ylower,&dx,&dy);
 
     double *area = fclaw2d_metric_patch_get_area(this_patch);
 
+    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
+    int level = this_patch->level;
+    int maxlevel = gparms->maxlevel;
+    int refratio = gparms->refratio;
     int m = pow_int(refratio,maxlevel-level);
     double *quadstore = FCLAW_ALLOC(double,3*(m+1)*(m+1));
 

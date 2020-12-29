@@ -62,7 +62,7 @@ typedef void (*fclaw2d_metric_compute_area_ghost_t)(struct fclaw2d_global *glob,
 													int blockno,
 													int patchno);
 
-typedef void (*fclaw2d_metric_compute_normals_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_metric_compute_tensors_t)(struct fclaw2d_global *glob,
 												 struct fclaw2d_patch *this_patch,
 												 int blockno,
 												 int patchno);
@@ -152,7 +152,7 @@ void fclaw2d_metric_compute_mesh_default(struct fclaw2d_global *glob,
 										 int patchno);
 
 
-void fclaw2d_metric_compute_normals_default(struct fclaw2d_global *glob,
+void fclaw2d_metric_compute_tensors_default(struct fclaw2d_global *glob,
 											struct fclaw2d_patch *this_patch,
 											int blockno,
 											int patchno);
@@ -169,7 +169,7 @@ struct fclaw2d_metric_vtable
 	fclaw2d_metric_compute_mesh_t        compute_mesh;    /* wrapper */
 	fclaw2d_metric_compute_area_t        compute_area;  /* wrapper */
 	fclaw2d_metric_compute_area_ghost_t  compute_area_ghost;
-	fclaw2d_metric_compute_normals_t     compute_normals;  /* wrapper */
+	fclaw2d_metric_compute_tensors_t     compute_tensors;  /* wrapper */
 
 	/* Fortran files */
 	fclaw2d_fort_compute_mesh_t          fort_compute_mesh;
