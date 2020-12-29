@@ -12,7 +12,7 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/fclaw2d_map_fivepatch.c \
 	applications/clawpack/transport/2d/square/fclaw2d_map_bilinear.c \
 	applications/clawpack/transport/2d/square/delta.f90 \
-	applications/clawpack/transport/2d/square/src.f90 \
+	applications/clawpack/transport/2d/square/src2.f90 \
 	applications/clawpack/transport/2d/square/setprob.f \
 	applications/clawpack/transport/2d/square/q0.f \
 	applications/clawpack/transport/2d/square/fdisc.f \

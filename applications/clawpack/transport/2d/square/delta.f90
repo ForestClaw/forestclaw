@@ -8,7 +8,8 @@ double precision function delta(x)
 
     double precision t0
 
-    delta = exp(-x**2/(4*t0))/sqrt(4*pi*t0)
+    t0 = 1d-4
+    delta = exp(-x**2/(4*t0))/(4*pi*t0)
 
     return
 

@@ -54,7 +54,7 @@ c     # Set non-zeros derivs only
       s = sqrt(2.d0)
       if (example .eq. 0) then
          u(1) = velocity(1)
-         u(2) = velocity(2)
+         u(2) = velocity(2)         
       elseif (example .eq. 1) then
 c        # No sonic points, i.e. velocity field > 0
          u(1) = s*(cos(pi*x)**2 + 0.5d0)         
