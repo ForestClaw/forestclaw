@@ -1,0 +1,73 @@
+Testing results for mx=8, and not computing error.  These are comparable to what is in 
+11/17/19.  Iterations count also match identically.
+
+Times are slightly slower - not sure why.   Same number of iterations, though.
+
+
+
+results/results_11_17_19/star_center/adapt/VC
+----------------------------------------------
+mgtest_00001.o1067:[libsc] Statistics for   WALLTIME
+mgtest_00001.o1067-[libsc]    Global number of values:       1
+mgtest_00001.o1067-[libsc]    Mean value (std. dev.):           0.19946 (0 = 0%)
+--
+mgtest_00001.o7373:[libsc] Statistics for   WALLTIME
+mgtest_00001.o7373-[libsc]    Global number of values:       1
+mgtest_00001.o7373-[libsc]    Mean value (std. dev.):           1.2418 (0 = 0%)
+--
+mgtest_00001.o2471:[libsc] Statistics for   WALLTIME
+mgtest_00001.o2471-[libsc]    Global number of values:       1
+mgtest_00001.o2471-[libsc]    Mean value (std. dev.):           7.29937 (0 = 0%)
+--
+mgtest_00001.o3818:[libsc] Statistics for   WALLTIME
+mgtest_00001.o3818-[libsc]    Global number of values:       1
+mgtest_00001.o3818-[libsc]    Mean value (std. dev.):           48.8163 (0 = 0%)
+--
+mgtest_00001.o9728:[libsc] Statistics for   WALLTIME
+mgtest_00001.o9728-[libsc]    Global number of values:       1
+mgtest_00001.o9728-[libsc]    Mean value (std. dev.):           268.286 (0 = 0%)
+--
+mgtest_00001.o7602:[libsc] Statistics for   WALLTIME
+mgtest_00001.o7602-[libsc]    Global number of values:       1
+mgtest_00001.o7602-[libsc]    Mean value (std. dev.):           1883.64 (0 = 0%)
+
+
+mgtest_00001.o1067:[fclaw] Iterations: 57
+mgtest_00001.o7373:[fclaw] Iterations: 131
+mgtest_00001.o2471:[fclaw] Iterations: 270
+mgtest_00001.o3818:[fclaw] Iterations: 545
+mgtest_00001.o9728:[fclaw] Iterations: 1008
+mgtest_00001.o7602:[fclaw] Iterations: 2338
+
+
+
+results/results_11_18_19/star_center/adapt/VC_mx_8
+--------------------------------------------------
+mgtest_00001.o3453:[libsc] Statistics for   WALLTIME
+mgtest_00001.o3453-[libsc]    Global number of values:       1
+mgtest_00001.o3453-[libsc]    Mean value (std. dev.):           0.191412 (0 = 0%)
+--
+mgtest_00001.o7686:[libsc] Statistics for   WALLTIME
+mgtest_00001.o7686-[libsc]    Global number of values:       1
+mgtest_00001.o7686-[libsc]    Mean value (std. dev.):           1.27875 (0 = 0%)
+--
+mgtest_00001.o6485:[libsc] Statistics for   WALLTIME
+mgtest_00001.o6485-[libsc]    Global number of values:       1
+mgtest_00001.o6485-[libsc]    Mean value (std. dev.):           7.55616 (0 = 0%)
+--
+mgtest_00001.o6059:[libsc] Statistics for   WALLTIME
+mgtest_00001.o6059-[libsc]    Global number of values:       1
+mgtest_00001.o6059-[libsc]    Mean value (std. dev.):           51.3031 (0 = 0%)
+--
+mgtest_00001.o1270:[libsc] Statistics for   WALLTIME
+mgtest_00001.o1270-[libsc]    Global number of values:       1
+mgtest_00001.o1270-[libsc]    Mean value (std. dev.):           280.133 (0 = 0%)
+
+
+mgtest_00001.o3453:[fclaw] Iterations: 57
+mgtest_00001.o7686:[fclaw] Iterations: 131
+mgtest_00001.o6485:[fclaw] Iterations: 270
+mgtest_00001.o6059:[fclaw] Iterations: 545
+mgtest_00001.o1270:[fclaw] Iterations: 1008
+
+

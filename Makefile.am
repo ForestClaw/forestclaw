@@ -20,6 +20,9 @@ EXTRA_DIST =
 LDADD = $(FLIBS)
 LINT_CSOURCES =
 TESTS =
+TEST_SOURCES =
+TEST_CPPFLAGS =
+TEST_LDADD =
 bin_PROGRAMS =
 check_PROGRAMS =
 include_HEADERS =
@@ -27,6 +30,7 @@ lib_LTLIBRARIES =
 nodist_include_HEADERS =
 noinst_HEADERS =
 noinst_PROGRAMS =
+noinst_LIBRARIES =
 sysconf_DATA =
 
 # use this if you want to link in ForestClaw without autotools
@@ -72,6 +76,9 @@ include src/Makefile.am
 
 # Examples
 include Makefile.apps
+
+# Tests
+include test/Makefile.am
 
 # ------------------------------------------------------------------
 

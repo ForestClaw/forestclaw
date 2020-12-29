@@ -30,7 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
 
-#include <fclaw2d_clawpatch_diagnostics.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
@@ -309,10 +308,10 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	if (fclaw_opt->time_sync && fclaw_opt->flux_correction)
 	{
 		FCLAW_ASSERT(claw46_vt->fort_rpn2_cons != NULL);
-		double *qvec   = FCLAW_ALLOC(double, meqn);
+		double *qvec          = FCLAW_ALLOC(double, meqn);
 		double *auxvec_center = FCLAW_ALLOC(double, maux);
-		double *auxvec_edge = FCLAW_ALLOC(double, maux);
-		double *flux   = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
+		double *auxvec_edge   = FCLAW_ALLOC(double, maux);
+		double *flux          = FCLAW_ALLOC(double, meqn);     /* f(qr) - f(ql) = amdq+apdq */
 
 		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,
 		                                &this_block_idx,&this_patch_idx, &dt,

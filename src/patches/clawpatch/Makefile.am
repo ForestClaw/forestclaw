@@ -23,6 +23,7 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics_default.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_pillow.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \

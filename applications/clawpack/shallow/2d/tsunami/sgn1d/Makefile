@@ -36,6 +36,7 @@ FFLAGS ?=  -O0 -g -ffpe-trap=invalid,zero,overflow  -L${LAPACK_DIR}/lib -llapack
 
 include $(CLAW)/classic/src/1d/Makefile.classic_1d
 
+
 # ---------------------------------------
 # package sources specifically to exclude
 # (i.e. if a custom replacement source 

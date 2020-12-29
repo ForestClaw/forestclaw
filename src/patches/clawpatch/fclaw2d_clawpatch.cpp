@@ -54,16 +54,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
 
+
 /* ------------------------------- Static function defs ------------------------------- */
 
-#if 0
 /* Added to turn off time_interp */
 static int fill_ghost(int time_interp)
 {
 	//return !time_interp;
 	return 1;
 }
-#endif
 
 
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
@@ -157,6 +156,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	cp->blockno = blockno;
 	cp->meqn = clawpatch_opt->meqn;
 	cp->maux = clawpatch_opt->maux;
+	cp->mfields = clawpatch_opt->rhs_fields;
 
 	for (int icorner=0; icorner < 4; icorner++)
 	{
@@ -238,7 +238,17 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
 	if (clawpatch_opt->maux > 0)
 	{
-	  cp->aux.define(box,cp->maux);
+		cp->aux.define(box,cp->maux);
+	}
+
+	if (clawpatch_opt->rhs_fields > 0)
+	{
+		cp->rhs.define(box,cp->mfields);
+		if (fclaw_opt->compute_error)
+		{
+			cp->elliptic_error.define(box,cp->mfields);
+			cp->elliptic_soln.define(box,cp->mfields);
+		}
 	}
 
 	if (fclaw_opt->manifold)
@@ -401,10 +411,14 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
 	my = clawpatch_opt->my;
 	mbc = clawpatch_opt->mbc;
 
+	/* This routine might be called between two time-sync patches */
 	fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
 	fclaw2d_clawpatch_timesync_data(glob,neighbor_patch,time_interp,&qneighbor,&meqn);
 
-	clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+	}
 }
 
 static
@@ -472,8 +486,11 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
 	my = clawpatch_opt->my;
 	mbc = clawpatch_opt->mbc;
 
-	clawpatch_vt->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iface_coarse,
-										&p4est_refineFactor,&refratio,&igrid,&transform_data);
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iface_coarse,
+		                                    &p4est_refineFactor,&refratio,&igrid,&transform_data);
+	}
 }
 
 static
@@ -489,7 +506,7 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
 	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
 	int meqn,mx,my,mbc;
-	double *qthis, *qcorner;
+	double *qthis, *qcorner;  
 	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
 	mx = clawpatch_opt->mx;
@@ -499,9 +516,11 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
 	fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
 	fclaw2d_clawpatch_timesync_data(glob,corner_patch,time_interp,&qcorner,&meqn);
 
-	clawpatch_vt->fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,
-								   &transform_data);
-
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,
+		                               &transform_data);
+	}
 }
 
 
@@ -539,10 +558,13 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
 	mbc = clawpatch_opt->mbc;
 
 	int manifold = fclaw_opt->manifold;
-	clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,
-									  &refratio,qcoarse,qfine,
-									  areacoarse,areafine,
-									  &manifold,&coarse_corner,&transform_data);
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,
+		                                  &refratio,qcoarse,qfine,
+		                                  areacoarse,areafine,
+		                                  &manifold,&coarse_corner,&transform_data);
+	}
 }
 
 static
@@ -574,9 +596,13 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
 	qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-	clawpatch_vt->fort_interpolate_corner(&mx,&my,&mbc,&meqn,
+	if (fill_ghost(time_interp))
+	{
+		clawpatch_vt->fort_interpolate_corner(&mx,&my,&mbc,&meqn,
 										  &refratio,qcoarse,qfine,
-										  &coarse_corner,&transform_data);
+										  &coarse_corner,&transform_data);	
+	}
+
 }
 
 
@@ -621,12 +647,22 @@ int clawpatch_tag4refinement(fclaw2d_global_t *glob,
 static
 int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 							 fclaw2d_patch_t *fine_patches,
-							 int blockno, int patchno)
+							 int blockno,
+							 int patchno,
+							 int initflag)
 {
-	int mx,my,mbc;
+	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+
+	int tag_patch,igrid;
+	double coarsen_threshold;
+
+	coarsen_threshold = fclaw_opt->coarsen_threshold;
+
 	double xlower,ylower,dx,dy;
-	fclaw2d_patch_t *patch0 = &fine_patches[0];
-	fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
+	int mx,my,mbc;
+	fclaw2d_clawpatch_grid_data(glob,&fine_patches[0],&mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
 	int meqn;
@@ -876,7 +912,7 @@ size_t clawpatch_ghost_pack_elems(fclaw2d_global_t* glob)
 	FCLAW_ASSERT(hole >= 0);
 
 	size_t psize = (wg - hole)*(meqn + packarea + packextra) + frsize;
-	FCLAW_ASSERT(psize > 0);
+	FCLAW_ASSERT(psize >= 0);
 
 	return psize;
 }    
@@ -1064,7 +1100,8 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	patch_vt->partition_unpack     = clawpatch_partition_unpack;
 
 	/* output functions */
-	clawpatch_vt->cb_output_ascii  = cb_clawpatch_output_ascii; 
+	clawpatch_vt->time_header_ascii  = fclaw2d_clawpatch_time_header_ascii;
+	clawpatch_vt->cb_output_ascii    = cb_clawpatch_output_ascii; 
 
 	/* Metric access */
 	patch_vt->metric_patch         = clawpatch_get_metric_patch;
@@ -1087,6 +1124,8 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 		clawpatch_vt->fort_output_ascii          = FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII;
 
 		/* Diagnostic functions */
+		clawpatch_vt->conservation_check         = fclaw2d_clawpatch_diagnostics_cons_default;
+		clawpatch_vt->compute_error              = fclaw2d_clawpatch_diagnostics_error_default;
 		clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
 		clawpatch_vt->fort_compute_error_norm    = FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM;
 		clawpatch_vt->fort_compute_patch_area    = FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA;
@@ -1201,6 +1240,7 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
 	*dy = cp->dy;
 }
 
+
 void fclaw2d_clawpatch_aux_data(fclaw2d_global_t *glob,
 								fclaw2d_patch_t *this_patch,
 								double **aux, int* maux)
@@ -1219,6 +1259,34 @@ void fclaw2d_clawpatch_soln_data(fclaw2d_global_t* glob,
 	*q = cp->griddata.dataPtr();
 	*meqn = cp->meqn;
 }
+
+void fclaw2d_clawpatch_rhs_data(fclaw2d_global_t* glob,
+								 fclaw2d_patch_t* patch,
+								 double **rhs, int *mfields)
+{
+	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+	*rhs = cp->rhs.dataPtr();
+	*mfields = cp->mfields;
+}
+
+void fclaw2d_clawpatch_elliptic_error_data(fclaw2d_global_t* glob,
+                                           fclaw2d_patch_t* patch,
+                                           double **err, int *mfields)
+{
+	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+	*err = cp->elliptic_error.dataPtr();
+	*mfields = cp->mfields;
+}
+
+void fclaw2d_clawpatch_elliptic_soln_data(fclaw2d_global_t* glob,
+                                           fclaw2d_patch_t* patch,
+                                           double **soln, int *mfields)
+{
+	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+	*soln = cp->elliptic_soln.dataPtr();
+	*mfields = cp->mfields;
+}
+
 
 double *fclaw2d_clawpatch_get_q(fclaw2d_global_t* glob,
 								fclaw2d_patch_t* this_patch)
@@ -1252,7 +1320,7 @@ double* fclaw2d_clawpatch_get_exactsoln(fclaw2d_global_t* glob,
 	return cp->exactsolution.dataPtr();
 }
 
-void* flaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
+void* fclaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* patch)
 {
     fclaw2d_clawpatch_t *cp = get_clawpatch(patch);

@@ -1,0 +1,30 @@
+1024, 1024   % Grid data
+12           % domain_length ax bx ay by
+250,8000        % nstep, nout  (orig = 250,8000)
+5d-4         % dt
+
+1728.d0	     % tm
+2350.        % lv
+5.42d0       % C
+0.155d0      % kappa
+0.015        % gamma
+200.d0       % mu
+4.d0         % k (orig = 0.945 (??))
+5.8d3        % sigma
+3.75d-5      % tau
+0.14d0       % beta
+
+0.5d0        % S   (orig = 0.1)
+400.0        % alpha
+0.035d0      % m
+0.00625d0    % xi
+4.d0         % k (anisotropy)
+0.1d0        % r0  (orig = 0.2)
+1.0          % amp
+0.5          % pdel  (orig = 0.5)
+0.25d0       % Gamma (gma2)
+-1.17d0      % beta_p
+0            % tau_th
+
+F              % Restart?
+'fort.q0060'   % Restart file

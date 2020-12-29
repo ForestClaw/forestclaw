@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -43,9 +43,7 @@ void elliptic_setup_solver(fclaw2d_global_t *glob)
 
     /* May not be anything to set up */
     if (elliptic_vt->setup != NULL)
-    {
         elliptic_vt->setup(glob);
-    }
 }
 
 /* -------------------------------- RHS functions -------------------------------- */
@@ -120,6 +118,8 @@ void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
     elliptic_solve(glob);
     
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE]);    
+
+    /* Store global error in EXTRA1, EXTRA2, EXTRA3 ? */
 }
 
 /*---------------------------- Virtual table functions -------------------------------- */
