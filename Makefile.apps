@@ -57,37 +57,6 @@ include applications/elliptic/phasefield/Makefile.am
 
 endif
 
-# --------------------------------------------
-# ThunderEgg solver
-# --------------------------------------------
-
-if FCLAW_ENABLE_THUNDEREGG
-
-## Patches needed for thunderegg solver
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/patches/clawpatch/Makefile.am
-
-## Solver libraries (most example apps require both)
-include src/solvers/fc2d_thunderegg/Makefile.am
-
-
-## Multigrid test
-#include applications/clawpack/shallow/2d/tsunami/Makefile.am
-
-## Elliptic example
-include applications/elliptic/poisson/Makefile.am
-
-## Heat equation
-include applications/elliptic/heat/Makefile.am
-
-## Allencahn equation
-include applications/elliptic/allencahn/Makefile.am
-
-## Crystal growth
-include applications/elliptic/phasefield/Makefile.am
-
-endif
-
 
 
 
@@ -100,11 +69,11 @@ if FCLAW_ENABLE_DEVELOPMENT
 include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5/Makefile.am
+#include src/solvers/fc2d_clawpack4.6/Makefile.am
+#include src/solvers/fc2d_clawpack5/Makefile.am
 
 # Development projects
-include applications/development.apps
+#include applications/development.apps
 
 endif
 
@@ -114,10 +83,10 @@ endif
 if FCLAW_ENABLE_PAPER
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
 
 # Development projects
 include applications/paper/paper.apps
