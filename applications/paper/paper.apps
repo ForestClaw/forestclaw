@@ -11,7 +11,7 @@ include applications/paper/square/Makefile.am
 include applications/paper/annulus/Makefile.am
 
 ## torus (Conservation test)
-include applications/paper/torus/Makefile.am
+#include applications/paper/torus/Makefile.am
 
 ## sphere (Conservation test)
 include applications/paper/sphere/Makefile.am
