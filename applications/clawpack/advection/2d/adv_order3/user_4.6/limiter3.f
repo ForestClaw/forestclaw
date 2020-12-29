@@ -17,12 +17,15 @@ c
       
       dimension      d(1-mbc:maxmx+mbc, meqn, mwaves)
 
+      double precision tol
+
 c
 c
 c     ===============================================================
 c     # TVD limiter
 c     ===============================================================
 c
+      tol = 1d-15
       do 10 i=1,mx
         do 20 m=1,meqn
             do 30 mw=1,mwaves
@@ -31,12 +34,14 @@ c
                 phi(i,m,mw) = dmax1(0.d0,
      &          dmin1(2d0/(1d0-dtdx(i)*dabs(s(i,mw))),
      &          phi(i,m,mw),2.*wave(i-1,m,mw)
-     &          /(dtdx(i)*dabs(s(i,mw))*wave(i,m,mw))))
+     &          /(dtdx(i)*dabs(s(i,mw))*
+     &               (wave(i,m,mw) + tol))))
                else
                 phi(i,m,mw) = dmax1(0.d0,
      &          dmin1(2d0/(1d0-dtdx(i)*dabs(s(i,mw))),
      &          phi(i,m,mw),2.*wave(i+1,m,mw)
-     &          /(dtdx(i)*dabs(s(i,mw))*wave(i,m,mw))))
+     &          /(dtdx(i)*dabs(s(i,mw))*
+     &              (wave(i,m,mw) + tol))))
                endif
               endif
    30          continue

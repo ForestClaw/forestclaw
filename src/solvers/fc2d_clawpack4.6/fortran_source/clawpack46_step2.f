@@ -100,7 +100,7 @@ c
 c     # perform x-sweeps
 c     ==================
 c
-      do 50 j = 0,my+1
+      do 50 j = 2-mbc,my+mbc-1
 c
 c        # copy data along a slice into 1d arrays:
          do m=1,meqn
@@ -109,7 +109,7 @@ c        # copy data along a slice into 1d arrays:
             enddo
          enddo
 
-         if (j .eq. 0) then
+         if (j .eq. 2-mbc) then
             do m = 1,meqn
                if (block_corner_count(0) .eq. 3) then
                   do ibc = 1,mbc
@@ -122,7 +122,7 @@ c        # copy data along a slice into 1d arrays:
                   enddo
                endif
             enddo
-         else if (j .eq. my+1) then
+         else if (j .eq. my+mbc) then
             do m = 1,meqn
                if (block_corner_count(2) .eq. 3) then
                   do ibc = 1,mbc
@@ -137,7 +137,7 @@ c        # copy data along a slice into 1d arrays:
             enddo
          endif
 c
-         if (mcapa.gt.0)  then
+         if (mcapa .gt. 0)  then
            do 21 i = 1-mbc, mx+mbc
                dtdx1d(i) = dtdx / aux(i,j,mcapa)
    21          continue
@@ -170,9 +170,9 @@ c        # compute modifications fadd and gadd to fluxes along this slice:
          cflgrid = dmax1(cflgrid,cfl1d)
 c
 c        # update fluxes for use in AMR:
-c
+c        # NOTE : We update ghost cell values for subcycling
          do 25 m=1,meqn
-            do 25 i=1,mx+1
+            do 25 i=2-mbc,mx+mbc
                fm(i,j,m) = fm(i,j,m) + faddm(i,m)
                fp(i,j,m) = fp(i,j,m) + faddp(i,m)
                gm(i,j,m) = gm(i,j,m) + gaddm(i,m,1)
@@ -188,7 +188,7 @@ c     # perform y sweeps
 c     ==================
 c
 c
-      do 100 i = 0, mx+1
+      do 100 i = 2-mbc, mx+mbc-1
 c
 c        # copy data along a slice into 1d arrays:
          do m=1,meqn
@@ -226,7 +226,7 @@ c        # copy data along a slice into 1d arrays:
          endif
 
 c
-         if (mcapa.gt.0)  then
+         if (mcapa .gt. 0)  then
            do 71 j = 1-mbc, my+mbc
                dtdy1d(j) = dtdy / aux(i,j,mcapa)
    71          continue
@@ -262,7 +262,7 @@ c        #
 c        # update fluxes for use in AMR:
 c
          do 75 m=1,meqn
-            do 75 j=1,my+1
+            do 75 j=2-mbc,my+mbc
                gm(i,j,m) = gm(i,j,m) + faddm(j,m)
                gp(i,j,m) = gp(i,j,m) + faddp(j,m)
                fm(i,j,m) = fm(i,j,m) + gaddm(j,m,1)

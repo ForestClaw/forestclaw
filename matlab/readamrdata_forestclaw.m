@@ -1,4 +1,4 @@
-function [amr,t] = readamrdata_forestclaw(dim,Frame,dir);
+function [amr,t] = readamrdata_forestclaw(dim,Frame,dir)
 
 % User-defined routine for reading in ForestClaw output.
 
@@ -6,13 +6,13 @@ n1 = Frame+10000;
 fname = [dir, 'fort.',num2str(n1)];
 fname(length(dir)+6) = 't';
 
-if ~exist(fname)
+if ~exist(fname,'file')
     amr = {};
     t = [];
     disp(' ');
     disp(['Frame ',num2str(Frame),' (',fname,') does not exist ***']);
     disp(' ');
-    return;
+    return
 end
 
 % Read data from fname = 'fort.tXXXX'
@@ -26,7 +26,7 @@ fclose(fid);
 
 % change the file name to read the q data:
 fname(length(dir) + 6) = 'q';
-if ~exist(fname)
+if ~exist(fname,'file')
     amr = {};
     t = [];
     return;

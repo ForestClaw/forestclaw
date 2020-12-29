@@ -6,14 +6,14 @@
 if FCLAW_ENABLE_CLAWPACK
 
 ## Patches needed for Clawpack solvers
-include src/patches/clawpatch/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5/Makefile.am
+#include src/solvers/fc2d_clawpack4.6/Makefile.am
+#include src/solvers/fc2d_clawpack5/Makefile.am
 
 ## examples
-include applications/clawpack/clawpack.apps
+#include applications/clawpack/clawpack.apps
 
 endif
 
@@ -123,12 +123,14 @@ endif
 # ----------------------------------
 if FCLAW_ENABLE_ACTIVEFLUX
 
+## Patches needed for Active Flux solver
+include src/patches/clawpatch/Makefile.am
+
 ## Solver library
-#include src/patches/clawpatch/Makefile.am
-#include src/solvers/fc2d_activeflux/Makefile.am
+include src/solvers/fc2d_activeflux/Makefile.am
 
 ## Applications
-#include src/solvers/fc2d_activeflux/examples/advection/2d/Makefile.am
+include src/solvers/fc2d_activeflux/examples/activeflux.apps
 
 endif
 
