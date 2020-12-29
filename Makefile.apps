@@ -116,7 +116,7 @@ if FCLAW_ENABLE_CLAWPACK3
 include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-#include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 include src/solvers/fc3d_clawpack46/Makefile.am    # clawpack 3
 
 ## examples

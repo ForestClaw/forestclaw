@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    CLAWPACK46_BC2, CLAWPACK46_QINIT, CLAWPACK5_QINIT,
    and so on */
 
-#include <fc3d_clawpack46_user_fort.h>  
-#include <clawpack5_user_fort.h>  
+#include <clawpack46_user_fort.h>  
+#include <clawpack5_user_fort.h>
 
 #ifdef __cplusplus
 extern "C"
