@@ -10,9 +10,6 @@
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision xp,yp,zp
 
-      integer refinement_strategy
-      common /refinement_comm/ refinement_strategy
-
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
@@ -23,6 +20,8 @@
       integer i,j, mq
       double precision qmin, qmax, xc, yc, qx, qy
       
+
+
       tag_patch = 0
 
       cont = get_context()
@@ -33,41 +32,40 @@ c     # Refine based only on first variable in system.
       qmax = q(1,1,mq)
       do j = 1,my
          do i = 1,mx
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
             if (example .eq. 0) then
-               if (q(i,j,mq) .gt. tag_threshold) then
-                   tag_patch = 1
-                   return
-               endif
-            elseif (example .eq. 1) then
                qmin = min(q(i,j,mq),qmin)
                qmax = max(q(i,j,mq),qmax)
                if (qmax-qmin .gt. tag_threshold) then
+
                   tag_patch = 1
                   return
                endif            
-            elseif (example .eq. 2) then
-               if (q(i,j,mq) .gt. tag_threshold .and.  
-     &               q(i,j,mq) .lt. 1-tag_threshold) then
+c               qx = (q(i+1,j,1)-q(i-1,j,1))/(2*dx)
+c               qy = (q(i,j+1,1)-q(i,j-1,1))/(2*dy)
+c               if (abs(qx) .gt. tag_threshold .or.
+c     &               abs(qy) .gt. tag_threshold) then
+cc                if (xc .gt. 0.5) then
+c                  tag_patch = 1
+c                  return
+c               endif
+            elseif (example .eq. 1) then
+               if (abs(q(i,j,mq)) .gt. tag_threshold) then
                    tag_patch = 1
                    return
                endif
-            elseif (example .eq. 3) then
-               qx = (q(i+1,j,1)-q(i-1,j,1))/(2*dx)
-               qy = (q(i,j+1,1)-q(i,j-1,1))/(2*dy)
-               if (abs(qx) .gt. tag_threshold .or.
-     &               abs(qy) .gt. tag_threshold) then
+            elseif (example .eq. 2) then
+               qmin = min(q(i,j,mq),qmin)
+               qmax = max(q(i,j,mq),qmax)
+               if (qmax-qmin .gt. tag_threshold) then
+
                   tag_patch = 1
                   return
-               endif
-            elseif (example .eq. 4) then
-c              #  static refinement
-               xc = xlower + (i-0.5)*dx
-               yc = ylower + (j-0.5)*dy
-               if (abs(yc-0.5) < 0.25) then
-                  tag_patch = 1
-                  return
-               endif
+               endif            
             endif
+c           #  static refinement
+c           if (abs(yc-0.5) < 0.25) then
          enddo
       enddo
 
