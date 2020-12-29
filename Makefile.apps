@@ -1,3 +1,12 @@
+# --------------------------------------------
+# List of available applications and examples
+#
+# Note : Any files below which are uncommented
+# need to be available at compile time, even 
+# the configuration flag is not set.  
+# --------------------------------------------
+
+
 
 # --------------------------------------------
 # Clawpack 4.6 and 5.0 libraries and examples
@@ -47,6 +56,38 @@ include applications/elliptic/allencahn/Makefile.am
 include applications/elliptic/phasefield/Makefile.am
 
 endif
+
+# --------------------------------------------
+# ThunderEgg solver
+# --------------------------------------------
+
+if FCLAW_ENABLE_THUNDEREGG
+
+## Patches needed for thunderegg solver
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+include src/solvers/fc2d_thunderegg/Makefile.am
+
+
+## Multigrid test
+#include applications/clawpack/shallow/2d/tsunami/Makefile.am
+
+## Elliptic example
+include applications/elliptic/poisson/Makefile.am
+
+## Heat equation
+include applications/elliptic/heat/Makefile.am
+
+## Allencahn equation
+include applications/elliptic/allencahn/Makefile.am
+
+## Crystal growth
+include applications/elliptic/phasefield/Makefile.am
+
+endif
+
 
 
 
@@ -105,7 +146,6 @@ endif
 # ---------------------------------------------
 # Ash3d examples (requires submodule)
 # -- Uncomment Makefiles below to compile Ash3d
-# -- 
 # ---------------------------------------------
 
 if FCLAW_ENABLE_ASH3D
@@ -118,19 +158,19 @@ if FCLAW_ENABLE_ASH3D
 
 endif
 
-# ----------------------------------
-# ACTIVEFLUX project
-# ----------------------------------
+# ----------------------------------------
+# ACTIVEFLUX project (requires submodule)
+# ----------------------------------------
 if FCLAW_ENABLE_ACTIVEFLUX
 
 ## Patches needed for Active Flux solver
-# include src/patches/clawpatch/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
 ## Solver library
-# include src/solvers/fc2d_activeflux/Makefile.am
+#include src/solvers/fc2d_activeflux/Makefile.am
 
 ## Applications
-# include src/solvers/fc2d_activeflux/examples/activeflux.apps
+#include src/solvers/fc2d_activeflux/examples/activeflux.apps
 
 endif
 
