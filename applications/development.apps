@@ -30,6 +30,10 @@
 ## Conservative advection (transport) on a square
 #include applications/clawpack/transport/2d/square/Makefile.am
 
+## Data assimilation
+include applications/clawpack/transport/2d/square/Makefile.am
+
+
 ## Shallow (tsunami, used for SGN equations)
 #include applications/clawpack/shallow/2d/tsunami/Makefile.am
 
@@ -52,7 +56,7 @@
 ## fix this, the patch needs to know something about data layout.  
 ## The clawpatch currently doesn't know about data layout. 
 
-# include applications/no_solver/Makefile.am
+#include applications/no_solver/Makefile.am
 
 ## -------------------------------------------------
 ## Checks for metric terms (curvature, normals, etc)
