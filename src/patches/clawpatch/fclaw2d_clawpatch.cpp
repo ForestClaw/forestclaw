@@ -653,13 +653,6 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 {
 	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
-	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-
-	int tag_patch,igrid;
-	double coarsen_threshold;
-
-	coarsen_threshold = fclaw_opt->coarsen_threshold;
-
 	double xlower,ylower,dx,dy;
 	int mx,my,mbc;
 	fclaw2d_clawpatch_grid_data(glob,&fine_patches[0],&mx,&my,&mbc,
@@ -682,7 +675,7 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 		clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,
 		                                  &xlower,&ylower,&dx,&dy,
 		                                  &blockno, q[0],q[1],q[2],q[3],
-		                                  &coarsen_threshold,&tag_patch);
+		                                  &coarsen_threshold,&initflag,&tag_patch);
 	}
 	else
 	{
