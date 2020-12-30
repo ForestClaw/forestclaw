@@ -400,7 +400,6 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     /* Multigrid vtable */
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
     //mg_vt->fort_rhs       = &HEAT_FORT_RHS;
-
     //mg_vt->fort_beta      = &HEAT_FORT_BETA;
     
     mg_vt->fort_apply_bc = &HEAT_FORT_APPLY_BC;
@@ -418,13 +417,7 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 
     // Output routines
-
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    //if (fclaw_opt->compute_error) 
-    {
-        clawpatch_vt->time_header_ascii = heat_time_header_ascii;
-        //clawpatch_vt->fort_header_ascii = &HEAT_FORT_HEADER_ASCII;
-        clawpatch_vt->cb_output_ascii = cb_heat_output_ascii;        
-    }
+    clawpatch_vt->time_header_ascii = heat_time_header_ascii;
+    clawpatch_vt->cb_output_ascii = cb_heat_output_ascii;        
 }
 
