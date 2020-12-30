@@ -11,7 +11,7 @@ DOUBLE PRECISION function poisson_qexact(x,y)
 
 
     flag = 0  !! Don't compute the gradient
-    call poisson_qexact_complete(example, x,y,q,qlap,grad,flag)
+    call poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
 
     poisson_qexact = q
 
@@ -47,8 +47,11 @@ SUBROUTINE poisson_qexact_gradient(x,y,q,grad)
     INTEGER flag
     DOUBLE PRECISION qlap
 
+    INTEGER example
+    COMMON /comm_example/ example
+
     flag = 1
-    CALL poisson_qexact_complete(x,y,q,qlap,grad,flag)
+    CALL poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
 
 END SUBROUTINE poisson_qexact_gradient
 
