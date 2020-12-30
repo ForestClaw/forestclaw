@@ -14,7 +14,7 @@ PlotData =  ones(1,MaxLevels);
 PlotGrid =  zeros(1,MaxLevels);
 PlotGridEdges = zeros(1,MaxLevels);
 
-PlotType = 1;  % Scatter plot
+PlotType = 4;  % Scatter plot
 
 MappedGrid = 0;
 
@@ -22,9 +22,14 @@ MappedGrid = 0;
 ContourValues = [];
 
 % for scatter plot (PlotType==4):
+if (PlotType == 4)
+    UserMap1d = 1;
+else
+    UserMap1d = 0;
+end
+
 x0 = 0;
 y0 = 0;
-UserMap1d = 0;
-ScatterStyle = setplotstyle('b-','r*','cs','gp','bo','k*');
+ScatterStyle = setplotstyle('b.','r*','cs','gp','bo','k*');
 
 PlotParallelPartitions=0;

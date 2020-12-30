@@ -41,8 +41,8 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
 
     claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
     claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
-    claw46_vt->fort_rpn2   = &RPN2_TSUNAMI;
-    claw46_vt->fort_rpt2   = &RPT2_TSUNAMI;
+    claw46_vt->fort_rpn2   = &RPN2_TSUNAMI;     /* or RPN2_GEOCLAW; */
+    claw46_vt->fort_rpt2   = &RPT2_TSUNAMI;     /* or RPT2_GEOCLAW; */
 }
 
 

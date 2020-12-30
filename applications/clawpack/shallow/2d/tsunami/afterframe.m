@@ -1,45 +1,11 @@
 g = 1;
 h0 = 1;
 b = 12.2;
-L = 4000;
+L = 4096;
 
-%%{
-xlim([0,100])
+plot_swe = true;
 
-drawcontourlines(10);
-
-view(2)
-
-axis([0,64,min(yedge),max(yedge)])
-caxis([-1,1]*1e-4)
-
-%%}
-
-%{
-hvec = zeros(1,2);
-hvec(1) = getlegendinfo();  % Get info from basic plot
-
-plot_swe = true;   % High res - 2^15
-
-if (plot_swe)
-    [amrdata_swe,t_swe] = readamrdata(1,Frame,'sgn1d/_output', ...
-        'ascii');
-    tol = 1e-6;
-    if (abs(t_swe - t) > tol)
-        fprintf('Times do not match; t_swe= %g; t = %g\n', t_swe, t);
-    end
-    hold on;
-    if (UserVariable == 1)
-        [q_swe,x_swe,h_swe] = plotframe1ez(amrdata_swe,mq,'b*',UserVariableFile);
-    else
-        [q_swe,x_swe,h_swe] = plotframe1ez(amrdata_swe,mq,'b*');
-    end
-    hvec(2) = h_swe;
-end
-
-% c = sqrt(g/h0);
-% refframe = c*t + b;
-
+% set axis limits
 if t <= 50
     w = 50;
     xticks = -w:10:w;
@@ -51,13 +17,6 @@ else
     xticks = -10:50:w;
 end
 
-
-% mask = [1,plot_swe, plot_bouss, plot_basilisk] == 1;
-mask = hvec ~= 0;
-
-c = sqrt(g/h0);
-refframe = c*t;
-
 x1 = xticks(1);
 x2 = xticks(end);
 if (mq == 1)
@@ -67,29 +26,46 @@ elseif mq == 2
     axis([x1,x2,-3.5,1]);
 end
 
-axis([x1,x2, -0.02, 1.0]);
+xl = [x1,x2];
+yl = [-0.02,0.15];
 
-%{
+% Set up moving reference frame
+c = sqrt(g/h0);
+refframe = c*t;
+
+% Add plots
+clear hvec lstr;
 if (PlotType == 1)
-    axis([refframe-w/2, refframe+w/2,0,16]);
-    ca = [-0.02,0.05];
+    % axis([refframe-w/2, refframe+w/2,0,16]);
+    set(gca,'xlim',[x1,x2]);
+    ca = yl;
     caxis(ca);
     cv = linspace(0,ca(end),15);
     drawcontourlines(cv);
     colorbar;
     view(2)
 elseif (PlotType == 4)
-    hvec = zeros(1,2);
     hvec(1) = getlegendinfo();  % Get info from basic plot
-    
-    plot_swe = true;   % High res - 2^15
-    
+
+    ms = 12;  % Markersize
+    userdata = get(gcf,'userdata');
+    udlines = userdata.lines;
+    maxlines = length(udlines);
+    for i = 1:length(amrdata)
+        level = amrdata(i).level;
+        for j = 1:maxlines
+            if (j-1 == level)
+                set(udlines{j},'markersize',ms);  % Array
+            end
+        end
+    end
+                
     if (plot_swe)
         [amrdata_swe,t_swe] = readamrdata(1,Frame,'sgn1d/_output', ...
             'ascii');
         tol = 1e-6;
         if (abs(t_swe - t) > tol)
-            fprintf('Times do not match; t_swe= %g; t = %g\n', t_swe, t);
+            fprintf('--------> WARNING : Times do not match; t_swe= %g; t = %g\n', t_swe, t);
         end
         hold on;
         if (UserVariable == 1)
@@ -101,47 +77,56 @@ elseif (PlotType == 4)
         hvec(2) = h_swe;
     end
     
-    hvec = get(gca,'children');
+    % hvec = get(gca,'children');
     
     for i = 1:length(hvec)
         h = hvec(i);
+        if (~ishandle(h))
+            continue;
+        end
         tag = get(h,'Tag');
         if (strcmp(tag,'SWE') == 0)
             % set(h,'color','k')
         end
         set(h,'linewidth',2);
         xdata = get(h,'xdata');
-        set(h,'xdata',xdata/h0 - refframe);
+        % set(h,'xdata',xdata/h0 - refframe);
+        xlim([-10,100]);
     end
     
        
-    axis([-w,w,ylim]);
+    % axis([-w,w,ylim]);
     set(gca,'xtick',xticks);
+    ylim(yl);
+        
     
     
     % mask = [1,plot_swe, plot_bouss, plot_basilisk] == 1;
     mask = hvec ~= 0;
     
-    level = round(log(mx)/log(2));
+    level = round(log2(mx));
     lstr{1} = sprintf('2d results (level %d)',level);
 
     if (plot_swe)
+        mx_swe = amrdata_swe.mx;
+        level_swe = round(log2(mx_swe));
         lstr{2} = sprintf('SWE (level %d)',level_swe);
     end
-    set(gcf,'position',[360   509   835   189]);    
+    set(gcf,'position',[360   509   835   189]);        
 end
-%} 
+
     
 fprintf('qmin = %24.16e\n',qmin);
 fprintf('qmax = %24.16e\n',qmax);
 
 
-set(gca,'fontsize',15);
 tstr = sprintf('t = %12.4f',t);
 title(tstr);
-set(gca,'box','on');
-%}
 
+set(gca,'fontsize',16);
+set(gca,'box','on');
+
+legend(hvec,lstr,'fontsize',16);
 
 prt = false;
 if (prt)
