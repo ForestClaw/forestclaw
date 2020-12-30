@@ -2,7 +2,7 @@
 
 !!SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,mbc,mx, & 
 
-SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx, & 
+SUBROUTINE rpt2_geoclaw(ixy,maxm,meqn,mwaves,maux,mbc,mx, & 
                    ql,qr,aux1,aux2,aux3,imp,asdq,bmasdq,bpasdq)
     
     IMPLICIT NONE
@@ -203,4 +203,4 @@ SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
          enddo
 
       return
-      end
+end subroutine rpt2_geoclaw

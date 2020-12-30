@@ -1,4 +1,4 @@
-SUBROUTINE clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my, & 
+    SUBROUTINE clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my, & 
     xlower,ylower,dx,dy,q,maux,aux)
 
     IMPLICIT NONE
@@ -34,7 +34,7 @@ SUBROUTINE clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my, &
         do j = 1-mbc,my+mbc
             yc = ylower + (j-0.5)*dy
             if (abs(xc) .lt. b) then
-                q(i,j,1) = h0 + a*exp(-20*(yc-ybar)**2)
+                q(i,j,1) = h0 + a !!*exp(-20*(yc-ybar)**2)
             else
                 q(i,j,1) = hr
             endif

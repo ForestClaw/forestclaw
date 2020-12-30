@@ -1,7 +1,7 @@
 !!======================================================================
 
-SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, & 
-           ql, qr,auxl,auxr,fwave,s,amdq,apdq)
+SUBROUTINE rpn2_tsunami(ixy,maxm,meqn,mwaves,mbc,mx, & 
+               ql, qr,auxl,auxr,fwave,s,amdq,apdq)
 
 !!======================================================================
 !!
@@ -174,10 +174,10 @@ SUBROUTINE clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,mx, &
 
 
     RETURN
-END SUBROUTINE clawpack46_rpn2
+END SUBROUTINE rpn2_tsunami
 
 
-SUBROUTINE simple_riemann(hr,ur,vr, hl,ul,vl, uhat,chat,bl, br, &
+SUBROUTINE tsunami_simple_riemann(hr,ur,vr, hl,ul,vl, uhat,chat,bl, br, &
                  phir,phil,s,fwave)
     IMPLICIT NONE
 
@@ -222,6 +222,8 @@ SUBROUTINE simple_riemann(hr,ur,vr, hl,ul,vl, uhat,chat,bl, br, &
     fwave(2,3) = beta(3)*s(3)
     fwave(3,3) = beta(3)*vr
 
-END subroutine simple_riemann
+END subroutine tsunami_simple_riemann
+
+
 
 

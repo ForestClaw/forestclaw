@@ -71,6 +71,33 @@ user_options_t* tsunami_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
+
+/* ***************************** FORTRAN - Riemann solvers **************************** */
+
+#define RPN2_TSUNAMI    FCLAW_F77_FUNC(rpn2_tsunami, RPN2_TSUNAMI)
+void RPN2_TSUNAMI(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                  const int* mbc,const int* mx, double ql[], double qr[],
+                  double auxl[], double auxr[], double wave[],
+                  double s[], double amdq[], double apdq[]);
+
+#define RPT2_TSUNAMI    FCLAW_F77_FUNC(rpt2_tsunami, RPT2_TSUNAMI)
+void RPT2_TSUNAMI(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                  const int* mbc, const int* mx, double ql[], double qr[],
+                  double aux1[], double aux2[], double aux3[], const int* imp,
+                  double dsdq[], double bmasdq[], double bpasdq[]);
+
+#define RPN2_GEOCLAW    FCLAW_F77_FUNC(rpn2_geoclaw,   RPN2_GEOCLAW)
+void RPN2_GEOCLAW(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                  const int* mbc,const int* mx, double ql[], double qr[],
+                  double auxl[], double auxr[], double wave[],
+                  double s[], double amdq[], double apdq[]);
+
+#define RPT2_GEOCLAW    FCLAW_F77_FUNC(rpt2_geoclaw,   RPT2_GEOCLAW)
+void RPT2_GEOCLAW(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                  const int* mbc, const int* mx, double ql[], double qr[],
+                  double aux1[], double aux2[], double aux3[], const int* imp,
+                  double dsdq[], double bmasdq[], double bpasdq[]);
+
 #ifdef __cplusplus
 #if 0
 {
