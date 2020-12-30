@@ -1,0 +1,21 @@
+1024, 1024          % Grid data
+12                 % domain_length ax bx ay by
+250,8000          % nstep, nout  (orig = 250,8000)
+5d-4               % dt
+
+500          % kmax
+1e-10        % tol
+1            % 0=Jacobi;  1=Gauss-Seidel
+T            % Print iterations
+
+0.5d0        % S   (orig = 0.1)
+400.0        % alpha
+0.035d0      % m
+0.00625d0    % xi
+4.d0         % k (anisotropy)
+0.1d0        % r0  (orig = 0.2)
+0.5          % pdel  (orig = 0.5)
+0.25d0       % Gamma (gma2)
+
+F              % Restart?
+'fort.q0060'   % Restart file

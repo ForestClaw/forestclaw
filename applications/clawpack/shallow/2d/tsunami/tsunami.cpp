@@ -114,7 +114,6 @@ main (int argc, char **argv)
     fclaw_options_t             *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
-\
     fclaw2d_global_t            *glob;
     fclaw2d_domain_t            *domain;
     sc_MPI_Comm mpicomm;

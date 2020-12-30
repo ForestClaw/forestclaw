@@ -1,5 +1,7 @@
 !! =====================================================
 
+!!SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,mbc,mx, & 
+
 SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx, & 
                    ql,qr,aux1,aux2,aux3,imp,asdq,bmasdq,bpasdq)
     
@@ -38,6 +40,10 @@ SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
 
 
     integer i,m,mw,mu,mv
+
+
+    write(6,*) 'rpt2_geoclaw : check input arguments'
+    stop
 
     tol = dry_tolerance
     abs_tol = tol

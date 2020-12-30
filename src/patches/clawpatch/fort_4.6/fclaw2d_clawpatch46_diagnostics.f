@@ -2,13 +2,13 @@ c    # -------------------------------------------------------------------------
 c    # Output and diagnostics
 c    # ----------------------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_conservation_check
-     &      (mx,my,mbc,meqn,dx,dy,area,q,sum,c_kahan)
+     &      (mx,my,mbc,mfields,dx,dy,area,q,sum,c_kahan)
       implicit none
 
-      integer mx,my,mbc,meqn
+      integer mx,my,mbc,mfields
       double precision dx, dy, dxdy
-      double precision sum(meqn), c_kahan
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision sum(mfields), c_kahan(mfields)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
       double precision c, t, y
 
       include 'metric_terms.i'
@@ -20,15 +20,15 @@ c    # -------------------------------------------------------------------------
       cont = get_context()
 
       dxdy = dx*dy
-      do m = 1,meqn
+      do m = 1,mfields
          if (fclaw2d_map_is_used(cont)) then
 C            sum(m) = 0
 c            c_kahan = 0
             do j = 1,my
                do i = 1,mx
-                  y = q(i,j,m)*area(i,j) - c_kahan
+                  y = q(i,j,m)*area(i,j) - c_kahan(m)
                   t = sum(m) + y
-                  c_kahan = (t-sum(m)) - y
+                  c_kahan(m) = (t-sum(m)) - y
                   sum(m) = t
 c                  sum(m) = sum(m) + q(i,j,m)*area(i,j)
                enddo
@@ -36,7 +36,11 @@ c                  sum(m) = sum(m) + q(i,j,m)*area(i,j)
          else
             do j = 1,my
                do i = 1,mx
-                  sum(m) = sum(m) + q(i,j,m)*dxdy
+                  y = q(i,j,m)*dxdy - c_kahan(m)
+                  t = sum(m) + y
+                  c_kahan(m) = (t-sum(m)) - y
+                  sum(m) = t
+!!                  sum(m) = sum(m) + q(i,j,m)*dxdy
                enddo
             enddo
          endif
@@ -79,13 +83,13 @@ c     # Compute area of a patch
 
 
       subroutine fclaw2d_clawpatch46_fort_compute_error_norm
-     &   (blockno, mx,my,mbc,meqn,dx,dy,area,error,error_norm)
+     &   (blockno, mx,my,mbc,mfields,dx,dy,area,error,error_norm)
       implicit none
 
-      integer mx,my,mbc,meqn, blockno
+      integer mx,my,mbc,mfields, blockno
       double precision dx, dy, dxdy, eij
-      double precision error_norm(meqn,3)
-      double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision error_norm(mfields,3)
+      double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
 
       include 'metric_terms.i'
 
@@ -97,7 +101,7 @@ c     # Compute area of a patch
 
 c     # error_norm(:) comes in with values;  do not initialize it here!
       dxdy = dx*dy
-      do m = 1,meqn
+      do m = 1,mfields
          if (fclaw2d_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx

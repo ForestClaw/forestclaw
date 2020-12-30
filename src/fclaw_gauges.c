@@ -263,7 +263,7 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
                this processor. This keeps the time consistent across all processors, 
                so that when this gauge is local to this processor, it knows when 
                it was last updated (even if it was updated on another processor). */
-            g->last_time = tcurr;            
+            g->last_time = tcurr;
 
             if (g->is_local)
             {

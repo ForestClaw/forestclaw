@@ -43,13 +43,17 @@ typedef void (*fclaw2d_elliptic_rhs_t)(struct fclaw2d_global *glob);
 
 typedef void (*fclaw2d_elliptic_solve_t)(struct fclaw2d_global *glob);
 
+typedef void (*fclaw2d_elliptic_physical_bc_t)(struct fclaw2d_global *glob);
+
+
 
 typedef struct fclaw2d_elliptic_vtable
 {
-    fclaw2d_elliptic_setup_t     setup;
-    fclaw2d_elliptic_rhs_t       rhs;
-    fclaw2d_elliptic_solve_t     solve;
- 
+    fclaw2d_elliptic_setup_t       setup;
+    fclaw2d_elliptic_rhs_t         rhs;
+    fclaw2d_elliptic_solve_t       solve;
+    fclaw2d_elliptic_physical_bc_t apply_bc;
+
     int is_set;
 
 } fclaw2d_elliptic_vtable_t;
@@ -58,11 +62,7 @@ void fclaw2d_elliptic_vtable_initialize();
 
 void fclaw2d_elliptic_solve(struct fclaw2d_global *glob);
 
-
-
 fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(void);
-
-
 
 #ifdef __cplusplus
 #if 0

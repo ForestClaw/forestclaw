@@ -93,9 +93,9 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    /* Return an error accumulator */
     if (diag_vt->patch_init_diagnostics != NULL)
     {
+        /* Return an error accumulator */
         diag_vt->patch_init_diagnostics(glob,&acc->patch_accumulator);
     }
 

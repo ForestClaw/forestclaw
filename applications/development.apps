@@ -3,9 +3,6 @@
 ## standard distribution
 ## ------------------------------------------------------------------------
 
-## Third order scalar advection
-#include applications/clawpack/advection/2d/adv_order3/Makefile.am
-
 ## Shallow water on the sphere (D. Calhoun)
 #include applications/clawpack/shallow/2d/sphere/Makefile.am
 
@@ -34,7 +31,21 @@ include applications/clawpack/shallow/2d/bump/Makefile.am
 #include applications/clawpack/transport/2d/square/Makefile.am
 
 ## tsunami (SGN)
-include applications/clawpack/shallow/2d/tsunami/Makefile.am
+#include applications/clawpack/shallow/2d/tsunami/Makefile.am
+
+## Shallow (tsunami, used for SGN equations)
+#include applications/clawpack/shallow/2d/tsunami/Makefile.am
+
+## -----------------------------------------------------------
+## Some third order examples
+## -----------------------------------------------------------
+
+## Burgers
+#include applications/clawpack/burgers/2d/burgers_order3/Makefile.am
+
+## Advection 
+#include applications/clawpack/advection/2d/adv_order3/Makefile.am
+
 
 ## ---------------------------
 ## No solver
