@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define  PRIORITY_SEARCH        FCLAW_TIMER_PRIORITY_DETAILS
 #define  PRIORITY_COMM          FCLAW_TIMER_PRIORITY_DETAILS
 #define  PRIORITY_CUDA          FCLAW_TIMER_PRIORITY_CUDA
+#define  PRIORITY_ELLIPTIC      FCLAW_TIMER_PRIORITY_ELLIPTIC
 #define  PRIORITY_EXTRA         FCLAW_TIMER_PRIORITY_EXTRA
 
 
@@ -210,6 +211,7 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
                     glob->timers[FCLAW2D_TIMER_ADVANCE].cumulative +
                     glob->timers[FCLAW2D_TIMER_GHOSTFILL].cumulative +
                     glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
+                    glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE].cumulative +
                     glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
                     glob->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
                     glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
@@ -260,10 +262,12 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET_GROUP(stats,WALLTIME,              WALL);
 
     FCLAW2D_STATS_SET_GROUP(stats,ADVANCE,               EXCLUSIVE1);
+    FCLAW2D_STATS_SET_GROUP(stats,ELLIPTIC_SOLVE,        EXCLUSIVE1);
     FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL,             EXCLUSIVE1);
     FCLAW2D_STATS_SET_GROUP(stats,GHOSTPATCH_COMM,       EXCLUSIVE1);
     FCLAW2D_STATS_SET_GROUP(stats,REGRID,                EXCLUSIVE1);
     FCLAW2D_STATS_SET_GROUP(stats,ADAPT_COMM,            EXCLUSIVE1);
+    FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE1);
 
     FCLAW2D_STATS_SET_GROUP(stats,INIT,                  EXCLUSIVE2);
     FCLAW2D_STATS_SET_GROUP(stats,OUTPUT,                EXCLUSIVE2);
@@ -271,12 +275,12 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET_GROUP(stats,PARTITION_COMM,        EXCLUSIVE2);
     FCLAW2D_STATS_SET_GROUP(stats,DIAGNOSTICS_COMM,      EXCLUSIVE2);
     FCLAW2D_STATS_SET_GROUP(stats,CFL_COMM,              EXCLUSIVE2);
-    FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE2);
 
     FCLAW2D_STATS_SET_GROUP(stats,LOCAL_COMM,            COMM);
     FCLAW2D_STATS_SET_GROUP(stats,GLOBAL_COMM,           COMM);
 
     FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_STEPS_COUNTER, COUNTERS1);
+    FCLAW2D_STATS_SET_GROUP(stats,ELLIPTIC_GRIDS_COUNTER, COUNTERS1);
     FCLAW2D_STATS_SET_GROUP(stats,GRIDS_PER_PROC,        COUNTERS1);
 
     FCLAW2D_STATS_SET_GROUP(stats,GRIDS_INTERIOR,        COUNTERS2);
@@ -309,6 +313,8 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY_H2D,      CUDA);
     FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY_D2H,      CUDA);
 
+    FCLAW2D_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
+    FCLAW2D_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
 
     FCLAW2D_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
     FCLAW2D_STATS_SET_GROUP(stats,EXTRA2,                EXTRA);
