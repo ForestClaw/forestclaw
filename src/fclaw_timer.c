@@ -202,21 +202,37 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GRIDS_REMOTE_BOUNDARY],grb,
                    "GRIDS_REMOTE_BOUNDARY");
 
-    sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
-                   glob->timers[FCLAW2D_TIMER_WALLTIME].cumulative -
-                   (glob->timers[FCLAW2D_TIMER_INIT].cumulative +
-                    glob->timers[FCLAW2D_TIMER_REGRID].cumulative +
-                    glob->timers[FCLAW2D_TIMER_OUTPUT].cumulative +
-                    glob->timers[FCLAW2D_TIMER_DIAGNOSTICS].cumulative +
-                    glob->timers[FCLAW2D_TIMER_ADVANCE].cumulative +
-                    glob->timers[FCLAW2D_TIMER_GHOSTFILL].cumulative +
-                    glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
-                    glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE].cumulative +
-                    glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative +
-                    glob->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
-                    glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
-                    glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative),
-                   "UNACCOUNTED");
+    int time_ex1 = glob->timers[FCLAW2D_TIMER_REGRID].cumulative +
+                   glob->timers[FCLAW2D_TIMER_ADVANCE].cumulative +
+                   glob->timers[FCLAW2D_TIMER_GHOSTFILL].cumulative +
+                   glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
+                   glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE].cumulative +
+                   glob->timers[FCLAW2D_TIMER_GHOSTPATCH_COMM].cumulative;
+
+
+    int time_ex2 = glob->timers[FCLAW2D_TIMER_INIT].cumulative +
+                   glob->timers[FCLAW2D_TIMER_OUTPUT].cumulative +
+                   glob->timers[FCLAW2D_TIMER_DIAGNOSTICS].cumulative +
+                   glob->timers[FCLAW2D_TIMER_PARTITION_COMM].cumulative +
+                   glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM].cumulative +
+                   glob->timers[FCLAW2D_TIMER_CFL_COMM].cumulative;
+
+    /* Get a partial sum of timers not accounted for in reported summary */
+    int priority = fclaw_opt->report_timing_verbosity;  /* Make this an option */
+
+
+    if (priority == FCLAW_TIMER_PRIORITY_SUMMARY)
+    {
+        sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
+                       glob->timers[FCLAW2D_TIMER_WALLTIME].cumulative - time_ex1,
+                       "UNACCOUNTED");
+    }
+    else
+    {
+        sc_stats_set1 (&stats[FCLAW2D_TIMER_UNACCOUNTED],
+                       glob->timers[FCLAW2D_TIMER_WALLTIME].cumulative - time_ex1 - time_ex2,
+                       "UNACCOUNTED");
+    }
 
     sc_stats_set1 (&stats[FCLAW2D_TIMER_GLOBAL_COMM],
                    glob->timers[FCLAW2D_TIMER_ADAPT_COMM].cumulative +
@@ -267,7 +283,12 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET_GROUP(stats,GHOSTPATCH_COMM,       EXCLUSIVE1);
     FCLAW2D_STATS_SET_GROUP(stats,REGRID,                EXCLUSIVE1);
     FCLAW2D_STATS_SET_GROUP(stats,ADAPT_COMM,            EXCLUSIVE1);
-    FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE1);
+
+
+    if (priority == FCLAW_TIMER_PRIORITY_SUMMARY)
+        FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE1);
+    else
+        FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE2);    
 
     FCLAW2D_STATS_SET_GROUP(stats,INIT,                  EXCLUSIVE2);
     FCLAW2D_STATS_SET_GROUP(stats,OUTPUT,                EXCLUSIVE2);
@@ -320,10 +341,6 @@ fclaw2d_timer_report(fclaw2d_global_t *glob)
     FCLAW2D_STATS_SET_GROUP(stats,EXTRA2,                EXTRA);
     FCLAW2D_STATS_SET_GROUP(stats,EXTRA3,                EXTRA);
     FCLAW2D_STATS_SET_GROUP(stats,EXTRA4,                EXTRA);
-
-
-    /* Get a partial sum of timers not accounted for in reported summary */
-    int priority = fclaw_opt->report_timing_verbosity;  /* Make this an option */
 
     /* ----------------------------------- Compute timers ------------------------------*/
 
