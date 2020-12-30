@@ -19,9 +19,9 @@ SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
     DOUBLE PRECISION    asdq(1-mbc:maxm+mbc,meqn)
     DOUBLE PRECISION  bmasdq(1-mbc:maxm+mbc,meqn)
     DOUBLE PRECISION  bpasdq(1-mbc:maxm+mbc,meqn)
-    DOUBLE PRECISION    aux1(1-mbc:maxm+mbc,*)
-    DOUBLE PRECISION    aux2(1-mbc:maxm+mbc,*)
-    DOUBLE PRECISION    aux3(1-mbc:maxm+mbc,*)
+    DOUBLE PRECISION    aux1(1-mbc:maxm+mbc,maux)
+    DOUBLE PRECISION    aux2(1-mbc:maxm+mbc,maux)
+    DOUBLE PRECISION    aux3(1-mbc:maxm+mbc,maux)
 
     DOUBLE PRECISION  s(3)
     DOUBLE PRECISION  r(3,3)
