@@ -161,7 +161,9 @@ fc2d_thunderegg_vtable_t* thunderegg_vt_init()
 void fc2d_thunderegg_solver_initialize()
 {
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
-	fclaw2d_clawpatch_vtable_initialize(claw_version);
+
+    if (fclaw2d_clawpatch_vtable_is_set() == 0)
+        fclaw2d_clawpatch_vtable_initialize(claw_version);
 
 
     //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
