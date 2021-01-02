@@ -466,7 +466,11 @@ fc2d_clawpack46_vtable_t* clawpack46_vt_init()
 void fc2d_clawpack46_solver_initialize()
 {
 	int claw_version = 4;
-	fclaw2d_clawpatch_vtable_initialize(claw_version);
+
+    if (fclaw2d_clawpatch_vtable_is_set() == 0)
+    {
+        fclaw2d_clawpatch_vtable_initialize(claw_version);
+    }
 
 	fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
 	fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
