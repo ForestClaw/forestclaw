@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_clawpack46.h>
 
+#include <fc2d_thunderegg.h>
+#include <fc2d_thunderegg_options.h>
+
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt,
@@ -88,6 +91,10 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
+    /* Test thunderegg solver */
+    fc2d_thunderegg_solver_initialize();
+
+    /* Inialize virtual tables for clawpack */
     fc2d_clawpack46_solver_initialize();
 
     tsunami_link_solvers(glob);
@@ -96,7 +103,10 @@ void run_program(fclaw2d_global_t* glob)
        Run
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+
+    tsunami_run(glob);
+
+
     fclaw2d_finalize(glob);
 }
 
@@ -114,6 +124,7 @@ main (int argc, char **argv)
     fclaw_options_t             *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
+    fc2d_thunderegg_options_t   *te_opt;
     fclaw2d_global_t            *glob;
     fclaw2d_domain_t            *domain;
     sc_MPI_Comm mpicomm;
@@ -127,7 +138,8 @@ main (int argc, char **argv)
     fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
-    user_opt =                tsunami_options_register(app,"fclaw_options.ini");  
+    te_opt =            fc2d_thunderegg_options_register(app,"fclaw_options.ini");
+    user_opt =                  tsunami_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -150,7 +162,8 @@ main (int argc, char **argv)
         fclaw2d_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
-        tsunami_options_store         (glob, user_opt);
+        fc2d_thunderegg_options_store   (glob, te_opt);
+        tsunami_options_store           (glob, user_opt);
 
         run_program(glob);
         

@@ -25,27 +25,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tsunami_user.h"
 
+#include <fclaw2d_include_all.h>
+
 #include <fclaw2d_clawpatch.h>
-
 #include <fc2d_clawpack46.h>
-
 #include <clawpack46_user_fort.h>
 
-void tsunami_link_solvers(fclaw2d_global_t *glob)
-{
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
-    vt->problem_setup = &tsunami_problem_setup;  /* Version-independent */
+#include <fclaw2d_elliptic_solver.h>
 
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+#include <fc2d_thunderegg.h>
+#include <fc2d_thunderegg_fort.h>
+#include <fc2d_thunderegg_options.h>
+#include <fc2d_thunderegg_physical_bc.h>
+#include <fc2d_thunderegg_starpatch.h>
+#include <fc2d_thunderegg_fivepoint.h>
 
-    claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
-    claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
-    claw46_vt->fort_rpn2   = &RPN2_TSUNAMI;     /* or RPN2_GEOCLAW; */
-    claw46_vt->fort_rpt2   = &RPT2_TSUNAMI;     /* or RPT2_GEOCLAW; */
-}
+#include "sgn_operator.h"
 
 
+static
 void tsunami_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = tsunami_get_options(glob);
@@ -71,5 +69,60 @@ void tsunami_problem_setup(fclaw2d_global_t* glob)
 
     TSUNAMI_SETPROB();  /* Reads file created above */
 }
+
+
+static
+void tsunami_rhs(fclaw2d_global_t *glob,
+                 fclaw2d_patch_t *patch,
+                 int blockno,
+                 int patchno)
+{
+
+    int mx,my,mbc;
+    double dx,dy,xlower,ylower;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    int mfields;
+    double *rhs;
+    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+
+    int meqn;
+    double *q;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    SGN_FORT_RHS(&blockno, &mbc, &mx, &my, &meqn, &mfields,
+                 &xlower, &ylower, &dx, &dy,q,rhs);
+}
+
+
+void tsunami_link_solvers(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    vt->problem_setup = &tsunami_problem_setup;  /* Version-independent */
+
+    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+
+    claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
+    claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
+    claw46_vt->fort_rpn2   = &RPN2_TSUNAMI;     /* or RPN2_GEOCLAW; */
+    claw46_vt->fort_rpt2   = &RPT2_TSUNAMI;     /* or RPT2_GEOCLAW; */
+
+    /* for SGN operator */
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    patch_vt->rhs = tsunami_rhs;          /* Overwrites default */
+
+    /* Assign SGN operator vtable */
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    mg_vt->patch_operator = sgn_solve;
+
+    mg_vt->fort_apply_bc = &SGN_FORT_APPLY_BC;
+    mg_vt->fort_eval_bc  = &SGN_NEUMANN;   // For non-homogeneous BCs
+
+}
+
+
+
 
 

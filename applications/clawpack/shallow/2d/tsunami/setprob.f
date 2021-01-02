@@ -4,14 +4,14 @@
       DOUBLE PRECISION pi, pi2
       COMMON /compi/ pi, pi2
 
-      double precision a,b,h0
-      common /common_initheight/ a,b,h0
+      DOUBLE PRECISION a,b,h0
+      COMMON /common_initheight/ a,b,h0
 
       DOUBLE PRECISION  grav, dry_tolerance, sea_level
       COMMON /common_swe/ grav, dry_tolerance, sea_level
 
-      double precision breaking, alpha
-      common /common_sgn/ breaking, alpha
+      DOUBLE PRECISION breaking, alpha
+      COMMON /common_sgn/ breaking, alpha
 
 c     # These should be read in as options.
       
@@ -25,7 +25,6 @@ c     # These should be read in as options.
       read(10,*) dry_tolerance
       read(10,*) sea_level
       close(10)
-
 
       return
       end

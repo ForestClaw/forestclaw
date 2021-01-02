@@ -28,13 +28,12 @@
 
     ybar = ylower + my*dy/2.d0
 
-
     do i = 1-mbc,mx+mbc
         xc = xlower + (i-0.5)*dx  
         do j = 1-mbc,my+mbc
             yc = ylower + (j-0.5)*dy
             if (abs(xc) .lt. b) then
-                q(i,j,1) = h0 + a !!*exp(-20*(yc-ybar)**2)
+                q(i,j,1) = hl  !!h0 + a*exp(-20*(yc-ybar)**2)
             else
                 q(i,j,1) = hr
             endif
