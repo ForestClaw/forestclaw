@@ -1020,12 +1020,14 @@ fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
 
 void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 {
+	fclaw2d_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_init();
+	
 	fclaw2d_patch_vtable_initialize();
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
-	fclaw2d_metric_vtable_initialize();
+	if (fclaw2d_metric_vtable_is_set() == 0)
+		fclaw2d_metric_vtable_initialize();
 
-	fclaw2d_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_init();
 
 	/* Patch setup */
 	patch_vt->patch_new             = clawpatch_new;
@@ -1182,6 +1184,11 @@ fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt()
 {
 	FCLAW_ASSERT(s_clawpatch_vt.is_set != 0);
 	return &s_clawpatch_vt;
+}
+
+int fclaw2d_clawpatch_vtable_is_set()
+{
+	return s_clawpatch_vt.is_set;
 }
 
 /* Called from clawpack 4.6 and 5.0 */

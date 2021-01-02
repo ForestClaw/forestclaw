@@ -184,4 +184,9 @@ fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt()
     return &s_clawpatch_pillow_vt;
 }
 
+int fclaw2d_clawpatch_pillow_vtable_is_set()
+{
+    return s_clawpatch_pillow_vt.is_set;
+}
+
 

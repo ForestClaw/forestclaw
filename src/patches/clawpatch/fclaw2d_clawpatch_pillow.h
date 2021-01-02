@@ -90,6 +90,8 @@ struct fclaw2d_clawpatch_pillow_vtable
 
 fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt();
 
+int fclaw2d_clawpatch_pillow_vtable_is_set();
+
 
 #ifdef __cplusplus
 #if 0

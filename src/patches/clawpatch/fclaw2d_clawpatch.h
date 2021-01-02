@@ -145,6 +145,8 @@ void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
 
 /* ------------------------------- Misc access functions ------------------------------ */
 
+int fclaw2d_clawpatch_vtable_is_set();
+
 void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* this_patch,
                                  int* mx, int* my, int* mbc,
