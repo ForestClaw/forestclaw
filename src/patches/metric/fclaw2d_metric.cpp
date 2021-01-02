@@ -249,6 +249,11 @@ fclaw2d_metric_vtable_t* fclaw2d_metric_vt()
     return &s_metric_vt;
 }
 
+int fclaw2d_metric_vtable_is_set()
+{
+    return s_metric_vt.is_set;
+}
+
 
 void fclaw2d_metric_vtable_initialize()  
 {

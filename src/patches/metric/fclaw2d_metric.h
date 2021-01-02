@@ -182,6 +182,8 @@ struct fclaw2d_metric_vtable
 
 void fclaw2d_metric_vtable_initialize();
 
+int fclaw2d_metric_vtable_is_set();
+
 
 #ifdef __cplusplus
 #if 0
