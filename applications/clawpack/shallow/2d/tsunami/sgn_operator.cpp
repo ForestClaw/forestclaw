@@ -67,21 +67,23 @@ using namespace ThunderEgg;
 using namespace ThunderEgg::VarPoisson;
 
 /*  Copy current state */
-shared_ptr<Vector<2>> restrict_phi_n_vec(shared_ptr<Vector<2>> prev_beta_vec, 
+shared_ptr<Vector<2>> restrict_q_n_vec(shared_ptr<Vector<2>> prev_state_vec, 
                                          shared_ptr<Domain<2>> prev_domain, 
                                          shared_ptr<Domain<2>> curr_domain)
 {
-    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, prev_beta_vec->getNumComponents(), true);
-    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, prev_beta_vec->getNumComponents());
-    restrictor.restrict(prev_beta_vec, new_beta_vec);
-    return new_beta_vec;
+    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, 
+                                        prev_state_vec->getNumComponents(), true);
+    auto new_state_vec = ValVector<2>::GetNewVector(curr_domain, 
+                                                    prev_state_vec->getNumComponents());
+    restrictor.restrict(prev_state_vec, new_state_vec);
+    return new_state_vec;
 }
 
 void sgn_solve(fclaw2d_global_t *glob) 
 {
     // get needed options
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    const fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
+    const fc2d_thunderegg_options_t *te_opt = fc2d_thunderegg_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
   
 #if 0  
@@ -112,7 +114,7 @@ void sgn_solve(fclaw2d_global_t *glob)
     IsNeumannFunc<2> inf = [&](Side<2> s, const array<double, 2> &lower,
                                const array<double, 2> &upper) 
     {
-        return mg_opt->boundary_conditions[s.getIndex()] == 2;
+        return te_opt->boundary_conditions[s.getIndex()] == 2;
     };
 
     // generates levels of patches for GMG;  2 layers of ghost cells    
@@ -122,19 +124,19 @@ void sgn_solve(fclaw2d_global_t *glob)
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
     /* Store q = (h,hu,hv) at time level n */
-    shared_ptr<Vector<2>> beta_vec = make_shared<fc2d_thunderegg_vector>(glob,STORE_STATE);    
+    shared_ptr<Vector<2>> state_vec = make_shared<fc2d_thunderegg_vector>(glob,STORE_STATE);    
 
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    auto op = make_shared<sgn>(glob,beta_vec,te_domain,ghost_filler);
+    auto op = make_shared<sgn>(glob,state_vec,te_domain,ghost_filler);
 
     // set the patch solver
     shared_ptr<PatchSolver<2>>  solver;
     solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                 mg_opt->patch_bcgs_tol,
-                                                 mg_opt->patch_bcgs_max_it,
+                                                 te_opt->patch_bcgs_tol,
+                                                 te_opt->patch_bcgs_max_it,
                                                  true);
 
     // create matrix
@@ -143,17 +145,17 @@ void sgn_solve(fclaw2d_global_t *glob)
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
 
-    if (mg_opt->mg_prec && domain_gen.hasCoarserDomain())
+    if (te_opt->mg_prec && domain_gen.hasCoarserDomain())
     {
         // options
         GMG::CycleOpts copts;
-        copts.max_levels = mg_opt->max_levels;
-        copts.patches_per_proc = mg_opt->patches_per_proc;
-        copts.pre_sweeps = mg_opt->pre_sweeps;
-        copts.post_sweeps = mg_opt->post_sweeps;
-        copts.mid_sweeps = mg_opt->mid_sweeps;
-        copts.coarse_sweeps = mg_opt->coarse_sweeps;
-        copts.cycle_type = mg_opt->cycle_type;
+        copts.max_levels = te_opt->max_levels;
+        copts.patches_per_proc = te_opt->patches_per_proc;
+        copts.pre_sweeps = te_opt->pre_sweeps;
+        copts.post_sweeps = te_opt->post_sweeps;
+        copts.mid_sweeps = te_opt->mid_sweeps;
+        copts.coarse_sweeps = te_opt->coarse_sweeps;
+        copts.cycle_type = te_opt->cycle_type;
 
         //GMG cycle builder
         GMG::CycleBuilder<2> builder(copts);
@@ -182,7 +184,7 @@ void sgn_solve(fclaw2d_global_t *glob)
         builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
 
         //add intermediate levels
-        auto prev_phi_n_vec = beta_vec;
+        auto prev_q_n_vec = state_vec;
         auto prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
@@ -191,16 +193,16 @@ void sgn_solve(fclaw2d_global_t *glob)
 
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-            auto restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, 
+            auto restricted_q_n_vec = restrict_q_n_vec(prev_q_n_vec, 
                                                            prev_domain, curr_domain);
-            patch_operator = make_shared<sgn>(glob,restricted_phi_n_vec,curr_domain, ghost_filler);
-            prev_phi_n_vec = restricted_phi_n_vec;
+            patch_operator = make_shared<sgn>(glob,restricted_q_n_vec,curr_domain, ghost_filler);
+            prev_q_n_vec = restricted_q_n_vec;
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
             smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it,
+                                                           te_opt->patch_bcgs_tol,
+                                                           te_opt->patch_bcgs_max_it,
                                                            true);
 
             //restrictor
@@ -227,13 +229,13 @@ void sgn_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        auto restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<sgn>(glob,restricted_phi_n_vec, curr_domain, ghost_filler);
+        auto restricted_q_n_vec = restrict_q_n_vec(prev_q_n_vec, prev_domain, curr_domain);
+        patch_operator = make_shared<sgn>(glob,restricted_q_n_vec, curr_domain, ghost_filler);
 
         //smoother
         smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                       mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it,
+                                                       te_opt->patch_bcgs_tol,
+                                                       te_opt->patch_bcgs_max_it,
                                                        true);
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
@@ -257,7 +259,7 @@ void sgn_solve(fclaw2d_global_t *glob)
 #endif    
 
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol, 
+    int its = BiCGStab<2>::solve(vg, A, u, f, M, te_opt->max_it, te_opt->tol, 
                                  nullptr, //no timer
                                  true); //output iteration information to cout
 

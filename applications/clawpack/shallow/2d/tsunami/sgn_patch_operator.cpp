@@ -42,71 +42,65 @@ void sgn::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     int mx = pinfo->ns[0]; 
     int my = pinfo->ns[1];
 
-#if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
-#endif    
-
     /* Apply boundary conditions */
     for(int m = 0; m < mfields; m++)
     {
-        LocalData<2>& u = const_cast<LocalData<2>&>(us[m]);
+        LocalData<2>& D = const_cast<LocalData<2>&>(us[m]);
 
         if (!pinfo->hasNbr(Side<2>::west()))
         {
             /* Physical boundary */
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+            auto ghosts = D.getGhostSliceOnSide(Side<2>::west(),1);
             for(int j = 0; j < my; j++)
-                ghosts[{j}] = s[0]*u[{0,j}];
+                ghosts[{j}] = s[0]*D[{0,j}];
         }
         else if (interior_dirichlet)
         {
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+            auto ghosts = D.getGhostSliceOnSide(Side<2>::west(),1);
             for(int j = 0; j < my; j++)
-                ghosts[{j}] = -u[{0,j}];
+                ghosts[{j}] = -D[{0,j}];
         }
 
         if (!pinfo->hasNbr(Side<2>::east()))
         {
             /* Physical boundary */
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+            auto ghosts = D.getGhostSliceOnSide(Side<2>::east(),1);
             for(int j = 0; j < my; j++)
-                ghosts[{j}] = s[1]*u[{mx-1,j}];            
+                ghosts[{j}] = s[1]*D[{mx-1,j}];            
         } 
         else if (interior_dirichlet)
         {
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+            auto ghosts = D.getGhostSliceOnSide(Side<2>::east(),1);
             for(int j = 0; j < my; j++)
-                ghosts[{j}] = -u[{mx-1,j}];
+                ghosts[{j}] = -D[{mx-1,j}];
         }
 
         if (!pinfo->hasNbr(Side<2>::south()))
         {
             /* Physical boundary */
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+            auto ghosts = D.getGhostSliceOnSide(Side<2>::south(),1);
             for(int i = 0; i < mx; i++)
-                ghosts[{i}] = s[2]*u[{i,0}];
+                ghosts[{i}] = s[2]*D[{i,0}];
         }
         else if (interior_dirichlet)
         {
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+            auto ghosts = D.getGhostSliceOnSide(Side<2>::south(),1);
             for(int i = 0; i < mx; i++)
-                ghosts[{i}] = -u[{i,0}];
+                ghosts[{i}] = -D[{i,0}];
         }
 
         if (!pinfo->hasNbr(Side<2>::north()))
         {
             /* Physical boundary */
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+            auto ghosts = D.getGhostSliceOnSide(Side<2>::north(),1);
             for(int i = 0; i < mx; i++)
-                ghosts[{i}] = s[3]*u[{i,my-1}];
+                ghosts[{i}] = s[3]*D[{i,my-1}];
         }
         else if (interior_dirichlet)
         {
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+            auto ghosts = D.getGhostSliceOnSide(Side<2>::north(),1);
             for(int i = 0; i < mx; i++)
-                ghosts[{i}] = -u[{i,my-1}];
+                ghosts[{i}] = -D[{i,my-1}];
         }
     }
 
@@ -145,11 +139,10 @@ void sgn::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     LocalData<2> h = q_n->getLocalData(0,pinfo->local_index);
 
 
-    for(int j = 0; j < my; j++)
+    for(int i = 0; i < mx; i++)
     {
-        for(int i = 0; i < mx; i++)
+        for(int j = 0; j < my; j++)
         {
-
             double hc = h[{i,j}];
 
             double hl = h[{i-1,j}];
@@ -166,11 +159,13 @@ void sgn::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             double dxh = (hr - hl)/(2*dx);
             double dyh = (hu - hd)/(2*dy);
 
+
             double hc2 = hc*hc;
 
             if (hc <= 0)
             {
-                fclaw_global_essentialf("sgn_patch_operator : h(i,j) = 0\n");
+                fclaw_global_essentialf("sgn_patch_operator : h(i,j) = 0;  %5d %5d %12.4e\n",
+                                        i,j,hc);
                 exit(0);
             }
 
@@ -188,15 +183,18 @@ void sgn::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
             double dyDy = (Dy[{i,j+1}] - Dy[{i,j-1}])/(2*dy);            
 
             Fx[{i,j}]   = -alpha/3.0*dxh3Dx + hc*Dx[{i,j}] - 
-                           alpha*hc*(hc*dxh*dyDy + hc2*dxyDy/3.0);
+                           0*alpha*hc*(hc*dxh*dyDy + hc2*dxyDy/3.0);
             Fy[{i,j}]   = -alpha/3.0*dyh3Dy + hc*Dy[{i,j}] - 
                            alpha*hc*(hc*dyh*dxDx + hc2*dxyDx/3.0);
 
-            printf("%5d %5d %12.4e %12.4e %12.4e\n",i,j,h[{i,j}],Fx[{i,j}],Fy[{i,j}]);
+            Fy[{i,j}] = Dy[{i,j}];
+
+            if (abs(Fy[{i,j}]) > 1e-10 || abs(Dy[{i,j}]) > 1e-10)
+            {
+                //printf("%5d %5d %12.4e %12.4e\n",i,j,Dy[{i,j}],Fy[{i,j}]);            
+            }
         }
     }
-    printf("Done with patch iteration\n\n");
-    
 }
 
 

@@ -87,7 +87,6 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw_opt->by = mx*dx;   // To get square mesh cells for pseudo 1d problem
 
-
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 

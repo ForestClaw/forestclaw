@@ -72,29 +72,10 @@ subroutine sgn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
 
                 rhs(i,j,m) = h*(grav/alpha*deta + (-2*R1 + R2))
             end do
+            rhs(i,j,2) = 0
         end do
     end do
 
 end subroutine sgn_fort_rhs
 
-
-subroutine sgn_update_q(mbc,mx,my,meqn,mfields,rhs,q)
-    IMPLICIT NONE
-
-    INTEGER mbc,mx,my, mfields, meqn
-    DOUBLE PRECISION rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)    
-    DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-
-    INTEGER i,j, m
-
-    do m = 1,2
-        do j = 1-mbc,my+mbc
-            do i = 1-mbc,mx+mbc
-                q(i,j,m) = rhs(i,j,m)
-            end do
-        end do
-    end do
-100 format(2F16.8)
-
-end subroutine sgn_update_q
 

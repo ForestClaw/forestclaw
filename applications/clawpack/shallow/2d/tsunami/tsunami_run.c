@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 
 #include <fclaw2d_forestclaw.h>
+
+#include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_advance.h>
@@ -36,6 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_vtable.h>
+
+#include <fclaw2d_clawpatch.hpp>
+#include <fclaw2d_clawpatch.h>
 
 #include <fclaw2d_elliptic_solver.h>
 
@@ -84,6 +89,47 @@ void save_time_step(fclaw2d_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
 }
+
+
+/* Update q with solution to SGN */
+static
+void cb_sgn_update_q(fclaw2d_domain_t *domain,
+                  fclaw2d_patch_t *patch,
+                  int blockno, int patchno,
+                  void *user)
+{
+    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(g->glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    /* SGN solution D stored in RHS */
+    double* D;
+    int mfields;
+    fclaw2d_clawpatch_rhs_data(g->glob, patch, &D, &mfields);
+
+    double* q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(g->glob, patch, &q, &meqn);
+
+    double *aux;
+    int maux;
+    fclaw2d_clawpatch_aux_data(g->glob,patch,&aux,&maux);
+
+    double dt = g->glob->curr_dt;
+    double t = g->glob->curr_time;
+    SGN_UPDATE_Q(&mx,&my,&mbc,&meqn,&mfields,&xlower, &ylower, 
+                 &dx, &dy, &t, &dt, &maux, aux, q, D);
+} 
+
+static
+void tsunami_run_update_q(fclaw2d_global_t *glob)
+{
+    fclaw2d_global_iterate_patches(glob, cb_sgn_update_q, NULL);
+}
+
 
 
 /* -------------------------------------------------------------------------------
@@ -209,6 +255,13 @@ void outstyle_1(fclaw2d_global_t *glob)
                     continue;
                 }
             }
+
+            /* We are happy with the hyperbolic step and step size;  now solve elliptic problem */
+            fclaw2d_elliptic_solve(glob);
+
+            /* Update q with SGN solution. */
+            tsunami_run_update_q(glob);
+
 
             /* We are happy with this step */
             n_inner++;
@@ -385,12 +438,19 @@ void outstyle_3(fclaw2d_global_t *glob)
             }
         }
 
-#if 1
         /* We are happy with the hyperbolic step and step size;  now solve elliptic problem */
-        printf("Solving SGN ...\n");
+        int time_interp = 0;
+        fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
+                             time_interp,FCLAW2D_TIMER_NONE);
+
         fclaw2d_elliptic_solve(glob);
-        printf("Done ...\n");
-#endif        
+
+        /* Update q with SGN solution. */
+        tsunami_run_update_q(glob);
+
+        /* Re-do ghost cells */
+        fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
+                             time_interp,FCLAW2D_TIMER_NONE);
 
         /* We are happy with this time step */
         t_curr = tc;

@@ -18,6 +18,7 @@ applications_clawpack_shallow_2d_tsunami_tsunami_SOURCES = \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/sgn_apply_bc.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/sgn_eval_bc.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/sgn_fort_rhs.f90 \
+	applications/clawpack/shallow/2d/tsunami/user_4.6/sgn_update_q.f90 \
 	applications/clawpack/shallow/2d/tsunami/bathy.f90 \
 	applications/clawpack/shallow/2d/rp/swe_simple_riemann.f90 \
 	applications/clawpack/shallow/2d/rp/rpn2_tsunami.f90 \

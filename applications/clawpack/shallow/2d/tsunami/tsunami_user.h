@@ -117,10 +117,12 @@ void SGN_FORT_RHS(const int* blockno, const int* mbc, const int* mx,
 
 #define SGN_UPDATE_Q FCLAW_F77_FUNC(sgn_update_q,SGN_UPDATE_Q)
 
-void SGN_UPDATE_Q(const int* mbc, const int* mx, 
-                   const int* my, const int* meqn, 
-                   const int* mfields, double rhs[],
-                   double q[]);
+void SGN_UPDATE_Q(const int* mx, const int *my, const int* mbc, const int* meqn,
+                  const int* mfields, const double* xlower, const double* ylower,
+                  const double* dx, const double* dy, 
+                  const double *t, const double* dt, 
+                  const int* maux, 
+                  double aux[], double q[], double D[]);
 
 
 #if 0

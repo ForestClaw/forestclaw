@@ -30,7 +30,7 @@ subroutine sgn_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
     double precision rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
 
     !! Dummy arrays needed to apply boundary conditions
-    double precision qh(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
+    double precision Dh(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
 
     integer i,j, m, iface, idir, i1, ig, ic, j1, jg, jc
     double precision d, h, x, y, g
@@ -56,7 +56,7 @@ subroutine sgn_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         !! Homogeneous array;  this is overkill - we don't need the entire array.
         do i = 1-mbc,mx+mbc
             do j = 1-mbc,my+mbc
-                qh(i,j,m) = 0
+                Dh(i,j,m) = 0
             end do
         end do
 
@@ -123,7 +123,7 @@ subroutine sgn_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
                         if (ccheck) then
                             uI = rhs(ic,j,m)
                         endif
-                        qh(ig,j,m) = (g - dI*uI)/d
+                        Dh(ig,j,m) = (g - dI*uI)/d
                     end do
                 elseif (idir .eq. 1) then
                     if (iface .eq. 2) then
@@ -149,7 +149,7 @@ subroutine sgn_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
                             uI = rhs(i,jc,m)
                         endif
 
-                        qh(i,jg,m) = (g - dI*uI)/d
+                        Dh(i,jg,m) = (g - dI*uI)/d
                     end do
                 endif
             endif
@@ -166,10 +166,10 @@ subroutine sgn_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         if (intersects_bc(0) .ne. 0) then
             do j = 1,my
                 if (ccheck) then
-                    flux(0) = (rhs(1,j,m) - qh(0,j,m))/dx
+                    flux(0) = (rhs(1,j,m) - Dh(0,j,m))/dx
                     flux_sum(m) = flux_sum(m) - flux(0)*dy    
                 else
-                    flux(0) = (qh(1,j,m) - qh(0,j,m))/dx
+                    flux(0) = (Dh(1,j,m) - Dh(0,j,m))/dx
                     rhs(1,j,m) = rhs(1,j,m) - (-flux(0)/dx)
                 endif
             end do
@@ -178,10 +178,10 @@ subroutine sgn_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         if (intersects_bc(1) .ne. 0) then
             do j = 1,my
                 if (ccheck) then
-                    flux(1) = (qh(mx+1,j,m) - rhs(mx,j,m))/dx
+                    flux(1) = (Dh(mx+1,j,m) - rhs(mx,j,m))/dx
                     flux_sum(m) = flux_sum(m) + flux(1)*dy
                 else
-                    flux(1) = (qh(mx+1,j,m) - qh(mx,j,m))/dx
+                    flux(1) = (Dh(mx+1,j,m) - Dh(mx,j,m))/dx
                     rhs(mx,j,m) = rhs(mx,j,m) - (flux(1)/dx)
                 endif
             end do
@@ -190,10 +190,10 @@ subroutine sgn_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         if (intersects_bc(2) .ne. 0) then
             do i = 1,mx
                 if (ccheck) then
-                    flux(2) = (rhs(i,1,m) - qh(i,0,m))/dy
+                    flux(2) = (rhs(i,1,m) - Dh(i,0,m))/dy
                     flux_sum(m) = flux_sum(m) - flux(2)*dx
                 else
-                    flux(2) = (qh(i,1,m) - qh(i,0,m))/dy
+                    flux(2) = (Dh(i,1,m) - Dh(i,0,m))/dy
                     rhs(i,1,m) = rhs(i,1,m) - (-flux(2)/dy)
                 endif
             end do
@@ -202,10 +202,10 @@ subroutine sgn_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         if (intersects_bc(3) .ne. 0) then
             do i = 1,mx
                 if (ccheck) then
-                    flux(3) = (qh(i,my+1,m) - rhs(i,my,m))/dy           
+                    flux(3) = (Dh(i,my+1,m) - rhs(i,my,m))/dy           
                     flux_sum(m) = flux_sum(m) + flux(3)*dx
                 else
-                    flux(3) = (qh(i,my+1,m) - qh(i,my,m))/dy           
+                    flux(3) = (Dh(i,my+1,m) - Dh(i,my,m))/dy           
                     rhs(i,my,m) = rhs(i,my,m) - (flux(3)/dy)
                 endif
             end do
