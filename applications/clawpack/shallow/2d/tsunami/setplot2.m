@@ -30,6 +30,6 @@ end
 
 x0 = 0;
 y0 = 0;
-ScatterStyle = setplotstyle('b.','r*','cs','gp','bo','k*');
+ScatterStyle = setplotstyle('g.','r.','k.','b.','m.','k.');
 
 PlotParallelPartitions=0;
