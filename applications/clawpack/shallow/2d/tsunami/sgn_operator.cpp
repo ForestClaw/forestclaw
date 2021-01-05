@@ -73,6 +73,7 @@ shared_ptr<Vector<2>> restrict_q_n_vec(shared_ptr<Vector<2>> prev_state_vec,
 {
     GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, 
                                         prev_state_vec->getNumComponents(), true);
+
     auto new_state_vec = ValVector<2>::GetNewVector(curr_domain, 
                                                     prev_state_vec->getNumComponents());
     restrictor.restrict(prev_state_vec, new_state_vec);
@@ -91,10 +92,14 @@ void sgn_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS,
+                                                                  clawpatch_opt->rhs_fields);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+
+    bool continue_on_breakdown = false;
+    bool output = false;
 
     // get p4est structure
     fclaw2d_domain_t *domain = glob->domain;
@@ -124,7 +129,9 @@ void sgn_solve(fclaw2d_global_t *glob)
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
     /* Store q = (h,hu,hv) at time level n */
-    shared_ptr<Vector<2>> state_vec = make_shared<fc2d_thunderegg_vector>(glob,STORE_STATE);    
+    shared_ptr<Vector<2>> state_vec = make_shared<fc2d_thunderegg_vector>(glob,
+                                                                          STORE_STATE,
+                                                                          clawpatch_opt->meqn);    
 
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
@@ -137,7 +144,7 @@ void sgn_solve(fclaw2d_global_t *glob)
     solver = make_shared<BiCGStabPatchSolver<2>>(op,
                                                  te_opt->patch_bcgs_tol,
                                                  te_opt->patch_bcgs_max_it,
-                                                 true);
+                                                 false);
 
     // create matrix
     shared_ptr<Operator<2>> A = op;
@@ -203,7 +210,7 @@ void sgn_solve(fclaw2d_global_t *glob)
             smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
                                                            te_opt->patch_bcgs_tol,
                                                            te_opt->patch_bcgs_max_it,
-                                                           true);
+                                                           continue_on_breakdown);
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
@@ -236,7 +243,7 @@ void sgn_solve(fclaw2d_global_t *glob)
         smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
                                                        te_opt->patch_bcgs_tol,
                                                        te_opt->patch_bcgs_max_it,
-                                                       true);
+                                                       continue_on_breakdown);
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
@@ -253,20 +260,22 @@ void sgn_solve(fclaw2d_global_t *glob)
 
 #if 0
     // Set starting conditions
+    printf("sgn_operator : Need to set an initial condition.");
+    exit(0);
     shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
 #else
-    shared_ptr<Vector<2>> u = vg->getNewVector();
+    shared_ptr<Vector<2>> D = vg->getNewVector();
 #endif    
 
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M, te_opt->max_it, te_opt->tol, 
+    int its = BiCGStab<2>::solve(vg, A, D, f, M, te_opt->max_it, te_opt->tol, 
                                  nullptr, //no timer
-                                 true); //output iteration information to cout
+                                 output); //output iteration information to cout
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 
     /* Solution is copied to right hand side */
-    f->copy(u);
+    f->copy(D);
 
 #if 0    
     fclaw_global_productionf("f-2norm:   %24.16f\n", f->twoNorm());

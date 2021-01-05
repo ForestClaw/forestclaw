@@ -256,11 +256,20 @@ void outstyle_1(fclaw2d_global_t *glob)
                 }
             }
 
+            int time_interp = 0;
+            fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
+                                 time_interp,FCLAW2D_TIMER_NONE);
+
             /* We are happy with the hyperbolic step and step size;  now solve elliptic problem */
             fclaw2d_elliptic_solve(glob);
 
             /* Update q with SGN solution. */
             tsunami_run_update_q(glob);
+
+
+            /* Re-do ghost cells */
+            fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
+                                 time_interp,FCLAW2D_TIMER_NONE);
 
 
             /* We are happy with this step */
@@ -440,12 +449,10 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         /* We are happy with the hyperbolic step and step size;  now solve elliptic problem */
         int time_interp = 0;
-        fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
-                             time_interp,FCLAW2D_TIMER_NONE);
 
         fclaw2d_elliptic_solve(glob);
 
-        /* Update q with SGN solution. */
+        /* Update q with SGN solution.   Use first order update. */
         tsunami_run_update_q(glob);
 
         /* Re-do ghost cells */

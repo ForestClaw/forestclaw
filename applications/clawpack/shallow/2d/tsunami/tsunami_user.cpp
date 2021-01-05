@@ -95,6 +95,70 @@ void tsunami_rhs(fclaw2d_global_t *glob,
                  &xlower, &ylower, &dx, &dy,q,rhs);
 }
 
+#if 0
+int tsunami_tag4refinement(fclaw2d_global_t *glob,
+                             fclaw2d_patch_t *this_patch,
+                             int blockno, int patchno,
+                             int initflag)
+{
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+
+    int tag_patch;
+    double refine_threshold;
+
+    refine_threshold = fclaw_opt->refine_threshold;
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+
+    tag_patch = 0;
+    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                      &blockno, q,&refine_threshold,
+                                      &initflag,&tag_patch);
+    return tag_patch;
+}
+
+static
+int tsunami_tag4coarsening(fclaw2d_global_t *glob,
+                             fclaw2d_patch_t *fine_patches,
+                             int blockno,
+                             int patchno,
+                             int initflag)
+{
+    fclaw2d_patch_t *patch0 = &fine_patches[0];
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    double coarsen_threshold = fclaw_opt->coarsen_threshold;
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *q[4];
+    int meqn;
+    for (int igrid = 0; igrid < 4; igrid++)
+    {
+        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+    }
+
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+    int tag_patch = 0;
+    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                      &blockno, q[0],q[1],q[2],q[3],
+                                      &coarsen_threshold,&initflag,&tag_patch);
+    return tag_patch == 1;
+}
+#endif
 
 void tsunami_link_solvers(fclaw2d_global_t *glob)
 {
@@ -120,6 +184,9 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
     mg_vt->fort_apply_bc = &SGN_FORT_APPLY_BC;
     mg_vt->fort_eval_bc  = &SGN_NEUMANN;   // For non-homogeneous BCs
 
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
+    clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 }
 
 

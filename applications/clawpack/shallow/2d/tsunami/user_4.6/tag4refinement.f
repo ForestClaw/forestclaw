@@ -14,7 +14,7 @@
       logical fclaw2d_map_is_used
 
       integer i,j, mq
-      double precision qmin, qmax, xc, yc
+      double precision qmin, qmax, xc, yc, bathy, hij
       
 
 
@@ -22,15 +22,18 @@
 
       cont = get_context()
 
+      bathy = -1
+
 c     # Refine based only on first variable in system.
       mq = 1
-      qmin = q(1,1,mq)
-      qmax = q(1,1,mq)
+      qmin = q(1,1,mq) + bathy
+      qmax = q(1,1,mq) + bathy
       do j = 1,my
          do i = 1,mx
-            qmin = min(q(i,j,mq),qmin)
-            qmax = max(q(i,j,mq),qmax)
-            if ((qmax-qmin) .gt. tag_threshold) then
+            hij = q(i,j,1)
+            qmin = min(hij + bathy,qmin)
+            qmax = max(hij + bathy,qmax)
+            if ((qmax) .gt. tag_threshold) then
                tag_patch = 1
                return
             endif

@@ -2,7 +2,7 @@ subroutine sgn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
                          xlower,ylower,dx,dy,q,rhs)
     IMPLICIT NONE
 
-    INTEGER mbc,mx,my, mfields, meqn
+    INTEGER mbc,mx,my, mfields, meqn, blockno
     DOUBLE PRECISION xlower,ylower,dx,dy
     DOUBLE PRECISION rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)    
     DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -18,10 +18,11 @@ subroutine sgn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
     DOUBLE PRECISION v(1-mbc:mx+mbc,1-mbc:my+mbc)
     DOUBLE PRECISION c(1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    INTEGER i,j, m, blockno
+    INTEGER i,j, m
     DOUBLE PRECISION h, dudx,dudy,dvdx,dvdy, divu
-    double precision dc(2),dh(2),db(2),deta, R1, R2
+    double precision dc(2),dh(2),db(2),deta, R1, R2, r0_norm
 
+    rhs = 0
     do j = 1-mbc,mx+mbc
         do i = 1-mbc,my+mbc
             h = q(i,j,1)
@@ -34,10 +35,8 @@ subroutine sgn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
         end do
     end do
 
-
-
-    do j = 1,my
-        do i = 1,mx
+    do j = 0,my+1
+        do i = 0,mx+1
             !! Compute dudx, dvdx,dudy, dvdy
             dudx = (u(i+1,j) - u(i-1,j))/(2*dx)
             dudy = (u(i,j+1) - u(i,j-1))/(2*dy)
@@ -50,6 +49,7 @@ subroutine sgn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
         end do
     end do
 
+    r0_norm = 0
     do j = 1,my
         do i = 1,mx
 
@@ -72,9 +72,13 @@ subroutine sgn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
 
                 rhs(i,j,m) = h*(grav/alpha*deta + (-2*R1 + R2))
             end do
-            rhs(i,j,2) = 0
+            if (.true.) then
+                !! For pseudo-1d
+                rhs(i,j,2) = 0
+            endif
         end do
     end do
+
 
 end subroutine sgn_fort_rhs
 

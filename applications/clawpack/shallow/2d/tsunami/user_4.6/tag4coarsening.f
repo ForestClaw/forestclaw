@@ -61,13 +61,17 @@ c     # not be coarsened.
       double precision coarsen_threshold
       double precision qmin,qmax
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      double precision bathy
       integer i,j
+
+      bathy = -1
 
       do i = 1,mx
          do j = 1,my
-            qmin = min(q(i,j,mq),qmin)
-            qmax = max(q(i,j,mq),qmax)
-            if ((qmax-qmin) .gt. coarsen_threshold) then
+            qmin = min(q(i,j,mq) + bathy,qmin)
+            qmax = max(q(i,j,mq) + bathy,qmax)
+            if ((qmax) .gt. coarsen_threshold) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
                tag_patch = 0

@@ -113,8 +113,11 @@ void sgn::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 
     double dx = pinfo->spacings[0];
     double dy = pinfo->spacings[1];
-    double dx2 = dx*dx;
-    double dy2 = dy*dy;
+    double dxsq = dx*dx;
+    double dysq = dy*dy;
+    double dx2 = 2*dx;
+    double dy2 = 2*dy;
+    double dxdy4 = 4*dx*dy;
 
     /* We need to discretize this (from Basilisk.fr)
 
@@ -133,35 +136,17 @@ void sgn::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     */
 
     double alpha = sgn_opt->alpha;
+    double a3 = alpha/3;
 
 
     /* Get local view into q_n (component 0) */
     LocalData<2> h = q_n->getLocalData(0,pinfo->local_index);
-
 
     for(int i = 0; i < mx; i++)
     {
         for(int j = 0; j < my; j++)
         {
             double hc = h[{i,j}];
-
-            double hl = h[{i-1,j}];
-            double hr = h[{i+1,j}];
-            double hu = h[{i,j+1}];
-            double hd = h[{i,j-1}];
-
-            /* Compute h^3 at edges */
-            double hl3 = pow((hl + hc)/2.0,3);
-            double hr3 = pow((hr + hc)/2.0,3);
-            double hu3 = pow((hu + hc)/2.0,3);
-            double hd3 = pow((hd + hc)/2.0,3);
-
-            double dxh = (hr - hl)/(2*dx);
-            double dyh = (hu - hd)/(2*dy);
-
-
-            double hc2 = hc*hc;
-
             if (hc <= 0)
             {
                 fclaw_global_essentialf("sgn_patch_operator : h(i,j) = 0;  %5d %5d %12.4e\n",
@@ -169,30 +154,64 @@ void sgn::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
                 exit(0);
             }
 
-            /* Operator without bathymetry */
-            double dxh3Dx = (hl3*Dx[{i-1,j}] - (hl3+hr3)*Dx[{i,j}] + hr3*Dx[{i+1,j}])/dx2;
-            double dyh3Dy = (hd3*Dy[{i,j-1}] - (hu3+hd3)*Dy[{i,j}] + hu3*Dy[{i,j+1}])/dy2;
+            double hc2 = hc*hc;
+            double hc3 = hc2*hc;
 
-            double dxyDx = ((Dx[{i+1,j+1}] - Dx[{i+1,j-1}]) - 
-                            (Dx[{i-1,j+1}] - Dx[{i-1,j-1}]))/(4*dx*dy);
-
-            double dxyDy = ((Dy[{i+1,j+1}] - Dy[{i+1,j-1}]) - 
-                            (Dy[{i-1,j+1}] - Dy[{i-1,j-1}]))/(4*dx*dy);
-
-            double dxDx = (Dx[{i+1,j}] - Dx[{i-1,j}])/(2*dx);
-            double dyDy = (Dy[{i,j+1}] - Dy[{i,j-1}])/(2*dy);            
-
-            Fx[{i,j}]   = -alpha/3.0*dxh3Dx + hc*Dx[{i,j}] - 
-                           0*alpha*hc*(hc*dxh*dyDy + hc2*dxyDy/3.0);
-            Fy[{i,j}]   = -alpha/3.0*dyh3Dy + hc*Dy[{i,j}] - 
-                           alpha*hc*(hc*dyh*dxDx + hc2*dxyDx/3.0);
-
-            Fy[{i,j}] = Dy[{i,j}];
-
-            if (abs(Fy[{i,j}]) > 1e-10 || abs(Dy[{i,j}]) > 1e-10)
             {
-                //printf("%5d %5d %12.4e %12.4e\n",i,j,Dy[{i,j}],Fy[{i,j}]);            
+                double hl = h[{i-1,j}];
+                double hr = h[{i+1,j}];
+                /* Compute h^3 at edges */
+                double hl3 = pow((hl + hc)/2.0,3);
+                double hr3 = pow((hr + hc)/2.0,3);
+
+                double dxh = (hr - hl)/dx2;
+                double dxh3Dx = (hl3*Dx[{i-1,j}] - (hl3+hr3)*Dx[{i,j}] + hr3*Dx[{i+1,j}])/dxsq;
+                double dxyDy = ((Dy[{i+1,j+1}] - Dy[{i+1,j-1}]) - 
+                            (Dy[{i-1,j+1}] - Dy[{i-1,j-1}]))/dxdy4;
+
+                double dyDy = (Dy[{i,j+1}] - Dy[{i,j-1}])/dy2;            
+
+#if 0
+                Fx[{i,j}]   = -a3*dxh3Dx + hc*Dx[{i,j}] - 
+                               alpha*hc*(hc2*dxyDy/3.0 + hc*dxh*dyDy);
+#endif                               
+                Fx[{i,j}]   = -a3*dxh3Dx + hc*Dx[{i,j}] - a3*hc3*dxyDy + alpha*hc2*dxh*dyDy;
+
+
             }
+
+            if (0)
+            {
+                /* Real 2d */
+                double hu = h[{i,j+1}];
+                double hd = h[{i,j-1}];
+
+                double hu3 = pow((hu + hc)/2.0,3);
+                double hd3 = pow((hd + hc)/2.0,3);
+
+                double dyh = (hu - hd)/dy2;     
+
+                /* Operator without bathymetry */
+                double dyh3Dy = (hd3*Dy[{i,j-1}] - (hu3+hd3)*Dy[{i,j}] + hu3*Dy[{i,j+1}])/dysq;
+
+                double dxyDx = ((Dx[{i+1,j+1}] - Dx[{i+1,j-1}]) - 
+                                (Dx[{i-1,j+1}] - Dx[{i-1,j-1}]))/dxdy4;
+
+                double dxDx = (Dx[{i+1,j}] - Dx[{i-1,j}])/dx2;
+
+#if 0
+                Fy[{i,j}]   = -a3*dyh3Dy + hc*Dy[{i,j}] - 
+                               alpha*hc*(hc*dyh*dxDx + hc2*dxyDx/3.0);
+#endif                               
+                Fy[{i,j}]   = -a3*dyh3Dy + hc*Dy[{i,j}] - alpha*hc2*dyh*dxDx + a3*hc3*dxyDx;
+
+            }
+            else
+            {
+                /* pseudo-1d */
+                Fy[{i,j}] = Dy[{i,j}];                
+            }
+
         }
     }
 }
