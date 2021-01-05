@@ -16,7 +16,11 @@ else
 end
 
 xl = [-w,w];
-yl = [-0.02,0.1];
+if (Frame == 0)
+    yl = [-0.02,0.105]
+else
+    yl = [-0.02,0.1];
+end
 
 % Set up moving reference frame
 c = sqrt(g/h0);
@@ -127,7 +131,7 @@ elseif (PlotType == 4)
     axis([xl,yl]);
     set(gca,'xtick',xticks);
         
-    set(gcf,'position',[2110,   509,   835,   189]);
+    set(gcf,'position',[1912,  676, 835,  189]);
     legend(hvec,lstr,'fontsize',12,'location','northwest');
         
     hold off;
