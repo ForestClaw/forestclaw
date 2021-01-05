@@ -310,7 +310,8 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
+    int num_components = 1;
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS,num_components);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -461,7 +462,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
 #if 0   
     // Set starting conditions
-    shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
+    shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN,num_components);
 #else
     shared_ptr<Vector<2>> u = vg->getNewVector();
 #endif    

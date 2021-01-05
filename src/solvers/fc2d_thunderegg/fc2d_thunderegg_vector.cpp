@@ -49,9 +49,11 @@ static int get_num_local_cells(fclaw2d_global_t* glob){
     return domain->local_num_patches * clawpatch_opt->mx * clawpatch_opt->my;
 }
 
-fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_choice)
+fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, 
+                                               int data_choice, 
+                                               int num_components)
     : Vector<2>( MPI_COMM_WORLD,
-                 fclaw2d_clawpatch_get_options(glob)->rhs_fields,
+                 num_components,
                  glob->domain->local_num_patches, 
                  get_num_local_cells(glob) ) 
 {
@@ -61,12 +63,11 @@ fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_
 
     fclaw2d_domain_t *domain = glob->domain;
 
-    mfields = clawpatch_opt->rhs_fields;
-
     ns[0] = clawpatch_opt->mx;
     ns[1] = clawpatch_opt->my;
 
     mbc = clawpatch_opt->mbc;
+    mfields = getNumComponents();
 
     strides[0] = 1;
     strides[1] = ns[0] + 2 * mbc;
@@ -77,7 +78,7 @@ fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_
     strides[1] = strides[0] * (ns[0] + 2 * mbc);
     */
 
-    patch_data.resize(domain->local_num_patches * clawpatch_opt->rhs_fields);
+    patch_data.resize(domain->local_num_patches * mfields);
     switch (data_choice)
     {
         case RHS:
@@ -87,12 +88,10 @@ fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_
             /* Copy solution to start guess */
             fclaw2d_global_iterate_patches(glob, set_start_value, this);
             break;
-#if 1            
         case STORE_STATE:
-            /* Store phi at time level n for use in defining operator */
+            /* Store state at time level n for use in defining operator */
             fclaw2d_global_iterate_patches(glob, store_state, this);
             break;
-#endif            
         default:
             fclaw_global_essentialf("fc2d_thunderegg_vector : no valid data_choice specified\n");
             exit(0);
@@ -156,7 +155,6 @@ void fc2d_thunderegg_vector::set_start_value(fclaw2d_domain_t *domain,
     }
 }
 
-#if 1
 void fc2d_thunderegg_vector::store_state(fclaw2d_domain_t *domain,
                                          fclaw2d_patch_t *patch,
                                          int blockno, int patchno,
@@ -175,6 +173,8 @@ void fc2d_thunderegg_vector::store_state(fclaw2d_domain_t *domain,
     double* q_ptr;
     fclaw2d_clawpatch_soln_data(g->glob, patch, &q_ptr, &meqn);
 
+    FCLAW_ASSERT(vec.mfields == meqn);
+
     // Store points to state on each patch
     // update point to point to non ghost cell
     for(int c = 0; c < meqn; c++)
@@ -184,7 +184,6 @@ void fc2d_thunderegg_vector::store_state(fclaw2d_domain_t *domain,
                                                   vec.mbc * vec.strides[1];
     }
 }
-#endif
 
 
 LocalData<2> fc2d_thunderegg_vector::getLocalDataPriv(int component_index, int local_patch_id) const 

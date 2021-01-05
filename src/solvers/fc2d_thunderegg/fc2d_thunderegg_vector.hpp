@@ -56,10 +56,12 @@ class fc2d_thunderegg_vector : public ThunderEgg::Vector<2> {
      * @brief strides in each direction
      */
     std::array<int, 2> strides;
+
     /**
      * @brief the number of equations
      */
-    int mfields;
+    int mfields;    
+
     /**
      * @brief stride to next eqn in patch
      */
@@ -89,7 +91,7 @@ class fc2d_thunderegg_vector : public ThunderEgg::Vector<2> {
     ThunderEgg::LocalData<2> getLocalDataPriv(int component_index, int local_patch_id) const;
 
    public:
-    fc2d_thunderegg_vector(struct fclaw2d_global *glob, int data_choice);
+    fc2d_thunderegg_vector(struct fclaw2d_global *glob, int data_choice, int num_components);
 
     ThunderEgg::LocalData<2> getLocalData(int component_index, int local_patch_id) override;
     const ThunderEgg::LocalData<2> getLocalData(int component_index, int local_patch_id) const override;
