@@ -98,7 +98,9 @@ void phasefield_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
+    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,
+                                                                  RHS,
+                                                                  clawpatch_opt->rhs_fields);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -131,7 +133,9 @@ void phasefield_solve(fclaw2d_global_t *glob)
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
     /* Store phi at time level n */
-    shared_ptr<Vector<2>> beta_vec = make_shared<fc2d_thunderegg_vector>(glob,STORE_STATE);    
+    shared_ptr<Vector<2>> beta_vec = make_shared<fc2d_thunderegg_vector>(glob,
+                                                                         STORE_STATE,
+                                                                         clawpatch_opt->meqn);    
 
     // ghost filler
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
