@@ -88,12 +88,10 @@ void run_program(fclaw2d_global_t* glob)
     double by = mx*dx;
     fclaw_opt->by = by;   // To get square mesh cells for pseudo 1d problem
 
-#if 0
     int mj = fclaw_opt->mj;
     int my = clawpatch_opt->my;
     double dy = (by-0)/(mj*my);
     printf("tsunami.cpp : (by,dx) = %f %f\n",fclaw_opt->by,dy);
-#endif    
 
 
     /* Initialize virtual table for ForestClaw */

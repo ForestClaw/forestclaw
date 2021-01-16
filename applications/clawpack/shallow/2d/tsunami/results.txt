@@ -1,0 +1,173 @@
+------------------------------------------------------------
+                         1/4/2020
+------------------------------------------------------------
+
+SGN operator works!   
+
+Test case (no refinement so far)
+
+     # Grid dimensions
+     mx = 32               # mx_leaf
+     my = 32               # my_leaf
+
+     # Regridding information
+     minlevel = 4               # Minimum level
+     maxlevel = 4              # Maximum levels of refinement
+
+     # Time stepping
+     tfinal = 128
+     
+     # initial_dt = 0.1047505286036417 
+     initial_dt = 0.2
+
+     use_fixed_dt = F           # Take a fixed time step
+     max_cfl = 1.0
+     desired_cfl = 0.8
+
+     outstyle = 1                 # OutputStyle = 1,2,3 (see below, e.g. [OutputStyle_1]
+     nout = 8                  # Used for all three out styles
+     nstep = 40                   # Only used if outstyle is 3
+
+     mi = 1    # 128
+     mj = 1
+
+     # Used only if manifold = F (fclaw2d_map_nomap)
+     ax = 0
+     bx = 128  # 4096
+     ay = 0 
+     by = 128  # This gets set to dx*mx so that mesh cells are square;  
+
+-----------------
+Timing results : 
+-----------------
+
+    # initial_dt = 0.1047505286036417 
+     initial_dt = 0.2
+
+     use_fixed_dt = T           # Take a fixed time step
+     max_cfl = 1.0
+     desired_cfl = 0.8
+
+     outstyle = 3                 # OutputStyle = 1,2,3 (see below, e.g. [OutputStyle_1]
+     nout = 3                  # Used for all three out styles
+     nstep = 1    
+
+     output = F
+
+
+Compiler switches : -O2
+
+Three steps with fixed time step (before any optimizations)
+
+* mx = 32
+* minlevel=maxlevel=2  (4x4 grid of patches)
+* Serial runs
+
+Full 2d : 
+
+WALLTIME      ELLIPTIC_SOLVE
+----------------------------
+ 148.307          147.822      Full 2d  (approx 13 iterations/step, no optimization)
+  19.4625          18.9821     Pseudo 1d (approx 3 iterations/step, with some optimization)
+
+
+
+------------------------------------------------------------
+                         1/15/2020
+------------------------------------------------------------
+
+Multi-block working. 
+
+# For 32x32 patches   (32*128  =  4096 = 2^12 at level 0)
+# For 32x32 patches   (32*256  =  8192 = 2^13 at level 0)
+# For 32x32 patches   (32*512  = 16384 = 2^14 at level 0)
+# For 32x32 patches   (32*1024 = 32768 = 2^15 at level 0)
+
+
+-------------------------------------------------
+* mx = my = 32;  mi = 128; mj = 1
+* dt = 0.753;  CFL = 0.8
+* Tfinal = 2000
+* minlevel=maxlevel=0
+* Domain [0,L]x[0,by]
+* dt_initial = 0.8
+
+L = 4096;   by = (L)/(mi*mx)
+
+
+Effective Resolution : 32*128 = 4096 = 2^12;  dx = 1
+-----------------------------------------------------
+
+* mx = my = 32;  mi = 256; mj = 1
+* dt = 0.753;  CFL = 0.8
+* Tfinal = 2000
+* minlevel=maxlevel=0
+* Domain [0,L]x[0,by]
+* dt_initial = 0.4
+
+L = 4096;   by = (L)/(mi*mx)
+
+
+Effective Resolution : 32*256 = 8192 = 2^13;  dx = 0.5
+------------------------------------------------------
+
+* mx = my = 32;  mi = 256; mj = 1
+* dt = 0.753;  CFL = 0.8
+* Tfinal = 2000
+* minlevel=maxlevel=0
+* Domain [0,L]x[0,by]
+* dt_initial = 0.2
+
+L = 4096;   dy = (L)/(mi*mx) = dx;  by = my*dy
+
+
+Effective Resolution : 32*256 = 16384 = 2^14;  dx = 0.25
+-------------------------------------------------------
+
+* mx = my = 32;  mi = 512; mj = 1
+* dt = 0.753;  CFL = 0.8
+* Tfinal = 2000
+* minlevel=maxlevel=0
+* Domain [0,L]x[0,by]
+* dt_initial = 0.1
+
+L = 4096;   dy = (L)/(mi*mx) = dx;  by = my*dy
+
+
+Effective Resolution : 32*512 = 32768 = 2^15;  dx = 0.125
+-------------------------------------------------------
+
+mx = 8 (mi = 128)
+-----------------
+level 0 :  2^10   dt = 3.2
+level 1 :  2^11   dt = 1.6
+level 2 :  2^12   dt = 0.8
+level 3 :  2^13   dt = 0.4
+level 4 :  2^14   dt = 0.2
+level 5 :  2^15   dt = 0.1
+
+mxx = 16 (mi = 128)
+-----------------
+level 0 :  2^11   dt = 1.6
+level 1 :  2^12   dt = 0.8
+level 2 :  2^13   dt = 0.4
+level 3 :  2^14   dt = 0.2
+level 4 :  2^15   dt = 0.1
+
+
+mx = 32 (mi = 128)
+-----------------
+level 0 :  2^12   dt = 0.8
+level 1 :  2^13   dt = 0.4
+level 2 :  2^14   dt = 0.2
+level 3 :  2^15   dt = 0.1
+
+
+
+
+
+
+
+Time : 
+
+
