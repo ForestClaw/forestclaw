@@ -828,6 +828,8 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 		FCLAW_ASSERT(clawpatch_vt->fort_local_ghost_pack_aux != NULL);
 		/* This should be renamed, since it doesn't point to an actual
 		   Fortran routine (or one with a fortran like signature) */
+		
+		int mint = mx/2;  /* Not clear why this is needed for activeflux */
 		clawpatch_vt->fort_local_ghost_pack_aux(glob,this_patch,mint,
 		                                        qpack,extrasize,
 		                                        packmode,&ierror);
@@ -965,6 +967,10 @@ size_t clawpatch_partition_packsize(fclaw2d_global_t* glob)
 	int my = clawpatch_opt->my;
 	int mbc = clawpatch_opt->mbc;
 	int meqn = clawpatch_opt->meqn;
+
+	/* Need to account for aux arrays, if they are packed and cannot be recreated
+	   on the other side of the partition */
+
 	size_t psize = (2*mbc + mx)*(2*mbc + my)*meqn;  /* Store area */
 	return psize*sizeof(double);
 }
