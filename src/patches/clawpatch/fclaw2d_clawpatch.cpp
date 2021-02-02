@@ -829,7 +829,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 		/* This should be renamed, since it doesn't point to an actual
 		   Fortran routine (or one with a fortran like signature) */
 		
-		int mint = mx/2;  /* Not clear why this is needed for activeflux */
+		// int mint = mx/2;  /* Something like this is needed if we need the entire patch */
 		clawpatch_vt->fort_local_ghost_pack_aux(glob,this_patch,mint,
 		                                        qpack,extrasize,
 		                                        packmode,&ierror);
