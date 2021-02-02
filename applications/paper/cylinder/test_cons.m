@@ -6,7 +6,12 @@ if (nargin == 0)
     f = 0;
 end
 
-map = 'cylinder';    % 'cylinder', 'latlong'
+map = 'latlong';    % 'cylinder', 'latlong'
+
+exact = false;
+exact_discrete = false;  % For spherical coordinates
+f_phi = 0.75;   % Fraction from 0 to 1;  0.5 is the equator
+
 
 R_cyl = 1;
 H_cyl = 2*pi*R_cyl;
@@ -33,9 +38,6 @@ switch map
         tensors = @latlong_tensors;
 end
 
-exact = false;
-exact_discrete = false;  % For spherical coordinates
-f_phi = 0.75;   % Fraction from 0 to 1;  0.5 is the equator
 
 minlevel = 1;
 maxlevel = 2;
