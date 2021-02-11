@@ -164,6 +164,14 @@ void square_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_tag4refinement = &SQUARE_TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &SQUARE_TAG4COARSENING;        
 
+    if (0)
+    {        
+        clawpatch_vt->fort_interpolate2fine      = SQUARE_FORT_INTERPOLATE2FINE;
+        clawpatch_vt->fort_interpolate_face      = SQUARE_FORT_INTERPOLATE_FACE;
+        clawpatch_vt->fort_interpolate_corner    = SQUARE_FORT_INTERPOLATE_CORNER;
+    }
+
+
     /* Include error in output files */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error)

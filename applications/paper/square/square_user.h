@@ -243,7 +243,7 @@ void  SQUARE_TAG4COARSENING(const int* mx, const int* my,
 
 
 
-#if 0
+#if 1
 #define SQUARE_TAG4REFINEMENT_WAVELET FCLAW_F77_FUNC(square_tag4refinement_wavelet, \
                                               SQUARE_TAG4REFINEMENT_WAVELET)
 void  SQUARE_TAG4REFINEMENT_WAVELET(const int* mx,const int* my,
@@ -269,10 +269,10 @@ void  SQUARE_TAG4COARSENING_WAVELET(const int* mx, const int* my,
                              int* tag_patch);
 
 
-#define PERIODIC_FORT_INTERPOLATE_FACE \
-              FCLAW_F77_FUNC(periodic_fort_interpolate_face, \
+#define SQUARE_FORT_INTERPOLATE_FACE \
+              FCLAW_F77_FUNC(square_fort_interpolate_face, \
                              PERIODIC_FORT_INTERPOLATE_FACE)
-void PERIODIC_FORT_INTERPOLATE_FACE(const int* mx, const int* my, 
+void SQUARE_FORT_INTERPOLATE_FACE(const int* mx, const int* my, 
                                     const int* mbc,const int* meqn,
                                     double qcoarse[],double qfine[],
                                     const int* idir, const int* iside,
@@ -282,20 +282,20 @@ void PERIODIC_FORT_INTERPOLATE_FACE(const int* mx, const int* my,
                                     transform_cptr);
 
 
-#define PERIODIC_FORT_INTERPOLATE_CORNER \
-      FCLAW_F77_FUNC(periodic_fort_interpolate_corner, \
-                     PERIODIC_FORT_INTERPOLATE_CORNER)
-void PERIODIC_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, 
+#define SQUARE_FORT_INTERPOLATE_CORNER \
+      FCLAW_F77_FUNC(square_fort_interpolate_corner, \
+                     SQUARE_FORT_INTERPOLATE_CORNER)
+void SQUARE_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, 
                                       const int* mbc,const int* meqn, 
                                       const int* a_refratio, double this_q[],
                                       double neighbor_q[], const int* a_corner,
                                       struct fclaw2d_patch_transform_data** 
                                       transform_cptr);
 
-#define PERIODIC_FORT_INTERPOLATE2FINE \
-           FCLAW_F77_FUNC(periodic_fort_interpolate2fine, \
-                          PERIODIC_FORT_INTERPOLATE2FINE)
-void PERIODIC_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
+#define SQUARE_FORT_INTERPOLATE2FINE \
+           FCLAW_F77_FUNC(square_fort_interpolate2fine, \
+                          SQUARE_FORT_INTERPOLATE2FINE)
+void SQUARE_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
                                     const int* mbc, const int* meqn,
                                     double qcoarse[], double qfine[],
                                     double areacoarse[], double areafine[],

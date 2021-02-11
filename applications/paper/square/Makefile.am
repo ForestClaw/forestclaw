@@ -26,6 +26,7 @@ applications_paper_square_square_SOURCES = \
 	applications/paper/square/user_4.6/rpn2cons_fw_manifold.f \
 	applications/paper/square/user_4.6/rpt2cons_manifold.f \
 	applications/paper/square/user_4.6/rpn2cons_update_manifold.f \
+	applications/paper/square/user_4.6/square_fort_interpolate.f \
 	applications/paper/square/user_4.6/tag4coarsening.f \
 	applications/paper/square/user_4.6/tag4refinement.f
 

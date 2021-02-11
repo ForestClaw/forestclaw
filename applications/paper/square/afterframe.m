@@ -1,5 +1,8 @@
 example = read_vars();
 
+view(2)
+
+
 s = 0.0;
 axis([-s, 1+s, -s, 1+s])
 axis square;
@@ -44,7 +47,6 @@ if (example == 0)
     hold off;
 end
 
-view(2)
 
 % This is used for creating vectorized PDFs
 prt_tikz = true;
