@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 include(cmake/policy.cmake)
 
 project(FORESTCLAW
-  LANGUAGES C Fortran
+  LANGUAGES C CXX Fortran
   VERSION 0.1.4880)
 
 include(CTest)
@@ -33,19 +33,27 @@ if(NOT TARGET P4EST::P4EST)
   include(cmake/p4est.cmake)
 endif()
 
-# --- ForestClaw
+# --- configure
 
 include(cmake/config.cmake)
 include(cmake/compilers.cmake)
 
+# --- ForestClaw
+
 add_library(forestclaw)
-# source and links defined in src/CMakeLists.txt
+target_include_directories(forestclaw
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/ ${PROJECT_BINARY_DIR}/include/
+install(DIRECTORY
+  ${PROJECT_SOURCE_DIR}/src/
+  ${PROJECT_BINARY_DIR}/include/
   DESTINATION include
   FILES_MATCHING PATTERN "*.h")
 
@@ -54,7 +62,88 @@ install(TARGETS forestclaw
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib)
 
-
 add_subdirectory(src)
+
+# --- Clawpatch
+
+add_library(clawpatch)
+target_link_libraries(clawpatch PRIVATE forestclaw P4EST::P4EST SC::SC)
+target_include_directories(clawpatch
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/patches/clawpatch>
+  $<INSTALL_INTERFACE:include/clawpatch>
+  $<INSTALL_INTERFACE:include>)
+
+install(DIRECTORY
+  ${PROJECT_SOURCE_DIR}/src/patches/clawpatch
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h")
+
+install(TARGETS clawpatch
+  EXPORT ${PROJECT_NAME}Targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)
+
+add_subdirectory(src/patches/clawpatch)
+
+# --- Clawpack 4.6
+
+add_library(clawpack4.6)
+target_link_libraries(clawpack4.6 PRIVATE clawpatch P4EST::P4EST SC::SC)
+target_include_directories(clawpack4.6
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack4.6>
+  $<INSTALL_INTERFACE:include>)
+
+install(DIRECTORY
+  ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h")
+
+install(TARGETS clawpack4.6
+  EXPORT ${PROJECT_NAME}Targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)
+
+add_subdirectory(src/solvers/fc2d_clawpack4.6)
+
+# --- Clawpack 5
+
+add_library(clawpack5)
+target_link_libraries(clawpack5 PRIVATE clawpatch P4EST::P4EST SC::SC)
+target_include_directories(clawpack5
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack5>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack5>
+  $<INSTALL_INTERFACE:include>)
+
+install(DIRECTORY
+  ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack5
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h")
+
+install(TARGETS clawpack5
+  EXPORT ${PROJECT_NAME}Targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)
+
+add_subdirectory(src/solvers/fc2d_clawpack5)
+
+# --- geoclaw
+
+if(geoclaw)
+
+add_library(geoclaw)
+target_link_libraries(geoclaw PRIVATE forestclaw clawpatch P4EST::P4EST SC::SC)
+
+add_subdirectory(src/solvers/fc2d_geoclaw)
+
+
+endif(geoclaw)
+
+# --- package
 
 include(cmake/install.cmake)
