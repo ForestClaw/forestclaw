@@ -49,8 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
-#include <ThunderEgg/BiCGStab.h>
-#include <ThunderEgg/BiCGStabPatchSolver.h>
+#include <ThunderEgg/Iterative/BiCGStab.h>
+#include <ThunderEgg/Iterative/CG.h>
+#include <ThunderEgg/Iterative/PatchSolver.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
 #include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
@@ -140,11 +141,14 @@ void phasefield_solve(fclaw2d_global_t *glob)
     auto op = make_shared<phasefield>(glob,beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
+    auto patch_cg = make_shared<Iterative::CG<2>>();
+    patch_cg->setTolerance(mg_opt->patch_bcgs_tol);
+    patch_cg->setMaxIterations(mg_opt->patch_bcgs_max_it);
+    auto patch_bicg = make_shared<Iterative::BiCGStab<2>>();
+    patch_bicg->setTolerance(mg_opt->patch_bcgs_tol);
+    patch_bicg->setMaxIterations(mg_opt->patch_bcgs_max_it);
     shared_ptr<PatchSolver<2>>  solver;
-    solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                 mg_opt->patch_bcgs_tol,
-                                                 mg_opt->patch_bcgs_max_it,
-                                                 true);
+    solver = make_shared<Iterative::PatchSolver<2>>(patch_cg,op,true);
 
     // create matrix
     shared_ptr<Operator<2>> A = op;
@@ -207,10 +211,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it,
-                                                           true);
+            smoother = make_shared<Iterative::PatchSolver<2>>(patch_cg,patch_operator, true);
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
@@ -240,10 +241,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
         patch_operator = make_shared<phasefield>(glob,restricted_phi_n_vec, curr_domain, ghost_filler);
 
         //smoother
-        smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                       mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it,
-                                                       true);
+        smoother = make_shared<Iterative::PatchSolver<2>>(patch_cg, patch_operator, true);
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
@@ -266,9 +264,11 @@ void phasefield_solve(fclaw2d_global_t *glob)
 #endif    
 
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol, 
-                                 nullptr, //no timer
-                                 false); //output iteration information to cout
+    Iterative::BiCGStab<2> iter_solver;
+    iter_solver.setMaxIterations(mg_opt->max_it);
+    iter_solver.setTolerance(mg_opt->tol);
+    int its = iter_solver.solve(vg, A, u, f, M,
+                                 true); //output iteration information to cout
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 
