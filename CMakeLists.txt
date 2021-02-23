@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.13)
-
-include(cmake/policy.cmake)
+cmake_minimum_required(VERSION 3.13...3.20)
 
 project(FORESTCLAW
   LANGUAGES C CXX Fortran
   VERSION 0.1.4880)
+
+message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}")
 
 include(CTest)
 

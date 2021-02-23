@@ -1,8 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
-
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Debug or Release")
-endif()
+cmake_minimum_required(VERSION 3.13...3.20)
 
 project(ForestClawApps LANGUAGES C CXX Fortran)
 
