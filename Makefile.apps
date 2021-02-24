@@ -119,17 +119,11 @@ endif
 # ----------------------------------------
 if FCLAW_ENABLE_ACTIVEFLUX
 
-<<<<<<< HEAD
-## Solver library
-#include src/patches/clawpatch/Makefile.am
-#include src/solvers/fc2d_swbli/Makefile.am
-=======
 ## Patches needed for Active Flux solver
 #include src/patches/clawpatch/Makefile.am
 
 ## Solver library
 #include src/solvers/fc2d_activeflux/Makefile.am
->>>>>>> develop
 
 ## Applications
 #include src/solvers/fc2d_activeflux/examples/activeflux.apps
