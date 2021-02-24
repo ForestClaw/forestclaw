@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13...3.20)
 
 project(FORESTCLAW
+  DESCRIPTION "Quadtree/octree adaptive PDE solver based based on p4est."
+  HOMEPAGE_URL https://github.com/ForestClaw/forestclaw
   LANGUAGES C CXX Fortran
   VERSION 0.1.4880)
 
@@ -150,6 +152,7 @@ add_subdirectory(src/solvers/fc2d_clawpack5)
 if(geoclaw)
 
 add_library(geoclaw)
+set_target_properties(geoclaw PROPERTIES EXPORT_NAME GEOCLAW)
 target_link_libraries(geoclaw PRIVATE forestclaw clawpatch P4EST::P4EST SC::SC)
 
 add_subdirectory(src/solvers/fc2d_geoclaw)
@@ -159,4 +162,5 @@ endif(geoclaw)
 
 # --- package
 
+include(cmake/pkgconf.cmake)
 include(cmake/install.cmake)
