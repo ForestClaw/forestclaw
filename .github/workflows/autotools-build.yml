@@ -23,7 +23,7 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: make test
+      run: make check
   serial_build_with_clawpack_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -42,7 +42,7 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: make test
+      run: make check
   serial_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -61,7 +61,7 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: make test
+      run: make check
   mpi_minimal_build:
     runs-on: ubuntu-20.04
     steps:
@@ -80,7 +80,7 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: make test
+      run: make check
   mpi_build_with_clawpack_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -99,7 +99,7 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: make test
+      run: make check
   mpi_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -118,7 +118,7 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: make test
+      run: make check
   mpi_thunderegg_build:
     runs-on: ubuntu-20.04
     steps:
@@ -147,4 +147,4 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: make test
+      run: make check
