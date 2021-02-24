@@ -62,6 +62,25 @@ jobs:
       run: make
     - name: Tests
       run: make check
+  serial_build_with_cudaclaw_enabled:
+    runs-on: ubuntu-20.04
+    env:
+      CUDA_PATH: /usr
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libblas-dev liblapack-dev nvidia-cuda-toolkit
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-cudaclaw
+    - name: Build
+      run: make
   mpi_minimal_build:
     runs-on: ubuntu-20.04
     steps:
@@ -119,7 +138,26 @@ jobs:
       run: make
     - name: Tests
       run: make check
-  mpi_thunderegg_build:
+  mpi_build_with_cudaclaw_enabled:
+    runs-on: ubuntu-20.04
+    env:
+      CUDA_PATH: /usr
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev nvidia-cuda-toolkit
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-cudaclaw --enable-mpi
+    - name: Build
+      run: make
+  mpi_build_with_thunderegg_enabled:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
