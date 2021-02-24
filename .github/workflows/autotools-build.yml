@@ -1,5 +1,7 @@
 name: ForestClaw Build
 on: [push]
+env:
+  CLFAGS: -lgfortran
 jobs:
   minimal_build:
     runs-on: ubuntu-20.04
