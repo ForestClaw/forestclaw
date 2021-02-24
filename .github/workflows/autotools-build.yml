@@ -1,0 +1,20 @@
+name: ForestClaw Build
+on: [push]
+jobs:
+  minimal_build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule udpate
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure
+    - name: Build
+      run: make
