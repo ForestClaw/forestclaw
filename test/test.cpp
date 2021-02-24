@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
 	// abort if failure, some tests can hang otherwise
 	if (result > 0) {
-		MPI_Abort(MPI_COMM_WORLD, result);
+		return -1;
 	}
 
 	// global clean-up...
