@@ -20,6 +20,8 @@ jobs:
     - name: Install ThunderEgg
       run: |
         cd ThunderEggSrc
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ .
+        make install
     - name: Init and Update Submodules
       run: |
         git submodule init
@@ -27,7 +29,7 @@ jobs:
     - name: Run bootstrap Script
       run: ./bootstrap
     - name: Configure
-      run: ./configure --enable-mpi --enable-thunderegg
+      run: ./configure --enable-mpi --enable-thunderegg --with-thunderegg=$GITHUB_WORKSPACE/ThunderEgg
     - name: Build
       run: make
     - name: Tests
