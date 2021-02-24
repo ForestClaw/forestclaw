@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
 	// global setup...
-	fclaw_mpi_init(nullptr, nullptr, MPI_COMM_WORLD, SC_LP_PRODUCTION);
+	fclaw_mpi_init(nullptr, nullptr, sc_MPI_COMM_WORLD, SC_LP_PRODUCTION);
 
 	int result = Catch::Session().run(argc, argv);
 
