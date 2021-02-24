@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get install libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libblas-dev liblapack-dev
+        sudo apt-get install libblas-dev liblapack-dev
     - name: Init and Update Submodules
       run: |
         git submodule init
@@ -58,6 +58,63 @@ jobs:
       run: ./bootstrap
     - name: Configure
       run: ./configure --enable-geoclaw
+    - name: Build
+      run: make
+    - name: Tests
+      run: make test
+  mpi_minimal_build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-mpi
+    - name: Build
+      run: make
+    - name: Tests
+      run: make test
+  mpi_build_with_clawpack_enabled:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-clawpack --enable-mpi
+    - name: Build
+      run: make
+    - name: Tests
+      run: make test
+  mpi_build_with_geoclaw_enabled:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-geoclaw --enable-mpi
     - name: Build
       run: make
     - name: Tests
