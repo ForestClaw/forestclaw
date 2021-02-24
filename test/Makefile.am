@@ -14,5 +14,13 @@ test_test_SOURCES += \
 	test/utils/DomainReader.cpp 
 endif
 
-test_test_CPPFLAGS = $(TEST_CPPFLAGS) $(AM_CPPFLAGS) -DDATADIR=\"$(srcdir)/\"
-test_test_LDADD = $(TEST_LDADD) $(AM_LDADD)
+test_test_CPPFLAGS = -DDATADIR=\"$(srcdir)/\" \
+        $(AM_CPPFLAGS) \
+        $(FCLAW_THUNDEREGG_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS) \
+        $(FCLAW_CPPFLAGS)
+test_test_LDADD = \
+        $(LDADD) \
+        $(FCLAW_THUNDEREGG_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+        $(FCLAW_LDADD)
