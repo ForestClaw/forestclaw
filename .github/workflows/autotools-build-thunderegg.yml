@@ -1,0 +1,34 @@
+name: ForestClaw Build
+on: [push]
+env:
+  CFLAGS: -lgfortran
+  CXXFLAGS: -lgfortran
+  FFLAGS: -lgfortran
+jobs:
+  mpi_thunderegg_build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        repository: ThunderEgg/ThunderEgg
+        ref: develop
+        path: ThunderEggSrc
+    - name: Install dependencies
+      run: |
+        sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libblas-dev liblapack-dev 
+    - name: Install ThunderEgg
+      run: |
+        cd ThunderEggSrc
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-mpi --enable-thunderegg
+    - name: Build
+      run: make
+    - name: Tests
+      run: make test
