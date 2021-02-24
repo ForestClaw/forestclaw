@@ -8,22 +8,13 @@ find_package(MPI COMPONENTS C Fortran REQUIRED)
 find_package(ZLIB REQUIRED)
 
 # --- get installed ForestClaw package
-find_package(FORESTCLAW CONFIG REQUIRED)
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
 
-if(EXISTS ${FORESTCLAW_DIR}/../SC/SCTargets.cmake)
-  include(${FORESTCLAW_DIR}/../SC/SCTargets.cmake)
+find_package(SC REQUIRED HINTS ${FORESTCLAW_ROOT} ${P4EST_ROOT} PATHS ${PROJECT_SOURCE_DIR}/../build)
 
-  add_library(SC::SC INTERFACE IMPORTED)
-  target_link_libraries(SC::SC INTERFACE SC::sc)
-endif()
+find_package(P4EST REQUIRED HINTS ${FORESTCLAW_ROOT} PATHS ${PROJECT_SOURCE_DIR}/../build)
 
-include(${FORESTCLAW_DIR}/../P4EST/P4ESTTargets.cmake)
-add_library(P4EST::P4EST INTERFACE IMPORTED)
-target_link_libraries(P4EST::P4EST INTERFACE P4EST::p4est)
-
-include(${FORESTCLAW_DIR}/FORESTCLAWTargets.cmake)
-add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED)
-target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE FORESTCLAW::forestclaw)
+find_package(FORESTCLAW REQUIRED PATHS ${PROJECT_SOURCE_DIR}/../build)
 
 # --- apps
 
