@@ -6,8 +6,6 @@ project(FORESTCLAW
   LANGUAGES C CXX Fortran
   VERSION 0.1.4880)
 
-message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}")
-
 include(CTest)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
@@ -15,6 +13,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 # --- user options
 
 include(cmake/options.cmake)
+message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}  install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # --- external libs
 
