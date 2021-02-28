@@ -49,11 +49,6 @@ typedef struct user_options
     double b;
     double h0;
 
-    double breaking;
-    double alpha;
-    double dry_tolerance;
-    double sea_level;
-
     int claw_version;
 
     int is_registered;
@@ -104,82 +99,6 @@ void RPT2_GEOCLAW(const int* ixy, const int* maxm, const int* meqn, const int* m
                   const int* mbc, const int* mx, double ql[], double qr[],
                   double aux1[], double aux2[], double aux3[], const int* imp,
                   double dsdq[], double bmasdq[], double bpasdq[]);
-
-
-#define SGN_FORT_RHS FCLAW_F77_FUNC(sgn_fort_rhs,SGN_FORT_RHS)
-
-void SGN_FORT_RHS(const int* blockno, const int* mbc, const int* mx, 
-                     const int* my, const int* meqn, const int* mfields, 
-                     const double *xlower, const double *ylower,
-                     const double* dx, const double* dy, 
-                     double q[], double rhs[]);
-
-
-#define SGN_UPDATE_Q FCLAW_F77_FUNC(sgn_update_q,SGN_UPDATE_Q)
-
-void SGN_UPDATE_Q(const int* mx, const int *my, const int* mbc, const int* meqn,
-                  const int* mfields, const double* xlower, const double* ylower,
-                  const double* dx, const double* dy, 
-                  const double *t, const double* dt, 
-                  const int* maux, 
-                  double aux[], double q[], double D[]);
-
-
-#if 0
-#define SGN_INIT FCLAW_F77_FUNC(sgn_init,SGN_INIT)
-
-void SGN_INIT(const int* meqn, const int* mbc, const int* mx, 
-               const int* my,  
-               const double *xlower, const double *ylower,
-               const double* dx, const double* dy, 
-               double q[]);
-#endif
-
-#if 0
-#define SGN_COMPUTE_ERROR FCLAW_F77_FUNC(sgn_compute_error,SGN_COMPUTE_ERROR)
-
-void SGN_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* mfields,
-                           double *dx, double *dy, double *xlower,
-                           double *ylower, double *t, double q[],
-                           double error[], double soln[]);
-#endif
-
-
-#define SGN_FORT_APPLY_BC FCLAW_F77_FUNC(sgn_fort_apply_bc, \
-                                            SGN_FORT_APPLY_BC)
-
-void SGN_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my, 
-                          const  int* mbc, const  int* mfields, 
-                          const double* xlower, const double* ylower,
-                          const double* dx, const double* dy, const double* t,
-                          int intersects_bc[], int mthbc[], 
-                          double rhs[], fc2d_thunderegg_fort_eval_bc_t g_bc, 
-                          int* cons_check, double flux_sum[]);
-
-
-#define SGN_FORT_EVAL_BC FCLAW_F77_FUNC(sgn_fort_eval_bc, SGN_FORT_EVAL_BC)
-
-double SGN_FORT_EVAL_BC(const int* iface, const double* t,const double* x, const double* y);
-
-
-#define SGN_NEUMANN FCLAW_F77_FUNC(sgn_neumann, SGN_NEUMANN)
-
-double SGN_NEUMANN(const int* iface, const double* t,const double* x, const double* y);
-
-
-
-#if 0
-#define SGN_FORT_BC2 FCLAW_F77_FUNC(sgn_fort_bc2, SGN_FORT_BC2)
-
-void SGN_FORT_BC2(const int* meqn, const int* mbc, 
-                        const int* mx, const int* my, 
-                        const double *xlower, const double *ylower, 
-                        const double *dx, const double *dy, 
-                        double q[], double* t, double *dt, 
-                        int intersects_bc[]);
-#endif
-
-
 
 
 #ifdef __cplusplus

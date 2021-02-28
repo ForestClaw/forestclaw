@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw_math.h"
 
+
+#include "../sgn/sgn_fort.h"
+
 /*  -----------------------------------------------------------------
     Time stepping
     -- saving time steps

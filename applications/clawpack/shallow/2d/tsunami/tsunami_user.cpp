@@ -40,12 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_thunderegg_starpatch.h>
 #include <fc2d_thunderegg_fivepoint.h>
 
-#include "sgn_operator.h"
+#include "../sgn/sgn_options.h"
+#include "../sgn/sgn_operator.h"
+#include "../sgn/sgn_patch_operator.h"
+
+#include "../sgn/sgn_fort.h"
+
 
 
 static
 void tsunami_problem_setup(fclaw2d_global_t* glob)
 {
+    const sgn_options_t* sgn = sgn_get_options(glob);
     const user_options_t* user = tsunami_get_options(glob);
 
     if (glob->mpirank == 0)
@@ -55,10 +61,11 @@ void tsunami_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,"%-24.4f %s\n",user->a,"\% a");
         fprintf(f,"%-24.4f %s\n",user->b,"\% b");
         fprintf(f,"%-24.4f %s\n",user->h0,"\% h0");
-        fprintf(f,"%-24.4f %s\n",user->breaking,"\% breaking");
-        fprintf(f,"%-24.4f %s\n",user->alpha,"\% alpha");
-        fprintf(f,"%-24.4f %s\n",user->dry_tolerance,"\% dry_tolerance");
-        fprintf(f,"%-24.4f %s\n",user->sea_level,"\% sea_level");        
+
+        fprintf(f,"%-24.4f %s\n",sgn->breaking,"\% breaking");
+        fprintf(f,"%-24.4f %s\n",sgn->alpha,"\% alpha");
+        fprintf(f,"%-24.4f %s\n",sgn->dry_tolerance,"\% dry_tolerance");
+        fprintf(f,"%-24.4f %s\n",sgn->sea_level,"\% sea_level");        
         fclose(f);
     }
 

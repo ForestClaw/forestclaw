@@ -6,20 +6,19 @@ applications_clawpack_shallow_2d_tsunami_tsunami_SOURCES = \
 	applications/clawpack/shallow/2d/tsunami/tsunami_user.cpp \
 	applications/clawpack/shallow/2d/tsunami/tsunami_user.h \
 	applications/clawpack/shallow/2d/tsunami/tsunami_run.c \
-	applications/clawpack/shallow/2d/tsunami/sgn_operator.cpp \
-	applications/clawpack/shallow/2d/tsunami/sgn_patch_operator.cpp \
 	applications/clawpack/shallow/2d/tsunami/setprob.f \
-	applications/clawpack/shallow/2d/tsunami/sgn1d/sgn.f90 \
-	applications/clawpack/shallow/2d/tsunami/sgn1d/tri_solve.f90 \
+	applications/clawpack/shallow/2d/tsunami/bathy.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/qinit.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/setaux.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/tag4refinement.f90 \
 	applications/clawpack/shallow/2d/tsunami/user_4.6/tag4coarsening.f90 \
-	applications/clawpack/shallow/2d/tsunami/user_4.6/sgn_apply_bc.f90 \
-	applications/clawpack/shallow/2d/tsunami/user_4.6/sgn_eval_bc.f90 \
-	applications/clawpack/shallow/2d/tsunami/user_4.6/sgn_fort_rhs.f90 \
-	applications/clawpack/shallow/2d/tsunami/user_4.6/sgn_update_q.f90 \
-	applications/clawpack/shallow/2d/tsunami/bathy.f90 \
+	applications/clawpack/shallow/2d/sgn/sgn_operator.cpp \
+	applications/clawpack/shallow/2d/sgn/sgn_patch_operator.cpp \
+	applications/clawpack/shallow/2d/sgn/sgn_options.c \
+	applications/clawpack/shallow/2d/sgn/fort_4.6/sgn_apply_bc.f90 \
+	applications/clawpack/shallow/2d/sgn/fort_4.6/sgn_eval_bc.f90 \
+	applications/clawpack/shallow/2d/sgn/fort_4.6/sgn_fort_rhs.f90 \
+	applications/clawpack/shallow/2d/sgn/fort_4.6/sgn_update_q.f90 \
 	applications/clawpack/shallow/2d/rp/swe_simple_riemann.f90 \
 	applications/clawpack/shallow/2d/rp/rpn2_tsunami.f90 \
 	applications/clawpack/shallow/2d/rp/rpt2_tsunami.f90 \

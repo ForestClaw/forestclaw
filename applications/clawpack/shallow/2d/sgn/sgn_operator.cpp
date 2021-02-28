@@ -24,10 +24,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "sgn_operator.h"
-
 #include "sgn_patch_operator.h"
 
-#include "tsunami_user.h"
+#include "sgn_options.h"
+
+//#include "tsunami_user.h"
 
 #include "fc2d_thunderegg.h"
 #include "fc2d_thunderegg_vector.hpp"

@@ -1,4 +1,7 @@
+
+#include "sgn_options.h"
 #include "sgn_patch_operator.h"
+
 #include <ThunderEgg/ValVector.h>
 
 using namespace ThunderEgg;
@@ -7,11 +10,11 @@ sgn::sgn(fclaw2d_global_t *glob,
                std::shared_ptr<const Vector<2>> q_n,
                std::shared_ptr<const Domain<2>> domain,
                std::shared_ptr<const GhostFiller<2>> ghost_filler) 
-    : sgn(fc2d_thunderegg_get_options(glob),tsunami_get_options(glob),q_n,domain,ghost_filler) 
+    : sgn(fc2d_thunderegg_get_options(glob),sgn_get_options(glob),q_n,domain,ghost_filler) 
 {
     //this just calls the other constructor
 }
-sgn::sgn(const fc2d_thunderegg_options *mg_opt,const user_options* sgn_opt,
+sgn::sgn(const fc2d_thunderegg_options *mg_opt,const sgn_options* sgn_opt,
                std::shared_ptr<const Vector<2>> q_n_in,
                std::shared_ptr<const Domain<2>> domain,
                std::shared_ptr<const GhostFiller<2>> ghost_filler) 

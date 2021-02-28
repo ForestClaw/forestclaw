@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2021 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,37 +23,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "tsunami_user.h"
+#include "sgn_options.h"
 
 #include <fclaw2d_clawpatch_options.h>
 
-static int s_user_options_package_id = -1;
+static int s_sgn_options_package_id = -1;
 
 static void *
-tsunami_register (user_options_t* user, sc_options_t * opt)
+sgn_register (sgn_options_t* sgn, sc_options_t * opt)
 {
-    /* [user] User options */
+    /* [sgn] User options */
 
-    sc_options_add_double (opt, 0, "g",    &user->g, 1.0,  "[user] g [1.0]");
-    sc_options_add_double (opt, 0, "a",    &user->a, 0.1,  "[user] a [0.1]");
-    sc_options_add_double (opt, 0, "b",    &user->b,  12,  "[user] b [12]");
-    sc_options_add_double (opt, 0, "h0",    &user->h0,  12,  "[user] h0 [1]");
+    sc_options_add_double (opt, 0, "g",    &sgn->g, 1.0,  "[sgn] g [1.0]");
+    sc_options_add_double (opt, 0, "a",    &sgn->a, 0.1,  "[sgn] a [0.1]");
+    sc_options_add_double (opt, 0, "b",    &sgn->b,  12,  "[sgn] b [12]");
+    sc_options_add_double (opt, 0, "h0",    &sgn->h0,  12,  "[sgn] h0 [1]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
+    sc_options_add_double (opt, 0, "breaking",    &sgn->breaking,  1,  "[sgn] 1 [1]");
+    sc_options_add_double (opt, 0, "alpha",    &sgn->alpha,  1.153,  "[sgn] alpha [1.153]");
+
+
+    sc_options_add_double (opt, 0, "dry-tolerance", &sgn->dry_tolerance, 1e-4,  
+                           "[sgn] dry_tolerance [1e-4]");
+
+    sc_options_add_double (opt, 0, "sea-level", &sgn->sea_level, 0,  
+                           "[sgn] sea-level [0]");
+
+    sc_options_add_int (opt, 0, "claw-version", &sgn->claw_version, 4,
                            "Clawpack_version (4 or 5) [4]");
 
-    user->is_registered = 1;
+    sgn->is_registered = 1;
     return NULL;
 }
 
 static fclaw_exit_type_t
-tsunami_check (user_options_t *user)
+sgn_check (sgn_options_t *sgn)
 {
     return FCLAW_NOEXIT;
 }
 
 static void
-tsunami_destroy(user_options_t *user)
+sgn_destroy(sgn_options_t *sgn)
 {
     /* Nothing to destroy */
 }
@@ -66,46 +76,46 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (opt != NULL);
 
-    user_options_t *user = (user_options_t*) package;
+    sgn_options_t *sgn = (sgn_options_t*) package;
 
 
-    return tsunami_register(user,opt);
+    return sgn_register(sgn,opt);
 }
 
 static fclaw_exit_type_t
 options_check(fclaw_app_t *app, void *package,void *registered)
 {
-    user_options_t           *user;
+    sgn_options_t           *sgn;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT(registered == NULL);
 
-    user = (user_options_t*) package;
+    sgn = (sgn_options_t*) package;
 
-    return tsunami_check(user);
+    return sgn_check(sgn);
 }
 
 
 static void
 options_destroy (fclaw_app_t * app, void *package, void *registered)
 {
-    user_options_t *user;
+    sgn_options_t *sgn;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT (registered == NULL);
 
-    user = (user_options_t*) package;
-    FCLAW_ASSERT (user->is_registered);
+    sgn = (sgn_options_t*) package;
+    FCLAW_ASSERT (sgn->is_registered);
 
-    tsunami_destroy (user);
+    sgn_destroy (sgn);
 
-    FCLAW_FREE (user);
+    FCLAW_FREE (sgn);
 }
 
 
-static const fclaw_app_options_vtable_t options_vtable_user =
+static const fclaw_app_options_vtable_t options_vtable_sgn =
 {
     options_register,
     NULL,
@@ -115,30 +125,30 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 
 /* ------------- User options access functions --------------------- */
 
-user_options_t* tsunami_options_register (fclaw_app_t * app,
+sgn_options_t* sgn_options_register (fclaw_app_t * app,
                                           const char *configfile)
 {
-    user_options_t *user;
+    sgn_options_t *sgn;
     FCLAW_ASSERT (app != NULL);
 
-    user = FCLAW_ALLOC (user_options_t, 1);
-    fclaw_app_options_register (app,"user", configfile, &options_vtable_user,
-                                user);
+    sgn = FCLAW_ALLOC (sgn_options_t, 1);
+    fclaw_app_options_register (app,"sgn", configfile, &options_vtable_sgn,
+                                sgn);
 
-    fclaw_app_set_attribute(app,"user",user);
-    return user;
+    fclaw_app_set_attribute(app,"sgn",sgn);
+    return sgn;
 }
 
-void tsunami_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void sgn_options_store (fclaw2d_global_t* glob, sgn_options_t* sgn)
 {
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
+    FCLAW_ASSERT(s_sgn_options_package_id == -1);
+    int id = fclaw_package_container_add_pkg(glob,sgn);
+    s_sgn_options_package_id = id;
 }
 
-user_options_t* tsunami_get_options(fclaw2d_global_t* glob)
+sgn_options_t* sgn_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
+    int id = s_sgn_options_package_id;
+    return (sgn_options_t*) fclaw_package_get_options(glob, id);    
 }
 

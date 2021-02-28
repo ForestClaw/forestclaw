@@ -1,5 +1,6 @@
+#include "sgn_options.h"
+
 #include <ThunderEgg/PatchOperator.h>
-#include "tsunami_user.h"
 #include "fc2d_thunderegg_options.h"
 
 class sgn : public ThunderEgg::PatchOperator<2>
@@ -9,14 +10,14 @@ class sgn : public ThunderEgg::PatchOperator<2>
     public:
     std::shared_ptr<const ThunderEgg::Vector<2>> q_n;
 
-    const user_options_t *sgn_opt;
+    const sgn_options_t *sgn_opt;
 
     sgn(fclaw2d_global_t *glob,
                std::shared_ptr<const ThunderEgg::Vector<2>> q_n_in,
                std::shared_ptr<const ThunderEgg::Domain<2>> domain,
                std::shared_ptr<const ThunderEgg::GhostFiller<2>> ghost_filler);
 
-    sgn(const fc2d_thunderegg_options *mg_opt,const user_options_t* sgn_opt,
+    sgn(const fc2d_thunderegg_options *mg_opt,const sgn_options_t* sgn_opt,
                std::shared_ptr<const ThunderEgg::Vector<2>> q_n_in,
                std::shared_ptr<const ThunderEgg::Domain<2>> domain,
                std::shared_ptr<const ThunderEgg::GhostFiller<2>> ghost_filler);
