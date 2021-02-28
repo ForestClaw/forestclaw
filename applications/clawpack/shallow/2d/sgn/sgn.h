@@ -42,6 +42,11 @@ struct fclaw2d_global;
     /* Fix syntax highlighting */
 #endif    
 
+void sgn_rhs(fclaw2d_global_t *glob,
+             fclaw2d_patch_t *patch,
+             int blockno,
+             int patchno);
+
 void sgn_run(struct fclaw2d_global *glob);
 
 
