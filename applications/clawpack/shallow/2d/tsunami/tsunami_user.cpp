@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "tsunami_user.h"
+#include "../sgn/sgn.h"
 
 #include <fclaw2d_include_all.h>
 
@@ -75,31 +76,6 @@ void tsunami_problem_setup(fclaw2d_global_t* glob)
 #endif
 
     TSUNAMI_SETPROB();  /* Reads file created above */
-}
-
-
-static
-void tsunami_rhs(fclaw2d_global_t *glob,
-                 fclaw2d_patch_t *patch,
-                 int blockno,
-                 int patchno)
-{
-
-    int mx,my,mbc;
-    double dx,dy,xlower,ylower;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    int mfields;
-    double *rhs;
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
-
-    int meqn;
-    double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
-
-    SGN_FORT_RHS(&blockno, &mbc, &mx, &my, &meqn, &mfields,
-                 &xlower, &ylower, &dx, &dy,q,rhs);
 }
 
 #if 0
@@ -182,7 +158,7 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
 
     /* for SGN operator */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
-    patch_vt->rhs = tsunami_rhs;          /* Overwrites default */
+    patch_vt->rhs = sgn_rhs;          /* Overwrites default */
 
     /* Assign SGN operator vtable */
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
