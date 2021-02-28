@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2021 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tsunami_user.h"
 #include "../sgn/sgn_options.h"
+#include "../sgn/sgn.h"
 
 #include <fclaw2d_include_all.h>
 
@@ -111,7 +112,7 @@ void run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
 
-    tsunami_run(glob);
+    sgn_run(glob);
 
 
     fclaw2d_finalize(glob);

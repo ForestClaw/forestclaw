@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2021 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,8 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-#include "tsunami_user.h"
+#include "sgn.h"
 
 #include <fclaw2d_patch.h>
 
@@ -128,7 +127,7 @@ void cb_sgn_update_q(fclaw2d_domain_t *domain,
 } 
 
 static
-void tsunami_run_update_q(fclaw2d_global_t *glob)
+void sgn_run_update_q(fclaw2d_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob, cb_sgn_update_q, NULL);
 }
@@ -267,7 +266,7 @@ void outstyle_1(fclaw2d_global_t *glob)
             fclaw2d_elliptic_solve(glob);
 
             /* Update q with SGN solution. */
-            tsunami_run_update_q(glob);
+            sgn_run_update_q(glob);
 
 
             /* Re-do ghost cells */
@@ -456,7 +455,7 @@ void outstyle_3(fclaw2d_global_t *glob)
         fclaw2d_elliptic_solve(glob);
 
         /* Update q with SGN solution.   Use first order update. */
-        tsunami_run_update_q(glob);
+        sgn_run_update_q(glob);
 
         /* Re-do ghost cells */
         fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
@@ -565,7 +564,7 @@ void outstyle_4(fclaw2d_global_t *glob)
    Public interface
    ---------------------------------------------------------------- */
 
-void tsunami_run(fclaw2d_global_t *glob)
+void sgn_run(fclaw2d_global_t *glob)
 {
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

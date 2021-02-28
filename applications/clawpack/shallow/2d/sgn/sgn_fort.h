@@ -27,6 +27,8 @@
 #define SGN_FORT_H
 
 #include <fclaw2d_include_all.h>
+#include <fc2d_thunderegg.h>
+
 
 #ifdef __cplusplus
 extern "C"
