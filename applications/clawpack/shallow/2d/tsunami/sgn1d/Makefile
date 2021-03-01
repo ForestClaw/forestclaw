@@ -56,8 +56,8 @@ SOURCES = \
   qinit.f90 \
   setprob.f90 \
   bc1.f \
-  ../swe/bathy.f90 \
-  ../swe/geoclaw_riemann_utils.f \
+  ../bathy.f90 \
+  ../../rp/geoclaw_riemann_utils.f \
   philim_user.f90 \
   inlinelimiter.f \
   src1.f90 \

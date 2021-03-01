@@ -2,8 +2,12 @@
 # ThunderEgg solver
 # --------------------------------------------
 
-## Multigrid test
+## SGN Solver (tsunami)
 include applications/clawpack/shallow/2d/tsunami/Makefile.am
+
+## SGN Solver (wavetank)
+include applications/clawpack/shallow/2d/wavetank/Makefile.am
+
 
 ## Elliptic example
 include applications/elliptic/poisson/Makefile.am
