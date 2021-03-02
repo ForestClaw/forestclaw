@@ -7,18 +7,20 @@ SUBROUTINE clawpack46_setaux(maxmx,maxmy,mbc,mx,my, &
     DOUBLE PRECISION  aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
     INTEGER i, j, ibc, jbc
-    DOUBLE PRECISION xc, bathy_compete, b, slope, d2xzb
+    DOUBLE PRECISION xc, yc, b, grad(2), d2xzb, d2yzb, d2xyzb
 
+    yc = 0
     DO j = 1-mbc,my+mbc
         DO i = 1-mbc,mx+mbc
             xc = xlower + (i-0.5)*dx     
-            call bathy_complete(xc,b,slope,d2xzb)
+            call sgn_fort_bathy_complete(xc,yc,b,grad,d2xzb,d2yzb,d2xyzb)
             aux(i,j,1) = b
-            aux(i,j,2) = slope
+            aux(i,j,2) = grad(1)
             aux(i,j,3) = d2xzb
         end do
     enddo
 
+    !! Use exact gradient and second derivatives
     return
 
     do j= 1-mbc,mx+2

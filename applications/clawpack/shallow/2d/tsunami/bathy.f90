@@ -1,22 +1,25 @@
-DOUBLE PRECISION FUNCTION bathy(x)
+DOUBLE PRECISION FUNCTION bathy(x,y)
   IMPLICIT NONE
 
-  DOUBLE PRECISION x
+  DOUBLE PRECISION x,y
 
-  double precision b, slope, d2xzb
+  DOUBLE PRECISION b, grad(2), d2xzb, d2yzb, d2xyzb
 
-  call bathy_complete(x,b,slope,d2xzb)
+  call sgn_fort_bathy_complete(x,y,b,grad,d2xzb,d2yzb, d2xyzb)
 
   bathy = b
 
 END FUNCTION bathy
 
-SUBROUTINE bathy_complete(xc,b,slope,d2xzb)
+SUBROUTINE sgn_fort_bathy_complete(xc,yc,b,grad,d2xzb,d2yzb,d2xyzb)
     IMPLICIT NONE
 
-    DOUBLE PRECISION xc,b,slope,d2xzb
+    DOUBLE PRECISION xc,yc,b,grad(2),d2xzb, d2yzb, d2xyzb
 
     b = -1.d0
-    slope = 0
+    grad = 0
     d2xzb = 0
-END SUBROUTINE bathy_complete
+    d2yzb = 0
+    d2xyzb = 0
+    
+END SUBROUTINE sgn_fort_bathy_complete

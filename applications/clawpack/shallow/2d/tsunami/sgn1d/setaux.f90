@@ -6,16 +6,17 @@ SUBROUTINE setaux(mbc,mx,xlower,dx,maux,aux)
   REAL(KIND=8), INTENT(out) ::  aux(maux,1-mbc:mx+mbc)
 
   INTEGER i, ibc
-  DOUBLE PRECISION xc, bathy, b, slope, d2xzb
+  DOUBLE PRECISION xc, yc, bathy, b, grad(2), d2xzb, d2yzb, d2xyzb
 
   if (maux .lt. 3) then
       write(6,*) 'setaux.f : maux must be at least 3'
       stop
   endif
 
+  yc = 0
   DO i = 1-mbc,mx+mbc
      xc = xlower + (i-0.5)*dx
-     call bathy_complete(xc,b,slope,d2xzb)
+     call sgn_fort_bathy_complete(xc,yc,b,grad,d2xzb,d2yzb,d2xyzb)
      aux(1,i) = b
      !! aux(2,i) = slope
      !! aux(3,i) = d2xzb
