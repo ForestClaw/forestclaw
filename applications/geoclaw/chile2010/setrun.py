@@ -100,7 +100,6 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.capa_index = 2
 
     
-    
     # -------------
     # Initial time:
     # -------------
@@ -273,10 +272,19 @@ def setrun(claw_pkg='geoclaw'):
         # and at the final time.
         clawdata.checkpt_interval = 5
 
+    # ---------------------------------------------------
+    # Forestclaw parameters
+    # NOTES : We will need to create a forestclaw module
+    # ---------------------------------------------------
 
-    # ---------------
+    # forestclawdata.weighted_partition = True
+
+
+    # --------------------------------------------------
     # AMR parameters:
-    # ---------------
+    # NOTES : Eventually, we will put similar info into
+    # a forestclaw module
+    # --------------------------------------------------
     amrdata = rundata.amrdata
 
     # maximum size of patches in each direction (matters in parallel):
@@ -347,7 +355,7 @@ def setrun(claw_pkg='geoclaw'):
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
     rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
-    
+
 
     return rundata
     # end of function setrun
@@ -429,7 +437,14 @@ if __name__ == '__main__':
     import sys
     from clawpack.geoclaw import kmltools
 
+    # Import 'forestclaw.py'
+    # import forestclaw
+
     rundata = setrun(*sys.argv[1:])
-    rundata.write()
+    rundata.write()    # Writes a bunch of .data files
+
+    # NOTES : We need to create this file in the "forestclaw.py" module.  This file should
+    # create a `geoclaw.ini' file.    
+    # forestclaw_write_ini(rundata,forestclawdata)  # writes a ForestClaw geoclaw.ini file
 
     kmltools.make_input_data_kmls(rundata)
