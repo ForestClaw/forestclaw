@@ -143,7 +143,7 @@ SUBROUTINE rpn2_geoclaw(ixy,maxm,meqn,mwaves,mbc,mx, &
         ENDIF
 
         !skip problem if in a completely dry area
-        IF (qr(i-1,1) <= dry_tolerance .AND. ql(i,1) <= dry_tolerance) THEN
+        IF (qr(i-1,1) .le. dry_tolerance .AND. ql(i,1) .le. dry_tolerance) THEN
             go to 30
         ENDIF
 
@@ -160,8 +160,8 @@ SUBROUTINE rpn2_geoclaw(ixy,maxm,meqn,mwaves,mbc,mx, &
 !!             pR = auxl(pressure_index, i)
 !!         end if
 
-         hvL = qr(i-1,mv) 
-         hvR = ql(i,mv)        
+        hvL = qr(i-1,mv) 
+        hvR = ql(i,mv)  
 
         !!check for wet/dry boundary
         IF (hR .GT. dry_tolerance) THEN
@@ -175,6 +175,7 @@ SUBROUTINE rpn2_geoclaw(ixy,maxm,meqn,mwaves,mbc,mx, &
             uR = 0.d0
             vR = 0
             phiR = 0.d0
+            sE2 = max(sE2,huL/hL+2.d0*sqrt(g*hL))
         ENDIF
 
         IF (hL .gt. dry_tolerance) THEN
@@ -188,14 +189,25 @@ SUBROUTINE rpn2_geoclaw(ixy,maxm,meqn,mwaves,mbc,mx, &
             uL = 0.d0
             vL = 0.d0
             phiL = 0.d0
+            sE1 = min(sE1,huR/hR - 2.d0*sqrt(g*hR))
         ENDIF
 
+
+        sE1 =  1.d99
+        sE2 = -1.d99
         wall(1) = 1.d0
         wall(2) = 1.d0
         wall(3) = 1.d0
         IF (hR .LE. dry_tolerance) THEN
             CALL riemanntype(hL,hL,uL,-uL,hstar,s1m,s2m, &
                              rare1,rare2,1,dry_tolerance,grav)
+
+!!            !what would be the Einfeldt speed of wall problem
+!!            !! Taken from geoclaw_1d
+!!            sLtest = min(-sqrt(g*hL),huL/hL-sqrt(g*hL)) 
+!!
+!!            !what would be middle state in approx Riemann solution
+!!            hstartest = hL - (huL/sLtest) 
 
             hstartest = MAX(hL,hstar)
             IF (hstartest + bL .LT. bR) THEN
@@ -209,14 +221,19 @@ SUBROUTINE rpn2_geoclaw(ixy,maxm,meqn,mwaves,mbc,mx, &
                 phiR = phiL
                 uR = -uL
                 vL = vR
-            ELSEIF (hL+bL.LT.bR) THEN
+            ELSEIF (hL + bL .lt. bR) THEN
                 bR = hL + bL
             ENDIF
-        ELSEIF (hL .LE. dry_tolerance) THEN ! right surface is lower than left topo
+        ELSEIF (hL .le. dry_tolerance) THEN ! right surface is lower than left topo
             CALL riemanntype(hR,hR,-uR,uR,hstar,s1m,s2m, &
                              rare1,rare2,1,dry_tolerance,grav)
             hstartest = MAX(hR,hstar)
-            IF (hstartest + bR .LT. bL) THEN
+
+            !! Take from geoclaw_1d
+!!            sRtest = max(sqrt(g*hR),huR/hR+sqrt(g*hR)) !what would be the Einfeldt speed of wall
+!!            hstartest = hR-(huR/sRtest) !what would be middle state in approx Rimeann solution
+
+            IF (hstartest + bR .lt. bL) THEN
                 !!left state should become ghost values that mirror right
                 !! bL=hstartest+bR
                 wall(1) = 0.d0
@@ -232,6 +249,8 @@ SUBROUTINE rpn2_geoclaw(ixy,maxm,meqn,mwaves,mbc,mx, &
             ENDIF
         ENDIF
 
+
+
         !!determine wave speeds
         sL = uL - SQRT(grav*hL) !! 1 wave speed of left state
         sR = uR + SQRT(grav*hR) !! 2 wave speed of right state
@@ -241,8 +260,14 @@ SUBROUTINE rpn2_geoclaw(ixy,maxm,meqn,mwaves,mbc,mx, &
         sRoe1 = uhat - chat 
         sRoe2 = uhat + chat 
 
+        
+
         sE1 = MIN(sL,sRoe1) 
         sE2 = MAX(sR,sRoe2) 
+
+!!        sE1 = min(sL,min(sL,sRoe1)) ! Eindfeldt speed 1 wave
+!!        sE2 = max(sR,max(sR,sRoe2)) ! Eindfeldt speed 2 wave
+
 
         !!--------------------end initializing...finally----------
 
@@ -265,6 +290,7 @@ SUBROUTINE rpn2_geoclaw(ixy,maxm,meqn,mwaves,mbc,mx, &
             fw(1,mw) = fw(1,mw)*wall(mw)
             fw(2,mw) = fw(2,mw)*wall(mw)
             fw(3,mw) = fw(3,mw)*wall(mw)
+
         ENDDO
 
         DO mw = 1,mwaves

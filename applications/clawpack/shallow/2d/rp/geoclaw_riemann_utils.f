@@ -176,10 +176,10 @@ c        !find if sonic problem
          else if ((uL - dsqrt(g*hL))*(uR - dsqrt(g*hR)) < 0.d0) then
             sonic = .true.
          end if
-         if (sonic) then
-            write(6,*) 'geoclaw_riemann_utils : sonic == true'
-            stop
-         endif
+!!         if (sonic) then
+!!            write(6,*) 'geoclaw_riemann_utils : sonic == true'
+!!            stop
+!!         endif
 
 c        !find jump in h, deldelh
          if (sonic) then

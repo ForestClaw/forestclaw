@@ -2,6 +2,9 @@
 
 !!SUBROUTINE clawpack46_rpt2(ixy,maxm,meqn,mwaves,mbc,mx, & 
 
+!!SUBROUTINE rpt2_tsunami(ixy,maxm,meqn,mwaves,maux,mbc,mx, & 
+!!                   ql,qr,aux1,aux2,aux3,imp,asdq,bmasdq,bpasdq)
+
 SUBROUTINE rpt2_geoclaw(ixy,maxm,meqn,mwaves,maux,mbc,mx, & 
                    ql,qr,aux1,aux2,aux3,imp,asdq,bmasdq,bpasdq)
     
@@ -40,9 +43,10 @@ SUBROUTINE rpt2_geoclaw(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
 
 
     integer i,m,mw,mu,mv
+    double precision u,v, h
 
 
-    write(6,*) 'rpt2_geoclaw : check input arguments'
+    write(6,*) 'rpt2_geoclaw : check code'
     stop
 
     tol = dry_tolerance
@@ -102,6 +106,8 @@ SUBROUTINE rpt2_geoclaw(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
 !!      !check and see if cell that transverse waves are going in is high and dry
 
         if (imp .eq. 1) then
+            u = qr(i-1,mu)/h
+            v = qr(i-1,mv)/h
             eta = qr(i-1,1)  + aux2(i-1,1)
             topo1 = aux1(i-1,1)
             topo3 = aux3(i-1,1)
@@ -109,6 +115,8 @@ SUBROUTINE rpt2_geoclaw(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
 !!            s3 = vl+sqrt(g*hl)
 !!            s2 = 0.5d0*(s1+s3)
         else
+            u = ql(i,mu)/h
+            v = ql(i,mv)/h
             eta = ql(i,1) + aux2(i,1)
             topo1 = aux1(i,1)
             topo3 = aux3(i,1)
@@ -116,7 +124,7 @@ SUBROUTINE rpt2_geoclaw(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
 !!            s3 = vr+sqrt(g*hr)
 !!            s2 = 0.5d0*(s1+s3)
         endif
-        if (eta .lt. max(topo1,topo3)) go to 90
+        if (eta .lt. min(topo1,topo3)) go to 90  !! fixed 3/3/2021
 
 !!      if (coordinate_system.eq.2) then
 !!         if (ixy.eq.2) then
@@ -135,27 +143,27 @@ SUBROUTINE rpt2_geoclaw(ixy,maxm,meqn,mwaves,maux,mbc,mx, &
 
 !!=====Determine some speeds necessary for the Jacobian=================
 
-            vhat = (vr*dsqrt(hr))/(dsqrt(hr) + dsqrt(hl)) + & 
-             (vl*dsqrt(hl))/(dsqrt(hr)+dsqrt(hl))
-
-            uhat = (ur*dsqrt(hr))/(dsqrt(hr) + dsqrt(hl)) + & 
-             (ul*dsqrt(hl))/(dsqrt(hr)+dsqrt(hl))
-            hhat = (hr + hl)/2.d0
-
-            roe1 = vhat-dsqrt(g*hhat)
-            roe3 = vhat+dsqrt(g*hhat)
-
-            s1l = vl-dsqrt(g*hl)
-            s3r = vr+dsqrt(g*hr)
-
-            s1 = dmin1(roe1,s1l)
-            s3 = dmax1(roe3,s3r)
-
-            s2 = 0.5d0*(s1+s3)
-
-           s(1) = s1
-           s(2) = s2
-           s(3) = s3
+!!            vhat = (vr*dsqrt(hr))/(dsqrt(hr) + dsqrt(hl)) + & 
+!!             (vl*dsqrt(hl))/(dsqrt(hr)+dsqrt(hl))
+!!
+!!            uhat = (ur*dsqrt(hr))/(dsqrt(hr) + dsqrt(hl)) + & 
+!!             (ul*dsqrt(hl))/(dsqrt(hr)+dsqrt(hl))
+!!            hhat = (hr + hl)/2.d0
+!!
+!!            roe1 = vhat-dsqrt(g*hhat)
+!!            roe3 = vhat+dsqrt(g*hhat)
+!!
+!!            s1l = vl-dsqrt(g*hl)
+!!            s3r = vr+dsqrt(g*hr)
+!!
+!!            s1 = dmin1(roe1,s1l)
+!!            s3 = dmax1(roe3,s3r)
+!!
+!!            s2 = 0.5d0*(s1+s3)
+!!
+!!           s(1) = s1
+!!           s(2) = s2
+!!           s(3) = s3
 !!=======================Determine asdq decomposition (beta)============
          delf1 = asdq(i,1)
          delf2 = asdq(i,mu)
