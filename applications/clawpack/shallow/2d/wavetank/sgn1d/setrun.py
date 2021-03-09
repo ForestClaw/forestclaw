@@ -38,38 +38,34 @@ def setrun(claw_pkg='Classic'):
     #------------------------------------------------------------------
 
     # Physical parameters
-    L = 4096.    # L = 4000
-    ax = 0
-    bx = L
+    ax = -160.8
+    bx = 40
 
     # Time stepping parameters
-    tfinal = 2000                  # If outstyle = 1
+    tfinal = 160                  # If outstyle = 1
 
     outstyle = 1
     if outstyle == 1:
-        tfinal = 2000
-        tfinal = 90
-        nout = 18
+        tfinal = 160
+        nout = 32
     elif outstyle == 2:
-        tfinal = 2000                  # If outstyle = 1
-        tsteps = [ 35.0, 90.0, 700.0, 2000.0]   # If outstyle = 2
+        pass
     else:
         nout = 400
         nsteps = 50    # If outstyle = 3
 
-    dt_initial = 0.1047505286036417
-    dt_initial = 0.8
+    dt_initial = 0.001
     dt_variable = True
 
-    limiter = 'minmod'      # 7 = generalized minmod
+    limiter = 'MC'      # 7 = generalized minmod
 
 
     # Spatial parameters
     mx_grid = 32
-    mi = 128
+    mi = 32
 
-    mx = 2**15     # 2**15 = 32768, 2**7 = 128
-    # mx = mx_grid*mi  # 2**5*2**7 = 2^12
+    # mx = 2**15     # 2**15 = 32768, 2**7 = 128
+    mx = mx_grid*mi  # 2**5*2**7 = 2^12
 
     maux = 3      # Store bathymetry
 

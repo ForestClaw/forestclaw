@@ -15,7 +15,7 @@ SUBROUTINE src1(meqn,mbc,mx,xlower,dx,q,maux,aux,t,dt)
 
   INTEGER i
   DOUBLE PRECISION hl, hc, hr, dxzb, dxh, dxeta, dx2
-  DOUBLE PRECISION bathy
+  !! DOUBLE PRECISION bathy
 
   DOUBLE PRECISION sgn_soln(1-mbc:mx+mbc), disp, xc, wall
   double precision wall_distance
