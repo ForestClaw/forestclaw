@@ -34,23 +34,8 @@ sgn_register (sgn_options_t* sgn, sc_options_t * opt)
 {
     /* [sgn] User options */
 
-    sc_options_add_double (opt, 0, "g",    &sgn->g, 1.0,  "[sgn] g [1.0]");
-    sc_options_add_double (opt, 0, "a",    &sgn->a, 0.1,  "[sgn] a [0.1]");
-    sc_options_add_double (opt, 0, "b",    &sgn->b,  12,  "[sgn] b [12]");
-    sc_options_add_double (opt, 0, "h0",    &sgn->h0,  12,  "[sgn] h0 [1]");
-
     sc_options_add_double (opt, 0, "breaking",    &sgn->breaking,  1,  "[sgn] 1 [1]");
     sc_options_add_double (opt, 0, "alpha",    &sgn->alpha,  1.153,  "[sgn] alpha [1.153]");
-
-
-    sc_options_add_double (opt, 0, "dry-tolerance", &sgn->dry_tolerance, 1e-4,  
-                           "[sgn] dry_tolerance [1e-4]");
-
-    sc_options_add_double (opt, 0, "sea-level", &sgn->sea_level, 0,  
-                           "[sgn] sea-level [0]");
-
-    sc_options_add_int (opt, 0, "claw-version", &sgn->claw_version, 4,
-                           "Clawpack_version (4 or 5) [4]");
 
     sgn->is_registered = 1;
     return NULL;

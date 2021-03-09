@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../sgn/sgn_fort.h"
 
+#define SOLVE_SGN 1
+
 /*  -----------------------------------------------------------------
     Time stepping
     -- saving time steps
@@ -262,16 +264,17 @@ void outstyle_1(fclaw2d_global_t *glob)
             fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
                                  time_interp,FCLAW2D_TIMER_NONE);
 
+#if SOLVE_SGN
             /* We are happy with the hyperbolic step and step size;  now solve elliptic problem */
             fclaw2d_elliptic_solve(glob);
 
             /* Update q with SGN solution. */
             sgn_run_update_q(glob);
 
-
             /* Re-do ghost cells */
             fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
                                  time_interp,FCLAW2D_TIMER_NONE);
+#endif
 
 
             /* We are happy with this step */
@@ -452,6 +455,7 @@ void outstyle_3(fclaw2d_global_t *glob)
         /* We are happy with the hyperbolic step and step size;  now solve elliptic problem */
         int time_interp = 0;
 
+#if SOLVE_SGN
         fclaw2d_elliptic_solve(glob);
 
         /* Update q with SGN solution.   Use first order update. */
@@ -460,7 +464,7 @@ void outstyle_3(fclaw2d_global_t *glob)
         /* Re-do ghost cells */
         fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
                              time_interp,FCLAW2D_TIMER_NONE);
-
+#endif
         /* We are happy with this time step */
         t_curr = tc;
         glob->curr_time = t_curr;

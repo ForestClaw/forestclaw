@@ -48,6 +48,12 @@ extern "C"
 void TSUNAMI_SETPROB();
 #endif
 
+#define SGN_FORT_BATHY_COMPLETE FCLAW_F77_FUNC(sgn_fort_bathy_complete, \
+                                               SGN_FORT_BATHY_COMPLETE)
+
+void SGN_FORT_BATHY_COMPLETE(double *xc,double *yc, double *b, double grad[],
+                             double* d2xzb, double* d2yzb, double* d2xyzb);
+
 
 /* ***************************** FORTRAN - Riemann solvers **************************** */
 

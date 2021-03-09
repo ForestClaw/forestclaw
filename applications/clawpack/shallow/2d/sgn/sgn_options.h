@@ -43,18 +43,8 @@ extern "C"
 
 typedef struct sgn_options
 {
-    int example;
-    double g;
-    double a;
-    double b;
-    double h0;
-
     double breaking;
     double alpha;
-    double dry_tolerance;
-    double sea_level;
-
-    int claw_version;
 
     int is_registered;
 } sgn_options_t;
