@@ -62,11 +62,11 @@ void tsunami_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,"%-24.4f %s\n",user->a,"\% a");
         fprintf(f,"%-24.4f %s\n",user->b,"\% b");
         fprintf(f,"%-24.4f %s\n",user->h0,"\% h0");
+        fprintf(f,"%-24.4f %s\n",user->dry_tolerance,"\% dry_tolerance");
+        fprintf(f,"%-24.4f %s\n",user->sea_level,"\% sea_level");        
 
         fprintf(f,"%-24.4f %s\n",sgn->breaking,"\% breaking");
         fprintf(f,"%-24.4f %s\n",sgn->alpha,"\% alpha");
-        fprintf(f,"%-24.4f %s\n",sgn->dry_tolerance,"\% dry_tolerance");
-        fprintf(f,"%-24.4f %s\n",sgn->sea_level,"\% sea_level");        
         fclose(f);
     }
 

@@ -49,6 +49,9 @@ typedef struct user_options
     double b;
     double h0;
 
+    double dry_tolerance;
+    double sea_level;
+
     int claw_version;
 
     int is_registered;

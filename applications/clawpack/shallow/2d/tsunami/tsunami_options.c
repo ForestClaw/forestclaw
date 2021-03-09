@@ -39,8 +39,14 @@ tsunami_register (user_options_t* user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "b",    &user->b,  12,  "[user] b [12]");
     sc_options_add_double (opt, 0, "h0",    &user->h0,  12,  "[user] h0 [1]");
 
+    sc_options_add_double (opt, 0, "dry-tolerance", &user->dry_tolerance, 1e-4,  
+                           "[user] dry_tolerance [1e-4]");
+
+    sc_options_add_double (opt, 0, "sea-level", &user->sea_level, 0,  
+                           "[user] sea-level [0]");
+
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
-                           "Clawpack_version (4 or 5) [4]");
+                           "[user] Clawpack_version (4 or 5) [4]");
 
     user->is_registered = 1;
     return NULL;
