@@ -93,7 +93,7 @@ void run_program(fclaw2d_global_t* glob)
     int mj = fclaw_opt->mj;
     int my = clawpatch_opt->my;
     double dy = (by-0)/(mj*my);
-    printf("wavetank.cpp : (by,dx) = %f %f\n",fclaw_opt->by,dy);
+    printf("wavetank.cpp : (dx,dy) = %f %f\n",dx,dy);
 
 
     /* Initialize virtual table for ForestClaw */

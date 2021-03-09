@@ -45,9 +45,9 @@ typedef struct user_options
 {
     int example;
     double g;
-    double a;
-    double b;
-    double h0;
+
+    double dry_tolerance;
+    double sea_level;
 
     int claw_version;
 
@@ -72,6 +72,9 @@ user_options_t* wavetank_get_options(fclaw2d_global_t* glob);
 void wavetank_run(fclaw2d_global_t *glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+
+void fc2d_geoclaw_output_ascii(fclaw2d_global_t* glob,int iframe);
 
 
 /* ***************************** FORTRAN - Riemann solvers **************************** */
@@ -99,6 +102,54 @@ void RPT2_GEOCLAW(const int* ixy, const int* maxm, const int* meqn, const int* m
                   const int* mbc, const int* mx, double ql[], double qr[],
                   double aux1[], double aux2[], double aux3[], const int* imp,
                   double dsdq[], double bmasdq[], double bpasdq[]);
+
+
+/* --------------------------------- Output functions ----------------------------------- */
+
+#define FC2D_GEOCLAW_FORT_WRITE_HEADER FCLAW_F77_FUNC(fc2d_geoclaw_fort_write_header,\
+                                                      FC2D_GEOCLAW_FORT_WRITE_HEADER)
+void FC2D_GEOCLAW_FORT_WRITE_HEADER(int* iframe, double* time, int* meqn, 
+                                    int* maux, int* ngrids);
+
+#define FC2D_GEOCLAW_FORT_WRITE_FILE FCLAW_F77_FUNC(fc2d_geoclaw_fort_write_file, \
+                                                    FC2D_GEOCLAW_FORT_WRITE_FILE)
+void FC2D_GEOCLAW_FORT_WRITE_FILE(int* mx,int* my,int* meqn,int* maux, 
+                                  int* mbathy,int* mbc, 
+                                  double* xlower, double* ylower, 
+                                  double* dx,double* dy,
+                                  double q[], double aux[], int* iframe, 
+                                  int* patch_num,int* level,
+                                  int* blockno,int* mpirank);
+
+#define WAVETANK_FORT_TAG4REFINEMENT FCLAW_F77_FUNC(wavetank_fort_tag4refinement, \
+                                                 WAVETANK_FORT_TAG4REFINEMENT)
+
+void WAVETANK_FORT_TAG4REFINEMENT(const int* mx,const int* my,
+                                  const int* mbc,const int* meqn,
+                                  const double* xlower, const double* ylower,
+                                  const double* dx, const double* dy,
+                                  double* time,
+                                  const int* blockno,
+                                  double q[],
+                                  const double* tag_threshold,
+                                  int* level,
+                                  const int* init_flag,
+                                  int* tag_patch);
+
+#define WAVETANK_FORT_TAG4COARSENING FCLAW_F77_FUNC(wavetank_fort_tag4coarsening, \
+                                                WAVETANK_FORT_TAG4COARSENING)
+
+void WAVETANK_FORT_TAG4COARSENING(const int* mx, const int* my,
+                                  const int* mbc, const int* meqn,
+                                  double xlower[], double ylower[],
+                                  const double* dx, const double* dy,
+                                  double* time,
+                                  const int* blockno,
+                                  double q0[],double q1[],
+                                  double q2[],double q3[],
+                                  const double* tag_threshold,
+                                  const int* initflag,
+                                  int* tag_patch);
 
 
 #ifdef __cplusplus

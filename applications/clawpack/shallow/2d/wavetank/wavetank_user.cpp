@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../sgn/sgn_patch_operator.h"
 
 
-
+#include <clawpack46_user_fort.h>
 
 static
 void wavetank_problem_setup(fclaw2d_global_t* glob)
@@ -59,14 +59,11 @@ void wavetank_problem_setup(fclaw2d_global_t* glob)
     {
         FILE *f = fopen("setprob.data","w");
         fprintf(f,"%-24.4f %s\n",user->g,"\% grav");
-        fprintf(f,"%-24.4f %s\n",user->a,"\% a");
-        fprintf(f,"%-24.4f %s\n",user->b,"\% b");
-        fprintf(f,"%-24.4f %s\n",user->h0,"\% h0");
+        fprintf(f,"%-24.4f %s\n",user->dry_tolerance,"\% dry_tolerance");
+        fprintf(f,"%-24.4f %s\n",user->sea_level,"\% sea_level");        
 
         fprintf(f,"%-24.4f %s\n",sgn->breaking,"\% breaking");
         fprintf(f,"%-24.4f %s\n",sgn->alpha,"\% alpha");
-        fprintf(f,"%-24.4f %s\n",sgn->dry_tolerance,"\% dry_tolerance");
-        fprintf(f,"%-24.4f %s\n",sgn->sea_level,"\% sea_level");        
         fclose(f);
     }
 
@@ -79,14 +76,14 @@ void wavetank_problem_setup(fclaw2d_global_t* glob)
 }
 
 
-#if 0
+/* --------------------------------- Output functions ---------------------------- */
+
+#if 1
 int wavetank_tag4refinement(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
+                             fclaw2d_patch_t *patch,
                              int blockno, int patchno,
                              int initflag)
 {
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
-
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     int tag_patch;
@@ -96,20 +93,25 @@ int wavetank_tag4refinement(fclaw2d_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     tag_patch = 0;
-    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                                      &blockno, q,&refine_threshold,
-                                      &initflag,&tag_patch);
+    int level = patch->level;
+    double time = glob->curr_time;
+    WAVETANK_FORT_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                 &time, &blockno, q,&refine_threshold,
+                                 &level,
+                                 &initflag,&tag_patch);
     return tag_patch;
 }
+#endif
 
+#if 1
 static
 int wavetank_tag4coarsening(fclaw2d_global_t *glob,
                              fclaw2d_patch_t *fine_patches,
@@ -123,9 +125,12 @@ int wavetank_tag4coarsening(fclaw2d_global_t *glob,
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
 
     int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    double xlower[4],ylower[4],dx,dy;
+    for(int k = 0; k < 4; k++)
+    {
+        fclaw2d_clawpatch_grid_data(glob,patch0+k,&mx,&my,&mbc,
+                                    &xlower[k],&ylower[k],&dx,&dy);        
+    }
 
     double *q[4];
     int meqn;
@@ -134,28 +139,40 @@ int wavetank_tag4coarsening(fclaw2d_global_t *glob,
         fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
-
     int tag_patch = 0;
-    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                                      &blockno, q[0],q[1],q[2],q[3],
-                                      &coarsen_threshold,&initflag,&tag_patch);
+    double time = glob->curr_time;
+    WAVETANK_FORT_TAG4COARSENING(&mx,&my,&mbc,&meqn,xlower,ylower,&dx,&dy,
+                                 &time, 
+                                 &blockno, q[0],q[1],q[2],q[3],
+                                 &coarsen_threshold,&initflag,&tag_patch);
+
+#if 1
+    if (time > 15 && tag_patch == 1) 
+    {
+        printf("coarsen %d\n",tag_patch);
+
+    }
+#endif    
     return tag_patch == 1;
 }
 #endif
 
 void wavetank_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
-    vt->problem_setup = &wavetank_problem_setup;  /* Version-independent */
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+
+    fclaw_vt->problem_setup = &wavetank_problem_setup;  /* Version-independent */
+    fclaw_vt->output_frame  = fc2d_geoclaw_output_ascii;
 
     //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
 
     claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
     claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
-    claw46_vt->fort_rpn2   = &RPN2_TSUNAMI;     /* or RPN2_GEOCLAW; */
-    claw46_vt->fort_rpt2   = &RPT2_TSUNAMI;     /* or RPT2_GEOCLAW; */
+    claw46_vt->fort_rpn2   = &RPN2_GEOCLAW;     /* or RPN2_GEOCLAW; */
+    claw46_vt->fort_rpt2   = &RPT2_GEOCLAW;     /* or RPT2_GEOCLAW; */
+    claw46_vt->fort_bc2    = &CLAWPACK46_BC2;     /* or RPT2_GEOCLAW; */
+
 
     /* for SGN operator */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
@@ -168,9 +185,14 @@ void wavetank_link_solvers(fclaw2d_global_t *glob)
     mg_vt->fort_apply_bc = &SGN_FORT_APPLY_BC;
     mg_vt->fort_eval_bc  = &SGN_NEUMANN;   // For non-homogeneous BCs
 
+    patch_vt->tag4refinement = wavetank_tag4refinement;
+    patch_vt->tag4coarsening = wavetank_tag4coarsening;
+#if 0
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
+#endif    
+
 }
 
 

@@ -9,17 +9,11 @@
     DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
     DOUBLE PRECISION aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
-    DOUBLE PRECISION  grav
-    COMMON /common_swe/ grav
-
-    DOUBLE PRECISION pi, pi2
-    COMMON /compi/ pi, pi2
-
     DOUBLE PRECISION  grav, dry_tolerance, sea_level
     COMMON /common_swe/ grav, dry_tolerance, sea_level
 
 
-    DOUBLE PRECISION xc,yc,hl, hr, ur, ybar
+    DOUBLE PRECISION eta
     INTEGER i,j
 
     do i = 1-mbc,mx+mbc

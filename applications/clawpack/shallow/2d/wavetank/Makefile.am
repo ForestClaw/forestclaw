@@ -3,14 +3,17 @@ bin_PROGRAMS += applications/clawpack/shallow/2d/wavetank/wavetank
 applications_clawpack_shallow_2d_wavetank_wavetank_SOURCES = \
 	applications/clawpack/shallow/2d/wavetank/wavetank.cpp \
 	applications/clawpack/shallow/2d/wavetank/wavetank_options.c \
+	applications/clawpack/shallow/2d/wavetank/fc2d_geoclaw_output_ascii.c \
 	applications/clawpack/shallow/2d/wavetank/wavetank_user.cpp \
 	applications/clawpack/shallow/2d/wavetank/wavetank_user.h \
 	applications/clawpack/shallow/2d/wavetank/setprob.f \
 	applications/clawpack/shallow/2d/wavetank/bathy.f90 \
 	applications/clawpack/shallow/2d/wavetank/user_4.6/qinit.f90 \
+	applications/clawpack/shallow/2d/wavetank/user_4.6/fc2d_geoclaw_output_ascii_fort.f \
+	applications/clawpack/shallow/2d/wavetank/user_4.6/bc2.f90 \
 	applications/clawpack/shallow/2d/wavetank/user_4.6/setaux.f90 \
-	applications/clawpack/shallow/2d/wavetank/user_4.6/tag4refinement.f90 \
-	applications/clawpack/shallow/2d/wavetank/user_4.6/tag4coarsening.f90 \
+	applications/clawpack/shallow/2d/wavetank/user_4.6/tag4refinement.f \
+	applications/clawpack/shallow/2d/wavetank/user_4.6/tag4coarsening.f \
 	applications/clawpack/shallow/2d/sgn/sgn_operator.cpp \
 	applications/clawpack/shallow/2d/sgn/sgn_patch_operator.cpp \
 	applications/clawpack/shallow/2d/sgn/sgn_options.c \
@@ -35,11 +38,13 @@ EXTRA_DIST += \
 
 applications_clawpack_shallow_2d_wavetank_wavetank_CPPFLAGS = \
         $(AM_CPPFLAGS) \
+        $(FCLAW_GEOCLAW_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_clawpack_shallow_2d_wavetank_wavetank_LDADD = \
         $(LDADD) \
+        $(FCLAW_GEOCLAW_LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD)

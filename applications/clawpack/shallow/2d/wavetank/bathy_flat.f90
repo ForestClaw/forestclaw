@@ -25,6 +25,7 @@ SUBROUTINE sgn_fort_bathy_complete(xc,yc, b,grad,d2xzb, d2yzb, d2xyzb)
 
 
     integer i
+    double precision bflat
 
     DATA xvals /-160.8, -125.5, -90,    0, 40/
     DATA bvals /-4,     -4,      -0.45, 0,  2/
@@ -41,7 +42,6 @@ SUBROUTINE sgn_fort_bathy_complete(xc,yc, b,grad,d2xzb, d2yzb, d2xyzb)
         x = xc
     endif
 
-
     !! From RJL "make_celledges.txt"
     !!  xzpairs = [(-160.8, -4),       # left edge
     !!             (-125.5, -4),       # start of first slope
@@ -49,15 +49,17 @@ SUBROUTINE sgn_fort_bathy_complete(xc,yc, b,grad,d2xzb, d2yzb, d2xyzb)
     !!             (  0,     0),       # shore
     !!             ( 40,     2)]       # right edge
 
+    bflat = -4
+
     !! Second derivative is always 0
     d2xzb = 0
     d2yzb = 0
     d2xyzb = 0
     do i = 1,4
         if (xvals(i) .le. x .and. x .le. xvals(i+1)) then
-            grad(1) = (bvals(i+1) - bvals(i))/(xvals(i+1) - xvals(i))
+            grad(1) = 0
             grad(2) = 0
-            b = bvals(i) + grad(1)*(x - xvals(i))
+            b = bflat !! bvals(i) + grad(1)*(x - xvals(i))
             return
         endif
     end do
