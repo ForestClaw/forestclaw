@@ -46,20 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
-#include <ThunderEgg/Iterative/BiCGStab.h>
-#include <ThunderEgg/Iterative/PatchSolver.h>
-#include <ThunderEgg/VarPoisson/StarPatchOperator.h>
-#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/P4estDomGen.h>
-#include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/ValVectorGenerator.h>
+#include <ThunderEgg.h>
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::VarPoisson;
 
 
 /**
@@ -145,7 +135,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    auto op = make_shared<StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
+    auto op = make_shared<VarPoisson::StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
     auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
@@ -211,7 +201,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
             auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-            patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+            patch_operator = make_shared<VarPoisson::StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
             prev_beta_vec = restricted_beta_vec;
 
             //smoother
@@ -245,7 +235,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
         auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+        patch_operator = make_shared<VarPoisson::StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
 
         //smoother
         if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){

@@ -46,20 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
-#include <ThunderEgg/Iterative/BiCGStab.h>
-#include <ThunderEgg/Iterative/PatchSolver.h>
-#include <ThunderEgg/VarPoisson/StarPatchOperator.h>
-#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/P4estDomGen.h>
-#include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/ValVectorGenerator.h>
+#include <ThunderEgg.h>
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::VarPoisson;
 
 class fivePoint : public PatchOperator<2>
 {
