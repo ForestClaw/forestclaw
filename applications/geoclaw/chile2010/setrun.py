@@ -438,13 +438,13 @@ if __name__ == '__main__':
     from clawpack.geoclaw import kmltools
 
     # Import 'forestclaw.py'
-    # import forestclaw
+    import forestclaw
 
     rundata = setrun(*sys.argv[1:])
     rundata.write()    # Writes a bunch of .data files
 
-    # NOTES : We need to create this file in the "forestclaw.py" module.  This file should
-    # create a `geoclaw.ini' file.    
-    # forestclaw_write_ini(rundata,forestclawdata)  # writes a ForestClaw geoclaw.ini file
+    forestclawdata = forestclaw.ForestClawData()
+
+    forestclawdata.write(rundata)  # writes a ForestClaw geoclaw.ini file
 
     kmltools.make_input_data_kmls(rundata)
