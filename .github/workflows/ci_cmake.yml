@@ -96,6 +96,10 @@ jobs:
 
     - name: CMake configure examples
       run: cmake -B applications/build -S applications -DFORESTCLAW_ROOT=~/fclaw
+      env:
+        CC: gcc-10
+        CXX: g++-10
+        FC: gfortran-10
 
     - name: CMake build examples
       run: cmake --build applications/build
