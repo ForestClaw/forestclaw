@@ -20,7 +20,7 @@ except:
     raise Exception("*** Must first set FCLAW enviornment variable")
 
 # Scratch directory for storing topo and dtopo files:
-scratch_dir = os.path.join(FCLAW, 'applications','geoclaw', 'scratch')
+scratch_dir = os.path.join(FCLAW,'applications','geoclaw', 'scratch')
 
 def get_topo(makeplots=False):
     """
