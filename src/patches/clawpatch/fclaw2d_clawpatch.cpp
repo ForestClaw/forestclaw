@@ -1185,6 +1185,27 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
 	*dy = cp->dy;
 }
 
+void fclaw2d_clawpatch_grid_data3(fclaw2d_global_t* glob,
+								 fclaw2d_patch_t* patch,
+								 int* mx, int* my, int* mz, int* mbc,
+								 double* xlower, double* ylower,
+								 double* zlower, 
+								 double* dx, double* dy, double* dz)
+{
+	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
+	*mx = cp->mx;
+	*my = cp->my;
+	*mz = cp->mz;
+	*mbc = cp->mbc;
+	*xlower = cp->xlower;
+	*ylower = cp->ylower;
+	*zlower = cp->zlower;
+	*dx = cp->dx;
+	*dy = cp->dy;
+	*dz = cp->dz;
+}
+
+
 void fclaw2d_clawpatch_aux_data(fclaw2d_global_t *glob,
 								fclaw2d_patch_t *this_patch,
 								double **aux, int* maux)
