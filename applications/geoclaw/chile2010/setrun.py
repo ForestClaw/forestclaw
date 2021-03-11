@@ -281,6 +281,13 @@ def setrun(claw_pkg='geoclaw'):
 
     forestclawdata = forestclaw.ForestClawData()
 
+    forestclawdata.minlevel = 2
+    forestclawdata.maxlevel = 5
+
+    forestclawdata.regrid_interval = 1
+    forestclawdata.refine_threshold = 0.01
+    forestclawdata.coarsen_threshold = 0.005
+
     # forestclawdata.weighted_partition = True
 
 
