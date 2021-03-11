@@ -5,8 +5,27 @@ from configparser import ConfigParser
 class ForestClawData(object):
     # Several forestclaw attributes (ignore for now)
 
-    def __init__(self, attributes=None):
-        pass
+    def __init__(self):
+        self.minlevel = 0
+        self.maxlevel = 0
+
+        self.weighted_partition = True
+        self.regrid_interval = 1
+        self.refine_threshold = 0.5
+        self.coarsen_threshold = 0.1
+        self.smooth_refine = False
+        self.smooth_level = 0
+        self.outstyle_uses_maxlevel = False
+        self.subcycle = False
+        self.advance_one_step = False
+        self.trapfpe = False
+        self.mpi_debug = False
+        self.conservation_check = False
+        self.run_user_diagnostics = False
+        self.output_gauges = False
+        self.output = True
+        self.verbosity = 'wall'
+
 
     def write(self,rundata):
         geoclaw = ConfigParser(allow_no_value=True)
@@ -27,35 +46,34 @@ class ForestClawData(object):
             }
 
         geoclaw['Options'] = {
-            'minlevel' : 0,
-            'maxlevel' : refinement_data.max_level_deep,  #Maximmum level of refinement
-            'regrid_interval': amrdata.regrid_interval,
-            'refine_threshold': 0.005,
-            'coarsen_threshold': False,
-            'smooth-level': 4,
-            'coarsen-delay': 0,
+
+            'minlevel' : self.minlevel,
+            'maxlevel' : self.maxlevel,
+            'weighted_partition' : self.weighted_partition,
+            'regrid_interval' : self.regrid_interval,
+            'refine_threshold' : self.refine_threshold,
+            'coarsen_threshold' : self.coarsen_threshold,
+            'smooth_refine' : self.smooth_refine,
+            'smooth_level' : self.smooth_level,
+            'outstyle_uses_maxlevel' : self.outstyle_uses_maxlevel,
+            'subcycle' : self.subcycle,
+            'advance_one_step' : self.advance_one_step,
+            'trapfpe' : self.trapfpe,
+            'mpi_debug' : self.mpi_debug,
+            'conservation_check' : self.conservation_check,
+            'run_user_diagnostics' : self.run_user_diagnostics,
+            'output_gauges' : self.output_gauges,
+            'output' : self.output,
+            'verbosity' : self.verbosity,
             #Time stepping 
             'tfinal': clawdata.tfinal,      # Final time
-            'use_fixed_dt': clawdata.dt_variable,
+            'use_fixed_dt': not clawdata.dt_variable,
             'initial_dt': clawdata.dt_initial,
             'max_cfl': clawdata.cfl_max,
             'desired_cfl': clawdata.cfl_desired,
             'outstyle': clawdata.output_style,
             'nout': clawdata.num_output_times,
-            'nstep': clawdata.output_step_interval,
-            'subcycle': False,
-            'outstyle-uses-maxlevel': True,
-            'weighted_partition': True,
-            'advanced-one-step': True,
-            # File and console IO
-            'verbosity': clawdata.verbosity,
-            'output-gauges': True,
-            'output': clawdata.output_t0 ,
-            #Diagnostics and dubbing
-            'trapfpe': False,
-            'mpi_debug': False,
-            'conservation-check': False,
-            'run-user-diagnostics': False,
+            'nstep': clawdata.output_step_interval,                                    
             # Mapping
             # Domain dimensions
             'ax': clawdata.lower[0],

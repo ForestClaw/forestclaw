@@ -11,6 +11,8 @@ from __future__ import print_function
 import os
 import numpy as np
 
+import forestclaw
+
 try:
     FCLAW = os.environ['FCLAW']
 except:
@@ -273,9 +275,11 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.checkpt_interval = 5
 
     # ---------------------------------------------------
-    # Forestclaw parameters
+    # Forestclaw parameters that aren't included in amrdata
     # NOTES : We will need to create a forestclaw module
     # ---------------------------------------------------
+
+    forestclawdata = forestclaw.ForestClawData()
 
     # forestclawdata.weighted_partition = True
 
@@ -287,16 +291,16 @@ def setrun(claw_pkg='geoclaw'):
     # --------------------------------------------------
     amrdata = rundata.amrdata
 
-    # maximum size of patches in each direction (matters in parallel):
-    amrdata.max1d = 60
+    # # maximum size of patches in each direction (matters in parallel):
+    # amrdata.max1d = 60
 
-    # max number of refinement levels:
-    amrdata.amr_levels_max = 6
+    # # max number of refinement levels:
+    # amrdata.amr_levels_max = 6
 
-    # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [2,2,2,2,2]
-    amrdata.refinement_ratios_y = [2,2,2,2,2]
-    amrdata.refinement_ratios_t = [2,2,2,2,2]
+    # # List of refinement ratios at each level (length at least mxnest-1)
+    # amrdata.refinement_ratios_x = [2,2,2,2,2]
+    # amrdata.refinement_ratios_y = [2,2,2,2,2]
+    # amrdata.refinement_ratios_t = [2,2,2,2,2]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -306,37 +310,37 @@ def setrun(claw_pkg='geoclaw'):
     amrdata.aux_type = ['center','capacity','yleft']
 
 
-    # Flag using refinement routine flag2refine rather than richardson error
-    amrdata.flag_richardson = False    # use Richardson?
-    amrdata.flag_richardson_tol = 0.002  # Richardson tolerance
-    amrdata.flag2refine = True
+    # # Flag using refinement routine flag2refine rather than richardson error
+    # amrdata.flag_richardson = False    # use Richardson?
+    # amrdata.flag_richardson_tol = 0.002  # Richardson tolerance
+    # amrdata.flag2refine = True
 
-    # steps to take on each level L between regriddings of level L+1:
-    amrdata.regrid_interval = 3
+    # # steps to take on each level L between regriddings of level L+1:
+    # amrdata.regrid_interval = 3
 
-    # width of buffer zone around flagged points:
-    # (typically the same as regrid_interval so waves don't escape):
-    amrdata.regrid_buffer_width  = 2
+    # # width of buffer zone around flagged points:
+    # # (typically the same as regrid_interval so waves don't escape):
+    # amrdata.regrid_buffer_width  = 2
 
-    # clustering alg. cutoff for (# flagged pts) / (total # of cells refined)
-    # (closer to 1.0 => more small grids may be needed to cover flagged cells)
-    amrdata.clustering_cutoff = 0.700000
+    # # clustering alg. cutoff for (# flagged pts) / (total # of cells refined)
+    # # (closer to 1.0 => more small grids may be needed to cover flagged cells)
+    # amrdata.clustering_cutoff = 0.700000
 
-    # print info about each regridding up to this level:
-    amrdata.verbosity_regrid = 0  
+    # # print info about each regridding up to this level:
+    # amrdata.verbosity_regrid = 0  
 
-    #  ----- For developers ----- 
-    # Toggle debugging print statements:
-    amrdata.dprint = False      # print domain flags
-    amrdata.eprint = False      # print err est flags
-    amrdata.edebug = False      # even more err est flags
-    amrdata.gprint = False      # grid bisection/clustering
-    amrdata.nprint = False      # proper nesting output
-    amrdata.pprint = False      # proj. of tagged points
-    amrdata.rprint = False      # print regridding summary
-    amrdata.sprint = False      # space/memory output
-    amrdata.tprint = True       # time step reporting each level
-    amrdata.uprint = False      # update/upbnd reporting
+    # #  ----- For developers ----- 
+    # # Toggle debugging print statements:
+    # amrdata.dprint = False      # print domain flags
+    # amrdata.eprint = False      # print err est flags
+    # amrdata.edebug = False      # even more err est flags
+    # amrdata.gprint = False      # grid bisection/clustering
+    # amrdata.nprint = False      # proper nesting output
+    # amrdata.pprint = False      # proj. of tagged points
+    # amrdata.rprint = False      # print regridding summary
+    # amrdata.sprint = False      # space/memory output
+    # amrdata.tprint = True       # time step reporting each level
+    # amrdata.uprint = False      # update/upbnd reporting
     
     # More AMR parameters can be set -- see the defaults in pyclaw/data.py
 
@@ -357,7 +361,7 @@ def setrun(claw_pkg='geoclaw'):
     rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
 
 
-    return rundata
+    return rundata, forestclawdata
     # end of function setrun
     # ----------------------
 
@@ -437,13 +441,8 @@ if __name__ == '__main__':
     import sys
     from clawpack.geoclaw import kmltools
 
-    # Import 'forestclaw.py'
-    import forestclaw
-
-    rundata = setrun(*sys.argv[1:])
+    rundata,forestclawdata = setrun(*sys.argv[1:])
     rundata.write()    # Writes a bunch of .data files
-
-    forestclawdata = forestclaw.ForestClawData()
 
     forestclawdata.write(rundata)  # writes a ForestClaw geoclaw.ini file
 
