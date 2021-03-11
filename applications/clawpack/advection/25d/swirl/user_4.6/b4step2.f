@@ -1,9 +1,10 @@
-      subroutine clawpack46_b4step2(maxmx, maxmy, mbc,mx,my,meqn,q,
-     &      xlower,ylower,dx,dy,time,dt,maux,aux)
+      subroutine clawpack46_b4step3(maxmx, maxmy, maxmz, 
+     &                              mbc,mx,my,mz, meqn,q,
+     &      xlower,ylower,zlower, dx,dy,dz, time,dt,maux,aux)
       implicit none
 
-      integer mbc, mx, my, meqn, maux, maxmx, maxmy
-      double precision xlower, ylower, dx, dy, time, dt
+      integer mbc, mx, my, mz, meqn, maux, maxmx, maxmy, maxmz
+      double precision xlower, ylower, zlower, dx, dy, dz, time, dt
       double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
 

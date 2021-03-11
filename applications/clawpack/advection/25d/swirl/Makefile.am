@@ -35,13 +35,13 @@ EXTRA_DIST += \
 applications_clawpack_advection_25d_swirl_swirl_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
-        $(FCLAW_CLAWPACK25d_46_CPPFLAGS) \
+        $(FCLAW_CLAWPACK3_46_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 
 applications_clawpack_advection_25d_swirl_swirl_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
-        $(FCLAW_CLAWPACK25d_46_LDADD) \
+        $(FCLAW_CLAWPACK3_46_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD)

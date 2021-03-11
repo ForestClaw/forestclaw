@@ -49,7 +49,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
         clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
-        clawpack46_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
+        clawpack46_vt->fort_b4step3   = &CLAWPACK46_B4STEP3;
     }
     else if (user->claw_version == 5)
     {

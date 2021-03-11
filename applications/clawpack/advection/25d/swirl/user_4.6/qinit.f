@@ -1,9 +1,9 @@
-      subroutine clawpack46_qinit(maxmx,maxmy, meqn,mbc,mx,my,
-     &      xlower,ylower,dx,dy,q,maux,aux)
+      subroutine clawpack46_qinit(maxmx,maxmy, maxmz, meqn,mbc,
+     &      mx,my,mz, xlower,ylower,zlower, dx,dy,dz, q,maux,aux)
        implicit none
 
-       integer meqn, mbc, mx, my, maux, maxmx, maxmy
-       double precision xlower, ylower, dx, dy
+       integer meqn, mbc, mx, my, mz, maux, maxmx, maxmy, maxmz
+       double precision xlower, ylower, zlower, dx, dy, dz
        double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
        double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
