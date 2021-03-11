@@ -36,13 +36,17 @@ extern "C"
 
 /* --------------------------------- Clawpack functions ------------------------------- */
 
-#define CLAWPACK46_BC2_DEFAULT FCLAW_F77_FUNC(clawpack46_bc2_default,CLAWPACK46_BC2_DEFAULT)
-void CLAWPACK46_BC2_DEFAULT(const int* maxmx, const int* maxmy, const int* meqn,
-					 const int* mbc, const int* mx, const int* my,
-					 const double* xlower, const double* ylower,
-					 const double* dx, const double* dy, const double q[],
-					 const int* maux, const double aux[], const double* t,
-					 const double* dt, const int mthbc[]);
+#define CLAWPACK46_BC3_DEFAULT FCLAW_F77_FUNC(clawpack46_bc3_default,CLAWPACK46_BC3_DEFAULT)
+void CLAWPACK46_BC3_DEFAULT(const int* maxmx, const int* maxmy, const int* maxmz,
+                            const int* meqn,
+                            const int* mbc, const int* mx, const int* my,
+                            const int* mz,
+                            const double* xlower, const double* ylower,
+                            const double* zlower, 
+                            const double* dx, const double* dy, const double *dz,
+                            const double q[],
+                            const int* maux, const double aux[], const double* t,
+                            const double* dt, const int mthbc[]);
 
 
 #define CLAWPACK46_FLUX2 FCLAW_F77_FUNC(clawpack46_flux2,CLAWPACK46_FLUX2)

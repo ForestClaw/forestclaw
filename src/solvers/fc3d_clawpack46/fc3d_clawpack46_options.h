@@ -79,7 +79,8 @@ void fc3d_clawpack46_package_register(fclaw_app_t* app,
 
 fc3d_clawpack46_options_t* fc3d_clawpack46_get_options(struct fclaw2d_global *glob);
 
-void fc3d_clawpack46_options_store (struct fclaw2d_global* glob, fc3d_clawpack46_options_t* clawopt);
+void fc3d_clawpack46_options_store (struct fclaw2d_global* glob, 
+                                    fc3d_clawpack46_options_t* clawopt);
 
 void fc3d_clawpack46_output(struct fclaw2d_global *glob, int iframe);
 

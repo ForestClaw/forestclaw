@@ -54,10 +54,13 @@ void SETPROB();
 void CLAWPACK46_SETPROB();
 
 #define CLAWPACK46_QINIT   FCLAW_F77_FUNC(clawpack46_qinit,  CLAWPACK46_QINIT)
-void CLAWPACK46_QINIT(const int* maxmx, const int* maxmy, const int* meqn,
-                      const int* mbc, const int* mx, const int* my,
+void CLAWPACK46_QINIT(const int* maxmx, const int* maxmy, const int* maxmz, 
+                      const int* meqn,
+                      const int* mbc, 
+                      const int* mx, const int* my, const int* mz,
                       const double* xlower, const double* ylower,
-                      const double* dx, const double* dy,
+                      const double* zlower, 
+                      const double* dx, const double* dy, const double *dz,
                       double q[], const int* maux, double aux[]);
   
 #define CLAWPACK46_SETAUX  FCLAW_F77_FUNC(clawpack46_setaux, CLAWPACK46_SETAUX)
@@ -76,19 +79,24 @@ void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
                     const double* dt, const int mthbc[]);
 
 
-#define CLAWPACK46_B4STEP2 FCLAW_F77_FUNC(clawpack46_b4step2,CLAWPACK46_B4STEP2)
-void CLAWPACK46_B4STEP2(const int* maxmx, const int* maxmy, const int* mbc,
-                        const int* mx, const int* my, const int* meqn,
+#define CLAWPACK46_B4STEP3 FCLAW_F77_FUNC(clawpack46_b4step3,CLAWPACK46_B4STEP3)
+void CLAWPACK46_B4STEP3(const int* maxmx, const int* maxmy, const int* maxmz,
+                        const int* mbc,
+                        const int* mx, const int* my, const int* mz,
+                        const int* meqn,
                         double q[], const double* xlower, const double* ylower,
-                        const double* dx, const double* dy,
+                        const double* zlower,
+                        const double* dx, const double* dy, const double* dz,
                         const double* t, const double* dt,
                         const int* maux, double aux[]);
 
-#define CLAWPACK46_SRC2    FCLAW_F77_FUNC(clawpack46_src2,   CLAWPACK46_SRC2)
-void CLAWPACK46_SRC2(const int* maxmx, const int* maxmy, const int* meqn,
-                     const int* mbc, const int* mx,const int* my,
-                     const double* xlower, const double* ylower,
-                     const double* dx, const double* dy, double q[],
+#define CLAWPACK46_SRC3    FCLAW_F77_FUNC(clawpack46_src3,   CLAWPACK46_SRC3)
+void CLAWPACK46_SRC3(const int* maxmx, const int* maxmy, const int* maxmz, 
+                     const int* meqn,
+                     const int* mbc, const int* mx,const int* my, const int* mz,
+                     const double* xlower, const double* ylower, const double* zlower,
+                     const double* dx, const double* dy, const double* dz,
+                     double q[],
                      const int* maux, double aux[], const double* t,
                      const double* dt);
 
