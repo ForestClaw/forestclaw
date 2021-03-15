@@ -186,3 +186,11 @@ jobs:
       run: make
     - name: Tests
       run: make check
+  clawpack_advection_2d_annulus:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/annulus
+        mpirun -n 2 ./annulus -F regression.ini
