@@ -221,3 +221,138 @@ jobs:
       run: |
         cd forestclaw/forestclaw/applications/clawpack/advection/2d/disk
         mpirun -n 2 ./disk -F regression.ini
+  clawpack_advection_2d_filament:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/filament
+        mpirun -n 2 ./filament -F regression.ini
+  clawpack_advection_2d_hemisphere:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/hemisphere
+        mpirun -n 2 ./hemisphere -F regression.ini
+  clawpack_advection_2d_latlong:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/latlong
+        mpirun -n 2 ./latlong -F regression.ini
+  clawpack_advection_2d_replicated:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/replicated
+        mpirun -n 2 ./replicated -F regression.ini
+  clawpack_advection_2d_sphere:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/sphere
+        mpirun -n 2 ./sphere -F regression.ini
+  clawpack_advection_2d_swirl:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/swirl
+        mpirun -n 2 ./swirl -F regression.ini
+  clawpack_advection_2d_torus:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/torus
+        mpirun -n 2 ./torus -F regression.ini
+  clawpack_acoustics_2d_interface:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/acoustics/2d/interface
+        mpirun -n 2 ./interface -F regression.ini
+  clawpack_acoustics_2d_radial:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/acoustics/2d/radial
+        mpirun -n 2 ./radial -F regression.ini
