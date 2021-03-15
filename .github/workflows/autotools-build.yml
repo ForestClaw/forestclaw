@@ -123,7 +123,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: clawpack_binaries
-        path: applicaitons/clawpack
+        path: applications/clawpack
   mpi_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
