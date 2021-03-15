@@ -119,6 +119,11 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Upload Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: clawpack_binaries
+        path: applicaitons/clawpack
   mpi_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
