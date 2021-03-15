@@ -204,6 +204,7 @@ jobs:
         name: clawpack_binaries
     - name: Run Test
       run: |
+        pwd
         cd forestclaw/forestclaw/applications/clawpack/advection/2d/annulus
         mpirun -n 2 ./annulus -F regression.ini
   clawpack_advection_2d_disk:
@@ -356,3 +357,93 @@ jobs:
       run: |
         cd forestclaw/forestclaw/applications/clawpack/acoustics/2d/radial
         mpirun -n 2 ./radial -F regression.ini
+  clawpack_burgers_2d_pwconst:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/burgers/2d/pwconst
+        mpirun -n 2 ./pwconst -F regression.ini
+  clawpack_shallow_2d_bump:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/shallow/2d/bump
+        mpirun -n 2 ./bump -F regression.ini
+  clawpack_shallow_2d_radialdam:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/shallow/2d/radialdam
+        mpirun -n 2 ./radialdam -F regression.ini
+  clawpack_transport_correlatedcb:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/transport/correlatedcb
+        mpirun -n 2 ./correlatedcb -F regression.ini
+  clawpack_transport_gaussian:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/transport/gaussian
+        mpirun -n 2 ./gaussian -F regression.ini
+  clawpack_transport_slotted_disk:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/transport/slotted_disk
+        mpirun -n 2 ./slotted_disk -F regression.ini
