@@ -205,7 +205,8 @@ jobs:
     - name: Run Test
       run: |
         pwd
-        cd forestclaw/forestclaw/applications/clawpack/advection/2d/annulus
+        ls
+        cd applications/clawpack/advection/2d/annulus
         mpirun -n 2 ./annulus -F regression.ini
   clawpack_advection_2d_disk:
     needs: mpi_build_with_clawpack_enabled
