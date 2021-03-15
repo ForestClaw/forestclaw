@@ -195,6 +195,9 @@ jobs:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
     steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
     - name: Download Binaries
       uses: actions/download-artifact@v2
       with:
