@@ -206,3 +206,18 @@ jobs:
       run: |
         cd forestclaw/forestclaw/applications/clawpack/advection/2d/annulus
         mpirun -n 2 ./annulus -F regression.ini
+  clawpack_advection_2d_disk:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Run Test
+      run: |
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/disk
+        mpirun -n 2 ./disk -F regression.ini
