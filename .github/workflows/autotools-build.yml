@@ -201,5 +201,5 @@ jobs:
         name: clawpack_binaries
     - name: Run Test
       run: |
-        cd applications/clawpack/advection/2d/annulus
+        cd forestclaw/forestclaw/applications/clawpack/advection/2d/annulus
         mpirun -n 2 ./annulus -F regression.ini
