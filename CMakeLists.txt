@@ -163,3 +163,5 @@ endif(geoclaw)
 
 include(cmake/pkgconf.cmake)
 include(cmake/install.cmake)
+
+add_subdirectory(applications/clawpack)
