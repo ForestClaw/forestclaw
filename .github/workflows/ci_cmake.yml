@@ -1,0 +1,120 @@
+name: CI for CMake
+
+on:
+  push:
+    paths:
+      - "**/CMakeLists.txt"
+      - "**.cmake"
+      - "**.cmake.in"
+      - "**.c"
+      - "**.h"
+      - "**.h.in"
+      - ".github/workflows/ci_cmake.yml"
+  pull_request:
+  release:
+    types: [published]
+
+
+jobs:
+
+  linux:
+    runs-on: ubuntu-20.04
+    name: CMake build on Linux
+    timeout-minutes: 15
+
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout source code
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -yq
+        sudo apt-get install -yq --no-install-recommends \
+            ninja-build libopenmpi-dev openmpi-bin
+
+    - name: CMake configure
+      run: cmake --preset=ninja -DCMAKE_INSTALL_PREFIX=~/fclaw
+
+    - name: CMake build
+      run: cmake --build build
+
+    - name: CMake install (for examples)
+      run: cmake --install build
+
+    - name: CMake self-tests
+      run: ctest --parallel 2 --output-on-failure
+      working-directory: build
+
+    - name: CMake configure examples
+      run: cmake -B applications/build -S applications -DFORESTCLAW_ROOT=~/fclaw
+
+    - name: CMake build examples
+      run: cmake --build applications/build
+
+    - name: CMake test examples
+      run: ctest --parallel 2 --output-on-failure
+      working-directory: applications/build
+
+    - name: Create package
+      if: github.event.action == 'published'
+      run: cpack --config build/CPackConfig.cmake
+
+    - name: Upload package
+      if: github.event.action == 'published'
+      uses: actions/upload-artifact@v1
+      with:
+        name: binary-archive
+        path: build/package
+
+
+  mac:
+    runs-on: macos-latest
+    name: CMake build on MacOS
+    timeout-minutes: 20
+    env:
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout source code
+
+    - name: Install system dependencies
+      run: brew install open-mpi ninja
+
+    - name: CMake configure
+      run: cmake --preset=mac -DCMAKE_INSTALL_PREFIX=~/fclaw
+
+    - name: CMake build
+      run: cmake --build build
+
+    - name: CMake install (for examples)
+      run: cmake --install build
+
+    - name: CMake self-tests
+      run: ctest -E sort --parallel 2 --output-on-failure
+      working-directory: build
+
+    - name: CMake configure examples
+      run: cmake -B applications/build -S applications -DFORESTCLAW_ROOT=~/fclaw
+      env:
+        CC: gcc-10
+        CXX: g++-10
+        FC: gfortran-10
+
+    - name: CMake build examples
+      run: cmake --build applications/build
+
+    - name: CMake test examples
+      run: ctest --parallel 2 --output-on-failure
+      working-directory: applications/build
+
+    - name: Create package
+      if: github.event.action == 'published'
+      run: cpack --config build/CPackConfig.cmake
+
+    - name: Upload package
+      if: github.event.action == 'published'
+      uses: actions/upload-artifact@v1
+      with:
+        name: binary-archive
+        path: build/package

@@ -9,7 +9,7 @@ add_executable(swirl swirl_user.cpp swirl.cpp swirl_options.c
   $<TARGET_OBJECTS:swirl_f>)
 target_include_directories(swirl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${a})
 target_link_libraries(swirl PRIVATE FORESTCLAW::FORESTCLAW
-FORESTCLAW::clawpack4.6 FORESTCLAW::clawpack5 FORESTCLAW::clawpatch)
+FORESTCLAW::CLAWPACK4.6 FORESTCLAW::CLAWPACK5 FORESTCLAW::CLAWPATCH P4EST::P4EST SC::SC)
 
 add_test(NAME swirl
   COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} $<TARGET_FILE:swirl>

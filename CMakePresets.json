@@ -24,7 +24,12 @@
   "name": "mac", "inherits": "ninja",
   "displayName": "MacOS",
   "description": "MacOS: OpenMP not used",
-  "cacheVariables": {"openmp": false}
+  "cacheVariables": {"openmp": false},
+  "environment": {
+    "CC": "gcc-10",
+    "CXX": "g++-10",
+    "FC": "gfortran-10"
+  }
 },
 {
   "name": "makemac", "inherits": ["make", "mac"],
