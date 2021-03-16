@@ -50,7 +50,7 @@ add_subdirectory(advection/2d/sphere)
 
 ## Acoustics (on flat domains)
 add_subdirectory(acoustics/2d/radial)
-#add_subdirectory(acoustics/2d/interface)
+add_subdirectory(acoustics/2d/interface)
 
 ## Burgers
 #add_subdirectory(burgers/2d/pwconst)
