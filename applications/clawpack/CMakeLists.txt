@@ -60,7 +60,7 @@ add_subdirectory(shallow/2d/radialdam)
 add_subdirectory(shallow/2d/bump)
 
 ## Euler
-#add_subdirectory(euler/2d/shockbubble)
+add_subdirectory(euler/2d/shockbubble)
 #add_subdirectory(euler/2d/quadrants)
 
 
