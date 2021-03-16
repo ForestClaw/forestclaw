@@ -39,7 +39,7 @@ add_subdirectory(advection/2d/torus)
 add_subdirectory(advection/2d/replicated)
 
 ## hemisphere (manifold, multi-block)
-#add_subdirectory(advection/2d/hemisphere)
+add_subdirectory(advection/2d/hemisphere)
 
 ## sphere (cubed-sphere and pillow-disk)
 #add_subdirectory(advection/2d/sphere)
