@@ -75,7 +75,7 @@ add_subdirectory(euler/2d/quadrants)
 ##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
 ## -------------------------------------------------------------------------
 
-#add_subdirectory(transport/gaussian)
+add_subdirectory(transport/gaussian)
 #add_subdirectory(transport/slotted_disk)
 #add_subdirectory(transport/correlatedcb)
 
