@@ -120,7 +120,7 @@ jobs:
     - name: Tests
       run: make check
     - name: Tar Files
-      run: tar -cvf clawpack_binaries.tar .
+      run: tar --exclude='./git' -cvf clawpack_binaries.tar .
     - name: Upload Binaries
       uses: actions/upload-artifact@v2
       with:
