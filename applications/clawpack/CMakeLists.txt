@@ -42,7 +42,7 @@ add_subdirectory(advection/2d/replicated)
 add_subdirectory(advection/2d/hemisphere)
 
 ## sphere (cubed-sphere and pillow-disk)
-#add_subdirectory(advection/2d/sphere)
+add_subdirectory(advection/2d/sphere)
 
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
