@@ -119,11 +119,13 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Tar Files
+      run: tar -cvf clawpack_binaries.tar applications/clawpack
     - name: Upload Binaries
       uses: actions/upload-artifact@v2
       with:
         name: clawpack_binaries
-        path: applications/clawpack
+        path: clawpack_binaries.tar
   mpi_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -205,7 +207,6 @@ jobs:
     - name: Run Test
       run: |
         cd advection/2d/annulus
-        chmod +x annulus
         mpirun -n 2 ./annulus -F regression.ini
   clawpack_advection_2d_disk:
     needs: mpi_build_with_clawpack_enabled
@@ -218,10 +219,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd advection/2d/disk
-        chmod +x disk
         mpirun -n 2 ./disk -F regression.ini
   clawpack_advection_2d_filament:
     needs: mpi_build_with_clawpack_enabled
@@ -234,10 +236,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd advection/2d/filament
-        chmod +x filament
         mpirun -n 2 ./filament -F regression.ini
   clawpack_advection_2d_hemisphere:
     needs: mpi_build_with_clawpack_enabled
@@ -250,10 +253,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd advection/2d/hemisphere
-        chmod +x hemisphere
         mpirun -n 2 ./hemisphere -F regression.ini
   clawpack_advection_2d_latlong:
     needs: mpi_build_with_clawpack_enabled
@@ -266,10 +270,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd advection/2d/latlong
-        chmod +x latlong
         mpirun -n 2 ./latlong -F regression.ini
   clawpack_advection_2d_replicated:
     needs: mpi_build_with_clawpack_enabled
@@ -282,10 +287,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd advection/2d/replicated
-        chmod +x replicated
         mpirun -n 2 ./replicated -F regression.ini
   clawpack_advection_2d_sphere:
     needs: mpi_build_with_clawpack_enabled
@@ -298,10 +304,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd advection/2d/sphere
-        chmod +x sphere
         mpirun -n 2 ./sphere -F regression.ini
   clawpack_advection_2d_swirl:
     needs: mpi_build_with_clawpack_enabled
@@ -314,10 +321,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd advection/2d/swirl
-        chmod +x swirl
         mpirun -n 2 ./swirl -F regression.ini
   clawpack_advection_2d_torus:
     needs: mpi_build_with_clawpack_enabled
@@ -330,10 +338,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd advection/2d/torus
-        chmod +x torus
         mpirun -n 2 ./torus -F regression.ini
   clawpack_acoustics_2d_interface:
     needs: mpi_build_with_clawpack_enabled
@@ -346,10 +355,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd acoustics/2d/interface
-        chmod +x interface
         mpirun -n 2 ./interface -F regression.ini
   clawpack_acoustics_2d_radial:
     needs: mpi_build_with_clawpack_enabled
@@ -362,10 +372,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd acoustics/2d/radial
-        chmod +x radial
         mpirun -n 2 ./radial -F regression.ini
   clawpack_burgers_2d_pwconst:
     needs: mpi_build_with_clawpack_enabled
@@ -378,10 +389,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd burgers/2d/pwconst
-        chmod +x pwconst
         mpirun -n 2 ./pwconst -F regression.ini
   clawpack_shallow_2d_bump:
     needs: mpi_build_with_clawpack_enabled
@@ -394,10 +406,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd shallow/2d/bump
-        chmod +x bump
         mpirun -n 2 ./bump -F regression.ini
   clawpack_shallow_2d_radialdam:
     needs: mpi_build_with_clawpack_enabled
@@ -410,10 +423,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd shallow/2d/radialdam
-        chmod +x radialdam
         mpirun -n 2 ./radialdam -F regression.ini
   clawpack_transport_correlatedcb:
     needs: mpi_build_with_clawpack_enabled
@@ -426,10 +440,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd transport/correlatedcb
-        chmod +x correlatedcb
         mpirun -n 2 ./correlatedcb -F regression.ini
   clawpack_transport_gaussian:
     needs: mpi_build_with_clawpack_enabled
@@ -442,10 +457,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd transport/gaussian
-        chmod +x gaussian
         mpirun -n 2 ./gaussian -F regression.ini
   clawpack_transport_slotted_disk:
     needs: mpi_build_with_clawpack_enabled
@@ -458,8 +474,9 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
         cd transport/slotted_disk
-        chmod +x slotted_disk
         mpirun -n 2 ./slotted_disk -F regression.ini
