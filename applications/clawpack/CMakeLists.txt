@@ -57,7 +57,7 @@ add_subdirectory(burgers/2d/pwconst)
 
 ## Shallow
 add_subdirectory(shallow/2d/radialdam)
-#add_subdirectory(shallow/2d/bump)
+add_subdirectory(shallow/2d/bump)
 
 ## Euler
 #add_subdirectory(euler/2d/shockbubble)
