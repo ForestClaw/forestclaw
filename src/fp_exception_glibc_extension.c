@@ -171,7 +171,11 @@ fegetexcept (void)
 {
   static fenv_t fenv;
 
+#if defined(__MINGW64__) || defined(__MINGW32__)
+  return fegetenv (&fenv) ? -1 : (fenv.__control_word & FE_ALL_EXCEPT);
+#else
   return fegetenv (&fenv) ? -1 : (fenv.__control & FE_ALL_EXCEPT);
+#endif
 }
 
 int
@@ -182,10 +186,17 @@ feenableexcept (int excepts)
                old_excepts;  // previous masks
 
   if ( fegetenv (&fenv) ) return -1;
+#if defined(__MINGW64__) || defined(__MINGW32__)
+  old_excepts = fenv.__control_word & FE_ALL_EXCEPT;
+#else
   old_excepts = fenv.__control & FE_ALL_EXCEPT;
-
+#endif
   // unmask
+#if defined(__MINGW64__) || defined(__MINGW32__)
+  fenv.__control_word &= ~new_excepts;
+#else
   fenv.__control &= ~new_excepts;
+#endif
   fenv.__mxcsr   &= ~(new_excepts << 7);
 
   return ( fesetenv (&fenv) ? -1 : old_excepts );
@@ -199,10 +210,18 @@ fedisableexcept (int excepts)
                old_excepts;  // all previous masks
 
   if ( fegetenv (&fenv) ) return -1;
+#if defined(__MINGW64__) || defined(__MINGW32__)
+  old_excepts = fenv.__control_word & FE_ALL_EXCEPT;
+#else
   old_excepts = fenv.__control & FE_ALL_EXCEPT;
+#endif
 
   // mask
+#if defined(__MINGW64__) || defined(__MINGW32__)
+  fenv.__control_word |= new_excepts;
+#else
   fenv.__control |= new_excepts;
+#endif
   fenv.__mxcsr   |= new_excepts << 7;
 
   return ( fesetenv (&fenv) ? -1 : old_excepts );

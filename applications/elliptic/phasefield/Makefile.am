@@ -51,10 +51,6 @@ applications_elliptic_phasefield_phasefield_LDADD = \
 #       applications/elliptic/phasefield/libphasefield.a
 
 
-TEST_CPPFLAGS += $(applications_elliptic_phasefield_phasefield_CPPFLAGS)
-
 TEST_SOURCES += \
 	test/applications/elliptic/phasefield/phasefield_patch_operator.cpp \
 	$(NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES)
-
-TEST_LDADD += $(applications_elliptic_phasefield_phasefield_LDADD)

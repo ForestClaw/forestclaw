@@ -1,4 +1,4 @@
-#include <ThunderEgg/PatchOperator.h>
+#include <ThunderEgg.h>
 #include "phasefield_options.h"
 #include "fc2d_thunderegg_options.h"
 

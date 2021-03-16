@@ -1,5 +1,4 @@
 #include "phasefield_patch_operator.h"
-#include <ThunderEgg/ValVector.h>
 
 using namespace ThunderEgg;
 
