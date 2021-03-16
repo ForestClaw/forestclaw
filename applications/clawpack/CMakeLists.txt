@@ -56,7 +56,7 @@ add_subdirectory(acoustics/2d/interface)
 add_subdirectory(burgers/2d/pwconst)
 
 ## Shallow
-#add_subdirectory(shallow/2d/radialdam)
+add_subdirectory(shallow/2d/radialdam)
 #add_subdirectory(shallow/2d/bump)
 
 ## Euler
