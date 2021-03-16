@@ -36,7 +36,7 @@ add_subdirectory(advection/2d/disk)
 add_subdirectory(advection/2d/torus)
 
 ## replicated (square, multi-block)
-#add_subdirectory(advection/2d/replicated)
+add_subdirectory(advection/2d/replicated)
 
 ## hemisphere (manifold, multi-block)
 #add_subdirectory(advection/2d/hemisphere)
