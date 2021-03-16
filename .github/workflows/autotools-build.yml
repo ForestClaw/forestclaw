@@ -178,7 +178,7 @@ jobs:
         sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libblas-dev liblapack-dev 
     - name: Install ThunderEgg
       run: |
-        cd ThunderEggSrc
+        cd applications/ThunderEggSrc
         cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ .
         make install
     - name: Init and Update Submodules
@@ -206,7 +206,7 @@ jobs:
         name: clawpack_binaries
     - name: Run Test
       run: |
-        cd advection/2d/annulus
+        cd applications/advection/2d/annulus
         mpirun -n 2 ./annulus -F regression.ini
   clawpack_advection_2d_disk:
     needs: mpi_build_with_clawpack_enabled
@@ -223,7 +223,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd advection/2d/disk
+        cd applications/advection/2d/disk
         mpirun -n 2 ./disk -F regression.ini
   clawpack_advection_2d_filament:
     needs: mpi_build_with_clawpack_enabled
@@ -240,7 +240,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd advection/2d/filament
+        cd applications/advection/2d/filament
         mpirun -n 2 ./filament -F regression.ini
   clawpack_advection_2d_hemisphere:
     needs: mpi_build_with_clawpack_enabled
@@ -257,7 +257,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd advection/2d/hemisphere
+        cd applications/advection/2d/hemisphere
         mpirun -n 2 ./hemisphere -F regression.ini
   clawpack_advection_2d_latlong:
     needs: mpi_build_with_clawpack_enabled
@@ -274,7 +274,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd advection/2d/latlong
+        cd applications/advection/2d/latlong
         mpirun -n 2 ./latlong -F regression.ini
   clawpack_advection_2d_replicated:
     needs: mpi_build_with_clawpack_enabled
@@ -291,7 +291,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd advection/2d/replicated
+        cd applications/advection/2d/replicated
         mpirun -n 2 ./replicated -F regression.ini
   clawpack_advection_2d_sphere:
     needs: mpi_build_with_clawpack_enabled
@@ -308,7 +308,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd advection/2d/sphere
+        cd applications/advection/2d/sphere
         mpirun -n 2 ./sphere -F regression.ini
   clawpack_advection_2d_swirl:
     needs: mpi_build_with_clawpack_enabled
@@ -325,7 +325,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd advection/2d/swirl
+        cd applications/advection/2d/swirl
         mpirun -n 2 ./swirl -F regression.ini
   clawpack_advection_2d_torus:
     needs: mpi_build_with_clawpack_enabled
@@ -342,7 +342,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd advection/2d/torus
+        cd applications/advection/2d/torus
         mpirun -n 2 ./torus -F regression.ini
   clawpack_acoustics_2d_interface:
     needs: mpi_build_with_clawpack_enabled
@@ -359,7 +359,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd acoustics/2d/interface
+        cd applications/acoustics/2d/interface
         mpirun -n 2 ./interface -F regression.ini
   clawpack_acoustics_2d_radial:
     needs: mpi_build_with_clawpack_enabled
@@ -376,7 +376,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd acoustics/2d/radial
+        cd applications/acoustics/2d/radial
         mpirun -n 2 ./radial -F regression.ini
   clawpack_burgers_2d_pwconst:
     needs: mpi_build_with_clawpack_enabled
@@ -393,7 +393,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd burgers/2d/pwconst
+        cd applications/burgers/2d/pwconst
         mpirun -n 2 ./pwconst -F regression.ini
   clawpack_shallow_2d_bump:
     needs: mpi_build_with_clawpack_enabled
@@ -410,7 +410,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd shallow/2d/bump
+        cd applications/shallow/2d/bump
         mpirun -n 2 ./bump -F regression.ini
   clawpack_shallow_2d_radialdam:
     needs: mpi_build_with_clawpack_enabled
@@ -427,7 +427,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd shallow/2d/radialdam
+        cd applications/shallow/2d/radialdam
         mpirun -n 2 ./radialdam -F regression.ini
   clawpack_transport_correlatedcb:
     needs: mpi_build_with_clawpack_enabled
@@ -444,7 +444,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd transport/correlatedcb
+        cd applications/transport/correlatedcb
         mpirun -n 2 ./correlatedcb -F regression.ini
   clawpack_transport_gaussian:
     needs: mpi_build_with_clawpack_enabled
@@ -461,7 +461,7 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd transport/gaussian
+        cd applications/transport/gaussian
         mpirun -n 2 ./gaussian -F regression.ini
   clawpack_transport_slotted_disk:
     needs: mpi_build_with_clawpack_enabled
@@ -478,5 +478,5 @@ jobs:
       run: tar -xvf clawpack_binaries.tar
     - name: Run Test
       run: |
-        cd transport/slotted_disk
+        cd applications/transport/slotted_disk
         mpirun -n 2 ./slotted_disk -F regression.ini
