@@ -53,7 +53,7 @@ add_subdirectory(acoustics/2d/radial)
 add_subdirectory(acoustics/2d/interface)
 
 ## Burgers
-#add_subdirectory(burgers/2d/pwconst)
+add_subdirectory(burgers/2d/pwconst)
 
 ## Shallow
 #add_subdirectory(shallow/2d/radialdam)
