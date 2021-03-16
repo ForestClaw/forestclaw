@@ -76,8 +76,8 @@ add_subdirectory(euler/2d/quadrants)
 ## -------------------------------------------------------------------------
 
 add_subdirectory(transport/gaussian)
-#add_subdirectory(transport/slotted_disk)
-#add_subdirectory(transport/correlatedcb)
+add_subdirectory(transport/slotted_disk)
+add_subdirectory(transport/correlatedcb)
 
 
 ## ---------------------Transport on the sphere ---------------------------- 
