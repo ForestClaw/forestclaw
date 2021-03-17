@@ -75,87 +75,93 @@ install(TARGETS forestclaw
 
 add_subdirectory(src)
 
-# --- Clawpatch
+if(clawpack)
 
-add_library(clawpatch)
-set_target_properties(clawpatch PROPERTIES EXPORT_NAME CLAWPATCH)
-target_link_libraries(clawpatch PRIVATE forestclaw P4EST::P4EST SC::SC)
-target_include_directories(clawpatch
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/patches/clawpatch>
-  $<INSTALL_INTERFACE:include/clawpatch>
-  $<INSTALL_INTERFACE:include>)
+  # --- Clawpatch
 
-install(DIRECTORY
-  ${PROJECT_SOURCE_DIR}/src/patches/clawpatch
-  DESTINATION include
-  FILES_MATCHING PATTERN "*.h")
+  add_library(clawpatch)
+  set_target_properties(clawpatch PROPERTIES EXPORT_NAME CLAWPATCH)
+  target_link_libraries(clawpatch PRIVATE forestclaw P4EST::P4EST SC::SC)
+  target_include_directories(clawpatch
+    INTERFACE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/patches/clawpatch>
+    $<INSTALL_INTERFACE:include/clawpatch>
+    $<INSTALL_INTERFACE:include>)
 
-install(TARGETS clawpatch
-  EXPORT ${PROJECT_NAME}Targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  install(DIRECTORY
+    ${PROJECT_SOURCE_DIR}/src/patches/clawpatch
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h")
 
-add_subdirectory(src/patches/clawpatch)
+  install(TARGETS clawpatch
+    EXPORT ${PROJECT_NAME}Targets
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib)
 
-# --- Clawpack 4.6
+  add_subdirectory(src/patches/clawpatch)
 
-add_library(clawpack4.6)
-set_target_properties(clawpack4.6 PROPERTIES EXPORT_NAME CLAWPACK4.6)
-target_link_libraries(clawpack4.6 PRIVATE clawpatch P4EST::P4EST SC::SC)
-target_include_directories(clawpack4.6
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack4.6>
-  $<INSTALL_INTERFACE:include>)
 
-install(DIRECTORY
-  ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6
-  DESTINATION include
-  FILES_MATCHING PATTERN "*.h")
+  # --- Clawpack 4.6
 
-install(TARGETS clawpack4.6
-  EXPORT ${PROJECT_NAME}Targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  add_library(clawpack4.6)
+  set_target_properties(clawpack4.6 PROPERTIES EXPORT_NAME CLAWPACK4.6)
+  target_link_libraries(clawpack4.6 PRIVATE clawpatch P4EST::P4EST SC::SC)
+  target_include_directories(clawpack4.6
+    INTERFACE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack4.6>
+    $<INSTALL_INTERFACE:include>)
 
-add_subdirectory(src/solvers/fc2d_clawpack4.6)
+  install(DIRECTORY
+    ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h")
 
-# --- Clawpack 5
+  install(TARGETS clawpack4.6
+    EXPORT ${PROJECT_NAME}Targets
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib)
 
-add_library(clawpack5)
-set_target_properties(clawpack5 PROPERTIES EXPORT_NAME CLAWPACK5)
-target_link_libraries(clawpack5 PRIVATE clawpatch P4EST::P4EST SC::SC)
-target_include_directories(clawpack5
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack5>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack5>
-  $<INSTALL_INTERFACE:include>)
+  add_subdirectory(src/solvers/fc2d_clawpack4.6)
 
-install(DIRECTORY
-  ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack5
-  DESTINATION include
-  FILES_MATCHING PATTERN "*.h")
+  # --- Clawpack 5
 
-install(TARGETS clawpack5
-  EXPORT ${PROJECT_NAME}Targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  add_library(clawpack5)
+  set_target_properties(clawpack5 PROPERTIES EXPORT_NAME CLAWPACK5)
+  target_link_libraries(clawpack5 PRIVATE clawpatch P4EST::P4EST SC::SC)
+  target_include_directories(clawpack5
+    INTERFACE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack5>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack5>
+    $<INSTALL_INTERFACE:include>)
 
-add_subdirectory(src/solvers/fc2d_clawpack5)
+  install(DIRECTORY
+    ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack5
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h")
+
+  install(TARGETS clawpack5
+    EXPORT ${PROJECT_NAME}Targets
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib)
+
+  add_subdirectory(src/solvers/fc2d_clawpack5)
+
+  add_subdirectory(applications/clawpack)
+
+endif(clawpack)
 
 # --- geoclaw
 
 if(geoclaw)
 
-add_library(geoclaw)
-set_target_properties(geoclaw PROPERTIES EXPORT_NAME GEOCLAW)
-target_link_libraries(geoclaw PRIVATE forestclaw clawpatch P4EST::P4EST SC::SC)
+  add_library(geoclaw)
+  set_target_properties(geoclaw PROPERTIES EXPORT_NAME GEOCLAW)
+  target_link_libraries(geoclaw PRIVATE forestclaw clawpatch P4EST::P4EST SC::SC)
 
-add_subdirectory(src/solvers/fc2d_geoclaw)
-
+  add_subdirectory(src/solvers/fc2d_geoclaw)
 
 endif(geoclaw)
 
@@ -163,5 +169,3 @@ endif(geoclaw)
 
 include(cmake/pkgconf.cmake)
 include(cmake/install.cmake)
-
-add_subdirectory(applications/clawpack)
