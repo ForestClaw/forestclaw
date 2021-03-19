@@ -9,7 +9,7 @@ add_subdirectory(applications/elliptic/poisson)
 add_subdirectory(applications/elliptic/heat)
 
 ## Allencahn equation
-#add_subdirectory(applications/elliptic/allencahn)
+add_subdirectory(applications/elliptic/allencahn)
 
 ## Crystal growth
 add_subdirectory(applications/elliptic/phasefield)
