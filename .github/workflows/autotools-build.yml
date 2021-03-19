@@ -24,6 +24,8 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Install
+      run: sudo make install
   serial_build_with_clawpack_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -43,6 +45,8 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Install
+      run: sudo make install
   serial_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -62,6 +66,8 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Install
+      run: sudo make install
   serial_build_with_cudaclaw_enabled:
     runs-on: ubuntu-20.04
     env:
@@ -81,6 +87,8 @@ jobs:
       run: ./configure --enable-cudaclaw
     - name: Build
       run: make
+    - name: Install
+      run: sudo make install
   mpi_minimal_build:
     runs-on: ubuntu-20.04
     steps:
@@ -100,6 +108,8 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Install
+      run: sudo make install
   mpi_build_with_clawpack_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -119,6 +129,8 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Install
+      run: sudo make install
     - name: Tar Files
       run: tar --exclude='./.git' -cvf clawpack_binaries.tar .
     - name: Upload Binaries
@@ -145,6 +157,8 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Install
+      run: sudo make install
   mpi_build_with_cudaclaw_enabled:
     runs-on: ubuntu-20.04
     env:
@@ -164,6 +178,8 @@ jobs:
       run: ./configure --enable-cudaclaw --enable-mpi
     - name: Build
       run: make
+    - name: Install
+      run: sudo make install
   mpi_build_with_thunderegg_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -193,6 +209,8 @@ jobs:
       run: make
     - name: Tests
       run: make check
+    - name: Install
+      run: sudo make install
   clawpack_advection_2d_annulus:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
