@@ -43,6 +43,15 @@ if(NOT TARGET P4EST::P4EST)
   include(cmake/p4est.cmake)
 endif()
 
+# --- ThunderEgg
+
+if(NOT thunderegg_external)
+  #find_package(ThunderEgg)
+endif()
+if(NOT TARGET THUNDEREGG::THUNDEREGG)
+  include(cmake/ThunderEgg.cmake)
+endif()
+
 # --- configure
 
 include(cmake/config.cmake)
@@ -149,7 +158,7 @@ if(clawpack)
 
   add_subdirectory(src/solvers/fc2d_clawpack5)
 
-  add_subdirectory(applications/clawpack)
+  include(applications/clawpack/clawpack.cmake)
 
 endif(clawpack)
 
@@ -165,6 +174,16 @@ if(geoclaw)
 
 endif(geoclaw)
 
+# --- ThunderEgg
+if(thunderegg)
+
+  add_library(thunderegg)
+  set_target_properties(thunderegg PROPERTIES EXPORT_NAME THUNDEREGG)
+  target_link_libraries(thunderegg PRIVATE forestclaw clawpatch THUNDEREGG::THUNDEREGG)
+
+  add_subdirectory(src/solvers/fc2d_thunderegg)
+
+endif(thunderegg)
 # --- package
 
 include(cmake/pkgconf.cmake)

@@ -18,50 +18,50 @@
 ## ----------------
 
 ## swirl  (single block, square)
-add_subdirectory(advection/2d/swirl)
+add_subdirectory(applications/clawpack/advection/2d/swirl)
 
 ## filament  (square, multi-block disk)
-add_subdirectory(advection/2d/filament)
+add_subdirectory(applications/clawpack/advection/2d/filament)
 
 ## annulus  (manifold, periodic in one direction)
-add_subdirectory(advection/2d/annulus)
+add_subdirectory(applications/clawpack/advection/2d/annulus)
 
 ## latlong (manifold, periodic in one direction)
-add_subdirectory(advection/2d/latlong)
+add_subdirectory(applications/clawpack/advection/2d/latlong)
 
 ## disk  (manifold, multi-block)
-add_subdirectory(advection/2d/disk)
+add_subdirectory(applications/clawpack/advection/2d/disk)
 
 ## torus  (manifold, periodic in both directions)
-add_subdirectory(advection/2d/torus)
+add_subdirectory(applications/clawpack/advection/2d/torus)
 
 ## replicated (square, multi-block)
-add_subdirectory(advection/2d/replicated)
+add_subdirectory(applications/clawpack/advection/2d/replicated)
 
 ## hemisphere (manifold, multi-block)
-add_subdirectory(advection/2d/hemisphere)
+add_subdirectory(applications/clawpack/advection/2d/hemisphere)
 
 ## sphere (cubed-sphere and pillow-disk)
-add_subdirectory(advection/2d/sphere)
+add_subdirectory(applications/clawpack/advection/2d/sphere)
 
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
 ## ----------------------------------------------------------
 
 ## Acoustics (on flat domains)
-add_subdirectory(acoustics/2d/radial)
-add_subdirectory(acoustics/2d/interface)
+add_subdirectory(applications/clawpack/acoustics/2d/radial)
+add_subdirectory(applications/clawpack/acoustics/2d/interface)
 
 ## Burgers
-add_subdirectory(burgers/2d/pwconst)
+add_subdirectory(applications/clawpack/burgers/2d/pwconst)
 
 ## Shallow
-add_subdirectory(shallow/2d/radialdam)
-add_subdirectory(shallow/2d/bump)
+add_subdirectory(applications/clawpack/shallow/2d/radialdam)
+add_subdirectory(applications/clawpack/shallow/2d/bump)
 
 ## Euler
-add_subdirectory(euler/2d/shockbubble)
-add_subdirectory(euler/2d/quadrants)
+add_subdirectory(applications/clawpack/euler/2d/shockbubble)
+add_subdirectory(applications/clawpack/euler/2d/quadrants)
 
 
 
@@ -75,9 +75,9 @@ add_subdirectory(euler/2d/quadrants)
 ##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
 ## -------------------------------------------------------------------------
 
-add_subdirectory(transport/gaussian)
-add_subdirectory(transport/slotted_disk)
-add_subdirectory(transport/correlatedcb)
+add_subdirectory(applications/clawpack/transport/gaussian)
+add_subdirectory(applications/clawpack/transport/slotted_disk)
+add_subdirectory(applications/clawpack/transport/correlatedcb)
 
 
 ## ---------------------Transport on the sphere ---------------------------- 
@@ -85,6 +85,6 @@ add_subdirectory(transport/correlatedcb)
 ##           This is how you might call ForestClaw from another
 ##           program.
 ## -------------------------------------------------------------------------
-#add_subdirectory(advection/2d/torthem)
+#add_subdirectory(applications/clawpack/advection/2d/torthem)
 
 

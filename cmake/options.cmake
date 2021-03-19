@@ -3,7 +3,9 @@ option(openmp "use OpenMP" on)
 
 option(geoclaw "build Geoclaw")
 option(clawpack "build Clawpack")
+option(thunderegg "build ThunderEgg")
 
+option(thunderegg_external "force build of ThunderEgg")
 option(p4est_external "force build of p4est")
 option(sc_external "force build of libsc")
 
