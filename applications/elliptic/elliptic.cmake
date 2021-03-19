@@ -6,7 +6,7 @@
 add_subdirectory(applications/elliptic/poisson)
 
 ## Heat equation
-#add_subdirectory(applications/elliptic/heat)
+add_subdirectory(applications/elliptic/heat)
 
 ## Allencahn equation
 #add_subdirectory(applications/elliptic/allencahn)
