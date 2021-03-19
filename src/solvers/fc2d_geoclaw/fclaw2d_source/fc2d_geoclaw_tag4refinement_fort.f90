@@ -134,13 +134,13 @@ SUBROUTINE fc2d_geoclaw_fort_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
                     !! Check wave criteria
                     if (abs(eta - sea_level) > wave_tolerance) then
                         !! Check to see if we are near shore
-                        IF (q(1,i,j) < deep_depth) THEN
-                            tag_patch = 1
-                            return
-                        ELSE IF (level < max_level_deep) THEN
-                            tag_patch = 1
-                            return
-                        endif
+!!                        IF (q(1,i,j) < deep_depth) THEN
+!!                            tag_patch = 1
+!!                            return
+!!                        ELSE IF (level < max_level_deep) THEN
+!!                            tag_patch = 1
+!!                            return
+!!                        endif
                     endif
 
                     !! Check speed criteria, note that it might be useful to

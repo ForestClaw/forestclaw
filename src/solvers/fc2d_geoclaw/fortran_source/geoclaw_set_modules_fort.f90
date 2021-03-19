@@ -53,7 +53,7 @@ SUBROUTINE fc2d_geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in,  &
     ! CALL set_gauges(restart,meqn,fname)
     CALL set_refinement()             !# sets refinement control parameters
     CALL read_dtopo_settings()        !# specifies file with dtopo from earthquake
-    CALL read_topo_settings()         !# specifies topography (bathymetry) files
+    CALL read_topo_settings(.false.)           !# specifies topography (bathymetry) files
     CALL set_qinit()                  !# specifies file with dh if this used instead
     CALL set_fixed_grids()            !# Fixed grid settings
     CALL set_storm()                  ! Set storm parameters
