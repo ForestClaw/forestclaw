@@ -179,9 +179,11 @@ if(thunderegg)
 
   add_library(thunderegg)
   set_target_properties(thunderegg PROPERTIES EXPORT_NAME THUNDEREGG)
-  target_link_libraries(thunderegg PRIVATE forestclaw clawpatch THUNDEREGG::THUNDEREGG)
+  target_link_libraries(thunderegg PUBLIC forestclaw clawpatch THUNDEREGG::THUNDEREGG)
 
   add_subdirectory(src/solvers/fc2d_thunderegg)
+
+  include(applications/elliptic/elliptic.cmake)
 
 endif(thunderegg)
 # --- package

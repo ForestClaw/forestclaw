@@ -20,8 +20,10 @@ target_sources(thunderegg PRIVATE
   $<TARGET_OBJECTS:thunderegg_f>
 )
 
-target_include_directories(thunderegg PRIVATE
+#TODO clean this up
+target_include_directories(thunderegg PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/operators
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}/include
 )
