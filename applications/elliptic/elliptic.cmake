@@ -12,4 +12,4 @@ add_subdirectory(applications/elliptic/poisson)
 #add_subdirectory(applications/elliptic/allencahn)
 
 ## Crystal growth
-#add_subdirectory(applications/elliptic/phasefield)
+add_subdirectory(applications/elliptic/phasefield)
