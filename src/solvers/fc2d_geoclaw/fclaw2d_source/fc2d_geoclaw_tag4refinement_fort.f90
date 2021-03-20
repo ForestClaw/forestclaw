@@ -5,10 +5,10 @@ SUBROUTINE fc2d_geoclaw_fort_tag4refinement(mx,my,mbc,meqn,maux,xlower,ylower, &
     USE geoclaw_module, ONLY: spherical_distance, coordinate_system
 
     USE topo_module, ONLY: tlowtopo,thitopo,xlowtopo,xhitopo,ylowtopo,yhitopo
-    USE topo_module, ONLY: minleveltopo,mtopofiles
+    USE topo_module, ONLY: mtopofiles
 
     USE topo_module, ONLY: tfdtopo,xlowdtopo,xhidtopo,ylowdtopo,yhidtopo
-    USE topo_module, ONLY: minleveldtopo,num_dtopo
+    USE topo_module, ONLY: num_dtopo
 
     USE qinit_module, ONLY: x_low_qinit,x_hi_qinit,y_low_qinit,y_hi_qinit
     USE qinit_module, ONLY: min_level_qinit,qinit_type
