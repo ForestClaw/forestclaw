@@ -50,17 +50,17 @@ logical function allowflag(x,y,t,level)
         allowflag = .true.
         return
     endif
-    do m=1,mtopofiles
-        if (level < maxleveltopo(m)) then
-            if (x > xlowtopo(m) .and. x < xhitopo(m) .and. &
-                y > ylowtopo(m) .and. y < yhitopo(m) .and. &
-                t >= tlowtopo(m) .and. t < thitopo(m)) then
-
-                allowflag = .true.
-                return
-            endif
-        endif
-    enddo
+!!    do m=1,mtopofiles
+!!        if (level < maxleveltopo(m)) then
+!!            if (x > xlowtopo(m) .and. x < xhitopo(m) .and. &
+!!                y > ylowtopo(m) .and. y < yhitopo(m) .and. &
+!!                t >= tlowtopo(m) .and. t < thitopo(m)) then
+!!
+!!                allowflag = .true.
+!!                return
+!!            endif
+!!        endif
+!!    enddo
     do m=1,num_regions
         if (level < regions(m)%max_level) then
             if (x > regions(m)%x_low .and. x <  regions(m)%x_hi.and. &
@@ -78,10 +78,10 @@ logical function allowflag(x,y,t,level)
             y >  ylowdtopo(m) .and. y < yhidtopo(m).and. &
             t >= t0dtopo(m)   .and. t <= tfdtopo(m)) then
 
-            if (level < maxleveldtopo(m)) then
-                allowflag = .true.
-                return
-            endif
+!!            if (level < maxleveldtopo(m)) then
+!!                allowflag = .true.
+!!                return
+!!            endif
         endif
     enddo
 
