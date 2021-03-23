@@ -3,7 +3,7 @@ on: [push]
 env:
   CFLAGS: -lgfortran
   CXXFLAGS: -lgfortran
-  FFLAGS: -lgfortran
+  FFLAGS: -lgfortran -cpp
 jobs:
   serial_minimal_build:
     runs-on: ubuntu-20.04
