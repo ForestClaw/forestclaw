@@ -364,12 +364,14 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
         fclaw_global_infof("Entering mpi_debug session");
         fclaw_mpi_debug ();
     }
+#ifdef FCLAW_HAVE_FEENABLEEXCEPT
     if (fclaw_opt->trapfpe)
     {
         fclaw_global_infof("Enabling floating point traps\n");
-        // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
+        feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
         feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
     }
+#endif
 
     return FCLAW_NOEXIT;
 }
