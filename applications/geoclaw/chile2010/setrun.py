@@ -288,6 +288,27 @@ def setrun(claw_pkg='geoclaw'):
     forestclawdata.refine_threshold = 0.01
     forestclawdata.coarsen_threshold = 0.005
 
+
+    forestclawdata.weighted_partition = True
+    forestclawdata.smooth_refine = False
+    forestclawdata.smooth_level = 0
+
+    forestclawdata.outstyle_uses_maxlevel = False
+    forestclawdata.subcycle = False
+    forestclawdata.advance_one_step = False
+    forestclawdata.trapfpe = False
+    forestclawdata.mpi_debug = False
+    forestclawdata.conservation_check = False
+    forestclawdata.run_user_diagnostics = False
+    forestclawdata.output_gauges = False
+    forestclawdata.output = True
+
+
+    # forestclawdata.ax = clawdata.lower[0]
+    # forestclawdata.bx = clawdata.upper[0]
+    # forestclawdata.ay = clawdata.lower[1]
+    # forestclawdata.by = clawdata.upper[1]
+
     # forestclawdata.weighted_partition = True
 
 
@@ -313,6 +334,7 @@ def setrun(claw_pkg='geoclaw'):
     # Specify type of each aux variable in amrdata.auxtype.
     # This must be a list of length maux, each element of which is one of:
     #   'center',  'capacity', 'xleft', or 'yleft'  (see documentation).
+
 
     amrdata.aux_type = ['center','capacity','yleft']
 

@@ -24,7 +24,9 @@ class ForestClawData(object):
         self.run_user_diagnostics = False
         self.output_gauges = False
         self.output = True
-        self.verbosity = 'wall'
+        self.verbosity = 'essential'
+        self.report_timing=True
+        self.report_timing_verbosity = 'wall'
 
 
     def write(self,rundata):
@@ -73,7 +75,7 @@ class ForestClawData(object):
             'desired_cfl': clawdata.cfl_desired,
             'outstyle': clawdata.output_style,
             'nout': clawdata.num_output_times,
-            'nstep': clawdata.output_step_interval,                                    
+            'nstep': clawdata.output_step_interval,
             # Mapping
             # Domain dimensions
             'ax': clawdata.lower[0],
@@ -82,15 +84,50 @@ class ForestClawData(object):
             'by': clawdata.upper[1]
             }
 
+
+# Choice of BCs at xlower and xupper:
+#   0 => user specified (must modify bcN.f to use this option)
+#   1 => extrapolation (non-reflecting outflow)
+#   2 => periodic (must specify this at both boundaries)
+#   3 => solid wall for systems where q(2) is normal velocity
+
+#clawdata.bc_lower[0] = 'extrap'
+#clawdata.bc_upper[0] = 'extrap'
+#clawdata.bc_lower[1] = 'extrap'
+#clawdata.bc_upper[1] = 'extrap'
+
+        
+        mthbc_in  = [clawdata.bc_lower[0], clawdata.bc_upper[0], 
+                     clawdata.bc_lower[1], clawdata.bc_upper[1]]
+        mthbc = [0]*4
+        mthbc_str = ""
+        bc_dict = {'user' : 0, 'extrap' : 1, 'periodic' : 2, 'wall' : 3}
+        for k in range(4):
+            if type(mthbc_in[k]) == str:
+                mthbc[k] = bc_dict[mthbc_in[k]]
+            else:
+                mthbc[k] = mthbc_in[k]
+
+            mthbc_str += " " + str(mthbc[k])
+
+        # Apply same idea for the limiter! 
+
+        # Apply same idea to order 
+
+        # Can we get dashes instead of underscores?    
+
+
         geoclaw['geoclaw'] = {
-                'order': [2,2],
+                'order': "2 2   # Order of the method",  
                 'mcapa': clawdata.capa_index,
                 'mbathy': 1,
                 'src_term': 1,
                 'mwaves': clawdata.num_waves,
-                'mthlim': [4, 4, 4],
-                'mthbc': [1, 1, 1, 1],
-                # Coarsening
+                'mthlim': "4 4 4",
+                # 'mthbc': "1  1  1  1",   # 0,1,2,3
+                'mthbc' : mthbc_str,
+
+                # Coarsening (probably going to go away)
                 'dry_tolerance_c': geo_data.dry_tolerance,
                 'wave_tolerance_c': refinement_data.wave_tolerance,
                 'speed_tolerance_entries_c': 6,
