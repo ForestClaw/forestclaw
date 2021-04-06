@@ -55,16 +55,16 @@ class ForestClawData(object):
             'regrid_interval' : self.regrid_interval,
             'refine_threshold' : self.refine_threshold,
             'coarsen_threshold' : self.coarsen_threshold,
-            'smooth_refine' : self.smooth_refine,
-            'smooth_level' : self.smooth_level,
-            'outstyle_uses_maxlevel' : self.outstyle_uses_maxlevel,
+            'smooth-refine' : self.smooth_refine,
+            'smooth-level' : self.smooth_level,
+            'outstyle-uses-maxlevel' : self.outstyle_uses_maxlevel,
             'subcycle' : self.subcycle,
-            'advance_one_step' : self.advance_one_step,
+            'advance-one-step' : self.advance_one_step,
             'trapfpe' : self.trapfpe,
             'mpi_debug' : self.mpi_debug,
-            'conservation_check' : self.conservation_check,
-            'run_user_diagnostics' : self.run_user_diagnostics,
-            'output_gauges' : self.output_gauges,
+            'conservation-check' : self.conservation_check,
+            'run-user-diagnostics' : self.run_user_diagnostics,
+            'output-gauges' : self.output_gauges,
             'output' : self.output,
             'verbosity' : self.verbosity,
             #Time stepping 
@@ -75,9 +75,7 @@ class ForestClawData(object):
             'desired_cfl': clawdata.cfl_desired,
             'outstyle': clawdata.output_style,
             'nout': clawdata.num_output_times,
-            'nstep': clawdata.output_step_interval,
-            # Mapping
-            # Domain dimensions
+            'nstep': None,   # clawdata.output_step_interval,
             'ax': clawdata.lower[0],
             'bx': clawdata.upper[0],
             'ay': clawdata.lower[1],
@@ -114,7 +112,7 @@ class ForestClawData(object):
 
         # Apply same idea to order 
 
-        # Can we get dashes instead of underscores?    
+        # Apply same idea to src
 
 
         geoclaw['geoclaw'] = {
@@ -124,7 +122,6 @@ class ForestClawData(object):
                 'src_term': 1,
                 'mwaves': clawdata.num_waves,
                 'mthlim': "4 4 4",
-                # 'mthbc': "1  1  1  1",   # 0,1,2,3
                 'mthbc' : mthbc_str,
 
                 # Coarsening (probably going to go away)
