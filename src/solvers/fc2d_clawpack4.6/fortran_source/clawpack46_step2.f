@@ -109,7 +109,7 @@ c        # copy data along a slice into 1d arrays:
             enddo
          enddo
 
-         if (j .eq. 2-mbc) then
+         if (j .le. 0) then
             do m = 1,meqn
                if (block_corner_count(0) .eq. 3) then
                   do ibc = 1,mbc
@@ -122,7 +122,7 @@ c        # copy data along a slice into 1d arrays:
                   enddo
                endif
             enddo
-         else if (j .eq. my+mbc-1) then
+         else if (j .eq. my+1) then
             do m = 1,meqn
                if (block_corner_count(2) .eq. 3) then
                   do ibc = 1,mbc
