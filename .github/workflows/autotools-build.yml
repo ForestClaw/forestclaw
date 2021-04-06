@@ -3,7 +3,7 @@ on: [push]
 env:
   CFLAGS: -lgfortran
   CXXFLAGS: -lgfortran
-  FCFLAGS: -lgortran -cpp
+  FCFLAGS: -lgfortran -cpp
   FFLAGS: -lgfortran -cpp
 jobs:
   serial_minimal_build:
