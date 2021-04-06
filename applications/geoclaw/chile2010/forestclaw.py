@@ -31,70 +31,95 @@ class ForestClawData(object):
 
     def write(self,rundata):
         geoclaw = ConfigParser(allow_no_value=True)
+        geoclaw.optionxform = str # To original case of comments. 
 
         clawdata = rundata.clawdata
         geo_data = rundata.geo_data
         refinement_data = rundata.refinement_data
         amrdata = rundata.amrdata
 
-        geoclaw['user'] = { 'example' : 0}
+        geoclaw['user'] = {
+            'example' : 0
+        }
+        
         geoclaw['clawpatch'] = {
-            #Grid dimensions
-            'mx' : clawdata.num_cells[0],   #mx_leaf
-            'my' : clawdata.num_cells[1],   #my_leaf
-            'mbc': clawdata.num_ghost,      #Number of ghost cells
-            'maux': clawdata.num_aux,
-            'meqn': clawdata.num_eqn        #Number of equations
+        '# Grid dimensions' : None,
+        '   # mx_leaf' : None,
+        '   mx' : clawdata.num_cells[0],"\n"
+        '   # my_leaf' :None, 
+        '   my' : clawdata.num_cells[1], "\n"
+        '   # Number of ghost cells': None,
+        '   mbc': clawdata.num_ghost, "\n"
+
+        '   maux': clawdata.num_aux,"\n"
+        '   # Number of equations' : None,
+        '   meqn': clawdata.num_eqn        
             }
 
         geoclaw['Options'] = {
 
-            'minlevel' : self.minlevel,
-            'maxlevel' : self.maxlevel,
-            'weighted_partition' : self.weighted_partition,
-            'regrid_interval' : self.regrid_interval,
-            'refine_threshold' : self.refine_threshold,
-            'coarsen_threshold' : self.coarsen_threshold,
-            'smooth-refine' : self.smooth_refine,
-            'smooth-level' : self.smooth_level,
-            'outstyle-uses-maxlevel' : self.outstyle_uses_maxlevel,
-            'subcycle' : self.subcycle,
-            'advance-one-step' : self.advance_one_step,
-            'trapfpe' : self.trapfpe,
-            'mpi_debug' : self.mpi_debug,
-            'conservation-check' : self.conservation_check,
-            'run-user-diagnostics' : self.run_user_diagnostics,
-            'output-gauges' : self.output_gauges,
-            'output' : self.output,
-            'verbosity' : self.verbosity,
-            #Time stepping 
-            'tfinal': clawdata.tfinal,      # Final time
-            'use_fixed_dt': not clawdata.dt_variable,
-            'initial_dt': clawdata.dt_initial,
-            'max_cfl': clawdata.cfl_max,
-            'desired_cfl': clawdata.cfl_desired,
-            'outstyle': clawdata.output_style,
-            'nout': clawdata.num_output_times,
-            'nstep': None,   # clawdata.output_step_interval,
-            'ax': clawdata.lower[0],
-            'bx': clawdata.upper[0],
-            'ay': clawdata.lower[1],
-            'by': clawdata.upper[1]
-            }
+        '# Regridding information' : None,
+        '   # Minimum level':None,
+        '   minlevel' : self.minlevel,"\n"
+        '   # Maximum levels of refinement':None,
+        '   maxlevel' : self.maxlevel,"\n"
+        "  # Regrid every 'regrid_interval' time steps.":None,
+        '   weighted_partition' : self.weighted_partition,"\n"
 
+        '   regrid-interval' : self.regrid_interval,
+        '   refine-threshold' : self.refine_threshold,
+        '   coarsen-threshold' : self.coarsen_threshold,
+        '   smooth-refine' : self.smooth_refine,
+        '   smooth-level' : self.smooth_level,
+        '   outstyle-uses-maxlevel' : self.outstyle_uses_maxlevel,
+        '   subcycle' : self.subcycle,
+        '   advance-one-step' : self.advance_one_step,"\n"
 
-# Choice of BCs at xlower and xupper:
-#   0 => user specified (must modify bcN.f to use this option)
-#   1 => extrapolation (non-reflecting outflow)
-#   2 => periodic (must specify this at both boundaries)
-#   3 => solid wall for systems where q(2) is normal velocity
+        '   # Diagnostics and debugging':None,
+        '   # Trap floating point errors.':None,
+        '   trapfpe' : self.trapfpe,"\n"
+        '   # Attach mpi processes in gdb':None,
+        '   mpi-debug' : self.mpi_debug,"\n"
+        '   conservation-check' : self.conservation_check,
+        '   run-user-diagnostics' : self.run_user_diagnostics,"\n"
 
-#clawdata.bc_lower[0] = 'extrap'
-#clawdata.bc_upper[0] = 'extrap'
-#clawdata.bc_lower[1] = 'extrap'
-#clawdata.bc_upper[1] = 'extrap'
+        '# File and console IO' : None,
+        '   output-gauges' : self.output_gauges,
+        '   output' : self.output,
+        '   verbosity' : self.verbosity,"\n"
 
+        '# Time stepping' : None, 
+        '   # Final time':None,
+        '   tfinal': clawdata.tfinal, "\n"     
+
+        '   # Take a fixed time step':None,
+        '   use-fixed-dt': not clawdata.dt_variable,"\n"
+        "  # Initial time step for 'minlevel'":None,
+        '   initial-dt': clawdata.dt_initial,"\n"
+        '   # maximum cfl':None,
+        '   max-cfl': clawdata.cfl_max,"\n"
+        '   # desired cfl':None,
+        '   desired-cfl': clawdata.cfl_desired,"\n"
+
+        '   # 1 : Output steps  = tfinal/nout;':None,                  
+        '   # 2 : not implemented;':None,                              
+        '   # 3 : Take nout steps;  save files every nstep steps.':None,
+        '   outstyle': clawdata.output_style,"\n" 
+
+        '   # Used for all three out styles;  has different meaning, though':None,                                     
+        '   nout': clawdata.num_output_times,"\n"
+        '   # Only used if outstyle is 3':None,
+        '   nstep': clawdata.output_style,"\n"
+
+        '# Mapping' : None,"\n"
+        '   # Domain dimensions' : None,
+        '   ax': clawdata.lower[0],
+        '   bx': clawdata.upper[0],
+        '   ay': clawdata.lower[1],
+        '   by': clawdata.upper[1]
+        }
         
+        #mthbc
         mthbc_in  = [clawdata.bc_lower[0], clawdata.bc_upper[0], 
                      clawdata.bc_lower[1], clawdata.bc_upper[1]]
         mthbc = [0]*4
@@ -108,31 +133,90 @@ class ForestClawData(object):
 
             mthbc_str += " " + str(mthbc[k])
 
-        # Apply same idea for the limiter! 
+        #Apply same idea for the limiter! 
+        lim_in  = [ s for s in clawdata.limiter]
+
+        lim = [0]*clawdata.num_waves
+        lim_str = ""
+        bc_dict = {'none' : 0, 'minmod' : 1, 'superbee' : 2, 'vanleer' : 3, 'mc' : 4}
+        for k in range(clawdata.num_waves):
+            if type(lim_in[k]) == str:
+                lim[k] = bc_dict[lim_in[k]]
+            else:
+                lim[k] = lim_in[k]
+
+            lim_str += " " + str(lim[k])
 
         # Apply same idea to order 
+        ord_in  = clawdata.source_split
 
-        # Apply same idea to src
+        ord = [0]*clawdata.order
+        ord_str = ""
+        bc_dict = {'none':0, 'godunov' : 1, 'strang' : 2}
+        for k in range(clawdata.order):
+            if type(ord_in) == str:
+                ord[k] = bc_dict[ord_in]
+            else:
+                ord[k] = ord_in
+
+            ord_str += " " + str(ord[k])
+
+        # Can we get dashes instead of underscores?   yes
 
 
         geoclaw['geoclaw'] = {
-                'order': "2 2   # Order of the method",  
-                'mcapa': clawdata.capa_index,
-                'mbathy': 1,
-                'src_term': 1,
-                'mwaves': clawdata.num_waves,
-                'mthlim': "4 4 4",
-                'mthbc' : mthbc_str,
+            '   # normal and transverse order': None,
+            '   # Order of the method' :None,
+            '   # Source terms splitting:' :None,
+            "   #   src_split == 0 or 'none'    ==> no source term (src routine never called)" :None,
+            "   #   src_split == 1 or 'godunov' ==> Godunov (1st order) splitting used," :None,
+            "   #   src_split == 2 or 'strang'  ==> Strang (2nd order) splitting used,  not recommended." :None,
+            #order': "2 2", "\n" 
+            '   order': ord_str,"\n"
 
-                # Coarsening (probably going to go away)
-                'dry_tolerance_c': geo_data.dry_tolerance,
-                'wave_tolerance_c': refinement_data.wave_tolerance,
-                'speed_tolerance_entries_c': 6,
-                'speed_tolerance_c': [1e12, 1e12, 1e12, 1e12, 1e12, 1e12],
-                # Output
-                'ascii-out': True,
-                #Number of lines in gauge file to store in memory before printing
-                'gauge-buffer-length': 100
+            '   # mcapa' : None,
+            '   mcapa': clawdata.capa_index,"\n"
+            '   # mbathy' : None,
+            '   mbathy': 1,"\n"
+            '   # src_term' : None,
+            '   src-term': 1,"\n"
+
+            '   # mwaves': None,
+            '   mwaves': clawdata.num_waves,"\n"
+
+            "  # mthlim (is a vector in general, with 'mwaves' entries": None,
+            '    # List of limiters to use for each wave family:': None,
+            '    # Required:  len(limiter) == num_waves': None,
+            '    # Some options:': None,
+            "    #   0 or 'none'     ==> no limiter (Lax-Wendroff)": None,
+            "    #   1 or 'minmod'   ==> minmod": None,
+            "    #   2 or 'superbee' ==> superbee": None,
+            "    #   3 or 'mc'       ==> MC limiter": None,
+            "    #   4 or 'vanleer'  ==> van Leer": None,
+            #'   mthlim': "4 4 4","\n"
+            '   mthlim' : lim_str,"\n"
+
+            '   # mthbc (=left,right,bottom,top)' : None,
+                # 'mthbc': "1  1  1  1",   # 0,1,2,3
+            '   # Choice of BCs at xlower and xupper:':None,
+            '   # 0 => user specified (must modify bcN.f to use this option)':None,
+            '   # 1 => extrapolation (non-reflecting outflow)':None,
+            '   # 2 => periodic (must specify this at both boundaries)':None,
+            '   # 3 => solid wall for systems where q(2) is normal velocity':None,
+            '   mthbc' : mthbc_str,"\n"
+
+            '# Coarsening' : None,            #(probably going to go away)
+            '   dry-tolerance_c': geo_data.dry_tolerance,
+            '   wave-tolerance_c': refinement_data.wave_tolerance,
+            '   speed-tolerance-entries_c': 6,
+            '   speed-tolerance-c': "1e12 1e12 1e12 1e12 1e12 1e12","\n"
+
+            '   # Output' : None,
+            '   ascii-out': True,"\n"
+
+            '   # Number of lines in gauge file to store in memory before printing' : None,
+            '   gauge-buffer-length': 100
+
             }
             
         with open('geoclaw.ini','w') as geoclawfile:
