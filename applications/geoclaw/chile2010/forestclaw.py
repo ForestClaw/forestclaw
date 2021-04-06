@@ -116,8 +116,8 @@ class ForestClawData(object):
         '   bx': clawdata.upper[0],
         '   ay': clawdata.lower[1],
         '   by': clawdata.upper[1]
-            }
-
+        }
+        
         #mthbc
         mthbc_in  = [clawdata.bc_lower[0], clawdata.bc_upper[0], 
                      clawdata.bc_lower[1], clawdata.bc_upper[1]]
@@ -215,6 +215,7 @@ class ForestClawData(object):
 
             '   # Number of lines in gauge file to store in memory before printing' : None,
             '   gauge-buffer-length': 100
+
             }
             
         with open('geoclaw.ini','w') as geoclawfile:
