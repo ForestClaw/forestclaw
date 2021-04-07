@@ -39,7 +39,7 @@ class ForestClawData(object):
         amrdata = rundata.amrdata
 
         geoclaw['user'] = {
-            'example' : 0
+        '   example' : 0
         }
         
         geoclaw['clawpatch'] = {
@@ -147,11 +147,11 @@ class ForestClawData(object):
             lim_str += " " + str(lim[k])
 
         # Apply same idea to order 
-        ord_in  = clawdata.source_split
+        ord_in  = clawdata.order
 
         ord = [0]*clawdata.order
         ord_str = ""
-        bc_dict = {'none':0, 'godunov' : 1, 'strang' : 2}
+        bc_dict = {'godunov' : 1, 'Lax-Wendroff' : 2}
         for k in range(clawdata.order):
             if type(ord_in) == str:
                 ord[k] = bc_dict[ord_in]
@@ -165,11 +165,9 @@ class ForestClawData(object):
 
         geoclaw['geoclaw'] = {
             '   # normal and transverse order': None,
-            '   # Order of the method' :None,
-            '   # Source terms splitting:' :None,
-            "   #   src_split == 0 or 'none'    ==> no source term (src routine never called)" :None,
-            "   #   src_split == 1 or 'godunov' ==> Godunov (1st order) splitting used," :None,
-            "   #   src_split == 2 or 'strang'  ==> Strang (2nd order) splitting used,  not recommended." :None,
+            '   # Order of accuracy:': None,
+            '     # 1 => Godunov,': None,  
+            '     # 2 => Lax-Wendroff plus limiters': None,
             #order': "2 2", "\n" 
             '   order': ord_str,"\n"
 
@@ -205,9 +203,9 @@ class ForestClawData(object):
             '   mthbc' : mthbc_str,"\n"
 
             '# Coarsening' : None,            #(probably going to go away)
-            '   dry-tolerance_c': geo_data.dry_tolerance,
-            '   wave-tolerance_c': refinement_data.wave_tolerance,
-            '   speed-tolerance-entries_c': 6,
+            '   dry-tolerance-c': geo_data.dry_tolerance,
+            '   wave-tolerance-c': refinement_data.wave_tolerance,
+            '   speed-tolerance-entries-c': 6,
             '   speed-tolerance-c': "1e12 1e12 1e12 1e12 1e12 1e12","\n"
 
             '   # Output' : None,
