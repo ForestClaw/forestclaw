@@ -57,6 +57,7 @@ class ForestClawData(object):
             }
 
         geoclaw['Options'] = {
+
         '# Regridding information' : None,
         '   # Minimum level':None,
         '   minlevel' : self.minlevel,"\n"
