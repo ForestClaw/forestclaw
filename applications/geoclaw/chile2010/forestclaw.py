@@ -6,6 +6,9 @@ from configparser import ConfigParser
 #   1.  Fix problem with 'ascii-out'.  Why is it printing false?
 #   2.  Fix mthbc and mthlim so they follow 'ord_str' idiom.
 #   3.  Check that anything we don't set here is set in fclaw_options.
+#   4.  Check that chile example runs as expected
+#   5.  Move 'forestclaw.py' to directory 'forestclaw/python'
+#   6.  Set up setrun.py for 'bowl_slosh' and 'bowl_radial' examples.
 
 
 class ForestClawData(object):
