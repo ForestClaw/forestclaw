@@ -85,8 +85,8 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # Number of grid cells: Coarsest grid
-    clawdata.num_cells[0] = 30
-    clawdata.num_cells[1] = 30
+    clawdata.num_cells[0] = 16
+    clawdata.num_cells[1] = 16
 
     # ---------------
     # Size of system:
@@ -187,8 +187,6 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.steps_max = 5000
 
 
-
-
     # ------------------
     # Method to be used:
     # ------------------
@@ -247,7 +245,6 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.bc_upper[1] = 'extrap'
 
 
-
     # --------------
     # Checkpointing:
     # --------------
@@ -274,10 +271,10 @@ def setrun(claw_pkg='geoclaw'):
         # and at the final time.
         clawdata.checkpt_interval = 5
 
-    # ---------------------------------------------------
-    # Forestclaw parameters that aren't included in amrdata
-    # NOTES : We will need to create a forestclaw module
-    # ---------------------------------------------------
+    # --------------------------------------------------------
+    # Forestclaw parameters. 
+    # These will overwrite any similar parameters listed above
+    # --------------------------------------------------------
 
     forestclawdata = forestclaw.ForestClawData()
 
@@ -288,29 +285,24 @@ def setrun(claw_pkg='geoclaw'):
     forestclawdata.refine_threshold = 0.01
     forestclawdata.coarsen_threshold = 0.005
 
-
-    forestclawdata.weighted_partition = True
-    forestclawdata.smooth_refine = False
-    forestclawdata.smooth_level = 0
-
-    forestclawdata.outstyle_uses_maxlevel = False
     forestclawdata.subcycle = False
-    forestclawdata.advance_one_step = False
-    forestclawdata.trapfpe = False
-    forestclawdata.mpi_debug = False
-    forestclawdata.conservation_check = False
-    forestclawdata.run_user_diagnostics = False
-    forestclawdata.output_gauges = False
     forestclawdata.output = True
 
+    # ForestClaw verbosity choices : 
+    # 0 or 'silent'      : No output to the terminal
+    # 1 or 'essential'   : Only essential output, including errors.
+    # 2 or 'production'  : Production level output
+    # 3 or 'info'        : More detailed output
+    # 4 or 'debug'       : Includes detailed output from each processor
+    forestclawdata.verbosity = 'production'
 
-    # forestclawdata.ax = clawdata.lower[0]
-    # forestclawdata.bx = clawdata.upper[0]
-    # forestclawdata.ay = clawdata.lower[1]
-    # forestclawdata.by = clawdata.upper[1]
 
-    # forestclawdata.weighted_partition = True
+    # Block dimensions for non-square domains
+    forestclawdata.mi = 1
+    forestclawdata.mj = 1
 
+    forestclawdata.user = {'example'     : 0, 
+                           'pi-value' : 3.14159}
 
     # --------------------------------------------------
     # AMR parameters:
@@ -345,7 +337,7 @@ def setrun(claw_pkg='geoclaw'):
     # amrdata.flag2refine = True
 
     # # steps to take on each level L between regriddings of level L+1:
-    # amrdata.regrid_interval = 3
+    amrdata.regrid_interval = 3
 
     # # width of buffer zone around flagged points:
     # # (typically the same as regrid_interval so waves don't escape):
