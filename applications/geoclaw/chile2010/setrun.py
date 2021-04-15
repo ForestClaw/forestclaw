@@ -9,7 +9,11 @@ that will be read in by the Fortran code.
 from __future__ import absolute_import
 from __future__ import print_function
 import os
+import sys
 import numpy as np
+
+#importing forestclaw.py from a different directory
+sys.path.insert(0, '/Users/mathadmin/fclaw-install/forestclaw/python')
 
 import forestclaw
 
