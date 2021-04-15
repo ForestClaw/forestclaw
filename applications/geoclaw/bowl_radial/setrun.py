@@ -8,6 +8,13 @@ that will be read in by the Fortran code.
 
 import os
 import numpy as np
+import sys
+
+#importing forestclaw.py from a different directory
+sys.path.insert(0, '/Users/mathadmin/fclaw-install/forestclaw/python')
+
+import forestclaw
+
 
 
 #------------------------------
@@ -252,6 +259,39 @@ def setrun(claw_pkg='geoclaw'):
         # and at the final time.
         clawdata.checkpt_interval = 5
 
+    # --------------------------------------------------------
+    # Forestclaw parameters. 
+    # These will overwrite any similar parameters listed above
+    # --------------------------------------------------------
+
+    forestclawdata = forestclaw.ForestClawData()
+
+    forestclawdata.minlevel = 2
+    forestclawdata.maxlevel = 5
+
+    forestclawdata.regrid_interval = 1
+    forestclawdata.refine_threshold = 0.01
+    forestclawdata.coarsen_threshold = 0.005
+
+    forestclawdata.subcycle = False
+    forestclawdata.output = True
+
+    # ForestClaw verbosity choices : 
+    # 0 or 'silent'      : No output to the terminal
+    # 1 or 'essential'   : Only essential output, including errors.
+    # 2 or 'production'  : Production level output
+    # 3 or 'info'        : More detailed output
+    # 4 or 'debug'       : Includes detailed output from each processor
+    forestclawdata.verbosity = 'production'
+
+
+    # Block dimensions for non-square domains
+    forestclawdata.mi = 1
+    forestclawdata.mj = 1
+
+    forestclawdata.user = {'example'     : 0, 
+                           'pi-value' : 3.14159}
+
     # ---------------
     # AMR parameters:
     # ---------------
@@ -359,7 +399,7 @@ def setrun(claw_pkg='geoclaw'):
     rundata.gaugedata.min_time_increment = 0.025
     
 
-    return rundata
+    return rundata, forestclawdata
 
     # end of function setrun
     # ----------------------
@@ -436,5 +476,11 @@ def setgeo(rundata):
 if __name__ == '__main__':
     # Set up run-time parameters and write all data files.
     import sys
-    rundata = setrun(*sys.argv[1:])
+    from clawpack.geoclaw import kmltools
+
+    rundata,forestclawdata = setrun(*sys.argv[1:])
     rundata.write()    
+
+    forestclawdata.write(rundata)  # writes a ForestClaw geoclaw.ini file
+
+    kmltools.make_input_data_kmls(rundata)
