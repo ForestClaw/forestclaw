@@ -6,6 +6,12 @@ env:
   FCFLAGS: -lgfortran -cpp
   FFLAGS: -lgfortran -cpp
 jobs:
+
+
+################
+# Serial builds
+################
+
   serial_minimal_build:
     runs-on: ubuntu-20.04
     steps:
@@ -27,6 +33,8 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
+
+
   serial_build_with_clawpack_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -48,6 +56,8 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
+
+
   serial_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -69,6 +79,8 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
+
+
   serial_build_with_cudaclaw_enabled:
     runs-on: ubuntu-20.04
     env:
@@ -90,6 +102,12 @@ jobs:
       run: make
     - name: Install
       run: sudo make install
+
+
+#############
+# MPI builds
+#############
+
   mpi_minimal_build:
     runs-on: ubuntu-20.04
     steps:
@@ -111,6 +129,8 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
+
+
   mpi_build_with_clawpack_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -139,6 +159,8 @@ jobs:
       with:
         name: clawpack_binaries
         path: clawpack_binaries.tar
+
+
   mpi_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -160,6 +182,8 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
+
+
   mpi_build_with_cudaclaw_enabled:
     runs-on: ubuntu-20.04
     env:
@@ -181,6 +205,8 @@ jobs:
       run: make
     - name: Install
       run: sudo make install
+
+
   mpi_build_with_thunderegg_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -212,6 +238,12 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
+
+
+############################
+# Clawpack Regression tests
+############################
+
   clawpack_advection_2d_annulus:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -229,6 +261,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/annulus
         mpirun -n 2 ./annulus -F regression.ini
+
+
   clawpack_advection_2d_disk:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -246,6 +280,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/disk
         mpirun -n 2 ./disk -F regression.ini
+
+
   clawpack_advection_2d_filament:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -263,6 +299,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/filament
         mpirun -n 2 ./filament -F regression.ini
+
+
   clawpack_advection_2d_hemisphere:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -280,6 +318,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/hemisphere
         mpirun -n 2 ./hemisphere -F regression.ini
+
+
   clawpack_advection_2d_latlong:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -297,6 +337,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/latlong
         mpirun -n 2 ./latlong -F regression.ini
+
+
   clawpack_advection_2d_replicated:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -314,6 +356,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/replicated
         mpirun -n 2 ./replicated -F regression.ini
+
+
   clawpack_advection_2d_sphere:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -331,6 +375,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/sphere
         mpirun -n 2 ./sphere -F regression.ini
+
+
   clawpack_advection_2d_swirl:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -348,6 +394,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/swirl
         mpirun -n 2 ./swirl -F regression.ini
+
+
   clawpack_advection_2d_torus:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -365,6 +413,8 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/torus
         mpirun -n 2 ./torus -F regression.ini
+
+
   clawpack_acoustics_2d_interface:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -382,6 +432,8 @@ jobs:
       run: |
         cd applications/clawpack/acoustics/2d/interface
         mpirun -n 2 ./interface -F regression.ini
+
+
   clawpack_acoustics_2d_radial:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -399,6 +451,8 @@ jobs:
       run: |
         cd applications/clawpack/acoustics/2d/radial
         mpirun -n 2 ./radial -F regression.ini
+
+
   clawpack_burgers_2d_pwconst:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -416,6 +470,8 @@ jobs:
       run: |
         cd applications/clawpack/burgers/2d/pwconst
         mpirun -n 2 ./pwconst -F regression.ini
+
+
   clawpack_shallow_2d_bump:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -433,6 +489,8 @@ jobs:
       run: |
         cd applications/clawpack/shallow/2d/bump
         mpirun -n 2 ./bump -F regression.ini
+
+
   clawpack_shallow_2d_radialdam:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -450,6 +508,8 @@ jobs:
       run: |
         cd applications/clawpack/shallow/2d/radialdam
         mpirun -n 2 ./radialdam -F regression.ini
+
+
   clawpack_transport_correlatedcb:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -467,6 +527,8 @@ jobs:
       run: |
         cd applications/clawpack/transport/correlatedcb
         mpirun -n 2 ./correlatedcb -F regression.ini
+
+
   clawpack_transport_gaussian:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -484,6 +546,8 @@ jobs:
       run: |
         cd applications/clawpack/transport/gaussian
         mpirun -n 2 ./gaussian -F regression.ini
+
+
   clawpack_transport_slotted_disk:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
