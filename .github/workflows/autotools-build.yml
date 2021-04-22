@@ -5,6 +5,7 @@ env:
   CXXFLAGS: -lgfortran
   FCFLAGS: -lgfortran -cpp
   FFLAGS: -lgfortran -cpp
+  CUDA_CFLAGS: -arch=sm_61
 jobs:
   serial_minimal_build:
     runs-on: ubuntu-20.04
