@@ -141,10 +141,14 @@ class ForestClawData(object):
         mthbc = [0]*4
         mthbc_str = ""
         for i in range(4):
-            if mthbc_in[i] in [0,'user']:        mthbc[i] = 0
-            elif mthbc_in[i] in [1,'extrap']:    mthbc[i] = 1
-            elif mthbc_in[i] in [2,'periodic']:  mthbc[i] = 2
-            elif mthbc_in[i] in [3,'wall']:      mthbc[i] = 3
+            if mthbc_in[i] in [0,'user']:        
+                mthbc[i] = 0
+            elif mthbc_in[i] in [1,'extrap']:    
+                mthbc[i] = 1
+            elif mthbc_in[i] in [2,'periodic']:  
+                mthbc[i] = 2
+            elif mthbc_in[i] in [3,'wall']:      
+                mthbc[i] = 3
             else:
                 mthbc_in[i] = mthbc[i]
             mthbc_str += " " + str(mthbc[i])
@@ -153,11 +157,16 @@ class ForestClawData(object):
         lim = [0]*clawdata.num_waves
         lim_str = "" 
         for i in range(clawdata.num_waves):
-            if clawdata.limiter[i] in [0,'none']:        lim[i] = 0
-            elif clawdata.limiter[i] in [1,'minmod']:    lim[i] = 1
-            elif clawdata.limiter[i] in [2,'superbee']:  lim[i] = 2
-            elif clawdata.limiter[i] in [3,'vanleer']:   lim[i] = 3
-            elif clawdata.limiter[i] in [4,'mc']:        lim[i] = 4
+            if clawdata.limiter[i] in [0,'none']:        
+                lim[i] = 0
+            elif clawdata.limiter[i] in [1,'minmod']:    
+                lim[i] = 1
+            elif clawdata.limiter[i] in [2,'superbee']:  
+                lim[i] = 2
+            elif clawdata.limiter[i] in [3,'vanleer']:   
+                lim[i] = 3
+            elif clawdata.limiter[i] in [4,'mc']:        
+                lim[i] = 4
             else:
                 clawdata.limiter[i] = lim[i]
             lim_str += " " + str(lim[i])
