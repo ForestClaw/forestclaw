@@ -6,9 +6,21 @@ TESTS = test/run_test.sh
 
 test_test_SOURCES = \
 	test/test.cpp \
-	test/utils/DomainReader.h \
-	test/utils/DomainReader.cpp \
 	$(TEST_SOURCES)
 
-test_test_CPPFLAGS = $(TEST_CPPFLAGS) -DDATADIR=\"$(srcdir)/\"
-test_test_LDADD = $(TEST_LDADD)
+if FCLAW_ENABLE_THUNDEREGG
+test_test_SOURCES += \
+	test/utils/DomainReader.h \
+	test/utils/DomainReader.cpp 
+endif
+
+test_test_CPPFLAGS = -DDATADIR=\"$(srcdir)/\" \
+        $(AM_CPPFLAGS) \
+        $(FCLAW_THUNDEREGG_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS) \
+        $(FCLAW_CPPFLAGS)
+test_test_LDADD = \
+        $(LDADD) \
+        $(FCLAW_THUNDEREGG_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+        $(FCLAW_LDADD)

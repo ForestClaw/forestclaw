@@ -46,20 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
-#include <ThunderEgg/BiCGStab.h>
-#include <ThunderEgg/BiCGStabPatchSolver.h>
-#include <ThunderEgg/VarPoisson/StarPatchOperator.h>
-#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/P4estDomGen.h>
-#include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/ValVectorGenerator.h>
+#include <ThunderEgg.h>
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::VarPoisson;
 
 class heat : public PatchOperator<2>
 {
@@ -349,10 +339,12 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     auto op = make_shared<heat>(glob,te_domain,ghost_filler);
 
     // set the patch solver
+    auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
+    p_bcgs->setTolerance(mg_opt->patch_bcgs_tol);
+    p_bcgs->setMaxIterations(mg_opt->patch_bcgs_max_it);
+
     shared_ptr<PatchSolver<2>>  solver;
-    solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                 mg_opt->patch_bcgs_tol,
-                                                 mg_opt->patch_bcgs_max_it);
+    solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs,op);
 
     // create matrix
     shared_ptr<Operator<2>> A = op;
@@ -411,9 +403,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
+            smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs,patch_operator);
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
@@ -442,9 +432,8 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
         patch_operator = make_shared<heat>(glob,curr_domain, ghost_filler);
 
         //smoother
-        smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                       mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it);
+        smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs,patch_operator);
+
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
@@ -467,7 +456,10 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 #endif    
 
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
+    Iterative::BiCGStab<2> iter_solver;
+    iter_solver.setMaxIterations(mg_opt->max_it);
+    iter_solver.setTolerance(mg_opt->tol);
+    int its = iter_solver.solve(vg, A, u, f, M);
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 
