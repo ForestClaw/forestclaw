@@ -12,9 +12,6 @@ import os
 import sys
 import numpy as np
 
-#importing forestclaw.py from a different directory
-sys.path.insert(0, '/Users/mathadmin/fclaw-install/forestclaw/python')
-
 import forestclaw
 
 try:
