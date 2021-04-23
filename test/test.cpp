@@ -1,22 +1,22 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 #include "catch_reporter_automake.hpp"
-#include <mpi.h>
+#include <fclaw_mpi.h>
 
 int main(int argc, char *argv[])
 {
 	// global setup...
-	MPI_Init(nullptr, nullptr);
+	fclaw_mpi_init(nullptr, nullptr, sc_MPI_COMM_WORLD, SC_LP_PRODUCTION);
 
 	int result = Catch::Session().run(argc, argv);
 
 	// abort if failure, some tests can hang otherwise
 	if (result > 0) {
-		MPI_Abort(MPI_COMM_WORLD, result);
+		return -1;
 	}
 
 	// global clean-up...
-	MPI_Finalize();
+	fclaw_mpi_finalize();
 
 	return result;
 }

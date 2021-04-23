@@ -28,7 +28,6 @@
 #include <fclaw2d_global.h>
 
 #include <fclaw2d_patch.h>
-#include <fclaw2d_clawpatch.h>
 
 
 /* Store virtual table for elliptic solver */

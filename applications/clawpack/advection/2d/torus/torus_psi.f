@@ -24,7 +24,7 @@ c     # ------------------------------------------------------------
       if (beta .ne. 0) then
           write(6,'(A,A)') 'psi (psi.f) : Streamfunction only works ',
      &         'for beta == 0'
-          stop
+          stop 'error'
       endif
 
       psi = pi2*revs_per_s*alpha*(pi2*y + alpha*sin(pi2*y))
@@ -51,7 +51,7 @@ c     # ------------------------------------------------------------
       if (beta .ne. 0) then
           write(6,'(A,A)') 'psi (psi.f) : Streamfunction only works ',
      &         'for beta == 0'
-          stop
+          stop 'error'
       endif
 
 c     # Stream function for rigid body rotation.      
@@ -117,7 +117,7 @@ c     # Stream function for rigid body rotation.
 
       if (flag > 7) then
           write(6,*) 'psi.f : flag > 7'
-          stop
+          stop 'error'
       endif
 
 c     # flag = 0      NA
