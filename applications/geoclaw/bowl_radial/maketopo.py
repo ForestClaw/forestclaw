@@ -1,4 +1,3 @@
-
 """
 Module to create topo and qinit data files for this example.
 """
@@ -23,7 +22,7 @@ def maketopo():
     topography.x = linspace(xlower,xupper,nxpoints)
     topography.y = linspace(ylower,yupper,nypoints)
     topography.write(outfile, topo_type=2, Z_format="%22.15e")
-
+    
 def makeqinit():
     """
     Create qinit data file
