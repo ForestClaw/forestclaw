@@ -46,20 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
-#include <ThunderEgg/BiCGStab.h>
-#include <ThunderEgg/BiCGStabPatchSolver.h>
-#include <ThunderEgg/VarPoisson/StarPatchOperator.h>
-#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/P4estDomGen.h>
-#include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/ValVectorGenerator.h>
+#include <ThunderEgg.h>
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::VarPoisson;
 
 
 /**
@@ -145,14 +135,15 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
 
     // patch operator
-    auto op = make_shared<StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
+    auto op = make_shared<VarPoisson::StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
+    auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
+    p_bcgs->setTolerance(mg_opt->patch_bcgs_tol);
+    p_bcgs->setMaxIterations(mg_opt->patch_bcgs_max_it);
     shared_ptr<PatchSolver<2>>  solver;
     if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-        solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                     mg_opt->patch_bcgs_tol,
-                                                     mg_opt->patch_bcgs_max_it);
+        solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, op);
     }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
         solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
     }
@@ -210,15 +201,13 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
             //operator
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
             auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-            patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+            patch_operator = make_shared<VarPoisson::StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
             prev_beta_vec = restricted_beta_vec;
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
             if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-                smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                               mg_opt->patch_bcgs_tol,
-                                                               mg_opt->patch_bcgs_max_it);
+                smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
             }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
                 smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
             }
@@ -246,13 +235,11 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
         auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+        patch_operator = make_shared<VarPoisson::StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
 
         //smoother
         if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
+            smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
         }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
             smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
         }
@@ -273,7 +260,10 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
     shared_ptr<Vector<2>> u = vg->getNewVector();
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
+    Iterative::BiCGStab<2> iter_solver;
+    iter_solver.setMaxIterations(mg_opt->max_it);
+    iter_solver.setTolerance(mg_opt->tol);
+    int its = iter_solver.solve(vg, A, u, f, M);
 
     fclaw_global_productionf("Iterations: %i\n", its);
     fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());

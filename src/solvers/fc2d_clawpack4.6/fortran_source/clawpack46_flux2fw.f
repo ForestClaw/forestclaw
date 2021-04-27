@@ -2,8 +2,8 @@ c
 c
 c     =====================================================
       subroutine clawpack46_flux2fw(ixy,maxm,meqn,maux,mbc,mx,
-     &      q1d,dtdx1d,aux1,aux2,aux3,
-     &      faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
+     &                              q1d,dtdx1d,aux1,aux2,aux3,
+     &                  faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
      &      amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
      &      mwaves,mcapa,method,mthlim)
 c     =====================================================
@@ -126,7 +126,8 @@ c     # solve Riemann problem at each interface and compute Godunov updates
 c     ---------------------------------------------------------------------
 c
       call rpn2(ixy,maxm,meqn,mwaves,mbc,mx,q1d,q1d,
-     &          aux2,aux2,fwave,s,amdq,apdq)
+     &          aux2,aux2,fwave,s,amdq,apdq,maux)
+
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
       do 40 i=1,mx+1
@@ -179,7 +180,7 @@ c
 c
        if (method(3).eq.0) go to 999   !# no transverse propagation
 c
-       if (method(3).eq.2) then
+       if (method(2).gt.1 .and. method(3).eq.2) then
 c         # incorporate cqxx into amdq and apdq so that it is split also.
           do 150 i = 1, mx+1
              do 150 m=1,meqn
@@ -194,9 +195,9 @@ c      --------------------------------------------
 c
 c
 c     # split the left-going flux difference into down-going and up-going:
-      call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
-     &          q1d,q1d,aux1,aux2,aux3,
-     &          1,amdq,bmasdq,bpasdq)
+      call rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx,
+     &          q1d,q1d,aux1,aux2,aux3,1,
+     &          amdq,bmasdq,bpasdq)
 c
 c     # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
       do 160 m=1,meqn
@@ -211,9 +212,9 @@ c
   160          continue
 c
 c     # split the right-going flux difference into down-going and up-going:
-      call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
-     &          q1d,q1d,aux1,aux2,aux3,
-     &          2,apdq,bmasdq,bpasdq)
+      call rpt2(ixy,maxm,meqn,mwaves,maux,mbc,mx,
+     &          q1d,q1d,aux1,aux2,aux3,2,
+     &          apdq,bmasdq,bpasdq)
 c
 c     # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
       do 180 m=1,meqn

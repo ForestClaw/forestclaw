@@ -28,6 +28,7 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
       tag_patch = 1
+
       mq = 1
       qmin = q0(1,1,mq)
       qmax = q0(1,1,mq)
@@ -36,45 +37,51 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call user_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
-     &      coarsen_threshold,tag_patch)
+      call periodic_get_minmax(mx,my,mbc,meqn,mq,blockno,q0,qmin,qmax,
+     &      dx,dy,xlower(0),ylower(0),coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call user_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
-     &      coarsen_threshold,tag_patch)
+      call periodic_get_minmax(mx,my,mbc,meqn,mq,blockno, q1,qmin,qmax,
+     &      dx,dy,xlower(1),ylower(1),coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call user_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
-     &      coarsen_threshold,tag_patch)
+      call periodic_get_minmax(mx,my,mbc,meqn,mq,blockno,q2,qmin,qmax,
+     &      dx,dy,xlower(2),ylower(2),coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call user_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
-     &      coarsen_threshold,tag_patch)
+      call periodic_get_minmax(mx,my,mbc,meqn,mq,blockno,q3,qmin,qmax,
+     &      dx,dy,xlower(3),ylower(3),coarsen_threshold,tag_patch)
 
       end
 
-      subroutine user_get_minmax(mx,my,mbc,meqn,mq,q,
-     &      qmin,qmax,coarsen_threshold,tag_patch)
+      subroutine periodic_get_minmax(mx,my,mbc,meqn,mq,blockno, q,
+     &      qmin,qmax,dx,dy,xlower,ylower, 
+     &      coarsen_threshold,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq,tag_patch
+      integer mx,my,mbc,meqn,mq,tag_patch, blockno
       double precision coarsen_threshold
-      double precision qmin,qmax
+      double precision dx,dy,xlower,ylower
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      integer i,j
 
-      do i = 1,mx
-         do j = 1,my
-            qmin = min(q(i,j,mq),qmin)
-            qmax = max(q(i,j,mq),qmax)
-            if (abs(q(i,j,mq)) .gt. coarsen_threshold) then
-c            if ((qmax-qmin) .gt. coarsen_threshold) then
-c              # We won't coarsen this family because at least one
-c              # grid fails the coarsening test.
-               tag_patch = 0
-               return
-            endif
-         enddo
-      enddo
+      integer example
+      common /example_comm/ example  
+
+      double precision qmin,qmax
+      double precision qx, qy, xc,yc
+      integer i,j, init_flag
+      logical refine
+
+      init_flag = 0
+      refine = .false.
+
+      call tag4refinement(mx,my,mbc,meqn,xlower,ylower,dx,dy,
+     &      blockno, q, coarsen_threshold, init_flag, refine)
+
+      if (refine) then
+          tag_patch = 0
+      else
+          tag_patch = 1
+      endif
 
       end
