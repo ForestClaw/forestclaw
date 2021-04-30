@@ -267,8 +267,8 @@ def setrun(claw_pkg='geoclaw'):
     forestclawdata.maxlevel = 5
 
     forestclawdata.regrid_interval = 1
-    forestclawdata.refine_threshold = 0.01
-    forestclawdata.coarsen_threshold = 0.005
+    forestclawdata.refine_threshold = 0.25
+    forestclawdata.coarsen_threshold = 0.05
 
     forestclawdata.subcycle = False
     forestclawdata.output = True
