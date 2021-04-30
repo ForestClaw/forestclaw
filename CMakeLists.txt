@@ -33,6 +33,13 @@ if(NOT TARGET P4EST::P4EST)
   include(cmake/p4est.cmake)
 endif()
 
+if(NOT sc_external)
+  find_package(SC)
+endif()
+if(NOT TARGET SC::SC)
+  include(cmake/sc.cmake)
+endif()
+
 # --- configure
 
 include(cmake/config.cmake)
