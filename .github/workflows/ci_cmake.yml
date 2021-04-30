@@ -43,9 +43,6 @@ jobs:
     - name: CMake install (for examples)
       run: cmake --install build
 
-    - name: CMake self-tests
-      run: ctest --preset default
-
     - name: CMake configure examples
       run: cmake -B applications/build -S applications -DFORESTCLAW_ROOT=~
 

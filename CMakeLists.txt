@@ -80,6 +80,10 @@ target_include_directories(clawpatch
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/patches/clawpatch>
   $<INSTALL_INTERFACE:include/clawpatch>
   $<INSTALL_INTERFACE:include>)
+if(mpi)
+  target_link_libraries(clawpatch PRIVATE MPI::MPI_C)
+endif(mpi)
+
 
 install(DIRECTORY
   ${PROJECT_SOURCE_DIR}/src/patches/clawpatch
@@ -103,6 +107,9 @@ target_include_directories(clawpack4.6
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack4.6>
   $<INSTALL_INTERFACE:include>)
+if(mpi)
+  target_link_libraries(clawpack4.6 PRIVATE MPI::MPI_C)
+endif(mpi)
 
 install(DIRECTORY
   ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6
@@ -126,6 +133,9 @@ target_include_directories(clawpack5
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack5>
   $<INSTALL_INTERFACE:include>)
+if(mpi)
+  target_link_libraries(clawpack5 PRIVATE MPI::MPI_C)
+endif(mpi)
 
 install(DIRECTORY
   ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack5

@@ -8,8 +8,7 @@ ${a}/clawpack46_setaux.f ${a}/clawpack5_setaux.f90 ${a}/clawpack46_rpn2adv.f ${a
 add_executable(swirl swirl_user.cpp swirl.cpp swirl_options.c
   $<TARGET_OBJECTS:swirl_f>)
 target_include_directories(swirl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${a})
-target_link_libraries(swirl PRIVATE FORESTCLAW::FORESTCLAW
-FORESTCLAW::clawpack4.6 FORESTCLAW::clawpack5 FORESTCLAW::clawpatch)
+target_link_libraries(swirl PRIVATE FORESTCLAW::FORESTCLAW)
 
 add_test(NAME swirl
   COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} $<TARGET_FILE:swirl>

@@ -4,26 +4,18 @@ project(ForestClawApps LANGUAGES C CXX Fortran)
 
 include(CTest)
 
-find_package(MPI COMPONENTS C Fortran REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(MPI COMPONENTS C CXX Fortran REQUIRED)
+
 
 # --- get installed ForestClaw package
-find_package(FORESTCLAW CONFIG REQUIRED)
+find_package(FORESTCLAW REQUIRED)
 
-if(EXISTS ${FORESTCLAW_DIR}/../SC/SCTargets.cmake)
-  include(${FORESTCLAW_DIR}/../SC/SCTargets.cmake)
-
-  add_library(SC::SC INTERFACE IMPORTED)
-  target_link_libraries(SC::SC INTERFACE SC::sc)
-endif()
-
-include(${FORESTCLAW_DIR}/../P4EST/P4ESTTargets.cmake)
-add_library(P4EST::P4EST INTERFACE IMPORTED)
-target_link_libraries(P4EST::P4EST INTERFACE P4EST::p4est)
-
-include(${FORESTCLAW_DIR}/FORESTCLAWTargets.cmake)
+# build convenience imported target to assure proper linking
 add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED)
-target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE FORESTCLAW::forestclaw)
+target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE
+FORESTCLAW::clawpack4.6 FORESTCLAW::clawpack5 FORESTCLAW::clawpatch
+P4EST::P4EST SC::SC MPI::MPI_Fortran MPI::MPI_CXX MPI::MPI_C ZLIB::ZLIB)
 
 # --- apps
 
