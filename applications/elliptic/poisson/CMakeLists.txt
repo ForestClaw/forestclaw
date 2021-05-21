@@ -1,21 +1,21 @@
 add_library(poisson_f OBJECT 
-	hsmooth.f90 
-	fortran/poisson_setprob.f90 
-	fortran/poisson_fort_rhs.f90 
-	fortran/poisson_compute_error.f 
-	fortran/poisson_qexact.f90 
-	fortran/poisson_apply_bc.f90 
-	fortran/poisson_eval_bc.f90 
-	fortran/poisson_tag4refinement.f 
-	fortran/poisson_tag4coarsening.f 
-	fortran/poisson_output.f90
+  hsmooth.f90 
+  fortran/poisson_setprob.f90 
+  fortran/poisson_fort_rhs.f90 
+  fortran/poisson_compute_error.f 
+  fortran/poisson_qexact.f90 
+  fortran/poisson_apply_bc.f90 
+  fortran/poisson_eval_bc.f90 
+  fortran/poisson_tag4refinement.f 
+  fortran/poisson_tag4coarsening.f 
+  fortran/poisson_output.f90
 )
 
 add_executable(poisson 
-	poisson.cpp 
-	poisson_user.cpp 
-	poisson_options.c 
-	poisson_diagnostics.c 
+  poisson.cpp 
+  poisson_user.cpp 
+  poisson_options.c 
+  poisson_diagnostics.c 
   $<TARGET_OBJECTS:poisson_f>
 )
 

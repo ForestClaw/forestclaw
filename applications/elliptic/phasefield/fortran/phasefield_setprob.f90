@@ -1,5 +1,4 @@
 SUBROUTINE phasefield_setprob()
-    USE hsmooth_mod
     IMPLICIT none
 
     INTEGER example
