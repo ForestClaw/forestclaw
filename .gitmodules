@@ -15,6 +15,3 @@
 [submodule "cub"]
 	path = cub
 	url = ./cub
-[submodule "ThunderEgg"]
-	path = ThunderEgg
-	url = https://github.com/thunderegg/thunderegg
