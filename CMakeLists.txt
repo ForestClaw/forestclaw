@@ -10,6 +10,7 @@ include(CTest)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
+set(CMAKE_CXX_STANDARD 17)
 # --- user options
 
 include(cmake/options.cmake)
@@ -46,7 +47,7 @@ endif()
 # --- ThunderEgg
 
 if(NOT thunderegg_external)
-  #find_package(ThunderEgg)
+  find_package(ThunderEgg)
 endif()
 if(NOT TARGET THUNDEREGG::THUNDEREGG)
   include(cmake/ThunderEgg.cmake)
@@ -89,13 +90,15 @@ if(clawpack)
   # --- Clawpatch
 
   add_library(clawpatch)
-  set_target_properties(clawpatch PROPERTIES EXPORT_NAME CLAWPATCH)
   target_link_libraries(clawpatch PRIVATE forestclaw P4EST::P4EST SC::SC)
   target_include_directories(clawpatch
     INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/patches/clawpatch>
     $<INSTALL_INTERFACE:include/clawpatch>
     $<INSTALL_INTERFACE:include>)
+  if(mpi)
+    target_link_libraries(clawpatch PRIVATE MPI::MPI_C)
+  endif(mpi)
 
   install(DIRECTORY
     ${PROJECT_SOURCE_DIR}/src/patches/clawpatch
@@ -113,7 +116,6 @@ if(clawpack)
   # --- Clawpack 4.6
 
   add_library(clawpack4.6)
-  set_target_properties(clawpack4.6 PROPERTIES EXPORT_NAME CLAWPACK4.6)
   target_link_libraries(clawpack4.6 PRIVATE clawpatch P4EST::P4EST SC::SC)
   target_include_directories(clawpack4.6
     INTERFACE
@@ -121,6 +123,9 @@ if(clawpack)
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack4.6>
     $<INSTALL_INTERFACE:include>)
+  if(mpi)
+    target_link_libraries(clawpack4.6 PRIVATE MPI::MPI_C)
+  endif(mpi)
 
   install(DIRECTORY
     ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6
@@ -137,7 +142,6 @@ if(clawpack)
   # --- Clawpack 5
 
   add_library(clawpack5)
-  set_target_properties(clawpack5 PROPERTIES EXPORT_NAME CLAWPACK5)
   target_link_libraries(clawpack5 PRIVATE clawpatch P4EST::P4EST SC::SC)
   target_include_directories(clawpack5
     INTERFACE
@@ -145,6 +149,10 @@ if(clawpack)
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack5>
     $<INSTALL_INTERFACE:include>)
+  if(mpi)
+    target_link_libraries(clawpack5 PRIVATE MPI::MPI_C)
+  endif(mpi)
+
 
   install(DIRECTORY
     ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack5
@@ -180,6 +188,9 @@ if(thunderegg)
   add_library(thunderegg)
   set_target_properties(thunderegg PROPERTIES EXPORT_NAME THUNDEREGG)
   target_link_libraries(thunderegg PUBLIC forestclaw clawpatch THUNDEREGG::THUNDEREGG)
+  if(mpi)
+    target_link_libraries(thunderegg PRIVATE MPI::MPI_C)
+  endif(mpi)
 
   add_subdirectory(src/solvers/fc2d_thunderegg)
 

@@ -28,12 +28,7 @@ target_include_directories(swirl PRIVATE
 )
 
 target_link_libraries(swirl PRIVATE 
-  forestclaw
-  clawpack4.6
-  clawpack5
-  clawpatch
-  P4EST::P4EST 
-  SC::SC
+  FORESTCLAW::FORESTCLAW 
 )
 
 # add_test(NAME swirl
