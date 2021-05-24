@@ -46,6 +46,7 @@ c     ==========================================================
       integer i0bpadq, iused
       double precision dtdx, dtdy, cfl1d
       integer m,i,j, ma, ixy
+      integer sweep_dir
 
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
@@ -79,28 +80,35 @@ c
       dtdx = dt/dx
       dtdy = dt/dy
 c
-      do 10 m=1,meqn
-         do 10 i=1-mbc,mx+mbc
-            do 10 j=1-mbc,my+mbc
+      do  m=1,meqn
+         do i=1-mbc,mx+mbc
+            do j=1-mbc,my+mbc
                fm(i,j,m) = 0.d0
                fp(i,j,m) = 0.d0
                gm(i,j,m) = 0.d0
                gp(i,j,m) = 0.d0
-   10          continue
+            end do
+        end do
+      end do
 c
       if (mcapa.eq.0) then
 c        # no capa array:
-         do 5 i=1-mbc,maxm+mbc
+         do  i=1-mbc,maxm+mbc
             dtdx1d(i) = dtdx
             dtdy1d(i) = dtdy
-    5       continue
-         endif
-c
-c
+         end do
+      endif
+
+c     # Set corners for an xsweep      
+      sweep_dir = 0
+      call clawpack46_fix_corners(mx,my,mbc,meqn,qold,sweep_dir,
+     &             block_corner_count)
+
+
 c     # perform x-sweeps
 c     ==================
 c
-      do 50 j = 2-mbc,my+mbc-1
+      do  j = 2-mbc,my+mbc-1
 c
 c        # copy data along a slice into 1d arrays:
          do m=1,meqn
@@ -109,48 +117,49 @@ c        # copy data along a slice into 1d arrays:
             enddo
          enddo
 
-         if (j .le. 0) then
-            do m = 1,meqn
-               if (block_corner_count(0) .eq. 3) then
-                  do ibc = 1,mbc
-                     q1d(1-ibc,m) = qold(ibc,0,m)
-                  enddo
-               endif
-               if (block_corner_count(1) .eq. 3) then
-                  do ibc = 1,mbc
-                     q1d(mx+ibc,m) = qold(mx-ibc+1,0,m)
-                  enddo
-               endif
-            enddo
-         else if (j .eq. my+1) then
-            do m = 1,meqn
-               if (block_corner_count(2) .eq. 3) then
-                  do ibc = 1,mbc
-                     q1d(1-ibc,m) = qold(ibc,my+1,m)
-                  enddo
-               endif
-               if (block_corner_count(3) .eq. 3) then
-                  do ibc = 1,mbc
-                     q1d(mx+ibc,m) = qold(mx-ibc+1,my+1,m)
-                  enddo
-               endif
-            enddo
-         endif
+c         if (j .le. 0) then
+c            do m = 1,meqn
+c               if (block_corner_count(0) .eq. 3) then
+c                  do ibc = 1,mbc
+c                     q1d(1-ibc,m) = qold(ibc,0,m)
+c                  enddo
+c               endif
+c               if (block_corner_count(1) .eq. 3) then
+c                  do ibc = 1,mbc
+c                     q1d(mx+ibc,m) = qold(mx-ibc+1,0,m)
+c                  enddo
+c               endif
+c            enddo
+c         else if (j .eq. my+1) then
+c            do m = 1,meqn
+c               if (block_corner_count(2) .eq. 3) then
+c                  do ibc = 1,mbc
+c                     q1d(1-ibc,m) = qold(ibc,my+1,m)
+c                  enddo
+c               endif
+c               if (block_corner_count(3) .eq. 3) then
+c                  do ibc = 1,mbc
+c                     q1d(mx+ibc,m) = qold(mx-ibc+1,my+1,m)
+c                  enddo
+c               endif
+c            enddo
+c         endif
 c
          if (mcapa .gt. 0)  then
-           do 21 i = 1-mbc, mx+mbc
+           do i = 1-mbc, mx+mbc
                dtdx1d(i) = dtdx / aux(i,j,mcapa)
-   21          continue
-           endif
+           end do
+         endif
 c
          if (maux .gt. 0)  then
-             do 22 ma=1,maux
-               do 22 i = 1-mbc, mx+mbc
+             do  ma=1,maux
+               do  i = 1-mbc, mx+mbc
                  aux1(i,ma) = aux(i,j-1,ma)
                  aux2(i,ma) = aux(i,j  ,ma)
                  aux3(i,ma) = aux(i,j+1,ma)
-   22            continue
-           endif
+               end do
+            end do
+        endif
 c
 c
 c        # Store the value of j along this slice in the common block
@@ -171,24 +180,31 @@ c        # compute modifications fadd and gadd to fluxes along this slice:
 c
 c        # update fluxes for use in AMR:
 c        # NOTE : We update ghost cell values for subcycling
-         do 25 m=1,meqn
-            do 25 i=2-mbc,mx+mbc
+         do  m=1,meqn
+            do  i=2-mbc,mx+mbc
                fm(i,j,m) = fm(i,j,m) + faddm(i,m)
                fp(i,j,m) = fp(i,j,m) + faddp(i,m)
                gm(i,j,m) = gm(i,j,m) + gaddm(i,m,1)
                gp(i,j,m) = gp(i,j,m) + gaddp(i,m,1)
                gm(i,j+1,m) = gm(i,j+1,m) + gaddm(i,m,2)
                gp(i,j+1,m) = gp(i,j+1,m) + gaddp(i,m,2)
-   25          continue
-   50    continue
+            end do
+        end do
+      end do
 c
 c
 c
 c     # perform y sweeps
 c     ==================
 c
+
+c     # Set corners for an y-sweep      
+      sweep_dir = 1
+      call clawpack46_fix_corners(mx,my,mbc,meqn,qold,sweep_dir,
+     &             block_corner_count)
+
 c
-      do 100 i = 2-mbc, mx+mbc-1
+      do  i = 2-mbc, mx+mbc-1
 c
 c        # copy data along a slice into 1d arrays:
          do m=1,meqn
@@ -197,49 +213,50 @@ c        # copy data along a slice into 1d arrays:
             enddo
          enddo
 
-         if (i .eq. 0) then
-            do m = 1,meqn
-               if (block_corner_count(0) .eq. 3) then
-                  do jbc = 1,mbc
-                     q1d(1-jbc,m) = qold(0,jbc,m)
-                  enddo
-               endif
-               if (block_corner_count(2) .eq. 3) then
-                  do jbc = 1,mbc
-                     q1d(my+jbc,m) = qold(0,my-jbc+1,m)
-                  enddo
-               endif
-            enddo
-         else if (i .eq. mx+1) then
-            do m = 1,meqn
-               if (block_corner_count(1) .eq. 3) then
-                  do jbc = 1,mbc
-                     q1d(1-jbc,m) = qold(mx+1,jbc,m)
-                  enddo
-               endif
-               if (block_corner_count(3) .eq. 3) then
-                  do jbc= 1,mbc
-                     q1d(my+jbc,m) = qold(mx+1,my-jbc+1,m)
-                  enddo
-               endif
-            enddo
-         endif
+c         if (i .eq. 0) then
+c            do m = 1,meqn
+c               if (block_corner_count(0) .eq. 3) then
+c                  do jbc = 1,mbc
+c                     q1d(1-jbc,m) = qold(0,jbc,m)
+c                  enddo
+c               endif
+c               if (block_corner_count(2) .eq. 3) then
+c                  do jbc = 1,mbc
+c                     q1d(my+jbc,m) = qold(0,my-jbc+1,m)
+c                  enddo
+c               endif
+c            enddo
+c         else if (i .eq. mx+1) then
+c            do m = 1,meqn
+c               if (block_corner_count(1) .eq. 3) then
+c                  do jbc = 1,mbc
+c                     q1d(1-jbc,m) = qold(mx+1,jbc,m)
+c                  enddo
+c               endif
+c               if (block_corner_count(3) .eq. 3) then
+c                  do jbc= 1,mbc
+c                     q1d(my+jbc,m) = qold(mx+1,my-jbc+1,m)
+c                  enddo
+c               endif
+c            enddo
+c         endif
 
 c
          if (mcapa .gt. 0)  then
-           do 71 j = 1-mbc, my+mbc
+           do  j = 1-mbc, my+mbc
                dtdy1d(j) = dtdy / aux(i,j,mcapa)
-   71          continue
-           endif
+           end do
+         endif
 c
          if (maux .gt. 0)  then
-             do 72 ma=1,maux
-               do 72 j = 1-mbc, my+mbc
+             do  ma=1,maux
+               do  j = 1-mbc, my+mbc
                  aux1(j,ma) = aux(i-1,j,ma)
                  aux2(j,ma) = aux(i,  j,ma)
                  aux3(j,ma) = aux(i+1,j,ma)
-   72            continue
-           endif
+               end do
+            end do
+        endif
 c
 c
 c        # Store the value of i along this slice in the common block
@@ -261,17 +278,86 @@ c
 c        #
 c        # update fluxes for use in AMR:
 c
-         do 75 m=1,meqn
-            do 75 j=2-mbc,my+mbc
+         do  m=1,meqn
+            do  j=2-mbc,my+mbc
                gm(i,j,m) = gm(i,j,m) + faddm(j,m)
                gp(i,j,m) = gp(i,j,m) + faddp(j,m)
                fm(i,j,m) = fm(i,j,m) + gaddm(j,m,1)
                fp(i,j,m) = fp(i,j,m) + gaddp(j,m,1)
                fm(i+1,j,m) = fm(i+1,j,m) + gaddm(j,m,2)
                fp(i+1,j,m) = fp(i+1,j,m) + gaddp(j,m,2)
-   75          continue
-  100    continue
+           end do
+        end do
+      end do
 c
 c
       return
+      end
+
+
+      subroutine clawpack46_fix_corners(mx,my,mbc,meqn,q,sweep_dir,
+     &             block_corner_count)
+      implicit none
+
+      integer mx,my,mbc,meqn,sweep_dir
+      integer block_corner_count(0:3)
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+
+      integer i,j,k,m,idata,jdata
+      double precision ibar(0:3),jbar(0:3)
+      integer idir, i1, j1, i2, j2, ibc, jbc
+      logical use_b
+
+C       data ibar /0.5, 0.5, mx+0.5, mx+0.5/
+C       data jbar /0.5, my+0.5, my+0.5, 0.5/
+
+      ibar(0) = 0.5
+      ibar(1) = 0.5
+      ibar(2) = mx+0.5
+      ibar(3) = mx+0.5
+
+      jbar(0) = 0.5
+      jbar(1) = my+0.5
+      jbar(2) = my+0.5
+      jbar(3) = 0.5
+
+      do m = 1,meqn
+          do k = 0,3
+              if (block_corner_count(k) .ne. 3) then
+                  cycle
+              endif
+              use_b = sweep_dir .eq. 0 .and. (k .eq. 0 .or. k .eq. 3)
+     &          .or.  sweep_dir .eq. 1 .and. (k .eq. 1 .or. k .eq. 2)
+              do ibc = 1,mbc
+                  do jbc = 1,mbc
+c                     # Average fine grid corners onto coarse grid ghost corners
+                      if (k .eq. 0) then
+                          i1 = 1-ibc
+                          j1 = 1-jbc
+                      elseif (k .eq. 1) then
+                          i1 = mx+ibc
+                          j1 = 1-jbc
+                      elseif (k .eq. 2) then
+                          i1 = 1-ibc
+                          j1 = my+jbc
+                      elseif (k .eq. 3) then
+                          i1 = mx+ibc
+                          j1 = my+jbc
+                      endif
+
+                      if (use_b) then
+c                         # Transform involves B                
+                          idata =  j1 + ibar(k) - jbar(k)
+                          jdata = -i1 + ibar(k) + jbar(k)
+                      else
+c                         # Transform involves B.transpose()             
+                          idata = -j1 + ibar(k) + jbar(k)
+                          jdata =  i1 - ibar(k) + jbar(k)
+                      endif 
+                      q(i1,j1,m) = q(idata,jdata,m)
+                  end do   !! jbc
+              end do  !! ibc
+          end do   !! corner 'k' loop
+      end do  !! meqn loop
+
       end
