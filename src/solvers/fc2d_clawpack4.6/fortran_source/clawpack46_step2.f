@@ -99,7 +99,8 @@ c        # no capa array:
          end do
       endif
 
-c     # Set corners for an xsweep      
+c     # Cubed sphere : Set corners for an x-sweep
+c     # This does nothing for non-cubed-sphere grids. 
       sweep_dir = 0
       call clawpack46_fix_corners(mx,my,mbc,meqn,qold,sweep_dir,
      &             block_corner_count)
@@ -117,34 +118,6 @@ c        # copy data along a slice into 1d arrays:
             enddo
          enddo
 
-c         if (j .le. 0) then
-c            do m = 1,meqn
-c               if (block_corner_count(0) .eq. 3) then
-c                  do ibc = 1,mbc
-c                     q1d(1-ibc,m) = qold(ibc,0,m)
-c                  enddo
-c               endif
-c               if (block_corner_count(1) .eq. 3) then
-c                  do ibc = 1,mbc
-c                     q1d(mx+ibc,m) = qold(mx-ibc+1,0,m)
-c                  enddo
-c               endif
-c            enddo
-c         else if (j .eq. my+1) then
-c            do m = 1,meqn
-c               if (block_corner_count(2) .eq. 3) then
-c                  do ibc = 1,mbc
-c                     q1d(1-ibc,m) = qold(ibc,my+1,m)
-c                  enddo
-c               endif
-c               if (block_corner_count(3) .eq. 3) then
-c                  do ibc = 1,mbc
-c                     q1d(mx+ibc,m) = qold(mx-ibc+1,my+1,m)
-c                  enddo
-c               endif
-c            enddo
-c         endif
-c
          if (mcapa .gt. 0)  then
            do i = 1-mbc, mx+mbc
                dtdx1d(i) = dtdx / aux(i,j,mcapa)
@@ -198,7 +171,8 @@ c     # perform y sweeps
 c     ==================
 c
 
-c     # Set corners for an y-sweep      
+c     # Cubed sphere : Set corners for an y-sweep
+c     # This does nothing for non-cubed-sphere grids. 
       sweep_dir = 1
       call clawpack46_fix_corners(mx,my,mbc,meqn,qold,sweep_dir,
      &             block_corner_count)
@@ -212,35 +186,6 @@ c        # copy data along a slice into 1d arrays:
                q1d(j,m) = qold(i,j,m)
             enddo
          enddo
-
-c         if (i .eq. 0) then
-c            do m = 1,meqn
-c               if (block_corner_count(0) .eq. 3) then
-c                  do jbc = 1,mbc
-c                     q1d(1-jbc,m) = qold(0,jbc,m)
-c                  enddo
-c               endif
-c               if (block_corner_count(2) .eq. 3) then
-c                  do jbc = 1,mbc
-c                     q1d(my+jbc,m) = qold(0,my-jbc+1,m)
-c                  enddo
-c               endif
-c            enddo
-c         else if (i .eq. mx+1) then
-c            do m = 1,meqn
-c               if (block_corner_count(1) .eq. 3) then
-c                  do jbc = 1,mbc
-c                     q1d(1-jbc,m) = qold(mx+1,jbc,m)
-c                  enddo
-c               endif
-c               if (block_corner_count(3) .eq. 3) then
-c                  do jbc= 1,mbc
-c                     q1d(my+jbc,m) = qold(mx+1,my-jbc+1,m)
-c                  enddo
-c               endif
-c            enddo
-c         endif
-
 c
          if (mcapa .gt. 0)  then
            do  j = 1-mbc, my+mbc
@@ -294,7 +239,7 @@ c
       return
       end
 
-
+c     #  See 'cubed_sphere_corners.ipynb'
       subroutine clawpack46_fix_corners(mx,my,mbc,meqn,q,sweep_dir,
      &             block_corner_count)
       implicit none
@@ -304,22 +249,25 @@ c
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j,k,m,idata,jdata
-      double precision ibar(0:3),jbar(0:3)
+      double precision ihat(0:3),jhat(0:3)
       integer idir, i1, j1, i2, j2, ibc, jbc
       logical use_b
 
-C       data ibar /0.5, 0.5, mx+0.5, mx+0.5/
-C       data jbar /0.5, my+0.5, my+0.5, 0.5/
+c     # Lower left corner
+      ihat(0) = 0.5
+      jhat(0) = 0.5
 
-      ibar(0) = 0.5
-      ibar(1) = 0.5
-      ibar(2) = mx+0.5
-      ibar(3) = mx+0.5
+c     # Lower right corner
+      ihat(1) = mx+0.5
+      jhat(1) = 0.5
 
-      jbar(0) = 0.5
-      jbar(1) = my+0.5
-      jbar(2) = my+0.5
-      jbar(3) = 0.5
+c     # Upper left corner
+      ihat(2) = 0.5
+      jhat(2) = my+0.5
+
+c     # Upper right corner
+      ihat(3) = mx+0.5
+      jhat(3) = my+0.5
 
       do m = 1,meqn
           do k = 0,3
@@ -347,12 +295,12 @@ c                     # Average fine grid corners onto coarse grid ghost corners
 
                       if (use_b) then
 c                         # Transform involves B                
-                          idata =  j1 + ibar(k) - jbar(k)
-                          jdata = -i1 + ibar(k) + jbar(k)
+                          idata =  j1 + ihat(k) - jhat(k)
+                          jdata = -i1 + ihat(k) + jhat(k)
                       else
 c                         # Transform involves B.transpose()             
-                          idata = -j1 + ibar(k) + jbar(k)
-                          jdata =  i1 - ibar(k) + jbar(k)
+                          idata = -j1 + ihat(k) + jhat(k)
+                          jdata =  i1 - ihat(k) + jhat(k)
                       endif 
                       q(i1,j1,m) = q(idata,jdata,m)
                   end do   !! jbc
