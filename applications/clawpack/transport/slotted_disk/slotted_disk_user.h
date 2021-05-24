@@ -40,7 +40,7 @@ extern "C"
 void slotted_disk_problem_setup(fclaw2d_global_t *glob);
 
 #define SLOTTED_DISK_SETPROB FCLAW_F77_FUNC(slotted_disk_setprob,SLOTTED_DISK_SETPROB)
-void SLOTTED_DISK_SETPROB(const double* kappa, const double* tfinal);
+void SLOTTED_DISK_SETPROB();
 
 void slotted_disk_link_solvers(fclaw2d_global_t *glob);
 
