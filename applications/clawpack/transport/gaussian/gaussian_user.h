@@ -40,7 +40,7 @@ extern "C"
 void gaussian_problem_setup(fclaw2d_global_t *glob);
 
 #define GAUSSIAN_SETPROB FCLAW_F77_FUNC(gaussian_setprob,GAUSSIAN_SETPROB)
-void GAUSSIAN_SETPROB(const double* kappa, const double* tfinal);
+void GAUSSIAN_SETPROB();
 
 
 void gaussian_link_solvers(fclaw2d_global_t *glob);
