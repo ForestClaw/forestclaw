@@ -20,3 +20,4 @@
  ***************************************************************************/
 #include "DomainReader.h"
 template class DomainReader<2>;
+template class DomainReader<3>;

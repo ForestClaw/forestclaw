@@ -22,36 +22,28 @@
 #include <ThunderEgg/tpl/json.hpp>
 #include <fstream>
 #include <string>
-template <int D> class DomainReader
+template <int D>
+class DomainReader
 {
 	private:
-	bool                                      neumann;
-	std::array<int, D>                        ns;
-	int                                       num_ghost;
-	std::shared_ptr<ThunderEgg::Domain<D>>    coarser_domain;
-	std::shared_ptr<ThunderEgg::Domain<D>>    finer_domain;
-	std::shared_ptr<ThunderEgg::PatchInfo<D>> parsePatch(nlohmann::json &patch_j)
+	std::array<int, D>                     ns;
+	int                                    num_ghost;
+	std::shared_ptr<ThunderEgg::Domain<D>> coarser_domain;
+	std::shared_ptr<ThunderEgg::Domain<D>> finer_domain;
+	ThunderEgg::PatchInfo<D>               parsePatch(nlohmann::json &patch_j)
 	{
-		auto pinfo             = std::make_shared<ThunderEgg::PatchInfo<D>>();
-		*pinfo                 = patch_j.get<ThunderEgg::PatchInfo<D>>();
-		pinfo->num_ghost_cells = num_ghost;
-		pinfo->ns              = ns;
+		ThunderEgg::PatchInfo<D> pinfo = patch_j.get<ThunderEgg::PatchInfo<D>>();
+		pinfo.num_ghost_cells          = num_ghost;
+		pinfo.ns                       = ns;
 		for (size_t d = 0; d < D; d++) {
-			pinfo->spacings[d] /= ns[d];
-		}
-
-		for (ThunderEgg::Side<D> s : ThunderEgg::Side<D>::getValues()) {
-			if (!pinfo->hasNbr(s)) {
-				pinfo->neumann[s.getIndex()] = neumann;
-			}
+			pinfo.spacings[d] /= ns[d];
 		}
 		return pinfo;
 	}
 
 	public:
-	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in,
-	             bool neumann_in = false)
-	: neumann(neumann_in), ns(ns_in), num_ghost(num_ghost_in)
+	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in)
+	: ns(ns_in), num_ghost(num_ghost_in)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -63,20 +55,20 @@ template <int D> class DomainReader
 		}
 		input_stream >> j;
 		input_stream.close();
-		std::map<int, std::shared_ptr<ThunderEgg::PatchInfo<D>>> finer_map;
+		std::deque<ThunderEgg::PatchInfo<D>> finer_patches;
 		for (nlohmann::json &patch_j : j.at("levels")[0]) {
 			auto patch = parsePatch(patch_j);
-			if (patch->rank == rank)
-				finer_map[patch->id] = patch;
+			if (patch.rank == rank)
+				finer_patches.push_back(patch);
 		}
-		finer_domain = std::make_shared<ThunderEgg::Domain<D>>(finer_map, ns, num_ghost);
-		std::map<int, std::shared_ptr<ThunderEgg::PatchInfo<D>>> coarser_map;
+		finer_domain = std::make_shared<ThunderEgg::Domain<D>>(0, ns, num_ghost, finer_patches.begin(), finer_patches.end());
+		std::deque<ThunderEgg::PatchInfo<D>> coarser_patches;
 		for (nlohmann::json &patch_j : j.at("levels")[1]) {
 			auto patch = parsePatch(patch_j);
-			if (patch->rank == rank)
-				coarser_map[patch->id] = patch;
+			if (patch.rank == rank)
+				coarser_patches.push_back(patch);
 		}
-		coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(coarser_map, ns, num_ghost);
+		coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(1, ns, num_ghost, coarser_patches.begin(), coarser_patches.end());
 	}
 	std::shared_ptr<ThunderEgg::Domain<D>> getCoarserDomain()
 	{
@@ -88,3 +80,4 @@ template <int D> class DomainReader
 	}
 };
 extern template class DomainReader<2>;
+extern template class DomainReader<3>;
