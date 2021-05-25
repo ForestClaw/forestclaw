@@ -40,7 +40,7 @@ extern "C"
 void correlatedcb_problem_setup(fclaw2d_global_t *glob);
 
 #define CORRELATEDCB_SETPROB FCLAW_F77_FUNC(correlatedcb_setprob,CORRELATEDCB_SETPROB)
-void CORRELATEDCB_SETPROB(const double* kappa, const double* tfinal);
+void CORRELATEDCB_SETPROB();
 
 void correlatedcb_link_solvers(fclaw2d_global_t *glob);
 
