@@ -85,7 +85,7 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
     auto y = ValVector<2>::GetNewVector(domain, 2);
     auto phi_n = ValVector<2>::GetNewVector(domain, 3);
 
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(domain);
+    auto ghost_filler = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
     DomainTools::SetValuesWithGhost<2>(domain,x,one,one);
     DomainTools::SetValues<2>(domain,x_just_ghosts,one,one);
