@@ -30,4 +30,4 @@ PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
 ContourValues = [];
 
 ShowUnderOverShoots = 0;
-UserColorMapping = 1;
+UserColorMapping = 0;
