@@ -218,7 +218,7 @@ jobs:
         path: ThunderEggSrc
     - name: Install dependencies
       run: |
-        sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libblas-dev liblapack-dev 
+        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libblas-dev liblapack-dev 
     - name: Install ThunderEgg
       run: |
         cd ThunderEggSrc
