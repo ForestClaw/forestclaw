@@ -31,10 +31,6 @@ target_include_directories(bump PRIVATE
 )
 
 target_link_libraries(bump PRIVATE 
-  forestclaw
   clawpack4.6
   clawpack5
-  clawpatch
-  P4EST::P4EST 
-  SC::SC
 )

@@ -23,10 +23,6 @@ target_include_directories(quadrants PRIVATE
 )
 
 target_link_libraries(quadrants PRIVATE 
-  forestclaw
   clawpack4.6
   clawpack5
-  clawpatch
-  P4EST::P4EST 
-  SC::SC
 )

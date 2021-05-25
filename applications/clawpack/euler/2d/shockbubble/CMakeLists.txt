@@ -38,10 +38,6 @@ target_include_directories(shockbubble PRIVATE
 )
 
 target_link_libraries(shockbubble PRIVATE 
-  forestclaw
   clawpack4.6
   clawpack5
-  clawpatch
-  P4EST::P4EST 
-  SC::SC
 )

@@ -38,5 +38,8 @@ target_include_directories(torus PRIVATE
 )
 
 target_link_libraries(torus PRIVATE
-  FORESTCLAW::FORESTCLAW 
+  forestclaw
+  clawpack4.6
+  clawpack5
+  clawpatch
 )

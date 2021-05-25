@@ -30,10 +30,6 @@ target_include_directories(interface PRIVATE
 )
 
 target_link_libraries(interface PRIVATE 
-  forestclaw
   clawpack4.6
   clawpack5
-  clawpatch
-  P4EST::P4EST 
-  SC::SC
 )
