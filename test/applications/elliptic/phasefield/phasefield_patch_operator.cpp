@@ -29,7 +29,7 @@ TEST_CASE("constructor sets s array correctly", "[applications/elliptic/phasefie
 
     auto phi_n = ValVector<2>::GetNewVector(domain, 3);
 
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(domain);
+    auto ghost_filler = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
     fc2d_thunderegg_options_t * mg_opt = new fc2d_thunderegg_options_t();
     mg_opt->boundary_conditions = new int[4];
@@ -96,7 +96,7 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
             if(pinfo->hasNbr(s)){
                 for(int component = 0;component<2;component++){
                     auto inner_slice = lds[component].getSliceOnSide(s);
-                    auto ghost_slice = lds[component].getGhostSliceOnSide(s,1);
+                    auto ghost_slice = lds[component].getGhostSliceOn(s,{0});
                     for(int i=0;i<10;i++){
                         ghost_slice[{i}]+=inner_slice[{i}];
                     }
