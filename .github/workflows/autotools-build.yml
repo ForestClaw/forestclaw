@@ -2,7 +2,7 @@ name: ForestClaw Build
 on: [push]
 env:
   CFLAGS: -lgfortran
-  CXXFLAGS: -lgfortran
+  CXXFLAGS: -lgfortran --std=c++17
   FCFLAGS: -lgfortran -cpp
   FFLAGS: -lgfortran -cpp
 jobs:
