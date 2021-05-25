@@ -95,7 +95,7 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
         for(Side<2> s : Side<2>::getValues()){
             if(pinfo.hasNbr(s)){
                 for(int component = 0;component<2;component++){
-                    auto inner_slice = lds[component].getSliceOnSide(s);
+                    auto inner_slice = lds[component].getSliceOn(s,{0});
                     auto ghost_slice = lds[component].getGhostSliceOn(s,{0});
                     for(int i=0;i<10;i++){
                         ghost_slice[{i}]+=inner_slice[{i}];
