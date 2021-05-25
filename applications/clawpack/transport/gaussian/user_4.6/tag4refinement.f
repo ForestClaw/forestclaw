@@ -18,6 +18,7 @@
 
       tag_patch = 0
 
+c     # Approximate the gradient      
       s = pi/2
       dx2 = 2*dx*s
       dy2 = 2*dy*s
