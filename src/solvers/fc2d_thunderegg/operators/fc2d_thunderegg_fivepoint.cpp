@@ -57,11 +57,11 @@ public:
     fivePoint(std::shared_ptr<const Domain<2>>      domain,
               std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
-    void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+    void applySinglePatch(const PatchInfo<2>& pinfo, 
                           const std::vector<LocalData<2>>& us,
                           std::vector<LocalData<2>>& fs,
                           bool interior_dirichlet) const override;
-    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+    void addGhostToRHS(const PatchInfo<2>& pinfo, 
                        const std::vector<LocalData<2>>& us,
                        std::vector<LocalData<2>>& fs) const override;
 
@@ -75,7 +75,7 @@ fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
 }
 
 
-void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo, 
                                  const std::vector<LocalData<2>>& us,
                                  std::vector<LocalData<2>>& fs,
                                  bool interior_dirichlet) const 
@@ -86,16 +86,16 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     //fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     int mfields = us.size();
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+    int mx = pinfo.ns[0]; 
+    int my = pinfo.ns[1];
 
 #if 0    
     int mbc = pinfo->num_ghost_cells;
     double xlower = pinfo->starts[0];
     double ylower = pinfo->starts[1];
 #endif    
-    double dx = pinfo->spacings[0];
-    double dy = pinfo->spacings[1];
+    double dx = pinfo.spacings[0];
+    double dy = pinfo.spacings[1];
 
 
     for(int m = 0; m < mfields; m++)
@@ -104,27 +104,27 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         LocalData<2>& f = fs[m];
 
         //if physical boundary
-        if (interior_dirichlet || !pinfo->hasNbr(Side<2>::west())){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+        if (interior_dirichlet || !pinfo.hasNbr(Side<2>::west())){
+            auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = -u[{0,j}];
             }
         }
-        if (interior_dirichlet || !pinfo->hasNbr(Side<2>::east())){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+        if (interior_dirichlet || !pinfo.hasNbr(Side<2>::east())){
+            auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = -u[{mx-1,j}];
             }
         }
 
-        if (interior_dirichlet || !pinfo->hasNbr(Side<2>::south())){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+        if (interior_dirichlet || !pinfo.hasNbr(Side<2>::south())){
+            auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = -u[{i,0}];
             }
         }
-        if (interior_dirichlet || !pinfo->hasNbr(Side<2>::north())){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+        if (interior_dirichlet || !pinfo.hasNbr(Side<2>::north())){
+            auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = -u[{i,my-1}];
             }
@@ -163,7 +163,7 @@ void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 }
 
 
-void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void fivePoint::addGhostToRHS(const PatchInfo<2>& pinfo, 
                               const std::vector<LocalData<2>>& us, 
                               std::vector<LocalData<2>>& fs) const 
 {
@@ -174,13 +174,13 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 #endif    
 
     int mfields = us.size();
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+    int mx = pinfo.ns[0]; 
+    int my = pinfo.ns[1];
 
-    double dx = pinfo->spacings[0];
+    double dx = pinfo.spacings[0];
     double dx2 = dx*dx;
 
-    double dy = pinfo->spacings[1];
+    double dy = pinfo.spacings[1];
     double dy2 = dy*dy;
 
     for(int m = 0; m < mfields; m++)
@@ -190,19 +190,19 @@ void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
         for(int j = 0; j < my; j++)
         {
             /* bool hasNbr(Side<D> s) */
-            if (pinfo->hasNbr(Side<2>::west()))
+            if (pinfo.hasNbr(Side<2>::west()))
                 f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
 
-            if (pinfo->hasNbr(Side<2>::east()))
+            if (pinfo.hasNbr(Side<2>::east()))
                 f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
         }
 
         for(int i = 0; i < mx; i++)
         {
-            if (pinfo->hasNbr(Side<2>::south()))
+            if (pinfo.hasNbr(Side<2>::south()))
                 f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
 
-            if (pinfo->hasNbr(Side<2>::north()))
+            if (pinfo.hasNbr(Side<2>::north()))
                 f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
         }
     }
@@ -217,6 +217,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
   
+    GhostFillingType fill_type = GhostFillingType::Faces;
 #if 0  
     fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
 #endif  
@@ -232,7 +233,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
     // create map function
-    P4estDomGen::BlockMapFunc bmf = [&](int block_no, double unit_x,      
+    P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x,      
                                         double unit_y, double &x, double &y) 
     {
         double x1,y1,z1;
@@ -241,21 +242,14 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
         y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * y1;
     };
 
-    // create neumann function
-    IsNeumannFunc<2> inf = [&](Side<2> s, const array<double, 2> &lower,
-                               const array<double, 2> &upper) 
-    {
-        return mg_opt->boundary_conditions[s.getIndex()] == 2;
-    };
-
     // generates levels of patches for GMG
-    P4estDomGen domain_gen(wrap->p4est, ns, 1, inf, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
 
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
     // ghost filler
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
+    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain, fill_type);
 
     // patch operator
     auto op = make_shared<fivePoint>(te_domain,ghost_filler);
@@ -265,6 +259,12 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     p_bcgs->setTolerance(mg_opt->patch_bcgs_tol);
     p_bcgs->setMaxIterations(mg_opt->patch_bcgs_max_it);
     shared_ptr<PatchSolver<2>>  solver;
+
+    bitset<4> neumann_bitset;
+    for(int i=0;i<4;i++){
+        neumann_bitset[i]= mg_opt->boundary_conditions[i] == 2;
+    }
+
     switch (mg_opt->patch_solver)
     {
         case BICG:
@@ -273,7 +273,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
         case FFT:
             /* This ignores the five point operator defined above and just uses the 
                ThunderEgg operator 'Poisson'. */
-            solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
+            solver = make_shared<Poisson::FFTWPatchSolver<2>>(op,neumann_bitset);
             break;
         default:
             fclaw_global_essentialf("thunderegg_fivepoint : No valid patch solver specified\n");
@@ -330,7 +330,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
             next_domain = domain_gen.getCoarserDomain();
 
             //operator
-            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
+            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
             patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
 
             //smoother
@@ -341,7 +341,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
                     smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
                     break;
                 case FFT:
-                    smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+                    smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
                     break;
                 default:
                     fclaw_global_essentialf("thunderegg_fivepoint : No valid " \
@@ -371,7 +371,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
         //add coarsest level
 
         //operator
-        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
+        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
         patch_operator = make_shared<fivePoint>(curr_domain, ghost_filler);
 
         //smoother
@@ -381,7 +381,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
                 smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
                 break;
             case FFT:
-                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
                 break;
             default:
                 fclaw_global_essentialf("thunderegg_fivepoint : No valid " \

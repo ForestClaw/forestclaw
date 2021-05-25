@@ -26,5 +26,4 @@ target_include_directories(phasefield PRIVATE
 
 target_link_libraries(phasefield PRIVATE 
   thunderegg
-  clawpatch
 )

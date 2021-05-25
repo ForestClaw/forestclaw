@@ -81,6 +81,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
     const fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
   
+    GhostFillingType fill_type = GhostFillingType::Faces;
 #if 0  
     fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
 #endif  
@@ -96,7 +97,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
     // create map function
-    P4estDomGen::BlockMapFunc bmf = [&](int block_no, double unit_x,      
+    P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x,      
                                         double unit_y, double &x, double &y) 
     {
         double x1,y1,z1;
@@ -105,15 +106,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
         y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * y1;
     };
 
-    // create neumann function
-    IsNeumannFunc<2> inf = [&](Side<2> s, const array<double, 2> &lower,
-                               const array<double, 2> &upper) 
-    {
-        return mg_opt->boundary_conditions[s.getIndex()] == 2;
-    };
-
     // generates levels of patches for GMG;  2 layers of ghost cells    
-    P4estDomGen domain_gen(wrap->p4est, ns, clawpatch_opt->mbc, inf, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, clawpatch_opt->mbc, bmf);
 
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
@@ -122,7 +116,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
     shared_ptr<Vector<2>> beta_vec = make_shared<fc2d_thunderegg_vector>(glob,STORE_STATE);    
 
     // ghost filler
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
+    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain, fill_type);
 
     // patch operator
     auto op = make_shared<phasefield>(glob,beta_vec,te_domain,ghost_filler);
@@ -190,7 +184,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
             next_domain = domain_gen.getCoarserDomain();
 
             //operator
-            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
+            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
             auto restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, 
                                                            prev_domain, curr_domain);
             patch_operator = make_shared<phasefield>(glob,restricted_phi_n_vec,curr_domain, ghost_filler);
@@ -223,7 +217,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
         //add coarsest level
 
         //operator
-        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
+        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
         auto restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, prev_domain, curr_domain);
         patch_operator = make_shared<phasefield>(glob,restricted_phi_n_vec, curr_domain, ghost_filler);
 
