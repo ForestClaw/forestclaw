@@ -3,22 +3,14 @@ on: [push]
 env:
   CFLAGS: -lgfortran
   CXXFLAGS: -lgfortran
-  FCFLAGS: -lgfortran -cpp
-  FFLAGS: -lgfortran -cpp
+  FFLAGS: -lgfortran
 jobs:
-
-
-################
-# Serial builds
-################
-
   serial_minimal_build:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libblas-dev liblapack-dev
     - name: Init and Update Submodules
       run: |
@@ -34,15 +26,12 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
-
-
   serial_build_with_clawpack_enabled:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libblas-dev liblapack-dev
     - name: Init and Update Submodules
       run: |
@@ -58,15 +47,12 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
-
-
   serial_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libblas-dev liblapack-dev
     - name: Init and Update Submodules
       run: |
@@ -82,8 +68,6 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
-
-
   serial_build_with_cudaclaw_enabled:
     runs-on: ubuntu-20.04
     env:
@@ -92,7 +76,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libblas-dev liblapack-dev nvidia-cuda-toolkit
     - name: Init and Update Submodules
       run: |
@@ -101,24 +84,17 @@ jobs:
     - name: Run bootstrap Script
       run: ./bootstrap
     - name: Configure
-      run: ./configure CUDA_CFLAGS="-arch=sm_61" LIBS="-lcuda -lcudart -lnvToolsExt" --enable-cudaclaw --disable-shared
+      run: ./configure --enable-cudaclaw
     - name: Build
       run: make
     - name: Install
       run: sudo make install
-
-
-#############
-# MPI builds
-#############
-
   mpi_minimal_build:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
     - name: Init and Update Submodules
       run: |
@@ -134,15 +110,12 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
-
-
   mpi_build_with_clawpack_enabled:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
     - name: Init and Update Submodules
       run: |
@@ -165,15 +138,12 @@ jobs:
       with:
         name: clawpack_binaries
         path: clawpack_binaries.tar
-
-
   mpi_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
     - name: Init and Update Submodules
       run: |
@@ -189,8 +159,6 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
-
-
   mpi_build_with_cudaclaw_enabled:
     runs-on: ubuntu-20.04
     env:
@@ -199,7 +167,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev nvidia-cuda-toolkit
     - name: Init and Update Submodules
       run: |
@@ -208,13 +175,11 @@ jobs:
     - name: Run bootstrap Script
       run: ./bootstrap
     - name: Configure
-      run: ./configure CUDA_CFLAGS="-arch=sm_61" LIBS="-lcuda -lcudart -lnvToolsExt" --enable-cudaclaw --enable-mpi --disable-shared
+      run: ./configure --enable-cudaclaw --enable-mpi
     - name: Build
       run: make
     - name: Install
       run: sudo make install
-
-
   mpi_build_with_thunderegg_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -226,7 +191,6 @@ jobs:
         path: ThunderEggSrc
     - name: Install dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libblas-dev liblapack-dev 
     - name: Install ThunderEgg
       run: |
@@ -247,12 +211,6 @@ jobs:
       run: make check
     - name: Install
       run: sudo make install
-
-
-############################
-# Clawpack Regression tests
-############################
-
   clawpack_advection_2d_annulus:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -270,8 +228,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/annulus
         mpirun -n 2 ./annulus -F regression.ini
-
-
   clawpack_advection_2d_disk:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -289,8 +245,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/disk
         mpirun -n 2 ./disk -F regression.ini
-
-
   clawpack_advection_2d_filament:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -308,8 +262,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/filament
         mpirun -n 2 ./filament -F regression.ini
-
-
   clawpack_advection_2d_hemisphere:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -327,8 +279,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/hemisphere
         mpirun -n 2 ./hemisphere -F regression.ini
-
-
   clawpack_advection_2d_latlong:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -346,8 +296,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/latlong
         mpirun -n 2 ./latlong -F regression.ini
-
-
   clawpack_advection_2d_replicated:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -365,8 +313,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/replicated
         mpirun -n 2 ./replicated -F regression.ini
-
-
   clawpack_advection_2d_sphere:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -384,8 +330,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/sphere
         mpirun -n 2 ./sphere -F regression.ini
-
-
   clawpack_advection_2d_swirl:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -403,8 +347,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/swirl
         mpirun -n 2 ./swirl -F regression.ini
-
-
   clawpack_advection_2d_torus:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -422,8 +364,6 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/torus
         mpirun -n 2 ./torus -F regression.ini
-
-
   clawpack_acoustics_2d_interface:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -441,8 +381,6 @@ jobs:
       run: |
         cd applications/clawpack/acoustics/2d/interface
         mpirun -n 2 ./interface -F regression.ini
-
-
   clawpack_acoustics_2d_radial:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -460,8 +398,6 @@ jobs:
       run: |
         cd applications/clawpack/acoustics/2d/radial
         mpirun -n 2 ./radial -F regression.ini
-
-
   clawpack_burgers_2d_pwconst:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -479,8 +415,6 @@ jobs:
       run: |
         cd applications/clawpack/burgers/2d/pwconst
         mpirun -n 2 ./pwconst -F regression.ini
-
-
   clawpack_shallow_2d_bump:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -498,8 +432,6 @@ jobs:
       run: |
         cd applications/clawpack/shallow/2d/bump
         mpirun -n 2 ./bump -F regression.ini
-
-
   clawpack_shallow_2d_radialdam:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -517,8 +449,6 @@ jobs:
       run: |
         cd applications/clawpack/shallow/2d/radialdam
         mpirun -n 2 ./radialdam -F regression.ini
-
-
   clawpack_transport_correlatedcb:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -536,8 +466,6 @@ jobs:
       run: |
         cd applications/clawpack/transport/correlatedcb
         mpirun -n 2 ./correlatedcb -F regression.ini
-
-
   clawpack_transport_gaussian:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -555,8 +483,6 @@ jobs:
       run: |
         cd applications/clawpack/transport/gaussian
         mpirun -n 2 ./gaussian -F regression.ini
-
-
   clawpack_transport_slotted_disk:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -574,3 +500,37 @@ jobs:
       run: |
         cd applications/clawpack/transport/slotted_disk
         mpirun -n 2 ./slotted_disk -F regression.ini
+  clawpack_euler_2d_shockbubble:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/euler/2d/shockbubble
+        mpirun -n 2 ./shockbubble -F regression.ini
+  clawpack_euler_2d_quadrants:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/euler/2d/quadrants
+        mpirun -n 2 ./quadrants -F regression.ini
