@@ -1,4 +1,4 @@
-      subroutine slotted_disk_setprob(kappa,tfinal)
+      subroutine slotted_disk_setprob()
       implicit none
 
       double precision kappa,tfinal
@@ -12,6 +12,11 @@
       common /compi/ pi
 
       pi = 4.d0*atan(1.d0)
+
+      open(10,file='setprob.data')
+      read(10,*) kappa
+      read(10,*) tfinal
+      close(10)
 
       call set_wind_parms(kappa,tfinal)
 

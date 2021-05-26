@@ -1,3 +1,5 @@
+setviews;
+
 axis image;
 daspect([1 1 1]);
 axis off;
@@ -28,7 +30,8 @@ set(o,'yticklabel',clabel);
 set(o,'ticklength',[0])
 set(o,'fontsize',16,'fontweight','bold')
 
-setviews;
+colorbar
+
 % set(gcf,'visible','off');
 
 NoQuery = 0;
@@ -41,6 +44,3 @@ if (prt)
 end
 
 shg
-
-clear afterframe;
-clear mapc2m;
