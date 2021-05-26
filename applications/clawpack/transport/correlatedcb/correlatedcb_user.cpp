@@ -43,6 +43,20 @@ void correlatedcb_link_solvers(fclaw2d_global_t *glob)
 void correlatedcb_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = transport_get_options(glob);
-    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
-    CORRELATEDCB_SETPROB(&user->kappa, &gparms->tfinal);
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,"%-24.4f %s\n",user->kappa,"\% kappa");
+        fprintf(f,"%-24.4f %s\n",fclaw_opt->tfinal,"\% tfinal");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+
+    CORRELATEDCB_SETPROB();
 }

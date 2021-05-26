@@ -1,18 +1,23 @@
-      subroutine correlatedcb_setprob(kappa,tfinal)
+      subroutine correlatedcb_setprob()
       implicit none
 
-      double precision kappa,tfinal
       integer n, m
 
       double precision rp2, th, lambda, wc(3,10), rps, a, w(3)
 
       double precision r, hmax,b,c
+      double precision kappa,tfinal
 
       double precision pi
       common /compi/ pi
 
       pi = 4.d0*atan(1.d0)
 
+      open(10,file='setprob.data')
+      read(10,*) kappa
+      read(10,*) tfinal
+      close(10)
+      
       call set_wind_parms(kappa,tfinal)
 
 c     # -------------------------------------------------

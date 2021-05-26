@@ -45,7 +45,21 @@ void gaussian_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = transport_get_options(glob);
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
-    GAUSSIAN_SETPROB(&user->kappa, &fclaw_opt->tfinal);
+
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,"%-24.4f %s\n",user->kappa,"\% kappa");
+        fprintf(f,"%-24.4f %s\n",fclaw_opt->tfinal,"\% tfinal");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+
+    GAUSSIAN_SETPROB();
 }
 
 
