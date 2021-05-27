@@ -69,3 +69,4 @@ set(FCLAW_VERSION \"${PROJECT_VERSION}\")
 
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/fclaw_config.h.in ${PROJECT_BINARY_DIR}/include/fclaw_config.h)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/test_config.h.in ${PROJECT_BINARY_DIR}/test/test_config.h)

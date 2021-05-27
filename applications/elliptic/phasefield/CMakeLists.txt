@@ -27,3 +27,18 @@ target_include_directories(phasefield PRIVATE
 target_link_libraries(phasefield PRIVATE 
   thunderegg
 )
+
+add_executable(phasefield_TEST.MPI1
+  phasefield_run.c 
+  phasefield_operator.cpp 
+  phasefield_patch_operator.cpp 
+  phasefield_patch_operator_TEST.cpp 
+  phasefield_user.cpp 
+  phasefield_options.c 
+  $<TARGET_OBJECTS:phasefield_f>
+)
+
+target_link_libraries(phasefield_TEST.MPI1 PRIVATE 
+  thunderegg
+  testutils
+)

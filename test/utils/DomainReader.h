@@ -51,7 +51,7 @@ class DomainReader
 		nlohmann::json j;
 		std::ifstream  input_stream(file_name);
 		if (!input_stream.good()) {
-			throw "could not open file";
+			throw "could not open file: " + file_name;
 		}
 		input_stream >> j;
 		input_stream.close();

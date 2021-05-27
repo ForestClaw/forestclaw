@@ -1,2 +1,2 @@
 #! /bin/sh
-test/test -r automake
+$1 -r automake

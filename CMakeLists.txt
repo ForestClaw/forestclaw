@@ -58,6 +58,10 @@ endif()
 include(cmake/config.cmake)
 include(cmake/compilers.cmake)
 
+# --- test
+
+add_subdirectory(test)
+
 # --- ForestClaw
 
 add_library(forestclaw)

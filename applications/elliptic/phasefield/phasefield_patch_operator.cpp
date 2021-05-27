@@ -245,8 +245,8 @@ void phasefield::addGhostToRHS(const PatchInfo<2>& pinfo,
         }
     }
 #else       
-    ValVector<2> new_u(MPI_COMM_WORLD,pinfo.ns,1,us.size(),0);
-    ValVector<2> new_Au(MPI_COMM_WORLD,pinfo.ns,1,us.size(),0);
+    ValVector<2> new_u(MPI_COMM_WORLD,pinfo.ns,1,us.size(),1);
+    ValVector<2> new_Au(MPI_COMM_WORLD,pinfo.ns,1,us.size(),1);
     auto new_us = new_u.getLocalDatas(0);
     auto new_Aus = new_Au.getLocalDatas(0);
     if(pinfo.hasNbr(Side<2>::west())){
