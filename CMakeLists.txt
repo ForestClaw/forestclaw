@@ -50,7 +50,7 @@ if(NOT thunderegg_external)
   find_package(ThunderEgg HINTS ${THUNDEREGG_ROOT})
 endif()
 if(NOT TARGET THUNDEREGG::THUNDEREGG)
-  #include(cmake/ThunderEgg.cmake)
+  include(cmake/ThunderEgg.cmake)
 endif()
 
 # --- configure
@@ -66,6 +66,8 @@ add_subdirectory(test)
 
 add_library(forestclaw)
 set_target_properties(forestclaw PROPERTIES EXPORT_NAME FORESTCLAW)
+target_link_libraries(forestclaw PUBLIC SC::SC P4EST::P4EST)
+target_link_libraries(forestclaw PRIVATE ZLIB::ZLIB)
 target_include_directories(forestclaw
   INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
@@ -100,9 +102,6 @@ if(clawpack)
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/patches/clawpatch>
     $<INSTALL_INTERFACE:include/clawpatch>
     $<INSTALL_INTERFACE:include>)
-  if(mpi)
-    target_link_libraries(clawpatch PRIVATE MPI::MPI_C)
-  endif(mpi)
 
   install(DIRECTORY
     ${PROJECT_SOURCE_DIR}/src/patches/clawpatch
@@ -127,9 +126,6 @@ if(clawpack)
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include/solvers/fc2d_clawpack4.6>
     $<INSTALL_INTERFACE:include>)
-  if(mpi)
-    target_link_libraries(clawpack4.6 PRIVATE MPI::MPI_C)
-  endif(mpi)
 
   install(DIRECTORY
     ${PROJECT_SOURCE_DIR}/src/solvers/fc2d_clawpack4.6
@@ -180,7 +176,7 @@ if(geoclaw)
 
   add_library(geoclaw)
   set_target_properties(geoclaw PROPERTIES EXPORT_NAME GEOCLAW)
-  target_link_libraries(geoclaw public forestclaw clawpatch)
+  target_link_libraries(geoclaw PUBLIC forestclaw clawpatch)
 
   add_subdirectory(src/solvers/fc2d_geoclaw)
 

@@ -1,10 +1,7 @@
 # provides imported targets THUNDEREGG::THUNDEREGG, ...
 include(ExternalProject)
-include(${CMAKE_CURRENT_LIST_DIR}/GitSubmodule.cmake)
 
 set(thunderegg_external true CACHE BOOL "build thunderegg library" FORCE)
-
-git_submodule("${PROJECT_SOURCE_DIR}/ThunderEgg")
 
 # --- thunderegg externalProject
 # this keeps project scopes totally separate, which avoids
@@ -22,11 +19,15 @@ endif()
 
 set(THUNDEREGG_INCLUDE_DIRS ${THUNDEREGG_ROOT}/include)
 
-ExternalProject_Add(THUNDEREGG
-SOURCE_DIR ${PROJECT_SOURCE_DIR}/thunderegg
-CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${THUNDEREGG_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp}
+ExternalProject_Add(ThunderEgg
+GIT_REPOSITORY https://github.com/thunderegg/thunderegg
+GIT_TAG        develop-wip
+CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${THUNDEREGG_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp} -Ddisable_petsc:BOOL=true
 BUILD_BYPRODUCTS ${THUNDEREGG_LIBRARIES}
 )
+
+# --- required libraries
+find_package(FFTW REQUIRED)
 
 # --- imported target
 
@@ -35,8 +36,8 @@ file(MAKE_DIRECTORY ${THUNDEREGG_INCLUDE_DIRS})
 
 # this GLOBAL is required to be visible via other
 # project's FetchContent of this project
-add_library(THUNDEREGG::THUNDEREGG INTERFACE IMPORTED GLOBAL)
-target_include_directories(THUNDEREGG::THUNDEREGG INTERFACE "${THUNDEREGG_INCLUDE_DIRS}")
-target_link_libraries(THUNDEREGG::THUNDEREGG INTERFACE "${THUNDEREGG_LIBRARIES}")
+add_library(ThunderEgg::ThunderEgg INTERFACE IMPORTED GLOBAL)
+target_include_directories(ThunderEgg::ThunderEgg INTERFACE "${THUNDEREGG_INCLUDE_DIRS}")
+target_link_libraries(ThunderEgg::ThunderEgg INTERFACE "${THUNDEREGG_LIBRARIES}" P4EST::P4EST SC::SC FFTW::FFTW)
 
-add_dependencies(THUNDEREGG::THUNDEREGG THUNDEREGG)
+add_dependencies(ThunderEgg::ThunderEgg ThunderEgg)

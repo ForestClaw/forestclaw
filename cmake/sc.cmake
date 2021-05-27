@@ -28,6 +28,7 @@ CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SC_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOO
 BUILD_BYPRODUCTS ${SC_LIBRARIES}
 )
 
+find_package(LIBZ)
 # --- imported target
 
 file(MAKE_DIRECTORY ${SC_INCLUDE_DIRS})
@@ -37,6 +38,7 @@ file(MAKE_DIRECTORY ${SC_INCLUDE_DIRS})
 # project's FetchContent of this project
 add_library(SC::SC INTERFACE IMPORTED GLOBAL)
 target_include_directories(SC::SC INTERFACE "${SC_INCLUDE_DIRS}")
-target_link_libraries(SC::SC INTERFACE "${SC_LIBRARIES}")
+# SC reference MPI in public headers
+target_link_libraries(SC::SC INTERFACE "${SC_LIBRARIES}" MPI::MPI_C)
 
 add_dependencies(SC::SC SC)
