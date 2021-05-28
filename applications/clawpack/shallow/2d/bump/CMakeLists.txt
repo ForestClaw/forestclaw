@@ -1,4 +1,4 @@
-set(rp ${PROJECT_SOURCE_DIR}/applications/clawpack/shallow/2d/rp)
+set(rp ${PROJECT_SOURCE_DIR}/clawpack/shallow/2d/rp)
 
 add_library(bump_f OBJECT 
   setprob.f 

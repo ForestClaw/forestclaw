@@ -1,4 +1,4 @@
-set(rp ${PROJECT_SOURCE_DIR}/applications/clawpack/euler/2d/rp)
+set(rp ${PROJECT_SOURCE_DIR}/clawpack/euler/2d/rp)
 
 add_library(shockbubble_f OBJECT 
   fdisc.f 

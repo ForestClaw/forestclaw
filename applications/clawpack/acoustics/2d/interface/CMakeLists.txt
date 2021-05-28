@@ -1,4 +1,4 @@
-set(rp ${PROJECT_SOURCE_DIR}/applications/clawpack/acoustics/2d/rp)
+set(rp ${PROJECT_SOURCE_DIR}/clawpack/acoustics/2d/rp)
 
 add_library(interface_f OBJECT 
   p0.f 

@@ -1,4 +1,4 @@
-set(all ${PROJECT_SOURCE_DIR}/applications/clawpack/advection/2d/all)
+set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(latlong_f OBJECT 
   fdisc.f 

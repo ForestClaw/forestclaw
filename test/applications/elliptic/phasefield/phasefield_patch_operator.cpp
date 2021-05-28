@@ -1,5 +1,5 @@
 #include <test/catch.hpp>
-#include <applications/elliptic/phasefield/phasefield_patch_operator.h>
+#include <phasefield_patch_operator.h>
 #include <test/utils/DomainReader.h>
 #include <ThunderEgg/ValVector.h>
 #include <ThunderEgg/BiLinearGhostFiller.h>

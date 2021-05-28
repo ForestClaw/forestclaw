@@ -1,4 +1,4 @@
-set(rp ${PROJECT_SOURCE_DIR}/applications/clawpack/burgers/2d/rp)
+set(rp ${PROJECT_SOURCE_DIR}/clawpack/burgers/2d/rp)
 
 add_library(pwconst_f OBJECT 
   user_4.6/qinit.f 
