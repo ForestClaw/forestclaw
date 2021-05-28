@@ -1,7 +1,6 @@
 name: Compare Autotools and CMake build systems
 
-on [push]
-  push:
+on: [push]
 jobs:
 
   check_for_build_system_files:
