@@ -10,7 +10,7 @@
       integer i,j
       double precision gaussian_sum
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
 c     # Assume a single field variable only
       do j = 1,my

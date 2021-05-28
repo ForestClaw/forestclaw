@@ -1,0 +1,13 @@
+# ------ applications/geoclaw/geoclaw.apps ----------------
+
+## ----------------------------------
+## GeoClaw examples
+## ----------------------------------
+
+#include applications/geoclaw/bowl_radial/Makefile.am
+#include applications/geoclaw/bowl_slosh/Makefile.am
+#include applications/geoclaw/chile2010/Makefile.am
+#
+##include applications/geoclaw/teton/Makefile.am
+add_subdirectory(applications/geoclaw/tohoku)
+

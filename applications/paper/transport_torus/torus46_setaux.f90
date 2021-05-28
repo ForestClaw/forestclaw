@@ -16,7 +16,7 @@ SUBROUTINE setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
     INTEGER maxlevel, rfactor, grid_mx, mi, mj
     COMMON /amr_comm/ maxlevel, rfactor, grid_mx, mi, mj
 
-    INCLUDE "metric_terms.i"
+    INCLUDE "fclaw2d_metric_terms.i"
 
     area_check = .false.
 
@@ -121,7 +121,7 @@ SUBROUTINE torus46_set_center_velocities(mx,my,mbc, &
 
   INTEGER i,j, k
 
-  INCLUDE "metric_terms.i"
+  INCLUDE "fclaw2d_metric_terms.i"
 
   !! # Cell-centered velocities : entries (4,5,6)
   DO i = 1-mbc,mx+mbc

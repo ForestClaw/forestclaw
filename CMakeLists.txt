@@ -180,6 +180,8 @@ if(geoclaw)
 
   add_subdirectory(src/solvers/fc2d_geoclaw)
 
+  include(applications/geoclaw/geoclaw.cmake)
+
 endif(geoclaw)
 
 # --- ThunderEgg

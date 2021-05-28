@@ -18,7 +18,7 @@ add_library(torus_f OBJECT
   ${all}/clawpack5_rpt2adv_manifold.f90
 )
 
-# link to clawpatch to get "metric_terms.i"
+# link to clawpatch to get "fclaw2d_metric_terms.i"
 target_link_libraries(torus_f PRIVATE
   clawpatch
 )
