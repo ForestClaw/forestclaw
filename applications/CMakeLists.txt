@@ -22,7 +22,7 @@ endif()
 # ThunderEgg solver
 # --------------------------------------------
 
-if(TARGET FORESTCLAW::THUNDEREGG)
+if(TARGET FORESTCLAW::FC2D_THUNDEREGG)
 
     include(elliptic/elliptic.cmake)
 

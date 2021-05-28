@@ -49,7 +49,7 @@ endif()
 if(NOT thunderegg_external)
   find_package(ThunderEgg HINTS ${THUNDEREGG_ROOT})
 endif()
-if(NOT TARGET THUNDEREGG::THUNDEREGG)
+if(NOT TARGET FC2D_THUNDEREGG::FC2D_THUNDEREGG)
   include(cmake/ThunderEgg.cmake)
 endif()
 
@@ -199,18 +199,18 @@ endif(geoclaw)
 # --- ThunderEgg
 if(thunderegg)
 
-  add_library(thunderegg)
-  set_target_properties(thunderegg PROPERTIES EXPORT_NAME THUNDEREGG)
-  target_link_libraries(thunderegg PUBLIC forestclaw clawpatch ThunderEgg::ThunderEgg)
+  add_library(fc2d_thunderegg)
+  set_target_properties(fc2d_thunderegg PROPERTIES EXPORT_NAME FC2D_THUNDEREGG)
+  target_link_libraries(fc2d_thunderegg PUBLIC forestclaw clawpatch ThunderEgg::ThunderEgg)
   if(mpi)
-    target_link_libraries(thunderegg PRIVATE MPI::MPI_C)
+    target_link_libraries(fc2d_thunderegg PRIVATE MPI::MPI_C)
   endif(mpi)
 
   add_subdirectory(src/solvers/fc2d_thunderegg)
 
   # imported target, for use from FetchContent
-  add_library(FORESTCLAW::THUNDEREGG INTERFACE IMPORTED GLOBAL)
-  target_link_libraries(FORESTCLAW::THUNDEREGG INTERFACE thunderegg)
+  add_library(FORESTCLAW::FC2D_THUNDEREGG INTERFACE IMPORTED GLOBAL)
+  target_link_libraries(FORESTCLAW::FC2D_THUNDEREGG INTERFACE fc2d_thunderegg)
 
 endif(thunderegg)
 # --- package

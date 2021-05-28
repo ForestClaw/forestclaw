@@ -24,5 +24,5 @@ target_include_directories(poisson PRIVATE
 )
 
 target_link_libraries(poisson PRIVATE 
-  thunderegg
+  FORESTCLAW::FC2D_THUNDEREGG
 )

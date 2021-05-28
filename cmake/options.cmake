@@ -1,9 +1,11 @@
+include(CMakeDependentOption)
+
 option(mpi "use MPI library" on)
 option(openmp "use OpenMP" on)
 
 option(geoclaw "build Geoclaw")
-option(clawpack "build Clawpack")
 option(thunderegg "build ThunderEgg")
+cmake_dependent_option(clawpack "build Clawpack" OFF "thunderegg" ON)
 
 option(thunderegg_external "force build of ThunderEgg")
 option(p4est_external "force build of p4est")

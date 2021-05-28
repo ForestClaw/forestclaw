@@ -27,5 +27,5 @@ target_include_directories(heat PRIVATE
 )
 
 target_link_libraries(heat PRIVATE 
-  thunderegg
+  FORESTCLAW::FC2D_THUNDEREGG
 )

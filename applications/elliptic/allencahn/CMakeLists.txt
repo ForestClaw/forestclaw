@@ -24,5 +24,5 @@ target_include_directories(allencahn PRIVATE
 )
 
 target_link_libraries(allencahn PRIVATE 
-  thunderegg
+  FORESTCLAW::FC2D_THUNDEREGG
 )

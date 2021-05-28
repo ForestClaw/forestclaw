@@ -25,7 +25,7 @@ target_include_directories(phasefield PRIVATE
 )
 
 target_link_libraries(phasefield PRIVATE 
-  thunderegg
+  FORESTCLAW::FC2D_THUNDEREGG
 )
 
 add_executable(phasefield_TEST.MPI1
@@ -39,6 +39,6 @@ add_executable(phasefield_TEST.MPI1
 )
 
 target_link_libraries(phasefield_TEST.MPI1 PRIVATE 
-  thunderegg
+  FORESTCLAW::FC2D_THUNDEREGG
   testutils
 )
