@@ -1,3 +1,4 @@
+# -- fortran library
 add_library(geoclaw_f OBJECT
     amrlib_source/amr_module.f90 
     geolib_source/utility_module.f90 
@@ -54,6 +55,10 @@ target_link_Libraries(geoclaw_f PRIVATE
 
 set_target_properties(geoclaw_f PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)
 
+# -- add library
+add_library(geoclaw)
+set_target_properties(geoclaw PROPERTIES EXPORT_NAME GEOCLAW)
+
 target_sources(geoclaw PRIVATE 
     $<TARGET_OBJECTS:geoclaw_f>
     fc2d_geoclaw.cpp 
@@ -63,7 +68,28 @@ target_sources(geoclaw PRIVATE
     fc2d_geoclaw_output_ascii.c
 )
 
+target_link_libraries(geoclaw PUBLIC forestclaw clawpatch)
+
 target_include_directories(geoclaw PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
+
+# -- install
+install(FILES
+  fc2d_geoclaw.h
+  types.h
+  fc2d_geoclaw_options.h
+  fc2d_geoclaw_gauges_default.h
+  DESTINATION include
+)
+
+install(TARGETS geoclaw
+  EXPORT ${PROJECT_NAME}Targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)
+
+
+# imported target, for use from FetchContent
+add_library(FORESTCLAW::GEOCLAW INTERFACE IMPORTED GLOBAL)
+target_link_libraries(FORESTCLAW::GEOCLAW INTERFACE clawpatch)

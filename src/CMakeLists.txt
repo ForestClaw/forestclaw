@@ -1,5 +1,6 @@
 # we use auxiliary objects for each code language to avoid compiler option mingling
 
+# -- c library
 add_library(forestclaw_c OBJECT 
   fclaw_base.c 
   fclaw_options.c 
@@ -46,10 +47,8 @@ add_library(forestclaw_c OBJECT
 )
 target_include_directories(forestclaw_c PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/include patches/clawpatch)
 target_link_libraries(forestclaw_c PRIVATE P4EST::P4EST SC::SC)
-if(MPI_FOUND)
-  target_link_libraries(forestclaw_c PRIVATE MPI::MPI_C)
-endif()
 
+# -- fortran library
 add_library(forestclaw_f OBJECT 
   mappings/context.f 
   mappings/scale_rot_map.f 
@@ -71,9 +70,70 @@ add_library(forestclaw_f OBJECT
   fortran_source2d/fdisc.f 
   fortran_source2d/philim.f
 )
-set_target_properties(forestclaw_f PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_include_directories(forestclaw_f INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include)
+
+# -- put together in final library
+
+add_library(forestclaw)
+set_target_properties(forestclaw PROPERTIES EXPORT_NAME FORESTCLAW)
 
 target_sources(forestclaw PRIVATE $<TARGET_OBJECTS:forestclaw_f> $<TARGET_OBJECTS:forestclaw_c>)
 
-target_link_libraries(forestclaw PUBLIC P4EST::P4EST SC::SC)
+target_link_libraries(forestclaw PUBLIC SC::SC P4EST::P4EST)
+target_link_libraries(forestclaw PRIVATE ZLIB::ZLIB)
+
+target_include_directories(forestclaw
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+# imported target, for use from FetchContent
+add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
+target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
+
+install(FILES
+  fclaw_base.h 
+	fclaw_timer.h 
+	fclaw_package.h 
+	fclaw_options.h 
+	fclaw_gauges.h 
+	fclaw_mpi.h 
+	fclaw_math.h 
+	forestclaw2d.h 
+	fp_exception_glibc_extension.h 
+  fclaw2d_include_all.h 
+	fclaw2d_defs.h 
+	fclaw2d_options.h 
+	fclaw2d_advance.h 
+	fclaw2d_elliptic_solver.h 
+	fclaw2d_farraybox.hpp 
+	fclaw2d_global.h 
+	fclaw2d_forestclaw.h 
+	fclaw2d_domain.h 
+	fclaw2d_block.h 
+	fclaw2d_patch.h 
+	fclaw2d_vtable.h 
+	fclaw2d_output.h 
+	fclaw2d_time_sync.h 
+	fclaw2d_update_single_step.h 
+	fclaw2d_physical_bc.h 
+	fclaw2d_ghost_fill.h 
+	fclaw2d_corner_neighbors.h 
+	fclaw2d_face_neighbors.h 
+	fclaw2d_map.h 
+	fclaw2d_timeinterp.h 
+	fclaw2d_regrid.h 
+	fclaw2d_map_brick.h 
+	fclaw2d_partition.h 
+	fclaw2d_exchange.h 
+	fclaw2d_convenience.h 
+	fclaw2d_map_query.h 
+	fclaw2d_map_query_defs.h 
+	fclaw2d_diagnostics.h
+  DESTINATION include
+)
+
+install(TARGETS forestclaw
+  EXPORT ${PROJECT_NAME}Targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)

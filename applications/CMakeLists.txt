@@ -14,6 +14,8 @@ project(ForestClawApps LANGUAGES C CXX Fortran)
 # -- check if this being included as a subdirectory
 if(NOT TARGET FORESTCLAW::FORESTCLAW)
 
+    find_package(MPI)
+
     # --- get installed ForestClaw package
     find_package(FORESTCLAW REQUIRED)
 

@@ -1,3 +1,4 @@
+# -- fortran library
 add_library(clawpack5_f OBJECT
   fortran_source/clawpack5_amr_module.f90 
   fortran_source/clawpack5_set_amr_module.f90 
@@ -13,7 +14,9 @@ add_library(clawpack5_f OBJECT
 
 set_target_properties(clawpack5_f PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)
 
-target_include_directories(clawpack5_f INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include)
+# -- add library
+add_library(clawpack5)
+set_target_properties(clawpack5 PROPERTIES EXPORT_NAME CLAWPACK5)
 
 target_sources(clawpack5 PRIVATE 
   fc2d_clawpack5.cpp	
@@ -21,8 +24,27 @@ target_sources(clawpack5 PRIVATE
   $<TARGET_OBJECTS:clawpack5_f>
 )
 
-target_include_directories(clawpack5 PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${PROJECT_SOURCE_DIR}/src
-  ${PROJECT_BINARY_DIR}/include
+target_link_libraries(clawpack5 PUBLIC clawpatch)
+target_include_directories(clawpack5
+  INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include>
 )
+
+# -- install
+install(FILES
+	fc2d_clawpack5.h
+	fc2d_clawpack5_options.h
+	clawpack5_user_fort.h
+	fc2d_clawpack5_fort.h
+  DESTINATION include
+)
+
+install(TARGETS clawpack5
+  EXPORT ${PROJECT_NAME}Targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)
+
+# imported target, for use from FetchContent
+add_library(FORESTCLAW::CLAWPACK5 INTERFACE IMPORTED GLOBAL)
+target_link_libraries(FORESTCLAW::CLAWPACK5 INTERFACE clawpack5)
