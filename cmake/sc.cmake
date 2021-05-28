@@ -28,7 +28,6 @@ CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SC_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOO
 BUILD_BYPRODUCTS ${SC_LIBRARIES}
 )
 
-find_package(LIBZ)
 # --- imported target
 
 file(MAKE_DIRECTORY ${SC_INCLUDE_DIRS})
