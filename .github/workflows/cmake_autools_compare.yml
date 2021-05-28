@@ -1,0 +1,14 @@
+name: Compare Autotools and CMake build systems
+
+on [push]
+  push:
+jobs:
+
+  check_for_build_system_files:
+    runs-on: ubuntu-latest
+    name: Check for Build System Files
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout source code
+    - name: Run Compare Script
+      run: scripts/ci/check_for_automake_and_cmake_files.py
