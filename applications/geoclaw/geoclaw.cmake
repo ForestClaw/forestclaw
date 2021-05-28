@@ -1,13 +1,13 @@
-# ------ applications/geoclaw/geoclaw.apps ----------------
+# ------ geoclaw/geoclaw.apps ----------------
 
 ## ----------------------------------
 ## GeoClaw examples
 ## ----------------------------------
 
-add_subdirectory(applications/geoclaw/bowl_radial)
-add_subdirectory(applications/geoclaw/bowl_slosh)
-add_subdirectory(applications/geoclaw/chile2010)
+add_subdirectory(geoclaw/bowl_radial)
+add_subdirectory(geoclaw/bowl_slosh)
+add_subdirectory(geoclaw/chile2010)
 
-#add_subdirectory(applications/geoclaw/teton)
-add_subdirectory(applications/geoclaw/tohoku)
+#add_subdirectory(geoclaw/teton)
+add_subdirectory(geoclaw/tohoku)
 

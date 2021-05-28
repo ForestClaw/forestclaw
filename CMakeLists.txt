@@ -115,6 +115,10 @@ if(clawpack)
 
   add_subdirectory(src/patches/clawpatch)
 
+  # imported target, for use from FetchContent
+  add_library(FORESTCLAW::CLAWPATCH INTERFACE IMPORTED GLOBAL)
+  target_link_libraries(FORESTCLAW::CLAWPATCH INTERFACE clawpatch)
+
 
   # --- Clawpack 4.6
 
@@ -138,6 +142,10 @@ if(clawpack)
     LIBRARY DESTINATION lib)
 
   add_subdirectory(src/solvers/fc2d_clawpack4.6)
+
+  # imported target, for use from FetchContent
+  add_library(FORESTCLAW::CLAWPACK4.6 INTERFACE IMPORTED GLOBAL)
+  target_link_libraries(FORESTCLAW::CLAWPACK4.6 INTERFACE clawpack4.6)
 
   # --- Clawpack 5
 
@@ -166,7 +174,9 @@ if(clawpack)
 
   add_subdirectory(src/solvers/fc2d_clawpack5)
 
-  include(applications/clawpack/clawpack.cmake)
+  # imported target, for use from FetchContent
+  add_library(FORESTCLAW::CLAWPACK5 INTERFACE IMPORTED GLOBAL)
+  target_link_libraries(FORESTCLAW::CLAWPACK5 INTERFACE clawpack5)
 
 endif(clawpack)
 
@@ -180,7 +190,9 @@ if(geoclaw)
 
   add_subdirectory(src/solvers/fc2d_geoclaw)
 
-  include(applications/geoclaw/geoclaw.cmake)
+  # imported target, for use from FetchContent
+  add_library(FORESTCLAW::GEOCLAW INTERFACE IMPORTED GLOBAL)
+  target_link_libraries(FORESTCLAW::GEOCLAW INTERFACE clawpatch)
 
 endif(geoclaw)
 
@@ -196,10 +208,15 @@ if(thunderegg)
 
   add_subdirectory(src/solvers/fc2d_thunderegg)
 
-  include(applications/elliptic/elliptic.cmake)
+  # imported target, for use from FetchContent
+  add_library(FORESTCLAW::THUNDEREGG INTERFACE IMPORTED GLOBAL)
+  target_link_libraries(FORESTCLAW::THUNDEREGG INTERFACE thunderegg)
 
 endif(thunderegg)
 # --- package
 
 include(cmake/pkgconf.cmake)
 include(cmake/install.cmake)
+
+# --- examples
+add_subdirectory(applications)

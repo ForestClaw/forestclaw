@@ -3,13 +3,13 @@
 # --------------------------------------------
 
 ## Elliptic example
-add_subdirectory(applications/elliptic/poisson)
+add_subdirectory(elliptic/poisson)
 
 ## Heat equation
-add_subdirectory(applications/elliptic/heat)
+add_subdirectory(elliptic/heat)
 
 ## Allencahn equation
-add_subdirectory(applications/elliptic/allencahn)
+add_subdirectory(elliptic/allencahn)
 
 ## Crystal growth
-add_subdirectory(applications/elliptic/phasefield)
+add_subdirectory(elliptic/phasefield)
