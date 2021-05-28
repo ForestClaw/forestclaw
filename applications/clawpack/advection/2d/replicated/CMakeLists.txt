@@ -28,6 +28,6 @@ target_include_directories(replicated PRIVATE
 )
 
 target_link_libraries(replicated PRIVATE 
-  clawpack4.6
-  clawpack5
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )

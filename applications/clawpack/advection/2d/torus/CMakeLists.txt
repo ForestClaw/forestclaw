@@ -20,7 +20,7 @@ add_library(torus_f OBJECT
 
 # link to clawpatch to get "fclaw2d_metric_terms.i"
 target_link_libraries(torus_f PRIVATE
-  clawpatch
+  FORESTCLAW::CLAWPATCH
 )
 
 add_executable(torus 
@@ -38,8 +38,6 @@ target_include_directories(torus PRIVATE
 )
 
 target_link_libraries(torus PRIVATE
-  forestclaw
-  clawpack4.6
-  clawpack5
-  clawpatch
+  FORESTCLAW::CLAWPACK4.6
+  FORESTCLAW::CLAWPACK5
 )

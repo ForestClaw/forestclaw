@@ -4,7 +4,7 @@ add_library(teton_f OBJECT
 )
 
 target_link_libraries(teton_f PRIVATE 
-  geoclaw
+  FORESTCLAW::GEOCLAW
 )
 
 add_executable(teton 
@@ -19,5 +19,5 @@ target_include_directories(teton PRIVATE
 
 target_link_libraries(teton PRIVATE 
   teton_f
-  geoclaw
+  FORESTCLAW::GEOCLAW
 )

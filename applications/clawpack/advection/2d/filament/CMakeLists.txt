@@ -39,6 +39,6 @@ target_include_directories(filament PRIVATE
 )
 
 target_link_libraries(filament PRIVATE 
-  clawpack4.6
-  clawpack5
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )

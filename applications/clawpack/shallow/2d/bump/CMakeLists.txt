@@ -31,6 +31,6 @@ target_include_directories(bump PRIVATE
 )
 
 target_link_libraries(bump PRIVATE 
-  clawpack4.6
-  clawpack5
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )

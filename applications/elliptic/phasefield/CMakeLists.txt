@@ -28,17 +28,19 @@ target_link_libraries(phasefield PRIVATE
   FORESTCLAW::FC2D_THUNDEREGG
 )
 
-add_executable(phasefield_TEST.MPI1
-  phasefield_run.c 
-  phasefield_operator.cpp 
-  phasefield_patch_operator.cpp 
-  phasefield_patch_operator_TEST.cpp 
-  phasefield_user.cpp 
-  phasefield_options.c 
-  $<TARGET_OBJECTS:phasefield_f>
-)
-
-target_link_libraries(phasefield_TEST.MPI1 PRIVATE 
-  FORESTCLAW::FC2D_THUNDEREGG
-  testutils
-)
+if(TARGET testutils)
+  add_executable(phasefield_TEST.MPI1
+    phasefield_run.c 
+    phasefield_operator.cpp 
+    phasefield_patch_operator.cpp 
+    phasefield_patch_operator_TEST.cpp 
+    phasefield_user.cpp 
+    phasefield_options.c 
+    $<TARGET_OBJECTS:phasefield_f>
+  )
+  
+  target_link_libraries(phasefield_TEST.MPI1 PRIVATE 
+    FORESTCLAW::FC2D_THUNDEREGG
+    testutils
+  )
+endif(TARGET testutils)

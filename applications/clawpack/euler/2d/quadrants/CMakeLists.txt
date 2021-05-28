@@ -23,6 +23,6 @@ target_include_directories(quadrants PRIVATE
 )
 
 target_link_libraries(quadrants PRIVATE 
-  clawpack4.6
-  clawpack5
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )

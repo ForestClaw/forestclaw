@@ -37,8 +37,10 @@ target_include_directories(fc2d_thunderegg PUBLIC
 # -- install
 install(FILES
 	fc2d_thunderegg.h
+	fc2d_thunderegg_fort.h
 	fc2d_thunderegg_options.h
 	fc2d_thunderegg_physical_bc.h
+	fc2d_thunderegg_vector.hpp
 	operators/fc2d_thunderegg_starpatch.h
 	operators/fc2d_thunderegg_fivepoint.h
 	operators/fc2d_thunderegg_varpoisson.h

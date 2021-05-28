@@ -6,6 +6,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../Modules)
 
 find_dependency(SC)
 find_dependency(P4EST)
+find_dependency(ZLIB)
+if(@thunderegg@)
+    find_dependency(ThunderEgg)
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 

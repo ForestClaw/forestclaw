@@ -71,6 +71,7 @@ install(FILES
   fclaw2d_clawpatch.h
 	fclaw2d_clawpatch.hpp
 	fclaw2d_clawpatch_options.h
+	fclaw2d_clawpatch_conservation.h
 	fclaw2d_clawpatch_transform.h
 	fclaw2d_clawpatch_diagnostics.h
 	fclaw2d_clawpatch_pillow.h

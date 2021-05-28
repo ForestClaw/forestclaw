@@ -29,6 +29,6 @@ target_include_directories(radial PRIVATE
 )
 
 target_link_libraries(radial PRIVATE 
-  clawpack4.6
-  clawpack5
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )

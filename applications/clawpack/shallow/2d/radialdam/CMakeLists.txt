@@ -30,6 +30,6 @@ target_include_directories(radialdam PRIVATE
 )
 
 target_link_libraries(radialdam PRIVATE 
-  clawpack4.6
-  clawpack5
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )

@@ -8,5 +8,5 @@ target_include_directories(bowl_radial PRIVATE
 )
 
 target_link_libraries(bowl_radial PRIVATE 
-  geoclaw
+  FORESTCLAW::GEOCLAW
 )

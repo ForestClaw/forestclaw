@@ -9,5 +9,5 @@ target_include_directories(tohoku PRIVATE
 )
 
 target_link_libraries(tohoku PRIVATE 
-  geoclaw
+  FORESTCLAW::GEOCLAW
 )

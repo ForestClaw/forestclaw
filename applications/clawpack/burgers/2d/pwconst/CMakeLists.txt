@@ -22,8 +22,6 @@ target_include_directories(pwconst PRIVATE
 )
 
 target_link_libraries(pwconst PRIVATE 
-  forestclaw
-  clawpack4.6
-  clawpack5
-  clawpatch
+  FORESTCLAW::CLAWPACK4.6
+  FORESTCLAW::CLAWPACK5
 )

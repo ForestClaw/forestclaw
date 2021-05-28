@@ -7,5 +7,5 @@ target_include_directories(chile2010 PRIVATE
 )
 
 target_link_libraries(chile2010 PRIVATE 
-  geoclaw
+  FORESTCLAW::GEOCLAW
 )

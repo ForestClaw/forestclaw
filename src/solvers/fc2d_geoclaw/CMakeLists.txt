@@ -80,7 +80,12 @@ install(FILES
   fc2d_geoclaw.h
   types.h
   fc2d_geoclaw_options.h
+  fc2d_geoclaw_fort.h
   fc2d_geoclaw_gauges_default.h
+  DESTINATION include
+)
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/include/geoclaw_module.mod
   DESTINATION include
 )
 
@@ -92,4 +97,4 @@ install(TARGETS geoclaw
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::GEOCLAW INTERFACE IMPORTED GLOBAL)
-target_link_libraries(FORESTCLAW::GEOCLAW INTERFACE clawpatch)
+target_link_libraries(FORESTCLAW::GEOCLAW INTERFACE geoclaw)

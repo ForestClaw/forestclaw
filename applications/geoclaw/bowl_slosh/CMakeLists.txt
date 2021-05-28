@@ -3,7 +3,7 @@ add_library(bowl_slosh_f OBJECT
 )
 
 target_link_libraries(bowl_slosh_f PRIVATE 
-  geoclaw
+  FORESTCLAW::GEOCLAW
 )
 
 add_executable(bowl_slosh 
@@ -18,6 +18,6 @@ target_include_directories(bowl_slosh PRIVATE
 )
 
 target_link_libraries(bowl_slosh PRIVATE 
-  geoclaw
+  FORESTCLAW::GEOCLAW
   bowl_slosh_f
 )

@@ -42,6 +42,6 @@ target_include_directories(slotted_disk PRIVATE
 )
 
 target_link_libraries(slotted_disk PRIVATE 
-  clawpack4.6
-  clawpack5
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )

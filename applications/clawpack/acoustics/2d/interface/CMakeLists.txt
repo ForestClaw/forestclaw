@@ -30,6 +30,6 @@ target_include_directories(interface PRIVATE
 )
 
 target_link_libraries(interface PRIVATE 
-  clawpack4.6
-  clawpack5
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )
