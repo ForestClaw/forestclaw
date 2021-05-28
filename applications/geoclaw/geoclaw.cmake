@@ -4,10 +4,10 @@
 ## GeoClaw examples
 ## ----------------------------------
 
-#include applications/geoclaw/bowl_radial/Makefile.am
-#include applications/geoclaw/bowl_slosh/Makefile.am
-#include applications/geoclaw/chile2010/Makefile.am
-#
-##include applications/geoclaw/teton/Makefile.am
+add_subdirectory(applications/geoclaw/bowl_radial)
+add_subdirectory(applications/geoclaw/bowl_slosh)
+add_subdirectory(applications/geoclaw/chile2010)
+
+#add_subdirectory(applications/geoclaw/teton)
 add_subdirectory(applications/geoclaw/tohoku)
 

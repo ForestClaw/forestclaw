@@ -55,6 +55,6 @@ target_include_directories(clawpatch PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}  
   ${PROJECT_SOURCE_DIR}/src
   ${metric}
-  INTERFACE
+  PUBLIC
   $<BUILD_INTERFACE:${metric}/fortran_source2d>
 )
