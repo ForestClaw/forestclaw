@@ -16,24 +16,14 @@ add_library(swirl_cuda_f OBJECT
   ${all}/clawpack5_rpt2adv.f90
 )
 
-add_library(swirl_cuda_cu OBJECT 
-	user_cuda/rpn2adv.cu
-	user_cuda/rpt2adv.cu
-	user_cuda/b4step2.cu
-)
-
-target_link_libraries(swirl_cuda_cu PRIVATE 
- FORESTCLAW::CLAWPACK4.6
- FORESTCLAW::CLAWPACK5
- FORESTCLAW::CUDACLAW
-)
-
 add_executable(swirl_cuda 
   swirl_user.cpp 
   swirl.cpp 
   swirl_options.c
+	user_cuda/rpn2adv.cu
+	user_cuda/rpt2adv.cu
+	user_cuda/b4step2.cu
   $<TARGET_OBJECTS:swirl_cuda_f>
-  $<TARGET_OBJECTS:swirl_cuda_cu>
 )
 
 target_include_directories(swirl_cuda PRIVATE 
