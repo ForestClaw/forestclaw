@@ -85,3 +85,8 @@ if(TARGET FORESTCLAW::CUDACLAW)
 
 endif()
 
+
+# Include examples that use the low-level interface to p4est
+# They should always compile
+
+add_subdirectory(lowlevel)
