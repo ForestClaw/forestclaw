@@ -4,6 +4,7 @@ option(mpi "use MPI library" on)
 option(openmp "use OpenMP" on)
 
 option(geoclaw "build Geoclaw")
+option(cudaclaw "build CudaClaw")
 option(thunderegg "build ThunderEgg")
 cmake_dependent_option(clawpack "build Clawpack" OFF "thunderegg" ON)
 

@@ -22,8 +22,9 @@ set(THUNDEREGG_INCLUDE_DIRS ${THUNDEREGG_ROOT}/include)
 ExternalProject_Add(ThunderEgg
 GIT_REPOSITORY https://github.com/thunderegg/thunderegg
 GIT_TAG        develop-wip
-CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${THUNDEREGG_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp} -Ddisable_petsc:BOOL=true
+CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${THUNDEREGG_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp} -Ddisable_petsc:BOOL=true -DP4EST_ROOT=${P4EST_ROOT}
 BUILD_BYPRODUCTS ${THUNDEREGG_LIBRARIES}
+DEPENDS P4EST-install
 )
 
 # --- required libraries
@@ -36,8 +37,13 @@ file(MAKE_DIRECTORY ${THUNDEREGG_INCLUDE_DIRS})
 
 # this GLOBAL is required to be visible via other
 # project's FetchContent of this project
-add_library(ThunderEgg::ThunderEgg INTERFACE IMPORTED GLOBAL)
+add_library(ThunderEgg::ThunderEgg STATIC IMPORTED GLOBAL)
 target_include_directories(ThunderEgg::ThunderEgg INTERFACE "${THUNDEREGG_INCLUDE_DIRS}")
-target_link_libraries(ThunderEgg::ThunderEgg INTERFACE "${THUNDEREGG_LIBRARIES}" P4EST::P4EST SC::SC FFTW::FFTW)
+target_link_libraries(ThunderEgg::ThunderEgg INTERFACE "${THUNDEREGG_LIBRARIES}" P4EST::P4EST)
+set_target_properties(ThunderEgg::ThunderEgg PROPERTIES 
+  IMPORTED_LOCATION ${THUNDEREGG_LIBRARIES}
+  INTERFACE_INCLUDE_DIRECTORIES ${THUNDEREGG_INCLUDE_DIRS}
+  INTERFACE_LINK_LIBRARIES "FFTW::FFTW;P4EST::P4EST;LAPACK::LAPACK;BLAS::BLAS"
+)
 
 add_dependencies(ThunderEgg::ThunderEgg ThunderEgg)

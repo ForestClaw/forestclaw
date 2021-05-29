@@ -47,6 +47,9 @@ add_library(forestclaw_c OBJECT
 )
 target_include_directories(forestclaw_c PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/include patches/clawpatch)
 target_link_libraries(forestclaw_c PRIVATE P4EST::P4EST SC::SC)
+if(mpi)
+  target_link_libraries(forestclaw_c PRIVATE MPI::MPI_C)
+endif(mpi)
 
 # -- fortran library
 add_library(forestclaw_f OBJECT 
@@ -78,11 +81,11 @@ set_target_properties(forestclaw PROPERTIES EXPORT_NAME FORESTCLAW)
 
 target_sources(forestclaw PRIVATE $<TARGET_OBJECTS:forestclaw_f> $<TARGET_OBJECTS:forestclaw_c>)
 
-target_link_libraries(forestclaw PUBLIC SC::SC P4EST::P4EST)
+target_link_libraries(forestclaw PRIVATE P4EST::P4EST SC::SC ZLIB::ZLIB)
+target_link_libraries(forestclaw INTERFACE P4EST::P4EST SC::SC)
 if(mpi)
-  target_link_libraries(forestclaw PUBLIC MPI::MPI_C)
+  target_link_libraries(forestclaw PUBLIC MPI::MPI_C INTERFACE MPI::MPI_CXX)
 endif(mpi)
-target_link_libraries(forestclaw PRIVATE ZLIB::ZLIB)
 
 target_include_directories(forestclaw
   INTERFACE

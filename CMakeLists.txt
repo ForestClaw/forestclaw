@@ -19,7 +19,11 @@ message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}  install prefix: ${CMAKE_INST
 # --- external libs
 
 if(mpi)
-  find_package(MPI COMPONENTS C REQUIRED)
+  find_package(MPI COMPONENTS C CXX REQUIRED)
+endif()
+
+if(cudaclaw)
+  enable_language(CUDA)
 endif()
 
 find_package(LAPACK)
@@ -46,13 +50,17 @@ endif()
 
 # --- ThunderEgg
 
-if(NOT thunderegg_external)
-  find_package(ThunderEgg HINTS ${THUNDEREGG_ROOT})
-endif()
-if(NOT TARGET ThunderEgg::ThunderEgg)
-  include(cmake/ThunderEgg.cmake)
-endif()
+if(thunderegg)
+  if(NOT thunderegg_external)
+    find_package(ThunderEgg HINTS ${THUNDEREGG_ROOT})
+  endif()
+  if(NOT TARGET ThunderEgg::ThunderEgg)
+    include(cmake/ThunderEgg.cmake)
+  endif()
+endif(thunderegg)
 
+if(cudaclaw)
+endif(cudaclaw)
 # --- configure
 
 include(cmake/config.cmake)

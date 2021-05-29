@@ -13,13 +13,19 @@ add_library(heat_f OBJECT
   fortran/heat_output.f90
 )
 
-add_executable(heat 
-  heat.cpp 
+add_library(heat_c OBJECT 
   heat_run.c 
-  heat_user.cpp 
   heat_options.c 
   heat_diagnostics.c 
+)
+target_link_libraries(heat_c PRIVATE 
+  FORESTCLAW::FC2D_THUNDEREGG
+)
+add_executable(heat 
+  heat.cpp 
+  heat_user.cpp 
   $<TARGET_OBJECTS:heat_f>
+  $<TARGET_OBJECTS:heat_c>
 )
 
 target_include_directories(heat PRIVATE 
@@ -27,5 +33,5 @@ target_include_directories(heat PRIVATE
 )
 
 target_link_libraries(heat PRIVATE 
-  FORESTCLAW::FC2D_THUNDEREGG
+  FORESTCLAW::FC2D_THUNDEREGG ZLIB::ZLIB
 )

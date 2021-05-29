@@ -27,6 +27,7 @@ SOURCE_DIR ${PROJECT_SOURCE_DIR}/sc
 CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SC_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp}
 BUILD_BYPRODUCTS ${SC_LIBRARIES}
 )
+ExternalProject_Add_StepTargets(SC install)
 
 # --- imported target
 
@@ -35,9 +36,11 @@ file(MAKE_DIRECTORY ${SC_INCLUDE_DIRS})
 
 # this GLOBAL is required to be visible via other
 # project's FetchContent of this project
-add_library(SC::SC INTERFACE IMPORTED GLOBAL)
-target_include_directories(SC::SC INTERFACE "${SC_INCLUDE_DIRS}")
-# SC reference MPI in public headers
-target_link_libraries(SC::SC INTERFACE "${SC_LIBRARIES}" MPI::MPI_C)
+add_library(SC::SC STATIC IMPORTED GLOBAL)
+set_target_properties(SC::SC PROPERTIES 
+  IMPORTED_LOCATION ${SC_LIBRARIES}
+  INTERFACE_INCLUDE_DIRECTORIES ${SC_INCLUDE_DIRS}
+  INTERFACE_LINK_LIBRARIES ZLIB::ZLIB
+)
 
 add_dependencies(SC::SC SC)

@@ -24,9 +24,11 @@ set(P4EST_INCLUDE_DIRS ${P4EST_ROOT}/include)
 
 ExternalProject_Add(P4EST
 SOURCE_DIR ${PROJECT_SOURCE_DIR}/p4est
-CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${P4EST_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp}
+CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${P4EST_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp} -DSC_ROOT=${SC_ROOT}
 BUILD_BYPRODUCTS ${P4EST_LIBRARIES}
+DEPENDS SC-install
 )
+ExternalProject_Add_StepTargets(P4EST install)
 
 # --- imported target
 
@@ -35,8 +37,11 @@ file(MAKE_DIRECTORY ${P4EST_INCLUDE_DIRS})
 
 # this GLOBAL is required to be visible via other
 # project's FetchContent of this project
-add_library(P4EST::P4EST INTERFACE IMPORTED GLOBAL)
-target_include_directories(P4EST::P4EST INTERFACE "${P4EST_INCLUDE_DIRS}")
-target_link_libraries(P4EST::P4EST INTERFACE "${P4EST_LIBRARIES}")
+add_library(P4EST::P4EST STATIC IMPORTED GLOBAL)
+set_target_properties(P4EST::P4EST PROPERTIES 
+  IMPORTED_LOCATION ${P4EST_LIBRARIES}
+  INTERFACE_INCLUDE_DIRECTORIES ${P4EST_INCLUDE_DIRS}
+  INTERFACE_LINK_LIBRARIES SC::SC
+)
 
 add_dependencies(P4EST::P4EST P4EST)
