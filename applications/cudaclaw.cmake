@@ -7,9 +7,9 @@
 add_subdirectory(clawpack/advection/2d/swirl_cuda)
 
 # Shallow water wave equations
-#include applications/clawpack/shallow/2d/bump_cuda/Makefile.am
+add_subdirectory(clawpack/shallow/2d/bump_cuda)
 add_subdirectory(clawpack/shallow/2d/radialdam_cuda)
-##include applications/clawpack/shallow/2d/tsunami_cuda/Makefile.am
+add_subdirectory(clawpack/shallow/2d/tsunami_cuda)
 
 # Acoustics
 ##include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am

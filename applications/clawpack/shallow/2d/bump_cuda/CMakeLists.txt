@@ -1,9 +1,10 @@
 set(rp ${PROJECT_SOURCE_DIR}/clawpack/shallow/2d/rp)
 
-add_library(radialdam_cuda_f OBJECT 
+add_library(bump_cuda_f OBJECT 
   setprob.f 
-  fdisc.f 
   user_4.6/qinit.f 
+  user_4.6/tag4refinement.f 
+  user_4.6/tag4coarsening.f 
   user_5.0/qinit.f90 
   user_5.0/setaux.f90 
   user_5.0/tag4refinement.f90 
@@ -16,21 +17,21 @@ add_library(radialdam_cuda_f OBJECT
   ${rp}/clawpack5_rpt2_manifold.f90
 )
 
-add_executable(radialdam_cuda 
-  radialdam.cpp 
-  radialdam_options.c 
-  radialdam_user.cpp 
-  fclaw2d_map_pillowdisk.c 
+add_executable(bump_cuda 
+  bump.cpp 
+  bump_options.c 
+  bump_user.cpp 
+  fclaw2d_map_fivepatch.c 
 	user_cuda/rpn2shallow.cu
-  $<TARGET_OBJECTS:radialdam_cuda_f>
+  $<TARGET_OBJECTS:bump_cuda_f>
 )
 
-target_include_directories(radialdam_cuda PRIVATE 
+target_include_directories(bump_cuda PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${rp}
 )
 
-target_link_libraries(radialdam_cuda PRIVATE 
+target_link_libraries(bump_cuda PRIVATE 
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
  FORESTCLAW::CUDACLAW
