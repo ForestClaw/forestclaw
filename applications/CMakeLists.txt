@@ -75,3 +75,13 @@ if(TARGET FORESTCLAW::GEOCLAW)
     include(geoclaw/geoclaw.cmake)
 
 endif()
+
+# ----------------------------------
+# CudaClaw library and examples
+# ----------------------------------
+if(TARGET FORESTCLAW::CUDACLAW)
+
+    include(cudaclaw.cmake)
+
+endif()
+

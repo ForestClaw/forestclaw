@@ -24,6 +24,7 @@ endif()
 
 if(cudaclaw)
   enable_language(CUDA)
+  find_package(CUDAToolkit REQUIRED)
 endif()
 
 find_package(LAPACK)
@@ -97,6 +98,14 @@ if(geoclaw)
   add_subdirectory(src/solvers/fc2d_geoclaw)
 
 endif(geoclaw)
+
+# --- cudaclaw
+
+if(cudaclaw)
+
+  add_subdirectory(src/solvers/fc2d_cudaclaw)
+
+endif(cudaclaw)
 
 # --- ThunderEgg
 if(thunderegg)
