@@ -12,7 +12,7 @@ add_subdirectory(clawpack/shallow/2d/radialdam_cuda)
 add_subdirectory(clawpack/shallow/2d/tsunami_cuda)
 
 # Acoustics
-##include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am
+add_subdirectory(clawpack/acoustics/2d/radial_cuda)
 
 # Euler equations
 ##include applications/clawpack/euler/2d/shockbubble_cuda/Makefile.am
