@@ -14,7 +14,7 @@ set_target_properties(cudaclaw_f PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CUR
 
 # -- add library
 add_library(cudaclaw STATIC)
-set_target_properties(cudaclaw PROPERTIES EXPORT_NAME CLAWPACK5)
+set_target_properties(cudaclaw PROPERTIES EXPORT_NAME CUDACLAW)
 
 # device code needs to relcoateable since it is in a shared library
 target_compile_options(cudaclaw PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:
