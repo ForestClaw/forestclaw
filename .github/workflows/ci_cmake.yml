@@ -45,7 +45,7 @@ jobs:
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
           cuda: true
         - name: "MPI With ThunderEgg"
-          configure_flags: "-Dmpi=ON -ThunderEgg=ON"
+          configure_flags: "-Dmpi=ON -Dthunderegg=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
 
     name: CMake ${{ matrix.name }} Build on Linux
