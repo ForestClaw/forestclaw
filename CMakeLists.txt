@@ -75,21 +75,30 @@ add_subdirectory(test)
 
 add_subdirectory(src)
 
-if(clawpack)
+# --- Clawpatch
 
-  # --- Clawpatch
+if(clawpatch)
 
   add_subdirectory(src/patches/clawpatch)
+  
+endif(clawpatch)
 
-  # --- Clawpack 4.6
+# --- Clawpack 4.6
+
+if(clawpack4.6)
 
   add_subdirectory(src/solvers/fc2d_clawpack4.6)
 
-  # --- Clawpack 5
+endif(clawpack4.6)
+
+# --- Clawpack 5
+
+if(clawpack5)
 
   add_subdirectory(src/solvers/fc2d_clawpack5)
 
-endif(clawpack)
+endif(clawpack5)
+
 
 # --- geoclaw
 
