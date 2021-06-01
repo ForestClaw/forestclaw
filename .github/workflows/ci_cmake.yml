@@ -41,7 +41,7 @@ jobs:
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "Minimal MPI With CudaClaw"
           configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin nivida-cuda-toolkit"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
 
     name: CMake ${{ matrix.name }} on Linux
     steps:
