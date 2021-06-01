@@ -8,6 +8,11 @@
 
 "configurePresets": [
 {
+  "name": "ci",
+  "binaryDir": "${sourceDir}/build",
+  "generator": "Ninja"
+},
+{
   "name": "default",
   "binaryDir": "${sourceDir}/build",
   "generator": "Ninja",

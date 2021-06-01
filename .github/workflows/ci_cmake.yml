@@ -55,10 +55,10 @@ jobs:
             ninja-build ${{ matrix.ubuntu_packages }}
 
     - name: CMake configure
-      run: cmake -DCMAKE_INSTALL_PREFIX=~ ${{ matrix.configure_flags }}
+      run: cmake --preset ci -DCMAKE_INSTALL_PREFIX=~ ${{ matrix.configure_flags }}
 
     - name: CMake build
-      run: cmake --build --preset default
+      run: cmake --build --preset ci
 
     - name: CMake test examples
       run: ctest --parallel 2 --output-on-failure
