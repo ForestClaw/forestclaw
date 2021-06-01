@@ -5,9 +5,9 @@ include(CheckCCompilerFlag)
 check_c_compiler_flag(-Wall _has_wall)
 if(_has_wall)
   add_compile_options(
-    $<$<COMPILE_LANGUAGE:C> -Wall>
-    $<$<COMPILE_LANGUAGE:CXX> -Wall>
-    $<$<COMPILE_LANGUAGE:Fortran> -Wall>
+    $<$<COMPILE_LANGUAGE:C>:-Wall>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
+    $<$<COMPILE_LANGUAGE:Fortran>:-Wall>
     )
 else()
   check_c_compiler_flag(/Wall _has_msvc_wall)
