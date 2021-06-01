@@ -11,7 +11,10 @@
   "name": "ci",
   "binaryDir": "${sourceDir}/build",
   "generator": "Ninja",
-  "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"}
+  "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"},
+  "environment": {
+    "CUDACXX": "/usr/local/cuda/bin/nvcc"
+  }
 },
 {
   "name": "default",
