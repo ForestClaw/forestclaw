@@ -1,7 +1,7 @@
 include(CMakeDependentOption)
 
-option(mpi "use MPI library" on)
-option(openmp "use OpenMP" on)
+option(mpi "use MPI library")
+option(openmp "use OpenMP")
 
 option(geoclaw "build Geoclaw")
 option(cudaclaw "build CudaClaw")
