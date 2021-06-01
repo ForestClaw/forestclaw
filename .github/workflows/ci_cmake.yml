@@ -75,8 +75,17 @@ jobs:
     - name: CMake build
       run: cmake --build --preset ci
 
-    - name: CMake test examples
+    - name: CMake test
       run: ctest --parallel 2 --output-on-failure
+
+    - name: CMake install (for examples)
+      run: cmake --install build
+
+    - name: CMake configure examples
+      run: cmake -B applications/build -S applications -DFORESTCLAW_ROOT=~
+
+    - name: CMake build examples
+      run: cmake --build applications/build
 
     - name: Create package
       if: github.event.action == 'published'
@@ -109,10 +118,22 @@ jobs:
       run: brew install open-mpi ninja fftw
 
     - name: CMake configure
-      run: cmake --preset mac -DCMAKE_INSTALL_PREFIX=~
+      run: cmake --preset mac -DCMAKE_INSTALL_PREFIX=~ -Dclawpack=on -Dgeoclaw=on -Dthunderegg=on
 
     - name: CMake build
       run: cmake --build build
+
+    - name: CMake test
+      run: ctest --parallel 2 --output-on-failure
+
+    - name: CMake install (for examples)
+      run: cmake --install build
+
+    - name: CMake configure examples
+      run: cmake -B applications/build -S applications -DFORESTCLAW_ROOT=~
+
+    - name: CMake build examples
+      run: cmake --build applications/build
 
     - name: Create package
       if: github.event.action == 'published'
