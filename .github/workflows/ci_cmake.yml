@@ -18,34 +18,37 @@ jobs:
     strategy:
       matrix:
         include:
-        - name: "Minimal Serial Build"
+        - name: "Serial Minimal"
           configure_flags: ""
           ubuntu_packages: ""
-        - name: "Minimal Serial With Clawpack"
+        - name: "Serial With Clawpack"
           configure_flags: "-Dclawpack=ON"
           ubuntu_packages: ""
-        - name: "Minimal Serial With GeoClaw"
+        - name: "Serial With GeoClaw"
           configure_flags: "-Dgeoclaw=ON"
           ubuntu_packages: ""
-        - name: "Minimal Serial With CudaClaw"
+        - name: "Serial With CudaClaw"
           configure_flags: "-Dcudaclaw=ON"
           ubuntu_packages: ""
           cuda: true
-        - name: "Minimal MPI Build"
+        - name: "MPI Minimal"
           configure_flags: "-Dmpi=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
-        - name: "Minimal MPI With Clawpack"
+        - name: "MPI With Clawpack"
           configure_flags: "-Dmpi=ON -Dclawapck=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
-        - name: "Minimal MPI With GeoClaw"
+        - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
-        - name: "Minimal MPI With CudaClaw"
+        - name: "MPI With CudaClaw"
           configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
           cuda: true
+        - name: "MPI With ThunderEgg"
+          configure_flags: "-Dmpi=ON -ThunderEgg=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
 
-    name: CMake ${{ matrix.name }} on Linux
+    name: CMake ${{ matrix.name }} Build on Linux
     steps:
     - uses: actions/checkout@v2
       name: Checkout source code
