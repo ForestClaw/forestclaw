@@ -10,7 +10,8 @@
 {
   "name": "ci",
   "binaryDir": "${sourceDir}/build",
-  "generator": "Ninja"
+  "generator": "Ninja",
+  "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"}
 },
 {
   "name": "default",
@@ -78,6 +79,10 @@
   {
     "name": "default",
     "configurePreset": "default"
+  },
+  {
+    "name": "ci",
+    "configurePreset": "ci"
   }
 ],
 "testPresets": [
