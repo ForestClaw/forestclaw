@@ -2,14 +2,6 @@ name: CI for CMake
 
 on:
   push:
-    paths:
-      - "**/CMakeLists.txt"
-      - "**.cmake"
-      - "**.cmake.in"
-      - "**.c"
-      - "**.h"
-      - "**.h.in"
-      - ".github/workflows/ci_cmake.yml"
   pull_request:
   release:
     types: [published]
@@ -19,11 +11,39 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
-    name: CMake build on Linux
     timeout-minutes: 15
     env:
       CTEST_PARALLEL_LEVEL: 2
 
+    strategy:
+      matrix:
+        include:
+        - name: "Minimal Serial Build"
+          configure_flags: ""
+          ubuntu_packages: ""
+        - name: "Minimal Serial With Clawpack"
+          configure_flags: "-Dclawpack=ON"
+          ubuntu_packages: ""
+        - name: "Minimal Serial With GeoClaw"
+          configure_flags: "-Dgeoclaw=ON"
+          ubuntu_packages: ""
+        - name: "Minimal Serial With CudaClaw"
+          configure_flags: "-Dcudaclaw=ON"
+          ubuntu_packages: "nvidia-cuda-toolkit"
+        - name: "Minimal MPI Build"
+          configure_flags: "-Dmpi=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "Minimal MPI With Clawpack"
+          configure_flags: "-Dmpi=ON -Dclawapck=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "Minimal MPI With GeoClaw"
+          configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "Minimal MPI With CudaClaw"
+          configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin nivida-cuda-toolkit"
+
+    name: CMake ${{ matrix.name }} on Linux
     steps:
     - uses: actions/checkout@v2
       name: Checkout source code
@@ -32,10 +52,10 @@ jobs:
       run: |
         sudo apt-get update -yq
         sudo apt-get install -yq --no-install-recommends \
-            ninja-build libopenmpi-dev openmpi-bin libfftw3-dev
+            ninja-build ${{ matrix.ubuntu_packages }}
 
     - name: CMake configure
-      run: cmake --preset default -DCMAKE_INSTALL_PREFIX=~
+      run: cmake -DCMAKE_INSTALL_PREFIX=~ ${{ matrix.configure_flags }}
 
     - name: CMake build
       run: cmake --build --preset default
