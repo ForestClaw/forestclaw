@@ -76,6 +76,38 @@ if(TARGET FORESTCLAW::GEOCLAW)
 
 endif()
 
+## ---------------------------------------------
+## Ash3d examples (requires submodule)
+## -- Uncomment Makefiles below to compile Ash3d
+## ---------------------------------------------
+#
+#if FCLAW_ENABLE_ASH3D
+#
+### Solver library
+##include src/solvers/fc3d_ash3d/Makefile.am
+#
+### Applications
+##include src/solvers/fc3d_ash3d/test_cases/ash3d.apps
+#
+#endif
+#
+## ----------------------------------------
+## ACTIVEFLUX project (requires submodule)
+## ----------------------------------------
+#if FCLAW_ENABLE_ACTIVEFLUX
+#
+### Patches needed for Active Flux solver
+##include src/patches/clawpatch/Makefile.am
+#
+### Solver library
+##include src/solvers/fc2d_activeflux/Makefile.am
+#
+### Applications
+##include src/solvers/fc2d_activeflux/examples/activeflux.apps
+#
+#endif
+
+
 # ----------------------------------
 # CudaClaw library and examples
 # ----------------------------------
