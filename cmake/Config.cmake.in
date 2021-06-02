@@ -10,6 +10,9 @@ find_dependency(ZLIB)
 if(@thunderegg@)
     find_dependency(ThunderEgg)
 endif()
+if(@cudaclaw@)
+    find_dependency(CUDAToolkit)
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 
