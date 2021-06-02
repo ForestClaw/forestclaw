@@ -82,10 +82,10 @@ jobs:
       run: cmake --install build
 
     - name: CMake configure examples
-      run: cmake -B applications/build -S applications -DFORESTCLAW_ROOT=~
+      run: cmake -B applications/build -S applications --preset ci -DFORESTCLAW_ROOT=~
 
     - name: CMake build examples
-      run: cmake --build applications/build
+      run: cmake --build --preset ci applications/build
 
     - name: Create package
       if: github.event.action == 'published'
