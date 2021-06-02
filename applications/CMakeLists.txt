@@ -16,6 +16,7 @@ set(CMAKE_CXX_STANDARD 17)
 # -- check if this being included as a subdirectory
 if(NOT TARGET FORESTCLAW::FORESTCLAW)
 
+    set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
     find_package(MPI)
 
     # --- get installed ForestClaw package
