@@ -47,6 +47,7 @@ target_include_directories(cudaclaw
 install(FILES
 	fc2d_cudaclaw.h
 	fc2d_cudaclaw_cuda.h
+	fc2d_cuda_profiler.h
 	fc2d_cudaclaw_options.h
 	cudaclaw_user_fort.h
 	fc2d_cudaclaw_fort.h
