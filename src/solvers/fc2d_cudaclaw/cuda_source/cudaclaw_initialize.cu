@@ -26,7 +26,7 @@
 
 
 #include "../fc2d_cudaclaw_cuda.h"
-#include "../fc2d_cudaclaw_check.cu"
+#include "../fc2d_cudaclaw_check.h"
 
 #include <fclaw2d_global.h>
 #if defined(FCLAW_ENABLE_MPI)  

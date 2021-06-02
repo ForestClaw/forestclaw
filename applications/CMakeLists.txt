@@ -22,6 +22,10 @@ if(NOT TARGET FORESTCLAW::FORESTCLAW)
     # --- get installed ForestClaw package
     find_package(FORESTCLAW REQUIRED)
 
+    if(TARGET FORESTCLAW::CUDACLAW)
+        enable_language(CUDA)
+    endif()
+
 endif()
 
 # --------------------------------------------

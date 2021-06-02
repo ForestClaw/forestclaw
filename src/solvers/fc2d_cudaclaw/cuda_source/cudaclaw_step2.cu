@@ -13,7 +13,7 @@
 #include <fclaw2d_clawpatch_options.h>
 #include <fc2d_cudaclaw_options.h>
 
-#include "../fc2d_cudaclaw_check.cu"  /* CHECK defined here */
+#include "../fc2d_cudaclaw_check.h"  /* CHECK defined here */
 
 #include <fc2d_cuda_profiler.h>
 #include <cub/cub.cuh>

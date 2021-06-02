@@ -4,7 +4,7 @@
 //#include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
 //#include <cassert>
 
-#include <fc2d_cudaclaw_check.cu>
+#include <fc2d_cudaclaw_check.h>
 
 __constant__ double s_grav;
 
