@@ -85,7 +85,7 @@ jobs:
       run: cmake -B applications/build -S applications --preset ci -DFORESTCLAW_ROOT=~
 
     - name: CMake build examples
-      run: cmake --build --preset ci applications/build
+      run: cmake --preset ci --build applications/build
 
     - name: Create package
       if: github.event.action == 'published'
