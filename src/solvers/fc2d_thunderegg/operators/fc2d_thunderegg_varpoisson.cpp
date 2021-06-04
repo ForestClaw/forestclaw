@@ -401,7 +401,8 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
             auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
             auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, 
                                                                     prev_domain, curr_domain);
-            patch_operator = make_shared<varpoisson>(restricted_beta_vec, curr_domain, ghost_filler);
+            patch_operator = make_shared<varpoisson>(restricted_beta_vec, 
+                                                     curr_domain, ghost_filler);
             prev_beta_vec = restricted_beta_vec;
 
             //smoother
@@ -431,9 +432,12 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
 
         //operator
         auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
-        auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<varpoisson>(restricted_beta_vec, curr_domain, 
-                                                    ghost_filler);
+        auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, 
+                                                                prev_domain, 
+                                                                curr_domain);
+        patch_operator = make_shared<varpoisson>(restricted_beta_vec, 
+                                                 curr_domain, 
+                                                 ghost_filler);
 
         //smoother
         smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
@@ -458,7 +462,9 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
-    int its = iter_solver.solve(vg, A, u, f, nullptr,true);
+
+    bool vl = mg_opt->verbosity_level != 0;
+    int its = iter_solver.solve(vg, A, u, f, M,vl);
 
     // copy solution into rhs
     f->copy(u);

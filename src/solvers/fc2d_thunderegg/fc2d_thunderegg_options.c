@@ -60,6 +60,9 @@ thunderegg_register (fc2d_thunderegg_options_t* mg_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "max-it", &mg_opt->max_it, 10000,
                            "Max iterations for BiCGStab solver. [10000]");
 
+    sc_options_add_int (opt, 0, "verbosity-level", &mg_opt->verbosity_level, 0,
+                           "Verbosity level (0-1) [0]");
+
     sc_options_add_double (opt, 0, "tol", &mg_opt->tol, 1e-12,
                            "Tolerance for BiCGStab solver. [1e-12]");
 

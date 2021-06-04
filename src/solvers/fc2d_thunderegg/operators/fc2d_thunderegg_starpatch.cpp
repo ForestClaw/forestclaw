@@ -214,7 +214,8 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                    next_domain, clawpatch_opt->rhs_fields);
+                                                                    next_domain, 
+                                                                    clawpatch_opt->rhs_fields);
 
             //interpolator
             auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
@@ -246,7 +247,8 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                    prev_domain, clawpatch_opt->rhs_fields);
+                                                                    prev_domain, 
+                                                                    clawpatch_opt->rhs_fields);
 
         //vector generator
         vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
@@ -263,7 +265,8 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
-    int its = iter_solver.solve(vg, A, u, f, M);
+    bool vl = mg_opt->verbosity_level != 0;
+    int its = iter_solver.solve(vg, A, u, f, M, vl);
 
     fclaw_global_productionf("Iterations: %i\n", its);
     fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
