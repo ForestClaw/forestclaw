@@ -9,7 +9,7 @@
       double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
       integer i, j
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
       dxdy = dx*dy
       do j = 1-mbc,my+mbc

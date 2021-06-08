@@ -2,9 +2,6 @@
 # ThunderEgg solver
 # --------------------------------------------
 
-## Multigrid test
-#include applications/clawpack/shallow/2d/tsunami/Makefile.am
-
 ## Elliptic example
 include applications/elliptic/poisson/Makefile.am
 

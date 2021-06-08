@@ -12,7 +12,7 @@
       integer i,j, k
       double precision dxdy,t
 
-      include "metric_terms.i"
+      include "fclaw2d_metric_terms.i"
 
 c     # ----------------------------------------------------------------
 c     # Conservative form (cell-centered velocities)
@@ -78,7 +78,7 @@ c             # x-face and y-face edge lengths (6,7)
       integer i,j, k
       double precision wl(3), wb(3)
 
-      include "metric_terms.i"
+      include "fclaw2d_metric_terms.i"
 
       cont = get_context()
 

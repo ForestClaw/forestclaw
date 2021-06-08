@@ -17,7 +17,7 @@ libclawpatch_installed_headers = \
 	src/patches/metric/fclaw2d_metric.hpp \
 	src/patches/metric/fclaw2d_metric_default.h \
 	src/patches/metric/fclaw2d_metric_default_fort.h \
-	src/patches/metric/fortran_source2d/metric_terms.i 
+	src/patches/metric/fortran_source2d/fclaw2d_metric_terms.i 
 
 libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
@@ -63,7 +63,7 @@ lib_LTLIBRARIES += src/patches/clawpatch/libclawpatch.la
 FCLAW_CLAWPATCH_CPPFLAGS = -I@top_srcdir@/src/patches/clawpatch \
                            -I@top_srcdir@/src/patches/metric
 
-## Needed for metric_terms.i
+## Needed for fclaw2d_metric_terms.i
 FCLAW_CLAWPATCH_FFLAGS = -I@top_srcdir@/src/patches/metric/fortran_source2d
 
 FCLAW_CLAWPATCH_LDADD    = @top_builddir@/src/patches/clawpatch/libclawpatch.la

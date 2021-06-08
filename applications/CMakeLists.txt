@@ -1,30 +1,129 @@
+# --------------------------------------------
+# List of available applications and examples
+#
+# Note : Any files below which are uncommented
+# need to be available at compile time, even 
+# the configuration flag is not set.  
+# --------------------------------------------
+
+
 cmake_minimum_required(VERSION 3.13...3.20)
 
 project(ForestClawApps LANGUAGES C CXX Fortran)
 
-include(CTest)
+set(CMAKE_CXX_STANDARD 17)
 
-find_package(MPI COMPONENTS C Fortran REQUIRED)
-find_package(ZLIB REQUIRED)
+# -- check if this being included as a subdirectory
+if(NOT TARGET FORESTCLAW::FORESTCLAW)
 
-# --- get installed ForestClaw package
-find_package(FORESTCLAW CONFIG REQUIRED)
+    set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
+    find_package(MPI)
 
-if(EXISTS ${FORESTCLAW_DIR}/../SC/SCTargets.cmake)
-  include(${FORESTCLAW_DIR}/../SC/SCTargets.cmake)
+    # --- get installed ForestClaw package
+    find_package(FORESTCLAW REQUIRED)
 
-  add_library(SC::SC INTERFACE IMPORTED)
-  target_link_libraries(SC::SC INTERFACE SC::sc)
+    if(TARGET FORESTCLAW::CUDACLAW)
+        enable_language(CUDA)
+    endif()
+
 endif()
 
-include(${FORESTCLAW_DIR}/../P4EST/P4ESTTargets.cmake)
-add_library(P4EST::P4EST INTERFACE IMPORTED)
-target_link_libraries(P4EST::P4EST INTERFACE P4EST::p4est)
+# --------------------------------------------
+# Clawpack 4.6 and 5.0 examples
+# --------------------------------------------
 
-include(${FORESTCLAW_DIR}/FORESTCLAWTargets.cmake)
-add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED)
-target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE FORESTCLAW::forestclaw)
+if(TARGET FORESTCLAW::CLAWPACK4.6 AND TARGET FORESTCLAW::CLAWPACK5)
 
-# --- apps
+    include(clawpack/clawpack.cmake)
 
-add_subdirectory(clawpack/advection/2d/swirl)
+endif()
+
+# --------------------------------------------
+# ThunderEgg solver
+# --------------------------------------------
+
+if(TARGET FORESTCLAW::FC2D_THUNDEREGG)
+
+    include(elliptic/elliptic.cmake)
+
+endif()
+
+
+
+
+# ----------------------------------
+# Projects under development
+# ----------------------------------
+if(TARGET FORESTCLAW::CLAWPACK4.6 AND TARGET FORESTCLAW::CLAWPACK5)
+
+    # Development projects
+    #include(development.cmake)
+
+endif()
+
+# ----------------------------------
+# Projects for paper
+# ----------------------------------
+if(TARGET FORESTCLAW::CLAWPACK4.6)
+
+    #include(paper.cmake)
+
+endif()
+
+
+# ----------------------------------
+# GeoClaw library and examples
+# ----------------------------------
+
+if(TARGET FORESTCLAW::GEOCLAW)
+
+    include(geoclaw/geoclaw.cmake)
+
+endif()
+
+## ---------------------------------------------
+## Ash3d examples (requires submodule)
+## -- Uncomment Makefiles below to compile Ash3d
+## ---------------------------------------------
+#
+#if FCLAW_ENABLE_ASH3D
+#
+### Solver library
+##include src/solvers/fc3d_ash3d/Makefile.am
+#
+### Applications
+##include src/solvers/fc3d_ash3d/test_cases/ash3d.apps
+#
+#endif
+#
+## ----------------------------------------
+## ACTIVEFLUX project (requires submodule)
+## ----------------------------------------
+#if FCLAW_ENABLE_ACTIVEFLUX
+#
+### Patches needed for Active Flux solver
+##include src/patches/clawpatch/Makefile.am
+#
+### Solver library
+##include src/solvers/fc2d_activeflux/Makefile.am
+#
+### Applications
+##include src/solvers/fc2d_activeflux/examples/activeflux.apps
+#
+#endif
+
+
+# ----------------------------------
+# CudaClaw library and examples
+# ----------------------------------
+if(TARGET FORESTCLAW::CUDACLAW)
+
+    include(cudaclaw.cmake)
+
+endif()
+
+
+# Include examples that use the low-level interface to p4est
+# They should always compile
+
+add_subdirectory(lowlevel)

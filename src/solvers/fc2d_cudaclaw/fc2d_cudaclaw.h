@@ -26,7 +26,7 @@
 #ifndef FC2D_CUDACLAW_H
 #define FC2D_CUDACLAW_H
 
-#include "fc2d_cudaclaw_cuda.h"  /* Defines typedefs */
+#include <fc2d_cudaclaw_cuda.h>  /* Defines typedefs */
 
 #ifdef __cplusplus
 extern "C"

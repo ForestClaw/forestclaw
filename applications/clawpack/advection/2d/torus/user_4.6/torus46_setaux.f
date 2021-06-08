@@ -15,7 +15,7 @@
       integer color_equation
       common /eqn_comm/ color_equation      
 
-      include "metric_terms.i"
+      include "fclaw2d_metric_terms.i"
 
 c     # ----------------------------------------------------------------
 c     # Color equation (edge velocities)
@@ -144,7 +144,7 @@ c           # y-face - left vertex
 
       integer i,j, k
 
-      include "metric_terms.i"
+      include "fclaw2d_metric_terms.i"
 
       cont = get_context()
 

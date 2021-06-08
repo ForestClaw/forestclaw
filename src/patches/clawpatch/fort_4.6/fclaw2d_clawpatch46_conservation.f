@@ -17,7 +17,7 @@
       integer i,j
       double precision dxdy
 
-      include "metric_terms.i"
+      include "fclaw2d_metric_terms.i"
 
       if (manifold .eq. 1) then
          do j = 1,my

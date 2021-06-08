@@ -1,6 +1,6 @@
 #include "../swirl_user.h"
 
-#include <fc2d_cudaclaw_check.cu>
+#include <fc2d_cudaclaw_check.h>
 
 __constant__ double s_tperiod;
 
