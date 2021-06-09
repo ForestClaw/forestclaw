@@ -269,7 +269,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/annulus
-        mpirun -n 2 ./annulus -F regression.ini
+        mpirun -n 2 ./annulus -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./annulus -F regression.ini --user:claw-version=5
 
 
   clawpack_advection_2d_disk:
@@ -288,7 +289,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/disk
-        mpirun -n 2 ./disk -F regression.ini
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5
 
 
   clawpack_advection_2d_filament:
@@ -403,6 +405,7 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/swirl
         mpirun -n 2 ./swirl -F regression.ini
+        mpirun -n 2 ./swirl -F regression.ini --user:claw-version=5
 
 
   clawpack_advection_2d_torus:
