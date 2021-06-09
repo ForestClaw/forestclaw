@@ -435,7 +435,8 @@ int geoclaw_patch_tag4refinement(fclaw2d_global_t *glob,
 static
 int geoclaw_patch_tag4coarsening(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_patches,
-                                      int blockno, int patchno)
+                                      int blockno, int patchno,
+                                      int initflag)
 
 {
     const fclaw_options_t *amropt;

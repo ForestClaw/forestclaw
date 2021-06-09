@@ -2,7 +2,8 @@
 
 bin_PROGRAMS += applications/elliptic/phasefield/phasefield
 
-NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES = \
+applications_elliptic_phasefield_phasefield_SOURCES = \
+	applications/elliptic/phasefield/phasefield.cpp \
 	applications/elliptic/phasefield/phasefield_run.c \
 	applications/elliptic/phasefield/phasefield_operator.cpp \
 	applications/elliptic/phasefield/phasefield_operator.h \
@@ -21,9 +22,7 @@ NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES = \
 	applications/elliptic/phasefield/fortran/phasefield_tag4refinement.f90 \
 	applications/elliptic/phasefield/fortran/phasefield_tag4coarsening.f90
 
-applications_elliptic_phasefield_phasefield_SOURCES = \
-	applications/elliptic/phasefield/phasefield.cpp \
-	$(NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES)
+
 
 EXTRA_DIST += \
 	applications/elliptic/phasefield/fclaw_options.ini
@@ -51,10 +50,35 @@ applications_elliptic_phasefield_phasefield_LDADD = \
 #       applications/elliptic/phasefield/libphasefield.a
 
 
-TEST_CPPFLAGS += $(applications_elliptic_phasefield_phasefield_CPPFLAGS)
+check_PROGRAMS += applications/elliptic/phasefield/phasefield_TEST.MPI1
+TESTS += applications/elliptic/phasefield/phasefield_TEST.MPI1
 
-TEST_SOURCES += \
-	test/applications/elliptic/phasefield/phasefield_patch_operator.cpp \
-	$(NONMAIN_applications_elliptic_phasefield_phasefield_SOURCES)
+applications_elliptic_phasefield_phasefield_TEST_MPI1_SOURCES = \
+	applications/elliptic/phasefield/phasefield_run.c \
+	applications/elliptic/phasefield/phasefield_operator.cpp \
+	applications/elliptic/phasefield/phasefield_operator.h \
+	applications/elliptic/phasefield/phasefield_patch_operator.cpp \
+	applications/elliptic/phasefield/phasefield_patch_operator_TEST.cpp \
+	applications/elliptic/phasefield/phasefield_patch_operator.h \
+	applications/elliptic/phasefield/phasefield_user.cpp \
+	applications/elliptic/phasefield/phasefield_user.h \
+	applications/elliptic/phasefield/phasefield_options.c \
+	applications/elliptic/phasefield/cellave.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_setprob.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_bc2.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_fort_rhs.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_qinit.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_apply_bc.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_eval_bc.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_tag4refinement.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_tag4coarsening.f90
 
-TEST_LDADD += $(applications_elliptic_phasefield_phasefield_LDADD)
+
+
+applications_elliptic_phasefield_phasefield_TEST_MPI1_CPPFLAGS = \
+    $(applications_elliptic_phasefield_phasefield_CPPFLAGS)
+
+applications_elliptic_phasefield_phasefield_TEST_MPI1_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+	$(applications_elliptic_phasefield_phasefield_LDADD)

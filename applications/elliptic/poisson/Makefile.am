@@ -15,8 +15,8 @@ applications_elliptic_poisson_poisson_SOURCES = \
 	applications/elliptic/poisson/fortran/poisson_qexact.f90 \
 	applications/elliptic/poisson/fortran/poisson_apply_bc.f90 \
 	applications/elliptic/poisson/fortran/poisson_eval_bc.f90 \
-	applications/elliptic/poisson/fortran/poisson_tag4refinement.f90 \
-	applications/elliptic/poisson/fortran/poisson_tag4coarsening.f90 \
+	applications/elliptic/poisson/fortran/poisson_tag4refinement.f \
+	applications/elliptic/poisson/fortran/poisson_tag4coarsening.f \
 	applications/elliptic/poisson/fortran/poisson_output.f90
 
 

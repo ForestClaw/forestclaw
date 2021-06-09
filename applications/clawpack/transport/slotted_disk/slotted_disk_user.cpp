@@ -36,12 +36,26 @@ void slotted_disk_link_solvers(fclaw2d_global_t *glob)
 
     /* Custom setprob */
     fclaw2d_vtable_t *vt = fclaw2d_vt();
-    vt->problem_setup    = &slotted_disk_problem_setup;  /* Version-independent */
+    vt->problem_setup = &slotted_disk_problem_setup;  /* Version-independent */
 }
 
 void slotted_disk_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = transport_get_options(glob);
-    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
-    SLOTTED_DISK_SETPROB(&user->kappa, &gparms->tfinal);
+    const fclaw_options_t* claw_opt = fclaw2d_get_options(glob);
+
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,"%-24.4f %s\n",user->kappa,"\% kappa");
+        fprintf(f,"%-24.4f %s\n",claw_opt->tfinal,"\% tfinal");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+
+    SLOTTED_DISK_SETPROB();  /* Reads file created above */
 }

@@ -1,9 +1,9 @@
       subroutine clawpack46_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
-     &      coarsen_threshold, tag_patch)
+     &      coarsen_threshold, init_flag, tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch
+      integer mx,my, mbc, meqn, tag_patch, init_flag
       integer blockno
       double precision xlower(0:3), ylower(0:3), dx, dy
       double precision coarsen_threshold

@@ -15,7 +15,7 @@
       logical fclaw2d_map_is_sphere
       integer i,j
 
-c     # Copied from 'metric_terms.i'
+c     # Copied from 'fclaw2d_metric_terms.i'
 
       double precision beta
       common /comtorus/ beta

@@ -1,4 +1,4 @@
-#include <ThunderEgg/PatchOperator.h>
+#include <ThunderEgg.h>
 #include "phasefield_options.h"
 #include "fc2d_thunderegg_options.h"
 
@@ -22,11 +22,11 @@ class phasefield : public ThunderEgg::PatchOperator<2>
                std::shared_ptr<const ThunderEgg::Domain<2>> domain,
                std::shared_ptr<const ThunderEgg::GhostFiller<2>> ghost_filler);
 
-    void applySinglePatch(std::shared_ptr<const ThunderEgg::PatchInfo<2>> pinfo,
+    void applySinglePatch(const ThunderEgg::PatchInfo<2>& pinfo,
                           const std::vector<ThunderEgg::LocalData<2>> &us,
                           std::vector<ThunderEgg::LocalData<2>> &fs,
                           bool interior_dirichlet) const override;
-    void addGhostToRHS(std::shared_ptr<const ThunderEgg::PatchInfo<2>> pinfo,
+    void addGhostToRHS(const ThunderEgg::PatchInfo<2>& pinfo,
                        const std::vector<ThunderEgg::LocalData<2>> &us,
                        std::vector<ThunderEgg::LocalData<2>> &fs) const override;
 
