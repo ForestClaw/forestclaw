@@ -8,6 +8,8 @@ showpatchborders;
 setpatchborderprops(1:8,'linewidth',1);
 view([65.5,12]);
 
+caxis([0.1,1.9]);
+
 % showgridlines(3);
 
 NoQuery = 0;
