@@ -309,7 +309,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/filament
-        mpirun -n 2 ./filament -F regression.ini
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5
 
 
   clawpack_advection_2d_hemisphere:
@@ -328,7 +329,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/hemisphere
-        mpirun -n 2 ./hemisphere -F regression.ini
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5
 
 
   clawpack_advection_2d_latlong:
@@ -347,7 +349,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/latlong
-        mpirun -n 2 ./latlong -F regression.ini
+        mpirun -n 2 ./latlong -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./latlong -F regression.ini --user:claw-version=5
 
 
   clawpack_advection_2d_replicated:
@@ -367,6 +370,25 @@ jobs:
       run: |
         cd applications/clawpack/advection/2d/replicated
         mpirun -n 2 ./replicated -F regression.ini
+
+  clawpack_advection_2d_periodic:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/periodic
+        mpirun -n 2 ./periodic -F regression.ini  --user:claw-version=4
+        mpirun -n 2 ./periodic -F regression.ini  --user:claw-version=5
 
 
   clawpack_advection_2d_sphere:
@@ -404,7 +426,7 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/swirl
-        mpirun -n 2 ./swirl -F regression.ini
+        mpirun -n 2 ./swirl -F regression.ini --user:claw-version=4
         mpirun -n 2 ./swirl -F regression.ini --user:claw-version=5
 
 
