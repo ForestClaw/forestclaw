@@ -1,6 +1,6 @@
       subroutine fclaw2d_clawpatch46_fort_tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
-     &      q, tag_threshold, init_flag,tag_patch)
+     &      q, tag_threshold, init_flag, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
@@ -22,7 +22,7 @@ c     # Refine based only on first variable in system.
          do i = 1-mbc,mx+mbc
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if (qmax .gt. tag_threshold) then
+            if (qmax-qmin .gt. tag_threshold) then
                tag_patch = 1
                return
             endif
