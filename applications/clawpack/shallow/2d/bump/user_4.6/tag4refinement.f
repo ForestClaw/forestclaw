@@ -16,8 +16,6 @@
       integer i,j, mq
       double precision qmin, qmax, xc, yc
       
-
-
       tag_patch = 0
 
       cont = get_context()

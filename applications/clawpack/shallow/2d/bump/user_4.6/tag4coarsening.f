@@ -10,11 +10,11 @@ c     # --------------------------------------------
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
       subroutine tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
-     &      coarsen_threshold, tag_patch)
+     &      coarsen_threshold, init_flag, tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch
-      integer blockno
+      integer blockno, init_flag
       double precision xlower(0:3), ylower(0:3), dx, dy
       double precision coarsen_threshold
       double precision q0(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -24,6 +24,11 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
 
       integer i,j, mq
       double precision qmin, qmax
+
+      if (init_flag .ne. 0) then
+            tag_patch = 0
+            return
+      endif
 
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
