@@ -21,9 +21,6 @@
 ## torus (original)
 #include applications/clawpack/advection/2d/torus/Makefile.am
 
-## periodic (original)
-#include applications/clawpack/advection/2d/periodic/Makefile.am
-
 ## bump (original)
 include applications/clawpack/shallow/2d/bump/Makefile.am
 
