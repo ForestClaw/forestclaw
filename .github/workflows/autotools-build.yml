@@ -369,7 +369,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/replicated
-        mpirun -n 2 ./replicated -F regression.ini
+        mpirun -n 2 ./replicated -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./replicated -F regression.ini --user:claw-version=5
 
   clawpack_advection_2d_periodic:
     needs: mpi_build_with_clawpack_enabled
@@ -390,7 +391,6 @@ jobs:
         mpirun -n 2 ./periodic -F regression.ini  --user:claw-version=4
         mpirun -n 2 ./periodic -F regression.ini  --user:claw-version=5
 
-
   clawpack_advection_2d_sphere:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
@@ -407,8 +407,10 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/sphere
-        mpirun -n 2 ./sphere -F regression.ini
-
+        mpirun -n 2 ./sphere -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./sphere -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./sphere -F regression.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./sphere -F regression.ini --user:claw-version=5 --user:example=1
 
   clawpack_advection_2d_swirl:
     needs: mpi_build_with_clawpack_enabled
@@ -446,7 +448,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/torus
-        mpirun -n 2 ./torus -F regression.ini
+        mpirun -n 2 ./torus -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./torus -F regression.ini --user:claw-version=5
 
 
   clawpack_acoustics_2d_interface:
@@ -465,7 +468,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/acoustics/2d/interface
-        mpirun -n 2 ./interface -F regression.ini
+        mpirun -n 2 ./interface -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./interface -F regression.ini --user:claw-version=5
 
 
   clawpack_acoustics_2d_radial:
@@ -484,7 +488,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/acoustics/2d/radial
-        mpirun -n 2 ./radial -F regression.ini
+        mpirun -n 2 ./radial -F regression.ini   --user:claw-version=4
+        mpirun -n 2 ./interface -F regression.ini --user:claw-version=5
 
 
   clawpack_burgers_2d_pwconst:
@@ -503,7 +508,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/burgers/2d/pwconst
-        mpirun -n 2 ./pwconst -F regression.ini
+        mpirun -n 2 ./pwconst -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./pwconst -F regression.ini --user:claw-version=5
 
 
   clawpack_shallow_2d_bump:
@@ -522,7 +528,8 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/shallow/2d/bump
-        mpirun -n 2 ./bump -F regression.ini
+        mpirun -n 2 ./bump -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./bump -F regression.ini --user:claw-version=5
 
 
   clawpack_shallow_2d_radialdam:
@@ -617,6 +624,7 @@ jobs:
       run: |
         cd applications/clawpack/euler/2d/shockbubble
         mpirun -n 2 ./shockbubble -F regression.ini
+
   clawpack_euler_2d_quadrants:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
