@@ -23,7 +23,7 @@ SUBROUTINE clawpack5_tag4refinement(mx,my,mbc,meqn, &
      DO j = 1,my
         qmin = MIN(q(mq,i,j),qmin)
         qmax = MAX(q(mq,i,j),qmax)
-        IF (q(mq,i,j)  .GT. refine_threshold) THEN
+        IF (qmax-qmin  .GT. refine_threshold) THEN
            tag_patch = 1
            RETURN
         ENDIF
