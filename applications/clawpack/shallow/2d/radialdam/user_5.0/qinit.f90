@@ -26,6 +26,7 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my, &
         q(1,i,j) = hin*win + hout*(1.d0-win)
         q(2,i,j) = 0.d0
         q(3,i,j) = 0.d0
+        q(4,i,j) = 0.d0
      ENDDO
   ENDDO
 END SUBROUTINE clawpack5_qinit
