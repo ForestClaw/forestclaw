@@ -9,8 +9,11 @@ applications_clawpack_shallow_2d_radialdam_radialdam_SOURCES = \
 	applications/clawpack/shallow/2d/radialdam/radialdam_user.h \
 	applications/clawpack/shallow/2d/radialdam/fclaw2d_map_pillowdisk.c \
 	applications/clawpack/shallow/2d/radialdam/setprob.f \
+	applications/clawpack/shallow/2d/radialdam/radialdam_exceeds_th.f90 \
 	applications/clawpack/shallow/2d/radialdam/fdisc.f \
 	applications/clawpack/shallow/2d/radialdam/user_4.6/qinit.f \
+	applications/clawpack/shallow/2d/radialdam/user_4.6/tag4refinement.f \
+	applications/clawpack/shallow/2d/radialdam/user_4.6/tag4coarsening.f \
 	applications/clawpack/shallow/2d/radialdam/user_5.0/qinit.f90 \
 	applications/clawpack/shallow/2d/radialdam/user_5.0/setaux.f90 \
 	applications/clawpack/shallow/2d/radialdam/user_5.0/tag4refinement.f90 \

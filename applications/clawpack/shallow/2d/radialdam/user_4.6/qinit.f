@@ -15,14 +15,15 @@ c
 
        blockno = fc2d_clawpack46_get_block()
 
-       do 20 i=1-mbc,mx+mbc
+       do i=1-mbc,mx+mbc
           xlow = xlower + (i-1.d0)*dx
-          do 20 j=1-mbc,my+mbc
+          do j=1-mbc,my+mbc
              ylow = ylower + (j-1.d0)*dy
              call cellave2(blockno,xlow,ylow,dx,dy,win)
              q(i,j,1) = hin*win + hout*(1.d0-win)
              q(i,j,2) = 0.d0
              q(i,j,3) = 0.d0
-  20         continue
+          end do
+       end do
        return
        end

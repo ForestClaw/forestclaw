@@ -1,4 +1,4 @@
-2000                mx          = cells in x direction
+2048                mx          = cells in x direction
 
 3                  nout        = number of output times to print results
 1                  outstyle    = style of specifying output times
