@@ -68,11 +68,15 @@ c     # not be coarsened.
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer i,j
 
+      logical exceeds_th, bump_exceeds_th
+
       do i = 1,mx
          do j = 1,my
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if (qmax-qmin .gt. coarsen_threshold) then
+            exceeds_th = bump_exceeds_th(
+     &             q(i,j,mq),qmin,qmax,coarsen_threshold)
+            if (exceeds_th) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
                tag_patch = 0
