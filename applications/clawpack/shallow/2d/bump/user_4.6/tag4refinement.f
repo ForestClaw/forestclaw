@@ -28,7 +28,7 @@ c     # Refine based only on first variable in system.
          do i = 1,mx
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if ((qmax-qmin) .gt. tag_threshold) then
+            if (q(1,i,j) .gt. tag_threshold) then
                tag_patch = 1
                return
             endif

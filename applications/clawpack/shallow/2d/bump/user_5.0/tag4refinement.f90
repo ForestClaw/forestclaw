@@ -17,26 +17,16 @@ SUBROUTINE clawpack5_tag4refinement(mx,my,mbc,meqn, &
 
   !! # Refine based only on first variable in system.
   mq = 1
+  qmin = q(mq,1,1)
+  qmax = q(mq,1,1)
   DO i = 1,mx
      DO j = 1,my
         qmin = MIN(q(mq,i,j),qmin)
         qmax = MAX(q(mq,i,j),qmax)
-        IF (qmax - qmin .GT. 0.2) THEN
+        IF (q(mq,i,j)  .GT. refine_threshold) THEN
            tag_patch = 1
            RETURN
         ENDIF
-
-!!         IF (init_flag .NE. 0) THEN
-!!            IF (ABS(q(mq,i,j)) .GT. 1.1) THEN
-!!               tag_patch = 1
-!!               RETURN
-!!            END IF
-!!         ELSE
-!!            IF (ABS(q(mq,i,j)) .GT. refine_threshold) THEN
-!!               tag_patch = 1
-!!               RETURN
-!!            ENDIF
-!!         END IF
      ENDDO
   ENDDO
 

@@ -63,7 +63,7 @@ SUBROUTINE user5_tag_sibling(mx,my,mbc,meqn,mq,q, &
      DO j = 1,my
         qmin = min(q(mq,i,j),qmin)
         qmax = max(q(mq,i,j),qmax)
-        IF (qmax - qmin.GT. coarsen_threshold) THEN
+        IF (q(mq,i,j) .GT. coarsen_threshold) THEN
            !! # We won't coarsen this family because at least one
            !! # grid fails the coarsening test.
            tag_patch = 0
