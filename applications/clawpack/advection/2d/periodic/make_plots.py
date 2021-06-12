@@ -1,8 +1,6 @@
 
 """ 
-Plot swirl using Clawpack's visclaw graphics.  This file can be run as ; 
-
-    % python plot_swirl.py
+Plot periodic using Clawpack's visclaw graphics.  This file can be run as ; 
 
 To learn more about visclaw graphics, see www.clawpack.org
     
