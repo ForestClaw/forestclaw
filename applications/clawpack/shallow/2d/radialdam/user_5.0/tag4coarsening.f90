@@ -1,4 +1,4 @@
-SUBROUTINE clawpack5_tag4coarsening(mx,my,mbc,meqn, &
+SUBROUTINE clawpatch5_tag4coarsening(mx,my,mbc,meqn, &
      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3, &
      coarsen_threshold, init_flag, tag_patch)
   IMPLICIT NONE
@@ -46,7 +46,7 @@ SUBROUTINE clawpack5_tag4coarsening(mx,my,mbc,meqn, &
   CALL user5_tag_sibling(blockno, mx,my,mbc,meqn,mq,q3,qmin,qmax, &
        xlower(3), ylower(3), dx, dy, coarsen_threshold,tag_patch)
 
-END SUBROUTINE clawpack5_tag4coarsening
+END SUBROUTINE clawpatch5_tag4coarsening
 
 SUBROUTINE user5_tag_sibling(blockno, mx,my,mbc,meqn,mq,q, &
      qmin,qmax,xlower, ylower, dx, dy, & 

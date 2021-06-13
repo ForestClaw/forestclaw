@@ -1,4 +1,4 @@
-SUBROUTINE clawpack5_tag4refinement(mx,my,mbc,meqn, &
+SUBROUTINE clawpatch5_tag4refinement(mx,my,mbc,meqn, &
            xlower,ylower,dx,dy,blockno, q,refine_threshold, &
            init_flag, tag_patch)
     IMPLICIT NONE
@@ -41,4 +41,4 @@ SUBROUTINE clawpack5_tag4refinement(mx,my,mbc,meqn, &
         end do
     END DO
 
-END SUBROUTINE clawpack5_tag4refinement
+END SUBROUTINE clawpatch5_tag4refinement

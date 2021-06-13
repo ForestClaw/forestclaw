@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -62,6 +62,12 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     case 1:
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale,fclaw_opt->shift,rotate);
+        break;
+    case 2:
+        /* Five patch square domain */
+        conn = p4est_connectivity_new_disk(0, 0);
+        cont = fclaw2d_map_new_pillowdisk5(fclaw_opt->scale,fclaw_opt->shift,
+                                          rotate,user->alpha);
         break;
     default:
         SC_ABORT_NOT_REACHED ();

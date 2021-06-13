@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,8 @@ radialdam_register (user_options_t* user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "hin",   &user->hin,   2.0, "[user] hin [2.0]");
     sc_options_add_double (opt, 0, "hout",  &user->hout,  1.0, "[user] hout [1.0]");
 
-    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4, "[user] alpha (for 5-patch map) [0.4]");
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4, 
+                           "[user] alpha (for 5-patch map) [0.4]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                            "Clawpack_version (4 or 5) [5]");
@@ -52,7 +53,7 @@ radialdam_register (user_options_t* user, sc_options_t * opt)
 static fclaw_exit_type_t
 radialdam_check (user_options_t *user)
 {
-    if (user->example < 0 || user->example > 1) {
+    if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }

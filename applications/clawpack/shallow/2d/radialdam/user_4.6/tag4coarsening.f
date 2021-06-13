@@ -8,7 +8,7 @@ c     # fclaw2d_fort_average2coarse
 c     # --------------------------------------------
 
 c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
-      subroutine clawpack46_tag4coarsening(mx,my,mbc,meqn,
+      subroutine clawpatch46_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, init_flag, tag_patch)
       implicit none
