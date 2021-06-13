@@ -85,13 +85,11 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
     COMMON /cparam/  grav
 
     integer i, m, mw, ioff
-    double precision enx, eny, enz, etx,ety,etz,g
+    double precision enx, eny, enz, etx,ety,etz
     double precision hunl, hunr, hutl, hutr, hl,hr,hsqr,hsql,hsq
     double precision a1,a2,a3, gamma, amn, apn, df, dx, dy
     double precision erx, ery, erz, h1, h3, hi, him1, hu1, hu3
     double precision s0, s03, s1, s3, sfract
-
-
 
 
     data efix /.true./    !# use entropy fix for transonic rarefactions
@@ -141,21 +139,19 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         etz =   etz / gamma
 
 
-        g = grav
-
-    !        # compute normal and tangential momentum at cell edge:
+        !!  # compute normal and tangential momentum at cell edge:
         hunl = enx*ql(i,2)   + eny*ql(i,3)   + enz*ql(i,4)
         hunr = enx*qr(i-1,2) + eny*qr(i-1,3) + enz*qr(i-1,4)
 
         hutl = etx*ql(i,2)   + ety*ql(i,3)   + etz*ql(i,4)
         hutr = etx*qr(i-1,2) + ety*qr(i-1,3) + etz*qr(i-1,4)
 
-    !        # compute the Roe-averaged variables needed in the Roe solver.
-    !        # These are stored in the common block comroe since they are
-    !        # later used in routine rpt2 to do the transverse wave splitting.
+        !! # compute the Roe-averaged variables needed in the Roe solver.
+        !! # These are stored in the common block comroe since they are
+        !! # later used in routine rpt2 to do the transverse wave splitting.
 
         hl = ql(i,1)
-        hr = qr(i-1,i)
+        hr = qr(i-1,1)
         h(i) = (hl+hr)*0.50d0
         hsqr = dsqrt(hr)
         hsql = dsqrt(hl)
@@ -164,7 +160,7 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         v(i) = (hutr/hsqr + hutl/hsql) / hsq
         a(i) = dsqrt(grav*h(i))
 
-    !        # Split the jump in q at each interface into waves
+        !! # Split the jump in q at each interface into waves
         delta(1) = hl - hr
         delta(2) = hunl - hunr
         delta(3) = hutl - hutr
@@ -174,7 +170,7 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         a3 = (-(u(i)-a(i))*delta(1) + delta(2))*(0.50d0/a(i))
 
 
-    !        # Compute the waves.
+        !! # Compute the waves.
 
         wave(i,1,1) = a1
         wave(i,2,1) = a1*(u(i)-a(i))*enx + a1*v(i)*etx
@@ -198,16 +194,16 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
     20 END DO
 
 
-!    # compute flux differences amdq and apdq.
-!    ---------------------------------------
+    !! # compute flux differences amdq and apdq.
+    !! ---------------------------------------
 
     if (efix) go to 110
 
-!     # no entropy fix
-!     ----------------
+    !! # no entropy fix
+    !! ----------------
 
-!     # amdq = SUM s*wave   over left-going waves
-!     # apdq = SUM s*wave   over right-going waves
+    !! # amdq = SUM s*wave   over left-going waves
+    !! # apdq = SUM s*wave   over right-going waves
 
     DO m=1,meqn
         do i=2-mbc, mx+mbc
@@ -223,7 +219,7 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         end do
     END DO
 
-!     # project momentum components of amdq and apdq onto tangent plane:
+    !! # project momentum components of amdq and apdq onto tangent plane:
 
     do i=2-mbc,mx+mbc
         erx = auxr(14,i-1)
@@ -272,12 +268,12 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         ety =   ety / gamma
         etz =   etz / gamma
     !           # compute normal and tangential momentum at cell edge:
-        hunl = enx*ql(i,2) + eny*ql(i,3) + enz*ql(i,4)
+        hunl = enx*ql(i,2)   + eny*ql(i,3) + enz*ql(i,4)
         hunr = enx*qr(i-1,2) + eny*qr(i-1,3) + enz*qr(i-1,4)
 
     !           check 1-wave
         him1 = qr(i-1,1)
-        s0 =  (hunr/him1 - dsqrt(g*him1)) * gamma / dy
+        s0 =  (hunr/him1 - dsqrt(grav*him1)) * gamma / dy
     !           check for fully supersonic case :
         if (s0 > 0.0d0 .AND. s(i,1) > 0.0d0) then
             do 60 m=1,4
@@ -289,7 +285,7 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         h1 = qr(i-1,1)+wave(i,1,1)
         hu1= hunr + enx*wave(i,2,1) + eny*wave(i,3,1) &
                        + enz*wave(i,4,1)
-        s1 = (hu1/h1 - dsqrt(g*h1))*gamma/dy  !speed just to right of 1-wave
+        s1 = (hu1/h1 - dsqrt(grav*h1))*gamma/dy  !speed just to right of 1-wave
         if (s0 < 0.0d0 .AND. s1 > 0.0d0) then
         !              transonic rarefaction in 1-wave
             sfract = s0*((s1-s(i,1))/(s1-s0))
@@ -316,10 +312,10 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
     !           check 3-wave
 
         hi = ql(i,1)
-        s03 = (hunl/hi + dsqrt(g*hi)) * gamma/dy
+        s03 = (hunl/hi + dsqrt(grav*hi)) * gamma/dy
         h3=ql(i,1)-wave(i,1,3)
         hu3=hunl-(enx*wave(i,2,3)+eny*wave(i,3,3)+enz*wave(i,4,3))
-        s3=(hu3/h3 + dsqrt(g*h3)) * gamma/dy
+        s3=(hu3/h3 + dsqrt(grav*h3)) * gamma/dy
         if (s3 < 0.0d0 .AND. s03 > 0.0d0) then
         !              transonic rarefaction in 3-wave
             sfract = s3*((s03-s(i,3))/(s03-s3))
