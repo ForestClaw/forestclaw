@@ -74,8 +74,8 @@ c     # not be coarsened.
       logical exceeds_th, radialdam_exceeds_th
       double precision xc,yc
 
-      do i = 1,mx         
-         do j = 1,my  
+      do i = 2,mx-1         
+         do j = 2,my-1  
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
             qmin = min(q(i,j,mq),qmin)

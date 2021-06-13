@@ -25,8 +25,8 @@
       mq = 1
       qmin = q(1,1,mq)
       qmax = q(1,1,mq)
-      do j = 1,my
-         do i = 1,mx
+      do j = 2,my-1
+         do i = 2,mx-1
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
             qmin = min(q(i,j,mq),qmin)

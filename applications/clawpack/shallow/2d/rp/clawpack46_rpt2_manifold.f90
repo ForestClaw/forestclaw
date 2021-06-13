@@ -24,10 +24,10 @@ SUBROUTINE clawpack46_rpt2_manifold(ixy,maxm,meqn,mwaves,mbc,mx, &
     double precision   aux3(1-mbc:maxm+mbc,*)
 
 !      parameter (maxm2 = 1002)  !# assumes at most 1000x1000 grid with mbc=2
-    double precision u(1-mbc:maxm+mbc),v(1-mbc:maxm+mbc),a(1-mbc:maxm+mbc), &
-    h(1-mbc:maxm+mbc)
-    double precision wave(meqn, mwaves, 1-mbc:maxm+mbc)
-    double precision    s(3, 1-mbc:maxm+mbc)
+    double precision u(1-mbc:maxm+mbc),v(1-mbc:maxm+mbc),& 
+                     a(1-mbc:maxm+mbc), h(1-mbc:maxm+mbc)
+    double precision wave(1-mbc:maxm+mbc,meqn, mwaves)
+    double precision    s(1-mbc:maxm+mbc,3)
     double precision enx(1-mbc:maxm+mbc), eny(1-mbc:maxm+mbc), &
                      enz(1-mbc:maxm+mbc)
     double precision etx(1-mbc:maxm+mbc), ety(1-mbc:maxm+mbc), &
@@ -109,7 +109,7 @@ SUBROUTINE clawpack46_rpt2_manifold(ixy,maxm,meqn,mwaves,mbc,mx, &
         ety(i) =   ety(i) / gamma(i)
         etz(i) =   etz(i) / gamma(i)
 
-        h(i) = ql(i1,i1)
+        h(i) = ql(i1,1)
         u(i) = (enx(i)*ql(i1,2)+eny(i)*ql(i1,3)+enz(i)*ql(i1,4)) &
         / h(i)
         v(i) = (etx(i)*ql(i1,2)+ety(i)*ql(i1,3)+etz(i)*ql(i1,4)) &

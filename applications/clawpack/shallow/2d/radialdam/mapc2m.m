@@ -1,7 +1,7 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
-% map = 'nomap';
-map = 'pillowdisk';
+map = 'nomap';
+% map = 'pillowdisk';
 % map = 'fivepatch';
 
 switch map

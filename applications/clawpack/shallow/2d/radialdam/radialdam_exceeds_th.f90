@@ -19,8 +19,8 @@ logical function radialdam_exceeds_th(blockno,qval,qmin,qmax,quad, &
 
     IF (fclaw2d_map_is_used(cont)) THEN
         CALL fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
-        CALL fclaw2d_map_c2m(cont,blockno,xc-dx,yc,xpm,yp,zp)
         CALL fclaw2d_map_c2m(cont,blockno,xc+dx,yc,xpp,yp,zp)
+        CALL fclaw2d_map_c2m(cont,blockno,xc-dx,yc,xpm,yp,zp)
         CALL fclaw2d_map_c2m(cont,blockno,xc,yc+dy,xp,ypp,zp)
         CALL fclaw2d_map_c2m(cont,blockno,xc,yc-dy,xp,ypm,zp)
         dx2 = xpp - xpm

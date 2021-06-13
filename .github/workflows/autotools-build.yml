@@ -488,7 +488,7 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/acoustics/2d/radial
-        mpirun -n 2 ./radial -F regression.ini   --user:claw-version=4
+        mpirun -n 2 ./radial -F regression.ini    --user:claw-version=4
         mpirun -n 2 ./interface -F regression.ini --user:claw-version=5
 
 
@@ -548,7 +548,12 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/shallow/2d/radialdam
-        mpirun -n 2 ./radialdam -F regression.ini
+        mpirun -n 2 ./radialdam -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./radialdam -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=2
 
 
   clawpack_transport_correlatedcb:
