@@ -8,6 +8,7 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/correlatedcb/correlatedcb_user.h \
 	applications/clawpack/transport/correlatedcb/setprob.f \
 	applications/clawpack/transport/correlatedcb/cosine_bell.f \
+	applications/clawpack/transport/correlatedcb/transport_exceeds_th.f90 \
 	applications/clawpack/transport/correlatedcb/user_4.6/qinit.f \
 	applications/clawpack/transport/correlatedcb/user_5.0/qinit.f90 \
 	applications/clawpack/transport/all/fclaw2d_map_cubedsphere.c \

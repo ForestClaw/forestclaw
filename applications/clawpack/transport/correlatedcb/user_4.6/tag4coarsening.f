@@ -13,7 +13,7 @@
       double precision q3(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer i,j, mq
-      double precision qmin, qmax,dq, dq1, dq2
+      double precision qmin, qmax
 
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
@@ -33,48 +33,61 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call user46_get_minmax(mx,my,mbc,meqn,mq,q0,qmin,qmax,
-     &      dx,dy,coarsen_threshold,tag_patch)
+      call user46_get_minmax(blockno, mx,my,mbc,meqn,mq,q0, 
+     &                       qmin,qmax, dx,dy,xlower(0),ylower(0),
+     &                       coarsen_threshold,tag_patch)
       if (tag_patch == 0) return
 
-      call user46_get_minmax(mx,my,mbc,meqn,mq,q1,qmin,qmax,
-     &      dx,dy,coarsen_threshold,tag_patch)
+      call user46_get_minmax(blockno, mx,my,mbc,meqn,mq,q1,
+     &                       qmin,qmax, dx,dy,xlower(1),ylower(1),
+     &                       coarsen_threshold, tag_patch)
       if (tag_patch == 0) return
 
-      call user46_get_minmax(mx,my,mbc,meqn,mq,q2,qmin,qmax,
-     &      dx,dy,coarsen_threshold,tag_patch)
+      call user46_get_minmax(blockno, mx,my,mbc,meqn,mq,q2,
+     &                       qmin,qmax, dx,dy,xlower(2),ylower(2),
+     &                       coarsen_threshold, tag_patch)
       if (tag_patch == 0) return
 
-      call user46_get_minmax(mx,my,mbc,meqn,mq,q3,qmin,qmax,
-     &      dx,dy,coarsen_threshold,tag_patch)
+      call user46_get_minmax(blockno, mx,my,mbc,meqn,mq,q3,
+     &                       qmin,qmax, dx,dy, xlower(3),ylower(3),
+     &                       coarsen_threshold, tag_patch)
 
       end
 
-      subroutine user46_get_minmax(mx,my,mbc,meqn,mq,q,
-     &      dx,dy,qmin,qmax,coarsen_threshold,tag_patch)
+      subroutine user46_get_minmax(blockno, mx,my,mbc,meqn,mq,q,
+     &      qmin,qmax, dx,dy,xlower, ylower, 
+     &      coarsen_threshold,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq,tag_patch
-      double precision coarsen_threshold, dx, dy
+      integer mx,my,mbc,meqn,mq,tag_patch, blockno
+      double precision coarsen_threshold, dx, dy, xlower,ylower
       double precision qmin,qmax
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       double precision pi
       common /compi/ pi
 
-      integer i,j
-      double precision dq1,dq2,dq, dx2, dy2, s
+      integer i,j, ii,jj
+      double precision quad(-1:1,-1:1), xc, yc
 
-      s = pi/2 
-      dx2 = 2*dx*s
-      dy2 = 2*dy*s
+      logical exceeds_th, transport_exceeds_th
 
       do i = 1,mx
          do j = 1,my
-C             dq1 = q(i+1,j,mq) - q(i-1,j,mq)/dx2
-C             dq2 = q(i,j+1,mq) - q(i,j-1,mq)/dy2
-C             dq = max(abs(dq1),abs(dq2))
-            if (q(i,j,mq) .gt. coarsen_threshold) then
+             xc = xlower + (i-0.5)*dx
+             yc = ylower + (j-0.5)*dy
+             qmin = min(qmin,q(i,j,mq))
+             qmax = max(qmax,q(i,j,mq))
+              do ii = -1,1
+                  do jj = -1,1
+                        quad(ii,jj) = q(i+ii,j+jj,mq)
+                  end do
+              end do
+              exceeds_th = transport_exceeds_th(blockno,
+     &                     q(i,j,mq),qmin,qmax,quad, dx,dy,xc,yc, 
+     &                     coarsen_threshold)
+
+            if (exceeds_th) then
 c              # We won't coarsen this family because at least one
 c              # grid fails the coarsening test.
                tag_patch = 0

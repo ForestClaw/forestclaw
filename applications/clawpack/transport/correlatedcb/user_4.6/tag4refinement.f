@@ -14,6 +14,10 @@
 
       integer i,j, mq
       double precision qmin, qmax, dq1, dq2,dq, dx2, dy2, s
+      double precision quad(-1:1,-1:1), xc, yc
+      integer ii,jj
+
+      logical exceeds_th, transport_exceeds_th
 
       tag_patch = 0
 
@@ -25,12 +29,24 @@ c     # We check only internal cells, because there is a problem with the
 c     # corner values on the cubed sphere. Possible bad values in (unused)
 c     # corners at block corners are triggering refinement where three blocks meet.
       mq = 1
+      qmin = q(1,1,mq)
+      qmax = q(1,1,mq)
       do j = 1,my
-         do i = 1,mx            
-C             dq1 = abs(q(i+1,j,mq) - q(i-1,j,mq))/dx2
-C             dq2 = abs(q(i,j+1,mq) - q(i,j-1,mq))/dy2
-C             dq = max(dq1,dq2)
-            if (q(i,j,mq) .gt. tag_threshold) then
+         do i = 1,mx
+             xc = xlower + (i-0.5)*dx
+             yc = ylower + (j-0.5)*dy
+             qmin = min(qmin,q(i,j,mq))
+             qmax = max(qmax,q(i,j,mq))
+              do ii = -1,1
+                  do jj = -1,1
+                        quad(ii,jj) = q(i+ii,j+jj,mq)
+                  end do
+              end do
+              exceeds_th = transport_exceeds_th(blockno,
+     &                     q(i,j,mq),qmin,qmax,quad, dx,dy,xc,yc, 
+     &                     tag_threshold)
+
+            if (exceeds_th) then
                tag_patch = 1
                return
             endif
