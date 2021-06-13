@@ -59,6 +59,8 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
             fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
             patch_vt->setup = &radialdam_patch_setup;
 
+            claw46_vt->fort_qinit = &CLAWPACK46_QINIT;
+
             claw46_vt->fort_rpn2  = &CLAWPACK46_RPN2_MANIFOLD;
             claw46_vt->fort_rpt2  = &CLAWPACK46_RPT2_MANIFOLD;
         }

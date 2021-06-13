@@ -57,11 +57,6 @@ radialdam_check (user_options_t *user)
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
-    if (user->example == 1 && user->claw_version == 4)
-    {
-        fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
-        return FCLAW_EXIT_QUIET;
-    }
     return FCLAW_NOEXIT;
 }
 

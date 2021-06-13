@@ -14,9 +14,9 @@ PlotData =  ones(1,MaxLevels);
 PlotGrid =  zeros(1,MaxLevels);
 PlotGridEdges = zeros(1,MaxLevels);
 
-PlotType = 4;  % Pseudo-color plot
+PlotType = 1;  % Pseudo-color plot
 
-MappedGrid = 0;
+MappedGrid = 0;  % set Manifold=1, above
 
 % for contour plots (PlotType==2):
 ContourValues = [];
