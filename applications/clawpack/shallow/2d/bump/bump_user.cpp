@@ -77,7 +77,13 @@ void bump_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24.16f   %s",user->gravity,"\% gravity\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+ 
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
     BUMP_SETPROB();
 }
 
