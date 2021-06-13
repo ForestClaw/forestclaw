@@ -106,6 +106,8 @@ void CLAWPACK46_RPT2(const int* ixy, const int* maxm, const int* meqn, const int
 
 
 
+/* These should actually be called CLAWPATCH46_TAG4REFINEMENT,  
+   CLAWPATCH46_TAG4COARSENING */
 #define CLAWPACK46_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack46_tag4refinement, \
                                                  CLAWPACK46_TAG4REFINEMENT)
 
