@@ -10,6 +10,7 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/shockbubble_user.h \
 	applications/clawpack/euler/2d/shockbubble/fdisc.f \
 	applications/clawpack/euler/2d/shockbubble/setprob.f \
+	applications/clawpack/euler/2d/shockbubble/difference_exceeds_th.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_4.6/qinit.f \
 	applications/clawpack/euler/2d/shockbubble/user_4.6/setaux.f \
 	applications/clawpack/euler/2d/shockbubble/user_4.6/bc2.f \
@@ -20,8 +21,8 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/setaux.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/bc2.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/src2.f90 \
-	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4coarsening.f90 \
-	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4refinement.f90 \
+	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4coarsening.f \
+	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4refinement.f \
 	applications/clawpack/euler/2d/rp/euler_user_fort.h \
 	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler4.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpt2_euler4.f \
