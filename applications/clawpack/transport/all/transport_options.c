@@ -40,8 +40,6 @@ transport_register (user_options_t* user, sc_options_t * opt)
                         "[user] 0 for cubed sphere, "    \
                         "1 for pillowgrid [0]");
 
-    sc_options_add_double (opt, 0, "kappa", &user->kappa, 2, "kappa (0 or 2.0) [2]");
-
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4, "claw-version [4]");
 
     user->is_registered = 1;

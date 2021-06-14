@@ -1,5 +1,5 @@
  /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,10 @@ extern "C"
 #endif
 #endif
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
 struct fclaw_options;
 struct user_options;
 struct fclaw2d_patch;
@@ -61,31 +65,38 @@ fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
 
 #if 0
 void transport_patch_setup(struct fclaw2d_global *glob,
-                           struct fclaw2d_patch *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx);
+                           struct fclaw2d_patch *patch,
+                           int blockno,
+                           int patchno);
 
 double transport_update(struct fclaw2d_global *glob,
-                        struct fclaw2d_patch *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
+                        struct fclaw2d_patch *patch,
+                        int blockno,
+                        int patchno,
                         double t,
                         double dt);
 
 void transport_b4step2(struct fclaw2d_global *glob,
-                       struct fclaw2d_patch *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
+                       struct fclaw2d_patch *patch,
+                       int blockno,
+                       int patchno,
                        double t,
                        double dt);
+
+void transport_problem_setup(fclaw2d_global_t* glob);
 
 #endif                        
 
 void transport_link_solvers(struct fclaw2d_global *glob);
 
 
+#if 0
 #define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
 void TRANSPORT_SETPROB(const double* kappa, const double* tfinal);
+#endif
+
+#define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
+void TRANSPORT_SETPROB();
 
 
 #define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
