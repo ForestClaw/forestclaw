@@ -4,9 +4,7 @@ bin_PROGRAMS += applications/clawpack/transport/gaussian/gaussian
 
 applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/transport/gaussian/gaussian.cpp \
-	applications/clawpack/transport/gaussian/gaussian_user.cpp \
 	applications/clawpack/transport/gaussian/gaussian_user.h \
-	applications/clawpack/transport/gaussian/setprob.f \
 	applications/clawpack/transport/gaussian/gradient_exceeds_th.f90 \
 	applications/clawpack/transport/gaussian/user_4.6/qinit.f \
 	applications/clawpack/transport/gaussian/user_5.0/qinit.f90 \
@@ -14,6 +12,7 @@ applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/transport/gaussian/user_5.0/tag4refinement.f \
 	applications/clawpack/transport/gaussian/user_4.6/tag4coarsening.f \
 	applications/clawpack/transport/gaussian/user_5.0/tag4coarsening.f \
+	applications/clawpack/transport/all/transport_setprob.f \
 	applications/clawpack/transport/all/velocity_wind.f \
 	applications/clawpack/transport/all/gaussian.f \
 	applications/clawpack/transport/all/transport_user.h \
