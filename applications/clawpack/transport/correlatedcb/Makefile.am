@@ -16,6 +16,7 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/all/gradient_exceeds_th.f90 \
 	applications/clawpack/transport/all/transport_setprob.f \
 	applications/clawpack/transport/all/velocity_wind.f \
+	applications/clawpack/transport/all/transport_util.f \
 	applications/clawpack/transport/all/transport_user.cpp \
 	applications/clawpack/transport/all/transport_domain.c \
 	applications/clawpack/transport/all/transport_options.c \
