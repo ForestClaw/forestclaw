@@ -4,13 +4,13 @@ logical function transport_exceeds_th(blockno,qval,qmin,qmax,quad, &
                                       dx,dy,xc,yc,threshhold)
     implicit none
     
-    double precision qval,qmin,qmax,threshhold, quad(-1:1,-1:1)
-    double precision dx,dy, xc, yc
-    integer blockno
-    logical refine
+    double precision :: qval,qmin,qmax,threshhold, quad(-1:1,-1:1)
+    double precision :: dx,dy, xc, yc
+    integer :: blockno
+    logical :: refine
 
-    double precision dx2, dy2, dqx,dqy, ds, d, nx, ny
-    double precision xp,yp,zp,xpm, xpp, ypm, ypp
+    double precision :: dx2, dy2, dqx,dqy, ds, d, nx, ny
+    double precision :: xp,yp,zp,xpm, xpp, ypm, ypp
 
     integer*8 cont, get_context
     logical fclaw2d_map_is_used

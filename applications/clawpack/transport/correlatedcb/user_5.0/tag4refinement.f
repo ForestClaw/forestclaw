@@ -13,7 +13,7 @@
       double precision qmin, qmax, quad(-1:1,-1:1), xc, yc
       integer ii,jj
 
-      logical exceeds_th, transport_exceeds_th
+      logical exceeds_th, gradient_exceeds_th
 
       tag_patch = 0
 
@@ -32,7 +32,7 @@ c     # Refine based only on first variable in system.
                         quad(ii,jj) = q(mq,i+ii,j+jj)
                   end do
               end do
-              exceeds_th = transport_exceeds_th(blockno,
+              exceeds_th = gradient_exceeds_th(blockno,
      &                     q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc, 
      &                     tag_threshold)
 

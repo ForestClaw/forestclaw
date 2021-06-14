@@ -63,7 +63,7 @@ c     # not be coarsened.
       double precision xc,yc,quad(-1:1,-1:1)
       integer ii,jj
 
-      logical exceeds_th, transport_exceeds_th
+      logical exceeds_th, gradient_exceeds_th
 
       do i = 1,mx
           do j = 1,my
@@ -76,7 +76,7 @@ c     # not be coarsened.
                       quad(ii,jj) = q(mq,i+ii,j+jj)
                   end do
               end do
-              exceeds_th = transport_exceeds_th(blockno,
+              exceeds_th = gradient_exceeds_th(blockno,
      &                     q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc, 
      &                     coarsen_threshold)
 
