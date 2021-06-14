@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,14 +36,7 @@ extern "C"
 #endif
 #endif
 
-
-void slotted_disk_problem_setup(fclaw2d_global_t *glob);
-
-#define SLOTTED_DISK_SETPROB FCLAW_F77_FUNC(slotted_disk_setprob,SLOTTED_DISK_SETPROB)
-void SLOTTED_DISK_SETPROB();
-
-void slotted_disk_link_solvers(fclaw2d_global_t *glob);
-
+/* Header files are all listed in transport_user.h */
 
 #ifdef __cplusplus
 #if 0
