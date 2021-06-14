@@ -25,6 +25,6 @@ ContourValues = [];
 x0 = 0;
 y0 = 0;
 UserMap1d = 1;
-ScatterStyle = setplotstyle('ro','m*','cs','kp','bo','c*','ro','m*','cs');
+ScatterStyle = setplotstyle('ro','m*','cs','mp','bo','c*','ro','m*','cs');
 
 PlotParallelPartitions=0;

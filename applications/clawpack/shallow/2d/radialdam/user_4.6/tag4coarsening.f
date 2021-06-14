@@ -71,7 +71,7 @@ c     # not be coarsened.
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       integer i,j, ii, jj
 
-      logical exceeds_th, radialdam_exceeds_th
+      logical exceeds_th, gradient_exceeds_th
       double precision xc,yc
 
       do i = 2,mx-1         
@@ -86,7 +86,7 @@ c     # not be coarsened.
                end do
             end do
 
-            exceeds_th = radialdam_exceeds_th(blockno, 
+            exceeds_th = gradient_exceeds_th(blockno, 
      &             q(i,j,mq),qmin,qmax,quad,dx,dy,xc,yc,
      &             coarsen_threshold)
             if (exceeds_th) then

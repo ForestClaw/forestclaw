@@ -4,18 +4,22 @@ logical function radialdam_exceeds_th(blockno,qval,qmin,qmax,quad, &
                                       dx,dy,xc,yc,threshhold)
     implicit none
     
-    double precision qval,qmin,qmax,threshhold, quad(-1:1,-1:1)
-    double precision dx,dy, xc, yc
-    integer blockno
-    logical refine
+    double precision :: qval,qmin,qmax,threshhold, quad(-1:1,-1:1)
+    double precision :: dx,dy, xc, yc
+    integer :: blockno
+    logical :: refine
 
-    double precision dx2, dy2, dqx,dqy, ds, d, nx, ny
-    double precision xp,yp,zp,xpm, xpp, ypm, ypp
+    double precision :: dx2, dy2, dqx,dqy, ds, d, nx, ny
+    double precision :: xp,yp,zp,xpm, xpp, ypm, ypp
 
-    integer*8 cont, get_context
-    logical fclaw2d_map_is_used
+    integer*8 :: cont, get_context
+    logical :: fclaw2d_map_is_used, transport_exceeds_th
 
     cont = get_context()
+
+    radialdam_exceeds_th = transport_exceeds_th(blockno,qval,qmin,qmax,quad, & 
+                                      dx,dy,xc,yc,threshhold)
+    return
 
     IF (fclaw2d_map_is_used(cont)) THEN
         CALL fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
@@ -31,7 +35,6 @@ logical function radialdam_exceeds_th(blockno,qval,qmin,qmax,quad, &
         xp = xc
         yp = yc
     ENDIF
-
     refine = .false.
 
     dqx = abs(quad(1,0) - quad(-1,0))/dx2

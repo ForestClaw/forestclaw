@@ -3,15 +3,15 @@ SUBROUTINE clawpatch5_tag4refinement(mx,my,mbc,meqn, &
            init_flag, tag_patch)
     IMPLICIT NONE
 
-    INTEGER mx,my, mbc, meqn, tag_patch, init_flag
-    INTEGER blockno
-    DOUBLE PRECISION xlower, ylower, dx, dy
-    DOUBLE PRECISION refine_threshold
-    DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    INTEGER :: mx,my, mbc, meqn, tag_patch, init_flag
+    INTEGER :: blockno
+    DOUBLE PRECISION :: xlower, ylower, dx, dy
+    DOUBLE PRECISION :: refine_threshold
+    DOUBLE PRECISION :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    INTEGER i,j, mq,m, ii, jj
-    DOUBLE PRECISION xc,yc, qmin, qmax, quad(-1:1,-1:1)
-    logical exceeds_th, radialdam_exceeds_th
+    INTEGER :: i,j, mq,m, ii, jj
+    DOUBLE PRECISION :: xc,yc, qmin, qmax, quad(-1:1,-1:1)
+    logical :: exceeds_th, gradient_exceeds_th
 
     tag_patch = 0
 
@@ -31,7 +31,7 @@ SUBROUTINE clawpatch5_tag4refinement(mx,my,mbc,meqn, &
                     quad(ii,jj) = q(mq,i+ii,j+jj)
                 end do
             end do
-            exceeds_th = radialdam_exceeds_th(blockno,  &                                       
+            exceeds_th = gradient_exceeds_th(blockno,  &                                       
                     q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc, &
                     refine_threshold)
             if (exceeds_th) then

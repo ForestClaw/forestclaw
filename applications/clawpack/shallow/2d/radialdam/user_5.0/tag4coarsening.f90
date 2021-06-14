@@ -3,17 +3,17 @@ SUBROUTINE clawpatch5_tag4coarsening(mx,my,mbc,meqn, &
      coarsen_threshold, init_flag, tag_patch)
   IMPLICIT NONE
 
-  INTEGER mx,my, mbc, meqn, tag_patch
-  INTEGER blockno, init_flag
-  DOUBLE PRECISION xlower(0:3), ylower(0:3), dx, dy
-  DOUBLE PRECISION coarsen_threshold
-  DOUBLE PRECISION q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-  DOUBLE PRECISION q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-  DOUBLE PRECISION q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-  DOUBLE PRECISION q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+  INTEGER :: mx,my, mbc, meqn, tag_patch
+  INTEGER :: blockno, init_flag
+  DOUBLE PRECISION :: xlower(0:3), ylower(0:3), dx, dy
+  DOUBLE PRECISION :: coarsen_threshold
+  DOUBLE PRECISION :: q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+  DOUBLE PRECISION :: q1(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+  DOUBLE PRECISION :: q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+  DOUBLE PRECISION :: q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-  INTEGER i,j, mq
-  DOUBLE PRECISION qmin, qmax
+  INTEGER :: i,j, mq
+  DOUBLE PRECISION :: qmin, qmax
 
   if (init_flag .ne. 0) then
       tag_patch = 0
@@ -53,15 +53,15 @@ SUBROUTINE user5_tag_sibling(blockno, mx,my,mbc,meqn,mq,q, &
      coarsen_threshold,tag_patch)
 
     IMPLICIT NONE
-    INTEGER mx,my,mbc,meqn,mq,tag_patch,blockno
-    double precision dx,dy,xlower, ylower
-    DOUBLE PRECISION coarsen_threshold
-    DOUBLE PRECISION qmin,qmax
-    DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    INTEGER :: mx,my,mbc,meqn,mq,tag_patch,blockno
+    double precision :: dx,dy,xlower, ylower
+    DOUBLE PRECISION :: coarsen_threshold
+    DOUBLE PRECISION :: qmin,qmax
+    DOUBLE PRECISION :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    DOUBLE PRECISION quad(-1:1,-1:1), xc, yc
-    LOGICAL exceeds_th, radialdam_exceeds_th
-    INTEGER i,j,ii,jj
+    DOUBLE PRECISION :: quad(-1:1,-1:1), xc, yc
+    LOGICAL :: exceeds_th, gradient_exceeds_th
+    INTEGER :: i,j,ii,jj
 
     DO i = 1,mx
         DO j = 1,my
@@ -75,7 +75,7 @@ SUBROUTINE user5_tag_sibling(blockno, mx,my,mbc,meqn,mq,q, &
                end do
             end do
 
-            exceeds_th = radialdam_exceeds_th(blockno,  & 
+            exceeds_th = gradient_exceeds_th(blockno,  & 
                   q(mq, i,j),qmin,qmax,quad,dx,dy,xc,yc,  & 
                   coarsen_threshold)
             if (exceeds_th) then
