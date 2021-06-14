@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,13 +36,7 @@ extern "C"
 #endif
 #endif
 
-
-void correlatedcb_problem_setup(fclaw2d_global_t *glob);
-
-#define CORRELATEDCB_SETPROB FCLAW_F77_FUNC(correlatedcb_setprob,CORRELATEDCB_SETPROB)
-void CORRELATEDCB_SETPROB();
-
-void correlatedcb_link_solvers(fclaw2d_global_t *glob);
+/* Header files in ../all/transport_user.h */
 
 #ifdef __cplusplus
 #if 0
