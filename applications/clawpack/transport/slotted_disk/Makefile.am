@@ -13,6 +13,7 @@ applications_clawpack_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/transport/slotted_disk/user_5.0/qinit.f90 \
 	applications/clawpack/transport/slotted_disk/user_5.0/tag4refinement.f \
 	applications/clawpack/transport/slotted_disk/user_5.0/tag4coarsening.f \
+	applications/clawpack/transport/all/minmax_exceeds_th.f \
 	applications/clawpack/transport/all/transport_setprob.f \
 	applications/clawpack/transport/all/velocity_wind.f \
 	applications/clawpack/transport/all/transport_util.f \
