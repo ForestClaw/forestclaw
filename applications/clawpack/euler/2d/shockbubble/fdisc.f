@@ -2,15 +2,20 @@ c
 c
 c
 c     =================================================
-      function fdisc(blockno,xc,yc)
+      double precision function fdisc(blockno,xc,yc)
 c     =================================================
-      implicit double precision (a-h,o-z)
+      implicit none
+
+      double precision xc,yc
+      integer blockno
+
+      double precision x0, y0, alf, beta, r0
+      integer idisc
       common/cdisc/ x0,y0,alf,beta,r0,idisc
 
 
-      integer blockno
       integer*8 cont, get_context
-      double precision f1,f2
+      double precision x, y, f1,f2
 
 c
 c     # for computing cell averages for initial data that has a

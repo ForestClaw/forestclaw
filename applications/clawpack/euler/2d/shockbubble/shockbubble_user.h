@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -66,9 +66,7 @@ user_options_t* shockbubble_get_options(fclaw2d_global_t* glob);
 /* ------------------------------- Fortran code --------------------------------------- */
 
 #define SHOCKBUBBLE_SETPROB FCLAW_F77_FUNC(shockbubble_setprob, SHOCKBUBBLE_SETPROB)
-void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0,
-                         const double* r0, const double* rhoin,
-                         const double* pinf, const int* idisc);
+void SHOCKBUBBLE_SETPROB();
 
 
 
