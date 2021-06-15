@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "interface_user.h"
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch46_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>

@@ -10,6 +10,7 @@ applications_clawpack_acoustics_2d_interface_interface_SOURCES = \
 	applications/clawpack/acoustics/2d/interface/interface_user.h \
 	applications/clawpack/acoustics/2d/interface/p0.f \
 	applications/clawpack/acoustics/2d/interface/setprob.f \
+	applications/clawpack/acoustics/2d/interface/value_exceeds_th.f90 \
 	applications/clawpack/acoustics/2d/interface/user_4.6/setaux.f \
 	applications/clawpack/acoustics/2d/interface/user_4.6/qinit.f \
 	applications/clawpack/acoustics/2d/interface/user_4.6/tag4refinement.f \
@@ -17,7 +18,7 @@ applications_clawpack_acoustics_2d_interface_interface_SOURCES = \
 	applications/clawpack/acoustics/2d/interface/user_5.0/setaux.f90 \
 	applications/clawpack/acoustics/2d/interface/user_5.0/qinit.f90 \
 	applications/clawpack/acoustics/2d/interface/user_5.0/tag4refinement.f90 \
-	applications/clawpack/acoustics/2d/interface/user_5.0/tag4coarsening.f \
+	applications/clawpack/acoustics/2d/interface/user_5.0/tag4coarsening.f90 \
 	applications/clawpack/acoustics/2d/rp/acoustics_user_fort.h \
 	applications/clawpack/acoustics/2d/rp/rpn2acv.f \
 	applications/clawpack/acoustics/2d/rp/rpt2acv.f \
