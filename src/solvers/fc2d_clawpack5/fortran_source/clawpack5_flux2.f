@@ -80,7 +80,7 @@ c
 c
       logical limit
 
-      double precision dtcom, dxcom, dycom, tcom
+      double precision dtcom, dxcom , dycom, tcom
       integer icom, jcom
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
