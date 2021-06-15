@@ -1,16 +1,25 @@
       subroutine clawpack46_qinit(maxmx,maxmy,meqn,mbc,mx,my,
      &      xlower,ylower,dx,dy,q,maux,aux)
-       implicit double precision (a-h,o-z)
-       dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+
+      implicit none
+
+      integer maxmx, maxmy, meqn, mbc, mx, my, maux
+      double precision xlower, ylower, dx,dy
+      double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 c
-       do 20 i=1-mbc,mx+mbc
+      integer i,j
+      double precision xi, yj, r, p0
+
+       do i=1-mbc,mx+mbc
           xi = xlower + (i-0.5d0)*dx
-          do 20 j=1-mbc,my+mbc
+          do j=1-mbc,my+mbc
              yj = ylower + (j-0.5d0)*dy
-             r = dsqrt((xi-0.25d0)**2 + (yj-0.4d0)**2)
+             r = sqrt((xi-0.25d0)**2 + (yj-0.4d0)**2)
              q(i,j,1) = p0(r)
              q(i,j,2) = 0.d0
              q(i,j,3) = 0.d0
-  20         continue
-       return
-       end
+         end do
+      end do
+      return
+      end

@@ -30,25 +30,31 @@ c     # From the basic clawpack routines, this routine is called with ql = qr
 c
 c     # aux arrays not used in this solver.
 c
-      implicit double precision (a-h,o-z)
-c
-      dimension wave(1-mbc:maxm+mbc, meqn, mwaves)
-      dimension    s(1-mbc:maxm+mbc, mwaves)
-      dimension   ql(1-mbc:maxm+mbc, meqn)
-      dimension   qr(1-mbc:maxm+mbc, meqn)
-      dimension apdq(1-mbc:maxm+mbc, meqn)
-      dimension amdq(1-mbc:maxm+mbc, meqn)
+      implicit none
+
+
+      integer ixy,maxm,meqn,mwaves,mbc,mx
+      double precision wave(1-mbc:maxm+mbc, meqn, mwaves)
+      double precision    s(1-mbc:maxm+mbc, mwaves)
+      double precision   ql(1-mbc:maxm+mbc, meqn)
+      double precision   qr(1-mbc:maxm+mbc, meqn)
+      double precision apdq(1-mbc:maxm+mbc, meqn)
+      double precision amdq(1-mbc:maxm+mbc, meqn)
+      double precision auxl(1-mbc:maxm+mbc, *)
+      double precision auxr(1-mbc:maxm+mbc, *)
 c
 c     local arrays
 c     ------------
-      dimension delta(3)
+      double precision delta(3)
 c
 c     # density, bulk modulus, and sound speed, and impedence of medium:
 c     # (should be set in setprob.f)
+      double precision rho, bulk, cc, zz
       common /cparam/ rho,bulk,cc,zz
 
-c
-c
+      integer mu, mv, i, m
+      double precision a1, a2
+
 c     # set mu to point to  the component of the system that corresponds
 c     # to velocity in the direction of this slice, mv to the orthogonal
 c     # velocity:
@@ -56,10 +62,10 @@ c
       if (ixy.eq.1) then
           mu = 2
           mv = 3
-        else
+      else
           mu = 3
           mv = 2
-        endif
+      endif
 c
 c     # note that notation for u and v reflects assumption that the
 c     # Riemann problems are in the x-direction with u in the normal
@@ -72,7 +78,7 @@ c
 c     # split the jump in q at each interface into waves
 c
 c     # find a1 and a2, the coefficients of the 2 eigenvectors:
-      do 20 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
          delta(1) = ql(i,1) - qr(i-1,1)
          delta(2) = ql(i,mu) - qr(i-1,mu)
          a1 = (-delta(1) + zz*delta(2)) / (2.d0*zz)
@@ -89,18 +95,18 @@ c
          wave(i,mu,2) = a2
          wave(i,mv,2) = 0.d0
          s(i,2) = cc
-c
-   20    continue
+      end do
 c
 c
 c     # compute the leftgoing and rightgoing flux differences:
 c     # Note s(i,1) < 0   and   s(i,2) > 0.
 c
-      do 220 m=1,meqn
-         do 220 i = 2-mbc, mx+mbc
+      do m=1,meqn
+         do i = 2-mbc, mx+mbc
             amdq(i,m) = s(i,1)*wave(i,m,1)
             apdq(i,m) = s(i,2)*wave(i,m,2)
-  220       continue
+         end do
+      end do
 c
       return
       end

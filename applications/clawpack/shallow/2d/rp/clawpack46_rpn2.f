@@ -151,15 +151,15 @@ c    # First compute amdq as sum of s*wave for left going waves.
 c    # Incorporate entropy fix by adding a modified fraction of wave
 c    # if s should change sign.
 c
-         do 200 i=2-mbc,mx+mbc
+         do i=2-mbc,mx+mbc
 c           check 1-wave
             him1 = qr(i-1,1)
             s0 =  qr(i-1,mu)/him1 - dsqrt(grav*him1)
 c           check for fully supersonic case :
             if (s0.gt.0.0d0.and.s(i,1).gt.0.0d0) then
-               do 60 m=1,3
+               do m=1,3
                   amdq(i,m)=0.0d0
-   60          continue
+               end do
                goto 200
             endif
 c
@@ -176,19 +176,19 @@ c              1-wave is leftgoing
 c              1-wave is rightgoing
                sfract = 0.0d0
             endif
-            do 120 m=1,3
+            do m=1,3
                amdq(i,m) = sfract*wave(i,m,1)
-  120       continue
+            end do
 
 c           check 2-wave
             if (s(i,2).gt.0.0d0) then
 c              #2 and 3 waves are right-going
                go to 200
-               endif
+            endif
 
-            do 140 m=1,3
+            do m=1,3
                amdq(i,m) = amdq(i,m) + s(i,2)*wave(i,m,2)
-  140       continue
+            end do
 c
 c           check 3-wave
 c
@@ -207,21 +207,23 @@ c              3-wave is leftgoing
 c              3-wave is rightgoing
                goto 200
             endif
-            do 160 m=1,3
+            do m=1,3
                amdq(i,m) = amdq(i,m) + sfract*wave(i,m,3)
-  160       continue
-  200       continue
+            end do
+         end do
+  200    continue
 c
 c           compute rightgoing flux differences :
 c
-            do 220 m=1,3
-               do 220 i = 2-mbc,mx+mbc
+            do m=1,3
+               do i = 2-mbc,mx+mbc
                   df = 0.0d0
-                  do 210 mw=1,mwaves
+                  do mw=1,mwaves
                      df = df + s(i,mw)*wave(i,m,mw)
-  210             continue
-                  apdq(i,m)=df-amdq(i,m)
-  220          continue
+                  end do
+               end do
+               apdq(i,m)=df-amdq(i,m)
+            end do
 c
 c
   900          continue

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -49,8 +49,8 @@ void interface_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
         claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
 
-        clawpatch_vt->fort_tag4refinement  = &CLAWPACK46_TAG4REFINEMENT;  
-        clawpatch_vt->fort_tag4coarsening  = &CLAWPACK46_TAG4COARSENING;  
+        clawpatch_vt->fort_tag4refinement  = &CLAWPATCH46_TAG4REFINEMENT;  
+        clawpatch_vt->fort_tag4coarsening  = &CLAWPATCH46_TAG4COARSENING;  
 
     }
     else if (user->claw_version == 5)
@@ -62,10 +62,8 @@ void interface_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_rpn2    = &CLAWPACK5_RPN2;
         claw5_vt->fort_rpt2    = &CLAWPACK5_RPT2;
 
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-
-        /* Use default coarsening: coarsening only if solution is sufficiently flat */
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
     }
 }
 
