@@ -2,6 +2,7 @@ set(rp ${PROJECT_SOURCE_DIR}/clawpack/shallow/2d/rp)
 
 add_library(bump_f OBJECT 
   setprob.f 
+  bump_exceeds_th.f90
   user_4.6/qinit.f 
   user_4.6/tag4refinement.f 
   user_4.6/tag4coarsening.f 
@@ -21,7 +22,6 @@ add_executable(bump
   bump.cpp 
   bump_options.c 
   bump_user.cpp 
-  fclaw2d_map_fivepatch.c 
   $<TARGET_OBJECTS:bump_f>
 )
 

@@ -3,6 +3,7 @@ set(rp ${PROJECT_SOURCE_DIR}/clawpack/euler/2d/rp)
 add_library(shockbubble_f OBJECT 
   fdisc.f 
   setprob.f 
+  difference_exceeds_th.f90 
   user_4.6/qinit.f 
   user_4.6/setaux.f 
   user_4.6/bc2.f 

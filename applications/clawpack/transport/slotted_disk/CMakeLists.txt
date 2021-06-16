@@ -2,7 +2,6 @@ set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/all)
 set(advection_all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(slotted_disk_f OBJECT 
-  setprob.f 
   fdisc.f 
   slotteddisk.f 
   user_4.6/qinit.f 
@@ -11,8 +10,10 @@ add_library(slotted_disk_f OBJECT
   user_5.0/qinit.f90 
   user_5.0/tag4refinement.f 
   user_5.0/tag4coarsening.f 
+  ${all}/minmax_exceeds_th.f90 
+  ${all}/transport_util.f 
+  ${all}/transport_setprob.f 
   ${all}/velocity_wind.f 
-  ${all}/gaussian.f 
   ${all}/user46_b4step2_manifold.f 
   ${all}/user5_b4step2_manifold.f90 
   ${advection_all}/advection_user_fort.h 
@@ -26,7 +27,6 @@ add_library(slotted_disk_f OBJECT
 
 add_executable(slotted_disk 
   slotted_disk.cpp 
-  slotted_disk_user.cpp 
   ${all}/transport_user.cpp 
   ${all}/transport_domain.c 
   ${all}/transport_options.c 
