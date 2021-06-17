@@ -35,27 +35,40 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
 ! From the basic clawpack routines, this routine is called with ql = qr
 !
 !
-      implicit double precision (a-h,o-z)
+      implicit none
 !
-      dimension wave(meqn, mwaves, 1-mbc:maxm+mbc)
-      dimension    s(mwaves, 1-mbc:maxm+mbc)
-      dimension   ql(meqn,1-mbc:maxm+mbc)
-      dimension   qr(meqn,1-mbc:maxm+mbc)
-      dimension  apdq(meqn, 1-mbc:maxm+mbc)
-      dimension  amdq(meqn, 1-mbc:maxm+mbc)
+      integer ixy, maxm, meqn, mwaves, maux, mbc, mx
+      double precision wave(meqn, mwaves, 1-mbc:maxm+mbc)
+      double precision    s(mwaves, 1-mbc:maxm+mbc)
+      double precision   ql(meqn,1-mbc:maxm+mbc)
+      double precision   qr(meqn,1-mbc:maxm+mbc)
+      double precision  apdq(meqn, 1-mbc:maxm+mbc)
+      double precision  amdq(meqn, 1-mbc:maxm+mbc)
+      double precision  auxl(maux, 1-mbc:maxm+mbc)
+      double precision  auxr(maux, 1-mbc:maxm+mbc)
 !
 !     local arrays -- common block comroe is passed to rpt2eu
 !     ------------
+
+      integer maxm2
       parameter (maxm2 = 602)  !# assumes at most 200x200 grid with mbc=2
-      dimension delta(4)
-      logical efix
+      double precision delta(4)
+
+      double precision gamma, gamma1
       common /cparam/  gamma
 !
+      logical efix
       data efix /.true./    !# use entropy fix for transonic rarefactions
 
       double precision u2v2(-6:maxm2+7), &
             u(-6:maxm2+7),v(-6:maxm2+7),enth(-6:maxm2+7),a(-6:maxm2+7), &
             g1a2(-6:maxm2+7),euv(-6:maxm2+7)
+
+      integer mu, mv, i, m, mw
+      double precision rhsqrtl, rhsqrtr, pl, pr, rhsq2, a1, a2, a3, a4
+      double precision rhoim1, pim1, cim1, s0, rho1, rhou1, rhov1, en1
+      double precision p1, c1, s1, sfract, df, rhoi, pi, ci, s3
+      double precision rho2, rhou2, rhov2, en2, p2, c2, s2
 !
       if (mbc > 7 .OR. maxm2 < maxm) then
          write(6,*) 'need to increase maxm2 or 7 in rpn'
@@ -93,7 +106,7 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
 !     # These are stored in the common block comroe since they are
 !     # later used in routine rpt2eu to do the transverse wave splitting.
 !
-      do 10 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
          rhsqrtl = dsqrt(qr(1,i-1))
          rhsqrtr = dsqrt(ql(1,i))
          pl = gamma1*(qr(4,i-1) - 0.5d0*(qr(2,i-1)**2 + &
@@ -110,13 +123,13 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
          a(i) = dsqrt(a2)
          g1a2(i) = gamma1 / a2
          euv(i) = enth(i) - u2v2(i)
-   10    continue
+       end do
 !
 !
 !     # now split the jump in q at each interface into waves
 !
 !     # find a1 thru a4, the coefficients of the 4 eigenvectors:
-      do 20 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
          delta(1) = ql(1,i) - qr(1,i-1)
          delta(2) = ql(mu,i) - qr(mu,i-1)
          delta(3) = ql(mv,i) - qr(mv,i-1)
@@ -159,8 +172,8 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
          wave(mv,4,i) = a4*v(i)
          wave(4,4,i) = a4*(enth(i)+u(i)*a(i))
          s(4,i) = u(i)+a(i)
+      end do
 !
-   20    continue
 !
 !
 !    # compute flux differences amdq and apdq.
@@ -174,18 +187,19 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
 !     # amdq = SUM s*wave   over left-going waves
 !     # apdq = SUM s*wave   over right-going waves
 !
-      do 100 m=1,meqn
-         do 100 i=2-mbc, mx+mbc
+      do m=1,meqn
+         do i=2-mbc, mx+mbc
             amdq(m,i) = 0.d0
             apdq(m,i) = 0.d0
-            do 90 mw=1,mwaves
+            do mw=1,mwaves
                if (s(mw,i) .lt. 0.d0) then
                    amdq(m,i) = amdq(m,i) + s(mw,i)*wave(m,mw,i)
-                 else
+               else
                    apdq(m,i) = apdq(m,i) + s(mw,i)*wave(m,mw,i)
-                 endif
-   90          continue
-  100       continue
+               endif
+            end do
+          end do
+        end do
       go to 900
 !
 !-----------------------------------------------------
@@ -200,7 +214,7 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
 !    # Incorporate entropy fix by adding a modified fraction of wave
 !    # if s should change sign.
 !
-      do 200 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
 !
 !        # check 1-wave:
 !        ---------------
@@ -214,11 +228,11 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
 !        # check for fully supersonic case:
          if (s0.ge.0.d0 .and. s(1,i).gt.0.d0)  then
 !            # everything is right-going
-             do 60 m=1,meqn
+             do m=1,meqn
                 amdq(m,i) = 0.d0
-   60           continue
+             end do
              go to 200
-             endif
+         endif
 !
          rho1 = qr(1,i-1) + wave(1,1,i)
          rhou1 = qr(mu,i-1) + wave(mu,1,i)
@@ -237,18 +251,18 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
 !            # 1-wave is rightgoing
              sfract = 0.d0   !# this shouldn't happen since s0 < 0
            endif
-         do 120 m=1,meqn
-            amdq(m,i) = sfract*wave(m,1,i)
-  120       continue
+           do m=1,meqn
+              amdq(m,i) = sfract*wave(m,1,i)
+           end do
 !
 !        # check contact discontinuity:
 !        ------------------------------
 !
          if (s(2,i) .ge. 0.d0) go to 200  !# 2- and 3-waves are rightgoing
-         do 140 m=1,meqn
+         do m=1,meqn
             amdq(m,i) = amdq(m,i) + s(2,i)*wave(m,2,i)
             amdq(m,i) = amdq(m,i) + s(3,i)*wave(m,3,i)
-  140       continue
+         end do
 !
 !        # check 4-wave:
 !        ---------------
@@ -277,22 +291,24 @@ SUBROUTINE clawpack5_rpn2_euler4(ixy,maxm,meqn,mwaves,maux, &
              go to 200
            endif
 !
-         do 160 m=1,meqn
+         do m=1,meqn
             amdq(m,i) = amdq(m,i) + sfract*wave(m,4,i)
-  160       continue
-  200    continue
+         end do
+         200 continue
+      end do
 !
 !     # compute the rightgoing flux differences:
 !     # df = SUM s*wave   is the total flux difference and apdq = df - amdq
 !
-      do 220 m=1,meqn
-         do 220 i = 2-mbc, mx+mbc
+      do m=1,meqn
+         do i = 2-mbc, mx+mbc
             df = 0.d0
-            do 210 mw=1,mwaves
+            do mw=1,mwaves
                df = df + s(mw,i)*wave(m,mw,i)
-  210          continue
+            end do
             apdq(m,i) = df - amdq(m,i)
-  220       continue
+        end do
+     end do
 !
   900 continue
       return

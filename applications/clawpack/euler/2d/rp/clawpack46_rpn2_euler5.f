@@ -15,19 +15,6 @@
       double precision  amdq(1-mbc:maxm+mbc, meqn)
 
 
-      double precision delta(4), gamma, gamma1
-      logical efix
-      integer mu,mv,i, mw, m
-
-      double precision rhsqrtl, rhsqrtr, pl,pr,rhsq2
-      double precision rhoiml, piml, ciml, s0
-      double precision rho1,rhou1,rhov1,en1,p1,c1,s1
-      double precision rhoi,pi,ci,s3,rho2,rhou2,rhov2,en2
-      double precision p2,c2,s2,df,cim1,pim1,rhoim1
-      double precision sfract
-
-      double precision a1,a2,a3,a4
-
 c     # Assume at most a 64x64 grid
       integer maxm2
       parameter (maxm2 = 520)
@@ -37,8 +24,22 @@ c     # Assume at most a 64x64 grid
      &       g1a2(-1:maxm2),euv(-1:maxm2)
 
 
+      double precision gamma, gamma1
       common /cparam/  gamma,gamma1
 
+      double precision rhsqrtl, rhsqrtr, pl,pr,rhsq2
+      double precision s0
+      double precision rho1,rhou1,rhov1,en1,p1,c1,s1
+      double precision rhoi,pi,ci,s3,rho2,rhou2,rhov2,en2
+      double precision p2,c2,s2,df,cim1,pim1,rhoim1
+      double precision sfract
+      double precision delta(4)
+
+      double precision a1,a2,a3,a4
+
+      integer mu,mv,i, mw, m
+
+      logical efix
       data efix /.true./    !# use entropy fix for transonic rarefactions
 c
       if (-1 .gt. 1-mbc .or. maxm2 .lt. maxm+mbc) then
@@ -81,7 +82,7 @@ c
 c     # now split the jump in q at each interface into waves
 
 c     # find a1 thru a4, the coefficients of the 4 eigenvectors:
-      do 20 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
          delta(1) = ql(i,1) - qr(i-1,1)
          delta(2) = ql(i,mu) - qr(i-1,mu)
          delta(3) = ql(i,mv) - qr(i-1,mv)
@@ -135,8 +136,8 @@ c        # tracer:
          wave(i,4,5) = 0.d0
          wave(i,5,5) = ql(i,5) - qr(i-1,5)
          s(i,5) = u(i)
+      end do
 c
-   20    continue
 c
 c
 c    # compute flux differences amdq and apdq.
@@ -150,18 +151,19 @@ c
 c     # amdq = SUM s*wave   over left-going waves
 c     # apdq = SUM s*wave   over right-going waves
 c
-      do 100 m=1,meqn
-         do 100 i=2-mbc, mx+mbc
+      do m=1,meqn
+         do i=2-mbc, mx+mbc
             amdq(i,m) = 0.d0
             apdq(i,m) = 0.d0
-            do 90 mw=1,mwaves
+            do mw=1,mwaves
                if (s(i,mw) .lt. 0.d0) then
                    amdq(i,m) = amdq(i,m) + s(i,mw)*wave(i,m,mw)
                  else
                    apdq(i,m) = apdq(i,m) + s(i,mw)*wave(i,m,mw)
                  endif
-   90          continue
-  100       continue
+            end do
+        end do
+       end do
       go to 900
 c
 c-----------------------------------------------------
@@ -176,7 +178,7 @@ c    # First compute amdq as sum of s*wave for left going waves.
 c    # Incorporate entropy fix by adding a modified fraction of wave
 c    # if s should change sign.
 c
-      do 200 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
 c
 c        # check 1-wave:
 c        ---------------
@@ -190,11 +192,11 @@ c
 c        # check for fully supersonic case:
          if (s0.ge.0.d0 .and. s(i,1).gt.0.d0)  then
 c            # everything is right-going
-             do 60 m=1,meqn
+             do m=1,meqn
                 amdq(i,m) = 0.d0
-   60           continue
+             end do
              go to 200
-             endif
+         endif
 c
          rho1 = qr(i-1,1) + wave(i,1,1)
          rhou1 = qr(i-1,mu) + wave(i,mu,1)
@@ -213,19 +215,19 @@ c            # 1-wave is leftgoing
 c            # 1-wave is rightgoing
              sfract = 0.d0   !# this shouldn't happen since s0 < 0
            endif
-         do 120 m=1,meqn
+         do m=1,meqn
             amdq(i,m) = sfract*wave(i,m,1)
-  120       continue
+         end do
 c
 c        # check contact discontinuity:
 c        ------------------------------
 c
          if (s(i,2) .ge. 0.d0) go to 200  !# 2- 3- and 5-waves are rightgoing
-         do 140 m=1,meqn
+         do m=1,meqn
             amdq(i,m) = amdq(i,m) + s(i,2)*wave(i,m,2)
             amdq(i,m) = amdq(i,m) + s(i,3)*wave(i,m,3)
             amdq(i,m) = amdq(i,m) + s(i,5)*wave(i,m,5)
-  140       continue
+         end do
 c
 c        # check 4-wave:
 c        ---------------
@@ -254,22 +256,24 @@ c            # 4-wave is rightgoing
              go to 200
            endif
 c
-         do 160 m=1,meqn
+         do m=1,meqn
             amdq(i,m) = amdq(i,m) + sfract*wave(i,m,4)
-  160       continue
+         end do
   200    continue
+        end do
 c
 c     # compute the rightgoing flux differences:
 c     # df = SUM s*wave   is the total flux difference and apdq = df - amdq
 c
-      do 220 m=1,meqn
-         do 220 i = 2-mbc, mx+mbc
+      do m=1,meqn
+         do i = 2-mbc, mx+mbc
             df = 0.d0
-            do 210 mw=1,mwaves
+            do mw=1,mwaves
                df = df + s(i,mw)*wave(i,m,mw)
-  210          continue
+            end do
             apdq(i,m) = df - amdq(i,m)
-  220       continue
+         end do
+       end do
 c
   900 continue
       return

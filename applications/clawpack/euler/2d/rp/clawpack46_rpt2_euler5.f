@@ -65,7 +65,7 @@ c
       enddo
 
 
-      do 20 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
          a3 = g1a2(i) * (euv(i)*asdq(i,1)
      &         + u(i)*asdq(i,mu) + v(i)*asdq(i,mv) - asdq(i,4))
          a2 = asdq(i,mu) - u(i)*asdq(i,1)
@@ -104,18 +104,19 @@ c
 c
 c        # compute the flux differences bmasdq and bpasdq
 c
-         do 10 m=1,meqn
+         do m=1,meqn
             bmasdq(i,m) = 0.d0
             bpasdq(i,m) = 0.d0
-            do 10 mw=1,4
+            do mw=1,4
                if (sb(mw) .lt. 0.d0) then
                   bmasdq(i,m) = bmasdq(i,m) + sb(mw) * waveb(m,mw)
                else
                   bpasdq(i,m) = bpasdq(i,m) + sb(mw) * waveb(m,mw)
                endif
-   10       continue
+            end do
+         end do
+        end do
 c
-   20    continue
 c
          return
          end
