@@ -34,9 +34,9 @@ c     # ----------------------------------------------------------
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq,r2, m
-      integer i, ic1, ic2, ibc, ifine,i1
-      integer j, jc1, jc2, jbc, jfine,j1
-      integer ic_add, jc_add, ic, jc, mth
+      integer ibc, i1
+      integer jbc, j1
+      integer ic, jc, mth
       double precision gradx, grady, qc, sl, sr, value
       double precision fclaw2d_clawpatch_compute_slopes
 
@@ -137,7 +137,7 @@ c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
                jc = my - jbc + 1
             endif
             do ic = 1,mx
-    1          i1 = ic
+               i1 = ic
                j1 = jc
                call fclaw2d_clawpatch_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
@@ -194,7 +194,7 @@ c              # ---------------------------------------------
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer ic, jc, mq, ibc,jbc, mth,i,j
+      integer ic, jc, mq, ibc,jbc, mth
       double precision qc, sl, sr, gradx, grady
       double precision fclaw2d_clawpatch_compute_slopes, value
 
@@ -207,7 +207,6 @@ c     # This should be refratio*refratio.
       integer a(2,2), f(2)
       integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
       double precision shiftx(0:rr2-1), shifty(0:rr2-1)
-      logical fclaw2d_clawpatch_check_indices
 
       r2 = refratio*refratio
       if (r2 .ne. rr2) then

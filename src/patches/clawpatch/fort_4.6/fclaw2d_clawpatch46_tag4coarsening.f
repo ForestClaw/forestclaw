@@ -12,7 +12,7 @@
       double precision q2(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision q3(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j, mq
+      integer mq
       double precision qmin, qmax
 
 c     # Don't coarsen when initializing the mesh
