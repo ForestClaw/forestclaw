@@ -8,8 +8,8 @@ c     # -------------------------------------------------------
 
       double precision xc,yc,xp,yp,zp
       double precision alpha
+      integer blockno
       double precision xc1, yc1
-      integer blockno, get_block
       double precision pi
 
       common /compi/ pi
