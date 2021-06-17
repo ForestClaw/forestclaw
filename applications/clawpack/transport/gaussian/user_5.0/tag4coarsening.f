@@ -13,8 +13,8 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       double precision q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer i,j, mq
-      double precision qmin, qmax, dq, dq1, dq2
+      integer mq
+      double precision qmin, qmax
 
       if (init_flag .ne. 0) then
             tag_patch = 0

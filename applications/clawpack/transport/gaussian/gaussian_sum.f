@@ -49,7 +49,7 @@ c     # -----------------------------------------------------
       double precision function gaussian_flat(x,y,z,w,a,hmax)
       implicit none
 
-      double precision x,y,z,w(3),q, a, r2, hmax
+      double precision x,y,z,w(3),a, r2, hmax
 
       r2 = (x-w(1))**2 + (y - w(2))**2 + (z - w(3))**2
       gaussian_flat = hmax*exp(-a*r2)

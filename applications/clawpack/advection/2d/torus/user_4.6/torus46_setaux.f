@@ -4,12 +4,12 @@
      &      xnormals,ynormals,surfnormals)
       implicit none
 
-      integer mbc, mx,my, meqn, maux
+      integer mbc, mx,my, maux
       integer blockno
       double precision dx,dy, xlower, ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
-      integer i,j, k
+      integer i,j
       double precision dxdy
      
       integer color_equation

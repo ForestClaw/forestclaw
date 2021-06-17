@@ -75,7 +75,7 @@ c     # and a rightgoing wave traveling at speed +c
 c     # relative to the material properties to the right of the interface,
 c
 c     # find a1 and a2, the coefficients of the 2 eigenvectors:
-      do 20 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
          delta(1) = ql(i,1) - qr(i-1,1)
          delta(2) = ql(i,mu) - qr(i-1,mu)
 c        # impedances:
@@ -97,19 +97,20 @@ c
          wave(i,mu,2) = a2
          wave(i,mv,2) = 0.d0
          s(i,2) = auxl(i,2)
+      end do
 c
-   20    continue
 c
 c
 c
 c     # compute the leftgoing and rightgoing flux differences:
 c     # Note s(i,1) < 0   and   s(i,2) > 0.
 c
-      do 220 m=1,meqn
-         do 220 i = 2-mbc, mx+mbc
+      do  m=1,meqn
+         do i = 2-mbc, mx+mbc
             amdq(i,m) = s(i,1)*wave(i,m,1)
             apdq(i,m) = s(i,2)*wave(i,m,2)
-  220       continue
+          end do
+      end do
 c
       return
       end

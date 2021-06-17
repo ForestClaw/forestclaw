@@ -37,18 +37,15 @@ c     ==========================================================
       double precision dtdy1d(1-mbc:maxm+mbc)
       double precision work(mwork)
 
-      integer ibc,jbc
-
       double precision dtcom, dxcom, dycom, tcom
       integer icom, jcom
+      common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
       integer i0wave, i0s, i0amdq, i0apdq, i0cqxx, i0bmadq
       integer i0bpadq, iused
       double precision dtdx, dtdy, cfl1d
       integer m,i,j, ma, ixy
       integer sweep_dir
-
-      common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
       ierror = 0
 c
@@ -248,9 +245,9 @@ c     #  See 'cubed_sphere_corners.ipynb'
       integer block_corner_count(0:3)
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j,k,m,idata,jdata
+      integer k,m,idata,jdata
       double precision ihat(0:3),jhat(0:3)
-      integer idir, i1, j1, i2, j2, ibc, jbc
+      integer i1, j1, ibc, jbc
       logical use_b
 
 c     # Lower left corner
@@ -295,12 +292,12 @@ c                     # Average fine grid corners onto coarse grid ghost corners
 
                       if (use_b) then
 c                         # Transform involves B                
-                          idata =  j1 + ihat(k) - jhat(k)
-                          jdata = -i1 + ihat(k) + jhat(k)
+                          idata =  j1 + int(ihat(k) - jhat(k))
+                          jdata = -i1 + int(ihat(k) + jhat(k))
                       else
 c                         # Transform involves B.transpose()             
-                          idata = -j1 + ihat(k) + jhat(k)
-                          jdata =  i1 - ihat(k) + jhat(k)
+                          idata = -j1 + int(ihat(k) + jhat(k))
+                          jdata =  i1 - int(ihat(k) - jhat(k))
                       endif 
                       q(i1,j1,m) = q(idata,jdata,m)
                   end do   !! jbc

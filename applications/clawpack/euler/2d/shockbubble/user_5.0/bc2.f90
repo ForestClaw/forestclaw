@@ -45,7 +45,6 @@ SUBROUTINE clawpack5_bc2(meqn,mbc,mx,my,xlower,ylower, &
         ENDDO
      ENDDO
   ENDDO
-125 CONTINUE
   GOTO 199
 
   130 continue

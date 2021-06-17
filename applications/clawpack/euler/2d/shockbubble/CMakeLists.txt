@@ -14,8 +14,8 @@ add_library(shockbubble_f OBJECT
   user_5.0/setaux.f90 
   user_5.0/bc2.f90 
   user_5.0/src2.f90 
-  user_5.0/tag4coarsening.f90 
-  user_5.0/tag4refinement.f90 
+  user_5.0/tag4coarsening.f
+  user_5.0/tag4refinement.f
   ${rp}/clawpack46_rpn2_euler4.f 
   ${rp}/clawpack46_rpt2_euler4.f 
   ${rp}/clawpack46_rpn2_euler5.f 

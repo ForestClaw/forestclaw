@@ -267,18 +267,16 @@ c     # grid cells
 
       integer*8 transform_cptr
 
-      logical is_valid_correct
-
       double precision fm,fp,gm,gp,ef
 
       integer i, j, ic, jc, ii1, ii2, jj1, jj2, ii, jj
-      integer i2(0:3), j2(0:3), m, mq
+      integer i2(0:3), j2(0:3), mq
       double precision deltac, areac
 
 
       integer a(2,2), f(2), sc, nm
 
-      logical is_valid_average, skip_this_grid
+      logical skip_this_grid
 
       call fclaw2d_clawpatch_build_transform(transform_cptr,a,f)
 
@@ -481,7 +479,7 @@ c    # -----------------------------------------------------------------
 
       implicit none
 
-      integer mx,my,mbc,meqn,idir,iface_coarse
+      integer mx,my,mbc,meqn,idir
       integer this_iface, this_blockno, neighbor_blockno
 
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -514,13 +512,11 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       double precision efneighbor3(mx,meqn,0:1)
 
 
-      double precision delta, deltap, deltam, area
+      double precision delta, area
 
       integer a(2,2), f(2), sc
 
       double precision fp,fm,gp,gm,ef
-
-      double precision neighborval
 
       integer*8 transform_cptr
 

@@ -113,7 +113,7 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
 
 !     # find a1 thru a3, the coefficients of the 3 eigenvectors:
 
-    do 20 i = 2-mbc, mx+mbc
+    do i = 2-mbc, mx+mbc
 
         enx =   auxl(ioff+1,i)
         eny =   auxl(ioff+2,i)
@@ -179,9 +179,9 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         wave(3,3,i) = a3*(u(i)+a(i))*eny + a3*v(i)*ety
         wave(4,3,i) = a3*(u(i)+a(i))*enz + a3*v(i)*etz
         s(3,i) = (u(i)+a(i)) * gamma/dy
-        281 format(2i4,5d12.4)
-        283 format(8x,5d12.4)
-    20 END DO
+!!        281 format(2i4,5d12.4)
+!!        283 format(8x,5d12.4)
+    END DO
 
 
 !    # compute flux differences amdq and apdq.
@@ -195,18 +195,19 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
 !     # amdq = SUM s*wave   over left-going waves
 !     # apdq = SUM s*wave   over right-going waves
 
-    DO 100 m=1,meqn
-        do 100 i=2-mbc, mx+mbc
+    DO m=1,meqn
+        do i=2-mbc, mx+mbc
             amdq(m,i) = 0.d0
             apdq(m,i) = 0.d0
-            do 90 mw=1,mwaves
+            do mw=1,mwaves
                 if (s(mw,i) < 0.d0) then
                     amdq(m,i) = amdq(m,i) + s(mw,i)*wave(m,mw,i)
                 else
                     apdq(m,i) = apdq(m,i) + s(mw,i)*wave(m,mw,i)
                 endif
-            90 END DO
-    100 END DO
+            END DO
+        end do
+    END DO
 
 !     # project momentum components of amdq and apdq onto tangent plane:
 
@@ -241,7 +242,7 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
 !    # Incorporate entropy fix by adding a modified fraction of wave
 !    # if s should change sign.
 
-    do 200 i=2-mbc,mx+mbc
+    do i=2-mbc,mx+mbc
         do m=1, meqn
             amdq(m,i) = 0.d0
             apdq(m,i) = 0.d0
@@ -265,9 +266,9 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         s0 =  (hunr/him1 - dsqrt(g*him1)) * gamma / dy
     !           check for fully supersonic case :
         if (s0 > 0.0d0 .AND. s(1,i) > 0.0d0) then
-            do 60 m=1,4
+            do m=1,4
                 amdq(m,i)=0.0d0
-            60 END DO
+            END DO
             goto 200
         endif
 
@@ -285,18 +286,18 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         !              1-wave is rightgoing
             sfract = 0.0d0
         endif
-        do 120 m=1,4
+        do m=1,4
             amdq(m,i) = sfract*wave(m,1,i)
-        120 END DO
+        END DO
     !           check 2-wave
         if (s(2,i) > 0.0d0) then
         !	       #2 and 3 waves are right-going
             go to 200
         endif
 
-        do 140 m=1,4
+        do m=1,4
             amdq(m,i) = amdq(m,i) + s(2,i)*wave(m,2,i)
-        140 END DO
+        END DO
 
     !           check 3-wave
 
@@ -315,21 +316,21 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         !              3-wave is rightgoing
             goto 200
         endif
-        do 160 m=1,4
+        do m=1,4
             amdq(m,i) = amdq(m,i) + sfract*wave(m,3,i)
-        160 END DO
+        END DO
     200 END DO
 
 !           compute rightgoing flux differences :
 
-    do 220 i = 2-mbc,mx+mbc
-        do 222 m=1,4
+    do i = 2-mbc,mx+mbc
+        do m=1,4
             df = 0.0d0
-            do 210 mw=1,mwaves
+            do mw=1,mwaves
                 df = df + s(mw,i)*wave(m,mw,i)
-            210 END DO
+            END DO
             apdq(m,i)=df - amdq(m,i)
-        222 END DO
+        END DO
 
     !                 project momentum components onto tangent plane
 
@@ -349,7 +350,7 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         apdq(3,i) = apdq(3,i) - apn*ery
         apdq(4,i) = apdq(4,i) - apn*erz
 
-    220 END DO
+    END DO
 
 
     900 continue

@@ -50,7 +50,7 @@ c     # Compute area of a patch
 
       include 'fclaw2d_metric_terms.i'
 
-      integer i,j,m
+      integer i,j
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 

@@ -22,7 +22,7 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       double precision q2(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision q3(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j, mq
+      integer mq
       double precision qmin, qmax
 
       if (init_flag .ne. 0) then

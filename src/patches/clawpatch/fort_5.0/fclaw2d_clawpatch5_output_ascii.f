@@ -3,7 +3,7 @@
                                                  
       implicit none
 
-      integer iframe,meqn,maux,ngrids
+      integer meqn,maux,ngrids
 
       character*11 matname1, matname2
       double precision time

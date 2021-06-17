@@ -87,7 +87,7 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
     integer i, m, mw, ioff
     double precision enx, eny, enz, etx,ety,etz
     double precision hunl, hunr, hutl, hutr, hl,hr,hsqr,hsql,hsq
-    double precision a1,a2,a3, gamma, amn, apn, df, dx, dy
+    double precision a1,a2,a3, gamma, amn, apn, df, dy
     double precision erx, ery, erz, h1, h3, hi, him1, hu1, hu3
     double precision s0, s03, s1, s3, sfract
 
@@ -189,9 +189,9 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         wave(i,3,3) = a3*(u(i)+a(i))*eny + a3*v(i)*ety
         wave(i,4,3) = a3*(u(i)+a(i))*enz + a3*v(i)*etz
         s(i,3) = (u(i)+a(i)) * gamma/dy
-        281 format(2i4,5d12.4)
-        283 format(8x,5d12.4)
-    20 END DO
+!!        281 format(2i4,5d12.4)
+!!        283 format(8x,5d12.4)
+    END DO
 
 
     !! # compute flux differences amdq and apdq.

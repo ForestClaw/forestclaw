@@ -53,11 +53,11 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
     real(kind=8) :: bmadq(meqn,1-mbc:maxm + mbc)
     REAL(kind=8) :: bpadq(meqn,1-mbc:maxm + mbc)
 
-    INTEGER block_corner_count(0:3), ibc,jbc,m, sweep_dir
+    INTEGER block_corner_count(0:3), sweep_dir
 
 
     ! Looping scalar storage
-    integer :: i,j,thread_num
+    integer :: i,j
     real(kind=8) :: dtdx,dtdy,cfl1d
 
     ! Common block storage
@@ -90,36 +90,6 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
     DO j = 0,my+1
        ! Copy old q into 1d slice
        q1d(:,1-mbc:mx+mbc) = qold(:,1-mbc:mx+mbc,j)
-
-!!        IF (j .EQ. 0) THEN
-!!           DO m = 1,meqn
-!!              IF (block_corner_count(0) .EQ. 3) THEN
-!!                 DO ibc = 1,mbc
-!!                    q1d(m,1-ibc) = qold(m,ibc,0)
-!!                 ENDDO
-!!              ENDIF
-!!              IF (block_corner_count(1) .EQ. 3) THEN
-!!                 DO ibc = 1,mbc
-!!                    q1d(m,mx+ibc) = qold(m,mx-ibc+1,0)
-!!                 ENDDO
-!!              ENDIF
-!!           ENDDO
-!!        ELSE IF (j .EQ. my+1) THEN
-!!           DO m = 1,meqn
-!!              IF (block_corner_count(2) .EQ. 3) THEN
-!!                 DO ibc = 1,mbc
-!!                    q1d(m,1-ibc) = qold(m,ibc,my+1)
-!!                 ENDDO
-!!              ENDIF
-!!              IF (block_corner_count(3) .EQ. 3) THEN
-!!                 DO ibc = 1,mbc
-!!                    q1d(m,mx+ibc) = qold(m,mx-ibc+1,my+1)
-!!                 ENDDO
-!!              ENDIF
-!!           ENDDO
-!!        ENDIF
-
-
 
         ! Set dtdx slice if a capacity array exists
         if (mcapa > 0)  then
@@ -162,35 +132,6 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
 
        ! Copy data along a slice into 1d arrays:
        q1d(:,1-mbc:my+mbc) = qold(:,i,1-mbc:my+mbc)
-
-       IF (i .EQ. 0) THEN
-          DO m = 1,meqn
-             IF (block_corner_count(0) .EQ. 3) THEN
-                DO jbc = 1,mbc
-                   q1d(m,1-jbc) = qold(m,0,jbc)
-                ENDDO
-             ENDIF
-             IF (block_corner_count(2) .EQ. 3) THEN
-                DO jbc = 1,mbc
-                   q1d(m,my+jbc) = qold(m,0,my-jbc+1)
-                ENDDO
-             ENDIF
-          ENDDO
-       ELSE IF (i .EQ. mx+1) THEN
-          DO m = 1,meqn
-             IF (block_corner_count(1) .EQ. 3) THEN
-                DO jbc = 1,mbc
-                   q1d(m,1-jbc) = qold(m,mx+1,jbc)
-                ENDDO
-             ENDIF
-             IF (block_corner_count(3) .EQ. 3) THEN
-                DO jbc= 1,mbc
-                   q1d(m,my+jbc) = qold(m,mx+1,my-jbc+1)
-                ENDDO
-             ENDIF
-          ENDDO
-       ENDIF
-
 
 
         ! Set dt/dy ratio in slice
@@ -241,9 +182,9 @@ subroutine clawpack5_fix_corners(mx,my,mbc,meqn,q,sweep_dir, &
     integer block_corner_count(0:3)
     double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    integer i,j,k,m,idata,jdata
+    integer k,m,idata,jdata
     double precision ihat(0:3),jhat(0:3)
-    integer idir, i1, j1, i2, j2, ibc, jbc
+    integer i1, j1, ibc, jbc
     logical use_b
 
     !! # Lower left corner
@@ -288,12 +229,12 @@ subroutine clawpack5_fix_corners(mx,my,mbc,meqn,q,sweep_dir, &
 
                     if (use_b) then
                         !! # Transform involves B                
-                        idata =  j1 + ihat(k) - jhat(k)
-                        jdata = -i1 + ihat(k) + jhat(k)
+                        idata =  j1 + int(ihat(k) - jhat(k))
+                        jdata = -i1 + int(ihat(k) + jhat(k))
                     else
                         !! # Transform involves B.transpose()             
-                        idata = -j1 + ihat(k) + jhat(k)
-                        jdata =  i1 - ihat(k) + jhat(k)
+                        idata = -j1 + int(ihat(k) + jhat(k))
+                        jdata =  i1 - int(ihat(k) - jhat(k))
                     endif 
                     q(m,i1,j1) = q(m,idata,jdata)
                 end do   !! jbc

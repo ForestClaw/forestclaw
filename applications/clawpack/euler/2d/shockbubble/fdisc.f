@@ -14,7 +14,6 @@ c     =================================================
       common/cdisc/ x0,y0,alf,beta,r0,idisc
 
 
-      integer*8 cont, get_context
       double precision x, y, f1,f2
 
 c

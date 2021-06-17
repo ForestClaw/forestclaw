@@ -3,7 +3,7 @@
       implicit none
 
       integer mbc, mx, my, maux, blockno
-      double precision xlower, ylower, dx, dy, time
+      double precision dx, dy, time
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
       double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)

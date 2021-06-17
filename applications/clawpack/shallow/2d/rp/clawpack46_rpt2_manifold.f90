@@ -44,7 +44,7 @@ SUBROUTINE clawpack46_rpt2_manifold(ixy,maxm,meqn,mwaves,mbc,mx, &
     COMMON /cparam/  grav
 
     integer i, m, mw, ioff, ix1, ixm1, i1
-    double precision dx, dy
+    double precision dx
     double precision erx, ery, erz, a1, a2, a3, bn
 
 

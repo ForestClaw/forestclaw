@@ -31,8 +31,6 @@ c     # Local variables
       integer i0faddm, i0faddp, i0gaddm, i0gaddp
       integer i0q1d, i0dtdx1, i0dtdy1
       integer i0aux1, i0aux2, i0aux3, i0next, mused, mwork1
-      integer i0wave, i0s, i0amdq, i0apdq, i0ql, i0qr, i0auxl
-      integer i0auxr
 
       integer i,j,m
 

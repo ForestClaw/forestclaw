@@ -149,7 +149,7 @@ c     # ----------------------------------------------------------------------
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer mq, ibc, jbc, ii, jj, ifine, jfine
+      integer mq, ibc, jbc
       integer ic, jc, mth
       double precision gradx, grady, shiftx, shifty
       double precision sl, sr, qc, value
