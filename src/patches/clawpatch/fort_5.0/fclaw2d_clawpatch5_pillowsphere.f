@@ -169,6 +169,10 @@ c     # ----------------------------------------------------------------------
       elseif (icorner_coarse .eq. 3) then
          ic = mx
          jc = my
+      else
+         write(6,*) 'pillow : icorner_coarse has unexpected value'
+         write(6,*) 'icorner_coarse : ', icorner_coarse
+         stop
       endif
 
 c     # This may not even matter
