@@ -292,12 +292,12 @@ c                     # Average fine grid corners onto coarse grid ghost corners
 
                       if (use_b) then
 c                         # Transform involves B                
-                          idata =  j1 + ihat(k) - jhat(k)
-                          jdata = -i1 + ihat(k) + jhat(k)
+                          idata =  j1 + int(ihat(k) - jhat(k))
+                          jdata = -i1 + int(ihat(k) + jhat(k))
                       else
 c                         # Transform involves B.transpose()             
-                          idata = -j1 + ihat(k) + jhat(k)
-                          jdata =  i1 - ihat(k) + jhat(k)
+                          idata = -j1 + int(ihat(k) + jhat(k))
+                          jdata =  i1 - int(ihat(k) - jhat(k))
                       endif 
                       q(i1,j1,m) = q(idata,jdata,m)
                   end do   !! jbc
