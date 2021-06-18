@@ -12,10 +12,17 @@
       integer i,j
       double precision dxdy
      
+      double precision        area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+
+
       integer color_equation
       common /eqn_comm/ color_equation      
 
-      include "fclaw2d_metric_terms.i"
+c      include "fclaw2d_metric_terms.i"
 
 c     # ----------------------------------------------------------------
 c     # Color equation (edge velocities)
@@ -139,12 +146,16 @@ c           # y-face - left vertex
       double precision nl(3), nr(3), nb(3), nt(3)
       double precision urrot, ulrot, ubrot, utrot
 
+      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
 
       integer*8 cont, get_context
 
       integer i,j, k
 
-      include "fclaw2d_metric_terms.i"
+c      include "fclaw2d_metric_terms.i"
 
       cont = get_context()
 
