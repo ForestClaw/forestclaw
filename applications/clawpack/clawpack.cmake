@@ -44,6 +44,9 @@ add_subdirectory(clawpack/advection/2d/hemisphere)
 ## sphere (cubed-sphere and pillow-disk)
 add_subdirectory(clawpack/advection/2d/sphere)
 
+## periodic (square,periodic in both directions, constant velocity)
+add_subdirectory(clawpack/advection/2d/periodic)
+
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
 ## ----------------------------------------------------------
