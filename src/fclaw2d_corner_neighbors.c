@@ -192,6 +192,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
         /* Case 3 : 'icorner' is an interior corner, at a block edge,
          or we are on a periodic block.  Need to return a valid
          transform in 'ftransform' */
+        /* block_iface is the block number at the of the neighbor? */
         if (block_iface >= 0)
         {
             /* The corner is on a block edge (but is not a block corner).
@@ -217,13 +218,13 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             /* Get transform needed to swap parallel ghost patch with fine
                grid on-proc patch.  This is done so that averaging and
                interpolation routines can be re-used. */
-            int iface1, rface1;
-            iface1 = block_iface;
-            rface1 = rfaceno;
+            int iface1 = block_iface;
+            int rface1 = rfaceno;
             fclaw2d_patch_face_swap(&iface1,&rface1);
             fclaw2d_patch_transform_blockface(iface1, rface1,
                                               ftransform_finegrid->transform);
             ftransform_finegrid->block_iface = iface1;
+            fclaw_debugf("On block face (interior): iface1= %d; rface1 = %d\n",iface1, rface1);
         }
         else if (this_block_idx == *corner_block_idx)
         {
@@ -233,6 +234,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             fclaw2d_patch_transform_blockface_intra (ftransform);
             fclaw2d_patch_transform_blockface_intra
                 (ftransform_finegrid->transform);
+
         }
         else
         {
@@ -319,6 +321,9 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
     else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
     {
         **ref_flag_ptr = 0;
+        fclaw_debugf("get_corner_neighbor: this_patch->level   = %d\n",this_patch->level);
+        fclaw_debugf("get_corner_neighbor: corner_patch->level = %d\n",(*corner_patch)->level);
+        fclaw_debugf("\n");
     }
     else /* FCLAW2D_PATCH_DOUBLESIZE */
     {
@@ -487,6 +492,23 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 }
                 else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                 {
+                    if (this_patch->level != corner_patch->level)
+                    {
+                        printf("\nError : \n");
+                        printf("Corner exchange routine is trying to copy between " \
+                               "patches at \ndifferent levels.  ");
+                        printf("You may be receiving this error because you have\n" \
+                               "built ForestClaw on an Apple M1 machine.  We are working " \
+                               "on fixing this.\n\n");
+                        printf("Info : \n");
+                        printf("       neighbor_level (should be 0) = %d  " \
+                               "(0 : patches are at the same level)\n",neighbor_level);
+                        printf("       this_patch->level = %d\n",this_patch->level);
+                        printf("       corner_patch->level = %d  (Should match level above)\n",corner_patch->level);
+                        printf("\n");
+                        //exit(0);
+
+                    }
                     fclaw2d_patch_copy_corner(s->glob,
                                               this_patch,
                                               corner_patch,
