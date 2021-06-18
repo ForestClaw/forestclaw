@@ -92,6 +92,10 @@ c           # this ensures that we get 'hanging' corners
                ic = ibc
             elseif (iface_coarse .eq. 1) then
                ic = mx - ibc + 1
+            else
+               write(6,*) 'interpolate : Problem with iface_coarse'
+               write(6,*) 'iface_coarse = ', iface_coarse
+               stop               
             endif
             do jc = 1,mx
                i1 = ic
@@ -134,7 +138,12 @@ c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
             if (iface_coarse .eq. 2) then
                jc = jbc
             elseif (iface_coarse .eq. 3) then
+c              // iface_coarse = 3
                jc = my - jbc + 1
+            else
+               write(6,*) 'interpolate : Problem with iface_coarse'
+               write(6,*) 'iface_coarse = ', iface_coarse
+               stop
             endif
             do ic = 1,mx
                i1 = ic
@@ -253,6 +262,10 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
       elseif (icorner_coarse .eq. 3) then
          ic = mx - ibc + 1
          jc = my - jbc + 1
+      else
+         write(6,*) "interpolate : Problem with icorner_coarse"
+         write(6,*) "icorner_coarse = ", icorner_coarse
+         stop
       endif
 
 c     # Interpolate coarse grid corners to fine grid corner ghost cells
