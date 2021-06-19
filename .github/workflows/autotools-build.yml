@@ -291,8 +291,10 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/disk
-        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4 --user:example=0   
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5 --user:example=1
 
 
   clawpack_advection_2d_filament:
@@ -312,8 +314,12 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/filament
-        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=2
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=2
 
 
   clawpack_advection_2d_hemisphere:
@@ -333,8 +339,10 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/hemisphere
-        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5 --user:example=1
 
 
   clawpack_advection_2d_latlong:
@@ -500,8 +508,12 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/acoustics/2d/radial
-        mpirun -n 2 ./radial -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./radial -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./radial -F regression.ini     --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=4 --user:example=2
+        mpirun -n 2 ./radial -F regression.ini     --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=5 --user:example=2
 
 
   clawpack_burgers_2d_pwconst:
@@ -566,7 +578,7 @@ jobs:
         mpirun -n 2 ./radialdam -F regression.ini --user:claw-version=4 --user:example=0
         mpirun -n 2 ./radialdam -F regression.ini --user:claw-version=5 --user:example=0
         mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=1
-        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2 --verbosity=debug
+        # mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2 --verbosity=debug
         mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=1
         mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=2
 
