@@ -57,6 +57,21 @@ void CLAWPACK5_RPT2_MANIFOLD(const int* ixy, const int* imp,
                              double aux3[],  double asdq[],
                              double bmasdq[], double bpasdq[]);
 
+#define CLAWPACK46_RPN2_MANIFOLD    FCLAW_F77_FUNC(clawpack46_rpn2_manifold,   \
+                                                   CLAWPACK46_RPN2_MANIFOLD)
+void CLAWPACK46_RPN2_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                     const int* mbc,const int* mx, double ql[], double qr[],
+                     double auxl[], double auxr[], double wave[],
+                     double s[], double amdq[], double apdq[]);
+
+#define CLAWPACK46_RPT2_MANIFOLD    FCLAW_F77_FUNC(clawpack46_rpt2_manifold,  \
+                                                   CLAWPACK46_RPT2_MANIFOLD)
+void CLAWPACK46_RPT2_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                     const int* mbc, const int* mx, double ql[], double qr[],
+                     double aux1[], double aux2[], double aux3[], const int* imp,
+                     double dsdq[], double bmasdq[], double bpasdq[]);
+
+
 #ifdef __cplusplus
 #if 0
 {
