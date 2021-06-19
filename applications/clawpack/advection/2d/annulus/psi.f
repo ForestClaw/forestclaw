@@ -2,7 +2,7 @@
       implicit none
 
       double precision xp,yp,zp,t
-      double precision r2, pi2, revs_per_s
+      double precision r2, revs_per_s
 
       double precision pi, pi2
       common /compi/ pi, pi2
