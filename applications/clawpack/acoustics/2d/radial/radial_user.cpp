@@ -113,11 +113,8 @@ void radial_problem_setup(fclaw2d_global_t* glob)
 #ifdef FCLAW_ENABLE_MPI
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
- 
     fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
-    RADIAL_SETPROB();
-
-
+ 
     /* rho, bulk are inputs; cc and zz are outputs.  Results are
        stored in a common block */
     RADIAL_SETPROB();
