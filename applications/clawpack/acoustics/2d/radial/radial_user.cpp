@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch46_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
@@ -52,11 +54,19 @@ void radial_link_solvers(fclaw2d_global_t *glob)
             claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
             claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
         }
-        else if (user->example == 1)
+        else if (user->example == 1 || user->example == 2)
         {
-            fclaw_global_essentialf("Mapped Riemann solver not yet " \
-                                    "implemented for ClawPack 4.6\n");
-            exit(0);
+            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
+            fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+            
+            patch_vt->setup = &radial_patch_setup;
+
+            claw46_vt->fort_rpn2  = &CLAWPACK46_RPN2_MANIFOLD;
+            claw46_vt->fort_rpt2  = &CLAWPACK46_RPT2_MANIFOLD;
+
+            /* Avoid tagging block corners in 5 patch example*/
+            clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
+            clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;
         }
     }
     else if (user->claw_version == 5)
@@ -70,7 +80,7 @@ void radial_link_solvers(fclaw2d_global_t *glob)
             claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
             claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
         }
-        else if (user->example == 1)
+        else if (user->example == 1 || user->example == 2)
         {
             fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
             fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -81,8 +91,8 @@ void radial_link_solvers(fclaw2d_global_t *glob)
             claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
 
             /* Avoid tagging block corners in 5 patch example*/
-            clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-            clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+            clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
+            clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
         }
     }
 }
@@ -91,9 +101,26 @@ void radial_problem_setup(fclaw2d_global_t* glob)
 {
     user_options_t* user = radial_get_options(glob);
 
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24.16f   %s",user->rho,"\% rho\n");
+        fprintf(f,  "%-24.16f   %s",user->bulk,"\% bulk\n");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+ 
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    RADIAL_SETPROB();
+
+
     /* rho, bulk are inputs; cc and zz are outputs.  Results are
        stored in a common block */
-    RADIAL_SETPROB(&user->rho, &user->bulk, &user->cc, &user->zz);
+    RADIAL_SETPROB();
 }
 
 void radial_patch_setup(fclaw2d_global_t *glob,
@@ -125,9 +152,22 @@ void radial_patch_setup(fclaw2d_global_t *glob,
                                    &xtangents,&ytangents,
                                    &surfnormals,&edgelengths,
                                    &curvature);
+
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
-    RADIAL_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                          &dx,&dy,&maux,aux,
-                          xnormals,ynormals,edgelengths,area);
+    const user_options_t* user = radial_get_options(glob);
+
+    if (user->claw_version == 4)
+    {
+        CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                                   &dx,&dy,&maux,aux,
+                                   xnormals,ynormals,edgelengths,area);
+    }
+    else if (user->claw_version == 5)
+    {
+        CLAWPACK5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                                  &dx,&dy,&maux,aux,
+                                  xnormals,ynormals,edgelengths,area);
+
+    }
 }
