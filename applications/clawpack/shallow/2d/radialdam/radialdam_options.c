@@ -61,7 +61,7 @@ radialdam_check (user_options_t *user,
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
-    else if (user->example > 0)
+    else if (user->example == 2)
     {
         if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
         {
