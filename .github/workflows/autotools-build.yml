@@ -575,12 +575,12 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/shallow/2d/radialdam
-        mpirun -n 2 ./radialdam -F regression.ini --user:claw-version=4 --user:example=0
-        mpirun -n 2 ./radialdam -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./radialdam -F regression.ini     --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./radialdam -F regression.ini     --user:claw-version=5 --user:example=0
         mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=1
-        # mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2 --verbosity=debug
         mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=1
-        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=2
+        # mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2
+        # mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=2
 
 
   clawpack_transport_correlatedcb:
