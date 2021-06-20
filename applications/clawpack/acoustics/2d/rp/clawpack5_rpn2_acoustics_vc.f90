@@ -1,5 +1,5 @@
 ! =====================================================
-SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc,mx,&
+SUBROUTINE clawpack5_rpn2_acoustics_vc(ixy,maxm,meqn,mwaves,maux,mbc,mx,&
      ql,qr,auxl,auxr,wave,s,amdq,apdq)
 ! =====================================================
 
@@ -42,20 +42,22 @@ SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc,mx,&
 ! From the basic clawpack routines, this routine is called with ql = qr
 
 
-  IMPLICIT DOUBLE PRECISION (a-h,o-z)
+  IMPLICIT none
 
-  DIMENSION wave(meqn, mwaves, 1-mbc:maxm+mbc)
-  DIMENSION    s(mwaves, 1-mbc:maxm+mbc)
-  DIMENSION   ql(meqn, 1-mbc:maxm+mbc)
-  DIMENSION   qr(meqn, 1-mbc:maxm+mbc)
-  DIMENSION apdq(meqn, 1-mbc:maxm+mbc)
-  DIMENSION amdq(meqn, 1-mbc:maxm+mbc)
-  DIMENSION auxl(maux, 1-mbc:maxm+mbc)
-  DIMENSION auxr(maux, 1-mbc:maxm+mbc)
+  integer  :: ixy,maxm,meqn,mwaves,maux,mbc,mx
+  DOUBLE PRECISION :: wave(meqn, mwaves, 1-mbc:maxm+mbc)
+  DOUBLE PRECISION ::    s(mwaves, 1-mbc:maxm+mbc)
+  DOUBLE PRECISION ::   ql(meqn, 1-mbc:maxm+mbc)
+  DOUBLE PRECISION ::   qr(meqn, 1-mbc:maxm+mbc)
+  DOUBLE PRECISION :: apdq(meqn, 1-mbc:maxm+mbc)
+  DOUBLE PRECISION :: amdq(meqn, 1-mbc:maxm+mbc)
+  DOUBLE PRECISION :: auxl(maux, 1-mbc:maxm+mbc)
+  DOUBLE PRECISION :: auxr(maux, 1-mbc:maxm+mbc)
 
 !     local arrays
 !     ------------
-  DIMENSION delta(3)
+  integer i, mu, mv, m
+  DOUBLE PRECISION :: delta(3), a1, a2, zi, zim
 
 !     # set mu to point to  the component of the system that corresponds
 !     # to velocity in the direction of this slice, mv to the orthogonal
@@ -121,4 +123,4 @@ SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc,mx,&
   ENDDO
 
   RETURN
-END SUBROUTINE clawpack5_rpn2
+END SUBROUTINE clawpack5_rpn2_acoustics_vc

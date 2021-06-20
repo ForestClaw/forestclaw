@@ -1,6 +1,7 @@
-      subroutine clawpack46_rpt2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,
+      subroutine clawpack46_rpt2_acoustics_vc(ixy,maxm,meqn,
+     &      mwaves,mbc,mx,ql,qr,
      &      aux1,aux2,aux3,imp,asdq,bmasdq,bpasdq)
-      implicit double precision (a-h,o-z)
+      implicit none
 c
 c     # Riemann solver in the transverse direction for the acoustics equations
 c     # with varying material properties rho and kappa
@@ -15,17 +16,19 @@ c     # Split asdq into down-going flux bmasdq and up-going flux bpasdq.
 c
 c     # imp=1  means  asdq=amdq,    imp=2 means asdq=apdq
 c
-      dimension    ql(1-mbc:maxm+mbc, meqn)
-      dimension    qr(1-mbc:maxm+mbc, meqn)
-      dimension    asdq(1-mbc:maxm+mbc, meqn)
-      dimension bmasdq(1-mbc:maxm+mbc, meqn)
-      dimension bpasdq(1-mbc:maxm+mbc, meqn)
-      dimension   aux1(1-mbc:maxm+mbc, *)
-      dimension   aux2(1-mbc:maxm+mbc, *)
-      dimension   aux3(1-mbc:maxm+mbc, *)
-c
-c
-c
+      integer ixy, maxm, meqn, mwaves, mbc, mx, imp
+      double precision    ql(1-mbc:maxm+mbc, meqn)
+      double precision    qr(1-mbc:maxm+mbc, meqn)
+      double precision    asdq(1-mbc:maxm+mbc, meqn)
+      double precision bmasdq(1-mbc:maxm+mbc, meqn)
+      double precision bpasdq(1-mbc:maxm+mbc, meqn)
+      double precision   aux1(1-mbc:maxm+mbc, *)
+      double precision   aux2(1-mbc:maxm+mbc, *)
+      double precision   aux3(1-mbc:maxm+mbc, *)
+
+      integer i, i1, mu, mv
+      double precision c, cm, cp, zm, zz, zp, a1, a2
+
       if (ixy.eq.1) then
           mu = 2
           mv = 3
@@ -35,7 +38,7 @@ c
         endif
 c
 c
-      do 20 i = 2-mbc, mx+mbc
+      do  i = 2-mbc, mx+mbc
 c
 c        # imp is used to flag whether wave is going to left or right,
 c        # since material properties are different on the two sides
@@ -86,8 +89,8 @@ c
          bpasdq(i,1) = cp * a2*zp
          bpasdq(i,mu) = 0.d0
          bpasdq(i,mv) = cp * a2
-c
-   20    continue
-c
+
+      end do
+
       return
       end

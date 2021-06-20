@@ -1,4 +1,4 @@
-      subroutine clawpack46_rpn2(ixy,maxm,meqn,mwaves,mbc,
+      subroutine clawpack46_rpn2_ACOUSTICS_VC(ixy,maxm,meqn,mwaves,mbc,
      &      mx,ql,qr,auxl,auxr,wave,s,amdq,apdq)
 c     =====================================================
 c
@@ -32,22 +32,28 @@ c     #                                    and right state ql(i,:)
 c     # From the basic clawpack routines, this routine is called with ql = qr
 c
 c
-      implicit double precision (a-h,o-z)
-c
-      dimension wave(1-mbc:maxm+mbc, meqn, mwaves)
-      dimension    s(1-mbc:maxm+mbc, mwaves)
-      dimension   ql(1-mbc:maxm+mbc, meqn)
-      dimension   qr(1-mbc:maxm+mbc, meqn)
-      dimension apdq(1-mbc:maxm+mbc, meqn)
-      dimension amdq(1-mbc:maxm+mbc, meqn)
-      dimension auxl(1-mbc:maxm+mbc, 2)
-      dimension auxr(1-mbc:maxm+mbc, 2)
-c
+      implicit none
+
+      integer ixy,maxm,meqn,mwaves,mbc,mx
+      double precision wave(1-mbc:maxm+mbc, meqn, mwaves)
+      double precision    s(1-mbc:maxm+mbc, mwaves)
+      double precision   ql(1-mbc:maxm+mbc, meqn)
+      double precision   qr(1-mbc:maxm+mbc, meqn)
+      double precision apdq(1-mbc:maxm+mbc, meqn)
+      double precision amdq(1-mbc:maxm+mbc, meqn)
+      double precision auxl(1-mbc:maxm+mbc, 2)
+      double precision auxr(1-mbc:maxm+mbc, 2)
+
+      double precision dtcom, dxcom, dycom, tcom
+      integer icom, jcom
+      common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
+
 c     local arrays
 c     ------------
-      dimension delta(3)
-c
-      common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
+      integer mu, mv, i, m
+      double precision zi, zim, a1, a2
+      double precision delta(3)
+
 c
 c     # set mu to point to  the component of the system that corresponds
 c     # to velocity in the direction of this slice, mv to the orthogonal

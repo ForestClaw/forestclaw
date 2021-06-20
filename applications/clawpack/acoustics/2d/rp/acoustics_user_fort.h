@@ -38,6 +38,38 @@ extern "C"
 #endif
 #endif
 
+/* ------------------------------ Clawpack 4.6 headers ------------------------------------------ */
+
+#define CLAWPACK46_RPN2_MANIFOLD    FCLAW_F77_FUNC(clawpack46_rpn2_manifold,   \
+                                                   CLAWPACK46_RPN2_MANIFOLD)
+void CLAWPACK46_RPN2_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                     const int* mbc,const int* mx, double ql[], double qr[],
+                     double auxl[], double auxr[], double wave[],
+                     double s[], double amdq[], double apdq[]);
+
+#define CLAWPACK46_RPT2_MANIFOLD    FCLAW_F77_FUNC(clawpack46_rpt2_manifold,  \
+                                                   CLAWPACK46_RPT2_MANIFOLD)
+void CLAWPACK46_RPT2_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                     const int* mbc, const int* mx, double ql[], double qr[],
+                     double aux1[], double aux2[], double aux3[], const int* imp,
+                     double dsdq[], double bmasdq[], double bpasdq[]);
+
+#define CLAWPACK46_RPN2_ACOUSTICS_VC    FCLAW_F77_FUNC(clawpack46_rpn2_acoustics_vc,   \
+                                                   CLAWPACK46_RPN2_ACOUSTICS_VC)
+void CLAWPACK46_RPN2_ACOUSTICS_VC(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                     const int* mbc,const int* mx, double ql[], double qr[],
+                     double auxl[], double auxr[], double wave[],
+                     double s[], double amdq[], double apdq[]);
+
+#define CLAWPACK46_RPT2_ACOUSTICS_VC    FCLAW_F77_FUNC(clawpack46_rpt2_acoustics_vc,  \
+                                                   CLAWPACK46_RPT2_ACOUSTICS_VC)
+void CLAWPACK46_RPT2_ACOUSTICS_VC(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                     const int* mbc, const int* mx, double ql[], double qr[],
+                     double aux1[], double aux2[], double aux3[], const int* imp,
+                     double dsdq[], double bmasdq[], double bpasdq[]);
+
+/* ------------------------------ Clawpack 4.6 headers ------------------------------------------ */
+
 #define CLAWPACK5_RPN2_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpn2_manifold, \
                                                CLAWPACK5_RPN2_MANIFOLD)
 void CLAWPACK5_RPN2_MANIFOLD(const int* ixy,const int* maxm, const int* meqn,
@@ -57,19 +89,24 @@ void CLAWPACK5_RPT2_MANIFOLD(const int* ixy, const int* imp,
                              double aux3[],  double asdq[],
                              double bmasdq[], double bpasdq[]);
 
-#define CLAWPACK46_RPN2_MANIFOLD    FCLAW_F77_FUNC(clawpack46_rpn2_manifold,   \
-                                                   CLAWPACK46_RPN2_MANIFOLD)
-void CLAWPACK46_RPN2_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-                     const int* mbc,const int* mx, double ql[], double qr[],
-                     double auxl[], double auxr[], double wave[],
-                     double s[], double amdq[], double apdq[]);
+#define CLAWPACK5_RPN2_ACOUSTICS_VC FCLAW_F77_FUNC(clawpack5_rpn2_acoustics_vc, \
+                                               CLAWPACK5_RPN2_ACOUSTICS_VC)
+void CLAWPACK5_RPN2_ACOUSTICS_VC(const int* ixy,const int* maxm, const int* meqn,
+                                const int* mwaves, const int* maux,
+                                const int* mbc,const int* mx,
+                                double ql[], double qr[], double auxl[], double auxr[],
+                                double wave[], double s[],double amdq[], double apdq[]);
 
-#define CLAWPACK46_RPT2_MANIFOLD    FCLAW_F77_FUNC(clawpack46_rpt2_manifold,  \
-                                                   CLAWPACK46_RPT2_MANIFOLD)
-void CLAWPACK46_RPT2_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-                     const int* mbc, const int* mx, double ql[], double qr[],
-                     double aux1[], double aux2[], double aux3[], const int* imp,
-                     double dsdq[], double bmasdq[], double bpasdq[]);
+#define CLAWPACK5_RPT2_ACOUSTICS_VC FCLAW_F77_FUNC(clawpack5_rpt2_acoustics_vc, \
+                                               CLAWPACK5_RPT2_ACOUSTICS_VC)
+void CLAWPACK5_RPT2_ACOUSTICS_VC(const int* ixy, const int* imp,
+                             const int* maxm, const int* meqn,
+                             const int* mwaves, const int* maux,
+                             const int* mbc,const int* mx,
+                             double ql[], double qr[],
+                             double aux1[], double aux2[],
+                             double aux3[],  double asdq[],
+                             double bmasdq[], double bpasdq[]);
 
 
 #ifdef __cplusplus

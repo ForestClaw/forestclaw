@@ -12,10 +12,10 @@ add_library(interface_f OBJECT
   user_5.0/qinit.f90 
   user_5.0/tag4refinement.f90 
   user_5.0/tag4coarsening.f90 
-  ${rp}/rpn2acv.f 
-  ${rp}/rpt2acv.f 
-  ${rp}/rpn2_vc_acoustics.f90 
-  ${rp}/rpt2_vc_acoustics.f90
+  ${rp}/clawpack46_rpn2_acoustics_vc.f 
+  ${rp}/clawpack46_rpt2_acoustics_vc.f 
+  ${rp}/clawpack5_rpn2_acoustics_vc.f90 
+  ${rp}/clawpack5_rpt2_acoustics_vc.f90
 )
 
 add_executable(interface 

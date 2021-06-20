@@ -21,12 +21,12 @@ applications_clawpack_acoustics_2d_radial_radial_SOURCES = \
 	applications/clawpack/acoustics/2d/radial/user_5.0/setaux.f90 \
 	applications/clawpack/acoustics/2d/rp/clawpack46_rpn2_acoustics.f \
 	applications/clawpack/acoustics/2d/rp/clawpack46_rpt2_acoustics.f \
-	applications/clawpack/acoustics/2d/rp/clawpack46_rpn2_acoustics_mapped.f \
-	applications/clawpack/acoustics/2d/rp/clawpack46_rpt2_acoustics_mapped.f \
+	applications/clawpack/acoustics/2d/rp/clawpack46_rpn2_acoustics_manifold.f90 \
+	applications/clawpack/acoustics/2d/rp/clawpack46_rpt2_acoustics_manifold.f90 \
 	applications/clawpack/acoustics/2d/rp/clawpack5_rpn2_acoustics.f90 \
 	applications/clawpack/acoustics/2d/rp/clawpack5_rpt2_acoustics.f90 \
-	applications/clawpack/acoustics/2d/rp/clawpack5_rpn2_acoustics_mapped.f90 \
-	applications/clawpack/acoustics/2d/rp/clawpack5_rpt2_acoustics_mapped.f90
+	applications/clawpack/acoustics/2d/rp/clawpack5_rpn2_acoustics_manifold.f90 \
+	applications/clawpack/acoustics/2d/rp/clawpack5_rpt2_acoustics_manifold.f90
 
 EXTRA_DIST += \
 	applications/clawpack/acoustics/2d/radial/fclaw_options.ini \

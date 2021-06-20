@@ -13,12 +13,12 @@ add_library(radial_f OBJECT
   user_5.0/setaux.f90 
   ${rp}/clawpack46_rpn2_acoustics.f 
   ${rp}/clawpack46_rpt2_acoustics.f 
-  ${rp}/clawpack46_rpn2_acoustics_mapped.f90 
-  ${rp}/clawpack46_rpt2_acoustics_mapped.f90 
+  ${rp}/clawpack46_rpn2_acoustics_manifold.f90 
+  ${rp}/clawpack46_rpt2_acoustics_manifold.f90 
   ${rp}/clawpack5_rpn2_acoustics.f90 
   ${rp}/clawpack5_rpt2_acoustics.f90 
-  ${rp}/clawpack5_rpn2_acoustics_mapped.f90 
-  ${rp}/clawpack5_rpt2_acoustics_mapped.f90
+  ${rp}/clawpack5_rpn2_acoustics_manifold.f90 
+  ${rp}/clawpack5_rpt2_acoustics_manifold.f90
 )
 
 add_executable(radial 
