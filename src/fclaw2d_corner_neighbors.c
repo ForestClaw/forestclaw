@@ -201,7 +201,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
             int rproc[FCLAW2D_REFINEFACTOR];
-            int rpatchno;
+            int rpatchno[FCLAW2D_REFINEFACTOR];
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw2d_patch_face_neighbors(domain,
                                          this_block_idx,
@@ -209,8 +209,10 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                                          block_iface,
                                          rproc,
                                          &rblockno,
-                                         &rpatchno,
+                                         rpatchno,
                                          &rfaceno);
+
+            FCLAW_ASSERT(rblockno == *corner_block_idx);
 
             /* Get encoding of transforming a neighbor coordinate across a face */
             fclaw2d_patch_transform_blockface (block_iface, rfaceno, ftransform);
@@ -224,7 +226,6 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             fclaw2d_patch_transform_blockface(iface1, rface1,
                                               ftransform_finegrid->transform);
             ftransform_finegrid->block_iface = iface1;
-            fclaw_debugf("On block face (interior): iface1= %d; rface1 = %d\n",iface1, rface1);
         }
         else if (this_block_idx == *corner_block_idx)
         {
@@ -321,9 +322,6 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
     else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
     {
         **ref_flag_ptr = 0;
-        fclaw_debugf("get_corner_neighbor: this_patch->level   = %d\n",this_patch->level);
-        fclaw_debugf("get_corner_neighbor: corner_patch->level = %d\n",(*corner_patch)->level);
-        fclaw_debugf("\n");
     }
     else /* FCLAW2D_PATCH_DOUBLESIZE */
     {
@@ -491,23 +489,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 }
                 else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                 {
-                    if (this_patch->level != corner_patch->level)
-                    {
-                        fclaw_global_essentialf("\nError : \n");
-                        fclaw_global_essentialf("Corner exchange routine is trying to copy between " \
-                               "patches at \ndifferent levels.  ");
-                        fclaw_global_essentialf("You may be receiving this error because you have\n" \
-                               "built ForestClaw on an Apple M1 machine.  We are working " \
-                               "on fixing this.\n\n");
-                        fclaw_global_essentialf("Info : \n");
-                        fclaw_global_essentialf("       neighbor_level (should be 0) = %d  " \
-                               "(0 : patches are at the same level)\n",neighbor_level);
-                        fclaw_global_essentialf("       this_patch->level = %d\n",this_patch->level);
-                        fclaw_global_essentialf("       corner_patch->level = %d  (Should match level above)\n",corner_patch->level);
-                        fclaw_global_essentialf("\n");
-                        //exit(0);
-
-                    }
                     fclaw2d_patch_copy_corner(s->glob,
                                               this_patch,
                                               corner_patch,
@@ -537,24 +518,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                        local fine grid patch.  We do not need to average to the 
                        remote patch corners unless corners are used in the 
                        interpolation stencil. */
-                    if (coarse_patch->level + 1 != fine_patch->level)
-                    {
-                        fclaw_global_essentialf("\nError (context switching) : \n");
-                        fclaw_global_essentialf("coarse_patch->level = %d; fine_patch->level = %d\n",
-                               coarse_patch->level, fine_patch->level);
-                        fclaw_global_essentialf("Corner interpolation routine is trying to interpolate between\n" \
-                               "patches at the same level.  ");
-                        fclaw_global_essentialf("You may be receiving this error because you have\n" \
-                               "built ForestClaw on an Apple M1 machine.  We are working " \
-                               "on fixing this.\n\n");
-                        fclaw_global_essentialf("Info : \n");
-                        fclaw_global_essentialf("       neighbor_level (should be 1) = %d  " \
-                               "(1 : neighbor is a fine grid)\n",neighbor_level);
-                        fclaw_global_essentialf("       coarse_patch->level = %d\n",coarse_patch->level);
-                        fclaw_global_essentialf("       fine_patch->level = %d  (Should be greater than level above)\n",
-                                        fine_patch->level);
-                        fclaw_global_essentialf("\n");                            
-                    }
                     int coarse_icorner = transform_data_finegrid.icorner;
                     fclaw2d_patch_interpolate_corner(s->glob,
                                                      coarse_patch,
