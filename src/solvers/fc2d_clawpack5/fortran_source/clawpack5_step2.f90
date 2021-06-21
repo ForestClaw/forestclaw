@@ -174,72 +174,72 @@ end subroutine clawpack5_step2
 
 !!    #  See 'cubed_sphere_corners.ipynb'
 
-subroutine clawpack5_fix_corners(mx,my,mbc,meqn,q,sweep_dir, & 
-                                  block_corner_count)
-    implicit none
+SUBROUTINE clawpack5_fix_corners(mx,my,mbc,meqn,q,sweep_dir, & 
+                                 block_corner_count)
+   IMPLICIT NONE
 
-    integer mx,my,mbc,meqn,sweep_dir
-    integer block_corner_count(0:3)
-    double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+   INTEGER :: mx,my,mbc,meqn,sweep_dir
+   INTEGER :: block_corner_count(0:3)
+   DOUBLE PRECISION :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    integer k,m,idata,jdata
-    double precision ihat(0:3),jhat(0:3)
-    integer i1, j1, ibc, jbc
-    logical use_b
+   INTEGER :: k,m,idata,jdata
+   DOUBLE PRECISION :: ihat(0:3),jhat(0:3)
+   INTEGER :: i1, j1, ibc, jbc
+   LOGICAL :: use_b
 
-    !! # Lower left corner
-    ihat(0) = 0.5
-    jhat(0) = 0.5
+   !! # lower left corner
+   ihat(0) = 0.5
+   jhat(0) = 0.5
 
-    !! # Lower right corner
-    ihat(1) = mx+0.5
-    jhat(1) = 0.5
+   !! # Lower right corner
+   ihat(1) = mx+0.5
+   jhat(1) = 0.5
 
-    !! # Upper left corner
-    ihat(2) = 0.5
-    jhat(2) = my+0.5
+   !! # Upper left corner
+   ihat(2) = 0.5
+   jhat(2) = my+0.5
 
-    !! # Upper right corner
-    ihat(3) = mx+0.5
-    jhat(3) = my+0.5
+   !! # Upper right corner
+   ihat(3) = mx+0.5
+   jhat(3) = my+0.5
 
-    do m = 1,meqn
-        do k = 0,3
-            if (block_corner_count(k) .ne. 3) then
-                cycle
-            endif
-            use_b = sweep_dir .eq. 0 .and. (k .eq. 0 .or. k .eq. 3)& 
-                .or.  sweep_dir .eq. 1 .and. (k .eq. 1 .or. k .eq. 2)
-            do ibc = 1,mbc
-                do jbc = 1,mbc
-                    !! # Average fine grid corners onto coarse grid ghost corners
-                    if (k .eq. 0) then
-                        i1 = 1-ibc
-                        j1 = 1-jbc
-                    else if (k .eq. 1) then
-                        i1 = mx+ibc
-                        j1 = 1-jbc
-                    else if (k .eq. 2) then
-                        i1 = 1-ibc
-                        j1 = my+jbc
-                    else if (k .eq. 3) then
-                        i1 = mx+ibc
-                        j1 = my+jbc
-                    end if
+   DO k = 0,3
+      IF (block_corner_count(k) .ne. 3) THEN
+         CYCLE
+      ENDIF
+      use_b = sweep_dir .eq. 0 .and. (k .eq. 0 .or. k .eq. 3)& 
+          .or.  sweep_dir .eq. 1 .and. (k .eq. 1 .or. k .eq. 2)
+      DO ibc = 1,mbc
+         DO jbc = 1,mbc
+            !! # Average fine grid corners onto coarse grid ghost corners
+            IF (k .eq. 0) THEN
+               i1 = 1-ibc
+               j1 = 1-jbc
+            ELSE IF (k .eq. 1) THEN
+               i1 = mx+ibc
+               j1 = 1-jbc
+            ELSE IF (k .eq. 2) THEN
+               i1 = 1-ibc
+               j1 = my+jbc
+            ELSE IF (k .eq. 3) THEN
+               i1 = mx+ibc
+               j1 = my+jbc
+            END if
 
-                    if (use_b) then
-                        !! # Transform involves B                
-                        idata =  j1 + int(ihat(k) - jhat(k))
-                        jdata = -i1 + int(ihat(k) + jhat(k))
-                    else
-                        !! # Transform involves B.transpose()             
-                        idata = -j1 + int(ihat(k) + jhat(k))
-                        jdata =  i1 - int(ihat(k) - jhat(k))
-                    endif 
-                    q(m,i1,j1) = q(m,idata,jdata)
-                end do   !! jbc
-            end do  !! ibc
-        end do   !! corner 'k' loop
-    end do  !! meqn loop
+            IF (use_b) THEN
+               !! # Transform involves B                
+               idata =  j1 + int(ihat(k) - jhat(k))
+               jdata = -i1 + int(ihat(k) + jhat(k))
+            ELSE
+               !! # Transform involves B.transpose()             
+               idata = -j1 + int(ihat(k) + jhat(k))
+               jdata =  i1 - int(ihat(k) - jhat(k))
+            ENDIF
+            DO m = 1,meqn
+               q(m,i1,j1) = q(m,idata,jdata)
+            END DO   !! m=1,meqn
+         END DO  !! jbc
+      END DO   !! ibc
+   END DO  !! loop over corners
 
-end
+END SUBROUTINE clawpack5_fix_corners
