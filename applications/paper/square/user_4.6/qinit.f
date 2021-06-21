@@ -7,8 +7,8 @@
       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
-      integer i, j, mq, blockno, fc2d_clawpack46_get_block
-      double precision xc,yc, xp, yp, zp, xlow, ylow, w, tol
+      integer i, j, blockno, fc2d_clawpack46_get_block
+      double precision xc,yc, xp, yp, zp, xlow, ylow, w
       double precision dxc,xm,ym
 
       double precision q0_physical
@@ -54,7 +54,7 @@ c                 # Not sure what this one is about
                   xm = 0.25
                   ym = 0.25
                   w = dxc/2.d0
-                  q(i,j,mq) = 0                     
+                  q(i,j,1) = 0                     
                   if (blockno .eq.2) then
                       do jj=7,8
                           do ii=1,2

@@ -2,8 +2,7 @@
      &         mx,ql,qr,auxl,auxr,wave,s,amdq,apdq)
       implicit none
 
-      integer maxm, mbc,mwaves,meqn,maux, mx
-      integer ixy
+      integer ixy, maxm, mbc,mwaves,meqn,mx
 
       double precision wave(1-mbc:maxm+mbc, meqn, mwaves)   
       double precision    s(1-mbc:maxm+mbc, mwaves)
@@ -15,7 +14,7 @@
       double precision auxr(1-mbc:maxm+mbc,*)
 
 
-      integer i, iface, m, idir
+      integer i, idir
       double precision qll,qrr
       double precision urrot, ulrot, g, uhat
 

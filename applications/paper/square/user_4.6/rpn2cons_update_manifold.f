@@ -8,7 +8,6 @@
       double precision q(meqn), flux(meqn)
       double precision auxvec_center(maux), auxvec_edge(maux)
       double precision urot
-      integer k
 
 c     # Get cell-centered velocity projected to face 
 c     # 'iface' (in 0,1,2,3) 
