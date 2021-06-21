@@ -36,3 +36,6 @@ target_link_libraries(hemisphere PRIVATE
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
 )
+
+add_test(NAME hemisphere COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(hemisphere PROPERTIES ENVIRONMENT "srcdir=${CMAKE_SOURCE_DIR}")

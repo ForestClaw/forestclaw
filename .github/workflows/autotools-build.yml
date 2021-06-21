@@ -321,30 +321,6 @@ jobs:
         mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=2
         mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=2
 
-
-  clawpack_advection_2d_hemisphere:
-    needs: mpi_build_with_clawpack_enabled
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install openmpi-bin
-    - name: Download Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: clawpack_binaries
-    - name: Untar Files
-      run: tar -xvf clawpack_binaries.tar
-    - name: Run Test
-      run: |
-        cd applications/clawpack/advection/2d/hemisphere
-        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4 --user:example=0
-        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5 --user:example=0
-        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4 --user:example=1
-        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5 --user:example=1
-
-
   clawpack_advection_2d_latlong:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
