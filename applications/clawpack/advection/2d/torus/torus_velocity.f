@@ -49,7 +49,7 @@ c     # ------------------------------------------------------------
       double precision nvec(3), gradpsi(3), sv
 
       double precision p, px, py
-      double precision u(2), uderivs(2)
+      double precision u(2)
 
       double precision pi, pi2
       common /compi/ pi, pi2
@@ -144,7 +144,6 @@ c     # ----------------------------------------------------------------
       implicit none
 
       double precision u(3),v(3),uxv(3),w, torus_dot
-      integer k
 
       uxv(1) =   u(2)*v(3) - u(3)*v(2)
       uxv(2) = -(u(1)*v(3) - u(3)*v(1))

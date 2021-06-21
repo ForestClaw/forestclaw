@@ -80,6 +80,8 @@ struct fc2d_thunderegg_options
     int coarse_sweeps;
     const char *cycle_type;
 
+    int verbosity_level;
+
     /* bicgstab patch solver settings*/
     int patch_bcgs_max_it;
     double patch_bcgs_tol;

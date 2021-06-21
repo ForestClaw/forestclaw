@@ -1,14 +1,27 @@
 ## Makefile.am in applications/elliptic/phasefield
 
-check_PROGRAMS += test/test
+check_LTLIBRARIES = test/libtestutils.la
 
-TESTS = test/run_test.sh
+TEST_EXTENTIONS = .MPI1
+MPI1_LOG_COMPILER = @top_srcdir@/test/run_test.sh
 
-test_test_SOURCES = \
-	test/test.cpp \
+TEST_SRC_DIR = @top_srcdir@
+
+test_libtestutils_la_SOURCES = \
+	test/test.cpp
+
+if FCLAW_ENABLE_THUNDEREGG
+test_libtestutils_la_SOURCES += \
 	test/utils/DomainReader.h \
-	test/utils/DomainReader.cpp \
-	$(TEST_SOURCES)
+	test/utils/DomainReader.cpp 
+endif
 
-test_test_CPPFLAGS = $(TEST_CPPFLAGS) -DDATADIR=\"$(srcdir)/\"
-test_test_LDADD = $(TEST_LDADD)
+test_libtestutils_la_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	$(FCLAW_CLAWPATCH_CPPFLAGS) \
+	$(FCLAW_CPPFLAGS)
+
+if FCLAW_ENABLE_THUNDEREGG
+test_libtestutils_la_CPPFLAGS += \
+	$(FCLAW_THUNDEREGG_CPPFLAGS)
+endif

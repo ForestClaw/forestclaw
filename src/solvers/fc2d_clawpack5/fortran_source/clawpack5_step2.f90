@@ -53,11 +53,11 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
     real(kind=8) :: bmadq(meqn,1-mbc:maxm + mbc)
     REAL(kind=8) :: bpadq(meqn,1-mbc:maxm + mbc)
 
-    INTEGER block_corner_count(0:3), ibc,jbc,m
+    INTEGER block_corner_count(0:3), sweep_dir
 
 
     ! Looping scalar storage
-    integer :: i,j,thread_num
+    integer :: i,j
     real(kind=8) :: dtdx,dtdy,cfl1d
 
     ! Common block storage
@@ -79,41 +79,17 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
     gm = 0.d0
     gp = 0.d0
 
+    !! # Cubed sphere : Set corners for an x-sweep
+    !! # This does nothing for non-cubed-sphere grids. 
+    sweep_dir = 0
+    call clawpack5_fix_corners(mx,my,mbc,meqn,qold,sweep_dir, &
+                               block_corner_count)
+
     ! ============================================================================
     ! Perform X-Sweeps
     DO j = 0,my+1
        ! Copy old q into 1d slice
        q1d(:,1-mbc:mx+mbc) = qold(:,1-mbc:mx+mbc,j)
-
-       IF (j .EQ. 0) THEN
-          DO m = 1,meqn
-             IF (block_corner_count(0) .EQ. 3) THEN
-                DO ibc = 1,mbc
-                   q1d(m,1-ibc) = qold(m,ibc,0)
-                ENDDO
-             ENDIF
-             IF (block_corner_count(1) .EQ. 3) THEN
-                DO ibc = 1,mbc
-                   q1d(m,mx+ibc) = qold(m,mx-ibc+1,0)
-                ENDDO
-             ENDIF
-          ENDDO
-       ELSE IF (j .EQ. my+1) THEN
-          DO m = 1,meqn
-             IF (block_corner_count(2) .EQ. 3) THEN
-                DO ibc = 1,mbc
-                   q1d(m,1-ibc) = qold(m,ibc,my+1)
-                ENDDO
-             ENDIF
-             IF (block_corner_count(3) .EQ. 3) THEN
-                DO ibc = 1,mbc
-                   q1d(m,mx+ibc) = qold(m,mx-ibc+1,my+1)
-                ENDDO
-             ENDIF
-          ENDDO
-       ENDIF
-
-
 
         ! Set dtdx slice if a capacity array exists
         if (mcapa > 0)  then
@@ -157,35 +133,6 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
        ! Copy data along a slice into 1d arrays:
        q1d(:,1-mbc:my+mbc) = qold(:,i,1-mbc:my+mbc)
 
-       IF (i .EQ. 0) THEN
-          DO m = 1,meqn
-             IF (block_corner_count(0) .EQ. 3) THEN
-                DO jbc = 1,mbc
-                   q1d(m,1-jbc) = qold(m,0,jbc)
-                ENDDO
-             ENDIF
-             IF (block_corner_count(2) .EQ. 3) THEN
-                DO jbc = 1,mbc
-                   q1d(m,my+jbc) = qold(m,0,my-jbc+1)
-                ENDDO
-             ENDIF
-          ENDDO
-       ELSE IF (i .EQ. mx+1) THEN
-          DO m = 1,meqn
-             IF (block_corner_count(1) .EQ. 3) THEN
-                DO jbc = 1,mbc
-                   q1d(m,1-jbc) = qold(m,mx+1,jbc)
-                ENDDO
-             ENDIF
-             IF (block_corner_count(3) .EQ. 3) THEN
-                DO jbc= 1,mbc
-                   q1d(m,my+jbc) = qold(m,mx+1,my-jbc+1)
-                ENDDO
-             ENDIF
-          ENDDO
-       ENDIF
-
-
 
         ! Set dt/dy ratio in slice
         if (mcapa > 0) then
@@ -223,3 +170,76 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
 
 
 end subroutine clawpack5_step2
+
+
+!!    #  See 'cubed_sphere_corners.ipynb'
+
+SUBROUTINE clawpack5_fix_corners(mx,my,mbc,meqn,q,sweep_dir, & 
+                                 block_corner_count)
+   IMPLICIT NONE
+
+   INTEGER :: mx,my,mbc,meqn,sweep_dir
+   INTEGER :: block_corner_count(0:3)
+   DOUBLE PRECISION :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+
+   INTEGER :: k,m,idata,jdata
+   DOUBLE PRECISION :: ihat(0:3),jhat(0:3)
+   INTEGER :: i1, j1, ibc, jbc
+   LOGICAL :: use_b
+
+   !! # lower left corner
+   ihat(0) = 0.5
+   jhat(0) = 0.5
+
+   !! # Lower right corner
+   ihat(1) = mx+0.5
+   jhat(1) = 0.5
+
+   !! # Upper left corner
+   ihat(2) = 0.5
+   jhat(2) = my+0.5
+
+   !! # Upper right corner
+   ihat(3) = mx+0.5
+   jhat(3) = my+0.5
+
+   DO k = 0,3
+      IF (block_corner_count(k) .ne. 3) THEN
+         CYCLE
+      ENDIF
+      use_b = sweep_dir .eq. 0 .and. (k .eq. 0 .or. k .eq. 3)& 
+          .or.  sweep_dir .eq. 1 .and. (k .eq. 1 .or. k .eq. 2)
+      DO ibc = 1,mbc
+         DO jbc = 1,mbc
+            !! # Average fine grid corners onto coarse grid ghost corners
+            IF (k .eq. 0) THEN
+               i1 = 1-ibc
+               j1 = 1-jbc
+            ELSE IF (k .eq. 1) THEN
+               i1 = mx+ibc
+               j1 = 1-jbc
+            ELSE IF (k .eq. 2) THEN
+               i1 = 1-ibc
+               j1 = my+jbc
+            ELSE IF (k .eq. 3) THEN
+               i1 = mx+ibc
+               j1 = my+jbc
+            END if
+
+            IF (use_b) THEN
+               !! # Transform involves B                
+               idata =  j1 + int(ihat(k) - jhat(k))
+               jdata = -i1 + int(ihat(k) + jhat(k))
+            ELSE
+               !! # Transform involves B.transpose()             
+               idata = -j1 + int(ihat(k) + jhat(k))
+               jdata =  i1 - int(ihat(k) - jhat(k))
+            ENDIF
+            DO m = 1,meqn
+               q(m,i1,j1) = q(m,idata,jdata)
+            END DO   !! m=1,meqn
+         END DO  !! jbc
+      END DO   !! ibc
+   END DO  !! loop over corners
+
+END SUBROUTINE clawpack5_fix_corners

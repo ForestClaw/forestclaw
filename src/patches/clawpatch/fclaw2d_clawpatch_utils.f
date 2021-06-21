@@ -2,7 +2,7 @@
      &      fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
       implicit none
 
-      double precision sl,sr, s, sc, philim, slim
+      double precision sl,sr, sc, philim, slim
       integer mth
 
 c     # ------------------------------------------------
@@ -130,8 +130,7 @@ c     # calls to T.
       implicit none
       integer i,j,mx, my, mbc
 
-      logical i1, i2
-      logical j1, j2
+      logical i1, j1
 
       i1 = 1-mbc .le. i .and. i .le. mx+mbc
       j1 = 1-mbc .le. j .and. j .le. my+mbc

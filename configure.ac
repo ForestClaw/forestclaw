@@ -13,6 +13,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([config])
 AC_PREFIX_DEFAULT([$PWD/local])
 AX_PREFIX_CONFIG_H([src/fclaw_config.h], [FCLAW])
+AC_CONFIG_FILES([test/test_config.h])
 AM_INIT_AUTOMAKE([parallel-tests subdir-objects])
 AM_SILENT_RULES
 SC_VERSION([FCLAW])
@@ -98,6 +99,7 @@ AC_DEFINE_UNQUOTED(CPP,         ["${CPP}"],         [C preprocessor])
 AC_DEFINE_UNQUOTED(CPPFLAGS,    ["${CPPFLAGS}"],    [C preprocessor flags])
 AC_DEFINE_UNQUOTED(F77,         ["${F77}"],         [F77 compiler])
 AC_DEFINE_UNQUOTED(FFLAGS,      ["${FFLAGS}"],      [F77 compiler flags])
+AC_DEFINE_UNQUOTED(FCFLAGS,     ["${FCFLAGS}"],     [FC compiler flags])
 AC_DEFINE_UNQUOTED(CC,          ["${CC}"],          [C compiler])
 AC_DEFINE_UNQUOTED(CFLAGS,      ["${CFLAGS}"],      [C compiler flags])
 AC_DEFINE_UNQUOTED(CXX,         ["${CXX}"],         [C++ compiler])
@@ -116,6 +118,7 @@ echo "| CPP:             $CPP"
 echo "| CPPFLAGS:        $CPPFLAGS"
 echo "| F77:             $F77"
 echo "| FFLAGS:          $FFLAGS"
+echo "| FCFLAGS:         $FCFLAGS"
 echo "| CC:              $CC"
 echo "| CFLAGS:          $CFLAGS"
 echo "| CXX:             $CXX"

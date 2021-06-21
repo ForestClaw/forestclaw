@@ -25,13 +25,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "radial_user.h"
 
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
+
 static int s_user_options_package_id = -1;
 
 static void *
 radial_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
-    sc_options_add_int    (opt, 0, "example", &user->example, 0, "[user] 0 - nomap; 1 - disk [0]");
+    sc_options_add_int    (opt, 0, "example", &user->example, 0, "[user] 0 - nomap; " \
+                                   "1 - 5-patch disk; 2-pillow-disk [0]");
     sc_options_add_double (opt, 0, "rho",     &user->rho, 1, "[user] rho [1]");
     sc_options_add_double (opt, 0, "bulk",    &user->bulk, 4, "[user] bulk modulus [4]");
     sc_options_add_double (opt, 0, "alpha",   &user->alpha, 0.5, "[user] alpha (for 5-patch map) [0.5]");
@@ -46,24 +50,28 @@ radial_register (user_options_t *user, sc_options_t * opt)
 static fclaw_exit_type_t
 radial_postprocess (user_options_t *user)
 {
-    user->cc = sqrt(user->bulk/user->rho);
-    user->zz = user->rho*user->cc;
+
+    //user->cc = sqrt(user->bulk/user->rho);
+    //user->zz = user->rho*user->cc;
 
     return FCLAW_NOEXIT;
 }
 
 static fclaw_exit_type_t
-radial_check (user_options_t *user)
+radial_check (user_options_t *user,
+             fclaw_options_t *fclaw_opt,
+             fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
-    if (user->example < 0 || user->example > 1) {
+    if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
-    if (user->example == 1 && user->claw_version == 4)
-    {
-        fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
-        return FCLAW_EXIT_QUIET;
-    }
+    if (user->example > 0)
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
+            return FCLAW_EXIT_QUIET;
+        }
     return FCLAW_NOEXIT;
 }
 
@@ -117,8 +125,13 @@ options_check(fclaw_app_t *app, void *package,void *registered)
     FCLAW_ASSERT(registered == NULL);
 
     user = (user_options_t*) package;
+    fclaw_options_t *fclaw_opt = 
+                 (fclaw_options_t*) fclaw_app_get_attribute(app,"Options",NULL);
 
-    return radial_check(user);
+    fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                 (fclaw2d_clawpatch_options_t*)  fclaw_app_get_attribute(app,"clawpatch",NULL);
+
+    return radial_check(user,fclaw_opt, clawpatch_opt);
 }
 
 static void

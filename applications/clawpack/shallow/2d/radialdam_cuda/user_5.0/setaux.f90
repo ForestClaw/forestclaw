@@ -8,7 +8,7 @@ SUBROUTINE user5_setaux_manifold(mbc,mx,my, &
   DOUBLE PRECISION xlower,ylower,dx,dy
   DOUBLE PRECISION aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-  !! Still hoping to be able to include this using 'metric_terms.i'
+  !! Still hoping to be able to include this using 'fclaw2d_metric_terms.i'
   DOUBLE PRECISION         area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
   DOUBLE PRECISION  surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
   DOUBLE PRECISION     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)

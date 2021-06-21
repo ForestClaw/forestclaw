@@ -33,7 +33,7 @@ SUBROUTINE clawpack5_rpt2(ixy,imp,maxm,meqn,mwaves,maux,mbc, &
         mv = 2
     endif
 
-    do 10 i = 2-mbc, mx+mbc
+    do i = 2-mbc, mx+mbc
         h(i) = (qr(1,i-1)+ql(1,i))*0.50d0
         hsqrtl = dsqrt(qr(1,i-1))
         hsqrtr = dsqrt(ql(1,i))
@@ -41,10 +41,10 @@ SUBROUTINE clawpack5_rpt2(ixy,imp,maxm,meqn,mwaves,maux,mbc, &
         u(i) = (qr(mu,i-1)/hsqrtl + ql(mu,i)/hsqrtr) / hsq2
         v(i) = (qr(mv,i-1)/hsqrtl + ql(mv,i)/hsqrtr) / hsq2
         a(i) = dsqrt(grav*h(i))
-    10 END DO
+    END DO
 
 
-    DO 20 i = 2-mbc, mx+mbc
+    DO i = 2-mbc, mx+mbc
         a1 = (0.50d0/a(i))*((v(i)+a(i))*asdq(1,i)-asdq(mv,i))
         a2 = asdq(mu,i) - u(i)*asdq(1,i)
         a3 = (0.50d0/a(i))*(-(v(i)-a(i))*asdq(1,i)+asdq(mv,i))
@@ -66,17 +66,18 @@ SUBROUTINE clawpack5_rpt2(ixy,imp,maxm,meqn,mwaves,maux,mbc, &
 
     !           # compute the flux differences bmasdq and bpasdq
 
-        do 30 m=1,meqn
+        do m=1,meqn
             bmasdq(m,i) = 0.d0
             bpasdq(m,i) = 0.d0
-            do 30 mw=1,mwaves
+            do mw=1,mwaves
                 bmasdq(m,i) = bmasdq(m,i) &
                 + dmin1(sb(mw), 0.d0) * waveb(m,mw)
                 bpasdq(m,i) = bpasdq(m,i) &
                 + dmax1(sb(mw), 0.d0) * waveb(m,mw)
-        30 END DO
+            end do
+        end do
 
-    20 END DO
+    END DO
 
     return
   END SUBROUTINE clawpack5_rpt2

@@ -111,7 +111,7 @@ SUBROUTINE clawpack5_rpt2_manifold(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx, &
 !     # now split asdq into waves:
 
 !     # find a1 thru a3, the coefficients of the 3 eigenvectors:
-    do 20 i = ix1,ixm1
+    do i = ix1,ixm1
         delta(1) = asdq(1,i)
         delta(2) = enx(i)*asdq(2,i)+eny(i)*asdq(3,i)+enz(i)*asdq(4,i)
         delta(3) = etx(i)*asdq(2,i)+ety(i)*asdq(3,i)+etz(i)*asdq(4,i)
@@ -138,20 +138,21 @@ SUBROUTINE clawpack5_rpt2_manifold(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx, &
         wave(3,3,i) = eny(i)*a3*(u(i)+a(i)) + ety(i)*a3*v(i)
         wave(4,3,i) = enz(i)*a3*(u(i)+a(i)) + etz(i)*a3*v(i)
         s(3,i) = (u(i)+a(i)) * gamma(i)/dx
-    20 END DO
+    END DO
 
 
 !    # compute flux difference bpasdq
 !    --------------------------------
 
-    do 40 m=1,meqn
-        do 40 i=ix1,ixm1
+    do m=1,meqn
+        do i=ix1,ixm1
             bpasdq(m,i) = 0.d0
-            do 30 mw=1,mwaves
+            do mw=1,mwaves
                 bpasdq(m,i) = bpasdq(m,i) &
                 + dmax1(s(mw,i),0.d0)*wave(m,mw,i)
-            30 END DO
-    40 END DO
+            END DO
+        end do
+    END DO
 
 !     # project momentum component of bpasdq to tangent plane:
     do i=ix1, ixm1
@@ -210,7 +211,7 @@ SUBROUTINE clawpack5_rpt2_manifold(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx, &
 !     # now split asdq into waves:
 
 !     # find a1 thru a3, the coefficients of the 3 eigenvectors:
-    do 80 i = ix1,ixm1
+    do i = ix1,ixm1
         delta(1) = asdq(1,i)
         delta(2) = enx(i)*asdq(2,i)+eny(i)*asdq(3,i)+enz(i)*asdq(4,i)
         delta(3) = etx(i)*asdq(2,i)+ety(i)*asdq(3,i)+etz(i)*asdq(4,i)
@@ -238,20 +239,21 @@ SUBROUTINE clawpack5_rpt2_manifold(ixy,imp,maxm,meqn,mwaves,maux,mbc,mx, &
         wave(3,3,i) = eny(i)*a3*(u(i)+a(i)) + ety(i)*a3*v(i)
         wave(4,3,i) = enz(i)*a3*(u(i)+a(i)) + etz(i)*a3*v(i)
         s(3,i) = (u(i)+a(i)) * gamma(i)/dx
-    80 END DO
+    END DO
 
 
 !    # compute flux difference bmasdq
 !    --------------------------------
 
-    DO 100 m=1,meqn
-        do 100 i=ix1,ixm1
+    DO m=1,meqn
+        do i=ix1,ixm1
             bmasdq(m,i) = 0.d0
-            do 90 mw=1,mwaves
+            do mw=1,mwaves
                 bmasdq(m,i) = bmasdq(m,i) &
                 + dmin1(s(mw,i), 0.d0)*wave(m,mw,i)
-            90 END DO
-    100 END DO
+            END DO
+        end do
+    END DO
 !     # project momentum component of bmasdq to tangent plane:
     do i=ix1, ixm1
         if (imp == 1) then

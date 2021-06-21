@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/P4estDomGen.h>
+#include <ThunderEgg/P4estDomainGenerator.h>
 #include <ThunderEgg/GMG/CycleBuilder.h>
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/ValVectorGenerator.h>
@@ -293,7 +293,7 @@ void fc2d_thunderegg_solve(fclaw2d_global_t *glob)
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
     // create map function
-    P4estDomGen::BlockMapFunc bmf = [&](int block_no, double unit_x,      
+    P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x,      
                                         double unit_y, double &x, double &y) 
     {
         double x1,y1,z1;
@@ -310,7 +310,7 @@ void fc2d_thunderegg_solve(fclaw2d_global_t *glob)
     };
 
     // generates levels of patches for GMG
-    P4estDomGen domain_gen(wrap->p4est, ns, 1, inf, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, inf, bmf);
 
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();

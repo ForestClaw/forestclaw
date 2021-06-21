@@ -39,21 +39,8 @@ include src/patches/clawpatch/Makefile.am
 ## Solver libraries (most example apps require both)
 include src/solvers/fc2d_thunderegg/Makefile.am
 
-
-## Multigrid test
-#include applications/clawpack/shallow/2d/tsunami/Makefile.am
-
-## Elliptic example
-include applications/elliptic/poisson/Makefile.am
-
-## Heat equation
-include applications/elliptic/heat/Makefile.am
-
-## Allencahn equation
-include applications/elliptic/allencahn/Makefile.am
-
-## Crystal growth
-include applications/elliptic/phasefield/Makefile.am
+## Applications that use an elliptic solver
+include applications/elliptic/elliptic.apps
 
 endif
 
@@ -150,16 +137,13 @@ endif
 if FCLAW_ENABLE_CUDACLAW
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
-#include src/solvers/fc2d_clawpack5/Makefile.am
-#include src/solvers/fc2d_cudaclaw/Makefile.am
-#
-#include applications/clawpack/advection/2d/swirl_cuda/Makefile.am
-#include applications/clawpack/shallow/2d/radialdam_cuda/Makefile.am
-#include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am
-#include applications/clawpack/euler/2d/shockbubble_cuda/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_cudaclaw/Makefile.am
+
+include applications/cudaclaw.apps
 
 
 endif

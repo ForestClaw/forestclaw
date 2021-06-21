@@ -18,8 +18,8 @@ c
       press  = 0.d0
       ndim   = 2
 
-      do 10 i=1,mx
-       do 10 j=1,my
+      do i=1,mx
+       do j=1,my
          rad      = aux(i,j,1)
          rho      = q(i,j,1)
          u        = q(i,j,2)/q(i,j,1)
@@ -52,7 +52,8 @@ c
      &                          (rho*v*v)
          q(i,j,4) = q(i,j,4) - dt*(ndim-1)/rad *
      &                          v*(qstar(4) + press)
-   10    continue
+      end do
+      end do
 
       return
       end

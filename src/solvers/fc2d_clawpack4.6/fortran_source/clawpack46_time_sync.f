@@ -10,20 +10,20 @@ c    # 4. clawpack46_fort_time_sync_copy
 c    # ----------------------------------------------------------------
 
 
-c    # -----------------------------------------------------------------
-c    # Called BEFORE step update.  This stores the value of the flux
-c    # function at cell centers.  At k=0, the flux at the the first interior
-c    # interior cell is stored;  At k=1, the flux evaluated in the 
-c    # ghost cell is stored;    If there is no flux function, we should 
-c    # set up a dummy function that returns zero.
-c    # 
-c    # These will be stored for each grid and used to compute
-c    # corrections.
-c    # -----------------------------------------------------------------
+c     # -----------------------------------------------------------------
+c     # Called BEFORE step update.  This stores the value of the flux
+c     # function at cell centers.  At k=0, the flux at the the first interior
+c     # interior cell is stored;  At k=1, the flux evaluated in the 
+c     # ghost cell is stored;    If there is no flux function, we should 
+c     # set up a dummy function that returns zero.
+c     # 
+c     # These will be stored for each grid and used to compute
+c     # corrections.
+c     # -----------------------------------------------------------------
       subroutine clawpack46_time_sync_store_flux(mx,my,mbc,meqn,
-     &      maux, blockno, patchno, dt,el0, el1, el2, el3,q, aux,
-     &      flux0,flux1,flux2,flux3,
-     &      rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
+     &     maux, blockno, patchno, dt,el0, el1, el2, el3,q, aux,
+     &     flux0,flux1,flux2,flux3,
+     &     rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
 
       implicit none
 
@@ -46,18 +46,18 @@ c    # -----------------------------------------------------------------
       integer i,j,k,m, idir, iface
 
       do j = 1,my
-c        # left side k=0 = in; k=1 = out
+c     # left side k=0 = in; k=1 = out
          idir = 0
          do k = 0,1
             iface = k
             do m = 1,maux
-c              # Cell centered values;  Each cell-centered value
-c              # will be projected onto edge between interior and
-c              # exterior cell.                
+c     # Cell centered values;  Each cell-centered value
+c     # will be projected onto edge between interior and
+c     # exterior cell.                
                auxvec_center(m) = aux(1-k,j,m)
 
-c              # Use this array to get edge values between interior
-c              # and exterior cells.
+c     # Use this array to get edge values between interior
+c     # and exterior cells.
                auxvec_edge(m) = aux(1,j,m)
             enddo
 
@@ -66,27 +66,27 @@ c              # and exterior cells.
                qvec(m) = q(1-k,j,m)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
-     &               auxvec_center,auxvec_edge,flux)         
+     &           auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
                flux0(j,m,k) = flux0(j,m,k) + dt*el0(j)*flux(m)
             enddo
          enddo
 
-c        # right side 0 = in; 1 = out
+c     # right side 0 = in; 1 = out
          do k = 0,1
             iface = 1-k
             do m = 1,maux
-c              # Cell centered values                
+c     # Cell centered values                
                auxvec_center(m) = aux(mx+k,j,m)
 
-c              # Edge between ghost cell and interior cell               
+c     # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(mx+1,j,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(mx+k,j,m)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
-     &              auxvec_center,auxvec_edge,flux)         
+     &           auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
                flux1(j,m,k) = flux1(j,m,k) + dt*el1(j)*flux(m)
             enddo
@@ -96,41 +96,41 @@ c              # Edge between ghost cell and interior cell
 
       idir = 1
       do i = 1,mx
-c        # bottom side 0 = in; 1 = out0
+c     # bottom side 0 = in; 1 = out0
          do k = 0,1
             iface = k + 2
             do m = 1,maux
-c              # Cell centered values                
+c     # Cell centered values                
                auxvec_center(m) = aux(i,1-k,m)
 
-c              # Edge between ghost cell and interior cell               
+c     # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(i,1,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(i,1-k,m)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
-     &               auxvec_center, auxvec_edge,flux)         
+     &           auxvec_center, auxvec_edge,flux)         
             do m = 1,meqn
                flux2(i,m,k) = flux2(i,m,k) + dt*el2(i)*flux(m)
             enddo
          enddo
 
-c        # Top side 0 = in; 1 = out
+c     # Top side 0 = in; 1 = out
          do k = 0,1
             iface = 3-k
             do m = 1,maux
-c              # Cell centered values                
+c     # Cell centered values                
                auxvec_center(m) = aux(i,my+k,m)
 
-c              # Edge between ghost cell and interior cell               
+c     # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(i,my+1,m)
             enddo
             do m = 1,meqn
                qvec(m) = q(i,my+k,m)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
-     &              auxvec_center,auxvec_edge, flux)         
+     &           auxvec_center,auxvec_edge, flux)         
             do m = 1,meqn
                flux3(i,m,k) = flux3(i,m,k) + dt*el3(i)*flux(m)
             enddo
@@ -267,18 +267,16 @@ c     # grid cells
 
       integer*8 transform_cptr
 
-      logical is_valid_correct
-
       double precision fm,fp,gm,gp,ef
 
       integer i, j, ic, jc, ii1, ii2, jj1, jj2, ii, jj
-      integer i2(0:3), j2(0:3), m, mq
+      integer i2(0:3), j2(0:3), mq
       double precision deltac, areac
 
 
       integer a(2,2), f(2), sc, nm
 
-      logical is_valid_average, skip_this_grid
+      logical skip_this_grid
 
       call fclaw2d_clawpatch_build_transform(transform_cptr,a,f)
 
@@ -361,6 +359,8 @@ c         # sign change ('sc') to account for normals at 0-1
 c         # patch faces which may point in a different direction.
 c         # First column is A*[1;0]        
           sc = (a(1,1) + a(2,1))/2
+          deltac = 0
+          areac = 1
           do mq = 1,meqn
               do jc = 1,my
                   if (iface_coarse .eq. 0) then
@@ -406,6 +406,8 @@ c         # sign change ('sc') to account for normals at 2-3
 c         # patch faces which may point in a different direction.
 c         # Second column is A*[0;1]        
           sc = (a(1,2) + a(2,2))/2
+          deltac = 0
+          areac = 1
           do mq = 1,meqn
               do ic = 1,mx                  
                   if (iface_coarse .eq. 2) then
@@ -484,7 +486,7 @@ c    # -----------------------------------------------------------------
 
       implicit none
 
-      integer mx,my,mbc,meqn,idir,iface_coarse
+      integer mx,my,mbc,meqn,idir
       integer this_iface, this_blockno, neighbor_blockno
 
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -517,13 +519,11 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       double precision efneighbor3(mx,meqn,0:1)
 
 
-      double precision delta, deltap, deltam, area
+      double precision delta, area
 
       integer a(2,2), f(2), sc
 
       double precision fp,fm,gp,gm,ef
-
-      double precision neighborval
 
       integer*8 transform_cptr
 

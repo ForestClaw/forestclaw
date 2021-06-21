@@ -831,8 +831,8 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
 	FCLAW_ASSERT(hole >= 0);
 
-	int psize = (wg - hole)*(meqn + packarea + packextra) + frsize;
-	FCLAW_ASSERT(psize > 0);
+	/* int psize = (wg - hole)*(meqn + packarea + packextra) + frsize; */
+	FCLAW_ASSERT(((wg - hole)*(meqn + packarea + packextra) + frsize) > 0);
 
 	int qareasize = (wg - hole)*(meqn + packarea);
 	int extrasize = (wg - hole)*(packextra);

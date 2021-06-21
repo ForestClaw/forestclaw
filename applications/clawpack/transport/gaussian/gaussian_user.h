@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,15 +36,7 @@ extern "C"
 #endif
 #endif
 
-
-void gaussian_problem_setup(fclaw2d_global_t *glob);
-
-#define GAUSSIAN_SETPROB FCLAW_F77_FUNC(gaussian_setprob,GAUSSIAN_SETPROB)
-void GAUSSIAN_SETPROB(const double* kappa, const double* tfinal);
-
-
-void gaussian_link_solvers(fclaw2d_global_t *glob);
-
+/* Header files are listed in ../all/transport_user.h */
 
 #ifdef __cplusplus
 #if 0

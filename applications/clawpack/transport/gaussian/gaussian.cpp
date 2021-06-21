@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "gaussian_user.h"
 
+#include "../all/transport_options.h"
+#include "../all/transport_user.h"
+
+
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
@@ -34,11 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack5_options.h>
-
-#include "../all/transport_options.h"
-
-#include "../all/transport_user.h"
-
 
 static
 void run_program(fclaw2d_global_t* glob)
@@ -65,7 +64,7 @@ void run_program(fclaw2d_global_t* glob)
         fc2d_clawpack5_solver_initialize();
     }
 
-    gaussian_link_solvers(glob);
+    transport_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run

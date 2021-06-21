@@ -83,8 +83,6 @@ fclaw2d_map_context_t *
                            const double alpha,
                            const double beta)
 {
-    int i;
-
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);

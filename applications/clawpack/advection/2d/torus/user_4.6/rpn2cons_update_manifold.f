@@ -7,8 +7,9 @@
       integer meqn,maux,idir, m, iface
       double precision q(meqn), flux(meqn)
       double precision auxvec_center(maux), auxvec_edge(maux)
-      double precision u,v,w,urot, nv(3)
-      integer k
+c      double precision u,v,w,urot,nv(3)
+      double precision urot
+
 
 cc     # Cell-centered velocities         
 c      u = auxvec_center(4)

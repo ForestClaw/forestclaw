@@ -1,5 +1,4 @@
 #include "phasefield_patch_operator.h"
-#include <ThunderEgg/ValVector.h>
 
 using namespace ThunderEgg;
 
@@ -42,7 +41,7 @@ phasefield::phasefield(const fc2d_thunderegg_options *mg_opt,const phasefield_op
 }
 
 
-void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void phasefield::applySinglePatch(const PatchInfo<2>& pinfo, 
                                  const std::vector<LocalData<2>>& us,
                                  std::vector<LocalData<2>>& fs,
                                  bool interior_dirichlet) const 
@@ -51,13 +50,13 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     //ThunderEgg doesn't care if ghost values are modified, just don't modify the interior values.
 
     int mfields = us.size();
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+    int mx =pinfo.ns[0]; 
+    int my =pinfo.ns[1];
 
 #if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
+    int mbc =pinfo.num_ghost_cells;
+    double xlower =pinfo.starts[0];
+    double ylower =pinfo.starts[1];
 #endif    
 
     /* Apply boundary conditions */
@@ -65,58 +64,58 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     {
         LocalData<2>& u = const_cast<LocalData<2>&>(us[m]);
 
-        if (!pinfo->hasNbr(Side<2>::west()))
+        if (pinfo.hasNbr(Side<2>::west()))
         {
             /* Physical boundary */
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
             for(int j = 0; j < my; j++)
                 ghosts[{j}] = s[0]*u[{0,j}];
         }
         else if (interior_dirichlet)
         {
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
             for(int j = 0; j < my; j++)
                 ghosts[{j}] = -u[{0,j}];
         }
 
-        if (!pinfo->hasNbr(Side<2>::east()))
+        if (pinfo.hasNbr(Side<2>::east()))
         {
             /* Physical boundary */
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
             for(int j = 0; j < my; j++)
                 ghosts[{j}] = s[1]*u[{mx-1,j}];            
         } 
         else if (interior_dirichlet)
         {
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
             for(int j = 0; j < my; j++)
                 ghosts[{j}] = -u[{mx-1,j}];
         }
 
-        if (!pinfo->hasNbr(Side<2>::south()))
+        if (pinfo.hasNbr(Side<2>::south()))
         {
             /* Physical boundary */
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
             for(int i = 0; i < mx; i++)
                 ghosts[{i}] = s[2]*u[{i,0}];
         }
         else if (interior_dirichlet)
         {
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
             for(int i = 0; i < mx; i++)
                 ghosts[{i}] = -u[{i,0}];
         }
 
-        if (!pinfo->hasNbr(Side<2>::north()))
+        if (pinfo.hasNbr(Side<2>::north()))
         {
             /* Physical boundary */
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
             for(int i = 0; i < mx; i++)
                 ghosts[{i}] = s[3]*u[{i,my-1}];
         }
         else if (interior_dirichlet)
         {
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
             for(int i = 0; i < mx; i++)
                 ghosts[{i}] = -u[{i,my-1}];
         }
@@ -130,8 +129,8 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     LocalData<2>& phi = const_cast<LocalData<2>&>(us[1]);
     LocalData<2>& Aphi = fs[1];
 
-    double dx = pinfo->spacings[0];
-    double dy = pinfo->spacings[1];
+    double dx =pinfo.spacings[0];
+    double dy =pinfo.spacings[1];
     double dx2 = dx*dx;
     double dy2 = dy*dy;
 
@@ -161,7 +160,7 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     double  T = xi*xi;
 
     /* Get local view into phi_n : component 1 */
-    LocalData<2> pn = phi_n->getLocalData(1,pinfo->local_index);
+    LocalData<2> pn = phi_n->getLocalData(pinfo.local_index,1);
 
     for(int j = 0; j < my; j++)
         for(int i = 0; i < mx; i++)
@@ -205,21 +204,21 @@ void phasefield::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 }
 
 
-void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void phasefield::addGhostToRHS(const PatchInfo<2>& pinfo, 
                               const std::vector<LocalData<2>>& us, 
                               std::vector<LocalData<2>>& Aus) const 
 {
     int mfields = us.size();
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+    int mx =pinfo.ns[0]; 
+    int my =pinfo.ns[1];
 
 
 #if 0
 
-    double dx = pinfo->spacings[0];
+    double dx =pinfo.spacings[0];
     double dx2 = dx*dx;
 
-    double dy = pinfo->spacings[1];
+    double dy =pinfo.spacings[1];
     double dy2 = dy*dy;
 
     for(int m = 0; m < mfields; m++)
@@ -229,49 +228,49 @@ void phasefield::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
         for(int j = 0; j < my; j++)
         {
             /* bool hasNbr(Side<D> s) */
-            if (pinfo->hasNbr(Side<2>::west()))
+            if pinfo.hasNbr(Side<2>::west()))
                 Au[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
 
-            if (pinfo->hasNbr(Side<2>::east()))
+            if pinfo.hasNbr(Side<2>::east()))
                 Au[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
         }
 
         for(int i = 0; i < mx; i++)
         {
-            if (pinfo->hasNbr(Side<2>::south()))
+            if pinfo.hasNbr(Side<2>::south()))
                 Au[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
 
-            if (pinfo->hasNbr(Side<2>::north()))
+            if pinfo.hasNbr(Side<2>::north()))
                 Au[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
         }
     }
 #else       
-    ValVector<2> new_u(MPI_COMM_WORLD,pinfo->ns,1,us.size(),1);
-    ValVector<2> new_Au(MPI_COMM_WORLD,pinfo->ns,1,us.size(),1);
+    ValVector<2> new_u(MPI_COMM_WORLD,pinfo.ns,1,us.size(),1);
+    ValVector<2> new_Au(MPI_COMM_WORLD,pinfo.ns,1,us.size(),1);
     auto new_us = new_u.getLocalDatas(0);
     auto new_Aus = new_Au.getLocalDatas(0);
-    if(pinfo->hasNbr(Side<2>::west())){
+    if(pinfo.hasNbr(Side<2>::west())){
         for(int field=0; field<mfields; field++){
             for(int j=0; j < my; j++){
                 new_us[field][{-1,j}]=us[field][{-1,j}]+us[field][{0,j}];
             }
         }
     }
-    if(pinfo->hasNbr(Side<2>::east())){
+    if(pinfo.hasNbr(Side<2>::east())){
         for(int field=0; field<mfields; field++){
             for(int j=0; j < my; j++){
                 new_us[field][{my,j}]=us[field][{my,j}]+us[field][{my-1,j}];
             }
         }
     }
-    if(pinfo->hasNbr(Side<2>::south())){
+    if(pinfo.hasNbr(Side<2>::south())){
         for(int field=0; field<mfields; field++){
             for(int i=0; i < mx; i++){
                 new_us[field][{i,-1}]=us[field][{i,-1}]+us[field][{i,0}];
             }
         }
     }
-    if(pinfo->hasNbr(Side<2>::north())){
+    if(pinfo.hasNbr(Side<2>::north())){
         for(int field=0; field<mfields; field++){
             for(int i=0; i < mx; i++){
                 new_us[field][{i,mx}]=us[field][{i,mx}]+us[field][{i,mx-1}];

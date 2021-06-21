@@ -57,7 +57,7 @@ void annulus_link_solvers(fclaw2d_global_t *glob);
 void annulus_problem_setup(fclaw2d_global_t *glob);
 
 #define SETPROB_ANNULUS FCLAW_F77_FUNC(setprob_annulus,SETPROB_ANNULUS)
-void SETPROB_ANNULUS(const double* beta);
+void SETPROB_ANNULUS();
 
 void annulus_patch_setup(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *this_patch,

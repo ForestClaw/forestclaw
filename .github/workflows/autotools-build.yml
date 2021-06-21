@@ -1,0 +1,694 @@
+name: ForestClaw Build
+on: [push]
+env:
+  CFLAGS: -lgfortran
+  CXXFLAGS: -lgfortran --std=c++17
+  FCFLAGS: -lgfortran -cpp
+  FFLAGS: -lgfortran -cpp
+jobs:
+
+
+################
+# Serial builds
+################
+
+  serial_minimal_build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure
+    - name: Build
+      run: make
+    - name: Tests
+      run: make check
+    - name: Install
+      run: sudo make install
+
+
+  serial_build_with_clawpack_enabled:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-clawpack
+    - name: Build
+      run: make
+    - name: Tests
+      run: make check
+    - name: Install
+      run: sudo make install
+
+
+  serial_build_with_geoclaw_enabled:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-geoclaw
+    - name: Build
+      run: make
+    - name: Tests
+      run: make check
+    - name: Install
+      run: sudo make install
+
+
+  serial_build_with_cudaclaw_enabled:
+    runs-on: ubuntu-20.04
+    env:
+      CUDA_PATH: /usr
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libblas-dev liblapack-dev nvidia-cuda-toolkit
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure CUDA_CFLAGS="-arch=sm_61" LIBS="-lcuda -lcudart -lnvToolsExt" --enable-cudaclaw --disable-shared
+    - name: Build
+      run: make
+    - name: Install
+      run: sudo make install
+
+
+#############
+# MPI builds
+#############
+
+  mpi_minimal_build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-mpi
+    - name: Build
+      run: make
+    - name: Tests
+      run: make check
+    - name: Install
+      run: sudo make install
+
+
+  mpi_build_with_clawpack_enabled:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-clawpack --enable-mpi
+    - name: Build
+      run: make
+    - name: Tests
+      run: make check
+    - name: Install
+      run: sudo make install
+    - name: Tar Files
+      run: tar --exclude='./.git' -cvf clawpack_binaries.tar .
+    - name: Upload Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: clawpack_binaries
+        path: clawpack_binaries.tar
+
+
+  mpi_build_with_geoclaw_enabled:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-geoclaw --enable-mpi
+    - name: Build
+      run: make
+    - name: Tests
+      run: make check
+    - name: Install
+      run: sudo make install
+
+
+  mpi_build_with_cudaclaw_enabled:
+    runs-on: ubuntu-20.04
+    env:
+      CUDA_PATH: /usr
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev nvidia-cuda-toolkit
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure CUDA_CFLAGS="-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include" LIBS="-lcuda -lcudart -lnvToolsExt" --enable-cudaclaw --enable-mpi --disable-shared
+    - name: Build
+      run: make
+    - name: Install
+      run: sudo make install
+
+
+  mpi_build_with_thunderegg_enabled:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        repository: ThunderEgg/ThunderEgg
+        ref: develop
+        path: ThunderEggSrc
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libblas-dev liblapack-dev 
+    - name: Install ThunderEgg
+      run: |
+        cd ThunderEggSrc
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ .
+        make install
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-mpi --enable-thunderegg --with-thunderegg=$GITHUB_WORKSPACE/ThunderEgg
+    - name: Build
+      run: make
+    - name: Tests
+      run: make check
+    - name: Install
+      run: sudo make install
+
+
+############################
+# Clawpack Regression tests
+############################
+
+  clawpack_advection_2d_annulus:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/annulus
+        mpirun -n 2 ./annulus -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./annulus -F regression.ini --user:claw-version=5
+
+
+  clawpack_advection_2d_disk:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/disk
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4 --user:example=0   
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5 --user:example=1
+
+
+  clawpack_advection_2d_filament:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/filament
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=2
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=2
+
+
+  clawpack_advection_2d_hemisphere:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/hemisphere
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5 --user:example=1
+
+
+  clawpack_advection_2d_latlong:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/latlong
+        mpirun -n 2 ./latlong -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./latlong -F regression.ini --user:claw-version=5
+
+
+  clawpack_advection_2d_replicated:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/replicated
+        mpirun -n 2 ./replicated -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./replicated -F regression.ini --user:claw-version=5
+
+  clawpack_advection_2d_periodic:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/periodic
+        mpirun -n 2 ./periodic -F regression.ini  --user:claw-version=4
+        mpirun -n 2 ./periodic -F regression.ini  --user:claw-version=5
+
+  clawpack_advection_2d_sphere:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/sphere
+        mpirun -n 2 ./sphere -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./sphere -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./sphere -F regression.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./sphere -F regression.ini --user:claw-version=5 --user:example=1
+
+  clawpack_advection_2d_swirl:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/swirl
+        mpirun -n 2 ./swirl -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./swirl -F regression.ini --user:claw-version=5
+
+
+  clawpack_advection_2d_torus:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/advection/2d/torus
+        mpirun -n 2 ./torus -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./torus -F regression.ini --user:claw-version=5
+
+
+  clawpack_acoustics_2d_interface:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/acoustics/2d/interface
+        mpirun -n 2 ./interface -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./interface -F regression.ini --user:claw-version=5
+
+
+  clawpack_acoustics_2d_radial:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/acoustics/2d/radial
+        mpirun -n 2 ./radial -F regression.ini     --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=4 --user:example=2
+        mpirun -n 2 ./radial -F regression.ini     --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=5 --user:example=2
+
+
+  clawpack_burgers_2d_pwconst:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/burgers/2d/pwconst
+        mpirun -n 2 ./pwconst -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./pwconst -F regression.ini --user:claw-version=5
+
+
+  clawpack_shallow_2d_bump:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/shallow/2d/bump
+        mpirun -n 2 ./bump -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./bump -F regression.ini --user:claw-version=5
+
+
+  clawpack_shallow_2d_radialdam:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/shallow/2d/radialdam
+        mpirun -n 2 ./radialdam -F regression.ini     --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./radialdam -F regression.ini     --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=2
+
+
+  clawpack_transport_correlatedcb:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/transport/correlatedcb
+        mpirun -n 2 ./correlatedcb -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./correlatedcb -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./correlatedcb -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./correlatedcb -F regression.ini --user:claw-version=5 --user:example=1
+
+
+  clawpack_transport_gaussian:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/transport/gaussian
+        mpirun -n 2 ./gaussian -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./gaussian -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./gaussian -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./gaussian -F regression.ini --user:claw-version=5 --user:example=1
+
+
+  clawpack_transport_slotted_disk:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/transport/slotted_disk
+        mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=5 --user:example=1
+
+
+  clawpack_euler_2d_shockbubble:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/euler/2d/shockbubble
+        mpirun -n 2 ./shockbubble -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./shockbubble -F regression.ini --user:claw-version=5
+
+  clawpack_euler_2d_quadrants:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/euler/2d/quadrants
+        mpirun -n 2 ./quadrants -F regression.ini --user:claw-version=4
+        mpirun -n 2 ./quadrants -F regression.ini --user:claw-version=5
+        

@@ -45,9 +45,9 @@ c     # these will be empty if we are not on a manifold.
       double precision sum, qf, kf
       logical is_manifold
 
-      integer mq,r2, m, m1
-      integer ic, ic1, ibc
-      integer jc, jc1, jbc
+      integer mq,r2, m
+      integer ic, ibc
+      integer jc, jbc
 
 c     # This should be refratio*refratio.
       integer rr2
@@ -206,8 +206,7 @@ c     # these will be empty if we are not on a manifold.
 
       double precision sum
 
-      integer i,j,ibc,jbc,ii,jj,mq,r2
-      integer ifine, jfine
+      integer ibc,jbc,mq,r2
       logical is_manifold
       double precision qf,kf, kc
 
@@ -234,7 +233,7 @@ c     # Loop over four corner cells on coarse grid
          do jbc = 1,mbc
 c           # Average fine grid corners onto coarse grid ghost corners
             if (icorner_coarse .eq. 0) then
-    1          i1 = 1-ibc
+               i1 = 1-ibc
                j1 = 1-jbc
             elseif (icorner_coarse .eq. 1) then
                i1 = mx+ibc
@@ -295,7 +294,7 @@ c     # these will be empty if we are not on a manifold.
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
+      integer i,j, ig, jg, ic_add, jc_add, ii, jj
       integer mq
       double precision sum
       logical is_manifold

@@ -28,7 +28,6 @@
 #include <fclaw2d_global.h>
 
 #include <fclaw2d_patch.h>
-#include <fclaw2d_clawpatch.h>
 
 
 /* Store virtual table for elliptic solver */
@@ -111,7 +110,7 @@ void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
     /* Set up right hand side */
     elliptic_rhs(glob);
 
-    /* Pass p4est point to elliptic solver, solve and transfer solution back. */
+    /* Pass p4est pointer to elliptic solver, solve and transfer solution back. */
     glob->count_elliptic_grids +=  domain->local_num_patches;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE]);    
 
@@ -119,7 +118,6 @@ void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
     
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE]);    
 
-    /* Store global error in EXTRA1, EXTRA2, EXTRA3 ? */
 }
 
 /*---------------------------- Virtual table functions -------------------------------- */

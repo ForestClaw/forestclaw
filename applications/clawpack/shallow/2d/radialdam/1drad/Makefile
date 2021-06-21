@@ -16,6 +16,9 @@
 
 #
 #
+
+F77 = gfortran
+FC = gfortran
 FFLAGS =  -O
 LFLAGS =  -O
 LINK	= gfortran

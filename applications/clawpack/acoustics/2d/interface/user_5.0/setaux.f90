@@ -11,7 +11,7 @@ SUBROUTINE clawpack5_setaux(mbc,mx,my, &
   COMMON /comaux/ rhol,cl,rhor,cr
 
   INTEGER i,j
-  DOUBLE PRECISION xcell, ycell
+  DOUBLE PRECISION xcell
 
   DO j=1-mbc,my+mbc
      DO i=1-mbc,mx+mbc

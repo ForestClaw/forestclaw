@@ -67,6 +67,12 @@ typedef void (*cudaclaw_cuda_rpt2_t)(int idir, int meqn, int mwaves, int maux,
                                      int imp, double dsdq[],
                                      double bmasdq[], double bpasdq[]);
 
+typedef void (*cudaclaw_cuda_speeds_t)(int idir, int meqn, int mwaves, int maux,
+                                       double ql[], double  qr[],
+                                       double auxl[], double auxr[],
+                                       double s[]);
+
+
 /* ------------------------------------- Function headers ------------------------------*/
 
 void cudaclaw_allocate_fluxes(struct fclaw2d_global *glob,

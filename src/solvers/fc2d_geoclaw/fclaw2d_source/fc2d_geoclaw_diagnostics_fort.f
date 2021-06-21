@@ -11,7 +11,7 @@ c    # -------------------------------------------------------------------------
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision c, t, y
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
       integer*8 cont, get_context
@@ -53,7 +53,7 @@ c     # Compute area of a patch
       double precision dx, dy
       double precision sum
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
       integer*8 cont, get_context
@@ -86,7 +86,7 @@ c     # Compute area of a patch
       double precision error_norm(meqn,3)
       double precision error(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
       integer*8 cont, get_context

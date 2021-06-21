@@ -8,7 +8,7 @@ SUBROUTINE user5_setaux_manifold(mbc,mx,my, &
   DOUBLE PRECISION xlower,ylower,dx,dy
   DOUBLE PRECISION aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-  !! Still hoping to be able to include this using 'metric_terms.i'
+  !! Still hoping to be able to include this using 'fclaw2d_metric_terms.i'
   DOUBLE PRECISION         area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
   DOUBLE PRECISION  surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
   DOUBLE PRECISION     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
@@ -26,6 +26,7 @@ SUBROUTINE user5_setaux_manifold(mbc,mx,my, &
         aux(2,i,j) = xnormals(i,j,1)
         aux(3,i,j) = xnormals(i,j,2)
         aux(4,i,j) = xnormals(i,j,3)
+
         aux(5,i,j) = xtangents(i,j,1)
         aux(6,i,j) = xtangents(i,j,2)
         aux(7,i,j) = xtangents(i,j,3)
@@ -33,6 +34,7 @@ SUBROUTINE user5_setaux_manifold(mbc,mx,my, &
         aux(8,i,j)  = ynormals(i,j,1)
         aux(9,i,j)  = ynormals(i,j,2)
         aux(10,i,j) = ynormals(i,j,3)
+        
         aux(11,i,j) = ytangents(i,j,1)
         aux(12,i,j) = ytangents(i,j,2)
         aux(13,i,j) = ytangents(i,j,3)

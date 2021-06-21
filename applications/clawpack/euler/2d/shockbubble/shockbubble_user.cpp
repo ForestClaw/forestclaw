@@ -111,6 +111,26 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
 
-    SHOCKBUBBLE_SETPROB(&user->gamma, &user->x0, &user->y0, &user->r0,
-                        &user->rhoin, &user->pinf, &user->idisc);
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24d   %s",   user->idisc,"\% idisc\n");
+        fprintf(f,  "%-24.16f   %s",   user->gamma,"\% gamma\n");
+        fprintf(f,  "%-24.16f   %s",user->x0,"\% x0\n");
+        fprintf(f,  "%-24.16f   %s",user->y0,"\% y0\n");
+        fprintf(f,  "%-24.16f   %s",user->r0,"\% r0\n");
+        fprintf(f,  "%-24.16f   %s",user->rhoin,"\% rhoin\n");
+        fprintf(f,  "%-24.16f   %s",user->pinf,"\% pinf\n");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+ 
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+
+
+    SHOCKBUBBLE_SETPROB();
 }

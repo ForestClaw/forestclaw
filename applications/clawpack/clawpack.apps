@@ -38,6 +38,9 @@ include applications/clawpack/advection/2d/torus/Makefile.am
 ## replicated (square, multi-block)
 include applications/clawpack/advection/2d/replicated/Makefile.am
 
+## periodic (original)
+include applications/clawpack/advection/2d/periodic/Makefile.am
+
 ## hemisphere (manifold, multi-block)
 include applications/clawpack/advection/2d/hemisphere/Makefile.am
 

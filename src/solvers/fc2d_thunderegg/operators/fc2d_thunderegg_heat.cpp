@@ -46,20 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
-#include <ThunderEgg/BiCGStab.h>
-#include <ThunderEgg/BiCGStabPatchSolver.h>
-#include <ThunderEgg/VarPoisson/StarPatchOperator.h>
-#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/P4estDomGen.h>
-#include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/ValVectorGenerator.h>
+#include <ThunderEgg.h>
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::VarPoisson;
 
 class heat : public PatchOperator<2>
 {
@@ -70,11 +60,11 @@ public:
          std::shared_ptr<const Domain<2>> domain,
          std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
-    void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+    void applySinglePatch(const PatchInfo<2>& pinfo, 
                           const std::vector<LocalData<2>>& us,
                           std::vector<LocalData<2>>& fs,
                           bool interior_dirichlet) const override;
-    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+    void addGhostToRHS(const PatchInfo<2>& pinfo, 
                        const std::vector<LocalData<2>>& us,
                        std::vector<LocalData<2>>& fs) const override;
 
@@ -115,7 +105,7 @@ heat::heat(fclaw2d_global_t *glob,
 }
 
 
-void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void heat::applySinglePatch(const PatchInfo<2>& pinfo, 
                                  const std::vector<LocalData<2>>& us,
                                  std::vector<LocalData<2>>& fs,
                                  bool interior_dirichlet) const 
@@ -126,16 +116,16 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
     //fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     int mfields = us.size();
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+    int mx = pinfo.ns[0]; 
+    int my = pinfo.ns[1];
 
 #if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
+    int mbc = pinfo.num_ghost_cells;
+    double xlower = pinfo.starts[0];
+    double ylower = pinfo.starts[1];
 #endif    
-    double dx = pinfo->spacings[0];
-    double dy = pinfo->spacings[1];
+    double dx = pinfo.spacings[0];
+    double dy = pinfo.spacings[1];
 
     for(int m = 0; m < mfields; m++)
     {
@@ -143,47 +133,47 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
         LocalData<2>& f = fs[m];
 
         //if physical boundary
-        if (!pinfo->hasNbr(Side<2>::west())){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+        if (!pinfo.hasNbr(Side<2>::west())){
+            auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = s[0]*u[{0,j}];
             }
         }else if(interior_dirichlet){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::west(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = -u[{0,j}];
             }
         }
-        if (!pinfo->hasNbr(Side<2>::east())){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+        if (!pinfo.hasNbr(Side<2>::east())){
+            auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = s[1]*u[{mx-1,j}];
             }
         }else if(interior_dirichlet){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::east(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
             for(int j = 0; j < my; j++){
                 ghosts[{j}] = -u[{mx-1,j}];
             }
         }
 
-        if (!pinfo->hasNbr(Side<2>::south())){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+        if (!pinfo.hasNbr(Side<2>::south())){
+            auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = s[2]*u[{i,0}];
             }
         }else if(interior_dirichlet){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::south(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = -u[{i,0}];
             }
         }
-        if (!pinfo->hasNbr(Side<2>::north())){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+        if (!pinfo.hasNbr(Side<2>::north())){
+            auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = s[3]*u[{i,my-1}];
             }
         }else if(interior_dirichlet){
-            auto ghosts = u.getGhostSliceOnSide(Side<2>::north(),1);
+            auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
             for(int i = 0; i < mx; i++){
                 ghosts[{i}] = -u[{i,my-1}];
             }
@@ -227,24 +217,24 @@ void heat::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 }
 
 
-void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
+void heat::addGhostToRHS(const PatchInfo<2>& pinfo, 
                               const std::vector<LocalData<2>>& us, 
                               std::vector<LocalData<2>>& fs) const 
 {
 #if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
+    int mbc = pinfo.num_ghost_cells;
+    double xlower = pinfo.starts[0];
+    double ylower = pinfo.starts[1];
 #endif    
 
     int mfields = us.size();
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+    int mx = pinfo.ns[0]; 
+    int my = pinfo.ns[1];
 
-    double dx = pinfo->spacings[0];
+    double dx = pinfo.spacings[0];
     double dx2 = dx*dx;
 
-    double dy = pinfo->spacings[1];
+    double dy = pinfo.spacings[1];
     double dy2 = dy*dy;
 
     for(int m = 0; m < mfields; m++)
@@ -254,7 +244,7 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
         for(int j = 0; j < my; j++)
         {
             /* bool hasNbr(Side<D> s) */
-            if (pinfo->hasNbr(Side<2>::west()))
+            if (pinfo.hasNbr(Side<2>::west()))
             {
                 f[{0,j}] += -(u[{-1,j}]+u[{0,j}])/dx2;
             }
@@ -263,7 +253,7 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
                 //f[{0,j}] += -(u[{0,j}])/dx2;                
             }
 
-            if (pinfo->hasNbr(Side<2>::east()))
+            if (pinfo.hasNbr(Side<2>::east()))
             {                
                 f[{mx-1,j}] += -(u[{mx-1,j}]+u[{mx,j}])/dx2;
             }
@@ -275,7 +265,7 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
 
         for(int i = 0; i < mx; i++)
         {
-            if (pinfo->hasNbr(Side<2>::south()))
+            if (pinfo.hasNbr(Side<2>::south()))
             {
                 f[{i,0}] += -(u[{i,-1}]+u[{i,0}])/dy2;
             }
@@ -284,7 +274,7 @@ void heat::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo,
                 //f[{i,0}] += -(u[{i,0}])/dy2;                
             }
 
-            if (pinfo->hasNbr(Side<2>::north()))
+            if (pinfo.hasNbr(Side<2>::north()))
             {
                 f[{i,my-1}] += -(u[{i,my-1}]+u[{i,my}])/dy2;
             }
@@ -305,6 +295,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
   
+    GhostFillingType fill_type = GhostFillingType::Faces;
 #if 0  
     fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
 #endif  
@@ -320,7 +311,7 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
     // create map function
-    P4estDomGen::BlockMapFunc bmf = [&](int block_no, double unit_x,      
+    P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x,      
                                         double unit_y, double &x, double &y) 
     {
         double x1,y1,z1;
@@ -329,30 +320,25 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
         y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * y1;
     };
 
-    // create neumann function
-    IsNeumannFunc<2> inf = [&](Side<2> s, const array<double, 2> &lower,
-                               const array<double, 2> &upper) 
-    {
-        return mg_opt->boundary_conditions[s.getIndex()] == 2;
-    };
-
     // generates levels of patches for GMG
-    P4estDomGen domain_gen(wrap->p4est, ns, 1, inf, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
 
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
 
     // ghost filler
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
+    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain, fill_type);
 
     // patch operator
     auto op = make_shared<heat>(glob,te_domain,ghost_filler);
 
     // set the patch solver
+    auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
+    p_bcgs->setTolerance(mg_opt->patch_bcgs_tol);
+    p_bcgs->setMaxIterations(mg_opt->patch_bcgs_max_it);
+
     shared_ptr<PatchSolver<2>>  solver;
-    solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                 mg_opt->patch_bcgs_tol,
-                                                 mg_opt->patch_bcgs_max_it);
+    solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs,op);
 
     // create matrix
     shared_ptr<Operator<2>> A = op;
@@ -406,14 +392,12 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
             next_domain = domain_gen.getCoarserDomain();
 
             //operator
-            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
+            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
             patch_operator = make_shared<heat>(glob,curr_domain, ghost_filler);
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
+            smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs,patch_operator);
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
@@ -438,13 +422,12 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
         //add coarsest level
 
         //operator
-        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
+        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
         patch_operator = make_shared<heat>(glob,curr_domain, ghost_filler);
 
         //smoother
-        smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                       mg_opt->patch_bcgs_tol,
-                                                       mg_opt->patch_bcgs_max_it);
+        smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs,patch_operator);
+
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
 
@@ -467,7 +450,10 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
 #endif    
 
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
+    Iterative::BiCGStab<2> iter_solver;
+    iter_solver.setMaxIterations(mg_opt->max_it);
+    iter_solver.setTolerance(mg_opt->tol);
+    int its = iter_solver.solve(vg, A, u, f, M);
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 

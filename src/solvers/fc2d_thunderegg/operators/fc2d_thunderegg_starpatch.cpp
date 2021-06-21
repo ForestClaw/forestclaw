@@ -46,20 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
-#include <ThunderEgg/BiCGStab.h>
-#include <ThunderEgg/BiCGStabPatchSolver.h>
-#include <ThunderEgg/VarPoisson/StarPatchOperator.h>
-#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/P4estDomGen.h>
-#include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/ValVectorGenerator.h>
+#include <ThunderEgg.h>
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::VarPoisson;
 
 
 /**
@@ -87,6 +77,9 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     fclaw2d_clawpatch_get_options(glob);
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
+
+    // ghost filling type
+    GhostFillingType fill_type = GhostFillingType::Faces;
   
 #if 0  
     fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
@@ -103,7 +96,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
     // create map function
-    P4estDomGen::BlockMapFunc bmf = [&](int block_no, double unit_x,      
+    P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x,      
                                         double unit_y, double &x, double &y) 
     {
         double x1,y1,z1;
@@ -112,15 +105,13 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
         y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * y1;
     };
 
-    // create neumann function
-    IsNeumannFunc<2> inf = [&](Side<2> s, const array<double, 2> &lower,
-                               const array<double, 2> &upper) 
-    {
-        return mg_opt->boundary_conditions[s.getIndex()] == 2;
-    };
+    bitset<4> neumann_bitset;
+    for(int i=0;i<4;i++){
+        neumann_bitset[i]= mg_opt->boundary_conditions[i] == 2;
+    }
 
     // generates levels of patches for GMG
-    P4estDomGen domain_gen(wrap->p4est, ns, 1, inf, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
 
     // get finest level
     shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
@@ -142,19 +133,20 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_func);
 
     // ghost filler
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain);
+    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain, fill_type);
 
     // patch operator
-    auto op = make_shared<StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
+    auto op = make_shared<VarPoisson::StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
+    auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
+    p_bcgs->setTolerance(mg_opt->patch_bcgs_tol);
+    p_bcgs->setMaxIterations(mg_opt->patch_bcgs_max_it);
     shared_ptr<PatchSolver<2>>  solver;
     if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-        solver = make_shared<BiCGStabPatchSolver<2>>(op,
-                                                     mg_opt->patch_bcgs_tol,
-                                                     mg_opt->patch_bcgs_max_it);
+        solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, op);
     }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-        solver = make_shared<Poisson::FFTWPatchSolver<2>>(op);
+        solver = make_shared<Poisson::FFTWPatchSolver<2>>(op, neumann_bitset);
     }
 
     // create matrix
@@ -208,24 +200,23 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
             next_domain = domain_gen.getCoarserDomain();
 
             //operator
-            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
+            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
             auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-            patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+            patch_operator = make_shared<VarPoisson::StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
             prev_beta_vec = restricted_beta_vec;
 
             //smoother
             shared_ptr<GMG::Smoother<2>> smoother;
             if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-                smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                               mg_opt->patch_bcgs_tol,
-                                                               mg_opt->patch_bcgs_max_it);
+                smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
             }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
             }
 
             //restrictor
             auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                    next_domain, clawpatch_opt->rhs_fields);
+                                                                    next_domain, 
+                                                                    clawpatch_opt->rhs_fields);
 
             //interpolator
             auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
@@ -244,22 +235,21 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
         //add coarsest level
 
         //operator
-        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain);
+        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
         auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+        patch_operator = make_shared<VarPoisson::StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
 
         //smoother
         if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-            smoother = make_shared<BiCGStabPatchSolver<2>>(patch_operator,
-                                                           mg_opt->patch_bcgs_tol,
-                                                           mg_opt->patch_bcgs_max_it);
+            smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
         }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-            smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator);
+            smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
         }
 
         //interpolator
         auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                    prev_domain, clawpatch_opt->rhs_fields);
+                                                                    prev_domain, 
+                                                                    clawpatch_opt->rhs_fields);
 
         //vector generator
         vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
@@ -273,7 +263,11 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
     shared_ptr<Vector<2>> u = vg->getNewVector();
 
-    int its = BiCGStab<2>::solve(vg, A, u, f, M, mg_opt->max_it, mg_opt->tol);
+    Iterative::BiCGStab<2> iter_solver;
+    iter_solver.setMaxIterations(mg_opt->max_it);
+    iter_solver.setTolerance(mg_opt->tol);
+    bool vl = mg_opt->verbosity_level != 0;
+    int its = iter_solver.solve(vg, A, u, f, M, vl);
 
     fclaw_global_productionf("Iterations: %i\n", its);
     fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());

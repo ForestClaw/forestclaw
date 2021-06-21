@@ -8,9 +8,7 @@
       logical fclaw2d_map_is_used
 
       double precision x0,y0,r0
-      integer idisc
       common /cdisc/ x0,y0,r0
-      common /comex/ idisc
 
       double precision r2,xp,yp,zp
 

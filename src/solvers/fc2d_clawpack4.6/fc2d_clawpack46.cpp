@@ -352,12 +352,14 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	}
 
 	/* NOTE: qold will be overwritten in this step */
+	CLAWPACK46_SET_BLOCK(&this_block_idx);
 	CLAWPACK46_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
 						  clawpack_options->mthlim, &clawpack_options->mcapa,
 						  &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
 						  work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
 						  claw46_vt->fort_rpn2, claw46_vt->fort_rpt2,claw46_vt->flux2,
 						  block_corner_count, &ierror);
+	CLAWPACK46_UNSET_BLOCK();
 
 	FCLAW_ASSERT(ierror == 0);
 

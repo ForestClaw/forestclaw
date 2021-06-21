@@ -138,7 +138,7 @@ SUBROUTINE torus46_set_center_velocities(mx,my,mbc, &
 
   INTEGER i,j, k
 
-  INCLUDE "metric_terms.i"
+  INCLUDE "fclaw2d_metric_terms.i"
 
   !! # Cell-centered velocities : entries (4,5,6)
   t = 0

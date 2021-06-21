@@ -6,7 +6,7 @@
       double precision sum
       integer i,j
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
       sum = 0
       do j = 1,my
@@ -28,7 +28,7 @@
       double precision minvalue
       integer i,j
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
 c     # minvalue comes in with a value;  we only
 c     # compare it here.
@@ -50,7 +50,7 @@ c     # compare it here.
       double precision maxvalue
       integer i,j
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
 c     # maxvalue comes in with a value;  we only
 c     # compare it here.

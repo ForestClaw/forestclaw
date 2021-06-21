@@ -136,18 +136,19 @@ SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc, &
 !     # amdq = SUM s*wave   over left-going waves
 !     # apdq = SUM s*wave   over right-going waves
 
-    DO 100 m=1,3
-        do 100 i=2-mbc, mx+mbc
+    DO m=1,3
+        do i=2-mbc, mx+mbc
             amdq(m,i) = 0.d0
             apdq(m,i) = 0.d0
-            do 90 mw=1,mwaves
+            do mw=1,mwaves
                 if (s(mw,i) < 0.d0) then
                     amdq(m,i) = amdq(m,i) + s(mw,i)*wave(m,mw,i)
                 else
                     apdq(m,i) = apdq(m,i) + s(mw,i)*wave(m,mw,i)
                 endif
-            90 END DO
-    100 END DO
+            END DO
+        end do
+    END DO
     go to 900
 
 !-----------------------------------------------------
@@ -162,7 +163,7 @@ SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc, &
 !    # Incorporate entropy fix by adding a modified fraction of wave
 !    # if s should change sign.
 
-    do 200 i=2-mbc,mx+mbc
+    do i=2-mbc,mx+mbc
     !           check 1-wave
         him1 = qr(1,i-1)
         s0 =  qr(mu,i-1)/him1 - dsqrt(grav*him1)
@@ -187,9 +188,9 @@ SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc, &
         !              1-wave is rightgoing
             sfract = 0.0d0
         endif
-        do 120 m=1,3
+        do m=1,3
             amdq(m,i) = sfract*wave(m,1,i)
-        120 END DO
+        END DO
 
     !           check 2-wave
         if (s(2,i) > 0.0d0) then
@@ -197,9 +198,9 @@ SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc, &
             go to 200
         endif
 
-        do 140 m=1,3
+        do m=1,3
             amdq(m,i) = amdq(m,i) + s(2,i)*wave(m,2,i)
-        140 END DO
+        END DO
 
     !           check 3-wave
 
@@ -218,10 +219,11 @@ SUBROUTINE clawpack5_rpn2(ixy,maxm,meqn,mwaves,maux,mbc, &
         !              3-wave is rightgoing
             goto 200
         endif
-        do 160 m=1,3
+        do m=1,3
             amdq(m,i) = amdq(m,i) + sfract*wave(m,3,i)
-        160 END DO
+        END DO
     200 END DO
+
 
 !           compute rightgoing flux differences :
 

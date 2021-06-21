@@ -9,7 +9,7 @@
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
       integer i,j
-      double precision x,y,z, xlow, ylow, w
+      double precision xlow, ylow, w
       integer blockno, fc2d_clawpack46_get_block
 
       blockno = fc2d_clawpack46_get_block()

@@ -14,16 +14,15 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my, &
   COMMON /comic/ hin,hout
 
   INTEGER i,j
-  DOUBLE PRECISION xlow,ylow, win
+  DOUBLE PRECISION xc,yc
 
   blockno = fc2d_clawpack5_get_block()
 
   DO i = 1-mbc,mx+mbc
-     xlow = xlower + (i-1.d0)*dx
+     xc = xlower + (i-0.5)*dx
      DO j = 1-mbc,my+mbc
-        ylow = ylower + (j-1.d0)*dy
-        CALL cellave2(blockno,xlow,ylow,dx,dy,win)
-        q(1,i,j) = hin*win + hout*(1.d0-win)
+        yc = ylower + (j-0.5)*dy
+        q(1,i,j) = 0.1d0 + exp(-200.d0*(xc**2 + yc**2))
         q(2,i,j) = 0.d0
         q(3,i,j) = 0.d0
      ENDDO

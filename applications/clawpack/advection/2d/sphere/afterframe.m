@@ -3,12 +3,14 @@ daspect([1 1 1]);
 axis off;
 
 yrbcolormap;
-caxis([0 1]);
+caxis([0 0.1]);
 
 showpatchborders;
 setpatchborderprops('linewidth',1);
 hidepatchborders(7);
 view(3);
+view([129.9, 33.6])
+caxis([0,0.1])
 
 MaxFrames = 64;
 NoQuery = 0;

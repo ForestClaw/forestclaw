@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,10 @@ extern "C"
 
 typedef struct user_options
 {
+    int example;
+
+    double alpha;
+
     double g;
     double x0;
     double y0;
@@ -45,20 +49,28 @@ typedef struct user_options
     double hin;
     double hout;
 
-    double alpha;
-
     int claw_version;
-    int example;
 
     int is_registered;
 } user_options_t;
 
 
 #define RADIALDAM_SETPROB FCLAW_F77_FUNC(radialdam_setprob, RADIALDAM_SETPROB)
-void RADIALDAM_SETPROB(const double *grav, const double* x0, const double* y0,
-                       const double* r0, const double* hin,
-                       const double* hinf, const int* example);
+void RADIALDAM_SETPROB();
 
+
+#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold, \
+                                             USER46_SETAUX_MANIFOLD)
+
+void USER46_SETAUX_MANIFOLD(const int* mbc,
+                            const int* mx, const int* my,
+                            const double* xlower, const double* ylower,
+                            const double* dx, const double* dy,
+                            const int* maux, double aux[],
+                            double xnormals[], double xtangents[],
+                            double ynormals[], double ytangents[],
+                            double surfnormals[],
+                            double area[]);
 
 #define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
                                              USER5_SETAUX_MANIFOLD)
@@ -72,6 +84,7 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double ynormals[], double ytangents[],
                            double surfnormals[],
                            double area[]);
+
 
 void radialdam_problem_setup(fclaw2d_global_t *glob);
 void radialdam_link_solvers(fclaw2d_global_t *glob);
@@ -90,15 +103,14 @@ void radialdam_patch_setup(fclaw2d_global_t *glob,
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
-                                                   const double shift[],
-                                                   const double rotate[],
-                                                   const double alpha);
-
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[]);
 
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha);
 
 #ifdef __cplusplus
 #if 0

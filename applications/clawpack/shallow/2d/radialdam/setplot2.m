@@ -16,7 +16,7 @@ PlotGridEdges = zeros(1,MaxLevels);
 
 PlotType = 1;  % Pseudo-color plot
 
-MappedGrid = 0;
+MappedGrid = 0;  % set Manifold=1, above
 
 % for contour plots (PlotType==2):
 ContourValues = [];
@@ -25,6 +25,6 @@ ContourValues = [];
 x0 = 0;
 y0 = 0;
 UserMap1d = 1;
-ScatterStyle = setplotstyle('ro','m*','cs','gp','ro','k*');
+ScatterStyle = setplotstyle('ro','m*','cs','mp','bo','c*','ro','m*','cs');
 
 PlotParallelPartitions=0;

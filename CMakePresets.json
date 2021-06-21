@@ -1,0 +1,107 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+},
+
+"configurePresets": [
+{
+  "name": "ci",
+  "binaryDir": "${sourceDir}/build",
+  "generator": "Ninja",
+  "cacheVariables": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_CUDA_ARCHITECTURES": "72"
+  },
+  "environment": {
+    "CUDACXX": "/usr/local/cuda/bin/nvcc"
+  }
+},
+{
+  "name": "default",
+  "binaryDir": "${sourceDir}/build",
+  "generator": "Ninja",
+  "cacheVariables": {"CMAKE_BUILD_TYPE": "Release",
+    "mpi": true,
+    "openmp": true}
+},
+{
+  "name": "mac", "inherits": "default",
+  "displayName": "MacOS",
+  "description": "MacOS: OpenMP not used",
+  "cacheVariables": {"openmp": false},
+  "environment": {
+    "CC": "gcc-10",
+    "CXX": "g++-10",
+    "FC": "gfortran-10"
+  }
+},
+{
+  "name": "makemac", "inherits": ["make", "mac"],
+  "displayName": "MacOS with Make",
+  "description": "MacOS: OpenMP not used, using Make"
+},
+{
+  "name": "make", "inherits": "default",
+  "displayName": "build with GNU Make",
+  "generator": "Unix Makefiles"
+},
+{
+  "name": "makewin", "inherits": "default",
+  "displayName": "build with GNU Make: Windows",
+  "generator": "MinGW Makefiles"
+},
+{
+  "name": "intel", "inherits": "default",
+  "displayName": "Intel Classic compiler: Linux/MacOS",
+  "environment": {
+    "CC": "icc",
+    "CXX": "icpc",
+    "FC": "ifort",
+    "MPI_ROOT": "$env{I_MPI_ROOT}"
+  }
+},
+{
+  "name": "intelwin", "inherits": "intel",
+  "displayName": "Intel Classic compiler: Windows",
+  "environment": {
+    "CC": "icl",
+    "CXX": "icl"
+  }
+},
+{
+  "name": "intelnext", "inherits": "intel",
+  "displayName": "Intel oneAPI LLVM",
+  "environment": {
+    "CC": "icx",
+    "CXX": "icx",
+    "FC": "ifx"
+  }
+}
+],
+"buildPresets": [
+  {
+    "name": "default",
+    "configurePreset": "default"
+  },
+  {
+    "name": "ci",
+    "configurePreset": "ci"
+  }
+],
+"testPresets": [
+{
+  "name": "default",
+  "configurePreset": "default",
+  "output": {
+    "outputOnFailure": true,
+    "verbosity": "default"
+  },
+  "execution": {
+    "noTestsAction": "error",
+    "stopOnFailure": false}
+}
+]
+}
