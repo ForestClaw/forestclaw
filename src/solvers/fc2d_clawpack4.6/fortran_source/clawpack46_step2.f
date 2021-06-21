@@ -112,7 +112,7 @@ c
 c      write(6,*) 'Doing x=sweep : blockno = ', blockno
       do  j = 2-mbc,my+mbc-1
 c     
-c     # copy data along a slice into 1d arrays:
+c        # copy data along a slice into 1d arrays:
          do m=1,meqn
             do i = 1-mbc, mx+mbc
                q1d(i,m) = qold(i,j,m)
@@ -136,12 +136,12 @@ c
          endif
 c     
 c     
-c     # Store the value of j along this slice in the common block
-c     # comxyt in case it is needed in the Riemann solver (for
-c     # variable coefficient problems)
+c        # Store the value of j along this slice in the common block
+c        # comxyt in case it is needed in the Riemann solver (for
+c        # variable coefficient problems)
          jcom = j
 c     
-c     # compute modifications fadd and gadd to fluxes along this slice:
+c        # compute modifications fadd and gadd to fluxes along this slice:
          ixy = 1
          call flux2(1,maxm,meqn,maux,mbc,mx,
      &        q1d,dtdx1d,aux1,aux2,aux3,
@@ -152,8 +152,8 @@ c     # compute modifications fadd and gadd to fluxes along this slice:
 
          cflgrid = dmax1(cflgrid,cfl1d)
 c     
-c     # update fluxes for use in AMR:
-c     # NOTE : We update ghost cell values for subcycling
+c        # update fluxes for use in AMR:
+c        # NOTE : We update ghost cell values for subcycling
          do  m=1,meqn
             do  i=2-mbc,mx+mbc
                fm(i,j,m) = fm(i,j,m) + faddm(i,m)
@@ -181,7 +181,7 @@ c     # This does nothing for non-cubed-sphere grids.
 c     
       do  i = 2-mbc, mx+mbc-1
 c     
-c     # copy data along a slice into 1d arrays:
+c        # copy data along a slice into 1d arrays:
          do m=1,meqn
             do j = 1-mbc, my+mbc
                q1d(j,m) = qold(i,j,m)
@@ -223,7 +223,6 @@ c     # compute modifications fadd and gadd to fluxes along this slice:
 c     
 c     #
 c     # update fluxes for use in AMR:
-c     
          do  m=1,meqn
             do  j=2-mbc,my+mbc
                gm(i,j,m) = gm(i,j,m) + faddm(j,m)
@@ -235,7 +234,6 @@ c
             end do
          end do
       end do
-c     
 c     
       return
       end
