@@ -12,40 +12,42 @@ c     ==========================================================
 
       external rpn2, rpt2, flux2
 
-      integer maxm, maxmx, maxmy, meqn, maux, mbc, mx, my, mwork
-      double precision dx, dy, dt, cflgrid
-      integer mwaves, mcapa, method(7), mthlim(mwaves)
-      integer block_corner_count(0:3)
-      integer ierror
+      integer :: maxm, maxmx, maxmy, meqn, maux, mbc, mx, my, mwork
+      double precision :: dx, dy, dt, cflgrid
+      integer :: mwaves, mcapa, method(7), mthlim(mwaves)
+      integer :: block_corner_count(0:3)
+      integer :: ierror
 
 
-      double precision qold(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-      double precision   fm(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-      double precision   fp(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-      double precision   gm(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-      double precision   gp(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-      double precision  q1d(1-mbc:maxm+mbc, meqn)
-      double precision faddm(1-mbc:maxm+mbc, meqn)
-      double precision faddp(1-mbc:maxm+mbc, meqn)
-      double precision gaddm(1-mbc:maxm+mbc, meqn, 2)
-      double precision gaddp(1-mbc:maxm+mbc, meqn, 2)
-      double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
-      double precision aux1(1-mbc:maxm+mbc, maux)
-      double precision aux2(1-mbc:maxm+mbc, maux)
-      double precision aux3(1-mbc:maxm+mbc, maux)
-      double precision dtdx1d(1-mbc:maxm+mbc)
-      double precision dtdy1d(1-mbc:maxm+mbc)
-      double precision work(mwork)
+      double precision :: qold(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision ::   fm(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision ::   fp(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision ::   gm(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision ::   gp(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision ::  q1d(1-mbc:maxm+mbc, meqn)
+      double precision :: faddm(1-mbc:maxm+mbc, meqn)
+      double precision :: faddp(1-mbc:maxm+mbc, meqn)
+      double precision :: gaddm(1-mbc:maxm+mbc, meqn, 2)
+      double precision :: gaddp(1-mbc:maxm+mbc, meqn, 2)
+      double precision :: aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
+      double precision :: aux1(1-mbc:maxm+mbc, maux)
+      double precision :: aux2(1-mbc:maxm+mbc, maux)
+      double precision :: aux3(1-mbc:maxm+mbc, maux)
+      double precision :: dtdx1d(1-mbc:maxm+mbc)
+      double precision :: dtdy1d(1-mbc:maxm+mbc)
+      double precision :: work(mwork)
 
-      double precision dtcom, dxcom, dycom, tcom
-      integer icom, jcom
+      double precision :: dtcom, dxcom, dycom, tcom
+      integer :: icom, jcom
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
-      integer i0wave, i0s, i0amdq, i0apdq, i0cqxx, i0bmadq
-      integer i0bpadq, iused
-      double precision dtdx, dtdy, cfl1d
-      integer m,i,j, ma, ixy
-      integer sweep_dir
+      integer :: i0wave, i0s, i0amdq, i0apdq, i0cqxx, i0bmadq
+      integer :: i0bpadq, iused
+      double precision :: dtdx, dtdy, cfl1d
+      integer :: m,i,j, ma, ixy
+      integer :: sweep_dir
+
+      integer :: blockno, fc2d_clawpack46_get_block
 
       ierror = 0
 c     
@@ -106,6 +108,8 @@ c     # This does nothing for non-cubed-sphere grids.
 c     # perform x-sweeps
 c     ==================
 c     
+      blockno = fc2d_clawpack46_get_block()
+c      write(6,*) 'Doing x=sweep : blockno = ', blockno
       do  j = 2-mbc,my+mbc-1
 c     
 c     # copy data along a slice into 1d arrays:
@@ -238,17 +242,17 @@ c
 
 c     #  See 'cubed_sphere_corners.ipynb'
       subroutine clawpack46_fix_corners(mx,my,mbc,meqn,q,sweep_dir,
-     &             block_corner_count)
+     &     block_corner_count)
       implicit none
 
-      integer mx,my,mbc,meqn,sweep_dir
-      integer block_corner_count(0:3)
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      integer :: mx,my,mbc,meqn,sweep_dir
+      integer :: block_corner_count(0:3)
+      double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer k,m,idata,jdata
-      double precision ihat(0:3),jhat(0:3)
-      integer i1, j1, ibc, jbc
-      logical use_b
+      integer :: k,m,idata,jdata
+      double precision :: ihat(0:3),jhat(0:3)
+      integer :: i1, j1, ibc, jbc
+      logical :: use_b
 
 c     # Lower left corner
       ihat(0) = 0.5
@@ -266,43 +270,43 @@ c     # Upper right corner
       ihat(3) = mx+0.5
       jhat(3) = my+0.5
 
-      do m = 1,meqn
-          do k = 0,3
-              if (block_corner_count(k) .ne. 3) then
-                  cycle
-              endif
-              use_b = sweep_dir .eq. 0 .and. (k .eq. 0 .or. k .eq. 3)
-     &          .or.  sweep_dir .eq. 1 .and. (k .eq. 1 .or. k .eq. 2)
-              do ibc = 1,mbc
-                  do jbc = 1,mbc
-c                     # Average fine grid corners onto coarse grid ghost corners
-                      if (k .eq. 0) then
-                          i1 = 1-ibc
-                          j1 = 1-jbc
-                      elseif (k .eq. 1) then
-                          i1 = mx+ibc
-                          j1 = 1-jbc
-                      elseif (k .eq. 2) then
-                          i1 = 1-ibc
-                          j1 = my+jbc
-                      elseif (k .eq. 3) then
-                          i1 = mx+ibc
-                          j1 = my+jbc
-                      endif
+      do k = 0,3
+         if (block_corner_count(k) .ne. 3) then
+            cycle
+         endif
+         use_b = sweep_dir .eq. 0 .and. (k .eq. 0 .or. k .eq. 3)
+     &        .or.  sweep_dir .eq. 1 .and. (k .eq. 1 .or. k .eq. 2)
+         do ibc = 1,mbc
+            do jbc = 1,mbc
+c              # Average fine grid corners onto coarse grid ghost corners
+               if (k .eq. 0) then
+                  i1 = 1-ibc
+                  j1 = 1-jbc
+               elseif (k .eq. 1) then
+                  i1 = mx+ibc
+                  j1 = 1-jbc
+               elseif (k .eq. 2) then
+                  i1 = 1-ibc
+                  j1 = my+jbc
+               elseif (k .eq. 3) then
+                  i1 = mx+ibc
+                  j1 = my+jbc
+               endif
 
-                      if (use_b) then
-c                         # Transform involves B                
-                          idata =  j1 + int(ihat(k) - jhat(k))
-                          jdata = -i1 + int(ihat(k) + jhat(k))
-                      else
-c                         # Transform involves B.transpose()             
-                          idata = -j1 + int(ihat(k) + jhat(k))
-                          jdata =  i1 - int(ihat(k) - jhat(k))
-                      endif 
-                      q(i1,j1,m) = q(idata,jdata,m)
-                  end do   !! jbc
-              end do  !! ibc
-          end do   !! corner 'k' loop
-      end do  !! meqn loop
+               if (use_b) then
+c                 # Transform involves B                
+                  idata =  j1 + int(ihat(k) - jhat(k))
+                  jdata = -i1 + int(ihat(k) + jhat(k))
+               else
+c                 # Transform involves B.transpose()             
+                  idata = -j1 + int(ihat(k) + jhat(k))
+                  jdata =  i1 - int(ihat(k) - jhat(k))
+               endif 
+               do m = 1,meqn
+                  q(i1,j1,m) = q(idata,jdata,m)
+               end do           !! jbc
+            end do              !! ibc
+         end do                 !! corner 'k' loop
+      end do                    !! meqn loop
 
       end

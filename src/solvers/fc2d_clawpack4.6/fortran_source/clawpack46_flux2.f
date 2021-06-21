@@ -115,6 +115,7 @@ c     ---------------------------------------------------------------------
 c
       call rpn2(ixy,maxm,meqn,mwaves,mbc,mx,q1d,q1d,
      &          aux2,aux2,wave,s,amdq,apdq)
+
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
       do i = 2-mbc, mx+mbc-1
