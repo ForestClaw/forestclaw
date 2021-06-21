@@ -291,12 +291,16 @@ double clawpack5_step2(fclaw2d_global_t *glob,
     //                                CLAWPACK5_FLUX2FW : CLAWPACK5_FLUX2;
     clawpack5_fort_flux2_t flux2 = CLAWPACK5_FLUX2;
     int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
+    CLAWPACK5_SET_BLOCK(&this_block_idx);
+
     CLAWPACK5_STEP2_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
                           clawpack_options->mthlim, &clawpack_options->mcapa,
                           &mwaves,&mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
                           work, &mwork, &xlower, &ylower, &level,&t, fp, fm, gp, gm,
                           claw5_vt->fort_rpn2, claw5_vt->fort_rpt2,flux2,
                           block_corner_count, &ierror);
+    CLAWPACK5_UNSET_BLOCK();
+
 
     FCLAW_ASSERT(ierror == 0);
 
