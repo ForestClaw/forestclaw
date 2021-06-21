@@ -1,9 +1,10 @@
-SUBROUTINE clawpack5_set_amr_module(mwaves_in,mcapa_in,mthlim_in,method_in)
+SUBROUTINE clawpack5_set_amr_module(mwaves_in,mcapa_in,mthlim_in, &
+    method_in, use_fwaves_in)
   USE clawpack5_amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves
   IMPLICIT NONE
 
   INTEGER, INTENT(in) :: mwaves_in, mcapa_in, method_in(7)
-  INTEGER, INTENT(in) :: mthlim_in(mwaves_in)
+  INTEGER, INTENT(in) :: mthlim_in(mwaves_in), use_fwaves_in
 
   mwaves = mwaves_in
   mcapa = mcapa_in
@@ -12,5 +13,5 @@ SUBROUTINE clawpack5_set_amr_module(mwaves_in,mcapa_in,mthlim_in,method_in)
       allocate(mthlim(mwaves))
   endif
   mthlim = mthlim_in
-  use_fwaves = .FALSE.
+  use_fwaves = use_fwaves_in
 END SUBROUTINE clawpack5_set_amr_module
