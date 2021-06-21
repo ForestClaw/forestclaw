@@ -91,7 +91,7 @@ c
       end do
 c     
       if (mcapa.eq.0) then
-c     # no capa array:
+c        # no capa array:
          do  i=1-mbc,maxm+mbc
             dtdx1d(i) = dtdx
             dtdy1d(i) = dtdy
