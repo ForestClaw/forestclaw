@@ -176,11 +176,9 @@ struct fc2d_clawpack46_vtable
 	clawpack46_fort_rpt2_t        fort_rpt2;
 	clawpack46_fort_rpn2_cons_t   fort_rpn2_cons;
 
-#if 1
 	// The signatures for rpn2 and rpn2fw are different, but Fortran doesn't care
 	clawpack46_fort_rpn2fw_t      fort_rpn2fw;
 	clawpack46_fort_rpt2fw_t      fort_rpt2fw;
-#endif
 
   clawpack46_fort_flux2_t     flux2;
 	
