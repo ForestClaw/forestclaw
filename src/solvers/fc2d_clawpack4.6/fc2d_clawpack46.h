@@ -160,7 +160,7 @@ struct fc2d_clawpack46_vtable
 	clawpack46_fort_rpt2_t      fort_rpt2;
 	clawpack46_fort_rpn2_cons_t   fort_rpn2_cons;
 
-    clawpack46_fort_flux2_t     flux2;
+  clawpack46_fort_flux2_t     flux2;
 	
 	int is_set;
 

@@ -276,7 +276,7 @@ c     # grid cells
 
       integer a(2,2), f(2), sc, nm
 
-      logical skip_this_grid
+      logical fc46_skip_this_grid
 
       call fclaw2d_clawpatch_build_transform(transform_cptr,a,f)
 
@@ -369,7 +369,8 @@ c         # First column is A*[1;0]
      &                     i2,j2,transform_cptr)
                       deltac = 0
                       areac = area0(jc)
-                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then
+                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                    then
                           fp = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &                fclaw2d_clawpatch_transform_face_half(ic+1,jc,
@@ -386,7 +387,8 @@ c                         # Check for validity?
      &                      transform_cptr)
                       deltac = 0
                       areac = area1(jc)
-                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then
+                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                 then
                           fm = qfine_dummy(i2(0),j2(0),mq)
     
                           call 
@@ -417,7 +419,8 @@ c         # Second column is A*[0;1]
      &                      transform_cptr)
                       deltac = 0
                       areac = area2(ic)
-                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then                
+                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                  then                
                           gp = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &      fclaw2d_clawpatch_transform_face_half(ic,jc+1,
@@ -434,7 +437,8 @@ c         # Second column is A*[0;1]
      &                      transform_cptr)
                       deltac = 0
                       areac = area3(ic)
-                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then                   
+                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                 then                   
                           gm = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &         fclaw2d_clawpatch_transform_face_half(ic,jc-1,
@@ -529,7 +533,7 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       integer i1,j1, i2, j2
 
 
-      call build_transform_samesize(transform_cptr,a,f)
+      call fc46_build_transform_samesize(transform_cptr,a,f)
 
       idir = this_iface/2
 
@@ -635,17 +639,17 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
       endif
       end
 
-      logical function skip_this_grid(idir,i2,j2,mx,my)
+      logical function fc46_skip_this_grid(idir,i2,j2,mx,my)
       implicit none
 
       integer idir, i2(0:3), j2(0:3), mx,my
       integer m
-      logical is_valid_correct
+      logical fc46_is_valid_correct
 
-      skip_this_grid = .false.
+      fc46_skip_this_grid = .false.
       do m = 0,3
-          if (.not. is_valid_correct(idir,i2(m),j2(m),mx,my)) then
-              skip_this_grid = .true.
+          if (.not. fc46_is_valid_correct(idir,i2(m),j2(m),mx,my)) then
+              fc46_skip_this_grid = .true.
               exit
           endif
       enddo   
@@ -654,7 +658,7 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
       end
 
 
-      logical function is_valid_correct(idir,i,j,mx,my)
+      logical function fc46_is_valid_correct(idir,i,j,mx,my)
       implicit none
 
       integer i,j,mx,my, idir
@@ -664,13 +668,13 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
       j1 = 1 .le. j .and. j .le. my
 
 c     # At least one of the above should be true.
-      is_valid_correct = xor(i1,j1)
+      fc46_is_valid_correct = xor(i1,j1)
 
 
       end
 
 
-      subroutine build_transform_samesize(transform_ptr,a,f)
+      subroutine fc46_build_transform_samesize(transform_ptr,a,f)
       implicit none
 
       integer a(2,2)
