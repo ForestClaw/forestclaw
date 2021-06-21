@@ -6,7 +6,7 @@
       integer flag
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
 
-      integer k, kk, i
+      integer k, i
       logical compute_covariant, compute_contravariant
       logical compute_derivatives, b(32)
 

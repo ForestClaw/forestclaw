@@ -34,8 +34,7 @@ c      end
       double precision velocity(2)
       common /velocity_comm/ velocity      
 
-      double precision s, pim, u1x, u1y, u2x, u2y
-      integer k
+      double precision s, u1x, u1y, u2x, u2y
 
 
 c     # uderivs(1) = u1x      

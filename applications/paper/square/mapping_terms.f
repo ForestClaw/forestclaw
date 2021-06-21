@@ -146,7 +146,6 @@ c     # ----------------------------------------------------------------
       implicit none
 
       double precision u(3),v(3),uxv(3),w, map_dot
-      integer k
 
       uxv(1) =   u(2)*v(3) - u(3)*v(2)
       uxv(2) = -(u(1)*v(3) - u(3)*v(1))
@@ -217,7 +216,6 @@ c     # Contravariant vectors
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
       double precision t1(3), t2(3), t1n2, t2n2
       double precision t1x(3), t1y(3), t2x(3), t2y(3)
-      double precision t1n3, t2n3
       double precision map_dot, map_quotient_rule
       double precision t1n, t2n, dt1ndx, dt1ndy,dt2ndx,dt2ndy
       integer flag, k

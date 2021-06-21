@@ -3,8 +3,7 @@
      &                       bmasdq,bpasdq)
       
       implicit none
-
-      integer ixy, maxm, meqn,mwaves,mbc,mx,maux,imp
+      integer ixy, maxm, meqn,mwaves,mbc,mx,imp
 
       double precision     ql(1-mbc:maxm+mbc, meqn)
       double precision     qr(1-mbc:maxm+mbc, meqn)
@@ -16,7 +15,7 @@
       double precision   aux3(1-mbc:maxm+mbc, *)
 
 
-      integer i, i1, k, idir
+      integer i, i1, idir
       double precision vrrot, vlrot, g, vhat
 
 c     # Transverse direction

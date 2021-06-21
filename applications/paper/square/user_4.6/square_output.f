@@ -2,7 +2,7 @@
      &      (matname1,matname2, time,meqn,maux,ngrids)
       implicit none
 
-      integer iframe,meqn,ngrids, maux, mfields
+      integer meqn,ngrids, maux, mfields
 
       character*11 matname1
       character*11 matname2
@@ -41,8 +41,7 @@
       integer meqn,mbc,mx,my
       integer patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy,time
-      double precision xc,yc,qc,qexact
-      double precision xc1, yc1, zc1, x,y
+      double precision xc,yc,qc
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)

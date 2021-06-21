@@ -11,6 +11,7 @@ applications_paper_square_square_SOURCES = \
 	applications/paper/square/fclaw2d_map_cart.c \
 	applications/paper/square/fclaw2d_map_fivepatch.c \
 	applications/paper/square/fclaw2d_map_bilinear.c \
+	applications/paper/square/value_exceeds_th.f90 \
 	applications/paper/square/setprob.f \
 	applications/paper/square/q0.f \
 	applications/paper/square/fdisc.f \
@@ -26,7 +27,6 @@ applications_paper_square_square_SOURCES = \
 	applications/paper/square/user_4.6/rpn2cons_fw_manifold.f \
 	applications/paper/square/user_4.6/rpt2cons_manifold.f \
 	applications/paper/square/user_4.6/rpn2cons_update_manifold.f \
-	applications/paper/square/user_4.6/square_fort_interpolate.f \
 	applications/paper/square/user_4.6/tag4coarsening.f \
 	applications/paper/square/user_4.6/tag4refinement.f
 

@@ -13,9 +13,9 @@
       integer example
       common /example_comm/ example
 
-      integer i,j,m
+      integer i,j
       double precision xc,yc, qexact
-      double precision xc1, yc1, zc1, x,y
+      double precision xc1, yc1, zc1
       integer flow_flag
 
       cont = get_context()
@@ -43,7 +43,8 @@ c              # In this case, physical and computational are the same.
      &                              xc1,yc1,zc1)
                soln(i,j,1) = qexact(xc1,yc1,t,flow_flag)
             endif
-            error(i,j,1) = q(i,j,1) - soln(i,j,1)
+c            error(i,j,1) = q(i,j,1) - soln(i,j,1)
+             error(i,j,1) = q(i,j,1)
          enddo
       enddo
 
