@@ -20,6 +20,9 @@
 ## swirl  (single block, square)
 add_subdirectory(clawpack/advection/2d/swirl)
 
+## swirlcons  (single block, square)
+add_subdirectory(clawpack/advection/2d/swirl_cons)
+
 ## filament  (square, multi-block disk)
 add_subdirectory(clawpack/advection/2d/filament)
 

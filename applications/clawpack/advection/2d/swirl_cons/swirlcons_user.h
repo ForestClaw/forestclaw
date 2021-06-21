@@ -58,10 +58,8 @@ typedef struct user_options
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(const int* example, const int* mapping, const int* initchoice,
-                   const int* color_equation, const int* use_stream,
-                   const double* alpha);
+#define SWIRLCONS_SETPROB FCLAW_F77_FUNC(swirlcons_setprob, SWIRLCONS_SETPROB)
+void SWIRLCONS_SETPROB();
 
 void swirlcons_link_solvers(struct fclaw2d_global *glob);
 
