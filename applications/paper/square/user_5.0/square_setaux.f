@@ -1,11 +1,11 @@
-      subroutine square46_setaux(blockno, mx,my,mbc,
+      subroutine square5_setaux(blockno, mx,my,mbc,
      &      xlower,ylower,dx,dy, area, edgelengths, 
      &      xp,yp,zp, aux, maux)
       implicit none
 
       integer mbc, mx,my, maux, blockno
       double precision dx,dy, xlower, ylower
-      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
+      double precision aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
       double precision   xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision   yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
@@ -41,8 +41,8 @@ c     # cell-centered velocities
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
 c           # x-face and y-face edge lengths (6,7)      
-            aux(i,j,6) = edgelengths(i,j,1)/dy
-            aux(i,j,7) = edgelengths(i,j,2)/dx
+            aux(6,i,j) = edgelengths(i,j,1)/dy
+            aux(7,i,j) = edgelengths(i,j,2)/dx
          enddo
       enddo
 
@@ -51,8 +51,8 @@ c           # x-face and y-face edge lengths (6,7)
 c             # Map to spherical coordinates in [0,1]x[0,1]
               call map2comp(xp(i,j),yp(i,j),zp(i,j),xc1,yc1)
 
-              aux(i,j,8) = xc1
-              aux(i,j,9) = yc1
+              aux(8,i,j) = xc1
+              aux(9,i,j) = yc1
           end do
       end do
 
@@ -60,14 +60,14 @@ c             # Map to spherical coordinates in [0,1]x[0,1]
       end
 
 
-      subroutine square46_set_velocities(blockno, mx,my,mbc,
+      subroutine square5_set_velocities(blockno, mx,my,mbc,
      &        dx,dy,xlower,ylower, t, xnormals,ynormals,
      &        surfnormals, aux, maux)
       implicit none
 
       integer mx,my,mbc,maux,blockno
       double precision dx,dy, xlower,ylower, t
-      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
       double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
       double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
@@ -85,8 +85,8 @@ c     # Cell-centered velocities : entries (4,5,6)
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
 
-            xc1 = aux(i,j,8)
-            yc1 = aux(i,j,9)
+            xc1 = aux(8,i,j)
+            yc1 = aux(9,i,j)
 
             call velocity_components_cart(xc1,yc1,t, vel)
 
@@ -114,10 +114,10 @@ c           # Subtract out component in the normal direction
             ubrot = map_dot(nb,vel)
             utrot = map_dot(nt,vel)
 
-            aux(i,j,2) = ulrot
-            aux(i,j,3) = urrot
-            aux(i,j,4) = ubrot
-            aux(i,j,5) = utrot
+            aux(2,i,j) = ulrot
+            aux(3,i,j) = urrot
+            aux(4,i,j) = ubrot
+            aux(5,i,j) = utrot
          enddo
       enddo
 

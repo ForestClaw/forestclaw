@@ -1,6 +1,8 @@
-      subroutine rpt2cons_manifold(ixy,maxm,meqn,mwaves,maux,mbc,mx,
-     &                       ql,qr,aux1,aux2,aux3,imp,asdq,
-     &                       bmasdq,bpasdq)
+c     !! Note : rpt2fw requires maux as argument 5
+
+      subroutine clawpack46_rpt2fw_manifold(ixy,maxm,meqn,mwaves,
+     &                       maux,mbc,mx, ql,qr,aux1,aux2,aux3,
+     &                       imp,asdq,bmasdq,bpasdq)
       
       implicit none
       integer ixy, maxm, meqn,mwaves,mbc,mx,imp,maux

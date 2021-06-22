@@ -31,6 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46_options.h>
 #include <clawpack46_user_fort.h>    /* Headers for user defined fortran files */
 
+#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack5_options.h>
+#include <clawpack5_user_fort.h>    /* Headers for user defined fortran files */
+
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
 
@@ -80,9 +84,19 @@ void square_patch_setup_manifold(fclaw2d_global_t *glob,
     int maux;
     fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);    
 
-    SQUARE_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
-                  &dx,&dy, area, edgelengths,xp,yp,zp,
-                  aux, &maux);
+    const user_options_t* user = square_get_options(glob);
+    if (user->claw_version == 4) 
+    {
+        SQUARE46_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
+            &dx,&dy, area, edgelengths,xp,yp,zp,
+            aux, &maux);
+    }
+    else if (user->claw_version == 5)
+    {
+        SQUARE5_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
+            &dx,&dy, area, edgelengths,xp,yp,zp,
+            aux, &maux);
+    }
 
 
     /* Assume that velocities don't depend on t */
@@ -91,16 +105,26 @@ void square_patch_setup_manifold(fclaw2d_global_t *glob,
                                     &xtangents, &ytangents, &surfnormals);
 
     double t = 0; /* Not used */
-    SQUARE_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
-                          &dx, &dy, &xlower, &ylower,
-                          &t, xnormals,ynormals, surfnormals,
-                          aux,&maux);
+    if (user->claw_version == 4)
+    {
+        SQUARE46_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
+                                &dx, &dy, &xlower, &ylower,
+                                &t, xnormals,ynormals, surfnormals,
+                                aux,&maux);
+    }
+    else
+    {
+        SQUARE5_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
+                                &dx, &dy, &xlower, &ylower,
+                                &t, xnormals,ynormals, surfnormals,
+                                aux,&maux);        
+    }
 }
 
 static
 void cb_square_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * this_patch,
-                            int this_block_idx, int this_patch_idx,
+                            fclaw2d_patch_t * patch,
+                            int blockno, int patchno,
                             void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
@@ -112,33 +136,39 @@ void cb_square_output_ascii (fclaw2d_domain_t * domain,
 
     /* Get info not readily available to user */
     int level, patch_num, global_num;
-    fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_block_idx,this_patch_idx,
+    fclaw2d_patch_get_info(glob->domain,patch,
+                           blockno,patchno,
                            &global_num, &patch_num,&level);
     
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    double* error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    double* error = fclaw2d_clawpatch_get_error(glob,patch);
+    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
 
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
 
     /* Here, we pass in q and the error, so need special headers and files */
-    SQUARE_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
-                            &xlower,&ylower,
-                            &dx,&dy,
-                            q,error,soln, &time, 
-                            &patch_num,&level,
-                            &this_block_idx,
-                            &glob->mpirank);
+    const user_options_t* user_opt = square_get_options(glob);
+    if (user_opt->claw_version == 4)
+    {
+        SQUARE46_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
+            &xlower,&ylower, &dx,&dy, q,error,soln, &time,
+            &patch_num,&level, &blockno, &glob->mpirank);
+    }
+    else if (user_opt->claw_version == 5)
+    {
+        SQUARE5_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
+            &xlower,&ylower, &dx,&dy, q,error,soln, &time,
+            &patch_num,&level, &blockno, &glob->mpirank);        
+    }
 }
 
 
@@ -152,17 +182,36 @@ void square_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     patch_vt->setup = &square_patch_setup_manifold;
 
-    fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
-    clawpack46_vt->fort_qinit  = &CLAWPACK46_QINIT;
-    clawpack46_vt->fort_rpn2   = &RPN2CONS_FW_MANIFOLD; 
-    clawpack46_vt->fort_rpt2   = &RPT2CONS_MANIFOLD;      
-    clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+    const user_options_t* user = square_get_options(glob);
+    if (user->claw_version == 4) 
+    {
+        fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
+        clawpack46_vt->fort_qinit  = &CLAWPACK46_QINIT;
+        /* Be careful : Signatures for rpn2fw, rpt2fw not the same as rpn2 and rpt2fw. */
+        clawpack46_vt->fort_rpn2fw   = &CLAWPACK46_RPN2FW_MANIFOLD; 
+        clawpack46_vt->fort_rpt2fw   = &CLAWPACK46_RPT2FW_MANIFOLD;      
+        clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
-    /* Clawpatch functions */
-    //const user_options_t* user = square_get_options(glob);
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    clawpatch_vt->fort_tag4refinement = &SQUARE_TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening = &SQUARE_TAG4COARSENING;        
+        /* Clawpatch functions */
+        //const user_options_t* user = square_get_options(glob);
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        clawpatch_vt->fort_tag4refinement = &SQUARE46_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &SQUARE46_TAG4COARSENING;       
+    } 
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_vtable_t  *clawpack5_vt = fc2d_clawpack5_vt();
+        clawpack5_vt->fort_qinit     = &CLAWPACK5_QINIT;
+        clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2FW_MANIFOLD; 
+        clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2_MANIFOLD;      
+        clawpack5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+
+        /* Clawpatch functions */
+        //const user_options_t* user = square_get_options(glob);
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        clawpatch_vt->fort_tag4refinement = &SQUARE5_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &SQUARE5_TAG4COARSENING;       
+    }
 
 #if 0
     if (0)
@@ -173,15 +222,24 @@ void square_link_solvers(fclaw2d_global_t *glob)
     }
 #endif
 
-
     /* Include error in output files */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error)
     {
-        clawpatch_vt->fort_compute_patch_error = &SQUARE_COMPUTE_ERROR;
-        clawpatch_vt->fort_header_ascii   = &SQUARE_FORT_HEADER_ASCII;
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        if (user->claw_version == 4)
+        {
+            clawpatch_vt->fort_compute_patch_error = &SQUARE46_COMPUTE_ERROR;
+            clawpatch_vt->fort_header_ascii   = &SQUARE46_FORT_HEADER_ASCII;            
+        }
+        else if (user->claw_version == 5)
+        {
+            clawpatch_vt->fort_compute_patch_error = &SQUARE5_COMPUTE_ERROR;
+            clawpatch_vt->fort_header_ascii   = &SQUARE5_FORT_HEADER_ASCII;                        
+        }
         clawpatch_vt->cb_output_ascii     = &cb_square_output_ascii;                
     }
+
  }
 
 

@@ -18,6 +18,7 @@ applications_paper_square_square_SOURCES = \
 	applications/paper/square/square_basis.f \
 	applications/paper/square/mapping_terms.f \
 	applications/paper/square/square_velocity.f \
+	applications/paper/square/rpn2cons_update_manifold.f \
 	applications/paper/square/qexact.f \
 	applications/paper/square/dopri5.f \
 	applications/paper/square/user_4.6/square_output.f \
@@ -26,9 +27,16 @@ applications_paper_square_square_SOURCES = \
 	applications/paper/square/user_4.6/square_setaux.f \
 	applications/paper/square/user_4.6/rpn2cons_fw_manifold.f \
 	applications/paper/square/user_4.6/rpt2cons_manifold.f \
-	applications/paper/square/user_4.6/rpn2cons_update_manifold.f \
 	applications/paper/square/user_4.6/tag4coarsening.f \
-	applications/paper/square/user_4.6/tag4refinement.f
+	applications/paper/square/user_4.6/tag4refinement.f \
+	applications/paper/square/user_5.0/square_output.f \
+	applications/paper/square/user_5.0/compute_error.f \
+	applications/paper/square/user_5.0/qinit.f \
+	applications/paper/square/user_5.0/square_setaux.f \
+	applications/paper/square/user_5.0/rpn2cons_fw_manifold.f \
+	applications/paper/square/user_5.0/rpt2cons_manifold.f \
+	applications/paper/square/user_5.0/tag4coarsening.f \
+	applications/paper/square/user_5.0/tag4refinement.f
 
 EXTRA_DIST += \
 	applications/paper/square/fclaw_options.ini \

@@ -1,4 +1,4 @@
-      subroutine square46_tag4refinement(mx,my,mbc,
+      subroutine square5_tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
      &      q, tag_threshold, init_flag,tag_patch)
       implicit none
@@ -6,7 +6,7 @@
       integer mx,my, mbc, meqn, tag_patch, init_flag, blockno
       double precision xlower, ylower, dx, dy
       double precision tag_threshold
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer i,j, mq, ii, jj
       double precision qmin, qmax, xc, yc
@@ -17,21 +17,21 @@
       tag_patch = 0
 
       mq = 1
-      qmin = q(1,1,mq)
-      qmax = q(1,1,mq)
+      qmin = q(mq,1,1)
+      qmax = q(mq,1,1)
       do j = 1,my
          do i = 1,mx
              xc = xlower + (i-0.5)*dx
              yc = ylower + (j-0.5)*dy
-             qmin = min(qmin,q(i,j,mq))
-             qmax = max(qmax,q(i,j,mq))
+             qmin = min(qmin,q(mq,i,j))
+             qmax = max(qmax,q(mq,i,j))
              do ii = -1,1
                 do jj = -1,1
-                    quad(ii,jj) = q(i+ii,j+jj,mq)
+                    quad(ii,jj) = q(mq,i+ii,j+jj)
                 end do
              end do
              exceeds_th = value_exceeds_th(blockno,
-     &                     q(i,j,mq),qmin,qmax,quad, dx,dy,xc,yc, 
+     &                     q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc, 
      &                     tag_threshold)
 
              if (exceeds_th) then
