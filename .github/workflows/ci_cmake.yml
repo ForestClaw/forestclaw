@@ -76,7 +76,7 @@ jobs:
       run: cmake --build --preset ci
 
     - name: CMake test
-      run: ctest --parallel 2 --output-on-failure
+      run: ctest --test-dir build --parallel 2 --output-on-failure
 
     - name: CMake install (for examples)
       run: cmake --install build
