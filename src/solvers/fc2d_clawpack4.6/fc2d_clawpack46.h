@@ -181,7 +181,6 @@ struct fc2d_clawpack46_vtable
 	clawpack46_fort_rpn2fw_t      fort_rpn2fw;
 	clawpack46_fort_rpt2fw_t      fort_rpt2fw;
 #endif
-
   clawpack46_fort_flux2_t     flux2;
 	
 	int is_set;

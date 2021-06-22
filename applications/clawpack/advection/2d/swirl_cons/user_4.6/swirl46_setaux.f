@@ -4,12 +4,19 @@
      &      surfnormals)
       implicit none
 
-      integer mbc, mx,my, meqn, maux
+      integer mbc, mx,my, maux
       integer blockno
       double precision dx,dy, xlower, ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
-      integer i,j, k
+      double precision        area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+
+
+      integer i,j
       double precision dxdy
 
       integer example
@@ -18,7 +25,7 @@
       integer color_equation
       common /eqn_comm/ color_equation      
 
-      include "fclaw2d_metric_terms.i"
+c      include "fclaw2d_metric_terms.i"
 
 c     # ----------------------------------------------------------------
 c     # Color equation (edge velocities)
@@ -74,7 +81,7 @@ c           # x-face and y-face edge lengths (6,7)
 
       double precision xc, yc
       double precision xc1, yc1, zc1, xc2, yc2, zc2
-      double precision x,y, x1,y1,x2,y2
+      double precision x1,y1,x2,y2
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
       integer*8 cont, get_context
@@ -147,6 +154,12 @@ c           # y-face - left vertex
       double precision dx,dy, xlower,ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
+c      double precision        area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+
       double precision xc,yc
       double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, swirl_dot
 
@@ -161,7 +174,7 @@ c           # y-face - left vertex
 
       integer i,j, k
 
-      include "fclaw2d_metric_terms.i"
+c      include "fclaw2d_metric_terms.i"
 
       cont = get_context()
 

@@ -19,10 +19,10 @@ add_library(swirlcons_f OBJECT
 	user_4.6/rpn2cons_ec_manifold.f
 	user_4.6/rpt2cons_manifold.f
 	user_4.6/rpn2cons_update_manifold.f
-	user_4.6/tag4coarsening.f
-	user_4.6/tag4refinement.f
 	${all}/clawpack46_rpn2adv_manifold.f
 	${all}/clawpack46_rpt2adv_manifold.f 
+	user_4.6/tag4coarsening.f
+	user_4.6/tag4refinement.f
 )
 
 add_executable(swirlcons 

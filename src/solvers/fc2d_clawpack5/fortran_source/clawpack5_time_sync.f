@@ -20,7 +20,7 @@ c     #
 c     # These will be stored for each grid and used to compute
 c     # corrections.
 c     # -----------------------------------------------------------------
-      subroutine clawpack46_time_sync_store_flux(mx,my,mbc,meqn,
+      subroutine clawpack5_time_sync_store_flux(mx,my,mbc,meqn,
      &     maux, blockno, patchno, dt,el0, el1, el2, el3,q, aux,
      &     flux0,flux1,flux2,flux3,
      &     rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
@@ -37,8 +37,8 @@ c     # -----------------------------------------------------------------
       double precision flux2(mx,meqn,0:1)
       double precision flux3(mx,meqn,0:1)
 
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision qvec(meqn),flux(meqn)
       double precision auxvec_center(maux), auxvec_edge(maux)
@@ -54,16 +54,16 @@ c     # left side k=0 = in; k=1 = out
 c     # Cell centered values;  Each cell-centered value
 c     # will be projected onto edge between interior and
 c     # exterior cell.                
-               auxvec_center(m) = aux(1-k,j,m)
+               auxvec_center(m) = aux(m,1-k,j)
 
 c     # Use this array to get edge values between interior
 c     # and exterior cells.
-               auxvec_edge(m) = aux(1,j,m)
+               auxvec_edge(m) = aux(m,1,j)
             enddo
 
 
             do m = 1,meqn
-               qvec(m) = q(1-k,j,m)
+               qvec(m) = q(m,1-k,j)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
      &           auxvec_center,auxvec_edge,flux)         
@@ -77,13 +77,13 @@ c     # right side 0 = in; 1 = out
             iface = 1-k
             do m = 1,maux
 c     # Cell centered values                
-               auxvec_center(m) = aux(mx+k,j,m)
+               auxvec_center(m) = aux(m,mx+k,j)
 
 c     # Edge between ghost cell and interior cell               
-               auxvec_edge(m) = aux(mx+1,j,m)
+               auxvec_edge(m) = aux(m,mx+1,j)
             enddo
             do m = 1,meqn
-               qvec(m) = q(mx+k,j,m)
+               qvec(m) = q(m,mx+k,j)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
      &           auxvec_center,auxvec_edge,flux)         
@@ -101,13 +101,13 @@ c     # bottom side 0 = in; 1 = out0
             iface = k + 2
             do m = 1,maux
 c     # Cell centered values                
-               auxvec_center(m) = aux(i,1-k,m)
+               auxvec_center(m) = aux(m,i,1-k)
 
 c     # Edge between ghost cell and interior cell               
-               auxvec_edge(m) = aux(i,1,m)
+               auxvec_edge(m) = aux(m,i,1)
             enddo
             do m = 1,meqn
-               qvec(m) = q(i,1-k,m)
+               qvec(m) = q(m,i,1-k)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
      &           auxvec_center, auxvec_edge,flux)         
@@ -121,13 +121,13 @@ c     # Top side 0 = in; 1 = out
             iface = 3-k
             do m = 1,maux
 c     # Cell centered values                
-               auxvec_center(m) = aux(i,my+k,m)
+               auxvec_center(m) = aux(m,i,my+k)
 
 c     # Edge between ghost cell and interior cell               
-               auxvec_edge(m) = aux(i,my+1,m)
+               auxvec_edge(m) = aux(m,i,my+1)
             enddo
             do m = 1,meqn
-               qvec(m) = q(i,my+k,m)
+               qvec(m) = q(m,i,my+k)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
      &           auxvec_center,auxvec_edge, flux)         
@@ -144,7 +144,7 @@ c    # This is called AFTER the step update.   This accumulates plus and
 c    # minus waves, scaled by dt*edge_length.  This scaling takes care 
 c    # of any division by 2 or 4. 
 c    # -----------------------------------------------------------------
-      subroutine clawpack46_time_sync_accumulate_waves(mx,my,
+      subroutine clawpack5_time_sync_accumulate_waves(mx,my,
      &                                                 mbc,meqn,
      &      dt, dx,dy, patchno,
      &      el0, el1, el2, el3,
@@ -159,10 +159,10 @@ c    # -----------------------------------------------------------------
       integer mx,my,mbc,meqn,patchno
       double precision dt,dx,dy
 
-      double precision fp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision fm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision gp(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision gm(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision fp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision fm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision gp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision gm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision fp_left(my,meqn),fp_right(my,meqn)
       double precision fm_left(my,meqn),fm_right(my,meqn)
@@ -187,21 +187,21 @@ c     # dx or dy.
 
       do j = 1,my
          do m = 1,meqn
-            fp_left(j,m)  = fp_left(j,m) - dt*dy*fp(1,j,m)
-            fm_left(j,m)  = fm_left(j,m) + dt*dy*fm(1,j,m)
+            fp_left(j,m)  = fp_left(j,m) - dt*dy*fp(m,1,j)
+            fm_left(j,m)  = fm_left(j,m) + dt*dy*fm(m,1,j)
 
-            fp_right(j,m) = fp_right(j,m)-dt*dy*fp(mx+1,j,m)
-            fm_right(j,m) = fm_right(j,m)+dt*dy*fm(mx+1,j,m)
+            fp_right(j,m) = fp_right(j,m)-dt*dy*fp(m,mx+1,j)
+            fm_right(j,m) = fm_right(j,m)+dt*dy*fm(m,mx+1,j)
          enddo
       enddo
 
       do i = 1,mx
          do m = 1,meqn
-            gp_bottom(i,m) = gp_bottom(i,m) - dt*dx*gp(i,1,m)
-            gm_bottom(i,m) = gm_bottom(i,m) + dt*dx*gm(i,1,m)
+            gp_bottom(i,m) = gp_bottom(i,m) - dt*dx*gp(m,i,1)
+            gm_bottom(i,m) = gm_bottom(i,m) + dt*dx*gm(m,i,1)
 
-            gp_top(i,m) = gp_top(i,m) - dt*dx*gp(i,my+1,m)
-            gm_top(i,m) = gm_top(i,m) + dt*dx*gm(i,my+1,m)
+            gp_top(i,m) = gp_top(i,m) - dt*dx*gp(m,i,my+1)
+            gm_top(i,m) = gm_top(i,m) + dt*dx*gm(m,i,my+1)
          enddo
       enddo
 
@@ -213,7 +213,7 @@ c    # -----------------------------------------------------------------
 c    # Add fine grid corrections to coarse grid.  
 c    # -----------------------------------------------------------------
 
-      subroutine clawpack46_fort_time_sync_f2c (mx,my,mbc,meqn,
+      subroutine clawpack5_fort_time_sync_f2c (mx,my,mbc,meqn,
      &                                          idir, iface_coarse,
      &                                          coarse_blockno,
      &                                          fine_blockno,
@@ -236,7 +236,7 @@ c    # -----------------------------------------------------------------
       integer mx,my,mbc,meqn,idir,iface_coarse
       integer coarse_blockno, fine_blockno, normal_match
 
-      double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
 c     # Double number of ghost cells so they map to whole coarse
 c     # grid cells      
@@ -276,7 +276,7 @@ c     # grid cells
 
       integer a(2,2), f(2), sc, nm
 
-      logical fc46_skip_this_grid
+      logical fc5_skip_this_grid
 
       call fclaw2d_clawpatch_build_transform(transform_cptr,a,f)
 
@@ -369,8 +369,8 @@ c         # First column is A*[1;0]
      &                     i2,j2,transform_cptr)
                       deltac = 0
                       areac = area0(jc)
-                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
-     &                    then
+                      if (.not. fc5_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                     then
                           fp = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &                fclaw2d_clawpatch_transform_face_half(ic+1,jc,
@@ -387,8 +387,8 @@ c                         # Check for validity?
      &                      transform_cptr)
                       deltac = 0
                       areac = area1(jc)
-                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
-     &                 then
+                      if (.not. fc5_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                      then
                           fm = qfine_dummy(i2(0),j2(0),mq)
     
                           call 
@@ -400,7 +400,7 @@ c                         # Check for validity?
      &                             (fm-fmthis1(jc,mq))
                       endif
                   endif
-                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
+                  qcoarse(mq,ic,jc) = qcoarse(mq,ic,jc) + deltac/areac
               enddo
           enddo
       else
@@ -419,8 +419,8 @@ c         # Second column is A*[0;1]
      &                      transform_cptr)
                       deltac = 0
                       areac = area2(ic)
-                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
-     &                  then                
+                      if (.not. fc5_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                     then                
                           gp = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &      fclaw2d_clawpatch_transform_face_half(ic,jc+1,
@@ -437,8 +437,8 @@ c         # Second column is A*[0;1]
      &                      transform_cptr)
                       deltac = 0
                       areac = area3(ic)
-                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
-     &                 then                   
+                      if (.not. fc5_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                    then                   
                           gm = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &         fclaw2d_clawpatch_transform_face_half(ic,jc-1,
@@ -449,10 +449,7 @@ c         # Second column is A*[0;1]
      &                            (gm-gmthis3(ic,mq))
                       endif
                   endif
-                  qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
-                  if (jc .eq. 1) then
-c                    write(6,'(2I5, 2E24.16)') ic,jc,deltac,deltac/areac
-                  endif
+                  qcoarse(mq,ic,jc) = qcoarse(mq,ic,jc) + deltac/areac
               enddo
           enddo
       endif
@@ -464,7 +461,7 @@ c    # -----------------------------------------------------------------
 c    # Add wave corrections at same level interfaces.  This accounts for
 c    # metric mismatches that can occur at block boundaries.
 c    # -----------------------------------------------------------------
-      subroutine clawpack46_fort_time_sync_samesize(mx,my,mbc,meqn,
+      subroutine clawpack_fort_time_sync_samesize(mx,my,mbc,meqn,
      &                                          idir, this_iface,
      &                                          this_blockno, 
      &                                          neighbor_blockno,
@@ -493,7 +490,7 @@ c    # -----------------------------------------------------------------
       integer mx,my,mbc,meqn,idir
       integer this_iface, this_blockno, neighbor_blockno
 
-      double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision qthis(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision qthis_dummy(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
@@ -536,7 +533,7 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       integer i1,j1, i2, j2
 
 
-      call fc46_build_transform_samesize(transform_cptr,a,f)
+      call fc5_build_transform_samesize(transform_cptr,a,f)
 
       idir = this_iface/2
 
@@ -595,7 +592,7 @@ c                 # x-direction (idir == 0)
                       area = area1(j1)
 
                   endif
-                  qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area
+                  qthis(mq,i1,j1) = qthis(mq,i1,j1) + 0.5*delta/area
               enddo
           enddo
       else
@@ -636,23 +633,23 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
                      area = area3(i1)
 
                   endif
-                  qthis(i1,j1,mq) = qthis(i1,j1,mq) + 0.5*delta/area                 
+                  qthis(mq,i1,j1) = qthis(mq,i1,j1) + 0.5*delta/area                 
               enddo
           enddo
       endif
       end
 
-      logical function fc46_skip_this_grid(idir,i2,j2,mx,my)
+      logical function fc5_skip_this_grid(idir,i2,j2,mx,my)
       implicit none
 
       integer idir, i2(0:3), j2(0:3), mx,my
       integer m
-      logical fc46_is_valid_correct
+      logical fc5_is_valid_correct
 
-      fc46_skip_this_grid = .false.
+      fc5_skip_this_grid = .false.
       do m = 0,3
-          if (.not. fc46_is_valid_correct(idir,i2(m),j2(m),mx,my)) then
-              fc46_skip_this_grid = .true.
+          if (.not. fc5_is_valid_correct(idir,i2(m),j2(m),mx,my)) then
+              fc5_skip_this_grid = .true.
               exit
           endif
       enddo   
@@ -661,7 +658,7 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
       end
 
 
-      logical function fc46_is_valid_correct(idir,i,j,mx,my)
+      logical function fc5_is_valid_correct(idir,i,j,mx,my)
       implicit none
 
       integer i,j,mx,my, idir
@@ -671,13 +668,13 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
       j1 = 1 .le. j .and. j .le. my
 
 c     # At least one of the above should be true.
-      fc46_is_valid_correct = xor(i1,j1)
+      fc5_is_valid_correct = xor(i1,j1)
 
 
       end
 
 
-      subroutine fc46_build_transform_samesize(transform_ptr,a,f)
+      subroutine fc5_build_transform_samesize(transform_ptr,a,f)
       implicit none
 
       integer a(2,2)

@@ -122,10 +122,22 @@ typedef void (*clawpack5_fort_flux2_t)(const int* ixy,const int* maxm, const int
                                         clawpack5_fort_rpn2_t rpn2,
                                         clawpack5_fort_rpt2_t rpt2);
 
+<<<<<<< HEAD
 typedef void (*clawpack5_fort_rpn2_cons_t)(const int* meqn, const int* maux, 
                       const int *idir, const int* iface, 
                                             double q[], double auxvec_center[],
                       double auxvec_edge[], double fq[]);
+=======
+
+//typedef void (*clawpack5_fort_fluxfun_t)(const int* meqn, double q[], double aux[],
+//                                          double fq[]);
+
+
+typedef void (*clawpack5_fort_rpn2_cons_t)(const int* meqn, const int* maux, 
+                                            const int *idir, const int* iface, 
+                                            double q[], double auxvec_center[],
+                                            double auxvec_edge[], double fq[]);
+>>>>>>> feature_claw5_conservation
 
 /* ------------------------------------- Virtual table -------------------------------- */
 
@@ -145,8 +157,14 @@ typedef struct fc2d_clawpack5_vtable
 
     clawpack5_fort_rpn2_t      fort_rpn2;
     clawpack5_fort_rpt2_t      fort_rpt2;
+<<<<<<< HEAD
 
     clawpack5_fort_rpn2_cons_t fort_rpn2_cons;
+=======
+    clawpack5_fort_rpn2_cons_t   fort_rpn2_cons;
+
+    //clawpack5_fort_flux2_t     flux2;
+>>>>>>> feature_claw5_conservation
 
     int is_set;
 } fc2d_clawpack5_vtable_t;
