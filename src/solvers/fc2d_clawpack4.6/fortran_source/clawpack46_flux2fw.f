@@ -4,8 +4,8 @@ c     =====================================================
       subroutine clawpack46_flux2fw(ixy,maxm,meqn,maux,mbc,mx,
      &                              q1d,dtdx1d,aux1,aux2,aux3,
      &                  faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
-     &      amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
-     &      mwaves,mcapa,method,mthlim)
+     &                 amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
+     &                 mwaves,mcapa,method,mthlim)
 c     =====================================================
 c
 c     # clawpack routine ...  modified for AMRCLAW
@@ -96,22 +96,25 @@ c
 c
       logical limit
       double precision dtcom,dxcom,dycom,tcom
-      integer                                icom,jcom
+      integer icom,jcom
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 c
       double precision gupdate
       integer mw,i,jside,m
 
       limit = .false.
-      do 5 mw=1,mwaves
-         if (mthlim(mw) .gt. 0) limit = .true.
-   5     continue
+      do mw = 1,mwaves
+         if (mthlim(mw) .gt. 0) then 
+            limit = .true.
+         endif 
+      end do
+
 c
 c     # initialize flux increments:
 c     -----------------------------
 c
-      do jside=1,2
-         do m=1,meqn
+      do jside = 1,2
+         do m = 1,meqn
             do i = 1-mbc, mx+mbc
                faddm(i,m) = 0.d0
                faddp(i,m) = 0.d0
@@ -130,8 +133,8 @@ c
 
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
-      do i=1,mx+1
-         do m=1,meqn
+      do i = 1,mx+1
+         do m = 1,meqn
             faddp(i,m) = faddp(i,m) - apdq(i,m)
             faddm(i,m) = faddm(i,m) + amdq(i,m)
          end do
@@ -139,10 +142,10 @@ c     # Set fadd for the donor-cell upwind method (Godunov)
 c
 c     # compute maximum wave speed for checking Courant number:
       cfl1d = 0.d0
-      do mw=1,mwaves
-         do i=1,mx+1
-c          # if s>0 use dtdx1d(i) to compute CFL,
-c          # if s<0 use dtdx1d(i-1) to compute CFL:
+      do mw = 1,mwaves
+         do i = 1,mx+1
+c           # if s>0 use dtdx1d(i) to compute CFL,
+c           # if s<0 use dtdx1d(i-1) to compute CFL:
             cfl1d = dmax1(cfl1d, dtdx1d(i)*s(i,mw),
      &                          -dtdx1d(i-1)*s(i,mw))
          end do
@@ -182,7 +185,7 @@ c
 c
        if (method(3).eq.0) go to 999   !# no transverse propagation
 c
-       if (method(2).gt.1 .and. method(3).eq.2) then
+       if (method(2) .gt. 1 .and. method(3).eq.2) then
 c         # incorporate cqxx into amdq and apdq so that it is split also.
           do i = 1, mx+1
              do m=1,meqn
