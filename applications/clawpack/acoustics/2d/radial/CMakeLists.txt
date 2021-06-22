@@ -40,5 +40,5 @@ target_link_libraries(radial PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_test(NAME radial COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(radial PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_test(NAME clawpack_acoustics_2d_radial COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_acoustics_2d_radial PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

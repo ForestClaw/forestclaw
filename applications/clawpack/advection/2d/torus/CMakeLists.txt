@@ -42,5 +42,5 @@ target_link_libraries(torus PRIVATE
   FORESTCLAW::CLAWPACK5
 )
 
-add_test(NAME torus COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(torus PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_test(NAME clawpack_advection_2d_torus COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_advection_2d_torus PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
