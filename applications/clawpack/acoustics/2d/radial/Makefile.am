@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/clawpack/acoustics/2d/radial/radial
 
+TESTS += applications/clawpack/acoustics/2d/radial/regressions.sh
+
 applications_clawpack_acoustics_2d_radial_radial_SOURCES = \
 	applications/clawpack/acoustics/2d/radial/radial.cpp \
 	applications/clawpack/acoustics/2d/radial/radial_user.cpp \
