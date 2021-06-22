@@ -6,9 +6,9 @@ application=$(pwd)/applications/clawpack/advection/2d/hemisphere/hemisphere
 cd $srcdir/applications/clawpack/advection/2d/hemisphere/
 
 # get runner
-if command -v mpirun
+if command -v mpiexec
 then
-	runner="mpirun -n 2"
+	runner="mpiexec -n 2"
 fi
 
 # run programs, exit script with nonzero on failure
