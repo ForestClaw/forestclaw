@@ -257,8 +257,6 @@ double clawpack5_step2(fclaw2d_global_t *glob,
 
     clawpack_options = fc2d_clawpack5_get_options(glob);
 
-    // cp = fclaw2d_clawpatch_get_cp(this_patch);
-
     level = this_patch->level;
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
@@ -303,15 +301,6 @@ double clawpack5_step2(fclaw2d_global_t *glob,
 
 
     FCLAW_ASSERT(ierror == 0);
-
-    //CLAWPACK5_STEP2(&maxm, &meqn, &maux, &mbc, &mx, &my, qold, aux, &dx, &dy, &dt, &cflgrid,
-    //                fm, fp, gm, gp, claw5_vt->rpn2, claw5_vt->rpt2);
-    /* Accumulate fluxes needed for conservative fix-up */
-    if (claw5_vt->fort_fluxfun != NULL)
-    {
-        /* Accumulate fluxes */
-    }
-
 
     delete [] fp;
     delete [] fm;
