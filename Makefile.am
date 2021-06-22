@@ -49,8 +49,9 @@ AM_CPPFLAGS += -DFCLAW_INIDIR=\"$(fclawinidir)\"
 
 # setup test environment
 if FCLAW_MPIRUN
-LOG_COMPILER = @FCLAW_MPIRUN@
-AM_LOG_FLAGS = @FCLAW_MPI_TEST_FLAGS@
+AM_TESTS_ENVIRONMENT = \
+FCLAW_MPIRUN=@FCLAW_MPIRUN@ \
+FCLAW_MPI_TEST_FLAGS=@FCLAW_MPI_TEST_FLAGS@
 endif
 
 # recurse only into subpackages
