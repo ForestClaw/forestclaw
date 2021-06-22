@@ -2,10 +2,10 @@ c
 c
 c     =====================================================
       subroutine clawpack46_flux2fw(ixy,maxm,meqn,maux,mbc,mx,
-     &      q1d,dtdx1d,aux1,aux2,aux3,
-     &      faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
-     &      amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
-     &      mwaves,mcapa,method,mthlim)
+     &                              q1d,dtdx1d,aux1,aux2,aux3,
+     &                  faddm,faddp,gaddm,gaddp,cfl1d,fwave,s,
+     &                 amdq,apdq,cqxx,bmasdq,bpasdq,rpn2,rpt2,
+     &                 mwaves,mcapa,method,mthlim)
 c     =====================================================
 c
 c     # clawpack routine ...  modified for AMRCLAW
@@ -96,30 +96,33 @@ c
 c
       logical limit
       double precision dtcom,dxcom,dycom,tcom
-      integer                                icom,jcom
+      integer icom,jcom
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 c
       double precision gupdate
       integer mw,i,jside,m
 
       limit = .false.
-      do 5 mw=1,mwaves
-         if (mthlim(mw) .gt. 0) limit = .true.
-   5     continue
+      do mw = 1,mwaves
+         if (mthlim(mw) .gt. 0) then 
+            limit = .true.
+         endif 
+      end do
+
 c
 c     # initialize flux increments:
 c     -----------------------------
 c
-      do 30 jside=1,2
-         do 20 m=1,meqn
-            do 10 i = 1-mbc, mx+mbc
+      do jside = 1,2
+         do m = 1,meqn
+            do i = 1-mbc, mx+mbc
                faddm(i,m) = 0.d0
                faddp(i,m) = 0.d0
                gaddm(i,m,jside) = 0.d0
                gaddp(i,m,jside) = 0.d0
-   10          continue
-   20       continue
-   30    continue
+            end do
+        end do
+      end do
 c
 c
 c     # solve Riemann problem at each interface and compute Godunov updates
@@ -129,21 +132,23 @@ c
      &          aux2,aux2,fwave,s,amdq,apdq)
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
-      do 40 i=2-mbc,mx+mbc-1
-         do 40 m=1,meqn
+      do i = 1,mx+1
+         do m = 1,meqn
             faddp(i,m) = faddp(i,m) - apdq(i,m)
             faddm(i,m) = faddm(i,m) + amdq(i,m)
-   40       continue
+         end do
+      end do
 c
 c     # compute maximum wave speed for checking Courant number:
       cfl1d = 0.d0
-      do 50 mw=1,mwaves
-         do 50 i=1,mx+1
-c          # if s>0 use dtdx1d(i) to compute CFL,
-c          # if s<0 use dtdx1d(i-1) to compute CFL:
+      do mw = 1,mwaves
+         do i = 1,mx+1
+c           # if s>0 use dtdx1d(i) to compute CFL,
+c           # if s<0 use dtdx1d(i-1) to compute CFL:
             cfl1d = dmax1(cfl1d, dtdx1d(i)*s(i,mw),
      &                          -dtdx1d(i-1)*s(i,mw))
-   50       continue
+        end do
+      end do
 c
       if (method(2).eq.1) go to 130
 c
@@ -179,7 +184,7 @@ c
 c
        if (method(3).eq.0) go to 999   !# no transverse propagation
 c
-       if (method(3).eq.2) then
+       if (method(2) .gt. 1 .and. method(3).eq.2) then
 c         # incorporate cqxx into amdq and apdq so that it is split also.
           do 150 i = 2-mbc, mx+mbc-1
              do 150 m=1,meqn
