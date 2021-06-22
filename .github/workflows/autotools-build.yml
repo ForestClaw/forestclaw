@@ -31,9 +31,10 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: |
-        make check
-        cat test-suite.log
+      run: make check
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
     - name: Install
       run: sudo make install
 
@@ -57,9 +58,10 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: |
-        make check
-        cat test-suite.log
+      run: make check
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
     - name: Install
       run: sudo make install
 
@@ -83,9 +85,10 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: |
-        make check
-        cat test-suite.log
+      run: make check
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
     - name: Install
       run: sudo make install
 
@@ -137,9 +140,10 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: |
-        make check
-        cat test-suite.log
+      run: make check
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
     - name: Install
       run: sudo make install
 
@@ -163,9 +167,10 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: |
-        make check
-        cat test-suite.log
+      run: make check
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
     - name: Install
       run: sudo make install
     - name: Tar Files
@@ -196,9 +201,10 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: |
-        make check
-        cat test-suite.log
+      run: make check
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
     - name: Install
       run: sudo make install
 
@@ -256,9 +262,10 @@ jobs:
     - name: Build
       run: make
     - name: Tests
-      run: |
-        make check
-        cat test-suite.log
+      run: make check
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
     - name: Install
       run: sudo make install
 
