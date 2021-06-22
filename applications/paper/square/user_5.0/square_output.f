@@ -1,4 +1,4 @@
-      subroutine square46_fort_header_ascii
+      subroutine square5_fort_header_ascii
      &      (matname1,matname2, time,meqn,maux,ngrids)
       implicit none
 
@@ -31,7 +31,7 @@
 
 
 
-      subroutine square46_fort_write_file(matname1,
+      subroutine square5_fort_write_file(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,error,soln, time, patch_num,level,blockno,mpirank)
 
@@ -43,9 +43,9 @@
       double precision xlower, ylower,dx,dy,time
       double precision xc,yc,qc
 
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision soln(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision error(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer matunit1
       integer i,j,mq
@@ -62,7 +62,7 @@ c      double precision swirl_divergence, divu
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
 
-      call square46_fort_write_grid_header(matunit1,
+      call square5_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 
@@ -79,20 +79,20 @@ c      double precision swirl_divergence, divu
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
             do mq = 1,meqn
-               if (abs(q(i,j,mq)) .lt. 1d-99) then
-                  q(i,j,mq) = 0.d0
+               if (abs(q(mq,i,j)) .lt. 1d-99) then
+                  q(mq,i,j) = 0.d0
                endif
             enddo
-            qc = soln(i,j,1)
+            qc = soln(1,i,j)
             if (abs(qc) .lt. 1d-99) then
                qc = 0.d0
             endif
-            if (abs(error(i,j,1)) .lt. 1d-99) then
-               error(i,j,1) = 0.d0
+            if (abs(error(1,i,j)) .lt. 1d-99) then
+               error(1,i,j) = 0.d0
             endif
 c            divu = swirl_divergence(xc,yc)
-            write(matunit1,120) (q(i,j,mq),mq=1,meqn),qc,
-     &            error(i,j,1)
+            write(matunit1,120) (q(mq,i,j),mq=1,meqn),qc,
+     &            error(1,i,j)
          enddo
          write(matunit1,*) ' '
       enddo
@@ -103,7 +103,7 @@ c     # This statement is checked above (meqn <= 5)
 
       end
 
-      subroutine square46_fort_write_grid_header
+      subroutine square5_fort_write_grid_header
      &      (matunit1, mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 

@@ -1,7 +1,6 @@
       subroutine  rpn2_cons_update_manifold(meqn,maux, idir, iface, q,
      &                                     auxvec_center,
      &                                     auxvec_edge,flux)
-
       implicit none
 
       integer meqn,maux,idir, m, iface
