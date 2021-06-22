@@ -145,7 +145,6 @@ typedef struct fc2d_clawpack5_vtable
 
     clawpack5_fort_rpn2_t      fort_rpn2;
     clawpack5_fort_rpt2_t      fort_rpt2;
-
     clawpack5_fort_rpn2_cons_t fort_rpn2_cons;
 
     int is_set;

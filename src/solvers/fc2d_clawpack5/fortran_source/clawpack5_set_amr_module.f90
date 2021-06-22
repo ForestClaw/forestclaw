@@ -13,5 +13,5 @@ SUBROUTINE clawpack5_set_amr_module(mwaves_in,mcapa_in,mthlim_in, &
       allocate(mthlim(mwaves))
   endif
   mthlim = mthlim_in
-  use_fwaves = use_fwaves_in
+  use_fwaves = use_fwaves_in .ne. 0
 END SUBROUTINE clawpack5_set_amr_module
