@@ -9,8 +9,8 @@ c    # -------------------------------------------------------------------------
       double precision dx, dy, dxdy
       double precision sum(mfields), c_kahan(mfields)
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
-      double precision c, t, y, area_ij
-      logical use_kahan
+      double precision t, y, area_ij
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       include 'metric_terms.i'
 
