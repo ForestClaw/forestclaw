@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/clawpack/transport/correlatedcb/correlatedcb
 
+TESTS += applications/clawpack/transport/correlatedcb/regressions.sh
+
 applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/correlatedcb/correlatedcb.cpp \
 	applications/clawpack/transport/correlatedcb/cosine_bell.f \
