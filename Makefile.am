@@ -51,7 +51,9 @@ AM_CPPFLAGS += -DFCLAW_INIDIR=\"$(fclawinidir)\"
 if FCLAW_MPIRUN
 AM_TESTS_ENVIRONMENT = \
 	FCLAW_MPIRUN="@FCLAW_MPIRUN@" \
-	FCLAW_MPI_TEST_FLAGS="@FCLAW_MPI_TEST_FLAGS@"
+	FCLAW_MPI_TEST_FLAGS="@FCLAW_MPI_TEST_FLAGS@" \
+	FCLAW_APPLICATIONS_SRC_DIR="@abs_top_srcdir@/applications" \
+	FCLAW_APPLICATIONS_BUILD_DIR="@abs_top_builddir@/applications"
 endif
 
 # recurse only into subpackages

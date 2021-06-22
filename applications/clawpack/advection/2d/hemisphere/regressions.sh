@@ -1,9 +1,9 @@
 #!/bin/sh
 # absolute path to application we are testing
-application=$(pwd)/applications/clawpack/advection/2d/hemisphere/hemisphere
+application=$FCLAW_APPLICATIONS_BUILD_DIR/clawpack/advection/2d/hemisphere/hemisphere
 
 # change to source dir for working directory
-cd $srcdir/applications/clawpack/advection/2d/hemisphere/
+cd $FCLAW_APPLICATIONS_SRC_DIR/clawpack/advection/2d/hemisphere/
 
 # run programs, exit script with nonzero on failure (or else script will exit with value of last program run)
 echo $FCLAW_MPIRUN $FCLAW_MPI_TEST_FLAGS
