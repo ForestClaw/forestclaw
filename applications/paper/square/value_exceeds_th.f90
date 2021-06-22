@@ -1,8 +1,8 @@
 !! # check to see if value exceeds threshold
 
 logical function value_exceeds_th(blockno,& 
-                                     qval,qmin,qmax,quad, & 
-                                     dx,dy,xc,yc,threshhold)
+                                  qval,qmin,qmax,quad, & 
+                                  dx,dy,xc,yc,threshhold)
     implicit none
     
     double precision :: qval,qmin,qmax,threshhold
@@ -16,12 +16,10 @@ logical function value_exceeds_th(blockno,&
     integer example
     common /example_comm/ example      
 
-    integer :: mq
     logical :: refine
 
     refine = .false.
 
-    mq = 1
     if (initchoice .le. 1) then
         if (example .eq. 0) then
             refine = qval .gt. threshhold .and. &
@@ -35,7 +33,6 @@ logical function value_exceeds_th(blockno,&
         write(6,'(A,A)') 'Refining not yet defined for example > 0'
         stop
     endif
-
 
     value_exceeds_th = refine
 
