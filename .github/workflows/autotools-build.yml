@@ -274,52 +274,6 @@ jobs:
 # Clawpack Regression tests
 ############################
 
-  clawpack_transport_gaussian:
-    needs: mpi_build_with_clawpack_enabled
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install openmpi-bin
-    - name: Download Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: clawpack_binaries
-    - name: Untar Files
-      run: tar -xvf clawpack_binaries.tar
-    - name: Run Test
-      run: |
-        cd applications/clawpack/transport/gaussian
-        mpirun -n 2 ./gaussian -F regression.ini --user:claw-version=4 --user:example=0
-        mpirun -n 2 ./gaussian -F regression.ini --user:claw-version=4 --user:example=1
-        mpirun -n 2 ./gaussian -F regression.ini --user:claw-version=5 --user:example=0
-        mpirun -n 2 ./gaussian -F regression.ini --user:claw-version=5 --user:example=1
-
-
-  clawpack_transport_slotted_disk:
-    needs: mpi_build_with_clawpack_enabled
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install openmpi-bin
-    - name: Download Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: clawpack_binaries
-    - name: Untar Files
-      run: tar -xvf clawpack_binaries.tar
-    - name: Run Test
-      run: |
-        cd applications/clawpack/transport/slotted_disk
-        mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=4 --user:example=0
-        mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=4 --user:example=1
-        mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=5 --user:example=0
-        mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=5 --user:example=1
-
-
   clawpack_euler_2d_shockbubble:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04

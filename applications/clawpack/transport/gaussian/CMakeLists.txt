@@ -43,3 +43,6 @@ target_link_libraries(gaussian PRIVATE
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
 )
+
+add_test(NAME clawpack_transport_gaussian COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_transport_gaussian PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

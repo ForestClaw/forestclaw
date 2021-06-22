@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/clawpack/transport/gaussian/gaussian
 
+TESTS += applications/clawpack/transport/gaussian/regressions.sh
+
 applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/transport/gaussian/gaussian.cpp \
 	applications/clawpack/transport/gaussian/gaussian_user.h \

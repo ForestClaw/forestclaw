@@ -45,3 +45,6 @@ target_link_libraries(slotted_disk PRIVATE
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
 )
+
+add_test(NAME clawpack_transport_slotted_disk COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_transport_slotted_disk PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
