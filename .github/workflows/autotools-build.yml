@@ -274,27 +274,6 @@ jobs:
 # Clawpack Regression tests
 ############################
 
-  clawpack_shallow_2d_bump:
-    needs: mpi_build_with_clawpack_enabled
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install openmpi-bin
-    - name: Download Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: clawpack_binaries
-    - name: Untar Files
-      run: tar -xvf clawpack_binaries.tar
-    - name: Run Test
-      run: |
-        cd applications/clawpack/shallow/2d/bump
-        mpirun -n 2 ./bump -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./bump -F regression.ini --user:claw-version=5
-
-
   clawpack_shallow_2d_radialdam:
     needs: mpi_build_with_clawpack_enabled
     runs-on: ubuntu-20.04
