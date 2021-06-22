@@ -173,13 +173,6 @@ jobs:
       run: cat test-suite.log
     - name: Install
       run: sudo make install
-    - name: Tar Files
-      run: tar --exclude='./.git' -cvf clawpack_binaries.tar .
-    - name: Upload Binaries
-      uses: actions/upload-artifact@v2
-      with:
-        name: clawpack_binaries
-        path: clawpack_binaries.tar
 
 
   mpi_build_with_geoclaw_enabled:
@@ -268,49 +261,3 @@ jobs:
       run: cat test-suite.log
     - name: Install
       run: sudo make install
-
-
-############################
-# Clawpack Regression tests
-############################
-
-  clawpack_euler_2d_shockbubble:
-    needs: mpi_build_with_clawpack_enabled
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install openmpi-bin
-    - name: Download Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: clawpack_binaries
-    - name: Untar Files
-      run: tar -xvf clawpack_binaries.tar
-    - name: Run Test
-      run: |
-        cd applications/clawpack/euler/2d/shockbubble
-        mpirun -n 2 ./shockbubble -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./shockbubble -F regression.ini --user:claw-version=5
-
-  clawpack_euler_2d_quadrants:
-    needs: mpi_build_with_clawpack_enabled
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install openmpi-bin
-    - name: Download Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: clawpack_binaries
-    - name: Untar Files
-      run: tar -xvf clawpack_binaries.tar
-    - name: Run Test
-      run: |
-        cd applications/clawpack/euler/2d/quadrants
-        mpirun -n 2 ./quadrants -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./quadrants -F regression.ini --user:claw-version=5
-        
