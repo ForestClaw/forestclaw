@@ -9,7 +9,7 @@ c    # -------------------------------------------------------------------------
       double precision dx, dy
       double precision sum(mfields), c_kahan(mfields)
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
-      double precision c, t, y, area_ij
+      double precision t, y, area_ij
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
 c      include 'fclaw2d_metric_terms.i'
