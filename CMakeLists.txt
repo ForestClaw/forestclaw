@@ -7,6 +7,7 @@ project(FORESTCLAW
   VERSION 0.1.4880)
 
 include(CTest)
+enable_testing()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
