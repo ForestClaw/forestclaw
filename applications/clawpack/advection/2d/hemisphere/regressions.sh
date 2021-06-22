@@ -5,14 +5,8 @@ application=$(pwd)/applications/clawpack/advection/2d/hemisphere/hemisphere
 # change to source dir for working directory
 cd $srcdir/applications/clawpack/advection/2d/hemisphere/
 
-# get runner
-if command -v mpiexec
-then
-	runner="mpiexec -n 2"
-fi
-
-# run programs, exit script with nonzero on failure
-$runner $application -F regression.ini --user:claw-version=4 --user:example=0 || exit 1
-$runner $application -F regression.ini --user:claw-version=5 --user:example=0 || exit 1
-$runner $application -F regression.ini --user:claw-version=4 --user:example=1 || exit 1
-$runner $application -F regression.ini --user:claw-version=5 --user:example=1 || exit 1
+# run programs, exit script with nonzero on failure (or else script will exit with value of last program run)
+$application -F regression.ini --user:claw-version=4 --user:example=0 || exit 1
+$application -F regression.ini --user:claw-version=5 --user:example=0 || exit 1
+$application -F regression.ini --user:claw-version=4 --user:example=1 || exit 1
+$application -F regression.ini --user:claw-version=5 --user:example=1 || exit 1
