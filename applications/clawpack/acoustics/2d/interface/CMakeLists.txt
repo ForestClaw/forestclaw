@@ -34,3 +34,6 @@ target_link_libraries(interface PRIVATE
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
 )
+
+add_test(NAME interface COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(interface PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
