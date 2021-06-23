@@ -20,9 +20,6 @@
 ## swirl  (single block, square)
 include applications/clawpack/advection/2d/swirl/Makefile.am
 
-## swirl_cons  (single block, square, uses conservative form)
-include applications/clawpack/advection/2d/swirl_cons/Makefile.am
-
 ## filament  (square, multi-block disk)
 include applications/clawpack/advection/2d/filament/Makefile.am
 
