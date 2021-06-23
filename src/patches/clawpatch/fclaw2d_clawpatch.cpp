@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -1150,6 +1150,8 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 		clawpatch_vt->fort_output_ascii          = FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII;
 
 		/* Diagnostic functions */
+		clawpatch_vt->conservation_check         = fclaw2d_clawpatch_diagnostics_cons_default;
+		clawpatch_vt->compute_error              = fclaw2d_clawpatch_diagnostics_error_default;
 		clawpatch_vt->fort_compute_patch_error   = NULL;   /* User defined */
 		clawpatch_vt->fort_compute_error_norm    = FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM;
 		clawpatch_vt->fort_compute_patch_area    = FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA;

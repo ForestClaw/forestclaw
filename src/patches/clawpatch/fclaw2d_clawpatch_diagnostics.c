@@ -37,13 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
                                               void **acc_patch)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
-    error_info_t *error_data;
+    fclaw_debugf("Initializing diagnostics\n");
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     int meqn = clawpatch_opt->meqn;  /* Clawpatch */
 
-    error_data = FCLAW_ALLOC(error_info_t,1);
+    error_info_t * error_data = FCLAW_ALLOC(error_info_t,1);
 
     /* Allocate memory for 1-norm, 2-norm, and inf-norm errors */
     error_data->local_error  = FCLAW_ALLOC_ZERO(double,3*meqn);
@@ -60,6 +60,7 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
 void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
                                          void* patch_acc)
 {
+    fclaw_debugf("Resetting diagnostics\n");
     error_info_t *error_data = (error_info_t*) patch_acc;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
@@ -88,6 +89,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
                             int patchno,
                             void* user) //void *patch_acc)
 {
+
     fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
     error_info_t *error_data = (error_info_t*) s->user; 
 
@@ -117,6 +119,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
 void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc)
 {
+    fclaw_debugf("Computing diagnostics\n");
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
     int check = gparms->compute_error || gparms->conservation_check;
     if (!check) return;
@@ -130,6 +133,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
                                           void* patch_acc,
                                           int init_flag)
 {
+    fclaw_debugf("Gathering diagnostics\n");
     fclaw2d_domain_t *domain = glob->domain;
     
     error_info_t *error_data = (error_info_t*) patch_acc;
