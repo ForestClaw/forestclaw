@@ -79,7 +79,7 @@ c
 
 c     # Include four additional arguments to avoid need for
 c     # global array
-      if (use_fwaves == 0) then
+      if (use_fwaves .eq. 0) then
           call clawpack46_step2(maxm,maxmx,maxmy,meqn,maux, mbc,
      &          mx,my, qold,aux,dx,dy,dt,
      &          cfl,fm,fp,gm,gp,

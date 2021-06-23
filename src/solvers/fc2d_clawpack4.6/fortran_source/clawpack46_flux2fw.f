@@ -99,7 +99,7 @@ c
       integer icom,jcom
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 c
-      double precision gupdate
+      double precision gupdate, dtdxave
       integer mw,i,jside,m
 
       limit = .false.
@@ -156,15 +156,17 @@ c     # modify F fluxes for second order q_{xx} correction terms:
 c     -----------------------------------------------------------
 c
 c     # apply limiter to fwaves:
-      if (limit) call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
+      if (limit) then 
+        call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
      &      fwave,s,mthlim)
+      endif
 c
       do 120 i = 2-mbc, mx+mbc-1
 c
 c        # For correction terms below, need average of dtdx in cell
 c        # i-1 and i.  Compute these and overwrite dtdx1d:
 c
-         dtdx1d(i-1) = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
+         dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
 c
          do 120 m=1,meqn
             cqxx(i,m) = 0.d0
@@ -172,9 +174,9 @@ c
 c
 c              # second order corrections:
                cqxx(i,m) = cqxx(i,m) + dsign(1.d0,s(i,mw))
-     &            * (1.d0 - dabs(s(i,mw))*dtdx1d(i-1)) * fwave(i,m,mw)
-c
-  119          continue
+     &            * (1.d0 - dabs(s(i,mw))*dtdxave )* fwave(i,m,mw)
+
+            end do
             faddm(i,m) = faddm(i,m) + 0.5d0 * cqxx(i,m)
             faddp(i,m) = faddp(i,m) + 0.5d0 * cqxx(i,m)
   120       continue
@@ -186,12 +188,13 @@ c
 c
        if (method(2) .gt. 1 .and. method(3).eq.2) then
 c         # incorporate cqxx into amdq and apdq so that it is split also.
-          do 150 i = 2-mbc, mx+mbc-1
-             do 150 m=1,meqn
+          do i = 1, mx+1
+             do m = 1,meqn
                 amdq(i,m) = amdq(i,m) + cqxx(i,m)
                 apdq(i,m) = apdq(i,m) - cqxx(i,m)
-  150           continue
-          endif
+             end do
+         end do
+        endif
 c
 c
 c      # modify G fluxes for transverse propagation
@@ -204,8 +207,8 @@ c     # split the left-going flux difference into down-going and up-going:
      &          1,amdq,bmasdq,bpasdq)
 c
 c     # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
-      do 160 m=1,meqn
-          do 160 i = 2-mbc, mx+mbc
+      do m = 1,meqn
+          do i = 1, mx+1
                gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(i,m)
                gaddm(i-1,m,1) = gaddm(i-1,m,1) - gupdate
                gaddp(i-1,m,1) = gaddp(i-1,m,1) - gupdate
@@ -213,7 +216,8 @@ c
                gupdate = 0.5d0*dtdx1d(i-1) * bpasdq(i,m)
                gaddm(i-1,m,2) = gaddm(i-1,m,2) - gupdate
                gaddp(i-1,m,2) = gaddp(i-1,m,2) - gupdate
-  160          continue
+          end do
+      end do
 c
 c     # split the right-going flux difference into down-going and up-going:
       call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
