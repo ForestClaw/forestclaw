@@ -55,6 +55,8 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
 
     INTEGER block_corner_count(0:3), sweep_dir
 
+    integer :: m
+
 
     ! Looping scalar storage
     integer :: i,j
@@ -87,7 +89,7 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
 
     ! ============================================================================
     ! Perform X-Sweeps
-    DO j = 0,my+1
+    DO j = 2-mbc,my+mbc-1
        ! Copy old q into 1d slice
        q1d(:,1-mbc:mx+mbc) = qold(:,1-mbc:mx+mbc,j)
 
@@ -123,12 +125,13 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
         gm(:,1:mx+1,j+1) = gm(:,1:mx+1,j+1) + gaddm(:,1:mx+1,2)
         gp(:,1:mx+1,j+1) = gp(:,1:mx+1,j+1) + gaddp(:,1:mx+1,2)
 
+
     enddo
 
     ! ============================================================================
     !  y-sweeps
     !
-    do i = 0,mx+1
+    do i = 2-mbc, mx+mbc-1
 
        ! Copy data along a slice into 1d arrays:
        q1d(:,1-mbc:my+mbc) = qold(:,i,1-mbc:my+mbc)
@@ -144,7 +147,7 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
         ! Copy aux slices
         if (maux .gt. 0)  then
             aux1(:,1-mbc:my+mbc) = aux(:,i-1,1-mbc:my+mbc)
-            aux2(:,1-mbc:my+mbc) = aux(:,i,1-mbc:my+mbc)
+            aux2(:,1-mbc:my+mbc) = aux(:,i,  1-mbc:my+mbc)
             aux3(:,1-mbc:my+mbc) = aux(:,i+1,1-mbc:my+mbc)
         endif
 
@@ -159,10 +162,10 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
         cflgrid = max(cflgrid,cfl1d)
 
         ! Update fluxes
-        gm(:,i,1:my+1) = gm(:,i,1:my+1) + faddm(:,1:my+1)
-        gp(:,i,1:my+1) = gp(:,i,1:my+1) + faddp(:,1:my+1)
-        fm(:,i,1:my+1) = fm(:,i,1:my+1) + gaddm(:,1:my+1,1)
-        fp(:,i,1:my+1) = fp(:,i,1:my+1) + gaddp(:,1:my+1,1)
+        gm(:,i,1:my+1)   = gm(:,i,1:my+1)   + faddm(:,1:my+1)
+        gp(:,i,1:my+1)   = gp(:,i,1:my+1)   + faddp(:,1:my+1)
+        fm(:,i,1:my+1)   = fm(:,i,1:my+1)   + gaddm(:,1:my+1,1)
+        fp(:,i,1:my+1)   = fp(:,i,1:my+1)   + gaddp(:,1:my+1,1)
         fm(:,i+1,1:my+1) = fm(:,i+1,1:my+1) + gaddm(:,1:my+1,2)
         fp(:,i+1,1:my+1) = fp(:,i+1,1:my+1) + gaddp(:,1:my+1,2)
 
