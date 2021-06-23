@@ -167,15 +167,8 @@ c
              end do
              faddm(m,i) = faddm(m,i) + 0.5d0 * cqxx(m,i)
              faddp(m,i) = faddp(m,i) + 0.5d0 * cqxx(m,i)
-             if (ixy .eq. 1) then
-c                 write(6,100) 5,ixy,i,jcom,wave(m,1,i), cqxx(m,i)
-             else
-c                 write(6,100) 5,ixy,icom,i,wave(m,1,i), cqxx(m,i)
-             endif
          end do
       end do
-c      write(6,*) ' '
-100      format(4I8,2F16.12)
 c
 c
   130  continue
