@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -182,11 +182,14 @@ void square_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     patch_vt->setup = &square_patch_setup_manifold;
 
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+
     const user_options_t* user = square_get_options(glob);
     if (user->claw_version == 4) 
     {
         fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
         clawpack46_vt->fort_qinit  = &CLAWPACK46_QINIT;
+        
         /* Be careful : Signatures for rpn2fw, rpt2fw not the same as rpn2 and rpt2fw. */
         clawpack46_vt->fort_rpn2fw   = &CLAWPACK46_RPN2FW_MANIFOLD; 
         clawpack46_vt->fort_rpt2fw   = &CLAWPACK46_RPT2FW_MANIFOLD;      
@@ -194,7 +197,6 @@ void square_link_solvers(fclaw2d_global_t *glob)
 
         /* Clawpatch functions */
         //const user_options_t* user = square_get_options(glob);
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
         clawpatch_vt->fort_tag4refinement = &SQUARE46_TAG4REFINEMENT;
         clawpatch_vt->fort_tag4coarsening = &SQUARE46_TAG4COARSENING;       
     } 
@@ -207,10 +209,8 @@ void square_link_solvers(fclaw2d_global_t *glob)
         clawpack5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */
-        //const user_options_t* user = square_get_options(glob);
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
         clawpatch_vt->fort_tag4refinement = &SQUARE5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &SQUARE5_TAG4COARSENING;       
+        clawpatch_vt->fort_tag4coarsening = &SQUARE5_TAG4COARSENING;     
     }
 
 #if 0
@@ -226,7 +226,6 @@ void square_link_solvers(fclaw2d_global_t *glob)
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error)
     {
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
         if (user->claw_version == 4)
         {
             clawpatch_vt->fort_compute_patch_error = &SQUARE46_COMPUTE_ERROR;

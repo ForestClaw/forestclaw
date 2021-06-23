@@ -1,13 +1,13 @@
-      subroutine clawpack5_qinit(maxmx,maxmy, meqn,mbc,mx,my,
-     &      xlower,ylower,dx,dy,q,maux,aux)
+      SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower, 
+     &                           dx,dy,q,maux,aux)
       implicit none
 
-      integer meqn, mbc, mx, my, maux, maxmx, maxmy
+      integer meqn, mbc, mx, my, maux
       double precision xlower, ylower, dx, dy
-      double precision q(meqn,1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc)
-      double precision aux(maux,1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc)
+      double precision q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
+      double precision aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
 
-      integer i, j, blockno, fc2d_clawpack46_get_block
+      integer i, j, blockno, fc2d_clawpack5_get_block
       double precision xc,yc, xp, yp, zp, xlow, ylow, w
       double precision dxc,xm,ym
 
@@ -23,7 +23,7 @@
 
       cont = get_context()
 
-      blockno = fc2d_clawpack46_get_block()
+      blockno = fc2d_clawpack5_get_block()
 
       do i = 1-mbc,mx+mbc
           xc = xlower + (i-0.5d0)*dx

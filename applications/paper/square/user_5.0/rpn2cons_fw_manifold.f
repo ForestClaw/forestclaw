@@ -4,15 +4,18 @@
 
       integer ixy, maxm, meqn, mwaves,maux, mbc, mx
 
-      double precision wave(1-mbc:maxm+mbc, meqn, mwaves)   
-      double precision    s(1-mbc:maxm+mbc, mwaves)
-      double precision   ql(1-mbc:maxm+mbc, meqn)
-      double precision   qr(1-mbc:maxm+mbc, meqn)
-      double precision amdq(1-mbc:maxm+mbc, meqn)
-      double precision apdq(1-mbc:maxm+mbc, meqn)
-      double precision auxl(1-mbc:maxm+mbc,*)
-      double precision auxr(1-mbc:maxm+mbc,*)
+      double precision wave(meqn, mwaves, 1-mbc:maxm+mbc)   
+      double precision    s(mwaves, 1-mbc:maxm+mbc)
+      double precision   ql(meqn, 1-mbc:maxm+mbc)
+      double precision   qr(meqn, 1-mbc:maxm+mbc)
+      double precision amdq(meqn, 1-mbc:maxm+mbc)
+      double precision apdq(meqn, 1-mbc:maxm+mbc)
+      double precision auxl(maux, 1-mbc:maxm+mbc)
+      double precision auxr(maux, 1-mbc:maxm+mbc)
 
+      integer :: icom,jcom
+      double precision :: dtcom,dxcom,dycom,tcom
+      common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
       integer i, idir
       double precision qll,qrr
@@ -42,8 +45,14 @@ c        # Use Roe-average values
          endif
          wave(1,1,i) = urrot*qrr - ulrot*qll
          s(1,i) = uhat
-
+         if (ixy .eq. 1) then
+c            write(6,100) 5, ixy,i,jcom,uhat, wave(1,1,i)
+         else
+c            write(6,100) 5, ixy,icom,i,uhat, wave(1,1,i)
+         endif
+100      format(4I8,2F16.12)
       enddo
+c      write(6,*) ' '
 
 
       return

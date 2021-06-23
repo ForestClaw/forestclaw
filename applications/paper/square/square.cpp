@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -103,9 +103,6 @@ void run_program(fclaw2d_global_t* glob)
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
-
-    /* Initialize virtual tables for solvers */
-    fc2d_clawpack46_solver_initialize();
 
     /* Initialize virtual tables for solvers */
     const user_options_t  *user_opt = square_get_options(glob);
