@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -113,12 +113,9 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 {
 	fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-	int level;
-
-
 	/* This step accounts for any metric discontinuities at block boundaries
 	   between grids at the same level */
-	for(level = fclaw_opt->maxlevel; level >= minlevel; level--)
+	for(int level = fclaw_opt->maxlevel; level >= minlevel; level--)
 	{
 		/* Correct metric mismatches between patches of the same size */
 		copy_at_blockbdry(glob,level,
@@ -137,7 +134,7 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 			time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_F2C);
 		}
 	}
-	for(level = fclaw_opt->maxlevel; level >= minlevel; level--)
+	for(int level = fclaw_opt->maxlevel; level >= minlevel; level--)
 	{
 		/* Clear registers at physical level;  These are not used
      	   in sychronization, but will accumulate throughout simulation.  */
