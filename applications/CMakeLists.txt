@@ -64,9 +64,9 @@ endif()
 # ----------------------------------
 # Projects for paper
 # ----------------------------------
-if(TARGET FORESTCLAW::CLAWPACK4.6)
+if(TARGET FORESTCLAW::CLAWPACK4.6 AND TARGET FORESTCLAW::CLAWPACK5)
 
-    #include(paper.cmake)
+    include(paper/paper.cmake)
 
 endif()
 
