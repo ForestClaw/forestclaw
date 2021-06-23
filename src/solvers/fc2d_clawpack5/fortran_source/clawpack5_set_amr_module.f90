@@ -6,12 +6,16 @@ SUBROUTINE clawpack5_set_amr_module(mwaves_in,mcapa_in,mthlim_in, &
   INTEGER, INTENT(in) :: mwaves_in, mcapa_in, method_in(7)
   INTEGER, INTENT(in) :: mthlim_in(mwaves_in), use_fwaves_in
 
+  integer :: mw
+
   mwaves = mwaves_in
   mcapa = mcapa_in
   method = method_in
   if (.not. allocated(mthlim)) then
       allocate(mthlim(mwaves))
   endif
-  mthlim = mthlim_in
+  do mw = 1,mwaves
+      mthlim(mw) = mthlim_in(mw)
+  end do  
   use_fwaves = use_fwaves_in .ne. 0
 END SUBROUTINE clawpack5_set_amr_module

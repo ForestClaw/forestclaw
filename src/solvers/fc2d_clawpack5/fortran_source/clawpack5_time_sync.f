@@ -289,6 +289,7 @@ c     # should go away.
         sc = (a(1,2) + a(2,2))/2
       endif
 
+
 c     # Ignore call to normal_match in calling routine      
       if (normal_match .eq. 0) then
           nm = -1
@@ -353,6 +354,7 @@ c     # ghost cells so that data aligns with coarse grid ghost cells.
 
          enddo
       enddo
+
 
       if (idir .eq. 0) then
 c         # sign change ('sc') to account for normals at 0-1
@@ -461,7 +463,7 @@ c    # -----------------------------------------------------------------
 c    # Add wave corrections at same level interfaces.  This accounts for
 c    # metric mismatches that can occur at block boundaries.
 c    # -----------------------------------------------------------------
-      subroutine clawpack_fort_time_sync_samesize(mx,my,mbc,meqn,
+      subroutine clawpack5_fort_time_sync_samesize(mx,my,mbc,meqn,
      &                                          idir, this_iface,
      &                                          this_blockno, 
      &                                          neighbor_blockno,

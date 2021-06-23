@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw2d_clawpatch_fort.h>
 
 #include <fclaw2d_clawpatch_conservation.h>
 
@@ -291,16 +292,16 @@ double clawpack5_step2(fclaw2d_global_t *glob,
 
 #if 1
         CLAWPACK5_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,
-                                        &this_block_idx,&this_patch_idx, &dt,
-                                          cr->edgelengths[0], 
-                                          cr->edgelengths[1], 
-                                          cr->edgelengths[2], 
-                                          cr->edgelengths[3],
-                                          qold,aux,
-                                          cr->edge_fluxes[0],cr->edge_fluxes[1],
-                                          cr->edge_fluxes[2],cr->edge_fluxes[3],
-                                          claw5_vt->fort_rpn2_cons,
-                                          qvec,auxvec_center,auxvec_edge,flux);
+                                       &this_block_idx,&this_patch_idx, &dt,
+                                       cr->edgelengths[0], 
+                                       cr->edgelengths[1], 
+                                       cr->edgelengths[2], 
+                                       cr->edgelengths[3],
+                                       qold,aux,
+                                       cr->edge_fluxes[0],cr->edge_fluxes[1],
+                                       cr->edge_fluxes[2],cr->edge_fluxes[3],
+                                       claw5_vt->fort_rpn2_cons,
+                                       qvec,auxvec_center,auxvec_edge,flux);
 #endif
         FCLAW_FREE(qvec);
         FCLAW_FREE(auxvec_center);
@@ -335,7 +336,6 @@ double clawpack5_step2(fclaw2d_global_t *glob,
 
     if (fclaw_opt->time_sync && fclaw_opt->fluctuation_correction)
     {
-
         CLAWPACK5_TIME_SYNC_ACCUMULATE_WAVES(&mx,&my,&mbc,&meqn, &dt, &dx, 
                                               &dy, &this_patch_idx,
                                               cr->edgelengths[0],
@@ -438,6 +438,7 @@ void fc2d_clawpack5_solver_initialize()
 
     fclaw2d_vtable_t*          fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*    patch_vt = fclaw2d_patch_vt();
+    fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
 
     fc2d_clawpack5_vtable_t*   claw5_vt = fc2d_clawpack5_vt_init();
 
@@ -449,6 +450,11 @@ void fc2d_clawpack5_solver_initialize()
     patch_vt->setup                 = clawpack5_setaux;
     patch_vt->physical_bc           = clawpack5_bc2;
     patch_vt->single_step_update    = clawpack5_update;
+
+    /* Conservation updates (based on Clawpack updates) */
+    clawpatch_vt->fort_time_sync_f2c         = CLAWPACK5_FORT_TIME_SYNC_F2C;
+    clawpatch_vt->fort_time_sync_samesize    = CLAWPACK5_FORT_TIME_SYNC_SAMESIZE;
+
 
     claw5_vt->b4step2   = clawpack5_b4step2;
     claw5_vt->src2      = clawpack5_src2;
