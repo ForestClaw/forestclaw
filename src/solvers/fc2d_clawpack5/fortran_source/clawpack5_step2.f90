@@ -55,9 +55,6 @@ SUBROUTINE clawpack5_step2(maxm,meqn,maux,mbc,mx,my,qold,aux,dx,dy,dt, &
 
     INTEGER block_corner_count(0:3), ibc,jbc,m
 
-    integer :: m
-
-
     ! Looping scalar storage
     integer :: i,j,thread_num
     real(kind=8) :: dtdx,dtdy,cfl1d
