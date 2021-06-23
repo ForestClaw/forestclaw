@@ -39,7 +39,6 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4refinement.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4coarsening.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_timeinterp.f  \
-	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_conservation.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_average.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_copy.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_interpolate.f \
