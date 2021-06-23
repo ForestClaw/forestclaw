@@ -50,14 +50,7 @@ c        # Use Roe-average values
          endif
          wave(i,1,1) = urrot*qrr - ulrot*qll
          s(i,1) = uhat
-c         if (ixy .eq. 1) then
-c            write(6,100) 4, ixy, i,jcom, uhat, wave(i,1,1)
-c         else
-c            write(6,100) 4, ixy, icom,i,uhat, wave(i,1,1)
-c         endif
-100      format(4I8,2F16.12)
       enddo
-c      write(6,*) ' '
 
 
       return
