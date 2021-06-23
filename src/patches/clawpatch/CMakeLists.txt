@@ -14,7 +14,6 @@ add_library(clawpatch_f OBJECT
   fort_4.6/fclaw2d_clawpatch46_tag4refinement.f 
   fort_4.6/fclaw2d_clawpatch46_tag4coarsening.f 
   fort_4.6/fclaw2d_clawpatch46_timeinterp.f 
-  fort_4.6/fclaw2d_clawpatch46_conservation.f
   fort_5.0/fclaw2d_clawpatch5_average.f 
   fort_5.0/fclaw2d_clawpatch5_copy.f
   fort_5.0/fclaw2d_clawpatch5_interpolate.f
