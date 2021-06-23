@@ -74,6 +74,7 @@ c      double precision swirl_divergence, divu
          stop
       endif
 
+
       do j = 1,my
          do i = 1,mx
             xc = xlower + (i-0.5)*dx

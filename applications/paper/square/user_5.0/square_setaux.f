@@ -32,7 +32,7 @@ c     # ----------------------------------------------------------------
 c     # Capacity : entry (1)
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
-            aux(i,j,1) = area(i,j)/dxdy
+            aux(1,i,j) = area(i,j)/dxdy
          enddo
       enddo
 
