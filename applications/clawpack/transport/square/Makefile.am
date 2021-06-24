@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/transport/square/square
 
-applications_clawpack/transport_square_square_SOURCES = \
+applications_clawpack_transport_square_square_SOURCES = \
 	applications/clawpack/transport/square/square.cpp \
 	applications/clawpack/transport/square/square_user.cpp \
 	applications/clawpack/transport/square/square_user.h \
