@@ -48,8 +48,8 @@ void interface_link_solvers(fclaw2d_global_t *glob)
 
         claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         claw46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
-        claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
-        claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
+        claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2_ACOUSTICS_VC;
+        claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2_ACOUSTICS_VC;
 
         clawpatch_vt->fort_tag4refinement  = &CLAWPATCH46_TAG4REFINEMENT;  
         clawpatch_vt->fort_tag4coarsening  = &CLAWPATCH46_TAG4COARSENING;  
@@ -61,8 +61,8 @@ void interface_link_solvers(fclaw2d_global_t *glob)
 
         claw5_vt->fort_qinit   = &CLAWPACK5_QINIT;
         claw5_vt->fort_setaux  = &CLAWPACK5_SETAUX;
-        claw5_vt->fort_rpn2    = &CLAWPACK5_RPN2;
-        claw5_vt->fort_rpt2    = &CLAWPACK5_RPT2;
+        claw5_vt->fort_rpn2    = &CLAWPACK5_RPN2_ACOUSTICS_VC;
+        claw5_vt->fort_rpt2    = &CLAWPACK5_RPT2_ACOUSTICS_VC;
 
         clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
         clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;

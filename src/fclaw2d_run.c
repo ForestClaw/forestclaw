@@ -121,6 +121,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
 
+    /* Set error to 0 */
     int init_flag = 1;  /* Store anything that needs to be stored */
     fclaw2d_diagnostics_gather(glob,init_flag);
     init_flag = 0;

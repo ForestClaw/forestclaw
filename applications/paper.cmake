@@ -5,15 +5,15 @@
 
 # ------------------------- Conservation ----------------------------------
 ## annulus (Conservation test)
-add_subdirectory(paper/annulus)
+#add_subdirectory(paper/annulus)
 
 ## torus (Conservation test)
-add_subdirectory(paper/torus_conservation)
+#add_subdirectory(paper/torus_conservation)
 
 
 # ------------------------- Acccuracy ----------------------------------
 ## torus (Accuracy test)
-add_subdirectory(paper/torus)
+#add_subdirectory(paper/torus)
 
 
 

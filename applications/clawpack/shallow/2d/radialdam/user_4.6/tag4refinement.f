@@ -8,10 +8,6 @@
       double precision xlower, ylower, dx, dy
       double precision tag_threshold
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision xp,yp,zp
-
-      integer*8 cont, get_context
-      logical fclaw2d_map_is_used
 
       integer i,j, mq, ii, jj
       double precision qmin, qmax, xc, yc, quad(-1:1,-1:1)
@@ -19,8 +15,6 @@
       logical exceeds_th, gradient_exceeds_th
       
       tag_patch = 0
-
-      cont = get_context()
 
       mq = 1
       qmin = q(1,1,mq)

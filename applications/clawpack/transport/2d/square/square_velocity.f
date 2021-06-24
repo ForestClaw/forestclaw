@@ -1,30 +1,27 @@
 c     # ------------------------------------------------------------
-c     # Streamfunction, velocity components and derivatives
+c     # Prescribes velocity fields for the unit square ([0.1]x[0,1]).
 c     # 
-c     # Stream function depends on these global variables
-c     #         example (0=incompressible; 1=compressible)
-c     #         mapping (0=swirl; 1=twisted swirl)
+c     # Assumes all components are given in coordinates relative to 
+c     # the standard basis (1,0) and (0,1). 
 c     # ------------------------------------------------------------
 
 
-      subroutine velocity_components(blockno,x,y,u)
+      subroutine velocity_components(x,y,u)
       implicit none
 
       double precision x, y, u(2)
-      integer blockno
       double precision uderivs(4)
 
       double precision s
 
-      call velocity_derivs(blockno, x,y,u,uderivs)
+      call velocity_derivs(x,y,u,uderivs)
 
       end
 
-      subroutine velocity_derivs(blockno,x,y,u,uderivs)
+      subroutine velocity_derivs(x,y,u,uderivs)
       implicit none
 
       double precision x, y, u(2)
-      integer blockno
       double precision uderivs(4)
 
       double precision pi, pi2
@@ -59,16 +56,16 @@ c     # Set non-zeros derivs only
 c        # No sonic points, i.e. velocity field > 0
          u(1) = s*(cos(pi*x)**2 + 0.5d0)         
          u(2) = s*(sin(pi*y)**2 + 0.5d0)
-         u1x = -pi*s*sin(pi*x)
-         u2y =  pi*s*cos(pi*y)
+         u1x = -2*pi*s*cos(pi*x)*sin(pi*x)
+         u2y =  2*pi*s*sin(pi*y)*cos(pi*y)
       elseif (example .eq. 2) then
 c        # Velocity field crosses 0
          u(1) = s*(cos(pi*x)**2 - 0.5d0)
          u(2) = s*(sin(pi*y)**2 - 0.5d0)
-         u1x = -pi*s*sin(pi*x)
-         u2y =  pi*s*cos(pi*y)
+         u1x = -2*pi*s*cos(pi*x)*sin(pi*x)
+         u2y =  2*pi*s*sin(pi*y)*cos(pi*y)
       else
-         write(6,'(A,A)') 'clawpack46_setaux : ',
+         write(6,'(A,A)') 'square_velocity : ',
      &              'No valid example provided'
          stop
       endif
@@ -84,11 +81,10 @@ c        # Velocity field crosses 0
 c     # ------------------------------------------------------------
 c     # Center : u = u1*tau1 + u2*tau2   (div u might not be zero)
 c     # ------------------------------------------------------------
-      subroutine square_center_velocity(blockno, x,y,vel)
+      subroutine square_center_velocity(x,y,vel)
       implicit none
 
       double precision x,y,vel(3)
-      integer blockno
 
       double precision t1(3), t2(3)
       double precision t1inv(3), t2inv(3)
@@ -99,14 +95,15 @@ c     # ------------------------------------------------------------
 
       integer k
 
-c     # Vector field defined as u1*tau1 + u2*tau2    
+c     # Velocity components are given in Cartesian components
+      call velocity_components(x,y,u)
 
-      call map_covariant_basis(blockno, x, y, t1,t2)
-      call velocity_components(blockno, x,y,u)
 
-      do k = 1,3
-        vel(k) = u(1)*t1(k) + u(2)*t2(k)
+c     # Velocities are all given in terms of Cartesian components   
+      do k = 1,2
+        vel(k) = u(k)
       enddo
+      vel(3) = 0
         
       end
 

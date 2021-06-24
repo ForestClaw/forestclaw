@@ -16,8 +16,8 @@ SUBROUTINE  rpn2qad_flux(meqn,maux,idir,iface,q,auxvec,flux)
     u(1) = auxvec(2)
     u(2) = auxvec(3)
 
-    nv(1) = auxvec(4+2*iface)
-    nv(2) = auxvec(5+2*iface)
+    nv(1) = auxvec(4+4*idir)
+    nv(2) = auxvec(5+4*idir)
 
     urot = g*(nv(1)*u(1) + nv(2)*u(2))
     

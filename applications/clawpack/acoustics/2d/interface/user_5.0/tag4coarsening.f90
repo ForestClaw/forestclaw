@@ -12,7 +12,7 @@ SUBROUTINE clawpatch5_tag4coarsening(mx,my,mbc,meqn, &
   DOUBLE PRECISION :: q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
   DOUBLE PRECISION :: q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-  INTEGER :: i,j, mq
+  INTEGER :: mq
   DOUBLE PRECISION :: qmin, qmax
 
   if (init_flag .ne. 0) then

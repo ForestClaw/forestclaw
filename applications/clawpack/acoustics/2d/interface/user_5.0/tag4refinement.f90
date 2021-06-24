@@ -9,7 +9,7 @@ SUBROUTINE clawpatch5_tag4refinement(mx,my,mbc,meqn, &
     DOUBLE PRECISION :: refine_threshold
     DOUBLE PRECISION :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    INTEGER :: i,j, mq,m, ii, jj
+    INTEGER :: i,j, mq, ii, jj
     DOUBLE PRECISION :: xc,yc, qmin, qmax, quad(-1:1,-1:1)
     logical :: exceeds_th, value_exceeds_th
 
@@ -17,9 +17,9 @@ SUBROUTINE clawpatch5_tag4refinement(mx,my,mbc,meqn, &
 
     !! # Refined based on dq/dr (radial derivative)
 
+    mq = 1
     qmin = q(mq,1,1)
     qmax = q(mq,1,1)
-    mq = 1
     DO i = 1,mx
        DO j = 1,my
             xc = xlower + (i-0.5)*dx

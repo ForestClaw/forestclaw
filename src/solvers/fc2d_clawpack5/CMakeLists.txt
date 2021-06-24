@@ -2,6 +2,7 @@
 add_library(clawpack5_f OBJECT
   fortran_source/clawpack5_amr_module.f90 
   fortran_source/clawpack5_set_amr_module.f90 
+  fortran_source/clawpack5_time_sync.f
   fortran_source/clawpack5_inlinelimiter.f 
   fortran_source/clawpack5_limiter.f 
   fortran_source/clawpack5_set_capacity.f 

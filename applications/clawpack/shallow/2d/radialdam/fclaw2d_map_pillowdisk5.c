@@ -67,8 +67,8 @@ fclaw2d_map_c2m_pillowdisk5(fclaw2d_map_context_t * cont, int blockno,
     MAPC2M_PILLOWDISK5(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
 
-    shift_map(cont, xp,yp,zp);
     scale_map(cont, xp,yp,zp);
+    shift_map(cont, xp,yp,zp);
 }
 
 

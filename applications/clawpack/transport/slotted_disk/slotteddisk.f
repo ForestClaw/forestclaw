@@ -32,7 +32,7 @@
       integer which_disk
 
       double precision th, lambda, thi, li, q
-      double precision get_gc_distance, ri, pi
+      double precision get_gc_distance, ri
 
       ri = get_gc_distance(x,y,z,w)
 

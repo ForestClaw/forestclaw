@@ -2,15 +2,17 @@ set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/all)
 set(advection_all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(gaussian_f OBJECT 
-  setprob.f 
+  gaussian_sum.f 
+  gradient_exceeds_th.f90
   user_4.6/qinit.f 
   user_5.0/qinit.f90 
   user_4.6/tag4refinement.f 
   user_5.0/tag4refinement.f 
   user_4.6/tag4coarsening.f 
   user_5.0/tag4coarsening.f 
+  ${all}/transport_util.f 
+  ${all}/transport_setprob.f 
   ${all}/velocity_wind.f 
-  ${all}/gaussian.f 
   ${all}/user46_b4step2_manifold.f 
   ${all}/user5_b4step2_manifold.f90 
   ${advection_all}/user46_setaux_manifold.f 
@@ -23,7 +25,6 @@ add_library(gaussian_f OBJECT
 
 add_executable(gaussian 
   gaussian.cpp 
-  gaussian_user.cpp 
   ${all}/transport_user.cpp 
   ${all}/transport_domain.c 
   ${all}/transport_options.c 

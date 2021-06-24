@@ -88,6 +88,27 @@ fclaw2d_map_context_t *
 /* ----------------------
    Clawpack 4.6 headers
    ---------------------- */
+
+#define ANNULUS_SETAUX FCLAW_F77_FUNC(annulus_setaux, ANNULUS_SETAUX)
+
+void ANNULUS_SETAUX(const int* blockno, const int* mx, const int* my,
+                   const int* mbc, const double* xlower, const double* ylower,
+                   const double* dx, const double* dy, 
+                   double area[],double edgelengths[],
+                   double xp[], double yp[], double zp[],
+                   double aux[],const int* maux);
+
+
+#define ANNULUS_SET_VELOCITIES FCLAW_F77_FUNC(annulus_set_velocities, \
+                                             ANNULUS_SET_VELOCITIES)
+
+void ANNULUS_SET_VELOCITIES(const int* blockno, const int* mx, const int* my,
+                   const int* mbc, const double* dx, const double* dy,
+                   const double* xlower, const double* ylower,
+                   const double *t, double xnormals[],double ynormals[],
+                   double surfnormals[], double aux[],const int* maux);
+
+#if 0
 #define ANNULUS46_SETAUX  FCLAW_F77_FUNC(annulus46_setaux, ANNULUS46_SETAUX)
 void ANNULUS46_SETAUX(const int* mbc, const int* mx, const int* my,
                     const double* xlower, const double* ylower,
@@ -99,6 +120,7 @@ void ANNULUS46_SETAUX(const int* mbc, const int* mx, const int* my,
                     double xnormals[], double ynormals[], 
                     double xtangents[], double ytangents[], 
                     double surfnormals[]);
+#endif                    
 
 
 #define  ANNULUS46_FORT_WRITE_FILE FCLAW_F77_FUNC(annulus46_fort_write_file,  \

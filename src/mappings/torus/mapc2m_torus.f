@@ -1,7 +1,6 @@
-      subroutine mapc2m_torus(blockno,xc,yc,xp,yp,zp,alpha, beta)
+      subroutine mapc2m_torus(xc,yc,xp,yp,zp,alpha, beta)
       implicit none
 
-      integer blockno
       double precision xc,yc,xp,yp,zp
       double precision alpha, beta, r1, R
 

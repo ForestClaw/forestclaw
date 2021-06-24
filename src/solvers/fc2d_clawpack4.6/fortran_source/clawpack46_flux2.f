@@ -56,8 +56,7 @@ c
 c
       implicit none
 
-      integer mw, jside, m, i, j, ixy, maxm, meqn, mbc, mx
-      integer my, maux
+      integer ixy, maxm, meqn, mbc, mx, maux
       integer mwaves, mcapa, method(7), mthlim(mwaves)
 
       external rpn2, rpt2
@@ -79,13 +78,15 @@ c
       double precision     s(1-mbc:maxm+mbc, mwaves)
       double precision  wave(1-mbc:maxm+mbc, meqn, mwaves)
 
-      double precision cfl1d, gupdate,dtdxave
-
-      integer ilr
-      logical limit
       double precision dtcom, dxcom, dycom, tcom
       integer icom, jcom
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
+
+
+      integer ilr, mw, jside, m, i
+      double precision cfl1d, gupdate,dtdxave
+      logical limit
+
 c
       limit = .false.
       do mw = 1,mwaves
@@ -114,6 +115,7 @@ c     ---------------------------------------------------------------------
 c
       call rpn2(ixy,maxm,meqn,mwaves,mbc,mx,q1d,q1d,
      &          aux2,aux2,wave,s,amdq,apdq)
+
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
       do i = 2-mbc, mx+mbc-1
@@ -222,6 +224,5 @@ c         # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
           end do
       end if
 
-  999 continue
       return
       end

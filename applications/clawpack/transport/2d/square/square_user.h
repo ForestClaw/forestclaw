@@ -40,8 +40,10 @@ typedef struct user_options
 {
     int example;
     int mapping;
+    int use_wavelets;
 
     double alpha;    /* Used by five-patch mapping */
+
 
     int initial_condition;  /* Smooth or non-smooth */
 
@@ -155,22 +157,6 @@ void CART_BASIS_COMPLETE(const int* blockno, const double* x, const double *y,
                           const int* flag);
 
 
-#if 0
-#define CLAWPACK46_SETAUX_MANIFOLD FCLAW_F77_FUNC(clawpack46_setaux_manifold, \
-                                               CLAWPACK46_SETAUX_MANIFOLD)
-
-void CLAWPACK46_SETAUX_MANIFOLD(const int* mbc,
-                            const int* mx, const int* my,
-                            const double* xlower, const double* ylower,
-                            const double* dx, const double* dy,
-                            const int* maux, double aux[],
-                            const int* blockno,
-                            double xp[], double yp[], double zp[],
-                            double area[],double edgelengths[],
-                            double xnormals[],double ynormals[],
-                            double surfnormals[]);
-#endif
-
 #define SQUARE_SETAUX FCLAW_F77_FUNC(square_setaux, SQUARE_SETAUX)
 
 void SQUARE_SETAUX(const int* blockno, const int* mx, const int* my,
@@ -202,6 +188,18 @@ void SQUARE_FORT_HEADER_ASCII(char* matname1, char* matname2,
                                int* ngrids);
 
 
+#define SQUARE_TAG4REFINEMENT_WAVELET FCLAW_F77_FUNC(square_tag4refinement_wavelet, \
+                                              SQUARE_TAG4REFINEMENT_WAVELET)
+void  SQUARE_TAG4REFINEMENT_WAVELET(const int* mx,const int* my,
+                             const int* mbc,const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q[],
+                             const double* tag_threshold,
+                             const int* init_flag,
+                             int* tag_patch);
+
 #define SQUARE_TAG4REFINEMENT FCLAW_F77_FUNC(square_tag4refinement, \
                                               SQUARE_TAG4REFINEMENT)
 void  SQUARE_TAG4REFINEMENT(const int* mx,const int* my,
@@ -213,6 +211,19 @@ void  SQUARE_TAG4REFINEMENT(const int* mx,const int* my,
                              const double* tag_threshold,
                              const int* init_flag,
                              int* tag_patch);
+
+#define  SQUARE_TAG4COARSENING_WAVELET FCLAW_F77_FUNC(square_tag4coarsening_wavelet, \
+                                              SQUARE_TAG4COARSENING_WAVELET)
+void  SQUARE_TAG4COARSENING_WAVELET(const int* mx, const int* my,
+                             const int* mbc, const int* meqn,
+                             const double* xlower, const double* ylower,
+                             const double* dx, const double* dy,
+                             const int* blockno,
+                             double q0[],double q1[],
+                             double q2[],double q3[],
+                             const double* tag_threshold,
+                             int* tag_patch);
+
 
 #define  SQUARE_TAG4COARSENING FCLAW_F77_FUNC(square_tag4coarsening, \
                                               SQUARE_TAG4COARSENING)
@@ -226,6 +237,38 @@ void  SQUARE_TAG4COARSENING(const int* mx, const int* my,
                              const double* tag_threshold,
                              int* tag_patch);
 
+
+#define PERIODIC_FORT_INTERPOLATE_FACE \
+              FCLAW_F77_FUNC(periodic_fort_interpolate_face, \
+                             PERIODIC_FORT_INTERPOLATE_FACE)
+void PERIODIC_FORT_INTERPOLATE_FACE(const int* mx, const int* my, 
+                                    const int* mbc,const int* meqn,
+                                    double qcoarse[],double qfine[],
+                                    const int* idir, const int* iside,
+                                    const int* num_neighbors,
+                                    const int* refratio, const int* igrid,
+                                    struct fclaw2d_patch_transform_data** 
+                                    transform_cptr);
+
+
+#define PERIODIC_FORT_INTERPOLATE_CORNER \
+      FCLAW_F77_FUNC(periodic_fort_interpolate_corner, \
+                     PERIODIC_FORT_INTERPOLATE_CORNER)
+void PERIODIC_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, 
+                                      const int* mbc,const int* meqn, 
+                                      const int* a_refratio, double this_q[],
+                                      double neighbor_q[], const int* a_corner,
+                                      struct fclaw2d_patch_transform_data** 
+                                      transform_cptr);
+
+#define PERIODIC_FORT_INTERPOLATE2FINE \
+           FCLAW_F77_FUNC(periodic_fort_interpolate2fine, \
+                          PERIODIC_FORT_INTERPOLATE2FINE)
+void PERIODIC_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
+                                    const int* mbc, const int* meqn,
+                                    double qcoarse[], double qfine[],
+                                    double areacoarse[], double areafine[],
+                                    const int* igrid, const int* manifold);
 
 
 #ifdef __cplusplus

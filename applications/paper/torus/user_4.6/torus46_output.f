@@ -12,7 +12,7 @@
       matunit1 = 10
       matunit2 = 15
 
-      mfields = meqn + 3  !! Include error, exact solution and divergence
+      mfields = meqn + 2  !! Include error, exact solution and divergence
       open(unit=matunit2,file=matname2)
       write(matunit2,1000) time,mfields,ngrids,maux,2
  1000 format(e30.20,'    time', /,
@@ -82,26 +82,15 @@
                   q(i,j,mq) = 0.d0
                endif
             enddo
-c            xc = xlower + (i-0.5)*dx
-c            yc = ylower + (j-0.5)*dy
-c            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-c            call torus_transform_coordinates(xc1,yc1,x,y,mapping)
-c            if (time .eq. 0) then
-c                qc = q(i,j,1)
-c            else
-c                qc = qexact(blockno, x, y,time)
-c            endif
-            qc = q(i,j,1)
+            qc = soln(i,j,1)
             if (abs(qc) .lt. 1d-99) then
                qc = 0.d0
             endif
             if (abs(error(i,j,1)) .lt. 1d-99) then
                error(i,j,1) = 0.d0
             endif
-c            divu = torus_divergence(x,y)
-            divu = 0
             write(matunit1,120) (q(i,j,mq),mq=1,meqn),qc,
-     &            error(i,j,1), divu
+     &            error(i,j,1)
          enddo
          write(matunit1,*) ' '
       enddo

@@ -6,13 +6,15 @@ c    # -------------------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn
-      double precision dx, dy, dxdy
+      double precision dx, dy
       double precision sum(meqn)
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      include 'fclaw2d_metric_terms.i'
+c      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
+      double precision dxdy
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
@@ -46,11 +48,12 @@ c     # Compute area of a patch
 
       integer mx,my, mbc
       double precision dx, dy
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+c      include 'fclaw2d_metric_terms.i'
+
+      integer i,j
       double precision sum
-
-      include 'fclaw2d_metric_terms.i'
-
-      integer i,j,m
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
@@ -77,13 +80,15 @@ c     # Compute area of a patch
       implicit none
 
       integer mx,my,mbc,meqn
-      double precision dx, dy, dxdy, eij
+      double precision dx, dy
       double precision error_norm(meqn,3)
       double precision error(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      include 'fclaw2d_metric_terms.i'
+c      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
+      double precision dxdy, eij
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 

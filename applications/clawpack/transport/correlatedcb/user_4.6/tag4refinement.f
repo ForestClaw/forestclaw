@@ -13,17 +13,13 @@
       common /compi/ pi
 
       integer i,j, mq
-      double precision qmin, qmax, dq1, dq2,dq, dx2, dy2, s
+      double precision qmin, qmax
       double precision quad(-1:1,-1:1), xc, yc
       integer ii,jj
 
       logical exceeds_th, gradient_exceeds_th
 
       tag_patch = 0
-
-      s = pi/2 
-      dx2 = 2*dx*s
-      dy2 = 2*dy*s
 
 c     # We check only internal cells, because there is a problem with the
 c     # corner values on the cubed sphere. Possible bad values in (unused)

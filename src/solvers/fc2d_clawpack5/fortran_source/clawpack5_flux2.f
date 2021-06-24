@@ -60,12 +60,12 @@ c
       external rpn2, rpt2
 
       integer ixy,maxm,meqn,maux,mbc,mx
-      double precision    q1d(meqn,1-mbc:maxm+mbc)
-      double precision   amdq(meqn,1-mbc:maxm+mbc)
-      double precision   apdq(meqn,1-mbc:maxm+mbc)
-      double precision bmasdq(meqn,1-mbc:maxm+mbc)
-      double precision bpasdq(meqn,1-mbc:maxm+mbc)
-      double precision   cqxx(meqn,1-mbc:maxm+mbc)
+      double precision     q1d(meqn,1-mbc:maxm+mbc)
+      double precision    amdq(meqn,1-mbc:maxm+mbc)
+      double precision    apdq(meqn,1-mbc:maxm+mbc)
+      double precision  bmasdq(meqn,1-mbc:maxm+mbc)
+      double precision  bpasdq(meqn,1-mbc:maxm+mbc)
+      double precision    cqxx(meqn,1-mbc:maxm+mbc)
       double precision   faddm(meqn,1-mbc:maxm+mbc)
       double precision   faddp(meqn,1-mbc:maxm+mbc)
       double precision   gaddm(meqn,1-mbc:maxm+mbc, 2)
@@ -94,6 +94,7 @@ c
          endif
       end do
 c
+
 c     # initialize flux increments:
 c     -----------------------------
 c
@@ -161,16 +162,16 @@ c        # second order corrections:
 c
                if (use_fwaves) then
                    abs_sign = dsign(1.d0,s(mw,i))
-                 else
+               else
                    abs_sign = dabs(s(mw,i))
                endif
 
                cqxx(m,i) = cqxx(m,i) + abs_sign
      &             * (1.d0 - dabs(s(mw,i))*dtdxave) * wave(m,mw,i)
              end do
+             faddm(m,i) = faddm(m,i) + 0.5d0 * cqxx(m,i)
+             faddp(m,i) = faddp(m,i) + 0.5d0 * cqxx(m,i)
          end do
-         faddm(m,i) = faddm(m,i) + 0.5d0 * cqxx(m,i)
-         faddp(m,i) = faddp(m,i) + 0.5d0 * cqxx(m,i)
       end do
 c
 c

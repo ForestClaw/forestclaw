@@ -6,44 +6,41 @@ c    # -------------------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,mfields
-      double precision dx, dy, dxdy
+      double precision dx, dy
       double precision sum(mfields), c_kahan(mfields)
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
-      double precision c, t, y
+      double precision t, y, area_ij
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      include 'fclaw2d_metric_terms.i'
+c      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
+      logical use_kahan
+
+      use_kahan = .true.
+
       cont = get_context()
 
-      dxdy = dx*dy
+      area_ij = dx*dy  !! Area in each mesh cell is constant
       do m = 1,mfields
-         if (fclaw2d_map_is_used(cont)) then
-C            sum(m) = 0
-c            c_kahan = 0
-            do j = 1,my
-               do i = 1,mx
-                  y = q(i,j,m)*area(i,j) - c_kahan(m)
+         do j = 1,my
+            do i = 1,mx
+               if (fclaw2d_map_is_used(cont)) then
+                  area_ij = area(i,j)  !! Area varies
+               endif
+               if (use_kahan) then
+                  y = q(i,j,m)*area_ij - c_kahan(m)
                   t = sum(m) + y
                   c_kahan(m) = (t-sum(m)) - y
                   sum(m) = t
-c                  sum(m) = sum(m) + q(i,j,m)*area(i,j)
-               enddo
+               else
+                  sum(m) = sum(m) + q(i,j,m)*area_ij
+               endif
             enddo
-         else
-            do j = 1,my
-               do i = 1,mx
-                  y = q(i,j,m)*dxdy - c_kahan(m)
-                  t = sum(m) + y
-                  c_kahan(m) = (t-sum(m)) - y
-                  sum(m) = t
-!!                  sum(m) = sum(m) + q(i,j,m)*dxdy
-               enddo
-            enddo
-         endif
+         enddo
       enddo
 
       end
@@ -56,13 +53,14 @@ c     # Compute area of a patch
 
       integer mx,my, mbc
       double precision dx, dy
-      double precision sum
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      include 'fclaw2d_metric_terms.i'
+c      include 'fclaw2d_metric_terms.i'
 
-      integer i,j,m
+      integer i,j
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
+      double precision sum
 
       cont = get_context()
 
@@ -87,13 +85,16 @@ c     # Compute area of a patch
       implicit none
 
       integer mx,my,mbc,mfields, blockno
-      double precision dx, dy, dxdy, eij
+      double precision dx, dy
       double precision error_norm(mfields,3)
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      include 'fclaw2d_metric_terms.i'
+c      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
+      double precision dxdy, eij
+
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 

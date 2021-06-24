@@ -5,11 +5,9 @@ c     # ------------------------------------------------
       implicit none
 
       double precision x,y,z,w(3)
-      double precision p(3), pn, wn, ca, th
-      double precision rsphere, get_scale
+      double precision p(3), pn, wn, ca, th, rsphere
       integer m
 
-c      rsphere = get_scale()
       rsphere = 1.0
 
       p(1) = x

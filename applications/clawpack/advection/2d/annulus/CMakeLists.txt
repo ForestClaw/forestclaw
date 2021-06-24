@@ -3,6 +3,7 @@ set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 add_library(annulus_f OBJECT 
   psi.f 
   setprob.f
+  fdisc.f 
   user_4.6/qinit.f 
   user_5.0/qinit.f90 
   ${all}/user46_setaux_manifold.f

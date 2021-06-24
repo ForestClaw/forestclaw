@@ -199,7 +199,6 @@ c     # solid wall (assumes 3'rd component is velocity or momentum in y):
             end do
          end do
       end do
-  435       continue
 c     # negate the normal velocity:
       do jbc=1,mbc
          do i = 1-mbc, mx+mbc

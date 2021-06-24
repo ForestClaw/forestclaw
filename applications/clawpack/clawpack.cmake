@@ -44,6 +44,36 @@ add_subdirectory(clawpack/advection/2d/hemisphere)
 ## sphere (cubed-sphere and pillow-disk)
 add_subdirectory(clawpack/advection/2d/sphere)
 
+## periodic (square,periodic in both directions, constant velocity)
+add_subdirectory(clawpack/advection/2d/periodic)
+
+
+## --------------------- Transport ---------------------------- 
+## Example : Solve the variable velocity transport equation
+##
+##                   q_t + div(u q) = 0
+##
+## These examples use the fwave approach and can be used to test
+## conservation.
+## ------------------------------------------------------------
+
+add_subdirectory(clawpack/transport/square)
+
+
+## ---------------------Transport on a sphere ---------------------------- 
+## Examples from suite described by Lauritzen, et al.  See:
+##   "A standard test case suite for two-dimensional  linear
+##    transport on the sphere: results from a collection 
+##    of state-of-the-art schemes", Lauritzen, et al.
+##    Geosciences Model Development, 2014. 
+##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
+## -------------------------------------------------------------------------
+
+add_subdirectory(clawpack/transport/gaussian)
+add_subdirectory(clawpack/transport/slotted_disk)
+add_subdirectory(clawpack/transport/correlatedcb)
+
+
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
 ## ----------------------------------------------------------
@@ -64,23 +94,7 @@ add_subdirectory(clawpack/euler/2d/shockbubble)
 add_subdirectory(clawpack/euler/2d/quadrants)
 
 
-
-
-## ---------------------Transport on the sphere ---------------------------- 
-## Examples from suite described by Lauritzen, et al.  See:
-##   "A standard test case suite for two-dimensional  linear
-##    transport on the sphere: results from a collection 
-##    of state-of-the-art schemes", Lauritzen, et al.
-##    Geosciences Model Development, 2014. 
-##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
-## -------------------------------------------------------------------------
-
-add_subdirectory(clawpack/transport/gaussian)
-add_subdirectory(clawpack/transport/slotted_disk)
-add_subdirectory(clawpack/transport/correlatedcb)
-
-
-## ---------------------Transport on the sphere ---------------------------- 
+## --------------------- Miscellaneous ---------------------------- 
 ## Example : Don't using the 'app' for configuring options;  
 ##           This is how you might call ForestClaw from another
 ##           program.

@@ -33,7 +33,7 @@ def setrun(claw_pkg='amrclaw'):
     # 3 = horizontal flow with variable speed
     # 4 = time dependent in both x and y
     # 5 = spatially dependent
-    example = 4          
+    example = 2          
 
     refine_pattern = 0   # 0 = constant theta;  1 = constant_r
 
@@ -95,8 +95,8 @@ def setrun(claw_pkg='amrclaw'):
     # 0 = no qad
     # 1 = original qad
     # 2 = modified (fixed to include call to rpn2qad)
-    # 3 = new qad (should be equivalent to 2)
-    qad_mode = 2
+    # 3 = new qad (equivalent to 2 but uses f90)
+    qad_mode = 1
 
     maux = 15
     use_fwaves = True
@@ -286,12 +286,15 @@ def setrun(claw_pkg='amrclaw'):
     # Conservative form (cell-centered velocities)
     # 1      capacity
     # 2-3    Cell-centered velocities projected 
-    # 4-5    normal at x face
-    # 6-7    normal at y face
-    # 8-9    edgelengths at x/y faces
+    # 4-5    normal at x face (left)
+    # 6-7    normal at x face (right)
+    # 8-9    normal at y face (bottom)
+    # 10-11    normal at y face (top)
+    # 12-15    edgelengths at all four x/y faces in cell.
     # ----------------------------------------------------------------
 
     if qad_mode in [0,1]:
+        # We don't expect to use the values at right/top faces. 
         amrdata.aux_type = ['capacity'] + ['center']*2 + ['xleft']*4 + \
               ['yleft']*4 + ['xleft']*2 + ['yleft']*2
     else:

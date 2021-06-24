@@ -13,7 +13,7 @@ c     # We tag for coarsening if this coarsened patch isn't tagged for refinemen
       double precision q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer i,j, mq
+      integer mq
       double precision qmin, qmax
 
 c     # Assume that we will coarsen a family unless we find a grid

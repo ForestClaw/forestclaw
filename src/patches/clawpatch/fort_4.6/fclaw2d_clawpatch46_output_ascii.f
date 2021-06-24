@@ -2,7 +2,7 @@
      &      (matname1,matname2, time,meqn,maux,ngrids)
       implicit none
 
-      integer iframe,meqn,ngrids, maux
+      integer meqn,ngrids, maux
 
       character*11 matname1
       character*11 matname2

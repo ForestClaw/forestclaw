@@ -41,8 +41,11 @@ typedef struct user_options
     int example;
     double rho;
     double bulk;
+
+#if 0
     double cc;
     double zz;
+#endif
 
     double alpha;
 
@@ -55,13 +58,24 @@ typedef struct user_options
 void radial_problem_setup(fclaw2d_global_t* glob);
 
 #define RADIAL_SETPROB FCLAW_F77_FUNC(radial_setprob, RADIAL_SETPROB)
-void RADIAL_SETPROB(const double* rho, const double *bulk,
-                    double* cc, double*zz);
+void RADIAL_SETPROB();
 
-#define RADIAL_SETAUX_MANIFOLD FCLAW_F77_FUNC(radial_setaux_manifold, \
-                                             RADIAL_SETAUX_MANIFOLD)
+#define CLAWPACK46_SETAUX_MANIFOLD FCLAW_F77_FUNC(clawpack46_setaux_manifold, \
+                                             CLAWPACK46_SETAUX_MANIFOLD)
 
-void RADIAL_SETAUX_MANIFOLD(const int* mbc,
+void CLAWPACK46_SETAUX_MANIFOLD(const int* mbc,
+                           const int* mx, const int* my,
+                           const double* xlower, const double* ylower,
+                           const double* dx, const double* dy,
+                           const int* maux, double aux[],
+                           double xnormals[], double ynormals[],
+                           double edgelengths[],
+                           double area[]);
+
+#define CLAWPACK5_SETAUX_MANIFOLD FCLAW_F77_FUNC(clawpack5_setaux_manifold, \
+                                                  CLAWPACK5_SETAUX_MANIFOLD)
+
+void CLAWPACK5_SETAUX_MANIFOLD(const int* mbc,
                            const int* mx, const int* my,
                            const double* xlower, const double* ylower,
                            const double* dx, const double* dy,
@@ -89,6 +103,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[],
+                                                  const double alpha);
 
 #ifdef __cplusplus
 #if 0

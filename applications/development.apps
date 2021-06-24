@@ -30,9 +30,6 @@ include applications/clawpack/shallow/2d/bump/Makefile.am
 ## tsunami (SGN)
 #include applications/clawpack/shallow/2d/tsunami/Makefile.am
 
-## Shallow (tsunami, used for SGN equations)
-#include applications/clawpack/shallow/2d/tsunami/Makefile.am
-
 ## -----------------------------------------------------------
 ## Some third order examples
 ## -----------------------------------------------------------

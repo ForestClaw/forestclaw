@@ -210,7 +210,7 @@ void fclaw2d_metric_patch_setup(fclaw2d_global_t* glob,
 
     /* Setup the mesh and normals */
     metric_vt->compute_mesh   (glob,this_patch,blockno,patchno);
-    metric_vt->compute_normals(glob,this_patch,blockno,patchno);
+    metric_vt->compute_tensors(glob,this_patch,blockno,patchno);
 }
 
 
@@ -229,7 +229,7 @@ void fclaw2d_metric_patch_setup_from_fine(fclaw2d_global_t *glob,
                                   fine0_patchno);
 
     metric_vt->compute_mesh(glob,coarse_patch,blockno,coarse_patchno);
-    metric_vt->compute_normals(glob,coarse_patch,blockno,coarse_patchno);
+    metric_vt->compute_tensors(glob,coarse_patch,blockno,coarse_patchno);
 }
 
 
@@ -257,7 +257,7 @@ void fclaw2d_metric_vtable_initialize()
     metric_vt->compute_mesh          = fclaw2d_metric_compute_mesh_default;
     metric_vt->compute_area          = fclaw2d_metric_compute_area_default;
     metric_vt->compute_area_ghost    = fclaw2d_metric_compute_area_ghost_default;
-    metric_vt->compute_normals       = fclaw2d_metric_compute_normals_default;
+    metric_vt->compute_tensors       = fclaw2d_metric_compute_tensors_default;
 
     /* Fortran files */
     metric_vt->fort_compute_mesh          = &FCLAW2D_FORT_COMPUTE_MESH;

@@ -3,6 +3,7 @@ set(rp ${PROJECT_SOURCE_DIR}/clawpack/euler/2d/rp)
 add_library(shockbubble_f OBJECT 
   fdisc.f 
   setprob.f 
+  difference_exceeds_th.f90 
   user_4.6/qinit.f 
   user_4.6/setaux.f 
   user_4.6/bc2.f 
@@ -13,8 +14,8 @@ add_library(shockbubble_f OBJECT
   user_5.0/setaux.f90 
   user_5.0/bc2.f90 
   user_5.0/src2.f90 
-  user_5.0/tag4coarsening.f90 
-  user_5.0/tag4refinement.f90 
+  user_5.0/tag4coarsening.f
+  user_5.0/tag4refinement.f
   ${rp}/clawpack46_rpn2_euler4.f 
   ${rp}/clawpack46_rpt2_euler4.f 
   ${rp}/clawpack46_rpn2_euler5.f 

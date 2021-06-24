@@ -111,7 +111,7 @@ c     # Stream function for rigid body rotation.
       double precision pi4
       double precision torus_dot
 
-      integer k, kk, i
+      integer k, i
       logical compute_covariant, compute_contravariant
       logical compute_derivatives, b(32)
 
@@ -166,6 +166,9 @@ c     #
       r1    = alpha*(1 + beta*sin(pi2*x))
       r1x   = pi2*alpha*beta*cos(pi2*x)
       r1xx  = -pi4*alpha*beta*sin(pi2*x)
+      r1y = 0
+      r1yy = 0
+      r1xy = 0
 
       R     = 1 +   r1*cos(pi2*y)
       Rx    =      r1x*cos(pi2*y)

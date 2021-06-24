@@ -7,7 +7,7 @@ logical function bump_exceeds_th(qval,qmin,qmax,threshhold)
     logical refine
 
     refine = .false.
-    if (qval .gt. threshhold) then
+    if (qmax-qmin .gt. threshhold) then
         refine = .true.
     endif
 

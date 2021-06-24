@@ -50,7 +50,7 @@ FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
-FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont, int *blockno,
+FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
                        const double *xc, const double *yc,
                        double *t, double *tinv, double *tderivs,
                        int *flag)
@@ -58,7 +58,7 @@ FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont, int *blockno,
     fclaw2d_map_context_t *cont = *pcont;
     FCLAW_ASSERT(cont->basis != NULL);
 
-    cont->basis (cont, *blockno, *xc, *yc, t, tinv, tderivs, *flag);
+    cont->basis (cont, *xc, *yc, t, tinv, tderivs, *flag);
 }
 
 

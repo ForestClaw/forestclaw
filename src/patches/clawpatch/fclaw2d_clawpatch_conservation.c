@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -336,10 +336,6 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
                                      *transform_data)
 {
 
-	int meqn,mx,my,mbc;
-	double dx,dy,xlower,ylower;
-	double *qcoarse, *qfine;
-
 	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
 	/* We don't correct time interpolated grids, since we assume that the time 
@@ -347,9 +343,16 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 	n and n+1 patches.  But we do correct ghost patches, since corrections will be 
 	needed for copying and interpolation.  */
 
+
+	double *qcoarse;
+	int meqn;
 	fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
+
+	double *qfine;
 	fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
 
+	int mx,my,mbc;
+	double dx,dy,xlower,ylower;
 	fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
@@ -403,14 +406,15 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 	interpolated average will already have correction information from times 
 	n and n+1 patches.  But we do correct ghost patches, since corrections will be 
 	needed for copying and interpolation.  */
-	int mx,my,meqn,mbc;
-	double dx,dy,xlower,ylower;
-	double *qthis;
 
 	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
+	double *qthis;
+	int meqn;
 	fclaw2d_clawpatch_soln_data(glob,this_patch,&qthis,&meqn);
 
+	int mx,my,mbc;
+	double dx,dy,xlower,ylower;
 	fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
@@ -455,6 +459,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 	                                      qneighbor_dummy,
 	                                      &transform_data);    
 	FCLAW_FREE(qneighbor_dummy);
+
 }
 
 

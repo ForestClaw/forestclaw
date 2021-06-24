@@ -291,8 +291,10 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/disk
-        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4 --user:example=0   
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./disk -F regression.ini --user:claw-version=5 --user:example=1
 
 
   clawpack_advection_2d_filament:
@@ -312,8 +314,12 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/filament
-        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=4 --user:example=2
+        mpirun -n 2 ./filament -F regression.ini --user:claw-version=5 --user:example=2
 
 
   clawpack_advection_2d_hemisphere:
@@ -333,8 +339,10 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/advection/2d/hemisphere
-        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./hemisphere -F regression.ini --user:claw-version=5 --user:example=1
 
 
   clawpack_advection_2d_latlong:
@@ -500,8 +508,12 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/acoustics/2d/radial
-        mpirun -n 2 ./radial -F regression.ini    --user:claw-version=4
-        mpirun -n 2 ./interface -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./radial -F regression.ini     --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=4 --user:example=1
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=4 --user:example=2
+        mpirun -n 2 ./radial -F regression.ini     --user:claw-version=5 --user:example=0
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./radial -F regression_map.ini --user:claw-version=5 --user:example=2
 
 
   clawpack_burgers_2d_pwconst:
@@ -563,11 +575,11 @@ jobs:
     - name: Run Test
       run: |
         cd applications/clawpack/shallow/2d/radialdam
-        mpirun -n 2 ./radialdam -F regression.ini --user:claw-version=4
-        mpirun -n 2 ./radialdam -F regression.ini --user:claw-version=5
+        mpirun -n 2 ./radialdam -F regression.ini     --user:claw-version=4 --user:example=0
+        mpirun -n 2 ./radialdam -F regression.ini     --user:claw-version=5 --user:example=0
         mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=1
-        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2
         mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=1
+        mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2
         mpirun -n 2 ./radialdam -F regression_map.ini --user:claw-version=5 --user:example=2
 
 
@@ -638,6 +650,32 @@ jobs:
         mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=4 --user:example=1
         mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=5 --user:example=0
         mpirun -n 2 ./slotted_disk -F regression.ini --user:claw-version=5 --user:example=1
+
+  clawpack_transport_square:
+    needs: mpi_build_with_clawpack_enabled
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install openmpi-bin
+    - name: Download Binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: clawpack_binaries
+    - name: Untar Files
+      run: tar -xvf clawpack_binaries.tar
+    - name: Run Test
+      run: |
+        cd applications/clawpack/transport/square
+        mpirun -n 2 ./square -F regression.ini --user:claw-version=4 --user:mapping=0  
+        mpirun -n 2 ./square -F regression.ini --user:claw-version=4 --user:mapping=1  
+        mpirun -n 2 ./square -F regression.ini --user:claw-version=4 --user:mapping=2
+        mpirun -n 2 ./square -F regression.ini --user:claw-version=4 --user:mapping=3 --mi=2 --mj=2
+        mpirun -n 2 ./square -F regression.ini --user:claw-version=5 --user:mapping=0
+        mpirun -n 2 ./square -F regression.ini --user:claw-version=5 --user:mapping=1  
+        mpirun -n 2 ./square -F regression.ini --user:claw-version=5 --user:mapping=2
+        mpirun -n 2 ./square -F regression.ini --user:claw-version=5 --user:mapping=3 --mi=2 --mj=2
 
 
   clawpack_euler_2d_shockbubble:

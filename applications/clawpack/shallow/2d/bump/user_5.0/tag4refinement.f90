@@ -9,9 +9,8 @@ SUBROUTINE clawpack5_tag4refinement(mx,my,mbc,meqn, &
   DOUBLE PRECISION refine_threshold
   DOUBLE PRECISION q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-  INTEGER i,j, mq,m
-  DOUBLE PRECISION xc,yc, qmin, qmax
-  DOUBLE PRECISION dq, dqi, dqj
+  INTEGER i,j, mq
+  DOUBLE PRECISION qmin, qmax
 
   tag_patch = 0
 

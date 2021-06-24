@@ -62,7 +62,7 @@ disk_check (user_options_t *user_opt,
 {
 
     if (user_opt->example < 0 || user_opt->example > 1) {
-        fclaw_global_essentialf ("Option --user:example must be 0, 1 or 2\n");
+        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
     else if (user_opt->example == 1)
