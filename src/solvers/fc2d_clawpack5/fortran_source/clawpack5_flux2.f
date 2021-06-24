@@ -56,6 +56,7 @@ c
 c
       use clawpack5_amr_module
       implicit none
+
       external rpn2, rpt2
 
       integer ixy,maxm,meqn,maux,mbc,mx
@@ -78,14 +79,17 @@ c
       double precision  wave(meqn, mwaves, 1-mbc:maxm+mbc)
 c
       logical limit
+
+      double precision dtcom, dxcom , dycom, tcom
+      integer icom, jcom
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
-      integer i,j,m, mw
-      double precision cfl1d, dtdxave
+      integer mw, i, m
+      double precision cfl1d, dtdxave, abs_sign, gupdate
 c
       limit = .false.
-      do mw=1,mwaves
-         if (mthlim(mw) .gt. 0) then 
+      do mw = 1,mwaves
+         if (mthlim(mw) .gt. 0) then
             limit = .true.
          endif
       end do
@@ -95,7 +99,7 @@ c     # initialize flux increments:
 c     -----------------------------
 c
        do i = 1-mbc, mx+mbc
-         do m=1,meqn
+         do m = 1,meqn
             faddm(m,i) = 0.d0
             faddp(m,i) = 0.d0
             gaddm(m,i,1) = 0.d0
@@ -141,7 +145,7 @@ c     # !!! Change to call clawpack5_limiter (original:limiter)
       if (limit) call clawpack5_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
      &      wave,s,mthlim)
 c
-      do i = 1, mx+1
+      do  i = 1, mx+1
 c
 c        # For correction terms below, need average of dtdx in cell
 c        # i-1 and i.  Compute these and overwrite dtdx1d:
@@ -152,7 +156,7 @@ c        # modified in Version 4.3 to use average only in cqxx, not transverse
 c
 c        # second order corrections:
 
-         do m=1,meqn
+         do m = 1,meqn
             cqxx(m,i) = 0.d0
             do mw=1,mwaves
 c
@@ -160,7 +164,7 @@ c
                    abs_sign = dsign(1.d0,s(mw,i))
                else
                    abs_sign = dabs(s(mw,i))
-                 endif
+               endif
 
                cqxx(m,i) = cqxx(m,i) + abs_sign
      &             * (1.d0 - dabs(s(mw,i))*dtdxave) * wave(m,mw,i)
@@ -182,8 +186,8 @@ c         # incorporate cqxx into amdq and apdq so that it is split also.
                 amdq(m,i) = amdq(m,i) + cqxx(m,i)
                 apdq(m,i) = apdq(m,i) - cqxx(m,i)
              end do
-         end do
-        endif
+          end do
+       endif
 c
 c
 c      # modify G fluxes for transverse propagation
@@ -196,7 +200,7 @@ c     # split the left-going flux difference into down-going and up-going:
      &          amdq,bmasdq,bpasdq)
 c
 c     # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
-       do i = 1, mx+1
+      do i = 1, mx+1
          do m=1,meqn
                gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(m,i)
                gaddm(m,i-1,1) = gaddm(m,i-1,1) - gupdate
@@ -205,7 +209,7 @@ c
                gupdate = 0.5d0*dtdx1d(i-1) * bpasdq(m,i)
                gaddm(m,i-1,2) = gaddm(m,i-1,2) - gupdate
                gaddp(m,i-1,2) = gaddp(m,i-1,2) - gupdate
-         end do
+            end do
       end do
 c
 c     # split the right-going flux difference into down-going and up-going:

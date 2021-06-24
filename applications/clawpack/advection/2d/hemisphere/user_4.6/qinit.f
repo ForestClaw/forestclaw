@@ -3,14 +3,14 @@
 
       implicit none
 
-      integer maxmx, maxmy, meqn, mbc, mx, my, maux,this_block_idx
+      integer maxmx, maxmy, meqn, mbc, mx, my, maux
       double precision xlower, ylower, dx, dy
       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
       integer i,j
       integer blockno, fc2d_clawpack46_get_block
-      double precision x,y,z, xlow, ylow, w
+      double precision xlow, ylow, w
 
       blockno = fc2d_clawpack46_get_block()
 
