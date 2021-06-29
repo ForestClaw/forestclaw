@@ -2,14 +2,12 @@
       implicit none
 
       double precision xp,yp,zp,t
-      double precision r2, pi2, revs_per_s
+      double precision r2, revs_per_s
 
-      double precision pi
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
       revs_per_s = 0.5d0
-
-      pi2 = 2*pi
 
 c     # annulus : Solid body rotation
       r2 = xp**2 + yp**2

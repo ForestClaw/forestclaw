@@ -3,10 +3,17 @@ function [xp,yp,zp] = mapc2m(xc1,yc1)
 
 global notpillowsphere;
 
-% map = 'pillowsphere';
-map = 'cubedsphere';
+% map = 'cubedsphere';
+map = 'pillowsphere';
 
 switch map
+    case 'nomap'
+        % This needs work
+        % Uses [ax,bx] x [ay,by] set in fclaw2d_defaults.ini
+        % This is what is stored in the fort.q files.
+        xp = xc1;
+        yp = yc1;
+        zp = zeros(size(xc1));
     case 'pillowsphere'
         notpillowsphere = false;
         [xp,yp,zp] = mapc2m_pillowsphere(xc1,yc1);

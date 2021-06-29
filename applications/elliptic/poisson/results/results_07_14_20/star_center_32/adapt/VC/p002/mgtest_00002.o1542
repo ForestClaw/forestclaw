@@ -1,0 +1,415 @@
+[libsc] This is libsc 2.2.43-e212
+[libsc] CPP                      mpicxx -E
+[libsc] CPPFLAGS                 
+[libsc] CC                       mpicxx
+[libsc] CFLAGS                   -O2 -Wall
+[libsc] LDFLAGS                  
+[libsc] LIBS                       -lz   
+[libsc] Shared memory node communicator size: 2
+[p4est] This is p4est 2.2.247-aa01
+[p4est] CPP                      mpicxx -E
+[p4est] CPPFLAGS                 
+[p4est] CC                       mpicxx
+[p4est] CFLAGS                   -O2 -Wall
+[p4est] LDFLAGS                  
+[p4est] LIBS                       -lz   
+[fclaw] This is ForestClaw 0.1.4990-1112a
+[fclaw] CPP                      mpicxx -E
+[fclaw] CPPFLAGS                 
+[fclaw] F77                      gfortran
+[fclaw] FFLAGS                   -O3 -cpp
+[fclaw] CC                       mpicxx
+[fclaw] CFLAGS                   -O3 -Wall
+[fclaw] CXX                      mpicxx
+[fclaw] CXXFLAGS                 -O3 -Wall
+[fclaw] LDFLAGS                  
+[fclaw] FLIBS                     -L/usr/lib/gcc/x86_64-linux-gnu/8 -L/usr/lib/gcc/x86_64-linux-gnu/8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/8/../../.. -lgfortran -lm -lquadmath
+[fclaw] LIBS                       -lz   
+[fclaw] Reading file fclaw_options.ini.
+[fclaw] Options:
+[fclaw]    help                                 false
+[fclaw]    version                              false
+[fclaw]    print-options                        false
+[fclaw]    verbosity                            production
+[fclaw]    lib-verbosity                        essential
+[fclaw]    initial_dt                           0.1
+[fclaw]    max_cfl                              1
+[fclaw]    desired_cfl                          0.9
+[fclaw]    reduce-cfl                           true
+[fclaw]    use_fixed_dt                         false
+[fclaw]    outstyle                             1
+[fclaw]    tfinal                               1
+[fclaw]    nout                                 10
+[fclaw]    nstep                                1
+[fclaw]    advance-one-step                     true
+[fclaw]    outstyle-uses-maxlevel               true
+[fclaw]    subcycle                             true
+[fclaw]    weighted_partition                   false
+[fclaw]    time-sync                            false
+[fclaw]    flux-correction                      true
+[fclaw]    fluctuation-correction               true
+[fclaw]    output                               false
+[fclaw]    output-gauges                        false
+[fclaw]    gauge-buffer-length                  1
+[fclaw]    tikz-out                             false
+[fclaw]    tikz-figsize                         8 8
+[fclaw]    tikz-plot-prefix                     plot
+[fclaw]    tikz-plot-suffix                     png
+[fclaw]    tikz-mesh-only                       false
+[fclaw]    tikz-plot-fig                        true
+[fclaw]    prefix                               fort
+[fclaw]    vtkspace                             0
+[fclaw]    init_ghostcell                       false
+[fclaw]    minlevel                             0
+[fclaw]    maxlevel                             8
+[fclaw]    regrid_interval                      1
+[fclaw]    refratio                             2
+[fclaw]    smooth-refine                        false
+[fclaw]    smooth-level                         7
+[fclaw]    coarsen-delay                        0
+[fclaw]    refine_threshold                     0.01
+[fclaw]    coarsen_threshold                    0.0025
+[fclaw]    run-user-diagnostics                 false
+[fclaw]    compute-error                        true
+[fclaw]    conservation-check                   true
+[fclaw]    report-timing                        true
+[fclaw]    report-timing-verbosity              all
+[fclaw]    ghost_patch_pack_area                true
+[fclaw]    ghost_patch_pack_extra               false
+[fclaw]    ghost_patch_pack_numextrafields      0
+[fclaw]    trapfpe                              true
+[fclaw]    mpi_debug                            false
+[fclaw]    ax                                   -1
+[fclaw]    bx                                   1
+[fclaw]    ay                                   -1
+[fclaw]    by                                   1
+[fclaw]    manifold                             false
+[fclaw]    mi                                   1
+[fclaw]    mj                                   1
+[fclaw]    periodic_x                           false
+[fclaw]    periodic_y                           false
+[fclaw]    scale                                1 1 1
+[fclaw]    shift                                0 0 0
+[fclaw]    phi                                  0
+[fclaw]    theta                                0
+[fclaw]    clawpatch:mx                         32
+[fclaw]    clawpatch:my                         32
+[fclaw]    clawpatch:maux                       0
+[fclaw]    clawpatch:mbc                        2
+[fclaw]    clawpatch:meqn                       1
+[fclaw]    clawpatch:interp_stencil_width       3
+[fclaw]    clawpatch:ghost_patch_pack_aux       true
+[fclaw]    multigrid:boundary_conditions        1 1 1 1
+[fclaw]    multigrid:ascii-out                  true
+[fclaw]    multigrid:vtk-out                    false
+[fclaw]    multigrid:mg-prec                    true
+[fclaw]    multigrid:max-it                     100000
+[fclaw]    multigrid:tol                        1e-14
+[fclaw]    multigrid:max-levels                 0
+[fclaw]    multigrid:patches-per-proc           0
+[fclaw]    multigrid:pre-sweeps                 1
+[fclaw]    multigrid:post-sweeps                1
+[fclaw]    multigrid:mid-sweeps                 1
+[fclaw]    multigrid:coarse-sweeps              1
+[fclaw]    multigrid:cycle-type                 V
+[fclaw]    multigrid:patch-bcgs-tol             0.1
+[fclaw]    multigrid:patch-bcgs-max-it          10000
+[fclaw]    user:example                         4
+[fclaw]    user:beta-choice                     0
+[fclaw]    user:alpha                           10000
+[fclaw]    user:x0                              0
+[fclaw]    user:y0                              0
+[fclaw]    user:a                               0.5
+[fclaw]    user:b                               0.5
+[fclaw]    user:eps-disk                        0.015625
+[fclaw]    user:m-polar                         1
+[fclaw]    user:x0-polar                        0
+[fclaw]    user:y0-polar                        0
+[fclaw]    user:r0-polar                        0.4
+[fclaw]    user:r1-polar                        0.45
+[fclaw]    user:n-polar                         6
+[fclaw] Arguments: none
+[p4est 0] Local minimum/maximum levels: 29 -1
+[p4est] Global minimum/maximum levels:  0  0
+[fclaw] Max threads set to 0
+[p4est 1] Local minimum/maximum levels:  0  0
+[p4est 1] Patches on level  0:         1
+[fclaw] error[0] =  1.9741e+02  1.2258e+03 1.6439e+04
+[fclaw] sum[0] =   -7.5911456395317573e-09    0.0000000000000000e+00
+[fclaw] Time step    0  at time   0.00000000e+00
+
+    0   1.00000000e+00
+    0   1.00000000e+00
+    1   7.04744090e-01
+    1   7.04744090e-01
+    2   2.78180524e-02
+    2   2.78180524e-02
+    3   1.94259315e-03
+    3   1.94259315e-03
+    4   1.04387522e-04
+    4   1.04387522e-04
+    5   6.65796052e-06
+    5   6.65796052e-06
+    6   3.10731346e-07
+    6   3.10731346e-07
+    7   1.78887781e-08
+    7   1.78887781e-08
+    8   1.01649194e-09
+    8   1.01649194e-09
+    9   2.19676957e-11
+    9   2.19676957e-11
+   10   2.55800955e-12
+   10   2.55800955e-12
+   11   1.65198558e-12
+   11   1.65198558e-12
+   12   1.11069890e-13
+   12   1.11069890e-13
+   13   7.40462259e-14
+   13   7.40462259e-14
+[fclaw] Iterations: 14
+[fclaw] f-2norm: 10041400.834931
+[fclaw] f-infnorm: 16438.387140
+[fclaw] u-2norm: 2397.654062
+[fclaw] u-infnorm: 1.000001
+
+[fclaw] Checking if copy function works:
+[fclaw] fcopy-2norm: 2397.654062
+[fclaw] fcopy-infnorm: 1.000001
+
+[fclaw] error[0] =  7.7004e-07  4.6925e-06 8.0837e-05
+[fclaw] sum[0] =    5.5417944521705054e-01    5.5417945280819614e-01
+[fclaw] Time step    1  at time   0.00000000e+00
+
+[fclaw] Finalizing run
+[libsc] Statistics for   INIT
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           5.24874 (0.0126 = 0.239%)
+[libsc]    Minimum attained at rank       1: 5.23619
+[libsc]    Maximum attained at rank       0: 5.26129
+[libsc] Statistics for   ADVANCE
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTFILL
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   REGRID
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   DIAGNOSTICS
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           2.24519 (0.0107 = 0.477%)
+[libsc]    Minimum attained at rank       0: 2.23449
+[libsc]    Maximum attained at rank       1: 2.25589
+[libsc] Statistics for   OUTPUT
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTPATCH_COMM
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.000349283 (4.98e-05 = 14.3%)
+[libsc]    Minimum attained at rank       1: 0.000299454
+[libsc]    Maximum attained at rank       0: 0.000399113
+[libsc] Statistics for   ADAPT_COMM
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.249793 (0.000566 = 0.227%)
+[libsc]    Minimum attained at rank       1: 0.249227
+[libsc]    Maximum attained at rank       0: 0.250359
+[libsc] Statistics for   PARTITION_COMM
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.0301688 (0.0134 = 44.3%)
+[libsc]    Minimum attained at rank       0: 0.0167985
+[libsc]    Maximum attained at rank       1: 0.043539
+[libsc] Statistics for   DIAGNOSTICS_COMM
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.0109142 (0.0106 = 97%)
+[libsc]    Minimum attained at rank       1: 0.000332117
+[libsc]    Maximum attained at rank       0: 0.0214963
+[libsc] Statistics for   CFL_COMM
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   WALLTIME
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           68.0915 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 68.0915
+[libsc]    Maximum attained at rank       1: 68.0915
+[libsc] Statistics for   UNACCOUNTED
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           60.3063 (0.000322 = 0.000534%)
+[libsc]    Minimum attained at rank       1: 60.306
+[libsc]    Maximum attained at rank       0: 60.3066
+[libsc] Statistics for   ADVANCE_STEPS_COUNTER
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GRIDS_PER_PROC
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           1 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 1
+[libsc]    Maximum attained at rank       0: 1
+[libsc] Statistics for   GRIDS_INTERIOR
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           1 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 1
+[libsc]    Maximum attained at rank       0: 1
+[libsc] Statistics for   GRIDS_LOCAL_BOUNDARY
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GRIDS_REMOTE_BOUNDARY
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   REGRID_BUILD
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           5.10582 (0.0114 = 0.224%)
+[libsc]    Minimum attained at rank       1: 5.09439
+[libsc]    Maximum attained at rank       0: 5.11726
+[libsc] Statistics for   REGRID_TAGGING
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.00769424 (0.000118 = 1.54%)
+[libsc]    Minimum attained at rank       1: 0.00757575
+[libsc]    Maximum attained at rank       0: 0.00781274
+[libsc] Statistics for   TIMESYNC
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTPATCH_BUILD
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.00416744 (1.13e-05 = 0.272%)
+[libsc]    Minimum attained at rank       1: 0.00415611
+[libsc]    Maximum attained at rank       0: 0.00417876
+[libsc] Statistics for   PARTITION
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.124344 (0.00125 = 1.01%)
+[libsc]    Minimum attained at rank       1: 0.123093
+[libsc]    Maximum attained at rank       0: 0.125595
+[libsc] Statistics for   PARTITION_BUILD
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.115587 (0.00146 = 1.26%)
+[libsc]    Minimum attained at rank       1: 0.114128
+[libsc]    Maximum attained at rank       0: 0.117046
+[libsc] Statistics for   ADVANCE_STEP2
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   ADVANCE_B4STEP2
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTFILL_COPY
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTFILL_AVERAGE
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTFILL_INTERP
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTFILL_PHYSBC
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTFILL_STEP1
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTFILL_STEP2
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   GHOSTFILL_STEP3
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   NEIGHBOR_SEARCH
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.00632071 (0.000242 = 3.83%)
+[libsc]    Minimum attained at rank       0: 0.00607848
+[libsc]    Maximum attained at rank       1: 0.00656295
+[libsc] Statistics for   FCLAW2D_TIMER_LOCAL_COMM
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           67.8002 (0.00217 = 0.0032%)
+[libsc]    Minimum attained at rank       1: 67.7981
+[libsc]    Maximum attained at rank       0: 67.8024
+[libsc] Statistics for   FCLAW2D_TIMER_GLOBAL_COMM
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0.291225 (0.00217 = 0.746%)
+[libsc]    Minimum attained at rank       0: 0.289053
+[libsc]    Maximum attained at rank       1: 0.293397
+[libsc] Statistics for   CUDA_ALLOCATE
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   CUDA_MEMCOPY_H2H
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   CUDA_MEMCOPY_H2D
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   CUDA_MEMCOPY_D2H
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   ELLIPTIC_GRIDS_COUNTER
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           6956 (0 = 0%)
+[libsc]    Minimum attained at rank       0: 6956
+[libsc]    Maximum attained at rank       0: 6956
+[libsc] Statistics for   ELLIPTIC_SOLVE
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           56.721 (0.0159 = 0.0279%)
+[libsc]    Minimum attained at rank       1: 56.7051
+[libsc]    Maximum attained at rank       0: 56.7368
+[libsc] Statistics for   EXTRA1
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   EXTRA2
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   EXTRA3
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Statistics for   EXTRA4
+[libsc]    Global number of values:       2
+[libsc]    Mean value (std. dev.):           0 (0)
+[libsc]    Minimum attained at rank       0: 0
+[libsc]    Maximum attained at rank       0: 0
+[libsc] Procs 2 advance 1 0 exchange 0 0 regrid 0 0 0
+[libsc] Max/P 2 advance 1 0 exchange 0 0 regrid 0 0 0

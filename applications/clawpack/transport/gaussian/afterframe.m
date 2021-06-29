@@ -9,7 +9,7 @@ setpatchborderprops('linewidth',1);
 daspect([1 1 1]);
 axis off;
 view([117.50,4]);
-
+% caxis([0.75,1.5]);
 
 NoQuery = 0;
 prt = false;

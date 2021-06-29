@@ -3,7 +3,7 @@
      &      xd,yd,zd,area)
       implicit none
 
-      integer mbc, mx,my, meqn, maux
+      integer mbc, mx,my, maux
       integer blockno
       double precision dx,dy, xlower, ylower
       double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
@@ -15,7 +15,7 @@
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer i,j
-      double precision dxdy, t, x
+      double precision dxdy, t
 
       dxdy = dx*dy
 

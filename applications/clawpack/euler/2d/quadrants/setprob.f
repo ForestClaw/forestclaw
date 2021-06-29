@@ -1,10 +1,13 @@
-      subroutine quadrants_setprob(gamma_in)
+      subroutine quadrants_setprob()
       implicit none
 
-      double precision gamma_in,gamma,gamma1
-      common /cparam/  gamma,gamma1
+      double precision gamma, gamma1
+      common /cparam/  gamma, gamma1
 
-      gamma = gamma_in
+      open(10,file='setprob.data')
+      read(10,*) gamma
+      close(10)
+
       gamma1 = gamma-1.d0
 
       return

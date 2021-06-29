@@ -2,12 +2,9 @@
 SUBROUTINE torus5_setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
     implicit none
 
-    integer mbc, mx,my, meqn, maux
+    integer mbc, mx,my, maux
     double precision dx,dy, xlower, ylower
     double precision aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-
-    integer i,j, k
-    double precision dxdy
 
     INTEGER blockno, fc2d_clawpack5_get_block
 

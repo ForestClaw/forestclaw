@@ -14,7 +14,7 @@
 c     # Number of interior layers to compute.  Since we only
 c     # interpolate from time-interpolated levels, we only
 c     # need two layers.  If we were averaging, we'd need four.
-      mint = 2
+      mint = mbc
       ierror = 0
       k = 1
 

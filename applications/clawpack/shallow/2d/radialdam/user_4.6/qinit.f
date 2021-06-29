@@ -6,23 +6,35 @@ c     # Set initial conditions for q.
 c     # Shallow water with radial dam break problem, h = hin inside
 c     # circle specified in fdisc.f
 c
-       implicit double precision (a-h,o-z)
-       dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      implicit none
 
-       integer blockno, fc2d_clawpack46_get_block
+      integer maxmx, maxmy, meqn, mbc, mx, my, maux
+      double precision xlower, ylower, dx, dy
+      double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
-       common /comic/ hin,hout
+      double precision xlow, ylow,win
+      integer i,j
 
-       blockno = fc2d_clawpack46_get_block()
+      integer blockno, fc2d_clawpack46_get_block
 
-       do 20 i=1-mbc,mx+mbc
-          xlow = xlower + (i-1.d0)*dx
-          do 20 j=1-mbc,my+mbc
-             ylow = ylower + (j-1.d0)*dy
-             call cellave2(blockno,xlow,ylow,dx,dy,win)
-             q(i,j,1) = hin*win + hout*(1.d0-win)
-             q(i,j,2) = 0.d0
-             q(i,j,3) = 0.d0
-  20         continue
-       return
-       end
+      double precision hin, hout
+      common /comic/ hin,hout
+
+      blockno = fc2d_clawpack46_get_block()
+
+      do i=1-mbc,mx+mbc
+         xlow = xlower + (i-1.d0)*dx
+         do j=1-mbc,my+mbc
+            ylow = ylower + (j-1.d0)*dy
+            call cellave2(blockno,xlow,ylow,dx,dy,win)
+            q(i,j,1) = hin*win + hout*(1.d0-win)
+            q(i,j,2) = 0.d0
+            q(i,j,3) = 0.d0
+            if (meqn .eq. 4) then
+               q(i,j,4) = 0.d0
+            endif
+         end do
+      end do
+      return
+      end

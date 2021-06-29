@@ -9,4 +9,5 @@ include applications/geoclaw/bowl_slosh/Makefile.am
 include applications/geoclaw/chile2010/Makefile.am
 
 #include applications/geoclaw/teton/Makefile.am
+include applications/geoclaw/tohoku/Makefile.am
 

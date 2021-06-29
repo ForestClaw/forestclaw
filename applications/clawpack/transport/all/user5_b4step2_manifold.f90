@@ -3,7 +3,7 @@ SUBROUTINE user5_b4step2_manifold(mx,my,mbc, &
   IMPLICIT NONE
 
   INTEGER mbc, mx, my, maux, blockno
-  DOUBLE PRECISION xlower, ylower, dx, dy, time
+  DOUBLE PRECISION dx, dy, time
   DOUBLE PRECISION aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
   DOUBLE PRECISION xd(-mbc:mx+mbc+2,-mbc:my+mbc+2)

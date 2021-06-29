@@ -11,7 +11,7 @@
       integer i,j,m
       double precision xc,yc
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
 c     The aux array has the following elements:
 c     1  kappa = ratio of cell area to dxc*dyc

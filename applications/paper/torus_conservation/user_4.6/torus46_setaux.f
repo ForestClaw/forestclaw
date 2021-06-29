@@ -12,7 +12,7 @@
       integer i,j, k
       double precision dxdy
 
-      include "metric_terms.i"
+      include "fclaw2d_metric_terms.i"
 
 c     # ----------------------------------------------------------------
 c     # Color equation (edge velocities)
@@ -82,7 +82,7 @@ c           # x-face and y-face edge lengths (6,7)
 
       integer i,j, k
 
-      include "metric_terms.i"
+      include "fclaw2d_metric_terms.i"
 
       cont = get_context()
 

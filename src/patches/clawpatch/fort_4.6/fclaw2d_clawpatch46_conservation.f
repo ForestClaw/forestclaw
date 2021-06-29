@@ -11,13 +11,16 @@
       integer manifold
       double precision dx,dy
 
+      double precision  area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+
       double precision area0(my), area1(my), area2(mx), area3(mx)
       double precision el0(my), el1(my), el2(mx), el3(mx)
 
       integer i,j
       double precision dxdy
 
-      include "metric_terms.i"
+c      include "fclaw2d_metric_terms.i"
 
       if (manifold .eq. 1) then
          do j = 1,my

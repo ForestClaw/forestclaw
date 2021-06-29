@@ -10,7 +10,10 @@
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer i,j, mq
-      double precision qmin, qmax, dq,dq1,dq2
+      double precision qmin, qmax, quad(-1:1,-1:1), xc, yc
+      integer ii,jj
+
+      logical exceeds_th, gradient_exceeds_th
 
       tag_patch = 0
 
@@ -20,13 +23,23 @@ c     # Refine based only on first variable in system.
       qmax = q(mq,1,1)
       do j = 1,my
          do i = 1,mx
-            dq1 = abs(q(mq,i+1,j) - q(mq,i-1,j))
-            dq2 = abs(q(mq,i,j+1) - q(mq,i,j-1))
-            dq = max(dq1,dq2)
-            if (dq .gt. tag_threshold) then
-               tag_patch = 1
-               return
-            endif
+             xc = xlower + (i-0.5)*dx
+             yc = ylower + (j-0.5)*dy
+             qmin = min(qmin,q(mq,i,j))
+             qmax = max(qmax,q(mq,i,j))
+              do ii = -1,1
+                  do jj = -1,1
+                        quad(ii,jj) = q(mq,i+ii,j+jj)
+                  end do
+              end do
+              exceeds_th = gradient_exceeds_th(blockno,
+     &                     q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc, 
+     &                     tag_threshold)
+
+              if (exceeds_th) then
+                  tag_patch = 1
+                  return
+              endif
          enddo
       enddo
 

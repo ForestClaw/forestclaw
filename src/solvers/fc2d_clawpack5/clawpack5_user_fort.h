@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -138,6 +138,7 @@ void CLAWPACK5_TAG4COARSENING(const int* mx, const int* my,
                               double q0[],double q1[],
                               double q2[],double q3[],
                               const double* tag_threshold,
+                              const int* initflag,
                               int* tag_patch);
 
 

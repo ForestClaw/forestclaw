@@ -17,17 +17,23 @@ c     # location (x0,y0), and then evolve x, y and q from
 c     # the starting location back to final position.
 c     # --------------------------------------------------------
 
-      double precision function qexact(blockno, x,y,tfinal)
+      double precision function qexact(x,y,tfinal)
       implicit none
 
       external map_rhs_divfree, map_rhs_nondivfree
       external solout
 
+      integer mapping
+      common /mapping_comm/ mapping
+
+      integer example
+      common /example_comm/ example
+
       double precision x,y,tfinal
       integer blockno
 
       double precision xc0, yc0
-      double precision xc1, yc1
+c      double precision xc1, yc1
 
 c      integer blockno_dummy
       double precision t0
@@ -76,9 +82,9 @@ c     # Initial conditions for ODE
       sigma(1) = x
       sigma(2) = y
 
-      ipar(1) = blockno
 
-      call dopri5(2,map_rhs_nondivfree,t0,sigma,tfinal,
+c     # This traces the velocity field back to the origin.
+      call dopri5(2,map_rhs_divfree,t0,sigma,tfinal,
      &            rtol,atol,itol,
      &            solout,iout, work,lwork,iwork,liwork,
      &            rpar,ipar,idid)
@@ -92,19 +98,22 @@ c     # Initial position traced back from (xc1,yc1)
       xc0 = sigma(1)
       yc0 = sigma(2)
 
-c     # Map to [-1,1]x[-1,1]      
-      call mapc2m_cart(blockno,xc0,yc0,xc1,yc1,zp)
-
-c     # Map to [0,1]x[0,1]      
-c      xp = (1 + xc0)/2.d0
-c      yp = (1 + yc0)/2.d0
+c     # Our physical domain is a unit square, which is the same
+c     # as our computational domain
       xp = xc0
       yp = yc0
+      zp = 0
 
       q0 = q0_physical(xp,yp,zp)
       
-      evolve_q = .true.
+c     # Evolve q along characteristics for variable coefficient case      
+      if (example .eq. 0) then
+           evolve_q = .false.
+      else
+           evolve_q = .true.
+      endif
       if (evolve_q) then
+c         # Variable coefficient case        
 c         # We now need to evolve q along with (x,y), starting from
 c         # from (xc0,yc0)
           sigma(1) = xc0
@@ -182,14 +191,12 @@ c     # ----------------------------------------------------------------
       double precision p, px, py
       double precision t1(3), t2(3), t1xt2(3), w
       double precision u(2)
-      integer blockno
 
       x = sigma(1)
       y = sigma(2)
 
-      blockno = ipar(1)
 
-      call velocity_components(blockno,x,y,u)
+      call velocity_components(x,y,u)
 
 c     # We are tracing these back, so use negative velocities        
       f(1) = -u(1)
@@ -210,7 +217,6 @@ c     # We are tracing these back, so use negative velocities
 
       double precision t1(3), t2(3), t1xt2(3), w
       double precision p,px,py
-      integer blockno
 
 c     # Track evolution of these three quantities
 
@@ -218,11 +224,9 @@ c     # Track evolution of these three quantities
       y = sigma(2)
       q = sigma(3)
 
-      blockno = ipar(1)
+      call velocity_components(x,y,u)
 
-      call velocity_components(blockno, x,y,u)
-
-      divu = map_divergence(blockno, x,y)
+      divu = map_divergence(x,y)
 
       f(1) = u(1)
       f(2) = u(2)

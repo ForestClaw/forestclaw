@@ -37,7 +37,7 @@ c        # Cell-centered values
          ul(2) = auxr(3,i-1)
 
 c        # left edge   : 4,5
-c        # bottom-edge : 6,7
+c        # bottom-edge : 9,10
          nv(1) = auxl(4 + 4*idir,i)
          nv(2) = auxl(5 + 4*idir,i)
 

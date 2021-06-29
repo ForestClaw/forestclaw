@@ -80,6 +80,93 @@ void CLAWPACK5_SET_CAPACITY(const int* mx, const int *my, const int *mbc,
                              const int *mcapa, const int* maux, double aux[]);
 
 
+/* ------------------------------------- Conservation --------------------------------- */
+
+#define CLAWPACK5_TIME_SYNC_STORE_FLUX FCLAW_F77_FUNC(clawpack5_time_sync_store_flux, \
+                             CLAWPACK5_TIME_SYNC_STORE_FLUX)
+
+void CLAWPACK5_TIME_SYNC_STORE_FLUX(int* mx,int* my, int* mbc, int* meqn,
+                     int* maux, int* blockno, int* patchno, double* dt,
+                     double* el0, 
+                     double* el1, 
+                     double* el2, 
+                     double* el3,
+                     double q[], double aux[],
+                     double flux0[],double flux1[], 
+                     double flux2[], double flux3[],
+                     clawpack5_fort_rpn2_cons_t rpn2_cons,
+                     double qvec[], 
+                     double auxvec_center[], double auxvec_edge[],
+                     double flux[]);
+
+
+
+#define CLAWPACK5_TIME_SYNC_ACCUMULATE_WAVES \
+            FCLAW_F77_FUNC(clawpack5_time_sync_accumulate_waves, \
+                     CLAWPACK5_TIME_SYNC_ACCUMULATE_WAVES)
+
+void CLAWPACK5_TIME_SYNC_ACCUMULATE_WAVES(int* mx, int* my, int* mbc, int* meqn,
+                        double* dt, double* dx, double* dy, 
+                        int* patchno,
+                        double el0[], double el1[], 
+                        double el2[], double el3[],
+                        double fp[], double fm[],
+                        double gp[], double gm[],
+                        double fp_left[], double fp_right[],
+                        double fm_left[], double fm_right[],
+                        double gp_bottom[], double gp_top[],
+                        double gm_bottom[], double gm_top[]);
+  
+
+#define CLAWPACK5_FORT_TIME_SYNC_F2C FCLAW_F77_FUNC(clawpack5_fort_time_sync_f2c, \
+                           CLAWPACK5_FORT_TIME_SYNC_F2C)
+
+void  CLAWPACK5_FORT_TIME_SYNC_F2C(const int* mx,const int* my,
+                  const int *mbc,const int *meqn,
+                  const int* idir,const int* iface_coarse,
+                  const int* coarse_blockno, 
+                  const int* fine_blockno,
+                  const int* normal_mismatch,
+                  double areac0[], double areac1[],
+                  double areac2[], double areac3[],
+                  double qcoarse[], 
+                  double fmcoarse0[], double fpcoarse1[],
+                  double gmcoarse2[], double gpcoarse3[],
+                  double fmfine0[], double fpfine1[],
+                  double gmfine2[], double gpfine3[],
+                  double efc0[], double efc1[],
+                  double efc2[], double efc3[],
+                  double eff0[], double eff1[],
+                  double eff2[], double eff3[],
+                  double qfine_dummy[],
+                  struct fclaw2d_patch_transform_data** 
+                  transform_cptr);
+
+
+#define CLAWPACK5_FORT_TIME_SYNC_SAMESIZE FCLAW_F77_FUNC(clawpack5_fort_time_sync_samesize, \
+                           CLAWPACK5_FORT_TIME_SYNC_SAMESIZE)
+
+void  CLAWPACK5_FORT_TIME_SYNC_SAMESIZE(const int* mx,const int* my,
+                                         const int *mbc,const int *meqn,
+                                         const int* idir,const int* iface_coarse,
+                                         const int* this_blockno, 
+                                         const int* neighbor_blockno,
+                                         double area0[], double area1[],
+                                         double area2[], double area3[],
+                                         double qcoarse[], 
+                                         double fmcoarse0[], double fpcoarse1[],
+                                         double gmcoarse2[], double gpcoarse3[],
+                                         double fmfine0[], double fpfine1[],
+                                         double gmfine2[], double gpfine3[],
+                                         double efc0[], double efc1[],
+                                         double efc2[], double efc3[],
+                                         double eff0[], double eff1[],
+                                         double eff2[], double eff3[],
+                                         double qfine_dummy[],
+                                         struct fclaw2d_patch_transform_data** 
+                                         transform_cptr);
+
+
 /* ------------------------------ Time stepping functions ---------------------------- */
 
 

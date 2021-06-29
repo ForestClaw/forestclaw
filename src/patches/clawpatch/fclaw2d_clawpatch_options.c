@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,10 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                         "Number of ghost cells [2]");
 
     sc_options_add_int (opt, 0, "meqn", &clawpatch_options->meqn, 1,
-                        "Number of equations [2]");
+                        "Number of equations [1]");
+
+    sc_options_add_int (opt, 0, "rhs-fields", &clawpatch_options->rhs_fields, 1,
+                        "Number of fields in rhs [1]");
 
     /* ---------------------- advanced options -------------------------- */
     sc_options_add_int (opt, 0, "interp_stencil_width",

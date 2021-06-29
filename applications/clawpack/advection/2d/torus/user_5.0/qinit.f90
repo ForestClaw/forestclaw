@@ -7,7 +7,7 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower, &
   DOUBLE PRECISION q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
   DOUBLE PRECISION aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
 
-  DOUBLE PRECISION xlow, ylow, w, xc,yc, q0
+  DOUBLE PRECISION xlow, ylow, w
   INTEGER i,j
 
   INTEGER blockno, fc2d_clawpack5_get_block

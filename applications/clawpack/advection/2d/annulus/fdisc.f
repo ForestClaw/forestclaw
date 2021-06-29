@@ -1,13 +1,15 @@
       double precision function  fdisc(blockno,xc,yc)
       implicit none
 
-      double precision xc,yc, xp, yp, zp
+      double precision xc,yc
       integer blockno
-      integer*8 cont, get_context
-      double precision th, tp
 
       double precision pi
       common /compi/ pi
+
+      integer*8 cont, get_context
+      double precision xp, yp, zp
+      double precision th, tp
 
       cont = get_context()
 

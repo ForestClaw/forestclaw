@@ -128,46 +128,71 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     }
 
     clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
- }
+}
 
 void swirlcons_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = swirlcons_get_options(glob);
 
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24d   %s",user->example,"\% example\n");
+        fprintf(f,  "%-24d   %s",user->mapping,"\% mapping\n");
+        fprintf(f,  "%-24d   %s",user->initial_condition,"\% initial_condition\n");
+        fprintf(f,  "%-24d   %s",user->color_equation,"\% color_equation\n");
+        fprintf(f,  "%-24d   %s",user->use_stream,"\% use_stream\n");
+        fprintf(f,  "%-24.16f   %s",user->alpha,"\% alpha\n");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+ 
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    SWIRLCONS_SETPROB();
+
+#if 0
     SWIRL_SETPROB(&user->example,&user->mapping,&user->initial_condition,
                   &user->color_equation, &user->use_stream,
                   &user->alpha);
+#endif
 }
 
 
 void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *this_patch,
+                                    fclaw2d_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
     const user_options_t* user = swirlcons_get_options(glob);
 
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *aux,*edgelengths,*area, *curvature;
-    double *xp, *yp, *zp, *xd, *yd, *zd;
-    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+
+    double *xp, *yp, *zp, *xd, *yd, *zd, *area;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fclaw2d_clawpatch_metric_scalar(glob, this_patch,&area,&edgelengths,
+    double *edgelengths, *curvature;
+    fclaw2d_clawpatch_metric_scalar(glob, patch, &area,&edgelengths,
                                     &curvature);
 
-    fclaw2d_clawpatch_metric_vector(glob,this_patch,
+    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
+    fclaw2d_clawpatch_metric_vector(glob,patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    double *aux;
+    int maux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     switch(user->mapping)
     {
@@ -185,49 +210,46 @@ void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
         case 3: /* bilinear */
             SWIRL46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
                            &dx,&dy,&maux,aux,&blockno,
-                           area,
-                           edgelengths,xnormals,ynormals,surfnormals);
+                           area, edgelengths,xnormals,ynormals,
+                           surfnormals);
             break;
     }
 }
 
 static
 void cb_swirl_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * this_patch,
-                            int this_block_idx, int this_patch_idx,
+                            fclaw2d_patch_t * patch,
+                            int blockno, int patchno, 
                             void *user)
 {
-    int patch_num;
-    int level;
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy, time;
-    double *q, *error, *soln;
-    int iframe;
-
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
 
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
-
-
-    iframe = *((int *) s->user);
-
-    time = glob->curr_time;
+    int iframe = *((int *) s->user);
+    double time = glob->curr_time;
 
 
     /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_block_idx,this_patch_idx,
-                           &patch_num,&level);
+    int local_patch_num, global_num, level;
+    fclaw2d_patch_get_info(glob->domain,patch,
+                           blockno,patchno,
+                           &global_num, 
+                           &local_patch_num,&level);
     
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower, ylower, dx, dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
+
+    double* error = fclaw2d_clawpatch_get_error(glob,patch);
+    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
@@ -237,8 +259,8 @@ void cb_swirl_output_ascii (fclaw2d_domain_t * domain,
                             &xlower,&ylower,
                             &dx,&dy,
                             q,error,soln, &time, 
-                            &patch_num,&level,
-                            &this_block_idx,
+                            &local_patch_num,&level,
+                            &blockno,
                             &glob->mpirank);
 }
 

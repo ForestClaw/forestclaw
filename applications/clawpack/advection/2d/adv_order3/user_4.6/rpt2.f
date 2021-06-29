@@ -1,7 +1,7 @@
 c
 c
 c     =====================================================
-      subroutine clawpack46_rpt2adv(ixy,maxm,meqn,mwaves,mbc,mx,
+      subroutine clawpack46_rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
      &                  ql,qr,aux1,aux2,aux3, ilr,asdq,bmasdq,bpasdq)
 c     =====================================================
       implicit double precision (a-h,o-z)

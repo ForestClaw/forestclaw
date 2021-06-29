@@ -45,7 +45,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
 
-    int patch_num;
+    int global_num, local_num;
     int level;
     int mx,my,mbc,meqn;
     double xlower,ylower,dx,dy;
@@ -57,7 +57,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     /* Get info not readily available to user */
     fclaw2d_patch_get_info(glob->domain,this_patch,
                            this_block_idx,this_patch_idx,
-                           &patch_num,&level);
+                           &global_num,&local_num, &level);
     
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -73,18 +73,16 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
     clawpatch_vt->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,
                                     &xlower,&ylower,&dx,&dy,q,
-                                    &patch_num,&level,&this_block_idx,
+                                    &global_num,&level,&this_block_idx,
                                     &glob->mpirank);
 }
 
 
 /* This function isn't virtualized;  should it be? */
-static
 void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    int meqn,ngrids,maux;
     char matname1[11];
     char matname2[11];
 
@@ -93,10 +91,10 @@ void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
     double time = glob->curr_time;
 
-    ngrids = glob->domain->global_num_patches;
+    int ngrids = glob->domain->global_num_patches;
 
-    meqn = clawpatch_opt->meqn;
-    maux = clawpatch_opt->maux;
+    int meqn = clawpatch_opt->meqn;
+    int maux = clawpatch_opt->maux;
 
     clawpatch_vt->fort_header_ascii(matname1,matname2,&time,&meqn,&maux,&ngrids);
 }
@@ -120,7 +118,7 @@ void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe)
 
     if (glob->mpirank == 0)
     {
-        fclaw2d_clawpatch_time_header_ascii(glob,iframe);
+        clawpatch_vt->time_header_ascii(glob,iframe);
     }
 
     /* Write out each patch to fort.qXXXX */

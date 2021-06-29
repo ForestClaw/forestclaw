@@ -66,7 +66,21 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
 void annulus_problem_setup(fclaw2d_global_t *glob)
 {
     const user_options_t *user = annulus_get_options(glob);
-    SETPROB_ANNULUS(&user->beta);
+
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24.16f   %s",user->beta,"\% beta\n");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+#ifdef FCLAW_ENABLE_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+ 
+    SETPROB_ANNULUS();
 }
 
 

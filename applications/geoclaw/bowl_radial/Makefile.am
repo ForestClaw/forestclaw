@@ -20,8 +20,13 @@ EXTRA_DIST += \
 	applications/geoclaw/bowl_radial/compare_gauges.m
 
 applications_geoclaw_bowl_radial_bowl_CPPFLAGS = \
-        $(AM_CPPFLAGS) $(FCLAW_GEOCLAW_CPPFLAGS)
+        $(AM_CPPFLAGS) \
+        $(FCLAW_GEOCLAW_CPPFLAGS) \
+        $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 applications_geoclaw_bowl_radial_bowl_LDADD = \
-        $(LDADD) $(FCLAW_GEOCLAW_LDADD) 
+        $(LDADD) \
+        $(FCLAW_GEOCLAW_LDADD) \
+        $(FCLAW_CLAWPATCH_LDADD) \
+        $(FCLAW_LDADD)
 

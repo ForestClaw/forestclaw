@@ -149,7 +149,7 @@ c     # ----------------------------------------------------------------------
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer mq, ibc, jbc, ii, jj, ifine, jfine
+      integer mq, ibc, jbc
       integer ic, jc, mth
       double precision gradx, grady, shiftx, shifty
       double precision sl, sr, qc, value
@@ -169,6 +169,10 @@ c     # ----------------------------------------------------------------------
       elseif (icorner_coarse .eq. 3) then
          ic = mx
          jc = my
+      else
+         write(6,*) 'pillow : icorner_coarse has unexpected value'
+         write(6,*) 'icorner_coarse : ', icorner_coarse
+         stop
       endif
 
 c     # This may not even matter

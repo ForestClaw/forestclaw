@@ -113,10 +113,26 @@ typedef void (*clawpack46_fort_rpn2_t)(const int* ixy,const int* maxm, const int
 
 typedef void (*clawpack46_fort_rpt2_t)(const int* ixy, const int* maxm, const int* meqn,
 									   const int* mwaves, const int* mbc,const int* mx,
-									   double ql[], double qr[], double aux1[], 
-									   double aux2[],
-									   double aux3[], const int* imp, double dsdq[],
-									   double bmasdq[], double bpasdq[]);
+									   double ql[], double qr[], 
+									   double aux1[], double aux2[], double aux3[], 
+									   const int* imp, double dsdq[], double bmasdq[], double bpasdq[]);
+
+
+typedef void (*clawpack46_fort_rpn2fw_t)(const int* ixy,const int* maxm, const int* meqn,
+									   const int* mwaves, const int* mbc,const int* mx,
+									   double ql[], double qr[], double auxl[], 
+									   double auxr[],
+									   double wave[], double s[],double amdq[], 
+									   double apdq[], const int* maux);
+
+
+typedef void (*clawpack46_fort_rpt2fw_t)(const int* ixy, const int* maxm, const int* meqn,
+									                       const int* mwaves, const int* maux, 
+									                       const int* mbc,const int* mx,
+									                       double ql[], double qr[], 
+									                       double aux1[], double aux2[], double aux3[], 
+									                       const int* imp, double dsdq[],
+									                       double bmasdq[], double bpasdq[]);
 
 
 typedef void (*clawpack46_fort_flux2_t)(const int* ixy,const int* maxm, const int* meqn,
@@ -149,18 +165,23 @@ struct fc2d_clawpack46_vtable
 	clawpack46_src2_t      src2;
 
 	/* Fortran routines */
-	clawpack46_fort_setprob_t   fort_setprob;
-	clawpack46_fort_bc2_t       fort_bc2;
-	clawpack46_fort_qinit_t     fort_qinit;
-	clawpack46_fort_setaux_t    fort_setaux;
-	clawpack46_fort_b4step2_t   fort_b4step2;
-	clawpack46_fort_src2_t      fort_src2;
+	clawpack46_fort_setprob_t     fort_setprob;
+	clawpack46_fort_bc2_t         fort_bc2;
+	clawpack46_fort_qinit_t       fort_qinit;
+	clawpack46_fort_setaux_t      fort_setaux;
+	clawpack46_fort_b4step2_t     fort_b4step2;
+	clawpack46_fort_src2_t        fort_src2;
 	
-	clawpack46_fort_rpn2_t      fort_rpn2;
-	clawpack46_fort_rpt2_t      fort_rpt2;
+	clawpack46_fort_rpn2_t        fort_rpn2;
+	clawpack46_fort_rpt2_t        fort_rpt2;
 	clawpack46_fort_rpn2_cons_t   fort_rpn2_cons;
 
-    clawpack46_fort_flux2_t     flux2;
+#if 1
+	// The signatures for rpn2 and rpn2fw are different, but Fortran doesn't care
+	clawpack46_fort_rpn2fw_t      fort_rpn2fw;
+	clawpack46_fort_rpt2fw_t      fort_rpt2fw;
+#endif
+  clawpack46_fort_flux2_t     flux2;
 	
 	int is_set;
 

@@ -2,11 +2,16 @@
       implicit none
 
       double precision xd, yd, zd, t
-      double precision l, th, lp, Tfinal, kappa, pi
 
-      common /compi/ pi
+      double precision kappa,tfinal
+      common /windparms/ kappa,tfinal
 
-      call get_wind_parms(kappa,tfinal)
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
+      double precision l, th, lp
+
+c      call get_wind_parms(kappa,tfinal)
 
       call map2polar(xd,yd,zd,l,th)
 
@@ -36,9 +41,10 @@ c     # Sign difference from Benchmark problem
       implicit none
 
       double precision x,y,z,th,lambda
-      double precision r, pi
+      double precision r
 
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
       r = sqrt(x**2 + y**2 + z**2)
       th = asin(z/r)
@@ -47,31 +53,5 @@ c     # Sign difference from Benchmark problem
       if (lambda .lt. 0) then
          lambda = lambda + 2*pi
       endif
-
-      end
-
-      subroutine set_wind_parms(kappa,tfinal)
-      implicit none
-
-      double precision kappa,tfinal
-      double precision init_kappa_com, tfinal_com
-      common /comwind/ init_kappa_com, tfinal_com
-
-      init_kappa_com = kappa
-c     tfinal_com = tfinal
-      tfinal_com = 5.0
-
-      end
-
-
-      subroutine get_wind_parms(kappa,tfinal)
-      implicit none
-
-      double precision kappa,tfinal
-      double precision init_kappa_com, tfinal_com
-      common /comwind/ init_kappa_com, tfinal_com
-
-      kappa = init_kappa_com
-      tfinal = tfinal_com
 
       end

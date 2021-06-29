@@ -675,13 +675,15 @@ def compile_results(results_dir=None,results_file='results.out',
                          'CUDA_MEMCOPY_H2H',
                          'CUDA_MEMCOPY_H2D',
                          'CUDA_MEMCOPY_D2H',
+                         'ELLIPTIC_SOLVE',
                          'OUTPUT']
 
     stats_list_int = ['ADVANCE_STEPS_COUNTER$',
                       'GRIDS_PER_PROC$',
                       'LOCAL_BOUNDARY',
                       'REMOTE_BOUNDARY',
-                      'INTERIOR']
+                      'INTERIOR',
+                      'ELLIPTIC_GRIDS_COUNTER']
 
     # ------------------------------
     # Options : Variable field width
@@ -707,7 +709,7 @@ def compile_results(results_dir=None,results_file='results.out',
     # ---------------------
     # Ints : Field width 12
     # ---------------------
-    int_list = ('adv_steps','grids_proc','local_bdry','remote_bdry','interior')
+    int_list = ('adv_steps','grids_proc','local_bdry','remote_bdry','interior','ell_grids')
     int_width = 12*len(int_list)
     int_str = ("{:>12s}"*len(int_list)).format(*int_list)
 
@@ -719,7 +721,7 @@ def compile_results(results_dir=None,results_file='results.out',
                   'gf_copy','local','comm','partition','gbuild','step1',
                   'step2','step3', 'copy',
                   'interp','average','adv_b4step2','adv_step2','memcopy_h2h',
-                  'memcopy_h2d','memcopy_d2h','output')
+                  'memcopy_h2d','memcopy_d2h','ell_solve','output')
     float_width = 12*len(float_list)
     float_str = ("{:>12s}"*len(float_list)).format(*float_list)
 

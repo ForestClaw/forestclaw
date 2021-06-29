@@ -16,7 +16,7 @@ SUBROUTINE setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
     INTEGER maxlevel, rfactor, grid_mx, mi, mj
     COMMON /amr_comm/ maxlevel, rfactor, grid_mx, mi, mj
 
-    INCLUDE "metric_terms.i"
+    INCLUDE "fclaw2d_metric_terms.i"
 
     area_check = .false.
 
@@ -120,7 +120,7 @@ SUBROUTINE annulus46_set_center_velocities(mx,my,mbc,dx,dy,blockno, &
     common /setaux_comm/ setaux_time
 
 
-    INCLUDE "metric_terms.i"
+    INCLUDE "fclaw2d_metric_terms.i"
 
 !!  This is needed so that aux arrays get set properly.
     t = setaux_time

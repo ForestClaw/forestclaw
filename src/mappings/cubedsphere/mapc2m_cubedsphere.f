@@ -1,7 +1,7 @@
       subroutine mapc2m_cubedsphere(blockno,xc,yc,xp,yp,zp)
       implicit none
 
-      double precision xc,yc,xp,yp,zp, R
+      double precision xc,yc,xp,yp,zp
       integer blockno
 
       if (blockno .eq. 0) then
