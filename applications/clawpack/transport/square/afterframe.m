@@ -49,7 +49,7 @@ end
 
 
 % This is used for creating vectorized PDFs
-prt_tikz = true;
+prt_tikz = false;
 if (prt_tikz)
     hidepatchborders;
     figsize = [16,16];  % Should match tikz figsize.
@@ -63,7 +63,7 @@ end
 
 
 NoQuery = 0;
-prt = true;
+prt = false;
 if (prt)
     filename = framename(Frame,'square0000','png');
     print('-dpng',filename);
