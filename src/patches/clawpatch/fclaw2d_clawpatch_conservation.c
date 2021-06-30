@@ -95,24 +95,23 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
                                                 fclaw2d_clawpatch_packmode_t packmode, 
                                                 int *ierror)
 {
-	int k, idir, i,j, cnt;
-	int mx,my,meqn;
-
 	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
-	meqn = clawpatch_opt->meqn;
+
+	int mx = clawpatch_opt->mx;
+	int my = clawpatch_opt->my;
+	int meqn = clawpatch_opt->meqn;
 
 	fclaw2d_clawpatch_registers_t* cr = fclaw2d_clawpatch_get_registers(glob,this_patch);
 
-	cnt = 0;
-	for(k = 0; k < 4; k++)
+	int cnt = 0;
+    /* Cycle over four edges */
+	for(int k = 0; k < 4; k++)
 	{
-		idir = k/2;
+		int idir = k/2;
 		if (idir == 0)
 		{
   		    /* k = 0,1 : Pack registers at faces 0,1 */
-			for(j = 0; j < meqn*my; j++)
+			for(int j = 0; j < meqn*my; j++)
 			{
 				if(packmode == CLAWPATCH_REGISTER_PACK)
 				{
@@ -129,7 +128,7 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
 					cr->edge_fluxes[k][j+meqn*my] = qpack[cnt++]; 
 				}
 			}
-			for(j = 0; j < my; j++)
+			for(int j = 0; j < my; j++)
 			{
 				if (packmode == CLAWPATCH_REGISTER_PACK)
 				{
@@ -146,7 +145,7 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
 		else if (idir == 1)
 		{
             /* k = 2,3 : Pack registers at faces 2,3 */
-			for(i = 0; i < meqn*mx; i++)
+			for(int i = 0; i < meqn*mx; i++)
 			{
 				if(packmode == CLAWPATCH_REGISTER_PACK)
 				{
@@ -163,7 +162,7 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
 					cr->edge_fluxes[k][i + meqn*mx] = qpack[cnt++];		
 				}
 			}
-			for(i = 0; i < mx; i++)
+			for(int i = 0; i < mx; i++)
 			{
 				if (packmode == CLAWPATCH_REGISTER_PACK)
 				{
