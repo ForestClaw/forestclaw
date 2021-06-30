@@ -21,20 +21,16 @@ c     # Note that edge tangents must be normalized.
 
       double precision enx, eny, enz
       double precision etx, ety, etz
-      double precision hun, hut, h, un, ut, gamma
-      integer ioff, mu, mv
+      double precision hun, hut, h, un, ut, gamma, f(4)
+      integer ioff
 
 c     #  f1 = (hu; hu^2 + 0.5*g*h^2; huv)
 c     #  f2 = (hv; huv; hv^2 + 0.5*gh^2)
 
       if (idir .eq. 0) then
           ioff = 1
-          mu = 2
-          mv = 3
       else
           ioff = 7
-          mu = 3
-          mv = 2
       endif
 
       enx =   auxvec_edge(ioff+1)
@@ -54,76 +50,19 @@ c     !! Normalize the edge lengths
       hut = etx*q(2)   + ety*q(3)   + etz*q(4)
 
       h = q(1)
-      un = hun/q(1)
-      ut = hut/q(1)
-
-      flux(1) = hun
-      flux(mu) = hun**2/h + 0.5*grav*h**2
-      flux(mv) = hun*ut
-      flux(4) = q(4)*un
-
-      end
-
-      subroutine  rpn2_cons_update(meqn,maux, idir, iface, q,
-     &                             auxvec_center,
-     &                             auxvec_edge,flux)
-      implicit none
-
-      integer meqn,maux,idir, iface
-      double precision q(meqn), flux(meqn)
-      double precision auxvec_center(maux), auxvec_edge(maux)
-
-      double precision grav
-      common /cparam/  grav
-
-      double precision hun, hut, h, un, ut
-
-      integer mu, mv
-
-c     #  f1 = (hu; hu^2 + 0.5*g*h^2; huv)
-c     #  f2 = (hv; huv; hv^2 + 0.5*gh^2)
-
-      if (idir .eq. 0) then
-          mu = 2
-          mv = 3
-      else
-          mu = 3
-          mv = 2
-      endif
-
-
-      
-      hun = q(mu)
-      hut = q(mv)
-
-      h = q(1)
       un = hun/h
       ut = hut/h
 
+      f(1) = hun
+      f(2) = hun**2/h + 0.5*grav*h**2
+      f(3) = un*hut
+      f(4)  = un*q(4)
+
       flux(1) = hun
-      flux(mu) = hun**2/h + 0.5*grav*h**2
-      flux(mv) = hun*ut
-      flux(4) = q(4)*un
+      flux(2) = enx*f(2) + etx*f(3)
+      flux(3) = eny*f(2) + ety*f(3)
+      flux(4) = enz*f(2) + etz*f(3)
 
       end
 
-
-      subroutine  rpn2_cons_update_zero(meqn,maux, idir, iface, q,
-     &                                  auxvec_center,
-     &                                  auxvec_edge,flux)
-
-      implicit none
-
-      integer meqn,maux,idir, iface
-      double precision q(meqn), flux(meqn)
-      double precision auxvec_center(maux), auxvec_edge(maux)
-      integer m
-
-c     #  f(q) = (n dot u)*q
-      do m = 1,meqn
-c         # No flux function available for equations in non-conservative form
-          flux(m) = 0
-      enddo
-
-      end
 

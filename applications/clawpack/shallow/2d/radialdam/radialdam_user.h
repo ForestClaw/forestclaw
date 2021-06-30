@@ -112,6 +112,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double rotate[],
                                                    const double alpha);
 
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double alpha);
+
+
 /* ------------------------ Conservative update --------------------------------------- */
 
 #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)

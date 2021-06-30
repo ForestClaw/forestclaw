@@ -5,6 +5,8 @@ add_library(radialdam_f OBJECT
   fdisc.f 
   gradient_exceeds_th.f90
   rpn2cons_update_manifold.f
+  rpn2cons_update.f
+  rpn2cons_update_zero.f
   user_4.6/qinit.f 
   user_4.6/setaux.f90
   user_4.6/tag4refinement.f
@@ -26,6 +28,7 @@ add_executable(radialdam
   radialdam.cpp 
   radialdam_options.c 
   radialdam_user.cpp 
+  fclaw2d_map_fivepatch.c   
   fclaw2d_map_pillowdisk.c   
   fclaw2d_map_pillowdisk5.c 
   $<TARGET_OBJECTS:radialdam_f>

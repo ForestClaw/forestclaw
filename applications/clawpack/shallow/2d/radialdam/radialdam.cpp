@@ -60,11 +60,18 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_nomap();
         break;
     case 1:
+        /* Five patch square : maps to [-1,1]x[-1,1] */
+        conn = p4est_connectivity_new_disk (0,0);
+        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
+                                          fclaw_opt->shift, user->alpha);
+        break;
+    case 2:
+        /* Pillow disk (single block) */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale,fclaw_opt->shift,rotate);
         break;
-    case 2:
-        /* Five patch square domain */
+    case 3:
+        /* Pillow disk mapping of the five patch square */
         conn = p4est_connectivity_new_disk(0, 0);
         cont = fclaw2d_map_new_pillowdisk5(fclaw_opt->scale,fclaw_opt->shift,
                                           rotate,user->alpha);
