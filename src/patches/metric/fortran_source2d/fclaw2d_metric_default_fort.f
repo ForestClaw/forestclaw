@@ -384,7 +384,6 @@ c           # Now do y-faces
             taup(3) = zd(i+1,j) - zd(i,j)
             tlen = sqrt(taup(1)**2 + taup(2)**2 + taup(3)**2)
 
-c           # nv has unit length
             do m = 1,3
 c               ytangents(i,j,m) = taup(m)/tlen
                ytangents(i,j,m) = taup(m)
