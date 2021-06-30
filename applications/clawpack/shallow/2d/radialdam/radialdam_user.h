@@ -112,6 +112,36 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double rotate[],
                                                    const double alpha);
 
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double alpha);
+
+
+/* ------------------------ Conservative update --------------------------------------- */
+
+#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+
+void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
+                      double q[], double aux_center[], double aux_edge[], double flux[]);
+
+
+#define RPN2_CONS_UPDATE_MANIFOLD FCLAW_F77_FUNC(rpn2_cons_update_manifold, \
+                                                 RPN2_CONS_UPDATE_MANIFOLD)
+
+void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir,
+                               const int* iface,
+                               double q[], double aux_center[], double aux_edge[],
+                               double flux[]);
+
+#define RPN2_CONS_UPDATE_ZERO FCLAW_F77_FUNC(rpn2_cons_update_zero, \
+                                                 RPN2_CONS_UPDATE_ZERO)
+
+void RPN2_CONS_UPDATE_ZERO(const int* meqn, const int* maux, const int* idir,
+                           const int* iface,
+                           double q[], double aux_center[], double aux_edge[],
+                           double flux[]);
+
+
 #ifdef __cplusplus
 #if 0
 {

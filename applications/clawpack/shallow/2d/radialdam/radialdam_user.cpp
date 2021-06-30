@@ -54,14 +54,16 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
         {
             claw46_vt->fort_rpn2 = &CLAWPACK46_RPN2;
             claw46_vt->fort_rpt2 = &CLAWPACK46_RPT2;
+            claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
         }
-        else if (user->example == 1 || user->example == 2)
+        else if (user->example >= 1 && user->example <= 3)
         {
             fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
             patch_vt->setup = &radialdam_patch_setup;
 
             claw46_vt->fort_rpn2  = &CLAWPACK46_RPN2_MANIFOLD;
             claw46_vt->fort_rpt2  = &CLAWPACK46_RPT2_MANIFOLD;
+            claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
         }
 
     }
@@ -79,14 +81,16 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
         {
             claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
             claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
+            claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
         }
-        else if (user->example == 1 || user->example == 2)
+        else if (user->example >= 1 && user->example <= 3)
         {
             fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
             patch_vt->setup = &radialdam_patch_setup;
 
             claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
             claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
+            claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
         }
     }
 }

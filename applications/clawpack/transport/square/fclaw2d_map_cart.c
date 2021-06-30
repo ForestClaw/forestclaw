@@ -89,7 +89,6 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     double xc1, yc1, zc1;
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-
     /* Unit square in [-1,1] x [-1,1] */
     MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
 

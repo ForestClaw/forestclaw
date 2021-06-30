@@ -10,12 +10,14 @@ extern "C"
 #endif
 #endif
 
+#if 0
 #define SQUARE_BASIS_COMPLETE FCLAW_F77_FUNC(square_basis_complete, \
                             SQUARE_BASIS_COMPLETE)
 
 void SQUARE_BASIS_COMPLETE(const double* x, const double *y,
                            double t[], double tinv[], double uderivs[], 
                            const int* flag);
+#endif
 
 
 static int
@@ -66,6 +68,7 @@ fclaw2d_map_query_fivepatch(fclaw2d_map_context_t * cont, int query_identifier)
     return 0;
 }
 
+#if 0
 static void
 fclaw2d_map_c2m_basis_fivepatch(fclaw2d_map_context_t * cont,
                                double xc, double yc, 
@@ -76,7 +79,7 @@ fclaw2d_map_c2m_basis_fivepatch(fclaw2d_map_context_t * cont,
        [xc,yc] \in [0,1]x[0,1] */
     SQUARE_BASIS_COMPLETE(&xc,&yc, t, tinv, tderivs, &flag);
 }
-
+#endif
 
 
 static void
@@ -106,7 +109,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_fivepatch;
     cont->mapc2m = fclaw2d_map_c2m_fivepatch;
-    cont->basis = fclaw2d_map_c2m_basis_fivepatch;
+    // cont->basis = fclaw2d_map_c2m_basis_fivepatch;
 
     set_scale(cont,scale);
     set_shift(cont,shift);

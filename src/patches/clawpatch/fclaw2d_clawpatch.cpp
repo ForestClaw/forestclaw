@@ -822,7 +822,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 	/* Include size of conservation registers.  Save fluxes on each size, even though
 	   only one or two sides may be used. */
-	int frsize = packregisters ? 12*meqn*(mx + my) : 0;
+	int frsize = packregisters ? 2*(4*meqn+2)*(mx + my) : 0;
 
 	/* This is computed twice - here, and in fclaw2d_clawpatch_ghost_packsize */
 	int wg = (2*nghost + mx)*(2*nghost + my);

@@ -45,23 +45,23 @@ c     # -----------------------------------------------------------------
 
       integer i,j,k,m, idir, iface
 
+      idir = 0
       do j = 1,my
-c     # left side k=0 = in; k=1 = out
-         idir = 0
+c        # left side k=0 = in; k=1 = out
          do k = 0,1
             iface = k
             do m = 1,maux
-c     # Cell centered values;  Each cell-centered value
-c     # will be projected onto edge between interior and
-c     # exterior cell.                
+c              # Cell centered values;  Each cell-centered value
+c              # will be projected onto edge between interior and
+c              # exterior cell.                
                auxvec_center(m) = aux(1-k,j,m)
 
-c     # Use this array to get edge values between interior
-c     # and exterior cells.
+c              # Use this array to get edge values between interior
+c              # and exterior cells.
                auxvec_edge(m) = aux(1,j,m)
             enddo
 
-
+c     #     Pass in q at interior cell (k=0) or exterior cell (k=1)
             do m = 1,meqn
                qvec(m) = q(1-k,j,m)
             enddo
@@ -72,19 +72,21 @@ c     # and exterior cells.
             enddo
          enddo
 
-c     # right side 0 = in; 1 = out
+c     #  right side 0 = in; 1 = out
          do k = 0,1
-            iface = 1-k
+            iface = 1-k    !! face of the cell
             do m = 1,maux
-c     # Cell centered values                
+c              # Cell centered values                
                auxvec_center(m) = aux(mx+k,j,m)
 
-c     # Edge between ghost cell and interior cell               
+c              # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(mx+1,j,m)
             enddo
+
             do m = 1,meqn
                qvec(m) = q(mx+k,j,m)
             enddo
+
             call rpn2_cons(meqn,maux,idir,iface,qvec,
      &           auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
@@ -100,10 +102,10 @@ c     # bottom side 0 = in; 1 = out0
          do k = 0,1
             iface = k + 2
             do m = 1,maux
-c     # Cell centered values                
+c              # Cell centered values                
                auxvec_center(m) = aux(i,1-k,m)
 
-c     # Edge between ghost cell and interior cell               
+c              # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(i,1,m)
             enddo
             do m = 1,meqn
@@ -116,14 +118,14 @@ c     # Edge between ghost cell and interior cell
             enddo
          enddo
 
-c     # Top side 0 = in; 1 = out
+c        # Top side 0 = in; 1 = out
          do k = 0,1
             iface = 3-k
             do m = 1,maux
-c     # Cell centered values                
+c              # Cell centered values                
                auxvec_center(m) = aux(i,my+k,m)
 
-c     # Edge between ghost cell and interior cell               
+c              # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(i,my+1,m)
             enddo
             do m = 1,meqn
@@ -563,10 +565,10 @@ c         # Get sign change to account for possible mismatch in normals
           sc = a(1,1) + a(2,1)    
           do mq = 1,meqn
               do j = 1,my
-c                 # Exchange at low side of 'this' grid in
-c                 # x-direction (idir == 0) 
                   j1 = j
                   if (this_iface .eq. 0) then
+c                     # Exchange at low side of 'this' grid in
+c                     # x-direction (idir == 0) 
                       i1 = 1
                       call 
      &       fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,

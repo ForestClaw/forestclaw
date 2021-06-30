@@ -10,10 +10,15 @@ if PlotType ~= 4
     
     set(gca,'fontsize',16);
     axis off
+
+    if (mq > 1)
+        caxis([-1,1])
+    else
+        caxis([0.5 1.5])
+    end
     
     colormap(jet);
     colorbar;    
-    caxis([0.5 1.5])
     view(2)
 end
 

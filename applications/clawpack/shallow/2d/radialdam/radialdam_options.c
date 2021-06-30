@@ -57,7 +57,7 @@ radialdam_check (user_options_t *user,
             fclaw_options_t *fclaw_opt,
             fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
-    if (user->example < 0 || user->example > 2) {
+    if (user->example < 0 || user->example > 3) {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }

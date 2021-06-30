@@ -313,6 +313,8 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	fclaw2d_clawpatch_registers_t* cr = 
 		  fclaw2d_clawpatch_get_registers(glob,patch);
 
+	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,patch);
+
 	/* Evaluate fluxes needed in correction terms */
 	if (fclaw_opt->time_sync && fclaw_opt->flux_correction)
 	{
@@ -324,15 +326,15 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 		CLAWPACK46_TIME_SYNC_STORE_FLUX(&mx,&my,&mbc,&meqn,&maux,
 		                                &blockno,&patchno, &dt,
-										  cr->edgelengths[0], 
-										  cr->edgelengths[1], 
-										  cr->edgelengths[2], 
-										  cr->edgelengths[3],
-										  qold,aux,
-										  cr->edge_fluxes[0],cr->edge_fluxes[1],
-										  cr->edge_fluxes[2],cr->edge_fluxes[3],
-										  claw46_vt->fort_rpn2_cons,
-										  qvec,auxvec_center,auxvec_edge,flux);
+										cr->edgelengths[0], 
+										cr->edgelengths[1], 
+										cr->edgelengths[2], 
+										cr->edgelengths[3],
+										qold,aux,
+										cr->edge_fluxes[0],cr->edge_fluxes[1],
+										cr->edge_fluxes[2],cr->edge_fluxes[3],
+										claw46_vt->fort_rpn2_cons,
+										qvec,auxvec_center,auxvec_edge,flux);
 
 		FCLAW_FREE(qvec);
 		FCLAW_FREE(auxvec_center);
@@ -352,7 +354,6 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 	double* gm = FCLAW_ALLOC(double,size);
 
 	int ierror = 0;
-	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,patch);
 
 	if (claw46_vt->flux2 == NULL)
 	{
