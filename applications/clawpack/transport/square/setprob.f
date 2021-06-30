@@ -11,8 +11,8 @@
       integer mapping
       common /mapping_comm/ mapping
 
-      integer initchoice
-      common /initchoice_comm/ initchoice
+      integer initial_condition
+      common /initchoice_comm/ initial_condition
 
       double precision alpha
       common /fivepatch_comm/ alpha
@@ -29,7 +29,7 @@
       open(10,file='setprob.data')
       read(10,*) example
       read(10,*) mapping
-      read(10,*) initchoice
+      read(10,*) initial_condition
       read(10,*) alpha
       read(10,*) x0
       read(10,*) y0
