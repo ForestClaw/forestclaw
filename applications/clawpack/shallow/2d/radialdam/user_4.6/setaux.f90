@@ -23,6 +23,8 @@ SUBROUTINE user46_setaux_manifold(mbc,mx,my, &
      DO i = 1-mbc,mx+mbc
         aux(i,j,1) = area(i,j)/(dx*dy)
 
+        !! xnormals are normalized;  xtangents are not.  Use
+        !! edge_lengths to normalize xtangents.
         aux(i,j,2) = xnormals(i,j,1)
         aux(i,j,3) = xnormals(i,j,2)
         aux(i,j,4) = xnormals(i,j,3)
