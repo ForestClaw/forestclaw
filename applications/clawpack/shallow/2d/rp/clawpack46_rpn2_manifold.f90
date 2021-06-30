@@ -136,6 +136,8 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         etx =   auxl(i,ioff+4)
         ety =   auxl(i,ioff+5)
         etz =   auxl(i,ioff+6)
+
+        !! Normalize edge
         gamma = dsqrt(etx**2 + ety**2 + etz**2)
         etx =   etx / gamma
         ety =   ety / gamma
@@ -172,7 +174,7 @@ SUBROUTINE clawpack46_rpn2_manifold(ixy,maxm,meqn,mwaves,mbc, &
         a3 = (-(u(i)-a(i))*delta(1) + delta(2))*(0.50d0/a(i))
 
 
-        !! # Compute the waves.
+        !! # Compute the waves.  Multiply by inverse of rotation matrix.
 
         wave(i,1,1) = a1
         wave(i,2,1) = a1*(u(i)-a(i))*enx + a1*v(i)*etx
