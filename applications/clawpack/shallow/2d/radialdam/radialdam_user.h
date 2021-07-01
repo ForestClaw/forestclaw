@@ -117,7 +117,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double alpha);
 
 
-/* ------------------------ Conservative update --------------------------------------- */
+/* ----------------------------- Conservative update ---------------------------------- */
 
 #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
 
