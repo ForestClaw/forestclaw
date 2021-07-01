@@ -2,6 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/euler/2d/shockbubble/shockbubble
 
+TESTS += applications/clawpack/euler/2d/shockbubble/regressions.sh
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/shockbubble.cpp \

@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/clawpack/advection/2d/periodic/periodic
 
+TESTS += applications/clawpack/advection/2d/periodic/regressions.sh
+
 applications_clawpack_advection_2d_periodic_periodic_SOURCES = \
 	applications/clawpack/advection/2d/periodic/periodic_user.cpp \
 	applications/clawpack/advection/2d/periodic/periodic_user.h \

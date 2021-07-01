@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/clawpack/transport/slotted_disk/slotted_disk
 
+TESTS += applications/clawpack/transport/slotted_disk/regressions.sh
+
 applications_clawpack_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/transport/slotted_disk/slotted_disk.cpp \
 	applications/clawpack/transport/slotted_disk/slotted_disk_user.h \

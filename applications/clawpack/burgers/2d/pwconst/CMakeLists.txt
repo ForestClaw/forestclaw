@@ -25,3 +25,6 @@ target_link_libraries(pwconst PRIVATE
   FORESTCLAW::CLAWPACK4.6
   FORESTCLAW::CLAWPACK5
 )
+
+add_test(NAME clawpack_burgers_2d_pwconst COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_burgers_2d_pwconst PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

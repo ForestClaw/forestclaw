@@ -35,6 +35,5 @@ target_link_libraries(periodic PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-# add_test(NAME periodic
-#  COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} $<TARGET_FILE:periodic>
-#  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_test(NAME clawpack_advection_2d_periodic COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_advection_2d_periodic PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
