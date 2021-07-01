@@ -15,6 +15,7 @@ applications_clawpack_shallow_2d_bump_bump_SOURCES = \
 	applications/clawpack/shallow/2d/bump/user_5.0/qinit.f90 \
 	applications/clawpack/shallow/2d/bump/user_5.0/tag4refinement.f90 \
 	applications/clawpack/shallow/2d/bump/user_5.0/tag4coarsening.f90 \
+	applications/clawpack/shallow/2d/rp/rpn2cons_update.f \
 	applications/clawpack/shallow/2d/rp/shallow_user_fort.h \
 	applications/clawpack/shallow/2d/rp/clawpack46_rpn2.f \
 	applications/clawpack/shallow/2d/rp/clawpack46_rpt2.f \

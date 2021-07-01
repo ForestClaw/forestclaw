@@ -3,6 +3,7 @@ set(rp ${PROJECT_SOURCE_DIR}/clawpack/shallow/2d/rp)
 add_library(bump_f OBJECT 
   setprob.f 
   bump_exceeds_th.f90
+  rpn2cons_update.f
   user_4.6/qinit.f 
   user_4.6/tag4refinement.f 
   user_4.6/tag4coarsening.f 

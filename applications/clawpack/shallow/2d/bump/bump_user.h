@@ -68,6 +68,14 @@ user_options_t* bump_get_options(fclaw2d_global_t* glob);
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 
+/* ----------------------------- Conservative update ---------------------------------- */
+
+#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+
+void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
+                      double q[], double aux_center[], double aux_edge[], double flux[]);
+
+
 #if 0
 void bump_patch_setup(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,

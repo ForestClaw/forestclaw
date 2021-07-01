@@ -45,6 +45,7 @@ void bump_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
         claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
+        claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
 
         /* Avoid tagging block corners in 5 patch example*/
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -57,6 +58,7 @@ void bump_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
         claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
+        claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
         
         /* Avoid tagging block corners in 5 patch example*/
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
