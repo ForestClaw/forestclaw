@@ -6,6 +6,10 @@ add_library(latlong_f OBJECT
   psi.f 
   user_4.6/qinit.f 
   user_5.0/qinit.f90 
+  ${all}/clawpatch46_tag4refinement.f 
+  ${all}/clawpatch46_tag4coarsening.f 
+  ${all}/clawpatch5_tag4refinement.f 
+  ${all}/clawpatch5_tag4coarsening.f
   ${all}/user46_setaux_manifold.f 
   ${all}/user5_setaux_manifold.f90 
   ${all}/clawpack46_rpn2adv_manifold.f 

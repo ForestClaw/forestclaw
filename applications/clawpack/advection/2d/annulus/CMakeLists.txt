@@ -12,6 +12,10 @@ add_library(annulus_f OBJECT
   ${all}/clawpack46_rpt2adv_manifold.f 
   ${all}/clawpack5_rpn2adv_manifold.f90 
   ${all}/clawpack5_rpt2adv_manifold.f90
+  ${all}/clawpatch46_tag4refinement.f 
+  ${all}/clawpatch46_tag4coarsening.f 
+  ${all}/clawpatch5_tag4refinement.f 
+  ${all}/clawpatch5_tag4coarsening.f
 )
 
 add_executable(annulus 

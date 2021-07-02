@@ -10,10 +10,14 @@ add_library(torus_f OBJECT
   user_4.6/rpn2cons_fw_manifold.f 
   user_4.6/rpt2cons_manifold.f 
   user_4.6/rpn2cons_update_manifold.f 
-  ${all}/clawpack46_rpn2adv_manifold.f 
-  ${all}/clawpack46_rpt2adv_manifold.f 
   user_5.0/qinit.f90 
   user_5.0/torus5_setaux.f90 
+  ${all}/clawpatch46_tag4refinement.f 
+  ${all}/clawpatch46_tag4coarsening.f 
+  ${all}/clawpatch5_tag4refinement.f 
+  ${all}/clawpatch5_tag4coarsening.f
+  ${all}/clawpack46_rpn2adv_manifold.f 
+  ${all}/clawpack46_rpt2adv_manifold.f 
   ${all}/clawpack5_rpn2adv_manifold.f90 
   ${all}/clawpack5_rpt2adv_manifold.f90
 )

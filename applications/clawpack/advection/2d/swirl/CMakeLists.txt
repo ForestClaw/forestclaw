@@ -7,6 +7,10 @@ add_library(swirl_f OBJECT
   user_4.6/b4step2.f
   user_5.0/qinit.f90 
   user_5.0/b4step2.f90
+  ${all}/clawpatch46_tag4refinement.f 
+  ${all}/clawpatch46_tag4coarsening.f 
+  ${all}/clawpatch5_tag4refinement.f 
+  ${all}/clawpatch5_tag4coarsening.f 
   ${all}/clawpack46_setaux.f
   ${all}/clawpack5_setaux.f90
   ${all}/clawpack46_rpn2adv.f 

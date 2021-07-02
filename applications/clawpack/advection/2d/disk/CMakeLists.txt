@@ -9,13 +9,13 @@ add_library(disk_f OBJECT
 	${all}/user46_setaux_manifold.f 
 	${all}/clawpack46_rpn2adv_manifold.f 
 	${all}/clawpack46_rpt2adv_manifold.f 
-	${all}/clawpack46_tag4refinement.f 
-	${all}/clawpack46_tag4coarsening.f 
 	${all}/user5_setaux_manifold.f90 
 	${all}/clawpack5_rpn2adv_manifold.f90 
 	${all}/clawpack5_rpt2adv_manifold.f90 
-	${all}/clawpack5_tag4refinement.f 
-	${all}/clawpack5_tag4coarsening.f
+	${all}/clawpatch46_tag4refinement.f 
+	${all}/clawpatch46_tag4coarsening.f 
+	${all}/clawpatch5_tag4refinement.f 
+	${all}/clawpatch5_tag4coarsening.f
 )
 
 add_executable(disk 
