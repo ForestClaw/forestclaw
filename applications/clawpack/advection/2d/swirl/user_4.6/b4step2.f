@@ -8,8 +8,9 @@
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
 
       integer i, j, k
-      double precision tperiod, pi2, vt, xll,yll, psi
+      double precision vt, xll,yll, psi, pij, vtx,vty
 
+      double precision tperiod, pi2
       common /comvt/ tperiod,pi2
 c
       if (tperiod .eq. 0.d0) then
@@ -19,25 +20,17 @@ c        # setaux should be used for all time.
       endif
 
       vt = cos(pi2*(time+dt/2.d0)/tperiod)
+      vty = vt/dy
+      vtx = vt/dx
 
-      do k = 1,2
-         do j = 1-mbc,my+mbc
-            do i = 1-mbc,mx+mbc
-c               # coordinates of lower left corner of grid cell:
-                xll = xlower + (i-1)*dx
-                yll = ylower + (j-1)*dy
-
-c               # difference stream function psi to get normal velocities:
-                if (k .eq. 1) then
-                    aux(i,j,k) = (psi(xll, yll+dy) - psi(xll,yll)) / dy
-                else
-                    aux(i,j,k) = -(psi(xll+dx, yll) - psi(xll,yll)) / dx
-                endif
-
-c               # multiply by time-factor:
-                aux(i,j,k) = vt * aux(i,j,k)
-c                aux(i,j,2) = vt * aux(i,j,2)
-           enddo
+      do j = 1-mbc,my+mbc
+         yll = ylower + (j-1)*dy
+         do i = 1-mbc,mx+mbc
+             xll = xlower + (i-1)*dx
+             
+             pij = psi(xll,yll)
+             aux(i,j,1) = vty*(psi(xll, yll+dy) - pij)
+             aux(i,j,2) = -vtx*(psi(xll+dx, yll) - pij)
         enddo
       enddo
 
