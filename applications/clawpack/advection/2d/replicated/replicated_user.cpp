@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "replicated_user.h"
 
+#if 0
 #include <fclaw2d_include_all.h>
 
 /* Two versions of Clawpack */
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
+#endif
 
-#include "../all/advection_user_fort.h"
+#include "../all/advection_user.h"
 
 void replicated_link_solvers(fclaw2d_global_t *glob)
 {
@@ -48,6 +50,10 @@ void replicated_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
         claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
         claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
+
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
     }
     else if (user->claw_version == 5)
     {
@@ -56,6 +62,10 @@ void replicated_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
+
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;        
     }
 }
 

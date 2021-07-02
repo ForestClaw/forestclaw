@@ -12,6 +12,10 @@ applications_clawpack_advection_2d_replicated_replicated_SOURCES = \
 	applications/clawpack/advection/2d/replicated/fdisc.f \
 	applications/clawpack/advection/2d/replicated/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/replicated/user_5.0/qinit.f90 \
+	applications/clawpack/advection/2d/all/clawpatch46_tag4refinement.f \
+	applications/clawpack/advection/2d/all/clawpatch46_tag4coarsening.f \
+	applications/clawpack/advection/2d/all/clawpatch5_tag4refinement.f \
+	applications/clawpack/advection/2d/all/clawpatch5_tag4coarsening.f \
     applications/clawpack/advection/2d/all/advection_user_fort.h \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv.f \

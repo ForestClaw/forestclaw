@@ -13,6 +13,10 @@ applications_clawpack_advection_2d_latlong_latlong_SOURCES = \
 	applications/clawpack/advection/2d/latlong/psi.f \
 	applications/clawpack/advection/2d/latlong/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/latlong/user_5.0/qinit.f90 \
+	applications/clawpack/advection/2d/all/clawpatch46_tag4refinement.f \
+	applications/clawpack/advection/2d/all/clawpatch46_tag4coarsening.f \
+	applications/clawpack/advection/2d/all/clawpatch5_tag4refinement.f \
+	applications/clawpack/advection/2d/all/clawpatch5_tag4coarsening.f \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \

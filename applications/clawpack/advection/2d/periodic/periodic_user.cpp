@@ -25,21 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "periodic_user.h"
 
-#include <fclaw2d_include_all.h>
-
-/* Two versions of Clawpack */
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../all/advection_user_fort.h"
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_fort.h>
+#include "../all/advection_user.h"
 
 void periodic_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt();
-
 
     vt->problem_setup = &periodic_problem_setup;  /* Version-independent */
 
@@ -54,10 +44,8 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
 
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-
-        //clawpack46_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
     }
     else if (user->claw_version == 5)
     {
@@ -69,9 +57,8 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
         clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
 
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
     }
 }
 

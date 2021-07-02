@@ -31,9 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
 #endif
+
+#if 0
+/* for syntax highlighting in Sublime */
 #endif
 
 typedef struct user_options
@@ -61,6 +62,7 @@ const user_options_t* periodic_get_options(fclaw2d_global_t* glob);
 #define PERIODIC_SETPROB FCLAW_F77_FUNC(periodic_setprob, PERIODIC_SETPROB)
 void PERIODIC_SETPROB();
 
+#if 0
 #define CLAWPACK46_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack46_tag4refinement, \
                                                  CLAWPACK46_TAG4REFINEMENT)
 void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my,
@@ -85,12 +87,10 @@ void CLAWPACK5_TAG4COARSENING(const int* mx, const int* my,
                               const double* tag_threshold,
                               const int* initflag,
                               int* tag_patch);
+#endif
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
