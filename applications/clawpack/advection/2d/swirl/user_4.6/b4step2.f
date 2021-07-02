@@ -7,7 +7,7 @@
       double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
 
-      integer i, j, k
+      integer i, j
       double precision vt, xll,yll, psi, pij, vtx,vty
 
       double precision tperiod, pi2
