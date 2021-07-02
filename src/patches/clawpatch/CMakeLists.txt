@@ -4,6 +4,10 @@ set(metric ${PROJECT_SOURCE_DIR}/src/patches/metric)
 
 add_library(clawpatch_f OBJECT
   fclaw2d_clawpatch_utils.f
+  fort_user/fclaw2d_clawpatch_difference_exceeds_th.f90
+  fort_user/fclaw2d_clawpatch_value_exceeds_th.f90
+  fort_user/fclaw2d_clawpatch_minmax_exceeds_th.f90
+  fort_user/fclaw2d_clawpatch_gradient_exceeds_th.f90
   fort_4.6/fclaw2d_clawpatch46_average.f 
   fort_4.6/fclaw2d_clawpatch46_copy.f 
   fort_4.6/fclaw2d_clawpatch46_interpolate.f 

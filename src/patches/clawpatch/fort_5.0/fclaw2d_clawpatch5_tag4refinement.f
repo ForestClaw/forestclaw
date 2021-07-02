@@ -9,8 +9,9 @@
       double precision tag_threshold
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer i,j, mq
-      double precision qmin, qmax
+      integer i,j, mq, ii, jj
+      double precision qmin, qmax, xc,yc,quad(-1:1,-1:1)
+      logical fclaw2d_clawpatch_minmax_exceeds_th, exceeds_th
 
       tag_patch = 0
 
@@ -20,9 +21,20 @@ c     # Refine based only on first variable in system.
       qmax = q(mq,1,1)
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
             qmin = min(q(mq,i,j),qmin)
             qmax = max(q(mq,i,j),qmax)
-            if (qmax - qmin .gt. tag_threshold) then
+            do ii = -1,1
+               do jj = -1,1
+                  quad(ii,jj) = q(mq,i+ii,j+jj)
+               end do
+            end do
+            exceeds_th = fclaw2d_clawpatch_minmax_exceeds_th(
+     &             blockno, q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc,
+     &             tag_threshold)
+            if (exceeds_th) then
+c              # Refine this patch               
                tag_patch = 1
                return
             endif

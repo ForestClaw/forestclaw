@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-logical function value_exceeds_th(blockno,& 
+logical function fclaw2d_clawpatch_value_exceeds_th(blockno,& 
                                   qval,qmin,qmax,quad, & 
                                   dx,dy,xc,yc,threshhold)
     implicit none
@@ -16,6 +16,6 @@ logical function value_exceeds_th(blockno,&
         refine = .true.
     endif
 
-    value_exceeds_th = refine
+    fclaw2d_clawpatch_value_exceeds_th = refine
 
-end function value_exceeds_th
+end function fclaw2d_clawpatch_value_exceeds_th

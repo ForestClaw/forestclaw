@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-logical function difference_exceeds_th(blockno,& 
+logical function fclaw2d_clawpatch_difference_exceeds_th(blockno,& 
                                      qval,qmin,qmax,quad, & 
                                      dx,dy,xc,yc,threshhold)
     implicit none
@@ -23,16 +23,6 @@ logical function difference_exceeds_th(blockno,&
         refine = .true.
     endif
 
-    difference_exceeds_th = refine
+    fclaw2d_clawpatch_difference_exceeds_th = refine
 
-end function difference_exceeds_th
-
-double precision function gradient_dot(u,v)
-    implicit none
-
-    double precision :: u(3), v(3)
-
-    gradient_dot = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
-
-end function gradient_dot
-
+end function fclaw2d_clawpatch_difference_exceeds_th

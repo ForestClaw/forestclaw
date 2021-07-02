@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-logical function gradient_exceeds_th(blockno,& 
+logical function fclaw2d_clawpatch_gradient_exceeds_th(blockno,& 
                                      qval,qmin,qmax,quad, & 
                                      dx,dy,xc,yc,threshhold)
     implicit none
@@ -20,7 +20,7 @@ logical function gradient_exceeds_th(blockno,&
     integer*8 :: cont, get_context
     logical :: fclaw2d_map_is_used
 
-    double precision :: gradient_dot
+    double precision :: clawpatch_gradient_dot
 
     integer :: m
 
@@ -46,10 +46,10 @@ logical function gradient_exceeds_th(blockno,&
         t2(2) = (ypp - ypm)/dy2
         t2(3) = (zpp - zpm)/dy2
 
-        gmat(1,1) = gradient_dot(t1,t1)
-        gmat(1,2) = gradient_dot(t1,t2)
+        gmat(1,1) = clawpatch_gradient_dot(t1,t1)
+        gmat(1,2) = clawpatch_gradient_dot(t1,t2)
         gmat(2,1) = gmat(1,2)
-        gmat(2,2) = gradient_dot(t2,t2)
+        gmat(2,2) = clawpatch_gradient_dot(t2,t2)
 
         d = gmat(1,1)*gmat(2,2) - gmat(1,2)*gmat(2,1)
 
@@ -70,22 +70,22 @@ logical function gradient_exceeds_th(blockno,&
     endif
     refine = .false.
 
-    ds = sqrt(gradient_dot(grad,grad))
+    ds = sqrt(clawpatch_gradient_dot(grad,grad))
 
     if (ds .gt. threshhold) then
         refine = .true.
     endif
 
-    gradient_exceeds_th = refine
+    fclaw2d_clawpatch_gradient_exceeds_th = refine
 
-end function gradient_exceeds_th
+end function fclaw2d_clawpatch_gradient_exceeds_th
 
-double precision function gradient_dot(u,v)
+double precision function clawpatch_gradient_dot(u,v)
     implicit none
 
     double precision :: u(3), v(3)
 
-    gradient_dot = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
+    clawpatch_gradient_dot = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
 
-end function gradient_dot
+end function clawpatch_gradient_dot
 

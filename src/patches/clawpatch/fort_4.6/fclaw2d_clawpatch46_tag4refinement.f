@@ -12,21 +12,34 @@
       integer i,j, mq
       double precision qmin, qmax
 
-      logical exceeds_th, fclaw2d_clawpatch46_exceeds_th
+      logical exceeds_th, fclaw2d_clawpatch_minmax_exceeds_th
+      integer ii,jj
+      double precision xc,yc,quad(-1:1,-1:1)
 
 c     # Assume that we won't refine      
       tag_patch = 0
 
-c     # Refine based only on first variable in system.
+c     # Default : Refinement based only on first variable in system.  
+c     # Users can modify this by creating a local copy of this routine
+c     # and the corresponding tag4coarsening routine.
       mq = 1
+
       qmin = q(1,1,mq)
       qmax = q(1,1,mq)
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
-            qmin = min(q(i,j,mq),qmin)
-            qmax = max(q(i,j,mq),qmax)
-            exceeds_th = fclaw2d_clawpatch46_exceeds_th(
-     &             q(i,j,mq),qmin,qmax,tag_threshold)
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
+            qmin = min(qmin,q(i,j,mq))
+            qmax = max(qmax,q(i,j,mq))
+            do ii = -1,1
+               do jj = -1,1
+                  quad(ii,jj) = q(i+ii,j+jj,mq)
+               end do
+            end do
+            exceeds_th = fclaw2d_clawpatch_minmax_exceeds_th(
+     &             blockno, q(i,j,mq),qmin,qmax,quad, dx,dy,xc,yc,
+     &             tag_threshold)
             if (exceeds_th) then
 c              # Refine this patch               
                tag_patch = 1
@@ -34,22 +47,5 @@ c              # Refine this patch
             endif
          enddo
       enddo
-
-      end
-
-c     # check to see if value exceeds threshold
-      logical function fclaw2d_clawpatch46_exceeds_th(
-     &                 qval,qmin,qmax,threshhold)
-
-      implicit none
-      double precision qval,qmin,qmax,threshhold
-      logical refine
-
-      refine = .false.
-      if (qval .gt. threshhold) then
-         refine = .true.
-      endif
-
-      fclaw2d_clawpatch46_exceeds_th = refine
 
       end
