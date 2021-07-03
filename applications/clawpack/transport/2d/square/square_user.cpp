@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46_options.h>
 #include <clawpack46_user_fort.h>    /* Headers for user defined fortran files */
 
+#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack5_options.h>
+#include <clawpack5_user_fort.h>    /* Headers for user defined fortran files */
+
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
 
@@ -59,88 +63,112 @@ void square_problem_setup(fclaw2d_global_t* glob)
 }
 
 void square_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *this_patch,
+                                    fclaw2d_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
-    //const user_options_t* user = square_get_options(glob);
-
-    int mx,my,mbc,maux;
+    int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    double *aux,*edgelengths,*area, *curvature;
-    double *xp, *yp, *zp, *xd, *yd, *zd;
-    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+    double *xp, *yp, *zp, *xd, *yd, *zd, *area;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fclaw2d_clawpatch_metric_scalar(glob, this_patch,&area,&edgelengths,
+    double *edgelengths,*curvature;
+    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
                                     &curvature);
 
-    fclaw2d_clawpatch_metric_vector(glob,this_patch,
-                                    &xnormals, &ynormals,
-                                    &xtangents, &ytangents,
-                                    &surfnormals);
+    double *aux;
+    int maux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);    
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-
-    SQUARE_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
-                  &dx,&dy, area, edgelengths,xnormals,ynormals,
-                  surfnormals, aux, &maux);
+    const user_options_t* user = square_get_options(glob);
+    if (user->claw_version == 4) 
+    {
+        SQUARE46_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
+            &dx,&dy, area, edgelengths,xp,yp,zp,
+            aux, &maux);
     }
+    else if (user->claw_version == 5)
+    {
+        SQUARE5_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
+            &dx,&dy, area, edgelengths,xp,yp,zp,
+            aux, &maux);
+    }
+
+
+    /* Assume that velocities don't depend on t */
+    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
+    fclaw2d_clawpatch_metric_vector(glob,patch, &xnormals, &ynormals, 
+                                    &xtangents, &ytangents, &surfnormals);
+
+    double t = 0; /* Not used */
+    if (user->claw_version == 4)
+    {
+        SQUARE46_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
+                                &dx, &dy, &xlower, &ylower,
+                                &t, xnormals,ynormals, surfnormals,
+                                aux,&maux);
+    }
+    else
+    {
+        SQUARE5_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
+                                &dx, &dy, &xlower, &ylower,
+                                &t, xnormals,ynormals, surfnormals,
+                                aux,&maux);        
+    }
+}
 
 static
 void cb_square_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * this_patch,
-                            int this_block_idx, int this_patch_idx,
+                            fclaw2d_patch_t * patch,
+                            int blockno, int patchno,
                             void *user)
 {
-    int patch_num;
-    int level;
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy, time;
-    double *q, *error, *soln;
-    int iframe;
-
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+    fclaw2d_global_t  *glob = (fclaw2d_global_t*) s->glob;
+    const fclaw_options_t  *fclaw_opt = fclaw2d_get_options(glob);
 
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
-
-
-    iframe = *((int *) s->user);
-
-    time = glob->curr_time;
-
+    int iframe = *((int *) s->user);
+    double time = glob->curr_time;
 
     /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_block_idx,this_patch_idx,
-                           &patch_num,&level);
+    int level, patch_num, global_num;
+    fclaw2d_patch_get_info(glob->domain,patch,
+                           blockno,patchno,
+                           &global_num, &patch_num,&level);
     
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    double* error = fclaw2d_clawpatch_get_error(glob,patch);
+    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
 
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
 
     /* Here, we pass in q and the error, so need special headers and files */
-    SQUARE_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
-                            &xlower,&ylower,
-                            &dx,&dy,
-                            q,error,soln, &time, 
-                            &patch_num,&level,
-                            &this_block_idx,
-                            &glob->mpirank);
+    const user_options_t* user_opt = square_get_options(glob);
+    if (user_opt->claw_version == 4)
+    {
+        SQUARE46_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
+            &xlower,&ylower, &dx,&dy, q,error,soln, &time,
+            &patch_num,&level, &blockno, &glob->mpirank);
+    }
+    else if (user_opt->claw_version == 5)
+    {
+        SQUARE5_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
+            &xlower,&ylower, &dx,&dy, q,error,soln, &time,
+            &patch_num,&level, &blockno, &glob->mpirank);        
+    }
 }
 
 
@@ -151,43 +179,66 @@ void square_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &square_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
-    patch_vt->setup   = &square_patch_setup_manifold;
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    patch_vt->setup = &square_patch_setup_manifold;
 
-    fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
-    clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
-    clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
-    clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
-    clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
-
-    /* Clawpatch functions */
-    const user_options_t* user = square_get_options(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    if (user->use_wavelets)
+
+    const user_options_t* user = square_get_options(glob);
+    if (user->claw_version == 4) 
     {
-        clawpatch_vt->fort_tag4refinement = &SQUARE_TAG4REFINEMENT_WAVELET;
-        clawpatch_vt->fort_tag4coarsening = &SQUARE_TAG4COARSENING_WAVELET;
-    }
-    else
+        fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
+        clawpack46_vt->fort_qinit  = &CLAWPACK46_QINIT;
+        
+        /* Be careful : Signatures for rpn2fw, rpt2fw not the same as rpn2 and rpt2fw. */
+        clawpack46_vt->fort_rpn2fw   = &CLAWPACK46_RPN2FW_MANIFOLD; 
+        clawpack46_vt->fort_rpt2fw   = &CLAWPACK46_RPT2FW_MANIFOLD;      
+        clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+
+        /* Clawpatch functions */
+        //const user_options_t* user = square_get_options(glob);
+        clawpatch_vt->fort_tag4refinement = &SQUARE46_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &SQUARE46_TAG4COARSENING;       
+    } 
+    else if (user->claw_version == 5)
     {
-        clawpatch_vt->fort_tag4refinement = &SQUARE_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &SQUARE_TAG4COARSENING;        
+        fc2d_clawpack5_vtable_t  *clawpack5_vt = fc2d_clawpack5_vt();
+        clawpack5_vt->fort_qinit     = &CLAWPACK5_QINIT;
+        clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2FW_MANIFOLD; 
+        clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2_MANIFOLD;      
+        clawpack5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+
+        /* Clawpatch functions */
+        clawpatch_vt->fort_tag4refinement = &SQUARE5_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &SQUARE5_TAG4COARSENING;     
     }
 
 #if 0
-    clawpatch_vt->fort_interpolate_face   = PERIODIC_FORT_INTERPOLATE_FACE;
-    clawpatch_vt->fort_interpolate_corner = PERIODIC_FORT_INTERPOLATE_CORNER;
-    clawpatch_vt->fort_interpolate2fine   = PERIODIC_FORT_INTERPOLATE2FINE;
-#endif    
+    if (0)
+    {        
+        clawpatch_vt->fort_interpolate2fine      = SQUARE_FORT_INTERPOLATE2FINE;
+        clawpatch_vt->fort_interpolate_face      = SQUARE_FORT_INTERPOLATE_FACE;
+        clawpatch_vt->fort_interpolate_corner    = SQUARE_FORT_INTERPOLATE_CORNER;
+    }
+#endif
 
     /* Include error in output files */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     if (fclaw_opt->compute_error)
     {
-        clawpatch_vt->fort_compute_patch_error = &SQUARE_COMPUTE_ERROR;
-        clawpatch_vt->fort_header_ascii   = &SQUARE_FORT_HEADER_ASCII;
+        if (user->claw_version == 4)
+        {
+            clawpatch_vt->fort_compute_patch_error = &SQUARE46_COMPUTE_ERROR;
+            clawpatch_vt->fort_header_ascii   = &SQUARE46_FORT_HEADER_ASCII;            
+        }
+        else if (user->claw_version == 5)
+        {
+            clawpatch_vt->fort_compute_patch_error = &SQUARE5_COMPUTE_ERROR;
+            clawpatch_vt->fort_header_ascii   = &SQUARE5_FORT_HEADER_ASCII;                        
+        }
         clawpatch_vt->cb_output_ascii     = &cb_square_output_ascii;                
     }
+
  }
 
 

@@ -1,8 +1,8 @@
-      subroutine square_fort_header_ascii
+      subroutine square46_fort_header_ascii
      &      (matname1,matname2, time,meqn,maux,ngrids)
       implicit none
 
-      integer iframe,meqn,ngrids, maux, mfields
+      integer meqn,ngrids, maux, mfields
 
       character*11 matname1
       character*11 matname2
@@ -31,7 +31,7 @@
 
 
 
-      subroutine square_fort_write_file(matname1,
+      subroutine square46_fort_write_file(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,error,soln, time, patch_num,level,blockno,mpirank)
 
@@ -41,8 +41,7 @@
       integer meqn,mbc,mx,my
       integer patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy,time
-      double precision xc,yc,qc,qexact
-      double precision xc1, yc1, zc1, x,y
+      double precision xc,yc,qc
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -63,7 +62,7 @@ c      double precision swirl_divergence, divu
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
 
-      call swirl46_fort_write_grid_header(matunit1,
+      call square46_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 
@@ -104,7 +103,7 @@ c     # This statement is checked above (meqn <= 5)
 
       end
 
-      subroutine swirl46_fort_write_grid_header
+      subroutine square46_fort_write_grid_header
      &      (matunit1, mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 

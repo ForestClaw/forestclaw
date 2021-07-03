@@ -1,9 +1,11 @@
 example = read_vars();
 
+view(2)
+
+
 s = 0.0;
-axis([-s 1+s -s 1+s])
-daspect([1 1 1]);
-axis on;
+axis([-s, 1+s, -s, 1+s])
+axis square;
 
 fprintf('%-10s %16.8e\n','qmin',qmin);
 fprintf('%-10s %16.8e\n','qmax',qmax);
@@ -18,6 +20,7 @@ end
 if (mq == 3)
     % Plot the error
     c = max([qmin,qmax]);
+    c = 3e-3;
     ca = [-c,c];    
 else    
     % Plot the solution
@@ -36,24 +39,24 @@ hidegridlines;
 
 if (example == 0)
     hold on;
-    refine_threshold = 0.5;
-    u = 1;
+    refine_threshold = 0.05;
+    u = 1;   % (u,v) = velocity
     v = 0.5;
     maxlevel = 5;  % Doesn't have to match true maxlevel
     plot_refine_contours(mx,maxlevel,t,u,v,refine_threshold);
     hold off;
 end
 
-view(2)
 
 % This is used for creating vectorized PDFs
 prt_tikz = false;
 if (prt_tikz)
-    figsize = [8,8];  % Should match tikz figsize.
-    maxlevel = 7;
+    hidepatchborders;
+    figsize = [16,16];  % Should match tikz figsize.
+    maxlevel = 6;
     dpi = mx*2^maxlevel/figsize(1);
     prefix = 'plot';    
-    caxis([-0.3,1]);
+    caxis(ca);
     plot_tikz_fig(Frame,figsize,prefix,dpi);    
 end
 
@@ -62,7 +65,7 @@ end
 NoQuery = 0;
 prt = false;
 if (prt)
-    filename = framename(Frame,'swirl0000','png');
+    filename = framename(Frame,'square0000','png');
     print('-dpng',filename);
 end
 

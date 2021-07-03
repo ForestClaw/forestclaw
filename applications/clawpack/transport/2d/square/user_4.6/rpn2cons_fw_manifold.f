@@ -1,9 +1,12 @@
-      subroutine rpn2cons_fw_manifold(ixy,maxm,meqn,mwaves,mbc,
-     &         mx,ql,qr,auxl,auxr,wave,s,amdq,apdq)
+c     !! Note additional parameter : maux
+
+      subroutine clawpack46_rpn2fw_manifold(ixy,maxm,
+     &                                      meqn,mwaves,mbc,
+     &                                      mx,ql,qr,auxl,auxr,
+     &                                      wave,s,amdq,apdq,maux)
       implicit none
 
-      integer maxm, mbc,mwaves,meqn,maux, mx
-      integer ixy
+      integer ixy, maxm, mbc,mwaves,meqn,mx, maux
 
       double precision wave(1-mbc:maxm+mbc, meqn, mwaves)   
       double precision    s(1-mbc:maxm+mbc, mwaves)
@@ -11,11 +14,15 @@
       double precision   qr(1-mbc:maxm+mbc, meqn)
       double precision amdq(1-mbc:maxm+mbc, meqn)
       double precision apdq(1-mbc:maxm+mbc, meqn)
-      double precision auxl(1-mbc:maxm+mbc,*)
-      double precision auxr(1-mbc:maxm+mbc,*)
+      double precision auxl(1-mbc:maxm+mbc,maux)
+      double precision auxr(1-mbc:maxm+mbc,maux)
+
+      integer :: icom,jcom
+      double precision :: dtcom,dxcom,dycom,tcom
+      common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
 
-      integer i, iface, m, idir
+      integer i, idir
       double precision qll,qrr
       double precision urrot, ulrot, g, uhat
 
@@ -43,7 +50,6 @@ c        # Use Roe-average values
          endif
          wave(i,1,1) = urrot*qrr - ulrot*qll
          s(i,1) = uhat
-
       enddo
 
 
