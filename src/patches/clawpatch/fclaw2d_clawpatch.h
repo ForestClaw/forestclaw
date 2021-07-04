@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -245,7 +245,6 @@ double* fclaw2d_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
 struct fclaw2d_clawpatch_registers* 
 fclaw2d_clawpatch_get_registers(struct fclaw2d_global* glob,
                                 struct fclaw2d_patch* this_patch);
-
 
 
 #ifdef __cplusplus

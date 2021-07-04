@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_package.h>
 
 static int s_clawpatch_options_package_id = -1;
+
+
+int refine_criteria_s = -1;
+
+void fclaw2d_clawpatch_set_refinement_criteria(int r)
+{
+    FCLAW_ASSERT(refine_criteria_s == -1);
+    refine_criteria_s = r;
+}
+
+int fclaw2d_clawpatch_get_refinement_criteria()
+{
+    FCLAW_ASSERT(refine_criteria_s != -1);
+    return refine_criteria_s;
+}
 
 static void *
 clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
@@ -60,6 +75,17 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                          &clawpatch_options->ghost_patch_pack_aux,1,
                          "Pack aux. variables for parallel comm. of ghost patches [T]");
 
+    /* Set verbosity level for reporting timing */
+    sc_keyvalue_t *kv = fclaw_opt->kv_timing_verbosity = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv, "value",        FCLAW_REFINE_CRITERIA_VALUE);
+    sc_keyvalue_set_int (kv, "difference",   FCLAW_REFINE_CRITERIA_DIFFERENCE);
+    sc_keyvalue_set_int (kv, "minmax",       FCLAW_REFINE_CRITERIA_MINMAX);
+    sc_keyvalue_set_int (kv, "gradient",     FCLAW_REFINE_CRITERIA_GRADIENT);
+    sc_keyvalue_set_int (kv, "user",         FCLAW_REFINE_CRITERIA_USER);
+    sc_options_add_keyvalue (opt, 0, "refine_criteria", 
+                             &fclaw_opt->refine_criteria, "minmax",
+                             kv, "Refinement criteria [minmax]");
+
     clawpatch_options->is_registered = 1;
 
     return NULL;
@@ -69,6 +95,8 @@ static fclaw_exit_type_t
 clawpatch_postprocess(fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
     /* Convert strings to arrays (no strings to process here) */
+
+    fclaw2d_clawpatch_set_refinement_criteria(clawpatch_opt->refine_factor);
 
     return FCLAW_NOEXIT;
 }

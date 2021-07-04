@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,14 @@ extern "C"
 #endif
 
 
+/* Criteria for tagging patches */
+#define  FCLAW_REFINE_CRITERIA_VALUE          1
+#define  FCLAW_REFINE_CRITERIA_DIFFERENCE     2
+#define  FCLAW_REFINE_CRITERIA_MINMAX         3
+#define  FCLAW_REFINE_CRITERIA_GRADIENT       4
+#define  FCLAW_REFINE_CRITERIA_USER           5
+
+
 struct fclaw2d_global;
 
 typedef struct fclaw2d_clawpatch_options fclaw2d_clawpatch_options_t;
@@ -59,6 +67,9 @@ struct fclaw2d_clawpatch_options
     int meqn;
     int rhs_fields;
 
+    int refine_criteria;
+    sc_keyvalue_t *kv_refine_criteria;
+
     /* Advanced options */
     int interp_stencil_width;
     int ghost_patch_pack_aux;
@@ -74,6 +85,12 @@ void fclaw2d_clawpatch_options_store (struct fclaw2d_global *glob,
                                       fclaw2d_clawpatch_options_t* clawpatch_options);
 
 fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global* glob);
+
+
+void fclaw2d_clawpatch_set_refinement_criteria(int r);
+
+int fclaw2d_clawpatch_get_refinement_criteria();
+
 
 
 #ifdef __cplusplus
