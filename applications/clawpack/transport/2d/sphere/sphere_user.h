@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -93,15 +93,16 @@ void SPHERE_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
 
 #define RPN2CONS_FW_MANIFOLD FCLAW_F77_FUNC(rpn2cons_fw_manifold, RPN2CONS_FW_MANIFOLD)
 void RPN2CONS_FW_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
-                          const int* mwaves,
+                          const int* mwaves, 
                           const int* mbc, const int* mx, double ql[], double qr[],
                           double auxl[], double auxr[], double fwave[],
-                          double s[], double amdq[], double apdq[]);
+                          double s[], double amdq[], double apdq[], const int* maux);
 
 
 #define RPT2CONS_MANIFOLD FCLAW_F77_FUNC(rpt2cons_manifold, RPT2CONS_MANIFOLD)
 void RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-                       const int* mbc, const int* mx, double ql[], double qr[],
+                       const int* maux, const int* mbc, const int* mx, 
+                       double ql[], double qr[],
                        double aux1[], double aux2[], double aux3[], const int* imp,
                        double dsdq[], double bmasdq[], double bpasdq[]);
 

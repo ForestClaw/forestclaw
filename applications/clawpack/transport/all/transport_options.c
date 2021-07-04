@@ -40,6 +40,9 @@ transport_register (user_options_t* user, sc_options_t * opt)
                         "[user] 0 for cubed sphere, "    \
                         "1 for pillowgrid [0]");
 
+    sc_options_add_int (opt, 0, "refine-criteria", &user->refine_criteria, 0,
+                        "[user] Refinement criteria [0]");
+
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4, "claw-version [4]");
 
     user->is_registered = 1;
@@ -57,14 +60,6 @@ transport_postprocess(user_options_t *user)
 static fclaw_exit_type_t
 transport_check (user_options_t *user)
 {
-    if (user->example == 1)
-    {
-#if 0        
-        fclaw_global_essentialf("Pillow sphere is not currently implemented.");
-        return FCLAW_EXIT_ERROR;
-#endif        
-    }
-
     if (user->example < 0 || user->example > 1) {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_ERROR;

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "sphere_user.h"
 
+#include "../all/transport_user.h"
+
+
+#if 0
 #include <fclaw2d_include_all.h>
 
 #include <fc2d_clawpack46.h>
@@ -33,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
+#endif
 
 #include <fclaw2d_block.h>
 
@@ -149,9 +154,9 @@ int sphere_tag4refinement(fclaw2d_global_t *glob,
     {
         /* Pass in time to tagging routine */
         tag_patch = 0;  
-        double t = glob->curr_time;
-        SPHERE_TAG4REFINEMENT(&mx,&my,&mbc,&meqn, &xlower,&ylower,&dx,&dy,
-                              &t, &blockno, q,&refine_threshold,
+        //double t = glob->curr_time;
+        CLAWPATCH46_TAG4REFINEMENT(&mx,&my,&mbc,&meqn, &xlower,&ylower,&dx,&dy,
+                              &blockno, q,&refine_threshold,
                               &initflag,&tag_patch);
     }
     return tag_patch;
@@ -162,7 +167,8 @@ static
 int sphere_tag4coarsening(fclaw2d_global_t *glob,
                           fclaw2d_patch_t *fine_patches,
                           int blockno,
-                          int patchno)
+                          int patchno,
+                          int initflag)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -184,11 +190,11 @@ int sphere_tag4coarsening(fclaw2d_global_t *glob,
     if (coarsen_threshold >= 0) 
     {
         tag_patch = 0;
-        double t = glob->curr_time;
-        SPHERE_TAG4COARSENING(&mx,&my,&mbc,&meqn,
-                              &xlower,&ylower,&dx,&dy,&t,
+        // double t = glob->curr_time;
+        CLAWPATCH46_TAG4COARSENING(&mx,&my,&mbc,&meqn,
+                              &xlower,&ylower,&dx,&dy,
                               &blockno, q[0],q[1],q[2],q[3],
-                              &coarsen_threshold,&tag_patch);
+                              &coarsen_threshold,&initflag,&tag_patch);
     }
     return tag_patch == 1;
 }
@@ -197,53 +203,47 @@ int sphere_tag4coarsening(fclaw2d_global_t *glob,
 
 static
 void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * this_patch,
-                            int this_block_idx, int this_patch_idx,
+                            fclaw2d_patch_t * patch,
+                            int blockno, int patchno,
                             void *user)
 {
-    int patch_num;
-    int level;
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy, time;
-    double *q, *error, *soln;
-    int iframe;
-
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
     fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
 
     //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
 
-
-    iframe = *((int *) s->user);
-
-    time = glob->curr_time;
-
+    int iframe = *((int *) s->user);
 
     /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_block_idx,this_patch_idx,
-                           &patch_num,&level);
+    int global_patch_num, local_patch_num, level;
+    fclaw2d_patch_get_info(glob->domain,patch,
+                           blockno,patchno,
+                           &global_patch_num,&local_patch_num,&level);
     
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    int meqn;
+    double *q;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
+    double* error = fclaw2d_clawpatch_get_error(glob,patch);
+    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
 
     /* Here, we pass in q and the error, so need special headers and files */
+    double time = glob->curr_time;
     SPHERE_FORT_WRITE_FILE(fname, &mx,&my,&meqn,&mbc,
-                            &xlower,&ylower,
-                            &dx,&dy,
-                            q,error,soln, &time, 
-                            &patch_num,&level,
-                            &this_block_idx,
-                            &glob->mpirank);
+                           &xlower,&ylower,
+                           &dx,&dy, q,error,soln, &time,
+                           &global_patch_num,&level,
+                           &blockno, &glob->mpirank);
 }
 
 
@@ -262,8 +262,8 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
     clawpack46_vt->b4step2        = sphere_b4step2;
     clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
-    clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 
-    clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;      
+    clawpack46_vt->fort_rpn2fw    = RPN2CONS_FW_MANIFOLD; 
+    clawpack46_vt->fort_rpt2fw    = &RPT2CONS_MANIFOLD;      
     clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
     /* Clawpatch functions */

@@ -60,6 +60,7 @@ include applications/clawpack/advection/2d/sphere/Makefile.am
 ## ------------------------------------------------------------
 
 include applications/clawpack/transport/2d/square/Makefile.am
+include applications/clawpack/transport/2d/sphere/Makefile.am
 
 
 ## ---------------------Transport on the sphere ---------------------------- 

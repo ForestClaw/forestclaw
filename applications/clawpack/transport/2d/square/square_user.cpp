@@ -25,22 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "square_user.h"
 
-#include <../all/transport_user.h>
-
-#if 0
-#include <fclaw2d_include_all.h>
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack46_options.h>
-#include <clawpack46_user_fort.h>    /* Headers for user defined fortran files */
-
-#include <fc2d_clawpack5.h>
-#include <fc2d_clawpack5_options.h>
-#include <clawpack5_user_fort.h>    /* Headers for user defined fortran files */
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
-#endif
+#include "../all/transport_user.h"
 
 static
 void square_problem_setup(fclaw2d_global_t* glob)
@@ -208,8 +193,11 @@ void square_link_solvers(fclaw2d_global_t *glob)
     {
         fc2d_clawpack5_vtable_t  *clawpack5_vt = fc2d_clawpack5_vt();
         clawpack5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-        clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2FW_MANIFOLD; 
-        clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2_MANIFOLD;      
+
+        /* Signature for both waves and fwaves solvers are the same, so no need for 
+           separate functions */
+        clawpack5_vt->fort_rpn2    = &CLAWPACK5_RPN2FW_MANIFOLD; 
+        clawpack5_vt->fort_rpt2    = &CLAWPACK5_RPT2_MANIFOLD;      
         clawpack5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */

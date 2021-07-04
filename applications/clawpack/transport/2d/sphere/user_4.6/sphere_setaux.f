@@ -3,15 +3,21 @@
      &      aux, maux)
       implicit none
 
-      integer mbc, mx,my, meqn, maux
+      integer mbc, mx,my, maux
       integer blockno
       double precision dx,dy, xlower, ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
-      integer i,j, k
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+      double precision        area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision          xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision          yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision          zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+      integer i,j
       double precision dxdy, xc1, yc1
 
-      include "metric_terms.i"
+c      include "metric_terms.i"
 
 c     # ----------------------------------------------------------------
 c     # Color equation (edge velocities)
@@ -68,17 +74,20 @@ c             # Map to spherical coordinates in [0,1]x[0,1]
 c      double precision pi, pi2
 c      common /compi/ pi, pi2
 
-      double precision xc,yc
-      double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, map_dot
+      double precision xc1,yc1,nv(3), vel(3), vdotn, map_dot
 
       double precision nl(3), nr(3), nb(3), nt(3)
       double precision urrot, ulrot, ubrot, utrot
+
+      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
 
       integer*8 cont, get_context
 
       integer i,j, k
 
-      include "metric_terms.i"
+c      include "metric_terms.i"
 
       cont = get_context()
 

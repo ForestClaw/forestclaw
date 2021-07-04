@@ -17,15 +17,17 @@ applications_clawpack_transport_2d_sphere_sphere_SOURCES = \
 	applications/clawpack/transport/2d/sphere/sphere_velocity.f \
 	applications/clawpack/transport/2d/sphere/qexact.f \
 	applications/clawpack/transport/2d/sphere/dopri5.f \
+	applications/clawpack/transport/2d/all/clawpatch46_tag4coarsening.f \
+	applications/clawpack/transport/2d/all/clawpatch46_tag4refinement.f \
+	applications/clawpack/transport/2d/all/clawpatch5_tag4coarsening.f \
+	applications/clawpack/transport/2d/all/clawpatch5_tag4refinement.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/sphere_output.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/compute_error.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/qinit.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/sphere_setaux.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/rpn2cons_fw_manifold.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/rpt2cons_manifold.f \
-	applications/clawpack/transport/2d/sphere/user_4.6/rpn2_cons_update_manifold.f \
-	applications/clawpack/transport/2d/sphere/user_4.6/tag4coarsening.f \
-	applications/clawpack/transport/2d/sphere/user_4.6/tag4refinement.f
+	applications/clawpack/transport/2d/sphere/user_4.6/rpn2_cons_update_manifold.f
 
 EXTRA_DIST += \
 	applications/clawpack/transport/2d/sphere/fclaw_options.ini \

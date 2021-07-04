@@ -13,9 +13,9 @@
       integer example
       common /example_comm/ example
 
-      integer i,j,m
+      integer i,j
       double precision xc,yc, qexact
-      double precision xc1, yc1, zc1, x,y
+      double precision xc1, yc1
       double precision xp, yp, zp
       integer flow_flag
 

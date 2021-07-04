@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "transport_user.h"
 #include "transport_options.h"
 
+
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
@@ -34,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
+#include "../../advection/2d/all/advection_user_fort.h"
 
 
 #if 0
@@ -60,20 +62,18 @@ void transport_problem_setup(fclaw2d_global_t* glob);
 
 void transport_problem_setup(fclaw2d_global_t* glob)
 {
-#if 0
     const user_options_t* user = transport_get_options(glob);
 
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
-        fprintf(f,"%-24.4f %s\n",user->kappa,"\% kappa");
+        fprintf(f,"%-24d %s\n",user->refine_criteria,"\% refine_criteria");
         fclose(f);
     }
 
     /* We want to make sure node 0 gets here before proceeding */
 #ifdef FCLAW_ENABLE_MPI
     MPI_Barrier(MPI_COMM_WORLD);
-#endif
 #endif
 
     TRANSPORT_SETPROB();
@@ -177,8 +177,8 @@ void transport_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_rpn2      = CLAWPACK46_RPN2ADV_MANIFOLD;
         claw46_vt->fort_rpt2      = CLAWPACK46_RPT2ADV_MANIFOLD;
 
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;
 
     }
     else if (user->claw_version == 5)
@@ -191,8 +191,8 @@ void transport_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
     }
 }
 

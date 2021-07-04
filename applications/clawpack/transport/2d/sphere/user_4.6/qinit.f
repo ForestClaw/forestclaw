@@ -7,16 +7,12 @@
       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
-      integer i, j, mq, blockno, fc2d_clawpack46_get_block
-      double precision xc,yc, xp, yp, zp, xlow, ylow, w, tol
-      double precision dxc,xm,ym
+      integer i, j, blockno, fc2d_clawpack46_get_block
+      double precision xc,yc, xp, yp, zp, xlow, ylow, w
 
       double precision q0_physical
 
       integer*8 cont, get_context
-      logical fclaw2d_map_is_used
-
-      integer ii,jj
 
       integer initchoice
       common /initchoice_comm/ initchoice

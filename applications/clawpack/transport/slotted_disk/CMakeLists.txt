@@ -5,12 +5,12 @@ add_library(slotted_disk_f OBJECT
   fdisc.f 
   slotteddisk.f 
   user_4.6/qinit.f 
-  user_4.6/tag4refinement.f 
-  user_4.6/tag4coarsening.f 
-  user_5.0/qinit.f90 
-  user_5.0/tag4refinement.f 
-  user_5.0/tag4coarsening.f 
-  ${all}/minmax_exceeds_th.f90 
+  user_5.0/qinit.f90
+  ${all}/clawpatch46_tag4refinement.f 
+  ${all}/clawpatch5_tag4refinement.f 
+  ${all}/clawpatch46_tag4coarsening.f 
+  ${all}/clawpatch5_tag4coarsening.f 
+  ${all}/transport_exceeds_threshold.f90
   ${all}/transport_util.f 
   ${all}/transport_setprob.f 
   ${all}/velocity_wind.f 

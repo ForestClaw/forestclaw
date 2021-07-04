@@ -3,6 +3,9 @@
 
       double precision th, lambda
 
+      integer refine_criteria
+      common /com_refine/ refine_criteria
+
       double precision kappa,tfinal
       common /windparms/ kappa,tfinal
 
@@ -23,6 +26,10 @@
 
       pi = 4.d0*atan(1.d0)
       pi2 = 2*pi
+
+      open(10,file='setprob.data')
+      read(10,*) refine_criteria;
+      close(10)
 
 c     # These govern the wind speed; don't change final time here
 c     # but rather use configuration tfinal.  This is really just

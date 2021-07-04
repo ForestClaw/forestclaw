@@ -58,6 +58,7 @@ add_subdirectory(clawpack/advection/2d/periodic)
 ## ------------------------------------------------------------
 
 add_subdirectory(clawpack/transport/2d/square)
+add_subdirectory(clawpack/transport/2d/sphere)
 
 
 ## ---------------------Transport on a sphere ---------------------------- 

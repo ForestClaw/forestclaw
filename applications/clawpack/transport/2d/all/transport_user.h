@@ -23,10 +23,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TRANSPORT_OPTIONS_H
-#define TRANSPORT_OPTIONS_H
+#ifndef TRANSPORT_USER_H
+#define TRANSPORT_USER_H
 
 #include <fclaw2d_include_all.h>
+
+#include <fclaw2d_clawpatch_pillow.h>
+
+/* FORTRAN headers are not needed here, but generally needed in the
+   advection examples and are included here for convenience */
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_fort.h>
+
+#include <fclaw2d_clawpatch46_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
+
+#include <fc2d_clawpack46.h>  
+#include <fc2d_clawpack46_options.h>
+
+#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack5_options.h>
+
+#include <fc2d_clawpack46_fort.h>  
+#include <fc2d_clawpack5_fort.h>
+
+#include <clawpack46_user_fort.h>  
+#include <clawpack5_user_fort.h>
+
+#include "transport_user_fort.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,25 +60,7 @@ extern "C"
 #endif
 #endif
 
-
-typedef struct user_options
-{
-    int example;
-
-    int refine_criteria;
-
-    int claw_version;
-    int is_registered;
-
-} user_options_t;
-
-const user_options_t* transport_get_options(fclaw2d_global_t* glob);
-
-user_options_t* transport_options_register (fclaw_app_t * app,
-                                             const char *configfile);
-
-void transport_options_store (fclaw2d_global_t* glob, user_options_t* user);
-
+/* Only include headers above */
 
 #ifdef __cplusplus
 #if 0
