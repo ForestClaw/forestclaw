@@ -59,7 +59,7 @@ include applications/clawpack/advection/2d/sphere/Makefile.am
 ## conservation.
 ## ------------------------------------------------------------
 
-include applications/clawpack/transport/square/Makefile.am
+include applications/clawpack/transport/2d/square/Makefile.am
 
 
 ## ---------------------Transport on the sphere ---------------------------- 

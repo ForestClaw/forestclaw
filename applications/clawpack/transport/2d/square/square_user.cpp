@@ -25,6 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "square_user.h"
 
+#include <../all/transport_user.h>
+
+#if 0
 #include <fclaw2d_include_all.h>
 
 #include <fc2d_clawpack46.h>
@@ -37,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
+#endif
 
 static
 void square_problem_setup(fclaw2d_global_t* glob)
@@ -197,8 +201,8 @@ void square_link_solvers(fclaw2d_global_t *glob)
 
         /* Clawpatch functions */
         //const user_options_t* user = square_get_options(glob);
-        clawpatch_vt->fort_tag4refinement = &SQUARE46_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &SQUARE46_TAG4COARSENING;       
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;       
     } 
     else if (user->claw_version == 5)
     {
@@ -209,8 +213,8 @@ void square_link_solvers(fclaw2d_global_t *glob)
         clawpack5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */
-        clawpatch_vt->fort_tag4refinement = &SQUARE5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &SQUARE5_TAG4COARSENING;     
+        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
+        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;     
     }
 
 #if 0

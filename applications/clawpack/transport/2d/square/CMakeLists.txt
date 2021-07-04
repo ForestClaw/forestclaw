@@ -1,4 +1,4 @@
-set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
+set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/2d/all)
 
 add_library(square_f OBJECT 
 	value_exceeds_th.f90
@@ -11,22 +11,22 @@ add_library(square_f OBJECT
 	rpn2cons_update_manifold.f
 	qexact.f
 	dopri5.f
+	${all}/clawpatch46_tag4coarsening.f
+	${all}/clawpatch46_tag4refinement.f
+	${all}/clawpatch5_tag4coarsening.f
+	${all}/clawpatch5_tag4refinement.f
 	user_4.6/square_output.f
 	user_4.6/compute_error.f
 	user_4.6/qinit.f
 	user_4.6/square_setaux.f
 	user_4.6/rpn2cons_fw_manifold.f
 	user_4.6/rpt2cons_manifold.f
-	user_4.6/tag4coarsening.f
-	user_4.6/tag4refinement.f
 	user_5.0/square_output.f
 	user_5.0/compute_error.f
 	user_5.0/qinit.f
 	user_5.0/square_setaux.f
 	user_5.0/rpn2cons_fw_manifold.f
 	user_5.0/rpt2cons_manifold.f
-	user_5.0/tag4coarsening.f
-	user_5.0/tag4refinement.f
 )
 
 add_executable(square
@@ -49,3 +49,11 @@ target_link_libraries(square PRIVATE
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
 )
+
+add_test(NAME clawpack_transport_2d_square 
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_transport_2d_square
+         PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+
+

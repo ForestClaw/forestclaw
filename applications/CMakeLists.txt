@@ -73,7 +73,7 @@ endif()
 # ----------------------------------
 if(TARGET FORESTCLAW::CLAWPACK4.6 AND TARGET FORESTCLAW::CLAWPACK5)
 
-    include(paper/paper.cmake)
+    #include(paper/paper.cmake)
 
 endif()
 
