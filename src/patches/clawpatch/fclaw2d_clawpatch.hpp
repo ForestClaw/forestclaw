@@ -75,6 +75,7 @@ public :
 
     /* Auxilliary array (used by Clawpack 4.6 and 5.0) */
     FArrayBox aux;
+    FArrayBox aux_save;
 
     /* Mapping and metric info */
     int manifold;    

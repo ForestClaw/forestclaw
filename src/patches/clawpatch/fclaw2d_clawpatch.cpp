@@ -239,6 +239,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	if (clawpatch_opt->maux > 0)
 	{
 		cp->aux.define(box,cp->maux);
+		cp->aux_save.define(box,cp->maux);
 	}
 
 	if (clawpatch_opt->rhs_fields > 0)
@@ -338,9 +339,6 @@ void clawpatch_restore_step(fclaw2d_global_t* glob,
 {
 	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
 	cp->griddata = cp->griddata_save;
-
-	/* Save data potentially needed for conservative fix */
-
 }
 
 static
