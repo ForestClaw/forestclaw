@@ -100,23 +100,21 @@ void clawpack46_bc2(fclaw2d_global_t *glob,
 					int time_interp)
 {
 	fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt();
-
-	fc2d_clawpack46_options_t *clawpack_options = fc2d_clawpack46_get_options(glob);
-
 	FCLAW_ASSERT(claw46_vt->fort_bc2 != NULL);
 
-	int mx,my,mbc,meqn,maux,maxmx,maxmy;
+	int mx,my,mbc,meqn
 	double xlower,ylower,dx,dy;
-	double *aux,*q;
-
 	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
+	int maux;
+	double* aux;
 	fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-	maxmx = mx;
-	maxmy = my;
+	int maxmx = mx;
+	int maxmy = my;
 
+	fc2d_clawpack46_options_t *clawpack_options = fc2d_clawpack46_get_options(glob);
 	int *block_mthbc = clawpack_options->mthbc;
 
 	/* Set a local copy of mthbc that can be used for a patch. */
@@ -139,6 +137,8 @@ void clawpack46_bc2(fclaw2d_global_t *glob,
 	  In this case, this boundary condition won't be used to update
 	  anything
 	*/
+	int meqn;
+	double *q;
 	fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&q,&meqn);
 
 	CLAWPACK46_SET_BLOCK(&blockno);
