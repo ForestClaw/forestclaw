@@ -5,6 +5,7 @@ axis off;
 
 yrbcolormap;
 showpatchborders(1:10);
+setpatchborderprops('linewidth',1);
 caxis([0,1])
 qlo = 0;
 qhi = 1;
