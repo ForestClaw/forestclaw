@@ -1,7 +1,9 @@
       subroutine clawpack46_set_block(blockno)
       implicit none
 
-      integer blockno, blockno_com
+      integer blockno
+
+      integer blockno_com
       common /comblock/ blockno_com
 
       blockno_com = blockno
@@ -20,7 +22,7 @@
       subroutine clawpack46_unset_block()
       implicit none
 
-      integer blockno, blockno_com
+      integer blockno_com
       common /comblock/ blockno_com
 
       blockno_com = -1

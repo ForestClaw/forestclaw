@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 /* -------------------------------- Fortran code -------------------------------------- */
 
 #define QUADRANTS_SETPROB FCLAW_F77_FUNC(quadrants_setprob, QUADRANTS_SETPROB)
-void QUADRANTS_SETPROB(const double* gamma);
+void QUADRANTS_SETPROB();
 
 
 

@@ -4,13 +4,21 @@ setviews;
 [example,A,rinit,beta,theta,freq,cart_speed] = read_vars();
 
 tfinal = 0.25;
-vcart = 1.092505803290319;
+vcart = cart_speed;
 dlen = vcart*tfinal;
 
-ravg = (1 + beta)/2;
-thc = pi/2*(1 + 1/8);
-pstart = [ravg*cos(thc),ravg*sin(thc)];
-pend = pstart + [dlen, 0];
+
+if example ~= 2
+    r = (1 + beta)/2;
+    thc = pi/2*(1 + 1/8);
+    dadd = [dlen,0];
+else
+    r = beta + (1-beta)*0.5625;
+    thc = pi/2;
+    dadd = [0,dlen];
+end
+pstart = [r*cos(thc),r*sin(thc)];
+pend = pstart + dadd;
 
 fprintf('%10s %24.16e\n','qmin',qmin);
 fprintf('%10s %24.16e\n','qmax',qmax);
@@ -26,23 +34,23 @@ showpatchborders(1:10);
 setpatchborderprops('linewidth',1)
 
 
-caxis([-1,1]);
+caxis([-1,1]*1e-15);
 
 set(gca,'fontsize',16);
 
 axis([-0.707106781186547   0.707106781186548   0.282842712474619,1]);
 
-%axis([-0.211745637207774, 0.211745637207774, 0.5, 0.85])
+% axis([-0.211745637207774, 0.211745637207774, 0.5, 0.85])
 
 
 plot_path = true;
-if (plot_path && example ~= 5)    
+if (plot_path && example ~= 3)    
     hold on;
     
     N = 128;
     th0 = linspace(0,2*pi,N+1);
-    x0 = rinit*cos(th) + pstart(1);
-    y0 = rinit*sin(th) + pstart(2);
+    x0 = rinit*cos(th0) + pstart(1);
+    y0 = rinit*sin(th0) + pstart(2);
 
     Y0 = pstart(:);
     [tout,yout] = ode45(@vel_ellipse,[0,tfinal],Y0);

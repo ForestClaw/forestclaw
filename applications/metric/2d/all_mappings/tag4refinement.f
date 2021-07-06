@@ -11,7 +11,7 @@
 
       integer i,j, m
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
       tag_patch = 0
       do j = 1,my

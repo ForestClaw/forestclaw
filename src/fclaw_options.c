@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -85,18 +85,18 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                         "Steps between output files, used with outstyle=3 [1]");
 
     sc_options_add_bool (opt, 0, "advance-one-step",
-                         &fclaw_opt->advance_one_step, 1,
+                         &fclaw_opt->advance_one_step, 0,
                          "Advance from t to t+dt in one global step (subcycle=F) [F]");
 
     sc_options_add_bool (opt, 0, "outstyle-uses-maxlevel",
-                         &fclaw_opt->outstyle_uses_maxlevel, 1,
+                         &fclaw_opt->outstyle_uses_maxlevel, 0,
                          "Expand nout/nstep to global (subcycle=F) [F]");
 
     sc_options_add_bool (opt, 0, "subcycle", &fclaw_opt->subcycle, 1,
-                         "Use subcycling in time [F]");
+                         "Use subcycling in time [T]");
 
-    sc_options_add_bool (opt, 0, "weighted_partition", &fclaw_opt->weighted_partition, 0,
-                         "Weight grids when partitioning [F]");
+    sc_options_add_bool (opt, 0, "weighted_partition", &fclaw_opt->weighted_partition, 1,
+                         "Weight grids when partitioning [T]");
 
     /* ------------------------------ Conservation fix -------------------------------- */
 
@@ -364,12 +364,14 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
         fclaw_global_infof("Entering mpi_debug session");
         fclaw_mpi_debug ();
     }
+#ifdef FCLAW_HAVE_FEENABLEEXCEPT
     if (fclaw_opt->trapfpe)
     {
         fclaw_global_infof("Enabling floating point traps\n");
         // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
         feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
     }
+#endif
 
     return FCLAW_NOEXIT;
 }

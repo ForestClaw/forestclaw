@@ -9,27 +9,36 @@
       double precision tag_threshold
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j, mq
-      double precision qmin, qmax
-      double precision dq, dqi, dqj
+      integer i,j, mq, ii, jj
+      double precision qmin, qmax, xc, yc
+      double precision quad(-1:1,-1:1)
+
+      logical exceeds_th, difference_exceeds_th
 
       tag_patch = 0
 
-c     # Refine based only on first variable in system.
-      qmin = q(1,1,1)
-      qmax = q(1,1,1)
+      mq = 1
+      qmin = q(1,1,mq)
+      qmax = q(1,1,mq)
       do j = 1,my
          do i = 1,mx
-            dq = 0
-            do mq = 1,1
-                dqi = dabs(q(i+1,j,mq) - q(i-1,j,mq))
-                dqj = dabs(q(i,j+1,mq) - q(i,j-1,mq))
-                dq  = dmax1(dq, dqi, dqj)
-                if (dq .gt. tag_threshold) then
-                   tag_patch = 1
-                   return
-                endif
-            enddo
+             xc = xlower + (i-0.5)*dx
+             yc = ylower + (j-0.5)*dy
+             qmin = min(qmin,q(i,j,mq))
+             qmax = max(qmax,q(i,j,mq))
+             do ii = -1,1
+                do jj = -1,1
+                    quad(ii,jj) = q(i+ii,j+jj,mq)
+                end do
+             end do
+             exceeds_th = difference_exceeds_th(blockno,
+     &                     q(i,j,mq),qmin,qmax,quad, dx,dy,xc,yc, 
+     &                     tag_threshold)
+
+             if (exceeds_th) then
+                 tag_patch = 1
+                 return
+             endif
          enddo
       enddo
 

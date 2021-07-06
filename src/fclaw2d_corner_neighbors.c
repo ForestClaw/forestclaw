@@ -192,6 +192,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
         /* Case 3 : 'icorner' is an interior corner, at a block edge,
          or we are on a periodic block.  Need to return a valid
          transform in 'ftransform' */
+        /* block_iface is the block number at the of the neighbor? */
         if (block_iface >= 0)
         {
             /* The corner is on a block edge (but is not a block corner).
@@ -200,7 +201,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
             int rproc[FCLAW2D_REFINEFACTOR];
-            int rpatchno;
+            int rpatchno[FCLAW2D_REFINEFACTOR];
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw2d_patch_face_neighbors(domain,
                                          this_block_idx,
@@ -208,8 +209,10 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                                          block_iface,
                                          rproc,
                                          &rblockno,
-                                         &rpatchno,
+                                         rpatchno,
                                          &rfaceno);
+
+            FCLAW_ASSERT(rblockno == *corner_block_idx);
 
             /* Get encoding of transforming a neighbor coordinate across a face */
             fclaw2d_patch_transform_blockface (block_iface, rfaceno, ftransform);
@@ -217,9 +220,8 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             /* Get transform needed to swap parallel ghost patch with fine
                grid on-proc patch.  This is done so that averaging and
                interpolation routines can be re-used. */
-            int iface1, rface1;
-            iface1 = block_iface;
-            rface1 = rfaceno;
+            int iface1 = block_iface;
+            int rface1 = rfaceno;
             fclaw2d_patch_face_swap(&iface1,&rface1);
             fclaw2d_patch_transform_blockface(iface1, rface1,
                                               ftransform_finegrid->transform);
@@ -233,6 +235,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             fclaw2d_patch_transform_blockface_intra (ftransform);
             fclaw2d_patch_transform_blockface_intra
                 (ftransform_finegrid->transform);
+
         }
         else
         {
@@ -460,7 +463,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     if (interpolate_to_neighbor && !remote_neighbor)
                     {
                         /* No need to interpolate to remote ghost patches. */
-
                         fclaw2d_patch_interpolate_corner(s->glob,
                                                          coarse_patch,
                                                          fine_patch,

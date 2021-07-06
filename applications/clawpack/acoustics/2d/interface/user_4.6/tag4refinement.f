@@ -1,25 +1,43 @@
-      subroutine clawpack46_tag4refinement(mx,my,mbc,meqn,
-     &      xlower,ylower,dx,dy,blockno, q,refine_threshold,
-     &      init_flag, tag_patch)
+      subroutine clawpatch46_tag4refinement(mx,my,mbc,
+     &      meqn, xlower,ylower,dx,dy,blockno,
+     &      q, tag_threshold, init_flag,tag_patch)
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
       integer blockno
       double precision xlower, ylower, dx, dy
-      double precision refine_threshold
+      double precision tag_threshold
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j, mq,m
-      double precision xc,yc, qmin, qmax
-      double precision dq, dqi, dqj
+      integer*8 cont, get_context
 
+      integer i,j, mq, ii, jj
+      double precision qmin, qmax, xc, yc, quad(-1:1,-1:1)
+
+      logical exceeds_th, value_exceeds_th
+      
       tag_patch = 0
 
-c     # Refine based only on first variable in system.
+      cont = get_context()
+
       mq = 1
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-            if (abs(q(i,j,mq)) .gt. refine_threshold) then
+      qmin = q(1,1,mq)
+      qmax = q(1,1,mq)
+      do j = 2,my-1
+         do i = 2,mx-1
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
+            qmin = min(q(i,j,mq),qmin)
+            qmax = max(q(i,j,mq),qmax)
+            do ii = -1,1
+               do jj = -1,1
+                  quad(ii,jj) = q(i+ii,j+jj,mq)
+               end do
+            end do
+            exceeds_th = value_exceeds_th(blockno,
+     &             q(i,j,mq),qmin,qmax,quad, dx,dy,xc,yc,
+     &             tag_threshold)
+            if (exceeds_th) then
                tag_patch = 1
                return
             endif

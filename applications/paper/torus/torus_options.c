@@ -34,17 +34,8 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user_opt->example, 0,
                         "[user] 0 = torus; 1 = twisted torus [0]");
 
-    sc_options_add_int (opt, 0, "mapping", &user_opt->mapping, 0,
-                        "[user] 0 = torus; 1 = twisted torus [0]");
-
     sc_options_add_int (opt, 0, "initial-condition", &user_opt->initial_condition, 0,
                         "[user] Initial condition : 0=non-smooth; 1=smooth [1]");
-
-    sc_options_add_bool (opt, 0, "color-equation", &user_opt->color_equation, 0,
-                        "[user]  Solve color-equation using edge velocities [1]");
-
-    sc_options_add_bool (opt, 0, "use-stream", &user_opt->use_stream, 0,
-                        "[user]  Use streamfunction [0]");
 
     sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
                            "[user] Ratio r/R, r=outer radius, R=inner radius " \
@@ -53,8 +44,26 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "beta", &user_opt->beta, 0.0,
                            "[user] beta > 0 gives variable cross section [0]");
 
+    sc_options_add_double (opt, 0, "init-radius", &user_opt->init_radius, 0.1,
+                           "[user] Initial radius [0.1]");
+
+
+    fclaw_options_add_double_array (opt, 0, "theta", 
+                                    &user_opt->theta_string,"0 1",&user_opt->theta,2,
+                                    "[user] theta range [0,1]");    
+
+    fclaw_options_add_double_array (opt, 0, "phi", 
+                                    &user_opt->phi_string,"0 1",&user_opt->phi,2,
+                                    "[user] phi range [0,1]");    
+
+    sc_options_add_int (opt, 0, "refine-pattern", &user_opt->refine_pattern, 0,
+                           "[user] Refinement pattern [0]");
+
     sc_options_add_double (opt, 0, "revs-per-s", &user_opt->revs_per_s, 0.5,
                            "[user] Revolutions per second [0.5]");
+
+    sc_options_add_double (opt, 0, "cart_speed", &user_opt->cart_speed, 0.5,
+                           "[user] Cartesian speed [1]");
 
     sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
@@ -66,7 +75,8 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
 static fclaw_exit_type_t
 torus_postprocess(user_options_t *user_opt)
 {
-    /* nothing to post-process yet ... */
+    fclaw_options_convert_double_array (user_opt->phi_string, &user_opt->phi, 2);
+    fclaw_options_convert_double_array (user_opt->theta_string, &user_opt->theta, 2);
     return FCLAW_NOEXIT;
 }
 
@@ -74,17 +84,7 @@ torus_postprocess(user_options_t *user_opt)
 static fclaw_exit_type_t
 torus_check(user_options_t *user_opt)
 {
-    if (user_opt->example < 0 || user_opt->example > 1)
-    {
-        fclaw_global_essentialf
-            ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    if (user_opt->use_stream == 1 && user_opt->example != 0)
-    {
-        fclaw_global_essentialf("use_stream == 1 and example != 0.\n");
-        return FCLAW_EXIT_QUIET;
-    }
+    /* Nothing to check */
     return FCLAW_NOEXIT;
 
 }
@@ -92,7 +92,8 @@ torus_check(user_options_t *user_opt)
 static void
 torus_destroy(user_options_t *user_opt)
 {
-    /* Nothing to destroy */
+    FCLAW_FREE (user_opt->theta);
+    FCLAW_FREE (user_opt->phi);
 }
 
 

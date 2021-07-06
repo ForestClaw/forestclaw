@@ -14,13 +14,13 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/setprob.f \
 	applications/clawpack/transport/2d/square/q0.f \
 	applications/clawpack/transport/2d/square/fdisc.f \
-	applications/clawpack/transport/2d/square/cart_basis.f \
-	applications/clawpack/transport/2d/square/identity_basis.f \
+	applications/clawpack/transport/2d/square/square_basis.f \
 	applications/clawpack/transport/2d/square/mapping_terms.f \
 	applications/clawpack/transport/2d/square/square_velocity.f \
 	applications/clawpack/transport/2d/square/qexact.f \
 	applications/clawpack/transport/2d/square/dopri5.f \
 	applications/clawpack/transport/2d/square/user_4.6/square_output.f \
+	applications/clawpack/transport/2d/square/user_4.6/periodic_interpolate.f \
 	applications/clawpack/transport/2d/square/user_4.6/compute_error.f \
 	applications/clawpack/transport/2d/square/user_4.6/qinit.f \
 	applications/clawpack/transport/2d/square/user_4.6/square_setaux.f \
@@ -28,7 +28,9 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/user_4.6/rpt2cons_manifold.f \
 	applications/clawpack/transport/2d/square/user_4.6/rpn2cons_update_manifold.f \
 	applications/clawpack/transport/2d/square/user_4.6/tag4coarsening.f \
-	applications/clawpack/transport/2d/square/user_4.6/tag4refinement.f
+	applications/clawpack/transport/2d/square/user_4.6/tag4refinement.f \
+	applications/clawpack/transport/2d/square/user_4.6/tag4coarsening_wavelet.f \
+	applications/clawpack/transport/2d/square/user_4.6/tag4refinement_wavelet.f
 
 EXTRA_DIST += \
 	applications/clawpack/transport/2d/square/fclaw_options.ini \

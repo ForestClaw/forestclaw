@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@ void run_program(fclaw2d_global_t* glob)
         fc2d_clawpack5_solver_initialize();
     }
 
-    correlatedcb_link_solvers(glob);
+    transport_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run

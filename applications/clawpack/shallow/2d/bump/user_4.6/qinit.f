@@ -14,13 +14,17 @@ c
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
       integer i,j
-      double precision xc, yc
+      double precision xc, yc, x0, y0, r2
+
+      x0 = 0
+      y0 = 0
 
       do i = 1-mbc,mx+mbc
           xc = xlower + (i-0.5d0)*dx
           do j = 1-mbc,my+mbc
               yc = ylower + (j-0.5d0)*dy
-              q(i,j,1) = 0.1d0 + exp(-200.d0*(xc**2 + yc**2))
+              r2 = (xc-x0)**2 + (yc-y0)**2
+              q(i,j,1) = 0.1d0 + exp(-200.d0*r2)
               q(i,j,2) = 0.d0
               q(i,j,3) = 0.d0
           end do

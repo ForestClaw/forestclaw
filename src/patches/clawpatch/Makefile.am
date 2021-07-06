@@ -17,12 +17,13 @@ libclawpatch_installed_headers = \
 	src/patches/metric/fclaw2d_metric.hpp \
 	src/patches/metric/fclaw2d_metric_default.h \
 	src/patches/metric/fclaw2d_metric_default_fort.h \
-	src/patches/metric/fortran_source2d/metric_terms.i 
+	src/patches/metric/fortran_source2d/fclaw2d_metric_terms.i 
 
 libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics_default.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_pillow.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.c \
@@ -38,7 +39,6 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4refinement.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4coarsening.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_timeinterp.f  \
-	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_conservation.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_average.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_copy.f \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_interpolate.f \
@@ -62,7 +62,7 @@ lib_LTLIBRARIES += src/patches/clawpatch/libclawpatch.la
 FCLAW_CLAWPATCH_CPPFLAGS = -I@top_srcdir@/src/patches/clawpatch \
                            -I@top_srcdir@/src/patches/metric
 
-## Needed for metric_terms.i
+## Needed for fclaw2d_metric_terms.i
 FCLAW_CLAWPATCH_FFLAGS = -I@top_srcdir@/src/patches/metric/fortran_source2d
 
 FCLAW_CLAWPATCH_LDADD    = @top_builddir@/src/patches/clawpatch/libclawpatch.la

@@ -10,20 +10,20 @@ c    # 4. clawpack46_fort_time_sync_copy
 c    # ----------------------------------------------------------------
 
 
-c    # -----------------------------------------------------------------
-c    # Called BEFORE step update.  This stores the value of the flux
-c    # function at cell centers.  At k=0, the flux at the the first interior
-c    # interior cell is stored;  At k=1, the flux evaluated in the 
-c    # ghost cell is stored;    If there is no flux function, we should 
-c    # set up a dummy function that returns zero.
-c    # 
-c    # These will be stored for each grid and used to compute
-c    # corrections.
-c    # -----------------------------------------------------------------
+c     # -----------------------------------------------------------------
+c     # Called BEFORE step update.  This stores the value of the flux
+c     # function at cell centers.  At k=0, the flux at the the first interior
+c     # interior cell is stored;  At k=1, the flux evaluated in the 
+c     # ghost cell is stored;    If there is no flux function, we should 
+c     # set up a dummy function that returns zero.
+c     # 
+c     # These will be stored for each grid and used to compute
+c     # corrections.
+c     # -----------------------------------------------------------------
       subroutine clawpack46_time_sync_store_flux(mx,my,mbc,meqn,
-     &      maux, blockno, patchno, dt,el0, el1, el2, el3,q, aux,
-     &      flux0,flux1,flux2,flux3,
-     &      rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
+     &     maux, blockno, patchno, dt,el0, el1, el2, el3,q, aux,
+     &     flux0,flux1,flux2,flux3,
+     &     rpn2_cons,qvec,auxvec_center,auxvec_edge, flux)
 
       implicit none
 
@@ -45,9 +45,9 @@ c    # -----------------------------------------------------------------
 
       integer i,j,k,m, idir, iface
 
+      idir = 0
       do j = 1,my
 c        # left side k=0 = in; k=1 = out
-         idir = 0
          do k = 0,1
             iface = k
             do m = 1,maux
@@ -61,20 +61,20 @@ c              # and exterior cells.
                auxvec_edge(m) = aux(1,j,m)
             enddo
 
-
+c     #     Pass in q at interior cell (k=0) or exterior cell (k=1)
             do m = 1,meqn
                qvec(m) = q(1-k,j,m)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
-     &               auxvec_center,auxvec_edge,flux)         
+     &           auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
                flux0(j,m,k) = flux0(j,m,k) + dt*el0(j)*flux(m)
             enddo
          enddo
 
-c        # right side 0 = in; 1 = out
+c     #  right side 0 = in; 1 = out
          do k = 0,1
-            iface = 1-k
+            iface = 1-k    !! face of the cell
             do m = 1,maux
 c              # Cell centered values                
                auxvec_center(m) = aux(mx+k,j,m)
@@ -82,11 +82,13 @@ c              # Cell centered values
 c              # Edge between ghost cell and interior cell               
                auxvec_edge(m) = aux(mx+1,j,m)
             enddo
+
             do m = 1,meqn
                qvec(m) = q(mx+k,j,m)
             enddo
+
             call rpn2_cons(meqn,maux,idir,iface,qvec,
-     &              auxvec_center,auxvec_edge,flux)         
+     &           auxvec_center,auxvec_edge,flux)         
             do m = 1,meqn
                flux1(j,m,k) = flux1(j,m,k) + dt*el1(j)*flux(m)
             enddo
@@ -96,7 +98,7 @@ c              # Edge between ghost cell and interior cell
 
       idir = 1
       do i = 1,mx
-c        # bottom side 0 = in; 1 = out0
+c     # bottom side 0 = in; 1 = out0
          do k = 0,1
             iface = k + 2
             do m = 1,maux
@@ -110,7 +112,7 @@ c              # Edge between ghost cell and interior cell
                qvec(m) = q(i,1-k,m)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
-     &               auxvec_center, auxvec_edge,flux)         
+     &           auxvec_center, auxvec_edge,flux)         
             do m = 1,meqn
                flux2(i,m,k) = flux2(i,m,k) + dt*el2(i)*flux(m)
             enddo
@@ -130,7 +132,7 @@ c              # Edge between ghost cell and interior cell
                qvec(m) = q(i,my+k,m)
             enddo
             call rpn2_cons(meqn,maux,idir,iface,qvec,
-     &              auxvec_center,auxvec_edge, flux)         
+     &           auxvec_center,auxvec_edge, flux)         
             do m = 1,meqn
                flux3(i,m,k) = flux3(i,m,k) + dt*el3(i)*flux(m)
             enddo
@@ -267,18 +269,16 @@ c     # grid cells
 
       integer*8 transform_cptr
 
-      logical is_valid_correct
-
       double precision fm,fp,gm,gp,ef
 
       integer i, j, ic, jc, ii1, ii2, jj1, jj2, ii, jj
-      integer i2(0:3), j2(0:3), m, mq
+      integer i2(0:3), j2(0:3), mq
       double precision deltac, areac
 
 
       integer a(2,2), f(2), sc, nm
 
-      logical is_valid_average, skip_this_grid
+      logical fc46_skip_this_grid
 
       call fclaw2d_clawpatch_build_transform(transform_cptr,a,f)
 
@@ -361,6 +361,8 @@ c         # sign change ('sc') to account for normals at 0-1
 c         # patch faces which may point in a different direction.
 c         # First column is A*[1;0]        
           sc = (a(1,1) + a(2,1))/2
+          deltac = 0
+          areac = 1
           do mq = 1,meqn
               do jc = 1,my
                   if (iface_coarse .eq. 0) then
@@ -369,7 +371,8 @@ c         # First column is A*[1;0]
      &                     i2,j2,transform_cptr)
                       deltac = 0
                       areac = area0(jc)
-                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then
+                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                    then
                           fp = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &                fclaw2d_clawpatch_transform_face_half(ic+1,jc,
@@ -386,7 +389,8 @@ c                         # Check for validity?
      &                      transform_cptr)
                       deltac = 0
                       areac = area1(jc)
-                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then
+                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                 then
                           fm = qfine_dummy(i2(0),j2(0),mq)
     
                           call 
@@ -406,6 +410,8 @@ c         # sign change ('sc') to account for normals at 2-3
 c         # patch faces which may point in a different direction.
 c         # Second column is A*[0;1]        
           sc = (a(1,2) + a(2,2))/2
+          deltac = 0
+          areac = 1
           do mq = 1,meqn
               do ic = 1,mx                  
                   if (iface_coarse .eq. 2) then
@@ -415,7 +421,8 @@ c         # Second column is A*[0;1]
      &                      transform_cptr)
                       deltac = 0
                       areac = area2(ic)
-                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then                
+                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                  then                
                           gp = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &      fclaw2d_clawpatch_transform_face_half(ic,jc+1,
@@ -432,7 +439,8 @@ c         # Second column is A*[0;1]
      &                      transform_cptr)
                       deltac = 0
                       areac = area3(ic)
-                      if (.not. skip_this_grid(idir,i2,j2,mx,my)) then                   
+                      if (.not. fc46_skip_this_grid(idir,i2,j2,mx,my)) 
+     &                 then                   
                           gm = qfine_dummy(i2(0),j2(0),mq)
                           call 
      &         fclaw2d_clawpatch_transform_face_half(ic,jc-1,
@@ -444,6 +452,9 @@ c         # Second column is A*[0;1]
                       endif
                   endif
                   qcoarse(ic,jc,mq) = qcoarse(ic,jc,mq) + deltac/areac
+                  if (jc .eq. 1) then
+c                    write(6,'(2I5, 2E24.16)') ic,jc,deltac,deltac/areac
+                  endif
               enddo
           enddo
       endif
@@ -481,7 +492,7 @@ c    # -----------------------------------------------------------------
 
       implicit none
 
-      integer mx,my,mbc,meqn,idir,iface_coarse
+      integer mx,my,mbc,meqn,idir
       integer this_iface, this_blockno, neighbor_blockno
 
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -514,13 +525,11 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       double precision efneighbor3(mx,meqn,0:1)
 
 
-      double precision delta, deltap, deltam, area
+      double precision delta, area
 
       integer a(2,2), f(2), sc
 
       double precision fp,fm,gp,gm,ef
-
-      double precision neighborval
 
       integer*8 transform_cptr
 
@@ -529,7 +538,7 @@ c     # stored at the '0' index; ghost layer stored at the '1' index.
       integer i1,j1, i2, j2
 
 
-      call build_transform_samesize(transform_cptr,a,f)
+      call fc46_build_transform_samesize(transform_cptr,a,f)
 
       idir = this_iface/2
 
@@ -556,10 +565,10 @@ c         # Get sign change to account for possible mismatch in normals
           sc = a(1,1) + a(2,1)    
           do mq = 1,meqn
               do j = 1,my
-c                 # Exchange at low side of 'this' grid in
-c                 # x-direction (idir == 0) 
                   j1 = j
                   if (this_iface .eq. 0) then
+c                     # Exchange at low side of 'this' grid in
+c                     # x-direction (idir == 0) 
                       i1 = 1
                       call 
      &       fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
@@ -635,17 +644,17 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
       endif
       end
 
-      logical function skip_this_grid(idir,i2,j2,mx,my)
+      logical function fc46_skip_this_grid(idir,i2,j2,mx,my)
       implicit none
 
       integer idir, i2(0:3), j2(0:3), mx,my
       integer m
-      logical is_valid_correct
+      logical fc46_is_valid_correct
 
-      skip_this_grid = .false.
+      fc46_skip_this_grid = .false.
       do m = 0,3
-          if (.not. is_valid_correct(idir,i2(m),j2(m),mx,my)) then
-              skip_this_grid = .true.
+          if (.not. fc46_is_valid_correct(idir,i2(m),j2(m),mx,my)) then
+              fc46_skip_this_grid = .true.
               exit
           endif
       enddo   
@@ -654,7 +663,7 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
       end
 
 
-      logical function is_valid_correct(idir,i,j,mx,my)
+      logical function fc46_is_valid_correct(idir,i,j,mx,my)
       implicit none
 
       integer i,j,mx,my, idir
@@ -664,13 +673,13 @@ c                      write(6,*) this_iface, i1, j1, i2, j2
       j1 = 1 .le. j .and. j .le. my
 
 c     # At least one of the above should be true.
-      is_valid_correct = xor(i1,j1)
+      fc46_is_valid_correct = xor(i1,j1)
 
 
       end
 
 
-      subroutine build_transform_samesize(transform_ptr,a,f)
+      subroutine fc46_build_transform_samesize(transform_ptr,a,f)
       implicit none
 
       integer a(2,2)

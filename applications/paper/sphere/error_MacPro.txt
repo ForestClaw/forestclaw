@@ -1,0 +1,68 @@
+--------------------------------------------------------------------------
+                         Sunday 11/10/2019
+--------------------------------------------------------------------------
+
+-- UNIFORM - Case 4
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : refine everywhere
+-- dt = 1e-2; (fixed time step; outstyle = 3)
+-- tfinal = 0.5 ;  nout = nstep = 50
+-- WITH conservation fix 
+-- no limiters
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
+-- Levels 0-0, 1-1, 2-2, 3-3, 4-4, etc. 
+-- See Tuesday 8/13/2019 (same results)
+-- Results run on four cores
+-- Times include output and error calculation
+
+Verify that results compare with laptop
+* results 4 processors include computations of error and output
+
+   N    ngrids         1-norm      2-norm   inf-norm       4 procs*      8 procs       12 procs   
+---------------------------------------------------------------------------------------------
+  32         6     2.2680e-02  6.7832e-02 5.3710e-01       2.11066     0.0777233      0.0904069 
+  64        24     1.3511e-02  4.7165e-02 4.0710e-01      12.4358      0.519787       0.646913 
+ 128        96     7.1525e-03  2.9932e-02 3.0984e-01      18.9532      3.13144        2.69837
+ 256       384     3.0674e-03  1.5985e-02 2.3382e-01     116.899      23.9971        18.8202
+ 512      1536     1.0061e-03  6.6145e-03 1.2287e-01     573.819     187.005        139.478 
+1024      6144     2.6940e-04  2.0815e-03 5.1700e-02     -------    1480.89        1085.22 
+
+
+
+-- Adaptive - Case 4
+-- Divergence-free Nair and Lauritzen test case 4 (with zonal flow)
+-- 32x32 patches
+-- refinement criteria : 0.105/0.101
+-- dt = 1e-2; (fixed time step; outstyle = 3)
+-- tfinal = 0.5 ;  nout = nstep = 50
+-- WITH conservation fix 
+-- no limiters
+-- initial condition : q = 0.1 + 0.9*H(xp,yp,zp)
+-- Levels 0-0, 0-1, 0-2, 0-3, 0-4, etc. 
+
+
+* Timing on 12 procs includes computation for error.
+
+
+   N    ngrids         1-norm      2-norm   inf-norm       %     12 procs*   
+---------------------------------------------------------------------------------------------
+  32         6     2.2680e-02  6.7832e-02 5.3710e-01       %     0.0904069 
+  64        24     1.3522e-02  4.7166e-02 4.0710e-01       %     2.60837
+ 128        96     7.1649e-03  2.9932e-02 3.0976e-01       %     4.96436 
+ 256       384     3.0785e-03  1.5985e-02 2.3384e-01       %    15.1495
+ 512      1536     1.0137e-03  6.6141e-03 1.2287e-01       %    53.5446
+1024      6144     2.7364e-04  2.0815e-03 5.1702e-02       %   326.681  
+2048     24576     7.5565e-05  5.6251e-04 1.8960e-02       %  1626.81 
+4096     93304     2.3736e-05  1.5423e-04 7.0735e-03       %  9678.84  
+
+
+   N    ngrids     4 procs*    8 procs        12 procs*   
+-------------------------------------------------------
+  32         6     2.11066     0.0777233      0.0904069 
+  64        24     4.49398     2.3926         2.60837
+ 128        96                                4.96436 
+ 256       384                               15.1495
+ 512      1536                               53.5446
+1024      6144                              326.681  
+2048     24576    

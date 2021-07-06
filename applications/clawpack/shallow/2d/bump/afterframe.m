@@ -39,7 +39,7 @@ title(sprintf('t = %g',t),'fontsize',16);
 
 NoQuery = 0;
 prt = false;
-MaxFrames = 32;
+MaxFrames = 1000;
 if (prt)
     % hidepatchborders;
     maxlevel = 7;    %  eff. res. = 2^maxlevel

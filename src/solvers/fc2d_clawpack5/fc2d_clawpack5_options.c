@@ -45,7 +45,7 @@ clawpack5_register (fc2d_clawpack5_options_t* clawopt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "src_term", &clawopt->src_term, 0,
                          "[clawpack5] Source term option [F]");
 
-    sc_options_add_bool (opt, 0, "use_fwaves", &clawopt->use_fwaves, 0,
+    sc_options_add_bool (opt, 0, "use-fwaves", &clawopt->use_fwaves, 0,
                          "[clawpack5] Use fwaves flux-form [F]");
 
 
@@ -97,12 +97,6 @@ clawpack5_check (fc2d_clawpack5_options_t * clawopt,
     clawopt->method[5] = clawopt->mcapa;
     clawopt->method[6] = clawpatch_opt->maux;
 
-    if (clawopt->use_fwaves)
-    {
-        fclaw_global_essentialf("clawpack5 : fwaves not yet implemented\n");
-        return FCLAW_EXIT_QUIET;
-    }
-
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
     {
         fclaw_global_essentialf("clawpack5 : mcapa > 0 but maux == 0.\n");
@@ -111,7 +105,8 @@ clawpack5_check (fc2d_clawpack5_options_t * clawopt,
 
     /* There is probably a better place to do this */    
     CLAWPACK5_SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
-                   clawopt->mthlim, clawopt->method);
+                   clawopt->mthlim, clawopt->method, 
+                   &clawopt->use_fwaves);
 
     /* Should also check mthbc, mthlim, etc. */
 

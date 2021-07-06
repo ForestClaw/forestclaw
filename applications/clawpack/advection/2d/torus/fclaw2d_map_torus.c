@@ -72,7 +72,9 @@ fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
 
     double alpha = cont->user_double[0];
     double beta = cont->user_double[1];
-    MAPC2M_TORUS(&blockno,&xc1,&yc1,xp,yp,zp,&alpha,&beta);
+
+    /* Don't pass in block number */
+    MAPC2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
 }
 
 fclaw2d_map_context_t *
@@ -83,8 +85,6 @@ fclaw2d_map_context_t *
                            const double alpha,
                            const double beta)
 {
-    int i;
-
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);

@@ -94,15 +94,14 @@ c        # finest level.
 
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      integer i,j,ii,jj, ir, rfactor, icell, jcell
-      double precision sum_area, xcorner, ycorner
+      integer i,j,ii,jj, rfactor, icell, jcell
+      double precision sum_area
       double precision xp1,yp1,zp1
       double precision quad(0:1,0:1,3)
       double precision get_area_approx
 
-      double precision dxf, dyf, xdf, ydf, total_area, a
+      double precision dxf, dyf
       double precision xef, yef, xe,ye
-      integer k, m
       logical is_area_interior
 
       integer*8 cont, get_context
@@ -292,8 +291,8 @@ c     # computed at the center of the mesh cell.
       double precision xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
       double precision ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
 
-      INTEGER i,j,m, ibc, jbc
-      DOUBLE PRECISION taud(3),taup(3),nv(3), sp, xv(3)
+      INTEGER i,j,m
+      DOUBLE PRECISION taud(3),taup(3),nv(3), sp
 
 c     # Compute normals at all interior edges.
 
@@ -318,7 +317,6 @@ c     # Get x-face normals
          ENDDO
       ENDDO
 
-
       DO j = 1-mbc,my+mbc+1
          DO i =  -mbc,mx+mbc+1
 c           # Now do y-faces
@@ -338,7 +336,6 @@ c           # nv has unit length
             enddo
          enddo
       enddo
-
 
       end subroutine
 
@@ -372,6 +369,7 @@ c     # Get x-face normals
             tlen = sqrt(taup(1)**2 + taup(2)**2 + taup(3)**2)
 
             DO m = 1,3
+c               xtangents(i,j,m) = taup(m)/tlen
                xtangents(i,j,m) = taup(m)
             ENDDO
             edge_lengths(i,j,1) = tlen
@@ -386,8 +384,8 @@ c           # Now do y-faces
             taup(3) = zd(i+1,j) - zd(i,j)
             tlen = sqrt(taup(1)**2 + taup(2)**2 + taup(3)**2)
 
-c           # nv has unit length
             do m = 1,3
+c               ytangents(i,j,m) = taup(m)/tlen
                ytangents(i,j,m) = taup(m)
             enddo
             edge_lengths(i,j,2) = tlen
@@ -458,7 +456,7 @@ c     # Neither version depends on any knowledge of the surface normals.
       implicit none
 
       double precision taup(3),taud(3),nv(3)
-      double precision sp,sd,dt,ct,st,c1,c2
+      double precision sp,sd,ct,st,c1,c2
       double precision tp(3), td(3), nlen
 
       integer m
@@ -503,7 +501,7 @@ c      endif
       double precision taup(3),taud(3),nv(3), sp
 
       integer m
-      double precision nlen,aii,ai2,c1,c2
+      double precision nlen,aii,ai2
 
 c     # we leave out any scaling by the determinant of the metric,
 c     # since we just normalize the vector anyway.
@@ -548,7 +546,7 @@ c         nv(m) = c1*taud(m) + c2*taup(m)
       double precision         area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
       integer i,j,m
-      double precision nv(3), sp, nlen, av(3), bv(3), kappa
+      double precision nv(3), nlen, av(3), bv(3), kappa
 
       logical isflat
 
@@ -607,7 +605,7 @@ c     # these will be empty if we are not on a manifold.
       double precision areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
+      integer i,j, ig, jg, ic_add, jc_add, ii, jj
       double precision sum
 
 c     # This should be refratio*refratio.

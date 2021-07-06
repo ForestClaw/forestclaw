@@ -82,6 +82,7 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
     fclaw_opt = fclaw2d_get_options(g->glob);
+    int domain_init = *((int*) g->user);
 
     int minlevel = fclaw_opt->minlevel;
 
@@ -91,7 +92,8 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
     {
         int family_coarsened = 1;
         family_coarsened = fclaw2d_patch_tag4coarsening(g->glob,&fine_patches[0],
-                                                        blockno, fine0_patchno);
+                                                        blockno, fine0_patchno,
+                                                        domain_init);
         if (family_coarsened == 1)
         {
             int igrid;
@@ -238,10 +240,10 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
     /* First determine which families should be coarsened. */
-    fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
-                                    (void*) NULL);
-
     int domain_init = 0;
+    fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
+                                    (void *) &domain_init);
+
     fclaw2d_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
                                    (void *) &domain_init);
 

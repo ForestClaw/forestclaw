@@ -66,6 +66,9 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
     dimension auxl(maux, 1-mbc:maxm+mbc)
     dimension auxr(maux, 1-mbc:maxm+mbc)
 
+    DOUBLE PRECISION grav
+    COMMON /cparam/  grav
+
 !     local arrays
 !     ------------
     dimension delta(3)
@@ -76,8 +79,8 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
     h(1-mbc:maxm+mbc)
     common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
 
-    DOUBLE PRECISION grav
-    COMMON /cparam/  grav
+!!    integer :: fc2d_clawpack46_get_block, blockno
+
 
 
     data efix /.true./    !# use entropy fix for transonic rarefactions
@@ -88,32 +91,32 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         dy = dxcom
     endif
 
-!     The aux array has the following elements:
-!         1  kappa = ratio of cell area to dxc*dyc
-!         2  enx = x-component of normal vector to left edge in tangent plane
-!         3  eny = y-component of normal vector to left edge in tangent plane
-!         4  enz = z-component of normal vector to left edge in tangent plane
-!         5  etx = x-component of tangent vector to left edge in tangent plane
-!         6  ety = y-component of tangent vector to left edge in tangent plane
-!         7  etz = z-component of tangent vector to left edge in tangent plane
-!         8  enx = x-component of normal vector to bottom edge in tangent plane
-!         9  eny = y-component of normal vector to bottom edge in tangent plane
-!        10  enz = z-component of normal vector to bottom edge in tangent plane
-!        11  etx = x-component of tangent vector to bottom edge in tangent plane
-!        12  ety = y-component of tangent vector to bottom edge in tangent plane
-!        13  etz = z-component of tangent vector to bottom edge in tangent plane
-!        14  erx = x-component of unit vector in radial direction at cell ctr
-!        15  ery = y-component of unit vector in radial direction at cell ctr
-!        16  erz = z-component of unit vector in radial direction at cell ctr
+    !! The aux array has the following elements:
+    !!  1  kappa = ratio of cell area to dxc*dyc
+    !!  2  enx = x-component of normal vector to left edge in tangent plane
+    !!  3  eny = y-component of normal vector to left edge in tangent plane
+    !!  4  enz = z-component of normal vector to left edge in tangent plane
+    !!  5  etx = x-component of tangent vector to left edge in tangent plane
+    !!  6  ety = y-component of tangent vector to left edge in tangent plane
+    !!  7  etz = z-component of tangent vector to left edge in tangent plane
+    !!  8  enx = x-component of normal vector to bottom edge in tangent plane
+    !!  9  eny = y-component of normal vector to bottom edge in tangent plane
+    !! 10  enz = z-component of normal vector to bottom edge in tangent plane
+    !! 11  etx = x-component of tangent vector to bottom edge in tangent plane
+    !! 12  ety = y-component of tangent vector to bottom edge in tangent plane
+    !! 13  etz = z-component of tangent vector to bottom edge in tangent plane
+    !! 14  erx = x-component of unit vector in radial direction at cell ctr
+    !! 15  ery = y-component of unit vector in radial direction at cell ctr
+    !! 16  erz = z-component of unit vector in radial direction at cell ctr
 
-!     # offset to index into aux array for enx, eny, etx, ety, gamma
-!     #    depends on whether ixy=1 (left edge) or ixy=2 (bottom edge).
+    !! # offset to index into aux array for enx, eny, etx, ety, gamma
+    !! #    depends on whether ixy=1 (left edge) or ixy=2 (bottom edge).
     ioff = 6*(ixy-1) + 1
 
 
-!     # find a1 thru a3, the coefficients of the 3 eigenvectors:
+    !! # find a1 thru a3, the coefficients of the 3 eigenvectors:
 
-    do 20 i = 2-mbc, mx+mbc
+    do i = 2-mbc, mx+mbc
 
         enx =   auxl(ioff+1,i)
         eny =   auxl(ioff+2,i)
@@ -129,16 +132,16 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
 
         g = grav
 
-    !        # compute normal and tangential momentum at cell edge:
+    !! # compute normal and tangential momentum at cell edge:
         hunl = enx*ql(2,i) + eny*ql(3,i) + enz*ql(4,i)
         hunr = enx*qr(2,i-1) + eny*qr(3,i-1) + enz*qr(4,i-1)
 
         hutl = etx*ql(2,i) + ety*ql(3,i) + etz*ql(4,i)
         hutr = etx*qr(2,i-1) + ety*qr(3,i-1) + etz*qr(4,i-1)
 
-    !        # compute the Roe-averaged variables needed in the Roe solver.
-    !        # These are stored in the common block comroe since they are
-    !        # later used in routine rpt2 to do the transverse wave splitting.
+        !! # compute the Roe-averaged variables needed in the Roe solver.
+        !! # These are stored in the common block comroe since they are
+        !! # later used in routine rpt2 to do the transverse wave splitting.
 
         hl = ql(1,i)
         hr = qr(1,i-1)
@@ -150,7 +153,7 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         v(i) = (hutr/hsqr + hutl/hsql) / hsq
         a(i) = dsqrt(grav*h(i))
 
-    !        # Split the jump in q at each interface into waves
+        !! # Split the jump in q at each interface into waves
         delta(1) = hl - hr
         delta(2) = hunl - hunr
         delta(3) = hutl - hutr
@@ -160,13 +163,14 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         a3 = (-(u(i)-a(i))*delta(1) + delta(2))*(0.50d0/a(i))
 
 
-    !        # Compute the waves.
+        !! # Compute the waves.
 
         wave(1,1,i) = a1
         wave(2,1,i) = a1*(u(i)-a(i))*enx + a1*v(i)*etx
         wave(3,1,i) = a1*(u(i)-a(i))*eny + a1*v(i)*ety
         wave(4,1,i) = a1*(u(i)-a(i))*enz + a1*v(i)*etz
         s(1,i) = (u(i)-a(i)) * gamma/dy
+
 
         wave(1,2,i) = 0.0d0
         wave(2,2,i) = a2*etx
@@ -179,36 +183,35 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         wave(3,3,i) = a3*(u(i)+a(i))*eny + a3*v(i)*ety
         wave(4,3,i) = a3*(u(i)+a(i))*enz + a3*v(i)*etz
         s(3,i) = (u(i)+a(i)) * gamma/dy
-        281 format(2i4,5d12.4)
-        283 format(8x,5d12.4)
-    20 END DO
+
+    END DO
 
 
-!    # compute flux differences amdq and apdq.
-!    ---------------------------------------
+    !! # compute flux differences amdq and apdq.
+    !! ---------------------------------------
 
     if (efix) go to 110
 
-!     # no entropy fix
-!     ----------------
+    !! # no entropy fix
+    !! ----------------
+    !! # amdq = SUM s*wave   over left-going waves
+    !! # apdq = SUM s*wave   over right-going waves
 
-!     # amdq = SUM s*wave   over left-going waves
-!     # apdq = SUM s*wave   over right-going waves
-
-    DO 100 m=1,meqn
-        do 100 i=2-mbc, mx+mbc
+    DO m=1,meqn
+        do i=2-mbc, mx+mbc
             amdq(m,i) = 0.d0
             apdq(m,i) = 0.d0
-            do 90 mw=1,mwaves
+            do mw=1,mwaves
                 if (s(mw,i) < 0.d0) then
                     amdq(m,i) = amdq(m,i) + s(mw,i)*wave(m,mw,i)
                 else
                     apdq(m,i) = apdq(m,i) + s(mw,i)*wave(m,mw,i)
                 endif
-            90 END DO
-    100 END DO
+            END DO
+        end do
+    END DO
 
-!     # project momentum components of amdq and apdq onto tangent plane:
+    !! # project momentum components of amdq and apdq onto tangent plane:
 
     do i=2-mbc,mx+mbc
         erx = auxr(14,i-1)
@@ -229,19 +232,18 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
     enddo
     go to 900
 
-!-----------------------------------------------------
+    !! -----------------------------------------------------
 
     110 continue
 
-!     # With entropy fix
-!     ------------------
+    !! # With entropy fix
+    !! ------------------
+    !! # compute flux differences amdq and apdq.
+    !! # First compute amdq as sum of s*wave for left going waves.
+    !! # Incorporate entropy fix by adding a modified fraction of wave
+    !! # if s should change sign.
 
-!    # compute flux differences amdq and apdq.
-!    # First compute amdq as sum of s*wave for left going waves.
-!    # Incorporate entropy fix by adding a modified fraction of wave
-!    # if s should change sign.
-
-    do 200 i=2-mbc,mx+mbc
+    do i=2-mbc,mx+mbc
         do m=1, meqn
             amdq(m,i) = 0.d0
             apdq(m,i) = 0.d0
@@ -256,18 +258,18 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         etx =   etx / gamma
         ety =   ety / gamma
         etz =   etz / gamma
-    !           # compute normal and tangential momentum at cell edge:
+        !! # compute normal and tangential momentum at cell edge:
         hunl = enx*ql(2,i) + eny*ql(3,i) + enz*ql(4,i)
         hunr = enx*qr(2,i-1) + eny*qr(3,i-1) + enz*qr(4,i-1)
 
-    !           check 1-wave
+        !! check 1-wave
         him1 = qr(1,i-1)
         s0 =  (hunr/him1 - dsqrt(g*him1)) * gamma / dy
-    !           check for fully supersonic case :
+        !! check for fully supersonic case :
         if (s0 > 0.0d0 .AND. s(1,i) > 0.0d0) then
-            do 60 m=1,4
+            do m=1,4
                 amdq(m,i)=0.0d0
-            60 END DO
+            END DO
             goto 200
         endif
 
@@ -285,18 +287,18 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         !              1-wave is rightgoing
             sfract = 0.0d0
         endif
-        do 120 m=1,4
+        do m=1,4
             amdq(m,i) = sfract*wave(m,1,i)
-        120 END DO
-    !           check 2-wave
+        END DO
+        !! check 2-wave
         if (s(2,i) > 0.0d0) then
         !	       #2 and 3 waves are right-going
             go to 200
         endif
 
-        do 140 m=1,4
+        do m=1,4
             amdq(m,i) = amdq(m,i) + s(2,i)*wave(m,2,i)
-        140 END DO
+        END DO
 
     !           check 3-wave
 
@@ -315,21 +317,21 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         !              3-wave is rightgoing
             goto 200
         endif
-        do 160 m=1,4
+        do m=1,4
             amdq(m,i) = amdq(m,i) + sfract*wave(m,3,i)
-        160 END DO
+        END DO
     200 END DO
 
 !           compute rightgoing flux differences :
 
-    do 220 i = 2-mbc,mx+mbc
-        do 222 m=1,4
+    do i = 2-mbc,mx+mbc
+        do m=1,4
             df = 0.0d0
-            do 210 mw=1,mwaves
+            do mw=1,mwaves
                 df = df + s(mw,i)*wave(m,mw,i)
-            210 END DO
+            END DO
             apdq(m,i)=df - amdq(m,i)
-        222 END DO
+        END DO
 
     !                 project momentum components onto tangent plane
 
@@ -349,7 +351,7 @@ SUBROUTINE clawpack5_rpn2_manifold(ixy,maxm,meqn,mwaves,maux,mbc, &
         apdq(3,i) = apdq(3,i) - apn*ery
         apdq(4,i) = apdq(4,i) - apn*erz
 
-    220 END DO
+    END DO
 
 
     900 continue

@@ -64,6 +64,11 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,fclaw_opt->shift,
                                             rotate,user->alpha);
         break;
+    case 2:
+        conn = p4est_connectivity_new_unitsquare ();
+        cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale,fclaw_opt->shift,
+                                            rotate,user->alpha);
+        break;
     default:
         SC_ABORT_NOT_REACHED ();
     }

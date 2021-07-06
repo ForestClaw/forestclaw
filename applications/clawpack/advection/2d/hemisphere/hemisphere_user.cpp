@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void hemisphere_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     patch_vt->setup      = &hemisphere_patch_setup;    
 
@@ -51,9 +49,10 @@ void hemisphere_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
         claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV_MANIFOLD;
 
-        if (user->example == 1)
+        if (user->example == 0)
         {
             /* Avoid tagging block corners in 5 patch example */
+            fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
             clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
             clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
         }
@@ -68,9 +67,10 @@ void hemisphere_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
         
-        if (user->example == 1)
+        if (user->example == 0)
         {
             /* Avoid tagging block corners in 5 patch example */
+            fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
             clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
             clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
         }
@@ -79,33 +79,34 @@ void hemisphere_link_solvers(fclaw2d_global_t *glob)
 
 
 void hemisphere_patch_setup(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx)
+                            fclaw2d_patch_t *patch,
+                            int blockno,
+                            int patchno)
 {
-    int mx,my,mbc,maux;
+    int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    double *aux,*xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    const user_options_t* user = hemisphere_get_options(glob);
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+    double *xd,*yd,*zd,*area;
+    double *xp,*yp,*zp;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    int maux;
+    double *aux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
+    const user_options_t* user = hemisphere_get_options(glob);
     if (user->claw_version == 4)
     {
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                               &maux,aux,&this_block_idx,xd,yd,zd,area);
+                               &maux,aux,&blockno,xd,yd,zd,area);
     }
-    else if(user->claw_version == 5)
+    else if (user->claw_version == 5)
     {
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                              &maux,aux,&this_block_idx,xd,yd,zd,area);
+                              &maux,aux,&blockno,xd,yd,zd,area);
     }
 
 }

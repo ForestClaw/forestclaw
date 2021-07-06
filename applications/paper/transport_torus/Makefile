@@ -50,12 +50,12 @@ EXCLUDE_SOURCES = setaux.f90 flag2refine2.f90 qad.f
 MODULES = \
 
 SOURCES = \
-  torus_velocity.f \
-  torus_psi.f \
   setprob.f \
   qinit.f \
-  mapc2m_torus.f \
-  torus46_setaux.f90 \
+  q0_new.f \
+  fdisc.f \
+  torus_setaux.f90 \
+  fclaw_utils.f \
   flag2refine2.f90 \
   fclaw2d_metric_default_fort.f \
   qad_choice.f90 \
@@ -65,8 +65,16 @@ SOURCES = \
   rpn2qad_flux.f90 \
   rpn2cons_fw_manifold.f \
   rpt2cons_manifold.f \
+  compute_error.f \
+  qexact.f \
+  dopri5.f \
   rpn2.f \
-  rpt2.f
+  rpt2.f \
+  ../all/torus_velocity.f \
+  ../all/torus_basis.f \
+  ../all/mapping_terms.f \
+  ../all/mapc2m_torus.f \
+  ../all/cellave2.f
 
 #-------------------------------------------------------------------
 # Include Makefile containing standard definitions and make options:

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,6 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    double kappa;
     int claw_version;
     int is_registered;
 

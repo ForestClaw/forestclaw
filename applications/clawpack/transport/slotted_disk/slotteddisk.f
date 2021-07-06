@@ -3,18 +3,20 @@
 
       double precision x,y,z
 
-      double precision w(3), q, qv, b, c
-      double precision r, hmax
-      integer m, n, get_n_locations
-      double precision slotted_disk
+      double precision wcloc(3,2)
+      common /location_parms/ wcloc
 
-      n = get_n_locations()
+      double precision r, hmax, b, c
+      common /slotteddisk_parms/ r, hmax, b, c
 
-      call get_td_sdisk_parms(r,hmax,b,c)
+      integer m, k
+      double precision w(3), q, qv, slotted_disk
 
       q = 0
-      do m = 1,n
-         call get_td_gaussian_locations(m,w)
+      do m = 1,2
+         do k = 1,3
+            w(k) = wcloc(k,m)
+         end do
          qv = slotted_disk(x,y,z,w,r,hmax,m)
          q = q + qv
       enddo
@@ -30,9 +32,7 @@
       integer which_disk
 
       double precision th, lambda, thi, li, q
-      double precision get_gc_distance, ri, pi
-
-c     r = 0.5d0
+      double precision get_gc_distance, ri
 
       ri = get_gc_distance(x,y,z,w)
 
@@ -63,83 +63,3 @@ c     # Now check to if we are in a disk
 
       end
 
-
-c     # ----------------------------------------------------
-c     # Set a,hmax parameters for slotted disk
-c     # ----------------------------------------------------
-
-      subroutine set_initial_sdisk_parms(r,hmax,b,c)
-      implicit none
-
-      double precision r,hmax, b,c
-
-      double precision wc_init_com(3,100), r_init_com, hmax_init_com
-      double precision b_init_com, c_init_com
-
-      common /comsdinit1/ wc_init_com, r_init_com, hmax_init_com,
-     &      b_init_com, c_init_com
-
-      r_init_com = r
-      hmax_init_com = hmax
-      b_init_com = b
-      c_init_com = c
-
-      call set_td_sdisk_parms(r,hmax,b,c)
-
-      end
-
-
-      subroutine get_initial_sdisk_parms(r,hmax,b,c)
-      implicit none
-
-      double precision r,hmax, b,c
-
-      double precision wc_init_com(3,100), r_init_com,
-     &      hmax_init_com, b_init_com, c_init_com
-
-      common /comsdinit1/ wc_init_com, r_init_com, hmax_init_com,
-     &      b_init_com, c_init_com
-
-      r = r_init_com
-      hmax = hmax_init_com
-      b = b_init_com
-      c = c_init_com
-
-      end
-
-      subroutine set_td_sdisk_parms(r,hmax,b,c)
-      implicit none
-
-      double precision r,hmax,b,c
-
-      double precision wc_td_com(3,100), r_td_com, hmax_td_com,
-     &      b_td_com, c_td_com
-
-      common /comsdinit1/ wc_td_com, r_td_com, hmax_td_com,
-     &      b_td_com, c_td_com
-
-      r_td_com = r
-      hmax_td_com = hmax
-      b_td_com = b
-      c_td_com = c
-
-      end
-
-
-      subroutine get_td_sdisk_parms(r,hmax,b,c)
-      implicit none
-
-      double precision r,hmax, b, c
-
-      double precision wc_td_com(3,100), r_td_com, hmax_td_com
-      double precision b_td_com,c_td_com
-
-      common /comsdinit1/ wc_td_com, r_td_com, hmax_td_com,
-     &      b_td_com, c_td_com
-
-      r = r_td_com
-      hmax = hmax_td_com
-      b = b_td_com
-      c = c_td_com
-
-      end

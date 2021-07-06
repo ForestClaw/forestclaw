@@ -6,7 +6,6 @@
 !  #      /* .... */
 !  #      vt.fort_tag4coarsening = &tag4coarsening;
 !  #      fclaw2d_set_vtable(domain,&vt);
-!  #
 !  # in virtual tables (typically set in <application>_user.cpp, in a
 !  # a routine link '<application>_link_solvers(domain)'
 !  #
@@ -91,10 +90,10 @@ SUBROUTINE check_patch(mx,my,mbc,meqn,maux,xlower,ylower, &
     USE geoclaw_module, ONLY: spherical_distance, coordinate_system
 
     USE topo_module, ONLY: tlowtopo,thitopo,xlowtopo,xhitopo,ylowtopo,yhitopo
-    USE topo_module, ONLY: minleveltopo,mtopofiles
+    USE topo_module, ONLY: mtopofiles
 
     USE topo_module, ONLY: tfdtopo,xlowdtopo,xhidtopo,ylowdtopo,yhidtopo
-    USE topo_module, ONLY: minleveldtopo,num_dtopo
+    USE topo_module, ONLY: num_dtopo
 
     USE qinit_module, ONLY: x_low_qinit,x_hi_qinit,y_low_qinit,y_hi_qinit
     USE qinit_module, ONLY: min_level_qinit,qinit_type
@@ -295,10 +294,10 @@ do m=1,mtopofiles
   if (x > xlowtopo(m) .and. x < xhitopo(m) .and. &
       y > ylowtopo(m) .and. y < yhitopo(m) .and. &
       t >= tlowtopo(m) .and. t < thitopo(m)) then
-      if (level < minleveltopo(m)) then
-        allowcoarsen = .false.
-        return
-      endif
+!!      if (level < minleveltopo(m)) then
+!!        allowcoarsen = .false.
+!!        return
+!!      endif
   endif
 enddo
 
@@ -317,10 +316,10 @@ do m=1,num_dtopo
     if (x >  xlowdtopo(m) .and. x < xhidtopo(m).and. &
         y >  ylowdtopo(m) .and. y < yhidtopo(m).and. &
         t >= t0dtopo(m)   .and. t <= tfdtopo(m)) then
-        if (level < minleveldtopo(m)) then
-            allowcoarsen = .false.
-            return
-        endif
+!!        if (level < minleveldtopo(m)) then
+!!            allowcoarsen = .false.
+!!            return
+!!        endif
     endif
 enddo
 

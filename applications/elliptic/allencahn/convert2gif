@@ -1,0 +1,16 @@
+#!/opt/local/bin/perl
+
+# This script converts a series of jpg files to gif files
+
+opendir(curr_dir,".");
+
+@jpgfiles = grep(/allencahn\d{4}.png/,readdir(curr_dir));
+
+closedir(curr_dir);
+
+foreach (@jpgfiles) {
+   $bfile = substr($_,0,13);
+   $constr = "convert -geometry 45\% -crop 0x0 $bfile.png $bfile.gif";
+   print "$constr\n";
+   !system($constr) || die "Problem with command \n\n  $constr\n\n ";
+}

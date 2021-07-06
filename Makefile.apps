@@ -1,3 +1,12 @@
+# --------------------------------------------
+# List of available applications and examples
+#
+# Note : Any files below which are uncommented
+# need to be available at compile time, even 
+# the configuration flag is not set.  
+# --------------------------------------------
+
+
 
 # --------------------------------------------
 # Clawpack 4.6 and 5.0 libraries and examples
@@ -6,16 +15,36 @@
 if FCLAW_ENABLE_CLAWPACK
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
-#include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 
 ## examples
-#include applications/clawpack/clawpack.apps
+include applications/clawpack/clawpack.apps
 
 endif
+
+# --------------------------------------------
+# ThunderEgg solver
+# --------------------------------------------
+
+if FCLAW_ENABLE_THUNDEREGG
+
+## Patches needed for thunderegg solver
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+include src/solvers/fc2d_thunderegg/Makefile.am
+
+## Applications that use an elliptic solver
+include applications/elliptic/elliptic.apps
+
+endif
+
+
 
 
 # ----------------------------------
@@ -27,11 +56,11 @@ if FCLAW_ENABLE_DEVELOPMENT
 include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5/Makefile.am
+#include src/solvers/fc2d_clawpack4.6/Makefile.am
+#include src/solvers/fc2d_clawpack5/Makefile.am
 
 # Development projects
-include applications/development.apps
+#include applications/development.apps
 
 endif
 
@@ -41,13 +70,14 @@ endif
 if FCLAW_ENABLE_PAPER
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 
 # Development projects
-#include applications/paper.apps
+include applications/paper/paper.apps
 
 endif
 
@@ -59,13 +89,13 @@ endif
 if FCLAW_ENABLE_GEOCLAW
 
 ## Patches needed for GeoClaw solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver library
-#include src/solvers/fc2d_geoclaw/Makefile.am
+include src/solvers/fc2d_geoclaw/Makefile.am
 
 ## Examples
-#include applications/geoclaw/geoclaw.apps
+include applications/geoclaw/geoclaw.apps
 
 endif
 
@@ -73,7 +103,6 @@ endif
 # ---------------------------------------------
 # Ash3d examples (requires submodule)
 # -- Uncomment Makefiles below to compile Ash3d
-# -- 
 # ---------------------------------------------
 
 if FCLAW_ENABLE_ASH3D
@@ -86,19 +115,19 @@ if FCLAW_ENABLE_ASH3D
 
 endif
 
-# ----------------------------------
-# ACTIVEFLUX project
-# ----------------------------------
+# ----------------------------------------
+# ACTIVEFLUX project (requires submodule)
+# ----------------------------------------
 if FCLAW_ENABLE_ACTIVEFLUX
 
 ## Patches needed for Active Flux solver
-include src/patches/clawpatch/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
 ## Solver library
-include src/solvers/fc2d_activeflux/Makefile.am
+#include src/solvers/fc2d_activeflux/Makefile.am
 
 ## Applications
-include src/solvers/fc2d_activeflux/examples/activeflux.apps
+#include src/solvers/fc2d_activeflux/examples/activeflux.apps
 
 endif
 
@@ -109,16 +138,13 @@ endif
 if FCLAW_ENABLE_CUDACLAW
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
-#include src/solvers/fc2d_clawpack5/Makefile.am
-#include src/solvers/fc2d_cudaclaw/Makefile.am
-#
-#include applications/clawpack/advection/2d/swirl_cuda/Makefile.am
-#include applications/clawpack/shallow/2d/radialdam_cuda/Makefile.am
-#include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am
-#include applications/clawpack/euler/2d/shockbubble_cuda/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_cudaclaw/Makefile.am
+
+include applications/cudaclaw.apps
 
 
 endif

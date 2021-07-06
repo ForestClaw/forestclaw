@@ -47,17 +47,18 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
-
     switch (user->mapping) {
     case 0:
         /* Unit square brick domain */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_identity(brick);
         break;
 
     case 1:
         /* Cart : Maps to [-1,1]x[-1,1] */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_cart(brick,fclaw_opt->scale, fclaw_opt->shift);
         break;
         
@@ -69,7 +70,10 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
         break;
 
     case 3:
-        /* bilinear square domain : maps to [-1,1]x[-1,1]*/
+        /* bilinear square domain : maps to [-1,1]x[-1,1] */
+        FCLAW_ASSERT(mi == 2 && mj == 2);
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_bilinear (brick, fclaw_opt->scale,
                                          fclaw_opt->shift, user->center);
         break;

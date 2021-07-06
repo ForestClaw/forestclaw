@@ -1,15 +1,15 @@
       subroutine clawpack46_step2_wrap(maxm, meqn, maux, mbc,
      &      method, mthlim, mcapa, mwaves, mx, my, qold, aux,
      &      dx, dy, dt,cfl, work, mwork,xlower,ylower,level,
-     &      t, fp,fm, gp, gm, rpn2, rpt2,flux2,
-     &      block_corner_count,ierror)
+     &      t, fp,fm, gp, gm, rpn2, rpt2, rpn2fw, rpt2fw, flux2,
+     &      block_corner_count,ierror, use_fwaves)
 
       implicit none
 
-      external rpn2,rpt2, flux2
+      external rpn2,rpt2, rpn2fw, rpt2fw, flux2
 
       integer maxm,meqn,maux,mbc,mcapa,mwaves,mx,my, mwork
-      integer maxmx, maxmy, level, ierror
+      integer maxmx, maxmy, level, ierror, use_fwaves
       integer method(7), mthlim(mwaves)
       integer block_corner_count(0:3)
 
@@ -31,8 +31,6 @@ c     # Local variables
       integer i0faddm, i0faddp, i0gaddm, i0gaddp
       integer i0q1d, i0dtdx1, i0dtdy1
       integer i0aux1, i0aux2, i0aux3, i0next, mused, mwork1
-      integer i0wave, i0s, i0amdq, i0apdq, i0ql, i0qr, i0auxl
-      integer i0auxr
 
       integer i,j,m
 
@@ -79,15 +77,31 @@ c
 
 c     # Include four additional arguments to avoid need for
 c     # global array
-      call clawpack46_step2(maxm,maxmx,maxmy,meqn,maux, mbc,
-     &      mx,my, qold,aux,dx,dy,dt,
-     &      cfl,fm,fp,gm,gp,
-     &      work(i0faddm),work(i0faddp),
-     &      work(i0gaddm),work(i0gaddp),
-     &      work(i0q1d),work(i0dtdx1),work(i0dtdy1),
-     &      work(i0aux1),work(i0aux2),work(i0aux3),
-     &      work(i0next),mwork1,rpn2,rpt2,flux2,
-     &      mwaves,mcapa,method,mthlim,block_corner_count,ierror)
+      if (use_fwaves .eq. 0) then
+          call clawpack46_step2(maxm,maxmx,maxmy,meqn,maux, mbc,
+     &          mx,my, qold,aux,dx,dy,dt,
+     &          cfl,fm,fp,gm,gp,
+     &          work(i0faddm),work(i0faddp),
+     &          work(i0gaddm),work(i0gaddp),
+     &          work(i0q1d),work(i0dtdx1),work(i0dtdy1),
+     &          work(i0aux1),work(i0aux2),work(i0aux3),
+     &          work(i0next),mwork1,rpn2,rpt2,flux2,
+     &          mwaves,mcapa,method,mthlim,block_corner_count,ierror)
+      else
+c         // Only difference is that we pass in rpn2fw, rpt2fw
+c         // instead of rpn2 and rpt2 (they have difference signatures). 
+c         // But fortunately, Fortran doesn't require separate 
+c         // signatures 
+          call clawpack46_step2(maxm,maxmx,maxmy,meqn,maux, mbc,
+     &          mx,my, qold,aux,dx,dy,dt,
+     &          cfl,fm,fp,gm,gp,
+     &          work(i0faddm),work(i0faddp),
+     &          work(i0gaddm),work(i0gaddp),
+     &          work(i0q1d),work(i0dtdx1),work(i0dtdy1),
+     &          work(i0aux1),work(i0aux2),work(i0aux3),
+     &          work(i0next),mwork1,rpn2fw,rpt2fw,flux2,
+     &          mwaves,mcapa,method,mthlim,block_corner_count,ierror)
+      endif
 
 c     # update q
       dtdx = dt/dx

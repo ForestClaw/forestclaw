@@ -22,7 +22,7 @@ c
       dimension waveb(3,3),sb(3)
       parameter (maxm2 = 603)  !# assumes at most 600x600 grid with mbc=3
       common /comroe/ u(-2:maxm2),v(-2:maxm2),a(-2:maxm2),hl(-2:maxm2),
-     &		      hr(-2:maxm2)
+     &                hr(-2:maxm2)
 c
       if (-2.gt.1-mbc .or. maxm2 .lt. maxm+mbc) then
           write(6,*) 'need to increase maxm2 in rpB'
@@ -30,7 +30,7 @@ c
       endif
 c
       if (ixy.eq.1) then
-	      mu = 2
+          mu = 2
           mv = 3
       else
           mu = 3
@@ -63,10 +63,10 @@ c         # compute the flux differences bmasdq and bpasdq
               bmasdq(i,m) = 0.d0
               bpasdq(i,m) = 0.d0
               do mw=1,mwaves
-                  bmasdq(i,m) = bmasdq(i,m)
-     &			       + dmin1(sb(mw), 0.d0) * waveb(m,mw)
+                  bmasdq(i,m) = bmasdq(i,m) 
+     &                          + dmin1(sb(mw), 0.d0) * waveb(m,mw)
                   bpasdq(i,m) = bpasdq(i,m)
-     &			       + dmax1(sb(mw), 0.d0) * waveb(m,mw)
+     &                          + dmax1(sb(mw), 0.d0) * waveb(m,mw)
                enddo
            enddo
       enddo 

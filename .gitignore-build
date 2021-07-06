@@ -1,0 +1,25 @@
+# These are files created by 'bootstrap' and autotools
+# 
+# Copy this file to your own .gitignore file in the top level directory.
+
+# Directories to ignore
+build-aux
+
+# Top level build files to ignore
+Makefile.in
+aclocal.m4
+autom4te.cache
+configure
+config.guess
+config.sub
+install-sh
+ltmain.sh
+
+
+# Files in directory 'config' to ignore.  These will be copied/recreated by
+# bootstrap if needed.
+libtool.m4
+lt~obsolete.m4
+ltoptions.m4
+ltsugar.m4
+ltversion.m4

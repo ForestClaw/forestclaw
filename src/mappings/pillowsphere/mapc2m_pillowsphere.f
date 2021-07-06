@@ -13,7 +13,6 @@ c     # ------------------------------------------------------------------
       double precision xc1,yc1, xp, yp, zp
 
       double precision x1, y1, d, rp2, xc, yc, zc
-      logical multiblock
       integer blockno
       logical l1, l2
       logical ispillowsphere

@@ -8,19 +8,14 @@
       double precision xlower, ylower, dx, dy
       double precision tag_threshold
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
-      double precision xp,yp,zp
-
-      integer*8 cont, get_context
-      logical fclaw2d_map_is_used
 
       integer i,j, mq
-      double precision qmin, qmax, xc, yc
+      double precision qmin, qmax
+
+      logical exceeds_th, bump_exceeds_th
+
       
-
-
       tag_patch = 0
-
-      cont = get_context()
 
 c     # Refine based only on first variable in system.
       mq = 1
@@ -30,7 +25,9 @@ c     # Refine based only on first variable in system.
          do i = 1,mx
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            if ((qmax-qmin) .gt. tag_threshold) then
+            exceeds_th = bump_exceeds_th(
+     &             q(i,j,mq),qmin,qmax,tag_threshold)
+            if (exceeds_th) then
                tag_patch = 1
                return
             endif
@@ -38,3 +35,4 @@ c     # Refine based only on first variable in system.
       enddo
 
       end
+
