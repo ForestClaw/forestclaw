@@ -41,6 +41,8 @@ typedef struct user_options
 {
     int example;
 
+    int mapping;
+
     int refine_criteria;
 
     int claw_version;

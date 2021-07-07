@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,10 @@ transport_register (user_options_t* user, sc_options_t * opt)
                         "[user] 0 for cubed sphere, "    \
                         "1 for pillowgrid [0]");
 
+    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
+                        "[user] 0 for cubed sphere, "    \
+                        "1 for pillowgrid [0]");
+
     sc_options_add_int (opt, 0, "refine-criteria", &user->refine_criteria, 0,
                         "[user] Refinement criteria [0]");
 
@@ -60,7 +64,7 @@ transport_postprocess(user_options_t *user)
 static fclaw_exit_type_t
 transport_check (user_options_t *user)
 {
-    if (user->example < 0 || user->example > 1) {
+    if (user->mapping < 0 || user->mapping > 1) {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_ERROR;
     }

@@ -28,9 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "transport_options.h"
 #include "transport_user.h"
 
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt,
-                                user_options_t* user_opt)
+fclaw2d_domain_t* transport_create_domain(sc_MPI_Comm mpicomm, 
+                                          fclaw_options_t* fclaw_opt,
+                                          user_options_t* user_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -44,7 +44,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = 0;
 
-    switch (user_opt->example) {
+    switch (user_opt->mapping) {
     case 0:
         conn = p4est_connectivity_new_cubed();
         cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale,fclaw_opt->shift,rotate);

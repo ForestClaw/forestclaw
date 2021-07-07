@@ -23,6 +23,7 @@ add_library(slotted_disk_f OBJECT
 
 add_executable(slotted_disk 
   slotted_disk.cpp 
+  slotted_disk_user.cpp 
   ${all}/transport_user.cpp 
   ${all}/transport_domain.c 
   ${all}/transport_options.c 

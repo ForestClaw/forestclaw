@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* FORTRAN headers are not needed here, but generally needed in the
    advection examples and are included here for convenience */
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include <fclaw2d_clawpatch46_fort.h>

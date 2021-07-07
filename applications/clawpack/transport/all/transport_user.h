@@ -50,9 +50,9 @@ struct fclaw2d_patch;
 struct fclaw2d_domain;
 
 /* 1 = cubed sphere domain; 2 - pillowgrid */
-struct fclaw2d_domain* create_domain(sc_MPI_Comm mpicomm, 
-                                struct fclaw_options* fclaw_opt,
-                                struct user_options* user_opt);
+struct fclaw2d_domain* transport_create_domain(sc_MPI_Comm mpicomm, 
+                                               struct fclaw_options* fclaw_opt,
+                                               struct user_options* user_opt);
 
 fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
                                                      const double shift[],
