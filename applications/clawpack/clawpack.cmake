@@ -70,9 +70,9 @@ add_subdirectory(clawpack/transport/2d/sphere)
 ##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
 ## -------------------------------------------------------------------------
 
-add_subdirectory(clawpack/transport/gaussian)
-add_subdirectory(clawpack/transport/slotted_disk)
-add_subdirectory(clawpack/transport/correlatedcb)
+add_subdirectory(clawpack/transport/2d/gaussian)
+add_subdirectory(clawpack/transport/2d/slotted_disk)
+add_subdirectory(clawpack/transport/2d/correlatedcb)
 
 
 ## ----------------------------------------------------------

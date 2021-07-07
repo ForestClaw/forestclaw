@@ -11,7 +11,6 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/fclaw2d_map_cart.c \
 	applications/clawpack/transport/2d/square/fclaw2d_map_fivepatch.c \
 	applications/clawpack/transport/2d/square/fclaw2d_map_bilinear.c \
-	applications/clawpack/transport/2d/square/value_exceeds_th.f90 \
 	applications/clawpack/transport/2d/square/setprob.f \
 	applications/clawpack/transport/2d/square/q0.f \
 	applications/clawpack/transport/2d/square/fdisc.f \
@@ -21,10 +20,6 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/rpn2cons_update_manifold.f \
 	applications/clawpack/transport/2d/square/qexact.f \
 	applications/clawpack/transport/2d/square/dopri5.f \
-	applications/clawpack/transport/2d/all/clawpatch46_tag4coarsening.f \
-	applications/clawpack/transport/2d/all/clawpatch46_tag4refinement.f \
-	applications/clawpack/transport/2d/all/clawpatch5_tag4coarsening.f \
-	applications/clawpack/transport/2d/all/clawpatch5_tag4refinement.f \
 	applications/clawpack/transport/2d/square/user_4.6/square_output.f \
 	applications/clawpack/transport/2d/square/user_4.6/compute_error.f \
 	applications/clawpack/transport/2d/square/user_4.6/qinit.f \

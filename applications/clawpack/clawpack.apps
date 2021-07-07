@@ -72,9 +72,9 @@ include applications/clawpack/transport/2d/sphere/Makefile.am
 ##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
 ## -------------------------------------------------------------------------
 
-include applications/clawpack/transport/gaussian/Makefile.am
-include applications/clawpack/transport/slotted_disk/Makefile.am
-include applications/clawpack/transport/correlatedcb/Makefile.am#
+include applications/clawpack/transport/2d/gaussian/Makefile.am
+include applications/clawpack/transport/2d/slotted_disk/Makefile.am
+include applications/clawpack/transport/2d/correlatedcb/Makefile.am#
 
 
 ## ----------------------------------------------------------

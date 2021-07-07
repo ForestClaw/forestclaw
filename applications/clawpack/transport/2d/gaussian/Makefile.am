@@ -1,15 +1,15 @@
 ## Makefile.am in applications/clawpack/transport/gaussian
 
-bin_PROGRAMS += applications/clawpack/transport/gaussian/gaussian
+bin_PROGRAMS += applications/clawpack/transport/2d/gaussian/gaussian
 
-TESTS += applications/clawpack/transport/gaussian/regressions.sh
+TESTS += applications/clawpack/transport/2d/gaussian/regressions.sh
 
-applications_clawpack_transport_gaussian_gaussian_SOURCES = \
-	applications/clawpack/transport/gaussian/gaussian.cpp \
-	applications/clawpack/transport/gaussian/gaussian_user.h \
-	applications/clawpack/transport/gaussian/gaussian_sum.f \
-	applications/clawpack/transport/gaussian/user_4.6/qinit.f \
-	applications/clawpack/transport/gaussian/user_5.0/qinit.f90 \
+applications_clawpack_transport_2d_gaussian_gaussian_SOURCES = \
+	applications/clawpack/transport/2d/gaussian/gaussian.cpp \
+	applications/clawpack/transport/2d/gaussian/gaussian_user.h \
+	applications/clawpack/transport/2d/gaussian/gaussian_sum.f \
+	applications/clawpack/transport/2d/gaussian/user_4.6/qinit.f \
+	applications/clawpack/transport/2d/gaussian/user_5.0/qinit.f90 \
 	applications/clawpack/transport/all/transport_setprob.f \
 	applications/clawpack/transport/all/velocity_wind.f \
 	applications/clawpack/transport/all/transport_user.cpp \
@@ -29,19 +29,19 @@ applications_clawpack_transport_gaussian_gaussian_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
 EXTRA_DIST += \
-	applications/clawpack/transport/gaussian/fclaw_options.ini \
-	applications/clawpack/transport/gaussian/regression.ini \
-	applications/clawpack/transport/gaussian/afterframe.m \
-	applications/clawpack/transport/gaussian/setplot2.m \
-	applications/clawpack/transport/gaussian/mapc2m.m
+	applications/clawpack/transport/2d/gaussian/fclaw_options.ini \
+	applications/clawpack/transport/2d/gaussian/regression.ini \
+	applications/clawpack/transport/2d/gaussian/afterframe.m \
+	applications/clawpack/transport/2d/gaussian/setplot2.m \
+	applications/clawpack/transport/2d/gaussian/mapc2m.m
 
-applications_clawpack_transport_gaussian_gaussian_CPPFLAGS = \
+applications_clawpack_transport_2d_gaussian_gaussian_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_clawpack_transport_gaussian_gaussian_LDADD = \
+applications_clawpack_transport_2d_gaussian_gaussian_LDADD = \
 	    $(LDADD) \
 	    $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
