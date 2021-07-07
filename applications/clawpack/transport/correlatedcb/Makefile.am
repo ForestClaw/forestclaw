@@ -11,11 +11,6 @@ applications_clawpack_transport_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/transport/correlatedcb/user_5.0/qinit.f90 \
 	applications/clawpack/transport/all/fclaw2d_map_cubedsphere.c \
 	applications/clawpack/transport/all/fclaw2d_map_pillowsphere.c \
-	applications/clawpack/transport/all/clawpatch46_tag4refinement.f \
-	applications/clawpack/transport/all/clawpatch5_tag4refinement.f \
-	applications/clawpack/transport/all/clawpatch46_tag4coarsening.f \
-	applications/clawpack/transport/all/clawpatch5_tag4coarsening.f \
-	applications/clawpack/transport/all/transport_exceeds_threshold.f90 \
 	applications/clawpack/transport/all/transport_setprob.f \
 	applications/clawpack/transport/all/velocity_wind.f \
 	applications/clawpack/transport/all/transport_util.f \
