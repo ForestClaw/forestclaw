@@ -115,7 +115,7 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
         
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
+        domain = transport_create_domain(mpicomm, fclaw_opt, user_opt);
     
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();
