@@ -12,9 +12,11 @@
       integer i,j, mq
       double precision qmin, qmax
 
-      logical exceeds_th, fclaw2d_clawpatch_minmax_exceeds_th
+      logical exceeds_th, fclaw2d_clawpatch_exceeds_threshold
       integer ii,jj
-      double precision xc,yc,quad(-1:1,-1:1)
+      double precision xc,yc,quad(-1:1,-1:1), qval
+
+      logical(kind=4) :: is_ghost, fclaw2d_clawpatch46_is_ghost
 
 c     # Assume that we won't refine      
       tag_patch = 0
@@ -22,8 +24,8 @@ c     # Assume that we won't refine
 c     # Default : Refinement based only on first variable in system.  
 c     # Users can modify this by creating a local copy of this routine
 c     # and the corresponding tag4coarsening routine.
-      mq = 1
 
+      mq = 1
       qmin = q(1,1,mq)
       qmax = q(1,1,mq)
       do j = 1-mbc,my+mbc
@@ -32,14 +34,18 @@ c     # and the corresponding tag4coarsening routine.
             yc = ylower + (j-0.5)*dy
             qmin = min(qmin,q(i,j,mq))
             qmax = max(qmax,q(i,j,mq))
-            do ii = -1,1
+            qval = q(i,j,mq)
+            is_ghost = fclaw2d_clawpatch46_is_ghost(i,j,mx,my)
+            if (.not. is_ghost) then
                do jj = -1,1
-                  quad(ii,jj) = q(i+ii,j+jj,mq)
+                  do ii = -1,1
+                     quad(ii,jj) = q(i+ii,j+jj,mq)
+                  end do
                end do
-            end do
-            exceeds_th = fclaw2d_clawpatch_minmax_exceeds_th(
-     &             blockno, q(i,j,mq),qmin,qmax,quad, dx,dy,xc,yc,
-     &             tag_threshold)
+            endif
+            exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
+     &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
+     &             tag_threshold,init_flag, is_ghost)
             if (exceeds_th) then
 c              # Refine this patch               
                tag_patch = 1
@@ -49,3 +55,26 @@ c              # Refine this patch
       enddo
 
       end
+
+
+c     # We may want to check ghost cells for tagging.  
+      logical(kind=4) function fclaw2d_clawpatch46_is_ghost(i,j,mx,my)
+         implicit none
+
+         integer i, j, mx, my
+         logical(kind=4) :: is_ghost
+
+         is_ghost = .false.
+         if (i .lt. 1 .or. j .lt. 1) then
+            is_ghost = .true.
+         elseif (i .gt. mx .or. j .gt. my) then
+            is_ghost = .true.
+         end if
+
+         fclaw2d_clawpatch46_is_ghost = is_ghost
+
+         return 
+
+      end
+
+

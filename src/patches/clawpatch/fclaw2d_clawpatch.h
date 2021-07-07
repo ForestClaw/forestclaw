@@ -44,7 +44,6 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
-
 /* --------------------------------- Typedefs ----------------------------------------- */
 typedef void (*clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
                                           struct fclaw2d_patch *patch,
@@ -75,13 +74,17 @@ typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
                                               int blockno,
                                               int patchno,
                                               void *error_data);
-/* ---------------------------- Virtual table ------------------------------------ */
 
+
+/* ---------------------------- Virtual table ------------------------------------ */
 /* members of this structure provide the only access to above functions */
 
 void fclaw2d_clawpatch_vtable_initialize(int claw_version);
 
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
+
+void* fclaw2d_clawpatch_get_exceeds_th_user();
+
 
 struct fclaw2d_clawpatch_vtable
 {
@@ -98,6 +101,8 @@ struct fclaw2d_clawpatch_vtable
     /* regridding functions */
     clawpatch_fort_tag4refinement_t        fort_tag4refinement;
     clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
+    clawpatch_fort_exceeds_threshold_t     fort_user_exceeds_threshold;
+
     clawpatch_fort_average2coarse_t        fort_average2coarse;
     clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
@@ -120,7 +125,6 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
     clawpatch_fort_local_ghost_pack_aux_t  fort_local_ghost_pack_aux;
     
-
     /* diagnostic functions */
     clawpatch_diagnostics_cons_t           conservation_check;
     clawpatch_diagnostics_error_t          compute_error;

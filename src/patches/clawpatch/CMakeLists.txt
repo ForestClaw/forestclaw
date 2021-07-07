@@ -54,6 +54,7 @@ add_library(clawpatch
   fclaw2d_clawpatch_output_ascii.c
   fclaw2d_clawpatch_output_vtk.c
   fclaw2d_clawpatch_conservation.c
+  fort_user/fclaw2d_clawpatch_exceeds_threshold.c
   ${metric}/fclaw2d_metric.cpp 
   ${metric}/fclaw2d_metric_default.c
 )

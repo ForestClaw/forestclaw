@@ -1,15 +1,16 @@
 !! # check to see if value exceeds threshold
 
-logical function fclaw2d_clawpatch_gradient_exceeds_th(blockno,& 
+logical(kind=4) function fclaw2d_clawpatch_gradient_exceeds_th(blockno,& 
                                      qval,qmin,qmax,quad, & 
-                                     dx,dy,xc,yc,threshhold)
+                                     dx,dy,xc,yc,threshold, &
+                                     init_flag, is_ghost)
     implicit none
     
-    double precision :: qval,qmin,qmax,threshhold
+    double precision :: qval,qmin,qmax,threshold
     double precision :: quad(-1:1,-1:1)
     double precision :: dx,dy, xc, yc
-    integer :: blockno
-    logical :: refine
+    integer :: blockno, init_flag
+    logical(kind=4) :: is_ghost
 
     double precision :: dqx, dqy
     double precision :: xp, yp, zp, xpp, ypp, zpp, xpm, ypm, zpm
@@ -17,12 +18,19 @@ logical function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
     double precision, dimension(2,2) :: gmat, gmatinv
     double precision :: grad(3), dx2, dy2, d, ds
 
+
     integer*8 :: cont, get_context
-    logical :: fclaw2d_map_is_used
+    integer :: fclaw2d_map_is_used
 
     double precision :: clawpatch_gradient_dot
-
+    logical :: refine
     integer :: m
+
+    if (is_ghost) then
+!!      # quad may have uninitialized values.  Don't refine.
+        fclaw2d_clawpatch_gradient_exceeds_th = .false.
+        return
+    endif
 
     cont = get_context()
 
@@ -32,7 +40,8 @@ logical function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
     dqx = (quad(1,0) - quad(-1,0))/dx2
     dqy = (quad(0,1) - quad(0,-1))/dy2
 
-    if (fclaw2d_map_is_used(cont)) THEN
+    refine = .false.
+    if (fclaw2d_map_is_used(cont) .ne. 0) THEN
         CALL fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
         CALL fclaw2d_map_c2m(cont,blockno,xc+dx,yc,xpp,ypp,zpp)
         CALL fclaw2d_map_c2m(cont,blockno,xc-dx,yc,xpm,ypm,zpm)
@@ -68,11 +77,10 @@ logical function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
         grad(2) = dqy
         grad(3) = 0
     endif
-    refine = .false.
 
     ds = sqrt(clawpatch_gradient_dot(grad,grad))
 
-    if (ds .gt. threshhold) then
+    if (ds .gt. threshold) then
         refine = .true.
     endif
 

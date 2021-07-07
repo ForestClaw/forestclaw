@@ -39,8 +39,8 @@ c     # that doesn't pass the coarsening test.
       if (tag_patch == 0) return
 
       call fclaw2d_clawpatch46_test_refine(blockno,mx,my,mbc,meqn,
-     &              mq,q2,qmin,qmax,dx,dy,xlower(2), ylower(2),
-     &              coarsen_threshold,initflag, tag_patch)
+     &      mq,q2,qmin,qmax,dx,dy,xlower(2), ylower(2),
+     &      coarsen_threshold,initflag, tag_patch)
       if (tag_patch == 0) return
 
       call fclaw2d_clawpatch46_test_refine(blockno,mx,my,mbc,meqn,
@@ -51,18 +51,20 @@ c     # that doesn't pass the coarsening test.
 
       subroutine fclaw2d_clawpatch46_test_refine(blockno,mx,my,mbc,
      &      meqn,mq,q, qmin,qmax,dx,dy,xlower,ylower,
-     &      coarsen_threshold,initflag,tag_patch)
+     &      coarsen_threshold,init_flag,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq,tag_patch, initflag, blockno
+      integer mx,my,mbc,meqn,mq,tag_patch, init_flag, blockno
       double precision coarsen_threshold
       double precision qmin,qmax, dx, dy, xlower, ylower
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      logical exceeds_th, fclaw2d_clawpatch_minmax_exceeds_th
-      double precision xc,yc,quad(-1:1,-1:1)
+      double precision xc,yc,quad(-1:1,-1:1),qval
 
       integer i,j, ii, jj
+
+      logical exceeds_th, fclaw2d_clawpatch_exceeds_threshold
+      logical(kind=4) :: is_ghost, fclaw2d_clawpatch46_is_ghost
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
@@ -70,14 +72,18 @@ c     # that doesn't pass the coarsening test.
             yc = ylower + (j-0.5)*dy
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
-            do ii = -1,1
-               do jj = -1,1
-                  quad(ii,jj) = q(i+ii,j+jj,mq)
+            qval = q(i,j,mq)
+            is_ghost = fclaw2d_clawpatch46_is_ghost(i,j,mx,my)
+            if (.not. is_ghost) then
+               do ii = -1,1               
+                  do jj = -1,1
+                     quad(ii,jj) = q(i+ii,j+jj,mq)
+                  end do
                end do
-            end do
-            exceeds_th = fclaw2d_clawpatch_minmax_exceeds_th(
-     &             blockno, q(i,j,mq),qmin,qmax,quad, dx,dy,xc,yc,
-     &             coarsen_threshold)
+            endif
+            exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
+     &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
+     &             coarsen_threshold, init_flag, is_ghost)
             if (exceeds_th) then
 c              # This patch exceeds coarsen threshold and so 
 c              # should not be coarsened.   

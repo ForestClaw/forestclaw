@@ -44,11 +44,11 @@ extern "C"
 
 
 /* Criteria for tagging patches */
-#define  FCLAW_REFINE_CRITERIA_VALUE          1
-#define  FCLAW_REFINE_CRITERIA_DIFFERENCE     2
-#define  FCLAW_REFINE_CRITERIA_MINMAX         3
-#define  FCLAW_REFINE_CRITERIA_GRADIENT       4
-#define  FCLAW_REFINE_CRITERIA_USER           5
+#define  FCLAW_REFINE_CRITERIA_VALUE          0
+#define  FCLAW_REFINE_CRITERIA_DIFFERENCE     1
+#define  FCLAW_REFINE_CRITERIA_MINMAX         2
+#define  FCLAW_REFINE_CRITERIA_GRADIENT       3
+#define  FCLAW_REFINE_CRITERIA_USER           4
 
 
 struct fclaw2d_global;
@@ -67,8 +67,8 @@ struct fclaw2d_clawpatch_options
     int meqn;
     int rhs_fields;
 
-    int refine_criteria;
-    sc_keyvalue_t *kv_refine_criteria;
+    int refinement_criteria;
+    sc_keyvalue_t *kv_refinement_criteria;
 
     /* Advanced options */
     int interp_stencil_width;

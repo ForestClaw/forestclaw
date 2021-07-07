@@ -56,19 +56,20 @@ c     # not be coarsened.
 
       subroutine fclaw2d_clawpatch5_test_refine(blockno, mx,my,mbc,
      &                meqn,mq,q, qmin,qmax,dx,dy,xlower,ylower,
-     &                coarsen_threshold,initflag,tag_patch)
+     &                coarsen_threshold,init_flag,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq,tag_patch,initflag,blockno
+      integer mx,my,mbc,meqn,mq,tag_patch,init_flag,blockno
       double precision coarsen_threshold
       double precision qmin,qmax, dx, dy, xlower, ylower
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      double precision xc,yc,quad(-1:1,-1:1)
-      logical exceeds_th, fclaw2d_clawpatch_minmax_exceeds_th
+      double precision xc,yc,quad(-1:1,-1:1), qval
+      logical exceeds_th, fclaw2d_clawpatch_exceeds_threshold
 
       integer i,j, ii, jj
 
+      logical(kind=4) is_ghost, fclaw2d_clawpatch5_is_ghost
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
@@ -76,14 +77,18 @@ c     # not be coarsened.
             yc = ylower + (j-0.5)*dy
             qmin = min(q(mq,i,j),qmin)
             qmax = max(q(mq,i,j),qmax)
-            do ii = -1,1
-               do jj = -1,1
-                  quad(ii,jj) = q(mq,i+ii,j+jj)
+            qval = q(mq,i,j)
+            is_ghost = fclaw2d_clawpatch5_is_ghost(i,j,mx,my)
+            if (.not. is_ghost) then
+               do ii = -1,1
+                  do jj = -1,1
+                     quad(ii,jj) = q(mq,i+ii,j+jj)
+                  end do
                end do
-            end do
-            exceeds_th = fclaw2d_clawpatch_minmax_exceeds_th(
-     &             blockno, q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc,
-     &             coarsen_threshold)
+            endif
+            exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
+     &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
+     &             coarsen_threshold, init_flag, is_ghost)
             if (exceeds_th) then
 c              # This patch exceeds coarsen threshold and so 
 c              # should not be coarsened.   
