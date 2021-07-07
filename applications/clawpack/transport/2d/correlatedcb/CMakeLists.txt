@@ -1,4 +1,4 @@
-set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/all)
+set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/2d/all)
 set(advection_all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(correlatedcb_f OBJECT 

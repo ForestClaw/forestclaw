@@ -1,7 +1,6 @@
 set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/2d/all)
 
 add_library(square_f OBJECT 
-	value_exceeds_th.f90
 	setprob.f
 	q0.f
 	fdisc.f
@@ -11,10 +10,6 @@ add_library(square_f OBJECT
 	rpn2cons_update_manifold.f
 	qexact.f
 	dopri5.f
-	${all}/clawpatch46_tag4coarsening.f
-	${all}/clawpatch46_tag4refinement.f
-	${all}/clawpatch5_tag4coarsening.f
-	${all}/clawpatch5_tag4refinement.f
 	user_4.6/square_output.f
 	user_4.6/compute_error.f
 	user_4.6/qinit.f
