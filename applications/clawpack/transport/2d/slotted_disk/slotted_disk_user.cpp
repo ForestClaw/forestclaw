@@ -26,10 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "slotted_disk_user.h"
 
 #include "../all/transport_user.h"
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-#include "../../advection/2d/all/advection_user.h"
-
 
 void slotted_disk_link_solvers(fclaw2d_global_t *glob)
 {

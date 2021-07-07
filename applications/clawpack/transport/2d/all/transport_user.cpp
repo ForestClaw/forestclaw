@@ -24,11 +24,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "transport_user.h"
+
 #include "transport_options.h"
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
-#include "../../advection/2d/all/advection_user.h"
+#include "../../../advection/2d/all/advection_user.h"
 
 
 void transport_problem_setup(fclaw2d_global_t* glob)

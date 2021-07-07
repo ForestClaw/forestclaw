@@ -25,10 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "gaussian_user.h"
 
-#include "../all/transport_options.h"
+// #include "../all/transport_options.h"
 #include "../all/transport_user.h"
 
 
+#if 0
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
@@ -38,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack5_options.h>
+#endif
 
 static
 void run_program(fclaw2d_global_t* glob)

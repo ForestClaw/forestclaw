@@ -1,4 +1,4 @@
-/*
+ /*
 Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
@@ -51,6 +51,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <clawpack5_user_fort.h>
 
 #include "transport_user_fort.h"
+#include "transport_options.h"
+
+
+#include <fclaw_base.h>  /* for MPI */
+
+#include "../../../advection/2d/all/advection_user.h"
+
 
 #ifdef __cplusplus
 extern "C"
@@ -60,7 +67,92 @@ extern "C"
 #endif
 #endif
 
-/* Only include headers above */
+#if 0
+/* Fix syntax highlighting */
+#endif
+
+struct fclaw_options;
+struct user_options;
+struct fclaw2d_patch;
+struct fclaw2d_domain;
+
+/* 1 = cubed sphere domain; 2 - pillowgrid */
+struct fclaw2d_domain* transport_create_domain(sc_MPI_Comm mpicomm, 
+                                               struct fclaw_options* fclaw_opt,
+                                               struct user_options* user_opt);
+
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+                                                     const double shift[],
+                                                     const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
+                                                      const double shfit[],
+                                                      const double rotate[]);
+
+
+#if 0
+void transport_patch_setup(struct fclaw2d_global *glob,
+                           struct fclaw2d_patch *patch,
+                           int blockno,
+                           int patchno);
+
+double transport_update(struct fclaw2d_global *glob,
+                        struct fclaw2d_patch *patch,
+                        int blockno,
+                        int patchno,
+                        double t,
+                        double dt);
+
+void transport_b4step2(struct fclaw2d_global *glob,
+                       struct fclaw2d_patch *patch,
+                       int blockno,
+                       int patchno,
+                       double t,
+                       double dt);
+
+void transport_problem_setup(fclaw2d_global_t* glob);
+
+#endif                        
+
+void transport_link_solvers(struct fclaw2d_global *glob);
+
+
+#if 0
+#define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
+void TRANSPORT_SETPROB(const double* kappa, const double* tfinal);
+#endif
+
+#define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
+void TRANSPORT_SETPROB();
+
+
+#define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
+void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
+                             const double* dx, const double* dy,
+                             const double* t, const int* maux, double aux[],
+                             const int* blockno,
+                             double xd[], double yd[], double zd[]);
+
+#define USER5_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user5_b4step2_manifold,USER5_B4STEP2_MANIFOLD)
+void USER5_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
+                            const double* dx, const double* dy,
+                            const double* t, const int* maux, double aux[],
+                            const int* blockno,
+                            double xd[], double yd[], double zd[]);
+
+#define USER_EXCEEDS_THRESHOLD FCLAW_F77_FUNC(user_exceeds_threshold, \
+                                              USER_EXCEEDS_THRESHOLD)
+
+int USER_EXCEEDS_THRESHOLD(int* blockno,
+                           double qval[], 
+                           double* qmin, double *qmax,
+                           double quad[], 
+                           double *dx, double *dy, 
+                           double *xc, double *yc, 
+                           int* tag_threshold, 
+                           int* init_flag,
+                           int* is_ghost);
+
 
 #ifdef __cplusplus
 #if 0

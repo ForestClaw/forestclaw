@@ -12,16 +12,16 @@ applications_clawpack_transport_2d_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/transport/2d/slotted_disk/user_4.6/qinit.f \
 	applications/clawpack/transport/2d/slotted_disk/user_5.0/qinit.f90 \
 	applications/clawpack/transport/2d/slotted_disk/slotted_disk_exceeds_th.f90 \
-	applications/clawpack/transport/all/transport_setprob.f \
-	applications/clawpack/transport/all/velocity_wind.f \
-	applications/clawpack/transport/all/transport_util.f \
-	applications/clawpack/transport/all/transport_user.cpp \
-	applications/clawpack/transport/all/transport_domain.c \
-	applications/clawpack/transport/all/transport_options.c \
-	applications/clawpack/transport/all/fclaw2d_map_cubedsphere.c \
-	applications/clawpack/transport/all/fclaw2d_map_pillowsphere.c \
-	applications/clawpack/transport/all/user46_b4step2_manifold.f \
-	applications/clawpack/transport/all/user5_b4step2_manifold.f90 \
+	applications/clawpack/transport/2d/all/transport_setprob.f \
+	applications/clawpack/transport/2d/all/velocity_wind.f \
+	applications/clawpack/transport/2d/all/transport_util.f \
+	applications/clawpack/transport/2d/all/transport_user.cpp \
+	applications/clawpack/transport/2d/all/transport_domain.c \
+	applications/clawpack/transport/2d/all/transport_options.c \
+	applications/clawpack/transport/2d/all/fclaw2d_map_cubedsphere.c \
+	applications/clawpack/transport/2d/all/fclaw2d_map_pillowsphere.c \
+	applications/clawpack/transport/2d/all/user46_b4step2_manifold.f \
+	applications/clawpack/transport/2d/all/user5_b4step2_manifold.f90 \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv_manifold.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv_manifold.f \
