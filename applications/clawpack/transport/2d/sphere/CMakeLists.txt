@@ -9,6 +9,7 @@ add_library(sphere_transport_f OBJECT
 	sphere_velocity.f 
 	qexact.f 
 	dopri5.f 
+	sphere_exceeds_th.f90
 	user_4.6/sphere_output.f 
 	user_4.6/compute_error.f 
 	user_4.6/qinit.f 
@@ -16,7 +17,6 @@ add_library(sphere_transport_f OBJECT
 	user_4.6/rpn2cons_fw_manifold.f 
 	user_4.6/rpt2cons_manifold.f 
 	user_4.6/rpn2_cons_update_manifold.f 
-	${all}/transport_exceeds_threshold.f90
 )
 
 add_executable(sphere_transport

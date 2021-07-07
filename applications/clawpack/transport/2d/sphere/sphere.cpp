@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,15 +24,6 @@
 */
 
 #include "sphere_user.h"
-
-#if 0
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack46.h>
-#endif
 
 #include "../../../advection/2d/all/advection_user.h"
 
