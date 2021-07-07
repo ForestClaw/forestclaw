@@ -6,16 +6,12 @@ TESTS += applications/clawpack/transport/slotted_disk/regressions.sh
 
 applications_clawpack_transport_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/transport/slotted_disk/slotted_disk.cpp \
-	applications/clawpack/transport/slotted_disk/slotted_disk_user.h \
+	applications/clawpack/transport/slotted_disk/slotted_disk_user.cpp \
 	applications/clawpack/transport/slotted_disk/fdisc.f \
 	applications/clawpack/transport/slotted_disk/slotteddisk.f \
 	applications/clawpack/transport/slotted_disk/user_4.6/qinit.f \
 	applications/clawpack/transport/slotted_disk/user_5.0/qinit.f90 \
-	applications/clawpack/transport/all/transport_exceeds_threshold.f90 \
-	applications/clawpack/transport/all/clawpatch46_tag4refinement.f \
-	applications/clawpack/transport/all/clawpatch46_tag4coarsening.f \
-	applications/clawpack/transport/all/clawpatch5_tag4refinement.f \
-	applications/clawpack/transport/all/clawpatch5_tag4coarsening.f \
+	applications/clawpack/transport/slotted_disk/slotted_disk_exceeds_th.f90 \
 	applications/clawpack/transport/all/transport_setprob.f \
 	applications/clawpack/transport/all/velocity_wind.f \
 	applications/clawpack/transport/all/transport_util.f \

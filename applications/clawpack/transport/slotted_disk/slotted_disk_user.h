@@ -38,6 +38,9 @@ extern "C"
 
 /* Header files are all listed in transport_user.h */
 
+void slotted_disk_link_solvers(fclaw2d_global_t *glob);
+
+
 #ifdef __cplusplus
 #if 0
 {

@@ -67,6 +67,9 @@ void run_program(fclaw2d_global_t* glob)
 
     transport_link_solvers(glob);
 
+    /* Set user criteria for exceeding threshold */
+    slotted_disk_link_solvers(glob);
+
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
