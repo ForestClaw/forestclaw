@@ -26,42 +26,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "transport_user.h"
 #include "transport_options.h"
 
-
-#include <fclaw2d_include_all.h>
-
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_pillow.h>
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "../../advection/2d/all/advection_user_fort.h"
-
-
-#if 0
-static
-void transport_patch_setup(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx);
-
-static
-void transport_b4step2(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      double t,
-                      double dt);
-
-
-void transport_problem_setup(fclaw2d_global_t* glob);
-
-#endif                    
-
+#include <fclaw2d_clawpatch_options.h>
+#include "../../advection/2d/all/advection_user.h"
 
 
 void transport_problem_setup(fclaw2d_global_t* glob)
 {
+#if 0
     const user_options_t* user = transport_get_options(glob);
 
     if (glob->mpirank == 0)
@@ -70,6 +42,7 @@ void transport_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,"%-24d %s\n",user->refine_criteria,"\% refine_criteria");
         fclose(f);
     }
+#endif    
 
     /* We want to make sure node 0 gets here before proceeding */
 #ifdef FCLAW_ENABLE_MPI
@@ -79,65 +52,59 @@ void transport_problem_setup(fclaw2d_global_t* glob)
     TRANSPORT_SETPROB();
 }
 
-
 static
 void transport_patch_setup(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx)
+                          fclaw2d_patch_t *patch,
+                          int blockno,
+                          int patchno)
 {
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *aux,*xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    const user_options_t* user = transport_get_options(glob);
-
-    if (fclaw2d_patch_is_ghost(this_patch))
-    {
+    if (fclaw2d_patch_is_ghost(patch))
         return;
-    }
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+    double *xd, *yd, *zd,*xp,*yp, *zp, *area;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    int maux;
+    double *aux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
+    const user_options_t* user = transport_get_options(glob);
     if (user->claw_version == 4)
-    {
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                               &maux,aux,&this_block_idx,xd,yd,zd,area);
-    }
+                               &maux,aux,&blockno,xd,yd,zd,area);
     else if(user->claw_version == 5)
-    {
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                              &maux,aux,&this_block_idx,xd,yd,zd,area);
-    }
+                              &maux,aux,&blockno,xd,yd,zd,area);
 }
 
 static
 void transport_b4step2(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *this_patch,
+                      fclaw2d_patch_t *patch,
                       int this_block_idx,
                       int this_patch_idx,
                       double t,
                       double dt)
 {
-    int mx, my, mbc, maux;
+    int mx, my, mbc;
     double xlower,ylower, dx,dy;
-    double *xp,*yp,*zp,*xd,*yd,*zd;
-    double *aux, *area;
-    const user_options_t* user = transport_get_options(glob);
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
+    double *xp,*yp,*zp,*xd,*yd,*zd;
+    double *area;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    int maux;
+    double *aux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
+    const user_options_t* user = transport_get_options(glob);
     if (user->claw_version == 4)
     {
         USER46_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&this_block_idx,xd,yd,zd);
@@ -150,22 +117,26 @@ void transport_b4step2(fclaw2d_global_t *glob,
 
 void transport_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-
-    patch_vt->setup = &transport_patch_setup;  
-
     /* Custom setprob */
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup  = &transport_problem_setup;  /* Version-independent */
 
-    const user_options_t* user = transport_get_options(glob);
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    patch_vt->setup = &transport_patch_setup;  
 
-    if (user->example == 1)
+#if 0
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    if (clawpatch_opt->refinement_criteria == FCLAW_REFINE_CRITERIA_USER)
     {
-        fclaw2d_clawpatch_use_pillowsphere();
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
     }
+#endif
+    
+    const user_options_t* user = transport_get_options(glob);
+    if (user->example == 1)
+        fclaw2d_clawpatch_use_pillowsphere();
+
 
     if (user->claw_version == 4)
     {
@@ -177,9 +148,10 @@ void transport_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_rpn2      = CLAWPACK46_RPN2ADV_MANIFOLD;
         claw46_vt->fort_rpt2      = CLAWPACK46_RPT2ADV_MANIFOLD;
 
+#if 0
         clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
         clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;
-
+#endif        
     }
     else if (user->claw_version == 5)
     {
@@ -191,8 +163,10 @@ void transport_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
 
+#if 0
         clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
         clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
+#endif        
     }
 }
 
