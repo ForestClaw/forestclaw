@@ -12,15 +12,12 @@ applications_clawpack_transport_2d_sphere_sphere_SOURCES = \
 	applications/clawpack/transport/2d/sphere/setprob.f \
 	applications/clawpack/transport/2d/sphere/q0.f \
 	applications/clawpack/transport/2d/sphere/fdisc.f \
+	applications/clawpack/transport/2d/sphere/sphere_exceeds_th.f90 \
 	applications/clawpack/transport/2d/sphere/sphere_basis.f \
 	applications/clawpack/transport/2d/sphere/mapping_terms.f \
 	applications/clawpack/transport/2d/sphere/sphere_velocity.f \
 	applications/clawpack/transport/2d/sphere/qexact.f \
 	applications/clawpack/transport/2d/sphere/dopri5.f \
-	applications/clawpack/transport/2d/all/clawpatch46_tag4coarsening.f \
-	applications/clawpack/transport/2d/all/clawpatch46_tag4refinement.f \
-	applications/clawpack/transport/2d/all/clawpatch5_tag4coarsening.f \
-	applications/clawpack/transport/2d/all/clawpatch5_tag4refinement.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/sphere_output.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/compute_error.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/qinit.f \

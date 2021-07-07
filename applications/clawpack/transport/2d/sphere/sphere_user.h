@@ -46,6 +46,8 @@ typedef struct user_options
     double *omega;
     const char* omega_string;
 
+    int claw_version;
+
     int is_registered;
 
 } user_options_t;
@@ -171,7 +173,7 @@ void SPHERE_FORT_HEADER_ASCII(char* matname1, char* matname2,
                                double* time, int* meqn, int* maux, 
                                int* ngrids);
 
-
+#if 0
 #define SPHERE_TAG4REFINEMENT FCLAW_F77_FUNC(sphere_tag4refinement, \
                                               SPHERE_TAG4REFINEMENT)
 void  SPHERE_TAG4REFINEMENT(const int* mx,const int* my,
@@ -195,6 +197,21 @@ void  SPHERE_TAG4COARSENING(const int* mx, const int* my,
                              double q2[],double q3[],
                              const double* tag_threshold,
                              int* tag_patch);
+
+#endif
+
+#define USER_EXCEEDS_THRESHOLD FCLAW_F77_FUNC(user_exceeds_threshold, \
+                                              USER_EXCEEDS_THRESHOLD)
+
+int USER_EXCEEDS_THRESHOLD(int* blockno,
+                           double qval[], 
+                           double* qmin, double *qmax,
+                           double quad[], 
+                           double *dx, double *dy, 
+                           double *xc, double *yc, 
+                           int* tag_threshold, 
+                           int* init_flag,
+                           int* is_ghost);
 
 
 #ifdef __cplusplus

@@ -17,10 +17,6 @@ add_library(sphere_transport_f OBJECT
 	user_4.6/rpt2cons_manifold.f 
 	user_4.6/rpn2_cons_update_manifold.f 
 	${all}/transport_exceeds_threshold.f90
-	${all}/clawpatch46_tag4coarsening.f 
-	${all}/clawpatch46_tag4refinement.f
-	${all}/clawpatch5_tag4coarsening.f
-	${all}/clawpatch5_tag4refinement.f
 )
 
 add_executable(sphere_transport
