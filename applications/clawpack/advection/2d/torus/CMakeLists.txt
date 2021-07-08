@@ -2,14 +2,10 @@ set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(torus_f OBJECT 
   setprob.f 
-  torus_velocity.f 
   torus_psi.f 
   fdisc.f 
   user_4.6/qinit.f 
   user_4.6/torus46_setaux.f 
-  user_4.6/rpn2cons_fw_manifold.f 
-  user_4.6/rpt2cons_manifold.f 
-  user_4.6/rpn2cons_update_manifold.f 
   user_5.0/qinit.f90 
   user_5.0/torus5_setaux.f90 
   ${all}/clawpack46_rpn2adv_manifold.f 

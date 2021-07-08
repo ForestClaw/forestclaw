@@ -62,6 +62,7 @@ c     # ------------------------------------------------------------
 
       integer k
 
+      use_stream = 1
       if (example .eq. 0 .and. use_stream .eq. 1) then
 c         # Divergence free velocity field : u = n cross \Psi  
           call torus_psi_derivs(x,y,p,px,py)

@@ -1,69 +1,19 @@
-      subroutine torus46_setaux(mbc,mx,my,
-     &      xlower,ylower,dx,dy,maux,aux,blockno,
-     &      area, edgelengths,
-     &      xnormals,ynormals,surfnormals)
+      subroutine torus46_setaux(maxmx,maxmy,mbc,mx,my,
+     &      xlower,ylower,dx,dy,maux,aux)
+
       implicit none
 
-      integer mbc, mx,my, maux
-      integer blockno
+      integer maxmx, maxmy, mbc, mx,my, maux
       double precision dx,dy, xlower, ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
-      integer i,j
-      double precision dxdy
-     
-      double precision        area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
-      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
+      integer blockno, fc2d_clawpack46_get_block
 
+      blockno = fc2d_clawpack46_get_block()
 
-      integer color_equation
-      common /eqn_comm/ color_equation      
-
-c      include "fclaw2d_metric_terms.i"
-
-c     # ----------------------------------------------------------------
-c     # Color equation (edge velocities)
-c     # 1      capacity
-c     # 2-3    Edge velocities
-c     #
-c     # Conservative form (cell-centered velocities)
-c     # 2-5    Cell-centered velocities projected onto four edge normals
-c     # 6-7    Edge lengths (x-face, y-face)
-c     # ----------------------------------------------------------------
-
-      dxdy = dx*dy
-
-c     # Capacity : entry (1)
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-            aux(i,j,1) = area(i,j)/dxdy
-         enddo
-      enddo
-
-      if (color_equation .eq. 1) then
-c         # Edge velocities : entries (2-3)      
-          call torus46_set_edge_velocities(mx,my,mbc,dx,dy,
-     &          blockno,xlower,ylower,aux,maux)
-      else
-c         # Center velocities : entries (2-5)      
-          call torus46_set_center_velocities(mx,my,mbc,dx,dy,
-     &          blockno,xlower,ylower,
-     &          edgelengths,xnormals,ynormals,surfnormals,
-     &          aux, maux)
-      endif
-
-c     # Needed to scale speeds in Riemann solver when using
-c     # cell-centered velocities
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-c           # x-face and y-face edge lengths (6,7)      
-            aux(i,j,6) = edgelengths(i,j,1)/dy
-            aux(i,j,7) = edgelengths(i,j,2)/dx
-         enddo
-      enddo
+c     # Edge velocities : entries (2-3)      
+      call torus46_set_edge_velocities(mx,my,mbc,dx,dy,
+     &             blockno,xlower,ylower,aux,maux)
 
       return
       end
@@ -125,80 +75,6 @@ c           # y-face - left vertex
 
             call torus_edge_velocity(xc1,yc1,xc2,yc2,dx,vn)
             aux(i,j,3) = -vn
-         enddo
-      enddo
-
-      end
-
-      subroutine torus46_set_center_velocities(mx,my,mbc,
-     &      dx,dy,blockno,xlower,ylower,
-     &          edgelengths,xnormals,ynormals,surfnormals,
-     &          aux, maux)
-      implicit none
-
-      integer mx,my,mbc,maux,blockno
-      double precision dx,dy, xlower,ylower
-      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
-
-      double precision xc,yc
-      double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, torus_dot
-
-      double precision nl(3), nr(3), nb(3), nt(3)
-      double precision urrot, ulrot, ubrot, utrot
-
-      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
-      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
-      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
-
-      integer*8 cont, get_context
-
-      integer i,j, k
-
-c      include "fclaw2d_metric_terms.i"
-
-      cont = get_context()
-
-c     # Cell-centered velocities : entries (4,5,6) 
-      do i = 1-mbc,mx+mbc
-         do j = 1-mbc,my+mbc
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
-
-c           # This is not the torus mapping, but rather maps the brick to
-c           # a unit square      
-            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
-
-            call torus_center_velocity(xc1,yc1,vel)
-
-c           # subtract out normal components
-            do k = 1,3
-                nv(k) = surfnormals(i,j,k)
-            enddo
-
-            vdotn = torus_dot(vel,nv)
-
-c           # Subtract out component in the normal direction
-            do k = 1,3
-                vel(k) = vel(k) - vdotn*nv(k)
-            end do
-
-            do k = 1,3
-                nl(k)  = xnormals(i,  j,  k)
-                nr(k)  = xnormals(i+1,j,  k)
-                nb(k)  = ynormals(i,  j,  k)
-                nt(k)  = ynormals(i,  j+1,k)
-            enddo
-
-            ulrot = nl(1)*vel(1) + nl(2)*vel(2) + nl(3)*vel(3)
-            urrot = nr(1)*vel(1) + nr(2)*vel(2) + nr(3)*vel(3)
-            ubrot = nb(1)*vel(1) + nb(2)*vel(2) + nb(3)*vel(3)
-            utrot = nt(1)*vel(1) + nt(2)*vel(2) + nt(3)*vel(3)
-
-            aux(i,j,2) = ulrot
-            aux(i,j,3) = urrot
-            aux(i,j,4) = ubrot
-            aux(i,j,5) = utrot
          enddo
       enddo
 

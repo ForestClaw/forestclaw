@@ -46,7 +46,6 @@ extern "C"
 typedef struct user_options
 {
     int example;    
-    int color_equation;
 
     double alpha;     /* Ratio of inner radius to outer radius */
     double beta;
@@ -74,96 +73,22 @@ const user_options_t* torus_get_options(fclaw2d_global_t* glob);
    Clawpack 4.6 headers
    ---------------------- */
 #define TORUS46_SETAUX  FCLAW_F77_FUNC(torus46_setaux, TORUS46_SETAUX)
-void TORUS46_SETAUX(const int* mbc, const int* mx, const int* my,
-                    const double* xlower, const double* ylower,
-                    const double* dx, const double* dy,
-                    const int* maux, double aux[], const int* blockno,
-                    double area[], double edgelengths[], 
-                    double xnormals[], double ynormals[], 
-                    double surfnormals[]);
-
-#if 0
-#define TORUS46_TAG4REFINEMENT FCLAW_F77_FUNC(torus46_tag4refinement, \
-                                              TORUS46_TAG4REFINEMENT)
-void  TORUS46_TAG4REFINEMENT(const int* mx,const int* my,
-                             const int* mbc,const int* meqn,
-                             const double* xlower, const double* ylower,
-                             const double* dx, const double* dy,
-                             const int* blockno,
-                             double q[],
-                             const double* tag_threshold,
-                             const int* init_flag,
-                             int* tag_patch);
-
-#define  TORUS46_TAG4COARSENING FCLAW_F77_FUNC(torus46_tag4coarsening, \
-                                              TORUS46_TAG4COARSENING)
-void  TORUS46_TAG4COARSENING(const int* mx, const int* my,
-                             const int* mbc, const int* meqn,
-                             const double* xlower, const double* ylower,
-                             const double* dx, const double* dy,
-                             const int* blockno,
-                             double q0[],double q1[],
-                             double q2[],double q3[],
-                             const double* tag_threshold,
-                             int* tag_patch);
-#endif
-
-
-#define RPN2CONS_FW_MANIFOLD FCLAW_F77_FUNC(rpn2cons_fw_manifold, RPN2CONS_FW_MANIFOLD)
-void RPN2CONS_FW_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
-                          const int* mwaves,
-                          const int* mbc, const int* mx, double ql[], double qr[],
-                          double auxl[], double auxr[], double fwave[],
-                          double s[], double amdq[], double apdq[]);
-
-
-#define RPT2CONS_MANIFOLD FCLAW_F77_FUNC(rpt2cons_manifold, RPT2CONS_MANIFOLD)
-void RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-                       const int* mbc, const int* mx, double ql[], double qr[],
-                       double aux1[], double aux2[], double aux3[], const int* imp,
-                       double dsdq[], double bmasdq[], double bpasdq[]);
-
-
-#define RPN2_CONS_UPDATE_MANIFOLD FCLAW_F77_FUNC(rpn2_cons_update_manifold, \
-                                                 RPN2_CONS_UPDATE_MANIFOLD)
-
-void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir,
-                               const int* iface, double q[], 
-                               double aux_center[], double aux_edge[],
-                               double flux[]);
-
-#define RPN2_CONS_UPDATE_ZERO FCLAW_F77_FUNC(rpn2_cons_update_zero, \
-                                             RPN2_CONS_UPDATE_ZERO)
-
-void RPN2_CONS_UPDATE_ZERO(const int* meqn, const int* maux, const int* idir,
-                           const int* iface,
-                           double q[], double aux_center[], double aux_edge[],
-                           double flux[]);
-
+void TORUS46_SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
+                       const int* mx, const int* my,
+                       const double* xlower, const double* ylower,
+                       const double* dx, const double* dy,
+                       const int* maux, double aux[]);
 
 /* ----------------------
    Clawpack 5.x headers
    ---------------------- */
 
 #define TORUS5_SETAUX  FCLAW_F77_FUNC(torus5_setaux,  TORUS5_SETAUX)
-void TORUS5_SETAUX(const int* mbc,
-                   const int* mx, const int* my,
+void TORUS5_SETAUX(const int* mbc, const int* mx, const int* my,
                    const double* xlower, const double* ylower,
                    const double* dx, const double* dy,
                    const int* maux, double aux[]);
 
-
-#define  TORUS5_TAG4COARSENING FCLAW_F77_FUNC(torus5_tag4coarsening, \
-                                              TORUS5_TAG4COARSENING)
-void  TORUS5_TAG4COARSENING(const int* mx, const int* my,
-                             const int* mbc, const int* meqn,
-                             const double* xlower, const double* ylower,
-                             const double* dx, const double* dy,
-                             const int* blockno,
-                             double q0[],double q1[],
-                             double q2[],double q3[],
-                             const double* tag_threshold,
-                             int* tag_patch);
 
 #ifdef __cplusplus
 #if 0
