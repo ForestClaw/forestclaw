@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,14 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "annulus_user.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack46.h>
-
-#include <fc2d_clawpack5_options.h>
-#include <fc2d_clawpack5.h>
+#include "../all/advection_user.h"
 
 /* ------------- Create the domain --------------------- */
 static
@@ -40,11 +33,6 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                 fclaw_options_t* fclaw_opt, 
                                 user_options_t* user)
 {
-    /* Used locally */
-    double pi = M_PI;
-    double rotate[2];
-    int mi, mj, a,b;
-
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
@@ -53,18 +41,26 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     /* ---------------------------------------------------------------
        Mapping geometry
        --------------------------------------------------------------- */
-    mi = fclaw_opt->mi;
-    mj = fclaw_opt->mj;
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
+    int a = fclaw_opt->periodic_x;
+    int b = 0;   /* No periodicity in radial direction */
+
+    /* Used locally */
+    double pi = M_PI;
+    double rotate[2];
+
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
-    a = fclaw_opt->periodic_x;
-    b = fclaw_opt->periodic_y;
 
     /* Annulus */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont = fclaw2d_map_new_annulus(brick,fclaw_opt->scale,fclaw_opt->shift,
-                                   rotate,user->beta, user->theta);
+    cont = fclaw2d_map_new_annulus(brick,
+                                   fclaw_opt->scale,
+                                   rotate,
+                                   user->beta, 
+                                   user->theta);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
 

@@ -71,15 +71,6 @@ sphere_patch_setup(fclaw2d_global_t *glob,
                    int this_block_idx,
                    int this_patch_idx);
 
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
-                                                     const double shift[],
-                                                     const double rotate[]);
-
-fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
-                                                      const double shfit[],
-                                                      const double rotate[]);
-
-
 #ifdef __cplusplus
 #if 0
 {

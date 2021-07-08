@@ -12,18 +12,14 @@ add_library(disk_f OBJECT
 	${all}/user5_setaux_manifold.f90 
 	${all}/clawpack5_rpn2adv_manifold.f90 
 	${all}/clawpack5_rpt2adv_manifold.f90 
-	${all}/clawpatch46_tag4refinement.f 
-	${all}/clawpatch46_tag4coarsening.f 
-	${all}/clawpatch5_tag4refinement.f 
-	${all}/clawpatch5_tag4coarsening.f
 )
 
 add_executable(disk 
   disk.cpp 
 	disk_options.c 
 	disk_user.cpp 
-	fclaw2d_map_pillowdisk.c 
-	fclaw2d_map_pillowdisk5.c 
+	${all}/fclaw2d_map_pillowdisk5.c
+	${all}/fclaw2d_map_pillowdisk.c
   $<TARGET_OBJECTS:disk_f>
 )
 

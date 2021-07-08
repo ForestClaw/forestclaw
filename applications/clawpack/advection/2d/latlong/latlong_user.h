@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -65,13 +65,6 @@ user_options_t*  latlong_options_register (fclaw_app_t * app,
 void latlong_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* latlong_get_options(fclaw2d_global_t* glob);
-
-fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
-                             const double scale[],
-                             const double lat[],
-                             const double longitude[],
-                             const int a, const int b);
 
 #ifdef __cplusplus
 #if 0

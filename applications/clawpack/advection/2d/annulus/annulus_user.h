@@ -71,14 +71,6 @@ void annulus_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* annulus_get_options(fclaw2d_global_t *glob);
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
-                             const double scale[],
-                             const double shift[],
-                             const double rotate[],
-                             const double alpha,
-                             const double theta[]);
-
 #ifdef __cplusplus
 #if 0
 {

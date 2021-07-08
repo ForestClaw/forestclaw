@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -54,40 +54,7 @@ void filament_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* filament_get_options(fclaw2d_global_t* glob);
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
-
-fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
-                                             const double scale[],
-                                             const double shift[],
-                                             const double rotate[]);
-  
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
-                                                  const double shift[],
-                                                  const double rotate[]);
-  
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
-                                                   const double shift[],
-                                                   const double rotate[],
-                                                   const double alpha);
-  
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
-                                                   const double shift[],
-                                                   const double rotate[],
-                                                   const double alpha);
-  
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
-                                                 const double shift[],
-                                                 const double rotate[],
-                                                 const double alpha);
-  
-
 void filament_link_solvers(fclaw2d_global_t *glob);
-
-void filament_patch_setup_manifold(fclaw2d_global_t *glob,
-                                   fclaw2d_patch_t *this_patch,
-                                   int this_block_idx,
-                                   int this_patch_idx);
-
 
 #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
 

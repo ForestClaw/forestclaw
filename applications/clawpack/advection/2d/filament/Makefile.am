@@ -9,19 +9,15 @@ applications_clawpack_advection_2d_filament_filament_SOURCES = \
 	applications/clawpack/advection/2d/filament/filament_options.c \
 	applications/clawpack/advection/2d/filament/filament_user.cpp \
 	applications/clawpack/advection/2d/filament/filament_user.h \
-	applications/clawpack/advection/2d/filament/fclaw2d_map_cart.c \
-	applications/clawpack/advection/2d/filament/fclaw2d_map_fivepatch.c \
 	applications/clawpack/advection/2d/filament/psi.f \
 	applications/clawpack/advection/2d/filament/fdisc.f \
 	applications/clawpack/advection/2d/filament/setprob.f \
 	applications/clawpack/advection/2d/filament/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/filament/user_5.0/qinit.f90 \
+	applications/clawpack/advection/2d/all/fclaw2d_map_cart.c \
+	applications/clawpack/advection/2d/all/fclaw2d_map_fivepatch.c \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
-	applications/clawpack/advection/2d/all/clawpatch46_tag4refinement.f \
-	applications/clawpack/advection/2d/all/clawpatch46_tag4coarsening.f \
-	applications/clawpack/advection/2d/all/clawpatch5_tag4refinement.f \
-	applications/clawpack/advection/2d/all/clawpatch5_tag4coarsening.f \
 	applications/clawpack/advection/2d/all/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv.f \

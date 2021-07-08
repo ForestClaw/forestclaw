@@ -10,20 +10,16 @@ add_library(hemisphere_f OBJECT
   ${all}/user5_setaux_manifold.f90 
   ${all}/clawpack46_rpn2adv_manifold.f 
   ${all}/clawpack46_rpt2adv_manifold.f 
-  ${all}/clawpatch46_tag4refinement.f 
-  ${all}/clawpatch46_tag4coarsening.f 
   ${all}/clawpack5_rpn2adv_manifold.f90 
   ${all}/clawpack5_rpt2adv_manifold.f90 
-  ${all}/clawpatch5_tag4refinement.f 
-  ${all}/clawpatch5_tag4coarsening.f
 )
 
 add_executable(hemisphere 
   hemisphere.cpp 
   hemisphere_options.c 
   hemisphere_user.cpp 
-  fclaw2d_map_pillowsphere.c 
-  fclaw2d_map_pillowsphere5.c 
+  ${all}/fclaw2d_map_pillowsphere.c 
+  ${all}/fclaw2d_map_pillowsphere5.c 
   $<TARGET_OBJECTS:hemisphere_f>
 )
 

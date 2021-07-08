@@ -10,9 +10,8 @@ extern "C"
 #endif
 #endif
 
-
 static int
-fclaw2d_map_query_pillowsphere (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -44,20 +43,16 @@ fclaw2d_map_query_pillowsphere (fclaw2d_map_context_t * cont, int query_identifi
     case FCLAW2D_MAP_QUERY_IS_SQUAREDDISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
-        return 0;
-    case FCLAW2D_MAP_QUERY_IS_HEMISPHERE:
-        return 1;
     case FCLAW2D_MAP_QUERY_IS_BRICK:
         return 0;
     default:
         printf("\n");
-        printf("fclaw2d_map_query_pillowsphere (fclaw2d_map.c) : Query id not "\
+        printf("fclaw2d_map_query_torus (fclaw2d_map.c) : Query id not "\
                "identified;  Maybe the query is not up to date?\nSee "  \
-               "fclaw2d_map_query_defs.h.\n");
+               "fclaw2d_map_torus.c.\n");
         printf("Requested query id : %d\n",query_identifier);
         SC_ABORT_NOT_REACHED ();
     }
@@ -66,31 +61,50 @@ fclaw2d_map_query_pillowsphere (fclaw2d_map_context_t * cont, int query_identifi
 
 
 static void
-fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
-                              double xc, double yc,
-                              double *xp, double *yp, double *zp)
+fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
+                       double xc, double yc,
+                       double *xp, double *yp, double *zp)
 {
-    MAPC2M_PILLOWSPHERE(&blockno,&xc,&yc,xp,yp,zp);
 
-    /* scale_map(cont,xp,yp,zp); */
-    /* rotate_map(cont,xp,yp,zp); */
+    /* Data is not already in brick domain */
+    double xc1,yc1,zc1;
+    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+
+    double alpha = cont->user_double[0];
+    double beta = cont->user_double[1];
+
+    /* Don't pass in block number */
+    MAPC2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
+
+    scale_map(cont,xp,yp,zp);
+    rotate_map(cont,xp,yp,zp);
 }
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_pillowsphere(const double scale[],
-                                 const double shift[],
-                                 const double rotate[])
+    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+                           const double scale[],
+                           const double rotate[],
+                           const double alpha,
+                           const double beta)
 {
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
-    cont->query = fclaw2d_map_query_pillowsphere;
-    cont->mapc2m = fclaw2d_map_c2m_pillowsphere;
-    set_rotate(cont, rotate);
-    /* set_scale(cont,scale); */
+    cont->query = fclaw2d_map_query_torus;
+    cont->mapc2m = fclaw2d_map_c2m_torus;
+
+    cont->user_double[0] = alpha;
+    cont->user_double[1] = beta;
+
+    /* Are we really using these? */
+    set_scale(cont,scale);
+    set_rotate(cont,rotate);
+
+    cont->brick = brick;
 
     return cont;
 }
+
 #ifdef __cplusplus
 #if 0
 {

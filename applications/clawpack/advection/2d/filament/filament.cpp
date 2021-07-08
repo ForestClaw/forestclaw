@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,15 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "filament_user.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack46.h>
-
-#include <fc2d_clawpack5_options.h>
-#include <fc2d_clawpack5.h>
-
+#include "../all/advection_user.h"
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt, 
@@ -44,13 +36,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
     
-    int mi, mj;
-    double rotate[2];
-
-    rotate[0] = 0;
-    rotate[1] = 0;
-    mi = fclaw_opt->mi;
-    mj = fclaw_opt->mj;
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
     int a = 0; /* non-periodic */
     int b = 0;
 
@@ -65,15 +52,16 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
         /* Square brick domain */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_cart(brick,fclaw_opt->scale,
-                                    fclaw_opt->shift,
-                                    rotate);
+        cont = fclaw2d_map_new_cart(brick,
+                                    fclaw_opt->scale,
+                                    fclaw_opt->shift);
         break;
     case 2:
         /* Five patch square domain */
         conn = p4est_connectivity_new_disk (0, 0);
-        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,fclaw_opt->shift,
-                                          rotate,user->alpha);
+        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
+                                          fclaw_opt->shift,
+                                          user->alpha);
         break;
 
     default:

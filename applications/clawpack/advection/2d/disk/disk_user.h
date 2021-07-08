@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -55,20 +55,6 @@ user_options_t* disk_options_register (fclaw_app_t * app,
 void disk_options_store (fclaw2d_global_t* glob, user_options_t* user_opt);
 
 const user_options_t* disk_get_options(fclaw2d_global_t* glob);
-
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
-                                                  const double shift[],
-                                                  const double rotate[]);
-
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
-                                                   const double shift[],
-                                                   const double rotate[],
-                                                   const double alpha);
-
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
-                                                 const double shift[],
-                                                 const double rotate[],
-                                                 const double alpha);
 
 void disk_link_solvers(fclaw2d_global_t *glob);
 

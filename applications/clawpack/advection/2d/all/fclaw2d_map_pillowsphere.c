@@ -38,7 +38,7 @@ fclaw2d_map_query_pillowsphere (fclaw2d_map_context_t * cont, int query_identifi
     case FCLAW2D_MAP_QUERY_IS_DISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SPHERE:
-        return 1;
+        return 0;
     case FCLAW2D_MAP_QUERY_IS_PILLOWDISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SQUAREDDISK:
@@ -47,6 +47,10 @@ fclaw2d_map_query_pillowsphere (fclaw2d_map_context_t * cont, int query_identifi
         return 1;
     case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
         return 0;
+    case FCLAW2D_MAP_QUERY_IS_FIVEPATCH:
+        return 0;
+    case FCLAW2D_MAP_QUERY_IS_HEMISPHERE:
+        return 1;
     case FCLAW2D_MAP_QUERY_IS_BRICK:
         return 0;
     default:
@@ -68,28 +72,25 @@ fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_PILLOWSPHERE(&blockno,&xc,&yc,xp,yp,zp);
 
-    /* These can probably be replaced by C functions at some point. */
-
-    /* scale_map(cont,xp,yp,zp); */
+    scale_map(cont,xp,yp,zp);
     rotate_map(cont,xp,yp,zp);
 }
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_pillowsphere(const double scale[],
-                                 const double shift[],
-                                 const double rotate[] )
+                                 const double rotate[])
 {
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowsphere;
     cont->mapc2m = fclaw2d_map_c2m_pillowsphere;
-    set_rotate(cont,rotate);
-    /* set_scale(cont,scale); */
+    
+    set_scale(cont,scale); 
+    set_rotate(cont, rotate);
 
     return cont;
 }
-
 #ifdef __cplusplus
 #if 0
 {

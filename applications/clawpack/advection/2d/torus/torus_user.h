@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -70,20 +70,6 @@ void torus_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* torus_get_options(fclaw2d_global_t* glob);
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
-                           const double scale[],
-                           const double shift[],
-                           const double rotate[],
-                           const double alpha,
-                           const double beta);
-
-fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
-                                             const double scale[],
-                                             const double shift[],
-                                             const double rotate[]);
-
-
 /* ----------------------
    Clawpack 4.6 headers
    ---------------------- */
@@ -96,7 +82,7 @@ void TORUS46_SETAUX(const int* mbc, const int* mx, const int* my,
                     double xnormals[], double ynormals[], 
                     double surfnormals[]);
 
-
+#if 0
 #define TORUS46_TAG4REFINEMENT FCLAW_F77_FUNC(torus46_tag4refinement, \
                                               TORUS46_TAG4REFINEMENT)
 void  TORUS46_TAG4REFINEMENT(const int* mx,const int* my,
@@ -120,7 +106,7 @@ void  TORUS46_TAG4COARSENING(const int* mx, const int* my,
                              double q2[],double q3[],
                              const double* tag_threshold,
                              int* tag_patch);
-
+#endif
 
 
 #define RPN2CONS_FW_MANIFOLD FCLAW_F77_FUNC(rpn2cons_fw_manifold, RPN2CONS_FW_MANIFOLD)

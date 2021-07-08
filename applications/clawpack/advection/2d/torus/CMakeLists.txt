@@ -12,10 +12,6 @@ add_library(torus_f OBJECT
   user_4.6/rpn2cons_update_manifold.f 
   user_5.0/qinit.f90 
   user_5.0/torus5_setaux.f90 
-  ${all}/clawpatch46_tag4refinement.f 
-  ${all}/clawpatch46_tag4coarsening.f 
-  ${all}/clawpatch5_tag4refinement.f 
-  ${all}/clawpatch5_tag4coarsening.f
   ${all}/clawpack46_rpn2adv_manifold.f 
   ${all}/clawpack46_rpt2adv_manifold.f 
   ${all}/clawpack5_rpn2adv_manifold.f90 
@@ -31,8 +27,7 @@ add_executable(torus
   torus.cpp 
   torus_options.c 
   torus_user.cpp 
-  fclaw2d_map_torus.c 
-  fclaw2d_map_cart.c 
+  ${all}/fclaw2d_map_torus.c 
   $<TARGET_OBJECTS:torus_f>
 )
 

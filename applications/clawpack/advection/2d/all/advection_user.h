@@ -61,7 +61,85 @@ extern "C"
 #endif
 #endif
 
-/* Only include headers above */
+/* --------------------------------- Square mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+                                            const double scale[],
+                                            const double shift[]);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+                                                   const double shift[],
+                                                   const double alpha);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+                                                const double scale[],
+                                                const double shift[],
+                                                const double center[]);
+
+/* ---------------------------------- Disk mappings ----------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double rotate[],
+                                                   const double alpha);
+
+/* --------------------------------- Annulus mapping ---------------------------------- */
+fclaw2d_map_context_t *
+    fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
+                             const double scale[],
+                             const double rotate[],
+                             const double alpha,
+                             const double theta[]);
+
+
+/* --------------------------------- Latlong mapping ---------------------------------- */
+fclaw2d_map_context_t *
+    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+                             const double scale[],
+                             const double lat[],
+                             const double longitude[],
+                             const int a, const int b);
+
+/* --------------------------------- Hemisphere mappings ------------------------------ */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
+                                                     const double rotate[],
+                                                     const double alpha);
+
+/* --------------------------------- Sphere mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
+                                                    const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+                                                     const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
+                                                      const double rotate[]);
+
+
+/* --------------------------------- Torus mappings ---------------------------------- */
+fclaw2d_map_context_t *
+    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+                           const double scale[],
+                           const double rotate[],
+                           const double alpha,
+                           const double beta);
+
+
+
+
+
+
+
 
 #ifdef __cplusplus
 #if 0

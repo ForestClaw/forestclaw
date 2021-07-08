@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -61,16 +61,6 @@ void hemisphere_patch_setup(fclaw2d_global_t *glob,
                             fclaw2d_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx);
-
-fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
-                                                    const double shift[],
-                                                    const double rotate[]);
-
-fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
-                                                     const double shift[],
-                                                     const double rotate[],
-                                                     const double alpha);
-
 
 #ifdef __cplusplus
 #if 0

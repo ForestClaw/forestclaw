@@ -11,7 +11,7 @@ extern "C"
 #endif
 
 static int
-fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_annulus (fclaw2d_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -33,7 +33,7 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
     case FCLAW2D_MAP_QUERY_IS_ALIGNED:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_FLAT:
-        return 0;
+        return 1;
     case FCLAW2D_MAP_QUERY_IS_DISK:
         return 0;
     case FCLAW2D_MAP_QUERY_IS_SPHERE:
@@ -50,9 +50,9 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
         return 0;
     default:
         printf("\n");
-        printf("fclaw2d_map_query_torus (fclaw2d_map.c) : Query id not "\
+        printf("fclaw2d_map_query_annulus (fclaw2d_map.c) : Query id not "\
                "identified;  Maybe the query is not up to date?\nSee "  \
-               "fclaw2d_map_torus.c.\n");
+               "fclaw2d_map_annulus.c.\n");
         printf("Requested query id : %d\n",query_identifier);
         SC_ABORT_NOT_REACHED ();
     }
@@ -61,42 +61,46 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
-fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_annulus (fclaw2d_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
-
-    /* Data is not already in brick domain */
     double xc1,yc1,zc1;
+
+    /* Scale's brick mapping to [0,1]x[0,1] */
+    /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-    double alpha = cont->user_double[0];
-    double beta = cont->user_double[1];
+    /* blockno is ignored in the current annulus mapping;  it just assumes
+       a single "logical" block in [0,1]x[0,1] */
+    double beta = cont->user_double[0];
+    double theta[2];
+    theta[0] = cont->user_double[1];
+    theta[1] = cont->user_double[2];
+    MAPC2M_ANNULUS(&blockno,&xc1,&yc1,xp,yp,zp,&beta,theta);
 
-    /* Don't pass in block number */
-    MAPC2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
+    scale_map(cont, xp,yp,zp);
+    rotate_map(cont, xp, yp, zp);
 }
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
-                           const double scale[],
-                           const double shift[],
-                           const double rotate[],
-                           const double alpha,
-                           const double beta)
+    fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
+                             const double scale[],
+                             const double rotate[],
+                             const double beta,
+                             const double theta[])
 {
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
-    cont->query = fclaw2d_map_query_torus;
-    cont->mapc2m = fclaw2d_map_c2m_torus;
+    cont->query = fclaw2d_map_query_annulus;
+    cont->mapc2m = fclaw2d_map_c2m_annulus;
 
-    cont->user_double[0] = alpha;
-    cont->user_double[1] = beta;
+    cont->user_double[0] = beta;
+    cont->user_double[1] = theta[0];
+    cont->user_double[2] = theta[1];
 
-    /* Are we really using these? */
     set_scale(cont,scale);
-    set_shift(cont,shift);
     set_rotate(cont,rotate);
 
     cont->brick = brick;

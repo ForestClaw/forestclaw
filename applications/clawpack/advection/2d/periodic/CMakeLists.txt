@@ -5,13 +5,8 @@ add_library(periodic_f OBJECT
   fdisc.f
   user_4.6/qinit.f 
   user_4.6/clawpack46_setaux.f
-  ${all}/clawpatch46_tag4coarsening.f
-  ${all}/clawpatch46_tag4refinement.f
   user_5.0/qinit.f90 
   user_5.0/clawpack5_setaux.f90
-  ${all}/clawpatch5_tag4coarsening.f
-  ${all}/clawpatch5_tag4refinement.f
-  ${all}/minmax_exceeds_th.f90
   ${all}/clawpack46_rpn2adv.f 
   ${all}/clawpack46_rpt2adv.f 
   ${all}/clawpack5_rpn2adv.f90 
