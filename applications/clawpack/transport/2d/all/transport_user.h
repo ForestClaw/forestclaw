@@ -30,34 +30,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_pillow.h>
 
-/* FORTRAN headers are not needed here, but generally needed in the
-   advection examples and are included here for convenience */
+/* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
-#include <fclaw2d_clawpatch46_fort.h>
-#include <fclaw2d_clawpatch5_fort.h>
 
+/* Clawpack 4.6 headers */
 #include <fc2d_clawpack46.h>  
 #include <fc2d_clawpack46_options.h>
+#include <fc2d_clawpack46_fort.h>  
+#include <clawpack46_user_fort.h>  
+#include <fclaw2d_clawpatch46_fort.h>
 
+
+/* Clawpack 5.0 headers */
 #include <fc2d_clawpack5.h>
 #include <fc2d_clawpack5_options.h>
-
-#include <fc2d_clawpack46_fort.h>  
 #include <fc2d_clawpack5_fort.h>
-
-#include <clawpack46_user_fort.h>  
 #include <clawpack5_user_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
 
 #include "transport_user_fort.h"
 #include "transport_options.h"
-
-
-#include <fclaw_base.h>  /* for MPI */
-
-#include "../../../advection/2d/all/advection_user.h"
-
 
 #ifdef __cplusplus
 extern "C"
@@ -75,6 +70,30 @@ struct fclaw_options;
 struct user_options;
 struct fclaw2d_patch;
 struct fclaw2d_domain;
+
+
+/* --------------------------------- Square mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+                                            const double scale[],
+                                            const double shift[]);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+                                                   const double shift[],
+                                                   const double alpha);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+                                                const double scale[],
+                                                const double shift[],
+                                                const double center[]);
+
+/* --------------------------------- Sphere mappings ---------------------------------- */
 
 /* 1 = cubed sphere domain; 2 - pillowgrid */
 struct fclaw2d_domain* transport_create_domain(sc_MPI_Comm mpicomm, 

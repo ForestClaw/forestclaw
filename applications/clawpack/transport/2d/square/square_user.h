@@ -80,21 +80,28 @@ void square_options_store (fclaw2d_global_t* glob, user_options_t* user);
 user_options_t* square_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
-/* --------------------------------- Mappings ----------------------------------------- */
+
+/* --------------------------------- Square mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+                                            const double scale[],
+                                            const double shift[]);
+  
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
-                                             const double scale[],
-                                             const double shift[]);
-
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+                                                   const double shift[],
+                                                   const double alpha);
+  
 fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
                                                 const double scale[],
                                                 const double shift[],
                                                 const double center[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
 
 /* ---------------------------------- Compute Error ------------------------------------- */
 
@@ -287,6 +294,7 @@ void SQUARE5_FORT_HEADER_ASCII(char* matname1, char* matname2,
 
 /* ---------------------------------------- TAGGING --------------------------------------- */
 
+#if 0
 #define SQUARE46_TAG4REFINEMENT FCLAW_F77_FUNC(square46_tag4refinement, \
                                               SQUARE46_TAG4REFINEMENT)
 void  SQUARE46_TAG4REFINEMENT(const int* mx,const int* my,
@@ -337,7 +345,7 @@ void  SQUARE5_TAG4COARSENING(const int* mx, const int* my,
                              const double* tag_threshold,
                              const int* initflag,
                              int* tag_patch);
-
+#endif
 
 
 

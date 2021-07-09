@@ -25,13 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "transport_user.h"
 
-#include "transport_options.h"
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-#include "../../../advection/2d/all/advection_user.h"
-
-
 void transport_problem_setup(fclaw2d_global_t* glob)
 {
 #if 0
@@ -125,15 +118,6 @@ void transport_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     patch_vt->setup = &transport_patch_setup;  
 
-#if 0
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-    if (clawpatch_opt->refinement_criteria == FCLAW_REFINE_CRITERIA_USER)
-    {
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
-    }
-#endif
-    
     const user_options_t* user = transport_get_options(glob);
     if (user->example == 1)
         fclaw2d_clawpatch_use_pillowsphere();
@@ -143,31 +127,23 @@ void transport_link_solvers(fclaw2d_global_t *glob)
     {
         fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
 
+        /* Time dependent velocities */
         claw46_vt->b4step2        = transport_b4step2; 
 
         claw46_vt->fort_qinit     = CLAWPACK46_QINIT;
         claw46_vt->fort_rpn2      = CLAWPACK46_RPN2ADV_MANIFOLD;
         claw46_vt->fort_rpt2      = CLAWPACK46_RPT2ADV_MANIFOLD;
-
-#if 0
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;
-#endif        
     }
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
 
+        /* Time dependent velocity field */
         claw5_vt->b4step2        = transport_b4step2; 
 
         claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
-
-#if 0
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
-#endif        
+        claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;        
     }
 }
 

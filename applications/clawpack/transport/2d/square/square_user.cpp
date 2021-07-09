@@ -25,23 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "square_user.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_fort.h>
 
-#include <fclaw2d_clawpatch46_fort.h>
-#include <fclaw2d_clawpatch5_fort.h>
-
-#include <fc2d_clawpack46.h>  
-#include <fc2d_clawpack46_options.h>
-
-#include <fc2d_clawpack5.h>
-#include <fc2d_clawpack5_options.h>
-
-#include <fc2d_clawpack46_fort.h>  
-#include <fc2d_clawpack5_fort.h>
-
-#include <clawpack46_user_fort.h>  
-#include <clawpack5_user_fort.h>
 
 #include <fclaw_base.h>  /* for MPI */
 
@@ -204,13 +188,6 @@ void square_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpn2fw   = &CLAWPACK46_RPN2FW_MANIFOLD; 
         clawpack46_vt->fort_rpt2fw   = &CLAWPACK46_RPT2FW_MANIFOLD;      
         clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
-
-        /* Clawpatch functions */
-#if 0        
-        //const user_options_t* user = square_get_options(glob);
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;       
-#endif        
     } 
     else if (user->claw_version == 5)
     {
@@ -222,12 +199,6 @@ void square_link_solvers(fclaw2d_global_t *glob)
         clawpack5_vt->fort_rpn2    = &CLAWPACK5_RPN2FW_MANIFOLD; 
         clawpack5_vt->fort_rpt2    = &CLAWPACK5_RPT2_MANIFOLD;      
         clawpack5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
-
-        /* Clawpatch functions */
-#if 0        
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;     
-#endif    
     }
 
 #if 0
