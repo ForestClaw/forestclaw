@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HEMISPHERE_USER_H
 #define HEMISPHERE_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/advection_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -40,8 +40,9 @@ extern "C"
 typedef struct user_options
 {
     int example;
-    int claw_version;
     double alpha;
+
+    int claw_version;
     int is_registered;
 
 } user_options_t;
@@ -57,10 +58,6 @@ const user_options_t* hemisphere_get_options(fclaw2d_global_t* glob);
 
 void hemisphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
-void hemisphere_patch_setup(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx);
 
 #ifdef __cplusplus
 #if 0

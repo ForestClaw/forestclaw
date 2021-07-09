@@ -18,6 +18,7 @@ add_executable(sphere
   sphere.cpp 
   sphere_user.cpp 
   sphere_options.c 
+  ${all}/advection_user.cpp
   ${all}/fclaw2d_map_cubedsphere.c 
   ${all}/fclaw2d_map_pillowsphere.c 
   $<TARGET_OBJECTS:sphere_f>

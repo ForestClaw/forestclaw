@@ -18,6 +18,7 @@ add_executable(disk
   disk.cpp 
 	disk_options.c 
 	disk_user.cpp 
+  ${all}/advection_user.cpp
 	${all}/fclaw2d_map_pillowdisk5.c
 	${all}/fclaw2d_map_pillowdisk.c
   $<TARGET_OBJECTS:disk_f>

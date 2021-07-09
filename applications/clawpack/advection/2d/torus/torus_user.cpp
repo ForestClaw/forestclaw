@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "torus_user.h"
 
-
 #include "../all/advection_user.h"
 
 static
@@ -42,8 +41,10 @@ void torus_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24.6f   %s",user->revs_per_s,"\% revs_per_second\n");
         fclose(f);
     }
+    /* Make sure node 0 writes `setprob.data` before proceeding */
     fclaw2d_domain_barrier (glob->domain);
-    TORUS_SETPROB();
+    
+    SETPROB();
 }
 
 static
@@ -52,33 +53,6 @@ void torus_patch_setup(fclaw2d_global_t *glob,
                        int blockno,
                        int patchno)
 {
-#if 0
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    double* area = fclaw2d_clawpatch_metric_get_area(glob,patch);
-
-    double *edgelengths,*area, *curvature;
-    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
-                                    &curvature);
-
-    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,patch,
-                                    &xnormals, &ynormals,
-                                    &xtangents, &ytangents,
-                                    &surfnormals);
-
-    double *xp, *yp, *zp, *xd, *yd, *zd;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    int maux;
-    double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
-#endif                                    
-
     const user_options_t* user = torus_get_options(glob);
     if (user->claw_version == 4)
     {
@@ -98,6 +72,9 @@ void torus_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */
 
+    /* Torus uses special patch setup (not advection_patch_setup), since the
+       streamfunction depends on computational coordinates, not physical
+       coordinates */
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     patch_vt->setup   = &torus_patch_setup;
 

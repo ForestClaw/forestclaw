@@ -24,6 +24,7 @@ add_executable(filament
   filament.cpp 
   filament_options.c 
   filament_user.cpp 
+  ${all}/advection_user.cpp
   ${all}/fclaw2d_map_cart.c 
   ${all}/fclaw2d_map_fivepatch.c 
   $<TARGET_OBJECTS:filament_f>

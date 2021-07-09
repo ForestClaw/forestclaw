@@ -26,14 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FILAMENT_USER_H
 #define FILAMENT_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/advection_user.h"
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
 #endif
+
+#if 0
+/* Fix syntax highlighting */
 #endif
 
 typedef struct user_options
@@ -56,16 +57,7 @@ const user_options_t* filament_get_options(fclaw2d_global_t* glob);
 
 void filament_link_solvers(fclaw2d_global_t *glob);
 
-#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
-
-void RPN2_CONS_UPDATE(int* meqn, int* maux, int* idir,
-                      double q[], double aux[], double flux[]);
-
-
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

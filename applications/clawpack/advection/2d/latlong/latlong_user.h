@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef LATLONG_USER_H
 #define LATLONG_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/advection_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -52,12 +52,6 @@ typedef struct user_options
 user_options_t;
 
 void latlong_link_solvers(fclaw2d_global_t *glob);
-
-void latlong_patch_setup_manifold(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
-                                  int this_block_idx,
-                                  int this_patch_idx);
-
 
 user_options_t*  latlong_options_register (fclaw_app_t * app,
                                            const char *configfile);\

@@ -7,11 +7,14 @@
       double precision q(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
 
+      double precision tperiod
+      common /comvt/ tperiod
+
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
       integer i, j
       double precision vt, xll,yll, psi, pij, vtx,vty
-
-      double precision tperiod, pi2
-      common /comvt/ tperiod,pi2
 c
       if (tperiod .eq. 0.d0) then
 c        # special case --- indication that velocities specified in

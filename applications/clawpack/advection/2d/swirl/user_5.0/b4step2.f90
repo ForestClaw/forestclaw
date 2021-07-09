@@ -8,8 +8,11 @@ SUBROUTINE clawpack5_b4step2(mbc,mx,my,meqn,q, &
   DOUBLE PRECISION :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
   DOUBLE PRECISION :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-  DOUBLE PRECISION :: tperiod, pi2
-  COMMON /comvt/ tperiod,pi2
+  DOUBLE PRECISION :: pi, pi2
+  COMMON /compi/ pi, pi2
+
+  DOUBLE PRECISION :: tperiod
+  COMMON /comvt/ tperiod
 
   INTEGER :: i,j
   DOUBLE PRECISION :: xll,yll, psi, vt, vtx,vty,pij

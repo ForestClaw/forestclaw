@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TORUS_USER_H
 #define TORUS_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/advection_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -38,10 +38,6 @@ extern "C"
 
 #if 0
 #endif
-
-/* --------------------------
-   Headers for both versions
-   -------------------------- */
 
 typedef struct user_options
 {
@@ -57,9 +53,6 @@ typedef struct user_options
 }
 user_options_t;
 
-#define TORUS_SETPROB FCLAW_F77_FUNC(torus_setprob,TORUS_SETPROB)
-void TORUS_SETPROB();
-
 void torus_link_solvers(fclaw2d_global_t *glob);
 
 user_options_t* torus_options_register (fclaw_app_t * app,
@@ -68,6 +61,10 @@ user_options_t* torus_options_register (fclaw_app_t * app,
 void torus_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* torus_get_options(fclaw2d_global_t* glob);
+
+
+/* Torus needs special setaux, since streamfunction psi is defined in terms of
+   computational coordinates (xi,eta), rather than physical coordinates */
 
 /* ----------------------
    Clawpack 4.6 headers

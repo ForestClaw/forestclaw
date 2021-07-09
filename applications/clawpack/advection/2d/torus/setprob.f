@@ -1,4 +1,4 @@
-      subroutine torus_setprob()
+      subroutine setprob()
       implicit none
 
       double precision pi, pi2

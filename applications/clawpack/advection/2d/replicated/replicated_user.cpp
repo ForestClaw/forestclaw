@@ -26,20 +26,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "replicated_user.h"
 
-#if 0
-#include <fclaw2d_include_all.h>
+static
+void replicated_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = replicated_get_options(glob);
 
-/* Two versions of Clawpack */
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-#endif
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,"%-24d %s\n",user->example,"\% example");
+        fprintf(f,"%-24.4f %s\n",user->uvel,"\% uvel");
+        fprintf(f,"%-24.4f %s\n",user->vvel,"\% vvel");
+        fprintf(f,"%-24.4f %s\n",user->revs_per_s,"\% revs_per_s");
+        fclose(f);
+    }
 
-#include "../all/advection_user.h"
+    /* Make sure that node 0 has written `setprob.data` before proceeding */
+    fclaw2d_domain_barrier(glob->domain);
+
+    SETPROB();  /* Reads file created above */
+}
 
 void replicated_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt();
-
     vt->problem_setup = &replicated_problem_setup; 
 
     const user_options_t* user = replicated_get_options(glob);
@@ -50,12 +60,6 @@ void replicated_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
         claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
         claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
-
-#if 0
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
-#endif        
     }
     else if (user->claw_version == 5)
     {
@@ -64,21 +68,7 @@ void replicated_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
-
-#if 0
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;        
-#endif        
     }
-}
-
-void replicated_problem_setup(fclaw2d_global_t* glob)
-{
-    const user_options_t* user = replicated_get_options(glob);
-
-    int example = user->example;  /* Macros don't expand properly without this */
-    REPLICATED_SETPROB(&example);    
 }
 
 

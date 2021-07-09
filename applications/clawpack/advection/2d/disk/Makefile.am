@@ -13,6 +13,7 @@ applications_clawpack_advection_2d_disk_disk_SOURCES = \
 	applications/clawpack/advection/2d/disk/setprob.f \
 	applications/clawpack/advection/2d/disk/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/disk/user_5.0/qinit.f90 \
+	applications/clawpack/advection/2d/all/advection_user.cpp \
 	applications/clawpack/advection/2d/all/fclaw2d_map_pillowdisk.c \
 	applications/clawpack/advection/2d/all/fclaw2d_map_pillowdisk5.c \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \

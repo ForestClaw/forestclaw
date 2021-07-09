@@ -25,51 +25,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "filament_user.h"
 
-#include "../all/advection_user.h"
-
-
 static
-void filament_patch_setup_manifold(fclaw2d_global_t *glob,
-                                   fclaw2d_patch_t *patch,
-                                   int blockno,
-                                   int patchno)
+void filament_patch_setup(fclaw2d_global_t *glob,
+                          fclaw2d_patch_t *patch,
+                          int blockno,
+                          int patchno)
 {
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    double *xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-    
-    int maux;
-    double* aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
-
     const user_options_t* user = filament_get_options(glob);
-    if (user->claw_version == 4)
-    {
-        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                               &dx,&dy,&maux,aux,&blockno,
-                               xd,yd,zd,area);
-    }
-    else if (user->claw_version == 5)
-    {
-        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                              &dx,&dy,&maux,aux,&blockno,
-                              xd,yd,zd,area);
-    }
+    advection_patch_setup_manifold(glob,patch,blockno,patchno,
+                                   user->claw_version); 
 }
 
 void filament_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t* user = filament_get_options(glob);
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    if (fclaw_opt->manifold)
+    {
+        fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+        patch_vt->setup = filament_patch_setup;        
+    }
 
+    const user_options_t* user = filament_get_options(glob);
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
@@ -77,12 +54,8 @@ void filament_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_setprob   = &SETPROB;
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
 
-        patch_vt->setup = fc2d_clawpack46_setaux;
-
         if (fclaw_opt->manifold)
         {
-            patch_vt->setup           = &filament_patch_setup_manifold;
-
             clawpack46_vt->fort_rpn2  = &CLAWPACK46_RPN2ADV_MANIFOLD;
             clawpack46_vt->fort_rpt2  = &CLAWPACK46_RPT2ADV_MANIFOLD;
         }
@@ -103,10 +76,8 @@ void filament_link_solvers(fclaw2d_global_t *glob)
         
         if (fclaw_opt->manifold)
         {
-            patch_vt->setup       = filament_patch_setup_manifold;
             claw5_vt->fort_rpn2   = CLAWPACK5_RPN2ADV_MANIFOLD;
             claw5_vt->fort_rpt2   = CLAWPACK5_RPT2ADV_MANIFOLD;
-
         }
         else
         {

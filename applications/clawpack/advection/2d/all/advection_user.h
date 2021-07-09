@@ -30,28 +30,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch_pillow.h>
 
-/* FORTRAN headers are not needed here, but generally needed in the
-   advection examples and are included here for convenience */
+/* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
-#include <fclaw2d_clawpatch46_fort.h>
-#include <fclaw2d_clawpatch5_fort.h>
 
+/* Clawpack 4.6 headers */
 #include <fc2d_clawpack46.h>  
 #include <fc2d_clawpack46_options.h>
+#include <fc2d_clawpack46_fort.h>  
+#include <clawpack46_user_fort.h>  
+#include <fclaw2d_clawpatch46_fort.h>
 
+
+/* Clawpack 5.0 headers */
 #include <fc2d_clawpack5.h>
 #include <fc2d_clawpack5_options.h>
-
-#include <fc2d_clawpack46_fort.h>  
 #include <fc2d_clawpack5_fort.h>
-
-#include <clawpack46_user_fort.h>  
 #include <clawpack5_user_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
 
+
+/* Headers for common FORTRAN files */
 #include "advection_user_fort.h"
+
+
+/* Common patch setup - this calls a common SETAUX routine that sets 
+   velocities based on a streamfunction */
+
+void advection_patch_setup_manifold(fclaw2d_global_t *glob,
+                                    fclaw2d_patch_t *patch,
+                                    int block,
+                                    int patchno,
+                                    int claw_version);
+
 
 #ifdef __cplusplus
 extern "C"
@@ -60,6 +73,12 @@ extern "C"
 }
 #endif
 #endif
+
+
+/* -------------------------------------- No map -------------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
 
 /* --------------------------------- Square mappings ---------------------------------- */
 

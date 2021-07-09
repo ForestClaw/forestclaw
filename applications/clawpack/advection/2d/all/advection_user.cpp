@@ -23,46 +23,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef DISK_USER_H
-#define DISK_USER_H
+#include "advection_user.h"
 
-#include "../all/advection_user.h"
 
-#ifdef __cplusplus
-extern "C"
+void advection_patch_setup_manifold(fclaw2d_global_t *glob,
+                                    fclaw2d_patch_t *patch,
+                                    int block,
+                                    int patchno,
+                                    int claw_version)
 {
-#if 0
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *xd,*yd,*zd,*area;
+    double *xp,*yp,*zp;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+                                  &xd,&yd,&zd,&area);
+
+    int maux;
+    double *aux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+
+    if (claw_version == 4)
+        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                               &dx,&dy,&maux,aux,&block,
+                               xd,yd,zd,area);
+
+    else if (claw_version == 5)
+        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                              &dx,&dy,&maux,aux,&block,
+                              xd,yd,zd,area);
 }
-#endif
-#endif
-
-typedef struct user_options
-{
-    int example;
-    double alpha;
-    int claw_version;
-
-    fclaw_options_t* gparms;   /* Need to check mx */
-
-    int is_registered;
-
-} user_options_t;
 
 
-user_options_t* disk_options_register (fclaw_app_t * app,
-                                       const char *configfile);
 
-void disk_options_store (fclaw2d_global_t* glob, user_options_t* user_opt);
 
-const user_options_t* disk_get_options(fclaw2d_global_t* glob);
-
-void disk_link_solvers(fclaw2d_global_t *glob);
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif
-
-#endif

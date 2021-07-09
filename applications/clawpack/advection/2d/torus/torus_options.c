@@ -70,12 +70,6 @@ torus_check(user_options_t *user)
                                     "claw-version == 5\n");
             return FCLAW_EXIT_QUIET;
         }
-        if (user->color_equation == 0)
-        {
-            fclaw_global_essentialf("Transport equation (color_equation == 0) not "\
-                                    "implemented in claw-version == 5\n");
-            return FCLAW_EXIT_QUIET;            
-        }
     }
     return FCLAW_NOEXIT;
 
