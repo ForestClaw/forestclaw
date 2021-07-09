@@ -3,9 +3,6 @@
 
       double precision th, lambda
 
-      integer refine_criteria
-      common /com_refine/ refine_criteria
-
       double precision kappa,tfinal
       common /windparms/ kappa,tfinal
 

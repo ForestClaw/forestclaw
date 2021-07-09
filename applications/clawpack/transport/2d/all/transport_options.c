@@ -44,9 +44,6 @@ transport_register (user_options_t* user, sc_options_t * opt)
                         "[user] 0 for cubed sphere, "    \
                         "1 for pillowgrid [0]");
 
-    sc_options_add_int (opt, 0, "refine-criteria", &user->refine_criteria, 0,
-                        "[user] Refinement criteria [0]");
-
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4, "claw-version [4]");
 
     user->is_registered = 1;

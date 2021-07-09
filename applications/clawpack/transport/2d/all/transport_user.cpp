@@ -27,22 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void transport_problem_setup(fclaw2d_global_t* glob)
 {
-#if 0
-    const user_options_t* user = transport_get_options(glob);
-
-    if (glob->mpirank == 0)
-    {
-        FILE *f = fopen("setprob.data","w");
-        fprintf(f,"%-24d %s\n",user->refine_criteria,"\% refine_criteria");
-        fclose(f);
-    }
-#endif    
-
-    /* We want to make sure node 0 gets here before proceeding */
-#ifdef FCLAW_ENABLE_MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
-
     SETPROB();
 }
 

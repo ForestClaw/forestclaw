@@ -43,8 +43,6 @@ typedef struct user_options
 
     int mapping;
 
-    int refine_criteria;
-
     int claw_version;
     int is_registered;
 
