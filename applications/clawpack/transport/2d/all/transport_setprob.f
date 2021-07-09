@@ -1,4 +1,4 @@
-      subroutine transport_setprob()
+      subroutine setprob()
       implicit none
 
       double precision th, lambda
@@ -27,17 +27,12 @@
       pi = 4.d0*atan(1.d0)
       pi2 = 2*pi
 
-      open(10,file='setprob.data')
-      read(10,*) refine_criteria;
-      close(10)
-
 c     # These govern the wind speed; don't change final time here
 c     # but rather use configuration tfinal.  This is really just
 c     # a parameter and determines when the flow condition returns
 c     # to its initial position.
       kappa = 2.0
       tfinal = 5.0
-
 
 c     # -------------------------------------------------
 c     # Locations for cosine bell, Gaussian or slotted disks

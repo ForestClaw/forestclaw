@@ -43,7 +43,7 @@ void transport_problem_setup(fclaw2d_global_t* glob)
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
-    TRANSPORT_SETPROB();
+    SETPROB();
 }
 
 static
