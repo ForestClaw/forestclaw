@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-logical(kind=4) function fclaw2d_clawpatch_gradient_exceeds_th(blockno,& 
+integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno,& 
                                      qval,qmin,qmax,quad, & 
                                      dx,dy,xc,yc,threshold, &
                                      init_flag, is_ghost)
@@ -23,12 +23,12 @@ logical(kind=4) function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
     integer :: fclaw2d_map_is_used
 
     double precision :: clawpatch_gradient_dot
-    logical :: refine
+    integer :: refine
     integer :: m
 
     if (is_ghost) then
-!!      # quad may have uninitialized values.  Don't refine.
-        fclaw2d_clawpatch_gradient_exceeds_th = .false.
+!!      # quad may have uninitialized values.  Test is inconclusive
+        fclaw2d_clawpatch_gradient_exceeds_th = -1
         return
     endif
 
@@ -40,7 +40,7 @@ logical(kind=4) function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
     dqx = (quad(1,0) - quad(-1,0))/dx2
     dqy = (quad(0,1) - quad(0,-1))/dy2
 
-    refine = .false.
+    refine = 0
     if (fclaw2d_map_is_used(cont) .ne. 0) THEN
         CALL fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
         CALL fclaw2d_map_c2m(cont,blockno,xc+dx,yc,xpp,ypp,zpp)
@@ -81,7 +81,7 @@ logical(kind=4) function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
     ds = sqrt(clawpatch_gradient_dot(grad,grad))
 
     if (ds .gt. threshold) then
-        refine = .true.
+        refine = 1
     endif
 
     fclaw2d_clawpatch_gradient_exceeds_th = refine

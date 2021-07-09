@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-logical function fclaw2d_clawpatch_minmax_exceeds_th(blockno,& 
+integer function fclaw2d_clawpatch_minmax_exceeds_th(blockno,& 
                                      qval,qmin,qmax,quad, & 
                                      dx,dy,xc,yc,threshold, &
                                      init_flag, is_ghost)
@@ -9,14 +9,15 @@ logical function fclaw2d_clawpatch_minmax_exceeds_th(blockno,&
     double precision :: qval,qmin,qmax,threshold
     double precision :: quad(-1:1,-1:1)
     double precision :: dx,dy, xc, yc
-    integer :: blockno, is_ghost, init_flag
+    integer :: blockno, init_flag
+    logical(kind=4) :: is_ghost
 
-    logical :: refine
+    integer :: refine
 
-    refine = .false.
+    refine = 0
 
     if (qmax-qmin .gt. threshold) then
-        refine = .true.
+        refine = 1
     endif
 
     fclaw2d_clawpatch_minmax_exceeds_th = refine

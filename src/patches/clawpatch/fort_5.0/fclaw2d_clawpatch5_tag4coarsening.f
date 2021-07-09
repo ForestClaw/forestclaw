@@ -65,7 +65,7 @@ c     # not be coarsened.
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision xc,yc,quad(-1:1,-1:1), qval
-      logical exceeds_th, fclaw2d_clawpatch_exceeds_threshold
+      integer exceeds_th, fclaw2d_clawpatch_exceeds_threshold
 
       integer i,j, ii, jj
 
@@ -89,7 +89,13 @@ c     # not be coarsened.
             exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
      &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
      &             coarsen_threshold, init_flag, is_ghost)
-            if (exceeds_th) then
+
+c           # -1 : Not conclusive (possibly ghost cell); don't tag for coarsening
+c           # 0  : Does not pass threshold (tag for coarsening)      
+c           # 1  : Passes threshold (do not tag for coarsening)
+c           # exceeds_th = -1 is ignored here (logic of regridding seems
+c           # to over-refine.  Not clear why.)
+            if (exceeds_th .gt. 0) then
 c              # This patch exceeds coarsen threshold and so 
 c              # should not be coarsened.   
                tag_patch = 0

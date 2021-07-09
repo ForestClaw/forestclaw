@@ -12,7 +12,7 @@
       integer i,j, mq
       double precision qmin, qmax
 
-      logical exceeds_th, fclaw2d_clawpatch_exceeds_threshold
+      integer exceeds_th, fclaw2d_clawpatch_exceeds_threshold
       integer ii,jj
       double precision xc,yc,quad(-1:1,-1:1), qval
 
@@ -46,8 +46,10 @@ c     # and the corresponding tag4coarsening routine.
             exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
      &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
      &             tag_threshold,init_flag, is_ghost)
-            if (exceeds_th) then
-c              # Refine this patch               
+c           # -1 : Not conclusive (possibly ghost cell); don't tag for refinement
+c           # 0  : Does not pass threshold (don't tag for refinement)      
+c           # 1  : Passes threshold (tag for refinement)
+            if (exceeds_th .gt. 0) then
                tag_patch = 1
                return
             endif

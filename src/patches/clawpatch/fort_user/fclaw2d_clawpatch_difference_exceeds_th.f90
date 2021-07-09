@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-logical function fclaw2d_clawpatch_difference_exceeds_th(blockno,& 
+integer function fclaw2d_clawpatch_difference_exceeds_th(blockno,& 
                                      qval,qmin,qmax,quad, & 
                                      dx,dy,xc,yc,threshold,&
                                      init_flag, is_ghost)
@@ -13,11 +13,11 @@ logical function fclaw2d_clawpatch_difference_exceeds_th(blockno,&
     logical(kind=4) :: is_ghost
 
     double precision :: dqx, dqy, dq
-    logical :: refine
+    integer :: refine
 
     if (is_ghost) then
-!!      # quad likely has uninitialized values. Don't refine
-        fclaw2d_clawpatch_difference_exceeds_th = .false.
+!!      # quad may have uninitialized values;  test inconclusive
+        fclaw2d_clawpatch_difference_exceeds_th = -1
         return
     endif
 
@@ -25,9 +25,9 @@ logical function fclaw2d_clawpatch_difference_exceeds_th(blockno,&
     dqy = abs(quad(0,1) - quad(0,-1))
     dq  = max(dqx, dqy)
 
-    refine = .false.
+    refine = 0
     if (dq .gt. threshold) then
-        refine = .true.
+        refine = 1
     endif
 
     fclaw2d_clawpatch_difference_exceeds_th = refine

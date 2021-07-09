@@ -63,7 +63,7 @@ c     # that doesn't pass the coarsening test.
 
       integer i,j, ii, jj
 
-      logical exceeds_th, fclaw2d_clawpatch_exceeds_threshold
+      integer exceeds_th, fclaw2d_clawpatch_exceeds_threshold
       logical(kind=4) :: is_ghost, fclaw2d_clawpatch46_is_ghost
 
       do i = 1-mbc,mx+mbc
@@ -84,9 +84,14 @@ c     # that doesn't pass the coarsening test.
             exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
      &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
      &             coarsen_threshold, init_flag, is_ghost)
-            if (exceeds_th) then
-c              # This patch exceeds coarsen threshold and so 
-c              # should not be coarsened.   
+            
+c           # -1 : Not conclusive (possibly ghost cell) (do not tag for coarsening)
+c           # 0  : Does not pass threshold (tag for coarsening)      
+c           # 1  : Passes threshold (do not tag for coarsening)
+c           # Note : exceeds_th = -1 leads to over-refining, so it is 
+c           # ignored here.  Logic of regridding (coarsening then 
+c           # refining) isn't clear.
+            if (exceeds_th .gt. 0) then
                tag_patch = 0
                return
             endif
