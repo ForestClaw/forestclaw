@@ -1,5 +1,4 @@
 set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/2d/all)
-set(advection_all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(correlatedcb_f OBJECT 
   cosine_bell.f 
@@ -10,28 +9,27 @@ add_library(correlatedcb_f OBJECT
   ${all}/velocity_wind.f 
   ${all}/user46_b4step2_manifold.f 
   ${all}/user5_b4step2_manifold.f90 
-  ${advection_all}/user46_setaux_manifold.f 
-  ${advection_all}/user5_setaux_manifold.f90 
-  ${advection_all}/clawpack46_rpn2adv_manifold.f 
-  ${advection_all}/clawpack46_rpt2adv_manifold.f 
-  ${advection_all}/clawpack5_rpn2adv_manifold.f90 
-  ${advection_all}/clawpack5_rpt2adv_manifold.f90
+  ${all}/user46_setaux_manifold.f 
+  ${all}/user5_setaux_manifold.f90 
+  ${all}/clawpack46_rpn2adv_manifold.f 
+  ${all}/clawpack46_rpt2adv_manifold.f 
+  ${all}/clawpack5_rpn2adv_manifold.f90 
+  ${all}/clawpack5_rpt2adv_manifold.f90
 )
 
 add_executable(correlatedcb 
   correlatedcb.cpp 
+  correlatedcb_user.cpp 
+  correlatedcb_options.c 
   ${all}/fclaw2d_map_cubedsphere.c 
   ${all}/fclaw2d_map_pillowsphere.c 
   ${all}/transport_user.cpp 
-  ${all}/transport_domain.c 
-  ${all}/transport_options.c 
   $<TARGET_OBJECTS:correlatedcb_f>
 )
 
 target_include_directories(correlatedcb PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${all}
-  ${advection_all}
 )
 
 target_link_libraries(correlatedcb PRIVATE 

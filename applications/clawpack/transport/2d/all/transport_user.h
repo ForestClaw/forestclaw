@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch5_fort.h>
 
 #include "transport_user_fort.h"
-#include "transport_options.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -72,6 +71,20 @@ struct fclaw2d_patch;
 struct fclaw2d_domain;
 
 
+void transport_patch_setup_manifold(fclaw2d_global_t *glob,
+                                    fclaw2d_patch_t *patch,
+                                    int blockno,
+                                    int patchno,
+                                    int claw_version);
+
+void transport_b4step2_manifold(fclaw2d_global_t *glob,
+                                fclaw2d_patch_t *patch,
+                                int blockno,
+                                int patchno,
+                                double t,
+                                double dt,
+                                int claw_version);
+
 /* --------------------------------- Square mappings ---------------------------------- */
 
 fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
@@ -84,9 +97,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double alpha);
 
+#if 0
 fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
                                                    const double shift[],
                                                    const double alpha);
+#endif                                                   
   
 fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
                                                 const double scale[],
@@ -134,33 +149,6 @@ void transport_problem_setup(fclaw2d_global_t* glob);
 #endif                        
 
 void transport_link_solvers(struct fclaw2d_global *glob);
-
-#define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
-void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
-                             const double* dx, const double* dy,
-                             const double* t, const int* maux, double aux[],
-                             const int* blockno,
-                             double xd[], double yd[], double zd[]);
-
-#define USER5_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user5_b4step2_manifold,USER5_B4STEP2_MANIFOLD)
-void USER5_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
-                            const double* dx, const double* dy,
-                            const double* t, const int* maux, double aux[],
-                            const int* blockno,
-                            double xd[], double yd[], double zd[]);
-
-#define USER_EXCEEDS_THRESHOLD FCLAW_F77_FUNC(user_exceeds_threshold, \
-                                              USER_EXCEEDS_THRESHOLD)
-
-int USER_EXCEEDS_THRESHOLD(int* blockno,
-                           double qval[], 
-                           double* qmin, double *qmax,
-                           double quad[], 
-                           double *dx, double *dy, 
-                           double *xc, double *yc, 
-                           int* tag_threshold, 
-                           int* init_flag,
-                           int* is_ghost);
 
 
 #ifdef __cplusplus

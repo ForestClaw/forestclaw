@@ -30,11 +30,11 @@ void transport_problem_setup(fclaw2d_global_t* glob)
     SETPROB();
 }
 
-static
-void transport_patch_setup(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *patch,
-                          int blockno,
-                          int patchno)
+void transport_patch_setup_manifold(fclaw2d_global_t *glob,
+                                    fclaw2d_patch_t *patch,
+                                    int blockno,
+                                    int patchno,
+                                    int claw_version)
 {
     if (fclaw2d_patch_is_ghost(patch))
         return;
@@ -52,22 +52,21 @@ void transport_patch_setup(fclaw2d_global_t *glob,
     double *aux;
     fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-    const user_options_t* user = transport_get_options(glob);
-    if (user->claw_version == 4)
+    if (claw_version == 4)
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                                &maux,aux,&blockno,xd,yd,zd,area);
-    else if(user->claw_version == 5)
+    else if(claw_version == 5)
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                               &maux,aux,&blockno,xd,yd,zd,area);
 }
 
-static
-void transport_b4step2(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *patch,
-                      int this_block_idx,
-                      int this_patch_idx,
-                      double t,
-                      double dt)
+void transport_b4step2_manifold(fclaw2d_global_t *glob,
+                                fclaw2d_patch_t *patch,
+                                int blockno,
+                                int patchno,
+                                double t,
+                                double dt,
+                                int claw_version)
 {
     int mx, my, mbc;
     double xlower,ylower, dx,dy;
@@ -82,53 +81,11 @@ void transport_b4step2(fclaw2d_global_t *glob,
     double *aux;
     fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-    const user_options_t* user = transport_get_options(glob);
-    if (user->claw_version == 4)
-    {
-        USER46_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&this_block_idx,xd,yd,zd);
-    }
-    else if (user->claw_version == 5)
-    {
-        USER5_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&this_block_idx,xd,yd,zd);
-    }
+    if (claw_version == 4)
+        USER46_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&blockno,xd,yd,zd);
+    
+    else if (claw_version == 5)
+        USER5_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&blockno,xd,yd,zd);
+    
 }
-
-void transport_link_solvers(fclaw2d_global_t *glob)
-{
-    /* Custom setprob */
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
-    vt->problem_setup  = &transport_problem_setup;  /* Version-independent */
-
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-    patch_vt->setup = &transport_patch_setup;  
-
-    const user_options_t* user = transport_get_options(glob);
-    if (user->example == 1)
-        fclaw2d_clawpatch_use_pillowsphere();
-
-
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
-
-        /* Time dependent velocities */
-        claw46_vt->b4step2        = transport_b4step2; 
-
-        claw46_vt->fort_qinit     = CLAWPACK46_QINIT;
-        claw46_vt->fort_rpn2      = CLAWPACK46_RPN2ADV_MANIFOLD;
-        claw46_vt->fort_rpt2      = CLAWPACK46_RPT2ADV_MANIFOLD;
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
-
-        /* Time dependent velocity field */
-        claw5_vt->b4step2        = transport_b4step2; 
-
-        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-        claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;        
-    }
-}
-
 

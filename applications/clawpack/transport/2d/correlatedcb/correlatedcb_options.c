@@ -23,18 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "transport_options.h"
-
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch_options.h>
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack46.h>
+#include "correlatedcb_user.h"
 
 static int s_user_options_package_id = -1;
 
 static void *
-transport_register (user_options_t* user, sc_options_t * opt)
+correlatedcb_register (user_options_t* user, sc_options_t * opt)
 {
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 0 for cubed sphere, "    \
@@ -51,7 +45,7 @@ transport_register (user_options_t* user, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-transport_postprocess(user_options_t *user)
+correlatedcb_postprocess(user_options_t *user)
 {
     /* nothing to post-process  */
     return FCLAW_NOEXIT;
@@ -59,7 +53,7 @@ transport_postprocess(user_options_t *user)
 
 
 static fclaw_exit_type_t
-transport_check (user_options_t *user)
+correlatedcb_check (user_options_t *user)
 {
     if (user->mapping < 0 || user->mapping > 1) {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
@@ -69,7 +63,7 @@ transport_check (user_options_t *user)
 }
 
 static void
-    transport_destroy(user_options_t* user)
+    correlatedcb_destroy(user_options_t* user)
 {
     /* Nothing to destroy */
 }
@@ -86,7 +80,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 
     user = (user_options_t*) package;
 
-    return transport_register(user,opt);
+    return correlatedcb_register(user,opt);
 }
 
 static fclaw_exit_type_t
@@ -103,7 +97,7 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
     FCLAW_ASSERT(user->is_registered);
 
     /* Convert strings to arrays */
-    return transport_postprocess (user);
+    return correlatedcb_postprocess (user);
 }
 
 
@@ -118,7 +112,7 @@ options_check(fclaw_app_t *app, void *package,void *registered)
 
     user = (user_options_t*) package;
 
-    return transport_check(user);
+    return correlatedcb_check(user);
 }
 
 static void
@@ -133,7 +127,7 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     user = (user_options_t*) package;
     FCLAW_ASSERT (user->is_registered);
 
-    transport_destroy (user);
+    correlatedcb_destroy (user);
 
     FCLAW_FREE (user);
 }
@@ -148,7 +142,7 @@ static const fclaw_app_options_vtable_t options_vtable_user =
 
 /* ------------- User options access functions --------------------- */
 
-user_options_t* transport_options_register (fclaw_app_t * app,
+user_options_t* correlatedcb_options_register (fclaw_app_t * app,
                                              const char *configfile)
 {
     user_options_t *user;
@@ -162,14 +156,14 @@ user_options_t* transport_options_register (fclaw_app_t * app,
     return user;
 }
 
-void transport_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void correlatedcb_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(s_user_options_package_id == -1);
     int id = fclaw_package_container_add_pkg(glob,user);
     s_user_options_package_id = id;
 }
 
-const user_options_t* transport_get_options(fclaw2d_global_t* glob)
+const user_options_t* correlatedcb_get_options(fclaw2d_global_t* glob)
 {
     int id = s_user_options_package_id;
     return (user_options_t*) fclaw_package_get_options(glob, id);    

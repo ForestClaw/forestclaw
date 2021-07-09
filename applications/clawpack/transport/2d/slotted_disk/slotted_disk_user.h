@@ -26,25 +26,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SLOTTED_DISK_USER_H
 #define SLOTTED_DISK_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/transport_user.h"
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
-/* Header files are all listed in transport_user.h */
+typedef struct user_options
+{
+    int example;
+
+    int mapping;
+
+    int claw_version;
+    int is_registered;
+
+} user_options_t;
+
+const user_options_t* slotted_disk_get_options(fclaw2d_global_t* glob);
+
+user_options_t* slotted_disk_options_register (fclaw_app_t * app,
+                                             const char *configfile);
+
+void slotted_disk_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
 
 void slotted_disk_link_solvers(fclaw2d_global_t *glob);
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

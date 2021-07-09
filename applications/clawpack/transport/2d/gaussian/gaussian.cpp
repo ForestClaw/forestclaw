@@ -25,21 +25,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "gaussian_user.h"
 
-// #include "../all/transport_options.h"
-#include "../all/transport_user.h"
+static
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+                                fclaw_options_t* fclaw_opt,
+                                user_options_t* user_opt)
+{
+    /* Mapped, multi-block domain */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t         *domain;
+    fclaw2d_map_context_t    *cont = NULL;
 
+    /* Used locally */
+    double pi = M_PI;
+    double rotate[2];
 
-#if 0
-#include <fclaw2d_include_all.h>
+    rotate[0] = pi*fclaw_opt->theta/180.0;
+    rotate[1] = 0;
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+    switch (user_opt->mapping) {
+    case 0:
+        conn = p4est_connectivity_new_cubed();
+        cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale,fclaw_opt->shift,rotate);
+        break;
+    case 1:
+        conn = p4est_connectivity_new_pillow();
+        cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,fclaw_opt->shift,rotate);
+        break;
+    default:
+        SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
+    }
 
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack5_options.h>
-#endif
+    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+    return domain;
+}
+
 
 static
 void run_program(fclaw2d_global_t* glob)
@@ -51,7 +72,7 @@ void run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user_opt = transport_get_options(glob);
+    user_opt = gaussian_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
@@ -66,7 +87,7 @@ void run_program(fclaw2d_global_t* glob)
         fc2d_clawpack5_solver_initialize();
     }
 
-    transport_link_solvers(glob);
+    gaussian_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run
@@ -105,7 +126,7 @@ main (int argc, char **argv)
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    user_opt =                 transport_options_register(app,"fclaw_options.ini");  
+    user_opt =                 gaussian_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -117,7 +138,7 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
         
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = transport_create_domain(mpicomm, fclaw_opt, user_opt);
+        domain = create_domain(mpicomm, fclaw_opt, user_opt);
     
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();
@@ -128,7 +149,7 @@ main (int argc, char **argv)
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
-        transport_options_store          (glob, user_opt);
+        gaussian_options_store          (glob, user_opt);
 
         /* Run the program */     
         run_program(glob);

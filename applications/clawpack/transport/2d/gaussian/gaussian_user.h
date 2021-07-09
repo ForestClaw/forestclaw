@@ -26,22 +26,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef GAUSSIAN_USER_H
 #define GAUSSIAN_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <../all/transport_user.h>
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
-/* Header files are listed in ../all/transport_user.h */
+typedef struct user_options
+{
+    int example;
+
+    int mapping;
+
+    int claw_version;
+    int is_registered;
+
+} user_options_t;
+
+void gaussian_link_solvers(struct fclaw2d_global *glob);
+
+
+const user_options_t* gaussian_get_options(fclaw2d_global_t* glob);
+
+user_options_t* gaussian_options_register (fclaw_app_t * app,
+                                             const char *configfile);
+
+void gaussian_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

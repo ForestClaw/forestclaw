@@ -34,6 +34,33 @@ extern "C"
 #endif
 #endif
 
+#define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
+void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
+                             const double* dx, const double* dy,
+                             const double* t, const int* maux, double aux[],
+                             const int* blockno,
+                             double xd[], double yd[], double zd[]);
+
+#define USER5_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user5_b4step2_manifold,USER5_B4STEP2_MANIFOLD)
+void USER5_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
+                            const double* dx, const double* dy,
+                            const double* t, const int* maux, double aux[],
+                            const int* blockno,
+                            double xd[], double yd[], double zd[]);
+
+#define USER_EXCEEDS_THRESHOLD FCLAW_F77_FUNC(user_exceeds_threshold, \
+                                              USER_EXCEEDS_THRESHOLD)
+
+int USER_EXCEEDS_THRESHOLD(int* blockno,
+                           double qval[], 
+                           double* qmin, double *qmax,
+                           double quad[], 
+                           double *dx, double *dy, 
+                           double *xc, double *yc, 
+                           int* tag_threshold, 
+                           int* init_flag,
+                           int* is_ghost);
+
 #define CLAWPACK46_RPN2ADV FCLAW_F77_FUNC(clawpack46_rpn2adv,CLAWPACK46_RPN2ADV)
 void CLAWPACK46_RPN2ADV(const int* ixy,const int* maxm, const int* meqn, 
                         const int* mwaves,
