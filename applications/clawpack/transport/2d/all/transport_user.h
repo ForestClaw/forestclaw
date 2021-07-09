@@ -135,16 +135,6 @@ void transport_problem_setup(fclaw2d_global_t* glob);
 
 void transport_link_solvers(struct fclaw2d_global *glob);
 
-
-#if 0
-#define TRANSPORT_SETPROB FCLAW_F77_FUNC(transport_setprob,TRANSPORT_SETPROB)
-void TRANSPORT_SETPROB(const double* kappa, const double* tfinal);
-#endif
-
-#define SETPROB FCLAW_F77_FUNC(setprob,SETPROB)
-void SETPROB();
-
-
 #define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
 void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
                              const double* dx, const double* dy,
