@@ -101,7 +101,6 @@ c     # ---------------------------------------------
       double precision x,y,t, u(2), vcart(3), derivs(4)
       integer flag
 
-
       call square_velocity_derivs(x,y,t, u,vcart,derivs,flag)
 
 c      if (flag .eq. 0) then

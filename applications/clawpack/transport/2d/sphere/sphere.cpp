@@ -25,9 +25,6 @@
 
 #include "sphere_user.h"
 
-#include "../../../advection/2d/all/advection_user.h"
-
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt,
@@ -50,7 +47,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         break;
     case 1:
         conn = p4est_connectivity_new_pillow();
-        cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale);
+        cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
+                                            rotate);
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */

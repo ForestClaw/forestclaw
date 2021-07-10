@@ -44,11 +44,13 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     switch (user_opt->mapping) {
     case 0:
         conn = p4est_connectivity_new_cubed();
-        cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale,fclaw_opt->shift,rotate);
+        cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale,
+                                           rotate);
         break;
     case 1:
         conn = p4est_connectivity_new_pillow();
-        cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,fclaw_opt->shift,rotate);
+        cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
+                                            rotate);
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */

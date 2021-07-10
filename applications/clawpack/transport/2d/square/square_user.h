@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SQUARE_USER_H
 #define SQUARE_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/transport_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -65,9 +65,6 @@ typedef struct user_options
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
-#define SQUARE_SETPROB FCLAW_F77_FUNC(square_setprob, SQUARE_SETPROB)
-void SQUARE_SETPROB();
-
 void square_link_solvers(struct fclaw2d_global *glob);
 
 /* ---------------------------------- Options ----------------------------------------- */
@@ -80,7 +77,7 @@ void square_options_store (fclaw2d_global_t* glob, user_options_t* user);
 user_options_t* square_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
-
+#if 0
 /* --------------------------------- Square mappings ---------------------------------- */
 
 fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
@@ -101,7 +98,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
                                                 const double scale[],
                                                 const double shift[],
                                                 const double center[]);
-
+#endif
 
 /* ---------------------------------- Compute Error ------------------------------------- */
 

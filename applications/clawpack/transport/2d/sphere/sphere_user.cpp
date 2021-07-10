@@ -25,10 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "sphere_user.h"
 
-#include <fclaw2d_block.h>
-
-#include "../../../advection/2d/all/advection_user.h"
-
 static
 void sphere_problem_setup(fclaw2d_global_t* glob)
 {
@@ -47,7 +43,7 @@ void sphere_problem_setup(fclaw2d_global_t* glob)
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
-    SPHERE_SETPROB();
+    SETPROB();
 }
 
 void sphere_patch_setup_manifold(fclaw2d_global_t *glob,

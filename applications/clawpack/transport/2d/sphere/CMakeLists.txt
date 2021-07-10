@@ -1,4 +1,4 @@
-set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/all)
+set(all ${PROJECT_SOURCE_DIR}/clawpack/transport/2d/all)
 
 add_library(sphere_transport_f OBJECT 
 	setprob.f 
@@ -22,7 +22,6 @@ add_library(sphere_transport_f OBJECT
 add_executable(sphere_transport
 	sphere.cpp 
 	sphere_user.cpp 
-	sphere_user.h 
 	sphere_options.c 
 	fclaw2d_map_cubedsphere.c 
 	fclaw2d_map_pillowsphere.c 

@@ -92,10 +92,11 @@ fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
     MAPC2M_PILLOWSPHERE(&blockno,&xc,&yc,xp,yp,zp);
 
     scale_map(cont,xp,yp,zp); 
+    rotate_map(cont,xp,yp,zp);
 }
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_pillowsphere(const double scale[])
+    fclaw2d_map_new_pillowsphere(const double scale[],const double rotate[])
 {
     fclaw2d_map_context_t *cont;
 
@@ -105,6 +106,7 @@ fclaw2d_map_context_t *
     cont->basis = fclaw2d_map_c2m_basis_pillowsphere;
     
     set_scale(cont,scale);
+    set_rotate(cont,rotate);
 
     return cont;
 }

@@ -25,13 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "square_user.h"
 
-
-
-#include <fclaw_base.h>  /* for MPI */
-
-#include "../../../advection/2d/all/advection_user.h"
-
-
 static
 void square_problem_setup(fclaw2d_global_t* glob)
 {
@@ -51,7 +44,7 @@ void square_problem_setup(fclaw2d_global_t* glob)
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
-    SQUARE_SETPROB();
+    SETPROB();
 
 
 }

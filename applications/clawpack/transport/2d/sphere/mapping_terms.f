@@ -108,35 +108,6 @@ c     # Compute covariant and derivatives
 
       end
 
-      double precision function map_divergence(x,y, t)
-      implicit none
-
-      double precision x,y, t
-
-      double precision u(2), vcart(3), derivs(4)
-      double precision D11, D22, g(2,2,2)
-      integer flag
-
-c     # Get g(i,j,k), g = \Gamma(i,j,k)
-      call velocity_derivs(x,y,t, u,vcart,derivs,flag)
-
-      if (flag .eq. 0) then
-c         # Velocity and derivatives are given in 
-c         # spherical components       
-          call map_christoffel_sym(x,y,g) 
-
-          D11 = derivs(1) + u(1)*g(1,1,1) + u(2)*g(1,2,1)
-          D22 = derivs(4) + u(1)*g(2,1,2) + u(2)*g(2,2,2)
-
-          map_divergence = D11 + D22
-      else
-c         # Velocity and derivatives are given in 
-c         # Cartesian components        
-          map_divergence = derivs(1) + derivs(2) + derivs(3)
-      endif
-
-      end
-
 
 c     # ----------------------------------------------------------------
 c     # Utility functions
@@ -146,7 +117,6 @@ c     # ----------------------------------------------------------------
       implicit none
 
       double precision u(3),v(3),uxv(3),w, map_dot
-      integer k
 
       uxv(1) =   u(2)*v(3) - u(3)*v(2)
       uxv(2) = -(u(1)*v(3) - u(3)*v(1))
@@ -217,7 +187,6 @@ c     # Contravariant vectors
       double precision t(3,2), tinv(3,2), tderivs(3,2,2)
       double precision t1(3), t2(3), t1n2, t2n2
       double precision t1x(3), t1y(3), t2x(3), t2y(3)
-      double precision t1n3, t2n3
       double precision map_dot, map_quotient_rule
       double precision t1n, t2n, dt1ndx, dt1ndy,dt2ndx,dt2ndy
       integer flag, k

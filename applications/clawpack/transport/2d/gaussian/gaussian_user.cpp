@@ -38,7 +38,8 @@ void gaussian_patch_setup_manifold(fclaw2d_global_t *glob,
                                     int patchno)
 {
     const user_options_t* user = gaussian_get_options(glob);
-    transport_patch_setup_manifold(glob,patch,blockno,patchno,user->claw_version);
+    transport_patch_setup_manifold(glob,patch,blockno,patchno,
+                                   user->claw_version);
 }
 
 static
@@ -50,7 +51,8 @@ void gaussian_b4step2_manifold(fclaw2d_global_t *glob,
                                double dt)
 {
     const user_options_t* user = gaussian_get_options(glob);
-    transport_b4step2_manifold(glob,patch,blockno,patchno,t,dt,user->claw_version);
+    transport_b4step2_manifold(glob,patch,blockno,patchno,t,dt,
+                               user->claw_version);
 }
 
 void gaussian_link_solvers(fclaw2d_global_t *glob)

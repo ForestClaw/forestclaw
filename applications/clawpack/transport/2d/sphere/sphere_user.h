@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SPHERE_USER_H
 #define SPHERE_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "transport_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -59,8 +59,10 @@ struct fclaw2d_patch;
 /* So syntax highlighting works */
 #endif
 
+#if 0
 #define SPHERE_SETPROB FCLAW_F77_FUNC(sphere_setprob, SPHERE_SETPROB)
 void SPHERE_SETPROB();
+#endif
 
 void sphere_link_solvers(struct fclaw2d_global *glob);
 
@@ -73,10 +75,12 @@ void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
 user_options_t* sphere_options_register (fclaw_app_t * app, const char *configfile);
 
 /* --------------------------------- Mappings ----------------------------------------- */
+#if 0
 fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[], 
                                                     const double rotate[]);
 
 fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere(const double scale[]);
+#endif
 
 /* --------------------------------- Riemann Problems --------------------------------- */
 void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);

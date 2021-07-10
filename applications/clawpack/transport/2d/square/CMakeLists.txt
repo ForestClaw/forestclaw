@@ -28,10 +28,10 @@ add_executable(square
 	square.cpp
 	square_user.cpp
 	square_options.c
-	fclaw2d_map_identity.c
-	fclaw2d_map_cart.c
-	fclaw2d_map_fivepatch.c
-	fclaw2d_map_bilinear.c
+	${all}/fclaw2d_map_identity.c
+	${all}/fclaw2d_map_cart.c
+	${all}/fclaw2d_map_fivepatch.c
+	${all}/fclaw2d_map_bilinear.c
   $<TARGET_OBJECTS:square_f>
 )
 

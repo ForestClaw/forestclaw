@@ -1,4 +1,4 @@
-      subroutine square_setprob()
+      subroutine setprob()
 
       implicit none
 

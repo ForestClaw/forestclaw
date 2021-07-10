@@ -10,10 +10,8 @@
 
       double precision f(3), fx(3), fy(3), fxx(3), fyy(3), fxy(3)
       double precision g(3), gx(3), gy(3), gxx(3), gyy(3), gxy(3)
-      double precision map_dot
 
-
-      integer k, kk, i
+      integer k, i
       logical compute_covariant, compute_contravariant
       logical compute_derivatives, b(32)
 

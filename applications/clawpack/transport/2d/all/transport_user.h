@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
-
 /* Clawpack 4.6 headers */
 #include <fc2d_clawpack46.h>  
 #include <fc2d_clawpack46_options.h>
@@ -56,9 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 #if 0
@@ -96,12 +92,6 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double alpha);
-
-#if 0
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
-                                                   const double shift[],
-                                                   const double alpha);
-#endif                                                   
   
 fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
                                                 const double scale[],
@@ -110,51 +100,13 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
 
 /* --------------------------------- Sphere mappings ---------------------------------- */
 
-/* 1 = cubed sphere domain; 2 - pillowgrid */
-struct fclaw2d_domain* transport_create_domain(sc_MPI_Comm mpicomm, 
-                                               struct fclaw_options* fclaw_opt,
-                                               struct user_options* user_opt);
-
 fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
-                                                     const double shift[],
                                                      const double rotate[]);
 
 fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
-                                                      const double shfit[],
                                                       const double rotate[]);
 
-
-#if 0
-void transport_patch_setup(struct fclaw2d_global *glob,
-                           struct fclaw2d_patch *patch,
-                           int blockno,
-                           int patchno);
-
-double transport_update(struct fclaw2d_global *glob,
-                        struct fclaw2d_patch *patch,
-                        int blockno,
-                        int patchno,
-                        double t,
-                        double dt);
-
-void transport_b4step2(struct fclaw2d_global *glob,
-                       struct fclaw2d_patch *patch,
-                       int blockno,
-                       int patchno,
-                       double t,
-                       double dt);
-
-void transport_problem_setup(fclaw2d_global_t* glob);
-
-#endif                        
-
-void transport_link_solvers(struct fclaw2d_global *glob);
-
-
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
