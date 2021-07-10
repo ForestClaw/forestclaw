@@ -137,6 +137,13 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double area[]);
 
 
+#define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
+void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
+                             const double* dx, const double* dy,
+                             const double* t, const int* maux, double aux[],
+                             const int* blockno,
+                             double xd[], double yd[], double zd[]);
+
 #define USER5_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user5_b4step2_manifold,USER5_B4STEP2_MANIFOLD)
 void USER5_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
                             const double* dx, const double* dy,

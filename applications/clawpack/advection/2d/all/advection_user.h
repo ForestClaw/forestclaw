@@ -56,6 +56,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "advection_user_fort.h"
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 /* Common patch setup - this calls a common SETAUX routine that sets 
    velocities based on a streamfunction */
 
@@ -65,15 +71,13 @@ void advection_patch_setup_manifold(fclaw2d_global_t *glob,
                                     int patchno,
                                     int claw_version);
 
-
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
+void advection_b4step2_manifold(fclaw2d_global_t *glob,
+                                fclaw2d_patch_t *patch,
+                                int blockno,
+                                int patchno,
+                                double t,
+                                double dt,
+                                int claw_version);
 
 /* -------------------------------------- No map -------------------------------------- */
 
@@ -161,9 +165,6 @@ fclaw2d_map_context_t *
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

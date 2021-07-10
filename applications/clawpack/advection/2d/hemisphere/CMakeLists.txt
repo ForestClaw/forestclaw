@@ -18,7 +18,7 @@ add_executable(hemisphere
   hemisphere.cpp 
   hemisphere_options.c 
   hemisphere_user.cpp 
-  ${all}/advection_user.cpp
+  ${all}/advection_patch_setup_manifold.c
   ${all}/fclaw2d_map_pillowsphere.c 
   ${all}/fclaw2d_map_pillowsphere5.c 
   $<TARGET_OBJECTS:hemisphere_f>

@@ -18,7 +18,7 @@ add_executable(annulus
   annulus_user.cpp 
   annulus.cpp 
   annulus_options.c
-  ${all}/advection_user.cpp
+  ${all}/advection_patch_setup_manifold.c
 	${all}/fclaw2d_map_annulus.c
   $<TARGET_OBJECTS:annulus_f>
 )

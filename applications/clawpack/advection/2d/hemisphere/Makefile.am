@@ -13,7 +13,7 @@ applications_clawpack_advection_2d_hemisphere_hemisphere_SOURCES = \
 	applications/clawpack/advection/2d/hemisphere/psi.f \
 	applications/clawpack/advection/2d/hemisphere/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/hemisphere/user_5.0/qinit.f90 \
-	applications/clawpack/advection/2d/all/advection_user.cpp \
+	applications/clawpack/advection/2d/all/advection_patch_setup_manifold.c \
 	applications/clawpack/advection/2d/all/fclaw2d_map_pillowsphere.c \
 	applications/clawpack/advection/2d/all/fclaw2d_map_pillowsphere5.c \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \

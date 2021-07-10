@@ -23,40 +23,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "advection_user.h"
+#ifndef CORRELATEDCB_USER_H
+#define CORRELATEDCB_USER_H
 
+#include "../all/advection_user.h"
 
-void advection_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
-                                    int block,
-                                    int patchno,
-                                    int claw_version)
+#ifdef __cplusplus
+extern "C"
 {
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+#endif
 
-    double *xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
 
-    int maux;
-    double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+typedef struct user_options
+{
+    int example;
 
-    if (claw_version == 4)
-        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                               &dx,&dy,&maux,aux,&block,
-                               xd,yd,zd,area);
+    int mapping;
 
-    else if (claw_version == 5)
-        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                              &dx,&dy,&maux,aux,&block,
-                              xd,yd,zd,area);
+    int claw_version;
+    int is_registered;
+
+} user_options_t;
+
+void correlatedcb_link_solvers(struct fclaw2d_global *glob);
+
+const user_options_t* correlatedcb_get_options(fclaw2d_global_t* glob);
+
+user_options_t* correlatedcb_options_register (fclaw_app_t * app,
+                                             const char *configfile);
+
+void correlatedcb_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
+
+#ifdef __cplusplus
 }
+#endif
 
-
-
-
+#endif

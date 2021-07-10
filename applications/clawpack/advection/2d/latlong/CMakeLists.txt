@@ -18,7 +18,7 @@ add_executable(latlong
   latlong.cpp 
   latlong_options.c 
   latlong_user.cpp 
-  ${all}/advection_user.cpp
+  ${all}/advection_patch_setup_manifold.c
   ${all}/fclaw2d_map_latlong.c 
   $<TARGET_OBJECTS:latlong_f>
 )

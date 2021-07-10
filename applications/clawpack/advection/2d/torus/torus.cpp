@@ -25,9 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "torus_user.h"
 
-#include "../all/advection_user.h"
-
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
@@ -94,13 +91,6 @@ void run_program(fclaw2d_global_t* glob)
     }
     else if (user->claw_version == 5)
     {
-        fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-        if (fclaw_opt->time_sync != 0)
-        {
-            fclaw_global_essentialf("Conservation correction not yet implemented in " \
-                                    " claw-version=5.\n");
-            exit(0);
-        }
         fc2d_clawpack5_solver_initialize();
     }
 
