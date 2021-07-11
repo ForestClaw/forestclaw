@@ -75,7 +75,7 @@ add_subdirectory(clawpack/advection/2d/slotted_disk)
 
 add_subdirectory(clawpack/transport/2d/sphere)
 add_subdirectory(clawpack/transport/2d/torus)
-#add_subdirectory(clawpack/transport/2d/square)
+add_subdirectory(clawpack/transport/2d/square)
 
 
 ## ----------------------------------------------------------
