@@ -31,7 +31,7 @@ add_executable(square
 	square_options.c
 	${all}/transport_patch_setup_manifold.c
 	${all}/transport_b4step2_manifold.c
-	${all}/transport46_set_velocity.f \
+	${all}/transport46_set_velocity.f
 	${all}/fclaw2d_map_identity.c
 	${all}/fclaw2d_map_cart.c
 	${all}/fclaw2d_map_fivepatch.c
