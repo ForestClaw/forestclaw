@@ -49,48 +49,18 @@ void torus_patch_setup(fclaw2d_global_t *glob,
                        int blockno,
                        int patchno)
 {
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    double *edgelengths,*area, *curvature;
-    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
-                                    &curvature);
-
-    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,patch,
-                                    &xnormals, &ynormals,
-                                    &xtangents, &ytangents,
-                                    &surfnormals);
-
-    double *xp, *yp, *zp, *xd, *yd, *zd;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    int maux;
-    double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     const user_options_t* user = torus_get_options(glob);
-    if (user->claw_version == 4)
-    {
-        /* Handles both non-conservative (ex 1-2) and conservative (ex 3-4) forms */
-        FCLAW_ASSERT(maux == 7);
-        TORUS46_SETAUX(&mbc,&mx,&my,&xlower,&ylower,
-                       &dx,&dy,&maux,aux,&blockno,
-                       area, edgelengths,xnormals,ynormals, 
-                       surfnormals);        
-    }
-    else if (user->claw_version == 5)
-    {
-        fclaw_global_essentialf("Not yet implemented for version 5");
-#if 0
-        /* Only works for advection in non-conservative form */
-        fc2d_clawpack5_setaux(glob,patch,blockno,patchno);
-        fc2d_clawpack5_set_capacity(glob,patch,blockno,patchno);
-#endif        
-    }
+    transport_patch_setup_manifold(glob,patch,blockno,patchno,
+                                   user->claw_version);
+
+    /* Torus velocity field is not time dependent, so we can set up the 
+       velocity here, using b4step */
+
+    double t = 0;
+    double dt = -1;    /* Not used */
+    transport_b4step2_manifold(glob,patch,blockno,patchno,t, dt,
+                               user->claw_version);
 }
 
 

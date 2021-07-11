@@ -13,16 +13,15 @@ applications_clawpack_transport_2d_torus_torus_SOURCES = \
 	applications/clawpack/transport/2d/torus/fdisc.f \
 	applications/clawpack/transport/2d/torus/fclaw2d_map_torus.c \
 	applications/clawpack/transport/2d/torus/user_4.6/qinit.f \
-	applications/clawpack/transport/2d/torus/user_4.6/torus46_setaux.f \
+	applications/clawpack/transport/2d/torus/user_5.0/qinit.f90 \
+	applications/clawpack/transport/2d/all/transport_patch_setup_manifold.c \
+	applications/clawpack/transport/2d/all/transport_b4step2_manifold.c \
+	applications/clawpack/transport/2d/all/clawpatch46_setaux_manifold.f \
+	applications/clawpack/transport/2d/all/transport46_set_velocity.f \
+	applications/clawpack/transport/2d/torus/user_5.0/torus5_setaux.f90 \
 	applications/clawpack/transport/2d/torus/user_4.6/rpn2cons_fw_manifold.f \
     applications/clawpack/transport/2d/torus/user_4.6/rpt2cons_manifold.f \
-	applications/clawpack/transport/2d/torus/user_4.6/rpn2cons_update_manifold.f \
-	applications/clawpack/transport/2d/torus/user_5.0/qinit.f90 \
-	applications/clawpack/transport/2d/torus/user_5.0/torus5_setaux.f90 \
-	applications/clawpack/transport/2d/all/clawpack46_rpn2adv_manifold.f \
-	applications/clawpack/transport/2d/all/clawpack46_rpt2adv_manifold.f \
-	applications/clawpack/transport/2d/all/clawpack5_rpn2adv_manifold.f90 \
-	applications/clawpack/transport/2d/all/clawpack5_rpt2adv_manifold.f90
+	applications/clawpack/transport/2d/torus/user_4.6/rpn2cons_update_manifold.f
 
 
 EXTRA_DIST += \

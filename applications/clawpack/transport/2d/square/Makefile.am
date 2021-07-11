@@ -17,24 +17,24 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/square_basis.f \
 	applications/clawpack/transport/2d/square/mapping_terms.f \
 	applications/clawpack/transport/2d/square/square_velocity.f \
-	applications/clawpack/transport/2d/square/rpn2cons_update_manifold.f \
 	applications/clawpack/transport/2d/square/qexact.f \
 	applications/clawpack/transport/2d/square/dopri5.f \
 	applications/clawpack/transport/2d/square/user_4.6/qinit.f \
 	applications/clawpack/transport/2d/square/user_5.0/qinit.f \
-	applications/clawpack/transport/2d/all/transport_patch_setup_manifold.c \
-	applications/clawpack/transport/2d/all/transport_b4step2_manifold.c \
-	applications/clawpack/transport/2d/all/clawpatch46_setaux_manifold.f \
-	applications/clawpack/transport/2d/all/transport46_set_velocity.f \
 	applications/clawpack/transport/2d/square/user_4.6/square_output.f \
 	applications/clawpack/transport/2d/square/user_4.6/compute_error.f \
-	applications/clawpack/transport/2d/square/user_4.6/rpn2cons_fw_manifold.f \
-	applications/clawpack/transport/2d/square/user_4.6/rpt2cons_manifold.f \
 	applications/clawpack/transport/2d/square/user_5.0/square_output.f \
 	applications/clawpack/transport/2d/square/user_5.0/compute_error.f \
 	applications/clawpack/transport/2d/square/user_5.0/square_setaux.f \
 	applications/clawpack/transport/2d/square/user_5.0/rpn2cons_fw_manifold.f \
-	applications/clawpack/transport/2d/square/user_5.0/rpt2cons_manifold.f
+	applications/clawpack/transport/2d/square/user_5.0/rpt2cons_manifold.f \
+	applications/clawpack/transport/2d/all/transport_patch_setup_manifold.c \
+	applications/clawpack/transport/2d/all/transport_b4step2_manifold.c \
+	applications/clawpack/transport/2d/all/clawpatch46_setaux_manifold.f \
+	applications/clawpack/transport/2d/all/transport46_set_velocity.f \
+	applications/clawpack/transport/2d/all/clawpack46_rpn2cons_fw_manifold.f \
+	applications/clawpack/transport/2d/all/clawpack46_rpt2cons_manifold.f \
+	applications/clawpack/transport/2d/all/rpn2cons_update_manifold.f
 
 EXTRA_DIST += \
 	applications/clawpack/transport/2d/square/fclaw_options.ini \

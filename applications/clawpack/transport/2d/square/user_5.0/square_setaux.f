@@ -15,8 +15,6 @@
       integer i,j
       double precision dxdy, xc1, yc1
 
-c      include "metric_terms.i"
-
 c     # ----------------------------------------------------------------
 c     # Color equation (edge velocities)
 c     # 1      capacity

@@ -6,12 +6,12 @@ add_library(torus_transport_f OBJECT
   torus_psi.f 
   fdisc.f 
   user_4.6/qinit.f 
-  user_4.6/torus46_setaux.f 
-  user_4.6/rpn2cons_fw_manifold.f 
-  user_4.6/rpt2cons_manifold.f 
-  user_4.6/rpn2cons_update_manifold.f 
+  ${all}/clawpatch46_setaux_manifold.f
+  ${all}/transport46_set_velocity.f
+  ${all}/clawpack46_rpn2cons_fw_manifold.f 
+  ${all}/clawpack46_rpt2cons_manifold.f 
+  ${all}/rpn2cons_update_manifold.f 
   user_5.0/qinit.f90 
-  ${all}/user46_setaux_manifold.f 
 )
 
 # link to clawpatch to get "fclaw2d_metric_terms.i"
@@ -23,6 +23,8 @@ add_executable(torus_transport
   torus.cpp 
   torus_options.c 
   torus_user.cpp 
+  ${all}/transport_patch_setup_manifold.c
+  ${all}/transport_b4step2_manifold.c
   fclaw2d_map_torus.c 
   $<TARGET_OBJECTS:torus_transport_f>
 )
@@ -37,6 +39,6 @@ target_link_libraries(torus_transport PRIVATE
   FORESTCLAW::CLAWPACK5
 )
 
-add_test(NAME clawpack_advection_2d_torus COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(clawpack_advection_2d_torus PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_test(NAME clawpack_transport_2d_torus COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_transport_2d_torus PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
 

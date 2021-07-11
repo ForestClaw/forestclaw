@@ -13,8 +13,10 @@ add_library(square_f OBJECT
 	user_4.6/square_output.f
 	user_4.6/compute_error.f
 	user_4.6/qinit.f
-	user_4.6/rpn2cons_fw_manifold.f
-	user_4.6/rpt2cons_manifold.f
+	${all}/clawpatch46_setaux_manifold.f
+  ${all}/clawpack46_rpn2cons_fw_manifold.f 
+  ${all}/clawpack46_rpt2cons_manifold.f 
+  ${all}/rpn2cons_update_manifold.f 
 	user_5.0/square_output.f
 	user_5.0/compute_error.f
 	user_5.0/qinit.f
@@ -29,7 +31,6 @@ add_executable(square
 	square_options.c
 	${all}/transport_patch_setup_manifold.c
 	${all}/transport_b4step2_manifold.c
-	${all}/clawpatch46_setaux_manifold.f \
 	${all}/transport46_set_velocity.f \
 	${all}/fclaw2d_map_identity.c
 	${all}/fclaw2d_map_cart.c

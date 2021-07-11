@@ -23,26 +23,14 @@ c     # ------------------------------------------------------------
 
 
 c     # ------------------------------------------------------------
-c     # Edge : u = \nabla cross \Psi - curl \Psi
-c     # ------------------------------------------------------------
-      subroutine torus_edge_velocity(x1,y1,x2,y2,ds,vn)
-      implicit none
-
-      double precision x1,y1,x2,y2, ds, vn, torus_psi
-
-      vn = (torus_psi(x1,y1) - torus_psi(x2,y2))/ds
-
-      end
-
-c     # ------------------------------------------------------------
 c     # Center : u = n cross grad \Psi   (div u = 0)
 c     # 
 c     # Center : u = u1*tau1 + u2*tau2   (div u might not be zero)
 c     # ------------------------------------------------------------
-      subroutine torus_center_velocity(x,y,vel)
+      subroutine user_velocity_components_cart(x,y,t,vel)
       implicit none
 
-      double precision x,y,vel(3)
+      double precision x,y,vel(3),t
 
       double precision t1(3), t2(3)
       double precision t1inv(3), t2inv(3)
@@ -54,11 +42,11 @@ c     # ------------------------------------------------------------
       double precision pi, pi2
       common /compi/ pi, pi2
 
+      integer use_stream
+
       integer example
       common /example_comm/ example  
 
-      integer use_stream
-      common /velocity_comm/ use_stream
 
       integer k
 
@@ -163,6 +151,25 @@ c     # ----------------------------------------------------------------
       torus_dot = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
 
       end
+
+
+      subroutine user_map2comp(blockno,xc,yc,xp,yp,zp,xc1,yc1)
+      implicit none
+
+      integer blockno
+      double precision xc,yc,xp,yp,zp,xc1,yc1
+
+      integer*8 cont, get_context
+
+      double precision zc1
+
+      cont = get_context()
+
+      call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+
+
+      end
+
 
 
 
