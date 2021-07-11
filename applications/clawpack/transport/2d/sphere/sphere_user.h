@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SPHERE_USER_H
 #define SPHERE_USER_H
 
-#include "transport_user.h"
+#include "../all/transport_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -82,20 +82,31 @@ fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[],
 fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere(const double scale[]);
 #endif
 
-/* --------------------------------- Riemann Problems --------------------------------- */
+/* ----------------------------------- Options ---------------------------------------- */
+
 void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* sphere_get_options(fclaw2d_global_t* glob);
 
-/* ---------------------------- Fortran headers --------------------------------------- */
+/* ---------------------------------- Compute Error ----------------------------------- */
 
-#define SPHERE_COMPUTE_ERROR FCLAW_F77_FUNC(sphere_compute_error,SPHERE_COMPUTE_ERROR)
+#define SPHERE46_COMPUTE_ERROR FCLAW_F77_FUNC(sphere46_compute_error, \
+                                              SPHERE46_COMPUTE_ERROR)
 
-void SPHERE_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+void SPHERE46_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
                            double *dx, double *dy, double *xlower,
                            double *ylower, double *t, double q[],
                            double error[], double soln[]);
 
+#define SPHERE5_COMPUTE_ERROR FCLAW_F77_FUNC(sphere5_compute_error, \
+                                              SPHERE5_COMPUTE_ERROR)
+
+void SPHERE5_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
+                           double *dx, double *dy, double *xlower,
+                           double *ylower, double *t, double q[],
+                           double error[], double soln[]);
+
+/* ---------------------------------- Riemann Solvers --------------------------------- */
 
 #define RPN2CONS_FW_MANIFOLD FCLAW_F77_FUNC(rpn2cons_fw_manifold, RPN2CONS_FW_MANIFOLD)
 void RPN2CONS_FW_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
@@ -127,6 +138,47 @@ void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir
                                double q[], double aux_center[], double aux_edge[],
                                double flux[]);
 
+/* -------------------------------------- Output -------------------------------------- */
+
+#define  SPHERE46_FORT_WRITE_FILE FCLAW_F77_FUNC(sphere46_fort_write_file,  \
+                                                SPHERE46_FORT_WRITE_FILE)
+void  SPHERE46_FORT_WRITE_FILE(char* matname1,
+                             int* mx,        int* my,
+                             int* meqn,      int* mbc,
+                             double* xlower, double* ylower,
+                             double* dx,     double* dy,
+                             double q[],     double error[], double soln[],
+                             double *time,
+                             int* patch_num, int* level,
+                             int* blockno,   int* mpirank);
+
+#define SPHERE46_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(sphere46_fort_header_ascii, \
+                        SPHERE46_FORT_HEADER_ASCII)
+void SPHERE46_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                               double* time, int* meqn, int* maux, 
+                               int* ngrids);
+
+#define  SPHERE5_FORT_WRITE_FILE FCLAW_F77_FUNC(sphere5_fort_write_file,  \
+                                                SPHERE5_FORT_WRITE_FILE)
+void  SPHERE5_FORT_WRITE_FILE(char* matname1,
+                             int* mx,        int* my,
+                             int* meqn,      int* mbc,
+                             double* xlower, double* ylower,
+                             double* dx,     double* dy,
+                             double q[],     double error[], double soln[],
+                             double *time,
+                             int* patch_num, int* level,
+                             int* blockno,   int* mpirank);
+
+#define SPHERE5_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(sphere5_fort_header_ascii, \
+                        SPHERE5_FORT_HEADER_ASCII)
+void SPHERE5_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                               double* time, int* meqn, int* maux, 
+                               int* ngrids);
+
+/* -------------------------------------- Old -------------------------------------- */
 
 #if 0
 #define SPHERE_BASIS_COMPLETE FCLAW_F77_FUNC(sphere_basis_complete, SPHERE_BASIS_COMPLETE)
@@ -140,6 +192,7 @@ void SPHERE_BASIS_COMPLETE(const double* x, const double *y,
 #define SPHERE_SETAUX FCLAW_F77_FUNC(sphere_setaux, SPHERE_SETAUX)
 
 
+#if 0
 void SPHERE_SETAUX(const int* blockno, const int* mx, const int* my,
                    const int* mbc, const double* xlower, const double* ylower,
                    const double* dx, const double* dy, 
@@ -156,7 +209,26 @@ void SPHERE_SET_VELOCITIES(const int* blockno, const int* mx, const int* my,
                    const double* xlower, const double* ylower,
                    const double *t, double xnormals[],double ynormals[],
                    double surfnormals[], double aux[],const int* maux);
+#endif
 
+#define  SPHERE_FORT_WRITE_FILE FCLAW_F77_FUNC(sphere_fort_write_file,  \
+                                                SPHERE_FORT_WRITE_FILE)
+void  SPHERE_FORT_WRITE_FILE(char* matname1,
+                             int* mx,        int* my,
+                             int* meqn,      int* mbc,
+                             double* xlower, double* ylower,
+                             double* dx,     double* dy,
+                             double q[],     double error[], double soln[],
+                             double *time,
+                             int* patch_num, int* level,
+                             int* blockno,   int* mpirank);
+
+#define SPHERE_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(sphere_fort_header_ascii, \
+                        SPHERE_FORT_HEADER_ASCII)
+void SPHERE_FORT_HEADER_ASCII(char* matname1, char* matname2,
+                               double* time, int* meqn, int* maux, 
+                               int* ngrids);
 
 #define  SPHERE_FORT_WRITE_FILE FCLAW_F77_FUNC(sphere_fort_write_file,  \
                                                 SPHERE_FORT_WRITE_FILE)

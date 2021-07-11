@@ -1,6 +1,7 @@
-      subroutine sphere_setaux(blockno, mx,my,mbc,
-     &      xlower,ylower,dx,dy, area, edgelengths, xp,yp,zp,
-     &      aux, maux)
+      subroutine torus46_setaux(mbc,mx,my,
+     &      xlower,ylower,dx,dy,maux,aux,blockno,
+     &      area, edgelengths,
+     &      xnormals,ynormals,surfnormals)
       implicit none
 
       integer mbc, mx,my, maux
@@ -8,26 +9,20 @@
       double precision dx,dy, xlower, ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc, maux)
 
-      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
-      double precision        area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision          xp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision          yp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-      double precision          zp(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-
       integer i,j
-      double precision dxdy, xc1, yc1
-
-c      include "metric_terms.i"
+      double precision dxdy
+     
+      double precision        area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+      double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+      double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
 
 c     # ----------------------------------------------------------------
-c     # Color equation (edge velocities)
-c     # 1      capacity
-c     # 2-3    Edge velocities at left/right x faces
-c     # 4-5    Edge velocities at top/bottom y faces
-c     # 6-7    Edge lengths (x-faces, y-faces)
-c     3 8-9    Spherical coordinates
+c     # Conservative form (cell-centered velocities)
+c     # 2-5    Cell-centered velocities projected onto four edge normals
+c     # 6-7    Edge lengths (x-face, y-face)
 c     # ----------------------------------------------------------------
-
 
       dxdy = dx*dy
 
@@ -37,6 +32,12 @@ c     # Capacity : entry (1)
             aux(i,j,1) = area(i,j)/dxdy
          enddo
       enddo
+
+c     # Center velocities : entries (2-5)      
+      call torus46_set_center_velocities(mx,my,mbc,dx,dy,
+     &          blockno,xlower,ylower,
+     &          edgelengths,xnormals,ynormals,surfnormals,
+     &          aux, maux)
 
 c     # Needed to scale speeds in Riemann solver when using
 c     # cell-centered velocities
@@ -48,35 +49,22 @@ c           # x-face and y-face edge lengths (6,7)
          enddo
       enddo
 
-      do i = 1-mbc,mx+mbc
-          do j = 1-mbc,my+mbc
-c              xc1 = xlower + (i-0.5)*dx
-c              yc1 = ylower + (j-0.5)*dy
-
-              call map2comp(xp(i,j),yp(i,j),zp(i,j),xc1,yc1)
-
-              aux(i,j,8) = xc1
-              aux(i,j,9) = yc1
-          end do
-      end do
-
       return
       end
 
 
-      subroutine sphere_set_velocities(blockno, mx,my,mbc,
-     &        dx,dy,xlower,ylower, t, xnormals,ynormals,
-     &        surfnormals, aux, maux)
+      subroutine torus46_set_center_velocities(mx,my,mbc,
+     &      dx,dy,blockno,xlower,ylower,
+     &          edgelengths,xnormals,ynormals,surfnormals,
+     &          aux, maux)
       implicit none
 
       integer mx,my,mbc,maux,blockno
-      double precision dx,dy, xlower,ylower, t
+      double precision dx,dy, xlower,ylower
       double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)
 
-c      double precision pi, pi2
-c      common /compi/ pi, pi2
-
-      double precision xc1,yc1,nv(3), vel(3), vdotn, map_dot
+      double precision xc,yc
+      double precision xc1,yc1,zc1, nv(3), vel(3), vdotn, torus_dot
 
       double precision nl(3), nr(3), nb(3), nt(3)
       double precision urrot, ulrot, ubrot, utrot
@@ -84,30 +72,32 @@ c      common /compi/ pi, pi2
       double precision surfnormals(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
       double precision     xnormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
       double precision     ynormals(-mbc:mx+mbc+2,-mbc:my+mbc+2,3)
+      double precision  edgelengths(-mbc:mx+mbc+2,-mbc:my+mbc+2,2)
 
       integer*8 cont, get_context
 
       integer i,j, k
-
-c      include "metric_terms.i"
 
       cont = get_context()
 
 c     # Cell-centered velocities : entries (4,5,6) 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
+            xc = xlower + (i-0.5)*dx
+            yc = ylower + (j-0.5)*dy
 
-            xc1 = aux(i,j,8)
-            yc1 = aux(i,j,9)
+c           # This is not the torus mapping, but rather maps the brick to
+c           # a unit square      
+            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
-            call sphere_center_velocity(xc1,yc1,t, vel)
+            call torus_center_velocity(xc1,yc1,vel)
 
 c           # subtract out normal components
             do k = 1,3
                 nv(k) = surfnormals(i,j,k)
             enddo
 
-            vdotn = map_dot(vel,nv)
+            vdotn = torus_dot(vel,nv)
 
 c           # Subtract out component in the normal direction
             do k = 1,3
@@ -121,10 +111,10 @@ c           # Subtract out component in the normal direction
                 nt(k)  = ynormals(i,  j+1,k)
             enddo
 
-            ulrot = map_dot(nl,vel)
-            urrot = map_dot(nr,vel)
-            ubrot = map_dot(nb,vel)
-            utrot = map_dot(nt,vel)
+            ulrot = nl(1)*vel(1) + nl(2)*vel(2) + nl(3)*vel(3)
+            urrot = nr(1)*vel(1) + nr(2)*vel(2) + nr(3)*vel(3)
+            ubrot = nb(1)*vel(1) + nb(2)*vel(2) + nb(3)*vel(3)
+            utrot = nt(1)*vel(1) + nt(2)*vel(2) + nt(3)*vel(3)
 
             aux(i,j,2) = ulrot
             aux(i,j,3) = urrot

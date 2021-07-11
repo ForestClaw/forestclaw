@@ -5,7 +5,8 @@ c     # Assumes all components are given in coordinates relative to
 c     # the standard basis (1,0) and (0,1). 
 c     # ------------------------------------------------------------
    
-      subroutine velocity_components_spherical(x,y,t, u, vcart,flag)
+      subroutine velocity_components_spherical(x,y,t, u, 
+     &                                              vcart,flag)
       implicit none
 
       double precision x, y, t, u(2),vcart(3)
@@ -362,7 +363,16 @@ c         # Cartesian components
 c     # ------------------------------------------------------------
 c     # Public interface (called from setaux)
 c     # ------------------------------------------------------------
-      subroutine sphere_center_velocity(x,y,t,vcart)
+      subroutine center_velocity(x,y,t,vcart)
+      implicit none
+
+      double precision x,y,t, vcart(3)
+
+      call velocity_components_cart(x,y,t,vcart)
+
+      end
+
+      subroutine user_velocity_components_cart(x,y,t,vcart)
       implicit none
 
       double precision x,y,t, vcart(3)

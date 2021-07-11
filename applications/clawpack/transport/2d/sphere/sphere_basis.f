@@ -233,10 +233,11 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 
       end
 
-      subroutine map2comp(xp,yp,zp,xc,yc)
+      subroutine user_map2comp(blockno,xc,yc,xp,yp,zp,xc1,yc1)
       implicit none
 
-      double precision xp,yp,zp, xc,yc
+      integer blockno
+      double precision xc,yc, xp,yp,zp, xc1,yc1
 
       double precision pi, pi2
       common /compi/ pi, pi2
@@ -245,7 +246,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 
       call map2spherical(xp,yp,zp,theta,phi)
 
-      call map_spherical2comp(theta,phi,xc,yc)
+      call map_spherical2comp(theta,phi,xc1,yc1)
 
       end
 

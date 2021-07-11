@@ -1,8 +1,8 @@
-      subroutine sphere_fort_header_ascii
+      subroutine sphere46_fort_header_ascii
      &      (matname1,matname2, time,meqn,maux,ngrids)
       implicit none
 
-      integer iframe,meqn,ngrids, maux, mfields
+      integer meqn,ngrids, maux, mfields
 
       character*11 matname1
       character*11 matname2
@@ -29,9 +29,7 @@
       end
 
 
-
-
-      subroutine sphere_fort_write_file(matname1,
+      subroutine sphere46_fort_write_file(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,error,soln, time, patch_num,level,blockno,mpirank)
 
@@ -41,8 +39,7 @@
       integer meqn,mbc,mx,my
       integer patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy,time
-      double precision xc,yc,qc,qexact
-      double precision xc1, yc1, zc1, x,y
+      double precision qc
 
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -63,7 +60,7 @@ c      double precision swirl_divergence, divu
       matunit1 = 10
       open(matunit1,file=matname1,position='append');
 
-      call swirl46_fort_write_grid_header(matunit1,
+      call sphere46_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 
@@ -77,8 +74,6 @@ c      double precision swirl_divergence, divu
 
       do j = 1,my
          do i = 1,mx
-            xc = xlower + (i-0.5)*dx
-            yc = ylower + (j-0.5)*dy
             do mq = 1,meqn
                if (abs(q(i,j,mq)) .lt. 1d-99) then
                   q(i,j,mq) = 0.d0
@@ -104,7 +99,7 @@ c     # This statement is checked above (meqn <= 5)
 
       end
 
-      subroutine swirl46_fort_write_grid_header
+      subroutine sphere46_fort_write_grid_header
      &      (matunit1, mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
 

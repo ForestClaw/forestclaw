@@ -54,58 +54,17 @@ void square_patch_setup_manifold(fclaw2d_global_t *glob,
                                     int blockno,
                                     int patchno)
 {
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    const user_options_t *user = square_get_options(glob);
+    transport_patch_setup_manifold(glob,patch,blockno,patchno,
+                                   user->claw_version);
 
-    double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
+    /* Square velocity field is not time dependent, so we can set up the 
+       velocity here, using b4step */
 
-    double *edgelengths,*curvature;
-    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
-                                    &curvature);
-
-    double *aux;
-    int maux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);    
-
-    const user_options_t* user = square_get_options(glob);
-    if (user->claw_version == 4) 
-    {
-        SQUARE46_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
-            &dx,&dy, area, edgelengths,xp,yp,zp,
-            aux, &maux);
-    }
-    else if (user->claw_version == 5)
-    {
-        SQUARE5_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
-            &dx,&dy, area, edgelengths,xp,yp,zp,
-            aux, &maux);
-    }
-
-
-    /* Assume that velocities don't depend on t */
-    double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,patch, &xnormals, &ynormals, 
-                                    &xtangents, &ytangents, &surfnormals);
-
-    double t = 0; /* Not used */
-    if (user->claw_version == 4)
-    {
-        SQUARE46_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
-                                &dx, &dy, &xlower, &ylower,
-                                &t, xnormals,ynormals, surfnormals,
-                                aux,&maux);
-    }
-    else
-    {
-        SQUARE5_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
-                                &dx, &dy, &xlower, &ylower,
-                                &t, xnormals,ynormals, surfnormals,
-                                aux,&maux);        
-    }
+    double t = 0;
+    double dt = -1;    /* Not used */
+    transport_b4step2_manifold(glob,patch,blockno,patchno,t, dt,
+                               user->claw_version); 
 }
 
 static

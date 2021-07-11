@@ -147,7 +147,7 @@ c     # Called from qexact
 c     # 
 c     #  -- components relative to basis are needed.
 c     # ------------------------------------------------------------
-      subroutine velocity_components(x,y,t,u)
+      subroutine user_velocity_components_cart(x,y,t,u)
       implicit none
 
       double precision x,y,t, u(2), vcart(3), derivs(4)
@@ -156,6 +156,24 @@ c     # ------------------------------------------------------------
       call velocity_derivs(x,y,t, u,vcart,derivs,flag)
 
       end
+
+      subroutine user_map2comp(blockno,xc,yc,xp,yp,zp,xc1,yc1)
+      implicit none
+
+      integer blockno
+      double precision xc,yc,xp,yp,zp,xc1,yc1
+
+      integer*8 cont, get_context
+
+      double precision zc1
+
+      cont = get_context()
+
+      call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+
+
+      end
+
 
 
 cc     # ------------------------------------------------------------

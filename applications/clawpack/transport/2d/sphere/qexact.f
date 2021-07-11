@@ -202,7 +202,7 @@ c     # Dummy routine
           tt = t
       endif
 
-      call velocity_components(x,y,tt,u)
+      call velocity_components_cart(x,y,tt,u)
 
       if (idir .eq. 0) then
 c         # We are tracing back to initial position

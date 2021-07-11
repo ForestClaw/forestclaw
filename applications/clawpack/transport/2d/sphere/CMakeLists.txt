@@ -10,19 +10,29 @@ add_library(sphere_transport_f OBJECT
 	qexact.f 
 	dopri5.f 
 	sphere_exceeds_th.f90
-	user_4.6/sphere_output.f 
-	user_4.6/compute_error.f 
-	user_4.6/qinit.f 
-	user_4.6/sphere_setaux.f 
-	user_4.6/rpn2cons_fw_manifold.f 
-	user_4.6/rpt2cons_manifold.f 
-	user_4.6/rpn2_cons_update_manifold.f 
+	user_4.6/sphere46_qinit.f 
+	user_4.6/sphere46_output.f 
+	user_4.6/sphere46_compute_error.f 
+	user_5.0/sphere5_qinit.f 
+	user_5.0/sphere5_output.f 
+	user_5.0/sphere5_compute_error.f 
+	${all}/transport46_setaux_manifold.f
+	${all}/transport46_set_velocity.f
+	${all}/transport5_setaux_manifold.f
+	${all}/transport5_set_velocity.f
+	${all}/clawpack46_rpn2cons_fw_manifold.f 
+	${all}/clawpack46_rpt2cons_manifold.f 
+	${all}/clawpack5_rpn2cons_fw_manifold.f 
+	${all}/clawpack5_rpt2cons_manifold.f 
+	${all}/rpn2cons_update_manifold.f 
 )
 
 add_executable(sphere_transport
 	sphere.cpp 
 	sphere_user.cpp 
 	sphere_options.c 
+	${all}/transport_patch_setup_manifold.c
+	${all}/transport_b4step2_manifold.c
 	fclaw2d_map_cubedsphere.c 
 	fclaw2d_map_pillowsphere.c 
   $<TARGET_OBJECTS:sphere_transport_f>
