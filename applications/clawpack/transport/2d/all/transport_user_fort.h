@@ -29,12 +29,114 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
-#define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
+/* ------------------------------------ SETAUX ---------------------------------------- */
+
+#define TRANSPORT46_SETAUX_MANIFOLD FCLAW_F77_FUNC(transport46_setaux_manifold, \
+                                                   TRANSPORT46_SETAUX_MANIFOLD)
+
+void TRANSPORT46_SETAUX_MANIFOLD(const int* blockno, const int* mx, const int* my,
+                                 const int* mbc, 
+                                 const double* xlower, const double* ylower,
+                                 const double* dx, const double* dy, 
+                                 double area[],double edgelengths[],
+                                 double aux[],const int* maux);
+
+#define TRANSPORT5_SETAUX_MANIFOLD FCLAW_F77_FUNC(transport5_setaux_manifold, \
+                                                   TRANSPORT5_SETAUX_MANIFOLD)
+
+void TRANSPORT5_SETAUX_MANIFOLD(const int* blockno, const int* mx, const int* my,
+                                 const int* mbc, 
+                                 const double* xlower, const double* ylower,
+                                 const double* dx, const double* dy, 
+                                 double area[],double edgelengths[],
+                                 double aux[],const int* maux);
+
+
+/* ------------------------------- SET_VELOCITY --------------------------------------- */
+
+#define TRANSPORT46_SET_VELOCITY FCLAW_F77_FUNC(transport46_set_velocity, \
+                                             TRANSPORT46_SET_VELOCITY)
+
+void TRANSPORT46_SET_VELOCITY(const int* blockno, const int* mx, const int* my,
+                              const int* mbc, const double* dx, const double* dy,
+                              const double* xlower, const double* ylower,
+                              const double *t, double xp[], double yp[], 
+                              double zp[], double xnormals[],double ynormals[],
+                              double surfnormals[], double aux[],const int* maux);
+
+
+
+
+#define TRANSPORT5_SET_VELOCITY FCLAW_F77_FUNC(transport5_set_velocity, \
+                                             TRANSPORT5_SET_VELOCITY)
+
+void TRANSPORT5_SET_VELOCITY(const int* blockno, const int* mx, const int* my,
+                              const int* mbc, const double* dx, const double* dy,
+                              const double* xlower, const double* ylower,
+                              const double *t, double xp[], double yp[], 
+                              double zp[], double xnormals[],double ynormals[],
+                              double surfnormals[], double aux[],const int* maux);
+
+
+
+/* ------------------------------- Riemann solvers ------------------------------------ */
+
+#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+
+void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
+                      double q[], double aux_center[], double aux_edge[], double flux[]);
+
+#define CLAWPACK46_RPN2CONS_FW_MANIFOLD FCLAW_F77_FUNC( \
+                          clawpack46_rpn2cons_fw_manifold, \
+                          CLAWPACK46_RPN2CONS_FW_MANIFOLD)
+void CLAWPACK46_RPN2CONS_FW_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
+                          const int* mwaves, 
+                          const int* mbc, const int* mx, double ql[], double qr[],
+                          double auxl[], double auxr[], double fwave[],
+                          double s[], double amdq[], double apdq[], const int* maux);
+
+
+#define CLAWPACK46_RPT2CONS_MANIFOLD FCLAW_F77_FUNC( \
+                       clawpack46_rpt2cons_manifold, \
+                       CLAWPACK46_RPT2CONS_MANIFOLD)
+
+void CLAWPACK46_RPT2CONS_MANIFOLD(const int* ixy, const int* maxm, 
+                                  const int* meqn, const int* mwaves,
+                                  const int* maux, const int* mbc, const int* mx, 
+                                  double ql[], double qr[],
+                                  double aux1[], double aux2[], 
+                                  double aux3[], const int* imp,
+                                  double dsdq[], double bmasdq[], double bpasdq[]);
+
+#define CLAWPACK5_RPN2CONS_MANIFOLD    FCLAW_F77_FUNC( \
+                            clawpack5_rpn2cons_manifold,\
+                            CLAWPACK5_RPN2CONS_MANIFOLD)
+void CLAWPACK5_RPN2CONS_MANIFOLD(const int* ixy,
+                                 const int* maxm, const int* meqn,
+                                 const int* mwaves, const int* maux,
+                                 const int* mbc,const int* mx,
+                                 double ql[], double qr[], 
+                                 double auxl[], double auxr[],
+                                 double wave[], double s[],
+                                 double amdq[], double apdq[]);
+
+#define CLAWPACK5_RPT2CONS_MANIFOLD  FCLAW_F77_FUNC( \
+                     clawpack5_rpt2cons_manifold,  \
+                     CLAWPACK5_RPT2CONS_MANIFOLD)
+void CLAWPACK5_RPT2CONS_MANIFOLD(const int* ixy, const int* imp,
+                                 const int* maxm, const int* meqn,
+                                 const int* mwaves, const int* maux,
+                                 const int* mbc,const int* mx,
+                                 double ql[], double qr[],
+                                 double aux1[], double aux2[],
+                                 double aux3[],  double asdq[],
+                                 double bmasdq[], double bpasdq[]);
+
+/* ------------------------------------ OLD ------------------------------------------- */
+#define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold, \
+                                               USER46_B4STEP2_MANIFOLD)
 void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
                              const double* dx, const double* dy,
                              const double* t, const int* maux, double aux[],
@@ -167,9 +269,6 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

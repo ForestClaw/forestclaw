@@ -2,8 +2,6 @@
 
 #include <fclaw2d_map.h>
 
-#include "square_user.h"
-
 #ifdef __cplusplus
 extern "C"
 {

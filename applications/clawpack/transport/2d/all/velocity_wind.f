@@ -26,17 +26,6 @@ c     # Sign difference from Benchmark problem
 
       end
 
-      subroutine get_psi_vel(xd1,xd2,ds,vn,t)
-      implicit none
-
-      double precision xd1(3),xd2(3), ds, vn, psi,t
-
-      vn = (psi(xd1(1),xd1(2),xd1(3),t) -
-     &      psi(xd2(1),xd2(2),xd2(3),t))/ds
-
-      end
-
-
       subroutine map2polar(x,y,z,lambda,th)
       implicit none
 
@@ -55,3 +44,17 @@ c     # Sign difference from Benchmark problem
       endif
 
       end
+
+
+      subroutine get_psi_vel(xd1,xd2,ds,vn,t)
+      implicit none
+
+      double precision xd1(3),xd2(3), ds, vn, psi,t
+
+      vn = (psi(xd1(1),xd1(2),xd1(3),t) -
+     &      psi(xd2(1),xd2(2),xd2(3),t))/ds
+
+      end
+
+
+

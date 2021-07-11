@@ -1,4 +1,5 @@
-      subroutine rpt2cons_manifold(ixy,maxm,meqn,mwaves,maux,mbc,mx,
+      subroutine clawpack46_rpt2cons_manifold(ixy,maxm,meqn,
+     &                       mwaves,maux,mbc,mx,
      &                       ql,qr,aux1,aux2,aux3,imp,asdq,
      &                       bmasdq,bpasdq)
       
