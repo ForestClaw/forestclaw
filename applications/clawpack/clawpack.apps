@@ -49,6 +49,20 @@ include applications/clawpack/advection/2d/swirl/Makefile.am
 ## torus  (manifold, periodic in both directions)
 include applications/clawpack/advection/2d/torus/Makefile.am
 
+## --------------------- Advection on the sphere ---------------------------- 
+## Examples from suite described by Lauritzen, et al.  See:
+##   "A standard test case suite for two-dimensional  linear
+##    transport on the sphere: results from a collection 
+##    of state-of-the-art schemes", Lauritzen, et al.
+##    Geosciences Model Development, 2014. 
+##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
+## -------------------------------------------------------------------------
+
+include applications/clawpack/advection/2d/gaussian/Makefile.am
+include applications/clawpack/advection/2d/correlatedcb/Makefile.am
+include applications/clawpack/advection/2d/slotted_disk/Makefile.am
+
+
 
 ## --------------------- Transport ---------------------------- 
 ## Example : Solve the variable velocity transport equation
@@ -59,23 +73,9 @@ include applications/clawpack/advection/2d/torus/Makefile.am
 ## conservation.
 ## ------------------------------------------------------------
 
-include applications/clawpack/transport/2d/square/Makefile.am
-#include applications/clawpack/transport/2d/sphere/Makefile.am
-
-
-## ---------------------Transport on the sphere ---------------------------- 
-## Examples from suite described by Lauritzen, et al.  See:
-##   "A standard test case suite for two-dimensional  linear
-##    transport on the sphere: results from a collection 
-##    of state-of-the-art schemes", Lauritzen, et al.
-##    Geosciences Model Development, 2014. 
-##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
-## -------------------------------------------------------------------------
-
-include applications/clawpack/transport/2d/gaussian/Makefile.am
-include applications/clawpack/transport/2d/slotted_disk/Makefile.am
-include applications/clawpack/transport/2d/correlatedcb/Makefile.am#
-
+include applications/clawpack/transport/2d/sphere/Makefile.am
+#include applications/clawpack/transport/2d/torus/Makefile.am
+#include applications/clawpack/transport/2d/square/Makefile.am
 
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
