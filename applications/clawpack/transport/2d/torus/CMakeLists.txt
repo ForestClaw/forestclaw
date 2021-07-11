@@ -6,12 +6,16 @@ add_library(torus_transport_f OBJECT
   torus_psi.f 
   fdisc.f 
   user_4.6/qinit.f 
-  ${all}/clawpatch46_setaux_manifold.f
+  user_5.0/qinit.f90
+  ${all}/transport46_setaux_manifold.f
   ${all}/transport46_set_velocity.f
+  ${all}/transport5_setaux_manifold.f
+  ${all}/transport5_set_velocity.f
   ${all}/clawpack46_rpn2cons_fw_manifold.f 
   ${all}/clawpack46_rpt2cons_manifold.f 
+  ${all}/clawpack5_rpn2cons_fw_manifold.f 
+  ${all}/clawpack5_rpt2cons_manifold.f 
   ${all}/rpn2cons_update_manifold.f 
-  user_5.0/qinit.f90 
 )
 
 # link to clawpatch to get "fclaw2d_metric_terms.i"

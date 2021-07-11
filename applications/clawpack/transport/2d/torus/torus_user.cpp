@@ -84,18 +84,32 @@ void torus_link_solvers(fclaw2d_global_t *glob)
         /* Solve conservative equation using cell-centered velocity */
         /* Fwaves give best accuracy */
         claw46_opt->use_fwaves = 1;
-        claw46_vt->fort_rpn2fw = RPN2CONS_FW_MANIFOLD; 
+        claw46_vt->fort_rpn2fw = CLAWPACK46_RPN2CONS_FW_MANIFOLD; 
 
         /* Transverse solver : Conservative form */
-        claw46_vt->fort_rpt2fw  = &RPT2CONS_MANIFOLD;  
+        claw46_vt->fort_rpt2fw  = &CLAWPACK46_RPT2CONS_MANIFOLD;  
 
         /* Flux function (for conservative fix) */
          claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
     }
     else if (user->claw_version == 5)
     {
-        fclaw_global_essentialf("Not yet implemented for version 5");
-        exit(0);
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+
+        claw5_vt->fort_qinit = &CLAWPACK5_QINIT;
+
+        fc2d_clawpack5_options_t *claw5_opt = fc2d_clawpack5_get_options(glob);
+
+        /* Solve conservative equation using cell-centered velocity */
+        /* Fwaves give best accuracy */
+        claw5_opt->use_fwaves = 1;
+        claw5_vt->fort_rpn2 = CLAWPACK5_RPN2CONS_MANIFOLD; 
+
+        /* Transverse solver : Conservative form */
+        claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2CONS_MANIFOLD;  
+
+        /* Flux function (for conservative fix) */
+         claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
     }
 }
 
