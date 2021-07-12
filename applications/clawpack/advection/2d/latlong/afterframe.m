@@ -14,6 +14,3 @@ daspect([1 1 1]);
 view(3);
 
 shg
-
-clear afterframe;
-clear mapc2m;

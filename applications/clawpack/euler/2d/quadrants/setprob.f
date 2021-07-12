@@ -1,4 +1,4 @@
-      subroutine quadrants_setprob()
+      subroutine setprob()
       implicit none
 
       double precision gamma, gamma1

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ANNULUS_USER_H
 #define ANNULUS_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/advection_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -54,30 +54,12 @@ user_options_t;
 
 void annulus_link_solvers(fclaw2d_global_t *glob);
 
-void annulus_problem_setup(fclaw2d_global_t *glob);
-
-#define SETPROB_ANNULUS FCLAW_F77_FUNC(setprob_annulus,SETPROB_ANNULUS)
-void SETPROB_ANNULUS();
-
-void annulus_patch_setup(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx);
-
 user_options_t* annulus_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
 void annulus_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* annulus_get_options(fclaw2d_global_t *glob);
-
-fclaw2d_map_context_t *
-    fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
-                             const double scale[],
-                             const double shift[],
-                             const double rotate[],
-                             const double alpha,
-                             const double theta[]);
 
 #ifdef __cplusplus
 #if 0

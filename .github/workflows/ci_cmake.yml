@@ -11,7 +11,7 @@ jobs:
 
   linux:
     runs-on: ubuntu-20.04
-    timeout-minutes: 15
+    timeout-minutes: 60
     env:
       CTEST_PARALLEL_LEVEL: 2
 
@@ -77,6 +77,7 @@ jobs:
 
     - name: CMake test
       run: ctest --parallel 2 --output-on-failure
+      working-directory: build
 
     - name: CMake install (for examples)
       run: cmake --install build
@@ -125,6 +126,7 @@ jobs:
 
     - name: CMake test
       run: ctest --parallel 2 --output-on-failure
+      working-directory: build
 
     - name: CMake install (for examples)
       run: cmake --install build

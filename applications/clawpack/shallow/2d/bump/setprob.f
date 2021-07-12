@@ -1,4 +1,4 @@
-      subroutine bump_setprob()
+      subroutine setprob()
       implicit none
 
       integer example

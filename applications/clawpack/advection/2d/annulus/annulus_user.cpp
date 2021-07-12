@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,14 +25,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "annulus_user.h"
 
-#include <fclaw2d_include_all.h>
+static
+void annulus_problem_setup(fclaw2d_global_t *glob)
+{
+    const user_options_t *user = annulus_get_options(glob);
 
-#include "fclaw2d_clawpatch.h"
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24.16f   %s",user->beta,"\% beta\n");
+        fclose(f);
+    }
 
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+    /* Make sure node 0 writes 'setprob.data' before proceeding */
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+ 
+    SETPROB();
+}
 
-#include "../all/advection_user_fort.h"
+
+static
+void annulus_patch_setup(fclaw2d_global_t *glob,
+                         fclaw2d_patch_t *patch,
+                         int blockno,
+                         int patchno)
+{
+    const user_options_t* user = annulus_get_options(glob);
+    advection_patch_setup_manifold(glob,patch,blockno,patchno,
+                                   user->claw_version);
+}
 
 
 void annulus_link_solvers(fclaw2d_global_t *glob)
@@ -62,55 +83,3 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
 }
 
 
-
-void annulus_problem_setup(fclaw2d_global_t *glob)
-{
-    const user_options_t *user = annulus_get_options(glob);
-
-    if (glob->mpirank == 0)
-    {
-        FILE *f = fopen("setprob.data","w");
-        fprintf(f,  "%-24.16f   %s",user->beta,"\% beta\n");
-        fclose(f);
-    }
-
-    /* We want to make sure node 0 gets here before proceeding */
-#ifdef FCLAW_ENABLE_MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
- 
-    SETPROB_ANNULUS();
-}
-
-
-void annulus_patch_setup(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx)
-{
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *aux,*xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    const user_options_t* user = annulus_get_options(glob);
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-
-    if (user->claw_version == 4)
-    {
-        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                               &maux,aux,&this_block_idx,xd,yd,zd,area);
-    }
-    else if(user->claw_version == 5)
-    {
-        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                              &maux,aux,&this_block_idx,xd,yd,zd,area);
-    }
-}

@@ -26,14 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PERIODIC_USER_H
 #define PERIODIC_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/advection_user.h"
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
 #endif
+
+#if 0
+/* for syntax highlighting in Sublime */
 #endif
 
 typedef struct user_options
@@ -47,8 +48,6 @@ typedef struct user_options
 
 void periodic_link_solvers(fclaw2d_global_t *glob);
 
-void periodic_problem_setup(fclaw2d_global_t* glob);
-
 /* ------------------------------------- Options ---------------------------------------*/
 user_options_t* periodic_options_register (fclaw_app_t * app,
                                         const char *configfile);
@@ -57,40 +56,9 @@ void periodic_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* periodic_get_options(fclaw2d_global_t* glob);
 
-/* ------------------------------------ Fortran ----------------------------------------*/
-#define PERIODIC_SETPROB FCLAW_F77_FUNC(periodic_setprob, PERIODIC_SETPROB)
-void PERIODIC_SETPROB();
-
-#define CLAWPACK46_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack46_tag4refinement, \
-                                                 CLAWPACK46_TAG4REFINEMENT)
-void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my,
-                               const int* mbc,const int* meqn,
-                               const double* xlower, const double* ylower,
-                               const double* dx, const double* dy,
-                               const int* blockno,
-                               double q[],
-                               const double* tag_threshold,
-                               const int* init_flag,
-                               int* tag_patch);
-
-#define CLAWPACK5_TAG4COARSENING FCLAW_F77_FUNC(clawpack5_tag4coarsening, \
-                                                CLAWPACK5_TAG4COARSENING)
-void CLAWPACK5_TAG4COARSENING(const int* mx, const int* my,
-                              const int* mbc, const int* meqn,
-                              const double* xlower, const double* ylower,
-                              const double* dx, const double* dy,
-                              const int* blockno,
-                              double q0[],double q1[],
-                              double q2[],double q3[],
-                              const double* tag_threshold,
-                              const int* initflag,
-                              int* tag_patch);
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

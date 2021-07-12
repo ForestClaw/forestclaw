@@ -5,7 +5,8 @@ c     # Assumes all components are given in coordinates relative to
 c     # the standard basis (1,0) and (0,1). 
 c     # ------------------------------------------------------------
    
-      subroutine velocity_components_spherical(x,y,t, u, vcart,flag)
+      subroutine velocity_components_spherical(x,y,t, u, 
+     &                                              vcart,flag)
       implicit none
 
       double precision x, y, t, u(2),vcart(3)
@@ -327,11 +328,42 @@ c         # Velocity components are given in Cartesian components
 
       end
 
+c     # ----------------------------------------------
+c     # Compute divergence of velocity field.  
+c     # ----------------------------------------------
+      double precision function map_divergence(x,y, t)
+      implicit none
+
+      double precision x,y, t
+
+      double precision u(2), vcart(3), derivs(4)
+      double precision D11, D22, g(2,2,2)
+      integer flag
+
+c     # Get g(i,j,k), g = \Gamma(i,j,k)
+      call velocity_derivs(x,y,t, u,vcart,derivs,flag)
+
+      if (flag .eq. 0) then
+c         # Velocity and derivatives are given in 
+c         # spherical components       
+          call map_christoffel_sym(x,y,g) 
+
+          D11 = derivs(1) + u(1)*g(1,1,1) + u(2)*g(1,2,1)
+          D22 = derivs(4) + u(1)*g(2,1,2) + u(2)*g(2,2,2)
+
+          map_divergence = D11 + D22
+      else
+c         # Velocity and derivatives are given in 
+c         # Cartesian components        
+          map_divergence = derivs(1) + derivs(2) + derivs(3)
+      endif
+
+      end
 
 c     # ------------------------------------------------------------
 c     # Public interface (called from setaux)
 c     # ------------------------------------------------------------
-      subroutine sphere_center_velocity(x,y,t,vcart)
+      subroutine center_velocity(x,y,t,vcart)
       implicit none
 
       double precision x,y,t, vcart(3)
@@ -339,6 +371,19 @@ c     # ------------------------------------------------------------
       call velocity_components_cart(x,y,t,vcart)
 
       end
+
+      subroutine user_velocity_components_cart(x,y,t,vcart)
+      implicit none
+
+      double precision x,y,t, vcart(3)
+
+      call velocity_components_cart(x,y,t,vcart)
+
+      end
+
+
+
+
 
 
 

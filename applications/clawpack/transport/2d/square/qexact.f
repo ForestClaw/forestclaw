@@ -1,79 +1,89 @@
 c     # ---------------------------------------------------
-c     # Trace back solution to initial position     
-c     # Input arguments should be the coordinates
-c     # for the canonical swirl mapping in terms of 
-c     # (x,y)
-c     #       
-c     #   T = (R*cos(2*pi*x), R*sin(2*pi*x), r*sin(2*pi*y))
-c     #
-c     #        r = alpha*(1 + beta*sin(2*pi*x))
-c     #        R = 1 + r*cos(2*pi*y)
+c     # QEXACT - returns exact solution to transport problem
+c     #          
+c     #                q_t + \div (u(x,y,t) q) = 0
 c     # 
-c     # The solution proceeds in two steps. If we are
-c     # solving an incompressible problem, we only need
-c     # to evolve (x(t), y(t)).  If we have a compressible
-c     # problem, we first evolve (x(t),y(t)) back to a starting
-c     # location (x0,y0), and then evolve x, y and q from 
-c     # the starting location back to final position.
+c     # Format : 
+c     #                qe = QEXACT(x,y,t,flow_flag)
+c     #
+c     # Input arguments : 
+c     #
+c     # (x,y,t)     : Specifies the time and location where the exact
+c     #               solution is desired.
+c     # flow_flag   : Set to 0 for divergent-free flow fields and set to
+c     #               1 for divergent flow fields.
+c     #
+c     # 
+c     # This routine requires three auxiliary functions : 
+c     # 
+c     #    call  velocity_components(x,y,t,u)
+c     #
+c     # which should compute velocity components (u(1),u(2)) in 
+c     # terms of spherical basis functions (not normalized)
+c     #
+c     # The user must also supply a divergence function
+c     #
+c     #         divu = map_divergence(x,y,t)  
+c     #
+c     # that computes the divergence of the velocity field. 
+c     #
+c     # Finally, the user needs to supply a function that computes the
+c     # initial conditions
+c     #
+c     #              q0 = q0_init(x,y) 
+c     # 
+c     # The solution proceeds in two steps. If we are solving an 
+c     # divergent-free problem, we only need to evolve (x(t), y(t)) 
+c     # backwards to the initial time.
+c     #
+c     # If we have a compressible problem, we first evolve (x(t),y(t))
+c     # back to a starting location (x0,y0), and  then evolve x,y, and q
+c     # from  the starting location back to final position.
+c     # back to final position.
+c     # 
 c     # --------------------------------------------------------
 
-      double precision function qexact(x,y,tfinal)
+      double precision function qexact(x,y,tfinal,flow_flag)
       implicit none
 
-      external map_rhs_divfree, map_rhs_nondivfree
+      external qexact_rhs
       external solout
 
-      integer mapping
-      common /mapping_comm/ mapping
-
-      integer example
-      common /example_comm/ example
-
       double precision x,y,tfinal
-      integer blockno
+      integer flow_flag
 
-      double precision xc0, yc0
-c      double precision xc1, yc1
+      double precision xc0, yc0, t0
+      double precision q0_init, q0
 
-c      integer blockno_dummy
-      double precision t0
-      double precision xp,yp,zp
-
-      double precision sigma(3), rtol, atol
+      double precision sigma(4), rtol, atol
       integer itol, iout
 
       integer Nmax, lwork,nrdens, liwork
-      parameter(Nmax=3, nrdens=0)
+      parameter(Nmax=4, nrdens=0)
       parameter(lwork=8*Nmax+5*nrdens+21)
       parameter(liwork=nrdens+21)
 
-      double precision work(lwork), rpar
-      double precision q0_physical, q0
+      double precision work(lwork), rpar(1)
       integer iwork(liwork), ipar(2), idid
 
       double precision tol
 
       logical evolve_q
 
-      integer*8 cont, get_context
-
       integer i
-
-      cont = get_context()
 
 c     # ------------------------------------------
 c     # Numerical parameters
 c     # ------------------------------------------
       itol = 0
-      rtol = 1.d-12
-      atol = 1.d-12
+      rtol = 1.d-14
+      atol = 1.d-14
       iout = 0
 
       do i = 1,20
           work(i) = 0
           iwork(i) = 0
       enddo
-
 
 c     # Evolve from t=t0 to t=tfinal
       t0 = 0
@@ -82,9 +92,14 @@ c     # Initial conditions for ODE
       sigma(1) = x
       sigma(2) = y
 
+c     # Needed for backward trace      
+      rpar(1) = tfinal
+
+c     # Tracing backwards      
+      ipar(1) = 0
 
 c     # This traces the velocity field back to the origin.
-      call dopri5(2,map_rhs_divfree,t0,sigma,tfinal,
+      call dopri5(2,qexact_rhs,t0,sigma,tfinal,
      &            rtol,atol,itol,
      &            solout,iout, work,lwork,iwork,liwork,
      &            rpar,ipar,idid)
@@ -94,24 +109,15 @@ c     # This traces the velocity field back to the origin.
           stop
       endif
 
-c     # Initial position traced back from (xc1,yc1)
+c     # Initial position in [0,1]x[0,1]
       xc0 = sigma(1)
       yc0 = sigma(2)
 
-c     # Our physical domain is a unit square, which is the same
-c     # as our computational domain
-      xp = xc0
-      yp = yc0
-      zp = 0
+c     # Get initial condition in computational coordinates (xc0,yc0)
+      q0 =  q0_init(xc0,yc0)
 
-      q0 = q0_physical(xp,yp,zp)
-      
-c     # Evolve q along characteristics for variable coefficient case      
-      if (example .eq. 0) then
-           evolve_q = .false.
-      else
-           evolve_q = .true.
-      endif
+c     # Evolve q along characteristics for divergent case     
+      evolve_q = flow_flag == 1
       if (evolve_q) then
 c         # Variable coefficient case        
 c         # We now need to evolve q along with (x,y), starting from
@@ -125,8 +131,11 @@ c         # from (xc0,yc0)
               iwork(i) = 0
           enddo
 
+c         # Tracing forwards
+          ipar(1) = 1
+
           t0 = 0
-          call dopri5(3,map_rhs_nondivfree,t0,sigma,tfinal,
+          call dopri5(3,qexact_rhs,t0,sigma,tfinal,
      &                rtol,atol,itol,
      &                solout,iout, work,lwork,iwork,liwork,
      &                rpar,ipar,idid)
@@ -136,7 +145,7 @@ c         # from (xc0,yc0)
               stop
           endif
 
-          tol = 1e-8
+          tol = 1e-12
           if (abs(sigma(1)-x) .gt. tol) then
               write(6,*) 'qexact.f : Did not evolve x correctly'
               write(6,100) xc0,yc0
@@ -172,67 +181,41 @@ c     # Dummy routine
       end
 
 
-c     # ----------------------------------------------------------------
-c     # RHS functions for ODE solver DOPRI5  (original ode45)
-c     #        -- divfree field
-c     #        -- field with divergence
-c     # ----------------------------------------------------------------
-
-      subroutine map_rhs_divfree(n,t,sigma,f,rpar,ipar)
+      subroutine qexact_rhs(n,t,sigma,f,rpar,ipar)
       implicit none
 
-      external velocity_components
-      integer n, ipar(2)
-      double precision t, sigma(n), f(n), rpar
+      integer n, ipar(1)
+      double precision t, sigma(n), f(n), rpar(1)
+      double precision x,y, u(2), tt, tfinal
+      double precision q, divu, map_divergence
+      integer idir
 
-
-      integer m, i
-      double precision xc1,yc1, q, u1,u2, x,y
-      double precision p, px, py
-      double precision t1(3), t2(3), t1xt2(3), w
-      double precision u(2)
+      idir = ipar(1)
 
       x = sigma(1)
       y = sigma(2)
 
+      if (idir .eq. 0) then
+          tfinal = rpar(1)
+          tt = tfinal - t
+      else
+          tt = t
+      endif
 
-      call velocity_components(x,y,u)
+      call velocity_components_cart(x,y,tt,u)
 
-c     # We are tracing these back, so use negative velocities        
-      f(1) = -u(1)
-      f(2) = -u(2)
+      if (idir .eq. 0) then
+c         # We are tracing back to initial position
+          f(1) = -u(1)
+          f(2) = -u(2)
+      else
+c         # We are evolving q along characteristics starting 
+c         # from initial position found above
+          q = sigma(3)
+          divu = map_divergence(x,y,t)
 
+          f(1) = u(1)
+          f(2) = u(2)
+          f(3) = -divu*q   
+      endif
       end
-
-      subroutine map_rhs_nondivfree(n,t,sigma,f,rpar,ipar)
-      implicit none
-
-      integer n, ipar(2)
-      double precision t, sigma(n), f(n), rpar
-
-
-      double precision x,y, q
-      double precision u(2)
-      double precision divu, map_divergence
-
-      double precision t1(3), t2(3), t1xt2(3), w
-      double precision p,px,py
-
-c     # Track evolution of these three quantities
-
-      x = sigma(1)
-      y = sigma(2)
-      q = sigma(3)
-
-      call velocity_components(x,y,u)
-
-      divu = map_divergence(x,y)
-
-      f(1) = u(1)
-      f(2) = u(2)
-      f(3) = -divu*q   !! Non-conservative case
-
-      end
-
-
-

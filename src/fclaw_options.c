@@ -51,8 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static void* 
 fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 {
-    sc_keyvalue_t *kv;
-
     /* -------------------------- Time stepping control ------------------------------- */
 
     sc_options_add_double (opt, 0, "initial_dt", &fclaw_opt->initial_dt, 0.1,
@@ -226,8 +224,9 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                          &fclaw_opt->report_timing,1,
                          "Report timing results [T]");
 
+
     /* Set verbosity level for reporting timing */
-    kv = fclaw_opt->kv_timing_verbosity = sc_keyvalue_new ();
+    sc_keyvalue_t *kv = fclaw_opt->kv_timing_verbosity = sc_keyvalue_new ();
     sc_keyvalue_set_int (kv, "wall",      FCLAW_TIMER_PRIORITY_WALL);
     sc_keyvalue_set_int (kv, "summary",   FCLAW_TIMER_PRIORITY_SUMMARY);
     sc_keyvalue_set_int (kv, "exclusive", FCLAW_TIMER_PRIORITY_EXCLUSIVE);

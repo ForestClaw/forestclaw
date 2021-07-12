@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef LATLONG_USER_H
 #define LATLONG_USER_H
 
-#include <fclaw2d_include_all.h>
+#include "../all/advection_user.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -53,25 +53,12 @@ user_options_t;
 
 void latlong_link_solvers(fclaw2d_global_t *glob);
 
-void latlong_patch_setup_manifold(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
-                                  int this_block_idx,
-                                  int this_patch_idx);
-
-
 user_options_t*  latlong_options_register (fclaw_app_t * app,
                                            const char *configfile);\
 
 void latlong_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* latlong_get_options(fclaw2d_global_t* glob);
-
-fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
-                             const double scale[],
-                             const double lat[],
-                             const double longitude[],
-                             const int a, const int b);
 
 #ifdef __cplusplus
 #if 0

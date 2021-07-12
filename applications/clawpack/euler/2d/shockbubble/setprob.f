@@ -1,4 +1,4 @@
-      subroutine shockbubble_setprob()
+      subroutine setprob()
 
       implicit none
 

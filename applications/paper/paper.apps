@@ -5,7 +5,7 @@
 
 # ------------------------- Conservation ----------------------------------
 ## square (Conservation test)
-include applications/paper/square/Makefile.am
+#include applications/paper/square/Makefile.am
 
 ## annulus (Conservation test)
 #include applications/paper/annulus/Makefile.am
