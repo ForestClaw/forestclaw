@@ -207,10 +207,10 @@ fc3d_clawpack46_options_t*  fc3d_clawpack46_options_register (fclaw_app_t * app,
     FCLAW_ASSERT (app != NULL);
 
     clawopt = FCLAW_ALLOC (fc3d_clawpack46_options_t, 1);
-    fclaw_app_options_register (app, "clawpack", configfile,
+    fclaw_app_options_register (app, "claw3", configfile,
                                 &clawpack_options_vtable, clawopt);
     
-    fclaw_app_set_attribute(app,"clawpack",clawopt);
+    fclaw_app_set_attribute(app,"claw3",clawopt);
     return clawopt;
 }
 

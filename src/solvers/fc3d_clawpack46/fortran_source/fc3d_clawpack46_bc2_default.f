@@ -1,9 +1,11 @@
-      subroutine clawpack46_bc3_default(maxmx,maxmy, meqn,mbc,
-     &      mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt,mthbc)
+      subroutine clawpack46_bc3_default(maxmx,maxmy, maxmz, meqn,mbc,
+     &      mx,my,mz, xlower,ylower,zlower, 
+     &      dx,dy,dz, q,maux,aux,t,dt,mthbc)
       implicit none
 
-      integer maxmx, maxmy, meqn, mbc, mx, my, maux, mthbc(4)
-      double precision xlower, ylower, dx, dy, t, dt
+      integer maxmx, maxmy, maxmz, meqn, mbc, mx, my, mz 
+      integer maux, mthbc(4)
+      double precision xlower, ylower, zlower, dx, dy, dz, t, dt
 
       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
