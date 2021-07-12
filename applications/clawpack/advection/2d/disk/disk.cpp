@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,16 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "disk_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack46.h>
-
-#include <fc2d_clawpack5_options.h>
-#include <fc2d_clawpack5.h>
+#include "../all/advection_user.h"
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
@@ -46,7 +37,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
     
-
+    /* Used locally */
     double pi = M_PI;
     double rotate[2];
 
@@ -58,15 +49,14 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_pillowdisk(fclaw_opt->scale,
-                                          fclaw_opt->shift,
                                           rotate);
         break;
     case 1:
         /* Map five-patch square to pillow disk. */
         conn = p4est_connectivity_new_disk (0, 0);
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,
-                                            fclaw_opt->shift,
-                                            rotate,user_opt->alpha);
+                                            rotate,
+                                            user_opt->alpha);
         break;
 
     default:

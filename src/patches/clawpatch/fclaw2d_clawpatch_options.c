@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int s_clawpatch_options_package_id = -1;
 
+
+static int s_refine_criteria = -1;
+
+void fclaw2d_clawpatch_set_refinement_criteria(int r)
+{
+    FCLAW_ASSERT(s_refine_criteria == -1);
+    s_refine_criteria = r;
+}
+
+int fclaw2d_clawpatch_get_refinement_criteria()
+{
+    FCLAW_ASSERT(s_refine_criteria != -1);
+    return s_refine_criteria;
+}
+
 static void *
 clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                    sc_options_t * opt)
@@ -46,7 +61,10 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                         "Number of ghost cells [2]");
 
     sc_options_add_int (opt, 0, "meqn", &clawpatch_options->meqn, 1,
-                        "Number of equations [2]");
+                        "Number of equations [1]");
+
+    sc_options_add_int (opt, 0, "rhs-fields", &clawpatch_options->rhs_fields, 1,
+                        "Number of fields in rhs [1]");
 
     /* ---------------------- advanced options -------------------------- */
     sc_options_add_int (opt, 0, "interp_stencil_width",
@@ -57,6 +75,17 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                          &clawpatch_options->ghost_patch_pack_aux,1,
                          "Pack aux. variables for parallel comm. of ghost patches [T]");
 
+    /* Set verbosity level for reporting timing */
+    sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv, "value",        FCLAW_REFINE_CRITERIA_VALUE);
+    sc_keyvalue_set_int (kv, "difference",   FCLAW_REFINE_CRITERIA_DIFFERENCE);
+    sc_keyvalue_set_int (kv, "minmax",       FCLAW_REFINE_CRITERIA_MINMAX);
+    sc_keyvalue_set_int (kv, "gradient",     FCLAW_REFINE_CRITERIA_GRADIENT);
+    sc_keyvalue_set_int (kv, "user",         FCLAW_REFINE_CRITERIA_USER);
+    sc_options_add_keyvalue (opt, 0, "refinement-criteria", 
+                             &clawpatch_options->refinement_criteria, "minmax",
+                             kv, "Refinement criteria [minmax]");
+
     clawpatch_options->is_registered = 1;
 
     return NULL;
@@ -66,7 +95,6 @@ static fclaw_exit_type_t
 clawpatch_postprocess(fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
     /* Convert strings to arrays (no strings to process here) */
-
     return FCLAW_NOEXIT;
 }
 
@@ -76,7 +104,8 @@ clawpatch_check(fclaw2d_clawpatch_options_t *clawpatch_opt)
     if (clawpatch_opt->mx != clawpatch_opt->my)
     {
         fclaw_global_essentialf("Clawpatch error : mx != my\n");
-        return FCLAW_EXIT_ERROR;    }
+        return FCLAW_EXIT_ERROR;    
+    }
 
     if (2*clawpatch_opt->mbc > clawpatch_opt->mx)
     {
@@ -87,16 +116,29 @@ clawpatch_check(fclaw2d_clawpatch_options_t *clawpatch_opt)
     if (clawpatch_opt->interp_stencil_width/2 > clawpatch_opt->mbc)
     {
         fclaw_global_essentialf("Interpolation width is too large for number of " \
-                                "ghost cells (mbc) specifed.  We should have " \
+                                "ghost cells (mbc) specified.  We should have " \
                                 "(width)/2 <= mbc");
     }
+
+    /* Don't check value, in case use wants to set something */
+    if (clawpatch_opt->refinement_criteria < 0 || clawpatch_opt->refinement_criteria > 4)
+    {
+        fclaw_global_essentialf("Clawpatch error : Default refinement criteria " \
+                                "must be one of 'value','difference','minmax', " \
+                                "'gradient', or 'user'.\n");
+        return FCLAW_EXIT_ERROR;            
+    }
+    /* This is needed so that the refine */
+    fclaw2d_clawpatch_set_refinement_criteria(clawpatch_opt->refinement_criteria);   
+
     return FCLAW_NOEXIT;
 }
 
 static void
 clawpatch_destroy (fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
-    /* Nothing to do */
+    FCLAW_ASSERT (clawpatch_opt->kv_refinement_criteria != NULL);
+    sc_keyvalue_destroy (clawpatch_opt->kv_refinement_criteria);
 }
 
 /* ------------------------------------------------------------------------

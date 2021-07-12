@@ -83,7 +83,8 @@ void fc2d_clawpack5_output(struct fclaw2d_global *glob, int iframe);
 #define CLAWPACK5_SET_AMR_MODULE FCLAW_F77_FUNC(clawpack5_set_amr_module, \
                         CLAWPACK5_SET_AMR_MODULE)
 void CLAWPACK5_SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
-                    const int mthlim_in[], const int method_in[]);
+                    const int mthlim_in[], const int method_in[], 
+                    const int *use_fwaves);
 
 
 #ifdef __cplusplus

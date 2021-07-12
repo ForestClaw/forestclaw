@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -25,16 +25,7 @@
 
 #include "swirl_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack5_options.h>
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+#include "../all/advection_user.h"
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)

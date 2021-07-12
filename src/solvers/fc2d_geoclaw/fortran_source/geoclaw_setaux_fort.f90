@@ -122,8 +122,9 @@ SUBROUTINE fc2d_geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux, &
         if (is_ghost .and. ghost_invalid(ii,jj,mx,my,nghost,mint)) then
           cycle
         endif
-        aux(1,ii,jj) = test_topo(xlow + (ii - 0.5d0) * dx,       &
-            ylow + (jj - 0.5d0) * dy)
+!!        aux(1,ii,jj) = test_topo(xlow + (ii - 0.5d0) * dx,       &
+!!            ylow + (jj - 0.5d0) * dy)
+          aux(1,ii,jj) = test_topo(xlow + (ii - 0.5d0) * dx)
       enddo
     enddo
   ENDIF

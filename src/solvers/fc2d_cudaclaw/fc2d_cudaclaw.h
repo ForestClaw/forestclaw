@@ -26,7 +26,7 @@
 #ifndef FC2D_CUDACLAW_H
 #define FC2D_CUDACLAW_H
 
-#include "fc2d_cudaclaw_cuda.h"  /* Defines typedefs */
+#include <fc2d_cudaclaw_cuda.h>  /* Defines typedefs */
 
 #ifdef __cplusplus
 extern "C"
@@ -158,6 +158,7 @@ struct fc2d_cudaclaw_vtable
 
     cudaclaw_cuda_rpn2_t      cuda_rpn2;
     cudaclaw_cuda_rpt2_t      cuda_rpt2;
+    cudaclaw_cuda_speeds_t    cuda_speeds;
     cudaclaw_cuda_b4step2_t   cuda_b4step2;    
     int is_set;
 

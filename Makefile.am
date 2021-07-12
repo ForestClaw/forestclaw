@@ -19,7 +19,7 @@ DISTCLEANFILES =
 EXTRA_DIST =
 LDADD = $(FLIBS)
 LINT_CSOURCES =
-TESTS =
+TESTS = 
 bin_PROGRAMS =
 check_PROGRAMS =
 include_HEADERS =
@@ -27,6 +27,7 @@ lib_LTLIBRARIES =
 nodist_include_HEADERS =
 noinst_HEADERS =
 noinst_PROGRAMS =
+noinst_LIBRARIES =
 sysconf_DATA =
 
 # use this if you want to link in ForestClaw without autotools
@@ -48,8 +49,15 @@ AM_CPPFLAGS += -DFCLAW_INIDIR=\"$(fclawinidir)\"
 
 # setup test environment
 if FCLAW_MPIRUN
-LOG_COMPILER = @FCLAW_MPIRUN@
-AM_LOG_FLAGS = @FCLAW_MPI_TEST_FLAGS@
+AM_TESTS_ENVIRONMENT = \
+	FCLAW_MPIRUN="@FCLAW_MPIRUN@" \
+	FCLAW_MPI_TEST_FLAGS="@FCLAW_MPI_TEST_FLAGS@" \
+	FCLAW_APPLICATIONS_SRC_DIR="@abs_top_srcdir@/applications" \
+	FCLAW_APPLICATIONS_BUILD_DIR="@abs_top_builddir@/applications"
+else
+AM_TESTS_ENVIRONMENT = \
+	FCLAW_APPLICATIONS_SRC_DIR="@abs_top_srcdir@/applications" \
+	FCLAW_APPLICATIONS_BUILD_DIR="@abs_top_builddir@/applications"
 endif
 
 # recurse only into subpackages
@@ -72,6 +80,9 @@ include src/Makefile.am
 
 # Examples
 include Makefile.apps
+
+# Tests
+include test/Makefile.am
 
 # ------------------------------------------------------------------
 

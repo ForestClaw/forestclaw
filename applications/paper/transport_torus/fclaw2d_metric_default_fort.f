@@ -33,7 +33,7 @@ c     # compute the normals at cell edges.
             yc = ylower + (j-1)*dyf
 
 
-            call mapc2m_torus(xc,yc,xd1,yd1,zd1)
+            call mapc2m_torus2(xc,yc,xd1,yd1,zd1)
 
 c            call fclaw2d_map_c2m(map_context_ptr,
 c     &            blockno,xc,yc,xd1,yd1,zd1)
@@ -136,7 +136,7 @@ c     # than in the rest of the mesh.
                   xef = xe + ii*dxf
                   yef = ye + jj*dyf
 
-                  call mapc2m_torus(xef,yef,xp1,yp1,zp1)
+                  call mapc2m_torus2(xef,yef,xp1,yp1,zp1)
 c                  call fclaw2d_map_c2m(cont,
 c     &                  blockno,xef,yef,xp1,yp1,zp1)
 
@@ -208,7 +208,7 @@ c      map_context_ptr = get_context()
 c                  call fclaw2d_map_c2m(map_context_ptr,
 c     &                  blockno,xcorner,ycorner,xp1,yp1,zp1)
 
-                  call mapc2m_torus(xcorner,ycorner,xp1,yp1,zp1)
+                  call mapc2m_torus2(xcorner,ycorner,xp1,yp1,zp1)
 
                   quad(icell,jcell,1) = xp1
                   quad(icell,jcell,2) = yp1

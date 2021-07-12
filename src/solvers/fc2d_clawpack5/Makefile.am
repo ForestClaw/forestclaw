@@ -9,6 +9,7 @@ libclawpack5_installed_headers = \
 libclawpack5_compiled_sources = \
 	src/solvers/fc2d_clawpack5/fc2d_clawpack5.cpp \
 	src/solvers/fc2d_clawpack5/fc2d_clawpack5_options.c \
+	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_time_sync.f \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_amr_module.f90 \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_set_amr_module.f90 \
 	src/solvers/fc2d_clawpack5/fortran_source/clawpack5_inlinelimiter.f \

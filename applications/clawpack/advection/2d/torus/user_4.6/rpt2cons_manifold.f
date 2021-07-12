@@ -1,22 +1,22 @@
-      subroutine rpt2cons_manifold(ixy,maxm,meqn,mwaves,mbc,mx,
-     &                       ql,qr,aux1,aux2,aux3,imp,asdq,
+      subroutine rpt2cons_manifold(ixy,maxm,meqn,mwaves,maux, 
+     &                       mbc,mx, ql,qr,aux1,aux2,aux3,imp,asdq,
      &                       bmasdq,bpasdq)
       
       implicit none
 
-      integer ixy, maxm, meqn,mwaves,mbc,mx,maux,imp
+      integer ixy, maxm, meqn,mwaves,mbc,mx,imp, maux
 
       double precision     ql(1-mbc:maxm+mbc, meqn)
       double precision     qr(1-mbc:maxm+mbc, meqn)
       double precision   asdq(1-mbc:maxm+mbc, meqn)
       double precision bmasdq(1-mbc:maxm+mbc, meqn)
       double precision bpasdq(1-mbc:maxm+mbc, meqn)
-      double precision   aux1(1-mbc:maxm+mbc, *)
-      double precision   aux2(1-mbc:maxm+mbc, *)
-      double precision   aux3(1-mbc:maxm+mbc, *)
+      double precision   aux1(1-mbc:maxm+mbc, maux)
+      double precision   aux2(1-mbc:maxm+mbc, maux)
+      double precision   aux3(1-mbc:maxm+mbc, maux)
 
 
-      integer i, i1, k, idir
+      integer i, i1, idir
       double precision vrrot, vlrot, g, vhat
 
 c     # ixy = 1 --> idir = 1

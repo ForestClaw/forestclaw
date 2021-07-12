@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch46_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
 #include "../rp/euler_user_fort.h"
+
+static
+void quadrants_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = quadrants_get_options(glob);
+
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24.16f   %s",   user->gamma,"\% gamma\n");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    SETPROB();
+}
 
 void quadrants_link_solvers(fclaw2d_global_t *glob)
 {
@@ -57,12 +76,5 @@ void quadrants_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_EULER4;  /* Signature is unchanged */
         claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_EULER4;
     }
-
 }
 
-void quadrants_problem_setup(fclaw2d_global_t* glob)
-{
-    const user_options_t* user = quadrants_get_options(glob);
-
-    QUADRANTS_SETPROB(&user->gamma);
-}

@@ -26,30 +26,74 @@ def setrun(claw_pkg='amrclaw'):
     # Custom parameters
     # -------------------------------------------------
 
-    refine_threshold = 15     # Refine everywhere
-    dt_initial = 4e-3          # Stable for level 1
+    refine_threshold = 0.05     # Refine everywhere
     use_fixed_dt = True
 
+    mx = 32
+    dt_initial = 5e-3
+
+    # -1 : Always refine
+    #  0 : Usual refinement based on threshold
+    #  1 : constant theta
+    #  2 : constant r
+    refine_pattern = 1
+
+    f = 5
+
+    uniform = True
+    if uniform:
+        # No refinement;  just increase resolution on each patch
+        maxlevel = 1  
+        mx *= 2**f    # Coarsest level
+        dt_initial /= 2**f
+        nout = 5*2**f
+        nstep = 5*2**f
+
+
+    adapt = not uniform
+    if adapt:
+        # Refinement everywhere
+        refine_pattern = -1   # always adapt
+        refine_pattern = 0   # usual refinement
+        maxlevel = f + 1     # refine everywhere to this level
+        nout = 50            # Number of coarse grid steps
+        nstep = 50
+
     outstyle = 3
-    nout = 5
-    nstep = 1
 
-    example = 0
+    # 0 : Rigid body rotation
+    # 1 : Vertical flow u = (0,omega)
+    # 2 : Horizontal flow (doesn't work for the torus)
+    # 3 : Swirl example
+    example = 3
 
-    # 0 :   q = 1 in [0.25,0.75]x[0.25x0.75]   (mass does not cross boundary)
-    # 1 :   q = 1 in [0,1]x[0,1]               (mass crosses boundary)
-    init_choice = 0      
+
+    # 0 : non-smooth; 
+    # 1 : q = 1  (for compressible velocity fields)
+    # 2 : smooth (for computing errors)
+
+    init_choice = 2
 
     alpha = 0.4
-    beta = 0.5
+    beta = 0
 
+    # theta_range = [0.125, 0.375]
+    theta_range = [0,1]
+    phi_range = [0,1]
 
-    maxlevel = 2
+    init_radius = 0.4
+
+    if example == 0:
+        revs_per_s = 1.0
+    elif example >= 1:
+        revs_per_s = 1.0
+
+    cart_speed = 0.765366864730180 
+
     ratioxy = 2
-    ratiok = 1
+    ratiok = 2
 
-
-    grid_mx = 32
+    grid_mx = mx
     mi = 5
     mj = 2
     mx = mi*grid_mx
@@ -60,9 +104,9 @@ def setrun(claw_pkg='amrclaw'):
     # 1 = original qad
     # 2 = original (fixed to include call to rpn2qad)
     # 3 = new qad (should be equivalent to 2)
-    qad_mode = 3
+    qad_mode = 2
 
-    maux = 9
+    maux = 11
     use_fwaves = True
 
 
@@ -71,13 +115,19 @@ def setrun(claw_pkg='amrclaw'):
     #------------------------------------------------------------------
 
     probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
-    # c      example_in,mapping_in, ic_in, alpha_in,rps_in)
-
     probdata.add_param('example',        example,        'example')
     probdata.add_param('init_choice',    init_choice,    'init_choice')
+    probdata.add_param('refine_pattern', refine_pattern, 'refine_pattern')
     probdata.add_param('alpha',          alpha,          'alpha')
     probdata.add_param('beta',           beta,           'beta')
-
+    probdata.add_param('init_radius',    init_radius,    'init_radius')
+    probdata.add_param('revs_per_s',     revs_per_s,     'revs_per_s')
+    probdata.add_param('cart_speed',     cart_speed,     'cart_speed')
+    probdata.add_param('theta0',         theta_range[0], 'theta[0]')
+    probdata.add_param('theta1',         theta_range[1], 'theta[1]')
+    probdata.add_param('phi0',           phi_range[0],   'phi[0]')
+    probdata.add_param('phi1',           phi_range[1],   'phi[1]')
+  
     probdata.add_param('grid_mx',        grid_mx,        'grid_mx')
     probdata.add_param('mi',             mi,             'mi')
     probdata.add_param('mj',             mj,             'mj')
@@ -153,7 +203,7 @@ def setrun(claw_pkg='amrclaw'):
     # The current t, dt, and cfl will be printed every time step
     # at AMR levels <= verbosity.  Set verbosity = 0 for no printing.
     #   (E.g. verbosity == 2 means print only on levels 1 and 2.)
-    clawdata.verbosity = maxlevel
+    clawdata.verbosity = 1
 
     # ----------------------------------------------------
     # Clawpack parameters
@@ -170,7 +220,7 @@ def setrun(claw_pkg='amrclaw'):
     #   2 or 'superbee' ==> superbee
     #   3 or 'vanleer'  ==> van Leer
     #   4 or 'mc'       ==> MC limiter
-    clawdata.limiter = ['vanleer']
+    clawdata.limiter = ['minmod']
 
     clawdata.use_fwaves = True    # True ==> use f-wave version of algorithms
     clawdata.source_split = 0
@@ -227,7 +277,7 @@ def setrun(claw_pkg='amrclaw'):
     amrdata.flag2refine = True      # use this?
 
     amrdata.regrid_interval = 1
-    amrdata.regrid_buffer_width  = 0
+    amrdata.regrid_buffer_width  = 3
     amrdata.clustering_cutoff = 0.800000
     amrdata.verbosity_regrid = 0
 
@@ -242,7 +292,7 @@ def setrun(claw_pkg='amrclaw'):
     # is stored, but we have to do it this way for conservation fix.
     # ----------------------------------------------------------------
 
-    amrdata.aux_type = ['capacity'] + ['center']*8
+    amrdata.aux_type = ['capacity'] + ['center']*10
 
     #  ----- For developers -----
     # Toggle debugging print statements:

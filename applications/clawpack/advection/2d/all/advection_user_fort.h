@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,17 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ADVECTION_USER_H
-#define ADVECTION_USER_H
-
-#include <fclaw_base.h>
-
-/* Fortran headers for user-defined fortran files
-   CLAWPACK46_BC2, CLAWPACK46_QINIT, CLAWPACK5_QINIT,
-   and so on */
-
-#include <clawpack46_user_fort.h>  
-#include <clawpack5_user_fort.h>
+#ifndef ADVECTION_USER_FORT_H
+#define ADVECTION_USER_FORT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -44,15 +35,21 @@ extern "C"
 #endif
 
 #define CLAWPACK46_RPN2ADV FCLAW_F77_FUNC(clawpack46_rpn2adv,CLAWPACK46_RPN2ADV)
-void CLAWPACK46_RPN2ADV(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-                        const int* mbc,const int* mx, double ql[], double qr[],
-                        double auxl[], double auxr[], double wave[],
+void CLAWPACK46_RPN2ADV(const int* ixy,const int* maxm, const int* meqn, 
+                        const int* mwaves,
+                        const int* mbc,const int* mx, 
+                        double ql[], double qr[],
+                        double auxl[], double auxr[], 
+                        double wave[],
                         double s[], double amdq[], double apdq[]);
 
 #define CLAWPACK46_RPT2ADV FCLAW_F77_FUNC(clawpack46_rpt2adv, CLAWPACK46_RPT2ADV)
-void CLAWPACK46_RPT2ADV(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
-                        const int* mbc, const int* mx, double ql[], double qr[],
-                        double aux1[], double aux2[], double aux3[], const int* imp,
+void CLAWPACK46_RPT2ADV(const int* ixy, const int* maxm, const int* meqn, 
+                        const int* mwaves,
+                        const int* mbc, const int* mx, 
+                        double ql[], double qr[],
+                        double aux1[], double aux2[], 
+                        double aux3[], const int* imp,
                         double dsdq[], double bmasdq[], double bpasdq[]);
 
 
@@ -60,7 +57,8 @@ void CLAWPACK46_RPT2ADV(const int* ixy, const int* maxm, const int* meqn, const 
                                                    CLAWPACK46_RPN2ADV_MANIFOLD)
 void CLAWPACK46_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, 
                                  const int* mwaves,
-                                 const int* mbc,const int* mx, double ql[], double qr[],
+                                 const int* mbc,const int* mx, 
+                                 double ql[], double qr[],
                                  double auxl[], double auxr[], double wave[],
                                  double s[], double amdq[], double apdq[]);
 
@@ -68,8 +66,10 @@ void CLAWPACK46_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn
                                                    CLAWPACK46_RPT2ADV_MANIFOLD)
 void CLAWPACK46_RPT2ADV_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
                                  const int* mwaves,
-                                 const int* mbc, const int* mx, double ql[], double qr[],
-                                 double aux1[], double aux2[], double aux3[], const int* imp,
+                                 const int* mbc, const int* mx, 
+                                 double ql[], double qr[],
+                                 double aux1[], double aux2[], double aux3[], 
+                                 const int* imp,
                                  double dsdq[], double bmasdq[], double bpasdq[]);
 
 
@@ -95,8 +95,10 @@ void CLAWPACK5_RPT2ADV(const int* ixy, const int* imp,
 void CLAWPACK5_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn,
                                 const int* mwaves, const int* maux,
                                 const int* mbc,const int* mx,
-                                double ql[], double qr[], double auxl[], double auxr[],
-                                double wave[], double s[],double amdq[], double apdq[]);
+                                double ql[], double qr[], 
+                                double auxl[], double auxr[],
+                                double wave[], double s[],
+                                double amdq[], double apdq[]);
 
 #define CLAWPACK5_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpt2adv_manifold,    \
                                                   CLAWPACK5_RPT2ADV_MANIFOLD)
@@ -135,6 +137,32 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double area[]);
 
 
+#define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold,USER46_B4STEP2_MANIFOLD)
+void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
+                             const double* dx, const double* dy,
+                             const double* t, const int* maux, double aux[],
+                             const int* blockno,
+                             double xd[], double yd[], double zd[]);
+
+#define USER5_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user5_b4step2_manifold,USER5_B4STEP2_MANIFOLD)
+void USER5_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
+                            const double* dx, const double* dy,
+                            const double* t, const int* maux, double aux[],
+                            const int* blockno,
+                            double xd[], double yd[], double zd[]);
+
+#define USER_EXCEEDS_THRESHOLD FCLAW_F77_FUNC(user_exceeds_threshold, \
+                                              USER_EXCEEDS_THRESHOLD)
+
+int USER_EXCEEDS_THRESHOLD(int* blockno,
+                           double qval[], 
+                           double* qmin, double *qmax,
+                           double quad[], 
+                           double *dx, double *dy, 
+                           double *xc, double *yc, 
+                           int* tag_threshold, 
+                           int* init_flag,
+                           int* is_ghost);
 
 
 #ifdef __cplusplus

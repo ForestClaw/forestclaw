@@ -2,7 +2,7 @@ SUBROUTINE user5_setaux_manifold(mbc,mx,my, xlower,ylower,dx,dy, &
      maux,aux,blockno,xd,yd,zd,area)
   IMPLICIT NONE
 
-  INTEGER mbc, mx,my, meqn, maux
+  INTEGER mbc, mx,my, maux
   INTEGER blockno
   DOUBLE PRECISION dx,dy, xlower, ylower
   DOUBLE PRECISION  aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -14,7 +14,7 @@ SUBROUTINE user5_setaux_manifold(mbc,mx,my, xlower,ylower,dx,dy, &
   DOUBLE PRECISION area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
   INTEGER i,j
-  DOUBLE PRECISION dxdy, t, x
+  DOUBLE PRECISION dxdy, t
 
   dxdy = dx*dy
 

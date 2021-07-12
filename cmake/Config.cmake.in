@@ -1,0 +1,23 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../Modules)
+
+find_dependency(SC)
+find_dependency(P4EST)
+find_dependency(ZLIB)
+if(@thunderegg@)
+    find_dependency(ThunderEgg)
+endif()
+if(@cudaclaw@)
+    find_dependency(CUDAToolkit)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+if(TARGET FORESTCLAW::CUDACLAW)
+    set_target_properties(FORESTCLAW::CUDACLAW PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+endif()
+
+check_required_components(@PROJECT_NAME@)

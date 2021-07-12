@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -52,12 +52,6 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         /* Use [ax,bx]x[ay,by] */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_nomap();
-        break;
-    case 1:
-        printf("Warning : Five patch square not tested.");
-        exit(0);
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_fivepatch(fclaw_opt->scale,user->alpha);
         break;
     default:
         SC_ABORT_NOT_REACHED ();

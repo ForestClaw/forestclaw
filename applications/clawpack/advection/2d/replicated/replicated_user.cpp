@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,18 +26,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "replicated_user.h"
 
-#include <fclaw2d_include_all.h>
+static
+void replicated_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = replicated_get_options(glob);
 
-/* Two versions of Clawpack */
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,"%-24d %s\n",user->example,"\% example");
+        fprintf(f,"%-24.4f %s\n",user->uvel,"\% uvel");
+        fprintf(f,"%-24.4f %s\n",user->vvel,"\% vvel");
+        fprintf(f,"%-24.4f %s\n",user->revs_per_s,"\% revs_per_s");
+        fclose(f);
+    }
 
-#include "../all/advection_user_fort.h"
+    /* Make sure that node 0 has written `setprob.data` before proceeding */
+    fclaw2d_domain_barrier(glob->domain);
+
+    SETPROB();  /* Reads file created above */
+}
 
 void replicated_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt();
-
     vt->problem_setup = &replicated_problem_setup; 
 
     const user_options_t* user = replicated_get_options(glob);
@@ -57,14 +69,6 @@ void replicated_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
     }
-}
-
-void replicated_problem_setup(fclaw2d_global_t* glob)
-{
-    const user_options_t* user = replicated_get_options(glob);
-
-    int example = user->example;  /* Macros don't expand properly without this */
-    REPLICATED_SETPROB(&example);    
 }
 
 

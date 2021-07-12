@@ -39,6 +39,8 @@
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 
+#include <fclaw2d_physical_bc.h>
+
 #include <fclaw_gauges.h>
 
 #include <fclaw2d_map.h>

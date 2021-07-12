@@ -4,7 +4,7 @@
 
       implicit none
       integer mx,my,mbc,meqn,psize, mint
-      integer pack_area, packmode, ierror
+      integer packmode, ierror
       double precision qdata(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision qpack(psize)
@@ -28,7 +28,7 @@
 
       packdata = packmode .eq. packq .or. packmode .eq. packarea
 
-      nghost = 2
+      nghost = mbc
       k = 1
 c     # Face 0
       do mq = 1,meqn

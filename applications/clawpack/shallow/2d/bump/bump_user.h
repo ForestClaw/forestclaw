@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -36,14 +36,14 @@ extern "C"
 #endif
 #endif
 
+#if 0
+/* To get syntax highlighting right */
+#endif
+
 typedef struct user_options
 {
     int example;
-
     double gravity;
-
-    int mapping; 
-    double alpha;
 
     int claw_version;
 
@@ -51,24 +51,6 @@ typedef struct user_options
 } user_options_t;
 
 
-#define BUMP_SETPROB FCLAW_F77_FUNC(bump_setprob, BUMP_SETPROB)
-void BUMP_SETPROB();
-
-
-#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
-                                             USER5_SETAUX_MANIFOLD)
-
-void USER5_SETAUX_MANIFOLD(const int* mbc,
-                           const int* mx, const int* my,
-                           const double* xlower, const double* ylower,
-                           const double* dx, const double* dy,
-                           const int* maux, double aux[],
-                           double xnormals[], double xtangents[],
-                           double ynormals[], double ytangents[],
-                           double surfnormals[],
-                           double area[]);
-
-void bump_problem_setup(fclaw2d_global_t *glob);
 void bump_link_solvers(fclaw2d_global_t *glob);
 
 user_options_t* bump_options_register (fclaw_app_t * app,
@@ -78,20 +60,15 @@ void bump_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 user_options_t* bump_get_options(fclaw2d_global_t* glob);
 
-void bump_patch_setup(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx);
-
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
-                                                   const double shift[],
-                                                   const double rotate[],
-                                                   const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
-                                                  const double alpha);
+/* ----------------------------- Conservative update ---------------------------------- */
+
+#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+
+void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
+                      double q[], double aux_center[], double aux_edge[], double flux[]);
 
 
 #ifdef __cplusplus

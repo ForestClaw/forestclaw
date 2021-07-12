@@ -47,7 +47,7 @@ c      #  ok as long as meqn, mwaves < maxvar
        dimension amdq(nvar,max1dp1),  apdq(nvar,max1dp1)
        dimension auxl(maxaux*max1dp1),  auxr(maxaux*max1dp1)
 
-       integer idir, iface, sgn
+       integer idir, iface
        logical use_fix
 
       logical qad_debug
@@ -149,9 +149,6 @@ c          # Re-purpose user Riemann solver
            call rpn2(1,max1dp1-2*nghost,nvar,mwaves,maux,nghost,
      &               nc+1-2*nghost,ql,qr,auxl,auxr,wave,s,amdq,apdq)
        endif           
-
-
-
 c
 c we have the wave. for side 1 add into sdflxm
 c
@@ -201,8 +198,6 @@ c          # skip over sides 2 and 4 in this case
              if (auxtype(ma).eq."yleft") then
 c                # Assuming velocity at bottom-face, this fix
 c                # preserves conservation in incompressible flow:
-c                # This assumes that the coarse grid aux variable is the 
-c                # same as the fine grid variable, i.e. edges match.
                  ifine = (ic-1)*lratiox + nghost + l
                  auxl(iaddaux(ma,lind+1)) = aux(ma,ifine,mjtot-nghost+1)
                else
@@ -243,9 +238,6 @@ c          # Re-purpose user Riemann solver
            call rpn2(2,max1dp1-2*nghost,nvar,mwaves,maux,nghost,
      &               nr+1-2*nghost,ql,qr,auxl,auxr,wave,s,amdq,apdq)
        endif
-
-
-
 c
 c we have the wave. for side 2. add into sdflxp
 c
@@ -318,12 +310,9 @@ c          # Re-purpose user Riemann solver
            call rpn2(1,max1dp1-2*nghost,nvar,mwaves,maux,nghost,
      &               nc+1-2*nghost,ql,qr,auxl,auxr,wave,s,amdq,apdq)
        endif
-
-
 c
 c we have the wave. for side 3 add into sdflxp
 C
-       sgn = -1  !! Sign
        do 330 j = 1, nc/lratioy
           influx  = influx + 1
           jfine = (j-1)*lratioy
@@ -398,8 +387,6 @@ c          # Re-purpose user Riemann solver
            call rpn2(2,max1dp1-2*nghost,nvar,mwaves,maux,nghost,
      &               nr+1-2*nghost,ql,qr,auxl,auxr,wave,s,amdq,apdq)
        endif
-       
-
 c
 c we have the wave. for side 4. add into sdflxm
 c
@@ -414,6 +401,8 @@ c
  450         continue
  440       continue
  430    continue
+
+ 101    format(I5, F24.16)
 
  499   continue
 
@@ -480,7 +469,6 @@ c       # Call user defined function to compute fluxes.  The resulting
 c       # flux should be those projected onto face 'iface_cell' and 
 c       # scaled by edgelength/dx or edgelength/dy.
 c       #
-c       # The cell edge is the same for both coarse and fine.
         call rpn2qad_flux(meqn,maux,idir,iface_cell,qvl,auxvl,fluxl)
         call rpn2qad_flux(meqn,maux,idir,iface_cell,qvr,auxvr,fluxr)
 

@@ -328,7 +328,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
             fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
             fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
-                                            (void*) NULL);
+                                            (void*) &domain_init);
 
             fclaw2d_global_iterate_patches(glob,cb_fclaw2d_regrid_tag4refinement,
                                          &domain_init);

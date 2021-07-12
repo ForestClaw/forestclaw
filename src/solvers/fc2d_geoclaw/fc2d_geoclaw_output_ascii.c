@@ -37,38 +37,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static
 void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx, int this_patch_idx,
+                             fclaw2d_patch_t *patch,
+                             int blockno, int patchno,
                              void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
     fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
 
-    const fc2d_geoclaw_options_t *geoclaw_options;
-    geoclaw_options = fc2d_geoclaw_get_options(glob);
-
-    int mx,my,mbc,meqn,maux;
-    int mbathy = geoclaw_options->mbathy;    
-    double xlower,ylower,dx,dy;
-    double *q,*aux;
-    int patch_num, level;
-
-    int iframe = *((int *) s->user);
+    int iframe = *((int *) s->user);    
 
     /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_block_idx,this_patch_idx,
-                           &patch_num,&level);
+    int local_num, global_num, level;
+    fclaw2d_patch_get_info(glob->domain,patch,
+                           blockno,patchno,
+                           &global_num, 
+                           &local_num,&level);
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    double *q;
+    int meqn;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    double *aux;
+    int maux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+
+
+    const fc2d_geoclaw_options_t *geoclaw_options = 
+                           fc2d_geoclaw_get_options(glob);
+    int mbathy = geoclaw_options->mbathy;    
 
     FC2D_GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn,&maux,&mbathy,&mbc,&xlower,&ylower,
-                                 &dx,&dy,q,aux,&iframe,&patch_num,&level,
-                                 &this_block_idx,&glob->mpirank);
+                                 &dx,&dy,q,aux,&iframe,&global_num,&level,
+                                 &blockno,&glob->mpirank);
 }
 
 static

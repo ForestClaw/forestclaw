@@ -10,7 +10,7 @@
 
 #include <fc2d_cuda_profiler.h>
 
-#include "../fc2d_cudaclaw_check.cu"
+#include "../fc2d_cudaclaw_check.h"
 
 
 /* Static buffers for transfering to the GPU */

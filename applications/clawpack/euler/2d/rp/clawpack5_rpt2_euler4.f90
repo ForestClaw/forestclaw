@@ -45,7 +45,7 @@ SUBROUTINE clawpack5_rpt2_euler4(ixy,imp,maxm,meqn,mwaves,maux, &
 !     # These are stored in the common block comroe since they are
 !     # later used in routine rpt2eu to do the transverse wave splitting.
 !
-      do 10 i = 2-mbc, mx+mbc
+      do i = 2-mbc, mx+mbc
          rhsqrtl = dsqrt(qr(1,i-1))
          rhsqrtr = dsqrt(ql(1,i))
          pl = gamma1*(qr(4,i-1) - 0.5d0*(qr(2,i-1)**2 + &
@@ -62,9 +62,9 @@ SUBROUTINE clawpack5_rpt2_euler4(ixy,imp,maxm,meqn,mwaves,maux, &
          a(i) = dsqrt(a2)
          g1a2(i) = gamma1 / a2
          euv(i) = enth(i) - u2v2(i)
-   10    continue
+      end do
 !
-         do 20 i = 2-mbc, mx+mbc
+         do i = 2-mbc, mx+mbc
             a3 = g1a2(i) * (euv(i)*asdq(1,i) &
                   + u(i)*asdq(mu,i) + v(i)*asdq(mv,i) - asdq(4,i))
             a2 = asdq(mu,i) - u(i)*asdq(1,i)
@@ -92,17 +92,17 @@ SUBROUTINE clawpack5_rpt2_euler4(ixy,imp,maxm,meqn,mwaves,maux, &
 !
 !           # compute the flux differences bmasdq and bpasdq
 !
-            do 30 m=1,meqn
+            do m=1,meqn
                bmasdq(m,i) = 0.d0
                bpasdq(m,i) = 0.d0
-               do 30 mw=1,3
+               do mw=1,3
                   bmasdq(m,i) = bmasdq(m,i) &
                               + dmin1(sb(mw), 0.d0) * waveb(m,mw)
                   bpasdq(m,i) = bpasdq(m,i) &
                               + dmax1(sb(mw), 0.d0) * waveb(m,mw)
-   30             continue
-!
-   20       continue
+               end do!
+            end do
+        end do
 !
       return
       end

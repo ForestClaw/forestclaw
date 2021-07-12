@@ -47,7 +47,8 @@ struct fclaw2d_global
     int count_ghost_exchange;
     int count_amr_regrid;
     int count_amr_new_domain;
-    int count_single_step;
+    int count_single_step;    
+    int count_elliptic_grids;
     int count_multiproc_corner;
     int count_grids_per_proc;
     int count_grids_remote_boundary;

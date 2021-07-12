@@ -56,7 +56,7 @@ c
                 r = dotr / wnorm2
               endif
 c
-            go to (10,20,30,40,50) mthlim(mw)
+            go to (10,20,30,40,50,60) mthlim(mw)
 c
    10       continue
 c           --------

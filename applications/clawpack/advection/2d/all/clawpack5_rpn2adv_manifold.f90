@@ -12,7 +12,7 @@ SUBROUTINE clawpack5_rpn2adv_manifold(ixy,maxm,meqn, &
   DOUBLE PRECISION auxl(maux,1-mbc:maxm+mbc)
   DOUBLE PRECISION auxr(maux,1-mbc:maxm+mbc)
 
-  INTEGER iface, i, i1, m
+  INTEGER iface, i, m
 
   IF (mwaves .NE. 1) THEN
      WRITE(6,*) 'clawpack5_rpn2 : mwaves should be equal to 1'

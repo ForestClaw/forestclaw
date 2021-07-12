@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -44,9 +44,6 @@ torus_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "revs_per_s", &user_opt->revs_per_s, 0.4,
                            "[user] Revolutions per second [0.5]");
 
-    sc_options_add_bool (opt, 0, "color-equation", &user_opt->color_equation, 1,
-                           "[user] User color equation [T]");
-
     sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 4,
                         "[user] Clawpack version (4 or 5) [4]");
 
@@ -72,12 +69,6 @@ torus_check(user_options_t *user)
             fclaw_global_essentialf("Non-zero beta not implemented for "\
                                     "claw-version == 5\n");
             return FCLAW_EXIT_QUIET;
-        }
-        if (user->color_equation == 0)
-        {
-            fclaw_global_essentialf("Transport equation (color_equation == 0) not "\
-                                    "implemented in claw-version == 5\n");
-            return FCLAW_EXIT_QUIET;            
         }
     }
     return FCLAW_NOEXIT;

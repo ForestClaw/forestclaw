@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -339,8 +339,6 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 	    /* This is the final synchronization not covered in fine_steps loop */
 		fclaw2d_time_sync(glob,minlevel,maxlevel);
 	}
-
-
 
 	delete_timestep_counters(&ts_counter);
 

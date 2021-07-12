@@ -91,9 +91,8 @@
             if (abs(error(i,j,1)) .lt. 1d-99) then
                error(i,j,1) = 0.d0
             endif
-            divu = annulus_divergence(xc,yc)
             write(matunit1,120) (q(i,j,mq),mq=1,meqn),qc,
-     &            error(i,j,1), divu
+     &            error(i,j,1)
          enddo
          write(matunit1,*) ' '
       enddo

@@ -1,4 +1,4 @@
-# comment = "Torus example : eff. resolution = 2048 x 2048"
+# comment = "Shockbubble example : eff. resolution = 2048 x 2048"
 import sys
 import os
 import subprocess
@@ -6,8 +6,9 @@ import random
 
 np = 1
 exec = "shockbubble"
+options_file = 'fclaw_options.ini'
 
-arg_list = ["mpirun","-n",str(np),exec,"--inifile=timing.ini"]
+arg_list = ["mpirun","-n",str(np),exec,"-F",options_file]
 jobid = random.randint(1000,9999)
 outfile = "{:s}_0000{:d}.o{:d}".format(exec,np,jobid)
 f = open(outfile,'w')

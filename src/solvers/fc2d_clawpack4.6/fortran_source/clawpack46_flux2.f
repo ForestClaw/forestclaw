@@ -56,8 +56,7 @@ c
 c
       implicit none
 
-      integer mw, jside, m, i, j, ixy, maxm, meqn, mbc, mx
-      integer my, maux
+      integer ixy, maxm, meqn, mbc, mx, maux
       integer mwaves, mcapa, method(7), mthlim(mwaves)
 
       external rpn2, rpt2
@@ -79,32 +78,36 @@ c
       double precision     s(1-mbc:maxm+mbc, mwaves)
       double precision  wave(1-mbc:maxm+mbc, meqn, mwaves)
 
-      double precision cfl1d, gupdate,dtdxave
-
-      integer ilr
-      logical limit
       double precision dtcom, dxcom, dycom, tcom
       integer icom, jcom
       common /comxyt/ dtcom,dxcom,dycom,tcom,icom,jcom
+
+
+      integer ilr, mw, jside, m, i
+      double precision cfl1d, gupdate,dtdxave
+      logical limit
+
 c
       limit = .false.
-      do 5 mw=1,mwaves
-         if (mthlim(mw) .gt. 0) limit = .true.
-    5 continue
+      do mw = 1,mwaves
+         if (mthlim(mw) .gt. 0) then 
+            limit = .true.
+        end if
+      end do
 c
 c     # initialize flux increments:
 c     -----------------------------
 c
-      do 30 jside=1,2
-         do 20 m=1,meqn
-            do 10 i = 1-mbc, mx+mbc
+      do jside=1,2
+         do m = 1,meqn
+            do i = 1-mbc, mx+mbc
                faddm(i,m) = 0.d0
                faddp(i,m) = 0.d0
                gaddm(i,m,jside) = 0.d0
                gaddp(i,m,jside) = 0.d0
-   10          continue
-   20       continue
-   30    continue
+            end do
+         end do
+      end do
 c
 c
 c     # solve Riemann problem at each interface and compute Godunov updates
@@ -112,110 +115,114 @@ c     ---------------------------------------------------------------------
 c
       call rpn2(ixy,maxm,meqn,mwaves,mbc,mx,q1d,q1d,
      &          aux2,aux2,wave,s,amdq,apdq)
+
 c
 c     # Set fadd for the donor-cell upwind method (Godunov)
-      do 40 i=1,mx+1
-         do 40 m=1,meqn
+      do i = 2-mbc, mx+mbc-1
+         do m = 1,meqn
             faddp(i,m) = faddp(i,m) - apdq(i,m)
             faddm(i,m) = faddm(i,m) + amdq(i,m)
-   40       continue
+         end do
+      end do
 c
 c     # compute maximum wave speed for checking Courant number:
       cfl1d = 0.d0
-      do 50 mw=1,mwaves
-         do 50 i=1,mx+1
-c          # if s>0 use dtdx1d(i) to compute CFL,
-c          # if s<0 use dtdx1d(i-1) to compute CFL:
-            cfl1d = dmax1(cfl1d, dtdx1d(i)*s(i,mw),
+      do mw = 1,mwaves
+          do i = 1,mx+1
+c             # if s>0 use dtdx1d(i) to compute CFL,
+c             # if s<0 use dtdx1d(i-1) to compute CFL:
+              cfl1d = dmax1(cfl1d, dtdx1d(i)*s(i,mw),
      &                          -dtdx1d(i-1)*s(i,mw))
-   50       continue
+          end do
+      end do
 c
-      if (method(2).eq.1) go to 130
-c
-c     # modify F fluxes for second order q_{xx} correction terms:
-c     -----------------------------------------------------------
-c
-c     # apply limiter to waves:
-      if (limit) call clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc,mx,
-     &      wave,s,mthlim)
-c
-      do 120 i = 1, mx+1
-c
-c        # For correction terms below, need average of dtdx in cell
-c        # i-1 and i.  Compute these and overwrite dtdx1d:
-c
-c         dtdx1d(i-1) = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
-         dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
-c
-         do 120 m=1,meqn
-            cqxx(i,m) = 0.d0
-            do 119 mw=1,mwaves
-c
-c              # second order corrections:
-               cqxx(i,m) = cqxx(i,m) + dabs(s(i,mw))
-     &             * (1.d0 - dabs(s(i,mw))*dtdxave) * wave(i,m,mw)
-c
-  119          continue
-            faddm(i,m) = faddm(i,m) + 0.5d0 * cqxx(i,m)
-            faddp(i,m) = faddp(i,m) + 0.5d0 * cqxx(i,m)
-  120       continue
-c
-c
-  130  continue
-c
-       if (method(3).eq.0) go to 999   !# no transverse propagation
-c
-       if (method(2) .gt. 1 .and. method(3) .eq. 2) then
-c         # incorporate cqxx into amdq and apdq so that it is split also.
-          do 150 i = 1, mx+1
-             do 150 m=1,meqn
-                amdq(i,m) = amdq(i,m) + cqxx(i,m)
-                apdq(i,m) = apdq(i,m) - cqxx(i,m)
-  150           continue
+      if (method(2) .eq. 2) then
+
+c         # modify F fluxes for second order q_{xx} correction terms:
+c         -----------------------------------------------------------
+
+c         # apply limiter to waves:
+          if (limit) then 
+              call clawpack46_inlinelimiter(maxm,meqn, mwaves,mbc,mx,
+     &                                      wave,s,mthlim)
+          end if
+
+          do i = 2-mbc, mx+mbc
+
+c             # For correction terms below, need average of dtdx in cell
+c             # i-1 and i.  Compute these and overwrite dtdx1d:
+
+c             dtdx1d(i-1) = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
+              dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
+
+              do m = 1,meqn
+                  cqxx(i,m) = 0.d0
+                  do mw = 1,mwaves
+
+c                     # second order corrections:
+                      cqxx(i,m) = cqxx(i,m) + dabs(s(i,mw))
+     &                 * (1.d0 - dabs(s(i,mw))*dtdxave) * wave(i,m,mw)
+                  end do
+                  faddm(i,m) = faddm(i,m) + 0.5d0 * cqxx(i,m)
+                  faddp(i,m) = faddp(i,m) + 0.5d0 * cqxx(i,m)
+              end do
+          end do
+      end if
+
+      if (method(3) .gt. 0) then
+
+          if (method(2) .gt. 1 .and. method(3) .eq. 2) then
+c             # incorporate cqxx into amdq and apdq so that it is split also.
+              do i = 2-mbc, mx+mbc-1
+                  do m=1,meqn
+                      amdq(i,m) = amdq(i,m) + cqxx(i,m)
+                      apdq(i,m) = apdq(i,m) - cqxx(i,m)
+                  end do
+              end do
           endif
-c
-c
-c      # modify G fluxes for transverse propagation
-c      --------------------------------------------
-c
-c
-c     # split the left-going flux difference into down-going and up-going:
-      ilr = 1
-      call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
-     &          q1d,q1d,aux1,aux2,aux3,
-     &          ilr,amdq,bmasdq,bpasdq)
-c
-c     # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
-      do 160 m=1,meqn
-          do 160 i = 1, mx+1
-               gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(i,m)
-               gaddm(i-1,m,1) = gaddm(i-1,m,1) - gupdate
-               gaddp(i-1,m,1) = gaddp(i-1,m,1) - gupdate
-c
-               gupdate = 0.5d0*dtdx1d(i-1) * bpasdq(i,m)
-               gaddm(i-1,m,2) = gaddm(i-1,m,2) - gupdate
-               gaddp(i-1,m,2) = gaddp(i-1,m,2) - gupdate
-  160          continue
-c
-c     # split the right-going flux difference into down-going and up
+
+
+c         # modify G fluxes for transverse propagation
+c         --------------------------------------------
+
+
+c         # split the left-going flux difference into down-going and up-going:
+          ilr = 1
+          call rpt2(ixy,maxm,meqn,mwaves,mbc,mx, q1d,q1d,
+     &          aux1,aux2,aux3, ilr,amdq,bmasdq,bpasdq)
+
+c         # modify flux below and above by B^- A^- Delta q and  B^+ A^- Delta q:
+          do m=1,meqn
+              do i = 2-mbc, mx+mbc
+                  gupdate = 0.5d0*dtdx1d(i-1) * bmasdq(i,m)
+                  gaddm(i-1,m,1) = gaddm(i-1,m,1) - gupdate
+                  gaddp(i-1,m,1) = gaddp(i-1,m,1) - gupdate
+
+                  gupdate = 0.5d0*dtdx1d(i-1) * bpasdq(i,m)
+                  gaddm(i-1,m,2) = gaddm(i-1,m,2) - gupdate
+                  gaddp(i-1,m,2) = gaddp(i-1,m,2) - gupdate
+              end do
+          end do
+
+c         # split the right-going flux difference into down-going and up
 c              -going:
-      ilr = 2
-      call rpt2(ixy,maxm,meqn,mwaves,mbc,mx,
-     &          q1d,q1d,aux1,aux2,aux3,
-     &          ilr,apdq,bmasdq,bpasdq)
-c
-c     # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
-      do 180 m=1,meqn
-          do 180 i = 1, mx+1
-               gupdate = 0.5d0*dtdx1d(i) * bmasdq(i,m)
-               gaddm(i,m,1) = gaddm(i,m,1) - gupdate
-               gaddp(i,m,1) = gaddp(i,m,1) - gupdate
-c
-               gupdate = 0.5d0*dtdx1d(i) * bpasdq(i,m)
-               gaddm(i,m,2) = gaddm(i,m,2) - gupdate
-               gaddp(i,m,2) = gaddp(i,m,2) - gupdate
-  180          continue
-c
-  999 continue
+          ilr = 2
+          call rpt2(ixy,maxm,meqn,mwaves,mbc,mx, q1d,q1d,
+     &               aux1,aux2,aux3, ilr,apdq,bmasdq,bpasdq)
+
+c         # modify flux below and above by B^- A^+ Delta q and  B^+ A^+ Delta q:
+          do m=1,meqn
+              do i = 2-mbc, mx+mbc
+                  gupdate = 0.5d0*dtdx1d(i) * bmasdq(i,m)
+                  gaddm(i,m,1) = gaddm(i,m,1) - gupdate
+                  gaddp(i,m,1) = gaddp(i,m,1) - gupdate
+
+                  gupdate = 0.5d0*dtdx1d(i) * bpasdq(i,m)
+                  gaddm(i,m,2) = gaddm(i,m,2) - gupdate
+                  gaddp(i,m,2) = gaddp(i,m,2) - gupdate                  
+              end do
+          end do
+      end if
+
       return
       end

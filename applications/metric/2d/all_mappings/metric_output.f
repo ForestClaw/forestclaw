@@ -16,7 +16,7 @@
       integer nstp,ipos,idigit
       integer i,j,mq
 
-      include 'metric_terms.i'
+      include 'fclaw2d_metric_terms.i'
 
       matname1 = 'fort.qxxxx'
       matunit1 = 10

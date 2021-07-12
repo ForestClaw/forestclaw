@@ -45,6 +45,8 @@ void cb_clawpatch_output_ascii (struct fclaw2d_domain * domain,
 
 void fclaw2d_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
 
+void fclaw2d_clawpatch_time_header_ascii(struct fclaw2d_global* glob, int iframe);
+
 
 #ifdef __cplusplus
 #if 0

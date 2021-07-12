@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -172,12 +172,12 @@ void CLAWPACK46_STEP2_WRAP(const int* maxm, const int* meqn, const int* maux,
 							const double* dx, const double* dy, const double* dt,
 							const double* cfl, double work[], const int* mwork,
 							const double* xlower, const double* ylower, const int* level,
-							const double* t, double fp[], double fm[], double gp[],
-							double gm[],
-							clawpack46_fort_rpn2_t rpn2,
-							clawpack46_fort_rpt2_t rpt2,
+							const double* t, 
+							double fp[], double fm[], double gp[], double gm[],
+							clawpack46_fort_rpn2_t rpn2,     clawpack46_fort_rpt2_t rpt2,
+							clawpack46_fort_rpn2fw_t rpn2fw, clawpack46_fort_rpt2fw_t rpt2fw,
 							clawpack46_fort_flux2_t flux2,
-							int block_corner_count[],int* ierror);
+							int block_corner_count[],int* ierror, const int* use_fwaves);
 
 /* ----------------------------- Misc ClawPack specific functions ------------------------------ */
 

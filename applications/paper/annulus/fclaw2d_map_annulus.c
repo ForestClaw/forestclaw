@@ -10,6 +10,22 @@ extern "C"
 #endif
 #endif
 
+
+#define MAPC2M_ANNULUS2 FCLAW_F77_FUNC(mapc2m_annulus2,MAPC2M_ANNULUS2)
+
+void MAPC2M_ANNULUS2(const double* xc1, const double *yc1, 
+                   double* xp, double *yp, double *zp);
+
+
+#define ANNULUS_BASIS_COMPLETE FCLAW_F77_FUNC(annulus_basis_complete, \
+                            ANNULUS_BASIS_COMPLETE)
+
+void ANNULUS_BASIS_COMPLETE(const double* x, const double *y,
+                           double t[], double tinv[], double uderivs[], 
+                           const int* flag);
+
+
+
 static int
 fclaw2d_map_query_annulus (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -61,14 +77,28 @@ fclaw2d_map_query_annulus (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
+fclaw2d_map_c2m_basis_annulus(fclaw2d_map_context_t * cont,
+                            double xc, double yc, 
+                            double *t, double *tinv, 
+                            double *tderivs, int flag)
+{
+    /* These coordinates are in [0,1]x[0,1] and are mapped to 
+       [theta,phi] using mappings in sphere_basis.f */
+    ANNULUS_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
+}
+
+
+static void
 fclaw2d_map_c2m_annulus (fclaw2d_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
+#if 0
     double beta, theta[2];
     beta     = cont->user_double[0];
     theta[0] = cont->user_double[1];
     theta[1] = cont->user_double[2];
+#endif    
 
     /* Scale's brick mapping to [0,1]x[0,1] */
     /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
@@ -77,7 +107,7 @@ fclaw2d_map_c2m_annulus (fclaw2d_map_context_t * cont, int blockno,
 
     /* blockno is ignored in the current annulus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
-    MAPC2M_ANNULUS(&blockno,&xc1,&yc1,xp,yp,zp,&beta,theta);
+    MAPC2M_ANNULUS2(&xc1,&yc1,xp,yp,zp);
 }
 
 fclaw2d_map_context_t *
@@ -92,6 +122,7 @@ fclaw2d_map_context_t *
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_annulus;
     cont->mapc2m = fclaw2d_map_c2m_annulus;
+    cont->basis = fclaw2d_map_c2m_basis_annulus;
 
     cont->user_double[0] = beta;
     cont->user_double[1] = theta[0];

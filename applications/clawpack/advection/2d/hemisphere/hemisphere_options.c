@@ -31,8 +31,8 @@ static void *
 hemisphere_register (user_options_t* user_opt, sc_options_t * opt)
 {
     sc_options_add_int (opt, 0, "example", &user_opt->example, 2,
-                        "[user] 1 for pillow grid, "    \
-                        "2 for five-patch hemisphere [2]");
+                        "[user] 0 for five-patch hemisphere, "    \
+                        "1 for pillowsphere[2]");
 
     sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.4,
                            "Ratio of outer square to inner square [0.4]");
@@ -47,8 +47,8 @@ hemisphere_register (user_options_t* user_opt, sc_options_t * opt)
 static fclaw_exit_type_t
 hemisphere_check (user_options_t *user_opt)
 {
-    if (user_opt->example < 0 || user_opt->example > 2) {
-        fclaw_global_essentialf ("Option --user:example must be 0,1 or 2\n");
+    if (user_opt->example < 0 || user_opt->example > 1) {
+        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_ERROR;
     }
 
