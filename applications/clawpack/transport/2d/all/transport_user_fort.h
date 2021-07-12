@@ -31,6 +31,10 @@ extern "C"
 {
 #endif
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
 /* ------------------------------------ SETAUX ---------------------------------------- */
 
 #define TRANSPORT46_SETAUX_MANIFOLD FCLAW_F77_FUNC(transport46_setaux_manifold, \
@@ -83,10 +87,14 @@ void TRANSPORT5_SET_VELOCITY(const int* blockno, const int* mx, const int* my,
 
 /* ------------------------------- Riemann solvers ------------------------------------ */
 
-#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+#define RPN2CONS_UPDATE_MANIFOLD FCLAW_F77_FUNC(rpn2cons_update_manifold, \
+                                                RPN2CONS_UPDATE_MANIFOLD)
 
-void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
-                      double q[], double aux_center[], double aux_edge[], double flux[]);
+void RPN2CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, 
+                              const int* idir, const int* iface,
+                              double q[], double aux_center[], 
+
+                              double aux_edge[], double flux[]);
 
 #define CLAWPACK46_RPN2CONS_FW_MANIFOLD FCLAW_F77_FUNC( \
                           clawpack46_rpn2cons_fw_manifold, \
@@ -134,21 +142,8 @@ void CLAWPACK5_RPT2CONS_MANIFOLD(const int* ixy, const int* imp,
                                  double aux3[],  double asdq[],
                                  double bmasdq[], double bpasdq[]);
 
-/* ------------------------------------ OLD ------------------------------------------- */
-#define USER46_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user46_b4step2_manifold, \
-                                               USER46_B4STEP2_MANIFOLD)
-void USER46_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
-                             const double* dx, const double* dy,
-                             const double* t, const int* maux, double aux[],
-                             const int* blockno,
-                             double xd[], double yd[], double zd[]);
 
-#define USER5_B4STEP2_MANIFOLD FCLAW_F77_FUNC(user5_b4step2_manifold,USER5_B4STEP2_MANIFOLD)
-void USER5_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
-                            const double* dx, const double* dy,
-                            const double* t, const int* maux, double aux[],
-                            const int* blockno,
-                            double xd[], double yd[], double zd[]);
+/* ------------------------------------ Tagging  -------------------------------------- */
 
 #define USER_EXCEEDS_THRESHOLD FCLAW_F77_FUNC(user_exceeds_threshold, \
                                               USER_EXCEEDS_THRESHOLD)
@@ -162,111 +157,6 @@ int USER_EXCEEDS_THRESHOLD(int* blockno,
                            int* tag_threshold, 
                            int* init_flag,
                            int* is_ghost);
-
-#define CLAWPACK46_RPN2ADV FCLAW_F77_FUNC(clawpack46_rpn2adv,CLAWPACK46_RPN2ADV)
-void CLAWPACK46_RPN2ADV(const int* ixy,const int* maxm, const int* meqn, 
-                        const int* mwaves,
-                        const int* mbc,const int* mx, 
-                        double ql[], double qr[],
-                        double auxl[], double auxr[], 
-                        double wave[],
-                        double s[], double amdq[], double apdq[]);
-
-#define CLAWPACK46_RPT2ADV FCLAW_F77_FUNC(clawpack46_rpt2adv, CLAWPACK46_RPT2ADV)
-void CLAWPACK46_RPT2ADV(const int* ixy, const int* maxm, const int* meqn, 
-                        const int* mwaves,
-                        const int* mbc, const int* mx, 
-                        double ql[], double qr[],
-                        double aux1[], double aux2[], 
-                        double aux3[], const int* imp,
-                        double dsdq[], double bmasdq[], double bpasdq[]);
-
-
-#define CLAWPACK46_RPN2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpn2adv_manifold, \
-                                                   CLAWPACK46_RPN2ADV_MANIFOLD)
-void CLAWPACK46_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn, 
-                                 const int* mwaves,
-                                 const int* mbc,const int* mx, 
-                                 double ql[], double qr[],
-                                 double auxl[], double auxr[], double wave[],
-                                 double s[], double amdq[], double apdq[]);
-
-#define CLAWPACK46_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack46_rpt2adv_manifold, \
-                                                   CLAWPACK46_RPT2ADV_MANIFOLD)
-void CLAWPACK46_RPT2ADV_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
-                                 const int* mwaves,
-                                 const int* mbc, const int* mx, 
-                                 double ql[], double qr[],
-                                 double aux1[], double aux2[], double aux3[], 
-                                 const int* imp,
-                                 double dsdq[], double bmasdq[], double bpasdq[]);
-
-
-#define CLAWPACK5_RPN2ADV FCLAW_F77_FUNC(clawpack5_rpn2adv,CLAWPACK5_RPN2ADV)
-void CLAWPACK5_RPN2ADV(const int* ixy,const int* maxm, const int* meqn,
-                       const int* mwaves, const int* maux,
-                       const int* mbc,const int* mx,
-                       double ql[], double qr[], double auxl[], double auxr[],
-                       double wave[], double s[],double amdq[], double apdq[]);
-
-#define CLAWPACK5_RPT2ADV FCLAW_F77_FUNC(clawpack5_rpt2adv, CLAWPACK5_RPT2ADV)
-void CLAWPACK5_RPT2ADV(const int* ixy, const int* imp,
-                       const int* maxm, const int* meqn,
-                       const int* mwaves, const int* maux,
-                       const int* mbc,const int* mx,
-                       double ql[], double qr[],
-                       double aux1[], double aux2[],
-                       double aux3[],  double asdq[],
-                       double bmasdq[], double bpasdq[]);
-
-#define CLAWPACK5_RPN2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpn2adv_manifold,    \
-                                                  CLAWPACK5_RPN2ADV_MANIFOLD)
-void CLAWPACK5_RPN2ADV_MANIFOLD(const int* ixy,const int* maxm, const int* meqn,
-                                const int* mwaves, const int* maux,
-                                const int* mbc,const int* mx,
-                                double ql[], double qr[], 
-                                double auxl[], double auxr[],
-                                double wave[], double s[],
-                                double amdq[], double apdq[]);
-
-#define CLAWPACK5_RPT2ADV_MANIFOLD FCLAW_F77_FUNC(clawpack5_rpt2adv_manifold,    \
-                                                  CLAWPACK5_RPT2ADV_MANIFOLD)
-void CLAWPACK5_RPT2ADV_MANIFOLD(const int* ixy, const int* imp,
-                                const int* maxm, const int* meqn,
-                                const int* mwaves, const int* maux,
-                                const int* mbc,const int* mx,
-                                double ql[], double qr[],
-                                double aux1[], double aux2[],
-                                double aux3[],  double asdq[],
-                                double bmasdq[], double bpasdq[]);
-
-#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold, \
-                                               USER46_SETAUX_MANIFOLD)
-
-void USER46_SETAUX_MANIFOLD(const int* mbc,
-                            const int* mx, const int* my,
-                            const double* xlower, const double* ylower,
-                            const double* dx, const double* dy,
-                            const int* maux, double aux[],
-                            const int* blockno,
-                            double xd[], double yd[], double zd[],
-                            double area[]);
-
-
-#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
-                                             USER5_SETAUX_MANIFOLD)
-
-void USER5_SETAUX_MANIFOLD(const int* mbc,
-                           const int* mx, const int* my,
-                           const double* xlower, const double* ylower,
-                           const double* dx, const double* dy,
-                           const int* maux, double aux[],
-                           const int* blockno,
-                           double xd[], double yd[], double zd[],
-                           double area[]);
-
-
-
 
 #ifdef __cplusplus
 }

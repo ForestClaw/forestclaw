@@ -106,6 +106,18 @@ fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
 fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
                                                       const double rotate[]);
 
+
+/* ----------------------------------- Torus mapping ---------------------------------- */
+fclaw2d_map_context_t *
+    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+                           const double scale[],
+                           const double rotate[],
+                           const double alpha,
+                           const double beta);
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -63,15 +63,14 @@ include applications/clawpack/advection/2d/correlatedcb/Makefile.am
 include applications/clawpack/advection/2d/slotted_disk/Makefile.am
 
 
-
-## --------------------- Transport ---------------------------- 
+## ---------------------------- Transport --------------------------------- 
 ## Example : Solve the variable velocity transport equation
 ##
 ##                   q_t + div(u q) = 0
 ##
 ## These examples use the fwave approach and can be used to test
 ## conservation.
-## ------------------------------------------------------------
+## -----------------------------------------------------------------------
 
 include applications/clawpack/transport/2d/sphere/Makefile.am
 include applications/clawpack/transport/2d/torus/Makefile.am

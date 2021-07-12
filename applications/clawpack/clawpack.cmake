@@ -63,7 +63,7 @@ add_subdirectory(clawpack/advection/2d/gaussian)
 add_subdirectory(clawpack/advection/2d/correlatedcb)
 add_subdirectory(clawpack/advection/2d/slotted_disk)
 
-## --------------------- Transport ---------------------------- 
+## ----------------------------- Transport --------------------------------- 
 ## Example : Solve the variable velocity transport equation
 ##
 ##                   q_t + div(u q) = 0
@@ -71,7 +71,7 @@ add_subdirectory(clawpack/advection/2d/slotted_disk)
 ## These examples use the fwave approach and can be used to test
 ## conservation.
 ##
-## ------------------------------------------------------------
+## -------------------------------------------------------------------------
 
 add_subdirectory(clawpack/transport/2d/sphere)
 add_subdirectory(clawpack/transport/2d/torus)

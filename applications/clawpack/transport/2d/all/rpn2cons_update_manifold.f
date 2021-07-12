@@ -1,4 +1,4 @@
-      subroutine  rpn2_cons_update_manifold(meqn,maux, idir, iface, q,
+      subroutine  rpn2cons_update_manifold(meqn,maux, idir, iface, q,
      &                                     auxvec_center,
      &                                     auxvec_edge,flux)
 
@@ -21,7 +21,7 @@ c         # Don't multiply by edgelength (scaling is done elsewhere)
 
       end
 
-      subroutine  rpn2_cons_update_zero(meqn,maux, idir, iface, q,
+      subroutine  rpn2cons_update_zero(meqn,maux, idir, iface, q,
      &                                  auxvec_center,
      &                                  auxvec_edge,flux)
 

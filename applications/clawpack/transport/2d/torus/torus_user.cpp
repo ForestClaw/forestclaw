@@ -90,7 +90,7 @@ void torus_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_rpt2fw  = &CLAWPACK46_RPT2CONS_MANIFOLD;  
 
         /* Flux function (for conservative fix) */
-         claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+         claw46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
     }
     else if (user->claw_version == 5)
     {
@@ -109,7 +109,7 @@ void torus_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2CONS_MANIFOLD;  
 
         /* Flux function (for conservative fix) */
-         claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+         claw5_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
     }
 }
 
