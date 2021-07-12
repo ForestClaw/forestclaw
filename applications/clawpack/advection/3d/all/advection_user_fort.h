@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    and so on */
 
 #include <fc3d_clawpack46_user_fort.h>  
-#include <clawpack5_user_fort.h>  
 
 #ifdef __cplusplus
 extern "C"
