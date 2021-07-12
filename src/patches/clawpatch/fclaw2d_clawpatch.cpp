@@ -482,6 +482,7 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
 
 	if (fill_ghost(time_interp))
 	{
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 		clawpatch_vt->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iface_coarse,
 		                                    &p4est_refineFactor,&refratio,&igrid,&transform_data);
 	}
