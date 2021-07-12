@@ -62,16 +62,20 @@ public :
 
     /* Grid info */
     int mx;           
-    int my;           
+    int my;   
+    int mz;        
     int mbc;          
     int maux;
 
     double dx;
     double dy;
+    double dz;
     double xlower;
     double ylower;
+    double zlower;
     double xupper;
     double yupper;
+    double zupper;
 
     /* Auxilliary array (used by Clawpack 4.6 and 5.0) */
     FArrayBox aux;

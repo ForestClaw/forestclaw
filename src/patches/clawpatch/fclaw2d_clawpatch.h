@@ -156,6 +156,14 @@ void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
                                  double* dx, double* dy);
 
 
+void fclaw2d_clawpatch_grid_data3(struct fclaw2d_global* glob,
+                                  struct fclaw2d_patch* patch,
+                                  int* mx, int* my, int* mz, int* mbc,
+                                  double* xlower, double* ylower,
+                                  double* zlower, 
+                                  double* dx, double* dy, double* dz);
+
+
 void fclaw2d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* this_patch,
                                      double **area,double **edgelengths,
