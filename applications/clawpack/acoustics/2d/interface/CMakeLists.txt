@@ -3,15 +3,10 @@ set(rp ${PROJECT_SOURCE_DIR}/clawpack/acoustics/2d/rp)
 add_library(interface_f OBJECT 
   p0.f 
   setprob.f 
-  value_exceeds_th.f90
   user_4.6/setaux.f 
   user_4.6/qinit.f 
-  user_4.6/tag4refinement.f 
-  user_4.6/tag4coarsening.f 
   user_5.0/setaux.f90 
   user_5.0/qinit.f90 
-  user_5.0/tag4refinement.f90 
-  user_5.0/tag4coarsening.f90 
   ${rp}/clawpack46_rpn2_acoustics_vc.f 
   ${rp}/clawpack46_rpt2_acoustics_vc.f 
   ${rp}/clawpack5_rpn2_acoustics_vc.f90 

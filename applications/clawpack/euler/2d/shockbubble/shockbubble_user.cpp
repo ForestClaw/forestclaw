@@ -37,11 +37,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../rp/euler_user_fort.h"
 
+
+void shockbubble_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = shockbubble_get_options(glob);
+
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24d   %s",   user->idisc,"\% idisc\n");
+        fprintf(f,  "%-24.16f   %s",   user->gamma,"\% gamma\n");
+        fprintf(f,  "%-24.16f   %s",user->x0,"\% x0\n");
+        fprintf(f,  "%-24.16f   %s",user->y0,"\% y0\n");
+        fprintf(f,  "%-24.16f   %s",user->r0,"\% r0\n");
+        fprintf(f,  "%-24.16f   %s",user->rhoin,"\% rhoin\n");
+        fprintf(f,  "%-24.16f   %s",user->pinf,"\% pinf\n");
+        fclose(f);
+    }
+
+    /* We want to make sure node 0 gets here before proceeding */
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    SETPROB();
+}
+
 void shockbubble_link_solvers(fclaw2d_global_t *glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
     fclaw_vt->problem_setup = &shockbubble_problem_setup;
 
@@ -70,15 +92,10 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
         default:
             SC_ABORT_NOT_REACHED ();
         }
-
-        /* Use divided differences to tag grids */
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
     }
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
         fc2d_clawpack5_options_t *clawopt = fc2d_clawpack5_get_options(glob);
 
         claw5_vt->fort_qinit  = &CLAWPACK5_QINIT;
@@ -100,37 +117,5 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
         default:
             SC_ABORT_NOT_REACHED ();
         }
-
-        /* Use divided differences to tag grids */
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
     }
-}
-
-void shockbubble_problem_setup(fclaw2d_global_t* glob)
-{
-    const user_options_t* user = shockbubble_get_options(glob);
-
-    if (glob->mpirank == 0)
-    {
-        FILE *f = fopen("setprob.data","w");
-        fprintf(f,  "%-24d   %s",   user->idisc,"\% idisc\n");
-        fprintf(f,  "%-24.16f   %s",   user->gamma,"\% gamma\n");
-        fprintf(f,  "%-24.16f   %s",user->x0,"\% x0\n");
-        fprintf(f,  "%-24.16f   %s",user->y0,"\% y0\n");
-        fprintf(f,  "%-24.16f   %s",user->r0,"\% r0\n");
-        fprintf(f,  "%-24.16f   %s",user->rhoin,"\% rhoin\n");
-        fprintf(f,  "%-24.16f   %s",user->pinf,"\% pinf\n");
-        fclose(f);
-    }
-
-    /* We want to make sure node 0 gets here before proceeding */
-#ifdef FCLAW_ENABLE_MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
- 
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
-
-
-    SHOCKBUBBLE_SETPROB();
 }

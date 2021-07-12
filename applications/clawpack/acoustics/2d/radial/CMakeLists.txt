@@ -2,14 +2,9 @@ set(rp ${PROJECT_SOURCE_DIR}/clawpack/acoustics/2d/rp)
 
 add_library(radial_f OBJECT 
   setprob.f 
-  value_exceeds_th.f90 
   user_4.6/qinit.f 
-  user_4.6/tag4refinement.f
-  user_4.6/tag4coarsening.f 
   user_4.6/setaux.f90
   user_5.0/qinit.f90 
-  user_5.0/tag4refinement.f90 
-  user_5.0/tag4coarsening.f90 
   user_5.0/setaux.f90 
   ${rp}/clawpack46_rpn2_acoustics.f 
   ${rp}/clawpack46_rpt2_acoustics.f 

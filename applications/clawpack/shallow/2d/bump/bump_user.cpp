@@ -32,41 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../rp/shallow_user_fort.h"
 
-void bump_link_solvers(fclaw2d_global_t *glob)
-{
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
-
-    vt->problem_setup = &bump_problem_setup;  /* Version-independent */
-
-    const user_options_t* user = bump_get_options(glob);
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
-        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
-        claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
-        claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
-        claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
-
-        /* Avoid tagging block corners in 5 patch example*/
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_vtable_t    *claw5_vt = fc2d_clawpack5_vt();
-        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-        claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
-        claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
-        claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
-        
-        /* Avoid tagging block corners in 5 patch example*/
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
-    }
-}
-
 
 void bump_problem_setup(fclaw2d_global_t* glob)
 {
@@ -81,61 +46,31 @@ void bump_problem_setup(fclaw2d_global_t* glob)
     }
 
     /* We want to make sure node 0 gets here before proceeding */
-#ifdef FCLAW_ENABLE_MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
- 
     fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
-    BUMP_SETPROB();
+    SETPROB();
 }
 
-
-#if 0
-void bump_patch_setup(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *patch,
-                           int blockno,
-                           int patchno)
+void bump_link_solvers(fclaw2d_global_t *glob)
 {
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
+
+    vt->problem_setup = &bump_problem_setup;  /* Version-independent */
 
     const user_options_t* user = bump_get_options(glob);
     if (user->claw_version == 4)
     {
-        printf("bump_patch_setup : Disk solution only works for version 5.");
-        exit(0);
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
+        claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
+        claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
+        claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
     }
-
-    if (fclaw2d_patch_is_ghost(patch))
+    else if (user->claw_version == 5)
     {
-        /* Mapped info is needed only for an update */
-        return;
+        fc2d_clawpack5_vtable_t    *claw5_vt = fc2d_clawpack5_vt();
+        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
+        claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
+        claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
+        claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;        
     }
-
-    int mx,my,mbc;
-    double  xlower, ylower, dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    double *xp,*yp,*zp,*area;
-    double *xd,*yd,*zd;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    double *xnormals,*ynormals,*xtangents,*ytangents;
-    double *surfnormals,*edgelengths,*curvature;
-    fclaw2d_clawpatch_metric_data2(glob,patch,
-                                   &xnormals,&ynormals,
-                                   &xtangents,&ytangents,
-                                   &surfnormals,&edgelengths,
-                                   &curvature);
-
-    int maux;
-    double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
-    
-    USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                          &dx,&dy,&maux,aux,
-                          xnormals,xtangents,
-                          ynormals,ytangents,
-                          surfnormals,area);
 }
-#endif

@@ -17,7 +17,7 @@ c     # ---------------------------------------------------------------
       common /initchoice_comm/ initchoice
 
 
-      double precision q0, r0, r, cb(2)
+      double precision q0, r0, r
       double precision theta, th, thc(2)
       double precision phi, l, lc(2)
       double precision c,b,cbell, hi, hmax, rarg
@@ -145,7 +145,7 @@ c     # ---------------------------------------------------------------
       integer example
       common /example_comm/ example
 
-      double precision xp, yp, zp, q0
+      double precision xp, yp, zp
       double precision q0_physical
 
       call mapc2m_spherical(xc,yc,xp,yp,zp)

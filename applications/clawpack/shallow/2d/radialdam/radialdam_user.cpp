@@ -34,68 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../rp/shallow_user_fort.h"
 
-void radialdam_link_solvers(fclaw2d_global_t *glob)
-{
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
 
-    vt->problem_setup = &radialdam_problem_setup;  /* Version-independent */
-
-    const user_options_t* user = radialdam_get_options(glob);
-    if (user->claw_version == 4)
-    {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
-        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
-
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH46_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH46_TAG4COARSENING;
-
-        if (user->example == 0) 
-        {
-            claw46_vt->fort_rpn2 = &CLAWPACK46_RPN2;
-            claw46_vt->fort_rpt2 = &CLAWPACK46_RPT2;
-            claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
-        }
-        else if (user->example >= 1 && user->example <= 3)
-        {
-            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
-            patch_vt->setup = &radialdam_patch_setup;
-
-            claw46_vt->fort_rpn2  = &CLAWPACK46_RPN2_MANIFOLD;
-            claw46_vt->fort_rpt2  = &CLAWPACK46_RPT2_MANIFOLD;
-            claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
-        }
-
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
-        claw5_vt->fort_qinit = &CLAWPACK5_QINIT;
-
-        /* Avoid tagging block corners in 5 patch example*/
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
-            
-        if (user->example == 0)
-        {
-            claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
-            claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
-            claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
-        }
-        else if (user->example >= 1 && user->example <= 3)
-        {
-            fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
-            patch_vt->setup = &radialdam_patch_setup;
-
-            claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
-            claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
-            claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
-        }
-    }
-}
-
-
+static
 void radialdam_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = radialdam_get_options(glob);
@@ -114,15 +54,11 @@ void radialdam_problem_setup(fclaw2d_global_t* glob)
     }
 
     /* We want to make sure node 0 gets here before proceeding */
-#ifdef FCLAW_ENABLE_MPI
-    MPI_Barrier(MPI_COMM_WORLD);
-#endif
- 
     fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
-    RADIALDAM_SETPROB();
+    SETPROB();
 }
 
-
+static
 void radialdam_patch_setup(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *patch,
                            int blockno,
@@ -172,4 +108,56 @@ void radialdam_patch_setup(fclaw2d_global_t *glob,
                               ynormals,ytangents,
                               surfnormals,area);
     
+}
+
+void radialdam_link_solvers(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
+
+    vt->problem_setup = &radialdam_problem_setup;  /* Version-independent */
+
+    const user_options_t* user = radialdam_get_options(glob);
+    if (user->claw_version == 4)
+    {
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
+
+        if (user->example == 0) 
+        {
+            claw46_vt->fort_rpn2 = &CLAWPACK46_RPN2;
+            claw46_vt->fort_rpt2 = &CLAWPACK46_RPT2;
+            claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
+        }
+        else if (user->example >= 1 && user->example <= 3)
+        {
+            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
+            patch_vt->setup = &radialdam_patch_setup;
+
+            claw46_vt->fort_rpn2  = &CLAWPACK46_RPN2_MANIFOLD;
+            claw46_vt->fort_rpt2  = &CLAWPACK46_RPT2_MANIFOLD;
+            claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+        }
+
+    }
+    else if (user->claw_version == 5)
+    {
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        claw5_vt->fort_qinit = &CLAWPACK5_QINIT;
+
+        if (user->example == 0)
+        {
+            claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
+            claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
+            claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
+        }
+        else if (user->example >= 1 && user->example <= 3)
+        {
+            fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+            patch_vt->setup = &radialdam_patch_setup;
+
+            claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
+            claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
+            claw5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+        }
+    }
 }
