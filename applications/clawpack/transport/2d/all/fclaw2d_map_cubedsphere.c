@@ -94,8 +94,10 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_CUBEDSPHERE(&blockno, &xc,&yc,xp,yp,zp);
 
-    //rotate_map(cont,xp,yp,zp);
+#if 0
+    rotate_map(cont,xp,yp,zp);
     scale_map(cont,xp,yp,zp);
+#endif    
 }
 
 fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[],

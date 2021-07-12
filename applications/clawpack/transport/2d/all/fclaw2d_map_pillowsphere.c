@@ -91,8 +91,10 @@ fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_PILLOWSPHERE(&blockno,&xc,&yc,xp,yp,zp);
 
+#if 0
     scale_map(cont,xp,yp,zp); 
     rotate_map(cont,xp,yp,zp);
+#endif    
 }
 
 fclaw2d_map_context_t *

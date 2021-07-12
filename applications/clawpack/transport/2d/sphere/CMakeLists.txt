@@ -9,7 +9,6 @@ add_library(sphere_transport_f OBJECT
 	sphere_velocity.f 
 	qexact.f 
 	dopri5.f 
-	sphere_exceeds_th.f90
 	user_4.6/sphere46_qinit.f 
 	user_4.6/sphere46_output.f 
 	user_4.6/sphere46_compute_error.f 

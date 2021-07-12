@@ -153,9 +153,6 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         /* Clawpatch functions */    
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
-        /* This will be used if we set `refinement-criteria=user`.  */
-        clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
-
         /* Include error in output files */
         const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
         if (fclaw_opt->compute_error)
@@ -176,9 +173,6 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
 
         /* Clawpatch functions */    
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-
-        /* This will be used if we set `refinement-criteria=user`.  */
-        clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
 
         /* Include error in output files */
         const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
