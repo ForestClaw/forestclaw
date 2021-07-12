@@ -140,7 +140,7 @@ c     # ------------------------------------------------
       double precision function get_gc_distance(x,y,z,w)
       implicit none
 
-      double precision x,y,z,w(3)
+      double precision x,y,z,w(3), w2
       double precision p(3), pn, wn, ca, th, rsphere
       integer m
 
@@ -156,7 +156,13 @@ c     # ------------------------------------------------
          stop
       endif
 
-      wn = sqrt(w(1)*w(1) + w(2)*w(2) + w(3)*w(3))
+      w2 = w(1)*w(1) + w(2)*w(2) + w(3)*w(3)
+      if (w2 .le. 0) then
+          write(6,*) 'get_gc_distance : w2 .le. 0'
+          stop
+      endif
+
+      wn = sqrt(w2)
       do m = 1,3
          w(m) = w(m)/wn
       enddo
