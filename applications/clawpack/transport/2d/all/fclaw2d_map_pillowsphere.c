@@ -11,6 +11,18 @@ extern "C"
 #endif
 
 
+#define SPHERE_BASIS_COMPLETE FCLAW_F77_FUNC(sphere_basis_complete, \
+                            SPHERE_BASIS_COMPLETE)
+
+void SPHERE_BASIS_COMPLETE(const double* x, const double *y,
+                              double t[], double tinv[], double uderivs[], 
+                              const int* flag);
+
+#define MAP2COMP FCLAW_F77_FUNC(map2comp,MAP2COMP)
+
+void MAP2COMP(double* xp, double* yp, double* zp, double* xc1, double* yc1);
+
+
 static int
 fclaw2d_map_query_pillowsphere (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -61,6 +73,17 @@ fclaw2d_map_query_pillowsphere (fclaw2d_map_context_t * cont, int query_identifi
 }
 
 
+
+static void
+fclaw2d_map_c2m_basis_pillowsphere(fclaw2d_map_context_t * cont,
+                                   double xc, double yc, 
+                                   double *t, double *tinv, 
+                                   double *tderivs, int flag)
+{
+    SPHERE_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
+}
+
+
 static void
 fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
                               double xc, double yc,
@@ -68,24 +91,22 @@ fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_PILLOWSPHERE(&blockno,&xc,&yc,xp,yp,zp);
 
-    /* These can probably be replaced by C functions at some point. */
-
-    scale_map(cont,xp,yp,zp);
+    scale_map(cont,xp,yp,zp); 
     rotate_map(cont,xp,yp,zp);
 }
 
 fclaw2d_map_context_t *
-    fclaw2d_map_new_pillowsphere(const double scale[],
-                                 const double rotate[] )
+    fclaw2d_map_new_pillowsphere(const double scale[],const double rotate[])
 {
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowsphere;
     cont->mapc2m = fclaw2d_map_c2m_pillowsphere;
-
+    cont->basis = fclaw2d_map_c2m_basis_pillowsphere;
+    
+    set_scale(cont,scale);
     set_rotate(cont,rotate);
-    set_scale(cont,scale); 
 
     return cont;
 }

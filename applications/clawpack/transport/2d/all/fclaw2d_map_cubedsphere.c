@@ -11,6 +11,19 @@ extern "C"
 #endif
 
 
+#define SPHERE_BASIS_COMPLETE FCLAW_F77_FUNC(sphere_basis_complete, \
+                            SPHERE_BASIS_COMPLETE)
+
+void SPHERE_BASIS_COMPLETE(const double* x, const double *y,
+                           double t[], double tinv[], double uderivs[], 
+                           const int* flag);
+
+#define MAP2COMP FCLAW_F77_FUNC(map2comp,MAP2COMP)
+
+void MAP2COMP(double* xp, double* yp, double* zp, double* xc1, double* yc1);
+
+
+
 static int
 fclaw2d_map_query_cubedsphere (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -62,32 +75,42 @@ fclaw2d_map_query_cubedsphere (fclaw2d_map_context_t * cont, int query_identifie
 
 
 static void
+fclaw2d_map_c2m_basis_cubedsphere(fclaw2d_map_context_t * cont,
+                                  double xc, double yc, 
+                                  double *t, double *tinv, 
+                                  double *tderivs, int flag)
+{
+    /* These coordinates are in [0,1]x[0,1] and are mapped to 
+       [theta,phi] using mappings in sphere_basis.f */
+    SPHERE_BASIS_COMPLETE(&xc, &yc, t, tinv, tderivs, &flag);
+}
+
+
+
+static void
 fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
                          double xc, double yc,
                          double *xp, double *yp, double *zp)
 {
     MAPC2M_CUBEDSPHERE(&blockno, &xc,&yc,xp,yp,zp);
 
-    /* These can probably be replaced by C functions at some point. */
-    scale_map(cont,xp,yp,zp); 
-    rotate_map(cont,xp,yp,zp);
+    //rotate_map(cont,xp,yp,zp);
+    scale_map(cont,xp,yp,zp);
 }
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_cubedsphere(const double scale[],
-                                const double rotate[])
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[],
+                                                    const double rotate[])
 {
     fclaw2d_map_context_t *cont;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cubedsphere;
     cont->mapc2m = fclaw2d_map_c2m_cubedsphere;
+    cont->basis = fclaw2d_map_c2m_basis_cubedsphere;
 
-    /* This stores rotate/scale parameters in common blocks for later
-       retrieval by scale_map/rotate_map (called above).  These parameters
-       can of course be stored as variables in a context field */
     set_rotate(cont,rotate);
-    set_scale(cont,scale);
+
+    set_scale(cont,scale); 
 
     return cont;
 }

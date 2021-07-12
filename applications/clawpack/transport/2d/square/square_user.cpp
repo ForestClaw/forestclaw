@@ -137,9 +137,9 @@ void square_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_qinit  = &CLAWPACK46_QINIT;
         
         /* Be careful : Signatures for rpn2fw, rpt2fw not the same as rpn2 and rpt2fw. */
-        clawpack46_vt->fort_rpn2fw   = &CLAWPACK46_RPN2CONS_FW_MANIFOLD; 
-        clawpack46_vt->fort_rpt2fw   = &CLAWPACK46_RPT2CONS_MANIFOLD;      
-        clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+        clawpack46_vt->fort_rpn2fw    = &CLAWPACK46_RPN2CONS_FW_MANIFOLD; 
+        clawpack46_vt->fort_rpt2fw    = &CLAWPACK46_RPT2CONS_MANIFOLD;      
+        clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
     } 
     else if (user->claw_version == 5)
     {
@@ -148,19 +148,10 @@ void square_link_solvers(fclaw2d_global_t *glob)
 
         /* Signature for both waves and fwaves solvers are the same, so no need for 
            separate functions */
-        clawpack5_vt->fort_rpn2    = &CLAWPACK5_RPN2CONS_MANIFOLD; 
-        clawpack5_vt->fort_rpt2    = &CLAWPACK5_RPT2CONS_MANIFOLD;      
-        clawpack5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+        clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2CONS_MANIFOLD; 
+        clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2CONS_MANIFOLD;      
+        clawpack5_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
     }
-
-#if 0
-    if (0)
-    {        
-        clawpatch_vt->fort_interpolate2fine      = SQUARE_FORT_INTERPOLATE2FINE;
-        clawpatch_vt->fort_interpolate_face      = SQUARE_FORT_INTERPOLATE_FACE;
-        clawpatch_vt->fort_interpolate_corner    = SQUARE_FORT_INTERPOLATE_CORNER;
-    }
-#endif
 
     /* Include error in output files */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
@@ -169,12 +160,12 @@ void square_link_solvers(fclaw2d_global_t *glob)
         if (user->claw_version == 4)
         {
             clawpatch_vt->fort_compute_patch_error = &SQUARE46_COMPUTE_ERROR;
-            clawpatch_vt->fort_header_ascii   = &SQUARE46_FORT_HEADER_ASCII;            
+            clawpatch_vt->fort_header_ascii        = &SQUARE46_FORT_HEADER_ASCII;            
         }
         else if (user->claw_version == 5)
         {
             clawpatch_vt->fort_compute_patch_error = &SQUARE5_COMPUTE_ERROR;
-            clawpatch_vt->fort_header_ascii   = &SQUARE5_FORT_HEADER_ASCII;                        
+            clawpatch_vt->fort_header_ascii        = &SQUARE5_FORT_HEADER_ASCII;                
         }
         clawpatch_vt->cb_output_ascii     = &cb_square_output_ascii;                
     }

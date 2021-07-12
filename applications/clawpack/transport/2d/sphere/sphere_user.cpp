@@ -148,7 +148,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
         clawpack46_vt->fort_rpn2fw    = &CLAWPACK46_RPN2CONS_FW_MANIFOLD; 
         clawpack46_vt->fort_rpt2fw    = &CLAWPACK46_RPT2CONS_MANIFOLD;      
-        clawpack46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+        clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */    
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
@@ -172,7 +172,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         clawpack5_vt->fort_qinit     = CLAWPACK5_QINIT;
         clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2CONS_MANIFOLD; 
         clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2CONS_MANIFOLD;      
-        clawpack5_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
+        clawpack5_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */    
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();

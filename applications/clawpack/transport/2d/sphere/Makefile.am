@@ -7,8 +7,6 @@ applications_clawpack_transport_2d_sphere_sphere_SOURCES = \
 	applications/clawpack/transport/2d/sphere/sphere_user.cpp \
 	applications/clawpack/transport/2d/sphere/sphere_user.h \
 	applications/clawpack/transport/2d/sphere/sphere_options.c \
-	applications/clawpack/transport/2d/sphere/fclaw2d_map_cubedsphere.c \
-	applications/clawpack/transport/2d/sphere/fclaw2d_map_pillowsphere.c \
 	applications/clawpack/transport/2d/sphere/setprob.f \
 	applications/clawpack/transport/2d/sphere/q0.f \
 	applications/clawpack/transport/2d/sphere/fdisc.f \
@@ -24,6 +22,8 @@ applications_clawpack_transport_2d_sphere_sphere_SOURCES = \
 	applications/clawpack/transport/2d/sphere/user_5.0/sphere5_output.f \
 	applications/clawpack/transport/2d/sphere/user_5.0/sphere5_compute_error.f \
 	applications/clawpack/transport/2d/sphere/user_5.0/sphere5_qinit.f \
+	applications/clawpack/transport/2d/all/fclaw2d_map_cubedsphere.c \
+	applications/clawpack/transport/2d/all/fclaw2d_map_pillowsphere.c \
 	applications/clawpack/transport/2d/all/transport_patch_setup_manifold.c \
 	applications/clawpack/transport/2d/all/transport_b4step2_manifold.c \
 	applications/clawpack/transport/2d/all/transport46_setaux_manifold.f \

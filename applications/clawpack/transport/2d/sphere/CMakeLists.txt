@@ -33,8 +33,8 @@ add_executable(sphere_transport
 	sphere_options.c 
 	${all}/transport_patch_setup_manifold.c
 	${all}/transport_b4step2_manifold.c
-	fclaw2d_map_cubedsphere.c 
-	fclaw2d_map_pillowsphere.c 
+	${all}/fclaw2d_map_cubedsphere.c 
+	${all}/fclaw2d_map_pillowsphere.c 
   $<TARGET_OBJECTS:sphere_transport_f>
 )
 

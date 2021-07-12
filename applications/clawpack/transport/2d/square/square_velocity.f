@@ -6,18 +6,6 @@ c     # the standard basis (1,0) and (0,1).
 c     # ------------------------------------------------------------
 
 
-c      subroutine square_velocity_components(x,y,u,vcart,flag)
-c      implicit none
-c
-c      double precision x, y, u(2), vcart(3)
-c      double precision uderivs(4)
-c
-c      double precision s
-c
-c      call velocity_derivs(x,y,u,uderivs)
-c
-c      end
-
       subroutine square_velocity_derivs(x,y,t,u,vcart,derivs,flag)
       implicit none
 
@@ -147,7 +135,7 @@ c     # Called from qexact
 c     # 
 c     #  -- components relative to basis are needed.
 c     # ------------------------------------------------------------
-      subroutine user_velocity_components_cart(x,y,t,u)
+      subroutine user_velocity_components_cart(x,y,t,vcart)
       implicit none
 
       double precision x,y,t, u(2), vcart(3), derivs(4)
@@ -169,38 +157,15 @@ c     # ------------------------------------------------------------
 
       cont = get_context()
 
-      call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+      !! This doesn't work with the five patch mapping
+      !! call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+
+      xc1 = xp
+      yc1 = yp
+      zc1 = 0
 
 
       end
-
-
-
-cc     # ------------------------------------------------------------
-cc     # Center : u = u1*tau1 + u2*tau2   (div u might not be zero)
-cc     # ------------------------------------------------------------
-c      subroutine velocity_componet(x,y,t,vcart)
-c      implicit none
-c
-c      double precision x,y,vel(3)
-c
-c
-c      double precision u(2), derivs(4)
-c
-c      integer k
-c
-cc     # Velocity components are given in Cartesian components
-c      call square_velocity_derivs(x,y,t,u)
-c
-c
-cc     # Velocities are all given in terms of Cartesian components   
-c      do k = 1,2
-c        vel(k) = u(k)
-c      enddo
-c      vel(3) = 0
-c        
-c      end
-
 
 
 

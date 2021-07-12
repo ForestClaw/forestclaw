@@ -74,14 +74,6 @@ void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 user_options_t* sphere_options_register (fclaw_app_t * app, const char *configfile);
 
-/* --------------------------------- Mappings ----------------------------------------- */
-#if 0
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[], 
-                                                    const double rotate[]);
-
-fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere(const double scale[]);
-#endif
-
 /* ----------------------------------- Options ---------------------------------------- */
 
 void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
@@ -108,6 +100,7 @@ void SPHERE5_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* meqn,
 
 /* ---------------------------------- Riemann Solvers --------------------------------- */
 
+#if 0
 #define RPN2CONS_FW_MANIFOLD FCLAW_F77_FUNC(rpn2cons_fw_manifold, RPN2CONS_FW_MANIFOLD)
 void RPN2CONS_FW_MANIFOLD(const int* ixy, const int* maxm, const int* meqn, 
                           const int* mwaves, 
@@ -138,6 +131,7 @@ void RPN2_CONS_UPDATE_MANIFOLD(const int* meqn, const int* maux, const int* idir
                                double q[], double aux_center[], double aux_edge[],
                                double flux[]);
 
+#endif
 /* -------------------------------------- Output -------------------------------------- */
 
 #define  SPHERE46_FORT_WRITE_FILE FCLAW_F77_FUNC(sphere46_fort_write_file,  \
@@ -188,8 +182,9 @@ void SPHERE_BASIS_COMPLETE(const double* x, const double *y,
                            const int* flag);
 #endif                           
 
-
+#if 0
 #define SPHERE_SETAUX FCLAW_F77_FUNC(sphere_setaux, SPHERE_SETAUX)
+#endif
 
 
 #if 0
@@ -211,6 +206,7 @@ void SPHERE_SET_VELOCITIES(const int* blockno, const int* mx, const int* my,
                    double surfnormals[], double aux[],const int* maux);
 #endif
 
+#if 0
 #define  SPHERE_FORT_WRITE_FILE FCLAW_F77_FUNC(sphere_fort_write_file,  \
                                                 SPHERE_FORT_WRITE_FILE)
 void  SPHERE_FORT_WRITE_FILE(char* matname1,
@@ -248,6 +244,7 @@ void  SPHERE_FORT_WRITE_FILE(char* matname1,
 void SPHERE_FORT_HEADER_ASCII(char* matname1, char* matname2,
                                double* time, int* meqn, int* maux, 
                                int* ngrids);
+#endif
 
 #if 0
 #define SPHERE_TAG4REFINEMENT FCLAW_F77_FUNC(sphere_tag4refinement, \
