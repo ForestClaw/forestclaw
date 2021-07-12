@@ -40,8 +40,7 @@ c     # Assume a single field variable only
                soln(1,i,j) = q(1,i,j)
             else
 c              # Map computational coordinates to unit square               
-c               call fclaw2d_map_c2m(cont,blockno,xc,yc,
-c     &                              xp, yp, zp)
+               call fclaw2d_map_c2m(cont,blockno,xc,yc,xp, yp, zp)
                call user_map2comp(blockno,xc,yc,xp,yp,zp,xc1,yc1)
                soln(1,i,j) = qexact(xc1,yc1,t,flow_flag)
             endif
