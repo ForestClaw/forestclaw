@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_user_fort.h>
 
-#include "../all/advection_user_fort.h"
+// #include "../all/advection_user_fort.h"
 
 
 #ifdef __cplusplus
@@ -43,9 +43,9 @@ extern "C"
 {
 #endif
 
+
 typedef struct user_options
 {
-    double period;
     int claw_version;
     int is_registered;
 
