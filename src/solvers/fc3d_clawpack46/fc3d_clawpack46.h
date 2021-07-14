@@ -118,6 +118,7 @@ typedef void (*clawpack46_fort_rpn3_t)(const int* ixyz,const int* maxm,
 
 
 typedef void (*clawpack46_fort_rpt3_t)(const int* ixyz, const int* icoor, 
+                                       const int* imp,
                                        const int *maxm, const int* meqn, 
                                        const int* mwaves, const int *maux,
                                        const int* mbc, const int* mx, 

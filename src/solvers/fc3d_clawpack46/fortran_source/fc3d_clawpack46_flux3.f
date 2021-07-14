@@ -271,7 +271,8 @@ c         -----------------------------------------------------------
      
 c     # apply limiter to waves:
       if (limit) then 
-         call limiter(maxm,meqn,mwaves,mbc,mx,wave,s,mthlim)
+         call clawpack46_inlinelimiter(maxm,meqn,mwaves,
+     &                  mbc,mx,wave,s,mthlim)
       endif
      
       if (use_fwaves .ne. 0) then

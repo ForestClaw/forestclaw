@@ -1,4 +1,4 @@
-subroutine clawpatch46_bc3_default(meqn,mbc,mx,my,mz, & 
+subroutine clawpack46_bc3_default(meqn,mbc,mx,my,mz, & 
         xlower, ylower,zlower, dx,dy,dz,q,maux,aux,t,dt,mthbc)
     !!  =====================================================
     !!
@@ -383,5 +383,5 @@ subroutine clawpatch46_bc3_default(meqn,mbc,mx,my,mz, &
 699 continue
 
     return
-end subroutine clawpatch46_bc3_default
+end subroutine clawpack46_bc3_default
 
