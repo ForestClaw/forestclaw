@@ -29,9 +29,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 
@@ -42,21 +39,19 @@ extern "C"
    into the library, but should be provided by the user.
 
    These signatures can be used if the user file matches these signatures 
-   and subroutine name. Otherwise, the user should provide their own headers.
+   and subroutine name. Otherwise, the user should provide their own headers.   
    ------------------------------------------------------------------------------- */
-
-
 
 #define SETPROB            FCLAW_F77_FUNC(setprob,           SETPROB)
 void SETPROB();
+
+/* ------------------------------- User defined routines ------------------------------ */
 
 #define CLAWPACK46_SETPROB FCLAW_F77_FUNC(clawpack_setprob,CLAWPACK46_SETPROB)
 void CLAWPACK46_SETPROB();
 
 #define CLAWPACK46_QINIT   FCLAW_F77_FUNC(clawpack46_qinit,  CLAWPACK46_QINIT)
-void CLAWPACK46_QINIT(const int* maxmx, const int* maxmy, const int* maxmz, 
-                      const int* meqn,
-                      const int* mbc, 
+void CLAWPACK46_QINIT(const int* meqn, const int* mbc,
                       const int* mx, const int* my, const int* mz,
                       const double* xlower, const double* ylower,
                       const double* zlower, 
@@ -64,25 +59,23 @@ void CLAWPACK46_QINIT(const int* maxmx, const int* maxmy, const int* maxmz,
                       double q[], const int* maux, double aux[]);
   
 #define CLAWPACK46_SETAUX  FCLAW_F77_FUNC(clawpack46_setaux, CLAWPACK46_SETAUX)
-void CLAWPACK46_SETAUX(const int* maxmx, const int* maxmy, const int* mbc,
-                       const int* mx, const int* my,
-                       const double* xlower, const double* ylower,
-                       const double* dx, const double* dy,
+void CLAWPACK46_SETAUX(const int* mbc, const int* mx, const int* my, const int* mz, 
+                       const double* xlower, const double* ylower, const double* zlower,
+                       const double* dx, const double* dy, const double* dz,
                        const int* maux, double aux[]);
 
-#define CLAWPACK46_BC2     FCLAW_F77_FUNC(clawpack46_bc2,    CLAWPACK46_bc2)
-void CLAWPACK46_BC2(const int* maxmx, const int* maxmy, const int* meqn,
-                    const int* mbc, const int* mx, const int* my,
-                    const double* xlower, const double* ylower,
-                    const double* dx, const double* dy, const double q[],
-                    const int* maux, const double aux[], const double* t,
-                    const double* dt, const int mthbc[]);
+
+#define CLAWPACK46_BC3     FCLAW_F77_FUNC(clawpack46_bc3,    CLAWPACK46_bc3)
+void CLAWPACK46_BC3(const int* meqn, const int* mbc, 
+                    const int* mx, const int* my, const int* mz,  
+                    const double* xlower, const double* ylower, const double* zlower,
+                    const double* dx, const double* dy, const double *dz,
+                    const double q[], const int* maux, const double aux[], 
+                    const double* t, const double* dt, const int mthbc[]);
 
 
 #define CLAWPACK46_B4STEP3 FCLAW_F77_FUNC(clawpack46_b4step3,CLAWPACK46_B4STEP3)
-void CLAWPACK46_B4STEP3(const int* maxmx, const int* maxmy, const int* maxmz,
-                        const int* mbc,
-                        const int* mx, const int* my, const int* mz,
+void CLAWPACK46_B4STEP3(const int* mbc, const int* mx, const int* my, const int* mz,
                         const int* meqn,
                         double q[], const double* xlower, const double* ylower,
                         const double* zlower,
@@ -91,8 +84,7 @@ void CLAWPACK46_B4STEP3(const int* maxmx, const int* maxmy, const int* maxmz,
                         const int* maux, double aux[]);
 
 #define CLAWPACK46_SRC3    FCLAW_F77_FUNC(clawpack46_src3,   CLAWPACK46_SRC3)
-void CLAWPACK46_SRC3(const int* maxmx, const int* maxmy, const int* maxmz, 
-                     const int* meqn,
+void CLAWPACK46_SRC3(const int* meqn,
                      const int* mbc, const int* mx,const int* my, const int* mz,
                      const double* xlower, const double* ylower, const double* zlower,
                      const double* dx, const double* dy, const double* dz,
@@ -100,52 +92,64 @@ void CLAWPACK46_SRC3(const int* maxmx, const int* maxmy, const int* maxmz,
                      const int* maux, double aux[], const double* t,
                      const double* dt);
 
-#define CLAWPACK46_RPN2    FCLAW_F77_FUNC(clawpack46_rpn2,   CLAWPACK46_RPN2)
-void CLAWPACK46_RPN2(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
-                     const int* mbc,const int* mx, double ql[], double qr[],
+/* ---------------------------------- Riemann solvers  -------------------------------- */
+
+#define CLAWPACK46_RPN3 FCLAW_F77_FUNC(clawpack46_rpn3,  CLAWPACK46_RPN3)
+void CLAWPACK46_RPN3(const int* ixyz,const int* maxm, 
+                     const int* meqn, const int* mwaves,
+                     const int* maux, const int* mbc, const int* mx, 
+                     double ql[], double qr[],
                      double auxl[], double auxr[], double wave[],
                      double s[], double amdq[], double apdq[]);
 
-#define CLAWPACK46_RPT2    FCLAW_F77_FUNC(clawpack46_rpt2,   CLAWPACK46_RPT2)
-void CLAWPACK46_RPT2(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+#define CLAWPACK46_RPT3 FCLAW_F77_FUNC(clawpack46_rpt3, CLAWPACK46_RPT3)
+void CLAWPACK46_RPT3(const int* ixyz, const int* icoor, const int* imp,
+                     const int *maxm, const int* meqn, const int* mwaves, 
+                     const int *maux, 
                      const int* mbc, const int* mx, double ql[], double qr[],
-                     double aux1[], double aux2[], double aux3[], const int* imp,
-                     double dsdq[], double bmasdq[], double bpasdq[]);
+                     double aux1[], double aux2[], double aux3[], 
+                     double asdq[], double bmasdq[], double bpasdq[]);
 
+#define CLAWPACK46_RPTT3    FCLAW_F77_FUNC(clawpack46_rptt3, CLAWPACK46_RPTT3)
+void CLAWPACK46_RPTT3(const int* ixyz, const int* icoor, const int* imp,
+                      const int* impt, const int* maxm, const int* meqn,
+                      const int* mwaves, const int* maux,
+                      const int* mbc,const int* mx,
+                      double ql[], double qr[],
+                      double aux1[], double aux2[],
+                      double aux3[],  double bsasdq[],
+                      double cmbsasdq[], double cpbsasdq[]);
+
+/* --------------------------------- Tagging routines  -------------------------------- */
 
 
 #define CLAWPACK46_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack46_tag4refinement, \
                                                  CLAWPACK46_TAG4REFINEMENT)
 
-void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my,
+void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my, const int* mz,
                                const int* mbc,const int* meqn,
                                const double* xlower, const double* ylower,
-                               const double* dx, const double* dy,
-                               const int* blockno,
-                               double q[],
+                               const double* zlower, 
+                               const double* dx, const double* dy, const int* dz,
+                               const int* blockno, double q[],
                                const double* tag_threshold,
                                const int* init_flag,
                                int* tag_patch);
 
 
-
 #define CLAWPACK46_TAG4COARSENING FCLAW_F77_FUNC(clawpack46_tag4coarsening, \
                                                 CLAWPACK46_TAG4COARSENING)
 
-void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my,
+void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my, const *mz,
                                const int* mbc, const int* meqn,
                                const double* xlower, const double* ylower,
-                               const double* dx, const double* dy,
+                               const int* zlower, 
+                               const double* dx, const double* dy, const int* dz,
                                const int* blockno,
-                               double q0[],double q1[],
-                               double q2[],double q3[],
-                               const double* tag_threshold,
+                               double *qfine[], const double* tag_threshold,
                                int* tag_patch);
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

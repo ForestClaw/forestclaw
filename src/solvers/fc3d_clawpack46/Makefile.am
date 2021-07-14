@@ -10,15 +10,13 @@ libclawpack3d_46_installed_headers = \
 libclawpack3_46_compiled_sources = \
 	src/solvers/fc3d_clawpack46/fc3d_clawpack46.cpp \
 	src/solvers/fc3d_clawpack46/fc3d_clawpack46_options.c \
-    src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_time_sync.f \
-	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_inlinelimiter.f \
-	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_set_capacity.f \
-	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_block.f \
-	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_bc2_default.f \
-	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_flux2.f \
-	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_flux2fw.f \
-	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_step2.f \
-	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_step2_wrap.f
+	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_inlinelimiter.f90 \
+	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_set_capacity.f90 \
+	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_block.f90 \
+	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_bc3_default.f90 \
+	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_flux3.f \
+	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_step3.f90 \
+	src/solvers/fc3d_clawpack46/fortran_source/fc3d_clawpack46_step3_wrap.f90
 
 
 ## Name of library to build

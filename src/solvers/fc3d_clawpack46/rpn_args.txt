@@ -1,0 +1,89 @@
+---------------------------------------------------------------
+rpn3 : 
+---------------------------------------------------------------
+
+from rpn3_vc_advection.f  (clawpack/riemann/src)
+---------------------------------------------------
+
+subroutine rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,
+                ql,qr,auxl,auxr,wave,s,amdq,apdq)
+
+from fc3d_clawpack46_user_fort.h
+--------------------------------
+
+#define CLAWPACK46_RPN3 FCLAW_F77_FUNC(clawpack46_rpn3,  CLAWPACK46_RPN3)
+void CLAWPACK46_RPN3(const int* ixyz,const int* maxm, 
+                     const int* meqn, const int* mwaves,
+                     const int* maux, const int* mbc, const int* mx, 
+                     double ql[], double qr[],
+                     double auxl[], double auxr[], double wave[],
+                     double s[], double amdq[], double apdq[]);
+
+from fc3d_clawpack46.h 
+-----------------------
+
+typedef void (*clawpack46_fort_rpn3_t)(const int* ixyz,const int* maxm, 
+                                       const int* meqn, const int* mwaves,
+                                       const int* maux, const int* mbc,const int* mx, 
+                                       double ql[], double qr[],
+                                       double auxl[], double auxr[], double wave[],
+                                       double s[], double amdq[], double apdq[]);
+
+
+---------------------------------------------------------------
+rpt3 : 
+---------------------------------------------------------------
+
+from rpt3_vc_advection.f90 (clawpack/riemann/src)
+--------------------------------------------------
+
+subroutine rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,
+                aux1,aux2,aux3,asdq,bmasdq,bpasdq)
+
+#define CLAWPACK46_RPT3 FCLAW_F77_FUNC(clawpack46_rpt3, CLAWPACK46_RPT3)
+void CLAWPACK46_RPT3(const int* ixyz, const int* icoor, const int* imp,
+                     const int *maxm, const int* meqn, const int* mwaves, 
+                     const int *maux, 
+                     const int* mbc, const int* mx, double ql[], double qr[],
+                     double aux1[], double aux2[], double aux3[], 
+                     double asdq[], double bmasdq[], double bpasdq[]);
+
+typedef void (*clawpack46_fort_rpt3_t)(const int* ixyz, const int* icoor, 
+                                       const int *maxm, const int* meqn, 
+                                       const int* mwaves, const int *maux,
+                                       const int* mbc, const int* mx, 
+                                       double ql[], double qr[],
+                                       double aux1[], double aux2[], double aux3[], 
+                                       double dsdq[], double bmasdq[], double bpasdq[]);
+
+
+---------------------------------------------------------------
+rptt3 : 
+---------------------------------------------------------------
+
+from rptt3_vc_advection.f90 (clawpack/riemann/src)
+---------------------------------------------------
+subroutine rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,
+aux1,aux2,aux3,bsasdq,cmbsasdq,cpbsasdq)
+
+
+void CLAWPACK46_RPTT3(const int* ixyz, const int* icoor, const int* imp,
+                      const int* impt, const int* maxm, const int* meqn,
+                      const int* mwaves, const int* maux,
+                      const int* mbc,const int* mx,
+                      double ql[], double qr[],
+                      double aux1[], double aux2[],
+                      double aux3[],  double bsasdq[],
+                      double cmbsasdq[], double cpbsasdq[]);
+
+
+typedef void (*clawpack46_fort_rptt3_t)(const int* ixyz, const int* icoor, 
+                                        const int* imp, const int* impt, 
+                                        const int* maxm, const int* meqn,
+                                        const int* mwaves, const int* maux,
+                                        const int* mbc,const int* mx,
+                                        double ql[], double qr[],
+                                        double aux1[], double aux2[], double aux3[],  
+                                        double bsasdq[], 
+                                        double cmbsasdq[], double cpbsasdq[]);
+
