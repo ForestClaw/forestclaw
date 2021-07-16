@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
 #endif
 
 
@@ -43,15 +40,11 @@ const int NumCorners   = FCLAW2D_NUMCORNERS;
 const int NumSiblings  = FCLAW2D_NUMSIBLINGS;
 const int RefineFactor = FCLAW2D_REFINEFACTOR;
 const int PatchDim     = FCLAW2D_PATCHDIM;
+const int RefineDim    = FCLAW2D_REFINEDIM;   /* 2 for 2d, extruded meshes */
 
 #ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
 }
 #endif
 
-
-/* Note: either we make this a C .h file, or we remove the extern "C". */
 
 #endif
