@@ -25,6 +25,8 @@
 
 #include "swirl_user.h"
 
+#include <fclaw2d_defs.h>
+
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {

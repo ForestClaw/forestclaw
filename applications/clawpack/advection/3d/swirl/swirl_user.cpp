@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.h"
 
+#include <fclaw2d_defs.h>
+
 static
 void swirl_problem_setup(fclaw2d_global_t* glob)
 {
@@ -49,6 +51,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
+
 
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)

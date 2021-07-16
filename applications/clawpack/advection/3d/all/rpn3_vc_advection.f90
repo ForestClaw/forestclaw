@@ -38,19 +38,16 @@ subroutine clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr, &
 
     implicit none
 
-    integer, intent(in) :: ixyz, maxm, meqn, mwaves, mbc, mx, maux
+    integer :: ixyz, maxm, meqn, mwaves, mbc, mx, maux
 
-    double precision, intent(in) :: ql, qr, auxl, auxr
-    double precision, intent(out) :: wave, s, amdq, apdq
-
-    dimension wave(meqn,mwaves,1-mbc:maxm+mbc)
-    dimension    s(mwaves,1-mbc:maxm+mbc)
-    dimension   ql(meqn,1-mbc:maxm+mbc)
-    dimension   qr(meqn,1-mbc:maxm+mbc)
-    dimension amdq(meqn,1-mbc:maxm+mbc)
-    dimension apdq(meqn,1-mbc:maxm+mbc)
-    dimension auxl(maux,1-mbc:maxm+mbc)
-    dimension auxr(maux,1-mbc:maxm+mbc)
+    double precision :: wave(meqn,mwaves,1-mbc:maxm+mbc)
+    double precision ::    s(mwaves,1-mbc:maxm+mbc)
+    double precision ::   ql(meqn,1-mbc:maxm+mbc)
+    double precision ::   qr(meqn,1-mbc:maxm+mbc)
+    double precision :: amdq(meqn,1-mbc:maxm+mbc)
+    double precision :: apdq(meqn,1-mbc:maxm+mbc)
+    double precision :: auxl(maux,1-mbc:maxm+mbc)
+    double precision :: auxr(maux,1-mbc:maxm+mbc)
 
     integer :: i
 
