@@ -46,13 +46,10 @@ c     # ------------------------------------------------------------
       double precision lpx, lpy, thx, thy
       double precision cu1, fu1, fu1x, fu1y, gu1, gu1x, gu1y
       double precision cu2, fu2, fu2x, fu2y, gu2, gu2x, gu2y
-      double precision hu1, hu1x, hu1y, hu2, hu2x, hu2y
+      double precision hu1, hu1x, hu1y
       double precision gh, ghx, ghy
       double precision zf, zfx, zfy
       double precision uderivs_comp(4), ucomp(2)
-      logical zonal_flow
-
-      integer k
 
 c     # uderivs(1) = u1x      
 c     # uderivs(2) = u1y      
