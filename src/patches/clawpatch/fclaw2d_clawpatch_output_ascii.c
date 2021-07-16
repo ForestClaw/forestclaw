@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,47 +34,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
-                                fclaw2d_patch_t * this_patch,
-                                int this_block_idx, int this_patch_idx,
+                                fclaw2d_patch_t * patch,
+                                int blockno, int patchno,
                                 void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
     fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
-
-
-    int global_num, local_num;
-    int level;
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
-    double *q;
-    // char fname[11];
-
-    int iframe = *((int *) s->user);
 
     /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
-                           this_block_idx,this_patch_idx,
+    int global_num, local_num, level;
+    fclaw2d_patch_get_info(glob->domain,patch,
+                           blockno,patchno,
                            &global_num,&local_num, &level);
     
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    int meqn;
+    double *q;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    int iframe = *((int *) s->user);
     char fname[BUFSIZ];
-    snprintf (fname, BUFSIZ, "%s.q%04d", gparms->prefix, iframe);
+    snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
     /* sprintf(fname,"fort.q%04d",iframe); */
 
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+#if FCLAW2D_PATCHDIM == 2
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
     clawpatch_vt->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,
                                     &xlower,&ylower,&dx,&dy,q,
-                                    &global_num,&level,&this_block_idx,
+                                    &global_num,&level,&blockno,
                                     &glob->mpirank);
+#else
+    int mz;
+    double zlower, dz;
+    fclaw2d_clawpatch_grid_data3(glob,patch,&mx,&my,&mz,&mbc,
+                                 &xlower,&ylower,&zlower,
+                                 &dx,&dy,&dz);
+    clawpatch_vt->fort_output_ascii(fname,&mx,&my,&mz,&meqn,&mbc,
+                                    &xlower,&ylower,&zlower,
+                                    &dx,&dy,&dz,q,
+                                    &global_num,&level,&blockno,
+                                    &glob->mpirank);
+#endif
+
 }
 
 

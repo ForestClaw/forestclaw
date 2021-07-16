@@ -15,6 +15,8 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* blockno,
                                         int* init_flag,
                                         int* is_ghost)
 {
+#if 0
+
     int refinement_criteria = fclaw2d_clawpatch_get_refinement_criteria();
 
     int exceeds_th;
@@ -68,6 +70,6 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* blockno,
             exit(0);
             break;
     }
-
     return exceeds_th;
+#endif
 }

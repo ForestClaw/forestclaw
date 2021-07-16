@@ -36,8 +36,8 @@ static void*
 clawpack_register (fc3d_clawpack46_options_t* clawopt, sc_options_t * opt)
 {
     fclaw_options_add_int_array (opt, 0, "order", &clawopt->order_string,
-                               "2 2", &clawopt->order, 2,
-                               "[clawpack] Normal and transverse orders [2 2]");
+                               "2 2 2", &clawopt->order, 3,
+                               "[clawpack] Normaltransverse and double transverse orders [2 2 2]");
 
     sc_options_add_int (opt, 0, "mcapa", &clawopt->mcapa, -1,
                         "[clawpack] Location of capacity function in aux array [-1]");
@@ -58,9 +58,9 @@ clawpack_register (fc3d_clawpack46_options_t* clawopt, sc_options_t * opt)
                                  "values 0-4) [NULL]");
     
     /* Array of NumFaces=4 values */
-    fclaw_options_add_int_array (opt, 0, "mthbc", &clawopt->mthbc_string, "1 1 1 1",
-                                 &clawopt->mthbc, 4,
-                                 "[clawpack] Physical boundary condition type [1 1 1 1]");
+    fclaw_options_add_int_array (opt, 0, "mthbc", &clawopt->mthbc_string, "1 1 1 1 1 1",
+                                 &clawopt->mthbc, 6,
+                                 "[clawpack] Physical boundary condition type [1 1 1 1 1 1]");
 
     sc_options_add_bool (opt, 0, "ascii-out", &clawopt->ascii_out, 0,
                            "Output ASCII formatted data [F]");
@@ -76,11 +76,11 @@ clawpack_register (fc3d_clawpack46_options_t* clawopt, sc_options_t * opt)
 static fclaw_exit_type_t
 clawpack_postprocess (fc3d_clawpack46_options_t * clawopt)
 {
-    fclaw_options_convert_int_array (clawopt->mthbc_string, &clawopt->mthbc,4);
+    fclaw_options_convert_int_array (clawopt->mthbc_string, &clawopt->mthbc,6);
     
     fclaw_options_convert_int_array (clawopt->mthlim_string, &clawopt->mthlim,
                                      clawopt->mwaves);
-    fclaw_options_convert_int_array (clawopt->order_string, &clawopt->order,2);
+    fclaw_options_convert_int_array (clawopt->order_string, &clawopt->order,3);
 
     return FCLAW_NOEXIT;
 }
@@ -93,7 +93,7 @@ clawpack_check(fc3d_clawpack46_options_t *clawopt,
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
     clawopt->method[1] = clawopt->order[0];
-    clawopt->method[2] = clawopt->order[1];
+    clawopt->method[2] = 10*clawopt->order[1] + clawopt->order[2];
     clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
@@ -207,10 +207,10 @@ fc3d_clawpack46_options_t*  fc3d_clawpack46_options_register (fclaw_app_t * app,
     FCLAW_ASSERT (app != NULL);
 
     clawopt = FCLAW_ALLOC (fc3d_clawpack46_options_t, 1);
-    fclaw_app_options_register (app, "clawpack", configfile,
+    fclaw_app_options_register (app, "claw3", configfile,
                                 &clawpack_options_vtable, clawopt);
     
-    fclaw_app_set_attribute(app,"clawpack",clawopt);
+    fclaw_app_set_attribute(app,"claw3",clawopt);
     return clawopt;
 }
 

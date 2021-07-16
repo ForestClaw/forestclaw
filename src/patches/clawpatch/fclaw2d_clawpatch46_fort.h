@@ -29,13 +29,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
+
+#if FCLAW2D_PATCHDIM == 2
+#include "fclaw2d_clawpatch46_fort2.h"
+#else
+#include "fclaw2d_clawpatch46_fort3.h"
+#endif
+
+
 #if 0
-}
-#endif
-#endif
-
-
-
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 /* ------------------------------ Time stepping functions ----------------------------- */
@@ -305,12 +309,9 @@ void CLAWPATCH46_TAG4COARSENING(const int* mx, const int* my,
                                const int* initflag,
                                int* tag_patch);
 
-
+#endif
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

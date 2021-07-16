@@ -54,6 +54,9 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
     sc_options_add_int (opt, 0, "my", &clawpatch_options->my, 8,
                         "Number of grid cells per patch in y [8]");
 
+    sc_options_add_int (opt, 0, "mz", &clawpatch_options->mz, 1,
+                        "Number of grid cells per patch in z [1]");
+
     sc_options_add_int (opt, 0, "maux", &clawpatch_options->maux, 0,
                         "Number of auxilliary variables [0]");
 

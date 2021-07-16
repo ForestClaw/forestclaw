@@ -60,9 +60,11 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
+#if FCLAW2D_PATCHDIM == 2
     pillow_vt->fort_copy_block_corner(&mx, &my, &mbc, &meqn, 
                                       qthis, qcorner,
                                       &icorner, &this_blockno);
+#endif
 
 }
 
@@ -95,10 +97,12 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
 
     qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
+#if FCLAW2D_PATCHDIM == 2
     pillow_vt->fort_average_block_corner(&mx,&my,&mbc,&meqn,
                                          &refratio,qcoarse,qfine,
                                          areacoarse,areafine,
                                          &icorner_coarse,&coarse_blockno);
+#endif
 }
 
 static
@@ -128,9 +132,11 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
+#if FCLAW2D_PATCHDIM == 2
     pillow_vt->fort_interpolate_block_corner(&mx, &my, &mbc, &meqn,
                                              &refratio, qcoarse, qfine,
                                              &icoarse_corner, &coarse_blockno);
+#endif
 }
 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
@@ -159,6 +165,7 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
 {
     fclaw2d_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_init();
 
+#if FCLAW2D_PATCHDIM == 2
     if (claw_version == 4)
     {
         pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW46_COPY_BLOCK_CORNER;
@@ -171,6 +178,7 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
         pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER;
         pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER;
     }
+#endif
 
     pillow_vt->is_set = 1;
 }

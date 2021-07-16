@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -55,9 +55,11 @@ void fclaw2d_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
 
+#if FCLAW2D_PATCHDIM == 2
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy,
                                           area, q, error_data->mass,
                                           error_data->c_kahan);
+#endif
 
 }
 
@@ -87,6 +89,7 @@ void fclaw2d_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
         double* error = fclaw2d_clawpatch_get_error(glob,patch);
         double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
 
+#if FCLAW2D_PATCHDIM == 2        
         clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,&meqn,&dx,&dy,
                                               &xlower,&ylower, &t, q, error, soln);
 
@@ -95,6 +98,7 @@ void fclaw2d_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
         clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &meqn, 
                                               &dx,&dy, area, error,
                                               error_data->local_error);
+#endif
     }
 }
 

@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 struct fclaw2d_global;
@@ -42,7 +39,16 @@ struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 /* Functions defined here are implemented in individual solvers (clawpack 4.6 and 
    clawpack 5.0) */
 
+#if FCLAW2D_PATCHDIM == 2
+#include "fclaw2d_clawpatch_fort2.h"
+#include "fclaw2d_clawpatch46_fort2.h"
+#else
+#include "fclaw2d_clawpatch_fort3.h"
+#include "fclaw2d_clawpatch46_fort3.h"
+#endif
 
+
+#if 0
 /* --------------------------- Ghost filling - patch specific ------------------------- */
 
 typedef void (*clawpatch_fort_copy_face_t)(const int* mx, const int* my, const int* mbc, 
@@ -326,12 +332,9 @@ void AVERAGE2COARSE(const int* mx,const int* my,const int* mbc,
 					double qcoarse[],double qfine[],
 					double areacoarse[],double areafine[],
 					const int* igrid, const int* manifold);
-
+#endif
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

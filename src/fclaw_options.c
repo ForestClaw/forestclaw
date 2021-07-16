@@ -276,6 +276,12 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "by", &fclaw_opt->by, 1, "yupper " \
                            "(used only with manifold=0) [1]");
 
+    sc_options_add_double (opt, 0, "az", &fclaw_opt->az, 0, "zlower " \
+                           "(used only with manifold=0) [0]");
+
+    sc_options_add_double (opt, 0, "bz", &fclaw_opt->bz, 1, "zupper " \
+                           "(used only with manifold=0) [1]");
+
     sc_options_add_bool (opt, 0, "manifold", &fclaw_opt->manifold, 0,
                          "Solution is on manifold [F]");
 
@@ -369,6 +375,14 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
         fclaw_global_infof("Enabling floating point traps\n");
         // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
         feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
+    }
+#endif
+
+#if FCLAW2D_PATCHDIM == 3
+    if (fclaw_opt->manifold)
+    {
+        fclaw_global_essentialf("Options : Manifold must be false for 3d patches\n");
+        return FCLAW_EXIT_ERROR;        
     }
 #endif
 

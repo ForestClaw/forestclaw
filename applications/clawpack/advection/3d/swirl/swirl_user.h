@@ -28,17 +28,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch.h>
+
+#include <fc3d_clawpack46_options.h>
+#include <fc3d_clawpack46.h>
+#include <fc3d_clawpack46_user_fort.h>
+
+// #include "../all/advection_user_fort.h"
+
+
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
 #endif
-#endif
+
 
 typedef struct user_options
 {
-    double period;
     int claw_version;
     int is_registered;
 
@@ -46,9 +53,8 @@ typedef struct user_options
 
 void swirl_link_solvers(fclaw2d_global_t *glob);
 
-void swirl_problem_setup(fclaw2d_global_t* glob);
-
 /* ------------------------------------- Options ---------------------------------------*/
+
 user_options_t* swirl_options_register (fclaw_app_t * app,
                                         const char *configfile);
 
@@ -56,15 +62,7 @@ void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
 
-/* ------------------------------------ Fortran ----------------------------------------*/
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(double* tperiod);
-
-
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
