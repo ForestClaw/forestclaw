@@ -1,7 +1,7 @@
 c
 c
 c     ==================================================================
-      subroutine flux3(ixyz,maxm,meqn,maux,       mbc,mx,
+      subroutine flux3(ixyz,maxm,meqn,maux,mbc,mx,
      &                 q1d,dtdx1d,dtdy,dtdz,aux1,aux2,aux3,
      &                 faddm,faddp,gadd,hadd,cfl1d,
      &                 wave,s,amdq,apdq,cqxx,
@@ -174,7 +174,7 @@ c
       double precision aux2(maux,1-mbc:maxm+mbc, 3)
       double precision aux3(maux,1-mbc:maxm+mbc, 3)
 c
-      double precision    s(1-mbc:maxm+mbc,mwaves)
+      double precision    s(mwaves,1-mbc:maxm+mbc)
       double precision  wave(meqn,mwaves,1-mbc:maxm+mbc)
 c
       logical limit
@@ -224,7 +224,7 @@ c     # local method parameters
          m3 = method(3)/10
          m4 = method(3) - 10*m3
       endif
-     
+
 c     -----------------------------------------------------------
 c     # solve normal Riemann problem and compute Godunov updates
 c     -----------------------------------------------------------
@@ -256,8 +256,8 @@ c     # compute maximum wave speed for checking Courant number:
 c          !  cfl1d = dmax1(cfl1d,dtdx1d(i)*dabs(s(mw,i))) OLD WAY
 c          # if s>0 use dtdx1d(i) to compute CFL,
 c          # if s<0 use dtdx1d(i-1) to compute CFL:
-           cfl1d = dmax1(cfl1d,  dtdx1d(i)*s(mw,i),
-     .                          -dtdx1d(i-1)*s(mw,i))
+           cfl1d = dmax1(cfl1d,  dtdx1d(i)*s(mw,i), 
+     &                    -dtdx1d(i-1)*s(mw,i))
          end do
       end do
 
@@ -276,7 +276,6 @@ c     # apply limiter to waves:
       endif
      
       if (use_fwaves .ne. 0) then
-
           do i = 1, mx+1
      
               dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
@@ -287,11 +286,10 @@ c     # apply limiter to waves:
                       cqxx(m,i) = cqxx(m,i) + 0.5d0 * dabs(s(mw,i)) *
      &                     (1.d0 - dabs(s(mw,i))*dtdxave) * wave(m,mw,i)
                   end do
+                  faddm(m,i) = faddm(m,i) + cqxx(m,i)
+                  faddp(m,i) = faddp(m,i) + cqxx(m,i)
               enddo
-              faddm(m,i) = faddm(m,i) + cqxx(m,i)
-              faddp(m,i) = faddp(m,i) + cqxx(m,i)
           end do
-
       else
           do i = 1, mx+1
 
