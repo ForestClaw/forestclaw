@@ -36,7 +36,7 @@ else
             ca = [-0.2,1];
         end
     else
-        ca = [0,1];
+        ca = [-0.2,1];
     end
 end
 
@@ -56,11 +56,11 @@ if (~flat)
     view(3)
     % view(vtop);
     % view(vtop);
-    hold on;
-    th = linspace(-pi/2, pi/2,500);
-    plot3(cos(th),0*th,sin(th),'k','linewidth',4);
-    th = linspace(pi/32, 2*pi-pi/32,500);
-    plot3(cos(th),sin(th),0*th,'k','linewidth',4);
+%     hold on;
+%     th = linspace(-pi/2, pi/2,500);
+%     plot3(cos(th),0*th,sin(th),'k','linewidth',4);
+%     th = linspace(pi/32, 2*pi-pi/32,500);
+%     plot3(cos(th),sin(th),0*th,'k','linewidth',4);
     hold off;
 end
 
