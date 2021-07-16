@@ -153,6 +153,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
 	cp->mx = clawpatch_opt->mx;
 	cp->my = clawpatch_opt->my;
+	cp->mz = clawpatch_opt->mz;
 	cp->mbc = clawpatch_opt->mbc;
 	cp->blockno = blockno;
 	cp->meqn = clawpatch_opt->meqn;
@@ -170,25 +171,41 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
 	cp->manifold = fclaw_opt->manifold;
 
+#if FCLAW2D_REFINEDIM == 2
+	/* For extruded mesh, we don't have any refinement in z */
+	double zlower = 0;
+	double zupper = 1;
+#endif
+
 	if (cp->manifold)
 	{
 		cp->xlower = patch->xlower;
 		cp->ylower = patch->ylower;
 		cp->xupper = patch->xupper;
 		cp->yupper = patch->yupper;
-	}
+#if FCLAW2D_REFINEDIM == 2
+		cp->zlower = zlower;
+		cp->zupper = zupper;
+#else
+		cp->zlower = patch->zlower;
+		cp->zupper = patch->zupper;
+#endif
+	}	
 	else
 	{
 		double ax = fclaw_opt->ax;
 		double bx = fclaw_opt->bx;
 		double ay = fclaw_opt->ay;
 		double by = fclaw_opt->by;
+		double az = fclaw_opt->az;
+		double bz = fclaw_opt->bz;
 
 		double xl = patch->xlower;
 		double yl = patch->ylower;
 		double xu = patch->xupper;
 		double yu = patch->yupper;
 
+#if FCLAW2D_REFINEDIM == 2
 		double xlower, ylower, xupper, yupper;
 
 		if (is_brick)
@@ -205,32 +222,41 @@ void clawpatch_define(fclaw2d_global_t* glob,
 			xupper = xu;
 			yupper = yu;
 		}
+#else
+		fclaw_global_essentialf("clawpatch::define : 3d refinement not yet implemented\n");
+		exit(0);
+#endif
 
 		cp->xlower = ax + (bx - ax)*xlower;
 		cp->xupper = ax + (bx - ax)*xupper;
 		cp->ylower = ay + (by - ay)*ylower;
 		cp->yupper = ay + (by - ay)*yupper;
+		cp->zlower = az + (bz - az)*zlower;
+		cp->zupper = az + (bz - az)*zupper;
 	}
 
 	cp->dx = (cp->xupper - cp->xlower)/cp->mx;
 	cp->dy = (cp->yupper - cp->ylower)/cp->my;
+	cp->dz = (cp->zupper - cp->zlower)/cp->mz;
 
-	int ll[2];
-	int ur[2];
-	for (int idir = 0; idir < 2; idir++)
+	int ll[FCLAW2D_PATCHDIM];
+	int ur[FCLAW2D_PATCHDIM];
+	for (int idir = 0; idir < PatchDim; idir++)
 	{
 		ll[idir] = 1-cp->mbc;
 	}
 	ur[0] = cp->mx + cp->mbc;
 	ur[1] = cp->my + cp->mbc;
-	Box box(ll,ur);
+	if (PatchDim == 3)
+		ur[2] = cp->mz + cp->mbc;
+
+	Box box(ll,ur);	
 
 	// This will destroy any existing memory n griddata.
 	cp->griddata.define(box, cp->meqn);
 	if (fclaw_opt->subcycle)
-	{
 		cp->griddata_time_interpolated.define(box, cp->meqn);
-	}
+
 	if (fclaw_opt->compute_error)
 	{
 		cp->griderror.define(box,cp->meqn);
@@ -238,9 +264,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	}
 
 	if (clawpatch_opt->maux > 0)
-	{
 		cp->aux.define(box,cp->maux);
-	}
 
 	if (clawpatch_opt->rhs_fields > 0)
 	{
@@ -268,9 +292,8 @@ void clawpatch_define(fclaw2d_global_t* glob,
 									  blockno,patchno,&cp->registers);
 
 	if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
-	{
+		/* If we are building ghost patches, we don't need all the patch memory */
 		return;
-	}
 
 	cp->griddata_last.define(box, cp->meqn);
 	cp->griddata_save.define(box, cp->meqn);
@@ -339,9 +362,6 @@ void clawpatch_restore_step(fclaw2d_global_t* glob,
 {
 	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
 	cp->griddata = cp->griddata_save;
-
-	/* Save data potentially needed for conservative fix */
-
 }
 
 static
@@ -352,7 +372,6 @@ void clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
 	/* We use the pack size here to make sure we are setting
 	   everything correctly;  it isn't needed for memory
 	   allocation */
-	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
 	int mx = clawpatch_opt->mx;
@@ -384,9 +403,11 @@ void clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
 	   neighboring fine grid will average to ghost cells of the interpolated
 	   level, then the interpolated level is used to interpolate to fine grid
 	   ghost cells. */
-
+	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+#if FCLAW2D_PATCHDIM == 2
 	clawpatch_vt->fort_timeinterp(&mx,&my,&mbc,&meqn,&psize,
 									qcurr,qlast,qinterp,&alpha,&ierror);
+#endif
 
 }
 
@@ -402,23 +423,29 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
 						 fclaw2d_patch_transform_data_t *transform_data)
 
 {
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
-	int meqn,mx,my,mbc;
-	double *qthis, *qneighbor;
 	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
-	mbc = clawpatch_opt->mbc;
+	int mx = clawpatch_opt->mx;
+	int my = clawpatch_opt->my;
+	int mbc = clawpatch_opt->mbc;
 
 	/* This routine might be called between two time-sync patches */
+	int meqn;
+	double *qthis;
 	fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
+
+	double *qneighbor;
 	fclaw2d_clawpatch_timesync_data(glob,neighbor_patch,time_interp,&qneighbor,&meqn);
 
 	if (fill_ghost(time_interp))
 	{
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+#if FCLAW2D_PATCHDIM == 2		
 		clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+#else
+		int mz = clawpatch_opt->mz;
+		clawpatch_vt->fort_copy_face(&mx,&my,&mz,&mbc,&meqn,qthis,qneighbor,&iface,&transform_data);
+#endif
 	}
 }
 
@@ -451,9 +478,17 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
 	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 	int manifold = fclaw_opt->manifold;
 	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
+#if FCLAW2D_PATCHDIM == 2
 	clawpatch_vt->fort_average_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,areacoarse,areafine,
 									&idir,&iface_coarse, &p4est_refineFactor, &refratio,
 									&igrid,&manifold,&transform_data);
+#else
+	int mz = clawpatch_opt->mz;
+	clawpatch_vt->fort_average_face(&mx,&my,&mz,&mbc,&meqn,qcoarse,qfine,areacoarse,areafine,
+									&idir,&iface_coarse, &p4est_refineFactor, &refratio,
+									&igrid,&manifold,&transform_data);
+#endif
 }
 
 static
@@ -483,8 +518,13 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
 	if (fill_ghost(time_interp))
 	{
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+#if FCLAW2D_PATCHDIM == 2
 		clawpatch_vt->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,&iface_coarse,
 		                                    &p4est_refineFactor,&refratio,&igrid,&transform_data);
+#else
+	int mz = clawpatch_opt->mz;
+	// ..
+#endif
 	}
 }
 
@@ -498,23 +538,30 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
 						   int time_interp,
 						   fclaw2d_patch_transform_data_t *transform_data)
 {
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
-	int meqn,mx,my,mbc;
-	double *qthis, *qcorner;  
 	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	int mx = clawpatch_opt->mx;
+	int my = clawpatch_opt->my;
+	int mbc = clawpatch_opt->mbc;
 
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
-	mbc = clawpatch_opt->mbc;
-
+	int meqn;
+	double *qthis;
 	fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
+
+	double *qcorner;
 	fclaw2d_clawpatch_timesync_data(glob,corner_patch,time_interp,&qcorner,&meqn);
 
 	if (fill_ghost(time_interp))
 	{
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+#if FCLAW2D_PATCHDIM == 2
 		clawpatch_vt->fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,&icorner,
 		                               &transform_data);
+#else
+		int mz = clawpatch_opt->mz;
+		clawpatch_vt->fort_copy_corner(&mx,&my,&mz, &mbc,&meqn,qthis,qcorner,&icorner,
+		                               &transform_data);		
+#endif
 	}
 }
 
@@ -529,36 +576,39 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
 							  int time_interp,
 							  fclaw2d_patch_transform_data_t* transform_data)
 {
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
-
-	int refratio = 2;
-
-	int meqn,mx,my,mbc;
-	double *qcoarse, *qfine;
-	double *areacoarse, *areafine;
-
-	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-
+	int meqn;
+	double *qcoarse;
 	fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
-	qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+
+	double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
 	/* These will be empty for non-manifolds cases */
-	areacoarse = clawpatch_get_area(coarse_patch);
+	double *areacoarse = clawpatch_get_area(coarse_patch);
+	double *areafine = clawpatch_get_area(fine_patch);
 
-	areafine = clawpatch_get_area(fine_patch);
+	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	int mx = clawpatch_opt->mx;
+	int my = clawpatch_opt->my;
+	int mbc = clawpatch_opt->mbc;
 
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
-	mbc = clawpatch_opt->mbc;
-
+	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 	int manifold = fclaw_opt->manifold;
 	if (fill_ghost(time_interp))
 	{
+		int refratio = 2;
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+#if FCLAW2D_PATCHDIM == 2
 		clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,
 		                                  &refratio,qcoarse,qfine,
 		                                  areacoarse,areafine,
 		                                  &manifold,&coarse_corner,&transform_data);
+#else
+		int mz = clawpatch_opt->mz;		
+		clawpatch_vt->fort_average_corner(&mx,&my,&mz,&mbc,&meqn,
+		                                  &refratio,qcoarse,qfine,
+		                                  areacoarse,areafine,
+		                                  &manifold,&coarse_corner,&transform_data);
+#endif
 	}
 }
 
@@ -573,29 +623,30 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
 								  fclaw2d_patch_transform_data_t* transform_data)
 
 {
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	int mx = clawpatch_opt->mx;
+	int my = clawpatch_opt->my;
+	int mbc = clawpatch_opt->mbc;
 
-	int refratio = 2;
-
-	int meqn,mx,my,mbc;
-	double *qcoarse, *qfine;
-	const fclaw2d_clawpatch_options_t *clawpatch_opt 
-					   = fclaw2d_clawpatch_get_options(glob);
-
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
-	mbc = clawpatch_opt->mbc;
-	meqn = clawpatch_opt->meqn;
-
-
+	int meqn;
+	double *qcoarse;
 	fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
-	qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+
+	double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
 	if (fill_ghost(time_interp))
 	{
+		int refratio = 2;
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+#if FCLAW2D_PATCHDIM == 2
 		clawpatch_vt->fort_interpolate_corner(&mx,&my,&mbc,&meqn,
 										  &refratio,qcoarse,qfine,
 										  &coarse_corner,&transform_data);	
+#else
+		int mz = clawpatch_opt->mz;
+		/* ... */
+#endif
+
 	}
 
 }
@@ -610,10 +661,6 @@ int clawpatch_tag4refinement(fclaw2d_global_t *glob,
 							 int blockno, int patchno,
 							 int initflag)
 {
-	int mx,my,mbc;
-	double xlower,ylower,dx,dy;
-	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-								&xlower,&ylower,&dx,&dy);
 	int meqn;
 	double *q;
 	fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
@@ -634,10 +681,26 @@ int clawpatch_tag4refinement(fclaw2d_global_t *glob,
 		/* This allows the user to specify a "exceeds_th" */
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
+		int mx,my,mbc;
+		double xlower,ylower,dx,dy;
+#if FCLAW2D_PATCHDIM == 2
+		fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+		                            &xlower,&ylower,&dx,&dy);
 		clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,
 		                                  &dx,&dy, &blockno, q,
 		                                  &refine_threshold,
 		                                  &initflag,&tag_patch);
+#else
+		int mz;
+		double zlower,dz;
+		fclaw2d_clawpatch_grid_data3(glob,patch,&mx,&my,&mz, &mbc,
+		                            &xlower,&ylower,&zlower, &dx,&dy,&dz);
+		clawpatch_vt->fort_tag4refinement(&mx,&my,&mz, &mbc,&meqn,
+		                                  &xlower,&ylower,&zlower,
+		                                  &dx,&dy, &dz, &blockno, q,
+		                                  &refine_threshold,
+		                                  &initflag,&tag_patch);
+#endif		
 	}
 	return tag_patch;
 }
@@ -649,10 +712,6 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 							 int patchno,
 							 int initflag)
 {
-	double xlower,ylower,dx,dy;
-	int mx,my,mbc;
-	fclaw2d_clawpatch_grid_data(glob,&fine_patches[0],&mx,&my,&mbc,
-								&xlower,&ylower,&dx,&dy);
 
 	int meqn;
 	double *q[4];
@@ -669,10 +728,26 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 	{		
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
+
+		double xlower,ylower,dx,dy;
+		int mx,my,mbc;
+#if FCLAW2D_PATCHDIM == 2
+		fclaw2d_clawpatch_grid_data(glob,&fine_patches[0],&mx,&my,&mbc,
+		                            &xlower,&ylower,&dx,&dy);
 		clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,
 		                                  &xlower,&ylower,&dx,&dy,
 		                                  &blockno, q[0],q[1],q[2],q[3],
 		                                  &coarsen_threshold,&initflag,&tag_patch);
+#else
+		int mz;
+		double zlower, dz;
+		fclaw2d_clawpatch_grid_data3(glob,&fine_patches[0],&mx,&my,&mz,&mbc,
+		                            &xlower,&ylower,&zlower,&dx,&dy,&dz);
+		clawpatch_vt->fort_tag4coarsening(&mx,&my,&mz,&mbc,&meqn,
+		                                  &xlower,&ylower,&zlower,&dx,&dy,&dz,
+		                                  &blockno, q[0],q[1],q[2],q[3],
+		                                  &coarsen_threshold,&initflag,&tag_patch);
+#endif
 	}
 	else
 	{
@@ -688,48 +763,44 @@ void clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 								int this_blockno, int coarse_patchno,
 								int fine0_patchno)
 {
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
 
-	int mx,my,mbc,meqn;
-	double *qcoarse,*qfine;
-	double *areacoarse,*areafine;
-	double *xp,*yp,*zp,*xd,*yd,*zd;
-	int igrid;
-
-	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	int mx = clawpatch_opt->mx;
+	int my = clawpatch_opt->my;
+	int mbc = clawpatch_opt->mbc;
+	int meqn = clawpatch_opt->meqn;
 
-	fclaw2d_patch_t* fine_patch;
-
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
-	mbc = clawpatch_opt->mbc;
-
+#if 0
+	double *xp,*yp,*zp,*xd,*yd,*zd,*areacoarse;
 	fclaw2d_metric_patch_mesh_data(glob,coarse_patch,&xp,&yp,&zp,
-							  &xd,&yd,&zd,&areacoarse);
-	fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
+							  &xd,&yd,&zd,&areacoarse);							
+#endif
+
+	double *areacoarse = clawpatch_get_area(coarse_patch);
+	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
 	/* Loop over four siblings (z-ordering) */
-	for (igrid = 0; igrid < 4; igrid++)
+	for (int igrid = 0; igrid < NumSiblings; igrid++)
 	{
-		fine_patch = &fine_patches[igrid];
+		fclaw2d_patch_t *fine_patch = &fine_patches[igrid];
+		double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-		fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
-
+		const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+		double *areafine = NULL;
 		if (fclaw_opt->manifold)
-		{
-			fclaw2d_metric_patch_mesh_data(glob,fine_patch,&xp,&yp,&zp,
-										   &xd,&yd,&zd,&areafine);
-		}
-		else
-		{
-			areafine = NULL;
-		}
+			areafine = clawpatch_get_area(fine_patch);
 
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+#if FCLAW2D_PATCHDIM == 2
 		clawpatch_vt->fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
 											areacoarse, areafine, &igrid,
 											&fclaw_opt->manifold);
-
+#else
+		int mz = clawpatch_opt->mz;
+		clawpatch_vt->fort_interpolate2fine(&mx,&my,&mz, &mbc,&meqn,qcoarse,qfine,
+											areacoarse, areafine, &igrid,
+											&fclaw_opt->manifold);
+#endif
 	}
 }
 
@@ -741,46 +812,37 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 							  int coarse_patchno)
 
 {
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+	const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+	                fclaw2d_clawpatch_get_options(glob);	
+	int mx = clawpatch_opt->mx;
+	int my = clawpatch_opt->my;
+	int mbc = clawpatch_opt->mbc;
+	int meqn = clawpatch_opt->meqn;
 
-	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
-	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-	
-	int mx,my, mbc, meqn;
-	double *qcoarse, *qfine;
-	double *areacoarse, *areafine;
-	double *xp,*yp,*zp,*xd,*yd,*zd;
-	int igrid;
-	fclaw2d_patch_t *fine_patch;
+	double *areacoarse = clawpatch_get_area(coarse_patch);
+	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
-	mbc = clawpatch_opt->mbc;
-
-	fclaw2d_metric_patch_mesh_data(glob,coarse_patch,&xp,&yp,&zp,
-								   &xd,&yd,&zd,&areacoarse);
-
-	fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
-
-	for(igrid = 0; igrid < 4; igrid++)
+	for(int igrid = 0; igrid < NumSiblings; igrid++)
 	{
-		fine_patch = &fine_patches[igrid];
+		fclaw2d_patch_t *fine_patch = &fine_patches[igrid];
+		double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-		fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
-
+		const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+		double *areafine = NULL;
 		if (fclaw_opt->manifold)
-		{
-			fclaw2d_metric_patch_mesh_data(glob,fine_patch,&xp,&yp,&zp,
-										   &xd,&yd,&zd,&areafine);
-		}
-		else
-		{
-			areafine = NULL;
-		}
+			areafine = clawpatch_get_area(fine_patch);
 
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+#if FCLAW2D_PATCHDIM == 2	
 		clawpatch_vt->fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
 										  areacoarse, areafine, &igrid,
 										  &fclaw_opt->manifold);
+#else
+		int mz = clawpatch_opt->mz;
+		clawpatch_vt->fort_average2coarse(&mx,&my,&mz, &mbc,&meqn,qcoarse,qfine,
+										  areacoarse, areafine, &igrid,
+										  &fclaw_opt->manifold);
+#endif
 
 	}
 }
@@ -821,11 +883,20 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 	/* Include size of conservation registers.  Save fluxes on each size, even though
 	   only one or two sides may be used. */
+#if FCLAW2D_PATCHDIM == 2
 	int frsize = packregisters ? 2*(4*meqn+2)*(mx + my) : 0;
 
 	/* This is computed twice - here, and in fclaw2d_clawpatch_ghost_packsize */
 	int wg = (2*nghost + mx)*(2*nghost + my);
 	int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
+#else
+	int mz = clawpatch_opt->mz;
+	int frsize = packregisters ? 2*(4*meqn + 2)*(mx + my + mz) : 0;
+
+	/* This is computed twice - here, and in fclaw2d_clawpatch_ghost_packsize */
+	int wg = (2*nghost + mx)*(2*nghost + my)*(2*nghost + mz);
+	int hole = (mx - 2*mint)*(my - 2*mint)*(mz - 2*mint);  /* Hole in center */
+#endif
 	FCLAW_ASSERT(hole >= 0);
 
 	/* int psize = (wg - hole)*(meqn + packarea + packextra) + frsize; */
@@ -834,8 +905,15 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	int qareasize = (wg - hole)*(meqn + packarea);
 	int extrasize = (wg - hole)*(packextra);
 
+#if FCLAW2D_PATCHDIM == 2
 	clawpatch_vt->fort_local_ghost_pack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
 										 qpack,&qareasize,&packmode,&ierror);
+#else
+	fclaw_global_essentialf("clawpatch_ghost_comm : 3d ghost " \
+	                        "exchange not yet implemented\n");
+	exit(0);
+#endif
+
 	qpack += qareasize;  /* Advance pointer */
 
 	FCLAW_ASSERT(ierror == 0);
@@ -1103,6 +1181,27 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	clawpatch_vt->fort_user_exceeds_threshold = NULL;
 
 	/* Fortran functions that depend on data layout (version 4.6 or 5.0) */
+
+#if FCLAW2D_PATCHDIM == 3
+	{
+		/* Clawpatch settings functions */
+		clawpatch_vt->fort_average2coarse        = FCLAW2D_CLAWPATCH46_FORT3_AVERAGE2COARSE;
+		clawpatch_vt->fort_interpolate2fine      = FCLAW2D_CLAWPATCH46_FORT3_INTERPOLATE2FINE;
+
+		/* Ghost cell exchange functions */
+		clawpatch_vt->fort_copy_face             = FCLAW2D_CLAWPATCH46_FORT3_COPY_FACE;
+		clawpatch_vt->fort_average_face          = FCLAW2D_CLAWPATCH46_FORT3_AVERAGE_FACE;
+		clawpatch_vt->fort_interpolate_face      = FCLAW2D_CLAWPATCH46_FORT3_INTERPOLATE_FACE;
+
+		clawpatch_vt->fort_copy_corner           = FCLAW2D_CLAWPATCH46_FORT3_COPY_CORNER;
+		clawpatch_vt->fort_average_corner        = FCLAW2D_CLAWPATCH46_FORT3_AVERAGE_CORNER;
+		clawpatch_vt->fort_interpolate_corner    = FCLAW2D_CLAWPATCH46_FORT3_INTERPOLATE_CORNER;
+
+		/* output functions */
+		clawpatch_vt->fort_header_ascii          = FCLAW2D_CLAWPATCH46_FORT3_HEADER_ASCII;
+		clawpatch_vt->fort_output_ascii          = FCLAW2D_CLAWPATCH46_FORT3_OUTPUT_ASCII;
+	}
+#else
 	if (claw_version == 4)
 	{
 		/* Clawpatch settings functions */
@@ -1172,8 +1271,8 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 		clawpatch_vt->fort_local_ghost_pack      = FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK;
 
 		clawpatch_vt->fort_timeinterp            = FCLAW2D_CLAWPATCH5_FORT_TIMEINTERP;
-
 	}
+#endif
 
 
 	fclaw2d_clawpatch_diagnostics_vtable_initialize();
