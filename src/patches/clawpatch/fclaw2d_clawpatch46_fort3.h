@@ -36,6 +36,7 @@ extern "C"
 #endif
 
 
+#if 0
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 
@@ -120,15 +121,20 @@ typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx, const int* my,con
                                                 int* tag_patch);
 
 
-typedef int (*clawpatch_fort_exceeds_threshold_t)(int* blockno,
-                                                   double qval[], 
-                                                   double* qmin, double *qmax,
+#if 0
+typedef int (*clawpatch_fort_exceeds_threshold_t)(int *blockno,
+                                                   double *qval, 
+                                                   double *qmin, 
+                                                   double *qmax,
                                                    double quad[], 
-                                                   double *dx, double *dy, double *dz,
-                                                   double *xc, double *yc, double *zc,
-                                                   int* tag_threshold,
+                                                   double *dx, 
+                                                   double *dy, 
+                                                   double *xc, 
+                                                   double *yc, 
+                                                   double* tag_threshold,
                                                    int* init_flag,
                                                    int* is_ghost);
+#endif                                                   
     
 
 typedef void (*clawpatch_fort_interpolate2fine_t)(const int* mx, const int* my, const int* mz,
@@ -237,7 +243,7 @@ typedef void (*clawpatch_fort_norm_t)(const int* blockno,
                                       double error[], 
                                       double error_norm[]);
 
-
+#endif
 /* ------------------------------ Time stepping functions ----------------------------- */
 #define FCLAW2D_CLAWPATCH46_FORT3_TIMEINTERP \
             FCLAW_F77_FUNC (fclaw2d_clawpatch46_fort3_timeinterp, \
@@ -444,10 +450,10 @@ void FCLAW2D_CLAWPATCH46_FORT3_OUTPUT_ASCII(const char *matname1,
 #define FCLAW2D_CLAWPATCH46_FORT3_HEADER_ASCII \
          FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort3_header_ascii, \
                         FCLAW2D_CLAWPATCH46_FORT3_HEADER_ASCII)
-void FCLAW2D_CLAWPATCH46_FORT3_HEADER_ASCII(char* matname1, char* matname2,
-                                           double* time, int* meqn, int* maux, 
-                                           int* ngrids);
-
+void FCLAW2D_CLAWPATCH46_FORT3_HEADER_ASCII(const char* matname1, const char* matname2,
+                                           const double* time, const int* meqn, 
+                                           const int* maux, 
+                                           const int* ngrids);
 /* ----------------------------- Diagnostics functions -------------------------------- */
 
 #define FCLAW2D_CLAWPATCH46_FORT3_CONSERVATION_CHECK \

@@ -83,7 +83,7 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version);
 
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
-void* fclaw2d_clawpatch_get_exceeds_th_user();
+// void* fclaw2d_clawpatch_get_exceeds_th_user();
 
 
 struct fclaw2d_clawpatch_vtable

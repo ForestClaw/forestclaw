@@ -1,23 +1,27 @@
 /* # check to see if value exceeds threshold */
 
-#include <fclaw2d_clawpatch.h>
+#include "../fclaw2d_clawpatch.h"
 
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch_fort.h>
+#include "../fclaw2d_clawpatch_options.h"
+#include "../fclaw2d_clawpatch_fort.h"
+
+
+/* ------------------------------------------------------------------------------------ */
 
 int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* blockno,
-                                        double qval[], 
-                                        double* qmin, double *qmax,
+                                        double *qval, 
+                                        double* qmin, 
+                                        double *qmax,
                                         double quad[], 
-                                        double *dx, double *dy, 
-                                        double *xc, double *yc, 
-                                        int* tag_threshold,
+                                        double *dx, 
+                                        double *dy, 
+                                        double *xc, 
+                                        double *yc, 
+                                        double *tag_threshold,
                                         int* init_flag,
                                         int* is_ghost)
 {
-#if 0
-
-    int refinement_criteria = fclaw2d_clawpatch_get_refinement_criteria();
+    int refinement_criteria = FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
 
     int exceeds_th;
 
@@ -46,7 +50,7 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* blockno,
             break;
         case FCLAW_REFINE_CRITERIA_GRADIENT:
             exceeds_th = FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(blockno,
-                    qval,qmin,qmax,quad, dx, dy, xc, yc, 
+                    qval,qmin,qmax,quad, dx, dy, xc, yc,     
                     tag_threshold,init_flag,is_ghost);
             break;
 
@@ -60,9 +64,11 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* blockno,
                                         "defined\n function was found.\n\n");
             }
             FCLAW_ASSERT(user_exceeds_threshold != NULL);
+#if 1
             exceeds_th = user_exceeds_threshold(blockno, qval,qmin,qmax,quad, 
                                                 dx, dy, xc, yc,
                                                 tag_threshold,init_flag,is_ghost);
+#endif                                            
             break;
         default:
             fclaw_global_essentialf("fclaw2d_clawpatch_exceeds_threshold.c): " \
@@ -71,5 +77,4 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* blockno,
             break;
     }
     return exceeds_th;
-#endif
 }
