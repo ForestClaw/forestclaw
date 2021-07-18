@@ -1,7 +1,7 @@
 # -*- Makefile -*-
-libclawpack3d_46_generated_headers =
+libclawpack3_46_generated_headers =
 
-libclawpack3d_46_installed_headers = \
+libclawpack3_46_installed_headers = \
 	src/solvers/fc3d_clawpack46/fc3d_clawpack46.h \
 	src/solvers/fc3d_clawpack46/fc3d_clawpack46_options.h \
 	src/solvers/fc3d_clawpack46/fc3d_clawpack46_user_fort.h \

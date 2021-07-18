@@ -1,37 +1,40 @@
-s = 1e-2;
-axis([-s 1+s -s 1+s])
+yrbcolormap
+axis([0 1 0 1 0 1])
 daspect([1 1 1]);
+
+hideslices;
+showslices('x',6);
+showslices('y',6);
+showslices('z',6);
+
+fprintf('qmin = %24.16e\n',qmin);
+fprintf('qmax = %24.16e\n',qmax);
+
+
+showpatchborders;
+setpatchbordercolor('k');
+% setpatchborderprops(1,'linewidth',2,'color','k');  % new version only
+% setpatchborderprops(2,'linewidth',2,'color','k');  % new version only
+% setpatchborderprops(3,'linewidth',2,'color','k');  % new version only
+
+showcubes;
+setcubecolor('r',1);
+setcubecolor('b',2);
+setcubecolor('k',3);
+hidecubes(1:2);
+
+caxis([0,1]);
+
+showgridlines(1:2);
+
+% cv = linspace(0,1,11);
+% cv([1 end]) = [];
+% drawcontourlines(cv);
+
+h = surflight;
+
 axis off;
 
-yrbcolormap;
-showpatchborders(1:10);
-caxis([0,1])
-qlo = 0;
-qhi = 1;
-under_label = sprintf('0 - %7.1e',qlo-qmin);
-over_label = sprintf('1 + %7.1e',qmax-qhi);
-fprintf('%6s %12s\n','qmin',under_label);
-fprintf('%6s %12s\n\n','qmax',over_label);
-
-
-if (ShowUnderOverShoots)
-    qlo = 0;
-    qhi = 1;
-    colorbar_underover(under_label,over_label);
-end
-
-
-view(2);
-
-NoQuery = 0;
-prt = false;
-if (prt)
-  filename = framename(Frame,'swirl0000','png');
-  print('-dpng',filename);
-end
-
-shg
+shg;
 
 clear afterframe;
-clear mapc2m;
-clear mapc2m_fivepatch;
