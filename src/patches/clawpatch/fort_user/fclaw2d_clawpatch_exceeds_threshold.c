@@ -8,20 +8,20 @@
 
 /* ------------------------------------------------------------------------------------ */
 
-int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* blockno,
-                                        double *qval, 
-                                        double* qmin, 
-                                        double *qmax,
-                                        double quad[], 
-                                        double *dx, 
-                                        double *dy, 
-                                        double *xc, 
-                                        double *yc, 
-                                        double *tag_threshold,
-                                        int* init_flag,
-                                        int* is_ghost)
+int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int* blockno,
+                                        const double *qval, 
+                                        const double* qmin, 
+                                        const double *qmax,
+                                        const double quad[], 
+                                        const double *dx, 
+                                        const double *dy, 
+                                        const double *xc, 
+                                        const double *yc, 
+                                        const double *tag_threshold,
+                                        const int* init_flag,
+                                        const int* is_ghost)
 {
-    int refinement_criteria = FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
+    int refinement_criteria = fclaw2d_clawpatch_get_refinement_criteria();
 
     int exceeds_th;
 

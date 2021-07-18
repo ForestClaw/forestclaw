@@ -693,7 +693,7 @@ int clawpatch_tag4refinement(fclaw2d_global_t *glob,
 #else
 		int mz;
 		double zlower,dz;
-		fclaw2d_clawpatch_grid_data3(glob,patch,&mx,&my,&mz, &mbc,
+		fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
 		                            &xlower,&ylower,&zlower, &dx,&dy,&dz);
 		clawpatch_vt->fort_tag4refinement(&mx,&my,&mz, &mbc,&meqn,
 		                                  &xlower,&ylower,&zlower,
@@ -741,7 +741,7 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 #else
 		int mz;
 		double zlower, dz;
-		fclaw2d_clawpatch_grid_data3(glob,&fine_patches[0],&mx,&my,&mz,&mbc,
+		fclaw2d_clawpatch_grid_data(glob,&fine_patches[0],&mx,&my,&mz,&mbc,
 		                            &xlower,&ylower,&zlower,&dx,&dy,&dz);
 		clawpatch_vt->fort_tag4coarsening(&mx,&my,&mz,&mbc,&meqn,
 		                                  &xlower,&ylower,&zlower,&dx,&dy,&dz,
@@ -920,12 +920,12 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	if (packextra)
 	{
 		FCLAW_ASSERT(extrasize > 0);
-		FCLAW_ASSERT(clawpatch_vt->fort_local_ghost_pack_aux != NULL);
+		FCLAW_ASSERT(clawpatch_vt->local_ghost_pack_aux != NULL);
 		/* This should be renamed, since it doesn't point to an actual
 		   Fortran routine (or one with a fortran like signature) */
-		clawpatch_vt->fort_local_ghost_pack_aux(glob,patch,mint,
-		                                        qpack,extrasize,
-		                                        packmode,&ierror);
+		clawpatch_vt->local_ghost_pack_aux(glob,patch,mint,
+		                                   qpack,extrasize,
+		                                   packmode,&ierror);
 		FCLAW_ASSERT(ierror == 0);
 		qpack += extrasize; /* Advance pointer */
 	}
@@ -1317,7 +1317,7 @@ fclaw2d_clawpatch_get_metric_patch(fclaw2d_patch_t* patch)
 	return get_metric_patch(patch);
 }
 
-
+#if FCLAW2D_PATCHDIM == 2
 void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
 								 fclaw2d_patch_t* patch,
 								 int* mx, int* my, int* mbc,
@@ -1333,8 +1333,8 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
 	*dx = cp->dx;
 	*dy = cp->dy;
 }
-
-void fclaw2d_clawpatch_grid_data3(fclaw2d_global_t* glob,
+#else
+void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
 								 fclaw2d_patch_t* patch,
 								 int* mx, int* my, int* mz, int* mbc,
 								 double* xlower, double* ylower,
@@ -1353,6 +1353,7 @@ void fclaw2d_clawpatch_grid_data3(fclaw2d_global_t* glob,
 	*dy = cp->dy;
 	*dz = cp->dz;
 }
+#endif
 
 
 void fclaw2d_clawpatch_aux_data(fclaw2d_global_t *glob,

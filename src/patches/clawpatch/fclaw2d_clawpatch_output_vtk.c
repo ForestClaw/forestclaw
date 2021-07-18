@@ -576,31 +576,19 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 
 static void
 fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
-                                  fclaw2d_patch_t * this_patch,
-                                  int this_block_idx, int this_patch_idx,
+                                  fclaw2d_patch_t * patch,
+                                  int blockno, int patchno,
                                   char *a)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
-    fclaw2d_map_context_t *cont;
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+
+    fclaw2d_map_context_t *cont = glob->cont;
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-
-
-    cont = glob->cont;
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+#if FCLAW2D_PATCHDIM == 2
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
-
-#if 0
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
-
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    const double xlower = cp->xlower ();
-    const double ylower = cp->ylower ();
-    const double dx = cp->dx ();
-    const double dy = cp->dy ();
-#endif
 
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
@@ -612,9 +600,9 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
         for (i = 0; i <= mx; ++i)
         {
             const double x = xlower + i * dx;
-            if (gparms->manifold)
+            if (fclaw_opt->manifold)
             {
-                FCLAW2D_MAP_C2M(&cont,&this_block_idx,&x,&y,&xpp,&ypp,&zpp);
+                FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                 *d++ = xpp;
                 *d++ = ypp;
                 *d++ = zpp;
@@ -627,24 +615,34 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
             }
         }
     }
+#elif FCLAW2D_PATCHDIM == 3
+    int mz;
+    double zlower, dz;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+#endif
 }
 
 
 static void
 fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
-                             fclaw2d_patch_t * this_patch,
-                             int this_block_idx, int this_patch_idx,
+                             fclaw2d_patch_t * patch,
+                             int blockno, int patchno,
                              char *a)
 {
-    double *q;
-    double xlower,ylower,dx,dy;
-    int mx,my,mbc,meqn;
 
 //    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    int meqn;
+    double *q;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+#if FCLAW2D_PATCHDIM == 2
+
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     const int xlane = mx + 2 * mbc;
@@ -667,6 +665,13 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
             }
         }
     }
+#elif FCLAW2D_PATCHDIM == 3
+    int mz;
+    double zlower, dz;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+#endif
 }
 
 /*  --------------------------------------------------------------------------
@@ -675,13 +680,13 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
 void
 fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my, 
                                    clawpatch_opt->meqn,
-                                   gparms->vtkspace, 0,
+                                   fclaw_opt->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
 }
@@ -693,17 +698,17 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 
 void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
 
     char basename[BUFSIZ];
-    snprintf (basename, BUFSIZ, "%s_frame_%04d", gparms->prefix, iframe);
+    snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my, 
                                    clawpatch_opt->meqn,
-                                   gparms->vtkspace, 0,
+                                   fclaw_opt->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
 }

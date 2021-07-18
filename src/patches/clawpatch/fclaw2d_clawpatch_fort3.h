@@ -31,6 +31,10 @@ extern "C"
 {
 #endif
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
@@ -58,7 +62,8 @@ typedef void (*clawpatch_fort_average_face_t)(const int* mx, const int* my, cons
 											  const int* manifold, 
 											  struct fclaw2d_patch_transform_data** transform_cptr);
 	
-typedef void (*clawpatch_fort_interpolate_face_t)(const int* mx, const int* my, const int* mz,
+typedef void (*clawpatch_fort_interpolate_face_t)(const int* mx, const int* my, 
+                                                  const int* mz,
                                                   const int* mbc, const int* meqn,
 												  double qcoarse[],double qfine[],
 												  const int* idir, const int* iside,
@@ -70,11 +75,14 @@ typedef void (*clawpatch_fort_interpolate_face_t)(const int* mx, const int* my, 
 
 typedef void (*clawpatch_fort_copy_corner_t)(const int* mx, const int* my, const int* mz,
                                              const int* mbc,
-											 const int* meqn, double this_q[],double neighbor_q[],
+											 const int* meqn, double this_q[],
+                                             double neighbor_q[],
 											 const int* a_corner,
-											 struct fclaw2d_patch_transform_data** transform_cptr);
+											 struct fclaw2d_patch_transform_data** 
+                                             transform_cptr);
 
-typedef void (*clawpatch_fort_average_corner_t)(const int* mx, const int* my, const int* mz,
+typedef void (*clawpatch_fort_average_corner_t)(const int* mx, const int* my, 
+                                                const int* mz,
                                                 const int* mbc,
 												const int* meqn, const int* a_refratio,
 												double qcoarse[], double qfine[],
@@ -83,7 +91,8 @@ typedef void (*clawpatch_fort_average_corner_t)(const int* mx, const int* my, co
 												const int* a_corner, 
 												struct fclaw2d_patch_transform_data** transform_cptr);
 
-typedef void (*clawpatch_fort_interpolate_corner_t)(const int* mx, const int* my, const int* mz,
+typedef void (*clawpatch_fort_interpolate_corner_t)(const int* mx, const int* my, 
+                                                    const int* mz,
                                                     const int* mbc,
 													const int* meqn, const int* a_refratio, 
 													double this_q[],
@@ -124,6 +133,9 @@ typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx,
 												int* tag_patch);
 
 
+#if 0
+/* Even though this is for 3d patches, we still assume that tagging can only be
+   dependent on two dimensions */
 typedef int (*clawpatch_fort_exceeds_threshold_t)(int *blockno,
                                                   double *qval, 
                                                   double *qmin, 
@@ -136,15 +148,18 @@ typedef int (*clawpatch_fort_exceeds_threshold_t)(int *blockno,
                                                   double *tag_threshold,
                                                   int    *init_flag,
                                                   int    *is_ghost);
+#endif
     
 
-typedef void (*clawpatch_fort_interpolate2fine_t)(const int* mx, const int* my,const int* mz,
+typedef void (*clawpatch_fort_interpolate2fine_t)(const int* mx, const int* my, 
+                                                  const int* mz,
 												  const int* mbc, const int* meqn,
 												  double qcoarse[], double qfine[],
 												  double areacoarse[], double areafine[],
 												  const int* igrid, const int* manifold);
 	
-typedef void (*clawpatch_fort_average2coarse_t)(const int* mx, const int* my,const int* mz,
+typedef void (*clawpatch_fort_average2coarse_t)(const int* mx, const int* my, 
+                                                const int* mz,
 												const int* mbc, const int* meqn,
 												double qcoarse[],double qfine[],
 												double areacoarse[],double areafine[],
@@ -153,8 +168,8 @@ typedef void (*clawpatch_fort_average2coarse_t)(const int* mx, const int* my,con
 
 /* ----------------------------------- time stepping ---------------------------------- */
 
-typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const int* mz,
-                                            const int* mbc,
+typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, 
+                                            const int* mz, const int* mbc,
 											const int *meqn, const int* psize,
 											double qcurr[], double qlast[],
 											double qinterp[],const double* alpha,
@@ -169,22 +184,14 @@ typedef void (*clawpatch_fort_local_ghost_pack_t)(const int *mx, const int *my,
 												  double qpack[], int *psize,
 												  const int *packmode, int *ierror);
 	
-typedef void (*clawpatch_fort_local_ghost_pack_aux_t)(struct fclaw2d_global *glob,
-													  struct fclaw2d_patch *patch,
-													  const int mint,
-													  double qpack[], int extrasize,
-													  int packmode, int* ierror);
-	
-typedef void (*clawpatch_fort_local_ghost_pack_registers_t)(struct fclaw2d_global *glob,
-													  struct fclaw2d_patch *patch,
-													  double qpack[], int frsize,
-													  int* ierror);
-
 /* ---------------------------------- Output functions -------------------------------- */
 
+#if 0
 typedef void  (*clawpatch_fort_header_ascii_t)(const char* matname1,const char* matname2,
 											   const double* time, const int* meqn, 
                                                const int* maux, const int* ngrids);
+
+#endif
 
 /* Write out data */
 typedef void (*clawpatch_fort_output_ascii_t)(const char* matname1,
@@ -262,41 +269,42 @@ void TAG4COARSENING(const int* mx, const int* my, const int* mz,
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_exceeds_threshold, \
                                   FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD)
 
-int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int *blockno,
-                                        double *qval, 
-                                        double *qmin, 
-                                        double *qmax,
-                                        double quad[], 
-                                        double *dx, 
-                                        double *dy, 
-                                        double *xc, 
-                                        double *yc, 
-                                        double *tag_threshold,
-                                        int *init_flag,
-                                        int *is_ghost);
-
+int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
+                                        const double *qval, 
+                                        const double *qmin, 
+                                        const double *qmax,
+                                        const double quad[], 
+                                        const double *dx, 
+                                        const double *dy, 
+                                        const double *xc, 
+                                        const double *yc, 
+                                        const double *tag_threshold,
+                                        const int *init_flag,
+                                        const int *is_ghost);
+#if 0
 #define FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA \
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_get_refinement_criteria, \
                                  FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA)
 int FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
+#endif
 
 /* ----------------------------- Value threshold -------------------------------------- */
 #define FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH \
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_value_exceeds_th, \
                                  FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH)
     
-int FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH(int* blockno,
-                                       double *qval, 
-                                       double* qmin, 
-                                       double *qmax,
-                                       double quad[], 
-                                       double *dx, 
-                                       double *dy, 
-                                       double *xc, 
-                                       double *yc, 
-                                       double* tag_threshold,
-                                       int* init_flag,
-                                       int* is_ghost);
+int FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
+                                       const double *qval, 
+                                       const double* qmin, 
+                                       const double *qmax,
+                                       const double quad[], 
+                                       const double *dx, 
+                                       const double *dy, 
+                                       const double *xc, 
+                                       const double *yc, 
+                                       const double* tag_threshold,
+                                       const int* init_flag,
+                                       const int* is_ghost);
     
 /* ----------------------------- difference threshold --------------------------------- */
 
@@ -304,18 +312,18 @@ int FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH(int* blockno,
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_difference_exceeds_th, \
                                  FCLAW2D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH)
 
-int FCLAW2D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(int    *blockno,
-                                            double *qval, 
-                                            double *qmin, 
-                                            double *qmax,
-                                            double quad[], 
-                                            double *dx, 
-                                            double *dy, 
-                                            double *xc, 
-                                            double *yc, 
-                                            double *tag_threshold,
-                                            int *init_flag,
-                                            int *is_ghost);
+int FCLAW2D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int    *blockno,
+                                            const double *qval, 
+                                            const double *qmin, 
+                                            const double *qmax,
+                                            const double quad[], 
+                                            const double *dx, 
+                                            const double *dy, 
+                                            const double *xc, 
+                                            const double *yc, 
+                                            const double *tag_threshold,
+                                            const int *init_flag,
+                                            const int *is_ghost);
 
 /* --------------------------------- minmax threshold --------------------------------- */
 
@@ -323,36 +331,36 @@ int FCLAW2D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(int    *blockno,
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_minmax_exceeds_th, \
                                  FCLAW2D_CLAWPATCH_MINMAX_EXCEEDS_TH)
 
-int FCLAW2D_CLAWPATCH_MINMAX_EXCEEDS_TH(int *blockno,
-                                        double *qval, 
-                                        double* qmin, 
-                                        double *qmax,
-                                        double quad[], 
-                                        double *dx, 
-                                        double *dy, 
-                                        double *xc, 
-                                        double *yc, 
-                                        double *tag_threshold,                        
-                                        int *init_flag,
-                                        int *is_ghost);
+int FCLAW2D_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
+                                        const double *qval, 
+                                        const double* qmin, 
+                                        const double *qmax,
+                                        const double quad[], 
+                                        const double *dx, 
+                                        const double *dy, 
+                                        const double *xc, 
+                                        const double *yc, 
+                                        const double *tag_threshold,                        
+                                        const int *init_flag,
+                                        const int *is_ghost);
 
 /* ------------------------------- gradient threshold --------------------------------- */
 #define FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH \
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_gradient_exceeds_th, \
                                  FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH)
 
-int FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(int *blockno,
-                                          double *qval, 
-                                          double* qmin, 
-                                          double *qmax,
-                                          double quad[], 
-                                          double *dx, 
-                                          double *dy, 
-                                          double *xc, 
-                                          double *yc, 
-                                          double *tag_threshold,
-                                          int *init_flag,
-                                          int *is_ghost);
+int FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
+                                          const double *qval, 
+                                          const double* qmin, 
+                                          const double *qmax,
+                                          const double quad[], 
+                                          const double *dx, 
+                                          const double *dy, 
+                                          const double *xc, 
+                                          const double *yc, 
+                                          const double *tag_threshold,
+                                          const int *init_flag,
+                                          const int *is_ghost);
 
 
 /* ----------------------------- interpolation/coarsening ----------------------------- */
