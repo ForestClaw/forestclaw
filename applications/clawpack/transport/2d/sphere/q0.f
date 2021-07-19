@@ -53,7 +53,8 @@ c         # Cosine Bells
           call map2spherical(xp,yp,zp,theta,phi)
           l = theta
           th = phi
-          
+          thc(1) = 0
+          thc(2) = 0
           if (example .eq. 1) then
               lc(1) = pi
               lc(2) = pi
@@ -88,6 +89,10 @@ c         # Cosine Bells
           end do
           q0 = cbell
 
+      else
+          write(6,'(A,A,I5)') 'q0_physical : Initchoice is not set to ',
+     &                'valid value; initchoice =  ', initchoice
+          stop
       endif
       q0_physical = q0
 

@@ -5,7 +5,6 @@ bin_PROGRAMS += applications/clawpack/transport/2d/sphere/sphere
 applications_clawpack_transport_2d_sphere_sphere_SOURCES = \
 	applications/clawpack/transport/2d/sphere/sphere.cpp \
 	applications/clawpack/transport/2d/sphere/sphere_user.cpp \
-	applications/clawpack/transport/2d/sphere/sphere_user.h \
 	applications/clawpack/transport/2d/sphere/sphere_options.c \
 	applications/clawpack/transport/2d/sphere/setprob.f \
 	applications/clawpack/transport/2d/sphere/q0.f \
