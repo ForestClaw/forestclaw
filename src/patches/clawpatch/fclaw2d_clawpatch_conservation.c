@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_clawpatch_conservation.h"
 #include "fclaw2d_clawpatch_conservation_fort.h"
 
+#include <fclaw2d_defs.h>    /* To get FCLAW2D_PATCHDIM defs */
+
 #include <fclaw2d_time_sync.h>
 
 #include "fclaw2d_clawpatch.h"
@@ -85,7 +87,6 @@ void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
 		cr->area[k]          = FCLAW_ALLOC(double,my);
 		cr->area[k+2]        = FCLAW_ALLOC(double,mx);		
 	}
-
 }
 
 void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
@@ -302,7 +303,7 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-#if FCLAW2D_PATCHCDIM == 2
+#if FCLAW2D_PATCHDIM == 2
 	fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 

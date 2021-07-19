@@ -23,26 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH5_FORT_H
-#define FCLAW2D_CLAWPATCH5_FORT_H
+#ifndef FCLAW2D_CLAWPATCH5_FORT2_H
+#define FCLAW2D_CLAWPATCH5_FORT2_H
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
-
-#if FCLAW2D_PATCHDIM == 2
-#include "fclaw2d_clawpatch5_fort2.h"
-#else
-/* No support for clawpack 5.0 in 3d yet */
-//#include "fclaw2d_clawpatch5_fort3.h"
-#endif
 
 #if 0
+/* Fix syntax highlighting */
+#endif
+
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 /* ------------------------------ Time stepping functions ----------------------------- */
@@ -249,11 +242,9 @@ void FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII(char* matname1,
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_header_ascii, \
                    FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII)
 
-void FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII(char* matname1, char* matname2,
-                                          double* time, int* meqn, int* maux, 
-                                          int* ngrids);
-
-
+void FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII(const char* matname1, const char* matname2,
+                                          const double* time, const int* meqn, 
+                                          const int* maux, const int* ngrids);
 
 /* ----------------------------- Diagnostics functions -------------------------------- */
 
@@ -326,13 +317,8 @@ void CLAWPATCH5_TAG4COARSENING(const int* mx, const int* my,
                               const int* initflag,
                               int* tag_patch);
 
-#endif
-
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

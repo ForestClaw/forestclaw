@@ -154,15 +154,18 @@ void USER5_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
 #define USER_EXCEEDS_THRESHOLD FCLAW_F77_FUNC(user_exceeds_threshold, \
                                               USER_EXCEEDS_THRESHOLD)
 
-int USER_EXCEEDS_THRESHOLD(int* blockno,
-                           double qval[], 
-                           double* qmin, double *qmax,
-                           double quad[], 
-                           double *dx, double *dy, 
-                           double *xc, double *yc, 
-                           int* tag_threshold, 
-                           int* init_flag,
-                           int* is_ghost);
+int USER_EXCEEDS_THRESHOLD(const int* blockno,
+                           const double qval[], 
+                           const double* qmin, 
+                           const double *qmax,
+                           const double quad[], 
+                           const double *dx, 
+                           const double *dy, 
+                           const double *xc, 
+                           const double *yc, 
+                           const double* tag_threshold, 
+                           const int* init_flag,
+                           const int* is_ghost);
 
 
 #ifdef __cplusplus

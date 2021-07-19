@@ -23,15 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_FORT_H
-#define FCLAW2D_CLAWPATCH_FORT_H
+#ifndef FCLAW2D_CLAWPATCH_FORT2_H
+#define FCLAW2D_CLAWPATCH_FORT2_H
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
 #endif
+
+#if 0
+/* Fix syntax highlighting ... */
 #endif
 
 struct fclaw2d_global;
@@ -152,10 +153,10 @@ typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const 
 /* ------------------------------- Parallel ghost patches ----------------------------- */
 
 typedef void (*clawpatch_fort_local_ghost_pack_t)(int *mx, int *my, int *mbc,
-												  int *meqn, int *mint,
-												  double qdata[], double area[],
-												  double qpack[], int *psize,
-												  int *packmode, int *ierror);
+                                                  int *meqn, int *mint,
+                                                  double qdata[], double area[],
+                                                  double qpack[], int *psize,
+                                                  int *packmode, int *ierror);
 	
 /* ---------------------------------- Output functions -------------------------------- */
 
@@ -241,9 +242,6 @@ void AVERAGE2COARSE(const int* mx,const int* my,const int* mbc,
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

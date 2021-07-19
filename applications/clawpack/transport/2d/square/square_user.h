@@ -31,9 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 #if 0
@@ -111,9 +108,9 @@ void     SQUARE46_FORT_WRITE_FILE(char* matname1,
 #define SQUARE46_FORT_HEADER_ASCII \
          FCLAW_F77_FUNC(square46_fort_header_ascii, \
                         SQUARE46_FORT_HEADER_ASCII)
-void SQUARE46_FORT_HEADER_ASCII(char* matname1, char* matname2,
-                               double* time, int* meqn, int* maux, 
-                               int* ngrids);
+void SQUARE46_FORT_HEADER_ASCII(const char* matname1, const char* matname2,
+                               const double* time, const int* meqn, 
+                               const int* maux, const int* ngrids);
 
 #define  SQUARE5_FORT_WRITE_FILE FCLAW_F77_FUNC(square5_fort_write_file,  \
                                                 SQUARE5_FORT_WRITE_FILE)
@@ -130,14 +127,11 @@ void     SQUARE5_FORT_WRITE_FILE(char* matname1,
 #define SQUARE5_FORT_HEADER_ASCII \
          FCLAW_F77_FUNC(square5_fort_header_ascii, \
                         SQUARE5_FORT_HEADER_ASCII)
-void SQUARE5_FORT_HEADER_ASCII(char* matname1, char* matname2,
-                               double* time, int* meqn, int* maux, 
-                               int* ngrids);
+void SQUARE5_FORT_HEADER_ASCII(const char* matname1, const char* matname2,
+                               const double* time, const int* meqn, 
+                               const int* maux, const int* ngrids);
                          
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

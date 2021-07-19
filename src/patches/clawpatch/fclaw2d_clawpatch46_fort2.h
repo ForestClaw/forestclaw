@@ -23,18 +23,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH46_FORT_H
-#define FCLAW2D_CLAWPATCH46_FORT_H
+#ifndef FCLAW2D_CLAWPATCH46_FORT2_H
+#define FCLAW2D_CLAWPATCH46_FORT2_H
 
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
+
 #if 0
-}
+/* Fix syntax highlighting */
 #endif
-#endif
-
-
 
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
@@ -228,12 +228,14 @@ void FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII(char* matname1,
                                             int* patch_num, int* level,
                                             int* blockno,   int* mpirank);
 
+#if 1
 #define FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII \
          FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_header_ascii, \
                         FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII)
-void FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII(char* matname1, char* matname2,
-                                           double* time, int* meqn, int* maux, 
-                                           int* ngrids);
+void FCLAW2D_CLAWPATCH46_FORT_HEADER_ASCII(const char* matname1, const char* matname2,
+                                           const double* time, const int* meqn, 
+                                           const int* maux, const int* ngrids);
+#endif                                           
 
 /* ----------------------------- Diagnostics functions -------------------------------- */
 
@@ -308,9 +310,6 @@ void CLAWPATCH46_TAG4COARSENING(const int* mx, const int* my,
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

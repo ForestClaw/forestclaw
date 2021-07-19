@@ -26,6 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_FORT_H
 #define FCLAW2D_CLAWPATCH_FORT_H
 
+#include <fclaw2d_defs.h>
+
+#if FCLAW2D_PATCHDIM == 2
+#include "fclaw2d_clawpatch_fort2.h"
+#else
+#include "fclaw2d_clawpatch_fort3.h"
+#endif
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -39,35 +48,30 @@ struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 /* Functions defined here are implemented in individual solvers (clawpack 4.6 and 
    clawpack 5.0) */
 
-#if FCLAW2D_PATCHDIM == 2
-#include "fclaw2d_clawpatch_fort2.h"
-#include "fclaw2d_clawpatch46_fort2.h"
-#else
-#include "fclaw2d_clawpatch_fort3.h"
-#include "fclaw2d_clawpatch46_fort3.h"
-#endif
+/* --------------------- Dimension independent defs and routines ---------------------- */
 
-/* ------------------ dimension independent defs and routines ------------------------- */
+/* These headers are independent of dimension and clawpack version */
 typedef void  (*clawpatch_fort_header_ascii_t)(const char* matname1,const char* matname2,
                                                const double* time, const int* meqn, 
                                                const int* maux, const int* ngrids);
 
 /* Even though this is for 3d patches, we still assume that tagging can only be
    dependent on two dimensions */
-typedef int (*clawpatch_fort_exceeds_threshold_t)(int *blockno,
-                                                  double *qval, 
-                                                  double *qmin, 
-                                                  double *qmax,
-                                                  double quad[], 
-                                                  double *dx, 
-                                                  double *dy, 
-                                                  double *xc, 
-                                                  double *yc, 
-                                                  double *tag_threshold,
-                                                  int    *init_flag,
-                                                  int    *is_ghost);
+typedef int (*clawpatch_fort_exceeds_threshold_t)(const int *blockno,
+                                                  const double *qval, 
+                                                  const double *qmin, 
+                                                  const double *qmax,
+                                                  const double quad[], 
+                                                  const double *dx, 
+                                                  const double *dy, 
+                                                  const double *xc, 
+                                                  const double *yc, 
+                                                  const double *tag_threshold,
+                                                  const int    *init_flag,
+                                                  const int    *is_ghost);
 
 /* ----------------------------- Fortran headers ---------------------------------------*/
+
 #define FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA \
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_get_refinement_criteria, \
                                  FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA)

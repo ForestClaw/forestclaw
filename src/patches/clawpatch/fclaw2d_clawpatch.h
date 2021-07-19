@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_H
 #define FCLAW2D_CLAWPATCH_H
 
+#include <fclaw2d_defs.h>      /* Needed to get correction def. of PATCHDIM */
+
 #include <forestclaw2d.h>       /* Need patch callback def */
 
 #include <fclaw2d_clawpatch_fort.h>
