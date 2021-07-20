@@ -72,18 +72,19 @@ void FCLAW2D_CLAWPATCH46_FORT3_TAG4REFINEMENT(const int* mx,const int* my,const 
            FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort3_tag4coarsening, \
                           FCLAW2D_CLAWPATCH46_FORT3_TAG4COARSENING)
 
-void FCLAW2D_CLAWPATCH46_FORT3_TAG4COARSENING(const int* mx, const int* my,const int *mz,
-                                             const int* mbc, const int* meqn,
-                                             const double* xlower, const double* ylower,
-                                             const double* zlower,
-                                             const double* dx, const double* dy,
-                                             const double* dz,
-                                             const int* blockno,
-                                             double q0[], double q1[],
-                                             double q2[], double q3[],
-                                             const double* tag_threshold,
-                                             const int* initflag,
-                                             int* tag_patch);
+void FCLAW2D_CLAWPATCH46_FORT3_TAG4COARSENING(const int* mx, const int* my,
+                                              const int *mz,
+                                              const int* mbc, const int* meqn,
+                                              double xlower[], double ylower[],
+                                              const double* zlower,
+                                              const double* dx, const double* dy,
+                                              const double* dz,
+                                              const int* blockno,
+                                              double q0[], double q1[],
+                                              double q2[], double q3[],
+                                              const double* tag_threshold,
+                                              const int* initflag,
+                                              int* tag_patch);
 
 #define FCLAW2D_CLAWPATCH46_FORT3_INTERPOLATE2FINE \
            FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort3_interpolate2fine, \
@@ -292,14 +293,14 @@ void FCLAW2D_CLAWPATCH46_FORT3_COMPUTE_ERROR_NORM (const int* blockno,
           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort3_local_ghost_pack, \
                          FCLAW2D_CLAWPATCH46_FORT3_LOCAL_GHOST_PACK)
 void FCLAW2D_CLAWPATCH46_FORT3_LOCAL_GHOST_PACK(const int *mx, 
-                                               const int *my, 
-                                               const int *mz, 
-                                               const int *mbc,
-                                               const int *meqn, 
-                                               const int *mint,
-                                               double qdata[], double area[],
-                                               double qpack[], int *psize,
-                                               int *packmode, int *ierror);
+                                                const int *my, 
+                                                const int *mz, 
+                                                const int *mbc,
+                                                const int *meqn, 
+                                                const int *mint,
+                                                double qdata[], double area[],
+                                                double qpack[], int *psize,
+                                                const int *packmode, int *ierror);
 
 
 

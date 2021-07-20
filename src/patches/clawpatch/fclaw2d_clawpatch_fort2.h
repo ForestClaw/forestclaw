@@ -106,7 +106,8 @@ typedef void (*clawpatch_fort_tag4refinement_t)(const int* mx,const int* my,
 
 typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx, const int* my,
 												const int* mbc, const int* meqn,
-												const double* xlower, const double* ylower,
+												double xlower[], 
+                                                double ylower[],
 												const double* dx, const double* dy,
 												const int* blockno,
 												double q0[],double q1[],
@@ -152,11 +153,12 @@ typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const 
 	
 /* ------------------------------- Parallel ghost patches ----------------------------- */
 
-typedef void (*clawpatch_fort_local_ghost_pack_t)(int *mx, int *my, int *mbc,
-                                                  int *meqn, int *mint,
+typedef void (*clawpatch_fort_local_ghost_pack_t)(const int *mx, const int *my, 
+                                                  const *mz, const int *mbc,
+                                                  const int *meqn, const int *mint,
                                                   double qdata[], double area[],
-                                                  double qpack[], int *psize,
-                                                  int *packmode, int *ierror);
+                                                  double qpack[], const int *psize,
+                                                  const int *packmode, int *ierror);
 	
 /* ---------------------------------- Output functions -------------------------------- */
 

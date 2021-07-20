@@ -21,15 +21,13 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int* blockno,
                                         const int* init_flag,
                                         const int* is_ghost)
 {
-    int refinement_criteria = fclaw2d_clawpatch_get_refinement_criteria();
-
-    int exceeds_th;
 
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
     clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 
                                 clawpatch_vt->fort_user_exceeds_threshold;
 
-    exceeds_th = 1;
+    int exceeds_th = 1;
+    int refinement_criteria = fclaw2d_clawpatch_get_refinement_criteria();
     switch(refinement_criteria)
     {
         case FCLAW_REFINE_CRITERIA_VALUE:
@@ -64,11 +62,9 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int* blockno,
                                         "defined\n function was found.\n\n");
             }
             FCLAW_ASSERT(user_exceeds_threshold != NULL);
-#if 1
             exceeds_th = user_exceeds_threshold(blockno, qval,qmin,qmax,quad, 
                                                 dx, dy, xc, yc,
                                                 tag_threshold,init_flag,is_ghost);
-#endif                                            
             break;
         default:
             fclaw_global_essentialf("fclaw2d_clawpatch_exceeds_threshold.c): " \
