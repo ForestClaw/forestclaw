@@ -247,8 +247,9 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	}
 	ur[0] = cp->mx + cp->mbc;
 	ur[1] = cp->my + cp->mbc;
-	if (PatchDim == 3)
-		ur[2] = cp->mz + cp->mbc;
+#if FCLAW2D_PATCHDIM == 3
+	ur[2] = cp->mz + cp->mbc;
+#endif
 
 	Box box(ll,ur);	
 
