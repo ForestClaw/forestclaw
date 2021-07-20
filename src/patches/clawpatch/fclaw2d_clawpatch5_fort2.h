@@ -280,11 +280,12 @@ void FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM (int* blockno, int* mx,int* my,i
                       FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_local_ghost_pack, \
                       FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK)
 
-void FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK(int *mx, int *my, int *mbc,
-                                              int *meqn, int *mint,
+void FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK(const int *mx,   const int *my, 
+                                              const int *mbc,
+                                              const int *meqn, const int *mint,
                                               double qdata[], double area[],
-                                              double qpack[], int *psize,
-                                              int *packmode, int *ierror);
+                                              double qpack[], const int *psize,
+                                              const int *packmode, int *ierror);
 
 
 /* ----------------------------- User convenience functions  -------------------------- */
