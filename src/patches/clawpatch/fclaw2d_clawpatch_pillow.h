@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PILLOWSPHERE_H
 #define PILLOWSPHERE_H
 
+#include <fclaw2d_defs.h>
+
 #ifdef __cplusplus
 extern "C"
 {
