@@ -31,8 +31,6 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
     integer :: i0faddm, i0faddp, i0gadd, i0hadd
     integer :: i0q1d, i0dtdx1, i0dtdy1, i0dtdz1
     integer :: i0aux1, i0aux2, i0aux3, i0next, mused, mwork1
-    integer :: i0wave, i0s, i0amdq, i0apdq, i0ql, i0qr
-    integer :: i0auxl, i0auxr
 
     double precision :: dtdx, dtdy, dtdz
     integer :: i,j,k, m

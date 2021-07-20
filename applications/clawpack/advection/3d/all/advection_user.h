@@ -23,16 +23,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH46_FORT_H
-#define FCLAW2D_CLAWPATCH46_FORT_H
+#ifndef ADVECTION_USER_H
+#define ADVECTION_USER_H
 
-#include <fclaw2d_defs.h>
+#include <fclaw2d_include_all.h>
 
-#if FCLAW2D_PATCHDIM == 2
-#include "fclaw2d_clawpatch46_fort2.h"
-#else
-#include "fclaw2d_clawpatch46_fort3.h"
+// #include <fclaw2d_clawpatch_pillow.h>
+
+/* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch_fort.h>
+
+
+/* Clawpack 4.6 headers */  
+#include <fc3d_clawpack46.h>  
+#include <fc3d_clawpack46_options.h>
+#include <fc3d_clawpack46_fort.h>  
+#include <fc3d_clawpack46_user_fort.h>  
+#include <fclaw2d_clawpatch46_fort.h>
+
+#if 0
+/* Clawpack 5.0 headers */
+#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack5_options.h>
+#include <fc2d_clawpack5_fort.h>
+#include <clawpack5_user_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
 #endif
 
+
+/* Headers for common FORTRAN files */
+#include "advection_user_fort3.h"
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/* Nothing yet */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

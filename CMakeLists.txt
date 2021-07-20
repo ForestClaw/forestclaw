@@ -131,3 +131,14 @@ include(cmake/install.cmake)
 
 # --- examples
 add_subdirectory(applications)
+
+
+# --- clawpack3
+
+if(clawpack3)
+
+  add_subdirectory(src/solvers/fc3d_clawpack46)
+  add_subdirectory(applications/clawpack/advection/3d/swirl)  
+
+endif(clawpack3)
+

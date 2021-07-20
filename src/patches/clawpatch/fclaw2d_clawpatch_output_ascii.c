@@ -75,7 +75,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
 #else
     int mz;
     double zlower, dz;
-    fclaw2d_clawpatch_grid_data3(glob,patch,&mx,&my,&mz,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                  &xlower,&ylower,&zlower,
                                  &dx,&dy,&dz);
     clawpatch_vt->fort_output_ascii(fname,&mx,&my,&mz,&meqn,&mbc,

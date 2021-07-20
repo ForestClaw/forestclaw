@@ -54,7 +54,7 @@ subroutine fclaw2d_clawpatch46_fort3_output_ascii(matname1, &
 
     if (meqn .gt. 5) then
         write(6,'(A,A,A,I5,A)')     & 
-              'Warning (fclaw2d_fort_write_grid_header.f) ', & 
+              'Warning (fclaw2d_fort3_write_grid_header.f) ', & 
               ': meqn > 5; change format statement 120.', & 
               '(meqn = ',meqn,')'
         stop
@@ -88,9 +88,9 @@ subroutine fclaw2d_clawpatch46_fort3_write_grid_header (matunit1, &
 
     implicit none
 
-    integer matunit1, mx, my, mz
-    integer patch_num, level, blockno, mpirank
-    double precision xlower, ylower,zlower, dx,dy, dz
+    integer :: matunit1, mx, my, mz
+    integer :: patch_num, level, blockno, mpirank
+    double precision :: xlower, ylower,zlower, dx,dy, dz
 
 
     write(matunit1,1001) patch_num, level, blockno, mpirank, mx, my, mz
@@ -110,4 +110,4 @@ subroutine fclaw2d_clawpatch46_fort3_write_grid_header (matunit1, &
             e24.16,'    dx', /,     & 
             e24.16,'    dy',/,      & 
             e24.16,'    dz',/)
-      end
+end subroutine fclaw2d_clawpatch46_fort3_write_grid_header

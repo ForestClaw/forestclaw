@@ -67,7 +67,7 @@ void clawpack46_qinit(fclaw2d_global_t *glob,
 {
 	int mx,my,mz,mbc;
 	double dx,dy,dz, xlower,ylower, zlower;
-	fclaw2d_clawpatch_grid_data3(glob,patch,&mx,&my,&mz,&mbc,
+	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower, 
 								&dx,&dy,&dz);
 
@@ -109,7 +109,7 @@ void clawpack46_bc3(fclaw2d_global_t *glob,
 
 	int mx,my,mz, mbc;
 	double dx,dy,dz, xlower,ylower, zlower;
-	fclaw2d_clawpatch_grid_data3(glob,patch, &mx,&my,&mz,&mbc,
+	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower, &dx,&dy,&dz);
 
 	double *aux;
@@ -162,7 +162,7 @@ void clawpack46_b4step3(fclaw2d_global_t *glob,
 
 	int mx,my,mz,mbc;
 	double xlower,ylower,zlower,dx,dy,dz;
-	fclaw2d_clawpatch_grid_data3(glob,patch, &mx,&my,&mz, &mbc,
+	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mz, &mbc,
 								&xlower,&ylower,&zlower,&dx,&dy,&dz);
 
 	int meqn;
@@ -196,7 +196,7 @@ void clawpack46_src3(fclaw2d_global_t *glob,
 
 	int mx,my,mz, mbc;
 	double xlower,ylower,zlower,dx,dy,dz;
-	fclaw2d_clawpatch_grid_data3(glob,patch, &mx,&my,&mz, &mbc,
+	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mz, &mbc,
 								&xlower,&ylower,&zlower, &dx,&dy, &dz);
 
 	double *q;
@@ -234,7 +234,7 @@ void clawpack46_setaux(fclaw2d_global_t *glob,
 
 	int mx,my,mz,mbc;
 	double xlower,ylower,zlower, dx,dy, dz;
-	fclaw2d_clawpatch_grid_data3(glob,patch, &mx,&my,&mz,&mbc,
+	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower, &dx,&dy, &dz);
 	int maux;
 	double *aux;
@@ -279,7 +279,7 @@ double clawpack46_step3(fclaw2d_global_t *glob,
 
 	int mx, my, mz, mbc;
 	double xlower, ylower, zlower, dx,dy, dz;
-	fclaw2d_clawpatch_grid_data3(glob,patch,&mx,&my,&mz,&mbc,
+	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower, &dx,&dy,&dz);
 
 	int meqn;
@@ -536,7 +536,7 @@ void fc3d_clawpack46_set_capacity(fclaw2d_global_t *glob,
 
 	int mx,my,mz, mbc;
 	double dx,dy,dz, xlower,ylower,zlower;
-	fclaw2d_clawpatch_grid_data3(glob,patch, &mx,&my,&mz,&mbc,
+	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower,&dx,&dy,&dz);
 
 	double *area = fclaw2d_clawpatch_get_area(glob,patch);

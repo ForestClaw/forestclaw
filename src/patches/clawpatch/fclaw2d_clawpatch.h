@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_H
 #define FCLAW2D_CLAWPATCH_H
 
+#include <fclaw2d_defs.h>      /* Needed to get correction def. of PATCHDIM */
+
 #include <forestclaw2d.h>       /* Need patch callback def */
 
 #include <fclaw2d_clawpatch_fort.h>
@@ -56,6 +58,16 @@ typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob
                                                      fclaw2d_clawpatch_packmode_t packmode,
                                                      int *ierror);
 
+typedef void (*clawpatch_local_ghost_pack_aux_t)(struct fclaw2d_global *glob,
+                                                 struct fclaw2d_patch *patch,
+                                                 const int mint,
+                                                 double qpack[], int extrasize,
+                                                 int packmode, int* ierror);
+    
+typedef void (*clawpatch_fort_local_ghost_pack_registers_t)(struct fclaw2d_global *glob,
+                                                            struct fclaw2d_patch *patch,
+                                                            double qpack[], int frsize,
+                                                            int* ierror);
 /* ------------------------------ typedefs - output ----------------------------------- */
 
 typedef void (*clawpatch_time_header_t)(struct fclaw2d_global* glob, int iframe);
@@ -82,9 +94,6 @@ typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
 void fclaw2d_clawpatch_vtable_initialize(int claw_version);
 
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
-
-void* fclaw2d_clawpatch_get_exceeds_th_user();
-
 
 struct fclaw2d_clawpatch_vtable
 {
@@ -123,9 +132,9 @@ struct fclaw2d_clawpatch_vtable
 
     /* ghost patch functions */
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
-    clawpatch_fort_local_ghost_pack_aux_t  fort_local_ghost_pack_aux;
-    
-    /* diagnostic functions */
+    clawpatch_local_ghost_pack_aux_t       local_ghost_pack_aux;
+
+      /* diagnostic functions */
     clawpatch_diagnostics_cons_t           conservation_check;
     clawpatch_diagnostics_error_t          compute_error;
 
@@ -149,19 +158,21 @@ void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
 
 /* ------------------------------- Misc access functions ------------------------------ */
 
+#if FCLAW2D_PATCHDIM == 2
 void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* this_patch,
                                  int* mx, int* my, int* mbc,
                                  double* xlower, double* ylower,
                                  double* dx, double* dy);
-
-
-void fclaw2d_clawpatch_grid_data3(struct fclaw2d_global* glob,
-                                  struct fclaw2d_patch* patch,
-                                  int* mx, int* my, int* mz, int* mbc,
-                                  double* xlower, double* ylower,
-                                  double* zlower, 
-                                  double* dx, double* dy, double* dz);
+#elif FCLAW2D_PATCHDIM == 3
+void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch* patch,
+                                 int* mx, int* my, int* mz, 
+                                 int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* zlower, 
+                                 double* dx, double* dy, double* dz);
+#endif
 
 
 void fclaw2d_clawpatch_metric_scalar(struct fclaw2d_global* glob,

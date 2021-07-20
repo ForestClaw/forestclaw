@@ -37,7 +37,7 @@ subroutine clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc, &
 
     integer :: mw,i, m
     double precision :: dotr, wnorm2, dotl, r, c, th
-    double precision :: wlimitr, philim
+    double precision :: wlimitr
 
     wave_loop : do mw = 1,mwaves
         if (mthlim(mw) .eq. 0) then 
@@ -65,6 +65,7 @@ subroutine clawpack46_inlinelimiter(maxm,meqn,mwaves,mbc, &
             endif            
 
             !! go to (10,20,30,40,50) mthlim(mw)
+            wlimitr = 1.0
             if (mthlim(mw) .eq. 1) then
                 !! 10         continue                    
                 !! --------
