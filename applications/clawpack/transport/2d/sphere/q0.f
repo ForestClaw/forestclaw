@@ -55,6 +55,8 @@ c         # Cosine Bells
           th = phi
           thc(1) = 0
           thc(2) = 0
+          lc(1) = pi
+          lc(2) = pi
           if (example .eq. 1) then
               lc(1) = pi
               lc(2) = pi
@@ -70,6 +72,9 @@ c         # Cosine Bells
               lc(2) = 5*pi/4.d0
               thc(1) = 0
               thc(2) = 0
+          else
+              write(6,*) 'q0.f : example is not valid; example = ', 
+     &             example
           endif
 
           cbell = b

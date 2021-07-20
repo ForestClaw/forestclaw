@@ -737,8 +737,13 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 	exit(0);
 #endif
 
-	int mx,my,mz,mbc,meqn;
-	double xlower[4],ylower[4],zlower,dx,dy,dz;
+	int mx,my,mbc,meqn;
+	double xlower[4],ylower[4],dx,dy;
+#if FCLAW2D_PATCHDIM == 3
+	int mz;
+	double zlower, dz;
+#endif
+
 	double *q[4];  /* Only need for grids, even for extruded mesh case */
 	for (int igrid = 0; igrid < 4; igrid++)
 	{

@@ -46,7 +46,8 @@ struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 /* --------------------------- Ghost filling - patch specific ------------------------- */
 
-typedef void (*clawpatch_fort_copy_face_t)(const int* mx, const int* my, const int* mbc, 
+typedef void (*clawpatch_fort_copy_face_t)(const int* mx, const int* my, 
+                                           const int* mbc, 
 										   const int* meqn,
 										   double qthis[],double qneighbor[], 
 										   const int* a_idir,
@@ -154,7 +155,7 @@ typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const 
 /* ------------------------------- Parallel ghost patches ----------------------------- */
 
 typedef void (*clawpatch_fort_local_ghost_pack_t)(const int *mx, const int *my, 
-                                                  const *mz, const int *mbc,
+                                                  const int *mbc,
                                                   const int *meqn, const int *mint,
                                                   double qdata[], double area[],
                                                   double qpack[], const int *psize,

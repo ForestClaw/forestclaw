@@ -11,7 +11,7 @@ logical(kind=4) function user_exceeds_threshold(blockno,&
     double precision :: dx,dy, xc, yc
     integer :: blockno, init_flag
 
-    logical(kind=4) :: exceeds_th, refine, is_ghost
+    logical(kind=4) :: refine, is_ghost
 
     refine = .false.
     if (qval .gt. threshold .and. qval .lt. 1-threshold) then
