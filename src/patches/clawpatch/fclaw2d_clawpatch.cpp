@@ -216,10 +216,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	cp->dy = (cp->yupper - cp->ylower)/cp->my;
 
 #if FCLAW2D_PATCHDIM == 3	
-	cp->mz = clawpatch_opt->mz;
-	double az = fclaw_opt->az;
-	double bz = fclaw_opt->bz;
-
+	
 #if FCLAW2D_REFINEDIM == 2
 	/* For extruded mesh, we don't have any refinement in z */
 	double zlower = 0;
@@ -229,6 +226,9 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	                        "implemented in 3d.\n");
 	exit(0);
 #endif
+	cp->mz = clawpatch_opt->mz;
+	double az = fclaw_opt->az;
+	double bz = fclaw_opt->bz;
 
 	cp->zlower = az + (bz - az)*zlower;
 	cp->zupper = az + (bz - az)*zupper;
@@ -993,11 +993,11 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	clawpatch_vt->fort_local_ghost_pack(&mx,&my,&mz,&mbc,&meqn,&mint,qthis,area,
 										 qpack,&qareasize,&packmode,&ierror);
 #endif
+	FCLAW_ASSERT(ierror == 0);
 
 	qpack += qareasize;  /* Advance pointer */
 
 	int extrasize = (wg - hole)*(packextra);
-	FCLAW_ASSERT(ierror == 0);
 	if (packextra)
 	{
 		FCLAW_ASSERT(extrasize > 0);
