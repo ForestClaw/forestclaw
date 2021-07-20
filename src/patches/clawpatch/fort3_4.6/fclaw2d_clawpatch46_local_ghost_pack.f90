@@ -28,7 +28,7 @@ subroutine fclaw2d_clawpatch46_fort3_local_ghost_pack (mx,my,mz, mbc, &
     count = 1
     !! # Face 0
     meqn_loop : do mq = 1,meqn
-        k1_loop : do k = 1,mz
+        k1_loop : do k = 1-mbc,mz+mbc
             do j = 1-nghost,my-mint
                 do ibc = 1-nghost,mint
                     if (packdata) then
