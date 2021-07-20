@@ -25,8 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.h"
 
-#include <fclaw2d_defs.h>
-
 static
 void swirl_problem_setup(fclaw2d_global_t* glob)
 {
@@ -52,6 +50,8 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
 
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
 
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
@@ -63,7 +63,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpn3      = &CLAWPACK46_RPN3;
         clawpack46_vt->fort_rpt3      = &CLAWPACK46_RPT3;
         clawpack46_vt->fort_rptt3      = &CLAWPACK46_RPTT3;
-        // clawpack46_vt->fort_b4step3   = &CLAWPACK46_B4STEP3;
+        // clawpack46_vt->fort_b4step3   = &CLAWPACK46_B4STEP3;        
     }
     else if (user->claw_version == 5)
     {

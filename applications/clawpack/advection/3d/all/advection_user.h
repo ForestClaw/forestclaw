@@ -23,34 +23,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SWIRL_USER_H
-#define SWIRL_USER_H
+#ifndef ADVECTION_USER_H
+#define ADVECTION_USER_H
 
-#include "../all/advection_user.h"
+#include <fclaw2d_include_all.h>
+
+// #include <fclaw2d_clawpatch_pillow.h>
+
+/* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch_fort.h>
+
+
+/* Clawpack 4.6 headers */  
+#include <fc3d_clawpack46.h>  
+#include <fc3d_clawpack46_options.h>
+#include <fc3d_clawpack46_fort.h>  
+#include <fc3d_clawpack46_user_fort.h>  
+#include <fclaw2d_clawpatch46_fort.h>
+
+#if 0
+/* Clawpack 5.0 headers */
+#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack5_options.h>
+#include <fc2d_clawpack5_fort.h>
+#include <clawpack5_user_fort.h>
+#include <fclaw2d_clawpatch5_fort.h>
+#endif
+
+
+/* Headers for common FORTRAN files */
+#include "advection_user_fort3.h"
+
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-
-typedef struct user_options
-{
-    int claw_version;
-    int is_registered;
-
-} user_options_t;
-
-void swirl_link_solvers(fclaw2d_global_t *glob);
-
-/* ------------------------------------- Options ---------------------------------------*/
-
-user_options_t* swirl_options_register (fclaw_app_t * app,
-                                        const char *configfile);
-
-void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
-
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+/* Nothing yet */
 
 #ifdef __cplusplus
 }
