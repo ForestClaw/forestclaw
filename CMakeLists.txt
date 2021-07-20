@@ -134,7 +134,6 @@ add_subdirectory(applications)
 
 
 # --- clawpack3
-
 if(clawpack3)
 
   add_subdirectory(src/solvers/fc3d_clawpack46)
