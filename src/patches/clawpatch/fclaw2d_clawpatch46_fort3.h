@@ -182,47 +182,53 @@ void FCLAW2D_CLAWPATCH46_FORT3_INTERPOLATE_CORNER(const int* mx, const int* my, 
 
 /* ------------------------- Pillow grid block corner routines  ----------------------- */
 
-#if 0
+#if 1
 /* Doesn't yet work in 3d */
-#define FCLAW2D_PILLOW46_COPY_BLOCK_CORNER \
-               FCLAW_F77_FUNC(fclaw2d_pillow46_copy_block_corner, \
-                              FCLAW2D_PILLOW46_COPY_BLOCK_CORNER)
+#define FCLAW2D_PILLOW46_COPY_BLOCK_CORNER3 \
+               FCLAW_F77_FUNC(fclaw2d_pillow46_copy_block_corner3, \
+                              FCLAW2D_PILLOW46_COPY_BLOCK_CORNER3)
 
-void FCLAW2D_PILLOW46_COPY_BLOCK_CORNER(const int* mx, const int* my,const int *mz,
+void FCLAW2D_PILLOW46_COPY_BLOCK_CORNER3(const int* mx, const int* my,const int *mz,
                                         const int* mbc, const int* meqn,
                                         double qthis[], 
                                         double qneighbor[], 
                                         const int* icorner,
                                         const int* iblock);
 
-#define FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER \
-          FCLAW_F77_FUNC(fclaw2d_pillow46_average_block_corner,\
-                         FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER)
+#define FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER3 \
+          FCLAW_F77_FUNC(fclaw2d_pillow46_average_block_corner3,\
+                         FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER3)
 
-void  FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER(const int* mx, const int* my, const int* mz, 
-                                            const int* mbc,
-                                            const int* meqn, 
-                                            const int* refratio, 
-                                            double qcoarse[],
-                                            double qfine[], 
-                                            double areacoarse[], 
-                                            double areafine[],
-                                            const int* a_coarse_corner,
-                                            const int* blockno);
+void  FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER3(const int* mx, 
+                                             const int* my, 
+                                             const int* mz, 
+                                             const double *dz,
+                                             const int* mbc,
+                                             const int* meqn, 
+                                             const int* refratio, 
+                                             double qcoarse[],
+                                             double qfine[], 
+                                             double areacoarse[], 
+                                             double areafine[],
+                                             const int* a_coarse_corner,
+                                             const int* blockno);
 
 // Averaging at block boundaries between coarse and fine grids.
-#define FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER \
-          FCLAW_F77_FUNC(fclaw2d_pillow46_interpolate_block_corner, \
-                         FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER)
+#define FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER3 \
+          FCLAW_F77_FUNC(fclaw2d_pillow46_interpolate_block_corner3, \
+                         FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER3)
 
-void  FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER(const int* mx, const int* my, const int* mz,
-                                                int* mbc,
-                                                int* meqn, int* refratio,
-                                                double qcoarse[],
-                                                double qfine[], 
-                                                int* icoarse_corner,
-                                                int* blockno);
-
+void  FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER3(const int* mx, 
+                                                 const int* my, 
+                                                 const int* mz,
+                                                 const int* mbc,
+                                                 const int* meqn, 
+                                                 const int* refratio,
+                                                 double qcoarse[],
+                                                 double qfine[], 
+                                                 const int* icoarse_corner,
+                                                 const int* blockno);
+    
 #endif
 
 /* ------------------------------------ Output functions ------------------------------ */

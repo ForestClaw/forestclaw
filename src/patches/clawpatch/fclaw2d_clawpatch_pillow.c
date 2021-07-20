@@ -69,6 +69,9 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
     double zlower, dz;
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                 &xlower,&ylower,&zlower, &dx, &dy, &dz);
+    pillow_vt->fort_copy_block_corner(&mx, &my, &mz, &mbc, &meqn, 
+                                      qthis, qcorner,
+                                      &icorner, &blockno);
 #endif
 
 }
@@ -113,6 +116,10 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower, &zlower, &dx,&dy, &dz);
 
+    pillow_vt->fort_average_block_corner(&mx,&my,&mz, &dz, &mbc,&meqn,
+                                         &refratio,qcoarse,qfine,
+                                         areacoarse,areafine,
+                                         &icorner_coarse,&coarse_blockno);
 #endif
 }
 
@@ -150,6 +157,10 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
     double zlower, dz;
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+    pillow_vt->fort_interpolate_block_corner(&mx, &my, &mz, &mbc, &meqn,
+                                             &refratio, qcoarse, qfine,
+                                             &icoarse_corner, &coarse_blockno);
 
 #endif
 }
@@ -192,6 +203,13 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
         pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW5_COPY_BLOCK_CORNER;
         pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER;
         pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER;
+    }
+#elif FCLAW2D_PATCHDIM == 3
+    if (claw_version == 4)
+    {
+        pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW46_COPY_BLOCK_CORNER3;
+        pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER3;
+        pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER3;
     }
 #endif
 

@@ -149,7 +149,8 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
 
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+	                     fclaw2d_clawpatch_get_options(glob);
 
 	cp->mx = clawpatch_opt->mx;
 	cp->my = clawpatch_opt->my;
@@ -158,9 +159,6 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	cp->meqn = clawpatch_opt->meqn;
 	cp->maux = clawpatch_opt->maux;
 	cp->mfields = clawpatch_opt->rhs_fields;
-
-#if FCLAW2D_PATCHDIM == 3
-#endif
 
 	for (int icorner=0; icorner < 4; icorner++)
 	{
@@ -218,12 +216,10 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	cp->dy = (cp->yupper - cp->ylower)/cp->my;
 
 #if FCLAW2D_PATCHDIM == 3	
-	/* Put all 3d stuff here rather than clutter code with too many 
-	  #if ... #endif statements */
 	cp->mz = clawpatch_opt->mz;
 	double az = fclaw_opt->az;
 	double bz = fclaw_opt->bz;
-	
+
 #if FCLAW2D_REFINEDIM == 2
 	/* For extruded mesh, we don't have any refinement in z */
 	double zlower = 0;

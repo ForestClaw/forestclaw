@@ -44,6 +44,8 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_local_ghost_pack.f90 \
 	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_output_ascii.f90 \
 	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_timeinterp.f90  \
+	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_pillowsphere.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_diagnostics.f90 \
 	\
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4refinement.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4coarsening.f \
