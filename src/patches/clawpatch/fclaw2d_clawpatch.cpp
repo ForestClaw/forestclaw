@@ -149,11 +149,11 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
 
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+	                     fclaw2d_clawpatch_get_options(glob);
 
 	cp->mx = clawpatch_opt->mx;
 	cp->my = clawpatch_opt->my;
-	cp->mz = clawpatch_opt->mz;
 	cp->mbc = clawpatch_opt->mbc;
 	cp->blockno = blockno;
 	cp->meqn = clawpatch_opt->meqn;
@@ -171,25 +171,12 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
 	cp->manifold = fclaw_opt->manifold;
 
-#if FCLAW2D_REFINEDIM == 2
-	/* For extruded mesh, we don't have any refinement in z */
-	double zlower = 0;
-	double zupper = 1;
-#endif
-
 	if (cp->manifold)
 	{
 		cp->xlower = patch->xlower;
 		cp->ylower = patch->ylower;
 		cp->xupper = patch->xupper;
 		cp->yupper = patch->yupper;
-#if FCLAW2D_REFINEDIM == 2
-		cp->zlower = zlower;
-		cp->zupper = zupper;
-#else
-		cp->zlower = patch->zlower;
-		cp->zupper = patch->zupper;
-#endif
 	}	
 	else
 	{
@@ -197,15 +184,12 @@ void clawpatch_define(fclaw2d_global_t* glob,
 		double bx = fclaw_opt->bx;
 		double ay = fclaw_opt->ay;
 		double by = fclaw_opt->by;
-		double az = fclaw_opt->az;
-		double bz = fclaw_opt->bz;
 
 		double xl = patch->xlower;
 		double yl = patch->ylower;
 		double xu = patch->xupper;
 		double yu = patch->yupper;
 
-#if FCLAW2D_REFINEDIM == 2
 		double xlower, ylower, xupper, yupper;
 
 		if (is_brick)
@@ -222,22 +206,35 @@ void clawpatch_define(fclaw2d_global_t* glob,
 			xupper = xu;
 			yupper = yu;
 		}
-#else
-		fclaw_global_essentialf("clawpatch::define : 3d refinement not yet implemented\n");
-		exit(0);
-#endif
-
 		cp->xlower = ax + (bx - ax)*xlower;
 		cp->xupper = ax + (bx - ax)*xupper;
 		cp->ylower = ay + (by - ay)*ylower;
 		cp->yupper = ay + (by - ay)*yupper;
-		cp->zlower = az + (bz - az)*zlower;
-		cp->zupper = az + (bz - az)*zupper;
 	}
 
 	cp->dx = (cp->xupper - cp->xlower)/cp->mx;
 	cp->dy = (cp->yupper - cp->ylower)/cp->my;
+
+#if FCLAW2D_PATCHDIM == 3	
+	cp->mz = clawpatch_opt->mz;
+	double az = fclaw_opt->az;
+	double bz = fclaw_opt->bz;
+
+#if FCLAW2D_REFINEDIM == 2
+	/* For extruded mesh, we don't have any refinement in z */
+	double zlower = 0;
+	double zupper = 1;
+#else
+	fclaw_global_essentialf("clawpatch::define : Octree refinement not yet " \
+	                        "implemented in 3d.\n");
+	exit(0);
+#endif
+
+	cp->zlower = az + (bz - az)*zlower;
+	cp->zupper = az + (bz - az)*zupper;
 	cp->dz = (cp->zupper - cp->zlower)/cp->mz;
+#endif
+
 
 	int ll[FCLAW2D_PATCHDIM];
 	int ur[FCLAW2D_PATCHDIM];

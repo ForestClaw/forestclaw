@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,7 @@ typedef struct fclaw2d_clawpatch_pillow_vtable fclaw2d_clawpatch_pillow_vtable_t
 
 /* ----------------------------- Fortran typedefs ------------------------------------- */
 
+#if FCLAW2D_PATCHDIM == 2
 typedef void (*pillow_fort_copy_block_corner_t)(int* mx, int* my,
                                                 int* mbc, int* meqn,
                                                 double qthis[], 
@@ -66,6 +67,43 @@ typedef void  (*pillow_fort_interpolate_block_corner_t)(int* mx, int* my, int* m
                                                         double qfine[], 
                                                         int* icoarse_corner,
                                                         int* blockno);
+#elif FCLAW2D_PATCHDIM == 3
+typedef void (*pillow_fort_copy_block_corner_t)(const int* mx, 
+                                                const int* my,
+                                                const int *mz,
+                                                const int* mbc, 
+                                                const int* meqn,
+                                                double qthis[], 
+                                                double qneighbor[], 
+                                                const int* icorner,
+                                                const int* iblock);
+
+typedef void  (*pillow_fort_average_block_corner_t)(const int* mx, 
+                                                    const int* my, 
+                                                    const int* mz, 
+                                                    const double *dz, 
+                                                    const int* mbc,
+                                                    const int* meqn, 
+                                                    const int* refratio, 
+                                                    double qcoarse[],
+                                                    double qfine[], 
+                                                    double areacoarse[], 
+                                                    double areafine[],
+                                                    const int* coarse_corner,
+                                                    const int* blockno);
+
+typedef void  (*pillow_fort_interpolate_block_corner_t)(const int* mx, 
+                                                        const int* my, 
+                                                        const int* mz,
+                                                        const int* mbc,
+                                                        const int* meqn, 
+                                                        const int* refratio,
+                                                        double qcoarse[],
+                                                        double qfine[], 
+                                                        const int* icoarse_corner,
+                                                        const int* blockno);
+
+#endif
 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
 
