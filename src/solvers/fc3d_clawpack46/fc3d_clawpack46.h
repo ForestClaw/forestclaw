@@ -31,9 +31,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 struct fclaw2d_global;
@@ -242,9 +239,6 @@ void fc3d_clawpack46_src2(struct fclaw2d_global* glob,
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
