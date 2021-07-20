@@ -13,7 +13,7 @@ target_include_directories(clawpack3_46_f INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/
 
 # -- add library
 add_library(clawpack3_46)
-set_target_properties(clawpack3_46 PROPERTIES EXPORT_NAME CLAWPACK3D_46)
+set_target_properties(clawpack3_46 PROPERTIES EXPORT_NAME CLAWPACK3_46)
 
 target_sources(clawpack3_46 PRIVATE 
   fc3d_clawpack46.cpp 
