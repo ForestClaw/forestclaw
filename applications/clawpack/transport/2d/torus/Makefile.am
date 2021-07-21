@@ -1,8 +1,8 @@
-bin_PROGRAMS += applications/clawpack/transport/2d/torus/torus
+bin_PROGRAMS += applications/clawpack/transport/2d/torus/torus_transport
 
 TESTS += applications/clawpack/transport/2d/torus/regressions.sh
 
-applications_clawpack_transport_2d_torus_torus_SOURCES = \
+applications_clawpack_transport_2d_torus_torus_transport_SOURCES = \
 	applications/clawpack/transport/2d/torus/torus.cpp \
 	applications/clawpack/transport/2d/torus/torus_options.c \
 	applications/clawpack/transport/2d/torus/torus_user.h \
@@ -34,14 +34,14 @@ EXTRA_DIST += \
 	applications/clawpack/transport/2d/torus/setplot2.m \
 	applications/clawpack/transport/2d/torus/mapc2m.m 
 
-applications_clawpack_transport_2d_torus_torus_CPPFLAGS = \
+applications_clawpack_transport_2d_torus_torus_transport_CPPFLAGS = \
 	    -I@top_srcdir@/applications/clawpack/transport/2d/all  \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_clawpack_transport_2d_torus_torus_LDADD = \
+applications_clawpack_transport_2d_torus_torus_transport_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \

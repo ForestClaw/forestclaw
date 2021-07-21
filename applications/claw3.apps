@@ -1,0 +1,7 @@
+# -----------------------------------------------
+# Clawpack 3 (extruded mesh) library and examples
+# -----------------------------------------------
+
+
+# Scalar advection
+include applications/clawpack/advection/3d/swirl/Makefile.am
