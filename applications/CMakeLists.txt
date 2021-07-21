@@ -129,6 +129,15 @@ if(TARGET FORESTCLAW::CUDACLAW)
 
 endif()
 
+# ----------------------------------
+# clawpack3 library and examples
+# ----------------------------------
+if(TARGET FORESTCLAW::CLAWPACK3)
+
+    include(claw3.cmake)
+
+endif()
+
 
 # Include examples that use the low-level interface to p4est
 # They should always compile

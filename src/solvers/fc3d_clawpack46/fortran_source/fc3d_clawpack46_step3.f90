@@ -1,26 +1,26 @@
 subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, & 
-     		     qold,aux,dx,dy,dz,dt,cflgrid, & 
-                 fm,fp,gm,gp,hm,hp, & 
-                 faddm,faddp,gadd,hadd, & 
-                 q1d,dtdx1d,dtdy1d,dtdz1d, & 
-                 aux1,aux2,aux3,work,mwork,rpn3,rpt3,rptt3, &
-                 mwaves,mcapa,method,mthlim,use_fwaves,ierror)
+    qold,aux,dx,dy,dz,dt,cflgrid, & 
+    fm,fp,gm,gp,hm,hp, & 
+    faddm,faddp,gadd,hadd, & 
+    q1d,dtdx1d,dtdy1d,dtdz1d, & 
+    aux1,aux2,aux3,work,mwork,rpn3,rpt3,rptt3, &
+    mwaves,mcapa,method,mthlim,use_fwaves,ierror)
 
-!!  ==================================================================
+    !!  ==================================================================
 
-!!  # clawpack routine ...  modified for AMRCLAW
+    !!  # clawpack routine ...  modified for AMRCLAW
 
-!!
-!!  # Take one time step, updating q.
-!!  # On entry, qold gives
-!!  #    initial data for this step
-!!  #    and is unchanged in this version.
-!!
-!!  # fm, fp are fluxes to left and right of single cell edge
-!!
-!!  # See the flux3 documentation for more information.
-!!
-!!      
+    !!
+    !!  # Take one time step, updating q.
+    !!  # On entry, qold gives
+    !!  #    initial data for this step
+    !!  #    and is unchanged in this version.
+    !!
+    !!  # fm, fp are fluxes to left and right of single cell edge
+    !!
+    !!  # See the flux3 documentation for more information.
+    !!
+    !!      
     implicit none
     external rpn3,rpt3,rptt3
 
@@ -131,9 +131,9 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     if (iused .gt. mwork) then
         !! # This shouldn't happen if mwork is set properly in stepgrid3
         write(6,*) '*** not enough work space in step3'
-	    write(6,*) '*** check parameter mwork in fc3d_clawpack46_step3'
+        write(6,*) '*** check parameter mwork in fc3d_clawpack46_step3'
         write(6,*) '*** iused = ', iused, '   mwork =',mwork
-	    stop
+        stop
     endif
 
     cflgrid = 0.d0
