@@ -10,7 +10,6 @@ applications_clawpack_advection_3d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/3d/swirl/swirl_options.c \
 	applications/clawpack/advection/3d/swirl/swirl.cpp \
 	applications/clawpack/advection/3d/swirl/setprob.f90 \
-	applications/clawpack/advection/3d/swirl/user_exceeds_th.f90 \
 	applications/clawpack/advection/3d/all/rpn3_vc_advection.f90 \
 	applications/clawpack/advection/3d/all/rpt3_vc_advection.f90 \
 	applications/clawpack/advection/3d/all/rptt3_vc_advection.f90 \
