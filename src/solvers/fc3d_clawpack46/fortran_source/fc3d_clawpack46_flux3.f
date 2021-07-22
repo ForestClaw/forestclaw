@@ -183,7 +183,7 @@ c      double precision dtcom, dxcom, dycom, dzcom, tcom
 c      integer icom,jcom,kcom
 c      common/comxyzt/dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
 
-      integer mw, m, i,j,k, m3, m4
+      integer mw, m, i,m3, m4
       double precision dtdxave
 
 
@@ -275,7 +275,7 @@ c     # apply limiter to waves:
      &                  mbc,mx,wave,s,mthlim)
       endif
      
-      if (use_fwaves .ne. 0) then
+      if (use_fwaves .eq. 0) then
           do i = 1, mx+1
      
               dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))

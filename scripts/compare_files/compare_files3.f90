@@ -181,6 +181,9 @@ PROGRAM compare_files3
         if (forestclaw1) then
             READ(10,*) blockno1
             READ(10,*) mpirank1
+        else
+            ngrid1 = ngrid1 - 1
+            level1 = level1 - 1
         endif
         READ(10,*) mx1
         READ(10,*) my1
@@ -197,6 +200,9 @@ PROGRAM compare_files3
         if (forestclaw2) then
             READ(20,*) blockno2
             READ(20,*) mpirank2
+        else
+            ngrid2 = ngrid2 - 1
+            level2 = level2 - 1
         endif
         READ(20,*) mx2
         READ(20,*) my2
@@ -431,7 +437,7 @@ SUBROUTINE write_qfile(mx,my,mz,meqn,xlower,ylower, zlower,&
     ENDIF
 
     !!      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
-    do k = 1,mz
+    DO k = 1,mz
         DO j = 1,my
             DO i = 1,mx
                 DO mq = 1,meqn
@@ -443,7 +449,8 @@ SUBROUTINE write_qfile(mx,my,mz,meqn,xlower,ylower, zlower,&
             ENDDO
             WRITE(fid_com,*) ' '
         END DO
-    end do
+        WRITE(fid_com,*) ' '
+    END DO
      !! Print the first field assuming it is the MPI rank (i.e. an integer)
 120  FORMAT (10E26.16)
 

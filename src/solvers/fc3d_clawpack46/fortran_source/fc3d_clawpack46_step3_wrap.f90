@@ -102,13 +102,13 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
                         qold(i,j,k, m) = qold(i,j,k,m) &
                             - dtdx * (fm(m,i+1,j,k) - fp(m,i,j,k))  &
                             - dtdy * (gm(m,i,j+1,k) - gp(m,i,j,k))  & 
-                            - dtdz * (hm(m,i,j+1,k) - hp(m,i,j,k))
+                            - dtdz * (hm(m,i,j,k+1) - hp(m,i,j,k))
                     else
                         !! # with capa array.
                         qold(i,j,k, m) = qold(i,j,k, m) & 
                              -(dtdx*(fm(m,i+1,j,k) - fp(m,i,j,k)) &
                              + dtdy*(gm(m,i,j+1,k) - gp(m,i,j,k)) &
-                             + dtdz*(hm(m,i,j+1,k) - hp(m,i,j,k)))/aux(i,j,k,mcapa)
+                             + dtdz*(hm(m,i,j,k+1) - hp(m,i,j,k)))/aux(i,j,k,mcapa)
                     endif
                 enddo
             enddo
