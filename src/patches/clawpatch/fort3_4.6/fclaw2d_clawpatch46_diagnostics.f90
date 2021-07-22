@@ -78,7 +78,7 @@ end function fclaw2d_clawpatch46_fort3_compute_patch_area
 
 
 subroutine fclaw2d_clawpatch46_fort3_compute_error_norm( & 
-     blockno, mx,my,mz,mbc,mfields,dx,dy,mz,area,error,error_norm)
+     blockno, mx,my,mz,mbc,mfields,dx,dy,dz,area,error,error_norm)
     implicit none
 
     integer :: mx,my,mz, mbc,mfields, blockno

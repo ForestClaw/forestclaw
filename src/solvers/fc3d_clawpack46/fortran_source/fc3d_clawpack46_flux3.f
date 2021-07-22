@@ -275,7 +275,7 @@ c     # apply limiter to waves:
      &                  mbc,mx,wave,s,mthlim)
       endif
      
-      if (use_fwaves .ne. 0) then
+      if (use_fwaves .eq. 0) then
           do i = 1, mx+1
      
               dtdxave = 0.5d0 * (dtdx1d(i-1) + dtdx1d(i))
