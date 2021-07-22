@@ -183,7 +183,7 @@ c      double precision dtcom, dxcom, dycom, dzcom, tcom
 c      integer icom,jcom,kcom
 c      common/comxyzt/dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
 
-      integer mw, m, i,j,k, m3, m4
+      integer mw, m, i,m3, m4
       double precision dtdxave
 
 
