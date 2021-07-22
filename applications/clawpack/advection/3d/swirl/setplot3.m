@@ -5,9 +5,9 @@ OutputDir = './';
 setviews  % set viewpoints so that view(xSlice), for example, can be used.
 setopengl;
 
-OutputFlag = 'ForestClaw';
+OutputFlag = 'forestclaw';
 
-ForestClaw = 1;     % Plot using ForestClaw preferences.
+ForestClaw = 1;
 
 PlotType = 1;                % type of plot to produce:
 			     % 1 = pcolor on slices (with optional contours)
@@ -21,21 +21,16 @@ UserVariable = 0;            % set to 1 to specify a user-defined variable
 UserVariableFile = ' ';      % name of m-file mapping data to q
 MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
 MaxFrames = 1000;            % max number of frames to loop over
-MaxLevels = 6;               % max number of AMR levels
+MaxLevels = 30;               % max number of AMR levels
 ReadBlockNumber = 1;
 
 PlotData =  ones(1,MaxLevels);       % Data on refinement level k is plotted only
-   			                         % if k'th component is nonzero
-PlotGrid =  zeros(1,MaxLevels);      % Plot grid lines on each level?
-
-PlotGridEdges = ones(1,MaxLevels);  % Plot edges of patches of each grid at
-                                    % this level?
-
-PlotGridEdges = zeros(1,MaxLevels);  % Plot edges of patches of each grid at
-                                     % this level on slices?
-
-PlotCubeEdges = ones(1,MaxLevels);   % Plot edges of cube of refinement patch at
-                                     % this level?
+			         % if k'th component is nonzero
+PlotGrid =  ones(1,MaxLevels);       % Plot grid lines on each level?
+PlotGridEdges =  zeros(1,MaxLevels);  % Plot edges of patches of each grid at
+                                 % this level on slices?
+PlotCubeEdges = zeros(1,MaxLevels);   % Plot edges of cube of refinement patch at
+                                 % this level?
 
 
 % ContourValues is a vector of contour lines that can be used with
@@ -50,15 +45,15 @@ ContourValues = [];   % draw contour lines from 'afterframe.m'
 %   ySliceCoords = 0:0.1:1;
 %   zSliceCoords = 0:0.1:1;
 
-xSliceCoords = [0.5];
-ySliceCoords = [0.5];
+xSliceCoords = [0.25];
+ySliceCoords = [0.25];
 zSliceCoords = [0.5];
 
 IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
 
-% (0=clear; 1=opaque)
-% NOTE: Your system must be able to
-% use the OpenGL Renderer.
-IsosurfAlphas    =  [0.5];     % Transparency of each surface
+  IsosurfAlphas    =  [0.25];     % Transparency of each surface
+                                          % (0=clear; 1=opaque)
+                                          % NOTE: Your system must be able to
+                                          % use the OpenGL Renderer.
 
-IsosurfColors    = 'q';      % Colors for each surface.
+  IsosurfColors    = 'w';      % Colors for each surface.
