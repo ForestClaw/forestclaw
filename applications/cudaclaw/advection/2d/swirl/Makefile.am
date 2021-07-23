@@ -1,8 +1,8 @@
-## Makefile.am in applications/cudaclaw/advection/2d/swirl
+## Makefile.am in applications/cudaclaw/advection/2d/swirl_cuda
 
-bin_PROGRAMS += applications/cudaclaw/advection/2d/swirl/swirl
+bin_PROGRAMS += applications/cudaclaw/advection/2d/swirl/swirl_cuda
 
-applications_cudaclaw_advection_2d_swirl_swirl_SOURCES = \
+applications_cudaclaw_advection_2d_swirl_swirl_cuda_SOURCES = \
 	applications/cudaclaw/advection/2d/swirl/swirl_user.cpp \
 	applications/cudaclaw/advection/2d/swirl/swirl_options.c \
 	applications/cudaclaw/advection/2d/swirl/swirl.cpp \
@@ -23,14 +23,14 @@ EXTRA_DIST += \
 ## Include headers and libraries needed to build this application
 ##  -- Only really need AM_CPPFLAGS and LDADD (since these include all the other 
 ##     variables).  But others are included here for completeness
-applications_cudaclaw_advection_2d_swirl_swirl_CPPFLAGS = \
+applications_cudaclaw_advection_2d_swirl_swirl_cuda_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CUDACLAW_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 SWIRL_DIR = applications/cudaclaw/advection/2d/swirl
 
-applications_cudaclaw_advection_2d_swirl_swirl_LDADD = \
+applications_cudaclaw_advection_2d_swirl_swirl_cuda_LDADD = \
         $(LDADD) \
         $(FCLAW_CUDACLAW_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
