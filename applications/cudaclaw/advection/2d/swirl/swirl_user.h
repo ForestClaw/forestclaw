@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,17 +26,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SWIRL_USER_H
 #define SWIRL_USER_H
 
-#include <fc2d_cudaclaw.h> /* Needed for cuda_rpn typedef */
-
 #include <fclaw2d_include_all.h>
 
+#include <fc2d_cudaclaw.h>
+
+#include <fc2d_cudaclaw_cuda.h>
+#include <cudaclaw_user_fort.h>
+
+//#include "../all/advection_user_fort.h"
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
 #endif
+
+#if 0
+/* fix syntax highlighted */
 #endif
 
 typedef struct user_options
@@ -49,8 +54,6 @@ typedef struct user_options
 } user_options_t;
 
 void swirl_link_solvers(fclaw2d_global_t *glob);
-
-void swirl_problem_setup(fclaw2d_global_t* glob);
 
 /* ------------------------------------- Options ---------------------------------------*/
 user_options_t* swirl_options_register (fclaw_app_t * app,
@@ -67,17 +70,16 @@ void swirl_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 void swirl_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 void swirl_assign_b4step2(cudaclaw_cuda_b4step2_t *b4step2);
 
-/* ------------------------------------ Fortran ----------------------------------------*/
-#define SWIRL_SETPROB FCLAW_F77_FUNC(swirl_setprob, SWIRL_SETPROB)
-void SWIRL_SETPROB(double* tperiod);
+void setprob();
 
-void swirl_setprob(double period_in);
+/* ------------------------------------ Fortran ----------------------------------------*/
+#if 0
+#define SETPROB FCLAW_F77_FUNC(setprob, SETPROB)
+void SETPROB();
+#endif
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
