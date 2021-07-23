@@ -8,4 +8,4 @@
 ## square (Conservation test)
 #add_subdirectory(paper/square)
 add_subdirectory(paper/sphere)
-add_subdirectory(paper/cylinder)
+#add_subdirectory(paper/cylinder)
