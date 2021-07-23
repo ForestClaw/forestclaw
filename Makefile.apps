@@ -140,11 +140,9 @@ if FCLAW_ENABLE_CUDACLAW
 ## Patches needed for Clawpack solvers
 include src/patches/clawpatch/Makefile.am
 
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5/Makefile.am
 include src/solvers/fc2d_cudaclaw/Makefile.am
 
-include applications/cudaclaw.apps
+include applications/cudaclaw/cudaclaw.apps
 
 
 endif
