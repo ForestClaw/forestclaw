@@ -655,8 +655,6 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 							 int patchno,
 							 int initflag)
 {
-	int mx,my,mbc;
-
 	int mx,my,mbc, meqn;
 	double dx,dy,xlower[4], ylower[4], *q[4];
 	for (int igrid = 0; igrid < 4; igrid++)
