@@ -105,7 +105,7 @@ typedef void (*clawpatch_fort_tag4refinement_t)(const int* mx,const int* my,
 
 typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx, const int* my,
 												const int* mbc, const int* meqn,
-												const double* xlower, const double* ylower,
+												double xlower[], double ylower[],
 												const double* dx, const double* dy,
 												const int* blockno,
 												double q0[],double q1[],
