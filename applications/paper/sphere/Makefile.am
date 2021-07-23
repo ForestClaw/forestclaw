@@ -5,7 +5,6 @@ bin_PROGRAMS += applications/paper/sphere/sphere
 applications_paper_sphere_sphere_SOURCES = \
 	applications/paper/sphere/sphere.cpp \
 	applications/paper/sphere/sphere_user.cpp \
-	applications/paper/sphere/sphere_user.h \
 	applications/paper/sphere/sphere_options.c \
 	applications/paper/sphere/fclaw2d_map_cubedsphere.c \
 	applications/paper/sphere/fclaw2d_map_pillowsphere.c \
