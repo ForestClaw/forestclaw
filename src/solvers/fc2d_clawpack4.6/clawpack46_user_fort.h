@@ -128,7 +128,7 @@ void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my,
 
 void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my,
                                const int* mbc, const int* meqn,
-                               const double* xlower, const double* ylower,
+                               double xlower[], double ylower[],
                                const double* dx, const double* dy,
                                const int* blockno,
                                double q0[],double q1[],
