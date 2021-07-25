@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_cudaclaw_cuda.h>
 #include <cudaclaw_user_fort.h>
 
-//#include "../all/advection_user_fort.h"
-
 #ifdef __cplusplus
 extern "C"
 {
