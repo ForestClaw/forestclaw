@@ -28,8 +28,18 @@
 
 #include <fclaw2d_include_all.h>
 
+
+#include <fclaw2d_include_all.h>
+
 #include <fc2d_cudaclaw.h>
+
+#include <fc2d_cudaclaw_cuda.h>
+#include <fc2d_cudaclaw_options.h>
+
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
+
+#include <cudaclaw_user_fort.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -52,8 +62,6 @@ typedef struct user_options
     int is_registered;
 } user_options_t;
 
-
-//void shockbubble_problem_setup(fclaw2d_global_t* glob);
 
 void shockbubble_link_solvers(fclaw2d_global_t *glob);
 
