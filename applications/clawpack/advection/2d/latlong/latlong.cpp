@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,26 +25,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "latlong_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack46.h>
-
-#include <fc2d_clawpack5_options.h>
-#include <fc2d_clawpack5.h>
-
+#include "../all/advection_user.h"
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
                                 user_options_t* user)
 {
-    /* Used locally */
-    int mi, mj, a,b;
-
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
@@ -53,16 +40,17 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     /* ---------------------------------------------------------------
        Mapping geometry
        --------------------------------------------------------------- */
-    mi = fclaw_opt->mi;
-    mj = fclaw_opt->mj;
-    a = fclaw_opt->periodic_x;
-    b = fclaw_opt->periodic_y;
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
+    int a = fclaw_opt->periodic_x;
+    int b = fclaw_opt->periodic_y;
 
     /* Latlong */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);
     cont = fclaw2d_map_new_latlong(brick,fclaw_opt->scale,
-                                   user->latitude, user->longitude,
+                                   user->latitude, 
+                                   user->longitude,
                                    a,b);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);

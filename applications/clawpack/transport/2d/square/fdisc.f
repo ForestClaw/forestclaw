@@ -11,7 +11,6 @@
       logical fclaw2d_map_is_used
 
       double precision xp, yp, zp
-      double precision dxc, xm, ym, w, wx, wy
 
       double precision r, r0
 

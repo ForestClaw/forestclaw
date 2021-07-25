@@ -34,9 +34,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../rp/acoustics_user_fort.h"
 
+
+void interface_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = interface_get_options(glob);
+    INTERFACE_SETPROB(&user->rhol,&user->cl,&user->rhor,&user->cr);
+}
+
 void interface_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     fclaw2d_vtable_t *vt = fclaw2d_vt();
 
     vt->problem_setup = &interface_problem_setup;  /* Version-independent */
@@ -51,9 +57,6 @@ void interface_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2_ACOUSTICS_VC;
         claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2_ACOUSTICS_VC;
 
-        clawpatch_vt->fort_tag4refinement  = &CLAWPATCH46_TAG4REFINEMENT;  
-        clawpatch_vt->fort_tag4coarsening  = &CLAWPATCH46_TAG4COARSENING;  
-
     }
     else if (user->claw_version == 5)
     {
@@ -64,14 +67,5 @@ void interface_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_rpn2    = &CLAWPACK5_RPN2_ACOUSTICS_VC;
         claw5_vt->fort_rpt2    = &CLAWPACK5_RPT2_ACOUSTICS_VC;
 
-        clawpatch_vt->fort_tag4refinement = &CLAWPATCH5_TAG4REFINEMENT;
-        clawpatch_vt->fort_tag4coarsening = &CLAWPATCH5_TAG4COARSENING;
     }
-}
-
-
-void interface_problem_setup(fclaw2d_global_t* glob)
-{
-    const user_options_t* user = interface_get_options(glob);
-    INTERFACE_SETPROB(&user->rhol,&user->cl,&user->rhor,&user->cr);
 }

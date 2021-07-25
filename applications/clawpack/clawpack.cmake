@@ -47,31 +47,35 @@ add_subdirectory(clawpack/advection/2d/sphere)
 ## periodic (square,periodic in both directions, constant velocity)
 add_subdirectory(clawpack/advection/2d/periodic)
 
-
-## --------------------- Transport ---------------------------- 
-## Example : Solve the variable velocity transport equation
-##
-##                   q_t + div(u q) = 0
-##
-## These examples use the fwave approach and can be used to test
-## conservation.
-## ------------------------------------------------------------
-
-add_subdirectory(clawpack/transport/square)
-
-
-## ---------------------Transport on a sphere ---------------------------- 
+## --------------------- Advection on a sphere ---------------------------- 
 ## Examples from suite described by Lauritzen, et al.  See:
 ##   "A standard test case suite for two-dimensional  linear
 ##    transport on the sphere: results from a collection 
 ##    of state-of-the-art schemes", Lauritzen, et al.
 ##    Geosciences Model Development, 2014. 
 ##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
+##
+## Like the examples above, these three examples all solve the color
+## color equation
 ## -------------------------------------------------------------------------
 
-add_subdirectory(clawpack/transport/gaussian)
-add_subdirectory(clawpack/transport/slotted_disk)
-add_subdirectory(clawpack/transport/correlatedcb)
+add_subdirectory(clawpack/advection/2d/gaussian)
+add_subdirectory(clawpack/advection/2d/correlatedcb)
+add_subdirectory(clawpack/advection/2d/slotted_disk)
+
+## ----------------------------- Transport --------------------------------- 
+## Example : Solve the variable velocity transport equation
+##
+##                   q_t + div(u q) = 0
+##
+## These examples use the fwave approach and can be used to test
+## conservation.
+##
+## -------------------------------------------------------------------------
+
+add_subdirectory(clawpack/transport/2d/sphere)
+add_subdirectory(clawpack/transport/2d/torus)
+add_subdirectory(clawpack/transport/2d/square)
 
 
 ## ----------------------------------------------------------

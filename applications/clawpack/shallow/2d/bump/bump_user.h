@@ -51,11 +51,6 @@ typedef struct user_options
 } user_options_t;
 
 
-#define BUMP_SETPROB FCLAW_F77_FUNC(bump_setprob, BUMP_SETPROB)
-void BUMP_SETPROB();
-
-
-void bump_problem_setup(fclaw2d_global_t *glob);
 void bump_link_solvers(fclaw2d_global_t *glob);
 
 user_options_t* bump_options_register (fclaw_app_t * app,
@@ -68,21 +63,13 @@ user_options_t* bump_get_options(fclaw2d_global_t* glob);
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 
-#if 0
-void bump_patch_setup(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx);
+/* ----------------------------- Conservative update ---------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
-                                                   const double shift[],
-                                                   const double rotate[],
-                                                   const double alpha);
+#define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
 
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
-                                                  const double alpha);
+void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
+                      double q[], double aux_center[], double aux_edge[], double flux[]);
 
-#endif
 
 #ifdef __cplusplus
 #if 0

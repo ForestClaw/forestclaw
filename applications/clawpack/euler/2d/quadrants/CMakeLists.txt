@@ -2,13 +2,8 @@ set(rp ${PROJECT_SOURCE_DIR}/clawpack/euler/2d/rp)
 
 add_library(quadrants_f OBJECT 
   setprob.f 
-  difference_exceeds_th.f90 
   user_4.6/qinit.f 
-  user_4.6/tag4refinement.f 
-  user_4.6/tag4coarsening.f 
   user_5.0/qinit.f90 
-  user_5.0/tag4refinement.f
-  user_5.0/tag4coarsening.f
   ${rp}/clawpack46_rpn2_euler4.f 
   ${rp}/clawpack46_rpt2_euler4.f 
   ${rp}/clawpack5_rpn2_euler4.f90 
@@ -31,3 +26,6 @@ target_link_libraries(quadrants PRIVATE
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
 )
+
+add_test(NAME clawpack_euler_2d_quadrants COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_euler_2d_quadrants PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

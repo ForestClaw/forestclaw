@@ -39,10 +39,6 @@ square_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "mapping", &user->mapping, 0,
                            "1 : u(x) > 0; 2: u(x) changes sign (1,2) [1]");
 
-    sc_options_add_bool (opt, 0, "use-wavelets", &user->use_wavelets, 0,
-                           "Use wavelet refinement criteria [F]");
-
-
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
                            "[user] Used in five-patch mapping [0.4]");
 
@@ -55,7 +51,12 @@ square_register (user_options_t *user, sc_options_t * opt)
 
     fclaw_options_add_double_array (opt, 0, "velocity", &user->velocity_string, "1 1",
                                     &user->velocity, 2, 
-                                    "Constant velocity for example 0  [1,1]");
+                                    "[user] Constant velocity for example 0  [1,1]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
+                        "[user] : Clawpack version (4 or 5) [4]");
+
+
 
     user->is_registered = 1;
 

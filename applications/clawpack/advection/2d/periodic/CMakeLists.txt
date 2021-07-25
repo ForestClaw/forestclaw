@@ -5,13 +5,8 @@ add_library(periodic_f OBJECT
   fdisc.f
   user_4.6/qinit.f 
   user_4.6/clawpack46_setaux.f
-  user_4.6/tag4coarsening.f
-  user_4.6/tag4refinement.f
   user_5.0/qinit.f90 
   user_5.0/clawpack5_setaux.f90
-  user_5.0/tag4coarsening.f
-  user_5.0/tag4refinement.f
-  ${all}/minmax_exceeds_th.f90
   ${all}/clawpack46_rpn2adv.f 
   ${all}/clawpack46_rpt2adv.f 
   ${all}/clawpack5_rpn2adv.f90 
@@ -35,6 +30,5 @@ target_link_libraries(periodic PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-# add_test(NAME periodic
-#  COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} $<TARGET_FILE:periodic>
-#  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_test(NAME clawpack_advection_2d_periodic COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_advection_2d_periodic PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

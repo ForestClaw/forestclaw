@@ -65,6 +65,7 @@ static int fill_ghost(int time_interp)
 }
 
 
+/* Store virtual table for retrieval from anywhere */
 static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
 static
@@ -635,7 +636,10 @@ int clawpatch_tag4refinement(fclaw2d_global_t *glob,
 	else
 	{
 		tag_patch = 0;	
+
+		/* This allows the user to specify a "exceeds_th" */
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
 		clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,
 		                                  &dx,&dy, &blockno, q,
 		                                  &refine_threshold,
@@ -651,16 +655,14 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 							 int patchno,
 							 int initflag)
 {
-	double xlower,ylower,dx,dy;
-	int mx,my,mbc;
-	fclaw2d_clawpatch_grid_data(glob,&fine_patches[0],&mx,&my,&mbc,
-								&xlower,&ylower,&dx,&dy);
-
-	int meqn;
-	double *q[4];
+	int mx,my,mbc, meqn;
+	double dx,dy,xlower[4], ylower[4], *q[4];
 	for (int igrid = 0; igrid < 4; igrid++)
 	{
 		fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+
+		fclaw2d_clawpatch_grid_data(glob,&fine_patches[0],&mx,&my,&mbc,
+								&xlower[igrid],&ylower[igrid],&dx,&dy);
 	}
 
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -670,8 +672,9 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 	if (coarsen_threshold > 0) 
 	{		
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+
 		clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,
-		                                  &xlower,&ylower,&dx,&dy,
+		                                  xlower,ylower,&dx,&dy,
 		                                  &blockno, q[0],q[1],q[2],q[3],
 		                                  &coarsen_threshold,&initflag,&tag_patch);
 	}
@@ -1100,6 +1103,9 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 	/* Ghost pack for registers (doesn't depend on clawpack version) */
 	clawpatch_vt->time_sync_pack_registers = fclaw2d_clawpatch_time_sync_pack_registers;
 
+	/* Tagging functions.  The default uses option 'refinement_criteria'. */
+	clawpatch_vt->fort_user_exceeds_threshold = NULL;
+
 	/* Fortran functions that depend on data layout (version 4.6 or 5.0) */
 	if (claw_version == 4)
 	{
@@ -1295,8 +1301,6 @@ fclaw2d_clawpatch_get_registers(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_t *cp = get_clawpatch(this_patch);
 	return cp->registers;
 }
-
-
 
 
 double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,

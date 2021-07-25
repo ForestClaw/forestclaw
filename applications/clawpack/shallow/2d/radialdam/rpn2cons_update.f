@@ -41,7 +41,7 @@ c     #  f2 = (hv; huv; hv^2 + 0.5*gh^2)
       flux(1) = hun
       flux(mu) = hun**2/h + 0.5*grav*h**2
       flux(mv) = un*hut
-      flux(4) = un*q(4)
+c      flux(4) = un*q(4)
 
       end
 

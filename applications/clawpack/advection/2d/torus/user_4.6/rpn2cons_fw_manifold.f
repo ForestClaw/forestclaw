@@ -1,8 +1,8 @@
       subroutine rpn2cons_fw_manifold(ixy,maxm,meqn,mwaves,mbc,
-     &         mx,ql,qr,auxl,auxr,wave,s,amdq,apdq)
+     &         mx,ql,qr,auxl,auxr,wave,s,amdq,apdq, maux)
       implicit none
 
-      integer maxm, mbc,mwaves,meqn,mx
+      integer maxm, mbc,mwaves,meqn,mx, maux
       integer ixy
 
       double precision wave(1-mbc:maxm+mbc, meqn, mwaves)   
@@ -11,8 +11,8 @@
       double precision   qr(1-mbc:maxm+mbc, meqn)
       double precision amdq(1-mbc:maxm+mbc, meqn)
       double precision apdq(1-mbc:maxm+mbc, meqn)
-      double precision auxl(1-mbc:maxm+mbc,*)
-      double precision auxr(1-mbc:maxm+mbc,*)
+      double precision auxl(1-mbc:maxm+mbc,maux)
+      double precision auxr(1-mbc:maxm+mbc,maux)
 
 
       integer i, idir

@@ -74,12 +74,11 @@ c      include 'fclaw2d_metric_terms.i'
 
       end
 
-
-      subroutine fclaw2d_clawpatch5_fort_compute_error_norm(mx,my,
-     &      mbc,meqn, dx,dy,area,error,error_norm)
+      subroutine fclaw2d_clawpatch5_fort_compute_error_norm(
+     &      blockno,mx,my, mbc,meqn, dx,dy,area,error,error_norm)
       implicit none
 
-      integer mx,my,mbc,meqn
+      integer mx,my,mbc,meqn, blockno
       double precision dx, dy
       double precision error_norm(meqn,3)
       double precision error(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)

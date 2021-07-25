@@ -1,4 +1,4 @@
-      subroutine radialdam_setprob()
+      subroutine setprob()
       implicit none
 
       double precision grav

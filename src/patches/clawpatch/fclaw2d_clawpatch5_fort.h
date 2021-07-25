@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -73,8 +73,10 @@ void FCLAW2D_CLAWPATCH5_FORT_TAG4REFINEMENT(const int* mx,const int* my,
 
 void FCLAW2D_CLAWPATCH5_FORT_TAG4COARSENING(const int* mx, const int* my,
                                              const int* mbc, const int* meqn,
-                                             const double* xlower, const double* ylower,
-                                             const double* dx, const double* dy,
+                                             double xlower[], 
+                                             double ylower[],
+                                             const double* dx, 
+                                             const double* dy,
                                              const int* blockno,
                                              double q0[],double q1[],
                                              double q2[],double q3[],
@@ -310,7 +312,7 @@ void CLAWPATCH5_TAG4REFINEMENT(const int* mx,const int* my,
 
 void CLAWPATCH5_TAG4COARSENING(const int* mx, const int* my,
                               const int* mbc, const int* meqn,
-                              const double* xlower, const double* ylower,
+                              double xlower[], double ylower[],
                               const double* dx, const double* dy,
                               const int* blockno,
                               double q0[],double q1[],

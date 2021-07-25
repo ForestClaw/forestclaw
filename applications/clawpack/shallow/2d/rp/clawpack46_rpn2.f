@@ -24,26 +24,42 @@ c     #                                    and right state ql(i,:)
 c     # From the basic clawpack routines, this routine is called with ql = qr
 c     
 c     
-      implicit double precision (a-h,o-z)
+      implicit none
+
+      integer ixy, maxm, meqn, mwaves, mbc, mx
 c     
-      dimension wave(1-mbc:maxm+mbc, meqn, mwaves)
-      dimension    s(1-mbc:maxm+mbc, mwaves)
-      dimension   ql(1-mbc:maxm+mbc, meqn)
-      dimension   qr(1-mbc:maxm+mbc, meqn)
-      dimension  apdq(1-mbc:maxm+mbc, meqn)
-      dimension  amdq(1-mbc:maxm+mbc, meqn)
-c     
+      double precision wave(1-mbc:maxm+mbc, meqn, mwaves)
+      double precision    s(1-mbc:maxm+mbc, mwaves)
+      double precision   ql(1-mbc:maxm+mbc, meqn)
+      double precision   qr(1-mbc:maxm+mbc, meqn)
+      double precision  apdq(1-mbc:maxm+mbc, meqn)
+      double precision  amdq(1-mbc:maxm+mbc, meqn)
+      double precision  auxl(1-mbc:maxm+mbc, *)
+      double precision  auxr(1-mbc:maxm+mbc, *)
+
+      double precision grav
+      common /cparam/ grav      !# gravitational parameter
+
 c     local arrays -- common block comroe is passed to rpt2sh
 c     ------------
+
+      integer maxm2
       parameter (maxm2 = 603)   !# assumes at most 600x600 grid with mbc=3
-      dimension delta(3)
+
+      double precision delta(3), hsqrtl, hsqrtr, hsq2
+      double precision a1, a2, a3, s0, s1, s3, him1
+      double precision h1, hu1, sfract, hi, s03, h3, hu3
+      double precision df
+      integer mu, mv, i, m, mw
+
       logical efix
-      common /cparam/ grav      !# gravitational parameter
-      common /comroe/ u(-2:maxm2),v(-2:maxm2),a(-2:maxm2),h(-2:maxm2)
+
+      double precision, dimension(-2:maxm2) :: u,v,a,h
+      common /comroe/ u,v,a,h
 c     
-      data efix /.false./       !# use entropy fix for transonic rarefactions
+      data efix /.true./       !# use entropy fix for transonic rarefactions
 c     
-      if (-2.gt.1-mbc .or. maxm2 .lt. maxm+mbc) then
+      if (-2 .gt. 1-mbc .or. maxm2 .lt. maxm+mbc) then
          write(6,*) 'Check dimensions of local arrays in rpn2'
          stop
       endif
@@ -52,7 +68,7 @@ c     # set mu to point to  the component of the system that corresponds
 c     # to momentum in the direction of this slice, mv to the orthogonal
 c     # momentum:
 c     
-      if (ixy.eq.1) then
+      if (ixy .eq. 1) then
          mu = 2
          mv = 3
       else
@@ -151,38 +167,38 @@ c     # First compute amdq as sum of s*wave for left going waves.
 c     # Incorporate entropy fix by adding a modified fraction of wave
 c     # if s should change sign.
 c     
-      do i=2-mbc,mx+mbc
-c     check 1-wave
+      do i = 2-mbc,mx+mbc
+c        # check 1-wave
          him1 = qr(i-1,1)
          s0 =  qr(i-1,mu)/him1 - dsqrt(grav*him1)
-c     check for fully supersonic case :
-         if (s0.gt.0.0d0.and.s(i,1).gt.0.0d0) then
-            do m=1,3
-               amdq(i,m)=0.0d0
+c        # check for fully supersonic case :
+         if (s0 .gt. 0.0d0 .and. s(i,1) .gt. 0.0d0) then
+            do m = 1,3
+               amdq(i,m) = 0.0d0
             end do
             goto 200
          endif
 c     
-         h1 = qr(i-1,1)+wave(i,1,1)
-         hu1= qr(i-1,mu)+wave(i,mu,1)
+         h1 = qr(i-1,1) + wave(i,1,1)
+         hu1= qr(i-1,mu) + wave(i,mu,1)
          s1 = hu1/h1 - dsqrt(grav*h1) !speed just to right of 1-wave
-         if (s0.lt.0.0d0.and.s1.gt.0.0d0) then
-c     transonic rarefaction in 1-wave
+         if (s0 .lt. 0.0d0 .and. s1 .gt. 0.0d0) then
+c           # transonic rarefaction in 1-wave
             sfract = s0*((s1-s(i,1))/(s1-s0))
-         else if (s(i,1).lt.0.0d0) then
-c     1-wave is leftgoing
+         else if (s(i,1) .lt. 0.0d0) then
+c           # 1-wave is leftgoing
             sfract = s(i,1)
          else
-c     1-wave is rightgoing
+c           # 1-wave is rightgoing
             sfract = 0.0d0
          endif
-         do m=1,3
+         do m = 1,3
             amdq(i,m) = sfract*wave(i,m,1)
          end do
 
-c     check 2-wave
-         if (s(i,2).gt.0.0d0) then
-c     #2 and 3 waves are right-going
+c        # check 2-wave
+         if (s(i,2) .gt. 0.0d0) then
+c           # 2 and 3 waves are right-going
             go to 200
          endif
 
@@ -194,35 +210,35 @@ c     check 3-wave
 c     
          hi = ql(i,1)
          s03 = ql(i,mu)/hi + dsqrt(grav*hi)
-         h3=ql(i,1)-wave(i,1,3)
-         hu3=ql(i,mu)-wave(i,mu,3)
-         s3=hu3/h3 + dsqrt(grav*h3)
-         if (s3.lt.0.0d0.and.s03.gt.0.0d0) then
-c     transonic rarefaction in 3-wave
+         h3 = ql(i,1)-wave(i,1,3)
+         hu3 = ql(i,mu)-wave(i,mu,3)
+         s3 = hu3/h3 + dsqrt(grav*h3)
+         if (s3 .lt. 0.0d0 .and. s03 .gt. 0.0d0) then
+c           # transonic rarefaction in 3-wave
             sfract = s3*((s03-s(i,3))/(s03-s3))
          else if (s(i,3).lt.0.0d0) then
-c     3-wave is leftgoing
+c           # 3-wave is leftgoing
             sfract = s(i,3)
          else
-c     3-wave is rightgoing
+c           # 3-wave is rightgoing
             goto 200
          endif
-         do m=1,3
+         do m = 1,3
             amdq(i,m) = amdq(i,m) + sfract*wave(i,m,3)
          end do
+200      continue
       end do
- 200  continue
 c     
 c     compute rightgoing flux differences :
 c     
-      do m=1,3
+      do m = 1,3
          do i = 2-mbc,mx+mbc
             df = 0.0d0
-            do mw=1,mwaves
+            do mw = 1,mwaves
                df = df + s(i,mw)*wave(i,m,mw)
             end do
+            apdq(i,m)=df - amdq(i,m)
          end do
-         apdq(i,m)=df-amdq(i,m)
       end do
 c     
 c     

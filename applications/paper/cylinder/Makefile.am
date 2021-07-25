@@ -3,13 +3,12 @@ bin_PROGRAMS += applications/paper/cylinder/cylinder
 applications_paper_cylinder_cylinder_SOURCES = \
 	applications/paper/cylinder/cylinder.cpp \
 	applications/paper/cylinder/cylinder_options.c \
-	applications/paper/cylinder/cylinder_user.h \
 	applications/paper/cylinder/cylinder_user.cpp \
+	applications/paper/cylinder/fclaw2d_map_cylinder.c \
 	applications/paper/cylinder/setprob.f \
 	applications/paper/cylinder/compute_exact.f90 \
 	applications/paper/cylinder/cylinder_compute_area_fort.f90 \
 	applications/paper/cylinder/latlong_compute_area_fort.f90 \
-	applications/paper/cylinder/fclaw2d_map_cylinder.c \
 	applications/paper/cylinder/dopri5.f \
 	applications/paper/cylinder/qexact.f \
 	applications/paper/cylinder/q0.f \
