@@ -7,12 +7,12 @@
 include applications/cudaclaw/advection/2d/swirl/Makefile.am
 
 # Shallow water wave equations
-#include applications/clawpack/shallow/2d/bump_cuda/Makefile.am
-#include applications/clawpack/shallow/2d/radialdam_cuda/Makefile.am
-#include applications/clawpack/shallow/2d/tsunami_cuda/Makefile.am
+#include applications/cudaclaw/shallow/2d/bump_cuda/Makefile.am
+#include applications/cudaclaw/shallow/2d/radialdam_cuda/Makefile.am
+#include applications/cudaclaw/shallow/2d/tsunami_cuda/Makefile.am
 
 # Acoustics
-#include applications/clawpack/acoustics/2d/radial_cuda/Makefile.am
+#include applications/cudaclaw/acoustics/2d/radial_cuda/Makefile.am
 
 # Euler equations
-include applications/shockbubble/euler/2d/shockbubble/Makefile.am
+include applications/cudaclaw/euler/2d/shockbubble/Makefile.am
