@@ -1,4 +1,4 @@
-      subroutine clawpack46_src2(maxmx,maxmy,meqn,mbc,mx,my,
+      subroutine cudaclaw_src2(maxmx,maxmy,meqn,mbc,mx,my,
      &      xlower,ylower,dx,dy,q,maux,aux,t,dt)
 c =========================================================
       implicit double precision(a-h,o-z)

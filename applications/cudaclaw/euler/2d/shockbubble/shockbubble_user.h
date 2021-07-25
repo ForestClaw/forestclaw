@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,18 +23,17 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SHOCKBUBBLE_USER_HPP
-#define SHOCKBUBBLE_USER_HPP
+#ifndef SHOCKBUBBLE_USER_H
+#define SHOCKBUBBLE_USER_H
 
 #include <fclaw2d_include_all.h>
+
 #include <fc2d_cudaclaw.h>
+#include <fclaw2d_clawpatch.h>
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 typedef struct user_options
@@ -54,7 +53,7 @@ typedef struct user_options
 } user_options_t;
 
 
-void shockbubble_problem_setup(fclaw2d_global_t* glob);
+//void shockbubble_problem_setup(fclaw2d_global_t* glob);
 
 void shockbubble_link_solvers(fclaw2d_global_t *glob);
 
@@ -67,23 +66,24 @@ user_options_t* shockbubble_get_options(fclaw2d_global_t* glob);
 
 /* ------------------------------- Fortran code --------------------------------------- */
 
+#if 0
 #define SHOCKBUBBLE_SETPROB FCLAW_F77_FUNC(shockbubble_setprob, SHOCKBUBBLE_SETPROB)
 void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0,
                          const double* r0, const double* rhoin,
                          const double* pinf, const int* idisc);
+#endif
 
 
 
 /* ---------------------------------- Cuda code --------------------------------------- */
-void shockbubble_setprob_cuda(double gamma);
+void shockbubble_setprob_cuda();
+
 void shockbubble_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+
 void shockbubble_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

@@ -1,4 +1,4 @@
-      subroutine clawpack46_bc2(maxmx,maxmy,meqn,mbc,
+      subroutine cudaclaw_bc2(maxmx,maxmy,meqn,mbc,
      &      mx,my,xlower,ylower,
      &      dx,dy,q,maux,aux,t,dt,mthbc)
 c     =====================================================
