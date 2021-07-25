@@ -63,7 +63,7 @@ void slotted_disk_link_solvers(fclaw2d_global_t *glob)
     patch_vt->setup = &slotted_disk_patch_setup_manifold;  
 
     const user_options_t* user = slotted_disk_get_options(glob);
-    if (user->example == 1)
+    if (user->mapping == 1)
         fclaw2d_clawpatch_use_pillowsphere();
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();

@@ -65,7 +65,7 @@ void gaussian_link_solvers(fclaw2d_global_t *glob)
     patch_vt->setup = &gaussian_patch_setup_manifold;  
 
     const user_options_t* user = gaussian_get_options(glob);
-    if (user->example == 1)
+    if (user->mapping == 1)
         fclaw2d_clawpatch_use_pillowsphere();
 
 
