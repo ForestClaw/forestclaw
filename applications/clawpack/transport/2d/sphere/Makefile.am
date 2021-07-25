@@ -1,8 +1,10 @@
 ## Makefile.am in applications/clawpack/transport/2d/sphere
 
-bin_PROGRAMS += applications/clawpack/transport/2d/sphere/sphere
+bin_PROGRAMS += applications/clawpack/transport/2d/sphere/sphere_transport
 
-applications_clawpack_transport_2d_sphere_sphere_SOURCES = \
+TESTS += applications/clawpack/transport/2d/sphere/regressions.sh
+
+applications_clawpack_transport_2d_sphere_sphere_transport_SOURCES = \
 	applications/clawpack/transport/2d/sphere/sphere.cpp \
 	applications/clawpack/transport/2d/sphere/sphere_user.cpp \
 	applications/clawpack/transport/2d/sphere/sphere_user.h \
@@ -40,14 +42,14 @@ EXTRA_DIST += \
 	applications/clawpack/transport/2d/sphere/afterframe.m \
 	applications/clawpack/transport/2d/sphere/setplot2.m
 
-applications_clawpack_transport_2d_sphere_sphere_CPPFLAGS = \
+applications_clawpack_transport_2d_sphere_sphere_transport_CPPFLAGS = \
 	    -I@top_srcdir@/applications/clawpack/advection/2d/all  \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_clawpack_transport_2d_sphere_sphere_LDADD = \
+applications_clawpack_transport_2d_sphere_sphere_transport_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \
