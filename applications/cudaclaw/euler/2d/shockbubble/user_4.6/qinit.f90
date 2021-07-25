@@ -25,8 +25,8 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
     double precision :: rinf, vinf, einf
     common /cominf/ rinf,vinf,einf
 
-    integer :: i,j, m
-    double precision :: xlow, ylow
+    integer :: i,j, m, idisc_example
+    double precision :: xlow, ylow, win
     double precision :: rhoin, rhoout, pout, pin, pinf
 
     integer :: blockno, fc2d_clawpack46_get_block
@@ -60,7 +60,7 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
 
         !! # behind shock:
         do  j=1-mbc,my+mbc
-            if (xclow .lt. 0.2d0) then
+            if (xlow .lt. 0.2d0) then
                 q(i,j,1) = rinf
                 q(i,j,2) = rinf*vinf
                 q(i,j,3) = 0.d0
