@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_cudaclaw.h>
 
 #include <fc2d_cudaclaw_cuda.h>
+#include <fc2d_cudaclaw_options.h>
+
 #include <cudaclaw_user_fort.h>
 
 #ifdef __cplusplus
