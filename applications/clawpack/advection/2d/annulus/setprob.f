@@ -1,14 +1,17 @@
-      subroutine setprob_annulus(beta_in)
+      subroutine setprob()
       implicit none
 
-      double precision pi
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
-      double precision beta_in, beta
+      double precision beta
       common /commannulus/ beta
 
       pi = 4.d0*atan(1.d0)
+      pi2 = 2*pi
 
-      beta = beta_in
+      open(10,file='setprob.data')
+      read(10,*) beta
+      close(10)
 
       end

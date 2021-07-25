@@ -7,8 +7,6 @@
 
       double precision r
 
-      logical fclaw2d_map_is_used
-
       cont = get_context()
 
       call fclaw2d_map_c2m(cont,

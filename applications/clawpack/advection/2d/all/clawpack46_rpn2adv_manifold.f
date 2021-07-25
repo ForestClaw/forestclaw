@@ -17,7 +17,6 @@ c
 
       integer meqn1
       parameter(meqn1 = 10)
-      double precision delta(meqn1)
 
       integer i,m
 

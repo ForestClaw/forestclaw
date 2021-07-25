@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,19 +25,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.h"
 
-#include <fclaw2d_include_all.h>
+static
+void swirl_problem_setup(fclaw2d_global_t* glob)
+{
+    const user_options_t* user = swirl_get_options(glob);
 
-/* Two versions of Clawpack */
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,"%-24.4f %s\n",user->period,"\% period");
+        fclose(f);
+    }
 
-#include "../all/advection_user_fort.h"
+    /* Make sure node 0 has written 'setprob.data' before proceeding */
+    fclaw2d_domain_barrier (glob->domain);
+
+    SETPROB();
+}
+
 
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt();
-
-
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
 
     const user_options_t* user = swirl_get_options(glob);
@@ -46,9 +55,11 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();        
 
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
-        clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
         clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
+
+        /* Velocity is set here rather than in setaux, because we have a 
+           time dependent velocity field */
         clawpack46_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
     }
     else if (user->claw_version == 5)
@@ -56,19 +67,13 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
         fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
 
         clawpack5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-        clawpack5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
-        clawpack5_vt->fort_b4step2   = &CLAWPACK5_B4STEP2;
         clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
-        clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
+        clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;  
+
+        /* Velocity is set here rather than in setaux, because we have a 
+           time dependent velocity field */
+        clawpack5_vt->fort_b4step2   = &CLAWPACK5_B4STEP2;
     }
-}
-
-void swirl_problem_setup(fclaw2d_global_t* glob)
-{
-    const user_options_t* user = swirl_get_options(glob);
-
-    double period = user->period;
-    SWIRL_SETPROB(&period);
 }
 
 

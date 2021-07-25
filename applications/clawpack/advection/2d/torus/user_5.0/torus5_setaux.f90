@@ -2,12 +2,9 @@
 SUBROUTINE torus5_setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
     implicit none
 
-    integer mbc, mx,my, meqn, maux
+    integer mbc, mx,my, maux
     double precision dx,dy, xlower, ylower
     double precision aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
-
-    integer i,j, k
-    double precision dxdy
 
     INTEGER blockno, fc2d_clawpack5_get_block
 
@@ -27,14 +24,9 @@ SUBROUTINE torus5_setaux(mbc,mx,my,xlower,ylower,dx,dy,maux,aux)
 
     blockno = fc2d_clawpack5_get_block()
 
-    if (color_equation .eq. 1) then
-!!      # Edge velocities : entries (2-3)      
+!!  # Edge velocities : entries (2-3)      
         call torus5_set_edge_velocities(mx,my,mbc,dx,dy,  &
                                         blockno,xlower,ylower,aux,maux)
-    else
-        write(6,*) 'torus5_setaux : Transport equation not implemented in version 5'
-        stop
-    endif
 
     return
 end subroutine torus5_setaux

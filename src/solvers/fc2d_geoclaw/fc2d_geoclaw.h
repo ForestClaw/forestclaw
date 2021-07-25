@@ -46,6 +46,8 @@ struct fclaw2d_patch;
 struct geoclaw_gauge;
 
 
+void fc2d_geoclaw_run(struct fclaw2d_global *glob);
+
 /* ------------------------------------- Access functions ---------------------------------- */
 
 void fc2d_geoclaw_module_setup(struct fclaw2d_global *glob);

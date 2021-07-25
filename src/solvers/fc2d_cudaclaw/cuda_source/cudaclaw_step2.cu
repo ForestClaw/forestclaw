@@ -13,10 +13,12 @@
 #include <fclaw2d_clawpatch_options.h>
 #include <fc2d_cudaclaw_options.h>
 
-#include "../fc2d_cudaclaw_check.cu"  /* CHECK defined here */
+#include "../fc2d_cudaclaw_check.h"  /* CHECK defined here */
 
 #include <fc2d_cuda_profiler.h>
 #include <cub/cub.cuh>
+
+#define thread_count 224
 
 
 /* Put header here so it doesn't have to go in *.h file */
@@ -27,10 +29,22 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                       const int mwork,
                                       const double dt, const double t,
                                       struct cudaclaw_fluxes* array_fluxes_struct_dev,
-                                      double * maxcflblocks_dev,
+                                      double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
                                       cudaclaw_cuda_rpt2_t rpt2,
                                       cudaclaw_cuda_b4step2_t b4step2);
+
+__global__
+void cudaclaw_compute_speeds_batch (const int mx,    const int my, 
+                                    const int meqn,  const int mbc, 
+                                    const int maux,  const int mwaves, 
+                                    const int mwork,
+                                    const double dt, const double t,
+                                    cudaclaw_fluxes_t* array_fluxes_struct,
+                                    double * maxcflblocks,
+                                    cudaclaw_cuda_speeds_t compute_speeds,
+                                    cudaclaw_cuda_b4step2_t b4step2);
+
 
 double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
@@ -135,16 +149,52 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     }
 
 
+#if 0
     {
-        PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
+        PROFILE_CUDA_GROUP("Configure and call to compute speeds",6);  
 
-        /* Configure kernel */
+        /* Compute speeds */
         int block_size = FC2D_CUDACLAW_BLOCK_SIZE;
+
         dim3 block(block_size,1,1);
         dim3 grid(1,1,batch_size);
 
+        mwork = 2*(meqn + maux) + mwaves;
+        bytes_per_thread = sizeof(double)*mwork;
+        bytes = bytes_per_thread*block_size;
+        bytes_kb = bytes/1024.0;
+
+        cudaclaw_compute_speeds_batch <<<grid,block,bytes>>>(mx,my,meqn, mbc, maux, mwaves,
+                                                             mwork, dt, t, 
+                                                             array_fluxes_struct_dev,
+                                                             maxcflblocks_dev,
+                                                             cuclaw_vt->cuda_speeds,
+                                                             cuclaw_vt->cuda_b4step2);
+
+        cudaDeviceSynchronize();
+
+        cudaError_t code = cudaPeekAtLastError();
+        if (code != cudaSuccess) 
+        {
+            fclaw_global_essentialf("ERROR (cudaclaw_step2.cu (compute_speeds)) : %s\n\n", 
+                                    cudaGetErrorString(code));
+            exit(code);
+        }
+    }        
+#endif    
+
+    {
+        PROFILE_CUDA_GROUP("Configure and call main kernel",6);  
+
         /* Determine shared memory size */
-        mwork = 9*meqn + 9*maux + mwaves + meqn*mwaves;
+        int block_size = FC2D_CUDACLAW_BLOCK_SIZE;
+        //int block_size = thread_count;
+        dim3 block(block_size,1,1);
+        dim3 grid(1,1,batch_size);
+
+        int mwork1 = 4*meqn + 2*maux + mwaves + meqn*mwaves;
+        int mwork2 = 5*meqn + 6*maux;
+        mwork = (mwork1 > mwork2) ? mwork1 : mwork2;
         bytes_per_thread = sizeof(double)*mwork;
         bytes = bytes_per_thread*block_size;
 
@@ -160,20 +210,17 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                                               cuclaw_vt->cuda_b4step2);
         cudaDeviceSynchronize();
 
+        
         cudaError_t code = cudaPeekAtLastError();
 
         if (code != cudaSuccess) 
         {
             fclaw_global_essentialf("ERROR (cudaclaw_step2.cu) : %s\n", 
                                     cudaGetErrorString(code));
-            fclaw_global_essentialf("    Most likely, too many threads per block were launched.  Set configure flag -DFC2D_CUDACLAW_BLOCK_SIZE=NNN\n");
-            fclaw_global_essentialf("    where NNN is a multiple of 32 smaller than %d. " \
-                                    "Do a clean build of the code and try again.\n", FC2D_CUDACLAW_BLOCK_SIZE);   
-            fclaw_global_essentialf("    Shared memory exceeds 48kb : %0.2f\n\n",bytes_kb);            
             exit(code);
         }
     }
-	
+
     /* -------------------------------- Finish CFL ------------------------------------*/ 
     {
         PROFILE_CUDA_GROUP("Finish CFL",2);
@@ -192,6 +239,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         cudaFree(cflgrid_dev);
     }
 
+
+	
     /* -------------------------- Copy q back to host ----------------------------------*/ 
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY_D2H]);       
 

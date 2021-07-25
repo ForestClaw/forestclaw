@@ -2,6 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/euler/2d/shockbubble/shockbubble
 
+TESTS += applications/clawpack/euler/2d/shockbubble/regressions.sh
 
 applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/shockbubble.cpp \
@@ -14,14 +15,10 @@ applications_clawpack_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/clawpack/euler/2d/shockbubble/user_4.6/setaux.f \
 	applications/clawpack/euler/2d/shockbubble/user_4.6/bc2.f \
 	applications/clawpack/euler/2d/shockbubble/user_4.6/src2.f \
-	applications/clawpack/euler/2d/shockbubble/user_4.6/tag4coarsening.f \
-	applications/clawpack/euler/2d/shockbubble/user_4.6/tag4refinement.f \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/qinit.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/setaux.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/bc2.f90 \
 	applications/clawpack/euler/2d/shockbubble/user_5.0/src2.f90 \
-	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4coarsening.f90 \
-	applications/clawpack/euler/2d/shockbubble/user_5.0/tag4refinement.f90 \
 	applications/clawpack/euler/2d/rp/euler_user_fort.h \
 	applications/clawpack/euler/2d/rp/clawpack46_rpn2_euler4.f \
 	applications/clawpack/euler/2d/rp/clawpack46_rpt2_euler4.f \

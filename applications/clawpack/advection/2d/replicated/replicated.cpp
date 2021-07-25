@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,16 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "replicated_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack5_options.h>
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+#include "../all/advection_user.h"
 
 #include <math.h>
 
@@ -48,11 +39,10 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    int mi,mj,a,b;
-    mi = fclaw_opt->mi;
-    mj = fclaw_opt->mj;
-    a = fclaw_opt->periodic_x;
-    b = fclaw_opt->periodic_y;
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
+    int a = fclaw_opt->periodic_x;
+    int b = fclaw_opt->periodic_y;
 
 
     /* Duplicate initial conditions in each block */

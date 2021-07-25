@@ -31,6 +31,17 @@ static void *
 periodic_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                           "example [0]");
+
+    sc_options_add_double (opt, 0, "ubar", &user->ubar, 2,
+                           "ubar [2]");
+
+    sc_options_add_double (opt, 0, "vbar", &user->vbar, 0,
+                           "vbar [0]");
+    sc_options_add_int (opt, 0, "refinement-strategy", &user->refinement_strategy, 0,
+                           "Refinement strategy [2]");
+
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                            "Clawpack_version (4 or 5) [5]");
 

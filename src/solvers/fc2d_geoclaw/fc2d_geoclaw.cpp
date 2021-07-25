@@ -333,6 +333,15 @@ double geoclaw_step2(fclaw2d_global_t *glob,
 }
 
 
+void fc2d_geoclaw_dt(fclaw2d_global_t *glob,double t, double* dt)
+{
+
+    
+
+}
+
+
+
 static
 double geoclaw_update(fclaw2d_global_t *glob,
                       fclaw2d_patch_t *this_patch,
@@ -426,7 +435,8 @@ int geoclaw_patch_tag4refinement(fclaw2d_global_t *glob,
 static
 int geoclaw_patch_tag4coarsening(fclaw2d_global_t *glob,
                                       fclaw2d_patch_t *fine_patches,
-                                      int blockno, int patchno)
+                                      int blockno, int patchno,
+                                      int initflag)
 
 {
     const fclaw_options_t *amropt;

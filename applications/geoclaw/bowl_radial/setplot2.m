@@ -37,3 +37,8 @@ UserMap1d = 1;
 
 ShowUnderOverShoots = 0;
 PlotParallelPartitions=0;
+
+UserColorMapping = 0;
+
+
+

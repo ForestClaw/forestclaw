@@ -72,12 +72,13 @@ void FCLAW2D_CLAWPATCH46_FORT_TAG4REFINEMENT(const int* mx,const int* my,
 
 void FCLAW2D_CLAWPATCH46_FORT_TAG4COARSENING(const int* mx, const int* my,
                                              const int* mbc, const int* meqn,
-                                             const double* xlower, const double* ylower,
+                                             double xlower[], double ylower[],
                                              const double* dx, const double* dy,
                                              const int* blockno,
                                              double q0[],double q1[],
                                              double q2[],double q3[],
                                              const double* tag_threshold,
+                                             const int* initflag,
                                              int* tag_patch);
 
 #define FCLAW2D_CLAWPATCH46_FORT_INTERPOLATE2FINE \
@@ -272,6 +273,37 @@ void FCLAW2D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK(int *mx, int *my, int *mbc,
                                                 double qpack[], int *psize,
                                                 int *packmode, int *ierror);
 
+
+
+/* ----------------------------- User convenience headers ----------------------------- */
+#define CLAWPATCH46_TAG4REFINEMENT FCLAW_F77_FUNC(clawpatch46_tag4refinement, \
+                                                 CLAWPATCH46_TAG4REFINEMENT)
+
+void CLAWPATCH46_TAG4REFINEMENT(const int* mx,const int* my,
+                               const int* mbc,const int* meqn,
+                               const double* xlower, const double* ylower,
+                               const double* dx, const double* dy,
+                               const int* blockno,
+                               double q[],
+                               const double* tag_threshold,
+                               const int* init_flag,
+                               int* tag_patch);
+
+
+
+#define CLAWPATCH46_TAG4COARSENING FCLAW_F77_FUNC(clawpatch46_tag4coarsening, \
+                                                CLAWPATCH46_TAG4COARSENING)
+
+void CLAWPATCH46_TAG4COARSENING(const int* mx, const int* my,
+                               const int* mbc, const int* meqn,
+                               double xlower[], double ylower[],
+                               const double* dx, const double* dy,
+                               const int* blockno,
+                               double q0[],double q1[],
+                               double q2[],double q3[],
+                               const double* tag_threshold,
+                               const int* initflag,
+                               int* tag_patch);
 
 
 

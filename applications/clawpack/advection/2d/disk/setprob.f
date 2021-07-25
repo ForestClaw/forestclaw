@@ -1,4 +1,4 @@
-      subroutine setprob
+      subroutine setprob()
       implicit none
 
       double precision pi

@@ -1,3 +1,5 @@
+
+
 ## ------------------------- Clawpack examples ----------------------
 ##
 ## Hyperbolic problems using Clawpack 4.6 and 5.0 
@@ -17,32 +19,62 @@
 ## Scalar advection 
 ## ----------------
 
-## swirl  (single block, square)
-include applications/clawpack/advection/2d/swirl/Makefile.am
-
-## filament  (square, multi-block disk)
-include applications/clawpack/advection/2d/filament/Makefile.am
-
 ## annulus  (manifold, periodic in one direction)
 include applications/clawpack/advection/2d/annulus/Makefile.am
-
-## latlong (manifold, periodic in one direction)
-include applications/clawpack/advection/2d/latlong/Makefile.am
 
 ## disk  (manifold, multi-block)
 include applications/clawpack/advection/2d/disk/Makefile.am
 
-## torus  (manifold, periodic in both directions)
-include applications/clawpack/advection/2d/torus/Makefile.am
-
-## replicated (square, multi-block)
-include applications/clawpack/advection/2d/replicated/Makefile.am
+## filament  (square, multi-block disk)
+include applications/clawpack/advection/2d/filament/Makefile.am
 
 ## hemisphere (manifold, multi-block)
 include applications/clawpack/advection/2d/hemisphere/Makefile.am
 
+## latlong (manifold, periodic in one direction)
+include applications/clawpack/advection/2d/latlong/Makefile.am
+
+## periodic (original)
+include applications/clawpack/advection/2d/periodic/Makefile.am
+
+## replicated (square, multi-block)
+include applications/clawpack/advection/2d/replicated/Makefile.am
+
 ## sphere (cubed-sphere and pillow-disk)
 include applications/clawpack/advection/2d/sphere/Makefile.am
+
+## swirl  (single block, square)
+include applications/clawpack/advection/2d/swirl/Makefile.am
+
+## torus  (manifold, periodic in both directions)
+include applications/clawpack/advection/2d/torus/Makefile.am
+
+## --------------------- Advection on the sphere ---------------------------- 
+## Examples from suite described by Lauritzen, et al.  See:
+##   "A standard test case suite for two-dimensional  linear
+##    transport on the sphere: results from a collection 
+##    of state-of-the-art schemes", Lauritzen, et al.
+##    Geosciences Model Development, 2014. 
+##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
+## -------------------------------------------------------------------------
+
+include applications/clawpack/advection/2d/gaussian/Makefile.am
+include applications/clawpack/advection/2d/correlatedcb/Makefile.am
+include applications/clawpack/advection/2d/slotted_disk/Makefile.am
+
+
+## ---------------------------- Transport --------------------------------- 
+## Example : Solve the variable velocity transport equation
+##
+##                   q_t + div(u q) = 0
+##
+## These examples use the fwave approach and can be used to test
+## conservation.
+## -----------------------------------------------------------------------
+
+include applications/clawpack/transport/2d/sphere/Makefile.am
+include applications/clawpack/transport/2d/torus/Makefile.am
+include applications/clawpack/transport/2d/square/Makefile.am
 
 ## ----------------------------------------------------------
 ## Other hyperbolic problems (acoustics, Euler, burgers, SWE)
@@ -57,29 +89,14 @@ include applications/clawpack/burgers/2d/pwconst/Makefile.am
 
 ## Shallow
 include applications/clawpack/shallow/2d/radialdam/Makefile.am
+include applications/clawpack/shallow/2d/bump/Makefile.am
 
 ## Euler
 include applications/clawpack/euler/2d/shockbubble/Makefile.am
 include applications/clawpack/euler/2d/quadrants/Makefile.am
 
 
-
-
-## ---------------------Transport on the sphere ---------------------------- 
-## Examples from suite described by Lauritzen, et al.  See:
-##   "A standard test case suite for two-dimensional  linear
-##    transport on the sphere: results from a collection 
-##    of state-of-the-art schemes", Lauritzen, et al.
-##    Geosciences Model Development, 2014. 
-##    http://www.geosci-model-dev.net/7/105/2014/gmd-7-105-2014.html
-## -------------------------------------------------------------------------
-
-include applications/clawpack/transport/gaussian/Makefile.am
-include applications/clawpack/transport/slotted_disk/Makefile.am
-include applications/clawpack/transport/correlatedcb/Makefile.am#
-
-
-## ---------------------Transport on the sphere ---------------------------- 
+## ------------------------- Simple example -------------------------------- 
 ## Example : Don't using the 'app' for configuring options;  
 ##           This is how you might call ForestClaw from another
 ##           program.

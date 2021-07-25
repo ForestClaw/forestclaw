@@ -29,9 +29,9 @@
       nghost = 2
       k = 1
 c     # Face 0
-      do mq = 1,meqn
-         do j = 1-nghost,my-mint
-            do ibc = 1-nghost,mint
+      do j = 1-nghost,my-mint
+         do ibc = 1-nghost,mint
+            do mq = 1,meqn
                if (packdata) then
                   qpack(k) = qdata(mq,ibc,j)
                else
@@ -40,10 +40,12 @@ c     # Face 0
                k = k + 1
             enddo
          enddo
+      end do
 
-c        # Face 2
-         do jbc = 1-nghost,mint
-            do i = mint+1,mx+nghost
+c     # Face 2
+      do jbc = 1-nghost,mint
+         do i = mint+1,mx+nghost
+            do mq = 1,meqn
                if (packdata) then
                   qpack(k) = qdata(mq,i,jbc)
                else
@@ -52,10 +54,12 @@ c        # Face 2
                k = k + 1
             enddo
          enddo
+      enddo
 
-c        # Face 1
-         do j = mint+1,my+nghost
-            do ibc = mx-mint+1,mx+nghost
+c     # Face 1
+      do j = mint+1,my+nghost
+         do ibc = mx-mint+1,mx+nghost
+            do mq = 1,meqn
                if (packdata) then
                   qpack(k) = qdata(mq,ibc,j)
                else
@@ -64,10 +68,12 @@ c        # Face 1
                k = k + 1
             enddo
          enddo
+      enddo 
 
-c        # Face 3
-         do jbc = my-mint+1,my+nghost
-            do i = 1-nghost,mx-mint
+c     # Face 3
+      do jbc = my-mint+1,my+nghost
+         do i = 1-nghost,mx-mint
+            do mq = 1,meqn
                if (packdata) then
                   qpack(k) = qdata(mq,i,jbc)
                else

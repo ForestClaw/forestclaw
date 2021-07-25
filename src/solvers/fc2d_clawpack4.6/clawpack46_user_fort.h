@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -106,6 +106,8 @@ void CLAWPACK46_RPT2(const int* ixy, const int* maxm, const int* meqn, const int
 
 
 
+/* These should actually be called CLAWPATCH46_TAG4REFINEMENT,  
+   CLAWPATCH46_TAG4COARSENING */
 #define CLAWPACK46_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack46_tag4refinement, \
                                                  CLAWPACK46_TAG4REFINEMENT)
 
@@ -126,12 +128,13 @@ void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my,
 
 void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my,
                                const int* mbc, const int* meqn,
-                               const double* xlower, const double* ylower,
+                               double xlower[], double ylower[],
                                const double* dx, const double* dy,
                                const int* blockno,
                                double q0[],double q1[],
                                double q2[],double q3[],
                                const double* tag_threshold,
+                               const int* initflag,
                                int* tag_patch);
 
 #ifdef __cplusplus

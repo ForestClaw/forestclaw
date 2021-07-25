@@ -36,6 +36,10 @@ extern "C"
 #endif
 #endif
 
+#if 0
+/* Needed to get syntax highlighting to work */
+#endif
+
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 
@@ -164,6 +168,25 @@ void FC2D_GEOCLAW_B4STEP2(const int* mbc,
                           const double* dx, const double* dy,
                           const double* t, const double* dt,
                           const int* maux, double aux[]);
+
+#if 0
+#define FC2D_GEOCLAW_CHECK_DTOPOTIME FCLAW_F77_FUNC(fc2d_geoclaw_check_dtopotime, 
+                                                    FC2D_GEOCLAW_CHECK_DTOPOTIME)
+int fc2d_geoclaw_check_dtopotime(double *t, double *tau);
+#endif
+
+
+#define FC2D_GEOCLAW_GET_DT_MAX_DTOPO FCLAW_F77_FUNC(fc2d_geoclaw_get_dt_max_dtopo, \
+                                                     FC2D_GEOCLAW_GET_DT_MAX_DTOPO)
+double FC2D_GEOCLAW_GET_DT_MAX_DTOPO();
+
+
+
+#define FC2D_GEOCLAW_GET_DTOPO_INTERVAL FCLAW_F77_FUNC(fc2d_geoclaw_get_dtopo_interval, \
+                                                       FC2D_GEOCLAW_GET_DTOPO_INTERVAL)
+void FC2D_GEOCLAW_GET_DTOPO_INTERVAL(double *tmin, double *tmax);
+
+
 
 #define FC2D_GEOCLAW_SRC2    FCLAW_F77_FUNC(fc2d_geoclaw_src2, FC2D_GEOCLAW_SRC2)
 void FC2D_GEOCLAW_SRC2(const int* meqn,

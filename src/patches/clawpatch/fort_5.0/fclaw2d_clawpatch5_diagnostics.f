@@ -6,13 +6,15 @@ c    # -------------------------------------------------------------------------
       implicit none
 
       integer mx,my,mbc,meqn
-      double precision dx, dy, dxdy
+      double precision dx, dy
       double precision sum(meqn)
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      include 'metric_terms.i'
+c      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
+      double precision dxdy
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
@@ -23,13 +25,13 @@ c    # -------------------------------------------------------------------------
          if (fclaw2d_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
-                  sum(m) = sum(m) + q(1,i,j)*area(i,j)
+                  sum(m) = sum(m) + q(m,i,j)*area(i,j)
                enddo
             enddo
          else
             do j = 1,my
                do i = 1,mx
-                  sum(m) = sum(m) + q(1,i,j)*dx*dy
+                  sum(m) = sum(m) + q(m,i,j)*dx*dy
                enddo
             enddo
          endif
@@ -46,11 +48,12 @@ c     # Compute area of a patch
 
       integer mx,my, mbc
       double precision dx, dy
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+
+c      include 'fclaw2d_metric_terms.i'
+
+      integer i,j
       double precision sum
-
-      include 'metric_terms.i'
-
-      integer i,j,m
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 
@@ -71,19 +74,20 @@ c     # Compute area of a patch
 
       end
 
-
-      subroutine fclaw2d_clawpatch5_fort_compute_error_norm(mx,my,
-     &      mbc,meqn, dx,dy,area,error,error_norm)
+      subroutine fclaw2d_clawpatch5_fort_compute_error_norm(
+     &      blockno,mx,my, mbc,meqn, dx,dy,area,error,error_norm)
       implicit none
 
-      integer mx,my,mbc,meqn
-      double precision dx, dy, dxdy, eij
+      integer mx,my,mbc,meqn, blockno
+      double precision dx, dy
       double precision error_norm(meqn,3)
       double precision error(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+      double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      include 'metric_terms.i'
+c      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
+      double precision dxdy, eij
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 

@@ -41,7 +41,9 @@ struct fclaw2d_patch;
 void fclaw2d_after_regrid(struct fclaw2d_global *glob);
 
 void fclaw2d_after_init(struct fclaw2d_global *glob);
-  
+
+
+/* ---------------------------------- Typedefs ---------------------------------------- */  
 typedef void (*fclaw2d_vtable_initialize_t)();
 
 typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
@@ -50,37 +52,18 @@ typedef void (*fclaw2d_output_frame_t)(struct fclaw2d_global * glob, int iframe)
 
 typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
 
-#if 0
-typedef void (*fclaw2d_time_sync_reset_t)(struct fclaw2d_global *glob, 
-										  int minlevel,int maxlevel, 
-										  int init);
-
-typedef void (*fclaw2d_time_sync_reset_samesize_t)(struct fclaw2d_global *glob, int level);
-#endif
-
-
 typedef void (*fclaw2d_after_initialization_t)(struct fclaw2d_global *glob);
 
-
-
-
+/* ------------------------------------ vtable ---------------------------------------- */  
 typedef struct fclaw2d_vtable
 {
 
 	fclaw2d_vtable_initialize_t          vtable_init;
-
 	fclaw2d_problem_setup_t              problem_setup;
-
 	fclaw2d_after_initialization_t       after_init;
 
 	/* regridding functions */
 	fclaw2d_after_regrid_t               after_regrid;
-
-#if 0
-	/* Time syncing */	
-	fclaw2d_time_sync_reset_t            time_sync_reset;
-	fclaw2d_time_sync_reset_samesize_t      time_sync_reset_samesize;
-#endif	
 
 	/* Output functions */
 	fclaw2d_output_frame_t               output_frame;

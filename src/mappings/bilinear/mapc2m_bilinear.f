@@ -9,7 +9,6 @@
       double precision a00(2), a01(2),a10(2), a11(2)
       double precision ll(2), lr(2), ul(2), ur(2)
       double precision shiftx(0:3), shifty(0:3)
-      double precision xp1,yp1,zp1
       integer m, i, j
 
       data ll/0,0/, ul/0, 1/, lr/1, 0/, ur/1,1/

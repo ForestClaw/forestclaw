@@ -1,27 +1,29 @@
-      subroutine radialdam_setprob(grav_in,x0_in,y0_in,r0_in,
-     &      hin_in,hout_in,example)
+      subroutine setprob()
       implicit none
 
-      double precision grav_in, x0_in, y0_in, r0_in, hin_in,hout_in
-      integer example
-      double precision grav,x0,y0,r0,hin,hout
-      integer idisc
-
+      double precision grav
       common /cparam/grav    !# gravitational parameter
+
+      double precision x0, y0, r0
       common/cdisc/ x0,y0,r0
+
+      double precision hin, hout
       common /comic/ hin,hout
-      common /comex/ idisc
 
-c     # These should be read in as options.
-      idisc = example
+      integer example
+      common /comex/ example
 
-      grav = grav_in
+      open(10,file='setprob.data')
 
-      x0 = x0_in
-      y0 = y0_in
-      r0 = r0_in
-      hin = hin_in
-      hout = hout_in
+      read(10,*) example
+      read(10,*) grav
+      read(10,*) x0
+      read(10,*) y0
+      read(10,*) r0
+      read(10,*) hin
+      read(10,*) hout
+      
+      close(10)
 
       return
       end

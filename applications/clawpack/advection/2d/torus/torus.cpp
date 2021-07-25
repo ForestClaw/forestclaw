@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,18 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "torus_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack5_options.h>
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
@@ -47,27 +35,27 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
-    /* Used locally */
-    double pi = M_PI;
-    double rotate[2];
-    int mi, mj, a,b;    
-
     /* ---------------------------------------------------------------
        Mapping geometry
        --------------------------------------------------------------- */
-    mi = fclaw_opt->mi;
-    mj = fclaw_opt->mj;
-    rotate[0] = pi*fclaw_opt->theta/180.0;
-    rotate[1] = 0;  /* Don't rotate through phi */
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
 
-    a = 1;  /* Torus is periodic in both directions */
-    b = 1;
+    int a = 1;  /* Torus is periodic in both directions */
+    int b = 1;
+
+    /* Used locally */
+    double pi = M_PI;
+    double rotate[2];
+
+    rotate[0] = pi*fclaw_opt->theta/180.0;
+    rotate[1] = pi*fclaw_opt->phi/180.0;
 
     /* This does both the regular torus and the twisted torus */
     conn  = p4est_connectivity_new_brick(mi,mj,a,b);
     brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont  = fclaw2d_map_new_torus(brick,fclaw_opt->scale,
-                                  fclaw_opt->shift,
+    cont  = fclaw2d_map_new_torus(brick,
+                                  fclaw_opt->scale,
                                   rotate,
                                   user->alpha,
                                   user->beta);
@@ -103,13 +91,6 @@ void run_program(fclaw2d_global_t* glob)
     }
     else if (user->claw_version == 5)
     {
-        fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-        if (fclaw_opt->time_sync != 0)
-        {
-            fclaw_global_essentialf("Conservation correction not yet implemented in " \
-                                    " claw-version=5.\n");
-            exit(0);
-        }
         fc2d_clawpack5_solver_initialize();
     }
 

@@ -18,6 +18,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_defs.h \
 	src/fclaw2d_options.h \
 	src/fclaw2d_advance.h \
+	src/fclaw2d_elliptic_solver.h \
 	src/fclaw2d_farraybox.hpp \
 	src/fclaw2d_global.h \
 	src/fclaw2d_forestclaw.h \
@@ -69,6 +70,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_convenience.c \
 	src/fclaw2d_exchange.c \
 	src/fclaw2d_advance.c \
+	src/fclaw2d_elliptic_solver.c \
 	src/fclaw2d_physical_bc.c \
 	src/fclaw2d_ghost_fill.c \
 	src/fclaw2d_output.c \

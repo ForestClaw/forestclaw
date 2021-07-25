@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,9 +33,6 @@ replicated_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user_opt->example, 0,
                         "[user] 0 - multi-block; 1 - single block [0]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 4,
-                        "[user] Clawpack version (4 or 5) [5]");
-
     sc_options_add_int (opt, 0, "replicate-factor", &user_opt->replicate_factor, 1,
                         "[user] Replication factor [-1]");
 
@@ -45,6 +42,18 @@ replicated_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "maxlevel-base", &user_opt->maxlevel_base, 7,
                         "[user] Block 1x1 maximum refinement [7]");
 
+    /* [user] User options */
+    sc_options_add_double (opt, 0, "uvel", &user_opt->uvel, 1,
+                           "[user] Velocity in x direction [1]");
+
+    sc_options_add_double (opt, 0, "vvel", &user_opt->vvel, 1,
+                           "[user] Velocity in y direction [1]");
+
+    sc_options_add_double (opt, 0, "revs-per-s", &user_opt->revs_per_s, 0.5,
+                           "[user] Revolutions per second [0.5]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 4,
+                        "[user] Clawpack version (4 or 5) [4]");
 
     user_opt->is_registered = 1;
     return NULL;

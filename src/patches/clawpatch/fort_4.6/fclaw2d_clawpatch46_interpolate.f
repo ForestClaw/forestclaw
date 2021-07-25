@@ -34,9 +34,9 @@ c     # ----------------------------------------------------------
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq,r2, m
-      integer i, ic1, ic2, ibc, ifine,i1
-      integer j, jc1, jc2, jbc, jfine,j1
-      integer ic_add, jc_add, ic, jc, mth
+      integer ibc, i1
+      integer jbc, j1
+      integer ic, jc, mth
       double precision gradx, grady, qc, sl, sr, value
       double precision fclaw2d_clawpatch_compute_slopes
 
@@ -87,10 +87,15 @@ c     # Create map :
          if (idir .eq. 0) then
 c           # this ensures that we get 'hanging' corners
 
+            do ibc = 1,mbc/2
             if (iface_coarse .eq. 0) then
-               ic = 1
+               ic = ibc
             elseif (iface_coarse .eq. 1) then
-               ic = mx
+               ic = mx - ibc + 1
+            else
+               write(6,*) 'interpolate : Problem with iface_coarse'
+               write(6,*) 'iface_coarse = ', iface_coarse
+               stop               
             endif
             do jc = 1,mx
                i1 = ic
@@ -127,14 +132,21 @@ c                 # Scaling is accounted for in 'shiftx' and 'shifty', below.
                   enddo
                endif
             enddo
+            enddo
          else
+            do jbc = 1,mbc/2
             if (iface_coarse .eq. 2) then
-               jc = 1
+               jc = jbc
             elseif (iface_coarse .eq. 3) then
-               jc = my
+c              // iface_coarse = 3
+               jc = my - jbc + 1
+            else
+               write(6,*) 'interpolate : Problem with iface_coarse'
+               write(6,*) 'iface_coarse = ', iface_coarse
+               stop
             endif
             do ic = 1,mx
-    1          i1 = ic
+               i1 = ic
                j1 = jc
                call fclaw2d_clawpatch_transform_face_half(i1,j1,i2,j2,
      &               transform_ptr)
@@ -175,6 +187,7 @@ c              # ---------------------------------------------
 
                endif                    !! Don't skip this grid
             enddo                       !! i loop
+            enddo                       !! end of jbc loop
          endif                          !! end idir branch
       enddo                             !! endo mq loop
 
@@ -190,7 +203,7 @@ c              # ---------------------------------------------
       double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qfine(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer ic, jc, mq, ibc,jbc, mth,i,j
+      integer ic, jc, mq, ibc,jbc, mth
       double precision qc, sl, sr, gradx, grady
       double precision fclaw2d_clawpatch_compute_slopes, value
 
@@ -203,7 +216,6 @@ c     # This should be refratio*refratio.
       integer a(2,2), f(2)
       integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
       double precision shiftx(0:rr2-1), shifty(0:rr2-1)
-      logical fclaw2d_clawpatch_check_indices
 
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
@@ -236,18 +248,24 @@ c           # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
 
       mth = 5
 
+      do ibc = 1,mbc/2
+      do jbc = 1,mbc/2
       if (icorner_coarse .eq. 0) then
-         ic = 1
-         jc = 1
+         ic = ibc
+         jc = jbc
       elseif (icorner_coarse .eq. 1) then
-         ic = mx
-         jc = 1
+         ic = mx - ibc + 1
+         jc = jbc
       elseif (icorner_coarse .eq. 2) then
-         ic = 1
-         jc = my
+         ic = ibc
+         jc = my - jbc + 1
       elseif (icorner_coarse .eq. 3) then
-         ic = mx
-         jc = my
+         ic = mx - ibc + 1
+         jc = my - jbc + 1
+      else
+         write(6,*) "interpolate : Problem with icorner_coarse"
+         write(6,*) "icorner_coarse = ", icorner_coarse
+         stop
       endif
 
 c     # Interpolate coarse grid corners to fine grid corner ghost cells
@@ -277,6 +295,8 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
             qfine(iff,jff,mq) = value
          enddo
 
+      enddo
+      enddo 
       enddo
 
       end

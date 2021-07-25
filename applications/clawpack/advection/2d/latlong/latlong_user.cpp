@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,23 +25,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "latlong_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-#include "fclaw2d_clawpatch.h"
-
-#include "../all/advection_user_fort.h"
+static
+void latlong_patch_setup(fclaw2d_global_t *glob,
+                         fclaw2d_patch_t *patch,
+                         int blockno,
+                         int patchno)
+{
+    const user_options_t* user = latlong_get_options(glob);
+    advection_patch_setup_manifold(glob,patch,blockno,patchno,
+                                   user->claw_version);
+}
 
 void latlong_link_solvers(fclaw2d_global_t *glob)
 {
-    const user_options_t   *user     =  latlong_get_options(glob);
-
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    patch_vt->setup = &latlong_patch_setup;
 
-    patch_vt->setup    = &latlong_patch_setup_manifold;
-
+    const user_options_t   *user = latlong_get_options(glob);
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
@@ -57,37 +57,5 @@ void latlong_link_solvers(fclaw2d_global_t *glob)
         claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
-    }
-}
-
-
-void latlong_patch_setup_manifold(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
-                                  int this_block_idx,
-                                  int this_patch_idx)
-{
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *aux,*xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    const user_options_t* user = latlong_get_options(glob);
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-
-    if (user->claw_version == 4)
-    {
-        USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                               &maux,aux,&this_block_idx,xd,yd,zd,area);
-    }
-    else if(user->claw_version == 5)
-    {
-        USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
-                              &maux,aux,&this_block_idx,xd,yd,zd,area);
     }
 }

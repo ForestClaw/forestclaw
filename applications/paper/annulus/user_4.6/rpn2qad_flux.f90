@@ -9,21 +9,19 @@ SUBROUTINE  rpn2qad_flux(meqn,maux,idir,iface,q,auxvec, &
     DOUBLE PRECISION q(meqn), flux(meqn)
     DOUBLE PRECISION auxvec(maux), auxvec_edge(maux)
 
-    DOUBLE PRECISION urot, nv(2), u(2)
+    DOUBLE PRECISION urot
     INTEGER m
 
-    u(1) = auxvec(2)
-    u(2) = auxvec(3)
+!!  # Get cell-centered velocity projected to face 
+!!  # 'iface' (in 0,1,2,3) 
+    urot = auxvec(2+iface)
 
-    nv(1) = auxvec(4+2*iface)
-    nv(2) = auxvec(5+2*iface)
-
-    urot = nv(1)*u(1) + nv(2)*u(2)
-
+!!  #  f(q) = (n dot u)*q
     DO m = 1,meqn
-        !! Don't scale the flux here 
+!!      # Don't multiply by edgelength (scaling is done elsewhere)
         flux(m) = urot*q(m)
     ENDDO
+
 
 END SUBROUTINE rpn2qad_flux
 

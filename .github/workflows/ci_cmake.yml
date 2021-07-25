@@ -1,0 +1,149 @@
+name: CI for CMake
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+
+
+jobs:
+
+  linux:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+    env:
+      CTEST_PARALLEL_LEVEL: 2
+
+    strategy:
+      matrix:
+        include:
+        - name: "Serial Minimal"
+          configure_flags: ""
+          ubuntu_packages: ""
+        - name: "Serial With Clawpack"
+          configure_flags: "-Dclawpack=ON"
+          ubuntu_packages: ""
+        - name: "Serial With GeoClaw"
+          configure_flags: "-Dgeoclaw=ON"
+          ubuntu_packages: ""
+        - name: "Serial With CudaClaw"
+          configure_flags: "-Dcudaclaw=ON"
+          ubuntu_packages: ""
+          cuda: true
+        - name: "MPI Minimal"
+          configure_flags: "-Dmpi=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With Clawpack"
+          configure_flags: "-Dmpi=ON -Dclawapck=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With GeoClaw"
+          configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With CudaClaw"
+          configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+          cuda: true
+        - name: "MPI With ThunderEgg"
+          configure_flags: "-Dmpi=ON -Dthunderegg=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
+
+    name: CMake ${{ matrix.name }} Build on Linux
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout source code
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -yq
+        sudo apt-get install -yq --no-install-recommends \
+            ninja-build ${{ matrix.ubuntu_packages }}
+
+    - name: Install Cuda Toolkit
+      if: matrix.cuda
+      run: |
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+        sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
+        sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
+        sudo apt-get update
+        sudo apt-get -y install cuda-toolkit-11-3
+
+    - name: CMake configure
+      run: cmake --preset ci -DCMAKE_INSTALL_PREFIX=~ ${{ matrix.configure_flags }}
+
+    - name: CMake build
+      run: cmake --build --preset ci
+
+    - name: CMake test
+      run: ctest --parallel 2 --output-on-failure
+      working-directory: build
+
+    - name: CMake install (for examples)
+      run: cmake --install build
+
+    - name: CMake configure examples
+      run: cmake -B applications/build -S applications --preset ci -DFORESTCLAW_ROOT=~
+
+    - name: CMake build examples
+      run: cmake --build applications/build
+
+    - name: Create package
+      if: github.event.action == 'published'
+      run: cpack --config build/CPackConfig.cmake
+
+    - name: Upload package
+      if: github.event.action == 'published'
+      uses: actions/upload-artifact@v1
+      with:
+        name: binary-archive
+        path: build/package
+
+
+  mac:
+    runs-on: macos-latest
+    name: CMake build on MacOS
+    timeout-minutes: 20
+    env:
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      CTEST_PARALLEL_LEVEL: 3
+      CC: gcc-10
+      CXX: g++-10
+      FC: gfortran-10
+
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout source code
+
+    - name: Install system dependencies
+      run: brew install open-mpi ninja fftw
+
+    - name: CMake configure
+      run: cmake --preset mac -DCMAKE_INSTALL_PREFIX=~ -Dclawpack=on -Dgeoclaw=on -Dthunderegg=on
+
+    - name: CMake build
+      run: cmake --build build
+
+    - name: CMake test
+      run: ctest --parallel 2 --output-on-failure
+      working-directory: build
+
+    - name: CMake install (for examples)
+      run: cmake --install build
+
+    - name: CMake configure examples
+      run: cmake -B applications/build -S applications -DFORESTCLAW_ROOT=~
+
+    - name: CMake build examples
+      run: cmake --build applications/build
+
+    - name: Create package
+      if: github.event.action == 'published'
+      run: cpack --config build/CPackConfig.cmake
+
+    - name: Upload package
+      if: github.event.action == 'published'
+      uses: actions/upload-artifact@v1
+      with:
+        name: binary-archive
+        path: build/package

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,18 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "hemisphere_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack5_options.h>
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt,
@@ -57,17 +45,16 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     switch (user_opt->example) {
     case 0:
-    case 1:
         conn = p4est_connectivity_new_disk (0, 0);
         cont = fclaw2d_map_new_pillowsphere5(fclaw_opt->scale,
-                                             fclaw_opt->shift,
-                                             rotate,user_opt->alpha);
+                                             rotate,
+                                             user_opt->alpha);
         break;
-    case 2:
+
+    case 1:
         /* Map unit square to disk using mapc2m_disk.f */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
-                                            fclaw_opt->shift,
                                             rotate);
         break;
     default:
@@ -83,27 +70,20 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t           *user_opt;
-
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user_opt = hemisphere_get_options(glob);
-
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
+    const user_options_t *user_opt = hemisphere_get_options(glob);
     if (user_opt->claw_version == 4)
-    {
         fc2d_clawpack46_solver_initialize();
-    }
     else if (user_opt->claw_version == 5)
-    {
         fc2d_clawpack5_solver_initialize();
-    }
 
     hemisphere_link_solvers(glob);
 

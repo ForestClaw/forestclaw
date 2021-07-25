@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -52,8 +52,6 @@ typedef struct user_options
 } user_options_t;
 
 
-void shockbubble_problem_setup(fclaw2d_global_t* glob);
-
 void shockbubble_link_solvers(fclaw2d_global_t *glob);
 
 user_options_t* shockbubble_options_register (fclaw_app_t * app,
@@ -62,15 +60,6 @@ user_options_t* shockbubble_options_register (fclaw_app_t * app,
 void shockbubble_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 user_options_t* shockbubble_get_options(fclaw2d_global_t* glob);
-
-/* ------------------------------- Fortran code --------------------------------------- */
-
-#define SHOCKBUBBLE_SETPROB FCLAW_F77_FUNC(shockbubble_setprob, SHOCKBUBBLE_SETPROB)
-void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0,
-                         const double* r0, const double* rhoin,
-                         const double* pinf, const int* idisc);
-
-
 
 #ifdef __cplusplus
 #if 0
