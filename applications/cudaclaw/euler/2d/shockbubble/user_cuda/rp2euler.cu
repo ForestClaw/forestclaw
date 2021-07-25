@@ -8,8 +8,13 @@ __constant__ double s_gamma;
 __constant__ double s_gamma1;
 
 
-void setprob_cuda(double gamma)
+void setprob_cuda()
 {
+    double gamma;
+    FILE *f = fopen("setprob.data","r");
+    fscanf(f,"%lf",&gamma);
+    fclose(f);    
+
     double gamma1 = gamma - 1.0;
     CHECK(cudaMemcpyToSymbol(s_gamma, &gamma, sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_gamma1, &gamma1, sizeof(double)));
