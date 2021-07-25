@@ -120,6 +120,9 @@ endif
 # ----------------------------------------
 if FCLAW_ENABLE_ACTIVEFLUX
 
+## Solver library
+#include src/patches/clawpatch/Makefile.am
+
 ## Patches needed for Active Flux solver
 #include src/patches/clawpatch/Makefile.am
 
