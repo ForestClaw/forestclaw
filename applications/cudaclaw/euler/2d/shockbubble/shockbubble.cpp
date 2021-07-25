@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shockbubble_user.h"
 
+#include <fc2d_cuda_profiler.h>
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
