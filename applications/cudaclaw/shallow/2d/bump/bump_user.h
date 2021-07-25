@@ -27,15 +27,21 @@
 #define BUMP_USER_H
 
 #include <fc2d_cudaclaw.h>
+#include <fc2d_cudaclaw_options.h>
+#include <cudaclaw_user_fort.h>
 
 #include <fclaw2d_include_all.h>
+
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
 #endif
+
+#if 0
+/* Fix syntax highlighting */
 #endif
 
 typedef struct user_options
@@ -60,11 +66,21 @@ void bump_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 void bump_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 void bump_assign_speeds(cudaclaw_cuda_speeds_t *speeds);
 
-void bump_setprob_cuda(double grav);
+void setprob_cuda();
+
+void bump_link_solvers(fclaw2d_global_t *glob);
+
+user_options_t* bump_options_register (fclaw_app_t * app,
+                                       const char *configfile);
+
+void bump_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
+user_options_t* bump_get_options(fclaw2d_global_t* glob);
 
 
 /* --------------------------------------- non-Cuda ----------------------------------------*/
 
+#if 0
 #define BUMP_SETPROB FCLAW_F77_FUNC(bump_setprob, BUMP_SETPROB)
 void BUMP_SETPROB();
 
@@ -83,17 +99,6 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double area[]);
 
 
-
-void bump_problem_setup(fclaw2d_global_t *glob);
-void bump_link_solvers(fclaw2d_global_t *glob);
-
-user_options_t* bump_options_register (fclaw_app_t * app,
-                                          const char *configfile);
-
-void bump_options_store (fclaw2d_global_t* glob, user_options_t* user);
-
-user_options_t* bump_get_options(fclaw2d_global_t* glob);
-
 void bump_patch_setup(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
@@ -109,11 +114,10 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                   const double alpha);
 
+#endif
+
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

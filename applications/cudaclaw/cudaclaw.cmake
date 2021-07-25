@@ -7,12 +7,12 @@
 add_subdirectory(cudaclaw/advection/2d/swirl)
 
 # Shallow water wave equations
-#add_subdirectory(clawpack/shallow/2d/bump_cuda)
-#add_subdirectory(clawpack/shallow/2d/radialdam_cuda)
-#add_subdirectory(clawpack/shallow/2d/tsunami_cuda)
+add_subdirectory(cudaclaw/shallow/2d/bump)
+#add_subdirectory(cudaclaw/shallow/2d/radialdam)
+#add_subdirectory(cudaclaw/shallow/2d/tsunami)
 
 # Acoustics
-#add_subdirectory(clawpack/acoustics/2d/radial_cuda)
+#add_subdirectory(cudaclaw/acoustics/2d/radial)
 
 # Euler equations
 add_subdirectory(cudaclaw/euler/2d/shockbubble)

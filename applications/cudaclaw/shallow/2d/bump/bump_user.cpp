@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,81 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "bump_user.h"
 
-#include <fclaw2d_clawpatch.h>
 
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-#include <fc2d_cudaclaw.h>
-
-#include "../rp/shallow_user_fort.h"
-
-void bump_link_solvers(fclaw2d_global_t *glob)
-{
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
-
-    vt->problem_setup = &bump_problem_setup;  /* Version-independent */
-
-    const user_options_t* user = bump_get_options(glob);
-    if(user->cuda)
-    {
-        fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt();
-
-        cuclaw_vt->fort_qinit     = &CLAWPACK46_QINIT;
-
-        bump_assign_rpn2(&cuclaw_vt->cuda_rpn2);
-        FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
-
-        bump_assign_rpt2(&cuclaw_vt->cuda_rpt2);
-        FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);
-
-        bump_assign_speeds(&cuclaw_vt->cuda_speeds);
-        FCLAW_ASSERT(cuclaw_vt->cuda_speeds != NULL);
-    }
-    else 
-    {
-        if (user->claw_version == 4)
-        {
-            fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-            fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
-
-            claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
-            claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
-            claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
-
-            /* Avoid tagging block corners in 5 patch example*/
-            clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
-            clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
-        }
-        else if (user->claw_version == 5)
-        {
-            fc2d_clawpack5_vtable_t    *claw5_vt = fc2d_clawpack5_vt();
-
-            claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-
-            if (user->example == 0)
-            {
-                claw5_vt->fort_rpn2 = &CLAWPACK5_RPN2;
-                claw5_vt->fort_rpt2 = &CLAWPACK5_RPT2;
-            }
-            else if (user->example == 1)
-            {
-                fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-                fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt();
-
-                patch_vt->setup = &bump_patch_setup;
-
-                claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;
-                claw5_vt->fort_rpt2  = &CLAWPACK5_RPT2_MANIFOLD;
-
-                /* Avoid tagging block corners in 5 patch example*/
-                clawpatch_vt->fort_tag4refinement = &CLAWPACK5_TAG4REFINEMENT;
-                clawpatch_vt->fort_tag4coarsening = &CLAWPACK5_TAG4COARSENING;
-            }
-        }
-    }
-}
-
-
+static
 void bump_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = bump_get_options(glob);
@@ -107,20 +34,37 @@ void bump_problem_setup(fclaw2d_global_t* glob)
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
-        fprintf(f,  "%-24d   %s",user->example,"\% example\n");
         fprintf(f,  "%-24.16f   %s",user->gravity,"\% gravity\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
-    BUMP_SETPROB();
 
-    if (user->cuda == 1)
-    {
-        bump_setprob_cuda(user->gravity);
-    }
+    setprob_cuda();
 }
 
 
+void bump_link_solvers(fclaw2d_global_t *glob)
+{
+    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    vt->problem_setup = &bump_problem_setup;  /* Version-independent */
+
+    //const user_options_t* user = bump_get_options(glob);
+
+    fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt();
+    cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
+
+    bump_assign_rpn2(&cuclaw_vt->cuda_rpn2);
+    FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
+
+    bump_assign_rpt2(&cuclaw_vt->cuda_rpt2);
+    FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);
+
+    bump_assign_speeds(&cuclaw_vt->cuda_speeds);
+    FCLAW_ASSERT(cuclaw_vt->cuda_speeds != NULL);
+}
+
+
+#if 0
 void bump_patch_setup(fclaw2d_global_t *glob,
                            fclaw2d_patch_t *this_patch,
                            int this_block_idx,
@@ -159,3 +103,4 @@ void bump_patch_setup(fclaw2d_global_t *glob,
                           ynormals,ytangents,
                           surfnormals,area);
 }
+#endif

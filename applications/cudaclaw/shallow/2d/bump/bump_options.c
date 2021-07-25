@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,14 @@ static int s_user_options_package_id = -1;
 static void *
 bump_register (user_options_t* user, sc_options_t * opt)
 {
+   sc_options_add_int (opt, 0, "example", &user->example, 0,
+                           "Example [0]");
     /* [user] User options */
-    sc_options_add_int (opt, 0, "example", &user->example, 0, "[user] example [0]");
-    sc_options_add_bool (opt, 0, "cuda", &user->cuda, 1, "[user] cuda [T]");
-    sc_options_add_int (opt, 0, "mapping", &user->mapping, 0, "[user] mapping [0]");
+    sc_options_add_double (opt, 0, "gravity", &user->gravity, 1.0, 
+                           "[user] gravity [1.0]");
 
-    sc_options_add_double (opt, 0, "gravity",     &user->gravity,     1.0, "[user] gravity [1.0]");
-    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4, 
-                           "[user] alpha (for 5-patch map) [0.4]");
-
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
-                           "Clawpack_version (4 or 5) [5]");
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
+                           "Clawpack_version (4 only) [4]");
 
     user->is_registered = 1;
     return NULL;
@@ -51,11 +48,6 @@ bump_check (user_options_t *user)
 {
     if (user->example != 0) {
         fclaw_global_essentialf ("Option --user:example must be 0\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    if (user->mapping == 1 && user->claw_version == 4)
-    {
-        fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;

@@ -1,16 +1,19 @@
 #include "../bump_user.h"
 
 #include <fc2d_cudaclaw.h>
-//#include <fclaw_base.h>  /* Needed for SC_MIN, SC_MAX */
-//#include <cassert>
 
 #include <fc2d_cudaclaw_check.h>
 
 __constant__ double s_grav;
 
 
-void bump_setprob_cuda(double grav)
+void setprob_cuda()
 {
+    double grav;
+    FILE *f = fopen("setprob.data","r");
+    fscanf(f,"%lf",&grav);
+    fclose(f);
+    
     CHECK(cudaMemcpyToSymbol(s_grav,  &grav, sizeof(double)));
 }
 
