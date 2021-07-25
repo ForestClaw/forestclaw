@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-logical(kind=4) function user_exceeds_threshold(blockno,& 
+integer function user_exceeds_threshold(blockno,& 
                                      qval,qmin,qmax,quad, & 
                                      dx,dy,xc,yc,threshold, &
                                      init_flag, is_ghost)
@@ -9,13 +9,11 @@ logical(kind=4) function user_exceeds_threshold(blockno,&
     double precision :: qval,qmin,qmax,threshold
     double precision :: quad(-1:1,-1:1)
     double precision :: dx,dy, xc, yc
-    integer :: blockno, init_flag
+    integer :: blockno, init_flag, is_ghost, refine
 
-    logical(kind=4) :: exceeds_th, refine, is_ghost
-
-    refine = .false.
+    refine = 0
     if (qval .gt. threshold .and. qval .lt. 1-threshold) then
-        refine = .true.
+        refine = 1
     endif
 
     user_exceeds_threshold = refine
