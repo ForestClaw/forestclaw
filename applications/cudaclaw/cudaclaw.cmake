@@ -15,4 +15,4 @@ add_subdirectory(cudaclaw/advection/2d/swirl)
 #add_subdirectory(clawpack/acoustics/2d/radial_cuda)
 
 # Euler equations
-#add_subdirectory(clawpack/euler/2d/shockbubble_cuda)
+add_subdirectory(cudaclaw/euler/2d/shockbubble)
