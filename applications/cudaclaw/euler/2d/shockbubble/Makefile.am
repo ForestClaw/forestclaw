@@ -1,37 +1,37 @@
 ## Makefile.am in applications/cudaclaw/euler/2d/shockbubble
 
-bin_PROGRAMS += applications/cudaclaw/euler/2d/shockbubble_cuda/shockbubble
+bin_PROGRAMS += applications/cudaclaw/euler/2d/shockbubble/shockbubble
 
 
-applications_cudaclaw_euler_2d_shockbubble_cuda_shockbubble_SOURCES = \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/shockbubble.cpp \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/shockbubble_options.c \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/shockbubble_user.cpp \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/shockbubble_user.h \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/fdisc.f \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/setprob.f90 \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/user_cuda/rp2euler.cu \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/user_4.6/qinit.f90 \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/user_4.6/bc2.f \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/user_4.6/src2.f
+applications_cudaclaw_euler_2d_shockbubble_shockbubble_SOURCES = \
+	applications/cudaclaw/euler/2d/shockbubble/shockbubble.cpp \
+	applications/cudaclaw/euler/2d/shockbubble/shockbubble_options.c \
+	applications/cudaclaw/euler/2d/shockbubble/shockbubble_user.cpp \
+	applications/cudaclaw/euler/2d/shockbubble/shockbubble_user.h \
+	applications/cudaclaw/euler/2d/shockbubble/fdisc.f \
+	applications/cudaclaw/euler/2d/shockbubble/setprob.f90 \
+	applications/cudaclaw/euler/2d/shockbubble/user_cuda/rp2euler.cu \
+	applications/cudaclaw/euler/2d/shockbubble/user_4.6/qinit.f90 \
+	applications/cudaclaw/euler/2d/shockbubble/user_4.6/bc2.f \
+	applications/cudaclaw/euler/2d/shockbubble/user_4.6/src2.f
 
 EXTRA_DIST += \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/fclaw_options.ini \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/regression.ini \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/afterframe.m \
-	applications/cudaclaw/euler/2d/shockbubble_cuda/setplot2.m
+	applications/cudaclaw/euler/2d/shockbubble/fclaw_options.ini \
+	applications/cudaclaw/euler/2d/shockbubble/regression.ini \
+	applications/cudaclaw/euler/2d/shockbubble/afterframe.m \
+	applications/cudaclaw/euler/2d/shockbubble/setplot2.m
 
-applications_cudaclaw_euler_2d_shockbubble_cuda_shockbubble_CPPFLAGS = \
+applications_cudaclaw_euler_2d_shockbubble_shockbubble_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CUDACLAW_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-SHOCKBUBBLE_DIR = applications/cudaclaw/euler/2d/shockbubble_cuda
+SHOCKBUBBLE_DIR = applications/cudaclaw/euler/2d/shockbubble
 
-applications_cudaclaw_euler_2d_shockbubble_cuda_shockbubble_LDADD = \
+applications_cudaclaw_euler_2d_shockbubble_shockbubble_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
-        $(FCLAW_CUDACLAW_LDADD) \
+        $(FCLAWCLAW_LDADD) \
         $(FCLAW_LDADD) \
 		$(SHOCKBUBBLE_DIR)/user_cuda/devicelink.o
 
