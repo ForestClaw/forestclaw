@@ -3,9 +3,9 @@
 add_library(shockbubble_cuda_f OBJECT 
   fdisc.f 
   setprob.f90 
-  user_4.6/qinit.f90
-  user_4.6/bc2.f 
-  user_4.6/src2.f 
+  user_cuda/qinit.f90
+  user_cuda/bc2.f 
+  user_cuda/src2.f 
 )
 
 add_executable(shockbubble_cuda 

@@ -11,9 +11,9 @@ applications_cudaclaw_euler_2d_shockbubble_shockbubble_SOURCES = \
 	applications/cudaclaw/euler/2d/shockbubble/fdisc.f \
 	applications/cudaclaw/euler/2d/shockbubble/setprob.f90 \
 	applications/cudaclaw/euler/2d/shockbubble/user_cuda/rp2euler.cu \
-	applications/cudaclaw/euler/2d/shockbubble/user_4.6/qinit.f90 \
-	applications/cudaclaw/euler/2d/shockbubble/user_4.6/bc2.f \
-	applications/cudaclaw/euler/2d/shockbubble/user_4.6/src2.f
+	applications/cudaclaw/euler/2d/shockbubble/user_cuda/qinit.f90 \
+	applications/cudaclaw/euler/2d/shockbubble/user_cuda/bc2.f \
+	applications/cudaclaw/euler/2d/shockbubble/user_cuda/src2.f
 
 EXTRA_DIST += \
 	applications/cudaclaw/euler/2d/shockbubble/fclaw_options.ini \

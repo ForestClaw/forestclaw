@@ -29,9 +29,9 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
     double precision :: xlow, ylow, win
     double precision :: rhoin, rhoout, pout, pin, pinf
 
-    integer :: blockno, fc2d_clawpack46_get_block
+    integer :: blockno, fc2d_cudaclaw_get_block
 
-    blockno = fc2d_clawpack46_get_block()
+    blockno = fc2d_cudaclaw_get_block()
 
     if (idisc .ne. 2) then
         write(6,*) 'qinit.f : idisc must be 2 for this example.'
