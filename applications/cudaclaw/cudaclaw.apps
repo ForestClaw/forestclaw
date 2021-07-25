@@ -15,4 +15,4 @@ include applications/cudaclaw/advection/2d/swirl/Makefile.am
 #include applications/cudaclaw/acoustics/2d/radial_cuda/Makefile.am
 
 # Euler equations
-include applications/cudaclaw/euler/2d/shockbubble/Makefile.am
+#include applications/cudaclaw/euler/2d/shockbubble/Makefile.am
