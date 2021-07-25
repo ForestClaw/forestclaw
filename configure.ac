@@ -49,9 +49,6 @@ FCLAW_ARG_ENABLE([activeflux], [Enable activeflux project],
 FCLAW_ARG_ENABLE([thunderegg], [Enable thunderegg solver],
                  [THUNDEREGG])
 
-FCLAW_ARG_ENABLE([magicforest], [Enable magicforest solver],
-                 [MAGICFOREST])
-
 echo "o---------------------------------------"
 echo "| Checking MPI and related programs"
 echo "o---------------------------------------"

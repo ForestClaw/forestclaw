@@ -70,14 +70,14 @@ endif
 if FCLAW_ENABLE_PAPER
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
-#include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 
 # Development projects
-#include applications/paper/paper.apps
+include applications/paper/paper.apps
 
 endif
 
@@ -89,13 +89,13 @@ endif
 if FCLAW_ENABLE_GEOCLAW
 
 ## Patches needed for GeoClaw solvers
-#include src/patches/clawpatch/Makefile.am
+include src/patches/clawpatch/Makefile.am
 
 ## Solver library
-#include src/solvers/fc2d_geoclaw/Makefile.am
+include src/solvers/fc2d_geoclaw/Makefile.am
 
 ## Examples
-#include applications/geoclaw/geoclaw.apps
+include applications/geoclaw/geoclaw.apps
 
 endif
 
@@ -131,44 +131,25 @@ if FCLAW_ENABLE_ACTIVEFLUX
 
 endif
 
+
 # ----------------------------------
 # CudaClaw library and examples
 # ----------------------------------
 if FCLAW_ENABLE_CUDACLAW
 
 ## Patches needed for Clawpack solvers
-#include src/patches/clawpatch/Makefile.am
-
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
-#include src/solvers/fc2d_clawpack5/Makefile.am
-#include src/solvers/fc2d_cudaclaw/Makefile.am
-
-#include applications/cudaclaw.apps
-
-endif
-
-# --------------------------------------------
-# Magic Forest
-# --------------------------------------------
-
-if FCLAW_ENABLE_MAGICFOREST
-
-## Patches needed for Clawpack solvers
 include src/patches/clawpatch/Makefile.am
 
-## Solver libraries (most example apps require both)
-include src/solvers/fc2d_clawpack4.6/Makefile.am 
-include src/solvers/fc2d_clawpack5/Makefile.am 
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_cudaclaw/Makefile.am
 
-## examples
-include magicforest/Makefile.am
+include applications/cudaclaw.apps
+
 
 endif
 
-
-# --------------------------------------------
 # Include examples that use the low-level interface to p4est
 # They should always compile
-# --------------------------------------------
 
 include applications/lowlevel/Makefile.am
