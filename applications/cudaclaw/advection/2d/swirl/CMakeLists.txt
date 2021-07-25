@@ -9,7 +9,6 @@ add_executable(swirl_cuda
   swirl_user.cpp 
   swirl.cpp 
   swirl_options.c
-  setprob.cu
 	user_cuda/rpn2adv.cu
 	user_cuda/rpt2adv.cu
 	user_cuda/b4step2.cu
