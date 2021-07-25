@@ -69,4 +69,4 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
         enddo
 
     return
-end subroutine clawpack46_qinit
+end subroutine cudaclaw_qinit
