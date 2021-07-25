@@ -86,9 +86,9 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
 
     //fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
     fc2d_cudaclaw_vtable_t *cuclaw_vt   = fc2d_cudaclaw_vt();
-    cuclaw_vt->fort_qinit  = &CLAWPACK46_QINIT;
-    cuclaw_vt->fort_bc2    = &CLAWPACK46_BC2;   /* Special  BCs at left edge */
-    cuclaw_vt->fort_src2   = &CLAWPACK46_SRC2;  /* To simulate axis-symmetric */
+    cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
+    cuclaw_vt->fort_bc2    = &CUDACLAW_BC2;   /* Special  BCs at left edge */
+    cuclaw_vt->fort_src2   = &CUDACLAW_SRC2;  /* To simulate axis-symmetric */
 
     shockbubble_assign_rpn2(&cuclaw_vt->cuda_rpn2);
     FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
