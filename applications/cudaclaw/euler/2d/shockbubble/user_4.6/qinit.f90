@@ -67,6 +67,7 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
                 q(i,j,4) = einf
             endif
         enddo
+    enddo
 
     return
 end subroutine cudaclaw_qinit
