@@ -8,7 +8,7 @@ __constant__ double s_gamma;
 __constant__ double s_gamma1;
 
 
-void shockbubble_setprob_cuda(double gamma)
+void setprob_cuda(double gamma)
 {
     double gamma1 = gamma - 1.0;
     CHECK(cudaMemcpyToSymbol(s_gamma, &gamma, sizeof(double)));

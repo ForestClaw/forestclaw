@@ -32,6 +32,7 @@
 #include <fclaw2d_include_all.h>
 
 #include <fc2d_cudaclaw.h>
+#include <cudaclaw_user_fort.h>
 
 #include <fc2d_cudaclaw_cuda.h>
 #include <fc2d_cudaclaw_options.h>
@@ -75,8 +76,8 @@ user_options_t* shockbubble_get_options(fclaw2d_global_t* glob);
 /* ------------------------------- Fortran code --------------------------------------- */
 
 #if 0
-#define SHOCKBUBBLE_SETPROB FCLAW_F77_FUNC(shockbubble_setprob, SHOCKBUBBLE_SETPROB)
-void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0,
+#define SETPROB FCLAW_F77_FUNC(setprob, SETPROB)
+void SETPROB(const double *gamma, const double* x0, const double* y0,
                          const double* r0, const double* rhoin,
                          const double* pinf, const int* idisc);
 #endif
@@ -84,7 +85,7 @@ void SHOCKBUBBLE_SETPROB(const double *gamma, const double* x0, const double* y0
 
 
 /* ---------------------------------- Cuda code --------------------------------------- */
-void shockbubble_setprob_cuda();
+void setprob_cuda();
 
 void shockbubble_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 

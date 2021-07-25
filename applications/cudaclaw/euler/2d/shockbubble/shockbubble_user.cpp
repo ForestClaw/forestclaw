@@ -49,7 +49,7 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
     setprob_cuda();    
 
     /* Call Fortran setprob to get parameters needed for qinit */
-    setprob();
+    SETPROB();
 }
 
 
