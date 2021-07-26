@@ -40,28 +40,9 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
-    /* Local variables */
-    double rotate[2];
-
-    rotate[0] = fclaw_opt->phi;
-    rotate[1] = fclaw_opt->theta;
-
-    switch (user->example)
-    {
-    case 0:
-        /* Use [ax,bx]x[ay,by] */
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_nomap();
-        break;
-    case 1:
-        conn = p4est_connectivity_new_disk (0, 0);
-        cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,fclaw_opt->shift,
-                                            rotate,user->alpha);
-        break;
-    default:
-        SC_ABORT_NOT_REACHED ();
-    }
-
+    /* Use [ax,bx]x[ay,by] */
+    conn = p4est_connectivity_new_unitsquare();
+    cont = fclaw2d_map_new_nomap();
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
