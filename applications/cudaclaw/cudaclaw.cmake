@@ -12,7 +12,7 @@ add_subdirectory(cudaclaw/shallow/2d/bump)
 #add_subdirectory(cudaclaw/shallow/2d/tsunami)
 
 # Acoustics
-#add_subdirectory(cudaclaw/acoustics/2d/radial)
+add_subdirectory(cudaclaw/acoustics/2d/radial)
 
 # Euler equations
 add_subdirectory(cudaclaw/euler/2d/shockbubble)
