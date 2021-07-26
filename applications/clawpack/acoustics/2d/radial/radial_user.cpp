@@ -25,16 +25,76 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "radial_user.h"
 
-#include <fclaw2d_include_all.h>
+static
+void radial_problem_setup(fclaw2d_global_t* glob)
+{
+    user_options_t* user = radial_get_options(glob);
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch46_fort.h>
-#include <fclaw2d_clawpatch5_fort.h>
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24.16f   %s",user->rho,"\% rho\n");
+        fprintf(f,  "%-24.16f   %s",user->bulk,"\% bulk\n");
+        fclose(f);
+    }
 
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
+    /* We want to make sure node 0 gets here before proceeding */
+    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+ 
+    /* rho, bulk are inputs; cc and zz are outputs.  Results are
+       stored in a common block */
+    SETPROB();
+}
 
-#include "../rp/acoustics_user_fort.h"
+static
+void radial_patch_setup(fclaw2d_global_t *glob,
+                        fclaw2d_patch_t *patch,
+                        int blockno,
+                        int patchno)
+{
+    if (fclaw2d_patch_is_ghost(patch))
+    {
+        /* Mapped info is needed only for an update */
+        return;
+    }
+
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+    double *xp,*yp,*zp;
+    double *xd,*yd,*zd,*area;
+    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+                                  &xd,&yd,&zd,&area);
+
+    double *xnormals,*ynormals,*xtangents,*ytangents;
+    double *surfnormals,*edgelengths,*curvature;
+    fclaw2d_clawpatch_metric_data2(glob,patch,
+                                   &xnormals,&ynormals,
+                                   &xtangents,&ytangents,
+                                   &surfnormals,&edgelengths,
+                                   &curvature);
+
+    int maux;
+    double* aux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+
+    const user_options_t* user = radial_get_options(glob);
+    if (user->claw_version == 4)
+    {
+        CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                                   &dx,&dy,&maux,aux,
+                                   xnormals,ynormals,edgelengths,area);
+    }
+    else if (user->claw_version == 5)
+    {
+        CLAWPACK5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
+                                  &dx,&dy,&maux,aux,
+                                  xnormals,ynormals,edgelengths,area);
+
+    }
+}
 
 void radial_link_solvers(fclaw2d_global_t *glob)
 {
@@ -87,71 +147,4 @@ void radial_link_solvers(fclaw2d_global_t *glob)
     }
 }
 
-void radial_problem_setup(fclaw2d_global_t* glob)
-{
-    user_options_t* user = radial_get_options(glob);
 
-    if (glob->mpirank == 0)
-    {
-        FILE *f = fopen("setprob.data","w");
-        fprintf(f,  "%-24.16f   %s",user->rho,"\% rho\n");
-        fprintf(f,  "%-24.16f   %s",user->bulk,"\% bulk\n");
-        fclose(f);
-    }
-
-    /* We want to make sure node 0 gets here before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
- 
-    /* rho, bulk are inputs; cc and zz are outputs.  Results are
-       stored in a common block */
-    RADIAL_SETPROB();
-}
-
-void radial_patch_setup(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx)
-{
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *aux,*xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    double *xnormals,*ynormals,*xtangents,*ytangents;
-    double *surfnormals,*edgelengths,*curvature;
-
-    if (fclaw2d_patch_is_ghost(this_patch))
-    {
-        /* Mapped info is needed only for an update */
-        return;
-    }
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    fclaw2d_clawpatch_metric_data2(glob,this_patch,
-                                   &xnormals,&ynormals,
-                                   &xtangents,&ytangents,
-                                   &surfnormals,&edgelengths,
-                                   &curvature);
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-
-    const user_options_t* user = radial_get_options(glob);
-
-    if (user->claw_version == 4)
-    {
-        CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                                   &dx,&dy,&maux,aux,
-                                   xnormals,ynormals,edgelengths,area);
-    }
-    else if (user->claw_version == 5)
-    {
-        CLAWPACK5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                                  &dx,&dy,&maux,aux,
-                                  xnormals,ynormals,edgelengths,area);
-
-    }
-}
