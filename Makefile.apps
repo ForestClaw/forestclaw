@@ -141,7 +141,7 @@ include src/patches/clawpatch/Makefile.am
 
 include src/solvers/fc2d_cudaclaw/Makefile.am
 
-include applications/cudaclaw/cudaclaw.apps
+include applications/cudaclaw.apps
 
 endif
 
@@ -167,19 +167,19 @@ endif
 # Magic Forest
 # --------------------------------------------
 
-if ENABLE_MAGIC_FOREST
-
-## Patches needed for Clawpack solvers
-include src/patches/clawpatch/Makefile.am
-
-## Solver libraries (most example apps require both)
-include src/solvers/fc2d_clawpack4.6/Makefile.am 
-include src/solvers/fc2d_clawpack5.0/Makefile.am 
-
-## examples
-include applications/magic.apps
-
-endif
+#if ENABLE_MAGIC_FOREST
+#
+### Patches needed for Clawpack solvers
+##include src/patches/clawpatch/Makefile.am
+#
+### Solver libraries (most example apps require both)
+##include src/solvers/fc2d_clawpack4.6/Makefile.am 
+##include src/solvers/fc2d_clawpack5.0/Makefile.am 
+#
+### examples
+##include applications/magic.apps
+#
+#endif
 
 
 # --------------------------------------------
