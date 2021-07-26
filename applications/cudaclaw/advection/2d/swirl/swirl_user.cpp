@@ -57,9 +57,6 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 
 	cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
 		
-	cudaclaw_vt->fort_setaux = NULL;
-	patch_vt->setup = NULL;   /* Don't call setaux at all for this problem */
-		
 	//cudaclaw_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
 	swirl_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
 	FCLAW_ASSERT(cudaclaw_vt->cuda_rpn2 != NULL);

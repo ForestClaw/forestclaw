@@ -2,12 +2,13 @@
 
 bin_PROGRAMS += applications/cudaclaw/advection/2d/swirl/swirl_cuda
 
+TESTS += applications/cudaclaw/advection/2d/swirl/regressions.sh
+
 applications_cudaclaw_advection_2d_swirl_swirl_cuda_SOURCES = \
 	applications/cudaclaw/advection/2d/swirl/swirl_user.cpp \
 	applications/cudaclaw/advection/2d/swirl/swirl_options.c \
 	applications/cudaclaw/advection/2d/swirl/swirl.cpp \
 	applications/cudaclaw/advection/2d/swirl/psi.f \
-	applications/cudaclaw/advection/2d/swirl/setprob.cu \
 	applications/cudaclaw/advection/2d/swirl/user_cuda/qinit.f \
 	applications/cudaclaw/advection/2d/swirl/user_cuda/rpn2adv.cu \
 	applications/cudaclaw/advection/2d/swirl/user_cuda/rpt2adv.cu \
@@ -40,13 +41,11 @@ applications_cudaclaw_advection_2d_swirl_swirl_cuda_LDADD = \
 ## nvcc -dlink has to b called after everything for the executable has been compiled.
 ## this generates a single object file with all of the linked  device code.
 $(SWIRL_DIR)/user_cuda/devicelink.o : \
-	$(SWIRL_DIR)/setprob.o \
 	$(SWIRL_DIR)/user_cuda/rpn2adv.o \
 	$(SWIRL_DIR)/user_cuda/rpt2adv.o \
 	$(SWIRL_DIR)/user_cuda/b4step2.o \
 	src/solvers/fc2d_cudaclaw/libcudaclaw.la
 		$(NVCC) $(CUDA_CFLAGS) -dlink  \
-		$(SWIRL_DIR)/setprob.o \
 		$(SWIRL_DIR)/user_cuda/rpn2adv.o \
 		$(SWIRL_DIR)/user_cuda/rpt2adv.o \
 		$(SWIRL_DIR)/user_cuda/b4step2.o \

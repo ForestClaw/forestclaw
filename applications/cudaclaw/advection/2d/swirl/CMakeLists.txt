@@ -9,7 +9,6 @@ add_executable(swirl_cuda
   swirl_user.cpp 
   swirl.cpp 
   swirl_options.c
-  setprob.cu
 	user_cuda/rpn2adv.cu
 	user_cuda/rpt2adv.cu
 	user_cuda/b4step2.cu
@@ -25,6 +24,5 @@ target_link_libraries(swirl_cuda PRIVATE
  FORESTCLAW::CUDACLAW
 )
 
-# add_test(NAME swirl_cuda
-#  COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} $<TARGET_FILE:swirl_cuda>
-#  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_test(NAME cudaclaw_advection_2d_swirl COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(cudaclaw_advection_2d_swirl PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

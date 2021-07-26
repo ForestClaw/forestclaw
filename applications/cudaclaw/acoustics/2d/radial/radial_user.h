@@ -23,19 +23,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SWIRL_USER_H
-#define SWIRL_USER_H
-
-#include <fclaw2d_include_all.h>
+#ifndef RADIAL_USER_H
+#define RADIAL_USER_H
 
 #include <fc2d_cudaclaw.h>
 
-#include <fc2d_cudaclaw_cuda.h>
-#include <fc2d_cudaclaw_options.h>
+#include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
 
+#include <fc2d_cudaclaw.h>
+#include <fc2d_cudaclaw_options.h>
 #include <cudaclaw_user_fort.h>
 
 #ifdef __cplusplus
@@ -44,43 +43,37 @@ extern "C"
 #endif
 
 #if 0
-/* fix syntax highlighted */
+/* Fix syntax highlighting */
 #endif
 
 typedef struct user_options
 {
-    double period;
+    int example;
+    double rho;
+    double bulk;
+
     int claw_version;
-    int cuda;
     int is_registered;
 
 } user_options_t;
 
-void swirl_link_solvers(fclaw2d_global_t *glob);
 
-/* ------------------------------------- Options ---------------------------------------*/
-user_options_t* swirl_options_register (fclaw_app_t * app,
-                                        const char *configfile);
+void radial_link_solvers(fclaw2d_global_t *glob);
 
-void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
+/* --------------------------------------- Options ----------------------------------------*/
+      
+user_options_t* radial_options_register (fclaw_app_t * app, const char *configfile);
 
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+void radial_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
+user_options_t* radial_get_options(fclaw2d_global_t* glob);
 
 /* --------------------------------------- Cuda ----------------------------------------*/
 
-void swirl_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
-void swirl_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
-void swirl_assign_b4step2(cudaclaw_cuda_b4step2_t *b4step2);
+void setprob_cuda();
 
-void setprob();
-
-/* ------------------------------------ Fortran ----------------------------------------*/
-#if 0
-#define SETPROB FCLAW_F77_FUNC(setprob, SETPROB)
-void SETPROB();
-#endif
-
+void radial_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+void radial_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 
 #ifdef __cplusplus
 }

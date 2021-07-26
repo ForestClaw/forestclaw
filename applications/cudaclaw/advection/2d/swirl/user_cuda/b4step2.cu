@@ -8,10 +8,8 @@ __device__ double psi(double x, double y)
 {
     return (pow(sin(M_PI*x),2) * pow(sin(M_PI*y),2)) / M_PI;
 } 
-      
-#if 0
-/* this is included in a separate file */
-void cuda_setprob()
+
+void setprob()
 {
     double period;
     FILE *f = fopen("setprob.data","r");
@@ -20,10 +18,11 @@ void cuda_setprob()
 
     CHECK(cudaMemcpyToSymbol(s_tperiod, &period, sizeof(double)));
 }
-#endif
-
-__device__ void swirl_b4step2_test(int mbc, int mx, int my, int meqn, double q[],
-                                   double xlower, double ylower, double dx, double dy, 
+      
+__device__ void swirl_b4step2_test(int mbc, int mx, int my, 
+                                   int meqn, double q[],
+                                   double xlower, double ylower, 
+                                   double dx, double dy, 
                                    double time, double dt, int maux, 
                                    double aux[], int i, int j)
 {

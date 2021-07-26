@@ -28,24 +28,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch_fort.h>
+
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack46_options.h>
+#include <clawpack46_user_fort.h>
+
+#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack5_options.h>
+#include <clawpack46_user_fort.h>
+
+#include "../rp/acoustics_user_fort.h"
+
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
 #if 0
-}
+/* Fix syntax highlighting */
 #endif
-#endif
+
 
 typedef struct user_options
 {
     int example;
     double rho;
     double bulk;
-
-#if 0
-    double cc;
-    double zz;
-#endif
 
     double alpha;
 
@@ -55,10 +66,17 @@ typedef struct user_options
 
 } user_options_t;
 
-void radial_problem_setup(fclaw2d_global_t* glob);
+void radial_link_solvers(fclaw2d_global_t *glob);
 
-#define RADIAL_SETPROB FCLAW_F77_FUNC(radial_setprob, RADIAL_SETPROB)
-void RADIAL_SETPROB();
+/* --------------------------------- Options ------------------------------------- */
+
+user_options_t* radial_options_register (fclaw_app_t * app, const char *configfile);
+
+void radial_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
+user_options_t* radial_get_options(fclaw2d_global_t* glob);
+
+/* --------------------------------- Fortran ------------------------------------- */
 
 #define CLAWPACK46_SETAUX_MANIFOLD FCLAW_F77_FUNC(clawpack46_setaux_manifold, \
                                              CLAWPACK46_SETAUX_MANIFOLD)
@@ -84,20 +102,7 @@ void CLAWPACK5_SETAUX_MANIFOLD(const int* mbc,
                            double edgelengths[],
                            double area[]);
 
-void radial_patch_setup(fclaw2d_global_t *global,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx);
-
-user_options_t* radial_options_register (fclaw_app_t * app, const char *configfile);
-
-void radial_options_store (fclaw2d_global_t* glob, user_options_t* user);
-
-user_options_t* radial_get_options(fclaw2d_global_t* glob);
-
-void radial_link_solvers(fclaw2d_global_t *glob);
-
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+/* -------------------------------- Mappings ------------------------------------- */
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
@@ -109,10 +114,8 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double rotate[],
                                                   const double alpha);
 
+
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
