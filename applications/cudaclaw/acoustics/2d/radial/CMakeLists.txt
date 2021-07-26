@@ -1,7 +1,6 @@
 # set(rp ${PROJECT_SOURCE_DIR}/clawpack/acoustics/2d/rp)
 
 add_library(radial_cuda_f OBJECT 
-  setprob.f 
 	user_cuda/qinit.f90
 )
 

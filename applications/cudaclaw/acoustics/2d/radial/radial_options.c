@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,16 +31,17 @@ static void *
 radial_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
-    sc_options_add_int    (opt, 0, "example", &user->example, 0, "[user] 0 - nomap; 1 - disk [0]");
-    sc_options_add_double (opt, 0, "rho",     &user->rho, 1, "[user] rho [1]");
-    sc_options_add_double (opt, 0, "bulk",    &user->bulk, 4, "[user] bulk modulus [4]");
-    sc_options_add_double (opt, 0, "alpha",   &user->alpha, 0.5, "[user] alpha (for 5-patch map) [0.5]");
+    sc_options_add_int    (opt, 0, "example", &user->example, 0, 
+                           "[user] Example [0]");
+
+    sc_options_add_double (opt, 0, "rho",     &user->rho, 1, 
+                           "[user] rho [1]");
+
+    sc_options_add_double (opt, 0, "bulk",    &user->bulk, 4, 
+                           "[user] bulk modulus [4]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
-
-    sc_options_add_bool (opt, 0, "cuda", &user->cuda, 0,
-                           "Use cudaclaw5 [F]");
 
     user->is_registered = 1;
     return NULL;
@@ -49,22 +50,14 @@ radial_register (user_options_t *user, sc_options_t * opt)
 static fclaw_exit_type_t
 radial_postprocess (user_options_t *user)
 {
-    user->cc = sqrt(user->bulk/user->rho);
-    user->zz = user->rho*user->cc;
-
     return FCLAW_NOEXIT;
 }
 
 static fclaw_exit_type_t
 radial_check (user_options_t *user)
 {
-    if (user->example < 0 || user->example > 1) {
-        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
-    }
-    if (user->example == 1 && user->claw_version == 4)
-    {
-        fclaw_global_essentialf("Example 1 (disk) can only be run with claw-version=5\n");
+    if (user->example  != 0) {
+        fclaw_global_essentialf ("Option --user:example must be 0\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;

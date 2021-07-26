@@ -1,21 +1,23 @@
-      subroutine radial_setprob(rho, bulk,cc,zz)
+      subroutine setprob()
       implicit none
-      double precision rho, bulk, cc, zz
-      double precision rho_com, bulk_com, cc_com, zz_com
-      common /cparam/ rho_com,bulk_com,cc_com,zz_com
 
-      double precision pi
-      common /compi/ pi
+      double precision rho, bulk, cc, zz
+      common /cparam/ rho,bulk,cc,zz
+
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
       pi = 4.d0*atan(1.d0)
+      pi2 = 2*pi
 
 c     # These need to be assigned from user options
-      rho_com = rho
-      bulk_com = bulk
+      open(10,file='setprob.data')
+      read(10,*) rho
+      read(10,*) bulk
+      close(10)
+
       cc = sqrt(bulk/rho)
       zz = rho*cc
-      cc_com = cc
-      zz_com = zz
 
       return
       end

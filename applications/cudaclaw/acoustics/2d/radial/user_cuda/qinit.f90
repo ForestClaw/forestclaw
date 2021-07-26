@@ -10,10 +10,12 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc,mx,my, &
     double precision :: q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
     double precision :: aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
 
-    integer i,j
-    double precision :: xc, yc, rc, pressure, width, pi
+    double precision :: pi, pi2
+    common /compi/ pi, pi2
 
-    pi = 4.d0*datan(1.d0)
+    integer i,j
+    double precision :: xc, yc, rc, pressure, width
+
     width = 0.2d0
 
     do i = 1-mbc,mx+mbc

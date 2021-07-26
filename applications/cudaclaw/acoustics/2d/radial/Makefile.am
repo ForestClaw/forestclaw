@@ -7,7 +7,6 @@ applications_cudaclaw_acoustics_2d_radial_radial_SOURCES = \
 	applications/cudaclaw/acoustics/2d/radial/radial_user.cpp \
 	applications/cudaclaw/acoustics/2d/radial/radial_options.c \
 	applications/cudaclaw/acoustics/2d/radial/radial_user.h \
-	applications/cudaclaw/acoustics/2d/radial/setprob.f \
 	applications/cudaclaw/acoustics/2d/radial/user_cuda/qinit.f90 \
 	applications/cudaclaw/acoustics/2d/radial/user_cuda/rpn2acoustics.cu
 
