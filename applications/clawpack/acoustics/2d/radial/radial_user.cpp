@@ -81,19 +81,17 @@ void radial_patch_setup(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     const user_options_t* user = radial_get_options(glob);
+    
     if (user->claw_version == 4)
-    {
         CLAWPACK46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                                    &dx,&dy,&maux,aux,
-                                   xnormals,ynormals,edgelengths,area);
-    }
-    else if (user->claw_version == 5)
-    {
+                                   xnormals,ynormals,edgelengths,area);   
+
+    else if (user->claw_version == 5)    
         CLAWPACK5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
                                   &dx,&dy,&maux,aux,
                                   xnormals,ynormals,edgelengths,area);
 
-    }
 }
 
 void radial_link_solvers(fclaw2d_global_t *glob)
