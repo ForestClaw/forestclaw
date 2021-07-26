@@ -7,11 +7,18 @@ __constant__ double s_bulk;
 __constant__ double s_c;
 __constant__ double s_z;
 
-void radial_setprob_cuda(double rho, double bulk)
+void setprob_cuda()
 {
+    double rho, bulk;
+    FILE *f = fopen("setprob.data","r");
+    fscanf(f,"%lf",&rho);
+    fscanf(f,"%lf",&bulk);
+    fclose(f);
+
     double c,z;
     c = sqrt(bulk/rho);
     z = c*rho;
+    
     CHECK(cudaMemcpyToSymbol(s_rho,  &rho, sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_bulk, &rho, sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_c,    &c,   sizeof(double)));
