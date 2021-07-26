@@ -25,7 +25,7 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc,mx,my, &
             rc = dsqrt(xc**2 + yc**2)
 
             if (abs(rc-0.5d0) .le. width) then
-                pressure = 1.d0 + cos(pi*(r - 0.5d0)/width)
+                pressure = 1.d0 + cos(pi*(rc - 0.5d0)/width)
             else
                 pressure = 0.d0
             endif
