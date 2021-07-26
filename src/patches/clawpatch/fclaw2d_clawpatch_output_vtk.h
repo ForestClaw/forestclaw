@@ -62,7 +62,11 @@ typedef void (*fclaw2d_vtk_patch_data_t) (struct fclaw2d_global * glob,
  */
 int
 fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
-                        int mx, int my, int meqn,
+                        int mx, int my,
+#if FCLAW2D_PATCHDIM == 3
+                        int mz,
+#endif
+                        int meqn,
                         double vtkspace, int vtkwrite,
                         fclaw2d_vtk_patch_data_t coordinate_cb,
                         fclaw2d_vtk_patch_data_t value_cb);
