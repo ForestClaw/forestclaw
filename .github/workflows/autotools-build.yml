@@ -113,11 +113,6 @@ jobs:
       run: ./configure CUDA_CFLAGS="-arch=sm_61" LIBS="-lcuda -lcudart -lnvToolsExt" --enable-cudaclaw --disable-shared
     - name: Build
       run: make
-    - name: Tests
-      run: make check -j2
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
     - name: Install
       run: sudo make install
 
