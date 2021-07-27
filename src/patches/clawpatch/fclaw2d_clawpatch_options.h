@@ -61,6 +61,7 @@ struct fclaw2d_clawpatch_options
     /* These are constant for all clawpatch's */
     int mx;
     int my;
+    int mz;
     int maux;
     int mbc;
 

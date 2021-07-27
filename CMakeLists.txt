@@ -27,8 +27,8 @@ if(cudaclaw)
   find_package(CUDAToolkit REQUIRED)
 endif()
 
-find_package(LAPACK)
-find_package(BLAS)
+#find_package(LAPACK)
+#find_package(BLAS)
 find_package(ZLIB)
 
 # --- p4est, sc
@@ -68,33 +68,35 @@ include(cmake/config.cmake)
 include(cmake/compilers.cmake)
 
 # --- test
-
 if(BUILD_TESTING)
   add_subdirectory(test)
 endif(BUILD_TESTING)
 
-# --- ForestClaw
 
+# --- ForestClaw
 add_subdirectory(src)
 
-# --- Clawpatch
 
+
+# --- Clawpatch
 if(clawpatch)
 
   add_subdirectory(src/patches/clawpatch)
   
 endif(clawpatch)
 
-# --- Clawpack 4.6
 
+
+# --- Clawpack 4.6
 if(clawpack4.6)
 
   add_subdirectory(src/solvers/fc2d_clawpack4.6)
 
 endif(clawpack4.6)
 
-# --- Clawpack 5
 
+
+# --- Clawpack 5
 if(clawpack5)
 
   add_subdirectory(src/solvers/fc2d_clawpack5)
@@ -131,3 +133,12 @@ include(cmake/install.cmake)
 
 # --- examples
 add_subdirectory(applications)
+
+
+# --- clawpack3
+if(clawpack3)
+
+  add_subdirectory(src/solvers/fc3d_clawpack46)
+
+endif(clawpack3)
+

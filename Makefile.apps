@@ -56,11 +56,11 @@ if FCLAW_ENABLE_DEVELOPMENT
 include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
-#include src/solvers/fc2d_clawpack4.6/Makefile.am
-#include src/solvers/fc2d_clawpack5/Makefile.am
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
 
 # Development projects
-#include applications/development.apps
+include applications/development.apps
 
 endif
 
@@ -131,7 +131,6 @@ if FCLAW_ENABLE_ACTIVEFLUX
 
 endif
 
-
 # ----------------------------------
 # CudaClaw library and examples
 # ----------------------------------
@@ -144,10 +143,48 @@ include src/solvers/fc2d_cudaclaw/Makefile.am
 
 include applications/cudaclaw/cudaclaw.apps
 
+endif
+
+# --------------------------------------------
+# Clawpack 3 libraries and examples
+# --------------------------------------------
+
+if FCLAW_ENABLE_CLAWPACK3
+
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+include src/solvers/fc3d_clawpack46/Makefile.am    # clawpack 3
+
+## examples
+include applications/clawpack/claw3.apps
 
 endif
 
+
+# --------------------------------------------
+# Magic Forest
+# --------------------------------------------
+
+#if ENABLE_MAGIC_FOREST
+#
+### Patches needed for Clawpack solvers
+##include src/patches/clawpatch/Makefile.am
+#
+### Solver libraries (most example apps require both)
+##include src/solvers/fc2d_clawpack4.6/Makefile.am 
+##include src/solvers/fc2d_clawpack5.0/Makefile.am 
+#
+### examples
+##include applications/magic.apps
+#
+#endif
+
+
+# --------------------------------------------
 # Include examples that use the low-level interface to p4est
 # They should always compile
+# --------------------------------------------
 
 include applications/lowlevel/Makefile.am

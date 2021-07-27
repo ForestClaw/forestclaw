@@ -55,8 +55,8 @@ c         # Cosine Bells
           th = phi
           thc(1) = 0
           thc(2) = 0
-          lc(1) = 0
-          lc(2) = 0
+          lc(1) = pi
+          lc(2) = pi
           if (example .eq. 1) then
               lc(1) = pi
               lc(2) = pi

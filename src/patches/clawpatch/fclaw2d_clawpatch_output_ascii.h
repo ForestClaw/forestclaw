@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 struct fclaw2d_global;
@@ -39,8 +36,8 @@ struct fclaw2d_patch;
 struct fclaw2d_domain;
 
 void cb_clawpatch_output_ascii (struct fclaw2d_domain * domain,
-                                struct fclaw2d_patch * this_patch,
-                                int this_block_idx, int this_patch_idx,
+                                struct fclaw2d_patch * patch,
+                                int blockno, int patchno,
                                 void *user);
 
 void fclaw2d_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
@@ -49,9 +46,6 @@ void fclaw2d_clawpatch_time_header_ascii(struct fclaw2d_global* glob, int iframe
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

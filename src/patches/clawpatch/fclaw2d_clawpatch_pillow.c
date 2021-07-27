@@ -39,30 +39,40 @@ struct fclaw2d_patch_transform_data;  /* Not used here, so we leave it incomplet
 
 static
 void pillow_copy_block_corner(fclaw2d_global_t* glob,
-                              fclaw2d_patch_t* this_patch, 
+                              fclaw2d_patch_t* patch, 
                               fclaw2d_patch_t *corner_patch,
-                              int this_blockno,
+                              int blockno,
                               int corner_blockno,
                               int icorner,
                               int time_interp,
                               struct fclaw2d_patch_transform_data *transform_data)
 {
+    int meqn;
+    double *qthis;
+    fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
+
+    double *qcorner = fclaw2d_clawpatch_get_q(glob,corner_patch);
+
     fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
-
-    int mx,my,mbc,meqn;
+    int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    double *qthis,*qcorner;
+#if FCLAW2D_PATCHDIM == 2
 
-    fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&qthis,&meqn);
-
-    qcorner = fclaw2d_clawpatch_get_q(glob,corner_patch);
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     pillow_vt->fort_copy_block_corner(&mx, &my, &mbc, &meqn, 
                                       qthis, qcorner,
-                                      &icorner, &this_blockno);
+                                      &icorner, &blockno);
+#elif FCLAW2D_PATCHDIM == 3
+    int mz;
+    double zlower, dz;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
+                                &xlower,&ylower,&zlower, &dx, &dy, &dz);
+    pillow_vt->fort_copy_block_corner(&mx, &my, &mz, &mbc, &meqn, 
+                                      qthis, qcorner,
+                                      &icorner, &blockno);
+#endif
 
 }
 
@@ -76,29 +86,41 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
                                  int time_interp,
                                  struct fclaw2d_patch_transform_data* transform_data)
 {
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
-
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
-    double *qcoarse, *qfine;
 
     int refratio = 2;
 
+    int meqn;
+    double *qcoarse;
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,
                                     &qcoarse,&meqn);
+    double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
     double *areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
     double *areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
 
+    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+#if FCLAW2D_PATCHDIM == 2
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
     pillow_vt->fort_average_block_corner(&mx,&my,&mbc,&meqn,
                                          &refratio,qcoarse,qfine,
                                          areacoarse,areafine,
                                          &icorner_coarse,&coarse_blockno);
+#elif FCLAW2D_PATCHDIM == 3
+    int mz;
+    double  zlower, dz;
+    fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
+                                &xlower,&ylower, &zlower, &dx,&dy, &dz);
+
+    pillow_vt->fort_average_block_corner(&mx,&my,&mz, &dz, &mbc,&meqn,
+                                         &refratio,qcoarse,qfine,
+                                         areacoarse,areafine,
+                                         &icorner_coarse,&coarse_blockno);
+#endif
 }
 
 static
@@ -112,25 +134,35 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
                                      struct fclaw2d_patch_transform_data* transform_data)
 
 {
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
-
-    int mx,my,mbc,meqn;
-    double xlower,ylower,dx,dy;
-    double *qcoarse, *qfine;
-
-    int refratio = 2;
-
+    int meqn;
+    double *qcoarse;
     fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,
                                     &qcoarse,&meqn);
 
-    qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
+    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
+    int refratio = 2;
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+#if FCLAW2D_PATCHDIM == 2
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     pillow_vt->fort_interpolate_block_corner(&mx, &my, &mbc, &meqn,
                                              &refratio, qcoarse, qfine,
                                              &icoarse_corner, &coarse_blockno);
+#elif FCLAW2D_PATCHDIM == 3
+    int mz;
+    double zlower, dz;
+    fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
+                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+    pillow_vt->fort_interpolate_block_corner(&mx, &my, &mz, &mbc, &meqn,
+                                             &refratio, qcoarse, qfine,
+                                             &icoarse_corner, &coarse_blockno);
+
+#endif
 }
 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
@@ -159,6 +191,7 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
 {
     fclaw2d_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_init();
 
+#if FCLAW2D_PATCHDIM == 2
     if (claw_version == 4)
     {
         pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW46_COPY_BLOCK_CORNER;
@@ -171,6 +204,14 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
         pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER;
         pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER;
     }
+#elif FCLAW2D_PATCHDIM == 3
+    if (claw_version == 4)
+    {
+        pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW46_COPY_BLOCK_CORNER3;
+        pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER3;
+        pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER3;
+    }
+#endif
 
     pillow_vt->is_set = 1;
 }

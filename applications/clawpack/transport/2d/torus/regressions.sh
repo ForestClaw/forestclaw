@@ -9,4 +9,4 @@ cd $FCLAW_APPLICATIONS_SRC_DIR/clawpack/transport/2d/torus/
 $FCLAW_MPIRUN $FCLAW_MPI_TEST_FLAGS $application -F regression.ini --user:claw-version=4 || exit 1
 
 # Version 5 not yet implemented.
-# $FCLAW_MPIRUN $FCLAW_MPI_TEST_FLAGS $application -F regression.ini --user:claw-version=5 || exit 1
+$FCLAW_MPIRUN $FCLAW_MPI_TEST_FLAGS $application -F regression.ini --user:claw-version=5 || exit 1

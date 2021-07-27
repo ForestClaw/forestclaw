@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,16 +26,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH46_FORT_H
 #define FCLAW2D_CLAWPATCH46_FORT_H
 
+#include <fclaw2d_defs.h>
+
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
+
+
+#if FCLAW2D_PATCHDIM == 2
+#include "fclaw2d_clawpatch46_fort2.h"
+#else
+#include "fclaw2d_clawpatch46_fort3.h"
+#endif
+
+
 #if 0
-}
+/* Fix syntax highlighting */
 #endif
-#endif
 
 
 
+#if 0
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 /* ------------------------------ Time stepping functions ----------------------------- */
@@ -306,12 +319,7 @@ void CLAWPATCH46_TAG4COARSENING(const int* mx, const int* my,
                                int* tag_patch);
 
 
-
+#endif
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
-#endif
-
 #endif

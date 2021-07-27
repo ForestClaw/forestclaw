@@ -5,13 +5,13 @@ global notpillowsphere flat;
 
 flat = false;
 
-map_list = {'cubedsphere', 'pillowpshere'};
+map_list = {'cubedsphere', 'pillowsphere'};
 
 [example,mapping,ic,~, ~] = read_vars();
 
 map = map_list{mapping+1};
 
-map = 'cubedsphere_flat';
+% map = 'cubedsphere_flat';
 
 switch map
     case 'pillowsphere'

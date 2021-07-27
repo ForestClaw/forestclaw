@@ -29,12 +29,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
 #if 0
-}
-#endif
+/* Fix syntax highlighting */
 #endif
 
 
+#if 0
 
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
@@ -320,6 +322,13 @@ void CLAWPATCH5_TAG4COARSENING(const int* mx, const int* my,
                               const double* tag_threshold,
                               const int* initflag,
                               int* tag_patch);
+#endif
+#if FCLAW2D_PATCHDIM == 2
+#include "fclaw2d_clawpatch5_fort2.h"
+#else
+/* No support for clawpack 5.0 in 3d yet */
+//#include "fclaw2d_clawpatch5_fort3.h"
+#endif
 
 
 #ifdef __cplusplus
