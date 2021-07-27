@@ -293,7 +293,7 @@ void geoclaw_print_gauges_default(fclaw2d_global_t *glob,
         geoclaw_user_t *guser = gauge_buffer[k];
 
         double eta = guser->qvar[0] + guser->avar[0];
-        eta = abs(eta) < 1e-99 ? 0 : eta; /* For reading in Matlab */
+        eta = fabs(eta) < 1e-99 ? 0 : eta; /* For reading in Matlab */
         fprintf(fp, "%5d %15.7e %15.7e %15.7e %15.7e %15.7e\n",
                 guser->level, guser->tcurr,
                 guser->qvar[0],guser->qvar[1],

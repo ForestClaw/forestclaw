@@ -867,7 +867,7 @@ void fc2d_geoclaw_solver_initialize()
 
     patch_vt->remote_ghost_setup          = geoclaw_remote_ghost_setup;
     clawpatch_vt->fort_local_ghost_pack   = FC2D_GEOCLAW_LOCAL_GHOST_PACK;
-    clawpatch_vt->fort_local_ghost_pack_aux = geoclaw_local_ghost_pack_aux;
+    clawpatch_vt->local_ghost_pack_aux    = geoclaw_local_ghost_pack_aux;
   
     /* Diagnostic functions partially implemented in clawpatch */
     clawpatch_vt->fort_compute_error_norm = FC2D_GEOCLAW_FORT_COMPUTE_ERROR_NORM;

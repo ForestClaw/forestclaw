@@ -416,15 +416,14 @@ void FC2D_GEOCLAW_FORT_WRITE_FILE(int* mx,int* my,int* meqn,int* maux,
 
 /* ---------------------------------- Parallel ghost patches  -------------------------------- */
 
-
 #define FC2D_GEOCLAW_LOCAL_GHOST_PACK \
                                FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack, \
                                FC2D_GEOCLAW_LOCAL_GHOST_PACK)
-void  FC2D_GEOCLAW_LOCAL_GHOST_PACK(int *mx, int *my, int *mbc,
-                                          int *meqn, int *mint,
+void  FC2D_GEOCLAW_LOCAL_GHOST_PACK(const int *mx, const int *my, const int *mbc,
+                                          const int *meqn, const int *mint,
                                           double qdata[], double area[],
-                                          double qpack[], int *psize,
-                                          int *packmode, int *ierror);
+                                          double qpack[], const int *psize,
+                                          const int *packmode, int *ierror);
 
 #define FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX \
                               FCLAW_F77_FUNC(fc2d_geoclaw_local_ghost_pack_aux, \
