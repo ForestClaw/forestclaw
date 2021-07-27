@@ -50,6 +50,10 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
 
+    /* example of how to set up a user defined criteria */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_TH;
+
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
     {
@@ -64,7 +68,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        printf("swirl_user.cpp : Example not implemented  for Claw version 5.\n");
+        printf("swirl_user.cpp : Example not implemented for Claw version 5.\n");
         exit(0);
     }
 }
