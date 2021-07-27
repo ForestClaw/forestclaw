@@ -171,6 +171,24 @@ int FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
                                           const int *is_ghost);
 
 
+/* ------------------------------- user threshold --------------------------------- */
+#define USER_EXCEEDS_TH \
+                  FCLAW_F77_FUNC(user_exceeds_th, \
+                                 USER_EXCEEDS_TH)
+
+int USER_EXCEEDS_TH(const int *blockno,
+                    const double *qval, 
+                    const double* qmin, 
+                    const double *qmax,
+                    const double quad[], 
+                    const double *dx, 
+                    const double *dy, 
+                    const double *xc, 
+                    const double *yc, 
+                    const double *tag_threshold,
+                    const int *init_flag,
+                    const int *is_ghost);
+
     
 #ifdef __cplusplus
 }

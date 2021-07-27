@@ -11,7 +11,7 @@
 !!> \param [in] mbc      Number of ghost cells
 !!> \param [in] meqn     Number of equations
 !!> \param [in] qcoarse,qfine  Solution on coarse,fine grid
-!!> \param [in] volcoarse,volfine  Area of mesh cells on coarse,fine grids.
+!!> \param [in] areacoarse,area  Area of mesh cells on coarse,fine grids.
 !!> \param [in] idir     Face orientation - 0 for x-faces; 1 for y-faces [0-1]
 !!> \param [in] iface    Face number of fine grid [0-3].
 !!> \param [in] iface_coarse Face number of coarse grid [0-3].
@@ -27,7 +27,7 @@
 !!> the coarse grid.
       
 SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, & 
-           qcoarse,qfine,volcoarse, volfine, & 
+           qcoarse,qfine,areacoarse, areafine, & 
            idir,iface_coarse,num_neighbors,refratio,igrid, & 
            manifold, transform_cptr)
     IMPLICIT NONE
@@ -40,8 +40,8 @@ SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, &
     DOUBLE PRECISION :: qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
     !! # these will be empty if we are not on a manifold.
-    DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
-    DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+    DOUBLE PRECISION :: areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+    DOUBLE PRECISION ::   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
     INTEGER :: mq,r2, m
     INTEGER :: ic, ibc, jc, jbc, k
@@ -105,7 +105,7 @@ SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, &
                                 vf_sum = 0
                                 do m = 0,r2-1
                                     qf = qfine(i2(m),j2(m),k,mq)
-                                    kf = volfine(i2(m),j2(m),k)
+                                    kf = areafine(i2(m),j2(m))
                                     sum = sum + qf*kf
                                     vf_sum = vf_sum + kf
                                 end do
@@ -144,7 +144,7 @@ SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, &
                                 vf_sum = 0
                                 do m = 0,r2-1
                                     qf = qfine(i2(m),j2(m),k, mq)
-                                    kf = volfine(i2(m),j2(m),k)
+                                    kf = areafine(i2(m),j2(m))
                                     sum = sum + qf*kf
                                     vf_sum = vf_sum + kf
                                 end do
@@ -169,7 +169,7 @@ end subroutine  fclaw2d_clawpatch46_fort3_average_face
 !!> Average across corners.
 
 subroutine fclaw2d_clawpatch46_fort3_average_corner(mx,my,mz,mbc,meqn, &
-    refratio,qcoarse,qfine,volcoarse,volfine, & 
+    refratio,qcoarse,qfine,areacoarse,areafine, & 
     manifold,icorner_coarse,transform_cptr)
     IMPLICIT NONE
 
@@ -179,8 +179,8 @@ subroutine fclaw2d_clawpatch46_fort3_average_corner(mx,my,mz,mbc,meqn, &
     DOUBLE PRECISION ::   qfine(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
     !! # these will be empty if we are not on a manifold.
-    DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
-    DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+    DOUBLE PRECISION :: areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+    DOUBLE PRECISION ::   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
     INTEGER :: ibc,jbc,mq,r2
     LOGICAL :: is_manifold
@@ -230,7 +230,7 @@ subroutine fclaw2d_clawpatch46_fort3_average_corner(mx,my,mz,mbc,meqn, &
                         vf_sum = 0
                         do m = 0,r2-1
                             qf = qfine(i2(m),j2(m),k,mq)
-                            kf = volfine(i2(m),j2(m),k)
+                            kf = areafine(i2(m),j2(m))
                             sum = sum + kf*qf
                             vf_sum = vf_sum + kf
                         enddo
@@ -253,7 +253,7 @@ end subroutine fclaw2d_clawpatch46_fort3_average_corner
 !!> \ingroup  Averaging
 !!> Average fine grid siblings to parent coarse grid.
 subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, & 
-           qcoarse,qfine, volcoarse, volfine, igrid,manifold)
+           qcoarse,qfine, areacoarse, areafine, igrid,manifold)
     IMPLICIT NONE
 
     INTEGER :: mx,my,mz,mbc,meqn
@@ -263,8 +263,8 @@ subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, &
 
     !! # these will be empty if we are not on a manifold, and so shouldn't
     !! # be referenced. 
-    DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1, -mbc:mz+mbc+1)
-    DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1, -mbc:mz+mbc+1)
+    DOUBLE PRECISION :: areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+    DOUBLE PRECISION ::   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
     !! # This should be refratio*refratio.
     INTEGER :: rr2
@@ -322,11 +322,11 @@ subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, &
                         sum = 0
                         do m = 0,r2-1
                             qf = qfine(i2(m),j2(m),k,mq)
-                            kf = volfine(i2(m),j2(m),k)
+                            kf = areafine(i2(m),j2(m))
                             sum = sum + kf*qf
                             vf_sum = vf_sum + kf
                         enddo
-                        !! kc = volcoarse(i1,j1,k)
+                        !! kc = areacoarse(i1,j1,k)
                         qcoarse(i1,j1,k,mq) = sum/vf_sum
                     else
                         sum = 0

@@ -14,11 +14,15 @@ setpatchbordercolor('k');
 showcubes;
 showslices;
 
+
 caxis([0,1]);
 
 h = surflight;
 
-axis off;
+set(gca,'box','on');
+
+%axis off;
+axis on;
 
 shg;
 
