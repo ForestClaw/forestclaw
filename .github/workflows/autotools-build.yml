@@ -240,7 +240,7 @@ jobs:
     - name: Run bootstrap Script
       run: ./bootstrap
     - name: Configure
-      run: ./configure --enable-clawpack3 --enable-mpi CFLAGS="-O2 -Wall -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2" CXXFLAGS="-O2 -Wall -std=c++11 -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2"
+      run: ./configure --enable-clawpack3 --enable-mpi CFLAGS="-O2 -Wall -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2" CXXFLAGS="-O2 -Wall -std=c++11 -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2" LIBS="-lgfortran -lstdc++"
     - name: Build
       run: make
     - name: Tests
