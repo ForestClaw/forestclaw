@@ -320,6 +320,9 @@ void CLAWPATCH46_TAG4COARSENING(const int* mx, const int* my,
 
 
 #endif
+
 #ifdef __cplusplus
 }
+#endif
+
 #endif
