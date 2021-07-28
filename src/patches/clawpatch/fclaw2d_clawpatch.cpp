@@ -1543,6 +1543,11 @@ size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob)
 	int mbc = clawpatch_opt->mbc;
 	size_t size = (mx+2*mbc)*(my+2*mbc)*meqn;
 
+#if FCLAW2D_PATCHDIM == 3
+	int mz = clawpatch_opt->mz;
+	size *= (mz + 2*mbc);
+#endif
+
 	return size;
 }
 
