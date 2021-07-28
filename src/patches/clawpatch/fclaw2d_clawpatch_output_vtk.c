@@ -636,15 +636,13 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
                                   int blockno, int patchno,
                                   char *a)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-
-    fclaw2d_map_context_t *cont = glob->cont;
-
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
 #if FCLAW2D_PATCHDIM == 2
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
+
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
@@ -658,6 +656,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
             const double x = xlower + i * dx;
             if (fclaw_opt->manifold)
             {
+                fclaw2d_map_context_t *cont = glob->cont;
                 FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                 *d++ = xpp;
                 *d++ = ypp;

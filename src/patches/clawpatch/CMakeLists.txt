@@ -28,6 +28,16 @@ add_library(clawpatch_f OBJECT
   fort_5.0/fclaw2d_clawpatch5_tag4refinement.f
   fort_5.0/fclaw2d_clawpatch5_tag4coarsening.f
   fort_5.0/fclaw2d_clawpatch5_timeinterp.f
+  fort3_4.6/fclaw2d_clawpatch46_tag4refinement.f90 
+  fort3_4.6/fclaw2d_clawpatch46_tag4coarsening.f90 
+  fort3_4.6/fclaw2d_clawpatch46_average.f90 
+  fort3_4.6/fclaw2d_clawpatch46_copy.f90 
+  fort3_4.6/fclaw2d_clawpatch46_interpolate.f90 
+  fort3_4.6/fclaw2d_clawpatch46_local_ghost_pack.f90 
+  fort3_4.6/fclaw2d_clawpatch46_output_ascii.f90 
+  fort3_4.6/fclaw2d_clawpatch46_timeinterp.f90  
+  fort3_4.6/fclaw2d_clawpatch46_pillowsphere.f90 
+  fort3_4.6/fclaw2d_clawpatch46_diagnostics.f90 
   ${metric}/fortran_source2d/fclaw2d_metric_default_fort.f
 )
 
