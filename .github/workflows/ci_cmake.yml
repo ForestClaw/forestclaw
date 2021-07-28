@@ -38,7 +38,7 @@ jobs:
           configure_flags: "-Dmpi=ON -Dclawpack=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With Clawpack 3"
-          configure_flags: "-Dmpi=ON -Dclawpack3=ON"
+          configure_flags: "-Dmpi=ON -Dclawpack3=ON -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
