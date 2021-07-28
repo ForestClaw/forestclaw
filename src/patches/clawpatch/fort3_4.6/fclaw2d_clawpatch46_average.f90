@@ -276,7 +276,7 @@ subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, &
     INTEGER :: ig, jg, ic_add, jc_add
     INTEGER :: rfactor, refratio, igrid
     LOGICAL :: is_manifold
-    DOUBLE PRECISION :: sum, kc, kf, qf, vf_sum
+    DOUBLE PRECISION :: sum, kf, qf, vf_sum
 
     !! Not sure why there are two different variables here.  Isn't 
     !! rfactor == refratio? 

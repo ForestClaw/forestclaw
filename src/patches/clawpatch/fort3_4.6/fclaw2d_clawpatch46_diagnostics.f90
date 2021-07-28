@@ -54,7 +54,7 @@ double precision function fclaw2d_clawpatch46_fort3_compute_patch_area( &
     double precision :: dx, dy, dz
     double precision :: area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-    integer :: i,j, k
+    integer :: i,j
     integer*8 :: cont, get_context
     logical :: fclaw2d_map_is_used
     double precision :: sum
