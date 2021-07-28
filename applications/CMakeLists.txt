@@ -134,7 +134,7 @@ endif()
 # ----------------------------------
 # clawpack3 library and examples
 # ----------------------------------
-if(TARGET FORESTCLAW::CLAWPACK3)
+if(TARGET FORESTCLAW::CLAWPACK3_46)
 
     include(clawpack/claw3.cmake)
 

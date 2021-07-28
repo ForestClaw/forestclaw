@@ -42,6 +42,7 @@ if(NOT TARGET SC::SC)
   include(cmake/sc.cmake)
 endif()
 
+
 if(NOT p4est_external)
   find_package(P4EST HINTS ${THUNDEREGG_ROOT})
 endif()
@@ -49,8 +50,9 @@ if(NOT TARGET P4EST::P4EST)
   include(cmake/p4est.cmake)
 endif()
 
-# --- ThunderEgg
 
+
+# --- ThunderEgg
 if(thunderegg)
   if(NOT thunderegg_external)
     find_package(ThunderEgg HINTS ${THUNDEREGG_ROOT})
@@ -60,9 +62,11 @@ if(thunderegg)
   endif()
 endif(thunderegg)
 
+
 if(cudaclaw)
 endif(cudaclaw)
 # --- configure
+
 
 include(cmake/config.cmake)
 include(cmake/compilers.cmake)
@@ -104,21 +108,24 @@ if(clawpack5)
 endif(clawpack5)
 
 
-# --- geoclaw
 
+# --- geoclaw
 if(geoclaw)
 
   add_subdirectory(src/solvers/fc2d_geoclaw)
 
 endif(geoclaw)
 
-# --- cudaclaw
 
+
+# --- cudaclaw
 if(cudaclaw)
 
   add_subdirectory(src/solvers/fc2d_cudaclaw)
 
 endif(cudaclaw)
+
+
 
 # --- ThunderEgg
 if(thunderegg)
@@ -128,12 +135,6 @@ if(thunderegg)
 endif(thunderegg)
 # --- package
 
-include(cmake/pkgconf.cmake)
-include(cmake/install.cmake)
-
-# --- examples
-add_subdirectory(applications)
-
 
 # --- clawpack3
 if(clawpack3)
@@ -141,4 +142,13 @@ if(clawpack3)
   add_subdirectory(src/solvers/fc3d_clawpack46)
 
 endif(clawpack3)
+
+
+include(cmake/pkgconf.cmake)
+include(cmake/install.cmake)
+
+
+# --- examples
+add_subdirectory(applications)
+
 

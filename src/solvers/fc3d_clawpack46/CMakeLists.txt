@@ -1,10 +1,12 @@
 # -- fortran library
 add_library(clawpack3_46_f OBJECT
+  fortran_source/fc3d_clawpack46_bc3_default.f90 
   fortran_source/fc3d_clawpack46_inlinelimiter.f90 
   fortran_source/fc3d_clawpack46_limiter.f90 
   fortran_source/fc3d_clawpack46_set_capacity.f90
   fortran_source/fc3d_clawpack46_block.f90 
   fortran_source/fc3d_clawpack46_bc3_default.f90 
+  fortran_source/fc3d_clawpack46_flux3.f
   fortran_source/fc3d_clawpack46_step3.f90 
   fortran_source/fc3d_clawpack46_step3_wrap.f90
 )

@@ -5,3 +5,6 @@
 
 # Scalar advection
 add_subdirectory(clawpack/advection/3d/swirl)
+add_subdirectory(clawpack/advection/3d/filament)
+
+
