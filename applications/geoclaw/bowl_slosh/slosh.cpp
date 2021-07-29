@@ -25,15 +25,6 @@
 
 #include "slosh_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-
-#include <fc2d_geoclaw.h>
-#include <fc2d_geoclaw_options.h>
-
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
