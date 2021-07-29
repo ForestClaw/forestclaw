@@ -1,5 +1,5 @@
 ! qinit routine for parabolic bowl problem, only single layer
-subroutine qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
+subroutine fc2d_geoclaw_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
 
     use geoclaw_module, only: grav
 
@@ -34,4 +34,4 @@ subroutine qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
         enddo
     enddo
     
-end subroutine qinit
+end subroutine fc2d_geoclaw_qinit
