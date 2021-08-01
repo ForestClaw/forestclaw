@@ -144,11 +144,19 @@ if(clawpack3)
 endif(clawpack3)
 
 
+# --- gemini
+if(gemini)
+
+  add_subdirectory(src/solvers/fc3d_gemini)
+
+endif(gemini)
+
+
 include(cmake/pkgconf.cmake)
 include(cmake/install.cmake)
 
 
 # --- examples
-add_subdirectory(applications)
+add_subdirectory(src/solvers/fc3d_gemini/examples)
 
 
