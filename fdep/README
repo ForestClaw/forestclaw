@@ -1,0 +1,99 @@
+fdep
+----
+
+fdep is a small set of scripts to teach autoconf/automake (using GNU make)
+about the additional dependencies in Fortran 90 files due to modules.
+
+With this, Fortran files can be listed in any order in Makefile.am and parallel
+builds work.
+
+
+Usage
+-----
+
+  Put this project as a directory "fdep" in your source code, place the two
+  lines
+
+    m4_include([fdep/fortran_dependencies.m4])
+    FDEP_F90_GNU_MAKE_DEPS
+
+  in your configure.ac, and add a single line
+
+    @FORTRAN_MODULE_DEPS@
+
+  in your Makefile.am. All .F90 files of all programs in bin_PROGRAMS and all
+  libraries in lib_LTLIBRARIES will now be scanned for modules and the
+  resulting dependencies will be honoured.
+
+
+What is the problem with Fortran 90 modules and make dependencies?
+------------------------------------------------------------------
+
+  In Fortran 90 source files one can define any number of "modules", containing
+  variable and function definitions. The names of the modules defined in a file
+  can be arbitrary.
+
+  In another source file these modules can be used, informing the Fortran
+  compiler about the definitions in these modules (e.g. to do type-checking).
+  This creates a problem, as the compiler has to know somehow where the module
+  is defined.
+
+  The usual solution employed by almost every Fortran compiler is to create
+  special "module" files for each module contained in a source file during
+  compilation. Their file name is derived by a compiler-specific recipe of the
+  modules identifier (usually the lower-cased module's identifier plus ".mod",
+  so "foo_module.mod" and "some_other_module.mod"). When the compiler
+  encounters a "use" statement during the compilation of another file, it
+  confers to this file to import the definitions of the module.
+
+  That means, you cannot compile files using modules defined in yet un-compiled
+  files, one has to tell make about this dependency.
+
+  (A primitive solution to this problem is listing the file in a pre-sorted
+   order, so that files defining modules are compiled first.
+
+   However, that way the dependency-graph make knows about is incomplete and
+   parallel builds will fail with a high probability)
+
+
+How does fdep solve this problem technically?
+---------------------------------------------
+
+  As the name of the module files can be an arbitrary (and some compilers might
+  even save the module definitions in some completely different way), fdep
+  tells make about the module dependencies as a relation directly between
+  object files, e.g. when a file 'b.f90' is using any module of file 'a.f90',
+  fdep adds a dependency of
+
+    b.o: a.o
+
+
+  More specifically, the perl-script fortran_dependencies.pl is run by make to
+  create a file .fortran_dependencies/dependencies.mk, which is then included.
+  To do this, first every source file (for every defined program and library)
+  is scanned for lines with "module" or "use" statements. These are saved in
+  two additional files (.use_mods and .def_mods) per source file and contain
+  lists of defined and required modules. The perl script then reads these in
+  and produces the appropriate rules.
+
+
+Drawbacks
+---------
+
+  GNU make is required. The detailed dependency graph due to "module" and "use"
+  statements is only available after pre-processing, when autoconf and even
+  configure is long over. To still get proper dependencies, fdep uses GNU
+  make's feature to include generated sub-Makefiles during a running make
+  invocation.
+
+
+License
+-------
+
+  fdep is released under the MIT License. See the LICENSE file for details.
+
+
+Contributing
+------------
+
+  Send your patches or pull-request to dev@stellardeath.org
