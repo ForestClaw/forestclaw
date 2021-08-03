@@ -143,12 +143,19 @@ if(clawpack3)
 
 endif(clawpack3)
 
+# --- HPS
+if(hps)
+
+  add_subdirectory(src/solvers/fc2d_hps)
+
+endif(hps)
+
 
 include(cmake/pkgconf.cmake)
 include(cmake/install.cmake)
 
 
 # --- examples
-add_subdirectory(applications)
+add_subdirectory(src/solvers/fc2d_hps/examples)
 
 
