@@ -5,7 +5,7 @@
 #
 
 define translate_name
-$(subst -,_,$(subst .,_,$1))
+$(subst /,_,$(subst -,_,$(subst .,_,$(subst ./,,$1))))
 endef
 
 _f90_verbose = $(_f90_verbose_$(V))
@@ -47,7 +47,7 @@ endef
 #
 # returns: the appropriate extension (i.e. 'o' for normal programs, '.lo' for libraries)
 define object_extension
-$(if $(filter $1,$(PROGRAMS)),o,lo)
+$(if $(filter $1,$(PROGRAMS)),o,o)
 endef
 
 # $1 source file
@@ -111,7 +111,7 @@ $(_f90_depdir):
 	@mkdir $@
 
 $(foreach p,$(_f90_targets),$(_f90_depdir)/$p): | $(_f90_depdir)
-	@mkdir $@
+	@mkdir -p $@
 
 CLEANFILES += $(foreach p,$(_f90_targets),$(_$p_def_mods) $(_$p_use_mods))
 CLEANFILES += $(foreach p,$(_f90_targets),$(_f90_depdir)/$p/*)
