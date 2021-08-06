@@ -33,15 +33,6 @@ BUILD_BYPRODUCTS ${P4EST_LIBRARIES}
 DEPENDS SC
 )
 
-
-ExternalProject_Get_property(P4EST SOURCE_DIR)
-
-# FIXME: patch p4est with FindMPI.cmake
-# (remove when p4est is updated with new FindMPI.cmaake)
-ExternalProject_Add_Step(P4EST patch_find_mpi DEPENDEES patch
-COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/Modules/FindMPI.cmake ${SOURCE_DIR}/cmake/Modules/)
-
-
 # --- imported target
 
 file(MAKE_DIRECTORY ${P4EST_INCLUDE_DIRS})

@@ -32,14 +32,6 @@ CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SC_ROOT} -DCMAKE_BUILD_TYPE=Release -Dm
 BUILD_BYPRODUCTS ${SC_LIBRARIES}
 )
 
-ExternalProject_Get_property(SC SOURCE_DIR)
-
-# FIXME: patch libsc with FindMPI.cmake
-# (remove when libsc is updated with new FindMPI.cmaake)
-ExternalProject_Add_Step(SC patch_find_mpi DEPENDEES patch
-COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/Modules/FindMPI.cmake ${SOURCE_DIR}/cmake/Modules/)
-
-
 # --- imported target
 
 file(MAKE_DIRECTORY ${SC_INCLUDE_DIRS})
