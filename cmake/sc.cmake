@@ -10,8 +10,12 @@ git_submodule("${PROJECT_SOURCE_DIR}/sc")
 # this keeps project scopes totally separate, which avoids
 # tricky to diagnose behaviors
 
-if(NOT DEFINED SC_ROOT)
-  set(SC_ROOT ${CMAKE_INSTALL_PREFIX})
+if(NOT SC_ROOT)
+  if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(SC_ROOT ${PROJECT_BINARY_DIR}/local CACHE PATH "default library root")
+  else()
+    set(SC_ROOT ${CMAKE_INSTALL_PREFIX})
+  endif()
 endif()
 
 if(BUILD_SHARED_LIBS)
@@ -24,10 +28,9 @@ set(SC_INCLUDE_DIRS ${SC_ROOT}/include)
 
 ExternalProject_Add(SC
 SOURCE_DIR ${PROJECT_SOURCE_DIR}/sc
-CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SC_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp}
+CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SC_ROOT} -DCMAKE_BUILD_TYPE=Release -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp}
 BUILD_BYPRODUCTS ${SC_LIBRARIES}
 )
-ExternalProject_Add_StepTargets(SC install)
 
 # --- imported target
 
@@ -37,7 +40,7 @@ file(MAKE_DIRECTORY ${SC_INCLUDE_DIRS})
 # this GLOBAL is required to be visible via other
 # project's FetchContent of this project
 add_library(SC::SC STATIC IMPORTED GLOBAL)
-set_target_properties(SC::SC PROPERTIES 
+set_target_properties(SC::SC PROPERTIES
   IMPORTED_LOCATION ${SC_LIBRARIES}
   INTERFACE_INCLUDE_DIRECTORIES ${SC_INCLUDE_DIRS}
   INTERFACE_LINK_LIBRARIES $<LINK_ONLY:ZLIB::ZLIB>

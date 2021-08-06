@@ -25,14 +25,10 @@ find_library (P4EST_LIBRARY
   NAMES p4est
   DOC "p4est library")
 
-if(P4EST_LIBRARY AND P4EST_INCLUDE_DIR)
-  set(P4EST_P4EST_FOUND true)
-endif()
-
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args (P4EST
-  REQUIRED_VARS P4EST_LIBRARY P4EST_INCLUDE_DIR SC_LIBRARY SC_INCLUDE_DIR
-  HANDLE_COMPONENTS)
+  REQUIRED_VARS P4EST_LIBRARY P4EST_INCLUDE_DIR
+  )
 
 if(P4EST_FOUND)
 

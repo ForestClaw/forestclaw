@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13...3.20)
+cmake_minimum_required(VERSION 3.13...3.21)
 
 project(FORESTCLAW
   DESCRIPTION "Quadtree/octree adaptive PDE solver based based on p4est."
@@ -29,44 +29,52 @@ endif()
 
 #find_package(LAPACK)
 #find_package(BLAS)
-find_package(ZLIB)
+find_package(ZLIB REQUIRED)
 
-# --- p4est, sc
-
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
+# --- find p4est or build if not found
 
 if(NOT sc_external)
-  find_package(SC HINTS ${THUNDEREGG_ROOT} ${P4EST_ROOT})
+  if(NOT SC_ROOT)
+    if(THUNDEREGG_ROOT)
+      set(SC_ROOT ${THUNDEREGG_ROOT})
+    elseif(P4EST_ROOT)
+      set(SC_ROOT P4EST_ROOT)
+    endif()
+  endif()
+  find_package(SC)
 endif()
 if(NOT TARGET SC::SC)
   include(cmake/sc.cmake)
 endif()
 
+# --- find libsc or build if not found
 
 if(NOT p4est_external)
-  find_package(P4EST HINTS ${THUNDEREGG_ROOT})
+  if(NOT P4EST_ROOT AND DEFINED THUNDEREGG_ROOT)
+    set(P4EST_ROOT ${THUNDEREGG_ROOT})
+  endif()
+  find_package(P4EST)
 endif()
 if(NOT TARGET P4EST::P4EST)
   include(cmake/p4est.cmake)
 endif()
 
-
-
 # --- ThunderEgg
 if(thunderegg)
   if(NOT thunderegg_external)
-    find_package(ThunderEgg HINTS ${THUNDEREGG_ROOT})
+    if(NOT ThunderEgg_ROOT AND DEFINED THUNDEREGG_ROOT)
+      set(ThunderEgg_ROOT ${THUNDEREGG_ROOT})
+    endif()
+    find_package(ThunderEgg)
   endif()
   if(NOT TARGET ThunderEgg::ThunderEgg)
     include(cmake/ThunderEgg.cmake)
   endif()
 endif(thunderegg)
 
-
 if(cudaclaw)
 endif(cudaclaw)
 # --- configure
-
 
 include(cmake/config.cmake)
 include(cmake/compilers.cmake)
@@ -76,20 +84,15 @@ if(BUILD_TESTING)
   add_subdirectory(test)
 endif(BUILD_TESTING)
 
-
 # --- ForestClaw
 add_subdirectory(src)
-
-
 
 # --- Clawpatch
 if(clawpatch)
 
   add_subdirectory(src/patches/clawpatch)
-  
+
 endif(clawpatch)
-
-
 
 # --- Clawpack 4.6
 if(clawpack4.6)
@@ -97,8 +100,6 @@ if(clawpack4.6)
   add_subdirectory(src/solvers/fc2d_clawpack4.6)
 
 endif(clawpack4.6)
-
-
 
 # --- Clawpack 5
 if(clawpack5)
@@ -108,7 +109,6 @@ if(clawpack5)
 endif(clawpack5)
 
 
-
 # --- geoclaw
 if(geoclaw)
 
@@ -116,16 +116,12 @@ if(geoclaw)
 
 endif(geoclaw)
 
-
-
 # --- cudaclaw
 if(cudaclaw)
 
   add_subdirectory(src/solvers/fc2d_cudaclaw)
 
 endif(cudaclaw)
-
-
 
 # --- ThunderEgg
 if(thunderegg)
@@ -147,8 +143,5 @@ endif(clawpack3)
 include(cmake/pkgconf.cmake)
 include(cmake/install.cmake)
 
-
 # --- examples
 add_subdirectory(applications)
-
-

@@ -16,6 +16,15 @@ else()
   endif()
 endif()
 
+# check system networking libraries
+include(CheckIncludeFile)
+check_include_file(arpa/inet.h HAVE_ARPA_INET_H)
+check_include_file(netinet/in.h HAVE_NETINET_IN_H)
+if(WIN32 AND NOT HAVE_ARPA_INET_H AND NOT HAVE_NETINET_IN_H)
+  check_include_file(Winsock2.h HAVE_WINSOCK2_H)
+  set(WINSOCK_LIBRARIES wsock32 ws2_32 Iphlpapi)
+endif()
+
 
 # --- auto-ignore build directory
 if(NOT EXISTS ${PROJECT_BINARY_DIR}/.gitignore)

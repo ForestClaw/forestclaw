@@ -79,8 +79,7 @@ jobs:
       run: cmake --build --preset ci
 
     - name: CMake test
-      run: ctest --parallel 2 --output-on-failure
-      working-directory: build
+      run: ctest --preset ci
 
     - name: CMake install (for examples)
       run: cmake --install build
@@ -110,9 +109,7 @@ jobs:
     env:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
       CTEST_PARALLEL_LEVEL: 3
-      CC: gcc-10
-      CXX: g++-10
-      FC: gfortran-10
+      FC: gfortran-11
 
     steps:
     - uses: actions/checkout@v2
@@ -128,8 +125,7 @@ jobs:
       run: cmake --build build
 
     - name: CMake test
-      run: ctest --parallel 2 --output-on-failure
-      working-directory: build
+      run: ctest --preset ci
 
     - name: CMake install (for examples)
       run: cmake --install build
