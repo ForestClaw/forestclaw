@@ -45,6 +45,10 @@ struct fclaw2d_patch;
 
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
+/** @addtogroup clawpatch
+ *  @{
+ */
+
 /* Functions defined here are implemented in individual solvers (clawpack 4.6 and 
    clawpack 5.0) */
 
@@ -194,6 +198,7 @@ int USER_EXCEEDS_TH(const int *blockno,
                     const int *init_flag,
                     const int *is_ghost);
 
+/** @} end of clawpack group */
     
 #ifdef __cplusplus
 }

@@ -43,6 +43,10 @@ extern "C"
 #endif
 #endif
 
+/** @defgroup clawpatch clawpatch
+ *  clawpatch related structures and routines
+ *  @{
+ */
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
@@ -95,46 +99,76 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version);
 
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
+/**
+ * @brief vtable for clawpatch related functions
+ */
 struct fclaw2d_clawpatch_vtable
 {
+    /**
+     * @brief Function that allows the user to set a user data pointer
+     */
     clawpatch_set_user_data_t              set_user_data;
 
-    /* ghost filling functions */
-    clawpatch_fort_copy_face_t             fort_copy_face;
-    clawpatch_fort_average_face_t          fort_average_face;
-    clawpatch_fort_interpolate_face_t      fort_interpolate_face;
-    clawpatch_fort_copy_corner_t           fort_copy_corner;
-    clawpatch_fort_average_corner_t        fort_average_corner;
-    clawpatch_fort_interpolate_corner_t    fort_interpolate_corner;
+    ///@{
+    /** @name Ghost Filling Functions */
 
-    /* regridding functions */
+    /** Exchanges face ghost data with neighboring grid at same level. */
+    clawpatch_fort_copy_face_t             fort_copy_face;
+    /**  Averages face fine grid interior values to neighboring ghost cell values of
+         the coarse grid */
+    clawpatch_fort_average_face_t          fort_average_face;
+    /** Interpolates face coarse grid interior values to neighboring ghost cell values 
+     *  of the fine grid. */
+    clawpatch_fort_interpolate_face_t      fort_interpolate_face;
+    /** Exchanges corner ghost data with neighboring grid at same level. */
+    clawpatch_fort_copy_corner_t           fort_copy_corner;
+    /**  Averages corner fine grid interior values to neighboring ghost cell values of
+         the coarse grid */
+    clawpatch_fort_average_corner_t        fort_average_corner;
+    /** Interpolates corner coarse grid interior values to neighboring ghost cell values 
+     *  of the fine grid. */
+    clawpatch_fort_interpolate_corner_t    fort_interpolate_corner;
+    ///@}
+
+    ///@{
+    /** @name Regridding Functions */
     clawpatch_fort_tag4refinement_t        fort_tag4refinement;
     clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
     clawpatch_fort_exceeds_threshold_t     fort_user_exceeds_threshold;
 
     clawpatch_fort_average2coarse_t        fort_average2coarse;
     clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
+    ///@}
 
-    /* Conservation update */
+    ///@{
+    /** @name Conservation Update */
     clawpatch_fort_time_sync_f2c_t         fort_time_sync_f2c;
     clawpatch_fort_time_sync_samesize_t    fort_time_sync_samesize;
     clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
+    ///@}
 
-    /* output functions (ascii) */
+    ///@{
+    /** @name Output Functions (ascii) */
     clawpatch_time_header_t                time_header_ascii;
     clawpatch_fort_header_ascii_t          fort_header_ascii;
 
     fclaw2d_patch_callback_t               cb_output_ascii;    
     clawpatch_fort_output_ascii_t          fort_output_ascii;
+    ///@}
 
-    /* Time interpolation functions */
+    ///@{
+    /** @name Time interpolation functions */
     clawpatch_fort_timeinterp_t            fort_timeinterp;
+    ///@}
 
-    /* ghost patch functions */
+    ///@{
+    /** @name Ghost Patch Functions */
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
     clawpatch_local_ghost_pack_aux_t       local_ghost_pack_aux;
+    ///@}
 
-      /* diagnostic functions */
+    ///@{
+    /** @name Diagnostic Functions */
     clawpatch_diagnostics_cons_t           conservation_check;
     clawpatch_diagnostics_error_t          compute_error;
 
@@ -142,10 +176,12 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_fort_conscheck_t             fort_conservation_check;
     clawpatch_fort_norm_t                  fort_compute_error_norm;
     clawpatch_fort_area_t                  fort_compute_patch_area;
+    ///@}
 
-    /* Diagnostics */
-
-    int is_set;
+    /** @{ @name Diagnostics */
+    /** Whether or not this vtable is set */
+    int is_set; 
+    /** @} */
 };
 
 
@@ -269,6 +305,7 @@ struct fclaw2d_clawpatch_registers*
 fclaw2d_clawpatch_get_registers(struct fclaw2d_global* glob,
                                 struct fclaw2d_patch* this_patch);
 
+/** @} end of clawpack group */
 
 #ifdef __cplusplus
 #if 0
