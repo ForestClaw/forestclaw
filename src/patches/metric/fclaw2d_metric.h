@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -104,25 +104,81 @@ void fclaw2d_metric_patch_grid_data(struct fclaw2d_global* glob,
 									double* xlower, double* ylower,
 									double* dx, double* dy);
 
+/**
+ * @brief Get the scalar metrics of a patch
+ * 
+ * @param[in]  glob glob the global context
+ * @param[in]  patch the patch context
+ * @param[out] area the area of each cell in the patch
+ * @param[out] edgelengths the edge lenghts for each cell. 
+ *             An array of dimension (-mbc:mx+mbc+2,-mbc:my+mbc+2,2). 
+ *             (i,j,1) contains the the bottom edge length for cell (i,j).
+ *             (i,j,2) contains the the left edge length for cell (i,j).
+ * @param[out] curvature the curvature for each cell in the patch
+ */
 void fclaw2d_metric_patch_scalar(struct fclaw2d_global* glob,
 								 struct fclaw2d_patch* this_patch,
 								 double **area, double** edgelengths,
 								 double **curvature);
 
-
+/**
+ * @brief Get the vector metrics of a patch
+ * 
+ * @param[in]  glob glob the global context
+ * @param[in]  patch the patch context
+ * @param[out] xnormals, ynormals the normals of each face of the patch
+ *             Arrays of dimension (-mbc:mx+mbc+2,-mbc:my+mbc+2,2). 
+ *             (i,j,1) contains the normal for the bottom edge of cell (i,j).
+ *             (i,j,2) contains the normal for the left edge of cell (i,j).
+ * @param[out] xtangents, ytangents the tangents of each face of the patch
+ *             Arrays of dimension (-mbc:mx+mbc+2,-mbc:my+mbc+2,2). 
+ *             (i,j,1) contains the tangent for the bottom edge of cell (i,j).
+ *             (i,j,2) contains the tangent for the left edge of cell (i,j).
+ * @param[out] surfnormals the surface normal for each cell center of the patch
+ *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+ */
 void fclaw2d_metric_patch_vector(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* this_patch,
                                  double **xnormals, double **ynormals,
                                  double **xtangents, double **ytangents,
                                  double **surfnormals);
 
+/**
+ * @brief Get the mesh metrics of a patch
+ * 
+ * @param[in]  glob glob the global context
+ * @param[in]  patch the patch context
+ * @param[out] xp, yp, zp the coordinates of the cell centers
+ * @param[out] xd, yd, zd the coordinates of the nodes
+ * @param[out] area the area of each cell
+ */
 void fclaw2d_metric_patch_mesh_data(struct fclaw2d_global* glob,
 									struct fclaw2d_patch* this_patch,
 									double **xp, double **yp, double **zp,
 									double **xd, double **yd, double **zd,
 									double **area);
 
-
+/**
+ * @brief Get the mesh metrics of a patch
+ * 
+ * @param[in]  glob glob the global context
+ * @param[in]  patch the patch context
+ * @param[out] xnormals, ynormals the normals of each face of the patch
+ *             Arrays of dimension (-mbc:mx+mbc+2,-mbc:my+mbc+2,2). 
+ *             (i,j,1) contains the normal for the bottom edge of cell (i,j).
+ *             (i,j,2) contains the normal for the left edge of cell (i,j).
+ * @param[out] xtangents, ytangents the tangents of each face of the patch
+ *             Arrays of dimension (-mbc:mx+mbc+2,-mbc:my+mbc+2,2). 
+ *             (i,j,1) contains the tangent for the bottom edge of cell (i,j).
+ *             (i,j,2) contains the tangent for the left edge of cell (i,j).
+ * @param[out] surfnormals the surface normal for each cell center of the patch
+ *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
+ * @param[out] edgelengths the edge lenghts for each cell. 
+ *             An array of dimension (-mbc:mx+mbc+2,-mbc:my+mbc+2,2). 
+ *             (i,j,1) contains the the bottom edge length for cell (i,j).
+ *             (i,j,2) contains the the left edge length for cell (i,j).
+ * @param[out] curvature the curvature for each cell in the patch
+ */
 void fclaw2d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
 									 struct fclaw2d_patch* this_patch,
 									 double **xnormals, double **ynormals,
@@ -130,7 +186,12 @@ void fclaw2d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
 									 double **surfnormals,
 									 double **edgelengths, double **curvature);
 
-
+/**
+ * @brief Get the area for each cell of the patch
+ * 
+ * @param this_patch the patch to get the are for
+ * @return double* the area array
+ */
 double* fclaw2d_metric_patch_get_area(struct fclaw2d_patch* this_patch);
 
 
