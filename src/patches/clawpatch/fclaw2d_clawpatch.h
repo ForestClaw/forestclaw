@@ -292,7 +292,7 @@ struct fclaw2d_clawpatch_vtable
 /* Called in step2 (clawpack 4.6 and clawpack 5.0) */
 
 /**
- * @brief Save the current timestep as the previous timestep
+ * @brief Save the current timestep
  * 
  * @param[in]  glob glob the global context
  * @param[in]  patch the patch context
