@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,18 +43,38 @@ extern "C"
 #endif
 #endif
 
-/** @defgroup clawpatch clawpatch
- *  clawpatch related structures and routines
- *  @{
+/** 
+ *  @file
+ *  Clawpatch related structures and routines
  */
 
+/**
+ * @brief fclaw2d_clawpatch_vtable type
+ */
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
 /* --------------------------------- Typedefs ----------------------------------------- */
+/**
+ * @brief Sets a pointer to user data for a specific patch
+ * 
+ * @param[in] glob the global context
+ * @param[in] patch the patch context
+ * @param[in] user the pointer to the user data
+ */
 typedef void (*clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
                                           struct fclaw2d_patch *patch,
                                           void* user);
 
+/**
+ * @brief Packs/Unpacks the fclaw2d_clawpatch_registers struct for ghost patches
+ * 
+ * @param[in] glob the global context
+ * @param[in] patch the patch context
+ * @param[in,out] qpack the buffer
+ * @param[in] frsize the size of the buffer
+ * @param[in] packmode enum fclaw2d_clawpatch_packmode enum
+ * @param[out] ierror error value
+ */
 typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob,
                                                      struct fclaw2d_patch *this_patch,
                                                      double *qpack,
@@ -62,6 +82,18 @@ typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob
                                                      fclaw2d_clawpatch_packmode_t packmode,
                                                      int *ierror);
 
+
+/**
+ * @brief Packs/Unpacks ghost cell data for an aux array
+ * 
+ * @param[in]     glob the global context
+ * @param[in]     patch the patch context
+ * @param[in]     mint the number of internal cells to pack
+ * @param[in,out] qpack the the buffer
+ * @param[in]     extrasize the size of the buffer
+ * @param[in]     packmode the packing mode (0 for packing aux, 1 for unpacking aux)
+ * @param[out]    ierror error value
+ */
 typedef void (*clawpatch_local_ghost_pack_aux_t)(struct fclaw2d_global *glob,
                                                  struct fclaw2d_patch *patch,
                                                  const int mint,
@@ -74,17 +106,43 @@ typedef void (*clawpatch_fort_local_ghost_pack_registers_t)(struct fclaw2d_globa
                                                             int* ierror);
 /* ------------------------------ typedefs - output ----------------------------------- */
 
+/**
+ * @brief Outputs a time header
+ * 
+ * @param[in] glob the global context
+ * @param[in] iframe the frame
+ */
 typedef void (*clawpatch_time_header_t)(struct fclaw2d_global* glob, int iframe);
 
 
 /* ---------------------------- typedefs - diagnostics -------------------------------- */
 
+/**
+ * @brief Fills in a user defined error_data structure for a specific patch.
+ * 
+ * @param[in] glob glob the global context
+ * @param[in] patch the patch context
+ * @param[in] blockno the block number
+ * @param[in] patchno the patch number
+ * @param[in,out] error_data a user defined structure
+ * 
+ */
 typedef void (*clawpatch_diagnostics_cons_t)(struct fclaw2d_global *glob,
                                              struct fclaw2d_patch *patch,
                                              int blockno,
                                              int patchno,
                                              void *error_data);
 
+/**
+ * @brief Fills in a user defined error_data structure for a specific patch.
+ * 
+ * @param[in] glob glob the global context
+ * @param[in] patch the patch context
+ * @param[in] blockno the block number
+ * @param[in] patchno the patch number
+ * @param[in,out] error_data a user defined structure
+ * 
+ */
 typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
                                               struct fclaw2d_patch *patch,
                                               int blockno,
@@ -95,8 +153,18 @@ typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
 /* ---------------------------- Virtual table ------------------------------------ */
 /* members of this structure provide the only access to above functions */
 
+/**
+ * @brief Initialize the clawpatch vtable global variable
+ * 
+ * @param claw_version the version of clawpack (4 for 4.6, 5 for 5)
+ */
 void fclaw2d_clawpatch_vtable_initialize(int claw_version);
 
+/**
+ * @brief Get a pointer to a clawpatch vtable global variable
+ * 
+ * @return fclaw2d_clawpatch_vtable_t* the vtable
+ */
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
 
 /**
@@ -109,78 +177,103 @@ struct fclaw2d_clawpatch_vtable
      */
     clawpatch_set_user_data_t              set_user_data;
 
-    ///@{
-    /** @name Ghost Filling Functions */
+    /** @{ @name Ghost Filling Functions */
 
-    /** Exchanges face ghost data with neighboring grid at same level. */
+    /** Copies ghost data from a face neighboring grid on the same level */
     clawpatch_fort_copy_face_t             fort_copy_face;
-    /**  Averages face fine grid interior values to neighboring ghost cell values of
-         the coarse grid */
+    /** Averages values from a face neighboring fine grid */
     clawpatch_fort_average_face_t          fort_average_face;
-    /** Interpolates face coarse grid interior values to neighboring ghost cell values 
-     *  of the fine grid. */
+    /** Interpolates values form a face neighboring coarse grid */
     clawpatch_fort_interpolate_face_t      fort_interpolate_face;
-    /** Exchanges corner ghost data with neighboring grid at same level. */
+    /** Copies ghost data from a corner neighboring grid on the same level */
     clawpatch_fort_copy_corner_t           fort_copy_corner;
-    /**  Averages corner fine grid interior values to neighboring ghost cell values of
-         the coarse grid */
+    /** Averages values from a corner neighboring fine grid */
     clawpatch_fort_average_corner_t        fort_average_corner;
-    /** Interpolates corner coarse grid interior values to neighboring ghost cell values 
-     *  of the fine grid. */
+    /** Interpolates values form a corner neighboring coarse grid */
     clawpatch_fort_interpolate_corner_t    fort_interpolate_corner;
-    ///@}
 
-    ///@{
-    /** @name Regridding Functions */
+    /** @} */
+
+    /** @{ @name Regridding Functions */
+
+    /** Tags a patch for refinement. */
     clawpatch_fort_tag4refinement_t        fort_tag4refinement;
+    /** Tags a quad of patches for coarsening. */
     clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
+    /** @deprecated Checks if solution exceeds a threshold */
     clawpatch_fort_exceeds_threshold_t     fort_user_exceeds_threshold;
 
+    /** Averages a fine patches to a coarse patch */
     clawpatch_fort_average2coarse_t        fort_average2coarse;
+    /** Interpolates from a coarse patch to a fine patche */
     clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
-    ///@}
 
-    ///@{
-    /** @name Conservation Update */
+    /** @} */
+
+    /** @{ @name Conservation Update */
+
+    /** Adds fine grid corrections to coarse grid. */
     clawpatch_fort_time_sync_f2c_t         fort_time_sync_f2c;
+    /** Adds wave corrections at same level interfaces. */
     clawpatch_fort_time_sync_samesize_t    fort_time_sync_samesize;
+    /** Packs/Unpacks the fclaw2d_clawpatch_registers struct for ghost patches */
     clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
-    ///@}
 
-    ///@{
-    /** @name Output Functions (ascii) */
+    /** @} */
+
+    /** @{ @name Output Functions (ascii) */
+
+    /** Outputs a time header */
     clawpatch_time_header_t                time_header_ascii;
+    /** Outputs a time header */
     clawpatch_fort_header_ascii_t          fort_header_ascii;
 
+    /** Called for every patch when outputing ascii */
     fclaw2d_patch_callback_t               cb_output_ascii;    
+    /** Outputs patch data in ascii */
     clawpatch_fort_output_ascii_t          fort_output_ascii;
-    ///@}
 
-    ///@{
-    /** @name Time interpolation functions */
+    /** @} */
+
+    /** @{ @name Time interpolation functions */
+
+    /** Interpolates q between timesteps */
     clawpatch_fort_timeinterp_t            fort_timeinterp;
-    ///@}
 
-    ///@{
-    /** @name Ghost Patch Functions */
+    /** @} */
+
+    /** @{ @name Ghost Patch Functions */
+    
+    /** Packs/Unpacks ghost cell data */
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
+    /** Packs/Unpacks ghost cell data for an aux array */
     clawpatch_local_ghost_pack_aux_t       local_ghost_pack_aux;
-    ///@}
 
-    ///@{
-    /** @name Diagnostic Functions */
+    /** @} */
+
+    /** @{ @name Diagnostic Functions */
+
+    /** Fills in a user defined error_data structure for a specific patch. */
     clawpatch_diagnostics_cons_t           conservation_check;
+    /** Fills in a user defined error_data structure for a specific patch. */
     clawpatch_diagnostics_error_t          compute_error;
 
+    /** Calculates the error for cells in a patch */
     clawpatch_fort_error_t                 fort_compute_patch_error;
+    /** Calculates a sum for each equation */
     clawpatch_fort_conscheck_t             fort_conservation_check;
+    /** Calculates the error norms for a patch */
     clawpatch_fort_norm_t                  fort_compute_error_norm;
+    /** Calculates the area of a patch */
     clawpatch_fort_area_t                  fort_compute_patch_area;
-    ///@}
+
+    /** @} */
 
     /** @{ @name Diagnostics */
+
     /** Whether or not this vtable is set */
     int is_set; 
+
     /** @} */
 };
 
@@ -304,8 +397,6 @@ double* fclaw2d_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
 struct fclaw2d_clawpatch_registers* 
 fclaw2d_clawpatch_get_registers(struct fclaw2d_global* glob,
                                 struct fclaw2d_patch* this_patch);
-
-/** @} end of clawpack group */
 
 #ifdef __cplusplus
 #if 0

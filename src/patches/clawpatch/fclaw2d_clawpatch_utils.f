@@ -55,6 +55,14 @@ c         fclaw2d_clawpatch_compute_slopes = sc
 
       end
 
+c     ---------------------------------------------------------------
+c>    @brief Determines the tranformation from a coarse patch to it's
+c> .  half-sized neighbor's coordinate system
+c>
+c>    @param[in]  the pointer to the fclaw2d_patch_transform_data struct
+c>    @param[out] a the 2x2 tranform matrix for the i.j indexes of a patch
+c>    @param[out] f the transform vector
+c     ---------------------------------------------------------------
       subroutine fclaw2d_clawpatch_build_transform(transform_ptr,a,f)
       implicit none
 
@@ -152,7 +160,16 @@ c     # calls to T.
 
       end
 
-
+c>    Initializes the area and edge length arrays for fclaw2d_clawpatch_registers
+c>
+c>    @param[in]  mx, my number of cells in the x and y directions
+c>    @param[in]  mbc number of ghost cells
+c>    @param[in]  dx, dy spacings in the x and y direcitons
+c>    @param[in]  area area of each cell
+c>    @param[in]  edgelengths edge lengts of each cell along the x and y directions
+c>    @param[out] area0, area1, area2, area3 areas of cells along the edges
+c>    @param[out] el0, el1, el2, el3 edges lengths of the cells along the dges
+c>    @param[in]  manifold 1 if using manifold
       subroutine clawpatch_time_sync_setup(mx,my,mbc,dx,dy,
      &                                     area,edgelengths,
      &                                     area0,area1,area2,area3,

@@ -23,10 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** \file
+/** 
+ * @file
  *
- * Routines for handling general ForestClaw input options.
- *
+ * Routines for handling clawpatch input options.
  */
 
 #ifndef FCLAW2D_CLAWPATCH_OPTIONS_H
@@ -90,6 +90,11 @@ fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global
 
 void fclaw2d_clawpatch_set_refinement_criteria(int r);
 
+/**
+ * @brief hello
+ * 
+ * @return int 
+ */
 int fclaw2d_clawpatch_get_refinement_criteria();
 
 

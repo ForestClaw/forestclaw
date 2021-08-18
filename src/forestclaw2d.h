@@ -37,6 +37,11 @@ extern "C"
 #endif
 #endif
 
+/** 
+ * @file
+ * blah blah
+ */
+
 /*************************** DATA TYPES ***********************************/
 
 typedef struct fclaw2d_domain fclaw2d_domain_t;

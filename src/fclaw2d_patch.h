@@ -37,6 +37,14 @@ extern "C"
 #endif
 #endif
 
+
+/** 
+ * @defgroup patch
+ * @ingroup fclaw2d 
+ * Patch related functions and typedefs
+ */
+/** @{ */
+
 typedef struct fclaw2d_patch_vtable          fclaw2d_patch_vtable_t;
 typedef struct fclaw2d_patch_data            fclaw2d_patch_data_t;
 typedef struct fclaw2d_patch_transform_data  fclaw2d_patch_transform_data_t;
@@ -326,6 +334,24 @@ size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
 
 
 /* ------------------------------ Time syncing funtions ------------------------------- */
+
+/**
+ * @brief Adds fine grid corrections to coarse grid.  
+ * 
+ * TODO
+ * 
+ * @param glob the global context
+ * @param coarse_patch the context for the coarse patch
+ * @param fine_patch the context for the fine patch
+ * @param coarse_blockno the block number of the coarse patch
+ * @param fine_blockno the block number for the fine patch
+ * @param coarse_patchno the patch number for the coarse patch
+ * @param idir ?
+ * @param igrid  the index of the fine grid in the siblings array
+ * @param iface_coarse ?
+ * @param time_interp ?
+ * @param transform_data ?
+ */
 void fclaw2d_patch_time_sync_f2c(struct fclaw2d_global* glob,
 								 struct fclaw2d_patch *coarse_patch,
 								 struct fclaw2d_patch *fine_patch,
@@ -788,6 +814,7 @@ void fclaw2d_patch_set_block_corner_count(struct fclaw2d_global *glob,
 										  int icorner, int block_corner_count);
 
 
+/** @} */
 
 #ifdef __cplusplus
 #if 0
