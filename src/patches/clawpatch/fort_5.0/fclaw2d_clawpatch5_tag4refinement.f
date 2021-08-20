@@ -1,3 +1,13 @@
+c> @file
+c> tag4refinement routine for clawpack 5
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_tag4refinement_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::clawpatch_fort_tag4refinement_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_tag4refinement(mx,my,mbc,
      &      meqn, xlower,ylower,dx,dy,blockno,
      &      q, tag_threshold, init_flag,tag_patch)
@@ -53,7 +63,16 @@ c              # Refine this patch
       end
 
 
-c     # We may want to check ghost cells for tagging.  
+c--------------------------------------------------------------------
+c> @brief checks if index is a ghost cell index
+c>
+c> We may want to check ghost cells for tagging.  
+c> Implementation for clawpatch 5
+c>
+c> @param[in] i,j the index
+c> @param[in] mx,my dimensions of grid
+c> @return if the index is a ghost index
+c--------------------------------------------------------------------
       logical(kind=4) function fclaw2d_clawpatch5_is_ghost(i,j,mx,my)
          implicit none
 

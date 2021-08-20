@@ -73,6 +73,7 @@ c--------------------------------------------------------------------
 c> @brief checks if index is a ghost cell index
 c>
 c> We may want to check ghost cells for tagging.  
+c> Implementation for clawpatch 4.6
 c>
 c> @param[in] i,j the index
 c> @param[in] mx,my dimensions of grid

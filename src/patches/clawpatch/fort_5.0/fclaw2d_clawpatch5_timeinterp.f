@@ -1,3 +1,13 @@
+c> @file
+c> Clawpatch 5 timeinterp subroutines
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_timeinterp_t
+c>
+c> Implementation for clawpack 5.
+c>    
+c> @details @copydetails ::clawpatch_fort_timeinterp_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_timeinterp(mx,my,mbc,
      &      meqn,psize, qcurr,qlast,qinterp,alpha,ierror)
       implicit none

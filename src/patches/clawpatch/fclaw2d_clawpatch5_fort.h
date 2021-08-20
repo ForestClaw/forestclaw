@@ -26,6 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH5_FORT_H
 #define FCLAW2D_CLAWPATCH5_FORT_H
 
+/**
+ * @file
+ * C declarations of clawpatch 5 fortran subroutines
+ */
 #ifdef __cplusplus
 extern "C"
 {
@@ -39,10 +43,12 @@ extern "C"
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 
 /* ------------------------------ Time stepping functions ----------------------------- */
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_TIMEINTERP \
                      FCLAW_F77_FUNC (fclaw2d_clawpatch5_fort_timeinterp, \
                      FCLAW2D_CLAWPATCH5_FORT_TIMEINTERP)
 
+/** @copydoc fclaw2d_clawpatch5_fort_timeinterp() */
 void FCLAW2D_CLAWPATCH5_FORT_TIMEINTERP(const int *mx, const int* my, const int* mbc,
                                          const int *meqn, const int* psize,
                                          double qcurr[], double qlast[],
@@ -51,10 +57,12 @@ void FCLAW2D_CLAWPATCH5_FORT_TIMEINTERP(const int *mx, const int* my, const int*
 
 /* --------------------------------- Regridding functions ----------------------------- */
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_TAG4REFINEMENT \
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_tag4refinement, \
                    FCLAW2D_CLAWPATCH5_FORT_TAG4REFINEMENT)
 
+/** @copydoc fclaw2d_clawpatch5_fort_tag4refinement() */
 void FCLAW2D_CLAWPATCH5_FORT_TAG4REFINEMENT(const int* mx,const int* my,
                                              const int* mbc,const int* meqn,
                                              const double* xlower, const double* ylower,
@@ -67,10 +75,12 @@ void FCLAW2D_CLAWPATCH5_FORT_TAG4REFINEMENT(const int* mx,const int* my,
 
 
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_TAG4COARSENING \
                 FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_tag4coarsening, \
                 FCLAW2D_CLAWPATCH5_FORT_TAG4COARSENING)
 
+/** @copydoc fclaw2d_clawpatch5_fort_tag4coarsening() */
 void FCLAW2D_CLAWPATCH5_FORT_TAG4COARSENING(const int* mx, const int* my,
                                              const int* mbc, const int* meqn,
                                              double xlower[], double ylower[],
@@ -82,20 +92,24 @@ void FCLAW2D_CLAWPATCH5_FORT_TAG4COARSENING(const int* mx, const int* my,
                                              const int* initflag,
                                              int* tag_patch);
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE2FINE \
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_interpolate2fine, \
                    FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE2FINE)
 
+/** @copydoc fclaw2d_clawpatch5_fort_interpolate2fine() */
 void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE2FINE(const int* mx,const int* my,
                                                const int* mbc, const int* meqn,
                                                double qcoarse[], double qfine[],
                                                double areacoarse[], double areafine[],
                                                const int* igrid, const int* manifold);
   
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_AVERAGE2COARSE \
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_average2coarse, \
                    FCLAW2D_CLAWPATCH5_FORT_AVERAGE2COARSE)
 
+/** @copydoc fclaw2d_clawpatch5_fort_average2coarse() */
 void FCLAW2D_CLAWPATCH5_FORT_AVERAGE2COARSE(const int* mx, const int* my,
                                              const int* mbc, const int* meqn,
                                              double qcoarse[],double qfine[],
@@ -106,10 +120,12 @@ void FCLAW2D_CLAWPATCH5_FORT_AVERAGE2COARSE(const int* mx, const int* my,
 
 /* ---------------------------------- Ghost filling  ---------------------------------- */
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_COPY_FACE \
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_copy_face, \
                    FCLAW2D_CLAWPATCH5_FORT_COPY_FACE)
 
+/** @copydoc fclaw2d_clawpatch5_fort_copy_face() */
 void FCLAW2D_CLAWPATCH5_FORT_COPY_FACE(const int* mx, const int* my, const int* mbc, 
                                        const int* meqn,
                                         double qthis[],double qneighbor[], const int* a_idir,
@@ -117,10 +133,12 @@ void FCLAW2D_CLAWPATCH5_FORT_COPY_FACE(const int* mx, const int* my, const int* 
                                         transform_cptr);
 
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_AVERAGE_FACE \
                     FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_average_face, \
                     FCLAW2D_CLAWPATCH5_FORT_AVERAGE_FACE)
 
+/** @copydoc fclaw2d_clawpatch5_fort_average_face() */
 void FCLAW2D_CLAWPATCH5_FORT_AVERAGE_FACE(const int* mx, const int* my, const int* mbc,
                                            const int* meqn,
                                            double qcoarse[],double qfine[],
@@ -132,10 +150,12 @@ void FCLAW2D_CLAWPATCH5_FORT_AVERAGE_FACE(const int* mx, const int* my, const in
                                            struct fclaw2d_patch_transform_data** 
                                            transform_cptr);
   
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_FACE \
                     FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_interpolate_face, \
                     FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_FACE)
 
+/** @copydoc fclaw2d_clawpatch5_fort_interpolate_face() */
 void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_FACE(const int* mx,const int* my,const int* mbc,
                                               const int* meqn,
                                               double qcoarse[],double qfine[],
@@ -145,10 +165,12 @@ void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_FACE(const int* mx,const int* my,const 
                                                struct fclaw2d_patch_transform_data** 
                                                transform_cptr);
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_COPY_CORNER \
                           FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_copy_corner, \
                           FCLAW2D_CLAWPATCH5_FORT_COPY_CORNER)
 
+/** @copydoc fclaw2d_clawpatch5_fort_copy_corner() */
 void FCLAW2D_CLAWPATCH5_FORT_COPY_CORNER(const int* mx, const int* my, const int* mbc,
                                          const int* meqn, double this_q[], 
                                          double neighbor_q[],
@@ -156,10 +178,12 @@ void FCLAW2D_CLAWPATCH5_FORT_COPY_CORNER(const int* mx, const int* my, const int
                                          struct fclaw2d_patch_transform_data** 
                                          transform_cptr);
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_AVERAGE_CORNER \
                          FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_average_corner, \
                          FCLAW2D_CLAWPATCH5_FORT_AVERAGE_CORNER)
 
+/** @copydoc fclaw2d_clawpatch5_fort_average_corner() */
 void FCLAW2D_CLAWPATCH5_FORT_AVERAGE_CORNER(const int* mx, const int* my, const int* mbc,
                                             const int* meqn, const int* a_refratio,
                                             double qcoarse[], double qfine[],
@@ -169,10 +193,12 @@ void FCLAW2D_CLAWPATCH5_FORT_AVERAGE_CORNER(const int* mx, const int* my, const 
                                             struct fclaw2d_patch_transform_data** 
                                             transform_cptr);
   
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER \
                     FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_interpolate_corner, \
                     FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER)
 
+/** @copydoc fclaw2d_clawpatch5_fort_interpolate_corner() */
 void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my, 
                                                 const int* mbc,
                                                 const int* meqn, const int* a_refratio, 
@@ -185,10 +211,12 @@ void FCLAW2D_CLAWPATCH5_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
 
 /* ------------------------- Pillow grid block corner routines  ----------------------- */
 
+/** Fortran subroutine name */
 #define FCLAW2D_PILLOW5_COPY_BLOCK_CORNER \
                FCLAW_F77_FUNC(fclaw2d_pillow5_copy_block_corner, \
                               FCLAW2D_PILLOW5_COPY_BLOCK_CORNER)
 
+/** @copydoc fclaw2d_pillow46_copy_block_corner() */
 void FCLAW2D_PILLOW5_COPY_BLOCK_CORNER(int* mx, int* my,
                                         int* mbc, int* meqn,
                                         double qthis[], 
@@ -196,10 +224,12 @@ void FCLAW2D_PILLOW5_COPY_BLOCK_CORNER(int* mx, int* my,
                                         int* icorner,
                                         int* iblock);
 
+/** Fortran subroutine name */
 #define FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER \
           FCLAW_F77_FUNC(fclaw2d_pillow5_average_block_corner,\
                          FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER)
 
+/** @copydoc fclaw2d_pillow46_average_block_corner() */
 void  FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER(int* mx, int* my, int* mbc,
                                             int* meqn, 
                                             int* refratio, 
@@ -211,10 +241,12 @@ void  FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER(int* mx, int* my, int* mbc,
                                             int* blockno);
 
 // Averaging at block boundaries between coarse and fine grids.
+/** Fortran subroutine name */
 #define FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER \
           FCLAW_F77_FUNC(fclaw2d_pillow5_interpolate_block_corner, \
                          FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER)
 
+/** @copydoc fclaw2d_pillow46_interpolate_block_corner() */
 void  FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER(int* mx, int* my, int* mbc,
                                                 int* meqn, int* refratio,
                                                 double qcoarse[],
@@ -225,10 +257,12 @@ void  FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER(int* mx, int* my, int* mbc,
 
 /* ------------------------------------ Output functions ------------------------------ */
 
+/** Fortran subroutine name */
 #define  FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII \
                        FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_output_ascii, \
                        FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII)
 
+/** @copydoc fclaw2d_clawpatch5_fort_output_ascii() */
 void FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII(char* matname1,
                                           int* mx,        int* my,
                                           int* meqn,      int* mbc,
@@ -238,36 +272,44 @@ void FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII(char* matname1,
                                           int* patch_num, int* level,
                                           int* blockno,   int* mpirank);
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII \
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_header_ascii, \
                    FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII)
 
+/** @copydoc fclaw2d_clawpatch5_fort_header_ascii() */
 void FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII(const char* matname1, const char* matname2,
                                           const double* time, const int* meqn, 
                                           const int* maux, const int* ngrids);
 
 /* ----------------------------- Diagnostics functions -------------------------------- */
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_CONSERVATION_CHECK \
                FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_conservation_check, \
                FCLAW2D_CLAWPATCH5_FORT_CONSERVATION_CHECK)
 
+/** @copydoc fclaw2d_clawpatch5_fort_conservation_check() */
 void FCLAW2D_CLAWPATCH5_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
                                                 double *dx, double *dy,
                                                 double* area, double *q, double* sum,
                                                 double *c_kahan);
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA \
                       FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_compute_patch_area, \
                       FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA)
 
+/** @copydoc fclaw2d_clawpatch5_fort_compute_patch_area() */
 double FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double* dx,
                                                   double* dy, double area[]);
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM \
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_compute_error_norm, \
                    FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM)
 
+/** @copydoc fclaw2d_clawpatch5_fort_compute_error_norm() */
 void FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM (int* blockno, int* mx,int* my,int* mbc,
                                                  int* meqn,double* dx,double* dy,
                                                  double area[], double error[],
@@ -276,10 +318,12 @@ void FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM (int* blockno, int* mx,int* my,i
 /* ----------------------------- Parallel ghost patches  ------------------------------ */
 
 
+/** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK \
                       FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_local_ghost_pack, \
                       FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK)
 
+/** @copydoc fclaw2d_clawpatch5_fort_local_ghost_pack() */
 void FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK(const int *mx,   const int *my, 
                                               const int *mbc,
                                               const int *meqn, const int *mint,
@@ -290,9 +334,17 @@ void FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK(const int *mx,   const int *my,
 
 /* ----------------------------- User convenience functions  -------------------------- */
 
+/** Fortran subroutine name */
 #define CLAWPATCH5_TAG4REFINEMENT FCLAW_F77_FUNC(clawpatch5_tag4refinement, \
                                                  CLAWPATCH5_TAG4REFINEMENT)
 
+/** 
+ * @brief @copybrief ::clawpatch_fort_tag4refinement_t 
+ * 
+ * For user defined clawpatch5_tag4refinment subroutine
+ * 
+ * @details @copydetails ::clawpatch_fort_tag4refinement_t 
+ */
 void CLAWPATCH5_TAG4REFINEMENT(const int* mx,const int* my,
                               const int* mbc,const int* meqn,
                               const double* xlower, const double* ylower,
@@ -304,9 +356,17 @@ void CLAWPATCH5_TAG4REFINEMENT(const int* mx,const int* my,
                               int* tag_patch);
 
 
+/** Fortran subroutine name */
 #define CLAWPATCH5_TAG4COARSENING FCLAW_F77_FUNC(clawpatch5_tag4coarsening, \
                                                  CLAWPATCH5_TAG4COARSENING)
 
+/** 
+ * @brief @copybrief ::clawpatch_fort_tag4coarsening_t 
+ * 
+ * For user defined clawpatch5_tag4coarsening subroutine
+ * 
+ * @details @copydetails ::clawpatch_fort_tag4coarsening_t 
+ */
 void CLAWPATCH5_TAG4COARSENING(const int* mx, const int* my,
                               const int* mbc, const int* meqn,
                               const double* xlower, const double* ylower,

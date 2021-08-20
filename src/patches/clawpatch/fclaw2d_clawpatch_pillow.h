@@ -26,12 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PILLOWSPHERE_H
 #define PILLOWSPHERE_H
 
-/**
- * @file
- * This handles the boundary conditions at the block
- * corners for the pillow sphere.
- */
-
 #include <fclaw2d_defs.h>
 
 #ifdef __cplusplus
@@ -46,6 +40,13 @@ struct fclaw2d_glob;
 struct fclaw2d_patch;
 struct fclaw2d_patch_transform;
 
+/**
+ * @file
+ * This handles the boundary conditions at the block
+ * corners for the pillow sphere.
+ */
+
+/** typedef */
 typedef struct fclaw2d_clawpatch_pillow_vtable fclaw2d_clawpatch_pillow_vtable_t;
 
 
