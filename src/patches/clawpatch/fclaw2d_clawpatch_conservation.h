@@ -191,17 +191,55 @@ typedef void  (*clawpatch_fort_time_sync_samesize_t)(const int* mx,
 
 
 
+/**
+ * @brief Allocate a new registers struct
+ * 
+ * @param[in] glob the global context
+ * @param[in] this_patch the patch context
+ * @param[in] blockno the block number
+ * @param[in] patchno the patch number
+ * @param[out] registers the newly allocated registers struct
+ */
 void fclaw2d_clawpatch_time_sync_new(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* this_patch,
                                      int blockno,int patchno,
                                      fclaw2d_clawpatch_registers_t **registers);
 
+/**
+ * @brief Deallocate the registers struct
+ * 
+ * @param[in,out] registers the registers, set to NULL on return
+ */
 void fclaw2d_clawpatch_time_sync_delete(fclaw2d_clawpatch_registers_t **registers);
 
+/**
+ * @brief Inialize the area and edgelength arrays of the registers
+ * 
+ * @param[in] glob the global context
+ * @param[in] this_patch the patch context
+ * @param[in] blockno the block number
+ * @param[in] patchno the patch number
+ */
 void fclaw2d_clawpatch_time_sync_setup(struct fclaw2d_global* glob,
                                        struct fclaw2d_patch* this_patch,
                                        int blockno,int patchno);
 
+/**
+ * @brief Adds fine grid corrections to coarse grid.  
+ * 
+ * @param[in] glob the global context
+ * @param[in,out] coarse_patch the coarse patch context
+ * @param[in] fine_patch the fine patch context
+ * @param[in] coarse_blockno the block number of the coarse patch
+ * @param[in] fine_blockno the block number of the fine patch
+ * @param[in] coarse_patchno the patch number of the coarse patch
+ * @param[in] idir the direction of the interface 0 for bottom/top 
+ *            1 for left/right
+ * @param[in] igrid the index of the fine grid in the child array
+ * @param[in] iface_coarse the interface on the coarse patch
+ * @param[in] time_interp NOT USED
+ * @param[in] transform_data the transform for the neighbor's coordinates
+ */
 void fclaw2d_clawpatch_time_sync_f2c(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* coarse_patch,
                                      struct fclaw2d_patch* fine_patch,
@@ -214,6 +252,17 @@ void fclaw2d_clawpatch_time_sync_f2c(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch_transform_data
                                      *transform_data);
 	
+/**
+ * @brief Adds corrections to patches that are at the same levle and are at block boundaries.
+ * 
+ * @param[in] glob the global context
+ * @param[in,out] this_patch this patch
+ * @param[in] neighbor_patch the neighbor patch
+ * @param[in] this_iface the interface that the neighbor patch is on
+ * @param[in] idir the direction of the interface 0 for bottom/top 
+ *            1 for left/right
+ * @param[in] transform_data the transform for the neighbor's coordinates
+ */
 void fclaw2d_clawpatch_time_sync_samesize(struct fclaw2d_global* glob,
                                           struct fclaw2d_patch* this_patch,
                                           struct fclaw2d_patch* neighbor_patch,
@@ -221,11 +270,29 @@ void fclaw2d_clawpatch_time_sync_samesize(struct fclaw2d_global* glob,
                                           struct fclaw2d_patch_transform_data
                                           *transform_data);
 
+/**
+ * @brief Resets arrays in the registers
+ * 
+ * @param[in] glob the global context
+ * @param[in,out] this_patch the patch context
+ * @param[in] coarse_level the the level of the coarse patch
+ * @param[in] reset_mode the reset mode ::fclaw2d_time_sync_type
+ */
 void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global* glob,
                                        struct fclaw2d_patch *this_patch,
                                        int coarse_level,
                                        int reset_mode);
 
+/**
+ * @brief Packs/Unpacks the registers to/from a buffer
+ * 
+ * @param[in] glob the global context
+ * @param[in,out] this_patch the patch context
+ * @param[in,out] qpack the buffer
+ * @param[in] frsize the size of the buffer
+ * @param[in] packmode the packing mode
+ * @param[out] ierror the error value
+ */
 void fclaw2d_clawpatch_time_sync_pack_registers(struct fclaw2d_global *glob,
                                                 struct fclaw2d_patch *this_patch,
                                                 double *qpack,

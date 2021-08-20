@@ -1,3 +1,7 @@
+c> @file
+c> Clawpatch utilities
+
+c> ????
       double precision function 
      &      fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
       implicit none
