@@ -1,3 +1,22 @@
+c> @file
+c> Clawpatch 4.6 timeinterp subroutines
+
+c--------------------------------------------------------------------
+c> .  @brief Interpolates q between timesteps.
+c>    
+c>    This only needs to interpolate the interior cells that are needed for ghost cells on
+c>    neighboring patches
+c>    
+c>    @param[in]     mx, my the number cells in the x and y directions, excluding ghost
+c>    @param[in]     mbc the number of ghost cells
+c>    @param[in]     meqn the number of equations
+c>    @param[in]     psize	the total number cells that should be interpolated 
+c>    @param[in]     qcurr the current q
+c>    @param[in]     qlast the previous q
+c>    @param[out]    qinterp the inerpolated q
+c>    @param[in]     alpha where to interpolate between qlast and qcurr
+c>    @param[out]    ierror error value
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_timeinterp
      &      (mx,my,mbc,meqn,psize,
      &      qcurr,qlast,qinterp,alpha,ierror)

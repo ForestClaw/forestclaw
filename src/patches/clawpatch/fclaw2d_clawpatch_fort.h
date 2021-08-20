@@ -51,7 +51,7 @@ struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 /** @{ @name Ghost filling - patch specific *//*----------------------------------------*/
 
 /**
- * @brief Copies ghost data from a face neighboring grid on the same level
+ * @brief Copies ghost data from a face-neighboring grid on the same level
  * 
  * @param[in]     mx, my the number cells in the x and y directions, excluding ghost
  * @param[in]     mbc the number of ghost cells
@@ -59,17 +59,17 @@ struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
  * @param[in,out] qthis the solution of this patch
  * @param[in]     qneighbor the solution of the neighbor patch
  * @param[in]     iface the interface that the neighbor is on
- * @param[in]     transform_cptr Encoding for indices at block boundaries (C only).
+ * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
 typedef void (*clawpatch_fort_copy_face_t)(const int* mx, const int* my, 
                                            const int* mbc, 
 										   const int* meqn,
 										   double qthis[],double qneighbor[], 
 										   const int* iface,
-										   struct fclaw2d_patch_transform_data** transform_cptr);
+										   struct fclaw2d_patch_transform_data** transform_ptr);
 
 /**
- * @brief Averages values from a face neighboring fine grid
+ * @brief Averages values from a face-neighboring fine grid
  * 
  * @param[in]     mx, my the number cells in the x and y directions, excluding ghost
  * @param[in]     mbc the number of ghost cells
@@ -77,14 +77,14 @@ typedef void (*clawpatch_fort_copy_face_t)(const int* mx, const int* my,
  * @param[in,out] qcoarse the solution of this patch
  * @param[in]     qfine the solution of the fine neighbor patch
  * @param[in]     areacoarse the area of cells in this patch
- * @param[in]     areacoarse the area of cells in the fine neighbor patch
- * @param in]     idir Face orientation - 0 for x-faces; 1 for y-faces [0-1]
+ * @param[in]     areafine the area of cells in the fine neighbor patch
+ * @param[in]     idir Face orientation - 0 for x-faces; 1 for y-faces [0-1]
  * @param[in]     iside the interface of the fine neighbor patch
  * @param[in]     num_neighbors the number of neighbors
  * @param[in]     refratio the refinement ratio
  * @param[in]     igrid the index of the fine neighbor in the child array
  * @param[in]     manifold true if using mainifold
- * @param[in]     transform_cptr Encoding for indices at block boundaries (C only).
+ * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
 typedef void (*clawpatch_fort_average_face_t)(const int* mx, const int* my, const int* mbc,
 											  const int* meqn,
@@ -94,9 +94,9 @@ typedef void (*clawpatch_fort_average_face_t)(const int* mx, const int* my, cons
 											  const int* num_neighbors,
 											  const int* refratio, const int* igrid,
 											  const int* manifold, 
-											  struct fclaw2d_patch_transform_data** transform_cptr);
+											  struct fclaw2d_patch_transform_data** transform_ptr);
 /**
- * @brief Interpolates values form a face neighboring coarse grid
+ * @brief Interpolates values from a face-neighboring coarse grid
  * 
  * @param[in]     mx, my the number cells in the x and y directions, excluding ghost
  * @param[in]     mbc the number of ghost cells
@@ -104,38 +104,37 @@ typedef void (*clawpatch_fort_average_face_t)(const int* mx, const int* my, cons
  * @param[in]     qcoarse the solution of the coarse neighbor patch
  * @param[in,out] qfine the solution of this patch
  * @param[in]     areacoarse the area of cells in the coarse neighbor patch
- * @param[in]     areacoarse the area of cells in the this patch
+ * @param[in]     arefine the area of cells in the this patch
  * @param[in]     idir Face orientation - 0 for x-faces; 1 for y-faces [0-1]
- * @param[in]     iside the interface of the coarse neighbor patch
+ * @param[in]     iface_coarse the interface of the coarse neighbor patch
  * @param[in]     num_neighbors the number of neighbors
  * @param[in]     refratio the refinement ratio
  * @param[in]     igrid the index of this patch in the child array
- * @param[in]     manifold true if using mainifold
- * @param[in]     transform_cptr Encoding for indices at block boundaries (C only).
+ * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
 typedef void (*clawpatch_fort_interpolate_face_t)(const int* mx, const int* my, const int* mbc,
 												  const int* meqn,
 												  double qcoarse[],double qfine[],
-												  const int* idir, const int* iside,
+												  const int* idir, const int* iface_coarse,
 												  const int* num_neighbors,
 												  const int* refratio, const int* igrid,
-												  struct fclaw2d_patch_transform_data** transform_cptr);
+												  struct fclaw2d_patch_transform_data** transform_ptr);
 	
 /**
- * @brief Copies ghost data from a corner neighboring grid on the same level
+ * @brief Copies ghost data from a corner-neighboring grid on the same level
  * 
  * @param[in]     mx, my the number cells in the x and y directions, excluding ghost
  * @param[in]     mbc the number of ghost cells
  * @param[in]     meqn the number of equations
- * @param[in,out] this_q the solution of this patch
- * @param[in]     neighbor_q the solution of the neighbor patch
- * @param[in]     a_corner the corner that the neighbor is on
- * @param[in]     transform_cptr Encoding for indices at block boundaries (C only).
+ * @param[in,out] qthis the solution of this patch
+ * @param[in]     qneighbor the solution of the neighbor patch
+ * @param[in]     icorner_coarse the corner of the coarse patch to copy from
+ * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
 typedef void (*clawpatch_fort_copy_corner_t)(const int* mx, const int* my, const int* mbc,
-											 const int* meqn, double this_q[],double neighbor_q[],
-											 const int* a_corner,
-											 struct fclaw2d_patch_transform_data** transform_cptr);
+											 const int* meqn, double qthis[],double qneighbor[],
+											 const int* icorner_coarse,
+											 struct fclaw2d_patch_transform_data** transform_ptr);
 
 /**
  * @brief Averages values from a corner neighboring fine grid
@@ -146,10 +145,10 @@ typedef void (*clawpatch_fort_copy_corner_t)(const int* mx, const int* my, const
  * @param[in,out] qcoarse the solution of this patch
  * @param[in]     qfine the solution of the fine neighbor patch
  * @param[in]     areacoarse the area of cells in this patch
- * @param[in]     areacoarse the area of cells in the fine neighbor patch
+ * @param[in]     arefine the area of cells in the fine neighbor patch
  * @param[in]     manifold true if using mainifold
  * @param[in]     a_corner the corner that the neighbor is on
- * @param[in]     transform_cptr Encoding for indices at block boundaries (C only).
+ * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
 typedef void (*clawpatch_fort_average_corner_t)(const int* mx, const int* my, const int* mbc,
 												const int* meqn, const int* a_refratio,
@@ -157,25 +156,25 @@ typedef void (*clawpatch_fort_average_corner_t)(const int* mx, const int* my, co
 												double areacoarse[], double areafine[],
 												const int* manifold,
 												const int* a_corner, 
-												struct fclaw2d_patch_transform_data** transform_cptr);
+												struct fclaw2d_patch_transform_data** transform_ptr);
 
 /**
- * @brief Interpolates values form a face neighboring coarse grid
+ * @brief Interpolates values form a corner-neighboring coarse grid
  * 
  * @param[in]     mx, my the number cells in the x and y directions, excluding ghost
  * @param[in]     mbc the number of ghost cells
  * @param[in]     meqn the number of equations
- * @param[in]     a_refratio the refinement ratio
- * @param[in,out] this_q the solution of this patch
- * @param[in]     neighbor_q the solution of the coarse neighbor patch
- * @param[in]     a_corner the corner that the neighbor is on
- * @param[in]     transform_cptr Encoding for indices at block boundaries (C only).
+ * @param[in]     refratio the refinement ratio
+ * @param[in]     qcoarse the solution of the coarse patch
+ * @param[in,out] qfine the solution of the fine patch
+ * @param[in]     icorner_coarse the corner of the coarse neighbor that to interpolate from
+ * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
 typedef void (*clawpatch_fort_interpolate_corner_t)(const int* mx, const int* my, const int* mbc,
-													const int* meqn, const int* a_refratio, 
-													double this_q[],
-													double neighbor_q[], const int* a_corner,
-													struct fclaw2d_patch_transform_data** transform_cptr);
+													const int* meqn, const int* refratio, 
+													double qcoarse[],
+													double qfine[], const int* icorner_coarse,
+													struct fclaw2d_patch_transform_data** transform_ptr);
 	
 /** @} */
 
@@ -252,8 +251,8 @@ typedef int (*clawpatch_fort_exceeds_threshold_t)(const int *blockno,
  * @param[in]  mx, my the number of cells in the x and y direcitons
  * @param[in]  mbc the number of ghost cells
  * @param[in]  meqn the number of equations
- * @param[out] qcoarse the coarse solution
- * @param[in]  qfine the fine solution
+ * @param[in]  qcoarse the coarse solution
+ * @param[out] qfine the fine solution
  * @param[in]  areacoarse the area of the coarse cells
  * @param[in]  areafine the area of the fine cells
  * @param[in]  igrid the index of the fine patch in the siblings array
@@ -328,6 +327,7 @@ typedef void (*clawpatch_fort_timeinterp_t)(const int *mx, const int* my, const 
  * @param[in]     psize the size of qpack buffer
  * @param[in]     packmode the packing mode (0 for packing q, 1 for unpacking q, 
  *                2 for packing q and area, and 3 for unpacking q and area) 
+ * @param[out]    ierror the error value
  */
 typedef void (*clawpatch_fort_local_ghost_pack_t)(const int *mx, const int *my, 
                                                   const int *mbc,
@@ -465,7 +465,21 @@ int FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_exceeds_threshold, \
                                   FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD)
 
-/** @brief C declaration of fclaw2d_clawpatch_exceeds_threshold() subroutine */
+/**
+ * @brief Check if the refinment threshold is exceeded
+ *
+ * @param[in] blockno the block number
+ * @param[in] qval the 
+ * @param[in] qmin the minimum q value
+ * @param[in] qmax the maximum q value
+ * @param[in] quad the value and adjacent values of q
+ * @param[in] dx, dy the spacing in the x and y directions
+ * @param[in] xc, yc the coordinate of the cell
+ * @param[in] threshold the threshold
+ * @param[in] init_flag true if in init stage
+ * @param[in] is_ghost true if cell is a ghost cell
+ * @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
+ */
 int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
                                         const double *qval, 
                                         const double *qmin, 
