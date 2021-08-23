@@ -36,15 +36,43 @@ extern "C"
 #endif
 #endif
 
+/**
+ * @file
+ * C declarations for Fortran subroutines
+ */
+
 
 /* Typedef'd functions that user can set to whatever they want */
+/**
+ * @brief Compute the cell center and node coordinates for a patch
+ *
+ * @param[in] mx, my the number of cells in the x and y directions
+ * @param[in] mbc the number of ghost cells
+ * @param[in] xlower, ylower the lower left coordinate of the patch
+ * @param[in] dx, dy the spacings in the x and y direcitons
+ * @param[in] blockno the block number
+ * @param[out] xp, yp, zp the coordinates of cell centers
+ * @param[out] xd, yd, zd the coordinates nodes
+ */
 typedef void (*fclaw2d_fort_compute_mesh_t)(const int* mx, const int* my, const int* mbc,
                                             const double* xlower, const double* ylower,
                                             const double* dx, const double* dy,
                                             int* blockno,
                                             double xp[], double yp[], double zp[],
                                             double xd[], double yd[], double zd[]);
-
+/**
+ * @brief Compute the area for each cell
+ *
+ * @param[in] mx, my the number of cells in the x and y directions
+ * @param[in] mbc the number of ghost cells
+ * @param[in] dx, dy the spacings in the x and y direcitons
+ * @param[in] xlower, ylower the lower left coordinate of the patch
+ * @param[in] blockno the block number
+ * @param[out] area the area of each cell
+ * @param[in] quadsize the length of the quad
+ * @param[in] quadstore stores a group of cell values
+ * @param[in] ghost_only true if only ghost cell shouyld be computed
+ */
 typedef void (*fclaw2d_fort_compute_area_t)(const int* mx, const int* my, const int* mbc,
                                             const double* dx, const double* dy,
                                             const double* xlower, const double* ylower,
@@ -52,16 +80,46 @@ typedef void (*fclaw2d_fort_compute_area_t)(const int* mx, const int* my, const 
                                             const int* level, const int* maxlevel,
                                             const int* refratio, const int* ghost_only);
 
+/**
+ * @brief Compute the normals at the cell faces
+ *
+ * @param[in] mx, my the number of cells in the x and y direcitons
+ * @param[in] mbc the number of ghost cells
+ * @param[in] xp, yp, zp the cell center coordinates
+ * @param[in] xd, yd, zd the node coordinates
+ * @param[in] xnormals, ynormals the normals of the cell faces
+ */
 typedef void (*fclaw2d_fort_compute_normals_t)(const int* mx, const int* my, const int* mbc,
                                                double xp[], double yp[], double zp[],
                                                double xd[], double yd[], double zd[],
                                                double xnormals[], double ynormals[]);
 
+/**
+ * @brief Computes the tangents and lengths at the cell faces
+ *
+ * @param[in] mx, my the number of cells in the x and y direcitons
+ * @param[in] mbc the number of ghost cells
+ * @param[in] xd, yd, zd the node coordinates
+ * @param[out] xtangents, ytangents the tangents of the cell faces
+ * @param[out] edge_lengths the lengths of the cell faces
+ */
 typedef void (*fclaw2d_fort_compute_tangents_t)(const int* mx, const int* my, const int* mbc,
                                                 double xd[], double yd[], double zd[],
                                                 double xtangents[], double ytangents[],
                                                 double edge_lengths[]);
 
+/**
+ * @brief Compute the normals for the cell surfaces
+ *
+ * @param[in] mx, my the number of cells in the x and y direcitons
+ * @param[in] mbc the number of ghost cells
+ * @param[in] xlower, ylower the lower lef coordinate of the patch
+ * @param[in] xnormals, ynormals the normals of the cell faces
+ * @param[in] edge_lengths the lengths of the cell faces
+ * @param[in] curvature
+ * @param[out] surfnormals the normals of the cell surfaces
+ * @param[in] area the area of each cell
+ */
 typedef void (*fclaw2d_fort_compute_surf_normals_t)(const int* mx, const int* my, const int* mbc,
                                                     double xnormals[],double ynormals[],
                                                     double edge_lengths[],
@@ -74,15 +132,19 @@ typedef double (*fclaw2d_fort_aux_func_t)(double* xc, double *yc);
 #endif
 
 
+/** Fortran subroutine name */
 #define FCLAW2D_FORT_AVERAGE_AREA FCLAW_F77_FUNC(fclaw2d_fort_average_area, \
                                                FCLAW2D_FORT_AVERAGE_AREA) 
+/** @copydoc fclaw2d_fort_average_area() */
 void FCLAW2D_FORT_AVERAGE_AREA(const int* mx, const int* my,
                                  const int* mbc,
                                  double areacoarse[],double areafine[],
                                  const int* igrid);
 
+/** Fortran subroutine name */
 #define FCLAW2D_FORT_COMPUTE_MESH \
     FCLAW_F77_FUNC(fclaw2d_fort_compute_mesh,FCLAW2D_FORT_COMPUTE_MESH)
+/** @copydoc fclaw2d_fort_compute_mesh() */
 void FCLAW2D_FORT_COMPUTE_MESH(const int* mx, const int* my, const int* mbc,
                              const double* xlower, const double* ylower,
                              const double* dx, const double* dy,
@@ -90,8 +152,10 @@ void FCLAW2D_FORT_COMPUTE_MESH(const int* mx, const int* my, const int* mbc,
                              double xp[], double yp[], double zp[],
                              double xd[], double yd[], double zd[]);
 
+/** Fortran subroutine name */
 #define FCLAW2D_FORT_COMPUTE_AREA \
     FCLAW_F77_FUNC(fclaw2d_fort_compute_area,FCLAW2D_FORT_COMPUTE_AREA)
+/** @copydoc fclaw2d_fort_compute_area() */
 void FCLAW2D_FORT_COMPUTE_AREA(const int* mx, const int* my, const int* mbc,
                                const double* dx, const double* dy,
                                const double* xlower, const double* ylower,
@@ -100,25 +164,31 @@ void FCLAW2D_FORT_COMPUTE_AREA(const int* mx, const int* my, const int* mbc,
                                const int* ghost_only);
 
 
+/** Fortran subroutine name */
 #define FCLAW2D_FORT_COMPUTE_NORMALS \
     FCLAW_F77_FUNC(fclaw2d_fort_compute_normals,FCLAW2D_FORT_COMPUTE_NORMALS)
 
+/** @copydoc fclaw2d_fort_compute_normals() */
 void FCLAW2D_FORT_COMPUTE_NORMALS(const int* mx, const int* my, const int* mbc,
                                   double xp[], double yp[], double zp[],
                                   double xd[], double yd[], double zd[],
                                   double xnormals[], double ynormals[]);
 
+/** Fortran subroutine name */
 #define FCLAW2D_FORT_COMPUTE_TANGENTS \
     FCLAW_F77_FUNC(fclaw2d_fort_compute_tangents,FCLAW2D_FORT_COMPUTE_TANGENTS)
 
+/** @copydoc fclaw2d_fort_compute_tangents() */
 void FCLAW2D_FORT_COMPUTE_TANGENTS(const int* mx, const int* my, const int* mbc,
                                    double xd[], double yd[], double zd[],
                                    double xtangents[], double ytangents[],
                                    double edge_lengths[]);
 
+/** Fortran subroutine name */
 #define FCLAW2D_FORT_COMPUTE_SURF_NORMALS \
     FCLAW_F77_FUNC(fclaw2d_fort_compute_surf_normals,FCLAW2D_FORT_COMPUTE_SURF_NORMALS)
 
+/** @copydoc fclaw2d_fort_compute_surf_normals() */
 void FCLAW2D_FORT_COMPUTE_SURF_NORMALS(const int* mx, const int* my, const int* mbc,
                                        double xnormals[],double ynormals[],
                                        double edge_lengths[],

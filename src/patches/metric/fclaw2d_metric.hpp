@@ -22,54 +22,88 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/**
+ * @file
+ * C++ structures for metric patch
+ */
 
 #ifndef FCLAW2D_METRIC_HPP
 #define FCLAW2D_METRIC_HPP
 
 #include <fclaw2d_farraybox.hpp>     /* Needed for FArray box used to store metric data */
 
-typedef struct fclaw2d_metric_vtable fclaw2d_metric_vtable_t;
-
-struct fclaw2d_global;
-struct fclaw2d_patch;
-
-class fclaw2d_metric_patch_t
+/**
+ * @brief Struct for patch metric data
+ */
+struct fclaw2d_metric_patch_t
 {
-public :
-
+    /** The number of cells in the x direction */
     int mx;           
+    /** The number of cells in the x direction */
     int my;           
+    /** The number of ghost cells */
     int mbc;
+    /** The block number */
     int blockno;
 
+    /** The spacing in the x direction */
     double dx;
+    /** The spacing in the y direction */
     double dy;
+    /** x value of bottom face */
     double xlower;
+    /** y value of left face */
     double ylower;
+    /** x value of upper face */
     double xupper;
+    /** y value of right face */
     double yupper;
     
+    /** x coordinates of cell centers */
     FArrayBox xp;
+    /** y coordinates of cell centers */
     FArrayBox yp;
+    /** z coordinates of cell centers */
     FArrayBox zp;
 
+    /** x coordinates of nodes */
     FArrayBox xd;
+    /** y coordinates of nodes */
     FArrayBox yd;
+    /** z coordinates of nodes */
     FArrayBox zd;
 
+    /** normals of the x faces */
     FArrayBox xface_normals;
+    /** normals of the y faces */
     FArrayBox yface_normals;
+    /** tangents of the x faces */
     FArrayBox xface_tangents;
+    /** tangents of the y faces */
     FArrayBox yface_tangents;
+    /** normals of cell surfaces */
     FArrayBox surf_normals;
+    /** edge lengths for both x and y faces */
     FArrayBox edge_lengths;
 
+    /** area of each cell */
     FArrayBox area;
-    FArrayBox curvature;  // ???
+    /** curvature of each cell */
+    FArrayBox curvature;
 };
 
+/**
+ * @brief Allocate a new metric patch
+ * 
+ * @return fclaw2d_metric_patch_t* the new metric patch
+ */
 fclaw2d_metric_patch_t* fclaw2d_metric_patch_new();
 
+/**
+ * @brief Delete the metric patch
+ * 
+ * @param patchmp the metric patch, null on return
+ */
 void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t **patchmp);
 
 #endif /* !FCLAW2D_METRIC_HPP */
