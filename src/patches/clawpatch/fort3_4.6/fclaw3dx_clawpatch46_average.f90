@@ -26,7 +26,7 @@
 !!> Average fine grid interior values to neighboring ghost cell values of
 !!> the coarse grid.
       
-SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, & 
+SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, & 
            qcoarse,qfine,areacoarse, areafine, & 
            idir,iface_coarse,num_neighbors,refratio,igrid, & 
            manifold, transform_cptr)
@@ -162,13 +162,13 @@ SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, &
             endif  !! idir conditonal
         end do k_loop
     end do meqn_loop
-end subroutine  fclaw2d_clawpatch46_fort3_average_face
+end subroutine  fclaw3dx_clawpatch46_fort_average_face
 
 
 !!> \ingroup Averaging
 !!> Average across corners.
 
-subroutine fclaw2d_clawpatch46_fort3_average_corner(mx,my,mz,mbc,meqn, &
+subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
     refratio,qcoarse,qfine,areacoarse,areafine, & 
     manifold,icorner_coarse,transform_cptr)
     IMPLICIT NONE
@@ -247,12 +247,12 @@ subroutine fclaw2d_clawpatch46_fort3_average_corner(mx,my,mz,mbc,meqn, &
         enddo k_loop
     end do meqn_loop
 
-end subroutine fclaw2d_clawpatch46_fort3_average_corner
+end subroutine fclaw3dx_clawpatch46_fort_average_corner
 
 
 !!> \ingroup  Averaging
 !!> Average fine grid siblings to parent coarse grid.
-subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, & 
+subroutine fclaw3dx_clawpatch46_fort_average2coarse(mx,my,mz,mbc,meqn, & 
            qcoarse,qfine, areacoarse, areafine, igrid,manifold)
     IMPLICIT NONE
 
@@ -340,6 +340,6 @@ subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, &
             enddo j_loop
         enddo k_loop
     enddo meqn_loop
-end subroutine  fclaw2d_clawpatch46_fort3_average2coarse
+end subroutine  fclaw3dx_clawpatch46_fort_average2coarse
 
 

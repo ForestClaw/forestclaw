@@ -1,4 +1,4 @@
-subroutine fclaw2d_clawpatch46_fort3_tag4coarsening(mx,my,mz, mbc,meqn, & 
+subroutine fclaw3dx_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, & 
            xlower,ylower,zlower,dx,dy, dz, blockno, q0, q1, q2, q3, & 
           coarsen_threshold, initflag, tag_patch)
     implicit none
@@ -47,7 +47,7 @@ subroutine fclaw2d_clawpatch46_fort3_tag4coarsening(mx,my,mz, mbc,meqn, &
            mq,q3,qmin,qmax,dx,dy,dz,xlower(3), ylower(3),zlower, &
            coarsen_threshold,initflag, tag_patch)
 
-end subroutine fclaw2d_clawpatch46_fort3_tag4coarsening
+end subroutine fclaw3dx_clawpatch46_fort_tag4coarsening
 
 subroutine fclaw2d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, & 
       meqn,mq,q, qmin,qmax,dx,dy,dz,xlower,ylower,zlower, &

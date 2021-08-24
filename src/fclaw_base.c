@@ -202,13 +202,17 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     sc_MPI_Comm mpicomm;
     fclaw_app_t *a;
 
-    mpiret = sc_MPI_Init (argc, argv);
-    SC_CHECK_MPI (mpiret);
     mpicomm = sc_MPI_COMM_WORLD;
 
-    sc_init (mpicomm, 1, 1, NULL, LP_lib);
-    p4est_init (NULL, LP_lib);
-    fclaw_init (NULL, LP_fclaw);
+    int mpi_initialized;
+    MPI_Initialized(&mpi_initialized);
+    if(!mpi_initialized){
+        mpiret = sc_MPI_Init (argc, argv);
+        SC_CHECK_MPI (mpiret);
+        sc_init (mpicomm, 1, 1, NULL, LP_lib);
+        p4est_init (NULL, LP_lib);
+        fclaw_init (NULL, LP_fclaw);
+    }
 
     a = FCLAW_ALLOC (fclaw_app_t, 1);
     a->mpicomm = mpicomm;

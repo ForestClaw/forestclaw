@@ -1,4 +1,4 @@
-subroutine fclaw2d_clawpatch46_fort3_tag4refinement(mx,my,mz,mbc, & 
+subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, & 
     meqn, xlower,ylower,zlower, dx,dy,dz, blockno, & 
     q, tag_threshold, init_flag, tag_patch)
     implicit none
@@ -57,7 +57,7 @@ subroutine fclaw2d_clawpatch46_fort3_tag4refinement(mx,my,mz,mbc, &
             end do
         end do
     end do
-end subroutine  fclaw2d_clawpatch46_fort3_tag4refinement
+end subroutine  fclaw3dx_clawpatch46_fort_tag4refinement
 
 !! # We may want to check ghost cells for tagging.  
 logical(kind=4) function clawpatch3_is_ghost(i,j,mx,my)

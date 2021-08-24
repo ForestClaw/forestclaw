@@ -9,7 +9,7 @@
 
 !! # Exchange edge ghost data with neighboring grid at same level.
 
-subroutine fclaw2d_clawpatch46_fort3_copy_face(mx,my,mz,mbc, & 
+subroutine fclaw3dx_clawpatch46_fort_copy_face(mx,my,mz,mbc, & 
            meqn,qthis, qneighbor, iface, transform_ptr)
 
     implicit none
@@ -64,9 +64,9 @@ subroutine fclaw2d_clawpatch46_fort3_copy_face(mx,my,mz,mbc, &
         end do k_loop
     enddo mq_loop
 
-end subroutine fclaw2d_clawpatch46_fort3_copy_face
+end subroutine fclaw3dx_clawpatch46_fort_copy_face
 
-subroutine fclaw2d_clawpatch46_fort3_copy_corner(mx,my,mz,mbc,meqn, &
+subroutine fclaw3dx_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &
     qthis, qneighbor, this_icorner,transform_ptr)
     implicit none
 
@@ -106,4 +106,4 @@ subroutine fclaw2d_clawpatch46_fort3_copy_corner(mx,my,mz,mbc,meqn, &
         end do k_loop
     end do mq_loop
 
-end subroutine fclaw2d_clawpatch46_fort3_copy_corner
+end subroutine fclaw3dx_clawpatch46_fort_copy_corner

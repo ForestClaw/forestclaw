@@ -22,7 +22,7 @@
 !! # This routine is used for both mapped and non-mapped
 !! # cases.
 !! # ----------------------------------------------------------
-subroutine fclaw2d_clawpatch46_fort3_interpolate_face & 
+subroutine fclaw3dx_clawpatch46_fort_interpolate_face & 
     (mx,my,mz,mbc,meqn,qcoarse,qfine, & 
      idir,iface_coarse,num_neighbors,refratio,igrid, & 
      transform_ptr)
@@ -185,9 +185,9 @@ subroutine fclaw2d_clawpatch46_fort3_interpolate_face &
         enddo k_loop
     enddo mq_loop
 
-end subroutine fclaw2d_clawpatch46_fort3_interpolate_face
+end subroutine fclaw3dx_clawpatch46_fort_interpolate_face
 
-subroutine fclaw2d_clawpatch46_fort3_interpolate_corner & 
+subroutine fclaw3dx_clawpatch46_fort_interpolate_corner & 
            (mx,my,mz, mbc,meqn,refratio, & 
            qcoarse,qfine,icorner_coarse,transform_ptr)
     implicit none
@@ -293,11 +293,11 @@ subroutine fclaw2d_clawpatch46_fort3_interpolate_corner &
         end do !! jbc_loop
     end do !! ibc_loop
 
-end subroutine fclaw2d_clawpatch46_fort3_interpolate_corner
+end subroutine fclaw3dx_clawpatch46_fort_interpolate_corner
 
 
 !! # Conservative intepolation to fine grid patch
-subroutine fclaw2d_clawpatch46_fort3_interpolate2fine & 
+subroutine fclaw3dx_clawpatch46_fort_interpolate2fine & 
           (mx,my,mz,mbc,meqn,qcoarse, qfine, areacoarse, &
            areafine, igrid, manifold)
     implicit none
@@ -373,12 +373,12 @@ subroutine fclaw2d_clawpatch46_fort3_interpolate2fine &
     if (manifold .ne. 0) then
         write(6,*) 'interpolate:fixcapaq2 : Manifold not yet implemented in 3D'
         stop
-        call fclaw2d_clawpatch46_fort3_fixcapaq2(mx,my,mz,mbc,meqn, & 
+        call fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, & 
                         qcoarse,qfine, areacoarse,areafine,igrid)
     endif
 
 
-end subroutine  fclaw2d_clawpatch46_fort3_interpolate2fine
+end subroutine  fclaw3dx_clawpatch46_fort_interpolate2fine
 
 
     !! # ------------------------------------------------------
@@ -386,7 +386,7 @@ end subroutine  fclaw2d_clawpatch46_fort3_interpolate2fine
     !! # coarse to fine when regridding.  But maybe it should
     !! # be used by the ghost cell routines as well?
     !! # ------------------------------------------------------
-subroutine fclaw2d_clawpatch46_fort3_fixcapaq2(mx,my,mz,mbc,meqn, & 
+subroutine fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, & 
            qcoarse,qfine, areacoarse,areafine,igrid)
     implicit none
 

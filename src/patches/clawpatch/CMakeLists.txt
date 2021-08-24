@@ -28,16 +28,16 @@ add_library(clawpatch_f OBJECT
   fort_5.0/fclaw2d_clawpatch5_tag4refinement.f
   fort_5.0/fclaw2d_clawpatch5_tag4coarsening.f
   fort_5.0/fclaw2d_clawpatch5_timeinterp.f
-  fort3_4.6/fclaw2d_clawpatch46_tag4refinement.f90 
-  fort3_4.6/fclaw2d_clawpatch46_tag4coarsening.f90 
-  fort3_4.6/fclaw2d_clawpatch46_average.f90 
-  fort3_4.6/fclaw2d_clawpatch46_copy.f90 
-  fort3_4.6/fclaw2d_clawpatch46_interpolate.f90 
-  fort3_4.6/fclaw2d_clawpatch46_local_ghost_pack.f90 
-  fort3_4.6/fclaw2d_clawpatch46_output_ascii.f90 
-  fort3_4.6/fclaw2d_clawpatch46_timeinterp.f90  
-  fort3_4.6/fclaw2d_clawpatch46_pillowsphere.f90 
-  fort3_4.6/fclaw2d_clawpatch46_diagnostics.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_tag4refinement.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_tag4coarsening.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_average.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_copy.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_interpolate.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_local_ghost_pack.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_output_ascii.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_timeinterp.f90  
+  fort3_4.6/fclaw3dx_clawpatch46_pillowsphere.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_diagnostics.f90 
   ${metric}/fortran_source2d/fclaw2d_metric_default_fort.f
 )
 
@@ -64,6 +64,8 @@ add_library(clawpatch
   fclaw2d_clawpatch_output_ascii.c
   fclaw2d_clawpatch_output_vtk.c
   fclaw2d_clawpatch_conservation.c
+  fclaw3dx_clawpatch.cpp 
+  fclaw3dx_clawpatch_options.c
   fort_user/fclaw2d_clawpatch_exceeds_threshold.c
   ${metric}/fclaw2d_metric.cpp 
   ${metric}/fclaw2d_metric_default.c
@@ -94,6 +96,7 @@ install(FILES
 	fclaw2d_clawpatch5_fort.h
 	fclaw2d_clawpatch_output_ascii.h
 	fclaw2d_clawpatch_output_vtk.h
+	fclaw3dx_clawpatch_options.h
 	${metric}/fclaw2d_metric.h
 	${metric}/fclaw2d_metric.hpp
 	${metric}/fclaw2d_metric_default.h
@@ -113,3 +116,9 @@ set_target_properties(clawpatch PROPERTIES EXPORT_NAME CLAWPATCH)
 # -- imported target, for use from FetchContent
 add_library(FORESTCLAW::CLAWPATCH INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CLAWPATCH INTERFACE clawpatch)
+
+add_executable(clawpatch_test
+    fclaw3dx_clawpatch_options_TEST.cpp
+    fclaw3dx_clawpatch_TEST.cpp
+)
+target_link_libraries(clawpatch_test testutils clawpatch)

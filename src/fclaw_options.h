@@ -171,10 +171,9 @@ struct fclaw_options
     double bx;   /**< Only for the single block, unmapped case */
     double ay;   /**< Only for the single block, unmapped case */
     double by;   /**< Only for the single block, unmapped case */
-#if FCLAW2D_PATCHDIM == 3
+    // TODO 
     double az;
     double bz;
-#endif
 
     /* Diagnostics */
     int run_user_diagnostics;

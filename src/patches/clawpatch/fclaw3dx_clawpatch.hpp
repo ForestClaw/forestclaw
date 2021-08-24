@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_HPP
-#define FCLAW2D_CLAWPATCH_HPP
+#ifndef FCLAW3DX_CLAWPATCH_HPP
+#define FCLAW3DX_CLAWPATCH_HPP
 
 /**
  * @file 
@@ -39,7 +39,7 @@ class  fclaw2d_metric_patch_t;
 /**
  * @brief Stores data for each patch
  */
-class fclaw2d_clawpatch_t
+class fclaw3dx_clawpatch_t
 {
 public :
     Box dataBox();  /**< Box containing data pointer q */
@@ -65,21 +65,25 @@ public :
     FArrayBox elliptic_soln;  /**< Solution for elliptic problems */
 
     /** Registers for accumulating mismatches at coarse/fine interfaces */
-    struct fclaw2d_clawpatch_registers *registers;
+    struct fclaw3dx_clawpatch_registers *registers;
 
     /* Grid info */
     int mx; /**< number of cells in the x direction */          
     int my; /**< number of cells in the y direction */  
+    int mz; /**< number of cells in the z direction */  
     int mbc; /**< number ghost cells */
     int maux; /**< number aux equations */
 
     double dx; /**< cell spacing in the x direction */
     double dy; /**< cell spacing in the y direction */
+    double dz; /**< cell spacing in the z direction */
 
-    double xlower; /**< x coordinate of the left edge of the patch */
-    double ylower; /**< y coordinate of the bottom edge of the patch */
-    double xupper; /**< x coordinate of the right edge of the patch */
-    double yupper; /**< y coordinate of the top edge of the patch */
+    double xlower; /**< x coordinate of the left face of the patch */
+    double ylower; /**< y coordinate of the bottom face of the patch */
+    double zlower; /**< z coordinate of the lower face of the patch */
+    double xupper; /**< x coordinate of the right face of the patch */
+    double yupper; /**< y coordinate of the top face of the patch */
+    double zupper; /**< z coordinate of the upper face of the patch */
 
     /** Auxilliary array (used by Clawpack 4.6 and 5.0) */
     FArrayBox aux;
@@ -101,10 +105,10 @@ public :
  * @brief Get the clawpatch structure for a patch
  * 
  * @param this_patch the patch context
- * @return fclaw2d_clawpatch_t* the clawpatch structure
+ * @return fclaw3dx_clawpatch_t* the clawpatch structure
  */
-fclaw2d_clawpatch_t* 
-fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
+fclaw3dx_clawpatch_t* 
+fclaw3dx_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
 
 /**
  * @brief Get the metrix structure for a patch
@@ -113,7 +117,7 @@ fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
  * @return fclaw2d_metric_patch_t* the metric structure
  */
 fclaw2d_metric_patch_t* 
-fclaw2d_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
+fclaw3dx_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
 
 
 
