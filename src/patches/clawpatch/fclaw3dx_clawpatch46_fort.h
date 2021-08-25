@@ -262,10 +262,10 @@ void  FCLAW3DX_PILLOW46_INTERPOLATE_BLOCK_CORNER(int* mx, int* my, int* mz, int*
                           FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII)
 /** @copydoc fclaw3dx_clawpatch46_fort_output_ascii() */
 void FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII(char* matname1,
-                                            int* mx,        int* my,
+                                            int* mx,        int* my, int* mz,
                                             int* meqn,      int* mbc,
-                                            double* xlower, double* ylower,
-                                            double* dx,     double* dy,
+                                            double* xlower, double* ylower, double* zlower,
+                                            double* dx,     double* dy, double* dz,
                                             double q[],
                                             int* patch_num, int* level,
                                             int* blockno,   int* mpirank);

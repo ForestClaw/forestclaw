@@ -55,7 +55,7 @@ typedef struct fclaw3dx_clawpatch_pillow_vtable fclaw3dx_clawpatch_pillow_vtable
 /**
  * @brief Handles the boundary condition at block corners
  * 
- * @param[in] my, my the number of cells in the x and y directions
+ * @param[in] my, my, mz the number of cells in the x, y, and z directions
  * @param[in] mbc the number of ghost cells
  * @param[in] meqn the number of equations
  * @param[in,out] qthis this solution
@@ -63,7 +63,8 @@ typedef struct fclaw3dx_clawpatch_pillow_vtable fclaw3dx_clawpatch_pillow_vtable
  * @param[in] icorner the corner that the neighbor is on
  * @param[in] iblock the block number
  */
-typedef void (*fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t)(int* mx, int* my,
+typedef void (*fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t)
+                                               (int* mx, int* my, int* mz,
                                                 int* mbc, int* meqn,
                                                 double qthis[], 
                                                 double qneighbor[], 
@@ -73,7 +74,8 @@ typedef void (*fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t)(int* mx, int*
 /**
  * @brief Handles the boundary condition at block corners with finer neighbors
  * 
- * @param[in] my, my the number of cells in the x and y directions
+ * @param[in] my, my, mz the number of cells in the x, y, and z directions
+ * @param[in] dz the spacing in the z direction
  * @param[in] mbc the number of ghost cells
  * @param[in] meqn the number of equations
  * @param[in] refratio the refinement ratio
@@ -84,7 +86,10 @@ typedef void (*fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t)(int* mx, int*
  * @param[in] icorner the corner that the fine neighbor is on
  * @param[in] blockno the block number
  */
-typedef void  (*fclaw3dx_clawpatch_pillow_fort_average_block_corner_t)(int* mx, int* my, int* mbc,
+typedef void  (*fclaw3dx_clawpatch_pillow_fort_average_block_corner_t)
+                                                   (int* mx, int* my, int* mz,
+                                                    double* dz,
+                                                    int* mbc,
                                                     int* meqn, 
                                                     int* refratio, 
                                                     double qcoarse[],
@@ -97,7 +102,7 @@ typedef void  (*fclaw3dx_clawpatch_pillow_fort_average_block_corner_t)(int* mx, 
 /**
  * @brief Handles the boundary condition at block corners with coarser neighbors
  * 
- * @param[in] my, my the number of cells in the x and y directions
+ * @param[in] my, my, mz the number of cells in the x, y, and z directions
  * @param[in] mbc the number of ghost cells
  * @param[in] meqn the number of equations
  * @param[in] refratio the refinement ratio
@@ -106,8 +111,10 @@ typedef void  (*fclaw3dx_clawpatch_pillow_fort_average_block_corner_t)(int* mx, 
  * @param[in] icorner_coarse the corner that the fine neighbor is on
  * @param[in] blockno the block number
  */
-typedef void  (*fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t)(int* mx, int* my, int* mbc,
-                                                        int* meqn, int* refratio,
+typedef void  (*fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t)
+                                                       (int* mx, int* my, int* mz,
+                                                        int* mbc, int* meqn, 
+                                                        int* refratio,
                                                         double qcoarse[],
                                                         double qfine[], 
                                                         int* icoarse_corner,

@@ -66,6 +66,11 @@ add_library(clawpatch
   fclaw2d_clawpatch_conservation.c
   fclaw3dx_clawpatch.cpp 
   fclaw3dx_clawpatch_options.c
+  fclaw3dx_clawpatch_diagnostics.c 
+  fclaw3dx_clawpatch_pillow.c 
+  fclaw3dx_clawpatch_transform.c 
+  fclaw3dx_clawpatch_output_ascii.c
+  fclaw3dx_clawpatch_conservation.c
   fort_user/fclaw2d_clawpatch_exceeds_threshold.c
   ${metric}/fclaw2d_metric.cpp 
   ${metric}/fclaw2d_metric_default.c

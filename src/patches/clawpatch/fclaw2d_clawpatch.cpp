@@ -1042,7 +1042,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 }
 
 
-size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
+static size_t clawpatch_ghost_packsize(fclaw2d_global_t* glob)
 {
 	size_t esize = clawpatch_ghost_pack_elems(glob);
 	return esize*sizeof(double);

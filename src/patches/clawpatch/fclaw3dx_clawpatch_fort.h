@@ -367,11 +367,11 @@ typedef void  (*fclaw3dx_clawpatch_fort_header_ascii_t)(const char* matname1,con
  * This should append the data to the file 
  * 
  * @param[in] matname1 the name of the data file
- * @param[in] mx, my the number cells in the x and y directions, excluding ghost
+ * @param[in] mx, my, mz the number cells in the x, y, and z directions, excluding ghost
  * @param[in] meqn the number of equations
  * @param[in] mbc the number of ghost cells
- * @param[in] xlower, ylower the coordinate of the lower left corner
- * @param[in] dx, dy spacing of cells in the x and y directions
+ * @param[in] xlower, ylower, zlower the coordinate of the lower bottom left corner
+ * @param[in] dx, dy spacing of cells in the x, y, and z directions
  * @param[in] q the solution
  * @param[in] pach_num the patch number
  * @param[in] level the level of the patch
@@ -379,10 +379,10 @@ typedef void  (*fclaw3dx_clawpatch_fort_header_ascii_t)(const char* matname1,con
  * @param[in] mpirank the mpi rank of the patch
  */
 typedef void (*fclaw3dx_clawpatch_fort_output_ascii_t)(char* matname1,
-											  int* mx,        int* my,
+											  int* mx,        int* my, int* mz,
 											  int* meqn,      int* mbc,
-											  double* xlower, double* ylower,
-											  double* dx,     double* dy,
+											  double* xlower, double* ylower, double* zlower,
+											  double* dx,     double* dy, double* dz,
 											  double q[],
 											  int* patch_num, int* level,
 											  int* blockno,   int* mpirank);
