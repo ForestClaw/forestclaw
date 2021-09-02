@@ -126,20 +126,22 @@ fclaw2d_domain_persist_t;
 
 struct fclaw2d_domain
 {
-    sc_MPI_Comm mpicomm;        /* MPI communicator */
-    int mpisize, mpirank;       /* MPI variables */
-    int possible_maxlevel;      /* theoretical maximum that can be reached */
+    sc_MPI_Comm mpicomm;        /**< MPI communicator */
+    int mpisize;                /**< MPI size */
+    int mpirank;                /**< MPI rank */
+    int possible_maxlevel;      /**< theoretical maximum that can be reached */
 
     fclaw2d_domain_persist_t p;         /**< Parameters that carry over from
                                              one domain to a derived one. */
 
-    int local_num_patches;      /* sum of patches over all blocks on this proc */
-    int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
+    int local_num_patches;      /**< sum of patches over all blocks on this proc */
+    int local_minlevel, local_maxlevel; /**< proc local.  If this proc doesn't
                                            store any patches at all, we set
                                            local_maxlevel < 0 <= local_minlevel. */
-    int64_t global_num_patches; /* sum of local_num_patches over all procs */
-    int64_t global_num_patches_before;  /* Number of patches on lower procs */
-    int global_minlevel, global_maxlevel;       /* global, well-defined */
+    int64_t global_num_patches; /**< sum of local_num_patches over all procs */
+    int64_t global_num_patches_before;  /**< Number of patches on lower procs */
+    int global_minlevel;       /**< global min level */
+    int global_maxlevel;       /**< global max level */
 
     int just_adapted;           /**< true after non-trivial adaptation */
     int just_partitioned;       /**< true after non-trivial partition */
@@ -147,25 +149,24 @@ struct fclaw2d_domain
     int partition_unchanged_length;     /**< number of unchanged quadrants */
     int partition_unchanged_old_first;  /**< local index wrt. previous partition */
 
-    int num_blocks;             /**< Total number of blocks.
-                                     TODO: only store non-empty blocks. */
-    fclaw2d_block_t *blocks;    /* allocated storage */
-    int num_exchange_patches;   /* # my patches relevant to other procs.
+    int num_blocks;             /**< Total number of blocks. */
+    fclaw2d_block_t *blocks;    /**< allocated storage */
+    int num_exchange_patches;   /**< number my patches relevant to other procs.
                                    Identified by this expression to be true:
                                    (patch->flags &
                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
     fclaw2d_patch_t **exchange_patches; /**< explicitly store exchange patches */
-    int num_ghost_patches;      /* # off-proc patches relevant to this proc */
-    fclaw2d_patch_t *ghost_patches;     /* array of off-proc patches */
+    int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
+    fclaw2d_patch_t *ghost_patches;     /**< array of off-proc patches */
 
     void **mirror_target_levels;  /**< Points to target level of each mirror. */
     int *ghost_target_levels;   /**< Contains target level for each ghost. */
 
-    void *pp;                   /* opaque backend data */
-    int pp_owned;               /* The pp member is owned by this domain */
-    sc_keyvalue_t *attributes;  /* Reserved to store domain attributes */
+    void *pp;                   /**< opaque backend data */
+    int pp_owned;               /**< True if the pp member is owned by this domain */
+    sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
 
-    void *user;
+    void *user; /**< user data pointer */
 };
 
 /***************************** FUNDAMENTALS *******************************/

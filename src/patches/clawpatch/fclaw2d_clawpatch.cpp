@@ -1080,9 +1080,8 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 								  fclaw2d_patch_t *patch,
 								  int blockno,
 								  int patchno,
-								  void *user)
+	                              fclaw2d_build_mode_t build_mode)
 {
-	fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
 	clawpatch_define(glob,patch,blockno,patchno,build_mode);
