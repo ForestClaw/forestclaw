@@ -154,8 +154,9 @@ struct fclaw2d_patch;
 
 
 /* ------------------------------------------------------------------------------------ */
-/** @{                      @name Creating/Deleting Patches                             */
+///                         @name Creating/Deleting Patches
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * DEPRECATED
@@ -211,10 +212,11 @@ void fclaw2d_patch_build_from_fine(struct fclaw2d_global *glob,
                                    fclaw2d_build_mode_t build_mode);
 
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                      @name Solver Specific Functions                             */
+///                         @name Solver Specific Functions
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Initialize patch data for a solver
@@ -283,10 +285,11 @@ void fclaw2d_patch_set_rhs(struct fclaw2d_global *glob,
                            int patchno);
 
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                           @name Time Stepping                                    */
+///                              @name Time Stepping
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Restores a previously saved solution
@@ -317,10 +320,11 @@ void fclaw2d_patch_setup_timeinterp(struct fclaw2d_global *glob,
                                     struct fclaw2d_patch *this_patch,
                                     double alpha);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                           @name Ghost Filling                                    */
+///                              @name Ghost Filling
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Copies ghost data from a face-neighboring grid on the same level
@@ -460,7 +464,7 @@ void fclaw2d_patch_interpolate_corner(struct fclaw2d_global* glob,
                                       int time_interp,
                                       struct fclaw2d_patch_transform_data* transform_data);
 
-/** @} */
+///@}
 /**
  * DEPRECATED
  * @deprecated NOT USED
@@ -476,8 +480,9 @@ void fclaw2d_patch_destroy_user_data(struct fclaw2d_global* glob,
                                      struct fclaw2d_patch* patch);
 
 /* ------------------------------------------------------------------------------------ */
-/** @{                      @name Transform Functions                                   */
+///                         @name Transform Functions
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Initialize the transform data for a patch
@@ -536,10 +541,11 @@ void fclaw2d_patch_transform_blockface(int faceno, int rfaceno,
  */
 void fclaw2d_patch_transform_blockface_intra(int ftransform[]);
   
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                      @name Regridding Functions                                  */
+///                         @name Regridding Functions
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Tag a patch for refinement
@@ -604,10 +610,11 @@ void fclaw2d_patch_average2coarse(struct fclaw2d_global *glob,
                                   int blockno, int fine0_patchno,
                                   int coarse_patchno);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                      @name Parallel Ghost Patches                                */
+///                         @name Parallel Ghost Patches
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /** 
  * @brief Get the buffer size needed to pack a single patch's ghost data 
@@ -688,10 +695,11 @@ void fclaw2d_patch_remote_ghost_unpack(struct fclaw2d_global* glob,
 void fclaw2d_patch_remote_ghost_delete(struct fclaw2d_global *glob,
                                        struct fclaw2d_patch *ghost_patch);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                       @name Parallel Partitioning                                */
+///                          @name Parallel Partitioning
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 
 /**
@@ -735,10 +743,11 @@ void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,
 size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
 
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                      @name Time Syncing Functions                                */
+///                         @name Time Syncing Functions
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Adds fine grid corrections to coarse grid.  
@@ -798,10 +807,11 @@ void fclaw2d_patch_time_sync_reset(struct fclaw2d_global* glob,
                                    int reset_mode);
 
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                 @name Creating/Deleting Patches (typedefs)                       */
+///                    @name Creating/Deleting Patches (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Allocates a new patch
@@ -864,10 +874,11 @@ typedef void (*fclaw2d_patch_setup_t)(struct fclaw2d_global *glob,
                                       int patchno,
                                       int blockno);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                 @name Solver Specific Functions (typedefs)                       */
+///                    @name Solver Specific Functions (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Initializes values in arrays of patch
@@ -939,10 +950,11 @@ typedef void (*fclaw2d_patch_rhs_t)(struct fclaw2d_global *glob,
                                     int blockno,
                                     int patchno);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                        @name Time Stepping (typedefs)                            */
+///                           @name Time Stepping (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /** @copydoc fclaw2d_patch_setup_timeinterp() */
 typedef void (*fclaw2d_patch_setup_timeinterp_t)(struct fclaw2d_global *glob,
@@ -958,10 +970,11 @@ typedef void (*fclaw2d_patch_save_step_t)(struct fclaw2d_global *glob,
                                           struct fclaw2d_patch* this_patch);
 
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                        @name Ghost Filling (typedefs)                            */
+///                           @name Ghost Filling (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Copies ghost data from a face-neighboring grid on the same level
@@ -1102,10 +1115,11 @@ typedef void (*fclaw2d_patch_interpolate_corner_t)(struct fclaw2d_global* glob,
                                                    struct fclaw2d_patch_transform_data 
                                                    *transform_data);
     
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                   @name Transform Functions (typedefs)                           */
+///                      @name Transform Functions (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Initialize the transform data for a patch
@@ -1164,10 +1178,11 @@ typedef void (*fclaw2d_patch_transform_blockface_t)(int faceno, int rfaceno,
  */
 typedef void (*fclaw2d_patch_transform_blockface_intra_t)(int ftransform[]);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                   @name Regridding Functions (typedefs)                          */
+///                      @name Regridding Functions (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Tags a patch for refinement
@@ -1231,10 +1246,11 @@ typedef void (*fclaw2d_patch_average2coarse_t)(struct fclaw2d_global *glob,
                                                int blockno, int fine_patchno,
                                                int coarse_patchno);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                 @name Parallel Ghost Patches (typedefs)                          */
+///                    @name Parallel Ghost Patches (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /** @copydoc fclaw2d_patch_ghost_packsize() */
 typedef size_t (*fclaw2d_patch_ghost_packsize_t)(struct fclaw2d_global* glob);
@@ -1285,10 +1301,11 @@ typedef void (*fclaw2d_patch_remote_ghost_unpack_t)(struct fclaw2d_global *glob,
 typedef void (*fclaw2d_patch_remote_ghost_delete_t)(void *user_patch);
 
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                       @name Partitioning (typedefs)                              */
+///                          @name Partitioning (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /** @copydoc fclaw2d_patch_partition_packsize() */
 typedef size_t (*fclaw2d_patch_partition_packsize_t)(struct fclaw2d_global* glob);
@@ -1309,10 +1326,11 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
                                                  int patchno,
                                                  void *unpack_data_from_here);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                  @name Conservative Updates (typedefs)                           */
+///                     @name Conservative Updates (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 
 /** @copydoc fclaw2d_patch_time_sync_f2c() */
@@ -1342,10 +1360,11 @@ typedef void (*fclaw2d_patch_time_sync_reset_t)(struct fclaw2d_global *glob,
                                                 int coarse_level,
                                                 int reset_mode);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                   @name User Data Functions (typedefs)                           */
+///                      @name User Data Functions (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Creates user data
@@ -1365,10 +1384,11 @@ typedef void (*fclaw2d_patch_create_user_data_t)(struct fclaw2d_global *glob,
 typedef void (*fclaw2d_patch_destroy_user_data_t)(struct fclaw2d_global* glob,
                                                   struct fclaw2d_patch* patch);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                      @name Access Functions (typedefs)                           */
+///                         @name Access Functions (typedefs)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Returns the corresponding metric patch
@@ -1377,9 +1397,11 @@ typedef void (*fclaw2d_patch_destroy_user_data_t)(struct fclaw2d_global* glob,
  */
 typedef void* (*fclaw2d_patch_metric_patch_t)(struct fclaw2d_patch *patch);
 
-/** @} */
-
-/* ----------------------------------- Virtual table  --------------------------------- */
+///@}
+/* ------------------------------------------------------------------------------------ */
+///                            @name Virtual Table
+/* ------------------------------------------------------------------------------------ */
+///@{
 
 /** vtable for patch level routines */
 struct fclaw2d_patch_vtable
@@ -1554,9 +1576,11 @@ fclaw2d_patch_vtable_t* fclaw2d_patch_vt();
 void fclaw2d_patch_vtable_initialize();
 
 
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                         @name Misc Access Functions                              */
+///                            @name Misc Access Functions
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Get the global_num, local_num, and level of a patch
@@ -1633,10 +1657,11 @@ void* fclaw2d_patch_metric_patch(struct fclaw2d_patch *patch);
  */
 int fclaw2d_patch_get_blockno(struct fclaw2d_patch* this_patch);
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                              @name Misc User Data                                */
+///                                 @name Misc User Data
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Get the user data pointer of a patch
@@ -1660,10 +1685,11 @@ void fclaw2d_patch_set_user_data(struct fclaw2d_global* glob,
                                  void* user);
 
 
-/** @} */
+///@}
 /* ------------------------------------------------------------------------------------ */
-/** @{                    @name Misc Functions (mostly internal)                        */
+///                       @name Misc Functions (mostly internal)
 /* ------------------------------------------------------------------------------------ */
+///@{
 
 /**
  * @brief Returns true if patch lies on a parallel boundary
@@ -1784,7 +1810,7 @@ void fclaw2d_patch_set_block_corner_count(struct fclaw2d_global *glob,
                                           struct fclaw2d_patch* this_patch,
                                           int icorner, int block_corner_count);
 
-/** @} */
+///@}
 
 #ifdef __cplusplus
 #if 0
