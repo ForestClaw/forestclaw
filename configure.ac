@@ -18,6 +18,9 @@ AM_INIT_AUTOMAKE([parallel-tests subdir-objects])
 AM_SILENT_RULES
 SC_VERSION([FCLAW])
 
+m4_include([fdep/fortran_dependencies.m4])
+FDEP_F90_GNU_MAKE_DEPS
+
 echo "o---------------------------------------"
 echo "| Checking options"
 echo "o---------------------------------------"
