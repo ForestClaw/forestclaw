@@ -34,7 +34,7 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/geolib_source/topointegral.f \
 	src/solvers/fc2d_geoclaw/geolib_source/topo_update.f90 \
 	src/solvers/fc2d_geoclaw/geolib_source/cellgridintegrate2.f \
-	src/solvers/fc2d_geoclaw/geolib_source/allowflag.f90 \
+	src/solvers/fc2d_geoclaw/geolib_source/allowflag.f \
 	src/solvers/fc2d_geoclaw/geolib_source/bilinearintegral.f \
 	src/solvers/fc2d_geoclaw/fortran_source/philim.f \
 	src/solvers/fc2d_geoclaw/fortran_source/geoclaw_set_modules_fort.f90 \
@@ -56,6 +56,8 @@ libgeoclaw_compiled_sources = \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_output_ascii_fort.f \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4refinement_fort.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_tag4coarsening_fort.f90 \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_flag2refine_fort.f90 \
+	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_test_regions.f90 \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_local_ghost_pack_fort.f \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_local_ghost_pack_aux_fort.f \
 	src/solvers/fc2d_geoclaw/fclaw2d_source/fc2d_geoclaw_diagnostics_fort.f \

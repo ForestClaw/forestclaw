@@ -1,6 +1,7 @@
 SUBROUTINE fc2d_geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in,  & 
                                     mthlim_in, method_in, ax, bx, ay, by)
-    USE amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves, xlower, ylower, xupper, yupper
+    USE amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves, xlower, & 
+                ylower, xupper, yupper
 
     USE regions_module, ONLY: set_regions
 !!    USE gauges_module, ONLY: set_gauges
@@ -33,7 +34,7 @@ SUBROUTINE fc2d_geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in,  &
     meqn = meqn_in
     maux = maux_in
     method = method_in
-    use_fwaves = .FALSE.
+    use_fwaves = .FALSE.   !! Why is this set to False?  
     xlower = ax
     xupper = bx
     ylower = ay

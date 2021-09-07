@@ -31,18 +31,16 @@ c     >
 c     > Average fine grid interior values to neighboring ghost cell values of
 c     > the coarse grid.
       subroutine fc2d_geoclaw_fort_average_face(mx,my,mbc,meqn,
-     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,mbathy,
-     &      idir,iface_coarse,num_neighbors,refratio,igrid,
-     &      manifold, transform_cptr)
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,
+     &      idir,iface_coarse,igrid, transform_cptr)
 
       use geoclaw_module, only: dry_tolerance
 
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
-      integer manifold,mbathy,mcapa,maux
+      integer mx,my,mbc,meqn,igrid,idir,iface_coarse
+      integer mcapa,maux
       integer*8 transform_cptr
-      integer num_neighbors
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
@@ -72,7 +70,15 @@ c     # This should be refratio*refratio.
       double precision capac, capa
       integer nwet
 
-      is_manifold = manifold .eq. 1
+      integer mbathy, refratio, num_neighbors
+
+      mbathy = 1
+      refratio = 2
+      num_neighbors = 2
+
+c     # Even though Geoclaw is on a manifold, we don't handle it 
+c     # in the usual forestclaw way      
+      is_manifold = .false.
 
 c     # 'iface' is relative to the coarse grid
 
@@ -118,6 +124,10 @@ c              # ---------------------------------------------
 
                if (.not. skip_this_grid) then
                   if (is_manifold) then
+                     write(6,'(A,A,A)') 'fc2d_geoclaw_average_fort : ',
+     &                   'We should not be here;  manifold case is ',
+     &                   'not handled here in geoclaw'
+                     stop
                      do mq = 1,meqn
                         sum = 0
                         af_sum = 0
@@ -311,14 +321,14 @@ c                     qcoarse(mq,ic,jc) = sum/dble(r2)
 c> \ingroup Averaging
 c> Average across corners.
       subroutine fc2d_geoclaw_fort_average_corner(mx,my,mbc,meqn,
-     &      refratio,qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,
-     &      mbathy,manifold,icorner_coarse,transform_cptr)
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,
+     &      icorner_coarse,transform_cptr)
       
       use geoclaw_module, only: dry_tolerance
       
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,icorner_coarse, manifold
+      integer mx,my,mbc,meqn,icorner_coarse
       integer*8 transform_cptr
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -348,7 +358,10 @@ c     # This should be refratio*refratio.
       double precision capac, capa
       integer nwet
 
-      integer maux,mcapa,mbathy
+      integer maux,mcapa,mbathy, refratio
+
+      refratio = 2
+      mbathy = 1
 
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
@@ -357,7 +370,9 @@ c     # This should be refratio*refratio.
          stop
       endif
 
-      is_manifold = manifold .eq. 1
+c     # Even though Geoclaw is on a manifold, we don't handle it 
+c     # in the usual forestclaw way      
+      is_manifold = .false.
 
       r2 = refratio*refratio
 c     # Loop over four corner cells on coarse grid
@@ -398,9 +413,9 @@ c                 qcoarse(mq,i1,j1) = sum/kc
                enddo
             else
                if (mcapa .eq. 0) then
-                  capac=1.0d0
+                  capac = 1.0d0
                else
-                  capac=aux_coarse(mcapa,i1,j1)
+                  capac = aux_coarse(mcapa,i1,j1)
                endif 
                etasum = 0.d0
                hsum   = 0.d0
@@ -412,9 +427,9 @@ c                 qcoarse(mq,i1,j1) = sum/kc
 c                       sum = sum + qfine(mq,i2(m),j2(m))
 c                       qcoarse(mq,ic,jc) = sum/dble(r2)
                   if (mcapa .eq. 0) then
-                     capa=1.0d0
+                     capa = 1.0d0
                   else
-                     capa=aux_fine(mcapa,i2(m),j2(m))
+                     capa = aux_fine(mcapa,i2(m),j2(m))
                   endif
                   hf = qfine(1,i2(m),j2(m))*capa
                   bf = aux_fine(mbathy,i2(m),j2(m))*capa
@@ -422,11 +437,11 @@ c                       qcoarse(mq,ic,jc) = sum/dble(r2)
                   hvf= qfine(3,i2(m),j2(m))*capa
                   if (hf > dry_tolerance) then
                      etaf = hf+bf
-                     nwet=nwet+1
+                     nwet = nwet+1
                   else
                      etaf = 0.d0
-                     huf=0.d0
-                     hvf=0.d0
+                     huf = 0.d0
+                     hvf = 0.d0
                   endif
                   hsum   = hsum + hf
                   husum  = husum + huf
@@ -434,19 +449,19 @@ c                       qcoarse(mq,ic,jc) = sum/dble(r2)
                   etasum = etasum + etaf
                enddo
                if (nwet.gt.0) then
-                  etaav=etasum/dble(nwet)
-                  hav=hsum/dble(nwet)
+                  etaav = etasum/dble(nwet)
+                  hav = hsum/dble(nwet)
 c                       hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
-                  hc=min(hav,(max(etaav-
+                  hc = min(hav,(max(etaav-
      &                        aux_coarse(mbathy,i1,j1)*capac,0.d0)))
 c                       huc=(min(hav,hc)/hsum)*husum
 c                       hvc=(min(hav,hc)/hsum)*hvsum
-                  huc=(hc/hsum)*husum
-                  hvc=(hc/hsum)*hvsum
+                  huc = (hc/hsum)*husum
+                  hvc = (hc/hsum)*hvsum
                else
-                  hc=0.d0
-                  huc=0.d0
-                  hvc=0.d0
+                  hc = 0.d0
+                  huc = 0.d0
+                  hvc = 0.d0
                endif
                qcoarse(1,i1,j1) = hc / capac
                qcoarse(2,i1,j1) = huc / capac
@@ -465,15 +480,14 @@ c               enddo
       end
 
       subroutine fc2d_geoclaw_fort_average2coarse(mx,my,mbc,meqn,
-     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,mbathy,
-     &      p4est_refineFactor,refratio,igrid)
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mcapa,igrid)
 
       use geoclaw_module, only: dry_tolerance      
       
       implicit none
 
-      integer mx,my,mbc,meqn,p4est_refineFactor,refratio
-      integer igrid,maux,mbathy,mcapa,nwet 
+      integer mx,my,mbc,meqn
+      integer igrid,maux,mcapa,nwet 
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -485,11 +499,17 @@ c               enddo
       double precision hf, huf, hvf, bf, etaf
       double precision capac, capa
 
+      integer refratio, p4est_refineFactor,mbathy
+
 c     # This should be refratio*refratio.
       integer i1,j1,r2,m
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
+
+      refratio = 2
+      p4est_refineFactor = 2
+      mbathy = 1
 
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
@@ -563,7 +583,7 @@ c           # loop over the fine grids
                hav=hsum/dble(nwet)
 c              hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
                hc=min(hav,(max(etaav-
-     &             aux_coarse(mbathy,i1,j1)*capac,0.d0)))
+     &             aux_coarse(1,i1,j1)*capac,0.d0)))
 c               huc=(min(hav,hc)/hsum)*husum
 c               hvc=(min(hav,hc)/hsum)*hvsum
                huc=(hc/hsum)*husum
@@ -572,7 +592,7 @@ c               hvc=(min(hav,hc)/hsum)*hvsum
                hc=0.d0
                huc=0.d0
                hvc=0.d0
-               endif      
+            endif      
             qcoarse(1,i1,j1) = hc / capac 
             qcoarse(2,i1,j1) = huc / capac 
             qcoarse(3,i1,j1) = hvc / capac 

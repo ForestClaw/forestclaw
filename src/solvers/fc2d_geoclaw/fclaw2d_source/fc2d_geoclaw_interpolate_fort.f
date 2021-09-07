@@ -22,16 +22,14 @@ c     # This routine is used for both mapped and non-mapped
 c     # cases.
 c     # ----------------------------------------------------------
       subroutine fc2d_geoclaw_fort_interpolate_face(mx,my,mbc,meqn,
-     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mbathy,
-     &      idir,iface_coarse,num_neighbors,refratio,igrid,
-     &      transform_ptr)
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,
+     &      idir,iface_coarse,igrid, transform_ptr)
 
       use geoclaw_module, ONLY:dry_tolerance, sea_level
       implicit none
 
-      integer mx,my,mbc,meqn,refratio,igrid,idir,iface_coarse
-      integer maux, mbathy
-      integer num_neighbors
+      integer mx,my,mbc,meqn,igrid,idir,iface_coarse
+      integer maux
       integer*8 transform_ptr
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -58,6 +56,12 @@ c     # This should be refratio*refratio.
       integer a(2,2), f(2)
       integer ii,jj,dc(2),df(2,0:rr2-1),iff,jff
       double precision shiftx(0:rr2-1),shifty(0:rr2-1)
+
+      integer refratio, num_neighbors, mbathy
+
+      refratio = 2
+      num_neighbors = 2
+      mbathy = 1
 
       mth = 5
       r2 = refratio*refratio
@@ -255,14 +259,14 @@ c              # ---------------------------------------------
       end
 
       subroutine fc2d_geoclaw_fort_interpolate_corner(mx,my,mbc,meqn,
-     &      refratio,qcoarse,qfine,maux,aux_coarse,aux_fine,mbathy,
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,
      &      icorner_coarse,transform_ptr)
 
       use geoclaw_module, ONLY:dry_tolerance, sea_level
       implicit none
 
-      integer mx,my,mbc,meqn,icorner_coarse,refratio
-      integer mbathy,maux
+      integer mx,my,mbc,meqn,icorner_coarse
+      integer maux
       integer*8 transform_ptr
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -286,6 +290,11 @@ c     # This should be refratio*refratio.
       integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
       double precision shiftx(0:rr2-1), shifty(0:rr2-1)
       logical check_indices
+
+      integer mbathy, refratio
+
+      refratio = 2
+      mbathy = 1
 
       r2 = refratio*refratio
       if (r2 .ne. rr2) then
@@ -394,14 +403,13 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
       end
 
       subroutine fc2d_geoclaw_fort_interpolate2fine(mx,my,mbc,meqn,
-     &      qcoarse,qfine,maux,aux_coarse,aux_fine,mbathy,
-     &      p4est_refineFactor,refratio,igrid)
+     &      qcoarse,qfine,maux,aux_coarse,aux_fine,igrid)
 
       use geoclaw_module, ONLY:dry_tolerance, sea_level
       implicit none
 
-      integer mx,my,mbc,meqn,p4est_refineFactor,refratio
-      integer igrid, maux,mbathy
+      integer mx,my,mbc,meqn
+      integer igrid, maux
       double precision qcoarse(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qfine(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -409,6 +417,7 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
 
       integer ii, jj, i,j, i1, i2, j1, j2, ig, jg, mq, mth
       integer ic,jc,ic_add, jc_add, iff, jf
+      integer p4est_refineFactor, refratio
       double precision qc, qf, shiftx, shifty, sl, sr, gradx, grady
       double precision fclaw2d_clawpatch_compute_slopes
       double precision uc(-1:1,-1:1), uf
@@ -416,9 +425,15 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
       double precision coarseumin, coarseumax
       logical redefine
 
+      integer mbathy
+
       hfsum = 0.d0
 c     # Use minmod to calculate slope.
       mth = 5
+
+      p4est_refineFactor = 2
+      refratio = 2
+      mbathy = 1
 
 c     # Get (ig,jg) for grid from linear (igrid) coordinates
       ig = mod(igrid,refratio)
