@@ -47,9 +47,8 @@ TEST_CASE("fclaw3dx_clawpatch_set_refinement_criteria, then fclaw3dx_clawpatch_g
 TEST_CASE("fclaw3dx_clawpatch_options_store, then fclaw3dx_clawpatch_get_options","[fclaw3dx][clawpatch]")
 {
 	fclaw2d_global_t* glob = fclaw2d_global_new();
-	fclaw3dx_clawpatch_options_t * opts = nullptr;
-	opts+=3;
-	fclaw3dx_clawpatch_options_store(glob, opts);
-	CHECK(fclaw3dx_clawpatch_get_options(glob) == opts);
+	fclaw3dx_clawpatch_options_t opts;
+	fclaw3dx_clawpatch_options_store(glob, &opts);
+	CHECK(fclaw3dx_clawpatch_get_options(glob) == &opts);
 	fclaw2d_global_destroy(glob);
 }

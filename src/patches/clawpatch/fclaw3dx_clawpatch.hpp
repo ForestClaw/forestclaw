@@ -42,11 +42,6 @@ class  fclaw2d_metric_patch_t;
 class fclaw3dx_clawpatch_t
 {
 public :
-    Box dataBox();  /**< Box containing data pointer q */
-    Box areaBox();  /**< Box containing area */
-    Box edgeBox();  /**< Box containing edge based values */
-    Box nodeBox();  /**< Box containing nodes */
-
     /* Solution data */
     int meqn; /**< number of equations */                   
     FArrayBox griddata; /**< the current solution */

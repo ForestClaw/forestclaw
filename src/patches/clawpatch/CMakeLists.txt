@@ -126,4 +126,4 @@ add_executable(clawpatch_test
     fclaw3dx_clawpatch_options_TEST.cpp
     fclaw3dx_clawpatch_TEST.cpp
 )
-target_link_libraries(clawpatch_test testutils clawpatch)
+target_link_libraries(clawpatch_test testutils clawpatch forestclaw)

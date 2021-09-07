@@ -249,7 +249,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
 	int ll[PATCH_DIM];
 	int ur[PATCH_DIM];
-	for (int idir = 0; idir < PatchDim; idir++)
+	for (int idir = 0; idir < PATCH_DIM; idir++)
 	{
 		ll[idir] = 1-cp->mbc;
 	}
@@ -259,7 +259,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	ur[2] = cp->mz + cp->mbc;
 #endif
 
-	Box box(ll,ur);	
+	Box box(ll,ur,PATCH_DIM);	
 
 	// This will destroy any existing memory n griddata.
 	cp->griddata.define(box, cp->meqn);
