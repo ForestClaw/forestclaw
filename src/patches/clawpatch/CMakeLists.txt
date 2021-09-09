@@ -4,6 +4,7 @@ set(metric ${PROJECT_SOURCE_DIR}/src/patches/metric)
 
 add_library(clawpatch_f OBJECT
   fclaw2d_clawpatch_utils.f
+  fclaw3dx_clawpatch_utils.f
   fort_user/fclaw2d_clawpatch_difference_exceeds_th.f90
   fort_user/fclaw2d_clawpatch_value_exceeds_th.f90
   fort_user/fclaw2d_clawpatch_minmax_exceeds_th.f90
@@ -70,8 +71,10 @@ add_library(clawpatch
   fclaw3dx_clawpatch_pillow.c 
   fclaw3dx_clawpatch_transform.c 
   fclaw3dx_clawpatch_output_ascii.c
+  fclaw3dx_clawpatch_output_vtk.c
   fclaw3dx_clawpatch_conservation.c
   fort_user/fclaw2d_clawpatch_exceeds_threshold.c
+  fort_user/fclaw3dx_clawpatch_exceeds_threshold.c
   ${metric}/fclaw2d_metric.cpp 
   ${metric}/fclaw2d_metric_default.c
 )
@@ -101,10 +104,19 @@ install(FILES
 	fclaw2d_clawpatch5_fort.h
 	fclaw2d_clawpatch_output_ascii.h
 	fclaw2d_clawpatch_output_vtk.h
+  fclaw3dx_clawpatch.h
+	fclaw3dx_clawpatch.hpp
 	fclaw3dx_clawpatch_options.h
+	fclaw3dx_clawpatch_conservation.h
+	fclaw3dx_clawpatch_transform.h
+	fclaw3dx_clawpatch_diagnostics.h
+	fclaw3dx_clawpatch_pillow.h
+	fclaw3dx_clawpatch_fort.h
+	fclaw3dx_clawpatch46_fort.h
+	fclaw3dx_clawpatch_output_ascii.h
+	fclaw3dx_clawpatch_output_vtk.h
 	${metric}/fclaw2d_metric.h
 	${metric}/fclaw2d_metric.hpp
-	${metric}/fclaw2d_metric_default.h
 	${metric}/fclaw2d_metric_default_fort.h
 	${metric}/fortran_source2d/fclaw2d_metric_terms.i 
   DESTINATION include

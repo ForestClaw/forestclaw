@@ -555,7 +555,7 @@ void fclaw3dx_clawpatch_set_solver_data(struct fclaw2d_global* glob,
  * 
  * @param[in] glob the global context
  * @param[in] this_patch the patch context
- * @param[in] time_interp the time to interpolate to
+ * @param[in] time_interp true if interpolated grid data should be returned
  * @param[out] q the interpolated solution
  * @param[out] meqn the number of equations
  */
@@ -569,7 +569,7 @@ void fclaw3dx_clawpatch_timesync_data(struct fclaw2d_global* glob,
  * 
  * @param glob the global context
  * @param this_patch the patch context
- * @param time_interp the time to interpolate to
+ * @param time_interp true if interpolated grid data should be returned
  * @return the interpolated solution
  */
 double* fclaw3dx_clawpatch_get_q_timesync(struct fclaw2d_global* glob,

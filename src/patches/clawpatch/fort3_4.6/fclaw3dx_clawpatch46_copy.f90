@@ -40,7 +40,7 @@ subroutine fclaw3dx_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
                             i1 = mx+ibc
                             j1 = j
                         endif
-                        call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
+                        call fclaw3dx_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
                         qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
                     enddo
                 enddo
@@ -56,7 +56,7 @@ subroutine fclaw3dx_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
                            i1 = i
                            j1 = my+jbc
                         endif
-                        call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
+                        call fclaw3dx_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
                         qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
                     enddo
                 enddo
@@ -99,7 +99,7 @@ subroutine fclaw3dx_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &
 
                     !! # this routine is not yet complete, but the complete one
                     !! # can now be dropped in.
-                    call fclaw2d_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
+                    call fclaw3dx_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
                     qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
                 end do
             end do

@@ -1513,7 +1513,7 @@ double* fclaw2d_clawpatch_get_exactsoln(fclaw2d_global_t* glob,
 	return cp->exactsolution.dataPtr();
 }
 
-void* fclaw2d_clawpatch_user_data(fclaw2d_global_t* glob,
+void* fclaw2d_clawpatch_get_user_data(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* patch)
 {
     fclaw2d_clawpatch_t *cp = get_clawpatch(patch);

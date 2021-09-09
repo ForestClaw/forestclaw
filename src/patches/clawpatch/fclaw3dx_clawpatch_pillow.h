@@ -119,43 +119,6 @@ typedef void  (*fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t)
                                                         double qfine[], 
                                                         int* icoarse_corner,
                                                         int* blockno);
-#if 0
-typedef void (*pillow_fort_copy_block_corner_t)(const int* mx, 
-                                                const int* my,
-                                                const int *mz,
-                                                const int* mbc, 
-                                                const int* meqn,
-                                                double qthis[], 
-                                                double qneighbor[], 
-                                                const int* icorner,
-                                                const int* iblock);
-
-typedef void  (*pillow_fort_average_block_corner_t)(const int* mx, 
-                                                    const int* my, 
-                                                    const int* mz, 
-                                                    const double *dz, 
-                                                    const int* mbc,
-                                                    const int* meqn, 
-                                                    const int* refratio, 
-                                                    double qcoarse[],
-                                                    double qfine[], 
-                                                    double areacoarse[], 
-                                                    double areafine[],
-                                                    const int* coarse_corner,
-                                                    const int* blockno);
-
-typedef void  (*pillow_fort_interpolate_block_corner_t)(const int* mx, 
-                                                        const int* my, 
-                                                        const int* mz,
-                                                        const int* mbc,
-                                                        const int* meqn, 
-                                                        const int* refratio,
-                                                        double qcoarse[],
-                                                        double qfine[], 
-                                                        const int* icoarse_corner,
-                                                        const int* blockno);
-
-#endif
 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
 

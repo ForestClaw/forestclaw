@@ -71,8 +71,8 @@ void fclaw3dx_clawpatch_face_transformation_intra (int ftransform[]);
 /* ----------------------------- Called from Fortran ---------------------------------- */
 
 /** Fortran subroutine name */
-#define FCLAW2D_CLAWPATCH_TRANSFORM_FACE FCLAW_F77_FUNC_(fclaw3dx_clawpatch_transform_face, \
-                                                         FCLAW2D_CLAWPATCH_TRANSFORM_FACE)
+#define FCLAW3DX_CLAWPATCH_TRANSFORM_FACE FCLAW_F77_FUNC_(fclaw3dx_clawpatch_transform_face, \
+                                                         FCLAW3DX_CLAWPATCH_TRANSFORM_FACE)
 /**
  * @brief Tranform an index for a face-neighboring patch's coordinate system
  * 
@@ -80,13 +80,13 @@ void fclaw3dx_clawpatch_face_transformation_intra (int ftransform[]);
  * @param[out] i2, j2 the transformed equivalent index in the neighboring patch
  * @param[in] ptdata the transform data
  */
-void FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
+void FCLAW3DX_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
                                        int *i2, int *j2,
                                        struct fclaw2d_patch_transform_data** ptdata);
 
 /** Fortran subroutine name */
-#define FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF FCLAW_F77_FUNC_(fclaw3dx_clawpatch_transform_face_half, \
-                                                              FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF)
+#define FCLAW3DX_CLAWPATCH_TRANSFORM_FACE_HALF FCLAW_F77_FUNC_(fclaw3dx_clawpatch_transform_face_half, \
+                                                              FCLAW3DX_CLAWPATCH_TRANSFORM_FACE_HALF)
 /**
  * @brief Tranform an index for a face-neighboring finer patch's coordinate system
  * 
@@ -94,13 +94,13 @@ void FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
  * @param[out] i2, j2 the four equivalent indexes in the finer patch
  * @param[in] ptdata the transform data
  */
-void FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
+void FCLAW3DX_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
                                             int i2[], int j2[],
                                             struct fclaw2d_patch_transform_data** ptdata);
 
 /** Fortran subroutine name */
-#define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER FCLAW_F77_FUNC_(fclaw3dx_clawpatch_transform_corner, \
-                                                           FCLAW2D_CLAWPATCH_TRANSFORM_CORNER)
+#define FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER FCLAW_F77_FUNC_(fclaw3dx_clawpatch_transform_corner, \
+                                                           FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER)
 /**
  * @brief Tranform an index for a face-neighboring patch's coordinate system
  * 
@@ -108,13 +108,13 @@ void FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
  * @param[out] i2, j2 the transformed equivalent index in the neighboring patch
  * @param[in] ptdata the transform data
  */
-void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
+void FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
                                          int *i2, int *j2,
                                          struct fclaw2d_patch_transform_data** ptdata);
 
 /** Fortran subroutine name */
-#define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF FCLAW_F77_FUNC_(fclaw3dx_clawpatch_transform_corner_half, \
-                                                                FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF)
+#define FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER_HALF FCLAW_F77_FUNC_(fclaw3dx_clawpatch_transform_corner_half, \
+                                                                FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER_HALF)
 
 /**
  * @brief Tranform an index for a corner-neighboring finer patch's coordinate system
@@ -123,7 +123,7 @@ void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
  * @param[out] i2, j2 the four equivalent indexes in the finer patch
  * @param[in] ptdata the transform data
  */
-void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
+void FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                               int i2[], int j2[],
                                               struct fclaw2d_patch_transform_data** ptdata);
 
@@ -134,4 +134,4 @@ void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
 }
 #endif
 
-#endif /* !FCLAW2D_CLAWPATCH_TRANSFORM_H */
+#endif /* !FCLAW3DX_CLAWPATCH_TRANSFORM_H */

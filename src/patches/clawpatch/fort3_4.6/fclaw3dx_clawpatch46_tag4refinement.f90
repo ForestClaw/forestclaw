@@ -12,7 +12,7 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
     integer :: i,j,k, mq
     double precision :: qmin, qmax
 
-    integer :: exceeds_th, fclaw2d_clawpatch_exceeds_threshold
+    integer :: exceeds_th, fclaw3dx_clawpatch_exceeds_threshold
     integer :: ii,jj
     double precision :: xc,yc,quad(-1:1,-1:1), qval
 
@@ -44,7 +44,7 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
                         end do
                     end do
                 endif
-                exceeds_th = fclaw2d_clawpatch_exceeds_threshold( & 
+                exceeds_th = fclaw3dx_clawpatch_exceeds_threshold( & 
                       blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,  & 
                       tag_threshold,init_flag, is_ghost)
                 !! # -1 : Not conclusive (possibly ghost cell); don't tag for refinement

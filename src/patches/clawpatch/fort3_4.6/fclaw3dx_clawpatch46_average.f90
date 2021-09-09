@@ -64,7 +64,7 @@ SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
 
     r2 = refratio**2    
     if (r2 .ne. rr2) then
-        write(6,*) 'average_face_ghost (fclaw2d_clawpatch46_average.f90) ', & 
+        write(6,*) 'average_face_ghost (fclaw3dx_clawpatch46_average.f90) ', & 
              '  Refratio**2 is not equal to rr2'
         stop
     endif
@@ -83,7 +83,7 @@ SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
                         elseif (iface_coarse .eq. 1) then
                             ic = mx+ibc
                         endif
-                        call fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2,transform_cptr)
+                        call fclaw3dx_clawpatch_transform_face_half(ic,jc,i2,j2,transform_cptr)
                         !! # ---------------------------------------------
                         !! # Two 'half-size' neighbors will be passed into
                         !! # this routine.  Only half of the coarse grid ghost
@@ -131,7 +131,7 @@ SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
                             jc = my+jbc
                         endif
 
-                        call fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2, transform_cptr)
+                        call fclaw3dx_clawpatch_transform_face_half(ic,jc,i2,j2, transform_cptr)
                         skip_this_grid = .false.
                         do m = 0,r2-1
                             if (.not. fclaw2d_clawpatch_is_valid_average(i2(m),j2(m),mx,my)) then
@@ -224,7 +224,7 @@ subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
                         j1 = my+jbc
                     endif
 
-                    call fclaw2d_clawpatch_transform_corner_half(i1,j1,i2,j2, transform_cptr)
+                    call fclaw3dx_clawpatch_transform_corner_half(i1,j1,i2,j2, transform_cptr)
                     if (is_manifold) then
                         sum = 0
                         vf_sum = 0
