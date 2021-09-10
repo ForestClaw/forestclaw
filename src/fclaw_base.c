@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_base.h>
+#include <fclaw_mpi.h>
 
 static const char *fclaw_configdir = ".forestclaw";
 static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
@@ -204,8 +205,9 @@ fclaw_app_new (int *argc, char ***argv, void *user)
 
     mpicomm = sc_MPI_COMM_WORLD;
 
+    // TODO Fix this
     int mpi_initialized;
-    MPI_Initialized(&mpi_initialized);
+    fclaw_mpi_initialized(&mpi_initialized);
     if(!mpi_initialized){
         mpiret = sc_MPI_Init (argc, argv);
         SC_CHECK_MPI (mpiret);
