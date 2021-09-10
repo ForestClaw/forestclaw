@@ -16,6 +16,7 @@ jobs:
       CTEST_PARALLEL_LEVEL: 2
 
     strategy:
+      fail-fast: false
       matrix:
         include:
         - name: "Serial Minimal"
