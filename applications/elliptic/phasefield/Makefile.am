@@ -65,13 +65,13 @@ applications_elliptic_phasefield_phasefield_TEST_MPI1_SOURCES = \
 	applications/elliptic/phasefield/phasefield_options.c \
 	applications/elliptic/phasefield/cellave.f90 \
 	applications/elliptic/phasefield/fortran/phasefield_setprob.f90 \
-	applications/elliptic/phasefield/fortran/phasefield_bc2.f90 \
+	applications/elliptic/phasefield/fortran/phasefield_bc2.f \
 	applications/elliptic/phasefield/fortran/phasefield_fort_rhs.f90 \
 	applications/elliptic/phasefield/fortran/phasefield_qinit.f90 \
 	applications/elliptic/phasefield/fortran/phasefield_apply_bc.f90 \
 	applications/elliptic/phasefield/fortran/phasefield_eval_bc.f90 \
-	applications/elliptic/phasefield/fortran/phasefield_tag4refinement.f90 \
-	applications/elliptic/phasefield/fortran/phasefield_tag4coarsening.f90
+	applications/elliptic/phasefield/fortran/phasefield_tag4refinement.f \
+	applications/elliptic/phasefield/fortran/phasefield_tag4coarsening.f
 
 
 
