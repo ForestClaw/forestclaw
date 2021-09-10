@@ -19,12 +19,16 @@ endif()
 
 set(THUNDEREGG_INCLUDE_DIRS ${THUNDEREGG_ROOT}/include)
 
+if(p4est_external)
+  set(THUNDEREGG_EXTERNAL_PROJECT_DEPENDS "P4EST-install")
+endif()
+
 ExternalProject_Add(ThunderEgg
 GIT_REPOSITORY https://github.com/thunderegg/thunderegg
 GIT_TAG        develop
 CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${THUNDEREGG_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp} -Ddisable_petsc:BOOL=true -DP4EST_ROOT=${P4EST_ROOT}
 BUILD_BYPRODUCTS ${THUNDEREGG_LIBRARIES}
-DEPENDS P4EST-install
+DEPENDS ${THUNDEREGG_EXTERNAL_PROJECT_DEPENDS}
 )
 
 # --- required libraries

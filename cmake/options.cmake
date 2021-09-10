@@ -30,7 +30,7 @@ endif(clawpack)
 if(clawpack3)
   set(clawpatch ON)
   set(clawpack3_46 ON)
-endif(clawpack)
+endif(clawpack3)
 
 if(geoclaw)
   set(clawpatch ON)

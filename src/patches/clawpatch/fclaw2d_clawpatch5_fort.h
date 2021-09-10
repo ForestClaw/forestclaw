@@ -83,7 +83,7 @@ void FCLAW2D_CLAWPATCH5_FORT_TAG4REFINEMENT(const int* mx,const int* my,
 /** @copydoc fclaw2d_clawpatch5_fort_tag4coarsening() */
 void FCLAW2D_CLAWPATCH5_FORT_TAG4COARSENING(const int* mx, const int* my,
                                              const int* mbc, const int* meqn,
-                                             double xlower[], double ylower[],
+                                             const double* xlower, const double* ylower,
                                              const double* dx, const double* dy,
                                              const int* blockno,
                                              double q0[],double q1[],
