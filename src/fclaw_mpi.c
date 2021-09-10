@@ -28,10 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Functions with C prototypes to use forestclaw from C code */
 
-#ifndef P4EST_ENABLE_MPI
-static int initialized = 0;
-#endif
-
 void
 fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp)
 {
@@ -47,22 +43,10 @@ fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp)
         printf("Recieved mpi_init_thread level %d\n", provided);
     }
     SC_CHECK_MPI (mpiret);
-#else
-    initialized = 1;
 #endif
 
     sc_init (mpicomm, 0, 0, NULL, lp);
     p4est_init (NULL, lp);
-}
-
-void
-fclaw_mpi_initialized (int * flag)
-{
-#ifdef P4EST_ENABLE_MPI
-    MPI_Initialized(flag);
-#else
-    *flag = initialized;
-#endif
 }
 
 void

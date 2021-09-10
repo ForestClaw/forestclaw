@@ -192,6 +192,7 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 fclaw_app_t *
 fclaw_app_new (int *argc, char ***argv, void *user)
 {
+    //TODO seperate intialize from creating new app
 #ifdef FCLAW_ENABLE_DEBUG
     const int LP_lib = SC_LP_INFO;
     const int LP_fclaw = SC_LP_DEBUG;
@@ -205,16 +206,11 @@ fclaw_app_new (int *argc, char ***argv, void *user)
 
     mpicomm = sc_MPI_COMM_WORLD;
 
-    // TODO Fix this
-    int mpi_initialized;
-    fclaw_mpi_initialized(&mpi_initialized);
-    if(!mpi_initialized){
-        mpiret = sc_MPI_Init (argc, argv);
-        SC_CHECK_MPI (mpiret);
-        sc_init (mpicomm, 1, 1, NULL, LP_lib);
-        p4est_init (NULL, LP_lib);
-        fclaw_init (NULL, LP_fclaw);
-    }
+    mpiret = sc_MPI_Init (argc, argv);
+    SC_CHECK_MPI (mpiret);
+    sc_init (mpicomm, 1, 1, NULL, LP_lib);
+    p4est_init (NULL, LP_lib);
+    fclaw_init (NULL, LP_fclaw);
 
     a = FCLAW_ALLOC (fclaw_app_t, 1);
     a->mpicomm = mpicomm;
