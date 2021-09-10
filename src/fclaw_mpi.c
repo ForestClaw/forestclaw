@@ -28,8 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Functions with C prototypes to use forestclaw from C code */
 
-#ifdef P4EST_ENABLE_MPI
-static int intialized = 0;
+#ifndef P4EST_ENABLE_MPI
+static int initialized = 0;
 #endif
 
 void
