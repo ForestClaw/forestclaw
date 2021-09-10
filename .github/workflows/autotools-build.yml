@@ -65,6 +65,31 @@ jobs:
     - name: Install
       run: sudo make install
 
+  serial_build_with_clawpack3_enabled:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libblas-dev liblapack-dev
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Run bootstrap Script
+      run: ./bootstrap
+    - name: Configure
+      run: ./configure --enable-clawpack3
+    - name: Build
+      run: make
+    - name: Tests
+      run: make check -j2
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
+    - name: Install
+      run: sudo make install
 
   serial_build_with_geoclaw_enabled:
     runs-on: ubuntu-20.04
@@ -240,7 +265,7 @@ jobs:
     - name: Run bootstrap Script
       run: ./bootstrap
     - name: Configure
-      run: ./configure --enable-clawpack3 --enable-mpi CFLAGS="-O2 -Wall -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2" CXXFLAGS="-O2 -Wall -std=c++11 -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2" LIBS="-lgfortran -lstdc++"
+      run: ./configure --enable-clawpack3 --enable-mpi
     - name: Build
       run: make
     - name: Tests
