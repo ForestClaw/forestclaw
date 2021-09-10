@@ -28,6 +28,11 @@ if(clawpack)
   set(clawpack3_46 ON)
 endif(clawpack)
 
+if(clawpack3)
+  set(clawpatch ON)
+  set(clawpack3_46 ON)
+endif(clawpack)
+
 if(geoclaw)
   set(clawpatch ON)
 endif(geoclaw)
