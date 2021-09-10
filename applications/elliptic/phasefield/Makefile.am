@@ -12,7 +12,7 @@ applications_elliptic_phasefield_phasefield_SOURCES = \
 	applications/elliptic/phasefield/phasefield_user.cpp \
 	applications/elliptic/phasefield/phasefield_user.h \
 	applications/elliptic/phasefield/phasefield_options.c \
-	applications/elliptic/phasefield/cellave.f90 \
+	applications/elliptic/phasefield/cellave.f \
 	applications/elliptic/phasefield/fortran/phasefield_setprob.f90 \
 	applications/elliptic/phasefield/fortran/phasefield_bc2.f \
 	applications/elliptic/phasefield/fortran/phasefield_fort_rhs.f90 \
