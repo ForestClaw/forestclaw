@@ -192,7 +192,7 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 fclaw_app_t *
 fclaw_app_new (int *argc, char ***argv, void *user)
 {
-    //TODO seperate intialize from creating new app
+    //TODO seperate intialize from creating new app (makes testing difficult)
 #ifdef FCLAW_ENABLE_DEBUG
     const int LP_lib = SC_LP_INFO;
     const int LP_fclaw = SC_LP_DEBUG;
