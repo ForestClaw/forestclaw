@@ -25,7 +25,6 @@ if(clawpack)
   set(clawpatch ON)
   set(clawpack4.6 ON)
   set(clawpack5 ON)
-  set(clawpack3_46 ON)
 endif(clawpack)
 
 if(clawpack3)
