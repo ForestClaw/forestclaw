@@ -29,6 +29,8 @@ DEPENDS P4EST-install
 
 # --- required libraries
 find_package(FFTW REQUIRED)
+find_package(BLAS)
+find_package(LAPACK)
 
 # --- imported target
 
@@ -43,7 +45,10 @@ target_link_libraries(ThunderEgg::ThunderEgg INTERFACE "${THUNDEREGG_LIBRARIES}"
 set_target_properties(ThunderEgg::ThunderEgg PROPERTIES 
   IMPORTED_LOCATION ${THUNDEREGG_LIBRARIES}
   INTERFACE_INCLUDE_DIRECTORIES ${THUNDEREGG_INCLUDE_DIRS}
-  INTERFACE_LINK_LIBRARIES "FFTW::FFTW;P4EST::P4EST;SC::SC;LAPACK::LAPACK;BLAS::BLAS;MPI::MPI_CXX"
+  INTERFACE_LINK_LIBRARIES "FFTW::FFTW;P4EST::P4EST;SC::SC;MPI::MPI_CXX"
 )
+if(TARGET BLAS::BLAS AND TARGET LAPACK::LAPACK)
+  target_link_libraries(ThunderEgg::ThunderEgg INTERFACE BLAS::BLAS LAPACK::LAPACK
+endif()
 
 add_dependencies(ThunderEgg::ThunderEgg ThunderEgg)
