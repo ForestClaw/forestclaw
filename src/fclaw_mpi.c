@@ -47,7 +47,7 @@ fclaw_mpi_init (int * argc, char *** argv, sc_MPI_Comm mpicomm, int lp)
         printf("Recieved mpi_init_thread level %d\n", provided);
     }
     SC_CHECK_MPI (mpiret);
-#elif
+#else
     initialized = 1;
 #endif
 
@@ -60,7 +60,7 @@ fclaw_mpi_initialized (int * flag)
 {
 #ifdef P4EST_ENABLE_MPI
     MPI_Initialized(flag);
-#elif
+#else
     *flag = initialized;
 #endif
 }
