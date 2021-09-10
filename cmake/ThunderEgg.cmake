@@ -48,7 +48,7 @@ set_target_properties(ThunderEgg::ThunderEgg PROPERTIES
   INTERFACE_LINK_LIBRARIES "FFTW::FFTW;P4EST::P4EST;SC::SC;MPI::MPI_CXX"
 )
 if(TARGET BLAS::BLAS AND TARGET LAPACK::LAPACK)
-  target_link_libraries(ThunderEgg::ThunderEgg INTERFACE BLAS::BLAS LAPACK::LAPACK
+  target_link_libraries(ThunderEgg::ThunderEgg INTERFACE BLAS::BLAS LAPACK::LAPACK)
 endif()
 
 add_dependencies(ThunderEgg::ThunderEgg ThunderEgg)
