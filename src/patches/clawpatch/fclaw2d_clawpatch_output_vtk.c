@@ -797,7 +797,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
 /*  --------------------------------------------------------------------------
     Used for debugging
     ------------------------------------------------------------------------- */
-void
+static void
 fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

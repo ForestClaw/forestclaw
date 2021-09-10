@@ -13,15 +13,27 @@ libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw2d_clawpatch5_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h \
+	\
+	src/patches/clawpatch/fclaw3dx_clawpatch.h \
+	src/patches/clawpatch/fclaw3dx_clawpatch.hpp \
+	src/patches/clawpatch/fclaw3dx_clawpatch_options.h \
+	src/patches/clawpatch/fclaw3dx_clawpatch_transform.h \
+	src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics.h \
+	src/patches/clawpatch/fclaw3dx_clawpatch_pillow.h \
+	src/patches/clawpatch/fclaw3dx_clawpatch_fort.h \
+	src/patches/clawpatch/fclaw3dx_clawpatch46_fort.h \
+	src/patches/clawpatch/fclaw3dx_clawpatch_output_ascii.h \
+	src/patches/clawpatch/fclaw3dx_clawpatch_output_vtk.h \
+	\
 	src/patches/metric/fclaw2d_metric.h \
 	src/patches/metric/fclaw2d_metric.hpp \
-	src/patches/metric/fclaw2d_metric_default.h \
 	src/patches/metric/fclaw2d_metric_default_fort.h \
 	src/patches/metric/fortran_source2d/fclaw2d_metric_terms.i 
 
 libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
+	src/patches/clawpatch/fclaw2d_clawpatch_conservation.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics_default.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_pillow.c \
@@ -30,22 +42,34 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_utils.f \
 	\
+	src/patches/clawpatch/fclaw3dx_clawpatch.cpp \
+	src/patches/clawpatch/fclaw3dx_clawpatch_options.c \
+	src/patches/clawpatch/fclaw3dx_clawpatch_conservation.c \
+	src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics.c \
+	src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics_default.c \
+	src/patches/clawpatch/fclaw3dx_clawpatch_pillow.c \
+	src/patches/clawpatch/fclaw3dx_clawpatch_transform.c \
+	src/patches/clawpatch/fclaw3dx_clawpatch_output_ascii.c \
+	src/patches/clawpatch/fclaw3dx_clawpatch_output_vtk.c \
+	src/patches/clawpatch/fclaw3dx_clawpatch_utils.f \
+	\
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_exceeds_threshold.c \
+	src/patches/clawpatch/fort_user/fclaw3dx_clawpatch_exceeds_threshold.c \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_difference_exceeds_th.f90 \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_value_exceeds_th.f90 \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_minmax_exceeds_th.f90 \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_gradient_exceeds_th.f90 \
 	\
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_tag4refinement.f90 \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_tag4coarsening.f90 \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_average.f90 \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_copy.f90 \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_interpolate.f90 \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_local_ghost_pack.f90 \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_output_ascii.f90 \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_timeinterp.f90  \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_pillowsphere.f90 \
-	src/patches/clawpatch/fort3_4.6/fclaw2d_clawpatch46_diagnostics.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_tag4refinement.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_tag4coarsening.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_average.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_copy.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_interpolate.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_local_ghost_pack.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_output_ascii.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_timeinterp.f90  \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_pillowsphere.f90 \
+	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_diagnostics.f90 \
 	\
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4refinement.f \
 	src/patches/clawpatch/fort_4.6/fclaw2d_clawpatch46_tag4coarsening.f \
@@ -69,7 +93,6 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_timeinterp.f  \
 	src/patches/clawpatch/fort_5.0/fclaw2d_clawpatch5_diagnostics.f \
 	\
-	src/patches/clawpatch/fclaw2d_clawpatch_conservation.c \
 	src/patches/metric/fclaw2d_metric.cpp \
 	src/patches/metric/fclaw2d_metric_default.c \
 	src/patches/metric/fortran_source2d/fclaw2d_metric_default_fort.f

@@ -395,63 +395,74 @@ typedef void (*fclaw3dx_clawpatch_fort_output_ascii_t)(char* matname1,
 /**
  * @brief Calculates the error for cells in a patch
  * 
- * @param[in] mx, my the number cells in the x and y directions, excluding ghost
+ * @param[in] blockno the block number
+ * @param[in] mx, my, mz the number cells in the x and y directions, excluding ghost
  * @param[in] mbc the number of ghost cells
  * @param[in] meqn the number of equations
- * @param[in] dx, dy spacing of cells in the x and y directions
- * @param[in] xlower, ylower the coordinate of the lower left corner
+ * @param[in] dx, dy, dz spacing of cells in the x and y directions
+ * @param[in] xlower, ylower, zlower the coordinate of the lower left corner
  * @param[in] q the computed solution
  * @param[out] error the error for each meqn in each cell
  * @param[in] soln the exact solution
  */
-typedef void (*fclaw3dx_clawpatch_fort_error_t)(int* blockno, int *mx, int *my, 
+typedef void (*fclaw3dx_clawpatch_fort_error_t)(int* blockno, 
+                                       int *mx, int *my, int* mz, 
                                        int *mbc,int *meqn,
-									   double *dx, double *dy, double *xlower,
-									   double *ylower, double *t, double q[],
+									   double *dx, double *dy, double* dz, 
+                                       double *xlower, double *ylower, double *zlower,
+                                       double *t, 
+                                       double q[],
 									   double error[], double soln[]);
 /**
  * @brief Calculates a sum for each equation
  * 
- * @param[in] mx, my the number cells in the x and y directions, excluding ghost
+ * @param[in] mx, my, mz the number cells in the x and y directions, excluding ghost
  * @param[in] mbc the number of ghost cells
  * @param[in] meqn the number of equations
- * @param[in] dx, dy spacing of cells in the x and y directions
+ * @param[in] dx, dy, dz spacing of cells in the x and y directions
  * @param[in] area the area for each cell
  * @param[in] q the computed solution
  * @param[in,out] sum the current sum for each equaiton
  * @param[in,out] c_kahan the the current c values for the Kahan summation algorithm
  */
-typedef void (*fclaw3dx_clawpatch_fort_conscheck_t)(int *mx, int *my, int* mbc, int* meqn,
-										   double *dx, double *dy,
-										   double area[], double q[], double sum[],
-                                           double *c_kahan);
+typedef void (*fclaw3dx_clawpatch_fort_conscheck_t)(int *mx, int *my, int *mz, 
+                                                    int* mbc, int* meqn,
+										            double *dx, double *dy, double* dz,
+										            double area[], double q[], double sum[],
+                                                    double *c_kahan);
 
 /**
  * @brief Calculates the area of a patch
  * 
- * @param[in] mx, my the number cells in the x and y directions, excluding ghost
+ * @param[in] mx, my, mz the number cells in the x and y directions, excluding ghost
  * @param[in] mbc the number of ghost cells
- * @param[in] dx, dy spacing of cells in the x and y directions
+ * @param[in] dx, dy, dz spacing of cells in the x and y directions
  * @param[in] area array of area values for cells
  * @return the total area of the patch
  */
-typedef double (*fclaw3dx_clawpatch_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
-										double* dy, double area[]);
+typedef double (*fclaw3dx_clawpatch_fort_area_t)(int *mx, int* my, int* mz, 
+                                                 int *mbc, 
+                                                 double *dx, double** dy, double *dz, 
+                                                 double area[]);
 
 /**
  * @brief Calculates the error norms for a patch
  * 
+ * @param[in] blockno the block number
  * @param[in] mx, my the number cells in the x and y directions, excluding ghost
  * @param[in] mbc the number of ghost cells
  * @param[in] meqn the number of equations
- * @param[in] dx, dy spacing of cells in the x and y directions
+ * @param[in] dx, dy, dz spacing of cells in the x and y directions
  * @param[in] area array of area values for cells
  * @param[in] error error array
  * @param[out] error_norm a 2d array of  l1, l2, and inf norms for each eqn
  */
-typedef void (*fclaw3dx_clawpatch_fort_norm_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
-									  double *dx, double *dy, double area[],
-									  double error[], double error_norm[]);
+typedef void (*fclaw3dx_clawpatch_fort_norm_t)(int* blockno, 
+                                               int *mx, int *my, int* mz,
+                                               int *mbc, int *meqn,
+									           double *dx, double *dy, double *dz,
+                                               double area[],
+									           double error[], double error_norm[]);
 
 /** @} */
 

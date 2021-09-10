@@ -65,14 +65,17 @@ add_library(clawpatch
   fclaw2d_clawpatch_output_ascii.c
   fclaw2d_clawpatch_output_vtk.c
   fclaw2d_clawpatch_conservation.c
+
   fclaw3dx_clawpatch.cpp 
   fclaw3dx_clawpatch_options.c
   fclaw3dx_clawpatch_diagnostics.c 
+  fclaw3dx_clawpatch_diagnostics_default.c
   fclaw3dx_clawpatch_pillow.c 
   fclaw3dx_clawpatch_transform.c 
   fclaw3dx_clawpatch_output_ascii.c
   fclaw3dx_clawpatch_output_vtk.c
   fclaw3dx_clawpatch_conservation.c
+
   fort_user/fclaw2d_clawpatch_exceeds_threshold.c
   fort_user/fclaw3dx_clawpatch_exceeds_threshold.c
   ${metric}/fclaw2d_metric.cpp 
@@ -104,6 +107,7 @@ install(FILES
 	fclaw2d_clawpatch5_fort.h
 	fclaw2d_clawpatch_output_ascii.h
 	fclaw2d_clawpatch_output_vtk.h
+
   fclaw3dx_clawpatch.h
 	fclaw3dx_clawpatch.hpp
 	fclaw3dx_clawpatch_options.h
@@ -115,6 +119,7 @@ install(FILES
 	fclaw3dx_clawpatch46_fort.h
 	fclaw3dx_clawpatch_output_ascii.h
 	fclaw3dx_clawpatch_output_vtk.h
+
 	${metric}/fclaw2d_metric.h
 	${metric}/fclaw2d_metric.hpp
 	${metric}/fclaw2d_metric_default_fort.h

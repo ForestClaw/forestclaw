@@ -157,7 +157,7 @@ subroutine fclaw2d_pillow46_interpolate_block_corner3(mx,my,mz,mbc,meqn, &
     integer :: ic, jc, k, mth
     double precision :: gradx, grady, shiftx, shifty
     double precision :: sl, sr, qc, value
-    double precision :: fclaw3dx_clawpatch_compute_slopes
+    double precision :: fclaw2d_clawpatch_compute_slopes
 
     mth = 5
 
@@ -185,11 +185,11 @@ subroutine fclaw2d_pillow46_interpolate_block_corner3(mx,my,mz,mbc,meqn, &
             qc = qcoarse(ic,jc,k,mq)
             sl = (qc - qcoarse(ic-1,jc,k,mq))
             sr = (qcoarse(ic+1,jc,k,mq) - qc)
-            gradx = fclaw3dx_clawpatch_compute_slopes(sl,sr,mth)
+            gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
             sl = (qc - qcoarse(ic,jc-1,k,mq))
             sr = (qcoarse(ic,jc+1,k,mq) - qc)
-            grady = fclaw3dx_clawpatch_compute_slopes(sl,sr,mth)
+            grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
             !! # Loop over fine grid ghost cells
             do ibc = 1,mbc

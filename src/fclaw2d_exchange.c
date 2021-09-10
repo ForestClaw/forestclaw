@@ -97,7 +97,7 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
         patchno = i;
 
         fclaw2d_patch_remote_ghost_build(glob,ghost_patch,blockno,
-                                         patchno,(void*) &build_mode);
+                                         patchno, build_mode);
     }
 }
 

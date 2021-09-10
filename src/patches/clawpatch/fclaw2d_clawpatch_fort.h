@@ -388,6 +388,7 @@ typedef void (*clawpatch_fort_output_ascii_t)(char* matname1,
 /**
  * @brief Calculates the error for cells in a patch
  * 
+ * @param[in] blockno the block number
  * @param[in] mx, my the number cells in the x and y directions, excluding ghost
  * @param[in] mbc the number of ghost cells
  * @param[in] meqn the number of equations
@@ -434,6 +435,7 @@ typedef double (*clawpatch_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
 /**
  * @brief Calculates the error norms for a patch
  * 
+ * @param[in] blockno the block number
  * @param[in] mx, my the number cells in the x and y directions, excluding ghost
  * @param[in] mbc the number of ghost cells
  * @param[in] meqn the number of equations
