@@ -263,8 +263,8 @@ void phasefield::modifyRHSForInternalBoundaryConditions(const PatchInfo<2>& pinf
         }
     }
 #else       
-    PatchArray<2> new_us(pinfo.ns,1,1);
-    PatchArray<2> new_Aus(pinfo.ns,1,1);
+    PatchArray<2> new_us(pinfo.ns,mfields,1);
+    PatchArray<2> new_Aus(pinfo.ns,mfields,1);
     if(pinfo.hasNbr(Side<2>::west())){
         for(int field=0; field<mfields; field++){
             for(int j=0; j < my; j++){

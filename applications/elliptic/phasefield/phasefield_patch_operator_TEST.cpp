@@ -125,9 +125,9 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
 
     op.apply(x,y);
     for(auto pinfo : domain.getPatchInfoVector()){
-        auto x_lds = x_just_ghosts.getPatchView(pinfo.local_index);
-        auto y_lds = y_expected.getPatchView(pinfo.local_index);
-        op.applySinglePatch(pinfo,x_lds,y_lds);
+        auto x_just_ghosts_view = x_just_ghosts.getPatchView(pinfo.local_index);
+        auto y_expected_view = y_expected.getPatchView(pinfo.local_index);
+        op.applySinglePatch(pinfo,x_just_ghosts_view,y_expected_view);
     }
     y_expected.scaleThenAdd(-1.0,y);
 
@@ -135,17 +135,17 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
     for(auto pinfo : domain.getPatchInfoVector()){
         INFO("x_start: " <<pinfo.starts[0]);
         INFO("y_start: " <<pinfo.starts[1]);
-        auto expected_lds = y_expected.getPatchView(pinfo.local_index);
-        auto lds = y.getPatchView(pinfo.local_index);
-        auto us = x.getPatchView(pinfo.local_index);
-        op.modifyRHSForInternalBoundaryConditions(pinfo,us,lds);
+        auto y_expected_view = y_expected.getPatchView(pinfo.local_index);
+        auto y_view = y.getPatchView(pinfo.local_index);
+        auto x_view = x.getPatchView(pinfo.local_index);
+        op.modifyRHSForInternalBoundaryConditions(pinfo,x_view,y_view);
         for(int component = 0;component<2;component++){
             INFO("Component: "<< component);
             for(int yi = 0; yi<10; yi++){
                 INFO("yi: "<< yi);
                 for(int xi = 0; xi<10; xi++){
                     INFO("xi: "<< xi);
-                    CHECK(lds(xi,yi,component)==Approx(expected_lds(xi,yi,component)));
+                    CHECK(y_view(xi,yi,component)==Approx(y_expected_view(xi,yi,component)));
                 }
             }
         }
