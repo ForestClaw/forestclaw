@@ -49,7 +49,7 @@ class DomainReader
 		ThunderEgg::Communicator comm(MPI_COMM_WORLD);
 
 		nlohmann::json j;
-		std::ifstream  input_stream(TEST_SRC_DIR + file_name);
+		std::ifstream  input_stream(file_name);
 		if (!input_stream.good()) {
 			throw "could not open file";
 		}
