@@ -40,57 +40,20 @@ typedef enum fc2d_thunderegg_data_choice
 }  fc2d_thunderegg_data_choice_t;
 
 /**
- * @brief Wrapper class for forestclaw data acess
+ * @brief Get a thunderegg vector that is a view to forestclaw data
+ * 
+ * @param glob the global context
+ * @param data_choice the data chioce
+ * @return ThunderEgg::Vector<2> the vector
  */
-class fc2d_thunderegg_vector : public ThunderEgg::Vector<2> {
-   private:
-    /**
-     * @brief the number of cells in each direction on each patch
-     */
-    std::array<int, 2> ns;
-    /**
-     * @brief number of ghost cells
-     */
-    int mbc;
-    /**
-     * @brief strides in each direction
-     */
-    std::array<int, 2> strides;
-    /**
-     * @brief the number of equations
-     */
-    int mfields;
-    /**
-     * @brief stride to next eqn in patch
-     */
-    int eqn_stride;
-    /**
-     * @brief pointers to patch data, index corresponds to local_num in
-     * forestclaw
-     */
-    std::vector<double *> patch_data;
-    /**
-     * @brief fclaw iterator to initialize path_data vector
-     */
-    static void enumeratePatchData(struct fclaw2d_domain *domain,
-                                   struct fclaw2d_patch *patch, int blockno,
-                                   int patchno, void *user);
+ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice);
 
-    static void set_start_value(struct fclaw2d_domain *domain,
-                                struct fclaw2d_patch *patch, int blockno,
-                                int patchno, void *user);
+/**
+ * @brief Get a thunderegg vector that is a view to forestclaw data
+ * 
+ * @param glob the global context
+ * @param data_choice the data chioce
+ * @return ThunderEgg::Vector<2> the vector
+ */
+void fc2d_thunderegg_store_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice, const ThunderEgg::Vector<2>& vec);
 
-#if 1
-    static void store_state(struct fclaw2d_domain *domain,
-                            struct fclaw2d_patch *patch, int blockno,
-                            int patchno, void *user);
-#endif                            
-
-    ThunderEgg::LocalData<2> getLocalDataPriv(int component_index, int local_patch_id) const;
-
-   public:
-    fc2d_thunderegg_vector(struct fclaw2d_global *glob, int data_choice);
-
-    ThunderEgg::LocalData<2> getLocalData(int component_index, int local_patch_id) override;
-    const ThunderEgg::LocalData<2> getLocalData(int component_index, int local_patch_id) const override;
-};

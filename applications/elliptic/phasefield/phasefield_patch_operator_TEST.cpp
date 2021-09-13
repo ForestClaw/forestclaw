@@ -2,7 +2,7 @@
 #include <test/test_config.h>
 #include "phasefield_patch_operator.h"
 #include <test/utils/DomainReader.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 
@@ -28,9 +28,9 @@ TEST_CASE("constructor sets s array correctly", "[applications/elliptic/phasefie
     DomainReader<2> reader(TEST_SRC_DIR "/test/mesh_files/2d_uniform_2x2_mpi1.json", {10,10}, 2);
     auto domain = reader.getCoarserDomain();
 
-    auto phi_n = ValVector<2>::GetNewVector(domain, 3);
+    Vector<2> phi_n(domain, 3);
 
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+    BiLinearGhostFiller ghost_filler(domain, GhostFillingType::Faces);
 
     fc2d_thunderegg_options_t * mg_opt = new fc2d_thunderegg_options_t();
     mg_opt->boundary_conditions = new int[4];
@@ -78,34 +78,34 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
     phasefield::setLambda(-1);
 
     DomainReader<2> reader(TEST_SRC_DIR "/test/mesh_files/2d_uniform_2x2_mpi1.json", {10,10}, 2);
-    auto domain = reader.getFinerDomain();
+    Domain<2> domain = reader.getFinerDomain();
 
-    auto x = ValVector<2>::GetNewVector(domain, 2);
-    auto x_just_ghosts = ValVector<2>::GetNewVector(domain, 2);
-    auto y_expected = ValVector<2>::GetNewVector(domain, 2);
-    auto y = ValVector<2>::GetNewVector(domain, 2);
-    auto phi_n = ValVector<2>::GetNewVector(domain, 3);
+    Vector<2> x(domain, 2);
+    Vector<2> x_just_ghosts(domain, 2);
+    Vector<2> y_expected(domain, 2);
+    Vector<2> y(domain, 2);
+    Vector<2> phi_n(domain, 3);
 
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+    BiLinearGhostFiller ghost_filler(domain, GhostFillingType::Faces);
 
     DomainTools::SetValuesWithGhost<2>(domain,x,one,one);
     DomainTools::SetValues<2>(domain,x_just_ghosts,one,one);
-    ghost_filler->fillGhost(x_just_ghosts);
-    for(auto pinfo : domain->getPatchInfoVector()){
-        auto lds = x_just_ghosts->getLocalDatas(pinfo.local_index);
+    ghost_filler.fillGhost(x_just_ghosts);
+    for(auto pinfo : domain.getPatchInfoVector()){
+        auto lds = x_just_ghosts.getPatchView(pinfo.local_index);
         for(Side<2> s : Side<2>::getValues()){
             if(pinfo.hasNbr(s)){
+                auto inner_slice = lds.getSliceOn(s,{0});
+                auto ghost_slice = lds.getGhostSliceOn(s,{0});
                 for(int component = 0;component<2;component++){
-                    auto inner_slice = lds[component].getSliceOn(s,{0});
-                    auto ghost_slice = lds[component].getGhostSliceOn(s,{0});
                     for(int i=0;i<10;i++){
-                        ghost_slice[{i}]+=inner_slice[{i}];
+                        ghost_slice(i,component)+=inner_slice(i,component);
                     }
                 }
             }
         }
     }
-    x_just_ghosts->set(0);
+    x_just_ghosts.set(0);
 
     DomainTools::SetValuesWithGhost<2>(domain,phi_n,two,two,two);
 
@@ -124,28 +124,28 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
     phasefield op(mg_opt, phase_opt, phi_n, domain, ghost_filler);
 
     op.apply(x,y);
-    for(auto pinfo : domain->getPatchInfoVector()){
-        auto x_lds = x_just_ghosts->getLocalDatas(pinfo.local_index);
-        auto y_lds = y_expected->getLocalDatas(pinfo.local_index);
-        op.applySinglePatch(pinfo,x_lds,y_lds,false);
+    for(auto pinfo : domain.getPatchInfoVector()){
+        auto x_lds = x_just_ghosts.getPatchView(pinfo.local_index);
+        auto y_lds = y_expected.getPatchView(pinfo.local_index);
+        op.applySinglePatch(pinfo,x_lds,y_lds);
     }
-    y_expected->scaleThenAdd(-1.0,y);
+    y_expected.scaleThenAdd(-1.0,y);
 
-    ghost_filler->fillGhost(x);
-    for(auto pinfo : domain->getPatchInfoVector()){
+    ghost_filler.fillGhost(x);
+    for(auto pinfo : domain.getPatchInfoVector()){
         INFO("x_start: " <<pinfo.starts[0]);
         INFO("y_start: " <<pinfo.starts[1]);
-        auto expected_lds = y_expected->getLocalDatas(pinfo.local_index);
-        auto lds = y->getLocalDatas(pinfo.local_index);
-        auto us = x->getLocalDatas(pinfo.local_index);
-        op.addGhostToRHS(pinfo,us,lds);
+        auto expected_lds = y_expected.getPatchView(pinfo.local_index);
+        auto lds = y.getPatchView(pinfo.local_index);
+        auto us = x.getPatchView(pinfo.local_index);
+        op.modifyRHSForInternalBoundaryConditions(pinfo,us,lds);
         for(int component = 0;component<2;component++){
             INFO("Component: "<< component);
             for(int yi = 0; yi<10; yi++){
                 INFO("yi: "<< yi);
                 for(int xi = 0; xi<10; xi++){
                     INFO("xi: "<< xi);
-                    CHECK(lds[component][{xi,yi}]==Approx(expected_lds[component][{xi,yi}]));
+                    CHECK(lds(xi,yi,component)==Approx(expected_lds(xi,yi,component)));
                 }
             }
         }

@@ -35,6 +35,7 @@
 
 using namespace ThunderEgg;
 
+#if 0
 /**
  * @brief Get the number of local cells in the forestclaw domain
  * 
@@ -48,12 +49,18 @@ static int get_num_local_cells(fclaw2d_global_t* glob){
 
     return domain->local_num_patches * clawpatch_opt->mx * clawpatch_opt->my;
 }
+#endif
 
-fc2d_thunderegg_vector::fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_choice)
-    : Vector<2>( MPI_COMM_WORLD,
-                 fclaw2d_clawpatch_get_options(glob)->rhs_fields,
-                 glob->domain->local_num_patches, 
-                 get_num_local_cells(glob) ) 
+ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice)
+{
+    return ThunderEgg::Vector<2>();
+}
+void fc2d_thunderegg_store_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice, const ThunderEgg::Vector<2>& vec)
+{
+}
+
+#if 0
+void fc2d_thunderegg_vector(fclaw2d_global_t *glob, int data_choice)
 {
 
     fclaw2d_clawpatch_options_t *clawpatch_opt =
@@ -199,3 +206,4 @@ const LocalData<2> fc2d_thunderegg_vector::getLocalData(int component_index, int
 {
     return getLocalDataPriv(component_index, local_patch_id);
 }
+#endif

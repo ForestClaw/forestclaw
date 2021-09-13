@@ -60,14 +60,12 @@ using namespace ThunderEgg;
  * @param curr_domain the current (coarser) domain
  * @return shared_ptr<Vector<2>> the restricted beta vector
  */
-shared_ptr<ValVector<2>> restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec, 
-                                        shared_ptr<Domain<2>> prev_domain, 
-                                        shared_ptr<Domain<2>> curr_domain)
+Vector<2> restrict_beta_vec(const Vector<2>& prev_beta_vec, 
+                            const Domain<2>& prev_domain, 
+                            const Domain<2>& curr_domain)
 {
-    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, prev_beta_vec->getNumComponents(), true);
-    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, prev_beta_vec->getNumComponents());
-    restrictor.restrict(prev_beta_vec, new_beta_vec);
-    return new_beta_vec;
+    GMG::LinearRestrictor<2> restrictor(prev_domain, curr_domain,  true);
+    return restrictor.restrict(prev_beta_vec);
 }
 
 void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob) 
@@ -86,7 +84,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
+    Vector<2> f = fc2d_thunderegg_get_vector(glob,RHS);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -114,7 +112,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
 
     // get finest level
-    shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
+    Domain<2> te_domain = domain_gen.getFinestDomain();
 
     // define operators for problems
 
@@ -129,28 +127,26 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create vector for beta
-    auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->rhs_fields);
+    Vector<2> beta_vec = f.getZeroClone();
     DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_func);
 
     // ghost filler
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain, fill_type);
+    BiLinearGhostFiller ghost_filler(te_domain, fill_type);
 
     // patch operator
-    auto op = make_shared<VarPoisson::StarPatchOperator<2>>(beta_vec,te_domain,ghost_filler);
+    VarPoisson::StarPatchOperator op(beta_vec, te_domain, ghost_filler);
 
     // set the patch solver
-    auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
-    p_bcgs->setTolerance(mg_opt->patch_bcgs_tol);
-    p_bcgs->setMaxIterations(mg_opt->patch_bcgs_max_it);
-    shared_ptr<PatchSolver<2>>  solver;
-    if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-        solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, op);
-    }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-        solver = make_shared<Poisson::FFTWPatchSolver<2>>(op, neumann_bitset);
-    }
+    Iterative::BiCGStab<2> p_bcgs;
+    p_bcgs.setTolerance(mg_opt->patch_bcgs_tol);
+    p_bcgs.setMaxIterations(mg_opt->patch_bcgs_max_it);
 
-    // create matrix
-    shared_ptr<Operator<2>> A = op;
+    unique_ptr<PatchSolver<2>>  solver;
+    if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
+        solver.reset(new Iterative::PatchSolver<2>(p_bcgs, op));
+    }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+        solver.reset(new Poisson::FFTWPatchSolver<2>(op, neumann_bitset));
+    }
 
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
@@ -173,60 +169,46 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
         //add finest level
 
         //next domain
-        auto curr_domain = te_domain;
-        auto next_domain = domain_gen.getCoarserDomain();
-
-        //operator
-        auto patch_operator = op;
-
-        //smoother
-        shared_ptr<GMG::Smoother<2>> smoother = solver;
+        Domain<2> curr_domain = te_domain;
+        Domain<2> next_domain = domain_gen.getCoarserDomain();
 
         //restrictor
-        auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                next_domain, clawpatch_opt->rhs_fields);
+        GMG::LinearRestrictor<2> restrictor(curr_domain, 
+                                            next_domain);
 
-        //vector generator
-        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
-
-        builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
+        builder.addFinestLevel(op, *solver, restrictor);
 
         //add intermediate levels
         auto prev_beta_vec = beta_vec;
-        auto prev_domain = curr_domain;
+        Domain<2> prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
         {
             next_domain = domain_gen.getCoarserDomain();
 
             //operator
-            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
-            auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-            patch_operator = make_shared<VarPoisson::StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+            BiLinearGhostFiller ghost_filler(curr_domain, fill_type);
+            Vector<2> restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
+            VarPoisson::StarPatchOperator<2> patch_operator(restricted_beta_vec, curr_domain, ghost_filler);
             prev_beta_vec = restricted_beta_vec;
 
             //smoother
-            shared_ptr<GMG::Smoother<2>> smoother;
+            unique_ptr<GMG::Smoother<2>> smoother;
             if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-                smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
+                smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
             }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-                smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
+                smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
             }
 
             //restrictor
-            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                    next_domain, 
-                                                                    clawpatch_opt->rhs_fields);
+            GMG::LinearRestrictor<2> restrictor(curr_domain, 
+                                                next_domain);
 
             //interpolator
-            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                        prev_domain, 
-                                                                        clawpatch_opt->rhs_fields);
+            GMG::DirectInterpolator<2> interpolator(curr_domain, 
+                                                    prev_domain);
 
-            //vector generator
-            vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
-
-            builder.addIntermediateLevel(patch_operator, smoother, restrictor, interpolator, vg);
+            builder.addIntermediateLevel(patch_operator, *smoother, restrictor, interpolator);
 
             prev_domain = curr_domain;
             curr_domain = next_domain;
@@ -235,50 +217,41 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
         //add coarsest level
 
         //operator
-        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
-        auto restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<VarPoisson::StarPatchOperator<2>>(restricted_beta_vec, curr_domain, ghost_filler);
+        BiLinearGhostFiller ghost_filler(curr_domain, fill_type);
+        Vector<2> restricted_beta_vec = restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
+        VarPoisson::StarPatchOperator<2> patch_operator(restricted_beta_vec, curr_domain, ghost_filler);
 
         //smoother
+        unique_ptr<GMG::Smoother<2>> smoother;
         if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-            smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
+            smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
         }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
-            smoother = make_shared<Poisson::FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
+            smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
         }
 
         //interpolator
-        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                    prev_domain, 
-                                                                    clawpatch_opt->rhs_fields);
+        GMG::DirectInterpolator<2> interpolator(curr_domain, 
+                                                prev_domain);
 
         //vector generator
-        vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
 
-        builder.addCoarsestLevel(patch_operator, smoother, interpolator, vg);
+        builder.addCoarsestLevel(patch_operator, *smoother, interpolator);
 
         M = builder.getCycle();
     }
 
     // solve
-    auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
-    shared_ptr<Vector<2>> u = vg->getNewVector();
+    Vector<2> u = f.getZeroClone();
 
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
     bool vl = mg_opt->verbosity_level != 0;
-    int its = iter_solver.solve(vg, A, u, f, M, vl);
+    int its = iter_solver.solve(op, u, f, M.get(), vl);
 
     fclaw_global_productionf("Iterations: %i\n", its);
-    fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
-    fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());
-    fclaw_global_productionf("u-infnorm: %f\n\n", u->infNorm());
 
     // copy solution into rhs
-    f->copy(u);
-    fclaw_global_productionf("Checking if copy function works:\n");
-    fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
+    fc2d_thunderegg_store_vector(glob, RHS, u);
 }
 
