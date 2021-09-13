@@ -23,8 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw3dx_clawpatch_options.h>
-
-#include <_fclaw2d_to_fclaw3dx.h>
+#define REFINE_DIM 2
+#define PATCH_DIM 3
 
 #include <fclaw2d_clawpatch_options.c>

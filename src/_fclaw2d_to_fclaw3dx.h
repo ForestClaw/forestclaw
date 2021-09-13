@@ -23,9 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define PATCH_DIM 3
-#define REFINE_DIM 2
-
 //fclaw2d_clawpatch_conservation.h
 #define fclaw2d_clawpatch_registers_t fclaw3dx_clawpatch_registers_t
 #define fclaw2d_clawpatch_registers fclaw3dx_clawpatch_registers

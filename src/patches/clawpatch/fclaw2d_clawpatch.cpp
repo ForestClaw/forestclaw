@@ -47,6 +47,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
+#elif REFINE_DIM == 2 && PATCH_DIM == 3
+#include <fclaw3dx_clawpatch.h>
+#include <fclaw3dx_clawpatch.hpp>
+
+#include <fclaw3dx_clawpatch_diagnostics.h>
+#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw3dx_clawpatch_output_ascii.h> 
+#include <fclaw3dx_clawpatch_output_vtk.h>
+#include <fclaw3dx_clawpatch_fort.h>
+#include <fclaw3dx_clawpatch_conservation.h>
+#include <fclaw3dx_clawpatch_conservation_fort.h>
+#include <fclaw3dx_clawpatch_transform.h>
+#include <fclaw3dx_clawpatch_pillow.h>  
+
+#include <fclaw3dx_clawpatch46_fort.h>
+
+#include <_fclaw2d_to_fclaw3dx.h>
+
 #endif
 
 #include <fclaw2d_metric.h>
