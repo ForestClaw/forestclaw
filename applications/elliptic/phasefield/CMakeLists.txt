@@ -43,4 +43,5 @@ if(TARGET testutils)
     FORESTCLAW::FC2D_THUNDEREGG
     testutils
   )
+  register_unit_tests(phasefield_TEST.MPI1)
 endif(TARGET testutils)

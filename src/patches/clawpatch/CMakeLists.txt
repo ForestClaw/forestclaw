@@ -139,8 +139,9 @@ set_target_properties(clawpatch PROPERTIES EXPORT_NAME CLAWPATCH)
 add_library(FORESTCLAW::CLAWPATCH INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CLAWPATCH INTERFACE clawpatch)
 
-add_executable(clawpatch_test
+add_executable(libclawpatch_TEST.MPI1
     fclaw3dx_clawpatch_options_TEST.cpp
     fclaw3dx_clawpatch_TEST.cpp
 )
-target_link_libraries(clawpatch_test testutils clawpatch forestclaw)
+target_link_libraries(libclawpatch_TEST.MPI1 testutils clawpatch forestclaw)
+register_unit_tests(libclawpatch_TEST.MPI1)

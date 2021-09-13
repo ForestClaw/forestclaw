@@ -107,7 +107,6 @@ FCLAW_CLAWPATCH_CPPFLAGS = -I@top_srcdir@/src/patches/clawpatch \
 
 ## Needed for fclaw2d_metric_terms.i
 FCLAW_CLAWPATCH_FFLAGS = -I@top_srcdir@/src/patches/metric/fortran_source2d
-
 FCLAW_CLAWPATCH_LDADD    = @top_builddir@/src/patches/clawpatch/libclawpatch.la
 
 ## Sources needed to build this library
@@ -126,3 +125,21 @@ AM_FFLAGS   += $(FCLAW_CLAWPATCH_FFLAGS)
 
 
 include_HEADERS += $(libclawpatch_installed_headers)
+
+## UNIT TESTS
+check_PROGRAMS += src/patches/clawpatch/libclawpatch_TEST.MPI1
+TESTS += src/patches/clawpatch/libclawpatch_TEST.MPI1
+
+src_patches_clawpatch_libclawpatch_TEST_MPI1_SOURCES = \
+	src/patches/clawpatch/fclaw3dx_clawpatch_TEST.cpp \
+	src/patches/clawpatch/fclaw3dx_clawpatch_options_TEST.cpp
+
+src_patches_clawpatch_libclawpatch_TEST_MPI1_CPPFLAGS = \
+    $(src_patches_clawpatch_libclawpatch_la_CPPFLAGS)
+
+src_patches_clawpatch_libclawpatch_TEST_MPI1_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+    $(LDADD) \
+    $(FCLAW_CLAWPATCH_LDADD) \
+    $(FCLAW_LDADD)

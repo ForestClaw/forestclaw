@@ -65,6 +65,7 @@ struct SinglePatchDomain {
     fclaw3dx_clawpatch_options_t opts;
 
     SinglePatchDomain(){
+        fclaw3dx_clawpatch_vtable_initialize(4);
         glob = fclaw2d_global_new();
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
@@ -109,6 +110,7 @@ struct QuadDomain {
     fclaw3dx_clawpatch_options_t opts;
 
     QuadDomain(){
+        fclaw3dx_clawpatch_vtable_initialize(4);
         glob = fclaw2d_global_new();
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
@@ -211,6 +213,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize","[fclaw3dx][clawpatch]")
 }
 TEST_CASE("fclaw3dx_clawpatch patch_build","[fclaw3dx][clawpatch]")
 {
+    fclaw3dx_clawpatch_vtable_initialize(4);
     fclaw2d_global_t* glob = fclaw2d_global_new();
     fclaw_options_t fopts;
     memset(&fopts, 0, sizeof(fopts));
