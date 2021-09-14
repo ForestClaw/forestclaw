@@ -19,7 +19,7 @@
       integer ii,jj
 
       integer initial_condition
-      common /initial_condition_comm/ initial_condition
+      common /initchoice_comm/ initial_condition
 
       cont = get_context()
 
