@@ -52,6 +52,7 @@ add_library(geoclaw_f OBJECT
 )
 
 target_link_Libraries(geoclaw_f PRIVATE 
+    FORESTCLAW::GEOCLAW
     clawpatch
 )
 
