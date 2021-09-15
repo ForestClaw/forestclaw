@@ -1,9 +1,5 @@
 /*
-<<<<<<< HEAD
 Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih
-=======
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
->>>>>>> origin/develop
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
