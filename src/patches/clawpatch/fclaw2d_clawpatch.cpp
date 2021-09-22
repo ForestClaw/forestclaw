@@ -262,6 +262,7 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	}
 
 	if (clawpatch_opt->maux > 0)
+	{
 		cp->aux.define(box,cp->maux);
 		cp->aux_save.define(box,cp->maux);
 	}
@@ -1002,14 +1003,14 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	if (packextra)
 	{
 		FCLAW_ASSERT(extrasize > 0);
-		FCLAW_ASSERT(clawpatch_vt->fort_local_ghost_pack_aux != NULL);
+		FCLAW_ASSERT(clawpatch_vt->local_ghost_pack_aux != NULL);
 		/* This should be renamed, since it doesn't point to an actual
 		   Fortran routine (or one with a fortran like signature) */
 		
 		// int mint = mx/2;  /* Something like this is needed if we need the entire patch */
-		clawpatch_vt->fort_local_ghost_pack_aux(glob,this_patch,mint,
-		                                        qpack,extrasize,
-		                                        packmode,&ierror);
+		clawpatch_vt->local_ghost_pack_aux(glob,patch,mint,
+		                                   qpack,extrasize,
+		                                   packmode,&ierror);
 		FCLAW_ASSERT(ierror == 0);
 		qpack += extrasize; /* Advance pointer */
 	}
