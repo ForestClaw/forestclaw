@@ -18,6 +18,9 @@ AM_INIT_AUTOMAKE([parallel-tests subdir-objects])
 AM_SILENT_RULES
 SC_VERSION([FCLAW])
 
+m4_include([fdep/fortran_dependencies.m4])
+FDEP_F90_GNU_MAKE_DEPS
+
 echo "o---------------------------------------"
 echo "| Checking options"
 echo "o---------------------------------------"
@@ -33,6 +36,9 @@ FCLAW_ARG_ENABLE([ash3d], [enable ash3d library and applications],
 
 FCLAW_ARG_ENABLE([clawpack], [Enable clawpack libraries 4.6 and 5.0 and applications],
                  [CLAWPACK])
+
+FCLAW_ARG_ENABLE([clawpack3], [Enable clawpack 3d libraries and applications],
+                 [CLAWPACK3])
 
 FCLAW_ARG_ENABLE([cudaclaw], [Enable cudaclaw library and application],
                  [CUDACLAW])

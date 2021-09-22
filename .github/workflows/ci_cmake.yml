@@ -11,7 +11,7 @@ jobs:
 
   linux:
     runs-on: ubuntu-20.04
-    timeout-minutes: 15
+    timeout-minutes: 60
     env:
       CTEST_PARALLEL_LEVEL: 2
 
@@ -35,7 +35,10 @@ jobs:
           configure_flags: "-Dmpi=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With Clawpack"
-          configure_flags: "-Dmpi=ON -Dclawapck=ON"
+          configure_flags: "-Dmpi=ON -Dclawpack=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With Clawpack 3"
+          configure_flags: "-Dmpi=ON -Dclawpack3=ON -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
@@ -44,9 +47,9 @@ jobs:
           configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
           cuda: true
-        - name: "MPI With ThunderEgg"
-          configure_flags: "-Dmpi=ON -Dthunderegg=ON"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
+        # - name: "MPI With ThunderEgg"
+        #   configure_flags: "-Dmpi=ON -Dthunderegg=ON"
+        #   ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
 
     name: CMake ${{ matrix.name }} Build on Linux
     steps:
@@ -77,6 +80,7 @@ jobs:
 
     - name: CMake test
       run: ctest --parallel 2 --output-on-failure
+      working-directory: build
 
     - name: CMake install (for examples)
       run: cmake --install build
@@ -125,6 +129,7 @@ jobs:
 
     - name: CMake test
       run: ctest --parallel 2 --output-on-failure
+      working-directory: build
 
     - name: CMake install (for examples)
       run: cmake --install build

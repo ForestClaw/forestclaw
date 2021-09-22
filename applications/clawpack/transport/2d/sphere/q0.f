@@ -17,9 +17,9 @@ c     # ---------------------------------------------------------------
       common /initchoice_comm/ initchoice
 
 
-      double precision q0, r0, r, cb(2)
-      double precision theta, th, thc(2)
-      double precision phi, l, lc(2)
+      double precision q0, r0, r
+      double precision theta, th, thc(2), lc(2)
+      double precision phi, l
       double precision c,b,cbell, hi, hmax, rarg
       double precision Hsmooth
       integer k
@@ -53,7 +53,10 @@ c         # Cosine Bells
           call map2spherical(xp,yp,zp,theta,phi)
           l = theta
           th = phi
-          
+          thc(1) = 0
+          thc(2) = 0
+          lc(1) = pi
+          lc(2) = pi
           if (example .eq. 1) then
               lc(1) = pi
               lc(2) = pi
@@ -69,6 +72,9 @@ c         # Cosine Bells
               lc(2) = 5*pi/4.d0
               thc(1) = 0
               thc(2) = 0
+          else
+              write(6,*) 'q0 : example must be 1,2 or 3'
+              stop
           endif
 
           cbell = b
@@ -87,7 +93,9 @@ c         # Cosine Bells
               endif
           end do
           q0 = cbell
-
+      else
+          write(6,*) 'q0.f  : initchoice must be 1,2 or 3'
+          stop          
       endif
       q0_physical = q0
 
@@ -145,7 +153,7 @@ c     # ---------------------------------------------------------------
       integer example
       common /example_comm/ example
 
-      double precision xp, yp, zp, q0
+      double precision xp, yp, zp
       double precision q0_physical
 
       call mapc2m_spherical(xc,yc,xp,yp,zp)

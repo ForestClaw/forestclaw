@@ -1,21 +1,22 @@
-      subroutine replicated_setprob(example_in)
+      subroutine setprob()
       implicit none
 
-      integer example_in, example
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
-      double precision pi
-      common /compi/ pi
+      double precision uvel, vvel, revs_per_s
+      common /comm_velocity/ uvel, vvel, revs_per_s
 
-      double precision u0_comm,v0_comm, revs_comm
-      common /comm_velocity/ u0_comm,v0_comm,revs_comm
+      integer example
       common /comex/ example
 
       pi = 4.d0*atan(1.d0)
+      pi2 = 2*pi
 
-      example = example_in
-
-      revs_comm = 0.5d0
-      u0_comm = 1.d0
-      v0_comm = 1.d0
+      open(10,file='setprob.data')
+      read(10,*) example
+      read(10,*) uvel
+      read(10,*) vvel
+      read(10,*) revs_per_s
 
       end

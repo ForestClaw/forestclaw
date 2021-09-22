@@ -62,7 +62,7 @@ public :
 
     /* Grid info */
     int mx;           
-    int my;           
+    int my;   
     int mbc;          
     int maux;
 
@@ -72,6 +72,13 @@ public :
     double ylower;
     double xupper;
     double yupper;
+
+#if FCLAW2D_PATCHDIM == 3    
+    int mz;        
+    double dz;
+    double zlower;
+    double zupper;
+#endif
 
     /* Auxilliary array (used by Clawpack 4.6 and 5.0) */
     FArrayBox aux;

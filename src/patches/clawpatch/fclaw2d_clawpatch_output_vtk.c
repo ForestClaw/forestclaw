@@ -35,7 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct fclaw2d_vtk_state
 {
-    int mx, my, meqn;
+    int mx, my;
+#if FCLAW2D_PATCHDIM == 3
+    int mz;
+#endif
+    int meqn;
     int points_per_patch, cells_per_patch;
     int intsize, ndsize;
     int fits32;
@@ -161,6 +165,12 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     return retval ? -1 : 0;
 }
 
+/**
+ * @brief Write the buffer to file
+ * 
+ * @param s the vtk state
+ * @param psize_field the size of the buffer
+ */
 static void
 write_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 {
@@ -206,6 +216,7 @@ write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
         int32_t *idata = (int32_t *) s->buf;
         int32_t k;
+#if FCLAW2D_PATCHDIM == 2
         for (j = 0; j < s->my; ++j)
         {
             for (i = 0; i < s->mx; ++i)
@@ -217,6 +228,27 @@ write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                 *idata++ = k + s->mx + 1;
             }
         }
+#else
+        int l;
+        for (k = 0; k < s->mz; ++k)
+        {
+        for (j = 0; j < s->my; ++j)
+        {
+            for (i = 0; i < s->mx; ++i)
+            {
+                l = pbefore + i + j * (s->mx + 1) + k * (s->my + 1) * (s->mx + 1);
+                *idata++ = l;
+                *idata++ = l + 1;
+                *idata++ = l + (s->mx + 1) + 1;
+                *idata++ = l + (s->mx + 1);
+                *idata++ = l+(s->mx+1)*(s->my+1);
+                *idata++ = l+(s->mx+1)*(s->my+1) + 1;
+                *idata++ = l+(s->mx+1)*(s->my+1) + (s->mx + 1) + 1;
+                *idata++ = l+(s->mx+1)*(s->my+1) + (s->mx + 1);
+            }
+        }
+        }
+#endif
     }
     else
     {
@@ -240,8 +272,9 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
              domain->blocks[blockno].num_patches_before + patchno);
 
         int32_t *idata = (int32_t *) s->buf;
-        int32_t k = 4 * (cbefore + 1);
-        for (c = 0; c < s->cells_per_patch; k += 4, ++c)
+        int32_t connectivity_size = (FCLAW2D_PATCHDIM==2)?4:8;
+        int32_t k = connectivity_size * (cbefore + 1);
+        for (c = 0; c < s->cells_per_patch; k += connectivity_size, ++c)
         {
             *idata++ = k;
         }
@@ -264,7 +297,11 @@ write_types_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     char *cdata = s->buf;
     for (c = 0; c < s->cells_per_patch; ++c)
     {
+#if FCLAW2D_PATCHDIM == 2
         *cdata++ = 9;
+#else
+        *cdata++ = 12;
+#endif
     }
     write_buffer (s, s->psize_types);
 }
@@ -480,7 +517,11 @@ fclaw2d_vtk_write_footer (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
 
 int
 fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
-                        int mx, int my, int meqn,
+                        int mx, int my,
+#if FCLAW2D_PATCHDIM == 3
+                        int mz,
+#endif
+                        int meqn,
                         double vtkspace, int vtkwrite,
                         fclaw2d_vtk_patch_data_t coordinate_cb,
                         fclaw2d_vtk_patch_data_t value_cb)
@@ -495,13 +536,24 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
     /* set up VTK internal information */
     s->mx = mx;
     s->my = my;
+#if FCLAW2D_PATCHDIM == 3
+    s->mz = mz;
+#endif
     s->meqn = meqn;
     s->points_per_patch = (mx + 1) * (my + 1);
     s->cells_per_patch = mx * my;
+#if FCLAW2D_PATCHDIM == 3
+    s->points_per_patch*=(mz+1);
+    s->cells_per_patch *=mz;
+#endif
     snprintf (s->filename, BUFSIZ, "%s.vtu", basename);
     s->global_num_points = s->points_per_patch * domain->global_num_patches;
     s->global_num_cells = s->cells_per_patch * domain->global_num_patches;
+#if FCLAW2D_PATCHDIM == 2
     s->global_num_connectivity = 4 * s->global_num_cells;
+#else
+    s->global_num_connectivity = 8 * s->global_num_cells;
+#endif
     s->fits32 = s->global_num_points <= INT32_MAX
         && s->global_num_connectivity <= INT32_MAX;
     s->inttype = s->fits32 ? "Int32" : "Int64";
@@ -512,7 +564,11 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 
     /* compute data size per patch for the various VTK data arrays */
     s->psize_position = s->points_per_patch * 3 * sizeof (double);
+#if FCLAW2D_PATCHDIM == 2
     s->psize_connectivity = s->cells_per_patch * 4 * s->intsize;
+#else
+    s->psize_connectivity = s->cells_per_patch * 8 * s->intsize;
+#endif
     s->psize_offsets = s->cells_per_patch * s->intsize;
     s->psize_types = s->cells_per_patch * 1;
     s->psize_mpirank = s->cells_per_patch * 4;
@@ -576,31 +632,17 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 
 static void
 fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
-                                  fclaw2d_patch_t * this_patch,
-                                  int this_block_idx, int this_patch_idx,
+                                  fclaw2d_patch_t * patch,
+                                  int blockno, int patchno,
                                   char *a)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
-    fclaw2d_map_context_t *cont;
-
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-
-
-    cont = glob->cont;
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+#if FCLAW2D_PATCHDIM == 2
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-#if 0
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
-
-    ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);
-    const double xlower = cp->xlower ();
-    const double ylower = cp->ylower ();
-    const double dx = cp->dx ();
-    const double dy = cp->dy ();
-#endif
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
@@ -612,9 +654,10 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
         for (i = 0; i <= mx; ++i)
         {
             const double x = xlower + i * dx;
-            if (gparms->manifold)
+            if (fclaw_opt->manifold)
             {
-                FCLAW2D_MAP_C2M(&cont,&this_block_idx,&x,&y,&xpp,&ypp,&zpp);
+                fclaw2d_map_context_t *cont = glob->cont;
+                FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                 *d++ = xpp;
                 *d++ = ypp;
                 *d++ = zpp;
@@ -627,24 +670,54 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
             }
         }
     }
+#elif FCLAW2D_PATCHDIM == 3
+    int mz;
+    double zlower, dz;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+    /* Enumerate point coordinates in the patch */
+    double *d = (double *) a;
+    int i, j, k;
+    for (k = 0; k <= mz; ++k)
+    {
+        const double z = zlower + k * dz;
+        for (j = 0; j <= my; ++j)
+        {
+            const double y = ylower + j * dy;
+            for (i = 0; i <= mx; ++i)
+            {
+                const double x = xlower + i * dx;
+                {
+                    *d++ = x;
+                    *d++ = y;
+                    *d++ = z;
+                }
+            }
+        }
+    }
+#endif
 }
 
 
 static void
 fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
-                             fclaw2d_patch_t * this_patch,
-                             int this_block_idx, int this_patch_idx,
+                             fclaw2d_patch_t * patch,
+                             int blockno, int patchno,
                              char *a)
 {
-    double *q;
-    double xlower,ylower,dx,dy;
-    int mx,my,mbc,meqn;
 
 //    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    int meqn;
+    double *q;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+#if FCLAW2D_PATCHDIM == 2
+
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     const int xlane = mx + 2 * mbc;
@@ -667,6 +740,37 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
             }
         }
     }
+#elif FCLAW2D_PATCHDIM == 3
+    int mz;
+    double zlower, dz;
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+    const int xlane = mx + 2 * mbc;
+    const int ylane = my + 2 * mbc;
+    const int zlane = mz + 2 * mbc;
+
+    // Enumerate equation data in the patch
+    float *f = (float *) a;
+    int i, j, k, eqn;
+    for (k = 0; k < mz; ++k)
+    {
+        for (j = 0; j < my; ++j)
+        {
+            for (i = 0; i < mx; ++i)
+            {
+                for (eqn = 0; eqn < meqn; ++eqn)
+                {
+                    /* For Clawpack 5.0 layout */
+                    //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
+
+                    /* For Clawpack 4.x layout */
+                    *f++ = (float) q[eqn * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
+                }
+            }
+        }
+    }
+#endif
 }
 
 /*  --------------------------------------------------------------------------
@@ -675,13 +779,16 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
 void
 fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my, 
+#if FCLAW2D_PATCHDIM == 3
+                                   clawpatch_opt->mz,
+#endif
                                    clawpatch_opt->meqn,
-                                   gparms->vtkspace, 0,
+                                   fclaw_opt->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
 }
@@ -693,17 +800,20 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 
 void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
 
     char basename[BUFSIZ];
-    snprintf (basename, BUFSIZ, "%s_frame_%04d", gparms->prefix, iframe);
+    snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my, 
+#if FCLAW2D_PATCHDIM == 3
+                                   clawpatch_opt->mz,
+#endif
                                    clawpatch_opt->meqn,
-                                   gparms->vtkspace, 0,
+                                   fclaw_opt->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
 }

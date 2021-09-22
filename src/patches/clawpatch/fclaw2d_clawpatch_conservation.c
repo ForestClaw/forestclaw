@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_clawpatch_conservation.h"
 #include "fclaw2d_clawpatch_conservation_fort.h"
 
+#include <fclaw2d_defs.h>    /* To get FCLAW2D_PATCHDIM defs */
+
 #include <fclaw2d_time_sync.h>
 
 #include "fclaw2d_clawpatch.h"
@@ -85,7 +87,6 @@ void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
 		cr->area[k]          = FCLAW_ALLOC(double,my);
 		cr->area[k+2]        = FCLAW_ALLOC(double,mx);		
 	}
-
 }
 
 void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
@@ -292,8 +293,7 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
                                        fclaw2d_patch_t* this_patch,
                                        int blockno,int patchno)
 {
-	int mx,my,mbc;
-	double dx,dy,xlower,ylower;
+#if FCLAW2D_PATCHDIM == 2
 	double *area, *edgelengths, *curvature;
 
 	fclaw2d_clawpatch_registers_t *cr = 
@@ -301,6 +301,9 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
+
+    int mx,my,mbc;
+    double dx,dy,xlower,ylower;
 	fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
@@ -318,6 +321,9 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 	                          cr->edgelengths[0],cr->edgelengths[1],
 	                          cr->edgelengths[2],cr->edgelengths[3],
 	                          &fclaw_opt->manifold);
+#elif FCLAW2D_PATCHDIM == 3
+    /* This routine is called, even if time-sync = F */
+#endif
 }
 
 
@@ -334,17 +340,15 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
                                      fclaw2d_patch_transform_data_t
                                      *transform_data)
 {
-
-	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-
 	/* We don't correct time interpolated grids, since we assume that the time 
 	interpolated average will already have correction information from times 
 	n and n+1 patches.  But we do correct ghost patches, since corrections will be 
 	needed for copying and interpolation.  */
 
 
+#if FCLAW2D_PATCHDIM == 2    
+    int meqn;
 	double *qcoarse;
-	int meqn;
 	fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
 	double *qfine;
@@ -367,6 +371,8 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 
 	int normal_match = fclaw2d_patch_normal_match(glob->domain, coarse_blockno, 
 	                                              coarse_patchno, iface_coarse);
+
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
 	/* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5 */
 	clawpatch_vt->fort_time_sync_f2c(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
@@ -391,6 +397,10 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 									 &transform_data);
 
 	FCLAW_FREE(qneighbor_dummy);
+#elif FCLAW2D_PATCHDIM == 3
+    fclaw_global_essentialf("Conservation not yet implemented for 3d patches\n");
+    exit(0);
+#endif    
 }
 
 
@@ -406,6 +416,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 	n and n+1 patches.  But we do correct ghost patches, since corrections will be 
 	needed for copying and interpolation.  */
 
+#if FCLAW2D_PATCHDIM == 2
 	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 
 	double *qthis;
@@ -458,6 +469,10 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 	                                      qneighbor_dummy,
 	                                      &transform_data);    
 	FCLAW_FREE(qneighbor_dummy);
+#elif FCLAW2D_PATCHDIM == 3
+    fclaw_global_essentialf("Conservation not yet implemented for 3d patches\n");
+    exit(0);
+#endif
 
 }
 

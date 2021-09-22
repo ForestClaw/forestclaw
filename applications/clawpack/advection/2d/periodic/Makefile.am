@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/clawpack/advection/2d/periodic/periodic
 
+TESTS += applications/clawpack/advection/2d/periodic/regressions.sh
+
 applications_clawpack_advection_2d_periodic_periodic_SOURCES = \
 	applications/clawpack/advection/2d/periodic/periodic_user.cpp \
 	applications/clawpack/advection/2d/periodic/periodic_user.h \
@@ -9,15 +11,10 @@ applications_clawpack_advection_2d_periodic_periodic_SOURCES = \
 	applications/clawpack/advection/2d/periodic/periodic.cpp \
 	applications/clawpack/advection/2d/periodic/setprob.f \
 	applications/clawpack/advection/2d/periodic/fdisc.f \
-    	applications/clawpack/advection/2d/periodic/user_4.6/clawpack46_setaux.f \
+    applications/clawpack/advection/2d/periodic/user_4.6/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/periodic/user_4.6/qinit.f \
-	applications/clawpack/advection/2d/periodic/user_4.6/tag4refinement.f \
-	applications/clawpack/advection/2d/periodic/user_4.6/tag4coarsening.f \
-    	applications/clawpack/advection/2d/periodic/user_5.0/clawpack5_setaux.f90 \
+    applications/clawpack/advection/2d/periodic/user_5.0/clawpack5_setaux.f90 \
 	applications/clawpack/advection/2d/periodic/user_5.0/qinit.f90 \
-	applications/clawpack/advection/2d/periodic/user_5.0/tag4refinement.f \
-	applications/clawpack/advection/2d/periodic/user_5.0/tag4coarsening.f \
-	applications/clawpack/advection/2d/all/minmax_exceeds_th.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv.f \
 	applications/clawpack/advection/2d/all/clawpack46_rpt2adv.f \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv.f90 \

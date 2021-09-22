@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,13 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "slosh_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch.h>
-#include <fc2d_geoclaw.h>
-
 void slosh_link_solvers(fclaw2d_global_t *glob)
 {
     fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt();
-    geoclaw_vt->qinit       = &QINIT;
+    geoclaw_vt->qinit       = &FC2D_GEOCLAW_QINIT;
 }

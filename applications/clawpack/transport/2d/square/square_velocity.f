@@ -6,23 +6,12 @@ c     # the standard basis (1,0) and (0,1).
 c     # ------------------------------------------------------------
 
 
-      subroutine velocity_components(x,y,u)
+      subroutine square_velocity_derivs(x,y,t,u,vcart,derivs,flag)
       implicit none
 
-      double precision x, y, u(2)
-      double precision uderivs(4)
-
-      double precision s
-
-      call velocity_derivs(x,y,u,uderivs)
-
-      end
-
-      subroutine velocity_derivs(x,y,u,uderivs)
-      implicit none
-
-      double precision x, y, u(2)
-      double precision uderivs(4)
+      double precision x, y, t, u(2), vcart(3)
+      double precision derivs(4)
+      integer flag
 
       double precision pi, pi2
       common /compi/ pi, pi2
@@ -33,8 +22,7 @@ c     # ------------------------------------------------------------
       double precision velocity(2)
       common /velocity_comm/ velocity      
 
-      double precision s, pim, u1x, u1y, u2x, u2y
-      integer k
+      double precision s, u1x, u1y, u2x, u2y
 
 
 c     # uderivs(1) = u1x      
@@ -46,6 +34,9 @@ c     # uderivs(4) = u2y
       u1y = 0
       u2x = 0
       u2y = 0
+
+c     # Basis map is the unit 
+      flag = 1      
 
 c     # Set non-zeros derivs only
       s = sqrt(2.d0)
@@ -70,43 +61,111 @@ c        # Velocity field crosses 0
          stop
       endif
 
-      uderivs(1) = u1x
-      uderivs(2) = u1y
-      uderivs(3) = u2x
-      uderivs(4) = u2y
+      vcart(1) = u(1)
+      vcart(2) = u(2)
+      vcart(3) = 0
+
+      derivs(1) = u1x
+      derivs(2) = u1y
+      derivs(3) = u2x
+      derivs(4) = u2y
 
       end
 
 
-c     # ------------------------------------------------------------
-c     # Center : u = u1*tau1 + u2*tau2   (div u might not be zero)
-c     # ------------------------------------------------------------
-      subroutine square_center_velocity(x,y,vel)
+c     # ----------------------------------------------------------------
+c     #                       Public interface
+c     # ----------------------------------------------------------------
+
+
+c     # ---------------------------------------------
+c     # Called from setaux
+c     # 
+c     #    -- used to compute velocity at faces
+c     # ---------------------------------------------
+      subroutine velocity_components_cart(x,y,t,vcart)
       implicit none
 
-      double precision x,y,vel(3)
+      double precision x,y,t, u(2), vcart(3), derivs(4)
+      integer flag
 
-      double precision t1(3), t2(3)
-      double precision t1inv(3), t2inv(3)
-      double precision nvec(3), gradpsi(3), sv
+      call square_velocity_derivs(x,y,t, u,vcart,derivs,flag)
 
-      double precision p, px, py
-      double precision u(2), uderivs(2)
+c      if (flag .eq. 0) then
+cc         # Velocity components are given in spherical components
+cc         # and must be converted to Cartesian
+c          call map_covariant_basis(x, y, t1,t2)
+c
+c          do k = 1,3
+c              vcart(k) = u(1)*t1(k) + u(2)*t2(k)
+c          enddo
+c      endif
 
-      integer k
-
-c     # Velocity components are given in Cartesian components
-      call velocity_components(x,y,u)
-
-
-c     # Velocities are all given in terms of Cartesian components   
-      do k = 1,2
-        vel(k) = u(k)
-      enddo
-      vel(3) = 0
-        
       end
 
+
+c     # ------------------------------------------------------------
+c     # Called from map_divergence
+c     # 
+c     #    -- Needed to define ODE system to get exact solution
+c     # ------------------------------------------------------------
+      subroutine velocity_derivs(x,y,t, u, vcart, derivs, flag)
+      implicit none
+
+      double precision x,y,t, u(2), vcart(3), derivs(4)
+      integer flag
+
+      call square_velocity_derivs(x,y,t, u,vcart,derivs,flag)
+
+c     # Not needed for Cartesian grid
+c      if (flag .eq. 1) then
+cc         # Velocity components are given in Cartesian components
+cc         # Derivatives are automatically given in terms of basis.
+c          call map_covariant_basis(x, y, t1,t2)
+c          t1n2 = map_dot(t1,t1)
+c          t2n2 = map_dot(t2,t2)
+c          u(1) = map_dot(vcart,t1)/t1n2
+c          u(2) = map_dot(vcart,t2)/t2n2
+c      endif
+
+      end
+
+c     # ------------------------------------------------------------
+c     # Called from qexact
+c     # 
+c     #  -- components relative to basis are needed.
+c     # ------------------------------------------------------------
+      subroutine user_velocity_components_cart(x,y,t,vcart)
+      implicit none
+
+      double precision x,y,t, u(2), vcart(3), derivs(4)
+      integer flag
+
+      call velocity_derivs(x,y,t, u,vcart,derivs,flag)
+
+      end
+
+      subroutine user_map2comp(blockno,xc,yc,xp,yp,zp,xc1,yc1)
+      implicit none
+
+      integer blockno
+      double precision xc,yc,xp,yp,zp,xc1,yc1
+
+      integer*8 cont, get_context
+
+      double precision zc1
+
+      cont = get_context()
+
+      !! This doesn't work with the five patch mapping
+      !! call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+
+      xc1 = xp
+      yc1 = yp
+      zc1 = 0
+
+
+      end
 
 
 

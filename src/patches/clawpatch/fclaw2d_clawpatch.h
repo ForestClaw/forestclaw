@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_H
 #define FCLAW2D_CLAWPATCH_H
 
+#include <fclaw2d_defs.h>      /* Needed to get correction def. of PATCHDIM */
+
 #include <forestclaw2d.h>       /* Need patch callback def */
 
 #include <fclaw2d_clawpatch_fort.h>
@@ -44,7 +46,6 @@ extern "C"
 
 typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
 
-
 /* --------------------------------- Typedefs ----------------------------------------- */
 typedef void (*clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
                                           struct fclaw2d_patch *patch,
@@ -57,6 +58,16 @@ typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob
                                                      fclaw2d_clawpatch_packmode_t packmode,
                                                      int *ierror);
 
+typedef void (*clawpatch_local_ghost_pack_aux_t)(struct fclaw2d_global *glob,
+                                                 struct fclaw2d_patch *patch,
+                                                 const int mint,
+                                                 double qpack[], int extrasize,
+                                                 int packmode, int* ierror);
+    
+typedef void (*clawpatch_fort_local_ghost_pack_registers_t)(struct fclaw2d_global *glob,
+                                                            struct fclaw2d_patch *patch,
+                                                            double qpack[], int frsize,
+                                                            int* ierror);
 /* ------------------------------ typedefs - output ----------------------------------- */
 
 typedef void (*clawpatch_time_header_t)(struct fclaw2d_global* glob, int iframe);
@@ -75,8 +86,9 @@ typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
                                               int blockno,
                                               int patchno,
                                               void *error_data);
-/* ---------------------------- Virtual table ------------------------------------ */
 
+
+/* ---------------------------- Virtual table ------------------------------------ */
 /* members of this structure provide the only access to above functions */
 
 void fclaw2d_clawpatch_vtable_initialize(int claw_version);
@@ -98,6 +110,8 @@ struct fclaw2d_clawpatch_vtable
     /* regridding functions */
     clawpatch_fort_tag4refinement_t        fort_tag4refinement;
     clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
+    clawpatch_fort_exceeds_threshold_t     fort_user_exceeds_threshold;
+
     clawpatch_fort_average2coarse_t        fort_average2coarse;
     clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
@@ -118,10 +132,9 @@ struct fclaw2d_clawpatch_vtable
 
     /* ghost patch functions */
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
-    clawpatch_fort_local_ghost_pack_aux_t  fort_local_ghost_pack_aux;
-    
+    clawpatch_local_ghost_pack_aux_t       local_ghost_pack_aux;
 
-    /* diagnostic functions */
+      /* diagnostic functions */
     clawpatch_diagnostics_cons_t           conservation_check;
     clawpatch_diagnostics_error_t          compute_error;
 
@@ -145,11 +158,21 @@ void fclaw2d_clawpatch_save_current_step(struct fclaw2d_global* glob,
 
 /* ------------------------------- Misc access functions ------------------------------ */
 
+#if FCLAW2D_PATCHDIM == 2
 void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* this_patch,
                                  int* mx, int* my, int* mbc,
                                  double* xlower, double* ylower,
                                  double* dx, double* dy);
+#elif FCLAW2D_PATCHDIM == 3
+void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch* patch,
+                                 int* mx, int* my, int* mz, 
+                                 int* mbc,
+                                 double* xlower, double* ylower,
+                                 double* zlower, 
+                                 double* dx, double* dy, double* dz);
+#endif
 
 
 void fclaw2d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
@@ -245,7 +268,6 @@ double* fclaw2d_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
 struct fclaw2d_clawpatch_registers* 
 fclaw2d_clawpatch_get_registers(struct fclaw2d_global* glob,
                                 struct fclaw2d_patch* this_patch);
-
 
 
 #ifdef __cplusplus

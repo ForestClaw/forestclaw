@@ -55,38 +55,6 @@ typedef struct user_options
 } user_options_t;
 
 
-#define RADIALDAM_SETPROB FCLAW_F77_FUNC(radialdam_setprob, RADIALDAM_SETPROB)
-void RADIALDAM_SETPROB();
-
-
-#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold, \
-                                             USER46_SETAUX_MANIFOLD)
-
-void USER46_SETAUX_MANIFOLD(const int* mbc,
-                            const int* mx, const int* my,
-                            const double* xlower, const double* ylower,
-                            const double* dx, const double* dy,
-                            const int* maux, double aux[],
-                            double xnormals[], double xtangents[],
-                            double ynormals[], double ytangents[],
-                            double surfnormals[],
-                            double area[]);
-
-#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
-                                             USER5_SETAUX_MANIFOLD)
-
-void USER5_SETAUX_MANIFOLD(const int* mbc,
-                           const int* mx, const int* my,
-                           const double* xlower, const double* ylower,
-                           const double* dx, const double* dy,
-                           const int* maux, double aux[],
-                           double xnormals[], double xtangents[],
-                           double ynormals[], double ytangents[],
-                           double surfnormals[],
-                           double area[]);
-
-
-void radialdam_problem_setup(fclaw2d_global_t *glob);
 void radialdam_link_solvers(fclaw2d_global_t *glob);
 
 user_options_t* radialdam_options_register (fclaw_app_t * app,
@@ -95,11 +63,6 @@ user_options_t* radialdam_options_register (fclaw_app_t * app,
 void radialdam_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
-
-void radialdam_patch_setup(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
@@ -140,6 +103,35 @@ void RPN2_CONS_UPDATE_ZERO(const int* meqn, const int* maux, const int* idir,
                            const int* iface,
                            double q[], double aux_center[], double aux_edge[],
                            double flux[]);
+
+/* ----------------------------- Setaux for manifolds --------------------------------- */
+
+#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold, \
+                                             USER46_SETAUX_MANIFOLD)
+
+void USER46_SETAUX_MANIFOLD(const int* mbc,
+                            const int* mx, const int* my,
+                            const double* xlower, const double* ylower,
+                            const double* dx, const double* dy,
+                            const int* maux, double aux[],
+                            double xnormals[], double xtangents[],
+                            double ynormals[], double ytangents[],
+                            double surfnormals[],
+                            double area[]);
+
+#define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
+                                             USER5_SETAUX_MANIFOLD)
+
+void USER5_SETAUX_MANIFOLD(const int* mbc,
+                           const int* mx, const int* my,
+                           const double* xlower, const double* ylower,
+                           const double* dx, const double* dy,
+                           const int* maux, double aux[],
+                           double xnormals[], double xtangents[],
+                           double ynormals[], double ytangents[],
+                           double surfnormals[],
+                           double area[]);
+
 
 
 #ifdef __cplusplus

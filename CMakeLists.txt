@@ -27,8 +27,8 @@ if(cudaclaw)
   find_package(CUDAToolkit REQUIRED)
 endif()
 
-find_package(LAPACK)
-find_package(BLAS)
+#find_package(LAPACK)
+#find_package(BLAS)
 find_package(ZLIB)
 
 # --- p4est, sc
@@ -42,6 +42,7 @@ if(NOT TARGET SC::SC)
   include(cmake/sc.cmake)
 endif()
 
+
 if(NOT p4est_external)
   find_package(P4EST HINTS ${THUNDEREGG_ROOT})
 endif()
@@ -49,8 +50,9 @@ if(NOT TARGET P4EST::P4EST)
   include(cmake/p4est.cmake)
 endif()
 
-# --- ThunderEgg
 
+
+# --- ThunderEgg
 if(thunderegg)
   if(NOT thunderegg_external)
     find_package(ThunderEgg HINTS ${THUNDEREGG_ROOT})
@@ -60,39 +62,45 @@ if(thunderegg)
   endif()
 endif(thunderegg)
 
+
 if(cudaclaw)
 endif(cudaclaw)
 # --- configure
+
 
 include(cmake/config.cmake)
 include(cmake/compilers.cmake)
 
 # --- test
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif(BUILD_TESTING)
 
-add_subdirectory(test)
 
 # --- ForestClaw
-
 add_subdirectory(src)
 
-# --- Clawpatch
 
+
+# --- Clawpatch
 if(clawpatch)
 
   add_subdirectory(src/patches/clawpatch)
   
 endif(clawpatch)
 
-# --- Clawpack 4.6
 
+
+# --- Clawpack 4.6
 if(clawpack4.6)
 
   add_subdirectory(src/solvers/fc2d_clawpack4.6)
 
 endif(clawpack4.6)
 
-# --- Clawpack 5
 
+
+# --- Clawpack 5
 if(clawpack5)
 
   add_subdirectory(src/solvers/fc2d_clawpack5)
@@ -100,21 +108,24 @@ if(clawpack5)
 endif(clawpack5)
 
 
-# --- geoclaw
 
+# --- geoclaw
 if(geoclaw)
 
   add_subdirectory(src/solvers/fc2d_geoclaw)
 
 endif(geoclaw)
 
-# --- cudaclaw
 
+
+# --- cudaclaw
 if(cudaclaw)
 
   add_subdirectory(src/solvers/fc2d_cudaclaw)
 
 endif(cudaclaw)
+
+
 
 # --- ThunderEgg
 if(thunderegg)
@@ -124,8 +135,20 @@ if(thunderegg)
 endif(thunderegg)
 # --- package
 
+
+# --- clawpack3
+if(clawpack3)
+
+  add_subdirectory(src/solvers/fc3d_clawpack46)
+
+endif(clawpack3)
+
+
 include(cmake/pkgconf.cmake)
 include(cmake/install.cmake)
 
+
 # --- examples
 add_subdirectory(applications)
+
+

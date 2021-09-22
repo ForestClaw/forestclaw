@@ -1,0 +1,18 @@
+# ----------------------------------
+# CudaClaw library and examples
+# ----------------------------------
+
+
+# Scalar advection
+include applications/cudaclaw/advection/2d/swirl/Makefile.am
+
+# Shallow water wave equations
+include applications/cudaclaw/shallow/2d/bump/Makefile.am
+#include applications/cudaclaw/shallow/2d/radialdam/Makefile.am
+#include applications/cudaclaw/shallow/2d/tsunami/Makefile.am
+
+# Acoustics
+include applications/cudaclaw/acoustics/2d/radial/Makefile.am
+
+# Euler equations
+include applications/cudaclaw/euler/2d/shockbubble/Makefile.am

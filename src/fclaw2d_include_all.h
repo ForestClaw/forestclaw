@@ -28,6 +28,7 @@
 
 #include <fclaw_base.h>
 #include <fclaw_package.h>
+#include <fclaw2d_defs.h>
 
 #include <fclaw2d_patch.h>
 

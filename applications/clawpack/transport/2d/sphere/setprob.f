@@ -1,4 +1,4 @@
-      subroutine sphere_setprob()
+      subroutine setprob()
 
       implicit none
 

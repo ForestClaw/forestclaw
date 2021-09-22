@@ -18,6 +18,9 @@ output:
 plots: 
 	${PYTHON} setplot.py
 
+clean:
+	rm -f *.data pyclaw.log gauges.kml bowl.topotype2 hump.xyz
+
 usage:
 	@echo "Usage : "
 	@echo "To create data files needed by GeoClaw : "
@@ -31,4 +34,7 @@ usage:
 	@echo " "
 	@echo "To create KMZ file for plotting in Google Earth"
 	@echo "       $$ make kml"
+	@echo " "
+	@echo "To clean data and topo files"
+	@echo "       $$ make clean"
 

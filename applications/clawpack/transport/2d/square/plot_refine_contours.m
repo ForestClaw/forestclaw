@@ -35,7 +35,8 @@ hold on;
 [~,h(2)] = contour(s,s,q0,[1-rf,1-rf],'k','linewidth',2);
 set(h,'tag','refine_region');
 
-daspect([1,1,1])
+% daspect([1,1,1])
+axis square;
 
 shg;
 

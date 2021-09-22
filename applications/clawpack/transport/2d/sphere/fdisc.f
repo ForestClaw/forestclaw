@@ -14,7 +14,7 @@
 
       double precision xp, yp, zp
 
-      double precision r, r0
+c      double precision r, r0
 
       cont = get_context()
 

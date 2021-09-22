@@ -1,4 +1,4 @@
-      subroutine setprob_annulus()
+      subroutine setprob()
       implicit none
 
       double precision pi, pi2

@@ -1,6 +1,5 @@
-      subroutine radial_setprob()
+      subroutine setprob()
       implicit none
-
 
       double precision rho, bulk, cc, zz
       common /cparam/ rho,bulk,cc,zz

@@ -10,10 +10,8 @@
 
       double precision f(3), fx(3), fy(3), fxx(3), fyy(3), fxy(3)
       double precision g(3), gx(3), gy(3), gxx(3), gyy(3), gxy(3)
-      double precision map_dot
 
-
-      integer k, kk, i
+      integer k, i
       logical compute_covariant, compute_contravariant
       logical compute_derivatives, b(32)
 
@@ -235,10 +233,11 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 
       end
 
-      subroutine map2comp(xp,yp,zp,xc,yc)
+      subroutine user_map2comp(blockno,xc,yc,xp,yp,zp,xc1,yc1)
       implicit none
 
-      double precision xp,yp,zp, xc,yc
+      integer blockno
+      double precision xc,yc, xp,yp,zp, xc1,yc1
 
       double precision pi, pi2
       common /compi/ pi, pi2
@@ -247,7 +246,7 @@ c     # Map yc in [0,1] to phi in [-pi/2,pi/2]
 
       call map2spherical(xp,yp,zp,theta,phi)
 
-      call map_spherical2comp(theta,phi,xc,yc)
+      call map_spherical2comp(theta,phi,xc1,yc1)
 
       end
 

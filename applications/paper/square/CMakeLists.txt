@@ -29,7 +29,7 @@ add_library(square_f OBJECT
 	user_5.0/tag4refinement.f
 )
 
-add_executable(square
+add_executable(square_paper
 	square.cpp
 	square_user.cpp
 	square_options.c
