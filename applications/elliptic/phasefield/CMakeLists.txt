@@ -28,7 +28,7 @@ target_link_libraries(phasefield PRIVATE
   FORESTCLAW::FC2D_THUNDEREGG
 )
 
-if(TARGET testutils)
+if(BUILD_TESTING)
   add_executable(phasefield_TEST.MPI1
     phasefield_run.c 
     phasefield_operator.cpp 
@@ -44,4 +44,4 @@ if(TARGET testutils)
     testutils
   )
   register_unit_tests(phasefield_TEST.MPI1)
-endif(TARGET testutils)
+endif(BUILD_TESTING)
