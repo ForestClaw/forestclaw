@@ -207,7 +207,7 @@ typedef void (*clawpatch_fort_norm_t)(int* blockno, int *mx, int *my, int *mbc,i
 #define TAG4REFINEMENT FCLAW_F77_FUNC(tag4refinement,TAG4REFINEMENT)
 void TAG4REFINEMENT(const int* mx,const int* my,
 					const int* mbc,const int* meqn,
-					const double* xlower, const double* ylower,
+					const double *xlower, const double *ylower,
 					const double* dx, const double* dy,
 					const int* blockno,
 					double q[],
@@ -218,7 +218,7 @@ void TAG4REFINEMENT(const int* mx,const int* my,
 #define TAG4COARSENING FCLAW_F77_FUNC(tag4coarsening,TAG4COARSENING)
 void TAG4COARSENING(const int* mx, const int* my,
 					const int* mbc, const int* meqn,
-					const double* xlower, const double* ylower,
+					double xlower[], double ylower[],
 					const double* dx, const double* dy,
 					const int* blockno,
 					double q0[],double q1[],
