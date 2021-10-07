@@ -15,11 +15,11 @@ applications_elliptic_heat_heat_SOURCES = \
 	applications/elliptic/heat/fortran/heat_init.f90 \
 	applications/elliptic/heat/fortran/heat_compute_error.f \
 	applications/elliptic/heat/fortran/heat_qexact.f90 \
-	applications/elliptic/heat/fortran/heat_bc2.f90 \
+	applications/elliptic/heat/fortran/heat_bc2.f \
 	applications/elliptic/heat/fortran/heat_apply_bc.f90 \
 	applications/elliptic/heat/fortran/heat_eval_bc.f90 \
-	applications/elliptic/heat/fortran/heat_tag4refinement.f90 \
-	applications/elliptic/heat/fortran/heat_tag4coarsening.f90 \
+	applications/elliptic/heat/fortran/heat_tag4refinement.f \
+	applications/elliptic/heat/fortran/heat_tag4coarsening.f \
 	applications/elliptic/heat/fortran/heat_output.f90
 
 

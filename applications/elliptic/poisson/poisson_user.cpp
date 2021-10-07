@@ -25,26 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "poisson_user.h"
-#include "poisson_options.h"
-#include "poisson_diagnostics.h"
-
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch_fort.h>
-
-#include <fc2d_thunderegg.h>
-#include <fc2d_thunderegg_fort.h>
-#include <fc2d_thunderegg_options.h>
-#include <fc2d_thunderegg_physical_bc.h>
-#include <fc2d_thunderegg_starpatch.h>
-#include <fc2d_thunderegg_fivepoint.h>
-
-#include <fclaw2d_elliptic_solver.h>
-
-
-#include <fclaw2d_farraybox.hpp>
 
 
 static
