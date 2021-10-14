@@ -252,24 +252,38 @@ void FCLAW2D_CLAWPATCH5_FORT_HEADER_ASCII(const char* matname1, const char* matn
                FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_conservation_check, \
                FCLAW2D_CLAWPATCH5_FORT_CONSERVATION_CHECK)
 
-void FCLAW2D_CLAWPATCH5_FORT_CONSERVATION_CHECK(int *mx, int *my, int* mbc, int* meqn,
-                                                double *dx, double *dy,
-                                                double* area, double *q, double* sum,
+void FCLAW2D_CLAWPATCH5_FORT_CONSERVATION_CHECK(const int *mx, 
+                                                const int *my, 
+                                                const int* mbc, 
+                                                const int* meqn,
+                                                const double *dx, 
+                                                const double *dy,
+                                                double area[], double q[], 
+                                                double* sum,
                                                 double *c_kahan);
 
 #define FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA \
                       FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_compute_patch_area, \
                       FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA)
 
-double FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, double* dx,
-                                                  double* dy, double area[]);
+double FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA(const int *mx, 
+                                                  const int* my, 
+                                                  const int* mbc, 
+                                                  const double* dx,
+                                                  const double* dy, 
+                                                  double area[]);
 
 #define FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM \
                    FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_compute_error_norm, \
                    FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM)
 
-void FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM (int* blockno, int* mx,int* my,int* mbc,
-                                                 int* meqn,double* dx,double* dy,
+void FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM (const int* blockno, 
+                                                 const int* mx,
+                                                 const int* my,
+                                                 const int* mbc, 
+                                                 const int* meqn,
+                                                 const double* dx,
+                                                 const double* dy,
                                                  double area[], double error[],
                                                  double* error_norm);
 

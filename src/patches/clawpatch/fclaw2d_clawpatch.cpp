@@ -741,7 +741,7 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 	double zlower, dz;
 #endif
 
-	double *q[4];  /* Only need for grids, even for extruded mesh case */
+	double *q[4];  /* Only need four grids, even for extruded mesh case */
 	for (int igrid = 0; igrid < 4; igrid++)
 	{
 		fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
@@ -750,8 +750,8 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 		                            &xlower[igrid],&ylower[igrid],&dx,&dy);
 #elif FCLAW2D_PATCHDIM == 3
 		/* For extruded meshes, zlower is the same for all patches. */
-		fclaw2d_clawpatch_grid_data(glob,&fine_patches[0],&mx,&my,&mz,&mbc,
-		                            &xlower[0],&ylower[0],&zlower,&dx,&dy,&dz);
+		fclaw2d_clawpatch_grid_data(glob,&fine_patches[igrid],&mx,&my,&mz,&mbc,
+		                            &xlower[igrid],&ylower[igrid],&zlower,&dx,&dy,&dz);
 #endif
 	}
 

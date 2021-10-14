@@ -21,7 +21,7 @@ add_library(geoclaw_f OBJECT
     geolib_source/topointegral.f 
     geolib_source/topo_update.f90 
     geolib_source/cellgridintegrate2.f 
-    geolib_source/allowflag.f90 
+    geolib_source/allowflag.f
     geolib_source/bilinearintegral.f 
     fortran_source/philim.f 
     fortran_source/geoclaw_set_modules_fort.f90 
@@ -43,6 +43,8 @@ add_library(geoclaw_f OBJECT
     fclaw2d_source/fc2d_geoclaw_output_ascii_fort.f 
     fclaw2d_source/fc2d_geoclaw_tag4refinement_fort.f90 
     fclaw2d_source/fc2d_geoclaw_tag4coarsening_fort.f90 
+    fclaw2d_source/fc2d_geoclaw_test_regions.f90 
+    fclaw2d_source/fc2d_geoclaw_flag2refine_fort.f90 
     fclaw2d_source/fc2d_geoclaw_local_ghost_pack_fort.f 
     fclaw2d_source/fc2d_geoclaw_local_ghost_pack_aux_fort.f 
     fclaw2d_source/fc2d_geoclaw_diagnostics_fort.f 

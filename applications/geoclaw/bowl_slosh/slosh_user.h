@@ -62,17 +62,6 @@ void slosh_options_store (fclaw2d_global_t* glob, user_options_t* user);
 user_options_t* slosh_get_options(fclaw2d_global_t* glob);
 
 
-/* ---------------------------------- Fortran routines -------------------------------- */
-#if 0
-#define QINIT FCLAW_F77_FUNC(qinit,QINIT)
-void QINIT(const int* meqn,const int* mbc,
-           const int* mx, const int* my,
-           const double* xlower, const double* ylower,
-           const double* dx, const double* dy,
-           double q[], const int* maux, double aux[]);
-#endif
-
-
 
 #ifdef __cplusplus
 }

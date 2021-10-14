@@ -320,6 +320,7 @@ subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, &
                     enddo
                     if (is_manifold) then
                         sum = 0
+                        vf_sum = 0
                         do m = 0,r2-1
                             qf = qfine(i2(m),j2(m),k,mq)
                             kf = areafine(i2(m),j2(m))

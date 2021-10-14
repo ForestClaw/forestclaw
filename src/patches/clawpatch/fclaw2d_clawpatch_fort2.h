@@ -182,23 +182,42 @@ typedef void (*clawpatch_fort_output_ascii_t)(char* matname1,
 
 /* ----------------------------- Diagnostic functions --------------------------------- */
 
-typedef void (*clawpatch_fort_error_t)(int* blockno, int *mx, int *my, 
-                                       int *mbc,int *meqn,
-									   double *dx, double *dy, double *xlower,
-									   double *ylower, double *t, double q[],
-									   double error[], double soln[]);
+typedef void (*clawpatch_fort_error_t)(const int* blockno, 
+                                       const int *mx, 
+                                       const int *my, 
+                                       const int *mbc, const int *meqn,
+									   const double *dx, 
+                                       const double *dy, 
+                                       const double *xlower,
+									   const double *ylower, 
+                                       const double *t, 
+                                       double q[], double error[], double soln[]);
 
-typedef void (*clawpatch_fort_conscheck_t)(int *mx, int *my, int* mbc, int* meqn,
-										   double *dx, double *dy,
+typedef void (*clawpatch_fort_conscheck_t)(const int *mx, 
+                                           const int *my, 
+                                           const int* mbc, 
+                                           const int* meqn,
+										   const double *dx, 
+                                           const double *dy,
 										   double area[], double q[], double sum[],
                                            double *c_kahan);
 
-typedef double (*clawpatch_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
-										double* dy, double area[]);
+typedef double (*clawpatch_fort_area_t)(const int *mx, 
+                                        const int* my, 
+                                        const int *mbc, 
+                                        const double* dx,
+										const double* dy, double area[]);
 
-typedef void (*clawpatch_fort_norm_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
-									  double *dx, double *dy, double area[],
-									  double error[], double error_norm[]);
+typedef void (*clawpatch_fort_norm_t)(const int* blockno, 
+                                      const int *mx, 
+                                      const int *my, 
+                                      const int *mbc,
+                                      const int *meqn,
+									  const double *dx, 
+                                      const double *dy, 
+                                      double area[],
+									  double error[], 
+                                      double error_norm[]);
 
 
 
