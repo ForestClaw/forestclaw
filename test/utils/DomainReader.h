@@ -31,7 +31,7 @@ class DomainReader
 	int                                    num_ghost;
 	std::shared_ptr<ThunderEgg::Domain<D>> coarser_domain;
 	std::shared_ptr<ThunderEgg::Domain<D>> finer_domain;
-	ThunderEgg::PatchInfo<D>               parsePatch(nlohmann::json &patch_j)
+	ThunderEgg::PatchInfo<D>               parsePatch(ThunderEgg::tpl::nlohmann::json &patch_j)
 	{
 		ThunderEgg::PatchInfo<D> pinfo = patch_j.get<ThunderEgg::PatchInfo<D>>();
 		pinfo.num_ghost_cells          = num_ghost;
@@ -48,7 +48,7 @@ class DomainReader
 	{
 		ThunderEgg::Communicator comm(MPI_COMM_WORLD);
 
-		nlohmann::json j;
+		ThunderEgg::tpl::nlohmann::json j;
 		std::ifstream  input_stream(file_name);
 		if (!input_stream.good()) {
 			throw "could not open file";
@@ -56,14 +56,14 @@ class DomainReader
 		input_stream >> j;
 		input_stream.close();
 		std::deque<ThunderEgg::PatchInfo<D>> finer_patches;
-		for (nlohmann::json &patch_j : j.at("levels")[0]) {
+		for (ThunderEgg::tpl::nlohmann::json &patch_j : j.at("levels")[0]) {
 			auto patch = parsePatch(patch_j);
 			if (patch.rank == comm.getRank())
 				finer_patches.push_back(patch);
 		}
 		finer_domain = std::make_shared<ThunderEgg::Domain<D>>(comm, 0, ns, num_ghost, finer_patches.begin(), finer_patches.end());
 		std::deque<ThunderEgg::PatchInfo<D>> coarser_patches;
-		for (nlohmann::json &patch_j : j.at("levels")[1]) {
+		for (ThunderEgg::tpl::nlohmann::json &patch_j : j.at("levels")[1]) {
 			auto patch = parsePatch(patch_j);
 			if (patch.rank == comm.getRank())
 				coarser_patches.push_back(patch);

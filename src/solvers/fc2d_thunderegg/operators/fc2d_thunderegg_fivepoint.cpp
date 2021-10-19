@@ -323,11 +323,13 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
         case BICG:
             solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, op);
             break;
+#ifdef THUNDEREGG_FFTW_ENABLED
         case FFT:
             /* This ignores the five point operator defined above and just uses the 
                ThunderEgg operator 'Poisson'. */
             solver = make_shared<Poisson::FFTWPatchSolver<2>>(op,neumann_bitset);
             break;
+#endif
         default:
             fclaw_global_essentialf("thunderegg_fivepoint : No valid patch solver specified\n");
             exit(0);            
@@ -340,8 +342,6 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     {
         // options
         GMG::CycleOpts copts;
-        copts.max_levels = mg_opt->max_levels;
-        copts.patches_per_proc = mg_opt->patches_per_proc;
         copts.pre_sweeps = mg_opt->pre_sweeps;
         copts.post_sweeps = mg_opt->post_sweeps;
         copts.mid_sweeps = mg_opt->mid_sweeps;
@@ -381,9 +381,11 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
                 case BICG:
                     smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
                     break;
+#ifdef THUNDEREGG_FFTW_ENABLED
                 case FFT:
                     smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
                     break;
+#endif
                 default:
                     fclaw_global_essentialf("thunderegg_fivepoint : No valid " \
                                             "patch solver specified\n");
@@ -419,9 +421,11 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
             case BICG:
                 smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
                 break;
+#ifdef THUNDEREGG_FFTW_ENABLED
             case FFT:
                 smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
                 break;
+#endif
             default:
                 fclaw_global_essentialf("thunderegg_fivepoint : No valid " \
                                         "patch solver specified\n");

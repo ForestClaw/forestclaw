@@ -25,8 +25,8 @@ endif()
 
 ExternalProject_Add(ThunderEgg
 GIT_REPOSITORY https://github.com/thunderegg/thunderegg
-GIT_TAG        develop
-CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${THUNDEREGG_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp} -Ddisable_petsc:BOOL=true -DP4EST_ROOT=${P4EST_ROOT}
+GIT_TAG        v1.0.1
+CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${THUNDEREGG_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp} -Ddisable_petsc:BOOL=true -DP4EST_ROOT=${P4EST_ROOT} -DBUILD_TESTING:BOOL=off
 BUILD_BYPRODUCTS ${THUNDEREGG_LIBRARIES}
 DEPENDS ${THUNDEREGG_EXTERNAL_PROJECT_DEPENDS}
 )
@@ -35,6 +35,7 @@ DEPENDS ${THUNDEREGG_EXTERNAL_PROJECT_DEPENDS}
 find_package(FFTW REQUIRED)
 find_package(BLAS)
 find_package(LAPACK)
+find_package(MPI COMPONENTS CXX)
 
 # --- imported target
 

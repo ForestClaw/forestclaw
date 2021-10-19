@@ -66,13 +66,6 @@ thunderegg_register (fc2d_thunderegg_options_t* mg_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "tol", &mg_opt->tol, 1e-12,
                            "Tolerance for BiCGStab solver. [1e-12]");
 
-    sc_options_add_int (opt, 0, "max-levels", &mg_opt->max_levels, 0,
-                           "The max number of levels in GMG cycle. 0 means no limit. [0]");
-
-    sc_options_add_double (opt, 0, "patches-per-proc", &mg_opt->patches_per_proc, 0,
-                           "Lowest level is guaranteed to have at least this number of "
-                           "patches per processor. [0]");
-
     sc_options_add_int (opt, 0, "pre-sweeps", &mg_opt->pre_sweeps, 1,
                            "Number of sweeps on down cycle [1]");
 

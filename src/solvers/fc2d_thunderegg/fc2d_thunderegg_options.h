@@ -72,8 +72,6 @@ struct fc2d_thunderegg_options
     double tol;
 
     /* thunderegg cyle settings */
-    int max_levels;
-    double patches_per_proc;
     int pre_sweeps;
     int post_sweeps;
     int mid_sweeps;
