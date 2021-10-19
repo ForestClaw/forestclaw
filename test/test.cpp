@@ -16,13 +16,14 @@ int main(int argc, char *argv[])
         MPI_Init(&argc,&argv);
         MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 #endif
+        int result=0;
         if(rank == 0){
-	        int result = Catch::Session().run(argc, argv);
+	       result = Catch::Session().run(argc, argv);
         }
 #ifdef P4EST_ENABLE_MPI
         MPI_Finalize();
 #endif
-        return 0;
+        return result;
     } else {
 	    // global setup...
 	    fclaw_mpi_init(nullptr, nullptr, sc_MPI_COMM_WORLD, SC_LP_PRODUCTION);
