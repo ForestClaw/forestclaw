@@ -51,12 +51,64 @@ static int get_num_local_cells(fclaw2d_global_t* glob){
 }
 #endif
 
+static void get_data(struct fclaw2d_global* glob, int patchno, fc2d_thunderegg_data_choice_t data_choice, double** q, int* meqn)
+{
+    switch(data_choice){
+        case RHS:
+          fclaw2d_clawpatch_rhs_data(glob, &glob->domain->blocks[0].patches[patchno], q, meqn);
+        break;
+        case SOLN:
+          fclaw2d_clawpatch_soln_data(glob, &glob->domain->blocks[0].patches[patchno], q, meqn);
+        break;
+        case STORE_STATE:
+          fclaw2d_clawpatch_soln_data(glob, &glob->domain->blocks[0].patches[patchno], q, meqn);
+        break;
+    }
+}
+
 ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice)
 {
-    return ThunderEgg::Vector<2>();
+    fclaw2d_clawpatch_options_t *clawpatch_opt =
+        fclaw2d_clawpatch_get_options(glob);
+
+    std::array<int,3> ns;
+    ns[0] = clawpatch_opt->mx;
+    ns[1] = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
+    std::array<int,3> strides;
+    strides[0] = 1;
+    strides[1] = strides[0]*(ns[0] + 2 * mbc);
+    strides[2] = strides[1]*(ns[1] + 2 * mbc);
+    std::vector<double *> starts(glob->domain->local_num_patches);
+    for(int i=0; i<glob->domain->local_num_patches; i++){
+        get_data(glob, i, data_choice, &starts[i], &ns[2]);
+    }
+    Communicator comm(glob->mpicomm);
+    return ThunderEgg::Vector<2>(comm,starts,strides,ns,mbc);
 }
 void fc2d_thunderegg_store_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice, const ThunderEgg::Vector<2>& vec)
 {
+    fclaw2d_clawpatch_options_t *clawpatch_opt =
+        fclaw2d_clawpatch_get_options(glob);
+
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
+
+    for(int patchno = 0; patchno < glob->domain->local_num_patches; patchno++){
+        PatchView<const double, 2> view = vec.getPatchView(patchno);
+        int meqn;
+        double *data;
+        get_data(glob, patchno, data_choice, &data, &meqn);
+        for(int eqn = 0; eqn < meqn; eqn++){
+            for(int j = -mbc; j < my + mbc; j++){
+                for(int i = -mbc; i < mx + mbc; i++){
+                    *data = view(i,j,eqn);
+                    data++;
+                }
+            }
+        }
+    }
 }
 
 #if 0

@@ -95,18 +95,22 @@ struct QuadDomain {
 }
 TEST_CASE("fclaw2d_thunderegg_get_vector","[fclaw2d][thunderegg]")
 {
+    fc2d_thunderegg_data_choice_t data_choice = GENERATE(RHS,SOLN,STORE_STATE);
     QuadDomain test_data;
     test_data.opts.mx   = GENERATE(4,5,6);
     test_data.opts.my   = GENERATE(4,5,6);
     test_data.opts.mbc  = GENERATE(1,2);
-    test_data.opts.meqn = GENERATE(1,2);
+    int meqn = GENERATE(1,2);
+    if(data_choice == RHS){
+        test_data.opts.rhs_fields = meqn;
+    }else{
+        test_data.opts.meqn = meqn;
+    }
     test_data.setup();
-    fc2d_thunderegg_data_choice_t data_choice = GENERATE(RHS,SOLN,STORE_STATE);
 
     int mx = test_data.opts.mx;
     int my = test_data.opts.my;
     int mbc = test_data.opts.mbc;
-    int meqn = test_data.opts.meqn;
 
     //set data
     for(int i=0; i < 4; i++){
@@ -151,8 +155,8 @@ TEST_CASE("fclaw2d_thunderegg_get_vector","[fclaw2d][thunderegg]")
         CHECK(view.getStrides()[2] == (mx+2*mbc)*(my+2*mbc));
         int idx=0;
         for(int eqn=0; eqn<meqn; eqn++){
-            for(int j=-mbc; j<my-1+mbc; j++){
-                for(int i=-mbc; i<mx-1+mbc; i++){
+            for(int j=-mbc; j<my+mbc; j++){
+                for(int i=-mbc; i<mx+mbc; i++){
                     CHECK(view(i,j,eqn) == patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx);
                     idx++;
                 }
@@ -163,18 +167,22 @@ TEST_CASE("fclaw2d_thunderegg_get_vector","[fclaw2d][thunderegg]")
 TEST_CASE("fclaw2d_thunderegg_store_vector","[fclaw2d][thunderegg]")
 {
     QuadDomain test_data;
+    fc2d_thunderegg_data_choice_t data_choice = GENERATE(RHS,SOLN,STORE_STATE);
     test_data.opts.mx   = GENERATE(4,5,6);
     test_data.opts.my   = GENERATE(4,5,6);
     test_data.opts.mbc  = GENERATE(1,2);
-    test_data.opts.meqn = GENERATE(1,2);
+    int meqn = GENERATE(1,2);
+    if(data_choice == RHS){
+        test_data.opts.rhs_fields = meqn;
+    }else{
+        test_data.opts.meqn = meqn;
+    }
     test_data.setup();
-    fc2d_thunderegg_data_choice_t data_choice = GENERATE(RHS,SOLN,STORE_STATE);
 
 
     int mx = test_data.opts.mx;
     int my = test_data.opts.my;
     int mbc = test_data.opts.mbc;
-    int meqn = test_data.opts.meqn;
 
     //set data
     Communicator comm(MPI_COMM_WORLD);
@@ -183,8 +191,8 @@ TEST_CASE("fclaw2d_thunderegg_store_vector","[fclaw2d][thunderegg]")
         PatchView<double, 2> view = vec.getPatchView(patch_idx);
         int idx=0;
         for(int eqn=0; eqn<meqn; eqn++){
-            for(int j=-mbc; j<my-1+mbc; j++){
-                for(int i=-mbc; i<mx-1+mbc; i++){
+            for(int j=-mbc; j<my+mbc; j++){
+                for(int i=-mbc; i<mx+mbc; i++){
                     view(i,j,eqn) = patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx;
                     idx++;
                 }
