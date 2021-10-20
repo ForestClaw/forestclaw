@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,19 +23,29 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/**
+ * @file 
+ * Routines for interfaceing with ThunderEgg vectors
+ */
+
 #include <ThunderEgg/Vector.h>
 
-// #include <fclaw2d_global.h>
 
 /* Avoid circular dependencies */
 struct fclaw2d_patch;
 struct fclaw2d_domain;
 struct fclaw2d_global;
 
+/**
+ * @brief Choice for patch data
+ */
 typedef enum fc2d_thunderegg_data_choice
 {
+    /** @brief RHS patch data */
     RHS=0,
+    /** @brief soln patch data */
     SOLN,
+    /** @brief soln patch data */
     STORE_STATE,
 }  fc2d_thunderegg_data_choice_t;
 
