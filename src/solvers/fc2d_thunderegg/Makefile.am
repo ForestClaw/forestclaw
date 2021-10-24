@@ -23,25 +23,25 @@ libthunderegg_compiled_sources = \
 	src/solvers/fc2d_thunderegg/fort_4.6/thunderegg_eval_bc_default.f90
 
 ## Name of library to build
-lib_LTLIBRARIES += src/solvers/fc2d_thunderegg/libfc2d_thundergg.la
+lib_LTLIBRARIES += src/solvers/fc2d_thunderegg/libfc2d_thunderegg.la
 
 ## Named variables that can be referenced from other libraries/apps
 FCLAW_THUNDEREGG_CPPFLAGS = -I@top_srcdir@/src/solvers/fc2d_thunderegg \
 	                       -I@top_srcdir@/src/solvers/fc2d_thunderegg/operators \
 						   $(THUNDEREGG_CFLAGS)
 
-FCLAW_THUNDEREGG_LDADD    = @top_builddir@/src/solvers/fc2d_thunderegg/libfc2d_thundergg.la \
+FCLAW_THUNDEREGG_LDADD    = @top_builddir@/src/solvers/fc2d_thunderegg/libfc2d_thunderegg.la \
 						   $(THUNDEREGG_LIBS)
 
 ## Sources needed to build this library
-src_solvers_fc2d_thunderegg_libfc2d_thundergg_la_SOURCES = \
+src_solvers_fc2d_thunderegg_libfc2d_thunderegg_la_SOURCES = \
           $(libthunderegg_internal_headers) \
           $(libthunderegg_compiled_sources)
 
 ## Headers needed to build this library.  Only AM_CPPFLAGS required; others are 
 ## included in AM_CPPFLAGS, but are included here for clarity (although makes 
 ## for lengthy compile lines)
-src_solvers_fc2d_thunderegg_libfc2d_thundergg_la_CPPFLAGS = \
+src_solvers_fc2d_thunderegg_libfc2d_thunderegg_la_CPPFLAGS = \
           $(AM_CPPFLAGS) \
           $(FCLAW_CPPFLAGS) \
           $(FCLAW_THUNDEREGG_CPPFLAGS) \
@@ -53,3 +53,20 @@ AM_CPPFLAGS  += $(FCLAW_THUNDEREGG_CPPFLAGS)
 LDADD        += $(FCLAW_THUNDEREGG_LDADD)
 
 include_HEADERS += $(libthunderegg_installed_headers)
+
+## UNIT TESTS
+check_PROGRAMS += src/solvers/fc2d_thunderegg/libfc2d_thunderegg_TEST.MPI1
+TESTS += src/solvers/fc2d_thunderegg/libfc2d_thunderegg_TEST.MPI1
+
+src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_SOURCES = \
+	src/solvers/fc2d_thunderegg/fc2d_thunderegg_vector_TEST.cpp
+
+src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_CPPFLAGS = \
+    $(src_solvers_fc2d_thunderegg_libfc2d_thunderegg_la_CPPFLAGS)
+
+src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+    $(LDADD) \
+    $(FCLAW_THUNDEREGG_LDADD) \
+    $(FCLAW_LDADD)

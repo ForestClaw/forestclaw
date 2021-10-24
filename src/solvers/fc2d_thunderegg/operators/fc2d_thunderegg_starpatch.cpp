@@ -145,7 +145,9 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
         solver.reset(new Iterative::PatchSolver<2>(p_bcgs, op));
     }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+#ifdef THUNDEREGG_FFTW_ENABLED
         solver.reset(new Poisson::FFTWPatchSolver<2>(op, neumann_bitset));
+#endif
     }
 
     // create gmg preconditioner
@@ -155,8 +157,6 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     {
         // options
         GMG::CycleOpts copts;
-        copts.max_levels = mg_opt->max_levels;
-        copts.patches_per_proc = mg_opt->patches_per_proc;
         copts.pre_sweeps = mg_opt->pre_sweeps;
         copts.post_sweeps = mg_opt->post_sweeps;
         copts.mid_sweeps = mg_opt->mid_sweeps;
@@ -197,7 +197,9 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
             if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
                 smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
             }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+#ifdef THUNDEREGG_FFTW_ENABLED
                 smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+#endif
             }
 
             //restrictor
@@ -226,7 +228,9 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
         if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
             smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
         }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+#ifdef THUNDEREGG_FFTW_ENABLED
             smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+#endif
         }
 
         //interpolator

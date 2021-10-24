@@ -386,8 +386,6 @@ void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob)
     {
         // options
         GMG::CycleOpts copts;
-        copts.max_levels = mg_opt->max_levels;
-        copts.patches_per_proc = mg_opt->patches_per_proc;
         copts.pre_sweeps = mg_opt->pre_sweeps;
         copts.post_sweeps = mg_opt->post_sweeps;
         copts.mid_sweeps = mg_opt->mid_sweeps;

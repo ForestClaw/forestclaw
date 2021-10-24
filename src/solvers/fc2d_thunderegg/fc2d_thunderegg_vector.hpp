@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -23,19 +23,29 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/**
+ * @file 
+ * Routines for interfaceing with ThunderEgg vectors
+ */
+
 #include <ThunderEgg/Vector.h>
 
-// #include <fclaw2d_global.h>
 
 /* Avoid circular dependencies */
 struct fclaw2d_patch;
 struct fclaw2d_domain;
 struct fclaw2d_global;
 
+/**
+ * @brief Choice for patch data
+ */
 typedef enum fc2d_thunderegg_data_choice
 {
+    /** @brief RHS patch data */
     RHS=0,
+    /** @brief soln patch data */
     SOLN,
+    /** @brief soln patch data */
     STORE_STATE,
 }  fc2d_thunderegg_data_choice_t;
 
@@ -43,7 +53,7 @@ typedef enum fc2d_thunderegg_data_choice
  * @brief Get a thunderegg vector that is a view to forestclaw data
  * 
  * @param glob the global context
- * @param data_choice the data chioce
+ * @param data_choice the data choice
  * @return ThunderEgg::Vector<2> the vector
  */
 ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice);
@@ -52,7 +62,7 @@ ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc
  * @brief Get a thunderegg vector that is a view to forestclaw data
  * 
  * @param glob the global context
- * @param data_choice the data chioce
+ * @param data_choice the data choice
  * @return ThunderEgg::Vector<2> the vector
  */
 void fc2d_thunderegg_store_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice, const ThunderEgg::Vector<2>& vec);
