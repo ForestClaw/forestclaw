@@ -1,3 +1,13 @@
+c> @file
+c> ghost pack routine for clawpack 5
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_local_ghost_pack_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::clawpatch_fort_local_ghost_pack_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_local_ghost_pack(mx,my,mbc,
      &      meqn, mint,qdata,area,qpack,psize,packmode,ierror)
 
@@ -145,6 +155,15 @@ c     # Face 3
       end
 
 
+c--------------------------------------------------------------------
+c> @brief Set the boundaries (faces) to a value
+c>
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] mbc the number of ghost cells
+c> @param[in] meqn the number of equations
+c> @param[in,out] q the solution
+c> @param[in] val the value to set the boundaries to
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_set_boundary_to_value(mx,my,mbc,
      &      meqn,q,val)
       implicit none
@@ -189,6 +208,15 @@ c        # Face 3
 
       end
 
+c--------------------------------------------------------------------
+c> @brief Set the corners to a value
+c>
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] mbc the number of ghost cells
+c> @param[in] meqn the number of equations
+c> @param[in,out] q the solution
+c> @param[in] val the value to set the boundaries to
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_set_corners_to_value(mx,my,mbc,
      &      meqn, q,value)
       implicit none

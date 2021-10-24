@@ -137,11 +137,11 @@ endif(thunderegg)
 
 
 # --- clawpack3
-if(clawpack3)
+if(clawpack3_46)
 
   add_subdirectory(src/solvers/fc3d_clawpack46)
 
-endif(clawpack3)
+endif(clawpack3_46)
 
 
 include(cmake/pkgconf.cmake)

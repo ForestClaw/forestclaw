@@ -63,47 +63,104 @@ double varpoisson_beta_coeff(const std::array<double,2>& coord)
 class varpoisson : public PatchOperator<2>
 {
     protected:
-    std::shared_ptr<const Vector<2>> beta;
+    Vector<2> beta;
 
     public:
-        varpoisson(std::shared_ptr<const Vector<2>> beta_vec, 
-                   std::shared_ptr<const Domain<2>> domain,
-                   std::shared_ptr<const GhostFiller<2>> ghost_filler);
+    varpoisson(const Vector<2>& beta_vec, 
+               const Domain<2>& domain,
+               const GhostFiller<2>& ghost_filler);
 
-        void applySinglePatch(const PatchInfo<2>& pinfo, 
-                              const std::vector<LocalData<2>>& us,
-                              std::vector<LocalData<2>>& fs,
-                              bool interior_dirichlet) const override;
+    varpoisson* clone() const override
+    {
+        return new varpoisson(*this);
+    }
+    void applySinglePatch(const PatchInfo<2>& pinfo,
+                          const PatchView<const double, 2>& u,
+                          const PatchView<double, 2>& f) const override;
 
-        void addGhostToRHS(const PatchInfo<2>& pinfo, 
-                           const std::vector<LocalData<2>>& us,
-                           std::vector<LocalData<2>>& fs) const override;
+    void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2>& pinfo,
+                                                        const PatchView<const double, 2>& u,
+                                                        const PatchView<double, 2>& f) const override;
+
+    void modifyRHSForInternalBoundaryConditions(const PatchInfo<2> &pinfo,
+	                                            const PatchView<const double, 2> &u,
+	                                            const PatchView<double, 2> &f) const override;
+
 
 };
 
 
-varpoisson::varpoisson(std::shared_ptr<const Vector<2>> coeffs,
-                       std::shared_ptr<const Domain<2>> domain,
-                       std::shared_ptr<const GhostFiller<2>> ghost_filler) : 
+varpoisson::varpoisson(const Vector<2>& coeffs,
+                       const Domain<2>& domain,
+                       const GhostFiller<2>& ghost_filler) : 
                             PatchOperator<2>(domain,ghost_filler),
                             beta(coeffs)
 {
-    this->ghost_filler->fillGhost(this->beta);
+    ghost_filler.fillGhost(this->beta);
 }
 
 
-void varpoisson::applySinglePatch(const PatchInfo<2>& pinfo, 
-                                  const std::vector<LocalData<2>>& us,
-                                  std::vector<LocalData<2>>& fs,
-                                  bool interior_dirichlet) const 
+void varpoisson::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2>& pinfo, 
+                                                                const PatchView<const double, 2>& u,
+                                                                const PatchView<double, 2>& f) const 
 {
-    const LocalData<2>  b  = beta->getLocalData(0, pinfo.local_index);
+    int mx = pinfo.ns[0]; 
+    int my = pinfo.ns[1];
+
+    int mfields = u.getEnd()[2]+1;
+
+    if (pinfo.hasNbr(Side<2>::west()))
+    {
+        auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
+        for(int m = 0; m < mfields; m++)
+        {
+            for(int j = 0; j < my; j++){
+                ghosts(j,m) = -u(0,j,m);
+            }
+        }
+    }
+    if (pinfo.hasNbr(Side<2>::east())){
+        auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
+        for(int m = 0; m < mfields; m++)
+        {
+            for(int j = 0; j < my; j++){
+                ghosts(j,m) = -u(mx-1,j,m);
+            }
+        }
+    }
+
+    if (pinfo.hasNbr(Side<2>::south())){
+        auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
+        for(int m = 0; m < mfields; m++)
+        {
+            for(int i = 0; i < mx; i++){
+                ghosts(i,m) = -u(i,0,m);
+            }
+        }
+    }
+    if (pinfo.hasNbr(Side<2>::north())){
+        auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
+        for(int m = 0; m < mfields; m++)
+        {
+            for(int i = 0; i < mx; i++){
+                ghosts(i,m) = -u(i,my-1,m);
+            }
+        }
+    }
+
+    applySinglePatch(pinfo, u, f);
+}
+void varpoisson::applySinglePatch(const PatchInfo<2>& pinfo, 
+                                  const PatchView<const double, 2>& u,
+                                  const PatchView<double, 2>& f) const 
+{
+    const ComponentView<const double,2>  b  = beta.getComponentView(0, pinfo.local_index);
     //LocalData<2>& b = const_cast<LocalData<2>&>(beta[0]);
 
     int mx = pinfo.ns[0]; 
     int my = pinfo.ns[1];
 
-    int mfields = us.size();
+    int mfields = u.getEnd()[2]+1;
 
 #if 0    
     int mbc = pinfo.num_ghost_cells;
@@ -113,57 +170,65 @@ void varpoisson::applySinglePatch(const PatchInfo<2>& pinfo,
     double dx = pinfo.spacings[0];
     double dy = pinfo.spacings[1];
 
-    for(int m = 0; m < mfields; m++)
+    //if physical boundary
+    if (!pinfo.hasNbr(Side<2>::west()))
     {
-        LocalData<2>& u = const_cast<LocalData<2>&>(us[m]);
-        LocalData<2>& f = fs[m];
-
-        //if physical boundary
-        if (interior_dirichlet || !pinfo.hasNbr(Side<2>::west()))
+        auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
+        for(int m = 0; m < mfields; m++)
         {
-            auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = -u[{0,j}];
+                ghosts(j,m) = -u(0,j,m);
             }
         }
-        if (interior_dirichlet || !pinfo.hasNbr(Side<2>::east())){
-            auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
+    }
+    if (!pinfo.hasNbr(Side<2>::east())){
+        auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
+        for(int m = 0; m < mfields; m++)
+        {
             for(int j = 0; j < my; j++){
-                ghosts[{j}] = -u[{mx-1,j}];
+                ghosts(j,m) = -u(mx-1,j,m);
             }
         }
+    }
 
-        if (interior_dirichlet || !pinfo.hasNbr(Side<2>::south())){
-            auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
+    if (!pinfo.hasNbr(Side<2>::south())){
+        auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
+        for(int m = 0; m < mfields; m++)
+        {
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = -u[{i,0}];
+                ghosts(i,m) = -u(i,0,m);
             }
         }
-        if (interior_dirichlet || !pinfo.hasNbr(Side<2>::north())){
-            auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
+    }
+    if (!pinfo.hasNbr(Side<2>::north())){
+        auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
+        for(int m = 0; m < mfields; m++)
+        {
             for(int i = 0; i < mx; i++){
-                ghosts[{i}] = -u[{i,my-1}];
+                ghosts(i,m) = -u(i,my-1,m);
             }
         }
+    }
 
 #if 1
-        double dx2 = 2*dx*dx;
-        double dy2 = 2*dy*dy;
+    double dx2 = 2*dx*dx;
+    double dy2 = 2*dy*dy;
+    for(int m = 0; m < mfields; m++)
         for(int j = 0; j < my; j++)
             for(int i = 0; i < mx; i++)
             {
-                double b0 = (b[{i,j}]   + b[{i-1,j}]);
-                double b1 = (b[{i+1,j}] + b[{i,j}]);
-                double b2 = (b[{i,j}]   + b[{i,j-1}]);
-                double b3 = (b[{i,j+1}] + b[{i,j}]);
+                double b0 = (b(i,j)   + b(i-1,j));
+                double b1 = (b(i+1,j) + b(i,j));
+                double b2 = (b(i,j)   + b(i,j-1));
+                double b3 = (b(i,j+1) + b(i,j));
 
                 double flux[4];
-                flux[0] = b0*(u[{i,j}] - u[{i-1,j}]);
-                flux[1] = b1*(u[{i+1,j}] - u[{i,j}]);
-                flux[2] = b2*(u[{i,j}] - u[{i,j-1}]);
-                flux[3] = b3*(u[{i,j+1}] - u[{i,j}]);
+                flux[0] = b0*(u(i,j,m) - u(i-1,j,m));
+                flux[1] = b1*(u(i+1,j,m) - u(i,j,m));
+                flux[2] = b2*(u(i,j,m) - u(i,j-1,m));
+                flux[3] = b3*(u(i,j+1,m) - u(i,j,m));
 
-                f[{i,j}] = (flux[1]-flux[0])/dx2 + (flux[3] - flux[2])/dy2;
+                f(i,j,m) = (flux[1]-flux[0])/dx2 + (flux[3] - flux[2])/dy2;
 
             }
 #endif
@@ -176,39 +241,38 @@ void varpoisson::applySinglePatch(const PatchInfo<2>& pinfo,
         for(int j = 0; j < my+1; j++)
             for(int i = 0; i < mx+1; i++)
             {
-                double b0 = (b[{i,j}]   + b[{i-1,j}]);
-                double flux0 = b0*(u[{i,j}] - u[{i-1,j}]);
+                double b0 = (b(i,j)   + b(i-1,j));
+                double flux0 = b0*(u(i,j) - u(i-1,j));
 
-                double b2 = (b[{i,j}] + b[{i,j-1}]);
-                double flux2 = b2*(u[{i,j}] - u[{i,j-1}]);
+                double b2 = (b(i,j) + b(i,j-1));
+                double flux2 = b2*(u(i,j) - u(i,j-1));
 
                 if (i < mx)
-                    f[{i,j}] = -flux0/dx2;
+                    f(i,j) = -flux0/dx2;
 
                 if (i > 0)
-                    f[{i-1,j}] += flux0/dx2;
+                    f(i-1,j) += flux0/dx2;
 
                 if (j < my)
-                    f[{i,j}] += -flux2/dy2;
+                    f(i,j) += -flux2/dy2;
 
                 if (j > 0)
-                    f[{i,j-1}] += flux2/dy2;
+                    f(i,j-1) += flux2/dy2;
 
             }
 #endif            
 
-    }
 }
 
 
-void varpoisson::addGhostToRHS(const PatchInfo<2>& pinfo, 
-                              const std::vector<LocalData<2>>& us, 
-                              std::vector<LocalData<2>>& fs) const 
+void varpoisson::modifyRHSForInternalBoundaryConditions(const PatchInfo<2>& pinfo, 
+                                                        const PatchView<const double,2>& u, 
+                                                        const PatchView<double,2>& f) const 
 {
 
-    const LocalData<2> b = beta->getLocalData(0, pinfo.local_index);
+    const ComponentView<const double,2> b = beta.getComponentView(0, pinfo.local_index);
 
-    int mfields = us.size();
+    int mfields = u.getEnd()[2]+1;
 
     int mx = pinfo.ns[0]; 
     int my = pinfo.ns[1];
@@ -225,45 +289,38 @@ void varpoisson::addGhostToRHS(const PatchInfo<2>& pinfo,
 
     for(int m = 0; m < mfields; m++)
     {
-        const LocalData<2>& u = us[m];
-        LocalData<2>& f = fs[m];
-
         for(int j = 0; j < my; j++)
         {
-            double b0 = (b[{0,j}] + b[{-1,j}])/2;
-            double b1 = (b[{mx,j}] + b[{mx-1,j}])/2;
+            double b0 = (b(0,j) + b(-1,j))/2;
+            double b1 = (b(mx,j) + b(mx-1,j))/2;
             /* bool hasNbr(Side<2> s) */
             if (pinfo.hasNbr(Side<2>::west()))
-                f[{0,j}] += -b0*(u[{-1,j}]+u[{0,j}])/dx2;
+                f(0,j,m) += -b0*(u(-1,j,m)+u(0,j,m))/dx2;
 
             if (pinfo.hasNbr(Side<2>::east()))
-                f[{mx-1,j}] += -b1*(u[{mx-1,j}]+u[{mx,j}])/dx2;
+                f(mx-1,j,m) += -b1*(u(mx-1,j,m)+u(mx,j,m))/dx2;
         }
 
         for(int i = 0; i < mx; i++)
         {
-            double b2 = (b[{i,0}] + b[{i,-1}])/2;
-            double b3 = (b[{i,my}] + b[{i,my-1}])/2;
+            double b2 = (b(i,0) + b(i,-1))/2;
+            double b3 = (b(i,my) + b(i,my-1))/2;
             if (pinfo.hasNbr(Side<2>::south()))
-                f[{i,0}] += -b2*(u[{i,-1}]+u[{i,0}])/dy2;
+                f(i,0,m) += -b2*(u(i,-1,m)+u(i,0,m))/dy2;
 
             if (pinfo.hasNbr(Side<2>::north()))
-                f[{i,my-1}] += -b3*(u[{i,my-1}]+u[{i,my}])/dy2;
+                f(i,my-1,m) += -b3*(u(i,my-1,m)+u(i,my,m))/dy2;
         }
     }
 }
  
 
-shared_ptr<ValVector<2>> varpoisson_restrict_beta_vec(shared_ptr<Vector<2>> prev_beta_vec, 
-                                                      shared_ptr<Domain<2>> prev_domain, 
-                                                      shared_ptr<Domain<2>> curr_domain)
+Vector<2> varpoisson_restrict_beta_vec(const Vector<2>& prev_beta_vec, 
+                                       const Domain<2>& prev_domain, 
+                                       const Domain<2>& curr_domain)
 {
-    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, 
-                                        prev_beta_vec->getNumComponents(), true);
-    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, 
-                                                   prev_beta_vec->getNumComponents());
-    restrictor.restrict(prev_beta_vec, new_beta_vec);
-    return new_beta_vec;
+    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, true);
+    return restrictor.restrict(prev_beta_vec);
 }
 
 
@@ -281,7 +338,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     GhostFillingType fill_type = GhostFillingType::Faces;
   
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
+    Vector<2> f = fc2d_thunderegg_get_vector(glob,RHS);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -304,7 +361,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
 
     // get finest level
-    shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
+    Domain<2> te_domain = domain_gen.getFinestDomain();
 
     // define operators for problems
 
@@ -314,7 +371,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
 #if 1
     // get beta function
     auto beta_func = [&](const std::array<double,2>& coord){
-        double beta;
+        double beta = 0.0;
         double grad[2];
         mg_vt->fort_beta(&coord[0],&coord[1],&beta,grad);
         //beta = 1;
@@ -324,26 +381,22 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     // create vector for beta
 
     //auto beta_vec = ValVector<2>::GetNewVector(te_domain, clawpatch_opt->rhs_fields);
-    auto beta_vec = ValVector<2>::GetNewVector(te_domain, 1);
+    Vector<2> beta_vec = f.getZeroClone();
     DomainTools::SetValuesWithGhost<2>(te_domain, beta_vec, beta_func);
 #endif
 
     // ghost filler
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain, fill_type);
+    BiLinearGhostFiller ghost_filler(te_domain, fill_type);
 
     // patch operator
-    auto op = make_shared<varpoisson>(beta_vec,te_domain,ghost_filler);
+    varpoisson op(beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
-    auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
-    p_bcgs->setTolerance(mg_opt->patch_bcgs_tol);
-    p_bcgs->setTolerance(mg_opt->patch_bcgs_max_it);
+    Iterative::BiCGStab<2> p_bcgs;
+    p_bcgs.setTolerance(mg_opt->patch_bcgs_tol);
+    p_bcgs.setTolerance(mg_opt->patch_bcgs_max_it);
 
-    shared_ptr<PatchSolver<2>>  solver;
-    solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, op);
-
-    // create matrix
-    shared_ptr<Operator<2>> A = op;
+    Iterative::PatchSolver<2> solver(p_bcgs, op);
 
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
@@ -352,8 +405,6 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     {
         // options
         GMG::CycleOpts copts;
-        copts.max_levels = mg_opt->max_levels;
-        copts.patches_per_proc = mg_opt->patches_per_proc;
         copts.pre_sweeps = mg_opt->pre_sweeps;
         copts.post_sweeps = mg_opt->post_sweeps;
         copts.mid_sweeps = mg_opt->mid_sweeps;
@@ -366,58 +417,43 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
         //add finest level
 
         //next domain
-        auto curr_domain = te_domain;
-        auto next_domain = domain_gen.getCoarserDomain();
-
-        //operator
-        auto patch_operator = op;
-
-        //smoother
-        shared_ptr<GMG::Smoother<2>> smoother = solver;
+        Domain<2> curr_domain = te_domain;
+        Domain<2> next_domain = domain_gen.getCoarserDomain();
 
         //restrictor
-        auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                next_domain, clawpatch_opt->rhs_fields);
+        GMG::LinearRestrictor<2> restrictor(curr_domain, 
+                                            next_domain);
 
-        //vector generator
-        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
-
-        builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
+        builder.addFinestLevel(op, solver, restrictor);
 
         //add intermediate levels
-        auto prev_beta_vec = beta_vec;
-        auto prev_domain = curr_domain;
+        Vector<2> prev_beta_vec = beta_vec;
+        Domain<2> prev_domain = curr_domain;
         curr_domain = next_domain;
         while(domain_gen.hasCoarserDomain())
         {
             next_domain = domain_gen.getCoarserDomain();
 
             //operator
-            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
-            auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, 
-                                                                    prev_domain, curr_domain);
-            patch_operator = make_shared<varpoisson>(restricted_beta_vec, 
-                                                     curr_domain, ghost_filler);
+            BiLinearGhostFiller ghost_filler(curr_domain, fill_type);
+            Vector<2> restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, 
+                                                                         prev_domain, curr_domain);
+            varpoisson patch_operator(restricted_beta_vec, 
+                                      curr_domain, ghost_filler);
             prev_beta_vec = restricted_beta_vec;
 
             //smoother
-            shared_ptr<GMG::Smoother<2>> smoother;
-            smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
+           Iterative::PatchSolver<2> smoother(p_bcgs, patch_operator);
 
             //restrictor
-            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                    next_domain, 
-                                                                    clawpatch_opt->rhs_fields);
+            GMG::LinearRestrictor<2> restrictor(curr_domain, 
+                                                next_domain);
 
             //interpolator
-            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                        prev_domain, 
-                                                                        clawpatch_opt->rhs_fields);
+            GMG::DirectInterpolator<2> interpolator(curr_domain, 
+                                                    prev_domain);
 
-            //vector generator
-            vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
-
-            builder.addIntermediateLevel(patch_operator, smoother, restrictor, interpolator, vg);
+            builder.addIntermediateLevel(patch_operator, smoother, restrictor, interpolator);
 
             prev_domain = curr_domain;
             curr_domain = next_domain;
@@ -426,51 +462,35 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
         //add coarsest level
 
         //operator
-        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
-        auto restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<varpoisson>(restricted_beta_vec, curr_domain, 
-                                                    ghost_filler);
+        BiLinearGhostFiller ghost_filler(curr_domain, fill_type);
+        Vector<2> restricted_beta_vec = varpoisson_restrict_beta_vec(prev_beta_vec, prev_domain, curr_domain);
+        varpoisson patch_operator(restricted_beta_vec, curr_domain, 
+                                  ghost_filler);
 
         //smoother
-        smoother = make_shared<Iterative::PatchSolver<2>>(p_bcgs, patch_operator);
+        Iterative::PatchSolver<2> smoother(p_bcgs, patch_operator);
 
         //interpolator
-        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                    prev_domain, 
-                                                                    clawpatch_opt->rhs_fields);
+        GMG::DirectInterpolator<2> interpolator(curr_domain, 
+                                                prev_domain);
 
-        //vector generator
-        vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
-
-        builder.addCoarsestLevel(patch_operator, smoother, interpolator, vg);
+        builder.addCoarsestLevel(patch_operator, smoother, interpolator);
 
         M = builder.getCycle();
     }
 
     // solve
-    auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
-    shared_ptr<Vector<2>> u = vg->getNewVector();
+    Vector<2> u = f.getZeroClone();
 
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
 
     bool vl = mg_opt->verbosity_level != 0;
-    int its = iter_solver.solve(vg, A, u, f, M,vl);
+    int its = iter_solver.solve(op, u, f, M.get(),vl);
 
     // copy solution into rhs
-    f->copy(u);
+    fc2d_thunderegg_store_vector(glob, RHS, u);
     fclaw_global_productionf("Iterations: %i\n", its);    
-
-#if 0
-    fclaw_global_productionf("f-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("f-infnorm: %f\n", f->infNorm());
-    fclaw_global_productionf("u-2norm: %f\n", u->twoNorm());
-    fclaw_global_productionf("u-infnorm: %f\n\n", u->infNorm());
-
-    fclaw_global_productionf("Checking if copy function works:\n");
-    fclaw_global_productionf("fcopy-2norm: %f\n", f->twoNorm());
-    fclaw_global_productionf("fcopy-infnorm: %f\n\n", f->infNorm());
-#endif    
 }
 

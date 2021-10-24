@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
     /* example of how to set up a user defined criteria */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt();
     clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_TH;
 
     const user_options_t* user = swirl_get_options(glob);

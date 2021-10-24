@@ -1,14 +1,19 @@
 c     # ----------------------------------------------------------
-c     # Exchange routines - (i,j,mq) ordering
+c>      @file
+c>      Exchange routines - (i,j,mq) ordering
 c     # ----------------------------------------------------------
 c     # exchange_face_ghost
 c     # exchange_corner_ghost
 c     # exchange_phys_corner_ghost
 c     # ----------------------------------------------------------
 
-
-c     # Exchange edge ghost data with neighboring grid at same level.
-
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_copy_face_t
+c>
+c> Implementation for clawpack 4.6
+c>
+c> @details @copydetails ::clawpatch_fort_copy_face_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_copy_face(mx,my,mbc,
      &      meqn,qthis,
      &      qneighbor,
@@ -69,6 +74,13 @@ c                 # y-direction (idir == 1)
 
       end
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_copy_corner_t
+c>
+c> Implementation for clawpack 4.6
+c>
+c> @details @copydetails ::clawpatch_fort_copy_corner_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_copy_corner(mx,my,mbc,meqn,
      &      qthis, qneighbor, this_icorner,transform_ptr)
       implicit none

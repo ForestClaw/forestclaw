@@ -1,5 +1,21 @@
-!! # check to see if value exceeds threshold
+!> @file
+!! check to see if value exceeds threshold
 
+!  --------------------------------------------------------------
+!> @brief Check if the gradient exceeds the threshold
+!!
+!! @param[in] blockno the block number
+!! @param[in] qval the 
+!! @param[in] qmin the minimum q value
+!! @param[in] qmax the maximum q value
+!! @param[in] quad the value and adjacent values of q
+!! @param[in] dx, dy the spacing in the x and y directions
+!! @param[in] xc, yc the coordinate of the cell
+!! @param[in] threshold the threshold
+!! @param[in] init_flag true if in init stage
+!! @param[in] is_ghost true if cell is a ghost cell
+!! @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
+!  --------------------------------------------------------------
 integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno,& 
                                      qval,qmin,qmax,quad, & 
                                      dx,dy,xc,yc,threshold, &
@@ -88,6 +104,12 @@ integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
 
 end function fclaw2d_clawpatch_gradient_exceeds_th
 
+!  --------------------------------------------------------------
+!> @brief Dot product of two vector
+!!
+!! @param[in] u, v the vectors
+!! @return the dot product
+!  --------------------------------------------------------------
 double precision function clawpatch_gradient_dot(u,v)
     implicit none
 

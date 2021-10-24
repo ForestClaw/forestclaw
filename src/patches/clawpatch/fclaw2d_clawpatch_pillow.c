@@ -24,14 +24,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include <fclaw2d_clawpatch_pillow.h>
+#ifndef REFINE_DIM
+#define REFINE_DIM 2
+#endif
+
+#ifndef PATCH_DIM
+#define PATCH_DIM 2
+#endif
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>
 
+#if REFINE_DIM == 2 && PATCH_DIM == 2
+
+#include <fclaw2d_clawpatch_pillow.h>
+
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
+
+#elif REFINE_DIM == 2 && PATCH_DIM == 3
+
+#include <fclaw3dx_clawpatch_pillow.h>
+
+#include <fclaw3dx_clawpatch.h>
+#include <fclaw3dx_clawpatch46_fort.h>
+
+#include <_fclaw2d_to_fclaw3dx.h>
+
+#endif
+
+
 
 static fclaw2d_clawpatch_pillow_vtable_t s_clawpatch_pillow_vt;
 
@@ -56,7 +79,7 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
     fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-#if FCLAW2D_PATCHDIM == 2
+#if PATCH_DIM == 2
 
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
@@ -64,7 +87,7 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
     pillow_vt->fort_copy_block_corner(&mx, &my, &mbc, &meqn, 
                                       qthis, qcorner,
                                       &icorner, &blockno);
-#elif FCLAW2D_PATCHDIM == 3
+#elif PATCH_DIM == 3
     int mz;
     double zlower, dz;
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
@@ -101,7 +124,7 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-#if FCLAW2D_PATCHDIM == 2
+#if PATCH_DIM == 2
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
@@ -110,7 +133,7 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
                                          &refratio,qcoarse,qfine,
                                          areacoarse,areafine,
                                          &icorner_coarse,&coarse_blockno);
-#elif FCLAW2D_PATCHDIM == 3
+#elif PATCH_DIM == 3
     int mz;
     double  zlower, dz;
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
@@ -145,14 +168,14 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
     int refratio = 2;
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-#if FCLAW2D_PATCHDIM == 2
+#if PATCH_DIM == 2
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     pillow_vt->fort_interpolate_block_corner(&mx, &my, &mbc, &meqn,
                                              &refratio, qcoarse, qfine,
                                              &icoarse_corner, &coarse_blockno);
-#elif FCLAW2D_PATCHDIM == 3
+#elif PATCH_DIM == 3
     int mz;
     double zlower, dz;
     fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
@@ -191,7 +214,7 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
 {
     fclaw2d_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_init();
 
-#if FCLAW2D_PATCHDIM == 2
+#if PATCH_DIM == 2
     if (claw_version == 4)
     {
         pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW46_COPY_BLOCK_CORNER;
@@ -204,12 +227,12 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
         pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER;
         pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER;
     }
-#elif FCLAW2D_PATCHDIM == 3
+#elif PATCH_DIM == 3
     if (claw_version == 4)
     {
-        pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW46_COPY_BLOCK_CORNER3;
-        pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER3;
-        pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER3;
+        pillow_vt->fort_copy_block_corner        = FCLAW3DX_PILLOW46_COPY_BLOCK_CORNER;
+        pillow_vt->fort_average_block_corner     = FCLAW3DX_PILLOW46_AVERAGE_BLOCK_CORNER;
+        pillow_vt->fort_interpolate_block_corner = FCLAW3DX_PILLOW46_INTERPOLATE_BLOCK_CORNER;
     }
 #endif
 

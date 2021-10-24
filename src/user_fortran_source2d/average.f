@@ -13,14 +13,12 @@ c> \param [in] meqn     Number of equations
 c> \param [in] qcoarse,qfine  Solution on coarse,fine grid
 c> \param [in] areacoarse,areafine  Area of mesh cells on coarse,fine grids.
 c> \param [in] idir     Face orientation - 0 for x-faces; 1 for y-faces [0-1]
-c> \param [in] iface    Face number of fine grid [0-3].
 c> \param [in] iface_coarse Face number of coarse grid [0-3].
 c> \param [in] num_neighbors Number of fine grid neighbors [2].
 c> \param [in] refratio  Refinement ratio between coarse and fine grids [2].
 c> \param [in] manifold  Flag indicating whether we are on mapped grid [0-1].
-c> \param [in] transform_cptr  Encoding for indices at block boundaries (C only).
+c> \param [in] transform_cptr Encoding for indices at block boundaries (C only).
 
-c> \ingroup Averaging
 c> Average fine ghost cell values.
 c>
 c> Average fine grid interior values to neighboring ghost cell values of

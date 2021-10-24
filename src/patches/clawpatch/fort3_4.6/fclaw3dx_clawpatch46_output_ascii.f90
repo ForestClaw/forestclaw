@@ -1,4 +1,4 @@
-subroutine fclaw2d_clawpatch46_fort3_header_ascii (matname1, &
+subroutine fclaw3dx_clawpatch46_fort_header_ascii (matname1, &
     matname2, time,meqn,maux,ngrids)
     implicit none
 
@@ -25,9 +25,9 @@ subroutine fclaw2d_clawpatch46_fort3_header_ascii (matname1, &
     open(unit=matunit1,file=matname1,status='replace')
     close(matunit1)
 
-end subroutine  fclaw2d_clawpatch46_fort3_header_ascii
+end subroutine  fclaw3dx_clawpatch46_fort_header_ascii
 
-subroutine fclaw2d_clawpatch46_fort3_output_ascii(matname1, & 
+subroutine fclaw3dx_clawpatch46_fort_output_ascii(matname1, & 
     mx,my,mz,meqn,mbc, xlower,ylower, zlower, dx,dy,dz, & 
     q,patch_num,level,blockno,mpirank)
 
@@ -47,7 +47,7 @@ subroutine fclaw2d_clawpatch46_fort3_output_ascii(matname1, &
     matunit1 = 10
     open(matunit1,file=matname1,position='append');
 
-    call fclaw2d_clawpatch46_fort3_write_grid_header(matunit1, & 
+    call fclaw3dx_clawpatch46_fort_write_grid_header(matunit1, & 
            mx,my,mz,xlower,ylower, zlower, dx,dy,dz, patch_num,level, & 
            blockno,mpirank)
 
@@ -79,10 +79,10 @@ subroutine fclaw2d_clawpatch46_fort3_output_ascii(matname1, &
 
     close(matunit1)
 
-end subroutine fclaw2d_clawpatch46_fort3_output_ascii
+end subroutine fclaw3dx_clawpatch46_fort_output_ascii
 
 
-subroutine fclaw2d_clawpatch46_fort3_write_grid_header (matunit1, & 
+subroutine fclaw3dx_clawpatch46_fort_write_grid_header (matunit1, & 
     mx,my,mz, xlower,ylower, zlower, dx,dy,dz, patch_num,level, & 
      blockno,mpirank)
 
@@ -110,4 +110,4 @@ subroutine fclaw2d_clawpatch46_fort3_write_grid_header (matunit1, &
             e24.16,'    dx', /,     & 
             e24.16,'    dy',/,      & 
             e24.16,'    dz',/)
-end subroutine fclaw2d_clawpatch46_fort3_write_grid_header
+end subroutine fclaw3dx_clawpatch46_fort_write_grid_header

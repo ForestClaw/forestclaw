@@ -1,3 +1,13 @@
+c> @file
+c> ghost pack routine for clawpack 4.6
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_local_ghost_pack_t
+c>
+c> Implementation for clawpack 4.6.
+c>
+c> @details @copydetails ::clawpatch_fort_local_ghost_pack_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_local_ghost_pack
      &     (mx,my,mbc,meqn, mint,qdata,area,qpack,psize,
      &       packmode,ierror)

@@ -57,3 +57,11 @@ install(TARGETS fc2d_thunderegg
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::FC2D_THUNDEREGG INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FC2D_THUNDEREGG INTERFACE fc2d_thunderegg)
+
+if(BUILD_TESTING)
+  add_executable(fc2d_thunderegg_TEST.MPI1
+    fc2d_thunderegg_vector_TEST.cpp
+  )
+  target_link_libraries(fc2d_thunderegg_TEST.MPI1 testutils fc2d_thunderegg forestclaw)
+  register_unit_tests(fc2d_thunderegg_TEST.MPI1)
+endif(BUILD_TESTING)

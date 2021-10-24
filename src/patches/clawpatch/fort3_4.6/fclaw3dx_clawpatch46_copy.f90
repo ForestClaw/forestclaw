@@ -9,7 +9,7 @@
 
 !! # Exchange edge ghost data with neighboring grid at same level.
 
-subroutine fclaw2d_clawpatch46_fort3_copy_face(mx,my,mz,mbc, & 
+subroutine fclaw3dx_clawpatch46_fort_copy_face(mx,my,mz,mbc, & 
            meqn,qthis, qneighbor, iface, transform_ptr)
 
     implicit none
@@ -40,7 +40,7 @@ subroutine fclaw2d_clawpatch46_fort3_copy_face(mx,my,mz,mbc, &
                             i1 = mx+ibc
                             j1 = j
                         endif
-                        call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
+                        call fclaw3dx_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
                         qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
                     enddo
                 enddo
@@ -56,7 +56,7 @@ subroutine fclaw2d_clawpatch46_fort3_copy_face(mx,my,mz,mbc, &
                            i1 = i
                            j1 = my+jbc
                         endif
-                        call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
+                        call fclaw3dx_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
                         qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
                     enddo
                 enddo
@@ -64,9 +64,9 @@ subroutine fclaw2d_clawpatch46_fort3_copy_face(mx,my,mz,mbc, &
         end do k_loop
     enddo mq_loop
 
-end subroutine fclaw2d_clawpatch46_fort3_copy_face
+end subroutine fclaw3dx_clawpatch46_fort_copy_face
 
-subroutine fclaw2d_clawpatch46_fort3_copy_corner(mx,my,mz,mbc,meqn, &
+subroutine fclaw3dx_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &
     qthis, qneighbor, this_icorner,transform_ptr)
     implicit none
 
@@ -99,11 +99,11 @@ subroutine fclaw2d_clawpatch46_fort3_copy_corner(mx,my,mz,mbc,meqn, &
 
                     !! # this routine is not yet complete, but the complete one
                     !! # can now be dropped in.
-                    call fclaw2d_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
+                    call fclaw3dx_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
                     qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
                 end do
             end do
         end do k_loop
     end do mq_loop
 
-end subroutine fclaw2d_clawpatch46_fort3_copy_corner
+end subroutine fclaw3dx_clawpatch46_fort_copy_corner

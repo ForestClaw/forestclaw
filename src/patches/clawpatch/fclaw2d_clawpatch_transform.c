@@ -23,9 +23,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef REFINE_DIM
+#define REFINE_DIM 2
+#endif
+
+#ifndef PATCH_DIM
+#define PATCH_DIM 2
+#endif
+
+#if REFINE_DIM == 2 && PATCH_DIM == 2
+
 #include <fclaw2d_clawpatch_transform.h>
 
 #include <fclaw2d_clawpatch_options.h>
+
+#elif REFINE_DIM == 2 && PATCH_DIM == 3
+
+#include <fclaw3dx_clawpatch_transform.h>
+
+#include <fclaw3dx_clawpatch_options.h>
+
+#include <fclaw3dx_clawpatch_transform.h>
+
+#include <_fclaw2d_to_fclaw3dx.h>
+
+#endif
+
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 

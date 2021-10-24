@@ -64,14 +64,12 @@ double phasefield_get_lambda()
 {
     return phasefield::getLambda();
 }
-shared_ptr<Vector<2>> restrict_phi_n_vec(shared_ptr<Vector<2>> prev_beta_vec, 
-                                         shared_ptr<Domain<2>> prev_domain, 
-                                         shared_ptr<Domain<2>> curr_domain)
+Vector<2> restrict_phi_n_vec(const Vector<2>& prev_beta_vec, 
+                             const Domain<2>& prev_domain, 
+                             const Domain<2>& curr_domain)
 {
-    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, prev_beta_vec->getNumComponents(), true);
-    auto new_beta_vec = ValVector<2>::GetNewVector(curr_domain, prev_beta_vec->getNumComponents());
-    restrictor.restrict(prev_beta_vec, new_beta_vec);
-    return new_beta_vec;
+    GMG::LinearRestrictor<2> restrictor(prev_domain,curr_domain, true);
+    return restrictor.restrict(prev_beta_vec);
 }
 
 void phasefield_solve(fclaw2d_global_t *glob) 
@@ -87,7 +85,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
 #endif  
 
     // create thunderegg vector for eqn 0
-    shared_ptr<Vector<2>> f = make_shared<fc2d_thunderegg_vector>(glob,RHS);
+    Vector<2> f = fc2d_thunderegg_get_vector(glob,RHS);
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
@@ -110,29 +108,25 @@ void phasefield_solve(fclaw2d_global_t *glob)
     P4estDomainGenerator domain_gen(wrap->p4est, ns, clawpatch_opt->mbc, bmf);
 
     // get finest level
-    shared_ptr<Domain<2>> te_domain = domain_gen.getFinestDomain();
+    Domain<2> te_domain = domain_gen.getFinestDomain();
 
     /* Store phi at time level n */
-    shared_ptr<Vector<2>> beta_vec = make_shared<fc2d_thunderegg_vector>(glob,STORE_STATE);    
+    Vector<2> beta_vec = fc2d_thunderegg_get_vector(glob,STORE_STATE);    
 
     // ghost filler
-    auto ghost_filler = make_shared<BiLinearGhostFiller>(te_domain, fill_type);
+    BiLinearGhostFiller ghost_filler(te_domain, fill_type);
 
     // patch operator
-    auto op = make_shared<phasefield>(glob,beta_vec,te_domain,ghost_filler);
+    phasefield op(glob,beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
-    auto patch_cg = make_shared<Iterative::CG<2>>();
-    patch_cg->setTolerance(mg_opt->patch_bcgs_tol);
-    patch_cg->setMaxIterations(mg_opt->patch_bcgs_max_it);
-    auto patch_bicg = make_shared<Iterative::BiCGStab<2>>();
-    patch_bicg->setTolerance(mg_opt->patch_bcgs_tol);
-    patch_bicg->setMaxIterations(mg_opt->patch_bcgs_max_it);
-    shared_ptr<PatchSolver<2>>  solver;
-    solver = make_shared<Iterative::PatchSolver<2>>(patch_cg,op,true);
-
-    // create matrix
-    shared_ptr<Operator<2>> A = op;
+    Iterative::CG<2> patch_cg;
+    patch_cg.setTolerance(mg_opt->patch_bcgs_tol);
+    patch_cg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    Iterative::BiCGStab<2> patch_bicg;
+    patch_bicg.setTolerance(mg_opt->patch_bcgs_tol);
+    patch_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    Iterative::PatchSolver<2> solver(patch_cg,op,true);
 
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
@@ -141,8 +135,6 @@ void phasefield_solve(fclaw2d_global_t *glob)
     {
         // options
         GMG::CycleOpts copts;
-        copts.max_levels = mg_opt->max_levels;
-        copts.patches_per_proc = mg_opt->patches_per_proc;
         copts.pre_sweeps = mg_opt->pre_sweeps;
         copts.post_sweeps = mg_opt->post_sweeps;
         copts.mid_sweeps = mg_opt->mid_sweeps;
@@ -158,22 +150,11 @@ void phasefield_solve(fclaw2d_global_t *glob)
         auto curr_domain = te_domain;
         auto next_domain = domain_gen.getCoarserDomain();
 
-        //operator
-        auto patch_operator = op;
-
-        //smoother
-        shared_ptr<GMG::Smoother<2>> smoother = solver;
-
         //restrictor
-        auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                next_domain, 
-                                                                clawpatch_opt->rhs_fields);
+        GMG::LinearRestrictor<2> restrictor(curr_domain, 
+                                            next_domain); 
 
-        //vector generator
-        auto vg = make_shared<ValVectorGenerator<2>>(curr_domain, 
-                                                     clawpatch_opt->rhs_fields);
-
-        builder.addFinestLevel(patch_operator, smoother, restrictor, vg);
+        builder.addFinestLevel(op, solver, restrictor);
 
         //add intermediate levels
         auto prev_phi_n_vec = beta_vec;
@@ -184,31 +165,25 @@ void phasefield_solve(fclaw2d_global_t *glob)
             next_domain = domain_gen.getCoarserDomain();
 
             //operator
-            auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
-            auto restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, 
-                                                           prev_domain, curr_domain);
-            patch_operator = make_shared<phasefield>(glob,restricted_phi_n_vec,curr_domain, ghost_filler);
+            BiLinearGhostFiller ghost_filler(curr_domain, fill_type);
+            Vector<2> restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, 
+                                                                prev_domain, curr_domain);
+            phasefield patch_operator(glob,restricted_phi_n_vec,curr_domain, ghost_filler);
             prev_phi_n_vec = restricted_phi_n_vec;
 
             //smoother
-            shared_ptr<GMG::Smoother<2>> smoother;
-            smoother = make_shared<Iterative::PatchSolver<2>>(patch_cg,patch_operator, true);
+            Iterative::PatchSolver<2> smoother(patch_cg,patch_operator, true);
 
             //restrictor
-            auto restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, 
-                                                                    next_domain, 
-                                                                    clawpatch_opt->rhs_fields);
+            GMG::LinearRestrictor<2> restrictor(curr_domain, 
+                                                next_domain);
 
             //interpolator
-            auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, 
-                                                                        prev_domain, 
-                                                                        clawpatch_opt->rhs_fields);
-
-            //vector generator
-            vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
+            GMG::DirectInterpolator<2> interpolator(curr_domain, 
+                                                    prev_domain);
 
             builder.addIntermediateLevel(patch_operator, smoother, restrictor, 
-                                         interpolator, vg);
+                                         interpolator);
 
             prev_domain = curr_domain;
             curr_domain = next_domain;
@@ -217,55 +192,37 @@ void phasefield_solve(fclaw2d_global_t *glob)
         //add coarsest level
 
         //operator
-        auto ghost_filler = make_shared<BiLinearGhostFiller>(curr_domain, fill_type);
-        auto restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, prev_domain, curr_domain);
-        patch_operator = make_shared<phasefield>(glob,restricted_phi_n_vec, curr_domain, ghost_filler);
+        BiLinearGhostFiller ghost_filler(curr_domain, fill_type);
+        Vector<2> restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, prev_domain, curr_domain);
+        phasefield coarse_patch_operator(glob,restricted_phi_n_vec, curr_domain, ghost_filler);
 
         //smoother
-        smoother = make_shared<Iterative::PatchSolver<2>>(patch_cg, patch_operator, true);
+        Iterative::PatchSolver<2> smoother(patch_cg, coarse_patch_operator, true);
         //interpolator
-        auto interpolator = make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, clawpatch_opt->rhs_fields);
+        GMG::DirectInterpolator<2> interpolator(curr_domain, prev_domain);
 
-        //vector generator
-        vg = make_shared<ValVectorGenerator<2>>(curr_domain, clawpatch_opt->rhs_fields);
-
-        builder.addCoarsestLevel(patch_operator, smoother, interpolator, vg);
+        builder.addCoarsestLevel(coarse_patch_operator, smoother, interpolator);
 
         M = builder.getCycle();
     }
 
-    // solve
-    auto vg = make_shared<ValVectorGenerator<2>>(te_domain, clawpatch_opt->rhs_fields);
-
 #if 0
     // Set starting conditions
-    shared_ptr<Vector<2>> u = make_shared<fc2d_thunderegg_vector>(glob,SOLN);
+    Vector<2> u = fc2d_thunderegg_get_vector(glob,SOLN);
 #else
-    shared_ptr<Vector<2>> u = vg->getNewVector();
+    Vector<2> u = f.getZeroClone();
 #endif    
 
 
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
-    int its = iter_solver.solve(vg, A, u, f, M,
+    int its = iter_solver.solve(op, u, f, M.get(),
                                  true); //output iteration information to cout
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 
     /* Solution is copied to right hand side */
-    f->copy(u);
-
-#if 0    
-    fclaw_global_productionf("f-2norm:   %24.16f\n", f->twoNorm());
-    fclaw_global_productionf("f-infnorm: %24.16f\n", f->infNorm());
-    fclaw_global_productionf("u-2norm:   %24.16f\n", u->twoNorm());
-    fclaw_global_productionf("u-infnorm: %24.16f\n\n", u->infNorm());
-
-    // copy solution into rhs
-    fclaw_global_productionf("Checking if copy function works:\n");
-    fclaw_global_productionf("fcopy-2norm:   %24.16f\n", f->twoNorm());
-    fclaw_global_productionf("fcopy-infnorm: %24.16f\n\n", f->infNorm());
-#endif    
+    fc2d_thunderegg_store_vector(glob, RHS, u);
 }
 

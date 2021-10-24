@@ -28,6 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
+/**
+ * @file
+ * C declarations of Fortran subroutines
+ */
 #ifdef __cplusplus
 extern "C"
 {
@@ -40,9 +44,11 @@ extern "C"
 /* To fix syntax highlighting below */
 #endif    
 
+/** Fortran subroutine name */
 #define CLAWPATCH_TIME_SYNC_SETUP FCLAW_F77_FUNC(clawpatch_time_sync_setup, \
                                                  CLAWPATCH_TIME_SYNC_SETUP)
 
+/** @copydoc clawpatch_time_sync_setup() */
 void CLAWPATCH_TIME_SYNC_SETUP(const int* mx,const int *my, const int* mbc, 
                                   const double* dx, const double *dy,
                                   double area[], double edge_lengths[],
