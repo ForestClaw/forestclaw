@@ -1,8 +1,16 @@
-c     # ----------------------------------------------------------------------
-c     # This handles the boundary conditions at the block
-c     # corners for the pillow sphere.
-c     # ----------------------------------------------------------------------
+c ----------------------------------------------------------------------
+c> @file
+c> This handles the boundary conditions at the block
+c> corners for the pillow sphere.
+c ----------------------------------------------------------------------
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::pillow_fort_copy_block_corner_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::pillow_fort_copy_block_corner_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_pillow5_copy_block_corner
      &      (mx,my,mbc,meqn,
      &      qthis, qneighbor, icorner, iblock)
@@ -49,6 +57,13 @@ c     # ----------------------------------------------------------------------
       enddo
       end
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::pillow_fort_average_block_corner_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::pillow_fort_average_block_corner_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_pillow5_average_block_corner
      &      (mx,my,mbc,meqn,
      &      refratio, qcoarse, qfine, areacoarse, areafine,
@@ -141,6 +156,13 @@ c     # ----------------------------------------------------------------------
       end
 
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::pillow_fort_average_block_corner_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::pillow_fort_average_block_corner_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_pillow5_interpolate_block_corner
      &      (mx,my,mbc,meqn,
      &      refratio, qcoarse, qfine, icorner_coarse, iblock)

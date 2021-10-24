@@ -90,7 +90,7 @@ void fclaw2d_metric_patch_define(fclaw2d_global_t* glob,
         ur[0] = mx + mbc + 1;
         ur[1] = my + mbc + 1;
 
-        Box box_p(ll,ur);
+        Box box_p(ll,ur,2);
         mp->area.define(box_p,1);
     }
 
@@ -125,7 +125,7 @@ void fclaw2d_metric_patch_define(fclaw2d_global_t* glob,
         ur[0] = mx + mbc + 1;
         ur[1] = my + mbc + 1;
 
-        Box box_p(ll,ur);   /* Store cell centered values here */
+        Box box_p(ll,ur,2);   /* Store cell centered values here */
 
         /* Mesh cell centers of physical mesh */
         mp->xp.define(box_p,1);
@@ -141,7 +141,7 @@ void fclaw2d_metric_patch_define(fclaw2d_global_t* glob,
         }
         ur[0] = mx + mbc + 2;
         ur[1] = my + mbc + 2;
-        Box box_d(ll,ur);
+        Box box_d(ll,ur,2);
 
         mp->xd.define(box_d,1);
         mp->yd.define(box_d,1);

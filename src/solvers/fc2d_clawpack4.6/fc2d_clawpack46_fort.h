@@ -114,6 +114,7 @@ void CLAWPACK46_TIME_SYNC_ACCUMULATE_WAVES(int* mx, int* my, int* mbc, int* meqn
 											  double gm_bottom[], double gm_top[]);
 	
 
+/** C declaration of clawpack46_fort_time_sync_f2c subroutine */
 #define CLAWPACK46_FORT_TIME_SYNC_F2C FCLAW_F77_FUNC(clawpack46_fort_time_sync_f2c, \
 													 CLAWPACK46_FORT_TIME_SYNC_F2C)
 

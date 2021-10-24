@@ -1,4 +1,13 @@
-c     # We tag for coarsening if this coarsened patch isn't tagged for refinement
+c> @file
+c> tag4coarsening routine for clawpack 5
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_tag4coarsening_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::clawpatch_fort_tag4coarsening_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_tag4coarsening(mx,my,mbc,meqn,
      &      xlower,ylower,dx,dy, blockno, q0, q1, q2, q3,
      &      coarsen_threshold, initflag,tag_patch)
@@ -54,6 +63,24 @@ c     # not be coarsened.
 
       end
 
+c--------------------------------------------------------------------
+c> @brief Tests a single patch to see if it exceeds threshold
+c>
+c> @param[in] blockno the block number
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] mbc the number of ghost cells
+c> @param[in] meqn the number of equations
+c> @param[in] mq the equation to test
+c> @param[in] q the solution
+c> @param[in,out] qmin the minimum value in q
+c> @param[in,out] qmax the maximum value in q
+c> @param[in] dx, dy the spacings in the x and y directions
+c> @param[in] xlower, ylower the lower left coordinate of the patch
+c> @param[in] coarsen_threshold the threshold
+c> @param[in] init_flag true if in init stage
+c> @param[in,out] tag_patch passed in as [1] may be set to [0] if it
+c>                should not be coarsened
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_test_refine(blockno, mx,my,mbc,
      &                meqn,mq,q, qmin,qmax,dx,dy,xlower,ylower,
      &                coarsen_threshold,init_flag,tag_patch)

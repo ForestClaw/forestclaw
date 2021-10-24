@@ -138,7 +138,7 @@ void outstyle_1(fclaw2d_global_t *glob)
             if (dt_small < 0)
             {
                 /* May end up taking either larger or smaller step */
-                if (abs(dt_small) < tol*dt_step)
+                if (fabs(dt_small) < tol*dt_step)
                     dt_step = tend - t_curr;
                 //double p = dt_step/dt_step_fixed;
                 //fclaw_global_essentialf("Took modified time step; dt = %.4f (%.2f\%)\n",dt_step,p);

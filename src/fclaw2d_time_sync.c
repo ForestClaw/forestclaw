@@ -31,6 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 #include <fclaw2d_exchange.h>
 
+typedef struct fclaw2d_time_sync_info
+{
+    /** The type of reset to perform */
+    fclaw2d_time_sync_type_t reset_mode;
+    /** The type of reset to perform */
+    int coarse_level;
+    /** The type of reset to perform */
+    int minlevel;
+} fclaw2d_time_sync_info_t;
+
+
 
 
 static 

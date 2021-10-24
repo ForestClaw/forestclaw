@@ -1,30 +1,18 @@
 c> \file
-c> \defgroup Averaging Average fine grids to a coarse grid
-c> Average cells from coarse grid to fine grid.
 c>
 c> Routines described here average are used to fill coarse grid ghost
 c> cells, and average sibling grids onto a parent grid.  Indices
 c> for cells at block boundaries are transformed using encodings
 c> stored in `transform_cptr`.
 c>
-c> \param [in] mx,my       Number of cells in x,y direction
-c> \param [in] mbc      Number of ghost cells
-c> \param [in] meqn     Number of equations
-c> \param [in] qcoarse,qfine  Solution on coarse,fine grid
-c> \param [in] areacoarse,areafine  Area of mesh cells on coarse,fine grids.
-c> \param [in] idir     Face orientation - 0 for x-faces; 1 for y-faces [0-1]
-c> \param [in] iface    Face number of fine grid [0-3].
-c> \param [in] iface_coarse Face number of coarse grid [0-3].
-c> \param [in] num_neighbors Number of fine grid neighbors [2].
-c> \param [in] refratio  Refinement ratio between coarse and fine grids [2].
-c> \param [in] manifold  Flag indicating whether we are on mapped grid [0-1].
-c> \param [in] transform_cptr  Encoding for indices at block boundaries (C only).
 
-c> \ingroup Averaging
-c> Average fine ghost cell values.
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_average_face_t
 c>
-c> Average fine grid interior values to neighboring ghost cell values of
-c> the coarse grid.
+c> Implementation for clawpack 4.6
+c>
+c> @details @copydetails ::clawpatch_fort_average_face_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_average_face(mx,my,mbc,meqn,
      &      qcoarse,qfine,areacoarse, areafine,
      &      idir,iface_coarse,num_neighbors,refratio,igrid,
@@ -188,8 +176,13 @@ c                       qcoarse(ic,jc,mq) = sum/kc
       end
 
 
-c> \ingroup Averaging
-c> Average across corners.
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_average_corner_t
+c>
+c> Implementation for clawpack 4.6
+c>
+c> @details @copydetails ::clawpatch_fort_average_corner_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_average_corner(mx,my,mbc,meqn,
      &      refratio,qcoarse,qfine,areacoarse,areafine,
      &      manifold,icorner_coarse,transform_cptr)
@@ -279,8 +272,13 @@ c                 qcoarse(i1,j1,mq) = sum/kc
       end
 
 
-c> \ingroup  Averaging
-c> Average fine grid siblings to parent coarse grid.
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_average2coarse_t
+c>
+c> Implementation for clawpack 4.6
+c>
+c> @details @copydetails ::clawpatch_fort_average2coarse_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_average2coarse(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse, areafine, igrid,manifold)
       implicit none

@@ -40,12 +40,29 @@ struct fclaw2d_glob;
 struct fclaw2d_patch;
 struct fclaw2d_patch_transform;
 
+/**
+ * @file
+ * This handles the boundary conditions at the block
+ * corners for the pillow sphere.
+ */
+
+/** typedef */
 typedef struct fclaw2d_clawpatch_pillow_vtable fclaw2d_clawpatch_pillow_vtable_t;
 
 
 /* ----------------------------- Fortran typedefs ------------------------------------- */
 
-#if FCLAW2D_PATCHDIM == 2
+/**
+ * @brief Handles the boundary condition at block corners
+ * 
+ * @param[in] my, my the number of cells in the x and y directions
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in,out] qthis this solution
+ * @param[in,out] qneighbor the neighbor solution
+ * @param[in] icorner the corner that the neighbor is on
+ * @param[in] iblock the block number
+ */
 typedef void (*pillow_fort_copy_block_corner_t)(int* mx, int* my,
                                                 int* mbc, int* meqn,
                                                 double qthis[], 
@@ -53,6 +70,20 @@ typedef void (*pillow_fort_copy_block_corner_t)(int* mx, int* my,
                                                 int* icorner,
                                                 int* iblock);
 
+/**
+ * @brief Handles the boundary condition at block corners with finer neighbors
+ * 
+ * @param[in] my, my the number of cells in the x and y directions
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in] refratio the refinement ratio
+ * @param[in,out] qcoarse this solution
+ * @param[in] qfine the neighbor solution
+ * @param[in] areacoarse cell areas
+ * @param[in] areafine neighbor cell areas
+ * @param[in] icorner the corner that the fine neighbor is on
+ * @param[in] blockno the block number
+ */
 typedef void  (*pillow_fort_average_block_corner_t)(int* mx, int* my, int* mbc,
                                                     int* meqn, 
                                                     int* refratio, 
@@ -60,16 +91,28 @@ typedef void  (*pillow_fort_average_block_corner_t)(int* mx, int* my, int* mbc,
                                                     double qfine[], 
                                                     double areacoarse[], 
                                                     double areafine[],
-                                                    int* a_coarse_corner,
+                                                    int* icorner,
                                                     int* blockno);
 
+/**
+ * @brief Handles the boundary condition at block corners with coarser neighbors
+ * 
+ * @param[in] my, my the number of cells in the x and y directions
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in] refratio the refinement ratio
+ * @param[in] qcoarse this solution
+ * @param[in,out] qfine the neighbor solution
+ * @param[in] icorner_coarse the corner that the fine neighbor is on
+ * @param[in] blockno the block number
+ */
 typedef void  (*pillow_fort_interpolate_block_corner_t)(int* mx, int* my, int* mbc,
                                                         int* meqn, int* refratio,
                                                         double qcoarse[],
                                                         double qfine[], 
                                                         int* icoarse_corner,
                                                         int* blockno);
-#elif FCLAW2D_PATCHDIM == 3
+#if 0
 typedef void (*pillow_fort_copy_block_corner_t)(const int* mx, 
                                                 const int* my,
                                                 const int *mz,
@@ -109,25 +152,45 @@ typedef void  (*pillow_fort_interpolate_block_corner_t)(const int* mx,
 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
 
+/**
+ * @brief Sets global patch_vtable to use pollow sphere routines
+ */
 void fclaw2d_clawpatch_use_pillowsphere();
 
 /* --------------------------------- Virtual table ------------------------------------ */
 
+/**
+ * @brief Initialize a global variable vtable
+ * 
+ * @param claw_version the clawaptck verstion 4 for v4.6, 5 for v5
+ */
 void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version);
 
+/**
+ * @brief vtable for handling block corners for pillow sphere
+ */
 struct fclaw2d_clawpatch_pillow_vtable
 {
     /* Block corners */
+    /** Handles the boundary condition at block corners */
     pillow_fort_copy_block_corner_t           fort_copy_block_corner;
+    /** Handles the boundary condition at block corners with finer neighbors */
     pillow_fort_average_block_corner_t        fort_average_block_corner;
+    /** Handles the boundary condition at block corners with coarser neighbors */
     pillow_fort_interpolate_block_corner_t    fort_interpolate_block_corner;
 
+    /** True if vtable is set */
     int is_set;
 };
 
 
 /* ------------------------------- Public access functions ---------------------------- */
 
+/**
+ * @brief Get the global vtable variable
+ * 
+ * @return fclaw2d_clawpatch_pillow_vtable_t* the vtable
+ */
 fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt();
 
 

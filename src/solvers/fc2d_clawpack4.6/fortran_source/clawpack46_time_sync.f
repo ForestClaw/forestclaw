@@ -1,25 +1,39 @@
-c    # ----------------------------------------------------------------
-c    # This file contains routines which accumulate fluxes, waves 
-c    # and add corrections to coarse grid at edges of both same size
-c    # grids and coarse/fine interfaces. 
-c    # 
-c    # 1. clawpack46_time_sync_store_flux (before step update)
-c    # 2. clawpack46_time_sync_accumulate_waves (after step update)
-c    # 3. clawpack46_fort_time_sync_f2c ()
-c    # 4. clawpack46_fort_time_sync_copy
-c    # ----------------------------------------------------------------
+c     ----------------------------------------------------------------
+c>    @file
+c>    Routines which accumulate fluxes, waves 
+c>    and add corrections to coarse grid at edges of both same size
+c>    grids and coarse/fine interfaces. 
+c>    
+c>    1. clawpack46_time_sync_store_flux (before step update)
+c>    2. clawpack46_time_sync_accumulate_waves (after step update)
+c>    3. clawpack46_fort_time_sync_f2c ()
+c>    4. clawpack46_fort_time_sync_copy
+c     ----------------------------------------------------------------
 
 
-c     # -----------------------------------------------------------------
-c     # Called BEFORE step update.  This stores the value of the flux
-c     # function at cell centers.  At k=0, the flux at the the first interior
-c     # interior cell is stored;  At k=1, the flux evaluated in the 
-c     # ghost cell is stored;    If there is no flux function, we should 
-c     # set up a dummy function that returns zero.
-c     # 
-c     # These will be stored for each grid and used to compute
-c     # corrections.
-c     # -----------------------------------------------------------------
+c     -----------------------------------------------------------------
+c> .  @brief This stores the value of the flux function at cell centers.
+c>
+c>    Called BEFORE step update. At k=0, the flux at the the first interior
+c>    interior cell is stored;  At k=1, the flux evaluated in the 
+c>    ghost cell is stored;  If there is no flux function, we should 
+c>    set up a dummy function that returns zero.
+c>    
+c>    These will be stored for each grid and used to compute
+c>    corrections.
+c> 
+c>    @param[in]     mx, my the number of cells in the x and y directions
+c>    @param[in]     mbc the number of ghost cells
+c>    @param[in]     meqn the number of ghost cells
+c>    @param[in]     maux the number of aux equations
+c>    @param[in]     blockno the block number
+c>    @param[in]     patchno the patch number
+c>    @param[in]     dt the time step size
+c>    @param[in]     el0, el1, el2, el3 the edge lengths along the edges
+c>    @param[in]     q the solution
+c>    @param[in]     aux aux array
+c>    @param[in,out] flux0, flux1, flux2, flux3 the values of the flux function
+c     -----------------------------------------------------------------
       subroutine clawpack46_time_sync_store_flux(mx,my,mbc,meqn,
      &     maux, blockno, patchno, dt,el0, el1, el2, el3,q, aux,
      &     flux0,flux1,flux2,flux3,
@@ -211,10 +225,32 @@ c     # dx or dy.
 
       end
 
-c    # -----------------------------------------------------------------
-c    # Add fine grid corrections to coarse grid.  
-c    # -----------------------------------------------------------------
-
+c     -----------------------------------------------------------------
+c>    Adds fine grid corrections to coarse grid.  
+c>
+c>    @param[in]     mx, my the number of cells in the x and y directions
+c>    @param[in]     mbc the number of ghost cells
+c>    @param[in]     meqn the number of ghost cells
+c>    @param[in]     idir the direction of the interface 0 for bottom/top 
+c>                   1 for left/right
+c>    @param[in]     iface_coarse the interface on the coarse patch
+c>    @param[in]     coarse_blockno the block number of the coarse patch
+c>    @param[in]     fine_blockno the block number of the fine patch
+c>    @param[in]     normal_match true if normals on coarse and fine patches match
+c>    @param[in]     area0, area1, area2, area3 area of cells along the 
+c>                   edges
+c>    @param[in,out] qcoarse the solution on the coarse patch
+c>    @param[in]     fpthis0, fmthis1, gpthis2, gmthis3 the fluxes along 
+c>                   the edges of the coarse patch
+c>    @param[in]     fmfine0, fmfine1, gpfine2, fpfine3 the fluxes along
+c>                   the dges of the fine patch
+c>    @param[in]     efthis0, efthis1, efthis2, efthis3 the values of the
+c>                   flux function along the coarse patch edges
+c>    @param[in]     eff0, eff1, eff2, eff3 the values of the flux 
+c>                   function along the fine patch edges
+c> .  @param[in,out] qfine_dummy work vector for determining values in the fine patch
+c>    @param[in]     transform_cptr the pointer to the fclaw2d_patch_transform_data struct
+c     -----------------------------------------------------------------
       subroutine clawpack46_fort_time_sync_f2c (mx,my,mbc,meqn,
      &                                          idir, iface_coarse,
      &                                          coarse_blockno,
@@ -462,10 +498,33 @@ c                    write(6,'(2I5, 2E24.16)') ic,jc,deltac,deltac/areac
       end
 
 
-c    # -----------------------------------------------------------------
-c    # Add wave corrections at same level interfaces.  This accounts for
-c    # metric mismatches that can occur at block boundaries.
-c    # -----------------------------------------------------------------
+c     -----------------------------------------------------------------
+c>    @brief Add wave corrections at same level interfaces.  
+c>
+c>    This accounts for metric mismatches that can occur at block boundaries.
+c>   
+c>    @param[in]     mx, my the number of cells in the x and y directions
+c>    @param[in]     mbc the number of ghost cells
+c>    @param[in]     meqn the number of ghost cells
+c>    @param[in]     idir the direction of the interface 0 for bottom/top 
+c>                   1 for left/right
+c>    @param[in]     iface_this the interface on the this patch
+c>    @param[in]     this_blockno the block number of the coarse patch
+c>    @param[in]     nbr_blockno the block number of the fine patch
+c>    @param[in]     area0, area1, area2, area3 area of cells along the 
+c>                   edges on this patch
+c>    @param[in,out] qthis the solution on this patch
+c>    @param[in]     fpthis0, fmthis1, gpthis2, gmthis3 the fluxes along 
+c>                   the edges of the this patch
+c>    @param[in]     fmfine0, fmfine1, gpfine2, fpfine3 the fluxes along
+c>                   the dges of the neighbor patch
+c>    @param[in]     efthis0, efthis1, efthis2, efthis3 the values of the
+c>                   flux function along the this patch edges
+c>    @param[in]     efnbr0, efnbr1, efnbr2, efnbr3 the values of the flux 
+c>                   function along the neighbor patch edges
+c>    @param[in,out] qnbr_dummy work vector for determining values in the fine patch
+c>    @param[in]     transform_cptr the pointer to the fclaw2d_patch_transform_data struct
+c     -----------------------------------------------------------------
       subroutine clawpack46_fort_time_sync_samesize(mx,my,mbc,meqn,
      &                                          idir, this_iface,
      &                                          this_blockno, 

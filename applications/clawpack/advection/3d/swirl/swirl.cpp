@@ -101,11 +101,11 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     /* Options */
-    sc_options_t                *options;
-    user_options_t              *user_opt;
-    fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
-    fc3d_clawpack46_options_t     *claw46_opt;
+    sc_options_t                 *options;
+    user_options_t               *user_opt;
+    fclaw_options_t              *fclaw_opt;
+    fclaw3dx_clawpatch_options_t *clawpatch_opt;
+    fc3d_clawpack46_options_t    *claw46_opt;
 
     fclaw2d_global_t            *glob;
     fclaw2d_domain_t            *domain;
@@ -118,7 +118,7 @@ main (int argc, char **argv)
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
+    clawpatch_opt =  fclaw3dx_clawpatch_options_register(app,"fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app,"fclaw_options.ini");
     user_opt =                    swirl_options_register(app,"fclaw_options.ini");  
 
@@ -141,7 +141,7 @@ main (int argc, char **argv)
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
-        fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw3dx_clawpatch_options_store(glob, clawpatch_opt);
         fc3d_clawpack46_options_store   (glob, claw46_opt);
         swirl_options_store             (glob, user_opt);
 

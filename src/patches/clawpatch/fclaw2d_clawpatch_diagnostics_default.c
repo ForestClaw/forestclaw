@@ -22,12 +22,31 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef REFINE_DIM
+#define REFINE_DIM 2
+#endif
+
+#ifndef PATCH_DIM
+#define PATCH_DIM 2
+#endif
+
+#if REFINE_DIM == 2 && PATCH_DIM == 2
 
 #include <fclaw2d_clawpatch_diagnostics.h>
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
 
+#elif REFINE_DIM == 2 && PATCH_DIM == 3
+
+#include <fclaw3dx_clawpatch_diagnostics.h>
+
+#include <fclaw3dx_clawpatch.h>
+#include <fclaw3dx_clawpatch_options.h>
+
+#include <_fclaw2d_to_fclaw3dx.h>
+
+#endif
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_options.h>
@@ -52,7 +71,7 @@ void fclaw2d_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
 
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
-#if FCLAW2D_PATCHDIM == 2
+#if PATCH_DIM == 2
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy,
@@ -96,7 +115,7 @@ void fclaw2d_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
 
         int mx, my, mbc;
         double xlower,ylower,dx,dy;
-#if FCLAW2D_PATCHDIM == 2        
+#if PATCH_DIM == 2        
         fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
 
         clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,&meqn,&dx,&dy,
@@ -107,7 +126,7 @@ void fclaw2d_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
         clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &meqn, 
                                               &dx,&dy, area, error,
                                               error_data->local_error);
-#elif FCLAW2D_PATCHDIM == 3
+#elif PATCH_DIM == 3
         int mz;
         double zlower, dz;
         fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, 

@@ -38,20 +38,35 @@ extern "C"
 
 struct fclaw2d_global;
 
+/** 
+ *  @file
+ *  Routines that add corrections from fine grids to coarse grids when timesteps are synced.
+ */
+
+/**
+ * @brief The type of reset to perform
+ */
 typedef enum fclaw2d_time_sync_type
-{
-    FCLAW2D_TIME_SYNC_RESET_F2C = 1,   /* Reset registers at c/f boundaries */
-    FCLAW2D_TIME_SYNC_RESET_SAMESIZE,  /* Reset registers between same size grids */
-    FCLAW2D_TIME_SYNC_RESET_PHYS       /* Reset registers at physical boundary */
+{   /** Reset registers at coarse-fine boundaries */
+    FCLAW2D_TIME_SYNC_RESET_F2C = 1,   
+    /** Reset registers between same size grids */
+    FCLAW2D_TIME_SYNC_RESET_SAMESIZE,  
+    /** Reset registers at physical boundary */
+    FCLAW2D_TIME_SYNC_RESET_PHYS             
 } fclaw2d_time_sync_type_t;
 
-typedef struct fclaw2d_time_sync_info
-{
-    fclaw2d_time_sync_type_t reset_mode;
-    int coarse_level;
-    int minlevel;
-} fclaw2d_time_sync_info_t;
 
+/**
+ * @brief Add corrections from  fine grids to coarse grid.  
+ * This is is done when two or more levels are time synchronized.
+ *	   - All parallel patches are valid 
+ *	   - Iterate over boundary patches only, since correction occurs
+ *	     only at coarse/fine boundaries.
+ * 
+ * @param glob the global context
+ * @param minlevel the minimum level
+ * @param maxlevel the maximmum level
+ */
 void fclaw2d_time_sync(struct fclaw2d_global *glob, int minlevel, int maxlevel);
 
 

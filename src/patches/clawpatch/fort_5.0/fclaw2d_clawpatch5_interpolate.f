@@ -1,26 +1,31 @@
-c     # ----------------------------------------------------------
-c     # Interpolation routines - (i,j,mq) ordering
-c     # ----------------------------------------------------------
-c     # interpolate_face_ghost
-c     # interpolate_corner_ghost
-c     # interpolate_to_fine_patch
-c     #
-c     # Other routines :
-c     # fclaw2d_clawpatch_compute_slopes (for limited function reconstruction)
-c     # fixcapaq (to preserve conservation)
-c     #
-c     # Note that fixcapaq is only used when regridding;  ghost
-c     # cell interpolation is not conservative in the mapped case.
-c     # (Should it be?  We are going to correct the flux mixmatch
-c     # anyhow, so maybe the accuracy of the ghost cell values is
-c     # more important.)
-c     # ----------------------------------------------------------
+c ----------------------------------------------------------
+c> @file
+c> Interpolation routines - (i,j,mq) ordering
+c ----------------------------------------------------------
+c interpolate_face_ghost
+c interpolate_corner_ghost
+c interpolate_to_fine_patch
+c
+c Other routines :
+c fclaw2d_clawpatch_compute_slopes (for limited function reconstruction)
+c fixcapaq (to preserve conservation)
+c
+c Note that fixcapaq is only used when regridding;  ghost
+c cell interpolation is not conservative in the mapped case.
+c (Should it be?  We are going to correct the flux mixmatch
+c anyhow, so maybe the accuracy of the ghost cell values is
+c more important.)
+c ----------------------------------------------------------
 
 
-c     # ----------------------------------------------------------
-c     # This routine is used for both mapped and non-mapped
-c     # cases.
-c     # ----------------------------------------------------------
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_interpolate_face_t
+c>
+c> Implementation for clawpack 5.
+c> This routine is used for both mapped and non-mapped cases.
+c>
+c> @details @copydetails ::clawpatch_fort_interpolate_face_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_interpolate_face(mx,my,mbc,
      &      meqn, qcoarse,qfine, idir,iface_coarse,num_neighbors,
      & refratio,igrid,transform_ptr)
@@ -186,6 +191,13 @@ c              # ---------------------------------------------
 
       end
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_interpolate_corner_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::clawpatch_fort_interpolate_corner_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_interpolate_corner(mx,my,
      &      mbc,meqn,refratio, qcoarse,qfine,icorner_coarse,
      &      transform_ptr)
@@ -290,7 +302,13 @@ c        # Scaling is accounted for in 'shiftx' and 'shifty', below.
 
       end
 
-c     # Conservative intepolation to fine grid patch
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_interpolate2fine_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::clawpatch_fort_interpolate2fine_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_interpolate2fine(mx,my,mbc,
      &    meqn, qcoarse, qfine, areacoarse, areafine, igrid, manifold)
       implicit none
@@ -369,11 +387,22 @@ c              # Fill in refined values on coarse grid cell (ic,jc)
       end
 
 
-c     # ------------------------------------------------------
-c     # So far, this is only used by the interpolation from
-c     # coarse to fine when regridding.  But maybe it should
-c     # be used by the ghost cell routines as well?
-c     # ------------------------------------------------------
+c--------------------------------------------------------------------
+c> @brief ensures interpolated fine grid has same mass as coarse grid
+c>
+c> So far, this is only used by the interpolation from
+c> coarse to fine when regridding.  But maybe it should
+c> be used by the ghost cell routines as well?
+c>
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] mbc the number of ghost cells
+c> @param[in] meqn the number of equations
+c> @param[in] qcoarse the coarse solution
+c> @param[in,out] qfine the interpolated fine solution, update for 
+c>                conservation
+c> @param[in] areacoarse, areafine the areas of the fine and coarse grids
+c> @param[in] igrid the index of the fine grid in the child array
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_fixcapaq2(mx,my,mbc,meqn,
      &      qcoarse,qfine, areacoarse,areafine,igrid)
       implicit none
