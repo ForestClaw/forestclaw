@@ -797,6 +797,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
 /*  --------------------------------------------------------------------------
     Used for debugging
     ------------------------------------------------------------------------- */
+#if 0
 static void
 fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 {
@@ -813,6 +814,7 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
                                    fclaw2d_output_vtk_coordinate_cb,
                                    fclaw2d_output_vtk_value_cb);
 }
+#endif
 
 
 /*  ---------------------------------------------------------------------------

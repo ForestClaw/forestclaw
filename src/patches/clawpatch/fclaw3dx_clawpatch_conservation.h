@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,9 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
 #endif
 
 struct fclaw2d_patch_transform_data;
@@ -301,9 +298,6 @@ void fclaw3dx_clawpatch_time_sync_pack_registers(struct fclaw2d_global *glob,
                                                 int *ierror);
 
 #ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
 }
 #endif
 

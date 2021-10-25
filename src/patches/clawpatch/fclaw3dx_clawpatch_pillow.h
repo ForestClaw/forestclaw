@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
 #endif
 
 struct fclaw2d_glob;
@@ -63,14 +60,16 @@ typedef struct fclaw3dx_clawpatch_pillow_vtable fclaw3dx_clawpatch_pillow_vtable
  * @param[in] icorner the corner that the neighbor is on
  * @param[in] iblock the block number
  */
-typedef void (*fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t)
-                                               (int* mx, int* my, int* mz,
-                                                int* mbc, int* meqn,
-                                                double qthis[], 
-                                                double qneighbor[], 
-                                                int* icorner,
-                                                int* iblock);
-
+typedef void (*fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t)(int* mx, 
+                                                                   int* my, 
+                                                                   int* mz,
+                                                                   int* mbc, 
+                                                                   int* meqn,
+                                                                   double qthis[], 
+                                                                   double qneighbor[], 
+                                                                   int* icorner,
+                                                                   int* iblock);
+    
 /**
  * @brief Handles the boundary condition at block corners with finer neighbors
  * 
@@ -86,18 +85,19 @@ typedef void (*fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t)
  * @param[in] icorner the corner that the fine neighbor is on
  * @param[in] blockno the block number
  */
-typedef void  (*fclaw3dx_clawpatch_pillow_fort_average_block_corner_t)
-                                                   (int* mx, int* my, int* mz,
-                                                    double* dz,
-                                                    int* mbc,
-                                                    int* meqn, 
-                                                    int* refratio, 
-                                                    double qcoarse[],
-                                                    double qfine[], 
-                                                    double areacoarse[], 
-                                                    double areafine[],
-                                                    int* icorner,
-                                                    int* blockno);
+typedef void  (*fclaw3dx_clawpatch_pillow_fort_average_block_corner_t)(int* mx, 
+                                                                       int* my, 
+                                                                       int* mz,
+                                                                       double* dz,
+                                                                       int* mbc,
+                                                                       int* meqn, 
+                                                                       int* refratio, 
+                                                                       double qcoarse[],
+                                                                       double qfine[], 
+                                                                       double areacoarse[], 
+                                                                       double areafine[],
+                                                                       int* icorner,
+                                                                       int* blockno);
 
 /**
  * @brief Handles the boundary condition at block corners with coarser neighbors
@@ -111,15 +111,17 @@ typedef void  (*fclaw3dx_clawpatch_pillow_fort_average_block_corner_t)
  * @param[in] icorner_coarse the corner that the fine neighbor is on
  * @param[in] blockno the block number
  */
-typedef void  (*fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t)
-                                                       (int* mx, int* my, int* mz,
-                                                        int* mbc, int* meqn, 
-                                                        int* refratio,
-                                                        double qcoarse[],
-                                                        double qfine[], 
-                                                        int* icoarse_corner,
-                                                        int* blockno);
-
+typedef void  (*fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t)(int* mx, 
+                                                                           int* my, 
+                                                                           int* mz,
+                                                                           int* mbc, 
+                                                                           int* meqn, 
+                                                                           int* refratio,
+                                                                           double qcoarse[],
+                                                                           double qfine[], 
+                                                                           int* icoarse_corner,
+                                                                           int* blockno);
+    
 /* ----------------------------- Use pillow sphere ------------------------------------ */
 
 /**
@@ -165,9 +167,6 @@ fclaw3dx_clawpatch_pillow_vtable_t* fclaw3dx_clawpatch_pillow_vt();
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

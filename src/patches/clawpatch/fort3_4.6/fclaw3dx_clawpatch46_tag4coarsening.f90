@@ -59,9 +59,9 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
     double precision :: qmin,qmax, dx, dy, dz, xlower, ylower,zlower
     double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    double precision :: xc,yc,quad(-1:1,-1:1),qval
+    double precision :: xc,yc,zc, quad(-1:1,-1:1,-1:1),qval
 
-    integer i,j, k, ii, jj
+    integer i,j, k, ii, jj,kk
 
     integer :: exceeds_th, fclaw3dx_clawpatch_exceeds_threshold
     logical(kind=4) :: is_ghost, clawpatch3_is_ghost
@@ -69,9 +69,10 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
 
     do k = 1,mz
         do i = 1-mbc,mx+mbc
-            do j = 1-mbc,my+mbc
+            do j = 1-mbc,my+mbc                
                 xc = xlower + (i-0.5)*dx
                 yc = ylower + (j-0.5)*dy
+                zc = zlower + (k-0.5)*dz
                 qmin = min(q(i,j,k,mq),qmin)
                 qmax = max(q(i,j,k,mq),qmax)
                 qval = q(i,j,k,mq)
@@ -79,12 +80,14 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
                 if (.not. is_ghost) then
                     do ii = -1,1               
                         do jj = -1,1
-                            quad(ii,jj) = q(i+ii,j+jj,k,mq)
+                            do kk = -1,1
+                                quad(ii,jj,kk) = q(i+ii,j+jj,k+kk,mq)
+                            end do
                         end do
                     end do
                 endif
                 exceeds_th = fclaw3dx_clawpatch_exceeds_threshold( & 
-                    blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,  &
+                    blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc,  &
                     coarsen_threshold, init_flag, is_ghost)
             
                 !! # -1 : Not conclusive (possibly ghost cell) (do not tag for coarsening)

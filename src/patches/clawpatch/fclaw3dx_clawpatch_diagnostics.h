@@ -34,9 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 struct fclaw2d_global;
@@ -141,9 +138,6 @@ void fclaw3dx_clawpatch_diagnostics_error_default(struct fclaw2d_global *glob,
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

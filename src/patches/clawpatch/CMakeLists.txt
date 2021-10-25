@@ -9,6 +9,10 @@ add_library(clawpatch_f OBJECT
   fort_user/fclaw2d_clawpatch_value_exceeds_th.f90
   fort_user/fclaw2d_clawpatch_minmax_exceeds_th.f90
   fort_user/fclaw2d_clawpatch_gradient_exceeds_th.f90
+  fort3_user/fclaw3dx_clawpatch_difference_exceeds_th.f90
+  fort3_user/fclaw3dx_clawpatch_value_exceeds_th.f90
+  fort3_user/fclaw3dx_clawpatch_minmax_exceeds_th.f90
+  fort3_user/fclaw3dx_clawpatch_gradient_exceeds_th.f90
   fort_4.6/fclaw2d_clawpatch46_average.f 
   fort_4.6/fclaw2d_clawpatch46_copy.f 
   fort_4.6/fclaw2d_clawpatch46_interpolate.f 
@@ -77,7 +81,7 @@ add_library(clawpatch
   fclaw3dx_clawpatch_conservation.c
 
   fort_user/fclaw2d_clawpatch_exceeds_threshold.c
-  fort_user/fclaw3dx_clawpatch_exceeds_threshold.c
+  fort3_user/fclaw3dx_clawpatch_exceeds_threshold.c
   ${metric}/fclaw2d_metric.cpp 
   ${metric}/fclaw2d_metric_default.c
 )
