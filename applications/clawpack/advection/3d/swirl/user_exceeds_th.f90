@@ -2,13 +2,13 @@
 
 integer function user_exceeds_th(blockno,& 
                                   qval,qmin,qmax,quad, & 
-                                  dx,dy,xc,yc,threshold, &
+                                  dx,dy,dz,xc,yc,zc,threshold, &
                                   init_flag, is_ghost)
     implicit none
     
     double precision :: qval,qmin,qmax,threshold
-    double precision :: quad(-1:1,-1:1)
-    double precision :: dx,dy, xc, yc
+    double precision :: quad(-1:1,-1:1,-1:1)
+    double precision :: dx,dy, dz, xc, yc, zc
     integer :: blockno, init_flag
     logical(kind=4) :: is_ghost
     integer :: refine

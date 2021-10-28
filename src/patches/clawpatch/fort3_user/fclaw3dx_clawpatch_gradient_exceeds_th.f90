@@ -29,12 +29,11 @@ integer function fclaw3dx_clawpatch_gradient_exceeds_th(blockno,&
     logical(kind=4) :: is_ghost
 
     double precision :: dqx, dqy, dqz
-    double precision :: grad(3), dx2, dy2, dz2, d, ds
+    double precision :: grad(3), dx2, dy2, dz2, ds
 
 
     double precision :: clawpatch_gradient_dot3
     integer :: refine
-    integer :: m
 
     if (is_ghost) then
 !!      # quad may have uninitialized values.  Test is inconclusive
