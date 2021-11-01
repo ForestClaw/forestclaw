@@ -1179,7 +1179,7 @@ void clawpatch_partition_unpack(fclaw2d_global_t *glob,
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
 {
-	FCLAW_ASSERT(s_clawpatch_vt.is_set == 0);
+	//FCLAW_ASSERT(s_clawpatch_vt.is_set == 0);
 	return &s_clawpatch_vt;
 }
 

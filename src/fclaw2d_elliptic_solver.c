@@ -125,7 +125,7 @@ void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
 static
 fclaw2d_elliptic_vtable_t* elliptic_vt_init()
 {
-    FCLAW_ASSERT(s_elliptic_vt.is_set == 0);
+    //FCLAW_ASSERT(s_elliptic_vt.is_set == 0);
     return &s_elliptic_vt;
 }
 

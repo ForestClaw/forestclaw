@@ -51,7 +51,7 @@ static int s_refine_criteria = -1;
 
 void fclaw2d_clawpatch_set_refinement_criteria(int r)
 {
-    FCLAW_ASSERT(s_refine_criteria == -1);
+    //FCLAW_ASSERT(s_refine_criteria == -1);
     s_refine_criteria = r;
 }
 
@@ -266,7 +266,7 @@ fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob,
 {
     int id;
 
-    FCLAW_ASSERT(s_clawpatch_options_package_id == -1);
+    //FCLAW_ASSERT(s_clawpatch_options_package_id == -1);
     id = fclaw_package_container_add_pkg(glob,
                                          clawpatch_options);
     s_clawpatch_options_package_id = id;

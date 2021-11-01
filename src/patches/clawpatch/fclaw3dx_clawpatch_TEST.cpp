@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <bitset>
 
+#include <fclaw2d_forestclaw.h>
+
 #define CHECK_BOX_DIMENSIONS(abox, mbc, mx, my, mz, mfields)\
 {\
     CHECK(abox.fields() == mfields);\
@@ -158,6 +160,9 @@ struct QuadDomain {
 }
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new();
+    fclaw2d_vtables_initialize(glob);
+
     fclaw3dx_clawpatch_vtable_initialize(4);
 
     fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt();
@@ -210,11 +215,15 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize","[fclaw3dx][clawpatch]")
     CHECK(patch_vt->build                          != NULL);
     CHECK(patch_vt->build_from_fine                != NULL);
     CHECK(patch_vt->setup                          == NULL);
+    fclaw2d_global_destroy(glob);
 }
 TEST_CASE("fclaw3dx_clawpatch patch_build","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     fclaw3dx_clawpatch_vtable_initialize(4);
-    fclaw2d_global_t* glob = fclaw2d_global_new();
+
     fclaw_options_t fopts;
     memset(&fopts, 0, sizeof(fopts));
     fopts.mi=1;
@@ -310,6 +319,9 @@ TEST_CASE("fclaw3dx_clawpatch patch_build","[fclaw3dx][clawpatch]")
 
 TEST_CASE("fclaw3dx_clawpatch save_step","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -317,10 +329,14 @@ TEST_CASE("fclaw3dx_clawpatch save_step","[fclaw3dx][clawpatch]")
     cp->griddata.dataPtr()[0] = 1234;
     fclaw2d_patch_save_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
     CHECK(cp->griddata_save.dataPtr()[0] == 1234);
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_save_current_step","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -330,10 +346,14 @@ TEST_CASE("fclaw3dx_clawpatch_save_current_step","[fclaw3dx][clawpatch]")
     fclaw3dx_clawpatch_save_current_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
     CHECK(cp->griddata_last.dataPtr()[0] == 1234);
 
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch restore_step","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -342,10 +362,15 @@ TEST_CASE("fclaw3dx_clawpatch restore_step","[fclaw3dx][clawpatch]")
     cp->griddata_save.dataPtr()[0] = 1234;
     fclaw2d_patch_restore_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
     CHECK(cp->griddata.dataPtr()[0] == 1234);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch get_metric_patch","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -353,30 +378,44 @@ TEST_CASE("fclaw3dx_clawpatch get_metric_patch","[fclaw3dx][clawpatch]")
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     CHECK(fclaw2d_patch_metric_patch(&test_data.domain->blocks[0].patches[0]) == cp->mp);
 
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_metric_patch","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
     //CHECK
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     CHECK(fclaw3dx_clawpatch_get_metric_patch(&test_data.domain->blocks[0].patches[0]) == cp->mp);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_area","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
     //CHECK
     fclaw2d_metric_patch_t* mp = fclaw3dx_clawpatch_get_metric_patch(&test_data.domain->blocks[0].patches[0]);
     CHECK(fclaw3dx_clawpatch_get_area(test_data.glob, &test_data.domain->blocks[0].patches[0]) == mp->area.dataPtr());
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_grid_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.opts.mx   = GENERATE(4,5,6);
     test_data.opts.my   = GENERATE(4,5,6);
@@ -401,10 +440,15 @@ TEST_CASE("fclaw3dx_clawpatch_grid_data","[fclaw3dx][clawpatch]")
     CHECK(dx == cp->dx);
     CHECK(dy == cp->dy);
     CHECK(dz == cp->dz);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_aux_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -416,10 +460,15 @@ TEST_CASE("fclaw3dx_clawpatch_aux_data","[fclaw3dx][clawpatch]")
 
     CHECK(aux == cp->aux.dataPtr());
     CHECK(maux == test_data.opts.maux);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_soln_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -431,10 +480,15 @@ TEST_CASE("fclaw3dx_clawpatch_soln_data","[fclaw3dx][clawpatch]")
 
     CHECK(q == cp->griddata.dataPtr());
     CHECK(meqn == test_data.opts.meqn);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_rhs_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -446,10 +500,15 @@ TEST_CASE("fclaw3dx_clawpatch_rhs_data","[fclaw3dx][clawpatch]")
 
     CHECK(rhs == cp->rhs.dataPtr());
     CHECK(mfields == test_data.opts.rhs_fields);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_elliptic_error_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -461,10 +520,15 @@ TEST_CASE("fclaw3dx_clawpatch_elliptic_error_data","[fclaw3dx][clawpatch]")
 
     CHECK(rhs == cp->elliptic_error.dataPtr());
     CHECK(mfields == test_data.opts.rhs_fields);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_elliptic_soln_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -476,10 +540,15 @@ TEST_CASE("fclaw3dx_clawpatch_elliptic_soln_data","[fclaw3dx][clawpatch]")
 
     CHECK(rhs == cp->elliptic_soln.dataPtr());
     CHECK(mfields == test_data.opts.rhs_fields);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_q","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -487,10 +556,15 @@ TEST_CASE("fclaw3dx_clawpatch_get_q","[fclaw3dx][clawpatch]")
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
     CHECK(fclaw3dx_clawpatch_get_q(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->griddata.dataPtr());
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_registers","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -498,10 +572,15 @@ TEST_CASE("fclaw3dx_clawpatch_get_registers","[fclaw3dx][clawpatch]")
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
     CHECK(fclaw3dx_clawpatch_get_registers(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->registers);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_error","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -509,10 +588,15 @@ TEST_CASE("fclaw3dx_clawpatch_get_error","[fclaw3dx][clawpatch]")
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
     CHECK(fclaw3dx_clawpatch_get_error(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->griderror.dataPtr());
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_exact_soln","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -520,9 +604,14 @@ TEST_CASE("fclaw3dx_clawpatch_get_exact_soln","[fclaw3dx][clawpatch]")
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
     CHECK(fclaw3dx_clawpatch_get_exactsoln(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->exactsolution.dataPtr());
+
+    fclaw2d_global_destroy(glob);
 }
 TEST_CASE("fclaw3dx_clawpatch_timesync_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -539,9 +628,14 @@ TEST_CASE("fclaw3dx_clawpatch_timesync_data","[fclaw3dx][clawpatch]")
         CHECK(q == cp->griddata.dataPtr());
     }
     CHECK(meqn == test_data.opts.meqn);
+
+    fclaw2d_global_destroy(glob);
 }
 TEST_CASE("fclaw3dx_clawpatch_get_q_timesync","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -554,9 +648,14 @@ TEST_CASE("fclaw3dx_clawpatch_get_q_timesync","[fclaw3dx][clawpatch]")
     } else {
         CHECK(fclaw3dx_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata.dataPtr());
     }
+
+    fclaw2d_global_destroy(glob);
 }
 TEST_CASE("fclaw3dx_clawpatch user_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -564,9 +663,14 @@ TEST_CASE("fclaw3dx_clawpatch user_data","[fclaw3dx][clawpatch]")
     void* user_data = (void *) 1234;
     fclaw3dx_clawpatch_set_user_data(test_data.glob, &test_data.domain->blocks[0].patches[0],user_data);
     CHECK(fclaw3dx_clawpatch_get_user_data(test_data.glob,&test_data.domain->blocks[0].patches[0]) == user_data);
+
+    fclaw2d_global_destroy(glob);
 }
 TEST_CASE("fclaw3dx_clawpatch solver_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -574,10 +678,14 @@ TEST_CASE("fclaw3dx_clawpatch solver_data","[fclaw3dx][clawpatch]")
     void* user_data = (void *) 1234;
     fclaw3dx_clawpatch_set_solver_data(test_data.glob, &test_data.domain->blocks[0].patches[0],user_data);
     CHECK(fclaw3dx_clawpatch_get_solver_data(test_data.glob,&test_data.domain->blocks[0].patches[0]) == user_data);
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_size","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.opts.mx   = GENERATE(4,5,6);
     test_data.opts.my   = GENERATE(4,5,6);
@@ -594,10 +702,15 @@ TEST_CASE("fclaw3dx_clawpatch_size","[fclaw3dx][clawpatch]")
 
     //CHECK
     CHECK(fclaw3dx_clawpatch_size(test_data.glob) == (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_metric_scalar","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -611,10 +724,15 @@ TEST_CASE("fclaw3dx_clawpatch_metric_scalar","[fclaw3dx][clawpatch]")
     CHECK(mp_area == area);
     CHECK(mp_edgelengths == edgelengths);
     CHECK(mp_curvature == curvature);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_metric_vector","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -636,10 +754,15 @@ TEST_CASE("fclaw3dx_clawpatch_metric_vector","[fclaw3dx][clawpatch]")
     CHECK(mp_xtangents == xtangents);
     CHECK(mp_ytangents == ytangents);
     CHECK(mp_curvature == curvature);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_metric_data","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -663,10 +786,15 @@ TEST_CASE("fclaw3dx_clawpatch_metric_data","[fclaw3dx][clawpatch]")
     CHECK(mp_yd == yd);
     CHECK(mp_zd == zd);
     CHECK(mp_area == area);
+
+    fclaw2d_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_metric_data2","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.setup();
 
@@ -690,6 +818,8 @@ TEST_CASE("fclaw3dx_clawpatch_metric_data2","[fclaw3dx][clawpatch]")
     CHECK(mp_surfnormals == surfnormals);
     CHECK(mp_edgelengths == edgelengths);
     CHECK(mp_curvature == curvature);
+
+    fclaw2d_global_destroy(glob);
 }
 namespace{
     double timeinterp_alpha;
@@ -698,6 +828,9 @@ namespace{
 }
 TEST_CASE("fclaw3dx_clawpatch setup_timeinterp","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.opts.interp_stencil_width=2;
     timeinterp_mint = 2;
@@ -729,6 +862,7 @@ TEST_CASE("fclaw3dx_clawpatch setup_timeinterp","[fclaw3dx][clawpatch]")
 
     fclaw2d_patch_setup_timeinterp(test_data.glob, &test_data.domain->blocks[0].patches[0], 
                                    timeinterp_alpha);
+    fclaw2d_global_destroy(glob);
 }
 namespace{
     fclaw3dx_clawpatch_t* t4r_cp;
@@ -737,6 +871,9 @@ namespace{
 }
 TEST_CASE("fclaw3dx_clawpatch tag4refinement","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.fopts.refine_threshold = 0.90210;
     test_data.setup();
@@ -776,9 +913,13 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement","[fclaw3dx][clawpatch]")
 
     CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == t4r_tag_patch);
                                     
+    fclaw2d_global_destroy(glob);
 }
 TEST_CASE("fclaw3dx_clawpatch tag4refinement negative refine threshold","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     SinglePatchDomain test_data;
     test_data.fopts.refine_threshold = -0.90210;
     test_data.setup();
@@ -786,6 +927,8 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement negative refine threshold","[fclaw3
     t4r_init_flag = GENERATE(true,false);
 
     CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == true);
+
+    fclaw2d_global_destroy(glob);
 }
 namespace{
     fclaw3dx_clawpatch_t* t4c_cp;
@@ -797,6 +940,9 @@ namespace{
 }
 TEST_CASE("fclaw3dx_clawpatch tag4coarsening","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     QuadDomain test_data;
     test_data.fopts.coarsen_threshold = 0.90210;
     test_data.setup();
@@ -842,9 +988,14 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening","[fclaw3dx][clawpatch]")
 
     CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == t4c_tag_patch);
                                     
+
+    fclaw2d_global_destroy(glob);
 }
 TEST_CASE("fclaw3dx_clawpatch tag4coarsening negative coarsen threshold","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     QuadDomain test_data;
     test_data.fopts.coarsen_threshold = -0.90210;
     test_data.setup();
@@ -852,6 +1003,8 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening negative coarsen threshold","[fclaw
     t4c_init_flag = GENERATE(true,false);
 
     CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == false);
+
+    fclaw2d_global_destroy(glob);
 }
 namespace{
     fclaw3dx_clawpatch_t* i2f_ccp;
@@ -864,6 +1017,9 @@ namespace{
 }
 TEST_CASE("fclaw3dx_clawpatch interpolate2fine","[fclaw3dx][clawpatch]")
 {
+    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw2d_vtables_initialize(glob);
+
     i2f_manifold = GENERATE(false);
 
     QuadDomain fine_test_data;
@@ -924,4 +1080,5 @@ TEST_CASE("fclaw3dx_clawpatch interpolate2fine","[fclaw3dx][clawpatch]")
 
     CHECK(i2f_igrids.all());
                                     
+    fclaw2d_global_destroy(glob);
 }

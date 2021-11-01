@@ -36,7 +36,7 @@ static fclaw2d_diagnostics_vtable_t s_diag_vt;
 static
 fclaw2d_diagnostics_vtable_t* diagnostics_vt_init()
 {
-    FCLAW_ASSERT(s_diag_vt.is_set == 0);  /* static storage --> is_set == 0 by default */
+    //FCLAW_ASSERT(s_diag_vt.is_set == 0);  /* static storage --> is_set == 0 by default */
     return &s_diag_vt;
 }
 

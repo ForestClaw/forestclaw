@@ -206,7 +206,7 @@ void fclaw2d_clawpatch_use_pillowsphere()
 static
 fclaw2d_clawpatch_pillow_vtable_t* pillow_vt_init()
 {
-    FCLAW_ASSERT(s_clawpatch_pillow_vt.is_set == 0);
+    //FCLAW_ASSERT(s_clawpatch_pillow_vt.is_set == 0);
     return &s_clawpatch_pillow_vt;
 }
 
