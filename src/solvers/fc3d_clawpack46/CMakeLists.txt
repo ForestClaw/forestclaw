@@ -37,7 +37,7 @@ install(FILES
 	fc3d_clawpack46.h
   fc3d_clawpack46_fort.h 
 	fc3d_clawpack46_options.h
-  fc3d_clawpack46_fort_user.h 
+  fc3d_clawpack46_user_fort.h 
 DESTINATION include
 )
 
