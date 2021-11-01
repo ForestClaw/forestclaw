@@ -38,7 +38,7 @@ void fclaw2d_options_store (fclaw2d_global_t *glob, fclaw_options_t* gparms)
 {
     int id;
 
-    FCLAW_ASSERT(s_fclaw2d_options_package_id == -1);
+    //FCLAW_ASSERT(s_fclaw2d_options_package_id == -1);
     id = fclaw_package_container_add_pkg(glob,gparms);
     s_fclaw2d_options_package_id = id;
 }

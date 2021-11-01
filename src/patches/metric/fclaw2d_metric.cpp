@@ -239,7 +239,7 @@ void fclaw2d_metric_patch_setup_from_fine(fclaw2d_global_t *glob,
 static
 fclaw2d_metric_vtable_t* metric_vt_init()
 {
-    FCLAW_ASSERT(s_metric_vt.is_set == 0);
+    //FCLAW_ASSERT(s_metric_vt.is_set == 0);
     return &s_metric_vt;
 }
 

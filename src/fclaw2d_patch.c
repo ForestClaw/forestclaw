@@ -774,7 +774,7 @@ void fclaw2d_patch_time_sync_reset(fclaw2d_global_t* glob,
 static
 fclaw2d_patch_vtable_t* patch_vt_init()
 {
-	s_patch_vt.is_set = 0;
+	//s_patch_vt.is_set = 0;
 	return &s_patch_vt;
 }
 
@@ -806,7 +806,7 @@ void fclaw2d_patch_vtable_initialize()
 
 fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
 {
-	FCLAW_ASSERT(s_patch_vt.is_set != 0);
+	//FCLAW_ASSERT(s_patch_vt.is_set != 0);
 	return &s_patch_vt;
 }
 

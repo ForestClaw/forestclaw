@@ -387,7 +387,7 @@ void gauge_finalize(fclaw2d_global_t *glob, void** acc)
 static
 fclaw_gauges_vtable_t* fclaw_gauges_vt_init()
 {
-    FCLAW_ASSERT(s_gauges_vt.is_set == 0);
+    //FCLAW_ASSERT(s_gauges_vt.is_set == 0);
     return &s_gauges_vt;
 }
 
