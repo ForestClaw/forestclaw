@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CLAWPACK46_USER_FORT_H
-#define CLAWPACK46_USER_FORT_H
+#ifndef FC3D_CLAWPACK46_USER_FORT_H
+#define FC3D_CLAWPACK46_USER_FORT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -140,7 +140,7 @@ void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my, const int* mz,
 #define CLAWPACK46_TAG4COARSENING FCLAW_F77_FUNC(clawpack46_tag4coarsening, \
                                                 CLAWPACK46_TAG4COARSENING)
 
-void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my, const int*mz,
+void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my, const int *mz,
                                const int* mbc, const int* meqn,
                                const double* xlower, const double* ylower,
                                const int* zlower, 
