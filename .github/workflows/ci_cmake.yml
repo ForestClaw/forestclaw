@@ -64,7 +64,7 @@ jobs:
       run: |
         sudo apt-get update -yq
         sudo apt-get install -yq --no-install-recommends \
-            ninja-build ${{ matrix.ubuntu_packages }}
+            ninja-build binutils-dev ${{ matrix.ubuntu_packages }}
 
     - name: Install Cuda Toolkit
       if: ${{ matrix.cuda }}

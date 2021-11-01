@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw_mpi.h>
+
+#ifdef FCLAW_ENABLE_SIGNALSTACKTRACE
+#include "private/register_backward_st.h"
+#endif
 
 static const char *fclaw_configdir = ".forestclaw";
 static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
@@ -187,6 +191,10 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
     fclaw_global_productionf ("%-*s %s\n", w, "LDFLAGS", FCLAW_LDFLAGS);
     fclaw_global_productionf ("%-*s %s\n", w, "FLIBS", FCLAW_FLIBS);
     fclaw_global_productionf ("%-*s %s\n", w, "LIBS", FCLAW_LIBS);
+
+#ifdef FCLAW_ENABLE_SIGNALSTACKTRACE
+    register_backward_st();
+#endif
 }
 
 fclaw_app_t *
