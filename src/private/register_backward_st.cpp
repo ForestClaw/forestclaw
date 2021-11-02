@@ -26,15 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <backward.hpp>
 extern "C"
 {
+backward::SignalHandling* sh;
 void register_backward_st()
 {
-	backward::SignalHandling sh;
-	using namespace backward;
-	StackTrace st; st.load_here(32);
-	Printer p;
-	p.object = true;
-	p.color_mode = ColorMode::always;
-	p.address = true;
-	p.print(st, stderr);
+	sh = new backward::SignalHandling();
 }
 }
