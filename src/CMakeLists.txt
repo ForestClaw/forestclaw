@@ -148,9 +148,11 @@ install(TARGETS forestclaw
 ## -- backward stacktrace libary
 if(FCLAW_ENABLE_SIGNALSTACKTRACE)
   set(Backward_DIR ${PROJECT_SOURCE_DIR}/backward-cpp)
-  list(APPEND CMAKE_MODULE_PATH ${Backward_DIR})
-  install(FILES ${Backward_DIR}/FindBackward.cmake DESTINATION lib/cmake/Modules)
-  find_package(Backward REQUIRED)
+  install(FILES ${Backward_DIR}/BackwardConfig.cmake 
+            DESTINATION lib/cmake/Modules
+            RENAME FindBackward.cmake   
+          )
+  find_package(Backward CONFIG REQUIRED)
   target_sources(forestclaw PRIVATE private/register_backward_st.cpp)
   target_link_libraries(forestclaw PRIVATE Backward::Backward) 
 endif()
