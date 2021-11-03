@@ -84,15 +84,13 @@ void run_program(fclaw2d_global_t* glob)
     }
 
     swirl_link_solvers(glob);
-    int * dumb=nullptr;
-    *dumb=0;
+
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
     fclaw2d_finalize(glob);
-
 }
 
 int

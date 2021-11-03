@@ -12,9 +12,8 @@
   "binaryDir": "${sourceDir}/build",
   "generator": "Ninja",
   "cacheVariables": {
-    "CMAKE_BUILD_TYPE": "DEBUG",
-    "CMAKE_CUDA_ARCHITECTURES": "72",
-    "FCLAW_ENABLE_SIGNALSTACKTRACE": "on"
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_CUDA_ARCHITECTURES": "72"
   },
   "environment": {
     "CUDACXX": "/usr/local/cuda/bin/nvcc"
