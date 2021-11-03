@@ -1,3 +1,13 @@
+c> @file
+c> Clawpatch 4.6 timeinterp subroutines
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_timeinterp_t
+c>
+c> Implementation for clawpack 4.6.
+c>    
+c> @details @copydetails ::clawpatch_fort_timeinterp_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_timeinterp
      &      (mx,my,mbc,meqn,psize,
      &      qcurr,qlast,qinterp,alpha,ierror)

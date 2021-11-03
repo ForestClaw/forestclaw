@@ -180,7 +180,7 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
     patch_data_new(glob,coarse_patch,blockno, coarse_patchno);
 
     fclaw2d_patch_data_t *pdata = get_patch_data(coarse_patch);
-    pdata->blockno = blockno;
+    pdata->block_idx = blockno;
 
     patch_vt->build_from_fine(glob,
                               fine_patches,
@@ -614,9 +614,8 @@ void fclaw2d_patch_remote_ghost_build(fclaw2d_global_t *glob,
 									  fclaw2d_patch_t *this_patch,
 									  int blockno,
 									  int patchno,
-									  void *user)
+									  fclaw2d_build_mode_t build_mode)
 {
-	fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
 
 	FCLAW_ASSERT(patch_vt->remote_ghost_build != NULL);
@@ -624,7 +623,7 @@ void fclaw2d_patch_remote_ghost_build(fclaw2d_global_t *glob,
 	patch_data_new(glob,this_patch,blockno,patchno);
 
 	patch_vt->remote_ghost_build(glob,this_patch,blockno,
-							patchno,&build_mode);
+							patchno,build_mode);
 	if (patch_vt->remote_ghost_setup != NULL)
 	{
 		patch_vt->remote_ghost_setup(glob,this_patch,blockno,patchno);
@@ -775,7 +774,7 @@ void fclaw2d_patch_time_sync_reset(fclaw2d_global_t* glob,
 static
 fclaw2d_patch_vtable_t* patch_vt_init()
 {
-	s_patch_vt.is_set = 0;
+	//s_patch_vt.is_set = 0;
 	return &s_patch_vt;
 }
 
@@ -807,7 +806,7 @@ void fclaw2d_patch_vtable_initialize()
 
 fclaw2d_patch_vtable_t* fclaw2d_patch_vt()
 {
-	FCLAW_ASSERT(s_patch_vt.is_set != 0);
+	//FCLAW_ASSERT(s_patch_vt.is_set != 0);
 	return &s_patch_vt;
 }
 

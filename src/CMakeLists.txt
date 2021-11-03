@@ -72,6 +72,7 @@ add_library(forestclaw_f OBJECT
   fortran_source2d/cellave2.f 
   fortran_source2d/fdisc.f 
   fortran_source2d/philim.f
+  fortran_source2d/cellave3.f
 )
 
 # -- put together in final library

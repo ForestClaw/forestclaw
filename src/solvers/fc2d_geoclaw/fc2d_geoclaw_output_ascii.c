@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -66,12 +66,7 @@ void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
     int maux;
     fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-
-    const fc2d_geoclaw_options_t *geoclaw_options = 
-                           fc2d_geoclaw_get_options(glob);
-    int mbathy = geoclaw_options->mbathy;    
-
-    FC2D_GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn,&maux,&mbathy,&mbc,&xlower,&ylower,
+    FC2D_GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn, &maux,&mbc,&xlower,&ylower,
                                  &dx,&dy,q,aux,&iframe,&global_num,&level,
                                  &blockno,&glob->mpirank);
 }
@@ -79,21 +74,14 @@ void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
 static
 void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt;
+    double time = glob->curr_time;
+    int ngrids = glob->domain->global_num_patches;
 
-    int meqn,maux,ngrids;
-    double time;
-
-    clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-
-    time = glob->curr_time;
-    ngrids = glob->domain->global_num_patches;
-
-    meqn = clawpatch_opt->meqn;
-    maux = clawpatch_opt->maux;
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    int meqn = clawpatch_opt->meqn;
+    int maux = clawpatch_opt->maux;
 
     FC2D_GEOCLAW_FORT_WRITE_HEADER(&iframe,&time,&meqn,&maux,&ngrids);
-
 }
 
 /* --------------------------------------------------------------
@@ -110,9 +98,7 @@ void fc2d_geoclaw_output_ascii(fclaw2d_global_t* glob,int iframe)
     fclaw2d_domain_serialization_enter (domain);
 
     if (domain->mpirank == 0)
-    {
         geoclaw_header_ascii(glob,iframe);
-    }
 
     /* Write out each patch to fort.qXXXX */
     fclaw2d_global_iterate_patches (glob, cb_geoclaw_output_ascii, &iframe);

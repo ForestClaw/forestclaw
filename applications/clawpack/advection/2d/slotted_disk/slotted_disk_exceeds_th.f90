@@ -12,6 +12,7 @@ integer function user_exceeds_threshold(blockno,&
     integer :: blockno, init_flag, is_ghost, refine
 
     refine = 0
+
     if (qval .gt. threshold .and. qval .lt. 1-threshold) then
         refine = 1
     endif

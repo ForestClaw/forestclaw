@@ -1,5 +1,6 @@
 c     # ----------------------------------------------------------
-c     # Exchange routines - (mq,i,j) ordering
+c>      @file
+c> .    Exchange routines - (mq,i,j) ordering
 c     # ----------------------------------------------------------
 c     # exchange_face_ghost
 c     # exchange_corner_ghost
@@ -7,7 +8,13 @@ c     # exchange_phys_corner_ghost
 c     # ----------------------------------------------------------
 
 
-c     # Exchange edge ghost data with neighboring grid at same level.
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_copy_face_t
+c>
+c> Implementation for clawpack 5
+c>
+c> @details @copydetails ::clawpatch_fort_copy_face_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_copy_face(mx,my,mbc,
      &      meqn,qthis,qneighbor,iface,transform_ptr)
       implicit none
@@ -66,6 +73,13 @@ c                 # y-direction (idir == 1)
       end
 
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_copy_corner_t
+c>
+c> Implementation for clawpack 5
+c>
+c> @details @copydetails ::clawpatch_fort_copy_corner_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_copy_corner(mx,my,mbc,meqn,
      &      qthis, qneighbor, this_icorner,transform_ptr)
       implicit none
@@ -107,6 +121,17 @@ c              # can now be dropped in.
       end
 
 
+c--------------------------------------------------------------------
+c> @brief Copy the corner ghost cells from a face neighbor
+c>
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] mbc the number of ghost cells
+c> @param[in] meqn the number of equations
+c> @param[in,out] q this this solution
+c> @param[in,out] qneighbor the neighbor the neighbor solution
+c> @param[in] icorner the corner to copy values to
+c> @param[in] iface the face that the neighbor is on
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_copy_phys_corner(mx,my,
      &      mbc,meqn, qthis, qneighbor, icorner, iface)
       implicit none

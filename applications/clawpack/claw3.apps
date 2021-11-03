@@ -1,0 +1,10 @@
+# -----------------------------------------------
+# Clawpack 3 (extruded mesh) library and examples
+# -----------------------------------------------
+
+
+# Swirl : Scalar advection
+include applications/clawpack/advection/3d/swirl/Makefile.am
+
+# Filament : sphere in rotating flow field
+include applications/clawpack/advection/3d/filament/Makefile.am

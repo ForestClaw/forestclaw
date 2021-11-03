@@ -36,13 +36,13 @@
 
       end
 
-      subroutine fc2d_geoclaw_fort_write_file(mx,my,meqn,maux,mbathy,
+      subroutine fc2d_geoclaw_fort_write_file(mx,my,meqn,maux,
      &      mbc,xlower,ylower,dx,dy,q,aux,iframe,patch_num,level,
      &      blockno,mpirank)
 
       implicit none
 
-      integer meqn,mbc,maux,mbathy,mx,my
+      integer meqn,mbc,maux,mx,my
       integer iframe,patch_num, level, blockno, mpirank
       double precision xlower, ylower,dx,dy
 
@@ -54,6 +54,10 @@
       integer nstp,ipos,idigit
       integer i,j,mq
       double precision eta
+
+      integer mbathy
+
+      mbathy = 1
 
       matname1 = 'fort.qxxxx'
       matunit1 = 10

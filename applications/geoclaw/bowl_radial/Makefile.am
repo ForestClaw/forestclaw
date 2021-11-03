@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/geoclaw/bowl_radial/bowl
 
+TESTS += applications/geoclaw/bowl_radial/regressions.sh
+
 applications_geoclaw_bowl_radial_bowl_SOURCES = \
 	applications/geoclaw/bowl_radial/bowl_user.cpp \
 	applications/geoclaw/bowl_radial/bowl_user.h \

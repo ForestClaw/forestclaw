@@ -171,6 +171,7 @@ struct fclaw_options
     double bx;   /**< Only for the single block, unmapped case */
     double ay;   /**< Only for the single block, unmapped case */
     double by;   /**< Only for the single block, unmapped case */
+    // TODO 
     double az;
     double bz;
 

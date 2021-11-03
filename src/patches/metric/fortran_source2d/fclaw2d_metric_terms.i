@@ -1,4 +1,6 @@
-C -*- FORTRAN -*-
+c> @file fclaw2d_metric_terms.i
+c> Defines arrays with correct dimensions for metric terms
+c> This is intended to be included in fortran source code
 
 c     # Include this file, or cut and paste dimensioning to get
 c     # correct dimensioning in Fortran

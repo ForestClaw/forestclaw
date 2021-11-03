@@ -23,14 +23,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** \file
- *
- * Routines for handling general ForestClaw input options.
- *
- */
-
 #ifndef FCLAW2D_CLAWPATCH_OPTIONS_H
 #define FCLAW2D_CLAWPATCH_OPTIONS_H
+
+/** 
+ * @file
+ * Routines for handling clawpatch input options.
+ */
 
 #include <fclaw_base.h>
 
@@ -43,52 +42,95 @@ extern "C"
 #endif
 
 
+
 /* Criteria for tagging patches */
+/** Refine based on value */
 #define  FCLAW_REFINE_CRITERIA_VALUE          0
+/** Refine based on derivative */
 #define  FCLAW_REFINE_CRITERIA_DIFFERENCE     1
+/** Refine based on difference between min and max */
 #define  FCLAW_REFINE_CRITERIA_MINMAX         2
+/** Refine based on gradient */
 #define  FCLAW_REFINE_CRITERIA_GRADIENT       3
+/** Refine based on user provided function */
 #define  FCLAW_REFINE_CRITERIA_USER           4
 
 
 struct fclaw2d_global;
 
+/** Typedef for fclaw2d_clwaptch_opitons structure */
 typedef struct fclaw2d_clawpatch_options fclaw2d_clawpatch_options_t;
 
 
+/**
+ * @brief Clawpatch options
+ */
 struct fclaw2d_clawpatch_options
 {
     /* These are constant for all clawpatch's */
-    int mx;
-    int my;
-    int maux;
-    int mbc;
+    int mx; /**< number of cells in the x direction */
+    int my; /**< number of cells in the y direction */
+    int maux; /**< number of aux equations */
+    int mbc; /**< the number of ghost cells */
 
-    int meqn;
-    int rhs_fields;
+    int meqn; /**< number fields in solution */
+    int rhs_fields; /**< number of rhs fields for elliptic problems */
 
-    int refinement_criteria;
-    sc_keyvalue_t *kv_refinement_criteria;
+    int refinement_criteria; /**< The refinement criteria */
+    sc_keyvalue_t *kv_refinement_criteria; /**< The refinement criteria */
 
     /* Advanced options */
-    int interp_stencil_width;
-    int ghost_patch_pack_aux;
+    int interp_stencil_width; /**< The width of the interpolation stencil */
+    int ghost_patch_pack_aux; /**< True if aux equations should be packed */
 
-    int is_registered;
+    int is_registered; /**< true if options have been registered */
 
 };
 
+/**
+ * @brief Register options from SC
+ * 
+ * @param app the app context
+ * @param configfile the config file
+ * @return fclaw2d_clawpatch_options_t* a newly allocated options struct
+ */
 fclaw2d_clawpatch_options_t *
 fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile);
 
+/**
+ * @brief Store the options in the global context
+ * 
+ * @param glob the global context
+ * @param clawpatch_options the options
+ */
 void fclaw2d_clawpatch_options_store (struct fclaw2d_global *glob, 
                                       fclaw2d_clawpatch_options_t* clawpatch_options);
 
+/**
+ * @brief Get the options from the global context
+ * 
+ * @param glob the global context
+ * @return fclaw2d_clawpatch_options_t* the options
+ */
 fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global* glob);
 
 
+/**
+ * @brief Set the refinment critera
+ * 
+ * Sets a global variable
+ * 
+ * @param r the refinement criteria
+ */
 void fclaw2d_clawpatch_set_refinement_criteria(int r);
 
+/**
+ * @brief Get the refinement criteria be used
+ * 
+ * Gets the value from a global variable
+ * 
+ * @return int the refinement criteria
+ */
 int fclaw2d_clawpatch_get_refinement_criteria();
 
 

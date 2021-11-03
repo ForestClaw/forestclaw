@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_base.h>
+#include <fclaw_mpi.h>
 
 static const char *fclaw_configdir = ".forestclaw";
 static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
@@ -191,6 +192,7 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 fclaw_app_t *
 fclaw_app_new (int *argc, char ***argv, void *user)
 {
+    //TODO seperate intialize from creating new app (makes testing difficult)
 #ifdef FCLAW_ENABLE_DEBUG
     const int LP_lib = SC_LP_INFO;
     const int LP_fclaw = SC_LP_DEBUG;
@@ -202,10 +204,10 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     sc_MPI_Comm mpicomm;
     fclaw_app_t *a;
 
-    mpiret = sc_MPI_Init (argc, argv);
-    SC_CHECK_MPI (mpiret);
     mpicomm = sc_MPI_COMM_WORLD;
 
+    mpiret = sc_MPI_Init (argc, argv);
+    SC_CHECK_MPI (mpiret);
     sc_init (mpicomm, 1, 1, NULL, LP_lib);
     p4est_init (NULL, LP_lib);
     fclaw_init (NULL, LP_fclaw);

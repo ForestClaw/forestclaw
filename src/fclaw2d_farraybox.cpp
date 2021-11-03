@@ -259,44 +259,11 @@ int FArrayBox::fields()
 }
 
 // Rename to "IndexBox"
-Box::Box()
+Box::Box(const int ll[], const int ur[], const int box_dim):
+    m_box_dim(box_dim),
+    m_ll(ll,ll+box_dim),
+    m_ur(ur,ur+box_dim)
 {
-    m_box_dim = PatchDim;
-    for (int idir = 0; idir < m_box_dim; idir++)
-    {
-        m_ll[idir] = 0;
-        m_ur[idir] = 0;
-    }
-}
-
-Box::Box(const Box& a_box)
-{
-    m_box_dim = a_box.m_box_dim;
-    for(int idir = 0; idir < m_box_dim; idir++)
-    {
-        m_ll[idir] = a_box.m_ll[idir];
-        m_ur[idir] = a_box.m_ur[idir];
-    }
-}
-
-Box::Box(const int ll[], const int ur[])
-{
-    m_box_dim = PatchDim;
-    for(int idir = 0; idir < m_box_dim; idir++)
-    {
-        m_ll[idir] = ll[idir];
-        m_ur[idir] = ur[idir];
-    }
-}
-
-Box::Box(const int ll[], const int ur[], const int box_dim)
-{
-    m_box_dim = box_dim;
-    for(int idir = 0; idir < m_box_dim; idir++)
-    {
-        m_ll[idir] = ll[idir];
-        m_ur[idir] = ur[idir];
-    }
 }
 
 int Box::smallEnd(int idir) const

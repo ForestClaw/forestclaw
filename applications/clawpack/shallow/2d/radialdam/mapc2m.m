@@ -5,7 +5,7 @@ function [xp,yp,zp] = mapc2m(xc,yc)
 % Choice 2 : pillowdisk
 % Choice 3 : pillowdisk5 (five patch square --> disk)
 
-map_choice = 3;
+map_choice = 1;
 map_list = {'nomap', 'fivepatch','pillowdisk','pillowdisk5'};
 
 map = map_list{map_choice + 1};

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2020 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,72 +26,87 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH_HPP
 #define FCLAW2D_CLAWPATCH_HPP
 
+/**
+ * @file 
+ * C++ structures for clawpatch
+ */
 #include <fclaw2d_farraybox.hpp>  /* Needed for FArray boxes */
 
 struct fclaw2d_patch;
 struct fclaw2d_global;
 class  fclaw2d_metric_patch_t;
 
+/**
+ * @brief Stores data for each patch
+ */
 class fclaw2d_clawpatch_t
 {
 public :
-    Box dataBox();  /* Box containing data pointer q */
-    Box areaBox();  /* Box containing area */
-    Box edgeBox();  /* Box containing edge based values */
-    Box nodeBox();  /* Box containing nodes */
-
     /* Solution data */
-    int meqn;                   
-    FArrayBox griddata;
-    FArrayBox griddata_last;
-    FArrayBox griddata_save;
-    FArrayBox griddata_time_interpolated;
-    FArrayBox griderror;
+    int meqn; /**< number of equations */                   
+    FArrayBox griddata; /**< the current solution */
+    FArrayBox griddata_last; /**< the solution at the last timestep */
+    FArrayBox griddata_save; /**< the saved solution */
+    FArrayBox griddata_time_interpolated; /**< the time interpolated solution */
+    FArrayBox griderror; /**< the error */
 
-    /* For diagnostics */
+    /** Exact solution for diagnostics */
     FArrayBox exactsolution;
 
-    int mfields;  /* Number of fields in the rhs */
-    FArrayBox rhs;  /* For elliptic problems */
+    int mfields;  /**< Number of fields in the rhs */
+    FArrayBox rhs;  /**< RHS for elliptic problems */
 
-    FArrayBox elliptic_error;  /* For elliptic problems */
-    FArrayBox elliptic_soln;  /* For elliptic problems */
+    FArrayBox elliptic_error;  /**< Error for elliptic problems */
+    FArrayBox elliptic_soln;  /**< Solution for elliptic problems */
 
-    /* Registers for accumulating mismatches at coarse/fine interfaces */
+    /** Registers for accumulating mismatches at coarse/fine interfaces */
     struct fclaw2d_clawpatch_registers *registers;
 
     /* Grid info */
-    int mx;           
-    int my;           
-    int mbc;          
-    int maux;
+    int mx; /**< number of cells in the x direction */          
+    int my; /**< number of cells in the y direction */  
+    int mbc; /**< number ghost cells */
+    int maux; /**< number aux equations */
 
-    double dx;
-    double dy;
-    double xlower;
-    double ylower;
-    double xupper;
-    double yupper;
+    double dx; /**< cell spacing in the x direction */
+    double dy; /**< cell spacing in the y direction */
 
-    /* Auxilliary array (used by Clawpack 4.6 and 5.0) */
+    double xlower; /**< x coordinate of the left edge of the patch */
+    double ylower; /**< y coordinate of the bottom edge of the patch */
+    double xupper; /**< x coordinate of the right edge of the patch */
+    double yupper; /**< y coordinate of the top edge of the patch */
+
+    /** Auxilliary array (used by Clawpack 4.6 and 5.0) */
     FArrayBox aux;
 
     /* Mapping and metric info */
-    int manifold;    
-    int blockno;
+    int manifold; /**< true if using manifold */   
+    int blockno; /**< the block number of a patch */
 
-    fclaw2d_metric_patch_t *mp;
+    fclaw2d_metric_patch_t *mp; /**< the metric data for a patch */
 
-    /* Extra storage needed by the solver(s) */
+    /** Extra storage needed by the solver(s) */
     void* solver_data;
 
-    /* User data*/ 
+    /** User data*/ 
     void* user_data;
 };
 
+/**
+ * @brief Get the clawpatch structure for a patch
+ * 
+ * @param this_patch the patch context
+ * @return fclaw2d_clawpatch_t* the clawpatch structure
+ */
 fclaw2d_clawpatch_t* 
 fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
 
+/**
+ * @brief Get the metrix structure for a patch
+ * 
+ * @param this_patch the patch context
+ * @return fclaw2d_metric_patch_t* the metric structure
+ */
 fclaw2d_metric_patch_t* 
 fclaw2d_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
 

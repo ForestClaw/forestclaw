@@ -28,13 +28,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
+
+#include <fc2d_geoclaw.h>
+#include <fc2d_geoclaw_options.h>
+
+
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
 #if 0
-}
+/* Fix Syntax highlighting */
 #endif
-#endif
+
 
 typedef struct user_options
 {
@@ -53,21 +62,8 @@ void slosh_options_store (fclaw2d_global_t* glob, user_options_t* user);
 user_options_t* slosh_get_options(fclaw2d_global_t* glob);
 
 
-/* ---------------------------------- Fortran routines -------------------------------- */
-
-#define QINIT FCLAW_F77_FUNC(qinit,QINIT)
-void QINIT(const int* meqn,const int* mbc,
-           const int* mx, const int* my,
-           const double* xlower, const double* ylower,
-           const double* dx, const double* dy,
-           double q[], const int* maux, double aux[]);
-
-
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

@@ -140,10 +140,10 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
     patch_vt->setup   = &sphere_patch_setup_manifold;
 
+
     const user_options_t* user_opt = sphere_get_options(glob);
     if (user_opt->mapping == 1)
         fclaw2d_clawpatch_use_pillowsphere();
-
 
     if (user_opt->claw_version == 4)
     {

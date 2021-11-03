@@ -138,7 +138,7 @@ double step_dtopo(fclaw2d_global_t *glob, double tstart_outer, double tend_outer
     double tend_local = (dtopo_interval[1] < tend_outer) ? dtopo_interval[1] : tend_outer;
 
     /* Check that we aren't taking a time step that is too small */ 
-    if (abs(tend_outer - tend_local) < 0.01*(tend_outer-tstart_outer))
+    if (fabs(tend_outer - tend_local) < 0.01*(tend_outer-tstart_outer))
     {
         /* Take a slightly larger time step */
         tend_local = tend_outer;

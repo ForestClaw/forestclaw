@@ -18,6 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
+#include <test/test_config.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/tpl/json.hpp>
 #include <fstream>
@@ -30,7 +31,7 @@ class DomainReader
 	int                                    num_ghost;
 	std::shared_ptr<ThunderEgg::Domain<D>> coarser_domain;
 	std::shared_ptr<ThunderEgg::Domain<D>> finer_domain;
-	ThunderEgg::PatchInfo<D>               parsePatch(nlohmann::json &patch_j)
+	ThunderEgg::PatchInfo<D>               parsePatch(ThunderEgg::tpl::nlohmann::json &patch_j)
 	{
 		ThunderEgg::PatchInfo<D> pinfo = patch_j.get<ThunderEgg::PatchInfo<D>>();
 		pinfo.num_ghost_cells          = num_ghost;
@@ -45,38 +46,37 @@ class DomainReader
 	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in)
 	: ns(ns_in), num_ghost(num_ghost_in)
 	{
-		int rank;
-		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		ThunderEgg::Communicator comm(MPI_COMM_WORLD);
 
-		nlohmann::json j;
+		ThunderEgg::tpl::nlohmann::json j;
 		std::ifstream  input_stream(file_name);
 		if (!input_stream.good()) {
-			throw "could not open file: " + file_name;
+			throw "could not open file";
 		}
 		input_stream >> j;
 		input_stream.close();
 		std::deque<ThunderEgg::PatchInfo<D>> finer_patches;
-		for (nlohmann::json &patch_j : j.at("levels")[0]) {
+		for (ThunderEgg::tpl::nlohmann::json &patch_j : j.at("levels")[0]) {
 			auto patch = parsePatch(patch_j);
-			if (patch.rank == rank)
+			if (patch.rank == comm.getRank())
 				finer_patches.push_back(patch);
 		}
-		finer_domain = std::make_shared<ThunderEgg::Domain<D>>(0, ns, num_ghost, finer_patches.begin(), finer_patches.end());
+		finer_domain = std::make_shared<ThunderEgg::Domain<D>>(comm, 0, ns, num_ghost, finer_patches.begin(), finer_patches.end());
 		std::deque<ThunderEgg::PatchInfo<D>> coarser_patches;
-		for (nlohmann::json &patch_j : j.at("levels")[1]) {
+		for (ThunderEgg::tpl::nlohmann::json &patch_j : j.at("levels")[1]) {
 			auto patch = parsePatch(patch_j);
-			if (patch.rank == rank)
+			if (patch.rank == comm.getRank())
 				coarser_patches.push_back(patch);
 		}
-		coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(1, ns, num_ghost, coarser_patches.begin(), coarser_patches.end());
+		coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(comm, 1, ns, num_ghost, coarser_patches.begin(), coarser_patches.end());
 	}
-	std::shared_ptr<ThunderEgg::Domain<D>> getCoarserDomain()
+	ThunderEgg::Domain<D> getCoarserDomain()
 	{
-		return coarser_domain;
+		return *coarser_domain;
 	}
-	std::shared_ptr<ThunderEgg::Domain<D>> getFinerDomain()
+	ThunderEgg::Domain<D> getFinerDomain()
 	{
-		return finer_domain;
+		return *finer_domain;
 	}
 };
 extern template class DomainReader<2>;

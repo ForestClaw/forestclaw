@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,14 +39,12 @@ extern "C"
 #define FCLAW2D_NUMCORNERS   4
 #define FCLAW2D_NUMSIBLINGS  4
 #define FCLAW2D_REFINEFACTOR 2
-#define FCLAW2D_PATCHDIM     2	
 
 extern const int SpaceDim;
 extern const int NumFaces;
 extern const int NumCorners;
 extern const int NumSiblings;
 extern const int RefineFactor;
-extern const int PatchDim;
 
 
 #ifdef __cplusplus

@@ -105,9 +105,9 @@ void  SPHERE46_FORT_WRITE_FILE(char* matname1,
 #define SPHERE46_FORT_HEADER_ASCII \
          FCLAW_F77_FUNC(sphere46_fort_header_ascii, \
                         SPHERE46_FORT_HEADER_ASCII)
-void SPHERE46_FORT_HEADER_ASCII(char* matname1, char* matname2,
-                               double* time, int* meqn, int* maux, 
-                               int* ngrids);
+void SPHERE46_FORT_HEADER_ASCII(const char* matname1, const char* matname2,
+                               const double* time, const int* meqn, const int* maux, 
+                               const int* ngrids);
 
 #define  SPHERE5_FORT_WRITE_FILE FCLAW_F77_FUNC(sphere5_fort_write_file,  \
                                                 SPHERE5_FORT_WRITE_FILE)
@@ -124,9 +124,9 @@ void  SPHERE5_FORT_WRITE_FILE(char* matname1,
 #define SPHERE5_FORT_HEADER_ASCII \
          FCLAW_F77_FUNC(sphere5_fort_header_ascii, \
                         SPHERE5_FORT_HEADER_ASCII)
-void SPHERE5_FORT_HEADER_ASCII(char* matname1, char* matname2,
-                               double* time, int* meqn, int* maux, 
-                               int* ngrids);
+void SPHERE5_FORT_HEADER_ASCII(const char* matname1, const char* matname2,
+                               const double* time, const int* meqn, 
+                               const int* maux, const int* ngrids);
 
 #ifdef __cplusplus
 #if 0

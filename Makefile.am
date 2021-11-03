@@ -122,3 +122,6 @@ doxygen: Doxyfile
 	doxygen
 
 .PHONY: doxygen
+
+
+@FORTRAN_MODULE_DEPS@
