@@ -20,8 +20,4 @@ if(TARGET FORESTCLAW::CUDACLAW)
     set_target_properties(FORESTCLAW::CUDACLAW PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 endif()
 
-if(@FCLAW_ENABLE_SIGNALSTACKTRACE@)
-  find_dependency(Backward)
-endif()
-
 check_required_components(@PROJECT_NAME@)

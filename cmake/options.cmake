@@ -11,13 +11,6 @@ option(thunderegg_external "force build of ThunderEgg")
 option(p4est_external "force build of p4est")
 option(sc_external "force build of libsc")
 
-
-# -- flags
-option(FCLAW_ENABLE_SIGNALSTACKTRACE "print stacktrace on signal exit (POSIX only)")
-if(FCLAW_ENABLE_SIGNALSTACKTRACE)
-  add_definitions(-DFCLAW_ENABLE_SIGNALSTACKTRACE)
-endif()
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 # --- default install directory under build/local
