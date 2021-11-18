@@ -54,11 +54,16 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw3dx_clawpatch_utils.f \
 	\
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_exceeds_threshold.c \
-	src/patches/clawpatch/fort_user/fclaw3dx_clawpatch_exceeds_threshold.c \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_difference_exceeds_th.f90 \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_value_exceeds_th.f90 \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_minmax_exceeds_th.f90 \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_gradient_exceeds_th.f90 \
+	\
+	src/patches/clawpatch/fort3_user/fclaw3dx_clawpatch_exceeds_threshold.c \
+	src/patches/clawpatch/fort3_user/fclaw3dx_clawpatch_difference_exceeds_th.f90 \
+	src/patches/clawpatch/fort3_user/fclaw3dx_clawpatch_value_exceeds_th.f90 \
+	src/patches/clawpatch/fort3_user/fclaw3dx_clawpatch_minmax_exceeds_th.f90 \
+	src/patches/clawpatch/fort3_user/fclaw3dx_clawpatch_gradient_exceeds_th.f90 \
 	\
 	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_tag4refinement.f90 \
 	src/patches/clawpatch/fort3_4.6/fclaw3dx_clawpatch46_tag4coarsening.f90 \
