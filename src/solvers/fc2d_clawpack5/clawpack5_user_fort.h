@@ -29,10 +29,12 @@
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
 #if 0
-}
+/* Fix syntax highlighting */
 #endif
-#endif
+
 
 /* --------------------------------------------------------------------------------
    Clawpack 5.0 routines
@@ -112,6 +114,7 @@ void CLAWPACK5_RPT2(const int* ixy, const int* imp,
                     double bmasdq[], double bpasdq[]);
 
 
+#if 0
 #define CLAWPACK5_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack5_tag4refinement, \
                                                           CLAWPACK5_TAG4REFINEMENT)
 
@@ -141,6 +144,7 @@ void CLAWPACK5_TAG4COARSENING(const int* mx, const int* my,
                               const int* initflag,
                               int* tag_patch);
 
+#endif
 
 
 #ifdef __cplusplus
