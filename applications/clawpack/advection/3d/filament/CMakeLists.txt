@@ -1,6 +1,6 @@
 set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/3d/all)
 
-add_library(filament_f OBJECT 
+add_library(filament3dx_f OBJECT 
   psi.f 
   fdisc.f 
   setprob.f 
@@ -11,19 +11,20 @@ add_library(filament_f OBJECT
   ${all}/rptt3_vc_advection.f90 
 )
 
-add_executable(filament 
+add_executable(filament3dx 
   filament.cpp 
   filament_options.c 
   filament_user.cpp 
-  $<TARGET_OBJECTS:filament_f>
+  $<TARGET_OBJECTS:filament3dx_f>
 )
+set_target_properties(filament3dx PROPERTIES OUTPUT_NAME filament)
 
-target_include_directories(filament PRIVATE 
+target_include_directories(filament3dx PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${all}
 )
 
-target_link_libraries(filament PRIVATE 
+target_link_libraries(filament3dx PRIVATE 
  FORESTCLAW::CLAWPACK3_46
 )
 

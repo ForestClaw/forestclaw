@@ -1,6 +1,15 @@
 c    # ----------------------------------------------------------------------------------
-c    # Output and diagnostics
+c>     @file
+c>     Diagnostics
 c    # ----------------------------------------------------------------------------------
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_conscheck_t
+c>
+c> Implementation for clawpack 5
+c>
+c> @details @copydetails ::clawpatch_fort_conscheck_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_conservation_check(mx,my,
      &      mbc,meqn, dx,dy,area,q,sum)
       implicit none
@@ -39,8 +48,13 @@ c      include 'fclaw2d_metric_terms.i'
 
       end
 
-
-c     # Compute area of a patch
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_area_t
+c>
+c> Implementation for clawpack 5
+c>
+c> @details @copydetails ::clawpatch_fort_area_t
+c--------------------------------------------------------------------
       double precision function
      &      fclaw2d_clawpatch5_fort_compute_patch_area(mx,my,
      &      mbc,dx,dy,area)
@@ -74,6 +88,13 @@ c      include 'fclaw2d_metric_terms.i'
 
       end
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_norm_t
+c>
+c> Implementation for clawpack 5
+c>
+c> @details @copydetails ::clawpatch_fort_norm_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_compute_error_norm(
      &      blockno,mx,my, mbc,meqn, dx,dy,area,error,error_norm)
       implicit none

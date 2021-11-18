@@ -1,3 +1,13 @@
+c> @file
+c> Fortran subroutines for metric terms
+
+c ---------------------------------------------------------
+c> @brief @copybrief ::fclaw2d_fort_compute_mesh_t
+c>
+c> Default implimentation
+c>
+c> @details @copydetails ::fclaw2d_fort_compute_mesh_t
+c ---------------------------------------------------------
       subroutine fclaw2d_fort_compute_mesh(mx,my,mbc,
      &      xlower,ylower, dx,dy,blockno,xp,yp,zp,xd,yd,zd)
       implicit none
@@ -53,6 +63,13 @@ c              # Physical locations of cell centers
       enddo
       end
 
+c ----------------------------------------------------------
+c> @brief @copybrief ::fclaw2d_fort_compute_area_t
+c>
+c> Default implimentation
+c>
+c> @details @copydetails ::fclaw2d_fort_compute_area_t
+c ---------------------------------------------------------
       subroutine fclaw2d_fort_compute_area(mx,my,mbc,dx,dy,
      &      xlower, ylower, blockno,area, quadsize, quadstore,
      &      ghost_only)
@@ -81,6 +98,19 @@ c        # finest level.
 
       end
 
+c ---------------------------------------------------------
+c> @brief Compute the area for each cell for general mappings
+c>
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] mbc the number of ghost cells
+c> @param[in] dx, dy the spacings in the x and y direcitons
+c> @param[in] xlower, ylower the lower left coordinate of the patch
+c> @param[in] blockno the block number
+c> @param[out] area the area of each cell
+c> @param[in] quadsize the length of the quad
+c> @param[in] quadstore stores a group of cell values
+c> @param[in] ghost_only
+c ---------------------------------------------------------
       subroutine fclaw2d_fort_compute_area_general(mx,my,mbc,
      &      dx,dy, xlower, ylower, blockno,area,
      &      quadsize, quadstore,ghost_only)
@@ -161,8 +191,23 @@ c     # than in the rest of the mesh.
       end
 
 
-c     # If the mapping is affine, (e.g. Ax + b) then we don't need to sum
-c     # the finer level areas.
+c ---------------------------------------------------------
+c> @brief Compute the area for each cell for affine mappings.
+c>
+c> If the mapping is affine, (e.g. Ax + b) then we don't need to sum
+c> the finer level areas.
+c>
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] mbc the number of ghost cells
+c> @param[in] dx, dy the spacings in the x and y direcitons
+c> @param[in] xlower, ylower the lower left coordinate of the patch
+c> @param[in] blockno the block number
+c> @param[out] area the area of each cell
+c> @param[in] quadsize the length of the quad
+c> @param[in] quadstore stores a group of cell values
+c> @param[in] ghost_only
+c ---------------------------------------------------------
+ 
       subroutine fclaw2d_fort_compute_area_affine(mx,my,mbc,dx,dy,
      &      xlower, ylower, blockno,area,ghost_only)
       implicit none
@@ -210,6 +255,13 @@ c     # the finer level areas.
 
       end
 
+c ---------------------------------------------------------
+c> @brief Check if the index is an interior index
+c>
+c> @param[in] mx, my the number of cell sin the x and y directions
+c> @param[in] i, j the index
+c> @return true if the index is interior
+c ---------------------------------------------------------
       logical function is_area_interior(mx,my,i,j)
       implicit none
       integer mx,my,i,j
@@ -220,10 +272,15 @@ c     # the finer level areas.
       end
 
 
-
-
-c     # This is the area element based on a bilinear approximation to
-c     # the surface defined by the corners of the mesh cell.
+c ---------------------------------------------------------
+c> @brief Approximate the area based on the corners of the mesh cell
+c>
+c> This is the area element based on a bilinear approximation to
+c> the surface defined by the corners of the mesh cell.
+c>
+c> @param[in] quad the coordinates of the cell nodes
+c> @return the approximate area
+c ---------------------------------------------------------
       double precision function get_area_approx(quad)
       implicit none
 
@@ -261,6 +318,12 @@ c     # computed at the center of the mesh cell.
 
       end
 
+c ---------------------------------------------------------
+c> @brief Get the l2norm of the vector cross product
+c>
+c> @param[in] u, v the vectors
+c> @return the norm of the cross product
+c ---------------------------------------------------------
       double precision function norm_cross(u,v)
       implicit none
 
@@ -274,6 +337,13 @@ c     # computed at the center of the mesh cell.
 
       end
 
+c ---------------------------------------------------------
+c> @brief @copybrief ::fclaw2d_fort_compute_normals_t
+c>
+c> Default implimentation
+c>
+c> @details @copydetails ::fclaw2d_fort_compute_normals_t
+c ---------------------------------------------------------
       subroutine fclaw2d_fort_compute_normals(mx,my,mbc,
      &      xp,yp,zp,xd,yd,zd,xnormals,ynormals)
       IMPLICIT NONE
@@ -340,6 +410,13 @@ c           # nv has unit length
       end subroutine
 
 
+c ---------------------------------------------------------
+c> @brief @copybrief ::fclaw2d_fort_compute_tangents_t
+c>
+c> Default implimentation
+c>
+c> @details @copydetails ::fclaw2d_fort_compute_tangents_t
+c ---------------------------------------------------------
       subroutine fclaw2d_fort_compute_tangents(mx,my,mbc,
      &      xd,yd,zd, xtangents,ytangents,edge_lengths)
       IMPLICIT NONE
@@ -395,47 +472,45 @@ c               ytangents(i,j,m) = taup(m)/tlen
       end subroutine
 
 
-c     # Compute an approximate unit normal to cell edge
-c     #
-c     # Inputs :
-c     # taud     Vector between adjoining cell centers ("dual" cell edge)
-c     # taup     Vector between edge nodes ("primal" cell edge)
-c     #
-c     # Ouputs :
-c     # nv       Unit vector vector normal to taup, and tangent to the surface
-c     # sp       Length of taup
-c     #
-c     # Idea is to construct normal to edge vector using
-c     #
-c     #     t^i = a^{i1} t_1 + a^{i2} t_2
-c     #
-c     # where t_1, t_2 are coordinate basis vectors T_xi, T_eta
-c     # and t^i dot t_j = 1 (i == j), 0 (i /= j)
-c     #
-c     # At left edge, we have
-c     #       taud ~ T_xi = t_1  and   taup ~ T_eta = t_2
-c     #
-c     # At bottom edge, we have
-c     #       taup ~ T_xi = t_1  and   taud ~ T_eta = t_2
-c     #
-c     # Metric a_{ij} = t_i dot t_j
-c     # Metric a^{ij} is the inverse of a_{ij}
-c     #
-c     # Both versions use this idea.  That is, both compute
-c     # coefficients c1, c2 so that the unit normal at the edge
-c     # is expressed as
-c     #
-c     #        n = c1*taup + c2*taud
-c     #
-c     # In version 1, trig. identities are used to express these coefficients
-c     # in terms of the angle between taup and taud.  In version 2, entries of
-c     # the conjugate tensor are used directly.   Both compute the same vector, but
-c     # version 2 is about 20%-30% faster.
-c     #
-c     # Formulas work for both left and bottom edges.
-c     #
-c     # Neither version depends on any knowledge of the surface normals.
-
+c ---------------------------------------------------------
+c> Compute an approximate unit normal to cell edge
+c>
+c> @param[in] taud     Vector between adjoining cell centers ("dual" cell edge)
+c> @param[in] taup     Vector between edge nodes ("primal" cell edge)
+c> @param[out] nv       Unit vector vector normal to taup, and tangent to the surface
+c> @param[out] sp       Length of taup
+c>
+c> Idea is to construct normal to edge vector using
+c>
+c>     t^i = a^{i1} t_1 + a^{i2} t_2
+c>
+c> where t_1, t_2 are coordinate basis vectors T_xi, T_eta
+c> and t^i dot t_j = 1 (i == j), 0 (i /= j)
+c>
+c> At left edge, we have
+c>       taud ~ T_xi = t_1  and   taup ~ T_eta = t_2
+c>
+c> At bottom edge, we have
+c>       taup ~ T_xi = t_1  and   taud ~ T_eta = t_2
+c>
+c> Metric a_{ij} = t_i dot t_j
+c> Metric a^{ij} is the inverse of a_{ij}
+c>
+c> Both versions use this idea.  That is, both compute
+c> coefficients c1, c2 so that the unit normal at the edge
+c> is expressed as
+c>
+c>        n = c1*taup + c2*taud
+c>
+c> In version 1, trig. identities are used to express these coefficients
+c> in terms of the angle between taup and taud.  In version 2, entries of
+c> the conjugate tensor are used directly.   Both compute the same vector, but
+c> version 2 is about 20%-30% faster.
+c>
+c> Formulas work for both left and bottom edges.
+c>
+c> Neither version depends on any knowledge of the surface normals.
+c ---------------------------------------------------------
       subroutine get_normal(taup,taud,nv,sp)
       implicit none
 
@@ -452,6 +527,13 @@ c     # Neither version depends on any knowledge of the surface normals.
 
       end
 
+c ---------------------------------------------------------
+c> @brief see get_normal()
+c>
+c> @param[in] taud     Vector between adjoining cell centers ("dual" cell edge)
+c> @param[in] taup     Vector between edge nodes ("primal" cell edge)
+c> @param[out] nv       Unit vector vector normal to taup, and tangent to the surface
+c ---------------------------------------------------------
       subroutine get_normal_ver1(taup,taud,nv)
       implicit none
 
@@ -495,6 +577,14 @@ c      endif
 
       end
 
+c ---------------------------------------------------------
+c> @brief see get_normal()
+c>
+c> @param[in] taud     Vector between adjoining cell centers ("dual" cell edge)
+c> @param[in] taup     Vector between edge nodes ("primal" cell edge)
+c> @param[out] nv       Unit vector vector normal to taup, and tangent to the surface
+c> @param[out] sp       Length of taup
+c ---------------------------------------------------------
       subroutine get_normal_ver2(taup,taud,nv,sp)
       implicit none
 
@@ -530,7 +620,14 @@ c         nv(m) = c1*taud(m) + c2*taup(m)
 
 
       end
-
+ 
+c ---------------------------------------------------------
+c> @brief @copybrief ::fclaw2d_fort_compute_surf_normals_t
+c>
+c> Default implimentation
+c>
+c> @details @copydetails ::fclaw2d_fort_compute_surf_normals_t
+c ---------------------------------------------------------
       subroutine fclaw2d_fort_compute_surf_normals(mx,my,mbc,
      &      xnormals,ynormals,edge_lengths,curvature,
      &      surfnormals,area)
@@ -593,8 +690,15 @@ c              # construct cross product
 
       end
 
-c> \ingroup  Averaging
-c> Average area of fine grid siblings to parent coarse grid.
+c ---------------------------------------------------------
+c> @brief Averages the area from a fine grid to a coarse grid
+c>
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] mbc the number of ghost cells
+c> @param[in] areafine the cell areas of the fine patch
+c> @param[out] areacoarse the cell areas of the coarse patch
+c> @param[in] igrid the index of the fine grid in the child array
+c ---------------------------------------------------------
       subroutine fclaw2d_fort_average_area(mx,my,mbc,
      &      areacoarse, areafine, igrid)
       implicit none

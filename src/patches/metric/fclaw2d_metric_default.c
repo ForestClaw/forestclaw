@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_math.h>
 
 #include "fclaw2d_metric.h"
-#include "fclaw2d_metric_default.h"
 #include "fclaw2d_metric_default_fort.h"
 
 

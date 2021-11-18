@@ -35,10 +35,10 @@ target_include_directories(clawpack3_46
 
 install(FILES
 	fc3d_clawpack46.h
+  fc3d_clawpack46_fort.h 
 	fc3d_clawpack46_options.h
-	clawpack46_user_fort.h
-	fc3d_clawpack46_fort.h 
-  DESTINATION include
+  fc3d_clawpack46_user_fort.h 
+DESTINATION include
 )
 
 install(TARGETS clawpack3_46

@@ -26,7 +26,7 @@
 !!> Average fine grid interior values to neighboring ghost cell values of
 !!> the coarse grid.
       
-SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, & 
+SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, & 
            qcoarse,qfine,areacoarse, areafine, & 
            idir,iface_coarse,num_neighbors,refratio,igrid, & 
            manifold, transform_cptr)
@@ -64,7 +64,7 @@ SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, &
 
     r2 = refratio**2    
     if (r2 .ne. rr2) then
-        write(6,*) 'average_face_ghost (fclaw2d_clawpatch46_average.f90) ', & 
+        write(6,*) 'average_face_ghost (fclaw3dx_clawpatch46_average.f90) ', & 
              '  Refratio**2 is not equal to rr2'
         stop
     endif
@@ -83,7 +83,7 @@ SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, &
                         elseif (iface_coarse .eq. 1) then
                             ic = mx+ibc
                         endif
-                        call fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2,transform_cptr)
+                        call fclaw3dx_clawpatch_transform_face_half(ic,jc,i2,j2,transform_cptr)
                         !! # ---------------------------------------------
                         !! # Two 'half-size' neighbors will be passed into
                         !! # this routine.  Only half of the coarse grid ghost
@@ -131,7 +131,7 @@ SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, &
                             jc = my+jbc
                         endif
 
-                        call fclaw2d_clawpatch_transform_face_half(ic,jc,i2,j2, transform_cptr)
+                        call fclaw3dx_clawpatch_transform_face_half(ic,jc,i2,j2, transform_cptr)
                         skip_this_grid = .false.
                         do m = 0,r2-1
                             if (.not. fclaw2d_clawpatch_is_valid_average(i2(m),j2(m),mx,my)) then
@@ -162,13 +162,13 @@ SUBROUTINE fclaw2d_clawpatch46_fort3_average_face(mx,my,mz,mbc,meqn, &
             endif  !! idir conditonal
         end do k_loop
     end do meqn_loop
-end subroutine  fclaw2d_clawpatch46_fort3_average_face
+end subroutine  fclaw3dx_clawpatch46_fort_average_face
 
 
 !!> \ingroup Averaging
 !!> Average across corners.
 
-subroutine fclaw2d_clawpatch46_fort3_average_corner(mx,my,mz,mbc,meqn, &
+subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
     refratio,qcoarse,qfine,areacoarse,areafine, & 
     manifold,icorner_coarse,transform_cptr)
     IMPLICIT NONE
@@ -224,7 +224,7 @@ subroutine fclaw2d_clawpatch46_fort3_average_corner(mx,my,mz,mbc,meqn, &
                         j1 = my+jbc
                     endif
 
-                    call fclaw2d_clawpatch_transform_corner_half(i1,j1,i2,j2, transform_cptr)
+                    call fclaw3dx_clawpatch_transform_corner_half(i1,j1,i2,j2, transform_cptr)
                     if (is_manifold) then
                         sum = 0
                         vf_sum = 0
@@ -247,12 +247,12 @@ subroutine fclaw2d_clawpatch46_fort3_average_corner(mx,my,mz,mbc,meqn, &
         enddo k_loop
     end do meqn_loop
 
-end subroutine fclaw2d_clawpatch46_fort3_average_corner
+end subroutine fclaw3dx_clawpatch46_fort_average_corner
 
 
 !!> \ingroup  Averaging
 !!> Average fine grid siblings to parent coarse grid.
-subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, & 
+subroutine fclaw3dx_clawpatch46_fort_average2coarse(mx,my,mz,mbc,meqn, & 
            qcoarse,qfine, areacoarse, areafine, igrid,manifold)
     IMPLICIT NONE
 
@@ -320,6 +320,7 @@ subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, &
                     enddo
                     if (is_manifold) then
                         sum = 0
+                        vf_sum = 0
                         do m = 0,r2-1
                             qf = qfine(i2(m),j2(m),k,mq)
                             kf = areafine(i2(m),j2(m))
@@ -340,6 +341,6 @@ subroutine fclaw2d_clawpatch46_fort3_average2coarse(mx,my,mz,mbc,meqn, &
             enddo j_loop
         enddo k_loop
     enddo meqn_loop
-end subroutine  fclaw2d_clawpatch46_fort3_average2coarse
+end subroutine  fclaw3dx_clawpatch46_fort_average2coarse
 
 

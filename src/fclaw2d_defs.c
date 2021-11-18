@@ -39,8 +39,6 @@ const int NumFaces     = FCLAW2D_NUMFACES;
 const int NumCorners   = FCLAW2D_NUMCORNERS;
 const int NumSiblings  = FCLAW2D_NUMSIBLINGS;
 const int RefineFactor = FCLAW2D_REFINEFACTOR;
-const int PatchDim     = FCLAW2D_PATCHDIM;
-const int RefineDim    = FCLAW2D_REFINEDIM;   /* 2 for 2d, extruded meshes */
 
 #ifdef __cplusplus
 }

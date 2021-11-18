@@ -179,7 +179,8 @@ module amr_module
 
     ! The max1d parameter should be changed if using OpenMP grid based 
     ! looping, usually set to max1d = 60
-    integer, parameter :: max1d = 1024 
+    ! max1d should now be set in setrun.py
+    integer :: max1d
 
     integer, parameter :: maxvar = 10
     integer, parameter :: maxaux = 20
@@ -208,7 +209,7 @@ module amr_module
     !integer ibuff,  mstart, ndfree, ndfree_bnd, lfine, node(nsize, maxgr), &
     integer ibuff,  mstart, ndfree, ndfree_bnd, lfine,  &
             icheck(maxlv),lstart(maxlv),newstl(maxlv), &
-            listsp(maxlv),intratx(maxlv),intraty(maxlv), &
+            listspStart(maxlv),listsp(maxlv),intratx(maxlv),intraty(maxlv), &
             kratio(maxlv), iregsz(maxlv),jregsz(maxlv), &
             iregst(maxlv),jregst(maxlv), &
             iregend(maxlv),jregend(maxlv), &

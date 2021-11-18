@@ -366,10 +366,9 @@ void copy_samelevel(fclaw2d_global_t* glob,
 }
 
 
-/**
- * \ingroup Averaging
+/*
  * Fill in coarse grid ghost cells by averaging or copying  from neighboring fine grids.
- **/
+ */
 static
 void average_fine2coarse_ghost(fclaw2d_global_t *glob,
 							   int mincoarse,
@@ -463,22 +462,6 @@ void fill_physical_ghost(fclaw2d_global_t* glob,
 /* -----------------------------------------------------------------------
    Public interface
    ---------------------------------------------------------------------*/
-
-/**
- * <summary>Complete exchange of all ghost patches at all levels.</summary>
- * <remarks>All parallel ghost patches are also exchanged at all
- * levels.</remarks>
- * <list>
- *    <item>Every level exchanges ghost cells with other patches
- *       at that level</item>
- *    <item>Every finer level exchanges with a coarser level</item>
- *    <item> All levels will be updated in next update step, regardless of
- *       whether we are in the subcycled or non-subcycled case.</item>
- *       </list>
- *   The reason for two separate ghost cell exchange routines is that
- *   the logic here is considerably simpler than for the partial
- *   update used in intermediate steps in the subcycled case.
- **/
 
 void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
 								   int minlevel,
@@ -625,21 +608,6 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
 }
 
 
-/**
- * <summary>Complete exchange of all ghost patches at all levels.</summary>
- * <remarks>All parallel ghost patches are also exchanged at all
- * levels.</remarks>
- * <list>
- *    <item>Every level exchanges ghost cells with other patches
- *       at that level</item>
- *    <item>Every finer level exchanges with a coarser level</item>
- *    <item> All levels will be updated in next update step, regardless of
- *       whether we are in the subcycled or non-subcycled case.</item>
- *       </list>
- *   The reason for two separate ghost cell exchange routines is that
- *   the logic here is considerably simpler than for the partial
- *   update used in intermediate steps in the subcycled case.
- **/
 void fclaw2d_ghost_update_async(fclaw2d_global_t* glob,
 								int minlevel,
 								int maxlevel,

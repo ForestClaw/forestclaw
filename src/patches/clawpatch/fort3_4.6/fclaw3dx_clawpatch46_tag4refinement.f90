@@ -1,4 +1,4 @@
-subroutine fclaw2d_clawpatch46_fort3_tag4refinement(mx,my,mz,mbc, & 
+subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, & 
     meqn, xlower,ylower,zlower, dx,dy,dz, blockno, & 
     q, tag_threshold, init_flag, tag_patch)
     implicit none
@@ -12,9 +12,9 @@ subroutine fclaw2d_clawpatch46_fort3_tag4refinement(mx,my,mz,mbc, &
     integer :: i,j,k, mq
     double precision :: qmin, qmax
 
-    integer :: exceeds_th, fclaw2d_clawpatch_exceeds_threshold
-    integer :: ii,jj
-    double precision :: xc,yc,quad(-1:1,-1:1), qval
+    integer :: exceeds_th, fclaw3dx_clawpatch_exceeds_threshold
+    integer :: ii,jj,kk
+    double precision :: xc,yc,zc, quad(-1:1,-1:1,-1:1), qval
 
     logical(kind=4) :: is_ghost, clawpatch3_is_ghost
 
@@ -32,7 +32,8 @@ subroutine fclaw2d_clawpatch46_fort3_tag4refinement(mx,my,mz,mbc, &
         do j = 1-mbc,my+mbc
             do i = 1-mbc,mx+mbc
                 xc = xlower + (i-0.5)*dx
-                yc = ylower + (j-0.5)*dy                
+                yc = ylower + (j-0.5)*dy   
+                zc = zlower + (k-0.5)*dz             
                 qmin = min(qmin,q(i,j,k,mq))
                 qmax = max(qmax,q(i,j,k,mq))
                 qval = q(i,j,k,mq)
@@ -40,12 +41,14 @@ subroutine fclaw2d_clawpatch46_fort3_tag4refinement(mx,my,mz,mbc, &
                 if (.not. is_ghost) then
                     do jj = -1,1
                         do ii = -1,1
-                            quad(ii,jj) = q(i+ii,j+jj,k,mq)
+                            do kk = -1,1
+                                quad(ii,jj,kk) = q(i+ii,j+jj,k+kk,mq)
+                            end do
                         end do
                     end do
                 endif
-                exceeds_th = fclaw2d_clawpatch_exceeds_threshold( & 
-                      blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,  & 
+                exceeds_th = fclaw3dx_clawpatch_exceeds_threshold( & 
+                      blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc, & 
                       tag_threshold,init_flag, is_ghost)
                 !! # -1 : Not conclusive (possibly ghost cell); don't tag for refinement
                 !! # 0  : Does not pass threshold (don't tag for refinement)      
@@ -57,7 +60,7 @@ subroutine fclaw2d_clawpatch46_fort3_tag4refinement(mx,my,mz,mbc, &
             end do
         end do
     end do
-end subroutine  fclaw2d_clawpatch46_fort3_tag4refinement
+end subroutine  fclaw3dx_clawpatch46_fort_tag4refinement
 
 !! # We may want to check ghost cells for tagging.  
 logical(kind=4) function clawpatch3_is_ghost(i,j,mx,my)

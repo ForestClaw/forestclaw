@@ -28,12 +28,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-// #include <fclaw2d_clawpatch_pillow.h>
+// #include <fclaw3dx_clawpatch_pillow.h>
 
 /* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch_fort.h>
+#include <fclaw3dx_clawpatch.h>
+#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw3dx_clawpatch_fort.h>
 
 
 /* Clawpack 4.6 headers */  
@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46_options.h>
 #include <fc3d_clawpack46_fort.h>  
 #include <fc3d_clawpack46_user_fort.h>  
-#include <fclaw2d_clawpatch46_fort.h>
+#include <fclaw3dx_clawpatch46_fort.h>
 
 #if 0
 /* Clawpack 5.0 headers */
@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5_options.h>
 #include <fc2d_clawpack5_fort.h>
 #include <clawpack5_user_fort.h>
-#include <fclaw2d_clawpatch5_fort.h>
+#include <fclaw3dx_clawpatch5_fort.h>
 #endif
 
 

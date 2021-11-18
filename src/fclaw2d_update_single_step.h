@@ -22,6 +22,10 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/**
+ * @file
+ * Single step routines
+ */
 
 #ifndef AMR_SINGLE_STEP_H
 #define AMR_SINGLE_STEP_H
@@ -37,22 +41,55 @@ extern "C"
 
 struct fclaw2d_global;
 
+/**
+ * @brief Buffer data for cudaclaw
+ */
 typedef struct fclaw2d_single_step_buffer_data
 {
+    /** Number of patches in buffer */
     int total_count;
+    /** Current patch index in buffer */
     int iter;
+    /**  Buffer pointer */
     void* user;    
 } fclaw2d_single_step_buffer_data_t;
 
 
+/**
+ * @brief Struct for single step iteration over patches
+ */
 typedef struct fclaw2d_single_step_data
 {
+    /** The time */
     double t;
+    /** The time step */
     double dt;
+    /** The maxcfl */
     double maxcfl;
+    /** The buffer data */
     fclaw2d_single_step_buffer_data_t buffer_data;
 } fclaw2d_single_step_data_t;
 
+/**
+ * @brief Advance the level using a single explicit time step.
+ * 
+ * Assumption is that the call back function 'cb_single_step'
+ * can update each patch independently of all the other
+ * patches at the level.  A second assumption is that only
+ * boundary conditions at the the current patch time are
+ * needed.  These are set before entering the patch update
+ * routine.
+ *
+ * This function is analogous to the MOL step solver
+ * fclaw_mol_step.cpp in that upon return, all the patches at
+ * the given level have been updated at the new time.
+ * 
+ * @param glob the global context
+ * @param level the level to advance
+ * @param t the current time
+ * @param dt the time step
+ * @return double the maxcfl
+ */
 double fclaw2d_update_single_step(struct fclaw2d_global *glob,
                                   int level,
                                   double t, double dt);

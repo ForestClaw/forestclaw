@@ -37,24 +37,49 @@ extern "C"
 #endif
 #endif
 
-/*************************** DATA TYPES ***********************************/
+/** 
+ * @file
+ * Main ForestClaw structures and routines
+ */
 
+/* ---------------------------------------------------------------------- */
+///                      @name Data Types
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Typedef for fclaw2d_domain */
 typedef struct fclaw2d_domain fclaw2d_domain_t;
+/** Typedef for fclaw2d_block */
 typedef struct fclaw2d_block fclaw2d_block_t;
+/** Typedef for fclaw2d_patch */
 typedef struct fclaw2d_patch fclaw2d_patch_t;
 
+/**
+ * @brief Enum for encoding patch information
+ */
 typedef enum
 {
+    /** Number relative to parent */
     FCLAW2D_PATCH_CHILDID = 0x7,
+    /** Patch is the first sibling */
     FCLAW2D_PATCH_FIRST_SIBLING = 0x8,
+    /** Has neighbor on different processor */
     FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY = 0x10,
+    /** Patch is a ghost patch */
     FCLAW2D_PATCH_IS_GHOST = 0x20,
+    /** Face 0 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_0 = 0x040,
+    /** Face 1 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_1 = 0x080,
+    /** Face 2 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_2 = 0x100,
+    /** Face 3 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_3 = 0x200,
+    /** Face 4 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_4_ONLY_FOR_3D = 0x400,
+    /** Face 5 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_5_ONLY_FOR_3D = 0x800,
+    /** Patch is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_BOUNDARY = 0xFC0
 }
 fclaw2d_patch_flags_t;
@@ -62,50 +87,62 @@ fclaw2d_patch_flags_t;
 /** For each of the four faces, the corresponding block boundary flag. */
 extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
 
-/*
- * The domain structure gives a processor local view of the grid hierarchy.
- * Unless explicitly noted otherwise, all variables are processor local,
- * i.e., they are generally different on each processor.
- * Variables that are synchronized and shared between processors
- * are denoted *global*.
- */
-
-/** The metadata structure for a forest leaf, which is a forestclaw patch.
+/** 
+ * @brief The metadata structure for a forest leaf, which is a forestclaw patch.
  * The patch may be either a process-local patch or a ghost patch.
  */
 struct fclaw2d_patch
 {
-    int level;                  /* 0 is root, increases if refined */
-    int target_level;           /* level desired after adaptation */
-    int flags;                  /* flags that encode tree information */
+    int level;                  /**< 0 is root, increases if refined */
+    int target_level;           /**< level desired after adaptation */
+    int flags;                  /**< flags that encode tree information */
+    /** @{ @brief lower left coordinate */
     double xlower, xupper;
+    /** @} */
+    /** @{ @brief upper right coordinate */
     double ylower, yupper;
+    /** @} */
+    /** Union, If this is a local patch, it points to the next patch, otherwise it gives
+     * the bock number of this patch */
     union
     {
-        fclaw2d_patch_t *next;  /* local: next patch same level same block */
-        int blockno;            /* off-proc: this patch's block number */
+        fclaw2d_patch_t *next;  /**< local: next patch same level same block */
+        int blockno;            /**< off-proc: this patch's block number */
     }
     u;
-    void *user;
+    void *user;                 /**< User Pointer */
 };
 
+/**
+ * @brief Data Structure for a block
+ */
 struct fclaw2d_block
 {
+    /** @{ @brief lower left coordinate */
     double xlower, xupper;
+    /** @} */
+    /** @{ @brief upper right coordinate */
     double ylower, yupper;
+    /** @} */
     double vertices[4 * 3];     /**< for each block corner, the xyz coordinates
                                      of the p4est_connectivity structure */
-    int is_boundary[4];         /* physical boundary flag */
-    int num_patches;            /* local patches in this block */
-    int num_patches_before;     /* in all previous blocks */
-    int num_exchange_patches;   /* exchange patches in this block */
-    int minlevel, maxlevel;     /* local over this block.  If this proc doesn't
-                                   store any patches in this block, we set
-                                   maxlevel < 0 <= minlevel. */
-    fclaw2d_patch_t *patches;   /* allocated storage */
-    fclaw2d_patch_t **patchbylevel;     /* array of pointers */
-    fclaw2d_patch_t **exchange_patches; /* one pointer for each exchange patch */
-    void *user;
+    int is_boundary[4];         /**< physical boundary flag */
+    int num_patches;            /**< local patches in this block */
+    int num_patches_before;     /**< in all previous blocks */
+    int num_exchange_patches;   /**< exchange patches in this block */
+    /** @{ 
+     * @brief min/max level
+     * local over this block.  If this proc doesn't
+     * store any patches in this block, we set
+     * maxlevel < 0 <= minlevel. 
+     */
+    int minlevel;
+    int maxlevel;
+    /** @} */
+    fclaw2d_patch_t *patches;           /**< The patches for this block */
+    fclaw2d_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
+    fclaw2d_patch_t **exchange_patches; /**< Pointer for each exchange patch */
+    void *user;                         /**< User pointer */
 };
 
 /** This structure identify parameters that are copied from a domain
@@ -119,22 +156,37 @@ typedef struct fclaw2d_domain_persist
 }
 fclaw2d_domain_persist_t;
 
+/**
+ * @brief The domain structure is a collection of blocks
+ * 
+ * The domain structure gives a processor local view of the grid hierarchy.
+ * Unless explicitly noted otherwise, all variables are processor local,
+ * i.e., they are generally different on each processor.
+ * Variables that are synchronized and shared between processors
+ * are denoted *global*.
+ */
 struct fclaw2d_domain
 {
-    sc_MPI_Comm mpicomm;        /* MPI communicator */
-    int mpisize, mpirank;       /* MPI variables */
-    int possible_maxlevel;      /* theoretical maximum that can be reached */
+    sc_MPI_Comm mpicomm;        /**< MPI communicator */
+    int mpisize;                /**< MPI size */
+    int mpirank;                /**< MPI rank */
+    int possible_maxlevel;      /**< theoretical maximum that can be reached */
 
     fclaw2d_domain_persist_t p;         /**< Parameters that carry over from
                                              one domain to a derived one. */
 
-    int local_num_patches;      /* sum of patches over all blocks on this proc */
-    int local_minlevel, local_maxlevel; /* proc local.  If this proc doesn't
-                                           store any patches at all, we set
-                                           local_maxlevel < 0 <= local_minlevel. */
-    int64_t global_num_patches; /* sum of local_num_patches over all procs */
-    int64_t global_num_patches_before;  /* Number of patches on lower procs */
-    int global_minlevel, global_maxlevel;       /* global, well-defined */
+    int local_num_patches;      /**< sum of patches over all blocks on this proc */
+    /** @{ */
+    /** Local to proc.  If this proc doesn't
+        store any patches at all, we set
+        local_maxlevel < 0 <= local_minlevel. */
+    int local_minlevel;
+    int local_maxlevel;
+    /** @} */
+    int64_t global_num_patches; /**< sum of local_num_patches over all procs */
+    int64_t global_num_patches_before;  /**< Number of patches on lower procs */
+    int global_minlevel;       /**< global min level */
+    int global_maxlevel;       /**< global max level */
 
     int just_adapted;           /**< true after non-trivial adaptation */
     int just_partitioned;       /**< true after non-trivial partition */
@@ -142,34 +194,41 @@ struct fclaw2d_domain
     int partition_unchanged_length;     /**< number of unchanged quadrants */
     int partition_unchanged_old_first;  /**< local index wrt. previous partition */
 
-    int num_blocks;             /**< Total number of blocks.
-                                     TODO: only store non-empty blocks. */
-    fclaw2d_block_t *blocks;    /* allocated storage */
-    int num_exchange_patches;   /* # my patches relevant to other procs.
+    int num_blocks;             /**< Total number of blocks. */
+    fclaw2d_block_t *blocks;    /**< allocated storage */
+    int num_exchange_patches;   /**< number my patches relevant to other procs.
                                    Identified by this expression to be true:
                                    (patch->flags &
                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
     fclaw2d_patch_t **exchange_patches; /**< explicitly store exchange patches */
-    int num_ghost_patches;      /* # off-proc patches relevant to this proc */
-    fclaw2d_patch_t *ghost_patches;     /* array of off-proc patches */
+    int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
+    fclaw2d_patch_t *ghost_patches;     /**< array of off-proc patches */
 
     void **mirror_target_levels;  /**< Points to target level of each mirror. */
     int *ghost_target_levels;   /**< Contains target level for each ghost. */
 
-    void *pp;                   /* opaque backend data */
-    int pp_owned;               /* The pp member is owned by this domain */
-    sc_keyvalue_t *attributes;  /* Reserved to store domain attributes */
+    void *pp;                   /**< opaque backend data */
+    int pp_owned;               /**< True if the pp member is owned by this domain */
+    sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
 
-    void *user;
+    void *user; /**< user data pointer */
 };
 
-/***************************** FUNDAMENTALS *******************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Fundamentals
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Log a message only on rank zero.
  * This is a hack: I shall check fclaw_base and make that useful instead. */
 void fclaw2d_global_log (int log_priority, const char *message);
 
-/***************************** DOMAIN ATTRIBUTES **************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Domain Attributes
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Add a named attribute to the domain.
  * Attribute names starting with 'fclaw' are reserved.
@@ -198,7 +257,11 @@ void *fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
 void fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain,
                                       const char *name);
 
-/*************************** TOPOLOGICAL PROPERTIES ***********************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                  @name Topological Properties
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Return the space dimension. */
 int fclaw2d_domain_dimension (const fclaw2d_domain_t * domain);
@@ -223,7 +286,11 @@ int fclaw2d_domain_num_orientations (const fclaw2d_domain_t * domain);
 void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
                                   int icorner, int faces[2]);
 
-/*************************** PATCH FUNCTIONS ******************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Patch Functions
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Return the dimension of a corner.
  * This function is LEGAL to call for both local and ghost patches.
@@ -256,18 +323,78 @@ int fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch);
  */
 int fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch);
 
-/************************* ALLOCATION *************************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                         @name Allocation
+/* ---------------------------------------------------------------------- */
+///@{
 
+/**
+ * @brief Allocate memory
+ * 
+ * @param size the size in bytes
+ * @return void* the newly allocated memory
+ */
 void *fclaw2d_alloc (size_t size);
+/**
+ * @brief Allocate a number of objects, intializes to 0
+ * 
+ * @param nmemb the number of objects
+ * @param size the size of an object (in bytes)
+ * @return void* the newly allocated memory
+ */
 void *fclaw2d_calloc (size_t nmemb, size_t size);
+/**
+ * @brief Reallocate memory
+ * 
+ * @param ptr the memory to be reallocated
+ * @param size the size in bytes
+ * @return void* the newly allocated memory
+ */
 void *fclaw2d_realloc (void *ptr, size_t size);
+/**
+ * @brief Free allocated memory
+ * 
+ * @param ptr the memory to free
+ */
 void fclaw2d_free (void *ptr);
+/**
+ * @brief Allocate an array with given length
+ * 
+ * @param t the type
+ * @param n the length of the array
+ * @return t* the newly allocateed memory
+ */
 #define FCLAW2D_ALLOC(t,n)      (t *) fclaw2d_alloc ((n) * sizeof (t))
+/**
+ * @brief Allocate an array with given length, initialized to zero
+ * 
+ * @param t the type
+ * @param n the length of the array
+ * @return t* the newly allocateed memory
+ */
 #define FCLAW2D_ALLOC_ZERO(t,n) (t *) fclaw2d_calloc ((n), sizeof (t))
+/**
+ * @brief Allocate an array with given length, initialized to zero
+ * 
+ * @param p pointer to memory to be reallocated
+ * @param t the type
+ * @param n the length of the array
+ * @return t* the newly allocateed memory
+ */
 #define FCLAW2D_REALLOC(p,t,n)  (t *) fclaw2d_realloc ((p), (n) * sizeof (t))
+/**
+ * @brief Free allocated memory
+ * 
+ * @param p the memory to free
+ */
 #define FCLAW2D_FREE(p)         fclaw2d_free (p)
 
-/***************************** PATCH ITERATORS ****************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Patch Iterators
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Callback prototype for the patch iterators.
  * We iterate over local patches only.
@@ -311,7 +438,11 @@ void fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
                                       fclaw2d_patch_callback_t pcb,
                                       void *user);
 
-/************************ PATCH NEIGHBORS *********************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Patch Neighbors
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Determine physical boundary status as 1, or 0 for neighbor patches.
  * This must ONLY be called for local patches.
@@ -335,11 +466,18 @@ int fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
 int fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
                                 int blockno, int patchno, int faceno);
 
+/**
+ * @brief The type of face neighbor
+ */
 typedef enum fclaw2d_face_neighbor
 {
+    /** Physical boundary */
     FCLAW2D_PATCH_BOUNDARY,
+    /** Half-size (finer) neighbor */
     FCLAW2D_PATCH_HALFSIZE,
+    /** Same-size neighbor */
     FCLAW2D_PATCH_SAMESIZE,
+    /** Double-size (coarser) neighbor */
     FCLAW2D_PATCH_DOUBLESIZE
 }
 fclaw2d_patch_relation_t;
@@ -567,7 +705,11 @@ void fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
                                       int mx, int my, int based,
                                       int i[], int j[]);
 
-/************************** ADAPT *****************************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                         @name Adaptivity
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Set parameters of refinement strategy in a domain.
  * This function only needs to be called once, and only for the first domain
@@ -636,7 +778,11 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                      fclaw2d_match_callback_t mcb,
                                      void *user);
 
-/*************************** PARTITION ************************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                         @name Parititon
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Allocate data buffer for parallel transfer of all patches.
  * \param [in,out] domain       The memory lives inside this domain.
@@ -709,30 +855,34 @@ void fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
 void fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
                                           void ***patch_data);
 
-/**************************** EXCHANGE ************************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                         @name Exchange
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Data structure for storing allocated data for parallel exchange. */
 typedef struct fclaw2d_domain_exchange
 {
-    size_t data_size;
+    size_t data_size; /**< The number of bytes per patch to exchange */
 
     /* These two members are for consistency checking */
-    int num_exchange_patches;
-    int num_ghost_patches;
-    /*
+    int num_exchange_patches; /**< Number of patches to send */
+    int num_ghost_patches; /**< Number of patches to receive */
+    /**
        One pointer per processor-local exchange patch in order, for a total
        count of domain->num_exchange_patches.  This applies precisely to local
        patches that touch the parallel boundary from the inside, i.e., if
        (flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY).
      */
     void **patch_data;
-    /*
+    /**
        Array of domain->num_ghost_patches many void pointers, each pointing to
        exactly data_size bytes of memory that can be read from by forestclaw
        after each fclaw2d_domain_parallel_exchange.
      */
     void **ghost_data;
-    /*
+    /**
        Memory where the ghost patch data actually lives.
        The above array ghost_data points into this memory.
        It will not be necessary to dereference this memory explicitly.
@@ -810,7 +960,11 @@ void fclaw2d_domain_ghost_exchange_end (fclaw2d_domain_t * domain,
 void fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
                                          fclaw2d_domain_exchange_t * e);
 
-/********************* INDIRECT PARALLEL NEIGHBORS ************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                 @name Indirect Parallel Neighbors
+/* ---------------------------------------------------------------------- */
+///@{
 
 /* Data structure for storing indirect parallel neighbor information */
 typedef struct fclaw2d_domain_indirect fclaw2d_domain_indirect_t;
@@ -874,7 +1028,11 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
 void fclaw2d_domain_indirect_destroy (fclaw2d_domain_t * domain,
                                       fclaw2d_domain_indirect_t * ind);
 
-/************************ COMMUNICATION ***********************************/
+///@}
+/* ---------------------------------------------------------------------- */
+///                     @name Communication
+/* ---------------------------------------------------------------------- */
+///@{
 
 /** Compute and return the maximum over all processors of a double value.
  * The minimum can be computed by using this function on the negative value.
@@ -909,6 +1067,7 @@ void fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain);
  */
 void fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain);
 
+///@}
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

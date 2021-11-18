@@ -35,13 +35,39 @@ struct fclaw2d_global;
 struct fclaw2d_patch;
 struct fclaw2d_domain;
 
+/** 
+ * @file
+ * Routines for ascii output 
+ */
+
+/**
+ * @brief Callback called on each patch
+ * 
+ * @param domain the domain context
+ * @param patch the patch context
+ * @param blockno the block number
+ * @param patchno the patch number
+ * @param user the user data pointer
+ */
 void cb_clawpatch_output_ascii (struct fclaw2d_domain * domain,
                                 struct fclaw2d_patch * patch,
                                 int blockno, int patchno,
                                 void *user);
 
+/**
+ * @brief output ascii data
+ * 
+ * @param glob the global context
+ * @param iframe the frame index
+ */
 void fclaw2d_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
 
+/**
+ * @brief output ascii time header
+ * 
+ * @param glob the global context
+ * @param iframe the frame index
+ */
 void fclaw2d_clawpatch_time_header_ascii(struct fclaw2d_global* glob, int iframe);
 
 

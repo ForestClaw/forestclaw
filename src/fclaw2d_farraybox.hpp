@@ -27,24 +27,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_FARRAYBOX_H
 
 #include <fclaw2d_defs.h>
+#include <vector>
 
 void fclaw2d_farraybox_set_to_nan(double& f);
 
 class Box
 {
 public:
-    Box();
-    Box(const int ll[], const int ur[]);
+    Box() = default;
     Box(const int ll[], const int ur[], const int box_dim);
-    Box(const Box& a_box);
     int smallEnd(int idir) const;
     int bigEnd(int idir) const;
     int boxDim() const;
 
 private:
-    int m_box_dim;
-    int m_ll[FCLAW2D_PATCHDIM];
-    int m_ur[FCLAW2D_PATCHDIM];
+    int m_box_dim = 0;
+    std::vector<int> m_ll;
+    std::vector<int> m_ur;
 };
 
 class FArrayBox

@@ -1,4 +1,4 @@
-subroutine fclaw2d_clawpatch46_fort3_timeinterp(mx,my,mz, mbc,meqn, & 
+subroutine fclaw3dx_clawpatch46_fort_timeinterp(mx,my,mz, mbc,meqn, & 
         psize, qcurr,qlast,qinterp,alpha,ierror)
     implicit none
 

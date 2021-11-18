@@ -16,6 +16,7 @@ jobs:
       CTEST_PARALLEL_LEVEL: 2
 
     strategy:
+      fail-fast: false
       matrix:
         include:
         - name: "Serial Minimal"
@@ -23,6 +24,9 @@ jobs:
           ubuntu_packages: ""
         - name: "Serial With Clawpack"
           configure_flags: "-Dclawpack=ON"
+          ubuntu_packages: ""
+        - name: "Serial With Clawpack 3"
+          configure_flags: "-Dclawpack3=ON"
           ubuntu_packages: ""
         - name: "Serial With GeoClaw"
           configure_flags: "-Dgeoclaw=ON"
@@ -38,7 +42,7 @@ jobs:
           configure_flags: "-Dmpi=ON -Dclawpack=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With Clawpack 3"
-          configure_flags: "-Dmpi=ON -Dclawpack3=ON -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2"
+          configure_flags: "-Dmpi=ON -Dclawpack3=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
@@ -47,9 +51,9 @@ jobs:
           configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
           cuda: true
-        # - name: "MPI With ThunderEgg"
-        #   configure_flags: "-Dmpi=ON -Dthunderegg=ON"
-        #   ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
+        - name: "MPI With ThunderEgg"
+          configure_flags: "-Dmpi=ON -Dthunderegg=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
 
     name: CMake ${{ matrix.name }} Build on Linux
     steps:
@@ -63,7 +67,7 @@ jobs:
             ninja-build ${{ matrix.ubuntu_packages }}
 
     - name: Install Cuda Toolkit
-      if: matrix.cuda
+      if: ${{ matrix.cuda }}
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
         sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
@@ -79,6 +83,7 @@ jobs:
       run: cmake --build --preset ci
 
     - name: CMake test
+      if: ${{ !matrix.cuda }}
       run: ctest --parallel 2 --output-on-failure
       working-directory: build
 

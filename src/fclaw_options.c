@@ -276,13 +276,11 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_double (opt, 0, "by", &fclaw_opt->by, 1, "yupper " \
                            "(used only with manifold=0) [1]");
 
-#if FCLAW2D_PATCHDIM == 3
     sc_options_add_double (opt, 0, "az", &fclaw_opt->az, 0, "zlower " \
                            "(used only with manifold=0) [0]");
 
     sc_options_add_double (opt, 0, "bz", &fclaw_opt->bz, 1, "zupper " \
                            "(used only with manifold=0) [1]");
-#endif    
 
     sc_options_add_bool (opt, 0, "manifold", &fclaw_opt->manifold, 0,
                          "Solution is on manifold [F]");

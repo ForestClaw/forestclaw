@@ -23,7 +23,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef REFINE_DIM
+#define REFINE_DIM 2
+#endif
+
+#ifndef PATCH_DIM
+#define PATCH_DIM 2
+#endif
+
+#if REFINE_DIM == 2 && PATCH_DIM == 2
+
 #include <fclaw2d_clawpatch_options.h>
+
+#elif REFINE_DIM == 2 && PATCH_DIM == 3
+
+#include <fclaw3dx_clawpatch_options.h>
+#include <_fclaw2d_to_fclaw3dx.h>
+
+#endif
 #include <fclaw2d_global.h>
 #include <fclaw_package.h>
 
@@ -34,7 +51,7 @@ static int s_refine_criteria = -1;
 
 void fclaw2d_clawpatch_set_refinement_criteria(int r)
 {
-    FCLAW_ASSERT(s_refine_criteria == -1);
+    //FCLAW_ASSERT(s_refine_criteria == -1);
     s_refine_criteria = r;
 }
 
@@ -54,8 +71,10 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
     sc_options_add_int (opt, 0, "my", &clawpatch_options->my, 8,
                         "Number of grid cells per patch in y [8]");
 
+#if PATCH_DIM == 3
     sc_options_add_int (opt, 0, "mz", &clawpatch_options->mz, 1,
                         "Number of grid cells per patch in z [1]");
+#endif
 
     sc_options_add_int (opt, 0, "maux", &clawpatch_options->maux, 0,
                         "Number of auxilliary variables [0]");
@@ -247,7 +266,7 @@ fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob,
 {
     int id;
 
-    FCLAW_ASSERT(s_clawpatch_options_package_id == -1);
+    //FCLAW_ASSERT(s_clawpatch_options_package_id == -1);
     id = fclaw_package_container_add_pkg(glob,
                                          clawpatch_options);
     s_clawpatch_options_package_id = id;

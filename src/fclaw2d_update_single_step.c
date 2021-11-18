@@ -70,19 +70,6 @@ void cb_single_step(fclaw2d_domain_t *domain,
 }
 
 
-/* ---------------------------------------------------
-   Advance the level using a single explicit time step
-   Assumption is that the call back function 'cb_single_step'
-   can update each patch independently of all the other
-   patches at the level.  A second assumption is that only
-   boundary conditions at the the current patch time are
-   needed.  These are set before entering the patch update
-   routine.
-
-   This function is analogous to the MOL step solver
-   fclaw_mol_step.cpp in that upon return, all the patches at
-   the given level have been updated at the new time.
-   --------------------------------------------------- */
 double fclaw2d_update_single_step(fclaw2d_global_t *glob,
                                   int level,
                                   double t, double dt)
