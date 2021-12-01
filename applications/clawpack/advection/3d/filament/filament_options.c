@@ -36,6 +36,9 @@ filament_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "example", &user->example, 0,
                         "[user] 0 = nomap 0]");
 
+    sc_options_add_bool (opt, 0, "use_claw3d", &user->use_claw3d, 1,
+                        "[user] Use 3d library [True]");
+
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
 
