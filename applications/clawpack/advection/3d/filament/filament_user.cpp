@@ -30,21 +30,28 @@ void filament_link_solvers(fclaw2d_global_t *glob)
 {
     const user_options_t* user = filament_get_options(glob);
     if (user->claw_version == 4)
-    {
-        fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt();
+    {        
+        if (!user->use_claw3d)
+        {
+            fclaw_global_essentialf("filament_user.cpp: 2d example not implemented in this directory.");
+        }
+        else
+        {
+            fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt();
 
-        clawpack46_vt->fort_setprob   = &SETPROB;
-        clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
+            clawpack46_vt->fort_setprob   = &SETPROB;
+            clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
 
-        /* Used in non-manifold case */
-        clawpack46_vt->fort_setaux     = &CLAWPACK46_SETAUX;  
-        clawpack46_vt->fort_rpn3       = &CLAWPACK46_RPN3;
-        clawpack46_vt->fort_rpt3       = &CLAWPACK46_RPT3;
-        clawpack46_vt->fort_rptt3      = &CLAWPACK46_RPTT3;
+            /* Used in non-manifold case */
+            clawpack46_vt->fort_setaux     = &CLAWPACK46_SETAUX;  
+            clawpack46_vt->fort_rpn3       = &CLAWPACK46_RPN3;
+            clawpack46_vt->fort_rpt3       = &CLAWPACK46_RPT3;
+            clawpack46_vt->fort_rptt3      = &CLAWPACK46_RPTT3;            
+        }
     }
     else if (user->claw_version == 5)
     {
-        printf("swirl_user.cpp : Example not implemented for Claw version 5.\n");
+        printf("filament_user.cpp : Example not implemented for Claw version 5.\n");
         exit(0);
     }
 }
