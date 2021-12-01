@@ -33,7 +33,9 @@ void filament_link_solvers(fclaw2d_global_t *glob)
     {        
         if (!user->use_claw3d)
         {
-            fclaw_global_essentialf("filament_user.cpp: 2d example not implemented in this directory.");
+            fclaw_global_essentialf("filament_user.cpp: " \
+                                    "2d example not implemented.\n");
+            exit(0);
         }
         else
         {
@@ -51,7 +53,8 @@ void filament_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        printf("filament_user.cpp : Example not implemented for Claw version 5.\n");
+        fclaw_global_essentialf("filament_user.cpp : " \
+                                "Example not implemented for Claw version 5.\n");
         exit(0);
     }
 }
