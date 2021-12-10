@@ -444,8 +444,8 @@ typedef double (*clawpatch_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
  * @param[in] error error array
  * @param[out] error_norm a 2d array of  l1, l2, and inf norms for each eqn
  */
-typedef void (*clawpatch_fort_norm_t)(int* blockno, int *mx, int *my, int *mbc,int *meqn,
-									  double *dx, double *dy, double area[],
+typedef void (*clawpatch_fort_norm_t)(const int* blockno, const int *mx, const int *my, const int *mbc, const int *meqn,
+									  const double *dx, const double *dy, double area[],
 									  double error[], double error_norm[]);
 
 /** @} */

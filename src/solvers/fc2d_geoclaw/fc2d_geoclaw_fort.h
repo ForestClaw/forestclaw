@@ -495,12 +495,12 @@ void  FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(const int *mx,
                        FCLAW_F77_FUNC(fc2d_geoclaw_fort_conservation_check, \
                        FC2D_GEOCLAW_FORT_CONSERVATION_CHECK)
 
-void FC2D_GEOCLAW_FORT_CONSERVATION_CHECK(const int *mx, 
-                                          const int *my, 
-                                          const int* mbc, 
-                                          const int* meqn,
-                                          const double *dx, 
-                                          const double *dy,
+void FC2D_GEOCLAW_FORT_CONSERVATION_CHECK( int *mx, 
+                                           int *my, 
+                                           int* mbc, 
+                                           int* meqn,
+                                           double *dx, 
+                                           double *dy,
                                           double area[], 
                                           double q[], 
                                           double* sum,
@@ -510,11 +510,11 @@ void FC2D_GEOCLAW_FORT_CONSERVATION_CHECK(const int *mx,
                       FCLAW_F77_FUNC(fc2d_geoclaw_fort_compute_patch_area, \
                       FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA)
 
-double FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA(const int *mx, 
-                                            const int *my, 
-                                            const int *mbc, 
-                                            const double* dx,                        
-                                            const double* dy, 
+double FC2D_GEOCLAW_FORT_COMPUTE_PATCH_AREA( int *mx, 
+                                             int *my, 
+                                             int *mbc, 
+                                             double* dx,                        
+                                             double* dy, 
                                             double area[]);
 
 
