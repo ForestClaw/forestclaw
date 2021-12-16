@@ -28,9 +28,10 @@
 
       double precision xc,yc,xp,yp,zp
       double precision R, tan_xi, tan_eta
-      double precision pi
 
-      common /compi/ pi
+      
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
       R = 1.d0
       tan_xi = tan(0.5d0*pi*(xc-0.5d0))

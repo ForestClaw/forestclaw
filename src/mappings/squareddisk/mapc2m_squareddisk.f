@@ -10,11 +10,9 @@ c     # -------------------------------------------------------
       double precision alpha
       integer blockno
       double precision xc1, yc1
-      double precision pi
 
-      common /compi/ pi
-
-      pi = 4.d0*atan(1.d0)
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
       if (blockno .eq. 2) then
          xp = (2*xc - 1)*alpha/sqrt(2.d0);
@@ -54,9 +52,9 @@ c     # -------------------------------------------------------
       double precision alpha
       double precision R, tau, xi_prime
 
-      double precision pi
+      double precision pi, pi2
 
-      common /compi/ pi
+      common /compi/ pi, pi2
 
 c     # Original R - might be smoother
       R = alpha**(1-eta)

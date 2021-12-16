@@ -68,9 +68,10 @@ c--------------------------------------------------------------------
      &      blockno,mpirank)
 
 
-      if (meqn .gt. 5) then
-         write(6,'(A,A)') 'Warning (fclaw2d_fort_write_file.f) ',
-     &         ': meqn > 5;  change format statement 109.'
+      if (meqn .gt. 20) then
+         write(6,'(A,A)') 
+     &       'Warning (fclaw2d_clawpatch5_fort_output_ascii) ',
+     &         ': meqn > 20;  change format statement 90.'
          stop
       endif
 
@@ -86,7 +87,7 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
          enddo
          write(matunit1,*) ' '
       enddo
-  120 format (5E26.16)
+  120 format (20E26.16)
 
       close(matunit1)
 

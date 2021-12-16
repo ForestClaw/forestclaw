@@ -10,6 +10,7 @@ c     # ------------------------------------------------------------------
       subroutine mapc2m_pillowsphere(blockno, xc1,yc1,xp,yp,zp)
       implicit none
 
+      external mapc2m_cart
       double precision xc1,yc1, xp, yp, zp
 
       double precision x1, y1, d, rp2, xc, yc, zc
@@ -75,8 +76,8 @@ c     #
       double precision xi,eta,x,y, minxy,maxxy
       double precision xit, etat, dd
 
-      double precision pi
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
       xc = x1
       yc = y1
