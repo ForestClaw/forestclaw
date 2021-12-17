@@ -25,7 +25,7 @@ target_include_directories(filament3dx PRIVATE
 )
 
 target_link_libraries(filament3dx PRIVATE 
- FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK3_46
  FORESTCLAW::CLAWPACK3_46
 )
 
