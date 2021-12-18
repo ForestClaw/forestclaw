@@ -1,8 +1,10 @@
-      double precision function psi(x,y,z)
+      double precision function psi(x,y)
       implicit none
 
-      double precision x,y,z,pi,r
-      common /compi/ pi
+      double precision x,y,r
+
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
 c      psi = ((sin(pi*x))**2 * (sin(pi*y))**2) / pi
 
@@ -24,7 +26,7 @@ c      psi = x + y
 
       double precision xd1(3),xd2(3), ds, vn, psi,t
 
-      vn = (psi(xd1(1),xd1(2),xd1(3)) -
-     &      psi(xd2(1),xd2(2),xd2(3)))/ds
+      vn = (psi(xd1(1),xd1(2)) -
+     &      psi(xd2(1),xd2(2)))/ds
 
       end

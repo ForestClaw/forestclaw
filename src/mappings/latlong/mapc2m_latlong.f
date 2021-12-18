@@ -4,9 +4,10 @@ c     # [xc,yc] are in [-180,180]x[0,360]
 
       integer blockno
       double precision xc,yc,xp,yp,zp
-      double precision pi, deg2rad,xc1,yc1
+      double precision deg2rad,xc1,yc1
 
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
 c     # blockno is not used here;  assume that [xc,yc] is
 c     # in a box [long0, long1]x[lat0,lat1], in

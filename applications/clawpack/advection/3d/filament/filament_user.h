@@ -40,6 +40,7 @@ extern "C"
 typedef struct user_options
 {
     int example;
+    int use_claw3d;
 
     int claw_version;
 

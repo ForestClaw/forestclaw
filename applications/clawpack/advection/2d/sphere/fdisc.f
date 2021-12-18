@@ -5,8 +5,8 @@
       integer blockno
       integer*8 cont, get_context
 
-      double precision pi
-      common /compi/ pi
+      double precision pi, pi2
+      common /compi/ pi, pi2
 
       cont = get_context()
 
