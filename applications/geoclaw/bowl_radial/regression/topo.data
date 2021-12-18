@@ -8,5 +8,5 @@
 0                    =: test_topography      # (Type topography specification) 
 1                    =: ntopofiles          
 
-'bowl.topotype2' 
+'./bowl.topotype2' 
    2   # topo_type
