@@ -6,6 +6,6 @@
 
 4                    =: qinit_type          
 
-'/home/calhoun/projects/forestclaw/applications/geoclaw/bowl_radial/regression/hump.xyz' 
+'./hump.xyz' 
 F                    =: variable_eta_init   
 0                    =: num_force_dry       
