@@ -99,6 +99,8 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
         fclaw2d_patch_remote_ghost_build(glob,ghost_patch,blockno,
                                          patchno, build_mode);
     }
+    fclaw_infof("[%d] Done building remove ghost patches : %d\n",
+                            domain->mpirank,domain->num_ghost_patches);
 }
 
 static
