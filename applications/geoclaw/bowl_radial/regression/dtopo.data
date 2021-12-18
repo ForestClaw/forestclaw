@@ -4,9 +4,7 @@
 ###    and then "make .data"                        ####
 ########################################################
 
-99999.0              =: topo_missing         # replace no_data_value in topofile 
-0                    =: test_topography      # (Type topography specification) 
-1                    =: ntopofiles          
+0                    =: mdtopofiles         
 
-'bowl.topotype2' 
-   2   # topo_type
+
+1e+99                =: dt_max_dtopo        
