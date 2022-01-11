@@ -15,13 +15,19 @@ set(CMAKE_CXX_STANDARD 17)
 
 # -- check if this being included as a subdirectory
 if(NOT TARGET FORESTCLAW::FORESTCLAW)
+    if(TEST_EXTERNAL_PROJECT)
+        list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ForestClawExternalProject)
+        include(ForestClawExternalProject)
+        ForestClawExternalProject(TAG develop
+                                  COMPONENTS ${TEST_EXTERNAL_PROJECT_COMPONENTS})
 
-    set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
-    find_package(MPI)
+    else()
+        set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
+        find_package(MPI)
 
-    # --- get installed ForestClaw package
-    find_package(FORESTCLAW REQUIRED)
-
+        # --- get installed ForestClaw package
+        find_package(FORESTCLAW REQUIRED)
+    endif()
     if(TARGET FORESTCLAW::CUDACLAW)
         enable_language(CUDA)
     endif()
