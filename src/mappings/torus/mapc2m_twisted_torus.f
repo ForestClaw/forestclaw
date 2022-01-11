@@ -6,10 +6,7 @@
       double precision alpha, r
 
       double precision pi, pi2
-
-      common /compi/ pi
-
-      pi2 = 2*pi
+      common /compi/ pi, pi2
 
       r = 1.d0 + alpha*cos(pi2*(yc + xc))
 

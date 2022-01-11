@@ -26,6 +26,7 @@ target_include_directories(filament3dx PRIVATE
 
 target_link_libraries(filament3dx PRIVATE 
  FORESTCLAW::CLAWPACK3_46
+ FORESTCLAW::CLAWPACK3_46
 )
 
 add_test(NAME clawpack_advection_3d_filament COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

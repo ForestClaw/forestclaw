@@ -83,7 +83,7 @@ void FCLAW2D_CLAWPATCH5_FORT_TAG4REFINEMENT(const int* mx,const int* my,
 /** @copydoc fclaw2d_clawpatch5_fort_tag4coarsening() */
 void FCLAW2D_CLAWPATCH5_FORT_TAG4COARSENING(const int* mx, const int* my,
                                              const int* mbc, const int* meqn,
-                                             const double* xlower, const double* ylower,
+                                             double xlower[], double ylower[],
                                              const double* dx, const double* dy,
                                              const int* blockno,
                                              double q0[],double q1[],
@@ -310,8 +310,8 @@ double FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, dou
                    FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM)
 
 /** @copydoc fclaw2d_clawpatch5_fort_compute_error_norm() */
-void FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM (int* blockno, int* mx,int* my,int* mbc,
-                                                 int* meqn,double* dx,double* dy,
+void FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM (const int* blockno, const int* mx,const int* my,const int* mbc,
+                                                 const int* meqn,const double* dx,const double* dy,
                                                  double area[], double error[],
                                                  double* error_norm);
 
@@ -369,7 +369,7 @@ void CLAWPATCH5_TAG4REFINEMENT(const int* mx,const int* my,
  */
 void CLAWPATCH5_TAG4COARSENING(const int* mx, const int* my,
                               const int* mbc, const int* meqn,
-                              const double* xlower, const double* ylower,
+                              double xlower[], double ylower[],
                               const double* dx, const double* dy,
                               const int* blockno,
                               double q0[],double q1[],

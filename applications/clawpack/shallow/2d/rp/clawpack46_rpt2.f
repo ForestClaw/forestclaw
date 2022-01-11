@@ -21,8 +21,8 @@ c
       common /cparam/  grav    !# gravitational parameter
       dimension waveb(3,3),sb(3)
       parameter (maxm2 = 603)  !# assumes at most 600x600 grid with mbc=3
-      common /comroe/ u(-2:maxm2),v(-2:maxm2),a(-2:maxm2),hl(-2:maxm2),
-     &                hr(-2:maxm2)
+      double precision, dimension(-2:maxm2) :: u,v,a,h
+      common /comroe/ u,v,a,h
 c
       if (-2.gt.1-mbc .or. maxm2 .lt. maxm+mbc) then
           write(6,*) 'need to increase maxm2 in rpB'
