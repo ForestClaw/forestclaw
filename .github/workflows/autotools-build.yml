@@ -244,7 +244,7 @@ jobs:
     - name: Install ThunderEgg
       run: |
         cd ThunderEggSrc
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ .
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ -DBUILD_TESTING=OFF .
         make install
     - name: Init and Update Submodules
       run: |
