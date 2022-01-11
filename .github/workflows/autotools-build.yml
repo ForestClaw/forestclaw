@@ -1,5 +1,9 @@
 name: ForestClaw Build
-on: [push]
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
 env:
   CFLAGS: -lgfortran
   CXXFLAGS: -lgfortran --std=c++17
