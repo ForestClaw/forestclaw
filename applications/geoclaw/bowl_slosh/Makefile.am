@@ -1,10 +1,10 @@
 ## Makefile.am in applications/geoclaw/bowl_slosh
 
-bin_PROGRAMS += applications/geoclaw/bowl_slosh/slosh
+bin_PROGRAMS += applications/geoclaw/bowl_slosh/bowl_slosh
 
 TESTS += applications/geoclaw/bowl_slosh/regressions.sh
 
-applications_geoclaw_bowl_slosh_slosh_SOURCES = \
+applications_geoclaw_bowl_slosh_bowl_slosh_SOURCES = \
 	applications/geoclaw/bowl_slosh/slosh_user.cpp \
 	applications/geoclaw/bowl_slosh/slosh_user.h \
 	applications/geoclaw/bowl_slosh/slosh.cpp \
@@ -22,12 +22,12 @@ EXTRA_DIST += \
 	applications/geoclaw/bowl_slosh/wetcell.m \
 	applications/geoclaw/bowl_slosh/plot_region.m
 
-applications_geoclaw_bowl_slosh_slosh_CPPFLAGS = \
+applications_geoclaw_bowl_slosh_bowl_slosh_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_GEOCLAW_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_geoclaw_bowl_slosh_slosh_LDADD = \
+applications_geoclaw_bowl_slosh_bowl_slosh_LDADD = \
          $(LDADD) \
          $(FCLAW_GEOCLAW_LDADD) \
          $(FCLAW_CLAWPATCH_LDADD) \
