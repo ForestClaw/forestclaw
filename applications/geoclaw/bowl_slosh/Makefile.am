@@ -1,6 +1,6 @@
 ## Makefile.am in applications/geoclaw/bowl_slosh
 
-bin_PROGRAMS += applications/geoclaw/bowl_slosh/slosh
+bin_PROGRAMS += applications/geoclaw/bowl_slosh/bowl_slosh
 
 TESTS += applications/geoclaw/bowl_slosh/regressions.sh
 
