@@ -1,5 +1,9 @@
 name: ForestClaw Build
-on: [push]
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
 env:
   CFLAGS: -lgfortran
   CXXFLAGS: -lgfortran --std=c++17
@@ -55,32 +59,6 @@ jobs:
       run: ./bootstrap
     - name: Configure
       run: ./configure --enable-clawpack
-    - name: Build
-      run: make
-    - name: Tests
-      run: make check -j2
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
-    - name: Install
-      run: sudo make install
-
-  serial_build_with_clawpack3_enabled:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libblas-dev liblapack-dev
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure --enable-clawpack3
     - name: Build
       run: make
     - name: Tests
@@ -250,33 +228,6 @@ jobs:
     - name: Install
       run: sudo make install
 
-  mpi_build_with_clawpack3_enabled:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure --enable-clawpack3 --enable-mpi
-    - name: Build
-      run: make
-    - name: Tests
-      run: make check
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
-    - name: Install
-      run: sudo make install
-
-
   mpi_build_with_thunderegg_enabled:
     runs-on: ubuntu-20.04
     steps:
@@ -293,7 +244,7 @@ jobs:
     - name: Install ThunderEgg
       run: |
         cd ThunderEggSrc
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ .
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ -DBUILD_TESTING=OFF .
         make install
     - name: Init and Update Submodules
       run: |
