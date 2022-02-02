@@ -18,7 +18,8 @@ if(NOT TARGET FORESTCLAW::FORESTCLAW)
     if(TEST_EXTERNAL_PROJECT)
         list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ForestClawExternalProject)
         include(ForestClawExternalProject)
-        ForestClawExternalProject(TAG develop
+        ForestClawExternalProject(REPOSITORY ${TEST_EXTERNAL_PROJECT_REPO}
+                                  TAG ${TEST_EXTERNAL_PROJECT_TAG}
                                   COMPONENTS ${TEST_EXTERNAL_PROJECT_COMPONENTS})
 
     else()
