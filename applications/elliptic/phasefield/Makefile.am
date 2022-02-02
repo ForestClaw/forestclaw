@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/elliptic/phasefield/phasefield
 
+TESTS += applications/elliptic/phasefield/regressions.sh
+
 applications_elliptic_phasefield_phasefield_SOURCES = \
 	applications/elliptic/phasefield/phasefield.cpp \
 	applications/elliptic/phasefield/phasefield_run.c \
