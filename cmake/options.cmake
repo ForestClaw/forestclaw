@@ -1,5 +1,6 @@
 option(mpi "use MPI library")
 option(openmp "use OpenMP")
+option(applications "build applications" ON)
 
 option(clawpack "build Clawpack")
 option(geoclaw "build Geoclaw")
