@@ -16,7 +16,8 @@ set(CMAKE_CXX_STANDARD 17)
 # -- check if this being included as a subdirectory
 if(NOT TARGET FORESTCLAW::FORESTCLAW)
     if(TEST_EXTERNAL_PROJECT)
-        list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ForestClawExternalProject)
+        get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+        list(APPEND CMAKE_MODULE_PATH ${PARENT_DIR}/scripts/ForestClawExternalProject)
         include(ForestClawExternalProject)
         ForestClawExternalProject(REPOSITORY ${TEST_EXTERNAL_PROJECT_REPO}
                                   TAG ${TEST_EXTERNAL_PROJECT_TAG}
