@@ -26,3 +26,9 @@ target_include_directories(allencahn PRIVATE
 target_link_libraries(allencahn PRIVATE 
   FORESTCLAW::FC2D_THUNDEREGG
 )
+
+add_test(NAME elliptic_allencahn 
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(elliptic_allencahn
+         PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
