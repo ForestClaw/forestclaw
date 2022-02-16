@@ -1,4 +1,4 @@
-subroutine clawpack46_set_capacity(mx,my,mz,mbc,dx,dy,dz, & 
+subroutine fc3d_clawpack46_set_capacity(mx,my,mz,mbc,dx,dy,dz, & 
                                    volume,mcapa,maux,aux)
     implicit none
 
@@ -19,4 +19,4 @@ subroutine clawpack46_set_capacity(mx,my,mz,mbc,dx,dy,dz, &
             end do
         end do
     end do
-end subroutine clawpack46_set_capacity
+end subroutine fc3d_clawpack46_set_capacity
