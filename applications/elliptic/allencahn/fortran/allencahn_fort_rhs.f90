@@ -7,8 +7,8 @@ subroutine allencahn_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
     DOUBLE PRECISION rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)    
     DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-    INTEGER i,j, m, blockno
-    DOUBLE PRECISION xc,yc, lambda, D, u
+    INTEGER i,j, blockno
+    DOUBLE PRECISION lambda, D, u
 
     lambda = -1.d0/dt
 
@@ -38,7 +38,7 @@ subroutine allencahn_update_q(mbc,mx,my,meqn,mfields,rhs,q)
             q(i,j,1) = rhs(i,j,1)
         end do
     end do
-100 format(2F16.8)
+!!100 format(2F16.8)
 
 end subroutine allencahn_update_q
 

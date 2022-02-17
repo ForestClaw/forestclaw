@@ -6,8 +6,6 @@ add_library(poisson_f OBJECT
   fortran/poisson_qexact.f90 
   fortran/poisson_apply_bc.f90 
   fortran/poisson_eval_bc.f90 
-  fortran/poisson_tag4refinement.f 
-  fortran/poisson_tag4coarsening.f 
   fortran/poisson_output.f90
 )
 

@@ -9,7 +9,7 @@
        double precision xc,yc,xp,yp,zp,rp
 
        integer i,j,m
-       double precision phi, x0, y0, th
+       double precision x0, y0, th
 
        double precision pi
        common /compi/pi

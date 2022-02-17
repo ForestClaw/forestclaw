@@ -8,7 +8,7 @@ subroutine poisson_fort_rhs(blockno, mbc,mx,my,mfields, &
     double precision q
 
     INTEGER i,j, m
-    DOUBLE PRECISION xc,yc, xc1, yc1, zc1, poisson_qexact_rhs
+    DOUBLE PRECISION xc,yc, poisson_qexact_rhs
     INTEGER blockno
 
     do i = 1-mbc,mx+mbc

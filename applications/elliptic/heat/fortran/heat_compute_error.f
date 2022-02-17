@@ -12,7 +12,6 @@
 
       integer i,j,m
       double precision xc,yc, heat_qexact
-      double precision xc1, yc1, zc1
 
       cont = get_context()
 

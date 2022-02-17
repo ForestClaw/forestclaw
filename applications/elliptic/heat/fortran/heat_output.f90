@@ -1,7 +1,7 @@
 subroutine heat_fort_header_ascii(matname1,matname2, time,meqn,maux,ngrids)
     implicit none
 
-    integer iframe,meqn,ngrids, maux
+    integer meqn,ngrids, maux
 
     character*11 matname1
     character*11 matname2
@@ -99,7 +99,7 @@ subroutine heat_fort_output_ascii(matname1, &
     close(matunit1)
 
 120 format (5E26.16)
-121 format (3I5,6E24.16)
-122 format (2I5,6E24.16)
+!!121 format (3I5,6E24.16)
+!!122 format (2I5,6E24.16)
 
 end subroutine heat_fort_output_ascii
