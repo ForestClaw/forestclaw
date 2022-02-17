@@ -31,14 +31,12 @@ subroutine heat_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
 
     !! Dummy arrays needed to apply boundary conditions
     double precision qh(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
-    double precision beta(1-mbc:mx+mbc,1-mbc:my+mbc,3)
 
     integer i,j, m, iface, idir, i1, ig, ic, j1, jg, jc
     double precision d, h, x, y, g
     double precision a,b
     double precision flux(0:3)
     double precision uI, dI
-    integer count
 
     logical ccheck
 
