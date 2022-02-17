@@ -73,7 +73,6 @@ SUBROUTINE poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
     DOUBLE PRECISION pi,pi2
     COMMON /compi/ pi, pi2
 
-    INTEGER i,j
     DOUBLE PRECISION r, r2, theta
     double precision hsmooth, h_grad(2), hsmooth_laplacian
     DOUBLE PRECISION qx,qy, dqdr, t1(2), t2(2)

@@ -36,9 +36,8 @@ subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
     integer i,j, m, iface, idir, i1, ig, ic, j1, jg, jc
     double precision d, h, x, y, g
     double precision a,b
-    double precision val_beta, grad_beta(2), div_beta_grad_u, flux(0:3)
+    double precision val_beta, grad_beta(2), flux(0:3)
     double precision uI, dI
-    integer count
 
     logical ccheck
 

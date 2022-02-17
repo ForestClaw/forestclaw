@@ -2,6 +2,8 @@
 
 bin_PROGRAMS += applications/elliptic/allencahn/allencahn
 
+TESTS += applications/elliptic/allencahn/regressions.sh
+
 applications_elliptic_allencahn_allencahn_SOURCES = \
 	applications/elliptic/allencahn/allencahn.cpp \
 	applications/elliptic/allencahn/allencahn_run.c \

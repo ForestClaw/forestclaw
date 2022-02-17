@@ -7,8 +7,8 @@ subroutine phasefield_init(meqn,mbc,mx,my, &
 
     double precision q(1-mbc:mx+mbc, 1-mbc:my+mbc, meqn)
 
-    integer i,j,m
-    double precision xlow, ylow, rp, w
+    integer i,j
+    double precision xlow, ylow, w
 
     do j = 1-mbc,my+mbc
         do i = 1-mbc,mx+mbc
