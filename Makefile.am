@@ -2,8 +2,7 @@
 # This file is part of ForestClaw.
 # Makefile.am in toplevel directory
 
-# include makefiles from installed subpackages
-ACLOCAL_AMFLAGS = -I config @FCLAW_SC_AMFLAGS@ @FCLAW_P4EST_AMFLAGS@
+ACLOCAL_AMFLAGS = -I config
 if FCLAW_SC_MK_USE
 @FCLAW_SC_MK_INCLUDE@
 endif
