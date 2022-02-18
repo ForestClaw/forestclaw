@@ -14,7 +14,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_math.h \
 	src/forestclaw2d.h \
 	src/fp_exception_glibc_extension.h \
-    src/fclaw2d_include_all.h \
+	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
 	src/fclaw2d_options.h \
 	src/fclaw2d_advance.h \
@@ -42,7 +42,9 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_diagnostics.h
+	src/fclaw2d_diagnostics.h \
+	src/forestclaw3d.h \
+	src/fclaw3d_domain.h
 
 libforestclaw_internal_headers =
 

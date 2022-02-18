@@ -27,10 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Domain structures and routines
  */
 
-#ifndef FCLAW2D_DOMAIN_H
-#define FCLAW2D_DOMAIN_H
+#ifndef FCLAW3D_DOMAIN_H
+#define FCLAW3D_DOMAIN_H
 
-#include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
+#include <forestclaw3d.h>  /* Needed for domain_exchange/domain_indirect info */
 
 #ifdef __cplusplus
 extern "C"
@@ -40,34 +40,34 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_domain;
+struct fclaw3d_global;
+struct fclaw3d_domain;
 
-typedef struct fclaw2d_domain_data
+typedef struct fclaw3d_domain_data
 {
     /* Debug counters and timers */
     int count_set_patch;
     int count_delete_patch;
 
-    fclaw2d_domain_exchange_t *domain_exchange;
-    fclaw2d_domain_indirect_t *domain_indirect;
+    fclaw3d_domain_exchange_t *domain_exchange;
+    fclaw3d_domain_indirect_t *domain_indirect;
 
-} fclaw2d_domain_data_t;
+} fclaw3d_domain_data_t;
 
-void fclaw2d_domain_data_new(struct fclaw2d_domain *domain);
+void fclaw3d_domain_data_new(struct fclaw3d_domain *domain);
 
-void fclaw2d_domain_data_delete(struct fclaw2d_domain* domain);
+void fclaw3d_domain_data_delete(struct fclaw3d_domain* domain);
 
-void fclaw2d_domain_setup(struct fclaw2d_global* glob,
-                          struct fclaw2d_domain* new_domain);
+void fclaw3d_domain_setup(struct fclaw3d_global* glob,
+                          struct fclaw3d_domain* new_domain);
 
-void fclaw2d_domain_reset(struct fclaw2d_global* glob);
+void fclaw3d_domain_reset(struct fclaw3d_global* glob);
 
-fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw2d_domain *domain);
+fclaw3d_domain_data_t* fclaw3d_domain_get_data(struct fclaw3d_domain *domain);
 
-/* OpenMP iterator (not part of forestclaw2d.h */
-void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int level,
-                                           fclaw2d_patch_callback_t pcb, void *user);
+/* OpenMP iterator (not part of forestclaw3d.h */
+void fclaw3d_domain_iterate_level_mthread (struct fclaw3d_domain * domain, int level,
+                                           fclaw3d_patch_callback_t pcb, void *user);
 
 #ifdef __cplusplus
 #if 0
@@ -76,4 +76,4 @@ void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int l
 }
 #endif
 
-#endif /* FCLAW2D_DOMAIN_H */
+#endif /* FCLAW3D_DOMAIN_H */

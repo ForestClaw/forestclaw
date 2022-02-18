@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
-    ddata = FCLAW2D_ALLOC_ZERO(fclaw2d_domain_data_t, 1);
+    ddata = FCLAW_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
     domain->user = ddata;
 
     ddata->count_set_patch = ddata->count_delete_patch = 0;
@@ -47,7 +47,7 @@ void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
 
-    FCLAW2D_FREE (ddata);
+    FCLAW_FREE (ddata);
     domain->user = NULL;
 }
 

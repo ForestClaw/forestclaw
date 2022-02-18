@@ -416,7 +416,7 @@ void fclaw_app_set_env_configdir (fclaw_app_t * a, const char *env_configdir);
  * \param [in] section          This variable decides about the options being
  *                              under the default "Options" section in a possible
  *                              configuration file, or under its own section.
- *                              If this is NULL, the options will be used with 
+ *                              If this is NULL, the options will be used with
  *                              the names used to add them to the options structure.
  *                              If not NULL, we will use \b sc_options_add_suboptions:
  *                              The true option name will be prefixed with \b section,
@@ -504,6 +504,88 @@ sc_MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
  * \deprecated TODO: We shall provide an interface that will not need this function.
  */
 sc_options_t *fclaw_app_get_options (fclaw_app_t * a);
+
+#if 0
+
+/*** rename the following names without the 2D ***/
+
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Fundamentals
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Log a message only on rank zero. */
+void fclaw2d_global_log (int log_priority, const char *message);
+
+///@}
+/* ---------------------------------------------------------------------- */
+///                         @name Allocation
+/* ---------------------------------------------------------------------- */
+///@{
+
+/**
+ * @brief Allocate memory
+ *
+ * @param size the size in bytes
+ * @return void* the newly allocated memory
+ */
+void *fclaw2d_alloc (size_t size);
+/**
+ * @brief Allocate a number of objects, intializes to 0
+ *
+ * @param nmemb the number of objects
+ * @param size the size of an object (in bytes)
+ * @return void* the newly allocated memory
+ */
+void *fclaw2d_calloc (size_t nmemb, size_t size);
+/**
+ * @brief Reallocate memory
+ *
+ * @param ptr the memory to be reallocated
+ * @param size the size in bytes
+ * @return void* the newly allocated memory
+ */
+void *fclaw2d_realloc (void *ptr, size_t size);
+/**
+ * @brief Free allocated memory
+ *
+ * @param ptr the memory to free
+ */
+void fclaw2d_free (void *ptr);
+/**
+ * @brief Allocate an array with given length
+ *
+ * @param t the type
+ * @param n the length of the array
+ * @return t* the newly allocateed memory
+ */
+#define FCLAW2D_ALLOC(t,n)      (t *) fclaw2d_alloc ((n) * sizeof (t))
+/**
+ * @brief Allocate an array with given length, initialized to zero
+ *
+ * @param t the type
+ * @param n the length of the array
+ * @return t* the newly allocateed memory
+ */
+#define FCLAW2D_ALLOC_ZERO(t,n) (t *) fclaw2d_calloc ((n), sizeof (t))
+/**
+ * @brief Allocate an array with given length, initialized to zero
+ *
+ * @param p pointer to memory to be reallocated
+ * @param t the type
+ * @param n the length of the array
+ * @return t* the newly allocateed memory
+ */
+#define FCLAW2D_REALLOC(p,t,n)  (t *) fclaw2d_realloc ((p), (n) * sizeof (t))
+/**
+ * @brief Free allocated memory
+ *
+ * @param p the memory to free
+ */
+#define FCLAW2D_FREE(p)         fclaw2d_free (p)
+
+#endif /* 0 */
 
 #ifdef __cplusplus
 #if 0

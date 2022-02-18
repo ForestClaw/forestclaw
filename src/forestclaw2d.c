@@ -35,15 +35,6 @@ const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4] = {
     FCLAW2D_PATCH_ON_BLOCK_FACE_3
 };
 
-/* This is already deprecated:
- * I need to go back to fclaw_base and see how to make that usable. */
-void
-fclaw2d_global_log (int log_priority, const char *message)
-{
-    /* TODO: establish an fclaw_package_id */
-    SC_GEN_LOG (sc_package_id, SC_LC_GLOBAL, log_priority, message);
-}
-
 double
 fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d)
 {
@@ -150,30 +141,6 @@ int
 fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch)
 {
     return patch->flags & FCLAW2D_PATCH_IS_GHOST ? 1 : 0;
-}
-
-void *
-fclaw2d_alloc (size_t size)
-{
-    return sc_malloc (p4est_package_id, size);
-}
-
-void *
-fclaw2d_calloc (size_t nmemb, size_t size)
-{
-    return sc_calloc (p4est_package_id, nmemb, size);
-}
-
-void *
-fclaw2d_realloc (void *ptr, size_t size)
-{
-    return sc_realloc (p4est_package_id, ptr, size);
-}
-
-void
-fclaw2d_free (void *ptr)
-{
-    sc_free (p4est_package_id, ptr);
 }
 
 void
