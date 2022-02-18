@@ -88,12 +88,12 @@ void CLAWPACK46_FLUX2FW(const int* ixy,const int* maxm, const int* meqn, //
 						int method[], int mthlim[]);
 #endif
 
-#define CLAWPACK46_SET_CAPACITY FCLAW_F77_FUNC(clawpack46_set_capacity,  \
-                                               CLAWPACK46_SET_CAPACITY)
-void CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int* mz, 
-                             const int *mbc, const double *dx, const double* dy, 
-                             double *dz, double area[],
-							 const int *mcapa, const int* maux, double aux[]);
+#define FC3D_CLAWPACK46_SET_CAPACITY FCLAW_F77_FUNC(fc3d_clawpack46_set_capacity,  \
+                                                    FC3D_CLAWPACK46_SET_CAPACITY)
+void FC3D_CLAWPACK46_SET_CAPACITY(const int* mx, const int *my, const int* mz, 
+                                  const int *mbc, const double *dx, const double* dy, 
+                                  double *dz, double area[],
+                                  const int *mcapa, const int* maux, double aux[]);
 
 /* ------------------------------------- Conservation --------------------------------- */
 
@@ -210,17 +210,18 @@ void CLAWPACK46_STEP3_WRAP(const int* maxm, const int* meqn, const int* maux,
 /* ----------------------------- Misc ClawPack specific functions ------------------------------ */
 
 
-#define CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(clawpack46_set_block,CLAWPACK46_SET_BLOCK)
-void CLAWPACK46_SET_BLOCK(int* blockno);
+#define FC3D_CLAWPACK46_SET_BLOCK FCLAW_F77_FUNC(fc3d_clawpack46_set_block, \
+                                                 FC3D_CLAWPACK46_SET_BLOCK)
+void FC3D_CLAWPACK46_SET_BLOCK(int* blockno);
 
 #define FC3D_CLAWPACK46_GET_BLOCK FCLAW_F77_FUNC(fc3d_clawpack46_get_block, \
 												 FC3D_CLAWPACK46_GET_BLOCK)
 int FC3D_CLAWPACK46_GET_BLOCK();
 
 
-#define CLAWPACK46_UNSET_BLOCK FCLAW_F77_FUNC(clawpack46_unset_block, \
-											  CLAWPACK46_UNSET_BLOCK)
-void CLAWPACK46_UNSET_BLOCK();
+#define FC3D_CLAWPACK46_UNSET_BLOCK FCLAW_F77_FUNC(fc3d_clawpack46_unset_block, \
+											       FC3D_CLAWPACK46_UNSET_BLOCK)
+void FC3D_CLAWPACK46_UNSET_BLOCK();
 
 
 

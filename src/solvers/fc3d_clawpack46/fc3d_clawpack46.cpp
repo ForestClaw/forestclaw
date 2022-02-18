@@ -84,10 +84,10 @@ void clawpack46_qinit(fclaw2d_global_t *glob,
 	FCLAW_ASSERT(claw46_vt->fort_qinit != NULL); /* Must be initialized */
 
 	/* Call to classic Clawpack 'qinit' routine.  This must be user defined */
-	CLAWPACK46_SET_BLOCK(&blockno);
+	FC3D_CLAWPACK46_SET_BLOCK(&blockno);
 	claw46_vt->fort_qinit(&meqn,&mbc,&mx,&my,&mz, &xlower,&ylower,&zlower, 
 	                      &dx,&dy,&dz, q, &maux,aux);
-	CLAWPACK46_UNSET_BLOCK();
+	FC3D_CLAWPACK46_UNSET_BLOCK();
 }
 
 
@@ -141,10 +141,10 @@ void clawpack46_bc3(fclaw2d_global_t *glob,
 	int meqn;
 	fclaw3dx_clawpatch_timesync_data(glob,patch,time_interp,&q,&meqn);
 
-	CLAWPACK46_SET_BLOCK(&blockno);
+	FC3D_CLAWPACK46_SET_BLOCK(&blockno);
 	claw46_vt->fort_bc3(&meqn,&mbc,&mx,&my,&mz,&xlower,&ylower,&zlower,
 						&dx,&dy,&dz, q,&maux,aux,&t,&dt,mthbc);
-	CLAWPACK46_UNSET_BLOCK();
+	FC3D_CLAWPACK46_UNSET_BLOCK();
 }
 
 
@@ -173,11 +173,11 @@ void clawpack46_b4step3(fclaw2d_global_t *glob,
 	double *aux;
 	fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-	CLAWPACK46_SET_BLOCK(&blockno);
+	FC3D_CLAWPACK46_SET_BLOCK(&blockno);
 	claw46_vt->fort_b4step3(&mbc,&mx,&my,&mz, &meqn,q, 
 	                        &xlower,&ylower,&zlower,
 							&dx,&dy,&dz, &t,&dt,&maux,aux);
-	CLAWPACK46_UNSET_BLOCK();
+	FC3D_CLAWPACK46_UNSET_BLOCK();
 }
 
 static
@@ -207,10 +207,10 @@ void clawpack46_src3(fclaw2d_global_t *glob,
 	int maux;
 	fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-	CLAWPACK46_SET_BLOCK(&blockno);
+	FC3D_CLAWPACK46_SET_BLOCK(&blockno);
 	claw46_vt->fort_src3(&meqn,&mbc,&mx,&my,&mz, &xlower,&ylower,&zlower,
 						 &dx,&dy,&dz, q,&maux,aux,&t,&dt);
-	CLAWPACK46_UNSET_BLOCK();
+	FC3D_CLAWPACK46_UNSET_BLOCK();
 }
 
 
@@ -240,10 +240,10 @@ void clawpack46_setaux(fclaw2d_global_t *glob,
 	double *aux;
 	fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-	CLAWPACK46_SET_BLOCK(&blockno);
+	FC3D_CLAWPACK46_SET_BLOCK(&blockno);
 	claw46_vt->fort_setaux(&mbc,&mx,&my,&mz, &xlower,&ylower,&zlower, 
 	                       &dx,&dy,&dz, &maux,aux);
-	CLAWPACK46_UNSET_BLOCK();
+	FC3D_CLAWPACK46_UNSET_BLOCK();
 }
 
 /* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
@@ -546,8 +546,8 @@ void fc3d_clawpack46_set_capacity(fclaw2d_global_t *glob,
 	fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
 	FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
-	CLAWPACK46_SET_CAPACITY(&mx,&my,&mz,&mbc,&dx,&dy,&dz,area,&mcapa,
-							&maux,aux);
+	FC3D_CLAWPACK46_SET_CAPACITY(&mx,&my,&mz,&mbc,&dx,&dy,&dz,area,&mcapa,
+	                             &maux,aux);
 }
 
 
