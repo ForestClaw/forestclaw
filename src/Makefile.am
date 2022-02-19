@@ -94,6 +94,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_output_tikz.c \
 	src/forestclaw2d.c \
 	src/forestclaw3d.c \
+	src/fclaw3d_convenience.c \
 	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \

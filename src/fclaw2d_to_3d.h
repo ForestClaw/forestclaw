@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* redefine typedefs */
 #define fclaw2d_patch_flags_t           fclaw3d_patch_flags_t
+#define fclaw2d_patch_t                 fclaw3d_patch_t
+#define fclaw2d_block_t                 fclaw3d_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
 
 /* redefine enums */
@@ -41,14 +43,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_1   FCLAW3D_PATCH_ON_BLOCK_FACE_1
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_2   FCLAW3D_PATCH_ON_BLOCK_FACE_2
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_3   FCLAW3D_PATCH_ON_BLOCK_FACE_3
+#define FCLAW2D_PATCH_FIRST_SIBLING     FCLAW3D_PATCH_FIRST_SIBLING
+#define FCLAW2D_PATCH_IS_GHOST          FCLAW3D_PATCH_IS_GHOST
+#define FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY
 
 /* redefine variables */
 #define fclaw2d_patch_block_face_flags  fclaw3d_patch_block_face_flags
+#define fclaw2d_smallest_h              fclaw3d_smallest_h
 
 /* redefine functions */
 #define fclaw2d_domain_global_maximum   fclaw3d_domain_global_maximum
 #define fclaw2d_domain_global_sum       fclaw3d_domain_global_sum
 #define fclaw2d_domain_barrier          fclaw3d_domain_barrier
 #define fclaw2d_domain_dimension        fclaw3d_domain_dimension
+#define fclaw2d_check_initial_level     fclaw3d_check_initial_level
+#define fclaw2d_domain_new_unitsquare   fclaw3d_domain_new_unitcube
+
+/* translations not found in p4est */
+#ifndef p4est_wrap_new_unitsquare
+#define p4est_wrap_new_unitsquare       p8est_wrap_new_unitcube
+#endif
 
 #endif /* !FCLAW2D_TO_3D_H */

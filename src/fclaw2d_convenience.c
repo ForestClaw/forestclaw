@@ -23,11 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef P4_TO_P8
 #include <fclaw2d_convenience.h>
 #include <p4est_bits.h>
 #include <p4est_search.h>
 #include <p4est_vtk.h>
 #include <p4est_wrap.h>
+#else
+#include <fclaw3d_convenience.h>
+#include <p8est_bits.h>
+#include <p8est_search.h>
+#include <p8est_vtk.h>
+#include <p8est_wrap.h>
+#endif
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
@@ -54,12 +62,26 @@ fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,
     {
         patch->flags |= FCLAW2D_PATCH_ON_BLOCK_FACE_3;
     }
+#ifdef P4_TO_P8
+    if (quad->z == 0)
+    {
+        patch->flags |= FCLAW3D_PATCH_ON_BLOCK_FACE_4;
+    }
+    if (quad->z + qh == P4EST_ROOT_LEN)
+    {
+        patch->flags |= FCLAW3D_PATCH_ON_BLOCK_FACE_5;
+    }
+#endif
     /* This suffices to test for block corners by using bitwise and */
 
     patch->xlower = quad->x * fclaw2d_smallest_h;
     patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
     patch->ylower = quad->y * fclaw2d_smallest_h;
     patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+#ifdef P4_TO_P8
+    patch->zlower = quad->z * fclaw2d_smallest_h;
+    patch->zupper = (quad->z + qh) * fclaw2d_smallest_h;
+#endif
 }
 
 /** Domain constructor takes ownership of wrap.
@@ -149,6 +171,10 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         block->xupper = 1.;
         block->ylower = 0.;
         block->yupper = 1.;
+#ifdef P4_TO_P8
+        block->zlower = 0.;
+        block->zupper = 1.;
+#endif
         if (conn->vertices != NULL && conn->tree_to_vertex != NULL)
         {
             for (j = 0; j < P4EST_CHILDREN; ++j)
@@ -303,6 +329,8 @@ fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)
                                                           initial_level),
                                NULL);
 }
+
+#ifndef P4_TO_P8
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm, int initial_level)
@@ -1047,3 +1075,5 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     /* tidy up memory */
     sc_array_destroy (points);
 }
+
+#endif /* !P4_TO_P8 */
