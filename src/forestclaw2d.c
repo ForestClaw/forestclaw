@@ -22,10 +22,18 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+#ifndef P4_TO_P8
 #include <forestclaw2d.h>
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
+#else
+#include <forestclaw3d.h>
+#include <p8est_bits.h>
+#include <p8est_wrap.h>
+#endif
 
+#ifndef P4_TO_P8
 #define FCLAW2D_DOMAIN_TAG_SERIALIZE 4526
 
 const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4] = {
@@ -34,6 +42,10 @@ const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4] = {
     FCLAW2D_PATCH_ON_BLOCK_FACE_2,
     FCLAW2D_PATCH_ON_BLOCK_FACE_3
 };
+
+#else
+#define FCLAW2D_DOMAIN_TAG_SERIALIZE 4527
+#endif
 
 double
 fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d)
@@ -75,6 +87,8 @@ fclaw2d_domain_dimension (const fclaw2d_domain_t * domain)
 {
     return P4EST_DIM;           /* space dimension */
 }
+
+#ifndef P4_TO_P8
 
 int
 fclaw2d_domain_num_faces (const fclaw2d_domain_t * domain)
@@ -1968,3 +1982,5 @@ fclaw2d_patch_t *fclaw2d_domain_get_patch (fclaw2d_domain_t * domain,
                                            int blockno, int patchno);
 
 #endif
+
+#endif /* ! P4_TO_P8 */
