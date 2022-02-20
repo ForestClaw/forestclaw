@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_block_t                 fclaw3d_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
+#define fclaw2d_patch_relation_t        fclaw3d_patch_relation_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID
@@ -48,6 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_1   FCLAW3D_PATCH_ON_BLOCK_FACE_1
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_2   FCLAW3D_PATCH_ON_BLOCK_FACE_2
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_3   FCLAW3D_PATCH_ON_BLOCK_FACE_3
+#define FCLAW2D_PATCH_BOUNDARY          FCLAW3D_PATCH_BOUNDARY
+#define FCLAW2D_PATCH_HALFSIZE          FCLAW3D_PATCH_HALFSIZE
+#define FCLAW2D_PATCH_SAMESIZE          FCLAW3D_PATCH_SAMESIZE
+#define FCLAW2D_PATCH_DOUBLESIZE        FCLAW3D_PATCH_DOUBLESIZE
 
 /* redefine variables */
 #define fclaw2d_patch_block_face_flags  fclaw3d_patch_block_face_flags
@@ -77,6 +82,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_iterate_families fclaw3d_domain_iterate_families
 #define fclaw2d_patch_boundary_type     fclaw3d_patch_boundary_type
 #define fclaw2d_patch_normal_match      fclaw3d_patch_normal_match
+#define fclaw2d_patch_face_neighbors    fclaw3d_patch_face_neighbors
+#define fclaw2d_patch_face_swap         fclaw3d_patch_face_swap
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

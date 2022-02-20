@@ -403,8 +403,6 @@ fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
     return (faceno + qtfi) & 1;
 }
 
-#ifndef P4_TO_P8
-
 static void
 fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
                                p4est_locidx_t qtq, int *proc, int *blockno,
@@ -562,6 +560,8 @@ fclaw2d_patch_face_swap (int *faceno, int *rfaceno)
     P4EST_ASSERT (0 <= *faceno && *faceno < P4EST_FACES);
     P4EST_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_HALF * P4EST_FACES);
 }
+
+#ifndef P4_TO_P8
 
 void
 fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
