@@ -88,8 +88,6 @@ fclaw2d_domain_dimension (const fclaw2d_domain_t * domain)
     return P4EST_DIM;           /* space dimension */
 }
 
-#ifndef P4_TO_P8
-
 int
 fclaw2d_domain_num_faces (const fclaw2d_domain_t * domain)
 {
@@ -116,11 +114,14 @@ fclaw2d_domain_num_orientations (const fclaw2d_domain_t * domain)
 
 void
 fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
-                             int icorner, int faces[2])
+                             int icorner, int faces[P4EST_DIM])
 {
     FCLAW_ASSERT (0 <= icorner && icorner < P4EST_CHILDREN);
     faces[0] = p4est_corner_faces[icorner][0];
     faces[1] = p4est_corner_faces[icorner][1];
+#ifdef P4_TO_P8
+    faces[2] = p8est_corner_faces[icorner][2];
+#endif
 }
 
 int
@@ -196,6 +197,8 @@ fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
         sc_keyvalue_unset (a, name);
     FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
 }
+
+#ifndef P4_TO_P8
 
 static fclaw2d_patch_t *
 fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)

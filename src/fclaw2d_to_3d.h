@@ -39,13 +39,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_t                fclaw3d_domain_t
 
 /* redefine enums */
+#define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID
+#define FCLAW2D_PATCH_FIRST_SIBLING     FCLAW3D_PATCH_FIRST_SIBLING
+#define FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY  FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY
+#define FCLAW2D_PATCH_IS_GHOST          FCLAW3D_PATCH_IS_GHOST
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_0   FCLAW3D_PATCH_ON_BLOCK_FACE_0
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_1   FCLAW3D_PATCH_ON_BLOCK_FACE_1
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_2   FCLAW3D_PATCH_ON_BLOCK_FACE_2
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_3   FCLAW3D_PATCH_ON_BLOCK_FACE_3
-#define FCLAW2D_PATCH_FIRST_SIBLING     FCLAW3D_PATCH_FIRST_SIBLING
-#define FCLAW2D_PATCH_IS_GHOST          FCLAW3D_PATCH_IS_GHOST
-#define FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY
 
 /* redefine variables */
 #define fclaw2d_patch_block_face_flags  fclaw3d_patch_block_face_flags
@@ -58,6 +59,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_dimension        fclaw3d_domain_dimension
 #define fclaw2d_check_initial_level     fclaw3d_check_initial_level
 #define fclaw2d_domain_new_unitsquare   fclaw3d_domain_new_unitcube
+#define fclaw2d_domain_num_faces        fclaw3d_domain_num_faces
+#define fclaw2d_domain_num_corners      fclaw3d_domain_num_corners
+#define fclaw2d_domain_num_face_corners     fclaw3d_domain_num_face_corners
+#define fclaw2d_domain_num_orientations fclaw3d_num_orientations
+#define fclaw2d_domain_corner_faces     fclaw3d_domain_corner_faces
+#define fclaw2d_patch_corner_dimension  fclaw3d_patch_corner_dimension
+#define fclaw2d_patch_childid           fclaw3d_patch_childid
+#define fclaw2d_patch_is_first_sibling  fclaw3d_patch_is_first_sibling
+#define fclaw2d_patch_is_ghost          fclaw3d_patch_is_ghost
+#define fclaw2d_domain_attribute_add    fclaw3d_domain_attribute_add
+#define fclaw2d_domain_attribute_access fclaw3d_domain_attribute_access
+#define fclaw2d_domain_attribute_remove fclaw3d_domain_attribute_remove
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
