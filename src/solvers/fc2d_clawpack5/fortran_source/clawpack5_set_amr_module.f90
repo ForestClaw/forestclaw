@@ -11,9 +11,11 @@ SUBROUTINE clawpack5_set_amr_module(mwaves_in,mcapa_in,mthlim_in, &
   mwaves = mwaves_in
   mcapa = mcapa_in
   method = method_in
-  if (.not. allocated(mthlim)) then
-      allocate(mthlim(mwaves))
-  endif
+!!  if (.not. allocated(mthlim)) then
+!!      allocate(mthlim(mwaves))
+!!  endif
+  write(6,*) "length(mthlim)", size(mthlim)
+  stop
   do mw = 1,mwaves
       mthlim(mw) = mthlim_in(mw)
   end do  
