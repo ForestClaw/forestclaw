@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_t                 fclaw3d_patch_t
 #define fclaw2d_block_t                 fclaw3d_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
+#define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID
@@ -71,6 +72,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_attribute_add    fclaw3d_domain_attribute_add
 #define fclaw2d_domain_attribute_access fclaw3d_domain_attribute_access
 #define fclaw2d_domain_attribute_remove fclaw3d_domain_attribute_remove
+#define fclaw2d_domain_iterate_level    fclaw3d_domain_iterate_level
+#define fclaw2d_domain_iterate_patches  fclaw3d_domain_iterate_patches
+#define fclaw2d_domain_iterate_families fclaw3d_domain_iterate_families
+#define fclaw2d_patch_boundary_type     fclaw3d_patch_boundary_type
+#define fclaw2d_patch_normal_match      fclaw3d_patch_normal_match
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

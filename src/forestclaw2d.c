@@ -222,6 +222,8 @@ fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)
     return block->patches + patchno;
 }
 
+#endif
+
 void
 fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
                               fclaw2d_patch_callback_t pcb, void *user)
@@ -350,7 +352,11 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
+#ifndef P4_TO_P8
 static const int normal_out[4] = { 0, 1, 0, 1 };
+#else
+static const int normal_out[6] = { 0, 1, 0, 1, 0, 1 };
+#endif
 #endif
 
 int
@@ -365,6 +371,7 @@ fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
     p4est_tree_t *tree;
 #ifdef FCLAW_ENABLE_DEBUG
     fclaw2d_block_t *block;
+    int num_orient = fclaw2d_domain_num_orientations (domain);
 #endif
 
     /* are we sane */
@@ -387,13 +394,16 @@ fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
     /* access face number of the neighbor */
     FCLAW_ASSERT (0 <= faceno && faceno < P4EST_FACES);
     qtfi = (int) mesh->quad_to_face[P4EST_FACES * totalleaf + faceno];
-    FCLAW_ASSERT (qtfi >= 0 || qtfi + 8 == (qtfi & 7));
-    FCLAW_ASSERT ((normal_out[faceno] ^ normal_out[qtfi & 3]) ==
+    FCLAW_ASSERT (qtfi >= -num_orient && qtfi < num_orient * (1 + P4EST_HALF));
+    FCLAW_ASSERT ((normal_out[faceno] ^
+                   normal_out[(qtfi + num_orient) % P4EST_FACES]) ==
                   ((faceno + qtfi) & 1));
 
     /* we return true if the last bit of the two face numbers differs */
     return (faceno + qtfi) & 1;
 }
+
+#ifndef P4_TO_P8
 
 static void
 fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
