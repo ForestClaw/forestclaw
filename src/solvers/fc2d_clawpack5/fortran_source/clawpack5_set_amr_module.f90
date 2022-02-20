@@ -1,6 +1,6 @@
 SUBROUTINE clawpack5_set_amr_module(mwaves_in,mcapa_in,mthlim_in, &
     method_in, use_fwaves_in)
-  USE clawpack5_amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves
+  USE clawpack5_amr_module, ONLY: mwaves, mcapa, method, mthlim, use_fwaves, mthlim_len
   IMPLICIT NONE
 
   INTEGER, INTENT(in) :: mwaves_in, mcapa_in, method_in(7)
@@ -11,11 +11,10 @@ SUBROUTINE clawpack5_set_amr_module(mwaves_in,mcapa_in,mthlim_in, &
   mwaves = mwaves_in
   mcapa = mcapa_in
   method = method_in
-!!  if (.not. allocated(mthlim)) then
-!!      allocate(mthlim(mwaves))
-!!  endif
-  write(6,*) "length(mthlim)", size(mthlim)
-  stop
+  if (mwaves .gt. mthlim_len) then
+      write(6,'(A)') "clawpack5_set_amr_module : mwaves > mthlilm_len;  Increase size of mthlim_len in amr_module."
+      stop
+  endif 
   do mw = 1,mwaves
       mthlim(mw) = mthlim_in(mw)
   end do  
