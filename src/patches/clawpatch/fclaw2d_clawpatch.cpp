@@ -291,7 +291,10 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	}
 
 	if (clawpatch_opt->maux > 0)
+	{		
 		cp->aux.define(box,cp->maux);
+		cp->aux_save.define(box,cp->maux);
+	}
 
 	if (clawpatch_opt->rhs_fields > 0)
 	{

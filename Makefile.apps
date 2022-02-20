@@ -7,6 +7,9 @@
 # --------------------------------------------
 
 
+# Most applications needs "clawpatch", so we include here only once
+include src/patches/clawpatch/Makefile.am
+
 
 # --------------------------------------------
 # Clawpack 4.6 and 5.0 libraries and examples
@@ -14,8 +17,8 @@
 
 if FCLAW_ENABLE_CLAWPACK
 
-## Patches needed for Clawpack solvers
-include src/patches/clawpatch/Makefile.am
+## Patches needed for Clawpack solvers (included above)
+#include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
 include src/solvers/fc2d_clawpack4.6/Makefile.am
@@ -37,50 +40,12 @@ if FCLAW_ENABLE_THUNDEREGG
 
 ## Patches needed for thunderegg solver
 include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/patches/clawpatch/Makefile.am
 
 ## Solver libraries (most example apps require both)
 include src/solvers/fc2d_thunderegg/Makefile.am
 
 ## Applications that use an elliptic solver
 include applications/elliptic/elliptic.apps
-
-endif
-
-
-
-
-# ----------------------------------
-# Projects under development
-# ----------------------------------
-if FCLAW_ENABLE_DEVELOPMENT
-
-## Patches needed for Clawpack solvers
-include src/patches/clawpatch/Makefile.am
-
-## Solver libraries (most example apps require both)
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5/Makefile.am
-
-# Development projects
-include applications/development.apps
-
-endif
-
-# ----------------------------------
-# Projects for paper
-# ----------------------------------
-if FCLAW_ENABLE_PAPER
-
-## Patches needed for Clawpack solvers
-include src/patches/clawpatch/Makefile.am
-
-## Solver libraries (most example apps require both)
-include src/solvers/fc2d_clawpack4.6/Makefile.am
-include src/solvers/fc2d_clawpack5/Makefile.am
-
-# Development projects
-include applications/paper/paper.apps
 
 endif
 
@@ -92,7 +57,7 @@ endif
 if FCLAW_ENABLE_GEOCLAW
 
 ## Patches needed for GeoClaw solvers
-include src/patches/clawpatch/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
 ## Solver library
 include src/solvers/fc2d_geoclaw/Makefile.am
@@ -123,12 +88,13 @@ endif
 # ----------------------------------------
 if FCLAW_ENABLE_ACTIVEFLUX
 
-## Patches needed for Active Flux solver
-include src/patches/clawpatch/Makefile.am
+## Patches needed for Active Flux solver (included above)
+#include src/patches/clawpatch/Makefile.am
 
 endif
 
-## Active Flux Solver library
+## Active Flux Solver library. This is a stub 
+## library unless the repo has been cloned.
 include src/solvers/fc2d_activeflux/Makefile.am
 
 # ----------------------------------
@@ -137,7 +103,7 @@ include src/solvers/fc2d_activeflux/Makefile.am
 if FCLAW_ENABLE_CUDACLAW
 
 ## Patches needed for Clawpack solvers
-include src/patches/clawpatch/Makefile.am
+#include src/patches/clawpatch/Makefile.am
 
 include src/solvers/fc2d_cudaclaw/Makefile.am
 
