@@ -49,10 +49,23 @@ typedef struct swirl_ray
 }
 swirl_ray_t;
 
+static int
+intersect_ray (fclaw2d_patch_t * patch, void *ray, void *user)
+{
+}
+
 static void
 integrate_rays (fclaw2d_global_t *glob, sc_array_t *rays)
 {
+  int                 result;
+  size_t              iz;
 
+  /* simulate calling the intersection callback from search */
+  for (iz = 0; iz < rays->elem_count; ++iz) {
+    result = intersect_ray (NULL, sc_array_index (rays, iz), glob);
+    if (result) {
+    }
+  }
 }
 
 static
