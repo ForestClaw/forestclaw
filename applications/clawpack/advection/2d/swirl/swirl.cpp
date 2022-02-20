@@ -46,12 +46,18 @@ typedef struct swirl_ray
       double              radius;
     } circle;
   } r;
+  double              integral_value;
 }
 swirl_ray_t;
 
 static int
-intersect_ray (fclaw2d_patch_t * patch, void *ray, void *user)
+intersect_ray (fclaw2d_global_t *glob, fclaw2d_patch_t * patch,
+               int blockno, int patchno, void *ray)
 {
+  /* later, when patch is a leaf, also compute exact integral */
+
+  /* return intersection or not, just as a bool */
+  return 0;
 }
 
 static void
@@ -62,7 +68,8 @@ integrate_rays (fclaw2d_global_t *glob, sc_array_t *rays)
 
   /* simulate calling the intersection callback from search */
   for (iz = 0; iz < rays->elem_count; ++iz) {
-    result = intersect_ray (NULL, sc_array_index (rays, iz), glob);
+    result = intersect_ray (glob, NULL, -1, -1,
+                            sc_array_index (rays, iz));
     if (result) {
     }
   }
@@ -139,6 +146,7 @@ swirl_rays_new (void)
     ray->xy[1] = 0.;
     ray->r.line.vec[0] = cos (M_PI / nlines);
     ray->r.line.vec[1] = sin (M_PI / nlines);
+    ray->integral_value = 0.;
   }
 
   /* add no circles yet */
