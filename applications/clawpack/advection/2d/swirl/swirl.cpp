@@ -27,6 +27,34 @@
 
 #include "../all/advection_user.h"
 
+typedef enum {
+  SWIRL_RAY_LINE,
+  SWIRL_RAY_CIRCLE,
+  SWIRL_RAY_TYPE_LAST
+}
+swirl_ray_type_t;
+
+typedef struct swirl_ray
+{
+  swirl_ray_type_t    rtype;
+  double              xy[2];
+  union {
+    struct {
+      double              vec[2];
+    } line;
+    struct {
+      double              radius;
+    } circle;
+  } r;
+}
+swirl_ray_t;
+
+static void
+integrate_rays (fclaw2d_global_t *glob, sc_array_t *rays)
+{
+
+}
+
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
@@ -47,7 +75,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw2d_global_t* glob, sc_array_t *rays)
 {
     const user_options_t           *user_opt;
 
@@ -78,14 +106,38 @@ void run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
+    integrate_rays(glob, rays);
     fclaw2d_finalize(glob);
+}
+
+static sc_array_t *
+swirl_rays_new (void)
+{
+  const int           nlines = 3;
+  int                 i;
+  swirl_ray_t        *ray;
+  sc_array_t         *a = sc_array_new (sizeof (swirl_ray_t));
+
+  /* add a couple straight rays */
+  for (i = 0; i < nlines; ++i) {
+    ray = (swirl_ray_t *) sc_array_push (a);
+    ray->rtype = SWIRL_RAY_LINE;
+    ray->xy[0] = 0.;
+    ray->xy[1] = 0.;
+    ray->r.line.vec[0] = cos (M_PI / nlines);
+    ray->r.line.vec[1] = sin (M_PI / nlines);
+  }
+
+  /* add no circles yet */
+  return a;
 }
 
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
     int first_arg;
+    sc_array_t *rays;
+    fclaw_app_t *app;
     fclaw_exit_type_t vexit;
 
     /* Options */
@@ -117,6 +169,9 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
+    /* Setup some rays to integrate along/around */
+    rays = swirl_rays_new ();
+
     /* Run the program */
     if (!retval & !vexit)
     {
@@ -136,11 +191,12 @@ main (int argc, char **argv)
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         swirl_options_store             (glob, user_opt);
 
-        run_program(glob);
+        run_program(glob, rays);
 
         fclaw2d_global_destroy(glob);        
     }
     
+    sc_array_destroy (rays);
     fclaw_app_destroy (app);
 
     return 0;
