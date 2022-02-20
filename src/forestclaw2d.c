@@ -561,8 +561,6 @@ fclaw2d_patch_face_swap (int *faceno, int *rfaceno)
     P4EST_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_HALF * P4EST_FACES);
 }
 
-#ifndef P4_TO_P8
-
 void
 fclaw2d_patch_face_transformation (int faceno, int rfaceno, int ftransform[])
 {
@@ -592,23 +590,26 @@ fclaw2d_patch_face_transformation_intra (int ftransform[])
     ftransform[8] = 4;
 }
 
+#ifndef P4_TO_P8
 static const int ftransform_max[9] = { 1, 0, 1, 1, 0, 1, 1, 0, 7 };
+#else
+static const int ftransform_max[9] = { 2, 2, 2, 2, 2, 2, 1, 1, 7 };
+#endif
 
 int
 fclaw2d_patch_face_transformation_valid (const int ftransform[])
 {
     int i;
 
-    for (i = 0; i < 9; ++i)
-    {
-        if (ftransform[i] < 0 || ftransform[i] > ftransform_max[i])
-        {
+    for (i = 0; i < 9; ++i) {
+        if (ftransform[i] < 0 || ftransform[i] > ftransform_max[i]) {
             return 0;
         }
     }
-
     return 1;
 }
+
+#ifndef P4_TO_P8
 
 void
 fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
