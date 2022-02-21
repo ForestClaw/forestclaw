@@ -76,7 +76,7 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
                 qmin = min(q(i,j,k,mq),qmin)
                 qmax = max(q(i,j,k,mq),qmax)
                 qval = q(i,j,k,mq)
-                is_ghost = clawpatch3_is_ghost(i,j,mx,my)
+                is_ghost = clawpatch3_is_ghost(i,j,k,mx,my,mz)
                 if (.not. is_ghost) then
                     do ii = -1,1               
                         do jj = -1,1

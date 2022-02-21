@@ -37,7 +37,7 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
                 qmin = min(qmin,q(i,j,k,mq))
                 qmax = max(qmax,q(i,j,k,mq))
                 qval = q(i,j,k,mq)
-                is_ghost = clawpatch3_is_ghost(i,j,mx,my)
+                is_ghost = clawpatch3_is_ghost(i,j,k, mx,my,mz)
                 if (.not. is_ghost) then
                     do jj = -1,1
                         do ii = -1,1
@@ -63,20 +63,16 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
 end subroutine  fclaw3dx_clawpatch46_fort_tag4refinement
 
 !! # We may want to check ghost cells for tagging.  
-logical(kind=4) function clawpatch3_is_ghost(i,j,mx,my)
+logical(kind=4) function clawpatch3_is_ghost(i,j,k, mx,my,mz)
     implicit none
 
-    integer :: i, j, mx, my
-    logical(kind=4) :: is_ghost
+    integer :: i, j, k, mx, my, mz
+    logical(kind=4) :: interior
 
-    is_ghost = .false.
-    if (i .lt. 1 .or. j .lt. 1) then
-        is_ghost = .true.
-    elseif (i .gt. mx .or. j .gt. my) then
-        is_ghost = .true.
-    end if
-
-    clawpatch3_is_ghost = is_ghost
+    interior = (i .ge. 1 .and. i .le. mx .and. & 
+                j .ge. 1 .and. j .le. my .and. &
+                k .ge. 1 .and. k .le. mz)
+    clawpatch3_is_ghost = .not. interior
 
     return 
 
