@@ -83,6 +83,7 @@ struct fclaw3dx_clawpatch_options
     /* Advanced options */
     int interp_stencil_width; /**< The width of the interpolation stencil */
     int ghost_patch_pack_aux; /**< True if aux equations should be packed */
+    int save_aux;             /**< Save the aux array when retaking a time step */
 
     int is_registered; /**< true if options have been registered */
 
