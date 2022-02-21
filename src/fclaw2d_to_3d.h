@@ -118,6 +118,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_destroy          fclaw3d_domain_destroy
 #define fclaw2d_domain_adapt            fclaw3d_domain_adapt
 #define fclaw2d_domain_partition        fclaw3d_domain_partition
+#define fclaw2d_domain_partition_unchanged  fclaw3d_domain_partition_unchanged
+#define fclaw2d_domain_complete         fclaw3d_domain_complete
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

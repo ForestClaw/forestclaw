@@ -677,8 +677,6 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
     }
 }
 
-#ifndef P4_TO_P8
-
 void
 fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
                                     int *unchanged_first,
@@ -719,6 +717,8 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
 
     p4est_wrap_complete (wrap);
 }
+
+#ifndef P4_TO_P8
 
 void
 fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
