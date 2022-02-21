@@ -10,7 +10,6 @@ add_library(forestclaw_c OBJECT
   fclaw_timer.c 
   fclaw_mpi.c 
   fclaw2d_block.c 
-  fclaw2d_defs.c 
   fclaw2d_options.c 
   fclaw2d_global.c 
   fclaw2d_forestclaw.c 

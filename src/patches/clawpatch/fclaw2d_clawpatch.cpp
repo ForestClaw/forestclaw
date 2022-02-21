@@ -845,7 +845,7 @@ void clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
 	/* Loop over four siblings (z-ordering) */
-	for (int igrid = 0; igrid < NumSiblings; igrid++)
+	for (int igrid = 0; igrid < FCLAW2D_NUMSIBLINGS; igrid++)
 	{
 		fclaw2d_patch_t *fine_patch = &fine_patches[igrid];
 		double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
@@ -887,7 +887,7 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 	double *areacoarse = clawpatch_get_area(coarse_patch);
 	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
-	for(int igrid = 0; igrid < NumSiblings; igrid++)
+	for(int igrid = 0; igrid < FCLAW2D_NUMSIBLINGS; igrid++)
 	{
 		fclaw2d_patch_t *fine_patch = &fine_patches[igrid];
 		double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);

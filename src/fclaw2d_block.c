@@ -36,7 +36,7 @@ void fclaw2d_block_get_block_boundary(fclaw2d_global_t * glob,
 {
     int iside;
 
-    for (iside = 0; iside < NumFaces; iside++)
+    for (iside = 0; iside < FCLAW2D_NUMFACES; iside++)
     {
         int iface_flags = fclaw2d_patch_block_face_flags[iside];
         int is_block_face = (patch->flags & iface_flags) != 0;

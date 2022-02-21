@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_DEFS_H
-#define FCLAW2D_DEFS_H
+#ifndef FCLAW3D_DEFS_H
+#define FCLAW3D_DEFS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -34,19 +34,12 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_SPACEDIM     2          /**< mesh dimension */
-#define FCLAW2D_NUMFACES     4          /**< faces per cell */
-#define FCLAW2D_NUMCORNERS   4          /**< corners per cell */
-#define FCLAW2D_NUMSIBLINGS  4          /**< children per cell */
-#define FCLAW2D_NUMFACENEIGHBORS 2      /**< half-size neighbors per face */
-#define FCLAW2D_REFINEFACTOR 2          /**< each edge is split on refinement */
-
-extern const int SpaceDim;
-extern const int NumFaces;
-extern const int NumCorners;
-extern const int NumSiblings;
-extern const int NumFaceNeighbors;
-extern const int RefineFactor;
+#define FCLAW3D_SPACEDIM     3          /**< mesh dimension */
+#define FCLAW3D_NUMFACES     6          /**< faces per cell */
+#define FCLAW3D_NUMCORNERS   8          /**< corners per cell */
+#define FCLAW3D_NUMSIBLINGS  8          /**< children per cell */
+#define FCLAW3D_NUMFACENEIGHBORS 4      /**< half-size neighbors per face */
+#define FCLAW3D_REFINEFACTOR 2          /**< each edge is split on refinement */
 
 #ifdef __cplusplus
 #if 0
@@ -55,4 +48,4 @@ extern const int RefineFactor;
 }
 #endif
 
-#endif
+#endif /* !FCLAW3D_DEFS_H */

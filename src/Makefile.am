@@ -62,7 +62,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw_timer.c \
 	src/fclaw_mpi.c \
 	src/fclaw2d_block.c \
-	src/fclaw2d_defs.c \
 	src/fclaw2d_options.c \
 	src/fclaw2d_global.c \
 	src/fclaw2d_forestclaw.c \
