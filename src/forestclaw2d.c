@@ -1310,8 +1310,6 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
 #endif
 }
 
-#ifndef P4_TO_P8
-
 void
 fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
                                int smooth_refine, int smooth_level,
@@ -1378,6 +1376,8 @@ fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
                                  (p4est_locidx_t) patchno);
     }
 }
+
+#ifndef P4_TO_P8
 
 void
 fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,

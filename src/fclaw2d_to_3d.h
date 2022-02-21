@@ -94,6 +94,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_corner_swap       fclaw3d_patch_corner_swap
 #define fclaw2d_patch_transform_corner  fclaw3d_patch_transform_corner
 #define fclaw2d_patch_transform_corner2 fclaw3d_patch_transform_corner2
+#define fclaw2d_domain_set_refinement   fclaw3d_domain_set_refinement
+#define fclaw2d_patch_mark_refine       fclaw3d_patch_mark_refine
+#define fclaw2d_patch_mark_coarsen      fclaw3d_patch_mark_coarsen
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
