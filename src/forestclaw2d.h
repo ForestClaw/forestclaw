@@ -534,7 +534,7 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  * \param [in,out] j        FOUR (4) integer coordinates along y-axis in
- *                          \a based .. \a mx.  On input, only the first is used.
+ *                          \a based .. \a my.  On input, only the first is used.
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */

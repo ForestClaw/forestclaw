@@ -510,14 +510,18 @@ int fclaw3d_patch_face_transformation_valid (const int ftransform[]);
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
  *                          This function assumes \a mx == \a my.
+ * \param [in] mz           Number of cells along z direction of patch.
+ *                          This function assumes \a mx == \a mz.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
+ * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
  */
 void fclaw3d_patch_transform_face (fclaw3d_patch_t * ipatch,
                                    fclaw3d_patch_t * opatch,
                                    const int ftransform[],
-                                   int mx, int my, int based, int *i, int *j);
+                                   int mx, int my, int mz, int based,
+                                   int *i, int *j, int *k);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size).
@@ -533,21 +537,27 @@ void fclaw3d_patch_transform_face (fclaw3d_patch_t * ipatch,
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
  *                          This function assumes \a mx == \a my.
+ * \param [in] mz           Number of cells along z direction of patch.
+ *                          This function assumes \a mx == \a mz.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
- * \param [in,out] i        FOUR (4) integer coordinates along x-axis in
+ * \param [in,out] i        EIGHT (8) integer coordinates along x-axis in
  *                          \a based .. \a mx.  On input, only the first is used.
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
- * \param [in,out] j        FOUR (4) integer coordinates along y-axis in
- *                          \a based .. \a mx.  On input, only the first is used.
+ * \param [in,out] j        EIGHT (8) integer coordinates along y-axis in
+ *                          \a based .. \a my.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ * \param [in,out] k        EIGHT (8) integer coordinates along z-axis in
+ *                          \a based .. \a mz.  On input, only the first is used.
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
 void fclaw3d_patch_transform_face2 (fclaw3d_patch_t * ipatch,
                                     fclaw3d_patch_t * opatch,
                                     const int ftransform[],
-                                    int mx, int my, int based, int i[],
-                                    int j[]);
+                                    int mx, int my, int mz, int based,
+                                    int i[], int j[], int k[]);
 
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e., no true multi-block.

@@ -609,58 +609,83 @@ fclaw2d_patch_face_transformation_valid (const int ftransform[])
     return 1;
 }
 
-#ifndef P4_TO_P8
-
 void
 fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
                               fclaw2d_patch_t * opatch,
                               const int ftransform[],
-                              int mx, int my, int based, int *i, int *j)
+                              int mx, int my,
+#ifdef P4_TO_P8
+                              int mz,
+#endif
+                              int based, int *i, int *j
+#ifdef P4_TO_P8
+                            , int *k
+#endif
+                             )
 {
     double Rmx;
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
     FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
     FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
     FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
+    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+#endif
 
     FCLAW_ASSERT (mx >= 1 && mx == my);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (mx == mz);
+#endif
     FCLAW_ASSERT (based == 0 || based == 1);
 
     FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
 
 #if 0
+#ifndef P4_TO_P8
     printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
             ipatch->xlower, ipatch->ylower, ipatch->level,
             ftransform[0], ftransform[2], ftransform[3], ftransform[5],
             ftransform[6], ftransform[8], mx, *i, *j, based);
 #endif
+#endif
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx *(double) (1 << ipatch->level);
+    Rmx = (double) mx * (double) (1 << ipatch->level);
 
     if (ftransform[8] & 4)
     {
         /* The two patches are in the same block.  ftransform is not used */
         *i += (int) ((ipatch->xlower - opatch->xlower) * Rmx);
         *j += (int) ((ipatch->ylower - opatch->ylower) * Rmx);
+#ifdef P4_TO_P8
+        *k += (int) ((ipatch->zlower - opatch->zlower) * Rmx);
+#endif
     }
     else
     {
         const int *my_axis = &ftransform[0];
         const int *target_axis = &ftransform[3];
         const int *edge_reverse = &ftransform[6];
-        double my_xyz[2], target_xyz[2];
+        double my_xyz[P4EST_DIM], target_xyz[P4EST_DIM];
 
         /* the reference cube is stretched to mx times my units */
         my_xyz[0] = ipatch->xlower * Rmx + *i - .5 * based;
         my_xyz[1] = ipatch->ylower * Rmx + *j - .5 * based;
+#ifdef P4_TO_P8
+        my_xyz[2] = ipatch->zlower * Rmx + *k - .5 * based;
+#endif
 
-        /* transform transversal direction */
+        /* transform transversal directions */
         target_xyz[target_axis[0]] =
             !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
+#ifdef P4_TO_P8
+        target_xyz[target_axis[1]] =
+            !edge_reverse[1] ? my_xyz[my_axis[1]] : Rmx - my_xyz[my_axis[1]];
+#endif
 
         /* transform normal direction */
         switch (edge_reverse[2])
@@ -684,11 +709,16 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
         /* transform back to integer coordinates: this is exact */
         *i = (int) (target_xyz[0] - opatch->xlower * Rmx + .5 * based);
         *j = (int) (target_xyz[1] - opatch->ylower * Rmx + .5 * based);
+#ifdef P4_TO_P8
+        *k = (int) (target_xyz[2] - opatch->zlower * Rmx + .5 * based);
+#endif
     }
 
 #if 0
+#ifndef P4_TO_P8
     printf ("Test O: IP %g %g IJ %d %d\n",
             opatch->xlower, opatch->ylower, *i, *j);
+#endif
 #endif
 }
 
@@ -696,69 +726,118 @@ void
 fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
                                fclaw2d_patch_t * opatch,
                                const int ftransform[],
-                               int mx, int my, int based, int i[], int j[])
+                               int mx, int my,
+#ifdef P4_TO_P8
+                               int mz,
+#endif
+                               int based, int i[], int j[]
+#ifdef P4_TO_P8
+                             , int k[]
+#endif
+                              )
 {
-    int kt, kn;
     int di, dj;
+#ifdef P4_TO_P8
+    int dk;
+#endif
     double Rmx;
 
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
     FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
     FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
     FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
+    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+#endif
 
     FCLAW_ASSERT (mx >= 1 && mx == my);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (mx == mz);
+#endif
     FCLAW_ASSERT (based == 0 || based == 1);
 
     FCLAW_ASSERT (fclaw2d_patch_face_transformation_valid (ftransform));
 
 #if 0
+#ifndef P4_TO_P8
     printf ("Test I: IP %g %g %d FT %d %d %d %d %d %d MX %d IJ %d %d BS %d\n",
             ipatch->xlower, ipatch->ylower, ipatch->level,
             ftransform[0], ftransform[2], ftransform[3], ftransform[5],
             ftransform[6], ftransform[8], mx, *i, *j, based);
 #endif
+#endif
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx *(double) (1 << opatch->level);
+    Rmx = (double) mx * (double) (1 << opatch->level);
 
     if (ftransform[8] & 4)
     {
+        int kx, ky, kz;
+
         /* The two patches are in the same block.  ftransform is undefined */
         di = based + (int)
             ((ipatch->xlower - opatch->xlower) * Rmx + 2. * (*i - based));
         dj = based + (int)
             ((ipatch->ylower - opatch->ylower) * Rmx + 2. * (*j - based));
+#ifdef P4_TO_P8
+        dk = based + (int)
+            ((ipatch->zlower - opatch->zlower) * Rmx + 2. * (*k - based));
+#else
+        kz = 0;
+#endif
 
         /* In the same block, the order of child cells is canonical */
-        for (kt = 0; kt < 2; ++kt)
+#ifdef P4_TO_P8
+        for (kz = 0; kz < 2; ++kz) {
+#if 0
+        }
+#endif
+#endif
+        for (ky = 0; ky < 2; ++ky)
         {
-            for (kn = 0; kn < 2; ++kn)
+            for (kx = 0; kx < 2; ++kx)
             {
-                i[2 * kt + kn] = di + kn;
-                j[2 * kt + kn] = dj + kt;
+                i[4 * kz + 2 * ky + kx] = di + kx;
+                j[4 * kz + 2 * ky + kx] = dj + ky;
+#ifdef P4_TO_P8
+                k[4 * kz + 2 * ky + kx] = dk + kz;
+#endif
             }
         }
+#ifdef P4_TO_P8
+#if 0
+        {
+#endif
+        }
+#endif
     }
     else
     {
+        int l, is[3], ik[3], ib[3], in[3];
         const int *my_axis = &ftransform[0];
         const int *target_axis = &ftransform[3];
         const int *edge_reverse = &ftransform[6];
-        int bt, bn;
-        int nx, ny;
-        int sx, sy;
-        double my_xyz[2], target_xyz[2];
+        double my_xyz[P4EST_DIM], target_xyz[P4EST_DIM];
 
         /* the reference cube is stretched to mx times my units */
         my_xyz[0] = ipatch->xlower * Rmx + 2. * (*i + .5 - based);
         my_xyz[1] = ipatch->ylower * Rmx + 2. * (*j + .5 - based);
+#ifdef P4_TO_P8
+        my_xyz[2] = ipatch->zlower * Rmx + 2. * (*k + .5 - based);
+#else
+        is[2] = ik[1] = ib[1] = in[2] = 0;
+#endif
 
-        /* transform transversal direction */
+        /* transform transversal directions */
         target_xyz[target_axis[0]] =
             !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
+#ifdef P4_TO_P8
+        target_xyz[target_axis[1]] =
+            !edge_reverse[1] ? my_xyz[my_axis[1]] : Rmx - my_xyz[my_axis[1]];
+#endif
 
         /* transform normal direction */
         switch (edge_reverse[2])
@@ -782,54 +861,73 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
         /* move back into integer coordinates: this is exact */
         di = (int) (target_xyz[0] - opatch->xlower * Rmx) + based - 1;
         dj = (int) (target_xyz[1] - opatch->ylower * Rmx) + based - 1;
+#ifdef P4_TO_P8
+        dk = (int) (target_xyz[2] - opatch->zlower * Rmx) + based - 1;
+#endif
 
         /* Run through the child cells in order of the small patch */
-        for (sy = 0; sy < 2; ++sy)
+#ifdef P4_TO_P8
+        for (is[2] = 0; is[2] < 2; ++is[2]) {
+#if 0
+        }
+#endif
+#endif
+        for (is[1] = 0; is[1] < 2; ++is[1])
         {
-            for (sx = 0; sx < 2; ++sx)
+            for (is[0] = 0; is[0] < 2; ++is[0])
             {
                 /* Compute small patch coordinate in (transverse, normal) order */
-                if (target_axis[0])
+                for (l = 0; l < 3; ++l)
                 {
-                    kt = sy;
-                    kn = sx;
-                }
-                else
-                {
-                    kt = sx;
-                    kn = sy;
+#if (P4EST_DIM == 2)
+                    if (l == 1) continue;
+#endif
+                    ik[l] = is[target_axis[l]];
                 }
 
                 /* Transform into big patch (transverse, normal) coordinate */
-                bt = !edge_reverse[0] ? kt : !kt;
-                bn = (edge_reverse[2] == 1
-                      || edge_reverse[2] == 2) ? kn : !kn;
+                ib[0] = !edge_reverse[0] ? ik[0] : !ik[0];
+#ifdef P4_TO_P8
+                ib[1] = !edge_reverse[1] ? ik[1] : !ik[1];
+#endif
+                ib[2] = (edge_reverse[2] == 1
+                      || edge_reverse[2] == 2) ? ik[2] : !ik[2];
 
                 /* Compute coordinate relative to the big patch */
-                if (my_axis[0])
+                for (l = 0; l < 3; ++l)
                 {
-                    nx = bn;
-                    ny = bt;
-                }
-                else
-                {
-                    nx = bt;
-                    ny = bn;
+#if (P4EST_DIM == 2)
+                    if (l == 1) continue;
+#endif
+                    in[my_axis[l]] = ib[l];
                 }
 
                 /* assign value in proper place */
-                i[2 * ny + nx] = di + sx;
-                j[2 * ny + nx] = dj + sy;
+                i[4 * in[2] + 2 * in[1] + in[0]] = di + is[0];
+                j[4 * in[2] + 2 * in[1] + in[0]] = dj + is[1];
+#ifdef P4_TO_P8
+                k[4 * in[2] + 2 * in[1] + in[0]] = dk + is[2];
+#endif
             }
         }
+#ifdef P4_TO_P8
+#if 0
+        {
+#endif
+        }
+#endif
     }
 
 #if 0
+#ifndef P4_TO_P8
     printf ("Test O: OP %g %g %d I %d %d %d %d J %d %d %d %d\n",
             opatch->xlower, opatch->ylower, opatch->level,
             i[0], i[1], i[2], i[3], j[0], j[1], j[2], j[3]);
 #endif
+#endif
 }
+
+#ifndef P4_TO_P8
 
 static inline p4est_locidx_t
 fclaw2d_array_index_locidx (sc_array_t * array, p4est_locidx_t li)

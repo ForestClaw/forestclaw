@@ -88,6 +88,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_face_transformation_block fclaw3d_patch_face_transformation_block
 #define fclaw2d_patch_face_transformation_intra fclaw3d_patch_face_transformation_intra
 #define fclaw2d_patch_face_transformation_valid fclaw3d_patch_face_transformation_valid
+#define fclaw2d_patch_transform_face    fclaw3d_patch_transform_face
+#define fclaw2d_patch_transform_face2   fclaw3d_patch_transform_face2
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
