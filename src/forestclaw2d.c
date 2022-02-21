@@ -198,8 +198,6 @@ fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
     FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
 }
 
-#ifndef P4_TO_P8
-
 static fclaw2d_patch_t *
 fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)
 {
@@ -221,8 +219,6 @@ fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)
     FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
     return block->patches + patchno;
 }
-
-#endif
 
 void
 fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
@@ -1377,8 +1373,6 @@ fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
     }
 }
 
-#ifndef P4_TO_P8
-
 void
 fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
                                 fclaw2d_domain_t * new_domain,
@@ -1632,6 +1626,8 @@ fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
 
     p4est_reset_data (wrap->p4est, 0, NULL, wrap->p4est->user_pointer);
 }
+
+#ifndef P4_TO_P8
 
 fclaw2d_domain_exchange_t *
 fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
