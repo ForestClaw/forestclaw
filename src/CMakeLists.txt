@@ -40,6 +40,8 @@ add_library(forestclaw_c OBJECT
   fclaw2d_farraybox.cpp 
   fclaw2d_output_tikz.c 
   forestclaw2d.c 
+  forestclaw3d.c
+  fclaw3d_convenience.c
   fp_exception_glibc_extension.c
   mappings/fclaw2d_map_nomap.c 
   mappings/fclaw2d_map_nomap_brick.c
@@ -136,6 +138,10 @@ install(FILES
 	fclaw2d_map_query.h 
 	fclaw2d_map_query_defs.h 
 	fclaw2d_diagnostics.h
+        fclaw2d_to_3d.h
+        forestclaw3d.h
+        fclaw3d_convenience.h
+	fclaw3d_defs.h
   DESTINATION include
 )
 
