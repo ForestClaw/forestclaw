@@ -2137,6 +2137,8 @@ fclaw2d_domain_indirect_destroy (fclaw2d_domain_t * domain,
     FCLAW_FREE (ind);
 }
 
+#endif
+
 void
 fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain)
 {
@@ -2184,7 +2186,5 @@ fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
  */
 fclaw2d_patch_t *fclaw2d_domain_get_patch (fclaw2d_domain_t * domain,
                                            int blockno, int patchno);
-
-#endif
 
 #endif /* ! P4_TO_P8 */
