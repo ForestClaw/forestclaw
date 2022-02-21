@@ -927,8 +927,6 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 #endif
 }
 
-#ifndef P4_TO_P8
-
 static inline p4est_locidx_t
 fclaw2d_array_index_locidx (sc_array_t * array, p4est_locidx_t li)
 {
@@ -969,7 +967,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     qid = mesh->quad_to_corner[P4EST_CHILDREN * local_num + cornerno];
 
     /* We are not yet ready for general multiblock connectivities where more
-     * than four blocks meet at a corner */
+     * than four (2D) or eight (3D) blocks meet at a corner */
     if (qid >= 0)
     {
         FCLAW_ASSERT (0 <= qid);
@@ -986,7 +984,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                                             cornerid + 1);
             if (cstart + 1 < cend)
             {
-                /* At least a five-corner, which is currently not supported */
+                /* At least a five/nine-corner, which is currently not supported */
                 qid = -1;
             }
             else
@@ -1080,32 +1078,55 @@ void
 fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
                                 fclaw2d_patch_t * opatch,
                                 int icorner, int is_block_boundary,
-                                int mx, int my, int based, int *i, int *j)
+                                int mx, int my,
+#ifdef P4_TO_P8
+                                int mz,
+#endif
+                                int based, int *i, int *j
+#ifdef P4_TO_P8
+                              , int *k
+#endif
+                               )
 {
     double Rmx, xshift, yshift;
+#ifdef P4_TO_P8
+    double zshift;
+#endif
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
     FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
     FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
     FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
+    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+#endif
 
     FCLAW_ASSERT (mx >= 1 && mx == my);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (mx == mz);
+#endif
     FCLAW_ASSERT (based == 0 || based == 1);
 
 #if 0
+#ifndef P4_TO_P8
     printf ("Test I: IP %g %g %d IC %d MX %d IJ %d %d BS %d\n",
             ipatch->xlower, ipatch->ylower, ipatch->level, icorner,
             mx, *i, *j, based);
 #endif
+#endif
 
     /* Work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx *(double) (1 << ipatch->level);
+    Rmx = (double) mx * (double) (1 << ipatch->level);
     if (!is_block_boundary)
     {
         /* The lower left coordinates are with respect to the same origin */
         xshift = yshift = 0.;
+#ifdef P4_TO_P8
+        zshift = 0.;
+#endif
     }
     else
     {
@@ -1122,54 +1143,93 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
         }
         if ((icorner & 2) == 0)
         {
-            /* This corner is on the bottom face of the patch */
+            /* This corner is on the front face of the patch */
             yshift = +1.;
         }
         else
         {
-            /* This corner is on the top face of the patch */
+            /* This corner is on the back face of the patch */
             yshift = -1.;
         }
+#ifdef P4_TO_P8
+        if ((icorner & 4) == 0)
+        {
+            /* This corner is on the bottom face of the patch */
+            zshift = +1.;
+        }
+        else
+        {
+            /* This corner is on the top face of the patch */
+            zshift = -1.;
+        }
+#endif
     }
 
     /* The two patches are in the same block, or in a different block
      * that has a coordinate system with the same orientation */
     *i += (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmx);
     *j += (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmx);
+#ifdef P4_TO_P8
+    *k += (int) ((ipatch->zlower - opatch->zlower + zshift) * Rmx);
+#endif
 }
 
 void
 fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
                                  fclaw2d_patch_t * opatch,
                                  int icorner, int is_block_boundary,
-                                 int mx, int my, int based, int i[], int j[])
+                                 int mx, int my,
+#ifdef P4_TO_P8
+                                 int mz,
+#endif
+                                 int based, int i[], int j[]
+#ifdef P4_TO_P8
+                               , int k[]
+#endif
+                                )
 {
-    int kt, kn;
+    int kt, kn, ks;
     int di, dj;
+#ifdef P4_TO_P8
+    int dk;
+    double zshift;
+#endif
     double Rmx, xshift, yshift;
 
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
     FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
     FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
     FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
+    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+#endif
 
     FCLAW_ASSERT (mx >= 1 && mx == my);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (mx == mz);
+#endif
     FCLAW_ASSERT (based == 0 || based == 1);
 
 #if 0
+#ifndef P4_TO_P8
     printf ("Test I: IP %g %g %d IC %d MX %d IJ %d %d BS %d\n",
             ipatch->xlower, ipatch->ylower, ipatch->level, icorner,
             mx, *i, *j, based);
 #endif
+#endif
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx *(double) (1 << opatch->level);
+    Rmx = (double) mx * (double) (1 << opatch->level);
     if (!is_block_boundary)
     {
         /* The lower left coordinates are with respect to the same origin */
         xshift = yshift = 0.;
+#ifdef P4_TO_P8
+        zshift = 0.;
+#endif
     }
     else
     {
@@ -1186,14 +1246,26 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
         }
         if ((icorner & 2) == 0)
         {
-            /* This corner is on the bottom face of the patch */
+            /* This corner is on the front face of the patch */
             yshift = +1.;
         }
         else
         {
-            /* This corner is on the top face of the patch */
+            /* This corner is on the back face of the patch */
             yshift = -1.;
         }
+#ifdef P4_TO_P8
+        if ((icorner & 4) == 0)
+        {
+            /* This corner is on the bottom face of the patch */
+            zshift = +1.;
+        }
+        else
+        {
+            /* This corner is on the top face of the patch */
+            zshift = -1.;
+        }
+#endif
     }
 
     /* The two patches are in the same block, or in a different block
@@ -1204,17 +1276,41 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
     dj = based
         + (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmx +
                  2. * (*j - based));
+#ifdef P4_TO_P8
+    dk = based
+        + (int) ((ipatch->zlower - opatch->zlower + zshift) * Rmx +
+                 2. * (*k - based));
+#else
+    ks = 0;
+#endif
 
     /* Without any rotation, the order of child cells is canonical */
+#ifdef P4_TO_P8
+    for (ks = 0; ks < 2; ++ks) {
+#if 0
+    }
+#endif
+#endif
     for (kt = 0; kt < 2; ++kt)
     {
         for (kn = 0; kn < 2; ++kn)
         {
-            i[2 * kt + kn] = di + kn;
-            j[2 * kt + kn] = dj + kt;
+            i[4 * ks + 2 * kt + kn] = di + kn;
+            j[4 * ks + 2 * kt + kn] = dj + kt;
+#ifdef P4_TO_P8
+            k[4 * ks + 2 * kt + kn] = dk + ks;
+#endif
         }
     }
+#ifdef P4_TO_P8
+#if 0
+    {
+#endif
+    }
+#endif
 }
+
+#ifndef P4_TO_P8
 
 void
 fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,

@@ -90,6 +90,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_face_transformation_valid fclaw3d_patch_face_transformation_valid
 #define fclaw2d_patch_transform_face    fclaw3d_patch_transform_face
 #define fclaw2d_patch_transform_face2   fclaw3d_patch_transform_face2
+#define fclaw2d_patch_corner_neighbors  fclaw3d_patch_corner_neighbors
+#define fclaw2d_patch_corner_swap       fclaw3d_patch_corner_swap
+#define fclaw2d_patch_transform_corner  fclaw3d_patch_transform_corner
+#define fclaw2d_patch_transform_corner2 fclaw3d_patch_transform_corner2
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
