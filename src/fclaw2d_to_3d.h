@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_t                 fclaw3d_patch_t
 #define fclaw2d_block_t                 fclaw3d_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
+#define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
 #define fclaw2d_patch_relation_t        fclaw3d_patch_relation_t
 #define fclaw2d_match_callback_t        fclaw3d_match_callback_t
@@ -114,6 +115,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_free_after_exchange  fclaw3d_domain_free_after_exchange
 #define fclaw2d_domain_serialization_enter  fclaw3d_domain_serialization_enter
 #define fclaw2d_domain_serialization_leave  fclaw3d_domain_serialization_leave
+#define fclaw2d_domain_destroy          fclaw3d_domain_destroy
+#define fclaw2d_domain_adapt            fclaw3d_domain_adapt
+#define fclaw2d_domain_partition        fclaw3d_domain_partition
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

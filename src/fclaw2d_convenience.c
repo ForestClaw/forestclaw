@@ -403,6 +403,8 @@ fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
     return domain;
 }
 
+#endif
+
 void
 fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
 {
@@ -479,7 +481,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     {
         int ng, nb, np;
         int face, corner;
-        int nprocs[2], nblockno, npatchno[2], nfc;
+        int nprocs[P4EST_HALF], nblockno, npatchno[P4EST_HALF], nfc;
         int level, max_tlevel;
         int exists;
         int k;
@@ -548,7 +550,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                     }
                     else if (nrel == FCLAW2D_PATCH_HALFSIZE)
                     {
-                        for (k = 0; k < 2; ++k)
+                        for (k = 0; k < P4EST_HALF; ++k)
                         {
                             npatch =
                                 fclaw2d_domain_get_neighbor_patch (domain,
@@ -674,6 +676,8 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
         return NULL;
     }
 }
+
+#ifndef P4_TO_P8
 
 void
 fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
