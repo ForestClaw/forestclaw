@@ -1627,8 +1627,6 @@ fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
     p4est_reset_data (wrap->p4est, 0, NULL, wrap->p4est->user_pointer);
 }
 
-#ifndef P4_TO_P8
-
 fclaw2d_domain_exchange_t *
 fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
                                          size_t data_size)
@@ -1747,6 +1745,8 @@ fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
     FCLAW_FREE (e->patch_data);
     FCLAW_FREE (e);
 }
+
+#ifndef P4_TO_P8
 
 struct fclaw2d_domain_indirect
 {

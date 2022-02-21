@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_relation_t        fclaw3d_patch_relation_t
 #define fclaw2d_match_callback_t        fclaw3d_match_callback_t
 #define fclaw2d_transfer_callback_t     fclaw3d_transfer_callback_t
+#define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID
@@ -105,6 +106,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_retrieve_after_partition     fclaw3d_domain_retrieve_after_partition
 #define fclaw2d_domain_iterate_partitioned  fclaw3d_domain_iterate_partitioned
 #define fclaw2d_domain_free_after_partition fclaw3d_domain_free_after_partition
+#define fclaw2d_domain_allocate_before_exchange fclaw3d_domain_allocate_before_exchange
+#define fclaw2d_domain_free_after_exchange  fclaw3d_domain_free_after_exchange
+#define fclaw2d_domain_ghost_exchange   fclaw3d_domain_ghost_exchange
+#define fclaw2d_domain_ghost_exchange_begin fclaw3d_domain_ghost_exchange_begin
+#define fclaw2d_domain_ghost_exchange_end   fclaw3d_domain_ghost_exchange_end
+#define fclaw2d_domain_free_after_exchange  fclaw3d_domain_free_after_exchange
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
