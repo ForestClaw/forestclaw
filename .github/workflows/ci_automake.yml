@@ -1,4 +1,4 @@
-name: ForestClaw Build
+name: CI for Automake
 on:
   push:
   pull_request:
@@ -10,256 +10,91 @@ env:
   FCFLAGS: -lgfortran -cpp
   FFLAGS: -lgfortran -cpp
 jobs:
-
-
-################
-# Serial builds
-################
-
-  serial_minimal_build:
+  linux:
     runs-on: ubuntu-20.04
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - name: "Serial Minimal"
+          configure_flags: ""
+          ubuntu_packages: ""
+        - name: "Serial With Clawpack"
+          configure_flags: "--enable-clawpack"
+          ubuntu_packages: ""
+        - name: "Serial With GeoClaw"
+          configure_flags: "--enable-geoclaw"
+          ubuntu_packages: ""
+        - name: "Serial With CudaClaw"
+          configure_flags: "CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
+          ubuntu_packages: "nvidia-cuda-toolkit"
+          cuda: true
+        - name: "MPI Minimal"
+          configure_flags: "--enable-mpi"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With Clawpack"
+          configure_flags: "--enable-clawpack --enable-mpi"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With GeoClaw"
+          configure_flags: "--enable-geoclaw --enable-mpi"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With CudaClaw"
+          configure_flags: "CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
+          cuda: true
+        - name: "MPI With ThunderEgg"
+          configure_flags: "--enable-mpi --enable-thunderegg --with-thunderegg=$GITHUB_WORKSPACE/ThunderEgg"
+          ubuntu_packages: "cmake libopenmpi-dev openmpi-bin libfftw3-dev"
+          thunderegg: true
+
+    name: Automake ${{ matrix.name }} Build on Linux
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libblas-dev liblapack-dev
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure
-    - name: Build
-      run: make
-    - name: Tests
-      run: make check -j2
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
-    - name: Install
-      run: sudo make install
+      name: "Checkout Source code"
 
-
-  serial_build_with_clawpack_enabled:
-    runs-on: ubuntu-20.04
-    steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libblas-dev liblapack-dev
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure --enable-clawpack
-    - name: Build
-      run: make
-    - name: Tests
-      run: make check -j2
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
-    - name: Install
-      run: sudo make install
-
-  serial_build_with_geoclaw_enabled:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libblas-dev liblapack-dev
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure --enable-geoclaw
-    - name: Build
-      run: make
-    - name: Tests
-      run: make check -j2
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
-    - name: Install
-      run: sudo make install
-
-
-  serial_build_with_cudaclaw_enabled:
-    runs-on: ubuntu-20.04
-    env:
-      CUDA_PATH: /usr
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libblas-dev liblapack-dev nvidia-cuda-toolkit
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure CUDA_CFLAGS="-arch=sm_61" LIBS="-lcuda -lcudart -lnvToolsExt" --enable-cudaclaw --disable-shared
-    - name: Build
-      run: make
-    - name: Install
-      run: sudo make install
-
-
-#############
-# MPI builds
-#############
-
-  mpi_minimal_build:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure --enable-mpi
-    - name: Build
-      run: make
-    - name: Tests
-      run: make check
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
-    - name: Install
-      run: sudo make install
-
-
-  mpi_build_with_clawpack_enabled:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure --enable-clawpack --enable-mpi
-    - name: Build
-      run: make
-    - name: Tests
-      run: make check
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
-    - name: Install
-      run: sudo make install
-
-
-  mpi_build_with_geoclaw_enabled:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure --enable-geoclaw --enable-mpi
-    - name: Build
-      run: make
-    - name: Tests
-      run: make check
-    - name: Print Test log
-      if: ${{ failure() }}
-      run: cat test-suite.log
-    - name: Install
-      run: sudo make install
-
-
-  mpi_build_with_cudaclaw_enabled:
-    runs-on: ubuntu-20.04
-    env:
-      CUDA_PATH: /usr
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libopenmpi-dev openmpi-bin libblas-dev liblapack-dev nvidia-cuda-toolkit
-    - name: Init and Update Submodules
-      run: |
-        git submodule init
-        git submodule update
-    - name: Run bootstrap Script
-      run: ./bootstrap
-    - name: Configure
-      run: ./configure CUDA_CFLAGS="-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include" LIBS="-lcuda -lcudart -lnvToolsExt" --enable-cudaclaw --enable-mpi --disable-shared
-    - name: Build
-      run: make
-    - name: Install
-      run: sudo make install
-
-  mpi_build_with_thunderegg_enabled:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/checkout@v2
+      name: "Checkout ThunderEgg Source code"
+      if: ${{ matrix.thunderegg }}
       with:
         repository: ThunderEgg/ThunderEgg
         ref: develop
         path: ThunderEggSrc
+
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libblas-dev liblapack-dev 
+        sudo apt-get install ${{ matrix.ubuntu_packages }}
+
     - name: Install ThunderEgg
+      if: ${{ matrix.thunderegg }}
       run: |
         cd ThunderEggSrc
         cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ -DBUILD_TESTING=OFF .
         make install
+
     - name: Init and Update Submodules
       run: |
         git submodule init
         git submodule update
+
     - name: Run bootstrap Script
       run: ./bootstrap
+
     - name: Configure
-      run: ./configure --enable-mpi --enable-thunderegg --with-thunderegg=$GITHUB_WORKSPACE/ThunderEgg
+      run: ./configure ${{ matrix.configure_flags }}
+
     - name: Build
       run: make
+
     - name: Tests
+      if: ${{ !matrix.cuda }}
       run: make check
+
     - name: Print Test log
       if: ${{ failure() }}
       run: cat test-suite.log
+
     - name: Install
       run: sudo make install
