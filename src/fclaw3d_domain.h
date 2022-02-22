@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW3D_DOMAIN_H
 #define FCLAW3D_DOMAIN_H
 
+#include <forestclaw.h>
 #include <forestclaw3d.h>  /* Needed for domain_exchange/domain_indirect info */
 
 #ifdef __cplusplus
@@ -41,7 +42,6 @@ extern "C"
 #endif
 
 struct fclaw3d_global;
-struct fclaw3d_domain;
 
 typedef struct fclaw3d_domain_data
 {
@@ -68,6 +68,26 @@ fclaw3d_domain_data_t* fclaw3d_domain_get_data(struct fclaw3d_domain *domain);
 /* OpenMP iterator (not part of forestclaw3d.h */
 void fclaw3d_domain_iterate_level_mthread (struct fclaw3d_domain * domain, int level,
                                            fclaw3d_patch_callback_t pcb, void *user);
+
+/* below are the functions needed for dimension independence */
+
+/** safeguard value for dimension-independent domain */
+#define FCLAW3D_DOMAIN_MAGIC 0x67890303
+
+/** Construct a dimension-specific domain and initialize patch data.
+ * \param [in] domain           Freshly created, valid domain structure
+ *                              without any user data attached to it.
+ * \param [in] init             This callback is pointed to a freshly
+ *                              allocated fclaw_patch whose 3D data it
+ *                              is supposed to fill with fitting values.
+ *                              This includes allocating and filling
+ *                              the patch user pointer, which the
+ *                              callback can do using the third
+ *                              parameter to this function, \a user.
+ * \param [in,out] user         Pointer passed through to \a init.
+ */
+fclaw_domain_t *fclaw_domain_new3d (fclaw3d_domain_t * domain,
+                                    fclaw_patch_callback_t init, void *user);
 
 #ifdef __cplusplus
 #if 0

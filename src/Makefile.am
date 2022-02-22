@@ -46,7 +46,8 @@ libforestclaw_installed_headers = \
         src/fclaw2d_to_3d.h \
 	src/forestclaw3d.h \
 	src/fclaw3d_domain.h \
-	src/fclaw3d_defs.h
+	src/fclaw3d_defs.h \
+	src/forestclaw.h
 
 libforestclaw_internal_headers =
 
@@ -94,7 +95,9 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_output_tikz.c \
 	src/forestclaw2d.c \
 	src/forestclaw3d.c \
+	src/fclaw3d_domain.c \
 	src/fclaw3d_convenience.c \
+	src/forestclaw.c \
 	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \

@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_DOMAIN_H
 #define FCLAW2D_DOMAIN_H
 
+#include <forestclaw.h>
 #include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
 
 #ifdef __cplusplus
@@ -41,7 +42,6 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_domain;
 
 typedef struct fclaw2d_domain_data
 {
@@ -68,6 +68,26 @@ fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw2d_domain *domain);
 /* OpenMP iterator (not part of forestclaw2d.h */
 void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int level,
                                            fclaw2d_patch_callback_t pcb, void *user);
+
+/* below are the functions needed for dimension independence */
+
+/** safeguard value for dimension-independent domain */
+#define FCLAW2D_DOMAIN_MAGIC 0x56780202
+
+/** Construct a dimension-specific domain and initialize patch data.
+ * \param [in] domain           Freshly created, valid domain structure
+ *                              without any user data attached to it.
+ * \param [in] init             This callback is pointed to a freshly
+ *                              allocated fclaw_patch whose 2D data it
+ *                              is supposed to fill with fitting values.
+ *                              This includes allocating and filling
+ *                              the patch user pointer, which the
+ *                              callback can do using the third
+ *                              parameter to this function, \a user.
+ * \param [in,out] user         Pointer passed through to \a init.
+ */
+fclaw_domain_t *fclaw_domain_new2d (fclaw2d_domain_t * domain,
+                                    fclaw_patch_callback_t init, void *user);
 
 #ifdef __cplusplus
 #if 0
