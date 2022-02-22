@@ -32,17 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_map.h>
 
-#if 0
-/* from feature_clawpatch3 */
-const int SpaceDim = FCLAW2D_SPACEDIM;
-const int NumFaces = FCLAW2D_NUMFACES;
-const int p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
-const int NumCorners = FCLAW2D_NUM_CORNERS;
-const int NumSiblings = FCLAW2D_NUM_SIBLINGS;
-const int PatchDim = FCLAW_PATCH_DIM;
-const int RefineDim = FCLAW_REFINE_DIM;
-#endif
-
 fclaw2d_global_t* fclaw2d_global_new (void)
 {
     fclaw2d_global_t *glob;

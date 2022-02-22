@@ -42,13 +42,12 @@ extern "C"
 #define FCLAW2D_REFINEFACTOR 2          /**< each edge is split on refinement */
 
 #if 0
-/* if we use them we need to prefix them with 2D/3D */
-extern const int SpaceDim;
-extern const int NumFaces;
-extern const int NumCorners;
-extern const int NumSiblings;
-extern const int NumFaceNeighbors;
-extern const int RefineFactor;
+extern const int fclaw2d_SpaceDim;
+extern const int fclaw2d_NumFaces;
+extern const int fclaw2d_NumCorners;
+extern const int fclaw2d_NumSiblings;
+extern const int fclaw2d_NumFaceNeighbors;
+extern const int fclaw2d_RefineFactor;
 #endif
 
 #ifdef __cplusplus

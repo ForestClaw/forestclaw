@@ -361,8 +361,8 @@ void fc3d_clawpack5_bc2(fclaw2d_global_t *glob,
     int *block_mthbc = clawopt->mthbc;
 
     /* Set a local copy of mthbc that can be used for a patch. */
-    int mthbc[NumFaces];
-    for(int i = 0; i < NumFaces; i++)
+    int mthbc[FCLAW2D_NUMFACES];
+    for(int i = 0; i < FCLAW2D_NUMFACES; i++)
     {
         if (intersects_phys_bdry[i])
         {
