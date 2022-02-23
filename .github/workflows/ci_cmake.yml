@@ -105,7 +105,7 @@ jobs:
   mac:
     runs-on: macos-latest
     name: CMake build on MacOS
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
       CTEST_PARALLEL_LEVEL: 3
