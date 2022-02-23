@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #ifndef P4_TO_P8
+#include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
 
 #include <fclaw_package.h>
@@ -34,16 +35,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_map.h>
 #else
+#include <fclaw3d_defs.h>
 #include <fclaw3d_global.h>
 #endif
 
 void
-fclaw2d_global_iterate_cb
+fclaw2d_iterate_patch_cb
   (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
    int blockno, int patchno, void *user)
 {
   fclaw_global_iterate_t *gi = (fclaw_global_iterate_t *) user;
+
+  FCLAW_ASSERT (gi->gpcb != NULL);
   gi->gpcb (gi->glob, (fclaw_patch_t *) patch->user, blockno, patchno, gi->user);
+}
+
+void
+fclaw2d_iterate_family_cb
+  (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+   int blockno, int patchno, void *user)
+{
+  fclaw_global_iterate_t *gi = (fclaw_global_iterate_t *) user;
+  fclaw_patch_t *family[FCLAW2D_NUMSIBLINGS];
+  int i;
+
+  for (i = 0; i < FCLAW2D_NUMSIBLINGS; ++i) {
+    family[i] = (fclaw_patch_t *) patch[i].user;
+  }
+
+  FCLAW_ASSERT (gi->gfcb != NULL);
+  gi->gfcb (gi->glob, family, blockno, patchno, gi->user);
 }
 
 #ifndef P4_TO_P8

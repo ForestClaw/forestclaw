@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW3D_GLOBAL_H
 #define FCLAW3D_GLOBAL_H
 
-#include <forestclaw3d.h>  /* Needed to declare callbacks (below) */
+#include <forestclaw3d.h>       /* Needed to declare callbacks (below) */
 
 #ifdef __cplusplus
 extern "C"
@@ -38,9 +38,13 @@ extern "C"
 
 /* these are dimension-specific functions */
 
-void fclaw3d_global_iterate_cb
-  (fclaw3d_domain_t *domain, fclaw3d_patch_t *patch,
-   int blockno, int patchno, void *user);
+void fclaw3d_iterate_patch_cb
+    (fclaw3d_domain_t * domain, fclaw3d_patch_t * patch,
+     int blockno, int patchno, void *user);
+
+void fclaw3d_iterate_family_cb
+    (fclaw3d_domain_t * domain, fclaw3d_patch_t * patch,
+     int blockno, int patchno, void *user);
 
 #ifdef __cplusplus
 #if 0

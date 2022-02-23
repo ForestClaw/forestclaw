@@ -30,9 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct fclaw_global
 {
-  fclaw_domain_t *domain;
+    fclaw_domain_t *domain;
 
-  /* lots of dimension-independent stuff */
+    /* lots of dimension-independent stuff */
 }
 fclaw_global_t;
 
@@ -44,22 +44,39 @@ fclaw_global_t;
  * \param [in] patchno  Patch number within block of processed patch.
  * \param [in,out] user	Data that was passed into the iterator functions.
  */
-typedef void (*fclaw_global_callback_t)
+typedef void (*fclaw_patch_callback_t)
     (fclaw_global_t * global, fclaw_patch_t * patch,
+     int blockno, int patchno, void *user);
+
+/** Dimension-independent callback prototype for family iterators.
+ * We iterate over local families of patches only.
+ * \param [in] domain	Dimension-independent global context.
+ * \param [in] family	Array of the patches in the family.
+ * \param [in] blockno  Block number of processed patches.
+ * \param [in] patchno  The local number of the first sibling patch
+ *                      in the family, relative to the block.  The
+ *                      remaining 3 (2D) or 7 (3D) are consecutive.
+ * \param [in,out] user	Data that was passed into the iterator functions.
+ */
+typedef void (*fclaw_family_callback_t)
+    (fclaw_global_t * global, fclaw_patch_t * family[],
      int blockno, int patchno, void *user);
 
 typedef struct fclaw_global_iterate
 {
-  fclaw_global_t *glob;
-  fclaw_global_callback_t gpcb;
-  void *user;
+    fclaw_global_t *glob;
+    fclaw_patch_callback_t gpcb;
+    fclaw_family_callback_t gfcb;
+    void *user;
 }
 fclaw_global_iterate_t;
 
+/** Iterate through all local patches one at a time. */
 void fclaw_global_iterate_patches (fclaw_global_t * glob,
-                                   fclaw_global_callback_t gpcb, void *user);
+                                   fclaw_patch_callback_t gpcb, void *user);
 
+/** Iterate through families of patches. */
 void fclaw_global_iterate_families (fclaw_global_t * glob,
-                                    fclaw_global_callback_t gpcb, void *user);
+                                    fclaw_family_callback_t gfcb, void *user);
 
 #endif /* FCLAW_GLOBAL_H */

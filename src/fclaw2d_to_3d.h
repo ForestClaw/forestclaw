@@ -32,6 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <p4est_to_p8est.h>
 
+/* redefine macros */
+#define FCLAW2D_SPACEDIM                FCLAW3D_SPACEDIM
+#define FCLAW2D_NUMFACES                FCLAW3D_NUMFACES
+#define FCLAW2D_NUMCORNERS              FCLAW3D_NUMCORNERS
+#define FCLAW2D_NUMSIBLINGS             FCLAW3D_NUMSIBLINGS
+#define FCLAW2D_NUMFACENEIGHBORS        FCLAW3D_NUMFACENEIGHBORS
+/* not redefining REFINEFACTOR, which should be dimension-independent */
+
 /* redefine typedefs */
 #define fclaw2d_patch_flags_t           fclaw3d_patch_flags_t
 #define fclaw2d_patch_t                 fclaw3d_patch_t
@@ -123,7 +131,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_iterate_cb       fclaw3d_domain_iterate_cb
 #define fclaw_domain_new2d              fclaw_domain_new3d
 #define fclaw_domain_destroy2d          fclaw_domain_destroy3d
-#define fclaw2d_global_iterate_cb       fclaw3d_global_iterate_cb
+#define fclaw2d_iterate_patch_cb        fclaw3d_iterate_patch_cb
+#define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

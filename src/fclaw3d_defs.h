@@ -39,7 +39,7 @@ extern "C"
 #define FCLAW3D_NUMCORNERS   8          /**< corners per cell */
 #define FCLAW3D_NUMSIBLINGS  8          /**< children per cell */
 #define FCLAW3D_NUMFACENEIGHBORS 4      /**< half-size neighbors per face */
-#define FCLAW3D_REFINEFACTOR 2          /**< each edge is split on refinement */
+/* not redefining REFINEFACTOR, which should be dimension-independent */
 
 #ifdef __cplusplus
 #if 0

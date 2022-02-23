@@ -27,42 +27,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw3d_global.h>
 
-void fclaw_global_iterate_patches (fclaw_global_t * glob,
-                                   fclaw_global_callback_t gpcb, void *user)
+void
+fclaw_global_iterate_patches (fclaw_global_t * glob,
+                              fclaw_patch_callback_t gpcb, void *user)
 {
     fclaw_global_iterate_t gi;
     gi.glob = glob;
     gi.gpcb = gpcb;
+    gi.gfcb = NULL;
     gi.user = user;
 
     if (glob->domain->dim == 2)
     {
         fclaw2d_domain_iterate_patches (glob->domain->d.d2.domain2,
-                                        fclaw2d_global_iterate_cb, &gi);
+                                        fclaw2d_iterate_patch_cb, &gi);
     }
-    else {
+    else
+    {
         FCLAW_ASSERT (glob->domain->dim == 3);
         fclaw3d_domain_iterate_patches (glob->domain->d.d3.domain3,
-                                        fclaw3d_global_iterate_cb, &gi);
+                                        fclaw3d_iterate_patch_cb, &gi);
     }
 }
 
-void fclaw_global_iterate_families (fclaw_global_t * glob,
-                                    fclaw_global_callback_t gpcb, void *user)
+void
+fclaw_global_iterate_families (fclaw_global_t * glob,
+                               fclaw_family_callback_t gfcb, void *user)
 {
     fclaw_global_iterate_t gi;
     gi.glob = glob;
-    gi.gpcb = gpcb;
+    gi.gpcb = NULL;
+    gi.gfcb = gfcb;
     gi.user = user;
 
     if (glob->domain->dim == 2)
     {
         fclaw2d_domain_iterate_families (glob->domain->d.d2.domain2,
-                                         fclaw2d_global_iterate_cb, &gi);
+                                         fclaw2d_iterate_family_cb, &gi);
     }
-    else {
+    else
+    {
         FCLAW_ASSERT (glob->domain->dim == 3);
         fclaw3d_domain_iterate_families (glob->domain->d.d3.domain3,
-                                         fclaw3d_global_iterate_cb, &gi);
+                                         fclaw3d_iterate_family_cb, &gi);
     }
 }
