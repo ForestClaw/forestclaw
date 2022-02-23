@@ -51,6 +51,29 @@ fclaw_global_iterate_patches (fclaw_global_t * glob,
 }
 
 void
+fclaw_global_iterate_level (fclaw_global_t * glob, int level,
+                            fclaw_patch_callback_t gpcb, void *user)
+{
+    fclaw_global_iterate_t gi;
+    gi.glob = glob;
+    gi.gpcb = gpcb;
+    gi.gfcb = NULL;
+    gi.user = user;
+
+    if (glob->domain->dim == 2)
+    {
+        fclaw2d_domain_iterate_level (glob->domain->d.d2.domain2, level,
+                                      fclaw2d_iterate_patch_cb, &gi);
+    }
+    else
+    {
+        FCLAW_ASSERT (glob->domain->dim == 3);
+        fclaw3d_domain_iterate_level (glob->domain->d.d3.domain3, level,
+                                      fclaw3d_iterate_patch_cb, &gi);
+    }
+}
+
+void
 fclaw_global_iterate_families (fclaw_global_t * glob,
                                fclaw_family_callback_t gfcb, void *user)
 {

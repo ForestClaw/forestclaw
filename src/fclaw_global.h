@@ -83,6 +83,10 @@ fclaw_global_iterate_t;
 void fclaw_global_iterate_patches (fclaw_global_t * glob,
                                    fclaw_patch_callback_t gpcb, void *user);
 
+/** Iterate through all local patches on  given level. */
+void fclaw_global_iterate_level (fclaw_global_t * glob, int level,
+                                 fclaw_patch_callback_t gpcb, void *user);
+
 /** Iterate through families of patches. */
 void fclaw_global_iterate_families (fclaw_global_t * glob,
                                     fclaw_family_callback_t gfcb, void *user);
