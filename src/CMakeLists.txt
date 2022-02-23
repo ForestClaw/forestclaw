@@ -149,6 +149,7 @@ install(FILES
         fclaw3d_global.h
         fclaw3d_defs.h
         forestclaw.h
+        fclaw_patch.h
         fclaw_global.h
   DESTINATION include
 )

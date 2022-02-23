@@ -30,33 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FORESTCLAW_H
 #define FORESTCLAW_H
 
-#include <fclaw_base.h>
-
-typedef struct fclaw_patch_user
-{
-    /** User defined patch structure */
-    void *user_patch;
-
-    /** Additional user data */
-    void *user_data;
-}
-fclaw_patch_user_t;
-
-typedef struct fclaw_patch
-{
-    union
-    {
-        /* avoid including dimension-specific files */
-        struct fclaw2d_patch_data *pd2;
-        struct fclaw3d_patch_data *pd3;
-    }
-    pd;
-
-    /* Those below are currently also in pd2, pd3.
-       Shall be removed from pd2, pd3. */
-    fclaw_patch_user_t pu;
-}
-fclaw_patch_t;
+#include <fclaw_patch.h>
 
 typedef struct fclaw_domain_user
 {

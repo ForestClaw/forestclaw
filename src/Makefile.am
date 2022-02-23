@@ -49,6 +49,7 @@ libforestclaw_installed_headers = \
 	src/fclaw3d_global.h \
 	src/fclaw3d_defs.h \
 	src/forestclaw.h \
+        src/fclaw_patch.h \
 	src/fclaw_global.h
 
 libforestclaw_internal_headers =
