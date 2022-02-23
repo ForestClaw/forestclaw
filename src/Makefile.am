@@ -45,11 +45,12 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_diagnostics.h \
         src/fclaw2d_to_3d.h \
 	src/forestclaw3d.h \
+	src/fclaw3d_convenience.h \
+	src/fclaw3d_defs.h \
 	src/fclaw3d_domain.h \
 	src/fclaw3d_global.h \
-	src/fclaw3d_defs.h \
-	src/forestclaw.h \
         src/fclaw_patch.h \
+	src/fclaw_domain.h \
 	src/fclaw_global.h
 
 libforestclaw_internal_headers =
@@ -98,10 +99,10 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_output_tikz.c \
 	src/forestclaw2d.c \
 	src/forestclaw3d.c \
+	src/fclaw3d_convenience.c \
 	src/fclaw3d_domain.c \
 	src/fclaw3d_global.c \
-	src/fclaw3d_convenience.c \
-	src/forestclaw.c \
+	src/fclaw_domain.c \
 	src/fclaw_global.c \
 	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \

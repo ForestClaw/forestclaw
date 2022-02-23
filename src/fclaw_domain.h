@@ -22,14 +22,18 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-/** 
+/**
  * @file
- * Dimension-independent version of domain, block, patch
+ * Dimension-independent wrapper of a forestclaw domain.
  */
 
-#ifndef FORESTCLAW_H
-#define FORESTCLAW_H
+#ifndef FCLAW_DOMAIN_H
+#define FCLAW_DOMAIN_H
 
+/*
+ * Domain-independent header file should not include domain-specific headers.
+ * The corresponding source file include the 2d and 3d domain-specific headers.
+ */
 #include <fclaw_patch.h>
 
 typedef struct fclaw_domain_user
@@ -133,4 +137,4 @@ void fclaw_domain_iterate_patches (fclaw_domain_t * domain,
 void fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
                                  fclaw_domain_callback_t iter, void *user);
 
-#endif /* !FORESTCLAW_H */
+#endif /* !FCLAW_DOMAIN_H */

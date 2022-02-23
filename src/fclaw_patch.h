@@ -22,14 +22,18 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-/** 
+/**
  * @file
- * Dimension-independent wrapper of patch
+ * Dimension-independent wrapper of a forestclaw patch.
  */
 
 #ifndef FCLAW_PATCH_H
 #define FCLAW_PATCH_H
 
+/*
+ * Domain-independent header file should not include domain-specific headers.
+ * The corresponding source file include the 2d and 3d domain-specific headers.
+ */
 #include <fclaw_base.h>
 
 typedef struct fclaw_patch_user
