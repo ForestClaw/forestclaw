@@ -11,7 +11,7 @@ add_library(forestclaw_c OBJECT
   fclaw_mpi.c 
   fclaw2d_block.c 
   fclaw2d_options.c 
-  fclaw2d_global.c 
+  fclaw2d_global.c
   fclaw2d_forestclaw.c 
   fclaw2d_vtable.c 
   fclaw2d_map.c 
@@ -27,7 +27,7 @@ add_library(forestclaw_c OBJECT
   fclaw2d_run.c 
   fclaw2d_diagnostics.c 
   fclaw2d_update_single_step.c 
-  fclaw2d_domain.c 
+  fclaw2d_domain.c
   fclaw2d_regrid.c 
   fclaw2d_patch.c 
   fclaw2d_partition.c 
@@ -42,8 +42,10 @@ add_library(forestclaw_c OBJECT
   forestclaw2d.c 
   forestclaw3d.c
   fclaw3d_domain.c
+  fclaw3d_global.c
   fclaw3d_convenience.c
   forestclaw.c
+  fclaw_global.c
   fp_exception_glibc_extension.c
   mappings/fclaw2d_map_nomap.c 
   mappings/fclaw2d_map_nomap_brick.c
@@ -117,9 +119,9 @@ install(FILES
 	fclaw2d_advance.h 
 	fclaw2d_elliptic_solver.h 
 	fclaw2d_farraybox.hpp 
-	fclaw2d_global.h 
+	fclaw2d_global.h
 	fclaw2d_forestclaw.h 
-	fclaw2d_domain.h 
+	fclaw2d_domain.h
 	fclaw2d_block.h 
 	fclaw2d_patch.h 
 	fclaw2d_vtable.h 
@@ -143,8 +145,11 @@ install(FILES
         fclaw2d_to_3d.h
         forestclaw3d.h
         fclaw3d_convenience.h
+        fclaw3d_domain.h
+        fclaw3d_global.h
         fclaw3d_defs.h
         forestclaw.h
+        fclaw_global.h
   DESTINATION include
 )
 

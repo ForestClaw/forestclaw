@@ -74,6 +74,10 @@ void fclaw3d_domain_iterate_level_mthread (struct fclaw3d_domain * domain, int l
 /** safeguard value for dimension-independent domain */
 #define FCLAW3D_DOMAIN_MAGIC 0x67890303
 
+void fclaw3d_domain_iterate_cb
+  (fclaw3d_domain_t * d3, fclaw3d_patch_t * patch,
+   int blockno, int patchno, void *user);
+
 /** Construct a dimension-specific domain and initialize patch data.
  * \param [in] domain           Freshly created, valid domain structure
  *                              without any user data attached to it.
@@ -87,7 +91,7 @@ void fclaw3d_domain_iterate_level_mthread (struct fclaw3d_domain * domain, int l
  * \param [in,out] user         Pointer passed through to \a init.
  */
 fclaw_domain_t *fclaw_domain_new3d (fclaw3d_domain_t * domain,
-                                    fclaw_patch_callback_t init, void *user);
+                                    fclaw_domain_callback_t init, void *user);
 
 #ifdef __cplusplus
 #if 0

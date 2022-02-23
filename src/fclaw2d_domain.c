@@ -36,10 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_convenience.h>  /* Contains domain_destroy and others */
 
 /* when ready include <fclaw3d_patch.h> */
-struct fclaw3d_patch_data
+typedef struct fclaw3d_patch_data
 {
     const fclaw3d_patch_t *real_patch;
-};
+}
+fclaw3d_patch_data_t;
 #endif
 
 /* dimension-independent helper functions first */
@@ -58,9 +59,19 @@ fclaw_domain_get_domain (fclaw_domain_t *d)
 
 #endif
 
+void
+fclaw2d_domain_iterate_cb
+  (fclaw2d_domain_t * d2, fclaw2d_patch_t * patch,
+   int blockno, int patchno, void *user)
+{
+    fclaw_domain_iterate_t *di = (fclaw_domain_iterate_t *) user;
+    di->iter (di->d, (fclaw_patch_t *) patch->user, blockno, patchno,
+              di->user);
+}
+
 fclaw_domain_t *
 fclaw_domain_new2d (fclaw2d_domain_t * domain,
-                    fclaw_patch_callback_t init, void *user)
+                    fclaw_domain_callback_t init, void *user)
 {
     int i, j;
     fclaw2d_block_t      *block;
@@ -80,8 +91,8 @@ fclaw_domain_new2d (fclaw2d_domain_t * domain,
     d->d.d3.dmagic3 = FCLAW3D_DOMAIN_MAGIC;
     d->d.d3.domain3 = domain;
 #endif
-    d->count_set_patch = 0;
-    d->count_delete_patch = 0;
+    d->du.count_set_patch = 0;
+    d->du.count_delete_patch = 0;
 
     /* iterate over all patches to initialize */
     for (i = 0; i < domain->num_blocks; ++i)
@@ -93,8 +104,10 @@ fclaw_domain_new2d (fclaw2d_domain_t * domain,
             patch = block->patches + j;
             patch->user = p = FCLAW_ALLOC_ZERO (fclaw_patch_t, 1);
 #ifndef P4_TO_P8
+            p->pd.pd2 = FCLAW_ALLOC_ZERO (fclaw2d_patch_data_t, 1);
             p->pd.pd2->real_patch = patch;
 #else
+            p->pd.pd3 = FCLAW_ALLOC_ZERO (fclaw3d_patch_data_t, 1);
             p->pd.pd3->real_patch = patch;
 #endif
             init (d, p, i, j, user);
@@ -227,4 +240,3 @@ void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
 }
 
 #endif /* !P4_TO_P8 */
-

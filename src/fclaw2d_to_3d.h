@@ -120,7 +120,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_partition        fclaw3d_domain_partition
 #define fclaw2d_domain_partition_unchanged  fclaw3d_domain_partition_unchanged
 #define fclaw2d_domain_complete         fclaw3d_domain_complete
+#define fclaw2d_domain_iterate_cb       fclaw3d_domain_iterate_cb
 #define fclaw_domain_new2d              fclaw_domain_new3d
+#define fclaw2d_global_iterate_cb       fclaw3d_global_iterate_cb
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

@@ -32,6 +32,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 
+typedef struct fclaw_patch_user
+{
+    /** User defined patch structure */
+    void *user_patch;
+
+    /** Additional user data */
+    void *user_data;
+}
+fclaw_patch_user_t;
+
 typedef struct fclaw_patch
 {
     union
@@ -43,15 +53,18 @@ typedef struct fclaw_patch
     pd;
 
     /* Those below are currently also in pd2, pd3.
-       Choose exactly one good place for them to be in */
-
-  /** User defined patch structure */
-    void *user_patch;
-
-  /** Additional user data */
-    void *user_data;
+       Shall be removed from pd2, pd3. */
+    fclaw_patch_user_t pu;
 }
 fclaw_patch_t;
+
+typedef struct fclaw_domain_user
+{
+    /* Debug counters and timers */
+    int count_set_patch;
+    int count_delete_patch;
+}
+fclaw_domain_user_t;
 
 typedef struct fclaw_domain
 {
@@ -64,20 +77,25 @@ typedef struct fclaw_domain
             /* avoid including dimension-specific files */
             int dmagic2;
             struct fclaw2d_domain *domain2;
+            struct fclaw2d_domain_exchange *exchange2;
+            struct fclaw2d_domain_indirect *indirect2;
+
         }
         d2;
         struct
         {
             int dmagic3;
             struct fclaw3d_domain *domain3;
+#if 0
+            struct fclaw3d_domain_exchange *exchange3;
+            struct fclaw3d_domain_indirect *indirect3;
+#endif
         }
         d3;
     }
     d;
 
-    /* Debug counters and timers */
-    int count_set_patch;
-    int count_delete_patch;
+    fclaw_domain_user_t du;
 }
 fclaw_domain_t;
 
@@ -89,9 +107,17 @@ fclaw_domain_t;
  * \param [in] patchno  Patch number within block of processed patch.
  * \param [in,out] user	Data that was passed into the iterator functions.
  */
-typedef void (*fclaw_patch_callback_t)
+typedef void (*fclaw_domain_callback_t)
     (fclaw_domain_t * domain, fclaw_patch_t * patch,
      int blockno, int patchno, void *user);
+
+typedef struct fclaw_domain_iterate
+{
+    fclaw_domain_t *d;
+    fclaw_domain_callback_t iter;
+    void *user;
+}
+fclaw_domain_iterate_t;
 
 /* Verify that dimension and domain object are set correctly.
  * \param [in] domain           Dimension-independent domain.
@@ -113,7 +139,15 @@ int fclaw_domain_is_valid (fclaw_domain_t * domain);
  * \param [in,out] user         Pointer passed through to \a init.
  */
 void fclaw_domain_destroy (fclaw_domain_t * domain,
-                           fclaw_patch_callback_t dele, void *user);
+                           fclaw_domain_callback_t dele, void *user);
+
+/** Iterate over all local patches.
+ * \param [in] domain	Dimension-independent domain structure.
+ * \param [in] iter     Function called for each patch of matching level.
+ * \param [in,out] user	Data is passed to the \a iter callback.
+ */
+void fclaw_domain_iterate_patches (fclaw_domain_t * domain,
+                                   fclaw_domain_callback_t iter, void *user);
 
 /** Iterate over all local patches on a given level.
  * \param [in] domain	Dimension-independent domain structure.
@@ -122,6 +156,6 @@ void fclaw_domain_destroy (fclaw_domain_t * domain,
  * \param [in,out] user	Data is passed to the \a iter callback.
  */
 void fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
-                                 fclaw_patch_callback_t iter, void *user);
+                                 fclaw_domain_callback_t iter, void *user);
 
 #endif /* !FORESTCLAW_H */
