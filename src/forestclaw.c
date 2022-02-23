@@ -56,10 +56,19 @@ fclaw_domain_is_valid (fclaw_domain_t * domain)
 }
 
 void
-fclaw_domain_destroy_domain (fclaw_domain_t * domain,
-                             fclaw_domain_callback_t dele, void *user)
+fclaw_domain_destroy (fclaw_domain_t * domain,
+                      fclaw_domain_callback_t dele, void *user)
 {
     FCLAW_ASSERT (fclaw_domain_is_valid (domain));
+    if (domain->dim == 2)
+    {
+        fclaw_domain_destroy2d (domain, dele, user);
+    }
+    else
+    {
+        FCLAW_ASSERT (domain->dim == 3);
+        fclaw_domain_destroy3d (domain, dele, user);
+    }
 }
 
 void
@@ -81,6 +90,7 @@ fclaw_domain_iterate_patches (fclaw_domain_t * domain,
     }
     else
     {
+        FCLAW_ASSERT (domain->dim == 3);
         fclaw3d_domain_iterate_patches (domain->d.d3.domain3,
                                         fclaw3d_domain_iterate_cb, &di);
     }
@@ -105,6 +115,7 @@ fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
     }
     else
     {
+        FCLAW_ASSERT (domain->dim == 3);
         fclaw3d_domain_iterate_level (domain->d.d3.domain3, level,
                                       fclaw3d_domain_iterate_cb, &di);
     }

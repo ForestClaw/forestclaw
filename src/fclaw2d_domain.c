@@ -110,13 +110,59 @@ fclaw_domain_new2d (fclaw2d_domain_t * domain,
             p->pd.pd3 = FCLAW_ALLOC_ZERO (fclaw3d_patch_data_t, 1);
             p->pd.pd3->real_patch = patch;
 #endif
-            init (d, p, i, j, user);
+            if (init != NULL) {
+                init (d, p, i, j, user);
+            }
         }
     }
 
     /* domain fully constructed */
     FCLAW_ASSERT (fclaw_domain_is_valid (d));
     return d;
+}
+
+void
+fclaw_domain_destroy2d (fclaw_domain_t * d,
+                        fclaw_domain_callback_t dele, void *user)
+{
+    int i, j;
+    fclaw2d_domain_t     *domain;
+    fclaw2d_block_t      *block;
+    fclaw2d_patch_t      *patch;
+    fclaw_patch_t        *p;
+
+    FCLAW_ASSERT (d->dim == P4EST_DIM);
+#ifndef P4_TO_P8
+    domain = d->d.d2.domain2;
+#else
+    domain = d->d.d3.domain3;
+#endif
+
+    FCLAW_ASSERT (domain != NULL && domain->mpisize > 0);
+    FCLAW_ASSERT (d->du.count_set_patch == d->du.count_delete_patch);
+
+    /* iterate over all patches to deinitialize */
+    for (i = 0; i < domain->num_blocks; ++i)
+    {
+        block = domain->blocks + i;
+        for (j = 0; j < block->num_patches; ++j)
+        {
+            /* free the new dimension-independent patch into storage */
+            patch = block->patches + j;
+            p = (fclaw_patch_t *) patch->user;
+            if (dele != NULL) {
+                dele (d, p, i, j, user);
+            }
+#ifndef P4_TO_P8
+            FCLAW_FREE (p->pd.pd2);
+#else
+            FCLAW_FREE (p->pd.pd3);
+#endif
+            FCLAW_FREE (p);
+        }
+    }
+    fclaw2d_domain_destroy (domain);
+    FCLAW_FREE (d);
 }
 
 #ifndef P4_TO_P8

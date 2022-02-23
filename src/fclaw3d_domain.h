@@ -88,10 +88,24 @@ void fclaw3d_domain_iterate_cb
  *                              the patch user pointer, which the
  *                              callback can do using the third
  *                              parameter to this function, \a user.
+ *                              May be NULL for no callback.
  * \param [in,out] user         Pointer passed through to \a init.
+ * \return                      Initialized dimension-independent domain.
  */
 fclaw_domain_t *fclaw_domain_new3d (fclaw3d_domain_t * domain,
                                     fclaw_domain_callback_t init, void *user);
+
+/** Destruct a dimension-specific domain and deinitialize patch data.
+ * \param [in] domain           Valid dimension-independent domain structure.
+ * \param [in] dele             This callback is pointed to each existing
+ *                              fclaw_patch whose 3D data it is supposed to
+ *                              deinitialize, as well as the patch user data.
+ *                              Note, just don't allocate the patch itself!
+ *                              May be NULL for no callback.
+ * \param [in,out] user         Pointer passed through to \a init.
+ */
+void fclaw_domain_destroy3d (fclaw_domain_t * domain,
+                             fclaw_domain_callback_t dele, void *user);
 
 #ifdef __cplusplus
 #if 0
