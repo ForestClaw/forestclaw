@@ -94,6 +94,7 @@ typedef struct fclaw_domain
         d3;
     }
     d;
+    sc_mstamp_t pstamp;     /**< internal: quickly allocate same-size patches */
 
     fclaw_domain_user_t du;
 }
