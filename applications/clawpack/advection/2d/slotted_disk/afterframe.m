@@ -1,10 +1,11 @@
 setviews;
 
-axis image;
-daspect([1 1 1]);
-axis off;
+% yrbcolormap;
+colormap(parula);
 
-yrbcolormap;
+fprintf('qmin = %16.8e\n',qmin);
+fprintf('qmax = %16.8e\n',qmax);
+
 
 if (UserColorMapping > 0)
     % showgridlines(1:4);
@@ -12,7 +13,7 @@ if (UserColorMapping > 0)
     setpatchborderprops('linewidth',1);
     hidepatchborders(7);
     view([65.5,12]);
-
+%{
     global ash_cm_limit ash_cm_N;
     qv = ash_cm_limit;
     N = ash_cm_N;
@@ -30,17 +31,24 @@ if (UserColorMapping > 0)
     set(o,'yticklabel',clabel);
     set(o,'ticklength',[0])
     set(o,'fontsize',16,'fontweight','bold')
+%}
 else
     showpatchborders;
     setpatchborderprops('linewidth',1);
-    caxis([0.1,1]);
+    caxis([-0.5,1]);
 end
-
-view([117.50,4]);
 
 colorbar
 
-% set(gcf,'visible','off');
+axis image;
+set(gca,'clipping','off')
+daspect([1 1 1]);
+axis off;
+
+view([117.50,4]);
+
+delete(get(gca,'title'));
+
 
 NoQuery = 0;
 prt = false;
