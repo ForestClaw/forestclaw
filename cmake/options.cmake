@@ -1,5 +1,6 @@
 option(mpi "use MPI library")
 option(openmp "use OpenMP")
+option(applications "build applications" ON)
 
 option(clawpack "build Clawpack")
 option(geoclaw "build Geoclaw")
@@ -26,7 +27,7 @@ if(clawpack)
   set(clawpack5 ON)
   set(clawpatch ON)
   set(clawpack3_46 ON)
-endif(clawpack3)
+endif(clawpack)
 
 if(geoclaw)
   set(clawpatch ON)

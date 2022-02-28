@@ -1,0 +1,86 @@
+name: External Project Tests
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+
+
+jobs:
+
+  linux:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+    env:
+      CTEST_PARALLEL_LEVEL: 2
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - name:            "Serial Minimal"
+          components:      ""
+          ubuntu_packages: ""
+
+        - name:            "Serial With Clawpack"
+          components:      "clawpack"
+          ubuntu_packages: ""
+
+        - name:            "Serial With GeoClaw"
+          components:      "geoclaw"
+          ubuntu_packages: ""
+
+        - name:            "Serial With CudaClaw"
+          components:      "cudaclaw"
+          ubuntu_packages: ""
+          cuda:            true
+
+        - name:            "MPI Minimal"
+          components:      "mpi"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+
+        - name:            "MPI With Clawpack"
+          components:      "mpi clawpack"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+
+        - name:            "MPI With GeoClaw"
+          components:      "mpi geoclaw"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+
+        - name:            "MPI With CudaClaw"
+          components:      "mpi cudaclaw"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+          cuda:            true
+
+        - name:            "MPI With ThunderEgg"
+          components:      "mpi thunderegg"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
+
+    name: External ${{ matrix.name }} Build on Linux
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout source code
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -yq
+        sudo apt-get install -yq --no-install-recommends \
+            ninja-build ${{ matrix.ubuntu_packages }}
+
+    - name: Install Cuda Toolkit
+      if: ${{ matrix.cuda }}
+      run: |
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+        sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
+        sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
+        sudo apt-get update
+        sudo apt-get -y install cuda-toolkit-11-3
+
+    - name: CMake configure examples
+      run: cmake -B applications/build -S applications --preset ci -DTEST_EXTERNAL_PROJECT=true -DTEST_EXTERNAL_PROJECT_COMPONENTS="${{ matrix.components }}" -DTEST_EXTERNAL_PROJECT_TAG="`git rev-parse HEAD`" -DTEST_EXTERNAL_PROJECT_REPO="`pwd`"
+
+    - name: CMake build examples
+      working-directory: applications
+      run: cmake --build --preset ci

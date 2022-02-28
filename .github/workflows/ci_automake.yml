@@ -1,0 +1,100 @@
+name: CI for Automake
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+env:
+  CFLAGS: -lgfortran
+  CXXFLAGS: -lgfortran --std=c++17
+  FCFLAGS: -lgfortran -cpp
+  FFLAGS: -lgfortran -cpp
+jobs:
+  linux:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - name: "Serial Minimal"
+          configure_flags: ""
+          ubuntu_packages: ""
+        - name: "Serial With Clawpack"
+          configure_flags: "--enable-clawpack"
+          ubuntu_packages: ""
+        - name: "Serial With GeoClaw"
+          configure_flags: "--enable-geoclaw"
+          ubuntu_packages: ""
+        - name: "Serial With CudaClaw"
+          configure_flags: "CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
+          ubuntu_packages: "nvidia-cuda-toolkit"
+          cuda: true
+        - name: "MPI Minimal"
+          configure_flags: "--enable-mpi"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With Clawpack"
+          configure_flags: "--enable-clawpack --enable-mpi"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With GeoClaw"
+          configure_flags: "--enable-geoclaw --enable-mpi"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With CudaClaw"
+          configure_flags: "CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
+          cuda: true
+        - name: "MPI With ThunderEgg"
+          configure_flags: "--enable-mpi --enable-thunderegg --with-thunderegg=$GITHUB_WORKSPACE/ThunderEgg"
+          ubuntu_packages: "cmake libopenmpi-dev openmpi-bin libfftw3-dev"
+          thunderegg: true
+
+    name: Automake ${{ matrix.name }} Build on Linux
+    steps:
+    - uses: actions/checkout@v2
+      name: "Checkout Source code"
+
+    - uses: actions/checkout@v2
+      name: "Checkout ThunderEgg Source code"
+      if: ${{ matrix.thunderegg }}
+      with:
+        repository: ThunderEgg/ThunderEgg
+        ref: develop
+        path: ThunderEggSrc
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install ${{ matrix.ubuntu_packages }}
+
+    - name: Install ThunderEgg
+      if: ${{ matrix.thunderegg }}
+      run: |
+        cd ThunderEggSrc
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ThunderEgg/ -DBUILD_TESTING=OFF .
+        make install
+
+    - name: Init and Update Submodules
+      run: |
+        git submodule init
+        git submodule update
+
+    - name: Run bootstrap Script
+      run: ./bootstrap
+
+    - name: Configure
+      run: ./configure ${{ matrix.configure_flags }}
+
+    - name: Build
+      run: make
+
+    - name: Tests
+      if: ${{ !matrix.cuda }}
+      run: make check
+
+    - name: Print Test log
+      if: ${{ failure() }}
+      run: cat test-suite.log
+
+    - name: Install
+      run: sudo make install

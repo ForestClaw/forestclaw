@@ -12,7 +12,6 @@
 
       integer i,j,m
       double precision xc,yc, poisson_qexact
-      double precision xc1, yc1, zc1, r, s, e
 
       cont = get_context()
 
