@@ -25,26 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "poisson_user.h"
-#include "poisson_options.h"
-#include "poisson_diagnostics.h"
-
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch_fort.h>
-
-#include <fc2d_thunderegg.h>
-#include <fc2d_thunderegg_fort.h>
-#include <fc2d_thunderegg_options.h>
-#include <fc2d_thunderegg_physical_bc.h>
-#include <fc2d_thunderegg_starpatch.h>
-#include <fc2d_thunderegg_fivepoint.h>
-
-#include <fclaw2d_elliptic_solver.h>
-
-
-#include <fclaw2d_farraybox.hpp>
 
 
 static
@@ -284,7 +264,7 @@ void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
 
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
     POISSON_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
@@ -387,8 +367,10 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
     // tagging routines
     patch_vt->tag4refinement       = poisson_tag4refinement;
     patch_vt->tag4coarsening       = poisson_tag4coarsening;
+#if 0
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
+#endif    
 
     // Output routines
 

@@ -35,3 +35,9 @@ target_include_directories(heat PRIVATE
 target_link_libraries(heat PRIVATE 
   FORESTCLAW::FC2D_THUNDEREGG ZLIB::ZLIB
 )
+
+add_test(NAME elliptic_heat 
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(elliptic_heat
+         PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

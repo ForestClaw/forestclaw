@@ -159,6 +159,8 @@ include(cmake/install.cmake)
 
 
 # --- examples
-add_subdirectory(applications)
+if(applications)
+  add_subdirectory(applications)
+endif(applications)
 
 

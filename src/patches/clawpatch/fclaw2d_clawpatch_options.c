@@ -94,8 +94,12 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                         3, "Interpolation stencil width [3]");
 
     sc_options_add_bool (opt, 0, "ghost_patch_pack_aux", 
-                         &clawpatch_options->ghost_patch_pack_aux,1,
-                         "Pack aux. variables for parallel comm. of ghost patches [T]");
+                         &clawpatch_options->ghost_patch_pack_aux,0,
+                         "Pack aux. variables for parallel comm. of ghost patches [F]");
+
+    sc_options_add_bool (opt, 0, "save-aux", 
+                         &clawpatch_options->save_aux,0,
+                         "Save aux variables when re-taking a time step [F]");
 
     /* Set verbosity level for reporting timing */
     sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria = sc_keyvalue_new ();

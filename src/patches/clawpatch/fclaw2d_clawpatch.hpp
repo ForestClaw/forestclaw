@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct fclaw2d_patch;
 struct fclaw2d_global;
-class  fclaw2d_metric_patch_t;
+struct  fclaw2d_metric_patch_t;
 
 /**
  * @brief Stores data for each patch
@@ -78,6 +78,7 @@ public :
 
     /** Auxilliary array (used by Clawpack 4.6 and 5.0) */
     FArrayBox aux;
+    FArrayBox aux_save;
 
     /* Mapping and metric info */
     int manifold; /**< true if using manifold */   

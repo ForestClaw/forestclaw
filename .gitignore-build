@@ -15,7 +15,6 @@ config.sub
 install-sh
 ltmain.sh
 
-
 # Files in directory 'config' to ignore.  These will be copied/recreated by
 # bootstrap if needed.
 libtool.m4
@@ -23,3 +22,6 @@ lt~obsolete.m4
 ltoptions.m4
 ltsugar.m4
 ltversion.m4
+
+# Generated header files
+src/pre_config.h.in

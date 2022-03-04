@@ -6,7 +6,7 @@ subroutine heat_init(blockno, mbc,mx,my,meqn, &
     DOUBLE PRECISION xlower,ylower,dx,dy
     DOUBLE PRECISION q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-    INTEGER i,j, m
+    INTEGER i,j
     DOUBLE PRECISION xc,yc, heat_qexact, qe
 
     do i = 1-mbc,mx+mbc

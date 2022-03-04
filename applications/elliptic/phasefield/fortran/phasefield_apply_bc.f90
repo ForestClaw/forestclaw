@@ -36,12 +36,9 @@ subroutine phasefield_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
     double precision d, h, x, y, g
     double precision a,b, uI, dI
     double precision flux(0:3)
-    integer count
 
     DOUBLE PRECISION S_parm, alpha_parm, m_parm, xi_parm, k_parm, gamma_parm, r0_parm
     COMMON /comm_parms/ S_parm, alpha_parm, m_parm, xi_parm, k_parm, gamma_parm, r0_parm
-
-    double precision dx2, dy2, grad_phi(2),qd1, qd2
 
     logical ccheck
 

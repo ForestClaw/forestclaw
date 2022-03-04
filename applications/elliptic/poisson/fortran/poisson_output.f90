@@ -1,7 +1,7 @@
 subroutine poisson_fort_header_ascii(matname1,matname2, time,mfields,maux,ngrids)
     implicit none
 
-    integer iframe,mfields,ngrids, maux
+    integer mfields,ngrids, maux
 
     character*11 matname1
     character*11 matname2
