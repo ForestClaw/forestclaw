@@ -95,7 +95,14 @@ P4EST_AS_SUBPACKAGE([FCLAW])
 AM_CONDITIONAL([FCLAW_DIST_DENY], [test "x$FCLAW_DIST_DENY" != x])
 AC_SUBST([FCLAW_DISTCLEAN])
 
+echo "o---------------------------------------"
+echo "| Checking CUDA"
+echo "o---------------------------------------"
+
 AX_CHECK_CUDA()
+AX_GET_CUDA_VERSION()
+# Check version
+AM_CONDITIONAL(USE_LOCAL_CUB, [expr "$CUDA_MAJOR_VERSION" "<"  "11"])
 
 # Print summary.
 AC_DEFINE_UNQUOTED(CPP,         ["${CPP}"],         [C preprocessor])
