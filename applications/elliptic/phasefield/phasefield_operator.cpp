@@ -126,7 +126,10 @@ void phasefield_solve(fclaw2d_global_t *glob)
     Iterative::BiCGStab<2> patch_bicg;
     patch_bicg.setTolerance(mg_opt->patch_bcgs_tol);
     patch_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
-    Iterative::PatchSolver<2> solver(patch_cg,op,true);
+
+    Iterative::Solver<2>* patch_iterative_solver = &patch_bicg;
+
+    Iterative::PatchSolver<2> solver(*patch_iterative_solver,op,true);
 
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
@@ -173,7 +176,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
             prev_phi_n_vec = restricted_phi_n_vec;
 
             //smoother
-            Iterative::PatchSolver<2> smoother(patch_cg,patch_operator, true);
+            Iterative::PatchSolver<2> smoother(*patch_iterative_solver, patch_operator, true);
 
             //restrictor
             GMG::LinearRestrictor<2> restrictor(curr_domain, 
@@ -200,7 +203,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
                                          ghost_filler);
 
         //smoother
-        Iterative::PatchSolver<2> smoother(patch_cg, coarse_patch_operator, true);
+        Iterative::PatchSolver<2> smoother(*patch_iterative_solver, coarse_patch_operator, true);
         //interpolator
         GMG::DirectInterpolator<2> interpolator(curr_domain, prev_domain);
 
