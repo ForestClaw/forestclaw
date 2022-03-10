@@ -99,7 +99,7 @@ echo "o---------------------------------------"
 echo "| Checking CUDA"
 echo "o---------------------------------------"
 
-if [ "x$FCLAW_CUDACLAW" = "xyes" ]; then
+if [ test "x$FCLAW_CUDACLAW" = "xyes" ]; then
         # Check for CUDA
         AX_CHECK_CUDA()
         AX_GET_CUDA_VERSION()
@@ -108,7 +108,7 @@ else
         CUDA_MAJOR_VERSION="0"
 fi
 # Check version
-AC_MSG_CHECKING([Checking if local CUB library shoudl be used])
+AC_MSG_CHECKING([Checking if local CUB library should be used])
 AM_CONDITIONAL(USE_LOCAL_CUB, [expr "$CUDA_MAJOR_VERSION" "<"  "11"])
 
 # Print summary.
