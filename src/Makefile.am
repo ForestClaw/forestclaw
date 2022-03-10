@@ -14,7 +14,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_math.h \
 	src/forestclaw2d.h \
 	src/fp_exception_glibc_extension.h \
-    src/fclaw2d_include_all.h \
+	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
 	src/fclaw2d_options.h \
 	src/fclaw2d_advance.h \
@@ -42,7 +42,16 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_diagnostics.h
+	src/fclaw2d_diagnostics.h \
+        src/fclaw2d_to_3d.h \
+	src/forestclaw3d.h \
+	src/fclaw3d_convenience.h \
+	src/fclaw3d_defs.h \
+	src/fclaw3d_domain.h \
+	src/fclaw3d_global.h \
+        src/fclaw_patch.h \
+	src/fclaw_domain.h \
+	src/fclaw_global.h
 
 libforestclaw_internal_headers =
 
@@ -59,7 +68,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw_timer.c \
 	src/fclaw_mpi.c \
 	src/fclaw2d_block.c \
-	src/fclaw2d_defs.c \
 	src/fclaw2d_options.c \
 	src/fclaw2d_global.c \
 	src/fclaw2d_forestclaw.c \
@@ -90,6 +98,12 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_farraybox.cpp \
 	src/fclaw2d_output_tikz.c \
 	src/forestclaw2d.c \
+	src/forestclaw3d.c \
+	src/fclaw3d_convenience.c \
+	src/fclaw3d_domain.c \
+	src/fclaw3d_global.c \
+	src/fclaw_domain.c \
+	src/fclaw_global.c \
 	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
