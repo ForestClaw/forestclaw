@@ -54,7 +54,7 @@ void run_program(fclaw2d_global_t* glob)
 	   --------------------------------------------------------------- */
 	fclaw2d_domain_data_new(glob->domain);
 
-	const user_options_t *user_opt = swirl_get_options(glob);
+	//const user_options_t *user_opt = swirl_get_options(glob);
 
 	/* Initialize virtual table for ForestClaw */
 	fclaw2d_vtables_initialize(glob);

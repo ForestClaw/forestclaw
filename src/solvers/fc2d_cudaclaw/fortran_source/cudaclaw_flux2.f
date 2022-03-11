@@ -56,8 +56,8 @@ c
 c
       implicit none
 
-      integer mw, jside, m, i, j, ixy, maxm, meqn, mbc, mx
-      integer my, maux
+      integer mw, jside, m, i, ixy, maxm, meqn, mbc, mx
+      integer maux
       integer mwaves, mcapa, method(7), mthlim(mwaves)
 
       external rpn2, rpt2

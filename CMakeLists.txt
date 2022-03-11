@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.13...3.20)
 
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+  set(CMAKE_CUDA_ARCHITECTURES 70)
+endif()
+
 project(FORESTCLAW
   DESCRIPTION "Quadtree/octree adaptive PDE solver based based on p4est."
   HOMEPAGE_URL https://github.com/ForestClaw/forestclaw
