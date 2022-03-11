@@ -121,11 +121,11 @@ void phasefield_solve(fclaw2d_global_t *glob)
 
     // set the patch solver
     Iterative::CG<2> patch_cg;
-    patch_cg.setTolerance(mg_opt->patch_bcgs_tol);
-    patch_cg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    patch_cg.setTolerance(mg_opt->patch_iter_tol);
+    patch_cg.setMaxIterations(mg_opt->patch_iter_max_it);
     Iterative::BiCGStab<2> patch_bicg;
-    patch_bicg.setTolerance(mg_opt->patch_bcgs_tol);
-    patch_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    patch_bicg.setTolerance(mg_opt->patch_iter_tol);
+    patch_bicg.setMaxIterations(mg_opt->patch_iter_max_it);
 
     Iterative::Solver<2>* patch_iterative_solver = nullptr;
     switch(mg_opt->patch_solver){

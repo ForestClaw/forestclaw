@@ -309,11 +309,11 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
 
     // set the patch solver
     Iterative::BiCGStab<2> p_bicg;
-    p_bicg.setTolerance(mg_opt->patch_bcgs_tol);
-    p_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    p_bicg.setTolerance(mg_opt->patch_iter_tol);
+    p_bicg.setMaxIterations(mg_opt->patch_iter_max_it);
     Iterative::BiCGStab<2> p_cg;
-    p_cg.setTolerance(mg_opt->patch_bcgs_tol);
-    p_cg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    p_cg.setTolerance(mg_opt->patch_iter_tol);
+    p_cg.setMaxIterations(mg_opt->patch_iter_max_it);
     shared_ptr<PatchSolver<2>>  solver;
 
     bitset<4> neumann_bitset;

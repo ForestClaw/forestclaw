@@ -72,7 +72,7 @@ struct fc2d_thunderegg_options
     int max_it;
     double tol;
 
-    /* thunderegg cyle settings */
+    /* thunderegg cycle settings */
     int pre_sweeps;
     int post_sweeps;
     int mid_sweeps;
@@ -81,9 +81,9 @@ struct fc2d_thunderegg_options
 
     int verbosity_level;
 
-    /* bicgstab patch solver settings*/
-    int patch_bcgs_max_it;
-    double patch_bcgs_tol;
+    /* iterative patch solver settings*/
+    int patch_iter_max_it;
+    double patch_iter_tol;
 
     int patch_operator;
     sc_keyvalue_t *kv_patch_operator;

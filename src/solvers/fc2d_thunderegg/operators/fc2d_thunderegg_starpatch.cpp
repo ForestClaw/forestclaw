@@ -138,11 +138,11 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 
     // set the patch solver
     Iterative::BiCGStab<2> p_cg;
-    p_cg.setTolerance(mg_opt->patch_bcgs_tol);
-    p_cg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    p_cg.setTolerance(mg_opt->patch_iter_tol);
+    p_cg.setMaxIterations(mg_opt->patch_iter_max_it);
     Iterative::BiCGStab<2> p_bicg;
-    p_bicg.setTolerance(mg_opt->patch_bcgs_tol);
-    p_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    p_bicg.setTolerance(mg_opt->patch_iter_tol);
+    p_bicg.setMaxIterations(mg_opt->patch_iter_max_it);
 
     unique_ptr<PatchSolver<2>>  solver;
     switch(mg_opt->patch_solver){
