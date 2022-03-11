@@ -52,6 +52,7 @@ typedef enum {
 typedef enum {
     FFT = 0,    /* Must use starpatch or fivepoint */
     BICG,       /* Can be used with any operator */
+    CG,         /* Can be used with any operator */
     USER_SOLVER
 } fc2d_thunderegg_solver_types;
 
@@ -83,9 +84,6 @@ struct fc2d_thunderegg_options
     /* bicgstab patch solver settings*/
     int patch_bcgs_max_it;
     double patch_bcgs_tol;
-
-    /* Used by starpatch only */
-    const char *patch_solver_type;
 
     int patch_operator;
     sc_keyvalue_t *kv_patch_operator;

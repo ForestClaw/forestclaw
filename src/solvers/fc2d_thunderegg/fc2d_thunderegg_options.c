@@ -88,23 +88,20 @@ thunderegg_register (fc2d_thunderegg_options_t* mg_opt, sc_options_t * opt)
                            "Max allowed iterations for patch-based bcgs solver [1000]");
 
 
-    /* Used by starpatch only */
-    sc_options_add_string (opt, 0, "patch-solver-type", &mg_opt->patch_solver_type, "BCGS",
-                           "Patch solver type. Can either be BCGS or FFT [BCGS]");
-
     /* Set operator type (starpatch, fivepoint) */
     sc_keyvalue_t *kv_op = mg_opt->kv_patch_operator = sc_keyvalue_new ();
-    sc_keyvalue_set_int (kv_op, "starpatch",  STARPATCH);     /* Uses patch-solver-type */
-    sc_keyvalue_set_int (kv_op, "fivepoint",  FIVEPOINT);     /* Uses FFT or BICG */
-    sc_keyvalue_set_int (kv_op, "varpoisson", VARPOISSON);   /* Uses BICG */
-    sc_keyvalue_set_int (kv_op, "heat",       HEAT);   /* Uses BICG */
-    sc_keyvalue_set_int (kv_op, "user_operator",  USER_OPERATOR);   /* Uses BICG */
+    sc_keyvalue_set_int (kv_op, "starpatch",  STARPATCH);     /* Uses FFT, CG or BICG */
+    sc_keyvalue_set_int (kv_op, "fivepoint",  FIVEPOINT);     /* Uses FFT, CG or BICG */
+    sc_keyvalue_set_int (kv_op, "varpoisson", VARPOISSON);   /* Uses BICG or CG */
+    sc_keyvalue_set_int (kv_op, "heat",       HEAT);   /* Uses BICG or CG */
+    sc_keyvalue_set_int (kv_op, "user_operator",  USER_OPERATOR);   /* Uses BICG or CG */
     sc_options_add_keyvalue (opt, 0, "patch_operator", &mg_opt->patch_operator,
                              "fivepoint", kv_op, "Set patch operator type [fivepoint]");
 
     /* Set solver type (FFT, BICG) */
     sc_keyvalue_t *kv_s = mg_opt->kv_patch_solver = sc_keyvalue_new ();
     sc_keyvalue_set_int (kv_s, "bicg", BICG);
+    sc_keyvalue_set_int (kv_s, "cg", CG);
     sc_keyvalue_set_int (kv_s, "fft",  FFT);     
     sc_keyvalue_set_int (kv_s, "user_solver",  USER_SOLVER);     
     sc_options_add_keyvalue (opt, 0, "patch_solver", &mg_opt->patch_solver,

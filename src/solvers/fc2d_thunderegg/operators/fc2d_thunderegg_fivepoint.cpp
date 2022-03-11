@@ -308,9 +308,12 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     fivePoint op(te_domain,ghost_filler);
 
     // set the patch solver
-    Iterative::BiCGStab<2> p_bcgs;
-    p_bcgs.setTolerance(mg_opt->patch_bcgs_tol);
-    p_bcgs.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    Iterative::BiCGStab<2> p_bicg;
+    p_bicg.setTolerance(mg_opt->patch_bcgs_tol);
+    p_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    Iterative::BiCGStab<2> p_cg;
+    p_cg.setTolerance(mg_opt->patch_bcgs_tol);
+    p_cg.setMaxIterations(mg_opt->patch_bcgs_max_it);
     shared_ptr<PatchSolver<2>>  solver;
 
     bitset<4> neumann_bitset;
@@ -321,7 +324,10 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     switch (mg_opt->patch_solver)
     {
         case BICG:
-            solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, op);
+            solver = make_shared<Iterative::PatchSolver<2>>(p_bicg, op);
+            break;
+        case CG:
+            solver = make_shared<Iterative::PatchSolver<2>>(p_cg, op);
             break;
 #ifdef THUNDEREGG_FFTW_ENABLED
         case FFT:
@@ -379,7 +385,10 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
             switch (mg_opt->patch_solver)
             {
                 case BICG:
-                    smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
+                    smoother.reset(new Iterative::PatchSolver<2>(p_bicg, patch_operator));
+                    break;
+                case CG:
+                    smoother.reset(new Iterative::PatchSolver<2>(p_cg, patch_operator));
                     break;
 #ifdef THUNDEREGG_FFTW_ENABLED
                 case FFT:
@@ -419,7 +428,10 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
         switch (mg_opt->patch_solver)
         {
             case BICG:
-                smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
+                smoother.reset(new Iterative::PatchSolver<2>(p_bicg, patch_operator));
+                break;
+            case CG:
+                smoother.reset(new Iterative::PatchSolver<2>(p_cg, patch_operator));
                 break;
 #ifdef THUNDEREGG_FFTW_ENABLED
             case FFT:

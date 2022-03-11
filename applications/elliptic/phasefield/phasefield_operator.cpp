@@ -127,7 +127,19 @@ void phasefield_solve(fclaw2d_global_t *glob)
     patch_bicg.setTolerance(mg_opt->patch_bcgs_tol);
     patch_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
 
-    Iterative::Solver<2>* patch_iterative_solver = &patch_bicg;
+    Iterative::Solver<2>* patch_iterative_solver = nullptr;
+    switch(mg_opt->patch_solver){
+        case CG:
+            patch_iterative_solver = &patch_cg;
+            break; 
+        case BICG:
+            patch_iterative_solver = &patch_bicg;
+            break;
+        default:
+            fclaw_global_essentialf("phasefield : No valid " \
+                                    "patch solver specified\n");
+            exit(0);            
+    }
 
     Iterative::PatchSolver<2> solver(*patch_iterative_solver,op,true);
 

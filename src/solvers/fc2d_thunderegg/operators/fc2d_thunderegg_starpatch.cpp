@@ -137,17 +137,30 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     VarPoisson::StarPatchOperator op(beta_vec, te_domain, ghost_filler);
 
     // set the patch solver
-    Iterative::BiCGStab<2> p_bcgs;
-    p_bcgs.setTolerance(mg_opt->patch_bcgs_tol);
-    p_bcgs.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    Iterative::BiCGStab<2> p_cg;
+    p_cg.setTolerance(mg_opt->patch_bcgs_tol);
+    p_cg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    Iterative::BiCGStab<2> p_bicg;
+    p_bicg.setTolerance(mg_opt->patch_bcgs_tol);
+    p_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
 
     unique_ptr<PatchSolver<2>>  solver;
-    if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-        solver.reset(new Iterative::PatchSolver<2>(p_bcgs, op));
-    }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+    switch(mg_opt->patch_solver){
+        case CG:
+            solver.reset(new Iterative::PatchSolver<2>(p_cg, op));
+            break;
+        case BICG:
+            solver.reset(new Iterative::PatchSolver<2>(p_bicg, op));
+            break;
 #ifdef THUNDEREGG_FFTW_ENABLED
-        solver.reset(new Poisson::FFTWPatchSolver<2>(op, neumann_bitset));
+        case FFT:
+            solver.reset(new Poisson::FFTWPatchSolver<2>(op, neumann_bitset));
+            break;
 #endif
+        default:
+            fclaw_global_essentialf("thunderegg_starpatch : No valid " \
+                                    "patch solver specified\n");
+            exit(0);            
     }
 
     // create gmg preconditioner
@@ -194,12 +207,22 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 
             //smoother
             unique_ptr<GMG::Smoother<2>> smoother;
-            if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-                smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
-            }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+            switch(mg_opt->patch_solver){
+                case CG:
+                    smoother.reset(new Iterative::PatchSolver<2>(p_cg, patch_operator));
+                    break;
+                case BICG:
+                    smoother.reset(new Iterative::PatchSolver<2>(p_bicg, patch_operator));
+                    break;
 #ifdef THUNDEREGG_FFTW_ENABLED
-                smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+                case FFT:
+                    smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+                    break;
 #endif
+                default:
+                    fclaw_global_essentialf("thunderegg_starpatch : No valid " \
+                                            "patch solver specified\n");
+                    exit(0);            
             }
 
             //restrictor
@@ -225,13 +248,25 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 
         //smoother
         unique_ptr<GMG::Smoother<2>> smoother;
-        if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-            smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
-        }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+        switch(mg_opt->patch_solver){
+            case CG:
+                smoother.reset(new Iterative::PatchSolver<2>(p_cg, patch_operator));
+                break;
+            case BICG:
+                smoother.reset(new Iterative::PatchSolver<2>(p_bicg, patch_operator));
+                break;
 #ifdef THUNDEREGG_FFTW_ENABLED
-            smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+            case FFT:
+                smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+                break;
 #endif
+            default:
+                fclaw_global_essentialf("thunderegg_starpatch : No valid " \
+                                        "patch solver specified\n");
+                exit(0);            
         }
+
+
 
         //interpolator
         GMG::DirectInterpolator<2> interpolator(curr_domain, 
