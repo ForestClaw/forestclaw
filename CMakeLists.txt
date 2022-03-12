@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13...3.20)
 project(FORESTCLAW
   DESCRIPTION "Quadtree/octree adaptive PDE solver based based on p4est."
   HOMEPAGE_URL https://github.com/ForestClaw/forestclaw
-  LANGUAGES C CXX Fortran
+  LANGUAGES C CXX Fortran 
   VERSION 0.1.4880)
 
 include(CTest)
@@ -11,6 +11,7 @@ include(CTest)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 set(CMAKE_CXX_STANDARD 17)
+
 # --- user options
 
 include(cmake/options.cmake)
@@ -24,6 +25,7 @@ endif()
 
 if(cudaclaw)
   enable_language(CUDA)
+  set(CMAKE_CUDA_STANDARD 14)
   find_package(CUDAToolkit REQUIRED)
 endif()
 
