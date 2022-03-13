@@ -52,7 +52,7 @@ c
       double precision  auxr(maux,1-mbc:maxm+mbc)
 
       !local only
-      integer m,i,mw,maxiter,mu,nv
+      integer i,mw,maxiter,mu,nv !m,
       double precision wall(3)
       double precision fw(3,3)
       double precision sw(3)
@@ -60,8 +60,8 @@ c
       double precision hR,hL,huR,huL,uR,uL,hvR,hvL,vR,vL,phiR,phiL
       double precision bR,bL,sL,sR,sRoe1,sRoe2,sE1,sE2,uhat,chat
       double precision s1m,s2m
-      double precision hstar,hstartest,hstarHLL,sLtest,sRtest
-      double precision tw,dxdc
+      double precision hstar,hstartest !,hstarHLL,sLtest,sRtest
+      double precision dxdc !tw
 
       logical rare1,rare2
 

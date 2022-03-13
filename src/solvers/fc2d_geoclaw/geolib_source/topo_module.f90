@@ -436,14 +436,14 @@ contains
         character(len=80) :: str
 
         ! NetCDF Support
-        character(len=10) :: direction, x_dim_name, x_var_name, y_dim_name, &
-            y_var_name, z_var_name, var_name
+        !character(len=10) :: direction  
+            !, z_var_name, y_var_name, y_dim_name, x_var_name,x_dim_name, var_name
         ! character(len=1) :: axis_string
-        real(kind=8), allocatable :: nc_buffer(:, :), xlocs(:), ylocs(:)
-        integer(kind=4) :: x_var_id, y_var_id, z_var_id, x_dim_id, y_dim_id
-        integer(kind=4) :: xstart(1), ystart(1), mx_tot, my_tot
-        integer(kind=4) :: ios, nc_file, dim_ids(2), num_dims, &
-            var_type, num_vars, num_dims_tot, z_dim_ids(2)
+        !real(kind=8), allocatable :: nc_buffer(:, :) !, xlocs(:), ylocs(:)
+        !integer(kind=4) :: x_dim_id , y_dim_id , z_var_id, y_var_id, x_var_id,
+        !integer(kind=4) :: mx_tot , my_tot, ystart(1), xstart(1),
+        !integer(kind=4) :: dim_ids(2) !ios,, num_dims,nc_file,
+             ! num_dims_tot , z_dim_ids(2), var_type,num_vars,
 
         print *, ' '
         print *, 'Reading topography file  ', fname
@@ -731,17 +731,17 @@ contains
         logical :: xll_registered, yll_registered
 
         ! NetCDF Support
-        ! character(len=1) :: axis_string
-        ! character(len=6) :: convention_string
-        ! integer(kind=4) :: convention_version
-        integer(kind=4) :: nc_file
-        real(kind=8), allocatable :: xlocs(:),ylocs(:)
-        logical, allocatable :: x_in_dom(:),y_in_dom(:)
-        integer(kind=4) :: dim_ids(2), num_dims, var_type, num_vars, num_dims_tot
-        integer(kind=4), allocatable :: var_ids(:)
-        character(len=10) :: var_name, x_var_name, y_var_name, z_var_name
-        character(len=10) :: x_dim_name, y_dim_name
-        integer(kind=4) :: x_var_id, y_var_id, z_var_id, x_dim_id, y_dim_id
+        !character(len=1) :: axis_string
+        !character(len=6) :: convention_string
+        !integer(kind=4) :: convention_version
+        !integer(kind=4) :: nc_file
+        !real(kind=8), allocatable :: xlocs(:) !,ylocs(:)
+        !logical, allocatable :: x_in_dom(:)!,y_in_dom(:)
+        !integer(kind=4) :: dim_ids(2), num_dims, num_vars, num_dims_tot !, var_type
+        !integer(kind=4), allocatable :: var_ids(:)
+        !character(len=10) :: var_name !, x_var_name !, y_var_name, z_var_name
+        !character(len=10) :: x_dim_name !, y_dim_name
+        !integer(kind=4) :: x_var_id !, y_var_id, x_dim_id, y_dim_id, z_var_id
 
         verbose = .false.
 
@@ -1039,7 +1039,7 @@ contains
 
         ! Locals
         integer, parameter :: iunit = 79
-        integer :: itopo,finer_than,rank
+        integer :: finer_than,rank !itopo,
         real(kind=8) :: area_i,area_j
         integer :: i,j
 

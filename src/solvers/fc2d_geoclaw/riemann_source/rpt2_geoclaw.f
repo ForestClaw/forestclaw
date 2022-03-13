@@ -27,9 +27,9 @@
       double precision  r(3,3)
       double precision  beta(3)
       double precision  abs_tol
-      double precision  hl,hr,hul,hur,hvl,hvr,vl,vr,ul,ur,bl,br
+      double precision  hl,hr,hul,hur,hvl,hvr,vl,vr,ul,ur !,bl,br
       double precision  uhat,vhat,hhat,roe1,roe3,s1,s2,s3,s1l,s3r
-      double precision  delf1,delf2,delf3,dxdcd,dxdcu
+      double precision  delf1,delf2,delf3 !,dxdcd ,dxdcu
       double precision  dxdcm,dxdcp,topo1,topo3,eta
 
       integer i,m,mw,mu,mv

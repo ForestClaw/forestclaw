@@ -20,7 +20,7 @@
       subroutine fc2d_geoclaw_unset_block()
       implicit none
 
-      integer blockno, blockno_com
+      integer blockno_com !blockno
       common /comblock/ blockno_com
 
       blockno_com = -1

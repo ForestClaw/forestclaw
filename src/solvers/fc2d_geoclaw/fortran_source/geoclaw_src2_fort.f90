@@ -6,7 +6,7 @@ SUBROUTINE fc2d_geoclaw_src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
   use geoclaw_module, only: manning_break, num_manning
   use geoclaw_module, only: spherical_distance, coordinate_system
   use geoclaw_module, only: RAD2DEG, pi, dry_tolerance
-  use geoclaw_module, only: ambient_pressure, rho_air
+  use geoclaw_module, only: rho_air !ambient_pressure,
 
   use storm_module, only: wind_forcing, pressure_forcing
   use storm_module, only: wind_drag
@@ -27,11 +27,11 @@ SUBROUTINE fc2d_geoclaw_src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
 
   !! Locals
   integer :: i, j, nman
-  real(kind=8) :: h, hu, hv, gamma, dgamma, y, fdt, a(2,2), coeff
+  real(kind=8) :: h, gamma, dgamma, y, fdt, a(2,2), coeff !hu, hv
   real(kind=8) :: xm, xc, xp, ym, yc, yp, dx_meters, dy_meters
-  real(kind=8) :: u, v, hu0, hv0
-  real(kind=8) :: tau, wind_speed, theta, phi, psi, P_gradient(2), S(2)
-  real(kind=8) :: Ddt, sloc(2)
+  ! real(kind=8) :: u, v !, hv0, hu0
+  real(kind=8) :: tau, wind_speed, theta, phi, psi, P_gradient(2) !, S(2)
+  real(kind=8) ::  sloc(2) !,Ddt
 
   !! Algorithm parameters
   !! Parameter controls when to zero out the momentum at a depth in the

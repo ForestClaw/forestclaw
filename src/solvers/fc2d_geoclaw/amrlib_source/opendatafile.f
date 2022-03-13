@@ -7,7 +7,7 @@ c     #
 !!
 !! All comment lines must start with # in the first column.
 
-      integer iunit, line, commentlines
+      integer iunit, commentlines !line
 
 
 c     This allows for a variable name length and obsolves (I think) the
