@@ -118,7 +118,10 @@ jobs:
 
     - name: Print Test log
       if: ${{ failure() }}
-      run: cat test-suite.log
+      run: |
+       cat sc/test-suite.log
+       cat p4est/test-suite.log
+       cat test-suite.log
 
     - name: Install
       run: sudo make install
