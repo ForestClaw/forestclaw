@@ -1,4 +1,4 @@
-      SUBROUTINE DOPRI5(N,FCN,X,Y,XEND,
+      SUBROUTINE FCLAW_DOPRI5(N,FCN,X,Y,XEND,
      &                  RTOL,ATOL,ITOL,
      &                  SOLOUT,IOUT,
      &                  WORK,LWORK,IWORK,LIWORK,RPAR,IPAR,IDID)
@@ -246,7 +246,8 @@ C -------- NRDENS   NUMBER OF DENSE OUTPUT COMPONENTS
             END IF 
             IF (NRDENS.EQ.N) THEN
                 DO 16 I=1,NRDENS
-  16            IWORK(20+I)=I 
+                IWORK(20+I)=I 
+  16            continue
             END IF
       END IF
 C -------- UROUND   SMALLEST NUMBER SATISFYING 1.D0+UROUND>1.D0  
@@ -388,6 +389,7 @@ C --- INITIAL PREPARATIONS
       LAST=.FALSE. 
       HLAMB=0.D0
       IASTI=0
+      nonsti = 0  !! Initialize to suppress compiler warnings. 
       CALL FCN(N,X,Y,K1,RPAR,IPAR)
       HMAX=ABS(HMAX)     
       IORD=5  
@@ -419,23 +421,29 @@ C --- THE FIRST 6 STAGES
          CALL FCN(N,X,Y,K1,RPAR,IPAR)
       END IF
       DO 22 I=1,N 
-  22  Y1(I)=Y(I)+H*A21*K1(I)
+      Y1(I)=Y(I)+H*A21*K1(I)
+  22  continue
       CALL FCN(N,X+C2*H,Y1,K2,RPAR,IPAR)
       DO 23 I=1,N 
-  23  Y1(I)=Y(I)+H*(A31*K1(I)+A32*K2(I))
+      Y1(I)=Y(I)+H*(A31*K1(I)+A32*K2(I))
+  23  continue
       CALL FCN(N,X+C3*H,Y1,K3,RPAR,IPAR)
       DO 24 I=1,N 
-  24  Y1(I)=Y(I)+H*(A41*K1(I)+A42*K2(I)+A43*K3(I))
+      Y1(I)=Y(I)+H*(A41*K1(I)+A42*K2(I)+A43*K3(I))
+  24  continue
       CALL FCN(N,X+C4*H,Y1,K4,RPAR,IPAR)
       DO 25 I=1,N 
-  25  Y1(I)=Y(I)+H*(A51*K1(I)+A52*K2(I)+A53*K3(I)+A54*K4(I))
+      Y1(I)=Y(I)+H*(A51*K1(I)+A52*K2(I)+A53*K3(I)+A54*K4(I))
+  25  continue
       CALL FCN(N,X+C5*H,Y1,K5,RPAR,IPAR) 
       DO 26 I=1,N 
-  26  YSTI(I)=Y(I)+H*(A61*K1(I)+A62*K2(I)+A63*K3(I)+A64*K4(I)+A65*K5(I))
+      YSTI(I)=Y(I)+H*(A61*K1(I)+A62*K2(I)+A63*K3(I)+A64*K4(I)+A65*K5(I))
+  26  continue
       XPH=X+H
       CALL FCN(N,XPH,YSTI,K6,RPAR,IPAR)
       DO 27 I=1,N 
-  27  Y1(I)=Y(I)+H*(A71*K1(I)+A73*K3(I)+A74*K4(I)+A75*K5(I)+A76*K6(I))  
+      Y1(I)=Y(I)+H*(A71*K1(I)+A73*K3(I)+A74*K4(I)+A75*K5(I)+A76*K6(I))  
+  27  continue
       CALL FCN(N,XPH,Y1,K2,RPAR,IPAR)
       IF (IOUT.GE.2) THEN 
             DO 40 J=1,NRD
@@ -445,18 +453,21 @@ C --- THE FIRST 6 STAGES
   40        CONTINUE
       END IF
       DO 28 I=1,N 
-  28  K4(I)=(E1*K1(I)+E3*K3(I)+E4*K4(I)+E5*K5(I)+E6*K6(I)+E7*K2(I))*H
+      K4(I)=(E1*K1(I)+E3*K3(I)+E4*K4(I)+E5*K5(I)+E6*K6(I)+E7*K2(I))*H
+  28  continue
       NFCN=NFCN+6 
 C --- ERROR ESTIMATION  
       ERR=0.D0
       IF (ITOL.EQ.0) THEN   
         DO 41 I=1,N 
         SK=ATOLI+RTOLI*MAX(ABS(Y(I)),ABS(Y1(I)))
-  41    ERR=ERR+(K4(I)/SK)**2
+        ERR=ERR+(K4(I)/SK)**2
+  41    continue
       ELSE
         DO 42 I=1,N 
         SK=ATOL(I)+RTOL(I)*MAX(ABS(Y(I)),ABS(Y1(I)))
-  42    ERR=ERR+(K4(I)/SK)**2
+        ERR=ERR+(K4(I)/SK)**2
+  42    continue
       END IF
       ERR=SQRT(ERR/N)  
 C --- COMPUTATION OF HNEW
@@ -506,7 +517,8 @@ C ------- STIFFNESS DETECTION
          END IF
          DO 44 I=1,N
          K1(I)=K2(I)
-  44     Y(I)=Y1(I)
+         Y(I)=Y1(I)
+  44     continue
          XOLD=X
          X=XPH
          IF (IOUT.NE.0) THEN
@@ -575,12 +587,14 @@ C ---- COMPARED TO THE SOLUTION
         DO 10 I=1,N 
         SK=ATOLI+RTOLI*ABS(Y(I))
         DNF=DNF+(F0(I)/SK)**2
-  10    DNY=DNY+(Y(I)/SK)**2 
+        DNY=DNY+(Y(I)/SK)**2 
+  10    continue
       ELSE
         DO 11 I=1,N 
         SK=ATOL(I)+RTOL(I)*ABS(Y(I))
         DNF=DNF+(F0(I)/SK)**2
-  11    DNY=DNY+(Y(I)/SK)**2 
+        DNY=DNY+(Y(I)/SK)**2 
+  11    continue
       END IF
       IF (DNF.LE.1.D-10.OR.DNY.LE.1.D-10) THEN
          H=1.0D-6
@@ -591,18 +605,21 @@ C ---- COMPARED TO THE SOLUTION
       H=SIGN(H,POSNEG) 
 C ---- PERFORM AN EXPLICIT EULER STEP
       DO 12 I=1,N
-  12  Y1(I)=Y(I)+H*F0(I)
+      Y1(I)=Y(I)+H*F0(I)
+  12  continue
       CALL FCN(N,X+H,Y1,F1,RPAR,IPAR) 
 C ---- ESTIMATE THE SECOND DERIVATIVE OF THE SOLUTION
       DER2=0.0D0
       IF (ITOL.EQ.0) THEN   
         DO 15 I=1,N 
         SK=ATOLI+RTOLI*ABS(Y(I))
-  15    DER2=DER2+((F1(I)-F0(I))/SK)**2   
+        DER2=DER2+((F1(I)-F0(I))/SK)**2 
+  15    continue  
       ELSE
         DO 16 I=1,N 
         SK=ATOL(I)+RTOL(I)*ABS(Y(I))
-  16    DER2=DER2+((F1(I)-F0(I))/SK)**2   
+        DER2=DER2+((F1(I)-F0(I))/SK)**2 
+  16    continue  
       END IF
       DER2=SQRT(DER2)/H
 C ---- STEP SIZE IS COMPUTED SUCH THAT
@@ -634,6 +651,7 @@ C ----- COMPUTE PLACE OF II-TH COMPONENT
    5  CONTINUE
       IF (I.EQ.0) THEN
          WRITE (6,*) ' NO DENSE OUTPUT AVAILABLE FOR COMP.',II 
+         contd5 = 0  !! Supply dummy value to suppress compiler warning
          RETURN
       END IF  
       THETA=(X-XOLD)/H

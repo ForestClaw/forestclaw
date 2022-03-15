@@ -90,7 +90,7 @@ c     # Initial conditions for ODE
       ipar(1) = example
       ipar(2) = use_stream
 
-      call dopri5(2,swirl_rhs_divfree,t0,sigma,tfinal,
+      call fclaw_dopri5(2,swirl_rhs_divfree,t0,sigma,tfinal,
      &            rtol,atol,itol,
      &            solout,iout, work,lwork,iwork,liwork,
      &            rpar,ipar,idid)
@@ -137,7 +137,7 @@ c         # from (xc0,yc0)
           enddo
 
           t0 = 0
-          call dopri5(3,swirl_rhs_nondivfree,t0,sigma,tfinal,
+          call fclaw_dopri5(3,swirl_rhs_nondivfree,t0,sigma,tfinal,
      &                rtol,atol,itol,
      &                solout,iout, work,lwork,iwork,liwork,
      &                rpar,ipar,idid)
