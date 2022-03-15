@@ -69,6 +69,7 @@ add_library(forestclaw_f OBJECT
   mappings/torus/mapc2m_torus.f 
   mappings/torus/mapc2m_twisted_torus.f 
   mappings/latlong/mapc2m_latlong.f
+  fortran_source2d/fclaw_dopri5.f 
   fortran_source2d/cellave2.f 
   fortran_source2d/fdisc.f 
   fortran_source2d/philim.f

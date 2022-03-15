@@ -20,7 +20,6 @@ applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/mapping_terms.f \
 	applications/clawpack/transport/2d/square/square_velocity.f \
 	applications/clawpack/transport/2d/square/qexact.f \
-	applications/clawpack/transport/2d/square/dopri5.f \
 	applications/clawpack/transport/2d/square/user_4.6/square46_qinit.f \
 	applications/clawpack/transport/2d/square/user_4.6/square46_output.f \
 	applications/clawpack/transport/2d/square/user_4.6/square46_compute_error.f \

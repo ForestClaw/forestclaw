@@ -99,7 +99,7 @@ c     # Tracing backwards
       ipar(1) = 0
 
 c     # This traces the velocity field back to the origin.
-      call dopri5(2,qexact_rhs,t0,sigma,tfinal,
+      call fclaw_dopri5(2,qexact_rhs,t0,sigma,tfinal,
      &            rtol,atol,itol,
      &            solout,iout, work,lwork,iwork,liwork,
      &            rpar,ipar,idid)
@@ -135,7 +135,7 @@ c         # Tracing forwards
           ipar(1) = 1
 
           t0 = 0
-          call dopri5(3,qexact_rhs,t0,sigma,tfinal,
+          call fclaw_dopri5(3,qexact_rhs,t0,sigma,tfinal,
      &                rtol,atol,itol,
      &                solout,iout, work,lwork,iwork,liwork,
      &                rpar,ipar,idid)
