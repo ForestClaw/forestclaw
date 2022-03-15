@@ -502,7 +502,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
 
-    bool vl = mg_opt->verbosity_level != 0;
+    bool vl = mg_opt->verbosity_level > 0 && glob->mpirank == 0;
     int its = iter_solver.solve(op, u, f, M.get(),vl);
 
     // copy solution into rhs

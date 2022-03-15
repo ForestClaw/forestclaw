@@ -235,7 +235,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);    
-    int its = iter_solver.solve(op, u, f, M.get(),true);  // output=false
+    bool prt_output = glob->mpirank == 0;
+    int its = iter_solver.solve(op, u, f, M.get(), prt_output);
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 
