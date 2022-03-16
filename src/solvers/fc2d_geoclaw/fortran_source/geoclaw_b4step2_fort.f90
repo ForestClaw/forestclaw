@@ -17,9 +17,9 @@ SUBROUTINE fc2d_geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
     !! 
 
     USE geoclaw_module, ONLY: dry_tolerance
-    USE topo_module, ONLY: num_dtopo  !!,topotime
-    USE topo_module, ONLY: aux_finalized
-    USE topo_module, ONLY: t0dtopo, tfdtopo
+    !USE topo_module, ONLY: num_dtopo  !!,topotime
+    !USE topo_module, ONLY: aux_finalized
+    !USE topo_module, ONLY: t0dtopo , tfdtopo
 
     USE amr_module, ONLY: NEEDS_TO_BE_SET
 
@@ -35,8 +35,8 @@ SUBROUTINE fc2d_geoclaw_b4step2(mbc,mx,my,meqn,q,xlower,ylower, &
     REAL(kind=8), INTENT(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
     !! Local storage
-    INTEGER :: index,i,j,k,dummy
-    REAL(kind=8) :: h,u,v
+    INTEGER :: i,j !,dummy, index,k 
+    !REAL(kind=8) :: u,v !hv
 
     INTEGER :: is_ghost, mint, nghost
     LOGICAL :: fc2d_geoclaw_check_dtopotime, t_in_dtopo_interval
@@ -115,7 +115,7 @@ LOGICAL FUNCTION fc2d_geoclaw_check_dtopotime(t, tau)
     DOUBLE PRECISION, INTENT(in) ::  t
     DOUBLE PRECISION, INTENT(out) :: tau
 
-    INTEGER :: i    
+    !INTEGER :: i    
 
     DOUBLE PRECISION :: tmin, tmax
 

@@ -23,7 +23,7 @@ SUBROUTINE fc2d_geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
 !
 
     use geoclaw_module, only: dry_tolerance
-    use amr_module, only: mwaves, mcapa
+    use amr_module, only: mcapa !mwaves
 
     implicit none
 
@@ -65,7 +65,7 @@ SUBROUTINE fc2d_geoclaw_step2(maxm,meqn,maux,mbc,mx,my, &
     INTEGER block_corner_count(0:3), ibc,jbc
 
     ! Looping scalar storage
-    integer :: i,j,m,thread_num
+    integer :: i,j,m !,thread_num
     real(kind=8) :: dtdx,dtdy,cfl1d,p,phi,cm,dtdxij,dtdyij
 
     ! Common block storage

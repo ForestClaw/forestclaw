@@ -53,7 +53,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t           *user_opt;
+     const user_options_t           *user_opt;
 
     /* ---------------------------------------------------------------
        Set domain data.

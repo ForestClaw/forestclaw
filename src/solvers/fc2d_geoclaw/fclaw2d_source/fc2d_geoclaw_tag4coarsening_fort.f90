@@ -67,7 +67,7 @@ SUBROUTINE fc2d_geoclaw_test_coarsen(blockno, mx,my,mbc,meqn,maux,xlower,ylower,
     INTEGER :: i,j,m
     DOUBLE PRECISION :: xc,yc, xupper, yupper, qvec(meqn), auxvec(maux)
 
-    INTEGER :: tag_patch_regions, fc2d_geoclaw_coarsen_using_regions
+    !INTEGER :: tag_patch_regions!, fc2d_geoclaw_coarsen_using_regions
     LOGICAL :: is_coarsening
 
     INTEGER :: fc2d_geoclaw_flag2refine, flag_patch
@@ -177,7 +177,7 @@ END FUNCTION fc2d_geoclaw_coarsen_using_regions
 
 LOGICAL FUNCTION allowcoarsen(x,y,t,level)
 
-use amr_module, only: t0
+!use amr_module, only: t0 
 use geoclaw_module
 use regions_module
 use refinement_module

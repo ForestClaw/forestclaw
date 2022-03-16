@@ -27,7 +27,7 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
 
     integer :: i,j, m, idisc_example
     double precision :: xlow, ylow, win
-    double precision :: rhoin, rhoout, pout, pin, pinf
+    ! double precision :: rhoin, rhoout, pout, pin, pinf
 
     integer :: blockno, fc2d_cudaclaw_get_block
 

@@ -9,7 +9,7 @@ c     =================================================
 
 
       integer blockno
-      integer*8 cont, get_context
+      !integer*8 cont  get_context
       double precision f1,f2
 
 c

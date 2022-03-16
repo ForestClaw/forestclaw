@@ -20,7 +20,7 @@ SUBROUTINE fc2d_geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in,  &
     INTEGER, INTENT(in) :: mthlim_in(mwaves_in)
 
     !! We don't yet allow the user to specify a different gauges file
-    CHARACTER(len=20) :: fname = 'gauges.data'
+    !CHARACTER(len=20) :: fname = 'gauges.data'
 
     INTEGER :: meqn, maux, mw
 

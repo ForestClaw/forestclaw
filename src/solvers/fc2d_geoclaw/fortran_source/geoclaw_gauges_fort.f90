@@ -14,7 +14,7 @@ SUBROUTINE fc2d_geoclaw_update_gauge (mx,my,mbc,meqn,xlower,ylower, &
 
     !! local variables:
     real(kind=8) :: xcent,ycent,xoff,yoff
-    integer :: ioff,joff,iindex,jindex,mq
+    integer :: iindex,jindex,mq !ioff, joff
     real(kind=8) :: h(4),drytol2,topo
 
     iindex =  int((xc-xlower)/dx) + 1
