@@ -264,7 +264,10 @@ module clawpack5_amr_module
     ! ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     character(len=10), allocatable :: auxtype(:)
     integer  method(7), mwaves, mcapa, dimensional_split
-    integer, allocatable :: mthlim(:)
+    !!integer, allocatable :: mthlim(:)
+
+    integer, parameter :: mthlim_len=20
+    integer :: mthlim(mthlim_len)
     real(kind=8) cfl,cflmax,cflv1,cfl_level
 
     logical :: use_fwaves

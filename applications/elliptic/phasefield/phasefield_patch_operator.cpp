@@ -178,7 +178,7 @@ void phasefield::applySinglePatch(const PatchInfo<2>& pinfo,
     double  T = xi*xi;
 
     /* Get local view into phi_n : component 1 */
-    ComponentView<const double,2> pn = phi_n.getComponentView(pinfo.local_index,1);
+    ComponentView<const double,2> pn = phi_n.getComponentView(1, pinfo.local_index);
 
     for(int j = 0; j < my; j++)
         for(int i = 0; i < mx; i++)

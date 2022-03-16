@@ -161,8 +161,8 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
  * A point is found correctly even if it is on a patch boundary.
  * We return the smallest patch number on the smallest processor touching it.
  * However, if a point is on a block boundary, it must be decided before
- *
  * calling this function which tree shall be queried for it.
+ *
  * \param [in] domain           Must be valid domain structure.  Will not be changed.
  * \param [in] block_offsets    Array of (num_blocks + 1) int variables.
  *                              The points to search in block t in [0, num_blocks)

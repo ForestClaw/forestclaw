@@ -6,8 +6,6 @@ add_library(poisson_f OBJECT
   fortran/poisson_qexact.f90 
   fortran/poisson_apply_bc.f90 
   fortran/poisson_eval_bc.f90 
-  fortran/poisson_tag4refinement.f 
-  fortran/poisson_tag4coarsening.f 
   fortran/poisson_output.f90
 )
 
@@ -26,3 +24,9 @@ target_include_directories(poisson PRIVATE
 target_link_libraries(poisson PRIVATE 
   FORESTCLAW::FC2D_THUNDEREGG
 )
+
+add_test(NAME elliptic_poisson 
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(elliptic_poisson
+         PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

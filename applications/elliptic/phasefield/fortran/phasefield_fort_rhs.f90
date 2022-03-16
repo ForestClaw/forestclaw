@@ -10,7 +10,7 @@ subroutine phasefield_fort_rhs(blockno, mbc,mx,my,meqn,mfields, &
     DOUBLE PRECISION S, alpha, m_parm, xi, k, gamma
     COMMON /comm_parms/ S, alpha, m_parm, xi, k, gamma
 
-    INTEGER i,j, m, blockno
+    INTEGER i,j, blockno
     DOUBLE PRECISION lambda, u, phi, g0, g, s1, s3, beta
 
     lambda = -1.d0/dt
@@ -51,7 +51,7 @@ subroutine phasefield_update_q(mbc,mx,my,meqn,mfields,rhs,q)
             end do
         end do
     end do
-100 format(2F16.8)
+!!100 format(2F16.8)
 
 end subroutine phasefield_update_q
 

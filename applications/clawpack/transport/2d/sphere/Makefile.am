@@ -15,7 +15,6 @@ applications_clawpack_transport_2d_sphere_sphere_transport_SOURCES = \
 	applications/clawpack/transport/2d/sphere/sphere_velocity.f \
 	applications/clawpack/transport/2d/sphere/mapping_terms.f \
 	applications/clawpack/transport/2d/sphere/qexact.f \
-	applications/clawpack/transport/2d/sphere/dopri5.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/sphere46_output.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/sphere46_compute_error.f \
 	applications/clawpack/transport/2d/sphere/user_4.6/sphere46_qinit.f \

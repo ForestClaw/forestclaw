@@ -16,8 +16,6 @@ SUBROUTINE phasefield_setprob()
     DOUBLE PRECISION pi,pi2
     COMMON /compi/ pi, pi2
 
-    integer i
-
     pi = 4.d0*atan(1.d0)
     pi2 = 2*pi
 

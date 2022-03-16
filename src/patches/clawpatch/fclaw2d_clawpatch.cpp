@@ -291,7 +291,11 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	}
 
 	if (clawpatch_opt->maux > 0)
+	{		
 		cp->aux.define(box,cp->maux);
+		if (clawpatch_opt->save_aux)
+			cp->aux_save.define(box,cp->maux);
+	}
 
 	if (clawpatch_opt->rhs_fields > 0)
 	{
@@ -379,6 +383,12 @@ void clawpatch_save_step(fclaw2d_global_t* glob,
 {
 	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
 	cp->griddata_save = cp->griddata;
+
+	/* Some aux arrays are time dependent, or contain part of the solution.  In this case, 
+	   we should save the aux array in case we need to re-take a time step */
+	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	if (clawpatch_opt->save_aux)
+		cp->aux_save = cp->aux;
 }
 
 
@@ -388,6 +398,11 @@ void clawpatch_restore_step(fclaw2d_global_t* glob,
 {
 	fclaw2d_clawpatch_t *cp = get_clawpatch(patch);
 	cp->griddata = cp->griddata_save;
+
+	/* Restore the aux array after before retaking a time step */
+	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	if (clawpatch_opt->save_aux)
+		cp->aux = cp->aux_save;
 }
 
 static
@@ -830,7 +845,7 @@ void clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
 	/* Loop over four siblings (z-ordering) */
-	for (int igrid = 0; igrid < NumSiblings; igrid++)
+	for (int igrid = 0; igrid < FCLAW2D_NUMSIBLINGS; igrid++)
 	{
 		fclaw2d_patch_t *fine_patch = &fine_patches[igrid];
 		double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
@@ -872,7 +887,7 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 	double *areacoarse = clawpatch_get_area(coarse_patch);
 	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
-	for(int igrid = 0; igrid < NumSiblings; igrid++)
+	for(int igrid = 0; igrid < FCLAW2D_NUMSIBLINGS; igrid++)
 	{
 		fclaw2d_patch_t *fine_patch = &fine_patches[igrid];
 		double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);

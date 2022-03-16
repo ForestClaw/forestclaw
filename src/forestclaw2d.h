@@ -216,16 +216,6 @@ struct fclaw2d_domain
 
 ///@}
 /* ---------------------------------------------------------------------- */
-///                      @name Fundamentals
-/* ---------------------------------------------------------------------- */
-///@{
-
-/** Log a message only on rank zero.
- * This is a hack: I shall check fclaw_base and make that useful instead. */
-void fclaw2d_global_log (int log_priority, const char *message);
-
-///@}
-/* ---------------------------------------------------------------------- */
 ///                      @name Domain Attributes
 /* ---------------------------------------------------------------------- */
 ///@{
@@ -322,73 +312,6 @@ int fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch);
  * \return              True if patch is off-processor, false if local.
  */
 int fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch);
-
-///@}
-/* ---------------------------------------------------------------------- */
-///                         @name Allocation
-/* ---------------------------------------------------------------------- */
-///@{
-
-/**
- * @brief Allocate memory
- * 
- * @param size the size in bytes
- * @return void* the newly allocated memory
- */
-void *fclaw2d_alloc (size_t size);
-/**
- * @brief Allocate a number of objects, intializes to 0
- * 
- * @param nmemb the number of objects
- * @param size the size of an object (in bytes)
- * @return void* the newly allocated memory
- */
-void *fclaw2d_calloc (size_t nmemb, size_t size);
-/**
- * @brief Reallocate memory
- * 
- * @param ptr the memory to be reallocated
- * @param size the size in bytes
- * @return void* the newly allocated memory
- */
-void *fclaw2d_realloc (void *ptr, size_t size);
-/**
- * @brief Free allocated memory
- * 
- * @param ptr the memory to free
- */
-void fclaw2d_free (void *ptr);
-/**
- * @brief Allocate an array with given length
- * 
- * @param t the type
- * @param n the length of the array
- * @return t* the newly allocateed memory
- */
-#define FCLAW2D_ALLOC(t,n)      (t *) fclaw2d_alloc ((n) * sizeof (t))
-/**
- * @brief Allocate an array with given length, initialized to zero
- * 
- * @param t the type
- * @param n the length of the array
- * @return t* the newly allocateed memory
- */
-#define FCLAW2D_ALLOC_ZERO(t,n) (t *) fclaw2d_calloc ((n), sizeof (t))
-/**
- * @brief Allocate an array with given length, initialized to zero
- * 
- * @param p pointer to memory to be reallocated
- * @param t the type
- * @param n the length of the array
- * @return t* the newly allocateed memory
- */
-#define FCLAW2D_REALLOC(p,t,n)  (t *) fclaw2d_realloc ((p), (n) * sizeof (t))
-/**
- * @brief Free allocated memory
- * 
- * @param p the memory to free
- */
-#define FCLAW2D_FREE(p)         fclaw2d_free (p)
 
 ///@}
 /* ---------------------------------------------------------------------- */
@@ -611,7 +534,7 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  * \param [in,out] j        FOUR (4) integer coordinates along y-axis in
- *                          \a based .. \a mx.  On input, only the first is used.
+ *                          \a based .. \a my.  On input, only the first is used.
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
@@ -695,7 +618,7 @@ void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  * \param [in,out] j        FOUR (4) integer coordinates along y-axis in
- *                          \a based .. \a mx.  On input, only the first is used.
+ *                          \a based .. \a my.  On input, only the first is used.
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */

@@ -34,18 +34,21 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_SPACEDIM     2
-#define FCLAW2D_NUMFACES     4
-#define FCLAW2D_NUMCORNERS   4
-#define FCLAW2D_NUMSIBLINGS  4
-#define FCLAW2D_REFINEFACTOR 2
+#define FCLAW2D_SPACEDIM     2          /**< mesh dimension */
+#define FCLAW2D_NUMFACES     4          /**< faces per cell */
+#define FCLAW2D_NUMCORNERS   4          /**< corners per cell */
+#define FCLAW2D_NUMSIBLINGS  4          /**< children per cell */
+#define FCLAW2D_NUMFACENEIGHBORS 2      /**< half-size neighbors per face */
+#define FCLAW2D_REFINEFACTOR 2          /**< each edge is split on refinement */
 
-extern const int SpaceDim;
-extern const int NumFaces;
-extern const int NumCorners;
-extern const int NumSiblings;
-extern const int RefineFactor;
-
+#if 0
+extern const int fclaw2d_SpaceDim;
+extern const int fclaw2d_NumFaces;
+extern const int fclaw2d_NumCorners;
+extern const int fclaw2d_NumSiblings;
+extern const int fclaw2d_NumFaceNeighbors;
+extern const int fclaw2d_RefineFactor;
+#endif
 
 #ifdef __cplusplus
 #if 0
@@ -54,7 +57,4 @@ extern const int RefineFactor;
 }
 #endif
 
-
-/* Note: either we make this a C .h file, or we remove the extern "C". */
-
-#endif
+#endif /* !FCLAW2D_DEFS_H */

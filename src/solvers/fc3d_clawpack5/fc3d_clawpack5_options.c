@@ -77,7 +77,7 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
                                  "values 0-4) [NULL]");
     
     fclaw_options_add_int_array (opt, 0, "mthbc", &clawopt->mthbc_string, "1 1 1 1",
-                                 &clawopt->mthbc, fclaw2d_NumFaces,
+                                 &clawopt->mthbc, FCLAW2D_NUMFACES,
                                  "[clawpack5] Physical boundary condition type [1 1 1 1]");
 
     clawpkg->is_registered = 1;
@@ -92,7 +92,7 @@ fc3d_clawpack5_postprocess (fc3d_clawpack5_options_t * clawopt)
     fclaw_options_convert_int_array (clawopt->order_string, &clawopt->order,
                                      2);
     fclaw_options_convert_int_array (clawopt->mthbc_string, &clawopt->mthbc,
-                                     fclaw2d_NumFaces); 
+                                     FCLAW2D_NUMFACES);
     return FCLAW_NOEXIT;
 }
 

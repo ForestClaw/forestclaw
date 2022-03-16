@@ -386,7 +386,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                       &transform_data_finegrid);
 
 
-    for (icorner = 0; icorner < NumCorners; icorner++)
+    for (icorner = 0; icorner < FCLAW2D_NUMCORNERS; icorner++)
     {
         block_corner_count = 0;
         get_corner_type(s->glob,icorner,

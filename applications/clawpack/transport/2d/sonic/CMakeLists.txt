@@ -6,7 +6,6 @@ add_library(swirlcons_f OBJECT
 	psi.f
 	velocity.f
 	qexact.f
-	dopri5.f
 	user_4.6/swirl46_output.f
 	user_4.6/compute_error.f
 	user_4.6/qinit.f

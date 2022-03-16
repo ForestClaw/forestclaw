@@ -168,7 +168,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
             BiLinearGhostFiller ghost_filler(curr_domain, fill_type);
             Vector<2> restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, 
                                                                 prev_domain, curr_domain);
-            phasefield patch_operator(glob,restricted_phi_n_vec,curr_domain, ghost_filler);
+            phasefield patch_operator(glob,restricted_phi_n_vec,curr_domain, 
+                                      ghost_filler);
             prev_phi_n_vec = restricted_phi_n_vec;
 
             //smoother
@@ -193,8 +194,10 @@ void phasefield_solve(fclaw2d_global_t *glob)
 
         //operator
         BiLinearGhostFiller ghost_filler(curr_domain, fill_type);
-        Vector<2> restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, prev_domain, curr_domain);
-        phasefield coarse_patch_operator(glob,restricted_phi_n_vec, curr_domain, ghost_filler);
+        Vector<2> restricted_phi_n_vec = restrict_phi_n_vec(prev_phi_n_vec, 
+                                                            prev_domain, curr_domain);
+        phasefield coarse_patch_operator(glob,restricted_phi_n_vec, curr_domain, 
+                                         ghost_filler);
 
         //smoother
         Iterative::PatchSolver<2> smoother(patch_cg, coarse_patch_operator, true);
@@ -216,9 +219,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
 
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
-    iter_solver.setTolerance(mg_opt->tol);
-    int its = iter_solver.solve(op, u, f, M.get(),
-                                 true); //output iteration information to cout
+    iter_solver.setTolerance(mg_opt->tol);    
+    int its = iter_solver.solve(op, u, f, M.get(),true);  // output=false
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 

@@ -24,7 +24,9 @@ set(SC_INCLUDE_DIRS ${SC_ROOT}/include)
 
 ExternalProject_Add(SC
 SOURCE_DIR ${PROJECT_SOURCE_DIR}/sc
-CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SC_ROOT} -Dmpi:BOOL=${mpi} -Dopenmp:BOOL=${openmp}
+CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SC_ROOT} 
+           -Dmpi:BOOL=${mpi}
+           -Dopenmp:BOOL=${openmp}
 BUILD_BYPRODUCTS ${SC_LIBRARIES}
 )
 ExternalProject_Add_StepTargets(SC install)
