@@ -9,12 +9,15 @@ integer function user_exceeds_threshold(blockno,&
     double precision :: qval,qmin,qmax,threshold
     double precision :: quad(-1:1,-1:1)
     double precision :: dx,dy, xc, yc
-    integer :: blockno, init_flag, is_ghost, refine
+    integer :: blockno, init_flag, refine
+    logical(kind=4) :: is_ghost
 
     refine = 0
 
-    if (qval .gt. threshold .and. qval .lt. 1-threshold) then
-        refine = 1
+    if (.not. is_ghost) then
+        if (qval .gt. threshold .and. qval .lt. 1-threshold) then
+            refine = 1
+        endif
     endif
 
     user_exceeds_threshold = refine
