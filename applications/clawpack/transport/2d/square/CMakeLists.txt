@@ -8,7 +8,6 @@ add_library(square_f OBJECT
 	mapping_terms.f
 	square_velocity.f
 	qexact.f
-	dopri5.f
 	user_4.6/square46_qinit.f
 	user_4.6/square46_output.f
 	user_4.6/square46_compute_error.f
