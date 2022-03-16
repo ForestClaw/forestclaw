@@ -61,7 +61,7 @@ void initialize_timestep_counters(fclaw2d_global_t* glob,
 	fclaw2d_timestep_counters *ts_counter;
 	int level;
 
-	*ts_counter_ptr = FCLAW2D_ALLOC(fclaw2d_level_data_t,fclaw_opt->maxlevel+1);
+	*ts_counter_ptr = FCLAW_ALLOC(fclaw2d_level_data_t,fclaw_opt->maxlevel+1);
 
 	ts_counter = *ts_counter_ptr;
 
@@ -119,7 +119,7 @@ void initialize_timestep_counters(fclaw2d_global_t* glob,
 static
 void delete_timestep_counters(fclaw2d_timestep_counters **ts_counter)
 {
-	FCLAW2D_FREE(*ts_counter);
+	FCLAW_FREE(*ts_counter);
 	*ts_counter = NULL;
 }
 

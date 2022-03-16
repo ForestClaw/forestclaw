@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,26 +23,5 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_FORESTCLAW_H
-#define FCLAW2D_FORESTCLAW_H
-
-#include <fclaw2d_defs.h>
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-
-const int SpaceDim     = FCLAW2D_SPACEDIM;
-const int NumFaces     = FCLAW2D_NUMFACES;
-const int NumCorners   = FCLAW2D_NUMCORNERS;
-const int NumSiblings  = FCLAW2D_NUMSIBLINGS;
-const int RefineFactor = FCLAW2D_REFINEFACTOR;
-
-#ifdef __cplusplus
-}
-#endif
-
-
-#endif
+#include <fclaw2d_to_3d.h>
+#include "fclaw2d_global.c"

@@ -63,8 +63,11 @@ include_HEADERS += $(libcudaclaw_installed_headers)
 CUDACLAW_INCLUDE_DIRS = $(DEFS) $(DEFAULT_INCLUDES) \
 	$(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) \
-	$(MPI_INCLUDES) \
-	-I@top_srcdir@/cub/
+	$(MPI_INCLUDES)
+
+if USE_LOCAL_CUB
+CUDACLAW_INCLUDE_DIRS += -I@top_srcdir@/cub/
+endif
 
 .cu.o: 
 	$(NVCC) $(CUDA_CFLAGS) -dc $(CUDACLAW_INCLUDE_DIRS) -c -o $@ $<

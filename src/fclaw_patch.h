@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -22,39 +22,44 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/**
+ * @file
+ * Dimension-independent wrapper of a forestclaw patch.
+ */
 
-#ifndef FCLAW2D_DEFS_H
-#define FCLAW2D_DEFS_H
+#ifndef FCLAW_PATCH_H
+#define FCLAW_PATCH_H
 
-#ifdef __cplusplus
-extern "C"
+/*
+ * Domain-independent header file should not include domain-specific headers.
+ * The corresponding source file include the 2d and 3d domain-specific headers.
+ */
+#include <fclaw_base.h>
+
+typedef struct fclaw_patch_user
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
+    /** User defined patch structure */
+    void *user_patch;
 
-#define FCLAW2D_SPACEDIM     2          /**< mesh dimension */
-#define FCLAW2D_NUMFACES     4          /**< faces per cell */
-#define FCLAW2D_NUMCORNERS   4          /**< corners per cell */
-#define FCLAW2D_NUMSIBLINGS  4          /**< children per cell */
-#define FCLAW2D_NUMFACENEIGHBORS 2      /**< half-size neighbors per face */
-#define FCLAW2D_REFINEFACTOR 2          /**< each edge is split on refinement */
-
-#if 0
-extern const int fclaw2d_SpaceDim;
-extern const int fclaw2d_NumFaces;
-extern const int fclaw2d_NumCorners;
-extern const int fclaw2d_NumSiblings;
-extern const int fclaw2d_NumFaceNeighbors;
-extern const int fclaw2d_RefineFactor;
-#endif
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
+    /** Additional user data */
+    void *user_data;
 }
-#endif
+fclaw_patch_user_t;
 
-#endif /* !FCLAW2D_DEFS_H */
+typedef struct fclaw_patch
+{
+    union
+    {
+        /* avoid including dimension-specific files */
+        struct fclaw2d_patch_data *pd2;
+        struct fclaw3d_patch_data *pd3;
+    }
+    pd;
+
+    /* Those below are currently also in pd2, pd3.
+       Shall be removed from pd2, pd3. */
+    fclaw_patch_user_t pu;
+}
+fclaw_patch_t;
+
+#endif /* !FCLAW_PATCH_H */

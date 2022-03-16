@@ -43,6 +43,10 @@ target_include_directories(cudaclaw
   $<INSTALL_INTERFACE:include>
 )
 
+if(CUDAToolkit_VERSION_MAJOR LESS 11)
+	target_include_directories(cudaclaw PRIVATE ${PROJECT_SOURCE_DIR}/cub)
+endif()
+
 # -- install
 install(FILES
 	fc2d_cudaclaw.h

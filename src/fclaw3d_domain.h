@@ -27,10 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Domain structures and routines
  */
 
-#ifndef FCLAW2D_DOMAIN_H
-#define FCLAW2D_DOMAIN_H
+#ifndef FCLAW3D_DOMAIN_H
+#define FCLAW3D_DOMAIN_H
 
-#include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
+#include <forestclaw3d.h>  /* Needed for domain_exchange/domain_indirect info */
 #include <fclaw_domain.h>
 
 #ifdef __cplusplus
@@ -41,48 +41,48 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw3d_global;
 
-typedef struct fclaw2d_domain_data
+typedef struct fclaw3d_domain_data
 {
     /* Debug counters and timers */
     int count_set_patch;
     int count_delete_patch;
 
-    fclaw2d_domain_exchange_t *domain_exchange;
-    fclaw2d_domain_indirect_t *domain_indirect;
+    fclaw3d_domain_exchange_t *domain_exchange;
+    fclaw3d_domain_indirect_t *domain_indirect;
 
-} fclaw2d_domain_data_t;
+} fclaw3d_domain_data_t;
 
-void fclaw2d_domain_data_new(struct fclaw2d_domain *domain);
+void fclaw3d_domain_data_new(struct fclaw3d_domain *domain);
 
-void fclaw2d_domain_data_delete(struct fclaw2d_domain* domain);
+void fclaw3d_domain_data_delete(struct fclaw3d_domain* domain);
 
-void fclaw2d_domain_setup(struct fclaw2d_global* glob,
-                          struct fclaw2d_domain* new_domain);
+void fclaw3d_domain_setup(struct fclaw3d_global* glob,
+                          struct fclaw3d_domain* new_domain);
 
-void fclaw2d_domain_reset(struct fclaw2d_global* glob);
+void fclaw3d_domain_reset(struct fclaw3d_global* glob);
 
-fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw2d_domain *domain);
+fclaw3d_domain_data_t* fclaw3d_domain_get_data(struct fclaw3d_domain *domain);
 
-/* OpenMP iterator (not part of forestclaw2d.h */
-void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int level,
-                                           fclaw2d_patch_callback_t pcb, void *user);
+/* OpenMP iterator (not part of forestclaw3d.h */
+void fclaw3d_domain_iterate_level_mthread (struct fclaw3d_domain * domain, int level,
+                                           fclaw3d_patch_callback_t pcb, void *user);
 
 /* below are the functions needed for dimension independence */
 
 /** safeguard value for dimension-independent domain */
-#define FCLAW2D_DOMAIN_MAGIC 0x56780202
+#define FCLAW3D_DOMAIN_MAGIC 0x67890303
 
-void fclaw2d_domain_iterate_cb
-  (fclaw2d_domain_t * d2, fclaw2d_patch_t * patch,
+void fclaw3d_domain_iterate_cb
+  (fclaw3d_domain_t * d3, fclaw3d_patch_t * patch,
    int blockno, int patchno, void *user);
 
 /** Construct a dimension-specific domain and initialize patch data.
  * \param [in] domain           Freshly created, valid domain structure
  *                              without any user data attached to it.
  * \param [in] init             This callback is pointed to a freshly
- *                              allocated fclaw_patch whose 2D data it
+ *                              allocated fclaw_patch whose 3D data it
  *                              is supposed to fill with fitting values.
  *                              This includes allocating and filling
  *                              the patch user pointer, which the
@@ -92,19 +92,19 @@ void fclaw2d_domain_iterate_cb
  * \param [in,out] user         Pointer passed through to \a init.
  * \return                      Initialized dimension-independent domain.
  */
-fclaw_domain_t *fclaw_domain_new2d (fclaw2d_domain_t * domain,
+fclaw_domain_t *fclaw_domain_new3d (fclaw3d_domain_t * domain,
                                     fclaw_domain_callback_t init, void *user);
 
 /** Destruct a dimension-specific domain and deinitialize patch data.
- * \param [in] domain           Valid domain-independent domain structure.
+ * \param [in] domain           Valid dimension-independent domain structure.
  * \param [in] dele             This callback is pointed to each existing
- *                              fclaw_patch whose 2D data it is supposed to
+ *                              fclaw_patch whose 3D data it is supposed to
  *                              deinitialize, as well as the patch user data.
  *                              Note, just don't allocate the patch itself!
  *                              May be NULL for no callback.
  * \param [in,out] user         Pointer passed through to \a init.
  */
-void fclaw_domain_destroy2d (fclaw_domain_t * domain,
+void fclaw_domain_destroy3d (fclaw_domain_t * domain,
                              fclaw_domain_callback_t dele, void *user);
 
 #ifdef __cplusplus
@@ -114,4 +114,4 @@ void fclaw_domain_destroy2d (fclaw_domain_t * domain,
 }
 #endif
 
-#endif /* FCLAW2D_DOMAIN_H */
+#endif /* FCLAW3D_DOMAIN_H */

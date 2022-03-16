@@ -23,6 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_global.h>
+#ifndef P4_TO_P8
+#include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
 
 #include <fclaw_package.h>
@@ -31,17 +34,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_map.h>
-
-#if 0
-/* from feature_clawpatch3 */
-const int SpaceDim = FCLAW2D_SPACEDIM;
-const int NumFaces = FCLAW2D_NUMFACES;
-const int p4est_refineFactor = FCLAW2D_P4EST_REFINE_FACTOR;
-const int NumCorners = FCLAW2D_NUM_CORNERS;
-const int NumSiblings = FCLAW2D_NUM_SIBLINGS;
-const int PatchDim = FCLAW_PATCH_DIM;
-const int RefineDim = FCLAW_REFINE_DIM;
+#else
+#include <fclaw3d_defs.h>
+#include <fclaw3d_global.h>
 #endif
+
+void
+fclaw2d_iterate_patch_cb
+  (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+   int blockno, int patchno, void *user)
+{
+  fclaw_global_iterate_t *gi = (fclaw_global_iterate_t *) user;
+
+  FCLAW_ASSERT (gi->gpcb != NULL);
+  gi->gpcb (gi->glob, (fclaw_patch_t *) patch->user, blockno, patchno, gi->user);
+}
+
+void
+fclaw2d_iterate_family_cb
+  (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+   int blockno, int patchno, void *user)
+{
+  fclaw_global_iterate_t *gi = (fclaw_global_iterate_t *) user;
+  fclaw_patch_t *family[FCLAW2D_NUMSIBLINGS];
+  int i;
+
+  for (i = 0; i < FCLAW2D_NUMSIBLINGS; ++i) {
+    family[i] = (fclaw_patch_t *) patch[i].user;
+  }
+
+  FCLAW_ASSERT (gi->gfcb != NULL);
+  gi->gfcb (gi->glob, family, blockno, patchno, gi->user);
+}
+
+#ifndef P4_TO_P8
+
+/* we're holding back with 3d counterparts
+   since much of this will move into fclaw_global.c */
+/* below follows the previous code unchanged */
 
 fclaw2d_global_t* fclaw2d_global_new (void)
 {
@@ -143,3 +173,5 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
     g.user = user;
     fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }
+
+#endif /* P4_TO_P8 */

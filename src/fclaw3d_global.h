@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,8 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_DEFS_H
-#define FCLAW2D_DEFS_H
+#ifndef FCLAW3D_GLOBAL_H
+#define FCLAW3D_GLOBAL_H
+
+#include <forestclaw3d.h>       /* Needed to declare callbacks (below) */
 
 #ifdef __cplusplus
 extern "C"
@@ -34,21 +36,15 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_SPACEDIM     2          /**< mesh dimension */
-#define FCLAW2D_NUMFACES     4          /**< faces per cell */
-#define FCLAW2D_NUMCORNERS   4          /**< corners per cell */
-#define FCLAW2D_NUMSIBLINGS  4          /**< children per cell */
-#define FCLAW2D_NUMFACENEIGHBORS 2      /**< half-size neighbors per face */
-#define FCLAW2D_REFINEFACTOR 2          /**< each edge is split on refinement */
+/* these are dimension-specific functions */
 
-#if 0
-extern const int fclaw2d_SpaceDim;
-extern const int fclaw2d_NumFaces;
-extern const int fclaw2d_NumCorners;
-extern const int fclaw2d_NumSiblings;
-extern const int fclaw2d_NumFaceNeighbors;
-extern const int fclaw2d_RefineFactor;
-#endif
+void fclaw3d_iterate_patch_cb
+    (fclaw3d_domain_t * domain, fclaw3d_patch_t * patch,
+     int blockno, int patchno, void *user);
+
+void fclaw3d_iterate_family_cb
+    (fclaw3d_domain_t * domain, fclaw3d_patch_t * patch,
+     int blockno, int patchno, void *user);
 
 #ifdef __cplusplus
 #if 0
@@ -57,4 +53,4 @@ extern const int fclaw2d_RefineFactor;
 }
 #endif
 
-#endif /* !FCLAW2D_DEFS_H */
+#endif /* FCLAW3D_GLOBAL_H */

@@ -23,12 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CONVENIENCE_H
-#define FCLAW2D_CONVENIENCE_H
+#ifndef FCLAW3D_CONVENIENCE_H
+#define FCLAW3D_CONVENIENCE_H
 
-#include <forestclaw2d.h>
-#include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
+#include <forestclaw3d.h>
+#if 0
+#include <fclaw3d_map.h>
+#endif
+#include <p8est_connectivity.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -38,18 +40,18 @@ extern "C"
 #endif
 #endif
 
-/* TODO: The unit square is a special case of the brick.  Use that instead. */
-fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
-                                                 int initial_level);
+/* TODO: The unit cube is a special case of the brick.  Use that instead. */
+fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
+                                               int initial_level);
 /* TODO: The torus is a special case of the brick.  Use that instead. */
-fclaw2d_domain_t *fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm,
+fclaw3d_domain_t *fclaw3d_domain_new_torus (sc_MPI_Comm mpicomm,
                                             int initial_level);
-fclaw2d_domain_t *fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm,
+fclaw3d_domain_t *fclaw3d_domain_new_twosphere (sc_MPI_Comm mpicomm,
                                                 int initial_level);
-fclaw2d_domain_t *fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
+fclaw3d_domain_t *fclaw3d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
                                                   int initial_level);
-fclaw2d_domain_t *fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
-                                           int initial_level);
+
+#if 0
 
 /** Create a brick connectivity, that is, a rectangular grid of blocks.
  * The origin is in the lower-left corner of the brick.
@@ -84,7 +86,9 @@ fclaw2d_domain_t *fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm,
                                                p4est_connectivity_t * conn,
                                                fclaw2d_map_context_t * cont);
 
-void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
+#endif /* 0 */
+
+void fclaw3d_domain_destroy (fclaw3d_domain_t * domain);
 
 /** Create a new domain based on refine and coarsen marks set previously.
  * All refine and coarsen markers are cancelled when this function is done.
@@ -95,9 +99,9 @@ void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
  * \return                      Adapted domain if refinement occurred, or NULL.
  *                              The return status is identical across all ranks.
  */
-fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
+fclaw3d_domain_t *fclaw3d_domain_adapt (fclaw3d_domain_t * domain);
 
-/** Create a repartitioned domain after fclaw2d_domain_adapt returned non-NULL.
+/** Create a repartitioned domain after fclaw3d_domain_adapt returned non-NULL.
  * All refine and coarsen markers are cancelled when this function is done.
  * \param [in,out] domain       Current domain that was adapted previously.
  *                              It stays alive because it is needed to
@@ -111,25 +115,25 @@ fclaw2d_domain_t *fclaw2d_domain_adapt (fclaw2d_domain_t * domain);
  * \return                      Partitioned domain if different, or NULL.
  *                              The return status is identical across all ranks.
  */
-fclaw2d_domain_t *fclaw2d_domain_partition (fclaw2d_domain_t * domain,
+fclaw3d_domain_t *fclaw3d_domain_partition (fclaw3d_domain_t * domain,
                                             int weight_exponent);
 
 /** Query the window of patches that is not transferred on partition.
  * \param [in] domain           A domain after a non-trivial partition
- *                              and before calling \ref fclaw2d_domain_complete.
+ *                              and before calling \ref fclaw3d_domain_complete.
  * \param [out] unchanged_first         First still-local patch in the new partition.
  * \param [out] unchanged_length        Number of patches that not changed owners.
  * \param [out] unchanged_old_first     First stayed_local patch in the old partition.
  */
-void fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
+void fclaw3d_domain_partition_unchanged (fclaw3d_domain_t * domain,
                                          int *unchanged_first,
                                          int *unchanged_length,
                                          int *unchanged_old_first);
 
-/** Clean up after fclaw2d_domain_partition returned non-NULL.
+/** Clean up after fclaw3d_domain_partition returned non-NULL.
  * \param [in,out] domain       Current domain that was partitioned.
  */
-void fclaw2d_domain_complete (fclaw2d_domain_t * domain);
+void fclaw3d_domain_complete (fclaw3d_domain_t * domain);
 
 /** Write VTK file(s) for a domain structure.
  *  Each patch is drawn as one rectangle.
@@ -138,23 +142,23 @@ void fclaw2d_domain_complete (fclaw2d_domain_t * domain);
  * \param [in] domain           A valid domain structure.  Is not changed.
  * \param [in] basename         Filename prefix passed to p4est_vtk functions.
  */
-void fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain,
+void fclaw3d_domain_write_vtk (fclaw3d_domain_t * domain,
                                const char *basename);
 
 /** Print patch number by level on all processors */
-void fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int log_priority);
+void fclaw3d_domain_list_levels (fclaw3d_domain_t * domain, int log_priority);
 
 /** Print face neighbor status for each face */
-void fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain,
+void fclaw3d_domain_list_neighbors (fclaw3d_domain_t * domain,
                                     int log_priority);
 
 /** Print information on adapted patches */
-void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
-                                  fclaw2d_domain_t * new_domain,
+void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
+                                  fclaw3d_domain_t * new_domain,
                                   int log_priority);
 
-/** Search triples of (block number, x coordinate, y coordinate) in the mesh.
- * The x, y coordinates must be in [0, 1]^2.
+/** Search triples of (block number, x, y, z coordinates) in the mesh.
+ * The x, y, z coordinates must be in [0, 1]^3.
  * The input data must be equal on every process: This is a collective call.
  * The results will also be equal on every process.
  *
@@ -169,14 +173,14 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
  *                              have indices [block_offsets[t], block_offsets[t + 1])
  *                              in the \b coordinates and results arrays.
  * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
- *                              entries (x, y) in [0, 1]^2.  Of these entries,
+ *                              entries (x, y, z) in [0, 1]^3.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
  * \param [in,out] results      On input, an array of type int and
  *                              \b block_offsets[num_blocks] many entries.
  *                              On output, each entry will be -1 if the point has
  *                              not been found, or the patch number within its block.
  */
-void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
+void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
                                    sc_array_t * block_offsets,
                                    sc_array_t * coordinates,
                                    sc_array_t * results);
@@ -188,4 +192,4 @@ void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
 }
 #endif
 
-#endif /* !FCLAW2D_CONVENIENCE_H */
+#endif /* !FCLAW3D_CONVENIENCE_H */

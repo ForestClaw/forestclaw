@@ -14,9 +14,6 @@
   "cacheVariables": {
     "CMAKE_BUILD_TYPE": "Release",
     "CMAKE_CUDA_ARCHITECTURES": "72"
-  },
-  "environment": {
-    "CUDACXX": "/usr/local/cuda/bin/nvcc"
   }
 },
 {

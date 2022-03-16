@@ -73,6 +73,9 @@ typedef enum
  */
 struct fclaw2d_patch_data
 {
+    /** Pointer to the core patch structure in the domain */
+    const fclaw2d_patch_t *real_patch;
+
     /** Neighbor relation on each face */
     fclaw2d_patch_relation_t face_neighbors[4];
     /** Neighbor relation on each corner */
@@ -97,7 +100,6 @@ struct fclaw2d_patch_data
     void *user_patch;
     /** Additional user data */
     void *user_data;
-
 };
 
 /**
