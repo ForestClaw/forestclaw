@@ -3,7 +3,7 @@
 
       implicit none
       integer mx,my,mbc,meqn,psize, mint
-      integer packmode, ierror !pack_area,
+      integer pack_area, packmode, ierror
       double precision qdata(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
       double precision qpack(psize)

@@ -26,7 +26,7 @@ c-----------------------------------------------------------------------
 
 
       !local
-      integer mw,k,iter !m,
+      integer m,mw,k,iter
       double precision A(3,3)
       double precision r(3,3)
       double precision lambda(3)
@@ -35,8 +35,8 @@ c-----------------------------------------------------------------------
 
       double precision delh,delhu,delphi,delb,delnorm
       double precision rare1st,rare2st,sdelta,raremin,raremax
-      double precision criticaltol,convergencetol !,raretol
-      double precision s1s2bar,s1s2tilde,hbar,hLstar,hRstar !,hustar
+      double precision criticaltol,convergencetol,raretol
+      double precision s1s2bar,s1s2tilde,hbar,hLstar,hRstar,hustar
       double precision huRstar,huLstar,uRstar,uLstar,hstarHLL
       double precision deldelh,deldelphi
       double precision s1m,s2m,hm
@@ -290,8 +290,8 @@ c-----------------------------------------------------------------------
       double precision deldelh,deldelphi
       double precision alpha1,alpha2,beta1,beta2,delalpha1,delalpha2
       double precision criticaltol,convergencetol
-      !double precision sL ,sR
-      !double precision chat,sRoe1,uhat,sRoe2
+      double precision sL,sR
+      double precision uhat,chat,sRoe1,sRoe2
 
       double precision sw(mwaves)
       double precision fw(meqn,mwaves)
@@ -469,8 +469,8 @@ c-----------------------------------------------------------------------
       double precision fw(meqn,mwaves)
 
       !local
-      double precision delh,delhu,delphi,delb,delphidecomp !,delhdecomp
-      double precision deldelphi !deldelh,
+      double precision delh,delhu,delphi,delb,delhdecomp,delphidecomp
+      double precision deldelh,deldelphi
       double precision beta1,beta2
 
 

@@ -51,15 +51,15 @@ c     # these will be empty if we are not on a manifold.
       double precision sum, qf, kf
       logical is_manifold
 
-      integer mq,r2, m !, m1
-      integer ic,  ibc !ic1,
-      integer jc,  jbc !jc1,
+      integer mq,r2, m, m1
+      integer ic, ic1, ibc
+      integer jc, jc1, jbc
 
 c     # This should be refratio*refratio.
       integer rr2
       parameter(rr2 = 4)
       integer i2(0:rr2-1),j2(0:rr2-1)
-      !double precision kc
+      double precision kc
 
       logical fclaw2d_clawpatch_is_valid_average, skip_this_grid
       double precision af_sum, qv(0:rr2-1)
@@ -339,10 +339,10 @@ c     # these will be empty if we are not on a manifold.
 
       double precision sum
 
-      integer ibc,jbc,mq,r2 !i,j,jj,ii,
-      !integer  jfine !ifine
+      integer i,j,ibc,jbc,ii,jj,mq,r2
+      integer ifine, jfine
       logical is_manifold
-      double precision qf,kf !, kc
+      double precision qf,kf, kc
 
 c     # This should be refratio*refratio.
       integer i1,j1,m
@@ -493,7 +493,7 @@ c               enddo
       double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer i,j, ig, jg, ic_add, jc_add, ii, jj !, ifine, jfine
+      integer i,j, ig, jg, ic_add, jc_add, ii, jj, ifine, jfine
       double precision etasum, hsum, husum, hvsum, etaav, hav
       double precision hc, huc, hvc
       double precision hf, huf, hvf, bf, etaf

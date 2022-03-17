@@ -38,13 +38,13 @@ c     # ----------------------------------------------------------
       double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       integer mq,r2, m
-      integer i1 !ic1, ic2,  ifine, !i,ibc,
-      integer    j1 !j,jbc,jc1, jc2,jfine,
-      integer   ic, jc, mth !ic_add,jc_add,
+      integer i, ic1, ic2, ibc, ifine,i1
+      integer j, jc1, jc2, jbc, jfine,j1
+      integer ic_add, jc_add, ic, jc, mth
       double precision gradx, grady, qc, sl, sr, value
       double precision fclaw2d_clawpatch_compute_slopes
       double precision etabarc(-1:1, -1:1), h, b
-      !integer jjj !iii,
+      integer iii,jjj
 
 c     # This should be refratio*refratio.
       integer rr2
@@ -274,7 +274,7 @@ c              # ---------------------------------------------
       double precision aux_coarse(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision aux_fine(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer ic, jc, mq,  mth !i ,ibc,j ,jbc,
+      integer ic, jc, mq, ibc,jbc, mth,i,j
       double precision qc, sl, sr, gradx, grady
       double precision fclaw2d_clawpatch_compute_slopes, value
 
@@ -289,7 +289,7 @@ c     # This should be refratio*refratio.
       integer a(2,2), f(2)
       integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
       double precision shiftx(0:rr2-1), shifty(0:rr2-1)
-      !logical check_indices
+      logical check_indices
 
       integer mbathy, refratio
 
@@ -420,10 +420,10 @@ c     # Interpolate coarse grid corners to fine grid corner ghost cells
       integer p4est_refineFactor, refratio
       double precision qc, qf, shiftx, shifty, sl, sr, gradx, grady
       double precision fclaw2d_clawpatch_compute_slopes
-      !double precision  uf !uc(-1:1,-1:1),
-      double precision etabarc(-1:1, -1:1), h, b, hfsum ! u,
-      !double precision coarseumin !, coarseumax
-      !logical redefine
+      double precision uc(-1:1,-1:1), uf
+      double precision etabarc(-1:1, -1:1), h, b, u, hfsum
+      double precision coarseumin, coarseumax
+      logical redefine
 
       integer mbathy
 

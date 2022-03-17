@@ -9,7 +9,7 @@ c    # -------------------------------------------------------------------------
       double precision dx, dy, dxdy
       double precision sum(meqn), c_kahan
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-      double precision  t, y !c,
+      double precision c, t, y
 
       include 'fclaw2d_metric_terms.i'
 
@@ -55,7 +55,7 @@ c     # Compute area of a patch
 
       include 'fclaw2d_metric_terms.i'
 
-      integer i,j !,m
+      integer i,j,m
       integer*8 cont, get_context
       logical fclaw2d_map_is_used
 

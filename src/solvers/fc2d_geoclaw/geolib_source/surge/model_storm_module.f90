@@ -384,7 +384,7 @@ contains
                                        dx, dy, t, aux, wind_index,           &
                                        pressure_index, storm)
 
-        use geoclaw_module, only: g => grav, rho_air, ambient_pressure 
+        use geoclaw_module, only: g => grav, rho_air, ambient_pressure
         use geoclaw_module, only: coriolis, deg2rad, coordinate_system
         use geoclaw_module, only: spherical_distance
 

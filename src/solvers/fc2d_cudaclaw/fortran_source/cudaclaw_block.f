@@ -20,7 +20,7 @@
       subroutine cudaclaw_unset_block()
       implicit none
 
-      integer blockno_com
+      integer blockno, blockno_com
       common /comblock/ blockno_com
 
       blockno_com = -1

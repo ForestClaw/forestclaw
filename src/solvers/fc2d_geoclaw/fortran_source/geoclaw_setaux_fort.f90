@@ -16,7 +16,7 @@ SUBROUTINE fc2d_geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux, &
   USE amr_module, ONLY: mcapa, xupper, yupper, xlower, ylower, NEEDS_TO_BE_SET
 
   USE geoclaw_module, ONLY: coordinate_system, earth_radius, deg2rad
-  USE geoclaw_module, ONLY: ambient_pressure !sea_level,
+  USE geoclaw_module, ONLY: sea_level, ambient_pressure
 
   USE storm_module, ONLY: wind_forcing, pressure_forcing
   USE storm_module, ONLY: wind_index, pressure_index, set_storm_fields
@@ -40,7 +40,7 @@ SUBROUTINE fc2d_geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux, &
   INTEGER :: ii,jj,m, iint,jint
   REAL(kind=8) :: x,y,xm,ym,xp,yp,topo_integral
   CHARACTER(len=*), PARAMETER :: aux_format = "(2i4,4d15.3)"
-  INTEGER :: skipcount,ilo,jlo
+  INTEGER :: skipcount,iaux,ilo,jlo
   LOGICAL ghost_invalid
 
   is_ghost = is_ghost_in .ne. 0
@@ -158,7 +158,7 @@ SUBROUTINE fc2d_geoclaw_setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux, &
 
 
         !!write(*,444)ii,jj,aux(1,ii,jj)
-!444     FORMAT("in setaux ",2i4,e12.5)
+444     FORMAT("in setaux ",2i4,e12.5)
 
         IF (is_ghost .AND. ghost_invalid(ii,jj,mx,my,nghost,mint)) THEN
            CYCLE

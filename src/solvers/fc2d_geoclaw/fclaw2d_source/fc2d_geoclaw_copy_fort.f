@@ -12,7 +12,7 @@ c     # Exchange edge ghost data with neighboring grid at same level.
      &      qneighbor,iface,transform_ptr)
       implicit none
 
-      integer mx,my,mbc,meqn,iface !, ftransform(9)
+      integer mx,my,mbc,meqn,iface, ftransform(9)
       integer*8 transform_ptr
       double precision qthis(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qneighbor(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)

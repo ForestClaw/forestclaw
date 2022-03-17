@@ -9,7 +9,7 @@
       external rpn2,rpt2, flux2
 
       integer maxm,meqn,maux,mbc,mcapa,mwaves,mx,my, mwork
-      integer maxmx, maxmy, level !, ierror
+      integer maxmx, maxmy, level, ierror
       integer method(7), mthlim(mwaves)
       integer block_corner_count(0:3)
 
