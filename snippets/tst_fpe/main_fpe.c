@@ -19,7 +19,8 @@ void enable_floating_point_exceptions()
 {
  fenv_t env;
  fegetenv(&env);
- env.__fpcr = env.__fpcr | __fpcr_trap_invalid | __fpcr_trap_overflow | __fpcr_trap_divbyzero;
+ env.__fpcr = env.__fpcr | __fpcr_trap_invalid | __fpcr_trap_overflow 
+     | __fpcr_trap_divbyzero | __fpcr_trap_underflow;
  fesetenv(&env);
  signal(SIGFPE, fpe_signal_handler);
 }
@@ -50,7 +51,7 @@ void print_hexval(double x)
     /* Kind of cool - didn't know it was possible to do this */
     uint64_t xn; 
     memcpy(&xn, &x, sizeof x);
-    printf("x = %f (%" PRIx64 ")\n", x, xn);
+    printf("x = %16f (%" PRIx64 ")\n", x, xn);
 }
 
 static
@@ -74,20 +75,26 @@ double create_exception(int choice)
         break;
 
         case 3:
+        y = pow(2,-1074);
+        print_hexval(y);
+        printf("1: UNDERFLOW : y = 2^(-1074)\n");
+        break;
+
+        case 4:
         x = 0;
         y = 1/x;
         print_hexval(y);
         printf("2: DIVBYZERO : y = 1/0\n");
         break;
 
-        case 4:
+        case 5:
         set_qnan(&x);
         print_hexval(x);
         y = x + 1;
         printf("3: Quiet NAN (not trapped) : x = NAN; y = x + 1;\n");
         break;
 
-        case 5:
+        case 6:
         set_snan(&x);
         print_hexval(x);
         y = x + 1;

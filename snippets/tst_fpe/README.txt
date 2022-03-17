@@ -10,11 +10,13 @@ Valid types are indicated by integer 1-5 :
 
 2 : OVERFLOW, e.g. 2^1024, exp(1000)
 
-3 : DIVBYZERO, e.g. 1/0
+3 : UNDERFLOW, e.g. denormalized numbers such as 2^(-1074), exp(-710)
 
-4 : Quiet NAN : This is useful for detecting use of uninitialized data
+4 : DIVBYZERO, e.g. 1/0
 
-5 : Signaling NAN : This NAN will get trapped. 
+5 : Quiet NAN : This is useful for detecting use of uninitialized data
+
+6 : Signaling NAN : This NAN will get trapped. 
 
 Ideas for code taken from 
 
