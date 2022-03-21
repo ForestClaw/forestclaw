@@ -97,7 +97,7 @@ void fivePoint::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2
         auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
         for(int m = 0; m < mfields; m++){
             for(int j = 0; j < my; j++){
-                ghosts[{j,m}] = -u[{0,j,m}];
+                ghosts(j,m) = -u(0,j,m);
             }
         }
     }
@@ -105,7 +105,7 @@ void fivePoint::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2
         auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
         for(int m = 0; m < mfields; m++){
             for(int j = 0; j < my; j++){
-                ghosts[{j,m}] = -u[{mx-1,j,m}];
+                ghosts(j,m) = -u(mx-1,j,m);
             }
         }
     }
@@ -114,7 +114,7 @@ void fivePoint::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2
         auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
         for(int m = 0; m < mfields; m++){
             for(int i = 0; i < mx; i++){
-                ghosts[{i,m}] = -u[{i,0,m}];
+                ghosts(i,m) = -u(i,0,m);
             }
         }
     }
@@ -122,7 +122,7 @@ void fivePoint::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2
         auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
         for(int m = 0; m < mfields; m++){
             for(int i = 0; i < mx; i++){
-                ghosts[{i,m}] = -u[{i,my-1,m}];
+                ghosts(i,m) = -u(i,my-1,m);
             }
         }
     }
@@ -155,7 +155,7 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
         for(int m = 0; m < mfields; m++){
             for(int j = 0; j < my; j++){
-                ghosts[{j,m}] = -u[{0,j,m}];
+                ghosts(j,m) = -u(0,j,m);
             }
         }
     }
@@ -163,7 +163,7 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
         for(int m = 0; m < mfields; m++){
             for(int j = 0; j < my; j++){
-                ghosts[{j,m}] = -u[{mx-1,j,m}];
+                ghosts(j,m) = -u(mx-1,j,m);
             }
         }
     }
@@ -172,7 +172,7 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
         for(int m = 0; m < mfields; m++){
             for(int i = 0; i < mx; i++){
-                ghosts[{i,m}] = -u[{i,0,m}];
+                ghosts(i,m) = -u(i,0,m);
             }
         }
     }
@@ -180,7 +180,7 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
         for(int m = 0; m < mfields; m++){
             for(int i = 0; i < mx; i++){
-                ghosts[{i,m}] = -u[{i,my-1,m}];
+                ghosts(i,m) = -u(i,my-1,m);
             }
         }
     }
@@ -194,9 +194,9 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         for(int j = 0; j < my; j++)
             for(int i = 0; i < mx; i++)
             {
-                double uij = u[{i,j,m}];
-                f[{i,j,m}] = (u[{i+1,j,m}] - 2*uij + u[{i-1,j,m}])/dx2 + 
-                             (u[{i,j+1,m}] - 2*uij + u[{i,j-1,m}])/dy2;
+                double uij = u(i,j,m);
+                f(i,j,m) = (u(i+1,j,m) - 2*uij + u(i-1,j,m))/dx2 + 
+                             (u(i,j+1,m) - 2*uij + u(i,j-1,m))/dy2;
             }
     
 #else
@@ -205,13 +205,13 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
     for(int j = 0; j < my; j++)
         for(int i = 0; i < mx; i++)
         {
-            double uij = u[{i,j}];
+            double uij = u(i,j);
             double flux[4];
-            flux[0] = (uij - u[{i-1,j}]);
-            flux[1] = (u[{i+1,j}] - uij);
-            flux[2] = (uij - u[{i,j-1}]);
-            flux[3] = (u[{i,j+1}] - uij);;
-            f[{i,j}] = (flux[1]-flux[0])/dx2 + (flux[3] - flux[2])/dy2;
+            flux[0] = (uij - u(i-1,j));
+            flux[1] = (u(i+1,j) - uij);
+            flux[2] = (uij - u(i,j-1));
+            flux[3] = (u(i,j+1) - uij);;
+            f(i,j) = (flux[1]-flux[0])/dx2 + (flux[3] - flux[2])/dy2;
         }
 #endif
     
@@ -253,7 +253,7 @@ void fivePoint::modifyRHSForInternalBoundaryConditions(const PatchInfo<2>& pinfo
         for(int i = 0; i < mx; i++)
         {
             if (pinfo.hasNbr(Side<2>::south()))
-                f(i,0,m) += -(u[{i,-1}]+u[{i,0}])/dy2;
+                f(i,0,m) += -(u(i,-1,m)+u(i,0,m))/dy2;
 
             if (pinfo.hasNbr(Side<2>::north()))
                 f(i,my-1,m) += -(u(i,my-1,m)+u(i,my,m))/dy2;
