@@ -110,10 +110,10 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Register packages */
-    fclaw_opt                    = fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt   = fclaw3dx_clawpatch_options_register(app,"fclaw_options.ini");
-    claw46_opt         = fc3d_clawpack46_options_register(app,"fclaw_options.ini");
-    user_opt =                  filament_options_register(app,"fclaw_options.ini");  
+    fclaw_opt                    = fclaw_options_register(app,              "fclaw_options.ini");
+    clawpatch_opt   = fclaw3dx_clawpatch_options_register(app,              "fclaw_options.ini");
+    claw46_opt         = fc3d_clawpack46_options_register(app,              "fclaw_options.ini");
+    user_opt =                  filament_options_register(app,              "fclaw_options.ini");  
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);
