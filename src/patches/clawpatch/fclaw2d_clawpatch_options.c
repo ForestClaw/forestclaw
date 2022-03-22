@@ -232,7 +232,7 @@ const fclaw_app_options_vtable_t fclaw2d_clawpatch_options_vtable = {
    --------------------------------------------------------- */
 
 fclaw2d_clawpatch_options_t *
-fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile)
+fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* name, const char* configfile)
 {
     fclaw2d_clawpatch_options_t* clawpatch_options;
 
@@ -241,12 +241,13 @@ fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile)
     /* allocate storage for fclaw_options */
     clawpatch_options = FCLAW_ALLOC(fclaw2d_clawpatch_options_t,1);
 
-    fclaw_app_options_register (app,"clawpatch",
+    fclaw_app_options_register (app,
+                                name,
                                 configfile,
                                 &fclaw2d_clawpatch_options_vtable,
                                 clawpatch_options);
 
-    fclaw_app_set_attribute(app,"clawpatch",clawpatch_options);
+    fclaw_app_set_attribute(app, name, clawpatch_options);
     return clawpatch_options;
 }
 
