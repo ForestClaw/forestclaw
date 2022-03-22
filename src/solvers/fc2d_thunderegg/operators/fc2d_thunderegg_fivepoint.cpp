@@ -280,6 +280,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+    int mbc = clawpatch_opt->mbc;
 
     // get p4est structure
     fclaw2d_domain_t *domain = glob->domain;
@@ -296,7 +297,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     };
 
     // generates levels of patches for GMG
-    P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, mbc, bmf);
 
     // get finest level
     Domain<2> te_domain = domain_gen.getFinestDomain();
