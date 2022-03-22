@@ -98,7 +98,7 @@ main (int argc, char **argv)
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
-    fclaw_opt                = fclaw_options_register(app,              "fclaw_options.ini");
+    fclaw_opt                = fclaw_options_register(app,  NULL,       "fclaw_options.ini");
     clawpatchopt = fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
     geoclawopt        = fc2d_geoclaw_options_register(app,              "fclaw_options.ini");
 
