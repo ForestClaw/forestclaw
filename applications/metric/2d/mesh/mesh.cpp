@@ -160,10 +160,10 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, user);
 
     /* All libraries that might be needed should be registered here */
-    gparms =      fclaw2d_forestclaw_options_register(app,              "fclaw_options.ini");
-    clawpatchopt = fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
-    claw46opt =      fc2d_clawpack46_options_register(app,              "fclaw_options.ini");
-    claw5opt =        fc2d_clawpack5_options_register(app,              "fclaw_options.ini");
+    gparms =      fclaw2d_forestclaw_options_register(app,               "fclaw_options.ini");
+    clawpatchopt = fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    claw46opt =      fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
+    claw5opt =        fc2d_clawpack5_options_register(app,               "fclaw_options.ini");
     register_user_options(app,"fclaw_options.ini",user);  /* [user] */
 
     /* Read configuration file(s) and command line, and process options */
