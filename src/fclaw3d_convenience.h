@@ -147,7 +147,6 @@ void fclaw3d_domain_complete (fclaw3d_domain_t * domain);
 void fclaw3d_domain_write_vtk (fclaw3d_domain_t * domain,
                                const char *basename);
 
-
 /** Print patch number by level on all processors */
 void fclaw3d_domain_list_levels (fclaw3d_domain_t * domain, int log_priority);
 

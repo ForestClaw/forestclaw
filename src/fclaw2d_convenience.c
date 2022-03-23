@@ -731,10 +731,7 @@ fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
     FCLAW_ASSERT (wrap != NULL);
     FCLAW_ASSERT (wrap->p4est != NULL);
 
-#ifndef P4_TO_P8
-    /* to be implemented in 3D */
     p4est_vtk_write_file (wrap->p4est, NULL, basename);
-#endif
 }
 
 static void
