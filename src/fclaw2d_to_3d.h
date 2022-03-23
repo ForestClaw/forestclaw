@@ -128,6 +128,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_partition        fclaw3d_domain_partition
 #define fclaw2d_domain_partition_unchanged  fclaw3d_domain_partition_unchanged
 #define fclaw2d_domain_complete         fclaw3d_domain_complete
+#define fclaw2d_domain_write_vtk        fclaw3d_domain_write_vtk
+#define fclaw2d_domain_list_levels      fclaw3d_domain_list_levels
+#define fclaw2d_domain_list_neighbors   fclaw3d_domain_list_neighbors
+#define fclaw2d_domain_list_adapted     fclaw3d_domain_list_adapted
+#define fclaw2d_domain_search_points    fclaw3d_domain_search_points
 #define fclaw2d_domain_iterate_cb       fclaw3d_domain_iterate_cb
 #define fclaw_domain_new2d              fclaw_domain_new3d
 #define fclaw_domain_destroy2d          fclaw_domain_destroy3d

@@ -43,6 +43,9 @@ extern "C"
 /* TODO: The unit cube is a special case of the brick.  Use that instead. */
 fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
                                                int initial_level);
+
+#if 0
+
 /* TODO: The torus is a special case of the brick.  Use that instead. */
 fclaw3d_domain_t *fclaw3d_domain_new_torus (sc_MPI_Comm mpicomm,
                                             int initial_level);
@@ -50,8 +53,6 @@ fclaw3d_domain_t *fclaw3d_domain_new_twosphere (sc_MPI_Comm mpicomm,
                                                 int initial_level);
 fclaw3d_domain_t *fclaw3d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
                                                   int initial_level);
-
-#if 0
 
 /** Create a brick connectivity, that is, a rectangular grid of blocks.
  * The origin is in the lower-left corner of the brick.
@@ -137,13 +138,15 @@ void fclaw3d_domain_complete (fclaw3d_domain_t * domain);
 
 /** Write VTK file(s) for a domain structure.
  *  Each patch is drawn as one rectangle.
- *  We ignore any geometric transformations
+ *  We ignore any geometric transformations.
+ * \note Not yet doing anything in 3D.
  *  and use the vertex locations specified in the p4est's connectivity.
  * \param [in] domain           A valid domain structure.  Is not changed.
  * \param [in] basename         Filename prefix passed to p4est_vtk functions.
  */
 void fclaw3d_domain_write_vtk (fclaw3d_domain_t * domain,
                                const char *basename);
+
 
 /** Print patch number by level on all processors */
 void fclaw3d_domain_list_levels (fclaw3d_domain_t * domain, int log_priority);
@@ -166,6 +169,10 @@ void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
  * We return the smallest patch number on the smallest processor touching it.
  * However, if a point is on a block boundary, it must be decided before
  * calling this function which tree shall be queried for it.
+ *
+ * \note Currently we do not find the smallest matching process, but instead
+ *       instead a point on a parallel boundary may be found on multiple processes.
+ *       This should be fixed in the near future.
  *
  * \param [in] domain           Must be valid domain structure.  Will not be changed.
  * \param [in] block_offsets    Array of (num_blocks + 1) int variables.
