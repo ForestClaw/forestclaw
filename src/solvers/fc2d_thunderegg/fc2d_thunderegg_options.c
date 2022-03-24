@@ -223,6 +223,7 @@ static const fclaw_app_options_vtable_t thunderegg_options_vtable = {
    Public interface to clawpack options
    ---------------------------------------------------------- */
 fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
+                                                              const char *section,
                                                               const char *configfile)
 {
     fc2d_thunderegg_options_t *mg_opt;
@@ -230,10 +231,10 @@ fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
     FCLAW_ASSERT (app != NULL);
 
     mg_opt = FCLAW_ALLOC (fc2d_thunderegg_options_t, 1);
-    fclaw_app_options_register (app, "thunderegg", configfile,
+    fclaw_app_options_register (app, section, configfile,
                                 &thunderegg_options_vtable, mg_opt);
     
-    fclaw_app_set_attribute(app,"thunderegg",mg_opt);
+    fclaw_app_set_attribute(app, section, mg_opt);
     return mg_opt;
 }
 

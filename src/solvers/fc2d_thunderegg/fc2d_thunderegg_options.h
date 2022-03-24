@@ -102,7 +102,16 @@ fclaw_exit_type_t fc2d_thunderegg_check (fc2d_thunderegg_options_t * mg_opt);
 
 void fc2d_thunderegg_reset (fc2d_thunderegg_options_t * mg_opt);
 
+/**
+ * @brief Register options in SC
+ * 
+ * @param a the app context
+ * @param section the section name
+ * @param configfile the config file
+ * @return fc2d_thunderegg_options_t* a newly allocated options struct
+ */
 fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
+                                                              const char *section,
                                                               const char *configfile);
 
 void fc2d_thunderegg_package_register(fclaw_app_t* app,
