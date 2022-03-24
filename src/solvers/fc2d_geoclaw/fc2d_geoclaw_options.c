@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -239,6 +239,7 @@ static const fclaw_app_options_vtable_t geoclaw_options_vtable = {
    ---------------------------------------------------------- */
 fc2d_geoclaw_options_t*  
 fc2d_geoclaw_options_register (fclaw_app_t * app,
+                               const char *section,
                                const char *configfile)
 {
     fc2d_geoclaw_options_t *geo_opt;
@@ -246,10 +247,10 @@ fc2d_geoclaw_options_register (fclaw_app_t * app,
     FCLAW_ASSERT (app != NULL);
 
     geo_opt = FCLAW_ALLOC (fc2d_geoclaw_options_t, 1);
-    fclaw_app_options_register (app, "geoclaw", configfile,
+    fclaw_app_options_register (app, section, configfile,
                                 &geoclaw_options_vtable, geo_opt);
 
-    fclaw_app_set_attribute(app,"geoclaw",geo_opt);
+    fclaw_app_set_attribute(app, section, geo_opt);
 
     return geo_opt;
 }

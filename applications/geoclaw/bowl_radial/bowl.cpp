@@ -99,7 +99,7 @@ main (int argc, char **argv)
 
     gparms                   = fclaw_options_register(app,  NULL,       "fclaw_options.ini");
     clawpatchopt = fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
-    geoclawopt        = fc2d_geoclaw_options_register(app,              "fclaw_options.ini");
+    geoclawopt        = fc2d_geoclaw_options_register(app, "geoclaw",   "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
