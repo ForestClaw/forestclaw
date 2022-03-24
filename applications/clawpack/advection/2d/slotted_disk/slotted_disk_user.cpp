@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ void slotted_disk_link_solvers(fclaw2d_global_t *glob)
     if (user->mapping == 1)
         fclaw2d_clawpatch_use_pillowsphere();
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
 
     if (user->claw_version == 4)

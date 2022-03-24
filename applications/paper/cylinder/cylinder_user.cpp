@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -277,7 +277,7 @@ void cylinder_link_solvers(fclaw2d_global_t *glob)
     claw46_vt->fort_rpt2  = &RPT2CONS_MANIFOLD;  
     claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     clawpatch_vt->fort_tag4refinement = &CYLINDER_TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &CYLINDER_TAG4COARSENING;
 

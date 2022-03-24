@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -150,7 +150,7 @@ typedef struct fc2d_clawpack5_vtable
     int is_set;
 } fc2d_clawpack5_vtable_t;
 
-void fc2d_clawpack5_solver_initialize();
+void fc2d_clawpack5_solver_initialize(struct fclaw2d_global* glob);
 
 fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt();
 

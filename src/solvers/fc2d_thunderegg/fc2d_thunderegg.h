@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -93,7 +93,7 @@ struct fc2d_thunderegg_vtable
 	int is_set;
 };
 
-void fc2d_thunderegg_solver_initialize(void);
+void fc2d_thunderegg_solver_initialize(struct fclaw2d_global* glob);
 
 fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(void);
 

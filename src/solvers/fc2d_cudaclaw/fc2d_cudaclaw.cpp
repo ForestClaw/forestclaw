@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2018 Carsten Burstedde, Donna Calhoun, Melody Shih, Scott Aiton,
+Copyright (c) 2018-2022 Carsten Burstedde, Donna Calhoun, Melody Shih, Scott Aiton,
 Xinsheng Qin.
 
 All rights reserved.
@@ -398,10 +398,10 @@ fc2d_cudaclaw_vtable_t* cudaclaw_vt_init()
     return &s_cudaclaw_vt;
 }
 
-void fc2d_cudaclaw_solver_initialize()
+void fc2d_cudaclaw_solver_initialize(fclaw2d_global_t* glob)
 {
     int claw_version = 4;
-    fclaw2d_clawpatch_vtable_initialize(claw_version);
+    fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
     fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -312,8 +312,8 @@ fc2d_cudaclaw5_vtable_t* fc2d_cudaclaw5_vt_init()
 void fc2d_cudaclaw5_solver_initialize()
 {
     //(WIP) Work for using both 46, 5 routines 
-    //fc2d_clawpack5_solver_initialize();
-    //fc2d_clawpack46_solver_initialize();
+    //fc2d_clawpack5_solver_initialize(glob);
+    //fc2d_clawpack46_solver_initialize(glob);
     
     int claw_version = 5;
     fclaw2d_clawpatch_vtable_initialize(claw_version);

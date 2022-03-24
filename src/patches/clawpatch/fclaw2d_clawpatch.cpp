@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -449,7 +449,7 @@ void clawpatch_setup_timeinterp(fclaw2d_global_t *glob,
 	   neighboring fine grid will average to ghost cells of the interpolated
 	   level, then the interpolated level is used to interpolate to fine grid
 	   ghost cells. */
-	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
 	clawpatch_vt->fort_timeinterp(&mx,&my,&mbc,&meqn,&psize,
 									qcurr,qlast,qinterp,&alpha,&ierror);
@@ -489,7 +489,7 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
 
 	if (fill_ghost(time_interp))
 	{
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2		
 		clawpatch_vt->fort_copy_face(&mx,&my,&mbc,&meqn,qthis,
 		                             qneighbor,&iface,&transform_data);
@@ -529,7 +529,7 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
 
 	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 	int manifold = fclaw_opt->manifold;
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
 #if PATCH_DIM == 2
 	clawpatch_vt->fort_average_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,
@@ -571,7 +571,7 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
 
 	if (fill_ghost(time_interp))
 	{
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
 		clawpatch_vt->fort_interpolate_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,&idir,
 		                                    &iface_coarse, &p4est_refineFactor,
@@ -610,7 +610,7 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
 
 	if (fill_ghost(time_interp))
 	{
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
 		clawpatch_vt->fort_copy_corner(&mx,&my,&mbc,&meqn,qthis,qcorner,
 		                               &icorner, &transform_data);
@@ -653,7 +653,7 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
 	if (fill_ghost(time_interp))
 	{
 		int refratio = 2;
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
 		clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,
 		                                  &refratio,qcoarse,qfine,
@@ -694,7 +694,7 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
 	if (fill_ghost(time_interp))
 	{
 		int refratio = 2;
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
 		clawpatch_vt->fort_interpolate_corner(&mx,&my,&mbc,&meqn,
 										  &refratio,qcoarse,qfine,
@@ -738,7 +738,7 @@ int clawpatch_tag4refinement(fclaw2d_global_t *glob,
 		tag_patch = 0;	
 
 		/* This allows the user to specify a "exceeds_th" */
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
 		int mx,my,mbc;
 		double xlower,ylower,dx,dy;
@@ -805,7 +805,7 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 	int tag_patch = 0;
 	if (coarsen_threshold > 0) 
 	{		
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
 		/* Get xlower,ylower for each grid. */
 		clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,
@@ -855,7 +855,7 @@ void clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 		if (fclaw_opt->manifold)
 			areafine = clawpatch_get_area(fine_patch);
 
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
 		clawpatch_vt->fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
 											areacoarse, areafine, &igrid,
@@ -897,7 +897,7 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 		if (fclaw_opt->manifold)
 			areafine = clawpatch_get_area(fine_patch);
 
-		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2	
 		clawpatch_vt->fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
 										  areacoarse, areafine, &igrid,
@@ -1023,7 +1023,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 	int qareasize = (wg - hole)*(meqn + packarea);
 	int ierror;
-	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
 	double *qthis;
 	fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
@@ -1198,7 +1198,8 @@ fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
 	return &s_clawpatch_vt;
 }
 
-void fclaw2d_clawpatch_vtable_initialize(int claw_version)
+void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob, 
+                                         int claw_version)
 {
 	fclaw2d_patch_vtable_initialize();
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
@@ -1402,7 +1403,7 @@ void fclaw2d_clawpatch_vtable_initialize(int claw_version)
 /* These functions are not virtualized and are not defined by the 
    patch interface */
 
-fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt()
+fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt(fclaw2d_global_t* glob)
 {
 	FCLAW_ASSERT(s_clawpatch_vt.is_set != 0);
 	return &s_clawpatch_vt;

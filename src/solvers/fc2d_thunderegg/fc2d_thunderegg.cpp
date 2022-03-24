@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -156,13 +156,13 @@ fc2d_thunderegg_vtable_t* thunderegg_vt_init()
 	return &s_thunderegg_vt;
 }
 
-void fc2d_thunderegg_solver_initialize()
+void fc2d_thunderegg_solver_initialize(fclaw2d_global_t* glob)
 {
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
-	fclaw2d_clawpatch_vtable_initialize(claw_version);
+	fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
 
-    //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
+    //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
 	/* ForestClaw vtable items */
 	fclaw2d_vtable_t*   fclaw_vt = fclaw2d_vt();

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -187,7 +187,7 @@ struct fc2d_clawpack46_vtable
 
 };
 
-void fc2d_clawpack46_solver_initialize(void);
+void fc2d_clawpack46_solver_initialize(struct fclaw2d_global* global);
 
 fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(void);
 

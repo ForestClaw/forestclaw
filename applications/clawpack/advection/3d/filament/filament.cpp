@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,7 @@ void run_program(fclaw2d_global_t* glob)
 
     if (user->claw_version == 4)
     {
-      fc3d_clawpack46_solver_initialize();
+      fc3d_clawpack46_solver_initialize(glob);
     }
     else if (user->claw_version == 5)
     {

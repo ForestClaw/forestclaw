@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -392,7 +392,7 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 	int normal_match = fclaw2d_patch_normal_match(glob->domain, coarse_blockno, 
 	                                              coarse_patchno, iface_coarse);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
 	/* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5 */
 	clawpatch_vt->fort_time_sync_f2c(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
@@ -437,7 +437,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 	needed for copying and interpolation.  */
 
 #if PATCH_DIM == 2
-	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
 	double *qthis;
 	int meqn;

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ void fc2d_geoclaw_output(struct fclaw2d_global *glob, int iframe);
 
 /* ------------------------------------- Virtual table ----------------------------------- */
 
-void fc2d_geoclaw_solver_initialize();
+void fc2d_geoclaw_solver_initialize(struct fclaw2d_global *glob);
 
 fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt();
 

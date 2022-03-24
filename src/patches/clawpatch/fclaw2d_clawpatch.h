@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -169,14 +169,15 @@ typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
  * 
  * @param claw_version the version of clawpack (4 for 4.6, 5 for 5)
  */
-void fclaw2d_clawpatch_vtable_initialize(int claw_version);
+void fclaw2d_clawpatch_vtable_initialize(struct fclaw2d_global *global,
+                                         int claw_version);
 
 /**
  * @brief Get a pointer to a clawpatch vtable global variable
  * 
  * @return fclaw2d_clawpatch_vtable_t* the vtable
  */
-fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt();
+fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt(struct fclaw2d_global* glob);
 
 /**
  * @brief vtable for clawpatch related functions

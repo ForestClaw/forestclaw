@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2021 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2021-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ struct QuadDomain {
     fclaw2d_clawpatch_options_t opts;
 
     QuadDomain(){
-        fclaw2d_clawpatch_vtable_initialize(4);
+        fclaw2d_clawpatch_vtable_initialize(glob, 4);
         glob = fclaw2d_global_new();
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
@@ -99,7 +99,7 @@ struct QuadDomainBrick {
     fclaw2d_clawpatch_options_t opts;
 
     QuadDomainBrick(){
-        fclaw2d_clawpatch_vtable_initialize(4);
+        fclaw2d_clawpatch_vtable_initialize(glob, 4);
         glob = fclaw2d_global_new();
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=2;

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 
 All rights reserved.
 
@@ -108,7 +108,7 @@ void poisson_compute_error(fclaw2d_global_t *glob,
     poisson_error_info_t* error_data = (poisson_error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     if (clawpatch_vt->fort_compute_patch_error != NULL)
     {
@@ -160,7 +160,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
     double *rhs;  /* Solution is stored in the right hand side */ 
     fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
 
 
@@ -218,7 +218,7 @@ void poisson_time_header_ascii(fclaw2d_global_t* glob, int iframe)
     fclose(f2);
 
 #if 0
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     /* header writes out mfields+2 fields (computed soln, true soln, error); */
     clawpatch_vt->fort_header_ascii(matname1,matname2,&time,&mfields,&maux,&ngrids);
 #endif    
@@ -264,7 +264,7 @@ void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
 
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
     POISSON_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
@@ -280,7 +280,7 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
                              int blockno, int patchno,
                              int initflag)
 {
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
@@ -329,7 +329,7 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
         fclaw2d_clawpatch_rhs_data(glob,&fine_patches[igrid],&rhs[igrid],&mfields);
     }
 
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     int tag_patch = 0;
     clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
@@ -360,7 +360,7 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
     mg_vt->fort_eval_bc  = &POISSON_FORT_EVAL_BC;   // For non-homogeneous BCs
 
     /* Clawpatch : Compute the error */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     clawpatch_vt->compute_error = poisson_compute_error;
     clawpatch_vt->fort_compute_patch_error = &POISSON_COMPUTE_ERROR;
 

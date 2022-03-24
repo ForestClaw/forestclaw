@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -80,7 +80,7 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
     fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
 
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     int iframe = *((int *) s->user);
 
@@ -155,7 +155,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */    
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
         /* Include error in output files */
         const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
@@ -176,7 +176,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         clawpack5_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */    
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
         /* Include error in output files */
         const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);

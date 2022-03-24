@@ -55,8 +55,9 @@ int FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(const int* blockno,
                                         const int* init_flag,
                                         const int* is_ghost)
 {
-
-    fclaw3dx_clawpatch_vtable_t* clawpatch_vt = fclaw3dx_clawpatch_vt();
+    // TODO Actual glob
+    struct fclaw2d_global* glob = NULL;
+    fclaw3dx_clawpatch_vtable_t* clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
     fclaw3dx_clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 
                                 clawpatch_vt->fort_user_exceeds_threshold;
 

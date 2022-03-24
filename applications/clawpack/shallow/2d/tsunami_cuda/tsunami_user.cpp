@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
     }
     else
     {
-        //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
         fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
 
         claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -475,14 +475,14 @@ fc2d_clawpack46_vtable_t* clawpack46_vt_init()
 	return &s_clawpack46_vt;
 }
 
-void fc2d_clawpack46_solver_initialize()
+void fc2d_clawpack46_solver_initialize(fclaw2d_global_t* glob)
 {
 	int claw_version = 4;
-	fclaw2d_clawpatch_vtable_initialize(claw_version);
+	fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
 	fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
 	fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
-    fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
 	fc2d_clawpack46_vtable_t*  claw46_vt = clawpack46_vt_init();
 

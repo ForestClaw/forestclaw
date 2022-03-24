@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,7 @@ struct SinglePatchDomain {
     fclaw3dx_clawpatch_options_t opts;
 
     SinglePatchDomain(){
-        fclaw3dx_clawpatch_vtable_initialize(4);
+        fclaw3dx_clawpatch_vtable_initialize(glob, 4);
         glob = fclaw2d_global_new();
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
@@ -112,7 +112,7 @@ struct QuadDomain {
     fclaw3dx_clawpatch_options_t opts;
 
     QuadDomain(){
-        fclaw3dx_clawpatch_vtable_initialize(4);
+        fclaw3dx_clawpatch_vtable_initialize(glob, 4);
         glob = fclaw2d_global_new();
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
@@ -163,9 +163,9 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize","[fclaw3dx][clawpatch]")
     fclaw2d_global_t* glob = fclaw2d_global_new();
     fclaw2d_vtables_initialize(glob);
 
-    fclaw3dx_clawpatch_vtable_initialize(4);
+    fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt();
+    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
 
     CHECK(clawpatch_vt->set_user_data             == NULL);
 
@@ -222,7 +222,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build","[fclaw3dx][clawpatch]")
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
 
-    fclaw3dx_clawpatch_vtable_initialize(4);
+    fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
     fclaw_options_t fopts;
     memset(&fopts, 0, sizeof(fopts));
@@ -841,7 +841,7 @@ TEST_CASE("fclaw3dx_clawpatch setup_timeinterp","[fclaw3dx][clawpatch]")
     timeinterp_alpha = 0.90210;
 
 
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt();
+    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
     clawpatch_vt->fort_timeinterp = [] (const int *mx, const int *my, const int *mz, 
                                         const int *mbc, const int *meqn, const int *psize, 
                                         double qcurr[], double qlast[], double qinterp[], 
@@ -881,7 +881,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement","[fclaw3dx][clawpatch]")
 
     t4r_cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt();
+    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
 
     t4r_tag_patch = GENERATE(true,false);
     t4r_init_flag = GENERATE(true,false);
@@ -953,7 +953,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening","[fclaw3dx][clawpatch]")
     t4c_cp2 = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[2]);
     t4c_cp3 = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[3]);
 
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt();
+    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
 
     t4c_tag_patch = GENERATE(true,false);
     t4c_init_flag = GENERATE(true,false);
@@ -1036,7 +1036,7 @@ TEST_CASE("fclaw3dx_clawpatch interpolate2fine","[fclaw3dx][clawpatch]")
     i2f_cp2 = fclaw3dx_clawpatch_get_clawpatch(&fine_test_data.domain->blocks[0].patches[2]);
     i2f_cp3 = fclaw3dx_clawpatch_get_clawpatch(&fine_test_data.domain->blocks[0].patches[3]);
 
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt();
+    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
 
     clawpatch_vt->fort_interpolate2fine = [](const int *mx, const int *my, const int *mz, 
                                              const int *mbc, const int *meqn, 

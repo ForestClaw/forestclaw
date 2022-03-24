@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -820,16 +820,16 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt()
     return &s_geoclaw_vt;
 }
 
-void fc2d_geoclaw_solver_initialize()
+void fc2d_geoclaw_solver_initialize(fclaw2d_global_t* glob)
 {
     int claw_version = 5;
-    fclaw2d_clawpatch_vtable_initialize(claw_version);
+    fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
     
     fclaw_gauges_vtable_t*           gauges_vt = fclaw_gauges_vt();
 
     fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
     fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();
-    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     fc2d_geoclaw_vtable_t*  geoclaw_vt = fc2d_geoclaw_vt_init();
 

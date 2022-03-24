@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -117,7 +117,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     /* Accumulate area for final computation of error */
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(s->glob);
 #if PATCH_DIM == 2
     double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
     FCLAW_ASSERT(clawpatch_vt->fort_compute_patch_area != NULL);
