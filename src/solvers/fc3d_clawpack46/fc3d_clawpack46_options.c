@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -200,6 +200,7 @@ static const fclaw_app_options_vtable_t clawpack_options_vtable = {
    Public interface to clawpack options
    ---------------------------------------------------------- */
 fc3d_clawpack46_options_t*  fc3d_clawpack46_options_register (fclaw_app_t * app,
+                                                              const char *section,
                                                               const char *configfile)
 {
     fc3d_clawpack46_options_t *clawopt;
@@ -207,10 +208,10 @@ fc3d_clawpack46_options_t*  fc3d_clawpack46_options_register (fclaw_app_t * app,
     FCLAW_ASSERT (app != NULL);
 
     clawopt = FCLAW_ALLOC (fc3d_clawpack46_options_t, 1);
-    fclaw_app_options_register (app, "claw3", configfile,
+    fclaw_app_options_register (app, section, configfile,
                                 &clawpack_options_vtable, clawopt);
     
-    fclaw_app_set_attribute(app,"claw3",clawopt);
+    fclaw_app_set_attribute(app, section, clawopt);
     return clawopt;
 }
 
