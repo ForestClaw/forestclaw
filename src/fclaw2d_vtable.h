@@ -44,8 +44,6 @@ void fclaw2d_after_init(struct fclaw2d_global *glob);
 
 
 /* ---------------------------------- Typedefs ---------------------------------------- */  
-typedef void (*fclaw2d_vtable_initialize_t)();
-
 typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
 
 typedef void (*fclaw2d_output_frame_t)(struct fclaw2d_global * glob, int iframe);
@@ -57,8 +55,6 @@ typedef void (*fclaw2d_after_initialization_t)(struct fclaw2d_global *glob);
 /* ------------------------------------ vtable ---------------------------------------- */  
 typedef struct fclaw2d_vtable
 {
-
-	fclaw2d_vtable_initialize_t          vtable_init;
 	fclaw2d_problem_setup_t              problem_setup;
 	fclaw2d_after_initialization_t       after_init;
 
@@ -68,8 +64,8 @@ typedef struct fclaw2d_vtable
 	/* Output functions */
 	fclaw2d_output_frame_t               output_frame;
 
+	/** @brief true if vtable is set */
 	int is_set;
-
 
 } fclaw2d_vtable_t;
 
