@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ void hemisphere_patch_setup(fclaw2d_global_t *glob,
 
 void hemisphere_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup      = &hemisphere_patch_setup;    
 
     const user_options_t* user = hemisphere_get_options(glob);

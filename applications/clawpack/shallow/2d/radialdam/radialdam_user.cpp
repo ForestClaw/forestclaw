@@ -130,7 +130,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
         }
         else if (user->example >= 1 && user->example <= 3)
         {
-            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
+            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt(glob);
             patch_vt->setup = &radialdam_patch_setup;
 
             claw46_vt->fort_rpn2  = &CLAWPACK46_RPN2_MANIFOLD;
@@ -152,7 +152,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
         }
         else if (user->example >= 1 && user->example <= 3)
         {
-            fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+            fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
             patch_vt->setup = &radialdam_patch_setup;
 
             claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;

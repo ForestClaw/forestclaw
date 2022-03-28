@@ -61,7 +61,7 @@ void gaussian_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup  = &gaussian_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &gaussian_patch_setup_manifold;  
 
     const user_options_t* user = gaussian_get_options(glob);

@@ -59,7 +59,7 @@ void slotted_disk_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup  = &slotted_disk_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &slotted_disk_patch_setup_manifold;  
 
     const user_options_t* user = slotted_disk_get_options(glob);

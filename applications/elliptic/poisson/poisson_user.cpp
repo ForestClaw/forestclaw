@@ -346,7 +346,7 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
     fclaw_vt->problem_setup = &poisson_problem_setup;  
 
     /* Patch : RHS function */
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->rhs = poisson_rhs;          /* Overwrites default */
     patch_vt->initialize = poisson_rhs;   /* Get an initial refinement */
 

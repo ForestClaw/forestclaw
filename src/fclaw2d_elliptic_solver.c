@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ void cb_elliptic_rhs(fclaw2d_domain_t *domain,
 {
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(g->glob);
 
     /* Check that the user has set the right hand side function */
     FCLAW_ASSERT(patch_vt->rhs != NULL);

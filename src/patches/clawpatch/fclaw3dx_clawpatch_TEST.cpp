@@ -207,7 +207,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize","[fclaw3dx][clawpatch]")
 
     CHECK(clawpatch_vt->is_set                      == 1);
 
-    fclaw2d_patch_vtable_t * patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t * patch_vt = fclaw2d_patch_vt(glob);
     //create delete build
     //TODO document patch_vt and expose these as part to public api
     CHECK(patch_vt->patch_new                      != NULL);
@@ -376,7 +376,7 @@ TEST_CASE("fclaw3dx_clawpatch get_metric_patch","[fclaw3dx][clawpatch]")
 
     //CHECK
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
-    CHECK(fclaw2d_patch_metric_patch(&test_data.domain->blocks[0].patches[0]) == cp->mp);
+    CHECK(fclaw2d_patch_metric_patch(glob, &test_data.domain->blocks[0].patches[0]) == cp->mp);
 
     fclaw2d_global_destroy(glob);
 }
@@ -701,7 +701,7 @@ TEST_CASE("fclaw3dx_clawpatch_size","[fclaw3dx][clawpatch]")
     int meqn = test_data.opts.meqn;
 
     //CHECK
-    CHECK(fclaw3dx_clawpatch_size(test_data.glob) == (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn);
+    CHECK(fclaw3dx_clawpatch_size(test_data.glob) == (size_t) (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn);
 
     fclaw2d_global_destroy(glob);
 }

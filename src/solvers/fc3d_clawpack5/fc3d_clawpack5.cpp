@@ -59,7 +59,7 @@ void fc3d_clawpack5_set_vtable(const fc3d_clawpack5_vtable_t user_vt)
 void fc3d_clawpack5_set_vtable_defaults()
 {
     fclaw2d_vtable_t*               fclaw_vt = fclaw2d_vt(glob);
-    fclaw2d_patch_vtable_t*         patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t*         patch_vt = fclaw2d_patch_vt(glob);
     fclaw_clawpatch3_vtable_t*  clawpatch_vt = fclaw_clawpatch3_vt();
     fc3d_clawpack5_vtable_t*        claw5_vt = fc3d_clawpack5_vt();
 

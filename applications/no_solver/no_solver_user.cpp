@@ -38,7 +38,7 @@ void no_solver_output(fclaw2d_global_t* glob,int iframe);
 
 void no_solver_link_solvers(fclaw2d_global_t* global)
 {
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     fclaw2d_vtable_t* vt = fclaw2d_vt(glob);
 
     patch_vt->single_step_update   = &no_solver_update;

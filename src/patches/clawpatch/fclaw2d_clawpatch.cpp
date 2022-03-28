@@ -134,9 +134,10 @@ double* q_time_sync(fclaw2d_patch_t* patch, int time_interp)
 
 
 static 
-double* clawpatch_get_area(fclaw2d_patch_t* patch)
+double* clawpatch_get_area(struct fclaw2d_global* glob,
+	                       fclaw2d_patch_t* patch)
 {
-	return fclaw2d_metric_patch_get_area(patch);
+	return fclaw2d_metric_patch_get_area(glob, patch);
 }
 
 
@@ -519,8 +520,8 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
 	double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
 	/* These will be empty for non-manifolds cases */
-	double *areacoarse = clawpatch_get_area(coarse_patch);
-	double *areafine = clawpatch_get_area(fine_patch);
+	double *areacoarse = clawpatch_get_area(glob, coarse_patch);
+	double *areafine = clawpatch_get_area(glob, fine_patch);
 
 	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 	int mx = clawpatch_opt->mx;
@@ -640,8 +641,8 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
 	double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
 	/* These will be empty for non-manifolds cases */
-	double *areacoarse = clawpatch_get_area(coarse_patch);
-	double *areafine = clawpatch_get_area(fine_patch);
+	double *areacoarse = clawpatch_get_area(glob, coarse_patch);
+	double *areafine = clawpatch_get_area(glob, fine_patch);
 
 	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 	int mx = clawpatch_opt->mx;
@@ -841,7 +842,7 @@ void clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 	int mbc = clawpatch_opt->mbc;
 	int meqn = clawpatch_opt->meqn;
 
-	double *areacoarse = clawpatch_get_area(coarse_patch);
+	double *areacoarse = clawpatch_get_area(glob, coarse_patch);
 	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
 	/* Loop over four siblings (z-ordering) */
@@ -853,7 +854,7 @@ void clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 		const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 		double *areafine = NULL;
 		if (fclaw_opt->manifold)
-			areafine = clawpatch_get_area(fine_patch);
+			areafine = clawpatch_get_area(glob, fine_patch);
 
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
@@ -884,7 +885,7 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 	int mbc = clawpatch_opt->mbc;
 	int meqn = clawpatch_opt->meqn;
 
-	double *areacoarse = clawpatch_get_area(coarse_patch);
+	double *areacoarse = clawpatch_get_area(glob, coarse_patch);
 	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
 	for(int igrid = 0; igrid < FCLAW2D_NUMSIBLINGS; igrid++)
@@ -895,7 +896,7 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 		const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 		double *areafine = NULL;
 		if (fclaw_opt->manifold)
-			areafine = clawpatch_get_area(fine_patch);
+			areafine = clawpatch_get_area(glob, fine_patch);
 
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2	
@@ -1027,7 +1028,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 	double *qthis;
 	fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
-	double *area = clawpatch_get_area(patch);	
+	double *area = clawpatch_get_area(glob, patch);	
 	double *qpack = (double*) unpack_from_here;
 #if PATCH_DIM == 2
 	clawpatch_vt->fort_local_ghost_pack(&mx,&my,&mbc,&meqn,&mint,qthis,area,
@@ -1201,8 +1202,8 @@ fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
 void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob, 
                                          int claw_version)
 {
-	fclaw2d_patch_vtable_initialize();
-	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+	fclaw2d_patch_vtable_initialize(glob);
+	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 
 	fclaw2d_metric_vtable_initialize();
 
@@ -1616,7 +1617,7 @@ double* fclaw2d_clawpatch_get_q_timesync(fclaw2d_global_t* glob,
 double* fclaw2d_clawpatch_get_area(fclaw2d_global_t* glob,
 								   fclaw2d_patch_t* patch)
 {
-	return clawpatch_get_area(patch);
+	return clawpatch_get_area(glob, patch);
 }
 
 void fclaw2d_clawpatch_metric_scalar(fclaw2d_global_t* glob,

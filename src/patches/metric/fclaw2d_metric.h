@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /**
  * @file 
- * Patch subroutines for patch-related metric terms
+ * @brief Patch subroutines for patch-related metric terms
  */
 
 
@@ -274,10 +274,12 @@ void fclaw2d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
 /**
  * @brief Get the area for each cell of the patch
  * 
+ * @param global the global context
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw2d_metric_patch_get_area(struct fclaw2d_patch* this_patch);
+double* fclaw2d_metric_patch_get_area(struct fclaw2d_global* glob,
+	                                  struct fclaw2d_patch* this_patch);
 
 
 /* ---------------------------- Metric default (virtualized) -------------------------- */

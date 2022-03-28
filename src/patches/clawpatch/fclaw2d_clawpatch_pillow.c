@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -190,9 +190,9 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
 
-void fclaw2d_clawpatch_use_pillowsphere()
+void fclaw2d_clawpatch_use_pillowsphere(fclaw2d_global_t* glob)
 {
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
 
     patch_vt->copy_block_corner          = pillow_copy_block_corner;
     patch_vt->average_block_corner       = pillow_average_block_corner;

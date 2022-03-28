@@ -320,7 +320,7 @@ void phasefield_link_solvers(fclaw2d_global_t *glob)
     /* These are listed here for reference */
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #endif
     /* ForestClaw vtable */
@@ -328,7 +328,7 @@ void phasefield_link_solvers(fclaw2d_global_t *glob)
     fclaw_vt->problem_setup = &phasefield_problem_setup;  
 
     /* Patch : RHS function */
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->physical_bc = phasefield_bc2;   /* Doesn't do anything */
     patch_vt->rhs = phasefield_rhs;          /* Overwrites default */
     patch_vt->initialize = phasefield_initialize;   /* Get an initial refinement */

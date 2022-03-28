@@ -47,7 +47,7 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
 	fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
-    fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
+    fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt(glob);  
 
 
 	vt->problem_setup = &swirl_problem_setup;  /* Version-independent */

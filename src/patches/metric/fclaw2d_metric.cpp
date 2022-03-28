@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,9 +33,10 @@ static fclaw2d_metric_vtable_t s_metric_vt;
 
 
 static
-fclaw2d_metric_patch_t* get_metric_patch(fclaw2d_patch_t *this_patch)
+fclaw2d_metric_patch_t* get_metric_patch(fclaw2d_global_t* glob,
+                                         fclaw2d_patch_t *this_patch)
 {
-    return (fclaw2d_metric_patch_t*) fclaw2d_patch_metric_patch(this_patch);
+    return (fclaw2d_metric_patch_t*) fclaw2d_patch_metric_patch(glob, this_patch);
 }
 
 
@@ -64,7 +65,7 @@ void fclaw2d_metric_patch_define(fclaw2d_global_t* glob,
                                  int blockno, int patchno,
                                  fclaw2d_build_mode_t build_mode)
 {
-    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    fclaw2d_metric_patch_t* mp = get_metric_patch(glob, this_patch);
 
     mp->mx   = mx;
     mp->my   = my;
@@ -176,11 +177,11 @@ void metric_average_area_from_fine(fclaw2d_global_t *glob,
     fclaw2d_metric_patch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                    &xlower,&ylower,&dx,&dy);
 
-    areacoarse = fclaw2d_metric_patch_get_area(coarse_patch);
+    areacoarse = fclaw2d_metric_patch_get_area(glob, coarse_patch);
 
     for(igrid = 0; igrid < 4; igrid++)
     {
-        areafine = fclaw2d_metric_patch_get_area(&fine_patches[igrid]);
+        areafine = fclaw2d_metric_patch_get_area(glob, &fine_patches[igrid]);
 
         FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
@@ -274,15 +275,17 @@ void fclaw2d_metric_vtable_initialize()
 /* These functions are not virtualized and are not defined by the 
    patch interface */
 
-fclaw2d_metric_patch_t* fclaw2d_metric_get_metric_patch(fclaw2d_patch_t* this_patch)
+fclaw2d_metric_patch_t* fclaw2d_metric_get_metric_patch(fclaw2d_global_t* glob,
+                                                        fclaw2d_patch_t* this_patch)
 
 {
-    return get_metric_patch(this_patch);
+    return get_metric_patch(glob, this_patch);
 }
 
-double* fclaw2d_metric_patch_get_area(fclaw2d_patch_t* this_patch)
+double* fclaw2d_metric_patch_get_area(fclaw2d_global_t* glob,
+                                      fclaw2d_patch_t* this_patch)
 {
-    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    fclaw2d_metric_patch_t* mp = get_metric_patch(glob, this_patch);
     return mp->area.dataPtr();
 }
 
@@ -293,7 +296,7 @@ void fclaw2d_metric_patch_scalar(fclaw2d_global_t* glob,
                                  double **area, double** edgelengths,
                                  double **curvature)
 {
-    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    fclaw2d_metric_patch_t* mp = get_metric_patch(glob, this_patch);
     *area = mp->area.dataPtr();
     *edgelengths =  mp->edge_lengths.dataPtr();
     *curvature = mp->curvature.dataPtr();
@@ -306,7 +309,7 @@ void fclaw2d_metric_patch_vector(struct fclaw2d_global* glob,
                                  double **xtangents, double **ytangents,
                                  double **surfnormals)
 {
-    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    fclaw2d_metric_patch_t* mp = get_metric_patch(glob, this_patch);
     *xnormals = mp->xface_normals.dataPtr();
     *ynormals = mp->yface_normals.dataPtr();
     *xtangents = mp->xface_tangents.dataPtr();
@@ -321,7 +324,7 @@ void fclaw2d_metric_patch_grid_data(fclaw2d_global_t* glob,
                                     double* xlower, double* ylower,
                                     double* dx, double* dy)
 {
-    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    fclaw2d_metric_patch_t* mp = get_metric_patch(glob, this_patch);
     *mx     = mp->mx;
     *my     = mp->my;
     *mbc    = mp->mbc;
@@ -338,7 +341,7 @@ void fclaw2d_metric_patch_mesh_data(fclaw2d_global_t* glob,
                                     double **xd, double **yd, double **zd,
                                     double **area)
 {
-    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    fclaw2d_metric_patch_t* mp = get_metric_patch(glob, this_patch);
     *xp = mp->xp.dataPtr();
     *yp = mp->yp.dataPtr();
     *zp = mp->zp.dataPtr();
@@ -355,7 +358,7 @@ void fclaw2d_metric_patch_mesh_data2(fclaw2d_global_t* glob,
                                      double **surfnormals,
                                      double **edgelengths, double **curvature)
 {
-    fclaw2d_metric_patch_t* mp = get_metric_patch(this_patch);
+    fclaw2d_metric_patch_t* mp = get_metric_patch(glob, this_patch);
     *xnormals    = mp->xface_normals.dataPtr();
     *ynormals    = mp->yface_normals.dataPtr();
     *xtangents   = mp->xface_tangents.dataPtr();

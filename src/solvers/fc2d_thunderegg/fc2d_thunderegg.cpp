@@ -169,7 +169,7 @@ void fc2d_thunderegg_solver_initialize(fclaw2d_global_t* glob)
 	fclaw_vt->output_frame      = thunderegg_output;
 
 	/* These could be over-written by user specific settings */
-	fclaw2d_patch_vtable_t*   patch_vt = fclaw2d_patch_vt();  
+	fclaw2d_patch_vtable_t*   patch_vt = fclaw2d_patch_vt(glob);  
 	patch_vt->rhs            = thunderegg_rhs;  /* Calls FORTRAN routine */
 	patch_vt->setup          = NULL;
     

@@ -149,7 +149,7 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
     vt->problem_setup = &annulus_problem_setup;
 
     /* Patch virtual functions */
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &annulus_patch_setup;
 
     /* Clawpatch virtual table */
