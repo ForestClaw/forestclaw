@@ -342,7 +342,7 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
 void poisson_link_solvers(fclaw2d_global_t *glob)
 {
     /* ForestClaw vtable */
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = &poisson_problem_setup;  
 
     /* Patch : RHS function */

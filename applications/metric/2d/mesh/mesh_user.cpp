@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ void mesh_link_solvers(fclaw2d_global_t *glob)
 {
     const user_options_t* user = mesh_user_get_options(glob);
 
-    fclaw2d_vt()->problem_setup = &mesh_problem_setup;  /* Version-independent */
+    fclaw2d_vt(glob)->problem_setup = &mesh_problem_setup;  /* Version-independent */
 
     if (user->claw_version == 4)
     {

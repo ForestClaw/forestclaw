@@ -256,7 +256,7 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
 void sphere_link_solvers(fclaw2d_global_t *glob)
 {
     /* ForestClaw core functions */
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &sphere_problem_setup;  /* Version-independent */
 
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();

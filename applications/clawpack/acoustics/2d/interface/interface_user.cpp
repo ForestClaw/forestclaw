@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ void interface_problem_setup(fclaw2d_global_t* glob)
 
 void interface_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
 
     vt->problem_setup = &interface_problem_setup;  /* Version-independent */
 

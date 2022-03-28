@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -74,9 +74,19 @@ typedef struct fclaw2d_vtable
 } fclaw2d_vtable_t;
 
 
-fclaw2d_vtable_t* fclaw2d_vt();
+/**
+ * @brief get the fclaw2d vtable
+ * 
+ * @param glob the global context
+ */
+fclaw2d_vtable_t* fclaw2d_vt(struct fclaw2d_global* glob);
 
-void fclaw2d_vtable_initialize();
+/**
+ * @brief Initialize fclaw2d vtable
+ * 
+ * @param glob the global context
+ */
+void fclaw2d_vtable_initialize(struct fclaw2d_global* glob);
 
 
 #ifdef __cplusplus

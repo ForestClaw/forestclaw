@@ -81,7 +81,7 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
 
     // fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = &shockbubble_problem_setup;
 
     //fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();

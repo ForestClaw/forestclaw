@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ fclaw2d_vtable_t* vt_init()
 }
 
 
-fclaw2d_vtable_t* fclaw2d_vt()
+fclaw2d_vtable_t* fclaw2d_vt(fclaw2d_global_t *glob)
 {
     FCLAW_ASSERT(s_vt.is_set != 0);
     return &s_vt;
@@ -48,7 +48,7 @@ fclaw2d_vtable_t* fclaw2d_vt()
 
 void fclaw2d_after_init(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     if (fclaw_vt->after_init != NULL)
     {
         fclaw_vt->after_init(glob);
@@ -57,7 +57,7 @@ void fclaw2d_after_init(fclaw2d_global_t *glob)
 
 void fclaw2d_after_regrid(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     if (fclaw_vt->after_regrid != NULL)
     {
         fclaw_vt->after_regrid(glob);
@@ -65,7 +65,7 @@ void fclaw2d_after_regrid(fclaw2d_global_t *glob)
 }
 
 /* Initialize any settings that can be set here */
-void fclaw2d_vtable_initialize()
+void fclaw2d_vtable_initialize(fclaw2d_global_t *glob)
 {
 
     fclaw2d_vtable_t *vt = vt_init();

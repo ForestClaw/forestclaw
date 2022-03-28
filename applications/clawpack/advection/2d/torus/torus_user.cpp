@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,7 @@ void torus_patch_setup(fclaw2d_global_t *glob,
 
 void torus_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */
 
     /* Torus uses special patch setup (not advection_patch_setup), since the

@@ -115,7 +115,7 @@ void cb_periodic_output_ascii (fclaw2d_domain_t * domain,
 
 void periodic_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
 
 
     vt->problem_setup = &periodic_problem_setup;  /* Version-independent */

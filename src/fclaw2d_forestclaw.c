@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_initialize();
+    fclaw2d_vtable_initialize(glob);
     fclaw2d_patch_vtable_initialize();
     fclaw2d_diagnostics_vtable_initialize();
     fclaw2d_elliptic_vtable_initialize();
@@ -45,7 +45,7 @@ void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
 
 void fclaw2d_problem_setup(fclaw2d_global_t *glob)
 {
-	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
 	
     /* User defined problem setup */
     if (fclaw_vt->problem_setup != NULL)

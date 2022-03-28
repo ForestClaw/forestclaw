@@ -167,7 +167,7 @@ void cb_torus_output_ascii (fclaw2d_domain_t * domain,
 void torus_link_solvers(fclaw2d_global_t *glob)
 {
 
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */
 
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();

@@ -403,7 +403,7 @@ void fc2d_cudaclaw_solver_initialize(fclaw2d_global_t* glob)
     int claw_version = 4;
     fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
-    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt(glob);
     fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
 
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = cudaclaw_vt_init();

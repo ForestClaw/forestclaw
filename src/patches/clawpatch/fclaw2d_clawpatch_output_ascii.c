@@ -132,7 +132,7 @@ void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
     /*--------------------------------------------------------------------
     Public interface
     Use this function as follows : 
-           fclaw2d_vtable_t *vt = fclaw2d_vt();
+           fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
            vt->output_frame = &fclaw2d_clawpatch_output_ascii;
     -------------------------------------------------------------------- */
 

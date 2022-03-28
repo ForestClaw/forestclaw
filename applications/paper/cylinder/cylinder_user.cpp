@@ -265,7 +265,7 @@ void cylinder_compute_tensors(fclaw2d_global_t *glob,
 void cylinder_link_solvers(fclaw2d_global_t *glob)
 {
 
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &cylinder_problem_setup;  /* Version-independent */
 
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();

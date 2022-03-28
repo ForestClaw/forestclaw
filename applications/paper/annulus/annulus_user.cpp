@@ -145,7 +145,7 @@ void annulus_b4step2(fclaw2d_global_t *glob,
 void annulus_link_solvers(fclaw2d_global_t *glob)
 {
     /* ForestClaw virtual functions */
-    fclaw2d_vtable_t  *vt = fclaw2d_vt();
+    fclaw2d_vtable_t  *vt = fclaw2d_vt(glob);
     vt->problem_setup = &annulus_problem_setup;
 
     /* Patch virtual functions */

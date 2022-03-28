@@ -384,11 +384,11 @@ void heat_link_solvers(fclaw2d_global_t *glob)
 #if 0 
     /* These are listed here for reference */
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
 #endif
     /* ForestClaw vtable */
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = &heat_problem_setup;  
 
     /* Patch : RHS function */
