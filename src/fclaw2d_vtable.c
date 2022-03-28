@@ -46,15 +46,6 @@ fclaw2d_vtable_t* fclaw2d_vt(fclaw2d_global_t *glob)
 }
 
 
-void fclaw2d_after_init(fclaw2d_global_t *glob)
-{
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    if (fclaw_vt->after_init != NULL)
-    {
-        fclaw_vt->after_init(glob);
-    }
-}
-
 void fclaw2d_after_regrid(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
@@ -77,8 +68,6 @@ void fclaw2d_vtable_initialize(fclaw2d_global_t *glob)
     /* These may be redefined by the user */
     /* Problem setup */
     vt->problem_setup              = NULL;
-
-    vt->after_init                 = NULL;
 
     /* Defaults for regridding */
     vt->after_regrid               = NULL;
