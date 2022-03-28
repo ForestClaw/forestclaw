@@ -76,7 +76,7 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
 
     double *qcorner = fclaw2d_clawpatch_get_q(glob,corner_patch);
 
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
+    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt(glob);
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 #if PATCH_DIM == 2
@@ -121,7 +121,7 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
     double *areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
     double *areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
 
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
+    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt(glob);
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 #if PATCH_DIM == 2
@@ -164,7 +164,7 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
 
     double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt();
+    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt(glob);
     int refratio = 2;
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -210,7 +210,8 @@ fclaw2d_clawpatch_pillow_vtable_t* pillow_vt_init()
     return &s_clawpatch_pillow_vt;
 }
 
-void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
+void fclaw2d_clawpatch_pillow_vtable_initialize(fclaw2d_global_t* glob,
+                                                int claw_version)
 {
     fclaw2d_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_init();
 
@@ -242,7 +243,7 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version)
 
 /* ------------------------------- Public access functions ---------------------------- */
 
-fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt()
+fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt(fclaw2d_global_t* glob)
 {
     FCLAW_ASSERT(s_clawpatch_pillow_vt.is_set != 0);
     return &s_clawpatch_pillow_vt;

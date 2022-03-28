@@ -1393,7 +1393,7 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_diagnostics_vtable_initialize();
 
 	/* Set the virtual table, even if it isn't used */
-	fclaw2d_clawpatch_pillow_vtable_initialize(claw_version);
+	fclaw2d_clawpatch_pillow_vtable_initialize(glob, claw_version);
 
 	clawpatch_vt->is_set = 1;
 }
