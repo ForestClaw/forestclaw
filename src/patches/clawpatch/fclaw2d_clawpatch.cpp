@@ -1205,7 +1205,7 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 	fclaw2d_patch_vtable_initialize(glob);
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 
-	fclaw2d_metric_vtable_initialize();
+	fclaw2d_metric_vtable_initialize(glob);
 
 	fclaw2d_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_init();
 

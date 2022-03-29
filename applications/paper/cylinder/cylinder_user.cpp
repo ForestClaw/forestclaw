@@ -206,7 +206,7 @@ void cylinder_compute_tensors(fclaw2d_global_t *glob,
                               int blockno,
                               int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -282,7 +282,7 @@ void cylinder_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_tag4coarsening = &CYLINDER_TAG4COARSENING;
 
 
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     /* Area and edge lengths can be computed analytically  */
     metric_vt->compute_area          = cylinder_compute_area;
     // metric_vt->compute_area_ghost    = fclaw2d_metric_compute_area_ghost_default;

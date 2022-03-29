@@ -36,7 +36,7 @@ void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
                                          int blockno,
                                          int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     FCLAW_ASSERT(metric_vt->fort_compute_mesh);
 
     int mx,my,mbc;
@@ -62,7 +62,7 @@ void fclaw2d_metric_compute_tensors_default(fclaw2d_global_t *glob,
                                             int blockno,
                                             int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;

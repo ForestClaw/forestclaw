@@ -339,14 +339,6 @@ void fclaw2d_metric_compute_tensors_default(struct fclaw2d_global *glob,
 /* ------------------------------------ Virtual table --------------------------------- */
 
 /**
- * @brief Get the global vtable variable
- * 
- * @return fclaw2d_metric_vtable_t* the vtable
- */
-fclaw2d_metric_vtable_t* fclaw2d_metric_vt();
-
-
-/**
  * @brief vtable for metric terms
  */
 struct fclaw2d_metric_vtable
@@ -376,9 +368,16 @@ struct fclaw2d_metric_vtable
 };
 
 /**
+ * @brief Get the global vtable variable
+ * 
+ * @return fclaw2d_metric_vtable_t* the vtable
+ */
+fclaw2d_metric_vtable_t* fclaw2d_metric_vt(struct fclaw2d_global* glob);
+
+/**
  * @brief Initializes a global vtable variable
  */
-void fclaw2d_metric_vtable_initialize();
+void fclaw2d_metric_vtable_initialize(struct fclaw2d_global* glob);
 
 
 #ifdef __cplusplus

@@ -167,7 +167,7 @@ void metric_average_area_from_fine(fclaw2d_global_t *glob,
                                    int fine0_patchno)
 
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     int mx,my, mbc;
     double xlower,ylower,dx,dy;
 
@@ -195,7 +195,7 @@ void fclaw2d_metric_patch_compute_area (fclaw2d_global_t *glob,
                                        fclaw2d_patch_t* this_patch,
                                        int blockno, int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     FCLAW_ASSERT(metric_vt->compute_area);
 
     metric_vt->compute_area(glob,this_patch,blockno,patchno);
@@ -207,7 +207,7 @@ void fclaw2d_metric_patch_setup(fclaw2d_global_t* glob,
                                 int blockno,
                                 int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
 
     /* Setup the mesh and normals */
     metric_vt->compute_mesh   (glob,this_patch,blockno,patchno);
@@ -223,7 +223,7 @@ void fclaw2d_metric_patch_setup_from_fine(fclaw2d_global_t *glob,
                                           int coarse_patchno,
                                           int fine0_patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
 
     metric_average_area_from_fine(glob,fine_patches,coarse_patch,
                                   blockno, coarse_patchno, 
@@ -244,14 +244,14 @@ fclaw2d_metric_vtable_t* metric_vt_init()
     return &s_metric_vt;
 }
 
-fclaw2d_metric_vtable_t* fclaw2d_metric_vt()
+fclaw2d_metric_vtable_t* fclaw2d_metric_vt(fclaw2d_global_t* glob)
 {
     FCLAW_ASSERT(s_metric_vt.is_set != 0);
     return &s_metric_vt;
 }
 
 
-void fclaw2d_metric_vtable_initialize()  
+void fclaw2d_metric_vtable_initialize(fclaw2d_global_t* glob)  
 {
     fclaw2d_metric_vtable_t *metric_vt = metric_vt_init();
 
