@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -391,13 +391,13 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt_init()
     return &s_gauges_vt;
 }
 
-fclaw_gauges_vtable_t* fclaw_gauges_vt()
+fclaw_gauges_vtable_t* fclaw_gauges_vt(fclaw2d_global_t* glob)
 {
     FCLAW_ASSERT(s_gauges_vt.is_set != 0);
     return &s_gauges_vt;
 }
 
-void fclaw_gauges_vtable_initialize()
+void fclaw_gauges_vtable_initialize(fclaw2d_global_t* glob)
 {
     fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt();
 
@@ -415,7 +415,7 @@ void fclaw_set_gauge_data(fclaw2d_global_t* glob,
                           fclaw_gauge_t **gauges, 
                           int *num_gauges)
 {
-    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
     if (gauge_vt->set_gauge_data == NULL)
     {
         *gauges = NULL;
@@ -431,7 +431,7 @@ void fclaw_create_gauge_files(fclaw2d_global_t* glob,
                               fclaw_gauge_t *gauges, 
                               int num_gauges)
 {
-    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
     FCLAW_ASSERT(gauge_vt->create_gauge_files != NULL);
     gauge_vt->create_gauge_files(glob, gauges, num_gauges);    
 
@@ -443,7 +443,7 @@ void fclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob,
                                       fclaw_gauge_t *g,
                                       double *xc, double *yc)
 {
-    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
     FCLAW_ASSERT(gauge_vt->normalize_coordinates != NULL);
     gauge_vt->normalize_coordinates(glob, block,blockno,g,xc,yc);    
 }
@@ -455,7 +455,7 @@ void  fclaw_update_gauge(fclaw2d_global_t* glob,
                          int blockno, int patchno,
                          double tcurr, fclaw_gauge_t *g)
 {
-    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
     FCLAW_ASSERT(gauge_vt->update_gauge != NULL);
 
     gauge_vt->update_gauge(glob,block,patch,blockno,patchno,tcurr,g);
@@ -463,7 +463,7 @@ void  fclaw_update_gauge(fclaw2d_global_t* glob,
 
 void fclaw_print_gauge_buffer(fclaw2d_global_t* glob, fclaw_gauge_t *g)
 {
-    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt();
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
     FCLAW_ASSERT(gauge_vt->print_gauge_buffer != NULL);
 
     gauge_vt->print_gauge_buffer(glob,g);
