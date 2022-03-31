@@ -1080,4 +1080,24 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     sc_array_destroy (points);
 }
 
+
+void
+fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
+                               fclaw2d_integrate_ray_t * intersect,
+                               sc_array_t * integrals)
+{
+    /* assert validity of parameters */
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (intersect != NULL);
+    FCLAW_ASSERT (integrals != NULL);
+    FCLAW_ASSERT (integrals->elem_size == sizeof (double));
+
+    /* set integral values to zero */
+
+
+
+
+     /* allgather integral values in parallel */
+}
+
 #endif /* !P4_TO_P8 */

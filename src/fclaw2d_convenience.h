@@ -181,6 +181,52 @@ void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                                    sc_array_t * coordinates,
                                    sc_array_t * results);
 
+/** Document please.
+ */
+typedef struct fclaw2d_ray_integral
+{
+  int             ray_no;       /**< Document. */
+  int             user_no;
+  double          integral;
+}
+fclaw2d_ray_integral_t;
+
+/** Document please.
+ * \param [in] patchno          When on a leaf, this is a valid patch number.
+ *                              in this case, this callback must add the
+ *                              contribution by this patch and ray to the
+ *                              integral value.
+ *                              Otherwise, patchno is -1.  In this case, the
+ *                              integral value must not be updated.
+ * \return                      Return 1 if there is a possible intersection
+ *                              of the patch with the ray.  This may be
+ *                              a false positive, we'll be fine.
+ *                              Return 0 if there is definitely no intersection.
+ *                              Only for leaves, this function must compute
+ *                              the exact integral contribution for this
+ *                              quadrant by intersecting this ray
+ *                              and add it to ray->integral.
+ *                              This may well be 0. if the intersection
+ *                              is, in fact, none (a false positive).
+ */
+typedef int (*fclaw2d_integrate_ray_t) (fclaw2d_domain_t * domain,
+                                        fclaw2d_patch_t * patch,
+                                        int blockno, int patchno,
+                                        fclaw2d_ray_integral_t * ray);
+
+/**
+ * \param [in,out] integrals    Array of one \ref fclaw2d_ray_integral_t per
+ *                              ray, whose int fields are up to the caller to
+ *                              define.  This function does touch these fields.
+ *                              The input values of the integrals are ignored.
+ *                              The number of entries is the number of rays.
+ *                              This must be ensured by the caller on input.
+ *                              On output, we provide final integral values.
+ */
+void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
+                                    fclaw2d_integrate_ray_t * intersect,
+                                    sc_array_t * integrals);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
