@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
-                                user_options_t* user_opt)
+                                user_options_t* user_opt,
+                                fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -44,7 +45,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
-    switch (user_opt->example) {
+    switch (user_opt->example) 
+    {
     case 0:
         /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
         conn = p4est_connectivity_new_unitsquare();
@@ -52,6 +54,13 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                           rotate);
         break;
     case 1:
+        /* First check that the grid has the right dimensions.  A bit late to be checking options, 
+        but this is awkward to do in the options post-processing step */
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
+            exit(0);
+        }
         /* Map five-patch square to pillow disk. */
         conn = p4est_connectivity_new_disk (0, 0);
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,
@@ -145,7 +154,7 @@ main (int argc, char **argv)
     {
         /* Options have been checked and are valid */
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
+        domain = create_domain(mpicomm, fclaw_opt, user_opt,clawpatch_opt);
     
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();
