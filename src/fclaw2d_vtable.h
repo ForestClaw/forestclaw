@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
 #endif
 
 struct fclaw2d_global;
@@ -41,6 +38,8 @@ struct fclaw2d_patch;
 void fclaw2d_after_regrid(struct fclaw2d_global *glob);
 
 void fclaw2d_after_init(struct fclaw2d_global *glob);
+
+void fclaw_fpe_handling(struct fclaw2d_global *glob);
 
 
 /* ---------------------------------- Typedefs ---------------------------------------- */  
@@ -54,19 +53,26 @@ typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
 
 typedef void (*fclaw2d_after_initialization_t)(struct fclaw2d_global *glob);
 
+typedef void (*fclaw_fpe_handling_t)(struct fclaw2d_global *glob);
+
+typedef void (*fclaw_fpe_signal_handler_t)(int sig);
+
 /* ------------------------------------ vtable ---------------------------------------- */  
 typedef struct fclaw2d_vtable
 {
 
-	fclaw2d_vtable_initialize_t          vtable_init;
-	fclaw2d_problem_setup_t              problem_setup;
-	fclaw2d_after_initialization_t       after_init;
+	fclaw2d_vtable_initialize_t      vtable_init;
+	fclaw2d_problem_setup_t          problem_setup;
+	fclaw2d_after_initialization_t   after_init;
 
 	/* regridding functions */
-	fclaw2d_after_regrid_t               after_regrid;
+	fclaw2d_after_regrid_t           after_regrid;
 
 	/* Output functions */
-	fclaw2d_output_frame_t               output_frame;
+	fclaw2d_output_frame_t           output_frame;
+
+    fclaw_fpe_handling_t             fpe_enable;
+    fclaw_fpe_signal_handler_t       fpe_signal_handler;
 
 	int is_set;
 
@@ -80,9 +86,6 @@ void fclaw2d_vtable_initialize();
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
