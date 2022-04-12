@@ -26,6 +26,12 @@
 #include "swirl_user.h"
 
 #include <fc2d_cuda_profiler.h>
+#include <fc2d_clawpack46.h>  
+#include <fc2d_clawpack46_options.h>
+#include <fc2d_clawpack46_fort.h>  
+#include <clawpack46_user_fort.h>  
+#include <fclaw2d_clawpatch46_fort.h>
+#include "../../../../clawpack/advection/2d/all/advection_user_fort.h"
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
@@ -52,42 +58,55 @@ void run_program(fclaw2d_global_t* glob)
 	/* ---------------------------------------------------------------
 	   Set domain data.
 	   --------------------------------------------------------------- */
-	fclaw2d_domain_data_new(glob->domain);
+	   fclaw2d_domain_data_new(glob->domain);
 
 	//const user_options_t *user_opt = swirl_get_options(glob);
 
 	/* Initialize virtual table for ForestClaw */
 	fclaw2d_vtables_initialize(glob);
+	
+	const user_options_t* user = swirl_get_options(glob);
+	
+	if (user->cuda != 0){
+		fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
 
-	fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
+		fc2d_cudaclaw_initialize_GPUs(glob);
 
-	fc2d_cudaclaw_initialize_GPUs(glob);
-
-   /* this has to be done after GPUs have been initialized */
-	cudaclaw_set_method_parameters(clawopt->order, 
-	                               clawopt->mthlim, clawopt->mwaves, 
-	                               clawopt->use_fwaves);
-	fc2d_cudaclaw_solver_initialize();
-
+	/* this has to be done after GPUs have been initialized */
+		cudaclaw_set_method_parameters(clawopt->order, 
+									clawopt->mthlim, clawopt->mwaves, 
+									clawopt->use_fwaves);
+		fc2d_cudaclaw_solver_initialize();
+	}
+	else
+	{
+		fc2d_clawpack46_solver_initialize();
+	}
+	
 	swirl_link_solvers(glob);
 
 	/* ---------------------------------------------------------------
 	   Run
 	   --------------------------------------------------------------- */
-	PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
-	fc2d_cudaclaw_allocate_buffers(glob);
+	if (user->cuda != 0){
+		PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
+	
+		fc2d_cudaclaw_allocate_buffers(glob);
+	}
 
 	fclaw2d_initialize(glob);
+
 	fclaw2d_run(glob);
 
-	PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
-	fc2d_cudaclaw_deallocate_buffers(glob);
+	if (user->cuda != 0){
+		PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
+		fc2d_cudaclaw_deallocate_buffers(glob);
+	}
 
 	fclaw2d_finalize(glob);
 }
 
-	int
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
 
 	PROFILE_CUDA_GROUP("Swirl : Main",1);
@@ -102,6 +121,7 @@ main (int argc, char **argv)
 	fclaw_options_t             *fclaw_opt;
 	fclaw2d_clawpatch_options_t *clawpatch_opt;
 	fc2d_cudaclaw_options_t    *cuclaw_opt;
+	fc2d_clawpack46_options_t *clawpack46_opt;
 
 	fclaw2d_global_t            *glob;
 	fclaw2d_domain_t            *domain;
@@ -115,6 +135,7 @@ main (int argc, char **argv)
 	/* Create new options packages */
 	fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
 	clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
+	clawpack46_opt =   fc2d_clawpack46_options_register(app,"fclaw_options.ini");
 	cuclaw_opt =        fc2d_cudaclaw_options_register(app,"fclaw_options.ini");
 	user_opt =                    swirl_options_register(app,"fclaw_options.ini");  
 
@@ -138,6 +159,7 @@ main (int argc, char **argv)
 		/* Store option packages in glob */
 		fclaw2d_options_store           (glob, fclaw_opt);
 		fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+		fc2d_clawpack46_options_store (glob, clawpack46_opt);
 		fc2d_cudaclaw_options_store    (glob, cuclaw_opt);
 		swirl_options_store             (glob, user_opt);
 
