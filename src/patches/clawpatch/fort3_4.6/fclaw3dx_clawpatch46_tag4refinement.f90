@@ -4,7 +4,7 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
     implicit none
 
     integer :: mx,my, mz, mbc, meqn, tag_patch, init_flag
-    integer :: blockno
+    integer :: glob, blockno
     double precision :: xlower, ylower, zlower, dx, dy, dz
     double precision :: tag_threshold
     double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
@@ -48,7 +48,7 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
                     end do
                 endif
                 exceeds_th = fclaw3dx_clawpatch_exceeds_threshold( & 
-                      blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc, & 
+                      glob,blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc, & 
                       tag_threshold,init_flag, is_ghost)
                 !! # -1 : Not conclusive (possibly ghost cell); don't tag for refinement
                 !! # 0  : Does not pass threshold (don't tag for refinement)      

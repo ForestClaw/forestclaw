@@ -232,7 +232,8 @@ typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx, const int* my,
 /** 
  * @deprecated Checks if solution exceeds a threshold
  */
-typedef int (*clawpatch_fort_exceeds_threshold_t)(const int *blockno,
+typedef int (*clawpatch_fort_exceeds_threshold_t)(int *glob,
+                                                  const int *blockno,
                                                   const double *qval, 
                                                   const double *qmin, 
                                                   const double *qmax,
@@ -470,6 +471,7 @@ int FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
 /**
  * @brief Check if the refinment threshold is exceeded
  *
+ * @param[in] glob the global context
  * @param[in] blockno the block number
  * @param[in] qval the 
  * @param[in] qmin the minimum q value
@@ -482,7 +484,8 @@ int FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
  * @param[in] is_ghost true if cell is a ghost cell
  * @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
  */
-int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
+int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* glob,
+                                        const int *blockno,
                                         const double *qval, 
                                         const double *qmin, 
                                         const double *qmax,
@@ -585,7 +588,8 @@ int FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
                                  USER_EXCEEDS_TH)
 
 /** @brief C declaration of user_exceeds_th() subroutine */
-int USER_EXCEEDS_TH(const int *blockno,
+int USER_EXCEEDS_TH(int * glob,
+                    const int *blockno,
                     const double *qval, 
                     const double* qmin, 
                     const double *qmax,

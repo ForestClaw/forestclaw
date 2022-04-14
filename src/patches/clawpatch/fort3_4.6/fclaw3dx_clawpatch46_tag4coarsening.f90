@@ -4,7 +4,7 @@ subroutine fclaw3dx_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, &
     implicit none
 
     integer :: mx,my, mz, mbc, meqn, tag_patch, initflag
-    integer :: blockno
+    integer :: glob, blockno
     double precision :: xlower(0:3), ylower(0:3), zlower, dx, dy, dz
     double precision :: coarsen_threshold
     double precision :: q0(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
@@ -54,7 +54,7 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
       coarsen_threshold,init_flag,tag_patch)
 
     implicit none
-    integer :: mx,my,mz,mbc,meqn,mq,tag_patch, init_flag, blockno
+    integer :: mx,my,mz,mbc,meqn,mq,tag_patch, init_flag, glob, blockno
     double precision :: coarsen_threshold
     double precision :: qmin,qmax, dx, dy, dz, xlower, ylower,zlower
     double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
@@ -87,7 +87,7 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
                     end do
                 endif
                 exceeds_th = fclaw3dx_clawpatch_exceeds_threshold( & 
-                    blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc,  &
+                    glob,blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc,  &
                     coarsen_threshold, init_flag, is_ghost)
             
                 !! # -1 : Not conclusive (possibly ghost cell) (do not tag for coarsening)
