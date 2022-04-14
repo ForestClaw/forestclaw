@@ -28,28 +28,28 @@ subroutine fclaw3dx_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, &
     qmin = q0(1,1,1,mq)
     qmax = q0(1,1,1,mq)
 
-    call fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+    call fclaw3dx_clawpatch46_test_refine3(glob,blockno,mx,my,mz,mbc,meqn, & 
            mq,q0,qmin,qmax, dx,dy,dz,xlower(0), ylower(0),zlower, &
            coarsen_threshold,initflag, tag_patch)
     if (tag_patch == 0) return
 
-    call fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+    call fclaw3dx_clawpatch46_test_refine3(glob,blockno,mx,my,mz,mbc,meqn, & 
            mq,q1,qmin,qmax,dx,dy,dz,xlower(1), ylower(1),  zlower, & 
            coarsen_threshold,initflag, tag_patch)
     if (tag_patch == 0) return
 
-    call fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+    call fclaw3dx_clawpatch46_test_refine3(glob,blockno,mx,my,mz,mbc,meqn, & 
            mq,q2,qmin,qmax,dx,dy,dz,xlower(2), ylower(2),zlower, &
            coarsen_threshold,initflag, tag_patch)
     if (tag_patch == 0) return
 
-    call fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, &
+    call fclaw3dx_clawpatch46_test_refine3(glob,blockno,mx,my,mz,mbc,meqn, &
            mq,q3,qmin,qmax,dx,dy,dz,xlower(3), ylower(3),zlower, &
            coarsen_threshold,initflag, tag_patch)
 
 end subroutine fclaw3dx_clawpatch46_fort_tag4coarsening
 
-subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, & 
+subroutine fclaw3dx_clawpatch46_test_refine3(glob,blockno,mx,my,mz,mbc, & 
       meqn,mq,q, qmin,qmax,dx,dy,dz,xlower,ylower,zlower, &
       coarsen_threshold,init_flag,tag_patch)
 
