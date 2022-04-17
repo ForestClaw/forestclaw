@@ -51,6 +51,11 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_nomap();
         break;
     case 1:
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
+            exit(0);
+        }
         conn = p4est_connectivity_new_disk (0, 0);
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,fclaw_opt->shift,
                                             rotate,user->alpha);
