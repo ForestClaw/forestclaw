@@ -25,17 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "radialdam_user.h"
 
-#include <fclaw2d_include_all.h>
-
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
-
-#include <fc2d_clawpack46_options.h>
-#include <fc2d_clawpack5_options.h>
-
-#include <fc2d_clawpack46.h>
-#include <fc2d_clawpack5.h>
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt,

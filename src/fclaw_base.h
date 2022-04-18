@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -484,6 +484,14 @@ void fclaw_app_options_register_core (fclaw_app_t * a,
  */
 fclaw_exit_type_t fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                                            const char *savefile);
+
+
+/** Print out use options
+ * \param [in] a         Initialized forestclaw application.
+ * \return               This pointer is returned unchanged.
+ */
+void fclaw_app_print_options(fclaw_app_t *app);
+
 
 /** Return the user pointer passed on \ref fclaw_app_new.
  * \param [in] a         Initialized forestclaw application.
