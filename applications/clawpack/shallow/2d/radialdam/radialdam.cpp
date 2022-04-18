@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -116,9 +116,11 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
+
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
     fclaw2d_finalize(glob);
+
 }
 
 
@@ -158,8 +160,11 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
+    radialdam_global_post_process(fclaw_opt, clawpatch_opt, user_opt);
+    fclaw_app_print_options(app);
+
     /* Run the program */
-    if (!retval & !vexit)
+    if (!retval & (vexit < 2))
     {
         /* Options have been checked and are valid */
 
