@@ -63,52 +63,8 @@ static fclaw_exit_type_t
 replicated_postprocess(user_options_t *user, fclaw_options_t *fclaw_opt)
 {
 
-    /* Check to make sure replicate factor is power of 2. 
-       We do it here, since options_check only happens after post-process. */
-    int pos = 0;    
-    while (user->replicate_factor != (1 << pos))
-    {
-        pos++;
-        if (pos > 32)
-        {
-            fclaw_global_essentialf("Replicated_postprocess : Replicate " \
-                                    "factor should be a low power of 2 (< 2**32)\n");
-            return FCLAW_EXIT_QUIET;
-        }
-    }
-
-    fclaw_opt->ax = 0;
-    fclaw_opt->ay = 0;
-    fclaw_opt->bx = user->replicate_factor;
-    fclaw_opt->by = user->replicate_factor;
-
-    fclaw_opt->minlevel = user->minlevel_base;
-    fclaw_opt->maxlevel = user->maxlevel_base;
-
-
-
-    if (user->example == 0)
-    {
-        /* 1x1 block;  use replicate factor to dimension domain */
-        fclaw_opt->mi = 1;
-        fclaw_opt->mj = 1;
-
-        /* We need to increase the refinement level when we increase domain size. 
-           Code below computes pos=log2(replicate_factor) */
-        fclaw_opt->minlevel += pos;
-        fclaw_opt->maxlevel += pos;
-    }
-    else
-    {
-        /* NxN block */
-        fclaw_opt->mi = user->replicate_factor;
-        fclaw_opt->mj = user->replicate_factor;
-    }
-
-    fclaw_opt->periodic_x = 1;
-    fclaw_opt->periodic_y = 1;
-    fclaw_opt->smooth_level = fclaw_opt->maxlevel-1;
-    return FCLAW_NOEXIT;
+    /* Do post-processing before printing out summary */
+    return FCLAW_EXIT_QUIET;
 }
 
 static void
@@ -205,5 +161,63 @@ const user_options_t* replicated_get_options(fclaw2d_global_t* glob)
 {
     int id = s_user_options_package_id;
     return (user_options_t*) fclaw_package_get_options(glob, id);    
+}
+
+void replicated_global_post_process(fclaw_options_t *fclaw_opt, 
+                                    fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                    user_options_t *user_opt)
+{
+    /* This routine will be called to do any more global  post-processing */
+    FCLAW_ASSERT(user_opt->replicate_factor >= 0);
+
+    fclaw_opt->ax = 0;
+    fclaw_opt->ay = 0;
+    fclaw_opt->bx = user_opt->replicate_factor;
+    fclaw_opt->by = user_opt->replicate_factor;
+
+    fclaw_opt->minlevel = user_opt->minlevel_base;
+    fclaw_opt->maxlevel = user_opt->maxlevel_base;
+
+    fclaw_opt->periodic_x = 1;
+    fclaw_opt->periodic_y = 1;
+    fclaw_opt->smooth_level = fclaw_opt->maxlevel;
+
+    switch (user_opt->example)
+    {
+        case 0:
+        {
+            /* In this case, we mimic the multiblock behavior in a single block */
+            /* Find p so that user_factor = 2**p.  Require p < 32 */
+            int p = 0;    
+            while (user_opt->replicate_factor != (1 << p))
+            {
+                p++;
+                if (p > 32)
+                {
+                    fclaw_global_essentialf("Replicated_postprocess : Replicate " \
+                                            "factor should be a low power of 2 (< 2**32)\n");
+                    return exit(1);
+                }
+            }
+
+            /* 1x1 block;  use replicate factor to dimension domain */
+            fclaw_opt->mi = 1;
+            fclaw_opt->mj = 1;
+
+            /* We need to increase the refinement level when we increase 
+               domain size.  */
+            fclaw_opt->minlevel += p;
+            fclaw_opt->maxlevel += p;
+        }
+        break;    
+    
+        default:
+        {
+            /* Multiblock case : NxN block */
+            fclaw_opt->mi = user_opt->replicate_factor;
+            fclaw_opt->mj = user_opt->replicate_factor;            
+        }
+        break;
+    }    
 }
 

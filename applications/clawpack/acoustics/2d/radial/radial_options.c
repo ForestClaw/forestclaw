@@ -64,6 +64,9 @@ radial_check (user_options_t *user)
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
+    /* Don't print output values yet.  Wait until we have done a global options
+       checking */
+    return FCLAW_EXIT_QUIET;
 }
 
 static void
@@ -173,4 +176,17 @@ user_options_t* radial_get_options(fclaw2d_global_t* glob)
     int id = s_user_options_package_id;
     return (user_options_t*) fclaw_package_get_options(glob, id);    
 }
+
+void radial_global_post_process(fclaw_options_t *fclaw_opt,
+                                fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                user_options_t *user_opt)
+{
+    if (user_opt->example == 1)
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
+            exit(0);
+        }
+}
+
 
