@@ -1133,9 +1133,8 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         patch->level = quadrant->level;
         patch->target_level = quadrant->level;
         patch->flags = p4est_quadrant_child_id (quadrant);
-        patch->flags |= (patch->flags ? 0 : FCLAW2D_PATCH_FIRST_SIBLING);
         fclaw2d_patch_set_boundary_xylower (patch, quadrant);
-        patch->u.blockno = which_tree;
+        patch->u.next = NULL;
         patch->user = NULL;
     }
 

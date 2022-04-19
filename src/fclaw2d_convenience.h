@@ -192,8 +192,10 @@ void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
  *                              domain.
  *                              Otherwise, this is an artificial patch
  *                              containing all standard patch information except
- *                              for the pointer to the next patch,
- *                              user-data of any kind and some flags.
+ *                              for the pointer to the next patch and user-data
+ *                              of any kind.
+ *                              Only the FCLAW2D_PATCH_CHILDID and the
+ *                              FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
  * \param [in] blockno          The block id under consideration.
  * \param [in] patchno          When on a leaf, this is a valid patch number.
  *                              in this case, this callback must add the
