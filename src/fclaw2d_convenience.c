@@ -1161,7 +1161,6 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
         &integrate_ray_data;
     p4est_t p4est;
     p4est_wrap_t *wrap;
-    void *user_save;
 
     /* assert validity of parameters */
     FCLAW_ASSERT (domain != NULL);
