@@ -1154,7 +1154,7 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     fclaw2d_ray_integral_t *rayint;
     fclaw2d_integrate_ray_data_t integrate_ray_data, *ird =
         &integrate_ray_data;
-    p4est_t *p4est;
+    p4est_t p4est;
     p4est_wrap_t *wrap;
     void *user_save;
 
@@ -1189,12 +1189,10 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     /* process-local integration through p4est */
     wrap = (p4est_wrap_t *) domain->pp;
     FCLAW_ASSERT (wrap != NULL);
-    p4est = wrap->p4est;
-    FCLAW_ASSERT (p4est != NULL);
-    user_save = p4est->user_pointer;
-    p4est->user_pointer = ird;
-    p4est_search_local (p4est, 0, NULL, integrate_ray_fn, ri);
-    p4est->user_pointer = user_save;
+    FCLAW_ASSERT (wrap->p4est != NULL);
+    p4est = *(wrap->p4est);
+    p4est.user_pointer = ird;
+    p4est_search_local (&p4est, 0, NULL, integrate_ray_fn, ri);
 
     /* allreduce local integral values in parallel */
     sc_MPI_Allreduce (lints->array, integrals->array, nintz,
