@@ -1102,7 +1102,6 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     fclaw2d_domain_t *domain;
     fclaw2d_patch_t *patch;
     int patchno;
-    p4est_qcoord_t qh;
 
     /* assert that the user_pointer contains a valid integrate_ray_data_t */
     fclaw2d_integrate_ray_data_t *ird
@@ -1134,16 +1133,10 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         patch->level = quadrant->level;
         patch->target_level = quadrant->level;
         patch->flags = p4est_quadrant_child_id (quadrant);
-        patch->flags += patch->flags ? 0 : 8;   /* set is-first-sibling-flag */
+        patch->flags |= (patch->flags ? 0 : FCLAW2D_PATCH_FIRST_SIBLING);
+        fclaw2d_patch_set_boundary_xylower (patch, quadrant);
         patch->u.blockno = which_tree;
         patch->user = NULL;
-
-        /* compute patch coordinates */
-        qh = P4EST_QUADRANT_LEN (quadrant->level);
-        patch->xlower = quadrant->x * fclaw2d_smallest_h;
-        patch->xupper = (quadrant->x + qh) * fclaw2d_smallest_h;
-        patch->ylower = quadrant->y * fclaw2d_smallest_h;
-        patch->yupper = (quadrant->y + qh) * fclaw2d_smallest_h;
     }
 
     return ird->integrate_ray (domain, patch, which_tree, patchno,
