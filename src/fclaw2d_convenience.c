@@ -1148,8 +1148,7 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
                                fclaw2d_integrate_ray_t intersect,
                                sc_array_t * rays, sc_array_t * integrals)
 {
-    int i;
-    int nints;
+    size_t i, nintz;
     sc_array_t lints[1];
     sc_array_t ri[1];
     fclaw2d_ray_integral_t *rayint;
@@ -1168,15 +1167,15 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (rays->elem_count == integrals->elem_count);
 
     /* create local storage for integral values */
-    nints = integrals->elem_count;
+    nintz = integrals->elem_count;
     sc_array_init (lints, sizeof (double));
-    sc_array_resize (lints, nints);
-    memset (lints->array, 0, sizeof (double) * nints);
+    sc_array_resize (lints, nintz);
+    memset (lints->array, 0, sizeof (double) * nintz);
 
     /* construct ray_integral_t array from rays */
     sc_array_init (ri, sizeof (fclaw2d_ray_integral_t));
-    sc_array_resize (ri, nints);
-    for (i = 0; i < nints; i++)
+    sc_array_resize (ri, nintz);
+    for (i = 0; i < nintz; i++)
     {
         rayint = (fclaw2d_ray_integral_t *) sc_array_index_int (ri, i);
         rayint->ray = (void *) sc_array_index_int (rays, i);
@@ -1198,7 +1197,7 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     p4est->user_pointer = user_save;
 
     /* allreduce local integral values in parallel */
-    sc_MPI_Allreduce (lints->array, integrals->array, nints,
+    sc_MPI_Allreduce (lints->array, integrals->array, nintz,
                       sc_MPI_DOUBLE, sc_MPI_SUM, domain->mpicomm);
 
     sc_array_reset (ri);
