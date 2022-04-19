@@ -198,23 +198,25 @@ void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
  *                              FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
  * \param [in] blockno          The block id under consideration.
  * \param [in] patchno          When on a leaf, this is a valid patch number.
- *                              in this case, this callback must add the
- *                              contribution by this patch and ray to the
- *                              integral value.
+ *                              In this case, this callback must set the
+ *                              integral value to the local contribution by this
+ *                              patch and ray.
  *                              Otherwise, patchno is -1.  In this case, the
  *                              integral value must not be updated.
  * \param [in] ray              Representation of a "ray"; user-defined.
  * \param [in,out] integral     The integral value associated with the ray.
- *                              Only for leaves the exact integral contribution
- *                              for this patch and ray will be added to it.
+ *                              On input this is 0.
+ *                              Only for leaves this callback must set it to the
+ *                              exact integral contribution for this patch and
+ *                              ray.
  * \return                      Return 1 if there is a possible intersection
  *                              of the patch with the ray. This may be
  *                              a false positive, we'll be fine.
  *                              Return 0 if there is definitely no intersection.
  *                              Only for leaves, this function must compute
  *                              the exact integral contribution for this
- *                              patch by intersecting this ray
- *                              and add it to ray->integral.
+ *                              patch by intersecting this ray and store it in
+ *                              integral.
  *                              This may well be 0. if the intersection
  *                              is, in fact, none (a false positive).
  */

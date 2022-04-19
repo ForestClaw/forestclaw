@@ -1099,6 +1099,8 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                   p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
                   void *point)
 {
+    double integral;
+    int intersects;
     fclaw2d_domain_t *domain;
     fclaw2d_patch_t *patch;
     int patchno;
@@ -1138,8 +1140,12 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         patch->user = NULL;
     }
 
-    return ird->integrate_ray (domain, patch, which_tree, patchno,
-                               ri->ray, ri->integral);
+    /* compute local integral and add it onto the ray integral */
+    integral = 0;
+    intersects = ird->integrate_ray (domain, patch, which_tree, patchno,
+                                     ri->ray, &integral);
+    *(ri->integral) += integral;
+    return intersects;
 }
 
 void
