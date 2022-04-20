@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
-    switch (user_opt->example) {
+    switch (user_opt->example) 
+    {
     case 0:
         /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
         conn = p4est_connectivity_new_unitsquare();
@@ -141,7 +142,11 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    if (!retval & !vexit)
+    disk_global_post_process(fclaw_opt,clawpatch_opt,user_opt);
+    fclaw_app_print_options(app);
+
+
+    if (!retval & (vexit < 2))
     {
         /* Options have been checked and are valid */
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);

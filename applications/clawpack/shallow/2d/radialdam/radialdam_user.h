@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,17 @@
 #define RADIALDAM_USER_H
 
 #include <fclaw2d_include_all.h>
+
+#include <fclaw2d_include_all.h>
+
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch.h>
+
+#include <fc2d_clawpack46_options.h>
+#include <fc2d_clawpack5_options.h>
+
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack5.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -64,6 +75,14 @@ void radialdam_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
 
+
+void radialdam_global_post_process(fclaw_options_t *fclaw_opt,
+                                   fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                   user_options_t *user_opt);
+
+
+/* ------------------------------- Mapping functions ---------------------------------- */
+
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
@@ -78,8 +97,6 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double alpha);
-
-
 /* ----------------------------- Conservative update ---------------------------------- */
 
 #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
@@ -131,8 +148,6 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double ynormals[], double ytangents[],
                            double surfnormals[],
                            double area[]);
-
-
 
 #ifdef __cplusplus
 #if 0
