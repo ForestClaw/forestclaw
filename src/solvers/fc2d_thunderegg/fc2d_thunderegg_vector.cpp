@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,6 @@ static void get_data(struct fclaw2d_global* glob, fclaw2d_patch_t* patch, fc2d_t
         break;
     }
 }
-
 ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice)
 {
     fclaw2d_clawpatch_options_t *clawpatch_opt =
@@ -58,6 +57,17 @@ ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc
     std::array<int,3> ns;
     ns[0] = clawpatch_opt->mx;
     ns[1] = clawpatch_opt->my;
+    switch(data_choice){
+        case RHS:
+          ns[2] = clawpatch_opt->rhs_fields;
+        break;
+        case SOLN:
+          ns[2] = clawpatch_opt->meqn;
+        break;
+        case STORE_STATE:
+          ns[2] = clawpatch_opt->meqn;
+        break;
+    }
     int mbc = clawpatch_opt->mbc;
     std::array<int,3> strides;
     strides[0] = 1;
@@ -67,7 +77,8 @@ ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++){
         fclaw2d_block_t* block = &glob->domain->blocks[blockno];
         for(int patchno = 0; patchno < block->num_patches; patchno++){
-            get_data(glob, &block->patches[patchno], data_choice, &starts[block->num_patches_before+patchno], &ns[2]);
+            int meqn;
+            get_data(glob, &block->patches[patchno], data_choice, &starts[block->num_patches_before+patchno], &meqn);
         }
     }
     Communicator comm(glob->mpicomm);

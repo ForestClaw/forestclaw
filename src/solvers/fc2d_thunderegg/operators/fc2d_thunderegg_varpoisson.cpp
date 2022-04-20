@@ -342,6 +342,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+    int mbc = clawpatch_opt->mbc;
 
     // get p4est structure
     fclaw2d_domain_t *domain = glob->domain;
@@ -358,7 +359,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     };
 
     // generates levels of patches for GMG
-    P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, mbc, bmf);
 
     // get finest level
     Domain<2> te_domain = domain_gen.getFinestDomain();
@@ -392,11 +393,27 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     varpoisson op(beta_vec,te_domain,ghost_filler);
 
     // set the patch solver
-    Iterative::BiCGStab<2> p_bcgs;
-    p_bcgs.setTolerance(mg_opt->patch_bcgs_tol);
-    p_bcgs.setTolerance(mg_opt->patch_bcgs_max_it);
+    Iterative::CG<2> patch_cg;
+    patch_cg.setTolerance(mg_opt->patch_iter_tol);
+    patch_cg.setTolerance(mg_opt->patch_iter_max_it);
+    Iterative::BiCGStab<2> patch_bicg;
+    patch_bicg.setTolerance(mg_opt->patch_iter_tol);
+    patch_bicg.setTolerance(mg_opt->patch_iter_max_it);
 
-    Iterative::PatchSolver<2> solver(p_bcgs, op);
+    Iterative::Solver<2>* patch_iterative_solver = nullptr;
+    switch(mg_opt->patch_solver){
+        case CG:
+            patch_iterative_solver = &patch_cg;
+            break; 
+        case BICG:
+            patch_iterative_solver = &patch_bicg;
+            break;
+        default:
+            fclaw_global_essentialf("thunderegg_varpoisson : No valid " \
+                                    "patch solver specified\n");
+            exit(0);            
+    }
+    Iterative::PatchSolver<2> solver(*patch_iterative_solver, op);
 
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
@@ -443,7 +460,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
             prev_beta_vec = restricted_beta_vec;
 
             //smoother
-           Iterative::PatchSolver<2> smoother(p_bcgs, patch_operator);
+           Iterative::PatchSolver<2> smoother(*patch_iterative_solver, patch_operator);
 
             //restrictor
             GMG::LinearRestrictor<2> restrictor(curr_domain, 
@@ -468,7 +485,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
                                   ghost_filler);
 
         //smoother
-        Iterative::PatchSolver<2> smoother(p_bcgs, patch_operator);
+        Iterative::PatchSolver<2> smoother(*patch_iterative_solver, patch_operator);
 
         //interpolator
         GMG::DirectInterpolator<2> interpolator(curr_domain, 
@@ -486,7 +503,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
 
-    bool vl = mg_opt->verbosity_level != 0;
+    bool vl = mg_opt->verbosity_level > 0 && glob->mpirank == 0;
     int its = iter_solver.solve(op, u, f, M.get(),vl);
 
     // copy solution into rhs
