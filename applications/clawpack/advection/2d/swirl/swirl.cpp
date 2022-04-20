@@ -46,33 +46,44 @@ typedef struct swirl_ray
       double              radius;
     } circle;
   } r;
-  double              integral_value;
 }
 swirl_ray_t;
 
 static int
-intersect_ray (fclaw2d_global_t *glob, fclaw2d_patch_t * patch,
-               int blockno, int patchno, void *ray)
+intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t * patch,
+               int blockno, int patchno, void *ray, double *integral)
 {
-  /* later, when patch is a leaf, also compute exact integral */
+  swirl_ray_t *swirl_ray;
 
-  /* return intersection or not, just as a bool */
-  return 0;
-}
+  /* assert that ray is a valid swirl_ray_t */
+  swirl_ray = (swirl_ray_t *) ray;
+  FCLAW_ASSERT(swirl_ray != NULL);
 
-static void
-integrate_rays (fclaw2d_global_t *glob, sc_array_t *rays)
-{
-  int                 result;
-  size_t              iz;
-
-  /* simulate calling the intersection callback from search */
-  for (iz = 0; iz < rays->elem_count; ++iz) {
-    result = intersect_ray (glob, NULL, -1, -1,
-                            sc_array_index (rays, iz));
-    if (result) {
-    }
+  if(patchno >= 0) {
+    /* We are at a leaf and the patch is a valid patch of the domain.
+     * Based on the patch, the domain, the blockno and the information stored
+     * in the swirl_ray_t we defined, we now have to set *integral to be the
+     * contribution of this ray-patch combination to the ray integral.
+     * Additionaly, we should return 1, if ray and patch do intersect,
+     * and 0 otherwise. */
+    *integral = swirl_ray->r.line.vec[0];
+    return 1;
+  } else {
+    /* We are not at a leaf and the patch is an artificial patch containing all
+     * standard patch information except for the pointer to the next patch and
+     * user-data of any kind. Only the FCLAW2D_PATCH_CHILDID and the
+     * FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
+     * Based on this, we now can run a test to check if the ray and the patch
+     * intersect.
+     * We return 0, if we know that the ray does not intersect any descendant
+     * of this patch.
+     * We return 1, if the test concludes that the ray may intersect the patch.
+     * This test may be overinclusive.
+     * Its purpose is to remove irrelevant patch-ray-combinations early on to
+     * avoid unnecessary computations. */
+    return 1;
   }
+
 }
 
 static
@@ -95,7 +106,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 }
 
 static
-void run_program(fclaw2d_global_t* glob, sc_array_t *rays)
+void run_program(fclaw2d_global_t* glob, sc_array_t *rays, sc_array_t *integrals)
 {
     const user_options_t           *user_opt;
 
@@ -126,14 +137,18 @@ void run_program(fclaw2d_global_t* glob, sc_array_t *rays)
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
-    integrate_rays(glob, rays);
+    /* We integrate after the run of the solver finished.
+     * It may be of interest to integrate several times during the run for
+     * different time steps */
+    fclaw2d_domain_integrate_rays(glob->domain, intersect_ray, rays, integrals);
     fclaw2d_finalize(glob);
 }
+
+static int           nlines = 3;
 
 static sc_array_t *
 swirl_rays_new (void)
 {
-  const int           nlines = 3;
   int                 i;
   swirl_ray_t        *ray;
   sc_array_t         *a = sc_array_new (sizeof (swirl_ray_t));
@@ -144,12 +159,19 @@ swirl_rays_new (void)
     ray->rtype = SWIRL_RAY_LINE;
     ray->xy[0] = 0.;
     ray->xy[1] = 0.;
-    ray->r.line.vec[0] = cos (M_PI / nlines);
-    ray->r.line.vec[1] = sin (M_PI / nlines);
-    ray->integral_value = 0.;
+    ray->r.line.vec[0] = cos (i * M_PI / nlines);
+    ray->r.line.vec[1] = sin (i * M_PI / nlines);
   }
 
   /* add no circles yet */
+  return a;
+}
+
+static sc_array_t *
+swirl_integrals_new(void)
+{
+  sc_array_t         *a = sc_array_new (sizeof (double));
+  sc_array_resize (a, nlines);
   return a;
 }
 
@@ -158,6 +180,7 @@ main (int argc, char **argv)
 {
     int first_arg;
     sc_array_t *rays;
+    sc_array_t *integrals;
     fclaw_app_t *app;
     fclaw_exit_type_t vexit;
 
@@ -192,6 +215,7 @@ main (int argc, char **argv)
 
     /* Setup some rays to integrate along/around */
     rays = swirl_rays_new ();
+    integrals = swirl_integrals_new();
 
     /* Run the program */
     if (!retval & !vexit)
@@ -212,12 +236,12 @@ main (int argc, char **argv)
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         swirl_options_store             (glob, user_opt);
 
-        run_program(glob, rays);
-
+        run_program(glob, rays, integrals);
         fclaw2d_global_destroy(glob);
     }
 
     sc_array_destroy (rays);
+    sc_array_destroy (integrals);
     fclaw_app_destroy (app);
 
     return 0;
