@@ -101,6 +101,8 @@ void run_program(fclaw2d_global_t* glob)
     }
 
     radialdam_link_solvers(glob);
+    
+    fclaw_fpe_handling(glob);
 
     /* ---------------------------------------------------------------
        Run

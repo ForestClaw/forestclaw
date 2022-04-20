@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_timer.h>
 #include <fclaw_mpi.h>
 
+#if 0
 /* Get whatever definitions exist already */
 #ifdef FCLAW_HAVE_FENV_H
 #ifndef __USE_GNU
@@ -42,6 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef FCLAW_HAVE_SIGNAL_H
 #include <signal.h>
+#endif
+#endif
+
+#if 0
+/* Nothing */
 #endif
 
 #ifdef FCLAW_HAVE_UNISTD_H
@@ -369,13 +375,16 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
         fclaw_global_infof("Entering mpi_debug session");
         fclaw_mpi_debug ();
     }
-#ifdef FCLAW_HAVE_FEENABLEEXCEPT
+
+#if 0        
+#ifdef FCLAW_HAVE_FEENABLEEXCEPT    
     if (fclaw_opt->trapfpe)
     {
         fclaw_global_infof("Enabling floating point traps\n");
-        // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
+        //feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW);
         feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
     }
+#endif
 #endif
 
 #if FCLAW2D_PATCHDIM == 3

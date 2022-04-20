@@ -9,7 +9,10 @@ add_library(forestclaw_c OBJECT
   fclaw_math.c 
   fclaw_timer.c 
   fclaw_mpi.c 
-  fclaw2d_block.c 
+  fclaw_fpe_default.c
+  fclaw_fpe_linux.c
+  fclaw_fpe_macos.c
+  fclaw2d_block.c   
   fclaw2d_options.c 
   fclaw2d_global.c
   fclaw2d_forestclaw.c 

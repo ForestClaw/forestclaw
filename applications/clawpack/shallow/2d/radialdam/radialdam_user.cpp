@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "radialdam_user.h"
 
+#include <fclaw_fpe.h>
+
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
@@ -115,6 +117,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
 
     vt->problem_setup = &radialdam_problem_setup;  /* Version-independent */
+    vt->fpe_enable = fclaw_fpe_handling_macos;
 
     const user_options_t* user = radialdam_get_options(glob);
     if (user->claw_version == 4)
