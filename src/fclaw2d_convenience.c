@@ -1103,6 +1103,7 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     int intersects;
     fclaw2d_domain_t *domain;
     fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
     int patchno;
 
     /* assert that the user_pointer contains a valid integrate_ray_data_t */
@@ -1129,9 +1130,8 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     else
     {
         /* create artifical patch and fill it based on the quadrant */
-        fclaw2d_patch_t fclaw2d_patch;
-        patch = &fclaw2d_patch;
         patchno = -1;
+        patch = &fclaw2d_patch;
         patch->level = quadrant->level;
         patch->target_level = quadrant->level;
         patch->flags = p4est_quadrant_child_id (quadrant);
@@ -1141,10 +1141,12 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     }
 
     /* compute local integral and add it onto the ray integral */
-    integral = 0;
+    integral = 0.;
     intersects = ird->integrate_ray (domain, patch, which_tree, patchno,
                                      ri->ray, &integral);
-    *(ri->integral) += integral;
+    if (local_num >= 0) {
+        *(ri->integral) += integral;
+    }
     return intersects;
 }
 
@@ -1172,17 +1174,15 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
 
     /* create local storage for integral values */
     nintz = integrals->elem_count;
-    sc_array_init (lints, sizeof (double));
-    sc_array_resize (lints, nintz);
+    sc_array_init_count (lints, sizeof (double), nintz);
     memset (lints->array, 0, sizeof (double) * nintz);
 
     /* construct ray_integral_t array from rays */
-    sc_array_init (ri, sizeof (fclaw2d_ray_integral_t));
-    sc_array_resize (ri, nintz);
+    sc_array_init_count (ri, sizeof (fclaw2d_ray_integral_t), nintz);
     for (i = 0; i < nintz; i++)
     {
         rayint = (fclaw2d_ray_integral_t *) sc_array_index_int (ri, i);
-        rayint->ray = (void *) sc_array_index_int (rays, i);
+        rayint->ray = sc_array_index_int (rays, i);
         rayint->integral = (double *) sc_array_index_int (lints, i);
     }
 
