@@ -219,7 +219,7 @@ void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
  *                              the exact integral contribution for this
  *                              patch by intersecting this ray and store it in
  *                              the \a integral output argument.
- *                              This may well be 0. if the intersection
+ *                              The integral value may well be 0. if the intersection
  *                              is, in fact, none (a false positive).
  */
 typedef int (*fclaw2d_integrate_ray_t) (fclaw2d_domain_t * domain,

@@ -58,14 +58,17 @@ intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t * patch,
   /* assert that ray is a valid swirl_ray_t */
   swirl_ray = (swirl_ray_t *) ray;
   FCLAW_ASSERT(swirl_ray != NULL);
+  FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
 
   if(patchno >= 0) {
     /* We are at a leaf and the patch is a valid patch of the domain.
      * Based on the patch, the domain, the blockno and the information stored
      * in the swirl_ray_t we defined, we now have to set *integral to be the
      * contribution of this ray-patch combination to the ray integral.
-     * Additionaly, we should return 1, if ray and patch do intersect,
-     * and 0 otherwise. */
+     * We should return 1 (even though a leaf return value is ignored). */
+
+    /* This is a dummy example.  We add the ray's x component for each patch.
+       Truly, this example must be updated to compute the exact ray integral. */
     *integral = swirl_ray->r.line.vec[0];
     return 1;
   } else {
@@ -75,15 +78,19 @@ intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t * patch,
      * FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
      * Based on this, we now can run a test to check if the ray and the patch
      * intersect.
-     * We return 0, if we know that the ray does not intersect any descendant
-     * of this patch.
-     * We return 1, if the test concludes that the ray may intersect the patch.
-     * This test may be overinclusive.
-     * Its purpose is to remove irrelevant patch-ray-combinations early on to
-     * avoid unnecessary computations. */
+     * We return 0 if we are certain that the ray does not intersect any
+     * descendant of this patch.
+     * We return 1 if the test concludes that the ray may intersect the patch.
+     * This test may be overinclusive / false positive to optimize for speed.
+     *
+     * The purpose of this test is to remove irrelevant ancestor
+     * patch-ray-combinations early on to avoid unnecessary computations.
+     * We do not need to assign to the integral value for ancestor patches. */
+
+    /* This is a dummy example.  Truly, implement a fast and over-inclusive test
+     * to see if this ray may possibly intersect the patch and return the answer. */
     return 1;
   }
-
 }
 
 static
@@ -137,10 +144,14 @@ void run_program(fclaw2d_global_t* glob, sc_array_t *rays, sc_array_t *integrals
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
-    /* We integrate after the run of the solver finished.
-     * It may be of interest to integrate several times during the run for
-     * different time steps */
+
+    /* For convenience, we integrate after the run of the solver has finished.
+     * In practice, it may be of interest to integrate several times during the
+     * run for different time steps.  To implement this, move the following
+     * call into a repeated diagnostic steps and output the integral values.
+     */
     fclaw2d_domain_integrate_rays(glob->domain, intersect_ray, rays, integrals);
+
     fclaw2d_finalize(glob);
 }
 
@@ -170,9 +181,7 @@ swirl_rays_new (void)
 static sc_array_t *
 swirl_integrals_new(void)
 {
-  sc_array_t         *a = sc_array_new (sizeof (double));
-  sc_array_resize (a, nlines);
-  return a;
+  return sc_array_new_count (sizeof (double), nlines);
 }
 
 int
