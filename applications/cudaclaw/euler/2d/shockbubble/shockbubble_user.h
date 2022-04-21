@@ -56,7 +56,6 @@ typedef struct user_options
     double r0;
     double rhoin;
     double pinf;
-
     int claw_version;
     int cuda;
 
