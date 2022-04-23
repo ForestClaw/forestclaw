@@ -62,11 +62,11 @@ typedef struct user_options
 
 /* --------------------------------------- Cuda ----------------------------------------*/
 
-void bump_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
-void bump_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
-void bump_assign_speeds(cudaclaw_cuda_speeds_t *speeds);
+  void bump_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
+  void bump_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
+  void bump_assign_speeds(cudaclaw_cuda_speeds_t *speeds);
 
-void setprob_cuda();
+  void setprob_cuda();
 
 void bump_link_solvers(fclaw2d_global_t *glob);
 
@@ -77,13 +77,22 @@ void bump_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 user_options_t* bump_get_options(fclaw2d_global_t* glob);
 
+/* ----------------------------- Conservative update ---------------------------------- */
+
+// fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+// #define RPN2_CONS_UPDATE FCLAW_F77_FUNC(rpn2_cons_update,RPN2_CONS_UPDATE)
+
+// void RPN2_CONS_UPDATE(const int* meqn, const int* maux, const int* idir, const int* iface,
+//                       double q[], double aux_center[], double aux_edge[], double flux[]);
+
+
 
 /* --------------------------------------- non-Cuda ----------------------------------------*/
 
 #if 0
 #define BUMP_SETPROB FCLAW_F77_FUNC(bump_setprob, BUMP_SETPROB)
 void BUMP_SETPROB();
-
 
 #define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
                                              USER5_SETAUX_MANIFOLD)

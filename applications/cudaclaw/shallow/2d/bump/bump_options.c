@@ -31,13 +31,15 @@ static void *
 bump_register (user_options_t* user, sc_options_t * opt)
 {
    sc_options_add_int (opt, 0, "example", &user->example, 0,
-                           "Example [0]");
+                           "[user] Example [0]");
     /* [user] User options */
     sc_options_add_double (opt, 0, "gravity", &user->gravity, 1.0, 
                            "[user] gravity [1.0]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
                            "Clawpack_version (4 only) [4]");
+    sc_options_add_bool (opt, 0, "cuda", &user->cuda, 0,
+                           "Use cudaclaw [F]");                       
 
     user->is_registered = 1;
     return NULL;
@@ -46,9 +48,12 @@ bump_register (user_options_t* user, sc_options_t * opt)
 static fclaw_exit_type_t
 bump_check (user_options_t *user)
 {
-    if (user->example != 0) {
-        fclaw_global_essentialf ("Option --user:example must be 0\n");
-        return FCLAW_EXIT_QUIET;
+    if(user->cuda != 0)
+    {
+        if (user->example != 0) {
+            fclaw_global_essentialf ("Option --user:example must be 0\n");
+            return FCLAW_EXIT_QUIET;
+        }
     }
     return FCLAW_NOEXIT;
 }

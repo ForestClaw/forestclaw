@@ -1,11 +1,11 @@
-      subroutine bump_setprob()
+      subroutine setprob()
       implicit none
 
       integer example
       common /comm_example/ example
 
       double precision grav
-      common /cparam/grav    !# gravitational parameter
+      common /cparam/ grav    !! gravitational parameter
 
       open(10,file='setprob.data')
       read(10,*) example      
