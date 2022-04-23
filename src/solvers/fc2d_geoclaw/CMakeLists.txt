@@ -87,7 +87,18 @@ install(FILES
   DESTINATION include
 )
 install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/include/amr_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/data_storm_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/fixedgrids_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/friction_module.mod
   ${CMAKE_CURRENT_BINARY_DIR}/include/geoclaw_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/model_storm_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/qinit_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/refinement_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/regions_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/storm_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/topo_module.mod
+  ${CMAKE_CURRENT_BINARY_DIR}/include/utility_module.mod
   DESTINATION include
 )
 

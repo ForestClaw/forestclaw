@@ -46,6 +46,7 @@ struct fclaw2d_diagnostics_accumulator
     void* patch_accumulator;
     void* solver_accumulator;
     void* user_accumulator;
+    void* gauge_accumulator;
 };
 
 /* Diagnostic information */
@@ -74,12 +75,19 @@ struct fclaw2d_diagnostics_vtable
     fclaw2d_diagnostics_reset_t          patch_reset_diagnostics;
     fclaw2d_diagnostics_finalize_t       patch_finalize_diagnostics;
 
-    /* solver diagnostic functions (gauges, fgmax, and so on) */
+    /* gauge diagnostic functions  */
     fclaw2d_diagnostics_initialize_t     solver_init_diagnostics;
     fclaw2d_diagnostics_compute_t        solver_compute_diagnostics;
     fclaw2d_diagnostics_gather_t         solver_gather_diagnostics;
     fclaw2d_diagnostics_reset_t          solver_reset_diagnostics;
     fclaw2d_diagnostics_finalize_t       solver_finalize_diagnostics;
+
+    /* solver diagnostic functions (other solver functions) */
+    fclaw2d_diagnostics_initialize_t     gauges_init_diagnostics;
+    fclaw2d_diagnostics_compute_t        gauges_compute_diagnostics;
+    fclaw2d_diagnostics_gather_t         gauges_gather_diagnostics;
+    fclaw2d_diagnostics_reset_t          gauges_reset_diagnostics;
+    fclaw2d_diagnostics_finalize_t       gauges_finalize_diagnostics;
 
     /* user defined diagnostics */
     fclaw2d_diagnostics_initialize_t     user_init_diagnostics;

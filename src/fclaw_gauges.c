@@ -298,7 +298,7 @@ void fclaw_locate_gauges(fclaw2d_global_t *glob)
     fclaw_gauge_t *g;
 
     fclaw_gauge_acc_t* gauge_acc = 
-              (fclaw_gauge_acc_t*) glob->acc->solver_accumulator;
+              (fclaw_gauge_acc_t*) glob->acc->gauge_accumulator;
 
     /* Locate each gauge in the new mesh */
     num = gauge_acc->num_gauges;
@@ -403,9 +403,9 @@ void fclaw_gauges_vtable_initialize()
 
     fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_init();
 
-    diag_vt->solver_init_diagnostics     = gauge_initialize;
-    diag_vt->solver_compute_diagnostics  = gauge_update;
-    diag_vt->solver_finalize_diagnostics = gauge_finalize;
+    diag_vt->gauges_init_diagnostics     = gauge_initialize;
+    diag_vt->gauges_compute_diagnostics  = gauge_update;
+    diag_vt->gauges_finalize_diagnostics = gauge_finalize;
 
     gauges_vt->is_set = 1;
 }

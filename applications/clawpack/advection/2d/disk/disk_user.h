@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,11 @@ void disk_options_store (fclaw2d_global_t* glob, user_options_t* user_opt);
 const user_options_t* disk_get_options(fclaw2d_global_t* glob);
 
 void disk_link_solvers(fclaw2d_global_t *glob);
+
+void disk_global_post_process(fclaw_options_t *fclaw_opt,
+                              fclaw2d_clawpatch_options_t *clawpatch_opt,
+                              user_options_t *user_opt);
+
 
 #ifdef __cplusplus
 #if 0

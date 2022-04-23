@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -59,17 +59,8 @@ radialdam_check (user_options_t *user,
 {
     if (user->example < 0 || user->example > 3) {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
-        return FCLAW_EXIT_QUIET;
     }
-    else if (user->example == 2)
-    {
-        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
-        {
-            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
-            return FCLAW_EXIT_QUIET;
-        }
-    }
-    return FCLAW_NOEXIT;
+    return FCLAW_EXIT_QUIET;
 }
 
 static void
@@ -168,4 +159,17 @@ user_options_t* radialdam_get_options(fclaw2d_global_t* glob)
     int id = s_user_options_package_id;
     return (user_options_t*) fclaw_package_get_options(glob, id);    
 }
+
+void radialdam_global_post_process(fclaw_options_t *fclaw_opt,
+                                fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                user_options_t *user_opt)
+{
+    if (user_opt->example == 2)
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
+            exit(0);
+        }
+}
+
 

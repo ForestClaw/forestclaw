@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -97,7 +97,7 @@ void fivePoint::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2
         auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
         for(int m = 0; m < mfields; m++){
             for(int j = 0; j < my; j++){
-                ghosts[{j,m}] = -u[{0,j,m}];
+                ghosts(j,m) = -u(0,j,m);
             }
         }
     }
@@ -105,7 +105,7 @@ void fivePoint::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2
         auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
         for(int m = 0; m < mfields; m++){
             for(int j = 0; j < my; j++){
-                ghosts[{j,m}] = -u[{mx-1,j,m}];
+                ghosts(j,m) = -u(mx-1,j,m);
             }
         }
     }
@@ -114,7 +114,7 @@ void fivePoint::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2
         auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
         for(int m = 0; m < mfields; m++){
             for(int i = 0; i < mx; i++){
-                ghosts[{i,m}] = -u[{i,0,m}];
+                ghosts(i,m) = -u(i,0,m);
             }
         }
     }
@@ -122,7 +122,7 @@ void fivePoint::applySinglePatchWithInternalBoundaryConditions(const PatchInfo<2
         auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
         for(int m = 0; m < mfields; m++){
             for(int i = 0; i < mx; i++){
-                ghosts[{i,m}] = -u[{i,my-1,m}];
+                ghosts(i,m) = -u(i,my-1,m);
             }
         }
     }
@@ -155,7 +155,7 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         auto ghosts = u.getGhostSliceOn(Side<2>::west(),{0});
         for(int m = 0; m < mfields; m++){
             for(int j = 0; j < my; j++){
-                ghosts[{j,m}] = -u[{0,j,m}];
+                ghosts(j,m) = -u(0,j,m);
             }
         }
     }
@@ -163,7 +163,7 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         auto ghosts = u.getGhostSliceOn(Side<2>::east(),{0});
         for(int m = 0; m < mfields; m++){
             for(int j = 0; j < my; j++){
-                ghosts[{j,m}] = -u[{mx-1,j,m}];
+                ghosts(j,m) = -u(mx-1,j,m);
             }
         }
     }
@@ -172,7 +172,7 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         auto ghosts = u.getGhostSliceOn(Side<2>::south(),{0});
         for(int m = 0; m < mfields; m++){
             for(int i = 0; i < mx; i++){
-                ghosts[{i,m}] = -u[{i,0,m}];
+                ghosts(i,m) = -u(i,0,m);
             }
         }
     }
@@ -180,7 +180,7 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         auto ghosts = u.getGhostSliceOn(Side<2>::north(),{0});
         for(int m = 0; m < mfields; m++){
             for(int i = 0; i < mx; i++){
-                ghosts[{i,m}] = -u[{i,my-1,m}];
+                ghosts(i,m) = -u(i,my-1,m);
             }
         }
     }
@@ -194,9 +194,9 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
         for(int j = 0; j < my; j++)
             for(int i = 0; i < mx; i++)
             {
-                double uij = u[{i,j,m}];
-                f[{i,j,m}] = (u[{i+1,j,m}] - 2*uij + u[{i-1,j,m}])/dx2 + 
-                             (u[{i,j+1,m}] - 2*uij + u[{i,j-1,m}])/dy2;
+                double uij = u(i,j,m);
+                f(i,j,m) = (u(i+1,j,m) - 2*uij + u(i-1,j,m))/dx2 + 
+                             (u(i,j+1,m) - 2*uij + u(i,j-1,m))/dy2;
             }
     
 #else
@@ -205,13 +205,13 @@ void fivePoint::applySinglePatch(const PatchInfo<2>& pinfo,
     for(int j = 0; j < my; j++)
         for(int i = 0; i < mx; i++)
         {
-            double uij = u[{i,j}];
+            double uij = u(i,j);
             double flux[4];
-            flux[0] = (uij - u[{i-1,j}]);
-            flux[1] = (u[{i+1,j}] - uij);
-            flux[2] = (uij - u[{i,j-1}]);
-            flux[3] = (u[{i,j+1}] - uij);;
-            f[{i,j}] = (flux[1]-flux[0])/dx2 + (flux[3] - flux[2])/dy2;
+            flux[0] = (uij - u(i-1,j));
+            flux[1] = (u(i+1,j) - uij);
+            flux[2] = (uij - u(i,j-1));
+            flux[3] = (u(i,j+1) - uij);;
+            f(i,j) = (flux[1]-flux[0])/dx2 + (flux[3] - flux[2])/dy2;
         }
 #endif
     
@@ -253,7 +253,7 @@ void fivePoint::modifyRHSForInternalBoundaryConditions(const PatchInfo<2>& pinfo
         for(int i = 0; i < mx; i++)
         {
             if (pinfo.hasNbr(Side<2>::south()))
-                f(i,0,m) += -(u[{i,-1}]+u[{i,0}])/dy2;
+                f(i,0,m) += -(u(i,-1,m)+u(i,0,m))/dy2;
 
             if (pinfo.hasNbr(Side<2>::north()))
                 f(i,my-1,m) += -(u(i,my-1,m)+u(i,my,m))/dy2;
@@ -280,6 +280,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+    int mbc = clawpatch_opt->mbc;
 
     // get p4est structure
     fclaw2d_domain_t *domain = glob->domain;
@@ -296,7 +297,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     };
 
     // generates levels of patches for GMG
-    P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, mbc, bmf);
 
     // get finest level
     Domain<2> te_domain = domain_gen.getFinestDomain();
@@ -308,9 +309,12 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     fivePoint op(te_domain,ghost_filler);
 
     // set the patch solver
-    Iterative::BiCGStab<2> p_bcgs;
-    p_bcgs.setTolerance(mg_opt->patch_bcgs_tol);
-    p_bcgs.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    Iterative::BiCGStab<2> p_bicg;
+    p_bicg.setTolerance(mg_opt->patch_iter_tol);
+    p_bicg.setMaxIterations(mg_opt->patch_iter_max_it);
+    Iterative::BiCGStab<2> p_cg;
+    p_cg.setTolerance(mg_opt->patch_iter_tol);
+    p_cg.setMaxIterations(mg_opt->patch_iter_max_it);
     shared_ptr<PatchSolver<2>>  solver;
 
     bitset<4> neumann_bitset;
@@ -321,7 +325,10 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     switch (mg_opt->patch_solver)
     {
         case BICG:
-            solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, op);
+            solver = make_shared<Iterative::PatchSolver<2>>(p_bicg, op);
+            break;
+        case CG:
+            solver = make_shared<Iterative::PatchSolver<2>>(p_cg, op);
             break;
 #ifdef THUNDEREGG_FFTW_ENABLED
         case FFT:
@@ -379,7 +386,10 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
             switch (mg_opt->patch_solver)
             {
                 case BICG:
-                    smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
+                    smoother.reset(new Iterative::PatchSolver<2>(p_bicg, patch_operator));
+                    break;
+                case CG:
+                    smoother.reset(new Iterative::PatchSolver<2>(p_cg, patch_operator));
                     break;
 #ifdef THUNDEREGG_FFTW_ENABLED
                 case FFT:
@@ -419,7 +429,10 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
         switch (mg_opt->patch_solver)
         {
             case BICG:
-                smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
+                smoother.reset(new Iterative::PatchSolver<2>(p_bicg, patch_operator));
+                break;
+            case CG:
+                smoother.reset(new Iterative::PatchSolver<2>(p_cg, patch_operator));
                 break;
 #ifdef THUNDEREGG_FFTW_ENABLED
             case FFT:
@@ -447,7 +460,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob)
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
-    bool prt_output = mg_opt->verbosity_level > 0;
+    bool prt_output = mg_opt->verbosity_level > 0 && glob->mpirank == 0;
     int its = iter_solver.solve(op, u, f, M.get(),prt_output);
 
     fclaw_global_productionf("Iterations: %i\n", its);    

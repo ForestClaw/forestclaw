@@ -62,6 +62,10 @@ void replicated_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* replicated_get_options(fclaw2d_global_t* glob);
 
+void replicated_global_post_process(fclaw_options_t *fclaw_opt, 
+                                    fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                    user_options_t *user_opt);
+
 
 #ifdef __cplusplus
 #if 0
