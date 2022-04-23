@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -47,8 +47,7 @@ filament_register (user_options_t *user, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t
-filament_check (user_options_t *user, fclaw_options_t *fclaw_opt, 
-                fclaw2d_clawpatch_options_t* clawpatch_opt)
+filament_check (user_options_t *user)
 {
     if (user->example != 0) {
         fclaw_global_essentialf ("Option --user:example must be 0\n");
@@ -91,13 +90,7 @@ options_check(fclaw_app_t *app, void *package,void *registered)
     FCLAW_ASSERT(registered == NULL);
 
     user = (user_options_t*) package;
-    fclaw_options_t *fclaw_opt = 
-                 (fclaw_options_t*) fclaw_app_get_attribute(app,"Options",NULL);
-    fclaw2d_clawpatch_options_t *clawpatch_opt = 
-                 (fclaw2d_clawpatch_options_t*)  
-                 fclaw_app_get_attribute(app,"clawpatch",NULL);
-
-    return filament_check(user,fclaw_opt, clawpatch_opt);
+    return filament_check(user);
 }
 
 static void

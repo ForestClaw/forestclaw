@@ -93,23 +93,21 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
+    /* Return an error accumulator */
     if (diag_vt->patch_init_diagnostics != NULL)
-    {
-        /* Return an error accumulator */
         diag_vt->patch_init_diagnostics(glob,&acc->patch_accumulator);
-    }
 
+    /* gauges */
+    if (diag_vt->gauges_init_diagnostics != NULL)
+        diag_vt->gauges_init_diagnostics(glob,&acc->gauge_accumulator);
+
+    /* solvers */
     if (diag_vt->solver_init_diagnostics != NULL)
-    {
-        /* Gauges, fgmax, etc */
         diag_vt->solver_init_diagnostics(glob,&acc->solver_accumulator);
-    }
 
+    /* User diagnostics */
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_init_diagnostics != NULL)
-    {
         diag_vt->user_init_diagnostics(glob,&acc->user_accumulator);
-    }
-
 }
 
 
@@ -127,20 +125,21 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
 
+    /* Patch diagnostics */
     if (diag_vt->patch_compute_diagnostics != NULL)
-    {
         diag_vt->patch_compute_diagnostics(glob,acc->patch_accumulator);
-    }
 
+    /* Gauges diagnostics */
+    if (diag_vt->gauges_compute_diagnostics != NULL)
+        diag_vt->gauges_compute_diagnostics(glob,acc->gauge_accumulator);
+
+    /* Solver diagnostics */
     if (diag_vt->solver_compute_diagnostics != NULL)
-    {
         diag_vt->solver_compute_diagnostics(glob,acc->solver_accumulator);
-    }
 
+    /* User diagnostics */
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_compute_diagnostics != NULL)
-    {
         diag_vt->user_compute_diagnostics(glob,acc->user_accumulator);
-    }
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
@@ -151,19 +150,16 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
 
     if (diag_vt->patch_gather_diagnostics != NULL)
-    {
         diag_vt->patch_gather_diagnostics(glob,acc->patch_accumulator,init_flag);
-    }
+
+    if (diag_vt->gauges_gather_diagnostics != NULL)
+        diag_vt->gauges_gather_diagnostics(glob,acc->gauge_accumulator,init_flag);
 
     if (diag_vt->solver_gather_diagnostics != NULL)
-    {
         diag_vt->solver_gather_diagnostics(glob,acc->solver_accumulator,init_flag);
-    }
 
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_gather_diagnostics != NULL)
-    {
         diag_vt->user_gather_diagnostics(glob,acc->user_accumulator,init_flag);
-    }
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
 
@@ -179,19 +175,17 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_reset_diagnostics != NULL)
-    {
         diag_vt->patch_reset_diagnostics(glob,acc->patch_accumulator);
-    }
+
+    if (diag_vt->gauges_reset_diagnostics != NULL)
+        diag_vt->gauges_reset_diagnostics(glob,acc->gauge_accumulator);
 
     if (diag_vt->solver_reset_diagnostics != NULL)
-    {
         diag_vt->solver_reset_diagnostics(glob,acc->solver_accumulator);
-    }
 
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_reset_diagnostics != NULL)
-    {
         diag_vt->user_reset_diagnostics(glob,acc->user_accumulator);
-    }
+
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 }
 
@@ -204,19 +198,17 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_finalize_diagnostics != NULL)
-    {
         diag_vt->patch_finalize_diagnostics(glob,&acc->patch_accumulator);
-    }
+
+    if (diag_vt->gauges_finalize_diagnostics != NULL)
+        diag_vt->gauges_finalize_diagnostics(glob,&acc->gauge_accumulator);
 
     if (diag_vt->solver_finalize_diagnostics != NULL)
-    {
         diag_vt->solver_finalize_diagnostics(glob,&acc->solver_accumulator);
-    }
 
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_finalize_diagnostics != NULL)
-    {
         diag_vt->user_finalize_diagnostics(glob,&acc->user_accumulator);
-    }
+
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 }
 
