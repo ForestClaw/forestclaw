@@ -112,8 +112,8 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
         // {
         // case 4:
         //     /* Requires meqn=4 */
-            claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER4;  /* No tracer */
-            claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER4;
+        claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER4;  /* No tracer */
+        claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER4;
         //     break;
         // case 5:
         //     /* Requires meqn=5 */
