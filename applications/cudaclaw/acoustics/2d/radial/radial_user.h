@@ -37,6 +37,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_cudaclaw_options.h>
 #include <cudaclaw_user_fort.h>
 
+#include <fclaw2d_clawpatch_fort.h>
+
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack46_options.h>
+#include <clawpack46_user_fort.h>
+
+#include <fc2d_clawpack5.h>
+#include <clawpack46_user_fort.h>
+
+#include "../../../../clawpack/acoustics/2d/rp/acoustics_user_fort.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -51,7 +62,8 @@ typedef struct user_options
     int example;
     double rho;
     double bulk;
-
+    double alpha;
+    int cuda;
     int claw_version;
     int is_registered;
 
@@ -74,6 +86,34 @@ void setprob_cuda();
 
 void radial_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 void radial_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
+
+/* --------------------------------- Fortran ------------------------------------- */
+#if 0
+#define CLAWPACK46_SETAUX_MANIFOLD FCLAW_F77_FUNC(clawpack46_setaux_manifold, \
+                                             CLAWPACK46_SETAUX_MANIFOLD)
+
+void CLAWPACK46_SETAUX_MANIFOLD(const int* mbc,
+                           const int* mx, const int* my,
+                           const double* xlower, const double* ylower,
+                           const double* dx, const double* dy,
+                           const int* maux, double aux[],
+                           double xnormals[], double ynormals[],
+                           double edgelengths[],
+                           double area[]);
+
+/* -------------------------------- Mappings ------------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[],
+                                                  const double alpha);
+
+#endif
 
 #ifdef __cplusplus
 }

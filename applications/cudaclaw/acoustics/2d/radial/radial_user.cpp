@@ -24,7 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "radial_user.h"
-
+#if 0
+#endif
 static
 void radial_problem_setup(fclaw2d_global_t* glob)
 {
@@ -39,11 +40,14 @@ void radial_problem_setup(fclaw2d_global_t* glob)
     /* We want to make sure node 0 gets here before proceeding */
     fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
 
-    setprob_cuda();
-
-    //SETPROB();
+    if(user->cuda != 0)
+    {
+        setprob_cuda();
+    }
+    
+    SETPROB();
+      
 }
-
 
 void radial_link_solvers(fclaw2d_global_t *glob)
 {
@@ -52,14 +56,30 @@ void radial_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &radial_problem_setup;  /* Version-independent */
 
-    //const user_options_t* user = radial_get_options(glob);
-    fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt();        
-    cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
+     const user_options_t* user = radial_get_options(glob);
+     if(user->cuda != 0)
+     {
+        //const user_options_t* user = radial_get_options(glob);
+        fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt();        
+        cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
+        
+        radial_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
+        FCLAW_ASSERT(cudaclaw_vt->cuda_rpn2 != NULL);
 
-    radial_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
-    FCLAW_ASSERT(cudaclaw_vt->cuda_rpn2 != NULL);
+        radial_assign_rpt2(&cudaclaw_vt->cuda_rpt2);
+        FCLAW_ASSERT(cudaclaw_vt->cuda_rpt2 != NULL);
+     }
+     else
+     {
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
 
-    radial_assign_rpt2(&cudaclaw_vt->cuda_rpt2);
-    FCLAW_ASSERT(cudaclaw_vt->cuda_rpt2 != NULL);
+        claw46_vt->fort_qinit     = &CUDACLAW_QINIT;
+        
+        claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
+        claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
+  
+        
+     }
+    
 }
 

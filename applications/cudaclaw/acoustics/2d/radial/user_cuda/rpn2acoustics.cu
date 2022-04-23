@@ -14,11 +14,13 @@ void setprob_cuda()
     fscanf(f,"%lf",&rho);
     fscanf(f,"%lf",&bulk);
     fclose(f);
-
+    rho = 1; 
+    bulk = 4;
     double c,z;
     c = sqrt(bulk/rho);
     z = c*rho;
-    
+    printf("in setprob_cuda debugibg speed \n");
+    printf("rho = %e\n, bulk = %e\n",rho, bulk);
     CHECK(cudaMemcpyToSymbol(s_rho,  &rho, sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_bulk, &rho, sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_c,    &c,   sizeof(double)));
