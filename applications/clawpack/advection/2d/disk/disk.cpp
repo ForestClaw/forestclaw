@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -142,12 +142,13 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    disk_global_post_process(fclaw_opt,clawpatch_opt,user_opt);
-    fclaw_app_print_options(app);
-
 
     if (!retval & (vexit < 2))
     {
+        /* Move this here in case vexit >= 2 */
+        disk_global_post_process(fclaw_opt,clawpatch_opt,user_opt);
+        fclaw_app_print_options(app);
+
         /* Options have been checked and are valid */
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
         domain = create_domain(mpicomm, fclaw_opt, user_opt);
