@@ -1144,7 +1144,8 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     integral = 0.;
     intersects = ird->integrate_ray (domain, patch, which_tree, patchno,
                                      ri->ray, &integral);
-    if (local_num >= 0) {
+    if (local_num >= 0)
+    {
         *(ri->integral) += integral;
     }
     return intersects;
