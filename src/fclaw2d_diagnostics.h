@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 struct fclaw2d_global;
@@ -47,6 +44,7 @@ struct fclaw2d_diagnostics_accumulator
     void* solver_accumulator;
     void* user_accumulator;
     void* gauge_accumulator;
+    void* ray_accumulator;
 };
 
 /* Diagnostic information */
@@ -89,6 +87,13 @@ struct fclaw2d_diagnostics_vtable
     fclaw2d_diagnostics_reset_t          gauges_reset_diagnostics;
     fclaw2d_diagnostics_finalize_t       gauges_finalize_diagnostics;
 
+    /* ray defined diagnostics */
+    fclaw2d_diagnostics_initialize_t     ray_init_diagnostics;
+    fclaw2d_diagnostics_compute_t        ray_compute_diagnostics;
+    fclaw2d_diagnostics_gather_t         ray_gather_diagnostics;
+    fclaw2d_diagnostics_reset_t          ray_reset_diagnostics;
+    fclaw2d_diagnostics_finalize_t       ray_finalize_diagnostics;
+
     /* user defined diagnostics */
     fclaw2d_diagnostics_initialize_t     user_init_diagnostics;
     fclaw2d_diagnostics_compute_t        user_compute_diagnostics;
@@ -114,9 +119,6 @@ void fclaw2d_diagnostics_reset(struct fclaw2d_global *glob);
 void fclaw2d_diagnostics_finalize(struct fclaw2d_global *glob);
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

@@ -4,7 +4,7 @@
 add_library(forestclaw_c OBJECT 
   fclaw_base.c 
   fclaw_options.c 
-  fclaw_gauges.c 
+  fclaw_gauges.c
   fclaw_package.c 
   fclaw_math.c 
   fclaw_timer.c 
@@ -26,6 +26,7 @@ add_library(forestclaw_c OBJECT
   fclaw2d_output.c 
   fclaw2d_run.c 
   fclaw2d_diagnostics.c 
+  fclaw2d_rays.c
   fclaw2d_update_single_step.c 
   fclaw2d_domain.c
   fclaw2d_regrid.c 

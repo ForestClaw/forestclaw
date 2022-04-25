@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -150,6 +150,8 @@ struct fclaw_options
     /* Gauges */
     int output_gauges;
     int gauge_buffer_length;       
+
+    int output_rays;
 
     /* Mapping functions */
     int manifold;
