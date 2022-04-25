@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_INTEGRATE_H
 #define FCLAW2D_INTEGRATE_H
 
+#include "fclaw2d_convenience.h"  /* Needed for def. of fclaw2d_integrate_t */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -39,7 +41,6 @@ struct fclaw2d_global;
 struct fclaw2d_domain;
 
 
-//#include "fclaw2d_convenience.h"
 
 typedef struct fclaw2d_ray_vtable fclaw2d_ray_vtable_t;
 
@@ -50,6 +51,7 @@ typedef struct fclaw2d_ray
 {
     int num;                /* User defined ID */
     void* ray_data;         /* User defined */
+    double integral;
 } fclaw2d_ray_t;
 
 
@@ -92,6 +94,8 @@ struct fclaw2d_ray_vtable
 {
     fclaw2d_ray_allocate_and_define_t   allocate_and_define;
     fclaw2d_ray_deallocate_t            deallocate;
+
+    fclaw2d_integrate_ray_t             integrate;   /* Function that does the integration */
 #if 0
     fclaw2d_ray_create_files_t  create_ray_files;
     fclaw2d_ray_update_t        update_ray;
@@ -111,13 +115,12 @@ void fclaw2d_ray_deallocate(struct fclaw2d_global* glob,
                             fclaw2d_ray_t **rays, 
                             int *num_rays);
 
-void fclaw2d_ray_set_ray(struct fclaw2d_global *glob, 
-                         fclaw2d_ray_t *r,
-                         int id, void* ray_data);
+void fclaw2d_ray_set_ray(fclaw2d_ray_t *r, 
+                         int id, 
+                         void* ray_data);
 
-void* fclaw2d_ray_get_ray(struct fclaw2d_global *glob, 
-                         fclaw2d_ray_t *r,
-                         int *id);
+void* fclaw2d_ray_get_ray(fclaw2d_ray_t *r, 
+                          int *id);
 
 fclaw2d_ray_vtable_t* fclaw2d_ray_vt();
 

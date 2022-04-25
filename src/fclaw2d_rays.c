@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_options.h"
 #include "fclaw2d_diagnostics.h"
 
+#include "fclaw2d_convenience.h"
+
 static fclaw2d_ray_vtable_t s_ray_vt;
 
 
@@ -103,7 +105,6 @@ void ray_initialize(fclaw2d_global_t* glob, void** acc)
         for(int i = 0; i < num_rays; i++)
         {
             //fclaw2d_ray_t *r = &rays[i];
-            fclaw_global_essentialf("ray_initialize : Setting up ray %d : \n",i);
             /* do something? */
         }
     }
@@ -121,8 +122,54 @@ void rays_reset(fclaw2d_global_t *glob, void**acc)
 static
 void ray_integrate(fclaw2d_global_t *glob, void *acc)
 {
-    /* Do nothing for now */
+    fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
+    FCLAW_ASSERT(ray_acc != NULL);
+
+    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt();
+
+    /* Copy arrays stored in accumulator to an sc_array */
+    sc_array_t  *sc_rays = sc_array_new (sizeof (fclaw2d_ray_t));
+    int num_rays = ray_acc->num_rays;
+    for(int i = 0; i < num_rays; i++)
+    {
+        fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) sc_array_push (sc_rays);        
+        fclaw_ray->num = ray_acc->rays[i].num;
+        fclaw_ray->ray_data = (void*) ray_acc->rays[i].ray_data;
+    }
+
+    sc_array_t *integrals = sc_array_new_count (sizeof (double), num_rays);
+
+    /* This does a compute and a gather. */
+    fclaw2d_domain_integrate_rays(glob->domain, ray_vt->integrate, sc_rays, integrals);
+
+    /* Copy integral value back to fclaw2d_ray_t */
+    for(int i = 0; i < num_rays; i++)
+    {
+        double intval = *((double*) sc_array_index_int(integrals,i));
+        ray_acc->rays[i].integral = intval;
+    }
+
+    sc_array_destroy (sc_rays);
+    sc_array_destroy (integrals);
 }
+
+static
+void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
+{
+    fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
+    FCLAW_ASSERT(ray_acc != NULL);
+
+    int num_rays = ray_acc->num_rays;
+    fclaw2d_ray_t *rays = ray_acc->rays;
+    for(int i = 0; i < num_rays; i++)
+    {
+        fclaw2d_ray_t *ray = &rays[i];
+        int id = ray->num;
+        double intval = ray->integral;
+        fclaw_global_essentialf("ray[%d] : id = %2d; integral = %16.6e\n",i,id,intval);
+    }
+}
+
 
 static
 void ray_finalize(fclaw2d_global_t *glob, void** acc)
@@ -160,7 +207,7 @@ void fclaw2d_ray_vtable_initialize()
 
     diag_vt->ray_init_diagnostics     = ray_initialize;    
     diag_vt->ray_compute_diagnostics  = ray_integrate;
-    diag_vt->ray_gather_diagnostics  = NULL; /* Gather is handled in compute step */
+    diag_vt->ray_gather_diagnostics  = ray_gather; 
     diag_vt->ray_finalize_diagnostics = ray_finalize;
 
     rays_vt->is_set = 1;
@@ -171,20 +218,17 @@ void fclaw2d_ray_vtable_initialize()
 
 
 /* Routines that operate on a single array */
-void fclaw2d_ray_set_ray(fclaw2d_global_t *glob, 
-                         fclaw2d_ray_t *r,
+void fclaw2d_ray_set_ray(fclaw2d_ray_t *r, 
                          int id, 
-                         void* ray_data)
-{
+                         void* user_ray){
     /* User calls this to set ray data */
     r->num = id;
-    r->ray_data = ray_data;
+    r->ray_data = user_ray;
 }
 
 
 
-void* fclaw2d_ray_get_ray(fclaw2d_global_t *glob, 
-                          fclaw2d_ray_t *r,
+void* fclaw2d_ray_get_ray(fclaw2d_ray_t *r, 
                           int *id)
 {
     *id = r->num;
