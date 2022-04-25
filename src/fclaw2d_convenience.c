@@ -723,6 +723,8 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
     p4est_wrap_complete (wrap);
 }
 
+#ifndef P4_TO_P8
+
 void
 fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 {
