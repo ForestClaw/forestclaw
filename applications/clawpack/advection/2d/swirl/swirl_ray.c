@@ -61,7 +61,10 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
                          double *integral)
 {
   /* assert that ray is a valid swirl_ray_t */
-  swirl_ray_t *swirl_ray = (swirl_ray_t *) ray;
+  fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) ray;  
+
+  int id;
+  swirl_ray_t *swirl_ray = (swirl_ray_t*) fclaw2d_ray_get_ray(fclaw_ray,&id);
   FCLAW_ASSERT(swirl_ray != NULL);
   FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
 
@@ -75,7 +78,19 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
 
     /* This is a dummy example.  We add the ray's x component for each patch.
        Truly, this example must be updated to compute the exact ray integral. */
-    *integral = swirl_ray->r.line.vec[0];
+    // *integral = swirl_ray->r.line.vec[0];
+    if (id == 1)
+        *integral = 1;
+    else if (id == 2)
+        *integral = 2;
+    else if (id == 3)
+        *integral = 3;
+    else
+    {        
+        fclaw_global_essentialf("swirl ray intersect : Invalid id\n");
+        exit(1);
+    }
+
     return 1;
   } 
   else 
@@ -104,26 +119,30 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
 
 static int nlines = 3;
 
+#if 0
 sc_array_t * swirl_rays_new (void)
 {
     swirl_ray_t *ray;
-    sc_array_t  *a = sc_array_new (sizeof (swirl_ray_t));
+    sc_array_t  *a = sc_array_new (sizeof (fclaw2d_ray_t));
 
     /* add a couple straight rays */
     for (int i = 0; i < nlines; ++i) 
     {
-        ray = (swirl_ray_t *) sc_array_push (a);
+        ray = (swirl_ray_t*) FCLAW_ALLOC(swirl_ray_t,1);
         ray->rtype = SWIRL_RAY_LINE;
         ray->xy[0] = 0.;
         ray->xy[1] = 0.;
         ray->r.line.vec[0] = cos (i * M_PI / nlines);
         ray->r.line.vec[1] = sin (i * M_PI / nlines);
+
+        fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) sc_array_push (a);
+        fclaw2d_ray_set_ray(NULL,fclaw_ray,i, ray);
     }
 
     /* add no circles yet */
     return a;
 }
-
+#endif
 
 
 
@@ -139,15 +158,19 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
        generic ray type is left opaque. This is destroy in matching FREE,
        below. */
     *rays = (fclaw2d_ray_t*) FCLAW_ALLOC(fclaw2d_ray_t,*num_rays);
+    fclaw2d_ray_t *ray_vec = *rays;
     for (int i = 0; i < nlines; ++i) 
     {
+        //fclaw_global_essentialf("ray_initialize : Setting up ray %d : \n",i);
         swirl_ray_t *sr = (swirl_ray_t*) FCLAW_ALLOC(swirl_ray_t,1);
         sr->rtype = SWIRL_RAY_LINE;
         sr->xy[0] = 0.;
         sr->xy[1] = 0.;
         sr->r.line.vec[0] = cos (i * M_PI / nlines);
         sr->r.line.vec[1] = sin (i * M_PI / nlines);
-        fclaw2d_ray_set_ray(glob,&(*rays)[i],i, sr);
+        fclaw2d_ray_t *ray = &ray_vec[i];
+        int id = i + 1;
+        fclaw2d_ray_set_ray(ray,id, sr);
     }
 }
 
@@ -157,11 +180,13 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
                            fclaw2d_ray_t** rays, 
                            int* num_rays)
 {
+    fclaw2d_ray_t *ray_vec = *rays;
     for(int i = 0; i < *num_rays; i++)
     {
         /* Retrieve rays set above and deallocate them */
         int id;
-        swirl_ray_t *rs = (swirl_ray_t*) fclaw2d_ray_get_ray(glob,&(*rays)[i],&id);
+        fclaw2d_ray_t *ray = &ray_vec[i];
+        swirl_ray_t *rs = (swirl_ray_t*) fclaw2d_ray_get_ray(ray,&id);
         FCLAW_ASSERT(rs != NULL);
         FCLAW_FREE(rs);
         rs = NULL;
@@ -179,6 +204,8 @@ void swirl_initialize_rays(fclaw2d_global_t* glob)
 
     rays_vt->allocate_and_define = swirl_allocate_and_define_rays;
     rays_vt->deallocate = swirl_deallocate_rays;
+
+    rays_vt->integrate = swirl_intersect_ray;
 }
 
 

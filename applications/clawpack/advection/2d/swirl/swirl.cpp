@@ -79,13 +79,15 @@ void run_program(fclaw2d_global_t* glob)
      * run for different time steps.  To implement this, move the following
      * call into a repeated diagnostic steps and output the integral values.
      */
+#if 0    
     sc_array_t *rays = swirl_rays_new ();
     sc_array_t *integrals = swirl_integrals_new();
 
-    //fclaw2d_domain_integrate_rays(glob->domain, swirl_intersect_ray, rays, integrals);
+    fclaw2d_domain_integrate_rays(glob->domain, swirl_intersect_ray, rays, integrals);
 
     sc_array_destroy (rays);
     sc_array_destroy (integrals);
+#endif    
 
     fclaw2d_finalize(glob);
 }
