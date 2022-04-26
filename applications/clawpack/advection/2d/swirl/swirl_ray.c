@@ -284,6 +284,11 @@ sc_array_t * swirl_rays_new (void)
     /* add no circles yet */
     return a;
 }
+
+sc_array_t * swirl_integrals_new(void)
+{
+    return sc_array_new_count (sizeof (double), nlines);
+}
 #endif
 
 
@@ -362,7 +367,3 @@ void swirl_initialize_rays(fclaw2d_global_t* glob)
 }
 
 
-sc_array_t * swirl_integrals_new(void)
-{
-    return sc_array_new_count (sizeof (double), nlines);
-}
