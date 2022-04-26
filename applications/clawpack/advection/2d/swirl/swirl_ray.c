@@ -350,9 +350,12 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
         rs = NULL;
     }
     /* Match FCLAW_ALLOC, above */
-    FCLAW_FREE(*rays);  
-    *num_rays = 0;  
-    *rays = NULL;
+    if (*num_rays > 0)
+    {
+        FCLAW_FREE(*rays);  
+        *num_rays = 0;  
+        *rays = NULL;        
+    }
 }
 
 void swirl_initialize_rays(fclaw2d_global_t* glob)
