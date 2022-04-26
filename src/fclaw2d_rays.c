@@ -68,8 +68,6 @@ void ray_deallocate(fclaw2d_global_t* glob,
 }
 
 
-
-
 static
 void ray_initialize(fclaw2d_global_t* glob, void** acc)
 {
@@ -94,20 +92,21 @@ void ray_initialize(fclaw2d_global_t* glob, void** acc)
     *acc = ray_acc;
     ray_acc->num_rays = num_rays;
 
-
+#if 0
     if (num_rays > 0)
     {
         /* Things that could be done here : 
            1. Open ray files to write out time series data for each ray 
            2. Set integral to 0? 
         */
-        //fclaw2d_ray_t *rays = ray_acc->rays;
+        fclaw2d_ray_t *rays = ray_acc->rays;
         for(int i = 0; i < num_rays; i++)
         {
-            //fclaw2d_ray_t *r = &rays[i];
+            fclaw2d_ray_t *r = &rays[i];
             /* do something? */
         }
     }
+#endif    
 }
 
 #if 0
@@ -125,8 +124,6 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
     fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
     FCLAW_ASSERT(ray_acc != NULL);
 
-    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt();
-
     /* Copy arrays stored in accumulator to an sc_array */
     sc_array_t  *sc_rays = sc_array_new (sizeof (fclaw2d_ray_t));
     int num_rays = ray_acc->num_rays;
@@ -140,6 +137,7 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
     sc_array_t *integrals = sc_array_new_count (sizeof (double), num_rays);
 
     /* This does a compute and a gather. */
+    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt();
     fclaw2d_domain_integrate_rays(glob->domain, ray_vt->integrate, sc_rays, integrals);
 
     /* Copy integral value back to fclaw2d_ray_t */
