@@ -113,7 +113,8 @@ void ray_initialize(fclaw2d_global_t* glob, void** acc)
 static
 void rays_reset(fclaw2d_global_t *glob, void**acc)
 {
-    /* Do nothing for now */
+    /* The obvious thing to do is to set the integral to 0, 
+       but this is handled by fclaw2d_convenience.c */
 }
 #endif
 
@@ -154,6 +155,8 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
 static
 void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
 {
+    /* Here is where we would do an all-reduce, but again this
+      is handled by fclaw2d_convenience routines */
     fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
     FCLAW_ASSERT(ray_acc != NULL);
 
@@ -164,7 +167,7 @@ void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
         fclaw2d_ray_t *ray = &rays[i];
         int id = ray->num;
         double intval = ray->integral;
-        fclaw_global_essentialf("ray[%d] : id = %2d; integral = %16.6e\n",i,id,intval);
+        fclaw_global_essentialf("ray[%d] : id = %2d; integral = %24.16e\n",i,id,intval);
     }
 }
 
@@ -173,10 +176,10 @@ static
 void ray_finalize(fclaw2d_global_t *glob, void** acc)
 {
     fclaw2d_ray_acc_t* ray_acc = *((fclaw2d_ray_acc_t**) acc);
-    FCLAW_ASSERT(ray_acc->rays != NULL);
-
-    ray_deallocate(glob,&ray_acc->rays,&ray_acc->num_rays);
-
+    if (ray_acc->rays != NULL)
+    {
+        ray_deallocate(glob,&ray_acc->rays,&ray_acc->num_rays);
+    }
     FCLAW_FREE(*acc);
     *acc = 0;
 }
