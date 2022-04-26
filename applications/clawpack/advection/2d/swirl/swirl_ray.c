@@ -28,6 +28,15 @@
 #include "../all/advection_user.h"
 
 #include <fclaw2d_rays.h>
+#include <math.h>
+
+
+typedef struct point
+{
+    double x;
+    double y;
+} point_t;
+
 
 typedef enum 
 {
@@ -52,6 +61,62 @@ typedef struct swirl_ray
         } circle;
     } r;
 } swirl_ray_t;
+
+
+static
+int point_in_quad(point_t p0, point_t pll, point_t pur)
+{
+    int intx = (pll.x <= p0.x) && (p0.x <= pur.x);
+    int inty = (pll.y <= p0.y) && (p0.y <= pur.y);
+
+    int found = (intx != 0) && (inty != 0);
+    return found;
+}
+
+static
+double distance(point_t p0, point_t p1)
+{
+    double dx = p0.x - p1.x;
+    double dy = p0.y - p1.y;
+    double d = sqrt(dx*dx + dy*dy);
+    return d;
+}
+
+static
+int segment_intersect(point_t p0, point_t p1, 
+                      point_t q0, point_t q1,
+                      point_t *r)
+{
+    /* Find the intersection of two line segments.  */
+    double a11 = p1.x - p0.x;
+    double a21 = p1.y - p0.y;
+    double a12 = -(q1.x - q0.x);
+    double a22 = -(q1.y - q0.y);
+
+    point_t b = {q0.x - p0.x, q0.y - p0.y};
+
+    /* Compute determinant of A */
+    double det = a22*a11 - a12*a21;
+    int found_intersection = 0;
+    if (det == 0)
+    {
+        found_intersection = 0;
+        return 0;
+    }
+
+    double s,t;
+    s = (a22*b.x - a12*b.y)/det;
+    t = (-a21*b.x + a11*b.y)/det;
+
+    if ((0 <= s && s <= 1) && (0 <= t && t <= 1))
+        found_intersection = 1;
+
+    r->x = q0.x + t*(q1.x - q0.x);
+    r->y = q0.y + t*(q1.y - q0.y);
+
+    return found_intersection;
+}
+
 
 int swirl_intersect_ray (fclaw2d_domain_t *domain, 
                          fclaw2d_patch_t * patch,
@@ -79,18 +144,95 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
     /* This is a dummy example.  We add the ray's x component for each patch.
        Truly, this example must be updated to compute the exact ray integral. */
     // *integral = swirl_ray->r.line.vec[0];
-    if (id == 1)
-        *integral = 1;
-    else if (id == 2)
-        *integral = 2;
-    else if (id == 3)
-        *integral = 3;
-    else
-    {        
-        fclaw_global_essentialf("swirl ray intersect : Invalid id\n");
-        exit(1);
-    }
 
+    /* DAC : Updated to consider intersection of ray with quadrant.  Contribution to the 
+        integral is the length of the ray segment that in the quad. 
+
+        Next step : consider parameterized curve.  */
+
+    /* Get data on current patch */
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;    
+    fclaw2d_clawpatch_grid_data(NULL,patch,&mx,&my,&mbc,
+                                &xlower,&ylower,&dx,&dy);
+
+
+    if (swirl_ray->rtype == SWIRL_RAY_LINE)
+    {
+        /* Check to see if line segment intersections one of four edges. */
+        point_t p0 = {swirl_ray->xy[0], swirl_ray->xy[1]};
+        point_t p1 = {p0.x + swirl_ray->r.line.vec[0],
+                      p0.y + swirl_ray->r.line.vec[1]};
+
+        double qx[5] = {xlower, xlower+dx*mx, xlower+dx*mx, xlower, xlower};
+        double qy[5] = {ylower, ylower, ylower+dy*my, ylower+dy*my, ylower};
+
+        point_t r;
+        int istart = -1, iend = -1;
+        point_t r0, r1;        
+        for(int i = 0; i < 4; i++)
+        {
+            point_t q0 = {qx[i],qy[i]};
+            point_t q1 = {qx[i+1],qy[i+1]};
+
+            int found = segment_intersect(p0,p1,q0,q1,&r);
+            if (found != 0)
+            {
+                if (istart < 0)
+                {
+                    istart = i;
+                    r0 = r;
+                }
+                else
+                {
+                    iend = i;
+                    r1 = r;
+                    break;
+                }
+            }
+        }
+        /* Four cases */
+        int found_intersection = 0;
+        point_t pstart, pend;
+        if (istart < 0 && iend < 0)
+        {
+            /* No intersection found */
+            //fclaw_global_essentialf("No intersection found\n");
+            *integral = 0;
+        }
+        else if (istart >= 0 && iend >= 0)
+        {
+            /* Ray enters and exits quad */
+            //fclaw_global_essentialf("Ray enters and exits quad\n");
+            pstart = r0;
+            pend = r1;
+            found_intersection = 1;
+        }
+        else
+        {
+            /* Ray starts or ends in quad */
+            point_t pll = {xlower,ylower};
+            point_t pur = {xlower+1,ylower+1};
+            if (point_in_quad(p0,pll,pur) != 0)
+            {
+                //fclaw_global_essentialf("Ray starts in quad and exits\n");
+                pstart = p0;
+                pend = r0;
+            }
+            else if (point_in_quad(p1,pll,pur) != 0)
+            {
+                //fclaw_global_essentialf("Ray starts outside quad and enters\n");
+                pstart = r0;
+                pend = p1;
+            }
+            found_intersection = 1;
+        }
+        if (found_intersection != 0)
+        {
+            /* This could be replaced by an integral along a curve in the patch */
+            *integral = distance(pstart,pend);
+        }
+    }  /* end of ray type line */
     return 1;
   } 
   else 
@@ -166,8 +308,19 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
         sr->rtype = SWIRL_RAY_LINE;
         sr->xy[0] = 0.;
         sr->xy[1] = 0.;
-        sr->r.line.vec[0] = cos (i * M_PI / nlines);
-        sr->r.line.vec[1] = sin (i * M_PI / nlines);
+
+#if 0
+        sr->r.line.vec[0] = cos (i * M_PI / (nlines-1));
+        sr->r.line.vec[1] = sin (i * M_PI / (nlines-1));
+#else        
+        /* End points are on a semi-circle in x>0,y>0 quad */
+        FCLAW_ASSERT(nlines >= 2);
+        double R = 0.25;
+        double dth = M_PI/(2*(nlines-1));
+        sr->r.line.vec[0] = R*cos (i * dth);
+        sr->r.line.vec[1] = R*sin (i * dth);
+#endif        
+
         fclaw2d_ray_t *ray = &ray_vec[i];
         int id = i + 1;
         fclaw2d_ray_set_ray(ray,id, sr);
