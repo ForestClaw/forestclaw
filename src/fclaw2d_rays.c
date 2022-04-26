@@ -180,6 +180,7 @@ void ray_finalize(fclaw2d_global_t *glob, void** acc)
     {
         ray_deallocate(glob,&ray_acc->rays,&ray_acc->num_rays);
     }
+    /* Matches allocation in ray_initialize */
     FCLAW_FREE(*acc);
     *acc = 0;
 }
