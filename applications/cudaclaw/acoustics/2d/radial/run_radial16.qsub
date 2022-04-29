@@ -1,0 +1,23 @@
+#!/bin/bash
+###
+###
+#SBATCH --time=00:30:00
+#SBATCH -n 16
+#SBATCH -N 1
+#SBATCH --job-name=radial
+#SBATCH --output=radial_00016.o%j
+#SBATCH -p gpu # queue (partition) -- defq, eduq, gpuq, shortq
+
+module load slurm
+module load cuda10.0
+
+# Execute the program
+#for N in 1 2 4 8 16
+#do
+mpirun  ./radial_cuda 
+#done
+
+status=$?
+if [ $status -ne 0 ]; then
+    exit $status
+fi
