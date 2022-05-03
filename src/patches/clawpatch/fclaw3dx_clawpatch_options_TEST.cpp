@@ -25,26 +25,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw3dx_clawpatch_options.h>
 #include <fclaw2d_global.h>
-#include <test/catch.hpp>
+#include <test/doctest.h>
 #include <fstream>
 
-namespace{
-std::vector<char*> get_argv(std::initializer_list<std::string> arguments){
-	std::vector<char*> argv;
-	for (const auto& arg : arguments)
-	    argv.push_back((char*)arg.data());
-	argv.push_back(nullptr);
-	return argv;
-}
-}
-TEST_CASE("fclaw3dx_clawpatch_set_refinement_criteria, then fclaw3dx_clawpatch_get_refinment_criteria","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_set_refinement_criteria, then fclaw3dx_clawpatch_get_refinment_criteria")
 {
-	int r = GENERATE(1,2,3);
-	fclaw3dx_clawpatch_set_refinement_criteria(r);
-	CHECK(r == fclaw3dx_clawpatch_get_refinement_criteria());
+	for(int r : {1,2,3}){
+		fclaw3dx_clawpatch_set_refinement_criteria(r);
+		CHECK(r == fclaw3dx_clawpatch_get_refinement_criteria());
+	}
 }
 
-TEST_CASE("fclaw3dx_clawpatch_options_store, then fclaw3dx_clawpatch_get_options","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_options_store, then fclaw3dx_clawpatch_get_options")
 {
 	fclaw2d_global_t* glob = fclaw2d_global_new();
 	fclaw3dx_clawpatch_options_t opts;

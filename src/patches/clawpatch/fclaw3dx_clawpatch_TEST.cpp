@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
 #include <fclaw2d_options.h>
-#include <test/catch.hpp>
+#include <test/doctest.h>
 #include <test/test.hpp>
 #include <fstream>
 #include <bitset>
@@ -158,7 +158,7 @@ struct QuadDomain {
     }
 };
 }
-TEST_CASE("fclaw3dx_clawpatch_vtable_initialize","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new();
     fclaw2d_vtables_initialize(glob);
@@ -217,107 +217,118 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize","[fclaw3dx][clawpatch]")
     CHECK(patch_vt->setup                          == NULL);
     fclaw2d_global_destroy(glob);
 }
-TEST_CASE("fclaw3dx_clawpatch patch_build","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch patch_build")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
+    for(const int& compute_error : {false,true})
+    for(const int& subcycle : {false,true})
+    for(const int& mx   : {4,5,6})
+    for(const int& my   : {4,5,6})
+    for(const int& mz   : {4,5,6})
+    for(const int& mbc  : {1,2})
+    for(const int& meqn : {1,2})
+    for(const int& maux : {0,2})
+    for(const int& rhs_fields : {0,2})
+    for(fclaw2d_build_mode_t build_mode : {FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED, FCLAW2D_BUILD_FOR_UPDATE})
+    {
+        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw2d_vtables_initialize(glob);
 
-    fclaw3dx_clawpatch_vtable_initialize(glob, 4);
+        fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
-    fclaw_options_t fopts;
-    memset(&fopts, 0, sizeof(fopts));
-    fopts.mi=1;
-    fopts.mj=1;
-    fopts.minlevel=0;
-    fopts.manifold=false;
-    fopts.bx = 1;
-    fopts.by = 2;
-    fopts.bz = 3;
-    fopts.compute_error = GENERATE(false,true);
-    fopts.subcycle = GENERATE(false,true);
+        fclaw_options_t fopts;
+        memset(&fopts, 0, sizeof(fopts));
+        fopts.mi=1;
+        fopts.mj=1;
+        fopts.minlevel=0;
+        fopts.manifold=false;
+        fopts.bx = 1;
+        fopts.by = 2;
+        fopts.bz = 3;
+        fopts.compute_error = compute_error;
+        fopts.subcycle = subcycle;
 
-    fclaw2d_domain_t *domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
-    fclaw2d_global_store_domain(glob, domain);
-    fclaw2d_options_store(glob, &fopts);
+        fclaw2d_domain_t *domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
+        fclaw2d_global_store_domain(glob, domain);
+        fclaw2d_options_store(glob, &fopts);
 
-    fclaw3dx_clawpatch_options_t opts;
-    memset(&opts, 0, sizeof(opts));
-    opts.mx   = GENERATE(4,5,6);
-    opts.my   = GENERATE(4,5,6);
-    opts.mz   = GENERATE(4,5,6);
-    opts.mbc  = GENERATE(1,2);
-    opts.meqn = GENERATE(1,2);
-    opts.maux = GENERATE(0,2);
-    opts.rhs_fields = GENERATE(0,2);
-    fclaw3dx_clawpatch_options_store(glob, &opts);
+        fclaw3dx_clawpatch_options_t opts;
+        memset(&opts, 0, sizeof(opts));
+        opts.mx   = mx;
+        opts.my   = my;
+        opts.mz   = mz;
+        opts.mbc  = mbc;
+        opts.meqn = meqn;
+        opts.maux = maux;
+        opts.rhs_fields = rhs_fields;
+        fclaw3dx_clawpatch_options_store(glob, &opts);
 
-    fclaw2d_domain_data_new(glob->domain);
-    fclaw2d_build_mode_t build_mode = GENERATE(FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED, FCLAW2D_BUILD_FOR_UPDATE);
-    CHECK(domain->blocks[0].patches[0].user == nullptr);
-    fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
-    CHECK(domain->blocks[0].patches[0].user != nullptr);
+        fclaw2d_domain_data_new(glob->domain);
+        CHECK(domain->blocks[0].patches[0].user == nullptr);
+        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        CHECK(domain->blocks[0].patches[0].user != nullptr);
 
-    fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&domain->blocks[0].patches[0]);
+        fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&domain->blocks[0].patches[0]);
 
-    CHECK(cp->meqn == opts.meqn);
-    CHECK(cp->mx == opts.mx);
-    CHECK(cp->my == opts.my);
-    CHECK(cp->mz == opts.mz);
-    CHECK(cp->mbc == opts.mbc);
-    CHECK(cp->manifold == fopts.manifold);
-    CHECK(cp->mp != nullptr);
-    CHECK(cp->registers != nullptr);
+        CHECK(cp->meqn == opts.meqn);
+        CHECK(cp->mx == opts.mx);
+        CHECK(cp->my == opts.my);
+        CHECK(cp->mz == opts.mz);
+        CHECK(cp->mbc == opts.mbc);
+        CHECK(cp->manifold == fopts.manifold);
+        CHECK(cp->mp != nullptr);
+        CHECK(cp->registers != nullptr);
 
-    CHECK(cp->xlower == fopts.ax);
-    CHECK(cp->ylower == fopts.ay);
-    CHECK(cp->zlower == fopts.az);
-    CHECK(cp->xupper == fopts.bx);
-    CHECK(cp->yupper == fopts.by);
-    CHECK(cp->zupper == fopts.bz);
-    CHECK(cp->dx == Approx((cp->xupper-cp->xlower)/opts.mx));
-    CHECK(cp->dy == Approx((cp->yupper-cp->ylower)/opts.my));
-    CHECK(cp->dz == Approx((cp->zupper-cp->zlower)/opts.mz));
+        CHECK(cp->xlower == fopts.ax);
+        CHECK(cp->ylower == fopts.ay);
+        CHECK(cp->zlower == fopts.az);
+        CHECK(cp->xupper == fopts.bx);
+        CHECK(cp->yupper == fopts.by);
+        CHECK(cp->zupper == fopts.bz);
+        CHECK(cp->dx == doctest::Approx((cp->xupper-cp->xlower)/opts.mx));
+        CHECK(cp->dy == doctest::Approx((cp->yupper-cp->ylower)/opts.my));
+        CHECK(cp->dz == doctest::Approx((cp->zupper-cp->zlower)/opts.mz));
 
-    //BOX DIEMSIONS
+        //BOX DIEMSIONS
 
-    CHECK_BOX_DIMENSIONS(cp->griddata, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-    if(build_mode == FCLAW2D_BUILD_FOR_UPDATE){
-        CHECK_BOX_DIMENSIONS(cp->griddata_last, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-        CHECK_BOX_DIMENSIONS(cp->griddata_save, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-    }else{
-        CHECK_BOX_EMPTY(cp->griddata_last);
-        CHECK_BOX_EMPTY(cp->griddata_save);
+        CHECK_BOX_DIMENSIONS(cp->griddata, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+        if(build_mode == FCLAW2D_BUILD_FOR_UPDATE){
+            CHECK_BOX_DIMENSIONS(cp->griddata_last, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+            CHECK_BOX_DIMENSIONS(cp->griddata_save, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+        }else{
+            CHECK_BOX_EMPTY(cp->griddata_last);
+            CHECK_BOX_EMPTY(cp->griddata_save);
+        }
+        if(fopts.subcycle){
+            CHECK_BOX_DIMENSIONS(cp->griddata_time_interpolated, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+        }else{
+            CHECK_BOX_EMPTY(cp->griddata_time_interpolated);
+        }
+        if(fopts.compute_error) {
+            CHECK_BOX_DIMENSIONS(cp->griderror, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+            CHECK_BOX_DIMENSIONS(cp->exactsolution, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+        }else{
+            CHECK_BOX_EMPTY(cp->griderror);
+            CHECK_BOX_EMPTY(cp->exactsolution);
+        }
+        if(opts.rhs_fields == 0){
+            CHECK_BOX_EMPTY(cp->rhs);
+        }else{
+            CHECK_BOX_DIMENSIONS(cp->rhs, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
+        }
+        if(opts.rhs_fields == 0 || !fopts.compute_error) {
+            CHECK_BOX_EMPTY(cp->elliptic_error);
+            CHECK_BOX_EMPTY(cp->elliptic_soln);
+        }else{
+            CHECK_BOX_DIMENSIONS(cp->elliptic_error, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
+            CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
+        }
+
+        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw2d_global_destroy(glob);
     }
-    if(fopts.subcycle){
-        CHECK_BOX_DIMENSIONS(cp->griddata_time_interpolated, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-    }else{
-        CHECK_BOX_EMPTY(cp->griddata_time_interpolated);
-    }
-    if(fopts.compute_error) {
-        CHECK_BOX_DIMENSIONS(cp->griderror, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-        CHECK_BOX_DIMENSIONS(cp->exactsolution, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-    }else{
-        CHECK_BOX_EMPTY(cp->griderror);
-        CHECK_BOX_EMPTY(cp->exactsolution);
-    }
-    if(opts.rhs_fields == 0){
-        CHECK_BOX_EMPTY(cp->rhs);
-    }else{
-        CHECK_BOX_DIMENSIONS(cp->rhs, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
-    }
-    if(opts.rhs_fields == 0 || !fopts.compute_error) {
-        CHECK_BOX_EMPTY(cp->elliptic_error);
-        CHECK_BOX_EMPTY(cp->elliptic_soln);
-    }else{
-        CHECK_BOX_DIMENSIONS(cp->elliptic_error, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
-        CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
-    }
-
-    fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-    fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch save_step","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch save_step")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -332,7 +343,7 @@ TEST_CASE("fclaw3dx_clawpatch save_step","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_save_current_step","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_save_current_step")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -349,7 +360,7 @@ TEST_CASE("fclaw3dx_clawpatch_save_current_step","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch restore_step","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch restore_step")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -366,7 +377,7 @@ TEST_CASE("fclaw3dx_clawpatch restore_step","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch get_metric_patch","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch get_metric_patch")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -381,7 +392,7 @@ TEST_CASE("fclaw3dx_clawpatch get_metric_patch","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_get_metric_patch","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_get_metric_patch")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -396,7 +407,7 @@ TEST_CASE("fclaw3dx_clawpatch_get_metric_patch","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_get_area","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_get_area")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -411,40 +422,48 @@ TEST_CASE("fclaw3dx_clawpatch_get_area","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_grid_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_grid_data")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
+    for(int mx   : {4,5,6})
+    for(int my   : {4,5,6})
+    for(int mz   : {4,5,6})
+    for(int mbc  : {1,2})
+    {
 
-    SinglePatchDomain test_data;
-    test_data.opts.mx   = GENERATE(4,5,6);
-    test_data.opts.my   = GENERATE(4,5,6);
-    test_data.opts.mz   = GENERATE(4,5,6);
-    test_data.opts.mbc  = GENERATE(1,2);
-    test_data.setup();
+        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw2d_vtables_initialize(glob);
 
-    //CHECK
-    fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
-    int mx,my,mz,mbc;
-    double xlower,ylower,zlower,dx,dy,dz;
-    fclaw3dx_clawpatch_grid_data(test_data.glob, &test_data.domain->blocks[0].patches[0],
-                                 &mx, &my, &mz, &mbc, &xlower, &ylower, &zlower, &dx, &dy, &dz);
+        SinglePatchDomain test_data;
+        test_data.opts.mx   = mx;
+        test_data.opts.my   = my;
+        test_data.opts.mz   = mz;
+        test_data.opts.mbc  = mbc;
+        test_data.setup();
 
-    CHECK(mx == test_data.opts.mx);
-    CHECK(my == test_data.opts.my);
-    CHECK(mz == test_data.opts.mz);
-    CHECK(mbc == test_data.opts.mbc);
-    CHECK(xlower == cp->xlower);
-    CHECK(ylower == cp->ylower);
-    CHECK(zlower == cp->zlower);
-    CHECK(dx == cp->dx);
-    CHECK(dy == cp->dy);
-    CHECK(dz == cp->dz);
+        //CHECK
+        fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
+        int mx_out,my_out,mz_out,mbc_out;
+        double xlower,ylower,zlower,dx,dy,dz;
+        fclaw3dx_clawpatch_grid_data(test_data.glob, &test_data.domain->blocks[0].patches[0],
+                                     &mx_out, &my_out, &mz_out, &mbc_out, &xlower, &ylower, &zlower, &dx, &dy, &dz);
+
+        CHECK(mx_out == test_data.opts.mx);
+        CHECK(my_out == test_data.opts.my);
+        CHECK(mz_out == test_data.opts.mz);
+        CHECK(mbc_out == test_data.opts.mbc);
+        CHECK(xlower == cp->xlower);
+        CHECK(ylower == cp->ylower);
+        CHECK(zlower == cp->zlower);
+        CHECK(dx == cp->dx);
+        CHECK(dy == cp->dy);
+        CHECK(dz == cp->dz);
 
     fclaw2d_global_destroy(glob);
+
+    }
 }
 
-TEST_CASE("fclaw3dx_clawpatch_aux_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_aux_data")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -464,7 +483,7 @@ TEST_CASE("fclaw3dx_clawpatch_aux_data","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_soln_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_soln_data")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -484,7 +503,7 @@ TEST_CASE("fclaw3dx_clawpatch_soln_data","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_rhs_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_rhs_data")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -504,7 +523,7 @@ TEST_CASE("fclaw3dx_clawpatch_rhs_data","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_elliptic_error_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_elliptic_error_data")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -524,7 +543,7 @@ TEST_CASE("fclaw3dx_clawpatch_elliptic_error_data","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_elliptic_soln_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_elliptic_soln_data")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -544,7 +563,7 @@ TEST_CASE("fclaw3dx_clawpatch_elliptic_soln_data","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_get_q","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_get_q")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -560,7 +579,7 @@ TEST_CASE("fclaw3dx_clawpatch_get_q","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_get_registers","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_get_registers")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -576,7 +595,7 @@ TEST_CASE("fclaw3dx_clawpatch_get_registers","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_get_error","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_get_error")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -592,7 +611,7 @@ TEST_CASE("fclaw3dx_clawpatch_get_error","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_get_exact_soln","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_get_exact_soln")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -607,51 +626,55 @@ TEST_CASE("fclaw3dx_clawpatch_get_exact_soln","[fclaw3dx][clawpatch]")
 
     fclaw2d_global_destroy(glob);
 }
-TEST_CASE("fclaw3dx_clawpatch_timesync_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_timesync_data")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
+    for(int time_interp : {true,false})
+    {
+        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw2d_vtables_initialize(glob);
 
-    SinglePatchDomain test_data;
-    test_data.setup();
+        SinglePatchDomain test_data;
+        test_data.setup();
 
-    //CHECK
-    fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
-    double* q;
-    int meqn;
-    int time_interp = GENERATE(true,false);
-    fclaw3dx_clawpatch_timesync_data(test_data.glob, &test_data.domain->blocks[0].patches[0], time_interp, &q, &meqn);
+        //CHECK
+        fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
+        double* q;
+        int meqn;
+        fclaw3dx_clawpatch_timesync_data(test_data.glob, &test_data.domain->blocks[0].patches[0], time_interp, &q, &meqn);
 
-    if(time_interp){
-        CHECK(q == cp->griddata_time_interpolated.dataPtr());
-    } else {
-        CHECK(q == cp->griddata.dataPtr());
+        if(time_interp){
+            CHECK(q == cp->griddata_time_interpolated.dataPtr());
+        } else {
+            CHECK(q == cp->griddata.dataPtr());
+        }
+        CHECK(meqn == test_data.opts.meqn);
+
+        fclaw2d_global_destroy(glob);
     }
-    CHECK(meqn == test_data.opts.meqn);
-
-    fclaw2d_global_destroy(glob);
 }
-TEST_CASE("fclaw3dx_clawpatch_get_q_timesync","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_get_q_timesync")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
+    for(int time_interp : {true,false})
+    {
+        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw2d_vtables_initialize(glob);
 
-    SinglePatchDomain test_data;
-    test_data.setup();
+        SinglePatchDomain test_data;
+        test_data.setup();
 
-    //CHECK
-    fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
+        //CHECK
+        fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
-    int time_interp = GENERATE(true,false);
-    if(time_interp){
-        CHECK(fclaw3dx_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata_time_interpolated.dataPtr());
-    } else {
-        CHECK(fclaw3dx_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata.dataPtr());
+        if(time_interp){
+            CHECK(fclaw3dx_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata_time_interpolated.dataPtr());
+        } else {
+            CHECK(fclaw3dx_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata.dataPtr());
+        }
+
+        fclaw2d_global_destroy(glob);
     }
-
-    fclaw2d_global_destroy(glob);
 }
-TEST_CASE("fclaw3dx_clawpatch user_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch user_data")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -666,7 +689,7 @@ TEST_CASE("fclaw3dx_clawpatch user_data","[fclaw3dx][clawpatch]")
 
     fclaw2d_global_destroy(glob);
 }
-TEST_CASE("fclaw3dx_clawpatch solver_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch solver_data")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -681,32 +704,33 @@ TEST_CASE("fclaw3dx_clawpatch solver_data","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_size","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_size")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
+    for(int mx   : {4,5,6})
+    for(int my   : {4,5,6})
+    for(int mz   : {4,5,6})
+    for(int mbc  : {1,2})
+    for(int meqn : {1,2})
+    {
+        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw2d_vtables_initialize(glob);
 
-    SinglePatchDomain test_data;
-    test_data.opts.mx   = GENERATE(4,5,6);
-    test_data.opts.my   = GENERATE(4,5,6);
-    test_data.opts.mz   = GENERATE(4,5,6);
-    test_data.opts.mbc  = GENERATE(1,2);
-    test_data.opts.meqn = GENERATE(1,2);
-    test_data.setup();
+        SinglePatchDomain test_data;
+        test_data.opts.mx   = mx;
+        test_data.opts.my   = my;
+        test_data.opts.mz   = mz;
+        test_data.opts.mbc  = mbc;
+        test_data.opts.meqn = meqn;
+        test_data.setup();
 
-    int mx = test_data.opts.mx;
-    int my = test_data.opts.my;
-    int mz = test_data.opts.mz;
-    int mbc = test_data.opts.mbc;
-    int meqn = test_data.opts.meqn;
+        //CHECK
+        CHECK(fclaw3dx_clawpatch_size(test_data.glob) == (size_t) (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn);
 
-    //CHECK
-    CHECK(fclaw3dx_clawpatch_size(test_data.glob) == (size_t) (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn);
-
-    fclaw2d_global_destroy(glob);
+        fclaw2d_global_destroy(glob);
+    }
 }
 
-TEST_CASE("fclaw3dx_clawpatch_metric_scalar","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_metric_scalar")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -728,7 +752,7 @@ TEST_CASE("fclaw3dx_clawpatch_metric_scalar","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_metric_vector","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_metric_vector")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -758,7 +782,7 @@ TEST_CASE("fclaw3dx_clawpatch_metric_vector","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_metric_data","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_metric_data")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -790,7 +814,7 @@ TEST_CASE("fclaw3dx_clawpatch_metric_data","[fclaw3dx][clawpatch]")
     fclaw2d_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_metric_data2","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch_metric_data2")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -826,7 +850,7 @@ namespace{
     int timeinterp_mint;
     fclaw3dx_clawpatch_t* timeinterp_cp;
 }
-TEST_CASE("fclaw3dx_clawpatch setup_timeinterp","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch setup_timeinterp")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
@@ -869,66 +893,73 @@ namespace{
     int t4r_tag_patch;
     int t4r_init_flag;
 }
-TEST_CASE("fclaw3dx_clawpatch tag4refinement","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch tag4refinement")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
-
-    SinglePatchDomain test_data;
-    test_data.fopts.refine_threshold = 0.90210;
-    test_data.setup();
-
-
-    t4r_cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
-
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
-
-    t4r_tag_patch = GENERATE(true,false);
-    t4r_init_flag = GENERATE(true,false);
-    clawpatch_vt->fort_tag4refinement = [](const int *mx, const int *my, const int *mz, 
-                                           const int *mbc, const int *meqn, 
-                                           const double *xlower, const double *ylower, const double *zlower, 
-                                           const double *dx, const double *dy, const double *dz, 
-                                           const int *blockno, 
-                                           double q[], const double *tag_threshold, const int *init_flag, 
-                                           int *tag_patch)
+    for(int tag_patch : {true,false})
+    for(int init_flag : {true,false})
     {
-        CHECK(*mx == t4r_cp->mx);
-        CHECK(*my == t4r_cp->my);
-        CHECK(*mz == t4r_cp->mz);
-        CHECK(*mbc == t4r_cp->mbc);
-        CHECK(*meqn == t4r_cp->meqn);
-        CHECK(*xlower == t4r_cp->xlower);
-        CHECK(*ylower == t4r_cp->ylower);
-        CHECK(*zlower == t4r_cp->zlower);
-        CHECK(*dx == t4r_cp->dx);
-        CHECK(*dy == t4r_cp->dy);
-        CHECK(*dz == t4r_cp->dz);
-        CHECK(*blockno == t4r_cp->blockno);
-        CHECK(q == t4r_cp->griddata.dataPtr());
-        CHECK(*tag_threshold == .90210);
-        CHECK(*init_flag == t4r_init_flag);
-        *tag_patch = t4r_tag_patch;
-    };
+        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw2d_vtables_initialize(glob);
 
-    CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == t4r_tag_patch);
-                                    
-    fclaw2d_global_destroy(glob);
+        SinglePatchDomain test_data;
+        test_data.fopts.refine_threshold = 0.90210;
+        test_data.setup();
+
+
+        t4r_cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
+
+        fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
+
+        t4r_tag_patch = tag_patch;
+        t4r_init_flag = init_flag;
+        clawpatch_vt->fort_tag4refinement = [](const int *mx, const int *my, const int *mz, 
+                                               const int *mbc, const int *meqn, 
+                                               const double *xlower, const double *ylower, const double *zlower, 
+                                               const double *dx, const double *dy, const double *dz, 
+                                               const int *blockno, 
+                                               double q[], const double *tag_threshold, const int *init_flag, 
+                                               int *tag_patch)
+        {
+            CHECK(*mx == t4r_cp->mx);
+            CHECK(*my == t4r_cp->my);
+            CHECK(*mz == t4r_cp->mz);
+            CHECK(*mbc == t4r_cp->mbc);
+            CHECK(*meqn == t4r_cp->meqn);
+            CHECK(*xlower == t4r_cp->xlower);
+            CHECK(*ylower == t4r_cp->ylower);
+            CHECK(*zlower == t4r_cp->zlower);
+            CHECK(*dx == t4r_cp->dx);
+            CHECK(*dy == t4r_cp->dy);
+            CHECK(*dz == t4r_cp->dz);
+            CHECK(*blockno == t4r_cp->blockno);
+            CHECK(q == t4r_cp->griddata.dataPtr());
+            CHECK(*tag_threshold == .90210);
+            CHECK(*init_flag == t4r_init_flag);
+            *tag_patch = t4r_tag_patch;
+        };
+
+        CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == t4r_tag_patch);
+
+        fclaw2d_global_destroy(glob);
+    }
 }
-TEST_CASE("fclaw3dx_clawpatch tag4refinement negative refine threshold","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch tag4refinement negative refine threshold")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
+    for(int init_flag : {true,false})
+    {
+        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw2d_vtables_initialize(glob);
 
-    SinglePatchDomain test_data;
-    test_data.fopts.refine_threshold = -0.90210;
-    test_data.setup();
+        SinglePatchDomain test_data;
+        test_data.fopts.refine_threshold = -0.90210;
+        test_data.setup();
 
-    t4r_init_flag = GENERATE(true,false);
+        t4r_init_flag = init_flag;
 
-    CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == true);
+        CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == true);
 
-    fclaw2d_global_destroy(glob);
+        fclaw2d_global_destroy(glob);
+    }
 }
 namespace{
     fclaw3dx_clawpatch_t* t4c_cp;
@@ -938,73 +969,82 @@ namespace{
     int t4c_tag_patch;
     int t4c_init_flag;
 }
-TEST_CASE("fclaw3dx_clawpatch tag4coarsening","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch tag4coarsening")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
-
-    QuadDomain test_data;
-    test_data.fopts.coarsen_threshold = 0.90210;
-    test_data.setup();
-
-
-    t4c_cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
-    t4c_cp1 = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[1]);
-    t4c_cp2 = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[2]);
-    t4c_cp3 = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[3]);
-
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
-
-    t4c_tag_patch = GENERATE(true,false);
-    t4c_init_flag = GENERATE(true,false);
-    clawpatch_vt->fort_tag4coarsening = [](const int *mx, const int *my, const int *mz, 
-                                           const int *mbc, const int *meqn, 
-                                           double xlower[], double ylower[], double zlower[], 
-                                           const double *dx, const double *dy, const double *dz, 
-                                           const int *blockno, 
-                                           double q0[], double q1[], double q2[], double q3[], 
-                                           const double *tag_threshold, const int *init_flag, int *tag_patch)
+    for(int tag_patch : {true,false})
     {
-        CHECK(*mx == t4c_cp->mx);
-        CHECK(*my == t4c_cp->my);
-        CHECK(*mz == t4c_cp->mz);
-        CHECK(*mbc == t4c_cp->mbc);
-        CHECK(*meqn == t4c_cp->meqn);
-        CHECK(*xlower == t4c_cp->xlower);
-        CHECK(*ylower == t4c_cp->ylower);
-        CHECK(*zlower == t4c_cp->zlower);
-        CHECK(*dx == t4c_cp->dx);
-        CHECK(*dy == t4c_cp->dy);
-        CHECK(*dz == t4c_cp->dz);
-        CHECK(*blockno == t4c_cp->blockno);
-        CHECK(q0 == t4c_cp->griddata.dataPtr());
-        CHECK(q1 == t4c_cp1->griddata.dataPtr());
-        CHECK(q2 == t4c_cp2->griddata.dataPtr());
-        CHECK(q3 == t4c_cp3->griddata.dataPtr());
-        CHECK(*tag_threshold == .90210);
-        CHECK(*init_flag == t4c_init_flag);
-        *tag_patch = t4c_tag_patch;
-    };
+        t4c_tag_patch= tag_patch;
+        for(int init_flag : {true,false})
+        {
+            t4c_init_flag = init_flag;
+            fclaw2d_global_t* glob = fclaw2d_global_new(); 
+            fclaw2d_vtables_initialize(glob);
 
-    CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == t4c_tag_patch);
-                                    
+            QuadDomain test_data;
+            test_data.fopts.coarsen_threshold = 0.90210;
+            test_data.setup();
 
-    fclaw2d_global_destroy(glob);
+
+            t4c_cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
+            t4c_cp1 = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[1]);
+            t4c_cp2 = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[2]);
+            t4c_cp3 = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[3]);
+
+            fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
+
+            clawpatch_vt->fort_tag4coarsening = [](const int *mx, const int *my, const int *mz, 
+                                                   const int *mbc, const int *meqn, 
+                                                   double xlower[], double ylower[], double zlower[], 
+                                                   const double *dx, const double *dy, const double *dz, 
+                                                   const int *blockno, 
+                                                   double q0[], double q1[], double q2[], double q3[], 
+                                                   const double *tag_threshold, const int *init_flag, int *tag_patch)
+            {
+                CHECK(*mx == t4c_cp->mx);
+                CHECK(*my == t4c_cp->my);
+                CHECK(*mz == t4c_cp->mz);
+                CHECK(*mbc == t4c_cp->mbc);
+                CHECK(*meqn == t4c_cp->meqn);
+                CHECK(*xlower == t4c_cp->xlower);
+                CHECK(*ylower == t4c_cp->ylower);
+                CHECK(*zlower == t4c_cp->zlower);
+                CHECK(*dx == t4c_cp->dx);
+                CHECK(*dy == t4c_cp->dy);
+                CHECK(*dz == t4c_cp->dz);
+                CHECK(*blockno == t4c_cp->blockno);
+                CHECK(q0 == t4c_cp->griddata.dataPtr());
+                CHECK(q1 == t4c_cp1->griddata.dataPtr());
+                CHECK(q2 == t4c_cp2->griddata.dataPtr());
+                CHECK(q3 == t4c_cp3->griddata.dataPtr());
+                CHECK(*tag_threshold == .90210);
+                CHECK(*init_flag == t4c_init_flag);
+                *tag_patch = t4c_tag_patch;
+            };
+
+            CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == t4c_tag_patch);
+
+
+            fclaw2d_global_destroy(glob);
+        }
+    }
 }
-TEST_CASE("fclaw3dx_clawpatch tag4coarsening negative coarsen threshold","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch tag4coarsening negative coarsen threshold")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
-    fclaw2d_vtables_initialize(glob);
+    for(int init_flag : {true,false})
+    {
+        t4c_init_flag = init_flag;
+    
+        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw2d_vtables_initialize(glob);
 
-    QuadDomain test_data;
-    test_data.fopts.coarsen_threshold = -0.90210;
-    test_data.setup();
+        QuadDomain test_data;
+        test_data.fopts.coarsen_threshold = -0.90210;
+        test_data.setup();
 
-    t4c_init_flag = GENERATE(true,false);
+        CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == false);
 
-    CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == false);
-
-    fclaw2d_global_destroy(glob);
+        fclaw2d_global_destroy(glob);
+    }
 }
 namespace{
     fclaw3dx_clawpatch_t* i2f_ccp;
@@ -1015,12 +1055,12 @@ namespace{
     std::bitset<4> i2f_igrids;
     int i2f_manifold;
 }
-TEST_CASE("fclaw3dx_clawpatch interpolate2fine","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw3dx_clawpatch interpolate2fine")
 {
     fclaw2d_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
 
-    i2f_manifold = GENERATE(false);
+    i2f_manifold = false;
 
     QuadDomain fine_test_data;
     fine_test_data.fopts.manifold = i2f_manifold;

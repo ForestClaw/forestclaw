@@ -17,6 +17,7 @@ test_libtestutils_la_SOURCES += \
 endif
 
 test_libtestutils_la_CPPFLAGS = \
+	-I@top_srcdir@/test \
 	$(AM_CPPFLAGS) \
 	$(FCLAW_CLAWPATCH_CPPFLAGS) \
 	$(FCLAW_CPPFLAGS)

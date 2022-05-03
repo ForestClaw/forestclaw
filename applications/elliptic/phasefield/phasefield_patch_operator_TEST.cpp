@@ -1,4 +1,4 @@
-#include <test/catch.hpp>
+#include <test/doctest.h>
 #include <test/test_config.h>
 #include "phasefield_patch_operator.h"
 #include <test/utils/DomainReader.h>
@@ -9,57 +9,63 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("default lambda value is 999", "[applications/elliptic/phasefield]")
+TEST_CASE("default lambda value is 999")
 {
     CHECK(phasefield::getLambda()==999);
 }
 
-TEST_CASE("setLambda", "[applications/elliptic/phasefield]")
+TEST_CASE("setLambda")
 {
     double orig_lambda = phasefield::getLambda();
     phasefield::setLambda(2);
     CHECK(phasefield::getLambda()==2);
     phasefield::setLambda(orig_lambda);
 }
-TEST_CASE("constructor sets s array correctly", "[applications/elliptic/phasefield]"){
-    double orig_lambda = phasefield::getLambda();
-    phasefield::setLambda(-1);
+TEST_CASE("constructor sets s array correctly"){
+    for(int bc_west : {1,2})
+    for(int bc_east : {1,2})
+    for(int bc_south : {1,2})
+    for(int bc_north : {1,2})
+    {
+        double orig_lambda = phasefield::getLambda();
+        phasefield::setLambda(-1);
 
-    DomainReader<2> reader(TEST_SRC_DIR "/test/mesh_files/2d_uniform_2x2_mpi1.json", {10,10}, 2);
-    auto domain = reader.getCoarserDomain();
+        DomainReader<2> reader(TEST_SRC_DIR "/test/mesh_files/2d_uniform_2x2_mpi1.json", {10,10}, 2);
+        auto domain = reader.getCoarserDomain();
 
-    Vector<2> phi_n(domain, 3);
+        Vector<2> phi_n(domain, 3);
 
-    BiLinearGhostFiller ghost_filler(domain, GhostFillingType::Faces);
+        BiLinearGhostFiller ghost_filler(domain, GhostFillingType::Faces);
 
-    fc2d_thunderegg_options_t * mg_opt = new fc2d_thunderegg_options_t();
-    mg_opt->boundary_conditions = new int[4];
-    mg_opt->boundary_conditions[0] = GENERATE(1,2);
-    mg_opt->boundary_conditions[1] = GENERATE(1,2);
-    mg_opt->boundary_conditions[2] = GENERATE(1,2);
-    mg_opt->boundary_conditions[3] = GENERATE(1,2);
+        fc2d_thunderegg_options_t * mg_opt = new fc2d_thunderegg_options_t();
+        mg_opt->boundary_conditions = new int[4];
+        mg_opt->boundary_conditions[0] = bc_west;
+        mg_opt->boundary_conditions[1] = bc_east;
+        mg_opt->boundary_conditions[2] = bc_south;
+        mg_opt->boundary_conditions[3] = bc_north;
 
 
-    phasefield_options_t * phase_opt = new phasefield_options_t();
+        phasefield_options_t * phase_opt = new phasefield_options_t();
 
-    phasefield op(mg_opt, phase_opt, phi_n, domain, ghost_filler);
+        phasefield op(mg_opt, phase_opt, phi_n, domain, ghost_filler);
 
-    const int* s = op.getS();
+        const int* s = op.getS();
 
-    for(int i=0;i<4;i++){
-        if(mg_opt->boundary_conditions[i]==1){
-            CHECK(s[i]==-1);
-        }else{
-            CHECK(s[i]==1);
+        for(int i=0;i<4;i++){
+            if(mg_opt->boundary_conditions[i]==1){
+                CHECK(s[i]==-1);
+            }else{
+                CHECK(s[i]==1);
+            }
         }
+
+        phasefield::setLambda(orig_lambda);
+
+        //cleanup
+        delete[] mg_opt->boundary_conditions;
+        delete mg_opt;
+        delete phase_opt;
     }
-
-    phasefield::setLambda(orig_lambda);
-
-    //cleanup
-    delete[] mg_opt->boundary_conditions;
-    delete mg_opt;
-    delete phase_opt;
 }
 
 
@@ -73,7 +79,7 @@ double two(std::array<double, 2> coord){
     double y = coord[1];
     return cos(x)*sin(y);
 }
-TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
+TEST_CASE("addGhostToRHS"){
     double orig_lambda = phasefield::getLambda();
     phasefield::setLambda(-1);
 
@@ -145,7 +151,7 @@ TEST_CASE("addGhostToRHS", "[applications/elliptic/phasefield]"){
                 INFO("yi: "<< yi);
                 for(int xi = 0; xi<10; xi++){
                     INFO("xi: "<< xi);
-                    CHECK(y_view(xi,yi,component)==Approx(y_expected_view(xi,yi,component)));
+                    CHECK(y_view(xi,yi,component)==doctest::Approx(y_expected_view(xi,yi,component)));
                 }
             }
         }

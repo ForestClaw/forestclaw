@@ -36,7 +36,7 @@
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
 #include <fclaw2d_options.h>
-#include <test/catch.hpp>
+#include <test/doctest.h>
 #include <test/test.hpp>
 using namespace ThunderEgg;
 
@@ -144,261 +144,268 @@ struct QuadDomainBrick {
     }
 };
 }
-TEST_CASE("fclaw2d_thunderegg_get_vector","[fclaw2d][thunderegg]")
+TEST_CASE("fclaw2d_thunderegg_get_vector")
 {
-    fc2d_thunderegg_data_choice_t data_choice = GENERATE(RHS,SOLN,STORE_STATE);
-    QuadDomain test_data;
-    test_data.opts.mx   = GENERATE(4,5,6);
-    test_data.opts.my   = GENERATE(4,5,6);
-    test_data.opts.mbc  = GENERATE(1,2);
-    int meqn = GENERATE(1,2);
-    if(data_choice == RHS){
-        test_data.opts.rhs_fields = meqn;
-    }else{
-        test_data.opts.meqn = meqn;
-    }
-    test_data.setup();
-
-    int mx = test_data.opts.mx;
-    int my = test_data.opts.my;
-    int mbc = test_data.opts.mbc;
-
-    //set data
-    for(int i=0; i < 4; i++){
-        double * data = nullptr;
-        switch(data_choice){
-            case RHS:
-              fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
-            break;
-            case SOLN:
-              fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
-            break;
-            case STORE_STATE:
-              fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
-            break;
+    for(fc2d_thunderegg_data_choice_t data_choice : {RHS,SOLN,STORE_STATE})
+    for(int mx   : {4,5,6})
+    for(int my   : {4,5,6})
+    for(int mbc  : {1,2})
+    for(int meqn : {1,2})
+    {
+        QuadDomain test_data;
+        test_data.opts.mx   = mx;
+        test_data.opts.my   = my;
+        test_data.opts.mbc  = mbc;
+        if(data_choice == RHS){
+            test_data.opts.rhs_fields = meqn;
+        }else{
+            test_data.opts.meqn = meqn;
         }
-        for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
-            data[j] = i*(mx+2*mbc)*(my+2*mbc)*meqn + j;
+        test_data.setup();
+
+        //set data
+        for(int i=0; i < 4; i++){
+            double * data = nullptr;
+            switch(data_choice){
+                case RHS:
+                  fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                break;
+                case SOLN:
+                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                break;
+                case STORE_STATE:
+                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                break;
+            }
+            for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
+                data[j] = i*(mx+2*mbc)*(my+2*mbc)*meqn + j;
+            }
         }
-    }
 
-    // get vector
-    Vector<2> vec = fc2d_thunderegg_get_vector(test_data.glob,data_choice);
+        // get vector
+        Vector<2> vec = fc2d_thunderegg_get_vector(test_data.glob,data_choice);
 
-    //CHECK
-    CHECK(vec.getNumLocalPatches() == 4);
-    for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
-        PatchView<double, 2> view = vec.getPatchView(patch_idx);
-        CHECK(view.getGhostStart()[0] == -mbc);
-        CHECK(view.getGhostStart()[1] == -mbc);
-        CHECK(view.getGhostStart()[2] == 0);
-        CHECK(view.getStart()[0] == 0);
-        CHECK(view.getStart()[1] == 0);
-        CHECK(view.getStart()[2] == 0);
-        CHECK(view.getEnd()[0] == mx-1);
-        CHECK(view.getEnd()[1] == my-1);
-        CHECK(view.getEnd()[2] == meqn-1);
-        CHECK(view.getGhostEnd()[0] == mx-1+mbc);
-        CHECK(view.getGhostEnd()[1] == my-1+mbc);
-        CHECK(view.getGhostEnd()[2] == meqn-1);
-        CHECK(view.getStrides()[0] == 1);
-        CHECK(view.getStrides()[1] == (mx+2*mbc));
-        CHECK(view.getStrides()[2] == (mx+2*mbc)*(my+2*mbc));
-        int idx=0;
-        for(int eqn=0; eqn<meqn; eqn++){
-            for(int j=-mbc; j<my+mbc; j++){
-                for(int i=-mbc; i<mx+mbc; i++){
-                    CHECK(view(i,j,eqn) == patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx);
-                    idx++;
+        //CHECK
+        CHECK(vec.getNumLocalPatches() == 4);
+        for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
+            PatchView<double, 2> view = vec.getPatchView(patch_idx);
+            CHECK(view.getGhostStart()[0] == -mbc);
+            CHECK(view.getGhostStart()[1] == -mbc);
+            CHECK(view.getGhostStart()[2] == 0);
+            CHECK(view.getStart()[0] == 0);
+            CHECK(view.getStart()[1] == 0);
+            CHECK(view.getStart()[2] == 0);
+            CHECK(view.getEnd()[0] == mx-1);
+            CHECK(view.getEnd()[1] == my-1);
+            CHECK(view.getEnd()[2] == meqn-1);
+            CHECK(view.getGhostEnd()[0] == mx-1+mbc);
+            CHECK(view.getGhostEnd()[1] == my-1+mbc);
+            CHECK(view.getGhostEnd()[2] == meqn-1);
+            CHECK(view.getStrides()[0] == 1);
+            CHECK(view.getStrides()[1] == (mx+2*mbc));
+            CHECK(view.getStrides()[2] == (mx+2*mbc)*(my+2*mbc));
+            int idx=0;
+            for(int eqn=0; eqn<meqn; eqn++){
+                for(int j=-mbc; j<my+mbc; j++){
+                    for(int i=-mbc; i<mx+mbc; i++){
+                        CHECK(view(i,j,eqn) == patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx);
+                        idx++;
+                    }
                 }
             }
         }
     }
 }
-TEST_CASE("fclaw2d_thunderegg_store_vector","[fclaw2d][thunderegg]")
+TEST_CASE("fclaw2d_thunderegg_store_vector")
 {
-    QuadDomain test_data;
-    fc2d_thunderegg_data_choice_t data_choice = GENERATE(RHS,SOLN,STORE_STATE);
-    test_data.opts.mx   = GENERATE(4,5,6);
-    test_data.opts.my   = GENERATE(4,5,6);
-    test_data.opts.mbc  = GENERATE(1,2);
-    int meqn = GENERATE(1,2);
-    if(data_choice == RHS){
-        test_data.opts.rhs_fields = meqn;
-    }else{
-        test_data.opts.meqn = meqn;
-    }
-    test_data.setup();
+    for(fc2d_thunderegg_data_choice_t data_choice : {RHS,SOLN,STORE_STATE})
+    for(int mx   : {4,5,6})
+    for(int my   : {4,5,6})
+    for(int mbc  : {1,2})
+    for(int meqn : {1,2})
+    {
+        QuadDomain test_data;
+        test_data.opts.mx   = mx;
+        test_data.opts.my   = my;
+        test_data.opts.mbc  = mbc;
+        if(data_choice == RHS){
+            test_data.opts.rhs_fields = meqn;
+        }else{
+            test_data.opts.meqn = meqn;
+        }
+        test_data.setup();
 
 
-    int mx = test_data.opts.mx;
-    int my = test_data.opts.my;
-    int mbc = test_data.opts.mbc;
-
-    //set data
-    Communicator comm(MPI_COMM_WORLD);
-    Vector<2> vec(comm,{mx,my},meqn,4,mbc);
-    for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
-        PatchView<double, 2> view = vec.getPatchView(patch_idx);
-        int idx=0;
-        for(int eqn=0; eqn<meqn; eqn++){
-            for(int j=-mbc; j<my+mbc; j++){
-                for(int i=-mbc; i<mx+mbc; i++){
-                    view(i,j,eqn) = patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx;
-                    idx++;
+        //set data
+        Communicator comm(MPI_COMM_WORLD);
+        Vector<2> vec(comm,{mx,my},meqn,4,mbc);
+        for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
+            PatchView<double, 2> view = vec.getPatchView(patch_idx);
+            int idx=0;
+            for(int eqn=0; eqn<meqn; eqn++){
+                for(int j=-mbc; j<my+mbc; j++){
+                    for(int i=-mbc; i<mx+mbc; i++){
+                        view(i,j,eqn) = patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx;
+                        idx++;
+                    }
                 }
             }
         }
-    }
 
-    fc2d_thunderegg_store_vector(test_data.glob,data_choice,vec);
-    //check
-    for(int i=0; i < 4; i++){
-        double * data = nullptr;
-        switch(data_choice){
-            case RHS:
-              fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
-            break;
-            case SOLN:
-              fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
-            break;
-            case STORE_STATE:
-              fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
-            break;
-        }
-        for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
-            CHECK(data[j] == i*(mx+2*mbc)*(my+2*mbc)*meqn + j);
+        fc2d_thunderegg_store_vector(test_data.glob,data_choice,vec);
+        //check
+        for(int i=0; i < 4; i++){
+            double * data = nullptr;
+            switch(data_choice){
+                case RHS:
+                  fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                break;
+                case SOLN:
+                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                break;
+                case STORE_STATE:
+                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                break;
+            }
+            for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
+                CHECK(data[j] == i*(mx+2*mbc)*(my+2*mbc)*meqn + j);
+            }
         }
     }
 
 }
-TEST_CASE("fclaw2d_thunderegg_get_vector multiblock","[fclaw2d][thunderegg]")
+TEST_CASE("fclaw2d_thunderegg_get_vector multiblock")
 {
-    fc2d_thunderegg_data_choice_t data_choice = GENERATE(RHS,SOLN,STORE_STATE);
-    QuadDomainBrick test_data;
-    test_data.opts.mx   = GENERATE(4,5,6);
-    test_data.opts.my   = GENERATE(4,5,6);
-    test_data.opts.mbc  = GENERATE(1,2);
-    int meqn = GENERATE(1,2);
-    if(data_choice == RHS){
-        test_data.opts.rhs_fields = meqn;
-    }else{
-        test_data.opts.meqn = meqn;
-    }
-    test_data.setup();
-
-    int mx = test_data.opts.mx;
-    int my = test_data.opts.my;
-    int mbc = test_data.opts.mbc;
-
-    //set data
-    for(int i=0; i < 4; i++){
-        double * data = nullptr;
-        switch(data_choice){
-            case RHS:
-              fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
-            break;
-            case SOLN:
-              fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
-            break;
-            case STORE_STATE:
-              fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
-            break;
+    for(fc2d_thunderegg_data_choice_t data_choice : {RHS,SOLN,STORE_STATE})
+    for(int mx   : {4,5,6})
+    for(int my   : {4,5,6})
+    for(int mbc  : {1,2})
+    for(int meqn : {1,2})
+    {
+        QuadDomainBrick test_data;
+        test_data.opts.mx   = mx;
+        test_data.opts.my   = my;
+        test_data.opts.mbc  = mbc;
+        if(data_choice == RHS){
+            test_data.opts.rhs_fields = meqn;
+        }else{
+            test_data.opts.meqn = meqn;
         }
-        for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
-            data[j] = i*(mx+2*mbc)*(my+2*mbc)*meqn + j;
+        test_data.setup();
+
+        int mx = test_data.opts.mx;
+        int my = test_data.opts.my;
+        int mbc = test_data.opts.mbc;
+
+        //set data
+        for(int i=0; i < 4; i++){
+            double * data = nullptr;
+            switch(data_choice){
+                case RHS:
+                  fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                break;
+                case SOLN:
+                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                break;
+                case STORE_STATE:
+                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                break;
+            }
+            for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
+                data[j] = i*(mx+2*mbc)*(my+2*mbc)*meqn + j;
+            }
         }
-    }
 
-    // get vector
-    Vector<2> vec = fc2d_thunderegg_get_vector(test_data.glob,data_choice);
+        // get vector
+        Vector<2> vec = fc2d_thunderegg_get_vector(test_data.glob,data_choice);
 
-    //CHECK
-    CHECK(vec.getNumLocalPatches() == 4);
-    for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
-        PatchView<double, 2> view = vec.getPatchView(patch_idx);
-        CHECK(view.getGhostStart()[0] == -mbc);
-        CHECK(view.getGhostStart()[1] == -mbc);
-        CHECK(view.getGhostStart()[2] == 0);
-        CHECK(view.getStart()[0] == 0);
-        CHECK(view.getStart()[1] == 0);
-        CHECK(view.getStart()[2] == 0);
-        CHECK(view.getEnd()[0] == mx-1);
-        CHECK(view.getEnd()[1] == my-1);
-        CHECK(view.getEnd()[2] == meqn-1);
-        CHECK(view.getGhostEnd()[0] == mx-1+mbc);
-        CHECK(view.getGhostEnd()[1] == my-1+mbc);
-        CHECK(view.getGhostEnd()[2] == meqn-1);
-        CHECK(view.getStrides()[0] == 1);
-        CHECK(view.getStrides()[1] == (mx+2*mbc));
-        CHECK(view.getStrides()[2] == (mx+2*mbc)*(my+2*mbc));
-        int idx=0;
-        for(int eqn=0; eqn<meqn; eqn++){
-            for(int j=-mbc; j<my+mbc; j++){
-                for(int i=-mbc; i<mx+mbc; i++){
-                    CHECK(view(i,j,eqn) == patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx);
-                    idx++;
+        //CHECK
+        CHECK(vec.getNumLocalPatches() == 4);
+        for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
+            PatchView<double, 2> view = vec.getPatchView(patch_idx);
+            CHECK(view.getGhostStart()[0] == -mbc);
+            CHECK(view.getGhostStart()[1] == -mbc);
+            CHECK(view.getGhostStart()[2] == 0);
+            CHECK(view.getStart()[0] == 0);
+            CHECK(view.getStart()[1] == 0);
+            CHECK(view.getStart()[2] == 0);
+            CHECK(view.getEnd()[0] == mx-1);
+            CHECK(view.getEnd()[1] == my-1);
+            CHECK(view.getEnd()[2] == meqn-1);
+            CHECK(view.getGhostEnd()[0] == mx-1+mbc);
+            CHECK(view.getGhostEnd()[1] == my-1+mbc);
+            CHECK(view.getGhostEnd()[2] == meqn-1);
+            CHECK(view.getStrides()[0] == 1);
+            CHECK(view.getStrides()[1] == (mx+2*mbc));
+            CHECK(view.getStrides()[2] == (mx+2*mbc)*(my+2*mbc));
+            int idx=0;
+            for(int eqn=0; eqn<meqn; eqn++){
+                for(int j=-mbc; j<my+mbc; j++){
+                    for(int i=-mbc; i<mx+mbc; i++){
+                        CHECK(view(i,j,eqn) == patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx);
+                        idx++;
+                    }
                 }
             }
         }
     }
 }
-TEST_CASE("fclaw2d_thunderegg_store_vector multiblock","[fclaw2d][thunderegg]")
+TEST_CASE("fclaw2d_thunderegg_store_vector multiblock")
 {
-    QuadDomainBrick test_data;
-    fc2d_thunderegg_data_choice_t data_choice = GENERATE(RHS,SOLN,STORE_STATE);
-    test_data.opts.mx   = GENERATE(4,5,6);
-    test_data.opts.my   = GENERATE(4,5,6);
-    test_data.opts.mbc  = GENERATE(1,2);
-    int meqn = GENERATE(1,2);
-    if(data_choice == RHS){
-        test_data.opts.rhs_fields = meqn;
-    }else{
-        test_data.opts.meqn = meqn;
-    }
-    test_data.setup();
+    for(fc2d_thunderegg_data_choice_t data_choice : {RHS,SOLN,STORE_STATE})
+    for(int mx   : {4,5,6})
+    for(int my   : {4,5,6})
+    for(int mbc  : {1,2})
+    for(int meqn : {1,2})
+    {
+        QuadDomainBrick test_data;
+        test_data.opts.mx   = mx;
+        test_data.opts.my   = my;
+        test_data.opts.mbc  = mbc;
+        if(data_choice == RHS){
+            test_data.opts.rhs_fields = meqn;
+        }else{
+            test_data.opts.meqn = meqn;
+        }
+        test_data.setup();
 
 
-    int mx = test_data.opts.mx;
-    int my = test_data.opts.my;
-    int mbc = test_data.opts.mbc;
-
-    //set data
-    Communicator comm(MPI_COMM_WORLD);
-    Vector<2> vec(comm,{mx,my},meqn,4,mbc);
-    for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
-        PatchView<double, 2> view = vec.getPatchView(patch_idx);
-        int idx=0;
-        for(int eqn=0; eqn<meqn; eqn++){
-            for(int j=-mbc; j<my+mbc; j++){
-                for(int i=-mbc; i<mx+mbc; i++){
-                    view(i,j,eqn) = patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx;
-                    idx++;
+        //set data
+        Communicator comm(MPI_COMM_WORLD);
+        Vector<2> vec(comm,{mx,my},meqn,4,mbc);
+        for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
+            PatchView<double, 2> view = vec.getPatchView(patch_idx);
+            int idx=0;
+            for(int eqn=0; eqn<meqn; eqn++){
+                for(int j=-mbc; j<my+mbc; j++){
+                    for(int i=-mbc; i<mx+mbc; i++){
+                        view(i,j,eqn) = patch_idx*(mx+2*mbc)*(my+2*mbc)*meqn + idx;
+                        idx++;
+                    }
                 }
             }
         }
-    }
 
-    fc2d_thunderegg_store_vector(test_data.glob,data_choice,vec);
-    //check
-    for(int i=0; i < 4; i++){
-        double * data = nullptr;
-        switch(data_choice){
-            case RHS:
-              fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
-            break;
-            case SOLN:
-              fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
-            break;
-            case STORE_STATE:
-              fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
-            break;
-        }
-        for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
-            CHECK(data[j] == i*(mx+2*mbc)*(my+2*mbc)*meqn + j);
+        fc2d_thunderegg_store_vector(test_data.glob,data_choice,vec);
+        //check
+        for(int i=0; i < 4; i++){
+            double * data = nullptr;
+            switch(data_choice){
+                case RHS:
+                  fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                break;
+                case SOLN:
+                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                break;
+                case STORE_STATE:
+                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                break;
+            }
+            for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
+                CHECK(data[j] == i*(mx+2*mbc)*(my+2*mbc)*meqn + j);
+            }
         }
     }
-
 }
 
 
