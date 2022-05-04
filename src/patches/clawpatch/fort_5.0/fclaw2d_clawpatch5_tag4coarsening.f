@@ -86,7 +86,7 @@ c--------------------------------------------------------------------
      &                coarsen_threshold,init_flag,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq,tag_patch,init_flag,glob,blockno
+      integer mx,my,mbc,meqn,mq,tag_patch,init_flag,blockno
       double precision coarsen_threshold
       double precision qmin,qmax, dx, dy, xlower, ylower
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -114,7 +114,7 @@ c--------------------------------------------------------------------
                end do
             endif
             exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
-     &             glob,blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
+     &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
      &             coarsen_threshold, init_flag, is_ghost)
 
 c           # -1 : Not conclusive (possibly ghost cell); don't tag for coarsening

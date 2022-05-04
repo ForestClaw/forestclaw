@@ -279,8 +279,7 @@ typedef void (*fclaw3dx_clawpatch_fort_tag4coarsening_t)(const int* mx,
 /** 
  * @deprecated Checks if solution exceeds a threshold
  */
-typedef int (*fclaw3dx_clawpatch_fort_exceeds_threshold_t)(int* glob,
-                                                           const int *blockno,
+typedef int (*fclaw3dx_clawpatch_fort_exceeds_threshold_t)(const int *blockno,
                                                            const double *qval, 
                                                            const double *qmin, 
                                                            const double *qmax,
@@ -588,9 +587,8 @@ int FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA();
                                   FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD)
 
 /**
- * @brief Check if the refinement threshold is exceeded
+ * @brief Check if the refinment threshold is exceeded
  *
- * @param[in] glob global context
  * @param[in] blockno the block number
  * @param[in] qval the 
  * @param[in] qmin the minimum q value
@@ -603,21 +601,20 @@ int FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA();
  * @param[in] is_ghost true if cell is a ghost cell
  * @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
  */
-int FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(int *glob,
-                                         const int *blockno,
-                                         const double *qval, 
-                                         const double *qmin, 
-                                         const double *qmax,
-                                         const double quad[], 
-                                         const double *dx, 
-                                         const double *dy, 
-                                         const double *dz,
-                                         const double *xc, 
-                                         const double *yc,
-                                         const double *zc, 
-                                         const double *tag_threshold,
-                                         const int *init_flag,
-                                         const int *is_ghost);
+int FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
+                                        const double *qval, 
+                                        const double *qmin, 
+                                        const double *qmax,
+                                        const double quad[], 
+                                        const double *dx, 
+                                        const double *dy, 
+                                        const double *dz,
+                                        const double *xc, 
+                                        const double *yc,
+                                        const double *zc, 
+                                        const double *tag_threshold,
+                                        const int *init_flag,
+                                        const int *is_ghost);
 
 
 /* ----------------------------- Value threshold -------------------------------------- */
@@ -717,8 +714,7 @@ int FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
                                  USER_EXCEEDS_TH)
 
 /** @brief C declaration of user_exceeds_th() subroutine */
-int USER_EXCEEDS_TH(int* glob,
-                    const int *blockno,
+int USER_EXCEEDS_TH(const int *blockno,
                     const double *qval, 
                     const double* qmin, 
                     const double *qmax,

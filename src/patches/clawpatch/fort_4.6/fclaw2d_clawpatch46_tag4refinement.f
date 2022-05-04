@@ -14,7 +14,7 @@ c--------------------------------------------------------------------
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
-      integer glob, blockno
+      integer blockno
       double precision xlower, ylower, dx, dy
       double precision tag_threshold
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
@@ -54,7 +54,7 @@ c     # and the corresponding tag4coarsening routine.
                end do
             endif
             exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
-     &             glob,blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
+     &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
      &             tag_threshold,init_flag, is_ghost)
 c           # -1 : Not conclusive (possibly ghost cell); don't tag for refinement
 c           # 0  : Does not pass threshold (don't tag for refinement)      

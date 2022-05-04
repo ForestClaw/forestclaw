@@ -31,9 +31,8 @@
 
 /* ------------------------------------------------------------------------------------ */
 
-int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* glob_int_ptr,
-                                        const int* blockno,
-                                        const double* qval, 
+int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int* blockno,
+                                        const double *qval, 
                                         const double* qmin, 
                                         const double *qmax,
                                         const double quad[], 
@@ -47,7 +46,7 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* glob_int_ptr,
 {
 
     //TODO Actual glob
-    struct fclaw2d_global* glob = (struct fclaw2d_global*) glob_int_ptr;
+    struct fclaw2d_global* glob = NULL;
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 
                                 clawpatch_vt->fort_user_exceeds_threshold;
@@ -88,7 +87,7 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(int* glob_int_ptr,
                                         "defined\n function was found.\n\n");
             }
             FCLAW_ASSERT(user_exceeds_threshold != NULL);
-            exceeds_th = user_exceeds_threshold((int*) glob, blockno, qval,qmin,qmax,quad, 
+            exceeds_th = user_exceeds_threshold(blockno, qval,qmin,qmax,quad, 
                                                 dx, dy, xc, yc,
                                                 tag_threshold,init_flag,is_ghost);
             break;

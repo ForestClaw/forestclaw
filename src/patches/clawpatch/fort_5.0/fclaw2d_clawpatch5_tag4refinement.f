@@ -14,7 +14,7 @@ c--------------------------------------------------------------------
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch, init_flag
-      integer glob, blockno
+      integer blockno
       double precision xlower, ylower, dx, dy
       double precision tag_threshold
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -46,7 +46,7 @@ c     # Refine based only on first variable in system.
                end do
             endif
             exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
-     &             glob,blockno, q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc,
+     &             blockno, q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc,
      &             tag_threshold,init_flag,is_ghost)
             
 c           # -1 : Not conclusive (possibly ghost cell); don't tag for refinement

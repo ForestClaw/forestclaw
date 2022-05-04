@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-integer function user_exceeds_th(glob, blockno,& 
+integer function user_exceeds_th(blockno,& 
                                   qval,qmin,qmax,quad, & 
                                   dx,dy,dz,xc,yc,zc,threshold, &
                                   init_flag, is_ghost)
@@ -9,7 +9,7 @@ integer function user_exceeds_th(glob, blockno,&
     double precision :: qval,qmin,qmax,threshold
     double precision :: quad(-1:1,-1:1,-1:1)
     double precision :: dx,dy, dz, xc, yc, zc
-    integer :: glob, blockno, init_flag
+    integer :: blockno, init_flag
     logical(kind=4) :: is_ghost
     integer :: refine
 
