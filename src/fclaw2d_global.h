@@ -130,6 +130,26 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
                                          fclaw2d_transfer_callback_t tcb,
                                          void *user);
 
+/**
+ * @brief Store a glob variable
+ * 
+ * @param glob the glob variable
+ */
+void fclaw2d_global_set_global(fclaw2d_global_t* glob);
+
+/**
+ * @brief Set the global glob the NULL
+ */
+void fclaw2d_global_unset_global();
+
+/**
+ * @brief Get the global glob variable
+ * 
+ * @return fclaw2d_global_t* the glob variable
+ */
+fclaw2d_global_t* fclaw2d_global_get_global();
+
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

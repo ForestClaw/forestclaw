@@ -174,4 +174,25 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
     fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }
 
+fclaw2d_global_t* global_glob = NULL;
+
+void fclaw2d_global_set_global(fclaw2d_global_t* glob)
+{
+    FCLAW_ASSERT(global_glob == NULL);
+    global_glob = glob;
+}
+
+void fclaw2d_global_unset_global()
+{
+    FCLAW_ASSERT(global_glob != NULL);
+    global_glob = NULL;
+}
+
+fclaw2d_global_t* fclaw2d_global_get_global()
+{
+    FCLAW_ASSERT(global_glob != NULL);
+    return global_glob;
+}
+
+
 #endif /* P4_TO_P8 */

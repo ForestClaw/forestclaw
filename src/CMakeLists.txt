@@ -159,3 +159,12 @@ install(TARGETS forestclaw
   EXPORT ${PROJECT_NAME}Targets
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib)
+
+if(BUILD_TESTING)
+  add_executable(libforestclaw_TEST
+      fclaw2d_global_TEST.cpp
+  )
+
+  target_link_libraries(libforestclaw_TEST testutils forestclaw)
+  register_unit_tests(libforestclaw_TEST)
+endif(BUILD_TESTING)

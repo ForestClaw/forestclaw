@@ -159,3 +159,20 @@ include_HEADERS += $(libforestclaw_installed_headers)
 
 AM_CPPFLAGS += $(FCLAW_CPPFLAGS) @FCLAW_SC_CPPFLAGS@ @FCLAW_P4EST_CPPFLAGS@
 AM_FFLAGS += $(FCLAW_FFLAGS)
+
+## UNIT TESTS
+check_PROGRAMS += src/libforestclaw.TEST
+TESTS += src/libforestclaw.TEST
+
+src_libforestclaw_TEST_SOURCES = \
+	src/fclaw2d_global_TEST.cpp 
+
+src_libforestclaw_TEST_CPPFLAGS = \
+	$(test_libtestutils_la_CPPFLAGS) \
+    $(src_libforestclaw_la_CPPFLAGS)
+
+src_libforestclaw_TEST_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+    $(LDADD) \
+    $(FCLAW_LDADD)

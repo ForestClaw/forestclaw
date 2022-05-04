@@ -2,6 +2,12 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest.h>
+#include <exception>
+
+void throw_exception()
+{
+    throw std::runtime_error("SC Aborted");
+}
 
 int main(int argc, char *argv[])
 {
@@ -39,6 +45,7 @@ int main(int argc, char *argv[])
 	    // global setup...
 	    fclaw_mpi_init(nullptr, nullptr, sc_MPI_COMM_WORLD, SC_LP_PRODUCTION);
 
+        sc_set_abort_handler(throw_exception);
 	    result = context.run();
 
 	    // global clean-up...

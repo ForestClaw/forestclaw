@@ -29,6 +29,7 @@
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
+#include <fclaw2d_diagnostics.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
@@ -48,8 +49,11 @@ struct QuadDomain {
     fclaw2d_clawpatch_options_t opts;
 
     QuadDomain(){
-        fclaw2d_clawpatch_vtable_initialize(glob, 4);
         glob = fclaw2d_global_new();
+
+        fclaw2d_diagnostics_vtable_initialize();
+        fclaw2d_clawpatch_vtable_initialize(glob, 4);
+    
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
         fopts.mj=1;
@@ -76,6 +80,7 @@ struct QuadDomain {
         fclaw2d_clawpatch_options_store(glob, &opts);
 
         fclaw2d_domain_data_new(glob->domain);
+
     }
     void setup(){
         fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
@@ -99,8 +104,11 @@ struct QuadDomainBrick {
     fclaw2d_clawpatch_options_t opts;
 
     QuadDomainBrick(){
-        fclaw2d_clawpatch_vtable_initialize(glob, 4);
         glob = fclaw2d_global_new();
+
+        fclaw2d_diagnostics_vtable_initialize();
+        fclaw2d_clawpatch_vtable_initialize(glob, 4);
+    
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=2;
         fopts.mj=2;
