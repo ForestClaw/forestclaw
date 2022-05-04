@@ -6,6 +6,7 @@ add_library(forestclaw_c OBJECT
   fclaw_options.c 
   fclaw_gauges.c 
   fclaw_package.c 
+  fclaw_pointer_map.cpp
   fclaw_math.c 
   fclaw_timer.c 
   fclaw_mpi.c 
@@ -108,6 +109,7 @@ install(FILES
   fclaw_base.h 
 	fclaw_timer.h 
 	fclaw_package.h 
+	fclaw_pointer_map.h 
 	fclaw_options.h 
 	fclaw_gauges.h 
 	fclaw_mpi.h 
@@ -162,6 +164,7 @@ install(TARGETS forestclaw
 
 if(BUILD_TESTING)
   add_executable(libforestclaw_TEST
+      fclaw_pointer_map.h.TEST.cpp
       fclaw2d_global_TEST.cpp
   )
 

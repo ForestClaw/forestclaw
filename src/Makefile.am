@@ -8,6 +8,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_base.h \
 	src/fclaw_timer.h \
 	src/fclaw_package.h \
+	src/fclaw_pointer_map.h \
 	src/fclaw_options.h \
 	src/fclaw_gauges.h \
 	src/fclaw_mpi.h \
@@ -64,6 +65,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_options.c \
 	src/fclaw_gauges.c \
 	src/fclaw_package.c \
+	src/fclaw_pointer_map.cpp \
 	src/fclaw_math.c \
 	src/fclaw_timer.c \
 	src/fclaw_mpi.c \
