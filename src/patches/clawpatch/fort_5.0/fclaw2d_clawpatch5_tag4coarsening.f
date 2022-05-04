@@ -14,7 +14,7 @@ c--------------------------------------------------------------------
       implicit none
 
       integer mx,my, mbc, meqn, tag_patch,initflag
-      integer glob, blockno
+      integer blockno
       double precision xlower(0:3), ylower(0:3), dx, dy
       double precision coarsen_threshold
       double precision q0(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
@@ -42,22 +42,22 @@ c     # If we find that (qmax-qmin > coarsen_threshold) on any
 c     # grid, we return immediately, since the family will then
 c     # not be coarsened.
 
-      call fclaw2d_clawpatch5_test_refine(glob,blockno,mx,my,mbc,meqn,
+      call fclaw2d_clawpatch5_test_refine(blockno,mx,my,mbc,meqn,
      &      mq,q0,qmin,qmax, dx,dy,xlower(0), ylower(0), 
      &      coarsen_threshold,initflag, tag_patch)
       if (tag_patch == 0) return
 
-      call fclaw2d_clawpatch5_test_refine(glob,blockno,mx,my,mbc,meqn,
+      call fclaw2d_clawpatch5_test_refine(blockno,mx,my,mbc,meqn,
      &      mq,q1,qmin,qmax,dx,dy,xlower(1), ylower(1), 
      &      coarsen_threshold,initflag, tag_patch)
       if (tag_patch == 0) return
 
-      call fclaw2d_clawpatch5_test_refine(glob,blockno,mx,my,mbc,meqn,
+      call fclaw2d_clawpatch5_test_refine(blockno,mx,my,mbc,meqn,
      &              mq,q2,qmin,qmax,dx,dy,xlower(2), ylower(2),
      &              coarsen_threshold,initflag, tag_patch)
       if (tag_patch == 0) return
 
-      call fclaw2d_clawpatch5_test_refine(glob,blockno,mx,my,mbc,meqn,
+      call fclaw2d_clawpatch5_test_refine(blockno,mx,my,mbc,meqn,
      &      mq,q3,qmin,qmax,dx,dy,xlower(3), ylower(3),
      &      coarsen_threshold,initflag, tag_patch)
 
@@ -81,7 +81,7 @@ c> @param[in] init_flag true if in init stage
 c> @param[in,out] tag_patch passed in as [1] may be set to [0] if it
 c>                should not be coarsened
 c--------------------------------------------------------------------
-      subroutine fclaw2d_clawpatch5_test_refine(glob,blockno, mx,my,mbc,
+      subroutine fclaw2d_clawpatch5_test_refine(blockno, mx,my,mbc,
      &                meqn,mq,q, qmin,qmax,dx,dy,xlower,ylower,
      &                coarsen_threshold,init_flag,tag_patch)
 
