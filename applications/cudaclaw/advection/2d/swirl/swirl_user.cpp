@@ -29,7 +29,7 @@
 #include <fc2d_clawpack46_fort.h>  
 #include <clawpack46_user_fort.h>  
 #include <fclaw2d_clawpatch46_fort.h>
-#include "../../../../clawpack/advection/2d/all/advection_user_fort.h"
+#include "../../../../clawpack/advection/2d/all/advection_user.h"
 
 static
 void swirl_problem_setup(fclaw2d_global_t* glob)
@@ -58,6 +58,7 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
 	fclaw2d_vtable_t *vt = fclaw2d_vt();
+    vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
     //vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
     //fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
     const user_options_t* user = swirl_get_options(glob);
@@ -73,12 +74,14 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
         /* Velocity is set here rather than in setaux, because we have a 
            time dependent velocity field */
         clawpack46_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
+        
     }
     else
     {
-        vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
+        //fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
 
         // const user_options_t* user = swirl_get_options(glob);
+        
         fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt();        
 
         cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;

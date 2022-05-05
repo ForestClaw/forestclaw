@@ -31,7 +31,8 @@
 #include <fc2d_clawpack46_fort.h>  
 #include <clawpack46_user_fort.h>  
 #include <fclaw2d_clawpatch46_fort.h>
-#include "../../../../clawpack/advection/2d/all/advection_user_fort.h"
+//#include "../../../../clawpack/advection/2d/all/advection_user_fort.h"
+#include "../../../../clawpack/advection/2d/all/advection_user.h"
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
@@ -108,7 +109,7 @@ void run_program(fclaw2d_global_t* glob)
 
 int main (int argc, char **argv)
 {
-
+	
 	PROFILE_CUDA_GROUP("Swirl : Main",1);
 
 	fclaw_app_t *app;
@@ -121,7 +122,7 @@ int main (int argc, char **argv)
 	fclaw_options_t             *fclaw_opt;
 	fclaw2d_clawpatch_options_t *clawpatch_opt;
 	fc2d_cudaclaw_options_t    *cuclaw_opt;
-	fc2d_clawpack46_options_t *clawpack46_opt;
+	fc2d_clawpack46_options_t  *claw46_opt;
 
 	fclaw2d_global_t            *glob;
 	fclaw2d_domain_t            *domain;
@@ -135,7 +136,7 @@ int main (int argc, char **argv)
 	/* Create new options packages */
 	fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
 	clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-	clawpack46_opt =   fc2d_clawpack46_options_register(app,"fclaw_options.ini");
+	claw46_opt =   fc2d_clawpack46_options_register(app,"fclaw_options.ini");
 	cuclaw_opt =        fc2d_cudaclaw_options_register(app,"fclaw_options.ini");
 	user_opt =                    swirl_options_register(app,"fclaw_options.ini");  
 
@@ -159,7 +160,7 @@ int main (int argc, char **argv)
 		/* Store option packages in glob */
 		fclaw2d_options_store           (glob, fclaw_opt);
 		fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
-		fc2d_clawpack46_options_store (glob, clawpack46_opt);
+		fc2d_clawpack46_options_store (glob, claw46_opt);
 		fc2d_cudaclaw_options_store    (glob, cuclaw_opt);
 		swirl_options_store             (glob, user_opt);
 
