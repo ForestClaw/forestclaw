@@ -51,14 +51,27 @@ swirl_ray_t;
 
 static int
 intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t * patch,
-               int blockno, int patchno, void *ray, double *integral)
+               int blockno, int patchno, void *vray, double *integral)
 {
-  swirl_ray_t *swirl_ray;
-
   /* assert that ray is a valid swirl_ray_t */
-  swirl_ray = (swirl_ray_t *) ray;
-  FCLAW_ASSERT(swirl_ray != NULL);
-  FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
+  swirl_ray_t *ray = (swirl_ray_t *) vray;
+  FCLAW_ASSERT(ray != NULL);
+  FCLAW_ASSERT(ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
+
+  if(fabs(ray->r.line.vec[0]) <= 1e-12 || fabs(ray->r.line.vec[1]) <= 1e-12) {
+    /* we can not guarantee correct results for rays are that run are almost
+     * identical to patch boundaries */
+    return 0;
+  }
+
+  /* store the patch corners in an indexable format */
+  double corners[2][2] = {{patch->xlower, patch->ylower},
+                          {patch->xupper, patch->yupper}};
+
+  int i, ni;
+  /* we search in the dimension of the strongest increase */
+  i = (fabs(ray->r.line.vec[0]) <= fabs(ray->r.line.vec[1])) ? 1 : 0;
+  ni = (i + 1) % 2;
 
   if(patchno >= 0) {
     /* We are at a leaf and the patch is a valid patch of the domain.
@@ -66,10 +79,43 @@ intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t * patch,
      * in the swirl_ray_t we defined, we now have to set *integral to be the
      * contribution of this ray-patch combination to the ray integral.
      * We should return 1 (even though a leaf return value is ignored). */
+    int j, nj;
+    double t;
+    double hits[2][2];
 
-    /* This is a dummy example.  We add the ray's x component for each patch.
-       Truly, this example must be updated to compute the exact ray integral. */
-    *integral = swirl_ray->r.line.vec[0];
+    /* compute the coordinates of the potential hits */
+    for(j = 0; j < 2; j++) {
+      hits[j][i] = corners[j][i];
+      t = (corners[j][i] - ray->xy[i]) / ray->r.line.vec[i];
+      hits[j][ni] = ray->xy[ni] + t * ray->r.line.vec[ni];
+    }
+
+    /* compute the actual hits */
+    t = 0;
+    for (j = 0; j < 2; j++) {
+      nj = (j + 1) % 2;
+      /* check if we hit the faces parallel to the search dimension */
+      if (hits[j][ni] < corners[0][ni]) {
+        t = (corners[0][ni] - hits[j][ni]) / (hits[nj][ni] - hits[j][ni]);
+        hits[j][ni] = corners[0][ni];
+      } else if (hits[j][ni] > corners[1][ni]) {
+        t = (corners[1][ni] - hits[j][ni]) / (hits[nj][ni] - hits[j][ni]);
+        hits[j][ni] = corners[1][ni];
+      } else {
+        /* if we get here we hit a face orthogonal to the search dimension */
+        continue;
+      }
+
+      if(t < 0 || t > 1) {
+        return 0; /* if t is not in [0, 1], both hits lie outside the patch */
+      }
+      hits[j][i] = hits[j][i] * (1 - t) + hits[nj][i] * t;
+    }
+
+    /* compute the distance of the two hits and store it in integral */
+    hits[0][0] = hits[0][0] - hits[1][0];
+    hits[0][1] = hits[0][1] - hits[1][1];
+    *integral = sqrt(hits[0][0] * hits[0][0] + hits[0][1] * hits[0][1]);
     return 1;
   } else {
     /* We are not at a leaf and the patch is an artificial patch containing all
@@ -86,10 +132,46 @@ intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t * patch,
      * The purpose of this test is to remove irrelevant ancestor
      * patch-ray-combinations early on to avoid unnecessary computations.
      * We do not need to assign to the integral value for ancestor patches. */
+    int j, is_left;
+    double t, rayatt;
 
-    /* This is a dummy example.  Truly, implement a fast and over-inclusive test
-     * to see if this ray may possibly intersect the patch and return the answer. */
-    return 1;
+    is_left = 0;
+    for(j = 0; j < 2; j++) {
+      /* compute the coordinates of the ray when it intersects the patch
+       * interval of the search dimension */
+      t = (corners[j][i] - ray->xy[i]) / ray->r.line.vec[i];
+      rayatt = ray->xy[ni] + t * ray->r.line.vec[ni];
+
+      if(corners[0][ni] > rayatt) {
+        is_left++; /* we pass the patch to the left */
+      } else if(rayatt <= corners[1][ni]) {
+        return 1; /* hits the edge between corners[ni][0] and corners[ni][1] */
+      }
+    }
+    /* If we reach this point, there was no direct hit in the search dimension.
+     * If there is one point on each side of the patch, there must be a hit in
+     * the other dimension, else there will be none. */
+    return (is_left == 1);
+  }
+}
+
+
+void
+print_integrals(fclaw2d_domain_t *domain, sc_array_t *rays,
+                sc_array_t *integrals) {
+  if(domain->mpirank == 0) {
+    size_t i;
+    swirl_ray_t *ray;
+    double *integral;
+
+    printf("Results of the domain integration:\n");
+    for (i = 0; i < rays->elem_count; i++) {
+      ray = (swirl_ray_t *) sc_array_index_int(rays, i);
+      integral = (double *) sc_array_index_int(integrals, i);
+      printf("Ray %ld: [%2.5f,%2.5f] + t * [%2.5f,%2.5f] has integral %f.\n",
+             i, ray->xy[0], ray->xy[1], ray->r.line.vec[0], ray->r.line.vec[1],
+             *integral);
+    }
   }
 }
 
@@ -151,11 +233,12 @@ void run_program(fclaw2d_global_t* glob, sc_array_t *rays, sc_array_t *integrals
      * call into a repeated diagnostic steps and output the integral values.
      */
     fclaw2d_domain_integrate_rays(glob->domain, intersect_ray, rays, integrals);
+    print_integrals(glob->domain, rays, integrals);
 
     fclaw2d_finalize(glob);
 }
 
-static int           nlines = 3;
+static int           nlines = 8;
 
 static sc_array_t *
 swirl_rays_new (void)
@@ -168,10 +251,12 @@ swirl_rays_new (void)
   for (i = 0; i < nlines; ++i) {
     ray = (swirl_ray_t *) sc_array_push (a);
     ray->rtype = SWIRL_RAY_LINE;
-    ray->xy[0] = 0.;
-    ray->xy[1] = 0.;
-    ray->r.line.vec[0] = cos (i * M_PI / nlines);
-    ray->r.line.vec[1] = sin (i * M_PI / nlines);
+    ray->xy[0] = 0.5;
+    ray->xy[1] = 0.5;
+    /* we add 0.1, since the intersection callback does not guarantee exact
+     * results for axis-parallel rays, which may lie on a patch boundary */
+    ray->r.line.vec[0] = cos ((i + 0.1) * 2 * M_PI / nlines);
+    ray->r.line.vec[1] = sin ((i + 0.1) * M_PI / nlines);
   }
 
   /* add no circles yet */
