@@ -82,6 +82,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_map_query.h>
 
+#include <fclaw_pointer_map.h>
+
 
 
 /* ------------------------------- Static function defs ------------------------------- */
@@ -95,7 +97,6 @@ static int fill_ghost(int time_interp)
 
 
 /* Store virtual table for retrieval from anywhere */
-static fclaw2d_clawpatch_vtable_t s_clawpatch_vt;
 
 static
 fclaw2d_clawpatch_t* get_clawpatch(fclaw2d_patch_t *patch)
@@ -1193,10 +1194,15 @@ void clawpatch_partition_unpack(fclaw2d_global_t *glob,
 /* ------------------------------------ Virtual table  -------------------------------- */
 
 static
-fclaw2d_clawpatch_vtable_t* clawpatch_vt_init()
+fclaw2d_clawpatch_vtable_t* clawpatch_vt_new()
 {
-	//FCLAW_ASSERT(s_clawpatch_vt.is_set == 0);
-	return &s_clawpatch_vt;
+    return (fclaw2d_clawpatch_vtable_t*) FCLAW_ALLOC (fclaw2d_clawpatch_vtable_t, 1);
+}
+
+static
+void clawpatch_vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
 }
 
 void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob, 
@@ -1207,7 +1213,7 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 
 	fclaw2d_metric_vtable_initialize(glob);
 
-	fclaw2d_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_init();
+	fclaw2d_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_new();
 
 	/* Patch setup */
 	patch_vt->patch_new             = clawpatch_new;
@@ -1396,6 +1402,9 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_pillow_vtable_initialize(glob, claw_version);
 
 	clawpatch_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"clawpatch") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "clawpatch", clawpatch_vt, clawpatch_vt_destroy);
 }
 
 
@@ -1406,8 +1415,12 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 
 fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt(fclaw2d_global_t* glob)
 {
-	FCLAW_ASSERT(s_clawpatch_vt.is_set != 0);
-	return &s_clawpatch_vt;
+
+	fclaw2d_clawpatch_vtable_t* clawpatch_vt = (fclaw2d_clawpatch_vtable_t*) 
+	   											fclaw_pointer_map_get(glob->vtables, "clawpatch");
+	FCLAW_ASSERT(clawpatch_vt != nullptr);
+	FCLAW_ASSERT(clawpatch_vt->is_set != 0);
+	return clawpatch_vt;
 }
 
 /* Called from clawpack 4.6 and 5.0 */

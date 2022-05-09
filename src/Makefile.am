@@ -167,6 +167,7 @@ check_PROGRAMS += src/libforestclaw.TEST
 TESTS += src/libforestclaw.TEST
 
 src_libforestclaw_TEST_SOURCES = \
+    src/fclaw_pointer_map.h.TEST.cpp \
 	src/fclaw2d_global_TEST.cpp 
 
 src_libforestclaw_TEST_CPPFLAGS = \

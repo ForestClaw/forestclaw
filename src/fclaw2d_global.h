@@ -76,6 +76,8 @@ struct fclaw2d_global
     int mpirank;              /**< Rank of this process in \b mpicomm. */
  
     struct fclaw_package_container *pkg_container;    /**< Solver packages for internal use. */
+
+    struct fclaw_pointer_map *vtables;    /**< Vtables */
  
     struct fclaw2d_map_context* cont;
     struct fclaw2d_domain *domain;

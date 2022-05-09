@@ -145,6 +145,7 @@ target_link_libraries(FORESTCLAW::CLAWPATCH INTERFACE clawpatch)
 
 if(BUILD_TESTING)
   add_executable(libclawpatch_TEST.MPI1
+      fclaw2d_clawpatch.h.TEST.cpp
       fclaw3dx_clawpatch_options_TEST.cpp
       fclaw3dx_clawpatch_TEST.cpp
   )

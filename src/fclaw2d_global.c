@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_package.h>
 #include <fclaw_timer.h>
+#include <fclaw_pointer_map.h>
 
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
@@ -79,6 +80,7 @@ fclaw2d_global_t* fclaw2d_global_new (void)
 
     glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
     glob->pkg_container = fclaw_package_container_new ();
+    glob->vtables = fclaw_pointer_map_new ();
 
     glob->count_amr_advance = 0;
     glob->count_ghost_exchange = 0;
@@ -114,6 +116,8 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     FCLAW_ASSERT (glob != NULL);
 
     fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
+    fclaw_pointer_map_destroy (glob->vtables);
+
     FCLAW_FREE (glob->acc);
     FCLAW_FREE (glob);
 }
