@@ -744,6 +744,7 @@ int clawpatch_tag4refinement(fclaw2d_global_t *glob,
 
 		int mx,my,mbc;
 		double xlower,ylower,dx,dy;
+		fclaw2d_global_set_global(glob);
 #if PATCH_DIM == 2
 		fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
 		                            &xlower,&ylower,&dx,&dy);
@@ -763,6 +764,7 @@ int clawpatch_tag4refinement(fclaw2d_global_t *glob,
 		                                  &refine_threshold,
 		                                  &initflag,&tag_patch);
 #endif		
+		fclaw2d_global_unset_global();
 	}
 	return tag_patch;
 }
@@ -808,6 +810,7 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 	if (coarsen_threshold > 0) 
 	{		
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+		fclaw2d_global_set_global(glob);
 #if PATCH_DIM == 2
 		/* Get xlower,ylower for each grid. */
 		clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,
@@ -821,6 +824,7 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 		                                  &blockno, q[0],q[1],q[2],q[3],
 		                                  &coarsen_threshold,&initflag,&tag_patch);
 #endif
+		fclaw2d_global_unset_global();
 	}
 	else
 	{

@@ -299,9 +299,11 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_rhs_data(glob,this_patch,&rhs,&mfields);
 
     tag_patch = 0;
+    fclaw2d_global_set_global(glob);
     clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs,&refine_threshold,
                                       &initflag,&tag_patch);
+    fclaw2d_global_unset_global();
     return tag_patch;
 }
 
@@ -332,9 +334,11 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     int tag_patch = 0;
+    fclaw2d_global_set_global(glob);
     clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
                                       &coarsen_threshold,&initflag,&tag_patch);
+    fclaw2d_global_unset_global();
     return tag_patch == 1;
 }
 

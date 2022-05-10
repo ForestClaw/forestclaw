@@ -45,11 +45,12 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two seperate vtables in t
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+    fclaw2d_vtables_initialize(glob1);
 
 	fclaw3dx_clawpatch_vtable_initialize(glob1,4);
 	fclaw3dx_clawpatch_vtable_initialize(glob2,4);
 
-	CHECK_NE(fclaw3dx_clawpatch_vt(glob2), fclaw3dx_clawpatch_vt(glob2));
+	CHECK_NE(fclaw3dx_clawpatch_vt(glob1), fclaw3dx_clawpatch_vt(glob2));
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -70,6 +71,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob"
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+    fclaw2d_vtables_initialize(glob1);
 
 	fclaw3dx_clawpatch_vtable_initialize(glob1,4);
 	CHECK_THROWS(fclaw3dx_clawpatch_vtable_initialize(glob1,4));
