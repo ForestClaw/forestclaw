@@ -9,6 +9,8 @@
 #endif
 
 
+#include<fclaw2d_global.h>
+
 #if REFINE_DIM == 2 && PATCH_DIM == 2
 
 #include "../fclaw2d_clawpatch.h"
@@ -44,15 +46,13 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int* blockno,
                                         const int* init_flag,
                                         const int* is_ghost)
 {
-
-    //TODO Actual glob
-    struct fclaw2d_global* glob = NULL;
+    struct fclaw2d_global* glob = fclaw2d_global_get_global();
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 
                                 clawpatch_vt->fort_user_exceeds_threshold;
 
     int exceeds_th = 1;
-    int refinement_criteria = fclaw2d_clawpatch_get_refinement_criteria();
+    int refinement_criteria = fclaw2d_clawpatch_get_options(glob)->refinement_criteria;
     switch(refinement_criteria)
     {
         case FCLAW_REFINE_CRITERIA_VALUE:
