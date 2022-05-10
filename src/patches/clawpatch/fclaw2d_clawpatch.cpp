@@ -1059,7 +1059,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	{
 		FCLAW_ASSERT(frsize > 0);
 		FCLAW_ASSERT(clawpatch_vt->time_sync_pack_registers != NULL);
-		fclaw2d_clawpatch_packmode_t frpackmode = packmode % 2 == 0 ?  
+		fclaw_clawpatch_packmode_t frpackmode = packmode % 2 == 0 ?  
 		                                            CLAWPATCH_REGISTER_PACK : 
 			                                        CLAWPATCH_REGISTER_UNPACK;
 		clawpatch_vt->time_sync_pack_registers(glob, patch,

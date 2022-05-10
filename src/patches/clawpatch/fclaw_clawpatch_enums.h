@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,11 +23,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <test/doctest.h>
+#ifndef FCLAW_CLAWPATCH_ENUMS_H
+#define FCLAW_CLAWPATCH_ENUMS_H
 
-//TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD uses refinent criteria in global glob")
-//{
-//	fclaw2d_global_t* glob = fclaw2d_global_new();
-//	fclaw3dx_clawpatch_options_t opts;
-//	fclaw3dx_clawpatch_set_refinement_criteria(r);
-//}
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/** 
+ *  @file
+ *  Clawpatch related structures and routines
+ */
+
+#if 0
+/* Fix syntax highlighting */
+#endif
+
+/**
+ * @brief Packing mode enum
+ */
+typedef enum fclaw_clawpatch_packmode
+{
+    /** Pack register into buffer */
+    CLAWPATCH_REGISTER_PACK = 0,
+    /** Unpack register from buffer */
+    CLAWPATCH_REGISTER_UNPACK
+} fclaw_clawpatch_packmode_t;
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* !FCLAW2D_CLAWPATCH_H */

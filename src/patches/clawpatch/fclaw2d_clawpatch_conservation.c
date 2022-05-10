@@ -113,7 +113,7 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
                                                 fclaw2d_patch_t *this_patch,
                                                 double *qpack,
                                                 int frsize, 
-                                                fclaw2d_clawpatch_packmode_t packmode, 
+                                                fclaw_clawpatch_packmode_t packmode, 
                                                 int *ierror)
 {
 	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);

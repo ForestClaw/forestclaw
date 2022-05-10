@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_forestclaw.h>
-//#include <fclaw3dx_clawpatch.h>
+#include <fclaw3dx_clawpatch.h>
 #include <test/doctest.h>
 
 TEST_CASE("fclaw2d_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs")
@@ -41,16 +41,16 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize stores two seperate vtables in tw
 	CHECK_NE(fclaw2d_clawpatch_vt(glob1), fclaw2d_clawpatch_vt(glob2));
 }
 
-//TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs")
-//{
-//	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-//	fclaw2d_global_t* glob2 = fclaw2d_global_new();
-//
-//	fclaw3dx_clawpatch_vtable_initialize(glob1,4);
-//	fclaw3dx_clawpatch_vtable_initialize(glob2,4);
-//
-//	CHECK_NE(fclaw3dx_clawpatch_vt(glob2), fclaw3dx_clawpatch_vt(glob2));
-//}
+TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs")
+{
+	fclaw2d_global_t* glob1 = fclaw2d_global_new();
+	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	fclaw3dx_clawpatch_vtable_initialize(glob1,4);
+	fclaw3dx_clawpatch_vtable_initialize(glob2,4);
+
+	CHECK_NE(fclaw3dx_clawpatch_vt(glob2), fclaw3dx_clawpatch_vt(glob2));
+}
 
 #ifdef FCLAW_ENABLE_DEBUG
 
@@ -66,15 +66,15 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob")
 	CHECK_THROWS(fclaw2d_clawpatch_vtable_initialize(glob2,4));
 }
 
-//TEST_CASE("fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob")
-//{
-//	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-//	fclaw2d_global_t* glob2 = fclaw2d_global_new();
-//
-//	fclaw3dx_clawpatch_vtable_initialize(glob1,4);
-//	CHECK_THROWS(fclaw3dx_clawpatch_vtable_initialize(glob1,4));
-//	fclaw3dx_clawpatch_vtable_initialize(glob2,4);
-//	CHECK_THROWS(fclaw3dx_clawpatch_vtable_initialize(glob2,4));
-//}
+TEST_CASE("fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob")
+{
+	fclaw2d_global_t* glob1 = fclaw2d_global_new();
+	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	fclaw3dx_clawpatch_vtable_initialize(glob1,4);
+	CHECK_THROWS(fclaw3dx_clawpatch_vtable_initialize(glob1,4));
+	fclaw3dx_clawpatch_vtable_initialize(glob2,4);
+	CHECK_THROWS(fclaw3dx_clawpatch_vtable_initialize(glob2,4));
+}
 
 #endif

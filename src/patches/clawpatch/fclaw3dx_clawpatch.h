@@ -82,7 +82,7 @@ typedef void (*fclaw3dx_clawpatch_time_sync_pack_registers_t)(struct fclaw2d_glo
                                                               struct fclaw2d_patch *patch,
                                                               double *qpack,
                                                               int frsize, 
-                                                        fclaw3dx_clawpatch_packmode_t packmode,
+                                                        fclaw_clawpatch_packmode_t packmode,
                                                               int *ierror);
 
 

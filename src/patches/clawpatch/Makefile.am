@@ -136,6 +136,8 @@ check_PROGRAMS += src/patches/clawpatch/libclawpatch_TEST.MPI1
 TESTS += src/patches/clawpatch/libclawpatch_TEST.MPI1
 
 src_patches_clawpatch_libclawpatch_TEST_MPI1_SOURCES = \
+    src/patches/clawpatch/fclaw2d_clawpatch.h.TEST.cpp \
+    src/patches/clawpatch/fclaw2d_clawpatch_fort.h.TEST.cpp \
 	src/patches/clawpatch/fclaw3dx_clawpatch_TEST.cpp \
 	src/patches/clawpatch/fclaw3dx_clawpatch_options_TEST.cpp
 
