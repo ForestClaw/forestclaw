@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_match_callback_t        fclaw3d_match_callback_t
 #define fclaw2d_transfer_callback_t     fclaw3d_transfer_callback_t
 #define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
+#define fclaw2d_integrate_ray_t         fclaw3d_integrate_ray_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID
@@ -133,6 +134,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw_domain_destroy2d          fclaw_domain_destroy3d
 #define fclaw2d_iterate_patch_cb        fclaw3d_iterate_patch_cb
 #define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
+#define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

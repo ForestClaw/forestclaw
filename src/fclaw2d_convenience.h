@@ -238,9 +238,8 @@ typedef int (*fclaw2d_integrate_ray_t) (fclaw2d_domain_t * domain,
  * \param [in] rays             Array containing the rays of user-defined type.
  *                              Each entry contains one item of arbitrary data.
  *                              We do not dereference, just pass pointers around.
- * \param [out] integrals       On output, array of double types representing a
- *                              ray's integral value.  Input values are ignored.
- *                              The number of entries must equal the number of rays.
+ * \param [in,out] integrals    Array of double variables.  The number of entries
+ *                              must equal the number of rays.  Input values ignored.
  *                              On output, we provide the final integral values.
  */
 void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,

@@ -1080,6 +1080,8 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     sc_array_destroy (points);
 }
 
+#endif /* !P4_TO_P8 */
+
 typedef struct fclaw2d_ray_integral
 {
     void *ray;
@@ -1206,5 +1208,3 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     sc_array_reset (ri);
     sc_array_reset (lints);
 }
-
-#endif /* !P4_TO_P8 */
