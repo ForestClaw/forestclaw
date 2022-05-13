@@ -1158,7 +1158,8 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
                                fclaw2d_integrate_ray_t intersect,
                                sc_array_t * rays, sc_array_t * integrals)
 {
-    size_t i, nintz;
+    int i;
+    size_t nintz;
     sc_array_t lints[1];
     sc_array_t ri[1];
     fclaw2d_ray_integral_t *rayint;
@@ -1182,7 +1183,7 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
 
     /* construct ray_integral_t array from rays */
     sc_array_init_count (ri, sizeof (fclaw2d_ray_integral_t), nintz);
-    for (i = 0; i < nintz; i++)
+    for (i = 0; i < (int) nintz; ++i)
     {
         rayint = (fclaw2d_ray_integral_t *) sc_array_index_int (ri, i);
         rayint->ray = sc_array_index_int (rays, i);

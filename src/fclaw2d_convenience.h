@@ -197,10 +197,10 @@ void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
  *                              Artificial patches are generally ancestors of
  *                              valid forestclaw patches that are leaves.
  * \param [in] blockno          The block id of the patch under consideration.
- * \param [in] patchno          When on a leaf, this is a valid patch number.
- *                              In this case, this callback must set the
- *                              integral value to the local contribution of this
- *                              patch and ray.
+ * \param [in] patchno          When on a leaf, this is a valid patch number,
+ *                              as always relative to its block.  For a leaf,
+ *                              this callback must set the integral value to
+ *                              the local contribution of this patch and ray.
  *                              Otherwise, patchno is -1.  In this case, the
  *                              integral value is ignored.
  * \param [in] ray              Representation of a "ray"; user-defined.
