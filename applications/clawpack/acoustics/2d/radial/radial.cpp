@@ -25,7 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "radial_user.h"
 
+#include <fclaw2d_clawpatch.h>
+
 /* ------------------------- Start of program ---------------------------- */
+
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
@@ -144,8 +147,11 @@ main (int argc, char **argv)
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Run the program */
-    if (!retval & !vexit)
+    if (!retval & (vexit < 2))
     {
+        radial_global_post_process(fclaw_opt, clawpatch_opt, user_opt);
+        fclaw_app_print_options(app);
+        
         /* Options have been checked and are valid */
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);

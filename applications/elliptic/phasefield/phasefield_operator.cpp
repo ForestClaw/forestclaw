@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -121,12 +121,27 @@ void phasefield_solve(fclaw2d_global_t *glob)
 
     // set the patch solver
     Iterative::CG<2> patch_cg;
-    patch_cg.setTolerance(mg_opt->patch_bcgs_tol);
-    patch_cg.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    patch_cg.setTolerance(mg_opt->patch_iter_tol);
+    patch_cg.setMaxIterations(mg_opt->patch_iter_max_it);
     Iterative::BiCGStab<2> patch_bicg;
-    patch_bicg.setTolerance(mg_opt->patch_bcgs_tol);
-    patch_bicg.setMaxIterations(mg_opt->patch_bcgs_max_it);
-    Iterative::PatchSolver<2> solver(patch_cg,op,true);
+    patch_bicg.setTolerance(mg_opt->patch_iter_tol);
+    patch_bicg.setMaxIterations(mg_opt->patch_iter_max_it);
+
+    Iterative::Solver<2>* patch_iterative_solver = nullptr;
+    switch(mg_opt->patch_solver){
+        case CG:
+            patch_iterative_solver = &patch_cg;
+            break; 
+        case BICG:
+            patch_iterative_solver = &patch_bicg;
+            break;
+        default:
+            fclaw_global_essentialf("phasefield : No valid " \
+                                    "patch solver specified\n");
+            exit(0);            
+    }
+
+    Iterative::PatchSolver<2> solver(*patch_iterative_solver,op,true);
 
     // create gmg preconditioner
     shared_ptr<Operator<2>> M;
@@ -173,7 +188,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
             prev_phi_n_vec = restricted_phi_n_vec;
 
             //smoother
-            Iterative::PatchSolver<2> smoother(patch_cg,patch_operator, true);
+            Iterative::PatchSolver<2> smoother(*patch_iterative_solver, patch_operator, true);
 
             //restrictor
             GMG::LinearRestrictor<2> restrictor(curr_domain, 
@@ -200,7 +215,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
                                          ghost_filler);
 
         //smoother
-        Iterative::PatchSolver<2> smoother(patch_cg, coarse_patch_operator, true);
+        Iterative::PatchSolver<2> smoother(*patch_iterative_solver, coarse_patch_operator, true);
         //interpolator
         GMG::DirectInterpolator<2> interpolator(curr_domain, prev_domain);
 
@@ -220,7 +235,8 @@ void phasefield_solve(fclaw2d_global_t *glob)
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);    
-    int its = iter_solver.solve(op, u, f, M.get(),true);  // output=false
+    bool prt_output = glob->mpirank == 0;
+    int its = iter_solver.solve(op, u, f, M.get(), prt_output);
 
     fclaw_global_productionf("Iterations: %i\n", its);    
 

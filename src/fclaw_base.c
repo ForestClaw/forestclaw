@@ -485,6 +485,13 @@ fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
                                 core);
 }
 
+
+void fclaw_app_print_options(fclaw_app_t *app)
+{
+        sc_options_print_summary (fclaw_get_package_id (),
+                                  FCLAW_VERBOSITY_ESSENTIAL, app->opt);    
+}
+
 fclaw_exit_type_t
 fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                          const char *savefile)

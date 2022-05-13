@@ -570,6 +570,11 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                     }
                 }
 
+#ifdef P4_TO_P8
+                /* loop through edge neighbors of this patch */
+                /* to be implemented */
+#endif
+
                 /* loop through corner neighbors of this patch */
                 for (corner = 0; max_tlevel <= level &&
                      corner < wrap->p4est_children; ++corner)
@@ -718,8 +723,6 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
     p4est_wrap_complete (wrap);
 }
 
-#ifndef P4_TO_P8
-
 void
 fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 {
@@ -799,6 +802,9 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
         P4EST_LOGF (ln->lp, "Block %d patch %d face %d neighbor %d\n",
                     block_no, patch_no, faceno, (int) fnt);
     }
+#ifdef P4_TO_P8
+    /* to be implemented: list edge neighbors as well */
+#endif
     for (cornerno = 0; cornerno < P4EST_CHILDREN; ++cornerno)
     {
         (void) fclaw2d_patch_corner_neighbors (domain, block_no, patch_no,
@@ -913,6 +919,9 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     int earlier, now;
     int *pentry;
     double x, y;
+#ifdef P4_TO_P8
+    double z;
+#endif
     double *xyentry;
     fclaw2d_block_t *block;
 #ifdef FCLAW_ENABLE_DEBUG
@@ -952,6 +961,14 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     {
         return 0;
     }
+#ifdef P4_TO_P8
+    z = xyentry[2];
+    if (z < quadrant->z * fclaw2d_smallest_h ||
+        z > (quadrant->z + qh) * fclaw2d_smallest_h)
+    {
+        return 0;
+    }
+#endif
     /* now we know that the point is contained in the search quadrant */
 
     if (local_num < 0)
@@ -975,6 +992,9 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     /* do the check a second time with the patch data */
     FCLAW_ASSERT (x >= patch->xlower && x <= patch->xupper);
     FCLAW_ASSERT (y >= patch->ylower && y <= patch->yupper);
+#ifdef P4_TO_P8
+    FCLAW_ASSERT (z >= patch->zlower && z <= patch->zupper);
+#endif
 
     /* remember the smallest local quadrant number as result */
     earlier = *(int *) sc_array_index_int (sd->results, ip);
@@ -1021,7 +1041,7 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (0 <= num_blocks);
 
     FCLAW_ASSERT (block_offsets->elem_size == sizeof (int));
-    FCLAW_ASSERT (coordinates->elem_size == 2 * sizeof (double));
+    FCLAW_ASSERT (coordinates->elem_size == P4EST_DIM * sizeof (double));
     FCLAW_ASSERT (results->elem_size == sizeof (int));
 
     FCLAW_ASSERT (num_blocks + 1 == (int) block_offsets->elem_count);
@@ -1037,7 +1057,7 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
         *(int *) sc_array_index_int (results, ip) = -1;
     }
 
-    /* construct input set for p4est search */
+    /* construct input set for p4est search: block and point number */
     points = sc_array_new_size (2 * sizeof (int), num_points);
     pbegin = 0;
     for (jb = 0; jb < num_blocks; ++jb)
@@ -1071,7 +1091,7 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                   (p4est_topidx_t) num_blocks);
     user_save = p4est->user_pointer;
     p4est->user_pointer = sd;
-    p4est_search (p4est, NULL, search_point_fn, points);
+    p4est_search_local (p4est, 0, NULL, search_point_fn, points);
     p4est->user_pointer = user_save;
 
     /* synchronize results in parallel */
@@ -1079,8 +1099,6 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     /* tidy up memory */
     sc_array_destroy (points);
 }
-
-#endif /* !P4_TO_P8 */
 
 typedef struct fclaw2d_ray_integral
 {

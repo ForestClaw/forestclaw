@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,23 +27,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user.h"
 
+#include <fclaw2d_clawpatch.h>
+
 #include <math.h>
+
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt,
-                                user_options_t* user_opt)
+                                fclaw_options_t* fclaw_opt)
 {
-    /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
+    /* Set up domain */
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
+    /* Mapped, multi-block domain */
+    p4est_connectivity_t     *conn = NULL;
+    fclaw2d_domain_t         *domain;
+    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     /* Duplicate initial conditions in each block */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
@@ -127,15 +130,21 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    if (!retval & !vexit)
+
+    if (!retval & (vexit < 2))
     {
+        /* This might change some of the values from above. */
+        replicated_global_post_process(fclaw_opt, clawpatch_opt, user_opt);
+        fclaw_app_print_options(app);
 
         /* Options have been checked and are valid */
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
-    
-        /* Create global structure which stores the domain, timers, etc */
+
+        domain = create_domain(mpicomm, fclaw_opt);
+
         glob = fclaw2d_global_new();
+
+        /* Create global structure which stores the domain, timers, etc */
         fclaw2d_global_store_domain(glob, domain);
 
         /* Store option packages in glob */
