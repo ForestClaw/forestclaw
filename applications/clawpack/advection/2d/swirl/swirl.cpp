@@ -53,23 +53,27 @@ static int
 intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t * patch,
                int blockno, int patchno, void *vray, double *integral)
 {
-  /* assert that ray is a valid swirl_ray_t */
+  int i, ni;
+  double corners[2][2];
   swirl_ray_t *ray = (swirl_ray_t *) vray;
+
+  /* assert that ray is a valid swirl_ray_t */
   FCLAW_ASSERT(ray != NULL);
   FCLAW_ASSERT(ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
 
   if(fabs(ray->r.line.vec[0]) <= 1e-12 || fabs(ray->r.line.vec[1]) <= 1e-12) {
-    /* we can not guarantee correct results for rays are that run are almost
-     * identical to patch boundaries */
+    /* we cannot guarantee correct results for rays are that run
+       almost parallel to patch boundaries */
     return 0;
   }
 
   /* store the patch corners in an indexable format */
-  double corners[2][2] = {{patch->xlower, patch->ylower},
-                          {patch->xupper, patch->yupper}};
+  corners[0][0] = patch->xlower;
+  corners[0][1] = patch->ylower;
+  corners[1][0] = patch->xupper;
+  corners[1][1] = patch->xupper;
 
-  int i, ni;
-  /* we search in the dimension of the strongest increase */
+  /* for stability we search in the dimension of the strongest increase */
   i = (fabs(ray->r.line.vec[0]) <= fabs(ray->r.line.vec[1])) ? 1 : 0;
   ni = (i + 1) % 2;
 
@@ -155,20 +159,20 @@ intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t * patch,
   }
 }
 
-
-void
+static void
 print_integrals(fclaw2d_domain_t *domain, sc_array_t *rays,
                 sc_array_t *integrals) {
   if(domain->mpirank == 0) {
-    size_t i;
-    swirl_ray_t *ray;
+    int i;
     double *integral;
+    swirl_ray_t *ray;
 
-    printf("Results of the domain integration:\n");
-    for (i = 0; i < rays->elem_count; i++) {
+    /* replace with proper logging as desired */
+    fprintf(stderr, "Results of the domain integration:\n");
+    for (i = 0; i < (int) rays->elem_count; i++) {
       ray = (swirl_ray_t *) sc_array_index_int(rays, i);
       integral = (double *) sc_array_index_int(integrals, i);
-      printf("Ray %ld: [%2.5f,%2.5f] + t * [%2.5f,%2.5f] has integral %f.\n",
+      fprintf(stderr, "Ray %ld: [%2.5f,%2.5f] + t * [%2.5f,%2.5f] integral %g\n",
              i, ray->xy[0], ray->xy[1], ray->r.line.vec[0], ray->r.line.vec[1],
              *integral);
     }
@@ -238,16 +242,15 @@ void run_program(fclaw2d_global_t* glob, sc_array_t *rays, sc_array_t *integrals
     fclaw2d_finalize(glob);
 }
 
-static int           nlines = 8;
-
 static sc_array_t *
-swirl_rays_new (void)
+swirl_rays_new (int nlines)
 {
   int                 i;
   swirl_ray_t        *ray;
   sc_array_t         *a = sc_array_new (sizeof (swirl_ray_t));
 
   /* add a couple straight rays */
+  FCLAW_ASSERT (nlines >= 0);
   for (i = 0; i < nlines; ++i) {
     ray = (swirl_ray_t *) sc_array_push (a);
     ray->rtype = SWIRL_RAY_LINE;
@@ -264,14 +267,18 @@ swirl_rays_new (void)
 }
 
 static sc_array_t *
-swirl_integrals_new(void)
+swirl_integrals_new(int nlines)
 {
+  FCLAW_ASSERT (nlines >= 0);
   return sc_array_new_count (sizeof (double), nlines);
 }
 
 int
 main (int argc, char **argv)
 {
+    /* number of rays that are straight lines.  No circles yet */
+    const int swirl_nlines = 8;
+
     int first_arg;
     sc_array_t *rays;
     sc_array_t *integrals;
@@ -308,8 +315,8 @@ main (int argc, char **argv)
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Setup some rays to integrate along/around */
-    rays = swirl_rays_new ();
-    integrals = swirl_integrals_new();
+    rays = swirl_rays_new (swirl_nlines);
+    integrals = swirl_integrals_new(swirl_nlines);
 
     /* Run the program */
     if (!retval & !vexit)
