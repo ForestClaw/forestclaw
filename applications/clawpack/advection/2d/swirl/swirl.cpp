@@ -61,15 +61,21 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     double corners[2][2];
     swirl_ray_t *ray = (swirl_ray_t *) vray;
 
+    /*
+     * This intersection routine takes the patch coordinate information directly.
+     * For mappings of any kind, these would have to be applied here in addition.
+     */
+
     /* assert that ray is a valid swirl_ray_t */
     FCLAW_ASSERT (ray != NULL);
-    FCLAW_ASSERT (ray->rtype == SWIRL_RAY_LINE);        /* Circles not there yet. */
+    FCLAW_ASSERT (ray->rtype == SWIRL_RAY_LINE);        /* feel free to add circles */
+    FCLAW_ASSERT (integral != NULL && *integral == 0.); /* documented precondition */
 
-    if (fabs (ray->r.line.vec[0]) <= 1e-12
-        || fabs (ray->r.line.vec[1]) <= 1e-12)
+    if (fabs (ray->r.line.vec[0]) <= 1e-12 ||
+        fabs (ray->r.line.vec[1]) <= 1e-12)
     {
-        /* we cannot guarantee correct results for rays are that run
-           almost parallel to patch boundaries */
+        /* we cannot guarantee correct results for rays
+           that run near parallel to patch boundaries */
         return 0;
     }
 
@@ -77,11 +83,11 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     corners[0][0] = patch->xlower;
     corners[0][1] = patch->ylower;
     corners[1][0] = patch->xupper;
-    corners[1][1] = patch->xupper;
+    corners[1][1] = patch->yupper;
 
-    /* for stability we search in the dimension of the strongest increase */
+    /* for stability we search in the dimension of the strongest component */
     i = (fabs (ray->r.line.vec[0]) <= fabs (ray->r.line.vec[1])) ? 1 : 0;
-    ni = (i + 1) % 2;
+    ni = i ^ 1;
 
     if (patchno >= 0)
     {
@@ -94,7 +100,7 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         double t;
         double hits[2][2];
 
-        /* compute the coordinates of the potential hits */
+        /* compute the coordinates of intersections with most orthogonal edges */
         for (j = 0; j < 2; j++)
         {
             hits[j][i] = corners[j][i];
@@ -102,22 +108,22 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             hits[j][ni] = ray->xy[ni] + t * ray->r.line.vec[ni];
         }
 
-        /* compute the actual hits */
-        t = 0;
+        /* compute the actual hit coordinates */
+        t = 0.;
         for (j = 0; j < 2; j++)
         {
-            nj = (j + 1) % 2;
+            nj = j ^ 1;
             /* check if we hit the faces parallel to the search dimension */
             if (hits[j][ni] < corners[0][ni])
             {
-                t = (corners[0][ni] - hits[j][ni]) / (hits[nj][ni] -
-                                                      hits[j][ni]);
+                t = (corners[0][ni] - hits[j][ni]) /
+                    (hits[nj][ni] - hits[j][ni]);
                 hits[j][ni] = corners[0][ni];
             }
             else if (hits[j][ni] > corners[1][ni])
             {
-                t = (corners[1][ni] - hits[j][ni]) / (hits[nj][ni] -
-                                                      hits[j][ni]);
+                t = (corners[1][ni] - hits[j][ni]) /
+                    (hits[nj][ni] - hits[j][ni]);
                 hits[j][ni] = corners[1][ni];
             }
             else
@@ -126,7 +132,7 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                 continue;
             }
 
-            if (t < 0 || t > 1)
+            if (t < 0. || t > 1.)
             {
                 return 0;       /* if t is not in [0, 1], both hits lie outside the patch */
             }
@@ -143,17 +149,17 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         /* We are not at a leaf and the patch is an artificial patch containing all
          * standard patch information except for the pointer to the next patch and
-         * user-data of any kind. Only the FCLAW2D_PATCH_CHILDID and the
-         * FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
-         * Based on this, we now can run a test to check if the ray and the patch
-         * intersect.
+         * user-data of any kind.
+         * Only FCLAW2D_PATCH_CHILDID and FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
+         * Based on this, we run a test to test whether the ray and the patch intersect.
+         *
          * We return 0 if we are certain that the ray does not intersect any
          * descendant of this patch.
          * We return 1 if the test concludes that the ray may intersect the patch.
-         * This test may be overinclusive / false positive to optimize for speed.
+         * This test may be overinclusive (a false positive) to optimize for speed.
          *
          * The purpose of this test is to remove irrelevant ancestor
-         * patch-ray-combinations early on to avoid unnecessary computations.
+         * patch-ray-combinations early on to avoid unnecessary computation.
          * We do not need to assign to the integral value for ancestor patches. */
         int j, is_left;
         double t, rayatt;
@@ -166,17 +172,17 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             t = (corners[j][i] - ray->xy[i]) / ray->r.line.vec[i];
             rayatt = ray->xy[ni] + t * ray->r.line.vec[ni];
 
-            if (corners[0][ni] > rayatt)
+            if (rayatt < corners[0][ni])
             {
-                is_left++;      /* we pass the patch to the left */
+                is_left++;      /* we pass the patch to the left (or bottom) */
             }
             else if (rayatt <= corners[1][ni])
             {
-                return 1;       /* hits the edge between corners[ni][0] and corners[ni][1] */
+                return 1;       /* hits the edge between corners[0][ni] and corners[1][ni] */
             }
         }
         /* If we reach this point, there was no direct hit in the search dimension.
-         * If there is one point on each side of the patch, there must be a hit in
+         * If there is one point on each side of the patch, there will be a hit in
          * the other dimension, else there will be none. */
         return (is_left == 1);
     }
