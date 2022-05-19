@@ -65,7 +65,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     if (user->example == 1)
     {
         /* Needed to get correct handling of block corners */
-        fclaw2d_clawpatch_use_pillowsphere();
+        fclaw2d_clawpatch_use_pillowsphere(glob);
     }
 
 
