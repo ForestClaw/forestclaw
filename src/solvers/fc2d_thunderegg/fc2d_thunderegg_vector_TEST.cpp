@@ -30,6 +30,7 @@
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_diagnostics.h>
+#include <fclaw2d_forestclaw.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
@@ -51,7 +52,7 @@ struct QuadDomain {
     QuadDomain(){
         glob = fclaw2d_global_new();
 
-        fclaw2d_diagnostics_vtable_initialize();
+        fclaw2d_vtables_initialize(glob);
         fclaw2d_clawpatch_vtable_initialize(glob, 4);
     
         memset(&fopts, 0, sizeof(fopts));
@@ -106,7 +107,7 @@ struct QuadDomainBrick {
     QuadDomainBrick(){
         glob = fclaw2d_global_new();
 
-        fclaw2d_diagnostics_vtable_initialize();
+        fclaw2d_vtables_initialize(glob);
         fclaw2d_clawpatch_vtable_initialize(glob, 4);
     
         memset(&fopts, 0, sizeof(fopts));

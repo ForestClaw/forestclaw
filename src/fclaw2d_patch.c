@@ -23,14 +23,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_pointer_map.h>
+
 #include <fclaw2d_patch.h>
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 
 struct fclaw2d_patch_transform_data;
-
-static fclaw2d_patch_vtable_t s_patch_vt;
 
 /* ------------------------------- static access functions ---------------------------- */
 static
@@ -774,42 +774,36 @@ void fclaw2d_patch_time_sync_reset(fclaw2d_global_t* glob,
 /* ----------------------------------- Virtual table ---------------------------------- */
 
 static
-fclaw2d_patch_vtable_t* patch_vt_init()
+fclaw2d_patch_vtable_t* patch_vt_new()
 {
-	//s_patch_vt.is_set = 0;
-	return &s_patch_vt;
+    return (fclaw2d_patch_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_patch_vtable_t, 1);
+}
+
+static
+void patch_vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
 }
 
 void fclaw2d_patch_vtable_initialize(fclaw2d_global_t* glob)
 {
-	fclaw2d_patch_vtable_t *patch_vt = patch_vt_init();
-
-#if 0
-	/* Function pointers are set to NULL by default so are not set here */
-
-	/* These must be redefined by the solver and user */
-	patch_vt->initialize          = NULL;
-	patch_vt->physical_bc         = NULL;
-	patch_vt->single_step_update  = NULL;
-
-	patch_vt->time_sync_f2c       = NULL;
-	patch_vt->time_sync_samesize  = NULL;
-
-	/* These are optional */
-	patch_vt->setup               = NULL;
-	patch_vt->remote_ghost_setup  = NULL;
-#endif    
+	fclaw2d_patch_vtable_t *patch_vt = patch_vt_new();
 
 	patch_vt->is_set = 1;
 
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_patch") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fclaw2d_patch", patch_vt, patch_vt_destroy);
 }
 
 /* ------------------------------ User access functions ------------------------------- */
 
 fclaw2d_patch_vtable_t* fclaw2d_patch_vt(fclaw2d_global_t* glob)
 {
-	//FCLAW_ASSERT(s_patch_vt.is_set != 0);
-	return &s_patch_vt;
+	fclaw2d_patch_vtable_t* patch_vt = (fclaw2d_patch_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_patch");
+	FCLAW_ASSERT(patch_vt != NULL);
+	FCLAW_ASSERT(patch_vt->is_set != 0);
+	return patch_vt;
 }
 
 

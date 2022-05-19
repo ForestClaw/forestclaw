@@ -616,9 +616,6 @@ TEST_CASE("fclaw3dx_clawpatch_size")
     for(int mbc  : {1,2})
     for(int meqn : {1,2})
     {
-        fclaw2d_global_t* glob = fclaw2d_global_new(); 
-        fclaw2d_vtables_initialize(glob);
-
         SinglePatchDomain test_data;
         test_data.opts.mx   = mx;
         test_data.opts.my   = my;
@@ -629,8 +626,6 @@ TEST_CASE("fclaw3dx_clawpatch_size")
 
         //CHECK
         CHECK(fclaw3dx_clawpatch_size(test_data.glob) == (size_t) (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn);
-
-        fclaw2d_global_destroy(glob);
     }
 }
 

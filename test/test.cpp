@@ -22,6 +22,15 @@ int main(int argc, char *argv[])
         listing = strcmp(argv[i], "--list-reporters") == 0;
         if (listing)
             break;
+        listing = strcmp(argv[i], "-ltc") == 0;
+        if (listing)
+            break;
+        listing = strcmp(argv[i], "-lts") == 0;
+        if (listing)
+            break;
+        listing = strcmp(argv[i], "-ltr") == 0;
+        if (listing)
+            break;
     }
 
     doctest::Context context;
@@ -31,16 +40,9 @@ int main(int argc, char *argv[])
 
     if(listing) {
         int rank = 0;
-#ifdef P4EST_ENABLE_MPI
-        MPI_Init(&argc,&argv);
-        MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-#endif
         if(rank == 0){
 	       result = context.run();
         }
-#ifdef P4EST_ENABLE_MPI
-        MPI_Finalize();
-#endif
     } else {
 	    // global setup...
 	    fclaw_mpi_init(nullptr, nullptr, sc_MPI_COMM_WORLD, SC_LP_PRODUCTION);
