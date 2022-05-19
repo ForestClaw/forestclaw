@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,46 +24,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_global.h>
-#include <doctest.h>
+#include <fclaw2d_vtable.h>
+#include <test/doctest.h>
 
-TEST_CASE("fclaw2d_global_set_global")
+TEST_CASE("fclaw2d_vtable_initialize stores two seperate vtables in two seperate globs")
 {
-	fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
-	fclaw2d_global_set_global(glob);
-	CHECK_EQ(fclaw2d_global_get_global(), glob);
-	fclaw2d_global_unset_global();
-}
+	fclaw2d_global_t* glob1 = fclaw2d_global_new();
+	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
-TEST_CASE("fclaw2d_global_unset_global")
-{
-	fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
-	fclaw2d_global_set_global(glob);
-	fclaw2d_global_unset_global();
-#ifdef FCLAW_ENABLE_DEBUG
-	CHECK_THROWS(fclaw2d_global_get_global());
-#else
-	CHECK_EQ(fclaw2d_global_get_global(), nullptr);
-#endif
+	fclaw2d_vtable_initialize(glob1);
+	fclaw2d_vtable_initialize(glob2);
+
+	CHECK_NE(fclaw2d_vt(glob1), fclaw2d_vt(glob2));
+
+	fclaw2d_global_destroy(glob1);
+	fclaw2d_global_destroy(glob2);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
 
-TEST_CASE("fclaw2d_global_set_global twice fails")
+TEST_CASE("fclaw2d_vtable_initialize fails if called twice on a glob")
 {
-	fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
-	fclaw2d_global_set_global(glob);
-	CHECK_THROWS(fclaw2d_global_set_global(glob));
-	fclaw2d_global_unset_global();
-}
+	fclaw2d_global_t* glob1 = fclaw2d_global_new();
+	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
-TEST_CASE("fclaw2d_global_unset_global assert fails when NULL")
-{
-	CHECK_THROWS(fclaw2d_global_unset_global());
-}
+	fclaw2d_vtable_initialize(glob1);
+	CHECK_THROWS(fclaw2d_vtable_initialize(glob1));
+	fclaw2d_vtable_initialize(glob2);
+	CHECK_THROWS(fclaw2d_vtable_initialize(glob2));
 
-TEST_CASE("fclaw2d_global_get_global assert fails when NULL")
-{
-	CHECK_THROWS(fclaw2d_global_get_global());
+	fclaw2d_global_destroy(glob1);
+	fclaw2d_global_destroy(glob2);
 }
 
 #endif

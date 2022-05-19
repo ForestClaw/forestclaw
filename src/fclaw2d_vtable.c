@@ -23,26 +23,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_pointer_map.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_output.h>
 #include <fclaw2d_global.h>
 
 #include <forestclaw2d.h>
 
-static fclaw2d_vtable_t s_vt;
-
 static
-fclaw2d_vtable_t* vt_init()
+fclaw2d_vtable_t* vt_new()
 {
-    // FCLAW_ASSERT(s_vt.is_set == 0);
-    return &s_vt;
+    return (fclaw2d_vtable_t*) FCLAW_ALLOC (fclaw2d_vtable_t, 1);
 }
 
+static
+void vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
+}
 
 fclaw2d_vtable_t* fclaw2d_vt(fclaw2d_global_t *glob)
 {
-    FCLAW_ASSERT(s_vt.is_set != 0);
-    return &s_vt;
+	fclaw2d_vtable_t* vt = (fclaw2d_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d");
+	FCLAW_ASSERT(vt != NULL);
+	FCLAW_ASSERT(vt->is_set != 0);
+	return vt;
 }
 
 
@@ -59,7 +65,7 @@ void fclaw2d_after_regrid(fclaw2d_global_t *glob)
 void fclaw2d_vtable_initialize(fclaw2d_global_t *glob)
 {
 
-    fclaw2d_vtable_t *vt = vt_init();
+    fclaw2d_vtable_t *vt = vt_new();
 
     /* ------------------------------------------------------------
       Functions below here depend on q and could be solver specific
@@ -76,4 +82,7 @@ void fclaw2d_vtable_initialize(fclaw2d_global_t *glob)
     vt->output_frame               = NULL;
 
     vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fclaw2d", vt, vt_destroy);
 }
