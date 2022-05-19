@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static
 fclaw2d_vtable_t* vt_new()
 {
-    return (fclaw2d_vtable_t*) FCLAW_ALLOC (fclaw2d_vtable_t, 1);
+    return (fclaw2d_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_vtable_t, 1);
 }
 
 static
@@ -66,20 +66,6 @@ void fclaw2d_vtable_initialize(fclaw2d_global_t *glob)
 {
 
     fclaw2d_vtable_t *vt = vt_new();
-
-    /* ------------------------------------------------------------
-      Functions below here depend on q and could be solver specific
-      ------------------------------------------------------------- */
-
-    /* These may be redefined by the user */
-    /* Problem setup */
-    vt->problem_setup              = NULL;
-
-    /* Defaults for regridding */
-    vt->after_regrid               = NULL;
-
-    /* Defaults for output */
-    vt->output_frame               = NULL;
 
     vt->is_set = 1;
 

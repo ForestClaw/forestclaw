@@ -1200,7 +1200,7 @@ void clawpatch_partition_unpack(fclaw2d_global_t *glob,
 static
 fclaw2d_clawpatch_vtable_t* clawpatch_vt_new()
 {
-    return (fclaw2d_clawpatch_vtable_t*) FCLAW_ALLOC (fclaw2d_clawpatch_vtable_t, 1);
+    return (fclaw2d_clawpatch_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_clawpatch_vtable_t, 1);
 }
 
 static
