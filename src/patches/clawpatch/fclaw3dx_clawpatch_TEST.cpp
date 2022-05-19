@@ -169,7 +169,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 
     fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
 
-    CHECK(clawpatch_vt->set_user_data             != NULL);
+    CHECK(clawpatch_vt->set_user_data             == NULL);
 
     //ghost filling
     CHECK(clawpatch_vt->fort_copy_face              == &FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE);
@@ -200,12 +200,12 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
     CHECK(clawpatch_vt->local_ghost_pack_aux        == NULL);
 
     //diagnostics
-    CHECK(clawpatch_vt->conservation_check          != NULL);
-    CHECK(clawpatch_vt->compute_error               != NULL);
-    CHECK(clawpatch_vt->fort_compute_patch_error    != NULL);
-    CHECK(clawpatch_vt->fort_conservation_check     != NULL);
-    CHECK(clawpatch_vt->fort_compute_error_norm     != NULL);
-    CHECK(clawpatch_vt->fort_compute_patch_area     != NULL);
+    CHECK(clawpatch_vt->conservation_check          == NULL);
+    CHECK(clawpatch_vt->compute_error               == NULL);
+    CHECK(clawpatch_vt->fort_compute_patch_error    == NULL);
+    CHECK(clawpatch_vt->fort_conservation_check     == NULL);
+    CHECK(clawpatch_vt->fort_compute_error_norm     == NULL);
+    CHECK(clawpatch_vt->fort_compute_patch_area     == NULL);
 
     CHECK(clawpatch_vt->is_set                      == 1);
 
