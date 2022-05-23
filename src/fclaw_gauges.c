@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_gauges.h>
 
+#include <fclaw_pointer_map.h>
+
 #include "fclaw2d_options.h"
 #include <fclaw2d_global.h>
 #include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
@@ -44,8 +46,6 @@ extern "C"
 #endif
 
 /* -------------------------------------------------------------------------------------*/
-
-static fclaw_gauges_vtable_t s_gauges_vt;
 
 typedef struct fclaw_gauge_acc
 {
@@ -383,31 +383,40 @@ void gauge_finalize(fclaw2d_global_t *glob, void** acc)
 }
 
 /* ---------------------------------- Virtual table  ---------------------------------- */
+static
+fclaw_gauges_vtable_t* fclaw_gauges_vt_new()
+{
+    return (fclaw_gauges_vtable_t*) FCLAW_ALLOC_ZERO (fclaw_gauges_vtable_t, 1);
+}
 
 static
-fclaw_gauges_vtable_t* fclaw_gauges_vt_init()
+void fclaw_gauges_vt_destroy(void* vt)
 {
-    //FCLAW_ASSERT(s_gauges_vt.is_set == 0);
-    return &s_gauges_vt;
+    FCLAW_FREE (vt);
 }
 
 fclaw_gauges_vtable_t* fclaw_gauges_vt(fclaw2d_global_t* glob)
 {
-    FCLAW_ASSERT(s_gauges_vt.is_set != 0);
-    return &s_gauges_vt;
+	fclaw_gauges_vtable_t* gauges_vt = (fclaw_gauges_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw_gauges");
+	FCLAW_ASSERT(gauges_vt != NULL);
+	FCLAW_ASSERT(gauges_vt->is_set != 0);
 }
 
 void fclaw_gauges_vtable_initialize(fclaw2d_global_t* glob)
 {
     fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt();
 
-    fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_init();
+    fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_new();
 
     diag_vt->gauges_init_diagnostics     = gauge_initialize;
     diag_vt->gauges_compute_diagnostics  = gauge_update;
     diag_vt->gauges_finalize_diagnostics = gauge_finalize;
 
     gauges_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw_gauges") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fclaw_gauges", gauges_vt, fclaw_gauges_vt_destroy);
 }
 /* ---------------------------- Virtualized Functions --------------------------------- */
 
