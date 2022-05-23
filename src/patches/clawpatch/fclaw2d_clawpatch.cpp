@@ -1399,7 +1399,7 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 #endif
 
 
-	fclaw2d_clawpatch_diagnostics_vtable_initialize();
+	fclaw2d_clawpatch_diagnostics_vtable_initialize(glob);
 
 	/* Set the virtual table, even if it isn't used */
 	fclaw2d_clawpatch_pillow_vtable_initialize(glob, claw_version);

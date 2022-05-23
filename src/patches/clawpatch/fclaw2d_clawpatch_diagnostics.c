@@ -232,10 +232,10 @@ void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
     *patch_acc = NULL;
 }
 
-void fclaw2d_clawpatch_diagnostics_vtable_initialize()
+void fclaw2d_clawpatch_diagnostics_vtable_initialize(fclaw2d_global_t* glob)
 {
     /* diagnostic functions that apply to patches (error, conservation) */
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
     
     diag_vt->patch_init_diagnostics      = fclaw2d_clawpatch_diagnostics_initialize;
     diag_vt->patch_compute_diagnostics   = fclaw2d_clawpatch_diagnostics_compute;

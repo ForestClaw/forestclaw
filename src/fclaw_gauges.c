@@ -405,7 +405,7 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt(fclaw2d_global_t* glob)
 
 void fclaw_gauges_vtable_initialize(fclaw2d_global_t* glob)
 {
-    fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt();
+    fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt(glob);
 
     fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_new();
 

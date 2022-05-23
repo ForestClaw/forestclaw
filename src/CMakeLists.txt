@@ -166,6 +166,7 @@ if(BUILD_TESTING)
   add_executable(libforestclaw_TEST
       fclaw_gauges.h.TEST.cpp
       fclaw_pointer_map.h.TEST.cpp
+      fclaw2d_diagnostics.h.TEST.cpp
       fclaw2d_global_TEST.cpp
       fclaw2d_patch.h.TEST.cpp
       fclaw2d_vtable.h.TEST.cpp
