@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <test/doctest.h>
 
-TEST_CASE("fclaw2d_vtable_initialize stores two seperate vtables in two seperate globs")
+TEST_CASE("fclaw2d_patch_vtable_initialize stores two seperate vtables in two seperate globs")
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
@@ -43,7 +43,7 @@ TEST_CASE("fclaw2d_vtable_initialize stores two seperate vtables in two seperate
 
 #ifdef FCLAW_ENABLE_DEBUG
 
-TEST_CASE("fclaw2d_vtable_initialize fails if called twice on a glob")
+TEST_CASE("fclaw2d_patch_vtable_initialize fails if called twice on a glob")
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
