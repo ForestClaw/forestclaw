@@ -401,6 +401,8 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt(fclaw2d_global_t* glob)
 	   							fclaw_pointer_map_get(glob->vtables, "fclaw_gauges");
 	FCLAW_ASSERT(gauges_vt != NULL);
 	FCLAW_ASSERT(gauges_vt->is_set != 0);
+
+    return gauges_vt;
 }
 
 void fclaw_gauges_vtable_initialize(fclaw2d_global_t* glob)

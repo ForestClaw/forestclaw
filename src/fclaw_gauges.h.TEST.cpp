@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_gauges.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_diagnostics.h>
 #include <test/doctest.h>
 
 TEST_CASE("fclaw_gauges_vtable_initialize stores two seperate vtables in two seperate globs")
@@ -32,7 +33,10 @@ TEST_CASE("fclaw_gauges_vtable_initialize stores two seperate vtables in two sep
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
+	fclaw2d_diagnostics_vtable_initialize(glob1);
 	fclaw_gauges_vtable_initialize(glob1);
+
+	fclaw2d_diagnostics_vtable_initialize(glob2);
 	fclaw_gauges_vtable_initialize(glob2);
 
 	CHECK_NE(fclaw_gauges_vt(glob1), fclaw_gauges_vt(glob2));
@@ -48,8 +52,11 @@ TEST_CASE("fclaw_guages_vtable_initialize fails if called twice on a glob")
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
+	fclaw2d_diagnostics_vtable_initialize(glob1);
 	fclaw_gauges_vtable_initialize(glob1);
 	CHECK_THROWS(fclaw_gauges_vtable_initialize(glob1));
+
+	fclaw2d_diagnostics_vtable_initialize(glob2);
 	fclaw_gauges_vtable_initialize(glob2);
 	CHECK_THROWS(fclaw_gauges_vtable_initialize(glob2));
 
