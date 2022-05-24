@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #if REFINE_DIM == 2 && PATCH_DIM == 2
+
+#define CLAWPATCH_VTABLE_NAME "fclaw2d_clawpatch"
+
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch.hpp>
 
@@ -48,6 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
+
+#define CLAWPATCH_VTABLE_NAME "fclaw3dx_clawpatch"
+
 #include <fclaw3dx_clawpatch.h>
 #include <fclaw3dx_clawpatch.hpp>
 
@@ -1406,8 +1412,8 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 
 	clawpatch_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"clawpatch") == NULL);
-	fclaw_pointer_map_insert(glob->vtables, "clawpatch", clawpatch_vt, clawpatch_vt_destroy);
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables, CLAWPATCH_VTABLE_NAME) == NULL);
+	fclaw_pointer_map_insert(glob->vtables, CLAWPATCH_VTABLE_NAME, clawpatch_vt, clawpatch_vt_destroy);
 }
 
 
@@ -1420,7 +1426,7 @@ fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt(fclaw2d_global_t* glob)
 {
 
 	fclaw2d_clawpatch_vtable_t* clawpatch_vt = (fclaw2d_clawpatch_vtable_t*) 
-	   											fclaw_pointer_map_get(glob->vtables, "clawpatch");
+	   											fclaw_pointer_map_get(glob->vtables, CLAWPATCH_VTABLE_NAME);
 	FCLAW_ASSERT(clawpatch_vt != nullptr);
 	FCLAW_ASSERT(clawpatch_vt->is_set != 0);
 	return clawpatch_vt;

@@ -41,6 +41,17 @@ TEST_CASE("fclaw2d_elliptic_vtable_initialize stores two seperate vtables in two
 	fclaw2d_global_destroy(glob2);
 }
 
+TEST_CASE("fclaw2d_elliptic_vtable_initialize sets is_set flag")
+{
+	fclaw2d_global_t* glob = fclaw2d_global_new();
+
+	fclaw2d_elliptic_vtable_initialize(glob);
+
+	CHECK_UNARY(fclaw2d_elliptic_vt(glob)->is_set);
+
+	fclaw2d_global_destroy(glob);
+}
+
 #ifdef FCLAW_ENABLE_DEBUG
 
 TEST_CASE("fclaw2d_elliptic_vtable_initialize fails if called twice on a glob")

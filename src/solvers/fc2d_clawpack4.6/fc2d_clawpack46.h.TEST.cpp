@@ -45,7 +45,7 @@ TEST_CASE("fc2d_clawpack46_solver_initialize stores two seperate vtables in two 
 	fclaw2d_global_destroy(glob2);
 }
 
-TEST_CASE("fc2d_clawpack46_solver_initialize set is_set flag")
+TEST_CASE("fc2d_clawpack46_solver_initialize sets is_set flag")
 {
 	fclaw2d_global_t* glob = fclaw2d_global_new();
 

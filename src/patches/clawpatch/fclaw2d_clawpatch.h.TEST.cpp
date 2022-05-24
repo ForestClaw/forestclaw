@@ -61,6 +61,32 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two seperate vtables in t
 	fclaw2d_global_destroy(glob2);
 }
 
+TEST_CASE("fclaw2d_clawpatch_vtable_initialize sets is_set flag")
+{
+	fclaw2d_global_t* glob = fclaw2d_global_new();
+
+    fclaw2d_vtables_initialize(glob);
+	fclaw2d_clawpatch_vtable_initialize(glob, 4);
+
+	CHECK_UNARY(fclaw2d_clawpatch_vt(glob)->is_set);
+
+	fclaw2d_global_destroy(glob);
+}
+
+TEST_CASE("fclaw3dx_clawpatch_vtable_initialize sets is_set flag")
+{
+	fclaw2d_global_t* glob = fclaw2d_global_new();
+
+    fclaw2d_vtables_initialize(glob);
+	fclaw3dx_clawpatch_vtable_initialize(glob, 4);
+
+	CHECK_UNARY(fclaw3dx_clawpatch_vt(glob)->is_set);
+
+	fclaw2d_global_destroy(glob);
+}
+
+
+
 #ifdef FCLAW_ENABLE_DEBUG
 
 TEST_CASE("fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob")
@@ -93,6 +119,18 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob"
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);
+}
+
+TEST_CASE("fclaw3dx_clawpatch_vt fails is fclaw2d_clawpatch_vt is set")
+{
+	fclaw2d_global_t* glob = fclaw2d_global_new();
+
+    fclaw2d_vtables_initialize(glob);
+	fclaw2d_clawpatch_vtable_initialize(glob, 4);
+
+	CHECK_THROWS(fclaw3dx_clawpatch_vt(glob));
+
+	fclaw2d_global_destroy(glob);
 }
 
 #endif
