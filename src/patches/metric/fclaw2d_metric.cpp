@@ -26,11 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_metric.h"
 #include "fclaw2d_metric.hpp"
 
+#include <fclaw_pointer_map.h>
+
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>  
-
-static fclaw2d_metric_vtable_t s_metric_vt;
-
 
 static
 fclaw2d_metric_patch_t* get_metric_patch(fclaw2d_global_t* glob,
@@ -238,22 +237,30 @@ void fclaw2d_metric_patch_setup_from_fine(fclaw2d_global_t *glob,
 /* ------------------------------------ Virtual table  -------------------------------- */
 
 static
-fclaw2d_metric_vtable_t* metric_vt_init()
+fclaw2d_metric_vtable_t* metric_vt_new()
 {
-    //FCLAW_ASSERT(s_metric_vt.is_set == 0);
-    return &s_metric_vt;
+    return (fclaw2d_metric_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_metric_vtable_t, 1);
+}
+
+static
+void metric_vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
 }
 
 fclaw2d_metric_vtable_t* fclaw2d_metric_vt(fclaw2d_global_t* glob)
 {
-    FCLAW_ASSERT(s_metric_vt.is_set != 0);
-    return &s_metric_vt;
+	fclaw2d_metric_vtable_t* metric_vt = (fclaw2d_metric_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_metric");
+	FCLAW_ASSERT(metric_vt != NULL);
+	FCLAW_ASSERT(metric_vt->is_set != 0);
+	return metric_vt;
 }
 
 
 void fclaw2d_metric_vtable_initialize(fclaw2d_global_t* glob)  
 {
-    fclaw2d_metric_vtable_t *metric_vt = metric_vt_init();
+    fclaw2d_metric_vtable_t *metric_vt = metric_vt_new();
 
     metric_vt->compute_mesh          = fclaw2d_metric_compute_mesh_default;
     metric_vt->compute_area          = fclaw2d_metric_compute_area_default;
@@ -267,6 +274,9 @@ void fclaw2d_metric_vtable_initialize(fclaw2d_global_t* glob)
     metric_vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
 
     metric_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_metric") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fclaw2d_metric", metric_vt, metric_vt_destroy);
 }
 
 

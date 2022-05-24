@@ -150,6 +150,7 @@ if(BUILD_TESTING)
       fclaw2d_clawpatch_fort.h.TEST.cpp
       fclaw3dx_clawpatch_options_TEST.cpp
       fclaw3dx_clawpatch_TEST.cpp
+      ${metric}/fclaw2d_metric.h.TEST.cpp
   )
   target_link_libraries(libclawpatch_TEST.MPI1 testutils clawpatch forestclaw)
   register_unit_tests(libclawpatch_TEST.MPI1)
