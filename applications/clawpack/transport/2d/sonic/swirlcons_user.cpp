@@ -48,7 +48,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t                     *vt = fclaw2d_vt(glob);
     fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-    fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
+    fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt(glob);
 
     fc2d_clawpack46_options_t  *clawopt = fc2d_clawpack46_get_options(glob);
     const user_options_t*          user = swirlcons_get_options(glob);

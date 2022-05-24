@@ -40,11 +40,11 @@ void mesh_link_solvers(fclaw2d_global_t *glob)
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
-        fc2d_clawpack46_vt()->setaux    = &CLAWPACK46_SETAUX;
-        fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV;
-        fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV;
-        fc2d_clawpack46_vt()->b4step2   = &CLAWPACK46_B4STEP2;
+        fc2d_clawpack46_vt(glob)->qinit     = &CLAWPACK46_QINIT;
+        fc2d_clawpack46_vt(glob)->setaux    = &CLAWPACK46_SETAUX;
+        fc2d_clawpack46_vt(glob)->rpn2      = &CLAWPACK46_RPN2ADV;
+        fc2d_clawpack46_vt(glob)->rpt2      = &CLAWPACK46_RPT2ADV;
+        fc2d_clawpack46_vt(glob)->b4step2   = &CLAWPACK46_B4STEP2;
     }
     else if (user->claw_version == 5)
     {

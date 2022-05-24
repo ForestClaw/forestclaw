@@ -53,7 +53,7 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
     const user_options_t* user = periodic_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();        
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);        
 
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;

@@ -173,7 +173,7 @@ void torus_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup   = &torus_patch_setup;
 
-    fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+    fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
     claw46_vt->fort_qinit = &CLAWPACK46_QINIT;
     claw46_vt->fort_rpn2  = RPN2CONS_FW_MANIFOLD; 
     claw46_vt->fort_rpt2  = &RPT2CONS_MANIFOLD;  

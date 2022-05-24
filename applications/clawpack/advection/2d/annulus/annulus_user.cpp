@@ -68,7 +68,7 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);
         clawpack46_vt->fort_qinit   = CLAWPACK46_QINIT;
         clawpack46_vt->fort_rpn2    = CLAWPACK46_RPN2ADV_MANIFOLD;
         clawpack46_vt->fort_rpt2    = CLAWPACK46_RPT2ADV_MANIFOLD;

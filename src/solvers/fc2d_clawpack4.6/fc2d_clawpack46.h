@@ -187,9 +187,22 @@ struct fc2d_clawpack46_vtable
 
 };
 
+/**
+ * @brief Initialize the clawpack46 solver
+ * 
+ * fclaw2d_vtables_intialize should be called before this function.
+ * 
+ * @param global the global context
+ */
 void fc2d_clawpack46_solver_initialize(struct fclaw2d_global* global);
 
-fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(void);
+/**
+ * @brief Get the clawpack46 vtable
+ * 
+ * @param global the global context
+ * @return fc2d_clawpack46_vtable_t* the vtable
+ */
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(struct fclaw2d_global* global);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */

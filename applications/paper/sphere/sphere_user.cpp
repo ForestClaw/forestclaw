@@ -264,7 +264,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     patch_vt->tag4refinement = sphere_tag4refinement;
     patch_vt->tag4coarsening = sphere_tag4coarsening;
 
-    fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt();
+    fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt(glob);
     clawpack46_vt->b4step2        = sphere_b4step2;
     clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
     clawpack46_vt->fort_rpn2      = RPN2CONS_FW_MANIFOLD; 

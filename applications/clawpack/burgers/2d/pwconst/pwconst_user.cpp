@@ -39,7 +39,7 @@ void pwconst_link_solvers(fclaw2d_global_t *glob)
     
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
 
         claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
         claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2;

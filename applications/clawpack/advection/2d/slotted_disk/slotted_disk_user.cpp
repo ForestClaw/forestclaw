@@ -71,7 +71,7 @@ void slotted_disk_link_solvers(fclaw2d_global_t *glob)
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
 
         /* Time dependent velocities */
         claw46_vt->b4step2        = slotted_disk_b4step2_manifold; 
