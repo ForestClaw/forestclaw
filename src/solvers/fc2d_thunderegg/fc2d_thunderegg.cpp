@@ -173,7 +173,7 @@ void fc2d_thunderegg_solver_initialize(fclaw2d_global_t* glob)
 	patch_vt->rhs            = thunderegg_rhs;  /* Calls FORTRAN routine */
 	patch_vt->setup          = NULL;
     
-    fclaw2d_elliptic_vtable_t *elliptic_vt = fclaw2d_elliptic_vt();
+    fclaw2d_elliptic_vtable_t *elliptic_vt = fclaw2d_elliptic_vt(glob);
     elliptic_vt->setup = thunderegg_setup_solver;
     elliptic_vt->solve = thunderegg_solve;    
     elliptic_vt->apply_bc = fc2d_thunderegg_physical_bc;

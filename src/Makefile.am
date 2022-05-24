@@ -169,6 +169,7 @@ TESTS += src/libforestclaw.TEST
 src_libforestclaw_TEST_SOURCES = \
     src/fclaw_gauges.h.TEST.cpp \
     src/fclaw_pointer_map.h.TEST.cpp \
+	src/fclaw2d_elliptic_solver.h.TEST.cpp \
 	src/fclaw2d_diagnostics.h.TEST.cpp \
 	src/fclaw2d_global_TEST.cpp \
 	src/fclaw2d_patch.h.TEST.cpp \

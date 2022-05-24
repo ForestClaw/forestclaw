@@ -23,6 +23,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_pointer_map.h>
 
 #include <fclaw2d_elliptic_solver.h>
 #include <fclaw2d_global.h>
@@ -30,15 +31,12 @@
 #include <fclaw2d_patch.h>
 
 
-/* Store virtual table for elliptic solver */
-static fclaw2d_elliptic_vtable_t   s_elliptic_vt;
-
 /* ---------------------------- Setup solver functions -------------------------------- */
 
 static
 void elliptic_setup_solver(fclaw2d_global_t *glob)
 {
-    fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt();
+    fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt(glob);
 
     /* May not be anything to set up */
     if (elliptic_vt->setup != NULL)
@@ -74,7 +72,7 @@ void elliptic_rhs_default(fclaw2d_global_t *glob)
 static
 void elliptic_rhs(fclaw2d_global_t *glob)
 {
-    fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt();
+    fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt(glob);
 
     FCLAW_ASSERT(elliptic_vt->rhs != NULL);
 
@@ -89,7 +87,7 @@ void elliptic_rhs(fclaw2d_global_t *glob)
 static
 void elliptic_solve(fclaw2d_global_t *glob)
 {
-    fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt();
+    fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt(glob);
 
     /* Check that the user has set an elliptic solver */
     FCLAW_ASSERT(elliptic_vt->solve != NULL);
@@ -123,29 +121,40 @@ void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
 /*---------------------------- Virtual table functions -------------------------------- */
 
 static
-fclaw2d_elliptic_vtable_t* elliptic_vt_init()
+fclaw2d_elliptic_vtable_t* elliptic_vt_new()
 {
-    //FCLAW_ASSERT(s_elliptic_vt.is_set == 0);
-    return &s_elliptic_vt;
+    return (fclaw2d_elliptic_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_elliptic_vtable_t, 1);
+}
+
+static
+void elliptic_vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
 }
 
 
-void fclaw2d_elliptic_vtable_initialize()
+void fclaw2d_elliptic_vtable_initialize(fclaw2d_global_t* glob)
 {
-    fclaw2d_elliptic_vtable_t *elliptic_vt = elliptic_vt_init();
+    fclaw2d_elliptic_vtable_t *elliptic_vt = elliptic_vt_new();
 
     elliptic_vt->rhs = elliptic_rhs_default;
 
     /* User should set the setup, rhs and solve routines */
     elliptic_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_elliptic") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fclaw2d_elliptic", elliptic_vt, elliptic_vt_destroy);
 }
 
 /*----------------------------------- Access functions -------------------------------- */
 
-fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt()
+fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(fclaw2d_global_t* glob)
 {
-    FCLAW_ASSERT(s_elliptic_vt.is_set != 0);
-    return &s_elliptic_vt;
+	fclaw2d_elliptic_vtable_t* elliptic_vt = (fclaw2d_elliptic_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_elliptic");
+	FCLAW_ASSERT(elliptic_vt != NULL);
+	FCLAW_ASSERT(elliptic_vt->is_set != 0);
+	return elliptic_vt;
 }
 
 

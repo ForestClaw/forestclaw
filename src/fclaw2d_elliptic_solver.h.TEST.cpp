@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,33 +23,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
-
 #include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_diagnostics.h>
-#include <fclaw_gauges.h>
-
 #include <fclaw2d_elliptic_solver.h>
+#include <test/doctest.h>
 
-void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
+TEST_CASE("fclaw2d_elliptic_vtable_initialize stores two seperate vtables in two seperate globs")
 {
-    fclaw2d_vtable_initialize(glob);
-    fclaw2d_patch_vtable_initialize(glob);
-    fclaw2d_diagnostics_vtable_initialize(glob);
-    fclaw2d_elliptic_vtable_initialize(glob);
+	fclaw2d_global_t* glob1 = fclaw2d_global_new();
+	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
-    fclaw_gauges_vtable_initialize(glob);    
+	fclaw2d_elliptic_vtable_initialize(glob1);
+	fclaw2d_elliptic_vtable_initialize(glob2);
+
+	CHECK_NE(fclaw2d_elliptic_vt(glob1), fclaw2d_elliptic_vt(glob2));
+
+	fclaw2d_global_destroy(glob1);
+	fclaw2d_global_destroy(glob2);
 }
 
-void fclaw2d_problem_setup(fclaw2d_global_t *glob)
+#ifdef FCLAW_ENABLE_DEBUG
+
+TEST_CASE("fclaw2d_elliptic_vtable_initialize fails if called twice on a glob")
 {
-	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-	
-    /* User defined problem setup */
-    if (fclaw_vt->problem_setup != NULL)
-    {
-        fclaw_vt->problem_setup(glob);
-    }
+	fclaw2d_global_t* glob1 = fclaw2d_global_new();
+	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	fclaw2d_elliptic_vtable_initialize(glob1);
+	CHECK_THROWS(fclaw2d_elliptic_vtable_initialize(glob1));
+	fclaw2d_elliptic_vtable_initialize(glob2);
+	CHECK_THROWS(fclaw2d_elliptic_vtable_initialize(glob2));
+
+	fclaw2d_global_destroy(glob1);
+	fclaw2d_global_destroy(glob2);
 }
+
+#endif

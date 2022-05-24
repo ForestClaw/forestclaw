@@ -58,11 +58,11 @@ typedef struct fclaw2d_elliptic_vtable
 
 } fclaw2d_elliptic_vtable_t;
 
-void fclaw2d_elliptic_vtable_initialize();
+void fclaw2d_elliptic_vtable_initialize(struct fclaw2d_global* glob);
 
 void fclaw2d_elliptic_solve(struct fclaw2d_global *glob);
 
-fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(void);
+fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(struct fclaw2d_global* glob);
 
 #ifdef __cplusplus
 #if 0
