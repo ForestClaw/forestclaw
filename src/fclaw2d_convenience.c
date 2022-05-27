@@ -1099,3 +1099,134 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     /* tidy up memory */
     sc_array_destroy (points);
 }
+
+typedef struct fclaw2d_ray_integral
+{
+    void *ray;
+    double *integral;
+}
+fclaw2d_ray_integral_t;
+
+typedef struct fclaw2d_integrate_ray_data
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_integrate_ray_t integrate_ray;
+    void *user;
+}
+fclaw2d_integrate_ray_data_t;
+
+static int
+integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                  p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
+                  void *point)
+{
+    double integral;
+    int intersects;
+    fclaw2d_domain_t *domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
+    int patchno;
+
+    /* assert that the user_pointer contains a valid integrate_ray_data_t */
+    fclaw2d_integrate_ray_data_t *ird
+        = (fclaw2d_integrate_ray_data_t *) p4est->user_pointer;
+    FCLAW_ASSERT (ird != NULL);
+    FCLAW_ASSERT (ird->domain != NULL);
+    FCLAW_ASSERT (ird->integrate_ray != NULL);
+
+    /* assert that point is a valid ray_integral_t */
+    fclaw2d_ray_integral_t *ri = (fclaw2d_ray_integral_t *) point;
+    FCLAW_ASSERT (ri != NULL);
+    FCLAW_ASSERT (ri->ray != NULL);
+    FCLAW_ASSERT (ri->integral != NULL);
+
+    /* collect patch information */
+    domain = ird->domain;
+    if (local_num >= 0)
+    {
+        fclaw2d_block_t *block = domain->blocks + which_tree;
+        patchno = local_num - block->num_patches_before;
+        patch = block->patches + patchno;
+    }
+    else
+    {
+        /* create artifical patch and fill it based on the quadrant */
+        patchno = -1;
+        patch = &fclaw2d_patch;
+        patch->level = quadrant->level;
+        patch->target_level = quadrant->level;
+        patch->flags = p4est_quadrant_child_id (quadrant);
+        fclaw2d_patch_set_boundary_xylower (patch, quadrant);
+        patch->u.next = NULL;
+        patch->user = NULL;
+    }
+
+    /* compute local integral and add it onto the ray integral */
+    integral = 0.;
+    intersects = ird->integrate_ray (domain, patch, which_tree, patchno,
+                                     ri->ray, &integral, ird->user);
+    if (local_num >= 0)
+    {
+        *(ri->integral) += integral;
+    }
+    return intersects;
+}
+
+void
+fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
+                               fclaw2d_integrate_ray_t intersect,
+                               sc_array_t * rays, sc_array_t * integrals,
+                               void * user)
+{
+    int i;
+    size_t nintz;
+    sc_array_t lints[1];
+    sc_array_t ri[1];
+    fclaw2d_ray_integral_t *rayint;
+    fclaw2d_integrate_ray_data_t integrate_ray_data, *ird =
+        &integrate_ray_data;
+    p4est_t p4est;
+    p4est_wrap_t *wrap;
+
+    /* assert validity of parameters */
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (intersect != NULL);
+    FCLAW_ASSERT (rays != NULL);
+    FCLAW_ASSERT (integrals != NULL);
+    FCLAW_ASSERT (integrals->elem_size == sizeof (double));
+    FCLAW_ASSERT (rays->elem_count == integrals->elem_count);
+
+    /* create local storage for integral values */
+    nintz = integrals->elem_count;
+    sc_array_init_count (lints, sizeof (double), nintz);
+    memset (lints->array, 0, sizeof (double) * nintz);
+
+    /* construct ray_integral_t array from rays */
+    sc_array_init_count (ri, sizeof (fclaw2d_ray_integral_t), nintz);
+    for (i = 0; i < (int) nintz; ++i)
+    {
+        rayint = (fclaw2d_ray_integral_t *) sc_array_index_int (ri, i);
+        rayint->ray = sc_array_index_int (rays, i);
+        rayint->integral = (double *) sc_array_index_int (lints, i);
+    }
+
+    /* construct fclaw2d_integrate_ray_data_t */
+    ird->domain = domain;
+    ird->integrate_ray = intersect;
+    ird->user = user;
+
+    /* process-local integration through p4est */
+    wrap = (p4est_wrap_t *) domain->pp;
+    FCLAW_ASSERT (wrap != NULL);
+    FCLAW_ASSERT (wrap->p4est != NULL);
+    p4est = *(wrap->p4est);
+    p4est.user_pointer = ird;
+    p4est_search_local (&p4est, 0, NULL, integrate_ray_fn, ri);
+
+    /* allreduce local integral values in parallel */
+    sc_MPI_Allreduce (lints->array, integrals->array, nintz,
+                      sc_MPI_DOUBLE, sc_MPI_SUM, domain->mpicomm);
+
+    sc_array_reset (ri);
+    sc_array_reset (lints);
+}
