@@ -27,9 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW3D_CONVENIENCE_H
 
 #include <forestclaw3d.h>
-#if 0
-#include <fclaw3d_map.h>
-#endif
 #include <p8est_connectivity.h>
 
 #ifdef __cplusplus
@@ -40,7 +37,6 @@ extern "C"
 #endif
 #endif
 
-/* TODO: The unit cube is a special case of the brick.  Use that instead. */
 fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
                                                int initial_level);
 
@@ -54,6 +50,8 @@ fclaw3d_domain_t *fclaw3d_domain_new_twosphere (sc_MPI_Comm mpicomm,
 fclaw3d_domain_t *fclaw3d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
                                                   int initial_level);
 
+#endif
+
 /** Create a brick connectivity, that is, a rectangular grid of blocks.
  * The origin is in the lower-left corner of the brick.
  * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
@@ -64,30 +62,25 @@ fclaw3d_domain_t *fclaw3d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
  *                              leftmost blocks.
  * \param [in] periodic_in_y    Periodicity along the vertical direction.
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
- * \param [in] cont             We do NOT take ownership of the mapping.
- *                              It is legal to pass NULL for this parameter.
  * \return                      A fully initialized domain structure.
  */
-fclaw2d_domain_t *fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
+fclaw3d_domain_t *fclaw3d_domain_new_brick (sc_MPI_Comm mpicomm,
                                             int blocks_in_x, int blocks_in_y,
+                                            int blocks_in_z,
                                             int periodic_in_x,
                                             int periodic_in_y,
-                                            int initial_level,
-                                            fclaw2d_map_context_t * cont);
+                                            int periodic_in_z,
+                                            int initial_level);
 
-/** Create a domain from a given forest connectivity and matching map.
+/** Create a domain from a given forest connectivity.
  * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
  * \param [in] conn             We DO take ownership of the connectivity.
- * \param [in] cont             We do NOT take ownership of the mapping.
  * \return                      A fully initialized domain structure.
  */
-fclaw2d_domain_t *fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm,
-                                               int initial_level,
-                                               p4est_connectivity_t * conn,
-                                               fclaw2d_map_context_t * cont);
-
-#endif /* 0 */
+fclaw3d_domain_t *fclaw3d_domain_new_conn (sc_MPI_Comm mpicomm,
+                                           int initial_level,
+                                           p8est_connectivity_t * conn);
 
 void fclaw3d_domain_destroy (fclaw3d_domain_t * domain);
 

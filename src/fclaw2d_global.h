@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_GLOBAL_H
 
 #include <forestclaw2d.h>  /* Needed to declare callbacks (below) */
+#include <fclaw2d_map.h>   /* Needed to store the map context */
 
 #include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
 
@@ -107,7 +108,11 @@ fclaw2d_global_t* fclaw2d_global_new (void);
 
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 
-void fclaw2d_global_store_domain (fclaw2d_global_t* glob, struct fclaw2d_domain* domain);
+void fclaw2d_global_store_domain (fclaw2d_global_t* glob,
+                                  struct fclaw2d_domain* domain);
+
+void fclaw2d_global_store_map (fclaw2d_global_t* glob,
+                               struct fclaw2d_map_context * map);
 
 void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);

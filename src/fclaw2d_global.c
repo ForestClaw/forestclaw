@@ -96,6 +96,7 @@ fclaw2d_global_t* fclaw2d_global_new (void)
 
     return glob;
 }
+
 void
 fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
 {
@@ -103,9 +104,16 @@ fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
     glob->mpicomm = domain->mpicomm;
     glob->mpisize = domain->mpisize;
     glob->mpirank = domain->mpirank;
-    
+
     glob->cont = (fclaw2d_map_context_t*)
            fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
+}
+
+void
+fclaw2d_global_store_map (fclaw2d_global_t* glob,
+                          struct fclaw2d_map_context * map)
+{
+    glob->cont = map;
 }
 
 void

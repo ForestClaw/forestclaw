@@ -38,12 +38,12 @@ extern "C"
 #endif
 #endif
 
-/* TODO: The unit square is a special case of the brick.  Use that instead. */
 fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                                  int initial_level);
-/* TODO: The torus is a special case of the brick.  Use that instead. */
+
 fclaw2d_domain_t *fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm,
                                             int initial_level);
+
 fclaw2d_domain_t *fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm,
                                                 int initial_level);
 fclaw2d_domain_t *fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
@@ -61,16 +61,23 @@ fclaw2d_domain_t *fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
  *                              leftmost blocks.
  * \param [in] periodic_in_y    Periodicity along the vertical direction.
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
- * \param [in] cont             We do NOT take ownership of the mapping.
- *                              It is legal to pass NULL for this parameter.
  * \return                      A fully initialized domain structure.
  */
 fclaw2d_domain_t *fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
                                             int blocks_in_x, int blocks_in_y,
                                             int periodic_in_x,
                                             int periodic_in_y,
-                                            int initial_level,
-                                            fclaw2d_map_context_t * cont);
+                                            int initial_level);
+
+/** Create a domain from a given forest connectivity.
+ * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
+ * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
+ * \param [in] conn             We DO take ownership of the connectivity.
+ * \return                      A fully initialized domain structure.
+ */
+fclaw2d_domain_t *fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm,
+                                           int initial_level,
+                                           p4est_connectivity_t * conn);
 
 /** Create a domain from a given forest connectivity and matching map.
  * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
