@@ -78,6 +78,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_dimension        fclaw3d_domain_dimension
 #define fclaw2d_check_initial_level     fclaw3d_check_initial_level
 #define fclaw2d_domain_new_unitsquare   fclaw3d_domain_new_unitcube
+#define fclaw2d_domain_new_brick        fclaw3d_domain_new_brick
+#define fclaw2d_domain_new_conn         fclaw3d_domain_new_conn
 #define fclaw2d_domain_num_faces        fclaw3d_domain_num_faces
 #define fclaw2d_domain_num_corners      fclaw3d_domain_num_corners
 #define fclaw2d_domain_num_face_corners     fclaw3d_domain_num_face_corners
@@ -137,6 +139,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_iterate_cb       fclaw3d_domain_iterate_cb
 #define fclaw_domain_new2d              fclaw_domain_new3d
 #define fclaw_domain_destroy2d          fclaw_domain_destroy3d
+
 #define fclaw2d_iterate_patch_cb        fclaw3d_iterate_patch_cb
 #define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
 #define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
