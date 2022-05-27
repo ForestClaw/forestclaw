@@ -55,7 +55,8 @@ swirl_ray_t;
 
 static int
 intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
-               int blockno, int patchno, void *vray, double *integral)
+               int blockno, int patchno, void *vray, double *integral,
+               void *user)
 {
     int i, ni;
     double corners[2][2];
@@ -70,6 +71,9 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     FCLAW_ASSERT (ray != NULL);
     FCLAW_ASSERT (ray->rtype == SWIRL_RAY_LINE);        /* feel free to add circles */
     FCLAW_ASSERT (integral != NULL && *integral == 0.); /* documented precondition */
+
+    /* just for demonstration purposes: not used in this example */
+    FCLAW_ASSERT (user == NULL);
 
     if (fabs (ray->r.line.vec[0]) <= 1e-12 ||
         fabs (ray->r.line.vec[1]) <= 1e-12)
@@ -205,7 +209,7 @@ print_integrals (fclaw2d_domain_t * domain, sc_array_t * rays,
             ray = (swirl_ray_t *) sc_array_index_int (rays, i);
             integral = (double *) sc_array_index_int (integrals, i);
             fprintf (stderr,
-                     "Ray %ld: [%2.5f,%2.5f] + t * [%2.5f,%2.5f] integral %g\n",
+                     "Ray %d: [%2.5f,%2.5f] + t * [%2.5f,%2.5f] integral %g\n",
                      i, ray->xy[0], ray->xy[1], ray->r.line.vec[0],
                      ray->r.line.vec[1], *integral);
         }
@@ -270,7 +274,7 @@ void run_program(fclaw2d_global_t* glob, sc_array_t *rays, sc_array_t *integrals
      * call into a repeated diagnostic steps and output the integral values.
      */
     fclaw2d_domain_integrate_rays (glob->domain,
-                                   intersect_ray, rays, integrals);
+                                   intersect_ray, rays, integrals, NULL);
     print_integrals (glob->domain, rays, integrals);
 
     fclaw2d_finalize(glob);

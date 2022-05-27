@@ -221,6 +221,7 @@ void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
  *                              For leaves this callback must set it to the
  *                              exact integral contribution for this patch and
  *                              ray.
+ * \param [in,out] user         Arbitrary data passed in earlier.
  * \return                      True if there is a possible/partial intersection of the
  *                              patch (which may be an ancestor) with the ray.
  *                              This may be a false positive; we'll be fine.
@@ -235,7 +236,8 @@ void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
 typedef int (*fclaw3d_integrate_ray_t) (fclaw3d_domain_t * domain,
                                         fclaw3d_patch_t * patch,
                                         int blockno, int patchno,
-                                        void *ray, double *integral);
+                                        void *ray, double *integral,
+                                        void *user);
 
 /** Compute the integrals of an array of user-defined rays.
  * The integral for each ray and intersection quadrant is supplied by a callback.
@@ -251,13 +253,13 @@ typedef int (*fclaw3d_integrate_ray_t) (fclaw3d_domain_t * domain,
  * \param [in,out] integrals    Array of double variables.  The number of entries
  *                              must equal the number of rays.  Input values ignored.
  *                              On output, we provide the final integral values.
+ * \param [in,out] user         Arbitrary data to be passed to the callback.
  */
 void fclaw3d_domain_integrate_rays (fclaw3d_domain_t * domain,
                                     fclaw3d_integrate_ray_t intersect,
                                     sc_array_t * rays,
-                                    sc_array_t * integrals);
-
-
+                                    sc_array_t * integrals,
+                                    void * user);
 
 #ifdef __cplusplus
 #if 0

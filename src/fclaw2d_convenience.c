@@ -1111,6 +1111,7 @@ typedef struct fclaw2d_integrate_ray_data
 {
     fclaw2d_domain_t *domain;
     fclaw2d_integrate_ray_t integrate_ray;
+    void *user;
 }
 fclaw2d_integrate_ray_data_t;
 
@@ -1163,7 +1164,7 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     /* compute local integral and add it onto the ray integral */
     integral = 0.;
     intersects = ird->integrate_ray (domain, patch, which_tree, patchno,
-                                     ri->ray, &integral);
+                                     ri->ray, &integral, ird->user);
     if (local_num >= 0)
     {
         *(ri->integral) += integral;
@@ -1174,7 +1175,8 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 void
 fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
                                fclaw2d_integrate_ray_t intersect,
-                               sc_array_t * rays, sc_array_t * integrals)
+                               sc_array_t * rays, sc_array_t * integrals,
+                               void * user)
 {
     int i;
     size_t nintz;
@@ -1211,6 +1213,7 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     /* construct fclaw2d_integrate_ray_data_t */
     ird->domain = domain;
     ird->integrate_ray = intersect;
+    ird->user = user;
 
     /* process-local integration through p4est */
     wrap = (p4est_wrap_t *) domain->pp;
