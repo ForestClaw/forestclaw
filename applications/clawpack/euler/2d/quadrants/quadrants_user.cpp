@@ -70,7 +70,7 @@ void quadrants_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
 
         claw5_vt->fort_qinit = &CLAWPACK5_QINIT;
         claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_EULER4;  /* Signature is unchanged */

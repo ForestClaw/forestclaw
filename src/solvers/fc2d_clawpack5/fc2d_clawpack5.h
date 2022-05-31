@@ -150,9 +150,22 @@ typedef struct fc2d_clawpack5_vtable
     int is_set;
 } fc2d_clawpack5_vtable_t;
 
+/**
+ * @brief Initialize the clawpack5 solver
+ * 
+ * fclaw2d_vtables_intialize should be called before this function.
+ * 
+ * @param global the global context
+ */
 void fc2d_clawpack5_solver_initialize(struct fclaw2d_global* glob);
 
-fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt();
+/**
+ * @brief Get the clawpack5 vtable
+ * 
+ * @param global the global context
+ * @return fc2d_clawpack5_vtable_t* the vtable
+ */
+fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt(struct fclaw2d_global* glob);
 
 /* ----------------------------- User access to solver functions --------------------------- */
 

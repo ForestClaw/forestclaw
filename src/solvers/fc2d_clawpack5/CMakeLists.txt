@@ -49,3 +49,11 @@ install(TARGETS clawpack5
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CLAWPACK5 INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CLAWPACK5 INTERFACE clawpack5)
+
+if(BUILD_TESTING)
+  add_executable(fc2d_clawpack5_TEST.MPI1
+    fc2d_clawpack5.h.TEST.cpp
+  )
+  target_link_libraries(fc2d_clawpack5_TEST.MPI1 testutils clawpack5)
+  register_unit_tests(fc2d_clawpack5_TEST.MPI1)
+endif(BUILD_TESTING)

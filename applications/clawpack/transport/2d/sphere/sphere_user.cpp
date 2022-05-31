@@ -168,7 +168,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     }
     else
     {
-        fc2d_clawpack5_vtable_t  *clawpack5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t  *clawpack5_vt = fc2d_clawpack5_vt(glob);
         clawpack5_vt->b4step2        = sphere_b4step2;
         clawpack5_vt->fort_qinit     = CLAWPACK5_QINIT;
         clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2CONS_MANIFOLD; 

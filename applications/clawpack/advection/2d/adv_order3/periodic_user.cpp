@@ -154,7 +154,7 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
 #if 0    
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt(glob);
 
         clawpack5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         clawpack5_vt->fort_setaux    = &CLAWPACK5_SETAUX;

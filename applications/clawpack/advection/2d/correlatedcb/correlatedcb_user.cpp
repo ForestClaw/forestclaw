@@ -81,7 +81,7 @@ void correlatedcb_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
 
         /* Time dependent velocity field */
         claw5_vt->b4step2        = correlatedcb_b4step2_manifold; 
