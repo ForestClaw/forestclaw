@@ -65,6 +65,10 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     /*
      * This intersection routine takes the patch coordinate information directly.
      * For mappings of any kind, these would have to be applied here in addition.
+     * We cannot guarantee correct results for rays that run near parallel to
+     * any coordinate axis, because they might cause undefined behaviour.
+     * We propose to rotate axis-parallel rays such that all entries of the
+     * vector are at least 1e-12.
      */
 
     /* assert that ray is a valid swirl_ray_t */
@@ -78,8 +82,6 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     if (fabs (ray->r.line.vec[0]) <= 1e-12 ||
         fabs (ray->r.line.vec[1]) <= 1e-12)
     {
-        /* we cannot guarantee correct results for rays
-           that run near parallel to patch boundaries */
         return 0;
     }
 
@@ -307,7 +309,7 @@ swirl_rays_new (int nlines)
         ray->xy[0] = 0.5;
         ray->xy[1] = 0.5;
         /* we add 0.1, since the intersection callback does not guarantee exact
-         * results for axis-parallel rays, which may lie on a patch boundary */
+         * results for axis-parallel rays */
         ray->r.line.vec[0] = cos ((i + 0.1) * 2 * M_PI / nlines);
         ray->r.line.vec[1] = sin ((i + 0.1) * M_PI / nlines);
     }
