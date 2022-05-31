@@ -166,7 +166,7 @@ struct fc2d_cudaclaw_vtable
 
 void fc2d_cudaclaw_solver_initialize(struct fclaw2d_global* glob);
 
-fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(void);
+fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(struct fclaw2d_global* glob);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */

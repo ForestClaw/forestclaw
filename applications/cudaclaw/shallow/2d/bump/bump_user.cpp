@@ -50,7 +50,7 @@ void bump_link_solvers(fclaw2d_global_t *glob)
 
     //const user_options_t* user = bump_get_options(glob);
 
-    fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt(glob);
     cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
 
     bump_assign_rpn2(&cuclaw_vt->cuda_rpn2);

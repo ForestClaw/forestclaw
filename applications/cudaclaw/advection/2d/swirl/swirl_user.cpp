@@ -53,7 +53,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 	vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
 
 	const user_options_t* user = swirl_get_options(glob);
-	fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt();        
+	fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt(glob);        
 
 	cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
 		

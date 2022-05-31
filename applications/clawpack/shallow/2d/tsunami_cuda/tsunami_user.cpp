@@ -41,7 +41,7 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
 
     if (user->cuda)
     {
-        fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt();
+        fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt(glob);
 
         cuclaw_vt->fort_qinit = &CLAWPACK46_QINIT;
 
