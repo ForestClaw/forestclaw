@@ -50,8 +50,8 @@ LDADD        += $(FCLAW_CLAWPACK46_LDADD)
 include_HEADERS += $(libclawpack4_6_installed_headers)
 
 ## UNIT TESTS
-check_PROGRAMS += src/solvers/fc2d_clawpack4.6/libclawpack4.6_TEST.MPI1
-TESTS += src/solvers/fc2d_clawpack4.6/libclawpack4.6_TEST.MPI1
+check_PROGRAMS += src/solvers/fc2d_clawpack4.6/libclawpack4_6_TEST.MPI1
+TESTS += src/solvers/fc2d_clawpack4.6/libclawpack4_6_TEST.MPI1
 
 src_solvers_fc2d_clawpack4_6_libclawpack4_6_TEST_MPI1_SOURCES = \
     src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.h.TEST.cpp
