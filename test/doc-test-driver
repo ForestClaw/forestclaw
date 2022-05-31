@@ -104,60 +104,71 @@ IFS='
 '
 STARTED=false
 a_test_failed=no
-for test_case in `$@ -ltc -nc`; do 
-  if test x"$test_case" = x"==============================================================================="; then
-    if test x"$STARTED" = x"true"; then
-      break
+test_cases=`$@ -ltc -nc`
+error=$?
+if test $error -eq 0; then
+  for test_case in $test_cases; do 
+    if test x"$test_case" = x"==============================================================================="; then
+      if test x"$STARTED" = x"true"; then
+        break
+      fi
+      STARTED=true
+      continue
     fi
-    STARTED=true
-    continue
-  fi
-
-  if test x"$STARTED" = x"true"; then
-    # Individual test cases run here
-    test_args="--test-case=\"${test_case}\""
-
-    echo "$@ $test_args" >> $log_file
-
-    eval "$@ $test_args" >> $log_file 2>&1
-    estatus=$?
-    
-    #doctest only has pass/fail state
-    #expect_failure means at least one of the tests should fail
-    case $estatus:$expect_failure in
-      0:*)   col=$grn res=PASS                   ;;
-      *:yes) col=$lgn res=XFAIL a_test_failed=yes;;
-      *:*)   col=$red res=FAIL  a_test_failed=yes;;
-    esac
-    
-    # Report the test outcome and exit status in the logs, so that one can
-    # know whether the test passed or failed simply by looking at the '.log'
-    # file, without the need of also peaking into the corresponding '.trs'
-    # file (automake bug#11814).
-    echo "$res $test_name $test_args (exit status: $estatus)" >> $log_file
-    echo >> $log_file
-    
-    # Report outcome to console.
-    echo "${col}${res}${std}: ${test_name} ${test_args}"
-    
-    # Register the test result, and other relevant metadata.
-    echo ":test-result: $res ${test_name} ${test_args}" >> $trs_file
-
-  fi
-done
+  
+    if test x"$STARTED" = x"true"; then
+      # Individual test cases run here
+      test_args="--test-case=\"${test_case}\""
+  
+      echo "$@ $test_args" >> $log_file
+  
+      eval "$@ $test_args" >> $log_file 2>&1
+      estatus=$?
+      
+      #doctest only has pass/fail state
+      #expect_failure means at least one of the tests should fail
+      case $estatus:$expect_failure in
+        0:*)   col=$grn res=PASS                   ;;
+        *:yes) col=$lgn res=XFAIL a_test_failed=yes;;
+        *:*)   col=$red res=FAIL  a_test_failed=yes;;
+      esac
+      
+      # Report the test outcome and exit status in the logs, so that one can
+      # know whether the test passed or failed simply by looking at the '.log'
+      # file, without the need of also peaking into the corresponding '.trs'
+      # file (automake bug#11814).
+      echo "$res $test_name $test_args (exit status: $estatus)" >> $log_file
+      echo >> $log_file
+      
+      # Report outcome to console.
+      echo "${col}${res}${std}: ${test_name} ${test_args}"
+      
+      # Register the test result, and other relevant metadata.
+      echo ":test-result: $res ${test_name} ${test_args}" >> $trs_file
+  
+    fi
+  done
+fi
 
 # the global test result can be pass/fail/xpass/xfail
-case $a_test_failed:$expect_failure in
-  no:yes)  col=$red  res=XPASS recheck=yes gcopy=yes;;
-  no:no)   col=$grn  res=PASS  recheck=no  gcopy=no ;;
-  yes:yes) col=$lgn  res=XFAIL recheck=no  gcopy=yes;;
-  yes:no)  col=$red  res=FAIL  recheck=yes gcopy=yes;;
+case $error:$a_test_failed:$expect_failure in
+  0:no:yes)  col=$red  res=XPASS recheck=yes gcopy=yes;;
+  0:no:no)   col=$grn  res=PASS  recheck=no  gcopy=no ;;
+  0:yes:yes) col=$lgn  res=XFAIL recheck=no  gcopy=yes;;
+  0:yes:no)  col=$red  res=FAIL  recheck=yes gcopy=yes;;
+  *:*:*)     col=$mgn  res=ERROR recheck=yes gcopy=yes;;
 esac
 
 if test "$res" = "XPASS"; then
     echo ":test-result: $res ${test_name}" >> $trs_file
     echo "${col}${res}${std}: ${test_name}"
 fi
+
+if test "$res" = "ERROR"; then
+    echo ":test-result: $res ${test_name}" >> $trs_file
+    echo "${col}${res}${std}: ${test_name}"
+fi
+
 
 
 echo ":global-test-result: $res ${test_name}" >> $trs_file
