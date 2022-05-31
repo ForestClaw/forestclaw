@@ -164,8 +164,21 @@ struct fc2d_cudaclaw_vtable
 
 };
 
+/**
+ * @brief Initialize the cudaclaw solver
+ * 
+ * fclaw2d_vtables_intialize should be called before this function.
+ * 
+ * @param global the global context
+ */
 void fc2d_cudaclaw_solver_initialize(struct fclaw2d_global* glob);
 
+/**
+ * @brief Get the cudaclaw vtable
+ * 
+ * @param global the global context
+ * @return fc2d_cudaclaw_vtable_t* the vtable
+ */
 fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(struct fclaw2d_global* glob);
 
 
