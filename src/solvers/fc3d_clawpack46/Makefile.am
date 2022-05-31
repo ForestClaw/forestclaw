@@ -46,3 +46,22 @@ AM_CPPFLAGS  += $(FCLAW_CLAWPACK3_46_CPPFLAGS)
 LDADD        += $(FCLAW_CLAWPACK3_46_LDADD)
 
 include_HEADERS += $(libclawpack3_46_installed_headers)
+
+## UNIT TESTS
+check_PROGRAMS += src/solvers/fc3d_clawpack46/libclawpack3_46_TEST.MPI1
+TESTS += src/solvers/fc3d_clawpack46/libclawpack3_46_TEST.MPI1
+
+src_solvers_fc3d_clawpack46_libclawpack3_46_TEST_MPI1_SOURCES = \
+    src/solvers/fc3d_clawpack46/fc3d_clawpack46.h.TEST.cpp
+
+src_solvers_fc3d_clawpack46_libclawpack3_46_TEST_MPI1_CPPFLAGS = \
+	$(test_libtestutils_la_CPPFLAGS) \
+    $(FCLAW_CLAWPACK3_46_CPPFLAGS)
+
+src_solvers_fc3d_clawpack46_libclawpack3_46_TEST_MPI1_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+    $(LDADD) \
+    $(FCLAW_CLAWPACK3_46_LDADD) \
+    $(FCLAW_CLAWPATCH_LDADD) \
+    $(FCLAW_LDADD)

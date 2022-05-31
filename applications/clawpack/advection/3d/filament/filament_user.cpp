@@ -39,7 +39,7 @@ void filament_link_solvers(fclaw2d_global_t *glob)
         }
         else
         {
-            fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt();
+            fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt(glob);
 
             clawpack46_vt->fort_setprob   = &SETPROB;
             clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;

@@ -34,7 +34,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt();        
+        fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt(glob);        
 
         clawpack46_vt->fort_setprob   = &SETPROB;
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
