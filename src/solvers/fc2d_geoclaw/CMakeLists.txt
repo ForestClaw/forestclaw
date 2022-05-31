@@ -111,3 +111,11 @@ install(TARGETS geoclaw
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::GEOCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::GEOCLAW INTERFACE geoclaw)
+
+if(BUILD_TESTING)
+  add_executable(fc2d_geoclaw_TEST.MPI1
+    fc2d_geoclaw.h.TEST.cpp
+  )
+  target_link_libraries(fc2d_geoclaw_TEST.MPI1 testutils geoclaw)
+  register_unit_tests(fc2d_geoclaw_TEST.MPI1)
+endif(BUILD_TESTING)
