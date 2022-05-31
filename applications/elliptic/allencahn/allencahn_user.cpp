@@ -340,7 +340,7 @@ void allencahn_link_solvers(fclaw2d_global_t *glob)
     patch_vt->initialize = allencahn_initialize;   /* Get an initial refinement */
 
     /* Multigrid vtable */
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
     //mg_vt->fort_rhs       = &ALLENCAHN_FORT_RHS;
 
     mg_vt->fort_beta      = &ALLENCAHN_FORT_BETA;

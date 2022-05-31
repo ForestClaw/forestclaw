@@ -143,7 +143,7 @@ void heat_rhs(fclaw2d_global_t *glob,
 
 #if 0
     /* Compute right hand side */
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
     FCLAW_ASSERT(mg_vt->fort_rhs != NULL);
 
     mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&mfields, &xlower,&ylower,&dx,&dy,rhs);
@@ -398,7 +398,7 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     patch_vt->initialize = heat_initialize;   /* Get an initial refinement */
 
     /* Multigrid vtable */
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
     //mg_vt->fort_rhs       = &HEAT_FORT_RHS;
     //mg_vt->fort_beta      = &HEAT_FORT_BETA;
     

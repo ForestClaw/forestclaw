@@ -59,6 +59,7 @@ check_PROGRAMS += src/solvers/fc2d_thunderegg/libfc2d_thunderegg_TEST.MPI1
 TESTS += src/solvers/fc2d_thunderegg/libfc2d_thunderegg_TEST.MPI1
 
 src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_SOURCES = \
+	src/solvers/fc2d_thunderegg/fc2d_thunderegg.h.TEST.cpp \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg_vector_TEST.cpp
 
 src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_CPPFLAGS = \
@@ -69,4 +70,5 @@ src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_LDADD = \
 	$(test_libtestutils_la_LDADD) \
     $(LDADD) \
     $(FCLAW_THUNDEREGG_LDADD) \
+    $(FCLAW_CLAWPATCH_LDADD) \
     $(FCLAW_LDADD)

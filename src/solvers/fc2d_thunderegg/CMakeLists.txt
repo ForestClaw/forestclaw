@@ -60,6 +60,7 @@ target_link_libraries(FORESTCLAW::FC2D_THUNDEREGG INTERFACE fc2d_thunderegg)
 
 if(BUILD_TESTING)
   add_executable(fc2d_thunderegg_TEST.MPI1
+    fc2d_thunderegg.h.TEST.cpp
     fc2d_thunderegg_vector_TEST.cpp
   )
   target_link_libraries(fc2d_thunderegg_TEST.MPI1 testutils fc2d_thunderegg forestclaw)

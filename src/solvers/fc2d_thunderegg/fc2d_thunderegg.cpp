@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_thunderegg_physical_bc.h"
 #include "fc2d_thunderegg_fort.h"
 
+#include <fclaw_pointer_map.h>
+
 #include <fclaw2d_elliptic_solver.h>
 
 #include <fclaw2d_clawpatch.h>
@@ -48,14 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-static fc2d_thunderegg_vtable_t s_thunderegg_vt;
-
 /* --------------------- ThunderEgg solver (required) ------------------------- */
 
 static
 void thunderegg_setup_solver(fclaw2d_global_t *glob)
 {
-	//fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+	//fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
 }
 
 
@@ -65,7 +65,7 @@ void thunderegg_rhs(fclaw2d_global_t *glob,
                    int blockno,
                    int patchno)
 {
-	fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+	fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
 
 	FCLAW_ASSERT(mg_vt->fort_rhs != NULL); /* Must be initialized */
 
@@ -90,7 +90,7 @@ void thunderegg_solve(fclaw2d_global_t* glob)
     // Apply non-homogeneous boundary conditions 
     fc2d_thunderegg_physical_bc(glob);
 
-    fc2d_thunderegg_vtable_t  *mg_vt  = fc2d_thunderegg_vt();  
+    fc2d_thunderegg_vtable_t  *mg_vt  = fc2d_thunderegg_vt(glob);  
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     /* Should the operators be part of the thunderegg library? Yes, for now, at least */
@@ -150,10 +150,15 @@ void thunderegg_output(fclaw2d_global_t *glob, int iframe)
 /* ------------------------------ Virtual functions  ---------------------------------- */
 
 static
-fc2d_thunderegg_vtable_t* thunderegg_vt_init()
+fc2d_thunderegg_vtable_t* thunderegg_vt_new()
 {
-	FCLAW_ASSERT(s_thunderegg_vt.is_set == 0);
-	return &s_thunderegg_vt;
+    return (fc2d_thunderegg_vtable_t*) FCLAW_ALLOC_ZERO (fc2d_thunderegg_vtable_t, 1);
+}
+
+static
+void thunderegg_vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
 }
 
 void fc2d_thunderegg_solver_initialize(fclaw2d_global_t* glob)
@@ -178,7 +183,7 @@ void fc2d_thunderegg_solver_initialize(fclaw2d_global_t* glob)
     elliptic_vt->solve = thunderegg_solve;    
     elliptic_vt->apply_bc = fc2d_thunderegg_physical_bc;
 
-	fc2d_thunderegg_vtable_t*  mg_vt = thunderegg_vt_init();	
+	fc2d_thunderegg_vtable_t*  mg_vt = thunderegg_vt_new();	
     mg_vt->fort_apply_bc = &THUNDEREGG_FORT_APPLY_BC_DEFAULT;
     mg_vt->fort_eval_bc  = &THUNDEREGG_FORT_EVAL_BC_DEFAULT;
 
@@ -188,15 +193,21 @@ void fc2d_thunderegg_solver_initialize(fclaw2d_global_t* glob)
 #endif    
 
 	mg_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fc2d_thunderegg") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fc2d_thunderegg", mg_vt, thunderegg_vt_destroy);
 }
 
 
 /* ----------------------------- User access to solver functions --------------------------- */
 
-fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt()
+fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(fclaw2d_global_t* glob)
 {
-	FCLAW_ASSERT(s_thunderegg_vt.is_set != 0);
-	return &s_thunderegg_vt;
+	fc2d_thunderegg_vtable_t* thunderegg_vt = (fc2d_thunderegg_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fc2d_thunderegg");
+	FCLAW_ASSERT(thunderegg_vt != NULL);
+	FCLAW_ASSERT(thunderegg_vt->is_set != 0);
+	return thunderegg_vt;
 }
 
 

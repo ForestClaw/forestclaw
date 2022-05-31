@@ -90,7 +90,7 @@ void poisson_rhs(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     /* Compute right hand side */
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
     FCLAW_ASSERT(mg_vt->fort_rhs != NULL);
 
     /* This function supplies an analytic right hand side. */
@@ -171,7 +171,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
                                           error_data->c_kahan);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
 
     int intersects_bc[4];
     fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
@@ -355,7 +355,7 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
     patch_vt->initialize = poisson_rhs;   /* Get an initial refinement */
 
     /* Multigrid vtable */
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
     mg_vt->fort_rhs       = &POISSON_FORT_RHS;
 
     mg_vt->fort_beta      = &POISSON_FORT_BETA;

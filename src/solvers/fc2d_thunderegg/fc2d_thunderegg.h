@@ -74,9 +74,6 @@ typedef void (*fc2d_thunderegg_operator_t)(struct fclaw2d_global *glob);
 
 //void fc2d_thunderegg_solve(struct fclaw2d_global *glob);
 
-fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt();
-
-
 /* --------------------------------- Virtual table ------------------------------------ */
 
 struct fc2d_thunderegg_vtable
@@ -93,9 +90,22 @@ struct fc2d_thunderegg_vtable
 	int is_set;
 };
 
+/**
+ * @brief Initialize the thunderegg solver
+ * 
+ * fclaw2d_vtables_intialize should be called before this function.
+ * 
+ * @param global the global context
+ */
 void fc2d_thunderegg_solver_initialize(struct fclaw2d_global* glob);
 
-fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(void);
+/**
+ * @brief Get the thunderegg vtable
+ * 
+ * @param global the global context
+ * @return fc2d_thunderegg_vtable_t* the vtable
+ */
+fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(struct fclaw2d_global* glob);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */

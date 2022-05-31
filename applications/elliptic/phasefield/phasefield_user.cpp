@@ -334,7 +334,7 @@ void phasefield_link_solvers(fclaw2d_global_t *glob)
     patch_vt->initialize = phasefield_initialize;   /* Get an initial refinement */
 
     /* Assign phasefield operator vtable */
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
     mg_vt->patch_operator = phasefield_solve;
 
     mg_vt->fort_apply_bc = &PHASEFIELD_FORT_APPLY_BC;
