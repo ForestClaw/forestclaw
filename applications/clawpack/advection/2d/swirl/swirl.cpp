@@ -82,6 +82,8 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     if (fabs (ray->r.line.vec[0]) <= 1e-12 ||
         fabs (ray->r.line.vec[1]) <= 1e-12)
     {
+        /* we cannot guarantee correct results for rays
+         * that run near parallel to coordinate axis */
         return 0;
     }
 
@@ -110,19 +112,15 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         t = (corners[0][i] - ray->xy[i]) / ray->r.line.vec[i];
         shift = ray->xy[ni] + t * ray->r.line.vec[ni];
 
-        /* shift coordinate system to first hit */
+        /* shift coordinate system to the first hit */
         hits[0][0] = 0.;
         hits[0][1] = 0.;
-#if 0
-        corners[1][i] -= corners[0][i];
-        corners[0][i] = 0.;
-#endif
         corners[1][ni] -= shift;
         corners[0][ni] -= shift;
 
         /* compute second hit in shifted coordinate system */
-        t = (corners[1][i] - corners[0][i]) / ray->r.line.vec[i];
-        hits[1][i] = (corners[1][i] - corners[0][i]);
+        hits[1][i] = corners[1][i] - corners[0][i];
+        t = hits[1][i] / ray->r.line.vec[i];
         hits[1][ni] = t * ray->r.line.vec[ni];
 
         /* compute the actual hit coordinates */
