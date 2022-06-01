@@ -56,17 +56,17 @@ LDADD        += $(FCLAW_CUDACLAW_LDADD)
 include_HEADERS += $(libcudaclaw_installed_headers)
 
 ## UNIT TESTS
-check_PROGRAMS += src/solvers/fc2d_cudaclaw/libcudaclaw_TEST.MPI1
-TESTS += src/solvers/fc2d_cudaclaw/libcudaclaw_TEST.MPI1
+check_PROGRAMS += src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.TEST
+TESTS += src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.TEST
 
-src_solvers_fc2d_cudaclaw_libcudaclaw_TEST_MPI1_SOURCES = \
+src_solvers_fc2d_cudaclaw_fc2d_cudaclaw_TEST_SOURCES = \
     src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.h.TEST.cpp
 
-src_solvers_fc2d_cudaclaw_libcudaclaw_TEST_MPI1_CPPFLAGS = \
+src_solvers_fc2d_cudaclaw_fc2d_cudaclaw_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \
     $(FCLAW_CUDACLAW_CPPFLAGS)
 
-src_solvers_fc2d_cudaclaw_libcudaclaw_TEST_MPI1_LDADD = \
+src_solvers_fc2d_cudaclaw_fc2d_cudaclaw_TEST_LDADD = \
 	test/libtestutils.la \
 	$(test_libtestutils_la_LDADD) \
     $(LDADD) \

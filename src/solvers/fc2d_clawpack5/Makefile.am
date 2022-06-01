@@ -51,17 +51,17 @@ include_HEADERS += $(libclawpack5_installed_headers)
 
 
 ## UNIT TESTS
-check_PROGRAMS += src/solvers/fc2d_clawpack5/libclawpack5_TEST.MPI1
-TESTS += src/solvers/fc2d_clawpack5/libclawpack5_TEST.MPI1
+check_PROGRAMS += src/solvers/fc2d_clawpack5/fc2d_clawpack5.TEST
+TESTS += src/solvers/fc2d_clawpack5/fc2d_clawpack5.TEST
 
-src_solvers_fc2d_clawpack5_libclawpack5_TEST_MPI1_SOURCES = \
+src_solvers_fc2d_clawpack5_fc2d_clawpack5_TEST_SOURCES = \
     src/solvers/fc2d_clawpack5/fc2d_clawpack5.h.TEST.cpp
 
-src_solvers_fc2d_clawpack5_libclawpack5_TEST_MPI1_CPPFLAGS = \
+src_solvers_fc2d_clawpack5_fc2d_clawpack5_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \
     $(FCLAW_CLAWPACK5_CPPFLAGS)
 
-src_solvers_fc2d_clawpack5_libclawpack5_TEST_MPI1_LDADD = \
+src_solvers_fc2d_clawpack5_fc2d_clawpack5_TEST_LDADD = \
 	test/libtestutils.la \
 	$(test_libtestutils_la_LDADD) \
     $(LDADD) \

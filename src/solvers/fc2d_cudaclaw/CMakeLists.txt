@@ -69,9 +69,9 @@ add_library(FORESTCLAW::CUDACLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CUDACLAW INTERFACE cudaclaw)
 
 if(BUILD_TESTING)
-  add_executable(fc2d_cudaclaw_TEST.MPI1
+  add_executable(fc2d_cudaclaw.TEST
     fc2d_cudaclaw.h.TEST.cpp
   )
-  target_link_libraries(fc2d_cudaclaw_TEST.MPI1 testutils cudaclaw)
-  register_unit_tests(fc2d_cudaclaw_TEST.MPI1)
+  target_link_libraries(fc2d_cudaclaw.TEST testutils cudaclaw)
+  register_unit_tests(fc2d_cudaclaw.TEST)
 endif(BUILD_TESTING)

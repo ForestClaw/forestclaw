@@ -88,17 +88,17 @@ LDADD += $(FCLAW_GEOCLAW_LDADD)
 include_HEADERS += $(libgeoclaw_installed_headers)
 
 ## UNIT TESTS
-check_PROGRAMS += src/solvers/fc2d_geoclaw/libgeoclaw_TEST.MPI1
-TESTS += src/solvers/fc2d_geoclaw/libgeoclaw_TEST.MPI1
+check_PROGRAMS += src/solvers/fc2d_geoclaw/fc2d_geoclaw.TEST
+TESTS += src/solvers/fc2d_geoclaw/fc2d_geoclaw.TEST
 
-src_solvers_fc2d_geoclaw_libgeoclaw_TEST_MPI1_SOURCES = \
+src_solvers_fc2d_geoclaw_fc2d_geoclaw_TEST_SOURCES = \
     src/solvers/fc2d_geoclaw/fc2d_geoclaw.h.TEST.cpp
 
-src_solvers_fc2d_geoclaw_libgeoclaw_TEST_MPI1_CPPFLAGS = \
+src_solvers_fc2d_geoclaw_fc2d_geoclaw_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \
     $(FCLAW_geoclaw_CPPFLAGS)
 
-src_solvers_fc2d_geoclaw_libgeoclaw_TEST_MPI1_LDADD = \
+src_solvers_fc2d_geoclaw_fc2d_geoclaw_TEST_LDADD = \
 	test/libtestutils.la \
 	$(test_libtestutils_la_LDADD) \
     $(LDADD) \

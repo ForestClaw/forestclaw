@@ -163,16 +163,16 @@ install(TARGETS forestclaw
   LIBRARY DESTINATION lib)
 
 if(BUILD_TESTING)
-  add_executable(libforestclaw_TEST
+  add_executable(forestclaw.TEST
       fclaw_gauges.h.TEST.cpp
       fclaw_pointer_map.h.TEST.cpp
       fclaw2d_elliptic_solver.h.TEST.cpp
       fclaw2d_diagnostics.h.TEST.cpp
-      fclaw2d_global_TEST.cpp
+      fclaw2d_global.h.TEST.cpp
       fclaw2d_patch.h.TEST.cpp
       fclaw2d_vtable.h.TEST.cpp
   )
 
-  target_link_libraries(libforestclaw_TEST testutils forestclaw)
-  register_unit_tests(libforestclaw_TEST)
+  target_link_libraries(forestclaw.TEST testutils forestclaw)
+  register_unit_tests(forestclaw.TEST)
 endif(BUILD_TESTING)

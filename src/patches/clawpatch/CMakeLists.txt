@@ -146,14 +146,13 @@ add_library(FORESTCLAW::CLAWPATCH INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CLAWPATCH INTERFACE clawpatch)
 
 if(BUILD_TESTING)
-  add_executable(libclawpatch_TEST.MPI1
+  add_executable(clawpatch.TEST
       fclaw2d_clawpatch.h.TEST.cpp
       fclaw2d_clawpatch_diagnostics.h.TEST.cpp
       fclaw2d_clawpatch_fort.h.TEST.cpp
-      fclaw3dx_clawpatch_options_TEST.cpp
-      fclaw3dx_clawpatch_TEST.cpp
+      fclaw3dx_clawpatch.h.TEST.cpp
       ${metric}/fclaw2d_metric.h.TEST.cpp
   )
-  target_link_libraries(libclawpatch_TEST.MPI1 testutils clawpatch forestclaw)
-  register_unit_tests(libclawpatch_TEST.MPI1)
+  target_link_libraries(clawpatch.TEST testutils clawpatch forestclaw)
+  register_unit_tests(clawpatch.TEST)
 endif(BUILD_TESTING)
