@@ -17,9 +17,9 @@ add_library(cudaclaw STATIC)
 set_target_properties(cudaclaw PROPERTIES EXPORT_NAME CUDACLAW)
 
 # device code needs to relcoateable since it is in a shared library
-target_compile_options(cudaclaw PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:
-                       --relocatable-device-code=true
-                       >)
+#target_compile_options(cudaclaw PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:
+#                       --relocatable-device-code=true
+#                       >)
 # needed because we have device code in a library
 set_target_properties(cudaclaw PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
