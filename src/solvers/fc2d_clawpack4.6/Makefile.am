@@ -54,7 +54,8 @@ check_PROGRAMS += src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.TEST
 TESTS += src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.TEST
 
 src_solvers_fc2d_clawpack4_6_fc2d_clawpack46_TEST_SOURCES = \
-    src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.h.TEST.cpp
+    src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.h.TEST.cpp \
+    src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.h.TEST.cpp
 
 src_solvers_fc2d_clawpack4_6_fc2d_clawpack46_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \
