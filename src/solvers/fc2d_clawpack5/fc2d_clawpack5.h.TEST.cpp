@@ -24,7 +24,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_global.h>
+#include <fclaw2d_clawpatch_options.h>
 #include <fc2d_clawpack5.h>
+#include <fc2d_clawpack5_options.h>
 #include <fclaw2d_forestclaw.h>
 #include <test/doctest.h>
 
@@ -32,6 +34,13 @@ TEST_CASE("fc2d_clawpack5_solver_initialize stores two seperate vtables in two s
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	/* create some empty options structures */
+	fclaw2d_clawpatch_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_clawpack5_options_store(glob1, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1));
+
+	fclaw2d_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_clawpack5_options_store(glob2, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1));
 
 	fclaw2d_vtables_initialize(glob1);
 	fc2d_clawpack5_solver_initialize(glob1);
@@ -49,6 +58,10 @@ TEST_CASE("fc2d_clawpack5_solver_initialize sets is_set flag")
 {
 	fclaw2d_global_t* glob = fclaw2d_global_new();
 
+	/* create some empty options structures */
+	fclaw2d_clawpatch_options_store(glob, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_clawpack5_options_store(glob, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1));
+
 	fclaw2d_vtables_initialize(glob);
 	fc2d_clawpack5_solver_initialize(glob);
 
@@ -64,6 +77,13 @@ TEST_CASE("fc2d_clawpack5_vtable_initialize fails if called twice on a glob")
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	/* create some empty options structures */
+	fclaw2d_clawpatch_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_clawpack5_options_store(glob1, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1));
+
+	fclaw2d_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_clawpack5_options_store(glob2, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1));
 
 	fclaw2d_vtables_initialize(glob1);
 	fc2d_clawpack5_solver_initialize(glob1);
