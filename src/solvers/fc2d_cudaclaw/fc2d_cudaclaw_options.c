@@ -91,8 +91,7 @@ cudaclaw_postprocess (fc2d_cudaclaw_options_t * clawopt)
 
 
 static fclaw_exit_type_t
-cudaclaw_check(fc2d_cudaclaw_options_t *clawopt,
-                 fclaw2d_clawpatch_options_t *clawpatch_opt)
+cudaclaw_check(fc2d_cudaclaw_options_t *clawopt)
 {
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
@@ -101,7 +100,6 @@ cudaclaw_check(fc2d_cudaclaw_options_t *clawopt,
     clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
-    clawopt->method[6] = clawpatch_opt->maux;
 
 #if 0
     if (clawopt->use_fwaves)
@@ -115,12 +113,6 @@ cudaclaw_check(fc2d_cudaclaw_options_t *clawopt,
     if (!check)
     {
         fclaw_global_essentialf("Size of MWAVES (set in fc2d_cudaclaw_cuda.h) should be increased\n");
-        return FCLAW_EXIT_ERROR;
-    }
-
-    if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
-    {
-        fclaw_global_essentialf("cudaclaw : bad maux/mcapa combination\n");
         return FCLAW_EXIT_ERROR;
     }
 
@@ -184,11 +176,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt = (fc2d_cudaclaw_options_t*) package;
     FCLAW_ASSERT (clawopt->is_registered);
 
-    clawpatch_opt = (fclaw2d_clawpatch_options_t *)
-        fclaw_app_get_attribute(app,"clawpatch",NULL);
-    FCLAW_ASSERT(clawpatch_opt->is_registered);
-
-    return cudaclaw_check(clawopt,clawpatch_opt);    
+    return cudaclaw_check(clawopt);
 }
 
 static void
