@@ -25,13 +25,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 #include <fc3d_clawpack46.h>
+#include <fc3d_clawpack46_options.h>
 #include <fclaw2d_forestclaw.h>
+#include <fclaw3dx_clawpatch_options.h>
 #include <test/doctest.h>
 
 TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two seperate globs")
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	/* create some empty options structures */
+	fclaw3dx_clawpatch_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fc3d_clawpack46_options_store(glob1, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
+
+	fclaw3dx_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fc3d_clawpack46_options_store(glob2, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
 	fclaw2d_vtables_initialize(glob1);
 	fc3d_clawpack46_solver_initialize(glob1);
@@ -48,6 +57,10 @@ TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two 
 TEST_CASE("fc3d_clawpack46_solver_initialize sets is_set flag")
 {
 	fclaw2d_global_t* glob = fclaw2d_global_new();
+
+	/* create some empty options structures */
+	fclaw3dx_clawpatch_options_store(glob, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fc3d_clawpack46_options_store(glob, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
 	fclaw2d_vtables_initialize(glob);
 	fc3d_clawpack46_solver_initialize(glob);
@@ -77,6 +90,13 @@ TEST_CASE("fc3d_clawpack46_vtable_initialize fails if called twice on a glob")
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	/* create some empty options structures */
+	fclaw3dx_clawpatch_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fc3d_clawpack46_options_store(glob1, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
+
+	fclaw3dx_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fc3d_clawpack46_options_store(glob2, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
 	fclaw2d_vtables_initialize(glob1);
 	fc3d_clawpack46_solver_initialize(glob1);

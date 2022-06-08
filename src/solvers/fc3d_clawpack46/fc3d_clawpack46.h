@@ -194,6 +194,9 @@ struct fc3d_clawpack46_vtable
  * 
  * fclaw2d_vtables_intialize should be called before this function.
  * 
+ * fclaw3dx_clawpatch_options, and fc3d_clawpack46_options should be stored in glob.
+ * fc3d_clawpack46_options will be changed in this call.
+ * 
  * @param glob the global context
  */
 void fc3d_clawpack46_solver_initialize(struct fclaw2d_global* glob);
