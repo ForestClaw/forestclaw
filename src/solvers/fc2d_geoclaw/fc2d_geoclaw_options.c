@@ -99,8 +99,7 @@ geoclaw_register (fc2d_geoclaw_options_t *geo_opt, sc_options_t * opt)
 }
 
 static fclaw_exit_type_t 
-geoclaw_check (fc2d_geoclaw_options_t *geo_opt, 
-              fclaw2d_clawpatch_options_t *clawpatch_opt)
+geoclaw_check (fc2d_geoclaw_options_t *geo_opt)
 {
     geo_opt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
@@ -109,15 +108,13 @@ geoclaw_check (fc2d_geoclaw_options_t *geo_opt,
     geo_opt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
     geo_opt->method[4] = geo_opt->src_term;
     geo_opt->method[5] = geo_opt->mcapa;
-    geo_opt->method[6] = clawpatch_opt->maux;
 
     return FCLAW_NOEXIT;    /* Nothing can go wrong here! */
 }
 
 
 static fclaw_exit_type_t
-geoclaw_postprocess (fc2d_geoclaw_options_t * geo_opt,fclaw_options_t *fclaw_opt,
-                     fclaw2d_clawpatch_options_t *clawpatch_opt)
+geoclaw_postprocess (fc2d_geoclaw_options_t * geo_opt)
 {
     fclaw_options_convert_int_array (geo_opt->mthbc_string, &geo_opt->mthbc,4);
 
@@ -128,13 +125,6 @@ geoclaw_postprocess (fc2d_geoclaw_options_t * geo_opt,fclaw_options_t *fclaw_opt
     fclaw_options_convert_double_array (geo_opt->speed_tolerance_c_string,
                                         &geo_opt->speed_tolerance_c,
                                         geo_opt->speed_tolerance_entries_c);
-
-    /* We have to do this so that we know how to size the ghost patches */
-    if (clawpatch_opt->ghost_patch_pack_aux)
-    {
-        fclaw_opt->ghost_patch_pack_extra = 1;  /* Pack the bathymetry */
-        fclaw_opt->ghost_patch_pack_numextrafields = clawpatch_opt->maux;
-    }
 
     return FCLAW_NOEXIT;
 }
@@ -180,11 +170,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     FCLAW_ASSERT(geo_opt->is_registered != 0);
 
 
-    clawpatch_opt = (fclaw2d_clawpatch_options_t*) 
-                              fclaw_app_get_attribute(app,"clawpatch",NULL);
-    FCLAW_ASSERT(clawpatch_opt->is_registered != 0);
-
-    return geoclaw_check(geo_opt,clawpatch_opt);
+    return geoclaw_check(geo_opt);
 }    
 
 static fclaw_exit_type_t
@@ -201,13 +187,7 @@ options_postprocess (fclaw_app_t * app, void *package, void *registered)
     geo_opt = (fc2d_geoclaw_options_t*) package;
     FCLAW_ASSERT (geo_opt->is_registered);
 
-    fclaw_opt = (fclaw_options_t*) fclaw_app_get_attribute(app,"Options",NULL);
-    FCLAW_ASSERT(fclaw_opt->is_registered);
-
-    clawpatch_opt = (fclaw2d_clawpatch_options_t*) fclaw_app_get_attribute(app,"clawpatch",NULL);
-    FCLAW_ASSERT (clawpatch_opt->is_registered);
-
-    return geoclaw_postprocess (geo_opt,fclaw_opt,clawpatch_opt);
+    return geoclaw_postprocess (geo_opt);
 }
 
 
