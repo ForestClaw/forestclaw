@@ -150,6 +150,7 @@ if(BUILD_TESTING)
       fclaw2d_clawpatch.h.TEST.cpp
       fclaw2d_clawpatch_diagnostics.h.TEST.cpp
       fclaw2d_clawpatch_fort.h.TEST.cpp
+      fclaw2d_clawpatch_options.h.TEST.cpp
       fclaw3dx_clawpatch.h.TEST.cpp
       ${metric}/fclaw2d_metric.h.TEST.cpp
   )
