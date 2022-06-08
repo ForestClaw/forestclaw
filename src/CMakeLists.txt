@@ -169,10 +169,11 @@ if(BUILD_TESTING)
       fclaw2d_elliptic_solver.h.TEST.cpp
       fclaw2d_diagnostics.h.TEST.cpp
       fclaw2d_global.h.TEST.cpp
+      fclaw2d_options.h.TEST.cpp
       fclaw2d_patch.h.TEST.cpp
       fclaw2d_vtable.h.TEST.cpp
   )
 
-  target_link_libraries(forestclaw.TEST testutils forestclaw)
+  target_link_libraries(forestclaw.TEST testutils forestclaw clawpatch)
   register_unit_tests(forestclaw.TEST)
 endif(BUILD_TESTING)

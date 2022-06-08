@@ -26,9 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 #include <fclaw2d_global.h>
 #include <fclaw_base.h>
-#include <fclaw_package.h>
-
-static int s_fclaw2d_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 /* ---------------------------------------------------------
    Public interface to ForestClaw options
@@ -36,17 +34,15 @@ static int s_fclaw2d_options_package_id = -1;
 
 void fclaw2d_options_store (fclaw2d_global_t *glob, fclaw_options_t* gparms)
 {
-    int id;
-
-    //FCLAW_ASSERT(s_fclaw2d_options_package_id == -1);
-    id = fclaw_package_container_add_pkg(glob,gparms);
-    s_fclaw2d_options_package_id = id;
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"fclaw2d") == NULL);
+	fclaw_pointer_map_insert(glob->options, "fclaw2d", gparms, NULL);
 }
 
 fclaw_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
 {
-    fclaw_options_t *gp = (fclaw_options_t*) 
-            fclaw_package_get_options(glob, s_fclaw2d_options_package_id);
-    return gp;
+    fclaw_options_t* gparms = (fclaw_options_t*) 
+	   							fclaw_pointer_map_get(glob->options, "fclaw2d");
+	FCLAW_ASSERT(gparms != NULL);
+	return gparms;
 }
 
