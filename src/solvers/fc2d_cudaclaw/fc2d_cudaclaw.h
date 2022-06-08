@@ -169,6 +169,9 @@ struct fc2d_cudaclaw_vtable
  * 
  * fclaw2d_vtables_intialize should be called before this function.
  * 
+ * fclaw2d_clawpatch_options, and fc2d_cudaclaw_options should be stored in glob.
+ * fclaw2d_clawpatch_options will be changed in this call.
+ * 
  * @param global the global context
  */
 void fc2d_cudaclaw_solver_initialize(struct fclaw2d_global* glob);
