@@ -77,7 +77,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     clawopt = fc2d_cudaclaw_get_options(glob);
     mwaves = clawopt->mwaves;
 
-    fc2d_cudaclaw_vtable_t*  cuclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t*  cuclaw_vt = fc2d_cudaclaw_vt(glob);
     FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
     if (clawopt->order[1] > 0)
     {

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
                                          int blockno,
                                          int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     FCLAW_ASSERT(metric_vt->fort_compute_mesh);
 
     int mx,my,mbc;
@@ -62,7 +62,7 @@ void fclaw2d_metric_compute_tensors_default(fclaw2d_global_t *glob,
                                             int blockno,
                                             int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -118,7 +118,7 @@ void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
     fclaw2d_metric_patch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                    &xlower,&ylower,&dx,&dy);
 
-    double *area = fclaw2d_metric_patch_get_area(this_patch);
+    double *area = fclaw2d_metric_patch_get_area(glob, this_patch);
 
     const fclaw_options_t* gparms = fclaw2d_get_options(glob);
     int level = this_patch->level;
@@ -146,7 +146,7 @@ void fclaw2d_metric_compute_area_ghost_default(fclaw2d_global_t* glob,
     fclaw2d_metric_patch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_metric_patch_get_area(this_patch);
+    area = fclaw2d_metric_patch_get_area(glob, this_patch);
 
     /* Set area in ghost cells not set above */
     const fclaw_options_t* gparms = fclaw2d_get_options(glob);

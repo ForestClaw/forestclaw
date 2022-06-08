@@ -50,4 +50,21 @@ AM_CPPFLAGS  += $(FCLAW_CLAWPACK5_CPPFLAGS)
 include_HEADERS += $(libclawpack5_installed_headers)
 
 
+## UNIT TESTS
+check_PROGRAMS += src/solvers/fc2d_clawpack5/fc2d_clawpack5.TEST
+TESTS += src/solvers/fc2d_clawpack5/fc2d_clawpack5.TEST
 
+src_solvers_fc2d_clawpack5_fc2d_clawpack5_TEST_SOURCES = \
+    src/solvers/fc2d_clawpack5/fc2d_clawpack5.h.TEST.cpp
+
+src_solvers_fc2d_clawpack5_fc2d_clawpack5_TEST_CPPFLAGS = \
+	$(test_libtestutils_la_CPPFLAGS) \
+    $(FCLAW_CLAWPACK5_CPPFLAGS)
+
+src_solvers_fc2d_clawpack5_fc2d_clawpack5_TEST_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+    $(LDADD) \
+    $(FCLAW_CLAWPACK5_LDADD) \
+    $(FCLAW_CLAWPATCH_LDADD) \
+    $(FCLAW_LDADD)

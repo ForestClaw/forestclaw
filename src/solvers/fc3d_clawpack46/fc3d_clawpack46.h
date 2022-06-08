@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -189,9 +189,22 @@ struct fc3d_clawpack46_vtable
 
 };
 
-void fc3d_clawpack46_solver_initialize(void);
+/**
+ * @brief Initialize the clawpack46 solver
+ * 
+ * fclaw2d_vtables_intialize should be called before this function.
+ * 
+ * @param glob the global context
+ */
+void fc3d_clawpack46_solver_initialize(struct fclaw2d_global* glob);
 
-fc3d_clawpack46_vtable_t* fc3d_clawpack46_vt(void);
+/**
+ * @brief Get the clawpack46 vtable
+ * 
+ * @param glob the global context
+ * @return fc3d_clawpack46_vtable_t* the vtable
+ */
+fc3d_clawpack46_vtable_t* fc3d_clawpack46_vt(struct fclaw2d_global* glob);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */

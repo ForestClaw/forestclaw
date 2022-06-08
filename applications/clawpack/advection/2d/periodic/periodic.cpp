@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -70,11 +70,11 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)
     {
-        fc2d_clawpack46_solver_initialize();
+        fc2d_clawpack46_solver_initialize(glob);
     }
     else if (user_opt->claw_version == 5)
     {
-        fc2d_clawpack5_solver_initialize();
+        fc2d_clawpack5_solver_initialize(glob);
     }
 
     periodic_link_solvers(glob);

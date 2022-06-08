@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,7 @@ typedef void (*fclaw3dx_clawpatch_time_sync_pack_registers_t)(struct fclaw2d_glo
                                                               struct fclaw2d_patch *patch,
                                                               double *qpack,
                                                               int frsize, 
-                                                        fclaw3dx_clawpatch_packmode_t packmode,
+                                                        fclaw_clawpatch_packmode_t packmode,
                                                               int *ierror);
 
 
@@ -173,14 +173,14 @@ typedef void (*fclaw3dx_clawpatch_diagnostics_error_t)(struct fclaw2d_global *gl
  * 
  * @param claw_version the version of clawpack (4 for 4.6, 5 for 5)
  */
-void fclaw3dx_clawpatch_vtable_initialize(int claw_version);
+void fclaw3dx_clawpatch_vtable_initialize(struct fclaw2d_global *glob, int claw_version);
 
 /**
  * @brief Get a pointer to a clawpatch vtable global variable
  * 
  * @return fclaw3dx_clawpatch_vtable_t* the vtable
  */
-fclaw3dx_clawpatch_vtable_t* fclaw3dx_clawpatch_vt();
+fclaw3dx_clawpatch_vtable_t* fclaw3dx_clawpatch_vt(struct fclaw2d_global *glob);
 
 /**
  * @brief vtable for clawpatch related functions

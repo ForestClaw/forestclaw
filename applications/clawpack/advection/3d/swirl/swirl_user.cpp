@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,13 +28,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
     /* example of how to set up a user defined criteria */
-    fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt();
-    clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_TH;
+    fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
+    clawpatch_vt->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
 
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt();        
+        fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt(glob);        
 
         clawpack46_vt->fort_setprob   = &SETPROB;
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;

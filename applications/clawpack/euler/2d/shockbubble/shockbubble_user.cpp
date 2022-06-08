@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -63,13 +63,13 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 void shockbubble_link_solvers(fclaw2d_global_t *glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
 
     fclaw_vt->problem_setup = &shockbubble_problem_setup;
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
         fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 
         claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
@@ -95,7 +95,7 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
         fc2d_clawpack5_options_t *clawopt = fc2d_clawpack5_get_options(glob);
 
         claw5_vt->fort_qinit  = &CLAWPACK5_QINIT;

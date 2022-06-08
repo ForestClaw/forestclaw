@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -115,26 +115,6 @@ void fclaw2d_clawpatch_options_store (struct fclaw2d_global *glob,
  * @return fclaw2d_clawpatch_options_t* the options
  */
 fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global* glob);
-
-
-/**
- * @brief Set the refinment critera
- * 
- * Sets a global variable
- * 
- * @param r the refinement criteria
- */
-void fclaw2d_clawpatch_set_refinement_criteria(int r);
-
-/**
- * @brief Get the refinement criteria be used
- * 
- * Gets the value from a global variable
- * 
- * @return int the refinement criteria
- */
-int fclaw2d_clawpatch_get_refinement_criteria();
-
 
 
 #ifdef __cplusplus

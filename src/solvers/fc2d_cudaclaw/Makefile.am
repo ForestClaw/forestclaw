@@ -55,6 +55,37 @@ LDADD        += $(FCLAW_CUDACLAW_LDADD)
 
 include_HEADERS += $(libcudaclaw_installed_headers)
 
+## UNIT TESTS
+check_PROGRAMS += src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.TEST
+TESTS += src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.TEST
+
+src_solvers_fc2d_cudaclaw_fc2d_cudaclaw_TEST_SOURCES = \
+    src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.h.TEST.cpp
+
+src_solvers_fc2d_cudaclaw_fc2d_cudaclaw_TEST_CPPFLAGS = \
+	$(test_libtestutils_la_CPPFLAGS) \
+    $(FCLAW_CUDACLAW_CPPFLAGS)
+
+src_solvers_fc2d_cudaclaw_fc2d_cudaclaw_TEST_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+    $(LDADD) \
+    $(FCLAW_CUDACLAW_LDADD) \
+    $(FCLAW_CLAWPATCH_LDADD) \
+    $(FCLAW_LDADD) \
+	src/solvers/fc2d_cudaclaw/devicelink.o 
+
+## nvcc -dlink has to b called after everything for the executable has been compiled.
+## this generates a single object file with all of the linked  device code.
+src/solvers/fc2d_cudaclaw/devicelink.o : \
+	src/solvers/fc2d_cudaclaw/libcudaclaw.la
+		$(NVCC) $(CUDA_CFLAGS) -dlink  \
+		src/solvers/fc2d_cudaclaw/.libs/libcudaclaw.a \
+		-o src/solvers/fc2d_cudaclaw/devicelink.o 
+
+
+
+
 # ------------------------------------------
 # Added to build CUDA code 
 # ------------------------------------------
@@ -79,6 +110,4 @@ endif
 	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	    $(LIBTOOLFLAGS) --mode=compile $(NVCC) \
 	    $(CUDA_CFLAGS) $(CUDACLAW_INCLUDE_DIRS) -dc -c -o $@ $<
-
-
 

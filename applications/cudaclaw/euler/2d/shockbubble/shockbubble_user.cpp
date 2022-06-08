@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -77,15 +77,15 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 void shockbubble_link_solvers(fclaw2d_global_t *glob)
 {
     // const user_options_t* user = shockbubble_get_options(glob);
-    // fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    // fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     // fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = &shockbubble_problem_setup;
 
-    //fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
-    fc2d_cudaclaw_vtable_t *cuclaw_vt   = fc2d_cudaclaw_vt();
+    //fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
+    fc2d_cudaclaw_vtable_t *cuclaw_vt   = fc2d_cudaclaw_vt(glob);
     cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
     cuclaw_vt->fort_bc2    = &CUDACLAW_BC2;   /* Special  BCs at left edge */
     cuclaw_vt->fort_src2   = &CUDACLAW_SRC2;  /* To simulate axis-symmetric */

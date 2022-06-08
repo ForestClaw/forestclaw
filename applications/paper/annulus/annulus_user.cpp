@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -145,15 +145,15 @@ void annulus_b4step2(fclaw2d_global_t *glob,
 void annulus_link_solvers(fclaw2d_global_t *glob)
 {
     /* ForestClaw virtual functions */
-    fclaw2d_vtable_t  *vt = fclaw2d_vt();
+    fclaw2d_vtable_t  *vt = fclaw2d_vt(glob);
     vt->problem_setup = &annulus_problem_setup;
 
     /* Patch virtual functions */
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &annulus_patch_setup;
 
     /* Clawpatch virtual table */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt  = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt  = fclaw2d_clawpatch_vt(glob);
     clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
 
@@ -166,7 +166,7 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
     }
 
     /* Clawpack virtual functions */
-    fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+    fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);
     clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
     clawpack46_vt->fort_rpn2      = &RPN2CONS_FW_MANIFOLD;   
     clawpack46_vt->fort_rpt2      = &RPT2CONS_MANIFOLD;    

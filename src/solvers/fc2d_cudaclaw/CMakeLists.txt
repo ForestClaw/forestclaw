@@ -17,9 +17,9 @@ add_library(cudaclaw STATIC)
 set_target_properties(cudaclaw PROPERTIES EXPORT_NAME CUDACLAW)
 
 # device code needs to relcoateable since it is in a shared library
-target_compile_options(cudaclaw PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:
-                       --relocatable-device-code=true
-                       >)
+#target_compile_options(cudaclaw PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:
+#                       --relocatable-device-code=true
+#                       >)
 # needed because we have device code in a library
 set_target_properties(cudaclaw PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
@@ -67,3 +67,11 @@ install(TARGETS cudaclaw
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CUDACLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CUDACLAW INTERFACE cudaclaw)
+
+if(BUILD_TESTING)
+  add_executable(fc2d_cudaclaw.TEST
+    fc2d_cudaclaw.h.TEST.cpp
+  )
+  target_link_libraries(fc2d_cudaclaw.TEST testutils cudaclaw)
+  register_unit_tests(fc2d_cudaclaw.TEST)
+endif(BUILD_TESTING)

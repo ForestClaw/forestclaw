@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -81,7 +81,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_vtables_initialize(glob);
 
     /* Test thunderegg solver */
-    fc2d_thunderegg_solver_initialize();
+    fc2d_thunderegg_solver_initialize(glob);
 
     /* set up elliptic solver to use the thunderegg solver */
     allencahn_link_solvers(glob);
