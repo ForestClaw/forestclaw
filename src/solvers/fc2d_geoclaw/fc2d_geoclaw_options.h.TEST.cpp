@@ -25,10 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_options.h>
-#include <fclaw2d_clawpatch_options.h>
-#include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
-#include <fclaw2d_forestclaw.h>
 #include <test/doctest.h>
 
 TEST_CASE("fc2d_geoclaw_options can store options in two seperate globs")
@@ -58,9 +55,9 @@ TEST_CASE("fc2d_geoclaw_get_options fails if not intialized")
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
-	CHECK_THROWS(fc2d_geoclaw_vt(glob1));
+	CHECK_THROWS(fc2d_geoclaw_get_options(glob1));
 
-	CHECK_THROWS(fc2d_geoclaw_vt(glob2));
+	CHECK_THROWS(fc2d_geoclaw_get_options(glob2));
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);
