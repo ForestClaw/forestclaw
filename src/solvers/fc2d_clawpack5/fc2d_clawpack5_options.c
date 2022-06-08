@@ -85,8 +85,7 @@ clawpack5_postprocess (fc2d_clawpack5_options_t * clawopt)
 
 
 fclaw_exit_type_t
-clawpack5_check (fc2d_clawpack5_options_t * clawopt, 
-                 fclaw2d_clawpatch_options_t *clawpatch_opt)
+clawpack5_check (fc2d_clawpack5_options_t * clawopt)
 {
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
@@ -95,13 +94,6 @@ clawpack5_check (fc2d_clawpack5_options_t * clawopt,
     clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
-    clawopt->method[6] = clawpatch_opt->maux;
-
-    if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
-    {
-        fclaw_global_essentialf("clawpack5 : mcapa > 0 but maux == 0.\n");
-        return FCLAW_EXIT_ERROR;
-    }
 
     /* There is probably a better place to do this */    
     CLAWPACK5_SET_AMR_MODULE(&clawopt->mwaves, &clawopt->mcapa,
@@ -170,11 +162,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt = (fc2d_clawpack5_options_t*) package;
     FCLAW_ASSERT (clawopt->is_registered);
 
-    clawpatch_opt = (fclaw2d_clawpatch_options_t *)
-        fclaw_app_get_attribute(app,"clawpatch",NULL);
-    FCLAW_ASSERT(clawpatch_opt->is_registered);
-
-    return clawpack5_check(clawopt,clawpatch_opt);    /* Nothing can go wrong here! */
+    return clawpack5_check(clawopt);    /* Nothing can go wrong here! */
 }
 
 static void
