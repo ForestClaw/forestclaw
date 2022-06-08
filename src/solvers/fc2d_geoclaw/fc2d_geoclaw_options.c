@@ -160,7 +160,6 @@ static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
     fc2d_geoclaw_options_t *geo_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -177,8 +176,6 @@ static fclaw_exit_type_t
 options_postprocess (fclaw_app_t * app, void *package, void *registered)
 {
     fc2d_geoclaw_options_t *geo_opt;
-    fclaw_options_t *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
