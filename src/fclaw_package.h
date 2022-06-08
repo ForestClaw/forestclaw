@@ -35,7 +35,14 @@ extern "C"
 }
 #endif
 #endif
-
+#if defined(__GNUC__) || defined(__clang__)
+#define DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+#define DEPRECATED __declspec(deprecated)
+#else
+#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+#define DEPRECATED
+#endif
 struct fclaw2d_global;
 
 /* Opaque pointers */
@@ -53,9 +60,9 @@ int fclaw_package_container_add (fclaw_package_container_t * pkg_container,
 void fclaw_package_container_new_app (fclaw_app_t *app);
 void fclaw_package_container_destroy_app (fclaw_app_t *app);
 
-int fclaw_package_container_add_pkg(struct fclaw2d_global* glob,
+DEPRECATED int fclaw_package_container_add_pkg(struct fclaw2d_global* glob,
                                     void* opt);
-void* fclaw_package_get_options(struct fclaw2d_global *glob, int id);
+DEPRECATED void* fclaw_package_get_options(struct fclaw2d_global *glob, int id);
 
 
 #ifdef __cplusplus
