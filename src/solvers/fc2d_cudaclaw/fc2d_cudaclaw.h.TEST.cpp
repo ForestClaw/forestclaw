@@ -73,6 +73,19 @@ TEST_CASE("fc2d_cudaclaw_solver_initialize sets is_set flag")
 
 #ifdef FCLAW_ENABLE_DEBUG
 
+TEST_CASE("fc2d_cudaclaw_vt fails if not intialized")
+{
+	fclaw2d_global_t* glob1 = fclaw2d_global_new();
+	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	CHECK_THROWS(fc2d_cudaclaw_vt(glob1));
+
+	CHECK_THROWS(fc2d_cudaclaw_vt(glob2));
+
+	fclaw2d_global_destroy(glob1);
+	fclaw2d_global_destroy(glob2);
+}
+
 TEST_CASE("fc2d_cudaclaw_vtable_initialize fails if called twice on a glob")
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
