@@ -122,8 +122,7 @@ thunderegg_postprocess (fc2d_thunderegg_options_t * mg_opt)
 
 
 static fclaw_exit_type_t
-thunderegg_check(fc2d_thunderegg_options_t *mg_opt,
-                 fclaw2d_clawpatch_options_t *clawpatch_opt)
+thunderegg_check(fc2d_thunderegg_options_t *mg_opt)
 {
     return FCLAW_NOEXIT;
 }
@@ -188,11 +187,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     mg_opt = (fc2d_thunderegg_options_t*) package;
     FCLAW_ASSERT (mg_opt->is_registered);
 
-    clawpatch_opt = (fclaw2d_clawpatch_options_t *)
-        fclaw_app_get_attribute(app,"clawpatch",NULL);
-    FCLAW_ASSERT(clawpatch_opt->is_registered);
-
-    return thunderegg_check(mg_opt,clawpatch_opt);    
+    return thunderegg_check(mg_opt);
 }
 
 static void
