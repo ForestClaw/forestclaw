@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw_options.h"
 #include <fclaw_options.h>
-#include <fclaw_package.h>
+#include <fclaw_pointer_map.h>
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_global.h>
@@ -37,8 +37,6 @@ extern "C"
 }
 #endif
 #endif
-
-static int s_geoclaw_options_package_id = -1;
 
 static void*
 geoclaw_register (fc2d_geoclaw_options_t *geo_opt, sc_options_t * opt)
@@ -234,19 +232,17 @@ fc2d_geoclaw_options_register (fclaw_app_t * app,
 
 fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_global_t *glob)
 {
-    int id = s_geoclaw_options_package_id;
-    return (fc2d_geoclaw_options_t*)  fclaw_package_get_options(glob, id);
+    fc2d_geoclaw_options_t* geo_opt = (fc2d_geoclaw_options_t*) 
+	   							fclaw_pointer_map_get(glob->options, "fc2d_geoclaw");
+	FCLAW_ASSERT(geo_opt != NULL);
+	return geo_opt;
 }
 
 void fc2d_geoclaw_options_store (fclaw2d_global_t* glob, 
                                fc2d_geoclaw_options_t* geo_opt)
 {
-    int id; 
-
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_geoclaw_options_package_id == -1);
-    id = fclaw_package_container_add_pkg(glob,geo_opt);
-    s_geoclaw_options_package_id = id;
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"fc2d_geoclaw") == NULL);
+	fclaw_pointer_map_insert(glob->options, "fc2d_geoclaw", geo_opt, NULL);
 }
 
 

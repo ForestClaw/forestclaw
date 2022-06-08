@@ -115,6 +115,7 @@ target_link_libraries(FORESTCLAW::GEOCLAW INTERFACE geoclaw)
 if(BUILD_TESTING)
   add_executable(fc2d_geoclaw.TEST
     fc2d_geoclaw.h.TEST.cpp
+    fc2d_geoclaw_options.h.TEST.cpp
   )
   target_link_libraries(fc2d_geoclaw.TEST testutils geoclaw)
   register_unit_tests(fc2d_geoclaw.TEST)

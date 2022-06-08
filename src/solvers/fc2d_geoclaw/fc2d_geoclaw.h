@@ -61,8 +61,8 @@ void fc2d_geoclaw_output(struct fclaw2d_global *glob, int iframe);
  * 
  * fclaw2d_vtables_intialize should be called before this function.
  * 
- * fclaw2d_clawpatch_options, and fc2d_geoclaw_options should be stored in glob.
- * fclaw2d_clawpatch_options will be changed in this call.
+ * fclaw_options, fclaw2d_clawpatch_options, and fc2d_geoclaw_options should be stored in glob.
+ * fclaw_options, and, fc2d_geoclaw_options will be changed in this call.
  * 
  * @param global the global context
  */
