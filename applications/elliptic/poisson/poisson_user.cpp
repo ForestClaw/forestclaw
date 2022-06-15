@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 
 All rights reserved.
 
@@ -90,7 +90,7 @@ void poisson_rhs(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     /* Compute right hand side */
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
     FCLAW_ASSERT(mg_vt->fort_rhs != NULL);
 
     /* This function supplies an analytic right hand side. */
@@ -108,7 +108,7 @@ void poisson_compute_error(fclaw2d_global_t *glob,
     poisson_error_info_t* error_data = (poisson_error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     if (clawpatch_vt->fort_compute_patch_error != NULL)
     {
@@ -160,7 +160,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
     double *rhs;  /* Solution is stored in the right hand side */ 
     fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
 
 
@@ -171,7 +171,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
                                           error_data->c_kahan);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
 
     int intersects_bc[4];
     fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
@@ -218,7 +218,7 @@ void poisson_time_header_ascii(fclaw2d_global_t* glob, int iframe)
     fclose(f2);
 
 #if 0
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     /* header writes out mfields+2 fields (computed soln, true soln, error); */
     clawpatch_vt->fort_header_ascii(matname1,matname2,&time,&mfields,&maux,&ngrids);
 #endif    
@@ -264,8 +264,8 @@ void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
 
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
+    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    //FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
     POISSON_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
                              &xlower,&ylower,&dx,&dy,rhs,
@@ -280,7 +280,7 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
                              int blockno, int patchno,
                              int initflag)
 {
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
@@ -299,9 +299,11 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_rhs_data(glob,this_patch,&rhs,&mfields);
 
     tag_patch = 0;
+    fclaw2d_global_set_global(glob);
     clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs,&refine_threshold,
                                       &initflag,&tag_patch);
+    fclaw2d_global_unset_global();
     return tag_patch;
 }
 
@@ -329,12 +331,14 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
         fclaw2d_clawpatch_rhs_data(glob,&fine_patches[igrid],&rhs[igrid],&mfields);
     }
 
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     int tag_patch = 0;
+    fclaw2d_global_set_global(glob);
     clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
                                       &coarsen_threshold,&initflag,&tag_patch);
+    fclaw2d_global_unset_global();
     return tag_patch == 1;
 }
 
@@ -342,16 +346,16 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
 void poisson_link_solvers(fclaw2d_global_t *glob)
 {
     /* ForestClaw vtable */
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = &poisson_problem_setup;  
 
     /* Patch : RHS function */
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->rhs = poisson_rhs;          /* Overwrites default */
     patch_vt->initialize = poisson_rhs;   /* Get an initial refinement */
 
     /* Multigrid vtable */
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
     mg_vt->fort_rhs       = &POISSON_FORT_RHS;
 
     mg_vt->fort_beta      = &POISSON_FORT_BETA;
@@ -360,7 +364,7 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
     mg_vt->fort_eval_bc  = &POISSON_FORT_EVAL_BC;   // For non-homogeneous BCs
 
     /* Clawpatch : Compute the error */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     clawpatch_vt->compute_error = poisson_compute_error;
     clawpatch_vt->fort_compute_patch_error = &POISSON_COMPUTE_ERROR;
 
@@ -393,7 +397,7 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
        used for the elliptic problem then for the hyperbolic problem */
     clawpatch_vt->conservation_check = poisson_conservation_check;        
 
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
     diag_vt->patch_init_diagnostics     = poisson_diagnostics_initialize;
     diag_vt->patch_reset_diagnostics    = poisson_diagnostics_reset;
     diag_vt->patch_compute_diagnostics  = poisson_diagnostics_compute;

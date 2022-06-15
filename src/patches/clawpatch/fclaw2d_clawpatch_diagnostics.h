@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -106,8 +106,12 @@ void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
 
 /**
  * @brief Initialize a global vtable
+ * 
+ * fclaw2d_diagnotistcs_vtable has to be initialized first
+ * 
+ * @param glob the global context
  */
-void fclaw2d_clawpatch_diagnostics_vtable_initialize();
+void fclaw2d_clawpatch_diagnostics_vtable_initialize(struct fclaw2d_global* glob);
 
 /**
  * @brief Calls the function in fclaw2d_clawpatch_vtable.fort_conservation_check

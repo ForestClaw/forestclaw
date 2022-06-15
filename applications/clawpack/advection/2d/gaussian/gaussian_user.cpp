@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -58,20 +58,20 @@ void gaussian_b4step2_manifold(fclaw2d_global_t *glob,
 void gaussian_link_solvers(fclaw2d_global_t *glob)
 {
     /* Custom setprob */
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup  = &gaussian_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &gaussian_patch_setup_manifold;  
 
     const user_options_t* user = gaussian_get_options(glob);
     if (user->mapping == 1)
-        fclaw2d_clawpatch_use_pillowsphere();
+        fclaw2d_clawpatch_use_pillowsphere(glob);
 
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
 
         /* Time dependent velocities */
         claw46_vt->b4step2        = gaussian_b4step2_manifold; 
@@ -82,7 +82,7 @@ void gaussian_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
 
         /* Time dependent velocity field */
         claw5_vt->b4step2        = gaussian_b4step2_manifold; 

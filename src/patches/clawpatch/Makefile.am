@@ -2,6 +2,8 @@
 libclawpatch_generated_headers =
 
 libclawpatch_installed_headers = \
+	src/patches/clawpatch/fclaw_clawpatch_enums.h \
+	\
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
 	src/patches/clawpatch/fclaw2d_clawpatch_options.h \
@@ -132,17 +134,21 @@ AM_FFLAGS   += $(FCLAW_CLAWPATCH_FFLAGS)
 include_HEADERS += $(libclawpatch_installed_headers)
 
 ## UNIT TESTS
-check_PROGRAMS += src/patches/clawpatch/libclawpatch_TEST.MPI1
-TESTS += src/patches/clawpatch/libclawpatch_TEST.MPI1
+check_PROGRAMS += src/patches/clawpatch/clawpatch.TEST
+TESTS += src/patches/clawpatch/clawpatch.TEST
 
-src_patches_clawpatch_libclawpatch_TEST_MPI1_SOURCES = \
-	src/patches/clawpatch/fclaw3dx_clawpatch_TEST.cpp \
-	src/patches/clawpatch/fclaw3dx_clawpatch_options_TEST.cpp
+src_patches_clawpatch_clawpatch_TEST_SOURCES = \
+    src/patches/clawpatch/fclaw2d_clawpatch.h.TEST.cpp \
+    src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h.TEST.cpp \
+    src/patches/clawpatch/fclaw2d_clawpatch_fort.h.TEST.cpp \
+	src/patches/clawpatch/fclaw3dx_clawpatch.h.TEST.cpp \
+	src/patches/metric/fclaw2d_metric.h.TEST.cpp
 
-src_patches_clawpatch_libclawpatch_TEST_MPI1_CPPFLAGS = \
+src_patches_clawpatch_clawpatch_TEST_CPPFLAGS = \
+	$(test_libtestutils_la_CPPFLAGS) \
     $(src_patches_clawpatch_libclawpatch_la_CPPFLAGS)
 
-src_patches_clawpatch_libclawpatch_TEST_MPI1_LDADD = \
+src_patches_clawpatch_clawpatch_TEST_LDADD = \
 	test/libtestutils.la \
 	$(test_libtestutils_la_LDADD) \
     $(LDADD) \

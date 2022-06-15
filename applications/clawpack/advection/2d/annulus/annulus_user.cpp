@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -60,22 +60,22 @@ void annulus_link_solvers(fclaw2d_global_t *glob)
 {
     const user_options_t   *user      =  annulus_get_options(glob);
 
-    fclaw2d_vtable_t           *vt           = fclaw2d_vt();
-    fclaw2d_patch_vtable_t     *patch_vt     = fclaw2d_patch_vt();
+    fclaw2d_vtable_t           *vt           = fclaw2d_vt(glob);
+    fclaw2d_patch_vtable_t     *patch_vt     = fclaw2d_patch_vt(glob);
 
     vt->problem_setup  = &annulus_problem_setup;
     patch_vt->setup    = &annulus_patch_setup;
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);
         clawpack46_vt->fort_qinit   = CLAWPACK46_QINIT;
         clawpack46_vt->fort_rpn2    = CLAWPACK46_RPN2ADV_MANIFOLD;
         clawpack46_vt->fort_rpt2    = CLAWPACK46_RPT2ADV_MANIFOLD;
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
         claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
         claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;

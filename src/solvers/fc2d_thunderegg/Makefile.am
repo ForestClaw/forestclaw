@@ -55,18 +55,20 @@ LDADD        += $(FCLAW_THUNDEREGG_LDADD)
 include_HEADERS += $(libthunderegg_installed_headers)
 
 ## UNIT TESTS
-check_PROGRAMS += src/solvers/fc2d_thunderegg/libfc2d_thunderegg_TEST.MPI1
-TESTS += src/solvers/fc2d_thunderegg/libfc2d_thunderegg_TEST.MPI1
+check_PROGRAMS += src/solvers/fc2d_thunderegg/fc2d_thunderegg.TEST
+TESTS += src/solvers/fc2d_thunderegg/fc2d_thunderegg.TEST
 
-src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_SOURCES = \
+src_solvers_fc2d_thunderegg_fc2d_thunderegg_TEST_SOURCES = \
+	src/solvers/fc2d_thunderegg/fc2d_thunderegg.h.TEST.cpp \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg_vector_TEST.cpp
 
-src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_CPPFLAGS = \
+src_solvers_fc2d_thunderegg_fc2d_thunderegg_TEST_CPPFLAGS = \
     $(src_solvers_fc2d_thunderegg_libfc2d_thunderegg_la_CPPFLAGS)
 
-src_solvers_fc2d_thunderegg_libfc2d_thunderegg_TEST_MPI1_LDADD = \
+src_solvers_fc2d_thunderegg_fc2d_thunderegg_TEST_LDADD = \
 	test/libtestutils.la \
 	$(test_libtestutils_la_LDADD) \
     $(LDADD) \
     $(FCLAW_THUNDEREGG_LDADD) \
+    $(FCLAW_CLAWPATCH_LDADD) \
     $(FCLAW_LDADD)

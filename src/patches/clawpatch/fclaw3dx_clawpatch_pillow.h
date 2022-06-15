@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ struct fclaw2d_patch_transform;
 
 /**
  * @file
- * This handles the boundary conditions at the block
+ * @brief This handles the boundary conditions at the block
  * corners for the pillow sphere.
  */
 
@@ -134,9 +134,11 @@ void fclaw3dx_clawpatch_use_pillowsphere();
 /**
  * @brief Initialize a global variable vtable
  * 
+ * @param glob the global context
  * @param claw_version the clawaptck verstion 4 for v4.6, 5 for v5
  */
-void fclaw3dx_clawpatch_pillow_vtable_initialize(int claw_version);
+void fclaw3dx_clawpatch_pillow_vtable_initialize(struct fclaw2d_global* glob,
+                                                 int claw_version);
 
 /**
  * @brief vtable for handling block corners for pillow sphere
@@ -161,9 +163,10 @@ struct fclaw3dx_clawpatch_pillow_vtable
 /**
  * @brief Get the global vtable variable
  * 
+ * @param glob the global context
  * @return fclaw3dx_clawpatch_pillow_vtable_t* the vtable
  */
-fclaw3dx_clawpatch_pillow_vtable_t* fclaw3dx_clawpatch_pillow_vt();
+fclaw3dx_clawpatch_pillow_vtable_t* fclaw3dx_clawpatch_pillow_vt(struct fclaw2d_global* glob);
 
 
 #ifdef __cplusplus

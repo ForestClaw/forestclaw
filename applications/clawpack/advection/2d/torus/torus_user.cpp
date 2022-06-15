@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -69,19 +69,19 @@ void torus_patch_setup(fclaw2d_global_t *glob,
 
 void torus_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */
 
     /* Torus uses special patch setup (not advection_patch_setup), since the
        streamfunction depends on computational coordinates, not physical
        coordinates */
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup   = &torus_patch_setup;
 
     const user_options_t *user =  torus_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
 
         claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
         claw46_vt->fort_setaux = &TORUS46_SETAUX;
@@ -91,7 +91,7 @@ void torus_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
         
         claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         claw5_vt->fort_setaux    = &TORUS5_SETAUX;

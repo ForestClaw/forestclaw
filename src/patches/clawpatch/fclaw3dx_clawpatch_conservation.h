@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef FCLAW3DX_CLAWPATCH_CONSERVATION_H
 #define FCLAW3DX_CLAWPATCH_CONSERVATION_H
+
+#include <fclaw_clawpatch_enums.h>
 
 /** 
  *  @file
@@ -70,17 +72,6 @@ struct fclaw3dx_clawpatch_registers
     /** Fluxes along the top face */
 	double *gm[2];
 };
-
-/**
- * @brief Packing mode enum
- */
-typedef enum fclaw3dx_clawpatch_packmode
-{
-    /** Pack register into buffer */
-    CLAWPATCH_REGISTER_PACK = 0,
-    /** Unpack register from buffer */
-    CLAWPATCH_REGISTER_UNPACK
-} fclaw3dx_clawpatch_packmode_t;
 
 /**
  * @brief Adds fine grid corrections to coarse grid.  
@@ -294,7 +285,7 @@ void fclaw3dx_clawpatch_time_sync_pack_registers(struct fclaw2d_global *glob,
                                                 struct fclaw2d_patch *this_patch,
                                                 double *qpack,
                                                 int frsize, 
-                                                fclaw3dx_clawpatch_packmode_t packmode, 
+                                                fclaw_clawpatch_packmode_t packmode, 
                                                 int *ierror);
 
 #ifdef __cplusplus

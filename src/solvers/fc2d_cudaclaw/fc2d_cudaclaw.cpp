@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2018 Carsten Burstedde, Donna Calhoun, Melody Shih, Scott Aiton,
+Copyright (c) 2018-2022 Carsten Burstedde, Donna Calhoun, Melody Shih, Scott Aiton,
 Xinsheng Qin.
 
 All rights reserved.
@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdlib.h>  /* For size_t */
 
+#include <fclaw_pointer_map.h>
+
 #include <fclaw2d_global.h>
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_update_single_step.h>  
@@ -50,15 +52,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_cuda_profiler.h"
 
-/* ------------------------------- Static virtual table ------------------------------- */
-static fc2d_cudaclaw_vtable_t s_cudaclaw_vt;
-
 /* --------------------- Clawpack solver functions (required) ------------------------- */
 
 static
 void cudaclaw_setprob(fclaw2d_global_t *glob)
 {
-    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
     if (cudaclaw_vt->fort_setprob != NULL)
     {
         cudaclaw_vt->fort_setprob();
@@ -74,7 +73,7 @@ void cudaclaw_qinit(fclaw2d_global_t *glob,
                       int this_patch_idx)
 {
     PROFILE_CUDA_GROUP("cudaclaw_qinit",1);
-    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
 
     FCLAW_ASSERT(cudaclaw_vt->fort_qinit != NULL); /* Must be initialized */
     int mx,my,mbc,meqn,maux,maxmx,maxmy;
@@ -109,7 +108,7 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
                     int time_interp)
 {
     PROFILE_CUDA_GROUP("cudaclaw_bc2",6);
-    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
 
     fc2d_cudaclaw_options_t *clawpack_options = fc2d_cudaclaw_get_options(glob);
 
@@ -167,7 +166,7 @@ void cudaclaw_b4step2(fclaw2d_global_t *glob,
 
 {
     PROFILE_CUDA_GROUP("cudaclaw_b4step2",1);
-    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
 
     int mx,my,mbc,meqn, maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
@@ -202,7 +201,7 @@ void cudaclaw_src2(fclaw2d_global_t *glob,
                      double dt)
 {
     PROFILE_CUDA_GROUP("cudaclaw_src2",7);
-    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
 
     int mx,my,mbc,meqn, maux,maxmx,maxmy;
     double xlower,ylower,dx,dy;
@@ -238,7 +237,7 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
                        int this_patch_idx)
 {
     PROFILE_CUDA_GROUP("cudaclaw_setaux",2);
-    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
 
     if (cudaclaw_vt->fort_setaux == NULL)
     {
@@ -280,7 +279,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                          void* user)
 {
     PROFILE_CUDA_GROUP("cudaclaw_update",3);
-    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt();
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
     const fc2d_cudaclaw_options_t* cuclaw_opt;
 
     int iter, total, patch_buffer_len;
@@ -392,21 +391,26 @@ void cudaclaw_output(fclaw2d_global_t *glob, int iframe)
 /* ---------------------------------- Virtual table  ---------------------------------- */
 
 static
-fc2d_cudaclaw_vtable_t* cudaclaw_vt_init()
+fc2d_cudaclaw_vtable_t* cudaclaw_vt_new()
 {
-    FCLAW_ASSERT(s_cudaclaw_vt.is_set == 0);
-    return &s_cudaclaw_vt;
+    return (fc2d_cudaclaw_vtable_t*) FCLAW_ALLOC_ZERO (fc2d_cudaclaw_vtable_t, 1);
 }
 
-void fc2d_cudaclaw_solver_initialize()
+static
+void cudaclaw_vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
+}
+
+void fc2d_cudaclaw_solver_initialize(fclaw2d_global_t* glob)
 {
     int claw_version = 4;
-    fclaw2d_clawpatch_vtable_initialize(claw_version);
+    fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
-    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
-    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();  
+    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt(glob);
+    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt(glob);  
 
-    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = cudaclaw_vt_init();
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = cudaclaw_vt_new();
 
 #if defined(_OPENMP)
     fclaw_global_essentialf("Current implementation does not allow OPENMP + CUDA\n");
@@ -444,6 +448,9 @@ void fc2d_cudaclaw_solver_initialize()
     cudaclaw_vt->fort_src2      = NULL;
 
     cudaclaw_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fc2d_cudaclaw") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fc2d_cudaclaw", cudaclaw_vt, cudaclaw_vt_destroy);
 }
 
 
@@ -452,10 +459,13 @@ void fc2d_cudaclaw_solver_initialize()
 
 /* These are here in case the user wants to call Clawpack routines directly */
 
-fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt()
+fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(fclaw2d_global_t *glob)
 {
-    FCLAW_ASSERT(s_cudaclaw_vt.is_set != 0);
-    return &s_cudaclaw_vt;
+	fc2d_cudaclaw_vtable_t* cudaclaw_vt = (fc2d_cudaclaw_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fc2d_cudaclaw");
+	FCLAW_ASSERT(cudaclaw_vt != NULL);
+	FCLAW_ASSERT(cudaclaw_vt->is_set != 0);
+	return cudaclaw_vt;
 }
 
 /* This should only be called when a new fclaw2d_clawpatch_t is created. */

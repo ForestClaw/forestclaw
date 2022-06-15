@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -56,9 +56,22 @@ void fc2d_geoclaw_output(struct fclaw2d_global *glob, int iframe);
 
 /* ------------------------------------- Virtual table ----------------------------------- */
 
-void fc2d_geoclaw_solver_initialize();
+/**
+ * @brief Initialize the geoclaw solver
+ * 
+ * fclaw2d_vtables_intialize should be called before this function.
+ * 
+ * @param global the global context
+ */
+void fc2d_geoclaw_solver_initialize(struct fclaw2d_global *glob);
 
-fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt();
+/**
+ * @brief Get the geoclaw vtable
+ * 
+ * @param global the global context
+ * @return fc2d_geoclaw_vtable_t* the vtable
+ */
+fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(struct fclaw2d_global *glob);
 
 
 struct fc2d_geoclaw_vtable

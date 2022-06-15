@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ struct fclaw2d_patch_transform;
 
 /**
  * @file
- * This handles the boundary conditions at the block
+ * @brief This handles the boundary conditions at the block
  * corners for the pillow sphere.
  */
 
@@ -155,16 +155,18 @@ typedef void  (*pillow_fort_interpolate_block_corner_t)(const int* mx,
 /**
  * @brief Sets global patch_vtable to use pollow sphere routines
  */
-void fclaw2d_clawpatch_use_pillowsphere();
+void fclaw2d_clawpatch_use_pillowsphere(struct fclaw2d_global* glob);
 
 /* --------------------------------- Virtual table ------------------------------------ */
 
 /**
- * @brief Initialize a global variable vtable
+ * @brief Initialize the pillow vtable
  * 
+ * @param glob the global context
  * @param claw_version the clawaptck verstion 4 for v4.6, 5 for v5
  */
-void fclaw2d_clawpatch_pillow_vtable_initialize(int claw_version);
+void fclaw2d_clawpatch_pillow_vtable_initialize(struct fclaw2d_global* glob, 
+                                                int claw_version);
 
 /**
  * @brief vtable for handling block corners for pillow sphere
@@ -187,11 +189,12 @@ struct fclaw2d_clawpatch_pillow_vtable
 /* ------------------------------- Public access functions ---------------------------- */
 
 /**
- * @brief Get the global vtable variable
+ * @brief Get the pillow vtable
  * 
+ * @param glob the global context
  * @return fclaw2d_clawpatch_pillow_vtable_t* the vtable
  */
-fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt();
+fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt(struct fclaw2d_global* glob);
 
 
 #ifdef __cplusplus

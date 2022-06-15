@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -46,20 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int s_clawpatch_options_package_id = -1;
 
-
-static int s_refine_criteria = -1;
-
-void fclaw2d_clawpatch_set_refinement_criteria(int r)
-{
-    //FCLAW_ASSERT(s_refine_criteria == -1);
-    s_refine_criteria = r;
-}
-
-int fclaw2d_clawpatch_get_refinement_criteria()
-{
-    FCLAW_ASSERT(s_refine_criteria != -1);
-    return s_refine_criteria;
-}
 
 static void *
 clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
@@ -154,8 +140,6 @@ clawpatch_check(fclaw2d_clawpatch_options_t *clawpatch_opt)
                                 "'gradient', or 'user'.\n");
         return FCLAW_EXIT_ERROR;            
     }
-    /* This is needed so that the refine */
-    fclaw2d_clawpatch_set_refinement_criteria(clawpatch_opt->refinement_criteria);   
 
     return FCLAW_NOEXIT;
 }
