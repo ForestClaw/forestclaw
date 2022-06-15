@@ -1,15 +1,71 @@
 !!
 !! Compare two fort files in two different directories.
 !! To compile :
-!!      gfortran -o compare_files compare_files.f90
+!!      gfortran -o compare_files compare_files.f90 -Wl,-rpath,/opt/local/lib/gcc-devel
 !!
-!! To use : Create a file called
+!! To use : Create two directories :
+!!
+!! For example : 
+!! 
+!!      $ mkdir cpu
+!!      $ mkdir gpu
+!!
+!! or 
+!!        
+!!      $ mkdir ver4
+!!      $ mkdir ver5
+!!
+!! or some other choice of directories names
+!!
+!! Create directory for results
+!!
+!! e.g 
+!!       $ mkdir compare
+!!
+!! Runs two simulations.  After each run, copy fort.* files to appropriate directory. 
+!!
+!! Run 'compare_files' in parent directory
+!!
+!! Enter names of directory 1 and directory 2
+!! Enter name of directory for results
+!!
+!! Enter Frame number to compare
+!!
+!! Results will appear in a summary file and in fort.* files in results directory.
+!!
+!! Sample run : 
+!!
+!!       (base) (bash) ~/.../advection/2d/swirl (develop) % compare_files
+!!       Enter directory 1 : 
+!!       ver4
+!!       Enter directory 2 : 
+!!       ver5
+!!       Enter directory for results (directory must exist) : 
+!!       compare
+!!       Enter Frame number to compare : 
+!!       5
+!!        Files that will be compared  :
+!!        ver4/fort.q0005                                            
+!!        ver5/fort.q0005
+!!                                                                                            
+!!        ver4/fort.t0005                                                                     
+!!        ver5/fort.t0005                                                                     
+!!        
+!!       Time of simulation : t =               4.03256644
+!!       A summary of the results will be stored in : 
+!!       compare/compare_summary.0005
+!!                                                                             
+!!       compare/fort.q0005
+!!       compare/fort.t0005
+!!      
+!!              0.0000000000000000E+00     occurs in field    1 on grid     0
+!!      
+
 
 PROGRAM compare_files
   IMPLICIT NONE
 
   INTEGER :: iframe
-!!  CHARACTER(100) :: dir1, dir2, dir3
 
   INTEGER :: i,j, n, m
 
@@ -40,8 +96,7 @@ PROGRAM compare_files
 
   INTEGER :: num_args, ix
   CHARACTER(len=12), DIMENSION(:), ALLOCATABLE :: args
-  CHARACTER(len=100) dir1,dir2
-  CHARACTER(len=100) dir3
+  CHARACTER(len=100) dir1, dir2, dir3
   INTEGER :: d1, d2
 
 
@@ -85,27 +140,30 @@ PROGRAM compare_files
   !! READ(10,*) dir3  !! results will be stored here in fort.qXXXX and fort.tXXXX
   !! CLOSE(10)
 
-  fname1 = 'fort.qxxxx'
-  fname2 = 'fort.txxxx'
-  nstp = iframe
-  DO ipos = 10, 7, -1
-     idigit = MOD(nstp,10)
-     fname1(ipos:ipos) = CHAR(ICHAR('0') + idigit)
-     fname2(ipos:ipos) = CHAR(ICHAR('0') + idigit)
-     nstp = nstp / 10
-  ENDDO
+!!  fname1 = 'fort.qxxxx'
+!!  fname2 = 'fort.txxxx'
+!!  nstp = iframe
+!!  DO ipos = 10, 7, -1
+!!     idigit = MOD(nstp,10)
+!!     fname1(ipos:ipos) = CHAR(ICHAR('0') + idigit)
+!!     fname2(ipos:ipos) = CHAR(ICHAR('0') + idigit)
+!!     nstp = nstp / 10
+!!  ENDDO
 
-  fname3 = 'compare_summary.xxxx'
-  nstp = iframe
-  DO ipos = 20, 17, -1
-     idigit = MOD(nstp,10)
-     fname3(ipos:ipos) = CHAR(ICHAR('0') + idigit)
-     nstp = nstp/10
-  ENDDO
 
+!!  fname3 = 'compare_summary.xxxx'
+!!  nstp = iframe
+!!  DO ipos = 20, 17, -1
+!!     idigit = MOD(nstp,10)
+!!     fname3(ipos:ipos) = CHAR(ICHAR('0') + idigit)
+!!     nstp = nstp/10
+!!  ENDDO
+
+  WRITE(fname1,'(A,I0.4)') 'fort.q',iframe
   dir1_fname1 = TRIM(dir1)//'/'//trim(fname1)
   dir2_fname1 = TRIM(dir2)//'/'//trim(fname1)
 
+  WRITE(fname2,'(A,I0.4)') 'fort.t',iframe
   dir1_fname2 = TRIM(dir1)//'/'//trim(fname2)
   dir2_fname2 = TRIM(dir2)//'/'//trim(fname2)
 
@@ -157,6 +215,7 @@ PROGRAM compare_files
 
   WRITE(6,'(A,F24.8)') 'Time of simulation : t = ',t
 
+  WRITE(fname3,'(A,I0.4)') 'compare_summary',iframe
   dir3_fname3 = TRIM(dir3)//'/'//TRIM(fname3)
   WRITE(6,*) 'A summary of the results will be stored in : '
   WRITE(6,*) dir3_fname3
@@ -170,7 +229,6 @@ PROGRAM compare_files
   ALLOCATE(grid_max(meqn),global_max(meqn))
   grid_max = 0
   global_max = 0
-
 
 
   OPEN(10,FILE=dir1_fname1,ERR=100)
@@ -308,13 +366,15 @@ SUBROUTINE write_tfile(iframe,time,meqn,ngrids,dir3)
 !!     nstp = nstp / 10
   !!  ENDDO
 
-  WRITE(fname1,'(A,I0.4)') 'fort.q',iframe
-  WRITE(fname2,'(A,I0.4)') 'fort.t',iframe
 
+  WRITE(fname1,'(A,I0.4)') 'fort.q',iframe
   dir3_fname1 = TRIM(dir3)//'/'//trim(fname1)
+
+  WRITE(fname2,'(A,I0.4)') 'fort.t',iframe
   dir3_fname2 = TRIM(dir3)//'/'//trim(fname2)
 
   maux = 0
+  matunit2 = 11
   OPEN(matunit2,file=dir3_fname2)
   WRITE(matunit2,1000) time,meqn,ngrids,maux
 1000 FORMAT(e18.8,'    time', /, &
@@ -338,15 +398,16 @@ SUBROUTINE new_qfile(iframe,dir3)
   INTEGER fid_com
   COMMON /com_newqfile/ fid_com
 
-  fname1 = 'fort.qxxxx'
-  fid_com = 51
-  nstp     = iframe
-  DO ipos = 10, 7, -1
-     idigit = MOD(nstp,10)
-     fname1(ipos:ipos) = CHAR(ICHAR('0') + idigit)
-     nstp = nstp / 10
-  ENDDO
+!!  fname1 = 'fort.qxxxx'
+!!  fid_com = 51
+!!  nstp     = iframe
+!!  DO ipos = 10, 7, -1
+!!     idigit = MOD(nstp,10)
+!!     fname1(ipos:ipos) = CHAR(ICHAR('0') + idigit)
+!!     nstp = nstp / 10
+!!  ENDDO
 
+  WRITE(fname1,'(A,I0.4)') 'fort.q',iframe
   dir3_fname1 = TRIM(dir3)//'/'//trim(fname1)
 
   OPEN(unit=fid_com,file=dir3_fname1,status='replace')
@@ -374,15 +435,18 @@ SUBROUTINE write_qfile(mx,my,meqn,xlower,ylower, &
   INTEGER fid_com
   COMMON /com_newqfile/ fid_com
 
-  fname1 = 'fort.qxxxx'
-  fid_com = 51
-  nstp     = iframe
-  DO ipos = 10, 7, -1
-     idigit = MOD(nstp,10)
-     fname1(ipos:ipos) = CHAR(ICHAR('0') + idigit)
-     nstp = nstp / 10
-  ENDDO
+!!  fname1 = 'fort.qxxxx'
+!!  fid_com = 51
+!!  nstp     = iframe
+!!  DO ipos = 10, 7, -1
+!!     idigit = MOD(nstp,10)
+!!     fname1(ipos:ipos) = CHAR(ICHAR('0') + idigit)
+!!     nstp = nstp / 10
+!!  ENDDO
 
+!!  WRITE(fname2,'(A,I0.4)') 'fort.t',iframe
+
+  WRITE(fname1,'(A,I0.4)') 'fort.q',iframe
   dir3_fname1 = TRIM(dir3)//'/'//trim(fname1)
   OPEN(fid_com,file=dir3_fname1,position='append');
 
