@@ -28,9 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_global.h>
 #include <fclaw_options.h>
-#include <fclaw_package.h>
-
-static int s_thunderegg_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 static void*
 thunderegg_register (fc2d_thunderegg_options_t* mg_opt, sc_options_t * opt)
@@ -234,12 +232,14 @@ fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
 
 fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(fclaw2d_global_t *glob)
 {
-    int id = s_thunderegg_options_package_id;
-    return (fc2d_thunderegg_options_t*) fclaw_package_get_options(glob,id);
+    fc2d_thunderegg_options_t* user = (fc2d_thunderegg_options_t*) 
+                              fclaw_pointer_map_get(glob->options, "fc2d_thunderegg");
+    FCLAW_ASSERT(user != NULL);
+    return user;
 }
 
 void fc2d_thunderegg_options_store (fclaw2d_global_t* glob, fc2d_thunderegg_options_t* mg_opt)
 {
-    int id = fclaw_package_container_add_pkg(glob,mg_opt);
-    s_thunderegg_options_package_id = id;
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"fc2d_thunderegg") == NULL);
+    fclaw_pointer_map_insert(glob->options, "fc2d_thunderegg", mg_opt, NULL);
 }
