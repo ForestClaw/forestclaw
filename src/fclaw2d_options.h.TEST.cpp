@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_options.h>
-#include <fclaw2d_clawpatch_options.h>
 #include <test/doctest.h>
 
 TEST_CASE("fclaw2d_options can store options in two seperate globs")
@@ -38,7 +37,6 @@ TEST_CASE("fclaw2d_options can store options in two seperate globs")
 
 	fclaw2d_options_store(glob1, opts1);
 	/* glob1 has one package glob2 has two */
-	fclaw2d_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
 	fclaw2d_options_store(glob2, opts2);
 
 	CHECK_EQ(fclaw2d_get_options(glob1), opts1);
