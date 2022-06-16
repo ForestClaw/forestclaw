@@ -174,6 +174,6 @@ if(BUILD_TESTING)
       fclaw2d_vtable.h.TEST.cpp
   )
 
-  target_link_libraries(forestclaw.TEST testutils forestclaw clawpatch)
+  target_link_libraries(forestclaw.TEST testutils forestclaw)
   register_unit_tests(forestclaw.TEST)
 endif(BUILD_TESTING)
