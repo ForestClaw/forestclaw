@@ -25,7 +25,7 @@
 
 #include "poisson_user.h"
 
-static int s_user_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 static void *
 poisson_register (poisson_options_t *user, sc_options_t * opt)
@@ -218,13 +218,14 @@ poisson_options_t* poisson_options_register (fclaw_app_t * app,
 
 void poisson_options_store (fclaw2d_global_t* glob, poisson_options_t* user)
 {
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"user") == NULL);
+    fclaw_pointer_map_insert(glob->options, "user", user, NULL);
 }
 
 const poisson_options_t* poisson_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_options_package_id;
-    return (poisson_options_t*) fclaw_package_get_options(glob, id);    
+    poisson_options_t* user = (poisson_options_t*) 
+                              fclaw_pointer_map_get(glob->options, "user");
+    FCLAW_ASSERT(user != NULL);
+    return user;
 }

@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "gaussian_user.h"
 
-static int s_user_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 static void *
 gaussian_register (user_options_t* user, sc_options_t * opt)
@@ -158,15 +158,16 @@ user_options_t* gaussian_options_register (fclaw_app_t * app,
 
 void gaussian_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"user") == NULL);
+    fclaw_pointer_map_insert(glob->options, "user", user, NULL);
 }
 
 const user_options_t* gaussian_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
+    user_options_t* user = (user_options_t*) 
+                              fclaw_pointer_map_get(glob->options, "user");
+    FCLAW_ASSERT(user != NULL);
+    return user;   
 }
 /* ------------------------- ... and here ---------------------------- */
 
