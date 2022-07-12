@@ -113,11 +113,13 @@ clawpatch_postprocess(fclaw2d_clawpatch_options_t *clawpatch_opt)
 static fclaw_exit_type_t
 clawpatch_check(fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
+#if 0
     if (clawpatch_opt->mx != clawpatch_opt->my)
     {
         fclaw_global_essentialf("Clawpatch error : mx != my\n");
         return FCLAW_EXIT_ERROR;    
     }
+#endif
 
     if (2*clawpatch_opt->mbc > clawpatch_opt->mx)
     {
