@@ -107,7 +107,9 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     retval = retval || fprintf (file, "<?xml version=\"1.0\"?>\n") < 0;
     retval = retval || fprintf (file, "<VTKFile type=\"UnstructuredGrid\" "
                                 "version=\"0.1\" "
-                                "byte_order=\"LittleEndian\">\n") < 0;
+                                "byte_order=\"LittleEndian\" "
+                                "header_type=\"UInt64\" "
+                                ">\n") < 0;
     retval = retval || fprintf (file, " <UnstructuredGrid>\n") < 0;
     retval = retval || fprintf (file, "  <Piece NumberOfPoints=\"%lld\" "
                                 "NumberOfCells=\"%lld\">\n",
@@ -405,7 +407,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
 {
     fclaw2d_domain_t *domain = glob->domain;
 
-    int32_t bcount;
+    int64_t bcount;
 #ifndef P4EST_ENABLE_MPIIO
     int retval;
 #else
@@ -441,7 +443,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
         retval = fwrite (&bcount, s->ndsize, 1, s->file);
         SC_CHECK_ABORT (retval == 1, "VTK file write failed");
 #else
-        mpiret = MPI_File_write (s->mpifile, &bcount, 1, MPI_INT, &mpistatus);
+        mpiret = MPI_File_write (s->mpifile, &bcount, 1, MPI_LONG, &mpistatus);
         SC_CHECK_MPI (mpiret);
 #endif
     }
@@ -579,7 +581,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
         && s->global_num_connectivity <= INT32_MAX;
     s->inttype = s->fits32 ? "Int32" : "Int64";
     s->intsize = s->fits32 ? sizeof (int32_t) : sizeof (int64_t);
-    s->ndsize = 4;              /* TODO: use VTK header_type if necessary */
+    s->ndsize = 8;   /*uint64*/
     s->coordinate_cb = coordinate_cb;
     s->value_cb = value_cb;
 
