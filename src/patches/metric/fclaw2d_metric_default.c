@@ -56,7 +56,7 @@ void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_metric_compute_tensors_default(fclaw2d_global_t *glob,
+void fclaw2d_metric_compute_basis_default(fclaw2d_global_t *glob,
                                             fclaw2d_patch_t *patch,
                                             int blockno,
                                             int patchno)
@@ -145,7 +145,7 @@ void fclaw2d_metric_compute_area_ghost_default(fclaw2d_global_t* glob,
     fclaw2d_metric_patch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_metric_patch_get_area(glob, patch);
+    double *area = fclaw2d_metric_patch_get_area(glob, patch);
 
     /* Set area in ghost cells not set above */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
@@ -156,7 +156,6 @@ void fclaw2d_metric_compute_area_ghost_default(fclaw2d_global_t* glob,
     int m = pow_int(refratio,maxlevel-level);
     double *quadstore = FCLAW_ALLOC(double,3*(m+1)*(m+1));
 
-    double *area;
     int ghost_only = 1;
     FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
                               &blockno, area, &m, quadstore,

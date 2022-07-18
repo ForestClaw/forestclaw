@@ -95,6 +95,10 @@ struct fclaw3d_metric_patch_t
 
     /** volume of each cell */
     FArrayBox volume;
+
+    /** Area of each cell of three faces */
+    FArrayBox face_area;
+
 };
 
 /**

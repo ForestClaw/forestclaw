@@ -8,7 +8,7 @@
 !!>
 !!> @details @copydetails ::fclaw3d_fort_compute_mesh_t
 !! ---------------------------------------------------------
-subroutine fclaw3d_fort_compute_mesh(mx,my,mz,mbc, &
+subroutine fclaw3d_metric_fort_compute_mesh(mx,my,mz,mbc, &
         xlower,ylower, zlower, dx,dy,dz, blockno, & 
         xp,yp,zp,xd,yd,zd)
     implicit none
@@ -40,8 +40,8 @@ subroutine fclaw3d_fort_compute_mesh(mx,my,mz,mbc, &
         do j = -2*mbc-1,2*(my+mbc+1)+1
             do k = -2*mbc-1,2*(mz+mbc+1) + 1
                 !! Skip over any values at face centers
-                if ((abs(mod(i,2)) .ne. abs(mod(j,2))) .or.  
-                    (abs(mod(i,2)) .ne. abs(mod(k,2))) .or.
+                if ((abs(mod(i,2)) .ne. abs(mod(j,2))) .or.  & 
+                    (abs(mod(i,2)) .ne. abs(mod(k,2))) .or.  & 
                     (abs(mod(j,2)) .ne. abs(mod(k,2)))) then 
                     cycle
                 endif
@@ -70,7 +70,7 @@ subroutine fclaw3d_fort_compute_mesh(mx,my,mz,mbc, &
             end do
         end do
     end do
-end subroutine fclaw3d_fort_compute_mesh
+end subroutine fclaw3d_metric_fort_compute_mesh
 
 !! ----------------------------------------------------------
 !!> @brief @copybrief ::fclaw3d_fort_compute_area_t
@@ -79,12 +79,12 @@ end subroutine fclaw3d_fort_compute_mesh
 !!>
 !!> @details @copydetails ::fclaw3d_fort_compute_area_t
 !! ---------------------------------------------------------
-subroutine fclaw3d_fort_compute_volume(mx,my,mz, mbc,dx,dy,dz, &
+subroutine fclaw3d_metric_fort_compute_volume(mx,my,mz, mbc,dx,dy,dz, &
            xlower, ylower, zlower, blockno, xd,yd,zd, & 
            volume, faceareas, hexsize, hexstore, ghost_only)
     implicit none
 
-    integer mx,my,mz,mbc,blockno, quadsize
+    integer mx,my,mz,mbc,blockno, hexsize
     double precision hexstore(0:hexsize,0:hexsize,0:hexsize,3)
     double precision dx,dy, dz, xlower, ylower, zlower
     integer ghost_only
@@ -95,17 +95,21 @@ subroutine fclaw3d_fort_compute_volume(mx,my,mz, mbc,dx,dy,dz, &
     double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2,-mbc:mz+mbc+2)
     double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2,-mbc:mz+mbc+2)
 
+    logical isaffine
+
+
     if (isaffine()) then
         !! # We don't need to compute areas all the way to the
         !! # finest level.
-        call fclaw3d_fort_compute_volume_affine(mx, my, mz, mbc, & 
+        call fclaw3d_metric_fort_compute_volume_affine(mx, my, mz, mbc, & 
                     xd, yd, zd, volume, faceareas, ghost_only)
     else
-        call fclaw3d_fort_compute_volume_general(mx, my, mz, mbc, dx, dy, dz, &
+        call fclaw3d_metric_fort_compute_volume_general(mx, my, mz, mbc, & 
+                dx, dy, dz, &
                 xlower, ylower, zlower, blockno, volume,faceareas, &
-                xrot, yrot, zrot, hexsize, hexstore, ghost_only)
+                hexsize, hexstore, ghost_only)
     endif
-end subroutine fclaw3d_fort_compute_volume
+end subroutine fclaw3d_metric_fort_compute_volume
 
 !! ---------------------------------------------------------
 !!> @brief Compute the volume for each cell for general mappings
@@ -120,7 +124,7 @@ end subroutine fclaw3d_fort_compute_volume
 !!> @param[in] hexstore stores a group of cell values
 !!> @param[in] ghost_only
 !! ---------------------------------------------------------
-subroutine fclaw3d_fort_compute_volume_general(mx,my,mz, mbc, & 
+subroutine fclaw3d_metric_fort_compute_volume_general(mx,my,mz, mbc, & 
            dx, dy, dz, xlower, ylower, zlower, blockno, volume, &
            faceareas, hexsize, hexfine,ghost_only)
     implicit none
@@ -134,11 +138,10 @@ subroutine fclaw3d_fort_compute_volume_general(mx,my,mz, mbc, &
     double precision faceareas(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3)
 
     integer i,j,k,ii,jj, kk, m, rfactor, icell, jcell, kcell
-    integer ir,jr,kr
     double precision sum_volume
     double precision xp1,yp1,zp1
     double precision hex(0:1,0:1,0:1,3)
-    double precision area(3), sum_face_area(3), rot(3,3,3)
+    double precision area(3), sum_face_area(3)
 
     double precision get_volume_approx
 
@@ -157,7 +160,7 @@ subroutine fclaw3d_fort_compute_volume_general(mx,my,mz, mbc, &
 
     do j = -mbc,my+mbc+1
         do i = -mbc,mx+mbc+1
-            do k = -mbc:mz+mbc+1
+            do k = -mbc,mz+mbc+1
 
                 !! Skip interior cells if we are only trying to rebuild
                 !! metric terms in ghost cells
@@ -217,7 +220,7 @@ subroutine fclaw3d_fort_compute_volume_general(mx,my,mz, mbc, &
                             if (ii .eq. 0 .or. & 
                                 jj .eq. 0 .or. & 
                                 kk .eq. 0) then
-                                call compute_surf_area(hex,area)
+                                call hex_compute_surf_area(hex,area)
                             endif
 
                             if (ii .eq. 0) then
@@ -241,7 +244,7 @@ subroutine fclaw3d_fort_compute_volume_general(mx,my,mz, mbc, &
             end do
         end do
     end do
-end subroutine fclaw3d_fort_compute_volume_general
+end subroutine fclaw3d_metric_fort_compute_volume_general
 
 
 !! ---------------------------------------------------------
@@ -261,7 +264,7 @@ end subroutine fclaw3d_fort_compute_volume_general
 !!> @param[in] ghost_only
 !! ---------------------------------------------------------
  
-subroutine fclaw3d_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, & 
+subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, & 
           volume, faceareas, ghost_only)
     implicit none
 
@@ -280,11 +283,11 @@ subroutine fclaw3d_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
     double precision get_volume_approx
     logical hex_is_volume_interior
 
-    double precision area(3), sum_face_area(3)
+    double precision area(3)
 
     do j = -mbc,my+mbc+1
         do i = -mbc,mx+mbc+1
-            do k = -mbc:mz+mbc+1
+            do k = -mbc,mz+mbc+1
                 if (hex_is_volume_interior(mx,my,mz,i,j,k) .and. & 
                     ghost_only .eq. 1) then
                     cycle
@@ -301,14 +304,14 @@ subroutine fclaw3d_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
 
                 volume(i,j,k) = get_volume_approx(hex)
 
-                call compute_surf_area(hex,area)
+                call hex_compute_surf_area(hex,area)
                 do m = 1,3
                     faceareas(i,j,k,m) = area(m)
                 end do
             end do
         end do
     end do
-end subroutine fclaw3d_fort_compute_volume_affine
+end subroutine fclaw3d_metric_fort_compute_volume_affine
 
 !! ---------------------------------------------------------
 !!> @brief Check if the index is an interior index
@@ -330,12 +333,12 @@ end function hex_is_volume_interior
 !! surface approximation at coarse grid cell face), we can compute a basis
 !! independent of the volume calculation.  This is needed, for example, if
 !! we re-build a coarse grid from fine grids
-subroutine fclaw3d_fort_compute_basis(mx, my, mz, mbc, xd, yd, zd, & 
-          xrot, yrot, zrot)
+subroutine fclaw3d_metric_fort_compute_basis(mx, my, mz, mbc, xd, yd, zd, & 
+          xrot, yrot, zrot, ghost_only)
     implicit none
 
-    integer mx,my,mz, mbc,blockno
-    double precision dx,dy, dz, xlower, ylower, zlower
+    integer mx,my,mz, mbc
+    integer ghost_only
 
     double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2,-mbc:mz+mbc+2)
     double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2,-mbc:mz+mbc+2)
@@ -345,7 +348,7 @@ subroutine fclaw3d_fort_compute_basis(mx, my, mz, mbc, xd, yd, zd, &
     double precision yrot(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3,3)
     double precision zrot(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3,3)
 
-    integer i,j, k, m, icell, jcell, kcell
+    integer i,j, k, ii,jj, icell, jcell, kcell
     !! double precision xcorner, ycorner, zcorner
     !! double precision xe, ye,ze, xp1, yp1, zp1
     double precision hex(0:1,0:1,0:1,3)
@@ -360,7 +363,7 @@ subroutine fclaw3d_fort_compute_basis(mx, my, mz, mbc, xd, yd, zd, &
 
     do j = -mbc,my+mbc+1
         do i = -mbc,mx+mbc+1
-            do k = -mbc:mz+mbc+1
+            do k = -mbc,mz+mbc+1
                 if (hex_is_volume_interior(mx,my,mz,i,j,k) .and. & 
                     ghost_only .eq. 1) then
                     cycle
@@ -393,7 +396,7 @@ subroutine fclaw3d_fort_compute_basis(mx, my, mz, mbc, xd, yd, zd, &
             end do
         end do
     end do
-end subroutine fclaw3d_fort_compute_basis
+end subroutine fclaw3d_metric_fort_compute_basis
 
 
 subroutine hex_compute_basis(hex,rot)
@@ -413,7 +416,8 @@ subroutine hex_compute_basis(hex,rot)
            a101(3), a011(3), a111(3)
 
     logical is_id
-    integer i,j,n
+    integer i,j,k, n, ni, info
+    double precision sum
 
 
     do i = 1,3
@@ -485,7 +489,7 @@ subroutine hex_compute_basis(hex,rot)
 
         !! # Compute inverse of Jacobian.
         !!  call dgesv(3,3,Jb,3,IPIV,rhs,3,info)
-        call compute_Jinv(Jb,rhs,info)
+        call hex_compute_Jinv(Jb,rhs,info)
 
          if (info .ne. 0) then
             !! # The Jacobian is singular;  set rotation to identity and hope
@@ -623,7 +627,7 @@ subroutine hex_compute_volume(hex,volume)
         end do
     end do
     volume = volume/2.d0
-end
+end subroutine hex_compute_volume
 
 double precision function hex_dot_cross(u,v,w)
     implicit none
@@ -634,7 +638,7 @@ double precision function hex_dot_cross(u,v,w)
                 u(3)*(v(1)*w(2) - v(2)*w(1))
 
     return
-end subroutine hex_compute_volume
+end function hex_dot_cross
 
 
 !! # This will give us the exact surface area of each face in the case
@@ -644,12 +648,11 @@ end subroutine hex_compute_volume
 subroutine hex_compute_surf_area(hex,area)
     implicit none
 
-    double precision hex_dot_cross
     double precision hex(0:1,0:1,0:1,3)
     double precision w(3), p(3), q(3), area(3)
     double precision quad(0:1,0:1,3)
 
-    integer n,i,j,j,ip,jp,m
+    integer n,i,j,ip,jp,m
     double precision d
 
     do n = 1,3
@@ -679,12 +682,11 @@ subroutine hex_compute_surf_area(hex,area)
                     p(m) = quad(ip,j,m) - quad(i,j,m)
                     q(m) = quad(i,jp,m) - quad(i,j,m)
                 enddo
-                !! w(1) =   p(2)*q(3) - p(3)*q(2)
-                !! w(2) = -(p(1)*q(3) - p(3)*q(1))
-                !! w(3) =   p(1)*q(2) - p(2)*q(1)
+                w(1) =   p(2)*q(3) - p(3)*q(2)
+                w(2) = -(p(1)*q(3) - p(3)*q(1))
+                w(3) =   p(1)*q(2) - p(2)*q(1)
 
-                !! d = w(1)*w(1) + w(2)*w(2) + w(3)*w(3)
-                d = hex_dot_cross(p,q)
+                d = w(1)*w(1) + w(2)*w(2) + w(3)*w(3)
                 area(n) = area(n) + dsqrt(d)/2.d0
             end do
         end do
@@ -737,7 +739,7 @@ end subroutine hex_compute_Jinv
 !!> @param[out] volcoarse the cell areas of the coarse patch
 !!> @param[in] igrid the index of the fine grid in the child array
 !! ---------------------------------------------------------
-subroutine fclaw3dx_fort_average_volume(mx,my,mz, mbc, & 
+subroutine fclaw3dx_metric_fort_average_volume(mx,my,mz, mbc, & 
            volcoarse, volfine, igrid)
     implicit none
 
@@ -757,7 +759,7 @@ subroutine fclaw3dx_fort_average_volume(mx,my,mz, mbc, &
     integer i2(0:rr2-1),j2(0:rr2-1)
     double precision kf
 
-    integer p4est_refineFactor, refratio, 
+    integer p4est_refineFactor, refratio
 
 
     p4est_refineFactor = 2
@@ -808,7 +810,7 @@ subroutine fclaw3dx_fort_average_volume(mx,my,mz, mbc, &
 
     !! # Compute area in the ghost cells
 
-end subroutine fclaw3dx_fort_average_volume
+end subroutine fclaw3dx_metric_fort_average_volume
 
 
 !! ---------------------------------------------------------
@@ -821,7 +823,7 @@ end subroutine fclaw3dx_fort_average_volume
 !!> @param[out] volcoarse the cell areas of the coarse patch
 !!> @param[in] igrid the index of the fine grid in the child array
 !! ---------------------------------------------------------
-subroutine fclaw3dx_fort_average_facearea(mx,my,mz, mbc, & 
+subroutine fclaw3dx_metric_fort_average_facearea(mx,my,mz, mbc, & 
            fa_coarse, fa_fine, igrid)
     implicit none
 
@@ -839,9 +841,9 @@ subroutine fclaw3dx_fort_average_facearea(mx,my,mz, mbc, &
     integer rr2
     parameter(rr2 = 4)
     integer i2(0:rr2-1),j2(0:rr2-1)
-    double precision kf, area(3)
+    double precision kf
 
-    integer p4est_refineFactor, refratio, 
+    integer p4est_refineFactor, refratio
 
 
     p4est_refineFactor = 2
@@ -907,4 +909,4 @@ subroutine fclaw3dx_fort_average_facearea(mx,my,mz, mbc, &
 
     !! # Compute area in the ghost cells
 
-end subroutine fclaw3dx_fort_average_facearea
+end subroutine fclaw3dx_metric_fort_average_facearea

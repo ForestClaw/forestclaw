@@ -57,9 +57,9 @@ struct fclaw2d_patch;
  * @param[in] patchno the patch number
  */
 typedef void (*fclaw3d_metric_compute_mesh_t)(struct fclaw2d_global *glob,
-                                               struct fclaw2d_patch *patch,
-                                               int blockno,
-                                               int patchno);
+                                              struct fclaw2d_patch *patch,
+                                              int blockno,
+                                              int patchno);
 
 /**
  * @brief Compute the area for each cell
@@ -70,9 +70,9 @@ typedef void (*fclaw3d_metric_compute_mesh_t)(struct fclaw2d_global *glob,
  * @param[in] patchno the patch number
  */
 typedef void (*fclaw3d_metric_compute_volume_t)(struct fclaw2d_global *glob,
-                                                 struct fclaw2d_patch *patch,
-                                                 int blockno,
-                                                 int patchno);
+                                                struct fclaw2d_patch *patch,
+                                                int blockno,
+                                                int patchno);
 
 /**
  * @brief Compute the volume for each ghost cell
@@ -96,10 +96,10 @@ typedef void (*fclaw3d_metric_compute_volume_ghost_t)(struct fclaw2d_global *glo
  * @param[in] patchno the patch number
  */
 
-typedef void (*fclaw3d_metric_compute_rotmat_t)(struct fclaw2d_global *glob,
-                                                struct fclaw2d_patch *patch,
-                                                int blockno,
-                                                int patchno);
+typedef void (*fclaw3d_metric_compute_basis_t)(struct fclaw2d_global *glob,
+                                               struct fclaw2d_patch *patch,
+                                               int blockno,
+                                               int patchno);
 
 
 /* ------------------------------ Metric routines ------------------------------------- */
@@ -121,11 +121,11 @@ typedef void (*fclaw3d_metric_compute_rotmat_t)(struct fclaw2d_global *glob,
 
 void fclaw3d_metric_patch_define(struct fclaw2d_global* glob,
                                   struct fclaw2d_patch *patch,
-                                  int mx, int my, int mz, int mbc, 
-                                  double dx, double dy, 
-                                  double xlower, double ylower,
-                                  double xupper, double yupper,
-                                  double zupper, double zupper,
+                                  int mx, int my, int mz, 
+                                  int mbc, 
+                                  double dx, double dy, double dz,
+                                  double xlower, double ylower, double zlower,
+                                  double xupper, double yupper, double zupper,
                                   int blockno, int patchno,
                                   fclaw2d_build_mode_t build_mode);
 
@@ -185,7 +185,8 @@ void fclaw3d_metric_patch_compute_volume(struct fclaw2d_global *glob,
  */
 void fclaw3d_metric_patch_grid_data(struct fclaw2d_global* glob,
 									struct fclaw2d_patch* patch,
-									int* mx, int* my, int* mz, int* mbc,
+									int* mx, int* my, int* mz, 
+                                    int* mbc,
 									double* xlower, double* ylower, double* zlower,
 									double* dx, double* dy, double* dz);
 
@@ -215,9 +216,9 @@ void fclaw3d_metric_patch_scalar(struct fclaw2d_global* glob,
  *             where 'N' is user-defined value for the number of components
  *             to store (maximum is 3x(3x3) = 27)
  */
-void fclaw3d_metric_patch_rotmat(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_basis(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* patch,
-                                 double **rot);
+                                 double **xrot, double **yrot, double **zrot);
 
 /**
  * @brief Get the mesh metrics of a patch
@@ -232,7 +233,7 @@ void fclaw3d_metric_patch_mesh_data(struct fclaw2d_global* glob,
 									struct fclaw2d_patch* patch,
 									double **xp, double **yp, double **zp,
 									double **xd, double **yd, double **zd,
-									double **volume);
+									double **volume, double** faceareas);
 
 /**
  * @brief Get the mesh metrics of a patch
@@ -247,7 +248,7 @@ void fclaw3d_metric_patch_mesh_data(struct fclaw2d_global* glob,
  */
 void fclaw3d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
 									 struct fclaw2d_patch* patch,
-                                     double **rot, double **faceareas);
+                                     double **xrot, double **yrot, double **zrot);
 
 /**
  * @brief Get the area for each cell of the patch
@@ -308,11 +309,11 @@ void fclaw3d_metric_compute_mesh_default(struct fclaw2d_global *glob,
  * 
  * @details @copydetails ::fclaw3d_metric_compute_tensors_t
  */
-void fclaw3d_metric_compute_tensors_default(struct fclaw2d_global *glob,
-											struct fclaw2d_patch *patch,
-											int blockno,
-											int patchno);
 
+void fclaw3d_metric_compute_basis_default(struct fclaw2d_global *glob,
+                                          struct fclaw2d_patch *patch,
+                                          int blockno,
+                                          int patchno);
 
 /* ------------------------------------ Virtual table --------------------------------- */
 
@@ -325,23 +326,27 @@ struct fclaw3d_metric_vtable
 	/** Computes the mesh coordinates. By default, calls fort_compute_mesh */
 	fclaw3d_metric_compute_mesh_t        compute_mesh;
 
-	/** Computes the area of each cell */
+	/** Computes the volume and face area of each cell */
 	fclaw3d_metric_compute_volume_t        compute_volume;  /* wrapper */
 
-	/** Computes the area of each ghost cell */
-	fclaw3d_metric_compute_volume_ghost_t  compute_volume_ghost;
+    /** Computes the area of each ghost cell */
+    fclaw3d_metric_compute_volume_ghost_t  compute_volume_ghost;
+
+    /** Computes the basis of each cell */
+    fclaw3d_metric_compute_basis_t        compute_basis;  /* wrapper */
+
 
 	/* ------------------------- Fortran files -----------------------------------------*/
 	/** Compute the mesh coordinates */
 	fclaw3d_fort_compute_mesh_t         fort_compute_mesh;
 
-    /** Compute the face normals */
-    fclaw3d_fort_compute_faceareas_t   fort_compute_faceareas;
+    /** Compute the face volume and face areas */
+    fclaw3d_fort_compute_volume_t   fort_compute_volume;
 
     /** Compute the face normal plus two additional vectors in face plane 
         to form a local, orthogonal coordinate system.  Rotation matrix data
         is stored at each of the three faces.  */
-    fclaw3d_fort_compute_rotmat_t       fort_compute_rotmat;
+    fclaw3d_fort_compute_basis_t       fort_compute_basis;
 
 
 	/** True if vtable has been set */

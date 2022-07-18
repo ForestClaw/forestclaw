@@ -41,15 +41,15 @@ void fclaw3d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 
     int mx,my,mz,mbc;
     double xlower,ylower,zlower,dx,dy,dz;
-    fclaw2d_metric_patch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
+    fclaw3d_metric_patch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                     &xlower,&ylower,&zlower,
                                     &dx,&dy,&dz);
 
     double *xp,*yp,*zp;
     double *xd,*yd,*zd;
-    double *volume;
+    double *volume, *facearea;
     fclaw3d_metric_patch_mesh_data(glob,patch,
-                                   &xp,&yp,&zp,&xd,&yd,&zd,&volume);
+                                   &xp,&yp,&zp,&xd,&yd,&zd,&volume,&facearea);
 
     /* Compute centers and corners of mesh cell */
     metric_vt->fort_compute_mesh(&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,
@@ -73,20 +73,21 @@ void fclaw3d_metric_compute_basis_default(fclaw2d_global_t *glob,
 
     double *xp,*yp,*zp;
     double *xd,*yd,*zd;
-    double *volume;
+    double *volume, *facearea;
     fclaw3d_metric_patch_mesh_data(glob,patch,
-                                   &xp,&yp,&zp,&xd,&yd,&zd,&volume);
+                                   &xp,&yp,&zp,&xd,&yd,&zd,
+                                   &volume,&facearea);
 
     /* The user could set these to NULL to avoid doing these computations ... */
 
     if (metric_vt->fort_compute_basis != NULL)
     {
-        double *volume, *xrot, *yrot, *zrot, *faceareas;
-        fclaw3d_metric_patch_mesh_data2(glob,patch,&xrot,&yrot,&zrot, 
-                                        &faceareas);
+        double *xrot, *yrot, *zrot;
+        fclaw3d_metric_patch_basis(glob,patch,&xrot,&yrot,&zrot);
 
+        int ghost_only = 0;
         metric_vt->fort_compute_basis(&mx,&my,&mz,&mbc,xd,yd,zd,
-                                       xrot,yrot,zrot);
+                                       xrot,yrot,zrot,&ghost_only);
     }
 }
 
@@ -96,14 +97,12 @@ void fclaw3d_metric_compute_volume_default(fclaw2d_global_t *glob,
                                          int blockno,
                                          int patchno)
 {
-    int mx,my,mbc;
+    int mx,my,mz,mbc;
     double xlower,ylower,zlower,dx,dy,dz;
     fclaw3d_metric_patch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                    &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
-    double *volume = fclaw3d_metric_patch_get_volume(glob, patch);
-
-    const fclaw_options_t* fclaw_opt = fclaw3d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     int level = patch->level;
     int maxlevel = fclaw_opt->maxlevel;
     int refratio = 2;
@@ -115,13 +114,18 @@ void fclaw3d_metric_compute_volume_default(fclaw2d_global_t *glob,
     int m = pow_int(refratio,maxlevel-level);
     double *hexstore = FCLAW_ALLOC(double,3*(m+1)*(m+1)*(m+1));
 
+    double *xp,*yp,*zp;
+    double *xd,*yd,*zd;
+    double *volume, *facearea;
+    fclaw3d_metric_patch_mesh_data(glob,patch,
+                                   &xp,&yp,&zp,&xd,&yd,&zd,&volume,&facearea);
+
     int ghost_only = 0;
-    FCLAW3D_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, 
+    FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, 
                                 &dx, &dy, &dz,
                                 &xlower, &ylower,&zlower,
-                                &blockno, volume, 
-                                &m, hexstore,
-                                &ghost_only);
+                                &blockno, xd,yd,zd, volume, facearea,
+                                &m, hexstore,&ghost_only);
 
     FCLAW_FREE(hexstore);
 }
@@ -144,22 +148,27 @@ void fclaw3d_metric_compute_volume_ghost_default(fclaw2d_global_t* glob,
                                    &dx, &dy, &dz);
 
 
-    double *volume = fclaw3d_metric_patch_get_volume(glob, patch);
-
     /* Set area in ghost cells not set above */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     int level = patch->level;
     int maxlevel = fclaw_opt->maxlevel;
     int refratio = fclaw_opt->refratio;
-    int ghost_only = 1;
 
     int m = pow_int(refratio,maxlevel-level);
     double *hexstore = FCLAW_ALLOC(double,3*(m+1)*(m+1)*(m+1));
 
-    double *volume;
-    FCLAW3D_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, &dx, &dy, &mz, 
+    double *xp,*yp,*zp;
+    double *xd,*yd,*zd;
+    double *volume, *faceareas;
+    fclaw3d_metric_patch_mesh_data(glob,patch,
+                                   &xp,&yp,&zp,&xd,&yd,&zd,&volume,&faceareas);
+
+    int ghost_only = 1;
+    FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, 
+                                &dx, &dy, &dz, 
                                 &xlower, &ylower,&zlower,
-                                &blockno, volume, &m, hexstore,
+                                &blockno, xd,yd,zd,
+                                volume, faceareas, &m, hexstore,
                                 &ghost_only);
     FCLAW_FREE(hexstore);
 }

@@ -39,9 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 /** Typedef for ::fclaw2d_metric_vtable */
@@ -91,14 +88,14 @@ typedef void (*fclaw2d_metric_compute_area_ghost_t)(struct fclaw2d_global *glob,
 													int patchno);
 
 /**
- * @brief Compute the tensors (normals and tangents)
+ * @brief Compute the basis (normals and tangents)
  *
  * @param[in] glob the global context
  * @param[in,out] this_patch the patch context
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_metric_compute_tensors_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_metric_compute_basis_t)(struct fclaw2d_global *glob,
 												 struct fclaw2d_patch *this_patch,
 												 int blockno,
 												 int patchno);
@@ -324,13 +321,13 @@ void fclaw2d_metric_compute_mesh_default(struct fclaw2d_global *glob,
 
 
 /**
- * @brief @copybrief ::fclaw2d_metric_compute_tensors_t
+ * @brief @copybrief ::fclaw2d_metric_compute_basis_t
  * 
  * Default implementation. Calls fclaw2d_metric_vtable.fort_compute_mesh
  * 
- * @details @copydetails ::fclaw2d_metric_compute_tensors_t
+ * @details @copydetails ::fclaw2d_metric_compute_basis_t
  */
-void fclaw2d_metric_compute_tensors_default(struct fclaw2d_global *glob,
+void fclaw2d_metric_compute_basis_default(struct fclaw2d_global *glob,
 											struct fclaw2d_patch *this_patch,
 											int blockno,
 											int patchno);
@@ -350,8 +347,8 @@ struct fclaw2d_metric_vtable
 	fclaw2d_metric_compute_area_t        compute_area;  /* wrapper */
 	/** Computes the area of each ghost cell */
 	fclaw2d_metric_compute_area_ghost_t  compute_area_ghost;
-	/** Computes the tensors. By default, calls fort_compute_normals, fort_compute_tangents, and fort_compute_surf_normals */
-	fclaw2d_metric_compute_tensors_t     compute_tensors;  /* wrapper */
+	/** Computes the basis. By default, calls fort_compute_normals, fort_compute_tangents, and fort_compute_surf_normals */
+	fclaw2d_metric_compute_basis_t     compute_basis;  /* wrapper */
 
 	/* Fortran files */
 	/** Compute the mesh coordinates */
@@ -381,9 +378,6 @@ void fclaw2d_metric_vtable_initialize(struct fclaw2d_global* glob);
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

@@ -104,13 +104,15 @@ typedef void (*fclaw3d_fort_compute_volume_t)(const int* mx, const int* my, cons
 typedef void (*fclaw3d_fort_compute_basis_t)(const int* mx, const int* my, const int* mz, 
                                              const int* mbc,
                                              double xd[], double yd[], double zd[],
-                                             double xrot[], double yrot[], double zrot);
+                                             double xrot[], double yrot[], double zrot[],
+                                             const int* ghost_only);
 
 /** Fortran subroutine name */
-#define FCLAW3D_FORT_COMPUTE_MESH \
-    FCLAW_F77_FUNC(fclaw3d_fort_compute_mesh,FCLAW3D_FORT_COMPUTE_MESH)
+#define FCLAW3D_METRIC_FORT_COMPUTE_MESH \
+                  FCLAW_F77_FUNC(fclaw3d_metric_fort_compute_mesh, \
+                                 FCLAW3D_METRIC_FORT_COMPUTE_MESH)
 /** @copydoc fclaw3d_fort_compute_mesh() */
-void FCLAW3D_FORT_COMPUTE_MESH(const int* mx, const int* my, const int* mz, 
+void FCLAW3D_METRIC_FORT_COMPUTE_MESH(const int* mx, const int* my, const int* mz, 
                                const int* mbc,
                                const double* xlower, const double* ylower,
                                const double* zlower, 
@@ -121,18 +123,18 @@ void FCLAW3D_FORT_COMPUTE_MESH(const int* mx, const int* my, const int* mz,
                                double xd[], double yd[], double zd[]);
 
 /** Fortran subroutine name */
-#define FCLAW3D_FORT_COMPUTE_VOLUME \
-                FCLAW_F77_FUNC(fclaw3d_fort_compute_volume, \
-                               FCLAW3D_FORT_COMPUTE_VOLUME)
+#define FCLAW3D_METRIC_FORT_COMPUTE_VOLUME \
+                FCLAW_F77_FUNC(fclaw3d_metric_fort_compute_volume, \
+                               FCLAW3D_METRIC_FORT_COMPUTE_VOLUME)
 /** @copydoc fclaw3d_fort_compute_volume() */
-void FCLAW3D_FORT_COMPUTE_VOLUME(const int* mx, const int* my, const int* mz,
+void FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(const int* mx, const int* my, const int* mz,
                                  const int* mbc,
                                  const double* dx, const double* dy,
                                  const double* dz,
                                  const double* xlower, const double* ylower,
                                  double *zlower,
                                  const int* blockno, 
-                                 double xd[], double yd[], double yd[],
+                                 double xd[], double yd[], double zd[],
                                  double volume[],
                                  double faceareas[],
                                  const int* hexsize, double hexfine[],
@@ -141,30 +143,33 @@ void FCLAW3D_FORT_COMPUTE_VOLUME(const int* mx, const int* my, const int* mz,
 
 
 /** Fortran subroutine name */
-#define FCLAW3D_FORT_COMPUTE_BASIS \
-                       FCLAW_F77_FUNC(fclaw3d_fort_compute_basis, \
-                                      FCLAW3D_FORT_COMPUTE_BASIS)
+#define FCLAW3D_METRIC_FORT_COMPUTE_BASIS \
+                       FCLAW_F77_FUNC(fclaw3d_metric_fort_compute_basis, \
+                                      FCLAW3D_METRIC_FORT_COMPUTE_BASIS)
 
 /** @copydoc fclaw3d_fort_compute_tangents() */
-void FCLAW3D_FORT_COMPUTE_BASIS(const int* mx, const int* my, const int* mz,
+void FCLAW3D_METRIC_FORT_COMPUTE_BASIS(const int* mx, const int* my, const int* mz,
                                 const int* mbc,
                                 double xd[], double yd[], double zd[],
-                                double xrot[], double yrot[], double zrot[]);
+                                double xrot[], double yrot[], double zrot[],
+                                const int* ghost_only);
 
 /** Fortran subroutine name */
-#define FCLAW3DX_FORT_AVERAGE_VOLUME FCLAW_F77_FUNC(fclaw3dx_fort_average_volume, \
-                                               FCLAW3DX_FORT_AVERAGE_VOLUME) 
+#define FCLAW3DX_METRIC_FORT_AVERAGE_VOLUME \
+                       FCLAW_F77_FUNC(fclaw3dx_metric_fort_average_volume, \
+                                      FCLAW3DX_METRIC_FORT_AVERAGE_VOLUME) 
 /** @copydoc fclaw3d_fort_average_volume() */
-void FCLAW3DX_FORT_AVERAGE_VOLUME(const int* mx, const int* my, const int* mz,
+void FCLAW3DX_METRIC_FORT_AVERAGE_VOLUME(const int* mx, const int* my, const int* mz,
                                   const int* mbc,
                                   double volcoarse[],double volfine[],
                                   const int* igrid);
 
 /** Fortran subroutine name */
-#define FCLAW3DX_FORT_AVERAGE_FACEAREA FCLAW_F77_FUNC(fclaw3dx_fort_average_facearea, \
-                                                      FCLAW3DX_FORT_AVERAGE_FACEAREA) 
+#define FCLAW3DX_METRIC_FORT_AVERAGE_FACEAREA \
+                FCLAW_F77_FUNC(fclaw3dx_metric_fort_average_facearea, \
+                               FCLAW3DX_METRIC_FORT_AVERAGE_FACEAREA) 
 /** @copydoc fclaw3d_fort_average_volume() */
-void FCLAW3DX_FORT_AVERAGE_FACEAREA(const int* mx, const int* my, const int* mz,
+void FCLAW3DX_METRIC_FORT_AVERAGE_FACEAREA(const int* mx, const int* my, const int* mz,
                                     const int* mbc,
                                     double fa_coarse[],double fa_fine[],
                                     const int* igrid);
