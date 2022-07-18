@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -283,8 +283,8 @@ void SHIFT_MAP (double *xp, double *yp, double *zp);
 #define SET_BLOCK FCLAW_F77_FUNC_(set_block,SET_BLOCK)
 void SET_BLOCK(const int * a_blockno);
 
-#define SET_CONTEXT FCLAW_F77_FUNC (set_context,SET_CONTEXT)
-void SET_CONTEXT (fclaw2d_map_context_t** a_context);
+#define FCLAW_MAP_SET_CONTEXT FCLAW_F77_FUNC (FCLAW_MAP_set_context,SET_CONTEXT)
+void FCLAW_MAP_SET_CONTEXT (fclaw2d_map_context_t** a_context);
 
 /* ----------------------------------------------------------------------------------
    Some generic fortran mappings.  Users can call these by setting up a
