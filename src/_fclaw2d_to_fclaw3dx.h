@@ -123,10 +123,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_clawpatch_vtable fclaw3dx_clawpatch_vtable
 #define fclaw2d_clawpatch_save_current_step fclaw3dx_clawpatch_save_current_step
 #define fclaw2d_clawpatch_grid_data fclaw3dx_clawpatch_grid_data
+
+#if 0
+/* These are included in 3d files */
 #define fclaw2d_clawpatch_metric_scalar fclaw3dx_clawpatch_metric_scalar
 #define fclaw2d_clawpatch_metric_vector fclaw3dx_clawpatch_metric_vector
 #define fclaw2d_clawpatch_metric_data fclaw3dx_clawpatch_metric_data
 #define fclaw2d_clawpatch_metric_data2 fclaw3dx_clawpatch_metric_data2
+#endif
+
 #define fclaw2d_clawpatch_get_area fclaw3dx_clawpatch_get_area
 #define fclaw2d_clawpatch_soln_data fclaw3dx_clawpatch_soln_data
 #define fclaw2d_clawpatch_aux_data fclaw3dx_clawpatch_aux_data
@@ -148,4 +153,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //fclaw2d_clawpatch.hpp
 #define fclaw2d_clawpatch_t fclaw3dx_clawpatch_t
 #define fclaw2d_clawpatch_get_clawpatch fclaw3dx_clawpatch_get_clawpatch
+
+#if 0
 #define fclaw2d_clawpatch_get_metric_patch fclaw3dx_clawpatch_get_metric_patch
+#endif

@@ -44,6 +44,7 @@ add_library(clawpatch_f OBJECT
   fort3_4.6/fclaw3dx_clawpatch46_pillowsphere.f90 
   fort3_4.6/fclaw3dx_clawpatch46_diagnostics.f90 
   ${metric}/fortran_source2d/fclaw2d_metric_default_fort.f
+  ${metric}/fortran_source3d/fclaw3d_metric_default_fort.f90
 )
 
 target_include_directories(clawpatch_f PRIVATE 
@@ -84,12 +85,15 @@ add_library(clawpatch
   fort3_user/fclaw3dx_clawpatch_exceeds_threshold.c
   ${metric}/fclaw2d_metric.cpp 
   ${metric}/fclaw2d_metric_default.c
+  ${metric}/fclaw3d_metric.cpp 
+  ${metric}/fclaw3d_metric_default.c
 )
 
 target_include_directories(clawpatch 
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${metric}/fortran_source2d>
+  $<BUILD_INTERFACE:${metric}/fortran_source3d>
   $<BUILD_INTERFACE:${metric}>
   $<INSTALL_INTERFACE:include>
 )
@@ -130,6 +134,10 @@ install(FILES
 	${metric}/fclaw2d_metric.hpp
 	${metric}/fclaw2d_metric_default_fort.h
 	${metric}/fortran_source2d/fclaw2d_metric_terms.i 
+
+  ${metric}/fclaw3d_metric.h
+  ${metric}/fclaw3d_metric.hpp
+  ${metric}/fclaw3d_metric_default_fort.h
   DESTINATION include
 )
 
