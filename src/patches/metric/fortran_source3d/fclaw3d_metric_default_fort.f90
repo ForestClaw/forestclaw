@@ -627,6 +627,8 @@ double precision function hex_compute_volume(hex)
         end do
     end do
     volume = volume/2.d0
+
+    hex_compute_volume = volume
 end function hex_compute_volume
 
 double precision function hex_dot_cross(u,v,w)
