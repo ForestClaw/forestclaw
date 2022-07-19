@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_output_vtk.h>
 #include <fclaw3dx_clawpatch_fort.h>
 
+#include <fclaw3d_metric.h>
+#include <fclaw3d_metric.hpp>
+
 #include <fclaw3dx_clawpatch_conservation.h>
 
 #include <fclaw2d_patch.h>
@@ -550,14 +553,14 @@ void fc3d_clawpack46_set_capacity(fclaw2d_global_t *glob,
 	fclaw3dx_clawpatch_grid_data(glob,patch, &mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower,&dx,&dy,&dz);
 
-	double *area = fclaw3dx_clawpatch_get_area(glob,patch);
+	double *volume = fclaw3d_clawpatch_get_volume(glob,patch);
 
 	int maux;
 	double *aux;
 	fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
 	FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
-	FC3D_CLAWPACK46_SET_CAPACITY(&mx,&my,&mz,&mbc,&dx,&dy,&dz,area,&mcapa,
+	FC3D_CLAWPACK46_SET_CAPACITY(&mx,&my,&mz,&mbc,&dx,&dy,&dz,volume,&mcapa,
 	                             &maux,aux);
 }
 
