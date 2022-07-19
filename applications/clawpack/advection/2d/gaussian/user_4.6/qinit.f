@@ -12,10 +12,10 @@
       double precision xc,yc,xp,yp,zp
       double precision gaussian_sum
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       integer blockno, fc2d_clawpack46_get_block
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
       blockno = fc2d_clawpack46_get_block()
 
       do j = 1-mbc,my+mbc

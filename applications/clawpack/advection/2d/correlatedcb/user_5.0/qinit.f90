@@ -3,7 +3,7 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
 
   INTEGER :: meqn, mbc, mx, my, maux
   DOUBLE PRECISION :: xlower, ylower, dx, dy
-  INTEGER*8 :: cont, get_context
+  INTEGER*8 :: cont, fclaw_map_get_context
   INTEGER :: blockno, fc2d_clawpack5_get_block
   DOUBLE PRECISION :: q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
   DOUBLE PRECISION :: aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
@@ -14,7 +14,7 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
 
   DOUBLE PRECISION :: a,b
 
-  cont = get_context()
+  cont = fclaw_map_get_context()
   blockno = fc2d_clawpack5_get_block()
 
   a = -0.8d0

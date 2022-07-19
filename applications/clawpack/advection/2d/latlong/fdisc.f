@@ -3,18 +3,18 @@
 
       double precision xc,yc, xp, yp, zp
       integer blockno
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       double precision th, tp
 
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       call fclaw2d_map_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
 c     # Torus or annulus
       th = atan2(yp,xp)

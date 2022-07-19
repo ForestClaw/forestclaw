@@ -3,13 +3,13 @@
 
       double precision xc,yc, xp, yp, zp
       integer blockno
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
 
       double precision r
 
       logical fclaw2d_map_is_used
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       if (fclaw2d_map_is_used(cont)) then
          call fclaw2d_map_c2m(cont,
