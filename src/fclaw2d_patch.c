@@ -156,7 +156,7 @@ void fclaw2d_patch_build(fclaw2d_global_t *glob,
     /* This should go first, in case the setup function relies on this 
        user data (or just needs to set it up)
     */
-    if (patch_vt->create_user_data)
+    if (patch_vt->create_user_data != NULL)
     {
         patch_vt->create_user_data(glob,this_patch);
     }
@@ -193,7 +193,7 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
                               fine0_patchno,
                               build_mode);
 
-    if (patch_vt->create_user_data)
+    if (patch_vt->create_user_data != NULL)
     {
         patch_vt->create_user_data(glob,coarse_patch);
     }    
