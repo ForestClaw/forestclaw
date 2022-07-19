@@ -50,7 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch.h>
 #include <fclaw3dx_clawpatch46_fort.h>
 
+#include <fclaw3d_metric.h>
+
 #include <_fclaw2d_to_fclaw3dx.h>
+#include <_fclaw2d_to_fclaw3d.h>
 
 #endif
 

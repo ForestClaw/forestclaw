@@ -1764,11 +1764,11 @@ void fclaw2d_clawpatch_metric_basis(struct fclaw2d_global* glob,
 
 
 
-void fclaw3d_clawpatch_metric_data(fclaw2d_global_t* glob,
-								   fclaw2d_patch_t* patch,
-								   double **xp, double **yp, double **zp,
-								   double **xd, double **yd, double **zd,
-								   double **volume, double **faceareas)
+void fclaw3d_clawpatch_mesh_data(fclaw2d_global_t* glob,
+                                 fclaw2d_patch_t* patch,
+                                 double **xp, double **yp, double **zp,
+                                 double **xd, double **yd, double **zd,
+                                 double **volume, double **faceareas)
 {
 	fclaw3d_metric_patch_mesh_data(glob,patch,xp,yp,zp,xd,yd,zd,
 	                               volume, faceareas);

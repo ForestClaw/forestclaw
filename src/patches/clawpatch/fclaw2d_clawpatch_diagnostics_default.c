@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_options.h>
 
 #include <_fclaw2d_to_fclaw3dx.h>
+#include <_fclaw2d_to_fclaw3d.h>
 
 #endif
 
