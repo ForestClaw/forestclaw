@@ -333,7 +333,7 @@ void fclaw2d_metric_patch_compute_area (fclaw2d_global_t *glob,
     metric_vt->compute_area(glob,patch,blockno,patchno);
 }
 #elif PATCH_DIM == 3
-void fclaw2d_metric_patch_compute_volume (fclaw2d_global_t *glob,
+void fclaw3d_metric_patch_compute_volume (fclaw2d_global_t *glob,
                                        fclaw2d_patch_t* patch,
                                        int blockno, int patchno)
 {

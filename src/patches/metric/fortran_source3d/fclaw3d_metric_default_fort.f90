@@ -143,7 +143,7 @@ subroutine fclaw3d_metric_fort_compute_volume_general(mx,my,mz, mbc, &
     double precision hex(0:1,0:1,0:1,3)
     double precision area(3), sum_face_area(3)
 
-    double precision get_volume_approx
+    double precision hex_compute_volume
 
     double precision dxf, dyf, dzf
     double precision xef, yef, zef, xe,ye, ze
@@ -213,7 +213,7 @@ subroutine fclaw3d_metric_fort_compute_volume_general(mx,my,mz, mbc, &
                             end do
 
                             !! Compute volume of sub-hex at finest level
-                            sum_volume = sum_volume + get_volume_approx(hex)
+                            sum_volume = sum_volume + hex_compute_volume(hex)
 
                             !! Compute face areas by summing areas over sub-hexes
                             !! at faces which intersect coarser grid face
@@ -280,7 +280,7 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
 
     integer i,j, k, m, icell, jcell, kcell
     double precision hex(0:1,0:1,0:1,3)
-    double precision get_volume_approx
+    double precision hex_compute_volume
     logical hex_is_volume_interior
 
     double precision area(3)
@@ -302,7 +302,7 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
                     end do
                 end do
 
-                volume(i,j,k) = get_volume_approx(hex)
+                volume(i,j,k) = hex_compute_volume(hex)
 
                 call hex_compute_surf_area(hex,area)
                 do m = 1,3
@@ -585,7 +585,7 @@ end subroutine hex_compute_basis
 
 
 
-subroutine hex_compute_volume(hex,volume)
+double precision function hex_compute_volume(hex)
     implicit none
 
 
@@ -627,7 +627,7 @@ subroutine hex_compute_volume(hex,volume)
         end do
     end do
     volume = volume/2.d0
-end subroutine hex_compute_volume
+end function hex_compute_volume
 
 double precision function hex_dot_cross(u,v,w)
     implicit none

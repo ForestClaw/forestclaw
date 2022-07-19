@@ -26,9 +26,9 @@ c ---------------------------------------------------------
       integer i,j
       double precision dxf,dyf, xc,yc,xd1, yd1,zd1
 
-      integer*8 map_context_ptr, get_context
+      integer*8 map_context_ptr, fclaw_map_get_context
 
-      map_context_ptr = get_context()
+      map_context_ptr = fclaw_map_get_context()
 
 c     # We need both cell centered and node locations to
 c     # compute the normals at cell edges.
@@ -81,10 +81,10 @@ c ---------------------------------------------------------
       integer ghost_only
       double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1)
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       logical isaffine
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
       if (isaffine()) then
 c        # We don't need to compute areas all the way to the
 c        # finest level.
@@ -134,9 +134,9 @@ c ---------------------------------------------------------
       double precision xef, yef, xe,ye
       logical is_area_interior
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       rfactor = quadsize
       dxf = dx/rfactor
@@ -226,9 +226,9 @@ c ---------------------------------------------------------
       double precision get_area_approx
       logical is_area_interior
 
-      integer*8 map_context_ptr, get_context
+      integer*8 map_context_ptr, fclaw_map_get_context
 
-      map_context_ptr = get_context()
+      map_context_ptr = fclaw_map_get_context()
 
       do j = -mbc,my+mbc+1
          do i = -mbc,mx+mbc+1
