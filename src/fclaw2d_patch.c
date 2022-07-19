@@ -153,14 +153,14 @@ void fclaw2d_patch_build(fclaw2d_global_t *glob,
 	pdata->blockno = blockno;
 #endif    
 
+    if (patch_vt->create_user_data)
+    {
+        patch_vt->create_user_data(glob,this_patch);
+    }
 
     if (patch_vt->setup != NULL)
     {
         patch_vt->setup(glob,this_patch,blockno,patchno);
-    }
-    if (patch_vt->create_user_data)
-    {
-        patch_vt->create_user_data(glob,this_patch);
     }
 }
 
@@ -190,14 +190,15 @@ void fclaw2d_patch_build_from_fine(fclaw2d_global_t *glob,
                               fine0_patchno,
                               build_mode);
 
-    if (patch_vt->setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
-    {
-        patch_vt->setup(glob,coarse_patch,blockno,coarse_patchno);
-    }
     if (patch_vt->create_user_data)
     {
         patch_vt->create_user_data(glob,coarse_patch);
     }    
+
+    if (patch_vt->setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+    {
+        patch_vt->setup(glob,coarse_patch,blockno,coarse_patchno);
+    }
 }
 
 #if 0

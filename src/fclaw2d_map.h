@@ -32,9 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
 #endif
 
 struct p4est_connectivity;
@@ -47,7 +44,6 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
                                            double *zp);
 
 #define FCLAW2D_MAP_QUERY FCLAW_F77_FUNC_(fclaw2d_map_query,FCLAW2D_MAP_QUERY)
-
 
 typedef struct fclaw2d_map_context fclaw2d_map_context_t;
 typedef struct fclaw2d_map_data fclaw2d_map_data_t;
@@ -283,7 +279,8 @@ void SHIFT_MAP (double *xp, double *yp, double *zp);
 #define SET_BLOCK FCLAW_F77_FUNC_(set_block,SET_BLOCK)
 void SET_BLOCK(const int * a_blockno);
 
-#define FCLAW_MAP_SET_CONTEXT FCLAW_F77_FUNC (FCLAW_MAP_set_context,SET_CONTEXT)
+#define FCLAW_MAP_SET_CONTEXT FCLAW_F77_FUNC (fclaw_map_set_context, \
+                                              FCLAW_MAP_SET_CONTEXT)
 void FCLAW_MAP_SET_CONTEXT (fclaw2d_map_context_t** a_context);
 
 /* ----------------------------------------------------------------------------------
@@ -351,9 +348,6 @@ void MAPC2M_ANNULUS (int* blockno, double *xc, double *yc,
 /* ---------------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
 }
 #endif
 

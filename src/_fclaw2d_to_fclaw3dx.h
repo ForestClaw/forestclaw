@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define clawpatch_fort_output_ascii_t fclaw3dx_clawpatch_fort_output_ascii_t
 #define clawpatch_fort_error_t fclaw3dx_clawpatch_fort_error_t
 #define clawpatch_fort_conscheck_t fclaw3dx_clawpatch_fort_conscheck_t
-#define clawpatch_fort_area_t fclaw3dx_clawpatch_fort_area_t
+//#define clawpatch_fort_area_t fclaw3dx_clawpatch_fort_area_t
 #define clawpatch_fort_norm_t fclaw3dx_clawpatch_fort_norm_t
 #define FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA
 #define FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD
@@ -132,7 +132,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_clawpatch_metric_data2 fclaw3dx_clawpatch_metric_data2
 #endif
 
-#define fclaw2d_clawpatch_get_area fclaw3dx_clawpatch_get_area
+//#define fclaw2d_clawpatch_get_area fclaw3dx_clawpatch_get_area
 #define fclaw2d_clawpatch_soln_data fclaw3dx_clawpatch_soln_data
 #define fclaw2d_clawpatch_aux_data fclaw3dx_clawpatch_aux_data
 #define fclaw2d_clawpatch_rhs_data fclaw3dx_clawpatch_rhs_data

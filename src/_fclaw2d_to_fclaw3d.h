@@ -32,16 +32,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_metric_patch_setup           fclaw3d_metric_patch_setup
 #define fclaw2d_metric_patch_setup_from_fine fclaw3d_metric_patch_setup_from_fine
 #define fclaw2d_metric_vtable_initialize     fclaw3d_metric_vtable_initialize
+#define fclaw2d_metric_patch_get_area        fclaw3d_metric_patch_get_volume
+#define fclaw2d_metric_get_metric_patch      fclaw3d_metric_get_metric_patch
 
 // fclaw3d_metric.hpp
 #define fclaw2d_metric_patch_t               fclaw3d_metric_patch_t
-
 
 //For Clawpatch
 #define fclaw2d_clawpatch_get_metric_patch   fclaw3d_clawpatch_get_metric_patch
 #define fclaw2d_clawpatch_metric_scalar      fclaw3d_clawpatch_metric_scalar
 #define fclaw2d_clawpatch_metric_vector      fclaw3d_clawpatch_metric_basis
 #define fclaw2d_clawpatch_metric_data        fclaw3d_clawpatch_metric_data
+#define fclaw2d_clawpatch_get_area           fclaw3d_clawpatch_get_volume
+
+// ForestClaw files
+#define fclaw2d_map_context_t                fclaw3d_map_context_t
+#define fclaw2d_map_destroy                  fclaw3d_map_destroy
 
 
 
