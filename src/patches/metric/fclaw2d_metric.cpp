@@ -35,14 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if PATCH_DIM == 2
 
-#define METRIC_VTABLE_NAME "fclaw2d_clawpatch"
+#define METRIC_VTABLE_NAME "fclaw2d_metric"
 
 #include "fclaw2d_metric.h"
 #include "fclaw2d_metric.hpp"
 
 #elif PATCH_DIM == 3
 
-#define METRIC_VTABLE_NAME "fclaw3d_clawpatch"
+#define METRIC_VTABLE_NAME "fclaw3d_metric"
 
 #include "fclaw3d_metric.h"
 #include "fclaw3d_metric.hpp"
