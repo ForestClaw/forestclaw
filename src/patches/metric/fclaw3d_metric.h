@@ -41,6 +41,11 @@ extern "C"
 {
 #endif
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
+
 /** Typedef for ::fclaw3d_metric_vtable */
 typedef struct fclaw3d_metric_vtable fclaw3d_metric_vtable_t;
 
@@ -235,6 +240,7 @@ void fclaw3d_metric_patch_mesh_data(struct fclaw2d_global* glob,
 									double **xd, double **yd, double **zd,
 									double **volume, double** faceareas);
 
+#if 0
 /**
  * @brief Get the mesh metrics of a patch
  * 
@@ -249,6 +255,7 @@ void fclaw3d_metric_patch_mesh_data(struct fclaw2d_global* glob,
 void fclaw3d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
 									 struct fclaw2d_patch* patch,
                                      double **xrot, double **yrot, double **zrot);
+#endif
 
 /**
  * @brief Get the area for each cell of the patch

@@ -43,7 +43,7 @@ add_library(clawpatch_f OBJECT
   fort3_4.6/fclaw3dx_clawpatch46_timeinterp.f90  
   fort3_4.6/fclaw3dx_clawpatch46_pillowsphere.f90 
   fort3_4.6/fclaw3dx_clawpatch46_diagnostics.f90 
-  ${metric}/fortran_source2d/fclaw2d_metric_default_fort.f
+  ${metric}/fortran_source2d/fclaw2d_metric_default_fort.f90
   ${metric}/fortran_source3d/fclaw3d_metric_default_fort.f90
 )
 

@@ -128,8 +128,8 @@ void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
 
     /* Fix this so we allocate quadstore in the Fortran routine */
     int ghost_only = 0;
-    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                              &blockno, area, &m, quadstore, &ghost_only);
+    FCLAW2D_METRIC_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                                     &blockno, area, &m, quadstore, &ghost_only);
 
     FCLAW_FREE(quadstore);
 }
@@ -157,8 +157,8 @@ void fclaw2d_metric_compute_area_ghost_default(fclaw2d_global_t* glob,
     double *quadstore = FCLAW_ALLOC(double,3*(m+1)*(m+1));
 
     int ghost_only = 1;
-    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                              &blockno, area, &m, quadstore,
-                              &ghost_only);
+    FCLAW2D_METRIC_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                                     &blockno, area, &m, quadstore,
+                                     &ghost_only);
     FCLAW_FREE(quadstore);
 }

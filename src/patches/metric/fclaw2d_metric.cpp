@@ -294,7 +294,7 @@ void metric_average_volume_from_fine(fclaw2d_global_t *glob,
     {
         double* areafine = fclaw2d_metric_patch_get_area(glob, &fine_patches[igrid]);
 
-        FCLAW2D_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
+        FCLAW2D_METRIC_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
     }
     metric_vt->compute_area_ghost(glob,coarse_patch,blockno,coarse_patchno);
 #elif PATCH_DIM == 3
@@ -418,10 +418,10 @@ void fclaw2d_metric_vtable_initialize(fclaw2d_global_t* glob)
     metric_vt->compute_area_ghost    = fclaw2d_metric_compute_area_ghost_default;
     metric_vt->compute_basis       = fclaw2d_metric_compute_basis_default;
 
-    metric_vt->fort_compute_mesh     = &FCLAW2D_FORT_COMPUTE_MESH;
-    metric_vt->fort_compute_normals       = &FCLAW2D_FORT_COMPUTE_NORMALS;
-    metric_vt->fort_compute_tangents      = &FCLAW2D_FORT_COMPUTE_TANGENTS;
-    metric_vt->fort_compute_surf_normals  = &FCLAW2D_FORT_COMPUTE_SURF_NORMALS;
+    metric_vt->fort_compute_mesh          = &FCLAW2D_METRIC_FORT_COMPUTE_MESH;
+    metric_vt->fort_compute_normals       = &FCLAW2D_METRIC_FORT_COMPUTE_NORMALS;
+    metric_vt->fort_compute_tangents      = &FCLAW2D_METRIC_FORT_COMPUTE_TANGENTS;
+    metric_vt->fort_compute_surf_normals  = &FCLAW2D_METRIC_FORT_COMPUTE_SURF_NORMALS;
 #elif PATCH_DIM == 3
     metric_vt->compute_mesh          = fclaw3d_metric_compute_mesh_default;
     metric_vt->compute_volume        = fclaw3d_metric_compute_volume_default;

@@ -352,13 +352,13 @@ struct fclaw2d_metric_vtable
 
 	/* Fortran files */
 	/** Compute the mesh coordinates */
-	fclaw2d_fort_compute_mesh_t          fort_compute_mesh;
+	fclaw2d_metric_fort_compute_mesh_t          fort_compute_mesh;
 	/** Compute the face normals */
-	fclaw2d_fort_compute_normals_t       fort_compute_normals;
+	fclaw2d_metric_fort_compute_normals_t       fort_compute_normals;
 	/** Compute the face tangents */
-	fclaw2d_fort_compute_tangents_t      fort_compute_tangents;
+	fclaw2d_metric_fort_compute_tangents_t      fort_compute_tangents;
 	/** Compute the surface normals */
-	fclaw2d_fort_compute_surf_normals_t  fort_compute_surf_normals;
+	fclaw2d_metric_fort_compute_surf_normals_t  fort_compute_surf_normals;
 
 	/** True if vtable has been set */
 	int is_set;
