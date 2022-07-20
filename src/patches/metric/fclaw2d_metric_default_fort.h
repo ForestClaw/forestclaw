@@ -33,6 +33,11 @@ extern "C"
 {
 #endif
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
+
 /**
  * @file
  * C declarations for Fortran subroutines

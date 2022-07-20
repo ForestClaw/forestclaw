@@ -47,7 +47,7 @@ void fclaw3d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 
     double *xp,*yp,*zp;
     double *xd,*yd,*zd;
-    double *volume, *facearea;
+    double *volume, *facearea; /* Not used here */
     fclaw3d_metric_patch_mesh_data(glob,patch,
                                    &xp,&yp,&zp,&xd,&yd,&zd,&volume,&facearea);
 
@@ -73,7 +73,7 @@ void fclaw3d_metric_compute_basis_default(fclaw2d_global_t *glob,
 
     double *xp,*yp,*zp;
     double *xd,*yd,*zd;
-    double *volume, *facearea;
+    double *volume, *facearea;  
     fclaw3d_metric_patch_mesh_data(glob,patch,
                                    &xp,&yp,&zp,&xd,&yd,&zd,
                                    &volume,&facearea);
