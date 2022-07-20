@@ -144,21 +144,12 @@ double* q_time_sync(fclaw2d_patch_t* patch, int time_interp)
 		return cp->griddata.dataPtr();
 }
 
-#if PATCH_DIM == 2
 static 
 double* clawpatch_get_area(struct fclaw2d_global* glob,
 	                       fclaw2d_patch_t* patch)
 {
 	return fclaw2d_metric_patch_get_area(glob, patch);
 }
-#elif PATCH_DIM == 3
-static 
-double* clawpatch_get_volume(struct fclaw2d_global* glob,
-                             fclaw2d_patch_t* patch)
-{
-	return fclaw3d_metric_patch_get_volume(glob, patch);
-}
-#endif
 
 
 /* ----------------------------- Creating/deleting patches ---------------------------- */
@@ -376,11 +367,7 @@ void clawpatch_build(fclaw2d_global_t *glob,
 
 	if (fclaw_opt->manifold)
 	{ 
-#if PATCH_DIM == 2
 		fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
-#elif PATCH_DIM == 3
-		fclaw3d_metric_patch_compute_volume(glob,patch,blockno,patchno);
-#endif
 		fclaw2d_metric_patch_setup(glob,patch,blockno,patchno);
 	}
 
@@ -563,18 +550,23 @@ void clawpatch_average_face(fclaw2d_global_t *glob,
 	int manifold = fclaw_opt->manifold;
 	fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
-#if PATCH_DIM == 2
-	/* These will be empty for non-manifolds cases */
 	double *areacoarse = clawpatch_get_area(glob, coarse_patch);
 	double *areafine = clawpatch_get_area(glob, fine_patch);
+
+#if PATCH_DIM == 2
+	/* These will be empty for non-manifolds cases */
 	clawpatch_vt->fort_average_face(&mx,&my,&mbc,&meqn,qcoarse,qfine,
 	                                areacoarse,areafine, &idir,&iface_coarse, 
 	                                &p4est_refineFactor, &refratio,
 									&igrid,&manifold,&transform_data);
 #elif PATCH_DIM == 3
-	/* These will be empty for non-manifolds cases */
+#if 0
 	double *volcoarse = clawpatch_get_volume(glob, coarse_patch);
 	double *volfine = clawpatch_get_volume(glob, fine_patch);
+#endif
+	/* These will be empty for non-manifolds cases */
+	double *volcoarse = areacoarse;
+	double *volfine = areafine;
 	int mz = clawpatch_opt->mz;
 	clawpatch_vt->fort_average_face(&mx,&my,&mz,&mbc,&meqn,qcoarse,qfine,
 	                                  volcoarse,volfine, &idir,&iface_coarse, 
@@ -634,8 +626,9 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
 						   fclaw2d_patch_transform_data_t *transform_data)
 {
 
-	const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-	int mx = clawpatch_opt->mx;
+	const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+        	     fclaw2d_clawpatch_get_options(glob);
+	int mx = clawpatch_opt->mx;       
 	int my = clawpatch_opt->my;
 	int mbc = clawpatch_opt->mbc;
 
@@ -688,18 +681,24 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
 	{
 		int refratio = 2;
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-#if PATCH_DIM == 2
-   	    /* These will be empty for non-manifolds cases */
+
 		double *areacoarse = clawpatch_get_area(glob, coarse_patch);
 		double *areafine = clawpatch_get_area(glob, fine_patch);
+
+#if PATCH_DIM == 2
+   	    /* These will be empty for non-manifolds cases */
 		clawpatch_vt->fort_average_corner(&mx,&my,&mbc,&meqn,
 		                                  &refratio,qcoarse,qfine,
 		                                  areacoarse,areafine,
 		                                  &manifold,&coarse_corner,&transform_data);
 #elif PATCH_DIM == 3
      	/* These will be empty for non-manifolds cases */
+#if 0     	
 		double *volcoarse = clawpatch_get_volume(glob, coarse_patch);
 		double *volfine = clawpatch_get_volume(glob, fine_patch);
+#endif
+		double *volcoarse = areacoarse;
+		double *volfine = areafine;
 		int mz = clawpatch_opt->mz;		
 		clawpatch_vt->fort_average_corner(&mx,&my,&mz,&mbc,&meqn,
 		                                  &refratio,qcoarse,qfine,
@@ -814,7 +813,7 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 							 int patchno,
 							 int initflag)
 {
-#if FCLAW2D_REFINEDIM == 3
+#if REFINE_DIM == 3
 	fclaw_global_essentialf("tag4coarsening : Not implemented for full 3d " \
 	                        "refinement.\n");
 	exit(0);
@@ -894,22 +893,24 @@ void clawpatch_interpolate2fine(fclaw2d_global_t* glob,
 		const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-#if PATCH_DIM == 2
+
+		double *areacoarse = clawpatch_get_area(glob, coarse_patch);
 		double *areafine = NULL;
+
+		double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
+
+#if PATCH_DIM == 2
 		if (fclaw_opt->manifold)
 			areafine = clawpatch_get_area(glob, fine_patch);
-		double *areacoarse = clawpatch_get_area(glob, coarse_patch);
-		double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
 		clawpatch_vt->fort_interpolate2fine(&mx,&my,&mbc,&meqn,qcoarse,qfine,
 											areacoarse, areafine, &igrid,
 											&fclaw_opt->manifold);
-#else
-		double *volfine = NULL;
+#elif PATCH_DIM == 3
+		double *volfine = areafine;
 		if (fclaw_opt->manifold)
 			 volfine = clawpatch_get_volume(glob, fine_patch);
-		double *volcoarse = clawpatch_get_volume(glob, coarse_patch);
-		double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
+		double *volcoarse = areacoarse;
 
 		int mz = clawpatch_opt->mz;
 		clawpatch_vt->fort_interpolate2fine(&mx,&my,&mz, &mbc,&meqn,qcoarse,qfine,
@@ -934,11 +935,8 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 	int mbc = clawpatch_opt->mbc;
 	int meqn = clawpatch_opt->meqn;
 
-#if PATCH_DIM == 2
 	double *areacoarse = clawpatch_get_area(glob, coarse_patch);
-#elif PATCH_DIM == 3
-	double *volcoarse = clawpatch_get_volume(glob, coarse_patch);
-#endif
+
 	double *qcoarse = fclaw2d_clawpatch_get_q(glob,coarse_patch);
 
 	for(int igrid = 0; igrid < FCLAW2D_NUMSIBLINGS; igrid++)
@@ -949,15 +947,18 @@ void clawpatch_average2coarse(fclaw2d_global_t *glob,
 		const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+
+
 #if PATCH_DIM == 2	
-		double *areafine = NULL;
+		double *areafine =  NULL;
 		if (fclaw_opt->manifold)
 			areafine = clawpatch_get_area(glob, fine_patch);
 		clawpatch_vt->fort_average2coarse(&mx,&my,&mbc,&meqn,qcoarse,qfine,
 										  areacoarse, areafine, &igrid,
 										  &fclaw_opt->manifold);
-#else
+#elif PATCH_DIM == 3
 		double *volfine = NULL;
+		double *volcoarse = areacoarse;
 		if (fclaw_opt->manifold)
 			volfine = clawpatch_get_volume(glob, fine_patch);
 		int mz = clawpatch_opt->mz;
@@ -1186,9 +1187,8 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 	{
 		if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
 		{
-#if PATCH_DIM == 2			
 			fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
-#elif PATCH_DIM == 3
+#if 0
 			fclaw3d_metric_patch_compute_volume(glob,patch,blockno,patchno);			
 #endif
 		}
@@ -1690,13 +1690,13 @@ double* fclaw2d_clawpatch_get_q_timesync(fclaw2d_global_t* glob,
 	return q_time_sync(patch, time_interp);
 }
 
-#if PATCH_DIM == 2
 double* fclaw2d_clawpatch_get_area(fclaw2d_global_t* glob,
 								   fclaw2d_patch_t* patch)
 {
 	return clawpatch_get_area(glob, patch);
 }
 
+#if PATCH_DIM == 2
 void fclaw2d_clawpatch_metric_scalar(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* patch,
                                      double **area, double** edgelengths,
@@ -1740,12 +1740,6 @@ void fclaw2d_clawpatch_metric_data2(fclaw2d_global_t* glob,
 									edgelengths,curvature);
 }
 #elif PATCH_DIM == 3
-
-double* fclaw3d_clawpatch_get_volume(fclaw2d_global_t* glob,
-								   fclaw2d_patch_t* patch)
-{
-	return clawpatch_get_volume(glob, patch);
-}
 
 void fclaw3d_clawpatch_metric_scalar(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* patch,

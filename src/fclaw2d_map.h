@@ -166,7 +166,6 @@ void FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont,
                             int * flag);
 
 
-#define FCLAW2D_MAP_BRICK2C FCLAW_F77_FUNC_(fclaw2d_map_brick2c,FCLAW2D_MAP_BRICK2C)
 
 /** Map brick to computational coordinates in [0,1]x[0,1]
  * \param [in] cont     Mapping context with matching callback functions.
@@ -177,6 +176,9 @@ void FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont,
  * \param [out] my      Transformed y-coordinate.
  * \param [out] mz      Transformed z-coordinate.
  */
+
+#define FCLAW2D_MAP_BRICK2C FCLAW_F77_FUNC_(fclaw2d_map_brick2c, \
+                                            FCLAW2D_MAP_BRICK2C)
 void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** cont, int *blockno,
                           const double *xc, const double *yc,
                           double *xp, double *yp, double *zp);

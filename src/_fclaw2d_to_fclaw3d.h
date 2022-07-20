@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_clawpatch_metric_vector      fclaw3d_clawpatch_metric_basis
 #define fclaw2d_clawpatch_metric_data        fclaw3d_clawpatch_metric_data
 #define fclaw2d_clawpatch_get_area           fclaw3d_clawpatch_get_volume
+#define clawpatch_get_area                   clawpatch_get_volume
+
 
 // ForestClaw files
 #define fclaw2d_map_context_t                fclaw3d_map_context_t
