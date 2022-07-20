@@ -34,6 +34,10 @@ extern "C"
 {
 #endif
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
 struct p4est_connectivity;
 struct fclaw2d_global;
 
@@ -135,7 +139,6 @@ void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** cont,
                         const int *query_identifier, int *iresult);
 
 
-#define FCLAW2D_MAP_C2M FCLAW_F77_FUNC_(fclaw2d_map_c2m,FCLAW2D_MAP_C2M)
 
 /** Mapping function that can be called from Fortran.
  * \param [in] cont     Mapping context with matching callback functions.
@@ -146,9 +149,12 @@ void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** cont,
  * \param [out] my      Transformed y-coordinate.
  * \param [out] mz      Transformed z-coordinate.
  */
+
+#define FCLAW2D_MAP_C2M FCLAW_F77_FUNC_(fclaw2d_map_c2m,FCLAW2D_MAP_C2M)
 void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
                       const double *xc, const double *yc,
                       double *xp, double *yp, double *zp);
+
 
 
 #define FCLAW2D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw2d_map_c2m_basis, \

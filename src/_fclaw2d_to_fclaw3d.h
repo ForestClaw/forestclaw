@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ForestClaw files
 #define fclaw2d_map_context_t                fclaw3d_map_context_t
 #define fclaw2d_map_destroy                  fclaw3d_map_destroy
-
+#define fclaw2d_map_query                    fclaw3d_map_query
 
 
 

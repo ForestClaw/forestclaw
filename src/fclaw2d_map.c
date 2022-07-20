@@ -24,10 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
-
 #ifndef PATCH_DIM
 #define PATCH_DIM 2
 #endif
@@ -47,24 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 
-#if PATCH_DIM == 2
 /* This function can be called from Fortran inside of ClawPatch. */
 void
-FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** pcont,
+fclaw2d_map_query (fclaw2d_map_context_t ** pcont,
                    const int *query_identifier, int *iresult)
 {
     fclaw2d_map_context_t *cont = *pcont;
     *iresult = cont->query (cont, *query_identifier);
 }
-#elif PATCH_DIM == 3
-void
-FCLAW3D_MAP_QUERY (fclaw3d_map_context_t ** pcont,
-                   const int *query_identifier, int *iresult)
-{
-    fclaw3d_map_context_t *cont = *pcont;
-    *iresult = cont->query (cont, *query_identifier);
-}
-#endif
 
 /* This function can be called from Fortran inside of ClawPatch. */
 
