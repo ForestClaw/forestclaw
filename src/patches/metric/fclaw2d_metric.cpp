@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw3d_metric.h"
 #include "fclaw3d_metric.hpp"
+
 #include <_fclaw2d_to_fclaw3d.h>
 
 #endif
@@ -323,25 +324,20 @@ void metric_average_volume_from_fine(fclaw2d_global_t *glob,
 
 /* --------------------------------- Public interface  -------------------------------- */
 
-#if PATCH_DIM == 2
 void fclaw2d_metric_patch_compute_area (fclaw2d_global_t *glob,
                                        fclaw2d_patch_t* patch,
                                        int blockno, int patchno)
 {
     fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
+#if PATCH_DIM == 2
     FCLAW_ASSERT(metric_vt->compute_area);
     metric_vt->compute_area(glob,patch,blockno,patchno);
-}
 #elif PATCH_DIM == 3
-void fclaw3d_metric_patch_compute_volume (fclaw2d_global_t *glob,
-                                       fclaw2d_patch_t* patch,
-                                       int blockno, int patchno)
-{
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     FCLAW_ASSERT(metric_vt->compute_volume);
     metric_vt->compute_volume(glob,patch,blockno,patchno);
-}
 #endif
+}
+
 
 void fclaw2d_metric_patch_setup(fclaw2d_global_t* glob,
                                 fclaw2d_patch_t* patch,
@@ -471,34 +467,65 @@ void fclaw2d_metric_patch_scalar(fclaw2d_global_t* glob,
                                  fclaw2d_patch_t* patch,
                                  double **area, double** edgelengths,
                                  double **curvature)
+#elif PATCH_DIM == 3
+void fclaw3d_metric_patch_scalar(fclaw2d_global_t* glob,
+                                 fclaw2d_patch_t* patch,
+                                 double **volume, double** faceareas)
+#endif
 {
     fclaw2d_metric_patch_t* mp = get_metric_patch(glob, patch);
+#if PATCH_DIM == 2
     *area = mp->area.dataPtr();
     *edgelengths =  mp->edge_lengths.dataPtr();
     *curvature = mp->curvature.dataPtr();
+#elif PATCH_DIM == 3
+    *volume = mp->volume.dataPtr();
+    *faceareas =  mp->face_area.dataPtr();
+#endif
 }
 
 
+
+#if PATCH_DIM == 2
 void fclaw2d_metric_patch_vector(struct fclaw2d_global* glob,
                                  struct fclaw2d_patch* patch,
                                  double **xnormals, double **ynormals,
                                  double **xtangents, double **ytangents,
                                  double **surfnormals)
+#elif PATCH_DIM == 3
+void fclaw3d_metric_patch_basis(fclaw2d_global_t* glob,
+                                fclaw2d_patch_t* patch,
+                                double **xrot, double **yrot, double **zrot)
+#endif
 {
     fclaw2d_metric_patch_t* mp = get_metric_patch(glob, patch);
+#if PATCH_DIM == 2
     *xnormals = mp->xface_normals.dataPtr();
     *ynormals = mp->yface_normals.dataPtr();
     *xtangents = mp->xface_tangents.dataPtr();
     *ytangents = mp->yface_tangents.dataPtr();
     *surfnormals = mp->surf_normals.dataPtr();
+#elif PATCH_DIM == 3
+    *xrot = mp->xrot.dataPtr();
+    *yrot = mp->yrot.dataPtr();
+    *zrot = mp->zrot.dataPtr();
+#endif
 }
 
-
+#if PATCH_DIM == 2
 void fclaw2d_metric_patch_grid_data(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* patch,
                                     int* mx, int* my, int* mbc,
                                     double* xlower, double* ylower,
                                     double* dx, double* dy)
+#elif PATCH_DIM == 3
+void fclaw3d_metric_patch_grid_data(fclaw2d_global_t* glob,
+                                    fclaw2d_patch_t* patch,
+                                    int* mx, int* my, int* mz, 
+                                    int* mbc,
+                                    double* xlower, double* ylower, double *zlower,
+                                    double* dx, double* dy, double* dz)
+#endif
 {
     fclaw2d_metric_patch_t* mp = get_metric_patch(glob, patch);
     *mx     = mp->mx;
@@ -508,14 +535,27 @@ void fclaw2d_metric_patch_grid_data(fclaw2d_global_t* glob,
     *ylower = mp->ylower;
     *dx     = mp->dx;
     *dy     = mp->dy;
+#if PATCH_DIM == 3
+    *mz     = mp->mz;
+    *zlower = mp->zlower;
+    *dz     = mp->dz;
+#endif
 }
 
 
+#if PATCH_DIM == 2
 void fclaw2d_metric_patch_mesh_data(fclaw2d_global_t* glob,
                                     fclaw2d_patch_t* patch,
                                     double **xp, double **yp, double **zp,
                                     double **xd, double **yd, double **zd,
                                     double **area)
+#elif PATCH_DIM == 3
+void fclaw3d_metric_patch_mesh_data(fclaw2d_global_t* glob,
+                                    fclaw2d_patch_t* patch,
+                                    double **xp, double **yp, double **zp,
+                                    double **xd, double **yd, double **zd,
+                                    double **volume, double** faceareas)
+#endif
 {
     fclaw2d_metric_patch_t* mp = get_metric_patch(glob, patch);
     *xp = mp->xp.dataPtr();
@@ -524,9 +564,15 @@ void fclaw2d_metric_patch_mesh_data(fclaw2d_global_t* glob,
     *xd = mp->xd.dataPtr();
     *yd = mp->yd.dataPtr();
     *zd = mp->zd.dataPtr();
+#if PATCH_DIM == 2
     *area = mp->area.dataPtr();
+#elif PATCH_DIM == 3
+    *volume = mp->volume.dataPtr();
+    *faceareas = mp->face_area.dataPtr();
+#endif
 }
 
+#if PATCH_DIM == 2
 void fclaw2d_metric_patch_mesh_data2(fclaw2d_global_t* glob,
                                      fclaw2d_patch_t* patch,
                                      double **xnormals, double **ynormals,
@@ -543,68 +589,6 @@ void fclaw2d_metric_patch_mesh_data2(fclaw2d_global_t* glob,
     *curvature   = mp->curvature.dataPtr();
     *edgelengths = mp->edge_lengths.dataPtr();
 }
-
-#elif PATCH_DIM == 3
-
-void fclaw3d_metric_patch_scalar(fclaw2d_global_t* glob,
-                                 fclaw2d_patch_t* patch,
-                                 double **volume, double** faceareas)
-{
-    fclaw3d_metric_patch_t* mp = get_metric_patch(glob, patch);
-    *volume = mp->volume.dataPtr();
-    *faceareas =  mp->face_area.dataPtr();
-}
-
-
-void fclaw3d_metric_patch_basis(fclaw2d_global_t* glob,
-                                fclaw2d_patch_t* patch,
-                                double **xrot, double **yrot, double **zrot)
-{
-    fclaw3d_metric_patch_t* mp = get_metric_patch(glob, patch);
-    *xrot = mp->xrot.dataPtr();
-    *yrot = mp->yrot.dataPtr();
-    *zrot = mp->zrot.dataPtr();
-}
-
-
-void fclaw3d_metric_patch_grid_data(fclaw2d_global_t* glob,
-                                    fclaw2d_patch_t* patch,
-                                    int* mx, int* my, int* mz, 
-                                    int* mbc,
-                                    double* xlower, double* ylower, double *zlower,
-                                    double* dx, double* dy, double* dz)
-{
-    fclaw3d_metric_patch_t* mp = get_metric_patch(glob, patch);
-    *mx     = mp->mx;
-    *my     = mp->my;
-    *mz     = mp->mz;
-    *mbc    = mp->mbc;
-    *xlower = mp->xlower;
-    *ylower = mp->ylower;
-    *zlower = mp->zlower;
-    *dx     = mp->dx;
-    *dy     = mp->dy;
-    *dz     = mp->dz;
-}
-
-
-void fclaw3d_metric_patch_mesh_data(fclaw2d_global_t* glob,
-                                    fclaw2d_patch_t* patch,
-                                    double **xp, double **yp, double **zp,
-                                    double **xd, double **yd, double **zd,
-                                    double **volume, double** faceareas)
-{
-    fclaw3d_metric_patch_t* mp = get_metric_patch(glob, patch);
-    *xp = mp->xp.dataPtr();
-    *yp = mp->yp.dataPtr();
-    *zp = mp->zp.dataPtr();
-    *xd = mp->xd.dataPtr();
-    *yd = mp->yd.dataPtr();
-    *zd = mp->zd.dataPtr();
-    *volume = mp->volume.dataPtr();
-    *faceareas = mp->face_area.dataPtr();
-}
-
 #endif
 
 

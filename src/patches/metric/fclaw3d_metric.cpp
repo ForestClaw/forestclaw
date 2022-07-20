@@ -29,6 +29,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_metric.cpp>
 
-struct fclaw2d_patch; 
-
 
