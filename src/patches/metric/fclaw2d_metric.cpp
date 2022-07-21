@@ -40,15 +40,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_metric.h"
 #include "fclaw2d_metric.hpp"
 
-#elif PATCH_DIM == 3
+#elif PATCH_DIM == 3 && REFINE_DIM == 2
 
-#define METRIC_VTABLE_NAME "fclaw3d_metric"
+#define METRIC_VTABLE_NAME "fclaw3dx_metric"
 
 #include "fclaw3d_metric.h"
 #include "fclaw3d_metric.hpp"
 
 #include <_fclaw2d_to_fclaw3d.h>
 
+#else
+#error "Octree refinement not yet implemented"
 #endif
 
 

@@ -108,7 +108,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t *brick,
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cart;
     cont->mapc2m = fclaw2d_map_c2m_cart;
-    cont->mapc2m_3dx = fclaw3dx_map_c2m_cart;
+    cont->mapc2m_3dx = fclaw2d_map_c2m_cart_3dx;
     cont->brick = brick;
 
     set_scale(cont,scale);

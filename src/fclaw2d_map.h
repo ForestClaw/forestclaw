@@ -41,6 +41,8 @@ extern "C"
 struct p4est_connectivity;
 struct fclaw2d_global;
 
+struct fclaw2d_map_context;
+
 /** This prototype matches the Fortran mapc2m functions used in ClawPatch.
  */
 typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
@@ -82,6 +84,18 @@ typedef void (*fclaw2d_map_c2m_basis_t)(fclaw2d_map_context_t * cont,
                                         double *t, double *tinv, 
                                         double *tderivs, int flag);
 
+/* For extruded mesh mappings */
+typedef void (*fclaw3dx_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
+                                   double xc, double yc,double zc,
+                                   double *xp, double *yp, double *zp);
+
+
+
+/* Covariant and contravariant basis vectors needed for exact solution */
+typedef void (*fclaw3dx_map_c2m_basis_t)(fclaw2d_map_context_t * cont, 
+                                        double xc, double yc, double zc,
+                                        double *t, double *tinv, 
+                                        double *tderivs, int flag);
 
 /** Destructor for a fclaw2d_map_context.
  */
@@ -93,8 +107,14 @@ typedef void (*fclaw2d_map_destroy_t) (fclaw2d_map_context_t * cont);
 struct fclaw2d_map_context
 {
     fclaw2d_map_query_t       query;
+
     fclaw2d_map_c2m_t         mapc2m;
     fclaw2d_map_c2m_basis_t   basis;
+
+    fclaw3dx_map_c2m_t         mapc2m_3dx;   /* Takes a 2d context */
+    fclaw3dx_map_c2m_basis_t   basis_3dx;
+    int is_extruded;
+
     fclaw2d_map_destroy_t destroy;
     int user_int[16];
     double user_double[16];
@@ -156,7 +176,6 @@ void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
                       double *xp, double *yp, double *zp);
 
 
-
 #define FCLAW2D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw2d_map_c2m_basis, \
                                               FCLAW2D_MAP_C2M_BASIS)
 
@@ -165,6 +184,20 @@ void FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont,
                             double *t, double *tinv, double *tderivs,
                             int * flag);
 
+
+#define FCLAW3D_MAP_C2M FCLAW_F77_FUNC_(fclaw3d_map_c2m,FCLAW3D_MAP_C2M)
+void FCLAW3D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
+                      const double *xc, const double *yc, const double *zc,
+                      double *xp, double *yp, double *zp);
+
+
+#define FCLAW3D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw3d_map_c2m_basis, \
+                                              FCLAW3D_MAP_C2M_BASIS)
+
+void FCLAW3D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont, 
+                            const double *xc, const double *yc, const double *zc,
+                            double *t, double *tinv, double *tderivs,
+                            int * flag);
 
 
 /** Map brick to computational coordinates in [0,1]x[0,1]

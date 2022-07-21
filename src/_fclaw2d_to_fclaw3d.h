@@ -48,10 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define clawpatch_get_area                   clawpatch_get_volume
 
 
+#if 0
 // ForestClaw files
-#define fclaw2d_map_context_t                fclaw3d_map_context_t
-#define fclaw2d_map_destroy                  fclaw3d_map_destroy
-#define fclaw2d_map_query                    fclaw3d_map_query
+#define fclaw2d_map_context_t                fclaw2d_map_context_t
+#define fclaw2d_map_destroy                  fclaw2d_map_destroy
+#define fclaw2d_map_query                    fclaw2d_map_query
+#endif
 
 
 

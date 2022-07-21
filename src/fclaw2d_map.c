@@ -23,6 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef REFINE_DIM
+#define REFINE_DIM 2
+#endif
 
 #ifndef PATCH_DIM
 #define PATCH_DIM 2
@@ -34,11 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
 
-#elif PATCH_DIM == 3
+#elif PATCH_DIM == 3 && REFINE_DIM == 2
 
-#include <fclaw3d_map.h>
-#include <fclaw3d_map_query.h>  /* Needed for pillowsphere query */
-#include <_fclaw2d_to_fclaw3d.h>
+#include <fclaw3dx_map.h>
+//#include <fclaw3d_map_query.h>  /* Needed for pillowsphere query */
+//#include <_fclaw2d_to_fclaw3d.h>
 #endif
 
 #include <fclaw2d_global.h>
@@ -54,31 +57,19 @@ fclaw2d_map_query (fclaw2d_map_context_t ** pcont,
 
 /* This function can be called from Fortran inside of ClawPatch. */
 
-#if PATCH_DIM == 2
 void
 FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
                  const double *xc, const double *yc,
                  double *xp, double *yp, double *zp)
 {
     fclaw2d_map_context_t *cont = *pcont;
+    FCLAW_ASSERT(cont->mapc2m != NULL);
     cont->mapc2m (cont, *blockno, *xc, *yc, xp, yp, zp);
 }
-
-#elif PATCH_DIM == 3
-void
-FCLAW3D_MAP_C2M (fclaw3d_map_context_t ** pcont, int *blockno,
-                 const double *xc, const double *yc, const double *zc,
-                 double *xp, double *yp, double *zp)
-{
-    fclaw2d_map_context_t *cont = *pcont;
-    cont->mapc2m (cont, *blockno, *xc, *yc, *zc, xp, yp, zp);
-}
-#endif
 
 
 /* This function can be called from Fortran inside of ClawPatch. */
 
-#if PATCH_DIM == 2
 void
 FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
                        const double *xc, const double *yc,
@@ -91,22 +82,39 @@ FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
     cont->basis (cont, *xc, *yc, t, tinv, tderivs, *flag);
 }
 
-#elif PATCH_DIM == 3
+
+/* This pragma requires a fclaw3dx_map.{c,h} file, so I"ll hold off for 
+   now on adding these.   Ideally, the patch metric won't know whether
+   the mapping is for an extruded mesh or for a full octree mesh. 
+*/
+
+//#if PATCH_DIM == 3 && REFINE_DIM == 2
 void
-FCLAW3D_MAP_C2M_BASIS (fclaw3d_map_context_t ** pcont,
+FCLAW3D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
+                 const double *xc, const double *yc, const double *zc,
+                 double *xp, double *yp, double *zp)
+{
+    fclaw2d_map_context_t *cont = *pcont;
+    FCLAW_ASSERT(cont->mapc2m_3dx != NULL);
+    cont->mapc2m_3dx (cont, *blockno, *xc, *yc, *zc, xp, yp, zp);
+}
+
+
+
+void
+FCLAW3D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
                        const double *xc, const double *yc, const double *zc, 
                        double *t, double *tinv, double *tderivs,
                        int *flag)
 {
     fclaw2d_map_context_t *cont = *pcont;
-    FCLAW_ASSERT(cont->basis != NULL);
+    FCLAW_ASSERT(cont->basis_3dx != NULL);
 
     /* DAC : Still need to decide what should go here */
-    cont->basis (cont, *xc, *yc, *zc, t, tinv, tderivs, *flag);
+    cont->basis_3dx (cont, *xc, *yc, *zc, t, tinv, tderivs, *flag);
 }
-#endif
+//#endif
 
-#if PATCH_DIM == 2
 void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
                           const double *xc, const double *yc,
                           double *xp, double *yp, double *zp)
@@ -127,30 +135,6 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
         *zp = 0;
     }
 }
-
-#elif PATCH_DIM == 3
-void FCLAW3D_MAP_BRICK2C (fclaw3d_map_context_t ** pcont, int *blockno,
-                          const double *xc, const double *yc, const double *zc,
-                          double *xp, double *yp, double *zp)
-{
-    fclaw2d_map_context_t *cont = *pcont;
-
-    if (cont->brick != NULL)
-    {
-        fclaw3d_map_context_t *brick = cont->brick;  
-        brick->mapc2m (brick, *blockno, *xc, *yc, *zc, xp, yp, zp);
-    }
-    else
-    {
-        /* We only have one tree */
-        FCLAW_ASSERT(blockno == 0);
-        *xp = *xc;
-        *yp = *yc;
-        *zp = *zc;
-    }
-}
-#endif
-
 
 /* This function is expected to be called from C or C++. */
 void
@@ -496,7 +480,6 @@ fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
 }
 #endif
 
-#if PATCH_DIM == 2
 int fclaw2d_map_pillowsphere(fclaw2d_global_t* glob)
 {
     fclaw2d_map_context_t *cont = glob->cont;
@@ -568,5 +551,4 @@ void rotate_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
     *yp = vrot[1];
     *zp = vrot[2];
 }
-#endif
 
