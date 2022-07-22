@@ -16,7 +16,7 @@ switch map
     case 'pillowdisk'
         % Uses [ax,bx] x [ay,by] set in fclaw2d_defaults.ini
         % This is what is stored in the fort.q files.
-        [xp,yp,zp]= mapc2m_pillowdisk(xc,yc);
+        [xp,yp,~]= mapc2m_pillowdisk(xc,yc);
         xp = xp+shift(1);
         yp = yp+shift(2);
         
@@ -27,8 +27,5 @@ switch map
         yp = yp+shift(2);
 end
 zp = 0*xp;
-
-
-
 
 end
