@@ -44,8 +44,6 @@ void disk_patch_setup(fclaw2d_global_t *glob,
     }
     fclaw2d_domain_barrier (glob->domain);
     SETPROB();
-
-
 }
 
 
@@ -59,7 +57,6 @@ void disk_link_solvers(fclaw2d_global_t *glob)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);
 
-        //clawpack46_vt->fort_setprob = &SETPROB;
         clawpack46_vt->fort_qinit   = &CLAWPACK46_QINIT;
         clawpack46_vt->fort_rpn2    = &CLAWPACK46_RPN2ADV_MANIFOLD;
         clawpack46_vt->fort_rpt2    = &CLAWPACK46_RPT2ADV_MANIFOLD;
@@ -68,7 +65,6 @@ void disk_link_solvers(fclaw2d_global_t *glob)
     {
         fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
 
-        //claw5_vt->fort_setprob = &SETPROB;
         claw5_vt->fort_qinit   = &CLAWPACK5_QINIT;
         claw5_vt->fort_rpn2    = &CLAWPACK5_RPN2ADV_MANIFOLD;
         claw5_vt->fort_rpt2    = &CLAWPACK5_RPT2ADV_MANIFOLD;
