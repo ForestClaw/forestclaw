@@ -26,15 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "disk_user.h"
 
 static
-void disk_patch_setup(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *patch,
-                      int blockno,
-                      int patchno)
+void disk_problem_setup(fclaw2d_global_t* glob)
 {
     const user_options_t* user = disk_get_options(glob);
-    advection_patch_setup_manifold(glob,patch,blockno,patchno,
-                                   user->claw_version);    
-
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
@@ -46,11 +40,25 @@ void disk_patch_setup(fclaw2d_global_t *glob,
     SETPROB();
 }
 
+static
+void disk_patch_setup(fclaw2d_global_t *glob,
+                      fclaw2d_patch_t *patch,
+                      int blockno,
+                      int patchno)
+{
+    const user_options_t* user = disk_get_options(glob);
+    advection_patch_setup_manifold(glob,patch,blockno,patchno,
+                                   user->claw_version);    
+}
+
 
 void disk_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);    
     patch_vt->setup = disk_patch_setup;    
+
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+    fclaw_vt->problem_setup = disk_problem_setup;
     
     const user_options_t* user = disk_get_options(glob);
     if (user->claw_version == 4)
