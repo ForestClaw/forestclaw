@@ -19,6 +19,7 @@ c     # Map to [-1,1]x[-1,1]
 c     # Get circle of radius sqrt(2.d0)
       call mapc2p_disk_circle(xc,yc,xp,yp)
 
+c     # Scale to get unit circle.
       xp = xp/sqrt(2.d0)
       yp = yp/sqrt(2.d0)
       zp = 0

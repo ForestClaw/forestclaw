@@ -5,9 +5,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 static int
@@ -68,11 +65,10 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     double xc1, yc1, zc1;
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
-
     /* Unit square in [-1,1] x [-1,1] */
     MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
 
-    scale_map(cont, xp,yp,zp);
+    /* Shift by (1,1,0) to [0,2]x[0,2] */
     shift_map(cont, xp,yp,zp);
 }
 
@@ -95,8 +91,5 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t *brick,
 }
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif

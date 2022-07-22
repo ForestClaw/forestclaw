@@ -63,7 +63,13 @@ fclaw2d_map_c2m_pillowdisk5(fclaw2d_map_context_t * cont, int blockno,
                                 double xc, double yc,
                                 double *xp, double *yp, double *zp)
 {
+<<<<<<< Updated upstream
     double alpha = cont->user_double[0];
+=======
+
+    /* Unit disk centered at (0,0) */
+    double alpha = cont->user_double[0];    
+>>>>>>> Stashed changes
     MAPC2M_PILLOWDISK5(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
     scale_map(cont, xp,yp,zp);
@@ -72,6 +78,10 @@ fclaw2d_map_c2m_pillowdisk5(fclaw2d_map_context_t * cont, int blockno,
 
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+<<<<<<< Updated upstream
+=======
+                                                   const double shift[],
+>>>>>>> Stashed changes
                                                    const double rotate[],
                                                    const double alpha)
 {
@@ -84,6 +94,10 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
     cont->user_double[0] = alpha;
 
     set_scale(cont, scale);
+<<<<<<< Updated upstream
+=======
+    set_shift(cont, shift);
+>>>>>>> Stashed changes
     set_rotate(cont, rotate);
 
     return cont;
