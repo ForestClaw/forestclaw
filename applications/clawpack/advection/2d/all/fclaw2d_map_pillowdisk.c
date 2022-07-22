@@ -66,12 +66,12 @@ fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
     MAPC2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
 
     /* These can probably be replaced by C functions at some point. */
-    scale_map(cont, xp,yp,zp);
-    rotate_map(cont, xp,yp,zp);
+    shift_map(cont, xp,yp,zp);
+    //rotate_map(cont, xp,yp,zp);
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double shift[],
                                                   const double rotate[])
 {
     fclaw2d_map_context_t *cont;
@@ -80,7 +80,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
     cont->query = fclaw2d_map_query_pillowdisk;
     cont->mapc2m = fclaw2d_map_c2m_pillowdisk;
 
-    set_scale(cont, scale);
+    set_shift(cont, shift);
     set_rotate(cont, rotate);
 
     return cont;
