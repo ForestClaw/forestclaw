@@ -27,15 +27,8 @@ c     #     0.1  otherwise
                 ylow = ylower + (j-1)*dy
                 call cellave2(blockno,xlow,ylow,dx,dy,w)
                 q(i,j,mq) = w
-                if (blockno .eq. 2) then
-                      write(6,*) w
-                endif
-c                if (blockno .eq. 1) then
-c                    q(i,j,mq) = 1
-c                endif
              enddo
           enddo
        enddo
-       stop
 
        end

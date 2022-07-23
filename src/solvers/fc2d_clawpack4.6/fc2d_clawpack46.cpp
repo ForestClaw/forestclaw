@@ -84,10 +84,6 @@ void clawpack46_qinit(fclaw2d_global_t *glob,
 	int maxmy = my;
 
 	/* Call to classic Clawpack 'qinit' routine.  This must be user defined */
-	if (blockno > 0)
-	{
-		printf("in clawpack46 : blockno = %d\n",blockno);
-	}
 	CLAWPACK46_SET_BLOCK(&blockno);
 	claw46_vt->fort_qinit(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
 						  &maux,aux);
