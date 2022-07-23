@@ -8,8 +8,14 @@ N_filament = N;
 reverse_flow = false;
 
 th = linspace(0,2*pi,N)';
-x = 0.25*cos(th) + 0.5;
-y = 0.25*sin(th) + 1;
+
+R_init = 0.25;
+xc_init = 0.5;
+yc_init = 1;
+
+% Initial disk of radius
+x = R_init*cos(th) + xc_init;
+y = R_init*sin(th) + yc_init;
 
 dir = 1;
 dir_filament = dir;
@@ -35,7 +41,8 @@ plot(xout,yout,'k-','linewidth',1);
 axis([0 2 0 2]);
 daspect([1 1 1]);
 
-area_init = pi*0.25^2;
+% Area of the initial disk of radius 0.25, centered at (0.5,1).  
+area_init = pi*R_init^2;
 area_init2 = polyarea(x,y);
 
 area_end = polyarea(xout,yout);
@@ -51,7 +58,7 @@ if (reverse_flow)
     dir = -1;
     figure(3);
     p0 = pout(end,:)';
-    area_init = pi*0.25^2;
+    area_init = pi*R_init^2;
     [tout,pout] = ode45(@f_rhs,[0,T],p0,opt);
 
     xout = pout(end,1:N);
@@ -90,6 +97,8 @@ r = sqrt((x-1).^2 + (y-1).^2);
 rx = (x-1)./r;
 ry = (y-1)./r;
 
+% u = dPsi/dy  = d(4/3*r^3)/dr*drdy
+% v = -dPsi/dx = -d(4/3*r^3)/dr*drdx
 u = 4*r.^2.*ry;
 v = -4*r.^2.*rx;
 

@@ -13,7 +13,8 @@ c      psi = ((sin(pi*x))**2 * (sin(pi*y))**2) / pi
 c     # Rigid body rotation
 c      psi = r**2
 
-c     # Filament formation
+c     # Filament formation.  The filament is in a 2x2 box, so 
+c     # we have to scale "dx" and "dy" by four.  
       psi = (4.d0/3.d0)*r**3
 
 c      psi = x + y
