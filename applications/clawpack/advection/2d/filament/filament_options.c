@@ -34,7 +34,7 @@ filament_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0 = nomap; 1 = brick; 2 = five patch square [0]");
+                        "[user] 0 = cart (brick); 1 = 5-patch; 2 = 5-patch [0]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
@@ -44,7 +44,7 @@ filament_register (user_options_t *user, sc_options_t * opt)
 
     fclaw_options_add_double_array (opt, 0, "center", &user->center_string, "0 0",
                                     &user->center, 2, 
-                                    "Center point for bilinear mapping  [1,1]");
+                                    "Center point for bilinear mapping  [(0,0)]");
 
     user->is_registered = 1;
     return NULL;

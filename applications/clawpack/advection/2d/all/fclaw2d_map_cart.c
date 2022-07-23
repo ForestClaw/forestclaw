@@ -72,6 +72,8 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     shift_map(cont, xp,yp,zp);
 }
 
+
+
 static void
 fclaw3dx_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
                      double xc,  double yc,  double zc,
@@ -83,11 +85,9 @@ fclaw3dx_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     double xc1, yc1, zc_zero;
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc_zero);
 
-
-    /* Unit cube in [-1,1] x [-1,1] x [-1,1] */
-    *xp = 2*xc1 - 1;
-    *yp = 2*yc1 - 1;
-    *zp = 2*zc - 1;
+    /* Unit square in [-1,1] x [-1,1] */
+    MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
+    *zp = zc;  /* Assume that zc is not mapped */
     
     /* Map to [ax,bx]x[ay,by]x[az,bz] */
     scale_map(cont, xp,yp,zp);

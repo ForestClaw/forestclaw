@@ -5,9 +5,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 
@@ -66,24 +63,15 @@ fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
     /* Unit disk centered at (0,0) */
     MAPC2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
 
-<<<<<<< Updated upstream
-    /* These can probably be replaced by C functions at some point. */
-    scale_map(cont, xp,yp,zp);
-    rotate_map(cont, xp,yp,zp);
-=======
 
     /* Shift center to (1,1) */
     scale_map(cont, xp, yp, zp);
     shift_map(cont, xp, yp, zp);
->>>>>>> Stashed changes
 }
 
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
-<<<<<<< Updated upstream
-=======
                                                   const double shift[],
->>>>>>> Stashed changes
                                                   const double rotate[])
 {
     fclaw2d_map_context_t *cont;
@@ -93,18 +81,12 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
     cont->mapc2m = fclaw2d_map_c2m_pillowdisk;
 
     set_scale(cont, scale);
-<<<<<<< Updated upstream
-=======
     set_shift(cont, shift);
->>>>>>> Stashed changes
     set_rotate(cont, rotate);
 
     return cont;
 }
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif

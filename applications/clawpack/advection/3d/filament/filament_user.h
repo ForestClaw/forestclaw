@@ -44,6 +44,11 @@ typedef struct user_options
 
     int claw_version;
 
+    double alpha;
+
+    double *center;
+    const char* center_string;
+
     int is_registered;
 
 } user_options_t;

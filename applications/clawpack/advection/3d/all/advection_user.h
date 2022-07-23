@@ -62,7 +62,31 @@ extern "C"
 {
 #endif
 
-/* Nothing yet */
+
+/* --------------------------------- Square mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+                                            const double scale[],
+                                            const double shift[]);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch5(const double scale[],
+                                                  const double shift[],
+                                                  const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+                                                   const double shift[],
+                                                   const double alpha);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+                                                const double scale[],
+                                                const double shift[],
+                                                const double center[]);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,5 @@
 set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/3d/all)
+set(all2d ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(filament3dx_f OBJECT 
   psi.f 
@@ -15,6 +16,9 @@ add_executable(filament3dx
   filament.cpp 
   filament_options.c 
   filament_user.cpp 
+  ${all2d}/fclaw2d_map_cart.c 
+  ${all2d}/fclaw2d_map_fivepatch.c 
+  ${all2d}/fclaw2d_map_bilinear.c 
   $<TARGET_OBJECTS:filament3dx_f>
 )
 set_target_properties(filament3dx PROPERTIES OUTPUT_NAME filament)
