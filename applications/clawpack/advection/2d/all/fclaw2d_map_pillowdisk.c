@@ -63,7 +63,6 @@ fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
     /* Unit disk centered at (0,0) */
     MAPC2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
 
-
     /* Shift center to (1,1) */
     scale_map(cont, xp, yp, zp);
     shift_map(cont, xp, yp, zp);

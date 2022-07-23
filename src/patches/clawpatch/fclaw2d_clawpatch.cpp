@@ -100,10 +100,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* ------------------------------- Static function defs ------------------------------- */
 
 /* Added to turn off time_interp */
-static int fill_ghost(int time_interp)
+static int fill_ghost(fclaw2d_global_t* glob, int time_interp)
 {
-	//return !time_interp;
-	return 1;
+	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	if (fclaw_opt->timeinterp2fillghost)
+		/* This will always fill ghost cells using data from "qsync", which is either 
+		   coarse grid data at time step, or time interpolated data */
+		return 1;
+	else
+		/* Only fill ghost cells with neighboring data if not doing time interpolation. 
+		  If doing time interpolation, then fine grid data at intermediate time steps 
+		  will be filled in some other way (.e.g. by advancing the solution in ghost 
+		  cells.) */
+		return !time_interp;
 }
 
 
@@ -509,7 +518,7 @@ void clawpatch_copy_face(fclaw2d_global_t *glob,
 	double *qneighbor;
 	fclaw2d_clawpatch_timesync_data(glob,neighbor_patch,time_interp,&qneighbor,&meqn);
 
-	if (fill_ghost(time_interp))
+	if (fill_ghost(glob,time_interp))
 	{
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2		
@@ -599,7 +608,7 @@ void clawpatch_interpolate_face(fclaw2d_global_t *glob,
 	int my = clawpatch_opt->my;
 	int mbc = clawpatch_opt->mbc;
 
-	if (fill_ghost(time_interp))
+	if (fill_ghost(glob,time_interp))
 	{
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
@@ -639,7 +648,7 @@ void clawpatch_copy_corner(fclaw2d_global_t *glob,
 	double *qcorner;
 	fclaw2d_clawpatch_timesync_data(glob,corner_patch,time_interp,&qcorner,&meqn);
 
-	if (fill_ghost(time_interp))
+	if (fill_ghost(glob,time_interp))
 	{
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 #if PATCH_DIM == 2
@@ -677,7 +686,7 @@ void clawpatch_average_corner(fclaw2d_global_t *glob,
 
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 	int manifold = fclaw_opt->manifold;
-	if (fill_ghost(time_interp))
+	if (fill_ghost(glob,time_interp))
 	{
 		int refratio = 2;
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
@@ -730,7 +739,7 @@ void clawpatch_interpolate_corner(fclaw2d_global_t* glob,
 
 	double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
 
-	if (fill_ghost(time_interp))
+	if (fill_ghost(glob,time_interp))
 	{
 		int refratio = 2;
 		fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
