@@ -54,6 +54,10 @@ subroutine fclaw3d_metric_fort_compute_mesh(mx,my,mz,mbc, &
                 call fclaw3d_map_c2m(map_context_ptr, &
                                      blockno,xc,yc,zc,xd1,yd1,zd1)
 
+                write(6,*) xc,yc,zc
+                write(6,*) xd1, yd1, zd1
+                write(6,*) ' '
+
                 !! whole integer indices are cell centers. 
                 if (abs(mod(i,2)) .eq. 1) then
                     !! # For odd values mesh values
@@ -70,6 +74,7 @@ subroutine fclaw3d_metric_fort_compute_mesh(mx,my,mz,mbc, &
             end do
         end do
     end do
+    stop
 end subroutine fclaw3d_metric_fort_compute_mesh
 
 !! ----------------------------------------------------------
@@ -593,7 +598,7 @@ double precision function hex_compute_volume(hex)
     double precision hex(0:1,0:1,0:1,3)
     double precision u(3),v(3),w(3), p(3), q(3), r(3)
 
-    integer i,j,k,ip,jp,kp,m
+    integer i,j,k,ip,jp,kp,m, ii, jj, kk
 
     do j = 1,3
         u(j) = hex(0,1,1,j) - hex(0,0,0,j)
@@ -627,6 +632,20 @@ double precision function hex_compute_volume(hex)
         end do
     end do
     volume = volume/2.d0
+
+    if (volume .eq. 0) then
+        do ii = 0,1
+            do jj = 0,1
+                do kk = 0,1
+                    write(6,*) hex(ii,jj,kk,1)
+                    write(6,*) hex(ii,jj,kk,2)
+                    write(6,*) hex(ii,jj,kk,3)
+                end do
+            end do
+        end do
+        write(6,*) 'volume is zero'
+        stop
+    endif
 
     hex_compute_volume = volume
 end function hex_compute_volume

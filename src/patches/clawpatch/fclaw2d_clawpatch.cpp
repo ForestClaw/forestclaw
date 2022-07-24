@@ -376,8 +376,8 @@ void clawpatch_build(fclaw2d_global_t *glob,
 
 	if (fclaw_opt->manifold)
 	{ 
-		fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
 		fclaw2d_metric_patch_setup(glob,patch,blockno,patchno);
+		fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
 	}
 
 	fclaw2d_clawpatch_time_sync_setup(glob,patch,blockno,patchno);

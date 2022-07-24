@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #elif PATCH_DIM == 3 && REFINE_DIM == 2
 
-#define METRIC_VTABLE_NAME "fclaw3dx_metric"
+#define METRIC_VTABLE_NAME "fclaw3d_metric"
 
 #include "fclaw3d_metric.h"
 #include "fclaw3d_metric.hpp"
@@ -354,7 +354,12 @@ void fclaw2d_metric_patch_setup(fclaw2d_global_t* glob,
     /* In 2d : Surface normals and tangents at each face
        In 3d : Volume, face areas, and rotation matrix for each face. 
     */
-    metric_vt->compute_basis(glob,patch,blockno,patchno);
+    if (metric_vt->compute_basis != NULL)
+    {
+        printf("fclaw2d_metric_patch_setup : \n");
+        metric_vt->compute_basis(glob,patch,blockno,patchno);
+    }
+
 }
 
 
@@ -379,7 +384,8 @@ void fclaw2d_metric_patch_setup_from_fine(fclaw2d_global_t *glob,
 #endif
 
     metric_vt->compute_mesh(glob,coarse_patch,blockno,coarse_patchno);
-    metric_vt->compute_basis(glob,coarse_patch,blockno,coarse_patchno);
+    if (metric_vt->compute_basis != NULL)
+        metric_vt->compute_basis(glob,coarse_patch,blockno,coarse_patchno);
 }
 
 
@@ -401,7 +407,7 @@ void metric_vt_destroy(void* vt)
 fclaw2d_metric_vtable_t* fclaw2d_metric_vt(fclaw2d_global_t* glob)
 {
 	fclaw2d_metric_vtable_t* metric_vt = (fclaw2d_metric_vtable_t*) 
-	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_metric");
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw3d_metric");
 	FCLAW_ASSERT(metric_vt != NULL);
 	FCLAW_ASSERT(metric_vt->is_set != 0);
 	return metric_vt;
@@ -428,7 +434,12 @@ void fclaw2d_metric_vtable_initialize(fclaw2d_global_t* glob)
     metric_vt->compute_mesh          = fclaw3d_metric_compute_mesh_default;
     metric_vt->compute_volume        = fclaw3d_metric_compute_volume_default;
     metric_vt->compute_volume_ghost  = fclaw3d_metric_compute_volume_ghost_default;
-    metric_vt->compute_basis         = fclaw3d_metric_compute_basis_default;
+    metric_vt->compute_basis         = fclaw3d_metric_compute_basis_default;    
+
+    metric_vt->fort_compute_mesh     = &FCLAW3D_METRIC_FORT_COMPUTE_MESH;
+    metric_vt->fort_compute_volume   = &FCLAW3D_METRIC_FORT_COMPUTE_VOLUME;
+    metric_vt->fort_compute_basis    = &FCLAW3D_METRIC_FORT_COMPUTE_BASIS;
+
 #endif
 
     metric_vt->is_set = 1;

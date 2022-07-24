@@ -37,7 +37,6 @@ void fclaw3d_metric_compute_mesh_default(fclaw2d_global_t *glob,
                                          int patchno)
 {
     fclaw3d_metric_vtable_t *metric_vt = fclaw3d_metric_vt(glob);
-    FCLAW_ASSERT(metric_vt->fort_compute_mesh);
 
     int mx,my,mz,mbc;
     double xlower,ylower,zlower,dx,dy,dz;
@@ -52,6 +51,7 @@ void fclaw3d_metric_compute_mesh_default(fclaw2d_global_t *glob,
                                    &xp,&yp,&zp,&xd,&yd,&zd,&volume,&facearea);
 
     /* Compute centers and corners of mesh cell */
+    FCLAW_ASSERT(metric_vt->fort_compute_mesh != NULL);
     metric_vt->fort_compute_mesh(&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,
                                  &dx,&dy,&dz,
                                  &blockno,xp,yp,zp,xd,yd,zd);
