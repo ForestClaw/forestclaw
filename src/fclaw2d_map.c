@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
-fclaw2d_map_query (fclaw2d_map_context_t ** pcont,
+FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** pcont,
                    const int *query_identifier, int *iresult)
 {
     fclaw2d_map_context_t *cont = *pcont;

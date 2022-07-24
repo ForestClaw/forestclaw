@@ -11,6 +11,7 @@ extern "C"
 static int
 fclaw2d_map_query_pillowdisk (fclaw2d_map_context_t * cont, int query_identifier)
 {
+
     switch (query_identifier)
     {
     case FCLAW2D_MAP_QUERY_IS_USED:
@@ -66,6 +67,22 @@ fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
     /* Shift center to (1,1) */
     scale_map(cont, xp, yp, zp);
     shift_map(cont, xp, yp, zp);
+
+}
+
+static void
+fclaw3dx_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
+                      double xc, double yc, double zc,
+                      double *xp, double *yp, double *zp)
+{
+    /* Unit disk centered at (0,0) */
+    MAPC2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
+    *zp = zc;
+
+    /* Shift center to (1,1) */
+    scale_map(cont, xp, yp, zp);
+    shift_map(cont, xp, yp, zp);
+
 }
 
 
@@ -78,6 +95,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowdisk;
     cont->mapc2m = fclaw2d_map_c2m_pillowdisk;
+    cont->mapc2m_3dx = fclaw3dx_map_c2m_pillowdisk;
 
     set_scale(cont, scale);
     set_shift(cont, shift);

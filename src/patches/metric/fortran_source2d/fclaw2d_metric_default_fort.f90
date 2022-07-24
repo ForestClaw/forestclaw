@@ -172,7 +172,7 @@ subroutine fclaw2d_metric_fort_compute_area_general(mx,my,mbc, &
                         do jcell = 0,1
                             do m = 1,3
                                 quad(icell,jcell,m) = & 
-                                     quadstore(ii+icell,jj+jcell,1)
+                                     quadstore(ii+icell,jj+jcell,m)
                             end do
                         end do
                     end do

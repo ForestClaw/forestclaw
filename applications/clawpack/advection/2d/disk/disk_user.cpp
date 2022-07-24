@@ -54,11 +54,11 @@ void disk_patch_setup(fclaw2d_global_t *glob,
 
 void disk_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);    
-    patch_vt->setup = disk_patch_setup;    
-
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = disk_problem_setup;
+
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);    
+    patch_vt->setup = disk_patch_setup;    
     
     const user_options_t* user = disk_get_options(glob);
     if (user->claw_version == 4)
