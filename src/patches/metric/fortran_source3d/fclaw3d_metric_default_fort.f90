@@ -36,6 +36,7 @@ subroutine fclaw3d_metric_fort_compute_mesh(mx,my,mz,mbc, &
     dxf = dx/2.d0
     dyf = dy/2.d0
     dzf = dz/2.d0
+
     do i = -2*mbc-1,2*(mx+mbc+1)+1
         do j = -2*mbc-1,2*(my+mbc+1)+1
             do k = -2*mbc-1,2*(mz+mbc+1) + 1
@@ -54,10 +55,6 @@ subroutine fclaw3d_metric_fort_compute_mesh(mx,my,mz,mbc, &
                 call fclaw3d_map_c2m(map_context_ptr, &
                                      blockno,xc,yc,zc,xd1,yd1,zd1)
 
-                write(6,*) xc,yc,zc
-                write(6,*) xd1, yd1, zd1
-                write(6,*) ' '
-
                 !! whole integer indices are cell centers. 
                 if (abs(mod(i,2)) .eq. 1) then
                     !! # For odd values mesh values
@@ -74,7 +71,6 @@ subroutine fclaw3d_metric_fort_compute_mesh(mx,my,mz,mbc, &
             end do
         end do
     end do
-    stop
 end subroutine fclaw3d_metric_fort_compute_mesh
 
 !! ----------------------------------------------------------
@@ -290,6 +286,7 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
 
     double precision area(3)
 
+
     do j = -mbc,my+mbc+1
         do i = -mbc,mx+mbc+1
             do k = -mbc,mz+mbc+1
@@ -308,14 +305,27 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
                 end do
 
                 volume(i,j,k) = hex_compute_volume(hex)
+                !! do ii = 0,1
+                !!     do jj = 0,1
+                !!         do kk = 0,1
+                !!             write(6,100) hex(ii,jj,kk,1), hex(ii,jj,kk,2), hex(ii,jj,kk,3)
+                !!         end do
+                !!     end do
+                !! end do
+                !! write(6,*) volume(i,j,k)
+                !! write(6,*) ' '
+
 
                 call hex_compute_surf_area(hex,area)
                 do m = 1,3
-                    faceareas(i,j,k,m) = area(m)
+                    faceareas(i,j,k,m) = area(m)                    
                 end do
+                !! Face areas look okay
+                !! write(6,100) faceareas(i,j,k,1), faceareas(i,j,k,2), faceareas(i,j,k,3)
             end do
         end do
     end do
+!! 100 format(3E24.8)                
 end subroutine fclaw3d_metric_fort_compute_volume_affine
 
 !! ---------------------------------------------------------
@@ -520,9 +530,9 @@ subroutine hex_compute_basis(hex,rot)
             do j = 1,3
                 Jinv(i,j) = rhs(ni,j)
             end do
-            write(10,'(3F16.8)') (Jinv(i,j),j=1,3)
+            !!write(10,'(3F16.8)') (Jinv(i,j),j=1,3)
         end do
-        write(10,*) ' '
+        !!write(10,*) ' '
 
         !! # Do Gram-Schmidt on rows of Jinv, to get orthogonal basis.
         do i = 1,3
@@ -598,7 +608,7 @@ double precision function hex_compute_volume(hex)
     double precision hex(0:1,0:1,0:1,3)
     double precision u(3),v(3),w(3), p(3), q(3), r(3)
 
-    integer i,j,k,ip,jp,kp,m, ii, jj, kk
+    integer i,j,k,ip,jp,kp,m
 
     do j = 1,3
         u(j) = hex(0,1,1,j) - hex(0,0,0,j)
@@ -632,20 +642,6 @@ double precision function hex_compute_volume(hex)
         end do
     end do
     volume = volume/2.d0
-
-    if (volume .eq. 0) then
-        do ii = 0,1
-            do jj = 0,1
-                do kk = 0,1
-                    write(6,*) hex(ii,jj,kk,1)
-                    write(6,*) hex(ii,jj,kk,2)
-                    write(6,*) hex(ii,jj,kk,3)
-                end do
-            end do
-        end do
-        write(6,*) 'volume is zero'
-        stop
-    endif
 
     hex_compute_volume = volume
 end function hex_compute_volume
@@ -693,6 +689,8 @@ subroutine hex_compute_surf_area(hex,area)
 
         !! area of face is length of cross product of vectors on 
         !! ruled surface.  
+        !! This is done by computing the cross product of four pairs
+        !! vectors at each of the four corners, and then averaging.  
         area(n) = 0
         do i = 0,1
             do j = 0,1

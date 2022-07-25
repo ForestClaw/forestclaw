@@ -122,6 +122,7 @@ void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
     mp->mz = mz;
     mp->zlower = zlower;
     mp->zupper = xupper;
+    mp->dz = (mp->zupper - mp->zlower)/mp->mz;
 #endif    
 
     /* Set up area for storage - this is needed for ghost patches, 
@@ -356,10 +357,8 @@ void fclaw2d_metric_patch_setup(fclaw2d_global_t* glob,
     */
     if (metric_vt->compute_basis != NULL)
     {
-        printf("fclaw2d_metric_patch_setup : \n");
         metric_vt->compute_basis(glob,patch,blockno,patchno);
     }
-
 }
 
 

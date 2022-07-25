@@ -40,10 +40,11 @@ void fclaw3d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 
     int mx,my,mz,mbc;
     double xlower,ylower,zlower,dx,dy,dz;
-    fclaw3d_metric_patch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
-                                    &xlower,&ylower,&zlower,
-                                    &dx,&dy,&dz);
-
+    fclaw3d_metric_patch_grid_data(glob,patch,
+                                   &mx,&my,&mz,&mbc,
+                                   &xlower,&ylower,&zlower,
+                                   &dx,&dy,&dz);
+ 
     double *xp,*yp,*zp;
     double *xd,*yd,*zd;
     double *volume, *facearea; /* Not used here */
