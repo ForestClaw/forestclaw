@@ -1,6 +1,6 @@
 subroutine claw3_setaux_manifold(mbc,mx,my,mz, & 
         xlower,ylower,zlower,dx,dy,dz,maux, & 
-        aux,blockno, xd,yd,zd,xp, yp, zp, area)
+        aux,blockno, xd,yd,zd,xp, yp, zp, volume)
    implicit none
 
    integer mbc, mx, my, mz, maux
@@ -16,7 +16,7 @@ subroutine claw3_setaux_manifold(mbc,mx,my,mz, &
    double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
    double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
-   double precision area(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc)
+   double precision volume(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc)
 
    integer i,j, k
    double precision dxdydz, t
@@ -26,7 +26,7 @@ subroutine claw3_setaux_manifold(mbc,mx,my,mz, &
    do i = 1-mbc,mx+mbc
       do j = 1-mbc,my+mbc
          do k = 1-mbc,mz+mbc
-            aux(i,j,k,1) = area(i,j,k)/dxdydz
+            aux(i,j,k,1) = volume(i,j,k)/dxdydz
          end do
       end do
    end do

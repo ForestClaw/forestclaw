@@ -13,6 +13,8 @@ setpatchbordercolor('k');
 
 showcubes(5);
 showslices;
+hidesurfs
+view(2);
 
 
 caxis([0,1]);
