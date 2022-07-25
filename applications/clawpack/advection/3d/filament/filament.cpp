@@ -48,6 +48,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     int mx = clawpatch_opt->mx;
     int minlevel = fclaw_opt->minlevel;
+    int check = mi*mx*pow_int(2,minlevel);
 
     switch (user->example) 
     {
@@ -73,8 +74,9 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         break;
     case 2:
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
-        if (mi*pow_int(mx,minlevel) < 32)
+        if (check < 32)
         {
+            printf("mi*pow_int(mx,minlevel) = %d\n",check);
             fclaw_global_essentialf("The five patch mapping requires mi*mx*2^minlevel > 32\n");
             exit(0);
 

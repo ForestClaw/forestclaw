@@ -41,15 +41,17 @@ ContourValues = [];   % draw contour lines from 'afterframe.m'
 % The next three parameters are vectors of x,y,z coordinates of 2d slices
 % to be displayed for PlotType = 1,2,3.
 
+% Note : Supply computational coordinates.  This is a bit of a disaster
+% for multiblock domains ...
 xSliceCoords = [];
 ySliceCoords = [];
 zSliceCoords = [0.5];
 
 IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
 
-  IsosurfAlphas    =  [1];     % Transparency of each surface
+IsosurfAlphas    =  [1];     % Transparency of each surface
                                           % (0=clear; 1=opaque)
                                           % NOTE: Your system must be able to
                                           % use the OpenGL Renderer.
 
-  IsosurfColors    = 'w';      % Colors for each surface.
+IsosurfColors    = 'w';      % Colors for each surface.

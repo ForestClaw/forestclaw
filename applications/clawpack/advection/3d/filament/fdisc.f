@@ -11,7 +11,6 @@
 
       cont = fclaw_map_get_context()
 
-
       if (fclaw2d_map_is_used(cont) .ne. 0) then
          call fclaw3d_map_c2m(cont,
      &         blockno,xc,yc,zc,xp,yp,zp)
