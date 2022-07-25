@@ -83,6 +83,7 @@ subroutine clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves,&
     ! depending on transverse direction:
     mcapa = manifold
     iuvw = ixyz + icoor - 1
+    
     if (iuvw.gt.3) iuvw = iuvw-3
 
     do i=2-mbc,mx+mbc

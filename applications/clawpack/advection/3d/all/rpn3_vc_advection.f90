@@ -60,7 +60,7 @@ subroutine clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr, &
     mcapa = manifold
     do i = 2-mbc, mx+mbc
         wave(1,1,i) = ql(1,i) - qr(1,i-1)
-        s(1,i) = auxl(ixyz,i)
+        s(1,i) = auxl(ixyz+mcapa,i)
         ! The flux difference df = s*wave all goes in the downwind direction:
         amdq(1,i) = dmin1(auxl(mcapa+iface,i), 0.d0) * wave(1,1,i)
         apdq(1,i) = dmax1(auxl(mcapa+iface,i), 0.d0) * wave(1,1,i)

@@ -87,6 +87,9 @@ subroutine clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc, &
             bmasdq(1,i) = dmin1(aux2(iuvw+mcapa,i1,2),0.d0)*asdq(1,i)
             bpasdq(1,i) = dmax1(aux2(iuvw+mcapa,i1,3),0.d0)*asdq(1,i)
         endif
+        if (icoor .eq. 3) then
+            !!write(6,*) aux2(iuvw+mcapa,i1,2),aux3(iuvw+mcapa,i1,2), aux2(iuvw+mcapa,i1,3)
+        endif
     end do
 
     return
