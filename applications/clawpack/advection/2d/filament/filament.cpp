@@ -57,7 +57,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                     fclaw_opt->shift);
         break;
     case 1:
-        if (mi*pow_int(mx,minlevel) < 32)
+        if (mi*mx*pow_int(2,minlevel) < 32)
         {
             fclaw_global_essentialf("The five patch mapping requires mi*mx*2^minlevel > 32\n");
             exit(0);
