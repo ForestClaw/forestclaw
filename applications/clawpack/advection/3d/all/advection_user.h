@@ -63,6 +63,13 @@ extern "C"
 #endif
 
 
+void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
+                                          fclaw2d_patch_t *patch,
+                                          int block,
+                                          int patchno,
+                                          int claw_version);
+
+
 /* --------------------------------- Square mappings ---------------------------------- */
 
 fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);

@@ -111,17 +111,20 @@ void CLAWPACK5_RPT2ADV_MANIFOLD(const int* ixy, const int* imp,
                                 double aux3[],  double asdq[],
                                 double bmasdq[], double bpasdq[]);
 
-#define USER46_SETAUX_MANIFOLD FCLAW_F77_FUNC(user46_setaux_manifold, \
-                                               USER46_SETAUX_MANIFOLD)
+#define CLAW3_SETAUX_MANIFOLD FCLAW_F77_FUNC(claw3_setaux_manifold, \
+                                               CLAW3_SETAUX_MANIFOLD)
 
-void USER46_SETAUX_MANIFOLD(const int* mbc,
-                            const int* mx, const int* my,
+void CLAW3_SETAUX_MANIFOLD(const int* mbc,
+                            const int* mx, const int* my, const int*mz,
                             const double* xlower, const double* ylower,
+                            const double* zlower,
                             const double* dx, const double* dy,
+                            const double *dz,
                             const int* maux, double aux[],
                             const int* blockno,
                             double xd[], double yd[], double zd[],
-                            double area[]);
+                            double xp[], double yp[], double zp[],
+                            double volume[]);
 
 
 #define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \

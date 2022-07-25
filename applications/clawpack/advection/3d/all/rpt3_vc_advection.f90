@@ -66,22 +66,26 @@ subroutine clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc, &
     dimension   aux2(maux,1-mbc:maxm+mbc,3)
     dimension   aux3(maux,1-mbc:maxm+mbc,3)
 
-    integer :: iuvw, i, i1
+    integer manifold
+    common /com_manifold/ manifold
+
+    integer :: iuvw, i, i1, mcapa
 
     ! set iuvw = 1 for u, 2 for v, 3 for w component of velocity
     ! depending on transverse direction:
+    mcapa = manifold
     iuvw = ixyz + icoor - 1
     if (iuvw.gt.3) iuvw = iuvw-3
 
     do i=2-mbc,mx+mbc
         i1 = i-2+imp    !#  =  i-1 for amdq,  i for apdq
         if (icoor == 2) then  !! transverse dir. is y-like direction
-            bmasdq(1,i) = dmin1(aux2(iuvw,i1,2), 0.d0)*asdq(1,i)
-            bpasdq(1,i) = dmax1(aux3(iuvw,i1,2), 0.d0)*asdq(1,i)
+            bmasdq(1,i) = dmin1(aux2(iuvw+mcapa,i1,2), 0.d0)*asdq(1,i)
+            bpasdq(1,i) = dmax1(aux3(iuvw+mcapa,i1,2), 0.d0)*asdq(1,i)
         else !! icoor == 3  !! transverse dir. is z-like direction
             !! quanities split into cmasdq and cpasdq
-            bmasdq(1,i) = dmin1(aux2(iuvw,i1,2),0.d0)*asdq(1,i)
-            bpasdq(1,i) = dmax1(aux2(iuvw,i1,3),0.d0)*asdq(1,i)
+            bmasdq(1,i) = dmin1(aux2(iuvw+mcapa,i1,2),0.d0)*asdq(1,i)
+            bpasdq(1,i) = dmax1(aux2(iuvw+mcapa,i1,3),0.d0)*asdq(1,i)
         endif
     end do
 
