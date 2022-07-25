@@ -11,7 +11,7 @@ showpatchborders;
 setpatchborderprops('linewidth',1);
 setpatchbordercolor('k');
 
-showcubes;
+showcubes(5);
 showslices;
 
 

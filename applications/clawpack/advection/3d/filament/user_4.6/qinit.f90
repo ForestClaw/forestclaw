@@ -10,9 +10,9 @@ SUBROUTINE clawpack46_qinit(meqn,mbc,mx,my,mz,xlower,ylower,zlower, &
     INTEGER :: i, j, k, mq
     DOUBLE PRECISION :: xlow, ylow, zlow, w   
 
-    integer :: blockno
+    integer :: blockno, fc3d_clawpack46_get_block
 
-    blockno = 0
+    blockno = fc3d_clawpack46_get_block()
 
     DO mq = 1,meqn
         do k = 1-mbc,mz+mbc

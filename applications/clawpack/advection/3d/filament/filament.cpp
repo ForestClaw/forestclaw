@@ -27,11 +27,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user.h"
 
+#include <fc3d_clawpack46.h>
+
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
                                 user_options_t* user,
-                                fclaw3dx_clawpatch_options_t* clawpatch_opt)
+                                fclaw3dx_clawpatch_options_t* clawpatch_opt,
+                                fc3d_clawpack46_options_t *claw3_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -49,6 +52,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     switch (user->example) 
     {
     case 0:
+        FCLAW_ASSERT(claw3_opt->mcapa == 0);
+        FCLAW_ASSERT(fclaw_opt->manifold == 0);
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_nomap();
@@ -179,7 +184,11 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt,clawpatch_opt);
+        domain = create_domain(mpicomm, 
+                               fclaw_opt, 
+                               user_opt,
+                               clawpatch_opt,
+                               claw46_opt);
             
         glob = fclaw2d_global_new();
         fclaw2d_global_store_domain(glob, domain);
