@@ -99,6 +99,25 @@ fclaw2d_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
+static void
+fclaw3dx_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
+                         double xc, double yc, double zc,
+                         double *xp, double *yp, double *zp)
+{
+    /* Brick mapping to computational coordinates [0,1]x[0,1] */
+    double center[2];
+    center[0] = cont->user_double[0];
+    center[1] = cont->user_double[1];
+
+    /* Map to unit square in [-1,1] x [-1,1], with middle point shifted to 
+       create four bilinear maps. */
+    MAPC2M_BILINEAR(&blockno,&xc,&yc,xp,yp,zp,center);
+    *zp = zc;
+
+    shift_map(cont, xp,yp,zp);
+}
+
+
 fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
                                                 const double scale[],
                                                 const double shift[],
@@ -109,6 +128,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
     cont = FCLAW_ALLOC_ZERO(fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_bilinear;
     cont->mapc2m = fclaw2d_map_c2m_bilinear;
+    cont->mapc2m_3dx = fclaw3dx_map_c2m_bilinear;
     cont->brick = brick;
 
 

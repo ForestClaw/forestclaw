@@ -76,6 +76,21 @@ fclaw2d_map_c2m_fivepatch(fclaw2d_map_context_t* cont, int blockno,
 
 }
 
+static void
+fclaw3dx_map_c2m_fivepatch(fclaw2d_map_context_t* cont, int blockno,
+                           double xc, double yc,double zc,
+                           double *xp, double *yp, double *zp)
+{
+    /* five patch square in [-1,1]x[-1,1] */
+    double alpha = cont->user_double[0];
+    MAPC2M_FIVEPATCH(&blockno,&xc,&yc,xp,yp,zp,&alpha);
+    *zp = zc;
+
+    /* Shift [-1,1]x[-1,1] to [0,2]x[0,2] */
+    shift_map(cont, xp,yp,zp);
+
+}
+
 
 fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
@@ -86,6 +101,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_fivepatch;
     cont->mapc2m = fclaw2d_map_c2m_fivepatch;
+    cont->mapc2m_3dx = fclaw3dx_map_c2m_fivepatch;
 
     set_scale(cont,scale);
     set_shift(cont,shift);
