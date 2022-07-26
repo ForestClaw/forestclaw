@@ -33,6 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
 #if PATCH_DIM == 2
 
 #define METRIC_VTABLE_NAME "fclaw2d_metric"
@@ -259,22 +263,12 @@ void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
 
 /* For 3d extruded mesh, this averages cell volumes */
 static
-#if PATCH_DIM == 2
 void metric_average_area_from_fine(fclaw2d_global_t *glob,
                                    fclaw2d_patch_t *fine_patches,
                                    fclaw2d_patch_t *coarse_patch,
                                    int blockno, 
                                    int coarse_patchno,
                                    int fine0_patchno)
-#elif PATCH_DIM == 3
-void metric_average_volume_from_fine(fclaw2d_global_t *glob,
-                                     fclaw2d_patch_t *fine_patches,
-                                     fclaw2d_patch_t *coarse_patch,
-                                     int blockno, 
-                                     int coarse_patchno,
-                                     int fine0_patchno)
-#endif
-
 {
     fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     int mx,my, mbc;
@@ -283,30 +277,29 @@ void metric_average_volume_from_fine(fclaw2d_global_t *glob,
 #if PATCH_DIM == 2
     fclaw2d_metric_patch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                    &xlower,&ylower,&dx,&dy);
+    double *areacoarse = fclaw2d_metric_patch_get_area(glob, coarse_patch);
 #elif PATCH_DIM == 3
     int mz;
     double zlower, dz;
     fclaw3d_metric_patch_grid_data(glob,coarse_patch,&mx,&my,&mz,&mbc,
                                    &xlower,&ylower,&zlower,&dx,&dy,&dz);    
-#endif
-
-#if PATCH_DIM == 2
-    double *areacoarse = fclaw2d_metric_patch_get_area(glob, coarse_patch);
-
-    for(int igrid = 0; igrid < 4; igrid++)
-    {
-        double* areafine = fclaw2d_metric_patch_get_area(glob, &fine_patches[igrid]);
-
-        FCLAW2D_METRIC_FORT_AVERAGE_AREA(&mx,&my,&mbc,areacoarse,areafine,&igrid);
-    }
-    metric_vt->compute_area_ghost(glob,coarse_patch,blockno,coarse_patchno);
-#elif PATCH_DIM == 3
     double *volcoarse, *fa_coarse;
     fclaw3d_metric_patch_scalar(glob,coarse_patch,&volcoarse, &fa_coarse);
+#endif
 
-#if REFINE_DIM == 2
+
     for(int igrid = 0; igrid < 4; igrid++)
     {
+
+#if PATCH_DIM == 2
+        double* areafine = fclaw2d_metric_patch_get_area(glob, 
+                                                         &fine_patches[igrid]);
+        FCLAW2D_METRIC_FORT_AVERAGE_AREA(&mx,&my,&mbc,
+                                         areacoarse,
+                                         areafine,&igrid);
+#elif PATCH_DIM == 3
+#if REFINE_DIM == 2
+
         double *volfine, *fa_fine;
         fclaw3d_metric_patch_scalar(glob,&fine_patches[igrid],&volfine, &fa_fine);
 
@@ -314,15 +307,32 @@ void metric_average_volume_from_fine(fclaw2d_global_t *glob,
            This will be exact, since both volume and face areas are computing at 
            finest level resolution.
         */
-        FCLAW3DX_METRIC_FORT_AVERAGE_VOLUME(&mx,&my,&mz, &mbc,volcoarse,volfine, &igrid);
-        FCLAW3DX_METRIC_FORT_AVERAGE_FACEAREA(&mx,&my,&mz, &mbc,fa_coarse,fa_fine, &igrid);
-    }
-    metric_vt->compute_volume_ghost(glob,coarse_patch,blockno,coarse_patchno);
+        FCLAW3DX_METRIC_FORT_AVERAGE_VOLUME(&mx,&my,&mz, &mbc,
+                                            volcoarse,volfine, 
+                                            &igrid);
+#if 0
+        FCLAW3DX_METRIC_FORT_AVERAGE_FACEAREA(&mx,&my,&mz, &mbc,
+                                              fa_coarse,fa_fine, &igrid);
+#endif                                              
 #else
-    fclaw_global_essential("Average area/vol from fine not implemented for full octree\n");
-    exit(0);
+        fclaw_global_essential("Average area/vol from fine not implemented for full octree\n");
+        exit(0);
 #endif
+
+#endif  /* End PATCH_DIM == 3 */
+    }
+
+/* Compute volume from scratch in second layer of coarse grid ghost cells. These
+   are not averaged from the fine grid (first layer can be averaged from fine
+   grid, however)
+*/
+#if PATCH_DIM == 2
+    metric_vt->compute_area_ghost(glob,coarse_patch,blockno,coarse_patchno);
+#elif PATCH_DIM == 3
+    metric_vt->compute_volume_ghost(glob,coarse_patch,blockno,coarse_patchno);
 #endif
+
+
 }
 
 /* --------------------------------- Public interface  -------------------------------- */
@@ -342,49 +352,70 @@ void fclaw2d_metric_patch_compute_area (fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_metric_patch_setup(fclaw2d_global_t* glob,
+void fclaw2d_metric_patch_build(fclaw2d_global_t* glob,
                                 fclaw2d_patch_t* patch,
                                 int blockno,
                                 int patchno)
 {
     fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
 
-    /* Setup (xp,yp,zp) and (xd,yd,zd) */
+    /* Compute (xp,yp,zp) and (xd,yd,zd) */
     metric_vt->compute_mesh(glob,patch,blockno,patchno);
 
-    /* In 2d : Surface normals and tangents at each face
-       In 3d : Volume, face areas, and rotation matrix for each face. 
-    */
+    /* Compute areas/volumes ($$$) from scratch. 
+       Note : These are all computed on finest level 
+       mesh and averaged down to coarser meshes.  This is 
+       required from geometric consistency */
+#if PATCH_DIM == 2    
+    /* Compute 2d patch areas */
+    metric_vt->compute_area(glob,patch,blockno,patchno);
+#elif PATCH_DIM == 3    
+    /* Compute 3d volumes and 2d face areas */
+    metric_vt->compute_volume(glob,patch,blockno,patchno);
+#endif
     if (metric_vt->compute_basis != NULL)
     {
+        /* In 2d : Surface normals, tangents, edge lengths, 
+           surface normals and curvature. 
+
+           In 3d : Rotation matrix at each face. 
+        */
         metric_vt->compute_basis(glob,patch,blockno,patchno);
     }
 }
 
 
 
-void fclaw2d_metric_patch_setup_from_fine(fclaw2d_global_t *glob,
+void fclaw2d_metric_patch_build_from_fine(fclaw2d_global_t *glob,
                                           fclaw2d_patch_t *fine_patches,
                                           fclaw2d_patch_t *coarse_patch,
                                           int blockno,
                                           int coarse_patchno,
                                           int fine0_patchno)
 {
+    /* This routine does a complete build using fine grid data to average
+       volumes and in 3d, face areas */
     fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
 
-#if PATCH_DIM == 2
+    /* Compute xd,yd,zd, xp,yp,zp */
+    metric_vt->compute_mesh(glob,coarse_patch,blockno,coarse_patchno);
+
+    /* Compute areas/volumes by averaging from finer grids  */
+
     metric_average_area_from_fine(glob,fine_patches,coarse_patch,
                                   blockno, coarse_patchno, 
                                   fine0_patchno);
-#elif PATCH_DIM == 3
-    metric_average_volume_from_fine(glob,fine_patches,coarse_patch,
-                                    blockno, coarse_patchno, 
-                                    fine0_patchno);
-#endif
 
-    metric_vt->compute_mesh(glob,coarse_patch,blockno,coarse_patchno);
     if (metric_vt->compute_basis != NULL)
-        metric_vt->compute_basis(glob,coarse_patch,blockno,coarse_patchno);
+    {
+        /* In 2d : Surface normals and tangents at each face
+           In 3d : Rotation matrix for each face. 
+
+           Note : These are not averaged from finer grids, but are 
+           built from scratch here. 
+        */
+        metric_vt->compute_basis(glob,coarse_patch,blockno,coarse_patchno);        
+    }
 }
 
 

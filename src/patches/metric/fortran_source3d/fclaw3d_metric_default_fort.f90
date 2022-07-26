@@ -286,7 +286,6 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
 
     double precision area(3)
 
-
     do j = -mbc,my+mbc+1
         do i = -mbc,mx+mbc+1
             do k = -mbc,mz+mbc+1
@@ -305,27 +304,14 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
                 end do
 
                 volume(i,j,k) = hex_compute_volume(hex)
-                !! do ii = 0,1
-                !!     do jj = 0,1
-                !!         do kk = 0,1
-                !!             write(6,100) hex(ii,jj,kk,1), hex(ii,jj,kk,2), hex(ii,jj,kk,3)
-                !!         end do
-                !!     end do
-                !! end do
-                !! write(6,*) volume(i,j,k)
-                !! write(6,*) ' '
-
 
                 call hex_compute_surf_area(hex,area)
                 do m = 1,3
                     faceareas(i,j,k,m) = area(m)                    
                 end do
-                !! Face areas look okay
-                !! write(6,100) faceareas(i,j,k,1), faceareas(i,j,k,2), faceareas(i,j,k,3)
             end do
         end do
     end do
-!! 100 format(3E24.8)                
 end subroutine fclaw3d_metric_fort_compute_volume_affine
 
 !! ---------------------------------------------------------
@@ -804,7 +790,7 @@ subroutine fclaw3dx_metric_fort_average_volume(mx,my,mz, mbc, &
     r2 = refratio*refratio
     !! This only works for extruded mesh version.  
     !! We include one layer of ghost cells on the coarse grid 
-    do k = 1,mz
+    do k = 0,mz+1
         do j = 0,my/p4est_refineFactor+1
             do i = 0,mx/p4est_refineFactor +1
                 i1 = i+ic_add
@@ -823,11 +809,12 @@ subroutine fclaw3dx_metric_fort_average_volume(mx,my,mz, mbc, &
                     sum = sum + kf
                 end do
                 volcoarse(i1,j1,k) = sum
+                if (i1 .eq. 0 .or. i1 .eq. mx+1) then
+                    !! write(6,*) 'i1 = ', i1
+                endif
             end do
         end do
     end do
-
-    !! # Compute area in the ghost cells
 
 end subroutine fclaw3dx_metric_fort_average_volume
 
@@ -925,7 +912,5 @@ subroutine fclaw3dx_metric_fort_average_facearea(mx,my,mz, mbc, &
             end do
         end do
     end do
-
-    !! # Compute area in the ghost cells
 
 end subroutine fclaw3dx_metric_fort_average_facearea

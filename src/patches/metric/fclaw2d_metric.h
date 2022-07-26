@@ -135,7 +135,7 @@ void fclaw2d_metric_patch_define(struct fclaw2d_global* glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-void fclaw2d_metric_patch_setup(struct fclaw2d_global* glob,
+void fclaw2d_metric_patch_build(struct fclaw2d_global* glob,
 								struct fclaw2d_patch* this_patch,
 								int blockno,
 								int patchno);
@@ -150,7 +150,7 @@ void fclaw2d_metric_patch_setup(struct fclaw2d_global* glob,
  * @param[in] coarse_patchno the block number of the coarse patch
  * @param[in] fine0_patchno the patch number of the first fine patch
  */
-void fclaw2d_metric_patch_setup_from_fine(struct fclaw2d_global *glob,
+void fclaw2d_metric_patch_build_from_fine(struct fclaw2d_global *glob,
 										  struct fclaw2d_patch *fine_patches,
 										  struct fclaw2d_patch *coarse_coarse,
 										  int blockno,

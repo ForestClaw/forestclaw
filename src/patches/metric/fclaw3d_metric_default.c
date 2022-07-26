@@ -119,7 +119,8 @@ void fclaw3d_metric_compute_volume_default(fclaw2d_global_t *glob,
     double *xd,*yd,*zd;
     double *volume, *facearea;
     fclaw3d_metric_patch_mesh_data(glob,patch,
-                                   &xp,&yp,&zp,&xd,&yd,&zd,&volume,&facearea);
+                                   &xp,&yp,&zp,&xd,&yd,&zd,
+                                   &volume,&facearea);
 
     int ghost_only = 0;
     FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, 
@@ -162,7 +163,8 @@ void fclaw3d_metric_compute_volume_ghost_default(fclaw2d_global_t* glob,
     double *xd,*yd,*zd;
     double *volume, *faceareas;
     fclaw3d_metric_patch_mesh_data(glob,patch,
-                                   &xp,&yp,&zp,&xd,&yd,&zd,&volume,&faceareas);
+                                   &xp,&yp,&zp,&xd,&yd,&zd,
+                                   &volume,&faceareas);
 
     int ghost_only = 1;
     FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, 
