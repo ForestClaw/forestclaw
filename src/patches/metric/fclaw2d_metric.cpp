@@ -121,7 +121,7 @@ void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
 #if PATCH_DIM == 3
     mp->mz = mz;
     mp->zlower = zlower;
-    mp->zupper = xupper;
+    mp->zupper = zupper;
     mp->dz = (mp->zupper - mp->zlower)/mp->mz;
 #endif    
 
