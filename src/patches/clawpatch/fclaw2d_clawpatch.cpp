@@ -330,8 +330,12 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
 	if (fclaw_opt->manifold)
 	{
-		/* We pass in detailed info so that the metric patch doesn't have
-		to know about a clawpatch */
+		/*  
+			Allocate space for all metric terms. 
+
+		    Note: We pass in detailed info so that the metric patch 
+		    doesn't have to know about a clawpatch 
+		*/
 
 #if PATCH_DIM == 2
 		fclaw2d_metric_patch_define(glob,patch, 
@@ -372,14 +376,19 @@ void clawpatch_build(fclaw2d_global_t *glob,
 	fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
+	/* Allocate space for all required arrays */
 	clawpatch_define(glob,patch,blockno,patchno,build_mode);
 
 	if (fclaw_opt->manifold)
 	{ 
-		fclaw2d_metric_patch_setup(glob,patch,blockno,patchno);
-		fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
+		/* Computes mesh (xp,yp,zp,xd,yd,zd) and basis vectors */
+		fclaw2d_metric_patch_build(glob,patch,blockno,patchno);
+
+		/* Computes areas and volumes */
+		//fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
 	}
 
+	/* Setup for conservation correction */
 	fclaw2d_clawpatch_time_sync_setup(glob,patch,blockno,patchno);
 }
 
@@ -398,10 +407,14 @@ void clawpatch_build_from_fine(fclaw2d_global_t *glob,
 
 	if (fclaw_opt->manifold)
 	{
-		fclaw2d_metric_patch_setup_from_fine(glob, fine_patches, coarse_patch,
-											 blockno, coarse_patchno, fine0_patchno);
+		/* Average areas/volume from fine grid to coarse grid */
+		fclaw2d_metric_patch_build_from_fine(glob, fine_patches, 
+		                                     coarse_patch,
+											 blockno, coarse_patchno, 
+											 fine0_patchno);
 	}
 
+	/* Setup for conservation correction */
 	fclaw2d_clawpatch_time_sync_setup(glob,coarse_patch,blockno,coarse_patchno);
 }
 
@@ -1204,6 +1217,7 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 	}
 	/* Any metric terms we might need for the registers are packed */
 #if 0	
+    /* Setup for conservation correction */
 	fclaw2d_clawpatch_time_sync_setup(glob,this_patch,blockno,patchno);
 #endif	
 }
