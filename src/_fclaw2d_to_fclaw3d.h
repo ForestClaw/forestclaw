@@ -29,13 +29,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_metric_patch_scalar          fclaw3d_metric_patch_scalar
 #define fclaw2d_metric_patch_new             fclaw3d_metric_patch_new
 #define fclaw2d_metric_patch_delete          fclaw3d_metric_patch_delete
-#define fclaw2d_metric_patch_setup           fclaw3d_metric_patch_setup
-#define fclaw2d_metric_patch_setup_from_fine fclaw3d_metric_patch_setup_from_fine
+#define fclaw2d_metric_patch_build           fclaw3d_metric_patch_build
+#define fclaw2d_metric_patch_build_from_fine fclaw3d_metric_patch_build_from_fine
 #define fclaw2d_metric_vtable_initialize     fclaw3d_metric_vtable_initialize
 #define fclaw2d_metric_patch_get_area        fclaw3d_metric_patch_get_volume
 #define fclaw2d_metric_get_metric_patch      fclaw3d_metric_get_metric_patch
 #define fclaw2d_metric_patch_compute_area    fclaw3d_metric_patch_compute_volume
 #define fclaw2d_metric_vtable_initialize     fclaw3d_metric_vtable_initialize
+
+// static names
+#define metric_average_area_from_fine        metric_average_volume_from_fine
 
 // fclaw3d_metric.hpp
 #define fclaw2d_metric_patch_t               fclaw3d_metric_patch_t
