@@ -44,8 +44,8 @@ ContourValues = [];   % draw contour lines from 'afterframe.m'
 
 % Note : Supply computational coordinates.  This is a bit of a disaster
 % for multiblock domains ...
-xSliceCoords = [];
-ySliceCoords = [];
+xSliceCoords = [1.5];
+ySliceCoords = [1.5];
 zSliceCoords = [0.5];
 
 IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
@@ -56,3 +56,6 @@ IsosurfAlphas    =  [1];     % Transparency of each surface
                                           % use the OpenGL Renderer.
 
 IsosurfColors    = 'w';      % Colors for each surface.
+
+PlotBlockColors = 1;
+PlotParallelPartitions = 0;

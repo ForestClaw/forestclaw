@@ -1,4 +1,4 @@
-yrbcolormap
+% yrbcolormap
 axis([0 2 0 2 0 1])
 daspect([1 1 1]);
 
@@ -22,7 +22,7 @@ else
 end
 hold on;
 zout = 0*xout + 0.5;
-plot3(xout,yout,zout,'k','linewidth',3);
+soln_handle = plot3(xout,yout,zout,'k','linewidth',3);
 % fprintf('Area of filament %24.16f\n',polyarea(xout,yout));
 hold off;
 
@@ -34,8 +34,8 @@ setpatchbordercolor('k');
 
 showcubes(5);
 showslices;
-hidesurfs
-view(2);
+% hidesurfs
+% view(2);
 
 
 caxis([0,1]);
