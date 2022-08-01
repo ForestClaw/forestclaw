@@ -237,38 +237,41 @@ write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     if (s->fits32)
     {
         int32_t *idata = (int32_t *) s->buf;
-        int32_t k;
-#if PATCH_DIM == 2
-        for (j = 0; j < s->my; ++j)
-        {
-            for (i = 0; i < s->mx; ++i)
-            {
-                k = pbefore + i + j * (s->mx + 1);
-                *idata++ = k;
-                *idata++ = k + 1;
-                *idata++ = k + s->mx + 2;
-                *idata++ = k + s->mx + 1;
-            }
-        }
-#else
-        int l;
+        int32_t l;
+
+#if PATCH_DIM == 3
+        int k;
         for (k = 0; k < s->mz; ++k)
         {
+#if 0
+        }
+#endif
+#endif
         for (j = 0; j < s->my; ++j)
         {
             for (i = 0; i < s->mx; ++i)
             {
-                l = pbefore + i + j * (s->mx + 1) + k * (s->my + 1) * (s->mx + 1);
+                l = (int32_t) pbefore + i + j * (s->mx + 1)
+#if PATCH_DIM == 3
+                     + k * (s->my + 1) * (s->mx + 1)
+#endif
+                     + 0;
                 *idata++ = l;
                 *idata++ = l + 1;
-                *idata++ = l + (s->mx + 1) + 1;
+                *idata++ = l + (s->mx + 2);
                 *idata++ = l + (s->mx + 1);
-                *idata++ = l+(s->mx+1)*(s->my+1);
-                *idata++ = l+(s->mx+1)*(s->my+1) + 1;
-                *idata++ = l+(s->mx+1)*(s->my+1) + (s->mx + 1) + 1;
-                *idata++ = l+(s->mx+1)*(s->my+1) + (s->mx + 1);
+#if PATCH_DIM == 3
+                *idata++ = l + (s->mx + 1) * (s->my + 1);
+                *idata++ = l + (s->mx + 1) * (s->my + 1) + 1;
+                *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 2);
+                *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 1);
+#endif
             }
         }
+#if PATCH_DIM == 3
+#if 0
+        {
+#endif
         }
 #endif
     }
