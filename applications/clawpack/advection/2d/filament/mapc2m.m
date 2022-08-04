@@ -9,6 +9,7 @@ elseif parms.example == 2
     map = 'bilinear';
 end
 
+
 % This domain should be in [0,1],[0,1]
 
 alpha = parms.alpha;
