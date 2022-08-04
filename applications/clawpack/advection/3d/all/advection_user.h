@@ -95,6 +95,39 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
                                                 const double shift[],
                                                 const double center[]);
 
+/* --------------------------------- Sphere mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
+                                                    const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+                                                     const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
+                                                      const double rotate[]);
+
+/* ---------------------------------- Disk mappings ----------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha);
+
+
+/* --------------------------------- Hemisphere mappings ------------------------------ */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
+                                                     const double rotate[],
+                                                     const double alpha);
+
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -71,11 +71,11 @@ subroutine claw3_set_velocity_manifold(mx,my,mz,mbc, &
             !! # although z values are at bottom of cell
             xd1(1) = xd(i,j+1,k)
             xd1(2) = yd(i,j+1,k)
-            xd1(3) = zp(i,j,k)  
+            xd1(3) = zd(i,j+1,k)  
 
             xd2(1) = xd(i,j,k)
             xd2(2) = yd(i,j,k)
-            xd2(3) = zp(i,j,k)    
+            xd2(3) = zd(i,j,k)    
 
             call get_psi_vel(xd1,xd2,dy,vn,t)
             if (ispillowsphere()) then
@@ -94,11 +94,11 @@ subroutine claw3_set_velocity_manifold(mx,my,mz,mbc, &
             !!# y-faces
             xd1(1) = xd(i+1,j,k)
             xd1(2) = yd(i+1,j,k)
-            xd1(3) = zp(i,j,k)
+            xd1(3) = zd(i+1,j,k)
 
             xd2(1) = xd(i,j,k)
             xd2(2) = yd(i,j,k)
-            xd2(3) = zp(i,j,k)
+            xd2(3) = zd(i,j,k)
 
             call get_psi_vel(xd1,xd2,dx,vn,t)
             if (ispillowsphere()) then
