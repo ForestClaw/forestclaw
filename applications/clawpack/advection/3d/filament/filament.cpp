@@ -134,7 +134,7 @@ void run_program(fclaw2d_global_t* glob)
     }
     else if (user->claw_version == 5)
     {
-        printf("swirl.cpp : Example not implemented for Claw version 5.\n");
+        printf("filament.cpp : 3d example not implemented for Claw version 5.\n");
         exit(0);
     }
 
@@ -196,7 +196,7 @@ main (int argc, char **argv)
         fclaw2d_global_store_domain(glob, domain);
 
         fclaw2d_options_store            (glob, fclaw_opt);
-        fclaw3dx_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw3dx_clawpatch_options_store  (glob, clawpatch_opt);
         fc3d_clawpack46_options_store    (glob, claw46_opt);
         filament_options_store           (glob, user_opt);
 

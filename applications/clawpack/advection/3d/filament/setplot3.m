@@ -1,7 +1,7 @@
 %  setplot3.m
 %  called in plotclaw3 before plotting to set various parameters
 
-OutputDir = './';
+OutputDir = './3d/';
 setviews  % set viewpoints so that view(xSlice), for example, can be used.
 setopengl;
 
@@ -44,8 +44,8 @@ ContourValues = [];   % draw contour lines from 'afterframe.m'
 
 % Note : Supply computational coordinates.  This is a bit of a disaster
 % for multiblock domains ...
-xSliceCoords = [1.5];
-ySliceCoords = [1.5];
+xSliceCoords = [];
+ySliceCoords = [];
 zSliceCoords = [0.5];
 
 IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
@@ -57,5 +57,5 @@ IsosurfAlphas    =  [1];     % Transparency of each surface
 
 IsosurfColors    = 'w';      % Colors for each surface.
 
-PlotBlockColors = 1;
+PlotBlockColors = 0;
 PlotParallelPartitions = 0;
