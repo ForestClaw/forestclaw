@@ -148,6 +148,7 @@ main (int argc, char **argv)
     {
         /* Move this here in case vexit >= 2 */
         disk_global_post_process(fclaw_opt,clawpatch_opt,user_opt);
+        
         fclaw_app_print_options(app);
 
         /* Options have been checked and are valid */
