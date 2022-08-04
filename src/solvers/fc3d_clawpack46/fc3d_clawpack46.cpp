@@ -349,7 +349,7 @@ double clawpack46_step3(fclaw2d_global_t *glob,
 	double* hm = FCLAW_ALLOC(double,size);
 
 	int ierror = 0;
-	//int* block_corner_count = fclaw2d_patch_block_corner_count(glob,patch);
+	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,patch);
 
 #if 0
 	if (claw46_vt->flux2 == NULL)
@@ -360,6 +360,7 @@ double clawpack46_step3(fclaw2d_global_t *glob,
 #endif
 
 	/* NOTE: qold will be overwritten in this step */
+	FC3D_CLAWPACK46_SET_BLOCK(&blockno);
 	CLAWPACK46_STEP3_WRAP(&maxm, &meqn, &maux, &mbc, clawpack_options->method,
 						  clawpack_options->mthlim, &clawpack_options->mcapa,
 						  &mwaves,&mx, &my, &mz, qold, aux, &dx, &dy, &dz, 
@@ -367,7 +368,9 @@ double clawpack46_step3(fclaw2d_global_t *glob,
 						  &level,&t, fp, fm, gp, gm, hp, hm, 
 						  claw46_vt->fort_rpn3, claw46_vt->fort_rpt3,
 						  claw46_vt->fort_rptt3,
-						  &clawpack_options->use_fwaves, &ierror);
+						  &clawpack_options->use_fwaves, block_corner_count, 
+						  &ierror);
+	FC3D_CLAWPACK46_UNSET_BLOCK();
 
 	FCLAW_ASSERT(ierror == 0);
 
