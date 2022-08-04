@@ -69,6 +69,22 @@ fclaw2d_map_c2m_pillowdisk5(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
+static void
+fclaw3dx_map_c2m_pillowdisk5(fclaw2d_map_context_t * cont, int blockno,
+                                double xc, double yc, double zc,
+                                double *xp, double *yp, double *zp)
+{
+    /* Unit disk centered at (0,0) */
+    double alpha = cont->user_double[0];    
+    MAPC2M_PILLOWDISK5(&blockno,&xc,&yc,xp,yp,zp,&alpha);
+
+    *zp = zc;
+
+    scale_map(cont, xp,yp,zp);
+    shift_map(cont,xp,yp,zp);
+}
+
+
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
@@ -79,6 +95,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowdisk5;
     cont->mapc2m = fclaw2d_map_c2m_pillowdisk5;
+    cont->mapc2m_3dx = fclaw3dx_map_c2m_pillowdisk5;
 
     cont->user_double[0] = alpha;
 
