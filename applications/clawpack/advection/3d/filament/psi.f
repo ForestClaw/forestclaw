@@ -14,10 +14,6 @@ c      psi = r**2
 c     # Filament formation (negative for clockwise rotation)
       psi = (4.d0/3.d0)*r**3
 
-      psi = y
-
-c      psi = x + y
-
       return
       end
 

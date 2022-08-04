@@ -20,7 +20,7 @@
          zp = zc
       endif
 
-      r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2 + (zp-0.5)**2)
+      r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2)
 
       fdisc = r-0.25d0
       end

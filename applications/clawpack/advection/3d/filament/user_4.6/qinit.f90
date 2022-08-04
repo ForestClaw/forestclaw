@@ -22,11 +22,7 @@ SUBROUTINE clawpack46_qinit(meqn,mbc,mx,my,mz,xlower,ylower,zlower, &
                 DO i = 1-mbc,mx+mbc
                     xlow = xlower + (i-1)*dx
                     CALL cellave3(blockno,xlow,ylow,zlow,dx,dy,dz,w)
-                    if (blockno .eq. 3) then
-                        q(i,j,k,1) = 1
-                    else
-                        q(i,j,k,1) = 0
-                    endif
+                    q(i,j,k,1) = w
                 end do                
             ENDDO
         ENDDO

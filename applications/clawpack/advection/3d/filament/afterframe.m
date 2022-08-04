@@ -31,17 +31,21 @@ showpatchborders;
 setpatchborderprops('linewidth',1);
 setpatchbordercolor('k');
 
-showcubes(5);
-showslices;
-hidesurfs
-view(2);
 
+view_3d = true;
+if view_3d
 
-caxis([0,1]);
-
-axis([0 2 0 2 0 1])
-daspect([1 1 1]);
-set(gca,'box','on');
+    showcubes(5);
+    showslices;
+    view(3);
+    daspect([1 1 0.25]);
+    set(gca,'box','on');
+    axis([0 2 0 2 0 1])
+else
+    daspect([1 1 1]);
+    axis([0 2 0 2])
+    view(2)
+end
 
 %axis off;
 axis on;
