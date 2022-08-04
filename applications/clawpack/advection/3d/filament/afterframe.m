@@ -7,7 +7,7 @@ fprintf('qmax = %24.16e\n',qmax);
 
 % Compute exact solution at time T.
 
-plot_soln = false;
+plot_soln = true;
 if plot_soln
     N = 500;
     if (t > 0)
@@ -21,9 +21,13 @@ if plot_soln
         yout = R_init*sin(th) + yc_init;
     end
     hold on;
-    zout = 0*xout + 0.5;
-    soln_handle = plot3(xout,yout,zout,'k','linewidth',3);
-    % fprintf('Area of filament %24.16f\n',polyarea(xout,yout));
+    for i = 1:length(zSliceCoords)  
+        s = zSliceCoords(i);
+    
+        zout = 0*xout + s;
+        soln_handle = plot3(xout,yout,zout,'k','linewidth',3);
+        % fprintf('Area of filament %24.16f\n',polyarea(xout,yout));
+    end
     hold off;
 end
 
