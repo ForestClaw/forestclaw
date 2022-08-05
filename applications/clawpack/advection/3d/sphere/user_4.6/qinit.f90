@@ -14,16 +14,14 @@ SUBROUTINE clawpack46_qinit(meqn,mbc,mx,my,mz,xlower,ylower,zlower, &
 
     blockno = fc3d_clawpack46_get_block()
 
-    DO mq = 1,meqn
-        do k = 1-mbc,mz+mbc
-            zlow = zlower + (k-1)*dz
-            DO j = 1-mbc,my+mbc
-                ylow = ylower + (j-1)*dy
-                DO i = 1-mbc,mx+mbc
-                    xlow = xlower + (i-1)*dx
-                    CALL cellave3(blockno,xlow,ylow,zlow,dx,dy,dz,w)
-                    q(i,j,k,1) = w
-                end do                
+    do k = 1-mbc,mz+mbc
+        zlow = zlower + (k-1)*dz
+        DO j = 1-mbc,my+mbc
+            ylow = ylower + (j-1)*dy
+            DO i = 1-mbc,mx+mbc
+                xlow = xlower + (i-1)*dx
+                CALL cellave3(blockno,xlow,ylow,zlow,dx,dy,dz,w)
+                q(i,j,k,1) = w
             ENDDO
         ENDDO
     ENDDO

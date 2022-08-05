@@ -14,7 +14,10 @@ parms = read_vars();
 
 R = parms.maxelev + 0.005;
 axis([-1-R,1+R,-1-R,1+R,-1-R,1+R]);
+set(gca,'box','on')
 view(3)
+
+view(vfront);
 
 % camlight;
 
