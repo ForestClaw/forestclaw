@@ -11,7 +11,7 @@ pp.npmax = 5;    % Number of processors
 tol = 1e-2;
 pp.qmin = 0.01;
 pp.qmax = 1.1;
-pp.plotq = false;
+pp.plotq = true;
 
 pp.qcolors = q;
 pp.colormap = colormap(yrbcolormap);  % Color map for q portion.
