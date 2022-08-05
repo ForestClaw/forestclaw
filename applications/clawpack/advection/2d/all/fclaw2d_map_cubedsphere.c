@@ -67,9 +67,7 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
 
     scale_map(cont,xp,yp,zp); 
 
-    /* These can probably be replaced by C functions at some point. */
 #if 0    
-    /* These could be causing problems ... */
     rotate_map(cont,xp,yp,zp);
 #endif    
 }
@@ -83,7 +81,7 @@ fclaw3dx_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
     /* Maps point on blockno to sphere */
     MAPC2M_CUBEDSPHERE(&blockno, &xc,&yc,xp,yp,zp);
 
-    /* Map point on sphere to point in shell */
+    /* Map point on sphere to point in unit shell (rp == 1) */
     double phi = asin(*zp);     // returns value in [-pi/2, pi/2]
     double theta = atan2(*yp,*xp);      // returns value in [-pi, pi]
     if (theta < 0)
@@ -98,7 +96,6 @@ fclaw3dx_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
     *zp = R*sin(phi);
 
 #if 0    
-    scale_map(cont,xp,yp,zp); 
     rotate_map(cont,xp,yp,zp);
 #endif    
 }
