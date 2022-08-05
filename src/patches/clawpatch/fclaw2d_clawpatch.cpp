@@ -381,11 +381,16 @@ void clawpatch_build(fclaw2d_global_t *glob,
 
 	if (fclaw_opt->manifold)
 	{ 
-		/* Computes mesh (xp,yp,zp,xd,yd,zd) and basis vectors */
-		fclaw2d_metric_patch_build(glob,patch,blockno,patchno);
+		/* Computes all metric terms : (xp,yp,zp,xd,yd,zd), 
+		areas/volumes, basis vectors and (in 2d) curvatures
+		and surface normals. 
 
-		/* Computes areas and volumes */
-		//fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
+		Note : Area/volume computations are expensive, since 
+		they are all computed on finest levels 
+
+		Note : When building from fine, call routine below 
+		where areas/volumes are averaged from fine patches */
+		fclaw2d_metric_patch_build(glob,patch,blockno,patchno);
 	}
 
 	/* Setup for conservation correction */
@@ -1058,7 +1063,7 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 	int packextra = fclaw_opt->ghost_patch_pack_numextrafields;
-	int packregisters = fclaw_opt->time_sync;
+	int packregisters = fclaw_opt->time_sync;  // For conservation
 	int refratio = fclaw_opt->refratio;
 
 	int mint = refratio*mbc;   /* # interior cells needed for averaging */
@@ -1078,7 +1083,13 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 
 #if PATCH_DIM == 3
 	int mz = clawpatch_opt->mz;
-	frsize *= mz;
+	if (packregisters)
+	{		
+		fclaw_global_essentialf("clawpatch_ghost_comm: Conservation fix not yet " \
+		                        "implemented in 3d\n");
+		exit(0);
+		frsize *= mz;
+	}
 #endif
 
 	/* wg   : whole grid
@@ -1210,9 +1221,6 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 		if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
 		{
 			fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
-#if 0
-			fclaw3d_metric_patch_compute_volume(glob,patch,blockno,patchno);			
-#endif
 		}
 	}
 	/* Any metric terms we might need for the registers are packed */
