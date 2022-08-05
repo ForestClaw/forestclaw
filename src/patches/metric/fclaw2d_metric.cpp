@@ -437,7 +437,7 @@ void metric_vt_destroy(void* vt)
 fclaw2d_metric_vtable_t* fclaw2d_metric_vt(fclaw2d_global_t* glob)
 {
 	fclaw2d_metric_vtable_t* metric_vt = (fclaw2d_metric_vtable_t*) 
-	   							fclaw_pointer_map_get(glob->vtables, "fclaw3d_metric");
+	   							fclaw_pointer_map_get(glob->vtables, METRIC_VTABLE_NAME);
 	FCLAW_ASSERT(metric_vt != NULL);
 	FCLAW_ASSERT(metric_vt->is_set != 0);
 	return metric_vt;
