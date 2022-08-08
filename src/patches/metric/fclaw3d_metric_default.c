@@ -122,12 +122,15 @@ void fclaw3d_metric_compute_volume_default(fclaw2d_global_t *glob,
                                    &xp,&yp,&zp,&xd,&yd,&zd,
                                    &volume,&facearea);
 
+    /* Computes volume and face areas */
     int ghost_only = 0;
     FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, 
                                 &dx, &dy, &dz,
                                 &xlower, &ylower,&zlower,
-                                &blockno, xd,yd,zd, volume, facearea,
-                                &m, hexstore,&ghost_only);
+                                &blockno, xd,yd,zd, 
+                                volume, facearea,
+                                &m, hexstore,
+                                &ghost_only);
 
     FCLAW_FREE(hexstore);
 }

@@ -201,7 +201,7 @@ subroutine fclaw3d_metric_fort_compute_volume_general(mx,my,mz, mbc, &
                     do jj = 0,rfactor-1
                         do kk = 0, rfactor-1
 
-                            !! Create sub-hex 
+                            !! Get single fine grid hex cell
                             do icell = 0,1
                                 do jcell = 0,1
                                     do kcell = 0,1
@@ -648,11 +648,11 @@ end function hex_dot_cross
 !! # the surface is flat.  Otherwise, this seems like it should give a
 !! # reasonable answer, but this is merely a conjecture!
 
-subroutine hex_compute_surf_area(hex,area)
+subroutine hex_compute_surf_area(hex,facearea)
     implicit none
 
     double precision hex(0:1,0:1,0:1,3)
-    double precision w(3), p(3), q(3), area(3)
+    double precision w(3), p(3), q(3), facearea(3)
     double precision quad(0:1,0:1,3)
 
     integer n,i,j,ip,jp,m
@@ -677,7 +677,7 @@ subroutine hex_compute_surf_area(hex,area)
         !! ruled surface.  
         !! This is done by computing the cross product of four pairs
         !! vectors at each of the four corners, and then averaging.  
-        area(n) = 0
+        facearea(n) = 0
         do i = 0,1
             do j = 0,1
                 ip = mod(i+1,2)
@@ -692,10 +692,10 @@ subroutine hex_compute_surf_area(hex,area)
                 w(3) =   p(1)*q(2) - p(2)*q(1)
 
                 d = w(1)*w(1) + w(2)*w(2) + w(3)*w(3)
-                area(n) = area(n) + dsqrt(d)/2.d0
+                facearea(n) = facearea(n) + dsqrt(d)/2.d0
             end do
         end do
-        area(n) = area(n)/2.d0
+        facearea(n) = facearea(n)/2.d0
     enddo !! face loop
 end subroutine hex_compute_surf_area
 
@@ -809,9 +809,6 @@ subroutine fclaw3dx_metric_fort_average_volume(mx,my,mz, mbc, &
                     sum = sum + kf
                 end do
                 volcoarse(i1,j1,k) = sum
-                if (i1 .eq. 0 .or. i1 .eq. mx+1) then
-                    !! write(6,*) 'i1 = ', i1
-                endif
             end do
         end do
     end do
@@ -839,7 +836,7 @@ subroutine fclaw3dx_metric_fort_average_facearea(mx,my,mz, mbc, &
     double precision fa_coarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3)
     double precision   fa_fine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3)
 
-    integer i,j, k, ig, jg, ic_add, jc_add, ii, jj
+    integer ic,jc, k, ig, jg, ic_add, jc_add, ii, jj
     double precision sum
 
     !! # This should be refratio*refratio.
@@ -874,33 +871,29 @@ subroutine fclaw3dx_metric_fort_average_facearea(mx,my,mz, mbc, &
 
     r2 = refratio*refratio
     !! This only works for extruded mesh version.
-    do k = 1,mz
-        do j = 0,my/2+1
-            do i = 0,mx/2+1
-                i1 = i+ic_add
-                j1 = j+jc_add
-                m = 0
+    do k = 0,mz+1
+        !! Loop over cells in quadrant in coarse grid covered by fine grid.
+        do jc = 0,my/2+1
+            do ic = 0,mx/2+1
+                !! Get region in coarse grid covered by fine grid
+                i1 = ic+ic_add
+                j1 = jc+jc_add
 
                 !! Set up linear indexing for 2x2 quad grid arrangement
+                m = 0
                 do jj = 1,2
                     do ii = 1,2
-                        i2(m) = 2*(i-1) + ii
-                        j2(m) = 2*(j-1) + jj
+                        i2(m) = 2*(ic-1) + ii
+                        j2(m) = 2*(jc-1) + jj
                         m = m + 1
                     end do
                 end do
 
-                !! Area of x-face
-                if (igrid .eq. 0 .or. igrid .eq. 2) then
-                    fa_coarse(i1,j1,k,1) = fa_fine(i2(0),j2(0),k,1) + & 
-                                           fa_fine(i2(2),j2(2),k,1)
-                endif
+                fa_coarse(i1,j1,k,1) = fa_fine(i2(0),j2(0),k,1) + & 
+                                       fa_fine(i2(2),j2(2),k,1)
 
-                !! Area of y-face
-                if (igrid .eq. 0 .or. igrid .eq. 1) then
-                    fa_coarse(i1,j1,k,2) = fa_fine(i2(0),j2(0),k,2) + & 
-                                           fa_fine(i2(1),j2(1),k,2)
-                endif
+                fa_coarse(i1,j1,k,2) = fa_fine(i2(0),j2(0),k,2) + & 
+                                       fa_fine(i2(1),j2(1),k,2)
 
                 !! Area of z-face
                 sum = 0
@@ -909,6 +902,11 @@ subroutine fclaw3dx_metric_fort_average_facearea(mx,my,mz, mbc, &
                     sum = sum + kf
                 end do
                 fa_coarse(i1,j1,k,3) = sum
+                if (sum .lt. 0) then
+                    write(6,*) 'facearea ', sum
+                    stop
+                endif
+
             end do
         end do
     end do

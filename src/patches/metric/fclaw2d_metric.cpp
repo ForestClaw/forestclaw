@@ -299,7 +299,6 @@ void metric_average_area_from_fine(fclaw2d_global_t *glob,
                                          areafine,&igrid);
 #elif PATCH_DIM == 3
 #if REFINE_DIM == 2
-
         double *volfine, *fa_fine;
         fclaw3d_metric_patch_scalar(glob,&fine_patches[igrid],&volfine, &fa_fine);
 
@@ -310,10 +309,9 @@ void metric_average_area_from_fine(fclaw2d_global_t *glob,
         FCLAW3DX_METRIC_FORT_AVERAGE_VOLUME(&mx,&my,&mz, &mbc,
                                             volcoarse,volfine, 
                                             &igrid);
-#if 0
+
         FCLAW3DX_METRIC_FORT_AVERAGE_FACEAREA(&mx,&my,&mz, &mbc,
                                               fa_coarse,fa_fine, &igrid);
-#endif                                              
 #else
         fclaw_global_essential("Average area/vol from fine not implemented for full octree\n");
         exit(0);
