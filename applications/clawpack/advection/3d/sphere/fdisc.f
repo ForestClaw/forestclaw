@@ -8,9 +8,6 @@
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision maxelev 
-      common /com_sphere/ maxelev
-
       double precision phi, R
       double precision rp, phi0
 

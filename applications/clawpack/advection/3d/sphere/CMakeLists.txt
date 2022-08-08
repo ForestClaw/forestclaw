@@ -2,7 +2,7 @@ set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/3d/all)
 set(all2d ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(sphere3dx_f OBJECT 
-  psi.f 
+  psi.f90 
   fdisc.f 
   setprob.f 
   user_4.6/qinit.f90 

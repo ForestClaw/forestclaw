@@ -44,6 +44,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
+    fclaw2d_map_latlong_set_maxelev(user_opt->maxelev);
+
     switch (user_opt->example) {
     case 0:
         conn = p4est_connectivity_new_cubed();

@@ -40,8 +40,8 @@ static void *
     sc_options_add_double (opt, 0, "revs-per-second", &user->revs_per_second, 2,
                         "[user] Revolutions per second [2]");
 
-    sc_options_add_double (opt, 0, "max_elevation", &user->maxelev, 0.25,
-                        "[user] Maximum elevation from sphere [0.25]");
+    sc_options_add_double (opt, 0, "max-elevation", &user->maxelev, 1.0,
+                        "[user] Maximum elevation from sphere [1.0]");
 
     user->is_registered = 1;
     return NULL;
