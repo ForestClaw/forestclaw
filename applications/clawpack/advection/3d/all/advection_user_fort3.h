@@ -124,7 +124,7 @@ void CLAW3_SETAUX_MANIFOLD(const int* mbc,
                             const int* blockno,
                             double xd[], double yd[], double zd[],
                             double xp[], double yp[], double zp[],
-                            double volume[]);
+                            double volume[],double faceareas[]);
 
 
 #define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \

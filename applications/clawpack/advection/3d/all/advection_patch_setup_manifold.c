@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
                                           fclaw2d_patch_t *patch,
-                                          int block,
+                                          int blockno,
                                           int patchno,
                                           int claw_version)
 {
@@ -47,14 +47,14 @@ void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
 
     if (claw_version == 4)
         CLAW3_SETAUX_MANIFOLD(&mbc,&mx,&my,&mz, &xlower,&ylower,&zlower,
-                               &dx,&dy,&dz,&maux,aux,&block,
-                               xd,yd,zd,xp,yp,zp,volume);
+                               &dx,&dy,&dz,&maux,aux,&blockno,
+                               xd,yd,zd,xp,yp,zp,volume,faceareas);
 
     else if (claw_version == 5)
         fclaw_global_essentialf("claw3_patch_setup_manifold : claw 5 not implemented.\n");
 #if 0
         USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                              &dx,&dy,&maux,aux,&block,
+                              &dx,&dy,&maux,aux,&blockno,
                               xd,yd,zd,area);
 #endif
 }

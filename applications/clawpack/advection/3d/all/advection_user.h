@@ -124,6 +124,16 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
                                                      const double rotate[],
                                                      const double alpha);
 
+/* --------------------------------- Latlong mapping ---------------------------------- */
+fclaw2d_map_context_t *
+    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+                             const double scale[],
+                             const double lat[],
+                             const double longitude[],
+                             const int a, const int b);
+
+
+
 
 
 
