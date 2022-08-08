@@ -14,8 +14,6 @@
       call fclaw2d_map_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
 
-      cont = fclaw_map_get_context()
-
 c     # Torus or annulus
       th = atan2(yp,xp)
       tp = abs(th)
