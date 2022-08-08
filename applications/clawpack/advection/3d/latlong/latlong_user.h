@@ -31,9 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 typedef struct user_options
@@ -41,13 +38,14 @@ typedef struct user_options
     int example;
     int claw_version;
 
+    double revs_per_second;
+    double maxelev;
+
     const char *latitude_string;
     double *latitude;
 
     const char *longitude_string;
     double *longitude;
-
-    double revs_per_second;
 
     int is_registered;
 }
@@ -62,10 +60,10 @@ void latlong_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* latlong_get_options(fclaw2d_global_t* glob);
 
+void fclaw2d_map_latlong_set_maxelev(double maxelev);
+
+
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

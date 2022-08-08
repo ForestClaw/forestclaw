@@ -41,8 +41,11 @@ latlong_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "revs-per-second", &user->revs_per_second, 2,
                         "[user] Revolutions per second [2]");
 
-    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
-                        "[user] Clawpack version (4 or 5) [5]");
+    sc_options_add_double (opt, 0, "max-elevation", &user->maxelev, 0.5,
+                        "[user] Max elevation in extruded direction [0.5]");
+
+    sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
+                        "[user] Clawpack version (4 only) [4]");
 
     user->is_registered = 1;
     return NULL;

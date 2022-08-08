@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "latlong_user.h"
 
+
 void latlong_problem_setup(fclaw2d_global_t *glob)
 {
     const user_options_t* user = latlong_get_options(glob);
@@ -39,12 +40,12 @@ void latlong_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24.6f %s",user->longitude[1],"\% longitude[1]\n");
         fprintf(f,  "%-24.6f %s",user->latitude[0],"\% latitude[0]\n");
         fprintf(f,  "%-24.6f %s",user->latitude[1],"\% latitude[1]\n");
+        fprintf(f,  "%-24.6f %s",user->maxelev,"\% max_elevation\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
     SETPROB();
 }
-
 
 static
 void latlong_patch_setup(fclaw2d_global_t *glob,
@@ -53,33 +54,31 @@ void latlong_patch_setup(fclaw2d_global_t *glob,
                          int patchno)
 {
     const user_options_t* user = latlong_get_options(glob);
-    advection_patch_setup_manifold(glob,patch,blockno,patchno,
-                                   user->claw_version);
+    claw3_advection_patch_setup_manifold(glob,patch,blockno,patchno,
+                                         user->claw_version);
 }
 
 void latlong_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = latlong_problem_setup;
-    
+
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &latlong_patch_setup;
 
     const user_options_t   *user = latlong_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
-        claw46_vt->fort_setprob     = SETPROB;
-        claw46_vt->fort_qinit       = CLAWPACK46_QINIT;
-        claw46_vt->fort_rpn2        = CLAWPACK46_RPN2ADV_MANIFOLD;
-        claw46_vt->fort_rpt2        = CLAWPACK46_RPT2ADV_MANIFOLD;
-    }
-    else if (user->claw_version == 5)
-    {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
-        claw5_vt->fort_setprob   = &SETPROB;
-        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
-        claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;
-        claw5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV_MANIFOLD;
+        fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt(glob);
+
+        /* This calls a manifold version of setaux */
+        fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+        patch_vt->setup = latlong_patch_setup;
+        clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
+
+        /* These will work for both non-manifold and manifold case */
+        clawpack46_vt->fort_rpn3       = &CLAWPACK46_RPN3;
+        clawpack46_vt->fort_rpt3       = &CLAWPACK46_RPT3;
+        clawpack46_vt->fort_rptt3      = &CLAWPACK46_RPTT3;            
     }
 }
