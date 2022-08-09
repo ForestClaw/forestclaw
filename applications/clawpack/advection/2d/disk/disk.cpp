@@ -30,7 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
-                                user_options_t* user_opt)
+                                user_options_t* user_opt,
+                                fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -55,6 +56,11 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         break;
     case 1:
         /* Map five-patch square to pillow disk. */
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
+            exit(0);
+        }
         conn = p4est_connectivity_new_disk (0, 0);
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,
                                             fclaw_opt->shift,
@@ -148,12 +154,11 @@ main (int argc, char **argv)
     if (!retval & (vexit < 2))
     {
         /* Move this here in case vexit >= 2 */
-        disk_global_post_process(fclaw_opt,clawpatch_opt,user_opt);
         fclaw_app_print_options(app);
 
         /* Options have been checked and are valid */
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
+        domain = create_domain(mpicomm, fclaw_opt, user_opt, clawpatch_opt);
     
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();

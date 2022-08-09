@@ -1,10 +1,9 @@
 yrbcolormap;
-s = 0.05;
 ax = 0; 
 bx = 2;
 ay = 0; 
 by = 2;
-axis([ax-s bx+s ay-s by+s])
+axis([ax bx ay by])
 daspect([1 1 1]);
 
 showpatchborders(1:9);
