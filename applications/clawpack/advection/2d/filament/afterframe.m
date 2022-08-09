@@ -29,8 +29,7 @@ showpatchborders(1:7);
 setpatchborderprops('linewidth',1)
 
 % axes
-s = 0.01;
-axis([-s 2+s -s 2+s])
+axis([0 2 0 2])
 daspect([1 1 1]);
 view(2);
 shg;

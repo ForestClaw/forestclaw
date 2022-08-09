@@ -16,13 +16,3 @@ c     # Filament formation (negative for clockwise rotation)
 
       return
       end
-
-      subroutine get_psi_vel(xd1,xd2,ds,vn,t)
-      implicit none
-
-      double precision xd1(3),xd2(3), ds, vn, psi,t
-
-      vn = (psi(xd1(1),xd1(2),xd1(3)) -
-     &      psi(xd2(1),xd2(2),xd2(3)))/ds
-
-      end
