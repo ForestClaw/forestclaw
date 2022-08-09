@@ -9,7 +9,11 @@ daspect([1 1 1]);
 set(gca,'box','on');
 view(3);
 
-view(vfront)
+cv = linspace(0,1,11);
+cv([1 end]) = [];
+drawcontourlines(cv);
+
+view(vbot)
 
 MaxFrames = 64;
 NoQuery = 0;
@@ -21,7 +25,3 @@ if (prt)
 end
 
 shg
-
-
-clear afterframe
-clear mapc2m

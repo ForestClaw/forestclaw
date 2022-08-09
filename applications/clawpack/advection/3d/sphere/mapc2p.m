@@ -11,7 +11,7 @@ elseif parms.example == 1
     map = 'pillowsphere';
 end
 
-b = getblocknumber();
+% b = getblocknumber();
 
 switch map
     case 'pillowsphere'

@@ -8,8 +8,7 @@
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      double precision phi, R
-      double precision rp, phi0
+      double precision phi, rp, phi0
 
       cont = fclaw_map_get_context()
 
