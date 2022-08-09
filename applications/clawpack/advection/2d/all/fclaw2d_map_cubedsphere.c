@@ -8,6 +8,17 @@ extern "C"
 #endif
 
 
+/* This can be used for extruded mesh computations */
+
+/* Set a default value : this should match the default option value */
+static double maxelev_s = 0.5;  
+
+void fclaw2d_map_latlong_set_maxelev(double maxelev)
+{
+    maxelev_s = maxelev;
+}
+
+
 static int
 fclaw2d_map_query_cubedsphere (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -122,9 +133,7 @@ fclaw2d_map_context_t *
        to the mapping, since this mapping is used both for 2d and 3d?
        Changing the argument list would break lots of examples ... 
     */
-    cont->user_double[0] = 0.5;   
-
-
+    cont->user_double[0] = maxelev_s;   
 
     return cont;
 }
