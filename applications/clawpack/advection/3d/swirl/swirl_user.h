@@ -72,8 +72,7 @@ void SWIRL_SETAUX_MANIFOLD(const int* mbc,
                             const double *dz,
                             const int* maux, double aux[],
                             const int* blockno,
-                            double xd[], double yd[], double zd[],
-                            double xp[], double yp[], double zp[],
+                            double xrot[], double yrot[], double zrot[],
                             double volume[],double faceareas[]);
 
 

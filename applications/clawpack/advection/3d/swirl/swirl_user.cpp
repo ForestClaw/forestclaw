@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.h"
 
+#include <fclaw3d_metric.h>
+
 void swirl_problem_setup(fclaw2d_global_t *glob)
 {
     const user_options_t* user = swirl_get_options(glob);
@@ -68,13 +70,16 @@ void swirl_patch_setup(fclaw2d_global_t *glob,
     fclaw3d_clawpatch_mesh_data(glob,patch,&xp,&yp,&zp,
                                 &xd,&yd,&zd,&volume,&faceareas);
 
+    double *xrot, *yrot, *zrot;
+    fclaw3d_metric_patch_basis(glob,patch,&xrot,&yrot,&zrot);
+
     int maux;
     double *aux;
     fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     SWIRL_SETAUX_MANIFOLD(&mbc,&mx,&my,&mz, &xlower,&ylower,&zlower,
                           &dx,&dy,&dz,&maux,aux,&blockno,
-                          xd,yd,zd,xp,yp,zp,volume,faceareas);
+                          xrot,yrot,zrot,volume,faceareas);
 }
 
 

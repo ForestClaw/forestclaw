@@ -1,6 +1,6 @@
 subroutine swirl_setaux_manifold(mbc,mx,my,mz, & 
                xlower,ylower,zlower,dx,dy,dz,maux, & 
-               aux,blockno, xd,yd,zd,xp, yp, zp, volume, & 
+               aux,blockno, xrot, yrot, zrot, volume, & 
                faceareas)
    implicit none
 
@@ -9,13 +9,9 @@ subroutine swirl_setaux_manifold(mbc,mx,my,mz, &
    double precision dx,dy, dz, xlower, ylower, zlower
    double precision  aux(1-mbc:mx+mbc,1-mbc:my+mbc, 1-mbc:mz+mbc,maux)
 
-   double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2, -mbc:mx+mbc+2)
-   double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2, -mbc:my+mbc+2)
-   double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2, -mbc:mz+mbc+2)
-
-   double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
-   double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
-   double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+   double precision xrot(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3,3)
+   double precision yrot(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3,3)
+   double precision zrot(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3,3)
 
    double precision volume(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc)
    double precision faceareas(-mbc:mx+mbc+1,-mbc:my+mbc+1, -mbc:mz+mbc+2,3)
@@ -36,7 +32,7 @@ subroutine swirl_setaux_manifold(mbc,mx,my,mz, &
    t = 0
    call swirl_set_velocity_manifold(mx,my,mz,mbc, & 
             dx,dy,dz,t,blockno,xlower,ylower,zlower, & 
-            aux,maux, faceareas)
+            xrot, yrot, zrot, faceareas,aux,maux)
 
    return
 end subroutine swirl_setaux_manifold
@@ -45,7 +41,7 @@ end subroutine swirl_setaux_manifold
 !!     ==================================================================
 subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, & 
            dx,dy,dz,t,blockno,xlower,ylower,zlower, & 
-           aux, maux, faceareas)
+           xrot, yrot, zrot, faceareas,aux, maux)
 !!     ==================================================================
 
     !!
@@ -64,15 +60,9 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
    double precision :: aux(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,maux)
    double precision faceareas(-mbc:mx+mbc+1,-mbc:my+mbc+1, -mbc:mz+mbc+2,3)
 
-
-!!   double precision xd(-mbc:mx+mbc+2,-mbc:my+mbc+2, -mbc:mz+mbc+2)
-!!   double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2, -mbc:mz+mbc+2)
-!!   double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2, -mbc:mz+mbc+2)
-
-!!   double precision xp(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
-!!   double precision yp(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
-!!   double precision zp(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
-
+   double precision xrot(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3,3)
+   double precision yrot(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3,3)
+   double precision zrot(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+2,3,3)
 
    double precision :: xc(1-mbc:mx+mbc)
    double precision :: yc(1-mbc:my+mbc)
@@ -83,6 +73,9 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
    integer :: i,j,k, mcapa
    double precision :: dx2, dy2, dz2, compute_u, compute_v, compute_w
    double precision :: dxdy, dxdz, dydz, u,v,w,g, xp,yp,zp
+   double precision :: rot(3,3), vn
+
+   integer ii, jj
 
    cont = fclaw_map_get_context()
 
@@ -114,22 +107,48 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
             call fclaw3d_map_c2m(cont,blockno,xc(i)-dx2,yc(j),zc(k),xp,yp,zp)
             g = faceareas(i,j,k,1)/dydz
             u = compute_u(xp,yp,zp)
-            aux(i,j,k,mcapa + 1) = g*u
+            v = compute_v(xp,yp,zp)
+            w = compute_w(xp,yp,zp)
+
+            do ii = 1,3
+               do jj = 1,3
+                  rot(ii,jj) = xrot(i,j,k,ii,jj)
+               end do
+            end do
+            vn = rot(1,1)*u + rot(1,2)*v + rot(1,3)*w
+            aux(i,j,k,mcapa + 1) = g*vn
 
             call fclaw3d_map_c2m(cont,blockno,xc(i),yc(j)-dy2,zc(k),xp,yp,zp)
             g = faceareas(i,j,k,2)/dxdz
+            u = compute_u(xp,yp,zp)
             v = compute_v(xp,yp,zp)
-            aux(i,j,k,mcapa + 2) = g*v
+            w = compute_w(xp,yp,zp)
+
+            do ii = 1,3
+               do jj = 1,3
+                  rot(ii,jj) = yrot(i,j,k,ii,jj)
+               end do
+            end do
+            vn = rot(1,1)*u + rot(1,2)*v + rot(1,3)*w
+            aux(i,j,k,mcapa + 2) = g*vn
 
             call fclaw3d_map_c2m(cont,blockno,xc(i),yc(j),zc(k)-dz2,xp,yp,zp)
             g = faceareas(i,j,k,3)/dxdy
+            u = compute_u(xp,yp,zp)
+            v = compute_v(xp,yp,zp)
             w = compute_w(xp,yp,zp)
-            aux(i,j,k,mcapa + 3) = g*w
+
+            do ii = 1,3
+               do jj = 1,3
+                  rot(ii,jj) = zrot(i,j,k,ii,jj)
+               end do
+            end do
+            vn = rot(1,1)*u + rot(1,2)*v + rot(1,3)*w
+            aux(i,j,k,mcapa + 3) = g*vn
          enddo
       enddo
    enddo
 
    return
 end subroutine swirl_set_velocity_manifold
-
 
