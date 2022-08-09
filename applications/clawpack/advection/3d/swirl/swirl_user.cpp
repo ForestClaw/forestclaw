@@ -55,11 +55,6 @@ void swirl_patch_setup(fclaw2d_global_t *glob,
                           int blockno,
                           int patchno)
 {
-#if 0
-    const user_options_t* user = swirl_get_options(glob);
-    claw3_advection_patch_setup_manifold(glob,patch,blockno,patchno,
-                                   user->claw_version); 
-#endif                                
     int mx,my,mz, mbc;
     double xlower,ylower,zlower, dx,dy, dz;
     fclaw3dx_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
@@ -111,12 +106,10 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
             clawpack46_vt->fort_setaux     = &CLAWPACK46_SETAUX;  
         }
 
-        //clawpack46_vt->fort_setprob   = &SETPROB;
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->fort_rpn3      = &CLAWPACK46_RPN3;
         clawpack46_vt->fort_rpt3      = &CLAWPACK46_RPT3;
         clawpack46_vt->fort_rptt3      = &CLAWPACK46_RPTT3;
-        // clawpack46_vt->fort_b4step3   = &CLAWPACK46_B4STEP3;        
     }
     else if (user->claw_version == 5)
     {

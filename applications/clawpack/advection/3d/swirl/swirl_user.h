@@ -76,6 +76,22 @@ void SWIRL_SETAUX_MANIFOLD(const int* mbc,
                             double volume[],double faceareas[]);
 
 
+#define SWIRL_SET_VELOCITY_MANIFOLD FCLAW_F77_FUNC(swirl_set_velocity_manifold, \
+                                               SWIRL_SET_VELOCITY_MANIFOLD)
+
+
+void SWIRL_SET_VELOCITY_MANIFOLD(const int* mx, const int* my, const int*mz,
+                                 const int* mbc,
+                                 const double* dx, const double* dy,
+                                 const double *dz,
+                                 const double *t, 
+                                 const int *blockno,
+                                 const double* xlower, const double* ylower,
+                                 const double* zlower,
+                                 double xrot[], double yrot[], double zrot[],
+                                 double faceareas[],
+                                 double aux[], const int* maux);
+
 
 #ifdef __cplusplus
 }

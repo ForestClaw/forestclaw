@@ -73,7 +73,7 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
    integer :: i,j,k, mcapa
    double precision :: dx2, dy2, dz2, compute_u, compute_v, compute_w
    double precision :: dxdy, dxdz, dydz, u,v,w,g, xp,yp,zp
-   double precision :: nv(3), vn
+   double precision :: nv(3), un_scaled, vn_scaled, wn_scaled
 
    integer jj
 
@@ -99,7 +99,7 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
    dxdz = dx*dz
    dydz = dy*dz
 
-   mcapa = 1
+   mcapa = 1  !! Offset into aux array
    do  k = 1-mbc,mz+mbc
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
@@ -114,8 +114,7 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
             do jj = 1,3
                nv(jj) = xrot(i,j,k,1,jj)
             end do
-            vn = nv(1)*u + nv(2)*v + nv(3)*w
-            aux(i,j,k,mcapa + 1) = g*vn
+            un_scaled = g*(nv(1)*u + nv(2)*v + nv(3)*w)
 
             !! Get velocity normal to y-face
             call fclaw3d_map_c2m(cont,blockno,xc(i),yc(j)-dy2,zc(k),xp,yp,zp)
@@ -127,8 +126,7 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
             do jj = 1,3
                nv(jj) = yrot(i,j,k,1,jj)
             end do
-            vn = nv(1)*u + nv(2)*v + nv(3)*w
-            aux(i,j,k,mcapa + 2) = g*vn
+            vn_scaled = g*(nv(1)*u + nv(2)*v + nv(3)*w)
 
             !! Get velocity normal to z-face
             call fclaw3d_map_c2m(cont,blockno,xc(i),yc(j),zc(k)-dz2,xp,yp,zp)
@@ -140,8 +138,11 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
             do jj = 1,3
                nv(jj) = zrot(i,j,k,1,jj)
             end do
-            vn = nv(1)*u + nv(2)*v + nv(3)*w
-            aux(i,j,k,mcapa + 3) = g*vn
+            wn_scaled = g*(nv(1)*u + nv(2)*v + nv(3)*w)
+
+            aux(i,j,k,mcapa + 1) = un_scaled
+            aux(i,j,k,mcapa + 2) = vn_scaled
+            aux(i,j,k,mcapa + 3) = wn_scaled
          enddo
       enddo
    enddo
