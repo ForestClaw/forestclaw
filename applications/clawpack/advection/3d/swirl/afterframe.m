@@ -11,8 +11,10 @@ showpatchborders;
 setpatchborderprops('linewidth',1);
 setpatchbordercolor('k');
 
-showcubes;
+% showcubes;
 showslices;
+hideslices('x');
+hideslices('y');
 
 
 caxis([0,1]);
@@ -25,5 +27,3 @@ set(gca,'box','on');
 axis on;
 
 shg;
-
-clear afterframe;
