@@ -69,6 +69,7 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
 
     /* Shift by (1,1,0) to [0,2]x[0,2] */
+    scale_map(cont, xp, yp, zp);
     shift_map(cont, xp,yp,zp);
 }
 
