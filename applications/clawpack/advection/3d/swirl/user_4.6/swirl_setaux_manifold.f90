@@ -73,12 +73,11 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
    integer :: i,j,k, mcapa
    double precision :: dx2, dy2, dz2, compute_u, compute_v, compute_w
    double precision :: dxdy, dxdz, dydz, u,v,w,g, xp,yp,zp
-   double precision :: rot(3,3), vn
+   double precision :: nv(3), vn
 
-   integer ii, jj
+   integer jj
 
    cont = fclaw_map_get_context()
-
 
    do i = 1-mbc,mx+mbc
       xc(i) = xlower + (i-0.5d0)*dx
@@ -104,46 +103,44 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
    do  k = 1-mbc,mz+mbc
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
+
+            !! Get velocity normal to x-face
             call fclaw3d_map_c2m(cont,blockno,xc(i)-dx2,yc(j),zc(k),xp,yp,zp)
             g = faceareas(i,j,k,1)/dydz
             u = compute_u(xp,yp,zp)
             v = compute_v(xp,yp,zp)
             w = compute_w(xp,yp,zp)
 
-            do ii = 1,3
-               do jj = 1,3
-                  rot(ii,jj) = xrot(i,j,k,ii,jj)
-               end do
+            do jj = 1,3
+               nv(jj) = xrot(i,j,k,1,jj)
             end do
-            vn = rot(1,1)*u + rot(1,2)*v + rot(1,3)*w
+            vn = nv(1)*u + nv(2)*v + nv(3)*w
             aux(i,j,k,mcapa + 1) = g*vn
 
+            !! Get velocity normal to y-face
             call fclaw3d_map_c2m(cont,blockno,xc(i),yc(j)-dy2,zc(k),xp,yp,zp)
             g = faceareas(i,j,k,2)/dxdz
             u = compute_u(xp,yp,zp)
             v = compute_v(xp,yp,zp)
             w = compute_w(xp,yp,zp)
 
-            do ii = 1,3
-               do jj = 1,3
-                  rot(ii,jj) = yrot(i,j,k,ii,jj)
-               end do
+            do jj = 1,3
+               nv(jj) = yrot(i,j,k,1,jj)
             end do
-            vn = rot(1,1)*u + rot(1,2)*v + rot(1,3)*w
+            vn = nv(1)*u + nv(2)*v + nv(3)*w
             aux(i,j,k,mcapa + 2) = g*vn
 
+            !! Get velocity normal to z-face
             call fclaw3d_map_c2m(cont,blockno,xc(i),yc(j),zc(k)-dz2,xp,yp,zp)
             g = faceareas(i,j,k,3)/dxdy
             u = compute_u(xp,yp,zp)
             v = compute_v(xp,yp,zp)
             w = compute_w(xp,yp,zp)
 
-            do ii = 1,3
-               do jj = 1,3
-                  rot(ii,jj) = zrot(i,j,k,ii,jj)
-               end do
+            do jj = 1,3
+               nv(jj) = zrot(i,j,k,1,jj)
             end do
-            vn = rot(1,1)*u + rot(1,2)*v + rot(1,3)*w
+            vn = nv(1)*u + nv(2)*v + nv(3)*w
             aux(i,j,k,mcapa + 3) = g*vn
          enddo
       enddo
