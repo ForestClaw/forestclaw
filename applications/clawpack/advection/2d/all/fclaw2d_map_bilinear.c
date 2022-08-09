@@ -95,6 +95,7 @@ fclaw2d_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
        create four bilinear maps. */
     MAPC2M_BILINEAR(&blockno,&xc,&yc,xp,yp,zp,center);
 
+    scale_map(cont, xp,yp,zp);
     shift_map(cont, xp,yp,zp);
 }
 
@@ -114,6 +115,7 @@ fclaw3dx_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
     MAPC2M_BILINEAR(&blockno,&xc,&yc,xp,yp,zp,center);
     *zp = zc;
 
+    scale_map(cont, xp,yp,zp);
     shift_map(cont, xp,yp,zp);
 }
 

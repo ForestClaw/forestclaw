@@ -72,6 +72,7 @@ fclaw2d_map_c2m_fivepatch(fclaw2d_map_context_t* cont, int blockno,
     MAPC2M_FIVEPATCH(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
     /* Shift [-1,1]x[-1,1] to [0,2]x[0,2] */
+    scale_map(cont, xp, yp, zp);
     shift_map(cont, xp,yp,zp);
 
 }
@@ -87,6 +88,7 @@ fclaw3dx_map_c2m_fivepatch(fclaw2d_map_context_t* cont, int blockno,
     *zp = zc;
 
     /* Shift [-1,1]x[-1,1] to [0,2]x[0,2] */
+    scale_map(cont, xp, yp, zp);
     shift_map(cont, xp,yp,zp);
 
 }
