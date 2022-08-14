@@ -54,3 +54,8 @@ IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
                                           % use the OpenGL Renderer.
 
   IsosurfColors    = 'w';      % Colors for each surface.
+
+
+PlotBlockColors = 0;
+PlotParallelPartitions = 1;
+  

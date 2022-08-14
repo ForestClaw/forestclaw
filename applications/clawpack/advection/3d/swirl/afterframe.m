@@ -16,6 +16,7 @@ showslices;
 hideslices('x');
 hideslices('y');
 
+view(vtop)
 
 caxis([0,1]);
 

@@ -48,14 +48,14 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     switch (user_opt->example) 
     {
-    case 0:
+    case 1:
         /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_pillowdisk(fclaw_opt->scale,
                                           fclaw_opt->shift,
                                           rotate);
         break;
-    case 1:
+    case 2:
         if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
         {
             fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");

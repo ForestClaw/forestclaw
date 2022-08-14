@@ -1,9 +1,9 @@
-yrbcolormap
 
 
 fprintf('qmin = %24.16e\n',qmin);
 fprintf('qmax = %24.16e\n',qmax);
 
+yrbcolormap
 caxis([0,1])
 colorbar;
 
@@ -41,7 +41,6 @@ setpatchbordercolor('k');
 
 view_3d = false;
 if view_3d
-
     showcubes(5);
     showslices;
     view(3);
@@ -53,6 +52,8 @@ else
     axis([0 2 0 2])
     view(2)
 end
+
+colormap(parula);
 
 
 %axis off;

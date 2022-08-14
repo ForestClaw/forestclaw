@@ -56,8 +56,13 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         FCLAW_ASSERT(claw3_opt->mcapa == 0);
         FCLAW_ASSERT(fclaw_opt->manifold == 0);
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_nomap_brick(brick);
+#if 0
         conn = p4est_connectivity_new_unitsquare();
         cont = fclaw2d_map_new_nomap();
+#endif        
         break;
 
     case 1:

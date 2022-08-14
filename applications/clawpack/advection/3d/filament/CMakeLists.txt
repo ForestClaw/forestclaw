@@ -7,6 +7,7 @@ add_library(filament3dx_f OBJECT
   setprob.f 
   user_4.6/qinit.f90 
   user_4.6/setaux.f90
+  user_exceeds_th.f90
   ${all}/claw3_setaux_manifold.f90
   ${all}/rpn3_vc_advection.f90 
   ${all}/rpt3_vc_advection.f90 
