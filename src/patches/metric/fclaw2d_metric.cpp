@@ -131,6 +131,7 @@ void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
 
     /* Set up area for storage - this is needed for ghost patches, 
     and updated patches */
+    Box box_p, box_d;
     {
         /* Create box for primary grid (cell-centered) */
         int ll_p[PATCH_DIM];
@@ -145,19 +146,57 @@ void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
         ur_p[2] = mp->mz + mbc + 1;
 #endif
 
-        Box box_p(ll_p,ur_p,PATCH_DIM);
+        box_p = Box(ll_p,ur_p,PATCH_DIM);
+
+
+        /* Create box for nodes (cell corners) */
+        int ll_d[PATCH_DIM];
+        int ur_d[PATCH_DIM];
+
+        /* Create node centered box */
+        for (int idir = 0; idir < PATCH_DIM; idir++)
+        {
+            ll_d[idir] = -mbc;
+        }
+        ur_d[0] = mp->mx + mbc + 2;
+        ur_d[1] = mp->my + mbc + 2;
+
+#if PATCH_DIM == 3
+        ur_d[2] = mp->mz + mbc + 2;
+#endif
+
+        box_d = Box(ll_d,ur_d,PATCH_DIM);
+
 
 #if PATCH_DIM == 2        
         mp->area.define(box_p,1);
 #elif PATCH_DIM == 3
+        /* volume is needed in ghost patches for averaging.   The face area is 
+           only needed if we are updating a cell, but since volume and 
+           face area are computed together, we should also allocate memory 
+           for face areas
+        */
         mp->volume.define(box_p,1);
+        mp->face_area.define(box_d,3);
+
+        /* Node values are needed by parallel ghost patches when we have an 
+           affine map.  In this case, the affine map can use pre-computed xd,yd,zd
+           values.
+
+           Note: This should be revisited since we are doing extra work for the affine
+           map. 
+        */
+        mp->xd.define(box_d,1);
+        mp->yd.define(box_d,1);
+        mp->zd.define(box_d,1);
 #endif
 
     }
 
 
+    /* Only allocate memory that is needed */
     if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED
-        && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+       && build_mode == FCLAW2D_BUILD_FOR_UPDATE)    
     {
         /* 
         From here on out, we build for patches that get updated 
@@ -189,54 +228,20 @@ void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
             We should come up with a way to store only what is needed 
         */
 
-        int ll_p[PATCH_DIM];
-        int ur_p[PATCH_DIM];
-
-        /* Metric  patches have an extra layer of ghost cells */
-        for (int idir = 0; idir < PATCH_DIM; idir++)
-        {
-            ll_p[idir] = -mbc;
-        }
-        ur_p[0] = mp->mx + mbc + 1;
-        ur_p[1] = mp->my + mbc + 1;
-
-#if PATCH_DIM == 3
-        ur_p[2] = mp->mz + mbc + 1;
-#endif
-
-        Box box_p(ll_p,ur_p,PATCH_DIM);   /* Store cell centered values here */
-
         /* Mesh cell centers of physical mesh */
         mp->xp.define(box_p,1);
         mp->yp.define(box_p,1);
         mp->zp.define(box_p,1);
+
 #if PATCH_DIM == 2
-        mp->surf_normals.define(box_p,3);
-        mp->curvature.define(box_p,1);
-#endif
-
-        int ll_d[PATCH_DIM];
-        int ur_d[PATCH_DIM];
-
-        /* Create node centered box */
-        for (int idir = 0; idir < PATCH_DIM; idir++)
-        {
-            ll_d[idir] = -mbc;
-        }
-        ur_d[0] = mp->mx + mbc + 2;
-        ur_d[1] = mp->my + mbc + 2;
-
-#if PATCH_DIM == 3
-        ur_d[2] = mp->mz + mbc + 2;
-#endif
-
-        Box box_d(ll_d,ur_d,PATCH_DIM);
 
         mp->xd.define(box_d,1);
         mp->yd.define(box_d,1);
         mp->zd.define(box_d,1);
 
-#if PATCH_DIM == 2        
+        mp->surf_normals.define(box_p,3);
+        mp->curvature.define(box_p,1);
+
         /* Store length of left and bottom edge of box */
         /* Face centered values */
         /* DAC : Why didn't I set this up as a cell-centered box? */
@@ -248,7 +253,7 @@ void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
         mp->edge_lengths.define(box_d,2);
 #elif PATCH_DIM == 3        
         /* Store face areas of left, front, bottom edge of box */
-        mp->face_area.define(box_d,3);
+        //mp->face_area.define(box_d,3);
 
         /* Store 3x3 rotation matrix for each of three faces */
         mp->xrot.define(box_d,9);
@@ -356,6 +361,7 @@ void fclaw2d_metric_patch_build(fclaw2d_global_t* glob,
                                 int patchno)
 {
     fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
+    FCLAW_ASSERT(metric_vt != NULL);
 
     /* Compute (xp,yp,zp) and (xd,yd,zd) */
     metric_vt->compute_mesh(glob,patch,blockno,patchno);
@@ -631,6 +637,15 @@ void fclaw2d_metric_patch_mesh_data2(fclaw2d_global_t* glob,
     *edgelengths = mp->edge_lengths.dataPtr();
 }
 #endif
+
+int fclaw2d_metric_patch_nodes_size(fclaw2d_global_t* glob,
+                                    fclaw2d_patch_t* patch)
+{
+    fclaw2d_metric_patch_t* mp = get_metric_patch(glob, patch);
+    return mp->xd.size();
+}
+
+
 
 
 

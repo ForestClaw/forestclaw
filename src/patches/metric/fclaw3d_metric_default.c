@@ -122,15 +122,24 @@ void fclaw3d_metric_compute_volume_default(fclaw2d_global_t *glob,
                                    &xp,&yp,&zp,&xd,&yd,&zd,
                                    &volume,&facearea);
 
+    int xd_size = fclaw3d_metric_patch_nodes_size(glob,patch);
+    if (xd_size == 0)
+    {
+        printf("xd size is 0\n");
+        exit(0);
+    }
     /* Computes volume and face areas */
     int ghost_only = 0;
-    FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, 
-                                &dx, &dy, &dz,
-                                &xlower, &ylower,&zlower,
-                                &blockno, xd,yd,zd, 
-                                volume, facearea,
-                                &m, hexstore,
-                                &ghost_only);
+
+    FCLAW_ASSERT(xd != NULL);  
+    FCLAW_ASSERT(facearea != NULL);
+    FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, &blockno,
+                                       &dx, &dy, &dz,
+                                       &xlower, &ylower,&zlower,
+                                       xd,yd,zd,
+                                       volume, facearea,
+                                       &m, hexstore,
+                                       &ghost_only);
 
     FCLAW_FREE(hexstore);
 }
@@ -170,10 +179,10 @@ void fclaw3d_metric_compute_volume_ghost_default(fclaw2d_global_t* glob,
                                    &volume,&faceareas);
 
     int ghost_only = 1;
-    FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, 
+    FCLAW3D_METRIC_FORT_COMPUTE_VOLUME(&mx, &my, &mz, &mbc, &blockno,
                                 &dx, &dy, &dz, 
                                 &xlower, &ylower,&zlower,
-                                &blockno, xd,yd,zd,
+                                xd,yd,zd,
                                 volume, faceareas, &m, hexstore,
                                 &ghost_only);
     FCLAW_FREE(hexstore);

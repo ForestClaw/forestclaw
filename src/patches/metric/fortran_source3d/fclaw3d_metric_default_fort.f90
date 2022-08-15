@@ -73,6 +73,7 @@ subroutine fclaw3d_metric_fort_compute_mesh(mx,my,mz,mbc, &
     end do
 end subroutine fclaw3d_metric_fort_compute_mesh
 
+
 !! ----------------------------------------------------------
 !!> @brief @copybrief ::fclaw3d_fort_compute_area_t
 !!>
@@ -80,8 +81,8 @@ end subroutine fclaw3d_metric_fort_compute_mesh
 !!>
 !!> @details @copydetails ::fclaw3d_fort_compute_area_t
 !! ---------------------------------------------------------
-subroutine fclaw3d_metric_fort_compute_volume(mx,my,mz, mbc,dx,dy,dz, &
-           xlower, ylower, zlower, blockno, xd,yd,zd, & 
+subroutine fclaw3d_metric_fort_compute_volume(mx,my,mz, mbc,blockno, & 
+           dx,dy,dz, xlower, ylower, zlower, xd,yd,zd, & 
            volume, faceareas, hexsize, hexstore, ghost_only)
     implicit none
 
@@ -102,12 +103,13 @@ subroutine fclaw3d_metric_fort_compute_volume(mx,my,mz, mbc,dx,dy,dz, &
     if (isaffine()) then
         !! # We don't need to compute areas all the way to the
         !! # finest level.
-        call fclaw3d_metric_fort_compute_volume_affine(mx, my, mz, mbc, & 
-                    xd, yd, zd, volume, faceareas, ghost_only)
+        call fclaw3d_metric_fort_compute_volume_affine(mx, my, mz, mbc, blockno, & 
+                    dx,dy,dz, xlower, ylower, zlower, xd,yd,zd, volume, & 
+                    faceareas, ghost_only)
     else
-        call fclaw3d_metric_fort_compute_volume_general(mx, my, mz, mbc, & 
-                dx, dy, dz, &
-                xlower, ylower, zlower, blockno, volume,faceareas, &
+        call fclaw3d_metric_fort_compute_volume_general(mx, my, mz, mbc, blockno, & 
+                dx, dy, dz, xlower, ylower, zlower, & 
+                volume,faceareas, &
                 hexsize, hexstore, ghost_only)
     endif
 end subroutine fclaw3d_metric_fort_compute_volume
@@ -125,8 +127,8 @@ end subroutine fclaw3d_metric_fort_compute_volume
 !!> @param[in] hexstore stores a group of cell values
 !!> @param[in] ghost_only
 !! ---------------------------------------------------------
-subroutine fclaw3d_metric_fort_compute_volume_general(mx,my,mz, mbc, & 
-           dx, dy, dz, xlower, ylower, zlower, blockno, volume, &
+subroutine fclaw3d_metric_fort_compute_volume_general(mx,my,mz, mbc, blockno, & 
+           dx, dy, dz, xlower, ylower, zlower, volume, &
            faceareas, hexsize, hexfine,ghost_only)
     implicit none
 
@@ -152,9 +154,12 @@ subroutine fclaw3d_metric_fort_compute_volume_general(mx,my,mz, mbc, &
 
     integer*8 cont, fclaw_map_get_context
 
+    logical isaffine
+
     cont = fclaw_map_get_context()
 
     rfactor = hexsize
+
     dxf = dx/rfactor
     dyf = dy/rfactor
     dzf = dz/rfactor
@@ -265,11 +270,15 @@ end subroutine fclaw3d_metric_fort_compute_volume_general
 !!> @param[in] ghost_only
 !! ---------------------------------------------------------
  
-subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, & 
-          volume, faceareas, ghost_only)
+
+
+subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc, blockno, & 
+        dx,dy,dz,xlower, ylower, zlower, xd,yd,zd, & 
+        volume, faceareas, ghost_only)
     implicit none
 
-    integer mx,my,mz, mbc
+    integer mx,my,mz, mbc, blockno
+    double precision xlower, ylower, zlower, dx, dy, dz
     integer ghost_only
 
     double precision volume(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
@@ -279,13 +288,44 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
     double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2,-mbc:mz+mbc+2)
     double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2,-mbc:mz+mbc+2)
 
-    integer i,j, k, m, icell, jcell, kcell
+    integer i,j, k, m, icell, jcell, kcell, ii, jj, kk
     double precision hex(0:1,0:1,0:1,3)
     double precision hex_compute_volume
     logical hex_is_volume_interior
 
-    double precision area(3)
+    double precision area(3), xef, yef, zef, xd1, yd1, zd1, xe, ye, ze
 
+    integer*8 cont, fclaw_map_get_context
+
+    cont = fclaw_map_get_context()
+
+    !! We could use pre-defined (xd,yd,zd) arrays here, but they are not 
+    !! always available when building a patch. For example, when we build 
+    !! a parallel ghost patch, we don't call the meshing routine to get 
+    !! (xd,yd,zd).  The (xd,yd,zd) routines passed may already be defined, 
+    !! but get redefined here. 
+
+    do j = -mbc,my+mbc+1
+        do i = -mbc,mx+mbc+1
+            do k = -mbc,mz+mbc+1
+                xe = xlower + (i-1)*dx
+                ye = ylower + (j-1)*dy
+                ze = zlower + (k-1)*dz
+
+                call fclaw3d_map_c2m(cont, & 
+                                blockno,xe,ye,ze, xd1,yd1,zd1)
+
+                xd(i,j,k) = xd1
+                yd(i,j,k) = yd1
+                zd(i,j,k) = zd1
+            end do
+        end do
+    end do
+
+
+    !! This basically doubles the amount of work required, and we can compute the 
+    !! affine mesh using (xd,yd,zd).  But we'd have to call the mesh generation
+    !! routine
     do j = -mbc,my+mbc+1
         do i = -mbc,mx+mbc+1
             do k = -mbc,mz+mbc+1
@@ -293,12 +333,15 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc,xd,yd,zd, &
                     ghost_only .eq. 1) then
                     cycle
                 endif
-                do icell = 0,1
-                    do jcell = 0,1
-                        do kcell = 0,1
-                            hex(icell,jcell,kcell,1) = xd(i+icell,j+jcell,k+kcell)
-                            hex(icell,jcell,kcell,2) = yd(i+icell,j+jcell,k+kcell)
-                            hex(icell,jcell,kcell,3) = zd(i+icell,j+jcell,k+kcell)
+
+                !! For each coarse grid cell, construct a local finer mesh at
+                !! maximum level of refinement
+                do ii = 0,1
+                    do jj = 0,1
+                        do kk = 0,1
+                            hex(ii,jj,kk,1) = xd(i+ii,j+jj,k+kk)
+                            hex(ii,jj,kk,2) = yd(i+ii,j+jj,k+kk)
+                            hex(ii,jj,kk,3) = zd(i+ii,j+jj,k+kk)
                         end do
                     end do
                 end do

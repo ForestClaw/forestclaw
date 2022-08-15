@@ -373,6 +373,10 @@ fclaw3d_metric_vtable_t* fclaw3d_metric_vt(struct fclaw2d_global* glob);
 void fclaw3d_metric_vtable_initialize(struct fclaw2d_global* glob);
 
 
+int fclaw3d_metric_patch_nodes_size(struct fclaw2d_global* glob,
+                                    struct fclaw2d_patch* patch);
+
+
 #ifdef __cplusplus
 }
 #endif
