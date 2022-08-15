@@ -85,7 +85,7 @@ fclaw3dx_map_c2m_fivepatch(fclaw2d_map_context_t* cont, int blockno,
     /* five patch square in [-1,1]x[-1,1] */
     double alpha = cont->user_double[0];
     MAPC2M_FIVEPATCH(&blockno,&xc,&yc,xp,yp,zp,&alpha);
-    *zp = zc;
+    *zp = 8*zc;
 
     /* Shift [-1,1]x[-1,1] to [0,2]x[0,2] */
     scale_map(cont, xp, yp, zp);

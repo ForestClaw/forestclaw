@@ -88,7 +88,7 @@ fclaw3dx_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
 
     /* Unit square in [-1,1] x [-1,1] (blockno not used) */
     MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
-    *zp = zc;  /* Assume that zc is not mapped */
+    *zp = 8*zc;  /* Assume that zc is not mapped */
 
     /* Map to [ax,bx]x[ay,by]x[az,bz] */
     scale_map(cont, xp,yp,zp);

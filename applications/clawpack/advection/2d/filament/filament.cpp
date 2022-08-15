@@ -47,7 +47,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     int minlevel = fclaw_opt->minlevel;
     
     switch (user->example) {
-    case 0:
+    case 1:
         /* Square brick domain */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
@@ -56,7 +56,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                     fclaw_opt->scale,
                                     fclaw_opt->shift);
         break;
-    case 1:
+    case 2:
         if (mi*mx*pow_int(2,minlevel) < 32)
         {
             fclaw_global_essentialf("The five patch mapping requires mi*mx*2^minlevel > 32\n");
@@ -69,7 +69,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                           fclaw_opt->shift,
                                           user->alpha);
         break;
-    case 2:
+    case 3:
         /* bilinear square domain : maps to [-1,1]x[-1,1] */
         FCLAW_ASSERT(mi == 2 && mj == 2);
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
