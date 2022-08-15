@@ -1027,7 +1027,12 @@ size_t clawpatch_ghost_pack_elems(fclaw2d_global_t* glob)
 	int frsize = packregisters ? 2*(4*meqn+2)*(mx + my) : 0;
 #if PATCH_DIM == 3
 	int mz = clawpatch_opt->mz;
-	frsize *= mz;
+	if (packregisters)
+	{		
+		fclaw_global_essentialf("clawpatch_ghost_comm: Conservation fix not yet " \
+		                        "implemented in 3d\n");
+		exit(0);
+	}
 #endif
 
 	int wg = (2*nghost + mx)*(2*nghost + my);  /* Whole grid     */
@@ -1035,7 +1040,7 @@ size_t clawpatch_ghost_pack_elems(fclaw2d_global_t* glob)
 
 #if PATCH_DIM == 3	
 	wg *= (mz + 2*nghost);
-	hole *= (mz + 2*nghost);
+	hole *= (mz + 2*nghost); 
 #endif
 	FCLAW_ASSERT(hole >= 0);
 
@@ -1088,7 +1093,6 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 		fclaw_global_essentialf("clawpatch_ghost_comm: Conservation fix not yet " \
 		                        "implemented in 3d\n");
 		exit(0);
-		frsize *= mz;
 	}
 #endif
 
@@ -1220,6 +1224,10 @@ void clawpatch_remote_ghost_build(fclaw2d_global_t *glob,
 	{
 		if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
 		{
+			/* Cell areas/volumes are not sent as MPI messages and so must
+			   be recomputed
+			*/
+			//fclaw2d_metric_patch_build(glob,patch,blockno,patchno);
 			fclaw2d_metric_patch_compute_area(glob,patch,blockno,patchno);
 		}
 	}
