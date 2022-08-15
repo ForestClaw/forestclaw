@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_metric_get_metric_patch      fclaw3d_metric_get_metric_patch
 #define fclaw2d_metric_patch_compute_area    fclaw3d_metric_patch_compute_volume
 #define fclaw2d_metric_vtable_initialize     fclaw3d_metric_vtable_initialize
+#define fclaw2d_metric_patch_nodes_size      fclaw3d_metric_patch_nodes_size
 
 // static names
 #define metric_average_area_from_fine        metric_average_volume_from_fine
