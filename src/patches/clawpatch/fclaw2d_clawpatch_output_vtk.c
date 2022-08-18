@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <_fclaw2d_to_fclaw3dx.h>
 
+#else
+#error "This combination of REFINE_DIM and PATCH_DIM is unsupported"
 #endif
 
 #include <fclaw2d_global.h>
@@ -620,9 +622,9 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
     s->global_num_points = s->points_per_patch * domain->global_num_patches;
     s->global_num_cells = s->cells_per_patch * domain->global_num_patches;
 #if PATCH_DIM == 2
-    s->global_num_connectivity = 4 * s->global_num_cells;
+    s->global_num_connectivity = 4 * (s->global_num_cells + 1);
 #else
-    s->global_num_connectivity = 8 * s->global_num_cells;
+    s->global_num_connectivity = 8 * (s->global_num_cells + 1);
 #endif
     s->fits32 = s->global_num_points <= INT32_MAX
         && s->global_num_connectivity <= INT32_MAX;
