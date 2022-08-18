@@ -1018,7 +1018,7 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                               sc_array_t * block_offsets,
                               sc_array_t * coordinates, sc_array_t * results)
 {
-    int ip, jb, ii;
+    int ip, jb, ii, mpiret;
     int num_blocks;
     int num_points;
     int pbegin, pend;
@@ -1108,8 +1108,11 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
             found[ii] = p4est->mpirank;
     }
 
-    sc_MPI_Allreduce (found, found_buffer, num_points, sc_MPI_INT, sc_MPI_MIN,
-                      sc_MPI_COMM_WORLD);
+    mpiret = sc_MPI_Allreduce (found, found_buffer, num_points, sc_MPI_INT,
+                               sc_MPI_MIN, sc_MPI_COMM_WORLD);
+    SC_CHECK_MPI (mpiret);
+
+    SC_FREE (found);
 
     for (ii = 0; ii < num_points; ++ii)
     {
@@ -1118,7 +1121,6 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     }
 
     /* tidy up memory */
-    sc_array_destroy (points);
-    SC_FREE (found);
     SC_FREE (found_buffer);
+    sc_array_destroy (points);
 }
