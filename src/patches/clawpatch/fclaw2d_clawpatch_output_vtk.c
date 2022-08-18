@@ -192,7 +192,7 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
 
 /**
  * @brief Write the buffer to file
- * 
+ *
  * @param s the vtk state
  * @param psize_field the size of the buffer
  */
@@ -597,9 +597,8 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
                         double vtkspace, int vtkwrite,
                         fclaw2d_vtk_patch_data_t coordinate_cb,
                         fclaw2d_vtk_patch_data_t value_cb)
-{   
+{
     fclaw2d_domain_t *domain = glob->domain;
-    
 
     int retval, gretval;
     int mpiret;
@@ -856,7 +855,7 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
-                                   clawpatch_opt->mx, clawpatch_opt->my, 
+                                   clawpatch_opt->mx, clawpatch_opt->my,
 #if PATCH_DIM == 3
                                    clawpatch_opt->mz,
 #endif
@@ -882,7 +881,7 @@ void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
     snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
-                                   clawpatch_opt->mx, clawpatch_opt->my, 
+                                   clawpatch_opt->mx, clawpatch_opt->my,
 #if PATCH_DIM == 3
                                    clawpatch_opt->mz,
 #endif
