@@ -198,10 +198,10 @@ static void
 write_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 {
 #ifndef P4EST_ENABLE_MPIIO
-    int retval;
+    size_t retvalz;
 
-    retval = fwrite (s->buf, psize_field, 1, s->file);
-    SC_CHECK_ABORT (retval == 1, "VTK file write failed");
+    retvalz = fwrite (s->buf, psize_field, 1, s->file);
+    SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
 #else
     int mpiret;
     MPI_Status mpistatus;
@@ -456,7 +456,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
 
     int64_t bcount;
 #ifndef P4EST_ENABLE_MPIIO
-    int retval;
+    size_t retvalz;
 #else
     int mpiret;
     MPI_Offset mpipos;
@@ -487,8 +487,8 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
                        bcount, bcount, bcount);
 #endif
 #ifndef P4EST_ENABLE_MPIIO
-        retval = fwrite (&bcount, s->ndsize, 1, s->file);
-        SC_CHECK_ABORT (retval == 1, "VTK file write failed");
+        retvalz = fwrite (&bcount, s->ndsize, 1, s->file);
+        SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
 #else
         mpiret = MPI_File_write (s->mpifile, &bcount, 1, MPI_LONG, &mpistatus);
         SC_CHECK_MPI (mpiret);
