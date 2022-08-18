@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
 
+#define PATCH_CHILDREN 4
+
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
 #include <fclaw3dx_clawpatch_output_vtk.h>
@@ -46,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_options.h>
 
 #include <_fclaw2d_to_fclaw3dx.h>
+
+#define PATCH_CHILDREN 8
 
 #else
 #error "This combination of REFINE_DIM and PATCH_DIM is unsupported"
@@ -328,7 +332,6 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
-    const int connectivity_size = (PATCH_DIM == 2) ? 4 : 8;
     const int64_t cbefore = s->cells_per_patch *
         (domain->global_num_patches_before +
          domain->blocks[blockno].num_patches_before + patchno);
@@ -336,8 +339,8 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     if (s->fits32)
     {
         int32_t *idata = (int32_t *) s->buf;
-        int32_t k = connectivity_size * (int32_t) (cbefore + 1);
-        for (c = 0; c < s->cells_per_patch; k += connectivity_size, ++c)
+        int32_t k = PATCH_CHILDREN * (int32_t) (cbefore + 1);
+        for (c = 0; c < s->cells_per_patch; k += PATCH_CHILDREN, ++c)
         {
             *idata++ = k;
         }
@@ -345,8 +348,8 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     else
     {
         int64_t *idata = (int64_t *) s->buf;
-        int64_t k = connectivity_size * (cbefore + 1);
-        for (c = 0; c < s->cells_per_patch; k += connectivity_size, ++c)
+        int64_t k = PATCH_CHILDREN * (cbefore + 1);
+        for (c = 0; c < s->cells_per_patch; k += PATCH_CHILDREN, ++c)
         {
             *idata++ = k;
         }
@@ -614,32 +617,24 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
     s->points_per_patch = (mx + 1) * (my + 1);
     s->cells_per_patch = mx * my;
 #if PATCH_DIM == 3
-    s->points_per_patch*=(mz+1);
-    s->cells_per_patch *=mz;
+    s->points_per_patch *= (mz + 1);
+    s->cells_per_patch *= mz;
 #endif
     snprintf (s->filename, BUFSIZ, "%s.vtu", basename);
     s->global_num_points = s->points_per_patch * domain->global_num_patches;
     s->global_num_cells = s->cells_per_patch * domain->global_num_patches;
-#if PATCH_DIM == 2
-    s->global_num_connectivity = 4 * (s->global_num_cells + 1);
-#else
-    s->global_num_connectivity = 8 * (s->global_num_cells + 1);
-#endif
+    s->global_num_connectivity = PATCH_CHILDREN * (s->global_num_cells + 1);
     s->fits32 = s->global_num_points <= INT32_MAX
         && s->global_num_connectivity <= INT32_MAX;
     s->inttype = s->fits32 ? "Int32" : "Int64";
     s->intsize = s->fits32 ? sizeof (int32_t) : sizeof (int64_t);
-    s->ndsize = 8;   /*uint64*/
+    s->ndsize = 8;   /* uint64 */
     s->coordinate_cb = coordinate_cb;
     s->value_cb = value_cb;
 
     /* compute data size per patch for the various VTK data arrays */
     s->psize_position = s->points_per_patch * 3 * sizeof (double);
-#if PATCH_DIM == 2
-    s->psize_connectivity = s->cells_per_patch * 4 * s->intsize;
-#else
-    s->psize_connectivity = s->cells_per_patch * 8 * s->intsize;
-#endif
+    s->psize_connectivity = s->cells_per_patch * PATCH_CHILDREN * s->intsize;
     s->psize_offsets = s->cells_per_patch * s->intsize;
     s->psize_types = s->cells_per_patch * 1;
     s->psize_mpirank = s->cells_per_patch * 4;
