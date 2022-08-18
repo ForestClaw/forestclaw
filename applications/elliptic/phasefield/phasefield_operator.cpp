@@ -81,7 +81,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
   
     GhostFillingType fill_type = GhostFillingType::Faces;
 #if 0  
-    fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt(glob);
 #endif  
 
     // create thunderegg vector for eqn 0

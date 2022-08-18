@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Yu-Hsuan Shih, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_geoclaw_fort.h"
 #include "fc2d_geoclaw_output_ascii.h"
 
+#include <fclaw_pointer_map.h>
+
 #include <fclaw_gauges.h>
 #include "fc2d_geoclaw_gauges_default.h"
 
@@ -54,9 +56,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "types.h"
 
 struct region_type region_type_for_debug;
-
-static fc2d_geoclaw_vtable_t s_geoclaw_vt;
-
 
 /* ----------------------------- static function defs ------------------------------- */
 static
@@ -85,7 +84,7 @@ void geoclaw_patch_setup(fclaw2d_global_t *glob,
 static
 void geoclaw_setprob(fclaw2d_global_t *glob)
 {
-    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt();
+    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt(glob);
     if (geoclaw_vt->setprob != NULL)
         geoclaw_vt->setprob();
 }
@@ -96,7 +95,7 @@ void geoclaw_qinit(fclaw2d_global_t *glob,
                    int blockno,
                    int patchno)
 {
-    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt();
+    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt(glob);
     FCLAW_ASSERT(geoclaw_vt->qinit != NULL); /* Must initialized */
 
     int mx,my,mbc;
@@ -129,7 +128,7 @@ void geoclaw_bc2(fclaw2d_global_t *glob,
                  int intersects_phys_bdry[],
                  int time_interp)
 {
-    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt();
+    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt(glob);
 
     fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
     FCLAW_ASSERT(geoclaw_vt->bc2 != NULL);
@@ -182,7 +181,7 @@ void geoclaw_setaux(fclaw2d_global_t *glob,
                     int blockno,
                     int patchno)
 {
-    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt();
+    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt(glob);
     FCLAW_ASSERT(geoclaw_vt->setaux != NULL);
 
     int mx,my,mbc;
@@ -215,7 +214,7 @@ void geoclaw_b4step2(fclaw2d_global_t *glob,
                      double t, double dt)
 
 {
-    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt();
+    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt(glob);
 
     if (geoclaw_vt->b4step2 != NULL)
     {
@@ -247,7 +246,7 @@ void geoclaw_src2(fclaw2d_global_t *glob,
                   double t,
                   double dt)
 {
-    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt();
+    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt(glob);
     FCLAW_ASSERT(geoclaw_vt->src2 != NULL);
 
     int mx,my,mbc;
@@ -279,7 +278,7 @@ double geoclaw_step2(fclaw2d_global_t *glob,
                      double t,
                      double dt)
 {
-    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt();
+    fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt(glob);
     FCLAW_ASSERT(geoclaw_vt->rpn2 != NULL);
     FCLAW_ASSERT(geoclaw_vt->rpt2 != NULL);
 
@@ -808,30 +807,38 @@ void fc2d_geoclaw_module_setup(fclaw2d_global_t *glob)
 /* -------------------------- Virtual table  ---------------------------- */
 
 static
-fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt_init()
+fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt_new()
 {
-    FCLAW_ASSERT(s_geoclaw_vt.is_set == 0);
-    return &s_geoclaw_vt;
+    return (fc2d_geoclaw_vtable_t*) FCLAW_ALLOC_ZERO (fc2d_geoclaw_vtable_t, 1);
 }
 
-fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt()
+static
+void fc2d_geoclaw_vt_destroy(void* vt)
 {
-    FCLAW_ASSERT(s_geoclaw_vt.is_set != 0);
-    return &s_geoclaw_vt;
+    FCLAW_FREE (vt);
 }
 
-void fc2d_geoclaw_solver_initialize()
+fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(fclaw2d_global_t* glob)
+{
+	fc2d_geoclaw_vtable_t* geoclaw_vt = (fc2d_geoclaw_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fc2d_geoclaw");
+	FCLAW_ASSERT(geoclaw_vt != NULL);
+	FCLAW_ASSERT(geoclaw_vt->is_set != 0);
+	return geoclaw_vt;
+}
+
+void fc2d_geoclaw_solver_initialize(fclaw2d_global_t* glob)
 {
     int claw_version = 5;
-    fclaw2d_clawpatch_vtable_initialize(claw_version);
+    fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
     
-    fclaw_gauges_vtable_t*           gauges_vt = fclaw_gauges_vt();
+    fclaw_gauges_vtable_t*           gauges_vt = fclaw_gauges_vt(glob);
 
-    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt();
-    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt();
-    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt(glob);
+    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt(glob);
+    fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
-    fc2d_geoclaw_vtable_t*  geoclaw_vt = fc2d_geoclaw_vt_init();
+    fc2d_geoclaw_vtable_t*  geoclaw_vt = fc2d_geoclaw_vt_new();
 
     /* ForestClaw virtual tables */
     fclaw_vt->problem_setup               = geoclaw_setprob;  
@@ -888,5 +895,8 @@ void fc2d_geoclaw_solver_initialize()
     gauges_vt->print_gauge_buffer = geoclaw_print_gauges_default;
 
     geoclaw_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fc2d_geoclaw") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fc2d_geoclaw", geoclaw_vt, fc2d_geoclaw_vt_destroy);
 }
 

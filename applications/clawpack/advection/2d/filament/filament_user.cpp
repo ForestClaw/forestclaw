@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -42,14 +42,14 @@ void filament_link_solvers(fclaw2d_global_t *glob)
 
     if (fclaw_opt->manifold)
     {
-        fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+        fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
         patch_vt->setup = filament_patch_setup;        
     }
 
     const user_options_t* user = filament_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);
 
         clawpack46_vt->fort_setprob   = &SETPROB;
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
@@ -69,7 +69,7 @@ void filament_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
 
         claw5_vt->fort_setprob   = &SETPROB;
         claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;

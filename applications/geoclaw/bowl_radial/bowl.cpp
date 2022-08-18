@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw2d_vtables_initialize(glob);
 
-    fc2d_geoclaw_solver_initialize();
+    fc2d_geoclaw_solver_initialize(glob);
 
     bowl_link_solvers(glob);
 

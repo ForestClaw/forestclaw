@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 
     if (fclaw_opt->output != 0)
     {
-        fclaw2d_vtable_t *vt = fclaw2d_vt();
+        fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
 
         FCLAW_ASSERT(vt->output_frame != NULL);
 

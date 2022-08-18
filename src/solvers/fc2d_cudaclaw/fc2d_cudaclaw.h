@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -164,9 +164,22 @@ struct fc2d_cudaclaw_vtable
 
 };
 
-void fc2d_cudaclaw_solver_initialize(void);
+/**
+ * @brief Initialize the cudaclaw solver
+ * 
+ * fclaw2d_vtables_intialize should be called before this function.
+ * 
+ * @param global the global context
+ */
+void fc2d_cudaclaw_solver_initialize(struct fclaw2d_global* glob);
 
-fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(void);
+/**
+ * @brief Get the cudaclaw vtable
+ * 
+ * @param global the global context
+ * @return fc2d_cudaclaw_vtable_t* the vtable
+ */
+fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(struct fclaw2d_global* glob);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */

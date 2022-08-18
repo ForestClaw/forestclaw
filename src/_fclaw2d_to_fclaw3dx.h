@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_clawpatch_registers_t fclaw3dx_clawpatch_registers_t
 #define fclaw2d_clawpatch_registers fclaw3dx_clawpatch_registers
 #define fclaw2d_clawpatch_packmode fclaw3dx_clawpatch_packmode
-#define fclaw2d_clawpatch_packmode_t fclaw3dx_clawpatch_packmode_t
 #define fclaw2d_clawpatch_fort_time_sync_f2c_t fclaw3dx_clawpatch_fort_time_sync_f2c_t
 #define fclaw2d_clawpatch_fort_time_sync_samesize_t fclaw3dx_clawpatch_fort_time_sync_samesize_t
 #define fclaw2d_clawpatch_time_sync_new fclaw3dx_clawpatch_time_sync_new

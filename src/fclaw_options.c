@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -92,6 +92,9 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     sc_options_add_bool (opt, 0, "subcycle", &fclaw_opt->subcycle, 1,
                          "Use subcycling in time [T]");
+
+    sc_options_add_bool (opt, 0, "ghost-fill-uses-time-interp", &fclaw_opt->timeinterp2fillghost, 1,
+                         "Use linear time interpolation when subcycling [T]");
 
     sc_options_add_bool (opt, 0, "weighted_partition", &fclaw_opt->weighted_partition, 1,
                          "Weight grids when partitioning [T]");

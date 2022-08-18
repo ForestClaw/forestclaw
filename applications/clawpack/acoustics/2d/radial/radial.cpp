@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -92,11 +92,11 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)
     {
-        fc2d_clawpack46_solver_initialize();
+        fc2d_clawpack46_solver_initialize(glob);
     }
     else if (user_opt->claw_version == 5)
     {
-        fc2d_clawpack5_solver_initialize();
+        fc2d_clawpack5_solver_initialize(glob);
     }
 
     radial_link_solvers(glob);
@@ -146,13 +146,12 @@ main (int argc, char **argv)
     retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    radial_global_post_process(fclaw_opt, clawpatch_opt, user_opt);
-    fclaw_app_print_options(app);
-
-
     /* Run the program */
     if (!retval & (vexit < 2))
     {
+        radial_global_post_process(fclaw_opt, clawpatch_opt, user_opt);
+        fclaw_app_print_options(app);
+        
         /* Options have been checked and are valid */
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
