@@ -65,6 +65,10 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     /*
      * This intersection routine takes the patch coordinate information directly.
      * For mappings of any kind, these would have to be applied here in addition.
+     * We cannot guarantee correct results for rays that run near parallel to
+     * any coordinate axis, because they might cause undefined behaviour.
+     * We propose to rotate axis-parallel rays such that all entries of the
+     * vector are at least 1e-12.
      */
 
     /* assert that ray is a valid swirl_ray_t */
@@ -79,7 +83,7 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         fabs (ray->r.line.vec[1]) <= 1e-12)
     {
         /* we cannot guarantee correct results for rays
-           that run near parallel to patch boundaries */
+         * that run near parallel to coordinate axis */
         return 0;
     }
 
@@ -91,7 +95,7 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
     /* for stability we search in the dimension of the strongest component */
     i = (fabs (ray->r.line.vec[0]) <= fabs (ray->r.line.vec[1])) ? 1 : 0;
-    ni = i ^ 1;
+    ni = i ^ 1; /* not i */
 
     if (patchno >= 0)
     {
@@ -101,16 +105,23 @@ intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
          * contribution of this ray-patch combination to the ray integral.
          * We should return 1 (even though a leaf return value is ignored). */
         int j, nj;
-        double t;
+        double t, shift;
         double hits[2][2];
 
         /* compute the coordinates of intersections with most orthogonal edges */
-        for (j = 0; j < 2; j++)
-        {
-            hits[j][i] = corners[j][i];
-            t = (corners[j][i] - ray->xy[i]) / ray->r.line.vec[i];
-            hits[j][ni] = ray->xy[ni] + t * ray->r.line.vec[ni];
-        }
+        t = (corners[0][i] - ray->xy[i]) / ray->r.line.vec[i];
+        shift = ray->xy[ni] + t * ray->r.line.vec[ni];
+
+        /* shift coordinate system to the first hit */
+        hits[0][0] = 0.;
+        hits[0][1] = 0.;
+        corners[1][ni] -= shift;
+        corners[0][ni] -= shift;
+
+        /* compute second hit in shifted coordinate system */
+        hits[1][i] = corners[1][i] - corners[0][i];
+        t = hits[1][i] / ray->r.line.vec[i];
+        hits[1][ni] = t * ray->r.line.vec[ni];
 
         /* compute the actual hit coordinates */
         t = 0.;
@@ -296,7 +307,7 @@ swirl_rays_new (int nlines)
         ray->xy[0] = 0.5;
         ray->xy[1] = 0.5;
         /* we add 0.1, since the intersection callback does not guarantee exact
-         * results for axis-parallel rays, which may lie on a patch boundary */
+         * results for axis-parallel rays */
         ray->r.line.vec[0] = cos ((i + 0.1) * 2 * M_PI / nlines);
         ray->r.line.vec[1] = sin ((i + 0.1) * M_PI / nlines);
     }
