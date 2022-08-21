@@ -1109,7 +1109,7 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     mpiret = sc_MPI_Allreduce (found, found_buffer, num_points, sc_MPI_INT,
                                sc_MPI_MIN, domain->mpicomm);
     SC_CHECK_MPI (mpiret);
-    SC_FREE (found);
+    FCLAW_FREE (found);
 
     for (ip = 0; ip < num_points; ++ip)
     {
@@ -1119,7 +1119,7 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     }
 
     /* tidy up memory */
-    SC_FREE (found_buffer);
+    FCLAW_FREE (found_buffer);
     sc_array_destroy (points);
 }
 
