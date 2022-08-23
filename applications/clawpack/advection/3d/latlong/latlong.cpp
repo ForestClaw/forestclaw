@@ -47,13 +47,22 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     fclaw2d_map_latlong_set_maxelev(user->maxelev);
 
-    /* Latlong */
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont = fclaw2d_map_new_latlong(brick,fclaw_opt->scale,
-                                   user->latitude, 
-                                   user->longitude,
-                                   a,b);
+    FCLAW_ASSERT(fclaw_opt->manifold != 0);
+
+    switch (user->example) 
+    {
+    case 1:
+        /* Latlong */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_latlong(brick,fclaw_opt->scale,
+                                       user->latitude, 
+                                       user->longitude,
+                                       a,b);
+        break;
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
@@ -85,7 +94,6 @@ void run_program(fclaw2d_global_t* glob)
     {
         fclaw_global_essentialf("latlong : clawpack 5.0 not yet implemented with mappings\n");
         exit(0);
-        //fc2d_clawpack5_solver_initialize(glob);
     }
 
     latlong_link_solvers(glob);

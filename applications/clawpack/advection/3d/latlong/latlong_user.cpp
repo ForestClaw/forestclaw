@@ -61,15 +61,23 @@ void latlong_patch_setup(fclaw2d_global_t *glob,
 void latlong_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+
     fclaw_vt->problem_setup = latlong_problem_setup;
 
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &latlong_patch_setup;
 
+    fclaw3dx_clawpatch_options_t *clawpatch_opt = fclaw3dx_clawpatch_get_options(glob);
+    FCLAW_ASSERT(clawpatch_opt->maux == 4);
+
     const user_options_t   *user = latlong_get_options(glob);
     if (user->claw_version == 4)
     {
         fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt(glob);
+        fc3d_clawpack46_options_t *clawopt = fc3d_clawpack46_get_options(glob);
+
+        /* mcapa should be non-zero for mapped examples */
+        FCLAW_ASSERT(clawopt->mcapa != 0);
 
         /* This calls a manifold version of setaux */
         fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
@@ -80,5 +88,10 @@ void latlong_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpn3       = &CLAWPACK46_RPN3;
         clawpack46_vt->fort_rpt3       = &CLAWPACK46_RPT3;
         clawpack46_vt->fort_rptt3      = &CLAWPACK46_RPTT3;            
+    }
+    else
+    {
+        fclaw_global_essentialf("Clawpack 5.0 examples not implemented.");
+        exit(0);
     }
 }
