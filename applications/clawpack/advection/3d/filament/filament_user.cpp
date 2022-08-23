@@ -79,16 +79,19 @@ void filament_link_solvers(fclaw2d_global_t *glob)
         else
         {
             fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt(glob);
+            fc3d_clawpack46_options_t *clawopt = fc3d_clawpack46_get_options(glob);
 
             if (fclaw_opt->manifold)
             {
                 /* This calls a manifold version of setaux */
+                FCLAW_ASSERT(clawopt->mcapa != 0);
                 fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
                 patch_vt->setup = filament_patch_setup;
             }
             else
             {
                 /* This calls a setaux routine */
+                FCLAW_ASSERT(clawopt->mcapa == 0);
                 clawpack46_vt->fort_setaux     = &CLAWPACK46_SETAUX;  
             }
             clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
