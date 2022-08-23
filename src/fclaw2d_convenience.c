@@ -1018,11 +1018,14 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                               sc_array_t * block_offsets,
                               sc_array_t * coordinates, sc_array_t * results)
 {
-    int ip, jb;
+    int ip, jb, mpiret;
     int num_blocks;
     int num_points;
     int pbegin, pend;
     int *pentry;
+    int *found;
+    int *found_buffer;
+    int *resi;
     sc_array_t *points;
 
     p4est_t *p4est;
@@ -1095,8 +1098,28 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     p4est->user_pointer = user_save;
 
     /* synchronize results in parallel */
+    found = FCLAW_ALLOC (int, num_points);
+    for (ip = 0; ip < num_points; ++ip)
+    {
+        resi = (int *) sc_array_index (results, ip);
+        found[ip] = (*resi < 0 ? domain->mpisize : domain->mpirank);
+    }
+
+    found_buffer = FCLAW_ALLOC (int, num_points);
+    mpiret = sc_MPI_Allreduce (found, found_buffer, num_points, sc_MPI_INT,
+                               sc_MPI_MIN, domain->mpicomm);
+    SC_CHECK_MPI (mpiret);
+    FCLAW_FREE (found);
+
+    for (ip = 0; ip < num_points; ++ip)
+    {
+        if (found_buffer[ip] != domain->mpirank) {
+            *(int *) sc_array_index (results, ip) = -1;
+        }
+    }
 
     /* tidy up memory */
+    FCLAW_FREE (found_buffer);
     sc_array_destroy (points);
 }
 
