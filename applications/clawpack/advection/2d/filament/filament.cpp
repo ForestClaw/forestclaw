@@ -51,6 +51,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         /* Square brick domain */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
+        
         /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
         cont = fclaw2d_map_new_cart(brick,
                                     fclaw_opt->scale,

@@ -62,8 +62,8 @@ filament_postprocess(user_options_t *user)
 static fclaw_exit_type_t
 filament_check (user_options_t *user)
 {
-    if (user->example < 0 || user->example > 2) {
-        fclaw_global_essentialf ("Option --user:example must be 0, 1, or 2\n");
+    if (user->example < 1 || user->example > 3) {
+        fclaw_global_essentialf ("Option --user:example must be 1, 2, or 3\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;

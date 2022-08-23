@@ -1,11 +1,11 @@
 function [xp,yp,zp] = mapc2m(xc,yc)
 
 parms = read_vars();
-if parms.example == 0
+if parms.example == 1
     map = 'cart';   % brick
-elseif parms.example == 1
-    map = 'fivepatch';
 elseif parms.example == 2
+    map = 'fivepatch';
+elseif parms.example == 3
     map = 'bilinear';
 end
 

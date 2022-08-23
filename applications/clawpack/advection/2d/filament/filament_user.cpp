@@ -55,6 +55,7 @@ void filament_patch_setup(fclaw2d_global_t *glob,
 
 void filament_link_solvers(fclaw2d_global_t *glob)
 {
+    /* All examples require manifold = T */
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     FCLAW_ASSERT(fclaw_opt->manifold != 0);
 
@@ -68,6 +69,9 @@ void filament_link_solvers(fclaw2d_global_t *glob)
     if (user->claw_version == 4)
     {
         fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);
+        fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
+
+        FCLAW_ASSERT(clawopt->mcapa != 0);
 
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV_MANIFOLD;
@@ -76,8 +80,13 @@ void filament_link_solvers(fclaw2d_global_t *glob)
     else if (user->claw_version == 5)
     {
         fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
+        fc2d_clawpack5_options_t *clawopt = fc2d_clawpack5_get_options(glob);
 
-        claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;        
+        /* All mappings require mcapa > 0 */
+        FCLAW_ASSERT(clawopt->mcapa != 0);
+
+
+        claw5_vt->fort_qinit  = &CLAWPACK5_QINIT;        
         claw5_vt->fort_rpn2   = CLAWPACK5_RPN2ADV_MANIFOLD;
         claw5_vt->fort_rpt2   = CLAWPACK5_RPT2ADV_MANIFOLD;
     }
