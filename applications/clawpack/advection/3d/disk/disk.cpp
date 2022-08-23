@@ -45,6 +45,11 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
+    /* Check that we are running a manifold example */
+    FCLAW_ASSERT(fclaw_opt->manifold != 0);
+
+    /* Four aux array values required for this simulation */
+    FCLAW_ASSERT(clawpatch_opt->maux == 4);
 
     switch (user_opt->example) 
     {

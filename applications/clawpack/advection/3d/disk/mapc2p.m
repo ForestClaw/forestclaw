@@ -2,9 +2,9 @@ function [xp,yp,zp] = mapc2p(xc,yc,zc)
 
 parms = read_vars();
 
-if parms.example == 0
+if parms.example == 1
     map = 'pillowdisk';
-elseif parms.example == 1
+elseif parms.example == 2
     map = 'pillowdisk5';
 end
 

@@ -61,6 +61,10 @@ void disk_link_solvers(fclaw2d_global_t *glob)
 
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);    
     patch_vt->setup = disk_patch_setup;    
+
+    /* Check that mcapa is set */
+    fc3d_clawpack46_options_t *clawopt = fc3d_clawpack46_get_options(glob);
+    FCLAW_ASSERT(clawopt->mcapa != 0);
     
     const user_options_t* user = disk_get_options(glob);
     if (user->claw_version == 4)
