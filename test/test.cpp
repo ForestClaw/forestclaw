@@ -24,6 +24,11 @@ void fclaw_test_expect_abort()
     expect_abort=true;
 }
 
+void fclaw_test_clear_expect_abort()
+{
+    expect_abort=false;
+}
+
 std::jmp_buf& fclaw_test_get_jump_buffer()
 {
     return jump_buffer;
