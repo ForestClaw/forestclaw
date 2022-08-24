@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
 #include <fclaw2d_options.h>
-#include <test/doctest.h>
+#include <test.hpp>
 #include <test/test.hpp>
 #include <fstream>
 #include <bitset>
