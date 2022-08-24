@@ -1,12 +1,32 @@
+#include <atomic>
 #include <fclaw_mpi.h>
 
 #define DOCTEST_CONFIG_IMPLEMENT
-#include <doctest.h>
+#include <test.hpp>
 #include <exception>
+#include <csetjmp>
+
+static bool expect_abort=false;
+
+std::jmp_buf jump_buffer;
 
 void throw_exception()
 {
-    throw std::runtime_error("SC Aborted");
+    if(expect_abort)
+    {
+        expect_abort=false;
+        std::longjmp(jump_buffer, 1);
+    }
+}
+
+void fclaw_test_expect_abort()
+{
+    expect_abort=true;
+}
+
+std::jmp_buf& fclaw_test_get_jump_buffer()
+{
+    return jump_buffer;
 }
 
 int main(int argc, char *argv[])
