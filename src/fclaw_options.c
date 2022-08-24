@@ -488,7 +488,9 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
     FCLAW_ASSERT (a != NULL);
 
     /* Basic options for print out help message, current options, etc */
-    fclaw_app_options_register_core (a, configfile);
+    if(!fclaw_app_options_core_registered(a)){
+        fclaw_app_options_register_core (a, configfile);
+    }
 
     /* allocate storage for fclaw_options */
     /* we will free it in the options_destroy callback */
@@ -501,13 +503,6 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
                                 &options_vtable,
                                 fclaw_opt);
     
-    /* this is to retrieve the option key-value pair */
-    if(section==NULL){
-        fclaw_app_set_attribute(a,"Options",fclaw_opt);
-    }else{
-        fclaw_app_set_attribute(a,section,fclaw_opt);
-    }
-
     return fclaw_opt;
 }
 
