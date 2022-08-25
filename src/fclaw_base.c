@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -58,6 +58,7 @@ struct fclaw_app
     char ***argv;             /**< Pointer to main function's argument list. */
     sc_options_t *opt;        /**< Central options structure. */
     void *user;               /**< Set by fclaw_app_new, not touched by forestclaw. */
+    int core_registered;    /**< True if core options (-h,etc) have been registered */
 
     /* paths and configuration files */
     const char *configdir;    /**< Defaults to fclaw_configdir under $HOME, may
@@ -226,6 +227,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->user = user;
     a->opt = sc_options_new ((*argv)[0]);
     sc_options_set_spacing (a->opt, 40, 56);
+    a->core_registered = 0;
 
     a->opt_pkg = sc_array_new (sizeof (fclaw_app_options_t));
 
@@ -468,6 +470,12 @@ static const fclaw_app_options_vtable_t options_vtable_core = {
     options_destroy_core
 };
 
+int
+fclaw_app_options_core_registered (fclaw_app_t * a)
+{
+    return a->core_registered;
+}
+
 void
 fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
 {
@@ -483,6 +491,7 @@ fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
     /* when there are more parameters to pass, create a structure to pass */
     fclaw_app_options_register (a, NULL, configfile, &options_vtable_core,
                                 core);
+    a->core_registered = 1;
 }
 
 

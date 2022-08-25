@@ -55,6 +55,7 @@ target_link_libraries(FORESTCLAW::CLAWPACK3_46 INTERFACE clawpack3_46)
 if(BUILD_TESTING)
   add_executable(fc3d_clawpack46.TEST
     fc3d_clawpack46.h.TEST.cpp
+    fc3d_clawpack46_options.h.TEST.cpp
   )
   target_link_libraries(fc3d_clawpack46.TEST testutils clawpack3_46)
   register_unit_tests(fc3d_clawpack46.TEST)

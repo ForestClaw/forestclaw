@@ -90,14 +90,15 @@ struct fclaw3dx_clawpatch_options
 };
 
 /**
- * @brief Register options from SC
+ * @brief Register options in SC
  * 
  * @param app the app context
+ * @param name the name of the options group
  * @param configfile the config file
  * @return fclaw3dx_clawpatch_options_t* a newly allocated options struct
  */
 fclaw3dx_clawpatch_options_t *
-fclaw3dx_clawpatch_options_register(fclaw_app_t* app, const char* configfile);
+fclaw3dx_clawpatch_options_register(fclaw_app_t* app, const char* name, const char* configfile);
 
 /**
  * @brief Store the options in the global context

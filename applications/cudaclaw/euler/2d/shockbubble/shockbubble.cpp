@@ -121,10 +121,10 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
-    fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    cuclaw_opt =          fc2d_cudaclaw_options_register(app,"fclaw_options.ini");
-    user_opt =              shockbubble_options_register(app,"fclaw_options.ini");  
+    fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
+    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    cuclaw_opt =          fc2d_cudaclaw_options_register(app, "cudaclaw",  "fclaw_options.ini");
+    user_opt =              shockbubble_options_register(app,              "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);

@@ -78,6 +78,7 @@ struct fclaw2d_global
     struct fclaw_package_container *pkg_container;    /**< Solver packages for internal use. */
 
     struct fclaw_pointer_map *vtables;    /**< Vtables */
+    struct fclaw_pointer_map *options;    /**< options */
  
     struct fclaw2d_map_context* cont;
     struct fclaw2d_domain *domain;

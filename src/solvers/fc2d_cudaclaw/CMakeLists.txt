@@ -72,6 +72,7 @@ target_link_libraries(FORESTCLAW::CUDACLAW INTERFACE cudaclaw)
 if(BUILD_TESTING)
   add_executable(fc2d_cudaclaw.TEST
     fc2d_cudaclaw.h.TEST.cpp
+    fc2d_cudaclaw_options.h.TEST.cpp
   )
   target_link_libraries(fc2d_cudaclaw.TEST testutils cudaclaw)
   register_unit_tests(fc2d_cudaclaw.TEST)

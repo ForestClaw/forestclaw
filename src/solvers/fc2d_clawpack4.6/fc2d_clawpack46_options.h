@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -71,7 +71,16 @@ fclaw_exit_type_t fc2d_clawpack46_check (fc2d_clawpack46_options_t * clawopt);
 
 void fc2d_clawpack46_reset (fc2d_clawpack46_options_t * clawopt);
 
+/**
+ * @brief Register options in SC
+ * 
+ * @param a the app context
+ * @param section the section name
+ * @param configfile the config file
+ * @return fc2d_clawpack46_options_t* a newly allocated options struct
+ */
 fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                                              const char *section,
                                                               const char *configfile);
 
 void fc2d_clawpack46_package_register(fclaw_app_t* app,

@@ -42,7 +42,16 @@ extern "C"
 /* Plan is to replace fclaw_options_t with fclaw_options_t */
 typedef struct fclaw_options fclaw_options_t;
 
+/**
+ * @brief Register options in SC
+ * 
+ * @param a the app context
+ * @param section the section name
+ * @param configfile the config file
+ * @return fclaw2d_options_t* a newly allocated options struct
+ */
 fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
+                                         const char *section,
                                          const char *configfile);
 
 /* These can be called from external routines (in torthem, for example?) */

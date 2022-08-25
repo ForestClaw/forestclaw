@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 
 #include "phasefield_user.h"
 
-static int s_user_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 static void *
 phasefield_register (phasefield_options_t *user, sc_options_t * opt)
@@ -190,13 +190,14 @@ phasefield_options_t* phasefield_options_register (fclaw_app_t * app,
 
 void phasefield_options_store (fclaw2d_global_t* glob, phasefield_options_t* user)
 {
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"user") == NULL);
+    fclaw_pointer_map_insert(glob->options, "user", user, NULL);
 }
 
 const phasefield_options_t* phasefield_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_options_package_id;
-    return (phasefield_options_t*) fclaw_package_get_options(glob, id);    
+    phasefield_options_t* user = (phasefield_options_t*) 
+                              fclaw_pointer_map_get(glob->options, "user");
+    FCLAW_ASSERT(user != NULL);
+    return user;
 }

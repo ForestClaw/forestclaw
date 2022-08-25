@@ -92,7 +92,8 @@ check_PROGRAMS += src/solvers/fc2d_geoclaw/fc2d_geoclaw.TEST
 TESTS += src/solvers/fc2d_geoclaw/fc2d_geoclaw.TEST
 
 src_solvers_fc2d_geoclaw_fc2d_geoclaw_TEST_SOURCES = \
-    src/solvers/fc2d_geoclaw/fc2d_geoclaw.h.TEST.cpp
+    src/solvers/fc2d_geoclaw/fc2d_geoclaw.h.TEST.cpp \
+    src/solvers/fc2d_geoclaw/fc2d_geoclaw_options.h.TEST.cpp
 
 src_solvers_fc2d_geoclaw_fc2d_geoclaw_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \

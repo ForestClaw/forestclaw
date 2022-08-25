@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -444,6 +444,15 @@ void fclaw_app_options_register (fclaw_app_t * a,
                                  const char *section, const char *configfile,
                                  const fclaw_app_options_vtable_t * vt,
                                  void *package);
+
+/**
+ * \brief Check if core options have been registered for this app
+ * 
+ * \param [in,out] a            A valid application object.
+ * \return int                  1 if registered, 0 if not
+ */
+int
+fclaw_app_options_core_registered (fclaw_app_t * a);
 
 /** Register a central convenience options package with default behavior.
  * It is just an example and completely fine not to use this function.

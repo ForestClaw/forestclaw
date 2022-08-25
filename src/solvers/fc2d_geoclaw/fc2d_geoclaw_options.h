@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,17 @@ typedef struct fc2d_geoclaw_options
     
 } fc2d_geoclaw_options_t;
 
+
+/**
+ * @brief Register options in SC
+ * 
+ * @param a the app context
+ * @param section the section name
+ * @param configfile the config file
+ * @return fc2d_geoclaw_options_t* a newly allocated options struct
+ */
 fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t * app,
+                                                       const char *section,
                                                        const char *configfile);
 
 void fc2d_geoclaw_options_store (struct fclaw2d_global* glob, 

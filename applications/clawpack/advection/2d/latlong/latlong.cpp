@@ -119,11 +119,11 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Register packages */
-    fclaw_opt                  = fclaw_options_register(app, "fclaw_options.ini");
-    clawpatch_opt  = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
-    claw46_opt       = fc2d_clawpack46_options_register(app, "fclaw_options.ini");
-    claw5_opt         = fc2d_clawpack5_options_register(app, "fclaw_options.ini");
-    user_opt                 = latlong_options_register(app, "fclaw_options.ini");
+    fclaw_opt                  = fclaw_options_register(app,  NULL,        "fclaw_options.ini");
+    clawpatch_opt  = fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    claw46_opt       = fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
+    claw5_opt         = fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
+    user_opt                 = latlong_options_register(app,               "fclaw_options.ini");
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);
