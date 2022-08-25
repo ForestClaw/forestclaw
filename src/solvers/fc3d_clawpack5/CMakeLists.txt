@@ -17,7 +17,7 @@ set_target_properties(clawpack5_3d_f PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE
 add_library(clawpack5_3d STATIC)
 set_target_properties(clawpack5_3d PROPERTIES EXPORT_NAME CLAWPACK5_3D)
 
-target_sources(clawpack5_3d PRIVATE 
+target_sources(clawpack5_3d PRIVATE
     fc3d_clawpack5.cpp
     fc3d_clawpack5_options.c
 	$<TARGET_OBJECTS:clawpack5_3d_f>
@@ -38,9 +38,10 @@ install(FILES
 )
 
 install(TARGETS clawpack5_3d
-  EXPORT ${PROJECT_NAME}Targets
+  EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION lib
+	RUNTIME DESTINATION bin)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CLAWPACK5_3D INTERFACE IMPORTED GLOBAL)

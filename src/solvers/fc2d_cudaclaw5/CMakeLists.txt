@@ -26,7 +26,7 @@ target_compile_options(cudaclaw5 PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:
 # needed because we have device code in a library
 set_target_properties(cudaclaw5 PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
-target_sources(cudaclaw5 PRIVATE 
+target_sources(cudaclaw5 PRIVATE
 	fc2d_cudaclaw5.cpp
 	fc2d_cudaclaw5_options.c
 	cuda_source/cudaclaw5_update_q.cu
@@ -55,9 +55,10 @@ install(FILES
 )
 
 install(TARGETS cudaclaw5
-  EXPORT ${PROJECT_NAME}Targets
+  EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION lib
+	RUNTIME DESTINATION bin)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CUDACLAW5 INTERFACE IMPORTED GLOBAL)
