@@ -65,9 +65,8 @@ void latlong_options_store (fclaw2d_global_t* glob, user_options_t* user);
 const user_options_t* latlong_get_options(fclaw2d_global_t* glob);
 
 /* Local mapping that is user defined. */
-struct fclaw2d_map_context *
-    latlong_map_extrude (fclaw2d_map_context_t* cont,
-                         const double maxelev);
+void latlong_map_extrude (fclaw2d_map_context_t* cont,
+                          const double maxelev);
 
 
 

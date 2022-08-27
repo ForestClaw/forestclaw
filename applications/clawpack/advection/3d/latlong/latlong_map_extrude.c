@@ -64,8 +64,7 @@ latlong_map_3dx(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-fclaw2d_map_context_t *
-    latlong_map_extrude(fclaw2d_map_context_t* cont,
+void latlong_map_extrude(fclaw2d_map_context_t* cont,
                          const double maxelev)
 
 {
@@ -76,7 +75,7 @@ fclaw2d_map_context_t *
 
     cont->is_extruded = 1;
 
-    return cont;
+    return;
 }
 
 
