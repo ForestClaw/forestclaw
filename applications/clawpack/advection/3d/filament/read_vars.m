@@ -6,5 +6,6 @@ parms.example = data(1);
 parms.manifold = data(2);
 parms.alpha = data(3);
 parms.center = data(4:5);
+parms.maxelev = data(6);
 
 end

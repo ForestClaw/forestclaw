@@ -45,6 +45,9 @@ filament_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
                         "[user] alpha (for 5-patch mapping) [0.4]");
 
+    sc_options_add_double (opt, 0, "max-elevation", &user->maxelev, 1,
+                        "[user] Max elevation in extruded direction [1]");
+
     fclaw_options_add_double_array (opt, 0, "center", &user->center_string, "0 0",
                                         &user->center, 2, 
                                         "Center point for bilinear mapping  [(0,0)]");

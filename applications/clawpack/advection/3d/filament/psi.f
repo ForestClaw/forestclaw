@@ -1,8 +1,12 @@
-      double precision function psi(x,y,z)
+      double precision function psi(x,y,z,t)
       implicit none
 
-      double precision x,y,z,pi,r
-      common /compi/ pi
+      double precision x,y,z,t 
+
+      double precision pi, pi2
+      common /compi/ pi, pi2
+
+      double precision r
 
 c      psi = ((sin(pi*x))**2 * (sin(pi*y))**2) / pi
 

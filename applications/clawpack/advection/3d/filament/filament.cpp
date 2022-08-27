@@ -27,8 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user.h"
 
-#include <fc3d_clawpack46.h>
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
@@ -55,6 +53,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     case 0:
         FCLAW_ASSERT(claw3_opt->mcapa == 0);
         FCLAW_ASSERT(fclaw_opt->manifold == 0);
+
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
@@ -106,6 +105,10 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         SC_ABORT_NOT_REACHED ();
     }
 
+    if (user->example > 0)
+    {
+        filament_map_extrude(cont,user->maxelev);
+    }
     
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);

@@ -20,6 +20,7 @@
          zp = zc
       endif
 
+c      write(6,*) xc,yc, zc, xp, yp
       r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2)
 
       fdisc = r-0.25d0

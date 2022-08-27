@@ -14,6 +14,7 @@ end
 % This domain should be in [0,1],[0,1]
 
 alpha = parms.alpha;
+maxelev = parms.maxelev;
 
 shift = [1,1,0];
 
@@ -30,14 +31,14 @@ switch map
                 
         xp = xp + shift(1);
         yp = yp + shift(2);
-        zp = zc;
+        zp = maxelev*zc;
         
     case 'fivepatch'
         [xp,yp,~] = mapc2m_fivepatch(xc,yc,alpha);
 
         xp = xp + shift(1);
         yp = yp + shift(2);
-        zp = zc;
+        zp = maxelev*zc;
 
     case 'bilinear'
         center = parms.center;
@@ -45,7 +46,7 @@ switch map
 
         xp = xp + shift(1);
         yp = yp + shift(2);
-        zp = zc;
+        zp = parms.maxelev*zc;
 
 end
 

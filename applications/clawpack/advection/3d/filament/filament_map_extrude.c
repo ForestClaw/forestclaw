@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,54 +23,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FILAMENT_USER_H
-#define FILAMENT_USER_H
 
-#include "../all/advection_user.h"
+#include "filament_user.h"
 
-#ifdef __cplusplus
-extern "C"
+/* User defined extruded mesh mapping */
+static void
+filament_map_3dx(fclaw2d_map_context_t * cont, int blockno,
+               double xc, double yc, double zc,
+               double *xp, double *yp, double *zp)
 {
-#endif
+    /* Call 2d mapping to get surface.  2d mapping is not scaled in the 
+       extruded case. */
+    cont->mapc2m(cont,blockno,xc,yc,xp,yp,zp);
 
-#if 0
-/* Fix syntax highlighting */
-#endif
+    /* Extrude in z direction to constant height maxelev. */
+    double maxelev = cont->user_double_3dx[0]; 
+    *zp = maxelev*zc;
 
-typedef struct user_options
-{
-    int example;
-    int use_claw3d;
+    /* Whether it makes sense to scale/shift this mapping is up to the user */
+    scale_map(cont,xp,yp,zp);
+    shift_map(cont,xp,yp,zp);
+}
 
-    int claw_version;
-
-    double alpha;
-
-    double maxelev;
-
-    double *center;
-    const char* center_string;
-
-    int is_registered;
-
-} user_options_t;
-
-
-user_options_t* filament_options_register (fclaw_app_t * app,
-                                           const char *configfile);
-
-void filament_options_store (fclaw2d_global_t* glob, user_options_t* user);
-
-const user_options_t* filament_get_options(fclaw2d_global_t* glob);
-
-void filament_link_solvers(fclaw2d_global_t *glob);
 
 void filament_map_extrude(fclaw2d_map_context_t* cont,
-                          const double maxelev);
+                          const double maxelev)
 
+{
+    /* May be needed to get more general mappings */
+    cont->mapc2m_3dx = filament_map_3dx;
 
-#ifdef __cplusplus
+    cont->user_double_3dx[0] = maxelev;
+
+    cont->is_extruded = 1;
+
+    return;
 }
-#endif
 
-#endif
+
+

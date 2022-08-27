@@ -38,6 +38,7 @@ void filament_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24.4f   %s",user->alpha,"\% alpha\n");
         fprintf(f,  "%-24.4f   %s",user->center[0],"\% center_x\n");
         fprintf(f,  "%-24.4f   %s",user->center[1],"\% center_y\n");
+        fprintf(f,  "%-24.4f   %s",user->maxelev,"\% max_elevation\n");
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);

@@ -18,6 +18,7 @@ add_executable(filament3dx
   filament.cpp 
   filament_options.c 
   filament_user.cpp 
+  filament_map_extrude.c 
   ${all}/advection_patch_setup_manifold.c 
   ${all2d}/fclaw2d_map_cart.c 
   ${all2d}/fclaw2d_map_fivepatch.c 

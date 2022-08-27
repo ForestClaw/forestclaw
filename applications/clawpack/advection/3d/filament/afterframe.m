@@ -7,6 +7,7 @@ yrbcolormap
 caxis([0,1])
 colorbar;
 
+parms = read_vars();
 
 % Compute exact solution at time T.
 
@@ -25,7 +26,7 @@ if plot_soln
     end
     hold on;
     for i = 1:length(zSliceCoords)  
-        s = zSliceCoords(i);
+        s = maxelev*zSliceCoords(i);
     
         zout = 0*xout + s;
         soln_handle = plot3(xout,yout,zout,'k','linewidth',3);
@@ -39,22 +40,21 @@ setpatchborderprops('linewidth',1);
 setpatchbordercolor('k');
 
 
-view_3d = false;
+view_3d = true;
 if view_3d
     showcubes(5);
     showslices;
     view(3);
-    daspect([1 1 0.25]);
+    daspect([1 1 1]);
     set(gca,'box','on');
-    axis([0 2 0 2 0 1])
+    parms = read_vars();
+    maxelev = parms.maxelev;
+    axis([0 2 0 2 0 maxelev])
 else
     daspect([1 1 1]);
     axis([0 2 0 2])
     view(2)
 end
-
-colormap(parula);
-
 
 %axis off;
 axis on;
