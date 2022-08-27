@@ -220,14 +220,22 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
 
 	cp->manifold = fclaw_opt->manifold;
-
 	if (cp->manifold)
 	{
 		cp->xlower = patch->xlower;
 		cp->ylower = patch->ylower;
 		cp->xupper = patch->xupper;
 		cp->yupper = patch->yupper;
-	}	
+
+#if PATCH_DIM == 3 
+#if REFINE_DIM == 2
+		cp->zlower = 0;
+		cp->zupper = 1;
+#else
+#error "clawpatch::define : Octrees not yet implemented."
+#endif
+#endif
+	}
 	else
 	{
 		double ax = fclaw_opt->ax;
@@ -260,30 +268,38 @@ void clawpatch_define(fclaw2d_global_t* glob,
 		cp->xupper = ax + (bx - ax)*xupper;
 		cp->ylower = ay + (by - ay)*ylower;
 		cp->yupper = ay + (by - ay)*yupper;
+
+#if PATCH_DIM == 3
+		/* Use [az,bz] to scale in z direction.  This should work for 
+		   both extruded mesh and octree mesh. */
+		double az = fclaw_opt->az;
+		double bz = fclaw_opt->bz;
+
+#if REFINE_DIM == 2
+		double zlower = 0;		
+		double zupper = 1;
+#else
+#error "clawpatch::define : Octrees not yet implemented."
+#endif		
+		cp->zlower = az + (bz - az)*zlower;
+		cp->zupper = az + (bz - az)*zupper;
+#endif		
+
 	}
 
 	cp->dx = (cp->xupper - cp->xlower)/cp->mx;
 	cp->dy = (cp->yupper - cp->ylower)/cp->my;
 
 #if PATCH_DIM == 3	
-	
 #if REFINE_DIM == 2
 	/* For extruded mesh, we don't have any refinement in z */
-	double zlower = 0;
-	double zupper = 1;
-#else
-	fclaw_global_essentialf("clawpatch::define : Octree refinement not yet " \
-	                        "implemented in 3d.\n");
-	exit(0);
-#endif
 	cp->mz = clawpatch_opt->mz;
-	double az = fclaw_opt->az;
-	double bz = fclaw_opt->bz;
-
-	cp->zlower = az + (bz - az)*zlower;
-	cp->zupper = az + (bz - az)*zupper;
 	cp->dz = (cp->zupper - cp->zlower)/cp->mz;
-#endif
+
+#else
+#error "clawpatch::define : Octrees not yet implemented."
+#endif  /* REFINE_DIM == 2 */
+#endif  /* PATCH_DIM == 3 */
 
 
 	int ll[PATCH_DIM];
