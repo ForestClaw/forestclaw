@@ -27,6 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user.h"
 
+/* Needed for 2d mappings */
+#include <fclaw2d_map.h>
+
+
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
@@ -45,7 +49,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
-    fclaw2d_map_latlong_set_maxelev(user->maxelev);
+    //fclaw2d_map_latlong_set_maxelev(user->maxelev);
 
     FCLAW_ASSERT(fclaw_opt->manifold != 0);
 
@@ -63,6 +67,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     default:
         SC_ABORT_NOT_REACHED ();
     }
+
+    latlong_map_extrude(cont,user->maxelev);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);

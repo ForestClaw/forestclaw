@@ -33,6 +33,10 @@ extern "C"
 {
 #endif
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
 typedef struct user_options
 {
     int example;
@@ -60,7 +64,12 @@ void latlong_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* latlong_get_options(fclaw2d_global_t* glob);
 
-void fclaw2d_map_latlong_set_maxelev(double maxelev);
+/* Local mapping that is user defined. */
+struct fclaw2d_map_context *
+    latlong_map_extrude (fclaw2d_map_context_t* cont,
+                         const double maxelev);
+
+
 
 
 #ifdef __cplusplus

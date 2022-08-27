@@ -16,6 +16,7 @@ add_executable(latlong_3dx
   latlong.cpp 
   latlong_options.c 
   latlong_user.cpp 
+  latlong_map_extrude.c 
   ${all}/advection_patch_setup_manifold.c
   ${all2d}/fclaw2d_map_latlong.c 
   $<TARGET_OBJECTS:latlong3dx_f>
