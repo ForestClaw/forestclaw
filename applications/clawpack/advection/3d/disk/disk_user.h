@@ -33,13 +33,14 @@ extern "C"
 {
 #endif
 
+
 typedef struct user_options
 {
     int example;
     double alpha;
     int claw_version;
 
-    //fclaw_options_t* gparms;   /* Need to check mx */
+    double maxelev;   
 
     int is_registered;
 
@@ -58,6 +59,10 @@ void disk_link_solvers(fclaw2d_global_t *glob);
 void disk_global_post_process(fclaw_options_t *fclaw_opt,
                               fclaw3dx_clawpatch_options_t *clawpatch_opt,
                               user_options_t *user_opt);
+
+void disk_map_extrude(fclaw2d_map_context_t *cont, 
+                      const double maxelev);
+
 
 
 #ifdef __cplusplus

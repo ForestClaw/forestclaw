@@ -40,6 +40,10 @@ disk_register (user_options_t *user_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "claw-version", &user_opt->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
 
+    sc_options_add_double (opt, 0, "max-elevation", &user_opt->maxelev, 1,
+                        "[user] Max elevation in extruded direction [1]");
+
+
     sc_options_add_double (opt, 0, "alpha", &user_opt->alpha, 0.5,
                            "[user] Ratio used for squared- and pillow-disk [0.5]");
 

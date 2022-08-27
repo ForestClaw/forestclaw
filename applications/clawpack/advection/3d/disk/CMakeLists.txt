@@ -3,7 +3,7 @@ set(all2d ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(disk3dx_f OBJECT 
 	psi.f 
-	fdisc.f 
+	fdisc.f90
 	setprob.f 
 	user_4.6/qinit.f90 
   ${all}/claw3_setaux_manifold.f90
@@ -16,6 +16,7 @@ add_executable(disk3dx
   disk.cpp 
 	disk_options.c 
 	disk_user.cpp 
+  fclaw3dx_map_disk.c
   ${all}/advection_patch_setup_manifold.c
 	${all2d}/fclaw2d_map_pillowdisk5.c
   ${all2d}/fclaw2d_map_pillowsphere5.c

@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user.h"
 
+#include <fclaw2d_map.h>
+
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
@@ -51,6 +53,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     /* Four aux array values required for this simulation */
     FCLAW_ASSERT(clawpatch_opt->maux == 4);
 
+    /* Get 2d mapping */
     switch (user_opt->example) 
     {
     case 1:
@@ -59,6 +62,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_pillowdisk(fclaw_opt->scale,
                                           fclaw_opt->shift,
                                           rotate);
+
         break;
     case 2:
         if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
@@ -73,12 +77,17 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                             fclaw_opt->shift,
                                             rotate,
                                             user_opt->alpha);
+
         break;
 
     default:
         SC_ABORT_NOT_REACHED ();
     }
     
+
+    /* Extend 2d mapping with extruded mesh mapping details */
+    disk_map_extrude(cont,user_opt->maxelev);
+
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
