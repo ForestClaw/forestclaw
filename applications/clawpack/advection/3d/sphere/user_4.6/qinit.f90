@@ -7,7 +7,7 @@ SUBROUTINE clawpack46_qinit(meqn,mbc,mx,my,mz,xlower,ylower,zlower, &
     DOUBLE PRECISION ::   q(1-mbc:mx+mbc, 1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
     DOUBLE PRECISION :: aux(1-mbc:mx+mbc, 1-mbc:my+mbc,1-mbc:mz+mbc,maux)
 
-    INTEGER :: i, j, k, mq
+    INTEGER :: i, j, k
     DOUBLE PRECISION :: xlow, ylow, zlow, w   
 
     integer :: blockno, fc3d_clawpack46_get_block

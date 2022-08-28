@@ -58,13 +58,8 @@ sphere_postprocess(user_options_t *user)
 static fclaw_exit_type_t
     sphere_check (user_options_t* user)
 {
-    if (user->example == 2)
-    {
-        fclaw_global_essentialf("Pillow sphere is not currently implemented.");
-        return FCLAW_EXIT_ERROR;
-    }
-    if (user->example < 0 || user->example > 2) {
-        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
+    if (user->example < 1 || user->example > 2) {
+        fclaw_global_essentialf ("Option --user:example must be 1 or 2\n");
         return FCLAW_EXIT_ERROR;
     }
     return FCLAW_NOEXIT;

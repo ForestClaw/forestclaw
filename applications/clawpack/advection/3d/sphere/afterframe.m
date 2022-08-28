@@ -17,9 +17,6 @@ axis([-1-R,1+R,-1-R,1+R,-1-R,1+R]);
 set(gca,'box','on')
 view(3)
 
-view(vfront);
-view(vtop);
-
 % camlight;
 
 

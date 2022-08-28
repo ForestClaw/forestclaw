@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "sphere_user.h"
 
+#include <fclaw3dx_clawpatch_pillow.h>
+
 static
 void sphere_problem_setup(fclaw2d_global_t* glob)
 {
@@ -66,18 +68,19 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     patch_vt->setup      = &sphere_patch_setup;  
 
     const user_options_t* user = sphere_get_options(glob);
-    if (user->example == 1)
+    if (user->example == 2)
     {
-        fclaw_global_essentialf("sphere (3d) : Pillow sphere not yet implemented\n");
-        exit(0);
         /* Needed to get correct handling of block corners */
-        //fclaw2d_clawpatch_use_pillowsphere(glob);
+        fclaw3dx_clawpatch_use_pillowsphere(glob);
     }
 
 
     if (user->claw_version == 4)
     {
         fc3d_clawpack46_vtable_t *claw46_vt = fc3d_clawpack46_vt(glob);
+        fc3d_clawpack46_options_t *claw46_opt = fc3d_clawpack46_get_options(glob);
+
+        FCLAW_ASSERT(claw46_opt->mcapa != 0);
 
         /* These will work for both non-manifold and manifold case */
         claw46_vt->fort_qinit      = &CLAWPACK46_QINIT;

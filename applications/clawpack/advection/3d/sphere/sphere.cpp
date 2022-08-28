@@ -25,17 +25,20 @@
 
 #include "sphere_user.h"
 
-#include "../all/advection_user.h"
-
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt,
-                                user_options_t* user_opt)
+                                user_options_t* user_opt,
+                                fclaw3dx_clawpatch_options_t *claw_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
+
+    FCLAW_ASSERT(fclaw_opt->manifold != 0);
+    FCLAW_ASSERT(claw_opt->maux == 4);
+
 
     /* Used locally */
     double pi = M_PI;
@@ -44,15 +47,13 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
-    fclaw2d_map_latlong_set_maxelev(user_opt->maxelev);
-
     switch (user_opt->example) {
-    case 0:
+    case 1:
         conn = p4est_connectivity_new_cubed();
         cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale,
                                            rotate);
         break;
-    case 1:
+    case 2:
         conn = p4est_connectivity_new_pillow();
         cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
                                             rotate);
@@ -60,6 +61,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
     }
+
+    sphere_map_extrude(cont,user_opt->maxelev);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
@@ -142,7 +145,7 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
+        domain = create_domain(mpicomm, fclaw_opt, user_opt,clawpatch_opt);
     
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();

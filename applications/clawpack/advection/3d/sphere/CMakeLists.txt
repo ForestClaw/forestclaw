@@ -16,6 +16,7 @@ add_executable(sphere3dx
   sphere.cpp 
   sphere_user.cpp 
   sphere_options.c 
+  sphere_map_extrude.c
   ${all}/advection_patch_setup_manifold.c
   ${all2d}/fclaw2d_map_cubedsphere.c 
   ${all2d}/fclaw2d_map_pillowsphere.c 
