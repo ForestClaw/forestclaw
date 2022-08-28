@@ -60,6 +60,7 @@ TESTS += src/solvers/fc2d_thunderegg/fc2d_thunderegg.TEST
 
 src_solvers_fc2d_thunderegg_fc2d_thunderegg_TEST_SOURCES = \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg.h.TEST.cpp \
+	src/solvers/fc2d_thunderegg/fc2d_thunderegg_options.h.TEST.cpp \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg_vector_TEST.cpp
 
 src_solvers_fc2d_thunderegg_fc2d_thunderegg_TEST_CPPFLAGS = \

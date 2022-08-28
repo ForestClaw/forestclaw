@@ -1,13 +1,13 @@
 # -- fortran library
 add_library(clawpack4.6_f OBJECT
-  fortran_source/clawpack46_time_sync.f 
-  fortran_source/clawpack46_inlinelimiter.f 
+  fortran_source/clawpack46_time_sync.f
+  fortran_source/clawpack46_inlinelimiter.f
   fortran_source/clawpack46_set_capacity.f
-  fortran_source/clawpack46_block.f 
-  fortran_source/clawpack46_bc2_default.f 
+  fortran_source/clawpack46_block.f
+  fortran_source/clawpack46_bc2_default.f
   fortran_source/clawpack46_flux2.f
-  fortran_source/clawpack46_flux2fw.f 
-  fortran_source/clawpack46_step2.f 
+  fortran_source/clawpack46_flux2fw.f
+  fortran_source/clawpack46_step2.f
   fortran_source/clawpack46_step2_wrap.f
 )
 
@@ -17,8 +17,8 @@ target_include_directories(clawpack4.6_f INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/i
 add_library(clawpack4.6)
 set_target_properties(clawpack4.6 PROPERTIES EXPORT_NAME CLAWPACK4.6)
 
-target_sources(clawpack4.6 PRIVATE 
-  fc2d_clawpack46.cpp 
+target_sources(clawpack4.6 PRIVATE
+  fc2d_clawpack46.cpp
   fc2d_clawpack46_options.c
   $<TARGET_OBJECTS:clawpack4.6_f>
 )
@@ -37,14 +37,15 @@ install(FILES
 	fc2d_clawpack46.h
 	fc2d_clawpack46_options.h
 	clawpack46_user_fort.h
-	fc2d_clawpack46_fort.h 
+	fc2d_clawpack46_fort.h
   DESTINATION include
 )
 
 install(TARGETS clawpack4.6
-  EXPORT ${PROJECT_NAME}Targets
+  EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 
 # -- imported target, for use from FetchContent
@@ -54,6 +55,7 @@ target_link_libraries(FORESTCLAW::CLAWPACK4.6 INTERFACE clawpack4.6)
 if(BUILD_TESTING)
   add_executable(fc2d_clawpack46.TEST
     fc2d_clawpack46.h.TEST.cpp
+    fc2d_clawpack46_options.h.TEST.cpp
   )
   target_link_libraries(fc2d_clawpack46.TEST testutils clawpack4.6)
   register_unit_tests(fc2d_clawpack46.TEST)

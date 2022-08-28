@@ -28,9 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_global.h>
 #include <fclaw_options.h>
-#include <fclaw_package.h>
-
-static int s_thunderegg_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 static void*
 thunderegg_register (fc2d_thunderegg_options_t* mg_opt, sc_options_t * opt)
@@ -122,8 +120,7 @@ thunderegg_postprocess (fc2d_thunderegg_options_t * mg_opt)
 
 
 static fclaw_exit_type_t
-thunderegg_check(fc2d_thunderegg_options_t *mg_opt,
-                 fclaw2d_clawpatch_options_t *clawpatch_opt)
+thunderegg_check(fc2d_thunderegg_options_t *mg_opt)
 {
     return FCLAW_NOEXIT;
 }
@@ -179,7 +176,6 @@ static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
     fc2d_thunderegg_options_t *mg_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -188,11 +184,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     mg_opt = (fc2d_thunderegg_options_t*) package;
     FCLAW_ASSERT (mg_opt->is_registered);
 
-    clawpatch_opt = (fclaw2d_clawpatch_options_t *)
-        fclaw_app_get_attribute(app,"clawpatch",NULL);
-    FCLAW_ASSERT(clawpatch_opt->is_registered);
-
-    return thunderegg_check(mg_opt,clawpatch_opt);    
+    return thunderegg_check(mg_opt);
 }
 
 static void
@@ -223,6 +215,7 @@ static const fclaw_app_options_vtable_t thunderegg_options_vtable = {
    Public interface to clawpack options
    ---------------------------------------------------------- */
 fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
+                                                              const char *section,
                                                               const char *configfile)
 {
     fc2d_thunderegg_options_t *mg_opt;
@@ -230,21 +223,23 @@ fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
     FCLAW_ASSERT (app != NULL);
 
     mg_opt = FCLAW_ALLOC (fc2d_thunderegg_options_t, 1);
-    fclaw_app_options_register (app, "thunderegg", configfile,
+    fclaw_app_options_register (app, section, configfile,
                                 &thunderegg_options_vtable, mg_opt);
     
-    fclaw_app_set_attribute(app,"thunderegg",mg_opt);
+    fclaw_app_set_attribute(app, section, mg_opt);
     return mg_opt;
 }
 
 fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(fclaw2d_global_t *glob)
 {
-    int id = s_thunderegg_options_package_id;
-    return (fc2d_thunderegg_options_t*) fclaw_package_get_options(glob,id);
+    fc2d_thunderegg_options_t* user = (fc2d_thunderegg_options_t*) 
+                              fclaw_pointer_map_get(glob->options, "fc2d_thunderegg");
+    FCLAW_ASSERT(user != NULL);
+    return user;
 }
 
 void fc2d_thunderegg_options_store (fclaw2d_global_t* glob, fc2d_thunderegg_options_t* mg_opt)
 {
-    int id = fclaw_package_container_add_pkg(glob,mg_opt);
-    s_thunderegg_options_package_id = id;
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"fc2d_thunderegg") == NULL);
+    fclaw_pointer_map_insert(glob->options, "fc2d_thunderegg", mg_opt, NULL);
 }

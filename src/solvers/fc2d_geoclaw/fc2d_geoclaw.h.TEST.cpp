@@ -24,7 +24,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_global.h>
+#include <fclaw2d_options.h>
+#include <fclaw2d_clawpatch_options.h>
 #include <fc2d_geoclaw.h>
+#include <fc2d_geoclaw_options.h>
 #include <fclaw2d_forestclaw.h>
 #include <test/doctest.h>
 
@@ -32,6 +35,15 @@ TEST_CASE("fc2d_geoclaw_solver_initialize stores two seperate vtables in two sep
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	/* create some empty options structures */
+	fclaw2d_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
+	fclaw2d_clawpatch_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_geoclaw_options_store(glob1, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
+
+	fclaw2d_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
+	fclaw2d_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_geoclaw_options_store(glob2, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
 
 	fclaw2d_vtables_initialize(glob1);
 	fc2d_geoclaw_solver_initialize(glob1);
@@ -49,6 +61,11 @@ TEST_CASE("fc2d_geoclaw_solver_initialize sets is_set flag")
 {
 	fclaw2d_global_t* glob = fclaw2d_global_new();
 
+	/* create some empty options structures */
+	fclaw2d_options_store(glob, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
+	fclaw2d_clawpatch_options_store(glob, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_geoclaw_options_store(glob, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
+
 	fclaw2d_vtables_initialize(glob);
 	fc2d_geoclaw_solver_initialize(glob);
 
@@ -60,10 +77,32 @@ TEST_CASE("fc2d_geoclaw_solver_initialize sets is_set flag")
 
 #ifdef FCLAW_ENABLE_DEBUG
 
+TEST_CASE("fc2d_geoclaw_vt fails if not intialized")
+{
+	fclaw2d_global_t* glob1 = fclaw2d_global_new();
+	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	CHECK_THROWS(fc2d_geoclaw_vt(glob1));
+
+	CHECK_THROWS(fc2d_geoclaw_vt(glob2));
+
+	fclaw2d_global_destroy(glob1);
+	fclaw2d_global_destroy(glob2);
+}
+
 TEST_CASE("fc2d_geoclaw_vtable_initialize fails if called twice on a glob")
 {
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+
+	/* create some empty options structures */
+	fclaw2d_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
+	fclaw2d_clawpatch_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_geoclaw_options_store(glob1, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
+
+	fclaw2d_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
+	fclaw2d_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1));
+	fc2d_geoclaw_options_store(glob2, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
 
 	fclaw2d_vtables_initialize(glob1);
 	fc2d_geoclaw_solver_initialize(glob1);

@@ -482,6 +482,16 @@ void clawpack46_vt_destroy(void* vt)
 
 void fc2d_clawpack46_solver_initialize(fclaw2d_global_t* glob)
 {
+	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fc2d_clawpack46_options_t* clawopt = fc2d_clawpack46_get_options(glob);
+    clawopt->method[6] = clawpatch_opt->maux;
+
+	if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
+    {
+        fclaw_global_essentialf("clawpack46 : bad maux/mcapa combination\n");
+        exit(FCLAW_EXIT_ERROR);
+    }
+
 	int claw_version = 4;
 	fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
