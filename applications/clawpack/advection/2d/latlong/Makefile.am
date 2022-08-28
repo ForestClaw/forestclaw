@@ -8,7 +8,7 @@ applications_clawpack_advection_2d_latlong_latlong_SOURCES = \
 	applications/clawpack/advection/2d/latlong/latlong_user.h \
 	applications/clawpack/advection/2d/latlong/latlong_user.cpp \
 	applications/clawpack/advection/2d/latlong/fdisc.f \
-	applications/clawpack/advection/2d/latlong/setprob.f \
+	applications/clawpack/advection/2d/latlong/setprob.f90 \
 	applications/clawpack/advection/2d/latlong/psi.f \
 	applications/clawpack/advection/2d/latlong/user_4.6/qinit.f \
 	applications/clawpack/advection/2d/latlong/user_5.0/qinit.f90 \

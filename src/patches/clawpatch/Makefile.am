@@ -30,7 +30,9 @@ libclawpatch_installed_headers = \
 	src/patches/metric/fclaw2d_metric.h \
 	src/patches/metric/fclaw2d_metric.hpp \
 	src/patches/metric/fclaw2d_metric_default_fort.h \
-	src/patches/metric/fortran_source2d/fclaw2d_metric_terms.i 
+	src/patches/metric/fclaw3d_metric.h \
+	src/patches/metric/fclaw3d_metric.hpp \
+	src/patches/metric/fclaw3d_metric_default_fort.h
 
 libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
@@ -102,7 +104,10 @@ libclawpatch_compiled_sources = \
 	\
 	src/patches/metric/fclaw2d_metric.cpp \
 	src/patches/metric/fclaw2d_metric_default.c \
-	src/patches/metric/fortran_source2d/fclaw2d_metric_default_fort.f
+	src/patches/metric/fclaw3d_metric.cpp \
+	src/patches/metric/fclaw3d_metric_default.c \
+	src/patches/metric/fortran_source2d/fclaw2d_metric_default_fort.f90 \
+	src/patches/metric/fortran_source3d/fclaw3d_metric_default_fort.f90
 
 
 ## Name of library to build
