@@ -8,17 +8,6 @@ extern "C"
 #endif
 
 
-/* This can be used for extruded mesh computations */
-
-/* Set a default value : this should match the default option value */
-static double maxelev_s = 0.5;  
-
-void fclaw2d_map_latlong_set_maxelev(double maxelev)
-{
-    maxelev_s = maxelev;
-}
-
-
 static int
 fclaw2d_map_query_cubedsphere (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -76,40 +65,13 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_CUBEDSPHERE(&blockno, &xc,&yc,xp,yp,zp);
 
-    scale_map(cont,xp,yp,zp); 
-
-#if 0    
-    rotate_map(cont,xp,yp,zp);
-#endif    
+    if (cont->is_extruded == 0)
+    {
+        scale_map(cont,xp,yp,zp); 
+        rotate_map(cont,xp,yp,zp);        
+    }
 }
 
-static void
-fclaw3dx_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
-                              double xc, double yc, double zc, 
-                              double *xp, double *yp, double *zp)
-
-{
-    /* Maps point on blockno to sphere */
-    MAPC2M_CUBEDSPHERE(&blockno, &xc,&yc,xp,yp,zp);
-
-    /* Map point on sphere to point in unit shell (rp == 1) */
-    double phi = asin(*zp);     // returns value in [-pi/2, pi/2]
-    double theta = atan2(*yp,*xp);      // returns value in [-pi, pi]
-    if (theta < 0)
-        theta += 2*M_PI;
-
-    double maxelev = cont->user_double[0];  /* should match value set in the options */
-
-    /* Scaling depends on zc value, so we can't just scale using 'scale' below. */
-    double R = maxelev*zc + 1;  
-    *xp = R*cos(phi)*cos(theta);
-    *yp = R*cos(phi)*sin(theta);
-    *zp = R*sin(phi);
-
-#if 0    
-    rotate_map(cont,xp,yp,zp);
-#endif    
-}
 
 
 fclaw2d_map_context_t *
@@ -121,26 +83,15 @@ fclaw2d_map_context_t *
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cubedsphere;
     cont->mapc2m = fclaw2d_map_c2m_cubedsphere;
-    cont->mapc2m_3dx = fclaw3dx_map_c2m_cubedsphere;
 
     set_rotate(cont,rotate);
     set_scale(cont,scale);
 
-    /* 
-       Should match value set in options. 
-
-       Note : Does it make sense to pass this through as an argument 
-       to the mapping, since this mapping is used both for 2d and 3d?
-       Changing the argument list would break lots of examples ... 
-    */
-    cont->user_double[0] = maxelev_s;   
+    cont->is_extruded = 0;
 
     return cont;
 }
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif

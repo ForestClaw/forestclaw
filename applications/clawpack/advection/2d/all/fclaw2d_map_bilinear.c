@@ -95,11 +95,15 @@ fclaw2d_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
        create four bilinear maps. */
     MAPC2M_BILINEAR(&blockno,&xc,&yc,xp,yp,zp,center);
 
-    scale_map(cont, xp,yp,zp);
-    shift_map(cont, xp,yp,zp);
+    if (cont->is_extruded == 0)
+    {
+        scale_map(cont, xp,yp,zp);
+        shift_map(cont, xp,yp,zp);        
+    }
 }
 
 
+#if 0
 static void
 fclaw3dx_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
                          double xc, double yc, double zc,
@@ -118,6 +122,7 @@ fclaw3dx_map_c2m_bilinear(fclaw2d_map_context_t * cont, int blockno,
     scale_map(cont, xp,yp,zp);
     shift_map(cont, xp,yp,zp);
 }
+#endif
 
 
 fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
@@ -130,7 +135,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
     cont = FCLAW_ALLOC_ZERO(fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_bilinear;
     cont->mapc2m = fclaw2d_map_c2m_bilinear;
-    cont->mapc2m_3dx = fclaw3dx_map_c2m_bilinear;
+    //cont->mapc2m_3dx = fclaw3dx_map_c2m_bilinear;
     cont->brick = brick;
 
 
@@ -143,6 +148,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
     set_scale(cont,scale);
     set_shift(cont,shift);
 
+    cont->is_extruded = 0;
 
     return cont;
 }

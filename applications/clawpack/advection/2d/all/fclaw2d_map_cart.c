@@ -7,6 +7,10 @@ extern "C"
 {
 #endif
 
+#if 0
+/* Fix syntax highlighting */    
+#endif    
+
 static int
 fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
 {
@@ -68,13 +72,17 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     /* Unit square in [-1,1] x [-1,1] */
     MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
 
-    /* Shift by (1,1,0) to [0,2]x[0,2] */
-    scale_map(cont, xp, yp, zp);
-    shift_map(cont, xp,yp,zp);
+    if (cont->is_extruded == 0)
+    {
+        /* Shift and scale 2d mapping */
+        scale_map(cont, xp, yp, zp);
+        shift_map(cont, xp,yp,zp);        
+    }
 }
 
 
 
+#if 0
 static void
 fclaw3dx_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
                      double xc,  double yc,  double zc,
@@ -94,7 +102,7 @@ fclaw3dx_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
     scale_map(cont, xp,yp,zp);
     shift_map(cont, xp,yp,zp);
 }
-
+#endif
 
 fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t *brick,
                                             const double scale[],
@@ -105,11 +113,14 @@ fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t *brick,
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_cart;
     cont->mapc2m = fclaw2d_map_c2m_cart;
-    cont->mapc2m_3dx = fclaw3dx_map_c2m_cart;
     cont->brick = brick;
+
+    //cont->mapc2m_3dx = fclaw3dx_map_c2m_cart;
 
     set_scale(cont,scale);
     set_shift(cont,shift);
+
+    cont->is_extruded = 0;
 
     return cont;
 }

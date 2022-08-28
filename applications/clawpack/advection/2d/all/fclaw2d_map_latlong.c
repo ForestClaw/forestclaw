@@ -2,22 +2,9 @@
 
 #include <fclaw2d_map.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#define LATLONG_RADIUS(x,y,z) sqrt(pow(x,2) + pow(y,2) + pow(z,2))
-
-/* This can be used for extruded mesh computations */
-
-/* Set a default value : this should match the default option value */
-static double maxelev_s = 0.5;  
-
-void fclaw2d_map_latlong_set_maxelev(double maxelev)
-{
-    maxelev_s = maxelev;
-}
+#if 0
+/* Fix syntax highlighting */
+#endif    
 
 
 static int
@@ -95,37 +82,10 @@ fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
        a single "logical" block in [long0,long1]x[lat0,lat1] */
     MAPC2M_LATLONG(&blockno,&xc2,&yc2,xp,yp,zp);
 
-    scale_map(cont,xp,yp,zp);
-
+    if (cont->is_extruded == 0)
+        scale_map(cont,xp,yp,zp);
 }
 
-
-static void
-fclaw3dx_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
-                       double xc, double yc, double zc,
-                       double *xp, double *yp, double *zp)
-{
-    /* Call 2d mapping to get physical point on unit sphere (possible scaled) */
-    fclaw2d_map_c2m_latlong(cont,blockno,xc,yc,xp,yp,zp);
-
-    /* rp might not be 1, if sphere has been scaled in 2d code */
-    double rp = LATLONG_RADIUS(*xp,*yp,*zp);
-    double phi = asin(*zp/rp);     // returns value in [-pi/2, pi/2]
-    double theta = atan2(*yp,*xp);      // returns value in [-pi, pi]
-    if (theta < 0)
-        theta += 2*M_PI;
-
-    double maxelev = cont->user_double[4];  /* should match value set in the options */
-
-    /* Scaling depends on zc value, so we can't just scale using 'scale' below. */
-    double R = 1 + maxelev*zc;  
-    *xp = R*cos(phi)*cos(theta);
-    *yp = R*cos(phi)*sin(theta);
-    *zp = R*sin(phi);
-
-    //scale_map(cont,xp,yp,zp);
-
-}
 
 
 fclaw2d_map_context_t *
@@ -140,7 +100,6 @@ fclaw2d_map_context_t *
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_latlong;
     cont->mapc2m = fclaw2d_map_c2m_latlong;    
-    cont->mapc2m_3dx = fclaw3dx_map_c2m_latlong;
 
     cont->user_double[0] = lat[0];
     cont->user_double[1] = lat[1];
@@ -154,17 +113,11 @@ fclaw2d_map_context_t *
 
     cont->brick = brick;
 
-    /* 
-       Should match value set in options. 
-
-       Note : Does it make sense to pass this through as an argument 
-       to the mapping, since this mapping is used both for 2d and 3d?
-       Changing the argument list would break lots of examples ... 
-    */
-    cont->user_double[4] = maxelev_s;   
+    cont->is_extruded = 0;
 
     return cont;
 }
+
 
 #ifdef __cplusplus
 }
