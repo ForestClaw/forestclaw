@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13...3.20)
 project(FORESTCLAW
   DESCRIPTION "Quadtree/octree adaptive PDE solver based based on p4est."
   HOMEPAGE_URL https://github.com/ForestClaw/forestclaw
-  LANGUAGES C CXX Fortran 
+  LANGUAGES C CXX Fortran
   VERSION 0.1.4880)
 
 include(CTest)
@@ -88,7 +88,7 @@ add_subdirectory(src)
 if(clawpatch)
 
   add_subdirectory(src/patches/clawpatch)
-  
+
 endif(clawpatch)
 
 
@@ -154,5 +154,3 @@ include(cmake/install.cmake)
 if(applications)
   add_subdirectory(applications)
 endif(applications)
-
-

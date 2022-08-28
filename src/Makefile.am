@@ -172,6 +172,7 @@ src_forestclaw_TEST_SOURCES = \
 	src/fclaw2d_elliptic_solver.h.TEST.cpp \
 	src/fclaw2d_diagnostics.h.TEST.cpp \
 	src/fclaw2d_global.h.TEST.cpp \
+	src/fclaw2d_options.h.TEST.cpp \
 	src/fclaw2d_patch.h.TEST.cpp \
 	src/fclaw2d_vtable.h.TEST.cpp 
 

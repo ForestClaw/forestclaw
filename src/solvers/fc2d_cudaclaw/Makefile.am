@@ -60,7 +60,8 @@ check_PROGRAMS += src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.TEST
 TESTS += src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.TEST
 
 src_solvers_fc2d_cudaclaw_fc2d_cudaclaw_TEST_SOURCES = \
-    src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.h.TEST.cpp
+    src/solvers/fc2d_cudaclaw/fc2d_cudaclaw.h.TEST.cpp \
+    src/solvers/fc2d_cudaclaw/fc2d_cudaclaw_options.h.TEST.cpp
 
 src_solvers_fc2d_cudaclaw_fc2d_cudaclaw_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \

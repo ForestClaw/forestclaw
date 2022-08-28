@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_global.h>
 #include <fclaw_options.h>
-#include <fclaw_package.h>
-
-static int s_clawpack46_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 static void*
 clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
@@ -87,8 +85,7 @@ clawpack46_postprocess (fc2d_clawpack46_options_t * clawopt)
 
 
 static fclaw_exit_type_t
-clawpack46_check(fc2d_clawpack46_options_t *clawopt,
-                 fclaw2d_clawpatch_options_t *clawpatch_opt)
+clawpack46_check(fc2d_clawpack46_options_t *clawopt)
 {
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
@@ -97,13 +94,6 @@ clawpack46_check(fc2d_clawpack46_options_t *clawopt,
     clawopt->method[3] = 0;  /* No verbosity allowed in fortran subroutines */
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
-    clawopt->method[6] = clawpatch_opt->maux;
-
-    if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
-    {
-        fclaw_global_essentialf("clawpack46 : bad maux/mcapa combination\n");
-        return FCLAW_EXIT_ERROR;
-    }
 
     /* Should also check mthbc, mthlim, etc. */
     return FCLAW_NOEXIT;
@@ -156,7 +146,6 @@ static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
     fc2d_clawpack46_options_t *clawopt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -165,11 +154,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt = (fc2d_clawpack46_options_t*) package;
     FCLAW_ASSERT (clawopt->is_registered);
 
-    clawpatch_opt = (fclaw2d_clawpatch_options_t *)
-        fclaw_app_get_attribute(app,"clawpatch",NULL);
-    FCLAW_ASSERT(clawpatch_opt->is_registered);
-
-    return clawpack46_check(clawopt,clawpatch_opt);    
+    return clawpack46_check(clawopt);
 }
 
 static void
@@ -200,6 +185,7 @@ static const fclaw_app_options_vtable_t clawpack46_options_vtable = {
    Public interface to clawpack options
    ---------------------------------------------------------- */
 fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
+                                                              const char *section,
                                                               const char *configfile)
 {
     fc2d_clawpack46_options_t *clawopt;
@@ -207,21 +193,23 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
     FCLAW_ASSERT (app != NULL);
 
     clawopt = FCLAW_ALLOC (fc2d_clawpack46_options_t, 1);
-    fclaw_app_options_register (app, "clawpack46", configfile,
+    fclaw_app_options_register (app, section, configfile,
                                 &clawpack46_options_vtable, clawopt);
     
-    fclaw_app_set_attribute(app,"clawpack46",clawopt);
+    fclaw_app_set_attribute(app, section, clawopt);
     return clawopt;
 }
 
 fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob)
 {
-    int id = s_clawpack46_options_package_id;
-    return (fc2d_clawpack46_options_t*) fclaw_package_get_options(glob,id);
+	fc2d_clawpack46_options_t* clawopt = (fc2d_clawpack46_options_t*) 
+	   							fclaw_pointer_map_get(glob->options, "fc2d_clawpack46");
+	FCLAW_ASSERT(clawopt != NULL);
+	return clawopt;
 }
 
 void fc2d_clawpack46_options_store (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt)
 {
-    int id = fclaw_package_container_add_pkg(glob,clawopt);
-    s_clawpack46_options_package_id = id;
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"fc2d_clawpack46") == NULL);
+	fclaw_pointer_map_insert(glob->options, "fc2d_clawpack46", clawopt, NULL);
 }

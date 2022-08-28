@@ -829,6 +829,19 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(fclaw2d_global_t* glob)
 
 void fc2d_geoclaw_solver_initialize(fclaw2d_global_t* glob)
 {
+	fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fc2d_geoclaw_options_t* geo_opt = fc2d_geoclaw_get_options(glob);
+
+    geo_opt->method[6] = clawpatch_opt->maux;
+
+    /* We have to do this so that we know how to size the ghost patches */
+    if (clawpatch_opt->ghost_patch_pack_aux)
+    {
+        fclaw_opt->ghost_patch_pack_extra = 1;  /* Pack the bathymetry */
+        fclaw_opt->ghost_patch_pack_numextrafields = clawpatch_opt->maux;
+    }
+
     int claw_version = 5;
     fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
     

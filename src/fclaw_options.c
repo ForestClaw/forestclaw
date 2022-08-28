@@ -480,28 +480,29 @@ static const fclaw_app_options_vtable_t options_vtable = {
    Public interface to ForestClaw options
    --------------------------------------------------------- */
 fclaw_options_t* fclaw_options_register (fclaw_app_t * a, 
-                                       const char *configfile)
+                                         const char *section,
+                                         const char *configfile)
 {
     fclaw_options_t* fclaw_opt;
 
     FCLAW_ASSERT (a != NULL);
 
     /* Basic options for print out help message, current options, etc */
-    fclaw_app_options_register_core (a, configfile);
+    if(!fclaw_app_options_core_registered(a)){
+        fclaw_app_options_register_core (a, configfile);
+    }
 
     /* allocate storage for fclaw_options */
     /* we will free it in the options_destroy callback */
     fclaw_opt = FCLAW_ALLOC(fclaw_options_t,1);
 
     /* Could also pass in a section header (set to NULL for now) */
-    fclaw_app_options_register (a,NULL,
+    fclaw_app_options_register (a,
+                                section,
                                 configfile,
                                 &options_vtable,
                                 fclaw_opt);
     
-    /* this is to retrieve the option key-value pair */
-    fclaw_app_set_attribute(a,"Options",fclaw_opt);
-
     return fclaw_opt;
 }
 

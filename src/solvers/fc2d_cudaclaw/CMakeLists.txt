@@ -23,7 +23,7 @@ set_target_properties(cudaclaw PROPERTIES EXPORT_NAME CUDACLAW)
 # needed because we have device code in a library
 set_target_properties(cudaclaw PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
-target_sources(cudaclaw PRIVATE 
+target_sources(cudaclaw PRIVATE
   fc2d_cudaclaw.cpp
 	fc2d_cudaclaw_options.c
 	cuda_source/cudaclaw_step2.cu
@@ -60,9 +60,10 @@ install(FILES
 )
 
 install(TARGETS cudaclaw
-  EXPORT ${PROJECT_NAME}Targets
+  EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION lib
+	RUNTIME DESTINATION bin)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CUDACLAW INTERFACE IMPORTED GLOBAL)
@@ -71,6 +72,7 @@ target_link_libraries(FORESTCLAW::CUDACLAW INTERFACE cudaclaw)
 if(BUILD_TESTING)
   add_executable(fc2d_cudaclaw.TEST
     fc2d_cudaclaw.h.TEST.cpp
+    fc2d_cudaclaw_options.h.TEST.cpp
   )
   target_link_libraries(fc2d_cudaclaw.TEST testutils cudaclaw)
   register_unit_tests(fc2d_cudaclaw.TEST)
