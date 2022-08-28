@@ -7,7 +7,7 @@
       integer*8 cont, fclaw_map_get_context
       integer fclaw2d_map_is_used
 
-      double precision r, xp, yp, zp
+      double precision xp, yp, zp
 
       cont = fclaw_map_get_context()
 
