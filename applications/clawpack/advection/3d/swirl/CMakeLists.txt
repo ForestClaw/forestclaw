@@ -24,6 +24,7 @@ add_executable(swirl3dx
   ${all2d}/fclaw2d_map_bilinear.c 
   $<TARGET_OBJECTS:swirl3dx_f>
 )
+
 set_target_properties(swirl3dx PROPERTIES OUTPUT_NAME swirl)
 
 target_include_directories(swirl3dx PRIVATE 
