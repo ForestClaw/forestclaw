@@ -18,6 +18,7 @@ add_executable(swirl3dx
   swirl_user.cpp 
   swirl.cpp 
   swirl_options.c
+  swirl_map_extrude.c
   ${all2d}/fclaw2d_map_cart.c 
   ${all2d}/fclaw2d_map_fivepatch.c 
   ${all2d}/fclaw2d_map_bilinear.c 

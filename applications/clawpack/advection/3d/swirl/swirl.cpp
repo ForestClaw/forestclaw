@@ -60,7 +60,9 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     case 1:
         /* Square brick domain */
+        FCLAW_ASSERT(claw3_opt->mcapa != 0);
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
+        FCLAW_ASSERT(clawpatch_opt->maux == 4);
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
         /* Square in [-1,1]x[-1,1], scaled/shifted to [0,1]x[0,1] */
@@ -71,6 +73,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         break;
     case 2:
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
+        FCLAW_ASSERT(claw3_opt->mcapa != 0);
+        FCLAW_ASSERT(clawpatch_opt->maux == 4);
         if (check < 32)
         {
             printf("mi*pow_int(mx,minlevel) = %d\n",check);
@@ -89,6 +93,8 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     case 3:
         /* bilinear square domain : maps to [-1,1]x[-1,1] */
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
+        FCLAW_ASSERT(claw3_opt->mcapa != 0);
+        FCLAW_ASSERT(clawpatch_opt->maux == 4);
         FCLAW_ASSERT(mi == 2 && mj == 2);
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
@@ -102,17 +108,10 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         SC_ABORT_NOT_REACHED ();
     }
 
-#if 0
-    /* Map unit square to disk using mapc2m_disk.f */
-    conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
-
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont = fclaw2d_map_new_nomap_brick(brick);
-#endif    
-
-
+    if (user->example > 0)
+    {
+        swirl_map_extrude(cont,user->maxelev);        
+    }
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);

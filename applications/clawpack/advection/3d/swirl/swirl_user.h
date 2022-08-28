@@ -41,6 +41,8 @@ typedef struct user_options
 
     double alpha;
 
+    double maxelev;    /* Extruded height */
+
     double *center;
     const char* center_string;
 
@@ -92,6 +94,7 @@ void SWIRL_SET_VELOCITY_MANIFOLD(const int* mx, const int* my, const int*mz,
                                  double faceareas[],
                                  double aux[], const int* maux);
 
+void swirl_map_extrude(fclaw2d_map_context_t *cont, double maxelev);
 
 #ifdef __cplusplus
 }

@@ -42,9 +42,9 @@ ContourValues = [];   % draw contour lines from 'afterframe.m'
 % The next three parameters are vectors of x,y,z coordinates of 2d slices
 % to be displayed for PlotType = 1,2,3.
 
-xSliceCoords = [0.75];
-ySliceCoords = [0.75];
-zSliceCoords = [0.25];
+xSliceCoords = [0.5];
+ySliceCoords = [0.5];
+zSliceCoords = [0.5];
 
 IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
 
@@ -57,5 +57,5 @@ IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
 
 
 PlotBlockColors = 0;
-PlotParallelPartitions = 1;
+PlotParallelPartitions = 0;
   

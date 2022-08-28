@@ -44,6 +44,9 @@ swirl_register (user_options_t *user, sc_options_t * opt)
                                     &user->center, 2, 
                                     "Center point for bilinear mapping  [(0,0)]");
 
+    sc_options_add_double (opt, 0, "max-elevation", &user->maxelev, 0.5,
+                        "[user] Max elevation in extruded direction [0.5]");
+
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                            "Clawpack_version (4 or 5) [5]");
 

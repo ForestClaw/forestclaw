@@ -12,15 +12,16 @@ setpatchborderprops('linewidth',1);
 setpatchbordercolor('k');
 
 % showcubes;
+parms = read_vars();
 showslices;
-hideslices('x');
-hideslices('y');
+if parms.example > 0
+    hideslices('x');
+    hideslices('y');
+end    
 
-view(vtop)
+showsurfs();
 
 caxis([0,1]);
-
-h = surflight;
 
 set(gca,'box','on');
 
