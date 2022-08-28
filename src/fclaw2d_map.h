@@ -90,7 +90,6 @@ typedef void (*fclaw3dx_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
                                    double *xp, double *yp, double *zp);
 
 
-
 /* Covariant and contravariant basis vectors needed for exact solution */
 typedef void (*fclaw3dx_map_c2m_basis_t)(fclaw2d_map_context_t * cont, 
                                         double xc, double yc, double zc,
@@ -116,10 +115,15 @@ struct fclaw2d_map_context
     int is_extruded;
 
     fclaw2d_map_destroy_t destroy;
+
+    /* Used strictly for 2d mapping */
     int user_int[16];
     double user_double[16];
 
-    /* This will be deprecated soon ... */
+    /* Create separate data for 2d and 3dx */
+    int user_int_3dx[16];
+    double user_double_3dx[16];
+
     double scale[3];
     double shift[3];
     double rotate[9];
