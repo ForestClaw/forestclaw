@@ -154,7 +154,7 @@ subroutine fclaw3d_metric_fort_compute_volume_general(mx,my,mz, mbc, blockno, &
 
     integer*8 cont, fclaw_map_get_context
 
-    logical isaffine
+    !!logical isaffine
 
     cont = fclaw_map_get_context()
 
@@ -288,12 +288,12 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc, blockno, &
     double precision yd(-mbc:mx+mbc+2,-mbc:my+mbc+2,-mbc:mz+mbc+2)
     double precision zd(-mbc:mx+mbc+2,-mbc:my+mbc+2,-mbc:mz+mbc+2)
 
-    integer i,j, k, m, icell, jcell, kcell, ii, jj, kk
+    integer i,j, k, m, ii, jj, kk
     double precision hex(0:1,0:1,0:1,3)
     double precision hex_compute_volume
     logical hex_is_volume_interior
 
-    double precision area(3), xef, yef, zef, xd1, yd1, zd1, xe, ye, ze
+    double precision xd1, yd1, zd1, area(3), xe, ye, ze
 
     integer*8 cont, fclaw_map_get_context
 
