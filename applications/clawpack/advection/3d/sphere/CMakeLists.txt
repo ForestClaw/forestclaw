@@ -23,6 +23,9 @@ add_executable(sphere3dx
   $<TARGET_OBJECTS:sphere3dx_f>
 )
 
+set_target_properties(sphere3dx PROPERTIES OUTPUT_NAME sphere)
+
+
 target_include_directories(sphere3dx PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${all}
