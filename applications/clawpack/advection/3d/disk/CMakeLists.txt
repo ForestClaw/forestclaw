@@ -16,7 +16,7 @@ add_executable(disk3dx
   disk.cpp 
 	disk_options.c 
 	disk_user.cpp 
-  fclaw3dx_map_disk.c
+  disk_map_extrude.c
   ${all}/advection_patch_setup_manifold.c
 	${all2d}/fclaw2d_map_pillowdisk5.c
   ${all2d}/fclaw2d_map_pillowsphere5.c
