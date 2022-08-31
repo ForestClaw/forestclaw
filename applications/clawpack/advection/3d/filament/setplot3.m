@@ -19,7 +19,8 @@ PlotType = 1;                % type of plot to produce:
 mq = 1;                      % which component of q to plot
 UserVariable = 0;            % set to 1 to specify a user-defined variable
 UserVariableFile = ' ';      % name of m-file mapping data to q
-MappedGrid = 0;              % set to 1 if mapc2p.m exists for nonuniform grid
+MappedGrid = 1;              % set to 1 if mapc2p.m exists for nonuniform grid
+Manifold = 0;
 MaxFrames = 1000;            % max number of frames to loop over
 MaxLevels = 30;               % max number of AMR levels
 ReadBlockNumber = 1;
@@ -41,15 +42,20 @@ ContourValues = [];   % draw contour lines from 'afterframe.m'
 % The next three parameters are vectors of x,y,z coordinates of 2d slices
 % to be displayed for PlotType = 1,2,3.
 
+% Note : Supply computational coordinates.  This is a bit of a disaster
+% for multiblock domains ...
 xSliceCoords = [];
 ySliceCoords = [];
-zSliceCoords = [0.5];
+zSliceCoords = [0 0.5 1];
 
-IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
+IsosurfValues    =  [];     % Plot surfaces at q = surfValue(i).
 
-  IsosurfAlphas    =  [1];     % Transparency of each surface
+IsosurfAlphas    =  [0];     % Transparency of each surface
                                           % (0=clear; 1=opaque)
                                           % NOTE: Your system must be able to
                                           % use the OpenGL Renderer.
 
-  IsosurfColors    = 'w';      % Colors for each surface.
+IsosurfColors    = 'w';      % Colors for each surface.
+
+PlotBlockColors = 0;
+PlotParallelPartitions = 0;

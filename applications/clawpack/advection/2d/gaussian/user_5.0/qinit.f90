@@ -10,10 +10,10 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
   DOUBLE PRECISION xc,yc,xp,yp,zp
   DOUBLE PRECISION gaussian_sum
 
-  INTEGER*8 cont, get_context
+  INTEGER*8 cont, fclaw_map_get_context
   INTEGER blockno, fc2d_clawpack5_get_block
 
-  cont = get_context()
+  cont = fclaw_map_get_context()
   blockno = fc2d_clawpack5_get_block()
 
   DO j = 1-mbc,my+mbc

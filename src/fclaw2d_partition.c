@@ -35,21 +35,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static
 void cb_partition_pack(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx,
+                       fclaw2d_patch_t *patch,
+                       int blockno,
+                       int patchno,
                        void *user)
 
 {
     /* Pack everything in old domain */
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
 
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
-    int patch_num = this_block->num_patches_before + this_patch_idx;
+    fclaw2d_block_t *this_block = &domain->blocks[blockno];
+    int patch_num = this_block->num_patches_before + patchno;
     void* pack_data_here = (void*) ((void**)g->user)[patch_num];
 
-    fclaw2d_patch_partition_pack(g->glob,this_patch,
-                                 this_block_idx,this_patch_idx,
+    fclaw2d_patch_partition_pack(g->glob,patch,
+                                 blockno,patchno,
                                  pack_data_here);
 }
 
@@ -117,7 +117,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION]);
 
     /* will need to access the subcyle switch */
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
@@ -139,7 +139,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
 
     /* this call creates a new domain that is valid after partitioning
        and transfers the data packed above to the new owner processors */
-    int exponent = gparms->subcycle && gparms->weighted_partition ? 1 : 0;
+    int exponent = fclaw_opt->subcycle && fclaw_opt->weighted_partition ? 1 : 0;
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION]);
     if (running != FCLAW2D_TIMER_NONE)
     {

@@ -1,16 +1,19 @@
 setviews;
-daspect([1 1 1]);
-axis off;
 
 yrbcolormap;
-caxis([0 0.1]);
+caxis([0 1]);
 
 showpatchborders;
 setpatchborderprops('linewidth',1);
-hidepatchborders(7);
+daspect([1 1 1]);
+set(gca,'box','on');
 view(3);
-view([129.9, 33.6])
-caxis([0,0.1])
+
+cv = linspace(0,1,11);
+cv([1 end]) = [];
+drawcontourlines(cv);
+
+view(vbot)
 
 MaxFrames = 64;
 NoQuery = 0;
@@ -22,7 +25,3 @@ if (prt)
 end
 
 shg
-
-
-clear afterframe
-clear mapc2m

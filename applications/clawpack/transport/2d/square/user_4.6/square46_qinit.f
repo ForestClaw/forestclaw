@@ -13,7 +13,7 @@
 
       double precision q0_physical
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       logical fclaw2d_map_is_used
 
       integer ii,jj
@@ -21,7 +21,7 @@
       integer initial_condition
       common /initchoice_comm/ initial_condition
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       blockno = fc2d_clawpack46_get_block()
 

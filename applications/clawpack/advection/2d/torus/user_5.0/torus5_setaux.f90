@@ -42,12 +42,12 @@ subroutine torus5_set_edge_velocities(mx,my,mbc,  &
     double precision xc1, yc1, zc1, xc2, yc2, zc2
     double precision aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-    integer*8 cont, get_context
+    integer*8 cont, fclaw_map_get_context
 
     integer i,j
     double precision vn
 
-    cont = get_context()
+    cont = fclaw_map_get_context()
 
     do i = 1-mbc,mx+mbc
         do j = 1-mbc,my+mbc

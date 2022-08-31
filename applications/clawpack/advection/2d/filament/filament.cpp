@@ -37,31 +37,30 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
-    
+
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
     int a = 0; /* non-periodic */
     int b = 0;
 
+    int mx = clawpatch_opt->mx;
+    int minlevel = fclaw_opt->minlevel;
+    
     switch (user->example) {
-    case 0:
-        /* Size is set by [ax,bx] x [ay, by], set in .ini file */
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_nomap();
-        break;
-
     case 1:
         /* Square brick domain */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
+        
+        /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
         cont = fclaw2d_map_new_cart(brick,
                                     fclaw_opt->scale,
                                     fclaw_opt->shift);
         break;
     case 2:
-        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        if (mi*mx*pow_int(2,minlevel) < 32)
         {
-            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel > 32\n");
+            fclaw_global_essentialf("The five patch mapping requires mi*mx*2^minlevel > 32\n");
             exit(0);
 
         }
@@ -70,6 +69,16 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
                                           fclaw_opt->shift,
                                           user->alpha);
+        break;
+    case 3:
+        /* bilinear square domain : maps to [-1,1]x[-1,1] */
+        FCLAW_ASSERT(mi == 2 && mj == 2);
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        cont = fclaw2d_map_new_bilinear (brick, 
+                                         fclaw_opt->scale,
+                                         fclaw_opt->shift, 
+                                         user->center);
         break;
 
     default:

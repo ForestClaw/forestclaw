@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define clawpatch_fort_output_ascii_t fclaw3dx_clawpatch_fort_output_ascii_t
 #define clawpatch_fort_error_t fclaw3dx_clawpatch_fort_error_t
 #define clawpatch_fort_conscheck_t fclaw3dx_clawpatch_fort_conscheck_t
-#define clawpatch_fort_area_t fclaw3dx_clawpatch_fort_area_t
+//#define clawpatch_fort_area_t fclaw3dx_clawpatch_fort_area_t
 #define clawpatch_fort_norm_t fclaw3dx_clawpatch_fort_norm_t
 #define FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA
 #define FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD
@@ -92,9 +92,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //fclaw2d_clawpatch_pillow.h
 #define fclaw2d_clawpatch_pillow_vtable_t fclaw3dx_clawpatch_pillow_vtable_t
+#if 0
 #define pillow_fort_copy_block_corner_t fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t
 #define pillow_fort_average_block_corner_t fclaw3dx_clawpatch_pillow_fort_average_block_corner_t
 #define pillow_fort_interpolate_block_corner_t fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t
+#endif
 #define fclaw2d_clawpatch_use_pillowsphere fclaw3dx_clawpatch_use_pillowsphere
 #define fclaw2d_clawpatch_pillow_vtable_initialize fclaw3dx_clawpatch_pillow_vtable_initialize
 #define fclaw2d_clawpatch_pillow_vtable fclaw3dx_clawpatch_pillow_vtable
@@ -123,11 +125,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_clawpatch_vtable fclaw3dx_clawpatch_vtable
 #define fclaw2d_clawpatch_save_current_step fclaw3dx_clawpatch_save_current_step
 #define fclaw2d_clawpatch_grid_data fclaw3dx_clawpatch_grid_data
+
+#if 0
+/* These are included in 3d files */
 #define fclaw2d_clawpatch_metric_scalar fclaw3dx_clawpatch_metric_scalar
 #define fclaw2d_clawpatch_metric_vector fclaw3dx_clawpatch_metric_vector
 #define fclaw2d_clawpatch_metric_data fclaw3dx_clawpatch_metric_data
 #define fclaw2d_clawpatch_metric_data2 fclaw3dx_clawpatch_metric_data2
-#define fclaw2d_clawpatch_get_area fclaw3dx_clawpatch_get_area
+#endif
+
+//#define fclaw2d_clawpatch_get_area fclaw3dx_clawpatch_get_area
 #define fclaw2d_clawpatch_soln_data fclaw3dx_clawpatch_soln_data
 #define fclaw2d_clawpatch_aux_data fclaw3dx_clawpatch_aux_data
 #define fclaw2d_clawpatch_rhs_data fclaw3dx_clawpatch_rhs_data
@@ -148,4 +155,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //fclaw2d_clawpatch.hpp
 #define fclaw2d_clawpatch_t fclaw3dx_clawpatch_t
 #define fclaw2d_clawpatch_get_clawpatch fclaw3dx_clawpatch_get_clawpatch
+
+#if 0
 #define fclaw2d_clawpatch_get_metric_patch fclaw3dx_clawpatch_get_metric_patch
+#endif

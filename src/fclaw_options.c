@@ -244,15 +244,15 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     /* ---------------------------- Ghost packing options ----------------------------- */
 
-    sc_options_add_bool (opt, 0, "ghost_patch_pack_area", 
-                         &fclaw_opt->ghost_patch_pack_area,1,
-                         "Pack area for parallel comm. of ghost patches [T]");
+    sc_options_add_bool (opt, 0, "ghost-patch-pack-area", 
+                         &fclaw_opt->ghost_patch_pack_area,0,
+                         "Pack area for parallel comm. of ghost patches [F]");
 
-    sc_options_add_bool (opt, 0, "ghost_patch_pack_extra", 
+    sc_options_add_bool (opt, 0, "ghost-patch-pack-extra", 
                          &fclaw_opt->ghost_patch_pack_extra,
                         0, "Pack extra fields for parallel comm. of ghost patches [F]");
 
-    sc_options_add_int (opt, 0, "ghost_patch_pack_numextrafields", 
+    sc_options_add_int (opt, 0, "ghost-patch-pack-numextrafields", 
                         &fclaw_opt->ghost_patch_pack_numextrafields,
                         0, "Number of extra fields to pack [0]");
 

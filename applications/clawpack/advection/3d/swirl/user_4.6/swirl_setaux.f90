@@ -56,8 +56,9 @@ end subroutine clawpack46_setaux
 
 double precision function compute_u(x,y,z)
     implicit none
-    double precision :: x,y,z,pi, pi2
+    double precision :: x,y,z
 
+    double precision pi, pi2
     common /compi/ pi, pi2
 
     compute_u = 2.d0 * dsin(pi*x)**2 * dsin(pi2*y) * dsin(pi2*z)
@@ -65,8 +66,9 @@ end function compute_u
 
 double precision function compute_v(x,y,z)
     implicit none
-    double precision :: x,y,z,pi, pi2
+    double precision :: x,y,z
 
+    double precision pi, pi2
     common /compi/ pi, pi2
 
     compute_v = -dsin(pi2*x) * dsin(pi*y)**2 * dsin(pi2*z)
@@ -74,8 +76,9 @@ end function compute_v
 
 double precision function compute_w(x,y,z)
     implicit none
-    double precision :: x,y,z,pi, pi2
+    double precision :: x,y,z
 
+    double precision pi, pi2
     common /compi/ pi, pi2
 
     compute_w = -dsin(pi2*x) * dsin(pi2*y) * dsin(pi*z)**2
