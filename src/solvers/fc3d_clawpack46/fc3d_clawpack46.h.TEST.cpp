@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_options.h>
 #include <fclaw2d_forestclaw.h>
+#include <fclaw3dx_clawpatch_options.h>
 #include <test.hpp>
 
 TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two seperate globs")
