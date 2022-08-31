@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_global.h>
-#include <doctest.h>
+#include <test.hpp>
 
 TEST_CASE("fclaw2d_global_set_global")
 {
@@ -40,7 +40,7 @@ TEST_CASE("fclaw2d_global_unset_global")
 	fclaw2d_global_set_global(glob);
 	fclaw2d_global_unset_global();
 #ifdef FCLAW_ENABLE_DEBUG
-	CHECK_THROWS(fclaw2d_global_get_global());
+	CHECK_SC_ABORTED(fclaw2d_global_get_global());
 #else
 	CHECK_EQ(fclaw2d_global_get_global(), nullptr);
 #endif
@@ -52,18 +52,18 @@ TEST_CASE("fclaw2d_global_set_global twice fails")
 {
 	fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
 	fclaw2d_global_set_global(glob);
-	CHECK_THROWS(fclaw2d_global_set_global(glob));
+	CHECK_SC_ABORTED(fclaw2d_global_set_global(glob));
 	fclaw2d_global_unset_global();
 }
 
 TEST_CASE("fclaw2d_global_unset_global assert fails when NULL")
 {
-	CHECK_THROWS(fclaw2d_global_unset_global());
+	CHECK_SC_ABORTED(fclaw2d_global_unset_global());
 }
 
 TEST_CASE("fclaw2d_global_get_global assert fails when NULL")
 {
-	CHECK_THROWS(fclaw2d_global_get_global());
+	CHECK_SC_ABORTED(fclaw2d_global_get_global());
 }
 
 #endif
