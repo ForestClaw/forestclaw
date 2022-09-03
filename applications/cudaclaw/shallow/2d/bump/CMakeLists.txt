@@ -5,6 +5,7 @@ add_library(bump_cpu_f OBJECT
   setprob.f 
   rpn2cons_update.f
   user_4.6/qinit.f 
+  fclaw2d_clawpatch46_output_ascii.f
   ${rpclaw}/clawpack46_rpn2.f 
   ${rpclaw}/clawpack46_rpt2.f 
 )
