@@ -55,6 +55,9 @@ void radial_link_solvers(fclaw2d_global_t *glob)
 
     fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &radial_problem_setup;  /* Version-independent */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(); //added
+    // clawpatch_vt->fort_header_ascii = DEBUG_HEADER; //added
+    // clawpatch_vt->fort_output_ascii = DEBUG_OUTPUT; //added
 
      const user_options_t* user = radial_get_options(glob);
      if(user->cuda != 0)

@@ -5,6 +5,7 @@ add_library(radial_cpu_f OBJECT
   setprob.f 
   user_4.6/qinit.f 
   user_4.6/setaux.f90
+  fclaw2d_clawpatch46_output_ascii.f
   ${rpclaw}/clawpack46_rpn2_acoustics.f 
   ${rpclaw}/clawpack46_rpt2_acoustics.f 
 )
