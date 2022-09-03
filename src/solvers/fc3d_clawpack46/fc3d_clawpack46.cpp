@@ -227,7 +227,10 @@ void clawpack46_setaux(fclaw2d_global_t *glob,
 	fc3d_clawpack46_vtable_t*  claw46_vt = fc3d_clawpack46_vt(glob);
 
 	if (claw46_vt->fort_setaux == NULL)
+	{
+		/* The user has not specified any aux routine */
 		return;
+	}
 
 	if (fclaw2d_patch_is_ghost(patch))
 	{
