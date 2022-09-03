@@ -6,6 +6,7 @@ add_library(shockbubble_cpu_f OBJECT
   user_4.6/setaux.f 
   user_4.6/bc2.f 
   user_4.6/src2.f 
+  fclaw2d_clawpatch46_output_ascii.f
   ${rpclaw}/clawpack46_rpn2_euler4.f 
   ${rpclaw}/clawpack46_rpt2_euler4.f 
   ${rpclaw}/clawpack46_rpn2_euler5.f 

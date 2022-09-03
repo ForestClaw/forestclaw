@@ -90,6 +90,27 @@ void shockbubble_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 
 void shockbubble_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 
+#define  DEBUG_OUTPUT \
+           FCLAW_F77_FUNC(debug_output, \
+                          DEBUG_OUTPUT)
+/** @copydoc DEBUG_OUTPUT() */
+void DEBUG_OUTPUT(char* matname1,
+                                            int* mx,        int* my,
+                                            int* meqn,      int* mbc,
+                                            double* xlower, double* ylower,
+                                            double* dx,     double* dy,
+                                            double q[],
+                                            int* patch_num, int* level,
+                                            int* blockno,   int* mpirank);
+
+/** Fortran subroutine name */
+#define DEBUG_HEADER \
+         FCLAW_F77_FUNC(debug_header, \
+                        DEBUG_HEADER)
+/** @copydoc DEBUG_HEADER() */
+void DEBUG_HEADER(const char* matname1, const char* matname2,
+                                           const double* time, const int* meqn, 
+                                           const int* maux, const int* ngrids);
 
 #ifdef __cplusplus
 }
