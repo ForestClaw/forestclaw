@@ -128,6 +128,11 @@ void outstyle_1(fclaw2d_global_t *glob)
 
     int iframe = 0;
     fclaw2d_output_frame(glob,iframe);
+    fclaw2d_output_frame(glob,iframe);
+
+    // printf("exiting outstyle_1");
+    
+    // exit(0);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
