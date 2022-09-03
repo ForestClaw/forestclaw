@@ -59,6 +59,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 {
 	fclaw2d_vtable_t *vt = fclaw2d_vt();
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(); //added
     //vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
     //fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
     const user_options_t* user = swirl_get_options(glob);
