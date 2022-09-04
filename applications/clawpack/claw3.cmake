@@ -10,4 +10,8 @@ add_subdirectory(clawpack/advection/3d/sphere)
 add_subdirectory(clawpack/advection/3d/disk)
 add_subdirectory(clawpack/advection/3d/latlong)
 
+# Euler equations
+add_subdirectory(clawpack/euler/3d/overpressure)
+
+
 
