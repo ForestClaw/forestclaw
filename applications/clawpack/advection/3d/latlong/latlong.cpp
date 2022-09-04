@@ -49,9 +49,15 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
-    //fclaw2d_map_latlong_set_maxelev(user->maxelev);
-
     FCLAW_ASSERT(fclaw_opt->manifold != 0);
+
+    /* Used locally */
+    double pi = M_PI;
+    double rotate[2];
+
+    rotate[0] = pi*fclaw_opt->theta/180.0;
+    rotate[1] = pi*fclaw_opt->phi/180.0;
+
 
     switch (user->example) 
     {
@@ -60,6 +66,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick(conn,mi,mj);
         cont = fclaw2d_map_new_latlong(brick,fclaw_opt->scale,
+                                       rotate,
                                        user->latitude, 
                                        user->longitude,
                                        a,b);

@@ -11,7 +11,7 @@ elseif parms.example == 2
     map = 'pillowsphere';
 end
 
-% b = getblocknumber();
+maxelev = parms.maxelev/2;
 
 switch map
     case 'pillowsphere'
@@ -28,7 +28,7 @@ m = theta < 0;
 theta(m) = theta(m) + 2*pi;
 
 % Assume zc1 in [0,1]
-R = parms.maxelev*zc1 + 1;
+R = maxelev*zc1 + 1;
 xp = R.*cos(phi).*cos(theta);
 yp = R.*cos(phi).*sin(theta);
 zp = R.*sin(phi);
