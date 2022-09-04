@@ -5,9 +5,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 
@@ -68,13 +65,14 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_CUBEDSPHERE(&blockno, &xc,&yc,xp,yp,zp);
 
-    /* These can probably be replaced by C functions at some point. */
-#if 0    
-    /* These could be causing problems ... */
-    scale_map(cont,xp,yp,zp); 
-    rotate_map(cont,xp,yp,zp);
-#endif    
+    if (cont->is_extruded == 0)
+    {
+        scale_map(cont,xp,yp,zp); 
+        rotate_map(cont,xp,yp,zp);        
+    }
 }
+
+
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_cubedsphere(const double scale[],
@@ -89,12 +87,11 @@ fclaw2d_map_context_t *
     set_rotate(cont,rotate);
     set_scale(cont,scale);
 
+    cont->is_extruded = 0;
+
     return cont;
 }
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif

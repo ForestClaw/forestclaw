@@ -127,7 +127,7 @@ typedef void  (*fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t)(int* 
 /**
  * @brief Sets global patch_vtable to use pollow sphere routines
  */
-void fclaw3dx_clawpatch_use_pillowsphere();
+void fclaw3dx_clawpatch_use_pillowsphere(struct fclaw2d_global* glob);
 
 /* --------------------------------- Virtual table ------------------------------------ */
 

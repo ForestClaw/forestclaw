@@ -34,7 +34,7 @@ filament_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
     sc_options_add_int (opt, 0, "example", &user->example, 0,
-                        "[user] 0 = nomap 0]");
+                        "[[user] 0: nomap; 1: cart (brick); 2: 5-patch; 3: 5-patch [0]");
 
     sc_options_add_bool (opt, 0, "use_claw3d", &user->use_claw3d, 1,
                         "[user] Use 3d library [True]");
@@ -42,15 +42,34 @@ filament_register (user_options_t *user, sc_options_t * opt)
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
 
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                        "[user] alpha (for 5-patch mapping) [0.4]");
+
+    sc_options_add_double (opt, 0, "max-elevation", &user->maxelev, 1,
+                        "[user] Max elevation in extruded direction [1]");
+
+    fclaw_options_add_double_array (opt, 0, "center", &user->center_string, "0 0",
+                                        &user->center, 2, 
+                                        "Center point for bilinear mapping  [(0,0)]");
+
+
     user->is_registered = 1;
     return NULL;
 }
 
 static fclaw_exit_type_t
+filament_postprocess(user_options_t *user)
+{
+    fclaw_options_convert_double_array(user->center_string, &user->center,2);
+
+    return FCLAW_NOEXIT;
+}
+
+static fclaw_exit_type_t
 filament_check (user_options_t *user)
 {
-    if (user->example != 0) {
-        fclaw_global_essentialf ("Option --user:example must be 0\n");
+    if (user->example < 0 || user->example > 3) {
+        fclaw_global_essentialf ("Option --user:example must be in [0-3]\n");
         return FCLAW_EXIT_QUIET;
     }
     return FCLAW_NOEXIT;
@@ -60,7 +79,7 @@ filament_check (user_options_t *user)
 static void
 filament_destroy (user_options_t *user)
 {
-    /* Nothing to destroy */
+    fclaw_options_destroy_array (user->center);
 }
 
 
@@ -77,6 +96,23 @@ options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
     user = (user_options_t*) package;
 
     return filament_register(user,opt);
+}
+
+static fclaw_exit_type_t
+options_postprocess (fclaw_app_t * a, void *package, void *registered)
+{
+    FCLAW_ASSERT (a != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    /* errors from the key-value options would have showed up in parsing */
+    user_options_t *user = (user_options_t *) package;
+
+    /* post-process this package */
+    FCLAW_ASSERT(user->is_registered);
+
+    /* Convert strings to arrays */
+    return filament_postprocess (user);
 }
 
 
@@ -114,7 +150,7 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
 static const fclaw_app_options_vtable_t options_vtable_user =
 {
     options_register,
-    NULL,
+    options_postprocess,
     options_check,
     options_destroy,
 };

@@ -159,11 +159,11 @@ c     # ----------------------------------------------------------------
       integer blockno
       double precision xc,yc,xp,yp,zp,xc1,yc1
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
 
       double precision zc1
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 

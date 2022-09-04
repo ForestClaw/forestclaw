@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_metric.h>
-#include <test/doctest.h>
+#include <test.hpp>
 
 TEST_CASE("fclaw2d_metric_vtable_initialize stores two seperate vtables in two seperate globs")
 {
@@ -60,9 +60,9 @@ TEST_CASE("fclaw2d_metric_vtable_initialize fails if called twice on a glob")
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
 	fclaw2d_metric_vtable_initialize(glob1);
-	CHECK_THROWS(fclaw2d_metric_vtable_initialize(glob1));
+	CHECK_SC_ABORTED(fclaw2d_metric_vtable_initialize(glob1));
 	fclaw2d_metric_vtable_initialize(glob2);
-	CHECK_THROWS(fclaw2d_metric_vtable_initialize(glob2));
+	CHECK_SC_ABORTED(fclaw2d_metric_vtable_initialize(glob2));
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);

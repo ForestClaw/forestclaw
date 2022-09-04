@@ -23,7 +23,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef REFINE_DIM
+#define REFINE_DIM 2
+#endif
+
+#ifndef PATCH_DIM
+#define PATCH_DIM 2
+#endif
+
+#if PATCH_DIM == 2
+
 #include <fclaw2d_map_query.h>
+
+#elif PATCH_DIM == 3
+
+#include <fclaw3d_map_query.h>
+#include <_fclaw2d_to_fclaw3d.h>
+
+#endif
 
 int FCLAW2D_MAP_IS_USED(fclaw2d_map_context_t** pcont)
 {

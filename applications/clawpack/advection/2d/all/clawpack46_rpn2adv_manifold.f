@@ -15,15 +15,7 @@ c
       double precision auxl(1-mbc:maxm+mbc, *)
       double precision auxr(1-mbc:maxm+mbc, *)
 
-      integer meqn1
-      parameter(meqn1 = 10)
-
       integer i,m
-
-      if (meqn1 .lt. meqn) then
-         write(6,*) 'rpn2noncons : meqn1 .lt. meqn'
-         stop
-      endif
 
       do i = 2-mbc, mx+mbc
          do m = 1,meqn
@@ -36,9 +28,7 @@ c
             amdq(i,m) = min(s(i,1), 0.d0) * wave(i,m,1)
             apdq(i,m) = max(s(i,1), 0.d0) * wave(i,m,1)
          enddo
-c         write(6,*) s(i,1), wave(i,1,1)         
       enddo
-c      write(6,*) ' '
 
       return
       end

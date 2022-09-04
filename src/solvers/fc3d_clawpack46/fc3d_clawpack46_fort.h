@@ -205,6 +205,7 @@ void CLAWPACK46_STEP3_WRAP(const int* maxm, const int* meqn, const int* maux,
 							clawpack46_fort_rpt3_t rpt3,
                             clawpack46_fort_rptt3_t rptt3,
                             const int* use_fwaves,
+                            int block_corner_count[],
 							int* ierror);
 
 /* ----------------------------- Misc ClawPack specific functions ------------------------------ */

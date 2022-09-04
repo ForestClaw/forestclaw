@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46_options.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw3dx_clawpatch_options.h>
-#include <test/doctest.h>
+#include <test.hpp>
 
 TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two seperate globs")
 {
@@ -100,11 +100,11 @@ TEST_CASE("fc3d_clawpack46_vtable_initialize fails if called twice on a glob")
 
 	fclaw2d_vtables_initialize(glob1);
 	fc3d_clawpack46_solver_initialize(glob1);
-	CHECK_THROWS(fc3d_clawpack46_solver_initialize(glob1));
+	CHECK_SC_ABORTED(fc3d_clawpack46_solver_initialize(glob1));
 
 	fclaw2d_vtables_initialize(glob2);
 	fc3d_clawpack46_solver_initialize(glob2);
-	CHECK_THROWS(fc3d_clawpack46_solver_initialize(glob2));
+	CHECK_SC_ABORTED(fc3d_clawpack46_solver_initialize(glob2));
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);

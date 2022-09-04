@@ -4,14 +4,13 @@ function pp = parallelpartitions(q)
 % PP = PARALLELPARTITIONS(Q) returns basic information about the 
 
 
-
-pp.seed = 337;   % Random seed for processor colormap.
+pp.seed = 310;    % okay
+pp.seed = 312;   % Random seed for processor colormap.
 pp.npmax = 5;    % Number of processors
 
+tol = 1e-2;
 pp.qmin = 0.01;
-pp.qmax = 0.9;
-pp.qmin = 1e-16;
-pp.qmax = 1e-15;
+pp.qmax = 1.1;
 pp.plotq = true;
 
 pp.qcolors = q;

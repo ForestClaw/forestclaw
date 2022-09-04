@@ -2,17 +2,17 @@
       implicit none
 
       double precision xp,yp,zp,t
-      double precision revs_per_second
 
       double precision pi, pi2
       common /compi/ pi, pi2
 
+      double precision revs_per_second
       common /spherecomm/ revs_per_second
 
 c     # Solid body rotation
-      psi = pi2*revs_per_second*zp
+      psi = pi2*revs_per_second*yp
 
-      psi = -psi
+c      psi = -psi
 
       end
 

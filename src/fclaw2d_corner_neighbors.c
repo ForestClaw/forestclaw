@@ -398,14 +398,13 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
         transform_data_finegrid.block_iface = -1;
 
-        /* This needs to be set here;  otherwise external corners
-           don't get set. */
+        /* Sets block_corner_count to 0 */
         fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                              icorner,block_corner_count);
 
         if (is_interior_corner)
         {
-            /* Interior to the domain, not necessarily to a block */
+            /* Is an interior patch corner;  may also be a block corner */
 
             int corner_block_idx;
             int neighbor_level;
@@ -430,6 +429,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                 transform_data.transform,
                                 &transform_data_finegrid);
 
+            /* This sets value in block_corner_count_array */
             fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                                  icorner,block_corner_count);
             transform_data.is_block_corner = is_block_corner;

@@ -4,7 +4,7 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     faddm,faddp,gadd,hadd, & 
     q1d,dtdx1d,dtdy1d,dtdz1d, & 
     aux1,aux2,aux3,work,mwork,rpn3,rpt3,rptt3, &
-    mwaves,mcapa,method,mthlim,use_fwaves,ierror)
+    mwaves,mcapa,method,mthlim,use_fwaves,block_corner_count, ierror)
 
     !!  ==================================================================
 
@@ -71,6 +71,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
     double precision :: dtdx, dtdy, dtdz, cfl1d
     integer :: i,j,k,m, ma
+
+    integer :: block_corner_count(0:3), sweep_dir
 
 
     !!  # store mesh parameters that may be needed in Riemann solver but not
@@ -165,6 +167,13 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
         end do
     end if
 
+    !! # Cubed sphere : Set corners for an x-sweep
+    !! # This does nothing for non-cubed-sphere grids. 
+    sweep_dir = 0
+    call fc3d_clawpack46_fix_corners(mx,my,mz, mbc,meqn,qold,sweep_dir, & 
+          block_corner_count)
+
+
     !!  ==================
     !!  # perform x-sweeps
     !!  ==================
@@ -238,7 +247,7 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             !! # update fluxes for use in AMR:
 
             do m = 1,meqn
-                do i = 1,mx+1
+                do i = 2-mbc,mx+mbc
                     fm(m,i,j,k) = fm(m,i,j,k) + faddm(m,i)
                     fp(m,i,j,k) = fp(m,i,j,k) + faddp(m,i)
 
@@ -278,6 +287,13 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     !!  ==================
     !!  # perform y sweeps
     !!  ==================
+
+
+    !! # Cubed sphere : Set corners for an y-sweep
+    !! # This does nothing for non-cubed-sphere grids. 
+    sweep_dir = 1
+    call fc3d_clawpack46_fix_corners(mx,my,mz, mbc,meqn,qold,sweep_dir, & 
+                                block_corner_count)
 
     ky_loop : do k = 0, mz+1
         iy_loop : do i = 0, mx+1
@@ -396,9 +412,15 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     !! # perform z sweeps
     !! ==================
 
+    !! # Cubed sphere : Set corners for an y-sweep
+    !! # This does nothing for non-cubed-sphere grids. 
+!!    sweep_dir = 2
+!!    call fc3d_clawpack46_fix_corners(mx,my,mz,mbc,meqn,qold,sweep_dir, & 
+!!                                block_corner_count)
+
+
     jz_loop : do j = 0, my+1
         iz_loop : do i = 0, mx+1
-
             do m = 1,meqn
                 do k = 1-mbc, mz+mbc
                     !! # copy data along a slice into 1d array:
@@ -510,3 +532,86 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
     return
 end subroutine clawpack46_step3
+
+
+!! #  See 'cubed_sphere_corners.ipynb'
+!! 
+!! NOTE : 'set_block_corner_count' is only getting set when 
+!! filling ghost cells.  This means that when this routine 
+!! is called for the first time, block_corner_count is set to all
+!! all zeros.
+subroutine fc3d_clawpack46_fix_corners(mx,my,mz, mbc,meqn,q,sweep_dir, & 
+            block_corner_count)
+    implicit none
+
+    integer :: mx,my,mz, mbc,meqn,sweep_dir
+    integer :: block_corner_count(0:3)
+    double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+
+    integer :: k,m,idata,jdata
+    double precision :: ihat(0:3),jhat(0:3)
+    integer :: i1, j1, ibc, jbc, kz
+    logical :: use_b
+
+    !! # Lower left corner
+    ihat(0) = 0.5
+    jhat(0) = 0.5
+
+    !! # Lower right corner
+    ihat(1) = mx+0.5
+    jhat(1) = 0.5
+
+    !! # Upper left corner
+    ihat(2) = 0.5
+    jhat(2) = my+0.5
+
+    !! # Upper right corner
+    ihat(3) = mx+0.5
+    jhat(3) = my+0.5
+
+    do kz = 1,mz
+        do k = 0,3
+            if (block_corner_count(k) .ne. 3) then
+                cycle
+            endif
+            use_b = sweep_dir .eq. 0 .and. (k .eq. 0 .or. k .eq. 3) & 
+                .or.  sweep_dir .eq. 1 .and. (k .eq. 1 .or. k .eq. 2) 
+            do ibc = 1,mbc
+                do jbc = 1,mbc
+                    !! # Average fine grid corners onto coarse grid ghost corners
+                    if (k .eq. 0) then
+                        i1 = 1-ibc
+                        j1 = 1-jbc
+                    elseif (k .eq. 1) then
+                        i1 = mx+ibc
+                        j1 = 1-jbc
+                    elseif (k .eq. 2) then
+                        i1 = 1-ibc
+                        j1 = my+jbc
+                    else if (k .eq. 3) then
+                        i1 = mx+ibc
+                        j1 = my+jbc
+                    else
+                        write(6,*) 'fix_corners (3d) : i1,j2 not defined'
+                        stop
+                    endif
+
+                    if (use_b) then
+                        !! # Transform involves B                
+                        idata =  j1 + int(ihat(k) - jhat(k))
+                        jdata = -i1 + int(ihat(k) + jhat(k))
+                    else
+                        !! # Transform involves B.transpose()             
+                        idata = -j1 + int(ihat(k) + jhat(k))
+                        jdata =  i1 - int(ihat(k) - jhat(k))
+                    endif 
+                    do m = 1,meqn
+                        q(i1,j1,kz,m) = q(idata,jdata,kz,m)
+                    end do   !!meqn
+                end do       !! jbc
+            end do           !! ibc
+        end do               !! k corner
+    end do                   !! kz loop
+
+
+end

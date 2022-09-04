@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_pointer_map.h>
-#include <doctest.h>
+#include <test.hpp>
 
 TEST_CASE("fclaw_pointer_map empty map get is nullptr")
 {

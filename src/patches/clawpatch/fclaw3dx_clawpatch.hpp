@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct fclaw2d_patch;
 struct fclaw2d_global;
-struct fclaw2d_metric_patch_t;
+struct fclaw3d_metric_patch_t;
 
 /**
  * @brief Stores data for each patch
@@ -88,7 +88,7 @@ public :
     int manifold; /**< true if using manifold */   
     int blockno; /**< the block number of a patch */
 
-    fclaw2d_metric_patch_t *mp; /**< the metric data for a patch */
+    fclaw3d_metric_patch_t *mp; /**< the metric data for a patch */
 
     /** Extra storage needed by the solver(s) */
     void* solver_data;
@@ -112,7 +112,8 @@ fclaw3dx_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
  * @param this_patch the patch context
  * @return fclaw2d_metric_patch_t* the metric structure
  */
-fclaw2d_metric_patch_t* 
+
+struct fclaw3d_metric_patch_t* 
 fclaw3dx_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
 
 

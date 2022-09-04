@@ -23,10 +23,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ADVECTION_USER_H
-#define ADVECTION_USER_H
+#ifndef ADVECTION_USER_3D_H
+#define ADVECTION_USER_3D_H
 
 #include <fclaw2d_include_all.h>
+
 
 // #include <fclaw3dx_clawpatch_pillow.h>
 
@@ -56,13 +57,87 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Headers for common FORTRAN files */
 #include "advection_user_fort3.h"
 
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-/* Nothing yet */
+#if 0
+/* Fix syntax */
+#endif
+
+void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
+                                          fclaw2d_patch_t *patch,
+                                          int block,
+                                          int patchno,
+                                          int claw_version);
+
+
+/* --------------------------------- Square mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+                                            const double scale[],
+                                            const double shift[]);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch5(const double scale[],
+                                                  const double shift[],
+                                                  const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+                                                   const double shift[],
+                                                   const double alpha);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+                                                const double scale[],
+                                                const double shift[],
+                                                const double center[]);
+
+/* --------------------------------- Sphere mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
+                                                    const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+                                                     const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
+                                                      const double rotate[]);
+
+/* ---------------------------------- Disk mappings ----------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha);
+
+
+/* --------------------------------- Hemisphere mappings ------------------------------ */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
+                                                     const double rotate[],
+                                                     const double alpha);
+
+/* --------------------------------- Latlong mapping ---------------------------------- */
+
+
+fclaw2d_map_context_t *
+    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+                             const double scale[],
+                             const double lat[],
+                             const double longitude[],
+                             const int a, const int b);
+
+
 
 #ifdef __cplusplus
 }

@@ -7,12 +7,12 @@
       double precision r, hmax, b, c
       common /slotteddisk_parms/ r, hmax, b, c
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       
       double precision q, qv, slotted_disk_sum
       double precision xp, yp, zp
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
 

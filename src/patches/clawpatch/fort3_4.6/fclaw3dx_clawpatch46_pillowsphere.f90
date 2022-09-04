@@ -3,7 +3,7 @@
 !! # corners for the pillow sphere.
 !! # ----------------------------------------------------------------------
 
-subroutine fclaw2d_pillow46_copy_block_corner3 (mx,my,mz,mbc,meqn, & 
+subroutine fclaw3dx_pillow46_copy_block_corner (mx,my,mz,mbc,meqn, & 
     qthis, qneighbor, icorner, iblock)
     implicit none
 
@@ -46,9 +46,10 @@ subroutine fclaw2d_pillow46_copy_block_corner3 (mx,my,mz,mbc,meqn, &
             end if
         end do k_loop
     end do
-end subroutine fclaw2d_pillow46_copy_block_corner3
 
-subroutine fclaw2d_pillow46_average_block_corner3(mx,my,mz,dz,mbc,meqn, & 
+end subroutine fclaw3dx_pillow46_copy_block_corner
+
+subroutine fclaw3dx_pillow46_average_block_corner(mx,my,mz,dz,mbc,meqn, & 
            refratio, qcoarse, qfine, areacoarse, areafine, & 
            icorner,iblock)
     implicit none
@@ -143,10 +144,10 @@ subroutine fclaw2d_pillow46_average_block_corner3(mx,my,mz,dz,mbc,meqn, &
         end do k_loop
     end do 
 
-end subroutine fclaw2d_pillow46_average_block_corner3
+end subroutine fclaw3dx_pillow46_average_block_corner
 
 
-subroutine fclaw2d_pillow46_interpolate_block_corner3(mx,my,mz,mbc,meqn, & 
+subroutine fclaw3dx_pillow46_interpolate_block_corner(mx,my,mz,mbc,meqn, & 
            refratio, qcoarse, qfine, icorner_coarse, iblock)
     implicit none
     integer :: mx, my, mz, mbc, meqn, icorner_coarse, iblock, refratio
@@ -212,4 +213,4 @@ subroutine fclaw2d_pillow46_interpolate_block_corner3(mx,my,mz,mbc,meqn, &
             end do
         end do k_loop
     end do
-end subroutine fclaw2d_pillow46_interpolate_block_corner3
+end subroutine fclaw3dx_pillow46_interpolate_block_corner

@@ -5,9 +5,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 static int
@@ -60,14 +57,26 @@ fclaw2d_map_query_nomap (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
-    fclaw2d_map_c2m_nomap(fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_nomap(fclaw2d_map_context_t * cont, int blockno,
                                double xc, double yc,
                                double *xp, double *yp, double *zp)
 {
 
     fclaw_global_essentialf("You are calling a mapping function but using the "\
                             "''nomap'' map.  Use the ''identity''\n map if you "\
-                            "like to test mapping for the trivial case.");
+                            "like to test mapping for the trivial case.\n");
+    exit(0);
+}
+
+static void
+fclaw3dx_map_c2m_nomap(fclaw2d_map_context_t * cont, int blockno,
+                               double xc, double yc, double zc,
+                               double *xp, double *yp, double *zp)
+{
+
+    fclaw_global_essentialf("You are calling a mapping function but using the "\
+                               "''nomap'' map.  Use the ''identity''\n map if you "\
+                               "like to test mapping for the trivial case.\n");
     exit(0);
 }
 
@@ -78,13 +87,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_nomap()
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_nomap;
     cont->mapc2m = fclaw2d_map_c2m_nomap;
+    cont->mapc2m_3dx = fclaw3dx_map_c2m_nomap;
 
     return cont;
 }
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif

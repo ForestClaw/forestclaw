@@ -8,6 +8,8 @@ map = 'cubedsphere';
 
 b = getblocknumber();
 
+scale = [1.5, 1.5, 1.5];
+
 switch map
     case 'pillowsphere'
         notpillowsphere = false;
@@ -30,6 +32,9 @@ switch map
                 xp = xp + s;
             otherwise
         end
+        xp = scale(1)*xp;
+        yp = scale(2)*yp;
+        zp = scale(3)*zp;
 end
 
 

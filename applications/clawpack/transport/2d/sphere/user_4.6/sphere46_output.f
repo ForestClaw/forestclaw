@@ -53,9 +53,9 @@ c      double precision swirl_divergence, divu
       integer mapping
       common /mapping_comm/ mapping
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       matunit1 = 10
       open(matunit1,file=matname1,position='append');

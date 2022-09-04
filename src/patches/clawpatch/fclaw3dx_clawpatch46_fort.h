@@ -280,7 +280,7 @@ void FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_CORNER(const int* mx,
 
 /** Fortran subroutine name */
 #define FCLAW3DX_PILLOW46_COPY_BLOCK_CORNER \
-               FCLAW_F77_FUNC(fclaw2d_pillow46_copy_block_corner, \
+               FCLAW_F77_FUNC(fclaw3dx_pillow46_copy_block_corner, \
                               FCLAW3DX_PILLOW46_COPY_BLOCK_CORNER)
 
 /** @copydoc fclaw2d_pillow46_copy_block_corner() */
@@ -296,7 +296,7 @@ void FCLAW3DX_PILLOW46_COPY_BLOCK_CORNER(int* mx,
 
 /** Fortran subroutine name */
 #define FCLAW3DX_PILLOW46_AVERAGE_BLOCK_CORNER \
-          FCLAW_F77_FUNC(fclaw2d_pillow46_average_block_corner,\
+          FCLAW_F77_FUNC(fclaw3dx_pillow46_average_block_corner,\
                          FCLAW3DX_PILLOW46_AVERAGE_BLOCK_CORNER)
 
 /** @copydoc fclaw2d_pillow46_average_block_corner() */
@@ -316,7 +316,7 @@ void  FCLAW3DX_PILLOW46_AVERAGE_BLOCK_CORNER(int* mx,
 
 /** Fortran subroutine name */
 #define FCLAW3DX_PILLOW46_INTERPOLATE_BLOCK_CORNER \
-          FCLAW_F77_FUNC(fclaw2d_pillow46_interpolate_block_corner, \
+          FCLAW_F77_FUNC(fclaw3dx_pillow46_interpolate_block_corner, \
                          FCLAW3DX_PILLOW46_INTERPOLATE_BLOCK_CORNER)
 
 /** @copydoc fclaw2d_pillow46_interpolate_block_corner() */

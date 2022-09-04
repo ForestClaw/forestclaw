@@ -30,6 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static void *
 latlong_register (user_options_t *user, sc_options_t * opt)
 {
+
+    sc_options_add_int (opt, 0, "example", &user->example, 1,
+                        "[user] Example [1]");
+
+
     fclaw_options_add_double_array(opt, 0, "latitude", &user->latitude_string,
                                    "-50 50", &user->latitude, 2,
                                    "[user] Latitude range (degrees) [-50 50]");
@@ -38,6 +43,8 @@ latlong_register (user_options_t *user, sc_options_t * opt)
                                    "0 360", &user->longitude, 2,
                                    "[user] Longitude range (degrees) [0 360]");
 
+    sc_options_add_double (opt, 0, "revs-per-second", &user->revs_per_second, 2,
+                        "[user] Revolutions per second [2]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
@@ -60,7 +67,7 @@ latlong_postprocess (user_options_t *user)
 static fclaw_exit_type_t
 latlong_check (user_options_t *user)
 {
-    /* Nothing to check ? */
+    FCLAW_ASSERT(user->example == 1);
     return FCLAW_NOEXIT;
 }
 
