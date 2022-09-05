@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_metric.hpp>
 #include <fclaw3d_metric.h>
 #include <fclaw2d_options.h>
-#include <test/doctest.h>
+#include <test.hpp>
 #include <test/test.hpp>
 #include <fstream>
 #include <bitset>
@@ -221,8 +221,8 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 }
 TEST_CASE("fclaw3dx_clawpatch patch_build")
 {
-    for(const int& compute_error : {false,true})
-    for(const int& subcycle : {false,true})
+    for(const int& compute_error : {0,1})
+    for(const int& subcycle : {0,1})
     for(const int& mx   : {4,5,6})
     for(const int& my   : {4,5,6})
     for(const int& mz   : {4,5,6})

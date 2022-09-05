@@ -38,7 +38,7 @@
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
 #include <fclaw2d_options.h>
-#include <test/doctest.h>
+#include <test.hpp>
 #include <test/test.hpp>
 using namespace ThunderEgg;
 
