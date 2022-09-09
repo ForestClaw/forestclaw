@@ -10,9 +10,7 @@ void setprob_cuda()
 {
     double rho, bulk;
     int i = 0;
-    char * line = NULL;
-    char *p = NULL;
-    char *eptr;
+    char * line = NULL, *p = NULL, *eptr;
     size_t len = 0;
     ssize_t read;
     double arr[2];
@@ -21,9 +19,9 @@ void setprob_cuda()
 
     while ((read = getline(&line, &len, f)) != -1) 
     {
-        p =strtok(line, " ");
-        arr[i] = strtod(p,&eptr);
-        i++;
+        p =strtok(line, " "); // get first word
+        arr[i] = strtod(p,&eptr);  // convert to double
+        i++; 
     }
     fclose(f);
 
