@@ -1,5 +1,4 @@
 #include "../radial_user.h"
-
 #include <fc2d_cudaclaw_check.h>
     
 __constant__ double s_rho;
@@ -10,19 +9,33 @@ __constant__ double s_z;
 void setprob_cuda()
 {
     double rho, bulk;
-    FILE *f = fopen("setprob.data","r");
-    fscanf(f,"%lf",&rho);
-    fscanf(f,"%lf",&bulk);
+    int i = 0;
+    char * line = NULL;
+    char *p = NULL;
+    char *eptr;
+    size_t len = 0;
+    ssize_t read;
+    double arr[2];
+    
+    FILE *f =  fopen("setprob.data","r");
+
+    while ((read = getline(&line, &len, f)) != -1) 
+    {
+        p =strtok(line, " ");
+        arr[i] = strtod(p,&eptr);
+        i++;
+    }
     fclose(f);
-    rho = 1; 
-    bulk = 4;
+
+    rho = arr[0];
+    bulk = arr[1];
+
     double c,z;
     c = sqrt(bulk/rho);
     z = c*rho;
-    printf("in setprob_cuda debugibg speed \n");
-    printf("rho = %e\n, bulk = %e\n",rho, bulk);
+    
     CHECK(cudaMemcpyToSymbol(s_rho,  &rho, sizeof(double)));
-    CHECK(cudaMemcpyToSymbol(s_bulk, &rho, sizeof(double)));
+    CHECK(cudaMemcpyToSymbol(s_bulk, &bulk, sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_c,    &c,   sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_z,    &z,   sizeof(double)));
 }
