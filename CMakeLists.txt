@@ -4,7 +4,7 @@ project(FORESTCLAW
   DESCRIPTION "Quadtree/octree adaptive PDE solver based based on p4est."
   HOMEPAGE_URL https://github.com/ForestClaw/forestclaw
   LANGUAGES C CXX Fortran
-  VERSION 0.1.4880)
+  VERSION 1.0.0)
 
 include(CTest)
 
