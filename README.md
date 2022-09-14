@@ -1,8 +1,6 @@
 # ForestClaw
 
-![ci](https://github.com/forestclaw/forestclose/workflows/ci_cmake/badge.svg)
-
-ForestClaw (http://www.forestclaw.org) is a parallel, multi-block adaptive finite volume
+ForestClaw (http://www.forestclaw.org/ForestClaw) is a parallel, multi-block adaptive finite volume
 code  for solving PDEs on a hierarchy of logically Cartesian meshes.
 
 -------
