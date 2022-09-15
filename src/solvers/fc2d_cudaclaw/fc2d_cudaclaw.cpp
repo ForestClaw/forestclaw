@@ -502,7 +502,7 @@ void fc2d_cudaclaw_src2(fclaw2d_global_t* glob,
                           double t,
                           double dt)
 {
-    cudaclaw_src2(glob,this_patch,this_block_idx,this_block_idx,t,dt);
+    cudaclaw_src2(glob,this_patch,this_block_idx,this_patch_idx,t,dt);
 }
 
 
@@ -542,7 +542,7 @@ void fc2d_cudaclaw_bc2(fclaw2d_global_t *glob,
                          int intersects_bc[],
                          int time_interp)
 {
-    cudaclaw_bc2(glob,this_patch,this_block_idx,this_block_idx,t,dt,
+    cudaclaw_bc2(glob,this_patch,this_block_idx,this_patch_idx,t,dt,
                    intersects_bc,time_interp);
 }
 
