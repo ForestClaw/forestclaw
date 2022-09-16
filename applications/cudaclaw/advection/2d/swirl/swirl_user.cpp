@@ -57,16 +57,16 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
 
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
-	fclaw2d_vtable_t *vt = fclaw2d_vt();
+	fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(); //added
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob); //added
     //vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
     //fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
     const user_options_t* user = swirl_get_options(glob);
 
     if (user->cuda == 0)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();        
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);        
         
         clawpack46_vt->fort_qinit     = &CUDACLAW_QINIT;
         clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
@@ -83,7 +83,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 
         // const user_options_t* user = swirl_get_options(glob);
         
-        fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt();        
+        fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt(glob);        
 
         cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
             

@@ -55,7 +55,7 @@ void radial_link_solvers(fclaw2d_global_t *glob)
 
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &radial_problem_setup;  /* Version-independent */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(); //added
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob); //added
     // clawpatch_vt->fort_header_ascii = DEBUG_HEADER; //added
     // clawpatch_vt->fort_output_ascii = DEBUG_OUTPUT; //added
 
@@ -63,7 +63,7 @@ void radial_link_solvers(fclaw2d_global_t *glob)
      if(user->cuda != 0)
      {
         //const user_options_t* user = radial_get_options(glob);
-        fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt();        
+        fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt(glob);        
         cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
         
         radial_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
@@ -74,7 +74,7 @@ void radial_link_solvers(fclaw2d_global_t *glob)
      }
      else
      {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
 
         claw46_vt->fort_qinit     = &CUDACLAW_QINIT;
         
