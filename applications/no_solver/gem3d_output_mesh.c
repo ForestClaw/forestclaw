@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -127,7 +127,7 @@ void gem3d_output_header_mesh(fclaw2d_global_t* glob, int iframe)
     /*--------------------------------------------------------------------
     Public interface
     Use this function as follows : 
-           fclaw2d_vtable_t *vt = fclaw2d_vt();
+           fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
            vt->output_frame = &fclaw2d_clawpatch_output_ascii;
     -------------------------------------------------------------------- */
 

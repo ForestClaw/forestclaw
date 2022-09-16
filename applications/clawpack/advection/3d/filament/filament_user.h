@@ -44,6 +44,13 @@ typedef struct user_options
 
     int claw_version;
 
+    double alpha;
+
+    double maxelev;
+
+    double *center;
+    const char* center_string;
+
     int is_registered;
 
 } user_options_t;
@@ -57,6 +64,10 @@ void filament_options_store (fclaw2d_global_t* glob, user_options_t* user);
 const user_options_t* filament_get_options(fclaw2d_global_t* glob);
 
 void filament_link_solvers(fclaw2d_global_t *glob);
+
+void filament_map_extrude(fclaw2d_map_context_t* cont,
+                          const double maxelev);
+
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_options.h>
 
 #include <_fclaw2d_to_fclaw3dx.h>
+#include <_fclaw2d_to_fclaw3d.h>
 
 #endif
 
@@ -117,7 +118,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     /* Accumulate area for final computation of error */
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(s->glob);
 #if PATCH_DIM == 2
     double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
     FCLAW_ASSERT(clawpatch_vt->fort_compute_patch_area != NULL);
@@ -143,8 +144,8 @@ void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
                                            void* patch_acc)
 {
     fclaw_debugf("Computing diagnostics\n");
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
-    int check = gparms->compute_error || gparms->conservation_check;
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    int check = fclaw_opt->compute_error || fclaw_opt->conservation_check;
     if (!check) return;
 
     fclaw2d_global_iterate_patches(glob, cb_compute_diagnostics, patch_acc);
@@ -160,12 +161,12 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     fclaw2d_domain_t *domain = glob->domain;
     
     error_info_t *error_data = (error_info_t*) patch_acc;
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     
     int meqn = clawpatch_opt->meqn;  /* clawpatch->meqn */
 
-    if (gparms->compute_error != 0)
+    if (fclaw_opt->compute_error != 0)
     {
         double total_area = fclaw2d_domain_global_sum(domain, error_data->area);
         FCLAW_ASSERT(total_area != 0);
@@ -198,7 +199,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     }
 
 
-    if (gparms->conservation_check != 0)
+    if (fclaw_opt->conservation_check != 0)
     {
         double *total_mass = FCLAW_ALLOC_ZERO(double,meqn);
         for(int m = 0; m < meqn; m++)
@@ -232,10 +233,10 @@ void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
     *patch_acc = NULL;
 }
 
-void fclaw2d_clawpatch_diagnostics_vtable_initialize()
+void fclaw2d_clawpatch_diagnostics_vtable_initialize(fclaw2d_global_t* glob)
 {
     /* diagnostic functions that apply to patches (error, conservation) */
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt();
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
     
     diag_vt->patch_init_diagnostics      = fclaw2d_clawpatch_diagnostics_initialize;
     diag_vt->patch_compute_diagnostics   = fclaw2d_clawpatch_diagnostics_compute;

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -144,6 +144,7 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
+
     fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
     cuclaw_opt =          fc2d_cudaclaw_options_register(app,"fclaw_options.ini");

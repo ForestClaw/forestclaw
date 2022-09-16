@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -37,15 +37,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
 #endif
 
 /* Plan is to replace fclaw_options_t with fclaw_options_t */
 typedef struct fclaw_options fclaw_options_t;
 
+/**
+ * @brief Register options in SC
+ * 
+ * @param a the app context
+ * @param section the section name
+ * @param configfile the config file
+ * @return fclaw2d_options_t* a newly allocated options struct
+ */
 fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
+                                         const char *section,
                                          const char *configfile);
 
 /* These can be called from external routines (in torthem, for example?) */
@@ -120,16 +126,11 @@ struct fclaw_options
     int nout;
     int nstep;
     int subcycle;               /**< Only relevant when subcycling. */
-    int advance_one_step;
-    int outstyle_uses_maxlevel;
     int use_fixed_dt;
     double max_cfl;
     double desired_cfl;
     int reduce_cfl;   /* Do an all-reduce to get max. cfl */
     double *tout;
-
-    /* Initialization of ghost cell */
-    int init_ghostcell;
 
     /* Refinement parameters */
     int refratio;
@@ -138,14 +139,10 @@ struct fclaw_options
     int regrid_interval;
     int smooth_refine;
     int smooth_level;
-    int coarsen_delay;
     double refine_threshold;
-    double coarsen_threshold;
 
     /* Conservation */
     int time_sync;
-    int flux_correction;
-    int fluctuation_correction;
 
     /* Gauges */
     int output_gauges;
@@ -157,6 +154,27 @@ struct fclaw_options
     int mj;
     int periodic_x;
     int periodic_y;
+
+    /* Advanced options */
+    int flux_correction;
+    int fluctuation_correction;
+
+    int coarsen_delay;
+    double coarsen_threshold;
+
+    /* Initialization of ghost cell */
+    int init_ghostcell;
+
+    /* Return after each time step  */
+    int advance_one_step;
+
+    /* nout, when used with outstyle option 3 refers to number of fine grid steps */
+    int outstyle_uses_maxlevel;
+
+    /* Do not use time interpolation.  This will be used for higher order schemes that 
+       may use extra ghost cells, for example. */
+    int timeinterp2fillghost;  
+
 
     const char *scale_string;
     double *scale;
@@ -216,9 +234,6 @@ struct fclaw_options
 };
 
 #ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
 }
 #endif
 

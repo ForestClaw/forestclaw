@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,31 +30,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 
 #include <fclaw_gauges.h>
-
-static fclaw2d_diagnostics_vtable_t s_diag_vt;
+#include <fclaw_pointer_map.h>
 
 static
-fclaw2d_diagnostics_vtable_t* diagnostics_vt_init()
+fclaw2d_diagnostics_vtable_t* diagnostics_vt_new()
 {
-    //FCLAW_ASSERT(s_diag_vt.is_set == 0);  /* static storage --> is_set == 0 by default */
-    return &s_diag_vt;
+    return (fclaw2d_diagnostics_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_diagnostics_vtable_t, 1);
 }
 
-
 static
-fclaw2d_diagnostics_vtable_t* diagnostics_vt()
+void diagnostics_vt_destroy(void* vt)
 {
-    FCLAW_ASSERT(s_diag_vt.is_set != 0);
-    return &s_diag_vt;
+    FCLAW_FREE (vt);
 }
 
 /* ---------------------------------------------------
     Public interface
     ------------------------------------------------ */
 
-fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt()
+fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt(fclaw2d_global_t* glob)
 {
-    return diagnostics_vt();
+	fclaw2d_diagnostics_vtable_t* diagnostics_vt = (fclaw2d_diagnostics_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_diagnostics");
+	FCLAW_ASSERT(diagnostics_vt != NULL);
+	FCLAW_ASSERT(diagnostics_vt->is_set != 0);
+    return diagnostics_vt;
 }
 
 /* global_maximum is in forestclaw2d.c */
@@ -75,20 +75,23 @@ double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
    Note that the check for whether the user has specified diagnostics
    to run is done here, not in fclaw2d_run.cpp
    ---------------------------------------------------------------- */
-void fclaw2d_diagnostics_vtable_initialize()
+void fclaw2d_diagnostics_vtable_initialize(fclaw2d_global_t* glob)
 {
 
-    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt_init();
+    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt_new();
 
     /* Function pointers all set to zero, since diag_vt has static storage */
 
     diag_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_diagnostics") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fclaw2d_diagnostics", diag_vt, diagnostics_vt_destroy);
 }
 
 
 void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
 {
-    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -117,7 +120,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
     /* -----------------------------------------------------
        Compute diagnostics on all local patches
@@ -170,7 +173,7 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 
@@ -193,7 +196,7 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt();
+    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 

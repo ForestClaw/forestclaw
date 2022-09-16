@@ -156,34 +156,102 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
 /** Search triples of (block number, x coordinate, y coordinate) in the mesh.
  * The x, y coordinates must be in [0, 1]^2.
  * The input data must be equal on every process: This is a collective call.
- * The results will also be equal on every process.
  *
- * A point is found correctly even if it is on a patch boundary.
+ * A point is found at most once even if it is on a patch boundary.
  * We return the smallest patch number on the smallest processor touching it.
  * However, if a point is on a block boundary, it must be decided before
  * calling this function which tree shall be queried for it.
  *
- * \note Currently we do not find the smallest matching process, but instead
- *       instead a point on a parallel boundary may be found on multiple processes.
- *       This should be fixed in the near future.
- *
  * \param [in] domain           Must be valid domain structure.  Will not be changed.
- * \param [in] block_offsets    Array of (num_blocks + 1) int variables.
+ * \param [in] block_offsets    Monotonous array of (num_blocks + 1) int variables.
  *                              The points to search in block t in [0, num_blocks)
  *                              have indices [block_offsets[t], block_offsets[t + 1])
  *                              in the \b coordinates and results arrays.
  * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
  *                              entries (x, y) in [0, 1]^2.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
+ *                              Currently we do not enforce the x and y ranges
+ *                              and simply do not find any point outside its block.
  * \param [in,out] results      On input, an array of type int and
- *                              \b block_offsets[num_blocks] many entries.
- *                              On output, each entry will be -1 if the point has
- *                              not been found, or the patch number within its block.
+ *                              \b block_offsets[num_blocks] many (ignored) entries.
+ *                              On output, an entry will be -1 if the point has
+ *                              not been found on this process, or the patch
+ *                              number within its block otherwise.
  */
 void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                                    sc_array_t * block_offsets,
                                    sc_array_t * coordinates,
                                    sc_array_t * results);
+
+/** Callback function to compute the integral of a "ray" within a patch.
+ *
+ * This function can be passed to \ref fclaw2d_domain_integrate_rays to
+ * eventually compute the integrals over the whole domain for an array of rays.
+ *
+ * \param [in] domain           The domain to integrate on.
+ * \param [in] patch            The patch under consideration.
+ *                              When on a leaf, this is a valid forestclaw patch.
+ *                              Otherwise, this is a temporary artificial patch
+ *                              containing all standard patch information except
+ *                              for the pointer to the next patch and user-data.
+ *                              Only the FCLAW2D_PATCH_CHILDID and the
+ *                              FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
+ *                              Artificial patches are generally ancestors of
+ *                              valid forestclaw patches that are leaves.
+ * \param [in] blockno          The block id of the patch under consideration.
+ * \param [in] patchno          When on a leaf, this is a valid patch number,
+ *                              as always relative to its block.  For a leaf,
+ *                              this callback must set the integral value to
+ *                              the local contribution of this patch and ray.
+ *                              Otherwise, patchno is -1.  In this case, the
+ *                              integral value is ignored.
+ * \param [in] ray              Representation of a "ray"; user-defined.
+ *                              Points to an array element of the rays passed
+ *                              to \ref fclaw2d_domain_integrate_rays.
+ * \param [in,out] integral     The integral value associated with the ray.
+ *                              On input this is 0.
+ *                              For leaves this callback must set it to the
+ *                              exact integral contribution for this patch and
+ *                              ray.
+ * \param [in,out] user         Arbitrary data passed in earlier.
+ * \return                      True if there is a possible/partial intersection of the
+ *                              patch (which may be an ancestor) with the ray.
+ *                              This may be a false positive; we'll be fine.
+ *                              Return false if there is definitely no intersection.
+ *                              Only for leaves, this function must compute
+ *                              the exact integral contribution for this
+ *                              patch by intersecting this ray and store it in
+ *                              the \a integral output argument.
+ *                              The integral value may well be 0. if the intersection
+ *                              is, in fact, none (a false positive).
+ */
+typedef int (*fclaw2d_integrate_ray_t) (fclaw2d_domain_t * domain,
+                                        fclaw2d_patch_t * patch,
+                                        int blockno, int patchno,
+                                        void *ray, double *integral,
+                                        void *user);
+
+/** Compute the integrals of an array of user-defined rays.
+ * The integral for each ray and intersection quadrant is supplied by a callback.
+ * We store the results in an array of integral values of type double.
+ *
+ * \param [in] domain           The domain to integrate on.
+ * \param [in] intersect        Callback function that returns true if a ray
+ *                              intersects a patch and -- when called for a leaf
+ *                              -- shall output the integral of the ray segment.
+ * \param [in] rays             Array containing the rays of user-defined type.
+ *                              Each entry contains one item of arbitrary data.
+ *                              We do not dereference, just pass pointers around.
+ * \param [in,out] integrals    Array of double variables.  The number of entries
+ *                              must equal the number of rays.  Input values ignored.
+ *                              On output, we provide the final integral values.
+ * \param [in,out] user         Arbitrary data to be passed to the callback.
+ */
+void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
+                                    fclaw2d_integrate_ray_t intersect,
+                                    sc_array_t * rays,
+                                    sc_array_t * integrals,
+                                    void * user);
 
 #ifdef __cplusplus
 #if 0

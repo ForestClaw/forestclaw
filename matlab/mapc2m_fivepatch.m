@@ -35,8 +35,8 @@ else
             error(str);
     end
 end
-% xp = reshape(xp,m,n);
-% yp = reshape(yp,m,n);
+xp = reshape(xp,m,n);
+yp = reshape(yp,m,n);
 zp = 0*xp;
     
 end

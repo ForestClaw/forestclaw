@@ -24,14 +24,14 @@ c--------------------------------------------------------------------
 c      include 'fclaw2d_metric_terms.i'
 
       integer i,j,m
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       logical fclaw2d_map_is_used
 
       logical use_kahan
 
       use_kahan = .true.
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       area_ij = dx*dy  !! Area in each mesh cell is constant
       do m = 1,mfields
@@ -73,11 +73,11 @@ c--------------------------------------------------------------------
 c      include 'fclaw2d_metric_terms.i'
 
       integer i,j
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       logical fclaw2d_map_is_used
       double precision sum
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       if (fclaw2d_map_is_used(cont)) then
          sum = 0
@@ -117,10 +117,10 @@ c      include 'fclaw2d_metric_terms.i'
       integer i,j,m
       double precision dxdy, eij
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       logical fclaw2d_map_is_used
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
 c     # error_norm(:) comes in with values;  do not initialize it here!
       dxdy = dx*dy

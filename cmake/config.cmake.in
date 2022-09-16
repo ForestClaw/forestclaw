@@ -1,0 +1,61 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+
+set(mpi @mpi@)
+if(mpi)
+    set(@PROJECT_NAME@_mpi_FOUND TRUE)
+endif()
+
+set(openmp @openmp@)
+if(openmp)
+    set(@PROJECT_NAME@_openmp_FOUND TRUE)
+endif()
+
+set(clawpack @clawpack@)
+if(clawpack)
+    set(@PROJECT_NAME@_clawpack_FOUND TRUE)
+endif()
+
+set(geoclaw @geoclaw@)
+if(geoclaw)
+    set(@PROJECT_NAME@_geoclaw_FOUND TRUE)
+endif()
+
+set(cudaclaw @cudaclaw@)
+if(cudaclaw)
+    set(@PROJECT_NAME@_cudaclaw_FOUND TRUE)
+endif()
+
+set(thunderegg @thunderegg@)
+if(thunderegg)
+    set(@PROJECT_NAME@_thunderegg_FOUND TRUE)
+endif()
+
+if(mpi)
+    find_dependency(MPI REQUIRED)
+endif()
+find_dependency(SC REQUIRED)
+find_dependency(P4EST REQUIRED)
+find_dependency(ZLIB)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake")
+
+if(thunderegg)
+    find_dependency(ThunderEgg)
+    if(NOT ThunderEgg_FOUND)
+        set(@PROJECT_NAME@_thunderegg_FOUND FALSE)
+    endif()
+endif()
+if(cudaclaw)
+    set_target_properties(@PROJECT_NAME@::CUDACLAW PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+
+    find_dependency(CUDAToolkit)
+    if(NOT CUDAToolkit_FOUND)
+        set(@PROJECT_NAME@_cudaclaw_FOUND FALSE)
+    endif()
+endif()
+
+check_required_components(@PROJECT_NAME@)

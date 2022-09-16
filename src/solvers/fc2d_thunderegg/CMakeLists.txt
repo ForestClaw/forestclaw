@@ -1,7 +1,7 @@
 
 # -- fortran library
 add_library(fc2d_thunderegg_f OBJECT
-	fort_4.6/thunderegg_apply_bc_default.f90 
+	fort_4.6/thunderegg_apply_bc_default.f90
 	fort_4.6/thunderegg_eval_bc_default.f90
 )
 
@@ -13,15 +13,15 @@ target_include_directories(fc2d_thunderegg_f INTERFACE ${CMAKE_CURRENT_BINARY_DI
 add_library(fc2d_thunderegg)
 set_target_properties(fc2d_thunderegg PROPERTIES EXPORT_NAME FC2D_THUNDEREGG)
 
-target_sources(fc2d_thunderegg PRIVATE 
+target_sources(fc2d_thunderegg PRIVATE
   fc2d_thunderegg.cpp
-  fc2d_thunderegg_options.c 
-  fc2d_thunderegg_vector.cpp 
-  fc2d_thunderegg_physical_bc.c 
-  operators/fc2d_thunderegg_starpatch.cpp 
-  operators/fc2d_thunderegg_fivepoint.cpp 
-  operators/fc2d_thunderegg_varpoisson.cpp 
-  operators/fc2d_thunderegg_heat.cpp 
+  fc2d_thunderegg_options.c
+  fc2d_thunderegg_vector.cpp
+  fc2d_thunderegg_physical_bc.c
+  operators/fc2d_thunderegg_starpatch.cpp
+  operators/fc2d_thunderegg_fivepoint.cpp
+  operators/fc2d_thunderegg_varpoisson.cpp
+  operators/fc2d_thunderegg_heat.cpp
   $<TARGET_OBJECTS:fc2d_thunderegg_f>
 )
 
@@ -49,9 +49,10 @@ install(FILES
 )
 
 install(TARGETS fc2d_thunderegg
-  EXPORT ${PROJECT_NAME}Targets
+  EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 
 # imported target, for use from FetchContent
@@ -59,9 +60,11 @@ add_library(FORESTCLAW::FC2D_THUNDEREGG INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FC2D_THUNDEREGG INTERFACE fc2d_thunderegg)
 
 if(BUILD_TESTING)
-  add_executable(fc2d_thunderegg_TEST.MPI1
+  add_executable(fc2d_thunderegg.TEST
+    fc2d_thunderegg.h.TEST.cpp
+    fc2d_thunderegg_options.h.TEST.cpp
     fc2d_thunderegg_vector_TEST.cpp
   )
-  target_link_libraries(fc2d_thunderegg_TEST.MPI1 testutils fc2d_thunderegg forestclaw)
-  register_unit_tests(fc2d_thunderegg_TEST.MPI1)
+  target_link_libraries(fc2d_thunderegg.TEST testutils fc2d_thunderegg forestclaw)
+  register_unit_tests(fc2d_thunderegg.TEST)
 endif(BUILD_TESTING)

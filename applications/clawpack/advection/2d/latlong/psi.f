@@ -2,14 +2,17 @@
       implicit none
 
       double precision xp,yp,zp,t
-      double precision revs_per_s
 
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      revs_per_s = 0.5d0
+      double precision revs_per_second
+      common /com_latlong/ revs_per_second
 
-      psi = pi2*revs_per_s*zp
+      double precision rp
+
+      rp = sqrt(xp**2 + yp**2 + zp**2)
+      psi = pi2*revs_per_second*zp*rp
 
       psi = -psi
 

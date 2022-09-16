@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_package.h>
 #include <fclaw_timer.h>
+#include <fclaw_pointer_map.h>
 
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
@@ -79,6 +80,8 @@ fclaw2d_global_t* fclaw2d_global_new (void)
 
     glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
     glob->pkg_container = fclaw_package_container_new ();
+    glob->vtables = fclaw_pointer_map_new ();
+    glob->options = fclaw_pointer_map_new ();
 
     glob->count_amr_advance = 0;
     glob->count_ghost_exchange = 0;
@@ -114,6 +117,9 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     FCLAW_ASSERT (glob != NULL);
 
     fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
+    fclaw_pointer_map_destroy (glob->vtables);
+    fclaw_pointer_map_destroy (glob->options);
+
     FCLAW_FREE (glob->acc);
     FCLAW_FREE (glob);
 }
@@ -173,5 +179,26 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
     g.user = user;
     fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }
+
+fclaw2d_global_t* global_glob = NULL;
+
+void fclaw2d_global_set_global(fclaw2d_global_t* glob)
+{
+    FCLAW_ASSERT(global_glob == NULL);
+    global_glob = glob;
+}
+
+void fclaw2d_global_unset_global()
+{
+    FCLAW_ASSERT(global_glob != NULL);
+    global_glob = NULL;
+}
+
+fclaw2d_global_t* fclaw2d_global_get_global()
+{
+    FCLAW_ASSERT(global_glob != NULL);
+    return global_glob;
+}
+
 
 #endif /* P4_TO_P8 */

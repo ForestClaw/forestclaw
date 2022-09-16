@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -710,24 +710,25 @@ int FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
 
 /* ------------------------------- user threshold --------------------------------- */
 /** Fortran subroutine name */
-#define USER_EXCEEDS_TH FCLAW_F77_FUNC(user_exceeds_th, \
-                                 USER_EXCEEDS_TH)
+#define FCLAW3DX_USER_EXCEEDS_TH FCLAW_F77_FUNC( \
+                             fclaw3dx_user_exceeds_th, \
+                             FCLAW3DX_USER_EXCEEDS_TH)
 
 /** @brief C declaration of user_exceeds_th() subroutine */
-int USER_EXCEEDS_TH(const int *blockno,
-                    const double *qval, 
-                    const double* qmin, 
-                    const double *qmax,
-                    const double quad[], 
-                    const double *dx, 
-                    const double *dy, 
-                    const double *dz,
-                    const double *xc, 
-                    const double *yc,
-                    const double *zc, 
-                    const double *tag_threshold,
-                    const int *init_flag,
-                    const int *is_ghost);
+int FCLAW3DX_USER_EXCEEDS_TH(const int *blockno,
+                             const double *qval, 
+                             const double* qmin, 
+                             const double *qmax,
+                             const double quad[], 
+                             const double *dx, 
+                             const double *dy, 
+                             const double *dz,
+                             const double *xc, 
+                             const double *yc,
+                             const double *zc, 
+                             const double *tag_threshold,
+                             const int *init_flag,
+                             const int *is_ghost);
 
 /* -------------------------- User convenience headers -------------------------------- */
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -206,7 +206,7 @@ void cylinder_compute_tensors(fclaw2d_global_t *glob,
                               int blockno,
                               int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -265,24 +265,24 @@ void cylinder_compute_tensors(fclaw2d_global_t *glob,
 void cylinder_link_solvers(fclaw2d_global_t *glob)
 {
 
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &cylinder_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup   = &cylinder_patch_setup;
 
-    fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+    fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
     claw46_vt->fort_qinit = &CLAWPACK46_QINIT;
     claw46_vt->fort_rpn2  = RPN2CONS_FW_MANIFOLD; 
     claw46_vt->fort_rpt2  = &RPT2CONS_MANIFOLD;  
     claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE_MANIFOLD;
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     clawpatch_vt->fort_tag4refinement = &CYLINDER_TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &CYLINDER_TAG4COARSENING;
 
 
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     /* Area and edge lengths can be computed analytically  */
     metric_vt->compute_area          = cylinder_compute_area;
     // metric_vt->compute_area_ghost    = fclaw2d_metric_compute_area_ghost_default;

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,7 @@ void bump_problem_setup(fclaw2d_global_t* glob)
 
 void bump_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &bump_problem_setup;  /* Version-independent */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
 

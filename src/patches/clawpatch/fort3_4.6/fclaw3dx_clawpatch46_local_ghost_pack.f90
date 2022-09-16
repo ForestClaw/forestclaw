@@ -1,11 +1,11 @@
 subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, & 
-    meqn, mint,qdata,area,qpack,psize, packmode,ierror)
+    meqn, mint,qdata,volume,qpack,psize, packmode,ierror)
 
     implicit none
     integer :: mx,my,mz, mbc,meqn,psize, mint
     integer :: packmode, ierror
     double precision :: qdata(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
-    double precision :: area(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc)
+    double precision :: volume(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc + 1)
     double precision :: qpack(psize)
 
     integer :: packq, unpackq, packarea, unpackarea
@@ -81,6 +81,7 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
     count_final = count - 1
     if (packmode .ne. packarea .and. packmode .ne. unpackarea) then
         if (count_final .ne. psize) then
+            write(6,*) 'Before volume packing/unpacking'
             write(6,*) 'count_final = ',count_final
             write(6,*) 'psize = ',psize
             ierror = 2
@@ -90,13 +91,13 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
 
 
     !! # Face 0
-    k2_loop : do k = 1-mbc,nghost+mbc
+    k2_loop : do k = 1-mbc,mz+mbc
         do j = 1-nghost,my-mint
             do ibc = 1-nghost,mint
                 if (packdata) then
-                    qpack(count) = area(ibc,j,k)
+                    qpack(count) = volume(ibc,j,k)
                 else
-                    area(ibc,j,k) = qpack(count)
+                    volume(ibc,j,k) = qpack(count)
                 endif
                 count = count + 1
             end do
@@ -106,9 +107,9 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
         do jbc = 1-nghost,mint
             do i = mint+1,mx+nghost
                 if (packdata) then
-                    qpack(count) = area(i,jbc,k)
+                    qpack(count) = volume(i,jbc,k)
                 else
-                    area(i,jbc,k) = qpack(count)
+                    volume(i,jbc,k) = qpack(count)
                 endif
                 count = count + 1
             end do
@@ -118,9 +119,9 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
         do j = mint+1,my+nghost
             do ibc = mx-mint+1,mx+nghost
                 if (packdata) then
-                    qpack(count) = area(ibc,j,k)
+                    qpack(count) = volume(ibc,j,k)
                 else
-                    area(ibc,j,k) = qpack(count)
+                    volume(ibc,j,k) = qpack(count)
                 endif
                 count = count + 1
             end do
@@ -130,9 +131,9 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
         do jbc = my-mint+1,my+nghost
             do i = 1-nghost,mx-mint
                 if (packdata) then
-                    qpack(count) = area(i,jbc,k)
+                    qpack(count) = volume(i,jbc,k)
                 else
-                    area(i,jbc,k) = qpack(count)
+                    volume(i,jbc,k) = qpack(count)
                 endif
                 count = count + 1
             end do
@@ -141,6 +142,9 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
 
     count_final = count-1
     if (count_final .ne. psize) then
+        write(6,*) 'After volume packing/unpacking'
+        write(6,*) 'psize = ', psize
+        write(6,*) 'count_final = ', count_final
        ierror = 2
    endif
 

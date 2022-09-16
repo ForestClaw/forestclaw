@@ -5,15 +5,17 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
 #endif
+
+#if 0
+/* Fix syntax highlighting */
 #endif
 
 
 static int
 fclaw2d_map_query_pillowdisk (fclaw2d_map_context_t * cont, int query_identifier)
 {
+
     switch (query_identifier)
     {
     case FCLAW2D_MAP_QUERY_IS_USED:
@@ -63,15 +65,19 @@ fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
                       double xc, double yc,
                       double *xp, double *yp, double *zp)
 {
+    /* Unit disk centered at (0,0) */
     MAPC2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
 
-    /* These can probably be replaced by C functions at some point. */
-    scale_map(cont, xp,yp,zp);
-    rotate_map(cont, xp,yp,zp);
+    if (cont->is_extruded == 0)
+    {
+        /* Scale and shift only if this won't be extruded. */
+        scale_map(cont, xp, yp, zp);
+        shift_map(cont, xp, yp, zp);        
+    }
 }
 
-
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
                                                   const double rotate[])
 {
     fclaw2d_map_context_t *cont;
@@ -81,14 +87,14 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
     cont->mapc2m = fclaw2d_map_c2m_pillowdisk;
 
     set_scale(cont, scale);
+    set_shift(cont, shift);
     set_rotate(cont, rotate);
+
+    cont->is_extruded = 0;    
 
     return cont;
 }
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif

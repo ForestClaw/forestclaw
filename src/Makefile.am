@@ -8,6 +8,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_base.h \
 	src/fclaw_timer.h \
 	src/fclaw_package.h \
+	src/fclaw_pointer_map.h \
 	src/fclaw_options.h \
 	src/fclaw_gauges.h \
 	src/fclaw_mpi.h \
@@ -64,6 +65,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_options.c \
 	src/fclaw_gauges.c \
 	src/fclaw_package.c \
+	src/fclaw_pointer_map.cpp \
 	src/fclaw_math.c \
 	src/fclaw_timer.c \
 	src/fclaw_mpi.c \
@@ -159,3 +161,27 @@ include_HEADERS += $(libforestclaw_installed_headers)
 
 AM_CPPFLAGS += $(FCLAW_CPPFLAGS) @FCLAW_SC_CPPFLAGS@ @FCLAW_P4EST_CPPFLAGS@
 AM_FFLAGS += $(FCLAW_FFLAGS)
+
+## UNIT TESTS
+check_PROGRAMS += src/forestclaw.TEST
+TESTS += src/forestclaw.TEST
+
+src_forestclaw_TEST_SOURCES = \
+    src/fclaw_gauges.h.TEST.cpp \
+    src/fclaw_pointer_map.h.TEST.cpp \
+	src/fclaw2d_elliptic_solver.h.TEST.cpp \
+	src/fclaw2d_diagnostics.h.TEST.cpp \
+	src/fclaw2d_global.h.TEST.cpp \
+	src/fclaw2d_options.h.TEST.cpp \
+	src/fclaw2d_patch.h.TEST.cpp \
+	src/fclaw2d_vtable.h.TEST.cpp 
+
+src_forestclaw_TEST_CPPFLAGS = \
+	$(test_libtestutils_la_CPPFLAGS) \
+    $(src_libforestclaw_la_CPPFLAGS)
+
+src_forestclaw_TEST_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+    $(LDADD) \
+    $(FCLAW_LDADD)

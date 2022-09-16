@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -187,9 +187,25 @@ struct fc2d_clawpack46_vtable
 
 };
 
-void fc2d_clawpack46_solver_initialize(void);
+/**
+ * @brief Initialize the clawpack46 solver
+ * 
+ * fclaw2d_vtables_intialize should be called before this function.
+ * 
+ * fclaw2d_clawpatch_options, and fc2d_clawpack46_options should be stored in glob.
+ * fclaw2d_clawpatch_options will be changed in this call.
+ * 
+ * @param global the global context
+ */
+void fc2d_clawpack46_solver_initialize(struct fclaw2d_global* global);
 
-fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(void);
+/**
+ * @brief Get the clawpack46 vtable
+ * 
+ * @param global the global context
+ * @return fc2d_clawpack46_vtable_t* the vtable
+ */
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(struct fclaw2d_global* global);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */

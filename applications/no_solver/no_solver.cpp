@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
+    fclaw2d_vtable_initialize(glob);
     fclaw2d_diagnostics_vtable_initialize();
 
     fclaw2d_clawpatch_vtable_initialize(user->clawpatch_version);
@@ -100,9 +100,9 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
-    fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    user_opt =                no_solver_options_register(app,"fclaw_options.ini");  
+    fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
+    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    user_opt =                no_solver_options_register(app,              "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);

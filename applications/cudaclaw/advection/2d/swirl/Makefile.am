@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/cudaclaw/advection/2d/swirl/swirl_cuda
 
-TESTS += applications/cudaclaw/advection/2d/swirl/regressions.sh
+#TESTS += applications/cudaclaw/advection/2d/swirl/regressions.sh
 
 applications_cudaclaw_advection_2d_swirl_swirl_cuda_SOURCES = \
 	applications/cudaclaw/advection/2d/swirl/swirl_user.cpp \

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -76,6 +76,9 @@ struct fclaw2d_global
     int mpirank;              /**< Rank of this process in \b mpicomm. */
  
     struct fclaw_package_container *pkg_container;    /**< Solver packages for internal use. */
+
+    struct fclaw_pointer_map *vtables;    /**< Vtables */
+    struct fclaw_pointer_map *options;    /**< options */
  
     struct fclaw2d_map_context* cont;
     struct fclaw2d_domain *domain;
@@ -129,6 +132,26 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
                                          struct fclaw2d_domain * new_domain,
                                          fclaw2d_transfer_callback_t tcb,
                                          void *user);
+
+/**
+ * @brief Store a glob variable
+ * 
+ * @param glob the glob variable
+ */
+void fclaw2d_global_set_global(fclaw2d_global_t* glob);
+
+/**
+ * @brief Set the global glob the NULL
+ */
+void fclaw2d_global_unset_global();
+
+/**
+ * @brief Get the global glob variable
+ * 
+ * @return fclaw2d_global_t* the glob variable
+ */
+fclaw2d_global_t* fclaw2d_global_get_global();
+
 
 #ifdef __cplusplus
 #if 0

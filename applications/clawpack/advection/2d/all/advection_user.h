@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ADVECTION_USER_H
-#define ADVECTION_USER_H
+#ifndef ADVECTION_USER_2D_H
+#define ADVECTION_USER_2D_H
 
 #include <fclaw2d_include_all.h>
 
@@ -108,9 +108,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
 /* ---------------------------------- Disk mappings ----------------------------------- */
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
                                                   const double rotate[]);
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
 
