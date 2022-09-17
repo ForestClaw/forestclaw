@@ -30,8 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_pointer_map.h>
 
-//static int s_clawpack5_options_package_id = -1;
-
 static void*
 clawpack5_register (fc2d_clawpack5_options_t* clawopt, sc_options_t * opt)
 {
