@@ -54,14 +54,20 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_nomap();
         break;
     case 1:
+        /* Map five-patch square to a disk using the pillowdisk.  Input
+           parameter alpha needed for five patch square */
         conn = p4est_connectivity_new_disk (0, 0);
-        cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,fclaw_opt->shift,
-                                            rotate,user->alpha);
+        cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale,
+                                            fclaw_opt->shift,
+                                            rotate,
+                                            user->alpha);
         break;
     case 2:
+        /* Map single Cartesian square to a pillowdisk */
         conn = p4est_connectivity_new_unitsquare ();
-        cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale,fclaw_opt->shift,
-                                            rotate,user->alpha);
+        cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale,
+                                           fclaw_opt->shift,
+                                           rotate);
         break;
     default:
         SC_ABORT_NOT_REACHED ();

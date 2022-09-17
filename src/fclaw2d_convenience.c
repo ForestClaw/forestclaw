@@ -787,7 +787,7 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
         (fclaw2d_domain_list_neighbors_t *) user;
     fclaw2d_patch_relation_t fnt;
     int faceno, cornerno, rcorner;
-    int rproc[2], rblockno, rpatchno[2], rfaceno;
+    int rproc[P4EST_FACES], rblockno, rpatchno[P4EST_FACES], rfaceno;
 
     FCLAW_ASSERT (0 <= block_no && block_no < domain->num_blocks);
     FCLAW_ASSERT (0 <= patch_no &&
