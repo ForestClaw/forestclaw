@@ -87,6 +87,8 @@ struct fclaw2d_global
 
     struct fclaw2d_diagnostics_accumulator *acc;
 
+    struct fclaw_gauge_info* gauge_info;
+
     void *user;
 };
 
