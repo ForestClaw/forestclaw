@@ -82,9 +82,9 @@ TEST_CASE("fc2d_geoclaw_vt fails if not intialized")
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
-	CHECK_THROWS(fc2d_geoclaw_vt(glob1));
+	CHECK_SC_ABORTED(fc2d_geoclaw_vt(glob1));
 
-	CHECK_THROWS(fc2d_geoclaw_vt(glob2));
+	CHECK_SC_ABORTED(fc2d_geoclaw_vt(glob2));
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);

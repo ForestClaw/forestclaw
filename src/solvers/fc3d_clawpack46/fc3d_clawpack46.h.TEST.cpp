@@ -78,9 +78,9 @@ TEST_CASE("fc3d_clawpack46_vt fails if not intialized")
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
-	CHECK_THROWS(fc3d_clawpack46_vt(glob1));
+	CHECK_SC_ABORTED(fc3d_clawpack46_vt(glob1));
 
-	CHECK_THROWS(fc3d_clawpack46_vt(glob2));
+	CHECK_SC_ABORTED(fc3d_clawpack46_vt(glob2));
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);
