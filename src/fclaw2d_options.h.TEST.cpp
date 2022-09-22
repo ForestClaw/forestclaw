@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_options.h>
-#include <test/doctest.h>
+#include <test.hpp>
 
 TEST_CASE("fclaw2d_options can store options in two seperate globs")
 {
@@ -53,9 +53,9 @@ TEST_CASE("fclaw2d_get_options fails if not intialized")
 	fclaw2d_global_t* glob1 = fclaw2d_global_new();
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
-	CHECK_THROWS(fclaw2d_get_options(glob1));
+	CHECK_SC_ABORTED(fclaw2d_get_options(glob1));
 
-	CHECK_THROWS(fclaw2d_get_options(glob2));
+	CHECK_SC_ABORTED(fclaw2d_get_options(glob2));
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);
@@ -67,10 +67,10 @@ TEST_CASE("fclaw2d_options_store fails if called twice on a glob")
 	fclaw2d_global_t* glob2 = fclaw2d_global_new();
 
 	fclaw2d_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
-	CHECK_THROWS(fclaw2d_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw_options_t,1)));
+	CHECK_SC_ABORTED(fclaw2d_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw_options_t,1)));
 
 	fclaw2d_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
-	CHECK_THROWS(fclaw2d_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw_options_t,1)));
+	CHECK_SC_ABORTED(fclaw2d_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw_options_t,1)));
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);
