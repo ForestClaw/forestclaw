@@ -13,3 +13,6 @@ add_subdirectory(elliptic/allencahn)
 
 ## Crystal growth
 add_subdirectory(elliptic/phasefield)
+
+## Heat Phasefield two solver example
+add_subdirectory(elliptic/heat_phasefield)
