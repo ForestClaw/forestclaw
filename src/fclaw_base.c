@@ -165,7 +165,56 @@ fclaw_debugf (const char *fmt, ...)
     fclaw_logv (SC_LC_NORMAL, SC_LP_DEBUG, fmt, ap);
     va_end (ap);
 }
+int current_rank = 0;
 
+static void
+log_handler (const char *name, FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+  int                 wi = 0;
+  int                 lindent = 0;
+
+  wi = (category == SC_LC_NORMAL);
+
+  fputc ('[', log_stream);
+  fprintf (log_stream, "%s", name);
+  if (wi){
+    fputc (' ', log_stream);
+    fprintf (log_stream, "%d", current_rank);
+  }
+  fprintf (log_stream, "] %*s", lindent, "");
+
+  if (priority == SC_LP_TRACE) {
+    char                bn[BUFSIZ], *bp;
+
+    snprintf (bn, BUFSIZ, "%s", filename);
+    bp = basename (bn);
+    fprintf (log_stream, "%s:%d ", bp, lineno);
+  }
+
+  fputs (msg, log_stream);
+  fflush (log_stream);
+}
+static void
+sc_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("libsc",log_stream,filename,lineno,package,category,priority,msg);
+}
+
+static void
+p4est_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("p4est",log_stream,filename,lineno,package,category,priority,msg);
+}
+
+static void
+fclaw_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("fclaw",log_stream,filename,lineno,package,category,priority,msg);
+}
 void
 fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 {
@@ -209,9 +258,9 @@ fclaw_app_new (int *argc, char ***argv, void *user)
 
     mpiret = sc_MPI_Init (argc, argv);
     SC_CHECK_MPI (mpiret);
-    sc_init (mpicomm, 1, 1, NULL, LP_lib);
-    p4est_init (NULL, LP_lib);
-    fclaw_init (NULL, LP_fclaw);
+    sc_init (mpicomm, 1, 1, sc_log_handler, LP_lib);
+    p4est_init (p4est_log_handler, LP_lib);
+    fclaw_init (fclaw_log_handler, LP_fclaw);
 
     a = FCLAW_ALLOC (fclaw_app_t, 1);
     a->mpicomm = mpicomm;
