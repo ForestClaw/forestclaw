@@ -23,10 +23,128 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw2d_forestclaw.h"
 #include "filament/filament_user.h"
 #include "swirl/swirl_user.h"
 
 #include "../all/advection_user.h"
+
+#include <fclaw_filesystem.h>
+void filament_initialize(fclaw2d_global_t* glob)
+{
+    char* old_path = fclaw_cwd();
+    fclaw_cd("filament");
+
+    filament_options_t             *user;
+
+    user = (filament_options_t*) filament_get_options(glob);
+
+
+    /* ---------------------------------------------------------------
+       Set domain data.
+       --------------------------------------------------------------- */
+    fclaw2d_domain_data_new(glob->domain);
+
+    /* Initialize virtual table for ForestClaw */
+    fclaw2d_vtables_initialize(glob);
+
+    if (user->claw_version == 4)
+    {
+      fc2d_clawpack46_solver_initialize(glob);
+    }
+    else if (user->claw_version == 5)
+    {
+      fc2d_clawpack5_solver_initialize(glob);
+    }
+
+    filament_link_solvers(glob);
+
+    fclaw2d_initialize(glob);
+
+    fclaw_cd(old_path);
+    FCLAW_FREE(old_path);
+}
+void filament_run_program(fclaw2d_global_t* glob)
+{
+    char* old_path = fclaw_cwd();
+    fclaw_cd("filament");
+
+    fclaw2d_problem_setup(glob);
+    fclaw2d_run(glob);
+
+    fclaw_cd(old_path);
+    FCLAW_FREE(old_path);
+}
+void filament_finalize(fclaw2d_global_t* glob)
+{
+    char* old_path = fclaw_cwd();
+    fclaw_cd("filament");
+
+    fclaw2d_problem_setup(glob);
+    fclaw2d_finalize(glob);
+
+    fclaw_cd(old_path);
+    FCLAW_FREE(old_path);
+}
+void swirl_initialize(fclaw2d_global_t* glob)
+{
+    char* old_path = fclaw_cwd();
+    fclaw_cd("swirl");
+
+    const swirl_options_t           *swirl_opt;
+
+    /* ---------------------------------------------------------------
+       Set domain data.
+       --------------------------------------------------------------- */
+    fclaw2d_domain_data_new(glob->domain);
+
+    swirl_opt = swirl_get_options(glob);
+
+    /* Initialize virtual table for ForestClaw */
+    fclaw2d_vtables_initialize(glob);
+
+    /* Initialize virtual tables for solvers */
+    if (swirl_opt->claw_version == 4)
+    {
+        fc2d_clawpack46_solver_initialize(glob);
+    }
+    else if (swirl_opt->claw_version == 5)
+    {
+        fc2d_clawpack5_solver_initialize(glob);
+    }
+
+    swirl_link_solvers(glob);
+
+    /* ---------------------------------------------------------------
+       Run
+       --------------------------------------------------------------- */
+    fclaw2d_initialize(glob);
+
+    fclaw_cd(old_path);
+    FCLAW_FREE(old_path);
+}
+void swirl_run_program(fclaw2d_global_t* glob)
+{
+    char* old_path = fclaw_cwd();
+    fclaw_cd("swirl");
+
+    fclaw2d_problem_setup(glob);
+    fclaw2d_run(glob);
+
+    fclaw_cd(old_path);
+    FCLAW_FREE(old_path);
+}
+void swirl_finalize(fclaw2d_global_t* glob)
+{
+    char* old_path = fclaw_cwd();
+    fclaw_cd("swirl");
+
+    fclaw2d_problem_setup(glob);
+    fclaw2d_finalize(glob);
+
+    fclaw_cd(old_path);
+    FCLAW_FREE(old_path);
+}
 
 int
 main (int argc, char **argv)
@@ -86,8 +204,13 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
+
+        /* Domains */
         filament_domain = filament_create_domain(mpicomm, filament_fclaw_opt, filament_user_opt,filament_clawpatch_opt);
+        swirl_domain = swirl_create_domain(mpicomm, swirl_fclaw_opt);
             
+
+        /* Globs */
         filament_glob = fclaw2d_global_new();
         fclaw2d_global_store_domain(filament_glob, filament_domain);
 
@@ -97,27 +220,30 @@ main (int argc, char **argv)
         fc2d_clawpack5_options_store     (filament_glob, filament_claw5_opt);
         filament_options_store           (filament_glob, filament_user_opt);
 
-        filament_run_program(filament_glob);
-
-        fclaw2d_global_destroy(filament_glob);        
-
-        /* Options have been checked and are valid */
-
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        swirl_domain = swirl_create_domain(mpicomm, swirl_fclaw_opt);
-
-        /* Create global structure which stores the domain, timers, etc */
         swirl_glob = fclaw2d_global_new();
         fclaw2d_global_store_domain(swirl_glob, swirl_domain);
 
-        /* Store option packages in glob */
         fclaw2d_options_store           (swirl_glob, swirl_fclaw_opt);
         fclaw2d_clawpatch_options_store (swirl_glob, swirl_clawpatch_opt);
         fc2d_clawpack46_options_store   (swirl_glob, swirl_claw46_opt);
         fc2d_clawpack5_options_store    (swirl_glob, swirl_claw5_opt);
         swirl_options_store             (swirl_glob, swirl_user_opt);
 
+        /* initialize */
+        filament_initialize(filament_glob);
+        swirl_initialize(swirl_glob);
+
+        /* run */
+        filament_run_program(filament_glob);
         swirl_run_program(swirl_glob);
+
+        /* finalzie */
+        filament_finalize(filament_glob);
+        swirl_finalize(swirl_glob);
+
+
+        /* destroy */
+        fclaw2d_global_destroy(filament_glob);        
         fclaw2d_global_destroy(swirl_glob);
 
     }

@@ -84,39 +84,3 @@ fclaw2d_domain_t* filament_create_domain(sc_MPI_Comm mpicomm,
     return domain;    
 }
 
-void filament_run_program(fclaw2d_global_t* glob)
-{
-    char* old_path = fclaw_cwd();
-    fclaw_cd("filament");
-
-    filament_options_t             *user;
-
-    user = (filament_options_t*) filament_get_options(glob);
-
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
-
-    /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
-
-    if (user->claw_version == 4)
-    {
-      fc2d_clawpack46_solver_initialize(glob);
-    }
-    else if (user->claw_version == 5)
-    {
-      fc2d_clawpack5_solver_initialize(glob);
-    }
-
-    filament_link_solvers(glob);
-
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
-    fclaw2d_finalize(glob);
-
-    fclaw_cd(old_path);
-    FCLAW_FREE(old_path);
-}
