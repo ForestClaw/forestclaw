@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_forestclaw.h"
+#include "fclaw_base.h"
 #include "filament/filament_user.h"
 #include "swirl/swirl_user.h"
 
@@ -32,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_filesystem.h>
 void filament_initialize(fclaw2d_global_t* glob)
 {
+    fclaw_set_glob_name("flmnt");
     char* old_path = fclaw_cwd();
     fclaw_cd("filament");
 
@@ -63,9 +65,11 @@ void filament_initialize(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
+    fclaw_set_glob_name(NULL);
 }
 void filament_run_program(fclaw2d_global_t* glob)
 {
+    fclaw_set_glob_name("flmnt");
     char* old_path = fclaw_cwd();
     fclaw_cd("filament");
 
@@ -74,9 +78,11 @@ void filament_run_program(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
+    fclaw_set_glob_name(NULL);
 }
 void filament_finalize(fclaw2d_global_t* glob)
 {
+    fclaw_set_glob_name("flmnt");
     char* old_path = fclaw_cwd();
     fclaw_cd("filament");
 
@@ -85,9 +91,11 @@ void filament_finalize(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
+    fclaw_set_glob_name(NULL);
 }
 void swirl_initialize(fclaw2d_global_t* glob)
 {
+    fclaw_set_glob_name("swirl");
     char* old_path = fclaw_cwd();
     fclaw_cd("swirl");
 
@@ -122,9 +130,11 @@ void swirl_initialize(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
+    fclaw_set_glob_name(NULL);
 }
 void swirl_run_program(fclaw2d_global_t* glob)
 {
+    fclaw_set_glob_name("swirl");
     char* old_path = fclaw_cwd();
     fclaw_cd("swirl");
 
@@ -133,9 +143,11 @@ void swirl_run_program(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
+    fclaw_set_glob_name(NULL);
 }
 void swirl_finalize(fclaw2d_global_t* glob)
 {
+    fclaw_set_glob_name("swirl");
     char* old_path = fclaw_cwd();
     fclaw_cd("swirl");
 
@@ -144,6 +156,7 @@ void swirl_finalize(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
+    fclaw_set_glob_name(NULL);
 }
 
 int

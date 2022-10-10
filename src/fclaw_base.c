@@ -167,33 +167,40 @@ fclaw_debugf (const char *fmt, ...)
 }
 int current_rank = 0;
 
+static const char* glob_name=NULL;
+void fclaw_set_glob_name(const char* new_name){
+    glob_name=new_name;
+}
 static void
 log_handler (const char *name, FILE * log_stream, const char *filename, int lineno,
                 int package, int category, int priority, const char *msg)
 {
-  int                 wi = 0;
-  int                 lindent = 0;
+    int                 wi = 0;
+    int                 lindent = 0;
 
-  wi = (category == SC_LC_NORMAL);
+    wi = (category == SC_LC_NORMAL);
 
-  fputc ('[', log_stream);
-  fprintf (log_stream, "%s", name);
-  if (wi){
-    fputc (' ', log_stream);
-    fprintf (log_stream, "%d", current_rank);
-  }
-  fprintf (log_stream, "] %*s", lindent, "");
+    if(glob_name != NULL){
+        fprintf(log_stream, "[%s]",glob_name);
+    }
+    fputc ('[', log_stream);
+    fprintf (log_stream, "%s", name);
+    if (wi){
+        fputc (' ', log_stream);
+        fprintf (log_stream, "%d", current_rank);
+    }
+    fprintf (log_stream, "] %*s", lindent, "");
 
-  if (priority == SC_LP_TRACE) {
-    char                bn[BUFSIZ], *bp;
+    if (priority == SC_LP_TRACE) {
+        char                bn[BUFSIZ], *bp;
 
-    snprintf (bn, BUFSIZ, "%s", filename);
-    bp = basename (bn);
-    fprintf (log_stream, "%s:%d ", bp, lineno);
-  }
+        snprintf (bn, BUFSIZ, "%s", filename);
+        bp = basename (bn);
+        fprintf (log_stream, "%s:%d ", bp, lineno);
+    }
 
-  fputs (msg, log_stream);
-  fflush (log_stream);
+    fputs (msg, log_stream);
+    fflush (log_stream);
 }
 static void
 sc_log_handler (FILE * log_stream, const char *filename, int lineno,
