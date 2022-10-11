@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw_mpi.h>
+#include <sc_mpi.h>
 
 static const char *fclaw_configdir = ".forestclaw";
 static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
@@ -165,12 +166,34 @@ fclaw_debugf (const char *fmt, ...)
     fclaw_logv (SC_LC_NORMAL, SC_LP_DEBUG, fmt, ap);
     va_end (ap);
 }
-int current_rank = 0;
 
-static const char* glob_name=NULL;
-void fclaw_set_glob_name(const char* new_name){
-    glob_name=new_name;
+static int current_rank = 0;
+static const char* logging_prefix = NULL;
+static sc_MPI_Comm default_comm = NULL;
+
+void 
+fclaw_set_logging_prefix(const char* new_name)
+{
+    logging_prefix=new_name;
 }
+
+static void 
+fclaw_set_logging_app_mpi_comm(sc_MPI_Comm comm)
+{
+    default_comm=comm;
+    sc_MPI_Comm_rank(comm,&current_rank);
+}
+
+void 
+fclaw_set_logging_mpi_comm(sc_MPI_Comm comm)
+{
+    if(comm == NULL){
+        sc_MPI_Comm_rank(default_comm,&current_rank);
+    }else{
+        sc_MPI_Comm_rank(comm,&current_rank);
+    }
+}
+
 static void
 log_handler (const char *name, FILE * log_stream, const char *filename, int lineno,
                 int package, int category, int priority, const char *msg)
@@ -180,8 +203,8 @@ log_handler (const char *name, FILE * log_stream, const char *filename, int line
 
     wi = (category == SC_LC_NORMAL);
 
-    if(glob_name != NULL){
-        fprintf(log_stream, "[%s]",glob_name);
+    if(logging_prefix != NULL){
+        fprintf(log_stream, "[%s]",logging_prefix);
     }
     fputc ('[', log_stream);
     fprintf (log_stream, "%s", name);
@@ -202,6 +225,7 @@ log_handler (const char *name, FILE * log_stream, const char *filename, int line
     fputs (msg, log_stream);
     fflush (log_stream);
 }
+
 static void
 sc_log_handler (FILE * log_stream, const char *filename, int lineno,
                 int package, int category, int priority, const char *msg)
@@ -222,6 +246,7 @@ fclaw_log_handler (FILE * log_stream, const char *filename, int lineno,
 {
     log_handler("fclaw",log_stream,filename,lineno,package,category,priority,msg);
 }
+
 void
 fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 {
@@ -268,6 +293,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     sc_init (mpicomm, 1, 1, sc_log_handler, LP_lib);
     p4est_init (p4est_log_handler, LP_lib);
     fclaw_init (fclaw_log_handler, LP_fclaw);
+    fclaw_set_logging_app_mpi_comm(mpicomm);
 
     a = FCLAW_ALLOC (fclaw_app_t, 1);
     a->mpicomm = mpicomm;

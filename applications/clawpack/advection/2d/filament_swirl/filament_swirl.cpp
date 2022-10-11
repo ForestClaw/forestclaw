@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_filesystem.h>
 void filament_initialize(fclaw2d_global_t* glob)
 {
-    fclaw_set_glob_name("flmnt");
+    fclaw2d_set_global_context(glob);
     char* old_path = fclaw_cwd();
     fclaw_cd("filament");
 
@@ -65,11 +65,11 @@ void filament_initialize(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
-    fclaw_set_glob_name(NULL);
+    fclaw2d_clear_global_context(glob);
 }
 void filament_run_program(fclaw2d_global_t* glob)
 {
-    fclaw_set_glob_name("flmnt");
+    fclaw2d_set_global_context(glob);
     char* old_path = fclaw_cwd();
     fclaw_cd("filament");
 
@@ -78,11 +78,11 @@ void filament_run_program(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
-    fclaw_set_glob_name(NULL);
+    fclaw2d_clear_global_context(glob);
 }
 void filament_finalize(fclaw2d_global_t* glob)
 {
-    fclaw_set_glob_name("flmnt");
+    fclaw2d_set_global_context(glob);
     char* old_path = fclaw_cwd();
     fclaw_cd("filament");
 
@@ -91,11 +91,11 @@ void filament_finalize(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
-    fclaw_set_glob_name(NULL);
+    fclaw2d_clear_global_context(glob);
 }
 void swirl_initialize(fclaw2d_global_t* glob)
 {
-    fclaw_set_glob_name("swirl");
+    fclaw2d_set_global_context(glob);
     char* old_path = fclaw_cwd();
     fclaw_cd("swirl");
 
@@ -130,11 +130,11 @@ void swirl_initialize(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
-    fclaw_set_glob_name(NULL);
+    fclaw2d_clear_global_context(glob);
 }
 void swirl_run_program(fclaw2d_global_t* glob)
 {
-    fclaw_set_glob_name("swirl");
+    fclaw2d_set_global_context(glob);
     char* old_path = fclaw_cwd();
     fclaw_cd("swirl");
 
@@ -143,11 +143,11 @@ void swirl_run_program(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
-    fclaw_set_glob_name(NULL);
+    fclaw2d_clear_global_context(glob);
 }
 void swirl_finalize(fclaw2d_global_t* glob)
 {
-    fclaw_set_glob_name("swirl");
+    fclaw2d_set_global_context(glob);
     char* old_path = fclaw_cwd();
     fclaw_cd("swirl");
 
@@ -156,7 +156,7 @@ void swirl_finalize(fclaw2d_global_t* glob)
 
     fclaw_cd(old_path);
     FCLAW_FREE(old_path);
-    fclaw_set_glob_name(NULL);
+    fclaw2d_clear_global_context(glob);
 }
 
 int

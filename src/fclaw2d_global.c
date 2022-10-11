@@ -23,6 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw2d_forestclaw.h"
+#include "fclaw2d_options.h"
+#include "fclaw2d_vtable.h"
+#include "fclaw_base.h"
 #include <fclaw_global.h>
 
 #include <fclaw_package.h>
@@ -248,4 +252,17 @@ fclaw2d_global_t* fclaw2d_global_get_global (void)
 {
     FCLAW_ASSERT(fclaw2d_global_glob != NULL);
     return fclaw2d_global_glob;
+}
+
+void fclaw2d_set_global_context(fclaw2d_global_t *glob)
+{
+    fclaw_options_t* opts = fclaw2d_get_options(glob);
+    fclaw_set_logging_prefix(opts->logging_prefix);
+    fclaw_set_logging_mpi_comm(glob->domain->mpicomm);
+}
+
+void fclaw2d_clear_global_context(fclaw2d_global_t *glob)
+{
+    fclaw_set_logging_prefix(NULL);
+    fclaw_set_logging_mpi_comm(NULL);
 }

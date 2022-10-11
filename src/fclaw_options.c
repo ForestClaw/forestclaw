@@ -329,6 +329,10 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                             "File used to override one or more options " \
                             "in fclaw_options.ini [empty]");
 
+    sc_options_add_string (opt, 0, "logging-prefix",
+                           &fclaw_opt->logging_prefix, 
+                           0,"prefixed used for logging [NULL]");    
+
     fclaw_opt->is_registered = 1;
 
     return NULL;

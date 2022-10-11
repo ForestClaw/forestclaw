@@ -233,6 +233,8 @@ struct fclaw_options
     int weighted_partition;            /**< Use weighted partition. */
 
     int is_registered;
+
+    const char * logging_prefix; /**< prefix presented in logging ie. [prefix] */
 };
 
 #ifdef __cplusplus

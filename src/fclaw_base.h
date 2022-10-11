@@ -539,7 +539,8 @@ sc_MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
  */
 sc_options_t *fclaw_app_get_options (fclaw_app_t * a);
 
-void fclaw_set_glob_name(const char* new_name);
+void fclaw_set_logging_prefix(const char* new_name);
+void fclaw_set_logging_mpi_comm(sc_MPI_Comm comm);
 #if 0
 
 /*** rename the following names without the 2D ***/
