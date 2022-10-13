@@ -1,4 +1,4 @@
-function [xp,yp,zp] = mapc2m(xc,yc)
+function [xp,yp,zp] = mapc2m_latlong(xc,yc)
 
 % assume that [xc,yc] in a lat/long box
 
