@@ -13,7 +13,7 @@ if (mapping <= 1)
     axis([-1,1,-1,1,-1,1])
     hideslices('z',[1,3])
     daspect([1,1,1])
-    view(3)
+    view(2)
 else
     % Spherical mappings with extrusion means R > 1
     s = 1 + parms.maxelev;
@@ -63,3 +63,5 @@ title(tstr)
 % Show patch borders
 showpatchborders
 setpatchborderprops('linewidth',1);
+
+shg

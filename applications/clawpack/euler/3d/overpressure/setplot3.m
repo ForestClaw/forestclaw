@@ -50,14 +50,16 @@ zSliceCoords = [];
 parms = read_vars();
 switch parms.mapping
     case 0
-        zSliceCoords = [-0.5, 0, 0.5];
+        zSliceCoords = [0, 0.25, 0.5, 0.75];
     case 1
+        zSliceCoords = [0.25 0.5 0.75];   % [0.2 0.4 0.6 0.8];
+    case 2
         zSliceCoords = [0.25 0.5 0.75];   % [0.2 0.4 0.6 0.8];
     otherwise
         error("zSlicecoords not specified");
 end
 
-IsosurfValues    =  [1.05];        % Plot surfaces at q = surfValue(i).
+IsosurfValues    =  [];        % Plot surfaces at q = surfValue(i).
 
 IsosurfAlphas    =  [0.75];     % Transparency of each surface
                                           % (0=clear; 1=opaque)

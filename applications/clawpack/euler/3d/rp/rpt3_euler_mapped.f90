@@ -76,6 +76,22 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
 
     integer mu, mv, mw
 
+    logical debugm, debugp
+    debugm = .false.
+    debugp = .false.
+    if (icoor .eq. 2) then
+        if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
+            if (ilr .eq. 1) then
+                debugm = .true.
+                debugp = .false.
+            endif
+        endif
+    endif
+    debugm = .false.
+    debugp = .false.
+
+
+
     IF(ixyz == 1)THEN
        mu = 2
        mv = 3
@@ -163,8 +179,8 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
                     + min(s_rot(mws), 0.d0) * wave(m,mws)
             enddo
         enddo
-        if (ixyz .eq. 1 .and. icoor .eq. 2 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-            !!write(6,201) i, jcom, enth, (bmasdq_cart(j+1,i), j=1,3)
+        if (debugm) then
+            write(6,211) 2, i, (ql_cart(j,i),j=1,5)
         endif
 
 
@@ -230,10 +246,10 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
                + max(s_rot(mws),0.d0) * wave(m,mws)
             enddo
         enddo
-        if (ixyz .eq. 1 .and. icoor .eq. 2 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-            !!write(6,201) i, jcom, enth, (bpasdq_cart(j+1,i), j=1,3)
+        if (debugp) then
+            write(6,211) 2, i, (ql_cart(j,i),j=1,5)
         endif
-201     format(2I5,4E24.16) 
+211     format(2I5,5E16.8) 
 
     enddo  !! end of i loop
 

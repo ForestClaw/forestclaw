@@ -28,18 +28,20 @@ double precision function fdisc(blockno,xc,yc,zc)
         !! Cylindrical or conical overpressure
         if (mapping .le. 1) then
             !! Initialize data in a cylinder for Cartesian mappings
-            !! fdisc = xp**2 + yp**2 - r0**2
             fdisc = xp**2 + yp**2 - r0**2
+            !!fdisc = xp**2 + zp**2 - r0**2
         else
             !! Cone with central axis p and angle omega0
-            !! p = (0,0,1)
-            !! d = p(1)*xp + p(2)*yp + p(3)*zp = zp
+            !! p = (1,0,0)
+            !! d = p(1)*xp + p(2)*yp + p(3)*zp  == xp
+            !! To shift to different location, set 'rotate' options.
             omega0 = pi/16.d0
-            omega = acos(zp/rp)
-            fdisc = omega - omega0
+            omega = acos(xp/rp)
+            fdisc = omega - omega0            
+            !! write(6,*) xp,yp,zp,omega, fdisc
         endif
     else if (init_choice .eq. 2) then
-        !! Spherical overpressure
+        !! Spherical overpressure 
         if (mapping .le. 1) then
             !! (x0,y0,z0) in Cartesian Coordinates.
             fdisc = (xp-x0)**2 + (yp-y0)**2 + (zp-z0)**2 - r0**2

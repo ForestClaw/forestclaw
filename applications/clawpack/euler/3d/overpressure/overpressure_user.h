@@ -56,6 +56,9 @@ typedef struct user_options
     double pin;
     double pout;
 
+    double min_z;
+    double max_z;
+
     const char *latitude_string;
     double *latitude;
 
@@ -81,7 +84,9 @@ user_options_t* overpressure_get_options(fclaw2d_global_t* glob);
 
 void overpressure_map_extrude(fclaw2d_map_context_t* cont,
                               const double maxelev,
-                              const int example);
+                              const int mapping,
+                              const double minz,
+                              const double maxz);
 
 
 /* ------------------------------- Fortran routines ----------------------------------- */

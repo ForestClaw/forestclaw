@@ -103,7 +103,10 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     if (user->mapping > 0) 
     {
-        overpressure_map_extrude(cont,user->maxelev,user->mapping);        
+        overpressure_map_extrude(cont,user->maxelev,
+                                 user->mapping,
+                                 user->min_z,
+                                 user->max_z);        
     }
 
 

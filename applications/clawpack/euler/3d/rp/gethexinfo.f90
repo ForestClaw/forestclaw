@@ -59,10 +59,10 @@ end subroutine get_aux_locations_t
 
 !! # This gets the aux locations needed for the double transverse
 !! # Riemann solves
-subroutine get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea)
+subroutine get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea,irot)
     implicit none
 
-    integer ixyz, icoor, locrot, locarea,mcapa
+    integer ixyz, icoor, locrot, locarea,mcapa, irot
     integer nxyz
 
     nxyz = 0
@@ -70,45 +70,34 @@ subroutine get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea)
         !! # (x-like, y-like, z-like) = (x,y,z)
         if (icoor .eq. 2) then
             !! # transverse solve is y-like solve
-            !! # double transverse is z-like solve
-            !! # z-like direction is a z-face
-            nxyz = 3
+            nxyz = 2
         elseif (icoor .eq. 3) then
             !! # transverse solve is z-like solve
-            !! # double transverse is y-like solve
-            !! # y-like direction is a y-face
-            nxyz = 2
+            nxyz = 3
         endif
     elseif (ixyz .eq. 2) then
         !! # (x-like, y-like, z-like) = (y,z,x)
         if (icoor .eq. 2) then
-            !! # transverse solve is y-like solve
-            !! # double transverse is z-like solve
-            !! # z-like direction is an x-face
-            nxyz = 1
-        else
             !! # transverse solve is z-like solve
-            !! # double transverse is y-like solve
-            !! # y-like direction is a z-face
             nxyz = 3
+        elseif (icoor .eq. 3) then
+            !! # transverse solve is x-like solve
+            nxyz = 1
         endif
     elseif (ixyz .eq. 3) then
         !! # (x-like, y-like, z-like) = (z,x,y)
         if (icoor .eq. 2) then
-            !! # transverse solve is y-like solve
-            !! # double transverse is z-like solve
-            !! # z-like direction is a y-face
-            nxyz = 2
-        elseif (icoor .eq. 3) then
-            !! # transverse solve is z-like solve
-            !! # double transverse is y-like solve
-            !! # y-like direction is an x-face
+            !! # transverse solve is x-like solve
             nxyz = 1
+        elseif (icoor .eq. 3) then
+            !! # transverse solve is y-like solve
+            nxyz = 2
         endif
     endif
 
     locarea = mcapa + nxyz
     locrot = mcapa + 4 + (nxyz-1)*9
+    irot = nxyz
 
 end subroutine get_aux_locations_tt
 

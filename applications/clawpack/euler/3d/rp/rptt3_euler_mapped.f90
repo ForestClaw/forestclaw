@@ -84,13 +84,27 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
 
     integer i, j, mws, m, i1, info
     double precision uvw2, pres, enth, area
-    integer locrot, locarea
+    integer locrot, locarea, irot
 
-    call get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea)
+    logical debugm, debugp
 
+    debugp = .false.
+    debugm = .false.
+    if (icoor .eq. 3) then
+        if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
+            if (ilr .eq. 1 .and. impt .eq. 1) then
+                debugm = .true.
+                debugp = .true.
+            endif
+        endif
+    endif
+    debugp = .false.
+    debugm = .false.
+
+
+    call get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea,irot)
 
     !! # Solve Riemann problem in the second coordinate direction
-
     do i = 2-mbc, mx+mbc
         i1 = i + ilr - 2
 
@@ -103,38 +117,31 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
         pres = gamma1*(ql_cart(5,i)  - 0.5d0*uvw2*ql_cart(1,i))
         enth = (ql_cart(5,i) + pres) / ql_cart(1,i)
 
-
-        !! kappa = aux2(mcapa,2,i1)
-
         !! # -------------------------------------------------------
         !! # Compute cmbsasdq
         !! # -------------------------------------------------------
 
-        !! # Using aux2 works for both y-like and z-like directions
-        !! Stopped here - 8/29/2022
-
         !! Set value to avoid compiler warnings
         area = aux2(locarea,i1,1)
-        if (impt .eq. 1) then
-            if (icoor .eq. 2) then
+        if (icoor .eq. 2) then
+            if (impt .eq. 1) then
                 do j = 1,9
-                    !! # DAC : set second index to 1 to match area
                     rot(j) = aux2(locrot+j-1,i1,1)
                 enddo
                 area = aux2(locarea,i1,1)
-            elseif (icoor .eq. 3) then
-                do j = 1,9
-                    rot(j) = aux1(locrot+j-1,i1,2)
-                enddo
-                area = aux1(locarea,i1,2)
-            endif
-        elseif (impt .eq. 2) then
-            if (icoor .eq. 2) then
+            elseif (impt .eq. 2) then
                 do j = 1,9
                     rot(j) = aux2(locrot+j-1,i1,3)
                 enddo
                 area = aux2(locarea,i1,3)
-            elseif (icoor .eq. 3) then
+            endif
+        elseif (icoor .eq. 3) then
+            if (impt .eq. 1) then
+                do j = 1,9
+                    rot(j) = aux1(locrot+j-1,i1,2)
+                enddo
+                area = aux1(locarea,i1,2)
+            elseif (impt .eq. 2) then
                 do j = 1,9
                     rot(j) = aux3(locrot+j-1,i1,2)
                 enddo
@@ -152,7 +159,7 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
         enddo
         call rotate3(rot,uvw)
 
-        call solve_riemann(uvw,enth,bsasdq, wave,s_rot,info)
+        call solve_riemann(uvw,enth, bsasdq, wave,s_rot,info)
 
         if (info > 0) then
             write(6,*) 'Calling from double transverse solve; C-'
@@ -168,12 +175,15 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
             cmbsasdq_cart(m,i) = 0.d0
             do mws=1,mwaves
                 cmbsasdq_cart(m,i) = cmbsasdq_cart(m,i) & 
-                + min(s_rot(mws), 0.d0) * wave(m,mws)
+                      + min(s_rot(mws), 0.d0) * wave(m,mws)
             enddo
         enddo
-        if (ixyz .eq. 1 .and. icoor .eq. 2 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-            write(6,201) i, jcom, enth, (cmbsasdq_cart(j+1,i),j=1,3)
-        endif          
+        if (debugm) then
+            !!write(6,211) 3, i, (ql_cart(j,i),j=1,5)
+            write(6,211) 3, i, (bsasdq_cart(j,i)/area**2,j=1,5)
+            write(6,211) 3, i, (cmbsasdq_cart(j,i)/area**3,j=1,5)
+        endif
+
 
 
         !! # -------------------------------------------------------
@@ -183,37 +193,44 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
 
         !! Set value to avoid compiler warnings
         area = 0
-        if (impt .eq. 1) then
-            if (icoor .eq. 2) then
+        if (icoor .eq. 2) then
+            if (impt .eq. 1) then
                 do j = 1,9
                     rot(j) = aux3(locrot+j-1,i1,1)
                 enddo
                 area = aux3(locarea,i1,1)
-            elseif (icoor .eq. 3) then
+            elseif (impt .eq. 2) then
+                do j = 1,9
+                    rot(j) = aux3(locrot+j-1,i1,3)
+                end do
+                area = aux3(locarea,i1,3)
+            endif
+        elseif (icoor .eq. 3) then
+            if (impt .eq. 1) then
                 do j = 1,9
                     rot(j) = aux1(locrot+j-1,i1,3)
                 enddo
                 area = aux1(locarea,i1,3)
+            elseif (impt .eq. 2) then
+                do j = 1,9
+                    rot(j) = aux3(locrot+j-1,i1,3)
+                end do
+                area = aux3(locarea,i1,3)
             endif
-        elseif (impt .eq. 2) then
-            do j = 1,9
-                rot(j) = aux3(locrot+j-1,i1,3)
-            end do
-            area = aux3(locarea,i1,3)
         endif
-
-
-        do j = 1,3
-            uvw(j) = uvw_cart(j)
-        enddo
-        call rotate3(rot,uvw)
 
         do m = 1,meqn
             bsasdq(m) = bsasdq_cart(m,i)
         enddo
         call rotate3(rot,bsasdq(2))
 
+        do j = 1,3
+            uvw(j) = uvw_cart(j)
+        enddo
+        call rotate3(rot,uvw)
+
         call solve_riemann(uvw,enth,bsasdq, wave,s_rot,info)
+
         if (info > 0) then
             write(6,*) 'Calling from double transverse solve; C+'
             stop
@@ -231,9 +248,15 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
                     + max(s_rot(mws),0.d0) * wave(m,mws)
             enddo
         enddo
+        if (debugp) then
+            write(6,211) 3, i, (cpbsasdq_cart(j,i)/area**3,j=1,5)
+            write(6,*) ' '
+        endif
 
     enddo  !! end of i loop
-201    format(2I5,5E24.16)        
+211    format(2I5,5E16.8) 
+
+
 
     return
 end subroutine clawpack46_rptt3_mapped

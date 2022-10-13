@@ -47,7 +47,7 @@ overpressure_register (user_options_t* user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "z0",    &user->z0,    0.0, "[user] z0 [0.0]");
     sc_options_add_double (opt, 0, "r0",    &user->r0,    0.2, "[user] r0 [0.25]");
     sc_options_add_double (opt, 0, "rhoin", &user->rhoin, 0.1, "[user] rhoin [1.0]");
-    sc_options_add_double (opt, 0, "rhoout", &user->rhoout, 0.1, "[user] rhoout [0.8]");
+    sc_options_add_double (opt, 0, "rhoout", &user->rhoout, 0.8, "[user] rhoout [0.8]");
     sc_options_add_double (opt, 0, "pin", &user->pin,     0.1, "[user] pin [1.2]");
     sc_options_add_double (opt, 0, "pout", &user->pout,   0.1, "[user] pout [1.0]");
 
@@ -61,6 +61,12 @@ overpressure_register (user_options_t* user, sc_options_t * opt)
 
     sc_options_add_double (opt, 0, "max-elevation", &user->maxelev, 0.5,
                         "[user] Max elevation in extruded direction [0.5]");
+
+    sc_options_add_double (opt, 0, "min-z", &user->min_z, 0,
+                        "[user] Minimum z value [0]");
+
+    sc_options_add_double (opt, 0, "max-z", &user->max_z, 1,
+                        "[user] Maximum z value [1]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
                            "Clawpack_version (4 or 5) [4]");

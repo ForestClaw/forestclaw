@@ -28,10 +28,15 @@ subroutine overpressure_setaux_manifold(mbc,mx,my,mz, mcapa, &
         do j = 1-mbc,my+mbc
             do k = 1-mbc,mz+mbc
                 aux(i,j,k,mcapa) = volume(i,j,k)/dxdydz
+                !!write(6,*) aux(i,j,k,mcapa)
 
                 aux(i,j,k,mcapa+1) = faceareas(i,j,k,1)/dydz
                 aux(i,j,k,mcapa+2) = faceareas(i,j,k,2)/dxdz
                 aux(i,j,k,mcapa+3) = faceareas(i,j,k,3)/dxdy
+                !!write(6,*) aux(i,j,k,mcapa+1)
+                !!write(6,*) aux(i,j,k,mcapa+2)
+                !!write(6,*) aux(i,j,k,mcapa+3)
+                !!write(6,*) ' '
 
                 count = 1
                 do ii = 1,3
@@ -46,6 +51,7 @@ subroutine overpressure_setaux_manifold(mbc,mx,my,mz, mcapa, &
             end do
         end do
     end do
+    !!stop
 
 end subroutine overpressure_setaux_manifold
 

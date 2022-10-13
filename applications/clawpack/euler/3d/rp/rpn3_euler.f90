@@ -72,6 +72,14 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
     ! Use entropy fix for transonic rarefactions
     LOGICAL, PARAMETER :: efix = .FALSE.
 
+    logical debug
+
+    debug = .false.
+    if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
+        debug = .true.
+    endif
+    debug = .false.
+
     IF (maxmrp < maxm+2*mbc)THEN
         WRITE(6,*) 'need to increase maxmrp in rpn3_euler.f90'
         WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
@@ -205,20 +213,18 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
         wave(5,3,i)  = alpha(5)*(enth(i)+u(i)*a(i))
         s(3,i) = u(i)+a(i)
 
-        if (ixyz .eq. 1 .and. kcom .eq. 4) then
-            !!write(6,*) i, jcom, (s(j,i), j = 1,3)
-        endif
     END DO
+200  format(I5,5E16.8)
 
     amdq = 0.d0
     apdq = 0.d0
 
     IF (.NOT.efix) THEN
-        !  No entropy fix
+        !!  No entropy fix
 
-        ! compute fluctuations amdq and apdq
-        !  amdq = SUM s*wave   over left-going waves
-        !  apdq = SUM s*wave   over right-going waves
+        !! compute fluctuations amdq and apdq
+        !!  amdq = SUM s*wave   over left-going waves
+        !!  apdq = SUM s*wave   over right-going waves
 
         DO i=2-mbc, mx+mbc
             DO mws=1,mwaves
@@ -228,91 +234,116 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
                     apdq(:,i) = apdq(:,i) + s(mws,i)*wave(:,mws,i)
                 ENDIF
             END DO
+            if (debug) then
+                delta(1) = ql(1,i) - qr(1,i-1)
+                delta(2) = ql(mu,i) - qr(mu,i-1)
+                delta(3) = ql(mv,i) - qr(mv,i-1)
+                delta(4) = ql(mw,i) - qr(mw,i-1)
+                delta(5) = ql(5,i) - qr(5,i-1)
+
+                write(6,211) 1, i, (ql(j,i),j=1,5)
+                !!write(6,211) i, (qr(j,i),j=1,5)
+                !!write(6,211) i, (delta(j),j=1,5)
+                !!write(6,211) i, (amdq(j,i),j=1,5)
+                !!write(6,211) i, (apdq(j,i),j=1,5)
+                !!write(6,*) ' '
+            endif
         END DO
+211 format(2I5,5E16.8)
+
+
 
     ELSE
-    ! With entropy fix
+        !! With entropy fix
+        !!
+        !! Compute flux differences amdq and apdq.
+        !!   First compute amdq as sum of s*wave for left going waves.
+        !!   Incorporate entropy fix by adding a modified fraction of 
+        !!   transonic wave if s should change sign.
 
-    ! Compute flux differences amdq and apdq.
-    !   First compute amdq as sum of s*wave for left going waves.
-    !   Incorporate entropy fix by adding a modified fraction of 
-    !   transonic wave if s should change sign.
-
-    DO i = 2-mbc, mx+mbc
-
-        ! Check if 1-wave is transonic
-        rhoim1 = qr(1,i-1)
-        pim1 = gamma1*(qr(5,i-1) - 0.5d0*(qr(mu,i-1)**2 &
-               + qr(mv,i-1)**2 + qr(mw,i-1)**2) / rhoim1)
-        cim1 = SQRT(gamma*pim1/rhoim1)
-        s0 = qr(mu,i-1)/rhoim1 - cim1  ! u-c in left state (cell i-1)
-
-        ! Check for fully supersonic case:
-        IF (s0 >= 0.d0 .AND. s(1,i) > 0.d0) CYCLE ! everything is right-going
-
-        rho1 = qr(1,i-1) + wave(1,1,i)
-        rhou1 = qr(mu,i-1) + wave(mu,1,i)
-        rhov1 = qr(mv,i-1) + wave(mv,1,i)
-        rhow1 = qr(mw,i-1) + wave(mw,1,i)
-        en1 = qr(5,i-1) + wave(5,1,i)
-        p1 = gamma1*(en1 - 0.5d0*(rhou1**2 + rhov1**2 + rhow1**2)/rho1)
-        c1 = SQRT(gamma*p1/rho1)
-        s1 = rhou1/rho1 - c1  ! u-c to right of 1-wave
-        IF (s0 < 0.d0 .AND. s1 > 0.d0) THEN
-            ! transonic rarefaction in the 1-wave
-            sfract = s0 * (s1-s(1,i)) / (s1-s0)
-        ELSE IF (s(1,i) < 0.d0) THEN
-            ! 1-wave is leftgoing
-            sfract = s(1,i)
-        ELSE
-            ! 1-wave is rightgoing
-            sfract = 0.d0   ! this shouldn't happen since s0 < 0
-        ENDIF
-        amdq(:,i) = sfract*wave(:,1,i)
-           
-        ! Check if 2-wave is transonic
-        IF (s(2,i) >= 0.d0) CYCLE ! 2- and 3-waves are right-going
-        amdq(:,i) = amdq(:,i) + s(2,i)*wave(:,2,i)
-        
-        ! Check if 3-wave is transonic
-        rhoi = ql(1,i)
-        pi = gamma1*(ql(5,i) - 0.5d0*(ql(mu,i)**2+ql(mv,i)**2+ql(mw,i)**2)/rhoi)
-        ci = SQRT(gamma*pi/rhoi)
-        s3 = ql(mu,i)/rhoi + ci     ! u+c in right state  (cell i)
-        
-        rho2 = ql(1,i) - wave(1,3,i)
-        rhou2 = ql(mu,i) - wave(mu,3,i)
-        rhov2 = ql(mv,i) - wave(mv,3,i)
-        rhow2 = ql(mw,i) - wave(mw,3,i)
-        en2 = ql(5,i) - wave(5,3,i)
-        p2 = gamma1*(en2 - 0.5d0*(rhou2**2 + rhov2**2 + rhow2**2)/rho2)
-        c2 = SQRT(gamma*p2/rho2)
-        s2 = rhou2/rho2 + c2   !# u+c to left of 3-wave
-        IF (s2 < 0.d0 .AND. s3 > 0.d0 ) THEN
-            ! transonic rarefaction in the 3-wave
-            sfract = s2 * (s3-s(3,i)) / (s3-s2)
-        ELSE IF (s(3,i) < 0.d0) THEN
-            ! 3-wave is left-going
-            sfract = s(3,i)
-        ELSE
-            ! 3-wave is right-going
-           CYCLE
-        ENDIF
-        
-        amdq(:,i) = amdq(:,i) + sfract*wave(:,3,i)
-    END DO
-     
-    ! Compute the remaining right-going fluctuations:
-    ! df = SUM s*wave   is the total flux difference and apdq = df - amdq
-    DO m=1,meqn
         DO i = 2-mbc, mx+mbc
-            df = 0.d0
-            DO mws=1,mwaves
-                df = df + s(mws,i)*wave(m,mws,i)
-            END DO
-            apdq(m,i) = df - amdq(m,i)
+
+            !! Check if 1-wave is transonic
+            rhoim1 = qr(1,i-1)
+            pim1 = gamma1*(qr(5,i-1) - 0.5d0*(qr(mu,i-1)**2 &
+                   + qr(mv,i-1)**2 + qr(mw,i-1)**2) / rhoim1)
+            cim1 = SQRT(gamma*pim1/rhoim1)
+            s0 = qr(mu,i-1)/rhoim1 - cim1  ! u-c in left state (cell i-1)
+
+            !! Check for fully supersonic case:
+            IF (s0 >= 0.d0 .AND. s(1,i) > 0.d0) then 
+                CYCLE 
+            endif
+            !! everything is right-going
+
+            rho1 = qr(1,i-1) + wave(1,1,i)
+            rhou1 = qr(mu,i-1) + wave(mu,1,i)
+            rhov1 = qr(mv,i-1) + wave(mv,1,i)
+            rhow1 = qr(mw,i-1) + wave(mw,1,i)
+            en1 = qr(5,i-1) + wave(5,1,i)
+            p1 = gamma1*(en1 - 0.5d0*(rhou1**2 + rhov1**2 + rhow1**2)/rho1)
+            c1 = SQRT(gamma*p1/rho1)
+            s1 = rhou1/rho1 - c1  
+            !! u-c to right of 1-wave
+            IF (s0 < 0.d0 .AND. s1 > 0.d0) THEN
+                !! transonic rarefaction in the 1-wave
+                sfract = s0 * (s1-s(1,i)) / (s1-s0)
+            ELSE IF (s(1,i) < 0.d0) THEN
+                !! 1-wave is leftgoing
+                sfract = s(1,i)
+            ELSE
+                !! 1-wave is rightgoing
+                !! this shouldn't happen since s0 < 0
+                sfract = 0.d0   
+            ENDIF
+            amdq(:,i) = sfract*wave(:,1,i)
+           
+            !! Check if 2-wave is transonic
+            IF (s(2,i) >= 0.d0) then 
+                CYCLE
+            ENDIF
+            !! 2- and 3-waves are right-going
+            amdq(:,i) = amdq(:,i) + s(2,i)*wave(:,2,i)
+        
+            !! Check if 3-wave is transonic
+            rhoi = ql(1,i)
+            pi = gamma1*(ql(5,i) - 0.5d0*(ql(mu,i)**2+ql(mv,i)**2+ql(mw,i)**2)/rhoi)
+            ci = SQRT(gamma*pi/rhoi)
+            s3 = ql(mu,i)/rhoi + ci     
+            !! u+c in right state  (cell i)
+        
+            rho2 = ql(1,i) - wave(1,3,i)
+            rhou2 = ql(mu,i) - wave(mu,3,i)
+            rhov2 = ql(mv,i) - wave(mv,3,i)
+            rhow2 = ql(mw,i) - wave(mw,3,i)
+            en2 = ql(5,i) - wave(5,3,i)
+            p2 = gamma1*(en2 - 0.5d0*(rhou2**2 + rhov2**2 + rhow2**2)/rho2)
+            c2 = SQRT(gamma*p2/rho2)
+            s2 = rhou2/rho2 + c2   !# u+c to left of 3-wave
+            IF (s2 < 0.d0 .AND. s3 > 0.d0 ) THEN
+                !! transonic rarefaction in the 3-wave
+                sfract = s2 * (s3-s(3,i)) / (s3-s2)
+            ELSE IF (s(3,i) < 0.d0) THEN
+                !! 3-wave is left-going
+                sfract = s(3,i)
+            ELSE
+                !! 3-wave is right-going
+                CYCLE
+            ENDIF        
+            amdq(:,i) = amdq(:,i) + sfract*wave(:,3,i)
         END DO
-    END DO
+     
+        !! Compute the remaining right-going fluctuations:
+        !! df = SUM s*wave   is the total flux difference and apdq = df - amdq
+        DO m=1,meqn
+            DO i = 2-mbc, mx+mbc
+                df = 0.d0
+                DO mws=1,mwaves
+                    df = df + s(mws,i)*wave(m,mws,i)
+                END DO
+                apdq(m,i) = df - amdq(m,i)
+            END DO
+        END DO
 
     END IF ! Entropy fix
 

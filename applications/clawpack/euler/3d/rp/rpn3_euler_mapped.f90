@@ -55,7 +55,15 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     double precision rho2, rhou2, rhov2, rhow2, en2, p2, c2
     double precision s2, df, area, uvw2
 
+    logical debug
+
     data efix /.false./    !# use entropy fix for transonic rarefactions
+
+    debug = .false.
+    if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
+        debug = .true.
+    endif
+    debug = .false.
 
     if (mwaves .ne. 3) then
         write(6,*) '*** Should have mwaves=3 for this Riemann solver'
@@ -67,17 +75,10 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     do i = 2-mbc, mx+mbc
 
-        !! # Get  two stored vectors; third is computed when rotations are done
-        do j = 1,9
-            rot(j) = auxl(locrot+j-1,i)
-        enddo
-
         do m = 1,meqn
             ql(m) = ql_cart(m,i)
             qr(m) = qr_cart(m,i-1)
         enddo
-        call rotate3(rot,ql(2))
-        call rotate3(rot,qr(2))
 
         !!# Use Roe averaged values for normal solves
         if (qr(1) .lt. 0) then
@@ -89,13 +90,11 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             stop
         endif
 
+        !! We can use unrotated values here, since we only use 
+        !! norm of velocity.
         rhsqrtl = sqrt(qr(1))
         rhsqrtr = sqrt(ql(1))
         rhsq2 = rhsqrtl + rhsqrtr
-
-        do j = 1,3
-            uvw(j) = (qr(j+1)/rhsqrtl + ql(j+1)/rhsqrtr) / rhsq2
-        enddo
 
         uvw2 = qr(2)**2 + qr(3)**2 + qr(4)**2
         pl = gamma1*(qr(5) - 0.5d0*uvw2/qr(1))
@@ -105,16 +104,24 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
         enth = (((qr(5)+pl)/rhsqrtl + (ql(5)+pr)/rhsqrtr)) / rhsq2
 
+
+        !! --------------- Use rotated values in Riemann solve ------------
+        do j = 1,9
+            rot(j) = auxl(locrot+j-1,i)
+        enddo
+
+        do j = 1,3
+            uvw(j) = (qr(j+1)/rhsqrtl + ql(j+1)/rhsqrtr) / rhsq2
+        enddo
+        call rotate3(rot,uvw)
+
         do j = 1,meqn
             delta(j) = ql(j) - qr(j)
         enddo
+        call rotate3(rot,delta(2))
 
         !! # Solve normal Riemann problem
         call solve_riemann(uvw, enth, delta, wave,s_rot,info)
-
-        if (ixyz .eq. 1 .and. kcom .eq. 4) then
-            !!write(6,*) i, jcom, (s_rot(j),j=1,3)
-        endif
 
         if (info > 0) then
             write(6,'(A)') 'In rpn3'
@@ -256,37 +263,37 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             enddo
         else
             !! # No entropy fix
+            do mws = 1,mwaves
+                call rotate3_tr(rot,wave(2,mws))
+                do m = 1,meqn
+                    wave_cart(m,mws,i) = wave(m,mws)
+                enddo 
+            enddo
+
+            area = auxl(locarea,i)
+            do mws = 1,mwaves
+                s(mws,i) = area*s_rot(mws)
+            enddo
+
             do m=1,meqn
-                amdq(m) = 0.d0
-                apdq(m) = 0.d0
+                amdq_cart(m,i) = 0.d0
+                apdq_cart(m,i) = 0.d0
                 do  mws = 1,mwaves
-                    if (s_rot(mws) .lt. 0.d0) then
-                        amdq(m) = amdq(m) + s_rot(mws)*wave(m,mws)
-                    else
-                        apdq(m) = apdq(m) + s_rot(mws)*wave(m,mws)
-                    endif
+                    amdq_cart(m,i) = amdq_cart(m,i) + min(s(mws,i),0.d0)*wave(m,mws)
+                    apdq_cart(m,i) = apdq_cart(m,i) + max(s(mws,i),0.d0)*wave(m,mws)
                 enddo
             enddo
         endif  !! end of efix
 
-        do mws = 1,mwaves
-            call rotate3_tr(rot,wave(2,mws))
-            do m = 1,meqn
-                wave_cart(m,mws,i) = wave(m,mws)
-            enddo
-        enddo
-
-        area = auxl(locarea,i)
-        do mws = 1,mwaves
-            s(mws,i) = area*s_rot(mws)
-        enddo
-
-        call rotate3_tr(rot,amdq(2))
-        call rotate3_tr(rot,apdq(2))
-        do m = 1,meqn
-            amdq_cart(m,i) = area*amdq(m)
-            apdq_cart(m,i) = area*apdq(m)
-        enddo
+        if (debug) then
+            write(6,211) 1, i, (ql_cart(j,i),j=1,5)
+            !!write(6,211) i, (qr_cart(j,i),j=1,5)
+            !!write(6,211) i, (delta(j),j=1,5)
+            !!write(6,211) i, (amdq_cart(j,i)/area,j=1,5)
+            !!write(6,211) i, (apdq_cart(j,i)/area,j=1,5)
+            !!write(6,*) ' '
+        endif
+211 format(2I5,5E16.8)
 
     enddo  !! end of i loop over 1d sweep array
 

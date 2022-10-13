@@ -45,7 +45,10 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
 
     /* In extruded case, no transformations are applied to the 2d mapping */
     int mapping = cont->user_int_3dx[0];
+
     double maxelev = cont->user_double_3dx[0];  
+    double minz = cont->user_double_3dx[1];  
+    double maxz = cont->user_double_3dx[2];  
 
     if (mapping == 1)
     {
@@ -57,7 +60,7 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
         *yp = yp1;
 
         /* Stretch zc in [0,1] into [-1,1] */
-        *zp = -1 + 2*zc;        
+        *zp = minz + (maxz-minz)*zc;        
     }
     else 
     {
@@ -69,35 +72,46 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
 
         // returns value in [-pi, pi]
         double theta = atan2(yp1,xp1);      
-#if 0        
-        if (theta < 0)
-            theta += 2*M_PI;
-#endif            
 
         /* Get scaling in the radial direction */
         scale_map(cont,&xp1,&yp1,&zp1);
         double rp = sqrt(pow(xp1,2) + pow(yp1,2) + pow(zp1,2));
 
-        /* Extrude in z direction to constant height maxelev. */
+        /* Extrude in z direction to constant height maxelev. 
+           This assumes that zc in [0,1] (default). 
+        */
         double R = rp + maxelev*zc;  
         *xp = R*cos(phi)*cos(theta);
         *yp = R*cos(phi)*sin(theta);
         *zp = R*sin(phi);
+#if 0        
+        printf("%f %f %f\n",xc,yc,zc);
+        printf("%f %f\n",theta, phi);
+        printf("%f %f %f\n\n",*xp,*yp,*zp);
+#endif        
     }
 }
 
 
 void overpressure_map_extrude(fclaw2d_map_context_t* cont,
                          const double maxelev,
-                         const int mapping)
+                         const int mapping,
+                         const double minz,
+                         const double maxz)
 
 {
     /* May be needed to get more general mappings */
     cont->mapc2m_3dx = overpressure_map_3dx;
 
+    /* Store parameters for use in routine above */
     cont->user_double_3dx[0] = maxelev;
+    cont->user_double_3dx[1] = minz;
+    cont->user_double_3dx[2] = maxz;
     cont->user_int_3dx[0] = mapping;
 
+    /* This is checked in 2d mappings.  If `is_extruded=1`, then the 2d mapping
+       will not be scaled, shifted or rotated
+    */
     cont->is_extruded = 1;
 
     return;

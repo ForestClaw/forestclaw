@@ -21,8 +21,14 @@ subroutine setprob
     double precision rhoin, rhoout, pin, pout
     double precision longitude(2), latitude(2)
 
+    double precision pi_com, pi2_com
+    common /compi/ pi_com, pi2_com
+
     pi = 4.d0*atan(1.d0)
     pi2 = 2*pi
+
+    pi_com = pi
+    pi2_com = pi2
 
     open(10,file='setprob.data')
     read(10,*) example

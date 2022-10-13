@@ -71,6 +71,19 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
 
     double precision pres
 
+    logical debug
+
+    debug = .false.
+    if (icoor .eq. 2) then
+        if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
+            if (imp .eq. 1) then
+                debug = .true.
+            endif
+        endif
+    endif
+    debug = .false.
+
+
     IF (maxmrp < maxm+mbc)THEN
        WRITE(6,*) 'need to increase maxmrp in rpt3_euler.f90'
        WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
@@ -187,9 +200,9 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
           sb(1) = v(i) - a(i)
           
           waveb(1,2)  = alpha(4)
-          waveb(mv,2) = alpha(4)*v(i)
-          waveb(mw,2) = alpha(4)*w(i) + alpha(3)
-          waveb(mu,2) = alpha(4)*u(i) + alpha(2)
+          waveb(mu,2) = alpha(2) + u(i)*alpha(4)
+          waveb(mv,2) =            v(i)*alpha(4)
+          waveb(mw,2) = alpha(3) + w(i)*alpha(4)
           waveb(5,2)  = alpha(4)*0.5d0*u2v2w2(i) + alpha(2)*u(i) + alpha(3)*w(i)
           sb(2) = v(i)
           
@@ -206,9 +219,9 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
              bmasdq(:,i) = bmasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
              bpasdq(:,i) = bpasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
           END DO
-          if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-              !!write(6,201) i, jcom, enth(i), (bpasdq(j+1,i),j=1,3)
-           endif
+          if (debug) then
+              write(6,211) 2, i, (ql(j,i),j=1,5)
+          endif
        END DO
 
     ! Solve Riemann problem in the third coordinate direction
@@ -251,10 +264,10 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
              bmasdq(:,i) = bmasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
              bpasdq(:,i) = bpasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
           END DO
-          if (ixyz .eq. 3 .and. icom .eq. 4 .and. jcom .eq. 4) then
-             !!write(6,201) i, kcom, enth(i), (bmasdq(j+1,i),j=1,3)
+          if (debug) then
+             write(6,211) i, (ql(j,i), j=1,5)
           endif
-201    format(2I5,5E24.16)        
+211    format(2I5,5E16.8)        
 
        END DO
     END IF
