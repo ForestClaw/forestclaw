@@ -113,6 +113,10 @@ fclaw2d_map_context_t *
         // Make sure periodic case as full 360 degrees.
         cont->user_double[3] = longitude[0] + 360.0;
     }
+    else
+    {
+        cont->user_double[3] = longitude[1];
+    }
 
     set_scale(cont,scale);
     set_rotate(cont,rotate);
