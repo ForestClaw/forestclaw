@@ -1,6 +1,6 @@
 #!/bin/sh
 # Print a version string.
-scriptversion=2008-04-08.07
+scriptversion=2022-09-14.1
 
 # Copyright (C) 2007-2008 Free Software Foundation
 #
@@ -29,15 +29,7 @@ scriptversion=2008-04-08.07
 # In order to use intra-version strings in your project, you will need two
 # separate generated version string files:
 #
-# .tarball-version - present only in a distribution tarball, and not in
-#   a checked-out repository.  Created with contents that were learned at
-#   the last time autoconf was run, and used by git-version-gen.  Must not
-#   be present in either $(srcdir) or $(builddir) for git-version-gen to
-#   give accurate answers during normal development with a checked out tree,
-#   but must be present in a tarball when there is no version control system.
-#   Therefore, it cannot be used in any dependencies.  GNUmakefile has
-#   hooks to force a reconfigure at distribution time to get the value
-#   correct, without penalizing normal development with extra reconfigures.
+# .tarball-version - present in repository, updated each release
 #
 # .version - present in a checked-out repository and in a distribution
 #   tarball.  Usable in dependencies, particularly for files that don't
@@ -72,6 +64,12 @@ scriptversion=2008-04-08.07
 #
 # With the new style of git submodules, .git may be a file: added test -f .git
 
+# Copyright (C) 2022 Scott Aiton
+# switch to vMAJOR.MINOR.PATCH-NUMCOMMITS-HASH format
+# switch to using git version even if .tarbal-version exists,
+# having .tarball-version in the repo makes the github release workflow easier
+#
+
 case $# in
   1) ;;
   *) echo 1>&2 "Usage: $0 \$srcdir/.tarball-version"; exit 1;;
@@ -86,27 +84,11 @@ nl='
 # for out of source make dist.
 cd $srcdir
 
-# First see if there is a tarball-only version file.
-# then try "git describe", then default.
-if test -f $tarball_version_file
-then
-  v=`cat $tarball_version_file` || exit 1
-  case $v in
-    *$nl*) v= ;; # reject multi-line output
-    [0-9]*) ;;
-    *) v= ;;
-  esac
-  test -z "$v" \
-  && echo "$0: WARNING: $tarball_version_file seems to be damaged" 1>&2
-fi
+# First try "git describe", then see if there is a tarball-only version file, then default
 
-
-if test -n "$v"
-then
-  : # use $v
-elif { test -d .git || test -f .git ; } \
-  && v=`git describe --abbrev=4 --match='v*' HEAD 2>/dev/null \
-  || git describe --abbrev=4 HEAD 2>/dev/null` \
+if { test -d .git || test -f .git ; } \
+  && v=`git describe --abbrev=4 --match='v*' --dirty=-dirty 2>/dev/null \
+  || git describe --abbrev=4 --dirty=-dirty 2>/dev/null` \
   && case $v in
   v[0-9]*) ;;
   *) (exit 1) ;;
@@ -128,28 +110,20 @@ then
     v=`echo "$v" | sed "s/\(.*\)-\(.*\)/\1-$numcommits-\2/"`;
     ;;
   esac
-
-    # Change the first '-' to a '.', so version-comparing tools work properly.
-    # Remove the "g" in git describe's output string, to save a byte.
-    v=`echo "$v" | sed 's/-/./;s/\(.*\)-g/\1-/'`;
+elif test -f $tarball_version_file
+then
+  v=`cat $tarball_version_file` || exit 1
+  case $v in
+    *$nl*) v= ;; # reject multi-line output
+    v[0-9]*) ;;
+    *) v= ;;
+  esac
+  test -z "$v" \
+  && echo "$0: WARNING: $tarball_version_file seems to be damaged" 1>&2
 else
     v=UNKNOWN
 fi
 
-v=`echo "$v" |sed 's/^v//'`
-
-# Don't declare a version "dirty" merely because a time stamp has changed.
-git status > /dev/null 2>&1
-
-dirty=`sh -c 'git diff-index --name-only HEAD' 2>/dev/null` || dirty=
-case "$dirty" in
-  '') ;;
-  *) # Append the suffix only if there isn't one already.
-  case $v in
-    *-dirty) ;;
-    *) v="$v-dirty" ;;
-  esac ;;
-esac
 
 # Omit the trailing newline, so that m4_esyscmd can use the result directly.
 echo "$v" | tr -d '\012'

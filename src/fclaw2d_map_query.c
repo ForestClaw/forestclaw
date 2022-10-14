@@ -153,9 +153,17 @@ int FCLAW2D_MAP_IS_TORUS(fclaw2d_map_context_t** pcont)
 
 int FCLAW2D_MAP_IS_BRICK(fclaw2d_map_context_t** pcont)
 {
-    int iresult;
     fclaw2d_map_context_t *cont = *pcont;
+    fclaw2d_map_context_t *brick = cont->brick;
+    int iresult;
     int id = FCLAW2D_MAP_QUERY_IS_BRICK;
-    iresult = cont->query(cont,id);
+    if (brick != NULL)
+    {
+        iresult = brick->query(cont,id);
+    }
+    else
+    {
+        iresult = cont->query(cont,id);
+    }
     return iresult != 0;
 }

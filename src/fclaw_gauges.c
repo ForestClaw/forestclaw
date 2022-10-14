@@ -140,16 +140,8 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         double y1 = 1;
 
         int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
-        int mi,mj;
-        if (is_brick)
-        {
-            FCLAW2D_MAP_BRICK_GET_DIM(&cont,&mi,&mj); 
-        }
-        else
-        {
-            mi = 1;
-            mj = 1;
-        }
+        int mi = fclaw_opt->mi;
+        int mj = fclaw_opt->mj;
 
         fclaw2d_block_t *blocks = glob->domain->blocks;
 
