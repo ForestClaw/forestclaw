@@ -1,4 +1,5 @@
 % Axes and title
+setviews;
 
 parms = read_vars();
 example = parms.example;
@@ -23,17 +24,17 @@ end
 
 if qmin == qmax
     if qmax == 0
-        caxis([-1,1])
+        clim([-1,1])
     else
-        caxis([-abs(qmax),abs(qmax)])
+        clim([-abs(qmax),abs(qmax)])
     end
 else
     if UserVariable == 1
         % Pressure
-        caxis([0.95,1.15])
+        clim([0.95,1.15])
     else
         % Density
-        caxis([0.5,1.3])
+        clim([qmin,qmax])
         % caxis([-1,1]*1e-3);  % For errors
         % view(2);
     end
@@ -59,6 +60,7 @@ colorbar
 
 title(tstr)
 
+view(vright)
 
 % Show patch borders
 showpatchborders

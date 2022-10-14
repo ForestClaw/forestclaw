@@ -35,7 +35,7 @@ double precision function fdisc(blockno,xc,yc,zc)
             !! p = (1,0,0)
             !! d = p(1)*xp + p(2)*yp + p(3)*zp  == xp
             !! To shift to different location, set 'rotate' options.
-            omega0 = pi/16.d0
+            omega0 = pi/32.d0
             omega = acos(xp/rp)
             fdisc = omega - omega0            
             !! write(6,*) xp,yp,zp,omega, fdisc
