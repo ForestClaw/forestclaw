@@ -142,7 +142,8 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
                          int blockno, 
                          int patchno, 
                          void *ray, 
-                         double *integral)
+                         double *integral,
+                         void* user)
 {
   /* assert that ray is a valid swirl_ray_t */
   fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) ray;  
@@ -281,37 +282,6 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
 
 static int nlines = 3;
 
-#if 0
-sc_array_t * swirl_rays_new (void)
-{
-    swirl_ray_t *ray;
-    sc_array_t  *a = sc_array_new (sizeof (fclaw2d_ray_t));
-
-    /* add a couple straight rays */
-    for (int i = 0; i < nlines; ++i) 
-    {
-        ray = (swirl_ray_t*) FCLAW_ALLOC(swirl_ray_t,1);
-        ray->rtype = SWIRL_RAY_LINE;
-        ray->xy[0] = 0.;
-        ray->xy[1] = 0.;
-        ray->r.line.vec[0] = cos (i * M_PI / nlines);
-        ray->r.line.vec[1] = sin (i * M_PI / nlines);
-
-        fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) sc_array_push (a);
-        fclaw2d_ray_set_ray(NULL,fclaw_ray,i, ray);
-    }
-
-    /* add no circles yet */
-    return a;
-}
-
-sc_array_t * swirl_integrals_new(void)
-{
-    return sc_array_new_count (sizeof (double), nlines);
-}
-#endif
-
-
 
 /* Virtual function for setting rays */
 static
@@ -326,7 +296,7 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
        below. */
 
     //*rays = (fclaw2d_ray_t*) FCLAW_ALLOC(fclaw2d_ray_t,*num_rays);
-    *rays = fclaw2d_ray_allocate_rays(*num_lines);
+    *rays = fclaw2d_ray_allocate_rays(*num_rays);
     fclaw2d_ray_t *ray_vec = *rays;
     for (int i = 0; i < nlines; ++i) 
     {
@@ -380,7 +350,7 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
 void swirl_initialize_rays(fclaw2d_global_t* glob)
 {
     /* Set up rays */
-    fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt(); 
+    fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt(glob); 
 
     rays_vt->allocate_and_define = swirl_allocate_and_define_rays;
     rays_vt->deallocate = swirl_deallocate_rays;

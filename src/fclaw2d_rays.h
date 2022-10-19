@@ -124,13 +124,13 @@ void fclaw2d_ray_set_ray(fclaw2d_ray_t *r,
 void* fclaw2d_ray_get_ray(fclaw2d_ray_t *r, 
                           int *id);
 
-fclaw2d_ray_vtable_t* fclaw2d_ray_vt();
+fclaw2d_ray_vtable_t* fclaw2d_ray_vt(struct fclaw2d_global *glob);
 
-void fclaw2d_ray_vtable_initialize();
+void fclaw2d_ray_vtable_initialize(struct fclaw2d_global *glob);
 
 fclaw2d_ray_t* fclaw2d_ray_allocate_rays(int num_rays);
 
-int fclaw2d_ray_deallocate_rays(fclaw2d_rays_t **rays);
+int fclaw2d_ray_deallocate_rays(fclaw2d_ray_t **rays);
 
 
 

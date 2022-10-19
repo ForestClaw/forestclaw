@@ -87,7 +87,8 @@ int swirl_intersect_ray(fclaw2d_domain_t *domain,
                          int blockno, 
                          int patchno, 
                          void *ray, 
-                         double *integral);
+                         double *integral,
+                         void* user);
 
 #if 0
 void swirl_define_ray(fclaw2d_global_t *glob, 

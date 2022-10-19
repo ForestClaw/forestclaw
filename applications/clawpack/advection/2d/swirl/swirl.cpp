@@ -84,9 +84,6 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    /* number of rays that are straight lines.  No circles yet */
-    const int swirl_nlines = 8;
-
     int first_arg;
     fclaw_app_t *app;
     fclaw_exit_type_t vexit;

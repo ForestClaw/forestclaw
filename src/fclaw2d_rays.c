@@ -30,7 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_convenience.h"
 
-static fclaw2d_ray_vtable_t s_ray_vt;
+#include <fclaw_pointer_map.h>
+
+
+//static fclaw2d_ray_vtable_t s_ray_vt;
 
 
 typedef struct fclaw2d_ray_acc
@@ -51,7 +54,7 @@ void ray_allocate_and_define(fclaw2d_global_t* glob,
                              fclaw2d_ray_t **rays, 
                              int *num_rays)
 {
-    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt();
+    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
 
     FCLAW_ASSERT(ray_vt->allocate_and_define != NULL);
     ray_vt->allocate_and_define(glob, rays, num_rays);    
@@ -62,12 +65,12 @@ void ray_deallocate(fclaw2d_global_t* glob,
                     fclaw2d_ray_t **rays, 
                     int *num_rays)
 {
-    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt();
+    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
 
     FCLAW_ASSERT(ray_vt->deallocate != NULL);
     ray_vt->deallocate(glob, rays, num_rays);    
 }
--
+
 
 static
 void ray_initialize(fclaw2d_global_t* glob, void** acc)
@@ -145,16 +148,16 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
 #endif    
 
     /* This does a compute and a gather. */
-    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt();
+    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
     fclaw2d_domain_integrate_rays(glob->domain, ray_vt->integrate, 
-                                  sc_rays, integrals);
+                                  sc_rays, integrals, NULL);
 
     /* Copy integral value back to fclaw2d_ray_t */
     for(int i = 0; i < num_rays; i++)
     {
-        fclaw2d_ray_t *ray = *((fclaw2d_ray_t*) sc_array_index_int(sc_rays,i));
+        fclaw2d_ray_t *ray = ((fclaw2d_ray_t*) sc_array_index_int(sc_rays,i));
         double intval = *((double*) sc_array_index_int(integrals,i));
-        rays->integral = intval;
+        ray->integral = intval;
     }
 
 #if 1
@@ -207,7 +210,20 @@ void ray_finalize(fclaw2d_global_t *glob, void** acc)
 /* ---------------------------------- Virtual table  ---------------------------------- */
 
 static
-fclaw2d_ray_vtable_t* fclaw2d_ray_vt_init()
+fclaw2d_ray_vtable_t* fclaw2d_ray_vt_new()
+{
+    return (fclaw2d_ray_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_ray_vtable_t, 1);
+}
+
+static
+void fclaw2d_ray_vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
+}
+
+#if 0
+static
+fclaw2d_ray_vtable_t* fclaw2d_ray_vt_new()
 {
     //FCLAW_ASSERT(s_rays_vt.is_set == 0);
     return &s_ray_vt;
@@ -218,17 +234,20 @@ fclaw2d_ray_vtable_t* fclaw2d_ray_vt()
     FCLAW_ASSERT(s_ray_vt.is_set != 0);
     return &s_ray_vt;
 }
+#endif
 
-void fclaw2d_ray_vtable_initialize()
+void fclaw2d_ray_vtable_initialize(fclaw2d_global_t *glob)
 {
-
-    fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt();
-    fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt_init(); 
-
+    fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt(glob);
     diag_vt->ray_init_diagnostics     = ray_initialize;    
     diag_vt->ray_compute_diagnostics  = ray_integrate;
     diag_vt->ray_gather_diagnostics  = ray_gather; 
     diag_vt->ray_finalize_diagnostics = ray_finalize;
+
+    fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt_new(); 
+
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_rays") == NULL);
+    fclaw_pointer_map_insert(glob->vtables, "fclaw2d_rays", rays_vt, fclaw2d_ray_vt_destroy);
 
     rays_vt->is_set = 1;
 }
@@ -236,13 +255,24 @@ void fclaw2d_ray_vtable_initialize()
 
 /* ---------------------------- Get Access Functions ---------------------------------- */
 
+
+fclaw2d_ray_vtable_t* fclaw2d_ray_vt(fclaw2d_global_t* glob)
+{
+    fclaw2d_ray_vtable_t* ray_vt = (fclaw2d_ray_vtable_t*) 
+                                fclaw_pointer_map_get(glob->vtables, "fclaw2d_rays");
+    FCLAW_ASSERT(ray_vt != NULL);
+    FCLAW_ASSERT(ray_vt->is_set != 0);
+    return ray_vt;
+}
+
+
 fclaw2d_ray_t* fclaw2d_ray_allocate_rays(int num_rays)
 {
     fclaw2d_ray_t* rays = (fclaw2d_ray_t*) FCLAW_ALLOC(fclaw2d_ray_t,num_rays);
     return rays;
 }
 
-int fclaw2d_ray_deallocate_rays(fclaw2d_rays_t **rays)
+int fclaw2d_ray_deallocate_rays(fclaw2d_ray_t **rays)
 {
     FCLAW_ASSERT(*rays != NULL);
     FCLAW_FREE(*rays);
