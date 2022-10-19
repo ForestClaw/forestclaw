@@ -7,11 +7,11 @@
       double precision pi, pi2
       common /compi/ pi, pi2
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       double precision xp, yp, zp
       double precision th, tp
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       pi = 4.0*atan(1.0)
       pi2 = 2*pi

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -104,9 +104,9 @@ struct fclaw2d_diagnostics_vtable
     int is_set;
 };
 
-fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt();
+fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt(struct fclaw2d_global* glob);
 
-void fclaw2d_diagnostics_vtable_initialize();
+void fclaw2d_diagnostics_vtable_initialize(struct fclaw2d_global* glob);
 
 double fclaw2d_domain_global_minimum (struct fclaw2d_domain* domain, double d);
 

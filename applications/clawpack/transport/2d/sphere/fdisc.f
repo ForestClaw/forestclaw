@@ -10,13 +10,13 @@
       integer initchoice
       common /initchoice_comm/ initchoice
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
 
       double precision xp, yp, zp
 
 c      double precision r, r0
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       call fclaw2d_map_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)

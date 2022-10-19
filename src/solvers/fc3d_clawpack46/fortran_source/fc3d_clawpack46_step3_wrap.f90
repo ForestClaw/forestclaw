@@ -2,7 +2,7 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
       method, mthlim, mcapa, mwaves, mx, my, mz, qold, aux, &
       dx, dy, dz, dt,cfl, work, mwork,xlower,ylower,zlower, &
       level, t, fp,fm, gp, gm, hp, hm, rpn3, rpt3, rptt3, &
-      use_fwaves, ierror)
+      use_fwaves, block_corner_count,ierror)
 
     implicit none
 
@@ -11,7 +11,7 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
     INTEGER :: maxm,meqn,maux,mbc,mcapa,mwaves,mx,my, mz, mwork
     INTEGER :: level, ierror, use_fwaves
     INTEGER :: method(7), mthlim(mwaves)
-!!      integer block_corner_count(0:3)
+    integer block_corner_count(0:3)
 
     DOUBLE PRECISION :: dx,dy,dz, dt,cfl, xlower, ylower, zlower, t
     DOUBLE PRECISION :: work(mwork)
@@ -87,7 +87,7 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
          work(i0q1d),work(i0dtdx1),work(i0dtdy1), work(i0dtdz1), &
          work(i0aux1),work(i0aux2),work(i0aux3), &
          work(i0next),mwork1,rpn3,rpt3, rptt3, &
-         mwaves,mcapa,method,mthlim,use_fwaves, ierror)
+         mwaves,mcapa,method,mthlim,use_fwaves, block_corner_count,ierror)
 
 !!  # update q
     dtdx = dt/dx

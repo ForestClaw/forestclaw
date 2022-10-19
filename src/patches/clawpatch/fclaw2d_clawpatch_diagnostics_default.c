@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_options.h>
 
 #include <_fclaw2d_to_fclaw3dx.h>
+#include <_fclaw2d_to_fclaw3d.h>
 
 #endif
 
@@ -66,7 +67,7 @@ void fclaw2d_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
     double *q; 
     fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
 
     int mx, my, mbc;
@@ -100,7 +101,7 @@ void fclaw2d_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
     error_info_t* error_data = (error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
     double *q;

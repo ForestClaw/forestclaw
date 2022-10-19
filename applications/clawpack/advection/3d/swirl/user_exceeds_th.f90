@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-integer function user_exceeds_th(blockno,& 
+integer function fclaw3dx_user_exceeds_th(blockno,& 
                                   qval,qmin,qmax,quad, & 
                                   dx,dy,dz,xc,yc,zc,threshold, &
                                   init_flag, is_ghost)
@@ -17,7 +17,7 @@ integer function user_exceeds_th(blockno,&
     !! would fail tagging criteria
     if (is_ghost) then
         !! Don't use this result
-        user_exceeds_th = -1
+        fclaw3dx_user_exceeds_th = -1
         return
     endif
 
@@ -28,6 +28,6 @@ integer function user_exceeds_th(blockno,&
         refine = 0
     endif
 
-    user_exceeds_th = refine
+    fclaw3dx_user_exceeds_th = refine
 
-end function user_exceeds_th
+end function fclaw3dx_user_exceeds_th

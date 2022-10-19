@@ -1,6 +1,9 @@
 yrbcolormap;
-s = 0.05;
-axis([-s 2+s -s 2+s])
+ax = 0; 
+bx = 2;
+ay = 0; 
+by = 2;
+axis([ax bx ay by])
 daspect([1 1 1]);
 
 showpatchborders(1:9);
@@ -10,9 +13,12 @@ N = 500;
 if (t > 0)
     [xout,yout] = filament_soln(N,t);
 else
+    R_init = 0.25;
+    xc_init = 0.5;
+    yc_init = 1.0;
     th = linspace(0,2*pi,N+1);
-    xout = 0.25*cos(th) + 0.5;
-    yout = 0.25*sin(th) + 1;
+    xout = R_init*cos(th) + xc_init;
+    yout = R_init*sin(th) + yc_init;
 end
 hold on;
 plot(xout,yout,'k','linewidth',2);
@@ -34,9 +40,3 @@ if (prt)
   filename = sprintf('filament_%04d.png',Frame)
   print('-dpng',filename);
 end
-
-clear afterframe
-clear mapc2m
-clear mapc2m_squareddisk
-clear mapc2m_pillowdisk
-clear parallelpartitions

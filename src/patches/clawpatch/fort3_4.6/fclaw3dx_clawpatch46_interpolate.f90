@@ -370,12 +370,12 @@ subroutine fclaw3dx_clawpatch46_fort_interpolate2fine &
         end do k_loop
     end do mq_loop
 
-    if (manifold .ne. 0) then
-        write(6,*) 'interpolate:fixcapaq2 : Manifold not yet implemented in 3D'
-        stop
-        call fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, & 
-                        qcoarse,qfine, areacoarse,areafine,igrid)
-    endif
+!!    if (manifold .ne. 0) then
+!!        write(6,*) 'interpolate:fixcapaq2 : Manifold not yet implemented in 3D'
+!!        stop
+!!        call fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, & 
+!!                        qcoarse,qfine, areacoarse,areafine,igrid)
+!!    endif
 
 
 end subroutine  fclaw3dx_clawpatch46_fort_interpolate2fine

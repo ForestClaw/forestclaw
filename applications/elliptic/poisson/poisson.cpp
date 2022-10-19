@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+  Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -81,7 +81,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_vtables_initialize(glob);
 
     /* Test thunderegg solver */
-    fc2d_thunderegg_solver_initialize();
+    fc2d_thunderegg_solver_initialize(glob);
 
     /* set up elliptic solver to use the thunderegg solver */
     poisson_link_solvers(glob);
@@ -143,10 +143,10 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
-    fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    mg_opt =        fc2d_thunderegg_options_register(app,"fclaw_options.ini");
-    user_opt =                    poisson_options_register(app,"fclaw_options.ini");  
+    fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
+    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    mg_opt =            fc2d_thunderegg_options_register(app, "thunderegg", "fclaw_options.ini");
+    user_opt =                  poisson_options_register(app,               "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);

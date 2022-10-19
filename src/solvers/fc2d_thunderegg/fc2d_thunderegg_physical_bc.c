@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@ void cb_fc2d_thunderegg_physical_bc(fclaw2d_domain_t *domain,
     double *rhs;
     fclaw2d_clawpatch_rhs_data(s->glob,patch,&rhs,&mfields);
 
-    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(s->glob);
 
     int cons_check = 0;
     double flux_sum[4];

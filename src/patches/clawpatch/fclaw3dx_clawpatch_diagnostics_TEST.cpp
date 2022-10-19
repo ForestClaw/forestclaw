@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,10 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw3dx_clawpatch.h>
 #include <fclaw2d_global.h>
-#include <test/catch.hpp>
+#include <test.hpp>
 #include <fstream>
 
-TEST_CASE("fclaw2d_clawpatch_initialize_vt","[fclaw3dx][clawpatch]")
+TEST_CASE("fclaw2d_clawpatch_initialize_vt")
 {
 	fclaw3dx_clawpatch_set_refinement_criteria(r);
 }

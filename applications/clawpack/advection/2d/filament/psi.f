@@ -1,7 +1,7 @@
-      double precision function psi(x,y)
+      double precision function psi(x,y,z)
       implicit none
 
-      double precision x,y,r
+      double precision x,y,z,r
 
       double precision pi, pi2
       common /compi/ pi, pi2
@@ -16,8 +16,6 @@ c      psi = r**2
 c     # Filament formation (negative for clockwise rotation)
       psi = (4.d0/3.d0)*r**3
 
-c      psi = x + y
-
       return
       end
 
@@ -26,7 +24,7 @@ c      psi = x + y
 
       double precision xd1(3),xd2(3), ds, vn, psi,t
 
-      vn = (psi(xd1(1),xd1(2)) -
-     &      psi(xd2(1),xd2(2)))/ds
+      vn = (psi(xd1(1),xd1(2),xd1(3)) -
+     &      psi(xd2(1),xd2(2),xd2(3)))/ds
 
       end

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -87,7 +87,7 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual tables for solvers */
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_solver_initialize();
+        fc2d_clawpack46_solver_initialize(glob);
     }
     else if (user->claw_version == 5)
     {
@@ -98,7 +98,7 @@ void run_program(fclaw2d_global_t* glob)
                                     " claw-version=5.\n");
             exit(0);
         }
-        fc2d_clawpack5_solver_initialize();
+        fc2d_clawpack5_solver_initialize(glob);
     }
 
     torus_link_solvers(glob);
@@ -136,11 +136,11 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
-    fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    claw46_opt =        fc2d_clawpack46_options_register(app,"fclaw_options.ini");
-    claw5_opt =          fc2d_clawpack5_options_register(app,"fclaw_options.ini");
-    user =                    torus_options_register(app,"fclaw_options.ini");  
+    fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
+    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    claw46_opt =        fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
+    claw5_opt =          fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
+    user =                        torus_options_register(app,               "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);

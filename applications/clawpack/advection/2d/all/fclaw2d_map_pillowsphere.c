@@ -5,9 +5,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 
@@ -72,8 +69,11 @@ fclaw2d_map_c2m_pillowsphere (fclaw2d_map_context_t * cont, int blockno,
 {
     MAPC2M_PILLOWSPHERE(&blockno,&xc,&yc,xp,yp,zp);
 
-    scale_map(cont,xp,yp,zp);
-    rotate_map(cont,xp,yp,zp);
+    if (cont->is_extruded == 0)
+    {
+        scale_map(cont,xp,yp,zp);
+        rotate_map(cont,xp,yp,zp);        
+    }
 }
 
 fclaw2d_map_context_t *
@@ -89,11 +89,10 @@ fclaw2d_map_context_t *
     set_scale(cont,scale); 
     set_rotate(cont, rotate);
 
+    cont->is_extruded = 0;
+
     return cont;
 }
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif

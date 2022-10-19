@@ -27,6 +27,7 @@ add_executable(filament
   ${all}/advection_patch_setup_manifold.c
   ${all}/fclaw2d_map_cart.c 
   ${all}/fclaw2d_map_fivepatch.c 
+  ${all}/fclaw2d_map_bilinear.c 
   $<TARGET_OBJECTS:filament_f>
 )
 

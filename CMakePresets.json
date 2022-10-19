@@ -11,9 +11,11 @@
   "name": "ci",
   "binaryDir": "${sourceDir}/build",
   "generator": "Ninja",
+  "environment": {
+    "CUDAARCHS": "72"
+  },
   "cacheVariables": {
-    "CMAKE_BUILD_TYPE": "Release",
-    "CMAKE_CUDA_ARCHITECTURES": "72"
+    "CMAKE_BUILD_TYPE": "Release"
   }
 },
 {

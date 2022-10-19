@@ -3,9 +3,9 @@
 
       double precision xc,yc, xp, yp, zp
       integer blockno
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       call fclaw2d_map_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)

@@ -35,7 +35,7 @@ integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
     double precision :: grad(3), dx2, dy2, d, ds
 
 
-    integer*8 :: cont, get_context
+    integer*8 :: cont, fclaw_map_get_context
     integer :: fclaw2d_map_is_used
 
     double precision :: clawpatch_gradient_dot
@@ -48,7 +48,7 @@ integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
         return
     endif
 
-    cont = get_context()
+    cont = fclaw_map_get_context()
 
     dx2 = 2*dx
     dy2 = 2*dy

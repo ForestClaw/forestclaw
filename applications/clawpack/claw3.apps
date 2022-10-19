@@ -8,3 +8,12 @@ include applications/clawpack/advection/3d/swirl/Makefile.am
 
 # Filament : sphere in rotating flow field
 include applications/clawpack/advection/3d/filament/Makefile.am
+
+# Disk : rotating flow field
+include applications/clawpack/advection/3d/disk/Makefile.am
+
+# Sphere : rotating ring (rigid body rotation)
+include applications/clawpack/advection/3d/sphere/Makefile.am
+
+# Latlong : beach ball
+include applications/clawpack/advection/3d/latlong/Makefile.am

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -175,9 +175,9 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
 
         /* No block corner transforms yet, so we use the 
         interior 'default' transforms. */
-        fclaw2d_patch_transform_blockface_intra (ftransform);
+        fclaw2d_patch_transform_blockface_intra (glob, ftransform);
         fclaw2d_patch_transform_blockface_intra
-            (ftransform_finegrid->transform);
+            (glob, ftransform_finegrid->transform);
     }
     else if (!has_corner_neighbor && !is_block_corner)
     {
@@ -215,7 +215,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             FCLAW_ASSERT(rblockno == *corner_block_idx);
 
             /* Get encoding of transforming a neighbor coordinate across a face */
-            fclaw2d_patch_transform_blockface (block_iface, rfaceno, ftransform);
+            fclaw2d_patch_transform_blockface (glob, block_iface, rfaceno, ftransform);
 
             /* Get transform needed to swap parallel ghost patch with fine
                grid on-proc patch.  This is done so that averaging and
@@ -223,7 +223,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             int iface1 = block_iface;
             int rface1 = rfaceno;
             fclaw2d_patch_face_swap(&iface1,&rface1);
-            fclaw2d_patch_transform_blockface(iface1, rface1,
+            fclaw2d_patch_transform_blockface(glob, iface1, rface1,
                                               ftransform_finegrid->transform);
             ftransform_finegrid->block_iface = iface1;
         }
@@ -232,9 +232,9 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
             /* Both patches are in the same block, so we set the transform to
                a default transform.  This could be the case for periodic boundaries. */
             *block_corner_count = 4;  /* assume four for now */
-            fclaw2d_patch_transform_blockface_intra (ftransform);
+            fclaw2d_patch_transform_blockface_intra (glob, ftransform);
             fclaw2d_patch_transform_blockface_intra
-                (ftransform_finegrid->transform);
+                (glob, ftransform_finegrid->transform);
 
         }
         else
@@ -398,14 +398,13 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
 
         transform_data_finegrid.block_iface = -1;
 
-        /* This needs to be set here;  otherwise external corners
-           don't get set. */
+        /* Sets block_corner_count to 0 */
         fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                              icorner,block_corner_count);
 
         if (is_interior_corner)
         {
-            /* Interior to the domain, not necessarily to a block */
+            /* Is an interior patch corner;  may also be a block corner */
 
             int corner_block_idx;
             int neighbor_level;
@@ -430,6 +429,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                                 transform_data.transform,
                                 &transform_data_finegrid);
 
+            /* This sets value in block_corner_count_array */
             fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                                  icorner,block_corner_count);
             transform_data.is_block_corner = is_block_corner;

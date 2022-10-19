@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -112,14 +112,14 @@ void radialdam_patch_setup(fclaw2d_global_t *glob,
 
 void radialdam_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
 
     vt->problem_setup = &radialdam_problem_setup;  /* Version-independent */
 
     const user_options_t* user = radialdam_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
         claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
 
         if (user->example == 0) 
@@ -130,7 +130,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
         }
         else if (user->example >= 1 && user->example <= 3)
         {
-            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt();
+            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt(glob);
             patch_vt->setup = &radialdam_patch_setup;
 
             claw46_vt->fort_rpn2  = &CLAWPACK46_RPN2_MANIFOLD;
@@ -141,7 +141,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
         claw5_vt->fort_qinit = &CLAWPACK5_QINIT;
 
         if (user->example == 0)
@@ -152,7 +152,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
         }
         else if (user->example >= 1 && user->example <= 3)
         {
-            fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+            fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
             patch_vt->setup = &radialdam_patch_setup;
 
             claw5_vt->fort_rpn2  = &CLAWPACK5_RPN2_MANIFOLD;

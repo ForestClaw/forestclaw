@@ -8,12 +8,8 @@
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
       double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
 
-      integer*8 cont, get_context
-
       integer i,j,m
       double precision xc,yc, heat_qexact
-
-      cont = get_context()
 
 c     # Assume a single field variable only
       do j = 1,my

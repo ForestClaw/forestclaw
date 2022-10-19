@@ -16,8 +16,13 @@ else()
   endif()
 endif()
 
-
-# --- auto-ignore build directory
-if(NOT EXISTS ${PROJECT_BINARY_DIR}/.gitignore)
-  file(WRITE ${PROJECT_BINARY_DIR}/.gitignore "*")
+if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel")
+  # something
+elseif("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
+  add_compile_options(
+#    $<$<COMPILE_LANGUAGE:Fortran>:-std=f2003>
+    $<$<COMPILE_LANGUAGE:Fortran>:-Wno-unused-dummy-argument>
+    $<$<COMPILE_LANGUAGE:Fortran>:-Wno-unused-variable>
+    $<$<COMPILE_LANGUAGE:Fortran>:-Wno-unused-label>
+    )
 endif()

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /**
  * @file 
- * Patch subroutines for patch-related metric terms
+ * @brief Patch subroutines for patch-related metric terms
  */
 
 
@@ -39,9 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 /** Typedef for ::fclaw2d_metric_vtable */
@@ -91,14 +88,14 @@ typedef void (*fclaw2d_metric_compute_area_ghost_t)(struct fclaw2d_global *glob,
 													int patchno);
 
 /**
- * @brief Compute the tensors (normals and tangents)
+ * @brief Compute the basis (normals and tangents)
  *
  * @param[in] glob the global context
  * @param[in,out] this_patch the patch context
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_metric_compute_tensors_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_metric_compute_basis_t)(struct fclaw2d_global *glob,
 												 struct fclaw2d_patch *this_patch,
 												 int blockno,
 												 int patchno);
@@ -138,7 +135,7 @@ void fclaw2d_metric_patch_define(struct fclaw2d_global* glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-void fclaw2d_metric_patch_setup(struct fclaw2d_global* glob,
+void fclaw2d_metric_patch_build(struct fclaw2d_global* glob,
 								struct fclaw2d_patch* this_patch,
 								int blockno,
 								int patchno);
@@ -153,7 +150,7 @@ void fclaw2d_metric_patch_setup(struct fclaw2d_global* glob,
  * @param[in] coarse_patchno the block number of the coarse patch
  * @param[in] fine0_patchno the patch number of the first fine patch
  */
-void fclaw2d_metric_patch_setup_from_fine(struct fclaw2d_global *glob,
+void fclaw2d_metric_patch_build_from_fine(struct fclaw2d_global *glob,
 										  struct fclaw2d_patch *fine_patches,
 										  struct fclaw2d_patch *coarse_coarse,
 										  int blockno,
@@ -274,10 +271,12 @@ void fclaw2d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
 /**
  * @brief Get the area for each cell of the patch
  * 
+ * @param global the global context
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw2d_metric_patch_get_area(struct fclaw2d_patch* this_patch);
+double* fclaw2d_metric_patch_get_area(struct fclaw2d_global* glob,
+	                                  struct fclaw2d_patch* this_patch);
 
 
 /* ---------------------------- Metric default (virtualized) -------------------------- */
@@ -322,27 +321,19 @@ void fclaw2d_metric_compute_mesh_default(struct fclaw2d_global *glob,
 
 
 /**
- * @brief @copybrief ::fclaw2d_metric_compute_tensors_t
+ * @brief @copybrief ::fclaw2d_metric_compute_basis_t
  * 
  * Default implementation. Calls fclaw2d_metric_vtable.fort_compute_mesh
  * 
- * @details @copydetails ::fclaw2d_metric_compute_tensors_t
+ * @details @copydetails ::fclaw2d_metric_compute_basis_t
  */
-void fclaw2d_metric_compute_tensors_default(struct fclaw2d_global *glob,
+void fclaw2d_metric_compute_basis_default(struct fclaw2d_global *glob,
 											struct fclaw2d_patch *this_patch,
 											int blockno,
 											int patchno);
 
 
 /* ------------------------------------ Virtual table --------------------------------- */
-
-/**
- * @brief Get the global vtable variable
- * 
- * @return fclaw2d_metric_vtable_t* the vtable
- */
-fclaw2d_metric_vtable_t* fclaw2d_metric_vt();
-
 
 /**
  * @brief vtable for metric terms
@@ -356,33 +347,41 @@ struct fclaw2d_metric_vtable
 	fclaw2d_metric_compute_area_t        compute_area;  /* wrapper */
 	/** Computes the area of each ghost cell */
 	fclaw2d_metric_compute_area_ghost_t  compute_area_ghost;
-	/** Computes the tensors. By default, calls fort_compute_normals, fort_compute_tangents, and fort_compute_surf_normals */
-	fclaw2d_metric_compute_tensors_t     compute_tensors;  /* wrapper */
+	/** Computes the basis. By default, calls fort_compute_normals, fort_compute_tangents, and fort_compute_surf_normals */
+	fclaw2d_metric_compute_basis_t     compute_basis;  /* wrapper */
 
 	/* Fortran files */
 	/** Compute the mesh coordinates */
-	fclaw2d_fort_compute_mesh_t          fort_compute_mesh;
+	fclaw2d_metric_fort_compute_mesh_t          fort_compute_mesh;
 	/** Compute the face normals */
-	fclaw2d_fort_compute_normals_t       fort_compute_normals;
+	fclaw2d_metric_fort_compute_normals_t       fort_compute_normals;
 	/** Compute the face tangents */
-	fclaw2d_fort_compute_tangents_t      fort_compute_tangents;
+	fclaw2d_metric_fort_compute_tangents_t      fort_compute_tangents;
 	/** Compute the surface normals */
-	fclaw2d_fort_compute_surf_normals_t  fort_compute_surf_normals;
+	fclaw2d_metric_fort_compute_surf_normals_t  fort_compute_surf_normals;
 
 	/** True if vtable has been set */
 	int is_set;
 };
 
 /**
+ * @brief Get the global vtable variable
+ * 
+ * @return fclaw2d_metric_vtable_t* the vtable
+ */
+fclaw2d_metric_vtable_t* fclaw2d_metric_vt(struct fclaw2d_global* glob);
+
+/**
  * @brief Initializes a global vtable variable
  */
-void fclaw2d_metric_vtable_initialize();
+void fclaw2d_metric_vtable_initialize(struct fclaw2d_global* glob);
+
+int fclaw2d_metric_patch_nodes_size(struct fclaw2d_global* glob,
+                                    struct fclaw2d_patch* patch);
+
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

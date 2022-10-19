@@ -49,15 +49,20 @@ subroutine clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr, &
     double precision :: auxl(maux,1-mbc:maxm+mbc)
     double precision :: auxr(maux,1-mbc:maxm+mbc)
 
-    integer :: i
+    integer manifold
+    common /com_manifold/ manifold
+
+    integer :: i, iface, mcapa
 
     ! Set wave, speed, and flux differences:
+    iface = ixyz
+    mcapa = manifold
     do i = 2-mbc, mx+mbc
         wave(1,1,i) = ql(1,i) - qr(1,i-1)
-        s(1,i) = auxl(ixyz,i)
+        s(1,i) = auxl(iface+mcapa,i)
         ! The flux difference df = s*wave all goes in the downwind direction:
-        amdq(1,i) = dmin1(auxl(ixyz,i), 0.d0) * wave(1,1,i)
-        apdq(1,i) = dmax1(auxl(ixyz,i), 0.d0) * wave(1,1,i)
+        amdq(1,i) = dmin1(s(1,i), 0.d0) * wave(1,1,i)
+        apdq(1,i) = dmax1(s(1,i), 0.d0) * wave(1,1,i)
     end do
 
     return

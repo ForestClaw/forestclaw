@@ -36,6 +36,16 @@ extern "C"
 
 typedef struct user_options
 {
+    int example;
+    int use_claw3d;
+
+    double alpha;
+
+    double maxelev;    /* Extruded height */
+
+    double *center;
+    const char* center_string;
+
     int claw_version;
     int is_registered;
 
@@ -51,6 +61,40 @@ user_options_t* swirl_options_register (fclaw_app_t * app,
 void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+
+
+#define SWIRL_SETAUX_MANIFOLD FCLAW_F77_FUNC(swirl_setaux_manifold, \
+                                               SWIRL_SETAUX_MANIFOLD)
+
+void SWIRL_SETAUX_MANIFOLD(const int* mbc,
+                            const int* mx, const int* my, const int*mz,
+                            const double* xlower, const double* ylower,
+                            const double* zlower,
+                            const double* dx, const double* dy,
+                            const double *dz,
+                            const int* maux, double aux[],
+                            const int* blockno,
+                            double xrot[], double yrot[], double zrot[],
+                            double volume[],double faceareas[]);
+
+
+#define SWIRL_SET_VELOCITY_MANIFOLD FCLAW_F77_FUNC(swirl_set_velocity_manifold, \
+                                               SWIRL_SET_VELOCITY_MANIFOLD)
+
+
+void SWIRL_SET_VELOCITY_MANIFOLD(const int* mx, const int* my, const int*mz,
+                                 const int* mbc,
+                                 const double* dx, const double* dy,
+                                 const double *dz,
+                                 const double *t, 
+                                 const int *blockno,
+                                 const double* xlower, const double* ylower,
+                                 const double* zlower,
+                                 double xrot[], double yrot[], double zrot[],
+                                 double faceareas[],
+                                 double aux[], const int* maux);
+
+void swirl_map_extrude(fclaw2d_map_context_t *cont, double maxelev);
 
 #ifdef __cplusplus
 }

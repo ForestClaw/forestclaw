@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -81,7 +81,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
 
 	/* This mapping context is needed by fortran mapping functions */
 	fclaw2d_map_context_t *cont = glob->cont;
-	SET_CONTEXT(&cont);
+	FCLAW_MAP_SET_CONTEXT(&cont);
 
 	int maxthreads = 0;
 

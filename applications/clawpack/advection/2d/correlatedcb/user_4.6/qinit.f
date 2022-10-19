@@ -5,7 +5,7 @@
 
       integer maxmx, maxmy, meqn, mbc, mx, my, maux
       double precision xlower, ylower, dx, dy
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
       integer blockno, fc2d_clawpack46_get_block
       double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
       double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, maux)
@@ -16,7 +16,7 @@
 
       double precision a,b
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
       blockno = fc2d_clawpack46_get_block()
 
       a = -0.8d0

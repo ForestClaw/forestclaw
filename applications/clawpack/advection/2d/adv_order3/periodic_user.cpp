@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
   
 Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ void cb_periodic_output_ascii (fclaw2d_domain_t * domain,
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
     fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
 
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
     const user_options_t  *user_opt =  periodic_get_options(glob);
 
@@ -115,7 +115,7 @@ void cb_periodic_output_ascii (fclaw2d_domain_t * domain,
 
 void periodic_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
+    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
 
 
     vt->problem_setup = &periodic_problem_setup;  /* Version-independent */
@@ -123,14 +123,14 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
     const user_options_t* user = periodic_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt();        
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);        
 
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
         clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE;
 
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
+        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
         clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
         clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
 
@@ -154,7 +154,7 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
 #if 0    
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *clawpack5_vt = fc2d_clawpack5_vt(glob);
 
         clawpack5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         clawpack5_vt->fort_setaux    = &CLAWPACK5_SETAUX;

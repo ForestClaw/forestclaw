@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,35 +34,55 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw_gauges_vtable fclaw_gauges_vtable_t;
+/**
+ * @file
+ * @brief Gauges
+ */
 
+
+/**
+ * @brief Gauge structure
+ */
 typedef struct fclaw_gauge
 {
+    /** @brief The block that the gauge is in */
     int blockno;
+    /** @brief Location of the gauge in the results array */
     int location_in_results;
 
     /* Some data needed to get around fact that in parallel, we don't communicate
        gauge information */
+    /** @brief true if this gauge is on the local processor */
     int is_local;
+    /** @brief the patch that the gauge is in */
     int patchno;
 
-    /* Relative to [ax,ay]x[bx,by] set in fclaw2d_options */
+    /** @{ @brief Relative to [ax,ay]x[bx,by] set in fclaw2d_options */
     double xc;   
     double yc;
+    /** @} */
 
-    double t1;   /* Tstart */
-    double t2;   /* Tend */
-    int num;     /* Gauge number 1001, 1002, 1003, ...*/
+    /** @brief Tstart */
+    double t1;
+    /** @brief Tend */
+    double t2;
+    /** @brief Gauge number */
+    int num;
 
     /* Control output times for gauges */
-    double min_time_increment;  /* Output gauges this often */
-    double last_time;           /* Last time we output gauge */
+    /** @brief Output gauges this often */
+    double min_time_increment;
+    /** @brief Last time we output gauge */
+    double last_time;
 
     /* Store data in buffer before outputting gauges */
-    int next_buffer_location;     /* Where are we in the gauge output */
+    /** @brief Where are we in the gauge output buffer */
+    int next_buffer_location;
+    /** @brief Buffer for storing gauge data */
     void **buffer;
 
-    void* user_data;  /* Data about each gauge that doesn't change */
+    /** @brief User data */
+    void* user_data;
 
 } fclaw_gauge_t;
 
@@ -71,86 +91,203 @@ struct fclaw2d_patch;
 struct fclaw2d_block;
 struct fclaw_gauge;
 
-
+/**
+ * @brief Sets the data for each gauge
+ * 
+ * @param[in] glob the global context
+ * @param[in,out] gauges the array of gauges
+ * @param[in] num_gauges the number of gauges
+ */
 typedef void (*fclaw_gauge_set_data_t)(struct fclaw2d_global *glob, 
                                        struct fclaw_gauge **gauges, 
                                        int *num);
 
+/**
+ * @brief Creates files for each gauge
+ * 
+ * @param[in] glob the global context
+ * @param[in] gauges the array of gauges
+ * @param[in] num_gauges the number of gauges
+ */
 typedef void (*fclaw_gauge_create_files_t)(struct fclaw2d_global *glob, 
                                            struct fclaw_gauge *gauges, 
                                            int num_gauges);
 
+/**
+ * @brief Maps gauge to normalized coordinates in a global [0,1]x[0,1]  domain.
+ * 
+ * @param[in] glob the global context
+ * @param[in] block the block that the gauge is in
+ * @param[in] blockno the block number that the gauge is in
+ * @param[in] g the gauge
+ * @param[out] xc,yc the normalized coordinates
+ */
 typedef void (*fclaw_gauge_normalize_t)(struct fclaw2d_global *glob, 
                                        struct fclaw2d_block *block,
                                        int blockno, 
                                        struct fclaw_gauge *g,
                                        double *xc, double *yc);
 
-
+/**
+ * @brief Updates the current buffer entry for the gauge
+ * 
+ * @param[in] glob the global context
+ * @param[in] block the block that the gauge is in
+ * @param[in] patch the patch that the gauge is in
+ * @param[in] blockno the block number that the gauge is in
+ * @param[in] patchno the patch number that the gauge is in
+ * @param[in] tcurr the current time
+ * @param[in,out] g the gauge
+ */
 typedef void (*fclaw_gauge_update_t)(struct fclaw2d_global* glob, 
                                      struct fclaw2d_block* block,
                                      struct fclaw2d_patch* patch, 
                                      int blockno, int patchno,
                                      double tcurr, struct fclaw_gauge *g);
 
+/**
+ * @brief Prints the buffer to a file
+ * 
+ * @param glob the global context
+ * @param g the gauge
+ */
 typedef void (*fclaw_gauge_print_t)(struct fclaw2d_global *glob, 
                                     struct fclaw_gauge *gauge);
 
-typedef void (*fclaw_gauge_destroy_buffer_data_t)(struct fclaw2d_global *glob, 
-                                                  void* gdata);
-
-
-struct fclaw_gauges_vtable
+/**
+ * @brief vtable for gauges
+ */
+typedef struct fclaw_gauges_vtable
 {
+    /** @brief Sets the data for each gauge */
     fclaw_gauge_set_data_t      set_gauge_data;
+    /** @brief Creates files for each gauge */
     fclaw_gauge_create_files_t  create_gauge_files;
+    /** @brief Updates the current buffer entry for the gauge */
     fclaw_gauge_update_t        update_gauge;
+    /** @brief Prints the buffer to a file */
     fclaw_gauge_print_t         print_gauge_buffer;
+
+    /** @brief Maps gauge to normalized coordinates in a global [0,1]x[0,1]  domain. */
     fclaw_gauge_normalize_t     normalize_coordinates;
 
+    /** @brief true if vtable has been set */
     int is_set;
-};
+} fclaw_gauges_vtable_t;
 
+/**
+ * @brief Locate the gauges in the mesh
+ * 
+ * @param glob the global context
+ */
 void fclaw_locate_gauges(struct fclaw2d_global *glob);
 
-void fclaw_gauges_vtable_initialize();
+/**
+ * @brief Initialize the gauges vtable
+ * 
+ * @param glob the global context
+ */
+void fclaw_gauges_vtable_initialize(struct fclaw2d_global *glob);
 
-fclaw_gauges_vtable_t* fclaw_gauges_vt();
+/**
+ * @brief Get the gauges vtable
+ * 
+ * @param glob the global context
+ * @return fclaw_gauges_vtable_t* the vtable
+ */
+fclaw_gauges_vtable_t* fclaw_gauges_vt(struct fclaw2d_global *glob);
 
 
 
 /* ------------------------ Virtualized gauge functions ------------------------------- */
 
+/**
+ * @brief Set the data for each gauge
+ * 
+ * @param glob the global context
+ * @param gauges the array of gauges
+ * @param num_gauges the number of gauges
+ */
 void fclaw_set_gauge_data(struct fclaw2d_global* glob, 
                           struct fclaw_gauge **gauges, 
                           int *num_gauges);
 
+/**
+ * @brief Create files for each gauge
+ * 
+ * @param[in] glob the global context
+ * @param[in] gauges the array of gauges
+ * @param[in] num_gauges the number of gauges
+ */
 void fclaw_create_gauge_files(struct fclaw2d_global* glob, 
                               struct fclaw_gauge *gauges, 
                               int num_gauges);
 
+/**
+ * @brief Map gauge to normalized coordinates in a global [0,1]x[0,1]  domain.
+ * 
+ * @param[in] glob the global context
+ * @param[in] block the block that the gauge is in
+ * @param[in] blockno the block number that the gauge is in
+ * @param[in] g the gauge
+ * @param[out] xc,yc the normalized coordinates
+ */
 void fclaw_gauge_normalize_coordinates(struct fclaw2d_global *glob, 
                                       struct fclaw2d_block *block,
                                       int blockno, 
                                       struct fclaw_gauge *g,
                                       double *xc, double *yc);
 
-
+/**
+ * @brief Update the current buffer entry for the gauge
+ * 
+ * @param[in] glob the global context
+ * @param[in] block the block that the gauge is in
+ * @param[in] patch the patch that the gauge is in
+ * @param[in] blockno the block number that the gauge is in
+ * @param[in] patchno the patch number that the gauge is in
+ * @param[in] tcurr the current time
+ * @param[in,out] g the gauge
+ */
 void  fclaw_update_gauge(struct fclaw2d_global* glob, 
                          struct fclaw2d_block *block,
                          struct fclaw2d_patch *patch,
                          int blockno, int patchno,
                          double tcurr, fclaw_gauge_t *g);
 
+/**
+ * @brief Print the buffer to a file
+ * 
+ * @param glob the global context
+ * @param g the gauge
+ */
 void fclaw_print_gauge_buffer(struct fclaw2d_global* glob, 
                               struct fclaw_gauge *g);
 
 
 /* ---------------------------------- Gauges ------------------------------------------ */
 
+/**
+ * @brief Allocate gauge structures
+ * 
+ * @param[in] glob the global context
+ * @param[in] num_gauges the number of gauges
+ * @param[out] g allocated array of gauges 
+ */
 void fclaw_gauge_allocate(struct fclaw2d_global *glob, int num_gauges,
                           struct fclaw_gauge **g);
 
+/**
+ * @brief Set the data for a single gauge
+ * 
+ * @param[in] glob the global context
+ * @param[in,out] g the gauge
+ * @param[in] num the gauge number (index the the guage array)
+ * @param[in] xc, yc Relative to [ax,ay]x[bx,by] set in fclaw2d_options 
+ * @param[in] t1 Tstart
+ * @param[in] t2 Tend
+ * @param[in] min_time_increment How often to output the gauge
+ */
 void fclaw_gauge_set_data(struct fclaw2d_global *glob, 
                           struct fclaw_gauge *g,
                           int num, 
@@ -158,32 +295,73 @@ void fclaw_gauge_set_data(struct fclaw2d_global *glob,
                           double  t1, double t2,
                           double min_time_increment);
 
+/**
+ * @brief Get the data for a single gauge
+ * 
+ * @param[in] glob the global context
+ * @param[in] g the gauge
+ * @param[out] num the gauge number (index the the guage array)
+ * @param[out] xc, yc Relative to [ax,ay]x[bx,by] set in fclaw2d_options 
+ * @param[out] t1 Tstart
+ * @param[out] t2 Tend
+ */
 void fclaw_gauge_get_data(struct fclaw2d_global *glob, 
                           struct fclaw_gauge *g,                             
                           int *num, 
                           double *xc, double *yc, 
                           double  *t1, double *t2);
 
+/**
+ * @brief Get the gauge number (index the the guage array)
+ * 
+ * @param glob the global context
+ * @param g the gauge
+ * @return int the gauge number
+ */
 int fclaw_gauge_get_id(struct fclaw2d_global *glob, 
                        struct fclaw_gauge *g);
     
-
+/**
+ * @brief Set data for current buffer entry
+ * 
+ * @param glob the global context
+ * @param g the gauge
+ * @param guser the data 
+ */
 void fclaw_gauge_set_buffer_entry(struct fclaw2d_global *glob,
                                   struct fclaw_gauge* g,
                                   void* guser);
 
+/**
+ * @brief get the buffer data
+ * 
+ * @param[in] glob the global context
+ * @param[in] g the gauge
+ * @param[out] kmax size of buffer
+ * @param[out] gauge_buffer the buffer
+ */
 void fclaw_gauge_get_buffer(struct fclaw2d_global *glob,
                             struct fclaw_gauge *g,
                             int *kmax, void*** gauge_buffer);
 
-void fclaw_gauge_buffer_reset(struct fclaw2d_global *glob, 
-                              struct fclaw_gauge *g);
-
-
+/**
+ * @brief the the user data for a gauge
+ * 
+ * @param[in] glob the global context
+ * @param[in] g the gauge
+ * @param[in] user the user data
+ */
 void fclaw_gauge_set_user_data(struct fclaw2d_global *glob,
                                struct fclaw_gauge* g,
                                void* user);
 
+/**
+ * @brief Get the user data for gauge
+ * 
+ * @param glob the global context
+ * @param g the gauge
+ * @return void* the user data
+ */
 void* fclaw_gauge_get_user_data(struct fclaw2d_global *glob,
                                 struct fclaw_gauge* g);
 

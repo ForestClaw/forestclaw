@@ -5,9 +5,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 
@@ -63,15 +60,20 @@ fclaw2d_map_c2m_pillowdisk5(fclaw2d_map_context_t * cont, int blockno,
                                 double xc, double yc,
                                 double *xp, double *yp, double *zp)
 {
-    double alpha = cont->user_double[0];
+    /* Unit disk centered at (0,0) */
+    double alpha = cont->user_double[0];    
     MAPC2M_PILLOWDISK5(&blockno,&xc,&yc,xp,yp,zp,&alpha);
 
-    scale_map(cont, xp,yp,zp);
-    rotate_map(cont,xp,yp,zp);
+    if (cont->is_extruded == 0)
+    {
+        scale_map(cont,xp,yp,zp);
+        shift_map(cont,xp,yp,zp);        
+    }
 }
 
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
                                                    const double rotate[],
                                                    const double alpha)
 {
@@ -81,17 +83,17 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
     cont->query = fclaw2d_map_query_pillowdisk5;
     cont->mapc2m = fclaw2d_map_c2m_pillowdisk5;
 
+
     cont->user_double[0] = alpha;
+    cont->is_extruded = 0;
 
     set_scale(cont, scale);
+    set_shift(cont, shift);
     set_rotate(cont, rotate);
 
     return cont;
 }
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif

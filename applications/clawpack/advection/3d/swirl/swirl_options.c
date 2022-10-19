@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -25,12 +25,28 @@
 
 #include "swirl_user.h"
 
-static int s_user_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 static void *
 swirl_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
+    sc_options_add_int (opt, 0, "example", &user->example, 0,
+                        "[[user] 0: nomap; 1: cart (brick); 2: 5-patch; 3: bilinear [0]");
+
+    sc_options_add_bool (opt, 0, "use_claw3d", &user->use_claw3d, 1,
+                        "[user] Use 3d library [True]");
+
+    sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.4,
+                        "[user] alpha (for 5-patch mapping) [0.4]");
+
+    fclaw_options_add_double_array (opt, 0, "center", &user->center_string, "0 0",
+                                    &user->center, 2, 
+                                    "Center point for bilinear mapping  [(0,0)]");
+
+    sc_options_add_double (opt, 0, "max-elevation", &user->maxelev, 0.5,
+                        "[user] Max elevation in extruded direction [0.5]");
+
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                            "Clawpack_version (4 or 5) [5]");
 
@@ -42,7 +58,7 @@ swirl_register (user_options_t *user, sc_options_t * opt)
 static fclaw_exit_type_t
 swirl_postprocess(user_options_t *user)
 {
-    /* nothing to post-process yet ... */
+    fclaw_options_convert_double_array(user->center_string, &user->center,2);
     return FCLAW_NOEXIT;
 }
 
@@ -50,15 +66,18 @@ swirl_postprocess(user_options_t *user)
 static fclaw_exit_type_t
 swirl_check (user_options_t *user)
 {
-    /* Nothing to check ? */
+    if (user->example < 0 || user->example > 3) {
+        fclaw_global_essentialf ("Option --user:example must be in [0-3]\n");
+        return FCLAW_EXIT_QUIET;
+    }
     return FCLAW_NOEXIT;
 }
 
 static void
 swirl_destroy(user_options_t *user)
 {
-    /* Nothing to destroy */
-}
+    fclaw_options_destroy_array (user->center);
+    }
 
 /* ------- Generic option handling routines that call above routines ----- */
 static void*
@@ -151,13 +170,14 @@ user_options_t* swirl_options_register (fclaw_app_t * app,
 
 void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"user") == NULL);
+    fclaw_pointer_map_insert(glob->options, "user", user, NULL);
 }
 
 const user_options_t* swirl_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
+    user_options_t* user = (user_options_t*) 
+                              fclaw_pointer_map_get(glob->options, "user");
+    FCLAW_ASSERT(user != NULL);
+    return user;   
 }

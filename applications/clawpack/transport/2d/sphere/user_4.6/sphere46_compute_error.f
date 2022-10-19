@@ -8,7 +8,7 @@
       double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
 
       integer example
       common /example_comm/ example
@@ -19,7 +19,7 @@
       double precision xp, yp, zp
       integer flow_flag
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
       if (example .ne. 3) then
 c          # Divergent flow         

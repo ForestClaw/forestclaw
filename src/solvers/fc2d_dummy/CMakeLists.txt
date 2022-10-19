@@ -2,7 +2,7 @@
 add_library(dummy)
 set_target_properties(dummy PROPERTIES EXPORT_NAME CLAWPACK5)
 
-target_sources(dummy PRIVATE 
+target_sources(dummy PRIVATE
 	fc2d_dummy.cpp
 )
 
@@ -18,9 +18,10 @@ install(FILES
 )
 
 install(TARGETS dummy
-  EXPORT ${PROJECT_NAME}Targets
+  EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::DUMMY INTERFACE IMPORTED GLOBAL)
