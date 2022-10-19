@@ -87,12 +87,27 @@ int segment_intersect(point_t p0, point_t p1,
                       point_t q0, point_t q1,
                       point_t *r)
 {
-    /* Find the intersection of two line segments.  */
+    /* Find the intersection of two line segments p(s), q(t)
+       with endpoints (p0,p1) and (q0,q1) (in R^2)
+
+       Idea : 
+
+       * Parameterize line segments as
+
+           p(s) = p0 + (p1-p0)*s,  s \in [0,1]
+           q(t) = q0 + (q1-q0)*t,  t \in [0,1]
+
+       * Set p(s)=q(t) to get 2x2 linear system A*x=b in unknowns x=(s,t)
+       * Solve linear system.  Note : Explicit inverse of A is used. 
+       * Check : Segments will intersect if both s,t in [0,1]
+    */
+    /* Coefficients of A */
     double a11 = p1.x - p0.x;
     double a21 = p1.y - p0.y;
     double a12 = -(q1.x - q0.x);
     double a22 = -(q1.y - q0.y);
 
+    /* Right hand side b */
     point_t b = {q0.x - p0.x, q0.y - p0.y};
 
     /* Compute determinant of A */
@@ -100,19 +115,23 @@ int segment_intersect(point_t p0, point_t p1,
     int found_intersection = 0;
     if (det == 0)
     {
+        /* Segments are co-linear or parallel */
         found_intersection = 0;
         return 0;
     }
 
-    double s,t;
-    s = (a22*b.x - a12*b.y)/det;
-    t = (-a21*b.x + a11*b.y)/det;
+    /* Solve linear system A*x = b : Use explicit inverse of 
+       2x2 matrix.  */
+    double s = (a22*b.x - a12*b.y)/det;
+    double t = (-a21*b.x + a11*b.y)/det;
 
+    /* Check to see if segments intersect */
     if ((0 <= s && s <= 1) && (0 <= t && t <= 1))
         found_intersection = 1;
 
-    r->x = q0.x + t*(q1.x - q0.x);
-    r->y = q0.y + t*(q1.y - q0.y);
+    /* Compute intersection of lines (even if segments don't intersect) */
+    r->x = q0.x + (q1.x - q0.x)*t;
+    r->y = q0.y + (q1.y - q0.y)*t;
 
     return found_intersection;
 }
@@ -170,6 +189,7 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
         point_t r;
         int istart = -1, iend = -1;
         point_t r0, r1;        
+        /* Check intersection of ray with each edge of quadrant */
         for(int i = 0; i < 4; i++)
         {
             point_t q0 = {qx[i],qy[i]};
@@ -304,22 +324,26 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
     /* We let the user allocate an array of rays, although what is inside the 
        generic ray type is left opaque. This is destroy in matching FREE,
        below. */
-    *rays = (fclaw2d_ray_t*) FCLAW_ALLOC(fclaw2d_ray_t,*num_rays);
+
+    //*rays = (fclaw2d_ray_t*) FCLAW_ALLOC(fclaw2d_ray_t,*num_rays);
+    *rays = fclaw2d_ray_allocate_rays(*num_lines);
     fclaw2d_ray_t *ray_vec = *rays;
     for (int i = 0; i < nlines; ++i) 
     {
         //fclaw_global_essentialf("ray_initialize : Setting up ray %d : \n",i);
         swirl_ray_t *sr = (swirl_ray_t*) FCLAW_ALLOC(swirl_ray_t,1);
         sr->rtype = SWIRL_RAY_LINE;
-        sr->xy[0] = 0.;
-        sr->xy[1] = 0.;
 
 #if 0
+        sr->xy[0] = 0.;
+        sr->xy[1] = 0.;
         sr->r.line.vec[0] = cos (i * M_PI / (nlines-1));
         sr->r.line.vec[1] = sin (i * M_PI / (nlines-1));
 #else        
         /* End points are on a semi-circle in x>0,y>0 quad */
         FCLAW_ASSERT(nlines >= 2);
+        sr->xy[0] = 0.0; //-0.1;
+        sr->xy[1] = 0.0; //-0.1;
         double R = 0.25;
         double dth = M_PI/(2*(nlines-1));
         sr->r.line.vec[0] = R*cos (i * dth);
@@ -350,12 +374,7 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
         rs = NULL;
     }
     /* Match FCLAW_ALLOC, above */
-    if (*num_rays > 0)
-    {
-        FCLAW_FREE(*rays);  
-        *num_rays = 0;  
-        *rays = NULL;        
-    }
+    *num_rays = fclaw2d_ray_deallocate_rays(rays);
 }
 
 void swirl_initialize_rays(fclaw2d_global_t* glob)

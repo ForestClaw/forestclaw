@@ -63,6 +63,8 @@ typedef void (*fclaw2d_ray_deallocate_t)(struct fclaw2d_global *glob,
                                          fclaw2d_ray_t **rays, 
                                          int *num);
 
+
+
 #if 0
 typedef void (*fclaw2d_ray_create_files_t)(struct fclaw2d_global *glob, 
                                            struct fclaw2d_ray *rays, 
@@ -125,6 +127,11 @@ void* fclaw2d_ray_get_ray(fclaw2d_ray_t *r,
 fclaw2d_ray_vtable_t* fclaw2d_ray_vt();
 
 void fclaw2d_ray_vtable_initialize();
+
+fclaw2d_ray_t* fclaw2d_ray_allocate_rays(int num_rays);
+
+int fclaw2d_ray_deallocate_rays(fclaw2d_rays_t **rays);
+
 
 
 

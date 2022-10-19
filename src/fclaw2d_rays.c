@@ -36,7 +36,8 @@ static fclaw2d_ray_vtable_t s_ray_vt;
 typedef struct fclaw2d_ray_acc
 {
     int num_rays;
-    int is_latest_domain;
+    //sc_array_t *rays;
+    //sc_array_t *integrals;
     fclaw2d_ray_t *rays;
 } fclaw2d_ray_acc_t;
 
@@ -66,7 +67,7 @@ void ray_deallocate(fclaw2d_global_t* glob,
     FCLAW_ASSERT(ray_vt->deallocate != NULL);
     ray_vt->deallocate(glob, rays, num_rays);    
 }
-
+-
 
 static
 void ray_initialize(fclaw2d_global_t* glob, void** acc)
@@ -95,16 +96,20 @@ void ray_initialize(fclaw2d_global_t* glob, void** acc)
 #if 0
     if (num_rays > 0)
     {
+        acc->rays = sc_array_new (sizeof (fclaw2d_ray_t));        
+        for(int i = 0; i < num_rays; i++)
+        {
+            fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) sc_array_push (sc_rays);        
+            fclaw_ray->num = ray_acc->rays[i].num;
+            fclaw_ray->ray_data = (void*) ray_acc->rays[i].ray_data;
+        }
+
+        acc->integrals = sc_array_new_count (sizeof (double), num_rays);
+
         /* Things that could be done here : 
            1. Open ray files to write out time series data for each ray 
            2. Set integral to 0? 
         */
-        fclaw2d_ray_t *rays = ray_acc->rays;
-        for(int i = 0; i < num_rays; i++)
-        {
-            fclaw2d_ray_t *r = &rays[i];
-            /* do something? */
-        }
     }
 #endif    
 }
@@ -125,6 +130,7 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
     fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
     FCLAW_ASSERT(ray_acc != NULL);
 
+#if 1
     /* Copy arrays stored in accumulator to an sc_array */
     sc_array_t  *sc_rays = sc_array_new (sizeof (fclaw2d_ray_t));
     int num_rays = ray_acc->num_rays;
@@ -136,20 +142,25 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
     }
 
     sc_array_t *integrals = sc_array_new_count (sizeof (double), num_rays);
+#endif    
 
     /* This does a compute and a gather. */
     const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt();
-    fclaw2d_domain_integrate_rays(glob->domain, ray_vt->integrate, sc_rays, integrals);
+    fclaw2d_domain_integrate_rays(glob->domain, ray_vt->integrate, 
+                                  sc_rays, integrals);
 
     /* Copy integral value back to fclaw2d_ray_t */
     for(int i = 0; i < num_rays; i++)
     {
+        fclaw2d_ray_t *ray = *((fclaw2d_ray_t*) sc_array_index_int(sc_rays,i));
         double intval = *((double*) sc_array_index_int(integrals,i));
-        ray_acc->rays[i].integral = intval;
+        rays->integral = intval;
     }
 
+#if 1
     sc_array_destroy (sc_rays);
     sc_array_destroy (integrals);
+#endif    
 }
 
 static
@@ -164,10 +175,12 @@ void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
     fclaw2d_ray_t *rays = ray_acc->rays;
     for(int i = 0; i < num_rays; i++)
     {
+        //double intval = *((double*) sc_array_index_int(integrals,i));
+        //fclaw2d_ray_t *ray = *((fclaw2d_ray_t*) sc_array_index_int(ray_acc->rays,i));
         fclaw2d_ray_t *ray = &rays[i];
         int id = ray->num;
         double intval = ray->integral;
-        fclaw_global_essentialf("ray[%d] : id = %2d; integral = %24.16e\n",i,id,intval);
+        fclaw_global_essentialf("ray %2d; integral = %24.16e\n",id,intval);
     }
 }
 
@@ -180,6 +193,11 @@ void ray_finalize(fclaw2d_global_t *glob, void** acc)
     {
         ray_deallocate(glob,&ray_acc->rays,&ray_acc->num_rays);
     }
+#if 0
+    sc_array_destroy (ray_acc->rays);
+    sc_array_destroy (ray_accc->integrals);
+#endif    
+
     /* Matches allocation in ray_initialize */
     FCLAW_FREE(*acc);
     *acc = 0;
@@ -217,6 +235,20 @@ void fclaw2d_ray_vtable_initialize()
 
 
 /* ---------------------------- Get Access Functions ---------------------------------- */
+
+fclaw2d_ray_t* fclaw2d_ray_allocate_rays(int num_rays)
+{
+    fclaw2d_ray_t* rays = (fclaw2d_ray_t*) FCLAW_ALLOC(fclaw2d_ray_t,num_rays);
+    return rays;
+}
+
+int fclaw2d_ray_deallocate_rays(fclaw2d_rays_t **rays)
+{
+    FCLAW_ASSERT(*rays != NULL);
+    FCLAW_FREE(*rays);
+    *rays = NULL;
+    return 0;  /* Number of rays */
+}
 
 
 /* Routines that operate on a single array */

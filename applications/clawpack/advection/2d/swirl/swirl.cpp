@@ -74,12 +74,12 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
 
+#if 0    
     /* For convenience, we integrate after the run of the solver has finished.
      * In practice, it may be of interest to integrate several times during the
      * run for different time steps.  To implement this, move the following
      * call into a repeated diagnostic steps and output the integral values.
      */
-#if 0    
     sc_array_t *rays = swirl_rays_new ();
     sc_array_t *integrals = swirl_integrals_new();
 
