@@ -228,10 +228,7 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
             else if (istart >= 0 && iend >= 0)
             {
                 /* Ray enters and exits quad */
-                if (id == 2)
-                {                    
-                    fclaw_global_essentialf("Ray enters and exits quad\n");
-                }
+                //fclaw_global_essentialf("Ray enters and exits quad\n");
                 pstart = r0;
                 pend = r1;
                 found_intersection = 1;
@@ -243,19 +240,12 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
                 point_t pur = {xupper, yupper};
                 if (point_in_quad(p0,pll,pur) != 0)
                 {
-                    if (id == 2) 
-                    {
-                        fclaw_global_essentialf("Ray starts in quad and exits\n");
-                    }
                     pstart = p0;
                     pend = r0;
                 }
                 else if (point_in_quad(p1,pll,pur) != 0)
                 {
-                    if (id == 2)
-                    {
-                        fclaw_global_essentialf("Ray starts outside quad and enters\n");       
-                    }
+                    //fclaw_global_essentialf("Ray starts outside quad and enters\n");       
                     pstart = r0;
                     pend = p1;
                 }
@@ -265,7 +255,8 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
             {
                 /* This could be replaced by an integral along a curve in the patch */
                 *integral = distance(pstart,pend);
-                if (id == 2)
+                
+                if (0)
                 {
                     printf("%5d %f\n",patchno,*integral);
                     printf("pstart : %f %f\n",pstart.x,pstart.y);
@@ -336,8 +327,8 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
         sr->xy[1] = 0; //-0.1;
         double R = 2.0;
         double dth = M_PI/(2*nlines);
-        sr->r.line.vec[0] = R*cos ((i+0.50001) * dth);
-        sr->r.line.vec[1] = R*sin ((i+0.50001) * dth);
+        sr->r.line.vec[0] = R*cos ((i+0.5) * dth);
+        sr->r.line.vec[1] = R*sin ((i+0.5) * dth);
 #endif        
 
         fclaw2d_ray_t *ray = &ray_vec[i];
