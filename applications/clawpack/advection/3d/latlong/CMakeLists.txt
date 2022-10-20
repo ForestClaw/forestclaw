@@ -33,6 +33,8 @@ target_include_directories(latlong_3dx PRIVATE
 
 target_link_libraries(latlong_3dx PRIVATE 
  FORESTCLAW::CLAWPACK3_46
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
 )
 
 add_test(NAME clawpack_advection_3d_latlong COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
