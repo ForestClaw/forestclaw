@@ -117,6 +117,15 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
     return glob;
 }
 
+int fclaw2d_global_serialize(fclaw2d_global_t * glob, char* buffer){
+    //
+    return 0;
+}
+int fclaw2d_global_deserialize(fclaw2d_global_t ** glob, char* buffer){
+    //
+    return 1;
+}
+
 void
 fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
 {

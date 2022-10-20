@@ -115,6 +115,24 @@ void fclaw2d_global_store_domain (fclaw2d_global_t* glob,
 
 void fclaw2d_global_store_map (fclaw2d_global_t* glob,
                                struct fclaw2d_map_context * map);
+/**
+ * @brief Serialize global structure into buffer
+ * 
+ * @param glob the global structure
+ * @param buffer the buffer to write to
+ * @return int number of bytes written
+ */
+int fclaw2d_global_serialize(fclaw2d_global_t * glob, char* buffer);
+
+/**
+ * @brief Deserialize global structure from buffer
+ * 
+ * @param glob newly create global structure
+ * @param buffer the buffer to read from
+ * @return int number of bytes read
+ */
+int fclaw2d_global_deserialize(fclaw2d_global_t ** glob, char* buffer);
+
 
 void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);
