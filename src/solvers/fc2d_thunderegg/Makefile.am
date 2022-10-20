@@ -38,8 +38,8 @@ src_solvers_fc2d_thunderegg_libfc2d_thunderegg_la_SOURCES = \
           $(libthunderegg_internal_headers) \
           $(libthunderegg_compiled_sources)
 
-## Headers needed to build this library.  Only AM_CPPFLAGS required; others are 
-## included in AM_CPPFLAGS, but are included here for clarity (although makes 
+## Headers needed to build this library.  Only AM_CPPFLAGS required; others are
+## included in AM_CPPFLAGS, but are included here for clarity (although makes
 ## for lengthy compile lines)
 src_solvers_fc2d_thunderegg_libfc2d_thunderegg_la_CPPFLAGS = \
           $(AM_CPPFLAGS) \
@@ -63,7 +63,7 @@ src_solvers_fc2d_thunderegg_fc2d_thunderegg_TEST_SOURCES = \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg_options.h.TEST.cpp \
 	src/solvers/fc2d_thunderegg/fc2d_thunderegg_vector_TEST.cpp
 
-src_solvers_fc2d_thunderegg_fc2d_thunderegg_TEST_CPPFLAGS = \	
+src_solvers_fc2d_thunderegg_fc2d_thunderegg_TEST_CPPFLAGS = \
     $(test_libtestutils_la_CPPFLAGS) \
     $(src_solvers_fc2d_thunderegg_libfc2d_thunderegg_la_CPPFLAGS)
 
