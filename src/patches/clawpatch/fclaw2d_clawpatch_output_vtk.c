@@ -422,7 +422,7 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
     if (s->fits32)
     {
-        const int32_t igpno = (const int32_t) gpno;
+        const int32_t igpno = (int32_t) gpno;
         int32_t *idata = (int32_t *) s->buf;
         for (c = 0; c < s->cells_per_patch; ++c)
         {
