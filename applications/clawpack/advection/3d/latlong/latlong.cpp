@@ -23,13 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "latlong_user.h"
-
-#include "../all/advection_user.h"
-
 /* Needed for 2d mappings */
 #include <fclaw2d_map.h>
 
+#include "latlong_user.h"
+
+#include "../all/advection_user.h"
 
 static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
