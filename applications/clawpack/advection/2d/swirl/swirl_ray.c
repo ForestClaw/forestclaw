@@ -66,8 +66,8 @@ typedef struct swirl_ray
 static
 int point_in_quad(point_t p0, point_t pll, point_t pur)
 {
-    int intx = (pll.x <= p0.x) && (p0.x <= pur.x);
-    int inty = (pll.y <= p0.y) && (p0.y <= pur.y);
+    int intx = (pll.x <= p0.x) && (p0.x < pur.x);
+    int inty = (pll.y <= p0.y) && (p0.y < pur.y);
 
     int found = (intx != 0) && (inty != 0);
     return found;
@@ -126,7 +126,7 @@ int segment_intersect(point_t p0, point_t p1,
     double t = (-a21*b.x + a11*b.y)/det;
 
     /* Check to see if segments intersect */
-    if ((0 <= s && s <= 1) && (0 <= t && t <= 1))
+    if ((0 <= s && s < 1) && (0 <= t && t < 1))
         found_intersection = 1;
 
     /* Compute intersection of lines (even if segments don't intersect) */
@@ -145,138 +145,158 @@ int swirl_intersect_ray (fclaw2d_domain_t *domain,
                          double *integral,
                          void* user)
 {
-  /* assert that ray is a valid swirl_ray_t */
-  fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) ray;  
 
-  int id;
-  swirl_ray_t *swirl_ray = (swirl_ray_t*) fclaw2d_ray_get_ray(fclaw_ray,&id);
-  FCLAW_ASSERT(swirl_ray != NULL);
-  FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
+    fclaw2d_global_t *glob = (fclaw2d_global_t*) user;
 
-  if (patchno >= 0) 
-  {
-     /* We are at a leaf and the patch is a valid patch of the domain.
-     * Based on the patch, the domain, the blockno and the information stored
-     * in the swirl_ray_t we defined, we now have to set *integral to be the
-     * contribution of this ray-patch combination to the ray integral.
-     * We should return 1 (even though a leaf return value is ignored). */
+    /* assert that ray is a valid swirl_ray_t */
+    fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) ray;  
 
-    /* This is a dummy example.  We add the ray's x component for each patch.
-       Truly, this example must be updated to compute the exact ray integral. */
-    // *integral = swirl_ray->r.line.vec[0];
+    int id;
+    swirl_ray_t *swirl_ray = (swirl_ray_t*) fclaw2d_ray_get_ray(fclaw_ray,&id);
+    FCLAW_ASSERT(swirl_ray != NULL);
+    FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
 
-    /* DAC : Updated to consider intersection of ray with quadrant.  Contribution to the 
-        integral is the length of the ray segment that in the quad. 
-
-        Next step : consider parameterized curve.  */
-
-    /* Get data on current patch */
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;    
-    fclaw2d_clawpatch_grid_data(NULL,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-
-    if (swirl_ray->rtype == SWIRL_RAY_LINE)
+    if (patchno >= 0) 
     {
-        /* Check to see if line segment intersections one of four edges. */
-        point_t p0 = {swirl_ray->xy[0], swirl_ray->xy[1]};
-        point_t p1 = {p0.x + swirl_ray->r.line.vec[0],
-                      p0.y + swirl_ray->r.line.vec[1]};
+        /* We are at a leaf and the patch is a valid patch of the domain.
+        * Based on the patch, the domain, the blockno and the information stored
+        * in the swirl_ray_t we defined, we now have to set *integral to be the
+        * contribution of this ray-patch combination to the ray integral.
+        * We should return 1 (even though a leaf return value is ignored). */
 
-        double qx[5] = {xlower, xlower+dx*mx, xlower+dx*mx, xlower, xlower};
-        double qy[5] = {ylower, ylower, ylower+dy*my, ylower+dy*my, ylower};
+        /* This is a dummy example.  We add the ray's x component for each patch.
+        Truly, this example must be updated to compute the exact ray integral. */
+        // *integral = swirl_ray->r.line.vec[0];
 
-        point_t r;
-        int istart = -1, iend = -1;
-        point_t r0, r1;        
-        /* Check intersection of ray with each edge of quadrant */
-        for(int i = 0; i < 4; i++)
+        /* DAC : Updated to consider intersection of ray with quadrant.  Contribution to the 
+            integral is the length of the ray segment that in the quad. 
+
+            Next step : consider parameterized curve.  */
+
+        /* Get data on current patch */
+        int mx,my,mbc;
+        double xlower,ylower,dx,dy;    
+        fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
+
+        if (swirl_ray->rtype == SWIRL_RAY_LINE)
         {
-            point_t q0 = {qx[i],qy[i]};
-            point_t q1 = {qx[i+1],qy[i+1]};
+            /* Check to see if line segment intersections one of four edges. */
+            point_t p0 = {swirl_ray->xy[0], swirl_ray->xy[1]};
+            point_t p1 = {p0.x + swirl_ray->r.line.vec[0],
+                          p0.y + swirl_ray->r.line.vec[1]};
 
-            int found = segment_intersect(p0,p1,q0,q1,&r);
-            if (found != 0)
+            double xupper = xlower + dx*mx;
+            double yupper = ylower + dy*my;
+            double qx[5] = {xlower, xupper, xupper, xlower, xlower};
+            double qy[5] = {ylower, ylower, yupper, yupper, ylower};
+
+            point_t r;
+            int istart = -1, iend = -1;
+            point_t r0, r1;        
+            /* Check intersection of ray with each edge of quadrant */
+            for(int i = 0; i < 4; i++)
             {
-                if (istart < 0)
+                point_t q0 = {qx[i],qy[i]};
+                point_t q1 = {qx[i+1],qy[i+1]};
+
+                int found = segment_intersect(p0,p1,q0,q1,&r);
+                if (found != 0)
                 {
-                    istart = i;
-                    r0 = r;
-                }
-                else
-                {
-                    iend = i;
-                    r1 = r;
-                    break;
+                    if (istart < 0)
+                    {
+                        istart = i;
+                        r0 = r;
+                    }
+                    else
+                    {
+                        iend = i;
+                        r1 = r;
+                        break;
+                    }
                 }
             }
-        }
-        /* Four cases */
-        int found_intersection = 0;
-        point_t pstart, pend;
-        if (istart < 0 && iend < 0)
-        {
-            /* No intersection found */
-            //fclaw_global_essentialf("No intersection found\n");
-            *integral = 0;
-        }
-        else if (istart >= 0 && iend >= 0)
-        {
-            /* Ray enters and exits quad */
-            //fclaw_global_essentialf("Ray enters and exits quad\n");
-            pstart = r0;
-            pend = r1;
-            found_intersection = 1;
-        }
-        else
-        {
-            /* Ray starts or ends in quad */
-            point_t pll = {xlower,ylower};
-            point_t pur = {xlower+1,ylower+1};
-            if (point_in_quad(p0,pll,pur) != 0)
+            /* Four cases */
+            int found_intersection = 0;
+            point_t pstart, pend;
+            if (istart < 0 && iend < 0)
             {
-                //fclaw_global_essentialf("Ray starts in quad and exits\n");
-                pstart = p0;
-                pend = r0;
+                /* No intersection found */
+                //fclaw_global_essentialf("No intersection found\n");
+                *integral = 0;
             }
-            else if (point_in_quad(p1,pll,pur) != 0)
+            else if (istart >= 0 && iend >= 0)
             {
-                //fclaw_global_essentialf("Ray starts outside quad and enters\n");
+                /* Ray enters and exits quad */
+                if (id == 2)
+                {                    
+                    fclaw_global_essentialf("Ray enters and exits quad\n");
+                }
                 pstart = r0;
-                pend = p1;
+                pend = r1;
+                found_intersection = 1;
             }
-            found_intersection = 1;
-        }
-        if (found_intersection != 0)
-        {
-            /* This could be replaced by an integral along a curve in the patch */
-            *integral = distance(pstart,pend);
-        }
-    }  /* end of ray type line */
-    return 1;
-  } 
-  else 
-  {
-    /* We are not at a leaf and the patch is an artificial patch containing all
-     * standard patch information except for the pointer to the next patch and
-     * user-data of any kind. Only the FCLAW2D_PATCH_CHILDID and the
-     * FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
-     * Based on this, we now can run a test to check if the ray and the patch
-     * intersect.
-     * We return 0 if we are certain that the ray does not intersect any
-     * descendant of this patch.
-     * We return 1 if the test concludes that the ray may intersect the patch.
-     * This test may be overinclusive / false positive to optimize for speed.
-     *
-     * The purpose of this test is to remove irrelevant ancestor
-     * patch-ray-combinations early on to avoid unnecessary computations.
-     * We do not need to assign to the integral value for ancestor patches. */
+            else
+            {
+                /* Ray starts or ends in quad */
+                point_t pll = {xlower,ylower};
+                point_t pur = {xupper, yupper};
+                if (point_in_quad(p0,pll,pur) != 0)
+                {
+                    if (id == 2) 
+                    {
+                        fclaw_global_essentialf("Ray starts in quad and exits\n");
+                    }
+                    pstart = p0;
+                    pend = r0;
+                }
+                else if (point_in_quad(p1,pll,pur) != 0)
+                {
+                    if (id == 2)
+                    {
+                        fclaw_global_essentialf("Ray starts outside quad and enters\n");       
+                    }
+                    pstart = r0;
+                    pend = p1;
+                }
+                found_intersection = 1;
+            }
+            if (found_intersection != 0)
+            {
+                /* This could be replaced by an integral along a curve in the patch */
+                *integral = distance(pstart,pend);
+                if (id == 2)
+                {
+                    printf("%5d %f\n",patchno,*integral);
+                    printf("pstart : %f %f\n",pstart.x,pstart.y);
+                    printf("pend   : %f %f\n",pend.x,pend.y);
+                    printf("\n");
+                }
+            }
+        }  /* end of ray type line */
+        return 1;
+    } 
+    else 
+    {
+        /* We are not at a leaf and the patch is an artificial patch containing all
+        * standard patch information except for the pointer to the next patch and
+        * user-data of any kind. Only the FCLAW2D_PATCH_CHILDID and the
+        * FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
+        * Based on this, we now can run a test to check if the ray and the patch
+        * intersect.
+        * We return 0 if we are certain that the ray does not intersect any
+        * descendant of this patch.
+        * We return 1 if the test concludes that the ray may intersect the patch.
+        * This test may be overinclusive / false positive to optimize for speed.
+        *
+        * The purpose of this test is to remove irrelevant ancestor
+        * patch-ray-combinations early on to avoid unnecessary computations.
+        * We do not need to assign to the integral value for ancestor patches. */
 
-    /* This is a dummy example.  Truly, implement a fast and over-inclusive test
-     * to see if this ray may possibly intersect the patch and return the answer. */
-    return 1;
-  }
+        /* This is a dummy example.  Truly, implement a fast and over-inclusive test
+        * to see if this ray may possibly intersect the patch and return the answer. */
+        return 1;
+    }
 }
 
 
@@ -312,12 +332,12 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
 #else        
         /* End points are on a semi-circle in x>0,y>0 quad */
         FCLAW_ASSERT(nlines >= 2);
-        sr->xy[0] = 0.0; //-0.1;
-        sr->xy[1] = 0.0; //-0.1;
-        double R = 0.25;
-        double dth = M_PI/(2*(nlines-1));
-        sr->r.line.vec[0] = R*cos (i * dth);
-        sr->r.line.vec[1] = R*sin (i * dth);
+        sr->xy[0] = 0; //-0.1;
+        sr->xy[1] = 0; //-0.1;
+        double R = 2.0;
+        double dth = M_PI/(2*nlines);
+        sr->r.line.vec[0] = R*cos ((i+0.5) * dth);
+        sr->r.line.vec[1] = R*sin ((i+0.5) * dth);
 #endif        
 
         fclaw2d_ray_t *ray = &ray_vec[i];

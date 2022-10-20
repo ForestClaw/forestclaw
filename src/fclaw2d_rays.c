@@ -133,37 +133,41 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
     fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
     FCLAW_ASSERT(ray_acc != NULL);
 
-#if 1
     /* Copy arrays stored in accumulator to an sc_array */
     sc_array_t  *sc_rays = sc_array_new (sizeof (fclaw2d_ray_t));
     int num_rays = ray_acc->num_rays;
     for(int i = 0; i < num_rays; i++)
     {
+        /* Add one ray to sc_rays;  return newly pushed array */
         fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) sc_array_push (sc_rays);        
+
+        /* Set data for ray */
         fclaw_ray->num = ray_acc->rays[i].num;
         fclaw_ray->ray_data = (void*) ray_acc->rays[i].ray_data;
     }
 
     sc_array_t *integrals = sc_array_new_count (sizeof (double), num_rays);
-#endif    
+
+    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
 
     /* This does a compute and a gather. */
-    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
     fclaw2d_domain_integrate_rays(glob->domain, ray_vt->integrate, 
-                                  sc_rays, integrals, NULL);
+                                  sc_rays, integrals, glob);
 
     /* Copy integral value back to fclaw2d_ray_t */
+    fclaw2d_ray_t *rays = ray_acc->rays;
     for(int i = 0; i < num_rays; i++)
     {
-        fclaw2d_ray_t *ray = ((fclaw2d_ray_t*) sc_array_index_int(sc_rays,i));
+        /* Return values from integrals */
         double intval = *((double*) sc_array_index_int(integrals,i));
+
+        /* Update rays stored in accumulator so we can report values later */
+        fclaw2d_ray_t *ray = &rays[i];
         ray->integral = intval;
     }
 
-#if 1
     sc_array_destroy (sc_rays);
     sc_array_destroy (integrals);
-#endif    
 }
 
 static
@@ -178,8 +182,6 @@ void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
     fclaw2d_ray_t *rays = ray_acc->rays;
     for(int i = 0; i < num_rays; i++)
     {
-        //double intval = *((double*) sc_array_index_int(integrals,i));
-        //fclaw2d_ray_t *ray = *((fclaw2d_ray_t*) sc_array_index_int(ray_acc->rays,i));
         fclaw2d_ray_t *ray = &rays[i];
         int id = ray->num;
         double intval = ray->integral;
