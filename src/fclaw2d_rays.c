@@ -131,7 +131,12 @@ static
 void ray_integrate(fclaw2d_global_t *glob, void *acc)
 {
     fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
-    FCLAW_ASSERT(ray_acc != NULL);
+
+    if (ray_acc->num_rays == 0)
+    {
+        return;
+    }
+    FCLAW_ASSERT(ray_acc->rays != NULL);
 
     /* Copy arrays stored in accumulator to an sc_array */
     sc_array_t  *sc_rays = sc_array_new (sizeof (fclaw2d_ray_t));
@@ -176,7 +181,7 @@ void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
     /* Here is where we would do an all-reduce, but again this
       is handled by fclaw2d_convenience routines */
     fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
-    FCLAW_ASSERT(ray_acc != NULL);
+    //FCLAW_ASSERT(ray_acc->rays != NULL);
 
     int num_rays = ray_acc->num_rays;
     fclaw2d_ray_t *rays = ray_acc->rays;
