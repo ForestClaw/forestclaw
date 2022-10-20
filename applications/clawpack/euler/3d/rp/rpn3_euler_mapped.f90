@@ -57,7 +57,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     logical debug
 
-    data efix /.false./    !# use entropy fix for transonic rarefactions
+    data efix /.true./    !# use entropy fix for transonic rarefactions
 
     debug = .false.
     if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
@@ -266,7 +266,6 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
         else
             !! # No entropy fix
-            write(6,*) "no entropy fix"
             do m=1,meqn
                 amdq(m) = 0.d0
                 apdq(m) = 0.d0
@@ -289,8 +288,8 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             s(mws,i) = area*s_rot(mws)
         enddo
 
-        call rotate3_tr(rot,apdq)
-        call rotate3_tr(rot,amdq)
+        call rotate3_tr(rot,apdq(2))
+        call rotate3_tr(rot,amdq(2))
         do m = 1,meqn
             apdq_cart(m,i) = area*apdq(m)
             amdq_cart(m,i) = area*amdq(m)
@@ -306,14 +305,14 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 !!            enddo
 !!        enddo
 
-    if (debug) then
-        write(6,211) 1, i, (ql_cart(j,i),j=1,5)
-        !!write(6,211) i, (qr_cart(j,i),j=1,5)
-        !!write(6,211) i, (delta(j),j=1,5)
-        !!write(6,211) i, (amdq_cart(j,i)/area,j=1,5)
-        !!write(6,211) i, (apdq_cart(j,i)/area,j=1,5)
-        !!write(6,*) ' '
-    endif
+        if (debug) then
+            write(6,211) 1, i, (ql_cart(j,i),j=1,5)
+            !!write(6,211) i, (qr_cart(j,i),j=1,5)
+            !!write(6,211) i, (delta(j),j=1,5)
+            !!write(6,211) i, (amdq_cart(j,i)/area,j=1,5)
+            !!write(6,211) i, (apdq_cart(j,i)/area,j=1,5)
+            !!write(6,*) ' '
+        endif
 211 format(2I5,5E16.8)
 
     enddo  !! end of i loop over 1d sweep array
