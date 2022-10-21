@@ -203,6 +203,7 @@ subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
 
     is_manifold = manifold .eq. 1
 
+    refratio = 2
     r2 = refratio*refratio
     !! # Loop over four corner cells on coarse grid
     meqn_loop : do mq = 1,meqn
@@ -238,10 +239,11 @@ subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
                     else
                         sum = 0
                         do m = 0,r2-1
-                            sum = sum + qfine(i2(m),j2(m),k,mq)
+                            qf = qfine(i2(m),j2(m),k,mq)
+                            sum = sum + qf
                         end do
+                        qcoarse(i1,j1,k,mq) = sum/dble(r2)
                     endif
-                    qcoarse(i1,j1,k,mq) = sum/dble(r2)
                 enddo jbc_loop
             enddo ibc_loop
         enddo k_loop
