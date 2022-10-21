@@ -117,14 +117,36 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
     return glob;
 }
 
-int fclaw2d_global_serialize(fclaw2d_global_t * glob, char* buffer){
-    //
-    return 0;
+#ifndef P4_TO_P8
+
+size_t 
+fclaw2d_global_pack(const fclaw2d_global_t * glob, char* buffer)
+{
+    memcpy(buffer, glob, sizeof(fclaw2d_global_t));
+    return sizeof(fclaw2d_global_t);
 }
-int fclaw2d_global_deserialize(fclaw2d_global_t ** glob, char* buffer){
-    //
-    return 1;
+
+size_t 
+fclaw2d_global_packsize(const fclaw2d_global_t * glob)
+{
+    return sizeof(fclaw2d_global_t);
 }
+
+size_t 
+fclaw2d_global_unpack(const char* buffer, fclaw2d_global_t ** glob_ptr)
+{
+    *glob_ptr = FCLAW_ALLOC (fclaw2d_global_t, 1);
+
+    memcpy(*glob_ptr, buffer, sizeof(fclaw2d_global_t));
+    (*glob_ptr)->pkg_container = NULL;
+    (*glob_ptr)->vtables = NULL;
+    (*glob_ptr)->options = NULL;
+    (*glob_ptr)->acc = NULL;
+
+    return sizeof(fclaw2d_global_t);
+}
+
+#endif
 
 void
 fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
@@ -155,9 +177,9 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
 
-    fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
-    fclaw_pointer_map_destroy (glob->vtables);
-    fclaw_pointer_map_destroy (glob->options);
+    if(glob->pkg_container != NULL) fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
+    if(glob->vtables != NULL) fclaw_pointer_map_destroy (glob->vtables);
+    if(glob->options != NULL) fclaw_pointer_map_destroy (glob->options);
 
 #ifndef P4_TO_P8
     FCLAW_FREE (glob->acc);

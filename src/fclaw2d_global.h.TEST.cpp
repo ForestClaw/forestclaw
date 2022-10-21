@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw_timer.h"
 #include <fclaw2d_global.h>
 #include <test.hpp>
 
@@ -39,40 +40,54 @@ TEST_CASE("fclaw2d_global_serialize"){
 	for(int count_grids_local_boundary : {1, 2})
 	for(double curr_time : {1.0, 1.2})
 	for(double curr_dt : {1.0, 1.2})
+	for(int timer_to_set : {1, 2})
 	{
-		fclaw2d_global_t glob1;
-		glob1.count_amr_advance = count_amr_advance;
-		glob1.count_ghost_exchange = count_ghost_exchange;
-		glob1.count_amr_regrid = count_amr_regrid;
-		glob1.count_amr_new_domain = count_amr_new_domain;
-		glob1.count_single_step = count_single_step;
-		glob1.count_elliptic_grids = count_elliptic_grids;
-		glob1.count_multiproc_corner = count_multiproc_corner;
-		glob1.count_grids_per_proc = count_grids_per_proc;
-		glob1.count_grids_remote_boundary = count_grids_remote_boundary;
-		glob1.count_grids_local_boundary = count_grids_local_boundary;
-		glob1.curr_time = curr_time;
-		glob1.curr_dt = curr_dt;
+		fclaw2d_global_t* glob1;
+    	glob1 = FCLAW_ALLOC_ZERO (fclaw2d_global_t, 1);
+		glob1->count_amr_advance            = count_amr_advance;
+		glob1->count_ghost_exchange         = count_ghost_exchange;
+		glob1->count_amr_regrid             = count_amr_regrid;
+		glob1->count_amr_new_domain         = count_amr_new_domain;
+		glob1->count_single_step            = count_single_step;
+		glob1->count_elliptic_grids         = count_elliptic_grids;
+		glob1->count_multiproc_corner       = count_multiproc_corner;
+		glob1->count_grids_per_proc         = count_grids_per_proc;
+		glob1->count_grids_remote_boundary  = count_grids_remote_boundary;
+		glob1->count_grids_local_boundary   = count_grids_local_boundary;
+		glob1->curr_time                    = curr_time;
+		glob1->curr_dt                      = curr_dt;
+		glob1->timers[timer_to_set].started = 1;
 
-		char buffer[1000];
-		int bytes_written = fclaw2d_global_serialize(&glob1, buffer);
+		size_t packsize = fclaw2d_global_packsize(glob1);
+		char buffer[packsize];
+		int bytes_written = fclaw2d_global_pack(glob1, buffer);
 		fclaw2d_global_t* glob2;
-		int bytes_read = fclaw2d_global_deserialize(&glob2, buffer);
+		int bytes_read = fclaw2d_global_unpack(buffer, &glob2);
 
-		CHECK_EQ(bytes_read,                        bytes_written);
+		CHECK_EQ(bytes_read,                         bytes_written);
 
-		CHECK_EQ(glob1.count_amr_advance,           glob2->count_amr_advance);
-		CHECK_EQ(glob1.count_ghost_exchange,        glob2->count_ghost_exchange);
-		CHECK_EQ(glob1.count_amr_regrid,            glob2->count_amr_regrid);
-		CHECK_EQ(glob1.count_amr_new_domain,        glob2->count_amr_new_domain);
-		CHECK_EQ(glob1.count_single_step,           glob2->count_single_step);
-		CHECK_EQ(glob1.count_elliptic_grids,        glob2->count_elliptic_grids);
-		CHECK_EQ(glob1.count_multiproc_corner,      glob2->count_multiproc_corner);
-		CHECK_EQ(glob1.count_grids_per_proc,        glob2->count_grids_per_proc);
-		CHECK_EQ(glob1.count_grids_remote_boundary, glob2->count_grids_remote_boundary);
-		CHECK_EQ(glob1.count_grids_local_boundary,  glob2->count_grids_local_boundary);
-		CHECK_EQ(glob1.curr_time,                   glob2->curr_time);
-		CHECK_EQ(glob1.curr_dt,                     glob2->curr_dt);
+		CHECK_EQ(glob1->count_amr_advance,           glob2->count_amr_advance);
+		CHECK_EQ(glob1->count_ghost_exchange,        glob2->count_ghost_exchange);
+		CHECK_EQ(glob1->count_amr_regrid,            glob2->count_amr_regrid);
+		CHECK_EQ(glob1->count_amr_new_domain,        glob2->count_amr_new_domain);
+		CHECK_EQ(glob1->count_single_step,           glob2->count_single_step);
+		CHECK_EQ(glob1->count_elliptic_grids,        glob2->count_elliptic_grids);
+		CHECK_EQ(glob1->count_multiproc_corner,      glob2->count_multiproc_corner);
+		CHECK_EQ(glob1->count_grids_per_proc,        glob2->count_grids_per_proc);
+		CHECK_EQ(glob1->count_grids_remote_boundary, glob2->count_grids_remote_boundary);
+		CHECK_EQ(glob1->count_grids_local_boundary,  glob2->count_grids_local_boundary);
+		CHECK_EQ(glob1->curr_time,                   glob2->curr_time);
+		CHECK_EQ(glob1->curr_dt,                     glob2->curr_dt);
+		for(int i = 0; i < FCLAW2D_TIMER_COUNT; i++){
+			CHECK_EQ(glob1->timers[i].cumulative, glob2->timers[i].cumulative);
+			CHECK_EQ(glob1->timers[i].running,    glob2->timers[i].running);
+			CHECK_EQ(glob1->timers[i].started,    glob2->timers[i].started);
+			CHECK_EQ(glob1->timers[i].stopped,    glob2->timers[i].stopped);
+		}
+
+
+		fclaw2d_global_destroy(glob1);
+		fclaw2d_global_destroy(glob2);
 	}
 }
 TEST_CASE("fclaw2d_global_set_global")
