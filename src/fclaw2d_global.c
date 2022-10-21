@@ -100,6 +100,18 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     return glob;
 }
 
+fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
+                                           int mpisize, int mpirank)
+{
+    fclaw2d_global_t *glob = fclaw2d_global_new ();
+
+    glob->mpicomm = mpicomm;
+    glob->mpisize = mpisize;
+    glob->mpirank = mpirank;
+
+    return glob;
+}
+
 void
 fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
 {

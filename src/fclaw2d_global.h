@@ -109,6 +109,9 @@ struct fclaw2d_diagnostics_accumulator;
 
 fclaw2d_global_t* fclaw2d_global_new (void);
 
+fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
+                                           int mpisize, int mpirank);
+
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 
 void fclaw2d_global_store_domain (fclaw2d_global_t* glob,
