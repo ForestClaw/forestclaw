@@ -24,13 +24,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_global.h>
-#ifndef P4_TO_P8
-#include <fclaw2d_defs.h>
-#include <fclaw2d_global.h>
 
 #include <fclaw_package.h>
 #include <fclaw_timer.h>
 #include <fclaw_pointer_map.h>
+
+#ifndef P4_TO_P8
+#include <fclaw2d_defs.h>
+#include <fclaw2d_global.h>
 
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
@@ -205,25 +206,24 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
     fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }
 
-fclaw2d_global_t* global_glob = NULL;
+static fclaw2d_global_t* fclaw2d_global_glob = NULL;
 
-void fclaw2d_global_set_global(fclaw2d_global_t* glob)
+void fclaw2d_global_set_global (fclaw2d_global_t* glob)
 {
-    FCLAW_ASSERT(global_glob == NULL);
-    global_glob = glob;
+    FCLAW_ASSERT (fclaw2d_global_glob == NULL);
+    fclaw2d_global_glob = glob;
 }
 
-void fclaw2d_global_unset_global()
+void fclaw2d_global_unset_global (void)
 {
-    FCLAW_ASSERT(global_glob != NULL);
-    global_glob = NULL;
+    FCLAW_ASSERT (fclaw2d_global_glob != NULL);
+    fclaw2d_global_glob = NULL;
 }
 
-fclaw2d_global_t* fclaw2d_global_get_global()
+fclaw2d_global_t* fclaw2d_global_get_global (void)
 {
-    FCLAW_ASSERT(global_glob != NULL);
-    return global_glob;
+    FCLAW_ASSERT(fclaw2d_global_glob != NULL);
+    return fclaw2d_global_glob;
 }
-
 
 #endif /* P4_TO_P8 */
