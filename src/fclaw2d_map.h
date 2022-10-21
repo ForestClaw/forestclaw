@@ -235,15 +235,14 @@ void fclaw2d_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
                                  double *xp, double* yp, double *zp);
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap(void);
-
 /* ----------------------------------------------------------------------------------
    New maps (torus, cubedsphere, disk) and a utility function for calling maps
    defined in fortran.
    ---------------------------------------------------------------------------------- */
 
-/* The torus is now defined in its own file in an example directory */
 #if 0
+
+/* The torus is now defined in its own file in an example directory */
 /** Create a torus mapping for one block with [0, 1]^2 (for now).
  * \param [in] R1       Large radius of the torus.
  * \param [in] R2       Small radius of the torus.
@@ -255,7 +254,7 @@ fclaw2d_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
  * \param [in] R        Radius of the cubed sphere surface.
  * \return              Mapping context.
  */
-#endif
+
 
 fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
 
@@ -281,25 +280,27 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
                                                 query_results
                                                 [FCLAW2D_MAP_QUERY_LAST]);
 
-
-/* ----------------------------------------------------------------------------------
-   Brick mapping
-   ---------------------------------------------------------------------------------- */
-
-fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
-                                             int mi,
-                                             int mj);
-
+#endif
 
 /* ----------------------------------------------------------------------------------
    Pillowsphere utility
    ---------------------------------------------------------------------------------- */
 
+/* This is called to determine is a map is a pillow sphere or not */
 int fclaw2d_map_pillowsphere(struct fclaw2d_global* glob);
 
+
+#if 0
 /* ----------------------------------------------------------------------------------
-   Some mapping utility functions
+   No map
    ---------------------------------------------------------------------------------- */
+
+
+fclaw2d_map_context_t* fclaw2d_map_new_nomap(void);
+
+#endif
+
+
 
 #if 0
 #define SET_SCALE FCLAW_F77_FUNC_(set_scale, SET_SCALE)
@@ -321,12 +322,112 @@ void ROTATE_MAP (double *xp, double *yp, double *zp);
 void SHIFT_MAP (double *xp, double *yp, double *zp);
 #endif
 
+/* ----------------------------------------------------------------------------------
+   Some mapping utility functions
+   ---------------------------------------------------------------------------------- */
+
+
 #define SET_BLOCK FCLAW_F77_FUNC_(set_block,SET_BLOCK)
 void SET_BLOCK(const int * a_blockno);
+
 
 #define FCLAW_MAP_SET_CONTEXT FCLAW_F77_FUNC (fclaw_map_set_context, \
                                               FCLAW_MAP_SET_CONTEXT)
 void FCLAW_MAP_SET_CONTEXT (fclaw2d_map_context_t** a_context);
+
+
+/* ----------------------------------------------------------------------------------
+                                   Headers for mappings
+   ---------------------------------------------------------------------------------- */
+
+/* -------------------------------------- No map -------------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+
+
+/* -------------------------------- Brick mapping ----------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
+                                             int mi,
+                                             int mj);
+
+
+
+/* --------------------------------- Square mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
+
+fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+                                            const double scale[],
+                                            const double shift[]);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+                                                 const double shift[],
+                                                 const double alpha);
+
+fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+                                                   const double shift[],
+                                                   const double alpha);
+  
+fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+                                                const double scale[],
+                                                const double shift[],
+                                                const double center[]);
+
+/* ---------------------------------- Disk mappings ----------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+                                                  const double shift[],
+                                                  const double rotate[]);
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+                                                   const double shift[],
+                                                   const double rotate[],
+                                                   const double alpha);
+
+/* --------------------------------- Annulus mapping ---------------------------------- */
+fclaw2d_map_context_t *
+    fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
+                             const double scale[],
+                             const double rotate[],
+                             const double alpha,
+                             const double theta[]);
+
+
+/* --------------------------------- Latlong mapping ---------------------------------- */
+fclaw2d_map_context_t *
+    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+                             const double scale[],
+                             const double rotate[],
+                             const double lat[],
+                             const double longitude[],
+                             const int a, const int b);
+
+/* --------------------------------- Hemisphere mappings ------------------------------ */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
+                                                     const double rotate[],
+                                                     const double alpha);
+
+/* --------------------------------- Sphere mappings ---------------------------------- */
+
+fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
+                                                    const double rotate[]);
+
+fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+                                                     const double rotate[]);
+
+/* --------------------------------- Torus mappings ---------------------------------- */
+fclaw2d_map_context_t *
+    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+                           const double scale[],
+                           const double rotate[],
+                           const double alpha,
+                           const double beta);
+
+
+
+
 
 /* ----------------------------------------------------------------------------------
    Some generic fortran mappings.  Users can call these by setting up a

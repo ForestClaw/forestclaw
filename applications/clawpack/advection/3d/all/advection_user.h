@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 
-// #include <fclaw3dx_clawpatch_pillow.h>
+#include <fclaw3dx_clawpatch_pillow.h>
 
 /* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
 #include <fclaw3dx_clawpatch.h>
@@ -71,72 +71,6 @@ void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
                                           int block,
                                           int patchno,
                                           int claw_version);
-
-
-/* --------------------------------- Square mappings ---------------------------------- */
-
-fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
-
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
-                                            const double scale[],
-                                            const double shift[]);
-  
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
-                                                 const double shift[],
-                                                 const double alpha);
-
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch5(const double scale[],
-                                                  const double shift[],
-                                                  const double alpha);
-
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
-                                                   const double shift[],
-                                                   const double alpha);
-  
-fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
-                                                const double scale[],
-                                                const double shift[],
-                                                const double center[]);
-
-/* --------------------------------- Sphere mappings ---------------------------------- */
-
-fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
-                                                    const double rotate[]);
-
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
-                                                     const double rotate[]);
-
-fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
-                                                      const double rotate[]);
-
-/* ---------------------------------- Disk mappings ----------------------------------- */
-
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
-                                                  const double shift[],
-                                                  const double rotate[]);
-
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
-                                                   const double shift[],
-                                                   const double rotate[],
-                                                   const double alpha);
-
-
-/* --------------------------------- Hemisphere mappings ------------------------------ */
-
-fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
-                                                     const double rotate[],
-                                                     const double alpha);
-
-/* --------------------------------- Latlong mapping ---------------------------------- */
-
-
-fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
-                             const double scale[],
-                             const double rotate[],
-                             const double lat[],
-                             const double longitude[],
-                             const int a, const int b);
 
 #ifdef __cplusplus
 }

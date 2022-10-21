@@ -2,8 +2,6 @@
 
 #include <fclaw2d_map.h>
 
-#include "advection_user.h"
-
 #if 0
 /* Fix syntax highlighting */
 #endif    
