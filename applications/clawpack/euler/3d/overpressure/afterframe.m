@@ -8,9 +8,9 @@ mapping = parms.mapping;
 
 
 
-
 parms = read_vars();
 if (mapping <= 1)
+    % No mapping or Cartesian mapping
     axis([-1,1,-1,1,-1,1])
     hideslices('z',[1,3])
     daspect([1,1,1])
@@ -19,7 +19,7 @@ else
     % Spherical mappings with extrusion means R > 1
     s = 1 + parms.maxelev;
     axis([-1,1,-1,1,-1,1]*s)
-    view([119,15])
+    view(vright)
 end
 
 if qmin == qmax
@@ -31,11 +31,14 @@ if qmin == qmax
 else
     if UserVariable == 1
         % Pressure
-        clim([0.95,1.15])
+        if mapping < 2
+            clim([0.9,1.1])
+        else
+            clim([0.975,1.035])
+        end
     else
         % Density
-        clim([qmin,qmax])
-        % caxis([-1,1]*1e-3);  % For errors
+        clim([0.7,1.2])
         % view(2);
     end
 end
@@ -56,11 +59,11 @@ else
 end
 % Color map and axis
 colormap(parula)
-colorbar
 
 title(tstr)
 
-view(vright)
+colorbar
+
 
 % Show patch borders
 showpatchborders

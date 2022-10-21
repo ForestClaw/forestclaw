@@ -24,6 +24,10 @@ subroutine setprob
     double precision pi_com, pi2_com
     common /compi/ pi_com, pi2_com
 
+    integer mapping_com
+    common /com_mapping/ mapping_com
+
+
     pi = 4.d0*atan(1.d0)
     pi2 = 2*pi
 
@@ -36,6 +40,8 @@ subroutine setprob
     read(10,*) manifold
     read(10,*) mcapa
     read(10,*) init_choice
+
+    mapping_com = mapping
 
     !! # These should be read in as options
     read(10,*) gamma

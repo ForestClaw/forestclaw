@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw3dx_clawpatch.h>
+#include <fclaw3dx_clawpatch_fort.h>
 
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_options.h>
@@ -127,6 +128,9 @@ void overpressure_link_solvers(fclaw2d_global_t *glob)
         fc3d_clawpack46_options_t *clawopt = fc3d_clawpack46_get_options(glob);
 
         claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
+
+        fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
+        clawpatch_vt->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
 
         fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
         if (fclaw_opt->manifold)

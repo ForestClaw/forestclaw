@@ -5,6 +5,7 @@ set(all2d ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 add_library(overpressure_f OBJECT 
   setprob_module.f90 
   fdisc.f90
+  latlong_exceeds_th.f90
   user_4.6/qinit.f90
   ${rp}/gethexinfo.f90
   ${rp}/rpn3_euler.f90

@@ -75,10 +75,8 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
 
     debug = .false.
     if (icoor .eq. 2) then
-        if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-            if (imp .eq. 1) then
-                debug = .true.
-            endif
+        if (ixyz .eq. 1 .and. jcom .eq. mx .and. kcom .eq. 4) then
+            debug = .true.
         endif
     endif
     debug = .false.

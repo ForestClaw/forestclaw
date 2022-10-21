@@ -28,8 +28,7 @@ double precision function fdisc(blockno,xc,yc,zc)
         !! Cylindrical or conical overpressure
         if (mapping .le. 1) then
             !! Initialize data in a cylinder for Cartesian mappings
-            fdisc = xp**2 + yp**2 - r0**2
-            !!fdisc = xp**2 + zp**2 - r0**2
+            fdisc = (xp-x0)**2 + (yp-y0)**2 - r0**2
         else
             !! Cone with central axis p and angle omega0
             !! p = (1,0,0)

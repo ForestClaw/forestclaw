@@ -57,7 +57,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     logical debug
 
-    data efix /.true./    !# use entropy fix for transonic rarefactions
+    data efix /.false./    !# use entropy fix for transonic rarefactions
 
     debug = .false.
     if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
