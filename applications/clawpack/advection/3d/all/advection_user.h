@@ -138,10 +138,8 @@ fclaw2d_map_context_t *
                              const double longitude[],
                              const int a, const int b);
 
-
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* !ADVECTION_USER_3D_H */

@@ -2,6 +2,8 @@
 
 #include <fclaw2d_map.h>
 
+#include "advection_user.h"
+
 #if 0
 /* Fix syntax highlighting */
 #endif    
@@ -127,8 +129,3 @@ fclaw2d_map_context_t *
 
     return cont;
 }
-
-
-#ifdef __cplusplus
-}
-#endif
