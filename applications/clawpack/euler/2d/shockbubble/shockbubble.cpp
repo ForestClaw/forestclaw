@@ -38,14 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static
-fclaw2d_global_t *create_glob (sc_MPI_Comm mpicomm,
-                               fclaw_options_t *fclaw_opt)
+void store_domain_map (fclaw2d_global_t *glob,
+                       fclaw_options_t *fclaw_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain = NULL;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
-    fclaw2d_global_t         *glob = NULL;
 
     /* Build a rectangle that may have periodic boundaries */
     int                       mi, mj, a, b;
@@ -57,11 +56,9 @@ fclaw2d_global_t *create_glob (sc_MPI_Comm mpicomm,
     /* The p4est connectivity is used for both domain and mapping context */
     conn = p4est_connectivity_new_brick (mi,mj,a,b);
 
-    /* Create global structure which stores the domain, timers, etc */
-    glob = fclaw2d_global_new ();
-
     /* Construct and store domain */
-    domain = fclaw2d_domain_new_conn (mpicomm, fclaw_opt->minlevel, conn);
+    domain = fclaw2d_domain_new_conn (glob->mpicomm,
+                                      fclaw_opt->minlevel, conn);
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
     fclaw2d_global_store_domain (glob, domain);
@@ -70,8 +67,6 @@ fclaw2d_global_t *create_glob (sc_MPI_Comm mpicomm,
     brick = fclaw2d_map_new_brick (conn, mi, mj);
     cont = fclaw2d_map_new_nomap_brick (brick);
     fclaw2d_global_store_map (glob, cont);
-
-    return glob;
 }
 
 static
@@ -124,9 +119,6 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
-    fclaw2d_global_t            *glob;
-    sc_MPI_Comm mpicomm;
-
     int retval;
 
     /* Initialize application */
@@ -148,8 +140,11 @@ main (int argc, char **argv)
     {
         /* Options have been checked and are valid */
 
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        glob = create_glob (mpicomm, fclaw_opt);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        fclaw2d_global_t * glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+
+        store_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
