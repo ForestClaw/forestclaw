@@ -144,6 +144,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
 #define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
 
+#define fclaw2d_global_t                fclaw3d_global_t
+#define fclaw2d_global_iterate_t        fclaw3d_global_iterate_t
+#define fclaw2d_global_set_global       fclaw3d_global_set_global
+#define fclaw2d_global_unset_global     fclaw3d_global_unset_global
+#define fclaw2d_global_get_global       fclaw3d_global_get_global
+
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
 #define p4est_wrap_new_unitsquare       p8est_wrap_new_unitcube

@@ -93,7 +93,6 @@ struct fclaw2d_global_iterate
 {
     fclaw2d_global_t* glob;
     void* user;
-
 };
 
 /* Use forward references here, since this file gets included everywhere */
@@ -142,24 +141,23 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
                                          void *user);
 
 /**
- * @brief Store a glob variable
- * 
+ * @brief Store a glob variable in static memory
+ *
  * @param glob the glob variable
  */
-void fclaw2d_global_set_global(fclaw2d_global_t* glob);
+void fclaw2d_global_set_global (fclaw2d_global_t* glob);
 
 /**
- * @brief Set the global glob the NULL
+ * @brief Set the static glob variable to NULL
  */
-void fclaw2d_global_unset_global();
+void fclaw2d_global_unset_global (void);
 
 /**
- * @brief Get the global glob variable
- * 
+ * @brief Get the static glob variable
+ *
  * @return fclaw2d_global_t* the glob variable
  */
-fclaw2d_global_t* fclaw2d_global_get_global();
-
+fclaw2d_global_t* fclaw2d_global_get_global (void);
 
 #ifdef __cplusplus
 #if 0

@@ -46,6 +46,41 @@ void fclaw3d_iterate_family_cb
     (fclaw3d_domain_t * domain, fclaw3d_patch_t * patch,
      int blockno, int patchno, void *user);
 
+/* much of the following will move into fclaw_global.h */
+
+typedef struct fclaw3d_global fclaw3d_global_t;
+typedef struct fclaw3d_global_iterate fclaw3d_global_iterate_t;
+
+struct fclaw3d_global
+{
+    void *user;
+};
+
+struct fclaw3d_global_iterate
+{
+    fclaw3d_global_t* glob;
+    void* user;
+};
+
+/**
+ * @brief Store a glob variable in static memory
+ *
+ * @param glob the glob variable
+ */
+void fclaw3d_global_set_global (fclaw3d_global_t* glob);
+
+/**
+ * @brief Set the static glob variable to NULL
+ */
+void fclaw3d_global_unset_global (void);
+
+/**
+ * @brief Get the static glob variable
+ *
+ * @return fclaw2d_global_t* the glob variable
+ */
+fclaw3d_global_t* fclaw3d_global_get_global (void);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
