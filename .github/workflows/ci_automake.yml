@@ -72,7 +72,7 @@ jobs:
       if: ${{ matrix.thunderegg }}
       with:
         repository: ThunderEgg/ThunderEgg
-        ref: v1.0.4
+        ref: v1.0.5
         path: ThunderEggSrc
 
     - name: Install dependencies
