@@ -37,22 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 
 static
-fclaw2d_map_context_t *create_map (void)
-{
-    /* no particular mapping */
-    return fclaw2d_map_new_nomap ();
-}
-
-static
 fclaw2d_domain_t* create_domain (sc_MPI_Comm mpicomm,
                                  fclaw_options_t* fclaw_opt)
 {
-    /* multi-block domain */
-    p4est_connectivity_t     *conn;
     fclaw2d_domain_t         *domain;
-
-    conn = p4est_connectivity_new_unitsquare ();
-    domain = fclaw2d_domain_new_conn (mpicomm, fclaw_opt->minlevel, conn);
+    domain = fclaw2d_domain_new_unitsquare (mpicomm, fclaw_opt->minlevel);
 
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
@@ -141,7 +130,7 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new ();
         fclaw2d_global_store_domain (glob, domain);
-        fclaw2d_global_store_map (glob, create_map ());
+        fclaw2d_global_store_map (glob, fclaw2d_map_new_nomap ());
 
          /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
