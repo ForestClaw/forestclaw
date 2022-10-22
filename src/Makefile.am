@@ -31,6 +31,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_time_sync.h \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
+	src/fclaw2d_rays.h \
 	src/fclaw2d_ghost_fill.h \
 	src/fclaw2d_corner_neighbors.h \
 	src/fclaw2d_face_neighbors.h \
@@ -83,6 +84,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_advance.c \
 	src/fclaw2d_elliptic_solver.c \
 	src/fclaw2d_physical_bc.c \
+	src/fclaw2d_rays.c \
 	src/fclaw2d_ghost_fill.c \
 	src/fclaw2d_output.c \
 	src/fclaw2d_run.c \

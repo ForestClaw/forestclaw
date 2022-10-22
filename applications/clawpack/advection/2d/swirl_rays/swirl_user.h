@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,34 +23,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
+#ifndef SWIRL_USER_H
+#define SWIRL_USER_H
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_diagnostics.h>
-#include <fclaw_gauges.h>
-#include <fclaw2d_rays.h>
+#include "../all/advection_user.h"
 
-#include <fclaw2d_elliptic_solver.h>
-
-void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
+#ifdef __cplusplus
+extern "C"
 {
-    fclaw2d_vtable_initialize(glob);
-    fclaw2d_patch_vtable_initialize(glob);
-    fclaw2d_diagnostics_vtable_initialize(glob);
-    fclaw2d_elliptic_vtable_initialize(glob);
-    fclaw_gauges_vtable_initialize(glob);
-    fclaw2d_ray_vtable_initialize(glob);
+#if 0
 }
+#endif
+#endif
 
-void fclaw2d_problem_setup(fclaw2d_global_t *glob)
+typedef struct user_options
 {
-	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-	
-    /* User defined problem setup */
-    if (fclaw_vt->problem_setup != NULL)
-    {
-        fclaw_vt->problem_setup(glob);
-    }
+    double period;
+    int claw_version;
+    int is_registered;
+
+} user_options_t;
+
+void swirl_link_solvers(fclaw2d_global_t *glob);
+
+/* ------------------------------------- Options ---------------------------------------*/
+user_options_t* swirl_options_register (fclaw_app_t * app,
+                                        const char *configfile);
+
+void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
+
+const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+
+#ifdef __cplusplus
+#if 0
+{
+#endif
 }
+#endif
+
+#endif

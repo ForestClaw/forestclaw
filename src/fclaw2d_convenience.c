@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -746,6 +746,8 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
     p4est_wrap_complete (wrap);
 }
 
+#ifndef P4_TO_P8
+
 void
 fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 {
@@ -1146,6 +1148,7 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     sc_array_destroy (points);
 }
 
+
 typedef struct fclaw2d_ray_integral
 {
     void *ray;
@@ -1276,3 +1279,7 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     sc_array_reset (ri);
     sc_array_reset (lints);
 }
+
+#if 0
+#endif /* !P4_TO_P8 */
+#endif
