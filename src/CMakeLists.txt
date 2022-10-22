@@ -133,6 +133,7 @@ install(FILES
 	fclaw2d_time_sync.h
 	fclaw2d_update_single_step.h
 	fclaw2d_physical_bc.h
+	fclaw2d_rays.h
 	fclaw2d_ghost_fill.h
 	fclaw2d_corner_neighbors.h
 	fclaw2d_face_neighbors.h
