@@ -52,6 +52,7 @@ typedef struct fclaw_gauge_acc
 } fclaw_gauge_acc_t;
 
 
+/* This is only used for blocks */
 typedef struct fclaw_gauge_info
 {
     sc_array_t *block_offsets;
@@ -78,15 +79,16 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     fclaw_gauge_t *gauges;
     if (!fclaw_opt->output_gauges)
     {
+        /* User does not want any gauge output, so no point in creating gauges */
         num_gauges = 0;
         gauge_acc->gauges = NULL;
     }
     else
     {
-        fclaw_set_gauge_data(glob, &gauges, &num_gauges);
+        fclaw_set_gauge_data(glob, &gauge_acc->gauges, &num_gauges);
 
         /* Set diagnostic accumulutor info  */
-        gauge_acc->gauges = gauges;  /* Might be NULL */    
+        //gauge_acc->gauges = gauges;  /* Might be NULL */    
     }
     *acc = gauge_acc;
     gauge_acc->num_gauges = num_gauges;
@@ -94,6 +96,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 
     if (num_gauges > 0)
     {
+        fclaw_gauge_t *gauges = gauge_acc->gauges;
         fclaw_create_gauge_files(glob,gauges,num_gauges);    
 
         /* ------------------------------------------------------------------
@@ -321,16 +324,13 @@ void fclaw_locate_gauges(fclaw2d_global_t *glob)
 static
 void gauge_finalize(fclaw2d_global_t *glob, void** acc)
 {
-    int i;
-    fclaw_gauge_t *g;
-
     /* Clean up gauges and print anything left over in buffers */
     fclaw_gauge_acc_t* gauge_acc = *((fclaw_gauge_acc_t**) acc);
     fclaw_gauge_t *gauges = gauge_acc->gauges;
 
-    for(i = 0; i < gauge_acc->num_gauges; i++)
+    for(int i = 0; i < gauge_acc->num_gauges; i++)
     {
-        g = &gauges[i];
+        fclaw_gauge_t *g = &gauges[i];
 
         /* Every processor owns every gauge (which will scale up to a few 
         hundred gauges).  But we only want to print those gauge buffers that 

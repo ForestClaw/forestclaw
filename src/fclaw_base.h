@@ -60,6 +60,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sc_options.h>
 
+/* define F77 and FC name-mangling if autoconf fails to do so */
+#ifndef FCLAW_F77_FUNC
+#define FCLAW_F77_FUNC(name,NAME) name ## _
+#endif
+
+#ifndef FCLAW_F77_FUNC_
+#define FCLAW_F77_FUNC_(name,NAME) name ## _
+#endif
+
+#ifndef FCLAW_FC_FUNC
+#define FCLAW_FC_FUNC(name,NAME) name ## _
+#endif
+
+#ifndef FCLAW_FC_FUNC_
+#define FCLAW_FC_FUNC_(name,NAME) name ## _
+#endif
+
 /* start declarations */
 
 #ifdef __cplusplus

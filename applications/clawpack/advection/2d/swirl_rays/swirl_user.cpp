@@ -43,12 +43,11 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
     SETPROB();
 }
 
+
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
-    
-    swirl_initialize_rays(glob);
 
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)

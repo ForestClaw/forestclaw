@@ -148,6 +148,8 @@ struct fclaw_options
     int output_gauges;
     int gauge_buffer_length;       
 
+    int output_rays;
+
     /* Mapping functions */
     int manifold;
     int mi;
