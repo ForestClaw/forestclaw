@@ -53,6 +53,23 @@ typedef struct fclaw3d_global_iterate fclaw3d_global_iterate_t;
 
 struct fclaw3d_global
 {
+
+    /* Time at start of each subcycled time step */
+    double curr_time;
+    double curr_dt;
+
+    sc_MPI_Comm mpicomm;
+    int mpisize;              /**< Size of communicator. */
+    int mpirank;              /**< Rank of this process in \b mpicomm. */
+
+    /** Solver packages for internal use. */
+    struct fclaw_package_container *pkg_container;
+
+    struct fclaw_pointer_map *vtables;    /**< Vtables */
+    struct fclaw_pointer_map *options;    /**< options */
+
+    struct fclaw3d_domain *domain;
+
     void *user;
 };
 
@@ -61,6 +78,30 @@ struct fclaw3d_global_iterate
     fclaw3d_global_t* glob;
     void* user;
 };
+
+
+
+
+void fclaw3d_global_iterate_level (fclaw3d_global_t * glob, int level,
+                                   fclaw3d_patch_callback_t pcb, void *user);
+
+void fclaw3d_global_iterate_patches (fclaw3d_global_t * glob,
+                                     fclaw3d_patch_callback_t pcb, void *user);
+
+void fclaw3d_global_iterate_families (fclaw3d_global_t * glob,
+                                      fclaw3d_patch_callback_t pcb, void *user);
+
+void fclaw3d_global_iterate_adapted (fclaw3d_global_t * glob,
+                                     struct fclaw3d_domain* new_domain,
+                                     fclaw3d_match_callback_t mcb, void *user);
+
+void fclaw3d_global_iterate_level_mthread (fclaw3d_global_t * glob, int level,
+                                           fclaw3d_patch_callback_t pcb, void *user);
+
+void fclaw3d_global_iterate_partitioned (fclaw3d_global_t * glob,
+                                         struct fclaw3d_domain * new_domain,
+                                         fclaw3d_transfer_callback_t tcb,
+                                         void *user);
 
 /**
  * @brief Store a glob variable in static memory

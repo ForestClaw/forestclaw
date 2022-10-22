@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #include <fclaw3d_defs.h>
 #include <fclaw3d_global.h>
+
+#include <fclaw3d_domain.h>
 #endif
 
 void
@@ -150,13 +152,15 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     FCLAW_FREE (glob);
 }
 
+#endif /* P4_TO_P8 */
+
 void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user)
 {
     fclaw2d_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_level(glob->domain, level, pcb, &g);
+    fclaw2d_domain_iterate_level (glob->domain, level, pcb, &g);
 }
 
 void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
@@ -165,7 +169,7 @@ void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
     fclaw2d_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_patches(glob->domain, pcb, &g);
+    fclaw2d_domain_iterate_patches (glob->domain, pcb, &g);
 }
 
 void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
@@ -174,7 +178,7 @@ void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
     fclaw2d_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_families(glob->domain, pcb, &g);
+    fclaw2d_domain_iterate_families (glob->domain, pcb, &g);
 }
 
 void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* new_domain,
@@ -183,7 +187,7 @@ void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* 
     fclaw2d_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_adapted(glob->domain, new_domain,mcb,&g);
+    fclaw2d_domain_iterate_adapted (glob->domain, new_domain,mcb,&g);
 }
 
 void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
@@ -192,7 +196,7 @@ void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
     fclaw2d_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_level_mthread(glob->domain, level,pcb,&g);
+    fclaw2d_domain_iterate_level_mthread (glob->domain, level,pcb,&g);
 }
 
 void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
@@ -225,5 +229,3 @@ fclaw2d_global_t* fclaw2d_global_get_global (void)
     FCLAW_ASSERT(fclaw2d_global_glob != NULL);
     return fclaw2d_global_glob;
 }
-
-#endif /* P4_TO_P8 */

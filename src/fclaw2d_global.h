@@ -60,7 +60,7 @@ struct fclaw2d_global
     int count_ghost_exchange;
     int count_amr_regrid;
     int count_amr_new_domain;
-    int count_single_step;    
+    int count_single_step;
     int count_elliptic_grids;
     int count_multiproc_corner;
     int count_grids_per_proc;
@@ -75,12 +75,13 @@ struct fclaw2d_global
     sc_MPI_Comm mpicomm;
     int mpisize;              /**< Size of communicator. */
     int mpirank;              /**< Rank of this process in \b mpicomm. */
- 
-    struct fclaw_package_container *pkg_container;    /**< Solver packages for internal use. */
+
+    /** Solver packages for internal use. */
+    struct fclaw_package_container *pkg_container;
 
     struct fclaw_pointer_map *vtables;    /**< Vtables */
     struct fclaw_pointer_map *options;    /**< options */
- 
+
     struct fclaw2d_map_context* cont;
     struct fclaw2d_domain *domain;
 
@@ -128,7 +129,7 @@ void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
 void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
                                       fclaw2d_patch_callback_t pcb, void *user);
 
-void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, 
+void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob,
                                      struct fclaw2d_domain* new_domain,
                                      fclaw2d_match_callback_t mcb, void *user);
 

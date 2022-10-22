@@ -137,8 +137,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_list_adapted     fclaw3d_domain_list_adapted
 #define fclaw2d_domain_search_points    fclaw3d_domain_search_points
 #define fclaw2d_domain_iterate_cb       fclaw3d_domain_iterate_cb
+#define fclaw2d_domain_iterate_level_mthread fclaw3d_domain_iterate_level_mthread
 #define fclaw_domain_new2d              fclaw_domain_new3d
 #define fclaw_domain_destroy2d          fclaw_domain_destroy3d
+
+/* translations for the global data structure */
 
 #define fclaw2d_iterate_patch_cb        fclaw3d_iterate_patch_cb
 #define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
@@ -146,6 +149,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define fclaw2d_global_t                fclaw3d_global_t
 #define fclaw2d_global_iterate_t        fclaw3d_global_iterate_t
+
+#define fclaw2d_global_iterate_level    fclaw3d_global_iterate_level
+#define fclaw2d_global_iterate_patches  fclaw3d_global_iterate_patches
+#define fclaw2d_global_iterate_families fclaw3d_global_iterate_families
+#define fclaw2d_global_iterate_adapted  fclaw3d_global_iterate_adapted
+#define fclaw2d_global_iterate_level_mthread fclaw3d_global_iterate_level_mthread
+#define fclaw2d_global_iterate_partitioned fclaw3d_global_iterate_partitioned
+
 #define fclaw2d_global_set_global       fclaw3d_global_set_global
 #define fclaw2d_global_unset_global     fclaw3d_global_unset_global
 #define fclaw2d_global_get_global       fclaw3d_global_get_global
