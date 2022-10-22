@@ -46,6 +46,9 @@ include applications/clawpack/advection/2d/sphere/Makefile.am
 ## swirl  (single block, square)
 include applications/clawpack/advection/2d/swirl/Makefile.am
 
+## swirl_rays (single block, square)
+include applications/clawpack/advection/2d/swirl_rays/Makefile.am
+
 ## torus  (manifold, periodic in both directions)
 include applications/clawpack/advection/2d/torus/Makefile.am
 
