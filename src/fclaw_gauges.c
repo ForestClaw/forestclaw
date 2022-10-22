@@ -96,7 +96,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 
     if (num_gauges > 0)
     {
-        fclaw_gauge_t *gauges = gauge_acc->gauges;
+        gauges = gauge_acc->gauges;
         fclaw_create_gauge_files(glob,gauges,num_gauges);    
 
         /* ------------------------------------------------------------------
