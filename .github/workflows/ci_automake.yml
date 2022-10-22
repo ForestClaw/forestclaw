@@ -1,14 +1,23 @@
 name: CI for Automake
 on:
   push:
+    paths-ignore:
+      - "**/CMakeLists.txt"
+      - "**.cmake"
+      - "**.cmake.in"
+      - "cmake/**"
+      - "CMake*"
+      - ".github/workflows/ci_cmake.yml"
   pull_request:
   release:
     types: [published]
+
 env:
   CFLAGS: -lgfortran
   CXXFLAGS: -lgfortran --std=c++17
   FCFLAGS: -lgfortran -cpp
   FFLAGS: -lgfortran -cpp
+
 jobs:
   linux:
     runs-on: ubuntu-20.04
@@ -111,11 +120,15 @@ jobs:
       run: cat config.log
 
     - name: Build
-      run: make
+      run: |
+       export V=0
+       make -j -C sc
+       make -j -C p4est
+       make -j || make -j || make -j || make -j || make -j
 
     - name: Tests
       if: ${{ !matrix.cuda }}
-      run: make check
+      run: make -j check V=0
 
     - name: Print Test log
       if: ${{ failure() }}
@@ -125,4 +138,4 @@ jobs:
        cat test-suite.log
 
     - name: Install
-      run: sudo make install
+      run: sudo make -j install V=0
