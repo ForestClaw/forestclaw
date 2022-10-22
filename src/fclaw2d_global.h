@@ -60,7 +60,7 @@ struct fclaw2d_global
     int count_ghost_exchange;
     int count_amr_regrid;
     int count_amr_new_domain;
-    int count_single_step;    
+    int count_single_step;
     int count_elliptic_grids;
     int count_multiproc_corner;
     int count_grids_per_proc;
@@ -75,12 +75,13 @@ struct fclaw2d_global
     sc_MPI_Comm mpicomm;
     int mpisize;              /**< Size of communicator. */
     int mpirank;              /**< Rank of this process in \b mpicomm. */
- 
-    struct fclaw_package_container *pkg_container;    /**< Solver packages for internal use. */
+
+    /** Solver packages for internal use. */
+    struct fclaw_package_container *pkg_container;
 
     struct fclaw_pointer_map *vtables;    /**< Vtables */
     struct fclaw_pointer_map *options;    /**< options */
- 
+
     struct fclaw2d_map_context* cont;
     struct fclaw2d_domain *domain;
 
@@ -93,7 +94,6 @@ struct fclaw2d_global_iterate
 {
     fclaw2d_global_t* glob;
     void* user;
-
 };
 
 /* Use forward references here, since this file gets included everywhere */
@@ -102,11 +102,7 @@ struct fclaw2d_map_context;
 struct fclaw_package_container;
 struct fclaw2d_diagnostics_accumulator;
 
-/** Allocate a new global structure.
- * \param [in] gparms           If not NULL, we borrow this gparms pointer.
- *                              If NULL, we allocate gparms ourselves.
- */
-
+/** Allocate a new global structure. */
 fclaw2d_global_t* fclaw2d_global_new (void);
 
 fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
@@ -129,7 +125,7 @@ void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
 void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
                                       fclaw2d_patch_callback_t pcb, void *user);
 
-void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, 
+void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob,
                                      struct fclaw2d_domain* new_domain,
                                      fclaw2d_match_callback_t mcb, void *user);
 
@@ -142,24 +138,23 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
                                          void *user);
 
 /**
- * @brief Store a glob variable
- * 
+ * @brief Store a glob variable in static memory
+ *
  * @param glob the glob variable
  */
-void fclaw2d_global_set_global(fclaw2d_global_t* glob);
+void fclaw2d_global_set_global (fclaw2d_global_t* glob);
 
 /**
- * @brief Set the global glob the NULL
+ * @brief Set the static glob variable to NULL
  */
-void fclaw2d_global_unset_global();
+void fclaw2d_global_unset_global (void);
 
 /**
- * @brief Get the global glob variable
- * 
+ * @brief Get the static glob variable
+ *
  * @return fclaw2d_global_t* the glob variable
  */
-fclaw2d_global_t* fclaw2d_global_get_global();
-
+fclaw2d_global_t* fclaw2d_global_get_global (void);
 
 #ifdef __cplusplus
 #if 0
