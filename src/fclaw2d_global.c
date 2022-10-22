@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_global.h>
 
 #include <fclaw3d_domain.h>
+/* figure out dimension-independent diagnostics */
+#include <fclaw3d_map.h>
 #endif
 
 void
@@ -71,11 +73,7 @@ fclaw2d_iterate_family_cb
   gi->gfcb (gi->glob, family, blockno, patchno, gi->user);
 }
 
-#ifndef P4_TO_P8
-
-/* we're holding back with 3d counterparts
-   since much of this will move into fclaw_global.c */
-/* below follows the previous code unchanged */
+/* much of this will eventually move into fclaw_global.c */
 
 fclaw2d_global_t* fclaw2d_global_new (void)
 {
@@ -98,7 +96,11 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     glob->count_elliptic_grids = 0;
     glob->curr_time = 0;
     glob->cont = NULL;
-    glob->acc = FCLAW_ALLOC(fclaw2d_diagnostics_accumulator_t, 1);
+
+#ifndef P4_TO_P8
+    /* think about how this can work independent of dimension */
+    glob->acc = FCLAW_ALLOC (fclaw2d_diagnostics_accumulator_t, 1);
+#endif /* P4_TO_P8 */
 
     return glob;
 }
@@ -134,7 +136,7 @@ fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
 
 void
 fclaw2d_global_store_map (fclaw2d_global_t* glob,
-                          struct fclaw2d_map_context * map)
+                          fclaw2d_map_context_t * map)
 {
     glob->cont = map;
 }
@@ -148,11 +150,11 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     fclaw_pointer_map_destroy (glob->vtables);
     fclaw_pointer_map_destroy (glob->options);
 
+#ifndef P4_TO_P8
     FCLAW_FREE (glob->acc);
+#endif
     FCLAW_FREE (glob);
 }
-
-#endif /* P4_TO_P8 */
 
 void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user)

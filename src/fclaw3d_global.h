@@ -26,7 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW3D_GLOBAL_H
 #define FCLAW3D_GLOBAL_H
 
-#include <forestclaw3d.h>       /* Needed to declare callbacks (below) */
+#include <forestclaw3d.h>  /* Needed to declare callbacks (below) */
+#include <fclaw3d_map.h>   /* Needed to store the map context */
+
+#include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
 
 #ifdef __cplusplus
 extern "C"
@@ -53,6 +56,17 @@ typedef struct fclaw3d_global_iterate fclaw3d_global_iterate_t;
 
 struct fclaw3d_global
 {
+    int count_amr_advance;
+    int count_ghost_exchange;
+    int count_amr_regrid;
+    int count_amr_new_domain;
+    int count_single_step;
+    int count_elliptic_grids;
+    int count_multiproc_corner;
+    int count_grids_per_proc;
+    int count_grids_remote_boundary;
+    int count_grids_local_boundary;
+    fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
 
     /* Time at start of each subcycled time step */
     double curr_time;
@@ -68,7 +82,12 @@ struct fclaw3d_global
     struct fclaw_pointer_map *vtables;    /**< Vtables */
     struct fclaw_pointer_map *options;    /**< options */
 
+    struct fclaw3d_map_context* cont;
     struct fclaw3d_domain *domain;
+
+#if 0
+    struct fclaw3d_diagnostics_accumulator *acc;
+#endif
 
     void *user;
 };
@@ -79,8 +98,19 @@ struct fclaw3d_global_iterate
     void* user;
 };
 
+/** Allocate a new global structure. */
+fclaw3d_global_t* fclaw3d_global_new (void);
 
+fclaw3d_global_t* fclaw3d_global_new_comm (sc_MPI_Comm mpicomm,
+                                           int mpisize, int mpirank);
 
+void fclaw3d_global_destroy (fclaw3d_global_t * glob);
+
+void fclaw3d_global_store_domain (fclaw3d_global_t* glob,
+                                  struct fclaw3d_domain* domain);
+
+void fclaw3d_global_store_map (fclaw3d_global_t* glob,
+                               fclaw3d_map_context_t * map);
 
 void fclaw3d_global_iterate_level (fclaw3d_global_t * glob, int level,
                                    fclaw3d_patch_callback_t pcb, void *user);

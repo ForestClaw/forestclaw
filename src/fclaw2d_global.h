@@ -102,11 +102,7 @@ struct fclaw2d_map_context;
 struct fclaw_package_container;
 struct fclaw2d_diagnostics_accumulator;
 
-/** Allocate a new global structure.
- * \param [in] gparms           If not NULL, we borrow this gparms pointer.
- *                              If NULL, we allocate gparms ourselves.
- */
-
+/** Allocate a new global structure. */
 fclaw2d_global_t* fclaw2d_global_new (void);
 
 fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
