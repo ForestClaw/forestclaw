@@ -311,10 +311,3 @@ void* fclaw2d_ray_get_ray(fclaw2d_ray_t *r,
     return r->ray_data;
 }
 
-
-#ifdef __cplusplus
-}
-#endif
-
-
-

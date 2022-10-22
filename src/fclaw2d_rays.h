@@ -133,6 +133,8 @@ fclaw2d_ray_t* fclaw2d_ray_allocate_rays(int num_rays);
 int fclaw2d_ray_deallocate_rays(fclaw2d_ray_t **rays);
 
 
+#endif
 
-
+#ifdef __cplusplus
+}
 #endif
