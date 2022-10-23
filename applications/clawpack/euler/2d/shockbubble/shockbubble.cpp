@@ -36,13 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-
 static
 void store_domain_map (fclaw2d_global_t *glob,
                        fclaw_options_t *fclaw_opt)
 {
     /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain = NULL;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
@@ -53,18 +51,15 @@ void store_domain_map (fclaw2d_global_t *glob,
     a = fclaw_opt->periodic_x;
     b = fclaw_opt->periodic_y;
 
-    /* The p4est connectivity is used for both domain and mapping context */
-    conn = p4est_connectivity_new_brick (mi,mj,a,b);
-
     /* Construct and store domain */
-    domain = fclaw2d_domain_new_conn (glob->mpicomm,
-                                      fclaw_opt->minlevel, conn);
+    domain = fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+                                      fclaw_opt->minlevel);
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
     fclaw2d_global_store_domain (glob, domain);
 
     /* Construct and store map */
-    brick = fclaw2d_map_new_brick (conn, mi, mj);
+    brick = fclaw2d_map_new_brick_domain (domain, mi, mj);
     cont = fclaw2d_map_new_nomap_brick (brick);
     fclaw2d_global_store_map (glob, cont);
 }
