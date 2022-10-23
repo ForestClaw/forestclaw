@@ -80,6 +80,12 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     fclaw2d_global_t *glob;
 
     glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
+
+    /* these variables need to be set after calling this function */
+    glob->mpicomm = sc_MPI_COMM_NULL;
+    glob->mpisize = 0;
+    glob->mpirank = -1;
+
     glob->pkg_container = fclaw_package_container_new ();
     glob->vtables = fclaw_pointer_map_new ();
     glob->options = fclaw_pointer_map_new ();
@@ -110,6 +116,11 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
 {
     fclaw2d_global_t *glob = fclaw2d_global_new ();
 
+    /*
+     * Set the communicator.
+     * With the current code, overridden by fclaw2d_global_store_domain.
+     * Maybe we should streamline this in the future.
+     */
     glob->mpicomm = mpicomm;
     glob->mpisize = mpisize;
     glob->mpirank = mpirank;
@@ -121,6 +132,13 @@ void
 fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
 {
     glob->domain = domain;
+
+    /* this is redundant if global has been created with a communicator */
+    if (glob->mpisize > 0) {
+        /* double-check for extra paranoia */
+        FCLAW_ASSERT (glob->mpisize == domain->mpisize);
+        FCLAW_ASSERT (glob->mpirank == domain->mpirank);
+    }
     glob->mpicomm = domain->mpicomm;
     glob->mpisize = domain->mpisize;
     glob->mpirank = domain->mpirank;
