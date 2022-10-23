@@ -28,6 +28,8 @@
 
 #include "../all/advection_user.h"
 
+#define STAR_OF_RAYS
+
 typedef enum
 {
     SWIRL_RAY_LINE,
@@ -54,10 +56,10 @@ typedef struct swirl_ray
 }
 swirl_ray_t;
 
-#if 0
-const int swirl_nlines = 3;
-#else
+#ifdef STAR_OF_RAYS
 const int swirl_nlines = 8;
+#else
+const int swirl_nlines = 3;
 #endif
 
 /* Virtual function for setting rays */
@@ -79,7 +81,14 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
         swirl_ray_t *sr = (swirl_ray_t*) FCLAW_ALLOC(swirl_ray_t,1);
         sr->rtype = SWIRL_RAY_LINE;
 
-#if 0
+#ifdef STAR_OF_RAYS
+        sr->xy[0] = 0.5;
+        sr->xy[1] = 0.5;
+        /* we add 0.1, since the intersection callback does not guarantee exact
+         * results for axis-parallel rays */
+        sr->r.line.vec[0] = cos ((i + 0.1) * 2 * M_PI / swirl_nlines);
+        sr->r.line.vec[1] = sin ((i + 0.1) * M_PI / swirl_nlines);
+#else
         /* End points are on a semi-circle in x>0,y>0 quad */
         FCLAW_ASSERT(swirl_nlines >= 2);
         sr->xy[0] = 0; //-0.1;
@@ -88,13 +97,7 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
         double dth = M_PI/(2*swirl_nlines);
         sr->r.line.vec[0] = R*cos ((i+0.5) * dth);
         sr->r.line.vec[1] = R*sin ((i+0.5) * dth);
-#else
-        sr->xy[0] = 0.5;
-        sr->xy[1] = 0.5;
-        /* we add 0.1, since the intersection callback does not guarantee exact
-         * results for axis-parallel rays */
-        sr->r.line.vec[0] = cos ((i + 0.1) * 2 * M_PI / swirl_nlines);
-        sr->r.line.vec[1] = sin ((i + 0.1) * M_PI / swirl_nlines);
+
 #endif
 
         fclaw2d_ray_t *ray = &ray_vec[i];
