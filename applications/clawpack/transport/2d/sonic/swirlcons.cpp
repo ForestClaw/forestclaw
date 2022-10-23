@@ -38,8 +38,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
                                 user_options_t *user)
 {
     /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    fclaw2d_domain_t         *domain = NULL;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     int mi = fclaw_opt->mi;
@@ -54,43 +53,46 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
     switch (user->mapping) {
     case 0:
         /* Square brick domain */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_nomap_brick(brick);
+
+        domain = fclaw2d_domain_new_brick (mpicomm, mi, mj, a, b,
+                                           fclaw_opt->minlevel);
+        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+        cont = fclaw2d_map_new_nomap_brick (brick);
         break;
 
     case 1:
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_cart(brick,fclaw_opt->scale,
-                                    fclaw_opt->shift,
-                                    rotate);
+        domain = fclaw2d_domain_new_brick (mpicomm, mi, mj, a, b,
+                                           fclaw_opt->minlevel);
+        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+        cont = fclaw2d_map_new_cart (brick, fclaw_opt->scale,
+                                     fclaw_opt->shift,
+                                     rotate);
         break;
-        
+
     case 2:
         /* Five patch square domain */
-        conn = p4est_connectivity_new_disk (1,1);
-        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,fclaw_opt->shift,
-                                          rotate,user->alpha);
+        domain = fclaw2d_domain_new_disk (mpicomm, 1, 1, fclaw_opt->minlevel);
+        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale, fclaw_opt->shift,
+                                          rotate, user->alpha);
         break;
 
     case 3:
         /* bilinear square domain */
-        conn = p4est_connectivity_new_brick (mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
-        cont = fclaw2d_map_new_bilinear (brick, fclaw_opt->scale,fclaw_opt->shift,
-                                          rotate,user->center);
+        domain = fclaw2d_domain_new_brick (mpicomm, mi, mj, a, b,
+                                           fclaw_opt->minlevel);
+        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+        cont = fclaw2d_map_new_bilinear (brick, fclaw_opt->scale, fclaw_opt->shift,
+                                         rotate, user->center);
         break;
 
     default:
         SC_ABORT_NOT_REACHED ();
     }
 
-
-    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
-    return domain;
+    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw2d_global_store_domain (glob, domain);
+    fclaw2d_global_store_map (glob, cont);
 }
 
 static
@@ -144,7 +146,7 @@ main (int argc, char **argv)
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
-    user_opt =                swirlcons_options_register(app,               "fclaw_options.ini");  
+    user_opt =                swirlcons_options_register(app,               "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -158,7 +160,7 @@ main (int argc, char **argv)
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
         domain = create_domain(mpicomm, fclaw_opt,user_opt);
-    
+
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();
         fclaw2d_global_store_domain(glob, domain);
@@ -171,9 +173,9 @@ main (int argc, char **argv)
 
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);        
+        fclaw2d_global_destroy(glob);
     }
-    
+
     fclaw_app_destroy (app);
 
     return 0;

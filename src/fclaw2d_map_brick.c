@@ -88,9 +88,8 @@ void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont)
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
-                                             int mi,
-                                             int mj)
+fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
+  (p4est_connectivity_t *conn, int mi, int mj)
 {
     fclaw2d_map_context_t *cont;
     fclaw2d_block_ll_t *bv;
@@ -135,8 +134,8 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
 }
 
 fclaw2d_map_context_t*
-fclaw2d_map_new_brick_domain (fclaw2d_domain_t *domain,
-                              int mi, int mj, int periodic_i, int periodic_j)
+fclaw2d_map_new_brick (fclaw2d_domain_t *domain,
+                       int mi, int mj, int periodic_i, int periodic_j)
 {
     fclaw2d_map_context_t *cont;
     fclaw2d_block_ll_t *bv;

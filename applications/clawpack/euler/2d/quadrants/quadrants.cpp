@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 
 static
-void store_domain_map (fclaw2d_global_t *glob,
-                       fclaw_options_t* fclaw_opt)
+void create_domain_map (fclaw2d_global_t *glob,
+                        fclaw_options_t* fclaw_opt)
 {
     fclaw2d_domain_t         *domain;
     domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
@@ -128,7 +128,7 @@ main (int argc, char **argv)
         int size, rank;
         mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
         glob = fclaw2d_global_new_comm (mpicomm, size, rank);
-        store_domain_map (glob, fclaw_opt);
+        create_domain_map (glob, fclaw_opt);
 
          /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);

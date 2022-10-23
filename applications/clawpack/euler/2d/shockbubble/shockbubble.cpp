@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 
 static
-void store_domain_map (fclaw2d_global_t *glob,
-                       fclaw_options_t *fclaw_opt)
+void create_domain_map (fclaw2d_global_t *glob,
+                        fclaw_options_t *fclaw_opt)
 {
     /* Mapped, multi-block domain */
     fclaw2d_domain_t         *domain = NULL;
@@ -59,7 +59,7 @@ void store_domain_map (fclaw2d_global_t *glob,
     fclaw2d_global_store_domain (glob, domain);
 
     /* Construct and store map */
-    brick = fclaw2d_map_new_brick_domain (domain, mi, mj, a, b);
+    brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
     cont = fclaw2d_map_new_nomap_brick (brick);
     fclaw2d_global_store_map (glob, cont);
 }
@@ -138,8 +138,7 @@ main (int argc, char **argv)
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
         fclaw2d_global_t * glob = fclaw2d_global_new_comm (mpicomm, size, rank);
-
-        store_domain_map (glob, fclaw_opt);
+        create_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);

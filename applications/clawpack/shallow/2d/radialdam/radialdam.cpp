@@ -26,8 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "radialdam_user.h"
 
 static
-void store_domain_map (fclaw2d_global_t *glob,
-                       fclaw_options_t *fclaw_opt, user_options_t *user)
+void create_domain_map (fclaw2d_global_t *glob,
+                        fclaw_options_t *fclaw_opt, user_options_t *user)
 {
     /* Mapped, multi-block domain */
     fclaw2d_domain_t         *domain = NULL;
@@ -155,7 +155,7 @@ main (int argc, char **argv)
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
         fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
-        store_domain_map (glob, fclaw_opt, user_opt);
+        create_domain_map (glob, fclaw_opt, user_opt);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
