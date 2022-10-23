@@ -59,7 +59,7 @@ void store_domain_map (fclaw2d_global_t *glob,
     fclaw2d_global_store_domain (glob, domain);
 
     /* Construct and store map */
-    brick = fclaw2d_map_new_brick_domain (domain, mi, mj);
+    brick = fclaw2d_map_new_brick_domain (domain, mi, mj, a, b);
     cont = fclaw2d_map_new_nomap_brick (brick);
     fclaw2d_global_store_map (glob, cont);
 }

@@ -66,7 +66,8 @@ typedef struct fclaw2d_block_ll
 } fclaw2d_block_ll_t;
 
 struct fclaw2d_map_context*
-fclaw2d_map_new_brick_domain (fclaw2d_domain_t *domain, int mi, int mj);
+fclaw2d_map_new_brick_domain (fclaw2d_domain_t *domain,
+                              int mi, int mj, int periodic_i, int periodic_j);
 
 void fclaw2d_map_destroy_brick(struct fclaw2d_map_context *cont);
 
