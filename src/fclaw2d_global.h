@@ -142,7 +142,7 @@ size_t fclaw2d_global_packsize(const fclaw2d_global_t * glob);
  * @param glob newly create global structure
  * @return size_t number of bytes read
  */
-size_t fclaw2d_global_unpack(const char* buffer, fclaw2d_global_t** glob);
+size_t fclaw2d_global_unpack(char* buffer, fclaw2d_global_t** glob);
 
 
 void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,

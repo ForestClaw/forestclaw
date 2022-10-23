@@ -23,67 +23,122 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw_base.h"
 #include "fclaw_timer.h"
+
+#include <fclaw_pointer_map.h>
+#include <fclaw_packing.h>
+
 #include <fclaw2d_global.h>
 #include <test.hpp>
 
-TEST_CASE("fclaw2d_global_serialize"){
-	for(int count_amr_advance : {1, 2})
-	for(int count_ghost_exchange : {1, 2})
-	for(int count_amr_regrid : {1, 2})
-	for(int count_amr_new_domain : {1, 2})
-	for(int count_single_step : {1, 2})
-	for(int count_elliptic_grids : {1, 2})
-	for(int count_multiproc_corner : {1, 2})
-	for(int count_grids_per_proc : {1, 2})
-	for(int count_grids_remote_boundary : {1, 2})
-	for(int count_grids_local_boundary : {1, 2})
+TEST_CASE("fclaw2d_global_pack with no options")
+{
+
 	for(double curr_time : {1.0, 1.2})
 	for(double curr_dt : {1.0, 1.2})
-	for(int timer_to_set : {1, 2})
 	{
 		fclaw2d_global_t* glob1;
-    	glob1 = FCLAW_ALLOC_ZERO (fclaw2d_global_t, 1);
-		glob1->count_amr_advance            = count_amr_advance;
-		glob1->count_ghost_exchange         = count_ghost_exchange;
-		glob1->count_amr_regrid             = count_amr_regrid;
-		glob1->count_amr_new_domain         = count_amr_new_domain;
-		glob1->count_single_step            = count_single_step;
-		glob1->count_elliptic_grids         = count_elliptic_grids;
-		glob1->count_multiproc_corner       = count_multiproc_corner;
-		glob1->count_grids_per_proc         = count_grids_per_proc;
-		glob1->count_grids_remote_boundary  = count_grids_remote_boundary;
-		glob1->count_grids_local_boundary   = count_grids_local_boundary;
+    	glob1 = fclaw2d_global_new();
 		glob1->curr_time                    = curr_time;
 		glob1->curr_dt                      = curr_dt;
-		glob1->timers[timer_to_set].started = 1;
 
 		size_t packsize = fclaw2d_global_packsize(glob1);
+
+		REQUIRE_GT(packsize, 0);
+
 		char buffer[packsize];
-		int bytes_written = fclaw2d_global_pack(glob1, buffer);
+
+		size_t bytes_written = fclaw2d_global_pack(glob1, buffer);
+
+		REQUIRE_EQ(bytes_written, packsize);
+
 		fclaw2d_global_t* glob2;
-		int bytes_read = fclaw2d_global_unpack(buffer, &glob2);
+		size_t bytes_read = fclaw2d_global_unpack(buffer, &glob2);
 
-		CHECK_EQ(bytes_read,                         bytes_written);
+		REQUIRE_EQ(bytes_read, packsize);
 
-		CHECK_EQ(glob1->count_amr_advance,           glob2->count_amr_advance);
-		CHECK_EQ(glob1->count_ghost_exchange,        glob2->count_ghost_exchange);
-		CHECK_EQ(glob1->count_amr_regrid,            glob2->count_amr_regrid);
-		CHECK_EQ(glob1->count_amr_new_domain,        glob2->count_amr_new_domain);
-		CHECK_EQ(glob1->count_single_step,           glob2->count_single_step);
-		CHECK_EQ(glob1->count_elliptic_grids,        glob2->count_elliptic_grids);
-		CHECK_EQ(glob1->count_multiproc_corner,      glob2->count_multiproc_corner);
-		CHECK_EQ(glob1->count_grids_per_proc,        glob2->count_grids_per_proc);
-		CHECK_EQ(glob1->count_grids_remote_boundary, glob2->count_grids_remote_boundary);
-		CHECK_EQ(glob1->count_grids_local_boundary,  glob2->count_grids_local_boundary);
-		CHECK_EQ(glob1->curr_time,                   glob2->curr_time);
-		CHECK_EQ(glob1->curr_dt,                     glob2->curr_dt);
-		for(int i = 0; i < FCLAW2D_TIMER_COUNT; i++){
-			CHECK_EQ(glob1->timers[i].cumulative, glob2->timers[i].cumulative);
-			CHECK_EQ(glob1->timers[i].running,    glob2->timers[i].running);
-			CHECK_EQ(glob1->timers[i].started,    glob2->timers[i].started);
-			CHECK_EQ(glob1->timers[i].stopped,    glob2->timers[i].stopped);
-		}
+		CHECK_EQ(glob1->curr_time, glob2->curr_time);
+		CHECK_EQ(glob1->curr_dt,   glob2->curr_dt);
+
+		CHECK_EQ(fclaw_pointer_map_size(glob1->options), 0);
+
+
+		fclaw2d_global_destroy(glob1);
+		fclaw2d_global_destroy(glob2);
+	}
+}
+
+namespace
+{
+
+size_t pack_dummy_options(void* user, char* buffer)
+{
+	//
+	return 0;
+};
+size_t unpack_dummy_options(char* buffer, void** user)
+{
+	//
+	return 0;
+};
+size_t packsize_dummy_options(void* user)
+{
+	//
+	return 0;
+};
+
+fclaw_userdata_vtable_t vt =
+{
+	pack_dummy_options,
+	unpack_dummy_options,
+	packsize_dummy_options
+};
+
+struct dummy_options
+{
+	size_t size;
+	char value;
+
+	dummy_options(size_t size_in, char value_in)
+		:size(size_in),value(value_in)
+	{
+		//nothing to do
+	}
+
+};
+
+}
+TEST_CASE("fclaw2d_global_pack with a single options structure")
+{
+
+	for(double curr_time : {1.0, 1.2})
+	for(double curr_dt : {1.0, 1.2})
+	{
+		fclaw2d_global_t* glob1;
+    	glob1 = fclaw2d_global_new();
+		glob1->curr_time                    = curr_time;
+		glob1->curr_dt                      = curr_dt;
+
+		size_t packsize = fclaw2d_global_packsize(glob1);
+
+		REQUIRE_GT(packsize, 0);
+
+		char buffer[packsize];
+
+		size_t bytes_written = fclaw2d_global_pack(glob1, buffer);
+
+		REQUIRE_EQ(bytes_written, packsize);
+
+		fclaw2d_global_t* glob2;
+		size_t bytes_read = fclaw2d_global_unpack(buffer, &glob2);
+
+		REQUIRE_EQ(bytes_read, packsize);
+
+		CHECK_EQ(glob1->curr_time, glob2->curr_time);
+		CHECK_EQ(glob1->curr_dt,   glob2->curr_dt);
+
+		CHECK_EQ(fclaw_pointer_map_size(glob1->options), 0);
 
 
 		fclaw2d_global_destroy(glob1);
@@ -108,15 +163,6 @@ TEST_CASE("fclaw2d_global_unset_global")
 #else
 	CHECK_EQ(fclaw2d_global_get_global(), nullptr);
 #endif
-}
-
-TEST_CASE("fclaw2d_global_packsize newly allocated glob"){
-
-	fclaw2d_global_t* glob = fclaw2d_global_new();
-
-	CHECK_EQ(fclaw2d_global_packsize(glob), sizeof(int)+2*sizeof(double));
-
-	fclaw2d_global_destroy(glob);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG

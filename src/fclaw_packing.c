@@ -30,6 +30,7 @@ size_t fclaw_pack_string(char * buffer, const char* string){
   //
   return 0;
 }
+
 size_t fclaw_pack_int(char * buffer, int value){
   *((int *) buffer) = value;
   return sizeof(int);
@@ -38,4 +39,24 @@ size_t fclaw_pack_int(char * buffer, int value){
 size_t fclaw_unpack_int(char * buffer, int* value){
   *value = *((int *) buffer);
   return sizeof(int);
+}
+
+size_t fclaw_pack_size_t(char * buffer, size_t value){
+  *((size_t *) buffer) = value;
+  return sizeof(size_t);
+}
+
+size_t fclaw_unpack_size_t(char * buffer, size_t* value){
+  *value = *((size_t *) buffer);
+  return sizeof(size_t);
+}
+
+size_t fclaw_pack_double(char * buffer, double value){
+  *((double *) buffer) = value;
+  return sizeof(double);
+}
+
+size_t fclaw_unpack_double(char * buffer, double* value){
+  *value = *((double *) buffer);
+  return sizeof(double);
 }

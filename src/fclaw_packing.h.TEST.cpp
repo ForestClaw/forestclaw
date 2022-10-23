@@ -41,3 +41,35 @@ TEST_CASE("fclaw_pack_int pack and unpack")
 		CHECK_EQ(value, unpacked_value);
 	}
 }
+
+TEST_CASE("fclaw_pack_size_t pack and unpack")
+{
+	char base_buffer[2*sizeof(size_t)];
+	for(char* buffer : {base_buffer,base_buffer+1,base_buffer+2})
+	for(size_t value : {1,0,2})
+	{
+
+		size_t unpacked_value;
+
+		CHECK_EQ(fclaw_pack_size_t(buffer,value), sizeof(size_t));
+		CHECK_EQ(fclaw_unpack_size_t(buffer,&unpacked_value), sizeof(size_t));
+
+		CHECK_EQ(value, unpacked_value);
+	}
+}
+
+TEST_CASE("fclaw_pack_double pack and unpack")
+{
+	char base_buffer[2*sizeof(double)];
+	for(char* buffer : {base_buffer,base_buffer+1,base_buffer+2})
+	for(double value : {-1.3,0.2,2.9})
+	{
+
+		double unpacked_value;
+
+		CHECK_EQ(fclaw_pack_double(buffer,value), sizeof(double));
+		CHECK_EQ(fclaw_unpack_double(buffer,&unpacked_value), sizeof(double));
+
+		CHECK_EQ(value, unpacked_value);
+	}
+}

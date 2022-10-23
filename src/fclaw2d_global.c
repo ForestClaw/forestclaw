@@ -136,11 +136,15 @@ size_t
 fclaw2d_global_pack(const fclaw2d_global_t * glob, char* buffer)
 {
     const char* buffer_start = buffer;
-    buffer += fclaw_pack_int(buffer,fclaw_pointer_map_size(glob->options));
-    fclaw_pointer_map_iterate(glob->options, pack_iterator_callback, &buffer);
 
-    memcpy(buffer, glob, sizeof(fclaw2d_global_t));
-    return (buffer-buffer_start)+sizeof(fclaw2d_global_t);
+    buffer += fclaw_pack_double(buffer,glob->curr_time);
+    buffer += fclaw_pack_double(buffer,glob->curr_dt);
+
+    buffer += fclaw_pack_size_t(buffer,fclaw_pointer_map_size(glob->options));
+
+    //fclaw_pointer_map_iterate(glob->options, pack_iterator_callback, &buffer);
+
+    return (buffer-buffer_start);
 }
 
 static void 
@@ -154,9 +158,9 @@ packsize_iterator_callback(const char* key, void* value, void* user)
 size_t 
 fclaw2d_global_packsize(const fclaw2d_global_t * glob)
 {
-    size_t options_size = sizeof(int);
-    fclaw_pointer_map_iterate(glob->options, packsize_iterator_callback, &options_size);
-    return sizeof(size_t) + options_size+sizeof(fclaw2d_global_t);
+    size_t options_size = sizeof(size_t);
+    //fclaw_pointer_map_iterate(glob->options, packsize_iterator_callback, &options_size);
+    return 2*sizeof(double) + options_size;
 }
 
 static void 
@@ -168,17 +172,19 @@ unpack_iterator_callback(const char* key, void* value, void* user)
 }
 
 size_t 
-fclaw2d_global_unpack(const char* buffer, fclaw2d_global_t ** glob_ptr)
+fclaw2d_global_unpack(char* buffer, fclaw2d_global_t ** glob_ptr)
 {
+    char* buffer_start = buffer;
 
 	fclaw2d_global_t* glob = fclaw2d_global_new();
+    *glob_ptr = glob;
 
-    *glob_ptr = FCLAW_ALLOC (fclaw2d_global_t, 1);
-    fclaw_pointer_map_t* options = fclaw_pointer_map_new();
-    
-    //
+    buffer += fclaw_unpack_double(buffer,&glob->curr_time);
+    buffer += fclaw_unpack_double(buffer,&glob->curr_dt);
+    size_t num_option_structs;
+    buffer += fclaw_unpack_size_t(buffer,&num_option_structs);
 
-    return sizeof(fclaw2d_global_t);
+    return buffer-buffer_start;
 }
 
 #endif
