@@ -359,11 +359,14 @@ fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
 }
 
 fclaw2d_domain_t *
-fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm, int initial_level)
+fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
+                         int periodic_in_x, int periodic_in_y,
+                         int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
     return fclaw2d_domain_new
-        (p4est_wrap_new_disk (mpicomm, 0, 0, initial_level), NULL);
+        (p4est_wrap_new_disk (mpicomm, periodic_in_x, periodic_in_y,
+                              initial_level), NULL);
 }
 
 #endif /* 0 */

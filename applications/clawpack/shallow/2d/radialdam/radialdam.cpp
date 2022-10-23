@@ -30,7 +30,6 @@ void store_domain_map (fclaw2d_global_t *glob,
                        fclaw_options_t *fclaw_opt, user_options_t *user)
 {
     /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain = NULL;
     fclaw2d_map_context_t    *cont = NULL;
 
@@ -44,31 +43,30 @@ void store_domain_map (fclaw2d_global_t *glob,
     {
     case 0:
         /* Use [ax,bx]x[ay,by] */
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_nomap();
+        domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
+        cont = fclaw2d_map_new_nomap ();
         break;
     case 1:
         /* Five patch square : maps to [-1,1]x[-1,1] */
-        conn = p4est_connectivity_new_disk (0,0);
+        domain = fclaw2d_domain_new_disk (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
         cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
                                           fclaw_opt->shift, user->alpha);
         break;
     case 2:
         /* Pillow disk (single block) */
-        conn = p4est_connectivity_new_unitsquare();
-        cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale,fclaw_opt->shift,rotate);
+        domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
+        cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale, fclaw_opt->shift,rotate);
         break;
     case 3:
         /* Pillow disk mapping of the five patch square */
-        conn = p4est_connectivity_new_disk(0, 0);
-        cont = fclaw2d_map_new_pillowdisk5(fclaw_opt->scale,fclaw_opt->shift,
-                                          rotate,user->alpha);
+        domain = fclaw2d_domain_new_disk (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
+        cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale, fclaw_opt->shift,
+                                            rotate,user->alpha);
         break;
     default:
         SC_ABORT_NOT_REACHED ();
     }
 
-    domain = fclaw2d_domain_new_conn (glob->mpicomm, fclaw_opt->minlevel, conn);
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
     fclaw2d_global_store_domain (glob, domain);
