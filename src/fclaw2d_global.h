@@ -56,6 +56,9 @@ typedef struct fclaw2d_global_iterate fclaw2d_global_iterate_t;
 
 struct fclaw2d_global
 {
+    /**
+     * @brief 
+     */
     int count_amr_advance;
     int count_ghost_exchange;
     int count_amr_regrid;

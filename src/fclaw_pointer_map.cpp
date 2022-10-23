@@ -75,3 +75,12 @@ void* fclaw_pointer_map_get(fclaw_pointer_map_t* map, const char* key)
     return map->map[key].pointer;
 }
 
+void fclaw_pointer_map_iterate(fclaw_pointer_map_t *map, fclaw_pointer_map_iterate_cb_t cb, void *user){
+    for(auto& pair: map->map){
+        cb(pair.first.c_str(),pair.second.pointer,user);
+    }
+}
+
+int fclaw_pointer_map_size(fclaw_pointer_map_t* map){
+    return map->map.size();
+}

@@ -6,6 +6,7 @@ add_library(forestclaw_c OBJECT
   fclaw_options.c
   fclaw_gauges.c
   fclaw_package.c
+  fclaw_packing.c
   fclaw_pointer_map.cpp
   fclaw_math.c
   fclaw_timer.c
@@ -111,6 +112,7 @@ install(FILES
   fclaw_base.h
 	fclaw_timer.h
 	fclaw_package.h
+	fclaw_packing.h
 	fclaw_pointer_map.h
 	fclaw_options.h
 	fclaw_gauges.h

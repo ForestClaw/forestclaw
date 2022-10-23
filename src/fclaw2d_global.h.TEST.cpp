@@ -110,6 +110,15 @@ TEST_CASE("fclaw2d_global_unset_global")
 #endif
 }
 
+TEST_CASE("fclaw2d_global_packsize newly allocated glob"){
+
+	fclaw2d_global_t* glob = fclaw2d_global_new();
+
+	CHECK_EQ(fclaw2d_global_packsize(glob), sizeof(int)+2*sizeof(double));
+
+	fclaw2d_global_destroy(glob);
+}
+
 #ifdef FCLAW_ENABLE_DEBUG
 
 TEST_CASE("fclaw2d_global_set_global twice fails")

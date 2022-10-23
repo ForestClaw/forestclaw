@@ -647,6 +647,15 @@ fclaw_app_get_options (fclaw_app_t * a)
     return a->opt;
 }
 
+void fclaw_app_options_store_vtable(const char*name,fclaw_userdata_vtable_t* vtable){
+    //
+}
+
+fclaw_userdata_vtable_t* fclaw_app_options_get_vtable(const char*name){
+    //
+    return NULL;
+}
+
 /*** which of the following do we need? ***/
 
 #if 0

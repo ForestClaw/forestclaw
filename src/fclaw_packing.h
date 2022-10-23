@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_SERIALIZATION_H
 #define FCLAW_SERIALIZATION_H
 
+#include <fclaw_base.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -41,22 +43,20 @@ extern "C"
  * @param userdata pointer to userdata
  * @param buffer buffer to pack into
  */
-typedef void (*fclaw_userdata_pack_t)(void* userdata,
+typedef size_t (*fclaw_userdata_pack_t)(void* userdata,
                                      char* buffer);
 /**
  * @brief Unpack userdata from buffer 
  * @param buffer buffer to unpack from
  * @return newly create userdata
  */
-typedef void* (*fclaw_userdata_unpack_t)(char* buffer);
+typedef size_t (*fclaw_userdata_unpack_t)(char* buffer,void**);
 /**
  * @brief Get the size needed to pack userdata
  * @return the size
  */
-typedef int (*fclaw_userdata_packsize_t)(void* userdata);
+typedef size_t (*fclaw_userdata_packsize_t)(void* userdata);
 
-
-typedef struct fclaw2d_global fclaw2d_global_t;
 
 typedef struct fclaw_userdata_vtable
 {
@@ -65,6 +65,9 @@ typedef struct fclaw_userdata_vtable
   fclaw_userdata_packsize_t size;
 } fclaw_useradata_vtable_t;
 
+size_t fclaw_pack_string(char * buffer, const char*);
+
+size_t fclaw_pack_int(char * buffer, int value);
 
 #ifdef __cplusplus
 #if 0

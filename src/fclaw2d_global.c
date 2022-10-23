@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_package.h>
 #include <fclaw_timer.h>
 #include <fclaw_pointer_map.h>
+#include <fclaw_packing.h>
 
 #ifndef P4_TO_P8
 #include <fclaw2d_defs.h>
@@ -119,29 +120,63 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
 
 #ifndef P4_TO_P8
 
+static void 
+pack_iterator_callback(const char* key, void* value, void* user)
+{
+    char** buffer_ptr = (char **) user;
+
+    *buffer_ptr += fclaw_pack_string(*buffer_ptr, key);
+
+    fclaw_userdata_vtable_t* vt = fclaw_app_options_get_vtable(key);
+
+    *buffer_ptr += vt->pack(value,*buffer_ptr);
+}
+
 size_t 
 fclaw2d_global_pack(const fclaw2d_global_t * glob, char* buffer)
 {
+    const char* buffer_start = buffer;
+    buffer += fclaw_pack_int(buffer,fclaw_pointer_map_size(glob->options));
+    fclaw_pointer_map_iterate(glob->options, pack_iterator_callback, &buffer);
+
     memcpy(buffer, glob, sizeof(fclaw2d_global_t));
-    return sizeof(fclaw2d_global_t);
+    return (buffer-buffer_start)+sizeof(fclaw2d_global_t);
+}
+
+static void 
+packsize_iterator_callback(const char* key, void* value, void* user)
+{
+    size_t* options_size = (size_t*) user;
+    fclaw_userdata_vtable_t* vt = fclaw_app_options_get_vtable(key);
+    (*options_size) += vt->size(value);
 }
 
 size_t 
 fclaw2d_global_packsize(const fclaw2d_global_t * glob)
 {
-    return sizeof(fclaw2d_global_t);
+    size_t options_size = sizeof(int);
+    fclaw_pointer_map_iterate(glob->options, packsize_iterator_callback, &options_size);
+    return sizeof(size_t) + options_size+sizeof(fclaw2d_global_t);
+}
+
+static void 
+unpack_iterator_callback(const char* key, void* value, void* user)
+{
+    size_t* options_size = (size_t*) user;
+    fclaw_userdata_vtable_t* vt = fclaw_app_options_get_vtable(key);
+    (*options_size) += vt->size(value);
 }
 
 size_t 
 fclaw2d_global_unpack(const char* buffer, fclaw2d_global_t ** glob_ptr)
 {
-    *glob_ptr = FCLAW_ALLOC (fclaw2d_global_t, 1);
 
-    memcpy(*glob_ptr, buffer, sizeof(fclaw2d_global_t));
-    (*glob_ptr)->pkg_container = NULL;
-    (*glob_ptr)->vtables = NULL;
-    (*glob_ptr)->options = NULL;
-    (*glob_ptr)->acc = NULL;
+	fclaw2d_global_t* glob = fclaw2d_global_new();
+
+    *glob_ptr = FCLAW_ALLOC (fclaw2d_global_t, 1);
+    fclaw_pointer_map_t* options = fclaw_pointer_map_new();
+    
+    //
 
     return sizeof(fclaw2d_global_t);
 }
