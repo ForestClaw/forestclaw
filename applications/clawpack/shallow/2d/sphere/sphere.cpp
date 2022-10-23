@@ -173,7 +173,7 @@ void run_program(fclaw_app_t* app)
     case 2:
         /* latlong */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
         cont = fclaw2d_map_new_latlong(brick,gparms->scale,
                                        user->latitude,user->longitude,a,b);
         break;
