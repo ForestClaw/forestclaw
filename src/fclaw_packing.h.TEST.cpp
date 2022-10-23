@@ -23,59 +23,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW_SERIALIZATION_H
-#define FCLAW_SERIALIZATION_H
+#include <fclaw_packing.h>
+#include <test.hpp>
 
-#include <fclaw_base.h>
-
-#ifdef __cplusplus
-extern "C"
+TEST_CASE("fclaw_pack_int pack and unpack")
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
+	char base_buffer[2*sizeof(int)];
+	for(char* buffer : {base_buffer,base_buffer+1,base_buffer+2})
+	for(int value : {-1,0,2})
+	{
 
-/* these are dimension-specific functions */
+		int unpacked_value;
 
-/**
- * @brief Pack userdata into a buffer
- * @param userdata pointer to userdata
- * @param buffer buffer to pack into
- */
-typedef size_t (*fclaw_userdata_pack_t)(void* userdata,
-                                     char* buffer);
-/**
- * @brief Unpack userdata from buffer 
- * @param buffer buffer to unpack from
- * @return newly create userdata
- */
-typedef size_t (*fclaw_userdata_unpack_t)(char* buffer,void**);
-/**
- * @brief Get the size needed to pack userdata
- * @return the size
- */
-typedef size_t (*fclaw_userdata_packsize_t)(void* userdata);
+		CHECK_EQ(fclaw_pack_int(buffer,value), sizeof(int));
+		CHECK_EQ(fclaw_unpack_int(buffer,&unpacked_value), sizeof(int));
 
-
-typedef struct fclaw_userdata_vtable
-{
-  fclaw_userdata_pack_t pack;
-  fclaw_userdata_pack_t unpack;
-  fclaw_userdata_packsize_t size;
-} fclaw_useradata_vtable_t;
-
-size_t fclaw_pack_string(char * buffer, const char*);
-
-size_t fclaw_pack_int(char * buffer, int value);
-
-size_t fclaw_unpack_int(char * buffer, int* value);
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
+		CHECK_EQ(value, unpacked_value);
+	}
 }
-#endif
-
-#endif /* !FCLAW2D_GLOBAL_H */

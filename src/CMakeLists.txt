@@ -172,6 +172,7 @@ install(TARGETS forestclaw
 if(BUILD_TESTING)
   add_executable(forestclaw.TEST
       fclaw_gauges.h.TEST.cpp
+      fclaw_packing.h.TEST.cpp
       fclaw_pointer_map.h.TEST.cpp
       fclaw2d_elliptic_solver.h.TEST.cpp
       fclaw2d_diagnostics.h.TEST.cpp

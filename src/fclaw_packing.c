@@ -31,6 +31,11 @@ size_t fclaw_pack_string(char * buffer, const char* string){
   return 0;
 }
 size_t fclaw_pack_int(char * buffer, int value){
-  //
+  *((int *) buffer) = value;
+  return sizeof(int);
+}
+
+size_t fclaw_unpack_int(char * buffer, int* value){
+  *value = *((int *) buffer);
   return sizeof(int);
 }
