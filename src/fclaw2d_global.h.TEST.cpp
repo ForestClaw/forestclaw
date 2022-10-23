@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_pointer_map.h>
 #include <fclaw_packing.h>
+#include <fclaw_base.h>
 
 #include <fclaw2d_global.h>
 #include <test.hpp>
@@ -61,7 +62,7 @@ TEST_CASE("fclaw2d_global_pack with no options")
 		CHECK_EQ(glob1->curr_time, glob2->curr_time);
 		CHECK_EQ(glob1->curr_dt,   glob2->curr_dt);
 
-		CHECK_EQ(fclaw_pointer_map_size(glob1->options), 0);
+		CHECK_EQ(fclaw_pointer_map_size(glob2->options), 0);
 
 
 		fclaw2d_global_destroy(glob1);
@@ -71,29 +72,6 @@ TEST_CASE("fclaw2d_global_pack with no options")
 
 namespace
 {
-
-size_t pack_dummy_options(void* user, char* buffer)
-{
-	//
-	return 0;
-};
-size_t unpack_dummy_options(char* buffer, void** user)
-{
-	//
-	return 0;
-};
-size_t packsize_dummy_options(void* user)
-{
-	//
-	return 0;
-};
-
-fclaw_userdata_vtable_t vt =
-{
-	pack_dummy_options,
-	unpack_dummy_options,
-	packsize_dummy_options
-};
 
 struct dummy_options
 {
@@ -105,8 +83,56 @@ struct dummy_options
 	{
 		//nothing to do
 	}
-
 };
+
+size_t pack_dummy_options(void* user, char* buffer)
+{
+	dummy_options* options = (dummy_options*) user;
+
+	char* buffer_start = buffer;
+	buffer += fclaw_pack_size_t(buffer, options->size);
+	for(size_t i = 0; i < options->size; i++){
+		buffer[i] = options->value;
+	}
+	buffer += options->size;
+
+	return buffer-buffer_start;
+};
+size_t unpack_dummy_options(char* buffer, void** user)
+{
+
+	char* buffer_start = buffer;
+
+	size_t size;
+	buffer += fclaw_unpack_size_t(buffer, &size);
+	char value = buffer[0];
+	for(size_t i = 1; i < size; i++){
+		CHECK_EQ(buffer[i],value);
+	}
+	buffer += size;
+
+	*user = new dummy_options(size,value);
+
+	return buffer-buffer_start;
+};
+size_t packsize_dummy_options(void* user)
+{
+	dummy_options* options = (dummy_options*) user;
+	return sizeof(size_t) + options->size;
+};
+
+fclaw_userdata_vtable_t dummy_opts_vt =
+{
+	pack_dummy_options,
+	unpack_dummy_options,
+	packsize_dummy_options
+};
+
+
+
+void destroy_dummy_options(void* user){
+	delete (dummy_options*) user;
+}
 
 }
 TEST_CASE("fclaw2d_global_pack with a single options structure")
@@ -124,6 +150,10 @@ TEST_CASE("fclaw2d_global_pack with a single options structure")
 
 		REQUIRE_GT(packsize, 0);
 
+		dummy_options* options = new dummy_options(20, 'a');
+		fclaw_app_options_store_vtable("dummy1",  &dummy_opts_vt);
+		fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
+
 		char buffer[packsize];
 
 		size_t bytes_written = fclaw2d_global_pack(glob1, buffer);
@@ -138,7 +168,14 @@ TEST_CASE("fclaw2d_global_pack with a single options structure")
 		CHECK_EQ(glob1->curr_time, glob2->curr_time);
 		CHECK_EQ(glob1->curr_dt,   glob2->curr_dt);
 
-		CHECK_EQ(fclaw_pointer_map_size(glob1->options), 0);
+		REQUIRE_EQ(fclaw_pointer_map_size(glob2->options), 1);
+
+		dummy_options* options_unpacked = (dummy_options*) fclaw_pointer_map_get(glob2->options, "dummy1");
+		REQUIRE(options_unpacked != nullptr);
+
+		CHECK_EQ(options_unpacked->size, options->size);
+		CHECK_EQ(options_unpacked->value, options->value);
+
 
 
 		fclaw2d_global_destroy(glob1);
