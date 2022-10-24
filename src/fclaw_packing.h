@@ -57,15 +57,24 @@ typedef size_t (*fclaw_userdata_unpack_t)(char* buffer,void**);
  */
 typedef size_t (*fclaw_userdata_packsize_t)(void* userdata);
 
+/**
+ * @brief destroy userdata
+ */
+typedef void (*fclaw_userdata_destroy_t)(void* value);
 
 typedef struct fclaw_userdata_vtable
 {
   fclaw_userdata_pack_t pack;
   fclaw_userdata_unpack_t unpack;
   fclaw_userdata_packsize_t size;
+  fclaw_userdata_destroy_t destroy;
 } fclaw_useradata_vtable_t;
 
+size_t fclaw_packsize_string(const char*);
+
 size_t fclaw_pack_string(char * buffer, const char*);
+
+size_t fclaw_unpack_string(char * buffer, char**);
 
 size_t fclaw_pack_int(char * buffer, int value);
 

@@ -73,3 +73,34 @@ TEST_CASE("fclaw_pack_double pack and unpack")
 		CHECK_EQ(value, unpacked_value);
 	}
 }
+TEST_CASE("fclaw_pack_string pack and unpack")
+{
+	char base_buffer[20];
+	for(char* buffer : {base_buffer,base_buffer+1,base_buffer+2})
+	for(const char* value : {"", "a", "abc"})
+	{
+		char* unpacked_value;
+
+		
+		CHECK_EQ(fclaw_packsize_string(value), sizeof(size_t)+1+strlen(value));
+		CHECK_EQ(fclaw_pack_string(buffer,value), sizeof(size_t)+1+strlen(value));
+		CHECK_EQ(fclaw_unpack_string(buffer,&unpacked_value), sizeof(size_t)+1+strlen(value));
+
+		CHECK_EQ(strcmp(value, unpacked_value), 0);
+		FCLAW_FREE(unpacked_value);
+	}
+}
+TEST_CASE("fclaw_pack_string pack and unpack NULL")
+{
+	char base_buffer[20];
+	for(char* buffer : {base_buffer,base_buffer+1,base_buffer+2})
+	{
+		char* unpacked_value;
+
+		CHECK_EQ(fclaw_packsize_string(NULL), sizeof(size_t));
+		CHECK_EQ(fclaw_pack_string(buffer,NULL), sizeof(size_t));
+		CHECK_EQ(fclaw_unpack_string(buffer,&unpacked_value), sizeof(size_t));
+
+		CHECK_EQ(unpacked_value, nullptr);
+	}
+}

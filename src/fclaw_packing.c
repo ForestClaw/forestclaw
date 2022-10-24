@@ -24,11 +24,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_packing.h>
+#include <fclaw_base.h>
 
+
+size_t fclaw_packsize_string(const char * string){
+  return sizeof(size_t) + (string == NULL ? 0 : strlen(string)+1);
+}
 
 size_t fclaw_pack_string(char * buffer, const char* string){
-  //
-  return 0;
+  char * buffer_start = buffer;
+  if(string == NULL){
+    buffer += fclaw_pack_size_t(buffer, 0);
+  }else{
+    size_t length = strlen(string)+1;
+    buffer += fclaw_pack_size_t(buffer, length);
+    memcpy(buffer,string,length);
+    buffer += length;
+  }
+  return buffer - buffer_start;
+}
+
+size_t fclaw_unpack_string(char * buffer, char** string){
+  char * buffer_start = buffer;
+  size_t length;
+  buffer += fclaw_unpack_size_t(buffer, &length);
+  if(length == 0){
+    *string = NULL;
+  }else{
+    *string = FCLAW_ALLOC(char,length);
+    memcpy(*string,buffer,length);
+    buffer += length;
+  }
+  return buffer - buffer_start;
 }
 
 size_t fclaw_pack_int(char * buffer, int value){

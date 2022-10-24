@@ -121,19 +121,52 @@ size_t packsize_dummy_options(void* user)
 	return sizeof(size_t) + options->size;
 };
 
-fclaw_userdata_vtable_t dummy_opts_vt =
-{
-	pack_dummy_options,
-	unpack_dummy_options,
-	packsize_dummy_options
-};
-
-
-
 void destroy_dummy_options(void* user){
 	delete (dummy_options*) user;
 }
 
+fclaw_userdata_vtable_t dummy_opts_vt =
+{
+	pack_dummy_options,
+	unpack_dummy_options,
+	packsize_dummy_options,
+	destroy_dummy_options
+};
+
+}
+TEST_CASE("fclaw2d_global_pack with no options structure")
+{
+
+	for(double curr_time : {1.0, 1.2})
+	for(double curr_dt : {1.0, 1.2})
+	{
+		fclaw2d_global_t* glob1;
+    	glob1 = fclaw2d_global_new();
+		glob1->curr_time                    = curr_time;
+		glob1->curr_dt                      = curr_dt;
+
+		size_t packsize = fclaw2d_global_packsize(glob1);
+		REQUIRE_GT(packsize, 0);
+
+		char buffer[packsize];
+
+		size_t bytes_written = fclaw2d_global_pack(glob1, buffer);
+
+		REQUIRE_EQ(bytes_written, packsize);
+
+		fclaw2d_global_t* glob2;
+		size_t bytes_read = fclaw2d_global_unpack(buffer, &glob2);
+
+		REQUIRE_EQ(bytes_read, packsize);
+
+		CHECK_EQ(glob1->curr_time, glob2->curr_time);
+		CHECK_EQ(glob1->curr_dt,   glob2->curr_dt);
+
+		REQUIRE_EQ(fclaw_pointer_map_size(glob2->options), 0);
+
+		fclaw2d_global_destroy(glob1);
+		fclaw2d_global_destroy(glob2);
+	}
 }
 TEST_CASE("fclaw2d_global_pack with a single options structure")
 {
@@ -146,13 +179,12 @@ TEST_CASE("fclaw2d_global_pack with a single options structure")
 		glob1->curr_time                    = curr_time;
 		glob1->curr_dt                      = curr_dt;
 
-		size_t packsize = fclaw2d_global_packsize(glob1);
-
-		REQUIRE_GT(packsize, 0);
-
 		dummy_options* options = new dummy_options(20, 'a');
 		fclaw_app_options_store_vtable("dummy1",  &dummy_opts_vt);
 		fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
+
+		size_t packsize = fclaw2d_global_packsize(glob1);
+		REQUIRE_GT(packsize, 0);
 
 		char buffer[packsize];
 
@@ -181,6 +213,114 @@ TEST_CASE("fclaw2d_global_pack with a single options structure")
 		fclaw2d_global_destroy(glob1);
 		fclaw2d_global_destroy(glob2);
 	}
+}
+TEST_CASE("fclaw2d_global_pack with two options structure")
+{
+
+	for(double curr_time : {1.0, 1.2})
+	for(double curr_dt : {1.0, 1.2})
+	{
+		fclaw2d_global_t* glob1;
+    	glob1 = fclaw2d_global_new();
+		glob1->curr_time                    = curr_time;
+		glob1->curr_dt                      = curr_dt;
+
+		dummy_options* options = new dummy_options(20, 'a');
+		dummy_options* options2 = new dummy_options(40, 'b');
+		fclaw_app_options_store_vtable("dummy1",  &dummy_opts_vt);
+		fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
+		fclaw_app_options_store_vtable("dummy2",  &dummy_opts_vt);
+		fclaw_pointer_map_insert(glob1->options, "dummy2", options2, destroy_dummy_options);
+
+		size_t packsize = fclaw2d_global_packsize(glob1);
+		REQUIRE_GT(packsize, 0);
+
+		char buffer[packsize];
+
+		size_t bytes_written = fclaw2d_global_pack(glob1, buffer);
+
+		REQUIRE_EQ(bytes_written, packsize);
+
+		fclaw2d_global_t* glob2;
+		size_t bytes_read = fclaw2d_global_unpack(buffer, &glob2);
+
+		REQUIRE_EQ(bytes_read, packsize);
+
+		CHECK_EQ(glob1->curr_time, glob2->curr_time);
+		CHECK_EQ(glob1->curr_dt,   glob2->curr_dt);
+
+		REQUIRE_EQ(fclaw_pointer_map_size(glob2->options), 2);
+
+		dummy_options* options_unpacked = (dummy_options*) fclaw_pointer_map_get(glob2->options, "dummy1");
+		dummy_options* options_unpacked2 = (dummy_options*) fclaw_pointer_map_get(glob2->options, "dummy2");
+		REQUIRE(options_unpacked != nullptr);
+		REQUIRE(options_unpacked2 != nullptr);
+
+		CHECK_EQ(options_unpacked->size, options->size);
+		CHECK_EQ(options_unpacked->value, options->value);
+
+		CHECK_EQ(options_unpacked2->size, options2->size);
+		CHECK_EQ(options_unpacked2->value, options2->value);
+
+		fclaw2d_global_destroy(glob1);
+		fclaw2d_global_destroy(glob2);
+	}
+}
+TEST_CASE("fclaw2d_global_pack aborts with unregistered vtable")
+{
+	fclaw2d_global_t* glob1;
+   	glob1 = fclaw2d_global_new();
+	glob1->curr_time                    = 100;
+	glob1->curr_dt                      = 200;
+
+	dummy_options* options = new dummy_options(20, 'a');
+	fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
+
+	char buffer[100];
+	CHECK_SC_ABORTED(fclaw2d_global_pack(glob1, buffer));
+
+	fclaw2d_global_destroy(glob1);
+}
+TEST_CASE("fclaw2d_global_packsize aborts with unregistered vtable")
+{
+	fclaw2d_global_t* glob1;
+   	glob1 = fclaw2d_global_new();
+	glob1->curr_time                    = 100;
+	glob1->curr_dt                      = 200;
+
+	dummy_options* options = new dummy_options(20, 'a');
+	fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
+
+	CHECK_SC_ABORTED(fclaw2d_global_packsize(glob1));
+
+	fclaw2d_global_destroy(glob1);
+}
+TEST_CASE("fclaw2d_global_unppack aborts with unregistered vtable")
+{
+	fclaw2d_global_t* glob1;
+   	glob1 = fclaw2d_global_new();
+	glob1->curr_time                    = 1;
+	glob1->curr_dt                      = 1;
+
+	dummy_options* options = new dummy_options(20, 'a');
+	fclaw_app_options_store_vtable("dummy1",  &dummy_opts_vt);
+	fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
+
+	size_t packsize = fclaw2d_global_packsize(glob1);
+	REQUIRE_GT(packsize, 0);
+
+	char buffer[packsize];
+
+	size_t bytes_written = fclaw2d_global_pack(glob1, buffer);
+
+	REQUIRE_EQ(bytes_written, packsize);
+
+	fclaw2d_global_t* glob2=nullptr;
+	fclaw_app_options_store_vtable("dummy1",  nullptr);
+	CHECK_SC_ABORTED(fclaw2d_global_unpack(buffer, &glob2));
+
+	fclaw2d_global_destroy(glob1);
+	fclaw2d_global_destroy(glob2);
 }
 TEST_CASE("fclaw2d_global_set_global")
 {

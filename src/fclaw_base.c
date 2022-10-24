@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_pointer_map.h>
 #include <fclaw_base.h>
 #include <fclaw_mpi.h>
 
@@ -647,13 +648,22 @@ fclaw_app_get_options (fclaw_app_t * a)
     return a->opt;
 }
 
+static fclaw_pointer_map_t* packing_vtables = NULL;
+
 void fclaw_app_options_store_vtable(const char*name,fclaw_userdata_vtable_t* vtable){
-    //
+    if(packing_vtables == NULL)
+    {
+        packing_vtables = fclaw_pointer_map_new();
+    }
+    fclaw_pointer_map_insert(packing_vtables, name, vtable, NULL);
 }
 
 fclaw_userdata_vtable_t* fclaw_app_options_get_vtable(const char*name){
-    //
-    return NULL;
+    if(packing_vtables == NULL)
+    {
+        packing_vtables = fclaw_pointer_map_new();
+    }
+    return fclaw_pointer_map_get(packing_vtables,name);
 }
 
 /*** which of the following do we need? ***/
