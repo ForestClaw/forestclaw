@@ -125,18 +125,65 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
     *num_rays = fclaw2d_ray_deallocate_rays(rays);
 }
 
+/** This function checks if a linear ray intersects a patch.
+ * In case the ray does not intersect the patch it returns 0.
+ * In case the ray does intersect the patch it returns 1, dt contains the
+ * length of the intersection (as long as the vec has norm 1) and rayni
+ * contains the not-i-coordinates of the ray for both its intersections with
+ * the patch-boundary in the search dimension i.
+ */
+static int
+intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray, int i,
+                 double *dt, double rayni[2]) {
+    int ni, j, isleft;
+    double corners[2][2];
+
+    /* store the patch corners in an indexable format */
+    corners[0][0] = patch->xlower;
+    corners[0][1] = patch->ylower;
+    corners[1][0] = patch->xupper;
+    corners[1][1] = patch->yupper;
+
+    /* compute the coordinates of intersections with most orthogonal edges */
+    ni = i ^ 1;
+    rayni[0] = swirl_ray->xy[ni] + swirl_ray->r.line.vec[ni] *
+                                   ((corners[0][i] - swirl_ray->xy[i]) / swirl_ray->r.line.vec[i]);
+    rayni[0] -= corners[0][ni]; /* shift coordinate system to lower left corner */
+
+    /* compute second hit in shifted coordinate system */
+    *dt = (corners[1][i] - corners[0][i]) / swirl_ray->r.line.vec[i];
+    rayni[1] = rayni[0] + *dt * swirl_ray->r.line.vec[ni];
+
+    isleft = 0;
+    for (j = 0; j < 2; j++)
+    {
+        if (rayni[j] < 0.)
+        {
+            isleft++;      /* we pass the patch to the left (or bottom) */
+        }
+        else if (rayni[j] <= (corners[1][ni] - corners[0][ni]))
+        {
+            return 1;       /* hits the edge between corners[0][ni] and corners[1][ni] */
+        }
+    }
+
+    /* If we reach this point, there was no direct hit in the search dimension.
+     * If there is one point on each side of the patch, there will be a hit in
+     * the other dimension, else there will be none. */
+    return (isleft == 1);
+}
+
 static int
 swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                int blockno, int patchno, void *ray, double *integral,
                void *user)
 {
-    int i, ni;
-    double corners[2][2];
+    int i, id;
+    double dt, rayni[2];
 
     /* assert that ray is a valid swirl_ray_t */
     fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) ray;
 
-    int id;
     swirl_ray_t *swirl_ray = (swirl_ray_t*) fclaw2d_ray_get_ray(fclaw_ray,&id);
     FCLAW_ASSERT(swirl_ray != NULL);
     FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
@@ -158,15 +205,8 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         return 0;
     }
 
-    /* store the patch corners in an indexable format */
-    corners[0][0] = patch->xlower;
-    corners[0][1] = patch->ylower;
-    corners[1][0] = patch->xupper;
-    corners[1][1] = patch->yupper;
-
     /* for stability we search in the dimension of the strongest component */
     i = (fabs (swirl_ray->r.line.vec[0]) <= fabs (swirl_ray->r.line.vec[1])) ? 1 : 0;
-    ni = i ^ 1; /* not i */
 
     if (patchno >= 0)
     {
@@ -175,60 +215,72 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
          * in the swirl_ray_t we defined, we now have to set *integral to be the
          * contribution of this ray-patch combination to the ray integral.
          * We should return 1 (even though a leaf return value is ignored). */
-        int j, nj;
-        double t, shift;
-        double hits[2][2];
+        if(!intersect_patch(patch, swirl_ray, i, &dt, rayni)) {
+            /* We do not have an intersection, the return value is ignored. */
+            return 1;
+        }
 
-        /* compute the coordinates of intersections with most orthogonal edges */
-        t = (corners[0][i] - swirl_ray->xy[i]) / swirl_ray->r.line.vec[i];
-        shift = swirl_ray->xy[ni] + t * swirl_ray->r.line.vec[ni];
+        int ni = i ^ 1;
+        int mx, my, mbc, meqn, sol_rows, j, k, klower, kupper, k_current;
+        double xlower, ylower, dx, dy, *sol, tstep,
+               nilower, niupper, raynilower, rayniupper;
+        fclaw2d_global_t *glob = (fclaw2d_global_t *) user;
+        FCLAW_ASSERT(glob != NULL);
 
-        /* shift coordinate system to the first hit */
-        hits[0][0] = 0.;
-        hits[0][1] = 0.;
-        corners[1][ni] -= shift;
-        corners[0][ni] -= shift;
+        /* Obtain cell indices of the hits. */
+        fclaw2d_clawpatch_grid_data(glob, patch, &mx, &my, &mbc,
+                                    &xlower, &ylower, &dx, &dy);
+        fclaw2d_clawpatch_soln_data(glob, patch, &sol, &meqn);
+        sol_rows = mx + 2 * mbc;
 
-        /* compute second hit in shifted coordinate system */
-        hits[1][i] = corners[1][i] - corners[0][i];
-        t = hits[1][i] / swirl_ray->r.line.vec[i];
-        hits[1][ni] = t * swirl_ray->r.line.vec[ni];
+        /* Make mx, my, dx, dy indexable. */
+        int m[2] = {mx, my};
+        double d[2] = {dx, dy};
 
-        /* compute the actual hit coordinates */
-        t = 0.;
-        for (j = 0; j < 2; j++)
-        {
-            nj = j ^ 1;
-            /* check if we hit the faces parallel to the search dimension */
-            if (hits[j][ni] < corners[0][ni])
-            {
-                t = (corners[0][ni] - hits[j][ni]) /
-                    (hits[nj][ni] - hits[j][ni]);
-                hits[j][ni] = corners[0][ni];
-            }
-            else if (hits[j][ni] > corners[1][ni])
-            {
-                t = (corners[1][ni] - hits[j][ni]) /
-                    (hits[nj][ni] - hits[j][ni]);
-                hits[j][ni] = corners[1][ni];
-            }
-            else
-            {
-                /* if we get here we hit a face orthogonal to the search dimension */
+        tstep = dt/m[i];
+        rayni[1] = rayni[0];
+        for(j = 0; j < m[i]; j++) {
+            /* Compute the range of the ni-coordinate of the next tstep and the
+             * corresponding indices in the mx x my cell-grid. We work on a
+             * coordinate system with (0,0) in the lower left patch corner. */
+            rayni[0] = rayni[1];
+            rayni[1] += tstep * swirl_ray->r.line.vec[ni];
+            raynilower = SC_MIN(rayni[0], rayni[1]);
+            rayniupper = SC_MAX(rayni[0], rayni[1]);
+            klower = floor(raynilower / d[ni]);
+            kupper = floor(rayniupper / d[ni]);
+
+            if(kupper < 0 || klower >= m[ni]) {
+                /* The current cell does not belong to the patch. */
                 continue;
             }
 
-            if (t < 0. || t > 1.)
-            {
-                return 0;       /* if t is not in [0, 1], both hits lie outside the patch */
+            if(klower == kupper) {
+                /* The solution is constant on every cell, so we are only
+                 * interested in the length fabs(tstep) of the intersection.
+                 * In other settings one might compute the actual coordinates
+                 * of the intersection of the ray with the cell boundaries
+                 * and apply more advanced numerical integration schemes here. */
+                *integral += sol[(mbc + klower) * sol_rows + (2 + j)] * fabs(tstep);
+            } else {
+                for(k = klower; k < kupper; k++) {
+                    /* compute the ni-range of the current cell. All values
+                     * outside the patch are ignored */
+                    nilower = (k == klower) ? SC_MAX(raynilower, 0) : k * d[ni];
+                    niupper = (k + 1 == kupper) ? SC_MIN(rayniupper, m[ni] * d[ni])
+                            : (k + 1) * d[ni];
+                    dt = tstep * (niupper - nilower) / (rayni[1] - rayni[0]);
+
+                    /* We do not want to use k as the cell-index, because it may
+                     * be afflicted by rounding errors. Instead, we use the
+                     * weighted mean of niupper and nilower to compute
+                     * the current cell-index. */
+                    k_current = floor((niupper + nilower) / (2 * d[ni]));
+                    *integral += sol[(mbc + k_current) * sol_rows + (2 + j)] * fabs(dt);
+                }
             }
-            hits[j][i] = hits[j][i] * (1 - t) + hits[nj][i] * t;
         }
 
-        /* compute the distance of the two hits and store it in integral */
-        hits[0][0] = hits[0][0] - hits[1][0];
-        hits[0][1] = hits[0][1] - hits[1][1];
-        *integral = sqrt (hits[0][0] * hits[0][0] + hits[0][1] * hits[0][1]);
         return 1;
     }
     else
@@ -247,30 +299,7 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
          * The purpose of this test is to remove irrelevant ancestor
          * patch-ray-combinations early on to avoid unnecessary computation.
          * We do not need to assign to the integral value for ancestor patches. */
-        int j, is_left;
-        double t, rayatt;
-
-        is_left = 0;
-        for (j = 0; j < 2; j++)
-        {
-            /* compute the coordinates of the ray when it intersects the patch
-             * interval of the search dimension */
-            t = (corners[j][i] - swirl_ray->xy[i]) / swirl_ray->r.line.vec[i];
-            rayatt = swirl_ray->xy[ni] + t * swirl_ray->r.line.vec[ni];
-
-            if (rayatt < corners[0][ni])
-            {
-                is_left++;      /* we pass the patch to the left (or bottom) */
-            }
-            else if (rayatt <= corners[1][ni])
-            {
-                return 1;       /* hits the edge between corners[0][ni] and corners[1][ni] */
-            }
-        }
-        /* If we reach this point, there was no direct hit in the search dimension.
-         * If there is one point on each side of the patch, there will be a hit in
-         * the other dimension, else there will be none. */
-        return (is_left == 1);
+        return intersect_patch(patch, swirl_ray, i, &dt, rayni);
     }
 }
 
