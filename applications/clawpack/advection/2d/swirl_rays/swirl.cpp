@@ -81,23 +81,22 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
         swirl_ray_t *sr = (swirl_ray_t*) FCLAW_ALLOC(swirl_ray_t,1);
         sr->rtype = SWIRL_RAY_LINE;
 
+        /* we define all vecs to have norm 1 to make integration easier */
 #ifdef STAR_OF_RAYS
         sr->xy[0] = 0.5;
         sr->xy[1] = 0.5;
         /* we add 0.1, since the intersection callback does not guarantee exact
          * results for axis-parallel rays */
         sr->r.line.vec[0] = cos ((i + 0.1) * 2 * M_PI / swirl_nlines);
-        sr->r.line.vec[1] = sin ((i + 0.1) * M_PI / swirl_nlines);
+        sr->r.line.vec[1] = sin ((i + 0.1) * 2 * M_PI / swirl_nlines);
 #else
         /* End points are on a semi-circle in x>0,y>0 quad */
         FCLAW_ASSERT(swirl_nlines >= 2);
         sr->xy[0] = 0; //-0.1;
         sr->xy[1] = 0; //-0.1;
-        double R = 2.0;
         double dth = M_PI/(2*swirl_nlines);
-        sr->r.line.vec[0] = R*cos ((i+0.5) * dth);
-        sr->r.line.vec[1] = R*sin ((i+0.5) * dth);
-
+        sr->r.line.vec[0] = cos ((i + 0.5) * dth);
+        sr->r.line.vec[1] = sin ((i + 0.5) * dth);
 #endif
 
         fclaw2d_ray_t *ray = &ray_vec[i];
