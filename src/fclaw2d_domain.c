@@ -266,6 +266,7 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     *domain = NULL;
 }
 
+#endif /* !P4_TO_P8 */
 
 void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
                                            fclaw2d_patch_callback_t pcb, void *user)
@@ -289,8 +290,10 @@ void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
         }
     }
 #else
-    fclaw_global_essentialf("fclaw2d_patch_iterator_mthread : We should not be here\n");
+#ifndef P4_TO_P8
+    fclaw_global_essentialf("fclaw2d_patch_iterator_mthread: We should not be here\n");
+#else
+    fclaw_global_essentialf("fclaw3d_patch_iterator_mthread: We should not be here\n");
+#endif
 #endif
 }
-
-#endif /* !P4_TO_P8 */

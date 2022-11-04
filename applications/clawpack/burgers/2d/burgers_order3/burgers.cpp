@@ -51,7 +51,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
 
     /* Map unit square to disk using mapc2m_disk.f */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
+    brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
     cont = fclaw2d_map_new_nomap_brick(brick);
 
 

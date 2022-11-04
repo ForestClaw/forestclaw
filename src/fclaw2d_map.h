@@ -286,9 +286,13 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
    Brick mapping
    ---------------------------------------------------------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
-                                             int mi,
-                                             int mj);
+/** This function will become deprecated.
+    This file shall eventually not depend on knowing the p4est_connectivity type.
+    We provide an alternative, temporarily called fclaw2d_map_new_brick_domain,
+    in the fclaw2d_map_brick files.
+ */
+fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
+   (struct p4est_connectivity* conn, int mi, int mj);
 
 
 /* ----------------------------------------------------------------------------------

@@ -46,6 +46,7 @@ add_library(forestclaw_c OBJECT
   fclaw3d_convenience.c
   fclaw3d_domain.c
   fclaw3d_global.c
+  fclaw3d_map.c
   fclaw_domain.c
   fclaw_global.c
   fp_exception_glibc_extension.c
@@ -153,6 +154,7 @@ install(FILES
   fclaw3d_defs.h
   fclaw3d_domain.h
   fclaw3d_global.h
+  fclaw3d_map.h
   fclaw_patch.h
   fclaw_domain.h
   fclaw_global.h
