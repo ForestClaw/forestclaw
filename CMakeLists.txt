@@ -154,3 +154,5 @@ include(cmake/install.cmake)
 if(applications)
   add_subdirectory(applications)
 endif(applications)
+
+include(cmake/documentation.cmake)
