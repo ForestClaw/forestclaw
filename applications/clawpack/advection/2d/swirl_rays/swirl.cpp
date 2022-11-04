@@ -266,12 +266,12 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                  * In other settings one might compute the actual coordinates
                  * of the intersection of the ray with the cell boundaries
                  * and apply more advanced numerical integration schemes here. */
-                *integral += sol[(mbc + klower) * sol_rows + (2 + j)] * fabs(tstep);
+                *integral += sol[(mbc + klower) * sol_rows + (mbc + j)] * fabs(tstep);
             } else {
                 for(k = klower; k < kupper; k++) {
                     /* compute the ni-range of the current cell. All values
                      * outside the patch are ignored */
-                    nilower = (k == klower) ? SC_MAX(raynilower, 0) : k * d[ni];
+                    nilower = (k == klower) ? SC_MAX(raynilower, 0.) : k * d[ni];
                     niupper = (k + 1 == kupper) ? SC_MIN(rayniupper, m[ni] * d[ni])
                             : (k + 1) * d[ni];
                     dt = tstep * (niupper - nilower) / (rayni[1] - rayni[0]);
@@ -280,8 +280,8 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                      * be afflicted by rounding errors. Instead, we use the
                      * weighted mean of niupper and nilower to compute
                      * the current cell-index. */
-                    k_current = floor((niupper + nilower) / (2 * d[ni]));
-                    *integral += sol[(mbc + k_current) * sol_rows + (2 + j)] * fabs(dt);
+                    k_current = floor((niupper + nilower) / (2. * d[ni]));
+                    *integral += sol[(mbc + k_current) * sol_rows + (mbc + j)] * fabs(dt);
                 }
             }
         }
