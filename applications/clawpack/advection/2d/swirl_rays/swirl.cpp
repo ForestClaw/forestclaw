@@ -28,7 +28,13 @@
 
 #include "../all/advection_user.h"
 
+/* A #define of 0 enables a set of rays that is the same as in the swirl
+ * example parallel to this application directory.
+ * If #define is 1, use an ad-hoc setup local to this file.
+ */
+#if 0
 #define STAR_OF_RAYS
+#endif
 
 typedef enum
 {
@@ -63,10 +69,9 @@ const int swirl_nlines = 3;
 #endif
 
 /* Virtual function for setting rays */
-static
-void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
-                                    fclaw2d_ray_t** rays,
-                                    int* num_rays)
+static void
+swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
+                                fclaw2d_ray_t ** rays, int *num_rays)
 {
     *num_rays = swirl_nlines;
 
