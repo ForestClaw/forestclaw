@@ -52,6 +52,13 @@ typedef struct swirl_ray
     {
         struct
         {
+            /* set to 0 if ray is approximately parallel to the x axis,
+               set to 1 if ray is approximately parallel to the y axis,
+               and to 2 otherwise.  Will only work for Cartesian setup.
+             */
+            int parallel;
+            /* set to 0 if the ray is more parallel to x than y axis. */
+            int dominant;
             double vec[2];
         } line;
         struct
@@ -59,6 +66,7 @@ typedef struct swirl_ray
             double radius;
         } circle;
     } r;
+    int untrustworthy;
 }
 swirl_ray_t;
 
@@ -73,6 +81,8 @@ static void
 swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
                                 fclaw2d_ray_t ** rays, int *num_rays)
 {
+    int i;
+
     *num_rays = swirl_nlines;
 
     /* We let the user allocate an array of rays, although what is inside the
@@ -81,9 +91,12 @@ swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
 
     *rays = fclaw2d_ray_allocate_rays(*num_rays);
     fclaw2d_ray_t *ray_vec = *rays;
-    for (int i = 0; i < swirl_nlines; ++i)
+    for (i = 0; i < swirl_nlines; ++i)
     {
-        swirl_ray_t *sr = (swirl_ray_t*) FCLAW_ALLOC(swirl_ray_t,1);
+#ifndef STAR_OF_RAYS
+        double dth;
+#endif
+        swirl_ray_t *sr = (swirl_ray_t *) FCLAW_ALLOC (swirl_ray_t, 1);
         sr->rtype = SWIRL_RAY_LINE;
 
         /* we define all vecs to have norm 1 to make integration easier */
@@ -97,16 +110,32 @@ swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
 #else
         /* End points are on a semi-circle in x>0,y>0 quad */
         FCLAW_ASSERT(swirl_nlines >= 2);
-        sr->xy[0] = 0; //-0.1;
-        sr->xy[1] = 0; //-0.1;
-        double dth = M_PI/(2*swirl_nlines);
+        sr->xy[0] = 0; /* -0.1; */
+        sr->xy[1] = 0; /* -0.1; */
+        dth = M_PI/(2*swirl_nlines);
         sr->r.line.vec[0] = cos ((i + 0.5) * dth);
         sr->r.line.vec[1] = sin ((i + 0.5) * dth);
 #endif
 
+        /* Determine whether a ray is axis parallel */
+        if (fabs (sr->r.line.vec[1]) <= 1e-12) {
+          sr->r.line.parallel = 0;
+        }
+        else if (fabs (sr->r.line.vec[0]) <= 1e-12) {
+          sr->r.line.parallel = 1;
+        }
+        else {
+          sr->r.line.parallel = 2;
+        }
+        sr->r.line.dominant =
+          fabs (sr->r.line.vec[0]) <= fabs (sr->r.line.vec[1]) ? 1 : 0;
+
+        /* Initialize the intersection status to trustworthy */
+        sr->untrustworthy = 0;
+
+        /* Assign ray to diagnostics item */
         fclaw2d_ray_t *ray = &ray_vec[i];
-        int id = i + 1;
-        fclaw2d_ray_set_ray(ray,id, sr);
+        fclaw2d_ray_set_ray (ray, i + 1, sr);
     }
 }
 
@@ -115,15 +144,17 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
                            fclaw2d_ray_t** rays,
                            int* num_rays)
 {
+    int i;
     fclaw2d_ray_t *ray_vec = *rays;
-    for(int i = 0; i < *num_rays; i++)
+
+    for(i = 0; i < *num_rays; i++)
     {
         /* Retrieve rays set above and deallocate them */
         int id;
         fclaw2d_ray_t *ray = &ray_vec[i];
-        swirl_ray_t *rs = (swirl_ray_t*) fclaw2d_ray_get_ray(ray,&id);
-        FCLAW_ASSERT(rs != NULL);
-        FCLAW_FREE(rs);
+        swirl_ray_t *rs = (swirl_ray_t*) fclaw2d_ray_get_ray(ray, &id);
+        FCLAW_ASSERT (rs != NULL);
+        FCLAW_FREE (rs);
         rs = NULL;
     }
     /* Match FCLAW_ALLOC, above */
@@ -138,9 +169,10 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
  * the patch-boundary in the search dimension i.
  */
 static int
-intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray, int i,
-                 double *dt, double rayni[2]) {
-    int ni, j, isleft;
+intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
+                 int i, double *dt, double rayni[2])
+{
+    int ni, j, isleft, iscenter;
     double corners[2][2];
 
     /* store the patch corners in an indexable format */
@@ -148,6 +180,18 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray, int i,
     corners[0][1] = patch->ylower;
     corners[1][0] = patch->xupper;
     corners[1][1] = patch->yupper;
+#if 0
+    /* there will be a better way that does not modify the computed coordinates */
+    if ((j = swirl_ray->r.line.parallel) != 2) {
+      /* this ray is parallel to one axis:
+         shrink the patch in that direction to eliminate glazing hits */
+      double h = corners[1][j ^ 1] - corners[0][j ^ 1];
+      corners[0][j ^ 1] += 5e-7 * h;
+      corners[1][j ^ 1] -= 5e-7 * h;
+      /* idea: do not do this here, but compute h and shift in the tests
+               below in a non-destructive manner. */
+    }
+#endif
 
     /* compute the coordinates of intersections with most orthogonal edges */
     ni = i ^ 1;
@@ -159,29 +203,36 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray, int i,
     *dt = (corners[1][i] - corners[0][i]) / swirl_ray->r.line.vec[i];
     rayni[1] = rayni[0] + *dt * swirl_ray->r.line.vec[ni];
 
-    isleft = 0;
+    isleft = iscenter = 0;
     for (j = 0; j < 2; j++)
     {
         if (rayni[j] < 0.)
         {
-            isleft++;      /* we pass the patch to the left (or bottom) */
+            ++isleft;       /* we pass the patch to the left (or bottom) */
         }
         else if (rayni[j] <= (corners[1][ni] - corners[0][ni]))
         {
-            return 1;       /* hits the edge between corners[0][ni] and corners[1][ni] */
+            ++iscenter;     /* hits the edge between corners[0][ni] and corners[1][ni] */
         }
     }
 
-    /* If we reach this point, there was no direct hit in the search dimension.
-     * If there is one point on each side of the patch, there will be a hit in
+    /* If there is one point on each side of the patch, there will be a hit in
      * the other dimension, else there will be none. */
-    return (isleft == 1);
+    return
+      (swirl_ray->r.line.parallel != i && (isleft == 1 || iscenter)) ||
+      (swirl_ray->r.line.parallel == i && iscenter == 2);
+
+    /* This routine eliminates rays that are glazing a parallel edge and intersect,
+       and it does not eliminate rays that are exactly on one edge of the patch.
+       We should eventually eliminate exact edge intersections, too.
+       We should report to the outside if an intersection is eliminated.
+       Thus, we should increment the swirl_ray->untrustworthy variable. */
 }
 
 static int
-swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
-               int blockno, int patchno, void *ray, double *integral,
-               void *user)
+swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+                     int blockno, int patchno, void *ray, double *integral,
+                     void *user)
 {
     int i, id;
     double dt, rayni[2];
@@ -193,6 +244,7 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     FCLAW_ASSERT(swirl_ray != NULL);
     FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
     FCLAW_ASSERT (integral != NULL && *integral == 0.); /* documented precondition */
+
     /*
      * This intersection routine takes the patch coordinate information directly.
      * For mappings of any kind, these would have to be applied here in addition.
@@ -202,16 +254,8 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
      * vector are at least 1e-12.
      */
 
-    if (fabs (swirl_ray->r.line.vec[0]) <= 1e-12 ||
-        fabs (swirl_ray->r.line.vec[1]) <= 1e-12)
-    {
-        /* we cannot guarantee correct results for rays
-         * that run near parallel to coordinate axis */
-        return 0;
-    }
-
     /* for stability we search in the dimension of the strongest component */
-    i = (fabs (swirl_ray->r.line.vec[0]) <= fabs (swirl_ray->r.line.vec[1])) ? 1 : 0;
+    i = swirl_ray->r.line.dominant;
 
     if (patchno >= 0)
     {
@@ -220,7 +264,7 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
          * in the swirl_ray_t we defined, we now have to set *integral to be the
          * contribution of this ray-patch combination to the ray integral.
          * We should return 1 (even though a leaf return value is ignored). */
-        if(!intersect_patch(patch, swirl_ray, i, &dt, rayni)) {
+        if (!intersect_patch (patch, swirl_ray, i, &dt, rayni)) {
             /* We do not have an intersection, the return value is ignored. */
             return 1;
         }
@@ -285,7 +329,6 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                 }
             }
         }
-
         return 1;
     }
     else
@@ -304,7 +347,7 @@ swirl_intersect_ray (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
          * The purpose of this test is to remove irrelevant ancestor
          * patch-ray-combinations early on to avoid unnecessary computation.
          * We do not need to assign to the integral value for ancestor patches. */
-        return intersect_patch(patch, swirl_ray, i, &dt, rayni);
+        return intersect_patch (patch, swirl_ray, i, &dt, rayni);
     }
 }
 
@@ -404,7 +447,7 @@ main (int argc, char **argv)
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
-    user_opt =                    swirl_options_register(app,               "fclaw_options.ini");  
+    user_opt =                    swirl_options_register(app,               "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
