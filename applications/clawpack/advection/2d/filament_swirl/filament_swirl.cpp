@@ -23,14 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_forestclaw.h"
-#include "fclaw_base.h"
 #include "filament/filament_user.h"
 #include "swirl/swirl_user.h"
 
 #include "../all/advection_user.h"
 
 #include <fclaw_filesystem.h>
+#include <fclaw_base.h>
+
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_global.h>
+
 void filament_initialize(fclaw2d_global_t* glob)
 {
     fclaw2d_set_global_context(glob);

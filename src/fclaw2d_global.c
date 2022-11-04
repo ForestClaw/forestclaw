@@ -254,6 +254,9 @@ fclaw2d_global_t* fclaw2d_global_get_global (void)
     return fclaw2d_global_glob;
 }
 
+// Only 2d for now need fclaw2d_options
+#ifndef P4_TO_P8
+
 void fclaw2d_set_global_context(fclaw2d_global_t *glob)
 {
     fclaw_options_t* opts = fclaw2d_get_options(glob);
@@ -266,3 +269,5 @@ void fclaw2d_clear_global_context(fclaw2d_global_t *glob)
     fclaw_set_logging_prefix(NULL);
     fclaw_set_logging_mpi_comm(NULL);
 }
+
+#endif
