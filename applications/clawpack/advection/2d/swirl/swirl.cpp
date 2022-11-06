@@ -29,17 +29,17 @@
 
 
 static
-void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* gparms)
+void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* fclaw_opt)
 {
     /* Mapped, multi-block domain */
     fclaw2d_domain_t         *domain = NULL;
-    domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, gparms->minlevel);
+    domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
     fclaw2d_global_store_domain (glob, domain);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    gparms->manifold = 0;
+    fclaw_opt->manifold = 0;
     fclaw2d_global_store_map (glob, fclaw2d_map_new_nomap ());
 }
 
