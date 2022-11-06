@@ -315,6 +315,7 @@ SUBROUTINE write_tfile(iframe,time,meqn,ngrids,dir3)
   dir3_fname2 = TRIM(dir3)//'/'//trim(fname2)
 
   maux = 0
+  matunit2 = 52
   OPEN(matunit2,file=dir3_fname2)
   WRITE(matunit2,1000) time,meqn,ngrids,maux
 1000 FORMAT(e18.8,'    time', /, &
