@@ -113,7 +113,7 @@ jobs:
 
 
   mac:
-    runs-on: macos-12
+    runs-on: macos-11
     name: CMake build on MacOS
     env:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
