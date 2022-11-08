@@ -453,7 +453,6 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             int remote_neighbor = fclaw2d_patch_is_ghost(corner_patch);
             if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
             {
-                /* Remote neighbor is a corner patch.  */
                 transform_data.neighbor_patch = corner_patch;
                 if (neighbor_level == FINER_GRID)
                 {
@@ -461,7 +460,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     fclaw2d_patch_t* fine_patch = corner_patch;
                     int coarse_blockno = this_block_idx;
                     int fine_blockno = corner_block_idx;
-                    if (interpolate_to_neighbor) // && !remote_neighbor)                        
+                    if (interpolate_to_neighbor && !remote_neighbor)
                     {
                         /* No need to interpolate to remote ghost patches. */
                         fclaw2d_patch_interpolate_corner(s->glob,
@@ -513,24 +512,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 int coarse_blockno = corner_block_idx;
                 int fine_blockno = this_patch_idx;
 
-                if (average_from_neighbor)
-                {
-                    /* Average from local fine grid to remote coarse ghost, since interpolation
-                    stencil may need corner coarse grid values */
-                    int coarse_icorner = transform_data_finegrid.icorner;
-                    //printf("Averaging from neighbors : %d %d\n",icorner,coarse_icorner);
-                    fclaw2d_patch_average_corner(s->glob,
-                                                 coarse_patch,
-                                                 fine_patch,
-                                                 coarse_blockno,
-                                                 fine_blockno,
-                                                 is_block_corner,
-                                                 coarse_icorner,time_interp,
-                                                 &transform_data_finegrid);                        
-
-                }
-
-                else if (interpolate_to_neighbor)
+                if (interpolate_to_neighbor)
                 {
                     /* Interpolate from remote coarse grid patch (coarse grid) to
                        local fine grid patch.  We do not need to average to the 
