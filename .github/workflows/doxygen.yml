@@ -1,0 +1,30 @@
+name: Doxygen Generation
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  deploy:
+    if: github.repository == 'forestclaw/forestclaw'
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install cmake doxygen graphviz
+    - uses: actions/checkout@v3
+    - name: Cmake Configure
+      run: cmake
+    - name: Generate Doxygen
+      run: make doxygen
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        external_repository: forestclaw/forestclaw.github.io
+        publish_dir: ./doxygen/html
+        destination_dir: docs/${{ steps.extract_branch.outputs.branch }}
