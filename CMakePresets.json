@@ -32,9 +32,9 @@
   "description": "MacOS: OpenMP not used",
   "cacheVariables": {"openmp": false},
   "environment": {
-    "CC": "gcc-10",
-    "CXX": "g++-10",
-    "FC": "gfortran-10"
+    "CC": "gcc-11",
+    "CXX": "g++-11",
+    "FC": "gfortran-11"
   }
 },
 {
