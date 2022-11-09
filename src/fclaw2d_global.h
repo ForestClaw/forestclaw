@@ -158,6 +158,20 @@ void fclaw2d_global_unset_global (void);
  */
 fclaw2d_global_t* fclaw2d_global_get_global (void);
 
+/**
+ * @brief 
+ * 
+ * @param glob 
+ */
+void fclaw2d_set_global_context(fclaw2d_global_t *glob);
+
+/**
+ * @brief 
+ * 
+ * @param glob 
+ */
+void fclaw2d_clear_global_context(fclaw2d_global_t *glob);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
