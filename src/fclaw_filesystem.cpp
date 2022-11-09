@@ -25,20 +25,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_filesystem.h>
 #include <fclaw_base.h>
+#if __APPLE__ || __linux__
+#include <unistd.h>
+#else
 #include <filesystem>
 #include <string>
+#endif
 #include <cstring>
 
 char* fclaw_cwd()
 {
+#if __APPLE__ || __linux__
+    char* c_current_path = FCLAW_ALLOC(char,PATH_MAX+1);
+    char* error = getcwd(c_current_path,PATH_MAX+1);
+    FCLAW_ASSERT(error != NULL);
+    return c_current_path;
+#else
     std::string current_path = std::filesystem::current_path();
     char* c_current_path = FCLAW_ALLOC(char, current_path.length()+1);
     strcpy(c_current_path,current_path.c_str());
     return c_current_path;
+#endif
 }
 
 void fclaw_cd(const char* dir)
 {
+#if __APPLE__ || __linux__
+    int error = chdir(dir);
+    FCLAW_ASSERT(error == 0);
+#else
     std::filesystem::path output_dir(dir);
 	std::filesystem::path output_path;
     if(output_dir.is_absolute())
@@ -54,5 +69,6 @@ void fclaw_cd(const char* dir)
 	std::filesystem::create_directory(output_path);
 
 	std::filesystem::current_path(output_path);
+#endif
 }
 
