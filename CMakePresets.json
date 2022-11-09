@@ -12,17 +12,20 @@
   "binaryDir": "${sourceDir}/build",
   "generator": "Ninja",
   "environment": {
-    "CUDAARCHS": "72"
+    "CUDAARCHS": "72",
+    "CFLAGS": "-DFCLAW_ENABLE_DEBUG",
+    "CXXFLAGS": "-DFCLAW_ENABLE_DEBUG"
   },
   "cacheVariables": {
-    "CMAKE_BUILD_TYPE": "Release"
+    "CMAKE_BUILD_TYPE": "RelWithDebInfo"
   }
 },
 {
   "name": "default",
   "binaryDir": "${sourceDir}/build",
   "generator": "Ninja",
-  "cacheVariables": {"CMAKE_BUILD_TYPE": "Release",
+  "cacheVariables": {
+    "CMAKE_BUILD_TYPE": "Release",
     "mpi": true,
     "openmp": true}
 },
@@ -32,8 +35,11 @@
   "description": "MacOS: OpenMP not used",
   "cacheVariables": {"openmp": false},
   "environment": {
+    "CMAKE_BUILD_TYPE": "RelWithDebInfo",
     "CC": "gcc-10",
+    "CFLAGS": "-DFCLAW_ENABLE_DEBUG",
     "CXX": "g++-10",
+    "CXXFLAGS": "-DFCLAW_ENABLE_DEBUG",
     "FC": "gfortran-10"
   }
 },
