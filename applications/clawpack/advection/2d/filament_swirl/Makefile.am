@@ -29,6 +29,7 @@ applications_clawpack_advection_2d_filament_swirl_filament_swirl_SOURCES = \
 	applications/clawpack/advection/2d/all/advection_patch_setup_manifold.c \
 	applications/clawpack/advection/2d/all/fclaw2d_map_cart.c \
 	applications/clawpack/advection/2d/all/fclaw2d_map_fivepatch.c \
+	applications/clawpack/advection/2d/all/fclaw2d_map_bilinear.c \
 	applications/clawpack/advection/2d/all/user46_setaux_manifold.f \
 	applications/clawpack/advection/2d/all/user5_setaux_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_setaux.f \
