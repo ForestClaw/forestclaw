@@ -41,11 +41,15 @@ typedef struct filament_options
 {
     int example;
     double alpha;
+
+    double *center;
+    const char* center_string;
     int claw_version;
 
     int is_registered;
 
 } filament_options_t;
+
 
 
 filament_options_t* filament_options_register (fclaw_app_t * app,

@@ -42,6 +42,10 @@ filament_register (filament_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "alpha", &user->alpha, 0.5,
                            "[user] Ratio used for squared- and pillow-disk [0.5]");
 
+    fclaw_options_add_double_array (opt, 0, "center", &user->center_string, "0 0",
+                                    &user->center, 2, 
+                                    "Center point for bilinear mapping  [(0,0)]");
+
     user->is_registered = 1;
     return NULL;
 }
