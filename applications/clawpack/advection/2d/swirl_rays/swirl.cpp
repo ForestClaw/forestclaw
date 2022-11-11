@@ -284,6 +284,9 @@ swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
         int m[2] = {mx, my};
         double d[2] = {dx, dy};
 
+        /* We will apply line-tracing to follow the ray through the cell-grid.
+         * For this we divide dt in m[i] equal steps tstep to end up with the
+         * values of the ray on the grid-boundaries. */
         tstep = dt/m[i];
         rayni[1] = rayni[0];
         for(j = 0; j < m[i]; j++) {
@@ -304,7 +307,9 @@ swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
 
             if(klower == kupper) {
                 /* The solution is constant on every cell, so we are only
-                 * interested in the length fabs(tstep) of the intersection.
+                 * interested in the length of the intersection.
+                 * Since we demanded the ray-vector to have length 1, we can
+                 * obtain it directly from the difference fabs(tstep) in t.
                  * In other settings one might compute the actual coordinates
                  * of the intersection of the ray with the cell boundaries
                  * and apply more advanced numerical integration schemes here. */
