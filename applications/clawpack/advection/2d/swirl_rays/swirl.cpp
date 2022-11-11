@@ -32,9 +32,7 @@
  * example parallel to this application directory.
  * If #define is 1, use an ad-hoc setup local to this file.
  */
-#if 0
 #define STAR_OF_RAYS
-#endif
 
 typedef enum
 {
@@ -102,10 +100,8 @@ swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
 #ifdef STAR_OF_RAYS
         sr->xy[0] = 0.5;
         sr->xy[1] = 0.5;
-        /* we add 0.1, since the intersection callback does not guarantee exact
-         * results for axis-parallel rays */
-        sr->r.line.vec[0] = cos ((i + 0.1) * 2 * M_PI / swirl_nlines);
-        sr->r.line.vec[1] = sin ((i + 0.1) * 2 * M_PI / swirl_nlines);
+        sr->r.line.vec[0] = cos ((i) * 2 * M_PI / swirl_nlines);
+        sr->r.line.vec[1] = sin ((i) * 2 * M_PI / swirl_nlines);
 #else
         /* End points are on a semi-circle in x>0,y>0 quad */
         FCLAW_ASSERT(swirl_nlines >= 2);
@@ -172,25 +168,13 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
                  int i, int *untrustworthy, double *dt, double rayni[2])
 {
     int ni, j, isleft, iscenter;
-    double corners[2][2];
+    double corners[2][2], h;
 
     /* store the patch corners in an indexable format */
     corners[0][0] = patch->xlower;
     corners[0][1] = patch->ylower;
     corners[1][0] = patch->xupper;
     corners[1][1] = patch->yupper;
-#if 0
-    /* there will be a better way that does not modify the computed coordinates */
-    if ((j = swirl_ray->r.line.parallel) != 2) {
-      /* this ray is parallel to one axis:
-         shrink the patch in that direction to eliminate glazing hits */
-      double h = corners[1][j ^ 1] - corners[0][j ^ 1];
-      corners[0][j ^ 1] += 5e-7 * h;
-      corners[1][j ^ 1] -= 5e-7 * h;
-      /* idea: do not do this here, but compute h and shift in the tests
-               below in a non-destructive manner. */
-    }
-#endif
 
     /* compute the coordinates of intersections with most orthogonal edges */
     ni = i ^ 1;
@@ -202,6 +186,15 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
     *dt = (corners[1][i] - corners[0][i]) / swirl_ray->r.line.vec[i];
     rayni[1] = rayni[0] + *dt * swirl_ray->r.line.vec[ni];
 
+    if ((j = swirl_ray->r.line.parallel) != 2)
+    {
+        /* this ray is parallel to one axis:
+           we will not integrate ray-patch-intersections that are closer than
+           h to the patch faces in dimension ni, because we cannot guarantee
+           reliable results in this case. */
+        h = 2e-12 * (corners[1][j ^ 1] - corners[0][j ^ 1]);
+    }
+
     isleft = iscenter = 0;
     for (j = 0; j < 2; j++)
     {
@@ -212,20 +205,25 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
         else if (rayni[j] <= (corners[1][ni] - corners[0][ni]))
         {
             ++iscenter;     /* hits the edge between corners[0][ni] and corners[1][ni] */
+            if (swirl_ray->r.line.parallel != 2)
+            {
+                if (rayni[j] < h ||
+                    rayni[j] > (corners[1][ni] - corners[0][ni]) - h) {
+                    /* the ray hits the patch too close to a face */
+                    *untrustworthy = 1;
+                    return 0;
+                }
+            }
         }
     }
 
-    /* If there is one point on each side of the patch, there will be a hit in
-     * the other dimension, else there will be none. */
-    return
-      (swirl_ray->r.line.parallel != i && (isleft == 1 || iscenter)) ||
-      (swirl_ray->r.line.parallel == i && iscenter == 2);
+    /* verify that we catched all axis parallel rays that intersect the patch
+     * boundary */
+    FCLAW_ASSERT(swirl_ray->r.line.parallel == 2 || iscenter != 1);
 
-    /* This routine eliminates rays that are glazing a parallel edge and intersect,
-       and it does not eliminate rays that are exactly on one edge of the patch.
-       We should eventually eliminate exact edge intersections, too.
-       We should report to the outside if an intersection is eliminated.
-       Thus, we should increment the swirl_ray->untrustworthy variable. */
+    /* If the ray misses the patch there will be two hits on the same side
+     * of the patch. */
+    return (isleft == 1 || iscenter);
 }
 
 static int
