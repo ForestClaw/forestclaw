@@ -129,6 +129,9 @@ swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
         }
         sr->r.line.dominant =
           fabs (sr->r.line.vec[0]) <= fabs (sr->r.line.vec[1]) ? 1 : 0;
+        /* check sanity of computation of parallel and dominant */
+        FCLAW_ASSERT(sr->r.line.parallel == 2 ||
+                     sr->r.line.parallel == sr->r.line.dominant);
 
         /* Initialize the intersection status to trustworthy */
         sr->untrustworthy = 0;
