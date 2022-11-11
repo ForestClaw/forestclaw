@@ -51,8 +51,9 @@ typedef struct fclaw2d_ray
 {
     int num;                 /* User defined ID */
     void* ray_data;          /* User defined */
-    double integral;
-    int untrustworthy;       /* set to 1, if integration result may be wrong */
+    double integral;         /**< scalar integral value lives here */
+    int untrustworthy;       /**< set to nonzero if integration
+                                  result may be inaccurate */
 } fclaw2d_ray_t;
 
 

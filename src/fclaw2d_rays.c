@@ -230,9 +230,10 @@ void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
         local_untrustworthy[i] = ray->untrustworthy;
     }
 
+    /* aggregate the boolean untrustworthy condition for each ray */
     global_untrustworthy = FCLAW_ALLOC (int, num_rays);
     sc_MPI_Allreduce(local_untrustworthy, global_untrustworthy, num_rays,
-                     sc_MPI_INT, sc_MPI_MAX, glob->mpicomm);
+                     sc_MPI_INT, sc_MPI_LOR, glob->mpicomm);
 
     for(int i = 0; i < num_rays; i++)
     {
