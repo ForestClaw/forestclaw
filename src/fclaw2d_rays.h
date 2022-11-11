@@ -49,9 +49,10 @@ struct fclaw2d_global;
 /* This is a polynmorphic type */
 typedef struct fclaw2d_ray
 {
-    int num;                /* User defined ID */
-    void* ray_data;         /* User defined */
+    int num;                 /* User defined ID */
+    void* ray_data;          /* User defined */
     double integral;
+    int untrustworthy;       /* set to 1, if integration result may be wrong */
 } fclaw2d_ray_t;
 
 

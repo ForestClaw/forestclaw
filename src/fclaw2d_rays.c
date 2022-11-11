@@ -78,7 +78,7 @@ void ray_initialize(fclaw2d_global_t* glob, void** acc)
     fclaw2d_ray_acc_t *ray_acc = (fclaw2d_ray_acc_t*) FCLAW_ALLOC(fclaw2d_ray_acc_t,1);
 
     /* Check to see if user wants ray output */
-    int num_rays;
+    int i, num_rays;
     const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
     if (!fclaw_opt->output_rays)
     {
@@ -92,6 +92,14 @@ void ray_initialize(fclaw2d_global_t* glob, void** acc)
            We could allocate ray_acc->rays here, but we don't know ahead of time 
            how many rays to create.  Only the user knows this */
         ray_allocate_and_define(glob, &ray_acc->rays, &num_rays);
+
+        /* We initialize untrustworthy to 0 */
+        fclaw2d_ray_t *rays = ray_acc->rays;
+        for (i =0; i < num_rays; i++)
+        {
+            fclaw2d_ray_t *ray = &rays[i];
+            ray->untrustworthy = 0;
+        }
     }
     *acc = ray_acc;
     ray_acc->num_rays = num_rays;
@@ -114,17 +122,31 @@ void ray_initialize(fclaw2d_global_t* glob, void** acc)
            2. Set integral to 0? 
         */
     }
-#endif    
+#endif
 }
 
-#if 0
 static
-void rays_reset(fclaw2d_global_t *glob, void**acc)
+void ray_reset(fclaw2d_global_t *glob, void*acc)
 {
-    /* The obvious thing to do is to set the integral to 0, 
-       but this is handled by fclaw2d_convenience.c */
+    fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
+
+    if (ray_acc->num_rays == 0)
+    {
+        return;
+    }
+    FCLAW_ASSERT(ray_acc->rays != NULL);
+
+    /* We reset untrustworthy to 0 */
+    int i, num_rays;
+    fclaw2d_ray_t *ray;
+    fclaw2d_ray_t *rays = ray_acc->rays;
+    num_rays = ray_acc->num_rays;
+    for (i =0; i < num_rays; i++)
+    {
+        ray = &rays[i];
+        ray->untrustworthy = 0;
+    }
 }
-#endif
 
 
 static
@@ -139,16 +161,20 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
     FCLAW_ASSERT(ray_acc->rays != NULL);
 
     /* Copy arrays stored in accumulator to an sc_array */
+    int i, num_rays;
+    double intval;
+    fclaw2d_ray_t *ray, *fclaw_ray;
     sc_array_t  *sc_rays = sc_array_new (sizeof (fclaw2d_ray_t));
-    int num_rays = ray_acc->num_rays;
-    for(int i = 0; i < num_rays; i++)
+    num_rays = ray_acc->num_rays;
+    for(i = 0; i < num_rays; i++)
     {
         /* Add one ray to sc_rays;  return newly pushed array */
-        fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) sc_array_push (sc_rays);        
+        fclaw_ray = (fclaw2d_ray_t *) sc_array_push (sc_rays);
 
         /* Set data for ray */
         fclaw_ray->num = ray_acc->rays[i].num;
         fclaw_ray->ray_data = (void*) ray_acc->rays[i].ray_data;
+        fclaw_ray->untrustworthy = 0;
     }
 
     sc_array_t *integrals = sc_array_new_count (sizeof (double), num_rays);
@@ -161,14 +187,17 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
 
     /* Copy integral value back to fclaw2d_ray_t */
     fclaw2d_ray_t *rays = ray_acc->rays;
-    for(int i = 0; i < num_rays; i++)
+    for(i = 0; i < num_rays; i++)
     {
         /* Return values from integrals */
-        double intval = *((double*) sc_array_index_int(integrals,i));
+        intval = *((double*) sc_array_index_int(integrals,i));
+
+        fclaw_ray = (fclaw2d_ray_t*)sc_array_index_int(sc_rays, i);
 
         /* Update rays stored in accumulator so we can report values later */
-        fclaw2d_ray_t *ray = &rays[i];
+        ray = &rays[i];
         ray->integral = intval;
+        ray->untrustworthy = fclaw_ray->untrustworthy;
     }
 
     sc_array_destroy (sc_rays);
@@ -188,15 +217,37 @@ void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
 
     FCLAW_ASSERT(ray_acc->rays != NULL);
 
+    /* we check if the rays yielded trustworthy results on all processes */
+    int i, *local_untrustworthy, *global_untrustworthy;
+    fclaw2d_ray_t *ray;
     int num_rays = ray_acc->num_rays;
     fclaw2d_ray_t *rays = ray_acc->rays;
+
+    local_untrustworthy = (int*) FCLAW_ALLOC (int, num_rays);
+    for (i = 0; i < num_rays; i++)
+    {
+        ray = &rays[i];
+        local_untrustworthy[i] = ray->untrustworthy;
+    }
+
+    global_untrustworthy = (int*) FCLAW_ALLOC (int, num_rays);
+    sc_MPI_Allreduce(local_untrustworthy, global_untrustworthy, num_rays,
+                     sc_MPI_INT, sc_MPI_MAX, glob->mpicomm);
+
     for(int i = 0; i < num_rays; i++)
     {
-        fclaw2d_ray_t *ray = &rays[i];
+        ray = &rays[i];
         int id = ray->num;
         double intval = ray->integral;
+        if (global_untrustworthy[i])
+        {
+            fclaw_global_essentialf("The integral of ray %2d is not trustworthy.\n",id);
+        }
         fclaw_global_essentialf("ray %2d; integral = %24.16e\n",id,intval);
     }
+
+    FCLAW_FREE (local_untrustworthy);
+    FCLAW_FREE (global_untrustworthy);
 }
 
 
@@ -253,7 +304,8 @@ void fclaw2d_ray_vtable_initialize(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt(glob);
     diag_vt->ray_init_diagnostics     = ray_initialize;    
     diag_vt->ray_compute_diagnostics  = ray_integrate;
-    diag_vt->ray_gather_diagnostics  = ray_gather; 
+    diag_vt->ray_gather_diagnostics   = ray_gather;
+    diag_vt->ray_reset_diagnostics    = ray_reset;
     diag_vt->ray_finalize_diagnostics = ray_finalize;
 
     fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt_new(); 

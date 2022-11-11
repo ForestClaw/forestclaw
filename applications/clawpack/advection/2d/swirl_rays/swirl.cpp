@@ -66,7 +66,6 @@ typedef struct swirl_ray
             double radius;
         } circle;
     } r;
-    int untrustworthy;
 }
 swirl_ray_t;
 
@@ -133,9 +132,6 @@ swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
         FCLAW_ASSERT(sr->r.line.parallel == 2 ||
                      sr->r.line.parallel == sr->r.line.dominant);
 
-        /* Initialize the intersection status to trustworthy */
-        sr->untrustworthy = 0;
-
         /* Assign ray to diagnostics item */
         fclaw2d_ray_t *ray = &ray_vec[i];
         fclaw2d_ray_set_ray (ray, i + 1, sr);
@@ -173,7 +169,7 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
  */
 static int
 intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
-                 int i, double *dt, double rayni[2])
+                 int i, int *untrustworthy, double *dt, double rayni[2])
 {
     int ni, j, isleft, iscenter;
     double corners[2][2];
@@ -267,7 +263,8 @@ swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
          * in the swirl_ray_t we defined, we now have to set *integral to be the
          * contribution of this ray-patch combination to the ray integral.
          * We should return 1 (even though a leaf return value is ignored). */
-        if (!intersect_patch (patch, swirl_ray, i, &dt, rayni)) {
+        if (!intersect_patch (patch, swirl_ray, i, &fclaw_ray->untrustworthy,
+                              &dt, rayni)) {
             /* We do not have an intersection, the return value is ignored. */
             return 1;
         }
@@ -350,7 +347,8 @@ swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
          * The purpose of this test is to remove irrelevant ancestor
          * patch-ray-combinations early on to avoid unnecessary computation.
          * We do not need to assign to the integral value for ancestor patches. */
-        return intersect_patch (patch, swirl_ray, i, &dt, rayni);
+        return intersect_patch (patch, swirl_ray, i, &fclaw_ray->untrustworthy,
+                                &dt, rayni);
     }
 }
 
