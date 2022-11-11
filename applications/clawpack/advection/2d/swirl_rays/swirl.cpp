@@ -32,7 +32,9 @@
  * example parallel to this application directory.
  * If #define is 1, use an ad-hoc setup local to this file.
  */
+#if 1
 #define STAR_OF_RAYS
+#endif
 
 typedef enum
 {
@@ -168,7 +170,10 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
                  int i, int *untrustworthy, double *dt, double rayni[2])
 {
     int ni, j, isleft, iscenter;
-    double corners[2][2], h;
+    double corners[2][2], h = 0.;
+
+    FCLAW_ASSERT (untrustworthy != NULL);
+    FCLAW_ASSERT (dt != NULL);
 
     /* store the patch corners in an indexable format */
     corners[0][0] = patch->xlower;
@@ -192,6 +197,7 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
            we will not integrate ray-patch-intersections that are closer than
            h to the patch faces in dimension ni, because we cannot guarantee
            reliable results in this case. */
+        FCLAW_ASSERT (i == j);
         h = 2e-12 * (corners[1][j ^ 1] - corners[0][j ^ 1]);
     }
 
@@ -217,13 +223,13 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
         }
     }
 
-    /* verify that we catched all axis parallel rays that intersect the patch
+    /* verify that we caught all axis parallel rays that intersect the patch
      * boundary */
     FCLAW_ASSERT(swirl_ray->r.line.parallel == 2 || iscenter != 1);
 
     /* If the ray misses the patch there will be two hits on the same side
      * of the patch. */
-    return (isleft == 1 || iscenter);
+    return isleft == 1 || iscenter;
 }
 
 static int
