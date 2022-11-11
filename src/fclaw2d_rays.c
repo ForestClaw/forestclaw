@@ -75,7 +75,7 @@ void ray_deallocate(fclaw2d_global_t* glob,
 static
 void ray_initialize(fclaw2d_global_t* glob, void** acc)
 {
-    fclaw2d_ray_acc_t *ray_acc = (fclaw2d_ray_acc_t*) FCLAW_ALLOC(fclaw2d_ray_acc_t,1);
+    fclaw2d_ray_acc_t *ray_acc = FCLAW_ALLOC(fclaw2d_ray_acc_t,1);
 
     /* Check to see if user wants ray output */
     int i, num_rays;
@@ -223,14 +223,14 @@ void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
     int num_rays = ray_acc->num_rays;
     fclaw2d_ray_t *rays = ray_acc->rays;
 
-    local_untrustworthy = (int*) FCLAW_ALLOC (int, num_rays);
+    local_untrustworthy = FCLAW_ALLOC (int, num_rays);
     for (i = 0; i < num_rays; i++)
     {
         ray = &rays[i];
         local_untrustworthy[i] = ray->untrustworthy;
     }
 
-    global_untrustworthy = (int*) FCLAW_ALLOC (int, num_rays);
+    global_untrustworthy = FCLAW_ALLOC (int, num_rays);
     sc_MPI_Allreduce(local_untrustworthy, global_untrustworthy, num_rays,
                      sc_MPI_INT, sc_MPI_MAX, glob->mpicomm);
 
@@ -332,7 +332,7 @@ fclaw2d_ray_vtable_t* fclaw2d_ray_vt(fclaw2d_global_t* glob)
 
 fclaw2d_ray_t* fclaw2d_ray_allocate_rays(int num_rays)
 {
-    fclaw2d_ray_t* rays = (fclaw2d_ray_t*) FCLAW_ALLOC(fclaw2d_ray_t,num_rays);
+    fclaw2d_ray_t* rays = FCLAW_ALLOC(fclaw2d_ray_t,num_rays);
     return rays;
 }
 
