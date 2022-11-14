@@ -160,7 +160,7 @@ fclaw2d_map_new_brick (fclaw2d_domain_t *domain,
 
     for (i = 0; i < nb; i++)
     {
-        fclaw2d_block_t *block = &domain->blocks[nb];
+        fclaw2d_block_t *block = &domain->blocks[i];
 
         /* (x,y) reference coordinates of lower-left block corner */
         bv->xv[i] = block->vertices[0];
