@@ -267,6 +267,7 @@ main (int argc, char **argv)
         /* MPI COMMs */
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
         create_solver_comms(user_opt, mpicomm, &filament_mpicomm, &swirl_mpicomm);
+
         /* Globs */
         filament_glob = fclaw2d_global_new();
 
@@ -314,19 +315,17 @@ main (int argc, char **argv)
         {
             /* finalize */
             filament_finalize(filament_glob);
-
-            /* destroy */
-            fclaw2d_global_destroy(filament_glob);        
         }
 
         if(swirl_mpicomm != sc_MPI_COMM_NULL)
         {
             /* finalize */
             swirl_finalize(swirl_glob);
-
-            /* destroy */
-            fclaw2d_global_destroy(swirl_glob);
         }
+
+        /* destroy */
+        fclaw2d_global_destroy(filament_glob);        
+        fclaw2d_global_destroy(swirl_glob);
     }
 
     fclaw_app_destroy (app);
