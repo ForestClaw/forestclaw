@@ -49,8 +49,6 @@ typedef enum {
 typedef struct phasefield_options
 {
     /* Put any user options here */
-    const char* directory;
-
     int example;
 
     double S;

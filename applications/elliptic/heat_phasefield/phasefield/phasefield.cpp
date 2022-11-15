@@ -30,6 +30,7 @@
 
 #include <fclaw2d_include_all.h>
 
+#include <fclaw2d_global.h>
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
 
@@ -68,9 +69,7 @@ fclaw2d_domain_t* phasefield_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t*
 
 void phasefield_run_program(fclaw2d_global_t* glob)
 {
-    const phasefield_options_t* user = phasefield_get_options(glob);
-    char* old_path = fclaw_cwd();
-    fclaw_cd(user->directory);
+    fclaw2d_set_global_context(glob);
 
     /* ---------------------------------------------------------------
        Set domain data.
@@ -101,6 +100,5 @@ void phasefield_run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_finalize(glob);
 
-    fclaw_cd(old_path);
-    FCLAW_FREE(old_path);
+    fclaw2d_clear_global_context(glob);
 }

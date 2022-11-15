@@ -49,8 +49,6 @@ typedef enum {
 typedef struct heat_options
 {
     /* Put any user options here */
-    const char* directory;
-
     int example;
     int beta_choice;
 

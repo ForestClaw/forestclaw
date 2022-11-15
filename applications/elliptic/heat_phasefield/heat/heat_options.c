@@ -31,11 +31,6 @@ static void *
 heat_register (heat_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
-
-    sc_options_add_string (opt, 0, "directory",
-                           &user->directory, 
-                           "","Directory to run simulation in. Empty string means current directory. []");  
-
     sc_options_add_int (opt, 0, "example", &user->example, 1,
                            "[user] Example [1]");
 
