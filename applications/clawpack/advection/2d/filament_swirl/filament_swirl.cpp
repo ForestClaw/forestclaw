@@ -71,20 +71,7 @@ void filament_initialize(fclaw2d_global_t* glob)
     FCLAW_FREE(old_path);
     fclaw2d_clear_global_context(glob);
 }
-static
-void filament_run_program(fclaw2d_global_t* glob)
-{
-    fclaw2d_set_global_context(glob);
-    char* old_path = fclaw_cwd();
-    fclaw_cd("filament");
 
-    fclaw2d_problem_setup(glob);
-    fclaw2d_run(glob);
-
-    fclaw_cd(old_path);
-    FCLAW_FREE(old_path);
-    fclaw2d_clear_global_context(glob);
-}
 static
 void filament_finalize(fclaw2d_global_t* glob)
 {
@@ -140,6 +127,36 @@ void swirl_initialize(fclaw2d_global_t* glob)
     fclaw2d_clear_global_context(glob);
 }
 static
+void swirl_finalize(fclaw2d_global_t* glob)
+{
+    fclaw2d_set_global_context(glob);
+    char* old_path = fclaw_cwd();
+    fclaw_cd("swirl");
+
+    fclaw2d_problem_setup(glob);
+    fclaw2d_finalize(glob);
+
+    fclaw_cd(old_path);
+    FCLAW_FREE(old_path);
+    fclaw2d_clear_global_context(glob);
+}
+
+static
+void filament_run_program(fclaw2d_global_t* glob)
+{
+    fclaw2d_set_global_context(glob);
+    char* old_path = fclaw_cwd();
+    fclaw_cd("filament");
+
+    fclaw2d_problem_setup(glob);
+    fclaw2d_run(glob);
+
+    fclaw_cd(old_path);
+    FCLAW_FREE(old_path);
+    fclaw2d_clear_global_context(glob);
+}
+
+static
 void swirl_run_program(fclaw2d_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
@@ -153,19 +170,12 @@ void swirl_run_program(fclaw2d_global_t* glob)
     FCLAW_FREE(old_path);
     fclaw2d_clear_global_context(glob);
 }
+
 static
-void swirl_finalize(fclaw2d_global_t* glob)
+void run_programs(fclaw2d_global_t* globs[])
 {
-    fclaw2d_set_global_context(glob);
-    char* old_path = fclaw_cwd();
-    fclaw_cd("swirl");
-
-    fclaw2d_problem_setup(glob);
-    fclaw2d_finalize(glob);
-
-    fclaw_cd(old_path);
-    FCLAW_FREE(old_path);
-    fclaw2d_clear_global_context(glob);
+    filament_run_program(globs[0]);
+    swirl_run_program(globs[1]);
 }
 
 int
@@ -259,8 +269,7 @@ main (int argc, char **argv)
         fclaw2d_global_t* globs[2];
         globs[0] = filament_glob;
         globs[1] = swirl_glob;
-        filament_run_program(filament_glob);
-        swirl_run_program(swirl_glob);
+        run_programs(globs);
 
         /* finalzie */
         filament_finalize(filament_glob);
