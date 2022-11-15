@@ -67,8 +67,6 @@ fclaw2d_domain_t* filament_create_domain(sc_MPI_Comm mpicomm,
                                          filament_options_t* user,
                                          fclaw2d_clawpatch_options_t* clawpatch_opt);
 
-void filament_run_program(fclaw2d_global_t* glob);
-
 #ifdef __cplusplus
 }
 #endif

@@ -57,8 +57,6 @@ const swirl_options_t* swirl_get_options(fclaw2d_global_t* glob);
 
 fclaw2d_domain_t* swirl_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms);
 
-void swirl_run_program(fclaw2d_global_t* glob);
-
 #ifdef __cplusplus
 #if 0
 {

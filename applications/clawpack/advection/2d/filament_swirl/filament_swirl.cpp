@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_global.h>
 
+static
 void filament_initialize(fclaw2d_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
@@ -70,6 +71,7 @@ void filament_initialize(fclaw2d_global_t* glob)
     FCLAW_FREE(old_path);
     fclaw2d_clear_global_context(glob);
 }
+static
 void filament_run_program(fclaw2d_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
@@ -83,6 +85,7 @@ void filament_run_program(fclaw2d_global_t* glob)
     FCLAW_FREE(old_path);
     fclaw2d_clear_global_context(glob);
 }
+static
 void filament_finalize(fclaw2d_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
@@ -96,6 +99,7 @@ void filament_finalize(fclaw2d_global_t* glob)
     FCLAW_FREE(old_path);
     fclaw2d_clear_global_context(glob);
 }
+static
 void swirl_initialize(fclaw2d_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
@@ -135,6 +139,7 @@ void swirl_initialize(fclaw2d_global_t* glob)
     FCLAW_FREE(old_path);
     fclaw2d_clear_global_context(glob);
 }
+static
 void swirl_run_program(fclaw2d_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
@@ -148,6 +153,7 @@ void swirl_run_program(fclaw2d_global_t* glob)
     FCLAW_FREE(old_path);
     fclaw2d_clear_global_context(glob);
 }
+static
 void swirl_finalize(fclaw2d_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
@@ -250,6 +256,9 @@ main (int argc, char **argv)
         swirl_initialize(swirl_glob);
 
         /* run */
+        fclaw2d_global_t* globs[2];
+        globs[0] = filament_glob;
+        globs[1] = swirl_glob;
         filament_run_program(filament_glob);
         swirl_run_program(swirl_glob);
 
