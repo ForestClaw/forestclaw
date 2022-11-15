@@ -119,6 +119,9 @@ struct fclaw_options
 {
     int dim;
 
+    /* Run Options */
+    const char* run_directory; /**< Directory where solver should be run */
+
     /* Time stepping */
     double initial_dt;  /**< Initial time step size */
     double tfinal;      /**< Final time */
