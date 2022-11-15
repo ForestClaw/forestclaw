@@ -33,7 +33,7 @@ static void *
 filament_register (filament_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
-    sc_options_add_int (opt, 0, "example", &user->example, 0,
+    sc_options_add_int (opt, 0, "example", &user->example, 1,
                         "[user] 0 = nomap; 1 = brick; 2 = five patch square [0]");
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,

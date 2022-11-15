@@ -29,6 +29,7 @@ add_library(filament_swirl_f OBJECT
 
 add_executable(filament_swirl 
   filament_swirl.cpp 
+  user_options.c 
   filament/filament.cpp
   filament/filament_options.c 
   filament/filament_user.cpp 
