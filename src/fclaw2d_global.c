@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_options.h"
 #include "fclaw2d_vtable.h"
 #include "fclaw_base.h"
+#include <fclaw_filesystem.h>
 #include <fclaw_global.h>
 
 #include <fclaw_package.h>
@@ -257,17 +258,33 @@ fclaw2d_global_t* fclaw2d_global_get_global (void)
 // Only 2d for now need fclaw2d_options
 #ifndef P4_TO_P8
 
+static char* old_path = NULL;
+
 void fclaw2d_set_global_context(fclaw2d_global_t *glob)
 {
     fclaw_options_t* opts = fclaw2d_get_options(glob);
     fclaw_set_logging_prefix(opts->logging_prefix);
     fclaw_set_logging_mpi_comm(glob->domain->mpicomm);
+
+    // Change run directory
+    if(opts->run_directory != NULL){
+        FCLAW_ASSERT(old_path = NULL);
+        old_path = fclaw_cwd();
+        fclaw_cd(opts->run_directory);
+    }
 }
 
 void fclaw2d_clear_global_context(fclaw2d_global_t *glob)
 {
     fclaw_set_logging_prefix(NULL);
     fclaw_set_logging_mpi_comm(NULL);
+
+    // Return to previous cwd
+    if(old_path != NULL){
+        fclaw_cd(old_path);
+        FCLAW_FREE(old_path);
+        old_path = NULL;
+    }
 }
 
 #endif
