@@ -1,11 +1,11 @@
 ## Makefile.am in applications/clawpack/advection/2d/filament_swirl
 
 bin_PROGRAMS += applications/clawpack/advection/2d/filament_swirl/filament_swirl
+bin_PROGRAMS += applications/clawpack/advection/2d/filament_swirl/filament_swirl_split
 
 TESTS += applications/clawpack/advection/2d/filament_swirl/regressions.sh
 
-applications_clawpack_advection_2d_filament_swirl_filament_swirl_SOURCES = \
-	applications/clawpack/advection/2d/filament_swirl/filament_swirl.cpp \
+applications_clawpack_advection_2d_filament_swirl_filament_swirl_COMMON_SOURCES = \
 	applications/clawpack/advection/2d/filament_swirl/user_options.c \
 	applications/clawpack/advection/2d/filament_swirl/psi.f \
 	applications/clawpack/advection/2d/filament_swirl/filament/filament.cpp \
@@ -44,6 +44,14 @@ applications_clawpack_advection_2d_filament_swirl_filament_swirl_SOURCES = \
 	applications/clawpack/advection/2d/all/clawpack5_rpn2adv_manifold.f90 \
 	applications/clawpack/advection/2d/all/clawpack5_rpt2adv_manifold.f90
 
+applications_clawpack_advection_2d_filament_swirl_filament_swirl_SOURCES = \
+	applications/clawpack/advection/2d/filament_swirl/filament_swirl.cpp \
+	$(applications_clawpack_advection_2d_filament_swirl_filament_swirl_COMMON_SOURCES)
+	
+applications_clawpack_advection_2d_filament_swirl_filament_swirl_split_SOURCES = \
+	applications/clawpack/advection/2d/filament_swirl/filament_swirl_split.cpp \
+	$(applications_clawpack_advection_2d_filament_swirl_filament_swirl_COMMON_SOURCES)
+
 EXTRA_DIST += \
 	applications/clawpack/advection/2d/filament_swirl/fclaw_options.ini \
 	applications/clawpack/advection/2d/filament_swirl/regression.ini \
@@ -64,6 +72,9 @@ applications_clawpack_advection_2d_filament_swirl_filament_swirl_CPPFLAGS = \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
+
+applications_clawpack_advection_2d_filament_swirl_filament_swirl_split_CPPFLAGS = \
+		$(applications_clawpack_advection_2d_filament_swirl_filament_swirl_CPPFLAGS)
 	    
 
 # applications_clawpack_advection_2d_filament_swirl_filament_swirl_CPPFLAGS += -D MPI_DEBUG
@@ -75,3 +86,6 @@ applications_clawpack_advection_2d_filament_swirl_filament_swirl_LDADD = \
         $(FCLAW_CLAWPACK5_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD)
+
+applications_clawpack_advection_2d_filament_swirl_filament_swirl_split_LDADD = \
+		$(applications_clawpack_advection_2d_filament_swirl_filament_swirl_LDADD)

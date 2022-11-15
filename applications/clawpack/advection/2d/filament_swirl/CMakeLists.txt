@@ -27,8 +27,7 @@ add_library(filament_swirl_f OBJECT
   ${all}/clawpack5_rpt2adv_manifold.f90
 )
 
-add_executable(filament_swirl 
-  filament_swirl.cpp 
+add_library(filament_swirl_common OBJECT 
   user_options.c 
   filament/filament.cpp
   filament/filament_options.c 
@@ -40,6 +39,21 @@ add_executable(filament_swirl
   ${all}/fclaw2d_map_cart.c 
   ${all}/fclaw2d_map_fivepatch.c 
   ${all}/fclaw2d_map_bilinear.c 
+)
+
+target_include_directories(filament_swirl_common PRIVATE 
+  ${CMAKE_CURRENT_SOURCE_DIR} 
+  ${all}
+)
+
+target_link_libraries(filament_swirl_common PRIVATE 
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
+)
+
+add_executable(filament_swirl 
+  filament_swirl.cpp
+  $<TARGET_OBJECTS:filament_swirl_common>
   $<TARGET_OBJECTS:filament_swirl_f>
 )
 
@@ -49,6 +63,22 @@ target_include_directories(filament_swirl PRIVATE
 )
 
 target_link_libraries(filament_swirl PRIVATE 
+ FORESTCLAW::CLAWPACK4.6
+ FORESTCLAW::CLAWPACK5
+)
+
+add_executable(filament_swirl_split
+  filament_swirl_split.cpp
+  $<TARGET_OBJECTS:filament_swirl_common>
+  $<TARGET_OBJECTS:filament_swirl_f>
+)
+
+target_include_directories(filament_swirl_split PRIVATE 
+  ${CMAKE_CURRENT_SOURCE_DIR} 
+  ${all}
+)
+
+target_link_libraries(filament_swirl_split PRIVATE 
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
 )
