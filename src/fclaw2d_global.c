@@ -268,7 +268,7 @@ void fclaw2d_set_global_context(fclaw2d_global_t *glob)
 
     // Change run directory
     if(opts->run_directory != NULL){
-        FCLAW_ASSERT(old_path = NULL);
+        FCLAW_ASSERT(old_path == NULL);
         old_path = fclaw_cwd();
         fclaw_cd(opts->run_directory);
     }
