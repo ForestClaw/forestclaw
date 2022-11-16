@@ -23,7 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "user.h"
 #include "filament/filament_user.h"
 #include "swirl/swirl_user.h"
 
@@ -184,8 +183,6 @@ main (int argc, char **argv)
     /* Options */
     sc_options_t                *options;
 
-    user_options_t              *user_opt;
-
     filament_options_t          *filament_user_opt;
     fclaw_options_t             *filament_fclaw_opt;
     fclaw2d_clawpatch_options_t *filament_clawpatch_opt;
@@ -229,9 +226,6 @@ main (int argc, char **argv)
 
     /* Initialize application on subcommunicator */
     app = fclaw_app_new_on_comm(subcomm, &argc, &argv, NULL);
-
-    /* user options for both solvers */
-    user_opt = user_options_register(app, "user", "fclaw_options.ini");  
 
     /* Register packages */
     filament_fclaw_opt                    = fclaw_options_register(app,  "filament",           "fclaw_options.ini");

@@ -28,7 +28,6 @@ add_library(filament_swirl_f OBJECT
 )
 
 add_library(filament_swirl_common OBJECT 
-  user_options.c 
   filament/filament.cpp
   filament/filament_options.c 
   filament/filament_user.cpp 

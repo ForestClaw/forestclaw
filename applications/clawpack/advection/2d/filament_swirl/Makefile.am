@@ -6,7 +6,6 @@ bin_PROGRAMS += applications/clawpack/advection/2d/filament_swirl/filament_swirl
 TESTS += applications/clawpack/advection/2d/filament_swirl/regressions.sh
 
 applications_clawpack_advection_2d_filament_swirl_filament_swirl_COMMON_SOURCES = \
-	applications/clawpack/advection/2d/filament_swirl/user_options.c \
 	applications/clawpack/advection/2d/filament_swirl/psi.f \
 	applications/clawpack/advection/2d/filament_swirl/filament/filament.cpp \
 	applications/clawpack/advection/2d/filament_swirl/filament/filament_options.c \
