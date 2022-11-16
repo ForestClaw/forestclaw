@@ -174,31 +174,6 @@ void run_programs(fclaw2d_global_t* globs[], int nglobs)
     }
 }
 
-static
-void create_solver_comms(user_options_t* opts, sc_MPI_Comm global_comm, sc_MPI_Comm* filament_comm, sc_MPI_Comm* swirl_comm)
-{
-    if(opts->split_comm)
-    {
-        int global_rank;
-        sc_MPI_Comm_rank(global_comm, &global_rank);
-        int global_size;
-        sc_MPI_Comm_size(global_comm, &global_size);
-        int color = global_rank > global_size / 2;
-        if(color == 0){
-            sc_MPI_Comm_split(global_comm, color, global_rank, filament_comm);
-            *swirl_comm = sc_MPI_COMM_NULL;
-        }else{
-            sc_MPI_Comm_split(global_comm, color, global_rank, swirl_comm);
-            *filament_comm = sc_MPI_COMM_NULL;
-        }
-    }
-    else 
-    {
-        *filament_comm = global_comm; 
-        *swirl_comm = global_comm; 
-    }
-}
-
 int
 main (int argc, char **argv)
 {
@@ -229,15 +204,31 @@ main (int argc, char **argv)
     fclaw2d_global_t         *swirl_glob;
     fclaw2d_domain_t         *swirl_domain;
 
-    sc_MPI_Comm mpicomm;
-    sc_MPI_Comm swirl_mpicomm;
-    sc_MPI_Comm filament_mpicomm;
+    sc_MPI_Comm mpicomm = sc_MPI_COMM_WORLD;
+    sc_MPI_Comm subcomm;
 
+    sc_MPI_Init(&argc, &argv);
+
+    /* Split MPI_COMM_WORLD */
+    int global_rank;
+    sc_MPI_Comm_rank(mpicomm, &global_rank);
+
+    int global_size;
+    sc_MPI_Comm_size(mpicomm, &global_size);
+
+    int color;
+    if(global_rank < global_size/2){
+        color = 0;
+    }else{
+        color = 1;
+    }
+
+    sc_MPI_Comm_split(mpicomm, color, global_rank, &subcomm);
 
     int retval;
 
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
+    /* Initialize application on subcommunicator */
+    app = fclaw_app_new_on_comm(subcomm, &argc, &argv, NULL);
 
     /* user options for both solvers */
     user_opt = user_options_register(app, "user", "fclaw_options.ini");  
@@ -266,7 +257,6 @@ main (int argc, char **argv)
 
         /* MPI COMMs */
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        create_solver_comms(user_opt, mpicomm, &filament_mpicomm, &swirl_mpicomm);
 
         /* Globs */
         filament_glob = fclaw2d_global_new();
@@ -285,40 +275,31 @@ main (int argc, char **argv)
         fc2d_clawpack5_options_store    (swirl_glob, swirl_claw5_opt);
         swirl_options_store             (swirl_glob, swirl_user_opt);
 
-        if(filament_mpicomm != sc_MPI_COMM_NULL)
+        if(color == 0)
         {
             /* Domain */
-            filament_domain = filament_create_domain(filament_mpicomm, filament_fclaw_opt, filament_user_opt,filament_clawpatch_opt);
+            filament_domain = filament_create_domain(subcomm, filament_fclaw_opt, filament_user_opt,filament_clawpatch_opt);
             fclaw2d_global_store_domain(filament_glob, filament_domain);
 
             /* initialize */
             filament_initialize(filament_glob);
-        }
 
-        if(swirl_mpicomm != sc_MPI_COMM_NULL)
-        {
+            /* run */
+            run_programs(&filament_glob, 1);
+
+            /* finalize */
+            filament_finalize(filament_glob);
+        }else{
             /* Domain */
-            swirl_domain = swirl_create_domain(swirl_mpicomm, swirl_fclaw_opt);
+            swirl_domain = swirl_create_domain(subcomm, swirl_fclaw_opt);
             fclaw2d_global_store_domain(swirl_glob, swirl_domain);
             
             /* initialize */
             swirl_initialize(swirl_glob);
-        }
 
-        /* run */
-        fclaw2d_global_t* globs[2];
-        globs[0] = filament_glob;
-        globs[1] = swirl_glob;
-        run_programs(globs, 2);
+            /* run */
+            run_programs(&swirl_glob, 1);
 
-        if(filament_mpicomm != sc_MPI_COMM_NULL)
-        {
-            /* finalize */
-            filament_finalize(filament_glob);
-        }
-
-        if(swirl_mpicomm != sc_MPI_COMM_NULL)
-        {
             /* finalize */
             swirl_finalize(swirl_glob);
         }
