@@ -36,11 +36,11 @@
   "cacheVariables": {"openmp": false},
   "environment": {
     "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-    "CC": "gcc-10",
+    "CC": "gcc-11",
     "CFLAGS": "-DFCLAW_ENABLE_DEBUG",
-    "CXX": "g++-10",
+    "CXX": "g++-11",
     "CXXFLAGS": "-DFCLAW_ENABLE_DEBUG",
-    "FC": "gfortran-10"
+    "FC": "gfortran-11"
   }
 },
 {
