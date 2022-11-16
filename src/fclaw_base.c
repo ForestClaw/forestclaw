@@ -272,7 +272,7 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 }
 
 fclaw_app_t *
-fclaw_app_new (int *argc, char ***argv, void *user)
+fclaw_app_new_on_comm (sc_MPI_Comm mpicomm, int *argc, char ***argv, void *user)
 {
     //TODO seperate intialize from creating new app (makes testing difficult)
 #ifdef FCLAW_ENABLE_DEBUG
@@ -283,13 +283,8 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     const int LP_fclaw = SC_LP_PRODUCTION;
 #endif
     int mpiret;
-    sc_MPI_Comm mpicomm;
     fclaw_app_t *a;
 
-    mpicomm = sc_MPI_COMM_WORLD;
-
-    mpiret = sc_MPI_Init (argc, argv);
-    SC_CHECK_MPI (mpiret);
     sc_init (mpicomm, 1, 1, sc_log_handler, LP_lib);
     p4est_init (p4est_log_handler, LP_lib);
     fclaw_init (fclaw_log_handler, LP_fclaw);
@@ -319,6 +314,20 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->attributes = sc_keyvalue_new ();
 
     return a;
+}
+
+fclaw_app_t *
+fclaw_app_new (int *argc, char ***argv, void *user)
+{
+    int mpiret;
+    sc_MPI_Comm mpicomm;
+
+    mpicomm = sc_MPI_COMM_WORLD;
+
+    mpiret = sc_MPI_Init (argc, argv);
+    SC_CHECK_MPI (mpiret);
+
+    return fclaw_app_new_on_comm(mpicomm, argc, argv, user);
 }
 
 void

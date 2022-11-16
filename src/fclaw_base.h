@@ -368,6 +368,25 @@ void fclaw_init (sc_log_handler_t log_handler, int log_threshold);
  */
 fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
 
+/** Use when MPI is already intialized.
+ * Call the (optional) init functions for sc, p4est, and ForestClaw.  The log
+ * level is set as well and depends on the configure option `--enable-debug`.
+ * With `--enable-debug`: DEBUG for ForestClaw, INFO for sc and p4est.  Without
+ * `--enable-debug`: PRODUCTION for ForestClaw, ESSENTIAL for sc and p4est.
+ * This can be influenced at compile time with `--enable-logging=SC_LP_DEBUG`
+ * for example, but this is somewhat clumsy and usually unnecessary since this
+ * option does not differentiate between the forestclaw and its submodules.
+ * It is possible and encouraged to change the levels with \b sc_package_set_verbosity.
+ * Attempts to reduce them (i.e., to cause more verbosity) at runtime are ignored.
+ * \param [in]     mpicomm      The MPI comm to initialize on.
+ * \param [in,out] argc         Command line argument count.
+ * \param [in,out] argv         Command line arguments.
+ * \param [in,out] user         Will not be changed by our code.
+ * \return            An allocated and initialized application object.
+ */
+fclaw_app_t *fclaw_app_new_on_comm (sc_MPI_Comm mpicomm, int *argc, char ***argv, void *user);
+
+
 /** Close down all systems that were setup in fclaw_init.
  * If a keyvalue structure has been added to a->opt, it is destroyed too.
  * \param [in,out] a            This application is cleaned up.
