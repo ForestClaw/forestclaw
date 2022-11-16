@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw_mpi.h>
-#include <sc_mpi.h>
 
 static const char *fclaw_configdir = ".forestclaw";
 static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
