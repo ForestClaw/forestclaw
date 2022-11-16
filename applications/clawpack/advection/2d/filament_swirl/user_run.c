@@ -110,7 +110,7 @@ typedef struct outstyle_1_context {
    Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
    -------------------------------------------------------------------------------- */
 static
-int outstyle_1(outstyle_1_context_t* ctx, fclaw2d_global_t *glob)
+double outstyle_1(outstyle_1_context_t* ctx, double t_pause, fclaw2d_global_t *glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -233,8 +233,8 @@ int outstyle_1(outstyle_1_context_t* ctx, fclaw2d_global_t *glob)
             }
 
             // this can be an opprotunity to return
-            if(1){
-                return 0;
+            if(ctx->tc >= t_pause){
+                return ctx->tc;
             }
             AFTER_TIMESTEP:
 
@@ -297,7 +297,7 @@ int outstyle_1(outstyle_1_context_t* ctx, fclaw2d_global_t *glob)
         ctx->iframe++;
         fclaw2d_output_frame(glob,ctx->iframe);
     }
-    return 1;
+    return ctx->final_time;
 }
 
 static
@@ -512,33 +512,39 @@ void outstyle_4(fclaw2d_global_t *glob)
 void user_run(fclaw2d_global_t * globs[],int nglobs)
 {
 
-    const fclaw_options_t *fclaw_opts[nglobs];
+    const fclaw_options_t* fclaw_opts[nglobs];
+    outstyle_1_context_t   contexts[nglobs];
+
+    int    finished[nglobs];
+    double dt[nglobs];
+    double tcurr[nglobs];
+
     for(int i=0; i< nglobs; i++){
         fclaw_opts[i] = fclaw2d_get_options(globs[i]);
-    }
 
-    outstyle_1_context_t contexts[nglobs];
-    for(int i=0; i< nglobs; i++){
-         contexts[i].intialized = 0;
-    }
+        contexts[i].intialized = 0;
 
-    int finished[nglobs];
-    for(int i=0; i< nglobs; i++){
         finished[i] = 0;
+        tcurr[i]    = 0;
+        dt[i]       = fclaw_opts[i]->tfinal/10;
     }
 
     int all_finished = 0;
+    int n = 1;
     while(!all_finished){
         for(int i=0; i< nglobs; i++){
             if(!finished[i]){
                 fclaw2d_set_global_context(globs[i]);
                 fclaw2d_problem_setup(globs[i]);
 
-                finished[i] = outstyle_1(&contexts[i], globs[i]);
+                tcurr[i] = outstyle_1(&contexts[i], n*dt[i], globs[i]);
+                finished[i] = tcurr[i] >= fclaw_opts[i]->tfinal;
+                fclaw_global_productionf("Paused at time %12.4f\n\n\n",tcurr[i]);
 
                 fclaw2d_clear_global_context(globs[i]);
             }
         }
+        n++;
         // this can be were solvers communicate with eatch other
 
         // check if all are finished
