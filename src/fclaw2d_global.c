@@ -264,7 +264,6 @@ void fclaw2d_set_global_context(fclaw2d_global_t *glob)
 {
     fclaw_options_t* opts = fclaw2d_get_options(glob);
     fclaw_set_logging_prefix(opts->logging_prefix);
-    fclaw_set_logging_mpi_comm(glob->domain->mpicomm);
 
     // Change run directory
     if(opts->run_directory != NULL){
@@ -277,7 +276,6 @@ void fclaw2d_set_global_context(fclaw2d_global_t *glob)
 void fclaw2d_clear_global_context(fclaw2d_global_t *glob)
 {
     fclaw_set_logging_prefix(NULL);
-    fclaw_set_logging_mpi_comm(NULL);
 
     // Return to previous cwd
     if(old_path != NULL){

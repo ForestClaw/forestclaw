@@ -167,7 +167,7 @@ fclaw_debugf (const char *fmt, ...)
     va_end (ap);
 }
 
-static int current_rank = 0;
+static int logging_rank = 0;
 static const char* logging_prefix = NULL;
 static sc_MPI_Comm default_comm = NULL;
 
@@ -175,23 +175,6 @@ void
 fclaw_set_logging_prefix(const char* new_name)
 {
     logging_prefix=new_name;
-}
-
-static void 
-fclaw_set_logging_app_mpi_comm(sc_MPI_Comm comm)
-{
-    default_comm=comm;
-    sc_MPI_Comm_rank(comm,&current_rank);
-}
-
-void 
-fclaw_set_logging_mpi_comm(sc_MPI_Comm comm)
-{
-    if(comm == NULL){
-        sc_MPI_Comm_rank(default_comm,&current_rank);
-    }else{
-        sc_MPI_Comm_rank(comm,&current_rank);
-    }
 }
 
 static void
@@ -210,7 +193,7 @@ log_handler (const char *name, FILE * log_stream, const char *filename, int line
     fprintf (log_stream, "%s", name);
     if (wi){
         fputc (' ', log_stream);
-        fprintf (log_stream, "%d", current_rank);
+        fprintf (log_stream, "%d", logging_rank);
     }
     fprintf (log_stream, "] %*s", lindent, "");
 
@@ -288,7 +271,6 @@ fclaw_app_new_on_comm (sc_MPI_Comm mpicomm, int *argc, char ***argv, void *user)
     sc_init (mpicomm, 1, 1, sc_log_handler, LP_lib);
     p4est_init (p4est_log_handler, LP_lib);
     fclaw_init (fclaw_log_handler, LP_fclaw);
-    fclaw_set_logging_app_mpi_comm(mpicomm);
 
     a = FCLAW_ALLOC (fclaw_app_t, 1);
     a->mpicomm = mpicomm;
@@ -296,6 +278,7 @@ fclaw_app_new_on_comm (sc_MPI_Comm mpicomm, int *argc, char ***argv, void *user)
     SC_CHECK_MPI (mpiret);
     mpiret = sc_MPI_Comm_rank (a->mpicomm, &a->mpirank);
     SC_CHECK_MPI (mpiret);
+    logging_rank = a->mpirank;
 
     srand (a->mpirank);
     a->first_arg = -1;
