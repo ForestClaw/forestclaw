@@ -126,12 +126,6 @@ void swirl_finalize(fclaw2d_global_t* glob)
     fclaw2d_clear_global_context(glob);
 }
 
-static
-void run_programs(fclaw2d_global_t* globs[])
-{
-    user_run(globs,2);
-}
-
 int
 main (int argc, char **argv)
 {
@@ -223,7 +217,7 @@ main (int argc, char **argv)
         fclaw2d_global_t* globs[2];
         globs[0] = filament_glob;
         globs[1] = swirl_glob;
-        run_programs(globs);
+        user_run(globs, 2);
 
         /* finalzie */
         filament_finalize(filament_glob);
