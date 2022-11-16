@@ -30,11 +30,6 @@
 static void *
 radial_register (radial_user_options_t *user, sc_options_t * opt)
 {
-    /* [user] User options */
-    sc_options_add_string (opt, 0, "directory",
-                           &user->directory, 
-                           "","Directory to run simulation in [CWD]");  
-
     user->is_registered = 1;
     return NULL;
 }

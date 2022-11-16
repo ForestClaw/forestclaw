@@ -47,9 +47,7 @@ extern "C"
 
 typedef struct slosh_user_options
 {
-  const char *directory;
   int is_registered;
-
 } slosh_user_options_t;
 
 void slosh_link_solvers(fclaw2d_global_t *glob);

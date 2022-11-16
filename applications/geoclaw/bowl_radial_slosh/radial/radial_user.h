@@ -38,7 +38,6 @@ extern "C"
 
 typedef struct radial_user_options
 {
-  const char *directory;
   int is_registered;
 } radial_user_options_t;
 

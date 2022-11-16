@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "slosh_user.h"
+#include "fclaw2d_global.h"
 #include <fclaw_filesystem.h>
 
 void slosh_link_solvers(fclaw2d_global_t *glob)
@@ -50,9 +51,7 @@ fclaw2d_domain_t* slosh_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gpar
 
 void slosh_run_program(fclaw2d_global_t* glob)
 {
-    slosh_user_options_t* user = slosh_get_options(glob);
-    char* old_path = fclaw_cwd();
-    fclaw_cd(user->directory);
+    fclaw2d_set_global_context(glob);
 
     /* ---------------------------------------------------------------
        Set domain data.
@@ -77,6 +76,5 @@ void slosh_run_program(fclaw2d_global_t* glob)
 
     fclaw2d_finalize(glob);
 
-    fclaw_cd(old_path);
-    FCLAW_FREE(old_path);
+    fclaw2d_clear_global_context(glob);
 }
