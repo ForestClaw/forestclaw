@@ -168,7 +168,6 @@ fclaw_debugf (const char *fmt, ...)
 
 static int logging_rank = 0;
 static const char* logging_prefix = NULL;
-static sc_MPI_Comm default_comm = NULL;
 
 void 
 fclaw_set_logging_prefix(const char* new_name)
