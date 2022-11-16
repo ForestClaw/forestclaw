@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "filament/filament_user.h"
 #include "swirl/swirl_user.h"
+#include "user.h"
 
 #include "../all/advection_user.h"
 
@@ -126,32 +127,9 @@ void swirl_finalize(fclaw2d_global_t* glob)
 }
 
 static
-void filament_run_program(fclaw2d_global_t* glob)
-{
-    fclaw2d_set_global_context(glob);
-
-    fclaw2d_problem_setup(glob);
-    fclaw2d_run(glob);
-
-    fclaw2d_clear_global_context(glob);
-}
-
-static
-void swirl_run_program(fclaw2d_global_t* glob)
-{
-    fclaw2d_set_global_context(glob);
-
-    fclaw2d_problem_setup(glob);
-    fclaw2d_run(glob);
-
-    fclaw2d_clear_global_context(glob);
-}
-
-static
 void run_programs(fclaw2d_global_t* globs[])
 {
-    filament_run_program(globs[0]);
-    swirl_run_program(globs[1]);
+    user_run(globs,2);
 }
 
 int
