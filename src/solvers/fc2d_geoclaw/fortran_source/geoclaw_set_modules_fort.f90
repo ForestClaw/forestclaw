@@ -40,6 +40,10 @@ SUBROUTINE fc2d_geoclaw_set_modules(mwaves_in, mcapa_in, meqn_in, maux_in,  &
     ylower = ay
     yupper = by
 
+    IF (ALLOCATED(mthlim)) THEN
+        DEALLOCATE(mthlim)
+    END IF
+
     ALLOCATE(mthlim(mwaves))
     DO mw = 1,mwaves
        mthlim(mw) = mthlim_in(mw)

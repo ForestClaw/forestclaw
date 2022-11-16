@@ -28,6 +28,9 @@ include applications/clawpack/advection/2d/disk/Makefile.am
 ## filament  (square, multi-block disk)
 include applications/clawpack/advection/2d/filament/Makefile.am
 
+## filament_swirl
+include applications/clawpack/advection/2d/filament_swirl/Makefile.am
+
 ## hemisphere (manifold, multi-block)
 include applications/clawpack/advection/2d/hemisphere/Makefile.am
 

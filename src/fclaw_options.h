@@ -119,6 +119,9 @@ struct fclaw_options
 {
     int dim;
 
+    /* Run Options */
+    const char* run_directory; /**< Directory where solver should be run */
+
     /* Time stepping */
     double initial_dt;  /**< Initial time step size */
     double tfinal;      /**< Final time */
@@ -233,6 +236,8 @@ struct fclaw_options
     int weighted_partition;            /**< Use weighted partition. */
 
     int is_registered;
+
+    const char * logging_prefix; /**< prefix presented in logging ie. [prefix] */
 };
 
 #ifdef __cplusplus

@@ -13,3 +13,6 @@ include applications/elliptic/allencahn/Makefile.am
 
 ## Crystal growth
 include applications/elliptic/phasefield/Makefile.am
+
+## Heat Phasefield two solver example
+include applications/elliptic/heat_phasefield/Makefile.am
