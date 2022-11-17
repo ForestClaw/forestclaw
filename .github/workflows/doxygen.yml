@@ -16,7 +16,7 @@ jobs:
     - name: Cmake Configure
       run: cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_Fortran_COMPILER=gfortran --preset ci -DCMAKE_INSTALL_PREFIX=~
     - name: Generate Doxygen
-      run: ninja doxygen
+      run: make doxygen
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
