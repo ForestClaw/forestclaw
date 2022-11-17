@@ -26,5 +26,6 @@ jobs:
       with:
         deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         external_repository: forestclaw/forestclaw.github.io
+        publish_branch: main
         publish_dir: ./doxygen/html
         destination_dir: docs/${{ steps.extract_branch.outputs.branch }}
