@@ -14,7 +14,7 @@ jobs:
         sudo apt-get install cmake doxygen graphviz ninja-build gfortran
     - uses: actions/checkout@v3
     - name: Cmake Configure
-      run: cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=cxx -DCMAKE_Fortran_COMPILER=gfortran --preset ci -DCMAKE_INSTALL_PREFIX=~
+      run: cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_Fortran_COMPILER=gfortran --preset ci -DCMAKE_INSTALL_PREFIX=~
     - name: Generate Doxygen
       run: ninja doxygen
     - name: Extract branch name
