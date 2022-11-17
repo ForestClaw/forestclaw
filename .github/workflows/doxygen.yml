@@ -14,7 +14,7 @@ jobs:
         sudo apt-get install cmake doxygen graphviz
     - uses: actions/checkout@v3
     - name: Cmake Configure
-      run: cmake
+      run: cmake --preset ci -DCMAKE_INSTALL_PREFIX=~
     - name: Generate Doxygen
       run: make doxygen
     - name: Extract branch name
