@@ -1283,6 +1283,62 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     sc_array_reset (lints);
 }
 
+/* dummy replacement until real p4est_search_partition_gfx is available */
+void
+p4est_search_partition_gfx (const p4est_gloidx_t *gfq,
+                            const p4est_quadrant_t *gfp,
+                            int nmemb, p4est_topidx_t num_trees,
+                            int call_post, void *user,
+                            p4est_search_partition_t quadrant_fn,
+                            p4est_search_partition_t point_fn,
+                            sc_array_t *points)
+{
+
+}
+
+typedef struct fclaw2d_interpolate_point_data
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_interpolate_point_t interpolate;
+    void *user;
+}
+fclaw2d_interpolate_point_data_t;
+
+void
+fclaw2d_overlap_exchange (fclaw2d_domain_t *domain,
+                          sc_array_t * query_points,
+                          fclaw2d_interpolate_point_t interpolate,
+                          void *user)
+{
+    fclaw2d_interpolate_point_data_t interpolate_point_data, *ipd =
+        &interpolate_point_data;
+    p4est_t p4est;
+    p4est_connectivity_t conn;
+    p4est_wrap_t *wrap;
+
+    /* assert validity of parameters */
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (query_points != NULL);
+    FCLAW_ASSERT(interpolate != NULL);
+
+    /* construct fclaw2d_integrate_ray_data_t */
+    ipd->domain = domain;
+    ipd->interpolate = interpolate;
+    ipd->user = user;
+
+    wrap = (p4est_wrap_t *) domain->pp;
+    FCLAW_ASSERT (wrap != NULL);
+    FCLAW_ASSERT (wrap->p4est != NULL);
+    FCLAW_ASSERT (wrap->conn != NULL);
+    p4est = *(wrap->p4est);
+    p4est.user_pointer = ipd;
+    conn = *(wrap->conn);
+    p4est_search_partition_gfx(p4est.global_first_quadrant,
+                               p4est.global_first_position, p4est.mpisize,
+                               conn.num_trees, 0, user, NULL,
+                               NULL, query_points);
+}
+
 #if 0
 #endif /* !P4_TO_P8 */
 #endif
