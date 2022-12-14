@@ -126,12 +126,53 @@ void swirl_finalize(fclaw2d_global_t* glob)
     fclaw2d_clear_global_context(glob);
 }
 
+typedef struct overlap_prodata
+{
+  double              myvalue;
+  int                 isset;
+}
+overlap_prodata_t;
+
+typedef struct overlap_point
+{
+  int                 rank;
+  p4est_locidx_t      lnum;
+  double              xyz[3];
+  overlap_prodata_t   prodata;
+}
+overlap_point_t;
+
+void
+create_query_points (sc_array_t *query_points)
+{
+    size_t iz, npz;
+    overlap_point_t *op;
+
+    npz = query_points->elem_count;
+    for (iz = 0; iz < npz; iz++) {
+        op = (overlap_point_t *) sc_array_index(query_points, iz);
+        op->xyz[0] = 0.1;
+        op->xyz[1] = 0.2;
+        op->xyz[2] = 0.3;
+    }
+}
+
+int
+overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+                     int blockno, int patchno, void *point, void *user)
+{
+    return 1;
+}
+
 int
 main (int argc, char **argv)
 {
     fclaw_app_t *app;
     int first_arg;
     fclaw_exit_type_t vexit;
+    sc_array_t *query_points;
+    overlap_point_t *op;
+    size_t iz, npz;
 
     /* Options */
     sc_options_t                *options;
@@ -214,10 +255,27 @@ main (int argc, char **argv)
         swirl_initialize(swirl_glob);
 
         /* run */
+        npz = 3;
+        query_points = sc_array_new_count(sizeof(overlap_point_t), npz);
+        create_query_points(query_points);
+        for (iz = 0; iz < npz; iz++) {
+            op = (overlap_point_t *)sc_array_index(query_points, iz);
+            printf("Query point %ld is [%f,%f,%f].\n", iz, op->xyz[0],
+                        op->xyz[1], op->xyz[2]);
+        }
+
+        fclaw2d_overlap_exchange(filament_domain, query_points,
+                                 overlap_interpolate, NULL);
+
+#if 0
         fclaw2d_global_t* globs[2];
         globs[0] = filament_glob;
         globs[1] = swirl_glob;
         user_run(globs, 2);
+#endif
+
+
+        sc_array_destroy(query_points);
 
         /* finalzie */
         filament_finalize(filament_glob);
