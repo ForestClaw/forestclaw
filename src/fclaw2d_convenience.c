@@ -1285,46 +1285,147 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
 
 /* dummy replacement until real p4est_search_partition_gfx is available */
 void
-p4est_search_partition_gfx (const p4est_gloidx_t *gfq,
-                            const p4est_quadrant_t *gfp,
+p4est_search_partition_gfx (const p4est_gloidx_t * gfq,
+                            const p4est_quadrant_t * gfp,
                             int nmemb, p4est_topidx_t num_trees,
                             int call_post, void *user,
                             p4est_search_partition_t quadrant_fn,
                             p4est_search_partition_t point_fn,
-                            sc_array_t *points)
+                            sc_array_t * points)
 {
 
 }
+
+typedef struct overlap_send_buf
+{
+    int rank;
+    sc_array_t ops;
+}
+overlap_buf_t;
 
 typedef struct fclaw2d_interpolate_point_data
 {
     fclaw2d_domain_t *domain;
     fclaw2d_interpolate_point_t interpolate;
     void *user;
+    size_t point_size;
+    sc_array_t *send_buffer;
 }
 fclaw2d_interpolate_point_data_t;
 
+static void
+overlap_consumer_add (fclaw2d_interpolate_point_data_t * ipd, void *point,
+                      int rank)
+{
+    size_t bcount;
+    overlap_buf_t *sb;
+
+    P4EST_ASSERT (ipd != NULL && ipd->send_buffer != NULL);
+    P4EST_ASSERT (point != NULL);
+    P4EST_ASSERT (0 <= rank && rank < ipd->domain->mpisize);
+
+    /* if we have a new rank, push new send buffer */
+    bcount = ipd->send_buffer->elem_count;
+    sb = NULL;
+    if (bcount > 0)
+    {
+        sb = (overlap_buf_t *) sc_array_index (ipd->send_buffer, bcount - 1);
+        P4EST_ASSERT (sb->rank <= rank);
+        P4EST_ASSERT (sb->ops.elem_count > 0);
+    }
+    if (bcount == 0 || sb->rank < rank)
+    {
+        sb = (overlap_buf_t *) sc_array_push (ipd->send_buffer);
+        sb->rank = rank;
+        sc_array_init (&sb->ops, ipd->point_size);
+    }
+    memcpy (sc_array_push (&sb->ops), point, ipd->point_size);
+}
+
+static int
+interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                          p4est_quadrant_t * quadrant, int pfirst, int plast,
+                          void *point)
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_domain_t fclaw2d_domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
+    int patchno;
+    int intersects;
+
+    /* assert that the user_pointer contains a valid interpolate_point_data_t */
+    fclaw2d_interpolate_point_data_t *ipd
+        = (fclaw2d_interpolate_point_data_t *) p4est->user_pointer;
+    FCLAW_ASSERT (ipd != NULL);
+    FCLAW_ASSERT (ipd->domain != NULL);
+    FCLAW_ASSERT (ipd->interpolate != NULL);
+
+    /* create artifical domain, that only contains global (process-independent)data */
+    domain = &fclaw2d_domain;
+    domain->mpicomm = p4est->mpicomm;
+    domain->mpisize = p4est->mpisize;
+    domain->num_blocks = ipd->domain->num_blocks;
+    FCLAW_ASSERT (ipd->domain->pp != NULL);
+    domain->pp = ipd->domain->pp;
+    domain->pp_owned = 0;
+    domain->attributes = ipd->domain->attributes;
+    domain->local_num_patches = -1;     /* marks domain as artifical domain */
+
+    /* create artifical patch and fill it based on the quadrant */
+    patch = &fclaw2d_patch;
+    patch->level = quadrant->level;
+    patch->target_level = quadrant->level;
+    patch->flags = p4est_quadrant_child_id (quadrant);
+    fclaw2d_patch_set_boundary_xylower (patch, quadrant);
+    patch->u.next = NULL;
+    patch->user = NULL;
+    patchno = -1;               /* marks patch as artifical patch */
+
+    /* check if the patch (or its decendants) may contribute to the
+     * interpolation data of the point */
+    intersects =
+        ipd->interpolate (domain, patch, which_tree, patchno, point,
+                          ipd->user);
+
+    if (!intersects)
+    {
+        return 0;
+    }
+
+    /* we have located the point in the intersection quadrant */
+    if (pfirst == plast)
+    {
+        /* we have intersected with a leaf quadrant */
+        overlap_consumer_add (ipd, point, pfirst);
+    }
+    return 1;
+}
+
 void
-fclaw2d_overlap_exchange (fclaw2d_domain_t *domain,
+fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
                           sc_array_t * query_points,
-                          fclaw2d_interpolate_point_t interpolate,
-                          void *user)
+                          fclaw2d_interpolate_point_t interpolate, void *user)
 {
     fclaw2d_interpolate_point_data_t interpolate_point_data, *ipd =
         &interpolate_point_data;
     p4est_t p4est;
     p4est_connectivity_t conn;
     p4est_wrap_t *wrap;
+    overlap_buf_t *b;
+    size_t bz, bcount;
 
     /* assert validity of parameters */
     FCLAW_ASSERT (domain != NULL);
     FCLAW_ASSERT (query_points != NULL);
-    FCLAW_ASSERT(interpolate != NULL);
+    FCLAW_ASSERT (interpolate != NULL);
 
-    /* construct fclaw2d_integrate_ray_data_t */
+    /* construct fclaw2d_interpolate_point_data_t */
     ipd->domain = domain;
     ipd->interpolate = interpolate;
     ipd->user = user;
+    ipd->point_size = query_points->elem_size;
+    ipd->send_buffer = sc_array_new (sizeof (overlap_buf_t));
 
     wrap = (p4est_wrap_t *) domain->pp;
     FCLAW_ASSERT (wrap != NULL);
@@ -1337,6 +1438,14 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t *domain,
                                p4est.global_first_position, p4est.mpisize,
                                conn.num_trees, 0, user, NULL,
                                NULL, query_points);
+
+    bcount = ipd->send_buffer->elem_count;
+    for (bz = 0; bz < bcount; ++bz)
+    {
+        b = (overlap_buf_t *) sc_array_index (ipd->send_buffer, bz);
+        sc_array_reset (&b->ops);
+    }
+    sc_array_destroy_null (&ipd->send_buffer);
 }
 
 #if 0
