@@ -160,6 +160,32 @@ int
 overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                      int blockno, int patchno, void *point, void *user)
 {
+    overlap_point_t *op;
+    double tol;
+
+    FCLAW_ASSERT (point != NULL);
+    op = (overlap_point_t *) point;
+
+    if (patchno == -1)
+    {
+        if (domain->local_num_patches == -1)
+        {
+            /* do stricter interpolation test on consumer side, so we will not
+             * lose the accepted points on the producer side */
+            tol = 0.5 * SC_1000_EPS;
+        }
+        else
+        {
+            tol = SC_1000_EPS;
+        }
+        if ((op->xy[0] < patch->xlower - tol
+             || op->xy[0] > patch->xupper + tol)
+            || (op->xy[1] < patch->ylower - tol
+                || op->xy[1] > patch->yupper + tol))
+        {
+            return 0;
+        }
+    }
     return 1;
 }
 
