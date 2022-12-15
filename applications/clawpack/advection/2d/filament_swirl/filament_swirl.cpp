@@ -137,7 +137,7 @@ typedef struct overlap_point
 {
   int                 rank;
   p4est_locidx_t      lnum;
-  double              xyz[3];
+  double              xy[2];
   overlap_prodata_t   prodata;
 }
 overlap_point_t;
@@ -151,9 +151,8 @@ create_query_points (sc_array_t *query_points)
     npz = query_points->elem_count;
     for (iz = 0; iz < npz; iz++) {
         op = (overlap_point_t *) sc_array_index(query_points, iz);
-        op->xyz[0] = 0.1;
-        op->xyz[1] = 0.2;
-        op->xyz[2] = 0.3;
+        op->xy[0] = 0.5 + 0.4 * cos ((iz) * 2 * M_PI / npz);
+        op->xy[1] = 0.5 + 0.4 * sin ((iz) * 2 * M_PI / npz);
     }
 }
 
@@ -260,8 +259,8 @@ main (int argc, char **argv)
         create_query_points(query_points);
         for (iz = 0; iz < npz; iz++) {
             op = (overlap_point_t *)sc_array_index(query_points, iz);
-            printf("Query point %ld is [%f,%f,%f].\n", iz, op->xyz[0],
-                        op->xyz[1], op->xyz[2]);
+            printf("Query point %ld is [%f,%f].\n", iz, op->xy[0],
+                        op->xy[1]);
         }
 
         fclaw2d_overlap_exchange(filament_domain, query_points,
