@@ -1311,6 +1311,12 @@ typedef struct overlap_send_buf
 }
 overlap_buf_t;
 
+typedef struct overlap_point
+{
+    void *point;
+    int rank;
+} overlap_point_t;
+
 typedef struct fclaw2d_interpolate_point_data
 {
     fclaw2d_domain_t *domain;
@@ -1393,6 +1399,14 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     int patchno;
     int intersects;
 
+    /* assert that the point is a valid overlap_point_t and was not added yet */
+    overlap_point_t *op = (overlap_point_t *) point;
+    FCLAW_ASSERT (op != NULL && op->point != NULL);
+    if (pfirst == plast && pfirst == op->rank)
+    {
+        return 0;               /* avoid sending the same point twice to the same process */
+    }
+
     /* assert that the user_pointer contains a valid interpolate_point_data_t */
     fclaw2d_interpolate_point_data_t *ipd
         = (fclaw2d_interpolate_point_data_t *) p4est->user_pointer;
@@ -1424,7 +1438,7 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     /* check if the patch (or its decendants) may contribute to the
      * interpolation data of the point */
     intersects =
-        ipd->interpolate (domain, patch, which_tree, patchno, point,
+        ipd->interpolate (domain, patch, which_tree, patchno, op->point,
                           ipd->user);
 
     if (!intersects)
@@ -1436,7 +1450,8 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     if (pfirst == plast)
     {
         /* we have intersected with a leaf quadrant */
-        overlap_consumer_add (ipd, point, pfirst);
+        overlap_consumer_add (ipd, op->point, pfirst);
+        op->rank = pfirst;      /* mark, that we added this point to the process buffer */
     }
     return 1;
 }
@@ -1802,6 +1817,9 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     p4est_t p4est;
     p4est_connectivity_t conn;
     p4est_wrap_t *wrap;
+    size_t iz, nipz;
+    sc_array_t *iquery_points;
+    overlap_point_t *ip;
     overlap_global_comm_t global, *g = &global;
     overlap_producer_comm_t *p = g->p = &g->pro;
     overlap_consumer_comm_t *c = g->c = &g->con;
@@ -1831,12 +1849,23 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
 
     fclaw_global_essentialf ("OVERLAP: customer partition search\n");
 
+    /* store the query points as overlap_point_t to be able to mark their last
+     * appearance in the search */
+    nipz = query_points->elem_count;
+    iquery_points = sc_array_new_count (sizeof (overlap_point_t), nipz);
+    for (iz = 0; iz < nipz; ++iz)
+    {
+        ip = (overlap_point_t *) sc_array_index (iquery_points, iz);
+        ip->point = sc_array_index (query_points, iz);
+        ip->rank = -1;
+    }
+
     /* search for the query points in the producer-partition and create a buffer
      * to send them to the respective producer ranks */
     p4est_search_partition_gfx (p4est.global_first_quadrant,
                                 p4est.global_first_position, p4est.mpisize,
-                                conn.num_trees, 0, user, NULL,
-                                NULL, query_points);
+                                conn.num_trees, 0, ipd, NULL,
+                                interpolate_partition_fn, iquery_points);
 
     /* initialize communication data */
     /*we assume that consumer and producer operate on congruent communicators */
@@ -1882,6 +1911,7 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     /* free remaining communication data */
     consumer_free_communication_data (c);
     producer_free_communication_data (p);
+    sc_array_destroy (iquery_points);
 }
 
 #if 0
