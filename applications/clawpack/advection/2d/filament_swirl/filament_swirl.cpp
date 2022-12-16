@@ -151,6 +151,8 @@ create_query_points (sc_array_t *query_points)
     npz = query_points->elem_count;
     for (iz = 0; iz < npz; iz++) {
         op = (overlap_point_t *) sc_array_index(query_points, iz);
+        op->prodata.isset = 0;
+        op->prodata.myvalue = 0;
         op->xy[0] = 0.5 + 0.4 * cos ((iz) * 2 * M_PI / npz);
         op->xy[1] = 0.5 + 0.4 * sin ((iz) * 2 * M_PI / npz);
     }
@@ -166,26 +168,44 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     FCLAW_ASSERT (point != NULL);
     op = (overlap_point_t *) point;
 
-    if (patchno == -1)
+    /* set tolerances */
+    if (domain->local_num_patches == -1)
     {
-        if (domain->local_num_patches == -1)
+        /* do stricter interpolation test on consumer side, so we will not
+         * lose the accepted points on the producer side */
+        tol = 0.5 * SC_1000_EPS;
+    }
+    else
+    {
+        tol = SC_1000_EPS;
+    }
+
+    /* check for intersections */
+    if ((op->xy[0] < patch->xlower - tol
+         || op->xy[0] > patch->xupper + tol)
+        || (op->xy[1] < patch->ylower - tol
+            || op->xy[1] > patch->yupper + tol))
+    {
+        return 0;
+    }
+
+    printf ("Found point [%f,%f] in patch [%f,%f]x[%f,%f].\n",
+            op->xy[0], op->xy[1], patch->xlower, patch->xupper, patch->ylower,
+            patch->yupper);
+
+    /* update interpolation data */
+    if (patchno >= 0)
+    {
+        /* we are on a leaf on the producer side */
+        if (!op->prodata.isset)
         {
-            /* do stricter interpolation test on consumer side, so we will not
-             * lose the accepted points on the producer side */
-            tol = 0.5 * SC_1000_EPS;
-        }
-        else
-        {
-            tol = SC_1000_EPS;
-        }
-        if ((op->xy[0] < patch->xlower - tol
-             || op->xy[0] > patch->xupper + tol)
-            || (op->xy[1] < patch->ylower - tol
-                || op->xy[1] > patch->yupper + tol))
-        {
-            return 0;
+            printf ("Setting interpolation data of point [%f,%f].\n",
+                    op->xy[0], op->xy[1]);
+            op->prodata.isset++;
+            op->prodata.myvalue += domain->mpirank;
         }
     }
+
     return 1;
 }
 
@@ -280,7 +300,7 @@ main (int argc, char **argv)
         swirl_initialize(swirl_glob);
 
         /* run */
-        npz = 3;
+        npz = filament_domain->mpisize;
         query_points = sc_array_new_count(sizeof(overlap_point_t), npz);
         create_query_points(query_points);
         for (iz = 0; iz < npz; iz++) {
