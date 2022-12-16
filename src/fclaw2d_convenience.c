@@ -1317,7 +1317,7 @@ typedef struct overlap_point
     int rank;
 } overlap_point_t;
 
-typedef struct fclaw2d_interpolate_point_data
+typedef struct fclaw2d_interpolation_data
 {
     fclaw2d_domain_t *domain;
     fclaw2d_interpolate_point_t interpolate;
@@ -1325,10 +1325,11 @@ typedef struct fclaw2d_interpolate_point_data
     size_t point_size;
     sc_array_t *send_buffer;
 }
-fclaw2d_interpolate_point_data_t;
+fclaw2d_interpolation_data_t;
 
 typedef struct overlap_producer_comm
 {
+    p4est_t *pro4est;
     sc_MPI_Comm glocomm;
     int prorank;
     int iprorank;
@@ -1359,7 +1360,7 @@ typedef struct overlap_global_comm
 overlap_global_comm_t;
 
 static void
-overlap_consumer_add (fclaw2d_interpolate_point_data_t * ipd, void *point,
+overlap_consumer_add (fclaw2d_interpolation_data_t * ipd, void *point,
                       int rank)
 {
     size_t bcount;
@@ -1407,9 +1408,9 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         return 0;               /* avoid sending the same point twice to the same process */
     }
 
-    /* assert that the user_pointer contains a valid interpolate_point_data_t */
-    fclaw2d_interpolate_point_data_t *ipd
-        = (fclaw2d_interpolate_point_data_t *) p4est->user_pointer;
+    /* assert that the user_pointer contains a valid interpolation_data_t */
+    fclaw2d_interpolation_data_t *ipd
+        = (fclaw2d_interpolation_data_t *) p4est->user_pointer;
     FCLAW_ASSERT (ipd != NULL);
     FCLAW_ASSERT (ipd->domain != NULL);
     FCLAW_ASSERT (ipd->interpolate != NULL);
@@ -1454,6 +1455,47 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         op->rank = pfirst;      /* mark, that we added this point to the process buffer */
     }
     return 1;
+}
+
+static int
+interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                      p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
+                      void *point)
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
+    int patchno;
+
+    /* assert that the user_pointer contains a valid interpolation_data_t */
+    fclaw2d_interpolation_data_t *ipd
+        = (fclaw2d_interpolation_data_t *) p4est->user_pointer;
+    FCLAW_ASSERT (ipd != NULL);
+    FCLAW_ASSERT (ipd->domain != NULL);
+    FCLAW_ASSERT (ipd->interpolate != NULL);
+
+    domain = ipd->domain;
+    if (local_num >= 0)
+    {
+        fclaw2d_block_t *block = domain->blocks + which_tree;
+        patchno = local_num - block->num_patches_before;
+        patch = block->patches + patchno;
+    }
+    else
+    {
+        /* create artifical patch and fill it based on the quadrant */
+        patchno = -1;
+        patch = &fclaw2d_patch;
+        patch->level = quadrant->level;
+        patch->target_level = quadrant->level;
+        patch->flags = p4est_quadrant_child_id (quadrant);
+        fclaw2d_patch_set_boundary_xylower (patch, quadrant);
+        patch->u.next = NULL;
+        patch->user = NULL;
+    }
+
+    return ipd->interpolate (domain, patch, which_tree, patchno, point,
+                             ipd->user);
 }
 
 #ifdef FCLAW_ENABLE_MPI
@@ -1628,7 +1670,8 @@ producer_interpolate (overlap_producer_comm_t * p)
                           && prod_indices[i] < num_senders);
             rb = (overlap_buf_t *) sc_array_index_int (p->recv_buffer,
                                                        prod_indices[i]);
-            /* here we would interpolate the point data */
+            p4est_search_local (p->pro4est, 0, NULL, interpolate_local_fn,
+                                &(rb->ops));
 
             /* send the requested producer data back in a nonblocking way */
             mpiret =
@@ -1636,10 +1679,9 @@ producer_interpolate (overlap_producer_comm_t * p)
                               rb->ops.elem_count * p->point_size,
                               sc_MPI_BYTE, rb->rank, COMM_TAG_PRODATA,
                               p->glocomm,
-                              (sc_MPI_Request *) sc_array_index_int (p->
-                                                                     send_reqs,
-                                                                     prod_indices
-                                                                     [i]));
+                              (sc_MPI_Request *)
+                              sc_array_index_int (p->send_reqs,
+                                                  prod_indices[i]));
             SC_CHECK_MPI (mpiret);
         }
 
@@ -1803,7 +1845,8 @@ consumer_producer_update_local (overlap_global_comm_t * g)
          * producer buffer, we update the points in-place. */
         sb = (overlap_buf_t *) sc_array_index_int (c->send_buffer,
                                                    c->iconrank);
-        /* here we would interpolate and update the local points */
+        p4est_search_local (p->pro4est, 0, NULL, interpolate_local_fn,
+                            &(sb->ops));
     }
 }
 
@@ -1812,8 +1855,8 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
                           sc_array_t * query_points,
                           fclaw2d_interpolate_point_t interpolate, void *user)
 {
-    fclaw2d_interpolate_point_data_t interpolate_point_data, *ipd =
-        &interpolate_point_data;
+    fclaw2d_interpolation_data_t interpolation_data, *ipd =
+        &interpolation_data;
     p4est_t p4est;
     p4est_connectivity_t conn;
     p4est_wrap_t *wrap;
@@ -1831,7 +1874,7 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
 
     fclaw_global_essentialf ("OVERLAP: exchange partition\n");
 
-    /* construct fclaw2d_interpolate_point_data_t */
+    /* construct fclaw2d_interpolation_data_t */
     ipd->domain = domain;
     ipd->interpolate = interpolate;
     ipd->user = user;
@@ -1844,7 +1887,6 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (wrap->p4est != NULL);
     FCLAW_ASSERT (wrap->conn != NULL);
     p4est = *(wrap->p4est);
-    p4est.user_pointer = ipd;
     conn = *(wrap->conn);
 
     fclaw_global_essentialf ("OVERLAP: customer partition search\n");
@@ -1873,6 +1915,8 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     c->conrank = p->prorank = domain->mpirank;
     c->send_buffer = ipd->send_buffer;
     c->point_size = p->point_size = ipd->point_size;
+    p4est.user_pointer = ipd;
+    p->pro4est = &p4est;
 
 #ifdef FCLAW_ENABLE_MPI
     /* notify the producer about the point-array-messages it will receive,
