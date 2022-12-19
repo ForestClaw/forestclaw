@@ -1388,6 +1388,20 @@ overlap_consumer_add (fclaw2d_interpolation_data_t * ipd, void *point,
     memcpy (sc_array_push (&sb->ops), point, ipd->point_size);
 }
 
+int
+domain_is_meta (fclaw2d_domain_t * domain)
+{
+    FCLAW_ASSERT (domain != NULL);
+    if (domain->local_num_patches == -1)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 static int
 interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                           p4est_quadrant_t * quadrant, int pfirst, int plast,

@@ -169,10 +169,11 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     op = (overlap_point_t *) point;
 
     /* set tolerances */
-    if (domain->local_num_patches == -1)
+    if (domain_is_meta (domain))
     {
-        /* do stricter interpolation test on consumer side, so we will not
-         * lose the accepted points on the producer side */
+        /* We are on the consumer side and can only rely on basic domain
+         * information. We do a stricter interpolation test on consumer side,
+         * in order to not lose the accepted points on the producer side */
         tol = 0.5 * SC_1000_EPS;
     }
     else
