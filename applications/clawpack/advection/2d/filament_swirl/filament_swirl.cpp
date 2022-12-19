@@ -151,6 +151,7 @@ create_query_points (sc_array_t *query_points)
     npz = query_points->elem_count;
     for (iz = 0; iz < npz; iz++) {
         op = (overlap_point_t *) sc_array_index(query_points, iz);
+        op->rank = -1;
         op->prodata.isset = 0;
         op->prodata.myvalue = 0;
         op->xy[0] = 0.5 + 0.4 * cos ((iz) * 2 * M_PI / npz);
@@ -164,16 +165,27 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 {
     overlap_point_t *op;
     double tol;
+    int consumer_side;
 
+    /* assert that we got passed a valid overlap_point_t */
     FCLAW_ASSERT (point != NULL);
     op = (overlap_point_t *) point;
 
+    /* check, if we are on the consumer or the producer side */
+    consumer_side = domain_is_meta (domain);
+
     /* set tolerances */
-    if (domain_is_meta (domain))
+    if (consumer_side)
     {
-        /* We are on the consumer side and can only rely on basic domain
-         * information. We do a stricter interpolation test on consumer side,
-         * in order to not lose the accepted points on the producer side */
+        /* we are on the consumer side and can only rely on basic domain
+         * information */
+        if (op->rank >= 0)
+        {
+            return 0;           /* avoid multiple matches */
+        }
+
+        /* we do a stricter interpolation test in order to not lose
+         * the accepted points on the producer side */
         tol = 0.5 * SC_1000_EPS;
     }
     else
@@ -193,6 +205,13 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     printf ("Found point [%f,%f] in patch [%f,%f]x[%f,%f].\n",
             op->xy[0], op->xy[1], patch->xlower, patch->xupper, patch->ylower,
             patch->yupper);
+
+    if (consumer_side && domain->mpirank >= 0)
+    {
+        /* we are at a leaf (patch belonging to just one process) of the
+         * partition search, so we will send the point to domain->mpirank */
+        op->rank = domain->mpirank;
+    }
 
     /* update interpolation data */
     if (patchno >= 0)
