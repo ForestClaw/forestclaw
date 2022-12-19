@@ -1469,6 +1469,8 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         ipd->interpolate (domain, patch, which_tree, patchno, op->point,
                           ipd->user);
 
+    fclaw2d_domain_destroy (domain);
+
     if (!intersects)
     {
         return 0;
@@ -1481,7 +1483,6 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         overlap_consumer_add (ipd, op->point, pfirst);
         op->rank = pfirst;      /* mark, that we added this point to the process buffer */
     }
-    fclaw2d_domain_destroy(domain);
     return 1;
 }
 
