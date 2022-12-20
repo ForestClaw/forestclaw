@@ -1416,9 +1416,9 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     /* assert that the point is a valid overlap_point_t and was not added yet */
     overlap_point_t *op = (overlap_point_t *) point;
     FCLAW_ASSERT (op != NULL && op->point != NULL);
-    if (pfirst == plast && pfirst == op->rank)
+    if (op->rank >= 0)
     {
-        return 0;               /* avoid sending the same point twice to the same process */
+        return 0;               /* avoid sending the same point twice */
     }
 
     /* assert that the user_pointer contains a valid interpolation_data_t */

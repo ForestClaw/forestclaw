@@ -135,7 +135,6 @@ overlap_prodata_t;
 
 typedef struct overlap_point
 {
-  int                 rank;
   p4est_locidx_t      lnum;
   double              xy[2];
   overlap_prodata_t   prodata;
@@ -151,7 +150,6 @@ create_query_points (sc_array_t *query_points)
     npz = query_points->elem_count;
     for (iz = 0; iz < npz; iz++) {
         op = (overlap_point_t *) sc_array_index(query_points, iz);
-        op->rank = -1;
         op->prodata.isset = 0;
         op->prodata.myvalue = 0;
         op->xy[0] = 0.5 + 0.4 * cos ((iz) * 2 * M_PI / npz);
@@ -178,13 +176,7 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     if (consumer_side)
     {
         /* we are on the consumer side and can only rely on basic domain
-         * information */
-        if (op->rank >= 0)
-        {
-            return 0;           /* avoid multiple matches */
-        }
-
-        /* we do a stricter interpolation test in order to not lose
+         * information. We do a stricter interpolation test in order to not lose
          * the accepted points on the producer side */
         tol = 0.5 * SC_1000_EPS;
     }
@@ -205,13 +197,6 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     printf ("Found point [%f,%f] in patch [%f,%f]x[%f,%f].\n",
             op->xy[0], op->xy[1], patch->xlower, patch->xupper, patch->ylower,
             patch->yupper);
-
-    if (consumer_side && domain->mpirank >= 0)
-    {
-        /* we are at a leaf (patch belonging to just one process) of the
-         * partition search, so we will send the point to domain->mpirank */
-        op->rank = domain->mpirank;
-    }
 
     /* update interpolation data */
     if (patchno >= 0)
