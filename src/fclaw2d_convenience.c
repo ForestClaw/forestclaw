@@ -1429,7 +1429,9 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     FCLAW_ASSERT (ipd->interpolate != NULL);
 
     /* create artifical domain, that only contains mpi and tree structure data */
-    domain = FCLAW_ALLOC(fclaw2d_domain_t, 1);
+    domain = FCLAW_ALLOC (fclaw2d_domain_t, 1);
+    memset (domain, 0, sizeof (fclaw2d_domain_t));      /* initialize to zero */
+    domain->local_num_patches = -1;     /* mark as artifical patch */
     domain->mpicomm = p4est->mpicomm;
     domain->mpisize = p4est->mpisize;
     domain->mpirank = (pfirst == plast) ? pfirst : -1;
@@ -1439,33 +1441,6 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     domain->pp = ipd->domain->pp;
     domain->pp_owned = 0;
     domain->attributes = ipd->domain->attributes;
-
-    /* mark uninitialized state of remaining variables */
-    domain->possible_maxlevel = -1;
-    domain->p.smooth_level = -1;
-    domain->p.smooth_refine = -1;
-    domain->local_num_patches = -1;
-    domain->local_minlevel = -1;
-    domain->local_maxlevel = -1;
-    domain->global_num_patches = -1;
-    domain->global_num_patches_before = -1;
-    domain->global_minlevel = -1;
-    domain->global_maxlevel = -1;
-    domain->just_adapted = 0; /* as asserted in domain_destroy */
-    domain->just_partitioned = 0; /* as asserted in domain_destroy */
-    domain->partition_unchanged_first = -1;
-    domain->partition_unchanged_length = -1;
-    domain->partition_unchanged_old_first = -1;
-    domain->num_blocks = -1;
-    domain->blocks = NULL;
-    domain->num_exchange_patches = -1;
-    domain->exchange_patches = NULL;
-    domain->num_ghost_patches = -1;
-    domain->ghost_patches = NULL;
-    domain->mirror_target_levels = NULL;
-    domain->ghost_target_levels = NULL;
-    domain->attributes = NULL;
-    domain->user = NULL;
 
     /* create artifical patch and fill it based on the quadrant */
     patch = &fclaw2d_patch;
