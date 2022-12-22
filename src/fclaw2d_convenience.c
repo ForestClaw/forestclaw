@@ -1304,6 +1304,13 @@ typedef enum comm_tag
 }
 comm_tag_t;
 
+typedef struct overlap_query_ind
+{
+    int rank;
+    sc_array_t oqs;
+}
+overlap_ind_t;
+
 typedef struct overlap_send_buf
 {
     int rank;
@@ -1315,6 +1322,7 @@ typedef struct overlap_point
 {
     void *point;
     int rank;
+    size_t id;
 } overlap_point_t;
 
 typedef struct fclaw2d_interpolation_data
@@ -1324,8 +1332,8 @@ typedef struct fclaw2d_interpolation_data
     void *user;
     size_t point_size;
     sc_array_t *send_buffer;
-}
-fclaw2d_interpolation_data_t;
+    sc_array_t *query_indices;
+} fclaw2d_interpolation_data_t;
 
 typedef struct overlap_producer_comm
 {
@@ -1349,6 +1357,8 @@ typedef struct overlap_consumer_comm
     sc_array_t *send_reqs;
     sc_array_t *recv_buffer;
     sc_array_t *recv_reqs;
+    sc_array_t *query_points;
+    sc_array_t *query_indices;
 } overlap_consumer_comm_t;
 
 typedef struct overlap_global_comm
@@ -1365,27 +1375,39 @@ overlap_consumer_add (fclaw2d_interpolation_data_t * ipd, void *point,
 {
     size_t bcount;
     overlap_buf_t *sb;
+    overlap_ind_t *qi;
 
-    P4EST_ASSERT (ipd != NULL && ipd->send_buffer != NULL);
-    P4EST_ASSERT (point != NULL);
+    P4EST_ASSERT (ipd != NULL);
+    P4EST_ASSERT (ipd->send_buffer != NULL && ipd->query_indices != NULL);
     P4EST_ASSERT (0 <= rank && rank < ipd->domain->mpisize);
+    overlap_point_t *op = (overlap_point_t *) point;
+    FCLAW_ASSERT (op != NULL && op->point != NULL);
+    op->rank = rank;            /* mark, that we added this point to the process buffer */
 
     /* if we have a new rank, push new send buffer */
     bcount = ipd->send_buffer->elem_count;
     sb = NULL;
+    qi = NULL;
     if (bcount > 0)
     {
         sb = (overlap_buf_t *) sc_array_index (ipd->send_buffer, bcount - 1);
+        qi = (overlap_ind_t *) sc_array_index (ipd->query_indices,
+                                               bcount - 1);
+        P4EST_ASSERT (sb->rank == qi->rank);
         P4EST_ASSERT (sb->rank <= rank);
+        P4EST_ASSERT (sb->ops.elem_count == qi->oqs.elem_count);
         P4EST_ASSERT (sb->ops.elem_count > 0);
     }
     if (bcount == 0 || sb->rank < rank)
     {
         sb = (overlap_buf_t *) sc_array_push (ipd->send_buffer);
-        sb->rank = rank;
+        qi = (overlap_ind_t *) sc_array_push (ipd->query_indices);
+        sb->rank = qi->rank = rank;
         sc_array_init (&sb->ops, ipd->point_size);
+        sc_array_init (&qi->oqs, sizeof (size_t));
     }
-    memcpy (sc_array_push (&sb->ops), point, ipd->point_size);
+    memcpy (sc_array_push (&sb->ops), op->point, ipd->point_size);
+    memcpy (sc_array_push (&qi->oqs), &op->id, qi->oqs.elem_size);
 }
 
 int
@@ -1469,8 +1491,7 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     if (pfirst == plast)
     {
         /* we have intersected with a leaf quadrant */
-        overlap_consumer_add (ipd, op->point, pfirst);
-        op->rank = pfirst;      /* mark, that we added this point to the process buffer */
+        overlap_consumer_add (ipd, op, pfirst);
     }
     return 1;
 }
@@ -1708,7 +1729,34 @@ producer_interpolate (overlap_producer_comm_t * p)
 
     FCLAW_FREE (prod_indices);
 }
+#endif /* FCLAW_ENABLE_MPI */
 
+static void
+consumer_update_from_buffer (overlap_consumer_comm_t * c, sc_array_t * buffer,
+                             int bi)
+{
+    overlap_buf_t *rb;
+    overlap_ind_t *qi;
+    void *p, *qp;
+    size_t *pi;
+    int i;
+
+    /* obtain the array of points we want to update the query points with */
+    P4EST_ASSERT (0 <= bi && bi < (int) buffer->elem_count);
+    rb = (overlap_buf_t *) sc_array_index_int (buffer, bi);
+    qi = (overlap_ind_t *) sc_array_index_int (c->query_indices, bi);
+
+    /* copy updated points into the query-point array */
+    for (i = 0; i < (int) rb->ops.elem_count; ++i)
+    {
+        p = sc_array_index_int (&rb->ops, i);
+        pi = (size_t *) sc_array_index_int (&qi->oqs, i);
+        qp = sc_array_index (c->query_points, *pi);
+        memcpy (qp, p, rb->ops.elem_size);
+    }
+}
+
+#ifdef FCLAW_ENABLE_MPI
 static void
 consumer_update_query_points (overlap_consumer_comm_t * c)
 {
@@ -1733,8 +1781,7 @@ consumer_update_query_points (overlap_consumer_comm_t * c)
 
         for (i = 0; i < received; ++i)
         {
-            /* here we would update the query points by the interpolated point data
-             * in the buffer */
+            consumer_update_from_buffer (c, c->recv_buffer, cons_indices[i]);
         }
 
         remaining -= received;
@@ -1775,7 +1822,9 @@ producer_waitall (overlap_producer_comm_t * p)
 static void
 consumer_free_communication_data (overlap_consumer_comm_t * c)
 {
+    overlap_ind_t *qi;
     overlap_buf_t *sb;
+    int i;
 #ifdef FCLAW_ENABLE_MPI
     overlap_buf_t *rb;
 #ifdef FCLAW_ENABLE_DEBUG
@@ -1818,6 +1867,12 @@ consumer_free_communication_data (overlap_consumer_comm_t * c)
         sc_array_reset (&sb->ops);
     }
 #endif
+    for (i = 0; i < c->query_indices->elem_count; i++)
+    {
+        qi = (overlap_ind_t *) sc_array_index_int (c->query_indices, i);
+        sc_array_reset (&qi->oqs);
+    }
+    sc_array_destroy_null (&c->query_indices);
     sc_array_destroy_null (&c->send_buffer);
 }
 
@@ -1865,6 +1920,7 @@ consumer_producer_update_local (overlap_global_comm_t * g)
                                                    c->iconrank);
         p4est_search_local (p->pro4est, 0, NULL, interpolate_local_fn,
                             &(sb->ops));
+        consumer_update_from_buffer (c, c->send_buffer, c->iconrank);
     }
 }
 
@@ -1898,6 +1954,7 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     ipd->user = user;
     ipd->point_size = query_points->elem_size;
     ipd->send_buffer = sc_array_new (sizeof (overlap_buf_t));
+    ipd->query_indices = sc_array_new (sizeof (overlap_ind_t));
 
     /* extract p4est data from wrapper */
     wrap = (p4est_wrap_t *) domain->pp;
@@ -1918,6 +1975,7 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
         ip = (overlap_point_t *) sc_array_index (iquery_points, iz);
         ip->point = sc_array_index (query_points, iz);
         ip->rank = -1;
+        ip->id = iz;
     }
 
     /* search for the query points in the producer-partition and create a buffer
@@ -1932,6 +1990,8 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     g->glocomm = c->glocomm = p->glocomm = domain->mpicomm;
     c->conrank = p->prorank = domain->mpirank;
     c->send_buffer = ipd->send_buffer;
+    c->query_points = query_points;
+    c->query_indices = ipd->query_indices;
     c->point_size = p->point_size = ipd->point_size;
     p4est.user_pointer = ipd;
     p->pro4est = &p4est;
