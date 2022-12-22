@@ -1284,19 +1284,6 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     sc_array_reset (lints);
 }
 
-/* dummy replacement until real p4est_search_partition_gfx is available */
-void
-p4est_search_partition_gfx (const p4est_gloidx_t * gfq,
-                            const p4est_quadrant_t * gfp,
-                            int nmemb, p4est_topidx_t num_trees,
-                            int call_post, void *user,
-                            p4est_search_partition_t quadrant_fn,
-                            p4est_search_partition_t point_fn,
-                            sc_array_t * points)
-{
-
-}
-
 typedef enum comm_tag
 {
     COMM_TAG_CONSDATA,
