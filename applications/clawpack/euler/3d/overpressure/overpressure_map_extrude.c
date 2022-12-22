@@ -46,9 +46,11 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
     /* In extruded case, no transformations are applied to the 2d mapping */
     int mapping = cont->user_int_3dx[0];
 
-    double maxelev = cont->user_double_3dx[0];  
-    double minz = cont->user_double_3dx[1];  
-    double maxz = cont->user_double_3dx[2];  
+    double maxelev    = cont->user_double_3dx[0];  
+    double minz       = cont->user_double_3dx[1];  
+    double maxz       = cont->user_double_3dx[2];  
+    double midz       = cont->user_double_3dx[3];  
+    double scale_bump = cont->user_double_3dx[4];
 
     if (mapping == 1)
     {
@@ -59,8 +61,28 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
         *xp = xp1;
         *yp = yp1;
 
-        /* Stretch zc in [0,1] into [-1,1] */
-        *zp = minz + (maxz-minz)*zc;        
+        /* Stretch zc into [minz+bump, maxz] */
+        double rp2 = xp1*xp1 + yp1*yp1;
+        if (minz < midz && midz < maxz)
+        {
+            double f = (midz-minz)/(maxz-minz);
+            if (zc < f)
+            {                
+                double zlow = minz + scale_bump*exp(-30*rp2);
+                *zp = zlow  + (midz-zlow)*(zc/f);
+            }
+            else
+            {
+                double zlow = midz;
+                *zp = zlow  + (maxz-zlow)*((zc-f)/(1-f));
+            }
+        }
+        else
+        {
+            double zlow = minz + scale_bump*exp(-30*rp2);
+            *zp = zlow  + (maxz-zlow)*zc;
+        }
+
     }
     else 
     {
@@ -84,11 +106,6 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
         *xp = R*cos(phi)*cos(theta);
         *yp = R*cos(phi)*sin(theta);
         *zp = R*sin(phi);
-#if 0        
-        printf("%f %f %f\n",xc,yc,zc);
-        printf("%f %f\n",theta, phi);
-        printf("%f %f %f\n\n",*xp,*yp,*zp);
-#endif        
     }
 }
 
@@ -97,7 +114,9 @@ void overpressure_map_extrude(fclaw2d_map_context_t* cont,
                          const double maxelev,
                          const int mapping,
                          const double minz,
-                         const double maxz)
+                         const double maxz,
+                         const double midz,
+                         const double scale_bump)
 
 {
     /* May be needed to get more general mappings */
@@ -107,6 +126,9 @@ void overpressure_map_extrude(fclaw2d_map_context_t* cont,
     cont->user_double_3dx[0] = maxelev;
     cont->user_double_3dx[1] = minz;
     cont->user_double_3dx[2] = maxz;
+    cont->user_double_3dx[3] = midz;
+    cont->user_double_3dx[4] = scale_bump;
+
     cont->user_int_3dx[0] = mapping;
 
     /* This is checked in 2d mappings.  If `is_extruded=1`, then the 2d mapping

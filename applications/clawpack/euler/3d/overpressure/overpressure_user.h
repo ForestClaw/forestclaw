@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef OVERPRESSURE_USER_HPP
-#define OVERPRESSURE_USER_HPP
+#ifndef OVERPRESSURE_USER_H
+#define OVERPRESSURE_USER_H
 
 #include <fclaw2d_include_all.h>
 
@@ -57,7 +57,9 @@ typedef struct user_options
     double pout;
 
     double min_z;
+    double mid_z;
     double max_z;
+    double scale_bump;
 
     const char *latitude_string;
     double *latitude;
@@ -86,52 +88,12 @@ void overpressure_map_extrude(fclaw2d_map_context_t* cont,
                               const double maxelev,
                               const int mapping,
                               const double minz,
-                              const double maxz);
+                              const double maxz,
+                              const double midz,
+                              const double scale_bump);
 
 
 /* ------------------------------- Fortran routines ----------------------------------- */
-#define OVERPRESSURE_SETAUX_MANIFOLD FCLAW_F77_FUNC(overpressure_setaux_manifold, \
-                                               OVERPRESSURE_SETAUX_MANIFOLD)
-
-void OVERPRESSURE_SETAUX_MANIFOLD(const int* mbc,
-                            const int* mx, const int* my, const int*mz,
-                            const int* mcapa, 
-                            const double* xlower, const double* ylower,
-                            const double* zlower,
-                            const double* dx, const double* dy,
-                            const double *dz,
-                            const int* maux, double aux[],
-                            const int* blockno,
-                            double xrot[], double yrot[], double zrot[],
-                            double volume[],double faceareas[]);
-
-
-#define CLAWPACK46_RPN3_MAPPED FCLAW_F77_FUNC(clawpack46_rpn3_mapped,  CLAWPACK46_RPN3_MAPPED)
-void CLAWPACK46_RPN3_MAPPED(const int* ixyz,const int* maxm, 
-                     const int* meqn, const int* mwaves,
-                     const int* maux, const int* mbc, const int* mx, 
-                     double ql[], double qr[],
-                     double auxl[], double auxr[], double wave[],
-                     double s[], double amdq[], double apdq[]);
-
-#define CLAWPACK46_RPT3_MAPPED FCLAW_F77_FUNC(clawpack46_rpt3_mapped, CLAWPACK46_RPT3_MAPPED)
-void CLAWPACK46_RPT3_MAPPED(const int* ixyz, const int* icoor, const int* imp,
-                     const int *maxm, const int* meqn, const int* mwaves, 
-                     const int *maux, 
-                     const int* mbc, const int* mx, double ql[], double qr[],
-                     double aux1[], double aux2[], double aux3[], 
-                     double asdq[], double bmasdq[], double bpasdq[]);
-
-#define CLAWPACK46_RPTT3_MAPPED    FCLAW_F77_FUNC(clawpack46_rptt3_mapped, CLAWPACK46_RPTT3_MAPPED)
-void CLAWPACK46_RPTT3_MAPPED(const int* ixyz, const int* icoor, const int* imp,
-                      const int* impt, const int* maxm, const int* meqn,
-                      const int* mwaves, const int* maux,
-                      const int* mbc,const int* mx,
-                      double ql[], double qr[],
-                      double aux1[], double aux2[],
-                      double aux3[],  double bsasdq[],
-                      double cmbsasdq[], double cpbsasdq[]);
-
 
 #ifdef __cplusplus
 }

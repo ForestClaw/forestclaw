@@ -9,5 +9,9 @@ parms.manifold = data(3);
 parms.longitude = data(15:16);
 parms.latitude = data(17:18);
 parms.maxelev = data(19);
+parms.minz = data(20);
+parms.maxz = data(21);
+parms.midz = data(22);
+parms.scale_bump = data(23);
 
 end

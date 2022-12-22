@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "overpressure_user.h"
 
+#include "../all/euler_user.h"
+
 #include <fclaw2d_include_all.h>
 
 #include <fclaw3dx_clawpatch.h>
@@ -69,6 +71,10 @@ void overpressure_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24.6f   %s",user->latitude[0],"\% latitude[0]\n");
         fprintf(f,  "%-24.6f   %s",user->latitude[1],"\% latitude[1]\n");
         fprintf(f,  "%-24.6f   %s",user->maxelev,"\% maxelev\n");
+        fprintf(f,  "%-24.6f   %s",user->min_z,"\% minz\n");
+        fprintf(f,  "%-24.6f   %s",user->max_z,"\% maxz\n");
+        fprintf(f,  "%-24.6f   %s",user->mid_z,"\% midz\n");
+        fprintf(f,  "%-24.6f   %s",user->scale_bump,"\% scale_bump\n");
         fclose(f);
     }
 
@@ -105,7 +111,7 @@ void overpressure_patch_setup(fclaw2d_global_t *glob,
     /* Use mcapa as an offset into geometry */
     int mcapa = clawopt->mcapa;
 
-    OVERPRESSURE_SETAUX_MANIFOLD(&mbc,&mx,&my,&mz, &mcapa, 
+    EULER3D_SETAUX_MANIFOLD(&mbc,&mx,&my,&mz, &mcapa, 
                                  &xlower,&ylower,&zlower,
                                  &dx,&dy,&dz,&maux,aux,&blockno,
                                  xrot,yrot,zrot,volume,faceareas);
@@ -139,6 +145,7 @@ void overpressure_link_solvers(fclaw2d_global_t *glob)
             FCLAW_ASSERT(clawopt->mcapa > 0);
             patch_vt->setup = overpressure_patch_setup;
 
+            claw46_vt->fort_bc3    = &CLAWPACK46_BC3;
             claw46_vt->fort_rpn3   = &CLAWPACK46_RPN3_MAPPED; 
             claw46_vt->fort_rpt3   = &CLAWPACK46_RPT3_MAPPED;
             claw46_vt->fort_rptt3   = &CLAWPACK46_RPTT3_MAPPED;      

@@ -68,6 +68,12 @@ overpressure_register (user_options_t* user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "max-z", &user->max_z, 1,
                         "[user] Maximum z value [1]");
 
+    /* Default : Don't use a midz "ceiling" */
+    sc_options_add_double (opt, 0, "mid-z", &user->mid_z, -1,
+                        "[user] Ceiling z value for mapping [0.5]");
+
+    sc_options_add_double(opt, 0, "scale-bump", &user->scale_bump, 0, "[user] Bump scale [0]");
+
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 4,
                            "Clawpack_version (4 or 5) [4]");
 

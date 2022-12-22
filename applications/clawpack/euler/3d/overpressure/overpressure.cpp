@@ -53,6 +53,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
+
     /* Use [ax,bx]x[ay,by] */
     switch (user->mapping) 
     {
@@ -96,7 +97,6 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
                                             rotate);
         break;
-
     default:
         SC_ABORT_NOT_REACHED ();
     }
@@ -106,7 +106,9 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         overpressure_map_extrude(cont,user->maxelev,
                                  user->mapping,
                                  user->min_z,
-                                 user->max_z);        
+                                 user->max_z,
+                                 user->mid_z,
+                                 user->scale_bump);        
     }
 
 
