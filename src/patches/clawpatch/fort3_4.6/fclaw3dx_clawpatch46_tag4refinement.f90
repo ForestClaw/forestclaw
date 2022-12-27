@@ -9,12 +9,12 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
     double precision :: tag_threshold
     double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    integer :: i,j,k, mq
+    integer :: i,j,k, mq, mqq
     double precision :: qmin, qmax
 
     integer :: exceeds_th, fclaw3dx_clawpatch_exceeds_threshold
     integer :: ii,jj,kk
-    double precision :: xc,yc,zc, quad(-1:1,-1:1,-1:1), qval
+    double precision :: xc,yc,zc, quad(-1:1,-1:1,-1:1), qval(meqn)
 
     logical(kind=4) :: is_ghost, clawpatch3_is_ghost
 
@@ -33,11 +33,13 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
             do i = 1-mbc,mx+mbc
                 xc = xlower + (i-0.5)*dx
                 yc = ylower + (j-0.5)*dy   
-                zc = zlower + (k-0.5)*dz             
+                zc = zlower + (k-0.5)*dz      
                 qmin = min(qmin,q(i,j,k,mq))
                 qmax = max(qmax,q(i,j,k,mq))
-                qval = q(i,j,k,mq)
                 is_ghost = clawpatch3_is_ghost(i,j,k, mx,my,mz)
+                do mqq = 1,meqn       
+                    qval(mqq) = q(i,j,k,mqq)
+                enddo
                 if (.not. is_ghost) then
                     do jj = -1,1
                         do ii = -1,1
@@ -47,9 +49,9 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
                         end do
                     end do
                 endif
-                exceeds_th = fclaw3dx_clawpatch_exceeds_threshold( & 
-                      blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc, & 
-                      tag_threshold,init_flag, is_ghost)
+                exceeds_th = fclaw3dx_clawpatch_exceeds_threshold(& 
+                            blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc, & 
+                            tag_threshold,init_flag, is_ghost)
                 !! # -1 : Not conclusive (possibly ghost cell); don't tag for refinement
                 !! # 0  : Does not pass threshold (don't tag for refinement)      
                 !! # 1  : Passes threshold (tag for refinement)

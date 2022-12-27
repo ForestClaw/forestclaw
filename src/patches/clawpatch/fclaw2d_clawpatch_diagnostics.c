@@ -129,6 +129,9 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     double zlower, dz;
     fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mz, 
                                 &mbc,&xlower,&ylower,&zlower, &dx,&dy,&dz);
+
+    // double *volume = fclaw3dx_clawpatch_get_area(s->glob,patch);
+    // error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mz, &mbc,&dx,&dy,&dz,volume);
 #endif
 
     /* Compute error */

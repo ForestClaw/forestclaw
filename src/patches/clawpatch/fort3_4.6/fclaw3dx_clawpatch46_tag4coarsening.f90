@@ -59,9 +59,9 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
     double precision :: qmin,qmax, dx, dy, dz, xlower, ylower,zlower
     double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    double precision :: xc,yc,zc, quad(-1:1,-1:1,-1:1),qval
+    double precision :: xc,yc,zc, quad(-1:1,-1:1,-1:1),qval(meqn)
 
-    integer i,j, k, ii, jj,kk
+    integer i,j, k, ii, jj,kk,mqq
 
     integer :: exceeds_th, fclaw3dx_clawpatch_exceeds_threshold
     logical(kind=4) :: is_ghost, clawpatch3_is_ghost
@@ -75,7 +75,9 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
                 zc = zlower + (k-0.5)*dz
                 qmin = min(q(i,j,k,mq),qmin)
                 qmax = max(q(i,j,k,mq),qmax)
-                qval = q(i,j,k,mq)
+                do mqq = 1,meqn
+                    qval(mqq) = q(i,j,k,mqq)
+                end do
                 is_ghost = clawpatch3_is_ghost(i,j,k,mx,my,mz)
                 if (.not. is_ghost) then
                     do ii = -1,1               
