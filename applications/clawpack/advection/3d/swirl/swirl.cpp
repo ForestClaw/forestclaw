@@ -64,7 +64,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
         FCLAW_ASSERT(clawpatch_opt->maux == 4);
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
         /* Square in [-1,1]x[-1,1], scaled/shifted to [0,1]x[0,1] */
         cont = fclaw2d_map_new_cart(brick,
                                     fclaw_opt->scale,
@@ -97,7 +97,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         FCLAW_ASSERT(clawpatch_opt->maux == 4);
         FCLAW_ASSERT(mi == 2 && mj == 2);
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
         cont = fclaw2d_map_new_bilinear (brick, 
                                          fclaw_opt->scale,
                                          fclaw_opt->shift, 

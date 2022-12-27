@@ -64,6 +64,48 @@ extern "C"
 /* Fix syntax */
 #endif
 
+#define EULER3D_SETAUX_MANIFOLD FCLAW_F77_FUNC(euler3d_setaux_manifold, \
+                                               EULER3D_SETAUX_MANIFOLD)
+
+void EULER3D_SETAUX_MANIFOLD(const int* mbc,
+                            const int* mx, const int* my, const int*mz,
+                            const int* mcapa, 
+                            const double* xlower, const double* ylower,
+                            const double* zlower,
+                            const double* dx, const double* dy,
+                            const double *dz,
+                            const int* maux, double aux[],
+                            const int* blockno,
+                            double xrot[], double yrot[], double zrot[],
+                            double volume[],double faceareas[]);
+
+
+#define CLAWPACK46_RPN3_MAPPED FCLAW_F77_FUNC(clawpack46_rpn3_mapped,  CLAWPACK46_RPN3_MAPPED)
+void CLAWPACK46_RPN3_MAPPED(const int* ixyz,const int* maxm, 
+                     const int* meqn, const int* mwaves,
+                     const int* maux, const int* mbc, const int* mx, 
+                     double ql[], double qr[],
+                     double auxl[], double auxr[], double wave[],
+                     double s[], double amdq[], double apdq[]);
+
+#define CLAWPACK46_RPT3_MAPPED FCLAW_F77_FUNC(clawpack46_rpt3_mapped, CLAWPACK46_RPT3_MAPPED)
+void CLAWPACK46_RPT3_MAPPED(const int* ixyz, const int* icoor, const int* imp,
+                     const int *maxm, const int* meqn, const int* mwaves, 
+                     const int *maux, 
+                     const int* mbc, const int* mx, double ql[], double qr[],
+                     double aux1[], double aux2[], double aux3[], 
+                     double asdq[], double bmasdq[], double bpasdq[]);
+
+#define CLAWPACK46_RPTT3_MAPPED    FCLAW_F77_FUNC(clawpack46_rptt3_mapped, CLAWPACK46_RPTT3_MAPPED)
+void CLAWPACK46_RPTT3_MAPPED(const int* ixyz, const int* icoor, const int* imp,
+                      const int* impt, const int* maxm, const int* meqn,
+                      const int* mwaves, const int* maux,
+                      const int* mbc,const int* mx,
+                      double ql[], double qr[],
+                      double aux1[], double aux2[],
+                      double aux3[],  double bsasdq[],
+                      double cmbsasdq[], double cpbsasdq[]);
+
 
 #define EULER3D_SETAUX_MANIFOLD FCLAW_F77_FUNC(euler3d_setaux_manifold, \
                                                EULER3D_SETAUX_MANIFOLD)

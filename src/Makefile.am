@@ -8,6 +8,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_base.h \
 	src/fclaw_timer.h \
 	src/fclaw_package.h \
+	src/fclaw_filesystem.h \
 	src/fclaw_pointer_map.h \
 	src/fclaw_options.h \
 	src/fclaw_gauges.h \
@@ -31,6 +32,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_time_sync.h \
 	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
+	src/fclaw2d_rays.h \
 	src/fclaw2d_ghost_fill.h \
 	src/fclaw2d_corner_neighbors.h \
 	src/fclaw2d_face_neighbors.h \
@@ -50,6 +52,7 @@ libforestclaw_installed_headers = \
 	src/fclaw3d_defs.h \
 	src/fclaw3d_domain.h \
 	src/fclaw3d_global.h \
+	src/fclaw3d_map.h \
         src/fclaw_patch.h \
 	src/fclaw_domain.h \
 	src/fclaw_global.h
@@ -65,6 +68,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_options.c \
 	src/fclaw_gauges.c \
 	src/fclaw_package.c \
+	src/fclaw_filesystem.cpp \
 	src/fclaw_pointer_map.cpp \
 	src/fclaw_math.c \
 	src/fclaw_timer.c \
@@ -82,6 +86,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_advance.c \
 	src/fclaw2d_elliptic_solver.c \
 	src/fclaw2d_physical_bc.c \
+	src/fclaw2d_rays.c \
 	src/fclaw2d_ghost_fill.c \
 	src/fclaw2d_output.c \
 	src/fclaw2d_run.c \
@@ -104,6 +109,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw3d_convenience.c \
 	src/fclaw3d_domain.c \
 	src/fclaw3d_global.c \
+	src/fclaw3d_map.c \
 	src/fclaw_domain.c \
 	src/fclaw_global.c \
 	src/fp_exception_glibc_extension.c \

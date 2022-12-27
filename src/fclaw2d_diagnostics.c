@@ -104,6 +104,10 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
     if (diag_vt->gauges_init_diagnostics != NULL)
         diag_vt->gauges_init_diagnostics(glob,&acc->gauge_accumulator);
 
+    /* rays */
+    if (diag_vt->ray_init_diagnostics != NULL)
+        diag_vt->ray_init_diagnostics(glob,&acc->ray_accumulator);
+
     /* solvers */
     if (diag_vt->solver_init_diagnostics != NULL)
         diag_vt->solver_init_diagnostics(glob,&acc->solver_accumulator);
@@ -136,6 +140,10 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
     if (diag_vt->gauges_compute_diagnostics != NULL)
         diag_vt->gauges_compute_diagnostics(glob,acc->gauge_accumulator);
 
+    /* Rays diagnostics */
+    if (diag_vt->ray_compute_diagnostics != NULL)
+        diag_vt->ray_compute_diagnostics(glob,acc->ray_accumulator);
+
     /* Solver diagnostics */
     if (diag_vt->solver_compute_diagnostics != NULL)
         diag_vt->solver_compute_diagnostics(glob,acc->solver_accumulator);
@@ -157,6 +165,9 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
 
     if (diag_vt->gauges_gather_diagnostics != NULL)
         diag_vt->gauges_gather_diagnostics(glob,acc->gauge_accumulator,init_flag);
+
+    if (diag_vt->ray_gather_diagnostics != NULL)
+        diag_vt->ray_gather_diagnostics(glob,acc->ray_accumulator,init_flag);
 
     if (diag_vt->solver_gather_diagnostics != NULL)
         diag_vt->solver_gather_diagnostics(glob,acc->solver_accumulator,init_flag);
@@ -183,6 +194,9 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
     if (diag_vt->gauges_reset_diagnostics != NULL)
         diag_vt->gauges_reset_diagnostics(glob,acc->gauge_accumulator);
 
+    if (diag_vt->ray_reset_diagnostics != NULL)
+        diag_vt->ray_reset_diagnostics(glob,acc->ray_accumulator);
+
     if (diag_vt->solver_reset_diagnostics != NULL)
         diag_vt->solver_reset_diagnostics(glob,acc->solver_accumulator);
 
@@ -205,6 +219,9 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
 
     if (diag_vt->gauges_finalize_diagnostics != NULL)
         diag_vt->gauges_finalize_diagnostics(glob,&acc->gauge_accumulator);
+
+    if (diag_vt->ray_finalize_diagnostics != NULL)
+        diag_vt->ray_finalize_diagnostics(glob,&acc->ray_accumulator);
 
     if (diag_vt->solver_finalize_diagnostics != NULL)
         diag_vt->solver_finalize_diagnostics(glob,&acc->solver_accumulator);

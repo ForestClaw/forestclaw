@@ -283,6 +283,19 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
 #endif
 
 /* ----------------------------------------------------------------------------------
+   Brick mapping
+   ---------------------------------------------------------------------------------- */
+
+/** This function will become deprecated.
+    This file shall eventually not depend on knowing the p4est_connectivity type.
+    We provide an alternative, temporarily called fclaw2d_map_new_brick_domain,
+    in the fclaw2d_map_brick files.
+ */
+fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
+   (struct p4est_connectivity* conn, int mi, int mj);
+
+
+/* ----------------------------------------------------------------------------------
    Pillowsphere utility
    ---------------------------------------------------------------------------------- */
 
@@ -347,9 +360,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 /* -------------------------------- Brick mapping ----------------------------------- */
 
+#if 0
 fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
                                              int mi,
                                              int mj);
+#endif                                             
 
 
 

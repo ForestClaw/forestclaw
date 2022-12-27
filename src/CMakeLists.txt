@@ -1,11 +1,12 @@
 # we use auxiliary objects for each code language to avoid compiler option mingling
 
 # -- c library
-add_library(forestclaw_c OBJECT
-  fclaw_base.c
-  fclaw_options.c
-  fclaw_gauges.c
-  fclaw_package.c
+add_library(forestclaw_c OBJECT 
+  fclaw_base.c 
+  fclaw_options.c 
+  fclaw_filesystem.cpp
+  fclaw_gauges.c 
+  fclaw_package.c 
   fclaw_pointer_map.cpp
   fclaw_math.c
   fclaw_timer.c
@@ -27,6 +28,7 @@ add_library(forestclaw_c OBJECT
   fclaw2d_output.c
   fclaw2d_run.c
   fclaw2d_diagnostics.c
+  fclaw2d_rays.c
   fclaw2d_update_single_step.c
   fclaw2d_domain.c
   fclaw2d_regrid.c
@@ -45,6 +47,7 @@ add_library(forestclaw_c OBJECT
   fclaw3d_convenience.c
   fclaw3d_domain.c
   fclaw3d_global.c
+  fclaw3d_map.c
   fclaw_domain.c
   fclaw_global.c
   fp_exception_glibc_extension.c
@@ -106,22 +109,23 @@ add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 
 install(FILES
-  fclaw_base.h
-	fclaw_timer.h
-	fclaw_package.h
-	fclaw_pointer_map.h
-	fclaw_options.h
-	fclaw_gauges.h
-	fclaw_mpi.h
-	fclaw_math.h
-	forestclaw2d.h
-	fp_exception_glibc_extension.h
-  fclaw2d_include_all.h
-	fclaw2d_defs.h
-	fclaw2d_options.h
-	fclaw2d_advance.h
-	fclaw2d_elliptic_solver.h
-	fclaw2d_farraybox.hpp
+  fclaw_base.h 
+	fclaw_timer.h 
+	fclaw_package.h 
+	fclaw_pointer_map.h 
+	fclaw_filesystem.h 
+	fclaw_options.h 
+	fclaw_gauges.h 
+	fclaw_mpi.h 
+	fclaw_math.h 
+	forestclaw2d.h 
+	fp_exception_glibc_extension.h 
+  fclaw2d_include_all.h 
+	fclaw2d_defs.h 
+	fclaw2d_options.h 
+	fclaw2d_advance.h 
+	fclaw2d_elliptic_solver.h 
+	fclaw2d_farraybox.hpp 
 	fclaw2d_global.h
 	fclaw2d_forestclaw.h
 	fclaw2d_domain.h
@@ -132,6 +136,7 @@ install(FILES
 	fclaw2d_time_sync.h
 	fclaw2d_update_single_step.h
 	fclaw2d_physical_bc.h
+	fclaw2d_rays.h
 	fclaw2d_ghost_fill.h
 	fclaw2d_corner_neighbors.h
 	fclaw2d_face_neighbors.h
@@ -151,6 +156,7 @@ install(FILES
   fclaw3d_defs.h
   fclaw3d_domain.h
   fclaw3d_global.h
+  fclaw3d_map.h
   fclaw_patch.h
   fclaw_domain.h
   fclaw_global.h

@@ -3,7 +3,6 @@
 #include <fclaw2d_map_brick.h>
 
 #include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
 #include <fclaw2d_convenience.h>
 
 static int
@@ -89,9 +88,8 @@ void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont)
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
-                                             int mi,
-                                             int mj)
+fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
+  (p4est_connectivity_t *conn, int mi, int mj)
 {
     fclaw2d_map_context_t *cont;
     fclaw2d_block_ll_t *bv;
@@ -124,7 +122,54 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(p4est_connectivity_t *conn,
     cont->user_data = (void*) bv;
 
     /* Write data for Matlab plotting */
-    FILE *fid; 
+    FILE *fid;
+    fid = fopen("brick.dat","w");
+    fprintf(fid,"%8d %8d\n",mi, mj);
+    for(i = 0; i < nb; i++)
+    {
+        fprintf(fid,"%12g %12g\n",bv->xv[i], bv->yv[i]);
+    }
+    fclose(fid);
+    return cont;
+}
+
+fclaw2d_map_context_t*
+fclaw2d_map_new_brick (fclaw2d_domain_t *domain,
+                       int mi, int mj, int periodic_i, int periodic_j)
+{
+    fclaw2d_map_context_t *cont;
+    fclaw2d_block_ll_t *bv;
+    int i,nb;
+
+    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont->query = fclaw2d_map_query_brick;
+    cont->mapc2m = fclaw2d_map_c2m_brick;
+    cont->destroy = fclaw2d_map_destroy_brick;
+
+    nb = domain->num_blocks;
+    bv = FCLAW_ALLOC_ZERO(fclaw2d_block_ll_t,1);
+
+    /* We don't store this in user_double[], since that only has limited
+       storage (16 doubles) */
+    bv->xv = FCLAW_ALLOC_ZERO(double,nb);
+    bv->yv = FCLAW_ALLOC_ZERO(double,nb);
+
+    bv->nb = nb;  /* These integer values could also be stored in user_int[] data */
+    bv->mi = mi;
+    bv->mj = mj;
+
+    for (i = 0; i < nb; i++)
+    {
+        fclaw2d_block_t *block = &domain->blocks[i];
+
+        /* (x,y) reference coordinates of lower-left block corner */
+        bv->xv[i] = block->vertices[0];
+        bv->yv[i] = block->vertices[1];
+    }
+    cont->user_data = (void*) bv;
+
+    /* Write data for Matlab plotting */
+    FILE *fid;
     fid = fopen("brick.dat","w");
     fprintf(fid,"%8d %8d\n",mi, mj);
     for(i = 0; i < nb; i++)
