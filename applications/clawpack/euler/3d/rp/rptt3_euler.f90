@@ -252,9 +252,4 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
         END DO
     END IF
 
-    if (debug) then
-        write(6,*) ' '
-    endif
-211    format(2I5,5E16.8)
-
 END SUBROUTINE clawpack46_rptt3

@@ -72,14 +72,6 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
     ! Use entropy fix for transonic rarefactions
     LOGICAL, PARAMETER :: efix = .FALSE.
 
-    logical debug
-
-    debug = .false.
-    if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-        debug = .true.
-    endif
-    debug = .false.
-
     IF (maxmrp < maxm+2*mbc)THEN
         WRITE(6,*) 'need to increase maxmrp in rpn3_euler.f90'
         WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
@@ -233,22 +225,7 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
                     apdq(:,i) = apdq(:,i) + s(mws,i)*wave(:,mws,i)
                 ENDIF
             END DO
-            if (debug) then
-                delta(1) = ql(1,i) - qr(1,i-1)
-                delta(2) = ql(mu,i) - qr(mu,i-1)
-                delta(3) = ql(mv,i) - qr(mv,i-1)
-                delta(4) = ql(mw,i) - qr(mw,i-1)
-                delta(5) = ql(5,i) - qr(5,i-1)
-
-                write(6,211) 1, i, (ql(j,i),j=1,5)
-                !!write(6,211) i, (qr(j,i),j=1,5)
-                !!write(6,211) i, (delta(j),j=1,5)
-                !!write(6,211) i, (amdq(j,i),j=1,5)
-                !!write(6,211) i, (apdq(j,i),j=1,5)
-                !!write(6,*) ' '
-            endif
         END DO
-211 format(2I5,5E16.8)
 
 
 
