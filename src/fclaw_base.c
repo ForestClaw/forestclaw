@@ -166,6 +166,68 @@ fclaw_debugf (const char *fmt, ...)
     va_end (ap);
 }
 
+static int logging_rank = 0;
+static const char* logging_prefix = NULL;
+
+void 
+fclaw_set_logging_prefix(const char* new_name)
+{
+    logging_prefix=new_name;
+}
+
+static void
+log_handler (const char *name, FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    int                 wi = 0;
+    int                 lindent = 0;
+
+    wi = (category == SC_LC_NORMAL);
+
+    if(logging_prefix != NULL){
+        fprintf(log_stream, "[%s]",logging_prefix);
+    }
+    fputc ('[', log_stream);
+    fprintf (log_stream, "%s", name);
+    if (wi){
+        fputc (' ', log_stream);
+        fprintf (log_stream, "%d", logging_rank);
+    }
+    fprintf (log_stream, "] %*s", lindent, "");
+
+    if (priority == SC_LP_TRACE) {
+        char                bn[BUFSIZ], *bp;
+
+        snprintf (bn, BUFSIZ, "%s", filename);
+        bp = basename (bn);
+        fprintf (log_stream, "%s:%d ", bp, lineno);
+    }
+
+    fputs (msg, log_stream);
+    fflush (log_stream);
+}
+
+static void
+sc_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("libsc",log_stream,filename,lineno,package,category,priority,msg);
+}
+
+static void
+p4est_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("p4est",log_stream,filename,lineno,package,category,priority,msg);
+}
+
+static void
+fclaw_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("fclaw",log_stream,filename,lineno,package,category,priority,msg);
+}
+
 void
 fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 {
@@ -191,7 +253,7 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 }
 
 fclaw_app_t *
-fclaw_app_new (int *argc, char ***argv, void *user)
+fclaw_app_new_on_comm (sc_MPI_Comm mpicomm, int *argc, char ***argv, void *user)
 {
     //TODO seperate intialize from creating new app (makes testing difficult)
 #ifdef FCLAW_ENABLE_DEBUG
@@ -202,16 +264,11 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     const int LP_fclaw = SC_LP_PRODUCTION;
 #endif
     int mpiret;
-    sc_MPI_Comm mpicomm;
     fclaw_app_t *a;
 
-    mpicomm = sc_MPI_COMM_WORLD;
-
-    mpiret = sc_MPI_Init (argc, argv);
-    SC_CHECK_MPI (mpiret);
-    sc_init (mpicomm, 1, 1, NULL, LP_lib);
-    p4est_init (NULL, LP_lib);
-    fclaw_init (NULL, LP_fclaw);
+    sc_init (mpicomm, 1, 1, sc_log_handler, LP_lib);
+    p4est_init (p4est_log_handler, LP_lib);
+    fclaw_init (fclaw_log_handler, LP_fclaw);
 
     a = FCLAW_ALLOC (fclaw_app_t, 1);
     a->mpicomm = mpicomm;
@@ -219,6 +276,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     SC_CHECK_MPI (mpiret);
     mpiret = sc_MPI_Comm_rank (a->mpicomm, &a->mpirank);
     SC_CHECK_MPI (mpiret);
+    logging_rank = a->mpirank;
 
     srand (a->mpirank);
     a->first_arg = -1;
@@ -237,6 +295,20 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->attributes = sc_keyvalue_new ();
 
     return a;
+}
+
+fclaw_app_t *
+fclaw_app_new (int *argc, char ***argv, void *user)
+{
+    int mpiret;
+    sc_MPI_Comm mpicomm;
+
+    mpicomm = sc_MPI_COMM_WORLD;
+
+    mpiret = sc_MPI_Init (argc, argv);
+    SC_CHECK_MPI (mpiret);
+
+    return fclaw_app_new_on_comm(mpicomm, argc, argv, user);
 }
 
 void

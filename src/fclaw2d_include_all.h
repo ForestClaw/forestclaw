@@ -45,7 +45,7 @@
 #include <fclaw_gauges.h>
 
 #include <fclaw2d_map.h>
-#include <p4est_connectivity.h>
+#include <fclaw2d_map_brick.h>
 #include <fclaw2d_map_query.h>
 
 #include <fclaw_math.h>

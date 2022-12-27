@@ -63,7 +63,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     case 1:
         /* Latlong */
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick(conn,mi,mj);
+        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
         cont = fclaw2d_map_new_latlong(brick,fclaw_opt->scale,
                                        rotate,
                                        user->latitude, 

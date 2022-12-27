@@ -60,6 +60,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sc_options.h>
 
+/* define F77 and FC name-mangling if autoconf fails to do so */
+#ifndef FCLAW_F77_FUNC
+#define FCLAW_F77_FUNC(name,NAME) name ## _
+#endif
+
+#ifndef FCLAW_F77_FUNC_
+#define FCLAW_F77_FUNC_(name,NAME) name ## _
+#endif
+
+#ifndef FCLAW_FC_FUNC
+#define FCLAW_FC_FUNC(name,NAME) name ## _
+#endif
+
+#ifndef FCLAW_FC_FUNC_
+#define FCLAW_FC_FUNC_(name,NAME) name ## _
+#endif
+
 /* start declarations */
 
 #ifdef __cplusplus
@@ -351,6 +368,25 @@ void fclaw_init (sc_log_handler_t log_handler, int log_threshold);
  */
 fclaw_app_t *fclaw_app_new (int *argc, char ***argv, void *user);
 
+/** Use when MPI is already intialized.
+ * Call the (optional) init functions for sc, p4est, and ForestClaw.  The log
+ * level is set as well and depends on the configure option `--enable-debug`.
+ * With `--enable-debug`: DEBUG for ForestClaw, INFO for sc and p4est.  Without
+ * `--enable-debug`: PRODUCTION for ForestClaw, ESSENTIAL for sc and p4est.
+ * This can be influenced at compile time with `--enable-logging=SC_LP_DEBUG`
+ * for example, but this is somewhat clumsy and usually unnecessary since this
+ * option does not differentiate between the forestclaw and its submodules.
+ * It is possible and encouraged to change the levels with \b sc_package_set_verbosity.
+ * Attempts to reduce them (i.e., to cause more verbosity) at runtime are ignored.
+ * \param [in]     mpicomm      The MPI comm to initialize on.
+ * \param [in,out] argc         Command line argument count.
+ * \param [in,out] argv         Command line arguments.
+ * \param [in,out] user         Will not be changed by our code.
+ * \return            An allocated and initialized application object.
+ */
+fclaw_app_t *fclaw_app_new_on_comm (sc_MPI_Comm mpicomm, int *argc, char ***argv, void *user);
+
+
 /** Close down all systems that were setup in fclaw_init.
  * If a keyvalue structure has been added to a->opt, it is destroyed too.
  * \param [in,out] a            This application is cleaned up.
@@ -522,6 +558,15 @@ sc_MPI_Comm fclaw_app_get_mpi_size_rank (fclaw_app_t * a,
  */
 sc_options_t *fclaw_app_get_options (fclaw_app_t * a);
 
+/**
+ * @brief Set a logging prefix.
+ *
+ * This will prepend a [prefix] on all logging messages.
+ * This is useful when running with two solvers.
+ * 
+ * @param prefix the logging prefix
+ */
+void fclaw_set_logging_prefix(const char* prefix);
 #if 0
 
 /*** rename the following names without the 2D ***/

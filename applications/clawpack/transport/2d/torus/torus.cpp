@@ -26,13 +26,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "torus_user.h"
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt, 
-                                user_options_t* user)
+void create_domain (fclaw2d_global_t * glob,
+                    fclaw_options_t* fclaw_opt, user_options_t* user)
 {
     /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    fclaw2d_domain_t         *domain = NULL;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     /* ---------------------------------------------------------------
@@ -51,22 +49,21 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
+    /* create domain topology */
+    domain = fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+                                       fclaw_opt->minlevel);
+    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw2d_global_store_domain (glob, domain);
+
     /* This does both the regular torus and the twisted torus */
-    conn  = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
+    brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
     cont  = fclaw2d_map_new_torus(brick,
                                   fclaw_opt->scale,
                                   rotate,
                                   user->alpha,
                                   user->beta);
-
-    domain = fclaw2d_domain_new_conn_map (mpicomm, 
-                                          fclaw_opt->minlevel, 
-                                          conn, cont);
-
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
-    return domain;
+    fclaw2d_global_store_map (glob, cont);
 }
 
 static
@@ -126,10 +123,6 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
-    fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
-    sc_MPI_Comm mpicomm;
-
     int retval;
 
     /* Initialize application */
@@ -151,12 +144,11 @@ main (int argc, char **argv)
     {
         /* Options have been checked and are valid */
         
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user);
-
         /* Create global structure which stores the domain, timers, etc */
-        glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        create_domain (glob, fclaw_opt, user);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);

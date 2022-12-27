@@ -7,6 +7,7 @@ TESTS += applications/clawpack/advection/2d/swirl/regressions.sh
 applications_clawpack_advection_2d_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl/swirl_user.cpp \
 	applications/clawpack/advection/2d/swirl/swirl_user.h \
+	applications/clawpack/advection/2d/swirl/swirl_ray.c \
 	applications/clawpack/advection/2d/swirl/swirl_options.c \
 	applications/clawpack/advection/2d/swirl/swirl.cpp \
 	applications/clawpack/advection/2d/swirl/psi.f \
