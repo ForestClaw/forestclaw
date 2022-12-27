@@ -1,4 +1,4 @@
-subroutine overpressure_setaux_manifold(mbc,mx,my,mz, mcapa, & 
+subroutine euler3d_setaux_manifold(mbc,mx,my,mz, mcapa, & 
                xlower,ylower,zlower,dx,dy,dz,maux, & 
                aux,blockno, xrot, yrot, zrot, volume, & 
                faceareas)
@@ -53,5 +53,5 @@ subroutine overpressure_setaux_manifold(mbc,mx,my,mz, mcapa, &
     end do
     !!stop
 
-end subroutine overpressure_setaux_manifold
+end subroutine euler3d_setaux_manifold
 

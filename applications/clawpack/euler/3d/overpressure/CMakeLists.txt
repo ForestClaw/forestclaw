@@ -14,7 +14,7 @@ add_library(overpressure_f OBJECT
   ${rp}/rptt3_euler.f90
   ${rp}/rpn3_euler_mapped.f90
   ${rp}/rpt3_euler_mapped.f90
-  ${rp}/rptt3_euler_debug.f90
+  ${rp}/rptt3_euler_mapped.f90
   ${all}/euler_setaux_manifold.f90
 )
 

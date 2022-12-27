@@ -360,9 +360,11 @@ fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 
 /* -------------------------------- Brick mapping ----------------------------------- */
 
+#if 0
 fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
                                              int mi,
                                              int mj);
+#endif                                             
 
 
 
