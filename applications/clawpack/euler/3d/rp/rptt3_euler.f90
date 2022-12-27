@@ -76,20 +76,6 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
 
     double precision pres
 
-    logical debug
-
-    debug = .false.
-    if (icoor .eq. 3) then
-        if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-            if (imp .eq. 1 .and. impt .eq. 1) then
-                debug = .true.
-            endif          
-        endif
-    endif
-    debug = .false.
-
- 
-
     IF (maxmrp < maxm+mbc)THEN
        WRITE(6,*) 'need to increase maxmrp in rpn3_neutral_qwave.f90'
        WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
@@ -216,21 +202,13 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
             waveb(mw,3) = alpha(5)*w(i)
             waveb(5,3)  = alpha(5)*(enth(i) + v(i)*a(i))
             sb(3) = v(i) + a(i)
-          
+
             cmbsasdq(:,i) = 0.d0
             cpbsasdq(:,i) = 0.d0
             DO mws = 1,mwaves
                 cmbsasdq(:,i) = cmbsasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
                 cpbsasdq(:,i) = cpbsasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
             END DO
-            if (debug) then
-                !! Only true if icoor == 2
-                !!write(6,211) 3, i, (ql(j,i),j=1,5)
-                write(6,211) 3, i, (bsasdq(j,i),j=1,5)
-                write(6,211) 3, i, (cmbsasdq(j,i),j=1,5)
-                write(6,211) 3, i, (cpbsasdq(j,i),j=1,5)
-                write(6,*) ' '
-            endif          
        END DO
 
     ! Solve Riemann problem in the third coordinate direction
@@ -271,13 +249,6 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
                 cmbsasdq(:,i) = cmbsasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
                 cpbsasdq(:,i) = cpbsasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
             END DO
-            if (debug) then
-                !! Only true if icoor == 3
-                write(6,211) 3, i, (bsasdq(j,i),j=1,5)
-                write(6,211) 3, i, (cmbsasdq(j,i),j=1,5)
-                write(6,211) 3, i, (cpbsasdq(j,i),j=1,5)
-                write(6,*) ' '
-            endif          
         END DO
     END IF
 

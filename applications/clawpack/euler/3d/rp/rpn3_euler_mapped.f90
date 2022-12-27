@@ -55,15 +55,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     double precision rho2, rhou2, rhov2, rhow2, en2, p2, c2
     double precision s2, df, area, uvw2
 
-    logical debug
-
-    data efix /.false./    !# use entropy fix for transonic rarefactions
-
-    debug = .false.
-    if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-        debug = .true.
-    endif
-    debug = .false.
+    data efix /.true./    !# use entropy fix for transonic rarefactions
 
     if (mwaves .ne. 3) then
         write(6,*) '*** Should have mwaves=3 for this Riemann solver'
@@ -305,16 +297,6 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 !!            enddo
 !!        enddo
 
-        if (debug) then
-            write(6,211) 1, i, (ql_cart(j,i),j=1,5)
-            !!write(6,211) i, (qr_cart(j,i),j=1,5)
-            !!write(6,211) i, (delta(j),j=1,5)
-            !!write(6,211) i, (amdq_cart(j,i)/area,j=1,5)
-            !!write(6,211) i, (apdq_cart(j,i)/area,j=1,5)
-            !!write(6,*) ' '
-        endif
-211 format(2I5,5E16.8)
-
     enddo  !! end of i loop over 1d sweep array
 
     return
@@ -327,8 +309,8 @@ subroutine solve_riemann(uvw,enth,delta,wave,s,info)
 
     double precision enth, uvw(3), delta(5)
     double precision wave(5,3), s(3)
-    double precision u2v2w2, a2, a, g1a2, euv
-    double precision a1, a3, a4, a5,u,v,w
+    double precision u2v2w2, c2, a, g1a2, euv
+    double precision a1, a2, a3, a4, a5,u,v,w
     integer info
 
     info = 0
@@ -338,16 +320,16 @@ subroutine solve_riemann(uvw,enth,delta,wave,s,info)
     w = uvw(3)
 
     u2v2w2 = u**2 + v**2 + w**2
-    a2 = gamma1*(enth - 0.5d0*u2v2w2)
-    if (a2 .lt. 0.d0) then
+    c2 = gamma1*(enth - 0.5d0*u2v2w2)
+    if (c2 .lt. 0.d0) then
         write(6,*) 'solve_riemann : '
-        write(6,*) 'a2 .lt. 0; ', a2
+        write(6,*) 'a2 .lt. 0; ', c2
         write(6,*) enth, u2v2w2
         info = 1
         return
     endif
-    a = sqrt(a2)
-    g1a2 = gamma1 / a2
+    a = sqrt(c2)
+    g1a2 = gamma1 / c2
     euv = enth - u2v2w2
 
     a4 = g1a2 * (euv*delta(1) + u*delta(2) + v*delta(3) + w*delta(4) & 
@@ -377,10 +359,10 @@ subroutine solve_riemann(uvw,enth,delta,wave,s,info)
     s(2) = u
 
     wave(1,3) = a5
-    wave(2,3) = a5*(u+a)
+    wave(2,3) = a5*(u + a)
     wave(3,3) = a5*v
     wave(4,3) = a5*w
-    wave(5,3) = a5*(enth+u*a)
+    wave(5,3) = a5*(enth + u*a)
     s(3) = u + a
 
 end subroutine solve_riemann

@@ -214,7 +214,6 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
         s(3,i) = u(i)+a(i)
 
     END DO
-200  format(I5,5E16.8)
 
     amdq = 0.d0
     apdq = 0.d0

@@ -74,22 +74,6 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
     double precision uvw2, pres, enth, area
     integer info
 
-    integer mu, mv, mw
-
-    logical debugm, debugp
-    debugm = .false.
-    debugp = .false.
-    if (icoor .eq. 2) then
-        if (ixyz .eq. 1 .and. jcom .eq. 1 .and. kcom .eq. 4) then
-            if (ilr .eq. 1) then
-                debugm = .true.
-                debugp = .false.
-            endif
-        endif
-    endif
-    debugm = .false.
-    debugp = .false.
-
 
 
 !!    IF(ixyz == 1)THEN
@@ -179,10 +163,6 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
                     + min(s_rot(mws), 0.d0) * wave(m,mws)
             enddo
         enddo
-        if (debugm) then
-            write(6,211) 2, i, (ql_cart(j,i),j=1,5)
-        endif
-
 
         !! # -------------------------------------------------------
         !! # Compute bpasdq
@@ -246,10 +226,6 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
                + max(s_rot(mws),0.d0) * wave(m,mws)
             enddo
         enddo
-        if (debugp) then
-            write(6,211) 2, i, (ql_cart(j,i),j=1,5)
-        endif
-211     format(2I5,5E16.8) 
 
     enddo  !! end of i loop
 

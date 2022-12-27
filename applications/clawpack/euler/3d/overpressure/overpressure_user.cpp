@@ -133,8 +133,10 @@ void overpressure_link_solvers(fclaw2d_global_t *glob)
         fc3d_clawpack46_vtable_t *claw46_vt = fc3d_clawpack46_vt(glob);
         fc3d_clawpack46_options_t *clawopt = fc3d_clawpack46_get_options(glob);
 
+        /* Initial configuration defined in fdisc.f90 */
         claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
 
+        /* Refine based on pressure */
         fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
         clawpatch_vt->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
 

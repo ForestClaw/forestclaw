@@ -1,6 +1,7 @@
 subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,& 
     maux,mbc,mx,ql_cart,qr_cart,aux1,aux2,aux3,bsasdq_cart,& 
     cmbsasdq_cart,cpbsasdq_cart)
+ 
     !! ==================================================================
     !! 
     !! # Riemann solver in the transverse direction for the
@@ -86,22 +87,6 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
     double precision uvw2, pres, enth, area
     integer locrot, locarea, irot
 
-    logical debugm, debugp
-
-    debugp = .false.
-    debugm = .false.
-    if (icoor .eq. 3) then
-        if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-            if (ilr .eq. 1 .and. impt .eq. 1) then
-                debugm = .true.
-                debugp = .true.
-            endif
-        endif
-    endif
-    debugp = .false.
-    debugm = .false.
-
-
     call get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea,irot)
 
     !! # Solve Riemann problem in the second coordinate direction
@@ -178,13 +163,6 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
                       + min(s_rot(mws), 0.d0) * wave(m,mws)
             enddo
         enddo
-        if (debugm) then
-            !!write(6,211) 3, i, (ql_cart(j,i),j=1,5)
-            write(6,211) 3, i, (bsasdq_cart(j,i)/area**2,j=1,5)
-            write(6,211) 3, i, (cmbsasdq_cart(j,i)/area**3,j=1,5)
-        endif
-
-
 
         !! # -------------------------------------------------------
         !! # Compute cpbsasdq
@@ -242,21 +220,14 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
         end do
 
         do m=1,meqn
-            cpbsasdq_cart(m,i) = 0.d0
+            cpbsasdq_cart(m,i) = 0
             do mws=1,mwaves
                cpbsasdq_cart(m,i) = cpbsasdq_cart(m,i) & 
                     + max(s_rot(mws),0.d0) * wave(m,mws)
             enddo
         enddo
-        if (debugp) then
-            write(6,211) 3, i, (cpbsasdq_cart(j,i)/area**3,j=1,5)
-            write(6,*) ' '
-        endif
 
     enddo  !! end of i loop
-211    format(2I5,5E16.8) 
-
-
 
     return
 end subroutine clawpack46_rptt3_mapped
