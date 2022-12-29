@@ -5,9 +5,9 @@ double precision function fdisc(blockno,xc,yc,zc)
     double precision xc,yc, zc
     integer blockno
 
-    double precision xp, yp, zp, rp
+    double precision xp, yp, zp, rp, r0_scaled, z0_scaled
     double precision omega0, omega
-    double precision z_center, r_sphere_2d
+    double precision r_sphere_2d
 
     integer*8 cont, fclaw_map_get_context
     integer fclaw2d_map_is_used
@@ -50,9 +50,13 @@ double precision function fdisc(blockno,xc,yc,zc)
 
             !! assume sphere is located on z-axis and that z0 in [0,1]
             !! Center of sphere, in physical coordinates.  
-            z_center = r_sphere_2d + maxelev*z0
+            !!r_center = r_sphere_2d + maxelev*z0            
 
-            fdisc = xp**2 + yp**2 + (zp-z_center)**2 - r0**2
+            r0_scaled = r0*maxelev
+            z0_scaled = z0*maxelev
+            fdisc = (xp-x0)**2 + (yp-y0)**2 + (zp-z0_scaled)**2 - r0_scaled**2
+            !!write(6,*) (xp-x0)**2 + (yp-y0)**2 + (zp-z_center)**2, r0_scaled**2
+            !!write(6,*) zp,z_center, (zp-z_center)**2
         endif
     endif
 

@@ -1,7 +1,7 @@
 %  setplot3.m
 %  called in plotclaw3 before plotting to set various parameters
 
-OutputDir = './compare';
+OutputDir = './';
 setviews  % set viewpoints so that view(xSlice), for example, can be used.
 setopengl;
 
@@ -16,8 +16,8 @@ PlotType = 1;                % type of plot to produce:
 			     % 4 = scatter plot of q vs. r
 			     % 5 = isosurface plot (at given levels)
 
-mq = 4;                      % which component of q to plot
-UserVariable = 0;            % set to 1 to specify a user-defined variable
+mq = 1;                      % which component of q to plot
+UserVariable = 1;            % set to 1 to specify a user-defined variable
 UserVariableFile = 'pressure';      % name of m-file mapping data to q
 MappedGrid = 1;              % set to 1 if mapc2p.m exists for nonuniform grid
 Manifold = 0;
@@ -50,11 +50,20 @@ zSliceCoords = [];
 parms = read_vars();
 switch parms.mapping
     case 0
-        zSliceCoords = [0.1,0.2,0.3,0.4,0.5];
+        % Mapping in [-1,1]x[-1,1]x[0,2]
+        xSliceCoords = [0];
+        ySliceCoords = [0];
+        zSliceCoords = [0];
     case 1
+        % Mapped coordinates should specify slices in normalized [0,1]
+        % coordinates.
         xSliceCoords = [0.5];
         ySliceCoords = [0.5];
-        zSliceCoords = [0.1,0.2,0.3,0.4,0.5];   % [0.2 0.4 0.6 0.8];
+        zSliceCoords = [0.5];   % [0.2 0.4 0.6 0.8];
+    case 2
+        xSliceCoords = [0.5];
+        ySliceCoords = [0.5];
+        zSliceCoords = [0.5];   % [0.2 0.4 0.6 0.8];
     otherwise
         zSliceCoords = [0.25 0.5 0.75];   % [0.2 0.4 0.6 0.8];
 end
