@@ -306,7 +306,7 @@ int domain_is_meta (fclaw2d_domain_t * domain);
  * \param [in] patchno          If patchno is -1, we are on an artifical patch.
  *                              Otherwise, this is a valid patchno from the
  *                              producer domain.
- * \param [in] point            Representation of a point; user-defined.
+ * \param [in,out] point        Representation of a point; user-defined.
  *                              Points to an array element of the query points
  *                              passed to \ref fclaw2d_overlap_exchange.
  *                              If patchno is non-negative, the points
