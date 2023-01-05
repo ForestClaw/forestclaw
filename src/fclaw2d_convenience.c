@@ -1804,7 +1804,7 @@ consumer_free_communication_data (overlap_consumer_comm_t * c)
 {
     overlap_ind_t *qi;
     overlap_buf_t *sb;
-    int i;
+    int i, num_queries;
 #ifdef FCLAW_ENABLE_MPI
     overlap_buf_t *rb;
 #ifdef FCLAW_ENABLE_DEBUG
@@ -1847,7 +1847,8 @@ consumer_free_communication_data (overlap_consumer_comm_t * c)
         sc_array_reset (&sb->ops);
     }
 #endif
-    for (i = 0; i < c->query_indices->elem_count; i++)
+    num_queries = (int) c->query_indices->elem_count;
+    for (i = 0; i < num_queries; i++)
     {
         qi = (overlap_ind_t *) sc_array_index_int (c->query_indices, i);
         sc_array_reset (&qi->oqs);
