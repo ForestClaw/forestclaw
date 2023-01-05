@@ -142,18 +142,26 @@ typedef struct overlap_point
 overlap_point_t;
 
 void
-create_query_points (sc_array_t *query_points)
+create_query_points (sc_array_t * query_points, fclaw2d_domain_t * domain)
 {
     size_t iz, npz;
     overlap_point_t *op;
+    double domain_fac;
 
+    /* We create a process-local set of query points, for which we want to
+     * obtain interpolation data from the producer side. The points may depend
+     * on the consumer domain (for example we may query the center-point of
+     * every local patch). Here, we create arbitrary process-local points for
+     * simplicity. */
     npz = query_points->elem_count;
-    for (iz = 0; iz < npz; iz++) {
-        op = (overlap_point_t *) sc_array_index(query_points, iz);
+    domain_fac = domain->mpirank * 0.05;
+    for (iz = 0; iz < npz; iz++)
+    {
+        op = (overlap_point_t *) sc_array_index (query_points, iz);
         op->prodata.isset = 0;
-        op->prodata.myvalue = 0;
-        op->xy[0] = 0.5 + 0.4 * cos ((iz) * 2 * M_PI / npz);
-        op->xy[1] = 0.5 + 0.4 * sin ((iz) * 2 * M_PI / npz);
+        op->prodata.myvalue = -1.;
+        op->xy[0] = 0.5 + 0.4 * cos (((iz) * 2 * M_PI + domain_fac) / npz);
+        op->xy[1] = 0.5 + 0.4 * sin (((iz) * 2 * M_PI + domain_fac) / npz);
     }
 }
 
@@ -207,7 +215,7 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             printf ("Setting interpolation data of point [%f,%f].\n",
                     op->xy[0], op->xy[1]);
             op->prodata.isset++;
-            op->prodata.myvalue += domain->mpirank;
+            op->prodata.myvalue = (double) domain->mpirank;
         }
     }
 
@@ -307,7 +315,7 @@ main (int argc, char **argv)
         /* run */
         npz = filament_domain->mpisize;
         query_points = sc_array_new_count(sizeof(overlap_point_t), npz);
-        create_query_points(query_points);
+        create_query_points (query_points, swirl_glob->domain);
         for (iz = 0; iz < npz; iz++) {
             op = (overlap_point_t *)sc_array_index(query_points, iz);
             printf("Query point %ld is [%f,%f].\n", iz, op->xy[0],
