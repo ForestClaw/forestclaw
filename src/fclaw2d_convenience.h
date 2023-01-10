@@ -293,8 +293,7 @@ int domain_is_meta (fclaw2d_domain_t * domain);
  *                              of the partition search, else it will be -1.
  * \param [in] patch            The patch under consideration.
  *                              When on a leaf on the producer side, this is a
- *                              valid patch number, as always relative to its
- *                              block.
+ *                              valid patch from the producer domain.
  *                              Otherwise, this is a temporary artificial patch
  *                              containing all standard patch information except
  *                              for the pointer to the next patch and user-data.
@@ -318,11 +317,13 @@ int domain_is_meta (fclaw2d_domain_t * domain);
  *                              interpolation data.
  *                              Return false if there is definitely no
  *                              contribution.
- *                              If patchno is non-negative this callback should
- *                              compute the exact interpolation data of the
- *                              point-patch-combination.
- *                              If patchno is -1, the return value may be a
- *                              false positive, we'll be fine.
+ *                              If we are on a leaf on the producer side
+ *                              (patchno is non-negative) or the consumer side
+ *                              (domain_is_meta and mpirank is non-negative)
+ *                              this callback should do an exact test for
+ *                              contribution.
+ *                              Else, the return value may be a false positive,
+ *                              we'll be fine.
  */
 typedef int (*fclaw2d_interpolate_point_t) (fclaw2d_domain_t * domain,
                                             fclaw2d_patch_t * patch,
@@ -343,10 +344,10 @@ typedef int (*fclaw2d_interpolate_point_t) (fclaw2d_domain_t * domain,
  *                              We do not dereference, just pass pointers around.
  *                              The array is defined processor-local and may
  *                              contain different points on different processes.
- *                              The query points are supposed to be computed and
- *                              transformed to the producer space (by an
+ *                              The query points are supposed to be computed
+ *                              (and transformed to the producer space by an
  *                              inverse mapping) locally on the consumer side.
- *                              On output the points will contain collected
+ *                              On output, the points will contain collected
  *                              interpolation data according to \b interpolate.
  * \param [in] interpolate      Callback function that returns true if a point
  *                              intersects a patch and -- when called for a leaf
