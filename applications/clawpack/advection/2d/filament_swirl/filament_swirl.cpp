@@ -213,6 +213,14 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   op->xy[0], op->xy[1], patch->xlower, patch->xupper,
                   patch->ylower, patch->yupper);
 
+    /* Although the point is located within a certain tolerance of the patch,
+     * it may still lie outside of the [0,1]x[0,1]-block on which the domain is
+     * defined. */
+    op->xy[0] = SC_MAX (op->xy[0], 0.);
+    op->xy[0] = SC_MIN (op->xy[0], 1.);
+    op->xy[1] = SC_MAX (op->xy[1], 0.);
+    op->xy[1] = SC_MIN (op->xy[1], 1.);
+
     /* update interpolation data */
     if (patchno >= 0)
     {
