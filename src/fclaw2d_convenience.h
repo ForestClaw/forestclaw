@@ -49,6 +49,8 @@ fclaw2d_domain_t *fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm,
 fclaw2d_domain_t *fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
                                                   int initial_level);
 fclaw2d_domain_t *fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
+                                           int periodic_in_x,
+                                           int periodic_in_y,
                                            int initial_level);
 
 /** Create a brick connectivity, that is, a rectangular grid of blocks.

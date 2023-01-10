@@ -1,11 +1,12 @@
 # we use auxiliary objects for each code language to avoid compiler option mingling
 
 # -- c library
-add_library(forestclaw_c OBJECT
-  fclaw_base.c
-  fclaw_options.c
-  fclaw_gauges.c
-  fclaw_package.c
+add_library(forestclaw_c OBJECT 
+  fclaw_base.c 
+  fclaw_options.c 
+  fclaw_filesystem.cpp
+  fclaw_gauges.c 
+  fclaw_package.c 
   fclaw_packing.c
   fclaw_pointer_map.cpp
   fclaw_math.c
@@ -109,23 +110,24 @@ add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 
 install(FILES
-  fclaw_base.h
-	fclaw_timer.h
-	fclaw_package.h
-	fclaw_packing.h
-	fclaw_pointer_map.h
-	fclaw_options.h
-	fclaw_gauges.h
-	fclaw_mpi.h
-	fclaw_math.h
-	forestclaw2d.h
-	fp_exception_glibc_extension.h
-  fclaw2d_include_all.h
-	fclaw2d_defs.h
-	fclaw2d_options.h
-	fclaw2d_advance.h
-	fclaw2d_elliptic_solver.h
-	fclaw2d_farraybox.hpp
+  fclaw_base.h 
+	fclaw_timer.h 
+	fclaw_package.h 
+  fclaw_packing.h
+	fclaw_pointer_map.h 
+	fclaw_filesystem.h 
+	fclaw_options.h 
+	fclaw_gauges.h 
+	fclaw_mpi.h 
+	fclaw_math.h 
+	forestclaw2d.h 
+	fp_exception_glibc_extension.h 
+  fclaw2d_include_all.h 
+	fclaw2d_defs.h 
+	fclaw2d_options.h 
+	fclaw2d_advance.h 
+	fclaw2d_elliptic_solver.h 
+	fclaw2d_farraybox.hpp 
 	fclaw2d_global.h
 	fclaw2d_forestclaw.h
 	fclaw2d_domain.h

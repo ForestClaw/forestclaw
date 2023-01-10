@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_filesystem.h>
 #include <fclaw_global.h>
 
 #include <fclaw_package.h>
@@ -33,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef P4_TO_P8
 #include <fclaw2d_defs.h>
 #include <fclaw2d_global.h>
+#include <fclaw2d_options.h>
 
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
@@ -81,6 +83,12 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     fclaw2d_global_t *glob;
 
     glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
+
+    /* these variables need to be set after calling this function */
+    glob->mpicomm = sc_MPI_COMM_NULL;
+    glob->mpisize = 0;
+    glob->mpirank = -1;
+
     glob->pkg_container = fclaw_package_container_new ();
     glob->vtables = fclaw_pointer_map_new ();
     glob->options = fclaw_pointer_map_new ();
@@ -111,6 +119,11 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
 {
     fclaw2d_global_t *glob = fclaw2d_global_new ();
 
+    /*
+     * Set the communicator.
+     * With the current code, overridden by fclaw2d_global_store_domain.
+     * Maybe we should streamline this in the future.
+     */
     glob->mpicomm = mpicomm;
     glob->mpisize = mpisize;
     glob->mpirank = mpirank;
@@ -207,6 +220,13 @@ void
 fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
 {
     glob->domain = domain;
+
+    /* this is redundant if global has been created with a communicator */
+    if (glob->mpisize > 0) {
+        /* double-check for extra paranoia */
+        FCLAW_ASSERT (glob->mpisize == domain->mpisize);
+        FCLAW_ASSERT (glob->mpirank == domain->mpirank);
+    }
     glob->mpicomm = domain->mpicomm;
     glob->mpisize = domain->mpisize;
     glob->mpirank = domain->mpirank;
@@ -317,3 +337,35 @@ fclaw2d_global_t* fclaw2d_global_get_global (void)
     FCLAW_ASSERT(fclaw2d_global_glob != NULL);
     return fclaw2d_global_glob;
 }
+
+// Only 2d for now need fclaw2d_options
+#ifndef P4_TO_P8
+
+static char* old_path = NULL;
+
+void fclaw2d_set_global_context(fclaw2d_global_t *glob)
+{
+    fclaw_options_t* opts = fclaw2d_get_options(glob);
+    fclaw_set_logging_prefix(opts->logging_prefix);
+
+    // Change run directory
+    if(opts->run_directory != NULL){
+        FCLAW_ASSERT(old_path == NULL);
+        old_path = fclaw_cwd();
+        fclaw_cd(opts->run_directory);
+    }
+}
+
+void fclaw2d_clear_global_context(fclaw2d_global_t *glob)
+{
+    fclaw_set_logging_prefix(NULL);
+
+    // Return to previous cwd
+    if(old_path != NULL){
+        fclaw_cd(old_path);
+        FCLAW_FREE(old_path);
+        old_path = NULL;
+    }
+}
+
+#endif

@@ -53,6 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static void* 
 fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 {
+    sc_options_add_string (opt, 0, "run-directory", 
+                           &fclaw_opt->run_directory,
+                           NULL, "Directory for running simulation in, can be relative for absolute [cwd]");    
+
     /* -------------------------- Time stepping control ------------------------------- */
 
     sc_options_add_double (opt, 0, "initial_dt", &fclaw_opt->initial_dt, 0.1,
@@ -330,6 +334,10 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_inifile (opt, 'F', "inifile",
                             "File used to override one or more options " \
                             "in fclaw_options.ini [empty]");
+
+    sc_options_add_string (opt, 0, "logging-prefix",
+                           &fclaw_opt->logging_prefix, 
+                           0,"prefixed used for logging [NULL]");    
 
     fclaw_opt->is_registered = 1;
 

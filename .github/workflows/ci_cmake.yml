@@ -63,7 +63,7 @@ jobs:
 
     name: CMake ${{ matrix.name }} Build on Linux
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout source code
 
     - name: Install system dependencies
@@ -113,18 +113,17 @@ jobs:
 
 
   mac:
-    runs-on: macos-latest
+    runs-on: macos-11
     name: CMake build on MacOS
-    timeout-minutes: 30
     env:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
       CTEST_PARALLEL_LEVEL: 3
-      CC: gcc-10
-      CXX: g++-10
-      FC: gfortran-10
+      CC: gcc-11
+      CXX: g++-11
+      FC: gfortran-11
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout source code
 
     - name: Install system dependencies
