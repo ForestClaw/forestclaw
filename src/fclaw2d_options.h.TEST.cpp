@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw_base.h"
 #include <fclaw2d_global.h>
 #include <fclaw2d_options.h>
 #include <test.hpp>
@@ -74,6 +75,12 @@ TEST_CASE("fclaw2d_options_store fails if called twice on a glob")
 
 	fclaw2d_global_destroy(glob1);
 	fclaw2d_global_destroy(glob2);
+}
+
+TEST_CASE("fclaw2d_options packing/unpacking")
+{
+	fclaw_app_t* app = fclaw_app_new(nullptr, nullptr, nullptr);
+
 }
 
 #endif

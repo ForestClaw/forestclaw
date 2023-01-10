@@ -23,6 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_base.h>
+#include <fclaw_packing.h>
 #include <fclaw_options.h>
 #include <fclaw_timer.h>
 #include <fclaw_mpi.h>
@@ -397,6 +399,15 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
     return FCLAW_NOEXIT;
 }
 
+static size_t options_packsize(void* user){
+    return 0;
+}
+static size_t options_pack(void* user, char* buffer){
+    return 0;
+}
+static size_t options_unpack(char* buffer, void** user){
+    return 0;
+}
 void
 fclaw_options_destroy(fclaw_options_t* fclaw_opt)
 {
@@ -408,6 +419,13 @@ fclaw_options_destroy(fclaw_options_t* fclaw_opt)
     sc_keyvalue_destroy (fclaw_opt->kv_timing_verbosity);
 }
 
+static fclaw_userdata_vtable_t packing_vt = 
+{
+	options_pack,
+	options_unpack,
+	options_packsize,
+	(void*)(void*)fclaw_options_destroy,
+};
 
 /* ------------------------------------------------------------------------
   Generic functions - these call the functions above
@@ -508,6 +526,9 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
                                 &options_vtable,
                                 fclaw_opt);
     
+    /* register packing vtable */
+    fclaw_app_options_store_vtable("fclaw", &packing_vt);
+
     return fclaw_opt;
 }
 
