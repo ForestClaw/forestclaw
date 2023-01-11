@@ -135,36 +135,59 @@ overlap_prodata_t;
 
 typedef struct overlap_point
 {
-  p4est_locidx_t      lnum;
+  size_t              lnum;
   double              xy[2];
   overlap_prodata_t   prodata;
 }
 overlap_point_t;
 
-void
-create_query_points (sc_array_t * query_points, fclaw2d_domain_t * domain)
+typedef struct overlap_consumer
 {
-    size_t iz, npz;
-    overlap_point_t *op;
-    double domain_fac;
+  fclaw2d_domain_t   *domain;
+  sc_array_t         *query_points;
+  size_t              patch_idx;
+}
+overlap_consumer_t;
 
+void
+add_patch_center (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+                  int blockno, int patchno, void *user)
+{
+    overlap_point_t *op;
+
+    /* assert that user is a valid overlap_consumer_t */
+    overlap_consumer_t *c = (overlap_consumer_t *) user;
+    FCLAW_ASSERT (c != NULL);
+    FCLAW_ASSERT (c->domain != NULL);
+    FCLAW_ASSERT (c->query_points != NULL);
+
+    /* initialize the query-point corresponding to this patch */
+    op = (overlap_point_t *) sc_array_index (c->query_points, c->patch_idx);
+    op->lnum = c->patch_idx++;  /* local index of the patch */
+    op->prodata.isset = 0;
+    op->prodata.myvalue = -1;
+
+    /* choose the middle point of the patch */
+    op->xy[0] = (patch->xlower + patch->xupper) / 2;
+    op->xy[1] = (patch->ylower + patch->yupper) / 2;
+
+    /* Here, we would need to apply the mapping of the consumer domain
+     * (in this example the swirl domain) to the point. */
+}
+
+void
+create_query_points (overlap_consumer_t * c)
+{
     /* We create a process-local set of query points, for which we want to
-     * obtain interpolation data from the producer side. The points may depend
-     * on the consumer domain (for example we may query the center-point of
-     * every local patch). Here, we create arbitrary process-local points for
-     * simplicity. */
-    npz = query_points->elem_count;
-    domain_fac = domain->mpirank * 0.05;
-    for (iz = 0; iz < npz; iz++)
-    {
-        op = (overlap_point_t *) sc_array_index (query_points, iz);
-        op->prodata.isset = 0;
-        op->prodata.myvalue = -1.;
-        op->xy[0] = 0.5 + 0.4 * cos (((iz) * 2 * M_PI + domain_fac) / npz);
-        op->xy[1] = 0.5 + 0.4 * sin (((iz) * 2 * M_PI + domain_fac) / npz);
-        fclaw_debugf ("Query point %ld on process %d is [%f,%f].\n", iz,
-                      domain->mpirank, op->xy[0], op->xy[1]);
-    }
+     * obtain interpolation data from the producer side. We query the
+     * center-point of every local patch. */
+    c->query_points = sc_array_new_count (sizeof (overlap_point_t),
+                                          c->domain->local_num_patches);
+    c->patch_idx = 0;
+    fclaw2d_domain_iterate_patches (c->domain, add_patch_center, c);
+
+    /* verify that we created as many query_points as expected */
+    FCLAW_ASSERT (c->patch_idx == (size_t) c->domain->local_num_patches);
 }
 
 int
@@ -198,9 +221,9 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     /* We check if the query point intersects the patch.
      * It is important to take the underlying geometries of the consumer and
      * the producer side under consideration.
-     * In this example, we assume that all query points were already mapped to
-     * the producer geometry by an inverse mapping, so we can simply compare
-     * them with the patch-boundaries. */
+     * Here, we would need to apply the inverse mapping of the producer side
+     * (in this example the filament side) to the query point first, so that it
+     * lies in the same coordinate system as the patch-boundaries. */
     if ((op->xy[0] < patch->xlower - tol
          || op->xy[0] > patch->xupper + tol)
         || (op->xy[1] < patch->ylower - tol
@@ -246,18 +269,19 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 void
-output_query_points (sc_array_t * query_points, fclaw2d_domain_t * domain)
+output_query_points (overlap_consumer_t * c)
 {
     size_t iz, npz;
     overlap_point_t *op;
 
-    npz = query_points->elem_count;
+    npz = c->query_points->elem_count;
     for (iz = 0; iz < npz; iz++)
     {
-        op = (overlap_point_t *) sc_array_index (query_points, iz);
+        op = (overlap_point_t *) sc_array_index (c->query_points, iz);
         printf
             ("Query point %ld on process %d is [%f,%f] and has interpolation data %f.\n",
-             iz, domain->mpirank, op->xy[0], op->xy[1], op->prodata.myvalue);
+             iz, c->domain->mpirank, op->xy[0], op->xy[1],
+             op->prodata.myvalue);
 
     }
 }
@@ -268,7 +292,7 @@ main (int argc, char **argv)
     fclaw_app_t *app;
     int first_arg;
     fclaw_exit_type_t vexit;
-    sc_array_t *query_points;
+    overlap_consumer_t consumer, *c = &consumer;
 
     /* Options */
     sc_options_t                *options;
@@ -351,16 +375,15 @@ main (int argc, char **argv)
         swirl_initialize(swirl_glob);
 
         /* compute process-local query points on the consumer side */
-        query_points = sc_array_new_count (sizeof (overlap_point_t),
-                                           swirl_glob->domain->mpisize);
-        create_query_points (query_points, swirl_glob->domain);
+        c->domain = swirl_glob->domain;
+        create_query_points (c);
 
         /* obtain interpolation data of the points from the producer side */
-        fclaw2d_overlap_exchange (filament_glob->domain, query_points,
+        fclaw2d_overlap_exchange (filament_glob->domain, c->query_points,
                                   overlap_interpolate, NULL);
 
         /* output the interpolation data for all query points */
-        output_query_points (query_points, swirl_glob->domain);
+        output_query_points (c);
 
         /* run */
         fclaw2d_global_t *globs[2];
@@ -374,7 +397,7 @@ main (int argc, char **argv)
 
 
         /* destroy */
-        sc_array_destroy (query_points);
+        sc_array_destroy (c->query_points);
         fclaw2d_global_destroy (filament_glob);
         fclaw2d_global_destroy (swirl_glob);
 
