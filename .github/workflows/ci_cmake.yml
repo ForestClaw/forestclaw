@@ -63,7 +63,7 @@ jobs:
 
     name: CMake ${{ matrix.name }} Build on Linux
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout source code
 
     - name: Install system dependencies
@@ -123,7 +123,7 @@ jobs:
       FC: gfortran-11
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout source code
 
     - name: Install system dependencies
