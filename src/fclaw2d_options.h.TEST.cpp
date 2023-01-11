@@ -156,6 +156,7 @@ TEST_CASE("fclaw2d_options packing/unpacking")
 	opts->weighted_partition = 0;
 	opts->is_registered = 1;
 	opts->logging_prefix = "werqreqw";
+	opts->unpacked = false;
 
 	const fclaw_userdata_vtable_t* vt = fclaw_options_get_packing_vtable();
 
@@ -282,6 +283,8 @@ TEST_CASE("fclaw2d_options packing/unpacking")
 
 	CHECK_NE(opts->logging_prefix                      , output_opts->logging_prefix);
 	CHECK_UNARY(!strcmp(opts->logging_prefix, output_opts->logging_prefix));
+
+	CHECK_UNARY(opts->unpacked);
 }
 
 #endif

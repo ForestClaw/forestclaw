@@ -245,6 +245,8 @@ struct fclaw_options
     int is_registered;
 
     const char * logging_prefix; /**< prefix presented in logging ie. [prefix] */
+
+    int unpacked; /**< True if options structure was unpacked from buffer */
 };
 
 #ifdef __cplusplus

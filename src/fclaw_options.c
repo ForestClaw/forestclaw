@@ -425,6 +425,7 @@ static size_t options_packsize(void* user){
 
     return size;
 }
+
 static size_t options_pack(void* user, char* buffer){
     char* buffer_start = buffer;
 
@@ -452,6 +453,7 @@ static size_t options_pack(void* user, char* buffer){
 
     return buffer-buffer_start;
 }
+
 static size_t options_unpack(char* buffer, void** user){
     char* buffer_start = buffer;
 
@@ -480,8 +482,20 @@ static size_t options_unpack(char* buffer, void** user){
     buffer += fclaw_unpack_string(buffer, (char **) &opts->prefix);
     buffer += fclaw_unpack_string(buffer, (char **) &opts->logging_prefix);
 
+    sc_keyvalue_t *kv = opts->kv_timing_verbosity = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv, "wall",      FCLAW_TIMER_PRIORITY_WALL);
+    sc_keyvalue_set_int (kv, "summary",   FCLAW_TIMER_PRIORITY_SUMMARY);
+    sc_keyvalue_set_int (kv, "exclusive", FCLAW_TIMER_PRIORITY_EXCLUSIVE);
+    sc_keyvalue_set_int (kv, "counters",  FCLAW_TIMER_PRIORITY_COUNTERS);
+    sc_keyvalue_set_int (kv, "details",   FCLAW_TIMER_PRIORITY_DETAILS);
+    sc_keyvalue_set_int (kv, "extra",     FCLAW_TIMER_PRIORITY_EXTRA);
+    sc_keyvalue_set_int (kv, "all",       FCLAW_TIMER_PRIORITY_EXTRA);
+
+    opts->unpacked = 1;
+   
     return buffer-buffer_start;
 }
+
 void
 fclaw_options_destroy(fclaw_options_t* fclaw_opt)
 {
@@ -491,6 +505,18 @@ fclaw_options_destroy(fclaw_options_t* fclaw_opt)
 
     FCLAW_ASSERT (fclaw_opt->kv_timing_verbosity != NULL);
     sc_keyvalue_destroy (fclaw_opt->kv_timing_verbosity);
+
+    // Strings need to be freed if this was unpacked form buffer
+    if(fclaw_opt->unpacked){
+        FCLAW_FREE ((void*) fclaw_opt->run_directory);
+        FCLAW_FREE ((void*) fclaw_opt->scale_string);
+        FCLAW_FREE ((void*) fclaw_opt->shift_string);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_figsize_string);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_plot_prefix);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_plot_suffix);
+        FCLAW_FREE ((void*) fclaw_opt->prefix);
+        FCLAW_FREE ((void*) fclaw_opt->logging_prefix);
+    }
 }
 
 static fclaw_userdata_vtable_t packing_vt = 
