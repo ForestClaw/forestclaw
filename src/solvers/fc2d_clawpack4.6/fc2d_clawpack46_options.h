@@ -62,6 +62,7 @@ struct fc2d_clawpack46_options
     int vtk_out;
 
     int is_registered;
+    int unpacked;
 };
 
 fclaw_exit_type_t fc2d_clawpack46_postprocess (fc2d_clawpack46_options_t *
@@ -92,6 +93,12 @@ void fc2d_clawpack46_options_store (struct fclaw2d_global* glob, fc2d_clawpack46
 
 void fc2d_clawpack46_output(struct fclaw2d_global *glob, int iframe);
 
+/**
+ * @brief Get the packing vtable for fc2d_clawpack46_options_t
+ * 
+ * @return const fclaw_userdata_vtable_t* the vtable
+ */
+const fclaw_userdata_vtable_t* fc2d_clawpack46_options_get_packing_vtable();
 
 #ifdef __cplusplus
 #if 0

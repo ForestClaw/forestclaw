@@ -284,7 +284,7 @@ TEST_CASE("fclaw2d_options packing/unpacking")
 	CHECK_NE(opts->logging_prefix                      , output_opts->logging_prefix);
 	CHECK_UNARY(!strcmp(opts->logging_prefix, output_opts->logging_prefix));
 
-	CHECK_UNARY(opts->unpacked);
+	CHECK_UNARY(output_opts->unpacked);
 }
 
 #endif

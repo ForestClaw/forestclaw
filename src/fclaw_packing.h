@@ -76,7 +76,7 @@ size_t fclaw_pack_string(const char*, char* buffer);
 
 size_t fclaw_unpack_string(char * buffer, char**);
 
-size_t fclaw_pack_int(char * buffer, int value);
+size_t fclaw_pack_int(int value, char* buffer);
 
 size_t fclaw_unpack_int(char * buffer, int* value);
 

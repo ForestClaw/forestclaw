@@ -58,7 +58,7 @@ size_t fclaw_unpack_string(char * buffer, char** string){
   return buffer - buffer_start;
 }
 
-size_t fclaw_pack_int(char * buffer, int value){
+size_t fclaw_pack_int(int value, char * buffer){
   *((int *) buffer) = value;
   return sizeof(int);
 }

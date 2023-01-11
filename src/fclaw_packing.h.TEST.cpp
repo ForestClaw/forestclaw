@@ -35,8 +35,8 @@ TEST_CASE("fclaw_pack_int pack and unpack")
 
 		int unpacked_value;
 
-		CHECK_EQ(fclaw_pack_int(buffer,value), sizeof(int));
-		CHECK_EQ(fclaw_unpack_int(buffer,&unpacked_value), sizeof(int));
+		CHECK_EQ(fclaw_pack_int(value, buffer), sizeof(int));
+		CHECK_EQ(fclaw_unpack_int(buffer, &unpacked_value), sizeof(int));
 
 		CHECK_EQ(value, unpacked_value);
 	}

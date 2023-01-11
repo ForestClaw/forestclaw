@@ -527,6 +527,10 @@ static fclaw_userdata_vtable_t packing_vt =
 	(void*)(void*)fclaw_options_destroy,
 };
 
+const fclaw_userdata_vtable_t* fclaw_options_get_packing_vtable(){
+    return &packing_vt;
+}
+
 /* ------------------------------------------------------------------------
   Generic functions - these call the functions above
   ------------------------------------------------------------------------ */
@@ -597,10 +601,6 @@ static const fclaw_app_options_vtable_t options_vtable = {
     options_check,
     options_destroy
 };
-
-const fclaw_userdata_vtable_t* fclaw_options_get_packing_vtable(){
-    return &packing_vt;
-}
 
 /* ---------------------------------------------------------
    Public interface to ForestClaw options
