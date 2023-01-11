@@ -340,6 +340,7 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                            0,"prefixed used for logging [NULL]");    
 
     fclaw_opt->is_registered = 1;
+    fclaw_opt->is_unpacked = 0;
 
     return NULL;
 }
@@ -406,6 +407,33 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
 
     return FCLAW_NOEXIT;
 }
+
+void
+fclaw_options_destroy(fclaw_options_t* fclaw_opt)
+{
+    FCLAW_FREE (fclaw_opt->scale);
+    FCLAW_FREE (fclaw_opt->shift);
+    FCLAW_FREE (fclaw_opt->tikz_figsize);
+
+    FCLAW_ASSERT (fclaw_opt->kv_timing_verbosity != NULL);
+    sc_keyvalue_destroy (fclaw_opt->kv_timing_verbosity);
+
+    // Strings need to be freed if this was unpacked form buffer
+    if(fclaw_opt->is_unpacked){
+        FCLAW_FREE ((void*) fclaw_opt->run_directory);
+        FCLAW_FREE ((void*) fclaw_opt->scale_string);
+        FCLAW_FREE ((void*) fclaw_opt->shift_string);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_figsize_string);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_plot_prefix);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_plot_suffix);
+        FCLAW_FREE ((void*) fclaw_opt->prefix);
+        FCLAW_FREE ((void*) fclaw_opt->logging_prefix);
+    }
+}
+
+/* ------------------------------------------------------------------------
+  Options packing
+  ------------------------------------------------------------------------ */
 
 static size_t options_packsize(void* user){
     fclaw_options_t* opts = (fclaw_options_t*) user;
@@ -491,32 +519,9 @@ static size_t options_unpack(char* buffer, void** user){
     sc_keyvalue_set_int (kv, "extra",     FCLAW_TIMER_PRIORITY_EXTRA);
     sc_keyvalue_set_int (kv, "all",       FCLAW_TIMER_PRIORITY_EXTRA);
 
-    opts->unpacked = 1;
+    opts->is_unpacked = 1;
    
     return buffer-buffer_start;
-}
-
-void
-fclaw_options_destroy(fclaw_options_t* fclaw_opt)
-{
-    FCLAW_FREE (fclaw_opt->scale);
-    FCLAW_FREE (fclaw_opt->shift);
-    FCLAW_FREE (fclaw_opt->tikz_figsize);
-
-    FCLAW_ASSERT (fclaw_opt->kv_timing_verbosity != NULL);
-    sc_keyvalue_destroy (fclaw_opt->kv_timing_verbosity);
-
-    // Strings need to be freed if this was unpacked form buffer
-    if(fclaw_opt->unpacked){
-        FCLAW_FREE ((void*) fclaw_opt->run_directory);
-        FCLAW_FREE ((void*) fclaw_opt->scale_string);
-        FCLAW_FREE ((void*) fclaw_opt->shift_string);
-        FCLAW_FREE ((void*) fclaw_opt->tikz_figsize_string);
-        FCLAW_FREE ((void*) fclaw_opt->tikz_plot_prefix);
-        FCLAW_FREE ((void*) fclaw_opt->tikz_plot_suffix);
-        FCLAW_FREE ((void*) fclaw_opt->prefix);
-        FCLAW_FREE ((void*) fclaw_opt->logging_prefix);
-    }
 }
 
 static fclaw_packing_vtable_t packing_vt = 

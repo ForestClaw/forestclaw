@@ -243,10 +243,10 @@ struct fclaw_options
     int weighted_partition;            /**< Use weighted partition. */
 
     int is_registered;
+    int is_unpacked; /**< True if options structure was unpacked from buffer */
 
     const char * logging_prefix; /**< prefix presented in logging ie. [prefix] */
 
-    int unpacked; /**< True if options structure was unpacked from buffer */
 };
 
 #ifdef __cplusplus
