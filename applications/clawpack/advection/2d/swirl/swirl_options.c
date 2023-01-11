@@ -23,9 +23,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw_base.h"
 #include "swirl_user.h"
 
+#include <fclaw_base.h>
 #include <fclaw_pointer_map.h>
 #include <fclaw_packing.h>
 
