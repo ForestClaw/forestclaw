@@ -408,13 +408,79 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
 }
 
 static size_t options_packsize(void* user){
-    return 0;
+    fclaw_options_t* opts = (fclaw_options_t*) user;
+
+    size_t size = sizeof(fclaw_options_t);
+    size += fclaw_packsize_string(opts->run_directory);
+    size += fclaw_packsize_string(opts->scale_string);
+    size += fclaw_packsize_string(opts->shift_string);
+    size += 3*sizeof(double); //scale
+    size += 3*sizeof(double); //shift
+    size += fclaw_packsize_string(opts->tikz_figsize_string);
+    size += 2*sizeof(double); //tickz_figsize
+    size += fclaw_packsize_string(opts->tikz_plot_prefix);
+    size += fclaw_packsize_string(opts->tikz_plot_suffix);
+    size += fclaw_packsize_string(opts->prefix);
+    size += fclaw_packsize_string(opts->logging_prefix);
+
+    return size;
 }
 static size_t options_pack(void* user, char* buffer){
-    return 0;
+    char* buffer_start = buffer;
+
+    fclaw_options_t* opts = (fclaw_options_t*) user;
+
+    //pack entire struct
+    *(fclaw_options_t*) buffer = *opts;
+    buffer += sizeof(fclaw_options_t);
+
+    //append arrays to buffer
+    buffer += fclaw_pack_string(opts->run_directory, buffer);
+    buffer += fclaw_pack_string(opts->scale_string, buffer);
+    buffer += fclaw_pack_string(opts->shift_string, buffer);
+    for(size_t i = 0; i < 3; i++){
+        buffer += fclaw_pack_double(opts->scale[i], buffer);
+        buffer += fclaw_pack_double(opts->shift[i], buffer);
+    }
+    buffer += fclaw_pack_string(opts->tikz_figsize_string, buffer);
+    buffer += fclaw_pack_double(opts->tikz_figsize[0], buffer);
+    buffer += fclaw_pack_double(opts->tikz_figsize[1], buffer);
+    buffer += fclaw_pack_string(opts->tikz_plot_prefix, buffer);
+    buffer += fclaw_pack_string(opts->tikz_plot_suffix, buffer);
+    buffer += fclaw_pack_string(opts->prefix, buffer);
+    buffer += fclaw_pack_string(opts->logging_prefix, buffer);
+
+    return buffer-buffer_start;
 }
 static size_t options_unpack(char* buffer, void** user){
-    return 0;
+    char* buffer_start = buffer;
+
+    fclaw_options_t** opts_ptr = (fclaw_options_t**) user;
+    *opts_ptr = FCLAW_ALLOC(fclaw_options_t,1);
+    fclaw_options_t* opts = *opts_ptr;
+
+    *opts = *(fclaw_options_t*) buffer;
+    buffer += sizeof(fclaw_options_t);
+
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->run_directory);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->scale_string);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->shift_string);
+    opts->scale = FCLAW_ALLOC(double,3);
+    opts->shift = FCLAW_ALLOC(double,3);
+    for(size_t i = 0; i < 3; i++){
+        buffer += fclaw_unpack_double(buffer, &opts->scale[i]);
+        buffer += fclaw_unpack_double(buffer, &opts->shift[i]);
+    }
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->tikz_figsize_string);
+    opts->tikz_figsize = FCLAW_ALLOC(double,2);
+    buffer += fclaw_unpack_double(buffer, &opts->tikz_figsize[0]);
+    buffer += fclaw_unpack_double(buffer, &opts->tikz_figsize[1]);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->tikz_plot_prefix);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->tikz_plot_suffix);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->prefix);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->logging_prefix);
+
+    return buffer-buffer_start;
 }
 void
 fclaw_options_destroy(fclaw_options_t* fclaw_opt)
@@ -506,6 +572,9 @@ static const fclaw_app_options_vtable_t options_vtable = {
     options_destroy
 };
 
+const fclaw_userdata_vtable_t* fclaw_options_get_packing_vtable(){
+    return &packing_vt;
+}
 
 /* ---------------------------------------------------------
    Public interface to ForestClaw options

@@ -72,7 +72,7 @@ typedef struct fclaw_userdata_vtable
 
 size_t fclaw_packsize_string(const char*);
 
-size_t fclaw_pack_string(char * buffer, const char*);
+size_t fclaw_pack_string(const char*, char* buffer);
 
 size_t fclaw_unpack_string(char * buffer, char**);
 
@@ -84,9 +84,9 @@ size_t fclaw_pack_size_t(char * buffer, size_t value);
 
 size_t fclaw_unpack_size_t(char * buffer, size_t* value);
 
-size_t fclaw_pack_double(char * buffer, double value);
+size_t fclaw_pack_double(double value, char * buffer);
 
-size_t fclaw_unpack_double(char * buffer, double* value);
+size_t fclaw_unpack_double(const char * buffer, double* value);
 
 #ifdef __cplusplus
 #if 0

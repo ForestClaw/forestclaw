@@ -145,7 +145,7 @@ pack_iterator_callback(const char* key, void* value, void* user)
 {
     char** buffer_ptr = (char **) user;
 
-    *buffer_ptr += fclaw_pack_string(*buffer_ptr, key);
+    *buffer_ptr += fclaw_pack_string(key, *buffer_ptr);
 
     fclaw_userdata_vtable_t* vt = fclaw_app_options_get_vtable(key);
     check_vt(vt,key);
@@ -158,8 +158,8 @@ fclaw2d_global_pack(const fclaw2d_global_t * glob, char* buffer)
 {
     const char* buffer_start = buffer;
 
-    buffer += fclaw_pack_double(buffer,glob->curr_time);
-    buffer += fclaw_pack_double(buffer,glob->curr_dt);
+    buffer += fclaw_pack_double(glob->curr_time, buffer);
+    buffer += fclaw_pack_double(glob->curr_dt, buffer);
 
     buffer += fclaw_pack_size_t(buffer,fclaw_pointer_map_size(glob->options));
 

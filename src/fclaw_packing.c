@@ -31,7 +31,7 @@ size_t fclaw_packsize_string(const char * string){
   return sizeof(size_t) + (string == NULL ? 0 : strlen(string)+1);
 }
 
-size_t fclaw_pack_string(char * buffer, const char* string){
+size_t fclaw_pack_string(const char* string, char* buffer){
   char * buffer_start = buffer;
   if(string == NULL){
     buffer += fclaw_pack_size_t(buffer, 0);
@@ -78,12 +78,12 @@ size_t fclaw_unpack_size_t(char * buffer, size_t* value){
   return sizeof(size_t);
 }
 
-size_t fclaw_pack_double(char * buffer, double value){
+size_t fclaw_pack_double(double value, char* buffer){
   *((double *) buffer) = value;
   return sizeof(double);
 }
 
-size_t fclaw_unpack_double(char * buffer, double* value){
+size_t fclaw_unpack_double(const char * buffer, double* value){
   *value = *((double *) buffer);
   return sizeof(double);
 }

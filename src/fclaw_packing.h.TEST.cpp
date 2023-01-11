@@ -67,7 +67,7 @@ TEST_CASE("fclaw_pack_double pack and unpack")
 
 		double unpacked_value;
 
-		CHECK_EQ(fclaw_pack_double(buffer,value), sizeof(double));
+		CHECK_EQ(fclaw_pack_double(value, buffer), sizeof(double));
 		CHECK_EQ(fclaw_unpack_double(buffer,&unpacked_value), sizeof(double));
 
 		CHECK_EQ(value, unpacked_value);
@@ -83,7 +83,7 @@ TEST_CASE("fclaw_pack_string pack and unpack")
 
 		
 		CHECK_EQ(fclaw_packsize_string(value), sizeof(size_t)+1+strlen(value));
-		CHECK_EQ(fclaw_pack_string(buffer,value), sizeof(size_t)+1+strlen(value));
+		CHECK_EQ(fclaw_pack_string(value, buffer), sizeof(size_t)+1+strlen(value));
 		CHECK_EQ(fclaw_unpack_string(buffer,&unpacked_value), sizeof(size_t)+1+strlen(value));
 
 		CHECK_EQ(strcmp(value, unpacked_value), 0);
@@ -98,7 +98,7 @@ TEST_CASE("fclaw_pack_string pack and unpack NULL")
 		char* unpacked_value;
 
 		CHECK_EQ(fclaw_packsize_string(NULL), sizeof(size_t));
-		CHECK_EQ(fclaw_pack_string(buffer,NULL), sizeof(size_t));
+		CHECK_EQ(fclaw_pack_string(NULL, buffer), sizeof(size_t));
 		CHECK_EQ(fclaw_unpack_string(buffer,&unpacked_value), sizeof(size_t));
 
 		CHECK_EQ(unpacked_value, nullptr);
