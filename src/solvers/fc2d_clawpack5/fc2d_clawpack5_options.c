@@ -24,11 +24,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fc2d_clawpack5_options.h"
+#include "fclaw_base.h"
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_global.h>
 #include <fclaw_options.h>
 #include <fclaw_pointer_map.h>
+#include <fclaw_packing.h>
 
 static void*
 clawpack5_register (fc2d_clawpack5_options_t* clawopt, sc_options_t * opt)
@@ -109,6 +111,108 @@ clawpack5_destroy (fc2d_clawpack5_options_t * clawopt)
     fclaw_options_destroy_array (clawopt->mthbc);
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
+
+    //free strings if unpacked
+    if (clawopt->unpacked)
+    {
+        FCLAW_FREE((void*) clawopt->order_string);
+        FCLAW_FREE((void*) clawopt->mthlim_string);
+        FCLAW_FREE((void*) clawopt->mthbc_string);
+    }
+}
+
+static size_t 
+options_packsize(void* user)
+{
+    fc2d_clawpack5_options_t* opts = (fc2d_clawpack5_options_t*) user;
+
+    size_t size = sizeof(fc2d_clawpack5_options_t);
+    size += fclaw_packsize_string(opts->order_string);
+    size += 2*sizeof(int);  /* order */
+    size += opts->mwaves*sizeof(int);  /* mthlim */
+    size += fclaw_packsize_string(opts->mthlim_string);
+    size += 4*sizeof(int);  /* mthbc */
+    size += fclaw_packsize_string(opts->mthbc_string);
+
+    return size;
+}
+
+static size_t 
+options_pack(void* user, char* buffer)
+{
+    char* buffer_start = buffer;
+
+    fc2d_clawpack5_options_t* opts = (fc2d_clawpack5_options_t*) user;
+
+    //pack entire struct
+    *(fc2d_clawpack5_options_t*) buffer = *opts;
+    buffer += sizeof(fc2d_clawpack5_options_t);
+
+    //append arrays to buffer
+    buffer += fclaw_pack_string(opts->order_string,buffer);
+    buffer += fclaw_pack_int(opts->order[0],buffer);
+    buffer += fclaw_pack_int(opts->order[1],buffer);
+    for(size_t i = 0; i < opts->mwaves; i++)
+    {
+        buffer += fclaw_pack_int(opts->mthlim[i],buffer);
+    }
+    buffer += fclaw_pack_string(opts->mthlim_string,buffer);
+    for(size_t i = 0; i < 4; i++)
+    {
+        buffer += fclaw_pack_int(opts->mthbc[i],buffer);
+    }
+    buffer += fclaw_pack_string(opts->mthbc_string,buffer);
+
+    return buffer-buffer_start;
+}
+
+static size_t 
+options_unpack(char* buffer, void** user)
+{
+    char* buffer_start = buffer;
+
+    fc2d_clawpack5_options_t** opts_ptr = (fc2d_clawpack5_options_t**) user;
+    *opts_ptr = FCLAW_ALLOC(fc2d_clawpack5_options_t,1);
+    fc2d_clawpack5_options_t* opts = *opts_ptr;
+
+    *opts = *(fc2d_clawpack5_options_t*) buffer;
+    buffer += sizeof(fc2d_clawpack5_options_t);
+
+    //unpack arrays
+    buffer += fclaw_unpack_string(buffer,(char**) &opts->order_string);
+    opts->order = FCLAW_ALLOC(int,2);
+    buffer += fclaw_unpack_int(buffer,&opts->order[0]);
+    buffer += fclaw_unpack_int(buffer,&opts->order[1]);
+    opts->mthlim = FCLAW_ALLOC(int,opts->mwaves);
+    for(size_t i = 0; i < opts->mwaves; i++)
+    {
+        buffer += fclaw_unpack_int(buffer,&opts->mthlim[i]);
+    }
+    buffer += fclaw_unpack_string(buffer,(char**) &opts->mthlim_string);
+    opts->mthbc = FCLAW_ALLOC(int,4);
+    for(size_t i = 0; i < 4; i++)
+    {
+        buffer += fclaw_unpack_int(buffer,&opts->mthbc[i]);
+    }
+    buffer += fclaw_unpack_string(buffer,(char**) &opts->mthbc_string);
+
+    opts->unpacked = 1;
+   
+    return buffer-buffer_start;
+}
+
+static fclaw_userdata_vtable_t packing_vt = 
+{
+	options_pack,
+	options_unpack,
+	options_packsize,
+	(void*)(void*)clawpack5_destroy,
+};
+
+const fclaw_userdata_vtable_t* 
+fc2d_clawpack5_options_get_packing_vtable()
+{
+    return &packing_vt;
 }
 
 
@@ -119,6 +223,8 @@ clawpack5_destroy (fc2d_clawpack5_options_t * clawopt)
 static void*
 options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
+    fclaw_app_options_store_vtable("fc2d_clawpack5", &packing_vt);
+
     fc2d_clawpack5_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);
