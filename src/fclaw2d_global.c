@@ -147,7 +147,7 @@ pack_iterator_callback(const char* key, void* value, void* user)
 
     *buffer_ptr += fclaw_pack_string(key, *buffer_ptr);
 
-    fclaw_packing_vtable_t* vt = fclaw_app_options_get_vtable(key);
+    fclaw_packing_vtable_t* vt = fclaw_app_get_options_packing_vtable(key);
     check_vt(vt,key);
 
     *buffer_ptr += vt->pack(value,*buffer_ptr);
@@ -172,7 +172,7 @@ static void
 packsize_iterator_callback(const char* key, void* value, void* user)
 {
     size_t* options_size = (size_t*) user;
-    fclaw_packing_vtable_t* vt = fclaw_app_options_get_vtable(key);
+    fclaw_packing_vtable_t* vt = fclaw_app_get_options_packing_vtable(key);
     check_vt(vt,key);
     (*options_size) += fclaw_packsize_string(key) + vt->size(value);
 }
@@ -203,7 +203,7 @@ fclaw2d_global_unpack(char* buffer, fclaw2d_global_t ** glob_ptr)
     {
         char * key;
         buffer += fclaw_unpack_string(buffer,&key);
-        fclaw_packing_vtable_t* vt = fclaw_app_options_get_vtable(key);
+        fclaw_packing_vtable_t* vt = fclaw_app_get_options_packing_vtable(key);
         check_vt(vt,key);
         void * options;
         buffer += vt->unpack(buffer,&options);

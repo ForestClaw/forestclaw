@@ -225,7 +225,7 @@ options_register(fclaw_app_t * a, void *optpkg, sc_options_t * opt)
     fclaw2d_clawpatch_options_t *clawpatch_opt = 
                                  (fclaw2d_clawpatch_options_t *) optpkg;
 
-    fclaw_app_options_store_vtable(CLAWPATCH_OPTION_NAME, &packing_vt);
+    fclaw_app_register_options_packing_vtable(CLAWPATCH_OPTION_NAME, &packing_vt);
 
     return clawpatch_register(clawpatch_opt,opt);
 }

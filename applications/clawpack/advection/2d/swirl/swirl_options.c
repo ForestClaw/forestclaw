@@ -189,7 +189,7 @@ user_options_t* swirl_options_register (fclaw_app_t * app,
 
     fclaw_app_set_attribute(app,"user",user);
 
-    fclaw_app_options_store_vtable("user", &packing_vt);
+    fclaw_app_register_options_packing_vtable("user", &packing_vt);
 
     return user;
 }

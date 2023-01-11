@@ -291,7 +291,7 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
                                                               const char *section,
                                                               const char *configfile)
 {
-    fclaw_app_options_store_vtable("fc2d_clawpack46", &packing_vt);
+    fclaw_app_register_options_packing_vtable("fc2d_clawpack46", &packing_vt);
 
     fc2d_clawpack46_options_t *clawopt;
 

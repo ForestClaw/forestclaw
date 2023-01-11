@@ -223,7 +223,7 @@ fc2d_clawpack5_options_get_packing_vtable()
 static void*
 options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
 {
-    fclaw_app_options_store_vtable("fc2d_clawpack5", &packing_vt);
+    fclaw_app_register_options_packing_vtable("fc2d_clawpack5", &packing_vt);
 
     fc2d_clawpack5_options_t *clawopt;
 

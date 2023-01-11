@@ -630,7 +630,7 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
                                 fclaw_opt);
     
     /* register packing vtable */
-    fclaw_app_options_store_vtable("fclaw2d", &packing_vt);
+    fclaw_app_register_options_packing_vtable("fclaw2d", &packing_vt);
 
     return fclaw_opt;
 }

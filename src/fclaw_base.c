@@ -723,7 +723,7 @@ fclaw_app_get_options (fclaw_app_t * a)
 
 static fclaw_pointer_map_t* packing_vtables = NULL;
 
-void fclaw_app_options_store_vtable(const char*name,fclaw_packing_vtable_t* vtable){
+void fclaw_app_register_options_packing_vtable(const char*name,fclaw_packing_vtable_t* vtable){
     if(packing_vtables == NULL)
     {
         packing_vtables = fclaw_pointer_map_new();
@@ -731,7 +731,7 @@ void fclaw_app_options_store_vtable(const char*name,fclaw_packing_vtable_t* vtab
     fclaw_pointer_map_insert(packing_vtables, name, vtable, NULL);
 }
 
-fclaw_packing_vtable_t* fclaw_app_options_get_vtable(const char*name){
+fclaw_packing_vtable_t* fclaw_app_get_options_packing_vtable(const char*name){
     if(packing_vtables == NULL)
     {
         packing_vtables = fclaw_pointer_map_new();

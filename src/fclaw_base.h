@@ -483,9 +483,21 @@ void fclaw_app_options_register (fclaw_app_t * a,
 
 typedef struct fclaw_packing_vtable fclaw_packing_vtable_t;
 
-void fclaw_app_options_store_vtable(const char*name,fclaw_packing_vtable_t* vtable);
+/**
+ * @brief Register a vtable used for packing an options structure
+ * 
+ * @param name the name, this should be the same name used for storing options in the glob
+ * @param vtable the vtable
+ */
+void fclaw_app_register_options_packing_vtable(const char*name,fclaw_packing_vtable_t* vtable);
 
-fclaw_packing_vtable_t* fclaw_app_options_get_vtable(const char*name);
+/**
+ * @brief Get an options packing vtable
+ * 
+ * @param name the name, this should be the same name used for storing options in the glob
+ * @return fclaw_packing_vtable_t* the vtable
+ */
+fclaw_packing_vtable_t* fclaw_app_get_options_packing_vtable(const char* name);
 
 /**
  * \brief Check if core options have been registered for this app

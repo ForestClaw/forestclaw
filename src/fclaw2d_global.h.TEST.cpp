@@ -180,7 +180,7 @@ TEST_CASE("fclaw2d_global_pack with a single options structure")
 		glob1->curr_dt                      = curr_dt;
 
 		dummy_options* options = new dummy_options(20, 'a');
-		fclaw_app_options_store_vtable("dummy1",  &dummy_opts_vt);
+		fclaw_app_register_options_packing_vtable("dummy1",  &dummy_opts_vt);
 		fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
 
 		size_t packsize = fclaw2d_global_packsize(glob1);
@@ -227,9 +227,9 @@ TEST_CASE("fclaw2d_global_pack with two options structure")
 
 		dummy_options* options = new dummy_options(20, 'a');
 		dummy_options* options2 = new dummy_options(40, 'b');
-		fclaw_app_options_store_vtable("dummy1",  &dummy_opts_vt);
+		fclaw_app_register_options_packing_vtable("dummy1",  &dummy_opts_vt);
 		fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
-		fclaw_app_options_store_vtable("dummy2",  &dummy_opts_vt);
+		fclaw_app_register_options_packing_vtable("dummy2",  &dummy_opts_vt);
 		fclaw_pointer_map_insert(glob1->options, "dummy2", options2, destroy_dummy_options);
 
 		size_t packsize = fclaw2d_global_packsize(glob1);
@@ -303,7 +303,7 @@ TEST_CASE("fclaw2d_global_unppack aborts with unregistered vtable")
 	glob1->curr_dt                      = 1;
 
 	dummy_options* options = new dummy_options(20, 'a');
-	fclaw_app_options_store_vtable("dummy1",  &dummy_opts_vt);
+	fclaw_app_register_options_packing_vtable("dummy1",  &dummy_opts_vt);
 	fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
 
 	size_t packsize = fclaw2d_global_packsize(glob1);
@@ -316,7 +316,7 @@ TEST_CASE("fclaw2d_global_unppack aborts with unregistered vtable")
 	REQUIRE_EQ(bytes_written, packsize);
 
 	fclaw2d_global_t* glob2=nullptr;
-	fclaw_app_options_store_vtable("dummy1",  nullptr);
+	fclaw_app_register_options_packing_vtable("dummy1",  nullptr);
 	CHECK_SC_ABORTED(fclaw2d_global_unpack(buffer, &glob2));
 
 	fclaw2d_global_destroy(glob1);
