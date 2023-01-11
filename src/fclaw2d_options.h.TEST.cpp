@@ -158,7 +158,7 @@ TEST_CASE("fclaw2d_options packing/unpacking")
 	opts->logging_prefix = "werqreqw";
 	opts->unpacked = false;
 
-	const fclaw_userdata_vtable_t* vt = fclaw_options_get_packing_vtable();
+	const fclaw_packing_vtable_t* vt = fclaw_options_get_packing_vtable();
 
 	size_t size = vt->size(opts);
 	char buffer[size];

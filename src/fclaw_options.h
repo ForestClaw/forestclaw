@@ -57,9 +57,9 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
 /**
  * @brief Get the packing vtable for the options
  * 
- * @return const fclaw_userdata_vtable_t* the vtable
+ * @return const fclaw_packing_vtable_t* the vtable
  */
-const fclaw_userdata_vtable_t* fclaw_options_get_packing_vtable();
+const fclaw_packing_vtable_t* fclaw_options_get_packing_vtable();
 
 /* These can be called from external routines (in torthem, for example?) */
 fclaw_exit_type_t 

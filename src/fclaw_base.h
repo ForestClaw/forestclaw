@@ -481,11 +481,11 @@ void fclaw_app_options_register (fclaw_app_t * a,
                                  const fclaw_app_options_vtable_t * vt,
                                  void *package);
 
-typedef struct fclaw_userdata_vtable fclaw_userdata_vtable_t;
+typedef struct fclaw_packing_vtable fclaw_packing_vtable_t;
 
-void fclaw_app_options_store_vtable(const char*name,fclaw_userdata_vtable_t* vtable);
+void fclaw_app_options_store_vtable(const char*name,fclaw_packing_vtable_t* vtable);
 
-fclaw_userdata_vtable_t* fclaw_app_options_get_vtable(const char*name);
+fclaw_packing_vtable_t* fclaw_app_options_get_vtable(const char*name);
 
 /**
  * \brief Check if core options have been registered for this app

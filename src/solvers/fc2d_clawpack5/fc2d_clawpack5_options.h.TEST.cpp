@@ -108,7 +108,7 @@ TEST_CASE("fc2d_clawpack5_options packing/unpacking")
 
 	opts->unpacked = 0;
 
-	const fclaw_userdata_vtable_t* vt = fc2d_clawpack5_options_get_packing_vtable();
+	const fclaw_packing_vtable_t* vt = fc2d_clawpack5_options_get_packing_vtable();
 
 	size_t size = vt->size(opts);
 	char buffer[size];

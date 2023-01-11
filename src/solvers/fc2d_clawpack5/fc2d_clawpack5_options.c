@@ -201,7 +201,7 @@ options_unpack(char* buffer, void** user)
     return buffer-buffer_start;
 }
 
-static fclaw_userdata_vtable_t packing_vt = 
+static fclaw_packing_vtable_t packing_vt = 
 {
 	options_pack,
 	options_unpack,
@@ -209,7 +209,7 @@ static fclaw_userdata_vtable_t packing_vt =
 	(void*)(void*)clawpack5_destroy,
 };
 
-const fclaw_userdata_vtable_t* 
+const fclaw_packing_vtable_t* 
 fc2d_clawpack5_options_get_packing_vtable()
 {
     return &packing_vt;

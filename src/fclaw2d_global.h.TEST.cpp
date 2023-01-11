@@ -90,7 +90,7 @@ size_t pack_dummy_options(void* user, char* buffer)
 	dummy_options* options = (dummy_options*) user;
 
 	char* buffer_start = buffer;
-	buffer += fclaw_pack_size_t(buffer, options->size);
+	buffer += fclaw_pack_size_t(options->size, buffer);
 	for(size_t i = 0; i < options->size; i++){
 		buffer[i] = options->value;
 	}
@@ -125,7 +125,7 @@ void destroy_dummy_options(void* user){
 	delete (dummy_options*) user;
 }
 
-fclaw_userdata_vtable_t dummy_opts_vt =
+fclaw_packing_vtable_t dummy_opts_vt =
 {
 	pack_dummy_options,
 	unpack_dummy_options,

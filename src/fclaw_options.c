@@ -519,7 +519,7 @@ fclaw_options_destroy(fclaw_options_t* fclaw_opt)
     }
 }
 
-static fclaw_userdata_vtable_t packing_vt = 
+static fclaw_packing_vtable_t packing_vt = 
 {
 	options_pack,
 	options_unpack,
@@ -527,7 +527,7 @@ static fclaw_userdata_vtable_t packing_vt =
 	(void*)(void*)fclaw_options_destroy,
 };
 
-const fclaw_userdata_vtable_t* fclaw_options_get_packing_vtable(){
+const fclaw_packing_vtable_t* fclaw_options_get_packing_vtable(){
     return &packing_vt;
 }
 

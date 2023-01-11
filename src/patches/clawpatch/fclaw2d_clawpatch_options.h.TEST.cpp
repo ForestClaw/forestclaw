@@ -154,7 +154,7 @@ TEST_CASE("fclaw2d_clawpatch_options packing/unpacking")
 	opts->save_aux = 1;
 	opts->is_registered = 1;
 
-	const fclaw_userdata_vtable_t* vt = fclaw2d_clawpatch_options_get_packing_vtable();
+	const fclaw_packing_vtable_t* vt = fclaw2d_clawpatch_options_get_packing_vtable();
 
 	size_t size = vt->size(opts);
 	char buffer[size];
@@ -199,7 +199,7 @@ TEST_CASE("fclaw3dx_clawpatch_options packing/unpacking")
 	opts->save_aux = 1;
 	opts->is_registered = 1;
 
-	const fclaw_userdata_vtable_t* vt = fclaw3dx_clawpatch_options_get_packing_vtable();
+	const fclaw_packing_vtable_t* vt = fclaw3dx_clawpatch_options_get_packing_vtable();
 
 	size_t size = vt->size(opts);
 	char buffer[size];

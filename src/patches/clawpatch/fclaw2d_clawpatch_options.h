@@ -121,9 +121,9 @@ fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global
 /**
  * @brief Get the packing vtable for fclaw2d_clawpatch_options_t
  * 
- * @return const fclaw_userdata_vtable_t* the vtable
+ * @return const fclaw_packing_vtable_t* the vtable
  */
-const fclaw_userdata_vtable_t* fclaw2d_clawpatch_options_get_packing_vtable();
+const fclaw_packing_vtable_t* fclaw2d_clawpatch_options_get_packing_vtable();
 
 
 #ifdef __cplusplus

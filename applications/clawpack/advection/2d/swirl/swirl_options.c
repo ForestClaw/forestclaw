@@ -94,7 +94,7 @@ options_unpack(char* buffer, void** user)
     return sizeof(user_options_t);
 }
 
-static fclaw_userdata_vtable_t packing_vt = 
+static fclaw_packing_vtable_t packing_vt = 
 {
 	options_pack,
 	options_unpack,

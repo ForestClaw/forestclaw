@@ -34,18 +34,18 @@ size_t fclaw_packsize_string(const char * string){
 size_t fclaw_pack_string(const char* string, char* buffer){
   char * buffer_start = buffer;
   if(string == NULL){
-    buffer += fclaw_pack_size_t(buffer, 0);
+    buffer += fclaw_pack_size_t(0, buffer);
   }else{
     size_t length = strlen(string)+1;
-    buffer += fclaw_pack_size_t(buffer, length);
+    buffer += fclaw_pack_size_t(length, buffer);
     memcpy(buffer,string,length);
     buffer += length;
   }
   return buffer - buffer_start;
 }
 
-size_t fclaw_unpack_string(char * buffer, char** string){
-  char * buffer_start = buffer;
+size_t fclaw_unpack_string(const char * buffer, char** string){
+  const char* buffer_start = buffer;
   size_t length;
   buffer += fclaw_unpack_size_t(buffer, &length);
   if(length == 0){
@@ -63,17 +63,17 @@ size_t fclaw_pack_int(int value, char * buffer){
   return sizeof(int);
 }
 
-size_t fclaw_unpack_int(char * buffer, int* value){
+size_t fclaw_unpack_int(const char* buffer, int* value){
   *value = *((int *) buffer);
   return sizeof(int);
 }
 
-size_t fclaw_pack_size_t(char * buffer, size_t value){
+size_t fclaw_pack_size_t(size_t value, char* buffer){
   *((size_t *) buffer) = value;
   return sizeof(size_t);
 }
 
-size_t fclaw_unpack_size_t(char * buffer, size_t* value){
+size_t fclaw_unpack_size_t(const char* buffer, size_t* value){
   *value = *((size_t *) buffer);
   return sizeof(size_t);
 }
