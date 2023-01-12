@@ -152,6 +152,14 @@ typedef struct overlap_consumer
 overlap_consumer_t;
 
 static
+void apply_consumer_mapping (overlap_point_t * op)
+{
+    /* Here, we would need to apply the mapping of the consumer domain
+     * (in this example the swirl domain) to the point. Since the swirl domain
+     * is mapped to the unit square, we do nothing.*/
+}
+
+static
 void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
@@ -179,12 +187,10 @@ void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             op->prodata.isset = 0;
             op->prodata.myvalue = -1;
 
-            /* choose the middle point of the cell */
+            /* choose the middle point of the cell and map it */
             op->xy[0] = xlower + (2 * i + 1) * dx / 2.;
             op->xy[1] = ylower + (2 * j + 1) * dy / 2.;
-
-            /* Here, we would need to apply the mapping of the consumer domain
-             * (in this example the swirl domain) to the point. */
+            apply_consumer_mapping (op);
         }
     }
 }
@@ -208,10 +214,21 @@ void create_query_points (overlap_consumer_t * c)
 }
 
 static
+void apply_inverse_producer_mapping (overlap_point_t * op, double xy[2])
+{
+    /* Here, we apply the inverse mapping of the producer domain (in this
+     * example the filament domain). We only consider the example case of the
+     * linear mapping to the [0,2]x[0,2]-block. */
+    xy[0] = op->xy[0] / 2;
+    xy[1] = op->xy[1] / 2;
+}
+
+static
 int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                          int blockno, int patchno, void *point, void *user)
 {
     overlap_point_t *op;
+    double xy[2];
     double tol;
     int consumer_side;
 
@@ -235,31 +252,30 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         tol = SC_1000_EPS;
     }
 
-    /* We check if the query point intersects the patch.
-     * It is important to take the underlying geometries of the consumer and
-     * the producer side under consideration.
-     * Here, we would need to apply the inverse mapping of the producer side
-     * (in this example the filament side) to the query point first, so that it
-     * lies in the same coordinate system as the patch-boundaries. */
-    if ((op->xy[0] < patch->xlower - tol
-         || op->xy[0] > patch->xupper + tol)
-        || (op->xy[1] < patch->ylower - tol
-            || op->xy[1] > patch->yupper + tol))
+    /* Apply the inverse mapping of the producer side to the point, so that it
+     * lies in the same coordinate system as the patch-boundaries. The result
+     * is stored in xy, which we will use for further geometrical operations. */
+    apply_inverse_producer_mapping (op, xy);
+
+    /* we check if the query point intersects the patch */
+    if ((xy[0] < patch->xlower - tol || xy[0] > patch->xupper + tol)
+        || (xy[1] < patch->ylower - tol || xy[1] > patch->yupper + tol))
     {
         return 0;
     }
 
-    fclaw_debugf ("Found point [%f,%f] in patch [%f,%f]x[%f,%f].\n",
-                  op->xy[0], op->xy[1], patch->xlower, patch->xupper,
-                  patch->ylower, patch->yupper);
+    fclaw_debugf
+        ("Found inversely-mapped point [%f,%f] in patch [%f,%f]x[%f,%f].\n",
+         xy[0], xy[1], patch->xlower, patch->xupper, patch->ylower,
+         patch->yupper);
 
     /* Although the point is located within a certain tolerance of the patch,
      * it may still lie outside of the [0,1]x[0,1]-block on which the domain is
      * defined. */
-    op->xy[0] = SC_MAX (op->xy[0], 0.);
-    op->xy[0] = SC_MIN (op->xy[0], 1.);
-    op->xy[1] = SC_MAX (op->xy[1], 0.);
-    op->xy[1] = SC_MIN (op->xy[1], 1.);
+    xy[0] = SC_MAX (xy[0], 0.);
+    xy[0] = SC_MIN (xy[0], 1.);
+    xy[1] = SC_MAX (xy[1], 0.);
+    xy[1] = SC_MIN (xy[1], 1.);
 
     /* update interpolation data */
     if (patchno >= 0)
@@ -272,8 +288,9 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
              * contributed to the points interpolation data.
              * We set myvalue to the mpirank of the domain for simplicity and
              * easy verification of the interpolation data at the end.
-             * In practice, one should implement actual interpolation and store
-             * the resulting data in the point-struct here. */
+             * In practice, one should implement actual interpolation (on the
+             * patch or on a specific cell in the patch) and store the resulting
+             * data in the point-struct here. */
             op->prodata.isset++;
             op->prodata.myvalue = (double) domain->mpirank;
             fclaw_debugf
@@ -295,7 +312,7 @@ void output_query_points (overlap_consumer_t * c)
     for (iz = 0; iz < npz; iz++)
     {
         op = (overlap_point_t *) sc_array_index (c->query_points, iz);
-        printf
+        fclaw_infof
             ("Query point %ld on process %d is [%f,%f] and has interpolation data %f.\n",
              iz, c->domain->mpirank, op->xy[0], op->xy[1],
              op->prodata.myvalue);
