@@ -151,9 +151,9 @@ typedef struct overlap_consumer
 }
 overlap_consumer_t;
 
-void
-add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
-                  int blockno, int patchno, void *user)
+static
+void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+                       int blockno, int patchno, void *user)
 {
     overlap_point_t *op;
     int mx, my, mbc, i, j;
@@ -189,8 +189,8 @@ add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     }
 }
 
-void
-create_query_points (overlap_consumer_t * c)
+static
+void create_query_points (overlap_consumer_t * c)
 {
     /* We create a process-local set of query points, for which we want to
      * obtain interpolation data from the producer side. We query the
@@ -207,9 +207,9 @@ create_query_points (overlap_consumer_t * c)
                   c->num_cells_in_patch);
 }
 
-int
-overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
-                     int blockno, int patchno, void *point, void *user)
+static
+int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+                         int blockno, int patchno, void *point, void *user)
 {
     overlap_point_t *op;
     double tol;
@@ -285,8 +285,8 @@ overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     return 1;
 }
 
-void
-output_query_points (overlap_consumer_t * c)
+static
+void output_query_points (overlap_consumer_t * c)
 {
     size_t iz, npz;
     overlap_point_t *op;
