@@ -132,11 +132,12 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
 }
 
 #ifndef P4_TO_P8
+// packing unpacking functions only 2d for now
 
 static void check_vt(fclaw_packing_vtable_t* vt, const char* name)
 {
     char msg[1024];
-    sprintf(msg,"Unregistered vtable for options %s",name);
+    sprintf(msg,"Unregistered options packing vtable for \"%s\"",name);
     SC_CHECK_ABORT ((vt != NULL), msg);
 }
 
@@ -150,6 +151,7 @@ pack_iterator_callback(const char* key, void* value, void* user)
     fclaw_packing_vtable_t* vt = fclaw_app_get_options_packing_vtable(key);
     check_vt(vt,key);
 
+    // advance buffer pointer
     *buffer_ptr += vt->pack(value,*buffer_ptr);
 }
 
@@ -161,7 +163,7 @@ fclaw2d_global_pack(const fclaw2d_global_t * glob, char* buffer)
     buffer += fclaw_pack_double(glob->curr_time, buffer);
     buffer += fclaw_pack_double(glob->curr_dt, buffer);
 
-    buffer += fclaw_pack_size_t(buffer,fclaw_pointer_map_size(glob->options));
+    buffer += fclaw_pack_size_t(fclaw_pointer_map_size(glob->options), buffer);
 
     fclaw_pointer_map_iterate(glob->options, pack_iterator_callback, &buffer);
 
