@@ -200,7 +200,7 @@ fclaw2d_global_unpack(char* buffer, fclaw2d_global_t ** glob_ptr)
 
     size_t num_option_structs;
     buffer += fclaw_unpack_size_t(buffer,&num_option_structs);
-    glob->options = fclaw_pointer_map_new();
+
     for(size_t i = 0; i< num_option_structs; i++)
     {
         char * key;
