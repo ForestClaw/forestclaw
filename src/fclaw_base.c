@@ -736,7 +736,7 @@ fclaw_packing_vtable_t* fclaw_app_get_options_packing_vtable(const char*name){
     {
         packing_vtables = fclaw_pointer_map_new();
     }
-    return fclaw_pointer_map_get(packing_vtables,name);
+    return (fclaw_packing_vtable_t*) fclaw_pointer_map_get(packing_vtables,name);
 }
 
 /*** which of the following do we need? ***/
