@@ -183,6 +183,11 @@ void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             /* initialize the query-point corresponding to this cell */
             op = (overlap_point_t *) sc_array_index (c->query_points,
                                                      c->cell_idx);
+
+            /* Initialize all struct bytes to 0. Not doing so can lead to
+             * valgrind warnings due to uninitialized compiler padding bytes. */
+            memset(op, 0, sizeof(overlap_point_t));
+
             op->lnum = c->cell_idx++;   /* local index of the cell */
             op->prodata.isset = 0;
             op->prodata.myvalue = -1;
