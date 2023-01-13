@@ -59,6 +59,22 @@ TEST_CASE("fclaw_pointer_map set and get")
 	CHECK_UNARY(value_destroyed);
 }
 
+TEST_CASE("fclaw_pointer_map set and get modified key")
+{
+	fclaw_pointer_map_t* map = fclaw_pointer_map_new();
+	void* value = (void*) 1;
+	value_destroyed = false;
+	std::string key = "key";
+	fclaw_pointer_map_insert(map, key.c_str(), value, [](void* v) {
+		value_destroyed = true;
+	});
+	key = "blah";
+	CHECK_UNARY_FALSE(value_destroyed);
+	CHECK_EQ(fclaw_pointer_map_get(map, "key"), value);
+	fclaw_pointer_map_destroy(map);
+	CHECK_UNARY(value_destroyed);
+}
+
 bool value2_destroyed = false;
 TEST_CASE("fclaw_pointer_map set and get two values")
 {
