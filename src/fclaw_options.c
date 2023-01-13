@@ -431,6 +431,13 @@ fclaw_options_destroy(fclaw_options_t* fclaw_opt)
     }
 }
 
+static void
+fclaw_options_destroy_void(void* user)
+{
+    fclaw_options_t* fclaw_opt = (fclaw_options_t*) user;
+    fclaw_options_destroy(fclaw_opt);
+}
+
 /* ------------------------------------------------------------------------
   Options packing
   ------------------------------------------------------------------------ */
@@ -529,7 +536,7 @@ static fclaw_packing_vtable_t packing_vt =
 	options_pack,
 	options_unpack,
 	options_packsize,
-	(void(*)(void*))fclaw_options_destroy,
+	fclaw_options_destroy_void
 };
 
 const fclaw_packing_vtable_t* fclaw_options_get_packing_vtable(){

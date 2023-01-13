@@ -121,6 +121,12 @@ clawpack5_destroy (fc2d_clawpack5_options_t * clawopt)
     }
 }
 
+static void clawpack5_destroy_void(void* user)
+{
+    fc2d_clawpack5_options_t* clawopt = (fc2d_clawpack5_options_t*) user;
+    clawpack5_destroy(clawopt);
+}
+
 static size_t 
 options_packsize(void* user)
 {
@@ -206,7 +212,7 @@ static fclaw_packing_vtable_t packing_vt =
 	options_pack,
 	options_unpack,
 	options_packsize,
-	(void*)(void*)clawpack5_destroy,
+	clawpack5_destroy_void
 };
 
 const fclaw_packing_vtable_t* 

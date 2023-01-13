@@ -65,6 +65,12 @@ swirl_destroy(user_options_t *user)
     /* Nothing to destroy */
 }
 
+static void
+swirl_destroy_void(void *user)
+{
+    swirl_destroy((user_options_t*) user);
+}
+
 static size_t 
 options_packsize(void* user)
 {
@@ -99,7 +105,7 @@ static fclaw_packing_vtable_t packing_vt =
 	options_pack,
 	options_unpack,
 	options_packsize,
-	(void*)(void*)swirl_destroy,
+	swirl_destroy_void
 };
 
 /* ------- Generic option handling routines that call above routines ----- */

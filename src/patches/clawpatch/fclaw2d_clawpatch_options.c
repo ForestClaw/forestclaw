@@ -164,6 +164,12 @@ clawpatch_destroy (fclaw2d_clawpatch_options_t *clawpatch_opt)
     sc_keyvalue_destroy (clawpatch_opt->kv_refinement_criteria);
 }
 
+static void
+clawpatch_destroy_void(void *clawpatch_opt)
+{
+    clawpatch_destroy ((fclaw2d_clawpatch_options_t *) clawpatch_opt);
+}
+
 static size_t 
 options_packsize(void* user)
 {
@@ -202,7 +208,7 @@ static fclaw_packing_vtable_t packing_vt =
 	options_pack,
 	options_unpack,
 	options_packsize,
-	(void*)(void*)clawpatch_destroy,
+	clawpatch_destroy_void
 };
 
 const fclaw_packing_vtable_t* 
