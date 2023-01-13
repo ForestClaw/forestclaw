@@ -1286,8 +1286,8 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
 
 typedef enum comm_tag
 {
-    COMM_TAG_CONSDATA,
-    COMM_TAG_PRODATA
+    COMM_TAG_CONSDATA = 5526,
+    COMM_TAG_PRODATA = 5527
 }
 comm_tag_t;
 
