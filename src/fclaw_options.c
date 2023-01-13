@@ -529,7 +529,7 @@ static fclaw_packing_vtable_t packing_vt =
 	options_pack,
 	options_unpack,
 	options_packsize,
-	(void*)(void*)fclaw_options_destroy,
+	(void(*)(void*))fclaw_options_destroy,
 };
 
 const fclaw_packing_vtable_t* fclaw_options_get_packing_vtable(){
