@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <test.hpp>
 
+#include <initializer_list>
+
 TEST_CASE("fclaw2d_global_pack with no options")
 {
 

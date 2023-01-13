@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_packing.h>
 #include <test.hpp>
 
+#include <initializer_list>
+
 TEST_CASE("fclaw_pack_int pack and unpack")
 {
 	char base_buffer[2*sizeof(int)];
