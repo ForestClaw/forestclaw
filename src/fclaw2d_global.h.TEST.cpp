@@ -283,8 +283,6 @@ TEST_CASE("fclaw2d_global_pack aborts with unregistered vtable")
 
 	char buffer[100];
 	CHECK_SC_ABORTED(fclaw2d_global_pack(glob1, buffer));
-
-	fclaw2d_global_destroy(glob1);
 }
 TEST_CASE("fclaw2d_global_packsize aborts with unregistered vtable")
 {
@@ -297,8 +295,6 @@ TEST_CASE("fclaw2d_global_packsize aborts with unregistered vtable")
 	fclaw_pointer_map_insert(glob1->options, "dummy1", options, destroy_dummy_options);
 
 	CHECK_SC_ABORTED(fclaw2d_global_packsize(glob1));
-
-	fclaw2d_global_destroy(glob1);
 }
 TEST_CASE("fclaw2d_global_unppack aborts with unregistered vtable")
 {
@@ -323,9 +319,6 @@ TEST_CASE("fclaw2d_global_unppack aborts with unregistered vtable")
 	fclaw2d_global_t* glob2=nullptr;
 	fclaw_app_register_options_packing_vtable("dummy1",  nullptr);
 	CHECK_SC_ABORTED(fclaw2d_global_unpack(buffer, &glob2));
-
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
 }
 TEST_CASE("fclaw2d_global_set_global")
 {
