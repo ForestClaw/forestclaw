@@ -127,8 +127,15 @@ main (int argc, char **argv)
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         swirl_options_store             (glob, user_opt);
 
+        //char buffer[fclaw2d_global_packsize(glob)];
+        //fclaw2d_global_pack(glob,buffer);
+        //fclaw2d_global_t* glob2;
+        //fclaw2d_global_unpack(buffer, &glob2);
+
         run_program(glob);
+
         fclaw2d_global_destroy(glob);
+        //fclaw2d_global_destroy(glob2);
     }
 
     fclaw_app_destroy (app);
