@@ -77,20 +77,25 @@ void fclaw_pointer_map_insert(fclaw_pointer_map_t* map,
     value_t* old_value = (value_t*) sc_keyvalue_get_pointer(kv, key, NULL);
 
     if(old_value != NULL){
+
         if(old_value->destroy != NULL){
             old_value->destroy(old_value->pointer);
         }
-        FCLAW_FREE(old_value);
+        old_value->destroy=destroy;
+        old_value->pointer=pointer;
+
+    }else{
+
+        value_t* value = FCLAW_ALLOC(value_t, 1);
+        value->pointer = pointer;
+        value->destroy = destroy;
+
+        char* key_copy = FCLAW_ALLOC(char, strlen(key) + 1);
+        strcpy(key_copy, key);
+
+        sc_keyvalue_set_pointer(kv, key_copy, value);
+
     }
-
-    value_t* value = FCLAW_ALLOC(value_t, 1);
-    value->pointer = pointer;
-    value->destroy = destroy;
-
-    char* key_copy = FCLAW_ALLOC(char, strlen(key) + 1);
-    strcpy(key_copy, key);
-
-    sc_keyvalue_set_pointer(kv, key_copy, value);
 }
 
 void* fclaw_pointer_map_get(fclaw_pointer_map_t* map, const char* key)
