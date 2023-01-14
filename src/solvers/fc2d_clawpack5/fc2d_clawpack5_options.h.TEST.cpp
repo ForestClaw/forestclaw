@@ -106,7 +106,7 @@ TEST_CASE("fc2d_clawpack5_options packing/unpacking")
 
 	opts->is_registered = 1;
 
-	opts->unpacked = 0;
+	opts->is_unpacked = 0;
 
 	const fclaw_packing_vtable_t* vt = fc2d_clawpack5_options_get_packing_vtable();
 
@@ -150,7 +150,7 @@ TEST_CASE("fc2d_clawpack5_options packing/unpacking")
 	CHECK_EQ(output_opts->ascii_out, opts->ascii_out);
 	CHECK_EQ(output_opts->vtk_out, opts->vtk_out);
 	CHECK_EQ(output_opts->is_registered, opts->is_registered);
-	CHECK_UNARY(output_opts->unpacked);
+	CHECK_UNARY(output_opts->is_unpacked);
 
 	vt->destroy(output_opts);
 	FCLAW_FREE(opts);

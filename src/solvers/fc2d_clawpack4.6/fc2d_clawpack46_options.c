@@ -69,7 +69,7 @@ clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
 
 
     clawopt->is_registered = 1;
-    clawopt->unpacked = 0;
+    clawopt->is_unpacked = 0;
 
     return NULL;
 }
@@ -110,7 +110,7 @@ void clawpack46_destroy (fc2d_clawpack46_options_t * clawopt)
     fclaw_options_destroy_array (clawopt->mthlim);
 
     //free strings if unpacked
-    if (clawopt->unpacked)
+    if (clawopt->is_unpacked)
     {
         FCLAW_FREE((void*) clawopt->order_string);
         FCLAW_FREE((void*) clawopt->mthlim_string);
@@ -199,7 +199,7 @@ options_unpack(char* buffer, void** user)
     }
     buffer += fclaw_unpack_string(buffer,(char**) &opts->mthbc_string);
 
-    opts->unpacked = 1;
+    opts->is_unpacked = 1;
    
     return buffer-buffer_start;
 }

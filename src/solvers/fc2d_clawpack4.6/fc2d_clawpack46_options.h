@@ -62,7 +62,7 @@ struct fc2d_clawpack46_options
     int vtk_out;
 
     int is_registered;
-    int unpacked;
+    int is_unpacked;
 };
 
 fclaw_exit_type_t fc2d_clawpack46_postprocess (fc2d_clawpack46_options_t *

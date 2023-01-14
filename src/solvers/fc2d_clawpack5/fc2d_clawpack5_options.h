@@ -64,7 +64,7 @@ struct fc2d_clawpack5_options
     int vtk_out;
 
     int is_registered;
-    int unpacked;
+    int is_unpacked;
 };
 
 
