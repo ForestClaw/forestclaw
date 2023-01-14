@@ -69,6 +69,8 @@ clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
 
 
     clawopt->is_registered = 1;
+    clawopt->unpacked = 0;
+
     return NULL;
 }
 

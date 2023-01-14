@@ -68,6 +68,8 @@ clawpack5_register (fc2d_clawpack5_options_t* clawopt, sc_options_t * opt)
                            "Output VTK formatted data [F]");
 
     clawopt->is_registered = 1;
+    clawopt->unpacked = 0;
+
     return NULL;
 }
 

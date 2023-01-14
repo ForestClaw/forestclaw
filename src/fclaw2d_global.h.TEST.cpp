@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <test.hpp>
 
 #include <initializer_list>
+#include <vector>
 
 TEST_CASE("fclaw2d_global_pack with no options")
 {
@@ -173,6 +174,11 @@ TEST_CASE("fclaw2d_global_pack with a single options structure")
 	for(double curr_time : {1.0, 1.2})
 	for(double curr_dt : {1.0, 1.2})
 	{
+		char dummy[] = "dummy1";
+		std::vector<char*> args = {dummy};
+		char ** argv = args.data();
+		int argc = 1;
+		//fclaw_app_t* app = fclaw_app_new_on_comm(sc_MPI_COMM_WORLD,&argc,&argv,NULL);
 		fclaw2d_global_t* glob1;
     	glob1 = fclaw2d_global_new();
 		glob1->curr_time                    = curr_time;
