@@ -344,7 +344,7 @@ fclaw_app_destroy (fclaw_app_t * a)
 
     FCLAW_FREE (a);
 
-    fclaw_pointer_map_destroy(packing_vtables);
+    if(packing_vtables!=NULL) fclaw_pointer_map_destroy(packing_vtables);
 
     sc_finalize ();
 
