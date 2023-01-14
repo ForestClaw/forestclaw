@@ -36,7 +36,17 @@ extern "C"
 #endif
 #endif
 
-/* these are dimension-specific functions */
+#define FCLAW_PACK(var,buffer) \
+({ \
+  memcpy(buffer,&var,sizeof(var)); \
+  sizeof(var); \
+})
+
+#define FCLAW_UNPACK(buffer,var_ptr) \
+({ \
+  memcpy(var_ptr,buffer,sizeof(*var_ptr)); \
+  sizeof(*var_ptr); \
+})
 
 /**
  * @brief Pack userdata into a buffer

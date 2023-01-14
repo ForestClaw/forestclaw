@@ -469,8 +469,7 @@ static size_t options_pack(void* user, char* buffer){
     fclaw_options_t* opts = (fclaw_options_t*) user;
 
     //pack entire struct
-    *(fclaw_options_t*) buffer = *opts;
-    buffer += sizeof(fclaw_options_t);
+    buffer += FCLAW_PACK(*opts, buffer);
 
     //append arrays to buffer
     buffer += fclaw_pack_string(opts->run_directory, buffer);
@@ -498,8 +497,7 @@ static size_t options_unpack(char* buffer, void** user){
     *opts_ptr = FCLAW_ALLOC(fclaw_options_t,1);
     fclaw_options_t* opts = *opts_ptr;
 
-    *opts = *(fclaw_options_t*) buffer;
-    buffer += sizeof(fclaw_options_t);
+    buffer += FCLAW_UNPACK(buffer, opts);
 
     buffer += fclaw_unpack_string(buffer, (char **) &opts->run_directory);
     buffer += fclaw_unpack_string(buffer, (char **) &opts->scale_string);

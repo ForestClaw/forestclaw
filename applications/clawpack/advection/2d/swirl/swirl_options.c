@@ -83,9 +83,7 @@ options_pack(void* user, char* buffer)
     user_options_t* opts = (user_options_t*) user;
 
     //pack entire struct
-    *(user_options_t*) buffer = *opts;
-
-    return sizeof(user_options_t);
+    return FCLAW_PACK(*opts, buffer);
 }
 
 static size_t 
@@ -95,9 +93,7 @@ options_unpack(char* buffer, void** user)
 
     *opts_ptr = FCLAW_ALLOC(user_options_t,1);
 
-    **opts_ptr = *(user_options_t*) buffer;
-
-    return sizeof(user_options_t);
+    return FCLAW_UNPACK(buffer, *opts_ptr);
 }
 
 static fclaw_packing_vtable_t packing_vt = 

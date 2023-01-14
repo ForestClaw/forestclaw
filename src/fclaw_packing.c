@@ -59,31 +59,25 @@ size_t fclaw_unpack_string(const char * buffer, char** string){
 }
 
 size_t fclaw_pack_int(int value, char * buffer){
-  *((int *) buffer) = value;
-  return sizeof(int);
+  return FCLAW_PACK(value,buffer);
 }
 
 size_t fclaw_unpack_int(const char* buffer, int* value){
-  *value = *((int *) buffer);
-  return sizeof(int);
+  return FCLAW_UNPACK(buffer,value);
 }
 
 size_t fclaw_pack_size_t(size_t value, char* buffer){
-  *((size_t *) buffer) = value;
-  return sizeof(size_t);
+  return FCLAW_PACK(value,buffer);
 }
 
 size_t fclaw_unpack_size_t(const char* buffer, size_t* value){
-  *value = *((size_t *) buffer);
-  return sizeof(size_t);
+  return FCLAW_UNPACK(buffer,value);
 }
 
 size_t fclaw_pack_double(double value, char* buffer){
-  *((double *) buffer) = value;
-  return sizeof(double);
+  return FCLAW_PACK(value,buffer);
 }
 
 size_t fclaw_unpack_double(const char * buffer, double* value){
-  *value = *((double *) buffer);
-  return sizeof(double);
+  return FCLAW_UNPACK(buffer,value);
 }

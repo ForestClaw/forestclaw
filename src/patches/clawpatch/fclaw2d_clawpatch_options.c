@@ -183,9 +183,7 @@ options_pack(void* user, char* buffer)
     fclaw2d_clawpatch_options_t* opts = (fclaw2d_clawpatch_options_t*) user;
 
     //pack entire struct
-    *(fclaw2d_clawpatch_options_t*) buffer = *opts;
-
-    return sizeof(fclaw2d_clawpatch_options_t);
+    return FCLAW_PACK(*opts,buffer);
 }
 
 static size_t 
@@ -194,6 +192,8 @@ options_unpack(char* buffer, void** user)
     fclaw2d_clawpatch_options_t** opts_ptr = (fclaw2d_clawpatch_options_t**) user;
 
     *opts_ptr = FCLAW_ALLOC(fclaw2d_clawpatch_options_t,1);
+
+    FCLAW_UNPACK(buffer,*opts_ptr);
 
     fclaw2d_clawpatch_options_t* opts = *opts_ptr;
 

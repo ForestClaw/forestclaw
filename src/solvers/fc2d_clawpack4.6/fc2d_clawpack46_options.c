@@ -150,8 +150,7 @@ options_pack(void* user, char* buffer)
     fc2d_clawpack46_options_t* opts = (fc2d_clawpack46_options_t*) user;
 
     //pack entire struct
-    *(fc2d_clawpack46_options_t*) buffer = *opts;
-    buffer += sizeof(fc2d_clawpack46_options_t);
+    buffer += FCLAW_PACK(*opts, buffer);
 
     //append arrays to buffer
     buffer += fclaw_pack_string(opts->order_string,buffer);
@@ -180,8 +179,7 @@ options_unpack(char* buffer, void** user)
     *opts_ptr = FCLAW_ALLOC(fc2d_clawpack46_options_t,1);
     fc2d_clawpack46_options_t* opts = *opts_ptr;
 
-    *opts = *(fc2d_clawpack46_options_t*) buffer;
-    buffer += sizeof(fc2d_clawpack46_options_t);
+    buffer += FCLAW_UNPACK(buffer, opts);
 
     //unpack arrays
     buffer += fclaw_unpack_string(buffer,(char**) &opts->order_string);
