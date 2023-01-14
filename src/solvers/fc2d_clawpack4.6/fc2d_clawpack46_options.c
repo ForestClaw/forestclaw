@@ -116,6 +116,8 @@ void clawpack46_destroy (fc2d_clawpack46_options_t * clawopt)
         FCLAW_FREE((void*) clawopt->mthlim_string);
         FCLAW_FREE((void*) clawopt->mthbc_string);
     }
+
+    FCLAW_FREE (clawopt);
 }
 
 static void clawpack46_destroy_void(void* user)
@@ -281,8 +283,6 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     FCLAW_ASSERT (clawopt->is_registered);
 
     clawpack46_destroy (clawopt);
-
-    FCLAW_FREE (clawopt);
 }
 
 static const fclaw_app_options_vtable_t clawpack46_options_vtable = {

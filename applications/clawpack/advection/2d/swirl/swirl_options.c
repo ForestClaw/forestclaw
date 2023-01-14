@@ -62,7 +62,7 @@ swirl_check (user_options_t *user)
 static void
 swirl_destroy(user_options_t *user)
 {
-    /* Nothing to destroy */
+    FCLAW_FREE (user);
 }
 
 static void
@@ -168,8 +168,6 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     FCLAW_ASSERT (user->is_registered);
 
     swirl_destroy (user);
-
-    FCLAW_FREE (user);
 }
 
 

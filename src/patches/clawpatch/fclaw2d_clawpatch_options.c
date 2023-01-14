@@ -162,6 +162,7 @@ clawpatch_destroy (fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
     FCLAW_ASSERT (clawpatch_opt->kv_refinement_criteria != NULL);
     sc_keyvalue_destroy (clawpatch_opt->kv_refinement_criteria);
+    FCLAW_FREE(clawpatch_opt);
 }
 
 static void
@@ -280,7 +281,6 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
 
     /* Destroy option arrays created in post-process */
     clawpatch_destroy (clawpatch_opt);
-    FCLAW_FREE(clawpatch_opt);
 }
 
 

@@ -429,6 +429,8 @@ fclaw_options_destroy(fclaw_options_t* fclaw_opt)
         FCLAW_FREE ((void*) fclaw_opt->prefix);
         FCLAW_FREE ((void*) fclaw_opt->logging_prefix);
     }
+
+    FCLAW_FREE(fclaw_opt);
 }
 
 static void
@@ -604,7 +606,6 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
 
     /* Destroy option arrays created in post-process */
     fclaw_options_destroy (fclaw_opt);
-    FCLAW_FREE(fclaw_opt);
 }
 
 static const fclaw_app_options_vtable_t options_vtable = {
