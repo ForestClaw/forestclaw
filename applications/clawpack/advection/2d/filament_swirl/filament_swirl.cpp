@@ -191,7 +191,7 @@ void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
             /* Initialize all struct bytes to 0. Not doing so can lead to
              * valgrind warnings due to uninitialized compiler padding bytes. */
-            memset (op, 0, sizeof (overlap_point_t));
+            memset (op, -1, sizeof (overlap_point_t));
 
             op->lnum = c->cell_idx++;   /* local index of the cell */
             op->prodata.isset = 0;
