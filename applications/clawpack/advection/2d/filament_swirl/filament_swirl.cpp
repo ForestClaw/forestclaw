@@ -156,7 +156,12 @@ void apply_consumer_mapping (overlap_point_t * op)
 {
     /* Here, we would need to apply the mapping of the consumer domain
      * (in this example the swirl domain) to the point. Since the swirl domain
-     * is mapped to the unit square, we do nothing.*/
+     * is mapped to the unit square, we do nothing.
+     * Furthermore, a conversion from the consumer to the producer coordinate
+     * system needs to be applied to the points either here or in the
+     * interpolation callback. Since both consumer side (swirl) and producer
+     * side (filament) map to the same cartesian coordinate system, we can omit
+     * this step as well. */
 }
 
 static
@@ -186,7 +191,7 @@ void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
             /* Initialize all struct bytes to 0. Not doing so can lead to
              * valgrind warnings due to uninitialized compiler padding bytes. */
-            memset(op, 0, sizeof(overlap_point_t));
+            memset (op, 0, sizeof (overlap_point_t));
 
             op->lnum = c->cell_idx++;   /* local index of the cell */
             op->prodata.isset = 0;
@@ -219,13 +224,21 @@ void create_query_points (overlap_consumer_t * c)
 }
 
 static
-void apply_inverse_producer_mapping (overlap_point_t * op, double xy[2])
+int apply_inverse_producer_mapping (overlap_point_t * op, double xy[2])
 {
+    /* check, if the point lies in the filament domain. */
+    if (op->xy[0] < 0. || op->xy[0] > 2. || op->xy[1] < 0. || op->xy[1] > 2.)
+    {
+        return 0;
+    }
+
     /* Here, we apply the inverse mapping of the producer domain (in this
      * example the filament domain). We only consider the example case of the
      * linear mapping to the [0,2]x[0,2]-block. */
     xy[0] = op->xy[0] / 2;
     xy[1] = op->xy[1] / 2;
+
+    return 1; /* the point lies in the domain */
 }
 
 static
@@ -240,6 +253,16 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     /* assert that we got passed a valid overlap_point_t */
     FCLAW_ASSERT (point != NULL);
     op = (overlap_point_t *) point;
+
+    /* Apply the inverse mapping of the producer side to the point. The result
+     * lies in the same reference coordinate system as the patch-boundaries.
+     * The inversely mapped point is stored in xy, which we will use for further
+     * geometrical operations.
+     * If the point lies outside of the domain, we immediately return 0. */
+    if (!apply_inverse_producer_mapping (op, xy))
+    {
+        return 0;
+    }
 
     /* check, if we are on the consumer or the producer side */
     consumer_side = domain_is_meta (domain);
@@ -256,11 +279,6 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         tol = SC_1000_EPS;
     }
-
-    /* Apply the inverse mapping of the producer side to the point, so that it
-     * lies in the same coordinate system as the patch-boundaries. The result
-     * is stored in xy, which we will use for further geometrical operations. */
-    apply_inverse_producer_mapping (op, xy);
 
     /* we check if the query point intersects the patch */
     if ((xy[0] < patch->xlower - tol || xy[0] > patch->xupper + tol)

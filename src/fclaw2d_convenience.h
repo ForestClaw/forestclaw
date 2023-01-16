@@ -342,6 +342,8 @@ typedef int (*fclaw2d_interpolate_point_t) (fclaw2d_domain_t * domain,
  * \param [in,out] query_points Array containing points of user-defined type.
  *                              Each entry contains one item of arbitrary data.
  *                              We do not dereference, just pass pointers around.
+ *                              The points will be sent via MPI, so they may not
+ *                              contain pointers to further data.
  *                              The array is defined processor-local and may
  *                              contain different points on different processes.
  *                              The query points are supposed to be computed
