@@ -22,8 +22,8 @@ c--------------------------------------------------------------------
       double precision q2(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision q3(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer mq
       double precision qmin(meqn), qmax(meqn)
+      integer mq
 
 c     # Don't coarsen when initializing the mesh
       if (initflag .ne. 0) then
@@ -87,15 +87,15 @@ c--------------------------------------------------------------------
      &                coarsen_threshold,init_flag,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq,tag_patch,init_flag,blockno
+      integer mx,my,mbc,meqn,tag_patch,init_flag,blockno
       double precision coarsen_threshold
-      double precision qmin(mq),qmax(mq), dx, dy, xlower, ylower
+      double precision qmin(meqn),qmax(meqn), dx, dy, xlower, ylower
       double precision q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
       double precision xc,yc,quad(-1:1,-1:1,meqn), qval(meqn)
       integer exceeds_th, fclaw2d_clawpatch_tag_criteria
 
-      integer i,j, ii, jj
+      integer i,j, ii, jj, mq
 
       logical(kind=4) is_ghost, fclaw2d_clawpatch5_is_ghost
 
