@@ -230,9 +230,10 @@ typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx, const int* my,
 												int* tag_patch);
 
 /** 
- * @deprecated Checks if solution exceeds a threshold
+ * @brief Checks if solution exceeds a threshold
  */
 typedef int (*clawpatch_fort_exceeds_threshold_t)(const int *blockno,
+                                                  const int* meqn, 
                                                   const double *qval, 
                                                   const double *qmin, 
                                                   const double *qmax,
@@ -241,9 +242,12 @@ typedef int (*clawpatch_fort_exceeds_threshold_t)(const int *blockno,
                                                   const double *dy, 
                                                   const double *xc, 
                                                   const double *yc, 
+                                                  const int* ivar_threshold,
                                                   const double *tag_threshold,
                                                   const int    *init_flag,
                                                   const int    *is_ghost);
+
+
 
 /** 
  * @brief Averages a fine patch to a coarse patch
@@ -462,6 +466,27 @@ int FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
 
 /* ------------------------------- General threshold ---------------------------------- */
 
+/** @brief Tagging criteria routine used internally by clawpatch tagging routines.*/
+#define FCLAW2D_CLAWPATCH_TAG_CRITERIA \
+                  FCLAW_F77_FUNC(fclaw2d_clawpatch_tag_criteria, \
+                                 FCLAW2D_CLAWPATCH_TAG_CRITERIA)
+
+
+int FCLAW2D_CLAWPATCH_TAG_CRITERIA(const int* blockno,
+                                        const double qval[], 
+                                        const double qmin[], 
+                                        const double qmax[],
+                                        const double quad[], 
+                                        const double *dx, 
+                                        const double *dy, 
+                                        const double *xc, 
+                                        const double *yc, 
+                                        const double *tag_threshold,
+                                        const int* init_flag,
+                                        const int* is_ghost);
+
+
+
 /** @brief C declaration of fclaw2d_clawpatch_exceeds_threshold() subroutine */
 #define FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD \
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_exceeds_threshold, \
@@ -483,6 +508,7 @@ int FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
  * @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
  */
 int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
+                                        const int* meqn, 
                                         const double *qval, 
                                         const double *qmin, 
                                         const double *qmax,
@@ -491,18 +517,22 @@ int FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
                                         const double *dy, 
                                         const double *xc, 
                                         const double *yc, 
+                                        const int* ivar_threshold,
                                         const double *tag_threshold,
                                         const int *init_flag,
                                         const int *is_ghost);
 
 /* ----------------------------- Value threshold -------------------------------------- */
+
+
 /** @brief C declaration of fclaw2d_clawpatch_value_exceeds_th() subroutine */
 #define FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH \
                   FCLAW_F77_FUNC(fclaw2d_clawpatch_value_exceeds_th, \
                                  FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH)
     
 /** @brief C declaration of fclaw2d_clawpatch_value_exceeds_th() subroutine */
-int FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
+int FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno, 
+                                       const int* meqn,
                                        const double *qval, 
                                        const double* qmin, 
                                        const double *qmax,
@@ -511,6 +541,7 @@ int FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
                                        const double *dy, 
                                        const double *xc, 
                                        const double *yc, 
+                                       const int* ivar_variable, 
                                        const double* tag_threshold,
                                        const int* init_flag,
                                        const int* is_ghost);
@@ -524,6 +555,7 @@ int FCLAW2D_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
 
 /** @brief C declaration of fclaw2d_clawpatch_difference_exceeds_th() subroutine */
 int FCLAW2D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int    *blockno,
+                                            const int* meqn,
                                             const double *qval, 
                                             const double *qmin, 
                                             const double *qmax,
@@ -532,6 +564,7 @@ int FCLAW2D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int    *blockno,
                                             const double *dy, 
                                             const double *xc, 
                                             const double *yc, 
+                                            const int* ivar_threshold, 
                                             const double *tag_threshold,
                                             const int *init_flag,
                                             const int *is_ghost);
@@ -545,6 +578,7 @@ int FCLAW2D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int    *blockno,
 
 /** @brief C declaration of fclaw2d_clawpatch_minmax_exceeds_th() subroutine */
 int FCLAW2D_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
+                                        const int* meqn,
                                         const double *qval, 
                                         const double* qmin, 
                                         const double *qmax,
@@ -553,6 +587,7 @@ int FCLAW2D_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
                                         const double *dy, 
                                         const double *xc, 
                                         const double *yc, 
+                                        const int* ivar_threshold,
                                         const double *tag_threshold,                        
                                         const int *init_flag,
                                         const int *is_ghost);
@@ -565,6 +600,7 @@ int FCLAW2D_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
 
 /** @brief C declaration of fclaw2d_clawpatch_gradient_exceeds_th() subroutine */
 int FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
+                                          const int* meqn, 
                                           const double *qval, 
                                           const double* qmin, 
                                           const double *qmax,
@@ -573,6 +609,7 @@ int FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
                                           const double *dy, 
                                           const double *xc, 
                                           const double *yc, 
+                                          const int* ivar_threshold,
                                           const double *tag_threshold,
                                           const int *init_flag,
                                           const int *is_ghost);
@@ -586,6 +623,7 @@ int FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
 
 /** @brief C declaration of user_exceeds_th() subroutine */
 int USER_EXCEEDS_TH(const int *blockno,
+                    const int* meqn,
                     const double *qval, 
                     const double* qmin, 
                     const double *qmax,
@@ -594,6 +632,7 @@ int USER_EXCEEDS_TH(const int *blockno,
                     const double *dy, 
                     const double *xc, 
                     const double *yc, 
+                    const int* ivar_threshold,
                     const double *tag_threshold,
                     const int *init_flag,
                     const int *is_ghost);
