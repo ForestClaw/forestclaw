@@ -81,8 +81,8 @@ add_library(clawpatch
   fclaw3dx_clawpatch_output_vtk.c
   fclaw3dx_clawpatch_conservation.c
 
-  fort_user/fclaw2d_clawpatch_exceeds_threshold.c
-  fort3_user/fclaw3dx_clawpatch_exceeds_threshold.c
+  fort_user/fclaw2d_clawpatch_tag_criteria.c
+  fort3_user/fclaw3dx_clawpatch_tag_criteria.c
   ${metric}/fclaw2d_metric.cpp
   ${metric}/fclaw2d_metric_default.c
   ${metric}/fclaw3d_metric.cpp 

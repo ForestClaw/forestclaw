@@ -17,14 +17,16 @@ c--------------------------------------------------------------------
       integer blockno
       double precision xlower, ylower, dx, dy
       double precision tag_threshold
-      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
+      integer :: ivar_theshold
+      double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)      
+
 
       integer i,j, mq
-      double precision qmin, qmax
+      double precision qmin(meqn), qmax(meqn)
 
-      integer exceeds_th, fclaw2d_clawpatch_exceeds_threshold
+      integer exceeds_th, fclaw2d_clawpatch_tag_criteria
       integer ii,jj
-      double precision xc,yc,quad(-1:1,-1:1), qval
+      double precision xc,yc,quad(-1:1,-1:1,meqn), qval(meqn)
 
       logical(kind=4) :: is_ghost, fclaw2d_clawpatch46_is_ghost
 
@@ -35,26 +37,31 @@ c     # Default : Refinement based only on first variable in system.
 c     # Users can modify this by creating a local copy of this routine
 c     # and the corresponding tag4coarsening routine.
 
-      mq = 1
-      qmin = q(1,1,mq)
-      qmax = q(1,1,mq)
+      do mq = 1,meqn
+         qmin(mq) = q(1,1,mq)
+         qmax(mq) = q(1,1,mq)
+      end do
       do j = 1-mbc,my+mbc
          do i = 1-mbc,mx+mbc
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            qmin = min(qmin,q(i,j,mq))
-            qmax = max(qmax,q(i,j,mq))
-            qval = q(i,j,mq)
+            do mq = 1,meqn
+               qval(mq) = q(i,j,mq)
+               qmin(mq) = min(qmin(mq),q(i,j,mq))
+               qmax(mq) = max(qmax(mq),q(i,j,mq))            
+            end do
             is_ghost = fclaw2d_clawpatch46_is_ghost(i,j,mx,my)
             if (.not. is_ghost) then
                do jj = -1,1
                   do ii = -1,1
-                     quad(ii,jj) = q(i+ii,j+jj,mq)
+                     do mq = 1,meqn
+                        quad(ii,jj,mq) = q(i+ii,j+jj,mq)
+                     end do
                   end do
                end do
             endif
-            exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
-     &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
+            exceeds_th = fclaw2d_clawpatch_tag_criteria(
+     &             blockno,qval,qmin,qmax,quad, dx,dy,xc,yc,
      &             tag_threshold,init_flag, is_ghost)
 c           # -1 : Not conclusive (possibly ghost cell); don't tag for refinement
 c           # 0  : Does not pass threshold (don't tag for refinement)      

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Check for Build System Files
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout source code
     - name: Run Compare Script
       run: scripts/ci/check_for_automake_and_cmake_files.py

@@ -16,20 +16,25 @@
 !! @param[in] is_ghost true if cell is a ghost cell
 !! @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
 !  --------------------------------------------------------------
-integer function fclaw2d_clawpatch_difference_exceeds_th(blockno,& 
+integer function fclaw2d_clawpatch_difference_exceeds_th(blockno,meqn,& 
                                      qval,qmin,qmax,quad, & 
-                                     dx,dy,xc,yc,threshold,&
-                                     init_flag, is_ghost)
+                                     dx,dy,xc,yc, ivar_threshold, &
+                                     threshold, init_flag, is_ghost)
     implicit none
     
-    double precision :: qval,qmin,qmax,threshold
-    double precision :: quad(-1:1,-1:1)
+    integer :: meqn
+    double precision :: qval(meqn),qmin(meqn),qmax(meqn),threshold
+    double precision :: quad(-1:1,-1:1,meqn)
     double precision :: dx,dy, xc, yc
     integer :: blockno, init_flag
+    integer :: ivar_threshold
     logical(kind=4) :: is_ghost
 
     double precision :: dqx, dqy, dq
     integer :: refine
+    integer :: mq
+
+    mq = ivar_threshold
 
     if (is_ghost) then
 !!      # quad may have uninitialized values;  test inconclusive
@@ -37,8 +42,8 @@ integer function fclaw2d_clawpatch_difference_exceeds_th(blockno,&
         return
     endif
 
-    dqx = abs(quad(1,0) - quad(-1,0))
-    dqy = abs(quad(0,1) - quad(0,-1))
+    dqx = abs(quad(1,0,mq) - quad(-1,0,mq))
+    dqy = abs(quad(0,1,mq) - quad(0,-1,mq))
     dq  = max(dqx, dqy)
 
     refine = 0

@@ -16,22 +16,26 @@
 !! @param[in] is_ghost true if cell is a ghost cell
 !! @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
 !  --------------------------------------------------------------
-integer function fclaw3dx_clawpatch_value_exceeds_th(blockno,& 
+integer function fclaw3dx_clawpatch_value_exceeds_th(blockno, meqn, & 
                                   qval,qmin,qmax,quad, & 
-                                  dx,dy,dz, xc,yc,zc, threshold, &
+                                  dx,dy,dz, xc,yc,zc, ivar_threshold, threshold, &
                                   init_flag, is_ghost)
     implicit none
     
-    double precision :: qval,qmin,qmax,threshold
-    double precision :: quad(-1:1,-1:1,-1:1)
+    integer :: meqn, ivar_threshold
+    double precision :: qval(meqn),qmin(meqn),qmax(meqn),threshold
+    double precision :: quad(-1:1,-1:1,-1:1, meqn)
     double precision :: dx,dy, dz, xc, yc, zc
     integer :: blockno, init_flag
     logical(kind=4) :: is_ghost
 
     integer :: refine
+    integer :: mq
+
+    mq = ivar_threshold
 
     refine = 0
-    if (qval .gt. threshold) then
+    if (qval(mq) .gt. threshold) then
         refine = 1
     endif
 

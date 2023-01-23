@@ -40,20 +40,22 @@ namespace{
     struct exceeds_test_parameters
     {
         int *blockno          = (int*)    1;
-        double *qval          = (double*) 2;
-        double* qmin          = (double*) 3;
-        double *qmax          = (double*) 4;
-        double *quad          = (double*) 5;
-        double *dx            = (double*) 6;
-        double *dy            = (double*) 7;
-        double *dz            = (double*) 8;
-        double *xc            = (double*) 9;
-        double *yc            = (double*)10;
-        double *zc            = (double*)11;
-        double *tag_threshold = (double*)12;
-        int *init_flag        = (int*)   13;
-        int *is_ghost         = (int*)   14;
-        int return_value      =          15;
+        int* meqn             = (int*)    2; 
+        double *qval          = (double*) 3;
+        double* qmin          = (double*) 4;
+        double *qmax          = (double*) 5;
+        double *quad          = (double*) 6;
+        double *dx            = (double*) 7;
+        double *dy            = (double*) 8;
+        double *dz            = (double*) 9;
+        double *xc            = (double*)10;
+        double *yc            = (double*)11;
+        double *zc            = (double*)12;
+        int* ivar_threshold   = (int*)   13; 
+        double *tag_threshold = (double*)14;
+        int *init_flag        = (int*)   15;
+        int *is_ghost         = (int*)   16;
+        int return_value      =          17;
     };
 
     exceeds_test_parameters global_exceeds_test_parameters;
@@ -70,6 +72,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 
     fclaw2d_clawpatch_vt(glob)->fort_user_exceeds_threshold = 
         [](const int *blockno,
+           const int* meqn,
            const double *qval, 
            const double* qmin, 
            const double *qmax,
@@ -78,12 +81,14 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
            const double *dy, 
            const double *xc, 
            const double *yc, 
+           const int* ivar_threshold, 
            const double *tag_threshold,
            const int *init_flag,
            const int *is_ghost)
         {
             exceeds_test_parameters& params = global_exceeds_test_parameters;
             CHECK_EQ(blockno, params.blockno);
+            //CHECK_EQ(meqn, params.meqn);  // This is changed inside function
             CHECK_EQ(qval, params.qval);
             CHECK_EQ(qmin, params.qmin);
             CHECK_EQ(qmax, params.qmax);
@@ -92,6 +97,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
             CHECK_EQ(dy, params.dy);
             CHECK_EQ(xc, params.xc);
             CHECK_EQ(yc, params.yc);
+            // CHECK_EQ(ivar_threshold, params.ivar_threshold);    //Will change
             CHECK_EQ(tag_threshold, params.tag_threshold);
             CHECK_EQ(init_flag, params.init_flag);
             CHECK_EQ(is_ghost, params.is_ghost);
@@ -103,7 +109,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     fclaw2d_clawpatch_options_store(glob, &opts);
 
     fclaw2d_global_set_global(glob);
-    int ret = FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD(params.blockno,
+    int ret = FCLAW2D_CLAWPATCH_TAG_CRITERIA(params.blockno,
                                                   params.qval,
                                                   params.qmin,
                                                   params.qmax,
@@ -133,6 +139,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 
     fclaw3dx_clawpatch_vt(glob)->fort_user_exceeds_threshold = 
         [](const int *blockno,
+           const int* meqn,
            const double *qval, 
            const double* qmin, 
            const double *qmax,
@@ -143,12 +150,14 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
            const double *xc, 
            const double *yc, 
            const double *zc, 
+           const int* ivar_threshold, 
            const double *tag_threshold,
            const int *init_flag,
            const int *is_ghost)
         {
             exceeds_test_parameters& params = global_exceeds_test_parameters;
             CHECK_EQ(blockno, params.blockno);
+            //CHECK_EQ(meqn, params.meqn);
             CHECK_EQ(qval, params.qval);
             CHECK_EQ(qmin, params.qmin);
             CHECK_EQ(qmax, params.qmax);
@@ -159,7 +168,8 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
             CHECK_EQ(xc, params.xc);
             CHECK_EQ(yc, params.yc);
             CHECK_EQ(zc, params.zc);
-            CHECK_EQ(tag_threshold, params.tag_threshold);
+            //CHECK_EQ(ivar_threshold, params.ivar_threshold); 
+            CHECK_EQ(tag_threshold, params.tag_threshold); 
             CHECK_EQ(init_flag, params.init_flag);
             CHECK_EQ(is_ghost, params.is_ghost);
             return params.return_value;
@@ -170,7 +180,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     fclaw3dx_clawpatch_options_store(glob, &opts);
 
     fclaw2d_global_set_global(glob);
-    int ret = FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(params.blockno,
+    int ret = FCLAW3DX_CLAWPATCH_TAG_CRITERIA(params.blockno,
                                                    params.qval,
                                                    params.qmin,
                                                    params.qmax,

@@ -99,6 +99,11 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                              &clawpatch_options->refinement_criteria, "minmax",
                              kv, "Refinement criteria [minmax]");
 
+    sc_options_add_int (opt, 0, "threshold-variable",
+                        &clawpatch_options->threshold_variable,
+                        1, "Index of variable used for tagging in [1,meqn] [1]");
+
+
     clawpatch_options->is_registered = 1;
 
     return NULL;
