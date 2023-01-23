@@ -155,6 +155,7 @@ void USER5_B4STEP2_MANIFOLD(const int* mx, const int* my, const int* mbc,
                                               USER_EXCEEDS_THRESHOLD)
 
 int USER_EXCEEDS_THRESHOLD(const int* blockno,
+                           const int* meqn,
                            const double qval[], 
                            const double* qmin, 
                            const double *qmax,
@@ -163,6 +164,7 @@ int USER_EXCEEDS_THRESHOLD(const int* blockno,
                            const double *dy, 
                            const double *xc, 
                            const double *yc, 
+                           const int* ivar_threshold,
                            const double* tag_threshold, 
                            const int* init_flag,
                            const int* is_ghost);
