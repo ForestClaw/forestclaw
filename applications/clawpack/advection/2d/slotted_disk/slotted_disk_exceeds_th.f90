@@ -2,7 +2,7 @@
 
 integer function user_exceeds_threshold(blockno,meqn,& 
                                      qval,qmin,qmax,quad, & 
-                                     dx,dy,xc,yc,threshold, ivar_threshold, &
+                                     dx,dy,xc,yc,ivar_threshold, threshold, &
                                      init_flag, is_ghost)
     implicit none
     
