@@ -4,7 +4,7 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
     implicit none
 
     integer :: mx,my, mz, mbc, meqn, tag_patch, init_flag
-    integer :: blockno, ivar_threshold
+    integer :: blockno
     double precision :: xlower, ylower, zlower, dx, dy, dz
     double precision :: tag_threshold
     double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
