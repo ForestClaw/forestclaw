@@ -34,7 +34,7 @@
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_options.h>
 
-#include <../all/euler_user.h>
+#include <../all/euler3d_user.h>
 
 
 #ifdef __cplusplus

@@ -65,12 +65,6 @@ subroutine setprob
 
     !! # density outside bubble and pressure ahead of shock are fixed:
 
-    !! From MSH
-    !! rhoin = 1.5d0
-    !! rhoout = 0.8d0
-    !! pin    = 1.d7
-    !! pout   = 1.d5
-
     qin(1) = rhoin
     qin(2) = 0.d0
     qin(3) = 0.d0

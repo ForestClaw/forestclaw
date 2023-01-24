@@ -1,19 +1,20 @@
 !! # check to see if value exceeds threshold
 
-integer function fclaw3dx_user_exceeds_th(blockno,& 
+integer function euler3d_pressure_exceeds_th(blockno,meqn,& 
         qval,qmin,qmax,quad, & 
-        dx,dy,dz,xc,yc,zc,threshold, &
+        dx,dy,dz,xc,yc,zc,ivar_threshold, threshold, &
         init_flag, is_ghost)
     use setprob_mod, only : gamma1
     implicit none
     
-    double precision :: qval(5),qmin,qmax,threshold
-    double precision :: quad(-1:1,-1:1,-1:1)
+    integer :: meqn, ivar_threshold
+    double precision :: qval(meqn),qmin(meqn),qmax(meqn),threshold
+    double precision :: quad(-1:1,-1:1,-1:1,meqn)
     double precision :: dx,dy, dz,xc, yc,zc
     integer :: blockno, init_flag, refine
     logical(kind=4) :: is_ghost
 
-    double precision rho, energy, kinetic, pressure
+    double precision rho, energy, kinetic, pressure    
 
 
     rho = qval(1)
@@ -26,6 +27,6 @@ integer function fclaw3dx_user_exceeds_th(blockno,&
         refine = 1
     endif
 
-    fclaw3dx_user_exceeds_th = refine
+    euler3d_pressure_exceeds_th = refine
 
-end function fclaw3dx_user_exceeds_th
+end function euler3d_pressure_exceeds_th

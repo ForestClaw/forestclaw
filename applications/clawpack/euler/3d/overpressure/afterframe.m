@@ -21,7 +21,11 @@ switch mapping
         view(3)
     case 1
         % Cartesian mapping    
-        axis([-1,1,-1,1,parms.minz,parms.maxz])
+        if parms.scale_bump > 0
+            axis([-2,2,-2,2,parms.minz,parms.maxz])
+        else
+            axis([-2,2,-2,2,parms.minz,parms.maxz])
+        end
         daspect([1,1,1])
         view(3)
     case 2
@@ -75,8 +79,8 @@ colormap(parula)
 colorbar
 
 
-% cv = linspace(0.8,1.2,24);
-% drawcontourlines(cv);
+cv = linspace(0.8,1.2,24);
+drawcontourlines(cv);
 showpatchborders
     
 

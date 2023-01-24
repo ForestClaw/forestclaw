@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "overpressure_user.h"
 
 /* For 2d mappings */
-#include "../all/euler_user.h"
+#include "../all/euler3d_user.h"
 
 #include <fclaw2d_map.h>
 

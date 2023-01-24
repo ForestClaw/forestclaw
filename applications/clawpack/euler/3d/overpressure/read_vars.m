@@ -14,4 +14,9 @@ parms.maxz = data(21);
 parms.midz = data(22);
 parms.scale_bump = data(23);
 
+parms.scale = data(24:25);
+parms.shift = data(26:27);
+
+
+
 end

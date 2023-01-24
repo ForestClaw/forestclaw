@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef EULER_USER_3D_H
-#define EULER_USER_3D_H
+#ifndef EULER3D_USER_H
+#define EULER3D_USER_H
 
 #include <fclaw2d_include_all.h>
 
@@ -148,6 +148,33 @@ void CLAWPACK46_RPTT3_MAPPED(const int* ixyz, const int* icoor, const int* imp,
                       double aux1[], double aux2[],
                       double aux3[],  double bsasdq[],
                       double cmbsasdq[], double cpbsasdq[]);
+
+
+/* ----------------------------- Pressure threshold ----------------------------------- */
+
+/** @brief C declaration of fclaw2d_clawpatch_value_exceeds_th() subroutine */
+#define EULER3D_PRESSURE_EXCEEDS_TH \
+                  FCLAW_F77_FUNC(euler3d_pressure_exceeds_th, \
+                                 EULER3D_PRESSURE_EXCEEDS_TH)
+    
+/** @brief C declaration of PRESSURE_exceeds_th() subroutine */
+int EULER3D_PRESSURE_EXCEEDS_TH(const int* blockno,
+                        const int* meqn, 
+                        const double *qval, 
+                        const double* qmin, 
+                        const double *qmax,
+                        const double quad[], 
+                        const double *dx, 
+                        const double *dy, 
+                        const double *dz,
+                        const double *xc, 
+                        const double *yc,
+                        const double *zc, 
+                        const int* ivar_variable,
+                        const double* tag_threshold,
+                        const int* init_flag,
+                        const int* is_ghost);
+
 
 
 

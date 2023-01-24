@@ -8,8 +8,8 @@ map_list = {'nomap', 'cart', 'latlong', 'cubedsphere', 'pillowsphere'};
 
 map = map_list{parms.mapping+1};
 
-scale = [0.5,0.5,0.5];
-shift = [0.5,0.5,0.5];
+scale = [parms.scale(:)',1];
+shift = [parms.shift(:)',0];
 
 switch map
     case 'nomap'
@@ -25,6 +25,8 @@ switch map
         s = 0;
         [xc1,yc1,~] = mapc2m_brick(xc,yc,s);
         [xp,yp,~] = mapc2m_cart(xc1,yc1);  % In [-1,1]x[-1,1]x[-1,1]
+        xp = scale(1)*xp + shift(1);
+        yp = scale(2)*yp + shift(2);
         rp2 = xp.^2 + yp.^2;
         zp = zeros(size(xp));
         if minz < midz && midz < maxz

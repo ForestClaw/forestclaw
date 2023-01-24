@@ -58,7 +58,7 @@ switch parms.mapping
         % Mapped coordinates should specify slices in normalized [0,1]
         % coordinates.
         xSliceCoords = [0.5];
-        ySliceCoords = [0.5];
+        ySliceCoords = [0.5];        
         zSliceCoords = [0.5];   % [0.2 0.4 0.6 0.8];
     case 2
         xSliceCoords = [0.5];
@@ -66,6 +66,10 @@ switch parms.mapping
         zSliceCoords = [0.5];   % [0.2 0.4 0.6 0.8];
     otherwise
         zSliceCoords = [0.25 0.5 0.75];   % [0.2 0.4 0.6 0.8];
+end
+
+if parms.mapping == 1 && parms.scale_bump >  0
+    zSliceCoords = [0];
 end
 
 IsosurfValues    =  [];        % Plot surfaces at q = surfValue(i).

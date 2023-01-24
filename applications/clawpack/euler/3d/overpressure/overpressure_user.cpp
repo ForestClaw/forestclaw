@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "overpressure_user.h"
 
-#include "../all/euler_user.h"
+#include "../all/euler3d_user.h"
 
 #include <fclaw2d_include_all.h>
 
@@ -75,6 +75,10 @@ void overpressure_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24.6f   %s",user->max_z,"\% maxz\n");
         fprintf(f,  "%-24.6f   %s",user->mid_z,"\% midz\n");
         fprintf(f,  "%-24.6f   %s",user->scale_bump,"\% scale_bump\n");
+        fprintf(f,  "%-24.6f   %s",fclaw_opt->scale[0],"\% scale_x\n");
+        fprintf(f,  "%-24.6f   %s",fclaw_opt->scale[1],"\% scale_y\n");
+        fprintf(f,  "%-24.6f   %s",fclaw_opt->shift[0],"\% shift_x\n");
+        fprintf(f,  "%-24.6f   %s",fclaw_opt->shift[1],"\% shift_y\n");
         fclose(f);
     }
 
@@ -138,7 +142,7 @@ void overpressure_link_solvers(fclaw2d_global_t *glob)
 
         /* Refine based on pressure */
         fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
-        clawpatch_vt->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
+        clawpatch_vt->fort_user_exceeds_threshold = &EULER3D_PRESSURE_EXCEEDS_TH;
 
         fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
         if (fclaw_opt->manifold)
