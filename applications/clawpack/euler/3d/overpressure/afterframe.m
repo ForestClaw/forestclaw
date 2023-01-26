@@ -10,6 +10,8 @@ example = parms.example;
 maxelev = parms.maxelev;
 mapping = parms.mapping;
 
+set(gca,'clipping','off')
+
 
 % Set axis
 parms = read_vars();
@@ -32,16 +34,16 @@ switch mapping
         % Spherical mappings with extrusion means R > 1
         s = 1 + parms.maxelev;
         axis([0,1,-1,1,-1,1]*s)
-        view(3)
     case {3,4}
         % Spherical mappings with extrusion means R > 1
         s = 1 + parms.maxelev;
-        axis([-1,1,-1,1,-1,1]*s)
-        view(3)
+        axis([-1,1,0,1,-1,1]*s)
+        set(gca,'clipping','on')
+        view([43.9086, 6.6000])
+%             view(3)
     otherwise
         error("No mapping specified.")
 end
-set(gca,'clipping','off')
 set(gca,'box','on')
 
 
@@ -59,7 +61,9 @@ else
         if mapping < 2
             clim([0.8,1.2])
         else
-            clim([0.975,1.125])
+            s = 2.5e-3;
+            cl = [1-s,1+s];
+            clim(cl);
         end
     else
         % Density
@@ -79,7 +83,11 @@ colormap(parula)
 colorbar
 
 
-cv = linspace(0.8,1.2,24);
+if mapping > 2
+    cv = linspace(cl(1),cl(2),24);
+else
+    cv = linspace(0.8,1.2,24);
+end
 drawcontourlines(cv);
 showpatchborders
     

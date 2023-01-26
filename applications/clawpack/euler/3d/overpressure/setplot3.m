@@ -64,6 +64,8 @@ switch parms.mapping
         xSliceCoords = [0.5];
         ySliceCoords = [0.5];
         zSliceCoords = [0.5];   % [0.2 0.4 0.6 0.8];
+    case {3,4}
+        zSliceCoords = [0, 0.25 0.5 0.75, 1.0]; 
     otherwise
         zSliceCoords = [0.25 0.5 0.75];   % [0.2 0.4 0.6 0.8];
 end
