@@ -79,6 +79,7 @@ struct fclaw3dx_clawpatch_options
 
     int refinement_criteria; /**< The refinement criteria */
     sc_keyvalue_t *kv_refinement_criteria; /**< The refinement criteria */
+    int threshold_variable;
 
     /* Advanced options */
     int interp_stencil_width; /**< The width of the interpolation stencil */
