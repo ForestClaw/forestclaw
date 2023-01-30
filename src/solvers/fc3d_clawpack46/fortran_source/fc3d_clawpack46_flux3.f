@@ -179,13 +179,20 @@ c
 c
       logical limit
 
-c      double precision dtcom, dxcom, dycom, dzcom, tcom
-c      integer icom,jcom,kcom
-c      common/comxyzt/dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
+      double precision dtcom, dxcom, dycom, dzcom, tcom
+      integer icom,jcom,kcom
+      common/comxyzt/dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
 
       integer mw, m, i,m3, m4
       double precision dtdxave
 
+
+      logical debug
+
+      debug = .false.
+      if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
+           debug = .true.
+      endif
 
       limit = .false.
       do mw = 1,mwaves
@@ -431,6 +438,8 @@ c     # then the transverse propagating correction waves in the z-direction
 c     # are also split. This yields terms of the form BCAu_{xzy} and
 c     # BCAAu_{xxzy}.
 c     
+      !! args (cart)   : (ixyz, icoor, ilr, impt,...)  
+      !! args (nomap)  : (ixyz, icoor, imp, impt,
       if (m4 .gt. 0) then
           call rptt3(ixyz,2,2,2,maxm,meqn,mwaves,maux,mbc,mx,
      &                q1d,q1d,aux1,aux2,aux3,cpapdq2,
@@ -557,6 +566,8 @@ c     # Note that the output to rptt3 below should logically be named
 c     # cmbsasdq and cpbsasdq rather than bmcsasdq and bpcsasdq, but
 c     # we are re-using the previous storage rather than requiring new arrays.
 c     
+
+      
       if (m4 .gt. 0) then
            call rptt3(ixyz,3,2,2,maxm,meqn,mwaves,maux,mbc,mx,
      &                q1d,q1d,aux1,aux2,aux3,bpapdq,bmcpapdq,bpcpapdq)

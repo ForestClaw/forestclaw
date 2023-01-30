@@ -43,10 +43,11 @@ PROGRAM compare_files3
     CHARACTER(100) :: dir1, dir2, dir3
     INTEGER :: d1, d2
 
-    logical :: forestclaw1, forestclaw2
+    logical :: forestclaw1, forestclaw2,mapped
 
     forestclaw1 = .true.
-    forestclaw2 = .false.
+    forestclaw2 = .true.
+    mapped = .true.
 
     num_args = COMMAND_ARGUMENT_COUNT()
     ALLOCATE(args(num_args))  ! I've omitted checking the return status of the allocation
@@ -224,17 +225,17 @@ PROGRAM compare_files3
             STOP
         ENDIF
 
-        IF (xlow1 .NE. xlow2) THEN
+        IF (xlow1 .NE. xlow2 .and. .not. mapped) THEN
             WRITE(6,*) 'xlow1 .ne. xlow2; ', ngrid, xlow1, xlow2
             STOP
         ENDIF
 
-        IF (ylow1 .NE. ylow2) THEN
+        IF (ylow1 .NE. ylow2 .and. .not. mapped) THEN
             WRITE(6,*) 'ylow1 .ne. ylow2; ', ngrid, ylow1, ylow2
             STOP
         ENDIF
 
-        IF (zlow1 .NE. zlow2) THEN
+        IF (zlow1 .NE. zlow2 .and. .not. mapped) THEN
             WRITE(6,*) 'zlow1 .ne. zlow2; ', ngrid, zlow1, zlow2
             STOP
         ENDIF
@@ -245,8 +246,8 @@ PROGRAM compare_files3
         mz = mz1
         level = level1
         ngrid = ngrid1
-        !! blockno = blockno1
-        !! mpirank = MAX(mpirank1,mpirank2)
+        blockno = blockno1
+        mpirank = MAX(mpirank1,mpirank2)
         dx = dx1
         dy = dy1
         dz = dz1
@@ -341,6 +342,7 @@ SUBROUTINE write_tfile(iframe,time,meqn,ngrids,dir3)
     dir3_fname2 = TRIM(dir3)//'/'//trim(fname2)
 
     maux = 0
+    matunit2 = 10
     OPEN(matunit2,file=dir3_fname2)
     WRITE(matunit2,1000) time,meqn,ngrids,maux
     1000 FORMAT(e18.8,'    time', /, &

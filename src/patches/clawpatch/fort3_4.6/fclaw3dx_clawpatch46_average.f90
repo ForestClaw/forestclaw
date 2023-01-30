@@ -27,7 +27,7 @@
 !!> the coarse grid.
       
 SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, & 
-           qcoarse,qfine,areacoarse, areafine, & 
+           qcoarse,qfine,volcoarse, volfine, & 
            idir,iface_coarse,num_neighbors,refratio,igrid, & 
            manifold, transform_cptr)
     IMPLICIT NONE
@@ -40,8 +40,8 @@ SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
     DOUBLE PRECISION :: qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
     !! # these will be empty if we are not on a manifold.
-    DOUBLE PRECISION :: areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-    DOUBLE PRECISION ::   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+    DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+    DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
     INTEGER :: mq,r2, m
     INTEGER :: ic, ibc, jc, jbc, k
@@ -105,7 +105,7 @@ SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
                                 vf_sum = 0
                                 do m = 0,r2-1
                                     qf = qfine(i2(m),j2(m),k,mq)
-                                    kf = areafine(i2(m),j2(m))
+                                    kf = volfine(i2(m),j2(m),k)
                                     sum = sum + qf*kf
                                     vf_sum = vf_sum + kf
                                 end do
@@ -144,7 +144,7 @@ SUBROUTINE fclaw3dx_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
                                 vf_sum = 0
                                 do m = 0,r2-1
                                     qf = qfine(i2(m),j2(m),k, mq)
-                                    kf = areafine(i2(m),j2(m))
+                                    kf = volfine(i2(m),j2(m),k)
                                     sum = sum + qf*kf
                                     vf_sum = vf_sum + kf
                                 end do
@@ -169,7 +169,7 @@ end subroutine  fclaw3dx_clawpatch46_fort_average_face
 !!> Average across corners.
 
 subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
-    refratio,qcoarse,qfine,areacoarse,areafine, & 
+    refratio,qcoarse,qfine,volcoarse,volfine, & 
     manifold,icorner_coarse,transform_cptr)
     IMPLICIT NONE
 
@@ -179,8 +179,8 @@ subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
     DOUBLE PRECISION ::   qfine(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
     !! # these will be empty if we are not on a manifold.
-    DOUBLE PRECISION :: areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-    DOUBLE PRECISION ::   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+    DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+    DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
     INTEGER :: ibc,jbc,mq,r2
     LOGICAL :: is_manifold
@@ -192,7 +192,7 @@ subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
     INTEGER :: i2(0:rr2-1),j2(0:rr2-1)
 
     INTEGER :: i1,j1,m, k
-    DOUBLE PRECISION :: vf_sum
+    DOUBLE PRECISION :: vf_sum, kc
 
     r2 = refratio*refratio
     if (r2 .ne. rr2) then
@@ -203,6 +203,7 @@ subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
 
     is_manifold = manifold .eq. 1
 
+    refratio = 2
     r2 = refratio*refratio
     !! # Loop over four corner cells on coarse grid
     meqn_loop : do mq = 1,meqn
@@ -230,7 +231,7 @@ subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
                         vf_sum = 0
                         do m = 0,r2-1
                             qf = qfine(i2(m),j2(m),k,mq)
-                            kf = areafine(i2(m),j2(m))
+                            kf = volfine(i2(m),j2(m),k)
                             sum = sum + kf*qf
                             vf_sum = vf_sum + kf
                         enddo
@@ -238,10 +239,11 @@ subroutine fclaw3dx_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
                     else
                         sum = 0
                         do m = 0,r2-1
-                            sum = sum + qfine(i2(m),j2(m),k,mq)
+                            qf = qfine(i2(m),j2(m),k,mq)
+                            sum = sum + qf
                         end do
+                        qcoarse(i1,j1,k,mq) = sum/dble(r2)
                     endif
-                    qcoarse(i1,j1,k,mq) = sum/dble(r2)
                 enddo jbc_loop
             enddo ibc_loop
         enddo k_loop
@@ -253,7 +255,7 @@ end subroutine fclaw3dx_clawpatch46_fort_average_corner
 !!> \ingroup  Averaging
 !!> Average fine grid siblings to parent coarse grid.
 subroutine fclaw3dx_clawpatch46_fort_average2coarse(mx,my,mz,mbc,meqn, & 
-           qcoarse,qfine, areacoarse, areafine, igrid,manifold)
+           qcoarse,qfine,volcoarse,volfine, igrid,manifold)
     IMPLICIT NONE
 
     INTEGER :: mx,my,mz,mbc,meqn
@@ -263,8 +265,8 @@ subroutine fclaw3dx_clawpatch46_fort_average2coarse(mx,my,mz,mbc,meqn, &
 
     !! # these will be empty if we are not on a manifold, and so shouldn't
     !! # be referenced. 
-    DOUBLE PRECISION :: areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-    DOUBLE PRECISION ::   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+    DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+    DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
     !! # This should be refratio*refratio.
     INTEGER :: rr2
@@ -323,11 +325,11 @@ subroutine fclaw3dx_clawpatch46_fort_average2coarse(mx,my,mz,mbc,meqn, &
                         vf_sum = 0
                         do m = 0,r2-1
                             qf = qfine(i2(m),j2(m),k,mq)
-                            kf = areafine(i2(m),j2(m))
+                            kf = volfine(i2(m),j2(m),k)
                             sum = sum + kf*qf
                             vf_sum = vf_sum + kf
                         enddo
-                        !! kc = areacoarse(i1,j1,k)
+                        !!kc = volcoarse(i1,j1,k)
                         qcoarse(i1,j1,k,mq) = sum/vf_sum
                     else
                         sum = 0

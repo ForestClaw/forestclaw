@@ -41,6 +41,9 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
     integer :: icom, jcom, kcom
     common /comxyt/ dtcom,dxcom,dycom,dzcom, tcom,icom,jcom, kcom
 
+    integer jfix, kfix
+    double precision kappa
+
     ierror = 0
 
     !! This should be set to actual time, in case the user wants it
@@ -114,5 +117,25 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
             enddo
         enddo
     end do
+
+    return
+
+    jfix = 4
+    kfix = 4
+    do i = 3,3
+        if (mcapa .eq. 0) then
+            write(6,211) i, (fm(m,i,jfix,kfix)*dtdx,m=1,5)
+            write(6,211) i, (gm(m,i,jfix,kfix)*dtdy,m=1,5)
+            write(6,211) i, (hm(m,i,jfix,kfix)*dtdz,m=1,5)
+            write(6,*) ' '
+        else
+            kappa = aux(i,jfix,kfix,mcapa)
+            write(6,211) i, (fm(m,i,jfix,kfix)*dtdx/kappa,m=1,5)
+            write(6,211) i, (gm(m,i,jfix,kfix)*dtdy/kappa,m=1,5)
+            write(6,211) i, (hm(m,i,jfix,kfix)*dtdz/kappa,m=1,5)
+            write(6,*) ' '
+        endif
+    enddo
+211 format(I5,5E24.16)
 
 end subroutine clawpack46_step3_wrap

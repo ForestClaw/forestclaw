@@ -10,10 +10,11 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
     double precision :: q(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
     integer :: i,j,k, mq
-    double precision :: qmin(meqn), qmax(meqn)
 
     integer :: exceeds_th, fclaw3dx_clawpatch_tag_criteria
     integer :: ii,jj,kk
+
+    double precision :: qmin(meqn), qmax(meqn)
     double precision :: xc,yc,zc, quad(-1:1,-1:1,-1:1,meqn), qval(meqn)
 
     logical(kind=4) :: is_ghost, clawpatch3_is_ghost
@@ -21,10 +22,8 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
     !! # Assume that we won't refine      
     tag_patch = 0
 
-    !! # Default : Refinement based only on first variable in system.  
-    !! # Users can modify this by creating a local copy of this routine
-    !! # and the corresponding tag4coarsening routine.
-
+    !! Tagging is based on clawpatch option `threshold_variable`.  This variable is passed to 
+    !! refinement criteria routines in `tag_criteria`, below.
     do mq = 1,meqn
         qmin(mq) = q(1,1,1,mq)
         qmax(mq) = q(1,1,1,mq)
@@ -41,6 +40,9 @@ subroutine fclaw3dx_clawpatch46_fort_tag4refinement(mx,my,mz,mbc, &
                     qmax(mq) = max(qmax(mq),q(i,j,k,mq))
                 end do
                 is_ghost = clawpatch3_is_ghost(i,j,k, mx,my,mz)
+                do mq = 1,meqn       
+                    qval(mq) = q(i,j,k,mq)
+                enddo
                 if (.not. is_ghost) then
                     do jj = -1,1
                         do ii = -1,1
