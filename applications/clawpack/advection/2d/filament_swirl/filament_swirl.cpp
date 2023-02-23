@@ -128,7 +128,7 @@ void swirl_finalize(fclaw2d_global_t* glob)
 
 typedef struct overlap_prodata
 {
-  double              myvalue;
+  double              myvalue[7];
   int                 isset;
 }
 overlap_prodata_t;
@@ -199,7 +199,7 @@ void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
             op->lnum = c->cell_idx++;   /* local index of the cell */
             op->prodata.isset = 0;
-            op->prodata.myvalue = -1;
+            memset (op->prodata.myvalue, -1, 7 * sizeof (double));
 
             /* choose the middle point of the cell */
             op->xy[0] = xlower + (2 * i + 1) * dx / 2.;
@@ -337,10 +337,13 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
              * patch or on a specific cell in the patch) and store the resulting
              * data in the point-struct here. */
             op->prodata.isset++;
-            op->prodata.myvalue = (double) domain->mpirank;
+
+            /* dummy result: mpirank and 6 x zero */
+            memset (op->prodata.myvalue, 0, 7 * sizeof (double));
+            op->prodata.myvalue[0] = (double) domain->mpirank;
             fclaw_debugf
                 ("Setting interpolation data of point [%f,%f] to %f.\n",
-                 op->xy[0], op->xy[1], op->prodata.myvalue);
+                 op->xy[0], op->xy[1], op->prodata.myvalue[0]);
         }
     }
 
@@ -360,7 +363,7 @@ void output_query_points (overlap_consumer_t * c)
         fclaw_infof
             ("Query point %ld on process %d is [%f,%f] and has interpolation data %f.\n",
              iz, c->domain->mpirank, op->xy[0], op->xy[1],
-             op->prodata.myvalue);
+             op->prodata.myvalue[0]);
 
     }
 }
