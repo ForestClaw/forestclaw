@@ -165,7 +165,7 @@ void apply_consumer_mapping (overlap_point_t * op)
      * this step as well. */
 
   /* placeholder: now xy becomes MAGIC coordinates.  This is a dummy action: */
-  op->xy[2] = 0.;
+  op->xy[2] = 0.5;   /* swirl 2D is placed at z=0.5 in MAGIC physical */
 }
 
 static
@@ -204,7 +204,7 @@ void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             /* choose the middle point of the cell */
             op->xy[0] = xlower + (2 * i + 1) * dx / 2.;
             op->xy[1] = ylower + (2 * j + 1) * dy / 2.;
-            op->xy[2] = 0.;   /* not used in forestclaw coordinates */
+            op->xy[2] = 0.;  /* swirl reference is 2D; unused */
 
             /* map cell midpoint from reference to MAGIC coordinate system */
             apply_consumer_mapping (op);
@@ -242,8 +242,9 @@ void create_query_points (overlap_consumer_t * c)
 static
 int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3])
 {
-    /* check, if the point lies in the filament domain. */
-    if (op->xy[0] < 0. || op->xy[0] > 2. || op->xy[1] < 0. || op->xy[1] > 2.)
+    /* check, if the point lies in the filament domain: do this properly */
+    if (op->xy[0] < 0. || op->xy[0] > 2. || op->xy[1] < 0. || op->xy[1] > 2. ||
+        op->xy[2] < 0. || op->xy[2] > 1.)   /* filament extruded to [0, 1] */
     {
         return 0;
     }
@@ -253,7 +254,7 @@ int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3])
      * linear mapping to the [0,2]x[0,2]-block. */
     xy[0] = op->xy[0] / 2;
     xy[1] = op->xy[1] / 2;
-    /* do nothing with xy[2] */
+    xy[2] = op->xy[2];      /* z coordinate identity transformation here */
 
     return 1; /* the point lies in the domain */
 }
@@ -263,7 +264,7 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                          int blockno, int patchno, void *point, void *user)
 {
     overlap_point_t *op;
-    double xy[3];
+    double xy[3];   /* this is 3D extruded reference for filament */
     double tol;
     int consumer_side;
 
@@ -281,7 +282,7 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         return 0;
     }
 
-    /* check, if we are on the consumer or the producer side */
+    /* check, if we are on the consumer or the producer side (boolean) */
     consumer_side = domain_is_meta (domain);
 
     /* set tolerances */
@@ -299,8 +300,10 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
     /* we check if the query point intersects the patch */
     if ((xy[0] < patch->xlower - tol || xy[0] > patch->xupper + tol)
-        || (xy[1] < patch->ylower - tol || xy[1] > patch->yupper + tol))
+        || (xy[1] < patch->ylower - tol || xy[1] > patch->yupper + tol)
+        || (xy[2] < 0. - tol || xy[2] > 1. + tol))     /* extruded reference is [0, 1] */
     {
+        /* this IS the actual check for overlapping a point with a patch. */
         return 0;
     }
 
@@ -316,7 +319,8 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     xy[0] = SC_MIN (xy[0], 1.);
     xy[1] = SC_MAX (xy[1], 0.);
     xy[1] = SC_MIN (xy[1], 1.);
-    /* xy[2] not touched in *our* initial demo */
+    xy[2] = SC_MAX (xy[2], 0.);
+    xy[2] = SC_MIN (xy[2], 1.);
 
     /* update interpolation data */
     if (patchno >= 0)
