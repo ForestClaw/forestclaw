@@ -32,6 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_forestclaw.h>
 
+static void 
+output_expected_values(fclaw2d_global_t* glob, const fclaw_options_t* gparms)
+{
+    //
+}
 /* ------------------------------------------------------------------
    Public interface
    ---------------------------------------------------------------- */
@@ -59,6 +64,10 @@ void fclaw2d_finalize(fclaw2d_global_t* glob)
         {
             fclaw_global_essentialf("Timing reports not generated for outstyle=0\n");
         }
+    }
+    if (gparms->regression_check)
+    {
+        output_expected_values(glob, gparms);
     }
     fclaw2d_domain_reset(glob);
 }
