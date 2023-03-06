@@ -23,6 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/* This example demonstrates the use of fclaw2d_overlap_exchange to exchange
+ * interpolation data between two meshes.
+ * Both meshes have a clearly assigned role:
+ *  consumer (e.g. Gemini) - queries data for points - represented by swirl
+ *  producer (e.g. MAGIC) - provides data - represented by filament. */
+
 #include "filament/filament_user.h"
 #include "swirl/swirl_user.h"
 #include "user.h"
@@ -155,17 +161,15 @@ static
 void apply_consumer_mapping (overlap_point_t * op)
 {
     /* Here, we would need to apply the mapping of the consumer domain
-     * (in this example the swirl domain) to the point in MAGIC coordinates.
-     * Since the swirl domain
-     * is mapped to the unit square, we do nothing.
+     * (in this example the swirl domain) to map the point from the
+     * forestclaw reference domain to the physical domain.
+     * Since the swirl domain is mapped to the unit square, we do nothing.
      * Furthermore, a conversion from the consumer to the producer coordinate
      * system needs to be applied to the points either here or in the
-     * interpolation callback. Since both consumer side (swirl) and producer
-     * side (filament) map to the same cartesian coordinate system, we can omit
-     * this step as well. */
-
-  /* placeholder: now xy becomes MAGIC coordinates.  This is a dummy action: */
-  op->xy[2] = 0.5;   /* swirl 2D is placed at z=0.5 in MAGIC physical */
+     * interpolation callback.
+     * For this, we map from the 2D swirl physical domain to the 3D filament
+     * physical domain by setting z = 0.5 as a dummy action. */
+    op->xy[2] = 0.5;   /* swirl 2D is placed at z=0.5 in producer physical */
 }
 
 static
@@ -199,16 +203,16 @@ void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
             op->lnum = c->cell_idx++;   /* local index of the cell */
             op->prodata.isset = 0;
-            memset (op->prodata.myvalue, -1, 7 * sizeof (double));
 
             /* choose the middle point of the cell */
             op->xy[0] = xlower + (2 * i + 1) * dx / 2.;
             op->xy[1] = ylower + (2 * j + 1) * dy / 2.;
             op->xy[2] = 0.;  /* swirl reference is 2D; unused */
 
-            /* map cell midpoint from reference to MAGIC coordinate system */
+            /* map cell midpoint from consumer reference to producer physical
+             * coordinate system */
             apply_consumer_mapping (op);
-            /* now xy is in MAGIC 3D coordinate frame */
+            /* now xy is in 3D producer coordinate frame */
         }
     }
 }
@@ -226,17 +230,16 @@ void create_query_points (overlap_consumer_t * c)
     c->cell_idx = 0;
     fclaw2d_domain_iterate_patches (c->domain, add_cell_centers, c);
 
+    /* verify that we created as many query_points as expected */
+    FCLAW_ASSERT (c->cell_idx ==
+                  (size_t) c->domain->local_num_patches *
+                  c->num_cells_in_patch);
 #else
     /* Alternatively, supposing there is an input array in memory "pointer"
        of sizeof (overlap_point_t) * some_number_of_points, we just view it. */
     c->query_points = sc_array_new_data (pointer, sizeof (overlap_point_t),
                                          some_number_of_points);
 #endif
-
-    /* verify that we created as many query_points as expected */
-    FCLAW_ASSERT (c->cell_idx ==
-                  (size_t) c->domain->local_num_patches *
-                  c->num_cells_in_patch);
 }
 
 static
@@ -331,8 +334,9 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             /* We update the query point by setting its interpolation data.
              * We increment isset, to keep track of how many local patches
              * contributed to the points interpolation data.
-             * We set myvalue to the mpirank of the domain for simplicity and
+             * We set myvalue[0] to the mpirank of the domain for simplicity and
              * easy verification of the interpolation data at the end.
+             * The remaining entries of myvalue are set to 0.
              * In practice, one should implement actual interpolation (on the
              * patch or on a specific cell in the patch) and store the resulting
              * data in the point-struct here. */
@@ -464,7 +468,6 @@ main (int argc, char **argv)
         create_query_points (c);
 
         /* obtain interpolation data of the points from the producer side */
-        /* in this case MAGIC is the producer (represented by filament). */
         fclaw2d_overlap_exchange (filament_glob->domain, c->query_points,
                                   overlap_interpolate, NULL);
 
