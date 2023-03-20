@@ -117,7 +117,12 @@ output_expected_values(fclaw2d_global_t* glob, const char* filename)
             exit(FCLAW_EXIT_ERROR);
         }
 
-        read_input_and_check(file, "amr_advance_steps,%d", glob->count_amr_advance);
+        int num_failures = 0;
+        num_failures += read_input_and_check(file, "amr_advance_steps,%d", glob->count_amr_advance);
+
+        if(num_failures > 0){
+            exit(1);
+        }
 
         // close file
         fclose(file);
