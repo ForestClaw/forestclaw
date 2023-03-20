@@ -43,7 +43,7 @@ static void write_output(FILE* file, const char* format, ...)
 
     if(fprintf_value < 0)
     {
-        fclaw_global_essentialf("Failed to write to output file");
+        fclaw_global_essentialf("Failed to write to output file\n");
         exit(1);
     }
 }
@@ -60,14 +60,14 @@ static int read_input_and_check(FILE* file, const char* name, int actual)
 
     if(fprintf_value < 0)
     {
-        fclaw_global_essentialf("Failed to write to output file");
+        fclaw_global_essentialf("Failed to write to output file\n");
         exit(1);
     }
 
     int failure = 0;
     if(expected != actual)
     {
-        fclaw_global_essentialf("Expected %s to be %d, but was %d", name, expected, actual);
+        fclaw_global_essentialf("Expected %s to be %d, but was %d\n", name, expected, actual);
         failure = 1;
     }
 
