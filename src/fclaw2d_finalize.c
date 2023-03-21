@@ -101,8 +101,9 @@ output_expected_values(fclaw2d_global_t* glob, const char* filename)
         }
 
         //write amr_dvance in fortran style output
-        write_output(file, "amr_advance_steps,%d\n", glob->count_amr_advance);
+        write_output(file, "count_amr_advance,%d\n", glob->count_amr_advance);
         write_output(file, "global_num_patches,%d\n", glob->domain->global_num_patches);
+        write_output(file, "count_amr_new_domain,%d\n", glob->count_amr_new_domain);
 
         //close file
         fclose(file);
@@ -118,8 +119,9 @@ output_expected_values(fclaw2d_global_t* glob, const char* filename)
         }
 
         int num_failures = 0;
-        num_failures += read_input_and_check(file, "amr_advance_steps", glob->count_amr_advance);
+        num_failures += read_input_and_check(file, "count_amr_advance", glob->count_amr_advance);
         num_failures += read_input_and_check(file, "global_num_patches", glob->domain->global_num_patches);
+        num_failures += read_input_and_check(file, "count_amr_new_domain", glob->count_amr_new_domain);
 
         if(num_failures > 0){
             exit(1);

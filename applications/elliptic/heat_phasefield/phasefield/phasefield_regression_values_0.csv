@@ -1,2 +1,3 @@
-amr_advance_steps,1
+count_amr_advance,1
 global_num_patches,64
+count_amr_new_domain,0
