@@ -41,7 +41,7 @@ char* fclaw_cwd()
     FCLAW_ASSERT(error != NULL);
     return c_current_path;
 #else
-    std::string current_path = std::filesystem::current_path();
+    std::string current_path = std::filesystem::current_path().generic_string();
     char* c_current_path = FCLAW_ALLOC(char, current_path.length()+1);
     strcpy(c_current_path,current_path.c_str());
     return c_current_path;
@@ -71,4 +71,3 @@ void fclaw_cd(const char* dir)
 	std::filesystem::current_path(output_path);
 #endif
 }
-
