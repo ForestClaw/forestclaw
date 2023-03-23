@@ -66,7 +66,7 @@ void fclaw_cd(const char* dir)
         output_path /= output_dir;
     }
 
-	std::filesystem::create_directory(output_path);
+	std::filesystem::create_directories(output_path);
 
 	std::filesystem::current_path(output_path);
 #endif
