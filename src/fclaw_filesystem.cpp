@@ -25,35 +25,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_filesystem.h>
 #include <fclaw_base.h>
-#if __APPLE__ || __linux__
-#include <unistd.h>
-#else
+
+// check if C++17 filesystem is available
+#if defined(__has_include) && __has_include(<filesystem>)
 #include <filesystem>
+#endif
+
+#ifdef __cpp_lib_filesystem
 #include <string>
 #include <cstring>
+#else
+#include <unistd.h>
 #endif
 
 char* fclaw_cwd()
 {
-#if __APPLE__ || __linux__
+#ifdef __cpp_lib_filesystem
+    std::string current_path = std::filesystem::current_path().generic_string();
+    char* c_current_path = FCLAW_ALLOC(char, current_path.length()+1);
+    std::strcpy(c_current_path, current_path.c_str());
+    return c_current_path;
+#else
     char* c_current_path = FCLAW_ALLOC(char,PATH_MAX+1);
     char* error = getcwd(c_current_path,PATH_MAX+1);
     FCLAW_ASSERT(error != NULL);
-    return c_current_path;
-#else
-    std::string current_path = std::filesystem::current_path().generic_string();
-    char* c_current_path = FCLAW_ALLOC(char, current_path.length()+1);
-    strcpy(c_current_path,current_path.c_str());
     return c_current_path;
 #endif
 }
 
 void fclaw_cd(const char* dir)
 {
-#if __APPLE__ || __linux__
-    int error = chdir(dir);
-    FCLAW_ASSERT(error == 0);
-#else
+#ifdef __cpp_lib_filesystem
+    // create "dir" including parents if it doesn't exist
     std::filesystem::path output_dir(dir);
 	std::filesystem::path output_path;
     if(output_dir.is_absolute())
@@ -69,5 +72,8 @@ void fclaw_cd(const char* dir)
 	std::filesystem::create_directories(output_path);
 
 	std::filesystem::current_path(output_path);
+#else
+    int error = chdir(dir);
+    FCLAW_ASSERT(error == 0);
 #endif
 }
